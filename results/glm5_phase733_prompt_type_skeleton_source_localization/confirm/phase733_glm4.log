@@ -1,0 +1,120 @@
+[20:33:21] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[20:33:21] [load] glm4: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[20:33:21] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:47,  9.29it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:04, 103.22it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 175.74it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 216.73it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 246.60it/s]Loading weights:  36%|███▌      | 158/443 [00:00<00:01, 260.84it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 278.54it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 287.12it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 286.30it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 294.44it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 297.06it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 298.64it/s]Loading weights:  88%|████████▊ | 388/443 [00:01<00:00, 298.01it/s]Loading weights:  95%|█████████▌| 422/443 [00:01<00:00, 305.22it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 265.44it/s]
+[20:33:23] [load] glm4: loaded attn=sdpa, device=cuda:0, gpu=18.80GB
+[20:33:23] glm4/confirm: scan_cases=66, pairs=18
+[20:33:23] scan 6/66 cases; current_sites=160
+[20:33:24] scan 12/66 cases; current_sites=160
+[20:33:24] scan 18/66 cases; current_sites=160
+[20:33:24] scan 24/66 cases; current_sites=160
+[20:33:24] scan 30/66 cases; current_sites=160
+[20:33:24] scan 36/66 cases; current_sites=160
+[20:33:25] scan 42/66 cases; current_sites=160
+[20:33:25] scan 48/66 cases; current_sites=160
+[20:33:25] scan 54/66 cases; current_sites=160
+[20:33:25] scan 60/66 cases; current_sites=160
+[20:33:26] scan 66/66 cases; current_sites=160
+[20:33:26] glm4/confirm: candidate_sites=['L31_layer_input', 'L39_layer_input', 'L23_attn_out', 'L35_attn_out', 'L38_mlp_out', 'L39_mlp_out', 'hidden_39', 'hidden_40']
+[20:33:46] transfer 6/18 pairs; rows=96
+[20:34:08] transfer 12/18 pairs; rows=192
+[20:34:30] transfer 18/18 pairs; rows=288
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "attn": "sdpa",
+  "formation": {
+    "layer_input": {
+      "max_site": "L39_layer_input",
+      "max_layer": 39,
+      "max_effect_norm": 125.97782897949219,
+      "earliest_35pct_site": "L31_layer_input",
+      "earliest_35pct_layer": 31,
+      "earliest_35pct_effect_norm": 44.54254150390625
+    },
+    "attn_out": {
+      "max_site": "L35_attn_out",
+      "max_layer": 35,
+      "max_effect_norm": 11.560429573059082,
+      "earliest_35pct_site": "L23_attn_out",
+      "earliest_35pct_layer": 23,
+      "earliest_35pct_effect_norm": 5.785955429077148
+    },
+    "mlp_out": {
+      "max_site": "L39_mlp_out",
+      "max_layer": 39,
+      "max_effect_norm": 156.7176055908203,
+      "earliest_35pct_site": "L38_mlp_out",
+      "earliest_35pct_layer": 38,
+      "earliest_35pct_effect_norm": 75.31871795654297
+    },
+    "layer_out": {
+      "max_site": "hidden_40",
+      "max_layer": 39,
+      "max_effect_norm": 228.9594268798828,
+      "earliest_35pct_site": "hidden_39",
+      "earliest_35pct_layer": 38,
+      "earliest_35pct_effect_norm": 125.97782897949219
+    }
+  },
+  "top_transfer": [
+    [
+      "commonsense<-explicit|L31_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 31,
+        "n": 18,
+        "mean_patched_delta_vs_recipient": 2.004255568401681,
+        "changed_rate": 0.2777777777777778,
+        "recipient_hit_rate": 0.9444444444444444,
+        "patched_hit_rate": 0.8888888888888888,
+        "hit_gain": 0.05555555555555555,
+        "hit_loss": 0.1111111111111111
+      }
+    ],
+    [
+      "explicit<-commonsense|L31_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 31,
+        "n": 18,
+        "mean_patched_delta_vs_recipient": -2.4792529272122517,
+        "changed_rate": 0.2777777777777778,
+        "recipient_hit_rate": 1.0,
+        "patched_hit_rate": 0.8333333333333334,
+        "hit_gain": 0.0,
+        "hit_loss": 0.16666666666666666
+      }
+    ],
+    [
+      "commonsense<-explicit|L39_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 39,
+        "n": 18,
+        "mean_patched_delta_vs_recipient": 2.3350928721742497,
+        "changed_rate": 0.16666666666666666,
+        "recipient_hit_rate": 0.9444444444444444,
+        "patched_hit_rate": 1.0,
+        "hit_gain": 0.05555555555555555,
+        "hit_loss": 0.0
+      }
+    ],
+    [
+      "explicit<-commonsense|L39_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 39,
+        "n": 18,
+        "mean_patched_delta_vs_recipient": -2.344290593639016,
+        "changed_rate": 0.16666666666666666,
+        "recipient_hit_rate": 1.0,
+        "patched_hit_rate": 0.9444444444444444,
+        "hit_gain": 0.0,
+        "hit_loss": 0.05555555555555555
+      }
+    ]
+  ]
+}

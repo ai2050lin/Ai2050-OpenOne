@@ -1,0 +1,157 @@
+[22:21:33] qwen3/smoke: pairs=2 target_site=hidden_36 attention=1 mlp=1
+[22:21:34] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   5%|▌         | 20/398 [00:00<00:01, 195.89it/s]Loading weights:  22%|██▏       | 89/398 [00:00<00:00, 460.42it/s]Loading weights:  39%|███▉      | 157/398 [00:00<00:00, 547.67it/s]Loading weights:  54%|█████▍    | 214/398 [00:00<00:00, 550.62it/s]Loading weights:  70%|███████   | 279/398 [00:00<00:00, 577.62it/s]Loading weights:  86%|████████▌ | 343/398 [00:00<00:00, 570.10it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 561.61it/s]
+[22:21:35] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[22:21:35] qwen3: attention source specs=1 layers=[35]
+[22:21:35] qwen3: attention source validation 1/2 pairs; rows=11
+[22:21:36] qwen3: attention source validation 2/2 pairs; rows=22
+[22:21:36] qwen3: mlp fine specs=2 from coarse=1, subgroups=2
+[22:21:36] qwen3: mlp fine decomposition 1/2 pairs; rows=2
+[22:21:36] qwen3: mlp fine decomposition 2/2 pairs; rows=4
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "target_site": "hidden_36",
+  "top_attention_source_paths": [
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L35H0",
+      "layer": 35,
+      "head": 0,
+      "source_group": "self_last",
+      "n": 2,
+      "mean_source_token_count": 1.0,
+      "mean_attention_mass": 0.951171875,
+      "mean_direct_source_projection": 13.237706661224365,
+      "mean_direct_source_norm": 46.24553871154785,
+      "mean_explicit_skeleton_loss": 11.225157260894775,
+      "mean_explicit_logprob_delta": -0.014364585280418396,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 56.606367111206055,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 12.181909561157227,
+      "holdout_mean_explicit_logprob_delta": -0.030930854380130768,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L35H0",
+      "layer": 35,
+      "head": 0,
+      "source_group": "answer_prefix",
+      "n": 2,
+      "mean_source_token_count": 1.0,
+      "mean_attention_mass": 0.005889892578125,
+      "mean_direct_source_projection": 0.09570812433958054,
+      "mean_direct_source_norm": 0.36082446575164795,
+      "mean_explicit_skeleton_loss": 0.2338078806642443,
+      "mean_explicit_logprob_delta": 0.00015101023018360138,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 1.957368552684784,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 0.47162702679634094,
+      "holdout_mean_explicit_logprob_delta": 0.0003058016300201416,
+      "role_guess": "source_state_contributor"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L35H0",
+      "layer": 35,
+      "head": 0,
+      "source_group": "question",
+      "n": 2,
+      "mean_source_token_count": 9.0,
+      "mean_attention_mass": 0.008254289627075195,
+      "mean_direct_source_projection": 0.036903864704072475,
+      "mean_direct_source_norm": 0.20465601980686188,
+      "mean_explicit_skeleton_loss": 0.037167346104979515,
+      "mean_explicit_logprob_delta": 9.71965491771698e-05,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 1.1133062839508057,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 0.018543895334005356,
+      "holdout_mean_explicit_logprob_delta": -1.3113021850585938e-06,
+      "role_guess": "source_state_contributor"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L35H0",
+      "layer": 35,
+      "head": 0,
+      "source_group": "records_other",
+      "n": 2,
+      "mean_source_token_count": 32.0,
+      "mean_attention_mass": 0.0023325495421886444,
+      "mean_direct_source_projection": 0.03635151870548725,
+      "mean_direct_source_norm": 0.1042877808213234,
+      "mean_explicit_skeleton_loss": 0.03151838295161724,
+      "mean_explicit_logprob_delta": 0.002292528748512268,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 0.8187545835971832,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 0.043162234127521515,
+      "holdout_mean_explicit_logprob_delta": 9.834766387939453e-07,
+      "role_guess": "source_state_contributor"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L35H0",
+      "layer": 35,
+      "head": 0,
+      "source_group": "records_all",
+      "n": 2,
+      "mean_source_token_count": 38.0,
+      "mean_attention_mass": 0.0026909224689006805,
+      "mean_direct_source_projection": 0.040665934793651104,
+      "mean_direct_source_norm": 0.11845287680625916,
+      "mean_explicit_skeleton_loss": 0.024289320223033428,
+      "mean_explicit_logprob_delta": 0.0022899769246578217,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 0.8592124879360199,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 0.021076248958706856,
+      "holdout_mean_explicit_logprob_delta": 1.6316771507263184e-06,
+      "role_guess": "source_state_contributor"
+    }
+  ],
+  "top_mlp_fine_candidates": [
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L28:mlp[256:384]",
+      "coarse_component_id": "L28:mlp[256:512]",
+      "layer": 28,
+      "start": 256,
+      "end": 384,
+      "width": 128,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 7.984606742858887,
+      "mean_explicit_logprob_delta": 0.006730860099196434,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 23.934998512268066,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 9.749704360961914,
+      "holdout_mean_explicit_logprob_delta": 0.0074289292097091675,
+      "role_guess": "fine_mlp_state_contributor"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L28:mlp[384:512]",
+      "coarse_component_id": "L28:mlp[256:512]",
+      "layer": 28,
+      "start": 384,
+      "end": 512,
+      "width": 128,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 5.122286796569824,
+      "mean_explicit_logprob_delta": -0.0043935514986515045,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 19.4602689743042,
+      "holdout_n": 1,
+      "holdout_mean_explicit_skeleton_loss": 3.282926559448242,
+      "holdout_mean_explicit_logprob_delta": -0.010862261056900024,
+      "role_guess": "fine_mlp_writer_candidate"
+    }
+  ]
+}

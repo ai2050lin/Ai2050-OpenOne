@@ -1,0 +1,77 @@
+[00:04:57] deepseek7b/smoke: pairs=1 target=hidden_28 audits=2
+[00:04:58] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 4/339 [00:00<00:09, 36.27it/s]Loading weights:   9%|▉         | 30/339 [00:00<00:01, 161.38it/s]Loading weights:  17%|█▋        | 59/339 [00:00<00:01, 215.33it/s]Loading weights:  26%|██▌       | 87/339 [00:00<00:01, 235.70it/s]Loading weights:  37%|███▋      | 124/339 [00:00<00:00, 282.33it/s]Loading weights:  45%|████▌     | 153/339 [00:00<00:00, 273.90it/s]Loading weights:  53%|█████▎    | 181/339 [00:00<00:00, 266.52it/s]Loading weights:  62%|██████▏   | 210/339 [00:00<00:00, 267.57it/s]Loading weights:  72%|███████▏  | 244/339 [00:00<00:00, 262.14it/s]Loading weights:  80%|███████▉  | 271/339 [00:01<00:00, 262.79it/s]Loading weights:  89%|████████▉ | 303/339 [00:01<00:00, 273.83it/s]Loading weights:  98%|█████████▊| 331/339 [00:01<00:00, 264.59it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 257.90it/s]
+[00:05:00] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[00:05:01] deepseek7b: readout audit 1/1 pairs; rows=2
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "target_site": "hidden_28",
+  "top_readout_audits": [
+    {
+      "intervention_key": "mlp_only|no_source|L27:mlp[2872:2932] conflict<-explicit",
+      "intervention_label": "mlp_only|no_source|L27:mlp[2872:2932]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "mlp_only",
+      "source_component_id": null,
+      "source_group": null,
+      "mlp_components": [
+        "L27:mlp[2872:2932]"
+      ],
+      "n": 1,
+      "mean_token0_donor_logprob_delta": -0.0027036666870117188,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.0,
+      "mean_token0_patched_margin_donor_vs_recipient": -7.8125,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -7.8125,
+      "mean_token0_donor_rank_delta": 0.0,
+      "mean_token0_patched_donor_rank": 52.0,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": null,
+      "mean_mlp_delta_norm_total": 23.251718521118164
+    },
+    {
+      "intervention_key": "mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+      "intervention_label": "mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "mlp_all",
+      "source_component_id": null,
+      "source_group": null,
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 1,
+      "mean_token0_donor_logprob_delta": -0.02231884002685547,
+      "mean_token0_margin_delta_donor_vs_recipient": -0.0625,
+      "mean_token0_patched_margin_donor_vs_recipient": -7.875,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -7.875,
+      "mean_token0_donor_rank_delta": -2.0,
+      "mean_token0_patched_donor_rank": 50.0,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": null,
+      "mean_mlp_delta_norm_total": 32.102128982543945
+    }
+  ]
+}

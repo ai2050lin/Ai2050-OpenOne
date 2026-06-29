@@ -1,0 +1,81 @@
+[08:12:55] qwen3/smoke: pairs=1 target=hidden_36 audits=1 combo_candidates=2
+[08:12:56] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 250.03it/s]Loading weights:  23%|██▎       | 90/398 [00:00<00:00, 473.09it/s]Loading weights:  36%|███▋      | 145/398 [00:00<00:00, 503.51it/s]Loading weights:  53%|█████▎    | 212/398 [00:00<00:00, 549.72it/s]Loading weights:  67%|██████▋   | 267/398 [00:00<00:00, 499.63it/s]Loading weights:  87%|████████▋ | 348/398 [00:00<00:00, 595.42it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 553.73it/s]
+[08:12:57] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[08:12:58] qwen3: competitor suppression audit 1/1 pairs; rows=3
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "suppression_scale": 0.0,
+      "n": 1,
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 8.0,
+      "mean_margin_donor_vs_top": -7.25,
+      "mean_margin_donor_vs_recipient": -7.25,
+      "mean_suppression_alpha_needed": 4.8802532062230775,
+      "top_token_class_counts": {
+        "recipient_answer": 1
+      },
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "suppressed_token_class_counts": {
+        "recipient_answer": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 3.0,
+      "mean_margin_donor_vs_top": -1.75,
+      "mean_margin_donor_vs_recipient": -0.125,
+      "mean_suppression_alpha_needed": 4.8802532062230775,
+      "top_token_class_counts": {
+        "format_or_schema": 1
+      },
+      "top_token_counts": {
+        " The": 1
+      },
+      "suppressed_token_class_counts": {
+        "recipient_answer": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 2.0,
+      "mean_margin_donor_vs_top": -0.875,
+      "mean_margin_donor_vs_recipient": 1.75,
+      "mean_suppression_alpha_needed": 4.8802532062230775,
+      "top_token_class_counts": {
+        "format_or_schema": 1
+      },
+      "top_token_counts": {
+        " The": 1
+      },
+      "suppressed_token_class_counts": {
+        "recipient_answer": 1
+      }
+    }
+  ],
+  "suppressed_class_summary": [
+    {
+      "suppressed_token_class": "recipient_answer",
+      "n": 1,
+      "mean_margin_donor_vs_top": -7.25,
+      "mean_suppression_alpha_needed": 4.8802532062230775,
+      "top_token_counts": {
+        " fruit": 1
+      }
+    }
+  ]
+}

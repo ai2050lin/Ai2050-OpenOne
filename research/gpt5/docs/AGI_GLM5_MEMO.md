@@ -3219,3 +3219,3917 @@ Phase 732: Full-Path Atlas Causal Edge Validation
 ```text
 从局部 patch 研究，升级为全路径功能图谱工程。
 ```
+
+## Phase 732: Full-Path Atlas Causal Edge Validation [2026-06-28 20:09]
+
+### 输入内容判断
+
+本阶段分析的 Phase 731 复盘材料总体正确。它指出 Phase 731 的范式切换是必要的，但必须严格降级理解：
+
+```text
+Phase 731 = descriptive atlas v0
+not causal atlas
+not neuron-level global atlas
+```
+
+材料中最重要的判断是正确的：
+
+```text
+prompt_type / knowledge source skeleton
+是当前 apple-fruit-attribute 微世界中最强的全路径因素。
+```
+
+因此 Phase 732 不继续扩大单点 channel / head 搜索，而是把 Phase 731 的描述性边转成少量因果边验证。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase732_full_path_atlas_causal_edge_validation.py
+tests/gpt5/run_phase732_full_path_atlas_causal_edge_validation_full.sh
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase732_full_path_atlas_causal_edge_validation.py
+python tests/gpt5/phase732_full_path_atlas_causal_edge_validation.py --dry-run
+bash tests/gpt5/run_phase732_full_path_atlas_causal_edge_validation_full.sh
+```
+
+三个模型按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。
+
+### 测试原理
+
+Phase 732 验证三类边：
+
+```text
+1. prompt_type skeleton -> late hidden / MLP
+   用 explicit_profile 与 commonsense 配对 prompt，
+   在关键 late site 做 donor state replacement。
+
+2. candidate head -> readout
+   对 Phase 731 的候选 head 做整头消融，
+   测 phrase likelihood 和 natural generation 是否变化。
+
+3. DS7B L20H17 -> L24_mlp_out
+   消融 L20H17，
+   测 L24_mlp_out、final logits 和 category likelihood 的变化。
+```
+
+prompt transfer 公式：
+
+```text
+h_v^{commonsense}
+← h_v^{explicit}
+```
+
+若 target likelihood 提升并且 generation 改变，说明 prompt_type skeleton 不是纯观察相关，而是能沿 late hidden / MLP site 改变输出路径。
+
+### 输出文件
+
+结果目录：
+
+```text
+results/glm5_phase732_full_path_atlas_causal_edge_validation/
+```
+
+核心文件：
+
+```text
+phase732_qwen3_prompt_transfer_rows.jsonl
+phase732_qwen3_head_ablation_rows.jsonl
+phase732_qwen3_summary.json
+
+phase732_glm4_prompt_transfer_rows.jsonl
+phase732_glm4_head_ablation_rows.jsonl
+phase732_glm4_summary.json
+
+phase732_deepseek7b_prompt_transfer_rows.jsonl
+phase732_deepseek7b_head_ablation_rows.jsonl
+phase732_deepseek7b_edge_mediation_rows.jsonl
+phase732_deepseek7b_summary.json
+
+phase732_cross_model_summary.json
+phase732_cross_model_summary.md
+phase732_atlas_graph.json
+```
+
+图谱输出：
+
+```text
+schema_version = atlas_graph_v1
+node_count = 55
+edge_count = 52
+```
+
+### 客观结果
+
+#### 1. prompt_type skeleton 因果替换
+
+qwen3：
+
+```text
+commonsense <- explicit @ hidden_35:
+  mean_delta = +3.259
+  changed_rate = 0.056
+  hit_rate: 0.944 -> 1.000
+  hit_gain = 0.056
+
+explicit <- commonsense @ hidden_35:
+  mean_delta = -3.698
+  changed_rate = 0.056
+  hit_rate: 1.000 -> 0.944
+  hit_loss = 0.056
+```
+
+GLM4：
+
+```text
+commonsense <- explicit @ hidden_39:
+  mean_delta = +2.374
+  changed_rate = 0.167
+  hit_rate: 0.944 -> 1.000
+  hit_gain = 0.056
+
+explicit <- commonsense @ hidden_39:
+  mean_delta = -2.387
+  changed_rate = 0.167
+  hit_rate: 1.000 -> 0.944
+  hit_loss = 0.056
+```
+
+DS7B：
+
+```text
+commonsense <- explicit @ L27_mlp_out:
+  mean_delta = +1.472
+  changed_rate = 0.667
+  hit_rate: 0.222 -> 0.389
+  hit_gain = 0.167
+
+commonsense <- explicit @ hidden_27:
+  mean_delta = +4.129
+  changed_rate = 0.889
+  hit_rate: 0.222 -> 0.444
+  hit_gain = 0.444
+  hit_loss = 0.222
+
+explicit <- commonsense @ hidden_27:
+  mean_delta = -4.559
+  changed_rate = 0.889
+  hit_rate: 0.667 -> 0.222
+  hit_loss = 0.556
+```
+
+结论：
+
+```text
+prompt_type / knowledge-source skeleton 是因果有效边，
+不是 Phase 731 中的纯描述性均值差。
+```
+
+但是 DS7B hidden_27 替换同时有 hit_gain 和 hit_loss，说明该 site 很强但很粗，替换会造成分布偏移。
+
+#### 2. 候选 head 必要性
+
+qwen3 最强 head edge：
+
+```text
+L24H29 / taste / explicit_profile:
+  mean_logprob_delta = -0.099
+  changed_rate = 0.000
+  hit_drop = 0.000
+```
+
+GLM4 最强 head edge：
+
+```text
+L24H19 / taste / commonsense:
+  mean_logprob_delta = -0.027
+  changed_rate = 0.000
+  hit_drop = 0.000
+```
+
+DS7B 最强 head edges：
+
+```text
+L20H17 / category / conflict_profile:
+  mean_logprob_delta = -1.957
+  rank_delta = +5.000
+  changed_rate = 0.250
+
+L20H17 / category / explicit_profile:
+  mean_logprob_delta = -0.929
+  rank_delta = +2.250
+  changed_rate = 0.333
+  hit_drop = 0.167
+
+L20H17 / category / commonsense:
+  mean_logprob_delta = -0.715
+  rank_delta = +8.667
+  changed_rate = 0.667
+
+L23H0 / taste / commonsense:
+  mean_logprob_delta = -0.911
+  rank_delta = +220.500
+```
+
+结论：
+
+```text
+qwen3 / GLM4 candidate heads 的因果必要性较弱；
+DS7B L20H17 是 category route 的强因果 head；
+DS7B L23H0 在 taste commonsense 中也有强 rank effect。
+```
+
+#### 3. DS7B L20H17 -> L24_mlp_out
+
+```text
+n = 22
+mean_source_delta_norm = 26.636
+mean_target_delta_norm = 32.777
+mean_source_target_delta_cos = -0.003
+mean_target_logprob_delta = -1.058
+mean_target_rank_delta = +4.500
+```
+
+结论：
+
+```text
+消融 L20H17 会显著改变 L24_mlp_out，
+并造成 category target likelihood 下降。
+```
+
+但是 source-target delta cosine 接近 0，说明这不是简单同方向线性传递，更像经过 MLP / residual 重写后的非线性变换。
+
+### 阶段结论
+
+Phase 732 至少验证了两类关键 causal edge：
+
+```text
+1. prompt_type skeleton -> late hidden / MLP site
+2. DS7B L20H17 -> category readout / L24_mlp_out
+```
+
+这把 Phase 731 从 descriptive atlas v0 推进到 causal edge atlas v0。
+
+当前图谱结构应更新为：
+
+```text
+prompt_type / knowledge-source skeleton
+  has causal control over late hidden / MLP state
+
+DS7B L20H17
+  is a causal category-route head
+
+L24_mlp_out
+  receives strong transformed perturbation from L20H17 ablation
+
+generation closure
+  still not fully closed, but causal edges are now visible
+```
+
+### 严格问题和硬伤
+
+```text
+1. site replacement 是强干预，可能造成分布偏移。
+2. hidden_27 / hidden_35 / hidden_39 很靠后，仍然偏 carrier，不是源点。
+3. prompt transfer 提升 likelihood，不等于完整生成修复。
+4. DS7B hidden_27 替换同时有 hit_gain 和 hit_loss，说明过粗。
+5. qwen3 / GLM4 head ablation 效应弱，说明它们可能更冗余或候选 head 不是必要点。
+6. L20H17 -> L24_mlp_out 的 cosine 接近 0，说明不能用线性方向解释。
+7. 当前仍是小模型结果，不能外推到大模型或人脑。
+```
+
+### 理论进展
+
+Phase 732 后，理论更明确：
+
+```text
+1. knowledge-source / prompt-type skeleton 是真实因果控制层。
+2. relation/category route 可以由特定 head 强因果支撑，DS7B 中是 L20H17。
+3. MLP/residual 不是简单传递，而是重写扰动。
+4. 语言编码机制必须用 causal edge graph，而不是只用 node importance。
+```
+
+当前最简链条：
+
+```text
+knowledge-source skeleton
+→ late residual / MLP state
+→ relation route head
+→ MLP nonlinear rewrite
+→ readout competition
+→ generation
+```
+
+### 下一步
+
+Phase 732 已经完成 causal edge validation v0。下一阶段仍属于同一大任务，但应继续收紧到：
+
+```text
+Phase 733: Prompt-Type Skeleton Source Localization
+
+目标：
+1. 不再只替换 late hidden。
+2. 向前追踪 prompt_type skeleton 的起点。
+3. 找到 commonsense / explicit / conflict 分离最早出现的层和组件。
+4. 区分 attention route、MLP rewrite、residual carrier 的先后顺序。
+5. 用更早层 site replacement 验证是否能保留 Phase 732 的因果效应。
+```
+
+核心问题：
+
+```text
+prompt_type skeleton 是在哪里被写入的？
+它是 attention 写入，MLP 写入，还是 residual 中逐层积累？
+```
+
+## Phase 733: Prompt-Type Skeleton Source Localization [2026-06-28 20:36]
+
+### 任务来源和判断
+
+用户给出的 Phase 732 分析基本正确：Phase 732 不是普通 patch 堆叠，而是把 Phase 731 的 descriptive atlas（描述性图谱）推进到 causal edge atlas v0（因果边图谱0版）。但必须收紧解释：late hidden replacement（晚期隐藏态替换）证明的是后段 carrier / controller（载体/控制器）有因果作用，不等于证明 prompt-type skeleton（提示类型骨架）的源点已经找到；DS7B L20H17 -> L24_mlp_out 的 cosine（余弦相似度）接近 0，也说明下游不是线性传递，而是非线性重写。
+
+因此本阶段继续完成同一大任务：向前定位 prompt-type / knowledge-source skeleton（提示类型/知识来源骨架）最早明显形成的位置，并验证较早 site（位置）是否仍有因果迁移效应。
+
+### 脚本和命令
+
+生成脚本：
+
+```text
+tests/gpt5/phase733_prompt_type_skeleton_source_localization.py
+tests/gpt5/run_phase733_prompt_type_skeleton_source_localization_round.sh
+```
+
+输出目录：
+
+```text
+results/glm5_phase733_prompt_type_skeleton_source_localization/
+```
+
+关键命令：
+
+```bash
+python -m py_compile tests/gpt5/phase733_prompt_type_skeleton_source_localization.py
+python tests/gpt5/phase733_prompt_type_skeleton_source_localization.py --dry-run --round-name smoke --max-scan-cases 9 --max-pairs 2
+
+PHASE733_ROUND_NAME=smoke PHASE733_MAX_SCAN_CASES=9 PHASE733_MAX_PAIRS=2 PHASE733_MAX_CANDIDATE_SITES=4 PHASE733_LOG_EVERY=1 bash tests/gpt5/run_phase733_prompt_type_skeleton_source_localization_round.sh
+PHASE733_ROUND_NAME=main PHASE733_MAX_SCAN_CASES=36 PHASE733_MAX_PAIRS=12 PHASE733_MAX_CANDIDATE_SITES=10 PHASE733_LOG_EVERY=4 bash tests/gpt5/run_phase733_prompt_type_skeleton_source_localization_round.sh
+PHASE733_ROUND_NAME=confirm PHASE733_MAX_SCAN_CASES=66 PHASE733_MAX_PAIRS=18 PHASE733_MAX_CANDIDATE_SITES=10 PHASE733_LOG_EVERY=6 bash tests/gpt5/run_phase733_prompt_type_skeleton_source_localization_round.sh
+```
+
+加载策略：bf16（bfloat16，脑浮点16位），quantization=off（量化关闭），先尝试 flash_attention_2（闪存注意力2），本地环境缺少 FlashAttention2 包，因此三模型均自动退到 sdpa（缩放点积注意力）。每个模型均使用 `--hard-exit-after-model`，按 qwen3 -> GLM4 -> DS7B 顺序执行，避免显存残留。
+
+### 测试原理
+
+本阶段不再只看某个 late hidden（晚期隐藏态）能不能修复输出，而是分两步：
+
+```text
+第一步：formation scan（形成扫描）
+对 explicit_profile / conflict_profile / commonsense 三类 prompt（提示）分别记录每层 layer_input、attn_out、mlp_out、layer_out 的最后词元向量。
+计算 commonsense_vs_explicit_profile 的平均向量距离，寻找 prompt-type skeleton 最早明显分离的位置。
+
+第二步：site replacement validation（位置替换验证）
+把 explicit prompt 在候选 site 的向量替换到 commonsense prompt 的对应 site，观察正确答案 logprob、生成文本、hit rate 是否变化。
+反向也做 explicit<-commonsense，判断方向性。
+```
+
+候选 site 选择规则：
+
+```text
+对 layer_input / attn_out / mlp_out / layer_out 四类 site：
+1. 找到 commonsense_vs_explicit_profile effect_norm 最大点。
+2. 找到达到最大 effect_norm 35% 的最早层。
+3. 同时加入 Phase 732 的 late hidden 参考点。
+```
+
+### 客观结果
+
+三轮均完成：smoke、main、confirm。
+
+confirm 轮关键结果：
+
+```text
+qwen3:
+layer_input earliest = L28_layer_input, max = L35_layer_input
+attn_out earliest = L26_attn_out, max = L34_attn_out
+mlp_out earliest = L28_mlp_out, max = L35_mlp_out
+layer_out earliest = hidden_28, max = hidden_36
+最强 commonsense<-explicit transfer：hidden_36 / L35_layer_input
+logprob delta 约 +3.11，hit 0.944 -> 1.000，changed_rate 0.056
+
+GLM4:
+layer_input earliest = L31_layer_input, max = L39_layer_input
+attn_out earliest = L23_attn_out, max = L35_attn_out
+mlp_out earliest = L38_mlp_out, max = L39_mlp_out
+layer_out earliest = hidden_39, max = hidden_40
+最强 commonsense<-explicit transfer：hidden_40 / L39_layer_input
+logprob delta 约 +2.34，hit 0.944 -> 1.000，changed_rate 0.167
+
+DS7B:
+layer_input earliest = L22_layer_input, max = L27_layer_input
+attn_out earliest = L21_attn_out, max = L27_attn_out
+mlp_out earliest = L25_mlp_out, max = L27_mlp_out
+layer_out earliest = hidden_24, max = hidden_28
+最强 commonsense<-explicit transfer：hidden_28
+logprob delta 约 +5.90，hit 0.222 -> 0.722，hit_gain 0.611，hit_loss 0.111
+L27_layer_input 也有效：logprob delta 约 +4.92，hit 0.222 -> 0.444
+```
+
+main 与 confirm 的层位基本一致：
+
+```text
+qwen3 稳定在 L26-L36 段。
+GLM4 稳定在 L23-L40 段，但真正强的 residual / MLP 位点靠最后两层。
+DS7B 稳定在 L21-L28 段，且生成 hit 改善最明显。
+```
+
+### 当前进展
+
+Phase 733 把 Phase 732 的结论向前推进了一步：
+
+```text
+Phase 732:
+late hidden / late MLP 有 prompt-type causal effect。
+
+Phase 733:
+prompt-type skeleton 在不同模型中有稳定的中后层形成轨迹；
+早期阈值点可定位，但最强因果迁移仍在晚层 residual / layer_input；
+DS7B 中该骨架对自然生成有明显修复效应，qwen3 / GLM4 中主要表现为 likelihood 支撑。
+```
+
+更新后的机制拼图：
+
+```text
+prompt-type / knowledge-source skeleton
+  begins to separate in mid-late layers
+  becomes strongest in late residual / layer_input
+  can causally bias correct value likelihood
+  in DS7B can partially repair generation
+
+attention route
+  can show earlier separation
+  but not yet proven to be primary writer
+
+MLP route
+  tends to peak late
+  more像 nonlinear rewrite（非线性重写）而不是线性转运
+```
+
+### 严格问题和硬伤
+
+```text
+1. earliest_35pct 是工程阈值，不是自然边界。
+2. site replacement 仍然是强干预，可能产生分布偏移。
+3. qwen3 / GLM4 的 hit 已接近天花板，因此 logprob 提升不等价于生成能力修复。
+4. DS7B 的修复最强，但同时仍有 hit_loss，说明 late carrier 过粗。
+5. formation scan 使用均值距离，能定位分离轨迹，但不能证明 writer neuron（写入神经元）。
+6. 当前仍是小模型，内部结构可能偏离大模型。
+7. FlashAttention2 未安装，实际使用 sdpa；这不影响结论方向，但需记录运行环境差异。
+```
+
+### 理论进展
+
+语言编码机制更接近如下结构：
+
+```text
+语义不是单个固定向量；
+生成不是单点读出；
+模型内部存在条件化相对状态轨迹；
+prompt-type skeleton 是轨迹的全局控制骨架之一；
+relation / value / format 等局部机制在该骨架上被差分复用；
+最终输出来自 late residual field 中多个因果边的闭合。
+```
+
+当前最简链条更新为：
+
+```text
+prompt condition
+→ mid-late prompt-type skeleton formation
+→ late residual / layer_input carrier
+→ attention / MLP nonlinear rewrite
+→ value / route competition
+→ readout
+→ generation closure
+```
+
+### 下一步
+
+Phase 733 和 Phase 732 属于同一阶段性目标：从局部 patch 转向 causal atlas（因果图谱）。当前已完成 prompt-type skeleton source localization v0，下一步仍应继续自动推进，但要从“找到 site”转向“找到 writer mechanism”。
+
+建议 Phase 734：
+
+```text
+Phase 734: Prompt-Type Skeleton Writer Decomposition
+
+目标：
+1. 以 qwen3 L28-L35、GLM4 L31-L40、DS7B L22-L28 为窗口。
+2. 对 candidate attention heads / MLP channels 做 source-restricted ablation。
+3. 不再只问 site replacement 是否有效，而是问：
+   哪些组件负责写入 prompt-type skeleton？
+   哪些组件只是 carrier？
+   哪些组件负责 nonlinear rewrite？
+4. 对 DS7B 优先，因为它有最强生成 hit_gain。
+5. 输出 writer-edge atlas v0。
+```
+
+## Phase 734: Prompt-Type Skeleton Writer Decomposition [2026-06-28 21:25]
+
+### 任务来源和判断
+
+用户给出的 Phase 733 复盘总体正确。Phase 733 的性质不是完整机制闭合，而是把 prompt-type / knowledge-source skeleton（提示类型 / 知识来源骨架）从 late carrier（后期承载器）推进到 mid-late formation trajectory（中后层形成轨迹）。它证明了：
+
+```text
+prompt-type skeleton 不是最后一层突然出现；
+它在中后层逐步分离，并在晚层 residual / layer_input 中达到最强；
+DS7B 中该骨架能明显修复 commonsense path failure。
+```
+
+但复盘中也指出一个关键硬伤：Phase 733 仍然没有回答 writer mechanism（写入机制）。因此 Phase 734 继续同一阶段性目标，从 site localization（位置定位）推进到 writer decomposition v0（写入器分解0版）。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase734_prompt_type_skeleton_writer_decomposition.py
+tests/gpt5/run_phase734_prompt_type_skeleton_writer_decomposition_round.sh
+```
+
+输出目录：
+
+```text
+results/glm5_phase734_prompt_type_skeleton_writer_decomposition/
+```
+
+核心输出文件：
+
+```text
+phase734_{model}_attention_writer_rows.jsonl
+phase734_{model}_mlp_writer_rows.jsonl
+phase734_{model}_summary.json
+phase734_cross_model_summary.json
+phase734_cross_model_summary.md
+phase734_atlas_graph.json
+```
+
+### 执行命令
+
+```bash
+python -m py_compile tests/gpt5/phase734_prompt_type_skeleton_writer_decomposition.py
+python tests/gpt5/phase734_prompt_type_skeleton_writer_decomposition.py --dry-run --round-name smoke --max-pairs 2 --max-layers 3 --max-heads-per-layer 4 --mlp-groups-per-layer 4
+
+PHASE734_ROUND_NAME=smoke PHASE734_MAX_PAIRS=2 PHASE734_MAX_LAYERS=3 PHASE734_MAX_HEADS_PER_LAYER=4 PHASE734_MLP_GROUPS_PER_LAYER=4 PHASE734_LOG_EVERY=1 bash tests/gpt5/run_phase734_prompt_type_skeleton_writer_decomposition_round.sh
+
+PHASE734_ROUND_NAME=main PHASE734_MAX_PAIRS=8 PHASE734_MAX_LAYERS=4 PHASE734_MAX_HEADS_PER_LAYER=8 PHASE734_MLP_GROUPS_PER_LAYER=8 PHASE734_LOG_EVERY=2 bash tests/gpt5/run_phase734_prompt_type_skeleton_writer_decomposition_round.sh
+
+PHASE734_ROUND_NAME=confirm PHASE734_MAX_PAIRS=12 PHASE734_MAX_HEADS_PER_LAYER=10 PHASE734_MLP_GROUPS_PER_LAYER=10 PHASE734_LOG_EVERY=3 bash tests/gpt5/run_phase734_prompt_type_skeleton_writer_decomposition_round.sh
+```
+
+加载策略：
+
+```text
+bf16
+quantization = off
+先尝试 flash_attention_2
+本地缺少 FlashAttention2 包，三模型实际均回退为 sdpa
+每个模型使用 --hard-exit-after-model
+执行顺序 qwen3 -> GLM4 -> DS7B
+```
+
+### 测试原理
+
+Phase 734 不再问“哪个 late hidden 替换有效”，而是问：
+
+```text
+消融某个 attention head 或 MLP output group 后，
+explicit path 在 downstream prompt-type carrier 上是否失去 explicit-vs-commonsense 方向？
+```
+
+具体流程：
+
+```text
+1. 从 Phase 733 confirm summary 自动读取每个模型的 target carrier：
+   qwen3: hidden_36
+   GLM4: hidden_40
+   DS7B: hidden_28
+
+2. 对同一 object-relation-answer 的 explicit_profile / commonsense pair，
+   计算 downstream skeleton direction：
+   d = h_target(explicit) - h_target(commonsense)
+
+3. 对候选窗口内 attention head 做 zero ablation，
+   重新计算 explicit path 的 target carrier shift：
+   Δh = h_target(explicit, ablated) - h_target(explicit)
+
+4. 计算 projection loss：
+   explicit_skeleton_loss = - <Δh, d / |d|>
+
+5. 同时测 answer first-token logprob delta。
+```
+
+判据：
+
+```text
+explicit_skeleton_loss > 0：
+  消融使 explicit path 远离 explicit-vs-commonsense 方向，
+  说明该组件可能参与写入或维持 prompt-type skeleton。
+
+explicit_logprob_delta < 0：
+  消融同时伤害目标答案支持。
+
+二者同时成立：
+  writer_candidate / contributor_candidate。
+```
+
+注意：本阶段扫描的是 attention head 与 MLP output group，不是单神经元，因此仍是 component-level v0。
+
+### 客观结果
+
+三轮均完成：smoke、main、confirm。
+
+confirm 轮关键结果：
+
+#### qwen3
+
+```text
+target_site = hidden_36
+scan_layers = [26, 27, 28, 34, 35]
+
+top attention:
+L35H0:
+  explicit_skeleton_loss = 7.007
+  explicit_logprob_delta = -0.001
+  commonsense_logprob_delta = -0.421
+  role = writer_candidate
+
+top MLP:
+L28:mlp[256:512]:
+  explicit_skeleton_loss = 6.347
+  explicit_logprob_delta = -0.0008
+  role = writer_candidate
+
+L34:mlp[0:256]:
+  explicit_skeleton_loss = 4.775
+  explicit_logprob_delta = -0.019
+  role = writer_candidate
+```
+
+解释：
+
+```text
+qwen3 有 attention writer candidate，最稳定的是 late L35H0。
+MLP 也有候选，但 logprob 效应较小，更多像弱写入 / 放大混合。
+```
+
+#### GLM4
+
+```text
+target_site = hidden_40
+scan_layers = [23, 31, 35, 38, 39]
+
+top attention:
+L39H21:
+  explicit_skeleton_loss = 9.445
+  explicit_logprob_delta = -0.0075
+  commonsense_logprob_delta = -0.152
+  role = writer_candidate
+
+L23H17:
+  explicit_skeleton_loss = 2.659
+  explicit_logprob_delta = -0.015
+  role = writer_candidate
+
+top MLP:
+L38:mlp[2870:3280]:
+  explicit_skeleton_loss = 8.267
+  explicit_logprob_delta = -0.0033
+  role = writer_candidate
+```
+
+解释：
+
+```text
+GLM4 的最稳定 attention writer candidate 在 L39H21。
+L23 也有早期候选，但效应较弱。
+L38 MLP group 明显扰动 downstream carrier，更像 late rewriter / amplifier。
+```
+
+#### DS7B
+
+```text
+target_site = hidden_28
+scan_layers = [21, 22, 23, 25, 27]
+
+top attention:
+L22H24:
+  explicit_skeleton_loss = 24.410
+  explicit_logprob_delta = -0.132
+  commonsense_logprob_delta = -0.064
+  role = writer_candidate
+
+L21H12:
+  explicit_skeleton_loss = 7.332
+  explicit_logprob_delta = -0.019
+  role = writer_candidate
+
+top MLP:
+L27:mlp[2872:3231]:
+  explicit_skeleton_loss = 108.435
+  explicit_logprob_delta = -0.698
+  commonsense_logprob_delta = -1.083
+  explicit_rank_delta = +1.25
+  commonsense_rank_delta = +103.33
+  role = writer_candidate
+
+L22:mlp[718:1077]:
+  explicit_skeleton_loss = 22.994
+  explicit_logprob_delta = -0.092
+  role = writer_candidate
+```
+
+解释：
+
+```text
+DS7B 是本阶段最强结果。
+L22H24 是明确 attention writer / contributor candidate。
+L27 MLP output group 对 downstream skeleton 和 answer likelihood 的影响极强，
+但由于它靠近 target hidden_28，更保守地说应解释为 late nonlinear rewriter / amplifier，
+不是纯早期 writer。
+L22 MLP group 更接近真正中层写入候选。
+```
+
+### 阶段进展
+
+Phase 734 把 Phase 733 的问题推进了一层：
+
+```text
+Phase 733:
+知道 prompt-type skeleton 在哪里开始可见、哪里最强。
+
+Phase 734:
+开始定位哪些 attention head / MLP output group 会削弱 downstream skeleton，
+即找到 writer / contributor candidates。
+```
+
+新的图谱边：
+
+```text
+attention_head / MLP_group
+  -> downstream prompt-type skeleton carrier
+  -> answer likelihood / readout support
+```
+
+当前最强边：
+
+```text
+DS7B L22H24 -> hidden_28 prompt-type skeleton
+DS7B L27 MLP[2872:3231] -> hidden_28 prompt-type skeleton / readout
+GLM4 L39H21 -> hidden_40 prompt-type skeleton
+qwen3 L35H0 -> hidden_36 prompt-type skeleton
+```
+
+### 严格问题和硬伤
+
+```text
+1. 本阶段是 component-level writer decomposition v0，不是 neuron-level atlas。
+2. MLP output group 很粗，一个 group 包含数百维，不是单通道或单神经元。
+3. attention head zero ablation 是强干预，可能同时破坏多个功能。
+4. explicit_skeleton_loss 说明该组件影响 downstream skeleton，不等于证明它是唯一写入源。
+5. DS7B L27 MLP group 太靠近 hidden_28，更像 late rewriter / amplifier。
+6. qwen3 / GLM4 的 logprob 伤害较小，因为 baseline hit 接近天花板，不能过度否定其机制作用。
+7. 当前没有 source-token restricted attribution，因此还不能说这些 head 具体从哪些 token 写入。
+8. 当前仍是小模型结果，层号和头号不能外推。
+```
+
+### 理论进展
+
+Phase 734 支持一个更细的分工：
+
+```text
+attention:
+  有一批 head 会影响 prompt-type skeleton 的 downstream carrier，
+  更像 route / writer / contributor。
+
+MLP:
+  中层 MLP group 可能参与写入；
+  晚层 MLP group 可能参与 nonlinear rewrite / amplification。
+
+residual:
+  仍是承载与累积通道。
+```
+
+更新后的机制链：
+
+```text
+prompt condition
+→ attention writer / route contributor
+→ MLP writer / nonlinear rewriter
+→ residual carrier
+→ relation / value route
+→ readout competition
+→ generation closure
+```
+
+### 下一步
+
+Phase 734 仍属于 causal atlas 大阶段，并且已经完成 writer decomposition v0。下一步不能简单扩大 group 扫描，应该从 component-level 下钻到 finer-grained writer validation。
+
+建议 Phase 735：
+
+```text
+Phase 735: Source-Restricted Writer Validation
+
+目标：
+1. 对 DS7B L22H24、L21H12、L22 MLP group、L27 MLP group 做重点验证。
+2. 加入 source token groups：
+   instruction tokens
+   record line tokens
+   question tokens
+   object/relation/value tokens
+3. 测这些 writer candidates 是否从特定 token group 写入 prompt-type skeleton。
+4. 对 top MLP group 做更细通道划分，缩小到几十维甚至单通道候选。
+5. 用 holdout objects / relations 验证候选是否跨样本稳定。
+```
+
+第一性原理判断：
+
+```text
+要破解语言编码机制，不能只知道某个状态有效；
+必须建立 writer -> carrier -> rewriter -> readout 的完整因果链。
+Phase 734 已经开始从 carrier 追到 writer，
+Phase 735 应继续追 writer 的 source token 与细粒度通道。
+```
+
+## Phase 735: Source-Restricted Writer Validation and MLP Fine Decomposition [2026-06-28 22:24]
+
+### 命令
+
+```bash
+python -m py_compile tests/gpt5/phase735_source_restricted_writer_validation.py
+python tests/gpt5/phase735_source_restricted_writer_validation.py --dry-run --round-name smoke --max-pairs 2 --top-attn 1 --top-mlp 1 --mlp-subgroups 2
+
+PHASE735_ROUND_NAME=smoke PHASE735_MAX_PAIRS=2 PHASE735_TOP_ATTN=1 PHASE735_TOP_MLP=1 PHASE735_MLP_SUBGROUPS=2 PHASE735_LOG_EVERY=1 bash tests/gpt5/run_phase735_source_restricted_writer_validation_round.sh
+
+PHASE735_ROUND_NAME=main PHASE735_MAX_PAIRS=12 PHASE735_TOP_ATTN=2 PHASE735_TOP_MLP=2 PHASE735_MLP_SUBGROUPS=4 PHASE735_LOG_EVERY=2 bash tests/gpt5/run_phase735_source_restricted_writer_validation_round.sh
+
+PHASE735_ROUND_NAME=confirm PHASE735_MAX_PAIRS=18 PHASE735_TOP_ATTN=2 PHASE735_TOP_MLP=2 PHASE735_MLP_SUBGROUPS=6 PHASE735_LOG_EVERY=3 bash tests/gpt5/run_phase735_source_restricted_writer_validation_round.sh
+```
+
+### 生成脚本和结果
+
+```text
+script:
+  tests/gpt5/phase735_source_restricted_writer_validation.py
+  tests/gpt5/run_phase735_source_restricted_writer_validation_round.sh
+
+results:
+  results/glm5_phase735_source_restricted_writer_validation/smoke/
+  results/glm5_phase735_source_restricted_writer_validation/main/
+  results/glm5_phase735_source_restricted_writer_validation/confirm/
+
+confirm outputs:
+  phase735_cross_model_summary.json
+  phase735_cross_model_summary.md
+  phase735_atlas_graph.json
+  phase735_{model}_attention_source_rows.jsonl
+  phase735_{model}_mlp_fine_rows.jsonl
+  phase735_{model}_summary.json
+```
+
+### 测试原理
+
+Phase 735 直接验证 Phase 734 的 writer candidate（写入器候选）是否真的从某些 source token group（源词元组）把 prompt-type skeleton（提示类型骨架）写入 downstream carrier（下游承载器）。
+
+对 attention head（注意力头）使用 source-restricted contribution erasure（源限制贡献擦除）：
+
+```text
+C_G(l,h) = sum_{t in G} alpha_{l,h}(a,t) V_{l,h}(t)
+```
+
+其中：
+
+```text
+G:
+  instruction / records_all / target_record_line / records_other
+  question / object_tokens / relation_tokens / target_value_tokens
+  answer_prefix / all_pre_answer / self_last
+
+a:
+  answer prompt last token（答案提示最后词元）
+```
+
+然后只擦除某个 head 从某个 G 接收到的 value contribution（值贡献），观察 target_site（目标位置）上的 explicit-vs-commonsense skeleton direction（显式-常识骨架方向）是否损失：
+
+```text
+Loss_K(h,G) = - < h_T^{explicit, erase(h,G)} - h_T^{explicit}, d_K >
+```
+
+同时记录 answer first-token logprob delta（答案首词元对数概率变化）。
+
+对 MLP group（多层感知机组）使用 fine output-channel ablation（输出通道细分消融），把 Phase 734 的粗组继续切成 2 / 4 / 6 个子组，观察每个子组的 skeleton loss（骨架损失）和 logprob delta（对数概率变化）。
+
+注意：因为 source-restricted attribution（源限制归因）需要 output_attentions（输出注意力），本阶段使用 eager attention（eager 注意力）。模型仍为 bf16（脑浮点16）、无量化、单模型顺序运行，并使用 --hard-exit-after-model 防止显存残留。
+
+### 三轮测试规模
+
+```text
+smoke:
+  2 pairs, 1 attention candidate, 1 MLP candidate, 2 MLP subgroups
+
+main:
+  12 pairs, 2 attention candidates, 2 MLP candidates, 4 MLP subgroups
+
+confirm:
+  18 pairs, 2 attention candidates, 2 MLP candidates, 6 MLP subgroups
+```
+
+confirm 轮每个模型生成：
+
+```text
+attention source rows:
+  396 rows/model
+
+MLP fine rows:
+  216 rows/model
+
+total:
+  1836 detailed rows
+```
+
+### 关键结果
+
+confirm 轮摘要：
+
+```text
+qwen3:
+  target_site = hidden_36
+  top source path:
+    L35H0 <- self_last
+    skeleton_loss = 6.537
+    logprob_delta = -0.002
+    attention_mass = 0.947
+  secondary source path:
+    L28H28 <- instruction
+    skeleton_loss = 4.369
+    logprob_delta ~= 0
+    attention_mass = 0.873
+  top MLP fine:
+    L34:mlp[43:85]
+    skeleton_loss = 3.681
+    logprob_delta = +0.005
+
+GLM4:
+  target_site = hidden_40
+  top source path:
+    L39H21 <- self_last
+    skeleton_loss = 8.997
+    logprob_delta = -0.005
+    attention_mass = 1.000
+  secondary source path:
+    L23H17 <- all_pre_answer / instruction
+    skeleton_loss = 3.111 / 3.021
+    logprob_delta = -0.018 / -0.024
+  top MLP fine:
+    L38:mlp[3212:3280]
+    skeleton_loss = 3.267
+    logprob_delta = +0.003
+
+DS7B:
+  target_site = hidden_28
+  top source path:
+    L22H24 <- all_pre_answer
+    skeleton_loss = 24.993
+    logprob_delta = -0.187
+    attention_mass = 0.981
+  record-specific source paths:
+    L22H24 <- records_all
+      skeleton_loss = 20.426
+      logprob_delta = -0.289
+      attention_mass = 0.725
+    L22H24 <- target_record_line
+      skeleton_loss = 16.386
+      logprob_delta = -0.295
+      attention_mass = 0.595
+    L22H24 <- target_value_tokens
+      skeleton_loss = 12.636
+      logprob_delta = -0.212
+      attention_mass = 0.354
+  secondary path:
+    L21H12 <- self_last
+    skeleton_loss = 5.913
+    logprob_delta = -0.018
+  top MLP fine:
+    L27:mlp[2872:2932]
+      skeleton_loss = 66.368
+      logprob_delta = -0.141
+    L22:mlp[957:1017]
+      skeleton_loss = 7.110
+      logprob_delta = -0.014
+```
+
+### 客观进展
+
+Phase 735 把 Phase 734 的 component-level writer candidate（组件级写入器候选）推进到 source-restricted writer path（源限制写入路径）：
+
+```text
+DS7B:
+  record/value source token
+  -> L22H24 attention contribution
+  -> hidden_28 prompt-type skeleton carrier
+  -> answer logprob support
+
+qwen3:
+  self_last / instruction source
+  -> L35H0 / L28H28
+  -> hidden_36 skeleton carrier
+
+GLM4:
+  self_last / instruction source
+  -> L39H21 / L23H17
+  -> hidden_40 skeleton carrier
+```
+
+最强客观结果是 DS7B：L22H24 不是普通 head 排名，而是能被分解到 records_all、target_record_line、target_value_tokens 的源限制因果路径。尤其 target_value_tokens 单独擦除后仍有 skeleton_loss = 12.636 且 logprob_delta = -0.212，说明它确实携带了显式记录中的值信息。
+
+MLP 方面，DS7B L27:mlp[2872:2932] 是当前最强 late nonlinear rewriter / amplifier（后期非线性重写器 / 放大器）细分候选，L22:mlp[957:1017] 是更靠近 writer 层的细分候选。
+
+### 严格审视和硬伤
+
+```text
+1. qwen3 / GLM4 的强源路径主要集中在 self_last 或 instruction，
+   说明它们当前更像 prompt-control skeleton path（提示控制骨架路径），
+   不是明确的 record-value path（记录值路径）。
+
+2. source groups 仍然不是完全正交：
+   all_pre_answer 包含 records、instruction、question 等所有前文，
+   所以它只能作为总源贡献，不应当单独解释为具体语义路径。
+
+3. attention source erasure 用的是 value contribution（值贡献）擦除，
+   还没有做 source-restricted replacement（源限制替换）。
+
+4. MLP fine decomposition 仍然是 output-channel group（输出通道组），
+   不是 hidden neuron activation（隐藏神经元激活）级别。
+
+5. 当前模型是小模型，
+   层号、头号、通道号不能外推到大模型；
+   只能外推功能阶段：source -> writer -> carrier -> rewriter -> readout。
+
+6. logprob delta 和 skeleton loss 有时不一致，
+   说明 skeleton carrier 与最终 answer readout 之间仍有非线性重写和竞争。
+```
+
+### 理论进展
+
+当前最接近语言编码机制的链条更新为：
+
+```text
+source token group
+-> attention writer / route contributor
+-> prompt-type skeleton carrier
+-> MLP nonlinear rewrite / amplification
+-> residual state accumulation
+-> readout competition
+-> generation closure
+```
+
+更具体地说，语言编码不是单个 semantic vector（语义向量），而是 condition-specific causal path（条件化因果路径）。同一个词嵌入进入模型后，会被 prompt type（提示类型）、source token（源词元）、relation（关系）、value（值）共同条件化，沿不同 head / MLP group 形成不同状态。
+
+### 下一步
+
+Phase 735 和当前任务仍属于同一个阶段性目标：从 component atlas（组件图谱）推进到 source-resolved functional atlas（源分辨功能图谱）。下一步不需要重新确认方向，应继续自动进入：
+
+```text
+Phase 736: Source-Restricted Replacement and Generation Closure
+
+目标：
+1. 对 DS7B L22H24 做 source-restricted replacement：
+   records_all / target_record_line / target_value_tokens
+   donor -> recipient 替换。
+2. 检查替换是否能恢复 hidden_28 skeleton 和 answer likelihood。
+3. 对 L27:mlp[2872:2932] 与 L22:mlp[957:1017] 做联合路径验证：
+   L22H24 source path -> L22 MLP fine writer -> L27 MLP rewriter。
+4. 加入 generation closure：
+   不只看 logprob，还看自然生成是否被拉回目标答案。
+5. 若 DS7B 成立，再做 qwen3 / GLM4 轻量对照，
+   但不要强行要求三模型同构。
+```
+
+第一性原理判断：
+
+```text
+破解语言背后编码机制的关键不是找到一个“语义向量”，
+而是找到 source-conditioned route（源条件化路径）
+如何经过 writer、carrier、rewriter、readout 形成可生成答案。
+Phase 735 第一次把 DS7B 的显式记录值路径从 source token 追到了 downstream carrier，
+这是比单纯 head 排名更接近真实编码机制的一步。
+```
+
+## Phase 736: Source-Restricted Replacement and Generation Closure [2026-06-28 22:54]
+
+### 任务背景
+
+本阶段分析 Phase 735 的判断后继续推进。Phase 735 的核心结论基本正确：它不是普通 head 排名，而是把 DS7B 的 L22H24 分解到了 `records_all`、`target_record_line`、`target_value_tokens` 等 source group（源词元组），形成 source-resolved functional path v0（源分辨功能路径初版）。但 Phase 735 仍有一个硬缺口：只证明 source-restricted erasure（源限制擦除）会破坏 hidden / likelihood，没有证明 donor source contribution（供体源贡献）替换到 recipient prompt（受体提示）后能否恢复目标状态、答案似然，甚至自然生成。
+
+因此 Phase 736 的目标是：
+
+```text
+donor source contribution
+-> recipient source contribution replacement
+-> target hidden restore
+-> donor answer likelihood shift
+-> greedy generation closure
+```
+
+### 生成脚本
+
+新增正式脚本：
+
+```text
+tests/gpt5/phase736_source_replacement_generation_closure.py
+```
+
+新增跨模型运行脚本：
+
+```text
+tests/gpt5/run_phase736_source_replacement_generation_closure_round.sh
+```
+
+输出目录：
+
+```text
+results/glm5_phase736_source_replacement_generation_closure/
+```
+
+确认轮主要结果文件：
+
+```text
+results/glm5_phase736_source_replacement_generation_closure/confirm/phase736_cross_model_summary.md
+results/glm5_phase736_source_replacement_generation_closure/confirm/phase736_cross_model_summary.json
+results/glm5_phase736_source_replacement_generation_closure/confirm/phase736_atlas_graph.json
+results/glm5_phase736_source_replacement_generation_closure/confirm/phase736_qwen3_replacement_rows.jsonl
+results/glm5_phase736_source_replacement_generation_closure/confirm/phase736_glm4_replacement_rows.jsonl
+results/glm5_phase736_source_replacement_generation_closure/confirm/phase736_deepseek7b_replacement_rows.jsonl
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase736_source_replacement_generation_closure.py
+```
+
+干运行：
+
+```bash
+PHASE736_DRY_RUN=1 PHASE736_ROUND_NAME=smoke PHASE736_MAX_PAIRS=2 PHASE736_TOP_PATHS=2 python tests/gpt5/phase736_source_replacement_generation_closure.py --models qwen3 glm4 deepseek7b --hard-exit-after-model
+```
+
+冒烟测试：
+
+```bash
+PHASE736_ROUND_NAME=smoke PHASE736_MAX_PAIRS=2 PHASE736_TOP_PATHS=2 PHASE736_MAX_NEW_TOKENS=2 PHASE736_LOG_EVERY=1 bash tests/gpt5/run_phase736_source_replacement_generation_closure_round.sh
+```
+
+主测试：
+
+```bash
+PHASE736_ROUND_NAME=main PHASE736_MAX_PAIRS=8 PHASE736_TOP_PATHS=4 PHASE736_MAX_NEW_TOKENS=3 PHASE736_LOG_EVERY=2 bash tests/gpt5/run_phase736_source_replacement_generation_closure_round.sh
+```
+
+确认测试：
+
+```bash
+PHASE736_ROUND_NAME=confirm PHASE736_MAX_PAIRS=12 PHASE736_TOP_PATHS=4 PHASE736_MAX_NEW_TOKENS=3 PHASE736_LOG_EVERY=3 bash tests/gpt5/run_phase736_source_replacement_generation_closure_round.sh
+```
+
+说明：本阶段没有使用量化。由于 source contribution replacement（源贡献替换）必须读取 attention weights（注意力权重），脚本使用 eager attention（急切注意力）而不是 flash attention（闪存注意力）。三模型按 qwen3、GLM4、DS7B 顺序运行，并传入 `--hard-exit-after-model`，每个模型结束后释放 GPU。
+
+### 测试原理
+
+对每个 donor / recipient case（供体 / 受体样本），先在目标 head 上计算 source group 的注意力值贡献：
+
+```text
+C_G(l,h)=sum_{s in G} A_{t,s}^{l,h} V_s^{l,h}
+```
+
+然后在 recipient prompt 的同一层同一头，将对应 head input 做源限制替换：
+
+```text
+head_input' = head_input - C_G(recipient) + C_G(donor)
+```
+
+之后测量四类指标：
+
+```text
+1. hidden restore projection：
+   recipient patched hidden 是否朝 donor hidden 移动。
+
+2. donor answer logprob delta：
+   donor answer token 在 recipient context 中是否被增强。
+
+3. recipient answer logprob delta：
+   原 recipient answer 是否被压低或扰动。
+
+4. generation closure：
+   greedy generation 是否真正转向 donor answer。
+```
+
+这比 Phase 735 的擦除更严格，因为它不是问“删掉是否破坏”，而是问“替换是否携带可迁移的功能信息”。
+
+### 客观结果
+
+三轮数据量：
+
+```text
+smoke：每模型 8 行 replacement rows
+main：每模型 64 行 replacement rows
+confirm：每模型 96 行 replacement rows
+total：504 行 replacement rows
+```
+
+确认轮最强结果：
+
+```text
+qwen3:
+  target_site = hidden_36
+  top path = L35H0 <- self_last, conflict<-explicit
+  restore = 1.803
+  restore_fraction = 0.0070
+  donor_logprob_delta = -0.151
+  donor_hit_gain = 0.000
+  changed_rate = 0.000
+  role = state_transfer_only
+
+GLM4:
+  target_site = hidden_40
+  top path = L23H17 <- all_pre_answer, explicit<-conflict
+  restore = 0.805
+  restore_fraction = 0.0055
+  donor_logprob_delta = 0.041
+  donor_hit_gain = 0.000
+  changed_rate = 0.000
+  role = content_transfer_candidate
+
+DS7B:
+  target_site = hidden_28
+  top path = L22H24 <- all_pre_answer, conflict<-explicit
+  restore = 15.831
+  restore_fraction = 0.0270
+  donor_logprob_delta = 0.286
+  donor_hit_gain = 0.000
+  changed_rate = 0.167
+  role = content_transfer_candidate
+```
+
+DS7B 确认轮的 source group 排序非常稳定：
+
+```text
+L22H24 all_pre_answer conflict<-explicit:
+  restore = 15.831
+  donor_logprob_delta = 0.286
+  changed_rate = 0.167
+
+L22H24 records_all conflict<-explicit:
+  restore = 14.701
+  donor_logprob_delta = 0.249
+  changed_rate = 0.167
+
+L22H24 target_record_line conflict<-explicit:
+  restore = 11.129
+  donor_logprob_delta = 0.244
+  changed_rate = 0.083
+
+L22H24 target_value_tokens conflict<-explicit:
+  restore = 7.035
+  donor_logprob_delta = 0.144
+  changed_rate = 0.000
+```
+
+主测试和确认测试一致：DS7B 的 L22H24 源贡献替换能显著推动 hidden_28 skeleton（隐藏态骨架）与 donor answer likelihood（供体答案似然），但不能稳定实现 donor answer generation（供体答案自然生成）。
+
+### 对 Phase 735 判断的校正
+
+Phase 735 关于 DS7B L22H24 是 source-resolved writer path（源分辨写入路径）的判断得到加强，但必须收紧：
+
+```text
+正确部分：
+  L22H24 的 records_all / target_record_line / target_value_tokens
+  确实携带可替换的源贡献。
+
+新增进展：
+  这些源贡献不是只在擦除时有破坏作用，
+  也能在 donor -> recipient 替换时推动目标 hidden 和 donor likelihood。
+
+必须收紧：
+  这种推动还没有形成稳定 generation closure。
+  因此它是 content transfer candidate（内容迁移候选路径），
+  不是完整答案生成路径。
+```
+
+### 严格审视和硬伤
+
+```text
+1. generation hit gain 全部为 0。
+   这说明当前替换只改变了隐藏态方向和答案似然，
+   还没有让自然生成稳定转向 donor value。
+
+2. DS7B changed_rate 只有 0.083 到 0.167。
+   即使输出发生变化，也不是稳定命中 donor answer。
+
+3. qwen3 最强路径 donor_logprob_delta 为负，
+   更像 state transfer only（状态扰动 / 骨架迁移），
+   不应解释为内容路径。
+
+4. GLM4 的 L23H17 有正向 restore 与 logprob，
+   但幅度很小且生成完全不变，
+   只能视为弱 content transfer candidate。
+
+5. source groups 仍有包含关系：
+   all_pre_answer 包含 records_all、instruction、question 等，
+   不能直接等同于语义值路径。
+
+6. 替换位置只覆盖注意力 head input，
+   没有同步替换后续 MLP rewriter、residual carrier、readout competition。
+   这可能是生成闭环失败的主要原因。
+
+7. 当前模型是小模型，
+   层号、头号不能外推到大模型；
+   可外推的只是功能链条：
+   source contribution -> writer -> carrier -> nonlinear rewrite -> readout -> generation。
+```
+
+### 理论进展
+
+当前拼图进一步收紧为：
+
+```text
+source token group
+-> source contribution in attention head
+-> prompt-type / value skeleton movement
+-> answer likelihood bias
+-> generation competition
+```
+
+Phase 736 的关键贡献是把“源分辨路径”从 erasure evidence（擦除证据）推进到 replacement evidence（替换证据）。这说明 DS7B L22H24 至少部分保存了可迁移的源词元贡献；但完整语言生成不是单个 head source contribution 决定的，后面仍有 MLP nonlinear rewrite（非线性重写）、readout competition（读出竞争）和 decoding attractor（解码吸引子）在限制输出闭合。
+
+第一性原理判断：
+
+```text
+语言编码机制不是一个静态语义向量，
+也不是单个 head 的注意力统计。
+它更像一个条件化生成场：
+source token contribution 提供局部内容势能，
+residual / MLP / readout 共同决定这个势能是否能进入生成闭环。
+```
+
+### 下一步
+
+Phase 736 已经完成当前阶段的 source-restricted replacement v0（源限制替换初版）。如果继续推进同一阶段的最终目标，下一步应进入：
+
+```text
+Phase 737: Writer-Rewriter Joint Replacement and Generation Closure
+
+目标：
+1. 以 DS7B L22H24 records_all / target_record_line / target_value_tokens 为入口。
+2. 联合替换后续 MLP 候选：
+   L22:mlp[957:1017]
+   L27:mlp[2872:2932]
+3. 同时检查 hidden_28、final hidden、answer logprob、greedy generation。
+4. 判断 generation closure 失败是：
+   a. source writer 不足；
+   b. downstream nonlinear rewrite 不足；
+   c. readout competition 抵消；
+   d. decoding attractor 太强。
+5. 只在 DS7B 上做完整验证；
+   qwen3 / GLM4 只做轻量对照，避免强行同构。
+```
+
+阶段性结论：
+
+```text
+Phase 736 支持“源词元贡献可迁移”，
+但反证了“单个源限制 head 替换即可闭合生成”。
+下一阶段必须从单 head replacement 进入 writer + rewriter + readout 的联合路径闭环。
+```
+
+## Phase 737: Writer-Rewriter Joint Replacement and Generation Closure [2026-06-28 23:40]
+
+### 任务背景
+
+本阶段首先分析 Phase 736 的复盘内容。该复盘判断基本正确：Phase 736 同时给出了重要正结果和关键负结果。正结果是 source-restricted replacement（源限制替换）确实能推动 DS7B 的 hidden_28 skeleton（隐藏态28骨架）和 donor answer likelihood（供体答案似然）；负结果是 generation hit gain（生成命中增益）仍为 0，说明单个 L22H24 source contribution（源贡献）不是完整答案生成路径。
+
+因此 Phase 737 继续同一阶段性目标，不再只测 single writer replacement（单写入器替换），而是测试：
+
+```text
+source writer
++ MLP rewriter
+-> readout margin
+-> generation closure
+```
+
+核心问题：
+
+```text
+Phase 736 生成闭合失败，
+是因为 source writer 不足，
+还是因为没有同步替换后续 MLP rewriter / readout competition？
+```
+
+### 生成脚本
+
+新增正式脚本：
+
+```text
+tests/gpt5/phase737_writer_rewriter_joint_replacement.py
+```
+
+新增跨模型运行脚本：
+
+```text
+tests/gpt5/run_phase737_writer_rewriter_joint_replacement_round.sh
+```
+
+输出目录：
+
+```text
+results/glm5_phase737_writer_rewriter_joint_replacement/
+```
+
+确认轮主要结果：
+
+```text
+results/glm5_phase737_writer_rewriter_joint_replacement/confirm/phase737_cross_model_summary.md
+results/glm5_phase737_writer_rewriter_joint_replacement/confirm/phase737_cross_model_summary.json
+results/glm5_phase737_writer_rewriter_joint_replacement/confirm/phase737_atlas_graph.json
+results/glm5_phase737_writer_rewriter_joint_replacement/confirm/phase737_qwen3_joint_rows.jsonl
+results/glm5_phase737_writer_rewriter_joint_replacement/confirm/phase737_glm4_joint_rows.jsonl
+results/glm5_phase737_writer_rewriter_joint_replacement/confirm/phase737_deepseek7b_joint_rows.jsonl
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase737_writer_rewriter_joint_replacement.py
+bash -n tests/gpt5/run_phase737_writer_rewriter_joint_replacement_round.sh
+```
+
+干运行：
+
+```bash
+python tests/gpt5/phase737_writer_rewriter_joint_replacement.py --dry-run --round-name smoke --max-pairs 1 --top-paths 2 --top-mlp 1 --mode-set compact
+```
+
+冒烟测试：
+
+```bash
+PHASE737_ROUND_NAME=smoke PHASE737_MAX_PAIRS=1 PHASE737_TOP_PATHS=2 PHASE737_TOP_MLP=1 PHASE737_MAX_NEW_TOKENS=2 PHASE737_MODE_SET=compact PHASE737_LOG_EVERY=1 bash tests/gpt5/run_phase737_writer_rewriter_joint_replacement_round.sh
+```
+
+主测试：
+
+```bash
+PHASE737_ROUND_NAME=main PHASE737_MAX_PAIRS=4 PHASE737_TOP_PATHS=3 PHASE737_TOP_MLP=2 PHASE737_MAX_NEW_TOKENS=3 PHASE737_MODE_SET=compact PHASE737_LOG_EVERY=1 bash tests/gpt5/run_phase737_writer_rewriter_joint_replacement_round.sh
+```
+
+确认测试：
+
+```bash
+PHASE737_ROUND_NAME=confirm PHASE737_MAX_PAIRS=8 PHASE737_TOP_PATHS=3 PHASE737_TOP_MLP=2 PHASE737_MAX_NEW_TOKENS=3 PHASE737_MODE_SET=compact PHASE737_LOG_EVERY=2 bash tests/gpt5/run_phase737_writer_rewriter_joint_replacement_round.sh
+```
+
+说明：本阶段没有使用量化。由于仍需读取 attention weights（注意力权重）计算 source contribution（源贡献），脚本继续使用 eager attention（急切注意力）。这不是 flash attention（闪存注意力），但这是当前替换算法的必要条件。三模型按 qwen3、GLM4、DS7B 顺序运行，并传入 `--hard-exit-after-model`。
+
+### 测试原理
+
+Phase 737 比 Phase 736 多了 MLP donor -> recipient replacement（多层感知机供体到受体替换）。
+
+source writer 替换仍为：
+
+```text
+head_input' = head_input - C_G(recipient) + C_G(donor)
+```
+
+MLP group 替换为：
+
+```text
+MLP_l[start:end]' = MLP_l[start:end]^{donor}
+```
+
+联合替换包括：
+
+```text
+source_only
+mlp_only
+mlp_all
+source_plus_top_mlp
+source_plus_all_mlp
+```
+
+新增 readout competition（读出竞争）指标：
+
+```text
+donor_vs_recipient_margin
+= logit(donor_answer) - logit(recipient_answer)
+```
+
+如果 donor_logprob 上升但 margin 仍为强负，说明 donor answer 仍无法突破 recipient / format / prose attractor（受体 / 格式 / 叙述吸引子）。
+
+### 客观数据量
+
+```text
+smoke：每模型 10 行 joint rows
+main：每模型 96 行 joint rows
+confirm：每模型 192 行 joint rows
+total：894 行 joint rows
+```
+
+### 确认轮关键结果
+
+```text
+qwen3:
+  target_site = hidden_36
+  top intervention =
+    source_plus_all_mlp
+    L35H0 <- self_last
+    + L34:mlp[85:128]
+    + L28:mlp[299:341]
+    explicit<-conflict
+  restore = 1.091
+  donor_logprob_delta = 0.119
+  margin_delta = 0.125
+  patched_margin = -17.016
+  donor_hit_gain = 0.000
+  changed_rate = 0.000
+
+GLM4:
+  target_site = hidden_40
+  top intervention =
+    source_plus_all_mlp
+    L23H17 <- all_pre_answer
+    + L38:mlp[2597:2665]
+    + L38:mlp[3007:3075]
+    conflict<-explicit
+  restore = 2.832
+  donor_logprob_delta = 0.333
+  margin_delta = 0.351
+  patched_margin = -8.867
+  donor_hit_gain = 0.000
+  changed_rate = 0.000
+
+DS7B:
+  target_site = hidden_28
+  top summary intervention =
+    mlp_only
+    L27:mlp[2872:2932]
+    conflict<-explicit
+  restore = 8.444
+  donor_logprob_delta = 0.108
+  margin_delta = 0.231
+  patched_margin = -9.100
+  donor_hit_gain = 0.000
+  recipient_hit_loss = 0.125
+  changed_rate = 0.250
+```
+
+DS7B 更细结果：
+
+```text
+source_plus_all_mlp
+L22H24 <- target_record_line
++ L27:mlp[2872:2932]
++ L22:mlp[957:1017]
+explicit<-conflict:
+  restore = 20.723
+  donor_logprob_delta = 0.428
+  margin_delta = 0.520
+  patched_margin = -12.933
+  donor_hit_gain = 0.000
+  recipient_hit_loss = 0.125
+  changed_rate = 0.125
+
+source_plus_all_mlp
+L22H24 <- all_pre_answer
++ L27:mlp[2872:2932]
++ L22:mlp[957:1017]
+conflict<-explicit:
+  restore = 26.561
+  donor_logprob_delta = 0.374
+  margin_delta = 0.414
+  patched_margin = -8.917
+  donor_hit_gain = 0.000
+  changed_rate = 0.125
+```
+
+按 intervention mode 聚合：
+
+```text
+qwen3:
+  donor hit gains = 0
+  changed = 0
+  recipient hit loss = 0
+
+GLM4:
+  donor hit gains = 0
+  changed = 0
+  recipient hit loss = 0
+  mlp_all mean_margin_delta = 0.291
+  source_plus_all_mlp mean_margin_delta = 0.303
+
+DS7B:
+  donor hit gains = 0
+  changed = 17 / 192
+  recipient hit loss = 4 / 192
+  source_only mean_margin_delta = 0.293
+  source_plus_top_mlp mean_margin_delta = 0.404
+  source_plus_all_mlp mean_margin_delta = 0.430
+```
+
+### 样本级观察
+
+DS7B 的 changed samples（生成变化样本）不是 donor answer 命中，而多为格式 / 前缀轨迹变化：
+
+```text
+carrot:taste explicit<-conflict
+baseline: 'earthy'
+patched : 'The taste of'
+donor = sweet
+recipient = earthy
+
+stone:category conflict<-explicit
+baseline: 'The category of'
+patched : 'stone.category'
+donor = object
+recipient = fruit
+```
+
+这说明联合替换确实能扰动 generation trajectory（生成轨迹），但扰动方向还不是 donor value answer（供体值答案），更像 format/prose route（格式 / 叙述路线）被激活。
+
+### 对 Phase 736 复盘的判断
+
+Phase 736 复盘文本基本正确。Phase 737 进一步验证了其中最关键的判断：
+
+```text
+source writer replacement 可以推动 hidden 和 likelihood；
+加入 MLP rewriter 后可以进一步推动 readout margin；
+但 generation closure 仍然没有成立。
+```
+
+所以当前最准确结论是：
+
+```text
+DS7B L22H24 + L27/L22 MLP group
+构成了可检测的 writer-rewriter-readout subpath（写入器-重写器-读出子路径），
+但还不是完整 generation path（生成路径）。
+```
+
+### 严格审视和硬伤
+
+```text
+1. donor_hit_gain 仍然为 0。
+   这是最强负结果，说明当前联合替换没有真正恢复 donor answer generation。
+
+2. patched_margin 仍然为强负。
+   qwen3 top patched_margin = -17.016
+   GLM4 top patched_margin = -8.867
+   DS7B top patched_margin = -9.100
+   虽然 margin_delta 为正，但 donor answer 仍远远输给 recipient / 其他输出。
+
+3. DS7B 的 changed_rate 来自格式或前缀扰动，
+   不是 donor value 命中。
+
+4. MLP replacement 是 output-channel group（输出通道组）替换，
+   仍不是 neuron activation（神经元激活）级别证明。
+
+5. donor MLP slice 直接替换到 recipient context 可能 off-manifold（离流形），
+   会制造状态扰动，不等于自然计算路径完全存在。
+
+6. source_plus_all_mlp 对 margin 的提升强于 source_only，
+   但提升幅度仍不足以翻转 readout competition。
+
+7. 小模型偏差仍然很强。
+   DS7B 的生成扰动更明显，可能来自小模型显式记录依赖强和解码稳定性弱。
+```
+
+### 理论进展
+
+Phase 737 使当前图谱从：
+
+```text
+source writer -> hidden / likelihood
+```
+
+推进到：
+
+```text
+source writer + MLP rewriter -> readout margin -> partial generation perturbation
+```
+
+最重要的拼图是：
+
+```text
+readout margin 是 generation closure 的硬瓶颈。
+```
+
+也就是说，当前不是完全没有内容路径；相反，内容路径已经能稳定推动 hidden、logprob、margin。但是 margin 仍停留在强负区间，说明 donor answer 没有成为最强竞争输出。因此自然生成不会闭合。
+
+更准确的机制链条更新为：
+
+```text
+source token group
+-> attention writer
+-> MLP rewriter / amplifier
+-> residual carrier
+-> readout margin competition
+-> format/prose/value route selection
+-> generation closure
+```
+
+第一性原理判断：
+
+```text
+语言生成不是“某个值被写入就输出”，
+而是多个候选生成场在 readout 端竞争。
+source writer 和 MLP rewriter 提供的是势能偏置，
+只有当该偏置足以翻转 readout margin，
+并且不被 format/prose attractor 吸走时，
+才会变成自然生成闭合。
+```
+
+### 下一步
+
+Phase 737 已经完成 Phase 736 规划中的 writer + rewriter 联合路径验证。继续在同一思路上盲目扩大替换组合，边际收益会下降。下一步应进入更靠近瓶颈的阶段：
+
+```text
+Phase 738: Readout Margin and Token Continuation Gate Audit
+
+目标：
+1. 不再优先寻找更多 writer / MLP 替换组合。
+2. 直接测 donor answer 为什么 margin 仍为强负。
+3. 拆分竞争对象：
+   donor answer
+   recipient answer
+   format/prose prefix
+   relation echo
+   object echo
+4. 测 token0 和 token1：
+   donor first token 是否被提升；
+   donor second token continuation 是否被阻断。
+5. 对 DS7B changed samples 做 focused audit：
+   为什么从答案路线转向 'The taste of'、'stone.category' 等格式路线。
+6. 输出 readout competition atlas（读出竞争图谱），
+   把 writer / rewriter 路径和最终竞争失败点接起来。
+```
+
+阶段性结论：
+
+```text
+Phase 737 支持“writer + rewriter 能增强 readout margin”，
+但反证了“writer + rewriter 联合替换足以闭合自然生成”。
+当前瓶颈已经从路径写入后移到 readout margin 和 token continuation gate。
+```
+
+## Phase 738: Readout Margin and Token Continuation Gate Audit [2026-06-29 00:08]
+
+### 触发原因
+
+Phase 737 证明 source writer（源写入器）和 MLP rewriter（多层感知机重写器）联合替换能够稳定提高 donor answer（供体答案）的 readout margin（读出边际），但仍不能自然闭合 generation（生成）。
+
+因此本阶段不继续扩大 writer / rewriter（写入器 / 重写器）组合，而是直接检查两个更靠近输出端的问题：
+
+```text
+1. token0（第一个词元）处 donor answer 为什么仍然输给其他候选。
+2. 如果强制给出 donor token0，token1（第二个词元）的续写路线会走向答案闭合，还是走向格式 / 关系 / 回声路线。
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase738_readout_margin_continuation_audit.py
+tests/gpt5/run_phase738_readout_margin_continuation_audit_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase738_readout_margin_continuation_audit/
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase738_readout_margin_continuation_audit.py
+bash -n tests/gpt5/run_phase738_readout_margin_continuation_audit_round.sh
+```
+
+冒烟测试：
+
+```bash
+PHASE738_ROUND_NAME=smoke PHASE738_MAX_PAIRS=1 PHASE738_TOP_AUDITS=2 PHASE738_LOG_EVERY=1 bash tests/gpt5/run_phase738_readout_margin_continuation_audit_round.sh
+```
+
+主测试：
+
+```bash
+PHASE738_ROUND_NAME=main PHASE738_MAX_PAIRS=8 PHASE738_TOP_AUDITS=5 PHASE738_LOG_EVERY=2 bash tests/gpt5/run_phase738_readout_margin_continuation_audit_round.sh
+```
+
+确认测试：
+
+```bash
+PHASE738_ROUND_NAME=confirm PHASE738_MAX_PAIRS=12 PHASE738_TOP_AUDITS=5 PHASE738_LOG_EVERY=3 bash tests/gpt5/run_phase738_readout_margin_continuation_audit_round.sh
+```
+
+三轮均按 qwen3 -> GLM4 -> DS7B 顺序运行，并使用 `--hard-exit-after-model`（每个模型完成后硬退出）释放 GPU（图形处理器）内存。脚本未使用 quantization（量化）。本阶段需要 attention weights（注意力权重）来复用 Phase 737 的 source contribution（源贡献）替换，因此使用 eager attention（急切注意力路径），没有强行使用 flash attention（闪存注意力）。
+
+### 测试原理
+
+本阶段从 Phase 737 的确认结果中读取每个模型最强的 joint intervention（联合干预）候选，然后做两类审计：
+
+```text
+第一类：token0 candidate competition（第一个词元候选竞争）
+
+比较 donor_answer（供体答案）、recipient_answer（受体答案）、
+object_echo（对象回声）、relation_echo（关系回声）、
+format_the / format_answer / format_value / format_it / format_of（格式前缀）
+在 patched readout（修补后读出）处谁最强。
+```
+
+```text
+第二类：forced donor-token continuation（强制供体词元后的续写）
+
+先强制生成 donor answer 的第一个词元，
+再比较下一步 token1（第二个词元）更倾向于：
+donor_answer_token1（供体答案后续词元）、
+recipient_answer_token1（受体答案后续词元）、
+stop token（停止词元）、
+is / of / colon / comma（格式或散文连接词）、
+relation_echo（关系回声）、
+object_echo（对象回声）。
+```
+
+核心指标：
+
+```text
+mean_token0_donor_logprob_delta
+mean_token0_margin_delta_donor_vs_recipient
+mean_token0_patched_margin_donor_vs_recipient
+token0_donor_top_candidate_rate
+token0_patched_best_counts
+token1_patched_best_counts
+```
+
+### 客观结果
+
+行数：
+
+```text
+smoke：每个模型 2 行，共 6 行
+main：每个模型 40 行，共 120 行
+confirm：每个模型 60 行，共 180 行
+三轮总计 306 行 readout audit（读出审计）记录
+```
+
+确认轮汇总：
+
+```text
+qwen3:
+target_site = hidden_36
+最佳审计 = source_plus_all_mlp, L35H0<-self_last, L34/L28 MLP
+mean_token0_margin_delta_donor_vs_recipient = +0.099
+mean_token0_patched_margin_donor_vs_recipient = -15.651
+token0_donor_top_candidate_rate = 0.000
+token0_patched_best_counts = {'recipient_answer': 12}
+token1_patched_best_counts = {'cont_is': 6, 'cont_stop_newline': 6}
+```
+
+```text
+GLM4:
+target_site = hidden_40
+最佳审计 = source_plus_all_mlp, L39H21<-self_last, L38 MLP pair
+mean_token0_margin_delta_donor_vs_recipient = +0.310
+mean_token0_patched_margin_donor_vs_recipient = -8.244
+token0_donor_top_candidate_rate = 0.000
+token0_patched_best_counts = {'recipient_answer': 12}
+token1_patched_best_counts = {'cont_is': 3, 'cont_of': 1, 'object_echo': 1, 'relation_echo': 7}
+```
+
+```text
+DS7B:
+target_site = hidden_28
+最佳审计 = source_plus_all_mlp, L22H24<-target_record_line, L27/L22 MLP
+mean_token0_margin_delta_donor_vs_recipient = +0.411
+mean_token0_patched_margin_donor_vs_recipient = -11.932
+token0_donor_top_candidate_rate = 0.000
+token0_patched_best_counts = {'object_echo': 1, 'recipient_answer': 10, 'relation_echo': 1}
+token1_patched_best_counts = {'cont_is': 11, 'cont_of': 1}
+```
+
+跨模型总计：
+
+```text
+qwen3 token0 patched best:
+recipient_answer = 60 / 60
+donor_answer = 0 / 60
+
+GLM4 token0 patched best:
+recipient_answer = 60 / 60
+donor_answer = 0 / 60
+
+DS7B token0 patched best:
+recipient_answer = 39 / 60
+object_echo = 11 / 60
+format_the = 8 / 60
+relation_echo = 2 / 60
+donor_answer = 0 / 60
+```
+
+forced donor token0 后的 token1：
+
+```text
+qwen3:
+cont_is = 32 / 60
+cont_stop_newline = 28 / 60
+
+GLM4:
+relation_echo = 30 / 60
+cont_is = 20 / 60
+object_echo = 4 / 60
+cont_of = 4 / 60
+cont_stop_newline = 2 / 60
+
+DS7B:
+cont_is = 49 / 60
+cont_of = 8 / 60
+object_echo = 2 / 60
+cont_stop_newline = 1 / 60
+```
+
+本阶段还生成了 atlas（图谱）文件：
+
+```text
+node_count = 30
+edge_count = 46
+source_phase = 738
+```
+
+### 对 Phase 737 分析的判断
+
+上传的 Phase 737 分析基本正确，但需要收紧：
+
+```text
+正确部分：
+source writer + MLP rewriter 的确能提升 donor answer 的读出势能。
+这种提升在 DS7B 上最明显，在 GLM4 上中等，在 qwen3 上较弱。
+```
+
+```text
+需要修正的部分：
+不能把 readout margin 改善理解为 generation closure（生成闭合）。
+Phase 738 证明 donor answer 虽然被提高，但仍没有赢得 token0 候选竞争。
+即使强制 donor token0，token1 也主要进入 is / of / relation_echo / newline 等路线。
+```
+
+因此，Phase 737 的真实位置应写成：
+
+```text
+writer / rewriter 路径已经找到一部分，
+但它只把内容推近输出端，
+还没有穿过 readout competition（读出竞争）和 continuation gate（续写门控）。
+```
+
+### 理论进展
+
+当前机制链条应更新为：
+
+```text
+source token group
+-> attention writer
+-> MLP rewriter / amplifier
+-> residual carrier
+-> readout candidate field
+-> token0 competition
+-> token1 continuation gate
+-> natural generation closure
+```
+
+Phase 738 的关键拼图是：
+
+```text
+readout margin 改善不是生成闭合；
+生成闭合至少需要两个门槛：
+1. donor answer 在 token0 竞争中胜出；
+2. donor token0 后的 token1 续写不被格式 / 关系 / 散文路线吸走。
+```
+
+这解释了为什么 Phase 737 中 DS7B 会出现 changed output（输出被改变），但 donor answer hit gain（供体答案命中增益）仍为 0：
+
+```text
+干预已经改变了生成场，
+但改变方向不是稳定答案闭合，
+而是把模型推向 object echo、relation echo、format prefix 或 prose connector。
+```
+
+### 问题和硬伤
+
+1. 当前候选集合仍是人工列出的，虽然包含 answer、echo、format、continuation 等主要竞争项，但不等于完整 vocabulary（词表）竞争图。
+
+2. 很多答案是单词，token1 审计不能简单解释为“答案第二词是否正确”，更准确说它测的是强制供体首词元之后模型进入哪条续写路线。
+
+3. 本阶段复用 Phase 737 的 patch（修补）干预，干预后状态可能偏离自然流形，因此结果说明“当前干预不能闭合生成”，不能直接说明自然模型不存在对应闭合路径。
+
+4. 当前模型都是小模型，内部结构可能偏粗糙。DS7B 的 object_echo / format_the 竞争较明显，可能包含小模型偏差。
+
+5. 本阶段没有直接修改 unembedding（反嵌入）或 final norm（最终归一化），所以还不能判断读出端本身的最小翻转阈值。
+
+### 下一步
+
+Phase 738 已完成 Phase 737 后的同阶段闭环验证。下一阶段不应继续盲目扩大 writer / MLP patch（写入器 / 多层感知机修补）组合，而应进入新的瓶颈阶段：
+
+```text
+Phase 739: Readout Threshold and Closure Boundary Test
+
+目标：
+1. 直接测 donor answer 从负 margin 到 token0 top1 需要多大 logit shift。
+2. 分离 final hidden（最终隐藏态）、final norm（最终归一化）、unembedding（反嵌入）三个环节。
+3. 对 donor answer direction（供体答案方向）做最小强度扫描，而不是继续做大规模局部 patch。
+4. 测 token0 top1 被翻转后，token1 是否仍进入 format/prose route（格式 / 散文路线）。
+5. 输出 readout threshold atlas（读出阈值图谱），连接 source writer、MLP rewriter、readout competition、continuation gate。
+```
+
+阶段性结论：
+
+```text
+Phase 738 支持 Phase 737 的正结果：
+writer + rewriter 能推动 donor answer 的读出势能。
+
+但 Phase 738 同时给出更强边界：
+当前推动远不足以让 donor answer 赢得 token0 竞争；
+并且强制 donor token0 后，token1 仍偏向格式 / 关系 / 散文续写。
+
+所以当前真正瓶颈已经从“有没有内容路径”移动到：
+readout threshold（读出阈值）和 continuation closure（续写闭合）。
+```
+
+## Phase 739: Readout Threshold and Closure Boundary Test [2026-06-29 00:37]
+
+### 触发原因
+
+用户上传的两份分析总体正确：Phase 738 已经把生成失败定位到 token0 competition（第一个词元竞争）和 token1 continuation gate（第二词元续写门）。其中最重要的正确部分是：
+
+```text
+1. 当前苹果—水果—属性图谱已经不是普通 patch（修补）实验，
+   而是进入 source token（源词元）-> writer（写入器）-> rewriter（重写器）-> readout competition（读出竞争）的路径级图谱。
+
+2. Phase 738 证明 writer + rewriter（写入器 + 重写器）能提高 donor answer（供体答案）势能，
+   但 donor answer 仍不能自然赢得 token0（第一个词元）竞争。
+
+3. 下一步应测 readout threshold（读出阈值），而不是继续扩大 writer / MLP patch（写入器 / 多层感知机修补）组合。
+```
+
+需要收紧的地方是：
+
+```text
+Phase 738 中 token1（第二词元）偏向 is / of / relation_echo（关系回声）等路线，
+不能直接说明 continuation gate（续写门）永远失败；
+因为如果 token0（第一个词元）本身没有赢，后续状态仍可能不是答案闭合状态。
+
+所以 Phase 739 直接测试：
+如果人工跨过 final readout threshold（最终读出阈值），生成是否能够闭合？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase739_readout_threshold_closure_boundary.py
+tests/gpt5/run_phase739_readout_threshold_closure_boundary_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase739_readout_threshold_closure_boundary/
+```
+
+### 执行命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase739_readout_threshold_closure_boundary.py
+bash -n tests/gpt5/run_phase739_readout_threshold_closure_boundary_round.sh
+```
+
+dry run（空跑）：
+
+```bash
+python tests/gpt5/phase739_readout_threshold_closure_boundary.py --dry-run --max-pairs 1 --top-audits 2 --round-name dry
+```
+
+smoke（冒烟测试）：
+
+```bash
+PHASE739_ROUND_NAME=smoke PHASE739_MAX_PAIRS=1 PHASE739_TOP_AUDITS=1 PHASE739_LOG_EVERY=1 bash tests/gpt5/run_phase739_readout_threshold_closure_boundary_round.sh
+```
+
+main（主测试）：
+
+```bash
+PHASE739_ROUND_NAME=main PHASE739_MAX_PAIRS=6 PHASE739_TOP_AUDITS=2 PHASE739_LOG_EVERY=2 bash tests/gpt5/run_phase739_readout_threshold_closure_boundary_round.sh
+```
+
+confirm（确认测试）：
+
+```bash
+PHASE739_ROUND_NAME=confirm PHASE739_MAX_PAIRS=10 PHASE739_TOP_AUDITS=2 PHASE739_LOG_EVERY=3 bash tests/gpt5/run_phase739_readout_threshold_closure_boundary_round.sh
+```
+
+三轮均按 qwen3 -> GLM4 -> DS7B 顺序执行，并使用 `--hard-exit-after-model`（每个模型完成后硬退出）。脚本未使用 quantization（量化）。由于 Phase 739 复用 Phase 738 选出的 joint path（联合路径）状态，其中可能包含 source contribution replacement（源贡献替换），仍需 attention weights（注意力权重），所以使用 eager attention（急切注意力路径）。
+
+### 测试原理
+
+Phase 739 不再寻找更多中间节点，而是在 Phase 738 的最佳 joint intervention（联合干预）基础上，直接测 final_norm_output（最终归一化输出）处需要多大的 readout boost（读出增强）才能让 donor answer（供体答案）成为第一个词元的 top1（第一候选）。
+
+设修补后 logits（词表分数）为：
+
+```text
+l(y) = W_U(y)^T h_final
+```
+
+其中：
+
+```text
+W_U(y) 是 token y（词元 y）的 unembedding（反嵌入）方向。
+h_final 是 final_norm_output（最终归一化输出）。
+```
+
+对当前 top competitor（最强竞争词元）c，构造方向：
+
+```text
+d = normalize(W_U(y_donor) - W_U(c))
+```
+
+然后扫描：
+
+```text
+h_final' = h_final + alpha * d
+```
+
+记录：
+
+```text
+1. donor answer（供体答案）何时成为 candidate top1（候选集合第一）。
+2. donor answer（供体答案）何时成为 vocabulary top1（全词表第一）。
+3. 一旦 token0（第一个词元）被翻转，继续 greedy generation（贪心生成）是否能闭合短答。
+```
+
+这个测试的意义不是证明自然路径已经存在，而是测量：
+
+```text
+自然 writer / rewriter path（写入器 / 重写器路径）距离真正生成闭合还差多大的 readout threshold（读出阈值）。
+```
+
+### 客观结果
+
+行数：
+
+```text
+smoke：每个模型 1 行，共 3 行
+main：每个模型 12 行，共 36 行
+confirm：每个模型 20 行，共 60 行
+三轮总计 99 行 threshold audit（阈值审计）记录
+```
+
+confirm（确认轮）汇总：
+
+```text
+qwen3:
+target_site = hidden_36
+最佳审计 = source_plus_all_mlp, L35H0<-self_last, L34/L28 MLP
+patched_candidate_best_counts = {'recipient_answer': 10}
+mean_patched_margin_donor_vs_vocab_top = -15.244
+mean_alpha_star_vocab_top = 11.196
+mean_first_alpha_donor_vocab_top = 17.986
+vocab_flip_found_rate = 1.000
+boosted_generation_donor_hit_rate = 1.000
+boosted_generation_class_counts = {'answer_stop': 10}
+```
+
+```text
+GLM4:
+target_site = hidden_40
+最佳审计 = source_plus_all_mlp, L23H17<-instruction, L38 MLP pair
+patched_candidate_best_counts = {'recipient_answer': 10}
+mean_patched_margin_donor_vs_vocab_top = -7.825
+mean_alpha_star_vocab_top = 8.911
+mean_first_alpha_donor_vocab_top = 11.922
+vocab_flip_found_rate = 1.000
+boosted_generation_donor_hit_rate = 1.000
+boosted_generation_class_counts = {'answer_stop': 10}
+```
+
+```text
+DS7B:
+target_site = hidden_28
+最佳审计 = source_plus_all_mlp, L22H24<-all_pre_answer, L27/L22 MLP
+patched_candidate_best_counts = {'recipient_answer': 6, 'object_echo': 2, 'format_the': 2}
+mean_patched_margin_donor_vs_vocab_top = -8.016
+mean_alpha_star_vocab_top = 5.962
+mean_first_alpha_donor_vocab_top = 11.654
+vocab_flip_found_rate = 1.000
+boosted_generation_donor_hit_rate = 1.000
+boosted_generation_class_counts = {'answer_stop': 10}
+```
+
+跨模型行级统计：
+
+```text
+qwen3:
+patched_candidate_best = recipient_answer 20 / 20
+boosted_generation = answer_stop 20 / 20
+mean_first_alpha_donor_vocab_top = 17.988
+
+GLM4:
+patched_candidate_best = recipient_answer 20 / 20
+boosted_generation = answer_stop 20 / 20
+mean_first_alpha_donor_vocab_top = 12.106
+
+DS7B:
+patched_candidate_best = recipient_answer 15 / 20, object_echo 2 / 20, format_the 2 / 20, relation_echo 1 / 20
+boosted_generation = answer_stop 15 / 20, answer_mentioned 5 / 20
+mean_first_alpha_donor_vocab_top = 14.526
+```
+
+本阶段生成 atlas（图谱）：
+
+```text
+node_count = 12
+edge_count = 9
+source_phase = 739
+```
+
+### 对当前分析的修正
+
+Phase 738 的“续写门失败”需要被 Phase 739 收紧：
+
+```text
+Phase 738 看到的是：
+在自然 writer + rewriter 势能不足时，
+强制 donor token0 后，token1 仍容易进入 is / of / echo route。
+
+Phase 739 看到的是：
+如果直接在 final readout（最终读出）层给足够大的 donor-vs-current-top boost（供体对当前第一候选的增强），
+三个模型都能让 donor answer 成为 top1，并且短答生成可以闭合。
+```
+
+因此更准确的结论是：
+
+```text
+continuation gate（续写门）不是完全不可通过；
+当前主要硬瓶颈是自然路径没有给 final readout（最终读出）足够强的 token0 flip force（第一词元翻转力）。
+
+一旦 token0 真正以足够强的读出优势进入答案路线，
+短答闭合可以发生。
+```
+
+但这个结论必须谨慎：
+
+```text
+Phase 739 的 readout boost（读出增强）是人工外力，
+不等于模型自然内部已经存在同等强度的路径。
+```
+
+### 理论进展
+
+当前机制链条进一步收紧为：
+
+```text
+source token group
+-> attention writer
+-> MLP rewriter / amplifier
+-> residual carrier
+-> readout potential
+-> readout threshold
+-> token0 route entry
+-> short-answer closure
+```
+
+Phase 739 的关键拼图是：
+
+```text
+自然路径不是完全错路；
+它缺的是足够强的 final readout threshold crossing（最终读出阈值跨越）。
+```
+
+数学上，生成闭合至少需要：
+
+```text
+l(y_donor) + Delta_readout(y_donor) > max_c l(c)
+```
+
+其中 Phase 739 测得的 Delta_readout（读出增量）在三个模型中都不小：
+
+```text
+qwen3 约需要 18 的 first_alpha（实际首次翻转增强）
+GLM4 约需要 12
+DS7B 约需要 12 到 17，取决于路径方向
+```
+
+这说明 Phase 737 / 738 的 writer + rewriter 已经把答案推向读出端，但离真正 top1 还有明显距离。
+
+### 问题和硬伤
+
+1. Phase 739 是 readout intervention（读出干预），属于人工边界测试，不是自然机制证明。
+
+2. alpha（增强强度）较大，说明最终状态可能已经 off-manifold（离自然流形）。它只能说明“读出端具备答案闭合能力”，不能说明自然路径能产生这么大的增强。
+
+3. 当前 boosted_generation_donor_hit_rate（增强后供体生成命中率）为 1.0，但很多答案是单词短答，因此 answer_stop（答案后停止）不等于复杂多词答案闭合。
+
+4. DS7B 有 5 / 20 是 answer_mentioned（答案被提及）而不是严格 answer_stop（答案停止），说明 DS7B 的格式 / 散文吸引子仍然存在。
+
+5. 本阶段仍未定位哪个自然节点能提供这 12 到 18 量级的 readout boost（读出增强）。
+
+6. 当前模型是小模型，阈值大小和具体路径不能直接外推到大模型。
+
+### 下一步
+
+Phase 739 已经完成 Phase 738 后的读出阈值闭环。下一阶段应继续沿同一大阶段推进，但不要再做单纯人工 readout boost（读出增强），而要寻找自然来源：
+
+```text
+Phase 740: Natural Readout Boost Source Backtrace
+
+目标：
+1. 以 Phase 739 的 donor-vs-current-top readout direction（供体对当前第一候选读出方向）为目标方向。
+2. 回溯哪些 late attention / late MLP / residual stream（后期注意力 / 后期多层感知机 / 残差流）自然贡献沿这个方向。
+3. 区分三类来源：
+   a. value content boost（值内容增强）
+   b. recipient suppression（受体抑制）
+   c. format / echo suppression（格式 / 回声抑制）
+4. 不再只看 logprob delta（对数概率增量），而看是否能提供接近 Phase 739 测得阈值的自然增量。
+5. 输出 natural threshold source atlas（自然阈值来源图谱）。
+```
+
+阶段性结论：
+
+```text
+Phase 739 证明：
+当前生成失败不是因为答案路线无法被读出，
+而是自然 writer + rewriter 给出的读出势能不足以跨过 token0 top1 阈值。
+
+人工跨过阈值后，三模型都能短答闭合。
+
+所以真正的下一瓶颈是：
+寻找自然计算中谁负责提供 readout threshold crossing force（读出阈值跨越力）。
+```
+
+## Phase 740: Natural Readout Boost Source Backtrace [2026-06-29 07:11]
+
+### 问题来源
+
+用户给出的 Phase 739 分析基本正确。Phase 739 已经证明：
+
+```text
+人工 final readout boost（最终读出增强）可以让 donor answer（供体答案）进入 token0 top1（第一个生成词元第一名），
+但自然 writer + rewriter（写入器 + 重写器）路径没有提供足够强的 readout threshold crossing force（读出阈值跨越力）。
+```
+
+因此 Phase 740 没有继续增加人工 readout boost（读出增强），而是回溯：
+
+```text
+自然 donor path（供体路径）里谁提供了目标答案方向？
+当前 patched path（修补路径）到底转移了多少这种方向？
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase740_natural_readout_boost_source_backtrace.py
+tests/gpt5/run_phase740_natural_readout_boost_source_backtrace_round.sh
+```
+
+### 命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase740_natural_readout_boost_source_backtrace.py
+bash -n tests/gpt5/run_phase740_natural_readout_boost_source_backtrace_round.sh
+python tests/gpt5/phase740_natural_readout_boost_source_backtrace.py --model qwen3 --round-name dry --max-pairs 1 --top-audits 2 --dry-run
+python tests/gpt5/phase740_natural_readout_boost_source_backtrace.py --model glm4 --round-name dry --max-pairs 1 --top-audits 2 --dry-run
+python tests/gpt5/phase740_natural_readout_boost_source_backtrace.py --model deepseek7b --round-name dry --max-pairs 1 --top-audits 2 --dry-run
+```
+
+冒烟测试：
+
+```bash
+PHASE740_ROUND_NAME=smoke PHASE740_MAX_PAIRS=1 PHASE740_TOP_AUDITS=1 PHASE740_LOG_EVERY=1 bash tests/gpt5/run_phase740_natural_readout_boost_source_backtrace_round.sh
+```
+
+主测试：
+
+```bash
+PHASE740_ROUND_NAME=main PHASE740_MAX_PAIRS=6 PHASE740_TOP_AUDITS=1 PHASE740_LOG_EVERY=2 bash tests/gpt5/run_phase740_natural_readout_boost_source_backtrace_round.sh
+```
+
+确认测试：
+
+```bash
+PHASE740_ROUND_NAME=confirm PHASE740_MAX_PAIRS=10 PHASE740_TOP_AUDITS=2 PHASE740_LOG_EVERY=3 bash tests/gpt5/run_phase740_natural_readout_boost_source_backtrace_round.sh
+```
+
+脚本按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model` 避免显存累积。
+
+### 测试原理
+
+Phase 740 直接复用 Phase 739 的 top threshold audit（阈值审计）结果。对每个模型选取 Phase 739 中最重要的路径，然后定义目标方向：
+
+```text
+d = normalize(W_U(y_donor) - W_U(c_top))
+```
+
+其中：
+
+```text
+y_donor = donor answer token（供体答案词元）
+c_top = patched state 当前 vocab top token（修补状态当前词表第一词元）
+W_U = unembedding（反嵌入矩阵）
+```
+
+然后测量三类量：
+
+```text
+1. donor_final_delta_proj
+   donor natural final output（供体自然最终输出）相对 recipient（受体）沿 d 的投影增量。
+
+2. patched_final_delta_proj
+   Phase 739 选中的 patched path（修补路径）相对 recipient（受体）沿 d 的投影增量。
+
+3. late component raw projection
+   late attention / MLP output（后期注意力 / 多层感知机输出）沿 d 的原始投影。
+```
+
+为了和 Phase 739 可比，所有关键结果都除以 Phase 739 测得的 first_alpha / threshold（首次翻转阈值）：
+
+```text
+fraction = projected_delta / threshold
+```
+
+所以：
+
+```text
+fraction >= 1
+```
+
+表示该自然差异在读出方向上的强度已经接近或超过 Phase 739 人工翻转需要的阈值。
+
+### 确认轮结果
+
+结果目录：
+
+```text
+results/glm5_phase740_natural_readout_boost_source_backtrace/confirm/
+```
+
+跨模型摘要：
+
+```text
+results/glm5_phase740_natural_readout_boost_source_backtrace/confirm/phase740_cross_model_summary.md
+```
+
+核心结果：
+
+| model | target site | threshold | patched final fraction | donor final fraction | top component | component patched fraction |
+|---|---:|---:|---:|---:|---|---:|
+| qwen3 | hidden_36 | 17.986 | 0.004 | 1.292 | L34:attn_out | 0.009 |
+| GLM4 | hidden_40 | 12.291 | 0.029 | 1.892 | L38:mlp_out | 0.042 |
+| DS7B | hidden_28 | 11.654 | 0.020 | 1.101 | L26:attn_out | 0.057 |
+
+更细结果：
+
+```text
+qwen3:
+donor final fraction ≈ 1.29
+patched final fraction ≈ 0.003-0.004
+候选组件：L34:attn_out、L31:attn_out、L33:mlp_out
+
+GLM4:
+donor final fraction ≈ 1.89-1.94
+patched final fraction ≈ 0.029
+候选组件：L38:mlp_out，其它 late components（后期组件）明显弱很多
+
+DS7B:
+donor final fraction ≈ 0.90-1.10
+patched final fraction ≈ 0.015-0.020
+候选组件：L26:attn_out、L27:mlp_out、L27:attn_out
+```
+
+### 客观结论
+
+Phase 740 的最关键事实是：
+
+```text
+donor natural context（供体自然上下文）里确实存在足够强的 readout direction（读出方向）；
+但是当前 writer + rewriter patch（写入器 + 重写器修补）只把极小比例传递到 final readout（最终读出）。
+```
+
+这把 Phase 739 的瓶颈进一步定位为：
+
+```text
+不是模型完全没有答案方向；
+也不是 unembedding readout（反嵌入读出）完全不能读出答案；
+而是当前已定位的路径没有把自然答案方向稳定送入最终读出阈值。
+```
+
+更具体地说：
+
+```text
+qwen3:
+自然 donor 已经超过阈值，但 patch 只传递约 0.3%-0.4%。
+
+GLM4:
+自然 donor 明显超过阈值，patch 传递约 3%。
+
+DS7B:
+自然 donor 接近或略超阈值，patch 传递约 1.5%-2%。
+```
+
+### 理论进展
+
+Phase 740 支持把当前语言编码路径写成：
+
+```text
+source evidence（源证据）
+-> writer / local router（写入器 / 局部路由器）
+-> rewriter / amplifier（重写器 / 放大器）
+-> late carrier（后期承载器）
+-> final readout direction（最终读出方向）
+-> token0 threshold crossing（第一个词元阈值跨越）
+```
+
+其中 Phase 740 新增的拼图是：
+
+```text
+late carrier（后期承载器）不是没有目标方向；
+目标方向在自然 donor path（供体路径）中很强；
+当前失败点在于路径传递、放大和竞争抑制没有闭合。
+```
+
+这说明当前研究已经从：
+
+```text
+找哪个 head / channel 有用
+```
+
+推进到：
+
+```text
+找自然阈值方向如何被生成、传递、放大、冲洗或读出。
+```
+
+### 问题和硬伤
+
+1. Phase 740 的 late component projection（后期组件投影）仍然是回溯证据，不是因果证明。
+
+2. component raw projection（组件原始投影）发生在 final norm（最终归一化）之前，不能直接等价于最终 logit（对数几率）变化。
+
+3. qwen3 和 DS7B 的候选 attention component（注意力组件）有明显 donor signal（供体信号），但 patched signal（修补信号）仍很弱，说明“看到了方向”不等于“完成闭合”。
+
+4. GLM4 的 L38:mlp_out 是最清晰候选，但也只解释约 4% 的阈值，需要继续验证是否存在组合放大或竞争抑制。
+
+5. 当前模型仍是小模型，内部结构可能有偏差，不能把具体层号直接外推为通用结论。
+
+### 下一步
+
+Phase 741 应继续处于同一阶段，目标不是扩大搜索，而是做因果验证：
+
+```text
+Phase 741: Causal Validation of Natural Threshold Source Candidates
+```
+
+具体任务：
+
+```text
+1. 对 Phase 740 的 top candidate components（最高候选组件）做 donor->recipient component transplant（供体到受体组件移植）。
+2. 做 component erasure / suppression（组件擦除 / 抑制），观察 final readout fraction（最终读出阈值比例）是否下降。
+3. 区分三种机制：
+   a. value boost（值增强）
+   b. competitor suppression（竞争者抑制）
+   c. format / echo route suppression（格式 / 回声路线抑制）
+4. 不以单个 logprob delta（对数概率增量）作为主要结论，而以 threshold fraction（阈值比例）和 token0 route change（第一个词元路线变化）作为核心指标。
+```
+
+阶段性判断：
+
+```text
+Phase 740 没有完成自然闭环，
+但它把瓶颈从“读出端不够强”推进为“自然读出方向存在，但当前路径没有把它因果传递到最终阈值”。
+```
+
+## Phase 741: Threshold Candidate Causal Validation [2026-06-29 07:21]
+
+### 问题来源
+
+Phase 740 找到了 natural readout threshold source candidates（自然读出阈值来源候选），但那些结果仍然是 projection backtrace（投影回溯），不是严格因果证据。
+
+因此 Phase 741 的问题是：
+
+```text
+这些 late component（后期组件）只是和目标方向相关，
+还是它们的 donor-recipient delta（供体-受体差分）真的能推动 final readout threshold（最终读出阈值）？
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase741_threshold_candidate_causal_validation.py
+tests/gpt5/run_phase741_threshold_candidate_causal_validation_round.sh
+```
+
+### 命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase741_threshold_candidate_causal_validation.py
+bash -n tests/gpt5/run_phase741_threshold_candidate_causal_validation_round.sh
+python tests/gpt5/phase741_threshold_candidate_causal_validation.py --round-name dry --max-pairs 1 --top-audits 2 --top-candidates 3 --dry-run
+```
+
+冒烟测试：
+
+```bash
+PHASE741_ROUND_NAME=smoke PHASE741_MAX_PAIRS=1 PHASE741_TOP_AUDITS=1 PHASE741_TOP_CANDIDATES=1 PHASE741_LOG_EVERY=1 bash tests/gpt5/run_phase741_threshold_candidate_causal_validation_round.sh
+```
+
+主测试：
+
+```bash
+PHASE741_ROUND_NAME=main PHASE741_MAX_PAIRS=6 PHASE741_TOP_AUDITS=2 PHASE741_TOP_CANDIDATES=3 PHASE741_LOG_EVERY=2 bash tests/gpt5/run_phase741_threshold_candidate_causal_validation_round.sh
+```
+
+确认测试：
+
+```bash
+PHASE741_ROUND_NAME=confirm PHASE741_MAX_PAIRS=10 PHASE741_TOP_AUDITS=2 PHASE741_TOP_CANDIDATES=3 PHASE741_LOG_EVERY=3 bash tests/gpt5/run_phase741_threshold_candidate_causal_validation_round.sh
+```
+
+脚本仍按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。
+
+### 测试原理
+
+Phase 741 对 Phase 740 排名前三的 candidate components（候选组件）做四类粗粒度因果操作：
+
+```text
+recipient_add_donor_delta:
+在 recipient（受体）自然路径中加入 donor - recipient component delta（供体-受体组件差分）。
+
+joint_add_donor_delta:
+在 Phase739/740 的 joint patch（联合修补路径）基础上，再加入 donor - recipient component delta。
+
+joint_erase_to_recipient_component:
+在 joint patch（联合修补路径）中，把该组件强制替换回 recipient component（受体组件）。
+
+donor_erase_to_recipient_component:
+在 donor（供体）自然路径中，把该组件替换成 recipient component（受体组件）。
+```
+
+核心指标仍然是：
+
+```text
+effect_vs_joint_fraction = projection(condition_final - joint_final, d) / threshold
+effect_vs_donor_fraction = projection(condition_final - donor_final, d) / threshold
+```
+
+其中 `d` 是 Phase 739 / 740 使用的 donor-vs-current-top readout direction（供体对当前第一候选读出方向），`threshold` 是 Phase 739 的 token0 top1（第一个生成词元第一名）翻转阈值。
+
+### 确认轮结果
+
+结果目录：
+
+```text
+results/glm5_phase741_threshold_candidate_causal_validation/confirm/
+```
+
+跨模型摘要：
+
+```text
+results/glm5_phase741_threshold_candidate_causal_validation/confirm/phase741_cross_model_summary.md
+```
+
+确认轮共生成：
+
+```text
+qwen3: 360 rows
+GLM4: 360 rows
+DS7B: 360 rows
+```
+
+核心表：
+
+| model | component | joint add effect | joint erase effect | donor erase effect | role |
+|---|---|---:|---:|---:|---|
+| qwen3 | L31:attn_out | 0.124 | 0.001 | -0.131 | causal_boost_candidate |
+| qwen3 | L33:mlp_out | 0.019 | 0.001 | -0.038 | weak_boost_candidate |
+| qwen3 | L34:attn_out | 0.164 | 0.001 | -0.230 | causal_boost_candidate |
+| GLM4 | L37:mlp_out | 0.053 | -0.000 | -0.039 | causal_boost_candidate |
+| GLM4 | L38:mlp_out | 0.671 | -0.028 | -0.678 | causal_boost_candidate |
+| GLM4 | L39:mlp_out | 0.204 | -0.005 | -0.135 | causal_boost_candidate |
+| DS7B | L26:attn_out | 0.310 | -0.005 | -0.320 | causal_boost_candidate |
+| DS7B | L27:attn_out | 0.211 | -0.002 | -0.204 | causal_boost_candidate |
+| DS7B | L27:mlp_out | 0.034 | -0.001 | -0.031 | weak_boost_candidate |
+
+### 客观结论
+
+Phase 741 的关键正结果：
+
+```text
+Phase 740 的候选组件不是纯相关信号；
+其中多个组件的 donor-recipient delta（供体-受体差分）具有直接因果读出增强作用。
+```
+
+最强结果：
+
+```text
+GLM4 L38:mlp_out:
+joint_add_donor_delta 平均增加约 0.671 个阈值比例，
+target_top1_rate（目标第一名率）达到 0.20。
+
+DS7B L26:attn_out:
+joint_add_donor_delta 平均增加约 0.310 个阈值比例。
+
+qwen3 L34:attn_out:
+joint_add_donor_delta 平均增加约 0.164 个阈值比例。
+
+qwen3 L31:attn_out:
+joint_add_donor_delta 平均增加约 0.124 个阈值比例。
+```
+
+关键负结果：
+
+```text
+joint_erase_to_recipient_component 的下降很小。
+```
+
+这说明：
+
+```text
+当前 Phase739/740 的 joint patch（联合修补路径）并没有真正利用这些自然阈值组件；
+这些组件更像是自然 donor path（供体路径）中存在的有效读出方向源，
+但原 patch 路线没有把它们接入最终闭合路径。
+```
+
+### 理论进展
+
+Phase 741 把当前图谱推进到：
+
+```text
+source writer（源写入器）
+-> rewriter（重写器）
+-> natural threshold component（自然阈值组件）
+-> final readout threshold（最终读出阈值）
+```
+
+其中 natural threshold component（自然阈值组件）首次获得了粗粒度因果验证。
+
+三个模型出现不同结构：
+
+```text
+qwen3:
+主要是 late attention outputs（后期注意力输出）提供中等强度读出增强。
+
+GLM4:
+L38:mlp_out 是非常清晰的 readout amplifier（读出放大器）。
+
+DS7B:
+L26 / L27 attention outputs（注意力输出）是主要读出增强源，MLP 较弱。
+```
+
+这说明语言编码机制很可能不是单一模块：
+
+```text
+同一种功能闭合，在不同模型中可以由 attention carrier（注意力承载器）或 MLP amplifier（多层感知机放大器）实现。
+```
+
+### 问题和硬伤
+
+1. Phase 741 是 component-output granularity（组件输出颗粒度），还不是 neuron-level（神经元级）证明。
+
+2. donor delta add（供体差分加入）是人工插入，可能 off-manifold（离自然流形）。
+
+3. 单个组件仍然没有普遍完成 top1 closure（第一名闭合）。GLM4 L38 最接近，但也只有 0.20 top1 rate。
+
+4. joint erase（联合擦除）效应很小，说明当前 joint patch 与自然候选路径没有真正接上。
+
+5. qwen3 / DS7B 的增强主要来自 attention output（注意力输出），但这不等于已经定位到具体 head / channel / neuron（注意力头 / 通道 / 神经元）。
+
+6. 当前是小模型，具体层号不能外推为大模型通用结构。
+
+### 下一步
+
+Phase 742 仍属于同一个阶段，应该继续完成：
+
+```text
+Combined Threshold Component Closure
+```
+
+核心问题：
+
+```text
+单个自然阈值组件不能完全闭合，
+那么多个 causally validated components（因果验证组件）组合后是否能跨过 threshold（阈值）？
+```
+
+测试设计：
+
+```text
+1. 对 Phase 741 的 top components（最高组件）做 top1 / top2 / top3 cumulative donor delta add（累计供体差分加入）。
+2. 测量 final threshold fraction（最终阈值比例）是否接近或超过 1。
+3. 测量 token0 target_top1_rate（第一个词元目标第一名率）是否明显提升。
+4. 如果组合仍不能闭合，则说明缺失的是：
+   a. 更早的路线选择机制；
+   b. format / competitor suppression（格式 / 竞争者抑制）；
+   c. final norm / readout geometry（最终归一化 / 读出几何）。
+```
+
+阶段性判断：
+
+```text
+Phase 741 已经证明自然阈值候选组件具备因果增强作用；
+但还没有证明完整自然闭合。
+
+所以当前最关键问题从“有没有因果读出组件”
+推进为“这些组件组合后是否足以完成 token0 threshold closure”。
+```
+
+## Phase 742: Combined Threshold Component Closure [2026-06-29 07:29]
+
+### 问题来源
+
+Phase 741 证明多个 Phase 740 候选组件具备 causal boost（因果增强）作用，但单个组件大多不能完成 token0 top1 closure（第一个生成词元第一名闭合）。
+
+因此 Phase 742 继续同一阶段的问题：
+
+```text
+如果把已经因果验证的组件组合起来，
+是否足以跨过 final readout threshold（最终读出阈值）？
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase742_combined_threshold_component_closure.py
+tests/gpt5/run_phase742_combined_threshold_component_closure_round.sh
+```
+
+### 命令
+
+静态检查：
+
+```bash
+python -m py_compile tests/gpt5/phase742_combined_threshold_component_closure.py
+bash -n tests/gpt5/run_phase742_combined_threshold_component_closure_round.sh
+python tests/gpt5/phase742_combined_threshold_component_closure.py --round-name dry --max-pairs 1 --top-audits 2 --top-candidates 3 --dry-run
+```
+
+冒烟测试：
+
+```bash
+PHASE742_ROUND_NAME=smoke PHASE742_MAX_PAIRS=1 PHASE742_TOP_AUDITS=1 PHASE742_TOP_CANDIDATES=3 PHASE742_LOG_EVERY=1 bash tests/gpt5/run_phase742_combined_threshold_component_closure_round.sh
+```
+
+主测试：
+
+```bash
+PHASE742_ROUND_NAME=main PHASE742_MAX_PAIRS=6 PHASE742_TOP_AUDITS=2 PHASE742_TOP_CANDIDATES=3 PHASE742_LOG_EVERY=2 bash tests/gpt5/run_phase742_combined_threshold_component_closure_round.sh
+```
+
+确认测试：
+
+```bash
+PHASE742_ROUND_NAME=confirm PHASE742_MAX_PAIRS=10 PHASE742_TOP_AUDITS=2 PHASE742_TOP_CANDIDATES=3 PHASE742_LOG_EVERY=3 bash tests/gpt5/run_phase742_combined_threshold_component_closure_round.sh
+```
+
+脚本仍按 qwen3、GLM4、DS7B 顺序运行，并使用 `--hard-exit-after-model`。
+
+### 测试原理
+
+Phase 742 不再扩大候选空间，而是读取 Phase 741 的确认轮结果，按 `joint_add_donor_delta`（联合路径加入供体差分）的因果强度排序。
+
+排序结果：
+
+```text
+qwen3:
+L34:attn_out -> L31:attn_out -> L33:mlp_out
+
+GLM4:
+L38:mlp_out -> L39:mlp_out -> L37:mlp_out
+
+DS7B:
+L26:attn_out -> L27:attn_out -> L27:mlp_out
+```
+
+然后测试：
+
+```text
+joint_add_top1:
+在 joint patch（联合修补路径）上加入最强组件 donor-recipient delta（供体-受体差分）。
+
+joint_add_top2:
+累计加入前两个组件差分。
+
+joint_add_top3:
+累计加入前三个组件差分。
+```
+
+核心指标：
+
+```text
+fraction = projection(condition_final - recipient_final, d) / threshold
+target_top1_rate = 目标答案 token 在 token0 的 top1 比例
+margin_donor_vs_top = 目标答案与当前 top token 的 logit margin（对数几率差）
+```
+
+### 确认轮结果
+
+结果目录：
+
+```text
+results/glm5_phase742_combined_threshold_component_closure/confirm/
+```
+
+跨模型摘要：
+
+```text
+results/glm5_phase742_combined_threshold_component_closure/confirm/phase742_cross_model_summary.md
+```
+
+确认轮共生成：
+
+```text
+qwen3: 200 rows
+GLM4: 200 rows
+DS7B: 200 rows
+```
+
+核心结果：
+
+| model | condition | components | fraction | joint add effect | target top1 rate | margin donor vs top |
+|---|---|---|---:|---:|---:|---:|
+| qwen3 | joint_base | - | 0.004 | 0.000 | 0.000 | -15.250 |
+| qwen3 | joint_add_top1 | L34:attn_out | 0.167 | 0.164 | 0.000 | -11.541 |
+| qwen3 | joint_add_top2 | L34:attn_out,L31:attn_out | 0.279 | 0.275 | 0.000 | -8.316 |
+| qwen3 | joint_add_top3 | L34:attn_out,L31:attn_out,L33:mlp_out | 0.312 | 0.309 | 0.000 | -7.534 |
+| GLM4 | joint_base | - | 0.029 | 0.000 | 0.000 | -7.825 |
+| GLM4 | joint_add_top1 | L38:mlp_out | 0.700 | 0.671 | 0.200 | -1.678 |
+| GLM4 | joint_add_top2 | L38:mlp_out,L39:mlp_out | 0.877 | 0.848 | 0.300 | -1.116 |
+| GLM4 | joint_add_top3 | L38:mlp_out,L39:mlp_out,L37:mlp_out | 0.931 | 0.901 | 0.500 | -0.706 |
+| DS7B | joint_base | - | 0.018 | 0.000 | 0.000 | -9.863 |
+| DS7B | joint_add_top1 | L26:attn_out | 0.328 | 0.310 | 0.000 | -5.125 |
+| DS7B | joint_add_top2 | L26:attn_out,L27:attn_out | 0.553 | 0.536 | 0.100 | -2.513 |
+| DS7B | joint_add_top3 | L26:attn_out,L27:attn_out,L27:mlp_out | 0.587 | 0.569 | 0.050 | -2.356 |
+
+### 客观结论
+
+Phase 742 得到一个强收束结果：
+
+```text
+因果组件组合可以显著推动 readout threshold（读出阈值），
+但三模型闭合程度不同。
+```
+
+具体：
+
+```text
+qwen3:
+top3 组合只达到约 0.312 个阈值比例，target_top1_rate = 0。
+说明已知组件只解释约三分之一阈值缺口。
+
+GLM4:
+top3 组合达到约 0.931 个阈值比例，target_top1_rate = 0.5。
+说明 GLM4 的自然阈值组件图谱已经非常接近 token0 top1 closure。
+
+DS7B:
+top3 组合达到约 0.587 个阈值比例，target_top1_rate = 0.05。
+说明 DS7B 的 L26/L27 attention（注意力）组合有明显推进，但还远未稳定闭合。
+```
+
+### 理论进展
+
+Phase 742 把当前机制图谱推进为：
+
+```text
+source writer（源写入器）
+-> rewriter（重写器）
+-> natural threshold components（自然阈值组件群）
+-> cumulative readout force（累计读出力）
+-> token0 competition（第一个词元竞争）
+```
+
+新的关键拼图：
+
+```text
+读出闭合不是单组件事件，
+而是多个自然阈值组件的累计效应。
+```
+
+但 Phase 742 同时说明：
+
+```text
+组件累计读出力 和 最终 token0 top1 闭合 不是同一件事。
+```
+
+GLM4 的 top3 组件已经接近 1.0 阈值比例，但仍只有 50% top1，说明除了 value boost（值增强），还存在：
+
+```text
+competitor suppression（竞争者抑制）
+format suppression（格式抑制）
+final norm / readout geometry（最终归一化 / 读出几何）
+```
+
+### 问题和硬伤
+
+1. Phase 742 使用的是 whole-component cumulative delta（整组件累计差分），还不是神经元级机制。
+
+2. top3 组合仍然是人工加入，不等于自然路径自动产生。
+
+3. qwen3 和 DS7B 未闭合，说明当前图谱缺少关键机制。
+
+4. GLM4 虽然接近闭合，但仍有 50% 未 top1，说明读出阈值比例接近 1 不等于稳定生成闭合。
+
+5. 当前仍未拆出 competitor token（竞争词元）为什么仍然占优。
+
+6. 当前模型是小模型，具体层号和组件分工不能直接外推。
+
+### 阶段性判断
+
+从 Phase 739 到 Phase 742，当前阶段已经完成以下闭环：
+
+```text
+Phase 739:
+人工 readout boost 可以闭合，瓶颈是阈值跨越。
+
+Phase 740:
+自然 donor path 中存在足够强的 readout direction（读出方向），但当前 patch 只传递很小比例。
+
+Phase 741:
+多个自然阈值组件具有因果增强作用。
+
+Phase 742:
+组件组合能显著接近闭合，其中 GLM4 已接近闭合，但 qwen3 / DS7B 仍不足。
+```
+
+因此当前大阶段已经达到一个自然收束点：
+
+```text
+已经确认“自然阈值组件群”是语言值输出闭合的重要机制拼图；
+但完整闭合还需要解释 competitor / format / readout geometry（三类竞争和读出几何问题）。
+```
+
+### 下一步
+
+下一阶段不应继续盲目增加 component add（组件加入），而应该转向：
+
+```text
+Phase 743: Competitor and Format Suppression Audit
+```
+
+核心问题：
+
+```text
+为什么 readout fraction（读出阈值比例）已经接近 1，
+但 token0 top1 仍不稳定？
+```
+
+建议测试：
+
+```text
+1. 对 GLM4 top3 near-closure cases（接近闭合样本）审计当前 top token 类型。
+2. 区分 competitor（竞争者）：
+   a. wrong semantic value（错误语义值）
+   b. format token（格式词元）
+   c. echo token（回声词元）
+   d. generic noun / category token（泛化名词 / 类别词）
+3. 测量这些 competitor 的 logit 来源：
+   late MLP（后期多层感知机）
+   attention output（注意力输出）
+   final norm（最终归一化）
+   unembedding geometry（反嵌入几何）
+4. 只在必要时做 suppression intervention（抑制干预），不要继续盲目增强 donor answer。
+```
+
+阶段性结论：
+
+```text
+Phase 742 证明：
+自然阈值组件群可以把答案推到读出闭合边缘；
+真正剩下的瓶颈不是“没有答案方向”，而是“答案方向和竞争/格式路线之间的最后选择机制”。
+```
+
+## Phase 743: 竞争者与格式抑制审计 [2026-06-29 08:15]
+
+### 背景和外部分析判断
+
+本阶段分析了用户提供的 Phase 740-742 总结。该总结总体正确：Phase 740-742 不是普通 patch（修补）堆叠，而是把瓶颈从 writer / rewriter（写入器 / 重写器）后移到 token0 competition（第一个词元竞争）。更准确的当前判断是：
+
+```text
+自然 donor path（供体路径）中存在足够的 answer readout direction（答案读出方向）。
+Phase 741/742 找到的自然阈值组件具有因果增强作用。
+但是 target answer（目标答案）是否成为 top1（第一名），还取决于 recipient answer（受体答案）、format token（格式词元）、echo token（回声词元）、punctuation / prose route（标点 / 散文路线）是否被压制。
+```
+
+因此本阶段不继续盲目加入更多组件，而是审计：
+
+```text
+joint + topK natural threshold components（联合路径 + 前K个自然阈值组件）之后，
+当前 top token（最高词元）到底是谁？
+属于哪一类竞争路线？
+如果只抑制当前 top competitor（最高竞争者），donor answer 是否能闭合？
+```
+
+### 生成脚本
+
+```text
+tests/gpt5/phase743_competitor_format_suppression_audit.py
+tests/gpt5/run_phase743_competitor_format_suppression_audit_round.sh
+```
+
+输出目录：
+
+```text
+results/glm5_phase743_competitor_format_suppression_audit/
+```
+
+关键输出：
+
+```text
+results/glm5_phase743_competitor_format_suppression_audit/confirm/phase743_cross_model_summary.md
+results/glm5_phase743_competitor_format_suppression_audit/confirm/phase743_cross_model_summary.json
+results/glm5_phase743_competitor_format_suppression_audit/confirm/phase743_atlas_graph.json
+```
+
+### 执行命令
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase743_competitor_format_suppression_audit_round.sh smoke --max-pairs 1 --top-audits 1 --top-candidates 2 --top-k-vocab 8 --suppress-scales 1.0 1.25 --log-every 1
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase743_competitor_format_suppression_audit_round.sh main --max-pairs 6 --top-audits 2 --top-candidates 3 --top-k-vocab 12 --suppress-scales 1.0 1.25 --log-every 2
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase743_competitor_format_suppression_audit_round.sh confirm --max-pairs 10 --top-audits 2 --top-candidates 3 --top-k-vocab 12 --suppress-scales 1.0 1.25 --log-every 2
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序执行，并使用：
+
+```text
+--hard-exit-after-model
+```
+
+模型加载采用 BF16（bfloat16）非量化方案，复用前面阶段的 hooks（钩子）和 component replacement（组件替换）框架。
+
+### 测试原理
+
+Phase 742 已经得到：
+
+```text
+h_combo = h_joint + sum(topK donor-recipient component delta)
+```
+
+本阶段在该状态上读取全词表 top-k token，并分类为：
+
+```text
+donor_answer
+recipient_answer
+other_semantic_value
+format_or_schema
+echo_object_or_relation
+punctuation_or_stop
+prose_prefix
+other_vocab
+```
+
+对于当前最高竞争词元 c，定义竞争方向：
+
+```text
+d_c = normalize(W_U(c) - W_U(y_donor))
+```
+
+当前竞争缺口为：
+
+```text
+gap_c = logit(c) - logit(y_donor)
+```
+
+最小抑制量近似为：
+
+```text
+alpha_c = gap_c / dot(W_U(c) - W_U(y_donor), d_c)
+```
+
+然后在 final norm output（最终归一化输出）处做：
+
+```text
+h' = h - scale * alpha_c * d_c
+```
+
+scale 取：
+
+```text
+1.0, 1.25
+```
+
+这不是自然机制证明，而是读出几何审计：如果压掉当前最高竞争者后 donor answer 仍不稳定，说明失败不是单个 competitor（竞争者）造成，而是多竞争路线或全局读出几何造成。
+
+### 确认轮客观结果
+
+#### qwen3
+
+```text
+joint_add_topK:
+  n = 20
+  donor_top1_rate = 0.000
+  mean_donor_rank = 14.45
+  mean_margin_donor_vs_top = -7.534
+  top_token_class = recipient_answer: 20/20
+
+suppress_current_top scale=1.0:
+  donor_top1_rate = 0.100
+  mean_donor_rank = 2.70
+  top_token_class:
+    format_or_schema = 16
+    recipient_answer = 3
+    donor_answer = 1
+
+suppress_current_top scale=1.25:
+  donor_top1_rate = 0.300
+  mean_donor_rank = 2.15
+  top_token_class:
+    format_or_schema = 13
+    donor_answer = 7
+```
+
+解释：
+
+```text
+qwen3 的 top3 阈值组件组合后，首先完全输给 recipient answer（受体答案）。
+但压掉 recipient answer 后，format_or_schema（格式 / 模板路线）大面积接管。
+所以 qwen3 不是单一 recipient competition（受体竞争）问题，而是 recipient + format 多路线竞争问题。
+```
+
+#### GLM4
+
+```text
+joint_add_topK:
+  n = 20
+  donor_top1_rate = 0.500
+  mean_donor_rank = 2.75
+  mean_margin_donor_vs_top = -0.706
+  top_token_class:
+    donor_answer = 10
+    echo_object_or_relation = 6
+    other_vocab = 4
+
+suppress_current_top scale=1.25:
+  n = 9
+  donor_top1_rate = 0.667
+  mean_donor_rank = 1.22
+  top_token_class:
+    donor_answer = 6
+    echo_object_or_relation = 2
+    other_vocab = 1
+```
+
+解释：
+
+```text
+GLM4 已经最接近闭合。
+失败样本主要不是 recipient answer，而是 echo_object_or_relation（回声 / 对象 / 关系）和 other_vocab 中的 "B" 路线。
+对失败样本压制当前 top competitor 后，有 66.7% 转为 donor top1。
+这说明 GLM4 的剩余瓶颈主要是局部竞争者抑制不足，而不是缺少大量 donor readout force（供体读出力）。
+```
+
+#### DS7B
+
+```text
+joint_add_topK:
+  n = 20
+  donor_top1_rate = 0.050
+  mean_donor_rank = 9.30
+  mean_margin_donor_vs_top = -2.356
+  top_token_class:
+    format_or_schema = 9
+    echo_object_or_relation = 7
+    punctuation_or_stop = 1
+    recipient_answer = 1
+    other_vocab = 1
+    donor_answer = 1
+
+suppress_current_top scale=1.25:
+  n = 18
+  donor_top1_rate = 0.500
+  mean_donor_rank = 2.06
+  top_token_class:
+    donor_answer = 9
+    echo_object_or_relation = 3
+    format_or_schema = 2
+    punctuation_or_stop = 2
+    other_semantic_value = 1
+    other_vocab = 1
+```
+
+解释：
+
+```text
+DS7B 的主要阻挡不是 recipient answer。
+最大竞争路线是 format_or_schema（尤其 "The"）和 echo_object_or_relation（category / taste / carrot / stone）。
+单独压制当前最高竞争者后，donor_top1_rate 从 0.05 提升到 0.50，但仍有格式、回声、标点路线接管。
+所以 DS7B 是多竞争吸引子问题，尤其是格式 / 回声路线控制不足。
+```
+
+### 总体结论
+
+Phase 743 支持并收紧 Phase 740-742 的判断：
+
+```text
+答案方向存在；
+自然阈值组件有因果增强作用；
+但生成闭合还必须包含 competitor suppression（竞争者抑制）。
+```
+
+三模型分化清楚：
+
+```text
+qwen3:
+  recipient answer competition 是第一阻挡；
+  recipient 被压下后 format route 立刻接管。
+
+GLM4:
+  donor force 已较强；
+  剩余失败多是 echo / relation / other_vocab 局部竞争；
+  最接近自然闭合。
+
+DS7B:
+  format route 和 echo route 是主要阻挡；
+  抑制当前 top competitor 可显著提升，但仍不稳定。
+```
+
+因此，输出闭合不只是：
+
+```text
+Boost donor answer
+```
+
+而是：
+
+```text
+Boost donor answer
++ Suppress recipient answer
++ Suppress format route
++ Suppress echo route
++ Suppress punctuation / prose continuation
+```
+
+### 关键进展
+
+本阶段第一次把 Phase 742 的“fraction 接近阈值但 top1 不稳定”拆成可观测竞争类别：
+
+```text
+qwen3: recipient_answer -> format_or_schema
+GLM4: echo_object_or_relation / other_vocab
+DS7B: format_or_schema + echo_object_or_relation
+```
+
+这说明：
+
+```text
+readout fraction（读出阈值比例）只解释 donor force（供体力）；
+token0 closure（第一个词元闭合）还需要 competitor field（竞争场）的压制结构。
+```
+
+### 问题、硬伤和边界
+
+1. 本阶段的 suppression（抑制）仍是在 final norm output（最终归一化输出）上的人工读出几何干预，不证明模型自然内部有同样的 suppression circuit（抑制回路）。
+
+2. 当前只压制“当前 top competitor”。如果压掉后另一个 format / echo token 接管，说明竞争场是多峰结构，不能用单竞争者解释。
+
+3. 分类规则仍是启发式。比如 GLM4 的 `" B"` 暂记为 other_vocab，但它可能是 option / format route（选项 / 格式路线），后续需要细分。
+
+4. 当前仍是 whole component（整组件）级路径，未进入 head/channel/neuron（注意力头 / 通道 / 神经元）级 suppression atlas（抑制图谱）。
+
+5. 小模型结果不能直接外推层号和组件形态，只能外推功能结构：
+
+```text
+writer -> rewriter -> threshold components -> competitor suppression -> token0 closure
+```
+
+### 理论更新
+
+当前完整路径应从：
+
+```text
+source -> writer -> rewriter -> threshold components -> readout boost
+```
+
+更新为：
+
+```text
+source -> writer -> rewriter -> threshold components
+-> donor readout force
+-> competitor suppression field
+-> token0 closure
+-> continuation closure
+```
+
+最小闭合公式：
+
+```text
+Closure = donor_force - max(competitor_force) > 0
+```
+
+更完整地写：
+
+```text
+logit(y_donor)
+-
+max_c logit(c)
+> 0
+```
+
+其中：
+
+```text
+logit(y_donor) = W_U(y_donor)^T h_final
+logit(c)       = W_U(c)^T h_final
+```
+
+而：
+
+```text
+h_final
+= h_base
++ source_writer
++ mlp_rewriter
++ threshold_components
++ suppression_components
++ residual_noise
+```
+
+Phase 743 的核心新项是：
+
+```text
+suppression_components
+```
+
+没有这个项，读出增强可以接近阈值，但不一定稳定生成。
+
+### 下一步
+
+下一阶段应进入：
+
+```text
+Phase 744: Competitor Suppression Source Localization
+竞争者抑制来源定位
+```
+
+核心目标：
+
+```text
+不再只在 final norm output 人工压制 competitor，
+而是定位哪些 head / MLP / channel 自然负责压制：
+1. recipient_answer
+2. format_or_schema
+3. echo_object_or_relation
+4. punctuation_or_stop
+```
+
+建议优先顺序：
+
+```text
+1. qwen3:
+   找 recipient_answer suppression source。
+
+2. DS7B:
+   找 "The" format route 和 category/taste echo route 的抑制来源。
+
+3. GLM4:
+   找 echo_object_or_relation 和 "B" route 的局部抑制来源。
+```
+
+成功判据：
+
+```text
+找到至少一种自然 suppression component（抑制组件），其 donor-recipient delta 能降低 competitor logit 或提升 donor-vs-competitor margin。
+```
+
+## Phase 744: 竞争者抑制来源定位 [2026-06-29 08:36]
+
+### 背景和判断
+
+本阶段分析了用户提供的 Phase 743 复盘。该复盘总体正确：Phase 743 的关键价值不是继续增强 donor answer（供体答案），而是把输出闭合改写为：
+
+```text
+donor boost（供体增强）
++
+competitor suppression（竞争者抑制）
+=
+token0 closure（第一个词元闭合）
+```
+
+Phase 743 已经证明：
+
+```text
+qwen3:
+  第一阻挡是 recipient_answer（受体答案），压掉后 format route（格式路线）接管。
+
+GLM4:
+  已经最接近闭合，剩余主要是 echo / other_vocab 竞争。
+
+DS7B:
+  主要是 format route + echo route 多吸引子竞争。
+```
+
+因此 Phase 744 的目标是继续同一阶段性任务：不再只问“要压谁”，而是定位“自然路径中哪些 component（组件）能压制这些竞争者，或至少提高 donor-vs-competitor margin（供体相对竞争者边际）”。
+
+### 生成脚本
+
+```text
+tests/gpt5/phase744_competitor_suppression_source_localization.py
+tests/gpt5/run_phase744_competitor_suppression_source_localization_round.sh
+```
+
+输出目录：
+
+```text
+results/glm5_phase744_competitor_suppression_source_localization/
+```
+
+关键输出：
+
+```text
+results/glm5_phase744_competitor_suppression_source_localization/confirm/phase744_cross_model_summary.md
+results/glm5_phase744_competitor_suppression_source_localization/confirm/phase744_cross_model_summary.json
+results/glm5_phase744_competitor_suppression_source_localization/confirm/phase744_atlas_graph.json
+```
+
+### 执行命令
+
+冒烟测试：
+
+```bash
+tests/gpt5/run_phase744_competitor_suppression_source_localization_round.sh smoke --max-pairs 1 --top-audits 1 --top-candidates 2 --top-k-vocab 8 --max-scan-candidates 6 --log-every 1
+```
+
+主测试：
+
+```bash
+tests/gpt5/run_phase744_competitor_suppression_source_localization_round.sh main --max-pairs 6 --top-audits 2 --top-candidates 3 --top-k-vocab 12 --log-every 2
+```
+
+确认测试：
+
+```bash
+tests/gpt5/run_phase744_competitor_suppression_source_localization_round.sh confirm --max-pairs 10 --top-audits 2 --top-candidates 3 --top-k-vocab 12 --log-every 2
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序执行，并使用：
+
+```text
+--hard-exit-after-model
+```
+
+加载方式：
+
+```text
+BF16（bfloat16）
+非量化
+attn=eager
+device_map=auto
+```
+
+### 测试原理
+
+Phase 743 在下列状态上得到当前最高竞争者：
+
+```text
+h_combo = h_joint + sum(topK donor-recipient threshold component delta)
+```
+
+Phase 744 固定该状态下的当前 top competitor（最高竞争者）c，然后扫描 late attn / mlp component（后期注意力 / 多层感知机组件），把自然 donor-recipient delta 加入 recipient combo state：
+
+```text
+h' = h_combo + delta_component(donor - recipient)
+```
+
+核心指标：
+
+```text
+base_margin = logit(y_donor) - logit(c)
+new_margin  = logit'(y_donor) - logit'(c)
+delta_margin = new_margin - base_margin
+
+delta_donor_logit = logit'(y_donor) - logit(y_donor)
+delta_comp_logit  = logit'(c) - logit(c)
+```
+
+解释规则：
+
+```text
+delta_margin > 0:
+  该组件能改善 donor-vs-current-competitor competition（供体对当前竞争者竞争）。
+
+delta_comp_logit < 0:
+  有直接 competitor suppression（竞争者抑制）证据。
+
+delta_donor_logit > 0 且 delta_comp_logit 不明显下降:
+  主要是 donor boost（供体增强），不是纯抑制。
+
+new_donor_top1_rate 上升:
+  该组件能把部分失败样本推向 token0 closure（第一个词元闭合）。
+```
+
+### 确认轮结果
+
+#### qwen3
+
+确认轮：
+
+```text
+n = 20
+base competitor class = recipient_answer: 20/20
+```
+
+主要候选：
+
+```text
+L33:attn_out:
+  delta_margin = +5.144
+  delta_donor_logit = +3.038
+  delta_competitor_logit = -2.106
+  new_donor_top1_rate = 0.000
+  解释：强烈压低 recipient answer，同时增强 donor，但 format route 接管，所以不闭合。
+
+L32:attn_out:
+  delta_margin = +3.259
+  delta_donor_logit = +2.959
+  delta_competitor_logit = -0.300
+  new_donor_top1_rate = 0.100
+  解释：混合 boost + suppression，并能少量闭合。
+
+L30:attn_out:
+  delta_margin = +1.991
+  delta_donor_logit = +1.428
+  delta_competitor_logit = -0.562
+  new_donor_top1_rate = 0.000
+
+L32:mlp_out:
+  delta_margin = +0.975
+  delta_donor_logit = +0.175
+  delta_competitor_logit = -0.800
+  new_donor_top1_rate = 0.000
+  解释：这是更接近 pure recipient suppression（纯受体抑制）的候选，但强度不足。
+```
+
+结论：
+
+```text
+qwen3 的 recipient_answer suppression source（受体答案抑制来源）候选成立。
+最强的是 L33:attn_out，但它压掉 recipient 后引出 format route。
+L32:mlp_out 是较纯的 recipient suppression candidate（受体抑制候选），但不能单独闭合。
+```
+
+#### GLM4
+
+确认轮中 GLM4 有 10 个 case 已经 donor top1，被跳过；剩余 10 个失败 case 用于来源定位。
+
+主要候选：
+
+```text
+L34:attn_out:
+  delta_margin = +2.306
+  delta_donor_logit = +2.131
+  delta_competitor_logit = -0.175
+  new_donor_top1_rate = 0.800
+  解释：最强闭合候选，主要是 donor boost，附带轻度 competitor suppression。
+
+L35:attn_out:
+  delta_margin = +0.794
+  delta_donor_logit = +0.581
+  delta_competitor_logit = -0.212
+  new_donor_top1_rate = 0.400
+
+L35:mlp_out:
+  delta_margin = +0.231
+  delta_donor_logit = +0.188
+  delta_competitor_logit = -0.044
+  new_donor_top1_rate = 0.400
+
+L36:attn_out:
+  delta_margin = +0.475
+  delta_donor_logit = +0.412
+  delta_competitor_logit = -0.062
+  new_donor_top1_rate = 0.300
+```
+
+按竞争类别：
+
+```text
+other_vocab:
+  L34:attn_out 可达 donor_top1_rate = 1.000，但主要是 donor boost。
+  L34:mlp_out 和 L39:attn_out 对 other_vocab 有较纯 suppression 迹象：
+    L34:mlp_out: competitor delta = -0.203, donor_top1_rate = 0.500
+    L39:attn_out: competitor delta = -0.281, donor_top1_rate = 0.500
+
+echo_object_or_relation:
+  L34:attn_out:
+    delta_margin = +2.885
+    delta_competitor_logit = -0.323
+    donor_top1_rate = 0.667
+```
+
+结论：
+
+```text
+GLM4 的失败样本可以被 L34/L35 attention route 显著修复。
+但 L34:attn_out 多数是 boost-dominant（增强主导），不是纯抑制。
+较纯的 suppression 候选在 L34:mlp_out / L39:attn_out，但强度较小。
+```
+
+#### DS7B
+
+确认轮中 1 个 case 已经 donor top1，被跳过，剩余 19 个失败 case。
+
+主要候选：
+
+```text
+L23:attn_out:
+  delta_margin = +1.977
+  delta_donor_logit = +1.671
+  delta_competitor_logit = -0.306
+  new_donor_top1_rate = 0.421
+  解释：最强 boost + suppression 混合候选。
+
+L22:attn_out:
+  delta_margin = +1.688
+  delta_donor_logit = +1.303
+  delta_competitor_logit = -0.385
+  new_donor_top1_rate = 0.316
+
+L24:attn_out:
+  delta_margin = +1.118
+  delta_donor_logit = +0.993
+  delta_competitor_logit = -0.125
+  new_donor_top1_rate = 0.263
+
+L24:mlp_out:
+  delta_margin = +0.868
+  delta_donor_logit = +0.753
+  delta_competitor_logit = -0.115
+  new_donor_top1_rate = 0.105
+
+L25:mlp_out:
+  delta_margin = +0.658
+  delta_donor_logit = +0.401
+  delta_competitor_logit = -0.257
+  new_donor_top1_rate = 0.105
+```
+
+结论：
+
+```text
+DS7B 的 L22-L24 attention 是主要竞争边际改善来源。
+L23:attn_out 最强，可把失败 case 的 donor_top1_rate 推到 0.421。
+这些组件不是纯 suppression，而是 donor boost + competitor suppression 混合。
+```
+
+### 总体结论
+
+Phase 744 支持 Phase 743 的路线，并给出新的客观拼图：
+
+```text
+1. 自然 donor-recipient component delta 中确实存在能改善 donor-vs-competitor margin 的来源。
+2. 这些来源多数不是纯 suppression，而是 boost + suppression 混合组件。
+3. 纯 suppression 候选存在，但通常强度较弱，单独不能闭合。
+4. GLM4 最接近闭合，L34:attn_out 对失败样本有 0.800 top1 修复率。
+5. DS7B 的 L23:attn_out 是最强混合候选，能把失败样本 donor_top1_rate 推到 0.421。
+6. qwen3 虽然 L33:attn_out 强烈压低 recipient answer，但 format route 接管，说明 qwen3 的瓶颈是 recipient + format 双层竞争。
+```
+
+### 理论更新
+
+Phase 743 的公式是：
+
+```text
+ClosureForce = Boost_donor + Suppress_competitors
+```
+
+Phase 744 进一步说明，实际组件通常不是纯分离的：
+
+```text
+component_effect(u)
+= donor_boost(u)
++ competitor_suppression(u)
++ route_shift(u)
+```
+
+其中：
+
+```text
+donor_boost(u) = delta logit(y_donor)
+competitor_suppression(u) = - delta logit(c)
+route_shift(u) = top competitor 从一种 route 切换到另一种 route
+```
+
+所以更接近当前实证结果的闭合公式是：
+
+```text
+delta_margin(u, c)
+= delta logit(y_donor)
+- delta logit(c)
+```
+
+而稳定闭合需要：
+
+```text
+sum_u delta_margin(u, c_i) > gap(c_i)
+for all dominant competitor routes c_i
+```
+
+这说明：
+
+```text
+语言生成闭合不是单一方向增强，
+而是多个竞争路线同时被重新排序。
+```
+
+### 问题和硬伤
+
+1. Phase 744 仍是 whole-component（整组件）级别，尚未定位到 head / channel / neuron（注意力头 / 通道 / 神经元）。
+
+2. donor-recipient delta add（供体-受体差分加入）仍是人工 transplant（移植），不等于证明自然生成中这些组件会自动被激活。
+
+3. 多数候选是 boost + suppression 混合，不是干净的 suppression circuit（抑制回路）。
+
+4. qwen3 的强 recipient suppression 会引出 format route，说明单类竞争者定位仍不够，必须进入 route-level multi-suppression（路线级多竞争抑制）。
+
+5. GLM4 的 `"B"` 仍归为 other_vocab，但它可能是格式/选项路线，需要更细 route classifier（路线分类器）。
+
+6. 小模型层号不可外推到大模型，只能外推功能结构：
+
+```text
+late component delta can jointly boost donor and suppress competitors.
+```
+
+### 下一步
+
+下一阶段应进入：
+
+```text
+Phase 745: Route-Level Multi-Competitor Suppression Validation
+路线级多竞争者抑制验证
+```
+
+核心目标：
+
+```text
+不再只针对 current top competitor（当前最高竞争者），
+而是同时处理一个 route class（路线类）：
+recipient route
+format route
+echo route
+other_vocab / option route
+```
+
+建议优先测试：
+
+```text
+qwen3:
+  L33:attn_out 压 recipient 后 format 接管，下一步要组合 L33 recipient suppression + format route suppression。
+
+GLM4:
+  L34:attn_out 可强闭合，但 boost 主导；需要找 L34/L39 的 pure suppression 子来源。
+
+DS7B:
+  L23:attn_out / L22:attn_out 是核心混合候选，下一步验证它们是否同时处理 format + echo route。
+```
+
+成功判据：
+
+```text
+1. 对每个模型至少确定一个 route-level suppressor set（路线级抑制集合）。
+2. 证明它比单 top competitor suppression 更稳定提升 donor_top1_rate。
+3. 对 qwen3，必须解释 recipient 被压制后 format 接管的问题。
+4. 对 GLM4，区分 boost-dominant closure 与 true suppression closure。
+5. 对 DS7B，验证 L23/L22 attention 是否是 format+echo mixed suppressor。
+```

@@ -1,0 +1,161 @@
+[23:31:41] qwen3/main: pairs=4 target=hidden_36 sources=3 mlp=2 interventions=12
+[23:31:42] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 251.23it/s]Loading weights:  22%|██▏       | 86/398 [00:00<00:00, 452.42it/s]Loading weights:  37%|███▋      | 148/398 [00:00<00:00, 514.59it/s]Loading weights:  53%|█████▎    | 212/398 [00:00<00:00, 535.85it/s]Loading weights:  70%|███████   | 279/398 [00:00<00:00, 571.36it/s]Loading weights:  87%|████████▋ | 345/398 [00:00<00:00, 593.57it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 559.80it/s]
+[23:31:43] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[23:31:53] qwen3: joint closure 1/4 pairs; rows=24
+[23:32:03] qwen3: joint closure 2/4 pairs; rows=48
+[23:32:13] qwen3: joint closure 3/4 pairs; rows=72
+[23:32:23] qwen3: joint closure 4/4 pairs; rows=96
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "target_site": "hidden_36",
+  "top_joint_interventions": [
+    {
+      "intervention_label": "source_plus_all_mlp|L28H28<-instruction|L34:mlp[85:128]+L28:mlp[299:341]",
+      "intervention_mode": "source_plus_all_mlp",
+      "direction": "conflict<-explicit",
+      "source_component_id": "L28H28",
+      "source_group": "instruction",
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 4,
+      "mean_restore_projection": 0.9905996918678284,
+      "mean_restore_fraction": 0.0025922451269458193,
+      "mean_donor_logprob_delta": 0.0777139663696289,
+      "mean_recipient_logprob_delta": -0.000411179440561682,
+      "mean_donor_rank_delta": 18.5,
+      "mean_donor_vs_recipient_margin_delta": 0.078125,
+      "mean_patched_donor_vs_recipient_margin": -16.265625,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": 0.13840886019170284,
+      "mean_mlp_delta_norm_total": 14.145271897315979,
+      "role_guess": "joint_readout_transfer_candidate"
+    },
+    {
+      "intervention_label": "mlp_only|no_source|L28:mlp[299:341]",
+      "intervention_mode": "mlp_only",
+      "direction": "explicit<-conflict",
+      "source_component_id": null,
+      "source_group": null,
+      "mlp_components": [
+        "L28:mlp[299:341]"
+      ],
+      "n": 4,
+      "mean_restore_projection": 1.5868983268737793,
+      "mean_restore_fraction": 0.006008937888324439,
+      "mean_donor_logprob_delta": 0.051898956298828125,
+      "mean_recipient_logprob_delta": -0.010600763489492238,
+      "mean_donor_rank_delta": 0.5,
+      "mean_donor_vs_recipient_margin_delta": 0.0625,
+      "mean_patched_donor_vs_recipient_margin": -15.453125,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": null,
+      "mean_mlp_delta_norm_total": 3.404380440711975,
+      "role_guess": "joint_readout_transfer_candidate"
+    },
+    {
+      "intervention_label": "mlp_all|no_source|L34:mlp[85:128]+L28:mlp[299:341]",
+      "intervention_mode": "mlp_all",
+      "direction": "explicit<-conflict",
+      "source_component_id": null,
+      "source_group": null,
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 4,
+      "mean_restore_projection": 1.5730548202991486,
+      "mean_restore_fraction": 0.00529105887753981,
+      "mean_donor_logprob_delta": 0.043494224548339844,
+      "mean_recipient_logprob_delta": -0.0033802978578023612,
+      "mean_donor_rank_delta": 17.0,
+      "mean_donor_vs_recipient_margin_delta": 0.046875,
+      "mean_patched_donor_vs_recipient_margin": -15.46875,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": null,
+      "mean_mlp_delta_norm_total": 14.145271897315979,
+      "role_guess": "joint_readout_transfer_candidate"
+    },
+    {
+      "intervention_label": "source_plus_all_mlp|L28H28<-all_pre_answer|L34:mlp[85:128]+L28:mlp[299:341]",
+      "intervention_mode": "source_plus_all_mlp",
+      "direction": "explicit<-conflict",
+      "source_component_id": "L28H28",
+      "source_group": "all_pre_answer",
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 4,
+      "mean_restore_projection": 0.6943522319197655,
+      "mean_restore_fraction": 0.002088962047514508,
+      "mean_donor_logprob_delta": 0.045020103454589844,
+      "mean_recipient_logprob_delta": -0.001854472269769758,
+      "mean_donor_rank_delta": 24.0,
+      "mean_donor_vs_recipient_margin_delta": 0.046875,
+      "mean_patched_donor_vs_recipient_margin": -15.46875,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": 0.38329003006219864,
+      "mean_mlp_delta_norm_total": 14.145271897315979,
+      "role_guess": "joint_readout_transfer_candidate"
+    },
+    {
+      "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+      "intervention_mode": "source_plus_all_mlp",
+      "direction": "explicit<-conflict",
+      "source_component_id": "L35H0",
+      "source_group": "self_last",
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 4,
+      "mean_restore_projection": 2.1326530426740646,
+      "mean_restore_fraction": 0.007091599897916873,
+      "mean_donor_logprob_delta": 0.027096033096313477,
+      "mean_recipient_logprob_delta": -0.0041537320939823985,
+      "mean_donor_rank_delta": -30.75,
+      "mean_donor_vs_recipient_margin_delta": 0.03125,
+      "mean_patched_donor_vs_recipient_margin": -15.484375,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": 16.70871901512146,
+      "mean_mlp_delta_norm_total": 14.145271897315979,
+      "role_guess": "joint_readout_transfer_candidate"
+    }
+  ]
+}

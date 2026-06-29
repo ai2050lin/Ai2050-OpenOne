@@ -1,0 +1,221 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "phase": 739,
+        "relation": "audits",
+        "source": "qwen3:model",
+        "target": "qwen3:readout_threshold:hidden_36"
+      },
+      {
+        "phase": 739,
+        "relation": "measures_minimum_boost",
+        "source": "qwen3:threshold_audit:confirm:source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+        "target": "qwen3:readout_threshold:hidden_36",
+        "weight": 11.196123745136504
+      },
+      {
+        "phase": 739,
+        "relation": "measures_minimum_boost",
+        "source": "qwen3:threshold_audit:confirm:mlp_only|no_source|L28:mlp[299:341] explicit<-conflict",
+        "target": "qwen3:readout_threshold:hidden_36",
+        "weight": 11.203435018357851
+      },
+      {
+        "phase": 739,
+        "relation": "audits",
+        "source": "glm4:model",
+        "target": "glm4:readout_threshold:hidden_40"
+      },
+      {
+        "phase": 739,
+        "relation": "measures_minimum_boost",
+        "source": "glm4:threshold_audit:confirm:source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "target": "glm4:readout_threshold:hidden_40",
+        "weight": 8.911054996489202
+      },
+      {
+        "phase": 739,
+        "relation": "measures_minimum_boost",
+        "source": "glm4:threshold_audit:confirm:source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "target": "glm4:readout_threshold:hidden_40",
+        "weight": 8.909755030775454
+      },
+      {
+        "phase": 739,
+        "relation": "audits",
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:readout_threshold:hidden_28"
+      },
+      {
+        "phase": 739,
+        "relation": "measures_minimum_boost",
+        "source": "deepseek7b:threshold_audit:confirm:source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+        "target": "deepseek7b:readout_threshold:hidden_28",
+        "weight": 5.961867421753157
+      },
+      {
+        "phase": 739,
+        "relation": "measures_minimum_boost",
+        "source": "deepseek7b:threshold_audit:confirm:source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+        "target": "deepseek7b:readout_threshold:hidden_28",
+        "weight": 8.636828474791173
+      }
+    ],
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -30,
+          0,
+          -10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:readout_threshold:hidden_36",
+        "label": "hidden_36",
+        "model": "qwen3",
+        "position": [
+          4,
+          0,
+          -10.0
+        ],
+        "role": "readout_threshold_boundary",
+        "type": "readout_threshold"
+      },
+      {
+        "id": "qwen3:threshold_audit:confirm:source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+        "label": "source_plus_all_mlp",
+        "mean_alpha_star_vocab_top": 11.196123745136504,
+        "model": "qwen3",
+        "role": "final_readout_boost",
+        "type": "threshold_audit",
+        "vocab_flip_found_rate": 1.0
+      },
+      {
+        "id": "qwen3:threshold_audit:confirm:mlp_only|no_source|L28:mlp[299:341] explicit<-conflict",
+        "label": "mlp_only",
+        "mean_alpha_star_vocab_top": 11.203435018357851,
+        "model": "qwen3",
+        "role": "final_readout_boost",
+        "type": "threshold_audit",
+        "vocab_flip_found_rate": 1.0
+      },
+      {
+        "id": "glm4:model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -30,
+          0,
+          0.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "glm4:readout_threshold:hidden_40",
+        "label": "hidden_40",
+        "model": "glm4",
+        "position": [
+          4,
+          0,
+          0.0
+        ],
+        "role": "readout_threshold_boundary",
+        "type": "readout_threshold"
+      },
+      {
+        "id": "glm4:threshold_audit:confirm:source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "label": "source_plus_all_mlp",
+        "mean_alpha_star_vocab_top": 8.911054996489202,
+        "model": "glm4",
+        "role": "final_readout_boost",
+        "type": "threshold_audit",
+        "vocab_flip_found_rate": 1.0
+      },
+      {
+        "id": "glm4:threshold_audit:confirm:source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "label": "source_plus_all_mlp",
+        "mean_alpha_star_vocab_top": 8.909755030775454,
+        "model": "glm4",
+        "role": "final_readout_boost",
+        "type": "threshold_audit",
+        "vocab_flip_found_rate": 1.0
+      },
+      {
+        "id": "deepseek7b:model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -30,
+          0,
+          10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:readout_threshold:hidden_28",
+        "label": "hidden_28",
+        "model": "deepseek7b",
+        "position": [
+          4,
+          0,
+          10.0
+        ],
+        "role": "readout_threshold_boundary",
+        "type": "readout_threshold"
+      },
+      {
+        "id": "deepseek7b:threshold_audit:confirm:source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+        "label": "source_plus_all_mlp",
+        "mean_alpha_star_vocab_top": 5.961867421753157,
+        "model": "deepseek7b",
+        "role": "final_readout_boost",
+        "type": "threshold_audit",
+        "vocab_flip_found_rate": 1.0
+      },
+      {
+        "id": "deepseek7b:threshold_audit:confirm:source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+        "label": "source_plus_all_mlp",
+        "mean_alpha_star_vocab_top": 8.636828474791173,
+        "model": "deepseek7b",
+        "role": "final_readout_boost",
+        "type": "threshold_audit",
+        "vocab_flip_found_rate": 1.0
+      }
+    ]
+  },
+  "layout": {
+    "x": "joint path state -> final readout threshold -> boosted generation",
+    "y": "threshold strength",
+    "z": "model lane"
+  },
+  "metrics": {
+    "edge_count": 9,
+    "node_count": 12,
+    "source_phase": 739
+  },
+  "model_info": {
+    "evidence_type": "minimum final-readout boost needed to flip donor token0 plus boosted generation closure",
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 739,
+    "round": "confirm",
+    "timestamp": "2026-06-29 00:36:27"
+  },
+  "schema_version": "atlas_graph_v1",
+  "source_files": [
+    "results/glm5_phase739_readout_threshold_closure_boundary/confirm/phase739_cross_model_summary.json"
+  ],
+  "title": "Phase 739 Readout Threshold and Closure Boundary (confirm)"
+}

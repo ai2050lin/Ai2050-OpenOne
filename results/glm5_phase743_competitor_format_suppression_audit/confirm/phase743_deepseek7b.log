@@ -1,0 +1,192 @@
+[08:15:12] deepseek7b/confirm: pairs=10 target=hidden_28 audits=2 combo_candidates=3
+[08:15:12] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   2%|▏         | 8/339 [00:00<00:04, 79.62it/s]Loading weights:   8%|▊         | 28/339 [00:00<00:02, 136.00it/s]Loading weights:  18%|█▊        | 62/339 [00:00<00:01, 221.04it/s]Loading weights:  30%|███       | 102/339 [00:00<00:00, 278.43it/s]Loading weights:  38%|███▊      | 130/339 [00:00<00:00, 260.84it/s]Loading weights:  51%|█████     | 173/339 [00:00<00:00, 303.35it/s]Loading weights:  60%|██████    | 204/339 [00:00<00:00, 295.79it/s]Loading weights:  69%|██████▉   | 234/339 [00:00<00:00, 278.51it/s]Loading weights:  79%|███████▉  | 268/339 [00:01<00:00, 290.88it/s]Loading weights:  88%|████████▊ | 298/339 [00:01<00:00, 274.05it/s]Loading weights:  97%|█████████▋| 328/339 [00:01<00:00, 262.54it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 269.33it/s]
+[08:15:14] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[08:15:19] deepseek7b: competitor suppression audit 2/10 pairs; rows=12
+[08:15:23] deepseek7b: competitor suppression audit 4/10 pairs; rows=24
+[08:15:27] deepseek7b: competitor suppression audit 6/10 pairs; rows=36
+[08:15:31] deepseek7b: competitor suppression audit 8/10 pairs; rows=46
+[08:15:35] deepseek7b: competitor suppression audit 10/10 pairs; rows=56
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "confirm",
+  "condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "suppression_scale": 0.0,
+      "n": 20,
+      "donor_top1_rate": 0.05,
+      "mean_donor_rank": 9.3,
+      "mean_margin_donor_vs_top": -2.35625,
+      "mean_margin_donor_vs_recipient": 1.8265625,
+      "mean_suppression_alpha_needed": 1.7200357942222158,
+      "top_token_class_counts": {
+        "echo_object_or_relation": 7,
+        "punctuation_or_stop": 1,
+        "format_or_schema": 9,
+        "donor_answer": 1,
+        "recipient_answer": 1,
+        "other_vocab": 1
+      },
+      "top_token_counts": {
+        " category": 2,
+        " ?\n\n": 1,
+        " The": 9,
+        " taste": 2,
+        " carrot": 2,
+        " orange": 1,
+        " stone": 1,
+        " object": 1,
+        " __": 1
+      },
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 7,
+        "punctuation_or_stop": 1,
+        "format_or_schema": 9,
+        "donor_answer": 1,
+        "recipient_answer": 1,
+        "other_vocab": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.0,
+      "n": 18,
+      "donor_top1_rate": 0.1111111111111111,
+      "mean_donor_rank": 3.111111111111111,
+      "mean_margin_donor_vs_top": -0.5694444444444444,
+      "mean_margin_donor_vs_recipient": 2.6909722222222223,
+      "mean_suppression_alpha_needed": 1.9111508824691288,
+      "top_token_class_counts": {
+        "punctuation_or_stop": 2,
+        "echo_object_or_relation": 4,
+        "other_vocab": 2,
+        "donor_answer": 3,
+        "format_or_schema": 6,
+        "other_semantic_value": 1
+      },
+      "top_token_counts": {
+        " ?\n\n": 2,
+        " apple": 1,
+        " __": 2,
+        " blue": 1,
+        " sweet": 1,
+        " The": 6,
+        " banana": 1,
+        " carrot": 1,
+        " fruit": 1,
+        " Purple": 1,
+        " stone": 1
+      },
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 7,
+        "punctuation_or_stop": 1,
+        "format_or_schema": 8,
+        "recipient_answer": 1,
+        "other_vocab": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.25,
+      "n": 18,
+      "donor_top1_rate": 0.5,
+      "mean_donor_rank": 2.0555555555555554,
+      "mean_margin_donor_vs_top": -0.3472222222222222,
+      "mean_margin_donor_vs_recipient": 3.0503472222222223,
+      "mean_suppression_alpha_needed": 1.9111508824691288,
+      "top_token_class_counts": {
+        "punctuation_or_stop": 2,
+        "echo_object_or_relation": 3,
+        "other_vocab": 1,
+        "donor_answer": 9,
+        "format_or_schema": 2,
+        "other_semantic_value": 1
+      },
+      "top_token_counts": {
+        " ?\n\n": 2,
+        " apple": 1,
+        " __": 1,
+        " blue": 1,
+        " sweet": 2,
+        " bitter": 2,
+        " The": 2,
+        " banana": 1,
+        " vegetable": 1,
+        " fruit": 1,
+        " Purple": 1,
+        " stone": 1,
+        " yellow": 1,
+        " none": 1
+      },
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 7,
+        "punctuation_or_stop": 1,
+        "format_or_schema": 8,
+        "recipient_answer": 1,
+        "other_vocab": 1
+      }
+    }
+  ],
+  "suppressed_class_summary": [
+    {
+      "suppressed_token_class": "format_or_schema",
+      "n": 9,
+      "mean_margin_donor_vs_top": -1.4930555555555556,
+      "mean_suppression_alpha_needed": 1.1600767999909818,
+      "top_token_counts": {
+        " The": 9
+      }
+    },
+    {
+      "suppressed_token_class": "echo_object_or_relation",
+      "n": 7,
+      "mean_margin_donor_vs_top": -2.8125,
+      "mean_suppression_alpha_needed": 1.9842137229668055,
+      "top_token_counts": {
+        " category": 2,
+        " taste": 2,
+        " carrot": 2,
+        " stone": 1
+      }
+    },
+    {
+      "suppressed_token_class": "punctuation_or_stop",
+      "n": 1,
+      "mean_margin_donor_vs_top": -3.25,
+      "mean_suppression_alpha_needed": 2.4341030068515286,
+      "top_token_counts": {
+        " ?\n\n": 1
+      }
+    },
+    {
+      "suppressed_token_class": "donor_answer",
+      "n": 1,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_suppression_alpha_needed": 0.0,
+      "top_token_counts": {
+        " orange": 1
+      }
+    },
+    {
+      "suppressed_token_class": "recipient_answer",
+      "n": 1,
+      "mean_margin_donor_vs_top": -5.1875,
+      "mean_suppression_alpha_needed": 3.6684189118388035,
+      "top_token_counts": {
+        " object": 1
+      }
+    },
+    {
+      "suppressed_token_class": "other_vocab",
+      "n": 1,
+      "mean_margin_donor_vs_top": -5.5625,
+      "mean_suppression_alpha_needed": 3.96800670506751,
+      "top_token_counts": {
+        " __": 1
+      }
+    }
+  ]
+}

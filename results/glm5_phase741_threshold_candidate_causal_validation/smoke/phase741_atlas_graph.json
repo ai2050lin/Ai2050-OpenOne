@@ -1,0 +1,236 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "phase": 741,
+        "relation": "audits",
+        "source": "qwen3:model",
+        "target": "qwen3:final_readout"
+      },
+      {
+        "phase": 741,
+        "relation": "donor_erase_to_recipient_component",
+        "role_guess": "donor_path_necessary_candidate",
+        "source": "qwen3:component:L34:attn_out",
+        "target": "qwen3:final_readout",
+        "weight": -0.11464570265791088
+      },
+      {
+        "phase": 741,
+        "relation": "joint_add_donor_delta",
+        "role_guess": "weak_boost_candidate",
+        "source": "qwen3:component:L34:attn_out",
+        "target": "qwen3:final_readout",
+        "weight": 0.034696831736115
+      },
+      {
+        "phase": 741,
+        "relation": "joint_erase_to_recipient_component",
+        "role_guess": "not_necessary_in_joint_path",
+        "source": "qwen3:component:L34:attn_out",
+        "target": "qwen3:final_readout",
+        "weight": 0.000697013055601099
+      },
+      {
+        "phase": 741,
+        "relation": "audits",
+        "source": "glm4:model",
+        "target": "glm4:final_readout"
+      },
+      {
+        "phase": 741,
+        "relation": "donor_erase_to_recipient_component",
+        "role_guess": "donor_path_necessary_candidate",
+        "source": "glm4:component:L38:mlp_out",
+        "target": "glm4:final_readout",
+        "weight": -0.8908553435169334
+      },
+      {
+        "phase": 741,
+        "relation": "joint_add_donor_delta",
+        "role_guess": "causal_boost_candidate",
+        "source": "glm4:component:L38:mlp_out",
+        "target": "glm4:final_readout",
+        "weight": 1.0439648219357935
+      },
+      {
+        "phase": 741,
+        "relation": "joint_erase_to_recipient_component",
+        "role_guess": "joint_path_necessary_candidate",
+        "source": "glm4:component:L38:mlp_out",
+        "target": "glm4:final_readout",
+        "weight": -0.05252757654356309
+      },
+      {
+        "phase": 741,
+        "relation": "audits",
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:final_readout"
+      },
+      {
+        "phase": 741,
+        "relation": "donor_erase_to_recipient_component",
+        "role_guess": "donor_path_necessary_candidate",
+        "source": "deepseek7b:component:L26:attn_out",
+        "target": "deepseek7b:final_readout",
+        "weight": -0.9813502125326118
+      },
+      {
+        "phase": 741,
+        "relation": "joint_add_donor_delta",
+        "role_guess": "causal_boost_candidate",
+        "source": "deepseek7b:component:L26:attn_out",
+        "target": "deepseek7b:final_readout",
+        "weight": 0.6847872775025936
+      },
+      {
+        "phase": 741,
+        "relation": "joint_erase_to_recipient_component",
+        "role_guess": "not_necessary_in_joint_path",
+        "source": "deepseek7b:component:L26:attn_out",
+        "target": "deepseek7b:final_readout",
+        "weight": -0.0027695494710828525
+      }
+    ],
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -24,
+          0,
+          -10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:final_readout",
+        "label": "final readout threshold",
+        "model": "qwen3",
+        "position": [
+          22,
+          0,
+          -10.0
+        ],
+        "role": "threshold_output",
+        "type": "readout"
+      },
+      {
+        "id": "qwen3:component:L34:attn_out",
+        "label": "L34:attn_out",
+        "model": "qwen3",
+        "phase740_patched_fraction": 0.00851355684347636,
+        "position": [
+          0,
+          0,
+          -10.0
+        ],
+        "role": "causal_candidate",
+        "type": "component"
+      },
+      {
+        "id": "glm4:model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -24,
+          0,
+          0.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "glm4:final_readout",
+        "label": "final readout threshold",
+        "model": "glm4",
+        "position": [
+          22,
+          0,
+          0.0
+        ],
+        "role": "threshold_output",
+        "type": "readout"
+      },
+      {
+        "id": "glm4:component:L38:mlp_out",
+        "label": "L38:mlp_out",
+        "model": "glm4",
+        "phase740_patched_fraction": 0.04181411292136393,
+        "position": [
+          0,
+          0,
+          0.0
+        ],
+        "role": "causal_candidate",
+        "type": "component"
+      },
+      {
+        "id": "deepseek7b:model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -24,
+          0,
+          10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:final_readout",
+        "label": "final readout threshold",
+        "model": "deepseek7b",
+        "position": [
+          22,
+          0,
+          10.0
+        ],
+        "role": "threshold_output",
+        "type": "readout"
+      },
+      {
+        "id": "deepseek7b:component:L26:attn_out",
+        "label": "L26:attn_out",
+        "model": "deepseek7b",
+        "phase740_patched_fraction": 0.05719511961941759,
+        "position": [
+          0,
+          0,
+          10.0
+        ],
+        "role": "causal_candidate",
+        "type": "component"
+      }
+    ]
+  },
+  "layout": {
+    "x": "model -> candidate component -> final readout threshold",
+    "y": "causal effect",
+    "z": "model lane"
+  },
+  "metrics": {
+    "edge_count": 12,
+    "node_count": 9,
+    "source_phase": 741
+  },
+  "model_info": {
+    "evidence_type": "component-output transplant and erasure causal validation against final readout threshold fractions",
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 741,
+    "round": "smoke",
+    "timestamp": "2026-06-29 07:17:31"
+  },
+  "schema_version": "atlas_graph_v1",
+  "source_files": [
+    "results/glm5_phase741_threshold_candidate_causal_validation/smoke/phase741_cross_model_summary.json"
+  ],
+  "title": "Phase 741 Threshold Candidate Causal Validation (smoke)"
+}

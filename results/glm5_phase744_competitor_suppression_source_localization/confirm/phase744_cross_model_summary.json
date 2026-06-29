@@ -1,0 +1,3309 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]"
+        },
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]"
+        }
+      ],
+      "candidate_summary": [
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L23:attn_out",
+          "candidate_layer": 23,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.3059210526315789,
+          "mean_delta_donor_logit": 1.6710526315789473,
+          "mean_delta_margin_donor_vs_competitor": 1.9769736842105263,
+          "mean_delta_recipient_logit": -1.9950657894736843,
+          "mean_new_donor_rank": 3.526315789473684,
+          "n": 19,
+          "new_donor_top1_rate": 0.42105263157894735,
+          "new_top_class_counts": {
+            "donor_answer": 8,
+            "echo_object_or_relation": 3,
+            "format_or_schema": 4,
+            "other_semantic_value": 1,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 6,
+            "boost_and_suppress_margin_candidate": 9,
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 2
+          },
+          "top_changed_rate": 0.631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L22:attn_out",
+          "candidate_layer": 22,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.3848684210526316,
+          "mean_delta_donor_logit": 1.3026315789473684,
+          "mean_delta_margin_donor_vs_competitor": 1.6875,
+          "mean_delta_recipient_logit": -2.9860197368421053,
+          "mean_new_donor_rank": 3.6315789473684212,
+          "n": 19,
+          "new_donor_top1_rate": 0.3157894736842105,
+          "new_top_class_counts": {
+            "donor_answer": 6,
+            "echo_object_or_relation": 7,
+            "format_or_schema": 3,
+            "other_semantic_value": 1,
+            "other_vocab": 2
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 6,
+            "boost_closure_candidate": 4,
+            "boost_margin_candidate": 4,
+            "harmful_or_competitor_support": 1,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 1
+          },
+          "top_changed_rate": 0.5263157894736842
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L24:attn_out",
+          "candidate_layer": 24,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.125,
+          "mean_delta_donor_logit": 0.993421052631579,
+          "mean_delta_margin_donor_vs_competitor": 1.118421052631579,
+          "mean_delta_recipient_logit": -1.199013157894737,
+          "mean_new_donor_rank": 5.631578947368421,
+          "n": 19,
+          "new_donor_top1_rate": 0.2631578947368421,
+          "new_top_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 6,
+            "format_or_schema": 5,
+            "other_semantic_value": 1,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_and_suppress_margin_candidate": 7,
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 6,
+            "weak_suppression_candidate": 1
+          },
+          "top_changed_rate": 0.2631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L24:mlp_out",
+          "candidate_layer": 24,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.11513157894736842,
+          "mean_delta_donor_logit": 0.7532894736842105,
+          "mean_delta_margin_donor_vs_competitor": 0.868421052631579,
+          "mean_delta_recipient_logit": -1.0773026315789473,
+          "mean_new_donor_rank": 6.0,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "format_or_schema": 7,
+            "other_vocab": 1,
+            "punctuation_or_stop": 2,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 9,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 2,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 1
+          },
+          "top_changed_rate": 0.3684210526315789
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L25:mlp_out",
+          "candidate_layer": 25,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.2565789473684211,
+          "mean_delta_donor_logit": 0.40131578947368424,
+          "mean_delta_margin_donor_vs_competitor": 0.6578947368421053,
+          "mean_delta_recipient_logit": -1.2088815789473684,
+          "mean_new_donor_rank": 7.578947368421052,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 7,
+            "format_or_schema": 6,
+            "other_semantic_value": 1,
+            "other_vocab": 2,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 8,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 2,
+            "suppression_margin_candidate": 1,
+            "weak_suppression_candidate": 4
+          },
+          "top_changed_rate": 0.3684210526315789
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L26:mlp_out",
+          "candidate_layer": 26,
+          "dominant_role_guess": "small_or_no_effect",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.23684210526315788,
+          "mean_delta_donor_logit": 0.3717105263157895,
+          "mean_delta_margin_donor_vs_competitor": 0.6085526315789473,
+          "mean_delta_recipient_logit": -1.2039473684210527,
+          "mean_new_donor_rank": 6.421052631578948,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "format_or_schema": 8,
+            "other_semantic_value": 1,
+            "other_vocab": 1,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 2,
+            "harmful_or_competitor_support": 3,
+            "small_or_no_effect": 3,
+            "suppression_closure_candidate": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 3,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.2631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L23:mlp_out",
+          "candidate_layer": 23,
+          "dominant_role_guess": "weak_suppression_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.20394736842105263,
+          "mean_delta_donor_logit": 0.17105263157894737,
+          "mean_delta_margin_donor_vs_competitor": 0.375,
+          "mean_delta_recipient_logit": -0.5213815789473685,
+          "mean_new_donor_rank": 7.7368421052631575,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 3,
+            "echo_object_or_relation": 7,
+            "format_or_schema": 6,
+            "other_vocab": 2,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_closure_candidate": 1,
+            "harmful_or_competitor_support": 3,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 3,
+            "weak_suppression_candidate": 6
+          },
+          "top_changed_rate": 0.21052631578947367
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L25:attn_out",
+          "candidate_layer": 25,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.21052631578947367,
+          "mean_delta_donor_logit": 0.1875,
+          "mean_delta_margin_donor_vs_competitor": 0.3980263157894737,
+          "mean_delta_recipient_logit": -0.29769736842105265,
+          "mean_new_donor_rank": 6.052631578947368,
+          "n": 19,
+          "new_donor_top1_rate": 0.05263157894736842,
+          "new_top_class_counts": {
+            "donor_answer": 1,
+            "echo_object_or_relation": 8,
+            "format_or_schema": 6,
+            "punctuation_or_stop": 3,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 3,
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 6,
+            "small_or_no_effect": 2,
+            "suppression_closure_candidate": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 5
+          },
+          "top_changed_rate": 0.2631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L22:mlp_out",
+          "candidate_layer": 22,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.29605263157894735,
+          "mean_delta_donor_logit": -0.039473684210526314,
+          "mean_delta_margin_donor_vs_competitor": 0.2565789473684211,
+          "mean_delta_recipient_logit": -0.4194078947368421,
+          "mean_new_donor_rank": 9.894736842105264,
+          "n": 19,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "echo_object_or_relation": 5,
+            "format_or_schema": 9,
+            "other_semantic_value": 1,
+            "other_vocab": 2,
+            "recipient_answer": 2
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 4,
+            "harmful_or_competitor_support": 5,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 3,
+            "weak_suppression_candidate": 5
+          },
+          "top_changed_rate": 0.2631578947368421
+        }
+      ],
+      "competitor_class_summary": [
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L22:attn_out",
+          "mean_delta_competitor_logit": -4.875,
+          "mean_delta_donor_logit": 0.6875,
+          "mean_delta_margin_donor_vs_competitor": 5.5625,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L23:attn_out",
+          "mean_delta_competitor_logit": -1.125,
+          "mean_delta_donor_logit": 2.4375,
+          "mean_delta_margin_donor_vs_competitor": 3.5625,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L25:attn_out",
+          "mean_delta_competitor_logit": -2.75,
+          "mean_delta_donor_logit": 0.1875,
+          "mean_delta_margin_donor_vs_competitor": 2.9375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L26:mlp_out",
+          "mean_delta_competitor_logit": -0.625,
+          "mean_delta_donor_logit": 2.0625,
+          "mean_delta_margin_donor_vs_competitor": 2.6875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L24:attn_out",
+          "mean_delta_competitor_logit": -1.0,
+          "mean_delta_donor_logit": 0.5,
+          "mean_delta_margin_donor_vs_competitor": 1.5,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L24:mlp_out",
+          "mean_delta_competitor_logit": -0.5,
+          "mean_delta_donor_logit": 0.6875,
+          "mean_delta_margin_donor_vs_competitor": 1.1875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L23:mlp_out",
+          "mean_delta_competitor_logit": -0.875,
+          "mean_delta_donor_logit": -0.125,
+          "mean_delta_margin_donor_vs_competitor": 0.75,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "suppression_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L25:mlp_out",
+          "mean_delta_competitor_logit": -0.75,
+          "mean_delta_donor_logit": -0.375,
+          "mean_delta_margin_donor_vs_competitor": 0.375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L22:mlp_out",
+          "mean_delta_competitor_logit": -0.375,
+          "mean_delta_donor_logit": -0.5,
+          "mean_delta_margin_donor_vs_competitor": -0.125,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L24:mlp_out",
+          "mean_delta_competitor_logit": 0.0,
+          "mean_delta_donor_logit": 2.125,
+          "mean_delta_margin_donor_vs_competitor": 2.125,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L22:attn_out",
+          "mean_delta_competitor_logit": 0.125,
+          "mean_delta_donor_logit": 2.0,
+          "mean_delta_margin_donor_vs_competitor": 1.875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L23:attn_out",
+          "mean_delta_competitor_logit": -0.375,
+          "mean_delta_donor_logit": 1.3125,
+          "mean_delta_margin_donor_vs_competitor": 1.6875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L23:mlp_out",
+          "mean_delta_competitor_logit": -1.25,
+          "mean_delta_donor_logit": 0.4375,
+          "mean_delta_margin_donor_vs_competitor": 1.6875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L25:mlp_out",
+          "mean_delta_competitor_logit": -0.5,
+          "mean_delta_donor_logit": 1.0,
+          "mean_delta_margin_donor_vs_competitor": 1.5,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L24:attn_out",
+          "mean_delta_competitor_logit": 0.0,
+          "mean_delta_donor_logit": 1.3125,
+          "mean_delta_margin_donor_vs_competitor": 1.3125,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L22:mlp_out",
+          "mean_delta_competitor_logit": -0.375,
+          "mean_delta_donor_logit": 0.625,
+          "mean_delta_margin_donor_vs_competitor": 1.0,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L26:mlp_out",
+          "mean_delta_competitor_logit": -1.0,
+          "mean_delta_donor_logit": -0.625,
+          "mean_delta_margin_donor_vs_competitor": 0.375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "punctuation_or_stop",
+          "candidate_component_id": "L25:attn_out",
+          "mean_delta_competitor_logit": -0.25,
+          "mean_delta_donor_logit": 0.0,
+          "mean_delta_margin_donor_vs_competitor": 0.25,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L26:mlp_out",
+          "mean_delta_competitor_logit": -0.9375,
+          "mean_delta_donor_logit": 2.5,
+          "mean_delta_margin_donor_vs_competitor": 3.4375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L23:attn_out",
+          "mean_delta_competitor_logit": -0.8125,
+          "mean_delta_donor_logit": 2.1875,
+          "mean_delta_margin_donor_vs_competitor": 3.0,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L22:attn_out",
+          "mean_delta_competitor_logit": 0.1875,
+          "mean_delta_donor_logit": 3.125,
+          "mean_delta_margin_donor_vs_competitor": 2.9375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L25:attn_out",
+          "mean_delta_competitor_logit": -0.625,
+          "mean_delta_donor_logit": 2.25,
+          "mean_delta_margin_donor_vs_competitor": 2.875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L24:mlp_out",
+          "mean_delta_competitor_logit": -0.6875,
+          "mean_delta_donor_logit": 1.6875,
+          "mean_delta_margin_donor_vs_competitor": 2.375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L25:mlp_out",
+          "mean_delta_competitor_logit": -1.75,
+          "mean_delta_donor_logit": 0.1875,
+          "mean_delta_margin_donor_vs_competitor": 1.9375,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L24:attn_out",
+          "mean_delta_competitor_logit": -0.375,
+          "mean_delta_donor_logit": 1.125,
+          "mean_delta_margin_donor_vs_competitor": 1.5,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L22:mlp_out",
+          "mean_delta_competitor_logit": -0.6875,
+          "mean_delta_donor_logit": -0.1875,
+          "mean_delta_margin_donor_vs_competitor": 0.5,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L23:mlp_out",
+          "mean_delta_competitor_logit": -0.125,
+          "mean_delta_donor_logit": 0.0625,
+          "mean_delta_margin_donor_vs_competitor": 0.1875,
+          "n": 1,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L23:attn_out",
+          "mean_delta_competitor_logit": -0.1597222222222222,
+          "mean_delta_donor_logit": 1.5486111111111112,
+          "mean_delta_margin_donor_vs_competitor": 1.7083333333333333,
+          "n": 9,
+          "new_donor_top1_rate": 0.5555555555555556,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 4,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L22:attn_out",
+          "mean_delta_competitor_logit": -0.4861111111111111,
+          "mean_delta_donor_logit": 1.0972222222222223,
+          "mean_delta_margin_donor_vs_competitor": 1.5833333333333333,
+          "n": 9,
+          "new_donor_top1_rate": 0.4444444444444444,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 5,
+            "boost_closure_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L24:attn_out",
+          "mean_delta_competitor_logit": -0.013888888888888888,
+          "mean_delta_donor_logit": 1.1180555555555556,
+          "mean_delta_margin_donor_vs_competitor": 1.1319444444444444,
+          "n": 9,
+          "new_donor_top1_rate": 0.3333333333333333,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 3,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L24:mlp_out",
+          "mean_delta_competitor_logit": -0.20833333333333334,
+          "mean_delta_donor_logit": 0.6527777777777778,
+          "mean_delta_margin_donor_vs_competitor": 0.8611111111111112,
+          "n": 9,
+          "new_donor_top1_rate": 0.2222222222222222,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 5,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 1,
+            "weak_boost_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L25:mlp_out",
+          "mean_delta_competitor_logit": -0.3125,
+          "mean_delta_donor_logit": 0.4722222222222222,
+          "mean_delta_margin_donor_vs_competitor": 0.7847222222222222,
+          "n": 9,
+          "new_donor_top1_rate": 0.2222222222222222,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 1,
+            "suppression_margin_candidate": 1,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L23:mlp_out",
+          "mean_delta_competitor_logit": -0.24305555555555555,
+          "mean_delta_donor_logit": 0.2777777777777778,
+          "mean_delta_margin_donor_vs_competitor": 0.5208333333333334,
+          "n": 9,
+          "new_donor_top1_rate": 0.2222222222222222,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 1,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L26:mlp_out",
+          "mean_delta_competitor_logit": -0.05555555555555555,
+          "mean_delta_donor_logit": 0.16666666666666666,
+          "mean_delta_margin_donor_vs_competitor": 0.2222222222222222,
+          "n": 9,
+          "new_donor_top1_rate": 0.2222222222222222,
+          "role_guess_counts": {
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 2,
+            "suppression_closure_candidate": 1,
+            "weak_boost_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L25:attn_out",
+          "mean_delta_competitor_logit": -0.0625,
+          "mean_delta_donor_logit": -0.20833333333333334,
+          "mean_delta_margin_donor_vs_competitor": -0.14583333333333334,
+          "n": 9,
+          "new_donor_top1_rate": 0.1111111111111111,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 4,
+            "small_or_no_effect": 1,
+            "suppression_closure_candidate": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "format_or_schema",
+          "candidate_component_id": "L22:mlp_out",
+          "mean_delta_competitor_logit": -0.2222222222222222,
+          "mean_delta_donor_logit": -0.05555555555555555,
+          "mean_delta_margin_donor_vs_competitor": 0.16666666666666666,
+          "n": 9,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 2,
+            "harmful_or_competitor_support": 2,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L23:attn_out",
+          "mean_delta_competitor_logit": -0.29464285714285715,
+          "mean_delta_donor_logit": 1.6964285714285714,
+          "mean_delta_margin_donor_vs_competitor": 1.9910714285714286,
+          "n": 7,
+          "new_donor_top1_rate": 0.42857142857142855,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_closure_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L22:attn_out",
+          "mean_delta_competitor_logit": 0.23214285714285715,
+          "mean_delta_donor_logit": 1.2946428571428572,
+          "mean_delta_margin_donor_vs_competitor": 1.0625,
+          "n": 7,
+          "new_donor_top1_rate": 0.2857142857142857,
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 2,
+            "harmful_or_competitor_support": 1,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L24:attn_out",
+          "mean_delta_competitor_logit": -0.125,
+          "mean_delta_donor_logit": 0.8392857142857143,
+          "mean_delta_margin_donor_vs_competitor": 0.9642857142857143,
+          "n": 7,
+          "new_donor_top1_rate": 0.2857142857142857,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 3,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L24:mlp_out",
+          "mean_delta_competitor_logit": 0.125,
+          "mean_delta_donor_logit": 0.5625,
+          "mean_delta_margin_donor_vs_competitor": 0.4375,
+          "n": 7,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 2,
+            "small_or_no_effect": 2,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L26:mlp_out",
+          "mean_delta_competitor_logit": -0.20535714285714285,
+          "mean_delta_donor_logit": 0.23214285714285715,
+          "mean_delta_margin_donor_vs_competitor": 0.4375,
+          "n": 7,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 2,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L25:attn_out",
+          "mean_delta_competitor_logit": 0.026785714285714284,
+          "mean_delta_donor_logit": 0.42857142857142855,
+          "mean_delta_margin_donor_vs_competitor": 0.4017857142857143,
+          "n": 7,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1,
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 2,
+            "small_or_no_effect": 1,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L22:mlp_out",
+          "mean_delta_competitor_logit": -0.3125,
+          "mean_delta_donor_logit": -0.026785714285714284,
+          "mean_delta_margin_donor_vs_competitor": 0.2857142857142857,
+          "n": 7,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1,
+            "harmful_or_competitor_support": 2,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L25:mlp_out",
+          "mean_delta_competitor_logit": 0.13392857142857142,
+          "mean_delta_donor_logit": 0.36607142857142855,
+          "mean_delta_margin_donor_vs_competitor": 0.23214285714285715,
+          "n": 7,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 2,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 2,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L23:mlp_out",
+          "mean_delta_competitor_logit": 0.08035714285714286,
+          "mean_delta_donor_logit": 0.05357142857142857,
+          "mean_delta_margin_donor_vs_competitor": -0.026785714285714284,
+          "n": 7,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 1,
+            "harmful_or_competitor_support": 3,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 2
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "include_combo_candidates": false,
+      "max_pairs": 10,
+      "model": "deepseek7b",
+      "n_rows": 171,
+      "phase": 744,
+      "phase739_round": "confirm",
+      "phase741_round": "confirm",
+      "quantization": "off",
+      "round": "confirm",
+      "scan_candidates": [
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L22:attn_out",
+          "layer": 22
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L22:mlp_out",
+          "layer": 22
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L23:attn_out",
+          "layer": 23
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L23:mlp_out",
+          "layer": 23
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L24:attn_out",
+          "layer": 24
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L24:mlp_out",
+          "layer": 24
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L25:attn_out",
+          "layer": 25
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L25:mlp_out",
+          "layer": 25
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L26:mlp_out",
+          "layer": 26
+        }
+      ],
+      "skipped_cases_already_donor_top1": 1,
+      "strict_interpretation": "Candidate donor-recipient delta add localizes possible natural margin/suppression sources at whole-component granularity. A negative competitor-logit delta is stronger evidence for suppression than a margin gain caused only by donor boost.",
+      "target_site": "hidden_28",
+      "threshold_combo_components": [
+        {
+          "component": "attn_out",
+          "component_id": "L26:attn_out",
+          "layer": 26,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "phase741_joint_add_effect": 0.3100355371735994,
+          "phase741_joint_add_fraction": 0.3276488426991234,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "attn_out",
+          "component_id": "L27:attn_out",
+          "layer": 27,
+          "phase740_mean_donor_fraction": 1.8331010374867347,
+          "phase740_mean_patched_fraction": 0.028992483721936087,
+          "phase741_joint_add_effect": 0.21130354358631293,
+          "phase741_joint_add_fraction": 0.22891685099706435,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L27:mlp_out",
+          "layer": 27,
+          "phase740_mean_donor_fraction": 0.24532093815331618,
+          "phase740_mean_patched_fraction": 0.037053610562865165,
+          "phase741_joint_add_effect": 0.03446649977325627,
+          "phase741_joint_add_fraction": 0.05207981140564784,
+          "phase741_target_top1_rate": 0.0
+        }
+      ],
+      "timestamp": "2026-06-29 08:35:50",
+      "title": "Competitor Suppression Source Localization",
+      "top_audits": 2,
+      "top_candidate_summary": [
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L23:attn_out",
+          "candidate_layer": 23,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.3059210526315789,
+          "mean_delta_donor_logit": 1.6710526315789473,
+          "mean_delta_margin_donor_vs_competitor": 1.9769736842105263,
+          "mean_delta_recipient_logit": -1.9950657894736843,
+          "mean_new_donor_rank": 3.526315789473684,
+          "n": 19,
+          "new_donor_top1_rate": 0.42105263157894735,
+          "new_top_class_counts": {
+            "donor_answer": 8,
+            "echo_object_or_relation": 3,
+            "format_or_schema": 4,
+            "other_semantic_value": 1,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 6,
+            "boost_and_suppress_margin_candidate": 9,
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 2
+          },
+          "top_changed_rate": 0.631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L22:attn_out",
+          "candidate_layer": 22,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.3848684210526316,
+          "mean_delta_donor_logit": 1.3026315789473684,
+          "mean_delta_margin_donor_vs_competitor": 1.6875,
+          "mean_delta_recipient_logit": -2.9860197368421053,
+          "mean_new_donor_rank": 3.6315789473684212,
+          "n": 19,
+          "new_donor_top1_rate": 0.3157894736842105,
+          "new_top_class_counts": {
+            "donor_answer": 6,
+            "echo_object_or_relation": 7,
+            "format_or_schema": 3,
+            "other_semantic_value": 1,
+            "other_vocab": 2
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 6,
+            "boost_closure_candidate": 4,
+            "boost_margin_candidate": 4,
+            "harmful_or_competitor_support": 1,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 1
+          },
+          "top_changed_rate": 0.5263157894736842
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L24:attn_out",
+          "candidate_layer": 24,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.125,
+          "mean_delta_donor_logit": 0.993421052631579,
+          "mean_delta_margin_donor_vs_competitor": 1.118421052631579,
+          "mean_delta_recipient_logit": -1.199013157894737,
+          "mean_new_donor_rank": 5.631578947368421,
+          "n": 19,
+          "new_donor_top1_rate": 0.2631578947368421,
+          "new_top_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 6,
+            "format_or_schema": 5,
+            "other_semantic_value": 1,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_and_suppress_margin_candidate": 7,
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 6,
+            "weak_suppression_candidate": 1
+          },
+          "top_changed_rate": 0.2631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L24:mlp_out",
+          "candidate_layer": 24,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.11513157894736842,
+          "mean_delta_donor_logit": 0.7532894736842105,
+          "mean_delta_margin_donor_vs_competitor": 0.868421052631579,
+          "mean_delta_recipient_logit": -1.0773026315789473,
+          "mean_new_donor_rank": 6.0,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "format_or_schema": 7,
+            "other_vocab": 1,
+            "punctuation_or_stop": 2,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 9,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 2,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 1
+          },
+          "top_changed_rate": 0.3684210526315789
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L25:mlp_out",
+          "candidate_layer": 25,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.2565789473684211,
+          "mean_delta_donor_logit": 0.40131578947368424,
+          "mean_delta_margin_donor_vs_competitor": 0.6578947368421053,
+          "mean_delta_recipient_logit": -1.2088815789473684,
+          "mean_new_donor_rank": 7.578947368421052,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 7,
+            "format_or_schema": 6,
+            "other_semantic_value": 1,
+            "other_vocab": 2,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 8,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 2,
+            "suppression_margin_candidate": 1,
+            "weak_suppression_candidate": 4
+          },
+          "top_changed_rate": 0.3684210526315789
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L26:mlp_out",
+          "candidate_layer": 26,
+          "dominant_role_guess": "small_or_no_effect",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.23684210526315788,
+          "mean_delta_donor_logit": 0.3717105263157895,
+          "mean_delta_margin_donor_vs_competitor": 0.6085526315789473,
+          "mean_delta_recipient_logit": -1.2039473684210527,
+          "mean_new_donor_rank": 6.421052631578948,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "format_or_schema": 8,
+            "other_semantic_value": 1,
+            "other_vocab": 1,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 1,
+            "boost_margin_candidate": 2,
+            "harmful_or_competitor_support": 3,
+            "small_or_no_effect": 3,
+            "suppression_closure_candidate": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 3,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.2631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L23:mlp_out",
+          "candidate_layer": 23,
+          "dominant_role_guess": "weak_suppression_candidate",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.20394736842105263,
+          "mean_delta_donor_logit": 0.17105263157894737,
+          "mean_delta_margin_donor_vs_competitor": 0.375,
+          "mean_delta_recipient_logit": -0.5213815789473685,
+          "mean_new_donor_rank": 7.7368421052631575,
+          "n": 19,
+          "new_donor_top1_rate": 0.10526315789473684,
+          "new_top_class_counts": {
+            "donor_answer": 3,
+            "echo_object_or_relation": 7,
+            "format_or_schema": 6,
+            "other_vocab": 2,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_closure_candidate": 1,
+            "harmful_or_competitor_support": 3,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 3,
+            "weak_suppression_candidate": 6
+          },
+          "top_changed_rate": 0.21052631578947367
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L25:attn_out",
+          "candidate_layer": 25,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.21052631578947367,
+          "mean_delta_donor_logit": 0.1875,
+          "mean_delta_margin_donor_vs_competitor": 0.3980263157894737,
+          "mean_delta_recipient_logit": -0.29769736842105265,
+          "mean_new_donor_rank": 6.052631578947368,
+          "n": 19,
+          "new_donor_top1_rate": 0.05263157894736842,
+          "new_top_class_counts": {
+            "donor_answer": 1,
+            "echo_object_or_relation": 8,
+            "format_or_schema": 6,
+            "punctuation_or_stop": 3,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 3,
+            "boost_margin_candidate": 1,
+            "harmful_or_competitor_support": 6,
+            "small_or_no_effect": 2,
+            "suppression_closure_candidate": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 5
+          },
+          "top_changed_rate": 0.2631578947368421
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 7,
+            "format_or_schema": 9,
+            "other_vocab": 1,
+            "punctuation_or_stop": 1,
+            "recipient_answer": 1
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L22:mlp_out",
+          "candidate_layer": 22,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -2.4802631578947367,
+          "mean_delta_competitor_logit": -0.29605263157894735,
+          "mean_delta_donor_logit": -0.039473684210526314,
+          "mean_delta_margin_donor_vs_competitor": 0.2565789473684211,
+          "mean_delta_recipient_logit": -0.4194078947368421,
+          "mean_new_donor_rank": 9.894736842105264,
+          "n": 19,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "echo_object_or_relation": 5,
+            "format_or_schema": 9,
+            "other_semantic_value": 1,
+            "other_vocab": 2,
+            "recipient_answer": 2
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 4,
+            "harmful_or_competitor_support": 5,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 3,
+            "weak_suppression_candidate": 5
+          },
+          "top_changed_rate": 0.2631578947368421
+        }
+      ],
+      "top_candidates": 3,
+      "top_k_vocab": 12
+    },
+    "glm4": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]"
+        },
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]"
+        }
+      ],
+      "candidate_summary": [
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "dominant_role_guess": "boost_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.175,
+          "mean_delta_donor_logit": 2.13125,
+          "mean_delta_margin_donor_vs_competitor": 2.30625,
+          "mean_delta_recipient_logit": -0.0125,
+          "mean_new_donor_rank": 1.2,
+          "n": 10,
+          "new_donor_top1_rate": 0.8,
+          "new_top_class_counts": {
+            "donor_answer": 8,
+            "echo_object_or_relation": 2
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 5
+          },
+          "top_changed_rate": 0.8
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L35:attn_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "boost_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.2125,
+          "mean_delta_donor_logit": 0.58125,
+          "mean_delta_margin_donor_vs_competitor": 0.79375,
+          "mean_delta_recipient_logit": 0.034375,
+          "mean_new_donor_rank": 3.3,
+          "n": 10,
+          "new_donor_top1_rate": 0.4,
+          "new_top_class_counts": {
+            "donor_answer": 5,
+            "echo_object_or_relation": 4,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 3,
+            "small_or_no_effect": 1,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.7
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L35:mlp_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "boost_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.04375,
+          "mean_delta_donor_logit": 0.1875,
+          "mean_delta_margin_donor_vs_competitor": 0.23125,
+          "mean_delta_recipient_logit": -0.025,
+          "mean_new_donor_rank": 5.0,
+          "n": 10,
+          "new_donor_top1_rate": 0.4,
+          "new_top_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 4,
+            "recipient_answer": 2
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 4,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 3,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.7
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L36:attn_out",
+          "candidate_layer": 36,
+          "dominant_role_guess": "boost_and_suppress_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.0625,
+          "mean_delta_donor_logit": 0.4125,
+          "mean_delta_margin_donor_vs_competitor": 0.475,
+          "mean_delta_recipient_logit": -0.109375,
+          "mean_new_donor_rank": 3.4,
+          "n": 10,
+          "new_donor_top1_rate": 0.3,
+          "new_top_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 6
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.4
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L37:attn_out",
+          "candidate_layer": 37,
+          "dominant_role_guess": "small_or_no_effect",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.00625,
+          "mean_delta_donor_logit": 0.4375,
+          "mean_delta_margin_donor_vs_competitor": 0.44375,
+          "mean_delta_recipient_logit": -0.009375,
+          "mean_new_donor_rank": 3.0,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 4,
+            "other_vocab": 4
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "small_or_no_effect": 6,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L39:attn_out",
+          "candidate_layer": 39,
+          "dominant_role_guess": "weak_boost_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": 0.00625,
+          "mean_delta_donor_logit": 0.225,
+          "mean_delta_margin_donor_vs_competitor": 0.21875,
+          "mean_delta_recipient_logit": -0.040625,
+          "mean_new_donor_rank": 4.0,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "other_vocab": 2
+          },
+          "role_guess_counts": {
+            "small_or_no_effect": 2,
+            "suppression_closure_candidate": 2,
+            "weak_boost_candidate": 4,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L38:attn_out",
+          "candidate_layer": 38,
+          "dominant_role_guess": "weak_boost_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": 0.08125,
+          "mean_delta_donor_logit": 0.225,
+          "mean_delta_margin_donor_vs_competitor": 0.14375,
+          "mean_delta_recipient_logit": 0.084375,
+          "mean_new_donor_rank": 4.5,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "other_vocab": 2
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 6
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L34:mlp_out",
+          "candidate_layer": 34,
+          "dominant_role_guess": "weak_suppression_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.09375,
+          "mean_delta_donor_logit": 0.0375,
+          "mean_delta_margin_donor_vs_competitor": 0.13125,
+          "mean_delta_recipient_logit": -0.315625,
+          "mean_new_donor_rank": 3.9,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 3,
+            "echo_object_or_relation": 6,
+            "other_vocab": 1
+          },
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 2,
+            "small_or_no_effect": 1,
+            "suppression_closure_candidate": 2,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 4
+          },
+          "top_changed_rate": 0.4
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L36:mlp_out",
+          "candidate_layer": 36,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.14375,
+          "mean_delta_donor_logit": -0.275,
+          "mean_delta_margin_donor_vs_competitor": -0.13125,
+          "mean_delta_recipient_logit": 0.671875,
+          "mean_new_donor_rank": 3.3,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 2,
+            "other_vocab": 4,
+            "recipient_answer": 2
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 2,
+            "harmful_or_competitor_support": 4,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.4
+        }
+      ],
+      "competitor_class_summary": [
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L34:attn_out",
+          "mean_delta_competitor_logit": 0.046875,
+          "mean_delta_donor_logit": 1.484375,
+          "mean_delta_margin_donor_vs_competitor": 1.4375,
+          "n": 4,
+          "new_donor_top1_rate": 1.0,
+          "role_guess_counts": {
+            "boost_closure_candidate": 4
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L35:attn_out",
+          "mean_delta_competitor_logit": -0.0625,
+          "mean_delta_donor_logit": 0.71875,
+          "mean_delta_margin_donor_vs_competitor": 0.78125,
+          "n": 4,
+          "new_donor_top1_rate": 1.0,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_closure_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L35:mlp_out",
+          "mean_delta_competitor_logit": 0.078125,
+          "mean_delta_donor_logit": 0.578125,
+          "mean_delta_margin_donor_vs_competitor": 0.5,
+          "n": 4,
+          "new_donor_top1_rate": 1.0,
+          "role_guess_counts": {
+            "boost_closure_candidate": 4
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L36:attn_out",
+          "mean_delta_competitor_logit": -0.140625,
+          "mean_delta_donor_logit": 0.40625,
+          "mean_delta_margin_donor_vs_competitor": 0.546875,
+          "n": 4,
+          "new_donor_top1_rate": 0.75,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L34:mlp_out",
+          "mean_delta_competitor_logit": -0.203125,
+          "mean_delta_donor_logit": 0.109375,
+          "mean_delta_margin_donor_vs_competitor": 0.3125,
+          "n": 4,
+          "new_donor_top1_rate": 0.5,
+          "role_guess_counts": {
+            "suppression_closure_candidate": 2,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L39:attn_out",
+          "mean_delta_competitor_logit": -0.28125,
+          "mean_delta_donor_logit": -0.03125,
+          "mean_delta_margin_donor_vs_competitor": 0.25,
+          "n": 4,
+          "new_donor_top1_rate": 0.5,
+          "role_guess_counts": {
+            "suppression_closure_candidate": 2,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L38:attn_out",
+          "mean_delta_competitor_logit": 0.078125,
+          "mean_delta_donor_logit": 0.234375,
+          "mean_delta_margin_donor_vs_competitor": 0.15625,
+          "n": 4,
+          "new_donor_top1_rate": 0.5,
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "weak_boost_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L37:attn_out",
+          "mean_delta_competitor_logit": 0.03125,
+          "mean_delta_donor_logit": 0.046875,
+          "mean_delta_margin_donor_vs_competitor": 0.015625,
+          "n": 4,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "small_or_no_effect": 4
+          }
+        },
+        {
+          "base_competitor_class": "other_vocab",
+          "candidate_component_id": "L36:mlp_out",
+          "mean_delta_competitor_logit": -0.515625,
+          "mean_delta_donor_logit": -1.890625,
+          "mean_delta_margin_donor_vs_competitor": -1.375,
+          "n": 4,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 4
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L34:attn_out",
+          "mean_delta_competitor_logit": -0.3229166666666667,
+          "mean_delta_donor_logit": 2.5625,
+          "mean_delta_margin_donor_vs_competitor": 2.8854166666666665,
+          "n": 6,
+          "new_donor_top1_rate": 0.6666666666666666,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L37:attn_out",
+          "mean_delta_competitor_logit": -0.03125,
+          "mean_delta_donor_logit": 0.6979166666666666,
+          "mean_delta_margin_donor_vs_competitor": 0.7291666666666666,
+          "n": 6,
+          "new_donor_top1_rate": 0.3333333333333333,
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "small_or_no_effect": 2,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L36:mlp_out",
+          "mean_delta_competitor_logit": 0.10416666666666667,
+          "mean_delta_donor_logit": 0.8020833333333334,
+          "mean_delta_margin_donor_vs_competitor": 0.6979166666666666,
+          "n": 6,
+          "new_donor_top1_rate": 0.3333333333333333,
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 2,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L35:attn_out",
+          "mean_delta_competitor_logit": -0.3125,
+          "mean_delta_donor_logit": 0.4895833333333333,
+          "mean_delta_margin_donor_vs_competitor": 0.8020833333333334,
+          "n": 6,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "weak_suppression_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L36:attn_out",
+          "mean_delta_competitor_logit": -0.010416666666666666,
+          "mean_delta_donor_logit": 0.4166666666666667,
+          "mean_delta_margin_donor_vs_competitor": 0.4270833333333333,
+          "n": 6,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L39:attn_out",
+          "mean_delta_competitor_logit": 0.19791666666666666,
+          "mean_delta_donor_logit": 0.3958333333333333,
+          "mean_delta_margin_donor_vs_competitor": 0.19791666666666666,
+          "n": 6,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 4
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L38:attn_out",
+          "mean_delta_competitor_logit": 0.08333333333333333,
+          "mean_delta_donor_logit": 0.21875,
+          "mean_delta_margin_donor_vs_competitor": 0.13541666666666666,
+          "n": 6,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 4
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L35:mlp_out",
+          "mean_delta_competitor_logit": -0.125,
+          "mean_delta_donor_logit": -0.07291666666666667,
+          "mean_delta_margin_donor_vs_competitor": 0.052083333333333336,
+          "n": 6,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 3,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "echo_object_or_relation",
+          "candidate_component_id": "L34:mlp_out",
+          "mean_delta_competitor_logit": -0.020833333333333332,
+          "mean_delta_donor_logit": -0.010416666666666666,
+          "mean_delta_margin_donor_vs_competitor": 0.010416666666666666,
+          "n": 6,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 2,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 2
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "include_combo_candidates": false,
+      "max_pairs": 10,
+      "model": "glm4",
+      "n_rows": 90,
+      "phase": 744,
+      "phase739_round": "confirm",
+      "phase741_round": "confirm",
+      "quantization": "off",
+      "round": "confirm",
+      "scan_candidates": [
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L34:attn_out",
+          "layer": 34
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L34:mlp_out",
+          "layer": 34
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L35:attn_out",
+          "layer": 35
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L35:mlp_out",
+          "layer": 35
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L36:attn_out",
+          "layer": 36
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L36:mlp_out",
+          "layer": 36
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L37:attn_out",
+          "layer": 37
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L38:attn_out",
+          "layer": 38
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L39:attn_out",
+          "layer": 39
+        }
+      ],
+      "skipped_cases_already_donor_top1": 10,
+      "strict_interpretation": "Candidate donor-recipient delta add localizes possible natural margin/suppression sources at whole-component granularity. A negative competitor-logit delta is stronger evidence for suppression than a margin gain caused only by donor boost.",
+      "target_site": "hidden_40",
+      "threshold_combo_components": [
+        {
+          "component": "mlp_out",
+          "component_id": "L38:mlp_out",
+          "layer": 38,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "phase741_joint_add_effect": 0.6707513981327047,
+          "phase741_joint_add_fraction": 0.699895211424984,
+          "phase741_target_top1_rate": 0.2
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L39:mlp_out",
+          "layer": 39,
+          "phase740_mean_donor_fraction": 0.31188196308309846,
+          "phase740_mean_patched_fraction": 0.004088608673849683,
+          "phase741_joint_add_effect": 0.20442254623899006,
+          "phase741_joint_add_fraction": 0.233566358680604,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L37:mlp_out",
+          "layer": 37,
+          "phase740_mean_donor_fraction": 0.05889259273735783,
+          "phase740_mean_patched_fraction": 0.0003999503792660739,
+          "phase741_joint_add_effect": 0.05260005221698597,
+          "phase741_joint_add_fraction": 0.08174386849240683,
+          "phase741_target_top1_rate": 0.0
+        }
+      ],
+      "timestamp": "2026-06-29 08:35:31",
+      "title": "Competitor Suppression Source Localization",
+      "top_audits": 2,
+      "top_candidate_summary": [
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "dominant_role_guess": "boost_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.175,
+          "mean_delta_donor_logit": 2.13125,
+          "mean_delta_margin_donor_vs_competitor": 2.30625,
+          "mean_delta_recipient_logit": -0.0125,
+          "mean_new_donor_rank": 1.2,
+          "n": 10,
+          "new_donor_top1_rate": 0.8,
+          "new_top_class_counts": {
+            "donor_answer": 8,
+            "echo_object_or_relation": 2
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 5
+          },
+          "top_changed_rate": 0.8
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L35:attn_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "boost_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.2125,
+          "mean_delta_donor_logit": 0.58125,
+          "mean_delta_margin_donor_vs_competitor": 0.79375,
+          "mean_delta_recipient_logit": 0.034375,
+          "mean_new_donor_rank": 3.3,
+          "n": 10,
+          "new_donor_top1_rate": 0.4,
+          "new_top_class_counts": {
+            "donor_answer": 5,
+            "echo_object_or_relation": 4,
+            "recipient_answer": 1
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 1,
+            "boost_and_suppress_margin_candidate": 2,
+            "boost_closure_candidate": 3,
+            "small_or_no_effect": 1,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.7
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L35:mlp_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "boost_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.04375,
+          "mean_delta_donor_logit": 0.1875,
+          "mean_delta_margin_donor_vs_competitor": 0.23125,
+          "mean_delta_recipient_logit": -0.025,
+          "mean_new_donor_rank": 5.0,
+          "n": 10,
+          "new_donor_top1_rate": 0.4,
+          "new_top_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 4,
+            "recipient_answer": 2
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 4,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 3,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.7
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L36:attn_out",
+          "candidate_layer": 36,
+          "dominant_role_guess": "boost_and_suppress_closure_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.0625,
+          "mean_delta_donor_logit": 0.4125,
+          "mean_delta_margin_donor_vs_competitor": 0.475,
+          "mean_delta_recipient_logit": -0.109375,
+          "mean_new_donor_rank": 3.4,
+          "n": 10,
+          "new_donor_top1_rate": 0.3,
+          "new_top_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 6
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 3,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.4
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L37:attn_out",
+          "candidate_layer": 37,
+          "dominant_role_guess": "small_or_no_effect",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.00625,
+          "mean_delta_donor_logit": 0.4375,
+          "mean_delta_margin_donor_vs_competitor": 0.44375,
+          "mean_delta_recipient_logit": -0.009375,
+          "mean_new_donor_rank": 3.0,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 4,
+            "other_vocab": 4
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "small_or_no_effect": 6,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L39:attn_out",
+          "candidate_layer": 39,
+          "dominant_role_guess": "weak_boost_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": 0.00625,
+          "mean_delta_donor_logit": 0.225,
+          "mean_delta_margin_donor_vs_competitor": 0.21875,
+          "mean_delta_recipient_logit": -0.040625,
+          "mean_new_donor_rank": 4.0,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "other_vocab": 2
+          },
+          "role_guess_counts": {
+            "small_or_no_effect": 2,
+            "suppression_closure_candidate": 2,
+            "weak_boost_candidate": 4,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L38:attn_out",
+          "candidate_layer": 38,
+          "dominant_role_guess": "weak_boost_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": 0.08125,
+          "mean_delta_donor_logit": 0.225,
+          "mean_delta_margin_donor_vs_competitor": 0.14375,
+          "mean_delta_recipient_logit": 0.084375,
+          "mean_new_donor_rank": 4.5,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 6,
+            "other_vocab": 2
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 6
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L34:mlp_out",
+          "candidate_layer": 34,
+          "dominant_role_guess": "weak_suppression_candidate",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.09375,
+          "mean_delta_donor_logit": 0.0375,
+          "mean_delta_margin_donor_vs_competitor": 0.13125,
+          "mean_delta_recipient_logit": -0.315625,
+          "mean_new_donor_rank": 3.9,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 3,
+            "echo_object_or_relation": 6,
+            "other_vocab": 1
+          },
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 2,
+            "small_or_no_effect": 1,
+            "suppression_closure_candidate": 2,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 4
+          },
+          "top_changed_rate": 0.4
+        },
+        {
+          "base_competitor_class_counts": {
+            "echo_object_or_relation": 6,
+            "other_vocab": 4
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L36:mlp_out",
+          "candidate_layer": 36,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -1.4125,
+          "mean_delta_competitor_logit": -0.14375,
+          "mean_delta_donor_logit": -0.275,
+          "mean_delta_margin_donor_vs_competitor": -0.13125,
+          "mean_delta_recipient_logit": 0.671875,
+          "mean_new_donor_rank": 3.3,
+          "n": 10,
+          "new_donor_top1_rate": 0.2,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "echo_object_or_relation": 2,
+            "other_vocab": 4,
+            "recipient_answer": 2
+          },
+          "role_guess_counts": {
+            "boost_closure_candidate": 2,
+            "boost_margin_candidate": 2,
+            "harmful_or_competitor_support": 4,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.4
+        }
+      ],
+      "top_candidates": 3,
+      "top_k_vocab": 12
+    },
+    "qwen3": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]"
+        },
+        {
+          "direction": "explicit<-conflict",
+          "label": "mlp_only|no_source|L28:mlp[299:341]"
+        }
+      ],
+      "candidate_summary": [
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L32:attn_out",
+          "candidate_layer": 32,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.3,
+          "mean_delta_donor_logit": 2.959375,
+          "mean_delta_margin_donor_vs_competitor": 3.259375,
+          "mean_delta_recipient_logit": -0.3,
+          "mean_new_donor_rank": 4.8,
+          "n": 20,
+          "new_donor_top1_rate": 0.1,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 11,
+            "boost_margin_candidate": 7
+          },
+          "top_changed_rate": 0.1
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L33:attn_out",
+          "candidate_layer": 33,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -2.10625,
+          "mean_delta_donor_logit": 3.0375,
+          "mean_delta_margin_donor_vs_competitor": 5.14375,
+          "mean_delta_recipient_logit": -2.10625,
+          "mean_new_donor_rank": 8.05,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "donor_answer": 1,
+            "format_or_schema": 12,
+            "recipient_answer": 7
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 20
+          },
+          "top_changed_rate": 0.65
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L30:attn_out",
+          "candidate_layer": 30,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.5625,
+          "mean_delta_donor_logit": 1.428125,
+          "mean_delta_margin_donor_vs_competitor": 1.990625,
+          "mean_delta_recipient_logit": -0.5625,
+          "mean_new_donor_rank": 8.7,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 13,
+            "boost_margin_candidate": 3,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.1
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L35:attn_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "boost_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 0.7625,
+          "mean_delta_donor_logit": 2.40625,
+          "mean_delta_margin_donor_vs_competitor": 1.64375,
+          "mean_delta_recipient_logit": 0.7625,
+          "mean_new_donor_rank": 10.2,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 4,
+            "recipient_answer": 16
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_margin_candidate": 12,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 3
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L32:mlp_out",
+          "candidate_layer": 32,
+          "dominant_role_guess": "suppression_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.8,
+          "mean_delta_donor_logit": 0.175,
+          "mean_delta_margin_donor_vs_competitor": 0.975,
+          "mean_delta_recipient_logit": -0.8,
+          "mean_new_donor_rank": 13.65,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 6,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 7,
+            "weak_suppression_candidate": 5
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L31:mlp_out",
+          "candidate_layer": 31,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.2,
+          "mean_delta_donor_logit": 0.728125,
+          "mean_delta_margin_donor_vs_competitor": 0.928125,
+          "mean_delta_recipient_logit": -0.2,
+          "mean_new_donor_rank": 10.05,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 10,
+            "boost_margin_candidate": 7,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 2
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L28:mlp_out",
+          "candidate_layer": 28,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.19375,
+          "mean_delta_donor_logit": 0.590625,
+          "mean_delta_margin_donor_vs_competitor": 0.784375,
+          "mean_delta_recipient_logit": -0.19375,
+          "mean_new_donor_rank": 12.35,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 1,
+            "recipient_answer": 19
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 7,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 5,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.05
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L28:attn_out",
+          "candidate_layer": 28,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.35625,
+          "mean_delta_donor_logit": 0.4125,
+          "mean_delta_margin_donor_vs_competitor": 0.76875,
+          "mean_delta_recipient_logit": -0.35625,
+          "mean_new_donor_rank": 11.9,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 15,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L30:mlp_out",
+          "candidate_layer": 30,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 0.075,
+          "mean_delta_donor_logit": 0.446875,
+          "mean_delta_margin_donor_vs_competitor": 0.371875,
+          "mean_delta_recipient_logit": 0.075,
+          "mean_new_donor_rank": 11.8,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 6,
+            "harmful_or_competitor_support": 4,
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 6,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L34:mlp_out",
+          "candidate_layer": 34,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 0.89375,
+          "mean_delta_donor_logit": -1.0625,
+          "mean_delta_margin_donor_vs_competitor": -1.95625,
+          "mean_delta_recipient_logit": 0.89375,
+          "mean_new_donor_rank": 20.05,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 12,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 4,
+            "weak_suppression_candidate": 1
+          },
+          "top_changed_rate": 0.1
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L35:mlp_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 2.8875,
+          "mean_delta_donor_logit": -0.409375,
+          "mean_delta_margin_donor_vs_competitor": -3.296875,
+          "mean_delta_recipient_logit": 2.8875,
+          "mean_new_donor_rank": 22.75,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 18,
+            "small_or_no_effect": 2
+          },
+          "top_changed_rate": 0.1
+        }
+      ],
+      "competitor_class_summary": [
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L32:attn_out",
+          "mean_delta_competitor_logit": -0.3,
+          "mean_delta_donor_logit": 2.959375,
+          "mean_delta_margin_donor_vs_competitor": 3.259375,
+          "n": 20,
+          "new_donor_top1_rate": 0.1,
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 11,
+            "boost_margin_candidate": 7
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L33:attn_out",
+          "mean_delta_competitor_logit": -2.10625,
+          "mean_delta_donor_logit": 3.0375,
+          "mean_delta_margin_donor_vs_competitor": 5.14375,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 20
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L30:attn_out",
+          "mean_delta_competitor_logit": -0.5625,
+          "mean_delta_donor_logit": 1.428125,
+          "mean_delta_margin_donor_vs_competitor": 1.990625,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 13,
+            "boost_margin_candidate": 3,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L35:attn_out",
+          "mean_delta_competitor_logit": 0.7625,
+          "mean_delta_donor_logit": 2.40625,
+          "mean_delta_margin_donor_vs_competitor": 1.64375,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_margin_candidate": 12,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L32:mlp_out",
+          "mean_delta_competitor_logit": -0.8,
+          "mean_delta_donor_logit": 0.175,
+          "mean_delta_margin_donor_vs_competitor": 0.975,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 6,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 7,
+            "weak_suppression_candidate": 5
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L31:mlp_out",
+          "mean_delta_competitor_logit": -0.2,
+          "mean_delta_donor_logit": 0.728125,
+          "mean_delta_margin_donor_vs_competitor": 0.928125,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 10,
+            "boost_margin_candidate": 7,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L28:mlp_out",
+          "mean_delta_competitor_logit": -0.19375,
+          "mean_delta_donor_logit": 0.590625,
+          "mean_delta_margin_donor_vs_competitor": 0.784375,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 7,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 5,
+            "weak_suppression_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L28:attn_out",
+          "mean_delta_competitor_logit": -0.35625,
+          "mean_delta_donor_logit": 0.4125,
+          "mean_delta_margin_donor_vs_competitor": 0.76875,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 15,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 3
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L30:mlp_out",
+          "mean_delta_competitor_logit": 0.075,
+          "mean_delta_donor_logit": 0.446875,
+          "mean_delta_margin_donor_vs_competitor": 0.371875,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 6,
+            "harmful_or_competitor_support": 4,
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 6,
+            "weak_suppression_candidate": 2
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L34:mlp_out",
+          "mean_delta_competitor_logit": 0.89375,
+          "mean_delta_donor_logit": -1.0625,
+          "mean_delta_margin_donor_vs_competitor": -1.95625,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 12,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 4,
+            "weak_suppression_candidate": 1
+          }
+        },
+        {
+          "base_competitor_class": "recipient_answer",
+          "candidate_component_id": "L35:mlp_out",
+          "mean_delta_competitor_logit": 2.8875,
+          "mean_delta_donor_logit": -0.409375,
+          "mean_delta_margin_donor_vs_competitor": -3.296875,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 18,
+            "small_or_no_effect": 2
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "include_combo_candidates": false,
+      "max_pairs": 10,
+      "model": "qwen3",
+      "n_rows": 220,
+      "phase": 744,
+      "phase739_round": "confirm",
+      "phase741_round": "confirm",
+      "quantization": "off",
+      "round": "confirm",
+      "scan_candidates": [
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L28:attn_out",
+          "layer": 28
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L28:mlp_out",
+          "layer": 28
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L30:attn_out",
+          "layer": 30
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L30:mlp_out",
+          "layer": 30
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L31:mlp_out",
+          "layer": 31
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L32:attn_out",
+          "layer": 32
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L32:mlp_out",
+          "layer": 32
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L33:attn_out",
+          "layer": 33
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L34:mlp_out",
+          "layer": 34
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "attn_out",
+          "component_id": "L35:attn_out",
+          "layer": 35
+        },
+        {
+          "already_in_threshold_combo": false,
+          "component": "mlp_out",
+          "component_id": "L35:mlp_out",
+          "layer": 35
+        }
+      ],
+      "skipped_cases_already_donor_top1": 0,
+      "strict_interpretation": "Candidate donor-recipient delta add localizes possible natural margin/suppression sources at whole-component granularity. A negative competitor-logit delta is stronger evidence for suppression than a margin gain caused only by donor boost.",
+      "target_site": "hidden_36",
+      "threshold_combo_components": [
+        {
+          "component": "attn_out",
+          "component_id": "L34:attn_out",
+          "layer": 34,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "phase741_joint_add_effect": 0.16391496652247423,
+          "phase741_joint_add_fraction": 0.16744744972534686,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "attn_out",
+          "component_id": "L31:attn_out",
+          "layer": 31,
+          "phase740_mean_donor_fraction": 0.49538392343140314,
+          "phase740_mean_patched_fraction": 0.005903768658792036,
+          "phase741_joint_add_effect": 0.12432384558261171,
+          "phase741_joint_add_fraction": 0.12785632623795423,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L33:mlp_out",
+          "layer": 33,
+          "phase740_mean_donor_fraction": 0.09864564824520697,
+          "phase740_mean_patched_fraction": 0.004938753742349763,
+          "phase741_joint_add_effect": 0.019193179858724842,
+          "phase741_joint_add_fraction": 0.022725664826035406,
+          "phase741_target_top1_rate": 0.0
+        }
+      ],
+      "timestamp": "2026-06-29 08:35:15",
+      "title": "Competitor Suppression Source Localization",
+      "top_audits": 2,
+      "top_candidate_summary": [
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L32:attn_out",
+          "candidate_layer": 32,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.3,
+          "mean_delta_donor_logit": 2.959375,
+          "mean_delta_margin_donor_vs_competitor": 3.259375,
+          "mean_delta_recipient_logit": -0.3,
+          "mean_new_donor_rank": 4.8,
+          "n": 20,
+          "new_donor_top1_rate": 0.1,
+          "new_top_class_counts": {
+            "donor_answer": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_closure_candidate": 2,
+            "boost_and_suppress_margin_candidate": 11,
+            "boost_margin_candidate": 7
+          },
+          "top_changed_rate": 0.1
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L33:attn_out",
+          "candidate_layer": 33,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -2.10625,
+          "mean_delta_donor_logit": 3.0375,
+          "mean_delta_margin_donor_vs_competitor": 5.14375,
+          "mean_delta_recipient_logit": -2.10625,
+          "mean_new_donor_rank": 8.05,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "donor_answer": 1,
+            "format_or_schema": 12,
+            "recipient_answer": 7
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 20
+          },
+          "top_changed_rate": 0.65
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L30:attn_out",
+          "candidate_layer": 30,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.5625,
+          "mean_delta_donor_logit": 1.428125,
+          "mean_delta_margin_donor_vs_competitor": 1.990625,
+          "mean_delta_recipient_logit": -0.5625,
+          "mean_new_donor_rank": 8.7,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 13,
+            "boost_margin_candidate": 3,
+            "weak_boost_candidate": 2,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.1
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L35:attn_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "boost_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 0.7625,
+          "mean_delta_donor_logit": 2.40625,
+          "mean_delta_margin_donor_vs_competitor": 1.64375,
+          "mean_delta_recipient_logit": 0.7625,
+          "mean_new_donor_rank": 10.2,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 4,
+            "recipient_answer": 16
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 4,
+            "boost_margin_candidate": 12,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 3
+          },
+          "top_changed_rate": 0.2
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L32:mlp_out",
+          "candidate_layer": 32,
+          "dominant_role_guess": "suppression_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.8,
+          "mean_delta_donor_logit": 0.175,
+          "mean_delta_margin_donor_vs_competitor": 0.975,
+          "mean_delta_recipient_logit": -0.8,
+          "mean_new_donor_rank": 13.65,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 6,
+            "harmful_or_competitor_support": 1,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 7,
+            "weak_suppression_candidate": 5
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L31:mlp_out",
+          "candidate_layer": 31,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.2,
+          "mean_delta_donor_logit": 0.728125,
+          "mean_delta_margin_donor_vs_competitor": 0.928125,
+          "mean_delta_recipient_logit": -0.2,
+          "mean_new_donor_rank": 10.05,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 10,
+            "boost_margin_candidate": 7,
+            "suppression_margin_candidate": 1,
+            "weak_boost_candidate": 2
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L28:mlp_out",
+          "candidate_layer": 28,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.19375,
+          "mean_delta_donor_logit": 0.590625,
+          "mean_delta_margin_donor_vs_competitor": 0.784375,
+          "mean_delta_recipient_logit": -0.19375,
+          "mean_new_donor_rank": 12.35,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 1,
+            "recipient_answer": 19
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 7,
+            "boost_margin_candidate": 2,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 5,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.05
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L28:attn_out",
+          "candidate_layer": 28,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": -0.35625,
+          "mean_delta_donor_logit": 0.4125,
+          "mean_delta_margin_donor_vs_competitor": 0.76875,
+          "mean_delta_recipient_logit": -0.35625,
+          "mean_new_donor_rank": 11.9,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 15,
+            "small_or_no_effect": 1,
+            "weak_boost_candidate": 1,
+            "weak_suppression_candidate": 3
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L30:mlp_out",
+          "candidate_layer": 30,
+          "dominant_role_guess": "boost_and_suppress_margin_candidate",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 0.075,
+          "mean_delta_donor_logit": 0.446875,
+          "mean_delta_margin_donor_vs_competitor": 0.371875,
+          "mean_delta_recipient_logit": 0.075,
+          "mean_new_donor_rank": 11.8,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "recipient_answer": 20
+          },
+          "role_guess_counts": {
+            "boost_and_suppress_margin_candidate": 6,
+            "harmful_or_competitor_support": 4,
+            "small_or_no_effect": 2,
+            "weak_boost_candidate": 6,
+            "weak_suppression_candidate": 2
+          },
+          "top_changed_rate": 0.0
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L34:mlp_out",
+          "candidate_layer": 34,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 0.89375,
+          "mean_delta_donor_logit": -1.0625,
+          "mean_delta_margin_donor_vs_competitor": -1.95625,
+          "mean_delta_recipient_logit": 0.89375,
+          "mean_new_donor_rank": 20.05,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 12,
+            "small_or_no_effect": 1,
+            "suppression_margin_candidate": 2,
+            "weak_boost_candidate": 4,
+            "weak_suppression_candidate": 1
+          },
+          "top_changed_rate": 0.1
+        },
+        {
+          "base_competitor_class_counts": {
+            "recipient_answer": 20
+          },
+          "candidate_already_in_threshold_combo": false,
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L35:mlp_out",
+          "candidate_layer": 35,
+          "dominant_role_guess": "harmful_or_competitor_support",
+          "mean_base_margin_donor_vs_competitor": -7.534375,
+          "mean_delta_competitor_logit": 2.8875,
+          "mean_delta_donor_logit": -0.409375,
+          "mean_delta_margin_donor_vs_competitor": -3.296875,
+          "mean_delta_recipient_logit": 2.8875,
+          "mean_new_donor_rank": 22.75,
+          "n": 20,
+          "new_donor_top1_rate": 0.0,
+          "new_top_class_counts": {
+            "format_or_schema": 2,
+            "recipient_answer": 18
+          },
+          "role_guess_counts": {
+            "harmful_or_competitor_support": 18,
+            "small_or_no_effect": 2
+          },
+          "top_changed_rate": 0.1
+        }
+      ],
+      "top_candidates": 3,
+      "top_k_vocab": 12
+    }
+  },
+  "evidence_type": "whole-component donor-recipient delta add measured by donor-vs-current-competitor margin and competitor logit change",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 744,
+  "round": "confirm",
+  "status": "complete",
+  "timestamp": "2026-06-29 08:35:52",
+  "title": "Competitor Suppression Source Localization"
+}

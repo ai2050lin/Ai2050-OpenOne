@@ -1,0 +1,81 @@
+[08:13:06] deepseek7b/smoke: pairs=1 target=hidden_28 audits=1 combo_candidates=2
+[08:13:07] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 4/339 [00:00<00:08, 38.34it/s]Loading weights:  12%|█▏        | 41/339 [00:00<00:01, 217.55it/s]Loading weights:  22%|██▏       | 76/339 [00:00<00:00, 265.68it/s]Loading weights:  30%|███       | 103/339 [00:00<00:00, 260.92it/s]Loading weights:  40%|████      | 137/339 [00:00<00:00, 254.69it/s]Loading weights:  51%|█████     | 173/339 [00:00<00:00, 282.94it/s]Loading weights:  61%|██████    | 206/339 [00:00<00:00, 267.26it/s]Loading weights:  72%|███████▏  | 244/339 [00:00<00:00, 297.23it/s]Loading weights:  81%|████████  | 275/339 [00:01<00:00, 284.00it/s]Loading weights:  90%|████████▉ | 304/339 [00:01<00:00, 281.04it/s]Loading weights:  98%|█████████▊| 333/339 [00:01<00:00, 271.09it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 270.28it/s]
+[08:13:08] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[08:13:10] deepseek7b: competitor suppression audit 1/1 pairs; rows=3
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "suppression_scale": 0.0,
+      "n": 1,
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 10.0,
+      "mean_margin_donor_vs_top": -3.25,
+      "mean_margin_donor_vs_recipient": 6.5,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "top_token_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "top_token_counts": {
+        " category": 1
+      },
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.0,
+      "n": 1,
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 4.0,
+      "mean_margin_donor_vs_top": -0.625,
+      "mean_margin_donor_vs_recipient": 8.1875,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "top_token_class_counts": {
+        "punctuation_or_stop": 1
+      },
+      "top_token_counts": {
+        " ?\n\n": 1
+      },
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "suppression_scale": 1.25,
+      "n": 1,
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 2.0,
+      "mean_margin_donor_vs_top": -0.125,
+      "mean_margin_donor_vs_recipient": 8.6875,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "top_token_class_counts": {
+        "punctuation_or_stop": 1
+      },
+      "top_token_counts": {
+        " ?\n\n": 1
+      },
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 1
+      }
+    }
+  ],
+  "suppressed_class_summary": [
+    {
+      "suppressed_token_class": "echo_object_or_relation",
+      "n": 1,
+      "mean_margin_donor_vs_top": -3.25,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "top_token_counts": {
+        " category": 1
+      }
+    }
+  ]
+}

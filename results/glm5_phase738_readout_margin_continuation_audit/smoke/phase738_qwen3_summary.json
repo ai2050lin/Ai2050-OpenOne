@@ -1,0 +1,92 @@
+{
+  "attention_note": "eager attention is required because audited Phase737 interventions can include source contribution replacement",
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "explicit<-conflict",
+      "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+      "phase737_role": "joint_readout_transfer_candidate"
+    },
+    {
+      "direction": "explicit<-conflict",
+      "label": "source_only|L35H0<-self_last|no_mlp",
+      "phase737_role": "readout_transfer_only"
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_pairs": 1,
+  "model": "qwen3",
+  "n_rows": 2,
+  "phase": 738,
+  "phase737_round": "confirm",
+  "quantization": "off",
+  "round": "smoke",
+  "strict_interpretation": "This phase audits why positive margin deltas still fail generation: token0 candidate competition and forced-token continuation are reported separately.",
+  "target_site": "hidden_36",
+  "timestamp": "2026-06-29 00:04:48",
+  "title": "Readout Margin and Token Continuation Gate Audit",
+  "top_audits": 2,
+  "top_readout_audits": [
+    {
+      "direction": "explicit<-conflict",
+      "intervention_key": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_mlp_delta_norm_total": 16.35501527786255,
+      "mean_source_contribution_delta_norm": 17.459585189819336,
+      "mean_token0_donor_logprob_delta": -0.36753082275390625,
+      "mean_token0_donor_rank_delta": -83.0,
+      "mean_token0_margin_delta_donor_vs_recipient": -0.375,
+      "mean_token0_patched_donor_rank": 1065.0,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -19.25,
+      "mean_token0_patched_margin_donor_vs_recipient": -19.25,
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 1,
+      "source_component_id": "L35H0",
+      "source_group": "self_last",
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token1_format_or_echo_top_rate": 1.0,
+      "token1_patched_best_counts": {
+        "cont_is": 1
+      }
+    },
+    {
+      "direction": "explicit<-conflict",
+      "intervention_key": "source_only|L35H0<-self_last|no_mlp explicit<-conflict",
+      "intervention_label": "source_only|L35H0<-self_last|no_mlp",
+      "intervention_mode": "source_only",
+      "mean_mlp_delta_norm_total": 0.0,
+      "mean_source_contribution_delta_norm": 17.459585189819336,
+      "mean_token0_donor_logprob_delta": -0.36591529846191406,
+      "mean_token0_donor_rank_delta": -37.0,
+      "mean_token0_margin_delta_donor_vs_recipient": -0.375,
+      "mean_token0_patched_donor_rank": 1111.0,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -19.25,
+      "mean_token0_patched_margin_donor_vs_recipient": -19.25,
+      "mlp_components": [],
+      "n": 1,
+      "source_component_id": "L35H0",
+      "source_group": "self_last",
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token1_format_or_echo_top_rate": 1.0,
+      "token1_patched_best_counts": {
+        "cont_is": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "alpha_max": 80.0,
+  "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "explicit<-conflict",
+      "label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "phase738_margin": -11.931966145833334
+    },
+    {
+      "direction": "conflict<-explicit",
+      "label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "phase738_margin": -8.264973958333334
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_new_tokens": 4,
+  "max_pairs": 10,
+  "model": "deepseek7b",
+  "n_rows": 20,
+  "phase": 739,
+  "phase738_round": "confirm",
+  "quantization": "off",
+  "round": "confirm",
+  "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+  "target_site": "hidden_28",
+  "timestamp": "2026-06-29 00:36:25",
+  "title": "Readout Threshold and Closure Boundary Test",
+  "top_audits": 2,
+  "top_threshold_audits": [
+    {
+      "boosted_generation_class_counts": {
+        "answer_stop": 10
+      },
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_tested": 10,
+      "candidate_flip_found_rate": 1.0,
+      "direction": "conflict<-explicit",
+      "intervention_key": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_alpha_star_candidate_best": 5.961867421753157,
+      "mean_alpha_star_vocab_top": 5.961867421753157,
+      "mean_final_norm_output_norm": 191.51158142089844,
+      "mean_first_alpha_donor_candidate_top": 11.653879293905174,
+      "mean_first_alpha_donor_vocab_top": 11.653879293905174,
+      "mean_mlp_delta_norm_total": 69.33902635574341,
+      "mean_patched_margin_donor_vs_candidate_best": -8.015625,
+      "mean_patched_margin_donor_vs_recipient": -7.609375,
+      "mean_patched_margin_donor_vs_vocab_top": -8.015625,
+      "mean_source_contribution_delta_norm": 8.041763019561767,
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 10,
+      "patched_candidate_best_counts": {
+        "format_the": 2,
+        "object_echo": 2,
+        "recipient_answer": 6
+      },
+      "patched_vocab_top_counts": {
+        " The": 2,
+        " bitter": 2,
+        " blue": 2,
+        " carrot": 1,
+        " stone": 1,
+        " sweet": 1,
+        " tool": 1
+      },
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "vocab_flip_found_rate": 1.0
+    },
+    {
+      "boosted_generation_class_counts": {
+        "answer_mentioned": 5,
+        "answer_stop": 5
+      },
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_tested": 10,
+      "candidate_flip_found_rate": 1.0,
+      "direction": "explicit<-conflict",
+      "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_alpha_star_candidate_best": 8.636828474791173,
+      "mean_alpha_star_vocab_top": 8.636828474791173,
+      "mean_final_norm_output_norm": 186.4530792236328,
+      "mean_first_alpha_donor_candidate_top": 17.398877098777383,
+      "mean_first_alpha_donor_vocab_top": 17.398877098777383,
+      "mean_mlp_delta_norm_total": 69.33902635574341,
+      "mean_patched_margin_donor_vs_candidate_best": -11.710546875,
+      "mean_patched_margin_donor_vs_recipient": -11.648046875,
+      "mean_patched_margin_donor_vs_vocab_top": -11.710546875,
+      "mean_source_contribution_delta_norm": 7.51079580783844,
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 10,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 9,
+        "relation_echo": 1
+      },
+      "patched_vocab_top_counts": {
+        " category": 1,
+        " gray": 1,
+        " none": 1,
+        " object": 1,
+        " orange": 1,
+        " red": 1,
+        " sweet": 2,
+        " vegetable": 1,
+        " yellow": 1
+      },
+      "source_component_id": "L22H24",
+      "source_group": "target_record_line",
+      "vocab_flip_found_rate": 1.0
+    }
+  ]
+}

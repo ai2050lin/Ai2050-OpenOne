@@ -1,0 +1,476 @@
+[07:19:43] glm4/confirm: pairs=10 target=hidden_40 audits=2 candidates=3
+[07:19:44] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.68it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:03, 105.19it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 178.54it/s]Loading weights:  19%|█▊        | 83/443 [00:00<00:01, 180.53it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 250.92it/s]Loading weights:  35%|███▌      | 157/443 [00:00<00:01, 260.73it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 282.76it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 290.65it/s]Loading weights:  58%|█████▊    | 255/443 [00:01<00:00, 285.29it/s]Loading weights:  66%|██████▌   | 292/443 [00:01<00:00, 306.24it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 307.93it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 309.27it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 303.83it/s]Loading weights:  95%|█████████▌| 421/443 [00:01<00:00, 278.74it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 263.24it/s]
+[07:19:46] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[07:20:00] glm4: causal validation 3/10 pairs; rows=108
+[07:20:13] glm4: causal validation 6/10 pairs; rows=216
+[07:20:26] glm4: causal validation 9/10 pairs; rows=324
+[07:20:30] glm4: causal validation 10/10 pairs; rows=360
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "target_site": "hidden_40",
+  "condition_summary": [
+    {
+      "candidate_component_id": "L37:mlp_out",
+      "condition": "donor_erase_to_recipient_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 37,
+      "mean_fraction_of_threshold": 1.8751062865025934,
+      "mean_effect_vs_joint_fraction": 1.8459624779319168,
+      "mean_effect_vs_donor_fraction": -0.03900837163345025,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 2,
+        " red": 2,
+        " sweet": 4,
+        " yellow": 2,
+        " vegetable": 2,
+        " orange": 2,
+        " object": 2,
+        " gray": 2,
+        " none": 2
+      },
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783,
+      "role_guess": "weak_donor_path_necessity"
+    },
+    {
+      "candidate_component_id": "L37:mlp_out",
+      "condition": "joint_add_donor_delta",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 37,
+      "mean_fraction_of_threshold": 0.08174386849240683,
+      "mean_effect_vs_joint_fraction": 0.05260005221698597,
+      "mean_effect_vs_donor_fraction": -1.8323708035890824,
+      "mean_target_rank": 59.45,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.24375,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783,
+      "role_guess": "causal_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L37:mlp_out",
+      "condition": "joint_base",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 37,
+      "mean_fraction_of_threshold": 0.029143816533258437,
+      "mean_effect_vs_joint_fraction": 0.0,
+      "mean_effect_vs_donor_fraction": -1.8849707994066773,
+      "mean_target_rank": 76.7,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.825,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783,
+      "role_guess": "baseline_or_small_effect"
+    },
+    {
+      "candidate_component_id": "L37:mlp_out",
+      "condition": "joint_erase_to_recipient_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 37,
+      "mean_fraction_of_threshold": 0.02890431991545357,
+      "mean_effect_vs_joint_fraction": -0.00023949729153252178,
+      "mean_effect_vs_donor_fraction": -1.885210288760596,
+      "mean_target_rank": 77.2,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.83671875,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783,
+      "role_guess": "not_necessary_in_joint_path"
+    },
+    {
+      "candidate_component_id": "L37:mlp_out",
+      "condition": "joint_replace_with_donor_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 37,
+      "mean_fraction_of_threshold": 0.08115794701090699,
+      "mean_effect_vs_joint_fraction": 0.05201412716992789,
+      "mean_effect_vs_donor_fraction": -1.832956699157076,
+      "mean_target_rank": 59.8,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.25078125,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783,
+      "role_guess": "causal_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L37:mlp_out",
+      "condition": "recipient_add_donor_delta",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 37,
+      "mean_fraction_of_threshold": 0.05541993183404379,
+      "mean_effect_vs_joint_fraction": 0.026276117236669082,
+      "mean_effect_vs_donor_fraction": -1.8586947179636408,
+      "mean_target_rank": 73.3,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.515625,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783,
+      "role_guess": "standalone_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L38:mlp_out",
+      "condition": "donor_erase_to_recipient_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 38,
+      "mean_fraction_of_threshold": 1.236375572468139,
+      "mean_effect_vs_joint_fraction": 1.2072317684530227,
+      "mean_effect_vs_donor_fraction": -0.677739092082974,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 2,
+        " red": 2,
+        " sweet": 4,
+        " yellow": 2,
+        " vegetable": 2,
+        " orange": 2,
+        " object": 2,
+        " gray": 2,
+        " none": 2
+      },
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892,
+      "role_guess": "donor_path_necessary_candidate"
+    },
+    {
+      "candidate_component_id": "L38:mlp_out",
+      "condition": "joint_add_donor_delta",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 38,
+      "mean_fraction_of_threshold": 0.699895211424984,
+      "mean_effect_vs_joint_fraction": 0.6707513981327047,
+      "mean_effect_vs_donor_fraction": -1.2142194091198364,
+      "mean_target_rank": 3.65,
+      "target_top1_rate": 0.2,
+      "mean_margin_donor_vs_top": -1.678125,
+      "top_token_counts": {
+        " fruit": 2,
+        " blue": 4,
+        " bitter": 4,
+        " vegetable": 2,
+        " purple": 2,
+        " stone": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892,
+      "role_guess": "causal_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L38:mlp_out",
+      "condition": "joint_base",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 38,
+      "mean_fraction_of_threshold": 0.029143816533258437,
+      "mean_effect_vs_joint_fraction": 0.0,
+      "mean_effect_vs_donor_fraction": -1.8849707994066773,
+      "mean_target_rank": 76.7,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.825,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892,
+      "role_guess": "baseline_or_small_effect"
+    },
+    {
+      "candidate_component_id": "L38:mlp_out",
+      "condition": "joint_erase_to_recipient_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 38,
+      "mean_fraction_of_threshold": 0.0013706726540115022,
+      "mean_effect_vs_joint_fraction": -0.027773143780537364,
+      "mean_effect_vs_donor_fraction": -1.9127439635695798,
+      "mean_target_rank": 93.7,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -8.10859375,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892,
+      "role_guess": "weak_joint_path_necessity"
+    },
+    {
+      "candidate_component_id": "L38:mlp_out",
+      "condition": "joint_replace_with_donor_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 38,
+      "mean_fraction_of_threshold": 0.6718557078497587,
+      "mean_effect_vs_joint_fraction": 0.6427118616371305,
+      "mean_effect_vs_donor_fraction": -1.2422589708177076,
+      "mean_target_rank": 4.1,
+      "target_top1_rate": 0.2,
+      "mean_margin_donor_vs_top": -1.8828125,
+      "top_token_counts": {
+        " fruit": 2,
+        " blue": 4,
+        " bitter": 4,
+        " vegetable": 2,
+        " purple": 2,
+        " stone": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892,
+      "role_guess": "causal_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L38:mlp_out",
+      "condition": "recipient_add_donor_delta",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 38,
+      "mean_fraction_of_threshold": 0.6718112012454361,
+      "mean_effect_vs_joint_fraction": 0.6426673877984425,
+      "mean_effect_vs_donor_fraction": -1.2423034438702054,
+      "mean_target_rank": 4.1,
+      "target_top1_rate": 0.2,
+      "mean_margin_donor_vs_top": -1.871875,
+      "top_token_counts": {
+        " fruit": 2,
+        " blue": 4,
+        " bitter": 4,
+        " vegetable": 2,
+        " purple": 2,
+        " stone": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892,
+      "role_guess": "standalone_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L39:mlp_out",
+      "condition": "donor_erase_to_recipient_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 39,
+      "mean_fraction_of_threshold": 1.779066215479234,
+      "mean_effect_vs_joint_fraction": 1.749922392448123,
+      "mean_effect_vs_donor_fraction": -0.13504844323699372,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 2,
+        " red": 2,
+        " sweet": 4,
+        " yellow": 2,
+        " vegetable": 2,
+        " orange": 2,
+        " object": 2,
+        " gray": 2,
+        " none": 2
+      },
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846,
+      "role_guess": "donor_path_necessary_candidate"
+    },
+    {
+      "candidate_component_id": "L39:mlp_out",
+      "condition": "joint_add_donor_delta",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 39,
+      "mean_fraction_of_threshold": 0.233566358680604,
+      "mean_effect_vs_joint_fraction": 0.20442254623899006,
+      "mean_effect_vs_donor_fraction": -1.6805482908190137,
+      "mean_target_rank": 51.5,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -6.10234375,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " B": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846,
+      "role_guess": "causal_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L39:mlp_out",
+      "condition": "joint_base",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 39,
+      "mean_fraction_of_threshold": 0.029143816533258437,
+      "mean_effect_vs_joint_fraction": 0.0,
+      "mean_effect_vs_donor_fraction": -1.8849707994066773,
+      "mean_target_rank": 76.7,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.825,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846,
+      "role_guess": "baseline_or_small_effect"
+    },
+    {
+      "candidate_component_id": "L39:mlp_out",
+      "condition": "joint_erase_to_recipient_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 39,
+      "mean_fraction_of_threshold": 0.024281966603575605,
+      "mean_effect_vs_joint_fraction": -0.004861849981556238,
+      "mean_effect_vs_donor_fraction": -1.8898326453806547,
+      "mean_target_rank": 79.55,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -7.8828125,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " bitter": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846,
+      "role_guess": "not_necessary_in_joint_path"
+    },
+    {
+      "candidate_component_id": "L39:mlp_out",
+      "condition": "joint_replace_with_donor_component",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 39,
+      "mean_fraction_of_threshold": 0.22906933390965745,
+      "mean_effect_vs_joint_fraction": 0.19992551668445113,
+      "mean_effect_vs_donor_fraction": -1.6850453265889886,
+      "mean_target_rank": 53.3,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -6.1453125,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " B": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846,
+      "role_guess": "causal_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L39:mlp_out",
+      "condition": "recipient_add_donor_delta",
+      "n": 20,
+      "candidate_component": "mlp_out",
+      "candidate_layer": 39,
+      "mean_fraction_of_threshold": 0.20507735063825483,
+      "mean_effect_vs_joint_fraction": 0.17593351504406893,
+      "mean_effect_vs_donor_fraction": -1.7090373866491706,
+      "mean_target_rank": 64.7,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -6.365625,
+      "top_token_counts": {
+        " tool": 2,
+        " blue": 4,
+        " B": 4,
+        " fruit": 4,
+        " purple": 2,
+        " yellow": 2,
+        " sweet": 2
+      },
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846,
+      "role_guess": "standalone_boost_candidate"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+[00:04:46] qwen3/smoke: pairs=1 target=hidden_36 audits=2
+[00:04:46] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   6%|▋         | 25/398 [00:00<00:01, 243.11it/s]Loading weights:  21%|██        | 82/398 [00:00<00:00, 415.89it/s]Loading weights:  37%|███▋      | 147/398 [00:00<00:00, 513.37it/s]Loading weights:  53%|█████▎    | 209/398 [00:00<00:00, 525.30it/s]Loading weights:  68%|██████▊   | 270/398 [00:00<00:00, 551.90it/s]Loading weights:  85%|████████▍ | 337/398 [00:00<00:00, 566.91it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 554.03it/s]
+[00:04:47] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[00:04:48] qwen3: readout audit 1/1 pairs; rows=2
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "target_site": "hidden_36",
+  "top_readout_audits": [
+    {
+      "intervention_key": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+      "direction": "explicit<-conflict",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L35H0",
+      "source_group": "self_last",
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 1,
+      "mean_token0_donor_logprob_delta": -0.36753082275390625,
+      "mean_token0_margin_delta_donor_vs_recipient": -0.375,
+      "mean_token0_patched_margin_donor_vs_recipient": -19.25,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -19.25,
+      "mean_token0_donor_rank_delta": -83.0,
+      "mean_token0_patched_donor_rank": 1065.0,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 17.459585189819336,
+      "mean_mlp_delta_norm_total": 16.35501527786255
+    },
+    {
+      "intervention_key": "source_only|L35H0<-self_last|no_mlp explicit<-conflict",
+      "intervention_label": "source_only|L35H0<-self_last|no_mlp",
+      "direction": "explicit<-conflict",
+      "intervention_mode": "source_only",
+      "source_component_id": "L35H0",
+      "source_group": "self_last",
+      "mlp_components": [],
+      "n": 1,
+      "mean_token0_donor_logprob_delta": -0.36591529846191406,
+      "mean_token0_margin_delta_donor_vs_recipient": -0.375,
+      "mean_token0_patched_margin_donor_vs_recipient": -19.25,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -19.25,
+      "mean_token0_donor_rank_delta": -37.0,
+      "mean_token0_patched_donor_rank": 1111.0,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 17.459585189819336,
+      "mean_mlp_delta_norm_total": 0.0
+    }
+  ]
+}

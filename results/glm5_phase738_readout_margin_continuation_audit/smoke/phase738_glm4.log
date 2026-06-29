@@ -1,0 +1,78 @@
+[00:04:50] glm4/smoke: pairs=1 target=hidden_40 audits=2
+[00:04:51] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   1%|          | 5/443 [00:00<00:09, 46.73it/s]Loading weights:   9%|▊         | 38/443 [00:00<00:01, 202.57it/s]Loading weights:  15%|█▍        | 65/443 [00:00<00:01, 218.64it/s]Loading weights:  23%|██▎       | 103/443 [00:00<00:01, 263.71it/s]Loading weights:  31%|███       | 137/443 [00:00<00:01, 279.82it/s]Loading weights:  38%|███▊      | 170/443 [00:00<00:00, 286.04it/s]Loading weights:  46%|████▌     | 203/443 [00:00<00:00, 294.34it/s]Loading weights:  53%|█████▎    | 236/443 [00:00<00:00, 296.42it/s]Loading weights:  61%|██████    | 269/443 [00:00<00:00, 299.28it/s]Loading weights:  68%|██████▊   | 301/443 [00:01<00:00, 298.03it/s]Loading weights:  75%|███████▍  | 331/443 [00:01<00:00, 293.13it/s]Loading weights:  82%|████████▏ | 364/443 [00:01<00:00, 295.68it/s]Loading weights:  91%|█████████ | 401/443 [00:01<00:00, 296.39it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 289.08it/s]
+[00:04:53] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[00:04:55] glm4: readout audit 1/1 pairs; rows=2
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "target_site": "hidden_40",
+  "top_readout_audits": [
+    {
+      "intervention_key": "source_plus_all_mlp|L23H17<-all_pre_answer|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L23H17<-all_pre_answer|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L23H17",
+      "source_group": "all_pre_answer",
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 1,
+      "mean_token0_donor_logprob_delta": 0.3575630187988281,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.375,
+      "mean_token0_patched_margin_donor_vs_recipient": -5.9375,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -5.9375,
+      "mean_token0_donor_rank_delta": -3.0,
+      "mean_token0_patched_donor_rank": 7.0,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token1_patched_best_counts": {
+        "relation_echo": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 4.05526876449585,
+      "mean_mlp_delta_norm_total": 15.214855194091797
+    },
+    {
+      "intervention_key": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L39H21",
+      "source_group": "self_last",
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 1,
+      "mean_token0_donor_logprob_delta": 0.28954124450683594,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.3125,
+      "mean_token0_patched_margin_donor_vs_recipient": -6.0,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -6.0,
+      "mean_token0_donor_rank_delta": -3.0,
+      "mean_token0_patched_donor_rank": 7.0,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 1.0,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.0,
+      "token0_patched_best_counts": {
+        "recipient_answer": 1
+      },
+      "token1_patched_best_counts": {
+        "relation_echo": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 14.030059814453125,
+      "mean_mlp_delta_norm_total": 15.214855194091797
+    }
+  ]
+}

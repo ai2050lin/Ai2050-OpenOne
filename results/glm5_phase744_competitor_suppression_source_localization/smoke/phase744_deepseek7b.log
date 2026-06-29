@@ -1,0 +1,239 @@
+[08:33:56] deepseek7b/smoke: pairs=1 target=hidden_28 audits=1 combo_candidates=2
+[08:33:56] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 4/339 [00:00<00:08, 39.78it/s]Loading weights:  12%|█▏        | 40/339 [00:00<00:01, 214.97it/s]Loading weights:  22%|██▏       | 76/339 [00:00<00:00, 265.30it/s]Loading weights:  30%|███       | 103/339 [00:00<00:00, 264.53it/s]Loading weights:  39%|███▊      | 131/339 [00:00<00:00, 251.99it/s]Loading weights:  49%|████▊     | 165/339 [00:00<00:00, 271.98it/s]Loading weights:  58%|█████▊    | 198/339 [00:00<00:00, 283.14it/s]Loading weights:  67%|██████▋   | 228/339 [00:00<00:00, 278.50it/s]Loading weights:  76%|███████▌  | 256/339 [00:00<00:00, 277.46it/s]Loading weights:  86%|████████▌ | 290/339 [00:01<00:00, 295.13it/s]Loading weights:  94%|█████████▍| 320/339 [00:01<00:00, 275.84it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 271.43it/s]
+[08:33:58] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[08:33:58] deepseek7b: scan_candidates=6 ['L22:attn_out', 'L22:mlp_out', 'L23:attn_out', 'L23:mlp_out', 'L24:attn_out', 'L24:mlp_out']
+[08:33:59] deepseek7b: suppression source scan 1/1 pairs; rows=6 skipped_top1=0
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "skipped_top1": 0,
+  "top_candidate_summary": [
+    {
+      "candidate_component_id": "L23:attn_out",
+      "candidate_layer": 23,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_base_margin_donor_vs_competitor": -3.25,
+      "mean_delta_margin_donor_vs_competitor": 2.625,
+      "mean_delta_donor_logit": 2.5,
+      "mean_delta_competitor_logit": -0.125,
+      "mean_delta_recipient_logit": -2.46875,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 2.0,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "new_top_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 1
+      },
+      "dominant_role_guess": "boost_and_suppress_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L24:mlp_out",
+      "candidate_layer": 24,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_base_margin_donor_vs_competitor": -3.25,
+      "mean_delta_margin_donor_vs_competitor": 1.375,
+      "mean_delta_donor_logit": 1.25,
+      "mean_delta_competitor_logit": -0.125,
+      "mean_delta_recipient_logit": -1.90625,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 7.0,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "new_top_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 1
+      },
+      "dominant_role_guess": "boost_and_suppress_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L24:attn_out",
+      "candidate_layer": 24,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_base_margin_donor_vs_competitor": -3.25,
+      "mean_delta_margin_donor_vs_competitor": 0.875,
+      "mean_delta_donor_logit": 1.0,
+      "mean_delta_competitor_logit": 0.125,
+      "mean_delta_recipient_logit": -3.5625,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 5.0,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "new_top_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "role_guess_counts": {
+        "boost_margin_candidate": 1
+      },
+      "dominant_role_guess": "boost_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L22:mlp_out",
+      "candidate_layer": 22,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_base_margin_donor_vs_competitor": -3.25,
+      "mean_delta_margin_donor_vs_competitor": 0.125,
+      "mean_delta_donor_logit": 0.25,
+      "mean_delta_competitor_logit": 0.125,
+      "mean_delta_recipient_logit": -3.4375,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 8.0,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "new_top_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "role_guess_counts": {
+        "weak_boost_candidate": 1
+      },
+      "dominant_role_guess": "weak_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L23:mlp_out",
+      "candidate_layer": 23,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_base_margin_donor_vs_competitor": -3.25,
+      "mean_delta_margin_donor_vs_competitor": 0.125,
+      "mean_delta_donor_logit": 0.375,
+      "mean_delta_competitor_logit": 0.25,
+      "mean_delta_recipient_logit": -1.90625,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 9.0,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "new_top_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "role_guess_counts": {
+        "weak_boost_candidate": 1
+      },
+      "dominant_role_guess": "weak_boost_candidate"
+    },
+    {
+      "candidate_component_id": "L22:attn_out",
+      "candidate_layer": 22,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 1,
+      "mean_base_margin_donor_vs_competitor": -3.25,
+      "mean_delta_margin_donor_vs_competitor": -0.1875,
+      "mean_delta_donor_logit": 0.0625,
+      "mean_delta_competitor_logit": 0.25,
+      "mean_delta_recipient_logit": -7.0859375,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 9.0,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "new_top_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "role_guess_counts": {
+        "harmful_or_competitor_support": 1
+      },
+      "dominant_role_guess": "harmful_or_competitor_support"
+    }
+  ],
+  "top_class_summary": [
+    {
+      "base_competitor_class": "echo_object_or_relation",
+      "candidate_component_id": "L23:attn_out",
+      "n": 1,
+      "mean_delta_margin_donor_vs_competitor": 2.625,
+      "mean_delta_donor_logit": 2.5,
+      "mean_delta_competitor_logit": -0.125,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 1
+      }
+    },
+    {
+      "base_competitor_class": "echo_object_or_relation",
+      "candidate_component_id": "L24:mlp_out",
+      "n": 1,
+      "mean_delta_margin_donor_vs_competitor": 1.375,
+      "mean_delta_donor_logit": 1.25,
+      "mean_delta_competitor_logit": -0.125,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 1
+      }
+    },
+    {
+      "base_competitor_class": "echo_object_or_relation",
+      "candidate_component_id": "L24:attn_out",
+      "n": 1,
+      "mean_delta_margin_donor_vs_competitor": 0.875,
+      "mean_delta_donor_logit": 1.0,
+      "mean_delta_competitor_logit": 0.125,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_margin_candidate": 1
+      }
+    },
+    {
+      "base_competitor_class": "echo_object_or_relation",
+      "candidate_component_id": "L22:mlp_out",
+      "n": 1,
+      "mean_delta_margin_donor_vs_competitor": 0.125,
+      "mean_delta_donor_logit": 0.25,
+      "mean_delta_competitor_logit": 0.125,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "weak_boost_candidate": 1
+      }
+    },
+    {
+      "base_competitor_class": "echo_object_or_relation",
+      "candidate_component_id": "L23:mlp_out",
+      "n": 1,
+      "mean_delta_margin_donor_vs_competitor": 0.125,
+      "mean_delta_donor_logit": 0.375,
+      "mean_delta_competitor_logit": 0.25,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "weak_boost_candidate": 1
+      }
+    },
+    {
+      "base_competitor_class": "echo_object_or_relation",
+      "candidate_component_id": "L22:attn_out",
+      "n": 1,
+      "mean_delta_margin_donor_vs_competitor": -0.1875,
+      "mean_delta_donor_logit": 0.0625,
+      "mean_delta_competitor_logit": 0.25,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "harmful_or_competitor_support": 1
+      }
+    }
+  ]
+}

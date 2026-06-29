@@ -1,0 +1,561 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]"
+        },
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]"
+        }
+      ],
+      "condition_summary": [
+        {
+          "condition": "joint_add_topK",
+          "donor_top1_rate": 0.08333333333333333,
+          "mean_donor_rank": 12.833333333333334,
+          "mean_margin_donor_vs_recipient": 1.6171875,
+          "mean_margin_donor_vs_top": -2.7604166666666665,
+          "mean_suppression_alpha_needed": 2.0178180135288413,
+          "n": 12,
+          "suppressed_token_class_counts": {
+            "donor_answer": 1,
+            "echo_object_or_relation": 4,
+            "format_or_schema": 5,
+            "other_vocab": 1,
+            "recipient_answer": 1
+          },
+          "suppression_scale": 0.0,
+          "top_token_class_counts": {
+            "donor_answer": 1,
+            "echo_object_or_relation": 4,
+            "format_or_schema": 5,
+            "other_vocab": 1,
+            "recipient_answer": 1
+          },
+          "top_token_counts": {
+            " The": 5,
+            " __": 1,
+            " category": 2,
+            " object": 1,
+            " orange": 1,
+            " stone": 1,
+            " taste": 1
+          }
+        },
+        {
+          "condition": "suppress_current_top",
+          "donor_top1_rate": 0.09090909090909091,
+          "mean_donor_rank": 3.8181818181818183,
+          "mean_margin_donor_vs_recipient": 2.6818181818181817,
+          "mean_margin_donor_vs_top": -0.8068181818181818,
+          "mean_suppression_alpha_needed": 2.201256014758736,
+          "n": 11,
+          "suppressed_token_class_counts": {
+            "echo_object_or_relation": 4,
+            "format_or_schema": 5,
+            "other_vocab": 1,
+            "recipient_answer": 1
+          },
+          "suppression_scale": 1.0,
+          "top_token_class_counts": {
+            "donor_answer": 1,
+            "echo_object_or_relation": 3,
+            "format_or_schema": 4,
+            "other_semantic_value": 1,
+            "punctuation_or_stop": 2
+          },
+          "top_token_counts": {
+            " ?\n\n": 2,
+            " Purple": 1,
+            " The": 4,
+            " apple": 1,
+            " banana": 1,
+            " stone": 1,
+            " sweet": 1
+          }
+        },
+        {
+          "condition": "suppress_current_top",
+          "donor_top1_rate": 0.2727272727272727,
+          "mean_donor_rank": 2.5454545454545454,
+          "mean_margin_donor_vs_recipient": 3.127840909090909,
+          "mean_margin_donor_vs_top": -0.5113636363636364,
+          "mean_suppression_alpha_needed": 2.201256014758736,
+          "n": 11,
+          "suppressed_token_class_counts": {
+            "echo_object_or_relation": 4,
+            "format_or_schema": 5,
+            "other_vocab": 1,
+            "recipient_answer": 1
+          },
+          "suppression_scale": 1.25,
+          "top_token_class_counts": {
+            "donor_answer": 3,
+            "echo_object_or_relation": 3,
+            "format_or_schema": 2,
+            "other_semantic_value": 1,
+            "punctuation_or_stop": 2
+          },
+          "top_token_counts": {
+            " ?\n\n": 2,
+            " Purple": 1,
+            " The": 2,
+            " apple": 1,
+            " banana": 1,
+            " bitter": 1,
+            " none": 1,
+            " stone": 1,
+            " sweet": 1
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_pairs": 6,
+      "model": "deepseek7b",
+      "n_rows": 34,
+      "phase": 743,
+      "phase739_round": "confirm",
+      "phase741_round": "confirm",
+      "quantization": "off",
+      "ranked_candidate_components": [
+        {
+          "component": "attn_out",
+          "component_id": "L26:attn_out",
+          "layer": 26,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "phase741_joint_add_effect": 0.3100355371735994,
+          "phase741_joint_add_fraction": 0.3276488426991234,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "attn_out",
+          "component_id": "L27:attn_out",
+          "layer": 27,
+          "phase740_mean_donor_fraction": 1.8331010374867347,
+          "phase740_mean_patched_fraction": 0.028992483721936087,
+          "phase741_joint_add_effect": 0.21130354358631293,
+          "phase741_joint_add_fraction": 0.22891685099706435,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L27:mlp_out",
+          "layer": 27,
+          "phase740_mean_donor_fraction": 0.24532093815331618,
+          "phase740_mean_patched_fraction": 0.037053610562865165,
+          "phase741_joint_add_effect": 0.03446649977325627,
+          "phase741_joint_add_fraction": 0.05207981140564784,
+          "phase741_target_top1_rate": 0.0
+        }
+      ],
+      "round": "main",
+      "strict_interpretation": "Final-norm suppression of the current top competitor is a readout-geometry intervention. It tests whether failure is local token competition, not whether the model naturally performs that suppression.",
+      "suppress_scales": [
+        1.0,
+        1.25
+      ],
+      "suppressed_class_summary": [
+        {
+          "mean_margin_donor_vs_top": -1.8875,
+          "mean_suppression_alpha_needed": 1.450046969730931,
+          "n": 5,
+          "suppressed_token_class": "format_or_schema",
+          "top_token_counts": {
+            " The": 5
+          }
+        },
+        {
+          "mean_margin_donor_vs_top": -3.234375,
+          "mean_suppression_alpha_needed": 2.3317889241962813,
+          "n": 4,
+          "suppressed_token_class": "echo_object_or_relation",
+          "top_token_counts": {
+            " category": 2,
+            " stone": 1,
+            " taste": 1
+          }
+        },
+        {
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_suppression_alpha_needed": 0.0,
+          "n": 1,
+          "suppressed_token_class": "donor_answer",
+          "top_token_counts": {
+            " orange": 1
+          }
+        },
+        {
+          "mean_margin_donor_vs_top": -5.1875,
+          "mean_suppression_alpha_needed": 3.6684189118388035,
+          "n": 1,
+          "suppressed_token_class": "recipient_answer",
+          "top_token_counts": {
+            " object": 1
+          }
+        },
+        {
+          "mean_margin_donor_vs_top": -5.5625,
+          "mean_suppression_alpha_needed": 3.96800670506751,
+          "n": 1,
+          "suppressed_token_class": "other_vocab",
+          "top_token_counts": {
+            " __": 1
+          }
+        }
+      ],
+      "target_site": "hidden_28",
+      "timestamp": "2026-06-29 08:14:11",
+      "title": "Competitor and Format Suppression Audit",
+      "top_audits": 2,
+      "top_candidates": 3,
+      "top_k_vocab": 12
+    },
+    "glm4": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]"
+        },
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]"
+        }
+      ],
+      "condition_summary": [
+        {
+          "condition": "joint_add_topK",
+          "donor_top1_rate": 0.5,
+          "mean_donor_rank": 3.5,
+          "mean_margin_donor_vs_recipient": 1.3880208333333333,
+          "mean_margin_donor_vs_top": -1.0885416666666667,
+          "mean_suppression_alpha_needed": 1.1728255158573222,
+          "n": 12,
+          "suppressed_token_class_counts": {
+            "donor_answer": 6,
+            "echo_object_or_relation": 4,
+            "other_vocab": 2
+          },
+          "suppression_scale": 0.0,
+          "top_token_class_counts": {
+            "donor_answer": 6,
+            "echo_object_or_relation": 4,
+            "other_vocab": 2
+          },
+          "top_token_counts": {
+            " B": 2,
+            " fruit": 2,
+            " orange": 2,
+            " stone": 3,
+            " taste": 1,
+            " yellow": 2
+          }
+        },
+        {
+          "condition": "suppress_current_top",
+          "donor_top1_rate": 0.0,
+          "mean_donor_rank": 2.0,
+          "mean_margin_donor_vs_recipient": 1.671875,
+          "mean_margin_donor_vs_top": -0.3020833333333333,
+          "mean_suppression_alpha_needed": 2.3456510317146444,
+          "n": 6,
+          "suppressed_token_class_counts": {
+            "echo_object_or_relation": 4,
+            "other_vocab": 2
+          },
+          "suppression_scale": 1.0,
+          "top_token_class_counts": {
+            "echo_object_or_relation": 2,
+            "format_or_schema": 2,
+            "other_vocab": 2
+          },
+          "top_token_counts": {
+            " B": 2,
+            " Category": 2,
+            " stone": 1,
+            " taste": 1
+          }
+        },
+        {
+          "condition": "suppress_current_top",
+          "donor_top1_rate": 0.6666666666666666,
+          "mean_donor_rank": 1.3333333333333333,
+          "mean_margin_donor_vs_recipient": 1.9479166666666667,
+          "mean_margin_donor_vs_top": -0.1875,
+          "mean_suppression_alpha_needed": 2.3456510317146444,
+          "n": 6,
+          "suppressed_token_class_counts": {
+            "echo_object_or_relation": 4,
+            "other_vocab": 2
+          },
+          "suppression_scale": 1.25,
+          "top_token_class_counts": {
+            "donor_answer": 4,
+            "echo_object_or_relation": 2
+          },
+          "top_token_counts": {
+            " object": 2,
+            " stone": 1,
+            " sweet": 2,
+            " taste": 1
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_pairs": 6,
+      "model": "glm4",
+      "n_rows": 24,
+      "phase": 743,
+      "phase739_round": "confirm",
+      "phase741_round": "confirm",
+      "quantization": "off",
+      "ranked_candidate_components": [
+        {
+          "component": "mlp_out",
+          "component_id": "L38:mlp_out",
+          "layer": 38,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "phase741_joint_add_effect": 0.6707513981327047,
+          "phase741_joint_add_fraction": 0.699895211424984,
+          "phase741_target_top1_rate": 0.2
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L39:mlp_out",
+          "layer": 39,
+          "phase740_mean_donor_fraction": 0.31188196308309846,
+          "phase740_mean_patched_fraction": 0.004088608673849683,
+          "phase741_joint_add_effect": 0.20442254623899006,
+          "phase741_joint_add_fraction": 0.233566358680604,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L37:mlp_out",
+          "layer": 37,
+          "phase740_mean_donor_fraction": 0.05889259273735783,
+          "phase740_mean_patched_fraction": 0.0003999503792660739,
+          "phase741_joint_add_effect": 0.05260005221698597,
+          "phase741_joint_add_fraction": 0.08174386849240683,
+          "phase741_target_top1_rate": 0.0
+        }
+      ],
+      "round": "main",
+      "strict_interpretation": "Final-norm suppression of the current top competitor is a readout-geometry intervention. It tests whether failure is local token competition, not whether the model naturally performs that suppression.",
+      "suppress_scales": [
+        1.0,
+        1.25
+      ],
+      "suppressed_class_summary": [
+        {
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_suppression_alpha_needed": 0.0,
+          "n": 6,
+          "suppressed_token_class": "donor_answer",
+          "top_token_counts": {
+            " fruit": 2,
+            " orange": 2,
+            " yellow": 2
+          }
+        },
+        {
+          "mean_margin_donor_vs_top": -3.046875,
+          "mean_suppression_alpha_needed": 3.288603504584768,
+          "n": 4,
+          "suppressed_token_class": "echo_object_or_relation",
+          "top_token_counts": {
+            " stone": 3,
+            " taste": 1
+          }
+        },
+        {
+          "mean_margin_donor_vs_top": -0.4375,
+          "mean_suppression_alpha_needed": 0.45974608597439814,
+          "n": 2,
+          "suppressed_token_class": "other_vocab",
+          "top_token_counts": {
+            " B": 2
+          }
+        }
+      ],
+      "target_site": "hidden_40",
+      "timestamp": "2026-06-29 08:13:54",
+      "title": "Competitor and Format Suppression Audit",
+      "top_audits": 2,
+      "top_candidates": 3,
+      "top_k_vocab": 12
+    },
+    "qwen3": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]"
+        },
+        {
+          "direction": "explicit<-conflict",
+          "label": "mlp_only|no_source|L28:mlp[299:341]"
+        }
+      ],
+      "condition_summary": [
+        {
+          "condition": "joint_add_topK",
+          "donor_top1_rate": 0.0,
+          "mean_donor_rank": 13.083333333333334,
+          "mean_margin_donor_vs_recipient": -7.119791666666667,
+          "mean_margin_donor_vs_top": -7.119791666666667,
+          "mean_suppression_alpha_needed": 5.188836392507187,
+          "n": 12,
+          "suppressed_token_class_counts": {
+            "recipient_answer": 12
+          },
+          "suppression_scale": 0.0,
+          "top_token_class_counts": {
+            "recipient_answer": 12
+          },
+          "top_token_counts": {
+            " fruit": 2,
+            " none": 2,
+            " object": 2,
+            " orange": 2,
+            " sweet": 2,
+            " yellow": 2
+          }
+        },
+        {
+          "condition": "suppress_current_top",
+          "donor_top1_rate": 0.16666666666666666,
+          "mean_donor_rank": 2.4166666666666665,
+          "mean_margin_donor_vs_recipient": -0.020833333333333332,
+          "mean_margin_donor_vs_top": -1.5104166666666667,
+          "mean_suppression_alpha_needed": 5.188836392507187,
+          "n": 12,
+          "suppressed_token_class_counts": {
+            "recipient_answer": 12
+          },
+          "suppression_scale": 1.0,
+          "top_token_class_counts": {
+            "donor_answer": 1,
+            "format_or_schema": 8,
+            "recipient_answer": 3
+          },
+          "top_token_counts": {
+            " Answer": 2,
+            " The": 6,
+            " blue": 1,
+            " orange": 2,
+            " yellow": 1
+          }
+        },
+        {
+          "condition": "suppress_current_top",
+          "donor_top1_rate": 0.3333333333333333,
+          "mean_donor_rank": 2.0,
+          "mean_margin_donor_vs_recipient": 1.78125,
+          "mean_margin_donor_vs_top": -0.8958333333333334,
+          "mean_suppression_alpha_needed": 5.188836392507187,
+          "n": 12,
+          "suppressed_token_class_counts": {
+            "recipient_answer": 12
+          },
+          "suppression_scale": 1.25,
+          "top_token_class_counts": {
+            "donor_answer": 4,
+            "format_or_schema": 8
+          },
+          "top_token_counts": {
+            " Answer": 2,
+            " The": 6,
+            " blue": 2,
+            " purple": 2
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_pairs": 6,
+      "model": "qwen3",
+      "n_rows": 36,
+      "phase": 743,
+      "phase739_round": "confirm",
+      "phase741_round": "confirm",
+      "quantization": "off",
+      "ranked_candidate_components": [
+        {
+          "component": "attn_out",
+          "component_id": "L34:attn_out",
+          "layer": 34,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "phase741_joint_add_effect": 0.16391496652247423,
+          "phase741_joint_add_fraction": 0.16744744972534686,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "attn_out",
+          "component_id": "L31:attn_out",
+          "layer": 31,
+          "phase740_mean_donor_fraction": 0.49538392343140314,
+          "phase740_mean_patched_fraction": 0.005903768658792036,
+          "phase741_joint_add_effect": 0.12432384558261171,
+          "phase741_joint_add_fraction": 0.12785632623795423,
+          "phase741_target_top1_rate": 0.0
+        },
+        {
+          "component": "mlp_out",
+          "component_id": "L33:mlp_out",
+          "layer": 33,
+          "phase740_mean_donor_fraction": 0.09864564824520697,
+          "phase740_mean_patched_fraction": 0.004938753742349763,
+          "phase741_joint_add_effect": 0.019193179858724842,
+          "phase741_joint_add_fraction": 0.022725664826035406,
+          "phase741_target_top1_rate": 0.0
+        }
+      ],
+      "round": "main",
+      "strict_interpretation": "Final-norm suppression of the current top competitor is a readout-geometry intervention. It tests whether failure is local token competition, not whether the model naturally performs that suppression.",
+      "suppress_scales": [
+        1.0,
+        1.25
+      ],
+      "suppressed_class_summary": [
+        {
+          "mean_margin_donor_vs_top": -7.119791666666667,
+          "mean_suppression_alpha_needed": 5.188836392507187,
+          "n": 12,
+          "suppressed_token_class": "recipient_answer",
+          "top_token_counts": {
+            " fruit": 2,
+            " none": 2,
+            " object": 2,
+            " orange": 2,
+            " sweet": 2,
+            " yellow": 2
+          }
+        }
+      ],
+      "target_site": "hidden_36",
+      "timestamp": "2026-06-29 08:13:35",
+      "title": "Competitor and Format Suppression Audit",
+      "top_audits": 2,
+      "top_candidates": 3,
+      "top_k_vocab": 12
+    }
+  },
+  "evidence_type": "top-k vocabulary competitor taxonomy plus final-norm current-top suppression against joint+threshold-component state",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 743,
+  "round": "main",
+  "status": "complete",
+  "timestamp": "2026-06-29 08:14:13",
+  "title": "Competitor and Format Suppression Audit"
+}

@@ -1,0 +1,117 @@
+[20:29:03] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[20:29:03] [load] qwen3: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[20:29:03] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 27/398 [00:00<00:01, 265.27it/s]Loading weights:  22%|██▏       | 88/398 [00:00<00:00, 450.27it/s]Loading weights:  38%|███▊      | 152/398 [00:00<00:00, 528.81it/s]Loading weights:  52%|█████▏    | 206/398 [00:00<00:00, 524.70it/s]Loading weights:  70%|███████   | 280/398 [00:00<00:00, 592.67it/s]Loading weights:  87%|████████▋ | 345/398 [00:00<00:00, 600.71it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 566.16it/s]
+[20:29:04] [load] qwen3: loaded attn=sdpa, device=cuda:0, gpu=8.05GB
+[20:29:04] qwen3/smoke: scan_cases=9, pairs=2
+[20:29:04] scan 1/9 cases; current_sites=144
+[20:29:04] scan 2/9 cases; current_sites=144
+[20:29:04] scan 3/9 cases; current_sites=144
+[20:29:04] scan 4/9 cases; current_sites=144
+[20:29:04] scan 5/9 cases; current_sites=144
+[20:29:04] scan 6/9 cases; current_sites=144
+[20:29:04] scan 7/9 cases; current_sites=144
+[20:29:04] scan 8/9 cases; current_sites=144
+[20:29:04] scan 9/9 cases; current_sites=144
+[20:29:04] qwen3/smoke: candidate_sites=['L28_layer_input', 'L35_layer_input', 'L26_attn_out', 'L34_attn_out']
+[20:29:06] transfer 1/2 pairs; rows=8
+[20:29:07] transfer 2/2 pairs; rows=16
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "attn": "sdpa",
+  "formation": {
+    "layer_input": {
+      "max_site": "L35_layer_input",
+      "max_layer": 35,
+      "max_effect_norm": 272.4493713378906,
+      "earliest_35pct_site": "L28_layer_input",
+      "earliest_35pct_layer": 28,
+      "earliest_35pct_effect_norm": 103.08977508544922
+    },
+    "attn_out": {
+      "max_site": "L34_attn_out",
+      "max_layer": 34,
+      "max_effect_norm": 86.38568115234375,
+      "earliest_35pct_site": "L26_attn_out",
+      "earliest_35pct_layer": 26,
+      "earliest_35pct_effect_norm": 37.556968688964844
+    },
+    "mlp_out": {
+      "max_site": "L35_mlp_out",
+      "max_layer": 35,
+      "max_effect_norm": 110.45732116699219,
+      "earliest_35pct_site": "L28_mlp_out",
+      "earliest_35pct_layer": 28,
+      "earliest_35pct_effect_norm": 39.38161849975586
+    },
+    "layer_out": {
+      "max_site": "hidden_36",
+      "max_layer": 35,
+      "max_effect_norm": 293.45477294921875,
+      "earliest_35pct_site": "hidden_28",
+      "earliest_35pct_layer": 27,
+      "earliest_35pct_effect_norm": 103.08977508544922
+    }
+  },
+  "top_transfer": [
+    [
+      "commonsense<-explicit|L28_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 28,
+        "n": 2,
+        "mean_patched_delta_vs_recipient": 2.366611897945404,
+        "changed_rate": 1.0,
+        "recipient_hit_rate": 1.0,
+        "patched_hit_rate": 0.0,
+        "hit_gain": 0.0,
+        "hit_loss": 1.0
+      }
+    ],
+    [
+      "explicit<-commonsense|L28_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 28,
+        "n": 2,
+        "mean_patched_delta_vs_recipient": -2.5801296420395374,
+        "changed_rate": 0.0,
+        "recipient_hit_rate": 1.0,
+        "patched_hit_rate": 1.0,
+        "hit_gain": 0.0,
+        "hit_loss": 0.0
+      }
+    ],
+    [
+      "commonsense<-explicit|L35_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 35,
+        "n": 2,
+        "mean_patched_delta_vs_recipient": 4.542584458831698,
+        "changed_rate": 0.0,
+        "recipient_hit_rate": 1.0,
+        "patched_hit_rate": 1.0,
+        "hit_gain": 0.0,
+        "hit_loss": 0.0
+      }
+    ],
+    [
+      "explicit<-commonsense|L35_layer_input",
+      {
+        "site_kind": "layer_input",
+        "layer": 35,
+        "n": 2,
+        "mean_patched_delta_vs_recipient": -5.377504367381334,
+        "changed_rate": 0.0,
+        "recipient_hit_rate": 1.0,
+        "patched_hit_rate": 1.0,
+        "hit_gain": 0.0,
+        "hit_loss": 0.0
+      }
+    ]
+  ]
+}

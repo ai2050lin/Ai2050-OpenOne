@@ -1,0 +1,444 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "sdpa",
+      "candidate_sites": [
+        "L22_layer_input",
+        "L27_layer_input",
+        "L21_attn_out",
+        "L27_attn_out"
+      ],
+      "dtype": "bfloat16",
+      "formation_summary": {
+        "attn_out": {
+          "earliest_35pct_effect_norm": 56.81743240356445,
+          "earliest_35pct_layer": 21,
+          "earliest_35pct_site": "L21_attn_out",
+          "max_effect_norm": 159.99009704589844,
+          "max_layer": 27,
+          "max_site": "L27_attn_out"
+        },
+        "layer_input": {
+          "earliest_35pct_effect_norm": 213.64569091796875,
+          "earliest_35pct_layer": 22,
+          "earliest_35pct_site": "L22_layer_input",
+          "max_effect_norm": 578.9385375976562,
+          "max_layer": 27,
+          "max_site": "L27_layer_input"
+        },
+        "layer_out": {
+          "earliest_35pct_effect_norm": 322.1124572753906,
+          "earliest_35pct_layer": 23,
+          "earliest_35pct_site": "hidden_24",
+          "max_effect_norm": 793.5023803710938,
+          "max_layer": 27,
+          "max_site": "hidden_28"
+        },
+        "mlp_out": {
+          "earliest_35pct_effect_norm": 171.888671875,
+          "earliest_35pct_layer": 24,
+          "earliest_35pct_site": "L24_mlp_out",
+          "max_effect_norm": 488.02825927734375,
+          "max_layer": 27,
+          "max_site": "L27_mlp_out"
+        }
+      },
+      "model": "deepseek7b",
+      "n_scan_rows": 336,
+      "n_transfer_rows": 16,
+      "phase": 733,
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+      "timestamp": "2026-06-28 20:29:25",
+      "title": "Prompt-Type Skeleton Source Localization",
+      "transfer_summary": {
+        "commonsense<-explicit|L21_attn_out": {
+          "changed_rate": 0.5,
+          "hit_gain": 0.0,
+          "hit_loss": 0.5,
+          "layer": 21,
+          "mean_patched_delta_vs_recipient": -0.4984922409057617,
+          "n": 2,
+          "patched_hit_rate": 0.0,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L22_layer_input": {
+          "changed_rate": 1.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.5,
+          "layer": 22,
+          "mean_patched_delta_vs_recipient": 0.4417245388031006,
+          "n": 2,
+          "patched_hit_rate": 0.0,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L27_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": 0.676997184753418,
+          "n": 2,
+          "patched_hit_rate": 0.5,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L27_layer_input": {
+          "changed_rate": 1.0,
+          "hit_gain": 0.5,
+          "hit_loss": 0.5,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": 4.44265478849411,
+          "n": 2,
+          "patched_hit_rate": 0.5,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L21_attn_out": {
+          "changed_rate": 0.5,
+          "hit_gain": 0.5,
+          "hit_loss": 0.0,
+          "layer": 21,
+          "mean_patched_delta_vs_recipient": 0.46655309200286865,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L22_layer_input": {
+          "changed_rate": 1.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.5,
+          "layer": 22,
+          "mean_patched_delta_vs_recipient": -4.152836948633194,
+          "n": 2,
+          "patched_hit_rate": 0.0,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L27_attn_out": {
+          "changed_rate": 0.5,
+          "hit_gain": 0.0,
+          "hit_loss": 0.5,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -0.7678662836551666,
+          "n": 2,
+          "patched_hit_rate": 0.0,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L27_layer_input": {
+          "changed_rate": 1.0,
+          "hit_gain": 0.5,
+          "hit_loss": 0.5,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -4.761672884225845,
+          "n": 2,
+          "patched_hit_rate": 0.5,
+          "recipient_hit_rate": 0.5,
+          "site_kind": "layer_input"
+        }
+      }
+    },
+    "glm4": {
+      "attn_implementation": "sdpa",
+      "candidate_sites": [
+        "L31_layer_input",
+        "L39_layer_input",
+        "L23_attn_out",
+        "L35_attn_out"
+      ],
+      "dtype": "bfloat16",
+      "formation_summary": {
+        "attn_out": {
+          "earliest_35pct_effect_norm": 6.125036239624023,
+          "earliest_35pct_layer": 23,
+          "earliest_35pct_site": "L23_attn_out",
+          "max_effect_norm": 13.089219093322754,
+          "max_layer": 35,
+          "max_site": "L35_attn_out"
+        },
+        "layer_input": {
+          "earliest_35pct_effect_norm": 47.5498046875,
+          "earliest_35pct_layer": 31,
+          "earliest_35pct_site": "L31_layer_input",
+          "max_effect_norm": 131.75758361816406,
+          "max_layer": 39,
+          "max_site": "L39_layer_input"
+        },
+        "layer_out": {
+          "earliest_35pct_effect_norm": 131.75758361816406,
+          "earliest_35pct_layer": 38,
+          "earliest_35pct_site": "hidden_39",
+          "max_effect_norm": 233.7808837890625,
+          "max_layer": 39,
+          "max_site": "hidden_40"
+        },
+        "mlp_out": {
+          "earliest_35pct_effect_norm": 76.93199157714844,
+          "earliest_35pct_layer": 38,
+          "earliest_35pct_site": "L38_mlp_out",
+          "max_effect_norm": 162.57273864746094,
+          "max_layer": 39,
+          "max_site": "L39_mlp_out"
+        }
+      },
+      "model": "glm4",
+      "n_scan_rows": 480,
+      "n_transfer_rows": 16,
+      "phase": 733,
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+      "timestamp": "2026-06-28 20:29:16",
+      "title": "Prompt-Type Skeleton Source Localization",
+      "transfer_summary": {
+        "commonsense<-explicit|L23_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 23,
+          "mean_patched_delta_vs_recipient": -0.06042921543121338,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L31_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 31,
+          "mean_patched_delta_vs_recipient": 2.212292604148388,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L35_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": 0.21734243631362915,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L39_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": 2.317843893542886,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L23_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 23,
+          "mean_patched_delta_vs_recipient": -0.0768030434846878,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L31_layer_input": {
+          "changed_rate": 0.5,
+          "hit_gain": 0.0,
+          "hit_loss": 0.5,
+          "layer": 31,
+          "mean_patched_delta_vs_recipient": -2.6345951706171036,
+          "n": 2,
+          "patched_hit_rate": 0.5,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L35_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": -0.030557937920093536,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L39_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": -2.3291226774454117,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        }
+      }
+    },
+    "qwen3": {
+      "attn_implementation": "sdpa",
+      "candidate_sites": [
+        "L28_layer_input",
+        "L35_layer_input",
+        "L26_attn_out",
+        "L34_attn_out"
+      ],
+      "dtype": "bfloat16",
+      "formation_summary": {
+        "attn_out": {
+          "earliest_35pct_effect_norm": 37.556968688964844,
+          "earliest_35pct_layer": 26,
+          "earliest_35pct_site": "L26_attn_out",
+          "max_effect_norm": 86.38568115234375,
+          "max_layer": 34,
+          "max_site": "L34_attn_out"
+        },
+        "layer_input": {
+          "earliest_35pct_effect_norm": 103.08977508544922,
+          "earliest_35pct_layer": 28,
+          "earliest_35pct_site": "L28_layer_input",
+          "max_effect_norm": 272.4493713378906,
+          "max_layer": 35,
+          "max_site": "L35_layer_input"
+        },
+        "layer_out": {
+          "earliest_35pct_effect_norm": 103.08977508544922,
+          "earliest_35pct_layer": 27,
+          "earliest_35pct_site": "hidden_28",
+          "max_effect_norm": 293.45477294921875,
+          "max_layer": 35,
+          "max_site": "hidden_36"
+        },
+        "mlp_out": {
+          "earliest_35pct_effect_norm": 39.38161849975586,
+          "earliest_35pct_layer": 28,
+          "earliest_35pct_site": "L28_mlp_out",
+          "max_effect_norm": 110.45732116699219,
+          "max_layer": 35,
+          "max_site": "L35_mlp_out"
+        }
+      },
+      "model": "qwen3",
+      "n_scan_rows": 432,
+      "n_transfer_rows": 16,
+      "phase": 733,
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+      "timestamp": "2026-06-28 20:29:07",
+      "title": "Prompt-Type Skeleton Source Localization",
+      "transfer_summary": {
+        "commonsense<-explicit|L26_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 26,
+          "mean_patched_delta_vs_recipient": 1.581836223602295,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L28_layer_input": {
+          "changed_rate": 1.0,
+          "hit_gain": 0.0,
+          "hit_loss": 1.0,
+          "layer": 28,
+          "mean_patched_delta_vs_recipient": 2.366611897945404,
+          "n": 2,
+          "patched_hit_rate": 0.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L34_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 34,
+          "mean_patched_delta_vs_recipient": 0.8267822265625,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L35_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": 4.542584458831698,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L26_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 26,
+          "mean_patched_delta_vs_recipient": 0.010191367473453283,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L28_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 28,
+          "mean_patched_delta_vs_recipient": -2.5801296420395374,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L34_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 34,
+          "mean_patched_delta_vs_recipient": 0.0015144292265176773,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L35_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": -5.377504367381334,
+          "n": 2,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        }
+      }
+    }
+  },
+  "evidence_type": "formation scan + early/mid/late site replacement",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 733,
+  "round": "smoke",
+  "status": "complete",
+  "timestamp": "2026-06-28 20:29:27",
+  "title": "Prompt-Type Skeleton Source Localization"
+}

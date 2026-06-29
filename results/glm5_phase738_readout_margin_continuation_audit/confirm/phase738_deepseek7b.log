@@ -1,0 +1,194 @@
+[00:07:47] deepseek7b/confirm: pairs=12 target=hidden_28 audits=5
+[00:07:47] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/339 [00:00<00:05, 58.01it/s]Loading weights:  12%|█▏        | 41/339 [00:00<00:01, 191.50it/s]Loading weights:  21%|██        | 71/339 [00:00<00:01, 228.54it/s]Loading weights:  32%|███▏      | 110/339 [00:00<00:00, 252.40it/s]Loading weights:  44%|████▍     | 149/339 [00:00<00:00, 276.11it/s]Loading weights:  54%|█████▍    | 184/339 [00:00<00:00, 286.42it/s]Loading weights:  63%|██████▎   | 213/339 [00:00<00:00, 252.91it/s]Loading weights:  76%|███████▌  | 257/339 [00:00<00:00, 291.64it/s]Loading weights:  85%|████████▍ | 287/339 [00:01<00:00, 276.14it/s]Loading weights:  94%|█████████▎| 317/339 [00:01<00:00, 281.75it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 267.64it/s]
+[00:07:49] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[00:07:55] deepseek7b: readout audit 3/12 pairs; rows=15
+[00:08:01] deepseek7b: readout audit 6/12 pairs; rows=30
+[00:08:07] deepseek7b: readout audit 9/12 pairs; rows=45
+[00:08:13] deepseek7b: readout audit 12/12 pairs; rows=60
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "confirm",
+  "target_site": "hidden_28",
+  "top_readout_audits": [
+    {
+      "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "explicit<-conflict",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L22H24",
+      "source_group": "target_record_line",
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 12,
+      "mean_token0_donor_logprob_delta": 0.34919337431589764,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.4114583333333333,
+      "mean_token0_patched_margin_donor_vs_recipient": -11.931966145833334,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -12.0673828125,
+      "mean_token0_donor_rank_delta": -58.833333333333336,
+      "mean_token0_patched_donor_rank": 3184.6666666666665,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 0.8333333333333334,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.16666666666666666,
+      "token0_patched_best_counts": {
+        "object_echo": 1,
+        "recipient_answer": 10,
+        "relation_echo": 1
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 11,
+        "cont_of": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 7.557269195715587,
+      "mean_mlp_delta_norm_total": 66.18871736526489
+    },
+    {
+      "intervention_key": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 12,
+      "mean_token0_donor_logprob_delta": 0.3261111577351888,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.3932291666666667,
+      "mean_token0_patched_margin_donor_vs_recipient": -8.264973958333334,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -8.697265625,
+      "mean_token0_donor_rank_delta": -362.3333333333333,
+      "mean_token0_patched_donor_rank": 1303.5833333333333,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 0.5833333333333334,
+      "token0_format_top_candidate_rate": 0.16666666666666666,
+      "token0_echo_top_candidate_rate": 0.25,
+      "token0_patched_best_counts": {
+        "format_the": 2,
+        "object_echo": 3,
+        "recipient_answer": 7
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 9,
+        "cont_of": 2,
+        "object_echo": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 8.157025337219238,
+      "mean_mlp_delta_norm_total": 66.18871736526489
+    },
+    {
+      "intervention_key": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "explicit<-conflict",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 12,
+      "mean_token0_donor_logprob_delta": 0.25811612606048584,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.2848307291666667,
+      "mean_token0_patched_margin_donor_vs_recipient": -12.05859375,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -12.173177083333334,
+      "mean_token0_donor_rank_delta": -149.58333333333334,
+      "mean_token0_patched_donor_rank": 3093.9166666666665,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 0.8333333333333334,
+      "token0_format_top_candidate_rate": 0.0,
+      "token0_echo_top_candidate_rate": 0.16666666666666666,
+      "token0_patched_best_counts": {
+        "object_echo": 1,
+        "recipient_answer": 10,
+        "relation_echo": 1
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 11,
+        "cont_of": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": 8.157025337219238,
+      "mean_mlp_delta_norm_total": 66.18871736526489
+    },
+    {
+      "intervention_key": "mlp_only|no_source|L27:mlp[2872:2932] conflict<-explicit",
+      "intervention_label": "mlp_only|no_source|L27:mlp[2872:2932]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "mlp_only",
+      "source_component_id": null,
+      "source_group": null,
+      "mlp_components": [
+        "L27:mlp[2872:2932]"
+      ],
+      "n": 12,
+      "mean_token0_donor_logprob_delta": 0.07000954945882161,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.19075520833333334,
+      "mean_token0_patched_margin_donor_vs_recipient": -8.467447916666666,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -8.983072916666666,
+      "mean_token0_donor_rank_delta": -318.5833333333333,
+      "mean_token0_patched_donor_rank": 1347.3333333333333,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 0.5,
+      "token0_format_top_candidate_rate": 0.25,
+      "token0_echo_top_candidate_rate": 0.25,
+      "token0_patched_best_counts": {
+        "format_the": 3,
+        "object_echo": 3,
+        "recipient_answer": 6
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 9,
+        "cont_of": 2,
+        "object_echo": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": null,
+      "mean_mlp_delta_norm_total": 57.49582386016846
+    },
+    {
+      "intervention_key": "mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+      "intervention_label": "mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "mlp_all",
+      "source_component_id": null,
+      "source_group": null,
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 12,
+      "mean_token0_donor_logprob_delta": 0.05522437890370687,
+      "mean_token0_margin_delta_donor_vs_recipient": 0.16276041666666666,
+      "mean_token0_patched_margin_donor_vs_recipient": -8.495442708333334,
+      "mean_token0_patched_margin_donor_vs_best_candidate": -9.031901041666666,
+      "mean_token0_donor_rank_delta": -311.3333333333333,
+      "mean_token0_patched_donor_rank": 1354.5833333333333,
+      "token0_donor_top_candidate_rate": 0.0,
+      "token0_recipient_top_candidate_rate": 0.5,
+      "token0_format_top_candidate_rate": 0.25,
+      "token0_echo_top_candidate_rate": 0.25,
+      "token0_patched_best_counts": {
+        "format_the": 3,
+        "object_echo": 3,
+        "recipient_answer": 6
+      },
+      "token1_patched_best_counts": {
+        "cont_is": 9,
+        "cont_of": 2,
+        "cont_stop_newline": 1
+      },
+      "token1_format_or_echo_top_rate": 1.0,
+      "mean_source_contribution_delta_norm": null,
+      "mean_mlp_delta_norm_total": 66.18871736526489
+    }
+  ]
+}

@@ -4,3 +4,92 @@
 Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights: 100%|██████████| 443/443 [00:00<00:00, 24503.19it/s]
 [model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=18.84GB
 [20:06:31] glm4: prompt_pairs=18, head_cases=66, sites=['hidden_39', 'hidden_40'], heads=['L29H18', 'L29H28', 'L24H19', 'L28H6']
+[20:06:51] glm4: prompt_transfer_rows=72
+[20:07:31] glm4: head_ablation_rows=264
+[20:07:31] glm4: edge_mediation_rows=0
+[model_utils] GPU memory released, allocated=18.85 GB
+{
+  "model": "glm4",
+  "prompt_transfer_summary": {
+    "commonsense<-explicit|hidden_39": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": 2.3740062332815595,
+      "changed_rate": 0.16666666666666666,
+      "recipient_hit_rate": 0.9444444444444444,
+      "patched_hit_rate": 1.0,
+      "hit_gain": 0.05555555555555555,
+      "hit_loss": 0.0
+    },
+    "explicit<-commonsense|hidden_39": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": -2.38657819158915,
+      "changed_rate": 0.16666666666666666,
+      "recipient_hit_rate": 1.0,
+      "patched_hit_rate": 0.9444444444444444,
+      "hit_gain": 0.0,
+      "hit_loss": 0.05555555555555555
+    },
+    "commonsense<-explicit|hidden_40": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": 2.3772014119765825,
+      "changed_rate": 0.16666666666666666,
+      "recipient_hit_rate": 0.9444444444444444,
+      "patched_hit_rate": 1.0,
+      "hit_gain": 0.05555555555555555,
+      "hit_loss": 0.0
+    },
+    "explicit<-commonsense|hidden_40": {
+      "n": 18,
+      "mean_patched_delta_vs_recipient": -2.382529056010147,
+      "changed_rate": 0.16666666666666666,
+      "recipient_hit_rate": 1.0,
+      "patched_hit_rate": 0.9444444444444444,
+      "hit_gain": 0.0,
+      "hit_loss": 0.05555555555555555
+    }
+  },
+  "top_head_edges": [
+    {
+      "head_key": "L24H19",
+      "relation": "taste",
+      "prompt_type": "commonsense",
+      "n": 6,
+      "mean_logprob_delta": -0.027254184087117512,
+      "mean_rank_delta": 0.16666666666666666,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    },
+    {
+      "head_key": "L29H18",
+      "relation": "taste",
+      "prompt_type": "commonsense",
+      "n": 6,
+      "mean_logprob_delta": -0.02535887559254964,
+      "mean_rank_delta": 0.16666666666666666,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    },
+    {
+      "head_key": "L28H6",
+      "relation": "taste",
+      "prompt_type": "commonsense",
+      "n": 6,
+      "mean_logprob_delta": -0.019429723421732586,
+      "mean_rank_delta": 0.0,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    },
+    {
+      "head_key": "L29H28",
+      "relation": "taste",
+      "prompt_type": "explicit_profile",
+      "n": 12,
+      "mean_logprob_delta": -0.013812155475535567,
+      "mean_rank_delta": 0.0,
+      "changed_rate": 0.0,
+      "hit_drop_rate": 0.0
+    }
+  ],
+  "edge_mediation_summary": {}
+}
+=== Phase732 glm4 done 2026-06-28 20:07:32 ===

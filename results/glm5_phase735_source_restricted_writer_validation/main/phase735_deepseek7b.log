@@ -1,0 +1,219 @@
+[22:22:32] deepseek7b/main: pairs=12 target_site=hidden_28 attention=2 mlp=2
+[22:22:32] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/339 [00:00<00:05, 58.50it/s]Loading weights:  11%|█         | 38/339 [00:00<00:01, 189.10it/s]Loading weights:  23%|██▎       | 77/339 [00:00<00:00, 262.11it/s]Loading weights:  32%|███▏      | 108/339 [00:00<00:00, 259.90it/s]Loading weights:  42%|████▏     | 142/339 [00:00<00:00, 284.14it/s]Loading weights:  50%|█████     | 171/339 [00:00<00:00, 280.15it/s]Loading weights:  59%|█████▉    | 200/339 [00:00<00:00, 274.45it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 274.48it/s]Loading weights:  77%|███████▋  | 260/339 [00:01<00:00, 260.87it/s]Loading weights:  86%|████████▌ | 292/339 [00:01<00:00, 266.84it/s]Loading weights:  97%|█████████▋| 328/339 [00:01<00:00, 283.84it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 267.73it/s]
+[22:22:34] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[22:22:34] deepseek7b: attention source specs=2 layers=[21, 22]
+[22:22:36] deepseek7b: attention source validation 2/12 pairs; rows=44
+[22:22:37] deepseek7b: attention source validation 4/12 pairs; rows=88
+[22:22:38] deepseek7b: attention source validation 6/12 pairs; rows=132
+[22:22:40] deepseek7b: attention source validation 8/12 pairs; rows=176
+[22:22:41] deepseek7b: attention source validation 10/12 pairs; rows=220
+[22:22:42] deepseek7b: attention source validation 12/12 pairs; rows=264
+[22:22:42] deepseek7b: mlp fine specs=8 from coarse=2, subgroups=4
+[22:22:43] deepseek7b: mlp fine decomposition 2/12 pairs; rows=16
+[22:22:43] deepseek7b: mlp fine decomposition 4/12 pairs; rows=32
+[22:22:44] deepseek7b: mlp fine decomposition 6/12 pairs; rows=48
+[22:22:44] deepseek7b: mlp fine decomposition 8/12 pairs; rows=64
+[22:22:45] deepseek7b: mlp fine decomposition 10/12 pairs; rows=80
+[22:22:45] deepseek7b: mlp fine decomposition 12/12 pairs; rows=96
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "main",
+  "target_site": "hidden_28",
+  "top_attention_source_paths": [
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L22H24",
+      "layer": 22,
+      "head": 24,
+      "source_group": "all_pre_answer",
+      "n": 12,
+      "mean_source_token_count": 62.0,
+      "mean_attention_mass": 0.9885509659846624,
+      "mean_direct_source_projection": 0.882897121210893,
+      "mean_direct_source_norm": 28.669919808705647,
+      "mean_explicit_skeleton_loss": 28.169685045878094,
+      "mean_explicit_logprob_delta": -0.18679909904797873,
+      "mean_explicit_rank_delta": 0.25,
+      "mean_explicit_target_delta_norm": 90.27091153462727,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 28.00704797108968,
+      "holdout_mean_explicit_logprob_delta": -0.09639722108840942,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L22H24",
+      "layer": 22,
+      "head": 24,
+      "source_group": "records_all",
+      "n": 12,
+      "mean_source_token_count": 37.0,
+      "mean_attention_mass": 0.7620591372251511,
+      "mean_direct_source_projection": 0.9537752556304137,
+      "mean_direct_source_norm": 25.214639743169148,
+      "mean_explicit_skeleton_loss": 21.65476103623708,
+      "mean_explicit_logprob_delta": -0.31276242434978485,
+      "mean_explicit_rank_delta": 0.25,
+      "mean_explicit_target_delta_norm": 82.16806761423747,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 20.45595161120097,
+      "holdout_mean_explicit_logprob_delta": -0.23227614164352417,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L22H24",
+      "layer": 22,
+      "head": 24,
+      "source_group": "target_record_line",
+      "n": 12,
+      "mean_source_token_count": 5.833333333333333,
+      "mean_attention_mass": 0.6798495352268219,
+      "mean_direct_source_projection": 0.8625893828769525,
+      "mean_direct_source_norm": 24.03760592142741,
+      "mean_explicit_skeleton_loss": 18.325794577598572,
+      "mean_explicit_logprob_delta": -0.31707411507765454,
+      "mean_explicit_rank_delta": 0.25,
+      "mean_explicit_target_delta_norm": 77.8697115580241,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 18.225277423858643,
+      "holdout_mean_explicit_logprob_delta": -0.24924004077911377,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L22H24",
+      "layer": 22,
+      "head": 24,
+      "source_group": "target_value_tokens",
+      "n": 12,
+      "mean_source_token_count": 1.0,
+      "mean_attention_mass": 0.4447835286458333,
+      "mean_direct_source_projection": 0.6784226649130384,
+      "mean_direct_source_norm": 18.00717443227768,
+      "mean_explicit_skeleton_loss": 16.254268785317738,
+      "mean_explicit_logprob_delta": -0.26181940237681073,
+      "mean_explicit_rank_delta": 0.16666666666666666,
+      "mean_explicit_target_delta_norm": 67.61095396677653,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 13.686550736427307,
+      "holdout_mean_explicit_logprob_delta": -0.23329379161198935,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L21H12",
+      "layer": 21,
+      "head": 12,
+      "source_group": "self_last",
+      "n": 12,
+      "mean_source_token_count": 1.0,
+      "mean_attention_mass": 0.21101888020833334,
+      "mean_direct_source_projection": 0.04298302282889684,
+      "mean_direct_source_norm": 9.562353213628134,
+      "mean_explicit_skeleton_loss": 7.683957099914551,
+      "mean_explicit_logprob_delta": 0.016008242964744568,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 41.603914419809975,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 8.204694112141928,
+      "holdout_mean_explicit_logprob_delta": 0.023953219254811604,
+      "role_guess": "source_state_contributor"
+    }
+  ],
+  "top_mlp_fine_candidates": [
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L27:mlp[2872:2962]",
+      "coarse_component_id": "L27:mlp[2872:3231]",
+      "layer": 27,
+      "start": 2872,
+      "end": 2962,
+      "width": 90,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 84.00426642100017,
+      "mean_explicit_logprob_delta": -0.22880306591590246,
+      "mean_explicit_rank_delta": 0.16666666666666666,
+      "mean_explicit_target_delta_norm": 358.5527165730794,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 90.28102111816406,
+      "holdout_mean_explicit_logprob_delta": -0.2697782864173253,
+      "role_guess": "fine_mlp_writer_candidate"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L22:mlp[898:987]",
+      "coarse_component_id": "L22:mlp[718:1077]",
+      "layer": 22,
+      "start": 898,
+      "end": 987,
+      "width": 89,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 12.158245464166006,
+      "mean_explicit_logprob_delta": -0.06942241887251537,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 58.55371411641439,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 12.661821881930033,
+      "holdout_mean_explicit_logprob_delta": -0.06299137075742085,
+      "role_guess": "fine_mlp_writer_candidate"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L22:mlp[718:808]",
+      "coarse_component_id": "L22:mlp[718:1077]",
+      "layer": 22,
+      "start": 718,
+      "end": 808,
+      "width": 90,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 9.422880907853445,
+      "mean_explicit_logprob_delta": 0.030398793518543243,
+      "mean_explicit_rank_delta": -0.08333333333333333,
+      "mean_explicit_target_delta_norm": 63.12484264373779,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 8.595053553581238,
+      "holdout_mean_explicit_logprob_delta": 0.045792073011398315,
+      "role_guess": "fine_mlp_state_contributor"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L27:mlp[2962:3052]",
+      "coarse_component_id": "L27:mlp[2872:3231]",
+      "layer": 27,
+      "start": 2962,
+      "end": 3052,
+      "width": 90,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 6.927649358908336,
+      "mean_explicit_logprob_delta": -0.966461663444837,
+      "mean_explicit_rank_delta": 2.5833333333333335,
+      "mean_explicit_target_delta_norm": 122.00136756896973,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 6.458894689877828,
+      "holdout_mean_explicit_logprob_delta": -0.853841761747996,
+      "role_guess": "fine_mlp_writer_candidate"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L22:mlp[808:898]",
+      "coarse_component_id": "L22:mlp[718:1077]",
+      "layer": 22,
+      "start": 808,
+      "end": 898,
+      "width": 90,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 3.947191260755062,
+      "mean_explicit_logprob_delta": 0.0623859167098999,
+      "mean_explicit_rank_delta": -0.08333333333333333,
+      "mean_explicit_target_delta_norm": 60.0987974802653,
+      "holdout_n": 6,
+      "holdout_mean_explicit_skeleton_loss": 0.4386012554168701,
+      "holdout_mean_explicit_logprob_delta": 0.06409210960070293,
+      "role_guess": "fine_mlp_state_contributor"
+    }
+  ]
+}

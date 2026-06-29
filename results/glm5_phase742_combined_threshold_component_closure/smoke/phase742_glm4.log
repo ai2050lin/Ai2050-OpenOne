@@ -1,0 +1,233 @@
+[07:25:57] glm4/smoke: pairs=1 target=hidden_40 audits=1 combo_candidates=3
+[07:25:58] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<01:56,  3.79it/s]Loading weights:   9%|▊         | 38/443 [00:00<00:03, 128.70it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 188.63it/s]Loading weights:  22%|██▏       | 96/443 [00:00<00:01, 198.51it/s]Loading weights:  30%|███       | 134/443 [00:00<00:01, 246.10it/s]Loading weights:  38%|███▊      | 170/443 [00:00<00:01, 259.32it/s]Loading weights:  47%|████▋     | 207/443 [00:00<00:00, 289.29it/s]Loading weights:  54%|█████▎    | 238/443 [00:01<00:00, 284.88it/s]Loading weights:  61%|██████    | 271/443 [00:01<00:00, 293.24it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 293.56it/s]Loading weights:  76%|███████▌  | 335/443 [00:01<00:00, 289.50it/s]Loading weights:  84%|████████▍ | 373/443 [00:01<00:00, 307.93it/s]Loading weights:  93%|█████████▎| 411/443 [00:01<00:00, 324.45it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 263.13it/s]
+[07:26:00] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[07:26:02] glm4: combined closure 1/1 pairs; rows=10
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "target_site": "hidden_40",
+  "ranked_candidates": [
+    {
+      "component_id": "L38:mlp_out",
+      "layer": 38,
+      "component": "mlp_out",
+      "phase741_joint_add_effect": 0.6707513981327047,
+      "phase741_joint_add_fraction": 0.699895211424984,
+      "phase741_target_top1_rate": 0.2,
+      "phase740_mean_patched_fraction": 0.04181411292136393,
+      "phase740_mean_donor_fraction": 1.0458718891793892
+    },
+    {
+      "component_id": "L39:mlp_out",
+      "layer": 39,
+      "component": "mlp_out",
+      "phase741_joint_add_effect": 0.20442254623899006,
+      "phase741_joint_add_fraction": 0.233566358680604,
+      "phase741_target_top1_rate": 0.0,
+      "phase740_mean_patched_fraction": 0.004088608673849683,
+      "phase740_mean_donor_fraction": 0.31188196308309846
+    },
+    {
+      "component_id": "L37:mlp_out",
+      "layer": 37,
+      "component": "mlp_out",
+      "phase741_joint_add_effect": 0.05260005221698597,
+      "phase741_joint_add_fraction": 0.08174386849240683,
+      "phase741_target_top1_rate": 0.0,
+      "phase740_mean_patched_fraction": 0.0003999503792660739,
+      "phase740_mean_donor_fraction": 0.05889259273735783
+    }
+  ],
+  "condition_summary": [
+    {
+      "condition": "joint_base",
+      "combo_k": 0,
+      "combo_components": [],
+      "n": 1,
+      "mean_fraction_of_threshold": 0.060111083360695206,
+      "mean_effect_vs_joint_fraction": 0.0,
+      "mean_effect_vs_donor_fraction": -2.8716655267573747,
+      "mean_target_rank": 7.0,
+      "target_top1_rate": 0.0,
+      "mean_margin_donor_vs_top": -5.875,
+      "top_token_counts": {
+        " tool": 1
+      },
+      "expected_add_effect_sum": 0
+    },
+    {
+      "condition": "donor_erase_top1",
+      "combo_k": 1,
+      "combo_components": [
+        "L38:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 2.0409212166735125,
+      "mean_effect_vs_joint_fraction": 1.9808104114810086,
+      "mean_effect_vs_donor_fraction": -0.8908553435169334,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.6707513981327047
+    },
+    {
+      "condition": "joint_add_top1",
+      "combo_k": 1,
+      "combo_components": [
+        "L38:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.1040758553688648,
+      "mean_effect_vs_joint_fraction": 1.0439648219357935,
+      "mean_effect_vs_donor_fraction": -1.8277007048215812,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.6707513981327047
+    },
+    {
+      "condition": "recipient_add_top1",
+      "combo_k": 1,
+      "combo_components": [
+        "L38:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.0488677716777601,
+      "mean_effect_vs_joint_fraction": 0.9887566241244055,
+      "mean_effect_vs_donor_fraction": -1.8829089026329693,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.6707513981327047
+    },
+    {
+      "condition": "donor_erase_top2",
+      "combo_k": 2,
+      "combo_components": [
+        "L38:mlp_out",
+        "L39:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.8366948667286551,
+      "mean_effect_vs_joint_fraction": 1.7765837191753002,
+      "mean_effect_vs_donor_fraction": -1.0950820358226416,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.8751739443716947
+    },
+    {
+      "condition": "joint_add_top2",
+      "combo_k": 2,
+      "combo_components": [
+        "L38:mlp_out",
+        "L39:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.435245272158995,
+      "mean_effect_vs_joint_fraction": 1.3751340104853567,
+      "mean_effect_vs_donor_fraction": -1.496531516272018,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.8751739443716947
+    },
+    {
+      "condition": "recipient_add_top2",
+      "combo_k": 2,
+      "combo_components": [
+        "L38:mlp_out",
+        "L39:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.3890198242263263,
+      "mean_effect_vs_joint_fraction": 1.3289086766729714,
+      "mean_effect_vs_donor_fraction": -1.5427569642046868,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.8751739443716947
+    },
+    {
+      "condition": "donor_erase_top3",
+      "combo_k": 3,
+      "combo_components": [
+        "L38:mlp_out",
+        "L39:mlp_out",
+        "L37:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.8040707306700767,
+      "mean_effect_vs_joint_fraction": 1.7439596972370055,
+      "mean_effect_vs_donor_fraction": -1.127705943640653,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.9277739965886808
+    },
+    {
+      "condition": "joint_add_top3",
+      "combo_k": 3,
+      "combo_components": [
+        "L38:mlp_out",
+        "L39:mlp_out",
+        "L37:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.4530237287717025,
+      "mean_effect_vs_joint_fraction": 1.3929124670980642,
+      "mean_effect_vs_donor_fraction": -1.4787530596593106,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.9277739965886808
+    },
+    {
+      "condition": "recipient_add_top3",
+      "combo_k": 3,
+      "combo_components": [
+        "L38:mlp_out",
+        "L39:mlp_out",
+        "L37:mlp_out"
+      ],
+      "n": 1,
+      "mean_fraction_of_threshold": 1.4091395725762537,
+      "mean_effect_vs_joint_fraction": 1.3490285391431827,
+      "mean_effect_vs_donor_fraction": -1.5226373299750429,
+      "mean_target_rank": 1.0,
+      "target_top1_rate": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "expected_add_effect_sum": 0.9277739965886808
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "attention_note": "eager attention is required because Phase739-selected joint states can include source contribution replacement",
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "explicit<-conflict",
+      "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]"
+    }
+  ],
+  "case_summary": [
+    {
+      "direction": "explicit<-conflict",
+      "intervention_key": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_alpha_star_vocab_top": 12.957913685488862,
+      "mean_donor_final_delta_proj": 23.46674346923828,
+      "mean_donor_final_fraction_of_threshold": 0.9054985254114599,
+      "mean_donor_final_input_delta_proj": 72.91712951660156,
+      "mean_mlp_delta_norm_total": 16.35501527786255,
+      "mean_patched_final_delta_proj": -0.13509103655815125,
+      "mean_patched_final_fraction_of_threshold": -0.005212684689721124,
+      "mean_patched_final_input_delta_proj": 0.45073312520980835,
+      "mean_patched_margin_donor_vs_vocab_top": -19.25,
+      "mean_source_contribution_delta_norm": 17.459585189819336,
+      "mean_threshold_used": 25.915827370977723,
+      "mlp_components": [
+        "L34:mlp[85:128]",
+        "L28:mlp[299:341]"
+      ],
+      "n": 1,
+      "patched_top_counts": {
+        " fruit": 1
+      },
+      "source_component_id": "L35H0",
+      "source_group": "self_last"
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_pairs": 1,
+  "model": "qwen3",
+  "n_case_rows": 1,
+  "n_component_rows": 12,
+  "phase": 740,
+  "phase738_round": "confirm",
+  "phase739_round": "confirm",
+  "quantization": "off",
+  "round": "smoke",
+  "scan_layers": [
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+  ],
+  "strict_interpretation": "Final-state projections are directly comparable to Phase739 alpha thresholds; raw attn/mlp component projections are candidate backtrace signals, not causal proof.",
+  "target_site": "hidden_36",
+  "timestamp": "2026-06-29 07:07:49",
+  "title": "Natural Readout Boost Source Backtrace",
+  "top_audits": 1,
+  "top_component_sources": [
+    {
+      "component": "attn_out",
+      "component_id": "L34:attn_out",
+      "donor_positive_rate": 1.0,
+      "layer": 34,
+      "mean_donor_delta_proj": 7.773327350616455,
+      "mean_donor_fraction_of_threshold": 0.29994517401831233,
+      "mean_patched_delta_proj": 0.3522307872772217,
+      "mean_patched_fraction_of_threshold": 0.013591338691801647,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L33:attn_out",
+      "donor_positive_rate": 1.0,
+      "layer": 33,
+      "mean_donor_delta_proj": 24.239286422729492,
+      "mean_donor_fraction_of_threshold": 0.9353082221050085,
+      "mean_patched_delta_proj": 0.2643110752105713,
+      "mean_patched_fraction_of_threshold": 0.010198828361797335,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L35:attn_out",
+      "donor_positive_rate": 1.0,
+      "layer": 35,
+      "mean_donor_delta_proj": 5.279928684234619,
+      "mean_donor_fraction_of_threshold": 0.2037337495984186,
+      "mean_patched_delta_proj": 0.1532893180847168,
+      "mean_patched_fraction_of_threshold": 0.005914891926482749,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L31:attn_out",
+      "donor_positive_rate": 1.0,
+      "layer": 31,
+      "mean_donor_delta_proj": 21.681386947631836,
+      "mean_donor_fraction_of_threshold": 0.8366079398997734,
+      "mean_patched_delta_proj": 0.08880608528852463,
+      "mean_patched_fraction_of_threshold": 0.0034267123336365335,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L32:attn_out",
+      "donor_positive_rate": 1.0,
+      "layer": 32,
+      "mean_donor_delta_proj": 7.961730480194092,
+      "mean_donor_fraction_of_threshold": 0.3072149835783429,
+      "mean_patched_delta_proj": 0.04563997685909271,
+      "mean_patched_fraction_of_threshold": 0.0017610850776928469,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L30:mlp_out",
+      "donor_positive_rate": 1.0,
+      "layer": 30,
+      "mean_donor_delta_proj": 2.140249729156494,
+      "mean_donor_fraction_of_threshold": 0.08258465757312804,
+      "mean_patched_delta_proj": 0.04387380927801132,
+      "mean_patched_fraction_of_threshold": 0.0016929349254403564,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L31:mlp_out",
+      "donor_positive_rate": 1.0,
+      "layer": 31,
+      "mean_donor_delta_proj": 3.128235340118408,
+      "mean_donor_fraction_of_threshold": 0.12070752345038444,
+      "mean_patched_delta_proj": 0.0405077263712883,
+      "mean_patched_fraction_of_threshold": 0.0015630497067074757,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L30:attn_out",
+      "donor_positive_rate": 1.0,
+      "layer": 30,
+      "mean_donor_delta_proj": 1.5518789291381836,
+      "mean_donor_fraction_of_threshold": 0.059881512055296425,
+      "mean_patched_delta_proj": 0.004727374762296677,
+      "mean_patched_fraction_of_threshold": 0.00018241265056390625,
+      "n": 1,
+      "patched_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L33:mlp_out",
+      "donor_positive_rate": 1.0,
+      "layer": 33,
+      "mean_donor_delta_proj": 0.41941285133361816,
+      "mean_donor_fraction_of_threshold": 0.016183656625344895,
+      "mean_patched_delta_proj": -0.014373229816555977,
+      "mean_patched_fraction_of_threshold": -0.0005546120373008844,
+      "n": 1,
+      "patched_positive_rate": 0.0,
+      "role_guess": "donor_context_only_candidate"
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L32:mlp_out",
+      "donor_positive_rate": 1.0,
+      "layer": 32,
+      "mean_donor_delta_proj": 1.7753701210021973,
+      "mean_donor_fraction_of_threshold": 0.06850524567818257,
+      "mean_patched_delta_proj": -0.09021377563476562,
+      "mean_patched_fraction_of_threshold": -0.0034810301189069134,
+      "n": 1,
+      "patched_positive_rate": 0.0,
+      "role_guess": "donor_context_only_candidate"
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L34:mlp_out",
+      "donor_positive_rate": 0.0,
+      "layer": 34,
+      "mean_donor_delta_proj": -15.346116065979004,
+      "mean_donor_fraction_of_threshold": -0.5921522722891962,
+      "mean_patched_delta_proj": -0.16375556588172913,
+      "mean_patched_fraction_of_threshold": -0.006318747363825766,
+      "n": 1,
+      "patched_positive_rate": 0.0,
+      "role_guess": "opposes_or_irrelevant"
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L35:mlp_out",
+      "donor_positive_rate": 0.0,
+      "layer": 35,
+      "mean_donor_delta_proj": -2.5905041694641113,
+      "mean_donor_fraction_of_threshold": -0.09995838189465374,
+      "mean_patched_delta_proj": -0.33308863639831543,
+      "mean_patched_fraction_of_threshold": -0.01285271087934975,
+      "n": 1,
+      "patched_positive_rate": 0.0,
+      "role_guess": "opposes_or_irrelevant"
+    }
+  ]
+}

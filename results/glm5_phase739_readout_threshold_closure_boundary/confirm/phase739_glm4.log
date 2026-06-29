@@ -1,0 +1,101 @@
+[00:34:48] glm4/confirm: pairs=10 target=hidden_40 audits=2
+[00:34:49] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:25, 17.00it/s]Loading weights:   5%|▌         | 23/443 [00:00<00:03, 120.14it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:01, 220.38it/s]Loading weights:  20%|██        | 89/443 [00:00<00:01, 238.32it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 277.63it/s]Loading weights:  35%|███▌      | 156/443 [00:00<00:01, 279.00it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 297.86it/s]Loading weights:  50%|█████     | 223/443 [00:00<00:00, 290.31it/s]Loading weights:  58%|█████▊    | 256/443 [00:00<00:00, 299.45it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 310.54it/s]Loading weights:  73%|███████▎  | 323/443 [00:01<00:00, 307.54it/s]Loading weights:  80%|████████  | 355/443 [00:01<00:00, 305.61it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 311.73it/s]Loading weights:  95%|█████████▌| 421/443 [00:01<00:00, 305.88it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 286.74it/s]
+[00:34:51] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[00:35:05] glm4: threshold audit 3/10 pairs; rows=6
+[00:35:19] glm4: threshold audit 6/10 pairs; rows=12
+[00:35:33] glm4: threshold audit 9/10 pairs; rows=18
+[00:35:38] glm4: threshold audit 10/10 pairs; rows=20
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "target_site": "hidden_40",
+  "top_threshold_audits": [
+    {
+      "intervention_key": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L23H17",
+      "source_group": "instruction",
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 10,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 10
+      },
+      "patched_vocab_top_counts": {
+        " tool": 1,
+        " blue": 2,
+        " bitter": 2,
+        " fruit": 2,
+        " purple": 1,
+        " yellow": 1,
+        " sweet": 1
+      },
+      "mean_patched_margin_donor_vs_recipient": -7.825,
+      "mean_patched_margin_donor_vs_candidate_best": -7.825,
+      "mean_patched_margin_donor_vs_vocab_top": -7.825,
+      "mean_alpha_star_vocab_top": 8.911054996489202,
+      "mean_alpha_star_candidate_best": 8.911054996489202,
+      "candidate_flip_found_rate": 1.0,
+      "vocab_flip_found_rate": 1.0,
+      "mean_first_alpha_donor_candidate_top": 10.396286189648297,
+      "mean_first_alpha_donor_vocab_top": 11.921553794780895,
+      "boosted_generation_tested": 10,
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_class_counts": {
+        "answer_stop": 10
+      },
+      "mean_final_norm_output_norm": 165.76244659423827,
+      "mean_source_contribution_delta_norm": 3.4185940504074095,
+      "mean_mlp_delta_norm_total": 14.386314392089844
+    },
+    {
+      "intervention_key": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L39H21",
+      "source_group": "self_last",
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 10,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 10
+      },
+      "patched_vocab_top_counts": {
+        " tool": 1,
+        " blue": 2,
+        " bitter": 2,
+        " fruit": 2,
+        " purple": 1,
+        " yellow": 1,
+        " sweet": 1
+      },
+      "mean_patched_margin_donor_vs_recipient": -7.825,
+      "mean_patched_margin_donor_vs_candidate_best": -7.825,
+      "mean_patched_margin_donor_vs_vocab_top": -7.825,
+      "mean_alpha_star_vocab_top": 8.909755030775454,
+      "mean_alpha_star_candidate_best": 8.909755030775454,
+      "candidate_flip_found_rate": 1.0,
+      "vocab_flip_found_rate": 1.0,
+      "mean_first_alpha_donor_candidate_top": 10.27395447094852,
+      "mean_first_alpha_donor_vocab_top": 12.290929733574451,
+      "boosted_generation_tested": 10,
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_class_counts": {
+        "answer_stop": 10
+      },
+      "mean_final_norm_output_norm": 166.69662780761718,
+      "mean_source_contribution_delta_norm": 13.457019329071045,
+      "mean_mlp_delta_norm_total": 14.386314392089844
+    }
+  ]
+}

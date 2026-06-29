@@ -1,0 +1,465 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]"
+        }
+      ],
+      "candidate_components": [
+        {
+          "component": "attn_out",
+          "component_id": "L26:attn_out",
+          "layer": 26,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "phase740_role_guess": "patched_threshold_alignment_candidate"
+        }
+      ],
+      "condition_summary": [
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L26:attn_out",
+          "candidate_layer": 26,
+          "condition": "donor_erase_to_recipient_component",
+          "mean_effect_vs_donor_fraction": -0.9813502125326118,
+          "mean_effect_vs_joint_fraction": 0.9782250805898204,
+          "mean_fraction_of_threshold": 1.0088916378720063,
+          "mean_margin_donor_vs_top": -1.4375,
+          "mean_target_rank": 4.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "role_guess": "donor_path_necessary_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " category": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L26:attn_out",
+          "candidate_layer": 26,
+          "condition": "joint_add_donor_delta",
+          "mean_effect_vs_donor_fraction": -1.2747880745201352,
+          "mean_effect_vs_joint_fraction": 0.6847872775025936,
+          "mean_fraction_of_threshold": 0.7154537169841861,
+          "mean_margin_donor_vs_top": -4.4375,
+          "mean_target_rank": 21.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "role_guess": "causal_boost_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " category": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L26:attn_out",
+          "candidate_layer": 26,
+          "condition": "joint_base",
+          "mean_effect_vs_donor_fraction": -1.9595754109230255,
+          "mean_effect_vs_joint_fraction": 0.0,
+          "mean_fraction_of_threshold": 0.030666483656815062,
+          "mean_margin_donor_vs_top": -7.5,
+          "mean_target_rank": 57.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "role_guess": "baseline_or_small_effect",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " tool": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L26:attn_out",
+          "candidate_layer": 26,
+          "condition": "joint_erase_to_recipient_component",
+          "mean_effect_vs_donor_fraction": -1.9623449028742874,
+          "mean_effect_vs_joint_fraction": -0.0027695494710828525,
+          "mean_fraction_of_threshold": 0.02789693648652505,
+          "mean_margin_donor_vs_top": -7.625,
+          "mean_target_rank": 54.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "role_guess": "not_necessary_in_joint_path",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " tool": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L26:attn_out",
+          "candidate_layer": 26,
+          "condition": "joint_replace_with_donor_component",
+          "mean_effect_vs_donor_fraction": -1.3090887801092725,
+          "mean_effect_vs_joint_fraction": 0.6504864541128629,
+          "mean_fraction_of_threshold": 0.681152952494752,
+          "mean_margin_donor_vs_top": -4.3125,
+          "mean_target_rank": 21.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "role_guess": "causal_boost_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " category": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L26:attn_out",
+          "candidate_layer": 26,
+          "condition": "recipient_add_donor_delta",
+          "mean_effect_vs_donor_fraction": -1.389944280217282,
+          "mean_effect_vs_joint_fraction": 0.5696310129051502,
+          "mean_fraction_of_threshold": 0.6002975701873361,
+          "mean_margin_donor_vs_top": -4.3125,
+          "mean_target_rank": 21.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 2.5941364463811385,
+          "phase740_mean_patched_fraction": 0.05719511961941759,
+          "role_guess": "standalone_boost_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " category": 1
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_pairs": 1,
+      "model": "deepseek7b",
+      "n_rows": 6,
+      "phase": 741,
+      "phase739_round": "confirm",
+      "phase740_round": "confirm",
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "Component transplant/erasure is causal at component-output granularity, but whole-component edits can be off-manifold and do not identify individual neurons.",
+      "target_site": "hidden_28",
+      "timestamp": "2026-06-29 07:17:29",
+      "title": "Threshold Candidate Causal Validation",
+      "top_audits": 1,
+      "top_candidates": 1
+    },
+    "glm4": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]"
+        }
+      ],
+      "candidate_components": [
+        {
+          "component": "mlp_out",
+          "component_id": "L38:mlp_out",
+          "layer": 38,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "phase740_role_guess": "patched_threshold_alignment_candidate"
+        }
+      ],
+      "condition_summary": [
+        {
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L38:mlp_out",
+          "candidate_layer": 38,
+          "condition": "donor_erase_to_recipient_component",
+          "mean_effect_vs_donor_fraction": -0.8908553435169334,
+          "mean_effect_vs_joint_fraction": 1.9808104114810086,
+          "mean_fraction_of_threshold": 2.0409212166735125,
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_target_rank": 1.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "role_guess": "donor_path_necessary_candidate",
+          "target_top1_rate": 1.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L38:mlp_out",
+          "candidate_layer": 38,
+          "condition": "joint_add_donor_delta",
+          "mean_effect_vs_donor_fraction": -1.8277007048215812,
+          "mean_effect_vs_joint_fraction": 1.0439648219357935,
+          "mean_fraction_of_threshold": 1.1040758553688648,
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_target_rank": 1.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "role_guess": "causal_boost_candidate",
+          "target_top1_rate": 1.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L38:mlp_out",
+          "candidate_layer": 38,
+          "condition": "joint_base",
+          "mean_effect_vs_donor_fraction": -2.8716655267573747,
+          "mean_effect_vs_joint_fraction": 0.0,
+          "mean_fraction_of_threshold": 0.060111083360695206,
+          "mean_margin_donor_vs_top": -5.875,
+          "mean_target_rank": 7.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "role_guess": "standalone_boost_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " tool": 1
+          }
+        },
+        {
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L38:mlp_out",
+          "candidate_layer": 38,
+          "condition": "joint_erase_to_recipient_component",
+          "mean_effect_vs_donor_fraction": -2.9241932673488455,
+          "mean_effect_vs_joint_fraction": -0.05252757654356309,
+          "mean_fraction_of_threshold": 0.00758350503400268,
+          "mean_margin_donor_vs_top": -6.25,
+          "mean_target_rank": 8.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "role_guess": "joint_path_necessary_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " tool": 1
+          }
+        },
+        {
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L38:mlp_out",
+          "candidate_layer": 38,
+          "condition": "joint_replace_with_donor_component",
+          "mean_effect_vs_donor_fraction": -1.8738123748315552,
+          "mean_effect_vs_joint_fraction": 0.9978531519258197,
+          "mean_fraction_of_threshold": 1.0579642994791745,
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_target_rank": 1.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "role_guess": "causal_boost_candidate",
+          "target_top1_rate": 1.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "mlp_out",
+          "candidate_component_id": "L38:mlp_out",
+          "candidate_layer": 38,
+          "condition": "recipient_add_donor_delta",
+          "mean_effect_vs_donor_fraction": -1.8829089026329693,
+          "mean_effect_vs_joint_fraction": 0.9887566241244055,
+          "mean_fraction_of_threshold": 1.0488677716777601,
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_target_rank": 1.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 1.0458718891793892,
+          "phase740_mean_patched_fraction": 0.04181411292136393,
+          "role_guess": "standalone_boost_candidate",
+          "target_top1_rate": 1.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_pairs": 1,
+      "model": "glm4",
+      "n_rows": 6,
+      "phase": 741,
+      "phase739_round": "confirm",
+      "phase740_round": "confirm",
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "Component transplant/erasure is causal at component-output granularity, but whole-component edits can be off-manifold and do not identify individual neurons.",
+      "target_site": "hidden_40",
+      "timestamp": "2026-06-29 07:17:24",
+      "title": "Threshold Candidate Causal Validation",
+      "top_audits": 1,
+      "top_candidates": 1
+    },
+    "qwen3": {
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]"
+        }
+      ],
+      "candidate_components": [
+        {
+          "component": "attn_out",
+          "component_id": "L34:attn_out",
+          "layer": 34,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "phase740_role_guess": "patched_threshold_alignment_candidate"
+        }
+      ],
+      "condition_summary": [
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "condition": "donor_erase_to_recipient_component",
+          "mean_effect_vs_donor_fraction": -0.11464570265791088,
+          "mean_effect_vs_joint_fraction": 0.7960654717943217,
+          "mean_fraction_of_threshold": 0.7908528319532777,
+          "mean_margin_donor_vs_top": 0.0,
+          "mean_target_rank": 1.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "role_guess": "donor_path_necessary_candidate",
+          "target_top1_rate": 1.0,
+          "top_token_counts": {
+            " tool": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "condition": "joint_add_donor_delta",
+          "mean_effect_vs_donor_fraction": -0.8760143519158462,
+          "mean_effect_vs_joint_fraction": 0.034696831736115,
+          "mean_fraction_of_threshold": 0.029484145896427793,
+          "mean_margin_donor_vs_top": -17.8125,
+          "mean_target_rank": 469.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "role_guess": "weak_boost_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "condition": "joint_base",
+          "mean_effect_vs_donor_fraction": -0.910711165252504,
+          "mean_effect_vs_joint_fraction": 0.0,
+          "mean_fraction_of_threshold": -0.005212684689721124,
+          "mean_margin_donor_vs_top": -19.25,
+          "mean_target_rank": 1065.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "role_guess": "baseline_or_small_effect",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "condition": "joint_erase_to_recipient_component",
+          "mean_effect_vs_donor_fraction": -0.9100141938113003,
+          "mean_effect_vs_joint_fraction": 0.000697013055601099,
+          "mean_fraction_of_threshold": -0.0045156718497386655,
+          "mean_margin_donor_vs_top": -19.125,
+          "mean_target_rank": 1070.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "role_guess": "not_necessary_in_joint_path",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "condition": "joint_replace_with_donor_component",
+          "mean_effect_vs_donor_fraction": -0.8745067003875404,
+          "mean_effect_vs_joint_fraction": 0.036204455665234905,
+          "mean_fraction_of_threshold": 0.030991769825547705,
+          "mean_margin_donor_vs_top": -17.75,
+          "mean_target_rank": 472.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "role_guess": "weak_boost_candidate",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        },
+        {
+          "candidate_component": "attn_out",
+          "candidate_component_id": "L34:attn_out",
+          "candidate_layer": 34,
+          "condition": "recipient_add_donor_delta",
+          "mean_effect_vs_donor_fraction": -0.8713134377802604,
+          "mean_effect_vs_joint_fraction": 0.039397681473600454,
+          "mean_fraction_of_threshold": 0.034184991034048935,
+          "mean_margin_donor_vs_top": -17.6875,
+          "mean_target_rank": 492.0,
+          "n": 1,
+          "phase740_mean_donor_fraction": 0.8263902646461071,
+          "phase740_mean_patched_fraction": 0.00851355684347636,
+          "role_guess": "baseline_or_small_effect",
+          "target_top1_rate": 0.0,
+          "top_token_counts": {
+            " fruit": 1
+          }
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_pairs": 1,
+      "model": "qwen3",
+      "n_rows": 6,
+      "phase": 741,
+      "phase739_round": "confirm",
+      "phase740_round": "confirm",
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "Component transplant/erasure is causal at component-output granularity, but whole-component edits can be off-manifold and do not identify individual neurons.",
+      "target_site": "hidden_36",
+      "timestamp": "2026-06-29 07:17:17",
+      "title": "Threshold Candidate Causal Validation",
+      "top_audits": 1,
+      "top_candidates": 1
+    }
+  },
+  "evidence_type": "component-output transplant and erasure causal validation against final readout threshold fractions",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 741,
+  "round": "smoke",
+  "status": "complete",
+  "timestamp": "2026-06-29 07:17:31",
+  "title": "Threshold Candidate Causal Validation"
+}

@@ -1,0 +1,143 @@
+{
+  "attn_implementation": "sdpa",
+  "candidate_sites": [
+    "L31_layer_input",
+    "L39_layer_input",
+    "L23_attn_out",
+    "L35_attn_out"
+  ],
+  "dtype": "bfloat16",
+  "formation_summary": {
+    "attn_out": {
+      "earliest_35pct_effect_norm": 6.125036239624023,
+      "earliest_35pct_layer": 23,
+      "earliest_35pct_site": "L23_attn_out",
+      "max_effect_norm": 13.089219093322754,
+      "max_layer": 35,
+      "max_site": "L35_attn_out"
+    },
+    "layer_input": {
+      "earliest_35pct_effect_norm": 47.5498046875,
+      "earliest_35pct_layer": 31,
+      "earliest_35pct_site": "L31_layer_input",
+      "max_effect_norm": 131.75758361816406,
+      "max_layer": 39,
+      "max_site": "L39_layer_input"
+    },
+    "layer_out": {
+      "earliest_35pct_effect_norm": 131.75758361816406,
+      "earliest_35pct_layer": 38,
+      "earliest_35pct_site": "hidden_39",
+      "max_effect_norm": 233.7808837890625,
+      "max_layer": 39,
+      "max_site": "hidden_40"
+    },
+    "mlp_out": {
+      "earliest_35pct_effect_norm": 76.93199157714844,
+      "earliest_35pct_layer": 38,
+      "earliest_35pct_site": "L38_mlp_out",
+      "max_effect_norm": 162.57273864746094,
+      "max_layer": 39,
+      "max_site": "L39_mlp_out"
+    }
+  },
+  "model": "glm4",
+  "n_scan_rows": 480,
+  "n_transfer_rows": 16,
+  "phase": 733,
+  "quantization": "off",
+  "round": "smoke",
+  "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+  "timestamp": "2026-06-28 20:29:16",
+  "title": "Prompt-Type Skeleton Source Localization",
+  "transfer_summary": {
+    "commonsense<-explicit|L23_attn_out": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 23,
+      "mean_patched_delta_vs_recipient": -0.06042921543121338,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "attn_out"
+    },
+    "commonsense<-explicit|L31_layer_input": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 31,
+      "mean_patched_delta_vs_recipient": 2.212292604148388,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "layer_input"
+    },
+    "commonsense<-explicit|L35_attn_out": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 35,
+      "mean_patched_delta_vs_recipient": 0.21734243631362915,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "attn_out"
+    },
+    "commonsense<-explicit|L39_layer_input": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 39,
+      "mean_patched_delta_vs_recipient": 2.317843893542886,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "layer_input"
+    },
+    "explicit<-commonsense|L23_attn_out": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 23,
+      "mean_patched_delta_vs_recipient": -0.0768030434846878,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "attn_out"
+    },
+    "explicit<-commonsense|L31_layer_input": {
+      "changed_rate": 0.5,
+      "hit_gain": 0.0,
+      "hit_loss": 0.5,
+      "layer": 31,
+      "mean_patched_delta_vs_recipient": -2.6345951706171036,
+      "n": 2,
+      "patched_hit_rate": 0.5,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "layer_input"
+    },
+    "explicit<-commonsense|L35_attn_out": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 35,
+      "mean_patched_delta_vs_recipient": -0.030557937920093536,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "attn_out"
+    },
+    "explicit<-commonsense|L39_layer_input": {
+      "changed_rate": 0.0,
+      "hit_gain": 0.0,
+      "hit_loss": 0.0,
+      "layer": 39,
+      "mean_patched_delta_vs_recipient": -2.3291226774454117,
+      "n": 2,
+      "patched_hit_rate": 1.0,
+      "recipient_hit_rate": 1.0,
+      "site_kind": "layer_input"
+    }
+  }
+}

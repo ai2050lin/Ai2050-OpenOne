@@ -1,0 +1,205 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "alpha_max": 80.0,
+      "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+          "phase738_margin": -11.931966145833334
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_new_tokens": 4,
+      "max_pairs": 1,
+      "model": "deepseek7b",
+      "n_rows": 1,
+      "phase": 739,
+      "phase738_round": "confirm",
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+      "target_site": "hidden_28",
+      "timestamp": "2026-06-29 00:31:51",
+      "title": "Readout Threshold and Closure Boundary Test",
+      "top_audits": 1,
+      "top_threshold_audits": [
+        {
+          "boosted_generation_class_counts": {},
+          "boosted_generation_donor_hit_rate": null,
+          "boosted_generation_tested": 0,
+          "candidate_flip_found_rate": 0.0,
+          "direction": "explicit<-conflict",
+          "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+          "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 11.125134291071385,
+          "mean_alpha_star_vocab_top": 11.125134291071385,
+          "mean_final_norm_output_norm": 190.50318908691406,
+          "mean_first_alpha_donor_candidate_top": null,
+          "mean_first_alpha_donor_vocab_top": null,
+          "mean_mlp_delta_norm_total": 32.102128982543945,
+          "mean_patched_margin_donor_vs_candidate_best": -15.046875,
+          "mean_patched_margin_donor_vs_recipient": -14.421875,
+          "mean_patched_margin_donor_vs_vocab_top": -15.046875,
+          "mean_source_contribution_delta_norm": 6.340348243713379,
+          "mlp_components": [
+            "L27:mlp[2872:2932]",
+            "L22:mlp[957:1017]"
+          ],
+          "n": 1,
+          "patched_candidate_best_counts": {
+            "relation_echo": 1
+          },
+          "patched_vocab_top_counts": {
+            " category": 1
+          },
+          "source_component_id": "L22H24",
+          "source_group": "target_record_line",
+          "vocab_flip_found_rate": 0.0
+        }
+      ]
+    },
+    "glm4": {
+      "alpha_max": 80.0,
+      "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+          "phase738_margin": -8.244140625
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_new_tokens": 4,
+      "max_pairs": 1,
+      "model": "glm4",
+      "n_rows": 1,
+      "phase": 739,
+      "phase738_round": "confirm",
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+      "target_site": "hidden_40",
+      "timestamp": "2026-06-29 00:31:45",
+      "title": "Readout Threshold and Closure Boundary Test",
+      "top_audits": 1,
+      "top_threshold_audits": [
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 1
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 1,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "conflict<-explicit",
+          "intervention_key": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+          "intervention_label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 6.827639953557833,
+          "mean_alpha_star_vocab_top": 6.827639953557833,
+          "mean_final_norm_output_norm": 168.78089904785156,
+          "mean_first_alpha_donor_candidate_top": 6.827639953557833,
+          "mean_first_alpha_donor_vocab_top": 8.534549941947292,
+          "mean_mlp_delta_norm_total": 15.214855194091797,
+          "mean_patched_margin_donor_vs_candidate_best": -6.0,
+          "mean_patched_margin_donor_vs_recipient": -6.0,
+          "mean_patched_margin_donor_vs_vocab_top": -6.0,
+          "mean_source_contribution_delta_norm": 14.030059814453125,
+          "mlp_components": [
+            "L38:mlp[2597:2665]",
+            "L38:mlp[3007:3075]"
+          ],
+          "n": 1,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 1
+          },
+          "patched_vocab_top_counts": {
+            " tool": 1
+          },
+          "source_component_id": "L39H21",
+          "source_group": "self_last",
+          "vocab_flip_found_rate": 1.0
+        }
+      ]
+    },
+    "qwen3": {
+      "alpha_max": 80.0,
+      "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+          "phase738_margin": -15.651041666666666
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_new_tokens": 4,
+      "max_pairs": 1,
+      "model": "qwen3",
+      "n_rows": 1,
+      "phase": 739,
+      "phase738_round": "confirm",
+      "quantization": "off",
+      "round": "smoke",
+      "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+      "target_site": "hidden_36",
+      "timestamp": "2026-06-29 00:31:38",
+      "title": "Readout Threshold and Closure Boundary Test",
+      "top_audits": 1,
+      "top_threshold_audits": [
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 1
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 1,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "explicit<-conflict",
+          "intervention_key": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+          "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 12.957913685488862,
+          "mean_alpha_star_vocab_top": 12.957913685488862,
+          "mean_final_norm_output_norm": 180.4156036376953,
+          "mean_first_alpha_donor_candidate_top": 25.915827370977723,
+          "mean_first_alpha_donor_vocab_top": 25.915827370977723,
+          "mean_mlp_delta_norm_total": 16.35501527786255,
+          "mean_patched_margin_donor_vs_candidate_best": -19.25,
+          "mean_patched_margin_donor_vs_recipient": -19.25,
+          "mean_patched_margin_donor_vs_vocab_top": -19.25,
+          "mean_source_contribution_delta_norm": 17.459585189819336,
+          "mlp_components": [
+            "L34:mlp[85:128]",
+            "L28:mlp[299:341]"
+          ],
+          "n": 1,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 1
+          },
+          "patched_vocab_top_counts": {
+            " fruit": 1
+          },
+          "source_component_id": "L35H0",
+          "source_group": "self_last",
+          "vocab_flip_found_rate": 1.0
+        }
+      ]
+    }
+  },
+  "evidence_type": "minimum final-readout boost needed to flip donor token0 plus boosted generation closure",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 739,
+  "round": "smoke",
+  "status": "complete",
+  "timestamp": "2026-06-29 00:31:53",
+  "title": "Readout Threshold and Closure Boundary Test"
+}

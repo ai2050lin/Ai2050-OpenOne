@@ -1,0 +1,219 @@
+[22:23:17] glm4/confirm: pairs=18 target_site=hidden_40 attention=2 mlp=2
+[22:23:18] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   1%|          | 5/443 [00:00<00:10, 41.04it/s]Loading weights:   9%|▊         | 38/443 [00:00<00:02, 186.07it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 231.18it/s]Loading weights:  23%|██▎       | 104/443 [00:00<00:01, 258.31it/s]Loading weights:  31%|███       | 136/443 [00:00<00:01, 269.57it/s]Loading weights:  38%|███▊      | 170/443 [00:00<00:00, 287.83it/s]Loading weights:  46%|████▌     | 203/443 [00:00<00:00, 293.84it/s]Loading weights:  53%|█████▎    | 236/443 [00:00<00:00, 294.73it/s]Loading weights:  61%|██████    | 269/443 [00:01<00:00, 289.79it/s]Loading weights:  69%|██████▉   | 307/443 [00:01<00:00, 314.04it/s]Loading weights:  77%|███████▋  | 339/443 [00:01<00:00, 310.44it/s]Loading weights:  84%|████████▎ | 371/443 [00:01<00:00, 309.30it/s]Loading weights:  91%|█████████ | 403/443 [00:01<00:00, 310.93it/s]Loading weights:  98%|█████████▊| 435/443 [00:01<00:00, 308.64it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 288.68it/s]
+[22:23:20] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[22:23:20] glm4: attention source specs=2 layers=[23, 39]
+[22:23:23] glm4: attention source validation 3/18 pairs; rows=66
+[22:23:25] glm4: attention source validation 6/18 pairs; rows=132
+[22:23:28] glm4: attention source validation 9/18 pairs; rows=198
+[22:23:30] glm4: attention source validation 12/18 pairs; rows=264
+[22:23:33] glm4: attention source validation 15/18 pairs; rows=330
+[22:23:36] glm4: attention source validation 18/18 pairs; rows=396
+[22:23:36] glm4: mlp fine specs=12 from coarse=2, subgroups=6
+[22:23:37] glm4: mlp fine decomposition 3/18 pairs; rows=36
+[22:23:38] glm4: mlp fine decomposition 6/18 pairs; rows=72
+[22:23:40] glm4: mlp fine decomposition 9/18 pairs; rows=108
+[22:23:41] glm4: mlp fine decomposition 12/18 pairs; rows=144
+[22:23:42] glm4: mlp fine decomposition 15/18 pairs; rows=180
+[22:23:44] glm4: mlp fine decomposition 18/18 pairs; rows=216
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "target_site": "hidden_40",
+  "top_attention_source_paths": [
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L39H21",
+      "layer": 39,
+      "head": 21,
+      "source_group": "self_last",
+      "n": 18,
+      "mean_source_token_count": 1.0,
+      "mean_attention_mass": 1.0,
+      "mean_direct_source_projection": 0.4711262567175759,
+      "mean_direct_source_norm": 3.8220394319958158,
+      "mean_explicit_skeleton_loss": 8.996775680118137,
+      "mean_explicit_logprob_delta": -0.005153057682845328,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 27.3043761783176,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 9.001182185279,
+      "holdout_mean_explicit_logprob_delta": -0.002267331298854616,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L23H17",
+      "layer": 23,
+      "head": 17,
+      "source_group": "all_pre_answer",
+      "n": 18,
+      "mean_source_token_count": 62.0,
+      "mean_attention_mass": 0.9932671785354614,
+      "mean_direct_source_projection": 0.0722511305163304,
+      "mean_direct_source_norm": 1.3090948793623183,
+      "mean_explicit_skeleton_loss": 3.110515938864814,
+      "mean_explicit_logprob_delta": -0.017537977029052045,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 9.29335747824775,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 3.1388564904530845,
+      "holdout_mean_explicit_logprob_delta": -0.018676937247316044,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L23H17",
+      "layer": 23,
+      "head": 17,
+      "source_group": "instruction",
+      "n": 18,
+      "mean_source_token_count": 15.0,
+      "mean_attention_mass": 0.9718816015455458,
+      "mean_direct_source_projection": 0.07066191877755854,
+      "mean_direct_source_norm": 1.2971748775906033,
+      "mean_explicit_skeleton_loss": 3.021249896950192,
+      "mean_explicit_logprob_delta": -0.02352994338919719,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 9.45838483174642,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 3.0908445252312555,
+      "holdout_mean_explicit_logprob_delta": -0.026394657997621432,
+      "role_guess": "source_restricted_writer_path"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L23H17",
+      "layer": 23,
+      "head": 17,
+      "source_group": "self_last",
+      "n": 18,
+      "mean_source_token_count": 1.0,
+      "mean_attention_mass": 0.006541781955295139,
+      "mean_direct_source_projection": 0.00038242579062676267,
+      "mean_direct_source_norm": 0.006987132157923447,
+      "mean_explicit_skeleton_loss": 0.014709061632553736,
+      "mean_explicit_logprob_delta": 0.0012040881233082877,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 3.208700246281094,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 0.2394335741798083,
+      "holdout_mean_explicit_logprob_delta": 0.0020172186195850372,
+      "role_guess": "source_state_contributor"
+    },
+    {
+      "component_type": "attention_head_source_group",
+      "component_id": "L39H21",
+      "layer": 39,
+      "head": 21,
+      "source_group": "instruction",
+      "n": 18,
+      "mean_source_token_count": 15.0,
+      "mean_attention_mass": 5.196644615858127e-07,
+      "mean_direct_source_projection": -3.82491348285521e-08,
+      "mean_direct_source_norm": 1.2637706896770042e-06,
+      "mean_explicit_skeleton_loss": 0.0,
+      "mean_explicit_logprob_delta": 0.0,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 0.0,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 0.0,
+      "holdout_mean_explicit_logprob_delta": 0.0,
+      "role_guess": "weak_or_mixed"
+    }
+  ],
+  "top_mlp_fine_candidates": [
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L38:mlp[3212:3280]",
+      "coarse_component_id": "L38:mlp[2870:3280]",
+      "layer": 38,
+      "start": 3212,
+      "end": 3280,
+      "width": 68,
+      "n": 18,
+      "mean_explicit_skeleton_loss": 3.266893188158671,
+      "mean_explicit_logprob_delta": 0.0026405290183093813,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 18.41640631357829,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 3.555913382106357,
+      "holdout_mean_explicit_logprob_delta": 0.00642750577794181,
+      "role_guess": "fine_mlp_state_contributor"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L38:mlp[2460:2528]",
+      "coarse_component_id": "L38:mlp[2460:2870]",
+      "layer": 38,
+      "start": 2460,
+      "end": 2528,
+      "width": 68,
+      "n": 18,
+      "mean_explicit_skeleton_loss": 2.5229550931188793,
+      "mean_explicit_logprob_delta": 0.0020191240020924145,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 14.371821191575792,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 2.9651762776904635,
+      "holdout_mean_explicit_logprob_delta": 0.0022136347575320136,
+      "role_guess": "fine_mlp_state_contributor"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L38:mlp[2597:2665]",
+      "coarse_component_id": "L38:mlp[2460:2870]",
+      "layer": 38,
+      "start": 2597,
+      "end": 2665,
+      "width": 68,
+      "n": 18,
+      "mean_explicit_skeleton_loss": 2.018090989854601,
+      "mean_explicit_logprob_delta": -0.0027231526457601124,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 12.651205115848118,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 2.186211268107096,
+      "holdout_mean_explicit_logprob_delta": -0.0045594289484951235,
+      "role_guess": "fine_mlp_writer_candidate"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L38:mlp[3007:3075]",
+      "coarse_component_id": "L38:mlp[2870:3280]",
+      "layer": 38,
+      "start": 3007,
+      "end": 3075,
+      "width": 68,
+      "n": 18,
+      "mean_explicit_skeleton_loss": 1.9868958637946181,
+      "mean_explicit_logprob_delta": -0.001923966118031078,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 12.937413586510552,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 2.1489981181091733,
+      "holdout_mean_explicit_logprob_delta": -0.0015115804142422145,
+      "role_guess": "fine_mlp_writer_candidate"
+    },
+    {
+      "component_type": "mlp_fine_output_group",
+      "component_id": "L38:mlp[2665:2733]",
+      "coarse_component_id": "L38:mlp[2460:2870]",
+      "layer": 38,
+      "start": 2665,
+      "end": 2733,
+      "width": 68,
+      "n": 18,
+      "mean_explicit_skeleton_loss": 1.8185296456019084,
+      "mean_explicit_logprob_delta": 0.0011328978257046805,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 14.231468730502659,
+      "holdout_n": 9,
+      "holdout_mean_explicit_skeleton_loss": 1.7974040110905964,
+      "holdout_mean_explicit_logprob_delta": 0.0012376625090837479,
+      "role_guess": "fine_mlp_state_contributor"
+    }
+  ]
+}

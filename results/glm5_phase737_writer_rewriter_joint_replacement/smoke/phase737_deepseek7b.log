@@ -1,0 +1,148 @@
+[23:31:14] deepseek7b/smoke: pairs=1 target=hidden_28 sources=2 mlp=1 interventions=5
+[23:31:14] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   4%|▍         | 13/339 [00:00<00:02, 118.91it/s]Loading weights:  16%|█▌        | 53/339 [00:00<00:01, 260.77it/s]Loading weights:  26%|██▌       | 88/339 [00:00<00:00, 289.15it/s]Loading weights:  35%|███▍      | 117/339 [00:00<00:00, 284.12it/s]Loading weights:  44%|████▎     | 148/339 [00:00<00:00, 283.29it/s]Loading weights:  52%|█████▏    | 177/339 [00:00<00:00, 259.43it/s]Loading weights:  62%|██████▏   | 210/339 [00:00<00:00, 278.94it/s]Loading weights:  72%|███████▏  | 245/339 [00:00<00:00, 283.58it/s]Loading weights:  83%|████████▎ | 280/339 [00:01<00:00, 291.56it/s]Loading weights:  91%|█████████▏| 310/339 [00:01<00:00, 280.18it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 279.00it/s]
+[23:31:16] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[23:31:21] deepseek7b: joint closure 1/1 pairs; rows=10
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "target_site": "hidden_28",
+  "top_joint_interventions": [
+    {
+      "intervention_label": "source_only|L22H24<-records_all|no_mlp",
+      "intervention_mode": "source_only",
+      "direction": "explicit<-conflict",
+      "source_component_id": "L22H24",
+      "source_group": "records_all",
+      "mlp_components": [],
+      "n": 1,
+      "mean_restore_projection": 6.179171562194824,
+      "mean_restore_fraction": 0.012542816848160866,
+      "mean_donor_logprob_delta": 0.021860122680664062,
+      "mean_recipient_logprob_delta": 0.09998536109924316,
+      "mean_donor_rank_delta": -713.0,
+      "mean_donor_vs_recipient_margin_delta": -0.078125,
+      "mean_patched_donor_vs_recipient_margin": -14.5625,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 0.0,
+      "baseline_recipient_hit_rate": 0.0,
+      "changed_rate": 1.0,
+      "mean_source_contribution_delta_norm": 7.419661045074463,
+      "mean_mlp_delta_norm_total": 0.0,
+      "role_guess": "joint_state_likelihood_transfer"
+    },
+    {
+      "intervention_label": "source_only|L22H24<-all_pre_answer|no_mlp",
+      "intervention_mode": "source_only",
+      "direction": "explicit<-conflict",
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "mlp_components": [],
+      "n": 1,
+      "mean_restore_projection": 4.634304046630859,
+      "mean_restore_fraction": 0.009406961158226038,
+      "mean_donor_logprob_delta": 0.07736015319824219,
+      "mean_recipient_logprob_delta": 0.2023603916168213,
+      "mean_donor_rank_delta": -696.0,
+      "mean_donor_vs_recipient_margin_delta": -0.125,
+      "mean_patched_donor_vs_recipient_margin": -14.609375,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 0.0,
+      "baseline_recipient_hit_rate": 0.0,
+      "changed_rate": 1.0,
+      "mean_source_contribution_delta_norm": 8.835427284240723,
+      "mean_mlp_delta_norm_total": 0.0,
+      "role_guess": "joint_state_likelihood_transfer"
+    },
+    {
+      "intervention_label": "source_only|L22H24<-all_pre_answer|no_mlp",
+      "intervention_mode": "source_only",
+      "direction": "conflict<-explicit",
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "mlp_components": [],
+      "n": 1,
+      "mean_restore_projection": 19.793659210205078,
+      "mean_restore_fraction": 0.04017824067994166,
+      "mean_donor_logprob_delta": 0.04498577117919922,
+      "mean_recipient_logprob_delta": -0.14251422882080078,
+      "mean_donor_rank_delta": 7.0,
+      "mean_donor_vs_recipient_margin_delta": 0.1875,
+      "mean_patched_donor_vs_recipient_margin": -7.625,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": 8.835427284240723,
+      "mean_mlp_delta_norm_total": 0.0,
+      "role_guess": "joint_readout_transfer_candidate"
+    },
+    {
+      "intervention_label": "source_plus_top_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]",
+      "intervention_mode": "source_plus_top_mlp",
+      "direction": "conflict<-explicit",
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "mlp_components": [
+        "L27:mlp[2872:2932]"
+      ],
+      "n": 1,
+      "mean_restore_projection": 22.172760009765625,
+      "mean_restore_fraction": 0.045007468237689176,
+      "mean_donor_logprob_delta": -0.034453392028808594,
+      "mean_recipient_logprob_delta": -0.15945357084274292,
+      "mean_donor_rank_delta": 8.0,
+      "mean_donor_vs_recipient_margin_delta": 0.125,
+      "mean_patched_donor_vs_recipient_margin": -7.6875,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": 8.835427284240723,
+      "mean_mlp_delta_norm_total": 23.251718521118164,
+      "role_guess": "state_transfer_only"
+    },
+    {
+      "intervention_label": "source_plus_top_mlp|L22H24<-records_all|L27:mlp[2872:2932]",
+      "intervention_mode": "source_plus_top_mlp",
+      "direction": "conflict<-explicit",
+      "source_component_id": "L22H24",
+      "source_group": "records_all",
+      "mlp_components": [
+        "L27:mlp[2872:2932]"
+      ],
+      "n": 1,
+      "mean_restore_projection": 16.304475784301758,
+      "mean_restore_fraction": 0.03309570733056839,
+      "mean_donor_logprob_delta": -0.03095531463623047,
+      "mean_recipient_logprob_delta": -0.09345537424087524,
+      "mean_donor_rank_delta": 6.0,
+      "mean_donor_vs_recipient_margin_delta": 0.0625,
+      "mean_patched_donor_vs_recipient_margin": -7.75,
+      "donor_hit_gain_rate": 0.0,
+      "recipient_hit_loss_rate": 0.0,
+      "patched_donor_hit_rate": 0.0,
+      "baseline_donor_hit_rate": 0.0,
+      "patched_recipient_hit_rate": 1.0,
+      "baseline_recipient_hit_rate": 1.0,
+      "changed_rate": 0.0,
+      "mean_source_contribution_delta_norm": 7.419661045074463,
+      "mean_mlp_delta_norm_total": 23.251718521118164,
+      "role_guess": "state_transfer_only"
+    }
+  ]
+}

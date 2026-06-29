@@ -1,0 +1,133 @@
+[21:22:13] glm4/confirm: pairs=12 target_site=hidden_40 layers=[23, 31, 35, 38, 39]
+[21:22:14] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[21:22:14] [load] glm4: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[21:22:14] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.65it/s]Loading weights:   5%|▍         | 20/443 [00:00<00:05, 78.20it/s]Loading weights:  13%|█▎        | 58/443 [00:00<00:02, 181.84it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 227.92it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 250.65it/s]Loading weights:  35%|███▍      | 155/443 [00:00<00:01, 259.52it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 284.69it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 292.97it/s]Loading weights:  58%|█████▊    | 255/443 [00:01<00:00, 285.07it/s]Loading weights:  65%|██████▌   | 289/443 [00:01<00:00, 300.27it/s]Loading weights:  72%|███████▏  | 321/443 [00:01<00:00, 299.55it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 310.35it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 302.04it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 311.15it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 268.92it/s]
+[21:22:16] [load] glm4: loaded attn=sdpa, device=cuda:0, gpu=18.80GB
+[21:22:16] glm4: attention head specs=50 over layers=[23, 31, 35, 38, 39]
+[21:22:30] glm4: attention writer scan 3/12 pairs; rows=150
+[21:22:44] glm4: attention writer scan 6/12 pairs; rows=300
+[21:22:57] glm4: attention writer scan 9/12 pairs; rows=450
+[21:23:11] glm4: attention writer scan 12/12 pairs; rows=600
+[21:23:11] glm4: mlp group specs=50 over layers=[23, 31, 35, 38, 39], d_model=4096
+[21:23:25] glm4: mlp writer scan 3/12 pairs; rows=150
+[21:23:38] glm4: mlp writer scan 6/12 pairs; rows=300
+[21:23:52] glm4: mlp writer scan 9/12 pairs; rows=450
+[21:24:05] glm4: mlp writer scan 12/12 pairs; rows=600
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "target_site": "hidden_40",
+  "layers": [
+    23,
+    31,
+    35,
+    38,
+    39
+  ],
+  "top_attention": [
+    {
+      "component_type": "attention_head",
+      "component_id": "L39H21",
+      "layer": 39,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 9.444613456726074,
+      "mean_commonsense_projection_delta": -26.389431635538738,
+      "mean_explicit_logprob_delta": -0.0075294021517038345,
+      "mean_commonsense_logprob_delta": -0.1519725223382314,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.08333333333333333,
+      "mean_explicit_target_delta_norm": 27.720555305480957,
+      "mean_baseline_skeleton_norm": 272.27103424072266,
+      "role_guess": "writer_candidate",
+      "head": 21
+    },
+    {
+      "component_type": "attention_head",
+      "component_id": "L35H10",
+      "layer": 35,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 3.295201142628988,
+      "mean_commonsense_projection_delta": -3.385555317004522,
+      "mean_explicit_logprob_delta": 0.018379931493351858,
+      "mean_commonsense_logprob_delta": 0.04217790563901266,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 13.182239452997843,
+      "mean_baseline_skeleton_norm": 272.27103424072266,
+      "role_guess": "weak_or_mixed",
+      "head": 10
+    },
+    {
+      "component_type": "attention_head",
+      "component_id": "L23H17",
+      "layer": 23,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 2.659188667933146,
+      "mean_commonsense_projection_delta": -0.09426714976628621,
+      "mean_explicit_logprob_delta": -0.014957156342764696,
+      "mean_commonsense_logprob_delta": -0.019396573305130005,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": -0.08333333333333333,
+      "mean_explicit_target_delta_norm": 8.943004131317139,
+      "mean_baseline_skeleton_norm": 272.27103424072266,
+      "role_guess": "writer_candidate",
+      "head": 17
+    }
+  ],
+  "top_mlp": [
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L38:mlp[2870:3280]",
+      "layer": 38,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 8.267185052235922,
+      "mean_commonsense_projection_delta": -1.8347059587637584,
+      "mean_explicit_logprob_delta": -0.0033046631142497063,
+      "mean_commonsense_logprob_delta": -0.07607710361480713,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.08333333333333333,
+      "mean_explicit_target_delta_norm": 35.28862444559733,
+      "mean_baseline_skeleton_norm": 272.27103424072266,
+      "role_guess": "writer_candidate",
+      "start": 2870,
+      "end": 3280
+    },
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L38:mlp[2050:2460]",
+      "layer": 38,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 8.165344476699829,
+      "mean_commonsense_projection_delta": -5.5322264432907104,
+      "mean_explicit_logprob_delta": 0.013826556193331877,
+      "mean_commonsense_logprob_delta": -0.11928711334864299,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 38.9482151667277,
+      "mean_baseline_skeleton_norm": 272.27103424072266,
+      "role_guess": "weak_or_mixed",
+      "start": 2050,
+      "end": 2460
+    },
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L38:mlp[3690:4096]",
+      "layer": 38,
+      "n": 12,
+      "mean_explicit_skeleton_loss": 6.364317099253337,
+      "mean_commonsense_projection_delta": 4.223365346590678,
+      "mean_explicit_logprob_delta": 0.03497216027850906,
+      "mean_commonsense_logprob_delta": 0.20249008138974509,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 48.42614587148031,
+      "mean_baseline_skeleton_norm": 272.27103424072266,
+      "role_guess": "weak_or_mixed",
+      "start": 3690,
+      "end": 4096
+    }
+  ]
+}

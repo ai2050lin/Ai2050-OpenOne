@@ -1,0 +1,363 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "alpha_max": 80.0,
+      "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+          "phase738_margin": -11.931966145833334
+        },
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+          "phase738_margin": -8.264973958333334
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_new_tokens": 4,
+      "max_pairs": 6,
+      "model": "deepseek7b",
+      "n_rows": 12,
+      "phase": 739,
+      "phase738_round": "confirm",
+      "quantization": "off",
+      "round": "main",
+      "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+      "target_site": "hidden_28",
+      "timestamp": "2026-06-29 00:33:58",
+      "title": "Readout Threshold and Closure Boundary Test",
+      "top_audits": 2,
+      "top_threshold_audits": [
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 6
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 6,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "conflict<-explicit",
+          "intervention_key": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+          "intervention_label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 5.513155589736029,
+          "mean_alpha_star_vocab_top": 5.513155589736029,
+          "mean_final_norm_output_norm": 192.6690902709961,
+          "mean_first_alpha_donor_candidate_top": 10.576551930136825,
+          "mean_first_alpha_donor_vocab_top": 10.576551930136825,
+          "mean_mlp_delta_norm_total": 70.27460932731628,
+          "mean_patched_margin_donor_vs_candidate_best": -7.536458333333333,
+          "mean_patched_margin_donor_vs_recipient": -7.171875,
+          "mean_patched_margin_donor_vs_vocab_top": -7.536458333333333,
+          "mean_source_contribution_delta_norm": 8.183632532755533,
+          "mlp_components": [
+            "L27:mlp[2872:2932]",
+            "L22:mlp[957:1017]"
+          ],
+          "n": 6,
+          "patched_candidate_best_counts": {
+            "format_the": 1,
+            "object_echo": 1,
+            "recipient_answer": 4
+          },
+          "patched_vocab_top_counts": {
+            " The": 1,
+            " bitter": 1,
+            " blue": 1,
+            " stone": 1,
+            " sweet": 1,
+            " tool": 1
+          },
+          "source_component_id": "L22H24",
+          "source_group": "all_pre_answer",
+          "vocab_flip_found_rate": 1.0
+        },
+        {
+          "boosted_generation_class_counts": {
+            "answer_mentioned": 3,
+            "answer_stop": 3
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 6,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "explicit<-conflict",
+          "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+          "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 9.487075179684904,
+          "mean_alpha_star_vocab_top": 9.487075179684904,
+          "mean_final_norm_output_norm": 187.72745768229166,
+          "mean_first_alpha_donor_candidate_top": 19.88199966403475,
+          "mean_first_alpha_donor_vocab_top": 19.88199966403475,
+          "mean_mlp_delta_norm_total": 70.27460932731628,
+          "mean_patched_margin_donor_vs_candidate_best": -12.986328125,
+          "mean_patched_margin_donor_vs_recipient": -12.882161458333334,
+          "mean_patched_margin_donor_vs_vocab_top": -12.986328125,
+          "mean_source_contribution_delta_norm": 7.564334750175476,
+          "mlp_components": [
+            "L27:mlp[2872:2932]",
+            "L22:mlp[957:1017]"
+          ],
+          "n": 6,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 5,
+            "relation_echo": 1
+          },
+          "patched_vocab_top_counts": {
+            " category": 1,
+            " none": 1,
+            " object": 1,
+            " orange": 1,
+            " sweet": 1,
+            " yellow": 1
+          },
+          "source_component_id": "L22H24",
+          "source_group": "target_record_line",
+          "vocab_flip_found_rate": 1.0
+        }
+      ]
+    },
+    "glm4": {
+      "alpha_max": 80.0,
+      "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+          "phase738_margin": -8.244140625
+        },
+        {
+          "direction": "conflict<-explicit",
+          "label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+          "phase738_margin": -8.251302083333334
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_new_tokens": 4,
+      "max_pairs": 6,
+      "model": "glm4",
+      "n_rows": 12,
+      "phase": 739,
+      "phase738_round": "confirm",
+      "quantization": "off",
+      "round": "main",
+      "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+      "target_site": "hidden_40",
+      "timestamp": "2026-06-29 00:33:29",
+      "title": "Readout Threshold and Closure Boundary Test",
+      "top_audits": 2,
+      "top_threshold_audits": [
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 6
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 6,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "conflict<-explicit",
+          "intervention_key": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+          "intervention_label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 9.523577139783685,
+          "mean_alpha_star_vocab_top": 9.523577139783685,
+          "mean_final_norm_output_norm": 166.75757853190103,
+          "mean_first_alpha_donor_candidate_top": 11.536656882166886,
+          "mean_first_alpha_donor_vocab_top": 12.804875651187096,
+          "mean_mlp_delta_norm_total": 14.915201187133789,
+          "mean_patched_margin_donor_vs_candidate_best": -8.473958333333334,
+          "mean_patched_margin_donor_vs_recipient": -8.473958333333334,
+          "mean_patched_margin_donor_vs_vocab_top": -8.473958333333334,
+          "mean_source_contribution_delta_norm": 3.4577524662017822,
+          "mlp_components": [
+            "L38:mlp[2597:2665]",
+            "L38:mlp[3007:3075]"
+          ],
+          "n": 6,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 6
+          },
+          "patched_vocab_top_counts": {
+            " bitter": 1,
+            " blue": 1,
+            " fruit": 1,
+            " purple": 1,
+            " sweet": 1,
+            " tool": 1
+          },
+          "source_component_id": "L23H17",
+          "source_group": "instruction",
+          "vocab_flip_found_rate": 1.0
+        },
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 6
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 6,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "conflict<-explicit",
+          "intervention_key": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+          "intervention_label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 9.533808977957566,
+          "mean_alpha_star_vocab_top": 9.533808977957566,
+          "mean_final_norm_output_norm": 167.9569091796875,
+          "mean_first_alpha_donor_candidate_top": 11.544472379703997,
+          "mean_first_alpha_donor_vocab_top": 13.16989833166447,
+          "mean_mlp_delta_norm_total": 14.915201187133789,
+          "mean_patched_margin_donor_vs_candidate_best": -8.484375,
+          "mean_patched_margin_donor_vs_recipient": -8.484375,
+          "mean_patched_margin_donor_vs_vocab_top": -8.484375,
+          "mean_source_contribution_delta_norm": 14.042559305826822,
+          "mlp_components": [
+            "L38:mlp[2597:2665]",
+            "L38:mlp[3007:3075]"
+          ],
+          "n": 6,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 6
+          },
+          "patched_vocab_top_counts": {
+            " bitter": 1,
+            " blue": 1,
+            " fruit": 1,
+            " purple": 1,
+            " sweet": 1,
+            " tool": 1
+          },
+          "source_component_id": "L39H21",
+          "source_group": "self_last",
+          "vocab_flip_found_rate": 1.0
+        }
+      ]
+    },
+    "qwen3": {
+      "alpha_max": 80.0,
+      "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+      "attn_implementation": "eager",
+      "audited_interventions": [
+        {
+          "direction": "explicit<-conflict",
+          "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+          "phase738_margin": -15.651041666666666
+        },
+        {
+          "direction": "explicit<-conflict",
+          "label": "mlp_only|no_source|L28:mlp[299:341]",
+          "phase738_margin": -15.677083333333334
+        }
+      ],
+      "dtype": "bfloat16",
+      "max_new_tokens": 4,
+      "max_pairs": 6,
+      "model": "qwen3",
+      "n_rows": 12,
+      "phase": 739,
+      "phase738_round": "confirm",
+      "quantization": "off",
+      "round": "main",
+      "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+      "target_site": "hidden_36",
+      "timestamp": "2026-06-29 00:32:55",
+      "title": "Readout Threshold and Closure Boundary Test",
+      "top_audits": 2,
+      "top_threshold_audits": [
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 6
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 6,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "explicit<-conflict",
+          "intervention_key": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+          "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
+          "intervention_mode": "source_plus_all_mlp",
+          "mean_alpha_star_candidate_best": 11.496949884145737,
+          "mean_alpha_star_vocab_top": 11.496949884145737,
+          "mean_final_norm_output_norm": 173.8203582763672,
+          "mean_first_alpha_donor_candidate_top": 19.2314877952458,
+          "mean_first_alpha_donor_vocab_top": 19.2314877952458,
+          "mean_mlp_delta_norm_total": 14.462636907895407,
+          "mean_patched_margin_donor_vs_candidate_best": -15.96875,
+          "mean_patched_margin_donor_vs_recipient": -15.96875,
+          "mean_patched_margin_donor_vs_vocab_top": -15.96875,
+          "mean_source_contribution_delta_norm": 16.956180731455486,
+          "mlp_components": [
+            "L34:mlp[85:128]",
+            "L28:mlp[299:341]"
+          ],
+          "n": 6,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 6
+          },
+          "patched_vocab_top_counts": {
+            " fruit": 1,
+            " none": 1,
+            " object": 1,
+            " orange": 1,
+            " sweet": 1,
+            " yellow": 1
+          },
+          "source_component_id": "L35H0",
+          "source_group": "self_last",
+          "vocab_flip_found_rate": 1.0
+        },
+        {
+          "boosted_generation_class_counts": {
+            "answer_stop": 6
+          },
+          "boosted_generation_donor_hit_rate": 1.0,
+          "boosted_generation_tested": 6,
+          "candidate_flip_found_rate": 1.0,
+          "direction": "explicit<-conflict",
+          "intervention_key": "mlp_only|no_source|L28:mlp[299:341] explicit<-conflict",
+          "intervention_label": "mlp_only|no_source|L28:mlp[299:341]",
+          "intervention_mode": "mlp_only",
+          "mean_alpha_star_candidate_best": 11.533688741838795,
+          "mean_alpha_star_vocab_top": 11.533688741838795,
+          "mean_final_norm_output_norm": 174.14666493733725,
+          "mean_first_alpha_donor_candidate_top": 19.277009741186053,
+          "mean_first_alpha_donor_vocab_top": 19.277009741186053,
+          "mean_mlp_delta_norm_total": 3.6744382778803506,
+          "mean_patched_margin_donor_vs_candidate_best": -16.020833333333332,
+          "mean_patched_margin_donor_vs_recipient": -16.020833333333332,
+          "mean_patched_margin_donor_vs_vocab_top": -16.020833333333332,
+          "mean_source_contribution_delta_norm": null,
+          "mlp_components": [
+            "L28:mlp[299:341]"
+          ],
+          "n": 6,
+          "patched_candidate_best_counts": {
+            "recipient_answer": 6
+          },
+          "patched_vocab_top_counts": {
+            " fruit": 1,
+            " none": 1,
+            " object": 1,
+            " orange": 1,
+            " sweet": 1,
+            " yellow": 1
+          },
+          "source_component_id": null,
+          "source_group": null,
+          "vocab_flip_found_rate": 1.0
+        }
+      ]
+    }
+  },
+  "evidence_type": "minimum final-readout boost needed to flip donor token0 plus boosted generation closure",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 739,
+  "round": "main",
+  "status": "complete",
+  "timestamp": "2026-06-29 00:34:00",
+  "title": "Readout Threshold and Closure Boundary Test"
+}

@@ -1,0 +1,117 @@
+{
+  "alpha_max": 80.0,
+  "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "conflict<-explicit",
+      "label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "phase738_margin": -8.244140625
+    },
+    {
+      "direction": "conflict<-explicit",
+      "label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "phase738_margin": -8.251302083333334
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_new_tokens": 4,
+  "max_pairs": 10,
+  "model": "glm4",
+  "n_rows": 20,
+  "phase": 739,
+  "phase738_round": "confirm",
+  "quantization": "off",
+  "round": "confirm",
+  "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+  "target_site": "hidden_40",
+  "timestamp": "2026-06-29 00:35:38",
+  "title": "Readout Threshold and Closure Boundary Test",
+  "top_audits": 2,
+  "top_threshold_audits": [
+    {
+      "boosted_generation_class_counts": {
+        "answer_stop": 10
+      },
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_tested": 10,
+      "candidate_flip_found_rate": 1.0,
+      "direction": "conflict<-explicit",
+      "intervention_key": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_alpha_star_candidate_best": 8.911054996489202,
+      "mean_alpha_star_vocab_top": 8.911054996489202,
+      "mean_final_norm_output_norm": 165.76244659423827,
+      "mean_first_alpha_donor_candidate_top": 10.396286189648297,
+      "mean_first_alpha_donor_vocab_top": 11.921553794780895,
+      "mean_mlp_delta_norm_total": 14.386314392089844,
+      "mean_patched_margin_donor_vs_candidate_best": -7.825,
+      "mean_patched_margin_donor_vs_recipient": -7.825,
+      "mean_patched_margin_donor_vs_vocab_top": -7.825,
+      "mean_source_contribution_delta_norm": 3.4185940504074095,
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 10,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 10
+      },
+      "patched_vocab_top_counts": {
+        " bitter": 2,
+        " blue": 2,
+        " fruit": 2,
+        " purple": 1,
+        " sweet": 1,
+        " tool": 1,
+        " yellow": 1
+      },
+      "source_component_id": "L23H17",
+      "source_group": "instruction",
+      "vocab_flip_found_rate": 1.0
+    },
+    {
+      "boosted_generation_class_counts": {
+        "answer_stop": 10
+      },
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_tested": 10,
+      "candidate_flip_found_rate": 1.0,
+      "direction": "conflict<-explicit",
+      "intervention_key": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_alpha_star_candidate_best": 8.909755030775454,
+      "mean_alpha_star_vocab_top": 8.909755030775454,
+      "mean_final_norm_output_norm": 166.69662780761718,
+      "mean_first_alpha_donor_candidate_top": 10.27395447094852,
+      "mean_first_alpha_donor_vocab_top": 12.290929733574451,
+      "mean_mlp_delta_norm_total": 14.386314392089844,
+      "mean_patched_margin_donor_vs_candidate_best": -7.825,
+      "mean_patched_margin_donor_vs_recipient": -7.825,
+      "mean_patched_margin_donor_vs_vocab_top": -7.825,
+      "mean_source_contribution_delta_norm": 13.457019329071045,
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 10,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 10
+      },
+      "patched_vocab_top_counts": {
+        " bitter": 2,
+        " blue": 2,
+        " fruit": 2,
+        " purple": 1,
+        " sweet": 1,
+        " tool": 1,
+        " yellow": 1
+      },
+      "source_component_id": "L39H21",
+      "source_group": "self_last",
+      "vocab_flip_found_rate": 1.0
+    }
+  ]
+}

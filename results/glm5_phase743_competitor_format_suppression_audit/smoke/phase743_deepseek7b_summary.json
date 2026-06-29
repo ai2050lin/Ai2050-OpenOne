@@ -1,0 +1,121 @@
+{
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "conflict<-explicit",
+      "label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]"
+    }
+  ],
+  "condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 10.0,
+      "mean_margin_donor_vs_recipient": 6.5,
+      "mean_margin_donor_vs_top": -3.25,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "n": 1,
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "suppression_scale": 0.0,
+      "top_token_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "top_token_counts": {
+        " category": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 4.0,
+      "mean_margin_donor_vs_recipient": 8.1875,
+      "mean_margin_donor_vs_top": -0.625,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "n": 1,
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "suppression_scale": 1.0,
+      "top_token_class_counts": {
+        "punctuation_or_stop": 1
+      },
+      "top_token_counts": {
+        " ?\n\n": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 2.0,
+      "mean_margin_donor_vs_recipient": 8.6875,
+      "mean_margin_donor_vs_top": -0.125,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "n": 1,
+      "suppressed_token_class_counts": {
+        "echo_object_or_relation": 1
+      },
+      "suppression_scale": 1.25,
+      "top_token_class_counts": {
+        "punctuation_or_stop": 1
+      },
+      "top_token_counts": {
+        " ?\n\n": 1
+      }
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_pairs": 1,
+  "model": "deepseek7b",
+  "n_rows": 3,
+  "phase": 743,
+  "phase739_round": "confirm",
+  "phase741_round": "confirm",
+  "quantization": "off",
+  "ranked_candidate_components": [
+    {
+      "component": "attn_out",
+      "component_id": "L26:attn_out",
+      "layer": 26,
+      "phase740_mean_donor_fraction": 2.5941364463811385,
+      "phase740_mean_patched_fraction": 0.05719511961941759,
+      "phase741_joint_add_effect": 0.3100355371735994,
+      "phase741_joint_add_fraction": 0.3276488426991234,
+      "phase741_target_top1_rate": 0.0
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L27:attn_out",
+      "layer": 27,
+      "phase740_mean_donor_fraction": 1.8331010374867347,
+      "phase740_mean_patched_fraction": 0.028992483721936087,
+      "phase741_joint_add_effect": 0.21130354358631293,
+      "phase741_joint_add_fraction": 0.22891685099706435,
+      "phase741_target_top1_rate": 0.0
+    }
+  ],
+  "round": "smoke",
+  "strict_interpretation": "Final-norm suppression of the current top competitor is a readout-geometry intervention. It tests whether failure is local token competition, not whether the model naturally performs that suppression.",
+  "suppress_scales": [
+    1.0,
+    1.25
+  ],
+  "suppressed_class_summary": [
+    {
+      "mean_margin_donor_vs_top": -3.25,
+      "mean_suppression_alpha_needed": 2.265251429586538,
+      "n": 1,
+      "suppressed_token_class": "echo_object_or_relation",
+      "top_token_counts": {
+        " category": 1
+      }
+    }
+  ],
+  "target_site": "hidden_28",
+  "timestamp": "2026-06-29 08:13:10",
+  "title": "Competitor and Format Suppression Audit",
+  "top_audits": 1,
+  "top_candidates": 2,
+  "top_k_vocab": 8
+}

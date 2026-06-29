@@ -1,0 +1,386 @@
+[08:34:12] qwen3/main: pairs=6 target=hidden_36 audits=2 combo_candidates=3
+[08:34:12] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 29/398 [00:00<00:01, 285.38it/s]Loading weights:  23%|██▎       | 91/398 [00:00<00:00, 453.47it/s]Loading weights:  39%|███▉      | 155/398 [00:00<00:00, 526.24it/s]Loading weights:  55%|█████▌    | 220/398 [00:00<00:00, 555.30it/s]Loading weights:  73%|███████▎  | 289/398 [00:00<00:00, 596.08it/s]Loading weights:  88%|████████▊ | 349/398 [00:00<00:00, 597.06it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 562.98it/s]
+[08:34:13] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[08:34:13] qwen3: scan_candidates=11 ['L28:attn_out', 'L28:mlp_out', 'L30:attn_out', 'L30:mlp_out', 'L31:mlp_out', 'L32:attn_out', 'L32:mlp_out', 'L33:attn_out', 'L34:mlp_out', 'L35:attn_out', 'L35:mlp_out']
+[08:34:16] qwen3: suppression source scan 2/6 pairs; rows=44 skipped_top1=0
+[08:34:19] qwen3: suppression source scan 4/6 pairs; rows=88 skipped_top1=0
+[08:34:22] qwen3: suppression source scan 6/6 pairs; rows=132 skipped_top1=0
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "skipped_top1": 0,
+  "top_candidate_summary": [
+    {
+      "candidate_component_id": "L32:attn_out",
+      "candidate_layer": 32,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 2.796875,
+      "mean_delta_donor_logit": 2.5364583333333335,
+      "mean_delta_competitor_logit": -0.2604166666666667,
+      "mean_delta_recipient_logit": -0.2604166666666667,
+      "new_donor_top1_rate": 0.16666666666666666,
+      "mean_new_donor_rank": 5.0,
+      "top_changed_rate": 0.16666666666666666,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 10,
+        "donor_answer": 2
+      },
+      "role_guess_counts": {
+        "boost_margin_candidate": 6,
+        "boost_and_suppress_margin_candidate": 4,
+        "boost_and_suppress_closure_candidate": 2
+      },
+      "dominant_role_guess": "boost_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L33:attn_out",
+      "candidate_layer": 33,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 4.541666666666667,
+      "mean_delta_donor_logit": 2.9479166666666665,
+      "mean_delta_competitor_logit": -1.59375,
+      "mean_delta_recipient_logit": -1.59375,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 6.333333333333333,
+      "top_changed_rate": 0.5833333333333334,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "format_or_schema": 7,
+        "recipient_answer": 5
+      },
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 12
+      },
+      "dominant_role_guess": "boost_and_suppress_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L30:attn_out",
+      "candidate_layer": 30,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 1.9739583333333333,
+      "mean_delta_donor_logit": 1.3489583333333333,
+      "mean_delta_competitor_logit": -0.625,
+      "mean_delta_recipient_logit": -0.625,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 7.75,
+      "top_changed_rate": 0.16666666666666666,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 10,
+        "format_or_schema": 2
+      },
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 8,
+        "boost_margin_candidate": 2,
+        "weak_boost_candidate": 2
+      },
+      "dominant_role_guess": "boost_and_suppress_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L35:attn_out",
+      "candidate_layer": 35,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 1.8177083333333333,
+      "mean_delta_donor_logit": 2.609375,
+      "mean_delta_competitor_logit": 0.7916666666666666,
+      "mean_delta_recipient_logit": 0.7916666666666666,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 8.916666666666666,
+      "top_changed_rate": 0.25,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 9,
+        "format_or_schema": 3
+      },
+      "role_guess_counts": {
+        "boost_margin_candidate": 10,
+        "boost_and_suppress_margin_candidate": 2
+      },
+      "dominant_role_guess": "boost_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L28:mlp_out",
+      "candidate_layer": 28,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 0.9114583333333334,
+      "mean_delta_donor_logit": 0.6197916666666666,
+      "mean_delta_competitor_logit": -0.2916666666666667,
+      "mean_delta_recipient_logit": -0.2916666666666667,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 10.833333333333334,
+      "top_changed_rate": 0.08333333333333333,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 11,
+        "format_or_schema": 1
+      },
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 5,
+        "weak_boost_candidate": 5,
+        "suppression_margin_candidate": 2
+      },
+      "dominant_role_guess": "boost_and_suppress_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L31:mlp_out",
+      "candidate_layer": 31,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 0.8177083333333334,
+      "mean_delta_donor_logit": 0.6927083333333334,
+      "mean_delta_competitor_logit": -0.125,
+      "mean_delta_recipient_logit": -0.125,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 8.916666666666666,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 12
+      },
+      "role_guess_counts": {
+        "boost_margin_candidate": 5,
+        "boost_and_suppress_margin_candidate": 4,
+        "suppression_margin_candidate": 1,
+        "weak_boost_candidate": 2
+      },
+      "dominant_role_guess": "boost_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L28:attn_out",
+      "candidate_layer": 28,
+      "candidate_component": "attn_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 0.6354166666666666,
+      "mean_delta_donor_logit": 0.40625,
+      "mean_delta_competitor_logit": -0.22916666666666666,
+      "mean_delta_recipient_logit": -0.22916666666666666,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 10.166666666666666,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 12
+      },
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 8,
+        "weak_boost_candidate": 1,
+        "small_or_no_effect": 1,
+        "weak_suppression_candidate": 2
+      },
+      "dominant_role_guess": "boost_and_suppress_margin_candidate"
+    },
+    {
+      "candidate_component_id": "L32:mlp_out",
+      "candidate_layer": 32,
+      "candidate_component": "mlp_out",
+      "candidate_already_in_threshold_combo": false,
+      "n": 12,
+      "mean_base_margin_donor_vs_competitor": -7.119791666666667,
+      "mean_delta_margin_donor_vs_competitor": 0.5989583333333334,
+      "mean_delta_donor_logit": -0.046875,
+      "mean_delta_competitor_logit": -0.6458333333333334,
+      "mean_delta_recipient_logit": -0.6458333333333334,
+      "new_donor_top1_rate": 0.0,
+      "mean_new_donor_rank": 12.333333333333334,
+      "top_changed_rate": 0.0,
+      "base_competitor_class_counts": {
+        "recipient_answer": 12
+      },
+      "new_top_class_counts": {
+        "recipient_answer": 12
+      },
+      "role_guess_counts": {
+        "weak_suppression_candidate": 3,
+        "suppression_margin_candidate": 5,
+        "boost_and_suppress_margin_candidate": 2,
+        "small_or_no_effect": 1,
+        "harmful_or_competitor_support": 1
+      },
+      "dominant_role_guess": "suppression_margin_candidate"
+    }
+  ],
+  "top_class_summary": [
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L32:attn_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 2.796875,
+      "mean_delta_donor_logit": 2.5364583333333335,
+      "mean_delta_competitor_logit": -0.2604166666666667,
+      "new_donor_top1_rate": 0.16666666666666666,
+      "role_guess_counts": {
+        "boost_margin_candidate": 6,
+        "boost_and_suppress_margin_candidate": 4,
+        "boost_and_suppress_closure_candidate": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L33:attn_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 4.541666666666667,
+      "mean_delta_donor_logit": 2.9479166666666665,
+      "mean_delta_competitor_logit": -1.59375,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 12
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L30:attn_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 1.9739583333333333,
+      "mean_delta_donor_logit": 1.3489583333333333,
+      "mean_delta_competitor_logit": -0.625,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 8,
+        "boost_margin_candidate": 2,
+        "weak_boost_candidate": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L35:attn_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 1.8177083333333333,
+      "mean_delta_donor_logit": 2.609375,
+      "mean_delta_competitor_logit": 0.7916666666666666,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_margin_candidate": 10,
+        "boost_and_suppress_margin_candidate": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L28:mlp_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 0.9114583333333334,
+      "mean_delta_donor_logit": 0.6197916666666666,
+      "mean_delta_competitor_logit": -0.2916666666666667,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 5,
+        "weak_boost_candidate": 5,
+        "suppression_margin_candidate": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L31:mlp_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 0.8177083333333334,
+      "mean_delta_donor_logit": 0.6927083333333334,
+      "mean_delta_competitor_logit": -0.125,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_margin_candidate": 5,
+        "boost_and_suppress_margin_candidate": 4,
+        "suppression_margin_candidate": 1,
+        "weak_boost_candidate": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L28:attn_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 0.6354166666666666,
+      "mean_delta_donor_logit": 0.40625,
+      "mean_delta_competitor_logit": -0.22916666666666666,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 8,
+        "weak_boost_candidate": 1,
+        "small_or_no_effect": 1,
+        "weak_suppression_candidate": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L32:mlp_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 0.5989583333333334,
+      "mean_delta_donor_logit": -0.046875,
+      "mean_delta_competitor_logit": -0.6458333333333334,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "weak_suppression_candidate": 3,
+        "suppression_margin_candidate": 5,
+        "boost_and_suppress_margin_candidate": 2,
+        "small_or_no_effect": 1,
+        "harmful_or_competitor_support": 1
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L30:mlp_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": 0.34375,
+      "mean_delta_donor_logit": 0.4375,
+      "mean_delta_competitor_logit": 0.09375,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "boost_and_suppress_margin_candidate": 4,
+        "weak_boost_candidate": 3,
+        "small_or_no_effect": 2,
+        "weak_suppression_candidate": 1,
+        "harmful_or_competitor_support": 2
+      }
+    },
+    {
+      "base_competitor_class": "recipient_answer",
+      "candidate_component_id": "L34:mlp_out",
+      "n": 12,
+      "mean_delta_margin_donor_vs_competitor": -2.1041666666666665,
+      "mean_delta_donor_logit": -1.4791666666666667,
+      "mean_delta_competitor_logit": 0.625,
+      "new_donor_top1_rate": 0.0,
+      "role_guess_counts": {
+        "harmful_or_competitor_support": 6,
+        "weak_boost_candidate": 2,
+        "suppression_margin_candidate": 2,
+        "weak_suppression_candidate": 1,
+        "small_or_no_effect": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "alpha_max": 80.0,
+  "attention_note": "eager attention is required because Phase738-selected joint states can include source contribution replacement",
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "conflict<-explicit",
+      "label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "phase738_margin": -8.244140625
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_new_tokens": 4,
+  "max_pairs": 1,
+  "model": "glm4",
+  "n_rows": 1,
+  "phase": 739,
+  "phase738_round": "confirm",
+  "quantization": "off",
+  "round": "smoke",
+  "strict_interpretation": "This phase measures artificial final-readout boost needed to flip donor token0; success under this boost is a boundary measurement, not proof of a natural internal path.",
+  "target_site": "hidden_40",
+  "timestamp": "2026-06-29 00:31:45",
+  "title": "Readout Threshold and Closure Boundary Test",
+  "top_audits": 1,
+  "top_threshold_audits": [
+    {
+      "boosted_generation_class_counts": {
+        "answer_stop": 1
+      },
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_tested": 1,
+      "candidate_flip_found_rate": 1.0,
+      "direction": "conflict<-explicit",
+      "intervention_key": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "intervention_mode": "source_plus_all_mlp",
+      "mean_alpha_star_candidate_best": 6.827639953557833,
+      "mean_alpha_star_vocab_top": 6.827639953557833,
+      "mean_final_norm_output_norm": 168.78089904785156,
+      "mean_first_alpha_donor_candidate_top": 6.827639953557833,
+      "mean_first_alpha_donor_vocab_top": 8.534549941947292,
+      "mean_mlp_delta_norm_total": 15.214855194091797,
+      "mean_patched_margin_donor_vs_candidate_best": -6.0,
+      "mean_patched_margin_donor_vs_recipient": -6.0,
+      "mean_patched_margin_donor_vs_vocab_top": -6.0,
+      "mean_source_contribution_delta_norm": 14.030059814453125,
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 1,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 1
+      },
+      "patched_vocab_top_counts": {
+        " tool": 1
+      },
+      "source_component_id": "L39H21",
+      "source_group": "self_last",
+      "vocab_flip_found_rate": 1.0
+    }
+  ]
+}

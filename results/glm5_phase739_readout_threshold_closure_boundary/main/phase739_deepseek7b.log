@@ -1,0 +1,102 @@
+[00:33:31] deepseek7b/main: pairs=6 target=hidden_28 audits=2
+[00:33:31] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   5%|▌         | 18/339 [00:00<00:01, 163.02it/s]Loading weights:  16%|█▌        | 53/339 [00:00<00:01, 262.25it/s]Loading weights:  24%|██▍       | 82/339 [00:00<00:00, 273.55it/s]Loading weights:  33%|███▎      | 111/339 [00:00<00:00, 262.33it/s]Loading weights:  41%|████▏     | 140/339 [00:00<00:00, 264.39it/s]Loading weights:  50%|████▉     | 169/339 [00:00<00:00, 271.52it/s]Loading weights:  58%|█████▊    | 198/339 [00:00<00:00, 271.18it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 287.48it/s]Loading weights:  77%|███████▋  | 261/339 [00:00<00:00, 274.05it/s]Loading weights:  86%|████████▌ | 292/339 [00:01<00:00, 277.03it/s]Loading weights:  94%|█████████▍| 320/339 [00:01<00:00, 268.77it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 273.20it/s]
+[00:33:33] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[00:33:42] deepseek7b: threshold audit 2/6 pairs; rows=4
+[00:33:50] deepseek7b: threshold audit 4/6 pairs; rows=8
+[00:33:58] deepseek7b: threshold audit 6/6 pairs; rows=12
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "main",
+  "target_site": "hidden_28",
+  "top_threshold_audits": [
+    {
+      "intervention_key": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L22H24",
+      "source_group": "all_pre_answer",
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 6,
+      "patched_candidate_best_counts": {
+        "recipient_answer": 4,
+        "format_the": 1,
+        "object_echo": 1
+      },
+      "patched_vocab_top_counts": {
+        " tool": 1,
+        " bitter": 1,
+        " blue": 1,
+        " The": 1,
+        " stone": 1,
+        " sweet": 1
+      },
+      "mean_patched_margin_donor_vs_recipient": -7.171875,
+      "mean_patched_margin_donor_vs_candidate_best": -7.536458333333333,
+      "mean_patched_margin_donor_vs_vocab_top": -7.536458333333333,
+      "mean_alpha_star_vocab_top": 5.513155589736029,
+      "mean_alpha_star_candidate_best": 5.513155589736029,
+      "candidate_flip_found_rate": 1.0,
+      "vocab_flip_found_rate": 1.0,
+      "mean_first_alpha_donor_candidate_top": 10.576551930136825,
+      "mean_first_alpha_donor_vocab_top": 10.576551930136825,
+      "boosted_generation_tested": 6,
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_class_counts": {
+        "answer_stop": 6
+      },
+      "mean_final_norm_output_norm": 192.6690902709961,
+      "mean_source_contribution_delta_norm": 8.183632532755533,
+      "mean_mlp_delta_norm_total": 70.27460932731628
+    },
+    {
+      "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
+      "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
+      "direction": "explicit<-conflict",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L22H24",
+      "source_group": "target_record_line",
+      "mlp_components": [
+        "L27:mlp[2872:2932]",
+        "L22:mlp[957:1017]"
+      ],
+      "n": 6,
+      "patched_candidate_best_counts": {
+        "relation_echo": 1,
+        "recipient_answer": 5
+      },
+      "patched_vocab_top_counts": {
+        " category": 1,
+        " sweet": 1,
+        " yellow": 1,
+        " orange": 1,
+        " object": 1,
+        " none": 1
+      },
+      "mean_patched_margin_donor_vs_recipient": -12.882161458333334,
+      "mean_patched_margin_donor_vs_candidate_best": -12.986328125,
+      "mean_patched_margin_donor_vs_vocab_top": -12.986328125,
+      "mean_alpha_star_vocab_top": 9.487075179684904,
+      "mean_alpha_star_candidate_best": 9.487075179684904,
+      "candidate_flip_found_rate": 1.0,
+      "vocab_flip_found_rate": 1.0,
+      "mean_first_alpha_donor_candidate_top": 19.88199966403475,
+      "mean_first_alpha_donor_vocab_top": 19.88199966403475,
+      "boosted_generation_tested": 6,
+      "boosted_generation_donor_hit_rate": 1.0,
+      "boosted_generation_class_counts": {
+        "answer_mentioned": 3,
+        "answer_stop": 3
+      },
+      "mean_final_norm_output_norm": 187.72745768229166,
+      "mean_source_contribution_delta_norm": 7.564334750175476,
+      "mean_mlp_delta_norm_total": 70.27460932731628
+    }
+  ]
+}

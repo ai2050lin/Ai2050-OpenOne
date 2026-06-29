@@ -1,0 +1,344 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "phase": 738,
+        "relation": "contains",
+        "source": "qwen3:model",
+        "target": "qwen3:phase:738:smoke"
+      },
+      {
+        "phase": 738,
+        "relation": "audits",
+        "source": "qwen3:phase:738:smoke",
+        "target": "qwen3:readout_competition:hidden_36"
+      },
+      {
+        "phase": 738,
+        "relation": "explains_competition_failure",
+        "source": "qwen3:readout_audit:smoke:source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+        "target": "qwen3:readout_competition:hidden_36",
+        "weight": -19.25
+      },
+      {
+        "phase": 738,
+        "relation": "wins_candidate_competition",
+        "source": "qwen3:competitor:recipient_answer",
+        "target": "qwen3:readout_audit:smoke:source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+        "weight": 1
+      },
+      {
+        "phase": 738,
+        "relation": "explains_competition_failure",
+        "source": "qwen3:readout_audit:smoke:source_only|L35H0<-self_last|no_mlp explicit<-conflict",
+        "target": "qwen3:readout_competition:hidden_36",
+        "weight": -19.25
+      },
+      {
+        "phase": 738,
+        "relation": "wins_candidate_competition",
+        "source": "qwen3:competitor:recipient_answer",
+        "target": "qwen3:readout_audit:smoke:source_only|L35H0<-self_last|no_mlp explicit<-conflict",
+        "weight": 1
+      },
+      {
+        "phase": 738,
+        "relation": "contains",
+        "source": "glm4:model",
+        "target": "glm4:phase:738:smoke"
+      },
+      {
+        "phase": 738,
+        "relation": "audits",
+        "source": "glm4:phase:738:smoke",
+        "target": "glm4:readout_competition:hidden_40"
+      },
+      {
+        "phase": 738,
+        "relation": "explains_competition_failure",
+        "source": "glm4:readout_audit:smoke:source_plus_all_mlp|L23H17<-all_pre_answer|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "target": "glm4:readout_competition:hidden_40",
+        "weight": -5.9375
+      },
+      {
+        "phase": 738,
+        "relation": "wins_candidate_competition",
+        "source": "glm4:competitor:recipient_answer",
+        "target": "glm4:readout_audit:smoke:source_plus_all_mlp|L23H17<-all_pre_answer|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "weight": 1
+      },
+      {
+        "phase": 738,
+        "relation": "explains_competition_failure",
+        "source": "glm4:readout_audit:smoke:source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "target": "glm4:readout_competition:hidden_40",
+        "weight": -6.0
+      },
+      {
+        "phase": 738,
+        "relation": "wins_candidate_competition",
+        "source": "glm4:competitor:recipient_answer",
+        "target": "glm4:readout_audit:smoke:source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "weight": 1
+      },
+      {
+        "phase": 738,
+        "relation": "contains",
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:phase:738:smoke"
+      },
+      {
+        "phase": 738,
+        "relation": "audits",
+        "source": "deepseek7b:phase:738:smoke",
+        "target": "deepseek7b:readout_competition:hidden_28"
+      },
+      {
+        "phase": 738,
+        "relation": "explains_competition_failure",
+        "source": "deepseek7b:readout_audit:smoke:mlp_only|no_source|L27:mlp[2872:2932] conflict<-explicit",
+        "target": "deepseek7b:readout_competition:hidden_28",
+        "weight": -7.8125
+      },
+      {
+        "phase": 738,
+        "relation": "wins_candidate_competition",
+        "source": "deepseek7b:competitor:recipient_answer",
+        "target": "deepseek7b:readout_audit:smoke:mlp_only|no_source|L27:mlp[2872:2932] conflict<-explicit",
+        "weight": 1
+      },
+      {
+        "phase": 738,
+        "relation": "explains_competition_failure",
+        "source": "deepseek7b:readout_audit:smoke:mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+        "target": "deepseek7b:readout_competition:hidden_28",
+        "weight": -7.875
+      },
+      {
+        "phase": 738,
+        "relation": "wins_candidate_competition",
+        "source": "deepseek7b:competitor:recipient_answer",
+        "target": "deepseek7b:readout_audit:smoke:mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+        "weight": 1
+      }
+    ],
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -34,
+          0,
+          -10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:phase:738:smoke",
+        "label": "Phase 738 smoke",
+        "model": "qwen3",
+        "position": [
+          -26,
+          2,
+          -10.0
+        ],
+        "role": "readout_margin_continuation_audit",
+        "type": "phase"
+      },
+      {
+        "id": "qwen3:readout_competition:hidden_36",
+        "label": "hidden_36",
+        "model": "qwen3",
+        "position": [
+          12,
+          0,
+          -10.0
+        ],
+        "role": "readout_competition",
+        "type": "readout"
+      },
+      {
+        "donor_top_rate": 0.0,
+        "id": "qwen3:readout_audit:smoke:source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
+        "label": "source_plus_all_mlp",
+        "margin_delta": -0.375,
+        "model": "qwen3",
+        "patched_margin": -19.25,
+        "role": "token0_competition",
+        "type": "readout_audit"
+      },
+      {
+        "id": "qwen3:competitor:recipient_answer",
+        "label": "recipient_answer",
+        "model": "qwen3",
+        "role": "readout_competitor",
+        "type": "token_competitor"
+      },
+      {
+        "donor_top_rate": 0.0,
+        "id": "qwen3:readout_audit:smoke:source_only|L35H0<-self_last|no_mlp explicit<-conflict",
+        "label": "source_only",
+        "margin_delta": -0.375,
+        "model": "qwen3",
+        "patched_margin": -19.25,
+        "role": "token0_competition",
+        "type": "readout_audit"
+      },
+      {
+        "id": "glm4:model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -34,
+          0,
+          0.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "glm4:phase:738:smoke",
+        "label": "Phase 738 smoke",
+        "model": "glm4",
+        "position": [
+          -26,
+          2,
+          0.0
+        ],
+        "role": "readout_margin_continuation_audit",
+        "type": "phase"
+      },
+      {
+        "id": "glm4:readout_competition:hidden_40",
+        "label": "hidden_40",
+        "model": "glm4",
+        "position": [
+          12,
+          0,
+          0.0
+        ],
+        "role": "readout_competition",
+        "type": "readout"
+      },
+      {
+        "donor_top_rate": 0.0,
+        "id": "glm4:readout_audit:smoke:source_plus_all_mlp|L23H17<-all_pre_answer|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "label": "source_plus_all_mlp",
+        "margin_delta": 0.375,
+        "model": "glm4",
+        "patched_margin": -5.9375,
+        "role": "token0_competition",
+        "type": "readout_audit"
+      },
+      {
+        "id": "glm4:competitor:recipient_answer",
+        "label": "recipient_answer",
+        "model": "glm4",
+        "role": "readout_competitor",
+        "type": "token_competitor"
+      },
+      {
+        "donor_top_rate": 0.0,
+        "id": "glm4:readout_audit:smoke:source_plus_all_mlp|L39H21<-self_last|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+        "label": "source_plus_all_mlp",
+        "margin_delta": 0.3125,
+        "model": "glm4",
+        "patched_margin": -6.0,
+        "role": "token0_competition",
+        "type": "readout_audit"
+      },
+      {
+        "id": "deepseek7b:model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -34,
+          0,
+          10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:phase:738:smoke",
+        "label": "Phase 738 smoke",
+        "model": "deepseek7b",
+        "position": [
+          -26,
+          2,
+          10.0
+        ],
+        "role": "readout_margin_continuation_audit",
+        "type": "phase"
+      },
+      {
+        "id": "deepseek7b:readout_competition:hidden_28",
+        "label": "hidden_28",
+        "model": "deepseek7b",
+        "position": [
+          12,
+          0,
+          10.0
+        ],
+        "role": "readout_competition",
+        "type": "readout"
+      },
+      {
+        "donor_top_rate": 0.0,
+        "id": "deepseek7b:readout_audit:smoke:mlp_only|no_source|L27:mlp[2872:2932] conflict<-explicit",
+        "label": "mlp_only",
+        "margin_delta": 0.0,
+        "model": "deepseek7b",
+        "patched_margin": -7.8125,
+        "role": "token0_competition",
+        "type": "readout_audit"
+      },
+      {
+        "id": "deepseek7b:competitor:recipient_answer",
+        "label": "recipient_answer",
+        "model": "deepseek7b",
+        "role": "readout_competitor",
+        "type": "token_competitor"
+      },
+      {
+        "donor_top_rate": 0.0,
+        "id": "deepseek7b:readout_audit:smoke:mlp_all|no_source|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
+        "label": "mlp_all",
+        "margin_delta": -0.0625,
+        "model": "deepseek7b",
+        "patched_margin": -7.875,
+        "role": "token0_competition",
+        "type": "readout_audit"
+      }
+    ]
+  },
+  "layout": {
+    "x": "patched intervention -> readout competitors -> continuation gate",
+    "y": "competition class",
+    "z": "model lane"
+  },
+  "metrics": {
+    "edge_count": 18,
+    "node_count": 18,
+    "source_phase": 738
+  },
+  "model_info": {
+    "evidence_type": "token0 readout competition plus forced donor-token continuation audit",
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 738,
+    "round": "smoke",
+    "timestamp": "2026-06-29 00:05:03"
+  },
+  "schema_version": "atlas_graph_v1",
+  "source_files": [
+    "results/glm5_phase738_readout_margin_continuation_audit/smoke/phase738_cross_model_summary.json"
+  ],
+  "title": "Phase 738 Readout Margin and Continuation Audit (smoke)"
+}

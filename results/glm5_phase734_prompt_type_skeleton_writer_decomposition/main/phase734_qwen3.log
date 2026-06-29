@@ -1,0 +1,132 @@
+[21:18:25] qwen3/main: pairs=8 target_site=hidden_36 layers=[26, 27, 34, 35]
+[21:18:25] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[21:18:25] [load] qwen3: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[21:18:25] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 250.04it/s]Loading weights:  21%|██        | 84/398 [00:00<00:00, 436.29it/s]Loading weights:  37%|███▋      | 146/398 [00:00<00:00, 504.93it/s]Loading weights:  51%|█████     | 203/398 [00:00<00:00, 528.26it/s]Loading weights:  69%|██████▉   | 274/398 [00:00<00:00, 590.38it/s]Loading weights:  84%|████████▍ | 335/398 [00:00<00:00, 589.30it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 559.02it/s]
+[21:18:26] [load] qwen3: loaded attn=sdpa, device=cuda:0, gpu=8.05GB
+[21:18:26] qwen3: attention head specs=32 over layers=[26, 27, 34, 35]
+[21:18:31] qwen3: attention writer scan 2/8 pairs; rows=64
+[21:18:35] qwen3: attention writer scan 4/8 pairs; rows=128
+[21:18:39] qwen3: attention writer scan 6/8 pairs; rows=192
+[21:18:43] qwen3: attention writer scan 8/8 pairs; rows=256
+[21:18:43] qwen3: mlp group specs=32 over layers=[26, 27, 34, 35], d_model=2560
+[21:18:47] qwen3: mlp writer scan 2/8 pairs; rows=64
+[21:18:51] qwen3: mlp writer scan 4/8 pairs; rows=128
+[21:18:55] qwen3: mlp writer scan 6/8 pairs; rows=192
+[21:19:00] qwen3: mlp writer scan 8/8 pairs; rows=256
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "target_site": "hidden_36",
+  "layers": [
+    26,
+    27,
+    34,
+    35
+  ],
+  "top_attention": [
+    {
+      "component_type": "attention_head",
+      "component_id": "L26H4",
+      "layer": 26,
+      "n": 8,
+      "mean_explicit_skeleton_loss": 6.8113009333610535,
+      "mean_commonsense_projection_delta": 0.46277066320180893,
+      "mean_explicit_logprob_delta": -0.0026991075137630105,
+      "mean_commonsense_logprob_delta": 0.04671938717365265,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 22.762556552886963,
+      "mean_baseline_skeleton_norm": 385.009708404541,
+      "role_guess": "writer_candidate",
+      "head": 4
+    },
+    {
+      "component_type": "attention_head",
+      "component_id": "L35H0",
+      "layer": 35,
+      "n": 8,
+      "mean_explicit_skeleton_loss": 5.6329552829265594,
+      "mean_commonsense_projection_delta": -7.481635972857475,
+      "mean_explicit_logprob_delta": -0.0008793954038992524,
+      "mean_commonsense_logprob_delta": -0.43632787466049194,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.75,
+      "mean_explicit_target_delta_norm": 56.04495716094971,
+      "mean_baseline_skeleton_norm": 385.009708404541,
+      "role_guess": "writer_candidate",
+      "head": 0
+    },
+    {
+      "component_type": "attention_head",
+      "component_id": "L27H18",
+      "layer": 27,
+      "n": 8,
+      "mean_explicit_skeleton_loss": 5.435755163431168,
+      "mean_commonsense_projection_delta": 1.3601541593670845,
+      "mean_explicit_logprob_delta": -0.0013064817758277059,
+      "mean_commonsense_logprob_delta": 0.01727338135242462,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.25,
+      "mean_explicit_target_delta_norm": 19.265464067459106,
+      "mean_baseline_skeleton_norm": 385.009708404541,
+      "role_guess": "writer_candidate",
+      "head": 18
+    }
+  ],
+  "top_mlp": [
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L35:mlp[320:640]",
+      "layer": 35,
+      "n": 8,
+      "mean_explicit_skeleton_loss": 7.439098745584488,
+      "mean_commonsense_projection_delta": 0.009310957044363022,
+      "mean_explicit_logprob_delta": 0.011161353628267534,
+      "mean_commonsense_logprob_delta": 0.26010267436504364,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": -0.375,
+      "mean_explicit_target_delta_norm": 92.5344467163086,
+      "mean_baseline_skeleton_norm": 385.009708404541,
+      "role_guess": "weak_or_mixed",
+      "start": 320,
+      "end": 640
+    },
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L27:mlp[0:320]",
+      "layer": 27,
+      "n": 8,
+      "mean_explicit_skeleton_loss": 5.80150581151247,
+      "mean_commonsense_projection_delta": -7.662095367908478,
+      "mean_explicit_logprob_delta": -0.0035190087219234556,
+      "mean_commonsense_logprob_delta": -0.2891588509082794,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.5,
+      "mean_explicit_target_delta_norm": 37.71868944168091,
+      "mean_baseline_skeleton_norm": 385.009708404541,
+      "role_guess": "writer_candidate",
+      "start": 0,
+      "end": 320
+    },
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L34:mlp[0:320]",
+      "layer": 34,
+      "n": 8,
+      "mean_explicit_skeleton_loss": 5.338054180145264,
+      "mean_commonsense_projection_delta": -13.925556600093842,
+      "mean_explicit_logprob_delta": -0.021655850170645863,
+      "mean_commonsense_logprob_delta": -0.11260667443275452,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.625,
+      "mean_explicit_target_delta_norm": 141.42837238311768,
+      "mean_baseline_skeleton_norm": 385.009708404541,
+      "role_guess": "writer_candidate",
+      "start": 0,
+      "end": 320
+    }
+  ]
+}

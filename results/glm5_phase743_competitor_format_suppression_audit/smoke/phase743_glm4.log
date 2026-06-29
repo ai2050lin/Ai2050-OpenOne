@@ -1,0 +1,43 @@
+[08:13:00] glm4/smoke: pairs=1 target=hidden_40 audits=1 combo_candidates=2
+[08:13:01] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:23, 18.96it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:02, 146.80it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:01, 217.29it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 249.96it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 271.55it/s]Loading weights:  35%|███▍      | 154/443 [00:00<00:01, 243.28it/s]Loading weights:  46%|████▌     | 203/443 [00:00<00:00, 308.19it/s]Loading weights:  53%|█████▎    | 235/443 [00:00<00:00, 304.02it/s]Loading weights:  61%|██████    | 269/443 [00:00<00:00, 310.61it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 310.67it/s]Loading weights:  75%|███████▌  | 334/443 [00:01<00:00, 308.40it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 311.08it/s]Loading weights:  91%|█████████ | 401/443 [00:01<00:00, 313.49it/s]Loading weights:  98%|█████████▊| 434/443 [00:01<00:00, 313.38it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 288.92it/s]
+[08:13:03] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[08:13:04] glm4: competitor suppression audit 1/1 pairs; rows=1
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "suppression_scale": 0.0,
+      "n": 1,
+      "donor_top1_rate": 1.0,
+      "mean_donor_rank": 1.0,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_margin_donor_vs_recipient": 4.25,
+      "mean_suppression_alpha_needed": 0.0,
+      "top_token_class_counts": {
+        "donor_answer": 1
+      },
+      "top_token_counts": {
+        " fruit": 1
+      },
+      "suppressed_token_class_counts": {
+        "donor_answer": 1
+      }
+    }
+  ],
+  "suppressed_class_summary": [
+    {
+      "suppressed_token_class": "donor_answer",
+      "n": 1,
+      "mean_margin_donor_vs_top": 0.0,
+      "mean_suppression_alpha_needed": 0.0,
+      "top_token_counts": {
+        " fruit": 1
+      }
+    }
+  ]
+}

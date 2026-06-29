@@ -1,0 +1,147 @@
+[07:07:51] glm4/smoke: pairs=1 target=hidden_40 audits=1
+[07:07:51] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   1%|          | 4/443 [00:00<00:13, 33.15it/s]Loading weights:   9%|▊         | 38/443 [00:00<00:02, 192.37it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 236.98it/s]Loading weights:  22%|██▏       | 96/443 [00:00<00:01, 237.11it/s]Loading weights:  31%|███       | 137/443 [00:00<00:01, 289.98it/s]Loading weights:  38%|███▊      | 170/443 [00:00<00:00, 297.45it/s]Loading weights:  46%|████▌     | 202/443 [00:00<00:00, 298.26it/s]Loading weights:  52%|█████▏    | 232/443 [00:00<00:00, 293.50it/s]Loading weights:  61%|██████    | 269/443 [00:00<00:00, 311.06it/s]Loading weights:  68%|██████▊   | 301/443 [00:01<00:00, 301.63it/s]Loading weights:  77%|███████▋  | 339/443 [00:01<00:00, 323.17it/s]Loading weights:  84%|████████▍ | 372/443 [00:01<00:00, 321.30it/s]Loading weights:  91%|█████████▏| 405/443 [00:01<00:00, 320.08it/s]Loading weights:  99%|█████████▉| 438/443 [00:01<00:00, 318.79it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 293.96it/s]
+[07:07:53] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[07:07:55] glm4: natural source backtrace 1/1 pairs; cases=1 components=12
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "target_site": "hidden_40",
+  "case_summary": [
+    {
+      "intervention_key": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075] conflict<-explicit",
+      "intervention_label": "source_plus_all_mlp|L23H17<-instruction|L38:mlp[2597:2665]+L38:mlp[3007:3075]",
+      "direction": "conflict<-explicit",
+      "intervention_mode": "source_plus_all_mlp",
+      "source_component_id": "L23H17",
+      "source_group": "instruction",
+      "mlp_components": [
+        "L38:mlp[2597:2665]",
+        "L38:mlp[3007:3075]"
+      ],
+      "n": 1,
+      "patched_top_counts": {
+        " tool": 1
+      },
+      "mean_threshold_used": 8.356746818156722,
+      "mean_alpha_star_vocab_top": 6.685397454525378,
+      "mean_patched_margin_donor_vs_vocab_top": -5.875,
+      "mean_donor_final_delta_proj": 24.50011444091797,
+      "mean_patched_final_delta_proj": 0.5023331046104431,
+      "mean_donor_final_fraction_of_threshold": 2.9317765601904457,
+      "mean_patched_final_fraction_of_threshold": 0.060111083360695206,
+      "mean_donor_final_input_delta_proj": 39.420284271240234,
+      "mean_patched_final_input_delta_proj": 0.6962888836860657,
+      "mean_source_contribution_delta_norm": 4.060324192047119,
+      "mean_mlp_delta_norm_total": 15.214855194091797
+    }
+  ],
+  "top_component_sources": [
+    {
+      "component_id": "L38:mlp_out",
+      "layer": 38,
+      "component": "mlp_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.5302402973175049,
+      "mean_donor_delta_proj": 11.603925704956055,
+      "mean_patched_fraction_of_threshold": 0.06345056382053488,
+      "mean_donor_fraction_of_threshold": 1.3885697338280227,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L34:attn_out",
+      "layer": 34,
+      "component": "attn_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.04623962938785553,
+      "mean_donor_delta_proj": 2.0360560417175293,
+      "mean_patched_fraction_of_threshold": 0.005533209321047107,
+      "mean_donor_fraction_of_threshold": 0.24364218349822275,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L39:mlp_out",
+      "layer": 39,
+      "component": "mlp_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.03925316780805588,
+      "mean_donor_delta_proj": 4.005228042602539,
+      "mean_patched_fraction_of_threshold": 0.004697182846651575,
+      "mean_donor_fraction_of_threshold": 0.47928076915054685,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L37:mlp_out",
+      "layer": 37,
+      "component": "mlp_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.027718644589185715,
+      "mean_donor_delta_proj": 0.3691495358943939,
+      "mean_patched_fraction_of_threshold": 0.003316918077374482,
+      "mean_donor_fraction_of_threshold": 0.04417383270393473,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L38:attn_out",
+      "layer": 38,
+      "component": "attn_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.020756784826517105,
+      "mean_donor_delta_proj": 0.6043809652328491,
+      "mean_patched_fraction_of_threshold": 0.0024838355496685375,
+      "mean_donor_fraction_of_threshold": 0.07232251716896691,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L36:attn_out",
+      "layer": 36,
+      "component": "attn_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.008131264708936214,
+      "mean_donor_delta_proj": 0.7095634937286377,
+      "mean_patched_fraction_of_threshold": 0.000973017956134485,
+      "mean_donor_fraction_of_threshold": 0.08490905721673506,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L35:mlp_out",
+      "layer": 35,
+      "component": "mlp_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.006003676448017359,
+      "mean_donor_delta_proj": -0.7788477540016174,
+      "mean_patched_fraction_of_threshold": 0.0007184226803393347,
+      "mean_donor_fraction_of_threshold": -0.09319987441876464,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 0.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    },
+    {
+      "component_id": "L37:attn_out",
+      "layer": 37,
+      "component": "attn_out",
+      "n": 1,
+      "mean_patched_delta_proj": 0.0038067996501922607,
+      "mean_donor_delta_proj": 0.26639658212661743,
+      "mean_patched_fraction_of_threshold": 0.0004555360755840082,
+      "mean_donor_fraction_of_threshold": 0.03187802477727541,
+      "patched_positive_rate": 1.0,
+      "donor_positive_rate": 1.0,
+      "role_guess": "patched_threshold_alignment_candidate"
+    }
+  ]
+}

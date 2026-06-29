@@ -1,0 +1,789 @@
+{
+  "by_model": {
+    "deepseek7b": {
+      "attn_implementation": "sdpa",
+      "candidate_sites": [
+        "L22_layer_input",
+        "L27_layer_input",
+        "L21_attn_out",
+        "L27_attn_out",
+        "L25_mlp_out",
+        "L27_mlp_out",
+        "hidden_24",
+        "hidden_28",
+        "hidden_27"
+      ],
+      "dtype": "bfloat16",
+      "formation_summary": {
+        "attn_out": {
+          "earliest_35pct_effect_norm": 52.259037017822266,
+          "earliest_35pct_layer": 21,
+          "earliest_35pct_site": "L21_attn_out",
+          "max_effect_norm": 148.03697204589844,
+          "max_layer": 27,
+          "max_site": "L27_attn_out"
+        },
+        "layer_input": {
+          "earliest_35pct_effect_norm": 199.77320861816406,
+          "earliest_35pct_layer": 22,
+          "earliest_35pct_site": "L22_layer_input",
+          "max_effect_norm": 527.1318969726562,
+          "max_layer": 27,
+          "max_site": "L27_layer_input"
+        },
+        "layer_out": {
+          "earliest_35pct_effect_norm": 295.297607421875,
+          "earliest_35pct_layer": 23,
+          "earliest_35pct_site": "hidden_24",
+          "max_effect_norm": 765.95458984375,
+          "max_layer": 27,
+          "max_site": "hidden_28"
+        },
+        "mlp_out": {
+          "earliest_35pct_effect_norm": 175.8887176513672,
+          "earliest_35pct_layer": 25,
+          "earliest_35pct_site": "L25_mlp_out",
+          "max_effect_norm": 474.7440185546875,
+          "max_layer": 27,
+          "max_site": "L27_mlp_out"
+        }
+      },
+      "model": "deepseek7b",
+      "n_scan_rows": 336,
+      "n_transfer_rows": 324,
+      "phase": 733,
+      "quantization": "off",
+      "round": "confirm",
+      "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+      "timestamp": "2026-06-28 20:35:50",
+      "title": "Prompt-Type Skeleton Source Localization",
+      "transfer_summary": {
+        "commonsense<-explicit|L21_attn_out": {
+          "changed_rate": 0.4444444444444444,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.05555555555555555,
+          "layer": 21,
+          "mean_patched_delta_vs_recipient": -1.1561481952667236,
+          "n": 18,
+          "patched_hit_rate": 0.2222222222222222,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L22_layer_input": {
+          "changed_rate": 0.7222222222222222,
+          "hit_gain": 0.0,
+          "hit_loss": 0.1111111111111111,
+          "layer": 22,
+          "mean_patched_delta_vs_recipient": -1.1773967411783006,
+          "n": 18,
+          "patched_hit_rate": 0.1111111111111111,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L25_mlp_out": {
+          "changed_rate": 0.3888888888888889,
+          "hit_gain": 0.0,
+          "hit_loss": 0.1111111111111111,
+          "layer": 25,
+          "mean_patched_delta_vs_recipient": 1.7825897004869249,
+          "n": 18,
+          "patched_hit_rate": 0.1111111111111111,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "mlp_out"
+        },
+        "commonsense<-explicit|L27_attn_out": {
+          "changed_rate": 0.4444444444444444,
+          "hit_gain": 0.16666666666666666,
+          "hit_loss": 0.0,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": 1.1911660432815552,
+          "n": 18,
+          "patched_hit_rate": 0.3888888888888889,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L27_layer_input": {
+          "changed_rate": 0.7777777777777778,
+          "hit_gain": 0.3888888888888889,
+          "hit_loss": 0.16666666666666666,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": 4.921156730916765,
+          "n": 18,
+          "patched_hit_rate": 0.4444444444444444,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L27_mlp_out": {
+          "changed_rate": 0.3888888888888889,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": 1.377232939004898,
+          "n": 18,
+          "patched_hit_rate": 0.2222222222222222,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "mlp_out"
+        },
+        "commonsense<-explicit|hidden_24": {
+          "changed_rate": 0.7777777777777778,
+          "hit_gain": 0.0,
+          "hit_loss": 0.2222222222222222,
+          "layer": 23,
+          "mean_patched_delta_vs_recipient": 1.9485140641530354,
+          "n": 18,
+          "patched_hit_rate": 0.0,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "layer_out"
+        },
+        "commonsense<-explicit|hidden_27": {
+          "changed_rate": 0.7777777777777778,
+          "hit_gain": 0.3888888888888889,
+          "hit_loss": 0.16666666666666666,
+          "layer": 26,
+          "mean_patched_delta_vs_recipient": 4.921156730916765,
+          "n": 18,
+          "patched_hit_rate": 0.4444444444444444,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "layer_out"
+        },
+        "commonsense<-explicit|hidden_28": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.6111111111111112,
+          "hit_loss": 0.1111111111111111,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": 5.898266288969252,
+          "n": 18,
+          "patched_hit_rate": 0.7222222222222222,
+          "recipient_hit_rate": 0.2222222222222222,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|L21_attn_out": {
+          "changed_rate": 0.2222222222222222,
+          "hit_gain": 0.16666666666666666,
+          "hit_loss": 0.0,
+          "layer": 21,
+          "mean_patched_delta_vs_recipient": 0.4732965677976608,
+          "n": 18,
+          "patched_hit_rate": 0.8888888888888888,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L22_layer_input": {
+          "changed_rate": 0.9444444444444444,
+          "hit_gain": 0.0,
+          "hit_loss": 0.6111111111111112,
+          "layer": 22,
+          "mean_patched_delta_vs_recipient": -4.456857471002473,
+          "n": 18,
+          "patched_hit_rate": 0.1111111111111111,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L25_mlp_out": {
+          "changed_rate": 0.3888888888888889,
+          "hit_gain": 0.1111111111111111,
+          "hit_loss": 0.2777777777777778,
+          "layer": 25,
+          "mean_patched_delta_vs_recipient": -0.270711201760504,
+          "n": 18,
+          "patched_hit_rate": 0.5555555555555556,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "mlp_out"
+        },
+        "explicit<-commonsense|L27_attn_out": {
+          "changed_rate": 0.5555555555555556,
+          "hit_gain": 0.0,
+          "hit_loss": 0.3333333333333333,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -1.0548007173670664,
+          "n": 18,
+          "patched_hit_rate": 0.3888888888888889,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L27_layer_input": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.1111111111111111,
+          "hit_loss": 0.6111111111111112,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -5.5637572093142404,
+          "n": 18,
+          "patched_hit_rate": 0.2222222222222222,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L27_mlp_out": {
+          "changed_rate": 0.4444444444444444,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.2222222222222222,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -1.5968404155638483,
+          "n": 18,
+          "patched_hit_rate": 0.5555555555555556,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "mlp_out"
+        },
+        "explicit<-commonsense|hidden_24": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.1111111111111111,
+          "hit_loss": 0.6111111111111112,
+          "layer": 23,
+          "mean_patched_delta_vs_recipient": -4.595733008450932,
+          "n": 18,
+          "patched_hit_rate": 0.2222222222222222,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|hidden_27": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.1111111111111111,
+          "hit_loss": 0.6111111111111112,
+          "layer": 26,
+          "mean_patched_delta_vs_recipient": -5.5637572093142404,
+          "n": 18,
+          "patched_hit_rate": 0.2222222222222222,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|hidden_28": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.1111111111111111,
+          "hit_loss": 0.6111111111111112,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -5.900350161724621,
+          "n": 18,
+          "patched_hit_rate": 0.2222222222222222,
+          "recipient_hit_rate": 0.7222222222222222,
+          "site_kind": "layer_out"
+        }
+      }
+    },
+    "glm4": {
+      "attn_implementation": "sdpa",
+      "candidate_sites": [
+        "L31_layer_input",
+        "L39_layer_input",
+        "L23_attn_out",
+        "L35_attn_out",
+        "L38_mlp_out",
+        "L39_mlp_out",
+        "hidden_39",
+        "hidden_40"
+      ],
+      "dtype": "bfloat16",
+      "formation_summary": {
+        "attn_out": {
+          "earliest_35pct_effect_norm": 5.785955429077148,
+          "earliest_35pct_layer": 23,
+          "earliest_35pct_site": "L23_attn_out",
+          "max_effect_norm": 11.560429573059082,
+          "max_layer": 35,
+          "max_site": "L35_attn_out"
+        },
+        "layer_input": {
+          "earliest_35pct_effect_norm": 44.54254150390625,
+          "earliest_35pct_layer": 31,
+          "earliest_35pct_site": "L31_layer_input",
+          "max_effect_norm": 125.97782897949219,
+          "max_layer": 39,
+          "max_site": "L39_layer_input"
+        },
+        "layer_out": {
+          "earliest_35pct_effect_norm": 125.97782897949219,
+          "earliest_35pct_layer": 38,
+          "earliest_35pct_site": "hidden_39",
+          "max_effect_norm": 228.9594268798828,
+          "max_layer": 39,
+          "max_site": "hidden_40"
+        },
+        "mlp_out": {
+          "earliest_35pct_effect_norm": 75.31871795654297,
+          "earliest_35pct_layer": 38,
+          "earliest_35pct_site": "L38_mlp_out",
+          "max_effect_norm": 156.7176055908203,
+          "max_layer": 39,
+          "max_site": "L39_mlp_out"
+        }
+      },
+      "model": "glm4",
+      "n_scan_rows": 480,
+      "n_transfer_rows": 288,
+      "phase": 733,
+      "quantization": "off",
+      "round": "confirm",
+      "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+      "timestamp": "2026-06-28 20:34:30",
+      "title": "Prompt-Type Skeleton Source Localization",
+      "transfer_summary": {
+        "commonsense<-explicit|L23_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 23,
+          "mean_patched_delta_vs_recipient": 0.048212157355414495,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L31_layer_input": {
+          "changed_rate": 0.2777777777777778,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.1111111111111111,
+          "layer": 31,
+          "mean_patched_delta_vs_recipient": 2.004255568401681,
+          "n": 18,
+          "patched_hit_rate": 0.8888888888888888,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L35_attn_out": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.0,
+          "hit_loss": 0.05555555555555555,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": 0.25039621194203693,
+          "n": 18,
+          "patched_hit_rate": 0.8888888888888888,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L38_mlp_out": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 38,
+          "mean_patched_delta_vs_recipient": 1.5612494382593367,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "mlp_out"
+        },
+        "commonsense<-explicit|L39_layer_input": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": 2.3350928721742497,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L39_mlp_out": {
+          "changed_rate": 0.1111111111111111,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": 1.0935570398966472,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "mlp_out"
+        },
+        "commonsense<-explicit|hidden_39": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 38,
+          "mean_patched_delta_vs_recipient": 2.3350928721742497,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_out"
+        },
+        "commonsense<-explicit|hidden_40": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": 2.340902671114438,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|L23_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 23,
+          "mean_patched_delta_vs_recipient": -0.10921598991586103,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L31_layer_input": {
+          "changed_rate": 0.2777777777777778,
+          "hit_gain": 0.0,
+          "hit_loss": 0.16666666666666666,
+          "layer": 31,
+          "mean_patched_delta_vs_recipient": -2.4792529272122517,
+          "n": 18,
+          "patched_hit_rate": 0.8333333333333334,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L35_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": -0.03707337545024024,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L38_mlp_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 38,
+          "mean_patched_delta_vs_recipient": -0.4488184950831864,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "mlp_out"
+        },
+        "explicit<-commonsense|L39_layer_input": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.0,
+          "hit_loss": 0.05555555555555555,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": -2.344290593639016,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L39_mlp_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": -0.3523401663535171,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "mlp_out"
+        },
+        "explicit<-commonsense|hidden_39": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.0,
+          "hit_loss": 0.05555555555555555,
+          "layer": 38,
+          "mean_patched_delta_vs_recipient": -2.344290593639016,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|hidden_40": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.0,
+          "hit_loss": 0.05555555555555555,
+          "layer": 39,
+          "mean_patched_delta_vs_recipient": -2.3370985912366047,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_out"
+        }
+      }
+    },
+    "qwen3": {
+      "attn_implementation": "sdpa",
+      "candidate_sites": [
+        "L28_layer_input",
+        "L35_layer_input",
+        "L26_attn_out",
+        "L34_attn_out",
+        "L28_mlp_out",
+        "L35_mlp_out",
+        "hidden_28",
+        "hidden_36",
+        "hidden_35",
+        "hidden_33"
+      ],
+      "dtype": "bfloat16",
+      "formation_summary": {
+        "attn_out": {
+          "earliest_35pct_effect_norm": 32.38372039794922,
+          "earliest_35pct_layer": 26,
+          "earliest_35pct_site": "L26_attn_out",
+          "max_effect_norm": 82.98188018798828,
+          "max_layer": 34,
+          "max_site": "L34_attn_out"
+        },
+        "layer_input": {
+          "earliest_35pct_effect_norm": 100.42964935302734,
+          "earliest_35pct_layer": 28,
+          "earliest_35pct_site": "L28_layer_input",
+          "max_effect_norm": 264.2308349609375,
+          "max_layer": 35,
+          "max_site": "L35_layer_input"
+        },
+        "layer_out": {
+          "earliest_35pct_effect_norm": 100.42964935302734,
+          "earliest_35pct_layer": 27,
+          "earliest_35pct_site": "hidden_28",
+          "max_effect_norm": 283.3746337890625,
+          "max_layer": 35,
+          "max_site": "hidden_36"
+        },
+        "mlp_out": {
+          "earliest_35pct_effect_norm": 38.163543701171875,
+          "earliest_35pct_layer": 28,
+          "earliest_35pct_site": "L28_mlp_out",
+          "max_effect_norm": 108.43995666503906,
+          "max_layer": 35,
+          "max_site": "L35_mlp_out"
+        }
+      },
+      "model": "qwen3",
+      "n_scan_rows": 432,
+      "n_transfer_rows": 360,
+      "phase": 733,
+      "quantization": "off",
+      "round": "confirm",
+      "strict_interpretation": "source localization v0; early effect formation is descriptive and site replacement remains causal but distribution-shifting",
+      "timestamp": "2026-06-28 20:33:18",
+      "title": "Prompt-Type Skeleton Source Localization",
+      "transfer_summary": {
+        "commonsense<-explicit|L26_attn_out": {
+          "changed_rate": 0.16666666666666666,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.05555555555555555,
+          "layer": 26,
+          "mean_patched_delta_vs_recipient": 0.8464042113886939,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L28_layer_input": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.0,
+          "hit_loss": 0.8333333333333334,
+          "layer": 28,
+          "mean_patched_delta_vs_recipient": -0.6372990268799994,
+          "n": 18,
+          "patched_hit_rate": 0.1111111111111111,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L28_mlp_out": {
+          "changed_rate": 0.1111111111111111,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.05555555555555555,
+          "layer": 28,
+          "mean_patched_delta_vs_recipient": 0.8801345924536387,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "mlp_out"
+        },
+        "commonsense<-explicit|L34_attn_out": {
+          "changed_rate": 0.1111111111111111,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 34,
+          "mean_patched_delta_vs_recipient": 0.9175623291068606,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "attn_out"
+        },
+        "commonsense<-explicit|L35_layer_input": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": 3.1087985031772405,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_input"
+        },
+        "commonsense<-explicit|L35_mlp_out": {
+          "changed_rate": 0.2777777777777778,
+          "hit_gain": 0.0,
+          "hit_loss": 0.16666666666666666,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": 1.488011646601889,
+          "n": 18,
+          "patched_hit_rate": 0.7777777777777778,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "mlp_out"
+        },
+        "commonsense<-explicit|hidden_28": {
+          "changed_rate": 0.8888888888888888,
+          "hit_gain": 0.0,
+          "hit_loss": 0.8333333333333334,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -0.6372990268799994,
+          "n": 18,
+          "patched_hit_rate": 0.1111111111111111,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_out"
+        },
+        "commonsense<-explicit|hidden_33": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 32,
+          "mean_patched_delta_vs_recipient": 3.0141002502706318,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_out"
+        },
+        "commonsense<-explicit|hidden_35": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 34,
+          "mean_patched_delta_vs_recipient": 3.1087985031772405,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_out"
+        },
+        "commonsense<-explicit|hidden_36": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.05555555555555555,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": 3.111650022872103,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 0.9444444444444444,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|L26_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 26,
+          "mean_patched_delta_vs_recipient": 0.00538641734359165,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L28_layer_input": {
+          "changed_rate": 0.1111111111111111,
+          "hit_gain": 0.0,
+          "hit_loss": 0.1111111111111111,
+          "layer": 28,
+          "mean_patched_delta_vs_recipient": -1.7312630754895508,
+          "n": 18,
+          "patched_hit_rate": 0.8888888888888888,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L28_mlp_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 28,
+          "mean_patched_delta_vs_recipient": -0.04076759325754312,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "mlp_out"
+        },
+        "explicit<-commonsense|L34_attn_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 34,
+          "mean_patched_delta_vs_recipient": -0.0376942732060949,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "attn_out"
+        },
+        "explicit<-commonsense|L35_layer_input": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": -3.565422910006924,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_input"
+        },
+        "explicit<-commonsense|L35_mlp_out": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": -0.06694451083118717,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "mlp_out"
+        },
+        "explicit<-commonsense|hidden_28": {
+          "changed_rate": 0.1111111111111111,
+          "hit_gain": 0.0,
+          "hit_loss": 0.1111111111111111,
+          "layer": 27,
+          "mean_patched_delta_vs_recipient": -1.7312630754895508,
+          "n": 18,
+          "patched_hit_rate": 0.8888888888888888,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|hidden_33": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.0,
+          "hit_loss": 0.05555555555555555,
+          "layer": 32,
+          "mean_patched_delta_vs_recipient": -3.080254201311618,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|hidden_35": {
+          "changed_rate": 0.0,
+          "hit_gain": 0.0,
+          "hit_loss": 0.0,
+          "layer": 34,
+          "mean_patched_delta_vs_recipient": -3.565422910006924,
+          "n": 18,
+          "patched_hit_rate": 1.0,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_out"
+        },
+        "explicit<-commonsense|hidden_36": {
+          "changed_rate": 0.05555555555555555,
+          "hit_gain": 0.0,
+          "hit_loss": 0.05555555555555555,
+          "layer": 35,
+          "mean_patched_delta_vs_recipient": -3.0935831575447486,
+          "n": 18,
+          "patched_hit_rate": 0.9444444444444444,
+          "recipient_hit_rate": 1.0,
+          "site_kind": "layer_out"
+        }
+      }
+    }
+  },
+  "evidence_type": "formation scan + early/mid/late site replacement",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 733,
+  "round": "confirm",
+  "status": "complete",
+  "timestamp": "2026-06-28 20:35:52",
+  "title": "Prompt-Type Skeleton Source Localization"
+}

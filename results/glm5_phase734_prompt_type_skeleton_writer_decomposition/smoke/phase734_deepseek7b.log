@@ -1,0 +1,127 @@
+[21:17:45] deepseek7b/smoke: pairs=2 target_site=hidden_28 layers=[21, 23, 27]
+[21:17:45] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[21:17:46] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[21:17:46] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<00:34,  9.90it/s]Loading weights:   1%|          | 4/339 [00:00<00:16, 20.62it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 115.16it/s]Loading weights:  17%|█▋        | 58/339 [00:00<00:01, 174.80it/s]Loading weights:  29%|██▉       | 100/339 [00:00<00:00, 250.92it/s]Loading weights:  37%|███▋      | 126/339 [00:00<00:00, 248.07it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 271.60it/s]Loading weights:  56%|█████▌    | 190/339 [00:00<00:00, 276.84it/s]Loading weights:  65%|██████▍   | 220/339 [00:00<00:00, 274.32it/s]Loading weights:  73%|███████▎  | 248/339 [00:01<00:00, 267.35it/s]Loading weights:  83%|████████▎ | 280/339 [00:01<00:00, 276.56it/s]Loading weights:  91%|█████████ | 308/339 [00:01<00:00, 261.98it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 242.54it/s]
+[21:17:47] [load] deepseek7b: loaded attn=sdpa, device=cuda:0, gpu=15.23GB
+[21:17:47] deepseek7b: attention head specs=12 over layers=[21, 23, 27]
+[21:17:48] deepseek7b: attention writer scan 1/2 pairs; rows=12
+[21:17:49] deepseek7b: attention writer scan 2/2 pairs; rows=24
+[21:17:49] deepseek7b: mlp group specs=12 over layers=[21, 23, 27], d_model=3584
+[21:17:50] deepseek7b: mlp writer scan 1/2 pairs; rows=12
+[21:17:51] deepseek7b: mlp writer scan 2/2 pairs; rows=24
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "target_site": "hidden_28",
+  "layers": [
+    21,
+    23,
+    27
+  ],
+  "top_attention": [
+    {
+      "component_type": "attention_head",
+      "component_id": "L21H0",
+      "layer": 21,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 8.081979036331177,
+      "mean_commonsense_projection_delta": 0.041426897048950195,
+      "mean_explicit_logprob_delta": 0.044100165367126465,
+      "mean_commonsense_logprob_delta": -0.04820454120635986,
+      "mean_explicit_rank_delta": -0.5,
+      "mean_commonsense_rank_delta": 4.5,
+      "mean_explicit_target_delta_norm": 46.51280975341797,
+      "mean_baseline_skeleton_norm": 903.2174682617188,
+      "role_guess": "weak_or_mixed",
+      "head": 0
+    },
+    {
+      "component_type": "attention_head",
+      "component_id": "L21H18",
+      "layer": 21,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 3.7877984046936035,
+      "mean_commonsense_projection_delta": -7.678668737411499,
+      "mean_explicit_logprob_delta": 0.20135483145713806,
+      "mean_commonsense_logprob_delta": -0.037030935287475586,
+      "mean_explicit_rank_delta": -0.5,
+      "mean_commonsense_rank_delta": 2.5,
+      "mean_explicit_target_delta_norm": 46.02523612976074,
+      "mean_baseline_skeleton_norm": 903.2174682617188,
+      "role_guess": "weak_or_mixed",
+      "head": 18
+    },
+    {
+      "component_type": "attention_head",
+      "component_id": "L23H18",
+      "layer": 23,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 2.2156050205230713,
+      "mean_commonsense_projection_delta": 2.3627659678459167,
+      "mean_explicit_logprob_delta": -0.07922086119651794,
+      "mean_commonsense_logprob_delta": 0.03196156024932861,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 0.0,
+      "mean_explicit_target_delta_norm": 39.003435134887695,
+      "mean_baseline_skeleton_norm": 903.2174682617188,
+      "role_guess": "writer_candidate",
+      "head": 18
+    }
+  ],
+  "top_mlp": [
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L27:mlp[2688:3584]",
+      "layer": 27,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 85.37209510803223,
+      "mean_commonsense_projection_delta": 21.405940055847168,
+      "mean_explicit_logprob_delta": -1.2175640165805817,
+      "mean_commonsense_logprob_delta": 0.5203534364700317,
+      "mean_explicit_rank_delta": 1.0,
+      "mean_commonsense_rank_delta": 184.0,
+      "mean_explicit_target_delta_norm": 442.5710754394531,
+      "mean_baseline_skeleton_norm": 903.2174682617188,
+      "role_guess": "writer_candidate",
+      "start": 2688,
+      "end": 3584
+    },
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L23:mlp[896:1792]",
+      "layer": 23,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 31.5233097076416,
+      "mean_commonsense_projection_delta": 46.13643264770508,
+      "mean_explicit_logprob_delta": -0.09824511408805847,
+      "mean_commonsense_logprob_delta": -0.10053181648254395,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 9.0,
+      "mean_explicit_target_delta_norm": 148.18737030029297,
+      "mean_baseline_skeleton_norm": 903.2174682617188,
+      "role_guess": "writer_candidate",
+      "start": 896,
+      "end": 1792
+    },
+    {
+      "component_type": "mlp_output_group",
+      "component_id": "L21:mlp[896:1792]",
+      "layer": 21,
+      "n": 2,
+      "mean_explicit_skeleton_loss": 24.471662521362305,
+      "mean_commonsense_projection_delta": 19.222379684448242,
+      "mean_explicit_logprob_delta": 0.04239335656166077,
+      "mean_commonsense_logprob_delta": -0.3012653589248657,
+      "mean_explicit_rank_delta": 0.0,
+      "mean_commonsense_rank_delta": 25.5,
+      "mean_explicit_target_delta_norm": 137.29108810424805,
+      "mean_baseline_skeleton_norm": 903.2174682617188,
+      "role_guess": "weak_or_mixed",
+      "start": 896,
+      "end": 1792
+    }
+  ]
+}

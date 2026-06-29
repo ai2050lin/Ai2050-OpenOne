@@ -1,0 +1,155 @@
+{
+  "attn_implementation": "eager",
+  "audited_interventions": [
+    {
+      "direction": "explicit<-conflict",
+      "label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]"
+    },
+    {
+      "direction": "explicit<-conflict",
+      "label": "mlp_only|no_source|L28:mlp[299:341]"
+    }
+  ],
+  "condition_summary": [
+    {
+      "condition": "joint_add_topK",
+      "donor_top1_rate": 0.0,
+      "mean_donor_rank": 13.083333333333334,
+      "mean_margin_donor_vs_recipient": -7.119791666666667,
+      "mean_margin_donor_vs_top": -7.119791666666667,
+      "mean_suppression_alpha_needed": 5.188836392507187,
+      "n": 12,
+      "suppressed_token_class_counts": {
+        "recipient_answer": 12
+      },
+      "suppression_scale": 0.0,
+      "top_token_class_counts": {
+        "recipient_answer": 12
+      },
+      "top_token_counts": {
+        " fruit": 2,
+        " none": 2,
+        " object": 2,
+        " orange": 2,
+        " sweet": 2,
+        " yellow": 2
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "donor_top1_rate": 0.16666666666666666,
+      "mean_donor_rank": 2.4166666666666665,
+      "mean_margin_donor_vs_recipient": -0.020833333333333332,
+      "mean_margin_donor_vs_top": -1.5104166666666667,
+      "mean_suppression_alpha_needed": 5.188836392507187,
+      "n": 12,
+      "suppressed_token_class_counts": {
+        "recipient_answer": 12
+      },
+      "suppression_scale": 1.0,
+      "top_token_class_counts": {
+        "donor_answer": 1,
+        "format_or_schema": 8,
+        "recipient_answer": 3
+      },
+      "top_token_counts": {
+        " Answer": 2,
+        " The": 6,
+        " blue": 1,
+        " orange": 2,
+        " yellow": 1
+      }
+    },
+    {
+      "condition": "suppress_current_top",
+      "donor_top1_rate": 0.3333333333333333,
+      "mean_donor_rank": 2.0,
+      "mean_margin_donor_vs_recipient": 1.78125,
+      "mean_margin_donor_vs_top": -0.8958333333333334,
+      "mean_suppression_alpha_needed": 5.188836392507187,
+      "n": 12,
+      "suppressed_token_class_counts": {
+        "recipient_answer": 12
+      },
+      "suppression_scale": 1.25,
+      "top_token_class_counts": {
+        "donor_answer": 4,
+        "format_or_schema": 8
+      },
+      "top_token_counts": {
+        " Answer": 2,
+        " The": 6,
+        " blue": 2,
+        " purple": 2
+      }
+    }
+  ],
+  "dtype": "bfloat16",
+  "max_pairs": 6,
+  "model": "qwen3",
+  "n_rows": 36,
+  "phase": 743,
+  "phase739_round": "confirm",
+  "phase741_round": "confirm",
+  "quantization": "off",
+  "ranked_candidate_components": [
+    {
+      "component": "attn_out",
+      "component_id": "L34:attn_out",
+      "layer": 34,
+      "phase740_mean_donor_fraction": 0.8263902646461071,
+      "phase740_mean_patched_fraction": 0.00851355684347636,
+      "phase741_joint_add_effect": 0.16391496652247423,
+      "phase741_joint_add_fraction": 0.16744744972534686,
+      "phase741_target_top1_rate": 0.0
+    },
+    {
+      "component": "attn_out",
+      "component_id": "L31:attn_out",
+      "layer": 31,
+      "phase740_mean_donor_fraction": 0.49538392343140314,
+      "phase740_mean_patched_fraction": 0.005903768658792036,
+      "phase741_joint_add_effect": 0.12432384558261171,
+      "phase741_joint_add_fraction": 0.12785632623795423,
+      "phase741_target_top1_rate": 0.0
+    },
+    {
+      "component": "mlp_out",
+      "component_id": "L33:mlp_out",
+      "layer": 33,
+      "phase740_mean_donor_fraction": 0.09864564824520697,
+      "phase740_mean_patched_fraction": 0.004938753742349763,
+      "phase741_joint_add_effect": 0.019193179858724842,
+      "phase741_joint_add_fraction": 0.022725664826035406,
+      "phase741_target_top1_rate": 0.0
+    }
+  ],
+  "round": "main",
+  "strict_interpretation": "Final-norm suppression of the current top competitor is a readout-geometry intervention. It tests whether failure is local token competition, not whether the model naturally performs that suppression.",
+  "suppress_scales": [
+    1.0,
+    1.25
+  ],
+  "suppressed_class_summary": [
+    {
+      "mean_margin_donor_vs_top": -7.119791666666667,
+      "mean_suppression_alpha_needed": 5.188836392507187,
+      "n": 12,
+      "suppressed_token_class": "recipient_answer",
+      "top_token_counts": {
+        " fruit": 2,
+        " none": 2,
+        " object": 2,
+        " orange": 2,
+        " sweet": 2,
+        " yellow": 2
+      }
+    }
+  ],
+  "target_site": "hidden_36",
+  "timestamp": "2026-06-29 08:13:35",
+  "title": "Competitor and Format Suppression Audit",
+  "top_audits": 2,
+  "top_candidates": 3,
+  "top_k_vocab": 12
+}
