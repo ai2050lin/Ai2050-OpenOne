@@ -75868,3 +75868,1374 @@ $$
 ```text
 blocker-field suppressor 的内部因果定位。
 ```
+
+## Phase 799: blocker-field causal suppressor localization（阻塞者场因果抑制器候选定位） [2026-06-30 13:03]
+
+### 一、任务来源
+
+本阶段读取并分析了 Phase 798 的外部判断。该判断基本正确：
+
+```text
+Phase 798 不是闭合阶段；
+它把 top-k blocker audit（前若干阻塞者审计）推进到 full-vocabulary blocker field audit（全词表阻塞者场审计）；
+下一步应该从“有多少 blocker”转向“哪些内部路径能压低 blocker field”。
+```
+
+因此，本阶段继续同一个阶段性目标：从全词表竞争场观测，推进到 blocker-field suppressor（阻塞者场抑制器）候选定位。
+
+### 二、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase799_blocker_field_causal_suppressor_localization.py
+tests/glm5/run_phase799_blocker_field_causal_suppressor_localization_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase799_blocker_field_causal_suppressor_localization/
+```
+
+三轮测试：
+
+```text
+smoke（冒烟测试）
+main（主测试）
+confirm（确认测试）
+```
+
+三模型顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载策略：
+
+```text
+bf16（半精度）
+quantization=off（不使用量化）
+flash_attention_2 优先，环境缺失后自动回退 sdpa
+```
+
+### 三、测试原理
+
+Phase 798 已经证明：recipient（受体样本）的 correct target（正确目标词元）上方存在大量 blocker（阻塞词元）。
+
+本阶段不再只看 blocker 数量，而是对候选 causal fiber（因果纤维）进行评分：
+
+```text
+一个候选内部路径是否同时：
+1. 提升 correct target；
+2. 压低 recipient baseline blocker field；
+3. 减少旧 blocker；
+4. 不制造大量新 blocker；
+5. 改善 identity anchor gap（身份锚间隔）。
+```
+
+定义 recipient baseline blocker field（受体基线阻塞者场）：
+
+$$
+B_{\text{rec}}(x)
+=
+\{v \ne y^+ \mid z^{\text{rec}}_v(x) > z^{\text{rec}}_{y^+}(x)\}
+$$
+
+其中：
+
+```text
+y+ 表示 correct target token（正确目标词元）
+z 表示 logit（对数几率）
+v 表示词表中的候选词元
+```
+
+目标提升：
+
+$$
+\Delta z_{\text{target}}
+=
+z^{\text{after}}_{y^+}
+-
+z^{\text{rec}}_{y^+}
+$$
+
+旧 blocker 平均抑制：
+
+$$
+S_{\text{blocker}}
+=
+\frac{1}{|B_{\text{rec}}|}
+\sum_{v\in B_{\text{rec}}}
+\left(
+z^{\text{rec}}_v
+-
+z^{\text{after}}_v
+\right)
+$$
+
+目标相对旧 blocker 的整体抬升：
+
+$$
+S_{\text{lift}}
+=
+\frac{1}{|B_{\text{rec}}|}
+\sum_{v\in B_{\text{rec}}}
+\left[
+\left(z^{\text{after}}_{y^+}-z^{\text{after}}_v\right)
+-
+\left(z^{\text{rec}}_{y^+}-z^{\text{rec}}_v\right)
+\right]
+$$
+
+新增 blocker 比例：
+
+$$
+R_{\text{new}}
+=
+\frac{|B_{\text{after}}\setminus B_{\text{rec}}|}
+{\max(|B_{\text{after}}|,1)}
+$$
+
+候选纤维闭合分数：
+
+$$
+S_{\text{closure-fiber}}
+=
+\alpha\Delta z_{\text{target}}
++
+\beta\Delta z_{\text{anchor}}
++
+\gamma S_{\text{blocker}}
+-
+\lambda R_{\text{new}}
+$$
+
+压力归一化分数：
+
+$$
+S_{\text{pressure}}
+=
+\frac{S_{\text{closure-fiber}}}
+{1+\log(1+|B_{\text{after}}|)}
+$$
+
+这个分数不是最终理论，只是用于区分三类行为：
+
+```text
+target booster（目标增强器）
+blocker suppressor（阻塞者抑制器）
+identity anchor improver（身份锚改进器）
+```
+
+### 四、确认轮核心结果
+
+确认轮使用 6 个 case（样本组），加入 target_value_tokens、instruction、all_pre_answer 三类 source group（来源组）。
+
+| model（模型） | rows（记录数） | target gain（目标提升） | blocker suppression（旧阻塞者平均抑制） | blocker count delta（阻塞者数量变化） | resolved rate（旧阻塞者解决率） | new blocker rate（新增阻塞者率） | anchor gap（身份锚间隔改善） | token closure gain（词元闭合增益） |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 192 | 2.890 | 0.662 | -1619.979 | 0.728 | 0.041 | 2.439 | 0.000 |
+| GLM4 | 120 | 1.593 | 0.444 | -391.200 | 0.684 | 0.045 | 0.147 | 0.000 |
+| DS7B | 192 | 2.970 | -0.522 | -1445.078 | 0.664 | 0.123 | 2.097 | 0.000 |
+
+最重要的客观现象：
+
+```text
+qwen3：目标提升、旧 blocker 平均下降、旧 blocker 解决率较高、新 blocker 较少，存在较强 suppressor-like candidate（类抑制器候选）。
+
+GLM4：旧 blocker 也平均下降，但目标提升和 identity anchor 改善较弱，更像 partial suppressor（部分抑制器）。
+
+DS7B：目标提升明显，blocker 数量下降，但旧 blocker 平均 suppression 为负，说明大量旧 blocker 的 logit 并没有被压低；数量下降主要可能来自 target 被抬高后的阈值移动，而不是 blocker field 被真实抑制。
+```
+
+### 五、候选路径
+
+确认轮 top candidates（最高候选）：
+
+| model（模型） | component（组件） | source group（来源组） | target gain（目标提升） | blocker suppression（阻塞者抑制） | resolved rate（解决率） | new rate（新增率） | pressure score（压力分数） |
+|---|---|---|---:|---:|---:|---:|---:|
+| qwen3 | attn:L34 | instruction | 2.984 | 0.491 | 0.716 | 0.022 | 1.394 |
+| GLM4 | attn:L33 | instruction | 1.895 | 0.465 | 0.764 | 0.028 | 0.545 |
+| DS7B | attn:L26 | instruction | 5.875 | -1.022 | 0.942 | 0.000 | 2.496 |
+
+这里必须谨慎解释：
+
+```text
+DS7B 的 attn:L26 虽然 pressure score 高，但 blocker suppression 为负。
+它更像 target booster / threshold shifter（目标增强器 / 阈值移动器），不能直接解释为 blocker suppressor。
+```
+
+qwen3 的 attn:L34 / L35 更接近当前定义下的 blocker-field suppressor candidate，因为它同时满足：
+
+```text
+target gain > 0
+blocker suppression > 0
+new blocker rate 较低
+resolved baseline blocker rate 较高
+identity anchor gap 改善明显
+```
+
+GLM4 的 attn:L33 是弱一些的同类候选。
+
+### 六、和 Phase 798 的关系
+
+Phase 798 的核心结论是：
+
+```text
+token closure failure（词元闭合失败）不是少数 top-k blocker 问题，
+而是 full-vocabulary blocker field（全词表阻塞者场）问题。
+```
+
+Phase 799 的新进展是：
+
+```text
+全词表 blocker field 不是只能被动观测；
+某些候选路径确实能改变整个 blocker field 的分布。
+```
+
+但是，Phase 799 同时证明：
+
+```text
+blocker count drop（阻塞者数量下降）不等于 blocker suppression（阻塞者抑制）。
+```
+
+这点非常关键。DS7B 的结果说明：
+
+```text
+如果只看 after blocker count，
+会把 target booster 误判成 suppressor。
+```
+
+所以后续图谱算法必须至少同时记录：
+
+```text
+1. target gain
+2. blocker suppression
+3. resolved baseline blocker rate
+4. new blocker rate
+5. identity anchor gap
+```
+
+不能只用单个 margin 或 top-k 排名。
+
+### 七、理论进展
+
+当前语言编码机制的最小闭合条件进一步收紧为：
+
+$$
+\text{TokenClosure}
+\Leftarrow
+\text{TargetRoute}
+\cap
+\text{BlockerSuppressorField}
+\cap
+\text{IdentityAnchor}
+\cap
+\text{ReadoutGeometry}
+$$
+
+更具体地说：
+
+$$
+\Delta C(x)
+=
+F_{\text{target}}(x)
++
+F_{\text{suppress}}(x)
++
+F_{\text{anchor}}(x)
++
+F_{\text{readout}}(x)
+-
+F_{\text{new-blocker}}(x)
+$$
+
+其中：
+
+```text
+F_target 表示目标路线增益；
+F_suppress 表示阻塞者场抑制；
+F_anchor 表示身份锚修正；
+F_readout 表示读出几何改造；
+F_new-blocker 表示新增竞争者惩罚。
+```
+
+Phase 799 说明，前两个量可以在部分模型中同时改善，但 token closure gain 仍为 0，说明至少还缺：
+
+```text
+identity anchor（身份锚）
+readout geometry（读出几何）
+或更完整的多路径同步写入。
+```
+
+因此当前理论不是被推翻，而是从：
+
+```text
+找到一个关键 head / channel
+```
+
+进一步升级为：
+
+```text
+找到一组能共同改变生成场的 causal fiber bundle（因果纤维束）。
+```
+
+### 八、问题、硬伤和边界
+
+1. 本阶段仍然不是 token closure（词元闭合）
+
+三模型确认轮：
+
+```text
+token_closure_gain_rate = 0
+```
+
+所以本阶段只是 suppressor candidate localization（抑制器候选定位），不是完整语言编码机制闭合。
+
+2. 评分函数仍是观察指标
+
+当前公式基于 logit-space（对数几率空间）变化，不能直接等同于内部神经元真实编码。它能筛选候选路径，但不能单独证明“这里就是 suppressor neuron（抑制神经元）”。
+
+3. DS7B 暴露了算法硬伤
+
+如果只看 blocker 数量，DS7B 看起来很好；但旧 blocker 平均 suppression 为负。说明：
+
+```text
+blocker count reduction 可能只是 target 上升造成的排名阈值变化。
+```
+
+下一步必须把 target booster 和 true suppressor 拆开。
+
+4. 小模型偏差仍然明显
+
+qwen3、GLM4、DS7B 都有 identity fragmentation（身份碎片化）和 token closure 不足。小模型可能把真实大模型中的连续机制拆成粗糙、分散、互相冲突的局部路线。
+
+因此本阶段只能说：
+
+```text
+在当前小模型上观察到候选 blocker-field suppressor 行为；
+不能直接断言这就是大模型或真实语言机制的完整形态。
+```
+
+5. 候选路径重复现象
+
+同一层 attention candidate（注意力候选）在不同 ladder / source group 下给出近似结果，说明当前干预粒度仍偏粗。它可以定位层级和组件，但还不能定位到 neuron-level atlas（神经元级图谱）。
+
+### 九、阶段性结论
+
+Phase 799 是实质进展，但不是闭合。
+
+它完成了三件关键事情：
+
+```text
+1. 把 Phase 798 的 full-vocabulary blocker field 从观测对象变成干预评分对象。
+2. 证明 qwen3 / GLM4 中存在 suppressor-like candidate，尤其 qwen3 的 attn:L34 / L35。
+3. 证明 blocker count drop 和 true blocker suppression 必须区分，DS7B 是关键反例。
+```
+
+最谨慎结论：
+
+```text
+当前语言闭合失败，不只是缺 target boost；
+也不只是缺少某个 contrast suppressor；
+而是缺少 target route、blocker-field suppressor、identity anchor、readout geometry 的同步闭合。
+```
+
+### 十、下一步 Phase
+
+下一阶段仍属于同一个阶段性目标，不需要等待新方向确认。
+
+建议进入：
+
+```text
+Phase 800: target booster vs true suppressor disentanglement（目标增强器与真实抑制器解耦）
+```
+
+核心任务：
+
+```text
+1. 控制 target gain 相近的候选路径，比较 blocker suppression 是否仍有差异。
+2. 对 qwen3 attn:L34 / L35、GLM4 attn:L33、DS7B attn:L26 / L23 做分组复测。
+3. 单独构造 target-neutral intervention（目标中性干预），观察是否仍能压低 blocker field。
+4. 单独构造 suppressor-neutral intervention（抑制中性干预），观察是否只提升 target。
+5. 把 candidate_list、semantic、echo、punctuation、format 等 blocker class 分开建图。
+6. 输出 atlas graph（图谱数据）时增加三类边：
+   a. target_boost edge（目标增强边）
+   b. blocker_suppress edge（阻塞者抑制边）
+   c. threshold_shift edge（阈值移动边）
+```
+
+闭合标准应从：
+
+```text
+after blocker count 下降
+```
+
+提升为：
+
+```text
+在 target gain 可控条件下，
+baseline blocker field 平均下降，
+new blocker 不显著增加，
+identity anchor 同时改善，
+最终 correct target 排名真实闭合。
+```
+
+只有达到这个标准，才能继续声称接近破解语言编码机制。
+
+## Phase 800: target booster vs true suppressor disentanglement（目标增强器与真实抑制器解耦） [2026-06-30 13:08]
+
+### 一、任务来源
+
+Phase 799 已经证明：
+
+```text
+blocker count drop（阻塞者数量下降）
+不等于
+true blocker suppression（真实阻塞者抑制）
+```
+
+尤其 DS7B 的结果显示：
+
+```text
+target gain 很高；
+after blocker count 明显下降；
+但 baseline blocker mean suppression 为负。
+```
+
+这说明它可能只是 target booster / threshold shifter（目标增强器 / 阈值移动器），而不是 true suppressor（真实抑制器）。
+
+因此 Phase 800 继续同一个阶段性目标：把 target booster、true suppressor、threshold shift 三种机制拆开。
+
+本阶段没有重新加载模型，而是基于 Phase 799 已经完成的 smoke / main / confirm 三轮结果进行离线分析。这样可以先避免重复消耗 GPU，同时客观检查已有结果是否支持机制分离。
+
+### 二、新增脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase800_target_booster_suppressor_disentanglement.py
+```
+
+结果目录：
+
+```text
+tests/result/phase800_target_booster_suppressor_disentanglement/
+```
+
+输出文件：
+
+```text
+phase800_disentanglement_summary.json
+phase800_disentanglement_summary.md
+```
+
+### 三、解耦指标
+
+对每个候选路径，继续使用 Phase 799 的核心量：
+
+$$
+\Delta z_{\text{target}}
+=
+z^{\text{after}}_{y^+}
+-
+z^{\text{rec}}_{y^+}
+$$
+
+$$
+S_{\text{blocker}}
+=
+\frac{1}{|B_{\text{rec}}|}
+\sum_{v\in B_{\text{rec}}}
+\left(
+z^{\text{rec}}_v
+-
+z^{\text{after}}_v
+\right)
+$$
+
+$$
+R_{\text{resolved}}
+=
+\frac{|B_{\text{rec}}\setminus B_{\text{after}}|}
+{|B_{\text{rec}}|}
+$$
+
+$$
+R_{\text{new}}
+=
+\frac{|B_{\text{after}}\setminus B_{\text{rec}}|}
+\max(|B_{\text{after}}|,1)}
+$$
+
+并新增两个解释分数。
+
+true suppressor score（真实抑制器分数）：
+
+$$
+S_{\text{true-suppressor}}
+=
+\max(\Delta z_{\text{target}},0)
+\cdot
+\max(S_{\text{blocker}},0)
+\cdot
+R_{\text{resolved}}
+\cdot
+(1-R_{\text{new}})
+$$
+
+threshold shift score（阈值移动分数）：
+
+$$
+S_{\text{threshold-shift}}
+=
+\max(\Delta z_{\text{target}},0)
+\cdot
+\max(-S_{\text{blocker}},0)
+\cdot
+R_{\text{resolved}}
+\cdot
+(1+R_{\text{new}})
+$$
+
+解释规则：
+
+```text
+如果 target gain > 0 且 blocker suppression > 0：
+  更像 true suppressor-like candidate（类真实抑制器候选）。
+
+如果 target gain > 0 但 blocker suppression <= 0，同时 blocker count 仍下降：
+  更像 target booster / threshold shifter（目标增强器 / 阈值移动器）。
+```
+
+### 四、跨轮结果
+
+| round（轮次） | model（模型） | rows（记录数） | target gain（目标提升） | blocker suppression（阻塞者抑制） | count reduction（数量下降率） | resolved（解决率） | new rate（新增率） | label hint（标签） |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| smoke | qwen3 | 4 | 2.938 | 1.093 | 0.827 | 0.838 | 0.065 | true_suppressor_like |
+| smoke | GLM4 | 2 | -0.219 | 0.797 | -0.032 | 0.299 | 0.321 | unstable_new_blocker |
+| smoke | DS7B | 4 | 3.094 | -1.164 | 0.617 | 0.653 | 0.094 | target_booster_or_threshold_shift |
+| main | qwen3 | 48 | 3.153 | 0.820 | 0.822 | 0.812 | 0.032 | true_suppressor_like |
+| main | GLM4 | 30 | 1.573 | 0.497 | 0.663 | 0.712 | 0.053 | true_suppressor_like |
+| main | DS7B | 48 | 3.271 | -0.580 | 0.388 | 0.686 | 0.134 | target_booster_or_threshold_shift |
+| confirm | qwen3 | 192 | 2.890 | 0.662 | 0.818 | 0.728 | 0.041 | true_suppressor_like |
+| confirm | GLM4 | 120 | 1.593 | 0.444 | 0.766 | 0.684 | 0.045 | true_suppressor_like |
+| confirm | DS7B | 192 | 2.970 | -0.522 | 0.429 | 0.664 | 0.123 | target_booster_or_threshold_shift |
+
+确认轮候选标签统计：
+
+```json
+{
+  "qwen3": {
+    "true_suppressor_like": 30,
+    "weak_or_mixed": 2
+  },
+  "GLM4": {
+    "true_suppressor_like": 16,
+    "unstable_new_blocker": 4
+  },
+  "DS7B": {
+    "target_booster_or_threshold_shift": 40
+  }
+}
+```
+
+### 五、关键客观结果
+
+1. qwen3 结果最接近 true suppressor-like
+
+确认轮：
+
+```text
+target gain = 2.890
+blocker suppression = 0.662
+blocker count reduction = 0.818
+resolved rate = 0.728
+new blocker rate = 0.041
+```
+
+最高候选集中在：
+
+```text
+attn:L35
+attn:L34
+```
+
+其中 attn:L35 的候选：
+
+```text
+target gain = 2.729
+blocker suppression = 0.889
+resolved rate = 0.740
+new blocker rate = 0.060
+true suppressor score = 1.686
+```
+
+这说明 qwen3 中至少存在一类候选路径，它不是单纯把 target 抬高，而是同时压低大量 baseline blocker。
+
+2. GLM4 是弱 true suppressor-like
+
+确认轮：
+
+```text
+target gain = 1.593
+blocker suppression = 0.444
+blocker count reduction = 0.766
+resolved rate = 0.684
+new blocker rate = 0.045
+```
+
+候选主要集中在：
+
+```text
+attn:L33
+```
+
+但它的 identity anchor gap improvement（身份锚间隔改善）很弱：
+
+```text
+anchor gap = 0.147
+```
+
+所以 GLM4 更像：
+
+```text
+局部 blocker suppressor 已经出现，
+但 identity anchor 和 readout closure 不足。
+```
+
+3. DS7B 是关键反例
+
+确认轮：
+
+```text
+target gain = 2.970
+blocker suppression = -0.522
+blocker count reduction = 0.429
+resolved rate = 0.664
+new blocker rate = 0.123
+```
+
+所有确认轮候选都被归为：
+
+```text
+target_booster_or_threshold_shift
+```
+
+最高 threshold-shift candidate：
+
+```text
+attn:L27
+target gain = 4.432
+blocker suppression = -0.699
+resolved rate = 0.689
+threshold shift score = 2.228
+```
+
+这说明 DS7B 的 blocker 数量下降不能解释为 true suppressor。更可能是：
+
+```text
+target logit 被抬高；
+排名阈值移动；
+部分 blocker 被 target 超过；
+但旧 blocker 本身并未整体下降。
+```
+
+### 六、对 Phase 799 的修正
+
+Phase 799 的“候选抑制器”说法需要收紧：
+
+```text
+qwen3：可以称为 blocker-field suppressor-like candidate。
+GLM4：可以称为 weak / partial blocker-field suppressor-like candidate。
+DS7B：不应称为 suppressor candidate，应称为 target booster / threshold-shift candidate。
+```
+
+这一步非常重要，因为它防止研究重新回到 patch success（补丁成功率）路线。
+
+真正有解释力的判断不应该是：
+
+```text
+干预后 blocker 数量减少了多少。
+```
+
+而应该是：
+
+```text
+旧 blocker 自身是否下降；
+target 是否上升；
+新 blocker 是否被制造；
+identity anchor 是否改善；
+最终 token 是否闭合。
+```
+
+### 七、理论进展
+
+当前最小闭合公式进一步拆成三个可区分项：
+
+$$
+\Delta \text{Closure}
+=
+\Delta T
++
+\Delta S
++
+\Delta A
+-
+\Delta N
+$$
+
+其中：
+
+```text
+Delta T 表示 target booster（目标增强）；
+Delta S 表示 true suppressor（真实抑制）；
+Delta A 表示 identity anchor / readout geometry（身份锚 / 读出几何）；
+Delta N 表示 new blocker penalty（新增阻塞者惩罚）。
+```
+
+Phase 800 的核心改进是：
+
+$$
+\Delta T \ne \Delta S
+$$
+
+并且：
+
+$$
+\Delta \text{BlockerCount} < 0
+\nRightarrow
+\Delta S > 0
+$$
+
+也就是说：
+
+```text
+阻塞者数量下降，不必然说明真实抑制发生。
+```
+
+这比 Phase 799 更接近语言编码机制，因为它开始区分：
+
+```text
+读出端排名变化
+和
+内部竞争场真实变形
+```
+
+### 八、硬伤和边界
+
+1. 本阶段仍然是离线分析
+
+它没有新增 target-neutral intervention（目标中性干预），所以还不能直接证明：
+
+```text
+某个路径在不提升 target 的情况下仍能压低 blocker。
+```
+
+2. 候选分组仍偏粗
+
+同一 candidate 在不同 ladder / source group 下重复出现，说明当前粒度仍是 head / route 级别，不是 neuron-level（神经元级）。
+
+3. 小模型偏差仍然存在
+
+qwen3、GLM4、DS7B 的差异非常大，说明小模型的机制可能更碎、更粗糙。不能把 DS7B 的 threshold-shift 行为直接泛化到大模型，也不能把 qwen3 的 suppressor-like 行为直接当作普遍结构。
+
+4. 仍然没有 token closure
+
+三模型三轮：
+
+```text
+token_closure_gain_rate = 0
+```
+
+说明 target booster 和 blocker suppressor 即使同时出现，也还不足以完成闭合。identity anchor 和 readout geometry 仍是核心瓶颈。
+
+### 九、阶段性结论
+
+Phase 800 是对 Phase 799 的必要收紧，也是实质进展。
+
+它证明：
+
+```text
+target booster 和 true suppressor 必须分开建模。
+```
+
+当前最可靠的现象拼图是：
+
+```text
+qwen3：存在较强 suppressor-like candidate；
+GLM4：存在弱 suppressor-like candidate；
+DS7B：主要是 target booster / threshold shift；
+三者都没有完成 token closure。
+```
+
+因此，语言编码机制图谱应从单一边类型升级为多边类型：
+
+```text
+target_boost edge（目标增强边）
+blocker_suppress edge（阻塞者抑制边）
+threshold_shift edge（阈值移动边）
+identity_anchor edge（身份锚边）
+readout_geometry edge（读出几何边）
+```
+
+### 十、下一步 Phase
+
+下一阶段仍属于同一个大目标，但需要重新进入模型测试。
+
+建议进入：
+
+```text
+Phase 801: target-neutral suppressor causal test（目标中性抑制器因果测试）
+```
+
+核心目标：
+
+```text
+验证是否存在：
+在 target gain 接近 0 的情况下，
+仍能显著压低 baseline blocker field 的内部路径。
+```
+
+最小测试设计：
+
+```text
+1. 以 qwen3 attn:L34 / L35 为正候选。
+2. 以 GLM4 attn:L33 为弱候选。
+3. 以 DS7B attn:L26 / L27 为 threshold-shift 对照。
+4. 构造 target-neutral projection：
+   从干预向量中扣除 target direction 后再 patch。
+5. 观察 blocker suppression 是否仍存在。
+6. 如果 target-neutral 后 blocker suppression 仍存在，才可以称为更强的 suppressor evidence。
+```
+
+闭合标准：
+
+$$
+\Delta z_{\text{target}} \approx 0
+\quad\land\quad
+S_{\text{blocker}} > 0
+\quad\land\quad
+R_{\text{new}} \text{ small}
+$$
+
+如果这一步成立，才说明 blocker suppressor 不是 target booster 的副产物。
+
+## Phase 801: target-neutral suppressor causal test（目标中性抑制器因果测试） [2026-06-30 14:10]
+
+### 一、任务来源
+
+本阶段接续 Phase 798-800。上传分析认为：
+
+```text
+Phase 798-800 的主线是正确的；
+当前研究已经不能只看 target logit gain，也不能只看 blocker count drop；
+必须把 target booster、true suppressor、threshold shifter、identity anchor、readout geometry 分开。
+```
+
+这个判断基本正确，而且是必要收紧。Phase 800 已经证明：
+
+```text
+target-only component 可以显著提高 target logit；
+但是 target-only component 通常不能解释 blocker suppression；
+因此 blocker suppressor 不能直接等同于 target booster。
+```
+
+但 Phase 800 仍然留下一个关键漏洞：
+
+```text
+raw route patch 同时包含 target direction 和非 target direction；
+raw blocker suppression 可能仍然是 target readout threshold 改变后的间接现象。
+```
+
+因此本阶段进入 Phase 801：
+
+```text
+从干预向量中扣除 direct target-readout direction，
+只保留 target-neutral component，
+观察 baseline blocker field 是否仍然被压低。
+```
+
+### 二、测试脚本和结果路径
+
+脚本：
+
+```text
+tests/glm5/phase801_target_neutral_suppressor_causal_test.py
+tests/glm5/run_phase801_target_neutral_suppressor_causal_test_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase801_target_neutral_suppressor_causal_test/smoke/
+tests/result/phase801_target_neutral_suppressor_causal_test/main/
+tests/result/phase801_target_neutral_suppressor_causal_test/confirm/
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+测试轮次：
+
+```text
+smoke: 1 case, 1 route
+main: 4 cases, 2 routes
+confirm: 6 cases, 3 routes
+```
+
+未使用量化方案，模型逐个加载，优先使用 flash_attention_2，失败后回退到 sdpa / eager。
+
+### 三、测试原理
+
+对 donor condition 和 recipient condition 的同一 answer position hidden state 做差：
+
+$$
+\Delta h = h_{\text{donor}} - h_{\text{recipient}}
+$$
+
+取正确目标词元的 unembedding direction：
+
+$$
+u_y = \frac{W_U[y]}{\|W_U[y]\|}
+$$
+
+把干预向量分解为三部分：
+
+$$
+\Delta h_{\text{target}} =
+\langle \Delta h, u_y \rangle u_y
+$$
+
+$$
+\Delta h_{\text{neutral}} =
+\Delta h - \Delta h_{\text{target}}
+$$
+
+$$
+\Delta h_{\text{raw}} = \Delta h
+$$
+
+然后分别执行三种 patch：
+
+$$
+h'_{\text{raw}} =
+h_{\text{recipient}} + \Delta h_{\text{raw}}
+$$
+
+$$
+h'_{\text{neutral}} =
+h_{\text{recipient}} + \Delta h_{\text{neutral}}
+$$
+
+$$
+h'_{\text{target}} =
+h_{\text{recipient}} + \Delta h_{\text{target}}
+$$
+
+核心检验不是看 target 是否上升，而是看：
+
+$$
+|\Delta z_{\text{target}}| \le \epsilon
+\quad\land\quad
+S_{\text{blocker}} > \tau
+\quad\land\quad
+R_{\text{new}} \le \eta
+$$
+
+本阶段使用：
+
+$$
+\epsilon = 0.75,\quad
+\tau = 0.25,\quad
+\eta = 0.10
+$$
+
+其中：
+
+$$
+S_{\text{blocker}}
+=
+\frac{1}{|B|}
+\sum_{b \in B}
+\left(z_b^{\text{before}} - z_b^{\text{after}}\right)
+$$
+
+$$
+R_{\text{new}}
+=
+\frac{
+|\{b: b \notin B_{\text{before}},\ b \in B_{\text{after}}\}|
+}{
+|B_{\text{after}}|
+}
+$$
+
+如果 target-neutral patch 仍然满足以上条件，才可以称为更强的 target-neutral suppressor evidence。
+
+### 四、确认轮客观结果
+
+confirm 汇总如下：
+
+```text
+qwen3 / target_neutral:
+target gain = -0.542
+blocker suppression = 0.747
+resolved baseline blocker rate = 0.229
+new blocker rate = 0.392
+token closure gain = 0
+strict pass = 0 / 12
+
+qwen3 / raw:
+target gain = 2.852
+blocker suppression = 0.691
+resolved baseline blocker rate = 0.728
+new blocker rate = 0.041
+token closure gain = 0
+
+qwen3 / target_only:
+target gain = 3.503
+blocker suppression = -0.051
+resolved baseline blocker rate = 0.771
+new blocker rate = 0.000
+token closure gain = 0
+```
+
+```text
+GLM4 / target_neutral:
+target gain = 0.174
+blocker suppression = 0.418
+resolved baseline blocker rate = 0.338
+new blocker rate = 0.193
+token closure gain = 0
+strict pass = 1 / 12
+
+GLM4 / raw:
+target gain = 1.146
+blocker suppression = 0.419
+resolved baseline blocker rate = 0.570
+new blocker rate = 0.068
+token closure gain = 0
+
+GLM4 / target_only:
+target gain = 0.979
+blocker suppression = 0.002
+resolved baseline blocker rate = 0.479
+new blocker rate = 0.019
+token closure gain = 0
+```
+
+```text
+DS7B / target_neutral:
+target gain = 0.702
+blocker suppression = -0.424
+resolved baseline blocker rate = 0.265
+new blocker rate = 0.427
+token closure gain = 0
+strict pass = 0 / 12
+
+DS7B / raw:
+target gain = 3.016
+blocker suppression = -0.530
+resolved baseline blocker rate = 0.671
+new blocker rate = 0.116
+token closure gain = 0
+
+DS7B / target_only:
+target gain = 2.577
+blocker suppression = -0.107
+resolved baseline blocker rate = 0.608
+new blocker rate = 0.048
+token closure gain = 0
+```
+
+### 五、关键样本
+
+qwen3 最强的 target-neutral 现象：
+
+```text
+case = p765_0041_commonsense_question_plant:oak:grows_on_tree
+route = attn:L35 + mlp:L35 + mlp:L34 + mlp:L33
+raw target gain = 3.750
+neutral target gain = -0.062
+raw blocker suppression = 1.117
+neutral blocker suppression = 1.242
+neutral new blocker rate = 0.374
+strict pass = false
+```
+
+这说明：
+
+```text
+target direction 被扣除后，baseline blocker suppression 不但没有消失，反而更强；
+但 new blocker rate 过高，所以不是闭合抑制器。
+```
+
+GLM4 唯一 strict pass：
+
+```text
+case = p765_0052_commonsense_statement_plant:wheat:edible
+route = mlp:L38 + mlp:L39 + mlp:L34 + mlp:L27
+raw target gain = 0.375
+neutral target gain = -0.250
+raw blocker suppression = 0.498
+neutral blocker suppression = 0.523
+neutral new blocker rate = 0.054
+strict pass = true
+```
+
+这说明：
+
+```text
+GLM4 存在至少一个较干净的 target-neutral suppressor evidence；
+但它只是局部样本，不足以说明形成全局机制。
+```
+
+DS7B 典型现象：
+
+```text
+target_only target gain 较高；
+target_neutral blocker suppression 为负；
+raw patch 也没有形成稳定 blocker suppression。
+```
+
+这继续支持 Phase 800 的判断：
+
+```text
+DS7B 当前主要表现为 threshold shift / target booster，
+没有稳定的 true suppressor evidence。
+```
+
+### 六、正确结论
+
+Phase 801 是一个重要正结果和重要负结果并存的阶段。
+
+正结果：
+
+```text
+qwen3 和 GLM4 中，blocker suppression 不是 target booster 的简单副产物。
+```
+
+依据是：
+
+```text
+target_only component 几乎不能压低 blocker field；
+target_neutral component 在 target gain 接近 0 时仍能压低 baseline blockers。
+```
+
+负结果：
+
+```text
+target-neutral suppressor 仍然不能完成 token closure；
+它经常压低旧 blocker，同时制造大量 new blockers。
+```
+
+因此更准确的机制判断是：
+
+```text
+当前找到的不是完整 suppressor，
+而是 baseline-blocker suppressing component。
+```
+
+它能压低旧阻塞者，但不能保证全局输出场稳定。
+
+### 七、对 Phase 798-800 判断的修正
+
+Phase 798-800 的主线仍然正确：
+
+```text
+blocker field 比单个 blocker 更接近真实瓶颈；
+target booster 和 blocker suppressor 必须拆开；
+DS7B 的很多 patch 成功更像 threshold shift。
+```
+
+Phase 801 对它的新增修正是：
+
+```text
+true suppressor 还必须继续拆成：
+1. old-blocker suppressor
+2. new-blocker stabilizer
+3. identity-anchor protector
+4. readout-geometry closer
+```
+
+只做到第 1 项，还不能破解语言编码机制。
+
+### 八、问题和硬伤
+
+1. target-neutral 只是扣除了当前目标词元的 unembedding direction：
+
+```text
+它不能保证完全去除所有间接 target effect。
+```
+
+深层非线性可能重新把 neutral component 转换成 target-relevant component。
+
+2. 本阶段仍然是 hidden-state answer-position patch：
+
+```text
+还没有进入 Q/K/V/O 内部空间；
+也不是神经元级因果图谱。
+```
+
+3. blocker field 的定义仍然依赖 top-k logits：
+
+```text
+它比单 target logit 更好，
+但仍然不是完整 vocabulary field。
+```
+
+4. 小模型偏差很明显：
+
+```text
+qwen3 和 GLM4 已经出现 suppressor-like component；
+DS7B 仍然偏 threshold-shift；
+说明不同小模型可能把同一语言机制压缩成不同粗糙结构。
+```
+
+因此不能把单模型路径直接上升为真实语言编码机制。
+
+5. token closure 仍然为 0：
+
+```text
+说明 target gain、old blocker suppression、new blocker control、identity anchor、readout geometry 仍未同时闭合。
+```
+
+### 九、阶段性理论进展
+
+当前图谱边类型应更新为：
+
+```text
+target_boost edge
+old_blocker_suppress edge
+new_blocker_generate edge
+new_blocker_stabilize edge
+identity_anchor edge
+readout_geometry edge
+token_closure edge
+```
+
+这比 Phase 800 更细，因为 Phase 801 证明：
+
+```text
+old blocker 被压低，不等于 output field 变稳定。
+```
+
+因此全局图谱的核心对象不能只是：
+
+```text
+哪个 route 提高 correct target。
+```
+
+而应该是：
+
+```text
+哪个 route 改变整个 logit field 的竞争结构。
+```
+
+更接近的公式是：
+
+$$
+F_{\text{out}}
+=
+G_{\text{target}}
+- S_{\text{old-blocker}}
++ G_{\text{new-blocker}}
++ A_{\text{identity}}
++ R_{\text{geometry}}
+$$
+
+token closure 需要满足：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y >
+\max_{v \neq y} z_v
+\right]
+$$
+
+但从机制上看，更严格条件是：
+
+$$
+z_y
+- \max_{b \in B_{\text{old}}} z_b
+- \max_{n \in B_{\text{new}}} z_n
+> 0
+$$
+
+当前 qwen3 / GLM4 的问题是：
+
+$$
+S_{\text{old-blocker}} > 0
+\quad\text{but}\quad
+G_{\text{new-blocker}} \text{ too large}
+$$
+
+DS7B 的问题是：
+
+$$
+G_{\text{target}} > 0
+\quad\text{but}\quad
+S_{\text{old-blocker}} \le 0
+$$
+
+### 十、下一阶段
+
+接下来的任务和当前任务属于同一个阶段性大目标：
+
+```text
+从 blocker field 走向 output-field closure。
+```
+
+建议进入：
+
+```text
+Phase 802: new-blocker stabilization and output-field closure test
+```
+
+核心问题：
+
+```text
+target-neutral component 为什么能压低 old blockers，
+却会制造大量 new blockers？
+```
+
+下一步不应继续只找更强 target booster，而应测试：
+
+```text
+1. old-blocker suppressor 是否有配套 new-blocker stabilizer；
+2. new blockers 来自哪些层、哪些 route、哪些词元类别；
+3. identity anchor 是否能减少 new blocker explosion；
+4. raw route 为什么 new blocker rate 低于 target-neutral route；
+5. 是否存在 old-blocker suppressor + readout geometry closer 的组合闭合。
+```
+
+建议的闭合标准：
+
+$$
+|\Delta z_{\text{target}}| \le \epsilon
+\quad\land\quad
+S_{\text{old-blocker}} > \tau
+\quad\land\quad
+R_{\text{new}} \le \eta
+\quad\land\quad
+A_{\text{identity}} \ge 0
+\quad\land\quad
+C_{\text{token}} = 1
+$$
+
+当前距离闭合仍然较远：
+
+```text
+qwen3：约完成 old-blocker suppressor 证据，未完成 new-blocker stabilization。
+GLM4：有少量较干净证据，但覆盖率不足。
+DS7B：尚未出现 true suppressor 证据。
+整体：完成了一个关键拼图，但离完整语言编码机制仍有明显距离。
+```
