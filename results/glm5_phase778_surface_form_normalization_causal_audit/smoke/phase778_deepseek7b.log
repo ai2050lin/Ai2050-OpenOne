@@ -1,0 +1,96 @@
+[22:33:53] deepseek7b/smoke: selected surface cases=2 variants=without_candidate_list,constrained_free_prompt,lowercase_short_value,lowercase_no_punctuation,token_identity_contract,with_candidate_list
+[22:33:54] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[22:33:54] [load] deepseek7b: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[22:33:54] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:28, 11.78it/s]Loading weights:   5%|▌         | 17/339 [00:00<00:04, 73.09it/s]Loading weights:  16%|█▌        | 55/339 [00:00<00:01, 190.69it/s]Loading weights:  26%|██▌       | 88/339 [00:00<00:01, 223.13it/s]Loading weights:  37%|███▋      | 125/339 [00:00<00:00, 262.24it/s]Loading weights:  45%|████▌     | 153/339 [00:00<00:00, 251.99it/s]Loading weights:  54%|█████▍    | 183/339 [00:00<00:00, 265.93it/s]Loading weights:  64%|██████▍   | 218/339 [00:00<00:00, 269.95it/s]Loading weights:  74%|███████▍  | 252/339 [00:01<00:00, 288.56it/s]Loading weights:  83%|████████▎ | 282/339 [00:01<00:00, 269.30it/s]Loading weights:  91%|█████████▏| 310/339 [00:01<00:00, 250.92it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 248.34it/s]
+[22:33:56] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
+[22:33:56] deepseek7b: surface-form audit 1/2 cases; rows=66
+[22:33:57] deepseek7b: surface-form audit 2/2 cases; rows=132
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "attn": "sdpa",
+  "n_cases": 2,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.5,
+      "surface_gain_rate": 0.5,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 0.5,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 4593.5,
+      "mean_top1_gap_above_target": 9.234375
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 1.0,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 1.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 3.0,
+      "mean_top1_gap_above_target": 1.9375
+    },
+    {
+      "prompt_variant": "token_identity_contract",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.5,
+      "surface_gain_rate": 0.5,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 0.5,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 385.0,
+      "mean_top1_gap_above_target": 4.96875
+    },
+    {
+      "prompt_variant": "lowercase_short_value",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.5,
+      "surface_gain_rate": 0.5,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 0.5,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 2044.0,
+      "mean_top1_gap_above_target": 5.0625
+    },
+    {
+      "prompt_variant": "lowercase_no_punctuation",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.5,
+      "surface_gain_rate": 0.5,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 0.5,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1677.0,
+      "mean_top1_gap_above_target": 6.76953125
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.5,
+      "surface_gain_rate": 0.5,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 0.5,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 2585.0,
+      "mean_top1_gap_above_target": 8.72802734375
+    }
+  ]
+}

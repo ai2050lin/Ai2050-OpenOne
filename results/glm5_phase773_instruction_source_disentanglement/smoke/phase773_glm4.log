@@ -1,0 +1,66 @@
+[20:51:44] glm4/smoke: focus=clean_fiber_high cases=1 sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix']
+[20:51:44] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:46,  9.41it/s]Loading weights:   5%|▌         | 23/443 [00:00<00:04, 87.68it/s]Loading weights:  13%|█▎        | 59/443 [00:00<00:02, 177.76it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 226.37it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 255.36it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 272.11it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 282.31it/s]Loading weights:  50%|█████     | 222/443 [00:00<00:00, 281.66it/s]Loading weights:  58%|█████▊    | 256/443 [00:01<00:00, 293.09it/s]Loading weights:  65%|██████▌   | 290/443 [00:01<00:00, 301.60it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 299.58it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 310.64it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 305.14it/s]Loading weights:  95%|█████████▌| 421/443 [00:01<00:00, 281.84it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 270.42it/s]
+[20:51:47] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[20:51:55] glm4: source disentanglement 1/1 cases; rows=4
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "n_cases": 1,
+  "by_source_family": [
+    {
+      "source_family": "candidate_protocol",
+      "candidate_kind": "source_group_top_component",
+      "n": 1,
+      "case_n": 1,
+      "mean_scan_score": 1.2327548321957391,
+      "mean_target_logit_drop": 0.3125,
+      "mean_margin_drop_target_vs_contrast": 0.3125,
+      "mean_attention_mass": 0.637690544128418,
+      "mean_direct_target_boost": 0.8391159772872925,
+      "mean_direct_route_suppression": 0.06453879363834858,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "source_family": "protocol_instruction",
+      "candidate_kind": "source_group_top_component",
+      "n": 1,
+      "case_n": 1,
+      "mean_scan_score": 0.07947070905162643,
+      "mean_target_logit_drop": 0.0,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_attention_mass": 0.8984031677246094,
+      "mean_direct_target_boost": -0.010542838834226131,
+      "mean_direct_route_suppression": 0.0682662334293127,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "source_family": "protocol_format",
+      "candidate_kind": "source_group_top_component",
+      "n": 1,
+      "case_n": 1,
+      "mean_scan_score": 0.014711675373837352,
+      "mean_target_logit_drop": 0.0,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_attention_mass": 0.24651718139648438,
+      "mean_direct_target_boost": -0.0037082917988300323,
+      "mean_direct_route_suppression": 0.004771632608026266,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "source_family": "output_prefix",
+      "candidate_kind": "source_group_top_component",
+      "n": 1,
+      "case_n": 1,
+      "mean_scan_score": 0.053757711107997846,
+      "mean_target_logit_drop": -0.0625,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_attention_mass": 0.34765625,
+      "mean_direct_target_boost": 0.020929004997015,
+      "mean_direct_route_suppression": 0.01815733313560486,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

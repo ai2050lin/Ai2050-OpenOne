@@ -1,0 +1,100 @@
+[22:17:05] glm4/main: focus=clean_fiber_high cases=8 variants=without_candidate_list,constrained_free_prompt,with_candidate_list top_k=30
+[22:17:06] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[22:17:06] [load] glm4: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[22:17:06] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.72it/s]Loading weights:   6%|▌         | 26/443 [00:00<00:04, 101.58it/s]Loading weights:  12%|█▏        | 54/443 [00:00<00:02, 163.57it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 225.23it/s]Loading weights:  28%|██▊       | 125/443 [00:00<00:01, 251.51it/s]Loading weights:  35%|███▍      | 155/443 [00:00<00:01, 264.82it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 290.89it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 297.14it/s]Loading weights:  58%|█████▊    | 257/443 [00:01<00:00, 297.05it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 305.66it/s]Loading weights:  73%|███████▎  | 323/443 [00:01<00:00, 302.64it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 308.86it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 306.82it/s]Loading weights:  95%|█████████▍| 420/443 [00:01<00:00, 302.71it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 271.57it/s]
+[22:17:08] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
+[22:17:09] glm4: readout bridge audit 2/8 cases; rows=186
+[22:17:09] glm4: readout bridge audit 4/8 cases; rows=372
+[22:17:10] glm4: readout bridge audit 6/8 cases; rows=558
+[22:17:10] glm4: readout bridge audit 8/8 cases; rows=744
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "main",
+  "attn": "sdpa",
+  "n_cases": 8,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 8,
+      "case_n": 8,
+      "base_top1_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "latent_pool_hit_rate": 1.0,
+      "mean_base_target_rank": 193.5,
+      "mean_pool_target_rank": 1.0,
+      "mean_top1_gap_above_target": 2.693359375
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 8,
+      "case_n": 8,
+      "base_top1_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "latent_pool_hit_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_pool_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 8,
+      "case_n": 8,
+      "base_top1_rate": 0.0,
+      "pool_top1_rate": 0.625,
+      "latent_pool_hit_rate": 0.625,
+      "mean_base_target_rank": 171.75,
+      "mean_pool_target_rank": 1.375,
+      "mean_top1_gap_above_target": 2.86328125
+    }
+  ],
+  "latent_top1_competitor_by_prompt": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "competitor_class": "case_variant_target_value",
+      "n": 6,
+      "case_n": 6,
+      "mean_gap_above_target": 1.2291666666666667,
+      "mean_base_target_rank": 3.5,
+      "mean_pool_target_rank": 1.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "competitor_class": "case_variant_target_value",
+      "n": 4,
+      "case_n": 4,
+      "mean_gap_above_target": 1.515625,
+      "mean_base_target_rank": 3.75,
+      "mean_pool_target_rank": 1.0
+    },
+    {
+      "prompt_variant": "without_candidate_list",
+      "competitor_class": "whitespace_or_empty",
+      "n": 1,
+      "case_n": 1,
+      "mean_gap_above_target": 7.515625,
+      "mean_base_target_rank": 1326.0,
+      "mean_pool_target_rank": 1.0
+    },
+    {
+      "prompt_variant": "without_candidate_list",
+      "competitor_class": "lexical_capitalized",
+      "n": 1,
+      "case_n": 1,
+      "mean_gap_above_target": 6.65625,
+      "mean_base_target_rank": 201.0,
+      "mean_pool_target_rank": 1.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "competitor_class": "lexical_capitalized",
+      "n": 1,
+      "case_n": 1,
+      "mean_gap_above_target": 6.125,
+      "mean_base_target_rank": 166.0,
+      "mean_pool_target_rank": 1.0
+    }
+  ]
+}

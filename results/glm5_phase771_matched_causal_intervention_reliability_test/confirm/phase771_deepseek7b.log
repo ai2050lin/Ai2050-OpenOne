@@ -1,0 +1,47 @@
+[19:56:29] deepseek7b/confirm: matched cases=20 pairs=10 sources=['instruction', 'question', 'object_tokens', 'relation_tokens']
+[19:56:29] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:27, 12.04it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 127.20it/s]Loading weights:  17%|█▋        | 58/339 [00:00<00:01, 188.99it/s]Loading weights:  26%|██▌       | 88/339 [00:00<00:01, 212.40it/s]Loading weights:  37%|███▋      | 124/339 [00:00<00:00, 247.20it/s]Loading weights:  45%|████▌     | 153/339 [00:00<00:00, 232.41it/s]Loading weights:  58%|█████▊    | 196/339 [00:00<00:00, 272.35it/s]Loading weights:  66%|██████▌   | 224/339 [00:00<00:00, 265.25it/s]Loading weights:  75%|███████▌  | 255/339 [00:01<00:00, 255.82it/s]Loading weights:  84%|████████▍ | 284/339 [00:01<00:00, 262.89it/s]Loading weights:  93%|█████████▎| 316/339 [00:01<00:00, 274.35it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 243.06it/s]
+[19:56:31] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[19:56:35] deepseek7b: matched causal cases 5/20 rows=40
+[19:56:38] deepseek7b: matched causal cases 10/20 rows=80
+[19:56:41] deepseek7b: matched causal cases 15/20 rows=120
+[19:56:44] deepseek7b: matched causal cases 20/20 rows=160
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "confirm",
+  "n_cases": 20,
+  "by_matched_arm": [
+    {
+      "matched_arm": "clean",
+      "n": 80,
+      "mean_target_logit_drop": 0.025,
+      "mean_margin_drop_target_vs_contrast": -0.005859375,
+      "mean_contrast_logit_gain": -0.030859375,
+      "mean_attention_mass": 0.27157970443367957,
+      "mean_direct_target_boost": 0.05792037385108415,
+      "mean_direct_route_suppression": 0.13115933544540895,
+      "top1_loss_rate": 0.0,
+      "candidate_kind_counts": {
+        "phase755_top_candidate": 40,
+        "same_layer_control_head": 40
+      }
+    },
+    {
+      "matched_arm": "fail",
+      "n": 80,
+      "mean_target_logit_drop": 0.01328125,
+      "mean_margin_drop_target_vs_contrast": 0.00205078125,
+      "mean_contrast_logit_gain": -0.01123046875,
+      "mean_attention_mass": 0.27685974538326263,
+      "mean_direct_target_boost": 0.09751400746099534,
+      "mean_direct_route_suppression": 0.1178981127035513,
+      "top1_loss_rate": 0.0125,
+      "candidate_kind_counts": {
+        "phase755_top_candidate": 40,
+        "same_layer_control_head": 40
+      }
+    }
+  ]
+}

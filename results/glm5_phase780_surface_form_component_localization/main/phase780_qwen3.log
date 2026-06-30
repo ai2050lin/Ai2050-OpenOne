@@ -1,0 +1,173 @@
+[00:08:50] qwen3/main: selected cases=6 variants=without_candidate_list,lowercase_short_value,with_candidate_list
+[00:08:51] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[00:08:51] [load] qwen3: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[00:08:51] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 254.02it/s]Loading weights:  23%|██▎       | 90/398 [00:00<00:00, 469.83it/s]Loading weights:  37%|███▋      | 148/398 [00:00<00:00, 505.18it/s]Loading weights:  54%|█████▎    | 213/398 [00:00<00:00, 557.86it/s]Loading weights:  68%|██████▊   | 269/398 [00:00<00:00, 542.31it/s]Loading weights:  85%|████████▌ | 340/398 [00:00<00:00, 597.31it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 557.56it/s]
+[00:08:52] [load] qwen3: loaded sdpa, device=cuda:0, gpu=8.05GB
+[00:08:53] qwen3: component localization 2/6 cases; rows=498
+[00:08:53] qwen3: component localization 4/6 cases; rows=996
+[00:08:54] qwen3: component localization 6/6 cases; rows=1494
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "attn": "sdpa",
+  "n_cases": 6,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.8333333333333334,
+      "pool_top1_rate": 1.0,
+      "mean_margin_target_vs_case_variant": -4.791666666666667,
+      "mean_target_rank": 5.333333333333333,
+      "top1_classes": {
+        "case_variant_target_value": 5,
+        "whitespace_or_empty": 1
+      }
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "mean_margin_target_vs_case_variant": 6.302083333333333,
+      "mean_target_rank": 1.0,
+      "top1_classes": {
+        "target_value": 6
+      }
+    },
+    {
+      "prompt_variant": "lowercase_short_value",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "mean_margin_target_vs_case_variant": 6.666666666666667,
+      "mean_target_rank": 1.0,
+      "top1_classes": {
+        "target_value": 6
+      }
+    }
+  ],
+  "top_delta_by_compare_kind_layer": [
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "attn",
+      "layer": 34,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.09375,
+      "mean_delta_direct_target_vs_case_variant": 7.250043526291847,
+      "mean_delta_direct_target_vs_contrast": 3.3182517687479653,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 7.250043526291847
+    },
+    {
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "attn",
+      "layer": 35,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.458333333333334,
+      "mean_delta_direct_target_vs_case_variant": 6.5462543567021685,
+      "mean_delta_direct_target_vs_contrast": 1.273137629032135,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 6.5462543567021685
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "attn",
+      "layer": 31,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.09375,
+      "mean_delta_direct_target_vs_case_variant": 6.199380074938138,
+      "mean_delta_direct_target_vs_contrast": -0.2947748303413391,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 6.199380074938138
+    },
+    {
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "mlp",
+      "layer": 35,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.458333333333334,
+      "mean_delta_direct_target_vs_case_variant": 6.0466431975364685,
+      "mean_delta_direct_target_vs_contrast": 0.6681274970372518,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 6.0466431975364685
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "mlp",
+      "layer": 34,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.09375,
+      "mean_delta_direct_target_vs_case_variant": 5.526928742726644,
+      "mean_delta_direct_target_vs_contrast": -1.749803066253662,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 5.526928742726644
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "mlp",
+      "layer": 35,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.09375,
+      "mean_delta_direct_target_vs_case_variant": 5.2167796691258745,
+      "mean_delta_direct_target_vs_contrast": 2.4267955223719277,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 5.2167796691258745
+    },
+    {
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "mlp",
+      "layer": 34,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.458333333333334,
+      "mean_delta_direct_target_vs_case_variant": 5.161165714263916,
+      "mean_delta_direct_target_vs_contrast": 2.9835784435272217,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 5.161165714263916
+    },
+    {
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "mlp",
+      "layer": 33,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 11.458333333333334,
+      "mean_delta_direct_target_vs_case_variant": 3.56169060866038,
+      "mean_delta_direct_target_vs_contrast": 0.2501978973547618,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 3.56169060866038
+    }
+  ]
+}

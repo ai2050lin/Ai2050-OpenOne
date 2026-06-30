@@ -1,0 +1,80 @@
+[21:22:17] qwen3/confirm: focus=clean_fiber_high cases=3 variants=with_candidate_list,without_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
+[21:22:17] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 250.59it/s]Loading weights:  22%|██▏       | 88/398 [00:00<00:00, 464.07it/s]Loading weights:  34%|███▍      | 136/398 [00:00<00:00, 461.85it/s]Loading weights:  51%|█████▏    | 204/398 [00:00<00:00, 536.91it/s]Loading weights:  69%|██████▉   | 275/398 [00:00<00:00, 597.29it/s]Loading weights:  84%|████████▍ | 335/398 [00:00<00:00, 583.28it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 557.03it/s]
+[21:22:18] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[21:22:56] qwen3: candidate-list ablation 1/3 cases; rows=30
+[21:23:33] qwen3: candidate-list ablation 2/3 cases; rows=60
+[21:24:10] qwen3: candidate-list ablation 3/3 cases; rows=90
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "confirm",
+  "n_cases": 3,
+  "by_prompt_variant": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 21,
+      "case_n": 3,
+      "base_top1_rate": 0.0,
+      "mean_base_target_rank": 1941.6666666666667,
+      "mean_base_margin": 3.03125,
+      "mean_scan_score": 0.4182084791221848,
+      "mean_target_logit_drop": 0.05803571428571429,
+      "mean_margin_drop_target_vs_contrast": 0.09672619047619048,
+      "mean_attention_mass": 0.2137980688185919,
+      "mean_direct_target_boost": 0.1261911541223526,
+      "mean_direct_route_suppression": 0.2951569141864422,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "same_layer_control_head",
+      "n": 21,
+      "case_n": 3,
+      "base_top1_rate": 0.0,
+      "mean_base_target_rank": 1941.6666666666667,
+      "mean_base_margin": 3.03125,
+      "mean_scan_score": 0.024433930370477835,
+      "mean_target_logit_drop": 0.002976190476190476,
+      "mean_margin_drop_target_vs_contrast": 0.03869047619047619,
+      "mean_attention_mass": 0.06316496786617097,
+      "mean_direct_target_boost": -0.0051946692789594335,
+      "mean_direct_route_suppression": 0.022364498809197574,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 24,
+      "case_n": 3,
+      "base_top1_rate": 1.0,
+      "mean_base_target_rank": 1.0,
+      "mean_base_margin": 8.333333333333334,
+      "mean_scan_score": 4.033022433871197,
+      "mean_target_logit_drop": 0.21354166666666666,
+      "mean_margin_drop_target_vs_contrast": 0.2682291666666667,
+      "mean_attention_mass": 0.2566243012746175,
+      "mean_direct_target_boost": 2.5149158126053712,
+      "mean_direct_route_suppression": 0.3343287791746358,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "same_layer_control_head",
+      "n": 24,
+      "case_n": 3,
+      "base_top1_rate": 1.0,
+      "mean_base_target_rank": 1.0,
+      "mean_base_margin": 8.333333333333334,
+      "mean_scan_score": 0.01820895709129723,
+      "mean_target_logit_drop": 0.036458333333333336,
+      "mean_margin_drop_target_vs_contrast": -0.018229166666666668,
+      "mean_attention_mass": 0.06565790351790686,
+      "mean_direct_target_boost": -0.13812441340875617,
+      "mean_direct_route_suppression": 0.024783450870017987,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

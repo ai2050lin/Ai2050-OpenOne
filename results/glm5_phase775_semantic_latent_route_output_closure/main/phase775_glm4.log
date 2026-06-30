@@ -1,0 +1,104 @@
+[21:43:35] glm4/main: focus=clean_fiber_high cases=5 variants=without_candidate_list,constrained_free_prompt,with_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
+[21:43:35] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:47,  9.29it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:04, 100.93it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 176.61it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 218.94it/s]Loading weights:  28%|██▊       | 124/443 [00:00<00:01, 244.97it/s]Loading weights:  34%|███▍      | 151/443 [00:00<00:01, 252.48it/s]Loading weights:  40%|████      | 179/443 [00:00<00:01, 259.85it/s]Loading weights:  48%|████▊     | 214/443 [00:00<00:00, 281.35it/s]Loading weights:  55%|█████▍    | 243/443 [00:01<00:00, 279.21it/s]Loading weights:  63%|██████▎   | 280/443 [00:01<00:00, 272.83it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 310.37it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 305.40it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 312.11it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 310.49it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 265.14it/s]
+[21:43:37] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[21:44:59] glm4: semantic latent audit 1/5 cases; rows=25
+[21:46:20] glm4: semantic latent audit 2/5 cases; rows=50
+[21:47:41] glm4: semantic latent audit 3/5 cases; rows=75
+[21:49:01] glm4: semantic latent audit 4/5 cases; rows=100
+[21:50:22] glm4: semantic latent audit 5/5 cases; rows=125
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "main",
+  "n_cases": 5,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 5,
+      "case_n": 5,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.8,
+      "pool_target_top1_rate": 0.8,
+      "mean_base_target_rank": 45.8,
+      "mean_pool_target_rank": 1.2,
+      "mean_base_margin": 2.933984375,
+      "mean_pool_margin_target_vs_best_other": 1.525
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 5,
+      "case_n": 5,
+      "base_top1_rate": 1.0,
+      "latent_pool_hit_rate": 0.0,
+      "pool_target_top1_rate": 1.0,
+      "mean_base_target_rank": 1.0,
+      "mean_pool_target_rank": 1.0,
+      "mean_base_margin": 2.05625,
+      "mean_pool_margin_target_vs_best_other": 1.5625
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 5,
+      "case_n": 5,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.6,
+      "pool_target_top1_rate": 0.6,
+      "mean_base_target_rank": 42.0,
+      "mean_pool_target_rank": 1.4,
+      "mean_base_margin": 2.61171875,
+      "mean_pool_margin_target_vs_best_other": 1.39375
+    }
+  ],
+  "by_prompt_effect": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 35,
+      "case_n": 5,
+      "mean_target_logit_drop": -0.004464285714285714,
+      "mean_margin_drop_target_vs_contrast": -0.0030691964285714285,
+      "mean_target_rank_delta": -0.7142857142857143,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.004464285714285714,
+      "mean_attention_mass": 0.5489603706768581,
+      "mean_direct_target_boost": 0.008341061669800963,
+      "mean_direct_route_suppression": 0.04281730882690421,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 40,
+      "case_n": 5,
+      "mean_target_logit_drop": 0.0046875,
+      "mean_margin_drop_target_vs_contrast": 0.0234375,
+      "mean_target_rank_delta": 0.0,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.015625,
+      "mean_attention_mass": 0.5260172292590142,
+      "mean_direct_target_boost": 0.057553388201631604,
+      "mean_direct_route_suppression": 0.045037237481301416,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "candidate_kind": "source_group_top_component",
+      "n": 35,
+      "case_n": 5,
+      "mean_target_logit_drop": -0.008928571428571428,
+      "mean_margin_drop_target_vs_contrast": 0.005245535714285714,
+      "mean_target_rank_delta": -0.5428571428571428,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.0035714285714285713,
+      "mean_attention_mass": 0.5364336013793946,
+      "mean_direct_target_boost": 0.011760029888578823,
+      "mean_direct_route_suppression": 0.04320797797159425,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    }
+  ]
+}

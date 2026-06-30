@@ -1,0 +1,78 @@
+[20:37:58] deepseek7b/confirm: focus=clean_fiber_high cases=5 sources=['instruction', 'question', 'object_tokens', 'relation_tokens']
+[20:37:58] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:27, 12.46it/s]Loading weights:   8%|▊         | 26/339 [00:00<00:02, 107.99it/s]Loading weights:  14%|█▎        | 46/339 [00:00<00:02, 131.74it/s]Loading weights:  30%|██▉       | 101/339 [00:00<00:00, 261.96it/s]Loading weights:  40%|████      | 136/339 [00:00<00:00, 283.89it/s]Loading weights:  49%|████▉     | 166/339 [00:00<00:00, 254.09it/s]Loading weights:  60%|█████▉    | 202/339 [00:00<00:00, 282.70it/s]Loading weights:  69%|██████▊   | 233/339 [00:00<00:00, 273.76it/s]Loading weights:  79%|███████▉  | 267/339 [00:01<00:00, 265.62it/s]Loading weights:  87%|████████▋ | 295/339 [00:01<00:00, 257.30it/s]Loading weights:  96%|█████████▋| 327/339 [00:01<00:00, 272.42it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 251.55it/s]
+[20:38:00] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[20:38:11] deepseek7b: component discovery 1/5 cases; rows=4
+[20:38:21] deepseek7b: component discovery 2/5 cases; rows=8
+[20:38:31] deepseek7b: component discovery 3/5 cases; rows=12
+[20:38:41] deepseek7b: component discovery 4/5 cases; rows=16
+[20:38:51] deepseek7b: component discovery 5/5 cases; rows=20
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "confirm",
+  "n_cases": 5,
+  "top_components": [
+    {
+      "component_key": "L27:attn_out:H21:instruction",
+      "n": 2,
+      "case_n": 2,
+      "mean_scan_score": 25.321148596704003,
+      "mean_target_logit_drop": 0.84375,
+      "mean_margin_drop_target_vs_contrast": 0.6875,
+      "mean_attention_mass": 0.8246040344238281,
+      "mean_direct_target_boost": 17.57511329650879,
+      "mean_direct_route_suppression": 0.3258933275938034,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "component_key": "L25:attn_out:H11:instruction",
+      "n": 1,
+      "case_n": 1,
+      "mean_scan_score": 27.137691003084182,
+      "mean_target_logit_drop": 0.6875,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_attention_mass": 0.841667890548706,
+      "mean_direct_target_boost": 17.085725784301758,
+      "mean_direct_route_suppression": 2.679121673107147,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "component_key": "L27:attn_out:H23:instruction",
+      "n": 3,
+      "case_n": 3,
+      "mean_scan_score": 26.621535038948057,
+      "mean_target_logit_drop": 0.5416666666666666,
+      "mean_margin_drop_target_vs_contrast": 0.3020833333333333,
+      "mean_attention_mass": 0.7850522994995117,
+      "mean_direct_target_boost": 18.80239741007487,
+      "mean_direct_route_suppression": 0.36799295743306476,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "component_key": "L27:attn_out:H17:instruction",
+      "n": 1,
+      "case_n": 1,
+      "mean_scan_score": 13.999360924959182,
+      "mean_target_logit_drop": 0.5,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_attention_mass": 0.8480091094970703,
+      "mean_direct_target_boost": 10.465287208557129,
+      "mean_direct_route_suppression": 0.7946754693984985,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "component_key": "L23:attn_out:H19:instruction",
+      "n": 2,
+      "case_n": 2,
+      "mean_scan_score": 15.463629126548767,
+      "mean_target_logit_drop": 0.375,
+      "mean_margin_drop_target_vs_contrast": -0.75,
+      "mean_attention_mass": 0.8666855096817017,
+      "mean_direct_target_boost": 14.63208293914795,
+      "mean_direct_route_suppression": 0.0,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

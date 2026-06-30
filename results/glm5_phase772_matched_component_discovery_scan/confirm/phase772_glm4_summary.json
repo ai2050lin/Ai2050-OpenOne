@@ -1,0 +1,303 @@
+{
+  "attn_implementation": "eager",
+  "by_candidate_kind": [
+    {
+      "candidate_kind": "scan_top_component",
+      "case_n": 5,
+      "mean_attention_mass": 0.8758116066455841,
+      "mean_direct_route_suppression": 0.09303224999457597,
+      "mean_direct_target_boost": 0.2641355708241463,
+      "mean_margin_drop_target_vs_contrast": 0.0875,
+      "mean_scan_score": 0.5995650281896815,
+      "mean_target_logit_drop": 0.025,
+      "n": 10,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "candidate_kind": "same_layer_control_head",
+      "case_n": 5,
+      "mean_attention_mass": 0.6557812750339508,
+      "mean_direct_route_suppression": 0.041001778893405574,
+      "mean_direct_target_boost": -0.0021366025088354946,
+      "mean_margin_drop_target_vs_contrast": 0.009375,
+      "mean_scan_score": 0.06158191307011294,
+      "mean_target_logit_drop": 0.0125,
+      "n": 10,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_fiber_bucket": [
+    {
+      "case_n": 5,
+      "fiber_bucket": "fiber_high",
+      "mean_attention_mass": 0.7657964408397675,
+      "mean_direct_route_suppression": 0.06701701444399077,
+      "mean_direct_target_boost": 0.1309994841576554,
+      "mean_margin_drop_target_vs_contrast": 0.0484375,
+      "mean_scan_score": 0.33057347062989717,
+      "mean_target_logit_drop": 0.01875,
+      "n": 20,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_matched_arm": [
+    {
+      "case_n": 5,
+      "matched_arm": "clean",
+      "mean_attention_mass": 0.7657964408397675,
+      "mean_direct_route_suppression": 0.06701701444399077,
+      "mean_direct_target_boost": 0.1309994841576554,
+      "mean_margin_drop_target_vs_contrast": 0.0484375,
+      "mean_scan_score": 0.33057347062989717,
+      "mean_target_logit_drop": 0.01875,
+      "n": 20,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_semantic_label": [
+    {
+      "case_n": 5,
+      "mean_attention_mass": 0.7657964408397675,
+      "mean_direct_route_suppression": 0.06701701444399077,
+      "mean_direct_target_boost": 0.1309994841576554,
+      "mean_margin_drop_target_vs_contrast": 0.0484375,
+      "mean_scan_score": 0.33057347062989717,
+      "mean_target_logit_drop": 0.01875,
+      "n": 20,
+      "semantic_label": "exact_clean",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_source_group": [
+    {
+      "case_n": 5,
+      "mean_attention_mass": 0.7657964408397675,
+      "mean_direct_route_suppression": 0.06701701444399077,
+      "mean_direct_target_boost": 0.1309994841576554,
+      "mean_margin_drop_target_vs_contrast": 0.0484375,
+      "mean_scan_score": 0.33057347062989717,
+      "mean_target_logit_drop": 0.01875,
+      "n": 20,
+      "source_group": "instruction",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "dtype": "bfloat16",
+  "focus": "clean_fiber_high",
+  "model": "glm4",
+  "n_cases": 5,
+  "n_pairs": 5,
+  "n_rows": 20,
+  "phase": 772,
+  "quantization": "off",
+  "round": "confirm",
+  "scan_layers": [
+    34,
+    35,
+    38,
+    39
+  ],
+  "source_groups": [
+    "instruction",
+    "question",
+    "object_tokens",
+    "relation_tokens"
+  ],
+  "strict_interpretation": "This is a direct-score discovery scan followed by top-component causal removal. It is head/source-level, not neuron/channel-level.",
+  "timestamp": "2026-06-29 20:37:55",
+  "title": "Matched Component Discovery Scan",
+  "top_components": [
+    {
+      "case_n": 1,
+      "component_key": "L34:attn_out:H13:instruction",
+      "mean_attention_mass": 0.8819694519042969,
+      "mean_direct_route_suppression": 0.06562203634530306,
+      "mean_direct_target_boost": 0.8376140594482422,
+      "mean_margin_drop_target_vs_contrast": 0.3125,
+      "mean_scan_score": 1.2429834774074455,
+      "mean_target_logit_drop": 0.3125,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L35:attn_out:H28:instruction",
+      "mean_attention_mass": 0.9179630279541016,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 0.30197733640670776,
+      "mean_margin_drop_target_vs_contrast": 0.125,
+      "mean_scan_score": 0.4505554370582104,
+      "mean_target_logit_drop": 0.125,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L38:attn_out:H26:instruction",
+      "mean_attention_mass": 0.8861789703369141,
+      "mean_direct_route_suppression": 0.09911701083183289,
+      "mean_direct_target_boost": 0.028920087963342667,
+      "mean_margin_drop_target_vs_contrast": 0.125,
+      "mean_scan_score": 0.18680610433220862,
+      "mean_target_logit_drop": 0.125,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L34:attn_out:H22:instruction",
+      "mean_attention_mass": 0.9056310653686523,
+      "mean_direct_route_suppression": 0.026534639298915863,
+      "mean_direct_target_boost": 0.6994664669036865,
+      "mean_margin_drop_target_vs_contrast": 0.125,
+      "mean_scan_score": 1.1210159115493297,
+      "mean_target_logit_drop": 0.0625,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L38:attn_out:H31:instruction",
+      "mean_attention_mass": 0.6878585815429688,
+      "mean_direct_route_suppression": 0.07883798331022263,
+      "mean_direct_target_boost": 0.014516398310661316,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_scan_score": 0.13500551357865334,
+      "mean_target_logit_drop": 0.0625,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L34:attn_out:H27:instruction",
+      "mean_attention_mass": 0.8584318161010742,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 0.002131235785782337,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 0.04505282659083605,
+      "mean_target_logit_drop": 0.0625,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 2,
+      "component_key": "L34:attn_out:H1:instruction",
+      "mean_attention_mass": 0.7160661220550537,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 0.5622458904981613,
+      "mean_margin_drop_target_vs_contrast": 0.0625,
+      "mean_scan_score": 0.8770889446139336,
+      "mean_target_logit_drop": 0.03125,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 2,
+      "component_key": "L34:attn_out:H20:instruction",
+      "mean_attention_mass": 0.8894557952880859,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 0.23139359056949615,
+      "mean_margin_drop_target_vs_contrast": 0.03125,
+      "mean_scan_score": 0.38331537544727323,
+      "mean_target_logit_drop": 0.03125,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L38:attn_out:H6:instruction",
+      "mean_attention_mass": 0.9674202799797058,
+      "mean_direct_route_suppression": 0.28546220529824495,
+      "mean_direct_target_boost": -0.03519739583134651,
+      "mean_margin_drop_target_vs_contrast": 0.03125,
+      "mean_scan_score": 0.19729193553018073,
+      "mean_target_logit_drop": 0.0,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L38:attn_out:H11:instruction",
+      "mean_attention_mass": 0.5346542000770569,
+      "mean_direct_route_suppression": 0.25049964524805546,
+      "mean_direct_target_boost": -0.028653886169195175,
+      "mean_margin_drop_target_vs_contrast": 0.03125,
+      "mean_scan_score": 0.15853055974779032,
+      "mean_target_logit_drop": 0.0,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L34:attn_out:H7:instruction",
+      "mean_attention_mass": 0.8877048492431641,
+      "mean_direct_route_suppression": 0.023022647423204035,
+      "mean_direct_target_boost": 0.005681283306330442,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 0.06377727053477429,
+      "mean_target_logit_drop": 0.0,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L35:attn_out:H1:instruction",
+      "mean_attention_mass": 0.6149773597717285,
+      "mean_direct_route_suppression": 0.05660115135833621,
+      "mean_direct_target_boost": -0.0014960137195885181,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 0.06301819934354475,
+      "mean_target_logit_drop": 0.0,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 2,
+      "component_key": "L34:attn_out:H25:instruction",
+      "mean_attention_mass": 0.7917251586914062,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": -0.005913062021136284,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 0.03958625793457031,
+      "mean_target_logit_drop": 0.0,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 2,
+      "component_key": "L34:attn_out:H6:instruction",
+      "mean_attention_mass": 0.6512572765350342,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": -0.0012723839026875794,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 0.032562863826751706,
+      "mean_target_logit_drop": 0.0,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L34:attn_out:H18:instruction",
+      "mean_attention_mass": 0.08822107315063477,
+      "mean_direct_route_suppression": 0.0010563615942373872,
+      "mean_direct_target_boost": 0.0008258492453023791,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 0.006136517382886571,
+      "mean_target_logit_drop": 0.0,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L34:attn_out:H2:instruction",
+      "mean_attention_mass": 0.9879094362258911,
+      "mean_direct_route_suppression": 0.453586608171463,
+      "mean_direct_target_boost": -0.7787038087844849,
+      "mean_margin_drop_target_vs_contrast": -0.03125,
+      "mean_scan_score": 0.27618877589702606,
+      "mean_target_logit_drop": -0.5,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

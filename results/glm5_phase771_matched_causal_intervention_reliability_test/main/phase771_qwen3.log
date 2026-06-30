@@ -1,0 +1,44 @@
+[19:54:54] qwen3/main: matched cases=12 pairs=6 sources=['instruction', 'question', 'object_tokens', 'relation_tokens']
+[19:54:55] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 254.01it/s]Loading weights:  22%|██▏       | 89/398 [00:00<00:00, 472.59it/s]Loading weights:  37%|███▋      | 147/398 [00:00<00:00, 512.18it/s]Loading weights:  50%|█████     | 200/398 [00:00<00:00, 500.78it/s]Loading weights:  68%|██████▊   | 271/398 [00:00<00:00, 555.27it/s]Loading weights:  86%|████████▌ | 341/398 [00:00<00:00, 599.61it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 552.62it/s]
+[19:54:56] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[19:54:58] qwen3: matched causal cases 4/12 rows=16
+[19:54:59] qwen3: matched causal cases 8/12 rows=32
+[19:55:01] qwen3: matched causal cases 12/12 rows=48
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "n_cases": 12,
+  "by_matched_arm": [
+    {
+      "matched_arm": "clean",
+      "n": 24,
+      "mean_target_logit_drop": -0.010416666666666666,
+      "mean_margin_drop_target_vs_contrast": -0.06510416666666667,
+      "mean_contrast_logit_gain": -0.0546875,
+      "mean_attention_mass": 0.2519694964090983,
+      "mean_direct_target_boost": 0.21693059710863358,
+      "mean_direct_route_suppression": 0.07357579714152962,
+      "top1_loss_rate": 0.0,
+      "candidate_kind_counts": {
+        "phase755_top_candidate": 24
+      }
+    },
+    {
+      "matched_arm": "fail",
+      "n": 24,
+      "mean_target_logit_drop": -0.026041666666666668,
+      "mean_margin_drop_target_vs_contrast": -0.109375,
+      "mean_contrast_logit_gain": -0.08333333333333333,
+      "mean_attention_mass": 0.24915401140848795,
+      "mean_direct_target_boost": 0.15084638844321793,
+      "mean_direct_route_suppression": 0.06799701403360814,
+      "top1_loss_rate": 0.0,
+      "candidate_kind_counts": {
+        "phase755_top_candidate": 24
+      }
+    }
+  ]
+}

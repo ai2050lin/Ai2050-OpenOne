@@ -1,0 +1,43 @@
+[19:54:36] deepseek7b/smoke: matched cases=2 pairs=1 sources=['instruction', 'question']
+[19:54:37] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:34,  9.70it/s]Loading weights:  11%|█         | 38/339 [00:00<00:02, 140.93it/s]Loading weights:  19%|█▉        | 64/339 [00:00<00:01, 181.71it/s]Loading weights:  26%|██▌       | 87/339 [00:00<00:01, 194.72it/s]Loading weights:  40%|████      | 136/339 [00:00<00:00, 281.22it/s]Loading weights:  49%|████▉     | 167/339 [00:00<00:00, 280.14it/s]Loading weights:  58%|█████▊    | 197/339 [00:00<00:00, 276.58it/s]Loading weights:  67%|██████▋   | 226/339 [00:00<00:00, 273.48it/s]Loading weights:  76%|███████▌  | 257/339 [00:01<00:00, 276.85it/s]Loading weights:  84%|████████▍ | 286/339 [00:01<00:00, 273.60it/s]Loading weights:  93%|█████████▎| 316/339 [00:01<00:00, 277.82it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 247.68it/s]
+[19:54:39] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
+[19:54:40] deepseek7b: matched causal cases 1/2 rows=2
+[19:54:40] deepseek7b: matched causal cases 2/2 rows=4
+[model_utils] GPU memory released, allocated=15.24 GB
+{
+  "model": "deepseek7b",
+  "round": "smoke",
+  "n_cases": 2,
+  "by_matched_arm": [
+    {
+      "matched_arm": "clean",
+      "n": 2,
+      "mean_target_logit_drop": 0.0,
+      "mean_margin_drop_target_vs_contrast": -0.03125,
+      "mean_contrast_logit_gain": -0.03125,
+      "mean_attention_mass": 0.4281127452850342,
+      "mean_direct_target_boost": -0.059631288051605225,
+      "mean_direct_route_suppression": 0.24953874573111534,
+      "top1_loss_rate": 0.0,
+      "candidate_kind_counts": {
+        "phase755_top_candidate": 2
+      }
+    },
+    {
+      "matched_arm": "fail",
+      "n": 2,
+      "mean_target_logit_drop": -0.03125,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_contrast_logit_gain": -0.03125,
+      "mean_attention_mass": 0.41584348678588867,
+      "mean_direct_target_boost": -0.06874293833971024,
+      "mean_direct_route_suppression": 0.22825866006314754,
+      "top1_loss_rate": 0.0,
+      "candidate_kind_counts": {
+        "phase755_top_candidate": 2
+      }
+    }
+  ]
+}

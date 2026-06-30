@@ -1,0 +1,143 @@
+{
+  "attn_implementation": "eager",
+  "by_candidate_kind": [
+    {
+      "candidate_kind": "scan_top_component",
+      "case_n": 2,
+      "mean_attention_mass": 0.9310641288757324,
+      "mean_direct_route_suppression": 1.784225009381771,
+      "mean_direct_target_boost": 20.24822998046875,
+      "mean_margin_drop_target_vs_contrast": 2.78125,
+      "mean_scan_score": 31.175401293486356,
+      "mean_target_logit_drop": 2.5625,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_fiber_bucket": [
+    {
+      "case_n": 1,
+      "fiber_bucket": "fiber_low",
+      "mean_attention_mass": 0.9132261276245117,
+      "mean_direct_route_suppression": 1.629946619272232,
+      "mean_direct_target_boost": 18.50943374633789,
+      "mean_margin_drop_target_vs_contrast": 3.625,
+      "mean_scan_score": 28.389572432637216,
+      "mean_target_logit_drop": 3.5,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "fiber_bucket": "fiber_high",
+      "mean_attention_mass": 0.9489021301269531,
+      "mean_direct_route_suppression": 1.9385033994913101,
+      "mean_direct_target_boost": 21.98702621459961,
+      "mean_margin_drop_target_vs_contrast": 1.9375,
+      "mean_scan_score": 33.961230154335496,
+      "mean_target_logit_drop": 1.625,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_matched_arm": [
+    {
+      "case_n": 1,
+      "matched_arm": "fail",
+      "mean_attention_mass": 0.9132261276245117,
+      "mean_direct_route_suppression": 1.629946619272232,
+      "mean_direct_target_boost": 18.50943374633789,
+      "mean_margin_drop_target_vs_contrast": 3.625,
+      "mean_scan_score": 28.389572432637216,
+      "mean_target_logit_drop": 3.5,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "matched_arm": "clean",
+      "mean_attention_mass": 0.9489021301269531,
+      "mean_direct_route_suppression": 1.9385033994913101,
+      "mean_direct_target_boost": 21.98702621459961,
+      "mean_margin_drop_target_vs_contrast": 1.9375,
+      "mean_scan_score": 33.961230154335496,
+      "mean_target_logit_drop": 1.625,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_semantic_label": [
+    {
+      "case_n": 1,
+      "mean_attention_mass": 0.9132261276245117,
+      "mean_direct_route_suppression": 1.629946619272232,
+      "mean_direct_target_boost": 18.50943374633789,
+      "mean_margin_drop_target_vs_contrast": 3.625,
+      "mean_scan_score": 28.389572432637216,
+      "mean_target_logit_drop": 3.5,
+      "n": 1,
+      "semantic_label": "semantic_fail",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "mean_attention_mass": 0.9489021301269531,
+      "mean_direct_route_suppression": 1.9385033994913101,
+      "mean_direct_target_boost": 21.98702621459961,
+      "mean_margin_drop_target_vs_contrast": 1.9375,
+      "mean_scan_score": 33.961230154335496,
+      "mean_target_logit_drop": 1.625,
+      "n": 1,
+      "semantic_label": "exact_clean",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_source_group": [
+    {
+      "case_n": 2,
+      "mean_attention_mass": 0.9310641288757324,
+      "mean_direct_route_suppression": 1.784225009381771,
+      "mean_direct_target_boost": 20.24822998046875,
+      "mean_margin_drop_target_vs_contrast": 2.78125,
+      "mean_scan_score": 31.175401293486356,
+      "mean_target_logit_drop": 2.5625,
+      "n": 2,
+      "source_group": "instruction",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "dtype": "bfloat16",
+  "focus": "all_matched",
+  "model": "qwen3",
+  "n_cases": 2,
+  "n_pairs": 1,
+  "n_rows": 2,
+  "phase": 772,
+  "quantization": "off",
+  "round": "smoke",
+  "scan_layers": [
+    30,
+    32
+  ],
+  "source_groups": [
+    "instruction",
+    "question"
+  ],
+  "strict_interpretation": "This is a direct-score discovery scan followed by top-component causal removal. It is head/source-level, not neuron/channel-level.",
+  "timestamp": "2026-06-29 20:29:36",
+  "title": "Matched Component Discovery Scan",
+  "top_components": [
+    {
+      "case_n": 2,
+      "component_key": "L32:attn_out:H7:instruction",
+      "mean_attention_mass": 0.9310641288757324,
+      "mean_direct_route_suppression": 1.784225009381771,
+      "mean_direct_target_boost": 20.24822998046875,
+      "mean_margin_drop_target_vs_contrast": 2.78125,
+      "mean_scan_score": 31.175401293486356,
+      "mean_target_logit_drop": 2.5625,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

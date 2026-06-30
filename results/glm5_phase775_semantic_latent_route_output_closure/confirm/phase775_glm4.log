@@ -1,0 +1,150 @@
+[21:58:09] glm4/confirm: focus=clean_fiber_high cases=3 variants=without_candidate_list,constrained_free_prompt,with_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
+[21:58:10] [load] glm4: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<01:39,  4.44it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:04, 101.88it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 176.59it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 219.21it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 245.17it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 262.82it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 271.79it/s]Loading weights:  50%|████▉     | 221/443 [00:00<00:00, 269.28it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 289.21it/s]Loading weights:  65%|██████▌   | 290/443 [00:01<00:00, 293.51it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 295.35it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 304.08it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 306.67it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 304.66it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 263.64it/s]
+[21:58:12] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
+[21:59:35] glm4: semantic latent audit 1/3 cases; rows=47
+[22:00:56] glm4: semantic latent audit 2/3 cases; rows=94
+[22:02:18] glm4: semantic latent audit 3/3 cases; rows=141
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "n_cases": 3,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 3,
+      "case_n": 3,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.6666666666666666,
+      "pool_target_top1_rate": 0.6666666666666666,
+      "mean_base_target_rank": 72.66666666666667,
+      "mean_pool_target_rank": 1.3333333333333333,
+      "mean_base_margin": 4.619140625,
+      "mean_pool_margin_target_vs_best_other": 2.2708333333333335
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 3,
+      "case_n": 3,
+      "base_top1_rate": 1.0,
+      "latent_pool_hit_rate": 0.0,
+      "pool_target_top1_rate": 1.0,
+      "mean_base_target_rank": 1.0,
+      "mean_pool_target_rank": 1.0,
+      "mean_base_margin": 2.6979166666666665,
+      "mean_pool_margin_target_vs_best_other": 1.875
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 3,
+      "case_n": 3,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 1.0,
+      "pool_target_top1_rate": 1.0,
+      "mean_base_target_rank": 65.66666666666667,
+      "mean_pool_target_rank": 1.0,
+      "mean_base_margin": 4.67578125,
+      "mean_pool_margin_target_vs_best_other": 2.6458333333333335
+    }
+  ],
+  "by_prompt_effect": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 21,
+      "case_n": 3,
+      "mean_target_logit_drop": -0.010416666666666666,
+      "mean_margin_drop_target_vs_contrast": -0.002139136904761905,
+      "mean_target_rank_delta": -1.2380952380952381,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.010416666666666666,
+      "mean_attention_mass": 0.5819664228530157,
+      "mean_direct_target_boost": 0.012122857428732373,
+      "mean_direct_route_suppression": 0.06802332856958467,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "same_layer_control_head",
+      "n": 21,
+      "case_n": 3,
+      "mean_target_logit_drop": -0.002976190476190476,
+      "mean_margin_drop_target_vs_contrast": -0.003162202380952381,
+      "mean_target_rank_delta": -0.42857142857142855,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.005952380952380952,
+      "mean_attention_mass": 0.15043833142235166,
+      "mean_direct_target_boost": -0.0005685563711224296,
+      "mean_direct_route_suppression": 0.02538950035618438,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "same_layer_control_head",
+      "n": 24,
+      "case_n": 3,
+      "mean_target_logit_drop": 0.010416666666666666,
+      "mean_margin_drop_target_vs_contrast": 0.026041666666666668,
+      "mean_target_rank_delta": 0.0,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.026041666666666668,
+      "mean_attention_mass": 0.13351662581165633,
+      "mean_direct_target_boost": -0.00015455925502768272,
+      "mean_direct_route_suppression": 0.02851600666660185,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 24,
+      "case_n": 3,
+      "mean_target_logit_drop": 0.010416666666666666,
+      "mean_margin_drop_target_vs_contrast": 0.0390625,
+      "mean_target_rank_delta": 0.0,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.026041666666666668,
+      "mean_attention_mass": 0.5050582215189934,
+      "mean_direct_target_boost": 0.048230880949025355,
+      "mean_direct_route_suppression": 0.07295046687916813,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "candidate_kind": "same_layer_control_head",
+      "n": 21,
+      "case_n": 3,
+      "mean_target_logit_drop": -0.002976190476190476,
+      "mean_margin_drop_target_vs_contrast": 0.007068452380952381,
+      "mean_target_rank_delta": -0.38095238095238093,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.00744047619047619,
+      "mean_attention_mass": 0.08365131838391313,
+      "mean_direct_target_boost": -0.00019510494816560574,
+      "mean_direct_route_suppression": 0.016611591142363658,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "candidate_kind": "source_group_top_component",
+      "n": 21,
+      "case_n": 3,
+      "mean_target_logit_drop": -0.010416666666666666,
+      "mean_margin_drop_target_vs_contrast": -0.0016741071428571428,
+      "mean_target_rank_delta": -0.9523809523809523,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": -0.004464285714285714,
+      "mean_attention_mass": 0.5431813171931675,
+      "mean_direct_target_boost": 0.01332689378233183,
+      "mean_direct_route_suppression": 0.06863475115304547,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    }
+  ]
+}

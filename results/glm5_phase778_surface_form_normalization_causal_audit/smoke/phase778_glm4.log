@@ -1,0 +1,96 @@
+[22:33:47] glm4/smoke: selected surface cases=2 variants=without_candidate_list,constrained_free_prompt,lowercase_short_value,lowercase_no_punctuation,token_identity_contract,with_candidate_list
+[22:33:48] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[22:33:48] [load] glm4: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[22:33:48] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:54,  8.07it/s]Loading weights:   8%|▊         | 35/443 [00:00<00:03, 124.16it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 197.77it/s]Loading weights:  23%|██▎       | 104/443 [00:00<00:01, 227.54it/s]Loading weights:  31%|███       | 137/443 [00:00<00:01, 254.64it/s]Loading weights:  38%|███▊      | 170/443 [00:00<00:01, 266.23it/s]Loading weights:  46%|████▌     | 203/443 [00:00<00:00, 284.09it/s]Loading weights:  53%|█████▎    | 233/443 [00:01<00:00, 284.49it/s]Loading weights:  61%|██████    | 269/443 [00:01<00:00, 297.60it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 299.41it/s]Loading weights:  76%|███████▌  | 335/443 [00:01<00:00, 306.10it/s]Loading weights:  83%|████████▎ | 366/443 [00:01<00:00, 300.92it/s]Loading weights:  90%|█████████ | 399/443 [00:01<00:00, 305.70it/s]Loading weights:  98%|█████████▊| 434/443 [00:01<00:00, 315.32it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 269.29it/s]
+[22:33:50] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
+[22:33:51] glm4: surface-form audit 1/2 cases; rows=66
+[22:33:51] glm4: surface-form audit 2/2 cases; rows=132
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "smoke",
+  "attn": "sdpa",
+  "n_cases": 2,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 1.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 2.0,
+      "mean_top1_gap_above_target": 1.46875
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "token_identity_contract",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 1.0,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 1.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 4.0,
+      "mean_top1_gap_above_target": 1.03125
+    },
+    {
+      "prompt_variant": "lowercase_short_value",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "lowercase_no_punctuation",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 2,
+      "case_n": 2,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 1.0,
+      "pool_top1_rate": 0.5,
+      "case_variant_top1_rate": 1.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 3.5,
+      "mean_top1_gap_above_target": 1.84375
+    }
+  ]
+}

@@ -1,0 +1,303 @@
+{
+  "attn_implementation": "eager",
+  "by_candidate_kind": [
+    {
+      "candidate_kind": "scan_top_component",
+      "case_n": 8,
+      "mean_attention_mass": 0.7575638939936956,
+      "mean_direct_route_suppression": 0.6469020619988441,
+      "mean_direct_target_boost": 10.845425437514981,
+      "mean_margin_drop_target_vs_contrast": 0.2890625,
+      "mean_scan_score": 14.660226597740419,
+      "mean_target_logit_drop": 0.5572916666666666,
+      "n": 24,
+      "top1_loss_rate": 0.08333333333333333
+    }
+  ],
+  "by_fiber_bucket": [
+    {
+      "case_n": 4,
+      "fiber_bucket": "fiber_high",
+      "mean_attention_mass": 0.8252022763093313,
+      "mean_direct_route_suppression": 0.7509974216421446,
+      "mean_direct_target_boost": 13.243991176287333,
+      "mean_margin_drop_target_vs_contrast": 0.46875,
+      "mean_scan_score": 18.83044725851052,
+      "mean_target_logit_drop": 0.6354166666666666,
+      "n": 12,
+      "top1_loss_rate": 0.16666666666666666
+    },
+    {
+      "case_n": 4,
+      "fiber_bucket": "fiber_low",
+      "mean_attention_mass": 0.6899255116780599,
+      "mean_direct_route_suppression": 0.5428067023555437,
+      "mean_direct_target_boost": 8.446859698742628,
+      "mean_margin_drop_target_vs_contrast": 0.109375,
+      "mean_scan_score": 10.490005936970313,
+      "mean_target_logit_drop": 0.4791666666666667,
+      "n": 12,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_matched_arm": [
+    {
+      "case_n": 4,
+      "matched_arm": "clean",
+      "mean_attention_mass": 0.7692481577396393,
+      "mean_direct_route_suppression": 0.6159757102529207,
+      "mean_direct_target_boost": 12.78104559580485,
+      "mean_margin_drop_target_vs_contrast": 0.4010416666666667,
+      "mean_scan_score": 17.750840650457473,
+      "mean_target_logit_drop": 0.625,
+      "n": 12,
+      "top1_loss_rate": 0.16666666666666666
+    },
+    {
+      "case_n": 4,
+      "matched_arm": "fail",
+      "mean_attention_mass": 0.7458796302477518,
+      "mean_direct_route_suppression": 0.6778284137447675,
+      "mean_direct_target_boost": 8.909805279225111,
+      "mean_margin_drop_target_vs_contrast": 0.17708333333333334,
+      "mean_scan_score": 11.569612545023361,
+      "mean_target_logit_drop": 0.4895833333333333,
+      "n": 12,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_semantic_label": [
+    {
+      "case_n": 2,
+      "mean_attention_mass": 0.7684670885403951,
+      "mean_direct_route_suppression": 0.4518437087535858,
+      "mean_direct_target_boost": 12.598138809204102,
+      "mean_margin_drop_target_vs_contrast": 0.5208333333333334,
+      "mean_scan_score": 17.333226282149553,
+      "mean_target_logit_drop": 0.6875,
+      "n": 6,
+      "semantic_label": "exact_clean",
+      "top1_loss_rate": 0.3333333333333333
+    },
+    {
+      "case_n": 2,
+      "mean_attention_mass": 0.7700292269388834,
+      "mean_direct_route_suppression": 0.7801077117522558,
+      "mean_direct_target_boost": 12.9639523824056,
+      "mean_margin_drop_target_vs_contrast": 0.28125,
+      "mean_scan_score": 18.168455018765396,
+      "mean_target_logit_drop": 0.5625,
+      "n": 6,
+      "semantic_label": "semantic_only",
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 4,
+      "mean_attention_mass": 0.7458796302477518,
+      "mean_direct_route_suppression": 0.6778284137447675,
+      "mean_direct_target_boost": 8.909805279225111,
+      "mean_margin_drop_target_vs_contrast": 0.17708333333333334,
+      "mean_scan_score": 11.569612545023361,
+      "mean_target_logit_drop": 0.4895833333333333,
+      "n": 12,
+      "semantic_label": "semantic_fail",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_source_group": [
+    {
+      "case_n": 8,
+      "mean_attention_mass": 0.7575638939936956,
+      "mean_direct_route_suppression": 0.6469020619988441,
+      "mean_direct_target_boost": 10.845425437514981,
+      "mean_margin_drop_target_vs_contrast": 0.2890625,
+      "mean_scan_score": 14.660226597740419,
+      "mean_target_logit_drop": 0.5572916666666666,
+      "n": 24,
+      "source_group": "instruction",
+      "top1_loss_rate": 0.08333333333333333
+    }
+  ],
+  "dtype": "bfloat16",
+  "focus": "all_matched",
+  "model": "deepseek7b",
+  "n_cases": 8,
+  "n_pairs": 6,
+  "n_rows": 24,
+  "phase": 772,
+  "quantization": "off",
+  "round": "main",
+  "scan_layers": [
+    22,
+    23,
+    25,
+    27
+  ],
+  "source_groups": [
+    "instruction",
+    "question",
+    "object_tokens",
+    "relation_tokens"
+  ],
+  "strict_interpretation": "This is a direct-score discovery scan followed by top-component causal removal. It is head/source-level, not neuron/channel-level.",
+  "timestamp": "2026-06-29 20:35:21",
+  "title": "Matched Component Discovery Scan",
+  "top_components": [
+    {
+      "case_n": 1,
+      "component_key": "L23:attn_out:H11:instruction",
+      "mean_attention_mass": 0.9702035188674927,
+      "mean_direct_route_suppression": 0.03538510203361511,
+      "mean_direct_target_boost": 7.215384006500244,
+      "mean_margin_drop_target_vs_contrast": 1.375,
+      "mean_scan_score": 10.429006106654802,
+      "mean_target_logit_drop": 0.9375,
+      "n": 1,
+      "top1_loss_rate": 1.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L27:attn_out:H24:instruction",
+      "mean_attention_mass": 0.8072032928466797,
+      "mean_direct_route_suppression": 1.549517273902893,
+      "mean_direct_target_boost": 17.794071197509766,
+      "mean_margin_drop_target_vs_contrast": 1.25,
+      "mean_scan_score": 27.5797886967659,
+      "mean_target_logit_drop": 0.9375,
+      "n": 1,
+      "top1_loss_rate": 1.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L27:attn_out:H21:instruction",
+      "mean_attention_mass": 0.8560333251953125,
+      "mean_direct_route_suppression": 0.12920650839805603,
+      "mean_direct_target_boost": 24.75325584411621,
+      "mean_margin_drop_target_vs_contrast": 0.9375,
+      "mean_scan_score": 36.18927658895651,
+      "mean_target_logit_drop": 1.125,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 2,
+      "component_key": "L27:attn_out:H17:instruction",
+      "mean_attention_mass": 0.9031357765197754,
+      "mean_direct_route_suppression": 0.8487582802772522,
+      "mean_direct_target_boost": 15.831622123718262,
+      "mean_margin_drop_target_vs_contrast": 0.71875,
+      "mean_scan_score": 22.238131124029557,
+      "mean_target_logit_drop": 0.78125,
+      "n": 2,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L27:attn_out:H20:instruction",
+      "mean_attention_mass": 0.7494983673095703,
+      "mean_direct_route_suppression": 1.8723180890083313,
+      "mean_direct_target_boost": 14.351278305053711,
+      "mean_margin_drop_target_vs_contrast": 0.625,
+      "mean_scan_score": 22.307493644952775,
+      "mean_target_logit_drop": 0.6875,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L25:attn_out:H11:instruction",
+      "mean_attention_mass": 0.841667890548706,
+      "mean_direct_route_suppression": 2.679121673107147,
+      "mean_direct_target_boost": 17.085725784301758,
+      "mean_margin_drop_target_vs_contrast": 0.375,
+      "mean_scan_score": 27.137691003084182,
+      "mean_target_logit_drop": 0.6875,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 5,
+      "component_key": "L23:attn_out:H19:instruction",
+      "mean_attention_mass": 0.8940061092376709,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 13.840031242370605,
+      "mean_margin_drop_target_vs_contrast": 0.0875,
+      "mean_scan_score": 14.010298364162447,
+      "mean_target_logit_drop": 0.55,
+      "n": 5,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L25:attn_out:H13:instruction",
+      "mean_attention_mass": 0.7894058227539062,
+      "mean_direct_route_suppression": 0.199858158826828,
+      "mean_direct_target_boost": 17.339582443237305,
+      "mean_margin_drop_target_vs_contrast": 0.625,
+      "mean_scan_score": 25.766773781180383,
+      "mean_target_logit_drop": 0.5,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 4,
+      "component_key": "L27:attn_out:H27:instruction",
+      "mean_attention_mass": 0.6856967210769653,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 4.931111216545105,
+      "mean_margin_drop_target_vs_contrast": 0.203125,
+      "mean_scan_score": 6.836696392297744,
+      "mean_target_logit_drop": 0.484375,
+      "n": 4,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 4,
+      "component_key": "L27:attn_out:H23:instruction",
+      "mean_attention_mass": 0.6735826730728149,
+      "mean_direct_route_suppression": 0.21226142346858978,
+      "mean_direct_target_boost": 7.654970645904541,
+      "mean_margin_drop_target_vs_contrast": -0.34375,
+      "mean_scan_score": 9.53205826729536,
+      "mean_target_logit_drop": 0.46875,
+      "n": 4,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L27:attn_out:H5:instruction",
+      "mean_attention_mass": 0.6250801086425781,
+      "mean_direct_route_suppression": 0.2913512885570526,
+      "mean_direct_target_boost": 7.117330074310303,
+      "mean_margin_drop_target_vs_contrast": 0.3125,
+      "mean_scan_score": 10.998600181937217,
+      "mean_target_logit_drop": 0.25,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L27:attn_out:H10:instruction",
+      "mean_attention_mass": 0.30859375,
+      "mean_direct_route_suppression": 2.173210620880127,
+      "mean_direct_target_boost": 3.4573283195495605,
+      "mean_margin_drop_target_vs_contrast": 0.0,
+      "mean_scan_score": 7.374632549285889,
+      "mean_target_logit_drop": 0.25,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L25:attn_out:H27:instruction",
+      "mean_attention_mass": 0.5204277038574219,
+      "mean_direct_route_suppression": 4.049118518829346,
+      "mean_direct_target_boost": -0.03147338330745697,
+      "mean_margin_drop_target_vs_contrast": 0.125,
+      "mean_scan_score": 4.0594030857086185,
+      "mean_target_logit_drop": -0.125,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

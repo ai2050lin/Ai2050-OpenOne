@@ -1,0 +1,255 @@
+{
+  "attn_implementation": "eager",
+  "by_candidate_kind": [
+    {
+      "candidate_kind": "scan_top_component",
+      "case_n": 8,
+      "mean_attention_mass": 0.8977952698866526,
+      "mean_direct_route_suppression": 0.3235542457550764,
+      "mean_direct_target_boost": 7.68249083062013,
+      "mean_margin_drop_target_vs_contrast": 0.65625,
+      "mean_scan_score": 10.66598806321207,
+      "mean_target_logit_drop": 0.7395833333333334,
+      "n": 24,
+      "top1_loss_rate": 0.041666666666666664
+    }
+  ],
+  "by_fiber_bucket": [
+    {
+      "case_n": 3,
+      "fiber_bucket": "fiber_low",
+      "mean_attention_mass": 0.9016784429550171,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 9.04005954000685,
+      "mean_margin_drop_target_vs_contrast": 0.4583333333333333,
+      "mean_scan_score": 11.88365666270256,
+      "mean_target_logit_drop": 0.5833333333333334,
+      "n": 9,
+      "top1_loss_rate": 0.1111111111111111
+    },
+    {
+      "case_n": 5,
+      "fiber_bucket": "fiber_high",
+      "mean_attention_mass": 0.895465366045634,
+      "mean_direct_route_suppression": 0.5176867932081223,
+      "mean_direct_target_boost": 6.867949604988098,
+      "mean_margin_drop_target_vs_contrast": 0.775,
+      "mean_scan_score": 9.935386903517776,
+      "mean_target_logit_drop": 0.8333333333333334,
+      "n": 15,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_matched_arm": [
+    {
+      "case_n": 4,
+      "matched_arm": "clean",
+      "mean_attention_mass": 0.9179758926232656,
+      "mean_direct_route_suppression": 0.48644112174709636,
+      "mean_direct_target_boost": 8.365520894527435,
+      "mean_margin_drop_target_vs_contrast": 0.53125,
+      "mean_scan_score": 11.96022622713612,
+      "mean_target_logit_drop": 0.5208333333333334,
+      "n": 12,
+      "top1_loss_rate": 0.08333333333333333
+    },
+    {
+      "case_n": 4,
+      "matched_arm": "fail",
+      "mean_attention_mass": 0.8776146471500397,
+      "mean_direct_route_suppression": 0.16066736976305643,
+      "mean_direct_target_boost": 6.999460766712825,
+      "mean_margin_drop_target_vs_contrast": 0.78125,
+      "mean_scan_score": 9.371749899288018,
+      "mean_target_logit_drop": 0.9583333333333334,
+      "n": 12,
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_semantic_label": [
+    {
+      "case_n": 4,
+      "mean_attention_mass": 0.9179758926232656,
+      "mean_direct_route_suppression": 0.48644112174709636,
+      "mean_direct_target_boost": 8.365520894527435,
+      "mean_margin_drop_target_vs_contrast": 0.53125,
+      "mean_scan_score": 11.96022622713612,
+      "mean_target_logit_drop": 0.5208333333333334,
+      "n": 12,
+      "semantic_label": "exact_clean",
+      "top1_loss_rate": 0.08333333333333333
+    },
+    {
+      "case_n": 4,
+      "mean_attention_mass": 0.8776146471500397,
+      "mean_direct_route_suppression": 0.16066736976305643,
+      "mean_direct_target_boost": 6.999460766712825,
+      "mean_margin_drop_target_vs_contrast": 0.78125,
+      "mean_scan_score": 9.371749899288018,
+      "mean_target_logit_drop": 0.9583333333333334,
+      "n": 12,
+      "semantic_label": "semantic_fail",
+      "top1_loss_rate": 0.0
+    }
+  ],
+  "by_source_group": [
+    {
+      "case_n": 8,
+      "mean_attention_mass": 0.8977952698866526,
+      "mean_direct_route_suppression": 0.3235542457550764,
+      "mean_direct_target_boost": 7.68249083062013,
+      "mean_margin_drop_target_vs_contrast": 0.65625,
+      "mean_scan_score": 10.66598806321207,
+      "mean_target_logit_drop": 0.7395833333333334,
+      "n": 24,
+      "source_group": "instruction",
+      "top1_loss_rate": 0.041666666666666664
+    }
+  ],
+  "dtype": "bfloat16",
+  "focus": "all_matched",
+  "model": "qwen3",
+  "n_cases": 8,
+  "n_pairs": 6,
+  "n_rows": 24,
+  "phase": 772,
+  "quantization": "off",
+  "round": "main",
+  "scan_layers": [
+    30,
+    32,
+    33,
+    35
+  ],
+  "source_groups": [
+    "instruction",
+    "question",
+    "object_tokens",
+    "relation_tokens"
+  ],
+  "strict_interpretation": "This is a direct-score discovery scan followed by top-component causal removal. It is head/source-level, not neuron/channel-level.",
+  "timestamp": "2026-06-29 20:31:52",
+  "title": "Matched Component Discovery Scan",
+  "top_components": [
+    {
+      "case_n": 6,
+      "component_key": "L32:attn_out:H5:instruction",
+      "mean_attention_mass": 0.898473302523295,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 17.31428050994873,
+      "mean_margin_drop_target_vs_contrast": 1.8125,
+      "mean_scan_score": 23.70176549951235,
+      "mean_target_logit_drop": 2.125,
+      "n": 6,
+      "top1_loss_rate": 0.16666666666666666
+    },
+    {
+      "case_n": 1,
+      "component_key": "L32:attn_out:H7:instruction",
+      "mean_attention_mass": 0.9489021301269531,
+      "mean_direct_route_suppression": 1.9385033994913101,
+      "mean_direct_target_boost": 21.98702621459961,
+      "mean_margin_drop_target_vs_contrast": 1.9375,
+      "mean_scan_score": 33.961230154335496,
+      "mean_target_logit_drop": 1.625,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L30:attn_out:H27:instruction",
+      "mean_attention_mass": 0.9847869873046875,
+      "mean_direct_route_suppression": 0.6747391372919083,
+      "mean_direct_target_boost": 5.088243007659912,
+      "mean_margin_drop_target_vs_contrast": 0.625,
+      "mean_scan_score": 7.9962412113944685,
+      "mean_target_logit_drop": 0.75,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L33:attn_out:H20:instruction",
+      "mean_attention_mass": 0.8991203308105469,
+      "mean_direct_route_suppression": 0.27223965525627136,
+      "mean_direct_target_boost": 8.004130363464355,
+      "mean_margin_drop_target_vs_contrast": 0.25,
+      "mean_scan_score": 12.137090596556664,
+      "mean_target_logit_drop": 0.375,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 6,
+      "component_key": "L33:attn_out:H31:instruction",
+      "mean_attention_mass": 0.8320124944051107,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 2.9776708682378135,
+      "mean_margin_drop_target_vs_contrast": 0.20833333333333334,
+      "mean_scan_score": 3.819066951672236,
+      "mean_target_logit_drop": 0.375,
+      "n": 6,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L33:attn_out:H21:instruction",
+      "mean_attention_mass": 0.7181854248046875,
+      "mean_direct_route_suppression": 1.9280084371566772,
+      "mean_direct_target_boost": -0.13443076610565186,
+      "mean_margin_drop_target_vs_contrast": 0.125,
+      "mean_scan_score": 1.8967023253440858,
+      "mean_target_logit_drop": 0.375,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L32:attn_out:H3:instruction",
+      "mean_attention_mass": 0.8310279846191406,
+      "mean_direct_route_suppression": 0.944574698805809,
+      "mean_direct_target_boost": 4.2427473068237305,
+      "mean_margin_drop_target_vs_contrast": 0.6875,
+      "mean_scan_score": 6.8283654655019435,
+      "mean_target_logit_drop": 0.125,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L33:attn_out:H29:instruction",
+      "mean_attention_mass": 0.9659347534179688,
+      "mean_direct_route_suppression": 1.3157944679260254,
+      "mean_direct_target_boost": 2.8453118801116943,
+      "mean_margin_drop_target_vs_contrast": 0.1875,
+      "mean_scan_score": 5.0723062237103775,
+      "mean_target_logit_drop": 0.0,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 5,
+      "component_key": "L30:attn_out:H24:instruction",
+      "mean_attention_mass": 0.9749516487121582,
+      "mean_direct_route_suppression": 0.0,
+      "mean_direct_target_boost": 3.405774450302124,
+      "mean_margin_drop_target_vs_contrast": -0.025,
+      "mean_scan_score": 3.4545220327377324,
+      "mean_target_logit_drop": -0.025,
+      "n": 5,
+      "top1_loss_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "component_key": "L32:attn_out:H8:instruction",
+      "mean_attention_mass": 0.9414558410644531,
+      "mean_direct_route_suppression": 0.6914421021938324,
+      "mean_direct_target_boost": 3.566171407699585,
+      "mean_margin_drop_target_vs_contrast": -0.0625,
+      "mean_scan_score": 5.694172669450443,
+      "mean_target_logit_drop": -0.375,
+      "n": 1,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+[00:09:27] glm4/confirm: selected cases=6 variants=without_candidate_list,lowercase_short_value,with_candidate_list
+[00:09:28] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[00:09:28] [load] glm4: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[00:09:28] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<01:33,  4.74it/s]Loading weights:   6%|▌         | 25/443 [00:00<00:04, 91.71it/s]Loading weights:  16%|█▌        | 70/443 [00:00<00:01, 198.82it/s]Loading weights:  23%|██▎       | 104/443 [00:00<00:01, 236.27it/s]Loading weights:  31%|███       | 137/443 [00:00<00:01, 258.36it/s]Loading weights:  37%|███▋      | 165/443 [00:00<00:01, 256.19it/s]Loading weights:  46%|████▌     | 203/443 [00:00<00:00, 291.14it/s]Loading weights:  53%|█████▎    | 235/443 [00:00<00:00, 294.78it/s]Loading weights:  61%|██████    | 269/443 [00:01<00:00, 300.43it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 291.00it/s]Loading weights:  78%|███████▊  | 345/443 [00:01<00:00, 324.97it/s]Loading weights:  86%|████████▌ | 379/443 [00:01<00:00, 308.73it/s]Loading weights:  93%|█████████▎| 412/443 [00:01<00:00, 309.46it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 271.21it/s]
+[00:09:30] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
+[00:09:31] glm4: component localization 2/6 cases; rows=606
+[00:09:32] glm4: component localization 4/6 cases; rows=1212
+[00:09:32] glm4: component localization 6/6 cases; rows=1818
+[model_utils] GPU memory released, allocated=18.81 GB
+{
+  "model": "glm4",
+  "round": "confirm",
+  "attn": "sdpa",
+  "n_cases": 6,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "mean_margin_target_vs_case_variant": -1.2291666666666667,
+      "mean_target_rank": 3.5,
+      "top1_classes": {
+        "case_variant_target_value": 6
+      }
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "mean_margin_target_vs_case_variant": 1.7708333333333333,
+      "mean_target_rank": 1.0,
+      "top1_classes": {
+        "target_value": 6
+      }
+    },
+    {
+      "prompt_variant": "lowercase_short_value",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 0.5,
+      "semantic_equiv_open_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "mean_margin_target_vs_case_variant": -0.052083333333333336,
+      "mean_target_rank": 2.1666666666666665,
+      "top1_classes": {
+        "target_value": 3,
+        "case_variant_target_value": 3
+      }
+    }
+  ],
+  "top_delta_by_compare_kind_layer": [
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "mlp",
+      "layer": 38,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 3.0,
+      "mean_delta_direct_target_vs_case_variant": 1.5203763296206791,
+      "mean_delta_direct_target_vs_contrast": -0.5611240069071451,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 1.5203763296206791
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "attn",
+      "layer": 33,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 3.0,
+      "mean_delta_direct_target_vs_case_variant": 1.3408958241343498,
+      "mean_delta_direct_target_vs_contrast": 0.2885155603289604,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 1.3408958241343498
+    },
+    {
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "mlp",
+      "layer": 38,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 0.5,
+      "mean_delta_actual_margin": 1.1770833333333333,
+      "mean_delta_direct_target_vs_case_variant": 0.6161950180927912,
+      "mean_delta_direct_target_vs_contrast": 0.10001798470815022,
+      "positive_delta_rate": 0.8333333333333334,
+      "sign_align_rate": 0.8333333333333334,
+      "candidate_score": 0.4279132070088828
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "attn",
+      "layer": 29,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 3.0,
+      "mean_delta_direct_target_vs_case_variant": 0.4076552589734395,
+      "mean_delta_direct_target_vs_contrast": 0.4546489243706067,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 0.4076552589734395
+    },
+    {
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "mlp",
+      "layer": 39,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 0.5,
+      "mean_delta_actual_margin": 1.1770833333333333,
+      "mean_delta_direct_target_vs_case_variant": 0.5699707667032877,
+      "mean_delta_direct_target_vs_contrast": -0.07571081320444743,
+      "positive_delta_rate": 0.8333333333333334,
+      "sign_align_rate": 0.8333333333333334,
+      "candidate_score": 0.3958130324328387
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "attn",
+      "layer": 35,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 3.0,
+      "mean_delta_direct_target_vs_case_variant": 0.1495333214600881,
+      "mean_delta_direct_target_vs_contrast": 0.04610738530755043,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 0.1495333214600881
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "attn",
+      "layer": 32,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 3.0,
+      "mean_delta_direct_target_vs_case_variant": 0.12370608529696862,
+      "mean_delta_direct_target_vs_contrast": 0.35917753477891284,
+      "positive_delta_rate": 1.0,
+      "sign_align_rate": 1.0,
+      "candidate_score": 0.12370608529696862
+    },
+    {
+      "compare_variant": "with_candidate_list",
+      "component_kind": "mlp",
+      "layer": 34,
+      "n": 6,
+      "case_n": 6,
+      "strict_repair_rate": 1.0,
+      "mean_delta_actual_margin": 3.0,
+      "mean_delta_direct_target_vs_case_variant": 0.16060995031148195,
+      "mean_delta_direct_target_vs_contrast": 0.08147336915135384,
+      "positive_delta_rate": 0.8333333333333334,
+      "sign_align_rate": 0.8333333333333334,
+      "candidate_score": 0.11153468771630692
+    }
+  ]
+}

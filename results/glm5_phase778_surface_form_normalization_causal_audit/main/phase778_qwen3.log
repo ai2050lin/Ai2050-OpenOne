@@ -1,0 +1,97 @@
+[22:34:14] qwen3/main: selected surface cases=6 variants=without_candidate_list,constrained_free_prompt,lowercase_short_value,lowercase_no_punctuation,token_identity_contract,with_candidate_list
+[22:34:15] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+[22:34:15] [load] qwen3: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
+[22:34:15] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   1%|          | 4/398 [00:00<00:11, 33.85it/s]Loading weights:  26%|██▌       | 102/398 [00:00<00:00, 546.11it/s]Loading weights:  40%|████      | 160/398 [00:00<00:00, 544.25it/s]Loading weights:  57%|█████▋    | 228/398 [00:00<00:00, 587.76it/s]Loading weights:  73%|███████▎  | 291/398 [00:00<00:00, 583.87it/s]Loading weights:  90%|█████████ | 359/398 [00:00<00:00, 614.71it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 571.17it/s]
+[22:34:16] [load] qwen3: loaded sdpa, device=cuda:0, gpu=8.05GB
+[22:34:17] qwen3: surface-form audit 2/6 cases; rows=252
+[22:34:17] qwen3: surface-form audit 4/6 cases; rows=504
+[22:34:18] qwen3: surface-form audit 6/6 cases; rows=756
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "attn": "sdpa",
+  "n_cases": 6,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 0.8333333333333334,
+      "surface_gain_rate": 0.8333333333333334,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.8333333333333334,
+      "hard_readout_after_equiv_rate": 0.16666666666666666,
+      "mean_base_target_rank": 5.333333333333333,
+      "mean_top1_gap_above_target": 4.875
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "token_identity_contract",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 0.6666666666666666,
+      "semantic_equiv_open_rate": 0.6666666666666666,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.3333333333333333,
+      "mean_base_target_rank": 2.1666666666666665,
+      "mean_top1_gap_above_target": 1.0
+    },
+    {
+      "prompt_variant": "lowercase_short_value",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "lowercase_no_punctuation",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 1.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 0.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 0.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 1.0,
+      "mean_top1_gap_above_target": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 6,
+      "case_n": 6,
+      "strict_open_rate": 0.0,
+      "semantic_equiv_open_rate": 1.0,
+      "surface_gain_rate": 1.0,
+      "pool_top1_rate": 1.0,
+      "case_variant_top1_rate": 1.0,
+      "hard_readout_after_equiv_rate": 0.0,
+      "mean_base_target_rank": 2.5,
+      "mean_top1_gap_above_target": 3.0208333333333335
+    }
+  ]
+}

@@ -1,0 +1,730 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "id": "phase795:multi_component_causal_fiber_closure->model:qwen3",
+        "source": "phase795:multi_component_causal_fiber_closure",
+        "target": "model:qwen3",
+        "type": "tested_model"
+      },
+      {
+        "id": "qwen3:o_only:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "o_only",
+          "ladder_specificity_score": 4.9375,
+          "matched_delta_margin": -0.1875,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 0.0,
+          "matched_token_gain": 0.0,
+          "model": "qwen3",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 2.28125,
+          "top_minus_matched_delta_margin": 2.46875,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 1.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:qwen3",
+        "target": "qwen3:ladder:o_only",
+        "type": "has_closure_pressure",
+        "weight": 4.9375
+      },
+      {
+        "id": "qwen3:o_only->all_pre_answer:positive",
+        "source": "qwen3:ladder:o_only",
+        "target": "qwen3:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 2.46875
+      },
+      {
+        "id": "qwen3:kv_o_route:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_o_route",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 4.59375,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "qwen3",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 4.59375,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:qwen3",
+        "target": "qwen3:ladder:kv_o_route",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "qwen3:kv_o_route->all_pre_answer:positive",
+        "source": "qwen3:ladder:kv_o_route",
+        "target": "qwen3:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "qwen3:route_answer:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "route_answer",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 5.03125,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "qwen3",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 5.03125,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:qwen3",
+        "target": "qwen3:ladder:route_answer",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "qwen3:route_answer->all_pre_answer:positive",
+        "source": "qwen3:ladder:route_answer",
+        "target": "qwen3:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "qwen3:kv_source:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_source",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 4.09375,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "qwen3",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.59375,
+          "top_minus_matched_delta_margin": -2.5,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:qwen3",
+        "target": "qwen3:ladder:kv_source",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "qwen3:kv_source->all_pre_answer:positive",
+        "source": "qwen3:ladder:kv_source",
+        "target": "qwen3:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": -2.5
+      },
+      {
+        "id": "qwen3:kv_o:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_o",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 4.4375,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "qwen3",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.71875,
+          "top_minus_matched_delta_margin": -2.71875,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:qwen3",
+        "target": "qwen3:ladder:kv_o",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "qwen3:kv_o->all_pre_answer:positive",
+        "source": "qwen3:ladder:kv_o",
+        "target": "qwen3:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": -2.71875
+      },
+      {
+        "id": "phase795:multi_component_causal_fiber_closure->model:glm4",
+        "source": "phase795:multi_component_causal_fiber_closure",
+        "target": "model:glm4",
+        "type": "tested_model"
+      },
+      {
+        "id": "glm4:o_only:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "o_only",
+          "ladder_specificity_score": 2.875,
+          "matched_delta_margin": -0.1875,
+          "matched_n": 1,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 0.0,
+          "matched_token_gain": 0.0,
+          "model": "glm4",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.25,
+          "top_minus_matched_delta_margin": 1.4375,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 1.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 1,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:glm4",
+        "target": "glm4:ladder:o_only",
+        "type": "has_closure_pressure",
+        "weight": 2.875
+      },
+      {
+        "id": "glm4:o_only->all_pre_answer:positive",
+        "source": "glm4:ladder:o_only",
+        "target": "glm4:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 1.4375
+      },
+      {
+        "id": "glm4:kv_o_route:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_o_route",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 1.34375,
+          "matched_n": 1,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "glm4",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.34375,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 1,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:glm4",
+        "target": "glm4:ladder:kv_o_route",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:kv_o_route->all_pre_answer:positive",
+        "source": "glm4:ladder:kv_o_route",
+        "target": "glm4:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:kv_source:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_source",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 1.21875,
+          "matched_n": 1,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "glm4",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.21875,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 1,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:glm4",
+        "target": "glm4:ladder:kv_source",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:kv_source->all_pre_answer:positive",
+        "source": "glm4:ladder:kv_source",
+        "target": "glm4:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:route_answer:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "route_answer",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 1.34375,
+          "matched_n": 1,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "glm4",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.34375,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 1,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:glm4",
+        "target": "glm4:ladder:route_answer",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:route_answer->all_pre_answer:positive",
+        "source": "glm4:ladder:route_answer",
+        "target": "glm4:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:route_answer:all_pre_answer:route",
+        "metrics": {
+          "budget_label": "route_only",
+          "ladder_id": "route_answer",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 1.65625,
+          "matched_n": 1,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 0.0,
+          "matched_token_gain": 0.0,
+          "model": "glm4",
+          "source_group": "all_pre_answer",
+          "source_set_size": 0,
+          "subspace_mode": "route",
+          "top_delta_margin": 1.65625,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 1,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 0.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:glm4",
+        "target": "glm4:ladder:route_answer",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:route_answer->all_pre_answer:route",
+        "source": "glm4:ladder:route_answer",
+        "target": "glm4:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:kv_o:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_o",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 1.25,
+          "matched_n": 1,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "glm4",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.09375,
+          "top_minus_matched_delta_margin": -0.15625,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 1,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:glm4",
+        "target": "glm4:ladder:kv_o",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "glm4:kv_o->all_pre_answer:positive",
+        "source": "glm4:ladder:kv_o",
+        "target": "glm4:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": -0.15625
+      },
+      {
+        "id": "phase795:multi_component_causal_fiber_closure->model:deepseek7b",
+        "source": "phase795:multi_component_causal_fiber_closure",
+        "target": "model:deepseek7b",
+        "type": "tested_model"
+      },
+      {
+        "id": "deepseek7b:o_only:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "o_only",
+          "ladder_specificity_score": 1.2890625,
+          "matched_delta_margin": -0.0234375,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "deepseek7b",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.265625,
+          "top_minus_matched_delta_margin": 1.2890625,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:deepseek7b",
+        "target": "deepseek7b:ladder:o_only",
+        "type": "has_closure_pressure",
+        "weight": 1.2890625
+      },
+      {
+        "id": "deepseek7b:o_only->all_pre_answer:positive",
+        "source": "deepseek7b:ladder:o_only",
+        "target": "deepseek7b:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 1.2890625
+      },
+      {
+        "id": "deepseek7b:kv_source:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_source",
+          "ladder_specificity_score": 0.015625,
+          "matched_delta_margin": 2.375,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "deepseek7b",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 2.390625,
+          "top_minus_matched_delta_margin": 0.015625,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:deepseek7b",
+        "target": "deepseek7b:ladder:kv_source",
+        "type": "has_closure_pressure",
+        "weight": 0.015625
+      },
+      {
+        "id": "deepseek7b:kv_source->all_pre_answer:positive",
+        "source": "deepseek7b:ladder:kv_source",
+        "target": "deepseek7b:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.015625
+      },
+      {
+        "id": "deepseek7b:route_answer:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "route_answer",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 2.34375,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "deepseek7b",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 2.34375,
+          "top_minus_matched_delta_margin": 0.0,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:deepseek7b",
+        "target": "deepseek7b:ladder:route_answer",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "deepseek7b:route_answer->all_pre_answer:positive",
+        "source": "deepseek7b:ladder:route_answer",
+        "target": "deepseek7b:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": 0.0
+      },
+      {
+        "id": "deepseek7b:kv_o_route:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_o_route",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 2.75,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "deepseek7b",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 2.4375,
+          "top_minus_matched_delta_margin": -0.3125,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:deepseek7b",
+        "target": "deepseek7b:ladder:kv_o_route",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "deepseek7b:kv_o_route->all_pre_answer:positive",
+        "source": "deepseek7b:ladder:kv_o_route",
+        "target": "deepseek7b:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": -0.3125
+      },
+      {
+        "id": "deepseek7b:kv_o:all_pre_answer:positive",
+        "metrics": {
+          "budget_label": "positive_1024",
+          "ladder_id": "kv_o",
+          "ladder_specificity_score": 0.0,
+          "matched_delta_margin": 2.390625,
+          "matched_n": 2,
+          "matched_phrase_gain": 0.0,
+          "matched_rank_improve": 1.0,
+          "matched_token_gain": 0.0,
+          "model": "deepseek7b",
+          "source_group": "all_pre_answer",
+          "source_set_size": 4,
+          "subspace_mode": "positive",
+          "top_delta_margin": 1.671875,
+          "top_minus_matched_delta_margin": -0.71875,
+          "top_minus_matched_phrase_gain": 0.0,
+          "top_minus_matched_rank_improve": 0.0,
+          "top_minus_matched_token_gain": 0.0,
+          "top_n": 2,
+          "top_phrase_gain": 0.0,
+          "top_rank_improve": 1.0,
+          "top_token_gain": 0.0
+        },
+        "source": "model:deepseek7b",
+        "target": "deepseek7b:ladder:kv_o",
+        "type": "has_closure_pressure",
+        "weight": 0.0
+      },
+      {
+        "id": "deepseek7b:kv_o->all_pre_answer:positive",
+        "source": "deepseek7b:ladder:kv_o",
+        "target": "deepseek7b:source:all_pre_answer",
+        "type": "conditioned_on_source_group",
+        "weight": -0.71875
+      }
+    ],
+    "nodes": [
+      {
+        "id": "phase795:multi_component_causal_fiber_closure",
+        "label": "Phase 795 multi-component causal fiber closure",
+        "type": "task"
+      },
+      {
+        "id": "model:qwen3",
+        "label": "qwen3",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:ladder:o_only",
+        "label": "o_only",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "qwen3:source:all_pre_answer",
+        "label": "all_pre_answer",
+        "type": "source_group"
+      },
+      {
+        "id": "qwen3:ladder:kv_o_route",
+        "label": "kv_o_route",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "qwen3:ladder:route_answer",
+        "label": "route_answer",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "qwen3:ladder:kv_source",
+        "label": "kv_source",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "qwen3:ladder:kv_o",
+        "label": "kv_o",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "model:glm4",
+        "label": "glm4",
+        "type": "model"
+      },
+      {
+        "id": "glm4:ladder:o_only",
+        "label": "o_only",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "glm4:source:all_pre_answer",
+        "label": "all_pre_answer",
+        "type": "source_group"
+      },
+      {
+        "id": "glm4:ladder:kv_o_route",
+        "label": "kv_o_route",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "glm4:ladder:kv_source",
+        "label": "kv_source",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "glm4:ladder:route_answer",
+        "label": "route_answer",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "glm4:ladder:kv_o",
+        "label": "kv_o",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "model:deepseek7b",
+        "label": "deepseek7b",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:ladder:o_only",
+        "label": "o_only",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "deepseek7b:source:all_pre_answer",
+        "label": "all_pre_answer",
+        "type": "source_group"
+      },
+      {
+        "id": "deepseek7b:ladder:kv_source",
+        "label": "kv_source",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "deepseek7b:ladder:route_answer",
+        "label": "route_answer",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "deepseek7b:ladder:kv_o_route",
+        "label": "kv_o_route",
+        "type": "causal_fiber_ladder"
+      },
+      {
+        "id": "deepseek7b:ladder:kv_o",
+        "label": "kv_o",
+        "type": "causal_fiber_ladder"
+      }
+    ]
+  },
+  "phase": 795,
+  "schema_version": "atlas_graph_v1"
+}

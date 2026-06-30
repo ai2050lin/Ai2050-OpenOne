@@ -1,0 +1,101 @@
+[21:36:47] qwen3/smoke: focus=clean_fiber_high cases=2 variants=without_candidate_list,constrained_free_prompt,with_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens']
+[21:36:47] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 27/398 [00:00<00:01, 259.33it/s]Loading weights:  23%|██▎       | 92/398 [00:00<00:00, 473.57it/s]Loading weights:  37%|███▋      | 148/398 [00:00<00:00, 486.04it/s]Loading weights:  56%|█████▌    | 223/398 [00:00<00:00, 576.95it/s]Loading weights:  71%|███████   | 281/398 [00:00<00:00, 576.03it/s]Loading weights:  85%|████████▌ | 339/398 [00:00<00:00, 563.02it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 561.70it/s]
+[21:36:48] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[21:37:08] qwen3: semantic latent audit 1/2 cases; rows=19
+[21:37:28] qwen3: semantic latent audit 2/2 cases; rows=38
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "n_cases": 2,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 2,
+      "case_n": 2,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.5,
+      "pool_target_top1_rate": 0.5,
+      "mean_base_target_rank": 2911.0,
+      "mean_pool_target_rank": 4.0,
+      "mean_base_margin": 1.546875,
+      "mean_pool_margin_target_vs_best_other": 1.140625
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 2,
+      "case_n": 2,
+      "base_top1_rate": 1.0,
+      "latent_pool_hit_rate": 0.0,
+      "pool_target_top1_rate": 1.0,
+      "mean_base_target_rank": 1.0,
+      "mean_pool_target_rank": 1.0,
+      "mean_base_margin": 8.6875,
+      "mean_pool_margin_target_vs_best_other": 5.125
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 2,
+      "case_n": 2,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.5,
+      "pool_target_top1_rate": 0.5,
+      "mean_base_target_rank": 1241.5,
+      "mean_pool_target_rank": 3.5,
+      "mean_base_margin": 1.21875,
+      "mean_pool_margin_target_vs_best_other": 1.0625
+    }
+  ],
+  "by_prompt_effect": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 10,
+      "case_n": 2,
+      "mean_target_logit_drop": 0.0375,
+      "mean_margin_drop_target_vs_contrast": 0.05,
+      "mean_target_rank_delta": 103.7,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.0625,
+      "mean_attention_mass": 0.2330482244491577,
+      "mean_direct_target_boost": 0.16081715784966946,
+      "mean_direct_route_suppression": 0.09180706962943078,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 12,
+      "case_n": 2,
+      "mean_target_logit_drop": 0.17708333333333334,
+      "mean_margin_drop_target_vs_contrast": 0.13020833333333334,
+      "mean_target_rank_delta": 0.0,
+      "mean_pool_rank_delta": 0.0,
+      "mean_pool_margin_drop": 0.19791666666666666,
+      "mean_attention_mass": 0.2837393879890442,
+      "mean_direct_target_boost": 2.566444815020077,
+      "mean_direct_route_suppression": 0.35898313058229786,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "candidate_kind": "source_group_top_component",
+      "n": 10,
+      "case_n": 2,
+      "mean_target_logit_drop": -0.15625,
+      "mean_margin_drop_target_vs_contrast": -0.0375,
+      "mean_target_rank_delta": -27.1,
+      "mean_pool_rank_delta": -0.1,
+      "mean_pool_margin_drop": -0.025,
+      "mean_attention_mass": 0.3534198522567749,
+      "mean_direct_target_boost": -0.02630920372903347,
+      "mean_direct_route_suppression": 0.3708390950225294,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+[21:39:05] qwen3/main: focus=clean_fiber_high cases=5 variants=without_candidate_list,constrained_free_prompt,with_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
+[21:39:06] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   6%|▌         | 24/398 [00:00<00:01, 230.15it/s]Loading weights:  22%|██▏       | 89/398 [00:00<00:00, 433.39it/s]Loading weights:  40%|███▉      | 159/398 [00:00<00:00, 539.53it/s]Loading weights:  56%|█████▋    | 224/398 [00:00<00:00, 575.79it/s]Loading weights:  72%|███████▏  | 286/398 [00:00<00:00, 588.97it/s]Loading weights:  87%|████████▋ | 345/398 [00:00<00:00, 517.77it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 561.76it/s]
+[21:39:07] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[21:40:00] qwen3: semantic latent audit 1/5 cases; rows=25
+[21:40:53] qwen3: semantic latent audit 2/5 cases; rows=50
+[21:41:46] qwen3: semantic latent audit 3/5 cases; rows=75
+[21:42:39] qwen3: semantic latent audit 4/5 cases; rows=100
+[21:43:32] qwen3: semantic latent audit 5/5 cases; rows=125
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "main",
+  "n_cases": 5,
+  "by_prompt_observation": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "n": 5,
+      "case_n": 5,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.8,
+      "pool_target_top1_rate": 0.8,
+      "mean_base_target_rank": 1168.8,
+      "mean_pool_target_rank": 2.2,
+      "mean_base_margin": 3.18125,
+      "mean_pool_margin_target_vs_best_other": 3.01875
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "n": 5,
+      "case_n": 5,
+      "base_top1_rate": 1.0,
+      "latent_pool_hit_rate": 0.0,
+      "pool_target_top1_rate": 1.0,
+      "mean_base_target_rank": 1.0,
+      "mean_pool_target_rank": 1.0,
+      "mean_base_margin": 6.75,
+      "mean_pool_margin_target_vs_best_other": 4.425
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "n": 5,
+      "case_n": 5,
+      "base_top1_rate": 0.0,
+      "latent_pool_hit_rate": 0.8,
+      "pool_target_top1_rate": 0.8,
+      "mean_base_target_rank": 498.2,
+      "mean_pool_target_rank": 2.0,
+      "mean_base_margin": 4.875,
+      "mean_pool_margin_target_vs_best_other": 4.525
+    }
+  ],
+  "by_prompt_effect": [
+    {
+      "prompt_variant": "without_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 35,
+      "case_n": 5,
+      "mean_target_logit_drop": 0.03125,
+      "mean_margin_drop_target_vs_contrast": 0.06339285714285714,
+      "mean_target_rank_delta": 37.2,
+      "mean_pool_rank_delta": 0.08571428571428572,
+      "mean_pool_margin_drop": 0.07232142857142858,
+      "mean_attention_mass": 0.2500060626438686,
+      "mean_direct_target_boost": 0.21886322221585683,
+      "mean_direct_route_suppression": 0.37948675963229367,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.08571428571428572
+    },
+    {
+      "prompt_variant": "with_candidate_list",
+      "candidate_kind": "source_group_top_component",
+      "n": 40,
+      "case_n": 5,
+      "mean_target_logit_drop": 0.1375,
+      "mean_margin_drop_target_vs_contrast": 0.221875,
+      "mean_target_rank_delta": 0.025,
+      "mean_pool_rank_delta": 0.025,
+      "mean_pool_margin_drop": 0.23125,
+      "mean_attention_mass": 0.2739827990531921,
+      "mean_direct_target_boost": 2.2686267361976205,
+      "mean_direct_route_suppression": 0.32542111215880143,
+      "top1_loss_rate": 0.025,
+      "pool_top1_loss_rate": 0.025
+    },
+    {
+      "prompt_variant": "constrained_free_prompt",
+      "candidate_kind": "source_group_top_component",
+      "n": 35,
+      "case_n": 5,
+      "mean_target_logit_drop": -0.11964285714285715,
+      "mean_margin_drop_target_vs_contrast": -0.0035714285714285713,
+      "mean_target_rank_delta": -9.17142857142857,
+      "mean_pool_rank_delta": -0.02857142857142857,
+      "mean_pool_margin_drop": -0.010714285714285714,
+      "mean_attention_mass": 0.2871627671377999,
+      "mean_direct_target_boost": 0.04034722474004541,
+      "mean_direct_route_suppression": 0.4864308155540909,
+      "top1_loss_rate": 0.0,
+      "pool_top1_loss_rate": 0.0
+    }
+  ]
+}

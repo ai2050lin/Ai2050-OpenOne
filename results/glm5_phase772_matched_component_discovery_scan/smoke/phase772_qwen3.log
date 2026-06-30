@@ -1,0 +1,27 @@
+[20:29:29] qwen3/smoke: focus=all_matched cases=2 sources=['instruction', 'question']
+[20:29:29] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   6%|▌         | 24/398 [00:00<00:01, 229.50it/s]Loading weights:  22%|██▏       | 87/398 [00:00<00:00, 441.22it/s]Loading weights:  39%|███▉      | 157/398 [00:00<00:00, 552.34it/s]Loading weights:  54%|█████▎    | 213/398 [00:00<00:00, 524.73it/s]Loading weights:  70%|██████▉   | 278/398 [00:00<00:00, 566.77it/s]Loading weights:  84%|████████▍ | 336/398 [00:00<00:00, 562.89it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 549.44it/s]
+[20:29:30] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
+[20:29:33] qwen3: component discovery 1/2 cases; rows=1
+[20:29:36] qwen3: component discovery 2/2 cases; rows=2
+[model_utils] GPU memory released, allocated=8.05 GB
+{
+  "model": "qwen3",
+  "round": "smoke",
+  "n_cases": 2,
+  "top_components": [
+    {
+      "component_key": "L32:attn_out:H7:instruction",
+      "n": 2,
+      "case_n": 2,
+      "mean_scan_score": 31.175401293486356,
+      "mean_target_logit_drop": 2.5625,
+      "mean_margin_drop_target_vs_contrast": 2.78125,
+      "mean_attention_mass": 0.9310641288757324,
+      "mean_direct_target_boost": 20.24822998046875,
+      "mean_direct_route_suppression": 1.784225009381771,
+      "top1_loss_rate": 0.0
+    }
+  ]
+}

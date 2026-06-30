@@ -60958,3 +60958,12957 @@ Matched Causal Intervention Reliability Test
 3. 检查 fiber-stable cases 是否更能预测 intervention success。
 4. 只有通过这一步，才适合继续下钻 neuron / channel atlas。
 ```
+
+## Phase 771: 配对因果干预可靠性测试 [2026-06-29 19:57]
+
+### 总体判断
+
+本阶段继续分析最新附件。附件对 Phase 770 的判断是正确的：
+
+```text
+semantic closure 可以作为 output closure 的入口，
+但不能直接作为 mechanism atlas 的入口。
+```
+
+Phase 770 的关键硬伤是：
+
+```text
+它仍然是离线重分析，不是新的 causal intervention。
+```
+
+因此本阶段执行 Phase 771：在 Phase 767 / Phase 770 已经配平的 semantic_clean vs semantic_fail cases 上，重新加载 qwen3、GLM4、DS7B，直接做 source-contribution removal（源贡献移除）因果干预，检查：
+
+```text
+1. output-clean cases 是否更依赖这些 source paths；
+2. fiber-high cases 是否更依赖这些 source paths；
+3. Phase755 top candidate head 是否明显强于 same-layer control head。
+```
+
+### 测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase771_matched_causal_intervention_reliability_test.py
+tests/glm5/run_phase771_matched_causal_intervention_reliability_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase771_matched_causal_intervention_reliability_test/
+results/glm5_phase771_matched_causal_intervention_reliability_test/
+```
+
+执行过三轮：
+
+```bash
+python -m py_compile tests/glm5/phase771_matched_causal_intervention_reliability_test.py
+
+python tests/glm5/phase771_matched_causal_intervention_reliability_test.py \
+  --dry-run \
+  --round-name dry \
+  --max-pairs 3 \
+  --max-per-stratum 1
+
+tests/glm5/run_phase771_matched_causal_intervention_reliability_round.sh smoke \
+  --max-pairs 1 \
+  --max-per-stratum 1 \
+  --max-source-groups 2 \
+  --max-candidates 1 \
+  --log-every 1
+
+tests/glm5/run_phase771_matched_causal_intervention_reliability_round.sh main \
+  --max-pairs 6 \
+  --max-per-stratum 1 \
+  --max-source-groups 4 \
+  --max-candidates 1 \
+  --log-every 4
+
+tests/glm5/run_phase771_matched_causal_intervention_reliability_round.sh confirm \
+  --max-pairs 10 \
+  --max-per-stratum 1 \
+  --max-source-groups 4 \
+  --max-candidates 1 \
+  --include-controls \
+  --controls-per-candidate 1 \
+  --log-every 5
+```
+
+模型按顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载设置：
+
+```text
+bf16
+quantization off
+device_map auto
+attention eager
+```
+
+注意：本阶段需要 output_attentions 来计算 source contribution，因此使用 eager attention。没有使用量化。
+
+### 测试原理
+
+从 Phase 767 读取 semantic / exact labels，从 Phase 770 读取 paired context fiber stability，然后按：
+
+```text
+domain + relation + context_format
+```
+
+配平 semantic_clean 与 semantic_fail cases。
+
+对每个 case，选择 Phase755 top candidate head，并在 confirm 轮加入 same-layer control head。对每个 source group：
+
+```text
+instruction
+question
+object_tokens
+relation_tokens
+```
+
+计算 source contribution：
+
+$$
+C_g(l,h\mid x)
+=
+\sum_{t\in g}
+\alpha_{l,h}(p,t\mid x)
+V_{l,h}(t\mid x)
+$$
+
+然后执行源贡献移除：
+
+$$
+h' = h - Proj_{O}(C_g(l,h\mid x))
+$$
+
+观察：
+
+$$
+\Delta \ell_y
+=
+\ell_y(x)-\ell_y(x')
+$$
+
+$$
+\Delta Margin
+=
+[
+\ell_y(x)-\ell_c(x)
+]
+-
+[
+\ell_y(x')-\ell_c(x')
+]
+$$
+
+以及：
+
+```text
+top1_loss
+attention_mass
+direct_target_boost
+direct_route_suppression
+```
+
+如果 output-clean 或 fiber-high 真正对应更稳定的机制路径，则预期：
+
+```text
+clean / fiber_high 的 target_logit_drop、margin_drop、top1_loss
+应系统性高于 fail / fiber_low。
+```
+
+### 三轮测试完成情况
+
+```text
+smoke：3 模型完成，验证加载、hook、source removal、结果写入正常。
+main：3 模型完成，每模型 6 对配平样本。
+confirm：3 模型完成，每模型 10 对配平样本，并加入 same-layer control head。
+```
+
+### Confirm 轮客观结果一：clean vs fail
+
+| model | arm | rows | target drop | margin drop | top1 loss | attention | direct boost | route suppression |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | clean | 80 | -0.023 | -0.022 | 0.000 | 0.257 | 0.240 | 0.070 |
+| qwen3 | fail | 80 | -0.030 | -0.042 | 0.000 | 0.255 | 0.166 | 0.068 |
+| GLM4 | clean | 80 | 0.007 | 0.018 | 0.000 | 0.266 | 0.001 | 0.002 |
+| GLM4 | fail | 80 | -0.002 | 0.009 | 0.000 | 0.268 | 0.001 | 0.001 |
+| DS7B | clean | 80 | 0.025 | -0.006 | 0.000 | 0.272 | 0.058 | 0.131 |
+| DS7B | fail | 80 | 0.013 | 0.002 | 0.013 | 0.277 | 0.098 | 0.118 |
+
+### Confirm 轮客观结果二：semantic label
+
+| model | semantic label | rows | target drop | margin drop | top1 loss |
+|---|---|---:|---:|---:|---:|
+| qwen3 | exact_clean | 80 | -0.023 | -0.022 | 0.000 |
+| qwen3 | semantic_fail | 80 | -0.030 | -0.042 | 0.000 |
+| GLM4 | exact_clean | 72 | 0.006 | 0.013 | 0.000 |
+| GLM4 | semantic_only | 8 | 0.016 | 0.062 | 0.000 |
+| GLM4 | semantic_fail | 80 | -0.002 | 0.009 | 0.000 |
+| DS7B | exact_clean | 32 | 0.002 | 0.003 | 0.000 |
+| DS7B | semantic_only | 48 | 0.040 | -0.012 | 0.000 |
+| DS7B | semantic_fail | 80 | 0.013 | 0.002 | 0.013 |
+
+### Confirm 轮客观结果三：fiber_high vs fiber_low
+
+| model | fiber bucket | rows | target drop | margin drop | top1 loss | direct boost | route suppression |
+|---|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | fiber_high | 96 | -0.008 | -0.021 | 0.000 | 0.261 | 0.094 |
+| qwen3 | fiber_low | 64 | -0.055 | -0.049 | 0.000 | 0.116 | 0.031 |
+| GLM4 | fiber_high | 88 | 0.007 | 0.013 | 0.000 | 0.002 | 0.002 |
+| GLM4 | fiber_low | 72 | -0.003 | 0.015 | 0.000 | -0.000 | 0.001 |
+| DS7B | fiber_high | 72 | 0.001 | 0.000 | 0.000 | 0.018 | 0.177 |
+| DS7B | fiber_low | 88 | 0.034 | -0.004 | 0.011 | 0.126 | 0.081 |
+
+### Confirm 轮客观结果四：candidate vs control
+
+| model | candidate kind | arm | rows | target drop | margin drop | top1 loss |
+|---|---|---|---:|---:|---:|---:|
+| qwen3 | Phase755 top candidate | clean | 40 | -0.041 | -0.048 | 0.000 |
+| qwen3 | Phase755 top candidate | fail | 40 | -0.019 | -0.056 | 0.000 |
+| qwen3 | same-layer control | clean | 40 | -0.006 | 0.005 | 0.000 |
+| qwen3 | same-layer control | fail | 40 | -0.041 | -0.028 | 0.000 |
+| GLM4 | Phase755 top candidate | clean | 40 | 0.013 | 0.022 | 0.000 |
+| GLM4 | Phase755 top candidate | fail | 40 | -0.002 | 0.014 | 0.000 |
+| GLM4 | same-layer control | clean | 40 | 0.002 | 0.015 | 0.000 |
+| GLM4 | same-layer control | fail | 40 | -0.002 | 0.005 | 0.000 |
+| DS7B | Phase755 top candidate | clean | 40 | 0.052 | -0.018 | 0.000 |
+| DS7B | Phase755 top candidate | fail | 40 | 0.023 | -0.010 | 0.025 |
+| DS7B | same-layer control | clean | 40 | -0.002 | 0.006 | 0.000 |
+| DS7B | same-layer control | fail | 40 | 0.003 | 0.014 | 0.000 |
+
+### 关键客观现象
+
+```text
+1. 三个模型的 clean rows 都没有出现 top1 loss。
+2. qwen3 的 source removal 效果为负或接近 0，
+   说明这些 source paths 不是 qwen3 输出闭合的必要路径。
+3. GLM4 clean 的 target drop 和 margin drop 稍高于 fail，
+   但数值很小，不能作为强因果路径。
+4. DS7B 的 Phase755 top candidate 比 same-layer control 更有 target drop，
+   但 clean 仍没有 top1 loss，fail 反而出现 0.025 top1 loss。
+5. fiber_high 不稳定预测更强 intervention sensitivity：
+   qwen3 / GLM4 有弱正迹象，
+   DS7B 反而 fiber_low 的 target drop 更大。
+6. attention_mass 很高的 source group 不一定有正向 removal effect。
+```
+
+### 严格结论
+
+Phase 771 是一个关键负结果 / 收紧结果。
+
+它没有推翻 Phase 768 的输出闭合线，也没有推翻 Phase 770 的双门槛准入理论；它进一步说明：
+
+```text
+即使 output closure 和 paired fiber stability 被配平，
+当前 Phase755 top candidate head / source group removal
+仍然不能稳定解释生成闭合。
+```
+
+更准确地说：
+
+```text
+output-clean / fiber-high 是机制图谱候选入口；
+但不是“当前候选 head/source path 必然可因果验证”的充分条件。
+```
+
+这意味着当前图谱缺少一层：
+
+```text
+matched component discovery
+```
+
+也就是必须在 matched clean/fail/fiber-stable cases 中重新发现真正有因果效应的 component，而不能直接沿用 Phase755 的跨域 top head。
+
+### 对 Phase 770 附件判断的修正
+
+附件说：
+
+```text
+balanced fiber reliability 才是进入机制图谱的关键门槛。
+```
+
+这句话方向正确，但 Phase 771 后必须再收紧：
+
+```text
+balanced fiber reliability 是进入机制图谱的必要门槛，
+但还不是 component-level causal sufficiency。
+```
+
+新的准入条件应改为：
+
+$$
+R_{atlas}(x)
+=
+R_{output}(x)
+\land
+R_{fiber}^{balanced}(x)
+\land
+R_{component}^{causal}(x)
+$$
+
+其中：
+
+$$
+R_{component}^{causal}(x)
+=
+\mathbf{1}
+\left[
+\Delta \ell_y^{do(component)}>\tau_l
+\lor
+\Delta Margin^{do(component)}>\tau_m
+\lor
+Top1Loss^{do(component)}=1
+\right]
+$$
+
+Phase 771 的结果显示：
+
+```text
+当前测试到的 component 对多数模型不满足强 R_component_causal。
+```
+
+### 当前硬伤
+
+```text
+1. 本阶段只测试 Phase755 top candidate head 和同层 control，
+   不是全组件扫描。
+2. 干预层级仍是 head/source contribution，
+   不是 neuron/channel-level intervention。
+3. source groups 只包括 instruction/question/object_tokens/relation_tokens，
+   没有覆盖所有可能路径。
+4. top1_loss 几乎为 0，说明干预不够强或组件不是必要路径。
+5. GLM4 的正结果很弱，不能作为稳定机制。
+6. DS7B 的唯一 top1_loss 出现在 fail group，
+   不支持 clean/fiber-high 更可靠。
+7. eager attention 是为了输出 attention 权重，不能直接等同高性能生成路径。
+8. 仍然依赖 allowed values 常识任务，不是自由生成机制。
+```
+
+### 下一步
+
+下一阶段应进入：
+
+```text
+Phase 772:
+Matched Component Discovery Scan
+（配对组件发现扫描）
+```
+
+任务不是继续扩大 clean/fail 对比，而是：
+
+```text
+1. 在 matched output-clean + fiber-high cases 内，
+   扫描更多 layer/head/source_group。
+2. 不再只沿用 Phase755 top candidate。
+3. 对每个 case 直接排名 component causal effect。
+4. 比较真正高因果效应 component 是否在 clean / fiber-high 中复现。
+5. 只有找到可复现 component，再进入 neuron/channel-level atlas。
+```
+
+阶段性结论：
+
+```text
+Phase 771 把机制图谱准入标准从“双门槛”推进到“三门槛”：
+
+output closure
++
+balanced fiber reliability
++
+component-level causal validation。
+```
+
+## Phase 772: Matched Component Discovery Scan（配对组件发现扫描） [2026-06-29 20:39]
+
+### 任务来源
+
+Phase 770 和 Phase 771 的合并判断基本正确：语言机制图谱的准入条件不能停留在 output closure（输出闭合）和 balanced fiber reliability（配平因果纤维可靠性），还必须加入 component-level causal validation（组件级因果验证）。
+
+原因是：
+
+```text
+Phase 770:
+semantic closure（语义闭合）不能直接等同内部 fiber stability（纤维稳定）。
+
+Phase 771:
+即使 output-clean（输出干净）和 fiber-high（纤维高稳定）成立，
+沿用 Phase 755 的 top head/source path（顶部注意力头 / 源路径）
+仍不能稳定解释生成闭合。
+```
+
+所以 Phase 772 不再继续复用 Phase 755 的旧候选，而是在 matched cases（配对样本）内部重新扫描 layer/head/source_group（层 / 注意力头 / 源组），先发现候选，再做 source contribution removal（源贡献移除）因果验证。
+
+### 测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase772_matched_component_discovery_scan.py
+tests/glm5/run_phase772_matched_component_discovery_scan_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase772_matched_component_discovery_scan/
+results/glm5_phase772_matched_component_discovery_scan/
+```
+
+完成三轮测试：
+
+```text
+smoke:
+tests/glm5/run_phase772_matched_component_discovery_scan_round.sh smoke \
+  --max-pairs 1 --max-cases 2 --max-per-stratum 1 \
+  --max-scan-layers 2 --max-source-groups 2 \
+  --top-components-per-case 1 --log-every 1
+
+main:
+tests/glm5/run_phase772_matched_component_discovery_scan_round.sh main \
+  --max-pairs 6 --max-cases 8 --max-per-stratum 1 \
+  --max-scan-layers 4 --max-source-groups 4 \
+  --top-components-per-case 3 --log-every 2
+
+confirm:
+tests/glm5/run_phase772_matched_component_discovery_scan_round.sh confirm \
+  --focus clean_fiber_high --max-pairs 10 --max-cases 5 \
+  --max-per-stratum 1 --max-scan-layers 4 --max-source-groups 4 \
+  --top-components-per-case 2 --include-controls \
+  --control-offset 5 --log-every 1
+```
+
+三轮测试均按 qwen3、GLM4、DS7B 顺序运行；bf16（bfloat16）加载；未使用量化；attention extraction（注意力抽取）需要 eager attention（急切注意力实现）。
+
+### 测试原理
+
+对每个 matched case（配对样本），先捕获指定层的 attention（注意力）和 value（值向量），然后对每个 source group（源组）计算某个 head（注意力头）从源词元到 answer position（答案位置）的源贡献：
+
+$$
+C_g(l,h \mid x)
+=
+\sum_{t \in g}
+\alpha_{l,h}(p,t \mid x)
+V_{l,h}(t \mid x)
+$$
+
+其中：
+
+```text
+g = source group（源组）
+l = layer（层）
+h = head（注意力头）
+p = answer position（答案位置）
+t = source token position（源词元位置）
+```
+
+然后把该源贡献投影回 residual stream（残差流），并用 unembedding（反嵌入读出矩阵）估计它对 target token（目标词元）和 route tokens（路线词元）的直接影响：
+
+$$
+S(l,h,g \mid x)
+=
+w_t \cdot max(0,\Delta y)
++
+w_r \cdot max(0,-\Delta R)
++
+w_m \cdot max(0,\Delta M)
++
+w_a \cdot A_g
+$$
+
+其中：
+
+```text
+Delta y = direct target boost（直接目标增强）
+Delta R = route suppression（路线抑制）
+Delta M = margin gain（边际增强）
+A_g = attention mass to source group（到源组的注意力质量）
+```
+
+这个分数只用于 discovery（发现），不作为最终证据。真正证据来自 causal removal（因果移除）：
+
+$$
+h' = h - Proj_O(C_g(l,h \mid x))
+$$
+
+观察：
+
+$$
+\Delta \ell_y
+=
+\ell_y(x)-\ell_y(x')
+$$
+
+$$
+\Delta Margin
+=
+[\ell_y(x)-\ell_c(x)]
+-
+[\ell_y(x')-\ell_c(x')]
+$$
+
+如果扫描出来的组件是真正的机制组件，它应当比 same-layer control head（同层控制头）产生更大的 target logit drop（目标分数下降）、margin drop（边际下降）或 top1 loss（第一名损失）。
+
+### 客观结果
+
+#### 冒烟测试
+
+smoke（冒烟轮）确认脚本可以完整跑通：
+
+```text
+qwen3:
+scan top component target drop = 2.562
+margin drop = 2.781
+top1 loss = 0.000
+
+GLM4:
+scan top component target drop = 0.375
+margin drop = 0.344
+top1 loss = 0.000
+
+DS7B:
+scan top component target drop = -0.250
+margin drop = -0.094
+top1 loss = 0.000
+```
+
+冒烟轮只验证链路，不用于机制结论。
+
+#### 主测试
+
+main（主测试）在 all_matched（全部配对样本）上得到：
+
+| model（模型） | rows（行数） | cases（样本数） | mean target drop（平均目标下降） | mean margin drop（平均边际下降） | top1 loss rate（第一名损失率） |
+|---|---:|---:|---:|---:|---:|
+| qwen3 | 24 | 8 | 0.740 | 0.656 | 0.042 |
+| GLM4 | 24 | 8 | 0.070 | 0.109 | 0.000 |
+| DS7B | 24 | 8 | 0.557 | 0.289 | 0.083 |
+
+主要复现组件：
+
+```text
+qwen3:
+L32:attn_out:H5:instruction
+n = 6 cases
+target drop = 2.125
+margin drop = 1.812
+top1 loss rate = 0.167
+
+GLM4:
+L34:attn_out:H1:instruction
+n = 5 cases
+target drop = 0.0875
+margin drop = 0.075
+top1 loss rate = 0
+
+DS7B:
+L27:attn_out:H23:instruction
+n = 4 cases
+target drop = 0.469
+margin drop = -0.344
+top1 loss rate = 0
+
+DS7B:
+L23:attn_out:H11:instruction 和 L27:attn_out:H24:instruction
+各自 n = 1
+target drop = 0.938
+top1 loss rate = 1.0
+```
+
+主测试说明：Phase 772 的重新扫描确实比 Phase 771 沿用旧候选更有信号，尤其 qwen3 和 DS7B。但 DS7B 的强 top1 loss 组件样本数仍只有 1，不能当作稳定通路。
+
+#### 确认测试
+
+confirm（确认轮）聚焦 clean_fiber_high（输出干净且纤维高稳定）样本，并加入 same-layer control head（同层控制头）。
+
+| model（模型） | candidate kind（候选类型） | rows（行数） | cases（样本数） | target drop（目标下降） | margin drop（边际下降） | top1 loss（第一名损失） |
+|---|---|---:|---:|---:|---:|---:|
+| qwen3 | scan_top_component | 10 | 5 | 0.600 | 0.825 | 0.200 |
+| qwen3 | same_layer_control_head | 10 | 5 | 0.037 | -0.006 | 0.000 |
+| GLM4 | scan_top_component | 10 | 5 | 0.025 | 0.087 | 0.000 |
+| GLM4 | same_layer_control_head | 10 | 5 | 0.013 | 0.009 | 0.000 |
+| DS7B | scan_top_component | 10 | 5 | 0.512 | 0.156 | 0.000 |
+| DS7B | same_layer_control_head | 10 | 5 | 0.044 | 0.025 | 0.000 |
+
+确认轮最重要结果：
+
+```text
+qwen3:
+扫描候选明显强于同层控制头，
+并出现 top1 loss = 0.20。
+
+DS7B:
+扫描候选明显强于同层控制头，
+但没有 top1 loss。
+
+GLM4:
+扫描候选略强于控制头，
+但绝对效应非常弱。
+```
+
+确认轮也显示所有 top components（顶部组件）几乎都来自 instruction source group（指令源组）。这是一个重要现象，但必须谨慎解释：可能是任务模板中的 instruction token（指令词元）承载了格式 / 目标约束，也可能是当前 source group 切分没有细分到真正语义载体。
+
+### 是否正确
+
+Phase 772 的方向正确，而且比 Phase 771 前进了一步。
+
+正确部分：
+
+```text
+1. 不再复用 Phase 755 的旧候选，而是在 matched cases 内重新发现组件。
+2. 先 discovery（发现）再 intervention（干预），证据层级更清楚。
+3. 加入 same-layer control head 后，qwen3 和 DS7B 的扫描候选明显强于控制。
+4. 结果支持 component-level causal validation 作为第三门槛。
+```
+
+需要收紧的部分：
+
+```text
+1. qwen3 有最强正结果，但 confirm 轮只有 5 个 clean_fiber_high cases。
+2. DS7B 有稳定 target drop，但 top1 loss 在 confirm 轮消失。
+3. GLM4 整体效应弱，不能证明三模型共享同一强组件机制。
+4. 当前发现的是 head/source 级组件，不是 neuron/channel 级组件。
+5. 当前 source group 几乎全落在 instruction，可能受模板结构影响。
+6. direct score 只是筛选器，不是因果证据。
+```
+
+因此最稳妥结论是：
+
+```text
+Phase 772 找到了比 Phase 755 旧候选更强的 matched component candidates。
+qwen3 和 DS7B 支持“组件发现扫描”这条路线。
+GLM4 只支持弱正结果。
+当前还没有完成 neuron/channel atlas。
+```
+
+### 当前理论收紧
+
+机制图谱准入公式应从 Phase 771 的三门槛继续细化为：
+
+$$
+R_{atlas}(x,c)
+=
+R_{output}(x)
+\land
+R_{fiber}^{balanced}(x)
+\land
+R_{component}^{discovered}(x,c)
+\land
+R_{component}^{causal}(x,c)
+$$
+
+其中：
+
+$$
+R_{component}^{discovered}(x,c)
+=
+\mathbf{1}
+\left[
+Score(c \mid x)
+>
+Score(control(c) \mid x)
+\right]
+$$
+
+$$
+R_{component}^{causal}(x,c)
+=
+\mathbf{1}
+\left[
+\Delta \ell_y^{do(c)} > \tau_l
+\lor
+\Delta Margin^{do(c)} > \tau_m
+\lor
+Top1Loss^{do(c)} = 1
+\right]
+$$
+
+也就是说，component（组件）不能只因为在旧图谱里排名高就进入 atlas（图谱）；它必须在当前 matched context（配对语境）内被重新发现，并在 causal removal（因果移除）中强于控制。
+
+### 硬伤和瓶颈
+
+```text
+1. 仍是小模型结果，内部机制可能偏移。
+2. 仍是 head/source 粒度，不能直接推出神经元级编码机制。
+3. source contribution removal 是局部干预，不等于完全删除该信息流。
+4. instruction source group 过强，说明当前任务格式可能主导了发现。
+5. clean/fiber_high 不是充分条件，必须进入组件级验证。
+6. top1 loss 稀少，说明很多组件只影响读出强度，不一定控制最终生成。
+7. scan layers 是根据近期证据选的局部层，不是全层全头扫描。
+8. direct score 和 causal effect 之间仍可能错配。
+```
+
+### 智能理论角度的关键洞察
+
+本阶段支持一个更谨慎的判断：
+
+```text
+语言机制图谱不是静态语义图谱，
+也不是单个 head / channel 的排名表，
+而是 matched context 中可重复发现、可因果干预的路线组件图谱。
+```
+
+更接近真实编码机制的对象不是：
+
+```text
+apple -> fruit 的静态边
+```
+
+而是：
+
+```text
+在给定语境下，
+哪些 source tokens（源词元）
+通过哪些 components（组件）
+改变 target / contrast / route competition（目标 / 对照 / 路线竞争）。
+```
+
+当前最重要的拼图是：
+
+```text
+instruction source group 在 qwen3 和 DS7B 中反复成为强 causal component source。
+```
+
+这提示语言系统里可能存在一种“任务约束 / 输出协议”路线，它不等于语义本身，但会强烈调制语义读出。
+
+### 下一步
+
+下一阶段不应马上进入 neuron/channel atlas（神经元 / 通道图谱），而应先解决 instruction source group 过强的问题。
+
+建议 Phase 773：
+
+```text
+Phase 773:
+Instruction Source Disentanglement and Object-Route Reweighting
+（指令源解耦与对象路线重加权）
+```
+
+核心任务：
+
+```text
+1. 把 instruction source group 细分为 task prefix / format cue / answer constraint。
+2. 把 object_tokens / relation_tokens 的扫描权重和样本结构单独加强。
+3. 比较 instruction-only、object-only、relation-only、mixed-source 的 causal effect。
+4. 对 qwen3 的 L32H5/L33H16 和 DS7B 的 L27H21/L27H23 做组件复测。
+5. 只有当 object/relation source 也出现稳定因果组件后，再进入 neuron/channel 粒度。
+```
+
+阶段性结论：
+
+```text
+Phase 772 是正结果，但不是最终闭合。
+
+它证明：
+matched component discovery scan 比复用旧 top candidates 更有效。
+
+它没有证明：
+当前已经找到完整语言编码机制或神经元级图谱。
+
+下一步必须拆开 instruction source 的格式效应和 object/relation source 的语义效应。
+```
+
+## Phase 773: Instruction Source Disentanglement and Object-Route Reweighting（指令源解耦与对象路线重加权） [2026-06-29 21:03]
+
+### 任务来源
+
+新上传的 Phase 772 分析基本正确。Phase 772 是正结果，但不是最终闭合。它证明了：
+
+```text
+不能继续沿用旧阶段 top head（顶部注意力头）；
+必须在 matched context（配对语境）内部重新发现 component（组件），
+再做 causal removal（因果移除）验证。
+```
+
+但 Phase 772 的最大硬伤也很清楚：
+
+```text
+最强 source group（源组）几乎都来自 instruction（指令）。
+```
+
+这可能意味着两种完全不同的机制：
+
+```text
+1. instruction（指令）本身是任务约束 / 输出协议路线；
+2. instruction 里混入了 candidate list（候选值列表），真正强的是候选列表，而不是自然语义。
+```
+
+因此 Phase 773 的目标不是继续找更强 head，而是拆开 instruction source（指令源），比较：
+
+```text
+instruction_core（常识指令）
+format_cue（短答案格式约束）
+candidate_list（候选值列表）
+answer_prefix（答案前缀）
+object_tokens（对象词元）
+relation_tokens（关系词元）
+semantic_pair（对象 + 关系）
+task_frame_without_semantic（去掉对象/关系后的任务框架）
+```
+
+### 测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase773_instruction_source_disentanglement.py
+tests/glm5/run_phase773_instruction_source_disentanglement_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase773_instruction_source_disentanglement/
+results/glm5_phase773_instruction_source_disentanglement/
+```
+
+完成三轮测试：
+
+```text
+smoke:
+tests/glm5/run_phase773_instruction_source_disentanglement_round.sh smoke \
+  --focus clean_fiber_high --max-pairs 4 --max-cases 2 \
+  --max-per-stratum 1 --max-scan-layers 2 --max-source-groups 4 \
+  --top-components-per-source 1 --top-global-components-per-case 0 \
+  --log-every 1
+
+main:
+tests/glm5/run_phase773_instruction_source_disentanglement_round.sh main \
+  --focus clean_fiber_high --max-pairs 10 --max-cases 5 \
+  --max-per-stratum 1 --max-scan-layers 4 --max-source-groups 8 \
+  --top-components-per-source 1 --top-global-components-per-case 0 \
+  --log-every 1
+
+confirm:
+tests/glm5/run_phase773_instruction_source_disentanglement_round.sh confirm \
+  --focus clean_fiber_high --max-pairs 10 --max-cases 4 \
+  --max-per-stratum 1 --max-scan-layers 4 --max-source-groups 8 \
+  --top-components-per-source 1 --top-global-components-per-case 0 \
+  --include-controls --control-offset 5 --log-every 1
+```
+
+三轮均按 qwen3、GLM4、DS7B 顺序运行；bf16（bfloat16）加载；未使用量化；attention extraction（注意力抽取）使用 eager attention（急切注意力实现）。
+
+### 测试原理
+
+Phase 772 的 source group（源组）太粗：
+
+```text
+instruction = common instruction + format cue + allowed values
+```
+
+Phase 773 把它拆成：
+
+$$
+G_{instruction}
+=
+G_{core}
+\cup
+G_{format}
+\cup
+G_{candidate}
+$$
+
+并继续保留语义源：
+
+$$
+G_{semantic}
+=
+G_{object}
+\cup
+G_{relation}
+$$
+
+对每个 source group（源组）、每个 layer/head（层 / 注意力头）计算源贡献：
+
+$$
+C_g(l,h \mid x)
+=
+\sum_{t \in g}
+\alpha_{l,h}(p,t \mid x)
+V_{l,h}(t \mid x)
+$$
+
+然后每个 source group 至少取一个 top component（顶部组件）做因果移除：
+
+$$
+h' = h - Proj_O(C_g(l,h \mid x))
+$$
+
+观察：
+
+$$
+\Delta \ell_y
+=
+\ell_y(x)-\ell_y(x')
+$$
+
+$$
+\Delta Margin
+=
+[\ell_y(x)-\ell_c(x)]
+-
+[\ell_y(x')-\ell_c(x')]
+$$
+
+关键改进是：不再让 global ranking（全局排序）把 object / relation（对象 / 关系）源压掉，而是强制每个源组都有被测试机会。
+
+### 客观结果
+
+#### 主测试
+
+main（主测试）在 clean_fiber_high（输出干净且纤维高稳定）样本上，每个模型 5 个 case（样本），每个 case 覆盖 8 个源组。
+
+| model（模型） | 最强源组 | target drop（目标下降） | margin drop（边际下降） | top1 loss（第一名损失） |
+|---|---|---:|---:|---:|
+| qwen3 | candidate_list | 0.975 | 1.512 | 0.200 |
+| GLM4 | candidate_list | 0.000 | 0.106 | 0.000 |
+| DS7B | candidate_list | 0.650 | 0.456 | 0.000 |
+
+qwen3 的其他源组：
+
+```text
+instruction_core:
+target drop = 0.075
+margin drop = 0.138
+
+semantic_pair:
+target drop = 0.025
+margin drop = 0.062
+
+object_tokens:
+target drop = -0.025
+margin drop = 0.013
+
+relation_tokens:
+target drop = 0.025
+margin drop = 0.037
+```
+
+DS7B 的其他源组：
+
+```text
+semantic_object:
+target drop = 0.037
+margin drop = 0.188
+
+semantic_mixed:
+target drop = -0.013
+margin drop = 0.144
+
+semantic_relation:
+target drop = -0.037
+margin drop = -0.013
+```
+
+GLM4 整体仍然弱：
+
+```text
+candidate_list:
+target drop = 0.000
+margin drop = 0.106
+
+其他源组 target drop 基本在 -0.013 到 0.025 之间。
+```
+
+#### 确认测试
+
+confirm（确认轮）加入 same-layer control head（同层控制头），每模型 4 个 case。
+
+整体候选 vs 控制：
+
+| model（模型） | candidate target drop（候选目标下降） | control target drop（控制目标下降） | candidate margin drop（候选边际下降） | control margin drop（控制边际下降） |
+|---|---:|---:|---:|---:|
+| qwen3 | 0.176 | 0.020 | 0.248 | -0.004 |
+| GLM4 | 0.021 | 0.008 | 0.025 | 0.008 |
+| DS7B | 0.139 | 0.016 | 0.137 | 0.012 |
+
+candidate_list（候选值列表）确认结果：
+
+```text
+qwen3:
+candidate_list top component:
+target drop = 1.000
+margin drop = 1.750
+
+candidate_list same-layer control:
+target drop = -0.094
+margin drop = -0.141
+
+GLM4:
+candidate_list top component:
+target drop = 0.125
+margin drop = 0.141
+
+candidate_list same-layer control:
+target drop = 0.016
+margin drop = -0.016
+
+DS7B:
+candidate_list top component:
+target drop = 0.844
+margin drop = 0.547
+
+candidate_list same-layer control:
+target drop = 0.000
+margin drop = 0.031
+```
+
+这说明 Phase 772 的 instruction dominance（指令源主导）需要进一步改写为：
+
+```text
+不是 instruction_core 主导；
+也不是 format_cue 主导；
+而是 candidate_list / allowed-values protocol（候选列表 / 允许值协议）主导。
+```
+
+### 是否正确
+
+Phase 773 的方向正确，并且是 Phase 772 之后必要的收紧。
+
+正确部分：
+
+```text
+1. 它拆开了 instruction 的内部结构。
+2. 它强制每个 source group 都被测试，避免 candidate_list 压制语义源。
+3. 它用 same-layer control 验证 candidate_list 不是简单同层噪声。
+4. 它客观证明 qwen3 和 DS7B 的强效应主要来自 candidate_list。
+```
+
+最重要的新结果：
+
+```text
+Phase 772 所谓 instruction source 强，
+更准确地说是 candidate_list source 强。
+```
+
+这对当前语言机制图谱是关键纠偏。
+
+### 严格问题和硬伤
+
+```text
+1. 当前任务包含 allowed values（允许值列表），这本身就是强外部候选集合。
+2. candidate_list 强可能是候选集合读出机制，不是自然语言语义机制。
+3. object/relation 源弱，不代表语义不存在，可能只是当前 allowed-values prompt 把语义压力转移给候选列表。
+4. GLM4 整体仍弱，三模型不形成统一强机制。
+5. qwen3 的 main 有 top1 loss，但 confirm 中 top1 loss 消失，说明 winner control 仍不稳定。
+6. DS7B 有 strong target/margin drop，但没有 top1 loss，更像读出强度调节。
+7. 仍是 head/source 粒度，不是 neuron/channel 粒度。
+8. clean_fiber_high 样本数量仍有限。
+```
+
+### 理论收紧
+
+Phase 773 后，机制图谱准入不能只写成：
+
+$$
+R_{component}^{causal}(x,c)
+$$
+
+还必须标明 source family（源族）：
+
+$$
+R_{component}^{causal}(x,c,g)
+$$
+
+其中：
+
+$$
+g \in
+\{
+candidate,
+instruction,
+format,
+object,
+relation,
+query,
+prefix
+\}
+$$
+
+当前结果支持：
+
+$$
+R_{candidate}^{causal}
+>
+R_{object}^{causal}
+\approx
+R_{relation}^{causal}
+$$
+
+至少在 allowed-values commonsense task（带候选值列表的常识任务）中成立。
+
+更严格的图谱准入应写成：
+
+$$
+R_{atlas}(x,c,g)
+=
+R_{output}(x)
+\land
+R_{fiber}^{balanced}(x)
+\land
+R_{component}^{discovered}(x,c,g)
+\land
+R_{component}^{causal}(x,c,g)
+\land
+R_{source}^{identified}(g)
+$$
+
+其中：
+
+$$
+R_{source}^{identified}(g)
+=
+\mathbf{1}
+[
+g \text{ 已经从 protocol / semantic / candidate 中解耦}
+]
+$$
+
+### 智能理论角度的关键洞察
+
+本阶段对“语言编码机制”有一个重要提醒：
+
+```text
+模型在当前任务里不一定直接从 object/relation semantic source 读出答案；
+它可能先利用 candidate list 建立候选竞争空间，
+再用较弱语义信号或格式信号完成 winner selection（胜出选择）。
+```
+
+也就是说，当前 allowed-values 任务更像：
+
+```text
+候选集合约束下的读出竞争机制
+```
+
+而不是完整自然语义生成机制。
+
+这不推翻前面的结果，但要求我们把机制图谱分成两层：
+
+```text
+1. candidate-conditioned closure（候选条件闭合）
+2. free semantic closure（自由语义闭合）
+```
+
+当前强结果主要属于第一层。
+
+### 下一步
+
+下一阶段仍属于当前大阶段，因为它直接解决 Phase 773 暴露出的核心硬伤。
+
+建议 Phase 774：
+
+```text
+Candidate-List Ablation and Free-Semantic Transfer
+（候选列表消融与自由语义迁移）
+```
+
+核心任务：
+
+```text
+1. 对同一批 clean_fiber_high cases，构造 with_candidate_list / without_candidate_list 两种 prompt。
+2. 比较 candidate_list 移除后，object_tokens / relation_tokens 是否增强。
+3. 检查 qwen3 和 DS7B 的 target drop 是否从 candidate_list 转移到 object/relation。
+4. 如果无候选列表后机制崩溃，说明当前图谱主要是候选条件闭合。
+5. 如果无候选列表后 object/relation 增强，说明可以继续进入自由语义图谱。
+```
+
+阶段性结论：
+
+```text
+Phase 773 是关键纠偏阶段。
+
+它证明：
+Phase 772 的强 instruction source 主要来自 candidate_list，
+不是自然 instruction_core，也不是 object/relation semantic source。
+
+当前研究应暂时暂停 neuron/channel atlas，
+先确认 candidate-conditioned closure 是否能迁移到 free semantic closure。
+```
+
+## Phase 774: Candidate-List Ablation and Free-Semantic Transfer（候选列表消融与自由语义迁移） [2026-06-29 21:29]
+
+### 任务来源
+
+Phase 773 证明 Phase 772 中最强的 source（源）不是自然 instruction_core（指令核心），也不是 object / relation semantic source（对象 / 关系语义源），而是 candidate_list（候选列表）这一类 allowed-values protocol（允许值协议）。
+
+因此 Phase 774 的核心问题变成：
+
+```text
+如果移除 candidate_list，
+当前图谱是否仍能依靠 object_tokens / relation_tokens 形成自由语义闭合？
+```
+
+这个问题直接决定当前机制图谱的性质：
+
+```text
+如果候选列表移除后仍能稳定输出正确值：
+  当前机制可能已经接近 free semantic closure（自由语义闭合）。
+
+如果候选列表移除后输出闭合崩溃：
+  当前机制主要还是 candidate-conditioned closure（候选条件闭合）。
+```
+
+### 测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase774_candidate_list_ablation_transfer.py
+tests/glm5/run_phase774_candidate_list_ablation_transfer_round.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase774_candidate_list_ablation_transfer/smoke/
+tests/result/phase774_candidate_list_ablation_transfer/main/
+tests/result/phase774_candidate_list_ablation_transfer/confirm/
+results/glm5_phase774_candidate_list_ablation_transfer/
+```
+
+测试设置：
+
+```text
+1. 三个模型顺序测试：qwen3 -> glm4 -> deepseek7b。
+2. 不使用量化。
+3. 使用 bf16。
+4. attention extraction（注意力提取）使用 eager attention。
+5. 同一批 clean_fiber_high cases 构造两种 prompt：
+   - with_candidate_list（带候选列表）
+   - without_candidate_list（不带候选列表）
+6. 对每种 prompt 执行 source_group_top_component（源组最强组件）消融。
+7. confirm 轮加入 same_layer_control_head（同层控制头）作为对照。
+```
+
+### 测试原理
+
+Phase 774 不是继续寻找更强的 head（注意力头），而是测试一个更上层的机制条件：
+
+```text
+candidate_list 是否是当前输出闭合的必要外部脚手架？
+```
+
+具体比较两个条件：
+
+```text
+P_with  = prompt(object, relation, candidate_list)
+P_free  = prompt(object, relation, no_candidate_list)
+```
+
+如果某个语义机制已经自然闭合，应满足：
+
+```text
+BaseTop1(P_free) 接近 BaseTop1(P_with)
+```
+
+并且：
+
+```text
+Effect(object/relation | P_free) >= Effect(object/relation | P_with)
+```
+
+也就是候选列表移除后，object_tokens（对象词元）和 relation_tokens（关系词元）的因果效应应该上升，承担原来 candidate_list 承担的闭合功能。
+
+### 数学表示
+
+把模型输出闭合写成：
+
+```text
+y = R(h_L, A)
+```
+
+其中：
+
+```text
+h_L = 最终层隐藏状态
+A   = allowed answer set（允许答案集合 / 候选列表）
+R   = readout closure（读出闭合函数）
+```
+
+候选条件闭合：
+
+```text
+C_candidate(x) =
+1[
+  Top1(R(h_L(x), A)) = y*
+]
+```
+
+自由语义闭合：
+
+```text
+C_free(x) =
+1[
+  Top1(R(h_L(x), empty)) = y*
+]
+```
+
+当前要验证的是：
+
+```text
+C_candidate(x) 是否可以迁移为 C_free(x)
+```
+
+以及：
+
+```text
+Delta_semantic_free =
+Effect(object_tokens, relation_tokens | A = empty)
+```
+
+是否显著增强。
+
+### 主轮结果
+
+主轮使用每模型 5 个 clean_fiber_high cases。
+
+#### qwen3
+
+```text
+with_candidate_list:
+  base_top1_rate = 1.000
+  mean_base_target_rank = 1.000
+  mean_target_logit_drop = 0.138
+  mean_margin_drop = 0.222
+
+without_candidate_list:
+  base_top1_rate = 0.000
+  mean_base_target_rank = 1168.800
+  mean_target_logit_drop = 0.031
+  mean_margin_drop = 0.063
+```
+
+qwen3 在带候选列表时稳定闭合；移除候选列表后，正确目标不再自然成为 top1。
+
+最关键的 source family（源家族）结果：
+
+```text
+with_candidate_list / candidate_protocol:
+  target_drop = 0.975
+  margin_drop = 1.512
+  direct_boost = 16.360
+
+without_candidate_list / semantic_object:
+  target_drop = 0.037
+  margin_drop = 0.025
+
+without_candidate_list / semantic_relation:
+  target_drop = 0.006
+  margin_drop = 0.069
+```
+
+候选列表移除后，object / relation 没有接管闭合功能。
+
+#### GLM4
+
+```text
+with_candidate_list:
+  base_top1_rate = 1.000
+  mean_base_target_rank = 1.000
+  mean_target_logit_drop = 0.005
+  mean_margin_drop = 0.023
+
+without_candidate_list:
+  base_top1_rate = 0.000
+  mean_base_target_rank = 45.800
+  mean_target_logit_drop = -0.004
+  mean_margin_drop = -0.003
+```
+
+GLM4 本来就不是强因果模型；移除候选列表后也不形成自由语义闭合。
+
+#### DS7B
+
+```text
+with_candidate_list:
+  base_top1_rate = 0.600
+  mean_base_target_rank = 2.200
+  mean_target_logit_drop = 0.102
+  mean_margin_drop = 0.105
+
+without_candidate_list:
+  base_top1_rate = 0.000
+  mean_base_target_rank = 4177.000
+  mean_target_logit_drop = 0.033
+  mean_margin_drop = 0.222
+```
+
+DS7B 在无候选列表条件下仍出现部分 semantic_mixed（混合语义）效应：
+
+```text
+without_candidate_list / semantic_mixed:
+  target_drop = 0.437
+  margin_drop = 0.905
+  direct_boost = 3.419
+```
+
+但 base_top1_rate = 0.000，mean_base_target_rank = 4177.000，说明这不是稳定自由语义输出闭合，而更像是局部语义方向存在但没有进入正确读出。
+
+### 确认轮结果
+
+确认轮使用每模型 3 个 clean_fiber_high cases，并加入 same_layer_control_head 对照。
+
+#### qwen3
+
+```text
+with_candidate_list / source_group_top_component:
+  base_top1_rate = 1.000
+  mean_base_target_rank = 1.000
+  target_drop = 0.214
+  margin_drop = 0.268
+
+with_candidate_list / control:
+  target_drop = 0.036
+  margin_drop = -0.018
+
+without_candidate_list / source_group_top_component:
+  base_top1_rate = 0.000
+  mean_base_target_rank = 1941.667
+  target_drop = 0.058
+  margin_drop = 0.097
+
+without_candidate_list / control:
+  target_drop = 0.003
+  margin_drop = 0.039
+```
+
+qwen3 的候选条件闭合稳定成立；自由语义闭合不成立。
+
+#### GLM4
+
+```text
+with_candidate_list / source_group_top_component:
+  base_top1_rate = 1.000
+  mean_base_target_rank = 1.000
+  target_drop = 0.010
+  margin_drop = 0.039
+
+without_candidate_list / source_group_top_component:
+  base_top1_rate = 0.000
+  mean_base_target_rank = 72.667
+  target_drop = -0.010
+  margin_drop = -0.002
+```
+
+GLM4 仍然没有显示出稳定自由语义闭合。
+
+#### DS7B
+
+```text
+with_candidate_list / source_group_top_component:
+  base_top1_rate = 0.333
+  mean_base_target_rank = 3.000
+  target_drop = 0.109
+  margin_drop = 0.049
+
+without_candidate_list / source_group_top_component:
+  base_top1_rate = 0.000
+  mean_base_target_rank = 6958.667
+  target_drop = 0.091
+  margin_drop = 0.285
+```
+
+DS7B 在无候选列表条件下的 source_group_top_component 仍明显强于 control：
+
+```text
+without_candidate_list / source_group_top_component:
+  target_drop = 0.091
+  margin_drop = 0.285
+
+without_candidate_list / control:
+  target_drop = 0.057
+  margin_drop = 0.018
+```
+
+其中 semantic_mixed 在确认轮仍然很强：
+
+```text
+without_candidate_list / semantic_mixed:
+  target_drop = 0.916
+  margin_drop = 1.190
+  direct_boost = 3.360
+```
+
+但由于：
+
+```text
+base_top1_rate = 0.000
+mean_base_target_rank = 6958.667
+```
+
+所以只能判断为：
+
+```text
+DS7B 存在可检测的局部语义路线，
+但该路线没有完成自然输出闭合。
+```
+
+### 客观结论
+
+Phase 774 的结果支持一个强收紧：
+
+```text
+当前 Phase 772-773 找到的强图谱，
+主要是 candidate-conditioned closure，
+不是完整 free semantic closure。
+```
+
+更具体地说：
+
+```text
+1. qwen3：
+   候选列表是输出闭合的强必要条件。
+   移除 candidate_list 后，object / relation 没有接管。
+
+2. GLM4：
+   候选列表可以让输出变得稳定，
+   但内部因果效应整体较弱。
+
+3. DS7B：
+   移除候选列表后仍有部分语义源效应，
+   尤其 semantic_mixed 明显强于普通控制头。
+   但正确目标没有进入自然 top1，
+   因此不是自由语义闭合。
+```
+
+### 对 Phase 772 附件判断的校正
+
+附件中说 Phase 772 是正结果但不是最终闭合，这个判断正确。
+
+Phase 774 进一步说明：
+
+```text
+Phase 772 的 matched component discovery scan 是有效的，
+但它发现的主要是候选协议条件下的闭合组件。
+```
+
+不能把它直接解释为：
+
+```text
+已经找到自然语言语义生成机制。
+```
+
+更稳妥的解释是：
+
+```text
+模型在 allowed-values protocol 下，
+会形成可定位、可消融、强于控制头的候选条件路线。
+```
+
+### 问题、硬伤和瓶颈
+
+#### 1. 无候选列表同时改变了输出空间
+
+移除 candidate_list 后，模型面对的是开放词表输出，不只是少了一个信息源。
+
+因此：
+
+```text
+base_top1 collapse
+```
+
+不能简单解释为：
+
+```text
+模型没有语义。
+```
+
+它也可能意味着：
+
+```text
+语义存在于 hidden state，
+但没有被当前 readout protocol 正确读出。
+```
+
+#### 2. DS7B 的 semantic_mixed 是重要线索，但不是闭合证据
+
+DS7B 在无候选列表下仍有强 semantic_mixed 效应，说明：
+
+```text
+语义路线可能存在。
+```
+
+但它没有生成正确 top1，说明：
+
+```text
+semantic latent route（潜在语义路线）
+和 output closure（输出闭合）
+之间仍然缺少桥。
+```
+
+#### 3. 当前仍是 head/source 级别
+
+Phase 774 没有进入 neuron/channel（神经元 / 通道）级别。
+
+因此不能宣称已经破解：
+
+```text
+具体神经元编码机制。
+```
+
+只能说：
+
+```text
+候选协议、语义源、输出读出之间的边界进一步清楚了。
+```
+
+#### 4. 小模型偏差必须保留
+
+当前模型都是小模型，尤其 DS7B 可能存在：
+
+```text
+语义路线不完整
+读出竞争不稳定
+格式协议过强
+开放生成弱
+```
+
+这些结果不能直接外推到更大模型。
+
+### 智能理论视角
+
+Phase 774 说明，语言机制不能被简单理解为：
+
+```text
+语义向量 -> 词表读出
+```
+
+更像是：
+
+```text
+条件协议 + 路线竞争 + 语义潜变量 + 读出闭合
+```
+
+其中 candidate_list 的作用不是普通提示信息，而是改变了整个读出闭合边界：
+
+```text
+A = allowed answer set
+```
+
+当 A 存在时：
+
+```text
+模型只需要在有限候选集合内完成竞争。
+```
+
+当 A 不存在时：
+
+```text
+模型必须在全词表开放空间中完成语义到词元的映射。
+```
+
+这两个任务不是同一个机制难度。
+
+### 阶段性判断
+
+当前阶段目标已经基本完成：
+
+```text
+Phase 772: 证明 matched component discovery scan 能找到强候选组件。
+Phase 773: 证明强 source 主要来自 candidate_list。
+Phase 774: 证明 candidate_list 移除后，自由语义闭合没有自然接管。
+```
+
+因此当前阶段的真实结论是：
+
+```text
+已经找到 candidate-conditioned route atlas 的关键组件，
+但还没有完成 free-semantic route atlas。
+```
+
+### 下一步
+
+下一阶段仍属于同一大任务，因为它直接追问 Phase 774 暴露出的缺口：
+
+```text
+语义是否已经存在于 hidden state，
+只是没有自然读出？
+```
+
+建议 Phase 775：
+
+```text
+Semantic Latent Route vs Output Closure Audit
+（语义潜在路线与输出闭合审计）
+```
+
+核心测试：
+
+```text
+1. 保持 without_candidate_list。
+2. 不只看 top1 输出，而是检查 correct target 在候选词、同类词、属性词附近的 logit / rank / hidden-state direction。
+3. 测试 semantic_mixed 强组件是否能提升目标 rank，即使不能直接提升 top1。
+4. 增加 constrained_free_prompt（弱约束自由提示），避免 candidate_list 直接提供答案集合，但保留输出格式。
+5. 对 DS7B 的 semantic_mixed 线索做确认轮，因为它是 Phase 774 中最接近自由语义路线的正信号。
+```
+
+如果 Phase 775 证明：
+
+```text
+hidden state 中已有语义方向，
+但 readout closure 失败，
+```
+
+那么后续任务应转向：
+
+```text
+readout bridge（读出桥）
+```
+
+而不是继续堆更多 candidate-conditioned head atlas。
+
+## Phase 775: Semantic Latent Route vs Output Closure Audit（语义潜在路线与输出闭合审计） [2026-06-29 22:05]
+
+### 任务来源
+
+Phase 774 得到一个非常重要的负结果：
+
+```text
+移除 candidate_list 后，
+qwen3 / GLM4 / DS7B 的开放词表 top1 输出闭合基本崩溃。
+```
+
+但这个负结果有一个危险解释：
+
+```text
+不能直接把 open-vocabulary top1 失败解释为“模型没有语义”。
+```
+
+因为无 candidate_list 条件同时改变了两个东西：
+
+```text
+1. 输入信息源少了候选列表。
+2. 输出空间从有限候选集合变成全词表开放空间。
+```
+
+因此 Phase 775 的核心任务是区分：
+
+```text
+语义路线不存在
+```
+
+和：
+
+```text
+语义路线存在，但没有完成开放词表读出闭合
+```
+
+### 测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase775_semantic_latent_route_output_closure.py
+tests/glm5/run_phase775_semantic_latent_route_output_closure_round.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase775_semantic_latent_route_output_closure/smoke/
+tests/result/phase775_semantic_latent_route_output_closure/main/
+tests/result/phase775_semantic_latent_route_output_closure/confirm/
+results/glm5_phase775_semantic_latent_route_output_closure/
+```
+
+测试设置：
+
+```text
+1. 三模型顺序测试：qwen3 -> GLM4 -> DS7B。
+2. 不使用量化。
+3. 使用 bf16。
+4. attention extraction（注意力提取）需要 eager attention。
+5. 每个 case 构造三种 prompt：
+   - without_candidate_list
+   - constrained_free_prompt
+   - with_candidate_list
+6. main 轮每模型最多 5 个 clean_fiber_high cases。
+7. confirm 轮每模型最多 3 个 clean_fiber_high cases，并加入 same_layer_control_head 对照。
+```
+
+### 测试原理
+
+Phase 775 不只看全词表 top1，而是增加一个“关系值池内选择”判据。
+
+对于一个 case，定义：
+
+```text
+V_all = 全词表
+V_rel = 当前 relation 对应的合理值池
+y*    = 正确答案 token
+```
+
+开放词表输出闭合：
+
+```text
+C_open(x) =
+1[
+  argmax_{v in V_all} logit(v | x) = y*
+]
+```
+
+关系值池内语义选择：
+
+```text
+C_pool(x) =
+1[
+  argmax_{v in V_rel} logit(v | x) = y*
+]
+```
+
+潜在语义命中：
+
+```text
+L_latent(x) =
+1[
+  C_open(x) = 0
+  and
+  C_pool(x) = 1
+]
+```
+
+含义：
+
+```text
+C_open = 1:
+  模型完成自然开放读出。
+
+C_pool = 1 但 C_open = 0:
+  模型在关系值空间内已经偏向正确答案，
+  但全词表竞争中没有把它读成最终输出。
+```
+
+这可以把 Phase 774 的“无候选列表失败”进一步拆成：
+
+```text
+1. 没有语义选择。
+2. 有语义选择，但 readout bridge（读出桥）失败。
+```
+
+### 主轮结果
+
+主轮每模型 5 个 clean_fiber_high cases。
+
+#### qwen3
+
+```text
+without_candidate_list:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.800
+  pool_target_top1_rate = 0.800
+  mean_base_target_rank = 1168.800
+  mean_pool_target_rank = 2.200
+
+constrained_free_prompt:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.800
+  pool_target_top1_rate = 0.800
+  mean_base_target_rank = 498.200
+  mean_pool_target_rank = 2.000
+
+with_candidate_list:
+  base_top1_rate = 1.000
+  pool_target_top1_rate = 1.000
+```
+
+qwen3 的结论非常清楚：
+
+```text
+没有候选列表时，开放输出不闭合；
+但在关系值池内，正确值经常已经是第一。
+```
+
+这说明 Phase 774 不能被解释为“没有语义”，更准确是：
+
+```text
+语义值选择存在，但读出桥失败。
+```
+
+#### GLM4
+
+```text
+without_candidate_list:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.800
+  pool_target_top1_rate = 0.800
+  mean_base_target_rank = 45.800
+  mean_pool_target_rank = 1.200
+
+constrained_free_prompt:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.600
+  pool_target_top1_rate = 0.600
+  mean_base_target_rank = 42.000
+  mean_pool_target_rank = 1.400
+
+with_candidate_list:
+  base_top1_rate = 1.000
+  pool_target_top1_rate = 1.000
+```
+
+GLM4 的 causal effect（因果效应）整体仍弱，但 observation（观察）层面也支持：
+
+```text
+值池内语义选择强于开放词表输出闭合。
+```
+
+#### DS7B
+
+```text
+without_candidate_list:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.800
+  pool_target_top1_rate = 0.800
+  mean_base_target_rank = 4177.000
+  mean_pool_target_rank = 1.200
+
+constrained_free_prompt:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.800
+  pool_target_top1_rate = 0.800
+  mean_base_target_rank = 1420.000
+  mean_pool_target_rank = 1.200
+
+with_candidate_list:
+  base_top1_rate = 0.600
+  pool_target_top1_rate = 0.800
+```
+
+DS7B 的结果尤其重要：
+
+```text
+无候选列表下，全词表 target rank 很差，
+但在关系值池内 target rank 接近第一。
+```
+
+这说明 DS7B 的语义路线不是完全消失，而是卡在读出竞争。
+
+### 确认轮结果
+
+确认轮每模型 3 个 cases，并加入 same_layer_control_head。
+
+#### qwen3
+
+```text
+without_candidate_list:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.667
+  pool_target_top1_rate = 0.667
+  mean_base_target_rank = 1941.667
+  mean_pool_target_rank = 3.000
+
+constrained_free_prompt:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.667
+  pool_target_top1_rate = 0.667
+  mean_base_target_rank = 828.333
+  mean_pool_target_rank = 2.667
+
+with_candidate_list:
+  base_top1_rate = 1.000
+  pool_target_top1_rate = 1.000
+```
+
+组件效应：
+
+```text
+without_candidate_list / source_group_top_component:
+  target_drop = 0.058
+  pool_margin_drop = 0.100
+
+without_candidate_list / same_layer_control_head:
+  target_drop = 0.003
+  pool_margin_drop = 0.042
+```
+
+qwen3 的 source_group_top_component 明显强于控制头，但效应不算非常大。
+
+#### GLM4
+
+```text
+without_candidate_list:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.667
+  pool_target_top1_rate = 0.667
+  mean_base_target_rank = 72.667
+  mean_pool_target_rank = 1.333
+
+constrained_free_prompt:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 1.000
+  pool_target_top1_rate = 1.000
+  mean_base_target_rank = 65.667
+  mean_pool_target_rank = 1.000
+
+with_candidate_list:
+  base_top1_rate = 1.000
+  pool_target_top1_rate = 1.000
+```
+
+GLM4 最有意思的点是：
+
+```text
+constrained_free_prompt 下，
+pool_target_top1_rate = 1.000，
+但 base_top1_rate = 0.000。
+```
+
+这几乎就是最干净的“读出桥失败”现象。
+
+但 GLM4 的组件因果效应仍接近控制：
+
+```text
+without_candidate_list / source_group_top_component:
+  target_drop = -0.010
+  pool_margin_drop = 0.010
+
+without_candidate_list / control:
+  target_drop = -0.003
+  pool_margin_drop = 0.006
+```
+
+因此 GLM4 更像是 observation positive（观察正结果），causal weak（因果弱结果）。
+
+#### DS7B
+
+```text
+without_candidate_list:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.667
+  pool_target_top1_rate = 0.667
+  mean_base_target_rank = 6958.667
+  mean_pool_target_rank = 1.333
+
+constrained_free_prompt:
+  base_top1_rate = 0.000
+  latent_pool_hit_rate = 0.667
+  pool_target_top1_rate = 0.667
+  mean_base_target_rank = 2363.000
+  mean_pool_target_rank = 1.333
+
+with_candidate_list:
+  base_top1_rate = 0.333
+  pool_target_top1_rate = 0.667
+```
+
+DS7B 的因果效应最强：
+
+```text
+without_candidate_list / source_group_top_component:
+  target_drop = 0.091
+  margin_drop = 0.285
+  pool_margin_drop = 0.243
+
+without_candidate_list / same_layer_control_head:
+  target_drop = 0.057
+  margin_drop = 0.018
+  pool_margin_drop = 0.103
+```
+
+更关键的是 source family：
+
+```text
+without_candidate_list / semantic_mixed:
+  target_drop = 0.916
+  pool_margin_drop = 0.960
+  direct_boost = 3.360
+
+without_candidate_list / semantic_object:
+  target_drop = 0.155
+  pool_margin_drop = 0.358
+  direct_boost = 3.346
+
+constrained_free_prompt / semantic_object:
+  target_drop = 0.365
+  pool_margin_drop = 0.594
+  direct_boost = 2.654
+
+constrained_free_prompt / semantic_mixed:
+  target_drop = 0.156
+  pool_margin_drop = 0.417
+  direct_boost = 2.810
+```
+
+这说明 DS7B 中确实有较强的 semantic latent route（潜在语义路线），只是没有跨过开放词表读出闭合。
+
+### 综合客观结论
+
+Phase 775 对 Phase 774 做了关键修正：
+
+```text
+Phase 774 证明：
+candidate_list 移除后，开放词表输出闭合失败。
+
+Phase 775 进一步证明：
+开放输出失败不等于语义路线不存在；
+三模型在无候选列表或弱约束自由提示下，经常已经在关系值池内选中正确答案。
+```
+
+因此当前更准确的机制图谱是：
+
+```text
+object / relation / semantic_pair
+        ↓
+semantic latent route（潜在语义路线）
+        ↓
+relation value pool preference（关系值池偏好）
+        ↓
+readout bridge 缺失
+        ↓
+open-vocabulary closure 失败
+```
+
+而 candidate_list 的真实作用应从 Phase 774 的解释进一步收紧为：
+
+```text
+candidate_list 不是简单提供答案；
+它更像是把潜在语义偏好接到有限候选读出空间上的 readout bridge。
+```
+
+### 对前面理论的影响
+
+前面若说：
+
+```text
+当前图谱只是 candidate-conditioned closure
+```
+
+现在需要修正为：
+
+```text
+当前图谱包含两层：
+
+1. free semantic latent selection（自由语义潜在选择）
+2. candidate-conditioned readout closure（候选条件读出闭合）
+```
+
+这比 Phase 774 更接近语言机制：
+
+```text
+语义不一定直接表现为自然生成 top1；
+它可能先表现为候选值空间内的相对排序优势。
+```
+
+### 问题、硬伤和瓶颈
+
+#### 1. value pool 是外部评估集合，不是模型自然生成集合
+
+Phase 775 的 pool_top1 是研究者构造的评估指标：
+
+```text
+V_rel = relation 对应的合理值池
+```
+
+它没有出现在 without_candidate_list 的 prompt 里，因此不是直接提示泄漏。
+
+但它仍然是外部给定的评估框架，所以不能直接等价为：
+
+```text
+模型自然知道完整语义空间。
+```
+
+更保守地说：
+
+```text
+当研究者给定正确的关系值池时，
+模型 logits 已经经常把正确值排在池内第一。
+```
+
+#### 2. 当前只检查 first token
+
+所有 answer / contrast 都使用 first token id。
+
+如果答案存在多 token 或 tokenizer 差异，则：
+
+```text
+rank / pool_top1 可能偏移。
+```
+
+需要后续做 multi-token answer scoring（多词元答案评分）。
+
+#### 3. pool_top1 不等于自然输出闭合
+
+Phase 775 的核心正结果是：
+
+```text
+C_pool 高
+```
+
+不是：
+
+```text
+C_open 高
+```
+
+所以它证明的是 latent selection（潜在选择），不是最终生成闭环。
+
+#### 4. GLM4 因果效应弱
+
+GLM4 的 observation 很强，但 source removal effect 接近控制。
+
+可能原因：
+
+```text
+1. GLM4 的语义偏好由更分散的组件承载。
+2. 当前 head/source 粒度不足。
+3. 小模型结构和 tokenizer 造成偏差。
+```
+
+#### 5. DS7B 的强语义组件仍未完成 readout closure
+
+DS7B 有最强的 semantic_mixed / semantic_object 因果信号，但开放输出仍失败。
+
+这说明瓶颈不在“有没有语义偏好”，而在：
+
+```text
+如何把语义偏好压过全词表竞争项。
+```
+
+### 智能理论视角
+
+Phase 775 提供了一个比 Phase 774 更细的语言机制分层：
+
+```text
+1. 语义潜变量层：
+   object / relation 形成正确值方向。
+
+2. 值池相对排序层：
+   正确值在相关候选集合内胜出。
+
+3. 开放词表竞争层：
+   正确值要击败格式词、解释词、常见高频词、续写路线。
+
+4. 读出闭合层：
+   生成系统必须把语义偏好变成第一个输出 token。
+```
+
+这说明语言编码机制不是简单的：
+
+```text
+语义 -> token
+```
+
+而更像：
+
+```text
+语义潜变量
+  -> 局部值空间排序
+  -> 全局词表竞争
+  -> 读出桥闭合
+```
+
+### 当前阶段性结论
+
+Phase 772-775 形成了一条更清楚的链：
+
+```text
+Phase 772:
+  matched component discovery scan 可以找到强组件。
+
+Phase 773:
+  强 source 很大程度来自 candidate_list。
+
+Phase 774:
+  移除 candidate_list 后，开放词表输出闭合失败。
+
+Phase 775:
+  开放输出失败不等于没有语义；
+  三模型经常已经在 relation value pool 内选中正确值。
+```
+
+所以当前最稳妥结论是：
+
+```text
+已经观察到自由语义潜在选择，
+但还没有完成自由语义开放读出闭合。
+```
+
+### 下一步
+
+Phase 775 已经完成当前小阶段目标：
+
+```text
+判断 Phase 774 的失败到底是“无语义”，还是“读出未闭合”。
+```
+
+结果倾向于：
+
+```text
+读出未闭合。
+```
+
+下一阶段应转入新的阶段性大任务：
+
+```text
+Phase 776: Readout-Bridge Competition Audit
+（读出桥竞争审计）
+```
+
+核心任务：
+
+```text
+1. 在 without_candidate_list / constrained_free_prompt 下，记录全词表 top-k 竞争 token。
+2. 判断正确值被哪些类型 token 压制：
+   - 格式续写
+   - 解释词
+   - 高频通用词
+   - 关系错误值
+   - 标点 / 空白
+3. 对 top-k competitor 做 route 分类。
+4. 测试 semantic latent route 已经 pool_top1 的 case 中，
+   哪些 competitor route 阻止 C_open。
+5. 不再优先找更多 candidate-conditioned head，
+   而是找从 C_pool 到 C_open 的 readout bridge。
+```
+
+如果 Phase 776 能定位到稳定的 open-vocabulary competitor route，那么才有条件继续做：
+
+```text
+readout bridge repair
+```
+
+否则当前研究会继续停留在：
+
+```text
+语义潜变量可见，
+但自然生成闭环不可控。
+```
+
+## Phase 776: 读出桥竞争审计：语义潜在选择后的开放词表竞争来源 [2026-06-29 22:19]
+
+### 背景
+
+Phase 773-775 形成了一条重要收紧链：
+
+```text
+Phase 773:
+  candidate_list 是 matched component discovery 中最强 source。
+
+Phase 774:
+  移除 candidate_list 后，开放词表 top1 闭合大幅失败。
+
+Phase 775:
+  开放词表失败不等于没有语义；
+  在 relation value pool 内，模型经常已经选中正确值。
+```
+
+所以 Phase 776 不再继续问：
+
+```text
+有没有语义潜在选择？
+```
+
+而是转向更靠近输出端的问题：
+
+```text
+当 relation value pool 已经选中正确值，
+为什么全词表 top1 仍然不是严格目标 token？
+```
+
+### 测试脚本和结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase776_readout_bridge_competition_audit.py
+tests/glm5/run_phase776_readout_bridge_competition_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase776_readout_bridge_competition_audit/smoke/
+tests/result/phase776_readout_bridge_competition_audit/main/
+tests/result/phase776_readout_bridge_competition_audit/confirm/
+```
+
+核心汇总文件：
+
+```text
+tests/result/phase776_readout_bridge_competition_audit/main/phase776_cross_model_summary.md
+tests/result/phase776_readout_bridge_competition_audit/confirm/phase776_cross_model_summary.md
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+模型加载方式：
+
+```text
+bf16
+不使用量化
+优先 flash_attention_2
+flash 不可用时回退到 sdpa
+```
+
+实际运行中，本地环境未安装 flash attention package，三模型均回退到 sdpa 后成功完成测试。
+
+### 测试原理
+
+Phase 775 只区分了两种闭合：
+
+```text
+1. 全词表严格目标 token top1
+2. relation value pool 内正确值 top1
+```
+
+Phase 776 在此基础上增加一层：
+
+```text
+如果 pool 已经选中正确值，但全词表没有选中严格目标 token，
+记录击败目标 token 的全词表 top-k competitor，
+并按 token 类型分类。
+```
+
+核心指标：
+
+```text
+C_open = 1[argmax_{v in V_all} logit(v | x) = y*]
+```
+
+```text
+C_pool = 1[argmax_{v in V_rel} logit(v | x) = y*]
+```
+
+```text
+L_latent = 1[C_open = 0 and C_pool = 1]
+```
+
+Phase 776 关注：
+
+```text
+if L_latent = 1:
+  competitor = argmax_{v in V_all} logit(v | x)
+  classify(competitor)
+```
+
+主要分类包括：
+
+```text
+case_variant_target_value
+whitespace_or_empty
+lexical_capitalized
+format_or_explanation_word
+relation_pool_wrong_value
+other_relation_value
+other_token
+```
+
+其中最关键的新分类是：
+
+```text
+case_variant_target_value
+```
+
+意思是：
+
+```text
+严格目标 token 可能是 lowercase 形式，
+但模型 top1 是同一语义答案的大小写变体。
+```
+
+例如：
+
+```text
+target = yes
+top1   = Yes
+```
+
+在严格 token 指标下这被算作失败，但从语义上看它不是错误答案。
+
+### 主要结果
+
+#### qwen3
+
+主测试与确认测试一致：
+
+```text
+without_candidate_list:
+  base_top1 = 0.000
+  pool_top1 = 0.857
+  latent_hit = 0.857
+  mean base rank = 902.857
+  mean pool rank = 1.857
+
+constrained_free_prompt:
+  base_top1 = 0.000
+  pool_top1 = 0.857
+  latent_hit = 0.857
+  mean base rank = 364.143
+  mean pool rank = 1.714
+
+with_candidate_list:
+  base_top1 = 1.000
+  pool_top1 = 1.000
+```
+
+latent-hit case 中的 top1 competitor：
+
+```text
+without_candidate_list:
+  case_variant_target_value = 5 cases
+  whitespace_or_empty = 1 case
+
+constrained_free_prompt:
+  case_variant_target_value = 6 cases
+```
+
+#### GLM4
+
+主测试与确认测试一致：
+
+```text
+without_candidate_list:
+  base_top1 = 0.000
+  pool_top1 = 1.000
+  latent_hit = 1.000
+  mean base rank = 193.500
+  mean pool rank = 1.000
+
+constrained_free_prompt:
+  base_top1 = 0.000
+  pool_top1 = 0.625
+  latent_hit = 0.625
+  mean base rank = 171.750
+  mean pool rank = 1.375
+
+with_candidate_list:
+  base_top1 = 1.000
+  pool_top1 = 1.000
+```
+
+latent-hit case 中的 top1 competitor：
+
+```text
+without_candidate_list:
+  case_variant_target_value = 6 cases
+  whitespace_or_empty = 1 case
+  lexical_capitalized = 1 case
+
+constrained_free_prompt:
+  case_variant_target_value = 4 cases
+  lexical_capitalized = 1 case
+```
+
+#### DS7B
+
+主测试与确认测试一致：
+
+```text
+without_candidate_list:
+  base_top1 = 0.125
+  pool_top1 = 0.625
+  latent_hit = 0.500
+  mean base rank = 1186.375
+  mean pool rank = 1.500
+
+constrained_free_prompt:
+  base_top1 = 0.125
+  pool_top1 = 0.750
+  latent_hit = 0.625
+  mean base rank = 675.000
+  mean pool rank = 1.250
+
+with_candidate_list:
+  base_top1 = 0.375
+  pool_top1 = 0.750
+  latent_hit = 0.375
+```
+
+latent-hit case 中的 top1 competitor：
+
+```text
+without_candidate_list:
+  case_variant_target_value = 4 cases
+
+constrained_free_prompt:
+  case_variant_target_value = 4 cases
+  lexical_capitalized = 1 case
+
+with_candidate_list:
+  case_variant_target_value = 3 cases
+```
+
+### 对 Phase 773-775 判断的修正
+
+附件中对 Phase 773-775 的判断总体正确：
+
+```text
+candidate_list 不只是普通提示词，
+它提供了输出端读出桥。
+```
+
+但 Phase 776 进一步收紧了这句话：
+
+```text
+candidate_list 的一部分作用，
+不是生成语义本身，
+而是把已经存在的语义潜在选择，
+规范化为可被严格 target token 指标捕捉的表面形式。
+```
+
+更具体地说：
+
+```text
+semantic latent selection
+  -> value pool 内已经选中正确答案
+  -> open vocabulary 中被大小写 / 空白 / 格式 token 击败
+  -> candidate_list 提供表面形式约束
+  -> strict target token top1 恢复
+```
+
+所以 Phase 775 的结论：
+
+```text
+存在自由语义潜在选择，但缺少开放读出闭合。
+```
+
+需要进一步拆成：
+
+```text
+1. 自由语义潜在选择确实存在。
+2. 开放读出闭合失败中，有相当部分是表面形式归一化失败。
+3. candidate_list 既是候选约束，也是 readout surface-form normalizer。
+```
+
+### 严格问题和硬伤
+
+第一，Phase 776 仍然不是因果实验。
+
+```text
+它只是记录了击败 target token 的 competitor 类型，
+没有证明 competitor route 因果压制了 target。
+```
+
+第二，当前严格 open closure 指标过于苛刻。
+
+```text
+如果 target = yes，
+而 top1 = Yes，
+当前指标仍然记为失败。
+```
+
+这说明 Phase 774-775 中的部分开放词表失败被高估了。
+
+第三，当前仍然是 single-token target 分析。
+
+```text
+多 token 答案、
+中文答案、
+同义词答案、
+大小写归一化答案，
+都还没有纳入完整评价。
+```
+
+第四，DS7B 仍然明显更弱。
+
+```text
+即使 with_candidate_list，
+DS7B base_top1 也只有 0.375，
+pool_top1 只有 0.750。
+```
+
+这说明 DS7B 的问题不只是大小写表面形式，还可能包括：
+
+```text
+1. value pool 本身选择不稳定
+2. format / explanation route 竞争更强
+3. readout geometry 更偏离严格目标 token
+```
+
+第五，当前模型都是小模型。
+
+```text
+这些结果可以作为机制线索，
+但不能直接外推为大模型完整语言机制。
+```
+
+### 当前阶段性结论
+
+Phase 776 的关键结果是：
+
+```text
+open-vocabulary strict token failure
+不等于
+semantic answer failure。
+```
+
+更准确的结构是：
+
+```text
+语义潜在选择
+  -> relation value pool 内正确
+  -> 表面形式 / 大小写 / 格式竞争
+  -> strict target token 失败
+```
+
+因此，当前图谱应从：
+
+```text
+semantic route -> readout
+```
+
+修正为：
+
+```text
+semantic latent route
+  -> value-pool selection
+  -> surface-form normalization
+  -> open-vocabulary token closure
+```
+
+### 智能理论角度的关键洞察
+
+这一步说明，语言生成不是简单的：
+
+```text
+概念向量 -> 目标 token
+```
+
+而更像是：
+
+```text
+语义潜变量
+  -> 候选值场
+  -> 表面形式场
+  -> 读出竞争场
+  -> token0 闭合
+```
+
+这与当前“条件化相对状态—生成场闭合理论”的方向一致：
+
+```text
+模型内部先形成相对语义状态，
+再通过任务条件、格式条件、候选条件完成生成场闭合。
+```
+
+但是 Phase 776 也指出一个必须修正的点：
+
+```text
+生成场闭合不能只看语义正确性；
+还必须显式建模 surface-form normalization。
+```
+
+否则会把：
+
+```text
+Yes vs yes
+```
+
+错误解释成：
+
+```text
+语义机制失败。
+```
+
+### 下一步
+
+Phase 776 和 Phase 775 属于同一个阶段性任务：
+
+```text
+从 candidate_list 依赖中拆出真正的 readout bridge。
+```
+
+下一步应继续同一阶段，做：
+
+```text
+Phase 777: Semantic-Equivalent Open Closure Recompute
+（语义等价开放闭合重算）
+```
+
+核心任务：
+
+```text
+1. 不重新加载模型。
+2. 直接基于 Phase 776 的 top1 competitor 记录。
+3. 把 case_variant_target_value 计入 semantic-equivalent open closure。
+4. 对比 strict open closure 与 semantic-equivalent open closure。
+5. 判断 Phase 774-775 中多少“开放失败”其实是表面形式失败。
+```
+
+这一步完成后，才能更客观地区分：
+
+```text
+真正的读出桥失败
+```
+
+和：
+
+```text
+严格 token 评价口径造成的假失败
+```
+
+## Phase 777: 语义等价开放闭合重算：修正 strict token 失败口径 [2026-06-29 22:22]
+
+### 背景
+
+Phase 776 发现：
+
+```text
+大量 open-vocabulary strict token failure
+并不是语义答案错误，
+而是 target token 的大小写 / 表面形式变体击败了严格目标 token。
+```
+
+例如：
+
+```text
+target token = yes
+top1 token  = Yes
+```
+
+在 Phase 774-776 的 strict open 指标下，这会被记为失败。
+
+但从语言机制角度，它更接近：
+
+```text
+语义已经正确，
+表面形式未归一化。
+```
+
+所以 Phase 777 不重新加载模型，而是直接读取 Phase 776 的结果，重新计算：
+
+```text
+semantic-equivalent open closure
+```
+
+### 脚本和结果位置
+
+脚本：
+
+```text
+tests/glm5/phase777_semantic_equivalent_open_closure_recompute.py
+```
+
+结果：
+
+```text
+tests/result/phase777_semantic_equivalent_open_closure_recompute/main/
+tests/result/phase777_semantic_equivalent_open_closure_recompute/confirm/
+```
+
+核心文件：
+
+```text
+tests/result/phase777_semantic_equivalent_open_closure_recompute/main/phase777_semantic_equivalent_open_closure_summary.md
+tests/result/phase777_semantic_equivalent_open_closure_recompute/confirm/phase777_semantic_equivalent_open_closure_summary.md
+```
+
+本阶段不加载模型，不占用 GPU。
+
+### 测试原理
+
+原 strict open closure：
+
+```text
+C_strict = 1[argmax_{v in V_all} logit(v | x) = y*]
+```
+
+Phase 777 增加语义等价开放闭合：
+
+```text
+C_equiv = 1[top1_class in {target_value, case_variant_target_value}]
+```
+
+等价地说：
+
+```text
+如果 top1 是严格目标 token，
+或者 top1 是目标答案的大小写 / 表面形式变体，
+则记为 semantic-equivalent open closure。
+```
+
+表面形式纠偏增益：
+
+```text
+G_surface = C_equiv - C_strict
+```
+
+剩余硬读出失败：
+
+```text
+H_readout = 1[C_pool = 1 and C_equiv = 0]
+```
+
+含义：
+
+```text
+relation value pool 已经正确，
+但开放 top1 仍然不是语义等价目标答案。
+```
+
+### 主要结果
+
+main 与 confirm 完全一致。
+
+#### qwen3
+
+```text
+without_candidate_list:
+  strict open = 0.000
+  semantic-equivalent open = 0.714
+  surface gain = 0.714
+  pool top1 = 0.857
+  hard readout after equiv = 0.143
+
+constrained_free_prompt:
+  strict open = 0.000
+  semantic-equivalent open = 0.857
+  surface gain = 0.857
+  pool top1 = 0.857
+  hard readout after equiv = 0.000
+
+with_candidate_list:
+  strict open = 1.000
+  semantic-equivalent open = 1.000
+  pool top1 = 1.000
+```
+
+latent-hit 重分类：
+
+```text
+constrained_free_prompt:
+  latent n = 6
+  semantic-equivalent open = 6
+  rate = 1.000
+
+without_candidate_list:
+  latent n = 6
+  semantic-equivalent open = 5
+  rate = 0.833
+```
+
+#### GLM4
+
+```text
+without_candidate_list:
+  strict open = 0.000
+  semantic-equivalent open = 0.750
+  surface gain = 0.750
+  pool top1 = 1.000
+  hard readout after equiv = 0.250
+
+constrained_free_prompt:
+  strict open = 0.000
+  semantic-equivalent open = 0.750
+  surface gain = 0.750
+  pool top1 = 0.625
+  hard readout after equiv = 0.125
+
+with_candidate_list:
+  strict open = 1.000
+  semantic-equivalent open = 1.000
+  pool top1 = 1.000
+```
+
+latent-hit 重分类：
+
+```text
+without_candidate_list:
+  latent n = 8
+  semantic-equivalent open = 6
+  rate = 0.750
+
+constrained_free_prompt:
+  latent n = 5
+  semantic-equivalent open = 4
+  rate = 0.800
+```
+
+#### DS7B
+
+```text
+without_candidate_list:
+  strict open = 0.125
+  semantic-equivalent open = 0.750
+  surface gain = 0.625
+  pool top1 = 0.625
+  hard readout after equiv = 0.000
+
+constrained_free_prompt:
+  strict open = 0.125
+  semantic-equivalent open = 0.750
+  surface gain = 0.625
+  pool top1 = 0.750
+  hard readout after equiv = 0.125
+
+with_candidate_list:
+  strict open = 0.375
+  semantic-equivalent open = 1.000
+  surface gain = 0.625
+  pool top1 = 0.750
+  hard readout after equiv = 0.000
+```
+
+latent-hit 重分类：
+
+```text
+without_candidate_list:
+  latent n = 4
+  semantic-equivalent open = 4
+  rate = 1.000
+
+constrained_free_prompt:
+  latent n = 5
+  semantic-equivalent open = 4
+  rate = 0.800
+
+with_candidate_list:
+  latent n = 3
+  semantic-equivalent open = 3
+  rate = 1.000
+```
+
+### 对前面阶段的修正
+
+Phase 777 强烈修正了 Phase 774-776 的一个评价口径问题。
+
+原先看起来：
+
+```text
+without_candidate_list / constrained_free_prompt 的 open closure 几乎完全失败。
+```
+
+修正后更准确地说：
+
+```text
+strict token closure 经常失败；
+semantic-equivalent open closure 经常成功。
+```
+
+尤其是：
+
+```text
+qwen3 constrained_free_prompt:
+  strict open = 0.000
+  semantic-equivalent open = 0.857
+
+GLM4 without_candidate_list:
+  strict open = 0.000
+  semantic-equivalent open = 0.750
+
+DS7B without_candidate_list:
+  strict open = 0.125
+  semantic-equivalent open = 0.750
+```
+
+这说明：
+
+```text
+之前把很多“表面形式未归一化”误计为“开放读出失败”。
+```
+
+### 当前更准确的机制图
+
+Phase 775 的图：
+
+```text
+semantic latent route
+  -> value pool selection
+  -> open vocabulary readout failure
+```
+
+需要修正为：
+
+```text
+semantic latent route
+  -> value pool selection
+  -> semantic-equivalent surface form often already top1
+  -> strict token identity sometimes fails
+```
+
+也就是说，当前主要缺口不应笼统叫：
+
+```text
+open readout failure
+```
+
+而应拆成：
+
+```text
+1. pool selection failure
+2. semantic-equivalent surface-form closure failure
+3. strict token identity normalization failure
+```
+
+### 严格问题和硬伤
+
+第一，Phase 777 是重算，不是新因果实验。
+
+```text
+它只能修正评价口径，
+不能证明大小写变体由哪条内部路线产生。
+```
+
+第二，semantic-equivalent open closure 目前只纳入：
+
+```text
+target_value
+case_variant_target_value
+```
+
+还没有纳入：
+
+```text
+同义词
+多 token 答案
+中文答案
+标点附着答案
+形态变化答案
+```
+
+第三，当前样本仍来自 Phase 776 的 clean_fiber_high 子集。
+
+```text
+它适合解释当前机制链，
+但不能代表所有语言任务。
+```
+
+第四，domain 维度仍有明显不稳定。
+
+例如：
+
+```text
+GLM4 abstract:
+  semantic-equivalent open = 0.333
+  hard readout after equiv = 0.500
+
+qwen3 abstract:
+  semantic-equivalent open = 0.333
+  pool top1 = 0.333
+```
+
+这说明 abstract domain 仍然是弱区，不能只根据 fruit / object 的好结果推断全局语言机制已经闭合。
+
+第五，小模型偏差仍然必须保留。
+
+```text
+这些现象是机制拼图，
+不是最终理论证明。
+```
+
+### 阶段性结论
+
+Phase 777 的最重要结论是：
+
+```text
+candidate_list 依赖被高估了一部分。
+```
+
+因为：
+
+```text
+没有 candidate_list 时，
+模型经常已经生成了语义等价答案，
+只是没有落到严格 token identity。
+```
+
+更精确的结论是：
+
+```text
+candidate_list 的主要作用之一是 surface-form normalization，
+而不是凭空提供语义。
+```
+
+所以当前语言机制研究应避免把：
+
+```text
+strict token mismatch
+```
+
+直接解释成：
+
+```text
+semantic route failure。
+```
+
+### 智能理论角度的关键洞察
+
+这一阶段说明，语言编码机制至少包含四层可区分结构：
+
+```text
+1. semantic latent state
+2. relation value pool selection
+3. surface-form normalization
+4. strict token identity closure
+```
+
+这比简单的：
+
+```text
+语义 -> token
+```
+
+更接近真实生成过程。
+
+从第一性原理看，自回归模型不是在输出“纯语义”，而是在每一步同时解决：
+
+```text
+1. 当前应该表达什么
+2. 应该用哪个候选值表达
+3. 应该用什么表面形式表达
+4. 应该落到哪个 tokenizer token
+```
+
+因此，破解语言编码机制时，不能只做静态语义图谱，也不能只做 head / neuron 重要性图谱，还必须做：
+
+```text
+语义状态 -> 表面形式 -> tokenizer 闭合
+```
+
+的连续图谱。
+
+### 下一步
+
+Phase 773-777 已经完成一个重要阶段性收束：
+
+```text
+candidate_list 依赖
+  -> 语义潜在选择
+  -> 表面形式归一化
+  -> strict token identity
+```
+
+下一阶段不应继续只在同一小样本上拆 token 细节，而应进入更高一级任务：
+
+```text
+Phase 778: Surface-Form Normalization Causal Audit
+（表面形式归一化因果审计）
+```
+
+核心任务：
+
+```text
+1. 构造大小写等价、标点等价、空格等价、多 token 等价的答案集合。
+2. 区分 semantic-equivalent success 与 strict-token success。
+3. 测试哪些 source / head / MLP 负责：
+   - 语义选择
+   - 表面形式归一化
+   - tokenizer identity 闭合
+4. 不再把 candidate_list 当作单一机制，
+   而是拆成：
+   - value pool scaffold
+   - surface-form normalizer
+   - tokenizer identity anchor
+```
+
+更大的阶段目标是：
+
+```text
+建立从语义潜变量到 tokenizer token 的多级闭合图谱。
+```
+
+## Phase 778: 表面形式归一化因果审计：从语义等价到严格 token 身份 [2026-06-29 22:35]
+
+### 背景
+
+附件对 Phase 776-777 的总体判断是正确的：
+
+```text
+Phase 776-777 不是普通 patch 结果，
+而是一次重要的评价口径修正。
+```
+
+Phase 773-775 的原始判断是：
+
+```text
+candidate_list 移除后，open vocabulary strict token closure 经常失败。
+```
+
+Phase 776-777 修正为：
+
+```text
+strict token identity closure 经常失败；
+但 semantic-equivalent open closure 经常已经成功。
+```
+
+也就是说，很多失败不是：
+
+```text
+semantic route failure
+```
+
+而是：
+
+```text
+surface-form normalization / tokenizer identity closure failure
+```
+
+Phase 778 因此继续同一阶段任务，做一个更直接的 prompt-level 因果审计：
+
+```text
+如果不用 candidate_list，
+只增加 lowercase / no punctuation / token identity 约束，
+能否把 case_variant_target_value 修成严格 target token？
+```
+
+### 脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase778_surface_form_normalization_causal_audit.py
+tests/glm5/run_phase778_surface_form_normalization_causal_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase778_surface_form_normalization_causal_audit/smoke/
+tests/result/phase778_surface_form_normalization_causal_audit/main/
+tests/result/phase778_surface_form_normalization_causal_audit/confirm/
+```
+
+镜像目录：
+
+```text
+results/glm5_phase778_surface_form_normalization_causal_audit/
+```
+
+核心汇总：
+
+```text
+tests/result/phase778_surface_form_normalization_causal_audit/main/phase778_cross_model_summary.md
+tests/result/phase778_surface_form_normalization_causal_audit/confirm/phase778_cross_model_summary.md
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+模型配置：
+
+```text
+bf16
+不使用量化
+优先 flash_attention_2
+flash 不可用时回退 sdpa
+```
+
+实际运行中，flash attention package 未安装，三模型均回退到 sdpa 后完成 smoke / main / confirm。
+
+### 测试数据
+
+Phase 778 直接从 Phase 776 confirm 结果中选择：
+
+```text
+strict token failure
+且
+top1 competitor = case_variant_target_value
+```
+
+也就是最典型的表面形式错误样本。
+
+每个模型可用样本：
+
+```text
+qwen3: 6 cases
+GLM4: 6 cases
+DS7B: 6 cases
+```
+
+main 和 confirm 均使用当前可用全量 6 个样本。由于 Phase 776 当前只提供这些 case-variant 样本，confirm 无法进一步扩大样本，只能用同一全量样本复现。
+
+### 测试提示类型
+
+```text
+without_candidate_list:
+  原始无候选列表提示。
+
+constrained_free_prompt:
+  弱约束自由提示。
+
+lowercase_short_value:
+  明确要求 exactly one short lowercase value。
+
+lowercase_no_punctuation:
+  明确要求 lowercase、no punctuation、no sentence。
+
+token_identity_contract:
+  明确要求 canonical lowercase answer token。
+
+with_candidate_list:
+  候选列表基线。
+```
+
+### 测试原理
+
+原严格闭合：
+
+```text
+C_strict(x) = 1[argmax_{v in V_all} logit(v | x) = y*]
+```
+
+语义等价闭合：
+
+```text
+C_equiv(x) = 1[top1_class in {target_value, case_variant_target_value}]
+```
+
+表面形式修复判断：
+
+```text
+如果 baseline top1 = case_variant_target_value，
+而 lowercase / token_identity 指令后 top1 = target_value，
+则说明 surface-form instruction 可以修复 strict token identity。
+```
+
+注意：
+
+```text
+这是 prompt-level causal audit，
+不是 head / MLP 级因果定位。
+```
+
+它只能说明：
+
+```text
+表面形式归一化层可以被显式指令控制。
+```
+
+还不能说明：
+
+```text
+哪个内部组件实现了这个控制。
+```
+
+### 主测试与确认测试结果
+
+main 和 confirm 数值一致。
+
+#### qwen3
+
+```text
+without_candidate_list:
+  strict open = 0.000
+  semantic-equiv open = 0.833
+  pool top1 = 1.000
+  case-variant top1 = 0.833
+  hard readout after equiv = 0.167
+
+constrained_free_prompt:
+  strict open = 0.000
+  semantic-equiv open = 1.000
+  case-variant top1 = 1.000
+
+lowercase_short_value:
+  strict open = 1.000
+  semantic-equiv open = 1.000
+
+lowercase_no_punctuation:
+  strict open = 1.000
+  semantic-equiv open = 1.000
+
+token_identity_contract:
+  strict open = 0.667
+  semantic-equiv open = 0.667
+
+with_candidate_list:
+  strict open = 1.000
+```
+
+qwen3 的结果最清楚：
+
+```text
+只要给出简单 lowercase 指令，
+无需 candidate_list，
+strict token identity 就可以从 0.000 修到 1.000。
+```
+
+这说明 qwen3 的很多 candidate_list 依赖，本质上是表面形式归一化依赖。
+
+#### GLM4
+
+```text
+without_candidate_list:
+  strict open = 0.000
+  semantic-equiv open = 1.000
+  pool top1 = 1.000
+  case-variant top1 = 1.000
+
+constrained_free_prompt:
+  strict open = 0.000
+  semantic-equiv open = 1.000
+  case-variant top1 = 1.000
+
+lowercase_short_value:
+  strict open = 0.500
+  semantic-equiv open = 1.000
+
+lowercase_no_punctuation:
+  strict open = 0.667
+  semantic-equiv open = 0.667
+
+token_identity_contract:
+  strict open = 0.167
+  semantic-equiv open = 0.667
+
+with_candidate_list:
+  strict open = 1.000
+```
+
+GLM4 的结果比 qwen3 更复杂：
+
+```text
+lowercase 指令可以部分修复 strict token identity，
+但 candidate_list 仍然明显更强。
+```
+
+这说明 GLM4 对表面形式约束敏感，但 generic lowercase instruction 不等于完整 candidate_list。
+
+#### DS7B
+
+```text
+without_candidate_list:
+  strict open = 0.000
+  semantic-equiv open = 0.833
+  pool top1 = 0.667
+  case-variant top1 = 0.833
+
+constrained_free_prompt:
+  strict open = 0.000
+  semantic-equiv open = 0.833
+  pool top1 = 0.667
+
+lowercase_short_value:
+  strict open = 0.500
+  semantic-equiv open = 0.667
+  pool top1 = 0.667
+
+lowercase_no_punctuation:
+  strict open = 0.167
+  semantic-equiv open = 0.667
+  pool top1 = 0.500
+
+token_identity_contract:
+  strict open = 0.167
+  semantic-equiv open = 0.667
+
+with_candidate_list:
+  strict open = 0.167
+  semantic-equiv open = 1.000
+```
+
+DS7B 的结果最弱：
+
+```text
+candidate_list 可以把 semantic-equiv open 提高到 1.000，
+但 strict open 仍只有 0.167。
+```
+
+这说明 DS7B 的问题不是简单 lowercase 归一化，而是更深的 tokenizer identity / format route 问题。
+
+### 对 Phase 776-777 的修正
+
+Phase 776-777 证明：
+
+```text
+严格 token 失败经常只是语义等价表面形式失败。
+```
+
+Phase 778 进一步证明：
+
+```text
+在 qwen3 中，表面形式失败可以被简单 lowercase instruction 几乎完全修复。
+在 GLM4 中，表面形式失败可以被部分修复，但 candidate_list 更稳。
+在 DS7B 中，表面形式失败和 token identity failure 更顽固。
+```
+
+因此当前最准确的三模型结构是：
+
+```text
+qwen3:
+  semantic latent -> surface form -> token identity
+  主要缺口可由 lowercase instruction 修复。
+
+GLM4:
+  semantic latent 很强，
+  surface form 可部分修复，
+  candidate_list 仍是强 token anchor。
+
+DS7B:
+  semantic-equivalent closure 常见，
+  但 strict token identity 很弱，
+  candidate_list 也不能稳定修复 strict token。
+```
+
+### 当前机制图
+
+最新图谱应写成：
+
+```text
+semantic latent state
+  -> relation value pool selection
+  -> surface-form family selection
+     - lowercase
+     - capitalization
+     - punctuation
+     - explanation prefix
+  -> tokenizer identity anchoring
+  -> phrase / generation closure
+```
+
+其中：
+
+```text
+candidate_list
+```
+
+至少有三种作用：
+
+```text
+1. value pool scaffold
+2. surface-form normalizer
+3. tokenizer identity anchor
+```
+
+Phase 778 证明：
+
+```text
+第 2 层 surface-form normalizer 可以被普通表面指令部分替代。
+```
+
+但仍未证明：
+
+```text
+第 3 层 tokenizer identity anchor 可以被普通指令完全替代。
+```
+
+### 问题和硬伤
+
+第一，Phase 778 是 prompt-level 因果审计，不是组件定位。
+
+```text
+它没有告诉我们哪个 head / MLP / channel 执行 lowercase normalization。
+```
+
+第二，样本来自 Phase 776 case-variant strict failure 子集。
+
+```text
+每个模型只有 6 个 case。
+```
+
+这是当前可用全量，但仍然偏小。结果适合作为机制方向，不足以作为全局定律。
+
+第三，测试只覆盖英文小写、大小写、标点和短值。
+
+尚未覆盖：
+
+```text
+多 token 答案
+中文答案
+同义词
+词形变化
+句子级答案
+推理中间结论
+```
+
+第四，严格 token identity 本身仍受 tokenizer 影响。
+
+```text
+同一字符串是否对应同一个 first token，
+会受到 tokenizer 和 prompt 边界影响。
+```
+
+第五，DS7B 的弱结果提示小模型偏差明显。
+
+```text
+DS7B 即使有 candidate_list，strict open 也只有 0.167。
+```
+
+这说明不能把 qwen3 的表面形式修复效果直接外推为所有模型的语言机制。
+
+第六，普通表面指令有时会伤害语义池选择。
+
+例如 GLM4：
+
+```text
+token_identity_contract:
+  pool top1 = 0.667
+```
+
+而 baseline without_candidate_list：
+
+```text
+pool top1 = 1.000
+```
+
+这说明强格式约束可能改变语义读出路线，不只是修复表面形式。
+
+### 当前阶段性结论
+
+Phase 778 的核心结论：
+
+```text
+surface-form normalization 是一个真实可操作的中间层，
+不是单纯评价口径幻觉。
+```
+
+但是它在三模型中的稳定性不同：
+
+```text
+qwen3:
+  lowercase instruction 几乎完全修复 strict token closure。
+
+GLM4:
+  lowercase instruction 部分修复；
+  candidate_list 更强。
+
+DS7B:
+  lowercase instruction 和 candidate_list 都难以稳定修复 strict token identity。
+```
+
+因此，当前语言机制不应再写成：
+
+```text
+语义 -> token
+```
+
+而应写成：
+
+```text
+语义潜变量
+  -> 值池选择
+  -> 表面形式归一化
+  -> tokenizer 身份锚定
+  -> 短语生成闭合
+```
+
+### 智能理论角度的关键洞察
+
+从第一性原理看，自回归模型每一步输出并不是单一任务，而是多个约束的同时闭合：
+
+```text
+1. 世界知识 / 语义正确性
+2. 当前关系对应的值池选择
+3. 表面形式选择
+4. tokenizer 词元身份选择
+5. 后续可续写性
+```
+
+Phase 778 说明：
+
+```text
+表面形式选择可以独立改变，
+并且能把语义等价答案转成严格 token。
+```
+
+这对语言背后的数学结构很重要：
+
+```text
+语言编码机制不是一个静态语义空间，
+而是多个闭合层之间的条件化转换系统。
+```
+
+也就是说，真正需要破解的是：
+
+```text
+状态空间如何从语义闭合切换到表面形式闭合，
+再切换到 tokenizer 身份闭合。
+```
+
+### 下一步
+
+Phase 773-778 已经完成一个阶段性目标：
+
+```text
+把 candidate_list 依赖拆成：
+  语义潜在选择
+  值池选择
+  表面形式归一化
+  token identity anchoring
+```
+
+下一阶段不应继续只做 prompt-level surface instruction，而应进入：
+
+```text
+Phase 779: Surface-Form Component Localization
+（表面形式组件定位）
+```
+
+核心任务：
+
+```text
+1. 固定 Phase 778 中可修复和不可修复样本。
+2. 对比 baseline、lowercase_short_value、with_candidate_list 的内部状态差异。
+3. 定位哪些 layer / head / MLP 对：
+   - case_variant_target_value -> target_value
+   - semantic-equiv open -> strict open
+   的转变贡献最大。
+4. 把组件分成三类：
+   - semantic value selector
+   - surface-form normalizer
+   - tokenizer identity anchor
+```
+
+如果 Phase 779 能定位到稳定组件，才可以继续进入神经元/通道级图谱。
+
+## Phase 779: 当前理论总收束与表面形式组件定位方案 [2026-06-29 23:46]
+
+### 性质说明
+
+本阶段不是新模型测试阶段，而是对 Phase 773-778 的阶段性理论总收束，并给出下一阶段研究方案。
+
+附件对 Phase 778 的判断基本正确：
+
+```text
+Phase 778 是正结果 + 重要收紧。
+```
+
+它证明 Phase 776-777 不是单纯评价口径幻觉，而是发现了一个真实可操作的中间层：
+
+```text
+surface-form normalization（表面形式归一化）
+```
+
+但必须严格限制结论：
+
+```text
+Phase 778 是 prompt-level causal audit（提示级因果审计），
+不是 component-level causal localization（组件级因果定位）。
+```
+
+### 当前理论与附件理论的关系
+
+附件理论的主线是：
+
+```text
+source token（源词元）
+-> writer（写入器）
+-> rewriter（重写器）
+-> route competition（路线竞争）
+-> suppressor matrix（抑制矩阵）
+-> readout geometry（读出几何）
+-> token0 closure（第一个词元闭合）
+-> continuation closure（续写闭合）
+```
+
+这是正确的中层机制图谱。
+
+Phase 776-778 在此基础上继续把读出端拆开：
+
+```text
+semantic latent state（语义潜在状态）
+-> relation value pool selection（关系值池选择）
+-> surface-form normalization（表面形式归一化）
+-> tokenizer identity anchoring（分词器身份锚定）
+-> phrase / generation closure（短语 / 生成闭合）
+```
+
+所以二者不是冲突关系，而是层级关系：
+
+```text
+附件理论 = 路线级机制图谱
+当前最新理论 = 路线级机制图谱 + 输出闭合细分图谱
+```
+
+### 当前最合理理论名称
+
+```text
+预测充分相对状态—路线竞争—表面形式归一化—词元身份闭合理论
+```
+
+也可以简称为：
+
+```text
+相对状态生成闭合理论
+```
+
+完整表述：
+
+```text
+自回归训练把关系寻址、内容搬运、非线性重写、路线竞争、抑制矩阵和生成闭合路径固化进同一套参数；
+推理时，当前上下文激活一条条件化相对状态轨迹；
+这条轨迹不是直接输出语义，而是先进入关系值池选择，再经过表面形式归一化和 tokenizer 身份锚定，最后完成或失败于短语生成闭合。
+```
+
+### 核心数学公式
+
+自回归预测：
+
+```text
+P_theta(x_{t+1} | x_{<=t})
+=
+softmax(W_U · Norm(h_t^L))
+```
+
+训练损失：
+
+```text
+L_t
+=
+-log P_theta(x_{t+1} | x_{<=t})
+```
+
+梯度：
+
+```text
+dL_t / d ell(y)
+=
+P_theta(y | x_{<=t}) - 1[y = x_{t+1}]
+```
+
+状态更新：
+
+```text
+h_i^{l+1}
+=
+h_i^l
++
+A_l(h_{<=i}^l)
++
+M_l(h_i^l)
+```
+
+条件化相对状态：
+
+```text
+h_l(o,r,v,k,p)
+=
+S_l
++ K_l(k)
++ P_l(p)
++ R_l(r)
++ O_l(o)
++ V_l(v)
++ B_l(o,r,v)
++ I_l(o,r,v,k,p)
++ eps_l
+```
+
+路线分数：
+
+```text
+S_R(h)
+=
+log sum_{y in V_R} exp(W_U(y)^T Norm(h))
+```
+
+路线抑制：
+
+```text
+Suppress_u(R)
+=
+S_R(h_base) - S_R(h_do(u))
+```
+
+严格词元闭合：
+
+```text
+C_strict(x)
+=
+1[argmax_{v in V_all} ell(v | x) = y*]
+```
+
+关系值池闭合：
+
+```text
+C_pool(x)
+=
+1[argmax_{v in V_rel} ell(v | x) = y*]
+```
+
+语义等价闭合：
+
+```text
+C_equiv(x)
+=
+1[argmax_{v in V_all} ell(v | x) in Eq(y*)]
+```
+
+表面形式闭合：
+
+```text
+C_surface(x)
+=
+1[exists s in Surface(y*) : rank(s | x) = 1]
+```
+
+词元身份闭合：
+
+```text
+C_token(x)
+=
+1[rank(Tok(y*) | x) = 1]
+```
+
+输出闭合向量：
+
+```text
+R_output(x)
+=
+(C_pool, C_equiv, C_surface, C_token, R_phrase, R_gen)
+```
+
+组件因果效应：
+
+```text
+Delta C_k^{do(c)}
+=
+C_k(x) - C_k(x; do(c))
+```
+
+其中：
+
+```text
+k in {pool, surface, token, phrase, generation}
+```
+
+### 当前核心拼图
+
+当前已经积累的核心拼图包括：
+
+```text
+1. 语言不是静态语义向量系统。
+2. 语言机制以条件化相对状态轨迹为基础。
+3. 自回归训练塑造了路线竞争和抑制结构。
+4. 残差流是跨层状态承载器。
+5. attention（注意力）主要负责关系寻址和内容搬运。
+6. MLP（多层感知机）主要负责非线性重写、增强、压制和格式重构。
+7. Q/K pattern（查询/键模式）和 V/O content（值/输出内容）必须分开。
+8. source token（源词元）贡献比单纯 attention mass（注意力质量）更接近因果。
+9. candidate_list（候选列表）不是简单答案提示，而是值池脚手架、表面形式归一化器和词元身份锚。
+10. semantic latent state（语义潜在状态）经常已经存在。
+11. relation value pool（关系值池）内正确值经常已经胜出。
+12. strict token failure（严格词元失败）不能直接等于 semantic failure（语义失败）。
+13. case_variant_target_value（目标值大小写变体）是开放词表失败的重要来源。
+14. surface-form normalization（表面形式归一化）是可操作中间层。
+15. tokenizer identity anchoring（分词器身份锚定）是更靠近输出端的瓶颈。
+16. token0 closure（第一个词元闭合）必须拆成值池闭合、表面形式闭合、词元身份闭合。
+17. phrase / generation closure（短语 / 生成闭合）不能由 first token（第一个词元）替代。
+18. route suppressor（路线抑制器）是分布式矩阵，不是单一头或单一神经元。
+19. DS7B（DeepSeek 蒸馏七十亿模型）的 L22/L23 局部结构有价值，但不能提升为普适不变量。
+20. qwen3（通义千问三模型）的表面形式失败可被 lowercase instruction（小写指令）强修复。
+21. GLM4（智谱四模型）的表面形式可部分修复，但 candidate_list 更稳。
+22. DS7B 的 strict token identity（严格词元身份）更顽固。
+23. 小模型偏差明显，不能直接外推到大模型或大脑。
+24. 当前图谱仍是 head / component / channelset（注意力头 / 组件 / 通道集合）级，不是神经元级。
+25. 当前已经从 patch 局部拟合推进到输出闭合机制分层，解释力仍在提升。
+```
+
+### 图谱形状
+
+当前图谱不是平面语义图，而是多层闭合图：
+
+```text
+source layer（源层）:
+  object tokens（对象词元）
+  relation tokens（关系词元）
+  value tokens（值词元）
+  instruction（指令）
+  answer prefix（答案前缀）
+
+transport layer（传输层）:
+  writer heads（写入注意力头）
+  source-restricted V/O contribution（源限制值/输出贡献）
+
+state layer（状态层）:
+  residual carrier（残差承载器）
+  MLP rewriter（多层感知机重写器）
+  route booster / suppressor（路线增强器 / 抑制器）
+
+competition layer（竞争层）:
+  value route（值路线）
+  format route（格式路线）
+  echo route（回声路线）
+  prose route（散文路线）
+  punctuation route（标点路线）
+
+closure layer（闭合层）:
+  C_pool
+  C_equiv
+  C_surface
+  C_token
+  R_phrase
+  R_gen
+```
+
+整体形状更像：
+
+```text
+多源输入 -> 多路写入 -> 残差轨迹 -> 路线竞争场 -> 多级输出闭合
+```
+
+而不是：
+
+```text
+概念节点 -> 概念节点
+```
+
+### 复用差分机制
+
+复用的是：
+
+```text
+shared skeleton（共享骨架）
+format route（格式路线）
+echo route（回声路线）
+prose route（散文路线）
+readout geometry（读出几何）
+surface-form machinery（表面形式机制）
+tokenizer interface（分词器接口）
+```
+
+差分的是：
+
+```text
+object identity（对象身份）
+relation route（关系路线）
+value pool（值池）
+domain-specific binding（语义域绑定）
+source-token evidence（源词元证据）
+route activation strength（路线激活强度）
+```
+
+当前更准确的表述是：
+
+```text
+语言编码 = 共享生成骨架 + 条件化语义差分 + 路线竞争调制 + 表面形式归一化 + 词元身份闭合
+```
+
+### 是否在提升解释力
+
+当前研究仍在提升解释力，不只是 patch 局部拟合。
+
+理由：
+
+```text
+1. 从单点 patch 成功率转向失败类型分解。
+2. 从重要 head 排名转向 source-restricted V/O contribution。
+3. 从 candidate_list 依赖转向值池、表面形式、词元身份三层拆解。
+4. 从 token0 单指标转向 C_pool / C_equiv / C_surface / C_token / R_gen。
+5. 从“模型是否知道答案”转向“答案如何落到生成闭合”。
+```
+
+但是，边际收益递减风险也存在：
+
+```text
+如果继续只做同类 prompt patch 或 top-k 排名，
+会进入技术性打转。
+```
+
+下一步必须进入：
+
+```text
+组件级表面形式定位
+```
+
+否则理论会停留在现象层。
+
+### 小模型偏差的影响
+
+当前测试模型是小模型，因此必须保留三类风险：
+
+```text
+1. 小模型更容易受格式、大小写、候选列表和 tokenizer 边界影响。
+2. DS7B 的局部 head 结构可能是小模型补偿策略，不是大模型普适结构。
+3. 小模型的 strict token identity failure 可能比大模型更严重。
+```
+
+因此当前结论应表述为：
+
+```text
+这些结果是语言机制拼图和研究方向，
+不是最终普适定律。
+```
+
+### 当前进度评估
+
+```text
+候选条件闭合：75%
+语义潜在选择：65%
+语义等价开放闭合：65%
+表面形式归一化：42%
+严格词元身份闭合：30%
+组件级因果定位：30%
+神经元级图谱：15%
+完整语言编码机制：60%
+智能统一理论：52%
+```
+
+### 围绕语言三大核心特性的反思
+
+知识网络：
+
+```text
+知识不是静态边 apple -> fruit，
+而是 apple 在 category relation 下激活 fruit value pool，并完成表面形式和词元身份闭合。
+```
+
+推理能力：
+
+```text
+推理不是抽象规则直接输出，
+而是中间结论必须完成可复用的状态闭合，才能成为下一步查询的输入。
+```
+
+语法系统：
+
+```text
+语法不是附属格式，
+而是控制表面形式、输出协议、短语续写和生成闭合的路线系统。
+```
+
+关键洞察：
+
+```text
+语言的三大特性不是三套分离模块，
+而是同一条件化状态轨迹在不同闭合层上的表现：
+知识网络对应值池和绑定；
+推理能力对应状态递归和中间闭合；
+语法系统对应表面形式与生成协议。
+```
+
+### 下一阶段方案
+
+下一阶段应定义为：
+
+```text
+Phase 780: Surface-Form Component Localization and Token Identity Atlas
+（表面形式组件定位与词元身份图谱）
+```
+
+核心目标：
+
+```text
+把 Phase 778 的 prompt-level surface-form effect（提示级表面形式效应）
+推进到 component-level causal localization（组件级因果定位）。
+```
+
+测试任务：
+
+```text
+1. 固定 qwen3 / GLM4 / DS7B 中可修复与不可修复样本。
+2. 对比 without_candidate_list、lowercase_short_value、with_candidate_list 的内部状态。
+3. 搜索哪些 layer / head / MLP 对 C_strict、C_surface、C_token 有最大贡献。
+4. 分离 semantic value selector、surface-form normalizer、token identity anchor。
+5. 对候选组件做 source-restricted removal 和 activation patch。
+6. 只把同时满足 sufficiency、necessity、transferability 的组件纳入图谱。
+```
+
+成功判据：
+
+```text
+1. 找到能稳定改变 case_variant_target_value -> target_value 的组件。
+2. 该组件对语义值池 C_pool 的破坏尽量小。
+3. 该组件跨 relation / domain / prompt variant 有稳定性。
+4. 能解释 qwen3、GLM4、DS7B 的差异，而不是只提高局部 patch 成功率。
+```
+
+如果 Phase 780 成功，才能继续进入：
+
+```text
+neuron / channel atlas（神经元 / 通道图谱）
+```
+
+## Phase 780: 表面形式组件候选定位与词元身份桥接审计 [2026-06-30 00:10]
+
+### 阶段性质
+
+Phase 780 是 Phase 778 和 Phase 779 之后的必要推进。Phase 778 已经证明：
+
+```text
+surface-form normalization（表面形式归一化）不是纯评估口径问题，
+而是可以被 prompt-level intervention（提示级干预）稳定改变的中间层。
+```
+
+Phase 780 不再只比较输出结果，而是把问题推进到 component-level candidate localization（组件级候选定位）：
+
+```text
+哪些 attention block（注意力模块）或 MLP block（多层感知机模块）
+在 target_value（目标值）相对 case_variant_target_value（大小写变体目标值）的读出方向上发生了稳定变化？
+```
+
+严格解释：
+
+```text
+Phase 780 是候选定位，不是最终因果证明。
+```
+
+它说明哪些组件最像 surface-form normalizer（表面形式归一化器）或 token identity bridge（词元身份桥），但还没有证明这些组件单独必要或充分。
+
+### 测试脚本与结果位置
+
+脚本：
+
+```text
+tests/glm5/phase780_surface_form_component_localization.py
+tests/glm5/run_phase780_surface_form_component_localization_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase780_surface_form_component_localization/smoke/
+tests/result/phase780_surface_form_component_localization/main/
+tests/result/phase780_surface_form_component_localization/confirm/
+results/glm5_phase780_surface_form_component_localization/
+```
+
+三轮测试：
+
+```text
+smoke（冒烟）：每模型 2 个关键样本，确认脚本、加载、hook、结果输出正常。
+main（主测试）：每模型 6 个关键样本。
+confirm（确认）：每模型 6 个关键样本，top-k 从 10 扩到 20，检查输出分类稳定性。
+```
+
+模型加载：
+
+```text
+qwen3 -> GLM4 -> DS7B 顺序执行。
+bf16。
+quantization off（不使用量化）。
+优先 flash_attention_2，因本机未安装 FlashAttention2，自动回退到 sdpa。
+```
+
+### 测试原理
+
+样本来自前面阶段中最有价值的一类错误：
+
+```text
+模型语义上已经接近正确，
+但 strict token（严格词元）输出被 case_variant_target_value（大小写变体目标值）或格式路线竞争压住。
+```
+
+对每个样本构造三种 prompt variant（提示变体）：
+
+```text
+without_candidate_list（无候选列表）
+lowercase_short_value（小写短值约束）
+with_candidate_list（带候选列表）
+```
+
+对每个模型，在答案位置捕获每层：
+
+```text
+self_attn output（注意力输出）
+MLP output（多层感知机输出）
+```
+
+然后计算每个组件对目标词元和大小写变体词元之间读出差异的 direct-logit attribution（直接 logit 归因）：
+
+$$
+d_{\text{surface}} =
+W_U[t_{\text{target}}] - W_U[t_{\text{case}}]
+$$
+
+$$
+A_{\ell,k}^{(v)}
+=
+\left\langle
+o_{\ell,k}^{(v)}, d_{\text{surface}}
+\right\rangle
+$$
+
+其中：
+
+```text
+o_{\ell,k}^{(v)} 表示第 l 层第 k 类组件在 prompt variant v 下的输出。
+k 取 attention block 或 MLP block。
+t_target 是目标值首词元。
+t_case 是大小写变体目标值首词元。
+```
+
+再计算相对 baseline（基线）的组件变化：
+
+$$
+\Delta A_{\ell,k}^{(v)}
+=
+A_{\ell,k}^{(v)}
+-
+A_{\ell,k}^{(\text{without})}
+$$
+
+同时测量真实输出层面的变化：
+
+$$
+\Delta M^{(v)}
+=
+\left(
+z_{t_{\text{target}}}^{(v)}
+-
+z_{t_{\text{case}}}^{(v)}
+\right)
+-
+\left(
+z_{t_{\text{target}}}^{(\text{without})}
+-
+z_{t_{\text{case}}}^{(\text{without})}
+\right)
+$$
+
+候选组件评分不是单纯看数值大小，而是同时要求：
+
+```text
+1. 组件 direct target-case delta 为正。
+2. 组件变化方向和真实 margin 变化方向一致。
+3. 该 prompt variant 确实带来 strict repair。
+```
+
+使用的候选评分可以写成：
+
+$$
+S_{\ell,k}^{(v)}
+=
+\Delta A_{\ell,k}^{(v)}
+\cdot
+P(\Delta A_{\ell,k}^{(v)} > 0)
+\cdot
+P(\operatorname{sign}(\Delta A_{\ell,k}^{(v)}) =
+\operatorname{sign}(\Delta M^{(v)}))
+$$
+
+这个公式的意义是：
+
+```text
+只把“和真实输出改善同方向变化”的组件列为候选。
+```
+
+### 客观结果
+
+#### qwen3
+
+输出层结果：
+
+```text
+without_candidate_list:
+strict open = 0.000
+semantic-equiv open = 0.833
+target-case margin = -4.792
+top1: case_variant_target_value 5/6, whitespace_or_empty 1/6
+
+with_candidate_list:
+strict open = 1.000
+semantic-equiv open = 1.000
+target-case margin = 6.302
+top1: target_value 6/6
+
+lowercase_short_value:
+strict open = 1.000
+semantic-equiv open = 1.000
+target-case margin = 6.667
+top1: target_value 6/6
+```
+
+最强候选组件：
+
+```text
+with_candidate_list:
+L34 attention，direct target-case delta = 7.250
+L31 attention，direct target-case delta = 6.199
+L34 MLP，direct target-case delta = 5.527
+L35 MLP，direct target-case delta = 5.217
+
+lowercase_short_value:
+L35 attention，direct target-case delta = 6.546
+L35 MLP，direct target-case delta = 6.047
+L34 MLP，direct target-case delta = 5.161
+L33 MLP，direct target-case delta = 3.562
+```
+
+解释：
+
+```text
+qwen3 的表面形式修复集中在后层 L31-L35，
+attention 和 MLP 都有明显候选，
+其中候选列表更偏 attention，
+小写短值约束更偏后层 MLP + attention 协同。
+```
+
+#### GLM4
+
+输出层结果：
+
+```text
+without_candidate_list:
+strict open = 0.000
+semantic-equiv open = 1.000
+target-case margin = -1.229
+top1: case_variant_target_value 6/6
+
+with_candidate_list:
+strict open = 1.000
+semantic-equiv open = 1.000
+target-case margin = 1.771
+top1: target_value 6/6
+
+lowercase_short_value:
+strict open = 0.500
+semantic-equiv open = 1.000
+target-case margin = -0.052
+top1: target_value 3/6, case_variant_target_value 3/6
+```
+
+最强候选组件：
+
+```text
+with_candidate_list:
+L38 MLP，direct target-case delta = 1.520
+L33 attention，direct target-case delta = 1.341
+L29 attention，direct target-case delta = 0.408
+
+lowercase_short_value:
+L38 MLP，direct target-case delta = 0.616
+L39 MLP，direct target-case delta = 0.570
+```
+
+解释：
+
+```text
+GLM4 的修复幅度比 qwen3 小，
+候选更集中在 L38-L39 MLP 和 L33 attention。
+candidate list 是强修复条件，
+lowercase_short_value 只能修复一半 strict case。
+```
+
+#### DS7B
+
+输出层结果：
+
+```text
+without_candidate_list:
+strict open = 0.000
+semantic-equiv open = 0.833
+pool top1 = 0.667
+target-case margin = -5.167
+top1: case_variant_target_value 5/6, format_or_explanation_word 1/6
+
+with_candidate_list:
+strict open = 0.167
+semantic-equiv open = 1.000
+pool top1 = 0.667
+target-case margin = -1.948
+top1: case_variant_target_value 5/6, target_value 1/6
+
+lowercase_short_value:
+strict open = 0.500
+semantic-equiv open = 0.667
+pool top1 = 0.667
+target-case margin = 0.216
+top1: target_value 3/6, case_variant_target_value 1/6, contrast/format 类 2/6
+```
+
+最强候选组件：
+
+```text
+lowercase_short_value:
+L27 MLP，direct target-case delta = 17.339
+L26 MLP，direct target-case delta = 8.681
+L24 MLP，direct target-case delta = 1.805
+
+with_candidate_list:
+L26 attention，direct target-case delta = 7.761
+L27 attention，direct target-case delta = 3.609
+L27 MLP，direct target-case delta = 3.818
+L25 attention，direct target-case delta = 1.347
+```
+
+解释：
+
+```text
+DS7B 的候选信号非常强，但 strict repair 仍然不完全。
+这说明 L26-L27 可能确实写入了 target-case 方向，
+但后续 token identity closure（词元身份闭合）或 readout competition（读出竞争）仍然不稳定。
+```
+
+### 主要进展
+
+Phase 780 的真实进展有三点。
+
+第一，Phase 778 的 prompt-level surface-form effect（提示级表面形式效应）不是无结构现象。它在内部有可定位的候选组件：
+
+```text
+qwen3: L31-L35 后层 attention / MLP
+GLM4: L33 attention + L38-L39 MLP
+DS7B: L26-L27 attention / MLP
+```
+
+第二，不同模型的机制位置明显不同：
+
+```text
+qwen3 更像后层读出桥接修复。
+GLM4 更像后层 MLP 表面形式归一化。
+DS7B 更像中后层已经写入强信号，但最终闭合失败。
+```
+
+第三，Phase 780 把语言机制图谱的准入条件进一步具体化：
+
+```text
+不能只看 C_pool（语义值池）。
+不能只看 C_surface（表面形式）。
+还必须定位 C_token（词元身份闭合）的候选组件。
+```
+
+### 当前硬伤
+
+第一，direct-logit attribution（直接 logit 归因）不是因果证明。
+
+```text
+组件在读出方向上变化，
+不等于该组件单独必要或充分。
+```
+
+第二，prompt variant（提示变体）会改变 tokenization（词元切分）、位置、上下文长度和整体 residual state（残差状态）。
+
+```text
+因此 Phase 780 定位的是候选变化层，
+不是严格同一状态下的局部替换因果链。
+```
+
+第三，attention block（注意力模块）仍然没有拆到 head（注意力头），MLP block（多层感知机模块）也没有拆到 channel / neuron（通道 / 神经元）。
+
+```text
+当前颗粒度仍然太粗。
+```
+
+第四，样本数量是每模型 6 个关键失败样本，适合作为机制候选定位，但不足以直接宣布全局规律。
+
+第五，当前模型是小模型，内部结构可能存在偏差：
+
+```text
+小模型可能把语义池、表面形式和词元身份纠缠在更少层中；
+大模型可能把这些功能分布到更清晰、更稀疏、更可复用的路径上。
+```
+
+### 阶段结论
+
+Phase 780 的结论应谨慎表述为：
+
+```text
+已经从 prompt-level surface-form normalization
+推进到 component-level candidate localization。
+
+但还没有完成 component-level causal closure。
+```
+
+更准确地说：
+
+```text
+qwen3、GLM4、DS7B 中都存在和 strict token identity repair 同方向变化的候选 attention / MLP 组件；
+这些组件很可能参与 surface-form normalizer 或 token identity bridge；
+但必须通过 patch / ablation 证明 necessity（必要性）、sufficiency（充分性）和 transferability（可迁移性）。
+```
+
+### 对理论公式的更新
+
+当前最有效的局部公式从：
+
+$$
+C_{\text{strict}}
+=
+C_{\text{pool}}
+\land
+C_{\text{surface}}
+\land
+C_{\text{token}}
+$$
+
+推进为带组件候选的形式：
+
+$$
+C_{\text{token}}
+=
+\Phi_{\text{token}}
+\left(
+\{o_{\ell,k}\}_{(\ell,k)\in \mathcal{G}_{\text{surface}}}
+,
+r_{\text{ans}}
+\right)
+$$
+
+其中：
+
+```text
+G_surface 是 Phase 780 给出的表面形式 / 词元身份候选组件集合。
+r_ans 是答案位置的残差状态。
+```
+
+本阶段估计的是：
+
+$$
+\mathcal{G}_{\text{surface}}^{\text{cand}}
+=
+\left\{
+(\ell,k):
+S_{\ell,k}^{(v)} > \tau
+\right\}
+$$
+
+但还没有证明：
+
+$$
+\mathcal{G}_{\text{surface}}^{\text{causal}}
+\subseteq
+\mathcal{G}_{\text{surface}}^{\text{cand}}
+$$
+
+下一步要用因果干预逼近：
+
+$$
+\operatorname{Patch}
+\left(
+o_{\ell,k}^{\text{repair}}
+\rightarrow
+o_{\ell,k}^{\text{base}}
+\right)
+\Rightarrow
+\Delta C_{\text{strict}}
+$$
+
+以及：
+
+$$
+\operatorname{Ablate}
+\left(
+o_{\ell,k}^{\text{repair}}
+\right)
+\Rightarrow
+\Delta C_{\text{strict}}
+$$
+
+### 下一阶段方案
+
+下一阶段仍属于当前阶段性目标，不需要切换方向。应继续自动推进：
+
+```text
+Phase 781: Surface-Form Candidate Causal Patch and Ablation
+（表面形式候选组件因果 patch 与消融）
+```
+
+核心任务：
+
+```text
+1. 选取 Phase 780 的 top candidate 组件。
+2. 在 without_candidate_list baseline 中 patch repair prompt 的候选组件输出。
+3. 在 repair prompt 中 ablate 或替换候选组件输出。
+4. 同时测量 C_pool、C_surface、C_token、C_strict。
+5. 只把同时满足 sufficiency、necessity、transferability 的组件纳入机制图谱。
+```
+
+成功判据：
+
+```text
+patch top candidate 后：
+case_variant_target_value -> target_value 的 strict 修复率上升；
+同时语义池不被破坏。
+
+ablate top candidate 后：
+repair prompt 的 strict 修复率下降；
+同时不是简单破坏所有输出能力。
+```
+
+如果 Phase 781 成功，才可以进入更细颗粒度：
+
+```text
+head-level / channel-level / neuron-level surface-form atlas
+（注意力头 / 通道 / 神经元级表面形式图谱）
+```
+
+## Phase 781: 表面形式候选组件因果 patch 与消融 [2026-06-30 00:17]
+
+### 阶段性质
+
+Phase 781 是 Phase 780 的直接因果验证阶段。Phase 780 给出了 component-level candidate localization（组件级候选定位），但它只证明：
+
+```text
+某些 attention / MLP block 的 direct-logit attribution
+和 strict token repair 同方向变化。
+```
+
+Phase 781 追问更严格的问题：
+
+```text
+这些候选组件是否真的具有因果作用？
+单个组件是否足以把 baseline strict failure 修成 target_value？
+把 repair prompt 中的候选组件替换或清零，是否会破坏 strict repair？
+```
+
+严格解释：
+
+```text
+Phase 781 是 block-level causal test（模块级因果测试），
+不是 head-level / neuron-level proof（注意力头 / 神经元级证明）。
+```
+
+### 测试脚本与结果位置
+
+脚本：
+
+```text
+tests/glm5/phase781_surface_form_candidate_causal_patch.py
+tests/glm5/run_phase781_surface_form_candidate_causal_patch_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase781_surface_form_candidate_causal_patch/smoke/
+tests/result/phase781_surface_form_candidate_causal_patch/main/
+tests/result/phase781_surface_form_candidate_causal_patch/confirm/
+results/glm5_phase781_surface_form_candidate_causal_patch/
+```
+
+三轮测试：
+
+```text
+smoke（冒烟）：每模型 2 个样本，2 个候选组件。
+main（主测试）：每模型 6 个样本，4 个候选组件。
+confirm（确认）：每模型 6 个样本，6 个候选组件，top-k 扩到 20。
+```
+
+模型加载：
+
+```text
+qwen3 -> GLM4 -> DS7B 顺序执行。
+bf16。
+quantization off（不使用量化）。
+优先 flash_attention_2，因本机未安装 FlashAttention2，自动回退到 sdpa。
+```
+
+### 测试原理
+
+对每个 case（样本）和 candidate component（候选组件），定义：
+
+```text
+B = without_candidate_list baseline prompt（基线提示）
+D = repair donor prompt（修复供体提示），即 with_candidate_list 或 lowercase_short_value
+c = Phase 780 选出的候选组件
+h_c^B = baseline 中组件 c 在答案位置的输出
+h_c^D = donor 中组件 c 在答案位置的输出
+```
+
+测试三种因果干预：
+
+第一，充分性 patch：
+
+$$
+F
+\left(
+B;
+h_c^B \leftarrow h_c^D
+\right)
+$$
+
+含义：
+
+```text
+只把 donor prompt 的候选组件输出移植到 baseline prompt，
+看 baseline 是否从 case_variant_target_value 变成 target_value。
+```
+
+第二，必要性替换：
+
+$$
+F
+\left(
+D;
+h_c^D \leftarrow h_c^B
+\right)
+$$
+
+含义：
+
+```text
+把 repair prompt 中的候选组件换回 baseline 状态，
+看 repair 是否被破坏。
+```
+
+第三，必要性清零：
+
+$$
+F
+\left(
+D;
+h_c^D \leftarrow 0
+\right)
+$$
+
+含义：
+
+```text
+直接移除 repair prompt 中该组件的答案位置输出，
+看 repair 是否被破坏。
+```
+
+测量指标仍然是三层闭合：
+
+$$
+C_{\text{strict}}
+=
+C_{\text{pool}}
+\land
+C_{\text{surface}}
+\land
+C_{\text{token}}
+$$
+
+具体观测：
+
+```text
+C_pool: pool_target_top1
+C_surface: semantic_equiv_open
+C_token / C_strict: target_value 是否为 top1
+margin: target_value logit - case_variant_target_value logit
+```
+
+充分性评分：
+
+$$
+S_{\text{suff}}(c)
+=
+\Delta M_c^{B \leftarrow D}
+\cdot
+P
+\left(
+C_{\text{strict}}^{B \leftarrow D}
+>
+C_{\text{strict}}^B
+\right)
+$$
+
+必要性评分：
+
+$$
+S_{\text{nec}}(c)
+=
+-
+\Delta M_c^{D \leftarrow B/0}
+\cdot
+\left[
+P(\Delta C_{\text{strict}} < 0)
++
+\frac{1}{2}
+P(\Delta C_{\text{surface}} < 0)
+\right]
+$$
+
+### 客观结果
+
+#### qwen3
+
+Phase 781 confirm（确认轮）中，qwen3 测试 6 个候选：
+
+```text
+with_candidate_list:attn:L34
+lowercase_short_value:attn:L35
+with_candidate_list:attn:L31
+lowercase_short_value:mlp:L35
+with_candidate_list:mlp:L34
+with_candidate_list:mlp:L35
+```
+
+充分性结果：
+
+```text
+with_candidate_list:mlp:L35
+patch baseline from donor:
+strict gain = 1/6
+delta margin = +2.125
+
+with_candidate_list:mlp:L34
+patch baseline from donor:
+strict gain = 1/6
+delta margin = +2.000
+
+lowercase_short_value:mlp:L35
+patch baseline from donor:
+strict gain = 0/6
+delta margin = +2.667
+
+lowercase_short_value:attn:L35
+patch baseline from donor:
+strict gain = 0/6
+delta margin = +2.438
+
+with_candidate_list:attn:L31 / L34
+patch baseline from donor:
+strict gain = 0/6
+delta margin 约 +2.0
+```
+
+必要性结果：
+
+```text
+with_candidate_list:mlp:L35
+replace donor with baseline:
+strict loss = 1/6
+semantic loss = 1/6
+delta margin = -1.677
+
+with_candidate_list:mlp:L34
+replace donor with baseline:
+strict loss = 1/6
+semantic loss = 1/6
+pool loss = 1/6
+delta margin = -1.573
+
+with_candidate_list:attn:L34
+zero donor component:
+strict loss = 1/6
+delta margin = -2.281
+```
+
+解释：
+
+```text
+qwen3 中 Phase 780 的强候选不是单组件充分机制。
+它们能明显推动 margin，但单独 patch 基本不能完成 strict closure。
+MLP L34/L35 在 with_candidate_list 条件下出现弱充分性和弱必要性，
+attention L34 更像 margin-supporting component（边际支撑组件）。
+```
+
+#### GLM4
+
+Phase 781 confirm 中，GLM4 最清楚：
+
+充分性结果：
+
+```text
+with_candidate_list:mlp:L38
+patch baseline from donor:
+strict gain = 3/6
+delta margin = +1.021
+
+with_candidate_list:attn:L33
+patch baseline from donor:
+strict gain = 2/6
+delta margin = +0.708
+
+lowercase_short_value:mlp:L38 / L39:
+strict gain = 0/6
+但 margin 有小幅上升。
+```
+
+必要性结果：
+
+```text
+with_candidate_list:mlp:L38
+replace donor with baseline:
+strict loss = 2/6
+delta margin = -1.146
+
+with_candidate_list:attn:L33
+replace / zero:
+strict loss = 2/6
+delta margin 约 -0.87
+
+lowercase_short_value:mlp:L38
+replace donor with baseline:
+strict loss = 3/6
+delta margin = -0.594
+```
+
+解释：
+
+```text
+GLM4 是当前三模型中最接近 block-level causal proof 的模型。
+L38 MLP 和 L33 attention 同时表现出部分 sufficiency 和 partial necessity。
+但即使 GLM4，也不是单组件全闭合，而是部分样本可被单块修复。
+```
+
+#### DS7B
+
+Phase 781 confirm 中，DS7B 候选包括：
+
+```text
+lowercase_short_value:mlp:L27
+lowercase_short_value:mlp:L26
+with_candidate_list:attn:L26
+with_candidate_list:attn:L27
+with_candidate_list:mlp:L27
+with_candidate_list:attn:L25
+```
+
+充分性结果：
+
+```text
+lowercase_short_value:mlp:L27
+patch baseline from donor:
+strict gain = 0/6
+delta margin = +2.690
+
+lowercase_short_value:mlp:L26
+patch baseline from donor:
+strict gain = 0/6
+delta margin = +1.880
+
+with_candidate_list:mlp:L27 / attn:L26 / attn:L27:
+strict gain = 0/6
+但 margin 有小幅上升。
+```
+
+必要性结果：
+
+```text
+lowercase_short_value:mlp:L27
+replace donor with baseline:
+strict loss = 3/6
+semantic loss = 1/6
+delta margin = -2.630
+
+lowercase_short_value:mlp:L26
+replace donor with baseline:
+strict loss = 2/6
+delta margin = -1.626
+
+with_candidate_list:attn:L27
+zero donor component:
+strict loss = 1/6
+semantic loss = 3/6
+pool loss = 1/6
+delta margin = -1.635
+```
+
+解释：
+
+```text
+DS7B 的 L26-L27 候选明显有必要性，
+尤其 L27 MLP 是最强必要性候选。
+但单组件 patch 无法修复 baseline strict failure。
+这说明 DS7B 的 strict closure 更像 distributed route（分布式路线）：
+中层候选组件能提供必要支撑，
+但必须和后续 readout / token identity route 一起工作。
+```
+
+### 主要进展
+
+Phase 781 的最大价值不是证明“某个单组件就是答案”，而是证明：
+
+```text
+Phase 780 的强候选不能被简单解释为完整机制。
+它们多数是 route support components（路线支撑组件），
+不是 single-point closure components（单点闭合组件）。
+```
+
+更具体地说：
+
+```text
+1. 单组件 patch 通常可以提高 target-case margin。
+2. 单组件 patch 通常不能稳定完成 strict target_value。
+3. 单组件替换 / 清零有时会造成 strict loss 或 semantic loss。
+4. 因此表面形式闭合更可能是多组件路线，而不是单个 attention / MLP block。
+```
+
+这把当前图谱从：
+
+```text
+component candidate atlas（组件候选图谱）
+```
+
+推进到：
+
+```text
+multi-component causal route atlas（多组件因果路线图谱）
+```
+
+### 关键硬伤
+
+第一，当前干预仍然是 block-level（模块级）：
+
+```text
+attention block 没有拆到 head；
+MLP block 没有拆到 channel / neuron。
+```
+
+第二，donor prompt 和 baseline prompt 不完全同构：
+
+```text
+with_candidate_list / lowercase_short_value 会改变上下文、token position 和 residual state。
+因此 patch 是跨提示状态移植，不是完全匹配条件下的局部替换。
+```
+
+第三，single answer-position patch 可能太窄：
+
+```text
+真实路线可能在多个 token position 上形成，
+只替换最后答案位置组件可能无法搬运完整上下文结构。
+```
+
+第四，样本仍然是每模型 6 个关键失败样本：
+
+```text
+足够做边界判断，
+不足够宣布全局机制。
+```
+
+第五，小模型偏差仍然重要：
+
+```text
+小模型可能把多个闭合功能压缩到同一层附近，
+也可能因为能力不足导致 token identity closure 不稳定。
+因此 Phase 781 的 DS7B 负结果不能直接外推到大模型。
+```
+
+### 阶段结论
+
+Phase 781 的结论应写成：
+
+```text
+表面形式 / 词元身份闭合不是单一组件机制。
+
+Phase 780 的候选组件具有真实因果影响，
+但大多数不是单组件充分闭合点。
+
+GLM4 的 L38 MLP 与 L33 attention 出现最明确的部分充分性与必要性；
+DS7B 的 L27/L26 MLP 更像必要支撑；
+qwen3 的 L34/L35 后层组件更像 margin-supporting route component。
+```
+
+最重要的收紧是：
+
+```text
+不要把 direct-logit candidate 当成完整机制。
+真正的机制很可能是多组件路线闭合。
+```
+
+### 对理论公式的更新
+
+Phase 780 的候选集合：
+
+$$
+\mathcal{G}_{\text{surface}}^{\text{cand}}
+=
+\left\{
+(\ell,k):
+S_{\ell,k}^{(v)} > \tau
+\right\}
+$$
+
+Phase 781 证明不能直接假设：
+
+$$
+\exists c \in \mathcal{G}_{\text{surface}}^{\text{cand}},
+\quad
+\operatorname{Patch}(c)
+\Rightarrow
+C_{\text{strict}}
+$$
+
+更合理的公式应改为：
+
+$$
+\exists \mathcal{R}_{\text{surface}}
+\subseteq
+\mathcal{G}_{\text{surface}}^{\text{cand}},
+\quad
+\operatorname{Patch}(\mathcal{R}_{\text{surface}})
+\Rightarrow
+C_{\text{strict}}
+$$
+
+其中：
+
+```text
+R_surface 不是单组件，而是多组件路线。
+```
+
+当前的机制闭合公式应更新为：
+
+$$
+C_{\text{strict}}
+=
+\Phi_{\text{close}}
+\left(
+\sum_{c \in \mathcal{R}_{\text{pool}}} h_c
+,
+\sum_{c \in \mathcal{R}_{\text{surface}}} h_c
+,
+\sum_{c \in \mathcal{R}_{\text{token}}} h_c
+\right)
+$$
+
+更符合 Phase 781 的路线表达是：
+
+$$
+\mathcal{R}_{\text{strict}}
+=
+\mathcal{R}_{\text{pool}}
+\cup
+\mathcal{R}_{\text{surface}}
+\cup
+\mathcal{R}_{\text{token}}
+$$
+
+并且：
+
+$$
+\operatorname{Patch}
+\left(
+\mathcal{R}_{\text{strict}}^{D}
+\rightarrow
+\mathcal{R}_{\text{strict}}^{B}
+\right)
+\gg
+\operatorname{Patch}
+\left(
+c^{D}
+\rightarrow
+c^{B}
+\right)
+$$
+
+含义：
+
+```text
+完整路线 patch 应该强于单组件 patch。
+如果完整路线 patch 成功，而单组件 patch 失败，
+说明机制是 distributed route closure（分布式路线闭合）。
+```
+
+### 下一阶段方案
+
+下一阶段仍属于当前阶段性目标，不需要切换方向。应继续自动推进：
+
+```text
+Phase 782: Multi-Component Surface Route Patch
+（多组件表面形式路线 patch）
+```
+
+核心任务：
+
+```text
+1. 选取 Phase 780 / 781 中同一 repair prompt 下的 top-k 组件集合。
+2. 同时 patch 多个候选组件，而不是单组件 patch。
+3. 对比 patch 1 个、2 个、4 个、6 个组件时的 strict gain。
+4. 判断 C_strict 是否存在组合阈值。
+5. 分离 qwen3、GLM4、DS7B 的差异：
+   qwen3 是否需要后层 attention + MLP 组合；
+   GLM4 是否 L38 MLP + L33 attention 已经接近充分；
+   DS7B 是否 L26-L27 MLP/attention 仍需后续 readout route。
+```
+
+成功判据：
+
+```text
+如果 multi-component patch 明显强于 single-component patch，
+说明 surface/token closure 是 route-level mechanism（路线级机制）。
+
+如果 multi-component patch 仍失败，
+说明缺失的不是组件集合，
+而可能是跨 token position、residual norm、或后续生成闭合结构。
+```
+
+## Phase 782: 多组件表面形式路线 patch 与组合阈值验证 [2026-06-30 00:26]
+
+### 任务背景
+
+本阶段接续 Phase 779 的理论总收束。Phase 779 的判断基本正确：
+
+```text
+当前研究不应再停留在“语义是否存在”，
+而应追踪语义如何经过 value pool、surface form、tokenizer identity、readout closure，
+最后变成自然语言输出。
+```
+
+但 Phase 779 仍然是理论收束，不是新的内部机制证据。Phase 780 已经用 direct logit attribution 定位了表面形式候选组件；Phase 781 进一步证明单组件 patch 只能产生弱修复或必要性证据。因此本阶段必须检验一个更强的问题：
+
+```text
+strict token identity closure 是否是 multi-component route mechanism，
+而不是单个 head / MLP / channel 的局部功能。
+```
+
+### 测试脚本和结果路径
+
+脚本：
+
+```text
+tests/glm5/phase782_multi_component_surface_route_patch.py
+tests/glm5/run_phase782_multi_component_surface_route_patch_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase782_multi_component_surface_route_patch/smoke
+tests/result/phase782_multi_component_surface_route_patch/main
+tests/result/phase782_multi_component_surface_route_patch/confirm
+
+results/glm5_phase782_multi_component_surface_route_patch/smoke
+results/glm5_phase782_multi_component_surface_route_patch/main
+results/glm5_phase782_multi_component_surface_route_patch/confirm
+```
+
+测试设置：
+
+```text
+模型顺序：qwen3 -> GLM4 -> DS7B
+精度：bf16
+量化：关闭
+attention：优先 flash_attention_2，环境缺失后回退 sdpa
+测试轮次：smoke / main / confirm
+confirm 轮 route size：1, 2, 4, 6
+```
+
+实际加载结果：
+
+```text
+flash_attention_2 未安装，三模型均回退 sdpa。
+没有使用量化。
+每个模型测试完后释放 GPU 显存。
+```
+
+### 测试原理
+
+Phase 780 先得到候选组件：
+
+```text
+component = attention layer output 或 MLP layer output
+候选标准 = 对 target token 相对 case-variant token 的直接 logit 贡献
+```
+
+Phase 782 不再只 patch 单个组件，而是把同一 repair prompt 下排名靠前的组件组成路线：
+
+$$
+\mathcal{R}_{k}^{(v)}
+=
+\{c_1, c_2, \ldots, c_k\}
+$$
+
+其中：
+
+```text
+v 表示 repair prompt variant，例如 with_candidate_list 或 lowercase_short_value。
+k 表示 route size。
+c_i 表示一个候选组件，例如 attn:L34 或 mlp:L35。
+```
+
+核心干预有三类：
+
+$$
+F_{\text{patch}}
+=
+F
+\left(
+B;
+\{h_c^B \leftarrow h_c^D\}_{c \in \mathcal{R}_k}
+\right)
+$$
+
+$$
+F_{\text{replace}}
+=
+F
+\left(
+D;
+\{h_c^D \leftarrow h_c^B\}_{c \in \mathcal{R}_k}
+\right)
+$$
+
+$$
+F_{\text{zero}}
+=
+F
+\left(
+D;
+\{h_c^D \leftarrow 0\}_{c \in \mathcal{R}_k}
+\right)
+$$
+
+评价重点不是只看 logit，而是同时看：
+
+$$
+C_{\text{strict}}
+=
+\mathbf{1}
+\left[
+\arg\max_{y \in V_{\text{all}}}
+\ell(y \mid x)
+=
+y^*
+\right]
+$$
+
+$$
+C_{\text{equiv}}
+=
+\mathbf{1}
+\left[
+\arg\max_{y \in V_{\text{all}}}
+\ell(y \mid x)
+\in
+\operatorname{Eq}(y^*)
+\right]
+$$
+
+$$
+\Delta m
+=
+\left[
+\ell(y^*)-\ell(y_{\text{case}})
+\right]_{\text{after}}
+-
+\left[
+\ell(y^*)-\ell(y_{\text{case}})
+\right]_{\text{before}}
+$$
+
+关键判据是：
+
+$$
+\Delta C_{\text{strict}}(\mathcal{R}_k)
+\gg
+\max_{c \in \mathcal{R}_k}
+\Delta C_{\text{strict}}(c)
+$$
+
+如果成立，说明：
+
+```text
+strict token identity closure 不是单组件闭合，
+而是 route-level closure（路线级闭合）。
+```
+
+### 主要客观结果
+
+#### qwen3
+
+confirm 轮最强结果：
+
+```text
+with_candidate_list:route_k6
+components = attn:L34, attn:L31, mlp:L34, mlp:L35, attn:L35, attn:L32
+patch strict = 6/6
+semantic-equiv = 6/6
+pool top1 = 6/6
+delta margin = +9.667
+
+lowercase_short_value:route_k6
+components = attn:L35, mlp:L35, mlp:L34, mlp:L33, mlp:L32, mlp:L26
+patch strict = 6/6
+semantic-equiv = 6/6
+pool top1 = 6/6
+delta margin = +8.729
+```
+
+组合阈值非常清楚：
+
+```text
+route_k1: strict gain = 0/6
+route_k2: strict gain = 2/6
+route_k4: strict gain = 5/6
+route_k6: strict gain = 6/6
+```
+
+必要性也很强：
+
+```text
+with_candidate_list:route_k6 replace donor with baseline:
+strict loss = 6/6
+semantic loss = 3/6
+delta margin = -9.333
+
+lowercase_short_value:route_k6 replace donor with baseline:
+strict loss = 5/6
+semantic loss = 1/6
+delta margin = -8.271
+```
+
+客观解释：
+
+```text
+qwen3 的 surface/token closure 存在明确的多组件路线。
+单组件不是充分条件，route_k4 / route_k6 接近充分。
+```
+
+#### GLM4
+
+confirm 轮最强结果：
+
+```text
+with_candidate_list:route_k6
+components = mlp:L38, attn:L33, attn:L29, attn:L35, attn:L32, mlp:L34
+patch strict = 5/6
+semantic-equiv = 6/6
+pool top1 = 6/6
+delta margin = +2.177
+
+with_candidate_list:route_k4
+patch strict = 4/6
+delta margin = +1.969
+
+with_candidate_list:route_k2
+patch strict = 4/6
+delta margin = +1.677
+```
+
+GLM4 的路线更集中：
+
+```text
+L38 MLP + L33 attention 已经产生较强修复。
+route_k6 进一步提升到 5/6 strict。
+lowercase_short_value 路线弱于 with_candidate_list 路线。
+```
+
+必要性：
+
+```text
+with_candidate_list:route_k6 replace donor with baseline:
+strict loss = 4/6
+delta margin = -2.458
+```
+
+客观解释：
+
+```text
+GLM4 的 strict closure 对候选列表路线更敏感。
+它不像 qwen3 那样强依赖后层多 attention + MLP 组合，
+但 route_k6 仍明显强于单组件。
+```
+
+#### DS7B
+
+confirm 轮最强结果：
+
+```text
+lowercase_short_value:route_k6
+components = mlp:L27, mlp:L26, mlp:L24, attn:L19, mlp:L22, mlp:L21
+patch strict = 3/6
+semantic-equiv = 5/6
+pool top1 = 4/6
+delta margin = +5.229
+
+lowercase_short_value:route_k4
+patch strict = 2/6
+delta margin = +5.234
+
+lowercase_short_value:route_k2
+patch strict = 1/6
+delta margin = +4.167
+```
+
+必要性：
+
+```text
+lowercase_short_value:route_k4 replace donor with baseline:
+strict loss = 3/6
+semantic loss = 1/6
+delta margin = -4.993
+
+lowercase_short_value:route_k6 replace donor with baseline:
+strict loss = 3/6
+delta margin = -5.004
+
+with_candidate_list:route_k2 zero donor route:
+semantic loss = 6/6
+```
+
+客观解释：
+
+```text
+DS7B 有明确的必要路线，但充分性不完整。
+MLP L21-L27 一带可以强烈改变 margin，
+但不能稳定完成 strict token identity closure。
+这说明 DS7B 的缺口可能在后续 readout route、token position range、或生成闭合结构。
+```
+
+### 对 Phase 779 判断的审视
+
+Phase 779 的理论判断基本正确：
+
+```text
+语言输出链条不能简化为 semantic -> token。
+必须加入 surface-form normalization、tokenizer identity anchoring、short phrase continuation。
+```
+
+Phase 782 对它的推进是：
+
+```text
+surface/token closure 不只是 prompt-level 可控现象，
+而且在 qwen3 和 GLM4 中能被多组件内部路线 patch 出来。
+```
+
+但必须收紧：
+
+```text
+Phase 782 仍然不是完整语言编码机制。
+它只证明了 answer-position 的多组件路线闭合，
+还没有证明跨 token position、全序列生成、神经元级图谱或跨语义域普适性。
+```
+
+### 当前核心拼图更新
+
+已经比较稳的拼图：
+
+```text
+1. semantic latent state 存在，但不是直接输出 token。
+2. relation value pool 可以被候选列表、约束提示、路线 patch 改变。
+3. surface-form normalization 是可操作中间层。
+4. token identity closure 有独立困难，尤其体现为大小写、空白、标点、短语竞争。
+5. 单组件 patch 通常不足以闭合 strict token。
+6. 多组件 route patch 可以显著超过单组件 patch。
+7. qwen3 出现清楚的组合阈值：k1 失败，k4/k6 接近或达到闭合。
+8. GLM4 的候选列表路线比小写路线更有效。
+9. DS7B 的中后层 MLP/attention 有必要性，但不充分。
+```
+
+仍然不稳的拼图：
+
+```text
+1. component 是 layer-level attention/MLP output，不是 head/channel/neuron。
+2. patch 只在 answer position，不是全 token position。
+3. route 是按 direct logit attribution 排名选取，可能混入下游读出成分。
+4. donor prompt 和 baseline prompt 不完全同分布，可能包含指令差异。
+5. DS7B 的失败说明小模型内部结构可能缺失、偏斜或路线断裂。
+```
+
+### 数学公式更新
+
+当前更合理的生成闭合表达为：
+
+$$
+z_t
+=
+E(x_{\le t})
+++
+\sum_{\ell=1}^{L}
+\left(
+A_\ell(z_t, z_{\le t})
+++
+M_\ell(z_t)
+\right)
+$$
+
+其中有效路线不是单个组件，而是条件化组件集合：
+
+$$
+\mathcal{R}_{\text{surface}}(x, I)
+=
+\{c_i:
+\Delta \ell_i(y^*, y_{\text{case}} \mid x, I) > 0\}
+$$
+
+严格词元闭合更接近：
+
+$$
+C_{\text{strict}}
+=
+\Phi_{\text{close}}
+\left(
+\mathcal{R}_{\text{semantic}},
+\mathcal{R}_{\text{value}},
+\mathcal{R}_{\text{surface}},
+\mathcal{R}_{\text{token}},
+\mathcal{R}_{\text{readout}}
+\right)
+$$
+
+Phase 782 新增的关键约束是组合阈值：
+
+$$
+\exists k^*:
+\quad
+C_{\text{strict}}(\mathcal{R}_{k})
+\approx 0
+\quad (k < k^*)
+$$
+
+$$
+C_{\text{strict}}(\mathcal{R}_{k})
+\rightarrow 1
+\quad (k \ge k^*)
+$$
+
+qwen3 的结果近似表现为：
+
+$$
+k^* \in [4, 6]
+$$
+
+GLM4 的结果近似表现为：
+
+$$
+k^* \in [2, 6]
+$$
+
+DS7B 的结果说明：
+
+$$
+\Delta m(\mathcal{R}_k) > 0
+\quad
+\nRightarrow
+\quad
+C_{\text{strict}}(\mathcal{R}_k)=1
+$$
+
+这说明：
+
+```text
+提高 target margin 不等于完成自然生成闭合。
+margin bridge 与 strict token closure 之间还有 readout / tokenizer / continuation gate。
+```
+
+### 严格问题和硬伤
+
+1. 样本量仍小。confirm 轮每模型只有 6 个核心 case，虽然是从错误样本中筛选出来的高价值样本，但不能当作全局统计规律。
+2. 当前是小模型实验。小模型可能存在结构压缩、路线缺失、训练不足或蒸馏偏差，尤其 DS7B 的不充分性不能直接推广为大模型规律。
+3. 当前 patch 的粒度仍偏粗。attention layer output / MLP layer output 不是 head、channel、neuron。
+4. 当前 patch 只发生在 answer position。语言生成机制可能分布在 subject token、relation token、instruction token、answer token 多个位置。
+5. route 候选来自 direct logit attribution，容易偏向读出端，可能漏掉上游抽象构造组件。
+6. donor prompt 与 baseline prompt 存在指令差异，patch 成功可能包含 instruction route，而不只是 surface-form route。
+7. route_k6 成功不等于找到完整机制，只能说明这些组件集合足以搬运一部分可闭合状态。
+
+### 阶段结论
+
+Phase 782 是强正结果，尤其 qwen3 和 GLM4。它把 Phase 779 的理论判断向内部机制推进了一层：
+
+```text
+strict token identity closure 至少在部分模型中是 multi-component route closure，
+不是单一语义向量、单个 attention head、单个 MLP 或单个 channel 的结果。
+```
+
+最保守的结论：
+
+```text
+qwen3：表面形式 / token identity 有清楚的多组件闭合路线。
+GLM4：候选列表条件下存在较强多组件闭合路线。
+DS7B：存在必要的中后层 MLP/attention 支撑路线，但严格闭合仍不充分。
+```
+
+当前研究不是单纯 patch 局部拟合。Phase 782 的解释力确实提升，因为它发现了：
+
+```text
+单组件失败 -> 多组件成功 -> route size 阈值 -> 替换 donor route 会破坏闭合
+```
+
+这比单纯提升输出概率更接近内部机制。但它还没有达到全局神经元图谱，也不能宣称破解语言编码机制。
+
+### 下一阶段方案
+
+下一阶段仍属于同一阶段性目标，不需要切换方向。建议继续：
+
+```text
+Phase 783: Token-Position Range Surface Route Patch
+（跨词元位置的表面形式路线 patch）
+```
+
+核心目标：
+
+```text
+验证 Phase 782 的路线是否只在 answer position 有效，
+还是必须同时 patch subject / relation / instruction / answer 多个 token position。
+```
+
+测试方案：
+
+```text
+1. 固定 Phase 782 的高价值路线：
+   qwen3 with_candidate route_k6 / lowercase route_k6
+   GLM4 with_candidate route_k6
+   DS7B lowercase route_k6
+
+2. 对比不同 token position 范围：
+   answer only
+   relation token
+   subject token
+   instruction token
+   subject + relation
+   relation + answer
+   all semantic span
+
+3. 评价 strict、semantic-equiv、pool top1、margin、top1 class。
+
+4. 如果跨位置 patch 显著强于 answer-only，
+   说明语言机制图谱必须从 component route 扩展为 position-component fiber。
+```
+
+数学表达：
+
+$$
+\mathcal{F}
+=
+\{(p, c):
+p \in P,\ c \in \mathcal{R}_k\}
+$$
+
+$$
+F_{\text{patch}}
+=
+F
+\left(
+B;
+\{h_{p,c}^{B} \leftarrow h_{p,c}^{D}\}_{(p,c)\in\mathcal{F}}
+\right)
+$$
+
+成功判据：
+
+$$
+\Delta C_{\text{strict}}(\mathcal{F})
+>
+\Delta C_{\text{strict}}(\mathcal{R}_k \text{ at answer only})
+$$
+
+如果成立，说明：
+
+```text
+语言编码机制不是二维 component graph，
+而是 token-position × component 的 causal fiber graph。
+```
+
+## Phase 783: 跨词元位置表面形式路线 patch 与因果纤维边界测试 [2026-06-30 00:41]
+
+### 任务背景
+
+本阶段分析用户上传的 Phase 780-782 总结。该总结总体正确，而且和已完成测试一致：
+
+```text
+Phase 780: 从 prompt-level effect 推进到 component-level candidate localization。
+Phase 781: 单组件候选有因果影响，但多数不是 single-point closure。
+Phase 782: 多组件路线 patch 明显强于单组件 patch。
+```
+
+最重要的正确判断是：
+
+```text
+表面形式 / 词元身份闭合不是单一组件机制，
+而是多组件路线机制。
+```
+
+但 Phase 780-782 仍有一个关键边界：
+
+```text
+所有 route patch 都只发生在 answer position。
+```
+
+因此 Phase 783 继续追问：
+
+```text
+Phase 782 找到的 route 是 answer-site readout route，
+还是需要跨 subject / relation / instruction / protocol / answer 多个 token position 才能成立的 causal fiber？
+```
+
+### 测试脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase783_token_position_surface_route_patch.py
+tests/glm5/run_phase783_token_position_surface_route_patch_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase783_token_position_surface_route_patch/smoke
+tests/result/phase783_token_position_surface_route_patch/main
+
+results/glm5_phase783_token_position_surface_route_patch/smoke
+results/glm5_phase783_token_position_surface_route_patch/main
+```
+
+主结果汇总：
+
+```text
+results/glm5_phase783_token_position_surface_route_patch/main/phase783_cross_model_summary.md
+tests/result/phase783_token_position_surface_route_patch/main/phase783_cross_model_summary.md
+```
+
+测试设置：
+
+```text
+模型顺序：qwen3 -> GLM4 -> DS7B
+精度：bf16
+量化：关闭
+attention：优先 flash_attention_2，环境缺失后回退 sdpa
+测试轮次：smoke + main
+confirm：跳过，因为 dry-run 显示每个模型可用 surface-failure case 上限仍为 6，main 已经全部使用，复跑不能增加样本证据。
+```
+
+### 测试原理
+
+Phase 782 的路线是：
+
+$$
+\mathcal{R}_{k}^{(v)}
+=
+\{c_1,c_2,\ldots,c_k\}
+$$
+
+Phase 783 把路线扩展成位置—组件纤维：
+
+$$
+\mathcal{F}_{P,k}^{(v)}
+=
+\{(p,c):p\in P,\ c\in\mathcal{R}_{k}^{(v)}\}
+$$
+
+其中：
+
+```text
+P 是 token position scope（词元位置范围）；
+c 是 Phase 782 的 route component（路线组件）。
+```
+
+测试的位置范围：
+
+```text
+answer_site
+answer_prefix
+format_cue
+object_tokens
+relation_tokens
+semantic_pair
+protocol_all
+all_pre_answer_plus_answer
+```
+
+核心 patch：
+
+$$
+F_{\text{patch}}
+=
+F
+\left(
+B;
+\{h_{p,c}^{B}\leftarrow h_{p',c}^{D}\}_{(p,c)\in\mathcal{F}}
+\right)
+$$
+
+当 source scope 和 target scope 的 token 数量一致时，按位置顺序对齐：
+
+$$
+p_i^B \leftarrow p_i^D
+$$
+
+当数量不一致时，使用 donor scope 的均值广播：
+
+$$
+h_{p_i,c}^{B}
+\leftarrow
+\frac{1}{|P_D|}
+\sum_{p'\in P_D} h_{p',c}^{D}
+$$
+
+这一点是重要边界：
+
+```text
+same_count 是较干净证据；
+mean_broadcast 是边界探测，不是严格位置对齐证据。
+```
+
+评价指标仍然是：
+
+$$
+C_{\text{strict}}
+=
+\mathbf{1}
+\left[
+\arg\max_{y\in V_{\text{all}}}
+\ell(y\mid x)
+=
+y^*
+\right]
+$$
+
+$$
+C_{\text{equiv}}
+=
+\mathbf{1}
+\left[
+\arg\max_{y\in V_{\text{all}}}
+\ell(y\mid x)
+\in
+\operatorname{Eq}(y^*)
+\right]
+$$
+
+$$
+\Delta m
+=
+\left[
+\ell(y^*)-\ell(y_{\text{case}})
+\right]_{\text{after}}
+-
+\left[
+\ell(y^*)-\ell(y_{\text{case}})
+\right]_{\text{before}}
+$$
+
+关键判据：
+
+$$
+\Delta C_{\text{strict}}
+\left(
+\mathcal{F}_{P,k}
+\right)
+>
+\Delta C_{\text{strict}}
+\left(
+\mathcal{F}_{\text{answer},k}
+\right)
+$$
+
+如果成立，说明：
+
+```text
+当前 route 不只是 answer-site readout route，
+而是跨位置 causal fiber。
+```
+
+如果不成立，说明：
+
+```text
+Phase 782 的路线主要是 answer-site readout-side route。
+```
+
+### 主要客观结果
+
+#### qwen3
+
+主测试结果：
+
+```text
+with_candidate_list:route_k6 @ answer_site
+strict gain = 6/6
+delta margin = +9.667
+alignment = same_count
+
+lowercase_short_value:route_k6 @ answer_site
+strict gain = 6/6
+delta margin = +8.729
+alignment = same_count
+```
+
+非 answer-site 结果：
+
+```text
+lowercase_short_value:route_k6 @ all_pre_answer_plus_answer
+strict gain = 5/6
+delta margin = +8.333
+alignment = mean_broadcast
+
+lowercase_short_value:route_k6 @ protocol_all
+strict gain = 4/6
+delta margin = +8.271
+alignment = mean_broadcast
+
+object_tokens / relation_tokens / semantic_pair
+strict gain = 0/6
+```
+
+必要性：
+
+```text
+with_candidate_list:route_k6 @ answer_site replace donor with baseline
+strict loss = 6/6
+semantic loss = 3/6
+delta margin = -9.333
+
+lowercase_short_value:route_k6 @ answer_site replace donor with baseline
+strict loss = 5/6
+delta margin = -8.271
+```
+
+客观解释：
+
+```text
+qwen3 的 Phase 782 route 主要是 answer-site readout-side closure route。
+protocol / all-pre-answer 范围可以部分搬运闭合状态，
+但没有超过 answer_site，且依赖 mean_broadcast，证据不如 answer_site 干净。
+```
+
+#### GLM4
+
+主测试结果：
+
+```text
+with_candidate_list:route_k6 @ answer_site
+strict gain = 5/6
+delta margin = +2.177
+alignment = same_count
+
+lowercase_short_value:route_k6 @ answer_site
+strict gain = 2/6
+delta margin = +0.885
+alignment = same_count
+```
+
+非 answer-site 结果：
+
+```text
+lowercase_short_value:route_k6 @ protocol_all
+strict gain = 2/6
+delta margin = +3.328
+alignment = mean_broadcast
+
+lowercase_short_value:route_k6 @ all_pre_answer_plus_answer
+strict gain = 2/6
+delta margin = +3.299
+alignment = mean_broadcast
+
+with_candidate_list:route_k6 @ protocol_all
+strict gain = 3/6
+delta margin = +1.943
+alignment = mean_broadcast
+
+with_candidate_list:route_k6 @ all_pre_answer_plus_answer
+strict gain = 3/6
+delta margin = +1.984
+alignment = mean_broadcast
+```
+
+必要性：
+
+```text
+with_candidate_list:route_k6 @ answer_site replace donor with baseline
+strict loss = 4/6
+delta margin = -2.458
+```
+
+客观解释：
+
+```text
+GLM4 的候选列表路线仍以 answer_site 最强。
+lowercase route 在 protocol_all / all_pre_answer_plus_answer 上有更大 margin gain，
+但 strict gain 没有超过 answer_site，而且依赖 mean_broadcast。
+这更像 protocol-level state perturbation，而不是干净的跨位置严格闭合纤维。
+```
+
+#### DS7B
+
+主测试结果：
+
+```text
+lowercase_short_value:route_k6 @ answer_site
+strict gain = 3/6
+delta margin = +5.229
+alignment = same_count
+
+lowercase_short_value:route_k6 @ all_pre_answer_plus_answer
+strict gain = 4/6
+delta margin = +5.789
+alignment = mean_broadcast
+
+lowercase_short_value:route_k6 @ protocol_all
+strict gain = 2/6
+delta margin = +5.846
+alignment = mean_broadcast
+
+with_candidate_list:route_k6 @ answer_site
+strict gain = 1/6
+delta margin = +3.229
+alignment = same_count
+```
+
+必要性：
+
+```text
+lowercase_short_value:route_k6 @ answer_site replace donor with baseline
+strict loss = 3/6
+delta margin = -5.004
+
+with_candidate_list:route_k6 @ answer_site replace donor with baseline
+strict loss = 1/6
+semantic loss = 1/6
+delta margin = -3.286
+```
+
+客观解释：
+
+```text
+DS7B 是唯一出现 non-answer scope strict gain 超过 answer_site 的模型：
+all_pre_answer_plus_answer 比 answer_site 多 1/6 strict gain。
+
+但这个结果必须非常谨慎：
+它是 mean_broadcast，不是 same_count 对齐；
+它包含 answer_site 本身；
+它可能是全上下文状态扰动增强，而不一定是干净的 token-position causal fiber。
+```
+
+### 对 Phase 780-782 总结的审视
+
+附件判断“Phase 780-782 是实质进展，不是普通 patch 局部拟合”是正确的。
+
+Phase 783 进一步收紧了它：
+
+```text
+多组件 route closure 成立；
+但至少在 qwen3 和 GLM4 中，最强证据仍集中在 answer_site。
+```
+
+也就是说：
+
+```text
+当前找到的主要不是上游语义构造纤维，
+而是靠近输出端的 surface/token readout-side route。
+```
+
+这不是退步，而是定位更清楚：
+
+```text
+Phase 782 发现了多组件闭合路线；
+Phase 783 说明这条路线主要位于答案位读出端。
+```
+
+### 当前核心拼图更新
+
+新增拼图：
+
+```text
+1. answer_site 是 qwen3 / GLM4 表面形式闭合最强位置。
+2. semantic_pair / object_tokens / relation_tokens 单独 patch 基本不能修复 strict token。
+3. protocol_all / all_pre_answer_plus_answer 能产生部分修复，但多依赖 mean_broadcast。
+4. DS7B 对全上下文平均状态扰动更敏感，可能说明其闭合路线更分散，也可能只是小模型结构不稳。
+5. Phase 782 的 multi-component route 更接近 readout-side route，不应直接解释为完整语义构造路线。
+```
+
+旧拼图保留：
+
+```text
+semantic latent state 存在；
+value pool selection 和 strict token identity closure 必须分开；
+surface-form normalization 是真实中间层；
+单组件通常只是 route support；
+multi-component route 有组合阈值。
+```
+
+需要修正的说法：
+
+```text
+不能说已经找到 token-position × component causal fiber graph。
+当前只能说已经测试了这个假设，并发现 qwen3 / GLM4 主要支持 answer-site route。
+```
+
+### 数学公式更新
+
+当前闭合路线应分成两类：
+
+$$
+\mathcal{R}_{\text{readout}}
+=
+\mathcal{F}_{\{p_{\text{answer}}\},k}
+$$
+
+$$
+\mathcal{R}_{\text{fiber}}
+=
+\mathcal{F}_{P,k},
+\quad
+|P|>1
+$$
+
+Phase 783 结果更支持：
+
+$$
+\Delta C_{\text{strict}}
+\left(
+\mathcal{R}_{\text{readout}}
+\right)
+\ge
+\Delta C_{\text{strict}}
+\left(
+\mathcal{R}_{\text{fiber}}
+\right)
+$$
+
+至少对 qwen3 和 GLM4 成立。
+
+DS7B 的异常结果可写成：
+
+$$
+\Delta C_{\text{strict}}
+\left(
+\mathcal{F}_{\text{all+answer},k}
+\right)
+>
+\Delta C_{\text{strict}}
+\left(
+\mathcal{F}_{\text{answer},k}
+\right)
+$$
+
+但由于该项使用 mean-broadcast：
+
+$$
+h_{p_i,c}^{B}
+\leftarrow
+\frac{1}{|P_D|}
+\sum_{p'\in P_D} h_{p',c}^{D}
+$$
+
+所以它不能直接证明精确位置纤维，只能作为边界线索。
+
+当前语言闭合公式应改写为：
+
+$$
+C_{\text{strict}}
+=
+\Phi_{\text{close}}
+\left(
+\mathcal{R}_{\text{value}},
+\mathcal{R}_{\text{surface}},
+\mathcal{R}_{\text{readout}},
+\mathcal{G}_{\text{protocol}}
+\right)
+$$
+
+其中：
+
+```text
+R_readout 是 answer-site 多组件闭合路线。
+G_protocol 是 protocol / instruction / candidate context 对 readout route 的条件化调制。
+```
+
+更保守的总体表达：
+
+$$
+G_{\text{language}}
+=
+\left(
+P,\ C,\ E_{\text{local}},
+E_{\text{protocol}},
+E_{\text{readout}}
+\right)
+$$
+
+但当前最强边只在：
+
+$$
+E_{\text{readout}}
+\subseteq
+\{(p_{\text{answer}},c_i)\}
+$$
+
+上成立。
+
+### 问题、硬伤和瓶颈
+
+1. 样本上限仍是 6。dry-run 使用 max-cases=20 后仍只选出 6 个 surface-failure case，因此没有进行确认轮。
+2. 位置对齐有两种证据质量。same_count 是较干净证据；mean_broadcast 只是边界扰动，不能作为精确纤维证明。
+3. all_pre_answer_plus_answer 包含 answer_site，因此 DS7B 的提升可能来自 answer_site 加强，而不是真正上游位置。
+4. 当前仍是 block-level attention / MLP 输出，不是 head / channel / neuron。
+5. semantic_pair / object_tokens / relation_tokens patch 失败，不代表上游语义构造不存在，只说明 Phase 782 选出的 readout-side route 不适合直接搬运到这些位置。
+6. donor prompt 与 baseline prompt 的协议差异仍在，protocol_all 的正结果可能混合了指令路线和格式路线。
+7. 小模型偏差必须考虑。DS7B 的全上下文扰动敏感可能是蒸馏小模型路线分散，也可能是结构不稳定。
+
+### 阶段结论
+
+Phase 783 是重要收紧结果。
+
+最保守结论：
+
+```text
+Phase 782 的 route 在 qwen3 和 GLM4 中主要是 answer-site readout-side route。
+它能完成 surface/token closure，但不等于完整跨位置语义构造路线。
+```
+
+DS7B 提供一个边界线索：
+
+```text
+DS7B 的 lowercase route 在 all_pre_answer_plus_answer 上比 answer_site 多 1/6 strict gain，
+但由于 mean_broadcast 和包含 answer_site，不能作为干净的跨位置 causal fiber 结论。
+```
+
+当前研究仍在提升解释力，而不是单纯局部拟合，因为它完成了：
+
+```text
+单组件候选 -> 多组件路线 -> route size 阈值 -> answer-site vs multi-position 边界
+```
+
+但它也说明：
+
+```text
+继续沿着同一批 answer-site route 无限细分，可能会进入边际收益递减区。
+下一步必须换成更干净的 token-position 对齐和 head/channel/neuron 分解。
+```
+
+### 下一阶段方案
+
+下一阶段仍属于同一阶段性目标，但应避免继续粗粒度重复 patch。建议：
+
+```text
+Phase 784: Same-Count Position-Aligned Fiber and Head/Channel Decomposition
+（同长度位置对齐纤维与头 / 通道分解）
+```
+
+核心任务：
+
+```text
+1. 不再使用 mean_broadcast 作为主要证据。
+2. 只测试 same_count 对齐的位置：
+   answer_site
+   answer_prefix
+   object_tokens
+   relation_tokens
+   semantic_pair
+
+3. 对 answer_site 的强路线做 head-level / channel-level 分解：
+   qwen3: with_candidate route_k6, lowercase route_k6
+   GLM4: with_candidate route_k6
+   DS7B: lowercase route_k6
+
+4. 判断 answer-site route 内部到底是：
+   少数 head / channel 主导，
+   还是 MLP block 的分布式方向主导。
+```
+
+成功判据：
+
+$$
+\exists h \text{ or } d:
+\quad
+\Delta C_{\text{strict}}(h,d)
+\approx
+\Delta C_{\text{strict}}(\mathcal{R}_{\text{answer}})
+$$
+
+如果成立：
+
+```text
+可以从 block-level route 下沉到 head/channel-level graph。
+```
+
+如果不成立：
+
+```text
+说明 answer-site route 本身也是分布式低秩方向，
+下一步应做 subspace-level decomposition，而不是继续找单 head。
+```
+
+## Phase 784: Answer-Site Route Channel Budget and Readout Subspace Decomposition（答案位置路线通道预算与读出子空间分解） [2026-06-30 01:00]
+
+### 任务来源
+
+用户上传的 Phase 783 分析总体正确。Phase 783 没有推翻 Phase 780-782，而是把 Phase 782 的多组件 route（路线）边界收紧为：
+
+```text
+qwen3 / GLM4 的最强证据主要集中在 answer_site（答案位置）。
+DS7B 有跨位置边界线索，但受 mean_broadcast（均值广播）和包含 answer_site 的影响，不能作为干净跨位置 causal fiber（因果纤维）证明。
+```
+
+因此当前不能直接声称已经找到完整 token-position × component causal fiber graph（词元位置 × 组件因果纤维图）。更稳妥的下一步是继续下沉 Phase 782/783 中最强的 answer-site readout route（答案位置读出路线），判断它究竟是：
+
+```text
+1. 少量 channel / subspace（通道 / 子空间）即可恢复；
+2. 必须整块 block output（模块输出）才能恢复；
+3. 或者全向量里同时混有有益维度和干扰维度。
+```
+
+### 新增脚本和结果位置
+
+新增正式脚本：
+
+```text
+tests/glm5/phase784_answer_site_route_channel_budget.py
+tests/glm5/run_phase784_answer_site_route_channel_budget_round.sh
+```
+
+结果保存：
+
+```text
+results/glm5_phase784_answer_site_route_channel_budget/
+tests/result/phase784_answer_site_route_channel_budget/
+```
+
+执行轮次：
+
+```text
+smoke: qwen3 -> glm4 -> deepseek7b
+main:  qwen3 -> glm4 -> deepseek7b
+confirm dry-run: 仍然只有 6 个样本，不能增加样本量，因此跳过确认轮
+```
+
+模型加载设置：
+
+```text
+bf16
+quantization off（不使用量化）
+优先 flash_attention_2，但当前环境未安装 FlashAttention2，自动回退到 sdpa
+模型逐个加载，逐个释放，避免 GPU 显存叠加
+```
+
+### 测试原理
+
+Phase 782/783 的完整 answer-site route patch（答案位置路线补丁）是：
+
+$$
+h_{p_a,c}^{B}
+\leftarrow
+h_{p_a,c}^{D},
+\quad
+c \in \mathcal{R}_6
+$$
+
+其中：
+
+```text
+B 是 baseline prompt（基线提示）；
+D 是 donor prompt（供体提示）；
+p_a 是 answer_site（答案位置）；
+c 是 Phase 782 选出的 route component（路线组件）。
+```
+
+Phase 784 不再替换整个组件向量，而是先计算 donor-baseline 差分：
+
+$$
+\Delta h_{c}
+=
+h_{p_a,c}^{D}
+-
+h_{p_a,c}^{B}
+$$
+
+然后用目标词元和失败词元的读出方向定义每个维度的直接贡献：
+
+$$
+r
+=
+W_U[y^*]
+-
+W_U[y_{\text{case}}]
+$$
+
+$$
+s_{c,d}
+=
+\Delta h_{c,d}
+\cdot
+r_d
+$$
+
+只按正贡献维度排序：
+
+$$
+s^+_{c,d}
+=
+\max(s_{c,d},0)
+$$
+
+然后给定预算：
+
+$$
+B_k
+=
+\operatorname{TopK}_{(c,d)}
+\left(s^+_{c,d}\right)
+$$
+
+只替换这些维度：
+
+$$
+h_{p_a,c,d}^{B}
+\leftarrow
+h_{p_a,c,d}^{D},
+\quad
+(c,d)\in B_k
+$$
+
+测试预算：
+
+```text
+16, 64, 256, 1024, all
+```
+
+判断标准：
+
+$$
+C_{\text{strict}}
+=
+\mathbf{1}
+\left[
+\arg\max_y \ell(y\mid x)
+=
+y^*
+\right]
+$$
+
+$$
+\Delta m
+=
+\left[
+\ell(y^*)-\ell(y_{\text{case}})
+\right]_{\text{after}}
+-
+\left[
+\ell(y^*)-\ell(y_{\text{case}})
+\right]_{\text{before}}
+$$
+
+核心问题是：
+
+$$
+\Delta C_{\text{strict}}(B_k)
+\approx
+\Delta C_{\text{strict}}(B_{\text{all}})
+$$
+
+如果小预算也能接近或超过 all，则说明 answer-site route（答案位置路线）不是均匀依赖整个向量，而是存在高贡献子空间；如果 all 才能恢复，则说明当前粒度下更分布式。
+
+### 主测试客观结果
+
+#### qwen3
+
+qwen3 主测试 6 个样本、2 条 route。
+
+```text
+lowercase_short_value:route_k6
+16 dims:   strict gain 0/6, delta margin +2.0417
+64 dims:   strict gain 0/6, delta margin +3.7708
+256 dims:  strict gain 4/6, delta margin +7.3750
+1024 dims: strict gain 6/6, delta margin +14.1354
+all dims:  strict gain 6/6, delta margin +8.7292
+```
+
+```text
+with_candidate_list:route_k6
+16 dims:   strict gain 1/6, delta margin +1.4375
+64 dims:   strict gain 1/6, delta margin +3.0417
+256 dims:  strict gain 4/6, delta margin +6.7292
+1024 dims: strict gain 6/6, delta margin +14.2604
+all dims:  strict gain 6/6, delta margin +9.6667
+```
+
+qwen3 的关键现象：
+
+```text
+1024 / 15360 维度，也就是约 6.67% 的 route 维度，已经达到 6/6 strict closure。
+256 维度约 1.67%，已经达到 4/6 strict closure。
+1024 维度的 margin gain 反而高于 all。
+```
+
+这说明 qwen3 的 answer-site route 里存在明显高贡献子空间；全向量中可能混入反向或噪声维度。
+
+主要维度分布：
+
+```text
+lowercase route 1024 dims:
+mlp:L35 约 311
+mlp:L34 约 221
+attn:L35 约 196
+mlp:L33 约 180
+mlp:L32 约 97
+mlp:L26 约 18
+
+with_candidate route 1024 dims:
+mlp:L35 约 249
+mlp:L34 约 244
+attn:L34 约 229
+attn:L35 约 109
+attn:L31 约 99
+attn:L32 约 95
+```
+
+#### GLM4
+
+GLM4 主测试 6 个样本、2 条 route。
+
+```text
+lowercase_short_value:route_k6
+16 dims:   strict gain 0/6, delta margin +0.6875
+64 dims:   strict gain 4/6, delta margin +1.3333
+256 dims:  strict gain 4/6, delta margin +2.6354
+1024 dims: strict gain 5/6, delta margin +5.1302
+all dims:  strict gain 2/6, delta margin +0.8854
+```
+
+```text
+with_candidate_list:route_k6
+16 dims:   strict gain 1/6, delta margin +0.4271
+64 dims:   strict gain 3/6, delta margin +1.1042
+256 dims:  strict gain 6/6, delta margin +2.7708
+1024 dims: strict gain 6/6, delta margin +5.8333
+all dims:  strict gain 5/6, delta margin +2.1771
+```
+
+GLM4 的关键现象：
+
+```text
+with_candidate route 只用 256 / 24576 维度，约 1.04%，就达到 6/6 strict closure。
+lowercase route 1024 维度达到 5/6，而 all 只有 2/6。
+```
+
+这比 qwen3 更明显地说明：全向量 patch 不是最纯净机制；高贡献通道子集比 all 更接近有效 readout subspace（读出子空间）。
+
+主要维度分布：
+
+```text
+lowercase route 1024 dims:
+mlp:L39 约 516
+mlp:L38 约 481
+其他层很少
+
+with_candidate route 1024 dims:
+mlp:L38 约 820
+attn:L33 约 96
+mlp:L34 约 54
+attn:L32 约 27
+attn:L29 约 22
+attn:L35 约 6
+```
+
+#### DS7B
+
+DS7B 主测试 6 个样本、2 条 route。
+
+```text
+lowercase_short_value:route_k6
+16 dims:   strict gain 0/6, delta margin +2.6875
+64 dims:   strict gain 1/6, delta margin +4.4010
+256 dims:  strict gain 4/6, delta margin +7.5156
+1024 dims: strict gain 6/6, delta margin +12.9271
+all dims:  strict gain 3/6, delta margin +5.2292
+```
+
+```text
+with_candidate_list:route_k6
+16 dims:   strict gain 0/6, delta margin +1.2292
+64 dims:   strict gain 0/6, delta margin +2.2240
+256 dims:  strict gain 1/6, delta margin +4.4193
+1024 dims: strict gain 5/6, delta margin +8.7292
+all dims:  strict gain 1/6, delta margin +3.2292
+```
+
+DS7B 的关键现象：
+
+```text
+1024 / 21504 维度，约 4.76%，把 lowercase route 从 all 的 3/6 提升到 6/6。
+with_candidate route 也从 all 的 1/6 提升到 1024 维度的 5/6。
+```
+
+这说明 DS7B 的 answer-site route 并不是“全向量越多越好”，而是有强烈的有效子空间 / 干扰子空间分离。
+
+主要维度分布：
+
+```text
+lowercase route 1024 dims:
+mlp:L27 约 484
+mlp:L26 约 304
+mlp:L24 约 117
+mlp:L22 约 69
+mlp:L21 约 40
+attn:L19 约 11
+
+with_candidate route 1024 dims:
+mlp:L27 约 425
+attn:L26 约 212
+attn:L27 约 158
+attn:L23 约 98
+attn:L25 约 91
+attn:L22 约 41
+```
+
+### 阶段结论
+
+Phase 784 是正结果，而且比 Phase 783 更进一步。
+
+最重要结论：
+
+```text
+answer-site route 不是只能靠整块 block output 才起作用。
+在 qwen3、GLM4、DS7B 中，少量高贡献维度可以恢复大部分甚至全部 strict token closure。
+```
+
+更关键的是：
+
+```text
+1024 维度经常比 all 维度更强。
+```
+
+这说明完整模块输出向量中至少混有三类成分：
+
+```text
+1. target-supporting subspace（支持目标值的子空间）
+2. neutral carrier subspace（中性承载子空间）
+3. interfering / competing subspace（干扰或竞争子空间）
+```
+
+因此 Phase 782 的 route 成功不能再理解为：
+
+```text
+整块组件就是机制。
+```
+
+更合理的解释是：
+
+```text
+组件内部存在更细的 readout-supporting subspace。
+route patch 成功来自这些子空间的组合，而不是来自整个 block output 的无差别替换。
+```
+
+### 理论公式更新
+
+原来的 route 公式是：
+
+$$
+\mathcal{R}
+=
+\{c_1,c_2,\ldots,c_k\}
+$$
+
+Phase 784 后，应改成带维度子空间的 route：
+
+$$
+\mathcal{R}_{\text{sub}}
+=
+\{(c_i,D_i)\}_{i=1}^{k}
+$$
+
+其中：
+
+```text
+c_i 是组件；
+D_i 是该组件内部被选中的有效维度集合。
+```
+
+生成闭合条件不再是：
+
+$$
+h_{p,c}^{B}
+\leftarrow
+h_{p,c}^{D}
+$$
+
+而是：
+
+$$
+h_{p,c,D_i}^{B}
+\leftarrow
+h_{p,c,D_i}^{D}
+$$
+
+并且有效维度由读出方向条件化定义：
+
+$$
+D_i(k)
+=
+\operatorname{TopK}_d
+\left(
+\max
+\left[
+\left(
+h_{p,c_i,d}^{D}
+-
+h_{p,c_i,d}^{B}
+\right)
+\left(
+W_U[y^*]_d
+-
+W_U[y_{\text{case}}]_d
+\right),
+0
+\right]
+\right)
+$$
+
+完整语言机制图谱现在应从：
+
+$$
+G
+=
+(P,C,E)
+$$
+
+升级为：
+
+$$
+G
+=
+\left(
+P,\ C,\ D,\ E_{\text{pos-comp}},\ E_{\text{comp-dim}},\ E_{\text{readout}}
+\right)
+$$
+
+其中：
+
+```text
+P 是 token position（词元位置）；
+C 是 component（组件）；
+D 是 component-internal dimension / channel（组件内部维度 / 通道）；
+E_pos-comp 是位置到组件边；
+E_comp-dim 是组件到有效子空间边；
+E_readout 是子空间到词元读出的边。
+```
+
+当前最强实证边是：
+
+$$
+E_{\text{comp-dim}}
+\subset
+\{(c,d): c\in \mathcal{R}_{\text{answer}}, d\in D_c\}
+$$
+
+而不是全局语义纤维。
+
+### 问题、硬伤和瓶颈
+
+1. 当前仍然不是 neuron-level（神经元级）图谱。这里的维度是 residual / block output channel（残差 / 模块输出通道），不能直接等同于生物神经元。
+2. 当前不是真实 head-level（注意力头级）分解。attention block 的输出维度被分解了，但还没有拆到每个 head 的 pre-output projection（输出投影前）贡献。
+3. 维度排序使用 direct readout attribution（直接读出归因），会偏向读出端，可能漏掉上游构造维度。
+4. 样本仍只有 6 个。confirm dry-run 不能增加样本，因此没有做确认轮。
+5. 1024 维度比 all 更强，说明 all patch 可能引入干扰，但也说明当前排序规则可能在“过滤干扰”而不是完整还原自然机制。
+6. 这里仍然只测试 answer_site，不证明跨位置 causal fiber。
+7. 小模型偏差必须保留。DS7B 的强子空间现象可能是蒸馏模型路线压缩，也可能是小模型读出端结构不稳定。
+
+### 当前研究进展判断
+
+Phase 784 说明当前研究仍在提升解释力，不是单纯 patch 局部拟合。
+
+原因是它完成了新的结构拆分：
+
+```text
+block-level route
+-> answer-site route
+-> route-internal channel/subspace budget
+-> 有益子空间与干扰子空间分离
+```
+
+这比继续寻找更多 patch 组合更有价值，因为它回答了：
+
+```text
+组件为什么有效？
+不是因为整块模块神奇有效，
+而是因为模块内部有少量方向强烈支持目标 token readout。
+```
+
+但也必须承认：
+
+```text
+这仍然主要是 readout-side mechanism（读出侧机制），
+还没有破解完整 language encoding mechanism（语言编码机制）。
+```
+
+### 下一阶段方案
+
+下一阶段仍属于同一阶段性目标：从局部 readout route（读出路线）下沉到可解释机制图谱。
+
+建议：
+
+```text
+Phase 785: Positive-Negative Subspace Split and Head Projection Audit
+（正负子空间分离与注意力头投影审计）
+```
+
+核心任务：
+
+```text
+1. 显式分离 positive subspace / negative subspace / neutral subspace。
+2. 测试只 patch positive subspace、只 patch negative subspace、positive+negative 同时 patch。
+3. 对 attention 组件继续拆 head projection：
+   判断 attn block 中的有效维度是否集中在少数 head 输出投影子空间。
+4. 对 MLP 组件做 activation-channel audit：
+   判断有效输出维度是否来自少数中间激活通道，还是输出投影后的分布式方向。
+```
+
+关键判据：
+
+$$
+\Delta C_{\text{strict}}
+\left(
+D_{\text{positive}}
+\right)
+>
+\Delta C_{\text{strict}}
+\left(
+D_{\text{all}}
+\right)
+$$
+
+如果成立：
+
+```text
+语言读出机制存在可分离的正负子空间。
+```
+
+再进一步：
+
+$$
+D_{\text{positive}}
+\approx
+\bigcup_h D_h
+$$
+
+如果成立：
+
+```text
+可以从 channel/subspace graph 继续下沉到 head graph。
+```
+
+如果不成立：
+
+```text
+说明有效机制更像 residual subspace（残差子空间），不是单 head / 单 neuron 机制。
+```
+
+本阶段不继续自动启动 Phase 785，因为 Phase 785 需要新的 head projection hook 和 MLP activation hook 设计；直接重复 Phase 784 不能增加样本，也不能增加证据质量。
+
+## Phase 785: Positive-Negative Subspace Split（正负子空间分离） [2026-06-30 02:13]
+
+### 一、阶段目标
+
+Phase 784 已经证明：
+
+```text
+answer-site route（答案位置路线）的有效性并不来自整块 block output（模块输出），
+而主要来自少量高贡献 channel / subspace（通道 / 子空间）。
+```
+
+Phase 785 继续追问更细的问题：
+
+```text
+同一条有效路线内部，是否同时存在：
+1. 支持 correct target token（正确目标词元）的 positive subspace（正子空间）；
+2. 抑制 correct target token 或增强 competing token（竞争词元）的 negative subspace（负子空间）；
+3. 基本无效的 neutral / random subspace（中性 / 随机子空间）。
+```
+
+这个问题很关键。因为如果 only top positive dims（只取正贡献维度）比 all dims（全部维度）更强，而 negative dims（负贡献维度）稳定伤害结果，那么 Phase 784 的“少量维度更强”就不只是压缩现象，而是说明模块内部存在可分离的正负读出结构。
+
+### 二、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase785_positive_negative_subspace_split.py
+tests/glm5/run_phase785_positive_negative_subspace_split_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase785_positive_negative_subspace_split/main/
+tests/result/phase785_positive_negative_subspace_split/main/
+```
+
+本轮依次完成三个模型：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+实际加载方式：
+
+```text
+bf16（半精度）
+no quantization（不量化）
+FlashAttention2 unavailable -> sdpa fallback（FlashAttention2 不可用，因此回退到 sdpa）
+```
+
+confirm dry-run（确认轮预运行）显示每个模型仍然只有 6 个可用样本，不能增加样本量，因此没有重复执行确认轮。这个限制需要保留。
+
+### 三、测试原理
+
+对 Phase 780 / 782 已经找到的 answer-site route（答案位置路线），在 baseline prompt（基线提示）和 donor prompt（供体提示）之间计算同一组件、同一维度的差分：
+
+$$
+\Delta h_{c,d}
+=
+h^{D}_{p_a,c,d}
+-
+h^{B}_{p_a,c,d}
+$$
+
+其中：
+
+```text
+p_a 是 answer-site token position（答案位置词元位置）；
+c 是 route component（路线组件），例如某层 attention（注意力）或 MLP（多层感知机）；
+d 是 component output channel（组件输出通道）；
+D 是 donor（供体）；
+B 是 baseline（基线）。
+```
+
+再用 correct target token（正确目标词元）和 competing case token（竞争词元）的 unembedding direction（反嵌入读出方向）定义读出方向：
+
+$$
+r
+=
+W_U[y^\*]
+-
+W_U[y_{\text{case}}]
+$$
+
+每个通道的 signed readout score（带符号读出分数）为：
+
+$$
+s_{c,d}
+=
+\Delta h_{c,d}\cdot r_d
+$$
+
+据此分成：
+
+$$
+D_{+}
+=
+\{(c,d):s_{c,d}>0\}
+$$
+
+$$
+D_{-}
+=
+\{(c,d):s_{c,d}<0\}
+$$
+
+$$
+D_{0}
+\approx
+\{(c,d):|s_{c,d}|\approx 0\}
+$$
+
+然后分别 patch（修补）：
+
+```text
+positive_256 / positive_1024
+negative_256 / negative_1024
+neutral_256 / neutral_1024
+random_256 / random_1024
+all_positive
+all_negative
+all
+```
+
+判断标准：
+
+$$
+\Delta m
+=
+\left[
+\ell(y^\*)-\ell(y_{\text{case}})
+\right]_{\text{patch}}
+-
+\left[
+\ell(y^\*)-\ell(y_{\text{case}})
+\right]_{\text{baseline}}
+$$
+
+如果：
+
+$$
+\Delta m(D_+)>0
+$$
+
+并且：
+
+$$
+\Delta m(D_-)<0
+$$
+
+同时 random / neutral 接近 0，则说明 route-internal subspace（路线内部子空间）存在方向性因果结构。
+
+### 四、核心客观结果
+
+主测试每个模型 6 个样本，2 条路线，336 行记录。
+
+| 模型 | 路线 | all_positive strict / Δmargin | positive_1024 strict / Δmargin | all strict / Δmargin | negative_1024 strict / Δmargin | random_1024 strict / Δmargin | neutral_1024 strict / Δmargin |
+|---|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | lowercase_short_value:route_k6 | 1.00 / +22.23 | 1.00 / +14.14 | 1.00 / +8.73 | 0.00 / -9.52 | 0.00 / +0.69 | 0.00 / +0.08 |
+| qwen3 | with_candidate_list:route_k6 | 1.00 / +25.26 | 1.00 / +14.26 | 1.00 / +9.67 | 0.00 / -11.27 | 0.00 / +0.50 | 0.00 / +0.02 |
+| GLM4 | lowercase_short_value:route_k6 | 1.00 / +8.28 | 0.83 / +5.13 | 0.33 / +0.89 | 0.00 / -4.68 | 0.00 / +0.01 | 0.00 / +0.01 |
+| GLM4 | with_candidate_list:route_k6 | 1.00 / +10.41 | 1.00 / +5.83 | 0.83 / +2.18 | 0.00 / -3.79 | 0.00 / +0.15 | 0.00 / +0.00 |
+| DS7B | lowercase_short_value:route_k6 | 1.00 / +18.07 | 1.00 / +12.93 | 0.50 / +5.23 | 0.00 / -9.68 | 0.00 / +0.61 | 0.00 / +0.05 |
+| DS7B | with_candidate_list:route_k6 | 1.00 / +17.70 | 0.83 / +8.73 | 0.17 / +3.23 | 0.00 / -6.99 | 0.00 / +0.25 | 0.00 / -0.00 |
+
+最稳定现象：
+
+```text
+1. all_positive 在三个模型、两条路线中全部 strict_open = 1.00。
+2. positive_1024 在多数条件下接近或达到 strict_open = 1.00。
+3. all_positive 的 Δmargin 明显大于 all，说明整块输出中混入了干扰维度。
+4. negative_1024 和 all_negative 全部 strict_open = 0.00，并且 Δmargin 为显著负数。
+5. neutral_1024 和 random_1024 基本接近 0，说明结果不是“随便 patch 同样数量维度”造成的。
+```
+
+### 五、阶段结论
+
+Phase 784 的判断基本正确，而且 Phase 785 把它推进了一层。
+
+更准确的表述是：
+
+```text
+answer-site route（答案位置路线）不是均匀有效的向量块；
+它内部包含正贡献子空间、负贡献子空间和近似无效子空间。
+```
+
+目前最强实证结论是：
+
+$$
+C(D_{+})
+\gg
+C(D_{\text{all}})
+\gg
+C(D_{0})
+$$
+
+并且：
+
+$$
+C(D_{-})<0
+$$
+
+其中 \(C(\cdot)\) 表示对 correct target token margin（正确目标词元边际）的因果贡献。
+
+这说明：
+
+```text
+有效路线不是“整块模块输出”；
+有效路线更像“条件化残差状态中的正负读出子空间组合”。
+```
+
+### 六、严格审视：问题和硬伤
+
+1. 这仍然不是 neuron-level（神经元级）图谱。这里的维度是 block output channel / residual channel（模块输出通道 / 残差通道）。
+2. 这也不是真正 head-level（注意力头级）机制。attention block（注意力模块）还没有拆成每个 head 的输出投影贡献。
+3. signed score 使用 unembedding direction（反嵌入方向），因此偏向 readout-side（读出侧）解释，可能漏掉上游构造维度。
+4. 每个模型仍只有 6 个可用样本。虽然三个模型现象一致，但不能当成大样本统计结论。
+5. all_positive 是人工筛选后的子空间，不等于自然生成时模型真的只使用这些维度。
+6. negative subspace（负子空间）是否代表 suppressor（抑制器）、format competition（格式竞争）、echo route（回声路线）或其他错误路线，还没有拆清楚。
+7. 小模型偏差必须保留。DS7B / qwen3 / GLM4 的内部路线可能比大模型更压缩、更脆弱，正负子空间分裂的强度不能直接外推到更大模型。
+
+### 七、对智能理论的意义
+
+当前结果支持一个更谨慎的理论图像：
+
+```text
+语言生成不是单一语义向量被线性读出；
+而是条件化残差状态中多条路线、多组子空间同时竞争，
+最后由读出几何完成 token closure（词元闭合）。
+```
+
+可以写成：
+
+$$
+h_{p}^{L}
+=
+h_{p}^{0}
++
+\sum_{c\in\mathcal{R}}
+\left(
+h_{p,c}^{+}
++
+h_{p,c}^{-}
++
+h_{p,c}^{0}
+\right)
++
+\epsilon
+$$
+
+读出端：
+
+$$
+\ell(y)
+=
+W_U[y]^\top h_{p}^{L}
+$$
+
+目标相对竞争项：
+
+$$
+m(y^\*,y_c)
+=
+\ell(y^\*)-\ell(y_c)
+$$
+
+子空间贡献：
+
+$$
+\Delta m(D)
+=
+\sum_{(c,d)\in D}
+\Delta h_{c,d}
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+这比“语义图谱”更接近当前证据：
+
+```text
+第一层不是静态概念节点；
+第一层应是 condition-dependent causal fiber（条件依赖因果纤维）；
+第二层才是 route / component / subspace（路线 / 组件 / 子空间）；
+第三层才映射到 semantic behavior（语义行为）。
+```
+
+### 八、下一阶段任务
+
+Phase 786 应继续同一阶段性目标，但要从 block-output subspace（模块输出子空间）下钻到来源结构：
+
+```text
+Phase 786: Head Projection and MLP Activation-Channel Source Audit
+（注意力头投影与 MLP 激活通道来源审计）
+```
+
+关键任务：
+
+```text
+1. 对 attention block 拆 head output projection，判断 D+ 是否集中在少数 head。
+2. 对 MLP 拆中间 activation channel，判断 D+ 是否来自少数 MLP neuron/channel。
+3. 对 D- 单独追踪来源，判断它是 suppressor、format route、echo route，还是读出端竞争噪声。
+4. 将 Phase 785 的 D+ / D- 写入 atlas graph（图谱）格式，方便可视化客户端展示。
+```
+
+核心判据：
+
+$$
+D_{+}
+\approx
+\bigcup_h D_{h,+}
+$$
+
+如果成立：
+
+```text
+可以从 residual channel graph（残差通道图谱）继续下沉到 head graph（注意力头图谱）。
+```
+
+如果不成立：
+
+```text
+说明有效机制更像分布式 residual subspace（残差子空间），不能强行解释成少数 head 或少数 neuron。
+```
+
+本阶段不继续自动启动 Phase 786，因为它需要新的 hook（钩子）设计，不是 Phase 785 脚本参数扩展能直接完成。继续重复当前测试不会增加样本，也不会增加机制颗粒度。
+
+## Phase 786: Head Projection and MLP Activation-Channel Source Audit（注意力头投影与 MLP 激活通道来源审计） [2026-06-30 06:25]
+
+### 一、对 Phase 785 附件判断的核查
+
+新上传的 Phase 785 判断基本正确。
+
+最重要的正确部分是：
+
+```text
+Phase 785 不是普通 patch（补丁）强化，
+而是把 answer-site route（答案位置路线）进一步拆成 signed subspace route（带符号子空间路线）。
+```
+
+客观证据来自 Phase 785：
+
+```text
+all_positive 在 qwen3 / GLM4 / DS7B 的两条路线中全部 strict_open = 1.00；
+negative_1024 和 all_negative 全部 strict_open = 0.00，并且 margin 明显下降；
+neutral / random 接近 0。
+```
+
+因此可以确认：
+
+```text
+answer-site route（答案位置路线）内部确实存在 positive / negative / neutral subspace（正 / 负 / 中性子空间）。
+```
+
+但附件中的部分数学公式排版断裂，例如：
+
+```text
+Δh 的减号、W_U 差分、集合定义都被 markdown 截断。
+```
+
+本阶段继续使用已经校正后的公式。
+
+### 二、为什么继续做 Phase 786
+
+Phase 785 证明的是：
+
+```text
+block-output channel / residual channel（模块输出通道 / 残差通道）层面的正负子空间。
+```
+
+它还没有回答：
+
+```text
+这些 D+ / D- 来自哪里？
+是少数 attention head（注意力头）？
+是少数 MLP activation channel（多层感知机激活通道）？
+还是分布式 residual subspace（残差子空间）？
+```
+
+所以 Phase 786 的目标是做 source audit（来源审计），不是立即做新的 patch 成功率优化。
+
+### 三、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase786_head_mlp_source_audit.py
+tests/glm5/run_phase786_head_mlp_source_audit_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase786_head_mlp_source_audit/main/
+tests/result/phase786_head_mlp_source_audit/main/
+```
+
+三模型已按顺序完成：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+加载设置：
+
+```text
+bf16（半精度）
+quantization=off（不量化）
+flash_attention_2 unavailable -> sdpa fallback（FlashAttention2 不可用，回退 sdpa）
+```
+
+主测试规模：
+
+```text
+qwen3：6 cases，2 routes，6528 rows
+GLM4：6 cases，2 routes，5920 rows
+DS7B：6 cases，2 routes，6336 rows
+```
+
+confirm dry-run（确认轮预运行）仍然只有 6 个可用样本，和 main 相同，因此没有执行重复确认轮。
+
+### 四、测试原理
+
+Phase 786 复用 Phase 785 的带符号子空间：
+
+$$
+s_{c,d}
+=
+\Delta h_{c,d}
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+其中：
+
+```text
+c 是 route component（路线组件）；
+d 是 component output channel（组件输出通道）；
+y* 是 correct target token（正确目标词元）；
+y_c 是 competing case token（竞争大小写词元）。
+```
+
+正负子空间仍为：
+
+$$
+D_+
+=
+\{(c,d):s_{c,d}>0\}
+$$
+
+$$
+D_-
+=
+\{(c,d):s_{c,d}<0\}
+$$
+
+#### 4.1 attention head projection audit（注意力头投影审计）
+
+对 attention component（注意力组件），捕获 `o_proj` 前输入：
+
+$$
+z^{\text{attn}}_{p,c}
+=
+[z_{p,c,1},z_{p,c,2},\ldots,z_{p,c,H}]
+$$
+
+其中 \(H\) 是 head 数量。
+
+`o_proj` 输出为：
+
+$$
+h^{\text{attn}}_{p,c}
+=
+W_O z^{\text{attn}}_{p,c}
+$$
+
+对某个 head \(h\) 的贡献：
+
+$$
+\Delta m_{h}(D)
+=
+\sum_{d\in D_c}
+\left(
+W_{O,d,h}
+\Delta z_{h}
+\right)
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+这里的意义是：
+
+```text
+把 Phase 785 的 D+ / D- 输出维度，
+反投影到 attention head 的 o_proj 输入切片上。
+```
+
+#### 4.2 MLP activation-channel audit（MLP 激活通道审计）
+
+对 MLP component（多层感知机组件），捕获 `down_proj` 前输入：
+
+$$
+a^{\text{mlp}}_{p,c}
+=
+\operatorname{Act}(W_{\text{gate}}x)\odot W_{\text{up}}x
+$$
+
+`down_proj` 输出为：
+
+$$
+h^{\text{mlp}}_{p,c}
+=
+W_{\text{down}}a^{\text{mlp}}_{p,c}
+$$
+
+单个 MLP activation channel（激活通道） \(j\) 对选定输出子空间 \(D\) 的贡献：
+
+$$
+\Delta m_j(D)
+=
+\Delta a_j
+\sum_{d\in D_c}
+W_{\text{down},d,j}
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+这里的意义是：
+
+```text
+把 Phase 785 的 D+ / D- 输出维度，
+追到 MLP down_proj 输入激活通道。
+```
+
+### 五、核心结果：来源集中度
+
+| model | source | subspace | budget | cases | head top1 | head top3 | head top8 | mlp top1 | mlp top8 | mlp top32 | sign rate |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | attention_head_o_proj | positive | positive_1024 | 6 | 0.152 | 0.324 | 0.609 | NA | NA | NA | 0.774 |
+| qwen3 | attention_head_o_proj | negative | negative_1024 | 6 | 0.128 | 0.306 | 0.595 | NA | NA | NA | 0.211 |
+| qwen3 | mlp_down_input_channel | positive | positive_1024 | 6 | NA | NA | NA | 0.025 | 0.107 | 0.210 | 0.972 |
+| qwen3 | mlp_down_input_channel | negative | negative_1024 | 6 | NA | NA | NA | 0.024 | 0.098 | 0.199 | 0.025 |
+| GLM4 | attention_head_o_proj | positive | positive_1024 | 6 | 0.197 | 0.396 | 0.656 | NA | NA | NA | 0.682 |
+| GLM4 | attention_head_o_proj | negative | negative_1024 | 6 | 0.177 | 0.377 | 0.650 | NA | NA | NA | 0.314 |
+| GLM4 | mlp_down_input_channel | positive | positive_1024 | 6 | NA | NA | NA | 0.023 | 0.066 | 0.127 | 0.867 |
+| GLM4 | mlp_down_input_channel | negative | negative_1024 | 6 | NA | NA | NA | 0.022 | 0.062 | 0.122 | 0.112 |
+| DS7B | attention_head_o_proj | positive | positive_1024 | 6 | 0.209 | 0.411 | 0.639 | NA | NA | NA | 0.832 |
+| DS7B | attention_head_o_proj | negative | negative_1024 | 6 | 0.188 | 0.397 | 0.631 | NA | NA | NA | 0.177 |
+| DS7B | mlp_down_input_channel | positive | positive_1024 | 6 | NA | NA | NA | 0.015 | 0.065 | 0.140 | 0.984 |
+| DS7B | mlp_down_input_channel | negative | negative_1024 | 6 | NA | NA | NA | 0.017 | 0.065 | 0.141 | 0.028 |
+
+解释：
+
+```text
+head top1 / top3 / top8 表示 attention head 对选定子空间绝对贡献的集中度；
+mlp top1 / top8 / top32 表示 MLP activation channel 对选定子空间绝对贡献的集中度；
+sign rate 表示来源项符号与目标方向一致的比例。
+```
+
+### 六、核心客观现象
+
+#### 6.1 attention head 有中等集中度
+
+三个模型中：
+
+```text
+positive_1024 的 attention top8 head 约解释 0.609 / 0.656 / 0.639；
+negative_1024 的 attention top8 head 约解释 0.595 / 0.650 / 0.631。
+```
+
+这说明：
+
+```text
+attention 子空间不是单 head 机制；
+但也不是完全均匀分布；
+大约少数 head group（约 top8）承载了多数投影贡献。
+```
+
+#### 6.2 MLP activation channel 更分布式
+
+三个模型中：
+
+```text
+positive_1024 的 MLP top32 channel 约解释 0.210 / 0.127 / 0.140；
+negative_1024 的 MLP top32 channel 约解释 0.199 / 0.122 / 0.141。
+```
+
+这说明：
+
+```text
+MLP 正负子空间不是少数单 neuron / channel 完成；
+更像较宽的 activation-channel ensemble（激活通道集合）。
+```
+
+#### 6.3 正负符号在 MLP 来源中极其稳定
+
+MLP 来源的 sign rate：
+
+```text
+positive_1024：
+qwen3 0.972，GLM4 0.867，DS7B 0.984
+
+negative_1024：
+qwen3 0.025，GLM4 0.112，DS7B 0.028
+```
+
+说明：
+
+```text
+MLP activation channels 对 D+ / D- 的符号方向非常清楚。
+```
+
+#### 6.4 attention head 来源也有符号方向，但混合更明显
+
+attention 来源的 sign rate：
+
+```text
+positive_1024：
+qwen3 0.774，GLM4 0.682，DS7B 0.832
+
+negative_1024：
+qwen3 0.211，GLM4 0.314，DS7B 0.177
+```
+
+说明：
+
+```text
+attention head 不是纯粹单向贡献；
+同一 head projection 内部可能混有正负输出维度。
+```
+
+### 七、若干高贡献来源点
+
+attention 高贡献例子：
+
+```text
+qwen3:
+with_candidate_list route, attn:L31, head 28, all_positive, signed +10.392
+with_candidate_list route, attn:L34, head 5, all_positive, signed +8.263
+
+GLM4:
+with_candidate_list route, attn:L33, head 9, all_positive, signed +1.705
+with_candidate_list route, attn:L33, head 9, all_negative, signed -0.500
+
+DS7B:
+with_candidate_list route, attn:L26, head 14, all_positive, signed +18.367
+with_candidate_list route, attn:L26, head 14, all_negative, signed -8.985
+```
+
+MLP 高贡献例子：
+
+```text
+qwen3:
+mlp:L35 channel 352 多次出现在 all_positive；
+mlp:L34 channel 8061 出现在 negative / all_negative。
+
+GLM4:
+mlp:L39 channel 11316 出现在 positive / all_positive；
+mlp:L34 channel 7605 同时在 all_positive / all_negative 中出现，符号随子空间变化。
+
+DS7B:
+mlp:L27 channel 2295 多次出现在 negative / all_negative；
+mlp:L27 channel 13660 在不同样本中可出现在 positive 或 negative，提示同一激活通道可能被不同上下文重用。
+```
+
+这些点是后续 causal validation（因果验证）的候选，不是最终结论。
+
+### 八、阶段结论
+
+Phase 786 是 Phase 785 的自然推进，方向正确，并产生了新的客观拼图：
+
+```text
+Phase 785:
+证明 answer-site route 内部存在 D+ / D-。
+
+Phase 786:
+证明 D+ / D- 可以追到 architecture source（架构来源）：
+attention 中表现为少数 head group 的中等集中；
+MLP 中表现为更分布式但符号稳定的 activation-channel ensemble。
+```
+
+最谨慎的结论是：
+
+```text
+语言读出路线不是单 head / 单 neuron 机制；
+更像 attention head group + distributed MLP activation ensemble
+共同形成 signed residual subspace（带符号残差子空间）。
+```
+
+### 九、问题、硬伤和边界
+
+1. Phase 786 是 attribution audit（归因审计），不是 causal patch / ablation（因果修补 / 消融）。
+2. attention head 的来源分解依赖 `o_proj` 线性投影，证明的是输出投影贡献，不等于完整 Q/K/V 注意力机制来源。
+3. MLP 分解使用 `down_proj` 输入激活，已经比 residual channel 更接近 neuron / activation channel，但还没有做 channel intervention（通道干预）。
+4. `top32` MLP 集中度不高，说明如果强行寻找少数神经元，可能会误判；更可能是分布式通道集合。
+5. 同一个 MLP channel 在不同样本或不同子空间中可能正负切换，说明需要按 context（上下文）和 route（路线）建图，而不是静态神经元标签。
+6. 样本仍为 6 个，confirm dry-run 无法增加样本，因此结论仍是高价值小样本机制证据。
+7. 小模型可能存在路线压缩、读出端过强、token identity bridge（词元身份桥）不稳定等偏差，不能直接外推到大模型。
+
+### 十、智能理论更新
+
+当前理论应从：
+
+```text
+signed subspace route（带符号子空间路线）
+```
+
+继续扩展为：
+
+```text
+source-conditioned signed subspace route（来源条件化带符号子空间路线）
+```
+
+数学上可以写成：
+
+$$
+h_{p}^{L}
+=
+h_p^0
++
+\sum_{c\in\mathcal R}
+\left(
+\sum_{u\in U_c^{\text{attn}}}
+\phi^{\text{attn}}_{c,u}(x)
++
+\sum_{v\in U_c^{\text{mlp}}}
+\phi^{\text{mlp}}_{c,v}(x)
+\right)
++
+\epsilon
+$$
+
+其中：
+
+```text
+U_c^{attn} 是 attention head source units（注意力头来源单元）；
+U_c^{mlp} 是 MLP activation source units（MLP 激活来源单元）；
+φ 是上下文条件化贡献。
+```
+
+对目标—竞争边际：
+
+$$
+\Delta m
+=
+\sum_{c\in\mathcal R}
+\sum_{u\in U_c}
+\Delta \phi_{c,u}(x)
+\cdot
+\left(
+W_U[y^\*]
+-
+W_U[y_c]
+\right)
+$$
+
+正负来源集合：
+
+$$
+U_+
+=
+\{(c,u):\Delta m_{c,u}>0\}
+$$
+
+$$
+U_-
+=
+\{(c,u):\Delta m_{c,u}<0\}
+$$
+
+当前更接近真实机制的图谱对象不是：
+
+```text
+semantic node（语义节点）
+```
+
+而是：
+
+```text
+context-conditioned source unit -> signed residual subspace -> readout closure
+（上下文条件化来源单元 -> 带符号残差子空间 -> 读出闭合）
+```
+
+### 十一、下一阶段方案
+
+下一阶段仍属于“从 signed subspace route 下钻到机制来源”的大阶段，但任务性质会从 attribution audit（归因审计）变成 causal validation（因果验证）。
+
+建议：
+
+```text
+Phase 787: Source Unit Causal Validation for Signed Subspace
+（带符号子空间来源单元因果验证）
+```
+
+核心任务：
+
+```text
+1. 对 Phase 786 找到的 top attention heads 做 head-slice patch / ablation。
+2. 对 Phase 786 找到的 top MLP activation channels 做 down_proj-input channel patch / ablation。
+3. 分别验证 positive source units 是否充分增强 correct token。
+4. 分别验证 negative source units 是否必要地压低 correct token 或增强 competitor。
+5. 比较 top sources 与 random sources，避免把分布式背景误判成机制来源。
+```
+
+关键判据：
+
+$$
+\Delta m(U_+^{\text{top}})
+>
+\Delta m(U_+^{\text{random}})
+$$
+
+以及：
+
+$$
+\Delta m(U_-^{\text{top}})
+<
+\Delta m(U_-^{\text{random}})
+$$
+
+如果成立，才能把 Phase 786 的来源归因推进为 source-unit causal edge（来源单元因果边）。
+
+本轮不继续自动启动 Phase 787。原因是 Phase 787 需要新的干预逻辑，尤其是 MLP activation-channel patch / ablation 会直接改变非线性中间激活；如果没有先明确 patch / ablation 的评价口径，容易把来源归因和因果必要性混在一起。
+
+## Phase 787: signed subspace source unit causal validation（带符号子空间来源单元因果验证） [2026-06-30 07:21]
+
+### 一、任务背景
+
+本阶段分析了上传的 Phase 786 判断。总体结论是：Phase 786 的方向正确，它把 Phase 785 的 signed residual subspace（带符号残差子空间）继续下钻到 architecture source unit（架构来源单元）层级；但 Phase 786 仍然只是 attribution audit（归因审计），不能直接当作因果证明。
+
+因此本轮继续自动完成同一阶段的下一步：Phase 787。目标不是继续增加候选 head（注意力头）或 MLP channel（多层感知机通道），而是验证 Phase 786 找到的 top source units（高贡献来源单元）是否真的能产生因果影响。
+
+测试脚本：
+
+```text
+tests/glm5/phase787_source_unit_causal_validation.py
+tests/glm5/run_phase787_source_unit_causal_validation_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase787_source_unit_causal_validation/main/
+tests/result/phase787_source_unit_causal_validation/main/
+```
+
+### 二、测试原理
+
+Phase 785 定义了 route component（路线组件）输出维度上的带符号贡献：
+
+$$
+s_{c,d}
+=
+\Delta h_{c,d}
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+其中：
+
+```text
+c：route component（路线组件）
+d：输出维度
+y*：correct target token（正确目标词元）
+yc：case-variant competitor token（大小写/表面形式竞争词元）
+WU：unembedding matrix（反嵌入矩阵）
+```
+
+Phase 786 把这个输出贡献反投影到来源单元。对 attention head（注意力头），使用 `o_proj` 输入切片：
+
+$$
+\Delta m_h(D)
+=
+\sum_{d\in D}
+\left(
+W_{O,d,h}\Delta z_h
+\right)
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+对 MLP activation channel（多层感知机激活通道），使用 `down_proj` 输入通道：
+
+$$
+\Delta m_j(D)
+=
+\Delta a_j
+\sum_{d\in D}
+W_{down,d,j}
+\left(
+W_U[y^\*]_d
+-
+W_U[y_c]_d
+\right)
+$$
+
+Phase 787 的因果干预是：
+
+1. sufficiency test（充分性测试）：在 baseline prompt（基线提示）中，把 top source units（高贡献来源单元）替换成 donor prompt（供体提示）的对应来源激活。
+2. necessity test（必要性测试）：在 donor prompt 中，把 top source units 替换回 baseline 的对应来源激活。
+3. random control（随机对照）：用相同数量的随机 head/channel 替换 baseline，比较 top 与 random 的差异。
+
+关键判据不是单看是否立刻 top1 修复，而是同时看：
+
+$$
+\Delta \text{margin}(U^{top})
+>
+\Delta \text{margin}(U^{random})
+$$
+
+以及：
+
+$$
+\text{loss}(U^{top}\leftarrow baseline)
+>
+\text{loss}(U^{random}\leftarrow baseline)
+$$
+
+### 三、执行情况
+
+本阶段按 qwen3、GLM4、DS7B 顺序执行，未使用量化；优先尝试 flash attention（闪存注意力），环境未安装 FlashAttention2，自动回落到 sdpa（缩放点积注意力）。三模型均完成 main round（主测试轮）。
+
+```text
+qwen3：6 cases，2 routes，252 rows，sdpa
+GLM4：6 cases，2 routes，216 rows，sdpa
+DS7B：6 cases，2 routes，216 rows，sdpa
+```
+
+confirm dry-run（确认轮试运行）显示三模型仍只有 6 个可用 case，和 main round 是同一批样本；只会把 MLP source set size（多层感知机来源集合大小）从 32 改为 48，不能形成独立数据确认。因此本轮跳过确认轮，避免把同样样本上的预算变化误判为独立验证。
+
+### 四、主要客观结果
+
+#### 1. top source units 明显强于 random control
+
+qwen3：
+
+```text
+attention positive：top delta=2.1042，random delta=0.0208，strict gain=0.0556
+attention negative：top delta=1.6111，random delta=0.0347，strict gain=0.0000
+MLP positive：top delta=1.8177，random delta=-0.0104，strict gain=0.0833
+MLP negative：top delta=0.4010，random delta=-0.0052，strict gain=0.0417
+```
+
+GLM4：
+
+```text
+attention positive：top delta=0.4844，random delta=0.0052，strict gain=0.1667
+attention negative：top delta=0.4583，random delta=-0.0260，strict gain=0.1667
+MLP positive：top delta=0.2630，random delta=-0.0026，strict gain=0.0417
+MLP negative：top delta=0.0078，random delta=0.0000，strict gain=0.0000
+```
+
+DS7B：
+
+```text
+attention positive：top delta=1.6285，random delta=0.0176，strict gain=0.0556
+attention negative：top delta=1.4674，random delta=0.1071，strict gain=0.0556
+MLP positive：top delta=1.4896，random delta=0.0310，strict gain=0.0000
+MLP negative：top delta=0.2640，random delta=0.0228，strict gain=0.0000
+```
+
+这说明 Phase 786 的来源单元排序不是纯统计幻觉：top source units（高贡献来源单元）在三模型上均比 random source units（随机来源单元）产生更大的 margin 变化。
+
+#### 2. 严格 top1 修复率仍然较低
+
+尽管 top source units 能稳定推动 margin（间隔），但 strict open rate（严格打开率）仍低：
+
+```text
+qwen3：top patch strict gain 约 0.0000 到 0.0833
+GLM4：top patch strict gain 约 0.0000 到 0.1667
+DS7B：top patch strict gain 约 0.0000 到 0.0556
+```
+
+这说明单个 component（组件）内的一组 top head/channel 通常不是完整闭合机制，只是完整生成路线中的局部因果来源。
+
+#### 3. necessity test 显示部分来源单元有必要性
+
+把 donor prompt 中的 top source units 替换回 baseline 后：
+
+```text
+qwen3：MLP positive / negative strict loss 均约 0.125；attention loss 约 0.0556
+GLM4：attention positive / negative loss 约 0.1667；MLP positive loss 约 0.125
+DS7B：attention negative loss 约 0.2778；attention positive loss 约 0.2222；MLP positive loss 约 0.2778
+```
+
+这说明 top source units 不只是能轻微推动 margin，也确实在部分样本中承载必要条件。
+
+#### 4. 跨模型结构差异明显
+
+qwen3 更偏向 late-layer（后层）attention / MLP：
+
+```text
+attn:L31/L34/L35
+mlp:L34/L35
+```
+
+GLM4 的有效 attention source 主要集中在：
+
+```text
+attn:L33
+```
+
+MLP 主要集中在：
+
+```text
+mlp:L38
+```
+
+DS7B 的有效 attention source 更偏中后层：
+
+```text
+attn:L19/L26/L27
+```
+
+MLP 主要集中在：
+
+```text
+mlp:L26/L27
+```
+
+这与前面“当前模型为小模型，结构可能偏斜”的提醒一致：不能直接把具体层号当作大型模型通用规律，但可以把“top source units 强于 random units”作为更稳的机制拼图。
+
+### 五、对 Phase 786 附件判断的审视
+
+附件认为 Phase 786 是从 signed residual subspace（带符号残差子空间）进入 source unit（来源单元）的自然下钻，这个判断正确。
+
+需要修正和收紧的是：
+
+```text
+Phase 786 不能证明完整 causal fiber（因果纤维）。
+Phase 787 证明了 source units 存在局部因果效应。
+但 Phase 787 仍没有证明这些 source units 足以完成完整生成闭合。
+```
+
+因此当前更准确的表述是：
+
+```text
+语言机制不是单 head / 单 channel；
+也不是纯 residual direction（残差方向）；
+而是多个 source units 通过 signed residual subspace 共同形成的条件化生成路线。
+```
+
+### 六、问题、硬伤和瓶颈
+
+1. 样本量仍然偏小。本轮每模型只有 6 个 case，虽然跨模型一致性增强了可信度，但不能得出强普遍结论。
+2. random control 只匹配了 unit count（单元数量），没有严格匹配 activation norm（激活范数）、layer distribution（层分布）、source score distribution（来源得分分布）。
+3. 本轮只在 answer-site（答案位置）patch `o_proj` 输入 head slice 和 `down_proj` 输入 activation channel，没有追踪 Q/K/V、上游 token、跨位置传播。
+4. MLP activation channel 比 residual channel 更接近 neuron-level（神经元级），但仍不是生物神经元，也不是完整稀疏特征。
+5. negative subspace（负子空间）的解释需要谨慎：部分 negative source patch 反而会提升 target margin，说明“负”可能是相对于当前 readout direction 的局部符号，而不是简单的语义抑制器。
+6. DS7B target rank 很高，说明它在部分 prompt 上仍被 format / explanation route（格式/解释路线）严重干扰；对 DS7B 的结论尤其要考虑小模型结构偏差。
+
+### 七、当前核心拼图更新
+
+当前新增拼图：
+
+```text
+source-unit causal edge（来源单元因果边）开始成立。
+```
+
+更完整的链条变为：
+
+```text
+prompt context（提示上下文）
+-> source unit activation difference（来源单元激活差异）
+-> signed residual subspace（带符号残差子空间）
+-> readout margin shift（读出间隔变化）
+-> token0 competition（首词元竞争）
+```
+
+本阶段最重要的进展不是 strict open rate，而是：
+
+```text
+top source units 的 margin effect 稳定大于 random source units。
+```
+
+这说明当前研究不是单纯 patch fitting（补丁拟合），而是在提升解释力：它把“组件级路线”进一步拆成了可干预的 head/channel 来源。
+
+但它还没有到完整语言编码机制，因为：
+
+```text
+source unit -> signed subspace 已验证局部因果；
+signed subspace -> complete generation closure 仍未闭合。
+```
+
+### 八、数学公式更新
+
+当前理论对象可以写成：
+
+$$
+x_t
+\xrightarrow{\text{context}}
+\phi_{l,u}(x_t)
+\xrightarrow{\Delta}
+\Delta \phi_{l,u}
+\xrightarrow{P_{l,u}}
+\Delta h_{l}
+\xrightarrow{W_U}
+\Delta m(y^\*,y_c)
+$$
+
+其中：
+
+```text
+phi_l,u：第 l 层第 u 个来源单元激活
+P_l,u：来源单元到 residual output（残差输出）的投影
+Delta m：正确词元相对竞争词元的 margin 变化
+```
+
+来源单元贡献：
+
+$$
+\Delta m_{l,u}
+=
+\left(
+P_{l,u}\Delta \phi_{l,u}
+\right)
+\cdot
+\left(
+W_U[y^\*]
+-
+W_U[y_c]
+\right)
+$$
+
+top 与 random 的因果判据：
+
+$$
+E[
+\Delta m(U^{top})
+-
+\Delta m(U^{random})
+]
+>
+0
+$$
+
+必要性判据：
+
+$$
+\Delta m(
+x^{donor};
+U^{top}\leftarrow U^{baseline}
+)
+<
+\Delta m(x^{donor})
+$$
+
+当前实验支持这两个判据的弱版本：margin 层面成立，strict top1 层面只部分成立。
+
+### 九、智能理论洞察
+
+这一步对智能理论的启发是：语言能力背后的编码机制不太像静态语义节点图谱，而更像条件化路线系统。
+
+更接近当前证据的说法是：
+
+```text
+概念不是一个固定向量；
+概念是在上下文中激活的一组来源单元，
+这些来源单元通过复用投影进入带符号残差子空间，
+最后在读出端形成 token competition（词元竞争）。
+```
+
+因此，破解语言编码机制的第一性原理不应是“找苹果节点”，而应是：
+
+```text
+找同一语义任务在不同上下文下复用哪些 source units；
+找不同语义任务之间差分替换哪些 source units；
+找这些 source units 如何共同形成稳定 readout margin。
+```
+
+这就是 reuse-difference mechanism（复用差分机制）在 source-unit 层面的更具体版本。
+
+### 十、下一阶段方案
+
+下一阶段仍属于同一阶段目标：从 source-unit causal edge（来源单元因果边）走向 fiber-level causal graph（纤维级因果图）。
+
+建议：
+
+```text
+Phase 788: Matched Source Unit Causal Fiber Validation
+（匹配来源单元因果纤维验证）
+```
+
+核心任务：
+
+1. 对 top source units 建立 matched controls（匹配对照），匹配 layer、activation norm、source score magnitude、unit count。
+2. 同时做 source-unit patch、ablation、swap 三种干预，避免只看 donor-to-baseline 的单向修复。
+3. 把 answer-site source units 继续向上游追踪到 source token、Q/K/V、MLP input，区分“生成来源”和“读出来源”。
+4. 对 positive / negative source units 分开建立 causal edge table（因果边表）。
+5. 输出可以被 3D atlas viewer（图谱可视化客户端）加载的 graph json，节点包括 component、source unit、subspace、readout token，边包括 patch effect、ablation loss、random-control gap。
+
+阶段性判据：
+
+$$
+\text{effect}(U^{top})
+-
+\text{effect}(U^{matched})
+>
+0
+$$
+
+并且：
+
+$$
+\text{patch gain}
+\land
+\text{ablation loss}
+\land
+\text{cross-case stability}
+$$
+
+三者同时成立，才能把 source unit（来源单元）升级为 causal fiber node（因果纤维节点）。
+
+本轮不继续自动启动 Phase 788。原因是 Phase 788 需要引入 matched controls（匹配对照）和 atlas graph export（图谱导出）两个新评价口径；如果继续沿用当前 random control，容易高估 top source units 的因果专属性。
+
+## Phase 788: matched source unit causal fiber validation（匹配来源单元因果纤维验证） [2026-06-30 08:19]
+
+### 一、阶段目标
+
+本阶段分析了上传的 Phase 786 判断。附件的核心判断基本正确：Phase 786 的 source-unit attribution audit（来源单元归因审计）方向正确，但证据层级只能限定为“归因审计 + 弱因果线索”，不能直接证明 causal fiber（因果纤维）已经闭合。
+
+Phase 787 已经证明 top source units（高贡献来源单元）相对 random controls（随机对照）有更强 margin effect（边际效应）。但 random controls 太弱，容易把“活跃单元”误判为“专属因果单元”。所以 Phase 788 的目标是增加 matched controls（匹配对照）：
+
+```text
+问题不再是：
+top source units 是否强于 random source units
+
+而是：
+top source units 是否强于同层、同组件、相近激活规模和相近来源强度的 matched source units
+```
+
+只有通过这个测试，source unit（来源单元）才有资格从 attribution candidate（归因候选）升级为更接近 causal fiber node（因果纤维节点）的对象。
+
+### 二、测试脚本和数据
+
+新增脚本：
+
+```text
+tests/glm5/phase788_matched_source_unit_causal_fiber_validation.py
+tests/glm5/run_phase788_matched_source_unit_causal_fiber_validation_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase788_matched_source_unit_causal_fiber_validation/main/
+tests/result/phase788_matched_source_unit_causal_fiber_validation/main/
+```
+
+主要输出：
+
+```text
+phase788_cross_model_summary.json
+phase788_cross_model_summary.md
+phase788_atlas_graph.json
+```
+
+`phase788_atlas_graph.json` 已符合 `atlas_graph_v1` 格式，主测试图谱包含 31 个节点、27 条边。
+
+本轮模型测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+本轮没有使用量化。脚本优先尝试 FlashAttention2，但当前环境不可用，因此自动回退到 `sdpa`。三模型均完成 bf16 测试。
+
+主测试规模：
+
+```text
+qwen3: 6 cases, 2 routes, 420 rows
+GLM4: 6 cases, 2 routes, 360 rows
+DS7B: 6 cases, 2 routes, 360 rows
+```
+
+confirm dry-run（确认轮预演）显示仍然是每模型 6 个 case，不能提供明显独立增量，因此本轮没有继续跑确认轮。这个决定是为了避免重复消耗显存和时间，同时避免把重复样本误当作强验证。
+
+### 三、测试原理
+
+Phase 785 定义了 signed subspace（带符号子空间）：
+
+$$
+D^{+}=\{i:\Delta z_i>0\}
+$$
+
+$$
+D^{-}=\{i:\Delta z_i<0\}
+$$
+
+其中 $\Delta z_i$ 表示 donor route（供体路线）相对 baseline route（基线路线）在输出维度上的差分贡献。
+
+Phase 786 把输出维度贡献反投影到 source unit（来源单元）。对单个来源单元 $u$，定义近似来源贡献：
+
+$$
+s_u^{\pm}
+=
+\sum_{i\in D^{\pm}}
+\Delta a_u \cdot W_{u,i}
+$$
+
+其中 $a_u$ 是 answer-site（答案位置）处的来源激活，$W_{u,i}$ 是从来源单元到输出子空间的投影权重。
+
+Phase 788 在此基础上加入 matched control（匹配对照）。对每个 top unit（高贡献单元）集合 $U^{top}$，在同一模型、同一层、同一组件类型内部寻找 $U^{matched}$：
+
+$$
+U^{matched}
+=
+\arg\min_{U}
+\left[
+\alpha |\|s_U\|-\|s_{top}\||
++\beta |\|\Delta a_U\|-\|\Delta a_{top}\||
++\gamma |\|a_U^{base}\|-\|a_{top}^{base}\||
+\right]
+$$
+
+这里匹配的是：
+
+```text
+1. source score magnitude（来源分数规模）
+2. donor-baseline activation delta norm（供体-基线激活差分范数）
+3. baseline activation norm（基线激活范数）
+4. same layer and same component kind（同层同组件）
+```
+
+然后比较三类集合：
+
+```text
+top source units
+matched source units
+random source units
+```
+
+核心 patch effect（修补效应）：
+
+$$
+E_{patch}(U)
+=
+m(x^{base}; U \leftarrow U^{donor})
+-
+m(x^{base})
+$$
+
+其中 $m$ 是 correct target（正确目标）的 logit margin（对数几率边际）。
+
+核心 specificity score（专属性分数）：
+
+$$
+S_{spec}
+=
+E_{patch}(U^{top})
+-
+E_{patch}(U^{matched})
+$$
+
+如果 $S_{spec}>0$，说明 top unit 的效果不能完全用“同层同规模活跃单元”解释。
+
+必要性测试使用 replacement loss（替换损失）：
+
+$$
+E_{replace}(U)
+=
+m(x^{donor}; U \leftarrow U^{base})
+-
+m(x^{donor})
+$$
+
+若 $E_{replace}(U^{top})$ 明显更负，说明这些 top units 对 donor route（供体路线）更必要。
+
+### 四、客观结果
+
+#### 1. attention source units（注意力来源单元）
+
+三模型中，attention head set（注意力头集合）的 top-minus-matched gap（高贡献集合减匹配集合差值）整体稳定为正。
+
+patch baseline from donor source units（从供体修补基线来源单元）：
+
+```text
+DS7B positive attention: top +1.6285, matched +0.0642, gap +1.5642
+DS7B negative attention: top +1.4674, matched +0.1178, gap +1.3496
+
+GLM4 positive attention: top +0.4844, matched -0.0208, gap +0.5052
+GLM4 negative attention: top +0.4583, matched -0.0208, gap +0.4792
+
+qwen3 positive attention: top +2.1042, matched -0.0833, gap +2.1875
+qwen3 negative attention: top +1.6111, matched +0.2292, gap +1.3819
+```
+
+replacement donor with baseline source units（用基线来源单元替换供体来源单元）也支持同一方向：
+
+```text
+DS7B positive attention: top -1.5456, matched -0.0391
+DS7B negative attention: top -1.3381, matched -0.1519
+
+GLM4 positive attention: top -0.5365, matched +0.0312
+GLM4 negative attention: top -0.4896, matched +0.0260
+
+qwen3 positive attention: top -1.9132, matched -0.0208
+qwen3 negative attention: top -1.3889, matched -0.2500
+```
+
+这说明 attention source units 不是只比 random controls 强，而是在同层同规模匹配对照下仍有较强专属性。
+
+#### 2. positive MLP source units（正向多层感知机来源单元）
+
+positive MLP channel set（正向多层感知机通道集合）也有正结果，但弱于 attention source units。
+
+```text
+DS7B positive MLP: top +1.4896, matched +0.1313, gap +1.3583
+GLM4 positive MLP: top +0.2630, matched +0.0495, gap +0.2135
+qwen3 positive MLP: top +1.8177, matched +0.0365, gap +1.7812
+```
+
+replacement loss（替换损失）同样大体支持：
+
+```text
+DS7B positive MLP: top -1.3016, matched -0.1072
+GLM4 positive MLP: top -0.2760, matched -0.0495
+qwen3 positive MLP: top -1.5625, matched +0.0833
+```
+
+这说明 positive MLP units（正向多层感知机单元）存在可重复的来源贡献，但当前证据仍主要是 answer-site activation channel（答案位置激活通道）层面的局部因果，不应直接解释成完整语义神经元。
+
+#### 3. negative MLP source units（负向多层感知机来源单元）
+
+negative MLP channel set（负向多层感知机通道集合）没有稳定通过 matched control。
+
+```text
+DS7B negative MLP: top +0.2640, matched +0.6338, gap -0.3698
+GLM4 negative MLP: top +0.0078, matched +0.0365, gap -0.0286
+qwen3 negative MLP: top +0.4010, matched +0.4479, gap -0.0469
+```
+
+replacement loss 也不稳定：
+
+```text
+DS7B negative MLP: top -0.2552, matched -0.5200
+GLM4 negative MLP: top +0.0078, matched -0.0312
+qwen3 negative MLP: top -0.1849, matched -0.2604
+```
+
+所以 negative MLP source units 暂时不能升级为稳定 causal fiber node（因果纤维节点）。更谨慎的说法是：负向 MLP 子空间可能更分布式、更容易被同层相似激活通道替代，或者当前 matching metric（匹配指标）还没有捕获真正的负向来源结构。
+
+#### 4. strict top1（严格第一名）仍然弱
+
+虽然 margin effect（边际效应）明显，但 strict top1 gain（严格第一名增益）仍然偏低：
+
+```text
+attention top strict gain 约 0.0556 到 0.1667
+positive MLP top strict gain 约 0.0417 到 0.0833
+negative MLP top strict gain 接近 0
+```
+
+因此，本阶段不能说已经完成 generation closure（生成闭合）。最稳妥的结论是：
+
+```text
+top source units 对 readout margin 有专属性因果影响；
+但它们还不足以稳定完成自然生成闭合。
+```
+
+### 五、对附件内容的审视
+
+附件认为 Phase 786 的证据层级必须收紧为 source-unit attribution audit（来源单元归因审计），这个判断正确。
+
+附件认为下一步必须使用 matched controls（匹配对照）而不能继续只使用 random controls（随机对照），这个判断也正确。本轮结果证明，这个收紧是必要的：
+
+```text
+attention source units:
+通过 matched control 后仍保留明显专属性
+
+positive MLP source units:
+部分通过 matched control
+
+negative MLP source units:
+没有稳定通过 matched control
+```
+
+这比 Phase 787 更客观，因为它排除了一个关键混淆：
+
+```text
+top units 强，可能只是因为它们更活跃或更接近高范数来源；
+不一定因为它们具有专属因果角色。
+```
+
+Phase 788 的结果显示，attention source units 和 positive MLP source units 不能完全被这个混淆解释。
+
+### 六、问题、硬伤和瓶颈
+
+1. matched controls 仍然是近似匹配。
+
+当前匹配了 layer、component kind、source score magnitude、activation delta norm、baseline activation norm，但没有匹配：
+
+```text
+source token position
+Q/K/V path
+attention pattern
+upstream component history
+full activation distribution
+```
+
+所以它不能证明完整 causal fiber（因果纤维）。
+
+2. MLP matched distance（多层感知机匹配距离）偏大。
+
+MLP 通道的 matched distance 很高，说明 MLP activation channel（多层感知机激活通道）呈现强稀疏、强长尾、强局部非线性。匹配困难本身就是一个重要现象：MLP 来源结构可能不像 attention head 那样容易用低维组件解释。
+
+3. answer-site source unit（答案位置来源单元）不等于完整语言路线。
+
+当前 patch 的位置仍然主要是 answer-site。它能说明读出端来源单元的因果作用，但不能说明信息如何从 source token（来源词元）经过 Q/K/V、attention mixing（注意力混合）、MLP rewrite（多层感知机重写）传到答案位置。
+
+4. strict top1 仍弱。
+
+margin 改变明显，但自然生成闭合不足。这说明 token0 closure（首词元闭合）还受 readout competition（读出竞争）、format route（格式路线）、surface form（表面形式）等因素影响。
+
+5. 小模型偏差必须保留。
+
+当前 qwen3、GLM4、DS7B 都是小模型或小规模蒸馏模型。小模型可能把本应分散的功能压缩到更少层、更少 head、更少 MLP channel 中，也可能产生更强的格式偏置。因此，当前结论更适合称为“小模型中的可观察机制图谱”，不能直接外推为大模型或人脑的完整结构。
+
+### 七、核心拼图更新
+
+当前新增拼图是：
+
+```text
+source unit specificity under matched control
+（匹配对照下的来源单元专属性）
+```
+
+它补上了 Phase 787 的一个关键缺口：
+
+```text
+Phase 787:
+top source units > random source units
+
+Phase 788:
+top source units > matched source units
+```
+
+但这个拼图不是完整闭合，只是把 source unit（来源单元）从“可疑候选”推进到“局部因果候选”。
+
+当前较稳定链条为：
+
+```text
+surface route localization
+-> signed residual subspace
+-> source-unit attribution
+-> source-unit causal patch
+-> matched-control specificity
+```
+
+这条链条说明语言机制图谱不应从静态 semantic node（语义节点）开始，而应从 context-conditioned causal route（上下文化因果路线）开始。
+
+### 八、理论和数学公式更新
+
+当前最接近证据的理论仍然是：
+
+```text
+条件化相对状态 - 生成场闭合理论
+```
+
+但 Phase 788 进一步把其中的 route unit（路线单元）收紧为 matched-control validated source unit（通过匹配对照验证的来源单元）。
+
+整体状态演化可以写成：
+
+$$
+h_{l+1,t}
+=
+h_{l,t}
++A_l(h_{\le t})
++M_l(h_{l,t})
+$$
+
+其中 $A_l$ 表示 attention route（注意力路线），$M_l$ 表示 MLP rewrite（多层感知机重写）。
+
+上下文化相对状态：
+
+$$
+r_{l,t}
+=
+h_{l,t}
+-
+\mathbb{E}[h_{l,t}\mid C_{base}]
+$$
+
+带符号读出子空间：
+
+$$
+D^{+},D^{-}
+=
+\operatorname{split}_{sign}
+\left(
+W_{out}^{target}
+-
+W_{out}^{competitor}
+\right)
+$$
+
+来源单元贡献：
+
+$$
+s_u^{\pm}
+=
+\langle
+\Delta a_u W_u,
+D^{\pm}
+\rangle
+$$
+
+匹配对照专属性：
+
+$$
+S_{spec}(U)
+=
+\left[
+m(x^{base};U^{top}\leftarrow U^{donor})
+-
+m(x^{base})
+\right]
+-
+\left[
+m(x^{base};U^{matched}\leftarrow U^{donor})
+-
+m(x^{base})
+\right]
+$$
+
+如果：
+
+$$
+S_{spec}(U)>0
+$$
+
+并且：
+
+$$
+m(x^{donor};U^{top}\leftarrow U^{base})
+<
+m(x^{donor};U^{matched}\leftarrow U^{base})
+$$
+
+则该来源单元集合可以被标记为：
+
+```text
+matched-control causal source candidate
+（匹配对照因果来源候选）
+```
+
+还不能标记为完整 causal fiber node（因果纤维节点），因为缺少上游路径闭合。
+
+### 九、智能理论洞察
+
+本阶段最重要的洞察不是“找到了某个神经元代表苹果”，而是：
+
+```text
+语言编码机制里的可解释单元，可能不是静态语义单元，
+而是条件化路线中的可替换来源单元。
+```
+
+attention source units 更像 route carrier（路线承载器），在 matched control 下仍然保留专属性。
+
+positive MLP source units 更像 rewrite contributor（重写贡献器），有部分专属性。
+
+negative MLP source units 暂时更像 distributed suppressive field（分布式抑制场），还不能定位成稳定单元。
+
+这说明破解语言编码机制的第一性原理，应从以下问题开始：
+
+```text
+同一任务中，哪些来源单元被稳定复用？
+不同任务之间，哪些来源单元发生差分替换？
+这些来源单元如何通过 attention / MLP 路线进入读出竞争？
+哪些来源单元只是局部 margin 修复，哪些能完成生成闭合？
+```
+
+### 十、下一阶段方案
+
+Phase 788 已完成当前阶段目标：把 Phase 786/787 的 source-unit result（来源单元结果）从 random control 提升到 matched control。
+
+下一阶段不应继续简单增加 source set size（来源集合大小），而应进入上游纤维追踪：
+
+```text
+Phase 789: upstream Q/K/V and source-token causal fiber trace
+（上游 Q/K/V 与来源词元因果纤维追踪）
+```
+
+核心任务：
+
+1. 对 Phase 788 通过 matched control 的 attention source units，追踪其 Q/K/V 来源。
+2. 区分 source token（来源词元）、answer token（答案词元）和 format token（格式词元）的贡献。
+3. 对 attention head 内部进一步拆分：
+
+```text
+Q path: 谁在查询
+K path: 谁被匹配
+V path: 什么值被搬运
+O path: 搬运后如何写入残差
+```
+
+4. 对 positive MLP units 做 activation predecessor audit（激活前驱审计），判断它们是语义重写、格式重写，还是读出放大。
+5. 对 negative MLP units 先不升级为因果节点，而是作为 distributed suppressive field（分布式抑制场）继续观察。
+6. 输出更完整的 atlas graph：
+
+```text
+source token
+-> Q/K/V source unit
+-> attention / MLP component
+-> signed subspace
+-> readout margin
+-> token0 closure
+```
+
+阶段性判据：
+
+$$
+E_{path}(Q,K,V,O)
+>
+E_{matched}(Q,K,V,O)
+$$
+
+并且：
+
+$$
+\text{source-token specificity}
+\land
+\text{component specificity}
+\land
+\text{readout specificity}
+\land
+\text{generation closure}
+$$
+
+同时成立时，才能把当前 source unit candidate（来源单元候选）升级为 causal fiber node（因果纤维节点）。
+
+本轮不继续自动启动 Phase 789。原因是 Phase 789 已经从 answer-site source unit matched validation（答案位置来源单元匹配验证）进入 Q/K/V upstream path tracing（上游路径追踪），属于同一大研究方向，但不是同一个窄阶段目标。继续前需要先实现新的路径级采样和对照口径，否则容易把 answer-site 因果效应误认为完整语言编码路径。
+
+## Phase 789: Phase 755 条件化相对状态分解公式复盘 [2026-06-30 08:35]
+
+### 一、任务
+
+本阶段没有进行新的模型测试，而是回看：
+
+```text
+Phase 719 条件化相对状态—生成场闭合理论
+Phase 746 自回归训练—条件化相对状态—生成场闭合理论整合
+Phase 747 预测充分状态不变量整合
+Phase 755 跨语义域路线不变量图谱第一版
+Phase 772 matched component discovery scan
+Phase 788 matched source unit causal fiber validation
+```
+
+目标是回答：
+
+```text
+1. Phase 755 中使用的条件化相对状态分解，详细计算步骤是什么？
+2. 这个公式在深度神经网络中是否有效？
+3. 公式是否正确？
+4. 后续如何改进？
+5. 改进后的效果在哪些方面超过原公式？
+```
+
+### 二、Phase 755 与条件化相对状态的关系
+
+Phase 755 本身不是第一次提出条件化相对状态公式。公式源头主要在 Phase 719，随后在 Phase 746 / 747 被收紧。Phase 755 的作用是把这个理论落到跨语义域图谱测试：
+
+```text
+fruit, animal, plant, object, tool, abstract
+```
+
+并测试固定 head/source path 是否在不同语义域中复用。
+
+Phase 755 的核心对象不是静态语义向量，而是：
+
+```text
+domain facts
+-> records_all / target_record_line / target_value_tokens
+-> attention head source contribution
+-> target logit support
+-> route competition change
+```
+
+所以 Phase 755 验证的是“跨域 route competition skeleton（路线竞争骨架）候选”，不是完整语言数学结构闭合。
+
+### 三、条件化相对状态分解的详细计算步骤
+
+早期理论把某一层某一位置的 hidden state 写成：
+
+```text
+h_l(o,r,v,k,p)
+=
+S_l
++ K_l(k)
++ P_l(p)
++ R_l(r)
++ O_l(o)
++ V_l(v)
++ B_l(o,r,v)
++ I_l(o,r,v,k,p)
++ eps_l
+```
+
+其中：
+
+```text
+S_l = 层级共享基底
+K_l(k) = 任务 / prompt / 模板类型条件
+P_l(p) = 位置条件
+R_l(r) = 关系条件，例如 category / color / taste
+O_l(o) = 对象条件，例如 apple / rose / hammer
+V_l(v) = 候选值条件，例如 fruit / red / tool
+B_l(o,r,v) = 对象-关系-值绑定项
+I_l(o,r,v,k,p) = 更高阶交互项
+eps_l = 未解释残差
+```
+
+可操作的计算步骤不是直接把这些变量从模型中解析出来，而是用对照样本近似估计：
+
+1. 先构造一组只改变一个条件的 paired prompts。
+
+```text
+同对象，不同关系；
+同关系，不同对象；
+同对象同关系，不同候选值；
+同事实，不同格式；
+同问题，不同答案前缀。
+```
+
+2. 对每个 prompt 前向传播，记录每层每位置 hidden state。
+
+```text
+h_l(x, p)
+```
+
+3. 用差分估计条件项。
+
+```text
+Delta_object ~= h_l(o1,r,v,k,p) - h_l(o2,r,v,k,p)
+Delta_relation ~= h_l(o,r1,v,k,p) - h_l(o,r2,v,k,p)
+Delta_format ~= h_l(o,r,v,k1,p) - h_l(o,r,v,k2,p)
+```
+
+4. 用 interaction residual 估计绑定项。
+
+```text
+B_l(o,r,v)
+~=
+h_l(o,r,v)
+- S_l
+- O_l(o)
+- R_l(r)
+- V_l(v)
+- K_l(k)
+- P_l(p)
+```
+
+5. 把差分状态投影到读出方向，观察是否支持目标 token。
+
+```text
+Delta logit(y)
+=
+W_U(y)^T Norm(h_l + Delta h)
+- W_U(y)^T Norm(h_l)
+```
+
+6. 不只看目标 token，还要看 route competition。
+
+```text
+S_R(h)
+=
+log sum_{y in V_R} exp(W_U(y)^T Norm(h))
+```
+
+其中 R 包括：
+
+```text
+target / recipient / format / echo / prose / punctuation / other_vocab
+```
+
+7. 最后用 intervention 验证差分不是静态相关。
+
+Phase 755 的具体实现不是直接 patch 抽象项，而是对 attention source contribution 做 removal：
+
+```text
+C_g(l,h | x)
+=
+sum_{t in g} alpha_{l,h}(p,t | x) * V_{l,h}(t | x)
+```
+
+再将该 head/source contribution 通过 O projection 写回 residual 后移除，观察：
+
+```text
+target logit drop
+margin drop
+route release
+top1 loss
+```
+
+### 四、这个公式在深度神经网络中是否有效
+
+结论需要分层：
+
+```text
+作为理论组织框架：有效。
+作为粗粒度实验设计语言：有效。
+作为精确可加分解公式：尚未证明。
+作为完整神经元级编码公式：目前不成立。
+```
+
+支持有效的证据：
+
+1. Phase 755 中 DS7B 的 L22:H24 / L22:H1 在六个语义域上出现强 source contribution effect。
+
+```text
+L22:H24 records_all:
+support rate = 0.862
+mean target drop = 0.528
+route guard rate = 0.310
+
+L22:H1 records_all:
+support rate = 0.810
+mean target drop = 0.554
+route guard rate = 0.328
+```
+
+这说明某些路线组件确实能跨 domain 影响 target readout 和 route competition。
+
+2. Phase 772 重新扫描 matched cases 后，qwen3 和 DS7B 的 scan_top_component 明显强于 same-layer control head。
+
+```text
+qwen3 scan_top_component:
+target drop = 0.600
+margin drop = 0.825
+top1 loss = 0.200
+
+qwen3 same-layer control:
+target drop = 0.037
+margin drop = -0.006
+
+DS7B scan_top_component:
+target drop = 0.512
+margin drop = 0.156
+
+DS7B same-layer control:
+target drop = 0.044
+margin drop = 0.025
+```
+
+3. Phase 788 中 source unit matched control 进一步证明 attention source units 和 positive MLP source units 不是只比 random control 强，而是在同层同组件同规模匹配对照下仍有专属性。
+
+所以，条件化相对状态分解作为“寻找路线差分和因果组件”的工具是有效的。
+
+### 五、公式是否正确
+
+最严格判断：
+
+```text
+公式方向正确，但形式过于线性、过于静态，只能作为近似分解。
+```
+
+正确之处：
+
+```text
+1. 它否定了固定概念向量直接读出的简单模型。
+2. 它强调同一个 token embedding 会被 object / relation / format / position / candidate set 条件化。
+3. 它能自然解释为什么语义 latent state 存在，但 strict token0 仍然失败。
+4. 它把语言机制从“语义点”转向“条件化路线轨迹”。
+```
+
+主要问题：
+
+```text
+1. 加法分解只是近似，Transformer 内部有 LayerNorm、attention softmax、MLP 非线性和 residual 累积，不能保证各项线性可分。
+2. S_l、O_l、R_l、V_l、B_l、I_l 不是模型内部显式变量，而是研究者定义的机制分解坐标。
+3. interaction term I_l 很大时，前面各单项解释力会下降。
+4. Phase 755 的固定 head 候选在 qwen3 / GLM4 上没有强复现，说明原公式容易把 DS7B-local route 当作通用不变量。
+5. 公式没有直接处理 output closure 的多层失败：pool、surface、token、phrase、generation。
+```
+
+因此不能说公式“严格正确”。更准确说法是：
+
+```text
+它是早期可用的机制坐标系，
+不是最终数学定律。
+```
+
+### 六、后续如何改进
+
+后续改进主要有五个方向。
+
+#### 1. 从静态状态分解升级为自回归训练闭环
+
+Phase 746 把公式接回训练目标：
+
+```text
+P_theta(x_{t+1} | x_{<=t})
+=
+softmax(W_U · Norm(h_t^L))
+
+L_t
+=
+-log P_theta(x_{t+1} | x_{<=t})
+
+dL_t / d ell(y)
+=
+P_theta(y | x_{<=t}) - 1[y = x_{t+1}]
+```
+
+改进点：
+
+```text
+原公式解释推理时状态如何分解；
+新公式解释为什么训练会塑造 writer / rewriter / suppressor / readout competition。
+```
+
+#### 2. 从 hidden-state 分解升级为预测充分等价类
+
+Phase 747 提出：
+
+```text
+H_suf(x_{<=t})
+=
+{
+  h:
+  D(P_theta(.|h), P_theta(.|x_{<=t})) < epsilon
+}
+```
+
+改进点：
+
+```text
+原公式关心 h 由哪些语义/格式项组成；
+新公式关心 h 是否足以产生正确的下一个 token 分布。
+```
+
+这比单纯状态分解更接近语言模型的真实目标。
+
+#### 3. 从单 token 胜出升级为路线级竞争场
+
+后续把 token0 closure 写成：
+
+```text
+Token0Closure
+<=>
+logit(y_target)
+- max_R max_{c in R} logit(c)
+> 0
+```
+
+其中：
+
+```text
+R in {recipient, format, echo, prose, punctuation, other}
+```
+
+改进点：
+
+```text
+原公式只解释目标语义是否被编码；
+新公式解释为什么正确语义存在时仍会输给格式、回声、散文或大小写路线。
+```
+
+#### 4. 从 Phase 755 固定候选升级为 matched component discovery
+
+Phase 772 不再沿用 Phase 755 的旧 top head，而是在 matched context 内重新扫描组件：
+
+```text
+R_atlas(x,c)
+=
+R_output(x)
+and R_fiber_balanced(x)
+and R_component_discovered(x,c)
+and R_component_causal(x,c)
+```
+
+改进点：
+
+```text
+原方法容易把历史候选组件固化；
+新方法要求组件在当前 matched cases 中重新被发现，并通过 causal removal 强于 control。
+```
+
+#### 5. 从 source attribution 升级为 matched source unit causal validation
+
+Phase 788 进一步加入 matched control：
+
+```text
+S_spec(U)
+=
+E_patch(U_top)
+- E_patch(U_matched)
+```
+
+改进点：
+
+```text
+原公式只能说明 top units 有贡献；
+新方法排除了“只是同层高激活/高范数单元”的混淆。
+```
+
+### 七、改进后在哪些方面超过原公式
+
+1. 证据更因果。
+
+原公式主要是差分解释；后续加入 source removal、patch、replacement loss、matched controls，证据从 attribution 提升到局部因果候选。
+
+2. 对失败模式解释更强。
+
+原公式难以解释“知道答案但输出格式词 / 回声词 / 大小写变体”。后续的 route competition、surface closure、token identity closure 能解释这些现象。
+
+3. 跨模型结论更谨慎。
+
+Phase 755 暴露出 DS7B 强而 qwen3 / GLM4 弱的问题。后续不再把单模型强 head 当作普适结构，而是要求 matched context 和 cross-model validation。
+
+4. 对组件准入更严格。
+
+原公式可以把 head/source path 当作路线候选；后续要求：
+
+```text
+output closure
+balanced fiber reliability
+component discovery
+component causal validation
+matched control specificity
+```
+
+5. 更接近神经网络真实计算。
+
+原公式偏线性加法。后续公式承认：
+
+```text
+attention = relation addressing + value transport
+MLP = nonlinear rewrite / boost / suppression
+residual = carrier
+unembedding = readout competition interface
+LayerNorm / softmax / MLP 使简单线性分解只能近似成立
+```
+
+### 八、最严格结论
+
+条件化相对状态分解是正确方向，但不是最终答案。
+
+它最重要的贡献是把研究从：
+
+```text
+找静态概念向量
+```
+
+推进到：
+
+```text
+找上下文条件下的路线差分、来源贡献、组件因果效应和输出闭合条件
+```
+
+它最大的硬伤是：
+
+```text
+把高度非线性的 Transformer 状态写成近似加法项，
+容易让人误以为每个理论变量都对应模型内部一个明确可分离对象。
+```
+
+目前更稳妥的理论表达应是：
+
+```text
+预测充分相对状态—路线竞争—表面形式归一化—词元身份闭合理论。
+```
+
+### 九、下一步关键任务
+
+下一步不应回到单纯改写总公式，而应把公式里的关键对象继续变成可测图谱节点：
+
+```text
+1. 测量预测充分等价类。
+2. 拆分 Q/K/V/O upstream path。
+3. 区分 source token、format token、candidate token、answer prefix token。
+4. 对 matched-control validated source units 追踪上游来源。
+5. 将 output closure 拆成 pool / surface / token / phrase / generation 多级指标。
+6. 继续扩大样本，避免小样本和单模型局部结构误导。
+```
+
+只有当：
+
+```text
+source-token specificity
+component specificity
+readout specificity
+generation closure
+matched-control specificity
+```
+
+同时成立时，才能把某个路线组件升级为更接近 causal fiber node（因果纤维节点）的对象。
+
+## Phase 790: 语言编码机制拆解为公式、图谱、闭合三目标 [2026-06-30 08:51]
+
+### 一、任务
+
+本阶段没有进行新的模型测试。原因是上传内容主要是在 Phase 788 和 Phase 789 的基础上做理论审视：
+
+```text
+Phase 788:
+matched source unit causal fiber validation
+（匹配来源单元因果纤维验证）
+
+Phase 789:
+Phase 755 条件化相对状态分解公式复盘
+```
+
+本阶段要回答两个问题：
+
+```text
+1. “完成一个类似条件化相对状态分解的公式”是否是破解语言编码机制的关键？
+2. “完成全局神经元图谱”是否是破解语言编码机制的关键？
+```
+
+结论是：这两个方向正确，但还不完整。更严格的目标应当是三件事同时成立：
+
+```text
+1. 机制公式：描述语言在网络内部如何运行。
+2. 全局图谱：定位这些机制落在哪些位置、组件、来源单元和子空间上。
+3. 生成闭合：证明这些机制足以完成 token0 / phrase / generation closure。
+```
+
+也就是：
+
+```text
+Formula + Atlas + Closure
+（公式 + 图谱 + 闭合）
+```
+
+如果缺少第三点，会出现一个严重风险：
+
+```text
+公式越来越完整；
+图谱越来越复杂；
+但仍然不能证明这些结构足以解释自然语言生成。
+```
+
+### 二、对 Phase 788 附件的判断
+
+附件对 Phase 788 的判断基本正确，而且收紧得很必要。
+
+Phase 788 的实质进展不是扩大 patch（补丁）成功率，而是把 Phase 787 的证据从：
+
+```text
+top source units > random source units
+```
+
+推进到：
+
+```text
+top source units > matched source units
+```
+
+这是一个重要证据升级。random control（随机对照）太弱，可能只说明 top units（高贡献单元）更活跃、更高范数、更靠近读出方向；matched control（匹配对照）控制了 layer（层）、component kind（组件类型）、source score magnitude（来源分数幅度）、activation delta norm（激活差分范数）、baseline activation norm（基线激活范数），更能检验专属性。
+
+当前最稳妥的 Phase 788 结论是：
+
+```text
+attention source units:
+较稳定通过 matched control
+
+positive MLP source units:
+部分通过 matched control
+
+negative MLP source units:
+没有稳定通过 matched control
+```
+
+所以现在可以说：
+
+```text
+source-unit attribution candidate
+（来源单元归因候选）
+
+已经推进到：
+
+matched-control causal source candidate
+（匹配对照因果来源候选）
+```
+
+但还不能说：
+
+```text
+complete causal fiber node
+（完整因果纤维节点）
+```
+
+原因是当前仍缺少：
+
+```text
+1. source token specificity（来源词元专属性）
+2. Q/K/V/O upstream path（上游查询 / 键 / 值 / 输出路径）
+3. cross-position transport（跨位置搬运）
+4. strict top1 closure（严格第一名闭合）
+5. phrase / generation closure（短语 / 生成闭合）
+```
+
+### 三、对 Phase 789 公式复盘的判断
+
+Phase 789 对 Phase 755 的条件化相对状态分解做了正确复盘。
+
+早期公式是：
+
+$$
+h_l(o,r,v,k,p)
+\approx
+S_l
++K_l(k)
++P_l(p)
++R_l(r)
++O_l(o)
++V_l(v)
++B_l(o,r,v)
++I_l(o,r,v,k,p)
++\epsilon_l
+$$
+
+其中：
+
+```text
+S_l: 层级共享基底
+K_l(k): 任务 / prompt / 模板条件
+P_l(p): 位置条件
+R_l(r): 关系条件
+O_l(o): 对象条件
+V_l(v): 候选值条件
+B_l(o,r,v): 对象-关系-值绑定项
+I_l(o,r,v,k,p): 高阶交互项
+epsilon_l: 未解释残差
+```
+
+这个公式方向正确，但不能当成严格数学定律。它最合适的定位是：
+
+```text
+机制坐标系；
+实验设计语言；
+差分分析框架；
+因果图谱的早期变量表。
+```
+
+它不应被理解为 Transformer 内部真的线性存放了这些可完全分离的变量。原因很明确：
+
+```text
+LayerNorm 会改变尺度；
+attention softmax 是条件化非线性寻址；
+MLP 是强非线性重写；
+residual stream 是多层叠加轨迹；
+interaction term 往往很大。
+```
+
+所以，Phase 789 的严格结论是对的：
+
+```text
+条件化相对状态分解是正确方向，
+但不是最终答案。
+```
+
+更准确的理论名称应收紧为：
+
+```text
+预测充分相对状态—路线竞争—表面形式归一化—词元身份闭合理论
+```
+
+### 四、用户提出的两个关键点是否正确
+
+用户提出：
+
+```text
+1. 完成一个类似条件化相对状态分解的公式，描述深度神经网络内部的语言运行机制。
+2. 完成全局神经元图谱，了解语言具体的编码是什么样的。
+```
+
+这两个判断方向正确，而且是当前研究的两条主轴。
+
+但必须改成更严格的三目标：
+
+```text
+1. 预测充分动态公式
+2. 全局因果纤维图谱
+3. 多级生成闭合验证
+```
+
+其中，“全局神经元图谱”也需要收紧。当前证据不支持一开始就直接做静态 neuron atlas（神经元图谱），因为语言机制不太像：
+
+```text
+某个神经元 = 某个概念
+```
+
+而更像：
+
+```text
+token position
+-> component
+-> source unit
+-> signed subspace
+-> route competition
+-> output closure
+```
+
+因此更准确的目标不是“全局神经元图谱”本身，而是：
+
+```text
+全局因果纤维图谱
+```
+
+neuron atlas（神经元图谱）应当是因果纤维图谱下钻后的最细颗粒版本，而不是第一步。
+
+### 五、改进后的完整理论框架
+
+当前最稳妥的完整理论可以写成：
+
+$$
+G_{\text{language}}
+=
+\left(
+H_{\text{suf}},
+R_{\text{cond}},
+\mathcal R_{\text{route}},
+U_{\pm,0},
+D_{\pm,0},
+E_{\text{matched}},
+R_{\text{output}}
+\right)
+$$
+
+其中：
+
+```text
+H_suf:
+预测充分状态等价类
+
+R_cond:
+条件化相对状态
+
+R_route:
+路线竞争场
+
+U_±,0:
+正 / 负 / 中性来源单元集合
+
+D_±,0:
+正 / 负 / 中性残差子空间
+
+E_matched:
+通过匹配对照验证的局部因果边
+
+R_output:
+多级输出闭合向量
+```
+
+用一句话概括：
+
+```text
+语言编码机制 =
+预测充分状态
++ 条件化相对状态
++ 路线竞争场
++ 来源单元因果边
++ 带符号残差子空间
++ 多级生成闭合
+```
+
+### 六、第一层：预测充分状态
+
+语言模型的训练目标是预测下一个 token（词元）：
+
+$$
+P_\theta(x_{t+1}\mid x_{\le t})
+=
+\operatorname{softmax}
+\left(
+W_U
+\operatorname{Norm}(h_t^L)
+\right)
+$$
+
+训练损失：
+
+$$
+\mathcal L_t
+=
+-\log
+P_\theta(x_{t+1}\mid x_{\le t})
+$$
+
+读出 logit（对数几率）的梯度：
+
+$$
+\frac{\partial \mathcal L_t}{\partial \ell(y)}
+=
+P_\theta(y\mid x_{\le t})
+-
+\mathbf 1[y=x_{t+1}]
+$$
+
+所以网络内部状态的第一标准不是“是否包含语义”，而是：
+
+```text
+是否足以产生正确的 next-token distribution
+（下一个词元分布）
+```
+
+定义预测充分等价类：
+
+$$
+H_{\text{suf}}(x_{\le t})
+=
+\left\{
+h:
+D
+\left(
+P_\theta(\cdot\mid h),
+P_\theta(\cdot\mid x_{\le t})
+\right)
+<
+\epsilon
+\right\}
+$$
+
+这个对象比静态语义向量更接近语言模型的真实目标。
+
+### 七、第二层：条件化相对状态
+
+相对状态应写成：
+
+$$
+r_{l,t}
+=
+h_{l,t}
+-
+\mathbb E
+\left[
+h_{l,t}
+\mid
+C_{\text{base}}
+\right]
+$$
+
+其中 $C_{\text{base}}$ 是基线条件。这样可以避免把 absolute hidden state（绝对隐藏状态）误认为语义本体。
+
+在研究操作上，条件化相对状态不是直接读出内部变量，而是通过 paired prompts（配对提示）估计：
+
+$$
+\Delta_{\text{object}}
+\approx
+h_l(o_1,r,v,k,p)
+-
+h_l(o_2,r,v,k,p)
+$$
+
+$$
+\Delta_{\text{relation}}
+\approx
+h_l(o,r_1,v,k,p)
+-
+h_l(o,r_2,v,k,p)
+$$
+
+$$
+\Delta_{\text{format}}
+\approx
+h_l(o,r,v,k_1,p)
+-
+h_l(o,r,v,k_2,p)
+$$
+
+这个方法有效，但必须记住它是差分近似，不是模型显式变量分解。
+
+### 八、第三层：路线竞争场
+
+定义路线集合：
+
+$$
+\mathcal R
+=
+\{
+R_{\text{value}},
+R_{\text{format}},
+R_{\text{echo}},
+R_{\text{prose}},
+R_{\text{punct}},
+R_{\text{case}},
+R_{\text{other}}
+\}
+$$
+
+每条路线的读出分数：
+
+$$
+S_R(h)
+=
+\log
+\sum_{y\in V_R}
+\exp
+\left(
+W_U[y]^T
+\operatorname{Norm}(h)
+\right)
+$$
+
+token0 closure（首词元闭合）不是目标 logit 高就够，而是：
+
+$$
+\ell(y^*)
+-
+\max_{R\ne target}
+\max_{y\in V_R}
+\ell(y)
+>
+0
+$$
+
+这能解释大量现象：
+
+```text
+模型知道目标语义；
+但 strict token 输给格式词、大小写词、回声词、解释词或标点路线。
+```
+
+### 九、第四层：带符号来源单元图谱
+
+Phase 785 到 Phase 788 已经把 signed subspace（带符号子空间）和 source unit（来源单元）联系起来。
+
+残差更新：
+
+$$
+h_{l+1,t}
+=
+h_{l,t}
++A_l(h_{\le t})
++M_l(h_{l,t})
+$$
+
+来源单元贡献链：
+
+$$
+x_t
+\xrightarrow{\text{context}}
+\phi_{l,u}(x_t)
+\xrightarrow{\Delta}
+\Delta \phi_{l,u}
+\xrightarrow{P_{l,u}}
+\Delta h_l
+\xrightarrow{W_U}
+\Delta m(y^*,y_c)
+$$
+
+来源单元边际贡献：
+
+$$
+\Delta m_{l,u}
+=
+\left(
+P_{l,u}
+\Delta \phi_{l,u}
+\right)
+\cdot
+\left(
+W_U[y^*]
+-
+W_U[y_c]
+\right)
+$$
+
+正向、负向、中性来源集合：
+
+$$
+U_+
+=
+\{(l,u):\Delta m_{l,u}>\tau_+\}
+$$
+
+$$
+U_-
+=
+\{(l,u):\Delta m_{l,u}<-\tau_-\}
+$$
+
+$$
+U_0
+=
+\{(l,u):|\Delta m_{l,u}|\le\tau_0\}
+$$
+
+Phase 788 加入的 matched specificity（匹配专属性）：
+
+$$
+S_{\text{spec}}(U)
+=
+E_{\text{patch}}(U^{top})
+-
+E_{\text{patch}}(U^{matched})
+$$
+
+其中：
+
+$$
+E_{\text{patch}}(U)
+=
+m(x^{base};U\leftarrow U^{donor})
+-
+m(x^{base})
+$$
+
+只有当：
+
+$$
+S_{\text{spec}}(U)>0
+$$
+
+并且 replacement loss（替换损失）也更强：
+
+$$
+E_{\text{replace}}(U^{top})
+<
+E_{\text{replace}}(U^{matched})
+$$
+
+才可标记为：
+
+```text
+matched-control causal source candidate
+（匹配对照因果来源候选）
+```
+
+还不能直接标记为完整 causal fiber node（因果纤维节点）。
+
+### 十、第五层：多级输出闭合
+
+当前必须把输出闭合写成向量，而不是单个 top1 指标：
+
+$$
+R_{\text{output}}(x)
+=
+\left(
+C_{\text{pool}},
+C_{\text{equiv}},
+C_{\text{surface}},
+C_{\text{token}},
+R_{\text{phrase}},
+R_{\text{gen}}
+\right)
+$$
+
+其中：
+
+$$
+C_{\text{pool}}
+=
+\mathbf 1
+\left[
+\arg\max_{v\in V_{rel}}
+\ell(v\mid x)
+=
+y^*
+\right]
+$$
+
+$$
+C_{\text{surface}}
+=
+\mathbf 1
+\left[
+\arg\max_{v\in V_{all}}
+\ell(v\mid x)
+\in
+\operatorname{Surface}(y^*)
+\right]
+$$
+
+$$
+C_{\text{token}}
+=
+\mathbf 1
+\left[
+\arg\max_{v\in V_{all}}
+\ell(v\mid x)
+=
+y^*
+\right]
+$$
+
+强闭合要求：
+
+$$
+R_{\text{strong}}
+=
+C_{\text{pool}}
+\land
+C_{\text{surface}}
+\land
+C_{\text{token}}
+\land
+R_{\text{phrase}}
+\land
+R_{\text{gen}}
+$$
+
+这正是当前研究中最薄弱但最关键的部分。
+
+### 十一、核心进展
+
+当前不是原地打转。Phase 780 到 Phase 788 的链条已经把研究从“找组件”推进到“来源单元专属性”：
+
+```text
+Phase 780:
+surface-form component localization
+
+Phase 782:
+multi-component route patch
+
+Phase 785:
+positive / negative / neutral signed subspace split
+
+Phase 786:
+head / MLP source audit
+
+Phase 787:
+top source units > random controls
+
+Phase 788:
+top source units > matched controls
+```
+
+这说明当前研究在提升解释力，而不是只做局部 patch fitting（补丁拟合）。
+
+但也必须承认：
+
+```text
+当前强证据主要集中在 answer-site readout side；
+上游 source-token -> Q/K/V/O -> answer-site 的完整路径还没有闭合；
+margin effect 强于 strict top1 / generation effect。
+```
+
+### 十二、问题和硬伤
+
+1. 条件化相对状态公式仍然是近似坐标系，不是严格可加定律。
+
+2. 全局图谱还不是神经元级全图，只是 component / source-unit / subspace 层面的局部图谱。
+
+3. Phase 788 的 source units 主要是 answer-site source units，还没有证明 source token specificity（来源词元专属性）。
+
+4. attention source units 比 MLP source units 更稳定；MLP 尤其 negative MLP 更分布式，不能轻易单元化。
+
+5. strict top1 和 generation closure 仍弱，说明读出端 margin 修复不等于完整语言生成。
+
+6. 小模型偏差必须保留。qwen3、GLM4、DS7B 可能把功能压缩到少量层和少量组件中，也可能产生更强格式偏置。因此当前结论只能称为小模型可观察机制图谱，不能直接外推为大模型或人脑完整结构。
+
+### 十三、下一阶段方案
+
+下一阶段不应继续重复理论总结，也不应只扩大 answer-site source-unit patch。最关键任务是把 Phase 788 的匹配来源单元向上游追踪。
+
+建议下一阶段：
+
+```text
+Phase 791:
+Upstream Q/K/V and Source-Token Causal Fiber Trace
+（上游 Q/K/V 与来源词元因果纤维追踪）
+```
+
+目标是把当前链条：
+
+```text
+answer-site source unit
+-> signed subspace
+-> readout margin
+```
+
+推进为：
+
+```text
+source token
+-> Q/K/V/O path
+-> attention / MLP source unit
+-> signed subspace
+-> route competition
+-> token0 / phrase / generation closure
+```
+
+测试原则：
+
+```text
+1. 只追踪 Phase 788 中通过 matched control 的 attention source units 和 positive MLP source units。
+2. 暂时降级 negative MLP source units，只作为 distributed suppressive field 观察。
+3. 对 source token、format token、candidate token、answer prefix token 分组。
+4. 拆 Q/K/V/O，不再只看 o_proj input slice。
+5. 对每条路径设置 matched path control，而不是 random path control。
+6. 输出 atlas_graph_v1，用于 3D 可视化客户端继续累积。
+```
+
+阶段性判据：
+
+$$
+E_{\text{path}}(Q,K,V,O)
+-
+E_{\text{matched-path}}(Q,K,V,O)
+>
+0
+$$
+
+同时需要：
+
+$$
+\text{source-token specificity}
+\land
+\text{component specificity}
+\land
+\text{readout specificity}
+\land
+\text{matched-control specificity}
+$$
+
+如果还想升级为完整语言编码机制，则必须再加：
+
+$$
+\text{generation closure}
+$$
+
+本轮不自动启动 Phase 791。原因是 Phase 790 完成的是理论目标拆解和公式收紧；Phase 791 需要新的路径级模型测试脚本，属于新的实验阶段。继续前必须先设计 Q/K/V/O 路径级对照和显存安全策略，避免把 answer-site 局部因果误判成完整语言编码路径。
+
+## Phase 791: upstream Q/K/V source-token causal fiber trace（上游 Q/K/V 来源词元因果纤维追踪） [2026-06-30 09:15]
+
+### 一、任务来源和判断
+
+本阶段接续 Phase 790。上传分析对 Phase 790 的判断基本正确：破解语言编码机制不能只靠一个条件化相对状态公式，也不能只靠神经元图谱，而必须形成：
+
+```text
+Formula（公式）
++ Atlas（图谱）
++ Closure（闭合）
+```
+
+三目标闭环。
+
+Phase 790 的重要修正是把研究目标从“找一个公式”或“做一个静态 neuron atlas（神经元图谱）”改为：
+
+```text
+机制公式负责描述语言状态如何形成、搬运、重写、竞争和读出；
+因果纤维图谱负责定位 token position（词元位置）、component（组件）、source unit（来源单元）、signed subspace（带符号子空间）；
+生成闭合负责证明这些结构足以完成 token0 / phrase / generation closure（首词元 / 短语 / 生成闭合）。
+```
+
+因此本阶段继续同一研究链条，启动 Phase 791。目标不是直接宣称完成语言编码机制，而是把 Phase 788 的 answer-site source unit（答案位置来源单元）进一步向上游拆成 source token（来源词元）和 Q/K/V/O path（查询 / 键 / 值 / 输出路径）的第一版可测图谱。
+
+### 二、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase791_upstream_qkv_source_token_causal_fiber_trace.py
+tests/glm5/run_phase791_upstream_qkv_source_token_causal_fiber_trace_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase791_upstream_qkv_source_token_causal_fiber_trace/
+tests/result/phase791_upstream_qkv_source_token_causal_fiber_trace/
+```
+
+本阶段按顺序测试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+全部使用 bf16（bfloat16，脑浮点十六位）加载，不使用量化。由于本阶段必须读取 attentions（注意力权重），采用 eager attention（非 flash 的显式注意力路径）；这是本阶段为了得到 Q/K proxy（查询 / 键代理信号）不得不接受的工程限制。
+
+### 三、测试原理
+
+Phase 788 已经验证：
+
+```text
+top source units（高贡献来源单元）
+>
+matched source units（匹配来源单元）
+```
+
+但 Phase 788 仍然偏 answer-site（答案位置）和 readout margin（读出边际）。本阶段把它拆成更接近路径级的四类量：
+
+1. Q/K proxy（查询 / 键代理）：用 attention mass to source group（到来源词元组的注意力质量）近似表示查询—键路径选择。
+2. V contribution（值贡献）：计算 source group 对 attention source unit 的 value contribution norm（值贡献范数）。
+3. O projection（输出投影）：把 source contribution 经过 o_proj（输出投影）映射回 residual stream（残差流），计算 direct target boost（直接目标提升）和 direct margin gain（直接边际增益）。
+4. causal removal（因果移除）：在 donor prompt（供体提示）中移除指定 source group 对指定 attention source unit 的贡献，再观察 target logit drop（目标 logit 下降）和 margin drop（边际下降）。
+
+本阶段的路径效应可写为：
+
+$$
+E_{\text{path}}
+=
+\Delta m_{\text{remove}}
++
+\lambda_a A_{\text{src}}
++
+\lambda_d D_{\text{direct}}
+$$
+
+其中：
+
+```text
+Delta m_remove：移除来源贡献后的目标相对对照边际下降；
+A_src：attention mass to source group（到来源组的注意力质量）；
+D_direct：o_proj 后对目标方向或边际方向的直接贡献；
+lambda_a / lambda_d：只作为低权重排序项，不作为理论常数。
+```
+
+匹配路径专属性为：
+
+$$
+S_{\text{matched-path}}
+=
+E_{\text{top path}}
+-
+E_{\text{matched path}}
+$$
+
+更严格地说，本阶段只能证明：
+
+$$
+\text{top source unit}
+\times
+\text{source group}
+\times
+Q/K/V/O_{\text{proxy}}
+\Rightarrow
+\text{readout-margin causal effect}
+$$
+
+不能直接证明：
+
+$$
+\text{full generation closure}
+$$
+
+### 四、测试规模
+
+冒烟测试：
+
+```text
+qwen3: 1 case, 16 rows
+GLM4: 1 case, 8 rows
+DS7B: 1 case, 16 rows
+```
+
+主测试：
+
+```text
+qwen3: 4 cases, 160 rows
+GLM4: 4 cases, 96 rows
+DS7B: 4 cases, 152 rows
+```
+
+确认测试：
+
+```text
+qwen3: 6 cases, 336 rows
+GLM4: 6 cases, 192 rows
+DS7B: 6 cases, 324 rows
+```
+
+确认测试额外加入：
+
+```text
+instruction（指令词元组）
+question（问题词元组）
+```
+
+用于检查主测试是否因为 source group（来源组）划分太窄而误判。
+
+### 五、客观结果
+
+#### 1. qwen3
+
+确认轮中，最强 matched-path specificity（匹配路径专属性）：
+
+```text
+positive candidate_tokens:
+  specificity = 2.6393
+  margin drop gap = 2.5208
+  direct gap = 6.2859
+
+positive target_value_tokens:
+  specificity = 1.5961
+  margin drop gap = 1.5677
+  direct gap = 3.5770
+
+positive all_pre_answer:
+  specificity = 1.5234
+  margin drop gap = 1.5234
+  direct gap = 1.8071
+
+negative candidate_tokens:
+  specificity = 1.4295
+  margin drop gap = 1.3958
+  direct gap = 2.3752
+```
+
+对应 top path effect（高贡献路径效应）：
+
+```text
+positive candidate_tokens:
+  path effect = 2.6609
+  mean margin drop = 2.3542
+  component = attn:L34
+
+positive all_pre_answer:
+  path effect = 2.0761
+  mean margin drop = 1.2604
+  component = attn:L34 + attn:L35
+
+negative candidate_tokens:
+  path effect = 1.9784
+  mean margin drop = 1.7708
+  component = attn:L34
+```
+
+qwen3 的结构最清楚：candidate_tokens（候选词元）和 target_value_tokens（目标值词元）都有明确 top > matched 差距，并且主要集中在 attn:L34 / attn:L35。
+
+#### 2. GLM4
+
+确认轮中，最强 matched-path specificity：
+
+```text
+negative candidate_tokens:
+  specificity = 1.3344
+  margin drop gap = 1.1198
+  direct gap = 0.9507
+
+positive candidate_tokens:
+  specificity = 1.2915
+  margin drop gap = 1.0833
+  direct gap = 0.9088
+
+negative all_pre_answer:
+  specificity = 1.1146
+  margin drop gap = 1.1146
+  direct gap = 0.9711
+
+positive all_pre_answer:
+  specificity = 1.1107
+  margin drop gap = 1.1094
+  direct gap = 0.9454
+
+negative target_value_tokens:
+  specificity = 0.9137
+```
+
+对应 top path effect：
+
+```text
+positive all_pre_answer:
+  path effect = 2.0192
+  mean margin drop = 1.0260
+  component = attn:L33
+
+negative all_pre_answer:
+  path effect = 2.0177
+  mean margin drop = 1.0260
+  component = attn:L33
+
+positive candidate_tokens:
+  path effect = 1.4521
+  mean margin drop = 1.0104
+  component = attn:L33
+```
+
+GLM4 的结果说明 candidate_tokens、target_value_tokens 和 all_pre_answer 都稳定，但更集中在 attn:L33。relation_tokens（关系词元）和 question（问题词元）效应很弱。
+
+#### 3. DS7B
+
+确认轮中，最强 matched-path specificity：
+
+```text
+positive all_pre_answer:
+  specificity = 1.4010
+  margin drop gap = 1.4010
+  direct gap = 2.0768
+
+positive instruction:
+  specificity = 1.1243
+  margin drop gap = 1.1243
+  direct gap = 0.4412
+
+negative all_pre_answer:
+  specificity = 1.0902
+  margin drop gap = 1.0902
+  direct gap = 1.2776
+
+negative instruction:
+  specificity = 0.9361
+
+positive target_value_tokens:
+  specificity = 0.2899
+
+positive candidate_tokens:
+  specificity = 0.2752
+```
+
+对应 top path effect：
+
+```text
+positive all_pre_answer:
+  path effect = 2.3688
+  mean margin drop = 1.3294
+  components = attn:L19 + attn:L26 + attn:L27
+
+negative all_pre_answer:
+  path effect = 2.2182
+  mean margin drop = 1.2294
+  components = attn:L19 + attn:L23 + attn:L26 + attn:L27
+
+positive instruction:
+  path effect = 1.5915
+  mean margin drop = 1.1478
+  components = attn:L19 + attn:L26 + attn:L27
+```
+
+DS7B 与 qwen3 / GLM4 不同：最强来源不是 candidate_tokens，而是 all_pre_answer 和 instruction。这说明 DS7B 的答题机制更依赖 prompt-level scaffold（提示级脚手架）或 instruction route（指令路线），而不是干净的值词元路径。
+
+### 六、跨模型共同现象
+
+本阶段最稳定的正结果是：
+
+```text
+top path removal 的 margin drop
+>
+matched path removal 的 margin drop
+```
+
+并且这个差距在主测试和确认测试中都存在。
+
+跨模型共同出现的强来源组：
+
+```text
+candidate_tokens
+target_value_tokens
+all_pre_answer
+```
+
+但模型间排序不同：
+
+```text
+qwen3:
+  candidate_tokens 最强，target_value_tokens 次强，all_pre_answer 稳定。
+
+GLM4:
+  all_pre_answer 与 candidate_tokens 都强，target_value_tokens 稳定。
+
+DS7B:
+  all_pre_answer 和 instruction 最强，candidate_tokens / target_value_tokens 有直接贡献但 margin closure 较弱。
+```
+
+这说明当前路径不是简单的“语义值词元直接写入答案”，而更像：
+
+```text
+source-token scaffold（来源词元脚手架）
++ candidate/value identity route（候选 / 值身份路线）
++ prompt/instruction route（提示 / 指令路线）
++ answer-site readout route（答案位置读出路线）
+```
+
+共同形成读出端边际变化。
+
+### 七、图谱输出
+
+本阶段输出 atlas_graph_v1（图谱格式第一版）：
+
+```text
+main:
+  nodes = 43
+  edges = 39
+
+confirm:
+  nodes = 55
+  edges = 51
+```
+
+这说明 Phase 791 的结果已经可以进入 3D atlas client（3D 图谱客户端）继续累计观察，但节点语义应标记为：
+
+```text
+path-level causal candidate（路径级因果候选）
+```
+
+而不能标记为：
+
+```text
+complete language encoding node（完整语言编码节点）
+```
+
+### 八、本阶段理论进展
+
+Phase 791 的主要进展是把 Phase 788 的：
+
+```text
+answer-site source unit specificity（答案位置来源单元专属性）
+```
+
+推进为：
+
+```text
+source group -> attention source unit -> O projection -> readout margin
+```
+
+的路径级证据。
+
+可以把当前公式扩展为：
+
+$$
+F_{\text{fiber}}
+=
+\left(
+p_{\text{src}},
+c_{l,h},
+QK_{\text{proxy}},
+V_{\text{src}},
+O(V_{\text{src}}),
+D_{\pm},
+\Delta m
+\right)
+$$
+
+其中：
+
+```text
+p_src：来源词元组；
+c_l,h：层 l 的 attention head / attention layer source unit；
+QK_proxy：attention mass 近似的 Q/K 路径选择；
+V_src：来源词元组的值贡献；
+O(V_src)：输出投影后的残差贡献；
+D_±：正 / 负 signed subspace（带符号子空间）；
+Delta m：目标相对竞争项的边际变化。
+```
+
+匹配因果纤维准入条件可以更新为：
+
+$$
+\text{fiber-candidate}
+\iff
+
+\left[
+\Delta m_{\text{top}}
+-
+\Delta m_{\text{matched}}
+>
+0
+\right]
+
+\land
+
+\left[
+D_{\text{direct,top}}
+-
+D_{\text{direct,matched}}
+>
+0
+\right]
+
+\land
+
+\left[
+\text{source-group specificity}
+\right]
+$$
+
+但完整语言机制节点仍需要：
+
+$$
+\text{fiber-candidate}
+\land
+\text{generation closure}
+$$
+
+也就是：
+
+$$
+\text{complete-node}
+\iff
+\text{path specificity}
+\land
+\text{matched causal effect}
+\land
+\text{token0 / phrase / generation closure}
+$$
+
+### 九、问题、硬伤和谨慎结论
+
+1. Q/K 仍只是 proxy（代理）。
+
+本阶段没有独立 patch Q 和 K，只用 attention mass 近似 Q/K 选择。因此不能说已经证明了真实 Q/K 因果路径。
+
+2. V/O 路径比 Phase 788 更清楚，但仍是 answer-site donor path（答案位置供体路径）。
+
+source group removal 证明的是 donor prompt 中某些 source group 对 answer-site source unit 的贡献重要，不等于证明自然生成时每一步都沿同一路径传播。
+
+3. strict top1 loss 仍为 0。
+
+本阶段强烈改变 margin，但没有稳定造成 top1 翻转。这说明它是 readout-margin causal path（读出边际因果路径），不是完整 closure path（闭合路径）。
+
+4. DS7B 的 instruction 路径偏强。
+
+这可能是真实机制，也可能是小模型 / 蒸馏模型的 prompt scaffold bias（提示脚手架偏置）。因此不能把 DS7B 的 instruction route 直接当成大模型通用机制。
+
+5. source group 划分仍是文本启发式。
+
+object_tokens、target_value_tokens、candidate_tokens、instruction 等分组不是模型内部天然边界，只是实验可控边界。后续需要从 token position clustering（词元位置聚类）和 causal edge consistency（因果边一致性）中让边界自然浮现。
+
+6. 当前还没有破解完整语言编码机制。
+
+本阶段证明了上游路径级因果候选存在，但没有完成 phrase / generation closure（短语 / 生成闭合）。
+
+### 十、关键洞察
+
+本阶段最重要的客观现象不是“哪个 head 最强”，而是：
+
+```text
+同一 answer-site route 的来源并不只来自目标值词元；
+它往往同时依赖 candidate/value token、all pre-answer context、instruction scaffold。
+```
+
+这提示语言编码机制可能不是静态语义节点图，而是：
+
+```text
+条件化上下文脚手架
++ 候选值池
++ 值身份锚定
++ 带符号读出子空间
++ 路线竞争场
+```
+
+共同形成的动态因果纤维。
+
+从智能理论角度看，语言能力更像：
+
+$$
+\text{Language ability}
+=
+\text{context-conditioned routing}
++
+\text{value identity binding}
++
+\text{competition suppression}
++
+\text{generation closure}
+$$
+
+中文解释：
+
+```text
+语言能力 =
+上下文条件化路由
++
+值身份绑定
++
+竞争抑制
++
+生成闭合。
+```
+
+### 十一、下一阶段任务
+
+Phase 792 应该继续同一方向，但不能简单扩大表格。下一阶段应专门验证：
+
+```text
+Q/K/V/O independent causal decomposition（Q/K/V/O 独立因果拆分）
+```
+
+具体目标：
+
+1. 分别 patch Q、K、V、O，而不是只用 attention mass 代理 Q/K。
+2. 对 source group 做 matched token-position control（匹配词元位置对照）。
+3. 检查 candidate_tokens / target_value_tokens / instruction / all_pre_answer 的路径是否可交换、可替代或互补。
+4. 增加 token0 closure 和 phrase closure（短语闭合）指标，避免只停留在 margin drop。
+5. 将 Phase 791 的 atlas_graph_v1 节点升级为：
+
+```text
+source token -> Q/K edge -> V contribution -> O projection -> signed subspace -> readout / closure
+```
+
+阶段性目标不是“更多 patch 成功”，而是判断：
+
+```text
+读出端强路径是否真的有上游 token-level causal fiber（词元级因果纤维）。
+```
+
+## Phase 792: formula-atlas isomorphism audit（公式—图谱同构审计） [2026-06-30 09:23]
+
+### 一、任务来源
+
+本阶段分析两个上传内容：
+
+```text
+1. 预测充分动态机制公式和全局因果纤维图谱是否可能重合；
+2. Phase 791 是否已经支持 source-token conditioned path-level causal candidate graph（来源词元组条件化路径级因果候选图谱）。
+```
+
+本阶段没有进行新模型测试。原因是：Phase 791 的 qwen3、GLM4、DS7B 三模型主测试和确认测试已经完成，当前上传内容主要是理论审计和框架收束；如果此时直接进入 Q/K/V/O 独立 patch（查询 / 键 / 值 / 输出独立补丁），需要新 hook 设计和独立校验，否则容易把 attention mass proxy（注意力质量代理）误写成真实 Q/K 因果路径。
+
+### 二、总体判断
+
+上传内容的大方向正确，但必须收紧措辞。
+
+正确部分是：
+
+```text
+预测充分动态机制公式
+和
+全局因果纤维图谱
+很可能不是两个互相独立的对象，
+而是同一套机制的压缩表达和展开表达。
+```
+
+更严格说：
+
+```text
+公式 = 图谱的可压缩生成规则；
+图谱 = 公式在具体模型、具体上下文中的展开实例；
+闭合 = 检验公式和图谱是否真实同构的判据。
+```
+
+但当前不能直接说：
+
+```text
+公式已经等于图谱。
+```
+
+只能说：
+
+```text
+Phase 791 已经让公式变量和图谱边开始一一对应，
+因此“公式—图谱同构”成为一个可检验假设。
+```
+
+### 三、为什么这个思路是重要进展
+
+过去容易把研究目标拆成两个分离任务：
+
+```text
+1. 写出一个统一公式；
+2. 做出一个全局神经元图谱。
+```
+
+这个拆法的问题是：
+
+```text
+公式可能空转；
+图谱可能堆积；
+二者之间没有严格互相约束。
+```
+
+Phase 791 之后，更合理的对象不是单独公式或单独图谱，而是：
+
+```text
+预测充分因果纤维场
+```
+
+它既包含机制公式，也包含可定位、可干预、可闭合的图谱边。
+
+### 四、统一对象
+
+可以把当前统一对象写成：
+
+$$
+\mathcal{G}_{\text{fiber}}
+=
+\left(
+P,
+C,
+U,
+D_{\pm,0},
+E,
+\Phi,
+R_{\text{output}}
+\right)
+$$
+
+其中：
+
+```text
+P：token position（词元位置）；
+C：component（组件）；
+U：source unit（来源单元）；
+D_±,0：positive / negative / neutral subspace（正 / 负 / 中性子空间）；
+E：matched causal edge（匹配因果边）；
+Phi：state transition rule（状态转移规则）；
+R_output：output closure vector（输出闭合向量）。
+```
+
+如果只看节点和边，它是 atlas（图谱）；如果看 Phi 如何把上下文状态映射到输出闭合，它就是 formula（公式）。
+
+### 五、当前公式应如何修正
+
+上传附件中的方向正确，但部分公式记号需要修正。例如：
+
+```text
+\mathcal{F}*{\theta}
+应写作
+\mathcal{F}_{\theta}
+
+x*{\le t}
+应写作
+x_{\le t}
+```
+
+当前更合适的状态映射是：
+
+$$
+\mathcal{F}_{\theta}:
+x_{\le t}
+\mapsto
+R_{\text{output}}(x_{\le t})
+$$
+
+展开为：
+
+$$
+x_{\le t}
+\rightarrow
+U(x)
+\rightarrow
+D_{\pm}(x)
+\rightarrow
+\mathcal{R}(x)
+\rightarrow
+R_{\text{output}}(x)
+$$
+
+其中：
+
+```text
+U(x)：上下文激活的来源单元集合；
+D_±(x)：正负残差子空间；
+R(x)：路线竞争场；
+R_output(x)：输出闭合状态。
+```
+
+Phase 791 后，路径级纤维可以写成：
+
+$$
+F_{\text{fiber}}
+=
+\left(
+p_{\text{src}},
+p_{\text{answer}},
+c_{l,h},
+QK_{\text{proxy}},
+V_{\text{src}},
+O(V_{\text{src}}),
+D_{\pm},
+\Delta m,
+\Delta C
+\right)
+$$
+
+其中：
+
+```text
+p_src：来源词元组；
+p_answer：答案位置；
+c_l,h：层 l 的 attention source unit（注意力来源单元）；
+QK_proxy：由 attention mass 近似的 Q/K 路径选择；
+V_src：来源词元组的值贡献；
+O(V_src)：输出投影后的残差贡献；
+D_±：带符号子空间；
+Delta m：读出边际变化；
+Delta C：闭合指标变化。
+```
+
+Phase 791 目前有：
+
+$$
+\Delta m
+$$
+
+但缺少强证据的：
+
+$$
+\Delta C
+$$
+
+所以它是路径级因果候选，不是完整闭合节点。
+
+### 六、公式—图谱同构的严格判据
+
+不能只凭直觉说公式和图谱重合。至少需要五个条件。
+
+#### 条件 1：公式能预测图谱边
+
+公式应能预测哪些节点和边会出现：
+
+$$
+\Phi_{\text{formula}}(x)
+\Rightarrow
+\hat{E}_{x}
+$$
+
+也就是：
+
+```text
+给定上下文 x，公式能预测可能参与的 source token、component、source unit、signed subspace 和 route competition。
+```
+
+#### 条件 2：图谱边能还原公式变量
+
+图谱中的边应能映射回公式项：
+
+$$
+e
+=
+\left(
+p,
+c,
+u,
+\sigma,
+\Delta m,
+\Delta C,
+S_{\text{spec}}
+\right)
+$$
+
+其中：
+
+```text
+p：位置；
+c：组件；
+u：来源单元；
+sigma：正负符号；
+Delta m：边际变化；
+Delta C：闭合变化；
+S_spec：匹配专属性。
+```
+
+如果一条边不能解释为公式变量，它只能是观察项，不能进入核心机制。
+
+#### 条件 3：干预图谱能改变公式预测量
+
+对图谱边做 patch / ablation（补丁 / 消融）后，公式中的预测量应按预期变化：
+
+$$
+\operatorname{Intervene}(e)
+\Rightarrow
+\Delta m
+\land
+\Delta C
+$$
+
+Phase 791 已经较好地支持：
+
+$$
+\Delta m
+$$
+
+但还没有支持完整：
+
+$$
+\Delta C
+$$
+
+#### 条件 4：公式能跨样本压缩图谱
+
+如果每个样本都需要完全不同的图谱，公式就没有真正抓住机制。需要存在：
+
+$$
+\mathcal{G}_{\text{fiber}}(x)
+=
+\mathcal{G}_{\text{shared}}
++
+\Delta \mathcal{G}(x)
+$$
+
+也就是：
+
+```text
+共享骨架 + 条件化差分。
+```
+
+当前 Phase 791 的跨模型现象已经出现这种趋势：
+
+```text
+qwen3 / GLM4：
+candidate_tokens 和 target_value_tokens 较强；
+
+DS7B：
+all_pre_answer 和 instruction 较强；
+
+共同点：
+都存在 top path > matched path 的路径专属性。
+```
+
+这说明可能存在共享机制骨架，但模型差分仍很明显。
+
+#### 条件 5：闭合必须成立
+
+最终必须证明：
+
+$$
+\operatorname{Patch}
+\left(
+\mathcal{G}_{\text{fiber}}
+\right)
+\Rightarrow
+R_{\text{strong}}
+$$
+
+其中：
+
+$$
+R_{\text{strong}}
+=
+C_{\text{pool}}
+\land
+C_{\text{surface}}
+\land
+C_{\text{token}}
+\land
+R_{\text{phrase}}
+\land
+R_{\text{gen}}
+$$
+
+这是当前最大缺口。Phase 791 仍然主要是 margin path（边际路径），不是 generation closure path（生成闭合路径）。
+
+### 七、Phase 791 对该假设的支持程度
+
+Phase 791 支持“公式—图谱可能同构”的部分是：
+
+```text
+公式中的 p_src、c_l,h、QK_proxy、V_src、O(V_src)、D_±、Delta m
+已经能对应图谱中的路径边。
+```
+
+具体客观结果：
+
+```text
+qwen3:
+  candidate_tokens 最强，target_value_tokens 次强，all_pre_answer 稳定；
+  主要集中在 attn:L34 / attn:L35。
+
+GLM4:
+  candidate_tokens、target_value_tokens、all_pre_answer 稳定；
+  主要集中在 attn:L33。
+
+DS7B:
+  all_pre_answer 和 instruction 最强；
+  candidate_tokens / target_value_tokens 有贡献，但闭合较弱。
+```
+
+这说明：
+
+```text
+同一 answer-site route 的来源不是单一语义值词元，
+而是 candidate/value token、instruction scaffold、all pre-answer context 共同形成读出端因果纤维。
+```
+
+但 Phase 791 不能证明的部分是：
+
+```text
+1. Q/K 独立因果路径；
+2. 自然 source-token 边界；
+3. phrase / generation closure；
+4. 大模型通用机制。
+```
+
+### 八、当前理论的最新表述
+
+当前最新理论可以表述为：
+
+```text
+预测充分因果纤维场理论。
+```
+
+更完整的中文表述是：
+
+```text
+语言模型在自回归训练中形成了一套预测充分因果纤维场。
+当前上下文不是被压缩成一个静态语义向量，而是激活一组条件化来源词元、组件、来源单元和带符号子空间。
+这些纤维通过 Q/K/V/O 路径进行选择、搬运、写入和读出，进入路线竞争场。
+当这些路径同时完成值池、表面形式、词元身份、短语和生成闭合时，语言输出才真正稳定。
+```
+
+数学上：
+
+$$
+R_{\text{output}}(x)
+=
+\Psi
+\left(
+\mathcal{G}_{\text{fiber}}(x)
+\right)
+$$
+
+而：
+
+$$
+\mathcal{G}_{\text{fiber}}(x)
+=
+\mathcal{G}_{\text{shared}}
++
+\Delta \mathcal{G}(x)
+$$
+
+这里的关键不是静态语义节点，而是：
+
+```text
+共享因果骨架 + 上下文条件化差分。
+```
+
+### 九、对当前研究进展的判断
+
+当前研究不是原地打转，也不只是普通 patch fitting（补丁拟合）。理由是：
+
+```text
+1. Phase 780-782 找到多组件路线；
+2. Phase 783 收紧到 answer-site readout-side route；
+3. Phase 784-785 找到有效子空间和正负子空间；
+4. Phase 786-788 找到 source-unit 层级，并通过 matched control；
+5. Phase 791 把 source unit 推进到 source group -> V/O -> margin 的路径级证据。
+```
+
+这些拼图正在从局部补丁转向机制结构。
+
+但边际收益递减风险仍然存在。如果继续只做：
+
+```text
+更多 head；
+更多 channel；
+更多 margin patch；
+更多 source group 表格；
+```
+
+就会重新陷入细节堆积。下一步必须直接检验：
+
+```text
+公式能否预测图谱边；
+图谱边能否产生闭合；
+共享骨架是否能压缩跨样本图谱。
+```
+
+### 十、小模型偏差
+
+当前结论仍然受小模型影响。
+
+可能偏差包括：
+
+```text
+1. 小模型可能把大模型中分散的机制压缩到少数层和少数 head；
+2. DS7B 作为蒸馏模型，instruction scaffold bias（指令脚手架偏置）可能被放大；
+3. 小模型 strict top1 / phrase closure 较弱，可能低估真实机制的闭合能力；
+4. 小模型也可能过度依赖候选列表和格式协议，导致语义路径看起来偏表面。
+```
+
+因此当前更准确的结论是：
+
+```text
+我们正在获得“小模型中的预测充分因果纤维场雏形”，
+还不能直接外推为所有大模型或人脑的通用结构。
+```
+
+### 十一、下一阶段任务
+
+下一阶段不应再做纯理论总结，也不应简单扩大 Phase 791 表格。应该进入：
+
+```text
+Phase 793: Q/K/V/O independent causal decomposition and closure gate
+（Q/K/V/O 独立因果拆分与闭合门验证）
+```
+
+目标是把当前：
+
+```text
+QK_proxy + V/O contribution + margin drop
+```
+
+推进为：
+
+```text
+Q causal effect
++ K causal effect
++ V causal effect
++ O causal effect
++ token0 / phrase closure
+```
+
+最低可接受判据：
+
+$$
+\Delta m_Q,
+\Delta m_K,
+\Delta m_V,
+\Delta m_O
+$$
+
+必须分开测，并且至少有一个闭合指标：
+
+$$
+\Delta C_{\text{token}}
+\quad
+\text{or}
+\quad
+\Delta R_{\text{phrase}}
+$$
+
+否则仍然只是读出边际图谱。
+
+下一阶段脚本设计必须先完成两个工程前提：
+
+```text
+1. 独立 hook q_proj / k_proj / v_proj / o_proj，并验证 shape、head split、GQA / MQA 兼容；
+2. 用 dry-run 和 smoke test 验证 qwen3、GLM4、DS7B 三模型都能稳定 patch，不发生维度错配或显存异常。
+```
+
+只有完成这些前提，才适合正式进行三模型主测试。
+
+## Phase 793: Q/K/V/O independent causal decomposition and closure gate（Q/K/V/O 独立因果拆分与闭合门验证） [2026-06-30 09:50]
+
+### 一、任务来源
+
+本阶段承接 Phase 792 的公式—图谱同构审计。附件中对 Phase 792 的判断基本正确：当前理论已经不适合继续只做局部 patch（修补）排名，而必须把条件化相对状态分解公式中的关键项，与图谱中的真实因果边逐项对齐。
+
+Phase 792 的正确部分是：
+
+```text
+1. 公式和图谱很可能不是两套东西，而是同一机制的两种投影；
+2. 当前图谱已经有 source unit、answer-site subspace、matched control 等拼图；
+3. 但 Q/K 仍然主要是 proxy（代理）证据，V/O 和 closure（闭合）也没有完全拆开；
+4. 下一步必须独立验证 Q、K、V、O 四条路径的因果贡献。
+```
+
+需要收紧的地方是：
+
+```text
+Phase 792 还不能证明公式—图谱完全同构。
+它只能说明：公式变量已经开始能映射到部分图谱边。
+如果没有独立 Q/K/V/O 拆分，以及 token0 / phrase closure（词元零位 / 短语闭合）验证，仍然不能说已经破解语言编码机制。
+```
+
+因此本阶段继续同一大阶段目标，完成 Phase 793。
+
+### 二、测试脚本和数据位置
+
+新增脚本：
+
+```text
+tests/glm5/phase793_qkvo_independent_causal_decomposition.py
+tests/glm5/run_phase793_qkvo_independent_causal_decomposition_round.sh
+```
+
+结果位置：
+
+```text
+results/glm5_phase793_qkvo_independent_causal_decomposition/
+tests/result/phase793_qkvo_independent_causal_decomposition/
+```
+
+三轮测试：
+
+```text
+smoke（冒烟测试）：1 个样本，确认脚本、hook、数据结构正常；
+main（主测试）：4 个样本，正负子空间、多个 source group；
+confirm（确认测试）：6 个样本，加入 question source group，验证重要结论。
+```
+
+三模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16，无量化；
+优先尝试 flash_attention_2；
+当前环境未安装 flash_attention_2，三模型均自动回退到 sdpa；
+所有测试完成后均释放 GPU 显存。
+```
+
+### 三、测试原理
+
+本阶段不再把一个注意力头或通道整体看成黑箱，而是把注意力路径拆成四个独立因果项：
+
+```text
+Q: answer position 的 query 形成能力；
+K: source token 被匹配为可检索对象的 key 能力；
+V: source token 携带 value 内容的能力；
+O: answer position 将 head 输出写回 residual stream（残差流）的能力。
+```
+
+具体干预方式是独立 zero-ablation（清零消融）：
+
+```text
+q_answer_zero: 在 answer position 清零 q_proj 对应 head 切片；
+k_source_zero: 在 source positions 清零 k_proj 对应 kv-head 切片；
+v_source_zero: 在 source positions 清零 v_proj 对应 kv-head 切片；
+o_answer_zero: 在 answer position 清零 o_proj 输入侧对应 head 切片。
+```
+
+这是一种 necessity-like（必要性倾向）测试：
+
+```text
+如果清零某一路径后 correct target margin（正确目标边际）下降，
+说明该路径对当前输出有贡献；
+但它不能证明该路径单独足以生成正确答案。
+```
+
+为避免把普通扰动误判为机制边，本阶段继续使用 top vs matched control（最高候选与匹配对照）：
+
+```text
+top: Phase 780/788/791 中排名靠前的候选头或路径；
+matched: 同层、同类型、相近结构但非 top 的匹配对照。
+```
+
+核心指标：
+
+```text
+margin_drop: 干预前后 correct target 对 contrast target 的 logit margin 下降；
+target_logit_drop: correct target logit 下降；
+rank_worse_rate: correct target 排名变差比例；
+token_top1_loss_rate: correct target 从 top1 掉出的比例；
+matched_specificity_score: top 相对 matched 的特异性得分。
+```
+
+### 四、核心公式
+
+令干预前的正确目标边际为：
+
+$$
+m(x)=z_{y^\*}(x)-z_{y^-}(x)
+$$
+
+其中：
+
+```text
+y*: correct target（正确目标）
+y-: contrast target（竞争目标）
+z: logit（输出打分）
+```
+
+四条路径的独立边际贡献定义为：
+
+$$
+\Delta m_Q
+=
+m(x)-m\left(x;\operatorname{zero}(Q_{\ell,h,a})\right)
+$$
+
+$$
+\Delta m_K
+=
+m(x)-m\left(x;\operatorname{zero}(K_{\ell,h,s})\right)
+$$
+
+$$
+\Delta m_V
+=
+m(x)-m\left(x;\operatorname{zero}(V_{\ell,h,s})\right)
+$$
+
+$$
+\Delta m_O
+=
+m(x)-m\left(x;\operatorname{zero}(O_{\ell,h,a})\right)
+$$
+
+其中：
+
+```text
+a: answer position（答案位置）
+s: source position（来源词元位置）
+ell: layer（层）
+h: head（注意力头）
+```
+
+top-matched 特异性定义为：
+
+$$
+S_{\operatorname{op},g}
+=
+\max\left(0,\mathbb{E}_{top}[\Delta m]-\mathbb{E}_{matched}[\Delta m]\right)
+\cdot
+\left(
+1+
+\max\left(0,\mathbb{E}_{top}[\Delta r]-\mathbb{E}_{matched}[\Delta r]\right)
+\right)
+$$
+
+其中：
+
+```text
+op: q_answer_zero / k_source_zero / v_source_zero / o_answer_zero
+g: source group（来源词元组）
+Delta r: target rank worse indicator（目标排名变差指示）
+```
+
+闭合指标仍然定义为：
+
+$$
+C_{\text{token}}(x)
+=
+\mathbf{1}
+\left[
+y^\*=\arg\max_y z_y(x)
+\right]
+$$
+
+$$
+\Delta C_{\text{token}}
+=
+C_{\text{token}}(x)
+-
+C_{\text{token}}(x;\operatorname{zero}(\cdot))
+$$
+
+本阶段更完整的图谱边向量可以写成：
+
+$$
+\mathcal{E}_{\ell,h,g}
+=
+\left(
+\Delta m_Q,\Delta m_K,\Delta m_V,\Delta m_O,\Delta C_{\text{token}}
+\right)
+$$
+
+更谨慎地说，Phase 793 只完成了：
+
+$$
+\left(
+\Delta m_Q,\Delta m_K,\Delta m_V,\Delta m_O
+\right)
+$$
+
+的独立拆分，尚未完成强闭合：
+
+$$
+\Delta C_{\text{token}}>0
+\quad
+\text{or}
+\quad
+\Delta R_{\text{phrase}}>0
+$$
+
+### 五、工程结果
+
+脚本先进行 dry-run 和 smoke test（冒烟测试）。初始 smoke 暴露了 K/V source position 多维高级索引的 shape mismatch（形状不匹配）问题，已经修复为逐位置、逐 head 的保守清零写法。
+
+最终三轮结果：
+
+```text
+smoke:
+  qwen3 rows=20, errors=0
+  GLM4 rows=12, errors=0
+  DS7B rows=20, errors=0
+
+main:
+  qwen3 rows=256, errors=0
+  GLM4 rows=160, errors=0
+  DS7B rows=256, errors=0
+
+confirm:
+  qwen3 rows=480, errors=0
+  GLM4 rows=288, errors=0
+  DS7B rows=480, errors=0
+```
+
+所有最终测试均无 intervention error（干预错误）。
+
+### 六、确认测试的客观结果
+
+confirm（确认测试）中，每个模型各路径的最强 top-matched 特异性如下：
+
+```text
+qwen3:
+  O(answer) positive: drop_gap=2.956, rank_gap=0.333, score=3.941
+  Q(answer) positive: drop_gap=1.354, rank_gap=0.250, score=1.693
+  V(source candidate_tokens) positive: drop_gap=0.880, rank_gap=0.167, score=1.027
+  K(source candidate_tokens) positive: drop_gap=0.870, rank_gap=0.167, score=1.015
+
+GLM4:
+  O(answer) positive: drop_gap=1.073, rank_gap=0.833, score=1.967
+  Q(answer) positive: drop_gap=1.010, rank_gap=0.833, score=1.852
+  K(source) best: drop_gap=0.000, score=0.000
+  V(source) best: drop_gap=0.000, score=0.000
+
+DS7B:
+  O(answer) positive: drop_gap=1.229, rank_gap=0.083, score=1.332
+  Q(answer) positive: drop_gap=1.030, rank_gap=-0.250, score=1.030
+  V(source all_pre_answer) negative: drop_gap=0.388, rank_gap=0.000, score=0.388
+  K(source instruction) negative: drop_gap=0.176, rank_gap=0.000, score=0.176
+```
+
+最稳定的现象：
+
+```text
+1. Q/O answer-position 路径在三模型中都有明确 top-matched 特异性；
+2. O 路径通常强于 Q 路径，是当前最稳定的输出端写回门；
+3. qwen3 的 K/V candidate_tokens 源端效应明显；
+4. DS7B 的 K/V 源端效应存在但弱，且更偏 all_pre_answer / instruction；
+5. GLM4 的 K/V 清零有 margin drop，但 top 和 matched 几乎相同，因此不支持 K/V source-specific causal edge（来源特异因果边）；
+6. token_top1_loss_gap 在确认测试中基本为 0，说明本阶段没有形成强 token0 closure（词元零位闭合）。
+```
+
+### 七、理论判断
+
+Phase 793 支持 Phase 792 的核心方向，但必须收紧结论。
+
+更准确的结论是：
+
+```text
+公式—图谱同构假设得到进一步支持，
+但当前支持主要来自 answer-site Q/O gate（答案位置 Q/O 门）；
+source-side K/V fiber（来源侧 K/V 纤维）仍然模型依赖明显；
+完整生成闭合尚未完成。
+```
+
+这说明当前语言机制图谱中至少存在三层结构：
+
+```text
+1. answer-site readout/writeback gate（答案位置读出/写回门）：
+   Q/O 稳定，跨模型较一致。
+
+2. source-side retrieval/value carrier（来源侧检索/值承载）：
+   K/V 在 qwen3 明显，在 DS7B 较弱，在 GLM4 不具备 top-matched 特异性。
+
+3. closure gate（闭合门）：
+   目前只看到 margin/rank 变化，没有看到 top1 或短语生成闭合。
+```
+
+因此，当前最接近真实机制的拼图不是单个 head（注意力头），也不是静态 semantic graph（语义图谱），而是：
+
+```text
+source token fiber
+-> Q/K/V/O path decomposition
+-> answer-site residual writeback
+-> readout competition
+-> closure gate
+```
+
+### 八、问题、硬伤和边界
+
+本阶段有几个必须严格承认的硬伤：
+
+```text
+1. zero-ablation 是必要性倾向测试，不是充分性测试；
+   清零导致 margin drop，不等于该路径单独能生成正确答案。
+
+2. Q/O 干预发生在 answer position；
+   它证明答案位置门很重要，但没有说明具体 source token 如何被选择。
+
+3. K/V 使用 kv-head 映射；
+   在 GQA / MQA 结构中，多个 query heads 共享 kv-head，颗粒度比真实 head 路径更粗。
+
+4. GLM4 的 K/V top=matched；
+   说明部分 K/V 结果可能只是共同扰动，不是语义或路径特异机制。
+
+5. token_top1_loss_gap 基本为 0；
+   当前主要是 margin/rank 图谱，不是完整自然生成闭合图谱。
+
+6. 当前测试模型都是小模型；
+   小模型可能把大模型中分散的机制压缩到少数层和少数头，也可能放大格式路线和候选列表依赖。
+
+7. 当前环境没有 flash_attention_2；
+   实际使用 sdpa。虽然结果稳定且无量化，但和 flash kernel 的数值路径不完全相同。
+```
+
+### 九、对语言编码机制的意义
+
+本阶段的最大进展不是“又找到几个重要 head”，而是把语言机制图谱从：
+
+```text
+component importance（组件重要性）
+```
+
+推进到：
+
+```text
+path factorization（路径因子分解）
+```
+
+也就是开始把一个输出结果拆成：
+
+```text
+谁在查询？
+谁被匹配？
+谁携带值？
+谁写回答案位置？
+是否闭合到最终词元？
+```
+
+这比普通 patch 成功率更接近语言编码机制，因为它开始接近动态机制公式中的变量分工：
+
+$$
+F_{\theta}(x)
+\approx
+\operatorname{Closure}
+\left(
+O
+\circ
+V
+\circ
+\operatorname{Attn}(Q,K)
+\right)
+$$
+
+但当前还不能写成完整等式，只能写成因果审计式：
+
+$$
+\operatorname{Audit}(x)
+=
+\left[
+\Delta m_Q,
+\Delta m_K,
+\Delta m_V,
+\Delta m_O,
+\Delta C_{\text{token}}
+\right]
+$$
+
+其中当前最可靠的是：
+
+$$
+\Delta m_O,\Delta m_Q
+$$
+
+最需要继续验证的是：
+
+$$
+\Delta C_{\text{token}},
+\Delta R_{\text{phrase}},
+\text{source-specific } \Delta m_K,\Delta m_V
+$$
+
+### 十、是否进入边际收益递减区
+
+本阶段不是普通 patch 的边际收益递减。
+
+理由：
+
+```text
+1. 它首次把 Q/K/V/O 从整体注意力头中拆开；
+2. 它证明 answer-site Q/O 是跨模型稳定门；
+3. 它发现 K/V 源端机制具有模型依赖性；
+4. 它给出了公式变量和图谱边的可测接口。
+```
+
+但如果下一步继续只优化 margin drop 或寻找更强 head，就会重新进入边际收益递减。
+
+真正应该推进的是：
+
+```text
+从 independent zero-ablation（独立清零消融）
+转向 source-to-answer replacement（来源到答案位置替换）
+和 natural generation closure（自然生成闭合）。
+```
+
+### 十一、下一阶段方案
+
+Phase 793 的阶段目标已经完成，下一步属于新阶段，不应继续在同一阶段里无限扩大表格。
+
+建议下一阶段为：
+
+```text
+Phase 794: source-to-answer Q/K/V/O replacement closure validation
+（来源到答案位置 Q/K/V/O 替换闭合验证）
+```
+
+核心任务：
+
+```text
+1. 不再只清零，而是把 donor prompt（供体提示）的 Q/K/V/O 或 residual subspace 替换到 recipient prompt（受体提示）；
+2. 同时测 margin、rank、token top1、短语生成；
+3. 区分四类边：
+   a. margin-only edge（只影响边际）
+   b. rank edge（影响排名）
+   c. token closure edge（影响 top1）
+   d. phrase closure edge（影响自然短语生成）
+4. 对 qwen3、GLM4、DS7B 继续顺序测试；
+5. 重点验证 answer-site O/Q 是否能把 source-side K/V 结果真正闭合到输出。
+```
+
+最低成功标准：
+
+$$
+\Delta m>0
+\quad\land\quad
+\Delta r>0
+\quad\land\quad
+\left(
+\Delta C_{\text{token}}>0
+\;\lor\;
+\Delta R_{\text{phrase}}>0
+\right)
+$$
+
+如果 Phase 794 仍然只有 margin/rank，而没有 token/phrase closure，那么当前理论必须进一步收紧为：
+
+```text
+我们找到了读出竞争动力学的一部分，
+但还没有找到完整语言生成闭合机制。
+```
+
+## Phase 794: source-to-answer Q/K/V/O replacement closure validation（来源到答案位置 Q/K/V/O 替换闭合验证） [2026-06-30 10:22]
+
+### 一、任务来源
+
+本阶段读取 Phase 793 的最新记录，并结合新上传分析进行继续验证。
+
+新上传内容对 Phase 793 的判断基本正确：
+
+```text
+Phase 793 不是普通 patch 边际拟合，
+而是首次把 attention head（注意力头）的整体影响拆成 Q/K/V/O 四个投影路径。
+```
+
+但必须收紧：
+
+```text
+Phase 793 的证据仍然主要是 independent zero-ablation（独立清零消融）。
+它证明某些路径被移除后会降低 margin/rank，
+但还没有证明这些路径足以把 donor（供体）状态闭合到 recipient（受体）生成。
+```
+
+所以 Phase 794 的任务是从“清零必要性”推进到“供体替换充分性近似验证”：
+
+```text
+把 donor prompt（供体提示）中的 Q/K/V/O 投影切片，
+替换到 recipient prompt（受体提示）对应位置，
+观察是否能提升 target margin（目标边际）、target rank（目标排名）、
+token top1 closure（词元第一名闭合）和 phrase generation closure（短语生成闭合）。
+```
+
+### 二、测试脚本和结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase794_qkvo_replacement_closure_validation.py
+tests/glm5/run_phase794_qkvo_replacement_closure_validation_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase794_qkvo_replacement_closure_validation/
+tests/result/phase794_qkvo_replacement_closure_validation/
+```
+
+三轮测试均已完成：
+
+```text
+smoke（冒烟测试）
+main（主测试）
+confirm（确认测试）
+```
+
+模型加载方式：
+
+```text
+bf16
+quantization=off（不使用量化）
+flash_attention_2 首先尝试开启
+由于本地缺少 FlashAttention2 包，自动回退到 sdpa
+三个模型均无 OOM，无运行错误
+```
+
+### 三、测试原理
+
+设：
+
+```text
+R = recipient prompt（受体提示）
+D = donor prompt（供体提示）
+y+ = 正确目标词元
+y- = 竞争目标词元
+```
+
+目标边际定义为：
+
+$$
+m(x)=z_{y^+}(x)-z_{y^-}(x)
+$$
+
+Phase 793 的清零消融是：
+
+$$
+\Delta m_{\text{zero}}^{(op)}
+=
+m(x)-m(x\setminus op)
+$$
+
+Phase 794 改为供体替换：
+
+$$
+\Delta m_{\text{replace}}^{(op)}
+=
+m(R \leftarrow D_{op})-m(R)
+$$
+
+其中：
+
+$$
+op \in \{Q,K,V,O\}
+$$
+
+answer-site（答案位置）替换：
+
+$$
+R_{Q/O,t_{\text{answer}}}
+\leftarrow
+D_{Q/O,t_{\text{answer}}}
+$$
+
+source-side（来源侧）替换：
+
+$$
+R_{K/V,S}
+\leftarrow
+D_{K/V,S}
+$$
+
+其中：
+
+$$
+S \in
+\{
+\text{target\_value\_tokens},
+\text{instruction},
+\text{question},
+\text{all\_pre\_answer}
+\}
+$$
+
+token 闭合增益：
+
+$$
+\Delta C_{\text{token}}
+=
+\mathbf{1}[
+\operatorname{top1}(R \leftarrow D_{op})=y^+
+]
+-
+\mathbf{1}[
+\operatorname{top1}(R)=y^+
+]
+$$
+
+短语闭合增益：
+
+$$
+\Delta R_{\text{phrase}}
+=
+\mathbf{1}[
+\operatorname{generate}(R \leftarrow D_{op}) \supset \text{target phrase}
+]
+-
+\mathbf{1}[
+\operatorname{generate}(R) \supset \text{target phrase}
+]
+$$
+
+top-vs-matched 特异性：
+
+$$
+\Delta m_{\text{specific}}
+=
+\Delta m_{\text{top}}
+-
+\Delta m_{\text{matched}}
+$$
+
+综合替换特异性分数采用谨慎的工程评分：
+
+$$
+\operatorname{score}
+=
+\max(0,\Delta m_{\text{specific}})
+\cdot
+(1+\Delta C_{\text{token}})
+\cdot
+(1+0.5\Delta R_{\text{phrase}})
+$$
+
+这个分数只用于排序，不作为理论不变量。
+
+### 四、测试规模
+
+冒烟测试：
+
+```text
+qwen3:       1 case,   8 rows
+GLM4:        1 case,   4 rows
+DS7B:        1 case,   8 rows
+```
+
+主测试：
+
+```text
+qwen3:       3 cases, 144 rows
+GLM4:        3 cases,  72 rows
+DS7B:        3 cases, 144 rows
+```
+
+确认测试：
+
+```text
+qwen3:       5 cases, 320 rows
+GLM4:        5 cases, 160 rows
+DS7B:        5 cases, 320 rows
+```
+
+### 五、客观结果
+
+#### 1. qwen3
+
+主测试最强结果：
+
+```text
+O answer replace / positive:
+  top-minus-matched margin gap = +2.4688
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = +0.1667
+
+V source replace / negative / all_pre_answer:
+  top-minus-matched margin gap = +1.9753
+  rank improve gap              = +0.1667
+  token gain                    = 0
+  phrase gain                   = +0.1667
+
+K source replace / positive / all_pre_answer:
+  top-minus-matched margin gap = +1.0599
+  rank improve gap              = +0.1667
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+确认测试：
+
+```text
+O answer replace / positive:
+  top-minus-matched margin gap = +2.5781
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = +0.1000
+
+K source replace / positive / all_pre_answer:
+  top-minus-matched margin gap = +1.5109
+  rank improve gap              = 0
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+qwen3 的 O answer replace（答案位置 O 替换）非常稳定，是本阶段最强的正结果。
+
+#### 2. GLM4
+
+主测试：
+
+```text
+O answer replace / negative:
+  top-minus-matched margin gap = +0.5052
+  rank improve gap              = +0.6667
+  token gain                    = 0
+  phrase gain                   = 0
+
+O answer replace / positive:
+  top-minus-matched margin gap = +0.5625
+  rank improve gap              = +0.3333
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+确认测试：
+
+```text
+O answer replace / positive:
+  top-minus-matched margin gap = +0.8375
+  rank improve gap              = +1.0000
+  token gain                    = 0
+  phrase gain                   = 0
+
+O answer replace / negative:
+  top-minus-matched margin gap = +0.8234
+  rank improve gap              = +0.8000
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+GLM4 的结论很干净：
+
+```text
+O answer replace 稳定有效；
+K/V source replace 基本贴近 matched 对照；
+没有 token/phrase closure。
+```
+
+#### 3. DS7B
+
+主测试：
+
+```text
+O answer replace / negative:
+  top-minus-matched margin gap = +0.5677
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = 0
+
+O answer replace / positive:
+  top-minus-matched margin gap = +0.4993
+  rank improve gap              = +0.1667
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+确认测试：
+
+```text
+O answer replace / positive:
+  top-minus-matched margin gap = +0.8121
+  rank improve gap              = +0.3000
+  token gain                    = 0
+  phrase gain                   = 0
+
+O answer replace / negative:
+  top-minus-matched margin gap = +0.8045
+  rank improve gap              = +0.3000
+  token gain                    = 0
+  phrase gain                   = 0
+
+V source replace / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.3707
+  rank improve gap              = 0
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+DS7B 的 O answer replace 也稳定，但强度低于 qwen3；V source replace 有 margin 提升，但 matched 对照也较高，所以特异性较弱。
+
+### 六、严格结论
+
+本阶段最稳定的事实是：
+
+```text
+donor-to-recipient O answer replacement
+可以跨 qwen3 / GLM4 / DS7B 稳定提升目标 margin 和 rank。
+```
+
+这说明 Phase 793 发现的 answer-site O path（答案位置 O 路径）不是单纯清零伪影，而具有更接近充分性的替换效应。
+
+但更严格地说：
+
+```text
+它仍然不是完整 generation closure（生成闭合）。
+```
+
+原因：
+
+```text
+1. 三个模型的 token top1 closure gain 全部为 0；
+2. phrase closure gain 只在 qwen3 中出现弱信号；
+3. GLM4 和 DS7B 没有 phrase gain；
+4. K/V source-side replacement 没有跨模型稳定闭合；
+5. Q answer replacement 明显弱于 O answer replacement。
+```
+
+所以本阶段的最佳结论是：
+
+```text
+Phase 794 证明了 answer-site O 是稳定的 readout competition gate（读出竞争门），
+但没有证明单独 Q/K/V/O 替换可以完成自然语言生成闭合。
+```
+
+### 七、对 Phase 793 上传分析的判断
+
+上传分析中认为 Phase 793 是实质进展，这一点正确。
+
+上传分析中认为下一步必须从 ablation（消融）转向 replacement / transplant（替换 / 移植），这一点也正确。
+
+但现在根据 Phase 794，需要进一步收紧：
+
+```text
+replacement 已经比 ablation 更接近因果充分性，
+但单路径 replacement 仍然只到达 margin/rank 层，
+还没有到达 token/phrase closure 层。
+```
+
+这意味着当前图谱应该分层记录：
+
+```text
+level 1: margin edge（边际边）
+level 2: rank edge（排名边）
+level 3: token closure edge（词元闭合边）
+level 4: phrase closure edge（短语闭合边）
+```
+
+Phase 794 主要确认了：
+
+```text
+O answer replace = stable margin/rank edge
+```
+
+还没有确认：
+
+```text
+O answer replace = stable token/phrase closure edge
+```
+
+### 八、问题、硬伤和瓶颈
+
+1. donor/recipient prompt（供体/受体提示）并不完全同构
+
+```text
+donor 来自更成功的 prompt variant；
+recipient 来自失败或较弱的 prompt variant；
+替换时可能带入 prompt format（提示格式）差异，而不只是语义机制差异。
+```
+
+2. K/V source pairing（来源位置配对）仍然粗糙
+
+```text
+target_value_tokens / instruction / question / all_pre_answer
+只是位置组近似，不是已经验证的真实因果纤维。
+```
+
+3. phrase generation（短语生成）证据弱于 margin/rank
+
+```text
+为了控制测试成本，生成测试只在 top selection 上采样；
+matched selection 没有完整生成对照。
+所以 phrase gain 只能作为辅助信号，不能作为最终闭合证据。
+```
+
+4. 小模型内部结构可能较粗糙
+
+```text
+qwen3 / GLM4 / DS7B 都是当前可用的小模型或较小规模模型；
+读出结构可能更硬、更局部，也可能有蒸馏后的路线塌缩。
+因此跨模型一致的 O gate 很有价值，
+但 K/V 不稳定不能直接推出大模型中不存在来源纤维。
+```
+
+5. 仍未完成自然生成闭合
+
+最关键的硬伤是：
+
+$$
+\Delta C_{\text{token}} = 0
+$$
+
+在三模型三轮测试中没有被突破。
+
+这说明：
+
+```text
+读出端 O gate 可以推高目标；
+但完整生成还需要更大范围的协同结构。
+```
+
+### 九、当前理论更新
+
+Phase 794 后，条件化相对状态公式需要把“边”分成不同闭合等级：
+
+$$
+h_t^{(l+1)}
+=
+h_t^{(l)}
++
+\Delta A_{QKVO}^{(l)}(t,S)
++
+\Delta MLP^{(l)}(t)
++
+\Delta R_{\text{res}}^{(l)}(t)
+$$
+
+其中注意力项进一步拆成：
+
+$$
+\Delta A_{QKVO}^{(l)}
+=
+\Delta A_Q^{(l)}
++
+\Delta A_K^{(l)}
++
+\Delta A_V^{(l)}
++
+\Delta A_O^{(l)}
+$$
+
+但 Phase 794 说明，在当前任务上最稳定的可替换边是：
+
+$$
+\Delta A_O^{(l)}(t_{\text{answer}})
+\rightarrow
+\Delta m,\Delta r
+$$
+
+尚未证明：
+
+$$
+\Delta A_O^{(l)}(t_{\text{answer}})
+\rightarrow
+\Delta C_{\text{token}}
+$$
+
+更完整的生成闭合应该写成：
+
+$$
+C_{\text{gen}}
+=
+F(
+\Delta A_{K/V}^{\text{source}},
+\Delta A_O^{\text{answer}},
+\Delta MLP^{\text{rewrite}},
+\Delta R^{\text{residual}},
+\Delta S^{\text{suppressor}}
+)
+$$
+
+其中：
+
+```text
+source K/V = 来源侧候选信息
+answer O = 答案位置读出竞争门
+MLP rewrite = 多层感知机重写
+residual = 残差承载
+suppressor = 抑制器 / 路线竞争控制
+```
+
+当前 Phase 794 只稳定验证了：
+
+$$
+\Delta A_O^{\text{answer}}
+$$
+
+对：
+
+$$
+\Delta m,\Delta r
+$$
+
+的贡献。
+
+### 十、是否进入边际收益递减区
+
+Phase 794 本身不是边际收益递减。
+
+原因：
+
+```text
+1. 它从 zero-ablation 推进到 donor replacement；
+2. 它用 top-vs-matched 对照排除了部分随机替换解释；
+3. 它把 O answer path 从“必要性信号”推进到“替换有效信号”；
+4. 它明确证明单路径 replacement 仍不足以闭合生成。
+```
+
+但如果继续只寻找更强的单个 Q/K/V/O path，就会进入边际收益递减。
+
+现在的路线必须从：
+
+```text
+single-path replacement（单路径替换）
+```
+
+转向：
+
+```text
+multi-component causal fiber assembly（多组件因果纤维组装）
+```
+
+### 十一、下一阶段方案
+
+Phase 794 的阶段目标已经完成。
+
+下一阶段不应继续扩大单路径替换表格，而应进入：
+
+```text
+Phase 795: multi-component causal fiber closure validation
+（多组件因果纤维闭合验证）
+```
+
+核心任务：
+
+```text
+1. 同时替换 source-side K/V、answer-site O、关键 MLP/rewrite、residual subspace；
+2. 构造 replacement ladder（替换阶梯）：
+   a. O only
+   b. K/V only
+   c. K/V + O
+   d. K/V + MLP + O
+   e. K/V + residual + MLP + O
+3. 每一级都测 margin、rank、token top1、短语生成；
+4. 成功标准不再是 margin/rank，而是 token 或 phrase closure；
+5. qwen3 信号最强，可作为主模型先跑完整阶梯；
+6. GLM4 和 DS7B 用于验证结构是否跨模型稳定。
+```
+
+最低有效闭合标准：
+
+$$
+\Delta m>0
+\quad\land\quad
+\Delta r>0
+\quad\land\quad
+\left(
+\Delta C_{\text{token}}>0
+\lor
+\Delta R_{\text{phrase}}>0
+\right)
+$$
+
+更严格标准：
+
+$$
+\Delta C_{\text{token}}>0
+\quad\land\quad
+\Delta R_{\text{phrase}}>0
+\quad\land\quad
+\text{top effect}>\text{matched effect}
+$$
+
+### 十二、阶段性结论
+
+Phase 794 的核心结论是：
+
+```text
+answer-site O 是稳定的读出竞争门；
+source-side K/V 可能包含候选来源信息，但跨模型不稳定；
+单独 Q/K/V/O 替换无法完成生成闭合；
+破解语言编码机制需要寻找多组件因果纤维，而不是继续追逐单个 head/path。
+```
+
+这一步没有证明完整语言编码机制，但把路径边界收紧了一层：
+
+```text
+从“哪个 head 重要”
+推进到
+“哪个投影路径能替换产生因果压力，
+以及这种压力停在 margin/rank 还是进入 token/phrase closure”。
+```
+
+## Phase 795: multi-component causal fiber closure validation（多组件因果纤维闭合验证） [2026-06-30 11:08]
+
+### 一、任务来源
+
+本阶段读取 Phase 794 的最新记录，并分析新上传内容。
+
+新上传内容的判断基本正确：
+
+```text
+Phase 794 是实质进展，但不是最终闭合。
+它把 Phase 793 的 independent zero-ablation（独立清零消融）
+推进到 donor-to-recipient replacement（供体到受体替换）。
+```
+
+但它也明确暴露一个边界：
+
+```text
+单路径 Q/K/V/O replacement（查询/键/值/输出替换）
+仍然停在 margin/rank edge（边际/排名边），
+没有稳定进入 token/phrase/generation closure（词元/短语/生成闭合）。
+```
+
+因此，本阶段继续完成 Phase 794 提出的自然下一步：
+
+```text
+不再只测单路径，
+而是构造 multi-component causal fiber ladder（多组件因果纤维阶梯），
+验证 source K/V、answer O、route attn/MLP 是否组合后能跨过闭合阈值。
+```
+
+### 二、测试脚本和结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase795_multi_component_causal_fiber_closure.py
+tests/glm5/run_phase795_multi_component_causal_fiber_closure_round.sh
+```
+
+结果目录：
+
+```text
+results/glm5_phase795_multi_component_causal_fiber_closure/
+tests/result/phase795_multi_component_causal_fiber_closure/
+```
+
+三轮测试均已完成：
+
+```text
+smoke（冒烟测试）
+main（主测试）
+confirm（确认测试）
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16
+quantization=off（不使用量化）
+优先 flash_attention_2
+本地缺少 FlashAttention2 包，自动回退到 sdpa
+三模型均无 OOM，无干预错误
+```
+
+### 三、测试原理
+
+Phase 794 测的是单路径：
+
+$$
+\Delta m_{\text{replace}}^{(op)}
+=
+m(R\leftarrow D_{op})-m(R)
+$$
+
+其中：
+
+$$
+op\in\{Q,K,V,O\}
+$$
+
+Phase 795 改成阶梯组合：
+
+$$
+\Delta m_{\text{ladder}}
+=
+m(R\leftarrow D_{\mathcal{L}})-m(R)
+$$
+
+其中：
+
+$$
+\mathcal{L}
+\in
+\{
+O,
+K/V,
+K/V+O,
+\text{route},
+K/V+O+\text{route}
+\}
+$$
+
+具体 ladder（阶梯）包括：
+
+```text
+o_only:
+  只替换 answer-site O
+
+kv_source:
+  替换 source-side K/V
+
+kv_o:
+  同时替换 source-side K/V + answer-site O
+
+route_answer:
+  替换 answer-position 的 route attn/MLP 输出
+
+kv_o_route:
+  同时替换 source-side K/V + answer-site O + route attn/MLP
+```
+
+目标边际：
+
+$$
+m(x)=z_{y^+}(x)-z_{y^-}(x)
+$$
+
+token 闭合增益：
+
+$$
+\Delta C_{\text{token}}
+=
+\mathbf{1}[
+\operatorname{top1}(R\leftarrow D_{\mathcal{L}})=y^+
+]
+-
+\mathbf{1}[
+\operatorname{top1}(R)=y^+
+]
+$$
+
+短语闭合增益：
+
+$$
+\Delta R_{\text{phrase}}
+=
+\mathbf{1}[
+\operatorname{generate}(R\leftarrow D_{\mathcal{L}})
+\supset
+\text{target phrase}
+]
+-
+\mathbf{1}[
+\operatorname{generate}(R)
+\supset
+\text{target phrase}
+]
+$$
+
+top-vs-matched 特异性：
+
+$$
+\Delta m_{\text{specific}}
+=
+\Delta m_{\text{top}}
+-
+\Delta m_{\text{matched}}
+$$
+
+组合闭合评分只作为工程排序：
+
+$$
+\operatorname{score}
+=
+\max(0,\Delta m_{\text{specific}})
+\cdot
+
+\left(
+1
++
+\Delta r_{\text{specific}}
++
+3\Delta C_{\text{token}}
++
+1.5\Delta R_{\text{phrase}}
+\right)
+$$
+
+这个分数不是理论不变量，只用来寻找候选路径。
+
+### 四、测试规模
+
+冒烟测试：
+
+```text
+qwen3:       1 case,  20 rows
+GLM4:        1 case,  12 rows
+DS7B:        1 case,  20 rows
+```
+
+主测试：
+
+```text
+qwen3:       3 cases, 120 rows
+GLM4:        3 cases,  66 rows
+DS7B:        3 cases, 120 rows
+```
+
+确认测试：
+
+```text
+qwen3:       5 cases, 400 rows
+GLM4:        5 cases, 220 rows
+DS7B:        5 cases, 400 rows
+```
+
+三轮总计：
+
+```text
+qwen3:       540 rows
+GLM4:        298 rows
+DS7B:        540 rows
+```
+
+### 五、客观结果
+
+#### 1. qwen3
+
+主测试：
+
+```text
+o_only / positive / all_pre_answer:
+  top-minus-matched margin gap = +2.4688
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = +0.1667
+
+kv_source / positive / all_pre_answer:
+  top-minus-matched margin gap = +1.7188
+  rank improve gap              = +0.3333
+  token gain                    = 0
+  phrase gain                   = +0.1667
+
+kv_o / positive / all_pre_answer:
+  top-minus-matched margin gap = +1.4922
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = +0.1667
+```
+
+确认测试：
+
+```text
+o_only / positive / all_pre_answer:
+  top-minus-matched margin gap = +2.5781
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = +0.1000
+
+o_only / positive / instruction:
+  top-minus-matched margin gap = +2.5781
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = +0.1000
+
+kv_o / positive / instruction:
+  top-minus-matched margin gap = +2.6750
+  rank improve gap              = +0.4000
+  token gain                    = 0
+  phrase gain                   = +0.1000
+```
+
+qwen3 有弱 phrase gain，但三轮均无 token gain：
+
+```text
+main:    token gain rows = 0/120, phrase gain rows = 14/120
+confirm: token gain rows = 0/400, phrase gain rows = 32/400
+```
+
+#### 2. GLM4
+
+主测试：
+
+```text
+o_only / negative / all_pre_answer:
+  top-minus-matched margin gap = +0.5052
+  rank improve gap              = +0.6667
+  token gain                    = 0
+  phrase gain                   = 0
+
+o_only / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.5625
+  rank improve gap              = +0.3333
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+确认测试：
+
+```text
+o_only / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.8375
+  rank improve gap              = +1.0000
+  token gain                    = 0
+  phrase gain                   = 0
+
+o_only / positive / instruction:
+  top-minus-matched margin gap = +0.8375
+  rank improve gap              = +1.0000
+  token gain                    = 0
+  phrase gain                   = 0
+
+kv_o / negative / instruction:
+  top-minus-matched margin gap = +0.8000
+  rank improve gap              = +1.0000
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+GLM4 没有任何 token/phrase gain：
+
+```text
+main:    token gain rows = 0/66,  phrase gain rows = 0/66
+confirm: token gain rows = 0/220, phrase gain rows = 0/220
+```
+
+#### 3. DS7B
+
+主测试：
+
+```text
+o_only / negative / all_pre_answer:
+  top-minus-matched margin gap = +0.5677
+  rank improve gap              = +0.5000
+  token gain                    = 0
+  phrase gain                   = 0
+
+o_only / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.4993
+  rank improve gap              = +0.1667
+  token gain                    = 0
+  phrase gain                   = 0
+
+kv_source / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.4375
+  rank improve gap              = 0
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+确认测试：
+
+```text
+kv_source / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.9367
+  rank improve gap              = +0.2000
+  token gain                    = 0
+  phrase gain                   = 0
+
+o_only / positive / all_pre_answer:
+  top-minus-matched margin gap = +0.8121
+  rank improve gap              = +0.3000
+  token gain                    = 0
+  phrase gain                   = 0
+
+o_only / negative / all_pre_answer:
+  top-minus-matched margin gap = +0.8045
+  rank improve gap              = +0.3000
+  token gain                    = 0
+  phrase gain                   = 0
+```
+
+DS7B 也没有任何 token/phrase gain：
+
+```text
+main:    token gain rows = 0/120, phrase gain rows = 0/120
+confirm: token gain rows = 0/400, phrase gain rows = 0/400
+```
+
+### 六、最关键的新发现
+
+Phase 795 的核心新发现不是“多组件终于闭合”，而是更严格的反向边界：
+
+```text
+多组件 route replacement 可以显著提高 margin/rank，
+但仍不能稳定完成 token closure。
+```
+
+尤其重要的是：
+
+```text
+route_answer 和 kv_o_route 的绝对 margin 很高，
+但 top 和 matched 往往几乎同样高。
+```
+
+例如 qwen3 confirm：
+
+```text
+route_answer / positive / instruction:
+  mean delta margin = +5.4719
+  token gain        = 0
+  phrase gain       = +0.1
+  top/matched 基本相同
+
+kv_o_route / positive / instruction:
+  mean delta margin = +5.4719
+  token gain        = 0
+  phrase gain       = +0.1
+  top/matched 基本相同
+```
+
+这说明：
+
+```text
+route_answer 可能是广义 donor route scaffold（供体路线脚手架），
+而不是已经定位到特定 source fiber（来源纤维）。
+```
+
+也就是说：
+
+```text
+它能把整体状态推向 donor 风格，
+但不能证明“具体哪个 source head / source group”产生了闭合。
+```
+
+### 七、对 Phase 794 上传内容的判断
+
+上传内容认为 Phase 794 是实质进展但不是最终闭合，这一点完全正确。
+
+Phase 795 进一步验证了上传内容中的关键判断：
+
+```text
+单路径 Q/K/V/O replacement 不够；
+需要多组件组合；
+但当前多组件组合仍未突破 token closure。
+```
+
+所以当前理论需要再次收紧：
+
+```text
+我们已经找到稳定的 readout pressure（读出压力）和 route scaffold（路线脚手架），
+但还没有找到让目标词元成为全词表 top1 的 token identity closure mechanism（词元身份闭合机制）。
+```
+
+### 八、图谱边等级更新
+
+当前图谱边必须至少分成五类：
+
+```text
+1. margin edge（边际边）
+2. rank edge（排名边）
+3. scaffold edge（路线脚手架边）
+4. phrase weak edge（弱短语边）
+5. token closure edge（词元闭合边）
+```
+
+Phase 795 中最稳定的是：
+
+```text
+O only = candidate-specific margin/rank edge
+route_answer = broad scaffold edge
+kv_o_route = broad scaffold + weak readout pressure edge
+```
+
+但仍没有稳定发现：
+
+```text
+token closure edge
+```
+
+### 九、当前理论公式更新
+
+上一阶段公式为：
+
+$$
+C_{\text{gen}}
+=
+F(
+\Delta A_{K/V}^{\text{source}},
+\Delta A_O^{\text{answer}},
+\Delta MLP^{\text{rewrite}},
+\Delta R^{\text{residual}},
+\Delta S^{\text{suppressor}}
+)
+$$
+
+Phase 795 后需要增加全词表竞争门：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_{y^+}
+>
+\max_{v\neq y^+} z_v
+\right]
+$$
+
+过去很多阶段测的是：
+
+$$
+m_{\text{contrast}}
+=
+z_{y^+}-z_{y^-}
+$$
+
+但 token closure 真正需要：
+
+$$
+m_{\text{global}}
+=
+z_{y^+}
+-
+\max_{v\neq y^+} z_v
+$$
+
+Phase 795 说明：
+
+$$
+\Delta m_{\text{contrast}}>0
+\nRightarrow
+\Delta C_{\text{token}}>0
+$$
+
+因此完整闭合公式必须改成：
+
+$$
+C_{\text{gen}}
+=
+F(
+\Delta A_{K/V}^{\text{source}},
+\Delta A_O^{\text{answer}},
+\Delta MLP^{\text{rewrite}},
+\Delta R^{\text{residual}},
+\Delta S^{\text{suppressor}},
+\Delta G_{\text{global-competition}}
+)
+$$
+
+其中：
+
+```text
+Delta G_global-competition
+= 全词表竞争场中的非目标竞争者抑制和目标身份锚定。
+```
+
+也就是：
+
+```text
+语言生成闭合不是只让 target 大于 contrast，
+而是让 target 大于所有实际竞争者。
+```
+
+### 十、问题、硬伤和瓶颈
+
+1. 仍然没有 token closure
+
+最硬的结果是：
+
+$$
+\Delta C_{\text{token}}=0
+$$
+
+在三模型三轮测试中仍然成立。
+
+2. route scaffold 不是 source-specific fiber
+
+route_answer 的绝对效果强，但 top/matched 一样强，说明它不是特定 source unit 的唯一证据。
+
+3. phrase gain 只在 qwen3 弱出现
+
+qwen3 confirm 中 phrase gain rows 为：
+
+```text
+32/400
+```
+
+但 GLM4 和 DS7B 全部为 0。
+
+4. 当前 margin 主要是 target-vs-contrast
+
+这可能低估了真正瓶颈：
+
+```text
+目标已经超过 contrast，
+但仍输给其他格式词、候选词、标点、echo token 或高频 token。
+```
+
+5. 小模型结构可能粗糙
+
+小模型可能把语义、格式、候选、读出竞争压缩到更少层和更硬的读出门里。
+
+因此不能直接把：
+
+```text
+小模型中 token closure 失败
+```
+
+推广成：
+
+```text
+大模型中不存在完整因果纤维。
+```
+
+### 十一、是否进入边际收益递减区
+
+Phase 795 本身不是边际收益递减。
+
+原因：
+
+```text
+1. 它从单路径替换推进到多组件阶梯；
+2. 它发现 route scaffold 可以大幅推高 margin/rank；
+3. 它证明多组件仍不能自动跨过 token closure；
+4. 它暴露了 target-vs-contrast margin 与 global top1 closure 的断裂。
+```
+
+但如果下一步继续只增加更多 route 组件或更大 source group，就会进入边际收益递减。
+
+当前真正瓶颈已经变成：
+
+```text
+global vocabulary competition（全词表竞争）
+和 token identity anchoring（词元身份锚定）。
+```
+
+### 十二、下一阶段方案
+
+Phase 795 的阶段目标已经完成。
+
+下一阶段不应继续盲目扩大多组件 ladder，而应进入：
+
+```text
+Phase 796: global competitor suppression and token identity closure audit
+（全局竞争者抑制与词元身份闭合审计）
+```
+
+核心任务：
+
+```text
+1. 不再只测 target-vs-contrast margin；
+2. 对每个 ladder 后的全词表 top-k 竞争者进行分类；
+3. 区分失败类型：
+   a. semantic competitor（语义竞争者）
+   b. format token（格式词元）
+   c. echo token（回声词元）
+   d. punctuation / newline（标点/换行）
+   e. candidate-list artifact（候选列表伪影）
+   f. high-frequency token（高频词元）
+4. 计算 global margin：
+   z_target - max_non_target(z)
+5. 追踪哪些组件提升 target，同时哪些组件抑制 top competitor；
+6. 寻找 suppressor + identity anchor 的组合，而不是只寻找 target booster。
+```
+
+成功标准应从：
+
+$$
+z_{y^+}>z_{y^-}
+$$
+
+升级为：
+
+$$
+z_{y^+}>
+\max_{v\neq y^+}z_v
+$$
+
+更严格地：
+
+$$
+\Delta z_{y^+}>0
+\quad\land\quad
+\Delta z_{\text{top competitor}}<0
+\quad\land\quad
+\Delta C_{\text{token}}>0
+$$
+
+### 十三、阶段性结论
+
+Phase 795 的最终结论是：
+
+```text
+多组件因果纤维可以形成更强的读出压力和路线脚手架，
+但仍没有完成 token identity closure。
+```
+
+当前最接近真实语言编码机制的图景是：
+
+```text
+source K/V 提供候选来源；
+answer O 提供稳定读出门；
+route attn/MLP 提供供体状态脚手架；
+但最终能否生成正确词元，取决于全词表竞争场和 token identity anchor。
+```
+
+所以当前研究继续接近完整语言编码机制，但瓶颈已经从：
+
+```text
+找重要 head / path
+```
+
+转移到：
+
+```text
+解释全词表竞争中，为什么 target 仍然不是 top1。
+```
