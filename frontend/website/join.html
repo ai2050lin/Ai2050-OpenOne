@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>参与讨论 | AI2050</title>
+    <meta name="description" content="扫描二维码加入 AI2050 社区，与助手互动或加入群聊。" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="主导航">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">AI2050</span></a>
+      <nav class="nav-links" aria-label="页面栏目">
+        <a href="index.html">首页</a>
+        <a href="ai2050.html">AI2050计划</a>
+        <a href="agi_project.html">AGI研究</a>
+        <a href="about.html">关于我们</a>
+      </nav>
+      <a class="header-action dark" href="index.html">返回首页</a>
+    </header>
+
+    <main class="page-shell join-page">
+      <section class="join-hero" aria-labelledby="join-title">
+        <h1 id="join-title">参与讨论</h1>
+        <p>扫描下方二维码，加入 AI2050 社区。可以添加助手获取帮助，或扫码进入群聊与大家交流。</p>
+      </section>
+
+      <section class="code-grid" aria-label="二维码">
+        <article class="code-card">
+          <div class="code-image-wrap">
+            <img id="assistant-code" src="wxcode/assistant.png" alt="AI2050 助手二维码" />
+            <div class="code-fallback" id="assistant-fallback">
+              <span>助手二维码</span>
+              <small>请放置 wxcode/assistant.png</small>
+            </div>
+          </div>
+          <h3>添加助手</h3>
+          <p>扫码添加 AI2050 助手微信，获取项目最新动态与帮助。</p>
+        </article>
+
+        <article class="code-card">
+          <div class="code-image-wrap">
+            <img id="group-code" alt="AI2050 群聊二维码" />
+            <div class="code-fallback" id="group-fallback">
+              <span>群聊二维码</span>
+              <small>请放置 wxcode/group_*.png</small>
+            </div>
+          </div>
+          <h3>加入群聊</h3>
+          <p>扫码进入 AI2050 交流群，与研究者、开发者共同讨论。</p>
+          <button type="button" class="ghost-button refresh-btn" id="refresh-group">换一张</button>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer compact-footer">
+      <div class="footer-brand"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">AI2050</span></a><p>致力于推动通用人工智能的发展，为人类创造更美好的未来。</p></div>
+      <div class="footer-bottom"><span>© 2025 AI2050. All rights reserved.</span></div>
+    </footer>
+
+    <script>
+      (function () {
+        // 群聊二维码候选清单：随机显示其中一张
+        // 自动检测 group_1.png ~ group_8.png 中实际存在的图片
+        var groupCandidates = [];
+        for (var i = 1; i <= 8; i++) {
+          groupCandidates.push("wxcode/group_" + i + ".png");
+        }
+
+        var groupImg = document.getElementById("group-code");
+        var groupFallback = document.getElementById("group-fallback");
+        var assistantImg = document.getElementById("assistant-code");
+        var assistantFallback = document.getElementById("assistant-fallback");
+
+        // 收集实际可加载的群聊图片
+        var availableGroups = [];
+        var checked = 0;
+
+        function tryFinish() {
+          checked++;
+          if (checked === groupCandidates.length) {
+            if (availableGroups.length > 0) {
+              loadRandomGroup();
+            } else {
+              groupFallback.style.display = "flex";
+              groupImg.style.display = "none";
+            }
+          }
+        }
+
+        groupCandidates.forEach(function (src) {
+          var test = new Image();
+          test.onload = function () {
+            availableGroups.push(src);
+            tryFinish();
+          };
+          test.onerror = tryFinish;
+          test.src = src;
+        });
+
+        function loadRandomGroup() {
+          if (availableGroups.length === 0) return;
+          var pick = availableGroups[Math.floor(Math.random() * availableGroups.length)];
+          groupImg.src = pick;
+          groupImg.style.display = "block";
+          groupFallback.style.display = "none";
+        }
+
+        // 助手二维码加载失败时显示占位
+        assistantImg.onerror = function () {
+          assistantImg.style.display = "none";
+          assistantFallback.style.display = "flex";
+        };
+        assistantImg.onload = function () {
+          assistantImg.style.display = "block";
+          assistantFallback.style.display = "none";
+        };
+
+        // 换一张按钮
+        document.getElementById("refresh-group").addEventListener("click", function () {
+          if (availableGroups.length > 1) {
+            var current = groupImg.src.split("/").pop();
+            var pool = availableGroups.filter(function (s) {
+              return s.split("/").pop() !== current;
+            });
+            var pick = pool[Math.floor(Math.random() * pool.length)];
+            groupImg.src = pick;
+          } else if (availableGroups.length === 1) {
+            loadRandomGroup();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

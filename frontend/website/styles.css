@@ -8,6 +8,9 @@
   --silver: #f7faff;
   --white: #ffffff;
   --shadow: 0 22px 70px rgba(42, 87, 145, 0.16);
+  --page-max: 1120px;
+  --page-gutter: 5vw;
+  --page-padding: max(var(--page-gutter), calc((100vw - var(--page-max)) / 2));
 }
 
 * {
@@ -43,7 +46,7 @@ a {
   align-items: center;
   gap: 2rem;
   min-height: 84px;
-  padding: 0 5vw;
+  padding: 0 var(--page-padding);
   border-bottom: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(18px);
@@ -113,7 +116,7 @@ a {
 
 .nav-links {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: clamp(1rem, 4vw, 4.5rem);
   font-size: 0.98rem;
   font-weight: 600;
@@ -270,11 +273,11 @@ h1 {
 
 .hero-visual img {
   position: absolute;
-  inset: -8% -22% -10% -28%;
-  width: 150%;
-  height: 126%;
-  object-fit: cover;
-  object-position: 78% 10%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
   filter: saturate(1.04) contrast(1.02);
 }
 
@@ -284,8 +287,8 @@ h1 {
   z-index: 1;
   content: "";
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.58) 24%, transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 44%, rgba(255, 255, 255, 0.86));
+    linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0%, transparent 30%);
+  pointer-events: none;
 }
 
 .visual-glow {
@@ -372,6 +375,8 @@ h1 {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.92)),
     linear-gradient(135deg, #f8fbff, #dceaff);
+  background-position: center;
+  background-size: cover;
 }
 
 .program-image::before,
@@ -380,11 +385,21 @@ h1 {
   content: "";
 }
 
+.horizon::before,
+.horizon::after,
+.brain::before,
+.brain::after,
+.forum::before,
+.forum::after,
+.lighthouse::before,
+.lighthouse::after {
+  display: none;
+}
+
 .horizon {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.84)),
-    radial-gradient(ellipse at 68% 78%, rgba(62, 126, 255, 0.18), transparent 34%),
-    linear-gradient(135deg, #fbfdff 0%, #dfeeff 100%);
+    url("assets/home_plan.png") center / cover no-repeat;
 }
 
 .horizon::before {
@@ -412,11 +427,8 @@ h1 {
 
 .brain {
   background:
-    linear-gradient(90deg, rgba(4, 19, 49, 0.12), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.9)),
-    radial-gradient(circle at 36% 52%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
-    radial-gradient(circle at 42% 43%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
-    radial-gradient(circle at 46% 59%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
-    linear-gradient(135deg, #08214e 0%, #176cff 58%, #e8f2ff 100%);
+    linear-gradient(90deg, rgba(4, 19, 49, 0.08), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.92)),
+    url("assets/home_agi.png") center / cover no-repeat;
 }
 
 .brain::before {
@@ -444,8 +456,7 @@ h1 {
 .forum {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.86)),
-    radial-gradient(circle at 70% 38%, rgba(18, 101, 255, 0.18), transparent 24%),
-    linear-gradient(135deg, #f7fbff 0%, #d7e8ff 100%);
+    url("assets/home_forum.png") center / cover no-repeat;
 }
 
 .forum::before {
@@ -478,7 +489,7 @@ h1 {
 .lighthouse {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.96)),
-    linear-gradient(180deg, #eef7ff 0%, #cfdff3 54%, #f5f9ff 55%, #ffffff 100%);
+    url("assets/home_support.png") center / cover no-repeat;
 }
 
 .lighthouse::before {
@@ -600,7 +611,7 @@ h1 {
 }
 
 .page-shell {
-  width: min(1120px, 100% - 10vw);
+  width: min(var(--page-max), 100% - calc(var(--page-gutter) * 2));
   margin: 0 auto;
 }
 
@@ -1088,6 +1099,46 @@ h1 {
   grid-template-columns: minmax(230px, 1.4fr) repeat(3, minmax(130px, 0.7fr));
 }
 
+.city-visual,
+.brain-stack-visual,
+.platform-visual,
+.route-visual,
+.cycle-visual {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.city-visual {
+  background-image: url("assets/plan_hero.png");
+}
+
+.brain-stack-visual {
+  background-image: url("assets/agi_hero.png");
+}
+
+.platform-visual {
+  background-image: url("assets/about_hero.png");
+}
+
+.route-visual {
+  background-image: url("assets/agi_route.png");
+}
+
+.cycle-visual {
+  background-image: url("assets/agi_cycle.png");
+}
+
+.city-visual > *,
+.brain-stack-visual > *,
+.platform-visual > *,
+.route-visual > *,
+.cycle-visual > *,
+.cycle-visual::before,
+.cycle-visual::after {
+  display: none;
+}
+
 @media (min-width: 981px) {
   .plan-hero h1,
   .about-hero h1 {
@@ -1104,7 +1155,7 @@ h1 {
   .nav-links {
     grid-column: 1 / -1;
     order: 3;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 1.2rem;
     overflow-x: auto;
     border-top: 1px solid var(--line);
@@ -1199,12 +1250,15 @@ h1 {
   }
 
   .hero-visual img {
-    inset: -6% -55% -10% -50%;
-    width: 205%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
   }
 
   .program-image {
-    background-size: 840px 1260px;
+    background-size: cover;
   }
 
   .site-footer {
@@ -1297,5 +1351,116 @@ h1 {
 
   .join-band {
     padding: 1.2rem;
+  }
+}
+
+/* ===== 参与讨论页（join.html） ===== */
+.join-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.join-hero {
+  text-align: center;
+  padding: 2.5rem 1rem 1rem;
+}
+
+.join-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin: 0 0 0.6rem;
+}
+
+.join-hero p {
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.code-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.6rem;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.code-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.8rem 1.4rem 1.6rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.code-image-wrap {
+  position: relative;
+  width: 230px;
+  height: 230px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--silver);
+  border: 1px solid var(--line);
+}
+
+.code-image-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+}
+
+.code-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--silver);
+}
+
+.code-fallback small {
+  font-weight: 400;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.code-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.code-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.refresh-btn {
+  margin-top: 0.3rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .code-grid {
+    grid-template-columns: 1fr;
   }
 }
