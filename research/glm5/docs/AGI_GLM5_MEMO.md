@@ -74767,3 +74767,1104 @@ Phase 796：进一步发现 global margin improvement 与 token closure 仍断�
 转向
 target booster + blocker suppressor + identity anchor 的三元图谱。
 ```
+
+## Phase 797: blocker-class targeted suppression and identity-anchor separation（阻塞者类别定向抑制与词元身份锚分离） [2026-06-30 11:39]
+
+### 一、任务来源
+
+本阶段读取并分析了 Phase 796 附件中的判断。附件的核心判断基本正确：
+
+```text
+Phase 796 不是完成 token closure（词元闭合），而是解释为什么前面大量 margin（边际）改善仍然无法闭合。
+```
+
+Phase 796 已经证明：
+
+```text
+target-vs-contrast（目标对指定对照）改善
+不等于
+target-vs-global vocabulary（目标对全词表）闭合。
+```
+
+更严格地说，即使 intervention（干预）提高了正确目标词元的 logit（对数几率）并改善了 global margin（全局边际），top1（第一候选）仍会被新的 blocker（阻塞词元）接管。因此上传内容中“从单点闭合转向全局图谱整体逼近”的判断是正确的。
+
+但它需要进一步收紧：
+
+```text
+当前瓶颈不是只缺 target booster（目标增强器），
+而是同时缺 blocker suppressor（阻塞者抑制器）和 identity anchor（词元身份锚）。
+```
+
+本阶段因此继续属于 Phase 795-796 的同一大阶段：从单点拟合转向全局竞争场审计。
+
+### 二、测试性质
+
+本阶段没有重新加载 qwen3、GLM4 和 DS7B 三个模型，也没有进行新的神经网络前向计算。原因是 Phase 796 已经保存了三模型的 top-k（前 k 候选）结果，本阶段的目标是对这些结果做 blocker-class oracle audit（阻塞者类别离线上界审计）。
+
+也就是说，本阶段回答的问题不是：
+
+```text
+某个真实干预是否已经能闭合？
+```
+
+而是：
+
+```text
+如果按类别移除某类 blocker，理论上是否足够让目标词元闭合？
+```
+
+因此它是 Phase 796 结果上的结构审计，不是新的模型测试。这样可以减少 token（词元）和显存消耗，同时避免重复运行模型。
+
+### 三、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase797_blocker_class_identity_anchor_audit.py
+tests/glm5/run_phase797_blocker_class_identity_anchor_audit_round.sh
+```
+
+输入数据：
+
+```text
+tests/result/phase796_global_competitor_token_identity_audit/{round}/phase796_{model}_rows.jsonl
+```
+
+输出结果：
+
+```text
+tests/result/phase797_blocker_class_identity_anchor_audit/smoke/
+tests/result/phase797_blocker_class_identity_anchor_audit/main/
+tests/result/phase797_blocker_class_identity_anchor_audit/confirm/
+results/glm5_phase797_blocker_class_identity_anchor_audit/smoke/
+results/glm5_phase797_blocker_class_identity_anchor_audit/main/
+results/glm5_phase797_blocker_class_identity_anchor_audit/confirm/
+```
+
+编译检查通过：
+
+```text
+python -m py_compile tests/glm5/phase797_blocker_class_identity_anchor_audit.py
+```
+
+### 四、测试原理
+
+设正确目标词元为：
+
+$$
+y^+
+$$
+
+Phase 796 干预后的 logit（对数几率）为：
+
+$$
+z_v^{after}(x)
+$$
+
+全词表闭合条件是：
+
+$$
+z_{y^+}^{after}(x) > \max_{v \neq y^+} z_v^{after}(x)
+$$
+
+Phase 796 的失败说明，目标词元虽然被增强，但仍然存在 blocker set（阻塞者集合）：
+
+$$
+B_k(x)=\{b_i \mid z_{b_i}^{after}(x)>z_{y^+}^{after}(x),\ b_i \in TopK(x)\}
+$$
+
+本阶段把 blocker（阻塞词元）按类别划分：
+
+$$
+B_k(x)=
+B_{contrast}
+\cup B_{case}
+\cup B_{echo}
+\cup B_{format}
+\cup B_{punct}
+\cup B_{semantic}
+\cup B_{other}
+$$
+
+然后进行类别级上界审计：
+
+$$
+B_k(x)\setminus C_j=\varnothing
+$$
+
+如果上式成立，说明在观测到的 top-k（前 k 候选）范围内，仅移除类别 \(C_j\) 就足够清空目标上方的 blocker。
+
+但精确闭合还需要更严格条件：
+
+$$
+rank(y^+) \leq k+1
+$$
+
+否则即使清空已保存 top-k 内的 blocker，也可能仍有未观测词元排在目标词元上方。
+
+本阶段同时审计 identity anchor fragmentation（词元身份锚碎片化）：
+
+$$
+I_{frag}(x)=
+\mathbf{1}
+\left[
+\exists b \in B_k(x),
+\ surface(b)=surface(y^+),
+\ id(b)\neq id(y^+)
+\right]
+$$
+
+如果同一答案表面形式的多个 token id（词元编号）排在目标词元上方，说明模型可能已经把语义答案推到了候选区，但没有完成精确 token identity closure（词元身份闭合）。
+
+### 五、三轮测试结果
+
+#### 1. smoke（冒烟轮）
+
+smoke（冒烟轮）确认脚本、输入读取、类别统计和摘要生成正常。
+
+关键结果：
+
+```text
+qwen3：token closure gain = 0，identity fragmentation = 1.0
+GLM4：token closure gain = 0，identity fragmentation = 1.0
+DS7B：token closure gain = 0，identity fragmentation = 1.0
+```
+
+冒烟轮已经显示：问题不是某个模型偶然失败，而是三模型都出现了目标增强但词元闭合失败。
+
+#### 2. main（主测试轮）
+
+main（主测试轮）扩大到更多 Phase 796 行。
+
+关键结果：
+
+```text
+qwen3：160 行，token closure gain = 0，identity fragmentation = 1.0
+GLM4：88 行，token closure gain = 0，identity fragmentation = 1.0
+DS7B：160 行，token closure gain = 0，identity fragmentation = 0.84375
+```
+
+主测试轮说明，identity anchor fragmentation（词元身份锚碎片化）不是极少数样本现象，而是在 qwen3 和 GLM4 中几乎全覆盖，在 DS7B 中也很高。
+
+#### 3. confirm（确认轮）
+
+confirm（确认轮）是本阶段主要依据。
+
+整体摘要：
+
+| 模型 | 行数 | 平均目标排名 | 全局边际变化 | token closure gain | identity fragmentation | exact top-k cover | unobserved blocker risk |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 480 | 1101.4604 | +1.5679 | 0.0000 | 1.0000 | 0.2771 | 0.7229 |
+| GLM4 | 264 | 264.7121 | +0.2032 | 0.0000 | 1.0000 | 0.2045 | 0.7955 |
+| DS7B | 480 | 2527.2375 | +1.5139 | 0.0000 | 0.8917 | 0.1104 | 0.8896 |
+
+confirm（确认轮）中，三模型 token closure gain（词元闭合增益）仍然全部为 0。
+
+同时，单类 blocker 抑制审计的结果非常关键：
+
+```text
+所有模型、所有 blocker 类别：
+observed top-k closure rate if suppressed = 0
+exact closure rate if suppressed = 0
+```
+
+这说明：
+
+```text
+单独压制 designated contrast（指定对照）不够；
+单独压制 semantic competitor（语义竞争者）不够；
+单独压制 echo / format / punctuation（回声 / 格式 / 标点）也不够。
+```
+
+当前瓶颈已经从单点 blocker 转为 blocker set（阻塞者集合）。
+
+### 六、客观现象拼图
+
+#### 拼图 1：global margin（全局边际）改善仍然不能推出闭合
+
+confirm（确认轮）中：
+
+```text
+qwen3：global margin +1.5679，但 token closure gain = 0
+GLM4：global margin +0.2032，但 token closure gain = 0
+DS7B：global margin +1.5139，但 token closure gain = 0
+```
+
+这继续支持 Phase 796 的结论：
+
+```text
+global margin improvement（全局边际改善）
+只是逼近闭合的局部指标，
+不是闭合本身。
+```
+
+#### 拼图 2：blocker 是集合，不是单一对象
+
+三模型中，单类 blocker 抑制均不能闭合。说明真正阻塞目标词元的不是一个稳定敌人，而是多个候选类轮流占据目标上方。
+
+confirm（确认轮）的 top blocker（顶部阻塞者）分布：
+
+```text
+qwen3：
+designated_contrast 270
+candidate_list_or_case_value 162
+whitespace_or_newline 48
+
+GLM4：
+designated_contrast 166
+candidate_list_or_case_value 96
+echo_token 2
+
+DS7B：
+designated_contrast 256
+candidate_list_or_case_value 144
+echo_token 80
+```
+
+这说明不同模型的 blocker 分布不完全相同，但都不是单类阻塞结构。
+
+#### 拼图 3：identity anchor（词元身份锚）比预期更关键
+
+confirm（确认轮）中，目标表面形式的其他 token id 排在目标词元上方的平均数量为：
+
+```text
+qwen3：3.1146
+GLM4：3.0758
+DS7B：2.4833
+```
+
+这意味着很多失败并不是“语义答案完全没出现”，而是：
+
+```text
+模型把答案推到了候选区，
+但没有锁定正确 token id。
+```
+
+这把当前研究从：
+
+```text
+answer semantic boosting（答案语义增强）
+```
+
+推进到：
+
+```text
+answer identity anchoring（答案身份锚定）
+```
+
+#### 拼图 4：top-k 审计仍然不完整
+
+confirm（确认轮）中未观测 blocker 风险很高：
+
+```text
+qwen3：0.7229
+GLM4：0.7955
+DS7B：0.8896
+```
+
+原因是大量样本的目标词元排名远低于 top-k 范围：
+
+```text
+qwen3 平均 rank = 1101.4604
+GLM4 平均 rank = 264.7121
+DS7B 平均 rank = 2527.2375
+```
+
+因此，Phase 797 不能声称已经完整识别所有 blocker。它只能说明：
+
+```text
+在已保存 top-k 范围内，单类 blocker 不足以闭合；
+并且 identity fragmentation 是稳定现象。
+```
+
+### 七、理论收紧
+
+Phase 796 的公式可以写成：
+
+$$
+\Delta m_{global}>0
+\not\Rightarrow
+closure(y^+)
+$$
+
+Phase 797 进一步收紧为：
+
+$$
+\Delta m_{global}>0
+\land
+\forall C_j,\ B_k\setminus C_j\neq \varnothing
+\Rightarrow
+\text{single-class suppression is insufficient}
+$$
+
+也就是说，闭合条件不再是二元结构：
+
+$$
+\text{target booster}+\text{contrast suppressor}
+$$
+
+而至少是三元结构：
+
+$$
+\text{closure}
+=
+F(
+\text{target booster},
+\text{blocker-set suppressor},
+\text{identity anchor}
+)
+$$
+
+更严格地写：
+
+$$
+\forall v\neq y^+,\quad
+z_{y^+}
+>
+z_v
+$$
+
+需要被分解为：
+
+$$
+z_{y^+}
++
+\Delta z_{target}
++
+\Delta z_{anchor}
+>
+\max_{v\neq y^+}
+\left(
+z_v
+-
+\Delta z_{suppress}(v)
+\right)
+$$
+
+其中：
+
+$$
+\Delta z_{target}
+$$
+
+表示目标语义增强；
+
+$$
+\Delta z_{anchor}
+$$
+
+表示目标 token id（词元编号）身份锚定；
+
+$$
+\Delta z_{suppress}(v)
+$$
+
+表示对不同 blocker 集合的抑制。
+
+Phase 797 的核心贡献是说明：
+
+```text
+只做 target booster 不够；
+只做单类 blocker suppressor 也不够；
+identity anchor 必须成为独立研究对象。
+```
+
+### 八、问题、硬伤和边界
+
+1. 本阶段不是真实神经网络干预
+
+本阶段是基于 Phase 796 保存结果的 oracle audit（离线上界审计）。它没有直接在模型内部压制 blocker 类别，因此不能证明某个 head（注意力头）或 MLP（多层感知机）就是真实 suppressor（抑制器）。
+
+2. top-k 不等于全词表
+
+大量样本中目标词元排名远低于保存的 top-k 范围，因此本阶段存在 unobserved blocker risk（未观测阻塞者风险）。如果要严格完成闭合审计，必须抽取目标上方的全词表 blocker，或者至少扩大 rank window（排名窗口）。
+
+3. blocker 分类仍然是启发式
+
+当前类别包括 designated contrast、candidate list、echo、format、punctuation、semantic 等，但这些类别是文本和 token 规则上的分类，不等价于模型内部真实机制分类。
+
+4. 小模型偏差必须保留
+
+qwen3、GLM4 和 DS7B 都是小模型或相对较小模型，内部机制可能更粗糙、更碎片化。identity fragmentation（身份碎片化）在小模型上可能被放大；大模型中可能有更强的 token identity anchor（词元身份锚），也可能有更复杂的 blocker suppressor matrix（阻塞者抑制矩阵）。
+
+因此当前结论只能写成：
+
+```text
+在当前三类小模型测试范围内，单点 target boosting 无法闭合，单类 blocker suppression 也不足以闭合，identity anchor fragmentation 是稳定瓶颈。
+```
+
+不能写成：
+
+```text
+所有语言模型的真实机制已经完全确定。
+```
+
+### 九、阶段性结论
+
+Phase 797 是 Phase 796 的自然延伸，结论是：
+
+```text
+当前 token closure 失败不是因为只缺一个更强 target booster；
+也不是因为只需要压制一个 contrast blocker；
+而是因为全词表竞争场中存在 blocker set 接管，以及答案表面形式到精确 token id 的 identity anchor 断裂。
+```
+
+因此，Phase 796 附件中的判断正确，但需要进一步补充：
+
+```text
+从单点闭合转向全局图谱逼近是正确方向；
+但图谱的核心节点不能只记录语义路线和增强方向，
+还必须记录 blocker set、identity anchor、以及二者与 target booster 的耦合关系。
+```
+
+### 十、下一步 Phase
+
+下一阶段仍然属于同一个大目标：从局部 patch（补丁）转向全局闭合机制图谱。
+
+建议进入：
+
+```text
+Phase 798: full-vocabulary blocker extraction and identity-anchor candidate localization
+```
+
+目标不是继续做单点 patch，而是完成两个更基础的客观拼图：
+
+```text
+1. 从 top-k blocker 审计扩展为 full-vocabulary blocker extraction（全词表阻塞者抽取）。
+2. 从 surface answer variants（表面答案变体）统计推进到 identity anchor candidate localization（词元身份锚候选定位）。
+```
+
+具体任务：
+
+```text
+1. 对每个样本保存所有高于目标词元的 token，或者保存足够大的 rank window。
+2. 统计 blocker set 的完整组成，而不是只看 top-k。
+3. 把同一答案表面形式的多个 token id 拆开，检查哪个结构负责把概率集中到正确 token id。
+4. 在 head、MLP、residual route、unembed geometry 四个层级上寻找 identity anchor 候选。
+5. 把 closure 公式从 margin score 推进到 blocker-set + identity-anchor 的三元约束。
+```
+
+如果 Phase 798 成功，当前研究将从：
+
+```text
+解释为什么不闭合
+```
+
+推进到：
+
+```text
+定位闭合缺少的具体结构。
+```
+
+## Phase 798: full-vocabulary blocker extraction and identity-anchor candidate localization（全词表阻塞者抽取与词元身份锚候选定位） [2026-06-30 12:31]
+
+### 一、任务来源
+
+本阶段读取并分析了 Phase 797 附件。附件判断正确，而且口径非常重要：
+
+```text
+Phase 797 是诊断阶段，不是新的模型因果干预阶段。
+```
+
+Phase 797 的价值不是继续做 patch（补丁），而是把 Phase 796 的闭合失败拆成三件事：
+
+```text
+1. target booster（目标增强器）不足；
+2. blocker suppressor（阻塞者抑制器）不足；
+3. identity anchor（词元身份锚）没有完成。
+```
+
+但 Phase 797 有一个硬边界：
+
+```text
+它只审计 Phase 796 保存的 top-k（前 k 候选）；
+目标词元经常远低于 top-k 范围；
+所以 blocker set（阻塞者集合）没有被完整抽取。
+```
+
+因此，本阶段继续同一阶段性目标，进入 Phase 798：
+
+```text
+从 top-k blocker audit（前 k 阻塞者审计）
+推进到
+full-vocabulary blocker extraction（全词表阻塞者抽取）。
+```
+
+### 二、测试脚本和运行方式
+
+新增脚本：
+
+```text
+tests/glm5/phase798_full_vocab_blocker_identity_anchor.py
+tests/glm5/run_phase798_full_vocab_blocker_identity_anchor_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase798_full_vocab_blocker_identity_anchor/smoke/
+tests/result/phase798_full_vocab_blocker_identity_anchor/main/
+tests/result/phase798_full_vocab_blocker_identity_anchor/confirm/
+results/glm5_phase798_full_vocab_blocker_identity_anchor/smoke/
+results/glm5_phase798_full_vocab_blocker_identity_anchor/main/
+results/glm5_phase798_full_vocab_blocker_identity_anchor/confirm/
+```
+
+运行方式：
+
+```text
+bash tests/glm5/run_phase798_full_vocab_blocker_identity_anchor_round.sh smoke
+bash tests/glm5/run_phase798_full_vocab_blocker_identity_anchor_round.sh main
+bash tests/glm5/run_phase798_full_vocab_blocker_identity_anchor_round.sh confirm
+```
+
+三轮均按顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+没有使用量化方案。模型加载采用 bf16（bfloat16，脑浮点 16 位）和 device_map=auto。脚本优先尝试 flash_attention_2，但本机没有安装 FlashAttention2，所以自动回退到 sdpa。该回退不改变“不量化”的前提，但速度和注意力实现可能与 flash 有差异。
+
+编译检查通过：
+
+```text
+python -m py_compile tests/glm5/phase798_full_vocab_blocker_identity_anchor.py
+```
+
+### 三、测试原理
+
+Phase 796/797 的闭合条件是：
+
+$$
+C_{\text{token}}(x)
+=
+\mathbf{1}
+\left[
+z_{y^+}(x)
+>
+\max_{v\neq y^+} z_v(x)
+\right]
+$$
+
+其中：
+
+$$
+y^+
+$$
+
+是正确目标 token id（词元编号）。
+
+Phase 797 只保存了 top-k（前 k）范围内排在目标上方的阻塞者：
+
+$$
+B_k(x)
+=
+\{b_i \mid z_{b_i}(x)>z_{y^+}(x),\ b_i\in TopK(x)\}
+$$
+
+Phase 798 改为直接从完整 logits（对数几率向量）中抽取：
+
+$$
+B_{\text{full}}(x)
+=
+\{v\in V,\ v\neq y^+,\ z_v(x)>z_{y^+}(x)\}
+$$
+
+这样可以得到真正的目标上方词元数量：
+
+$$
+N_{\text{block}}(x)
+=
+|B_{\text{full}}(x)|
+$$
+
+也可以得到 top-k 之外的盲区规模：
+
+$$
+N_{\text{blind}}(x)
+=
+|B_{\text{full}}(x)|-|B_k(x)|
+$$
+
+对于每个 blocker（阻塞词元），继续按启发式类别划分：
+
+$$
+B_{\text{full}}
+=
+B_{\text{contrast}}
+\cup
+B_{\text{case}}
+\cup
+B_{\text{echo}}
+\cup
+B_{\text{format}}
+\cup
+B_{\text{punct}}
+\cup
+B_{\text{semantic}}
+\cup
+B_{\text{other}}
+$$
+
+然后检查单类抑制是否可能闭合：
+
+$$
+\exists C_j,\quad
+B_{\text{full}}\setminus C_j=\varnothing
+$$
+
+如果上式为假，说明即使从全词表角度看，单一类别 blocker suppression（阻塞者抑制）仍不足以闭合。
+
+本阶段同时检查 identity anchor fragmentation（词元身份锚碎片化）：
+
+$$
+I_{\text{frag}}(x)
+=
+\mathbf{1}
+\left[
+\exists b\in B_{\text{full}}(x),
+\ surface(b)=surface(y^+),
+\ id(b)\neq id(y^+)
+\right]
+$$
+
+含义是：同一个答案表面形式已经出现，但概率分散到其他 token id 上，正确 token id 没有成为该表面形式中的第一身份。
+
+### 四、客观测试结果
+
+#### 1. smoke（冒烟轮）
+
+冒烟轮确认三模型均能完成：
+
+```text
+1. Phase 796 路线复用；
+2. 干预后 logits 获取；
+3. 全词表目标上方 blocker 抽取；
+4. blocker class（阻塞者类别）统计；
+5. identity anchor fragmentation（词元身份锚碎片化）统计。
+```
+
+冒烟轮已经显示：
+
+```text
+qwen3：平均 full blockers = 31
+GLM4：平均 full blockers = 193
+DS7B：平均 full blockers = 409
+```
+
+这说明 Phase 797 的 top-k 盲区是真实存在的。
+
+#### 2. main（主测试轮）
+
+主测试轮扩大到 3 个 case（案例）、2 条 route（路线）和更多 source group（来源组）。
+
+结果：
+
+| 模型 | 行数 | case 数 | 平均目标排名 | 平均全词表 blocker 数 | top-k 外 blocker 数 | token gain | 单类闭合率 | 身份碎片化 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 48 | 3 | 691.0417 | 690.0417 | 633.5833 | 0.0000 | 0.0000 | 1.0000 |
+| GLM4 | 30 | 3 | 82.4667 | 81.4667 | 36.9333 | 0.0000 | 0.0000 | 1.0000 |
+| DS7B | 48 | 3 | 2549.9167 | 2548.9167 | 2495.5208 | 0.0000 | 0.0000 | 1.0000 |
+
+主测试已经证明：
+
+```text
+Phase 797 的 top-k 盲区不是边缘误差；
+在 qwen3 和 DS7B 中，绝大多数 blocker 位于保存 top-k 之外。
+```
+
+#### 3. confirm（确认轮）
+
+确认轮扩大到 6 个 case，并保留 qwen3、GLM4、DS7B 三模型顺序测试。
+
+确认轮总体结果：
+
+| 模型 | 行数 | case 数 | 平均目标排名 | 平均全词表 blocker 数 | top-k 外 blocker 数 | global margin delta | target logit gain | token gain | 单类闭合率 | 身份碎片化 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 192 | 6 | 361.1875 | 360.1875 | 311.0938 | +2.5220 | +2.8898 | 0.0000 | 0.0000 | 1.0000 |
+| GLM4 | 120 | 6 | 120.6333 | 119.6333 | 63.5667 | +0.1471 | +1.5930 | 0.0000 | 0.0000 | 1.0000 |
+| DS7B | 192 | 6 | 1927.4219 | 1926.4219 | 1864.2552 | +2.4261 | +2.9704 | 0.0000 | 0.0000 | 1.0000 |
+
+确认轮最重要的事实有四个。
+
+第一，三模型 token gain（词元闭合增益）仍然全部为 0：
+
+$$
+\Delta C_{\text{token}}=0
+$$
+
+第二，三模型 full single-class closure possible rate（全词表单类闭合可能率）全部为 0：
+
+$$
+\forall C_j,\quad
+B_{\text{full}}\setminus C_j\neq\varnothing
+$$
+
+第三，三模型 identity anchor fragmentation rate（词元身份锚碎片化率）全部为 1：
+
+$$
+I_{\text{frag}}=1
+$$
+
+第四，full classification complete rate（全词表阻塞者分类完整率）全部为 1，说明本轮没有因为安全上限而截断分类。
+
+### 五、全词表 blocker 分布
+
+确认轮中，全词表 blocker 类别分布如下。
+
+qwen3：
+
+```text
+semantic_or_lexical_competitor：48083
+echo_token：6949
+punctuation：4892
+whitespace_or_newline：4069
+high_frequency_or_format：2196
+candidate_list_or_case_value：1408
+other_token：1319
+designated_contrast：192
+number_or_symbol：48
+```
+
+GLM4：
+
+```text
+semantic_or_lexical_competitor：8908
+echo_token：2024
+punctuation：1192
+candidate_list_or_case_value：1024
+high_frequency_or_format：908
+designated_contrast：120
+whitespace_or_newline：92
+other_token：88
+```
+
+DS7B：
+
+```text
+semantic_or_lexical_competitor：286869
+whitespace_or_newline：31676
+punctuation：25924
+echo_token：11745
+other_token：7270
+high_frequency_or_format：3845
+candidate_list_or_case_value：2145
+designated_contrast：192
+number_or_symbol：188
+special_token：19
+```
+
+这个结果非常关键：
+
+```text
+designated_contrast（指定对照）只是 blocker 集合中的很小一部分；
+真正的大量 blocker 来自 semantic / lexical competitor（语义 / 词汇竞争者）、echo、format、punctuation 等广义竞争场。
+```
+
+因此，Phase 797 中“单类 blocker suppression 不足以闭合”的判断，在 Phase 798 中被全词表结果进一步坐实。
+
+### 六、核心进展
+
+#### 1. top-k 盲区被量化
+
+Phase 797 只能说 top-k 不完整。Phase 798 给出了具体数量：
+
+```text
+qwen3：平均 311.0938 个 blocker 在 top-k 外；
+GLM4：平均 63.5667 个 blocker 在 top-k 外；
+DS7B：平均 1864.2552 个 blocker 在 top-k 外。
+```
+
+这说明，过去只看 top-k 容易低估竞争场复杂度。
+
+#### 2. blocker set 是全词表场，不是几个词元
+
+Phase 798 显示，目标词元上方经常不是几十个，而是数百到数千个词元。尤其 DS7B 平均还有 1926 个词元排在目标上方。
+
+因此，闭合公式必须从：
+
+$$
+z_{y^+}>z_{contrast}
+$$
+
+升级为：
+
+$$
+z_{y^+}>
+\max_{v\in V,\ v\neq y^+}z_v
+$$
+
+并且必须处理：
+
+$$
+B_{\text{full}}(x)
+$$
+
+而不是只处理：
+
+$$
+B_k(x)
+$$
+
+#### 3. identity anchor 是独立瓶颈
+
+确认轮中：
+
+```text
+qwen3：mean surface target identity rank = 4.25
+GLM4：mean surface target identity rank = 4.40
+DS7B：mean surface target identity rank = 4.8854
+```
+
+这说明正确 token id 在同表面答案 token 变体中通常不是第一位，而是大约第 4 到第 5 位。
+
+因此，模型可能已经把答案表面形式推到候选区，但没有完成：
+
+```text
+surface answer（表面答案）
+到
+exact token id（精确词元编号）
+```
+
+的身份锚定。
+
+#### 4. target booster 仍然有效，但远远不够
+
+确认轮中：
+
+```text
+qwen3：target logit gain = +2.8898
+GLM4：target logit gain = +1.5930
+DS7B：target logit gain = +2.9704
+```
+
+说明目标增强确实存在。
+
+但同时：
+
+```text
+token gain = 0
+```
+
+因此，当前不是“没有找到有效方向”，而是有效方向不足以完成全词表闭合。
+
+### 七、理论收紧
+
+Phase 797 的三元闭合公式是：
+
+$$
+\text{closure}
+=
+F(
+\text{target booster},
+\text{blocker-set suppressor},
+\text{identity anchor}
+)
+$$
+
+Phase 798 可以进一步写成全词表版本：
+
+$$
+\forall v\in V,\ v\neq y^+:
+\quad
+z_{y^+}
++
+\Delta z_{\text{target}}
++
+\Delta z_{\text{anchor}}
+>
+z_v
+-
+\Delta z_{\text{suppress}}(v)
+$$
+
+其中：
+
+$$
+\Delta z_{\text{target}}
+$$
+
+表示目标语义或目标值增强；
+
+$$
+\Delta z_{\text{anchor}}
+$$
+
+表示正确 token id 的身份锚定；
+
+$$
+\Delta z_{\text{suppress}}(v)
+$$
+
+表示对每个 blocker 的抑制。
+
+因为 blocker 是集合，所以更准确地写：
+
+$$
+\Delta z_{\text{suppress}}:
+B_{\text{full}}(x)
+\rightarrow
+\mathbb{R}_{\geq 0}
+$$
+
+也就是说，抑制器不是一个标量，而是一个定义在 blocker field（阻塞者场）上的函数。
+
+最终闭合条件变成：
+
+$$
+\min_{v\in V,\ v\neq y^+}
+\left[
+z_{y^+}
++
+\Delta z_{\text{target}}
++
+\Delta z_{\text{anchor}}
+-
+z_v
++
+\Delta z_{\text{suppress}}(v)
+\right]
+>
+0
+$$
+
+Phase 798 的关键贡献是把 \(B_k\) 替换为 \(B_{\text{full}}\)，并证明：
+
+```text
+真实闭合难度远高于 top-k 审计显示的难度。
+```
+
+### 八、问题、硬伤和谨慎边界
+
+1. 仍然不是内部 suppressor 定位
+
+Phase 798 抽取了全词表 blocker，但没有证明哪个 head、MLP 或 residual subspace 是真实 suppressor。
+
+当前证据只能说明：
+
+```text
+需要 blocker-set suppressor；
+还没有定位 blocker-set suppressor。
+```
+
+2. blocker 分类仍然是启发式
+
+semantic_or_lexical_competitor、echo、punctuation 等分类基于 token 文本规则，不等于模型内部真实机制分类。它们是观察层分类，不是神经元级分类。
+
+3. 小模型偏差可能很大
+
+qwen3、GLM4、DS7B 当前表现出严重 identity fragmentation 和大量 blocker。小模型可能因为容量不足、token identity bridge 粗糙、读出几何不稳定而放大这些现象。
+
+因此不能直接说大模型也是同样数量级的 blocker 场。更稳妥的说法是：
+
+```text
+在当前小模型上，语言闭合机制明显不是单点结构；
+它表现为目标增强、全词表竞争场抑制、词元身份锚三者共同不足。
+```
+
+4. 本阶段仍然停留在 logit-space audit（对数几率空间审计）
+
+它没有直接完成 neuron atlas（神经元图谱）或 causal fiber localization（因果纤维定位），但它给出了下一步定位必须面对的目标集合：
+
+```text
+B_full blocker field（全词表阻塞者场）
+```
+
+### 九、阶段性结论
+
+Phase 798 是实质进展。它把 Phase 797 的 top-k 诊断推进到全词表审计，证明：
+
+```text
+当前 token closure 失败不是因为少数 top-k blocker 没处理好；
+而是因为目标词元上方存在大规模 full-vocabulary blocker field。
+```
+
+同时，三模型确认：
+
+```text
+target booster 有效；
+但 blocker-set suppressor 缺失；
+identity anchor 也缺失；
+单类 suppression 不可能闭合；
+top-k 审计会严重低估闭合难度。
+```
+
+因此，目前最接近真实语言编码机制的图谱，不应该是静态 semantic graph（语义图谱），而应该是：
+
+```text
+target route（目标路线）
++
+full-vocabulary blocker field（全词表阻塞者场）
++
+identity anchor route（身份锚路线）
++
+suppressor field（抑制场）
+```
+
+### 十、下一步 Phase
+
+下一阶段仍然属于同一个大目标：从全词表竞争场走向真正的内部机制定位。
+
+建议进入：
+
+```text
+Phase 799: blocker-field causal suppressor localization（阻塞者场因果抑制器定位）
+```
+
+目标不是继续统计 blocker 数量，而是定位：
+
+```text
+哪些 head / MLP / residual subspace
+能够同时降低 blocker field，
+而不是只降低某个 contrast token。
+```
+
+最小任务：
+
+```text
+1. 从 Phase 798 中抽取每个样本的 top blocker classes 和 full blocker profile。
+2. 对候选 head / MLP 做 blocker-field suppression score（阻塞者场抑制分数）。
+3. 区分三种作用：
+   a. target booster：提高目标；
+   b. blocker suppressor：降低大量 blocker；
+   c. identity anchor：把同表面答案集中到正确 token id。
+4. 寻找同时满足三者的候选 causal fiber（因果纤维）。
+```
+
+新的评分函数应从单个 margin 改成：
+
+$$
+S_{\text{closure-fiber}}
+=
+\alpha\Delta z_{\text{target}}
++
+\beta\Delta z_{\text{anchor}}
++
+\gamma
+\frac{1}{|B_{\text{full}}|}
+\sum_{v\in B_{\text{full}}}
+\Delta z_{\text{suppress}}(v)
+-
+\lambda N_{\text{new-blocker}}
+$$
+
+其中：
+
+$$
+N_{\text{new-blocker}}
+$$
+
+表示干预后新出现或上升的 blocker 数量。
+
+这一步如果成立，研究将从：
+
+```text
+全词表 blocker 场观测
+```
+
+推进到：
+
+```text
+blocker-field suppressor 的内部因果定位。
+```
