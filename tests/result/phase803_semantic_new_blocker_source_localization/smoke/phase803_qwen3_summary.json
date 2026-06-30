@@ -1,0 +1,380 @@
+{
+  "alpha_grid": [
+    0.0,
+    0.75,
+    1.0
+  ],
+  "attn_implementation": "sdpa",
+  "by_alpha": [
+    {
+      "case_n": 1,
+      "label_counts": {
+        "threshold_cover_not_true_suppression": 1
+      },
+      "mean_alpha0_semantic_new_count": 32.0,
+      "mean_matched_semantic_delta_vs_alpha0": 0.173828125,
+      "mean_matched_semantic_delta_vs_recipient": 3.27734375,
+      "mean_matched_semantic_gap_vs_target": -1.681640625,
+      "mean_matched_semantic_still_above_target_rate": 0.03125,
+      "mean_new_blocker_rate": 0.12121212121212122,
+      "mean_old_blocker_suppression": 1.1428072452545166,
+      "mean_target_gain_delta_vs_alpha0": 2.875,
+      "mean_target_logit_gain": 2.8125,
+      "mean_true_semantic_suppression_score": 0.0,
+      "mean_true_semantic_suppression_vs_alpha0": -0.173828125,
+      "model": "qwen3",
+      "n": 1,
+      "new_blocker_class_counts": {
+        "echo_token": 2,
+        "high_frequency_or_format": 1,
+        "semantic_or_lexical_competitor": 1
+      },
+      "target_direction_alpha": 0.75,
+      "token_closure_gain_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "label_counts": {
+        "threshold_cover_not_true_suppression": 1
+      },
+      "mean_alpha0_semantic_new_count": 32.0,
+      "mean_matched_semantic_delta_vs_alpha0": 0.24609375,
+      "mean_matched_semantic_delta_vs_recipient": 3.349609375,
+      "mean_matched_semantic_gap_vs_target": -2.546875,
+      "mean_matched_semantic_still_above_target_rate": 0.03125,
+      "mean_new_blocker_rate": 0.047619047619047616,
+      "mean_old_blocker_suppression": 1.1171438694000244,
+      "mean_target_gain_delta_vs_alpha0": 3.8125,
+      "mean_target_logit_gain": 3.75,
+      "mean_true_semantic_suppression_score": 0.0,
+      "mean_true_semantic_suppression_vs_alpha0": -0.24609375,
+      "model": "qwen3",
+      "n": 1,
+      "new_blocker_class_counts": {
+        "semantic_or_lexical_competitor": 1
+      },
+      "target_direction_alpha": 1.0,
+      "token_closure_gain_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "label_counts": {
+        "semantic_new_blockers_persist": 1
+      },
+      "mean_alpha0_semantic_new_count": 32.0,
+      "mean_matched_semantic_delta_vs_alpha0": 0.0,
+      "mean_matched_semantic_delta_vs_recipient": 3.103515625,
+      "mean_matched_semantic_gap_vs_target": 1.01953125,
+      "mean_matched_semantic_still_above_target_rate": 1.0,
+      "mean_new_blocker_rate": 0.3742690058479532,
+      "mean_old_blocker_suppression": 1.2417947053909302,
+      "mean_target_gain_delta_vs_alpha0": 0.0,
+      "mean_target_logit_gain": -0.0625,
+      "mean_true_semantic_suppression_score": 0.0,
+      "mean_true_semantic_suppression_vs_alpha0": 0.0,
+      "model": "qwen3",
+      "n": 1,
+      "new_blocker_class_counts": {
+        "candidate_list_or_case_value": 3,
+        "echo_token": 11,
+        "high_frequency_or_format": 7,
+        "punctuation": 3,
+        "semantic_or_lexical_competitor": 39,
+        "whitespace_or_newline": 1
+      },
+      "target_direction_alpha": 0.0,
+      "token_closure_gain_rate": 0.0
+    }
+  ],
+  "by_component_route": [
+    {
+      "case_n": 1,
+      "component_label": "mlp:L35",
+      "mean_component_semantic_gap": 0.60546875,
+      "mean_component_semantic_logit_delta": 0.853515625,
+      "mean_component_semantic_new_count": 32.0,
+      "mean_component_semantic_release_score": 19.375,
+      "mean_new_blocker_rate": 0.3116883116883117,
+      "mean_old_blocker_suppression": 0.42178770899772644,
+      "mean_overlap_with_full_alpha0_count": 10.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.18518518518518517,
+      "model": "qwen3",
+      "n": 1,
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33"
+    },
+    {
+      "case_n": 1,
+      "component_label": "mlp:L34",
+      "mean_component_semantic_gap": 0.25,
+      "mean_component_semantic_logit_delta": 0.5625,
+      "mean_component_semantic_new_count": 5.0,
+      "mean_component_semantic_release_score": 1.25,
+      "mean_new_blocker_rate": 0.046357615894039736,
+      "mean_old_blocker_suppression": 0.39874300360679626,
+      "mean_overlap_with_full_alpha0_count": 3.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.08823529411764706,
+      "model": "qwen3",
+      "n": 1,
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33"
+    },
+    {
+      "case_n": 1,
+      "component_label": "attn:L35",
+      "mean_component_semantic_gap": 0.65625,
+      "mean_component_semantic_logit_delta": 1.15625,
+      "mean_component_semantic_new_count": 2.0,
+      "mean_component_semantic_release_score": 1.3125,
+      "mean_new_blocker_rate": 0.03305785123966942,
+      "mean_old_blocker_suppression": 0.541201114654541,
+      "mean_overlap_with_full_alpha0_count": 2.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.0625,
+      "model": "qwen3",
+      "n": 1,
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33"
+    },
+    {
+      "case_n": 1,
+      "component_label": "mlp:L33",
+      "mean_component_semantic_gap": 0.4166666666666667,
+      "mean_component_semantic_logit_delta": 1.3541666666666667,
+      "mean_component_semantic_new_count": 3.0,
+      "mean_component_semantic_release_score": 1.25,
+      "mean_new_blocker_rate": 0.023622047244094488,
+      "mean_old_blocker_suppression": -0.037709496915340424,
+      "mean_overlap_with_full_alpha0_count": 2.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.06060606060606061,
+      "model": "qwen3",
+      "n": 1,
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33"
+    }
+  ],
+  "by_route_alpha": [
+    {
+      "case_n": 1,
+      "label_counts": {
+        "threshold_cover_not_true_suppression": 1
+      },
+      "mean_alpha0_semantic_new_count": 32.0,
+      "mean_matched_semantic_delta_vs_alpha0": 0.173828125,
+      "mean_matched_semantic_delta_vs_recipient": 3.27734375,
+      "mean_matched_semantic_gap_vs_target": -1.681640625,
+      "mean_matched_semantic_still_above_target_rate": 0.03125,
+      "mean_new_blocker_rate": 0.12121212121212122,
+      "mean_old_blocker_suppression": 1.1428072452545166,
+      "mean_target_gain_delta_vs_alpha0": 2.875,
+      "mean_target_logit_gain": 2.8125,
+      "mean_true_semantic_suppression_score": 0.0,
+      "mean_true_semantic_suppression_vs_alpha0": -0.173828125,
+      "model": "qwen3",
+      "n": 1,
+      "new_blocker_class_counts": {
+        "echo_token": 2,
+        "high_frequency_or_format": 1,
+        "semantic_or_lexical_competitor": 1
+      },
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33",
+      "target_direction_alpha": 0.75,
+      "token_closure_gain_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "label_counts": {
+        "threshold_cover_not_true_suppression": 1
+      },
+      "mean_alpha0_semantic_new_count": 32.0,
+      "mean_matched_semantic_delta_vs_alpha0": 0.24609375,
+      "mean_matched_semantic_delta_vs_recipient": 3.349609375,
+      "mean_matched_semantic_gap_vs_target": -2.546875,
+      "mean_matched_semantic_still_above_target_rate": 0.03125,
+      "mean_new_blocker_rate": 0.047619047619047616,
+      "mean_old_blocker_suppression": 1.1171438694000244,
+      "mean_target_gain_delta_vs_alpha0": 3.8125,
+      "mean_target_logit_gain": 3.75,
+      "mean_true_semantic_suppression_score": 0.0,
+      "mean_true_semantic_suppression_vs_alpha0": -0.24609375,
+      "model": "qwen3",
+      "n": 1,
+      "new_blocker_class_counts": {
+        "semantic_or_lexical_competitor": 1
+      },
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33",
+      "target_direction_alpha": 1.0,
+      "token_closure_gain_rate": 0.0
+    },
+    {
+      "case_n": 1,
+      "label_counts": {
+        "semantic_new_blockers_persist": 1
+      },
+      "mean_alpha0_semantic_new_count": 32.0,
+      "mean_matched_semantic_delta_vs_alpha0": 0.0,
+      "mean_matched_semantic_delta_vs_recipient": 3.103515625,
+      "mean_matched_semantic_gap_vs_target": 1.01953125,
+      "mean_matched_semantic_still_above_target_rate": 1.0,
+      "mean_new_blocker_rate": 0.3742690058479532,
+      "mean_old_blocker_suppression": 1.2417947053909302,
+      "mean_target_gain_delta_vs_alpha0": 0.0,
+      "mean_target_logit_gain": -0.0625,
+      "mean_true_semantic_suppression_score": 0.0,
+      "mean_true_semantic_suppression_vs_alpha0": 0.0,
+      "model": "qwen3",
+      "n": 1,
+      "new_blocker_class_counts": {
+        "candidate_list_or_case_value": 3,
+        "echo_token": 11,
+        "high_frequency_or_format": 7,
+        "punctuation": 3,
+        "semantic_or_lexical_competitor": 39,
+        "whitespace_or_newline": 1
+      },
+      "route_component_signature": "attn:L35+mlp:L35+mlp:L34+mlp:L33",
+      "target_direction_alpha": 0.0,
+      "token_closure_gain_rate": 0.0
+    }
+  ],
+  "dtype": "bfloat16",
+  "model": "qwen3",
+  "n_cases": 1,
+  "n_component_rows": 4,
+  "n_routes": 1,
+  "n_rows": 7,
+  "n_trace_rows": 3,
+  "phase": 803,
+  "quantization": "off",
+  "round": "smoke",
+  "routes": [
+    {
+      "candidate_id": "lowercase_short_value:route_k6",
+      "compare_variant": "lowercase_short_value",
+      "component_kind": "route",
+      "component_labels": [
+        "attn:L35",
+        "mlp:L35",
+        "mlp:L34",
+        "mlp:L33",
+        "mlp:L32",
+        "mlp:L26"
+      ],
+      "components": [
+        {
+          "component_kind": "attn",
+          "layer": 35,
+          "phase780_actual_margin_delta": 11.458333333333334,
+          "phase780_candidate_score": 6.5462543567021685,
+          "phase780_direct_delta": 6.5462543567021685
+        },
+        {
+          "component_kind": "mlp",
+          "layer": 35,
+          "phase780_actual_margin_delta": 11.458333333333334,
+          "phase780_candidate_score": 6.0466431975364685,
+          "phase780_direct_delta": 6.0466431975364685
+        },
+        {
+          "component_kind": "mlp",
+          "layer": 34,
+          "phase780_actual_margin_delta": 11.458333333333334,
+          "phase780_candidate_score": 5.161165714263916,
+          "phase780_direct_delta": 5.161165714263916
+        },
+        {
+          "component_kind": "mlp",
+          "layer": 33,
+          "phase780_actual_margin_delta": 11.458333333333334,
+          "phase780_candidate_score": 3.56169060866038,
+          "phase780_direct_delta": 3.56169060866038
+        },
+        {
+          "component_kind": "mlp",
+          "layer": 32,
+          "phase780_actual_margin_delta": 11.458333333333334,
+          "phase780_candidate_score": 1.0985067288080852,
+          "phase780_direct_delta": 1.0985067288080852
+        },
+        {
+          "component_kind": "mlp",
+          "layer": 26,
+          "phase780_actual_margin_delta": 11.458333333333334,
+          "phase780_candidate_score": 0.782832662264506,
+          "phase780_direct_delta": 0.782832662264506
+        }
+      ],
+      "layer": -1,
+      "phase780_actual_margin_delta": 11.458333333333334,
+      "phase780_candidate_score": 3.866182211372587,
+      "phase780_direct_delta": 3.866182211372587,
+      "phase780_strict_repair_rate": null,
+      "route_id": "lowercase_short_value:route_k6",
+      "route_size": 6
+    }
+  ],
+  "strict_boundary": "This phase matches semantic new blockers released at alpha=0 and tracks their logits across alpha. It distinguishes threshold cover from true semantic new-blocker logit suppression, but it still uses answer-position hidden-state route patching rather than neuron-level causal graph closure.",
+  "timestamp": "2026-06-30 14:47:08",
+  "title": "Semantic New-Blocker Source Localization",
+  "top_component_sources": [
+    {
+      "case_n": 1,
+      "component_kind": "mlp",
+      "component_label": "mlp:L35",
+      "layer": 35,
+      "mean_component_semantic_gap": 0.60546875,
+      "mean_component_semantic_logit_delta": 0.853515625,
+      "mean_component_semantic_new_count": 32.0,
+      "mean_component_semantic_release_score": 19.375,
+      "mean_new_blocker_rate": 0.3116883116883117,
+      "mean_old_blocker_suppression": 0.42178770899772644,
+      "mean_overlap_with_full_alpha0_count": 10.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.18518518518518517,
+      "model": "qwen3",
+      "n": 1
+    },
+    {
+      "case_n": 1,
+      "component_kind": "mlp",
+      "component_label": "mlp:L34",
+      "layer": 34,
+      "mean_component_semantic_gap": 0.25,
+      "mean_component_semantic_logit_delta": 0.5625,
+      "mean_component_semantic_new_count": 5.0,
+      "mean_component_semantic_release_score": 1.25,
+      "mean_new_blocker_rate": 0.046357615894039736,
+      "mean_old_blocker_suppression": 0.39874300360679626,
+      "mean_overlap_with_full_alpha0_count": 3.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.08823529411764706,
+      "model": "qwen3",
+      "n": 1
+    },
+    {
+      "case_n": 1,
+      "component_kind": "attn",
+      "component_label": "attn:L35",
+      "layer": 35,
+      "mean_component_semantic_gap": 0.65625,
+      "mean_component_semantic_logit_delta": 1.15625,
+      "mean_component_semantic_new_count": 2.0,
+      "mean_component_semantic_release_score": 1.3125,
+      "mean_new_blocker_rate": 0.03305785123966942,
+      "mean_old_blocker_suppression": 0.541201114654541,
+      "mean_overlap_with_full_alpha0_count": 2.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.0625,
+      "model": "qwen3",
+      "n": 1
+    },
+    {
+      "case_n": 1,
+      "component_kind": "mlp",
+      "component_label": "mlp:L33",
+      "layer": 33,
+      "mean_component_semantic_gap": 0.4166666666666667,
+      "mean_component_semantic_logit_delta": 1.3541666666666667,
+      "mean_component_semantic_new_count": 3.0,
+      "mean_component_semantic_release_score": 1.25,
+      "mean_new_blocker_rate": 0.023622047244094488,
+      "mean_old_blocker_suppression": -0.037709496915340424,
+      "mean_overlap_with_full_alpha0_count": 2.0,
+      "mean_overlap_with_full_alpha0_jaccard": 0.06060606060606061,
+      "model": "qwen3",
+      "n": 1
+    }
+  ]
+}

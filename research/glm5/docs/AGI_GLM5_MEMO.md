@@ -77239,3 +77239,2116 @@ GLM4：有少量较干净证据，但覆盖率不足。
 DS7B：尚未出现 true suppressor 证据。
 整体：完成了一个关键拼图，但离完整语言编码机制仍有明显距离。
 ```
+
+## Phase 802: new-blocker stabilization dose response（新阻塞者稳定化剂量响应测试） [2026-06-30 14:28]
+
+### 一、任务来源
+
+上传分析对 Phase 801 的判断基本正确：
+
+```text
+Phase 801 是重要正结果和重要负结果并存的阶段。
+正结果是 target booster 和 blocker suppressor 被真正拆开；
+负结果是 target-neutral component 虽然压低 old blocker，
+但会制造大量 new blocker，三模型都没有 token closure。
+```
+
+这个判断和 Phase 801 的确认轮结果一致。更准确地说：
+
+```text
+qwen3 / GLM4：存在 old-blocker suppressing component；
+DS7B：仍主要是 target booster / threshold shift；
+三模型：token closure gain = 0。
+```
+
+因此下一步仍属于同一阶段性目标：
+
+```text
+从 blocker field 走向 output-field closure。
+```
+
+Phase 802 的核心问题是：
+
+```text
+如果 target-neutral component 会制造大量 new blockers，
+那么逐步加回 target direction 后，
+new blocker 是否会下降？
+如果下降，是因为真实稳定了 new blockers，
+还是只是 target / readout threshold 被抬高？
+```
+
+### 二、测试脚本和结果路径
+
+脚本：
+
+```text
+tests/glm5/phase802_new_blocker_stabilization_dose_response.py
+tests/glm5/run_phase802_new_blocker_stabilization_dose_response_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase802_new_blocker_stabilization_dose_response/smoke/
+tests/result/phase802_new_blocker_stabilization_dose_response/main/
+tests/result/phase802_new_blocker_stabilization_dose_response/confirm/
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+测试轮次：
+
+```text
+smoke: 1 case, 1 route, alpha = 0 / 0.5 / 1.0
+main: 4 cases, 2 routes, alpha = 0 / 0.25 / 0.5 / 0.75 / 1.0
+confirm: 6 cases, 2 routes, alpha = 0 / 0.25 / 0.5 / 0.75 / 1.0 / 1.25
+```
+
+未使用量化方案，模型逐个加载，优先尝试 flash_attention_2，失败后回退到 sdpa。
+
+### 三、测试原理
+
+Phase 801 的分解是：
+
+$$
+\Delta h =
+\Delta h_{\text{neutral}}
++
+\Delta h_{\text{target}}
+$$
+
+Phase 802 不再只比较三种离散状态，而是做 target-direction dose response：
+
+$$
+\Delta h(\alpha)
+=
+\Delta h_{\text{neutral}}
++
+\alpha \Delta h_{\text{target}}
+$$
+
+其中：
+
+$$
+\alpha = 0
+\Rightarrow
+\Delta h(\alpha)=\Delta h_{\text{neutral}}
+$$
+
+$$
+\alpha = 1
+\Rightarrow
+\Delta h(\alpha)=\Delta h_{\text{raw}}
+$$
+
+$$
+\alpha > 1
+\Rightarrow
+\text{over-inject direct target direction}
+$$
+
+然后观察五个量：
+
+$$
+\Delta z_y(\alpha)
+$$
+
+$$
+S_{\text{old}}(\alpha)
+=
+\frac{1}{|B_{\text{old}}|}
+\sum_{b\in B_{\text{old}}}
+\left(
+z_b^{\text{before}}
+-
+z_b^{\text{after}}(\alpha)
+\right)
+$$
+
+$$
+R_{\text{new}}(\alpha)
+=
+\frac{
+|B_{\text{new}}(\alpha)|
+}{
+|B_{\text{after}}(\alpha)|
+}
+$$
+
+$$
+A_{\text{identity}}(\alpha)
+=
+g_{\text{anchor}}^{\text{before}}
+-
+g_{\text{anchor}}^{\text{after}}(\alpha)
+$$
+
+$$
+C_{\text{token}}(\alpha)
+=
+\mathbf{1}
+\left[
+z_y(\alpha)
+>
+\max_{v\ne y}z_v(\alpha)
+\right]
+$$
+
+本阶段的稳定化分数为：
+
+$$
+Q_{\text{stable}}(\alpha)
+=
+\max(S_{\text{old}}(\alpha),0)
+\cdot
+R_{\text{resolved}}(\alpha)
+\cdot
+\left(1-R_{\text{new}}(\alpha)\right)
+$$
+
+输出场闭合候选分数为：
+
+$$
+Q_{\text{field}}(\alpha)
+=
+\frac{
+Q_{\text{stable}}(\alpha)
+\cdot
+\left(
+1+
+\frac{\max(A_{\text{identity}}(\alpha),0)}
+{1+|A_{\text{identity}}(\alpha)|}
+\right)
+}{
+1+
+\max(|\Delta z_y(\alpha)|-1,0)
+}
+$$
+
+这个分数不是理论真值，只是排序工具。它的作用是同时惩罚：
+
+```text
+new blocker 过多；
+target gain 过大；
+identity anchor 变差。
+```
+
+### 四、确认轮客观结果
+
+qwen3：
+
+```text
+alpha=0.00:
+target gain = -0.542
+old suppression = 0.747
+resolved = 0.229
+new rate = 0.392
+anchor = 0.969
+field score = 0.166
+token closure = 0
+
+alpha=0.50:
+target gain = 1.156
+old suppression = 0.716
+resolved = 0.523
+new rate = 0.136
+anchor = 1.688
+field score = 0.381
+token closure = 0
+
+alpha=0.75:
+target gain = 2.018
+old suppression = 0.699
+resolved = 0.652
+new rate = 0.071
+anchor = 2.091
+field score = 0.399
+token closure = 0
+
+alpha=1.00:
+target gain = 2.852
+old suppression = 0.691
+resolved = 0.728
+new rate = 0.041
+anchor = 2.477
+field score = 0.337
+token closure = 0
+
+alpha=1.25:
+target gain = 3.690
+old suppression = 0.678
+resolved = 0.795
+new rate = 0.027
+anchor = 2.826
+field score = 0.291
+token closure = 0
+```
+
+GLM4：
+
+```text
+alpha=0.00:
+target gain = 0.174
+old suppression = 0.418
+resolved = 0.338
+new rate = 0.193
+anchor = -0.514
+field score = 0.163
+token closure = 0
+
+alpha=0.50:
+target gain = 0.678
+old suppression = 0.421
+resolved = 0.470
+new rate = 0.105
+anchor = -0.077
+field score = 0.195
+token closure = 0
+
+alpha=1.00:
+target gain = 1.146
+old suppression = 0.419
+resolved = 0.570
+new rate = 0.068
+anchor = 0.339
+field score = 0.208
+token closure = 0
+
+alpha=1.25:
+target gain = 1.355
+old suppression = 0.420
+resolved = 0.604
+new rate = 0.059
+anchor = 0.522
+field score = 0.215
+token closure = 0
+```
+
+DS7B：
+
+```text
+alpha=0.00:
+target gain = 0.702
+old suppression = -0.424
+resolved = 0.265
+new rate = 0.427
+anchor = 0.794
+field score = 0.011
+token closure = 0
+
+alpha=0.50:
+target gain = 1.859
+old suppression = -0.474
+resolved = 0.495
+new rate = 0.198
+anchor = 1.450
+field score = 0.015
+token closure = 0
+
+alpha=1.00:
+target gain = 3.016
+old suppression = -0.530
+resolved = 0.671
+new rate = 0.116
+anchor = 2.078
+field score = 0.011
+token closure = 0
+
+alpha=1.25:
+target gain = 3.591
+old suppression = -0.556
+resolved = 0.727
+new rate = 0.100
+anchor = 2.399
+field score = 0.010
+token closure = 0
+```
+
+### 五、主要现象
+
+#### 1. qwen3 出现清晰剂量曲线
+
+qwen3 中，随着 alpha 增大：
+
+```text
+new rate: 0.392 -> 0.238 -> 0.136 -> 0.071 -> 0.041 -> 0.027
+resolved: 0.229 -> 0.374 -> 0.523 -> 0.652 -> 0.728 -> 0.795
+old suppression: 0.747 -> 0.729 -> 0.716 -> 0.699 -> 0.691 -> 0.678
+```
+
+这说明：
+
+```text
+加入 target direction 可以显著降低 new blocker rate，
+同时大体保留 old blocker suppression。
+```
+
+但它也说明另一个边界：
+
+```text
+new blocker rate 的下降伴随 target gain 显著上升。
+```
+
+因此不能简单说找到了 new-blocker suppressor。
+
+更谨慎的结论是：
+
+```text
+target/readout dose 能稳定 output field 的排名结构，
+但未证明它直接压低 new blocker logits。
+```
+
+#### 2. GLM4 也有同向但更弱的剂量曲线
+
+GLM4 中：
+
+```text
+new rate: 0.193 -> 0.142 -> 0.105 -> 0.083 -> 0.068 -> 0.059
+old suppression: 0.418 -> 0.415 -> 0.421 -> 0.418 -> 0.419 -> 0.420
+```
+
+这说明：
+
+```text
+GLM4 的 old blocker suppression 基本稳定；
+new blocker rate 随 alpha 上升而下降；
+但 identity anchor 在低 alpha 时为负，到高 alpha 才转正。
+```
+
+GLM4 比 qwen3 更像：
+
+```text
+较弱但更平滑的 readout-field stabilization。
+```
+
+#### 3. DS7B 仍然是强反例
+
+DS7B 中：
+
+```text
+new rate 随 alpha 下降；
+resolved 随 alpha 上升；
+但 old suppression 始终为负。
+```
+
+这说明：
+
+```text
+DS7B 的 blocker 数量改善主要来自 target / threshold shift；
+不是 old blocker 被真实压低。
+```
+
+因此 Phase 802 进一步坐实：
+
+```text
+DS7B 当前不能作为 true suppressor 证据来源。
+```
+
+### 六、new blocker 的类别分布
+
+三模型的新阻塞者都主要来自：
+
+```text
+semantic_or_lexical_competitor
+```
+
+qwen3 在 alpha=0 时：
+
+```text
+semantic_or_lexical_competitor new blockers = 12515
+echo_token = 263
+whitespace_or_newline = 269
+punctuation = 174
+```
+
+qwen3 在 alpha=1 时：
+
+```text
+semantic_or_lexical_competitor new blockers = 147
+echo_token = 7
+punctuation = 3
+```
+
+GLM4 在 alpha=0 时：
+
+```text
+semantic_or_lexical_competitor new blockers = 914
+echo_token = 91
+punctuation = 96
+```
+
+GLM4 在 alpha=1.25 时：
+
+```text
+semantic_or_lexical_competitor new blockers = 104
+echo_token = 16
+punctuation = 18
+```
+
+DS7B 在 alpha=0 时：
+
+```text
+semantic_or_lexical_competitor new blockers = 54871
+punctuation = 2303
+whitespace_or_newline = 2128
+echo_token = 627
+```
+
+这说明：
+
+```text
+new blocker explosion 不是单纯 format / echo 问题；
+主体是 semantic / lexical competitor 被释放。
+```
+
+这是 Phase 802 的重要拼图。
+
+### 七、关键样本
+
+qwen3 较好样本：
+
+```text
+case = apple:grows_on_tree
+route = attn:L34 + attn:L31 + mlp:L34 + mlp:L35
+best alpha = 0.75
+target gain = 0.875
+old suppression = 0.943
+new rate = 0.056
+anchor = 5.875
+score = 0.887
+label = old_suppress_new_stable_anchor_ok
+token closure = false
+```
+
+这个样本说明：
+
+```text
+存在 old suppression + low new rate + positive anchor 的组合，
+但仍没有 token closure。
+```
+
+GLM4 较好样本：
+
+```text
+case = chair:category
+route = mlp:L38 + attn:L33 + attn:L29 + attn:L35
+best alpha = 1.25
+target gain = 0.875
+old suppression = 0.756
+new rate = 0.066
+anchor = -1.438
+score = 0.486
+label = old_suppress_new_stable_anchor_weak
+token closure = false
+```
+
+这个样本说明：
+
+```text
+GLM4 可以压低 new rate，
+但 identity anchor 仍可能变差。
+```
+
+DS7B 最好样本仍很弱：
+
+```text
+case = apple:grows_on_tree
+route = mlp:L27 + mlp:L26 + mlp:L24 + attn:L19
+best alpha = 0.5
+target gain = 2.719
+old suppression = 0.179
+new rate = 0.159
+anchor = 2.594
+score = 0.076
+label = weak_or_mixed
+token closure = false
+```
+
+### 八、正确结论
+
+Phase 802 是实质进展，但不是闭合。
+
+实质进展是：
+
+```text
+new blocker explosion 被定位为 output-field instability；
+加入 target/readout dose 可以显著降低 new blocker rate；
+qwen3 和 GLM4 的 old blocker suppression 在 alpha 增加时仍能保留。
+```
+
+但边界也非常清楚：
+
+```text
+new blocker rate 下降不等于 new blocker logits 被真实压低；
+它可能只是 target threshold / readout geometry 被抬高。
+```
+
+最关键观察是：
+
+```text
+qwen3 / GLM4 的 new blocker class mean logit delta 多数仍为正；
+也就是说很多 new blockers 的自身 logit 仍在上升，
+只是 target / readout threshold 上升得更多。
+```
+
+因此 Phase 802 不能证明：
+
+```text
+已经找到 new-blocker suppressor。
+```
+
+只能证明：
+
+```text
+target/readout dose 可以作为 new-blocker rate stabilizer；
+但它更像 readout threshold stabilizer，而不是纯粹 new-blocker suppressor。
+```
+
+### 九、和 Phase 801 的关系
+
+Phase 801 证明：
+
+$$
+S_{\text{old}}(\alpha=0) > 0
+$$
+
+即扣除 target direction 后，旧阻塞者仍能被压低。
+
+Phase 802 证明：
+
+$$
+R_{\text{new}}(\alpha)
+\text{ generally decreases as }
+\alpha \text{ increases}
+$$
+
+但同时：
+
+$$
+\Delta z_y(\alpha)
+\text{ also increases}
+$$
+
+所以当前机制链更准确地写成：
+
+$$
+\Delta h_{\text{neutral}}
+\Rightarrow
+S_{\text{old}} > 0
+\quad\text{but}\quad
+R_{\text{new}} \uparrow
+$$
+
+$$
+\Delta h_{\text{target}}
+\Rightarrow
+R_{\text{new}} \downarrow
+\quad\text{but}\quad
+\Delta z_y \uparrow
+$$
+
+完整闭合需要的是：
+
+$$
+S_{\text{old}} > 0
+\quad\land\quad
+R_{\text{new}} \downarrow
+\quad\land\quad
+\Delta z_y \text{ not merely threshold shift}
+\quad\land\quad
+C_{\text{token}}=1
+$$
+
+当前还没有满足。
+
+### 十、问题和硬伤
+
+1. alpha dose response 不能区分：
+
+```text
+真实 new-blocker suppression
+和
+target threshold rise。
+```
+
+2. 本阶段仍是 answer-position hidden-state route patch：
+
+```text
+不是 Q/K/V/O 内部空间；
+不是 neuron-level causal atlas。
+```
+
+3. new blocker 主要是 semantic / lexical competitor：
+
+```text
+说明下一步不能只处理 format / echo；
+必须进入语义竞争场的来源定位。
+```
+
+4. token closure 仍然为 0：
+
+```text
+即使 old suppression、new rate、identity anchor 同时改善，
+仍不足以让目标词元成为 top1。
+```
+
+5. 小模型偏差仍需谨慎：
+
+```text
+qwen3、GLM4、DS7B 的机制形态差异很大；
+特别是 DS7B 几乎把改善压缩成 threshold shift；
+这可能是小模型容量不足或蒸馏结构偏差造成的。
+```
+
+### 十一、阶段性图谱更新
+
+当前图谱应进一步分成：
+
+```text
+old_blocker_suppress fiber
+new_blocker_release fiber
+target_threshold_stabilizer fiber
+identity_anchor_stabilizer fiber
+semantic_competitor_release fiber
+token_closure fiber
+```
+
+Phase 802 说明：
+
+```text
+new blocker 的主体不是格式噪声，而是语义 / 词汇竞争者；
+target direction 的作用不仅是 target booster，也像 readout threshold stabilizer；
+但它还不是完整 closure fiber。
+```
+
+### 十二、下一阶段
+
+下一阶段仍属于同一阶段性目标：
+
+```text
+从 output-field stabilization 走向 token closure。
+```
+
+建议进入：
+
+```text
+Phase 803: semantic new-blocker source localization（语义新阻塞者来源定位）
+```
+
+核心任务：
+
+```text
+1. 定位 alpha=0 时释放出来的 semantic / lexical new blockers 来自哪些层和 route；
+2. 比较 alpha=0 与 alpha=0.75 / 1.0 的 new blocker logits，而不是只看 new blocker rate；
+3. 判断 target direction 是压低 new blockers，还是只是抬高 target threshold；
+4. 寻找不依赖大 target gain 的 semantic competitor stabilizer；
+5. 把 new blocker class 从“统计类别”推进到“来源纤维”。
+```
+
+下一步闭合标准应改为：
+
+$$
+S_{\text{old}} > 0
+$$
+
+$$
+\Delta z_{\text{new-semantic}} \le 0
+$$
+
+$$
+R_{\text{new}} \le \eta
+$$
+
+$$
+|\Delta z_y| \le \epsilon
+$$
+
+$$
+A_{\text{identity}} \ge 0
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+当前完成度判断：
+
+```text
+old-blocker suppressor：已有较强证据；
+new-blocker rate stabilizer：已有剂量响应证据；
+true new-blocker suppressor：尚未证明；
+semantic competitor source fiber：尚未定位；
+token closure：尚未完成。
+```
+
+## Phase 803: semantic new-blocker source localization（语义新阻塞者来源定位） [2026-06-30 14:50]
+
+### 一、任务来源
+
+本阶段读取并分析 Phase 802 的最新判断后继续推进。Phase 802 的核心判断是正确的：
+
+```text
+target direction dose（目标方向剂量）会降低 new blocker rate（新阻塞者率），
+但这不等价于 new blocker logits（新阻塞者对数几率）被真实压低。
+```
+
+因此 Phase 803 不再只看 new blocker rate（新阻塞者率），而是追踪 alpha=0 时释放出的同一批 semantic / lexical new blockers（语义 / 词汇新阻塞者），观察它们在加入 target direction（目标方向）后是否真的下降。
+
+本阶段仍属于同一阶段性目标：
+
+```text
+从 output-field stabilization（输出场稳定）
+推进到 token closure（词元闭合）。
+```
+
+### 二、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase803_semantic_new_blocker_source_localization.py
+tests/glm5/run_phase803_semantic_new_blocker_source_localization_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase803_semantic_new_blocker_source_localization/
+```
+
+三轮测试：
+
+```text
+smoke：冒烟测试，确认脚本、模型加载、数据结构正常；
+main：主要测试，覆盖三模型和 alpha 剂量网格；
+confirm：确认测试，增加样本后验证关键结论。
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载策略：
+
+```text
+bf16；
+quantization=off（不使用量化）；
+优先 flash_attention_2，环境缺少 FlashAttention2 时自动回退 sdpa；
+每个模型完成后释放 GPU 内存。
+```
+
+### 三、测试原理
+
+Phase 803 首先定义 alpha=0 时由 target-neutral component（目标中性成分）释放出的语义新阻塞者集合：
+
+$$
+B_{\text{new-sem}}(0)
+=
+\left\{
+v\mid
+z_v(0)>z_y(0),
+\ z_v^{\text{recipient}}\le z_y^{\text{recipient}},
+\ \operatorname{class}(v)=\text{semantic}
+\right\}
+$$
+
+其中 \(y\) 是目标 token（词元），\(v\) 是候选阻塞 token（词元）。
+
+然后在不同 alpha 下追踪同一批 \(v\)，而不是重新统计新的 top-k：
+
+$$
+D_v(\alpha)
+=
+z_v(\alpha)-z_v(0)
+$$
+
+如果 \(D_v(\alpha)<0\)，说明该语义新阻塞者的 logit（对数几率）被真实压低。
+
+同时观察它相对目标 token（词元）的差距：
+
+$$
+G_v(\alpha)
+=
+z_v(\alpha)-z_y(\alpha)
+$$
+
+如果 \(G_v(\alpha)<0\)，说明它已经低于目标 token（词元）。
+
+因此判断标准是：
+
+$$
+\text{true semantic suppression}
+\Longleftrightarrow
+\mathbb{E}_{v\in B_{\text{new-sem}}(0)}
+D_v(\alpha)<0
+$$
+
+而阈值覆盖判断是：
+
+$$
+\text{threshold cover}
+\Longleftrightarrow
+\mathbb{E}_{v\in B_{\text{new-sem}}(0)}
+D_v(\alpha)\ge 0
+\quad\text{and}\quad
+\mathbb{E}_{v\in B_{\text{new-sem}}(0)}
+G_v(\alpha)<0
+$$
+
+也就是说，若语义阻塞者自身没有下降，但目标 token（词元）上升后把它们盖住，这只能算 readout threshold shift（读出阈值位移），不能算 true new-blocker suppressor（真实新阻塞者抑制器）。
+
+### 四、确认轮核心结果
+
+#### 1. qwen3
+
+qwen3 的结论最清楚：target direction（目标方向）持续降低 new blocker rate（新阻塞者率），但同一批语义新阻塞者没有下降，反而轻微上升。
+
+```text
+alpha=0.00：new rate=0.392，matched delta vs a0=0.000，still above=1.000
+alpha=0.50：new rate=0.136，matched delta vs a0=+0.046，still above=0.475
+alpha=0.75：new rate=0.071，matched delta vs a0=+0.071，still above=0.225
+alpha=1.00：new rate=0.041，matched delta vs a0=+0.092，still above=0.153
+alpha=1.25：new rate=0.027，matched delta vs a0=+0.113，still above=0.072
+```
+
+判断：
+
+```text
+qwen3 的 new blocker rate 下降主要来自 target/readout threshold（目标 / 读出阈值）抬高，
+不是 semantic new blockers（语义新阻塞者）被真实压低。
+```
+
+主要来源候选：
+
+```text
+mlp:L35：semantic new=49.083，overlap=19.750，jaccard=0.265，release score=71.055
+mlp:L34：semantic new=18.417，overlap=5.917，jaccard=0.078，release score=20.849
+mlp:L33：semantic new=10.167，overlap=4.000，jaccard=0.050，release score=2.865
+attn:L34 / attn:L35 / attn:L31：次级来源候选
+```
+
+qwen3 的 dominant semantic release source（主导语义释放来源）集中在后段 MLP，尤其是 L35。
+
+#### 2. GLM4
+
+GLM4 的变化更温和。new blocker rate（新阻塞者率）随 alpha 下降，但 matched semantic blocker logit（匹配语义阻塞者对数几率）几乎不变。
+
+```text
+alpha=0.00：new rate=0.193，matched delta vs a0=0.000，still above=1.000
+alpha=0.50：new rate=0.105，matched delta vs a0=-0.001，still above=0.548
+alpha=0.75：new rate=0.083，matched delta vs a0=+0.003，still above=0.417
+alpha=1.00：new rate=0.068，matched delta vs a0=+0.003，still above=0.310
+alpha=1.25：new rate=0.059，matched delta vs a0=+0.006，still above=0.253
+```
+
+判断：
+
+```text
+GLM4 没有出现稳定、足量的 semantic suppression（语义抑制）。
+alpha=0.50 的 -0.001 太小，不能作为真实机制证据。
+整体仍更接近 threshold cover（阈值覆盖）和 semantic blockers persist（语义阻塞者持续存在）。
+```
+
+主要来源候选：
+
+```text
+mlp:L38：semantic new=26.833，overlap=21.833，jaccard=0.458，release score=13.461
+mlp:L39：semantic new=34.167，overlap=21.667，jaccard=0.350，release score=16.068
+mlp:L27：semantic new=21.833，overlap=11.333，jaccard=0.191，release score=3.266
+```
+
+GLM4 的 source overlap（来源重叠）最集中在 L38/L39 MLP。
+
+#### 3. DS7B
+
+DS7B 的结果最能说明边界：new blocker rate（新阻塞者率）下降，但 old blocker suppression（旧阻塞者抑制）为负，同一批语义新阻塞者还在上升。
+
+```text
+alpha=0.00：new rate=0.427，matched delta vs a0=0.000，still above=1.000，old suppress=-0.424
+alpha=0.50：new rate=0.198，matched delta vs a0=+0.041，still above=0.831，old suppress=-0.474
+alpha=0.75：new rate=0.143，matched delta vs a0=+0.061，still above=0.711，old suppress=-0.501
+alpha=1.00：new rate=0.116，matched delta vs a0=+0.080，still above=0.641，old suppress=-0.530
+alpha=1.25：new rate=0.100，matched delta vs a0=+0.101，still above=0.473，old suppress=-0.556
+```
+
+判断：
+
+```text
+DS7B 不是通过真实压低语义阻塞者完成稳定，
+而是明显依赖 target/readout threshold shift（目标 / 读出阈值位移）。
+并且它对 old blockers（旧阻塞者）没有稳定抑制，说明 DS7B 的闭合结构更粗糙。
+```
+
+主要来源候选：
+
+```text
+attn:L19：semantic new=38.667，overlap=22.167，jaccard=0.392，release score=55.630
+mlp:L27：semantic new=43.583，overlap=17.917，jaccard=0.205，release score=73.451
+mlp:L26：semantic new=39.667，overlap=16.000，jaccard=0.217，release score=29.531
+mlp:L24：semantic new=41.500，overlap=11.333，jaccard=0.138，release score=29.951
+```
+
+DS7B 的 semantic release source（语义释放来源）更分散，attention L19（第19层注意力）和 MLP L27（第27层多层感知机）同时重要。
+
+### 五、总体判断
+
+Phase 803 是实质进展，但仍不是 token closure（词元闭合）。
+
+它验证了 Phase 802 的关键疑问：
+
+```text
+new blocker rate（新阻塞者率）下降，
+不等于 semantic new blocker logits（语义新阻塞者对数几率）下降。
+```
+
+三模型共同现象：
+
+```text
+1. alpha 增大后 new blocker rate 会下降；
+2. matched semantic blocker logits（匹配语义阻塞者对数几率）没有稳定下降；
+3. qwen3 和 DS7B 中，匹配语义阻塞者还随 alpha 轻微上升；
+4. GLM4 只有接近零的小幅波动，不能构成真实抑制证据；
+5. token closure rate（词元闭合率）仍为 0。
+```
+
+所以，当前不能说已经找到：
+
+```text
+true semantic new-blocker suppressor（真实语义新阻塞者抑制器）
+```
+
+只能说已经找到：
+
+```text
+semantic new-blocker release source candidates（语义新阻塞者释放来源候选）
+readout threshold cover mechanism（读出阈值覆盖机制）
+old-blocker suppressor 与 target/readout stabilizer 的分离证据
+```
+
+### 六、对 Phase 802 附件判断的审视
+
+附件判断基本正确，而且 Phase 803 进一步强化了它最谨慎的部分。
+
+正确部分：
+
+```text
+Phase 802 是实质进展；
+target direction dose 可以降低 new blocker rate；
+但这很可能不是 true new-blocker suppression；
+下一步应定位 semantic / lexical new blockers 的来源。
+```
+
+需要收紧的部分：
+
+```text
+Phase 802 中“稳定 output field”的说法必须拆开：
+它稳定的是排名阈值，不是完整输出场；
+它抬高目标相对位置，但没有证明竞争者自身被压低；
+因此距离 token closure 仍然有明显缺口。
+```
+
+### 七、当前图谱更新
+
+当前图谱需要从 Phase 802 的六类纤维继续细分：
+
+```text
+old_blocker_suppress fiber：旧阻塞者抑制纤维
+target_threshold_stabilizer fiber：目标阈值稳定纤维
+semantic_new_blocker_release fiber：语义新阻塞者释放纤维
+semantic_new_blocker_true_suppress fiber：真实语义新阻塞者抑制纤维，尚未找到
+identity_anchor_stabilizer fiber：身份锚稳定纤维
+token_closure fiber：词元闭合纤维，尚未完成
+```
+
+本阶段新增的客观拼图是：
+
+```text
+qwen3：semantic release source 强集中于 MLP L35；
+GLM4：semantic release source 强集中于 MLP L38/L39；
+DS7B：semantic release source 分散在 attn L19 与 MLP L27/L26/L24；
+target direction 更像覆盖器，不像语义抑制器；
+小模型之间来源层差异很大，说明不能轻易上升为通用神经结构。
+```
+
+### 八、问题、硬伤和边界
+
+1. 本阶段仍然是 hidden-state route patch（隐藏态路线补丁），不是 neuron-level causal proof（神经元级因果证明）。
+
+2. source localization（来源定位）目前是单组件替换统计，证明的是候选来源，不是完整因果链。
+
+3. matched semantic blocker（匹配语义阻塞者）追踪使用 top-k 子集，不能保证覆盖全部语义竞争者。
+
+4. token closure（词元闭合）仍为 0，说明当前方法仍未完成最终生成闭合。
+
+5. 小模型限制非常明显：
+
+```text
+qwen3、GLM4、DS7B 的来源层、旧阻塞者抑制、语义释放形态差异都很大；
+DS7B 尤其表现出 threshold shift 依赖和 old blocker suppression 失效；
+因此当前结果更适合拼出机制轮廓，不适合声称完整语言编码机制。
+```
+
+### 九、智能理论层面的进展
+
+本阶段对“条件化相对状态—生成场闭合理论”的推进是：把输出场闭合拆成了两个不同过程。
+
+第一，阈值覆盖：
+
+$$
+z_y(\alpha)
+\uparrow
+\quad\Rightarrow\quad
+z_y(\alpha)>z_v(\alpha)
+$$
+
+第二，真实竞争者抑制：
+
+$$
+z_v(\alpha)
+\downarrow
+\quad\Rightarrow\quad
+z_y(\alpha)>z_v(\alpha)
+$$
+
+Phase 803 说明目前主要看到的是第一类，不是第二类。
+
+因此更完整的闭合条件应写成：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y
+>
+\max_{v\neq y}z_v
+\right]
+$$
+
+但闭合来源必须进一步分解为：
+
+$$
+z_y-z_v
+=
+\Delta_{\text{target}}
++ \Delta_{\text{old-suppress}}
++ \Delta_{\text{new-sem-suppress}}
++ \Delta_{\text{format-suppress}}
++ \Delta_{\text{anchor}}
++ \epsilon
+$$
+
+当前已较明确的是：
+
+$$
+\Delta_{\text{target}}>0
+$$
+
+以及部分模型中：
+
+$$
+\Delta_{\text{old-suppress}}>0
+$$
+
+但尚未证明：
+
+$$
+\Delta_{\text{new-sem-suppress}}>0
+$$
+
+这就是当前离 token closure（词元闭合）的主要距离。
+
+### 十、下一阶段
+
+下一阶段仍属于同一阶段性目标，应继续自动推进。建议进入：
+
+```text
+Phase 804: true semantic suppressor search（真实语义抑制器搜索）
+```
+
+核心任务：
+
+```text
+1. 不再以 target gain（目标提升）为主要目标；
+2. 以 matched semantic blocker logits（匹配语义阻塞者对数几率）下降为主目标；
+3. 搜索能让 D_v(alpha)<0 的组件、子空间或纤维；
+4. 同时限制 target gain，避免把阈值覆盖误判为真实抑制；
+5. 检查 old blocker suppression、identity anchor、format / echo blocker 是否被破坏；
+6. 把 source candidates（来源候选）推进到 suppressor candidates（抑制候选）。
+```
+
+下一阶段闭合标准：
+
+$$
+\mathbb{E}_{v\in B_{\text{new-sem}}(0)}
+\left[
+z_v^{\text{after}}-z_v^{\text{before}}
+\right]
+<0
+$$
+
+$$
+\Delta z_y \le \epsilon
+$$
+
+$$
+S_{\text{old}}>0
+$$
+
+$$
+A_{\text{identity}}\ge 0
+$$
+
+$$
+R_{\text{new}}\le \eta
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+如果 Phase 804 仍不能找到真实语义抑制器，就需要承认：小模型上的 token closure（词元闭合）可能不是靠单点局部纤维完成，而需要更全局的 conditional field rebalancing（条件化场重平衡）。
+
+## Phase 804: true semantic suppressor projection search（真实语义抑制器投影搜索） [2026-06-30 15:00]
+
+### 一、任务来源
+
+Phase 803 已经证明：
+
+```text
+target direction（目标方向）可以降低 new blocker rate（新阻塞者率），
+但同一批 semantic new blockers（语义新阻塞者）并没有稳定下降。
+```
+
+因此 Phase 804 继续同一个阶段性目标，直接测试一个更强问题：
+
+```text
+如果从 route delta（路线差分）中剥离 matched semantic blocker direction（匹配语义阻塞者方向），
+同一批语义阻塞者的 logit（对数几率）是否会真实下降？
+```
+
+这一步不是继续堆 patch（补丁）成功率，而是把 Phase 803 的“来源定位”推进到“方向级因果抑制测试”。
+
+### 二、测试脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase804_true_semantic_suppressor_projection_search.py
+tests/glm5/run_phase804_true_semantic_suppressor_projection_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase804_true_semantic_suppressor_projection_search/
+```
+
+执行轮次：
+
+```text
+smoke：完成，三模型通过；
+main：完成，qwen3 和 GLM4 为 3 cases，DS7B 因长循环段错误收缩为 2 cases；
+confirm：完成，qwen3 为 5 cases，GLM4 收缩为 3 cases，DS7B 收缩为 2 cases。
+```
+
+运行边界：
+
+```text
+bf16；
+不使用量化；
+优先 flash_attention_2，但本机缺少 FlashAttention2，自动回退 sdpa；
+DS7B 和 GLM4 在较长循环中出现 segmentation fault（段错误），因此确认轮采用收缩设置，避免卡死和显存风险。
+```
+
+### 三、测试原理
+
+Phase 803 的 alpha=0 语义新阻塞者集合为：
+
+$$
+B_{\text{new-sem}}(0)
+=
+\left\{
+v\mid
+z_v(0)>z_y(0),
+\ z_v^{\text{recipient}}\le z_y^{\text{recipient}},
+\ \operatorname{class}(v)=\text{semantic}
+\right\}
+$$
+
+Phase 804 用这批 \(v\) 的 unembedding（反嵌入）均值构造 semantic blocker direction（语义阻塞者方向）：
+
+$$
+d_{\text{sem}}
+=
+\frac{1}{|B_{\text{new-sem}}(0)|}
+\sum_{v\in B_{\text{new-sem}}(0)}
+W_U[v]
+-
+W_U[y]
+$$
+
+为了避免把目标方向混进去，先从语义方向中去掉目标方向投影：
+
+$$
+d_{\text{sem}\perp y}
+=
+d_{\text{sem}}
+-
+\operatorname{proj}_{d_y}(d_{\text{sem}})
+$$
+
+对 route delta（路线差分）先做 target decomposition（目标分解）：
+
+$$
+\Delta h
+=
+\Delta h_{\perp y}
++
+\Delta h_y
+$$
+
+然后设置 target alpha（目标剂量）：
+
+$$
+\Delta h(\alpha)
+=
+\Delta h_{\perp y}
++
+\alpha \Delta h_y
+$$
+
+再剥离 semantic blocker direction（语义阻塞者方向）：
+
+$$
+\Delta h(\alpha,\beta)
+=
+\Delta h(\alpha)
+-
+\beta
+\operatorname{proj}_{d_{\text{sem}\perp y}}
+\left(
+\Delta h(\alpha)
+\right)
+$$
+
+其中：
+
+```text
+beta=0：不剥离语义阻塞者方向；
+beta=1：剥离语义阻塞者方向；
+beta>1：过量剥离 / 反向压制。
+```
+
+真实语义抑制的判据是：
+
+$$
+\mathbb{E}_{v\in B_{\text{new-sem}}(0)}
+\left[
+z_v(\alpha,\beta)-z_v(0,0)
+\right]
+<0
+$$
+
+同时要求尽量不要只靠目标阈值抬高：
+
+$$
+|\Delta z_y(\alpha,\beta)-\Delta z_y(0,0)|
+\le
+\epsilon
+$$
+
+### 四、确认轮核心结果
+
+#### 1. qwen3
+
+qwen3 在 beta=1 时出现强语义抑制。
+
+```text
+alpha=0, beta=0：
+  true semantic suppress=0.000
+  still above=1.000
+  new rate=0.363
+  token closure=0
+
+alpha=0, beta=1：
+  true semantic suppress=2.637
+  still above=0.221
+  new rate=0.165
+  target gain delta=-0.072
+  token closure=0
+
+alpha=0.75, beta=0：
+  true semantic suppress=-0.073
+  still above=0.259
+  new rate=0.068
+  token closure=0
+
+alpha=0.75, beta=1：
+  true semantic suppress=2.552
+  still above=0.009
+  new rate=0.036
+  target gain delta=2.553
+  token closure=0
+```
+
+判断：
+
+```text
+qwen3 中确实存在方向级 semantic suppressor（语义抑制器）证据；
+alpha=0, beta=1 最重要，因为它不依赖目标阈值大幅抬高；
+但 token closure 仍为 0，说明压低语义阻塞者还不等于完成生成闭合。
+```
+
+#### 2. GLM4
+
+GLM4 也出现稳定语义抑制，但强度低于 qwen3。
+
+```text
+alpha=0, beta=0：
+  true semantic suppress=0.000
+  still above=1.000
+  new rate=0.202
+  token closure=0
+
+alpha=0, beta=1：
+  true semantic suppress=0.795
+  still above=0.318
+  new rate=0.151
+  target gain delta=-0.089
+  token closure=0
+
+alpha=0.75, beta=1：
+  true semantic suppress=0.798
+  still above=0.214
+  new rate=0.070
+  target gain delta=0.560
+  token closure=0
+```
+
+判断：
+
+```text
+GLM4 支持 semantic blocker direction（语义阻塞者方向）是真实可控方向；
+但 still above rate（仍高于目标率）没有降到足够低；
+因此只是 partial semantic suppressor（部分语义抑制器），不是闭合纤维。
+```
+
+#### 3. DS7B
+
+DS7B 在 beta=1 时语义阻塞者也明显下降，但闭合质量最差。
+
+```text
+alpha=0, beta=0：
+  true semantic suppress=0.000
+  still above=1.000
+  new rate=0.545
+  old suppress=-0.741
+  token closure=0
+
+alpha=0, beta=1：
+  true semantic suppress=3.035
+  still above=0.508
+  new rate=0.245
+  old suppress=1.493
+  target gain delta=-0.152
+  token closure=0
+
+alpha=0.75, beta=1：
+  true semantic suppress=2.953
+  still above=0.273
+  new rate=0.120
+  old suppress=1.355
+  target gain delta=2.291
+  token closure=0
+```
+
+判断：
+
+```text
+DS7B 也支持“语义阻塞者方向可被直接压低”；
+但仍高于目标的语义阻塞者比例很高，且确认样本因为稳定性问题较小；
+因此 DS7B 结果只能作为方向证据，不能作为闭合证据。
+```
+
+### 五、总体判断
+
+Phase 804 是重要正结果，但仍不是 token closure（词元闭合）。
+
+它完成了 Phase 803 没有完成的一步：
+
+```text
+Phase 803：证明 target direction 主要是 threshold cover（阈值覆盖），不是语义抑制；
+Phase 804：证明存在一个 direct semantic blocker direction（直接语义阻塞者方向），剥离后同一批语义阻塞者 logit 会明显下降。
+```
+
+所以当前结论应收紧为：
+
+```text
+已经找到方向级 true semantic suppressor evidence（真实语义抑制器证据）；
+尚未找到 token closure fiber（词元闭合纤维）；
+尚未完成 neuron-level causal graph（神经元级因果图谱）。
+```
+
+这比 Phase 803 有实质进展，因为 Phase 803 只能说“新阻塞者来自哪里”，Phase 804 已经证明“语义阻塞者方向可被直接压低”。
+
+### 六、当前图谱更新
+
+当前输出场机制至少需要拆成四类方向：
+
+```text
+target direction：提高目标 token（词元）；
+old-blocker suppress direction：压低旧阻塞者；
+semantic-blocker suppress direction：压低语义新阻塞者；
+residual closure direction：仍未找到，负责把剩余竞争、格式、身份锚、读出几何一起闭合。
+```
+
+Phase 804 新增拼图是：
+
+```text
+semantic-blocker suppress direction 可以通过 unembedding-defined projection（反嵌入定义投影）显式构造；
+这说明至少一部分语义竞争是 readout-aligned direction（读出对齐方向）；
+但完整语言编码机制不只是读出方向，因为 token closure 仍然为 0。
+```
+
+### 七、问题和硬伤
+
+1. 本阶段仍然是 route-level projection（路线级投影），不是 neuron-level intervention（神经元级干预）。
+
+2. semantic direction（语义方向）由当前 top matched semantic blockers（匹配语义阻塞者）构造，因此存在后验性，不是独立发现的不变量。
+
+3. beta=1 的效果很强，说明方向有效；但也可能过度依赖 unembedding geometry（反嵌入几何），还没有证明内部计算本来就显式使用这一方向。
+
+4. token closure 仍为 0，说明缺少至少一个剩余闭合机制：
+
+```text
+可能是 format / echo 抑制；
+可能是 identity anchor 修复；
+可能是多路竞争重平衡；
+也可能是小模型内部结构粗糙导致单点闭合失败。
+```
+
+5. GLM4 和 DS7B 在较长循环中出现 segmentation fault（段错误），说明当前脚本和后端稳定性仍需改进；结果有效但确认轮样本被迫收缩。
+
+### 八、智能理论层面的改进
+
+Phase 804 让当前公式从二分结构：
+
+$$
+z_y-z_v
+=
+\Delta_{\text{target}}
++
+\Delta_{\text{suppress}}
++
+\epsilon
+$$
+
+改进为更细的四项结构：
+
+$$
+z_y-z_v
+=
+\Delta_{\text{target}}
++
+\Delta_{\text{old-blocker}}
++
+\Delta_{\text{semantic-blocker}}
++
+\Delta_{\text{closure-residual}}
+$$
+
+其中 Phase 804 直接支持：
+
+$$
+\Delta_{\text{semantic-blocker}}>0
+$$
+
+但仍未完成：
+
+$$
+\Delta_{\text{closure-residual}}
+\rightarrow
+\text{token closure}
+$$
+
+因此最新完整理论应写成：
+
+$$
+h_{\text{out}}
+=
+h_{\text{context}}
++
+F_{\text{target}}
++
+F_{\text{old-blocker}}
++
+F_{\text{semantic-blocker}}
++
+F_{\text{anchor}}
++
+F_{\text{format}}
++
+F_{\text{residual-closure}}
+$$
+
+输出闭合条件是：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y
+>
+\max_{v\neq y} z_v
+\right]
+=1
+$$
+
+但机制闭合条件必须更严格：
+
+$$
+S_{\text{old}}>0
+$$
+
+$$
+S_{\text{semantic}}>0
+$$
+
+$$
+A_{\text{identity}}\ge 0
+$$
+
+$$
+R_{\text{format/echo}}\le \eta
+$$
+
+$$
+R_{\text{new}}\le \eta
+$$
+
+$$
+|\Delta z_y|\le \epsilon
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+Phase 804 完成的是 \(S_{\text{semantic}}>0\) 的方向证据，不是全部条件。
+
+### 九、下一阶段
+
+下一阶段仍属于同一个阶段性目标，但应避免继续单纯增强语义抑制，因为 Phase 804 已经证明语义方向可控。
+
+建议进入：
+
+```text
+Phase 805: residual closure component audit（剩余闭合成分审计）
+```
+
+核心任务：
+
+```text
+1. 固定 beta=1 的 semantic suppressor（语义抑制器）；
+2. 检查仍未闭合的 top blockers（最高阻塞者）属于哪些类别；
+3. 把剩余失败拆成 format / echo / identity / unrelated semantic / punctuation；
+4. 判断缺口主要来自 readout geometry（读出几何），还是来自内部路由没有完成；
+5. 不再以 target gain 为主目标，而以 residual blocker class（剩余阻塞者类别）为主目标。
+```
+
+如果 Phase 805 显示剩余阻塞者已经不再是 semantic blocker（语义阻塞者），那说明语言闭合至少需要：
+
+```text
+old blocker suppressor
++ semantic blocker suppressor
++ format/echo suppressor
++ identity anchor stabilizer
++ readout geometry closure
+```
+
+如果剩余仍主要是 semantic blocker（语义阻塞者），则说明 Phase 804 的 projection（投影）只压低了显式 readout-aligned semantic direction（读出对齐语义方向），还没有触及更深的内部语义路线。
+
+## Phase 805: residual closure blocker audit（剩余闭合阻塞者审计） [2026-06-30 15:41]
+
+### 一、任务来源
+
+本阶段读取并分析上传内容后继续推进。上传内容对 Phase 803 和 Phase 804 的判断基本正确：
+
+```text
+Phase 803 证明 target direction dose（目标方向剂量）主要是 threshold cover（阈值覆盖）；
+Phase 804 证明 semantic blocker direction（语义阻塞者方向）可以被直接剥离并压低同一批语义阻塞者；
+但 token closure（词元闭合）仍然为 0。
+```
+
+因此 Phase 805 不再继续增强语义抑制，而是固定 semantic suppressor（语义抑制器）后审计剩余阻塞者：
+
+```text
+如果语义阻塞者已经被压低，为什么目标 token（词元）仍然不能 top1（第一名）？
+```
+
+### 二、测试脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase805_residual_closure_blocker_audit.py
+tests/glm5/run_phase805_residual_closure_blocker_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase805_residual_closure_blocker_audit/
+```
+
+执行轮次：
+
+```text
+smoke：完成，三模型通过；
+main：完成，三模型通过；
+confirm：完成，qwen3=5 cases，GLM4=3 cases，DS7B=2 cases。
+```
+
+运行边界：
+
+```text
+bf16；
+不使用量化；
+优先 flash_attention_2，本机缺少 FlashAttention2 时回退 sdpa；
+为避免前面 GLM4 / DS7B 长循环 segmentation fault（段错误），confirm 轮采用模型差异化样本数。
+```
+
+### 三、测试原理
+
+Phase 805 沿用 Phase 804 的语义抑制投影：
+
+$$
+\Delta h(\alpha,\beta)
+=
+\Delta h(\alpha)
+-
+\beta
+\operatorname{proj}_{d_{\text{sem}\perp y}}
+\left(
+\Delta h(\alpha)
+\right)
+$$
+
+其中：
+
+```text
+beta=0：不剥离语义阻塞者方向；
+beta=1：剥离语义阻塞者方向。
+```
+
+本阶段不再只看 matched semantic blockers（匹配语义阻塞者），而是对 after logits（干预后对数几率）做 full-vocabulary residual blocker audit（全词表剩余阻塞者审计）：
+
+$$
+B_{\text{res}}(\alpha,\beta)
+=
+\left\{
+v\mid
+z_v(\alpha,\beta)>z_y(\alpha,\beta),
+\ v\neq y
+\right\}
+$$
+
+然后统计：
+
+$$
+N_{\text{res}}
+=
+|B_{\text{res}}|
+$$
+
+以及各类剩余阻塞者比例：
+
+$$
+r_c
+=
+\frac{
+|\{v\in B_{\text{res}}\mid \operatorname{class}(v)=c\}|
+}{
+|B_{\text{res}}|
+}
+$$
+
+重点观察三类：
+
+```text
+semantic_or_lexical_competitor（语义 / 词汇竞争者）；
+format / echo / punctuation / whitespace（格式 / 回声 / 标点 / 空白）；
+identity anchor / surface variant（身份锚 / 表面形式变体）。
+```
+
+如果 beta=1 后：
+
+$$
+r_{\text{semantic}}\downarrow
+\quad\text{and}\quad
+r_{\text{format/echo}}\uparrow
+$$
+
+说明语义阻塞方向有效，但剩余闭合瓶颈已经转向 format / echo / identity anchor（格式 / 回声 / 身份锚）。
+
+### 四、确认轮核心结果
+
+#### 1. qwen3
+
+qwen3 在 \( \alpha=0.75,\beta=1 \) 下表现最好，但仍未闭合。
+
+```text
+alpha=0,beta=0：
+  residual blockers=3103.6
+  semantic share=0.638
+  format/echo share=0.299
+  token closure=0
+
+alpha=0,beta=1：
+  residual blockers=1144.0
+  semantic share=0.463
+  format/echo share=0.449
+  semantic suppress=2.637
+  token closure=0
+
+alpha=0.75,beta=0：
+  residual blockers=663.1
+  semantic share=0.479
+  format/echo share=0.378
+  token closure=0
+
+alpha=0.75,beta=1：
+  residual blockers=318.3
+  semantic share=0.322
+  format/echo share=0.510
+  semantic suppress=2.552
+  semantic still above=0.009
+  token closure=0
+```
+
+判断：
+
+```text
+qwen3 中 semantic blocker（语义阻塞者）已经被大幅压低；
+剩余阻塞场明显转向 format/echo（格式 / 回声）和 identity anchor（身份锚）；
+token closure 不再主要卡在显式语义竞争，而是卡在残余输出场几何。
+```
+
+#### 2. GLM4
+
+GLM4 的剩余阻塞者数量较小，但语义残余仍偏高。
+
+```text
+alpha=0,beta=0：
+  residual blockers=225.2
+  semantic share=0.567
+  format/echo share=0.360
+  token closure=0
+
+alpha=0,beta=1：
+  residual blockers=214.5
+  semantic share=0.535
+  format/echo share=0.381
+  semantic suppress=0.795
+  token closure=0
+
+alpha=0.75,beta=1：
+  residual blockers=131.8
+  semantic share=0.488
+  format/echo share=0.364
+  semantic suppress=0.798
+  token closure=0
+```
+
+判断：
+
+```text
+GLM4 的 semantic suppressor（语义抑制器）有效但不彻底；
+剩余阻塞场仍然是 semantic + identity anchor 混合；
+它不像 qwen3 那样明显转向 format/echo。
+```
+
+#### 3. DS7B
+
+DS7B 的剩余阻塞场数量最大，说明小模型 / 蒸馏模型结构更粗糙。
+
+```text
+alpha=0,beta=0：
+  residual blockers=21676.0
+  semantic share=0.736
+  format/echo share=0.237
+  token closure=0
+
+alpha=0,beta=1：
+  residual blockers=3007.0
+  semantic share=0.599
+  format/echo share=0.354
+  semantic suppress=3.035
+  token closure=0
+
+alpha=0.75,beta=1：
+  residual blockers=864.25
+  semantic share=0.402
+  format/echo share=0.538
+  semantic suppress=2.953
+  token closure=0
+```
+
+判断：
+
+```text
+DS7B 中 beta=1 确实大幅减少残余阻塞者数量；
+但 residual blockers（剩余阻塞者）仍然非常多；
+在 alpha=0.75,beta=1 后，瓶颈开始转向 format/echo，但语义残余仍不少。
+```
+
+### 五、总体判断
+
+Phase 805 是实质进展，但仍不是 token closure（词元闭合）。
+
+它回答了 Phase 804 的核心遗留问题：
+
+```text
+语义阻塞方向被压低后，为什么仍然不闭合？
+```
+
+答案是：
+
+```text
+因为剩余阻塞场不是单一语义问题。
+```
+
+三模型共同现象：
+
+```text
+1. beta=1 会显著减少 residual blockers（剩余阻塞者）数量；
+2. matched semantic still above（匹配语义仍高于目标率）下降；
+3. token closure 仍然为 0；
+4. identity anchor fragmented rate（身份锚碎片化率）始终为 1；
+5. 剩余阻塞者中 format/echo/punctuation/whitespace（格式 / 回声 / 标点 / 空白）占比明显上升。
+```
+
+所以当前结论应收紧为：
+
+```text
+Phase 804 的 semantic suppressor 是真实方向；
+但它只解决了输出场的一部分；
+token closure 至少还需要 format/echo suppressor、identity anchor stabilizer 和 readout geometry closure。
+```
+
+### 六、对上传内容的审视
+
+上传内容的主判断正确：
+
+```text
+Phase 803/804 是实质进展；
+不是 token closure；
+语义抑制方向是一个重要拼图；
+下一步应审计 residual closure direction（剩余闭合方向）。
+```
+
+Phase 805 对其进一步补充：
+
+```text
+剩余闭合方向不是抽象未知项；
+它已经可以被拆成 format/echo residual、identity anchor residual、semantic residual 三块。
+```
+
+需要纠正的地方是：
+
+```text
+不能说 Phase 804 已经接近完整语言编码机制；
+它只是把 semantic blocker suppress direction（语义阻塞者抑制方向）从猜测变成了方向级证据；
+真正闭合仍然缺至少 2 到 3 个控制方向。
+```
+
+### 七、当前图谱更新
+
+当前输出场图谱应更新为：
+
+```text
+target direction：目标词元提升；
+old-blocker suppress direction：旧阻塞者抑制；
+semantic-blocker suppress direction：语义阻塞者抑制；
+format/echo residual field：格式 / 回声剩余场；
+identity-anchor residual field：身份锚剩余场；
+readout-geometry closure field：读出几何闭合场；
+token-closure fiber：仍未找到。
+```
+
+Phase 805 新增拼图：
+
+```text
+qwen3：语义阻塞基本清理后，残余主要偏 format/echo；
+GLM4：残余仍是 semantic + identity anchor 混合；
+DS7B：残余数量很大，但 alpha=0.75,beta=1 后也转向 format/echo；
+identity anchor fragmented rate 始终为 1，是强瓶颈；
+required bias to clear all（清空所有剩余阻塞者所需偏置）仍很大，说明 readout geometry 没有闭合。
+```
+
+### 八、问题、硬伤和边界
+
+1. Phase 805 是 residual audit（剩余审计），不是新因果抑制器发现。
+
+2. residual class（剩余类别）依赖 token classifier（词元分类器），分类本身是启发式的。
+
+3. full-vocabulary blocker count（全词表阻塞者数量）受小模型输出分布影响很大，DS7B 尤其夸张。
+
+4. identity anchor fragmented rate 始终为 1，说明现有干预没有解决表面词元身份问题。
+
+5. token closure 始终为 0，说明当前仍没有完成真正的生成闭合。
+
+6. 小模型偏差仍需谨慎：
+
+```text
+qwen3、GLM4、DS7B 的 residual shape（剩余形状）差异很大；
+这可能是真实架构差异，也可能是小模型容量不足和蒸馏损伤；
+因此不能把任一模型的层位置或比例直接上升为通用规律。
+```
+
+### 九、智能理论层面的更新
+
+Phase 805 把 Phase 804 的剩余项拆细：
+
+$$
+\Delta_{\text{closure-residual}}
+=
+\Delta_{\text{format/echo}}
++
+\Delta_{\text{identity-anchor}}
++
+\Delta_{\text{semantic-residual}}
++
+\Delta_{\text{readout-geometry}}
+$$
+
+因此当前完整公式应写成：
+
+$$
+z_y-z_v
+=
+\Delta_{\text{target}}
++
+\Delta_{\text{old-blocker}}
++
+\Delta_{\text{semantic-blocker}}
++
+\Delta_{\text{format/echo}}
++
+\Delta_{\text{identity-anchor}}
++
+\Delta_{\text{readout-geometry}}
+$$
+
+其中已经有较强证据的是：
+
+$$
+\Delta_{\text{old-blocker}}>0
+$$
+
+$$
+\Delta_{\text{semantic-blocker}}>0
+$$
+
+但尚未完成的是：
+
+$$
+\Delta_{\text{format/echo}}>0
+$$
+
+$$
+\Delta_{\text{identity-anchor}}>0
+$$
+
+$$
+\Delta_{\text{readout-geometry}}>0
+$$
+
+最终闭合条件仍然是：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y>\max_{v\neq y}z_v
+\right]
+=1
+$$
+
+但机制闭合必须满足：
+
+$$
+S_{\text{old}}>0
+$$
+
+$$
+S_{\text{semantic}}>0
+$$
+
+$$
+S_{\text{format/echo}}>0
+$$
+
+$$
+A_{\text{identity}}\ge 0
+$$
+
+$$
+G_{\text{readout}}>0
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+### 十、下一阶段
+
+下一阶段仍属于同一大目标，但应从“语义抑制”转向“格式 / 回声与身份锚闭合”。
+
+建议进入：
+
+```text
+Phase 806: format-echo and identity-anchor suppressor search（格式回声与身份锚抑制器搜索）
+```
+
+核心任务：
+
+```text
+1. 固定 semantic beta=1；
+2. 从 residual class top tokens（剩余类别最高词元）中构造 format/echo direction（格式 / 回声方向）；
+3. 构造 identity-anchor direction（身份锚方向），优先处理 surface variants（表面变体）；
+4. 分别测试 beta_semantic、beta_format、beta_identity 三种方向；
+5. 判断是否能同时降低 residual blockers、identity fragmentation 和 required bias；
+6. 如果仍不能 closure，说明缺口主要是 readout geometry closure（读出几何闭合）。
+```
+
+Phase 806 的闭合目标应是：
+
+$$
+r_{\text{semantic}}\downarrow
+$$
+
+$$
+r_{\text{format/echo}}\downarrow
+$$
+
+$$
+A_{\text{identity}}\uparrow
+$$
+
+$$
+N_{\text{res}}\downarrow
+$$
+
+$$
+C_{\text{token}}=1
+$$
