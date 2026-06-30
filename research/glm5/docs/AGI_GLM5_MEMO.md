@@ -73912,3 +73912,858 @@ route attn/MLP 提供供体状态脚手架；
 ```text
 解释全词表竞争中，为什么 target 仍然不是 top1。
 ```
+
+## Phase 796: global competitor suppression and token identity closure audit（全局竞争者抑制与词元身份闭合审计） [2026-06-30 11:26]
+
+### 一、任务来源
+
+本阶段根据两条新判断继续推进：
+
+```text
+1. 小模型的语言编码机制可能不是完整机制的等比例缩小版，而是压缩、缺边、缺门、格式路线过强的近似结构；
+2. Phase 795 已经证明 multi-component causal fiber（多组件因果纤维）可以提高 margin/rank（边际 / 排名），但仍没有完成 token top1 closure（词元第一名闭合）。
+```
+
+因此，本阶段不再继续盲目扩大 ladder（阶梯组合），而是把 Phase 795 的失败拆开：
+
+```text
+target 被推高以后，到底输给了谁？
+```
+
+核心目标从：
+
+```text
+target-vs-contrast margin（目标对指定竞争项边际）
+```
+
+升级为：
+
+```text
+global vocabulary competition（全词表竞争）
+```
+
+### 二、对上传内容的判断
+
+上传内容的判断基本正确，但需要收紧：
+
+```text
+正确部分：
+小模型上不应该只追求单点闭合；
+应该转向 global atlas fit（全局图谱拟合）和多维评分；
+Phase 795 的失败主要不是没有因果压力，而是没有跨过全词表 top1 门槛。
+
+需要收紧部分：
+不能因为小模型单点闭合困难，就取消闭合判据；
+global score（全局分数）只能作为阶段性图谱拟合指标，不能替代最终 token / phrase / generation closure（词元 / 短语 / 生成闭合）。
+```
+
+本阶段采用的判断是：
+
+```text
+小模型阶段主目标：
+提高全局机制图谱的整体拟合质量。
+
+最终目标：
+仍然必须解释并实现严格生成闭合。
+```
+
+### 三、本阶段脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase796_global_competitor_token_identity_audit.py
+```
+
+新增运行器：
+
+```text
+tests/glm5/run_phase796_global_competitor_token_identity_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase796_global_competitor_token_identity_audit/
+results/glm5_phase796_global_competitor_token_identity_audit/
+```
+
+测试方式：
+
+```text
+smoke：1 case，top-k=20；
+main：4 cases，top-k=30；
+confirm：6 cases，top-k=40；
+模型顺序：qwen3 -> GLM4 -> DS7B；
+数据类型：bf16；
+量化：off；
+flash_attention_2：尝试启用，但本环境缺少包，实际回退为 sdpa；
+模型测试期间未并行其他分析任务。
+```
+
+### 四、测试原理
+
+Phase 795 测的是：
+
+$$
+m_{\text{contrast}}
+=
+z_{y^+}-z_{y^-}
+$$
+
+其中：
+
+```text
+y^+：目标词元；
+y^-：指定对照词元。
+```
+
+但 token closure（词元闭合）真实要求是：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_{y^+}
+>
+\max_{v\neq y^+}z_v
+\right]
+$$
+
+因此本阶段定义：
+
+$$
+m_{\text{global}}
+=
+z_{y^+}
+-
+\max_{v\neq y^+}z_v
+$$
+
+对每次干预记录：
+
+$$
+\Delta m_{\text{global}}
+=
+m_{\text{global}}(R\leftarrow D_{\mathcal L})
+-
+m_{\text{global}}(R)
+$$
+
+同时记录原始阻塞词元是否被压制：
+
+$$
+\Delta z_{\text{blocker}}
+=
+z_{\text{blocker}}(R\leftarrow D_{\mathcal L})
+-
+z_{\text{blocker}}(R)
+$$
+
+其中：
+
+```text
+blocker = recipient 状态下最高的非目标词元。
+```
+
+如果：
+
+$$
+\Delta z_{\text{blocker}}<0
+$$
+
+说明原阻塞词元被压低。
+
+更严格的 token identity closure（词元身份闭合）应满足：
+
+$$
+\Delta z_{y^+}>0
+\quad\land\quad
+\Delta z_{\text{blocker}}<0
+\quad\land\quad
+z_{y^+}>
+\max_{v\neq y^+}z_v
+$$
+
+本阶段还把 after top competitor（干预后的最高非目标竞争词元）分类为：
+
+```text
+designated_contrast（指定竞争项）
+candidate_list_or_case_value（候选列表或案例值词元）
+echo_token（回声词元）
+whitespace_or_newline（空白或换行）
+punctuation（标点）
+high_frequency_or_format（高频或格式词）
+semantic_or_lexical_competitor（语义或词汇竞争项）
+```
+
+### 五、客观结果
+
+#### 1. smoke 结果
+
+```text
+qwen3：
+1 case，20 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 19；
+原竞争者压制 = 16；
+after top competitor 全部为 designated_contrast。
+
+GLM4：
+1 case，12 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 11；
+原竞争者压制 = 8；
+after top competitor：
+designated_contrast = 10；
+candidate_list_or_case_value = 2。
+
+DS7B：
+1 case，20 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 19；
+原竞争者压制 = 10；
+after top competitor：
+designated_contrast = 12；
+candidate_list_or_case_value = 8。
+```
+
+smoke 说明脚本有效，并且已经能区分：
+
+```text
+全局边际改善
+和
+真实 token top1 闭合
+```
+
+#### 2. main 结果
+
+```text
+qwen3：
+4 cases，160 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 122；
+原竞争者压制 = 115；
+after top competitor：
+designated_contrast = 86；
+candidate_list_or_case_value = 56；
+whitespace_or_newline = 18。
+
+GLM4：
+4 cases，88 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 43；
+原竞争者压制 = 26；
+after top competitor：
+designated_contrast = 51；
+candidate_list_or_case_value = 36；
+echo_token = 1。
+
+DS7B：
+4 cases，160 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 150；
+原竞争者压制 = 79；
+after top competitor：
+designated_contrast = 78；
+candidate_list_or_case_value = 42；
+echo_token = 40。
+```
+
+main 结果显示：
+
+```text
+干预不是无效的；
+大量样本 global margin 确实改善；
+但目标词元仍然没有跨过全词表 top1 门槛。
+```
+
+#### 3. confirm 结果
+
+```text
+qwen3：
+6 cases，480 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 344；
+原竞争者压制 = 291；
+after top competitor：
+designated_contrast = 270；
+candidate_list_or_case_value = 162；
+whitespace_or_newline = 48。
+
+GLM4：
+6 cases，264 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 146；
+原竞争者压制 = 73；
+after top competitor：
+designated_contrast = 166；
+candidate_list_or_case_value = 96；
+echo_token = 2。
+
+DS7B：
+6 cases，480 rows；
+token_gain = 0；
+global_cross = 0；
+global_improve = 429；
+原竞争者压制 = 264；
+after top competitor：
+designated_contrast = 256；
+candidate_list_or_case_value = 144；
+echo_token = 80。
+```
+
+confirm 结果非常关键：
+
+```text
+三模型都出现大量 global margin improvement（全局边际改善）；
+三模型 token_gain 仍然全部为 0；
+三模型 global_cross 仍然全部为 0。
+```
+
+也就是说：
+
+$$
+\Delta m_{\text{global}}>0
+\nRightarrow
+\Delta C_{\text{token}}>0
+$$
+
+这比 Phase 795 的结论更严格。
+
+Phase 795 证明：
+
+$$
+\Delta m_{\text{contrast}}>0
+\nRightarrow
+\Delta C_{\text{token}}>0
+$$
+
+Phase 796 进一步证明：
+
+$$
+\Delta m_{\text{global}}>0
+\nRightarrow
+\Delta C_{\text{token}}>0
+$$
+
+原因是：
+
+```text
+干预可以压低原 blocker，
+但新的 blocker 会接管 top1 位置。
+```
+
+### 六、最重要的新发现
+
+#### 1. token closure 失败不是因为完全没有全局边际改善
+
+confirm 中：
+
+```text
+qwen3：344/480 行 global margin 改善；
+GLM4：146/264 行 global margin 改善；
+DS7B：429/480 行 global margin 改善。
+```
+
+这说明之前的机制图谱不是完全无效。
+
+更准确的说法是：
+
+```text
+图谱已经能推动目标接近 top1；
+但还不能稳定控制全词表竞争场。
+```
+
+#### 2. 原竞争者被压低后，新竞争者会接管
+
+qwen3 confirm 中最强 route_answer / kv_o_route 类结果：
+
+```text
+recipient top competitor 多为 designated_contrast；
+after top competitor 大量变成 candidate_list_or_case_value；
+少量变成 whitespace_or_newline。
+```
+
+DS7B confirm 中更明显：
+
+```text
+after top competitor 同时包含：
+designated_contrast；
+candidate_list_or_case_value；
+echo_token。
+```
+
+这说明真实失败不是单一竞争项，而是一个竞争场：
+
+$$
+\mathcal B
+=
+\{b_1,b_2,\dots,b_k\}
+$$
+
+要闭合，不能只压低一个：
+
+$$
+z_{b_1}
+$$
+
+而必须让目标超过整个阻塞集合：
+
+$$
+z_{y^+}>
+\max_{b\in\mathcal B} z_b
+$$
+
+#### 3. answer-site O 仍然是最稳定的特异性边
+
+confirm 中 top-vs-matched specificity（高贡献对匹配特异性）最稳定的仍然是 O 或 K/V+O：
+
+```text
+qwen3：
+kv_o positive instruction gap_global = +2.5417；
+o_only positive all_pre_answer gap_global = +2.4505。
+
+GLM4：
+o_only positive all_pre_answer gap_global = +0.5417；
+o_only negative all_pre_answer gap_global = +0.5299。
+
+DS7B：
+o_only positive all_pre_answer gap_global = +1.1976；
+kv_o positive instruction gap_global = +1.0476。
+```
+
+这延续了 Phase 794/795 的结果：
+
+```text
+answer-site O path 是当前最稳定的候选特异读出门。
+```
+
+#### 4. route_answer / kv_o_route 是强 scaffold，但不是稳定特异闭合边
+
+route_answer 和 kv_o_route 经常有最高 absolute global effect（绝对全局效应），例如：
+
+```text
+qwen3 confirm：
+route_answer / kv_o_route global_delta 约 +2.56；
+
+DS7B confirm：
+kv_o_route global_delta 约 +2.40 到 +2.45。
+```
+
+但这些结果经常 top 和 matched 接近，说明：
+
+```text
+它们更像 donor route scaffold（供体路线脚手架），
+不是 source-specific token identity fiber（来源特异词元身份纤维）。
+```
+
+### 七、对“小模型偏差”判断的修正
+
+本阶段支持“小模型不能只看单点闭合”的判断。
+
+原因：
+
+```text
+1. 小模型中 global margin 已经能改善，但 token closure 仍为 0；
+2. 这说明它可能有部分路线和读出压力，但缺少完整闭合门；
+3. DS7B 中 echo_token 阻塞明显，说明蒸馏或格式路线可能压过语义路线；
+4. GLM4 效应更弱，说明同一机制在不同小模型中可能结构角色相似但强度不同。
+```
+
+但不能把它解释成：
+
+```text
+小模型没价值；
+或者闭合标准不重要。
+```
+
+更准确的结论是：
+
+```text
+小模型适合做 mechanism atlas approximation（机制图谱近似）；
+不适合把单点 token closure 当作唯一成功标准；
+但最终理论仍必须解释 token closure 为什么失败、如何闭合。
+```
+
+### 八、全局图谱评分的改进
+
+本阶段后，全局图谱分数应加入“竞争场项”：
+
+$$
+S_{\text{global}}
+=
+\lambda_1 S_{\text{coverage}}
++
+\lambda_2 S_{\text{causal}}
++
+\lambda_3 S_{\text{specificity}}
++
+\lambda_4 S_{\text{stability}}
++
+\lambda_5 S_{\text{closure-prox}}
++
+\lambda_6 S_{\text{compression}}
++
+\lambda_7 S_{\text{competition}}
+-
+\lambda_8 S_{\text{overfit}}
+$$
+
+其中新增：
+
+$$
+S_{\text{competition}}
+=
+\mathbb E
+\left[
+f(\Delta m_{\text{global}})
++
+\mathbf{1}[\Delta z_{\text{blocker}}<0]
+-
+\rho \cdot
+\mathbf{1}[\text{new blocker appears}]
+\right]
+$$
+
+这可以防止一种幻觉：
+
+```text
+原 blocker 被压低；
+但新的 candidate/value/echo blocker 接管 top1；
+评分却误以为机制已闭合。
+```
+
+图谱边现在至少应分为：
+
+```text
+1. margin edge（边际边）
+2. rank edge（排名边）
+3. global-margin edge（全局边际边）
+4. blocker-suppression edge（阻塞者压制边）
+5. scaffold edge（脚手架边）
+6. token-identity edge（词元身份边）
+7. token-closure edge（词元闭合边）
+```
+
+当前已较稳的是：
+
+```text
+global-margin edge；
+blocker-suppression edge；
+scaffold edge。
+```
+
+仍缺少：
+
+```text
+token-identity edge；
+token-closure edge。
+```
+
+### 九、当前问题和硬伤
+
+#### 1. token_gain 仍然为 0
+
+最硬结果：
+
+```text
+qwen3 / GLM4 / DS7B；
+smoke / main / confirm；
+token_gain 全部为 0。
+```
+
+所以不能说已经完成语言编码机制闭合。
+
+#### 2. global_cross 仍然为 0
+
+本阶段不仅没有 token closure，而且：
+
+```text
+global margin 从负跨到正的事件也为 0。
+```
+
+这说明目标虽然接近 top1，但还没有真正越过全词表门槛。
+
+#### 3. 竞争者是集合，不是单点
+
+失败不是只输给 contrast：
+
+```text
+candidate_list_or_case_value；
+echo_token；
+whitespace_or_newline；
+designated_contrast；
+```
+
+都会成为阻塞者。
+
+#### 4. route scaffold 会替换竞争者类型
+
+强 route 组件经常把：
+
+```text
+designated_contrast
+```
+
+压下去，但新出现：
+
+```text
+candidate_list_or_case_value
+或 echo_token。
+```
+
+这说明 route scaffold 没有提供真正的 token identity anchor（词元身份锚）。
+
+#### 5. 小模型偏差必须进入解释
+
+当前三模型都是小模型，可能有：
+
+```text
+容量不足；
+蒸馏偏差；
+格式路线过强；
+候选列表依赖；
+语义和格式竞争混合；
+读出层过度压缩。
+```
+
+因此不能把“闭合失败”直接外推为“真实语言机制不存在闭合纤维”。
+
+### 十、最新理论状态
+
+当前最接近事实的理论应写成：
+
+```text
+语言生成不是单点向量读出；
+而是条件化相对状态在多组件因果纤维中推进，
+并在全词表竞争场中完成或失败。
+```
+
+更完整公式：
+
+$$
+h_t^{(l+1)}
+=
+h_t^{(l)}
++
+A_{QKVO}^{(l)}
+\left(
+h_{\le t}^{(l)}, C
+\right)
++
+M^{(l)}
+\left(
+h_t^{(l)}, C
+\right)
+$$
+
+其中：
+
+```text
+C 表示上下文条件，包括任务、格式、候选池、对象、关系、位置。
+```
+
+候选读出：
+
+$$
+z_v
+=
+W_U(v)^\top h_t^{(L)}
+$$
+
+严格闭合：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_{y^+}
+>
+\max_{v\neq y^+} z_v
+\right]
+$$
+
+当前干预有效项：
+
+$$
+\Delta h
+=
+\Delta A_{K/V}^{\text{source}}
++
+\Delta A_O^{\text{answer}}
++
+\Delta R_{\text{route}}
++
+\Delta M_{\text{rewrite}}
++
+\Delta S_{\text{suppressor}}
+$$
+
+但本阶段说明还必须加入：
+
+$$
+\Delta G_{\text{competition}}
+=
+\Delta z_{y^+}
+-
+\Delta \max_{v\neq y^+}z_v
+$$
+
+更真实的闭合函数：
+
+$$
+C_{\text{gen}}
+=
+F
+\left(
+\Delta A_{K/V}^{\text{source}},
+\Delta A_O^{\text{answer}},
+\Delta R_{\text{route}},
+\Delta M_{\text{rewrite}},
+\Delta S_{\text{suppressor}},
+\Delta G_{\text{competition}},
+\Delta I_{\text{identity-anchor}}
+\right)
+$$
+
+其中：
+
+```text
+Delta I_identity-anchor 是词元身份锚定项。
+```
+
+Phase 796 的新贡献是把：
+
+```text
+Delta G_competition
+```
+
+从理论缺口变成了可测对象。
+
+### 十一、是否继续处于同一阶段
+
+Phase 796 与 Phase 795 属于同一个大阶段：
+
+```text
+从单点 patch/closure 转向全局因果纤维图谱逼近。
+```
+
+但 Phase 796 本身的目标已经完成：
+
+```text
+确认了全词表竞争审计脚本；
+完成了三模型三轮测试；
+证明 global margin 改善仍不等于 token closure；
+定位了实际阻塞者类别。
+```
+
+下一步仍属于同一个大阶段，但应进入新的子阶段，不应继续重复 Phase 796。
+
+### 十二、下一阶段方案
+
+建议下一阶段为：
+
+```text
+Phase 797: blocker-class targeted suppression and identity-anchor separation
+（阻塞者类别定向抑制与词元身份锚分离）
+```
+
+核心任务：
+
+```text
+1. 不再只观察 after top competitor；
+2. 针对三类主要 blocker 分别测试：
+   a. designated_contrast；
+   b. candidate_list_or_case_value；
+   c. echo_token；
+3. 对每类 blocker 寻找 suppressor edge（抑制边）；
+4. 分离 target booster（目标增强器）和 blocker suppressor（阻塞者抑制器）；
+5. 判断 token identity anchor 是否位于：
+   a. candidate list token；
+   b. answer-site O；
+   c. late MLP rewrite；
+   d. residual route subspace；
+   e. unembedding-adjacent readout geometry。
+```
+
+最低有效标准不再是：
+
+$$
+\Delta m_{\text{global}}>0
+$$
+
+而是：
+
+$$
+\Delta z_{y^+}>0
+\quad\land\quad
+\Delta z_{b}<0
+\quad\land\quad
+\Delta
+\left(
+z_{y^+}-z_b
+\right)>0
+$$
+
+其中：
+
+```text
+b 是同一类别 blocker，而不是一个固定 contrast。
+```
+
+更严格的阶段目标：
+
+$$
+\exists b\in\mathcal B:
+\quad
+\Delta z_{b}<0
+\quad
+\text{且}
+\quad
+\text{new blocker rate 不上升}
+$$
+
+也就是说，不能只把一个 blocker 换成另一个 blocker。
+
+### 十三、阶段性结论
+
+Phase 796 的结论是：
+
+```text
+当前机制图谱已经能解释并推动全局边际改善；
+但仍不能完成 token identity closure；
+失败原因不是单一 contrast，而是全词表竞争场中的 blocker 集合轮流接管 top1。
+```
+
+因此，上传内容中“从单点闭合转向全局图谱整体拟合”的判断是正确的，但必须增加一个约束：
+
+```text
+全局图谱评分不能替代闭合，
+只能指导我们更系统地逼近闭合。
+```
+
+当前研究不是简单 patch 边际收益递减，而是在提升解释力：
+
+```text
+Phase 795：发现 target-vs-contrast 与 token closure 断裂；
+Phase 796：进一步发现 global margin improvement 与 token closure 仍断裂，并定位 blocker 类型。
+```
+
+下一步突破点已经明确：
+
+```text
+从 target booster 图谱
+转向
+target booster + blocker suppressor + identity anchor 的三元图谱。
+```
