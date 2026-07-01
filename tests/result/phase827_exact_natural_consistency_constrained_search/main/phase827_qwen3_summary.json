@@ -1,0 +1,270 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase prioritizes exact target plus multi-natural target consistency before natural-only gains.",
+  "budget_summary": {
+    "16": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 0.6666666666666666,
+      "n": 12,
+      "patched_classes": {
+        "broad_near_miss": 8,
+        "target_equivalent": 4
+      },
+      "target_transition_rows": 4
+    },
+    "32": {
+      "degraded_rows": 1,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 0.08333333333333333,
+      "n": 12,
+      "patched_classes": {
+        "broad_near_miss": 9,
+        "target_equivalent": 2,
+        "unknown_other": 1
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "component_donor_summary": {
+    "attention_output/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "attention_output/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "attention_output/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 3,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "layer_residual/natural_category": {
+      "degraded_rows": 1,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": -0.75,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 3,
+        "unknown_other": 1
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 3,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "mlp_output/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 2.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "consistency_records": [
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "mlp_output",
+        "whole_mlp_output",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "mlp_output",
+        "whole_mlp_output",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "layer_residual",
+        "whole_layer_residual",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 1,
+      "delta_sum": -1.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": true,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "layer_residual",
+        "whole_layer_residual",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 0,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 4.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": true,
+      "improved_total": 2,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_output",
+        "whole_attention_output",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 2
+    }
+  ],
+  "degraded_rows": 1,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 6,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "natural_category": {
+      "degraded_rows": 1,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": -0.125,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 6,
+        "target_equivalent": 1,
+        "unknown_other": 1
+      },
+      "target_transition_rows": 1
+    },
+    "object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 3,
+      "mean_delta_boundary_rank": 0.75,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 5,
+        "target_equivalent": 3
+      },
+      "target_transition_rows": 3
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_plus_any_natural_target_pairs": 1,
+  "exact_plus_multi_natural_target_pairs": 0,
+  "exact_target_rows": 2,
+  "improved_rows": 6,
+  "min_natural_targets": 2,
+  "model": "qwen3",
+  "multi_natural_target_pairs": 0,
+  "n_rows": 24,
+  "n_source_components": 4,
+  "natural_degraded_rows": 1,
+  "natural_improved_rows": 4,
+  "natural_target_rows": 4,
+  "phase": 827,
+  "quantization": "off",
+  "round": "main",
+  "source_round": "confirm",
+  "target_transition_rows": 6,
+  "timestamp": "2026-07-01 15:55:21",
+  "title": "Exact-Natural Consistency Constrained Search"
+}

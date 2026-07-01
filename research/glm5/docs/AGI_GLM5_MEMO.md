@@ -89296,3 +89296,2400 @@ Phase 823 证明“组件内部可拆”是正确方向；
 但也证明“读出符号正负拆分”不是最终答案。
 下一步必须从 readout-proxy split 进入 boundary-objective sparse search。
 ```
+
+## Phase 824: boundary-objective sparse subspace search（边界目标稀疏子空间搜索） [2026-07-01 14:42]
+
+### 一、任务
+
+本阶段继续分析 Phase 823（第823阶段）附件中的判断，并基于当前进展自动进入同一大阶段的下一步：
+
+```text
+Phase 824:
+boundary-objective sparse subspace search
+（边界目标稀疏子空间搜索）
+```
+
+Phase 823 已经证明：
+
+```text
+1. 组件内部确实可以拆出能触发 boundary transition（边界迁移）的维度集合；
+2. 但 readout-sign（读出符号）不能干净地区分 beneficial / harmful（有益 / 有害）；
+3. abs_topk（绝对值最大维度）经常强于 positive_topk（读出正向维度）；
+4. 小模型中存在明显的正负混合、符号反向和预算敏感现象。
+```
+
+因此 Phase 824 不再只按 readout proxy（读出代理）选择子空间，而是直接用生成后的 answer boundary class（答案边界类）给候选子空间打分。
+
+### 二、对附件判断的审视
+
+附件判断基本正确。
+
+正确部分：
+
+```text
+1. Phase 823 是实质进展，但不是闭合；
+2. Phase 823 的核心转向是从“组件是否有效”进入“组件内部维度集合是否有效”；
+3. readout-sign 不是最终机制方向；
+4. 下一步应进入 boundary-objective sparse search；
+5. 当前不能继续用 target first-token direction（目标首词元方向）冒充完整语言闭合机制。
+```
+
+需要收紧的部分：
+
+```text
+1. boundary-objective search 也不是最终闭合，只是比 readout proxy 更贴近目标；
+2. 它仍然是 donor exact_choices -> recipient no_choices 的强干预；
+3. greedy 搜索只在候选池内有效，候选池外的真实因果维度仍可能漏掉；
+4. 小模型结果只能作为机制拼图，不能直接上升为真实语言编码机制。
+```
+
+### 三、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase824_boundary_objective_sparse_subspace_search.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase824_boundary_objective_sparse_subspace_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase824_boundary_objective_sparse_subspace_search/
+```
+
+三轮测试：
+
+```text
+smoke:
+  max_source_rows = 2
+  budgets = 16
+  candidate_pool = 12
+
+main:
+  max_source_rows = 8
+  budgets = 16,64
+  candidate_pool = 24
+
+confirm:
+  max_source_rows = 0
+  budgets = 16,64,256
+  candidate_pool = 32
+  save_probe_rows = true
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载策略：
+
+```text
+bf16
+no quantization（不使用量化）
+优先 flash_attention_2
+本地未安装 FlashAttention2 后自动回退到 sdpa
+每个模型完成后释放显存
+```
+
+### 四、测试原理
+
+Phase 824 仍从 Phase 822 confirm 中读取 signal-bearing components（有信号组件）：
+
+```text
+target_transition = true
+或 improved_boundary = true
+或 degraded_boundary = true
+```
+
+每个组件仍然构造：
+
+```text
+recipient = no_choices prompt（无候选项提示）
+donor     = exact_choices prompt（带候选项提示）
+```
+
+组件差分仍为：
+
+```math
+\Delta h^{(m)}
+=
+h_D^{(m)} - h_R^{(m)}
+```
+
+但本阶段不再直接假设：
+
+```math
+S_{\text{good}}
+=
+\{i \mid \Delta h_i^{(m)} g_i^{(m)} > 0\}
+```
+
+而是构造一个候选池：
+
+```math
+\Omega_m
+=
+\text{TopAbs}(\Delta h^{(m)} \odot g^{(m)})
+\cup
+\text{TopAbs}(\Delta h^{(m)})
+\cup
+\text{RandomControl}
+```
+
+然后把候选池切成若干小组：
+
+```math
+\Omega_m
+=
+G_1 \cup G_2 \cup \cdots \cup G_k
+```
+
+每个候选组都用真实生成结果打分：
+
+```math
+J(G_j)
+=
+\left[
+\mathbf{1}(B_{\text{after}}=T),
+\Delta r,
+r(B_{\text{after}}),
+\mathbf{1}(\text{protocol repaired})
+\right]
+```
+
+其中：
+
+```text
+T = target_equivalent（目标等价）
+\Delta r = boundary rank improvement（边界等级提升）
+```
+
+然后进行小规模 greedy search（贪心搜索）：
+
+```math
+S_{t+1}
+=
+S_t
+\cup
+\arg\max_{G_j}
+J(S_t \cup G_j)
+```
+
+并与以下对照比较：
+
+```text
+all
+positive_topk
+abs_topk
+random_topk
+causal_greedy
+candidate_probe
+```
+
+本阶段的关键变化是：
+
+```text
+子空间选择目标从 readout-score（读出分数）
+改为 answer-boundary objective（答案边界目标）。
+```
+
+### 五、确认轮总体结果
+
+确认轮结果：
+
+```text
+qwen3:
+  source components = 14
+  rows = 294
+  improved = 61
+  target transitions = 61
+  degraded = 1
+  mean delta rank = +0.364
+  greedy better pairs = 7 / 42
+  greedy >= control pairs = 36 / 42
+
+GLM4:
+  source components = 4
+  rows = 84
+  improved = 13
+  target transitions = 13
+  degraded = 1
+  mean delta rank = +0.214
+  greedy better pairs = 0 / 12
+  greedy >= control pairs = 12 / 12
+
+DS7B:
+  source components = 5
+  rows = 101
+  improved = 23
+  target transitions = 21
+  degraded = 0
+  mean delta rank = +1.059
+  greedy better pairs = 0 / 14
+  greedy >= control pairs = 13 / 14
+```
+
+### 六、按模式汇总
+
+qwen3：
+
+```text
+candidate_probe:
+  n=112, target=3, improved=3, degraded=0
+
+causal_greedy:
+  n=42, target=18, improved=18, degraded=0
+
+positive_topk:
+  n=42, target=10, improved=10, degraded=1
+
+abs_topk:
+  n=42, target=12, improved=12, degraded=0
+
+random_topk:
+  n=42, target=7, improved=7, degraded=0
+
+all:
+  n=14, target=11, improved=11, degraded=0
+```
+
+GLM4：
+
+```text
+candidate_probe:
+  n=32, target=1, improved=1, degraded=0
+
+causal_greedy:
+  n=12, target=3, improved=3, degraded=0
+
+positive_topk:
+  n=12, target=2, improved=2, degraded=1
+
+abs_topk:
+  n=12, target=3, improved=3, degraded=0
+
+random_topk:
+  n=12, target=0, improved=0, degraded=0
+
+all:
+  n=4, target=4, improved=4, degraded=0
+```
+
+DS7B：
+
+```text
+candidate_probe:
+  n=40, target=2, improved=2, degraded=0
+
+causal_greedy:
+  n=14, target=5, improved=5, degraded=0
+
+positive_topk:
+  n=14, target=4, improved=4, degraded=0
+
+abs_topk:
+  n=14, target=4, improved=4, degraded=0
+
+random_topk:
+  n=14, target=3, improved=3, degraded=0
+
+all:
+  n=5, target=3, improved=5, degraded=0
+```
+
+### 七、关键客观现象
+
+#### 1. qwen3：boundary-objective search 有明确增益
+
+qwen3 是本阶段最强正结果。
+
+```text
+causal_greedy target = 18 / 42
+positive_topk target = 10 / 42
+abs_topk target = 12 / 42
+random_topk target = 7 / 42
+```
+
+并且：
+
+```text
+greedy better pairs = 7 / 42
+greedy >= control pairs = 36 / 42
+```
+
+这说明：
+
+```text
+直接按 boundary objective 搜索，
+确实比 readout-positive / abs / random 更接近目标。
+```
+
+典型胜出案例：
+
+```text
+p816_heart_body_organ:
+  layer_residual budget 16:
+    causal_greedy -> Body Organ
+    positive_topk -> Circulatory System
+
+  attention_output budget 16:
+    causal_greedy -> Body Organ
+    positive_topk -> Circulatory System
+
+  head_8 budget 16:
+    causal_greedy -> Body Organ
+    positive_topk -> Circulatory System
+
+  head_4 budget 16 / 64:
+    causal_greedy -> Body Organ
+    positive_topk -> Circulatory System
+
+  head_22 budget 16:
+    causal_greedy -> Body Organ
+    positive_topk -> Circulatory System
+```
+
+最重要的特殊现象：
+
+```text
+Phase 822 中 qwen3 的 head_21 是 harmful_mixer：
+  whole head_21 -> unknown_other / "1"
+
+但 Phase 824 中：
+  head_21 causal_greedy budget 16 -> Body Organ
+```
+
+这说明：
+
+```text
+一个整体有害的 head 内部，
+仍然可能包含可触发正确边界迁移的稀疏子空间。
+```
+
+这是 Phase 824 的最重要正结果。
+
+#### 2. GLM4：直接搜索不超过最佳代理，但稳定不差
+
+GLM4 中：
+
+```text
+causal_greedy target = 3 / 12
+abs_topk target = 3 / 12
+positive_topk target = 2 / 12
+random_topk target = 0 / 12
+all target = 4 / 4
+```
+
+并且：
+
+```text
+greedy better pairs = 0 / 12
+greedy >= control pairs = 12 / 12
+```
+
+这说明：
+
+```text
+GLM4 中 boundary-objective search 没有超过 abs_topk / positive_topk 最佳对照；
+但没有比对照差。
+```
+
+最稳定案例仍然是：
+
+```text
+p816_carrot_root_vegetable L39:
+  causal_greedy 16 / 64 / 256 -> Root vegetable
+```
+
+但对于：
+
+```text
+winter / cactus / red
+```
+
+整层 all patch 仍强于稀疏子空间。
+
+这延续 Phase 822 / 823 的判断：
+
+```text
+GLM4 的边界迁移更像 distributed residual combination（分布式残差组合）。
+```
+
+#### 3. DS7B：triangle 路线稳定，但不是 greedy 特异优势
+
+DS7B 中：
+
+```text
+causal_greedy target = 5 / 14
+positive_topk target = 4 / 14
+abs_topk target = 4 / 14
+random_topk target = 3 / 14
+```
+
+但：
+
+```text
+greedy better pairs = 0 / 14
+greedy >= control pairs = 13 / 14
+```
+
+所以 DS7B 的现象是：
+
+```text
+causal_greedy 有效，
+但没有超过最佳代理对照。
+```
+
+稳定正例仍然集中在：
+
+```text
+p816_triangle_geometric_shape:
+  layer_residual causal_greedy -> polygon
+  mlp_topdiff_32 causal_greedy -> polygon
+```
+
+这说明：
+
+```text
+DS7B 的 triangle object_echo -> category route 很强；
+但它不是 Phase 824 方法独有发现，
+Phase 823 的 positive / abs / negative / random 已经能触发一部分。
+```
+
+### 八、阶段性结论
+
+Phase 824 是实质进展，但不是跨模型闭合。
+
+它证明：
+
+```text
+1. boundary-objective sparse search 是正确方向；
+2. qwen3 中 causal_greedy 明确优于 readout-positive / abs / random；
+3. 有害 head 内部可以存在有益稀疏子空间；
+4. GLM4 和 DS7B 中 causal_greedy 至少不弱于最佳对照，但没有明显超过；
+5. 直接按边界目标搜索比 readout-sign 更贴近真实机制，但还不够稳定。
+```
+
+更严格地说：
+
+```text
+Phase 824 达到了最低标准的一部分：
+  qwen3 上 causal_greedy 优于 readout-positive 和 random；
+
+但没有达到跨模型中等标准：
+  GLM4 和 DS7B 没有显示 greedy 明确优于最佳对照。
+```
+
+### 九、问题和硬伤
+
+第一，candidate pool（候选池）仍然依赖 readout / delta 代理。
+
+虽然选择目标变成了 boundary objective，但候选池仍来自：
+
+```text
+abs(readout score)
+abs(delta)
+random fill
+```
+
+如果真实因果维度不在候选池里，greedy 无法找到。
+
+第二，greedy 搜索不是全局最优。
+
+当前只是小规模块级贪心：
+
+```math
+S_{t+1}
+=
+S_t
+\cup
+\arg\max_{G_j} J(S_t \cup G_j)
+```
+
+它不能保证找到最小充分子空间。
+
+第三，candidate_probe 单块成功率很低。
+
+确认轮：
+
+```text
+qwen3 candidate_probe: 3 / 112 target
+GLM4 candidate_probe: 1 / 32 target
+DS7B candidate_probe: 2 / 40 target
+```
+
+说明有效边界迁移通常需要组合维度，而不是单块孤立触发。
+
+第四，小模型偏差依然明显。
+
+```text
+qwen3:
+  greedy 增益最明显，但集中在 heart/body-organ 相关路线。
+
+GLM4:
+  整层残差仍强，稀疏搜索很难超过 abs_topk。
+
+DS7B:
+  triangle 路线稳定，但 protocol verbalizer 路线仍强。
+```
+
+第五，仍不是自然生成闭合。
+
+所有测试仍是：
+
+```text
+donor exact_choices -> recipient no_choices
+```
+
+的 first-step intervention（首步干预），不是模型自然生成过程中自发选择这些子空间。
+
+### 十、理论更新
+
+Phase 823 的子空间公式是：
+
+```math
+B_{\text{after}}
+=
+\mathcal{C}
+\left(
+h_R
++
+\Pi_{S}
+\left(h_D-h_R\right),
+\mathcal{P},
+\mathcal{V}
+\right)
+```
+
+Phase 824 将子空间选择算子从 readout proxy 改为 boundary objective：
+
+```math
+S^*
+=
+\arg\max_{S \subset \Omega_m}
+J
+\left(
+\mathcal{C}
+\left(
+h_R
++
+\Pi_S(h_D-h_R),
+\mathcal{P},
+\mathcal{V}
+\right)
+\right)
+```
+
+其中：
+
+```math
+J
+=
+\left[
+\mathbf{1}(B=T),
+\Delta r,
+r(B),
+\mathbf{1}(\text{protocol repaired})
+\right]
+```
+
+这一阶段的理论变化是：
+
+```text
+真正的有益子空间不是由线性读出方向直接给出；
+而是由生成后的边界类迁移结果反向定义。
+```
+
+也就是说：
+
+```math
+S_{\text{beneficial}}
+\neq
+\{i \mid \Delta h_i g_i > 0\}
+```
+
+更接近当前结果的是：
+
+```math
+S_{\text{beneficial}}
+\approx
+\arg\max_S
+\left[
+\mathbf{1}(B_S=T),
+\Delta r_S,
+r(B_S)
+\right]
+```
+
+### 十一、智能理论角度的洞察
+
+从语言编码机制看：
+
+```text
+语言编码不是一个固定语义向量；
+而是条件化状态在组件 / 子空间 / 全词表竞争场中的路线选择。
+```
+
+从知识网络看：
+
+```text
+“heart -> body organ”不是一个节点被读取；
+而是通过若干 attention head / residual / MLP 子空间，把 broad_near_miss 路线推到 target_equivalent 边界。
+```
+
+从推理能力看：
+
+```text
+推理更像边界迁移和路线重定向；
+不是单纯沿一个线性概念方向移动。
+```
+
+从语法 / 协议系统看：
+
+```text
+DS7B 中 protocol verbalizer 仍然很强；
+说明协议路线是竞争路线本身，不是表面格式。
+```
+
+从数学体系看：
+
+```text
+当前公式必须从“线性方向评分”
+升级为“条件化子空间搜索 + 边界类目标函数 + 全词表竞争场”的组合。
+```
+
+### 十二、当前进度评估
+
+Phase 824 比 Phase 823 更接近真实编码机制，但仍未闭合。
+
+谨慎估计：
+
+```text
+结构拼图进度：44% -> 46%
+神经元级图谱进度：20% -> 22%
+完整 token closure 进度：26% -> 27%
+统一数学理论进度：36% -> 38%
+```
+
+提升原因：
+
+```text
+1. 首次用 boundary objective 直接搜索子空间；
+2. 证明 qwen3 的有害 head 内部存在有益子空间；
+3. 证明候选块直接评分比 readout-sign 更接近目标。
+```
+
+限制原因：
+
+```text
+1. 跨模型不稳定；
+2. GLM4 / DS7B 未显示 greedy 明确优于最佳代理；
+3. 候选池仍依赖代理；
+4. 仍是强干预，不是自然生成机制闭合。
+```
+
+### 十三、下一步 Phase
+
+下一阶段仍属于当前大阶段，但 Phase 824 已完成第一版 boundary-objective sparse search。下一步应进入：
+
+```text
+Phase 825:
+candidate-pool expansion and natural-route validation
+（候选池扩展与自然路线验证）
+```
+
+原因：
+
+```text
+Phase 824 的主要瓶颈不是目标函数，而是候选池和自然性。
+```
+
+建议任务：
+
+```text
+1. 扩展候选池来源：
+   - readout-score
+   - delta magnitude
+   - candidate_probe winners
+   - Phase 822 successful component dims
+   - random hard negatives
+
+2. 对 qwen3 的 head_21 做重点验证：
+   - whole head harmful
+   - sparse subspace beneficial
+   - 查明有益维度和有害维度是否可稳定分离
+
+3. 对 GLM4 做 residual block-level multi-chunk search：
+   - 不只搜索单层维度
+   - 搜索跨层 residual groups
+
+4. 对 DS7B 区分：
+   - triangle category route
+   - protocol verbalizer route
+
+5. 输出 atlas graph（图谱）节点：
+   - component
+   - candidate group
+   - boundary effect
+   - generated phrase
+   - role label
+```
+
+阶段性标准：
+
+```text
+最低标准：
+  扩展候选池后 qwen3 greedy better pairs 明显增加。
+
+中等标准：
+  GLM4 或 DS7B 至少一个模型出现 greedy > best proxy。
+
+高标准：
+  某类 sparse boundary route 能跨 case 复用。
+```
+
+当前结论：
+
+```text
+Phase 824 证明 boundary-objective sparse search 是必要方向；
+但也证明仅靠当前候选池和小规模贪心还不能完成闭合。
+下一步应从“搜索目标”转向“候选池质量 + 自然路线验证”。
+```
+
+## Phase 825: candidate-pool expansion and natural-route validation [2026-07-01 15:18]
+
+### 一、任务来源
+
+本阶段读取并分析了用户上传的 Phase 824 评估内容。总体判断基本正确：
+
+```text
+Phase 824 的真正进展不是完成 token closure，
+而是把子空间搜索从 readout-sign proxy 转向 boundary-objective。
+```
+
+其中正确部分包括：
+
+```text
+1. readout-sign 不能稳定区分 beneficial / harmful 子空间；
+2. 直接使用 answer boundary class 作为目标函数是必要方向；
+3. Phase 824 仍是 exact_choices donor 到 no_choices recipient 的强干预；
+4. 下一步必须验证这些 sparse subspace 是否能被自然供体复用。
+```
+
+需要收紧的部分是：
+
+```text
+Phase 825 结果显示：
+扩大候选池没有明显提高 exact greedy 的上限；
+真正新增的信息来自 natural-route validation。
+```
+
+也就是说，Phase 825 没有证明“候选池扩展已经解决问题”，而是证明：
+
+```text
+exact donor 搜到的一部分 sparse subspace，
+在 qwen3 和 DS7B 上可以被自然 donor 复用；
+但 GLM4 没有出现自然迁移。
+```
+
+### 二、脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase825_candidate_pool_expansion_natural_route_validation.py
+tests/glm5/run_phase825_candidate_pool_expansion_natural_route_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase825_candidate_pool_expansion_natural_route_validation/
+```
+
+三轮测试均按 qwen3、GLM4、DS7B 顺序执行。未使用量化。优先尝试 flash_attention_2，但本地未安装 FlashAttention2 包，因此三模型均自动回退到 sdpa。
+
+```text
+qwen3: loaded sdpa, gpu about 8.04 GB
+GLM4: loaded sdpa, gpu about 18.80 GB
+DS7B: loaded sdpa, gpu about 15.23 GB
+```
+
+### 三、测试原理
+
+Phase 825 的核心问题是：
+
+```text
+Phase 824 用 exact_choices donor 搜到的 sparse boundary subspace，
+是否只是依赖显式选项提示，
+还是可以被更自然的 donor prompt 复用？
+```
+
+#### 1. 受体和供体
+
+受体仍然是无候选项提示：
+
+```text
+recipient = no_choices prompt
+```
+
+搜索供体仍然使用显式候选项：
+
+```text
+search donor = exact_choices prompt
+```
+
+自然验证供体新增三类：
+
+```text
+natural_category
+natural_question
+object_only
+```
+
+#### 2. 组件差分
+
+对每个 Phase 822 confirm 中有信号的组件，取：
+
+```math
+\Delta h^{(m)} = h_D^{(m)} - h_R^{(m)}
+```
+
+其中：
+
+```text
+m = component
+h_D = donor component state
+h_R = recipient component state
+```
+
+#### 3. 扩展候选池
+
+Phase 825 的候选池不是只用 Phase 824 的读出代理，而是加入 Phase 823 / 824 已成功维度、delta 高能维度、signed score 高能维度和随机补充：
+
+```math
+\Omega_m =
+\Omega_{\text{prior}}
+\cup
+\Omega_{\text{base}}
+\cup
+\operatorname{TopK}(|\Delta h^{(m)}|)
+\cup
+\operatorname{TopK}(|\Delta h^{(m)} \odot g^{(m)}|)
+\cup
+\Omega_{\text{random}}
+```
+
+其中：
+
+```text
+prior = Phase 823 / Phase 824 中已经造成 target_transition 或 improved_boundary 的维度；
+base = Phase 824 原候选池；
+g = effective readout direction；
+random = 随机补充维度，用作 hard negative 和覆盖盲区。
+```
+
+#### 4. exact donor 上搜索
+
+在 exact_choices donor 上做贪心搜索：
+
+```math
+S_{t+1}
+=
+S_t
+\cup
+\arg\max_{G_j \subset \Omega_m}
+J(S_t \cup G_j)
+```
+
+目标函数仍然是边界类目标：
+
+```math
+J(S)
+=
+\left[
+\mathbf{1}(B_S = T),
+\Delta r_S,
+r(B_S)
+\right]
+```
+
+其中：
+
+```text
+T = target_equivalent
+B_S = patch 后生成文本的 boundary class
+r(B_S) = boundary rank
+\Delta r_S = patch 后 rank 相对 baseline 的提升
+```
+
+#### 5. 自然路线验证
+
+关键验证不是重新搜索，而是固定 exact donor 搜到的子空间，再把 donor vector 换成自然提示下的 donor vector：
+
+```math
+\hat{y}_{N,S}
+=
+F\left(
+h_R^{(m)} + P_S(h_N^{(m)} - h_R^{(m)})
+\right)
+```
+
+自然迁移成功定义为：
+
+```math
+\operatorname{Transfer}(N,S)
+=
+\mathbf{1}\left(B(\hat{y}_{N,S}) = T\right)
+```
+
+如果 exact donor 能成功，但 natural donor 失败，说明该子空间仍可能只是显式选项提示路线。
+
+如果 natural donor 也成功，说明它更接近自然路线中的可复用因果纤维。
+
+### 四、三轮结果
+
+#### 1. 冒烟轮
+
+```text
+qwen3:
+  source components = 2
+  rows = 4
+  exact target = 1
+  natural target = 0
+
+GLM4:
+  source components = 2
+  rows = 4
+  exact target = 0
+  natural target = 0
+
+DS7B:
+  source components = 2
+  rows = 4
+  exact target = 1
+  natural target = 0
+```
+
+冒烟轮确认：
+
+```text
+脚本、数据选择、模型加载、结果保存均正常。
+```
+
+#### 2. 主轮
+
+```text
+qwen3:
+  source components = 8
+  rows = 48
+  exact target = 7
+  natural target = 2
+  natural improved = 2
+  natural preserves target = 2
+  transfer pairs = 32
+
+GLM4:
+  source components = 4
+  rows = 24
+  exact target = 0
+  natural target = 0
+  natural improved = 0
+  natural preserves target = 0
+  transfer pairs = 16
+
+DS7B:
+  source components = 5
+  rows = 30
+  exact target = 2
+  natural target = 3
+  natural improved = 3
+  natural preserves target = 3
+  transfer pairs = 20
+```
+
+主轮显示：
+
+```text
+qwen3 和 DS7B 出现自然供体迁移；
+GLM4 没有自然迁移。
+```
+
+#### 3. 确认轮
+
+```text
+qwen3:
+  source components = 14
+  rows = 168
+  exact target = 18
+  natural target = 8
+  natural improved = 8
+  natural preserves target = 6
+  transfer pairs = 126
+
+GLM4:
+  source components = 4
+  rows = 48
+  exact target = 3
+  natural target = 0
+  natural improved = 0
+  natural preserves target = 0
+  transfer pairs = 36
+
+DS7B:
+  source components = 5
+  rows = 56
+  exact target = 5
+  natural target = 9
+  natural improved = 9
+  natural preserves target = 9
+  transfer pairs = 42
+```
+
+确认轮是本阶段最重要结果。
+
+### 五、确认轮 donor 结果
+
+qwen3：
+
+```text
+exact_choices:
+  n = 42
+  target = 18
+  improved = 18
+  degraded = 0
+  mean delta = 0.810
+
+natural_category:
+  n = 42
+  target = 3
+  improved = 3
+  degraded = 3
+  mean delta = -0.071
+
+natural_question:
+  n = 42
+  target = 0
+  improved = 0
+  degraded = 2
+  mean delta = -0.143
+
+object_only:
+  n = 42
+  target = 5
+  improved = 5
+  degraded = 0
+  mean delta = 0.238
+```
+
+GLM4：
+
+```text
+exact_choices:
+  n = 12
+  target = 3
+  improved = 3
+  degraded = 0
+
+natural_category:
+  n = 12
+  target = 0
+  degraded = 3
+
+natural_question:
+  n = 12
+  target = 0
+
+object_only:
+  n = 12
+  target = 0
+```
+
+DS7B：
+
+```text
+exact_choices:
+  n = 14
+  target = 5
+  improved = 5
+  degraded = 0
+  mean delta = 1.786
+
+natural_category:
+  n = 14
+  target = 2
+  improved = 2
+  degraded = 0
+
+natural_question:
+  n = 14
+  target = 2
+  improved = 2
+  degraded = 0
+
+object_only:
+  n = 14
+  target = 5
+  improved = 5
+  degraded = 0
+```
+
+### 六、关键客观现象
+
+#### 1. qwen3 的自然迁移主要集中在 heart/body organ
+
+qwen3 的 target 行主要集中于：
+
+```text
+p816_heart_body_organ
+```
+
+有效组件包括：
+
+```text
+L14 mlp_output whole_mlp_output
+L14 layer_residual whole_layer_residual
+L14 attention_output whole_attention_output
+L14 attention_head head_4
+L14 attention_head head_22
+L14 attention_head head_16
+L14 attention_head head_21
+```
+
+自然供体中最有效的是：
+
+```text
+object_only
+natural_category
+```
+
+典型结果：
+
+```text
+object_only donor + L14 layer_residual sparse subspace -> Body Organ
+object_only donor + L14 mlp_output sparse subspace -> Body Organ
+natural_category donor + L14 attention_head head_21 sparse subspace -> Body Organ
+```
+
+这说明 qwen3 的 heart/body organ 路线中，存在一部分可以脱离显式候选项复用的 sparse route。
+
+但它仍然高度局限于单一 case，不是全局自然语义路线闭合。
+
+#### 2. qwen3 的 head_21 再次被收紧
+
+Phase 822 中 qwen3 head_21 曾表现为 harmful mixer。
+
+Phase 824 发现：
+
+```text
+whole head harmful，
+但 sparse subspace beneficial。
+```
+
+Phase 825 进一步发现：
+
+```text
+head_21 中某些 sparse subspace 不只在 exact_choices donor 下有效，
+在 natural_category donor 下也能生成 Body Organ。
+```
+
+这比 Phase 824 更强，因为它说明 head_21 的有益子空间不是完全依赖显式选项格式。
+
+但仍需谨慎：
+
+```text
+该结果目前只在 qwen3 heart/body organ case 中稳定，
+不能上升为跨 domain 通用 suppressor 或 category writer。
+```
+
+#### 3. DS7B 的自然迁移最干净，但领域更窄
+
+DS7B 的自然迁移集中于：
+
+```text
+p816_triangle_geometric_shape
+```
+
+有效组件包括：
+
+```text
+L27 layer_residual whole_layer_residual
+L27 mlp_channel_group mlp_topdiff_32
+```
+
+典型结果：
+
+```text
+exact_choices donor -> polygon
+natural_category donor -> polygon
+natural_question donor -> polygon
+object_only donor -> polygon
+```
+
+DS7B 的自然迁移比 qwen3 更干净：
+
+```text
+natural target = 9
+natural degraded = 0
+```
+
+但它主要是 triangle -> polygon，一个相对简单、规则性强、协议干扰明显的 case。它说明 DS7B 中确实有可自然复用的 geometric route，但还不能证明一般语言知识网络闭合。
+
+#### 4. GLM4 是关键负结果
+
+GLM4 确认轮中：
+
+```text
+exact target = 3
+natural target = 0
+natural degraded = 3
+```
+
+这说明：
+
+```text
+GLM4 可以在 exact_choices 强干预下达到 target；
+但该 sparse subspace 不能被自然 donor prompt 复用。
+```
+
+这个负结果非常重要。它排除了一个过强结论：
+
+```text
+不能说 Phase 825 已经找到跨模型自然路线。
+```
+
+更准确地说：
+
+```text
+Phase 825 找到了部分模型、部分 case、部分组件上的自然可复用 sparse route。
+```
+
+### 七、与 Phase 824 的比较
+
+Phase 824 confirm 中 causal_greedy target：
+
+```text
+qwen3: 18 / 42
+GLM4: 3 / 12
+DS7B: 5 / 14
+```
+
+Phase 825 confirm 中 exact_choices expanded greedy target：
+
+```text
+qwen3: 18 / 42
+GLM4: 3 / 12
+DS7B: 5 / 14
+```
+
+这个对比非常关键：
+
+```text
+候选池扩展没有明显提高 exact greedy 上限。
+```
+
+因此 Phase 825 的实质进展不是“更强搜索找到了更多 exact target”，而是：
+
+```text
+把 exact sparse subspace 拿到自然 donor prompt 下验证，
+并发现 qwen3 / DS7B 有部分自然复用，GLM4 没有。
+```
+
+### 八、理论进展
+
+Phase 825 使当前理论从：
+
+```text
+boundary-objective sparse search
+```
+
+推进到：
+
+```text
+boundary-objective sparse search
++
+natural route transfer test
+```
+
+当前更准确的机制表述是：
+
+```text
+语言生成不是某个正确 token logit 的单点升高；
+也不是某个 readout-positive direction 的线性累加；
+而是条件化组件状态中一部分 sparse route，
+在不同 prompt 条件下是否能稳定推动 boundary class 迁移。
+```
+
+Phase 825 说明：
+
+```text
+如果一个 sparse subspace 只能在 exact_choices donor 下有效，
+它更像显式提示路线；
+
+如果它能在 object_only / natural_category / natural_question donor 下有效，
+它更接近自然语言机制路线。
+```
+
+### 九、统一公式的局部改进
+
+Phase 825 后，当前机制公式应加入自然迁移项。
+
+原来只看：
+
+```math
+B\left(
+F(h_R^{(m)} + P_S(h_D^{(m)} - h_R^{(m)}))
+\right)
+```
+
+现在必须区分：
+
+```math
+D_{\text{exact}}
+\quad \text{and} \quad
+D_{\text{natural}}
+```
+
+候选子空间的有效性应写为：
+
+```math
+E(S)
+=
+J_{\text{exact}}(S)
++
+\lambda
+\cdot
+J_{\text{natural}}(S)
+-
+\mu
+\cdot
+H_{\text{degrade}}(S)
+```
+
+其中：
+
+```math
+J_{\text{natural}}(S)
+=
+\frac{1}{|\mathcal{N}|}
+\sum_{N \in \mathcal{N}}
+\left[
+\mathbf{1}(B_{N,S}=T),
+\Delta r_{N,S},
+r(B_{N,S})
+\right]
+```
+
+自然供体集合为：
+
+```math
+\mathcal{N}
+=
+\{
+\text{natural_category},
+\text{natural_question},
+\text{object_only}
+\}
+```
+
+这意味着，下一阶段不能只优化 exact donor：
+
+```text
+必须把 natural donor 加入目标函数本身。
+```
+
+### 十、闭合标准收紧
+
+Phase 825 后，闭合标准需要进一步严格化。
+
+弱标准：
+
+```text
+exact_choices donor 下 sparse patch 产生 target_equivalent。
+```
+
+中标准：
+
+```text
+same sparse subspace 在至少一个 natural donor 下仍产生 target_equivalent。
+```
+
+强标准：
+
+```text
+same sparse subspace 在多个 natural donor 下稳定产生 target_equivalent，
+且不引入 degraded boundary。
+```
+
+更强标准：
+
+```text
+same sparse route 可跨 case 或跨 domain 复用。
+```
+
+最终闭合标准仍然没有达到：
+
+```text
+1. 不是自然生成的无干预闭合；
+2. 不是跨模型稳定；
+3. 不是跨 domain 复用；
+4. 仍未解释全词表竞争场中 blocker 的完整消除机制。
+```
+
+### 十一、问题、硬伤与瓶颈
+
+#### 1. 候选池扩展没有提高 exact 上限
+
+从 Phase 824 到 Phase 825：
+
+```text
+qwen3 exact target: 18 -> 18
+GLM4 exact target: 3 -> 3
+DS7B exact target: 5 -> 5
+```
+
+这说明瓶颈不只是候选池大小。
+
+更可能的瓶颈是：
+
+```text
+1. exact_choices donor 本身带来路线偏置；
+2. greedy search 只在局部候选组中找局部最优；
+3. 单组件子空间不足以完成完整 boundary closure；
+4. 自然路线需要多组件协同，不是单一组件 patch。
+```
+
+#### 2. 自然迁移高度 case-specific
+
+qwen3 主要在 heart/body organ 上成功。
+
+DS7B 主要在 triangle/polygon 上成功。
+
+这说明：
+
+```text
+当前结果更像局部自然路线，而不是全局语言路线。
+```
+
+#### 3. GLM4 负结果说明跨模型结构不稳定
+
+GLM4 的 exact success 无法迁移到 natural donor。
+
+这可能说明：
+
+```text
+1. GLM4 的 exact_choices 路线更依赖显式选项；
+2. natural donor 触发的是不同路线；
+3. 当前 component/subspace 层级仍不够；
+4. 小模型内部机制粗糙，导致自然路线不稳定。
+```
+
+#### 4. 小模型偏差仍然必须计入
+
+当前测试模型都是小模型或较粗糙模型。
+
+因此结果可能存在：
+
+```text
+1. route fragmentation: 路线碎片化；
+2. protocol overfitting: 协议路线过强；
+3. component entanglement: 组件角色混杂；
+4. weak abstraction hierarchy: 抽象层级不稳；
+5. poor natural transfer: 自然提示迁移弱。
+```
+
+所以不能把 Phase 825 的自然迁移比例直接当成真实语言编码机制比例。
+
+更合理的解释是：
+
+```text
+小模型中已经能观察到自然路线复用的局部证据；
+但它被模型容量、训练质量和协议路线严重扰动。
+```
+
+### 十二、当前拼图位置
+
+目前已经积累的核心拼图：
+
+```text
+1. readout-sign 不是可靠 beneficial/harmful 分界；
+2. answer-boundary objective 比 readout proxy 更贴近目标；
+3. harmful whole component 内部可能包含 beneficial sparse subspace；
+4. exact_choices donor 可以发现可触发 boundary transition 的 sparse subspace；
+5. 一部分 sparse subspace 可以迁移到 natural donor；
+6. 自然迁移在 qwen3 和 DS7B 中存在，但在 GLM4 中缺失；
+7. 自然迁移目前高度集中于少数 case 和少数组件；
+8. 当前还没有完成跨 case / 跨 domain / 跨模型的自然路线闭合。
+```
+
+Phase 825 的进展不是单纯 patch 拟合，而是提升了解释力：
+
+```text
+它第一次把 sparse subspace 从 exact donor 干预成功，
+推进到 natural donor 可复用性验证。
+```
+
+但它仍然没有达到完整语言编码机制：
+
+```text
+当前距离 token closure 仍较远。
+```
+
+### 十三、当前进度评估
+
+谨慎估计：
+
+```text
+结构拼图进度：46% -> 48%
+神经元级图谱进度：22% -> 23%
+自然路线验证进度：10% -> 18%
+完整 token closure 进度：27% -> 28%
+统一数学理论进度：38% -> 40%
+```
+
+提升原因：
+
+```text
+1. 引入 natural donor transfer test；
+2. qwen3 / DS7B 出现自然迁移正结果；
+3. GLM4 给出重要负结果，避免过度总结；
+4. 闭合标准从 exact success 收紧到 natural transfer。
+```
+
+仍然缓慢的原因：
+
+```text
+1. exact greedy 上限没有提高；
+2. 自然迁移比例低；
+3. case-specific 很强；
+4. 跨模型不稳定；
+5. 仍是人工 patch，不是模型自然生成闭合。
+```
+
+### 十四、下一步 Phase
+
+下一阶段仍属于当前大阶段：
+
+```text
+从 exact donor sparse search
+走向 natural-route causal closure。
+```
+
+Phase 825 已完成“验证 exact sparse route 是否能自然迁移”的第一版。
+
+下一步应进入：
+
+```text
+Phase 826:
+multi-donor natural-objective sparse search
+（多供体自然目标稀疏搜索）
+```
+
+核心变化：
+
+```text
+不要先在 exact_choices donor 上搜索，再事后验证 natural donor；
+而是直接把 exact_choices、natural_category、natural_question、object_only
+一起放进目标函数。
+```
+
+目标函数：
+
+```math
+S_{t+1}
+=
+S_t
+\cup
+\arg\max_{G_j}
+\left[
+J_{\text{exact}}(S_t \cup G_j)
++
+\lambda
+\sum_{N \in \mathcal{N}}
+J_N(S_t \cup G_j)
+-
+\mu
+D_N(S_t \cup G_j)
+\right]
+```
+
+其中：
+
+```text
+J_N = natural donor boundary improvement
+D_N = natural donor degraded penalty
+```
+
+最低标准：
+
+```text
+qwen3 或 DS7B 的 natural target rows 比 Phase 825 增加，
+且 degraded 不明显增加。
+```
+
+中标准：
+
+```text
+GLM4 出现至少一个 natural target。
+```
+
+高标准：
+
+```text
+同一 case 中 exact + 至少两个 natural donors 同时 target。
+```
+
+更高标准：
+
+```text
+同类 sparse route 能跨 case 复用。
+```
+
+当前结论：
+
+```text
+Phase 825 证明自然路线复用存在，但不稳定；
+下一步必须把自然供体纳入搜索目标本身，
+否则会继续停留在 exact donor 强干预路线。
+```
+
+## Phase 826: multi-donor natural-objective sparse search [2026-07-01 15:36]
+
+### 一、任务来源
+
+Phase 825 证明：
+
+```text
+exact_choices donor 搜到的一部分 sparse subspace，
+可以在 qwen3 和 DS7B 的自然 donor prompt 中复用；
+但 GLM4 没有自然迁移。
+```
+
+这说明 Phase 825 的路线正确，但仍有一个关键问题：
+
+```text
+如果先用 exact_choices donor 搜索，
+再事后验证 natural donor，
+搜索目标仍然偏向显式选项路线。
+```
+
+因此 Phase 826 继续当前阶段任务，把自然供体直接加入搜索目标本身。
+
+### 二、脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase826_multi_donor_natural_objective_sparse_search.py
+tests/glm5/run_phase826_multi_donor_natural_objective_sparse_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase826_multi_donor_natural_objective_sparse_search/
+```
+
+三轮测试仍按 qwen3、GLM4、DS7B 顺序执行。未使用量化。优先尝试 flash_attention_2，但本地没有安装 FlashAttention2，因此自动回退到 sdpa。
+
+### 三、测试原理
+
+Phase 825 的流程是：
+
+```text
+先在 exact_choices donor 上搜索 sparse subspace；
+再把同一 sparse subspace 放到 natural donor 上验证。
+```
+
+Phase 826 改为：
+
+```text
+搜索时同时评价 exact donor 和 natural donor。
+```
+
+也就是说，候选子空间的选择目标从：
+
+```math
+\max_S J_{\text{exact}}(S)
+```
+
+改为：
+
+```math
+\max_S
+\left[
+J_{\text{exact}}(S)
++
+\lambda
+\sum_{N \in \mathcal{N}} J_N(S)
+-
+\mu
+\sum_{N \in \mathcal{N}} D_N(S)
+\right]
+```
+
+本阶段第一版实现没有显式调参，而是使用排序目标近似：
+
+```math
+K(S)
+=
+\left[
+C_{\text{natural-target}}(S),
+C_{\text{all-target}}(S),
+C_{\text{improved}}(S),
+-C_{\text{degraded}}(S),
+\sum \Delta r(S),
+C_{\text{exact-target}}(S)
+\right]
+```
+
+其中：
+
+```text
+C_natural-target = natural donor 中 target_equivalent 的数量；
+C_all-target = exact + natural donor 的 target_equivalent 总数；
+C_improved = improved_boundary 总数；
+C_degraded = degraded_boundary 总数；
+Delta r = boundary rank improvement。
+```
+
+贪心搜索为：
+
+```math
+S_{t+1}
+=
+S_t
+\cup
+\arg\max_{G_j \subset \Omega_m}
+K(S_t \cup G_j)
+```
+
+候选池仍来自 Phase 825：
+
+```math
+\Omega_m =
+\Omega_{\text{prior}}
+\cup
+\Omega_{\text{base}}
+\cup
+\operatorname{TopK}(|\Delta h^{(m)}|)
+\cup
+\operatorname{TopK}(|\Delta h^{(m)} \odot g^{(m)}|)
+\cup
+\Omega_{\text{random}}
+```
+
+但 Phase 826 对每个 donor 都生成候选池，再取并集：
+
+```math
+\Omega_m^{826}
+=
+\bigcup_{D \in \{exact\} \cup \mathcal{N}}
+\Omega_{m,D}
+```
+
+### 四、三轮结果
+
+#### 1. 冒烟轮
+
+```text
+qwen3:
+  source components = 2
+  rows = 4
+  exact target = 0
+  natural target = 1
+  natural improved = 1
+  natural degraded = 0
+
+GLM4:
+  source components = 2
+  rows = 4
+  exact target = 0
+  natural target = 0
+
+DS7B:
+  source components = 2
+  rows = 4
+  exact target = 1
+  natural target = 1
+```
+
+冒烟轮确认脚本、加载、保存和多供体目标都可运行。
+
+#### 2. 主轮
+
+```text
+qwen3:
+  source components = 4
+  rows = 24
+  exact target = 2
+  natural target = 6
+  natural improved = 6
+  natural degraded = 0
+  multi-natural pairs = 0
+  exact + multi-natural pairs = 0
+
+GLM4:
+  source components = 4
+  rows = 24
+  exact target = 0
+  natural target = 0
+  natural improved = 0
+  natural degraded = 0
+
+DS7B:
+  source components = 4
+  rows = 24
+  exact target = 2
+  natural target = 4
+  natural improved = 4
+  natural degraded = 0
+  multi-natural pairs = 2
+  exact + multi-natural pairs = 2
+```
+
+主轮显示：
+
+```text
+qwen3 的自然 target 明显增加；
+DS7B 保持 exact + natural 一致；
+GLM4 仍没有突破。
+```
+
+#### 3. 确认轮
+
+```text
+qwen3:
+  source components = 8
+  rows = 64
+  exact target = 1
+  natural target = 13
+  natural improved = 13
+  natural degraded = 3
+  multi-natural pairs = 3
+  exact + multi-natural pairs = 0
+
+GLM4:
+  source components = 4
+  rows = 32
+  exact target = 0
+  natural target = 0
+  natural improved = 0
+  natural degraded = 0
+  multi-natural pairs = 0
+  exact + multi-natural pairs = 0
+
+DS7B:
+  source components = 5
+  rows = 40
+  exact target = 2
+  natural target = 6
+  natural improved = 6
+  natural degraded = 0
+  multi-natural pairs = 2
+  exact + multi-natural pairs = 2
+```
+
+### 五、确认轮 donor 结果
+
+qwen3：
+
+```text
+exact_choices:
+  n = 16
+  target = 1
+  improved = 1
+  degraded = 0
+  mean delta = 0.125
+
+natural_category:
+  n = 16
+  target = 4
+  improved = 4
+  degraded = 2
+  mean delta = 0.125
+
+natural_question:
+  n = 16
+  target = 3
+  improved = 3
+  degraded = 1
+  mean delta = 0.188
+
+object_only:
+  n = 16
+  target = 6
+  improved = 6
+  degraded = 0
+  mean delta = 0.750
+```
+
+GLM4：
+
+```text
+exact_choices:
+  n = 8
+  target = 0
+
+natural_category:
+  n = 8
+  target = 0
+
+natural_question:
+  n = 8
+  target = 0
+
+object_only:
+  n = 8
+  target = 0
+```
+
+DS7B：
+
+```text
+exact_choices:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+
+natural_category:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+
+natural_question:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+
+object_only:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+```
+
+### 六、核心客观现象
+
+#### 1. qwen3 的自然目标显著增加，但 exact 目标被牺牲
+
+Phase 825 confirm 中 qwen3：
+
+```text
+exact target = 18
+natural target = 8
+natural degraded = 5
+```
+
+Phase 826 confirm 中 qwen3：
+
+```text
+exact target = 1
+natural target = 13
+natural degraded = 3
+```
+
+这个结果非常重要：
+
+```text
+多供体自然目标确实把搜索推向 natural donor；
+但当前排序目标过度偏向 natural target，
+导致 exact route 被牺牲。
+```
+
+因此 Phase 826 不是最终闭合，而是暴露了新的权衡：
+
+```text
+natural transfer 和 exact closure 之间存在目标冲突。
+```
+
+qwen3 命中仍主要集中在：
+
+```text
+p816_heart_body_organ
+```
+
+有效组件包括：
+
+```text
+L14 mlp_output whole_mlp_output
+L14 layer_residual whole_layer_residual
+L14 attention_output whole_attention_output
+L14 attention_head head_8
+L14 attention_head head_4
+L14 attention_head head_3
+```
+
+说明 qwen3 的 body organ route 可以被自然目标强化，但仍集中于单一 case。
+
+#### 2. DS7B 是最干净的正结果
+
+DS7B confirm 中：
+
+```text
+exact target = 2
+natural target = 6
+natural degraded = 0
+multi-natural pairs = 2
+exact + multi-natural pairs = 2
+```
+
+命中集中于：
+
+```text
+p816_triangle_geometric_shape
+L27 mlp_channel_group mlp_topdiff_32
+```
+
+同一 sparse subspace 在四个 donor 上都能生成：
+
+```text
+polygon
+```
+
+这说明 DS7B 的 triangle -> polygon 路线中，存在较清晰的可自然复用子空间。
+
+但限制仍然明显：
+
+```text
+这是单一几何类别 case；
+不能直接泛化为所有语义域。
+```
+
+#### 3. GLM4 负结果进一步稳固
+
+Phase 825 中 GLM4：
+
+```text
+exact target = 3
+natural target = 0
+```
+
+Phase 826 中 GLM4：
+
+```text
+exact target = 0
+natural target = 0
+```
+
+这说明当前多供体目标没有解决 GLM4。
+
+更严格地说：
+
+```text
+GLM4 的自然 route 可能不在当前 Phase 822 选出的组件 / 子空间里；
+也可能需要跨层、多组件联合 patch；
+也可能被小模型内部结构粗糙性扰动。
+```
+
+### 七、与 Phase 825 的关系
+
+Phase 825 证明：
+
+```text
+自然迁移存在，但只是在 exact subspace 搜索之后被动验证。
+```
+
+Phase 826 证明：
+
+```text
+把 natural donor 放进目标函数后，确实能把搜索推向自然 target；
+但如果目标函数不平衡，会牺牲 exact target。
+```
+
+因此当前最准确结论是：
+
+```text
+natural route objective 是必要的；
+但必须加入 exact-natural consistency 约束。
+```
+
+否则会出现：
+
+```text
+natural target 增加，
+但 exact closure 消失；
+或者 exact closure 存在，
+但 natural transfer 不稳。
+```
+
+### 八、理论进展
+
+Phase 826 把当前理论从：
+
+```text
+natural route validation
+```
+
+推进到：
+
+```text
+natural route objective
+```
+
+但也发现：
+
+```text
+单纯最大化 natural target 不是闭合目标；
+闭合目标必须要求 exact 与 natural 的一致性。
+```
+
+更接近真实语言编码机制的对象不是：
+
+```text
+某个 donor prompt 下有效的 sparse subspace
+```
+
+而是：
+
+```text
+跨多个 donor condition 保持同一 boundary transition 的 causal fiber。
+```
+
+这使“因果纤维”的定义更严格：
+
+```math
+\mathcal{F}
+=
+\left\{
+S:
+\forall D \in \mathcal{D}_{\text{valid}},
+B_{D,S}=T
+\ \text{and}\
+D_{D,S}=0
+\right\}
+```
+
+其中：
+
+```text
+D_valid = exact_choices + natural donor set
+B_D,S = donor D 在子空间 S 上 patch 后的 boundary class
+D_D,S = degraded indicator
+```
+
+### 九、统一公式修正
+
+Phase 826 后，目标函数不能只写成自然 target 数量。
+
+应该改为：
+
+```math
+E(S)
+=
+\alpha C_{\text{exact-target}}(S)
++
+\beta C_{\text{natural-target}}(S)
++
+\gamma C_{\text{exact-natural-consistency}}(S)
+-
+\mu C_{\text{degraded}}(S)
+-
+\rho C_{\text{route-divergence}}(S)
+```
+
+其中：
+
+```math
+C_{\text{exact-natural-consistency}}(S)
+=
+\sum_{N \in \mathcal{N}}
+\mathbf{1}
+\left(
+B_{\text{exact},S}=T
+\land
+B_{N,S}=T
+\right)
+```
+
+路线分歧惩罚可定义为：
+
+```math
+C_{\text{route-divergence}}(S)
+=
+\sum_{N \in \mathcal{N}}
+\mathbf{1}
+\left(
+B_{\text{exact},S} \neq B_{N,S}
+\right)
+```
+
+这比 Phase 826 当前实现更严格。
+
+Phase 826 当前实现相当于：
+
+```text
+natural-target 优先级过高；
+exact-natural consistency 权重不足。
+```
+
+### 十、闭合标准再次收紧
+
+Phase 826 后，闭合标准应改为：
+
+```text
+1. exact donor target；
+2. 至少两个 natural donor target；
+3. exact 与 natural 的 target 是同一个 boundary class；
+4. degraded = 0；
+5. 同一子空间跨预算稳定；
+6. 最后再要求跨 case 复用。
+```
+
+DS7B 的 triangle / polygon 达到局部强标准：
+
+```text
+exact + natural_category + natural_question + object_only 均 target，
+degraded = 0。
+```
+
+qwen3 达到自然目标强化，但没有达到 exact-natural consistency：
+
+```text
+natural target 多，
+exact target 少，
+有 degraded。
+```
+
+GLM4 没有达到。
+
+### 十一、问题与硬伤
+
+#### 1. qwen3 目标函数失衡
+
+Phase 826 qwen3 的自然 target 上升，但 exact target 下降：
+
+```text
+natural target = 13
+exact target = 1
+```
+
+这说明当前目标函数不是闭合目标，只是自然目标偏置器。
+
+#### 2. DS7B 正结果过窄
+
+DS7B 的正结果非常干净，但集中在：
+
+```text
+triangle -> polygon
+```
+
+它可能反映几何类别规则，而不是一般语义知识网络。
+
+#### 3. GLM4 稳定失败
+
+GLM4 仍无法自然迁移。
+
+这说明：
+
+```text
+当前算法不是跨模型通用；
+也说明不能把 qwen3 / DS7B 的局部现象当成完整机制。
+```
+
+#### 4. 仍然是人工 patch
+
+Phase 826 仍然是人工选择组件和子空间后注入 donor 差分。
+
+它没有证明模型自然生成时会自动选择该 route。
+
+### 十二、当前进度评估
+
+谨慎估计：
+
+```text
+结构拼图进度：48% -> 49%
+神经元级图谱进度：23% -> 24%
+自然路线验证进度：18% -> 24%
+完整 token closure 进度：28% -> 29%
+统一数学理论进度：40% -> 42%
+```
+
+提升原因：
+
+```text
+1. 首次把 natural donor 纳入搜索目标；
+2. 发现 qwen3 natural target 可被主动增强；
+3. DS7B 出现 exact + multi-natural consistency；
+4. 发现 exact-natural objective conflict。
+```
+
+限制原因：
+
+```text
+1. qwen3 exact target 被牺牲；
+2. GLM4 仍为 0；
+3. DS7B 正结果 case 太窄；
+4. 仍未跨 case 复用。
+```
+
+### 十三、下一步 Phase
+
+下一步仍属于当前大阶段，但 Phase 826 已完成第一版 multi-donor natural-objective search。
+
+下一阶段应进入：
+
+```text
+Phase 827:
+exact-natural consistency constrained search
+（精确供体与自然供体一致性约束搜索）
+```
+
+关键变化：
+
+```text
+不能只最大化 natural target；
+必须显式要求 exact target 与 natural target 同时成立。
+```
+
+建议目标函数：
+
+```math
+K_{827}(S)
+=
+\left[
+C_{\text{exact+multi-natural}}(S),
+C_{\text{multi-natural}}(S),
+C_{\text{exact-target}}(S),
+-C_{\text{degraded}}(S),
+\sum \Delta r(S)
+\right]
+```
+
+最低标准：
+
+```text
+qwen3 exact+multi-natural pairs 从 0 提高到至少 1。
+```
+
+中标准：
+
+```text
+DS7B 保持 exact+multi-natural pairs，同时 degraded = 0。
+```
+
+高标准：
+
+```text
+GLM4 出现至少一个 natural target 或 exact+natural consistency。
+```
+
+当前结论：
+
+```text
+Phase 826 证明 natural objective 能改变搜索方向；
+但也证明 natural target 和 exact closure 会发生冲突。
+下一步必须从“自然目标最大化”
+转向“exact-natural consistency 约束”。
+```

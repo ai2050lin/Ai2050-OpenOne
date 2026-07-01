@@ -1,0 +1,101 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase searches sparse subspaces with exact and natural donors in the objective, not as a post-hoc validation only.",
+  "budget_summary": {
+    "16": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 3,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    }
+  },
+  "component_donor_summary": {
+    "layer_residual/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 1,
+      "patched_classes": {
+        "broad_near_miss": 1
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 1,
+      "patched_classes": {
+        "broad_near_miss": 1
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 1,
+      "patched_classes": {
+        "broad_near_miss": 1
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 2.0,
+      "n": 1,
+      "patched_classes": {
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    }
+  },
+  "degraded_rows": 0,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_plus_multi_natural_target_pairs": 0,
+  "exact_target_rows": 0,
+  "improved_rows": 1,
+  "model": "qwen3",
+  "multi_natural_target_pairs": 0,
+  "n_rows": 4,
+  "n_source_components": 2,
+  "natural_degraded_rows": 0,
+  "natural_improved_rows": 1,
+  "natural_target_rows": 1,
+  "phase": 826,
+  "quantization": "off",
+  "round": "smoke",
+  "source_round": "confirm",
+  "target_transition_rows": 1,
+  "timestamp": "2026-07-01 15:24:29",
+  "title": "Multi-Donor Natural-Objective Sparse Search"
+}

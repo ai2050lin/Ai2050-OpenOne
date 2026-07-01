@@ -1,0 +1,194 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase searches sparse subspaces with exact and natural donors in the objective, not as a post-hoc validation only.",
+  "budget_summary": {
+    "16": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 20,
+      "patched_classes": {
+        "format_echo": 12,
+        "object_echo": 4,
+        "target_equivalent": 4
+      },
+      "target_transition_rows": 4
+    },
+    "32": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 4,
+      "patched_classes": {
+        "target_equivalent": 4
+      },
+      "target_transition_rows": 4
+    },
+    "64": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 16,
+      "patched_classes": {
+        "format_echo": 12,
+        "object_echo": 4
+      },
+      "target_transition_rows": 0
+    }
+  },
+  "component_donor_summary": {
+    "layer_residual/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_channel_group/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_channel_group/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_channel_group/natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_channel_group/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "degraded_rows": 0,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 10,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 10,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 10,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 10,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_plus_multi_natural_target_pairs": 2,
+  "exact_target_rows": 2,
+  "improved_rows": 8,
+  "model": "deepseek7b",
+  "multi_natural_target_pairs": 2,
+  "n_rows": 40,
+  "n_source_components": 5,
+  "natural_degraded_rows": 0,
+  "natural_improved_rows": 6,
+  "natural_target_rows": 6,
+  "phase": 826,
+  "quantization": "off",
+  "round": "confirm",
+  "source_round": "confirm",
+  "target_transition_rows": 8,
+  "timestamp": "2026-07-01 15:36:38",
+  "title": "Multi-Donor Natural-Objective Sparse Search"
+}

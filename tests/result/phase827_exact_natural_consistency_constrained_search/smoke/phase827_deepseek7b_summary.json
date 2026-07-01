@@ -1,0 +1,123 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase prioritizes exact target plus multi-natural target consistency before natural-only gains.",
+  "budget_summary": {
+    "16": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 2.5,
+      "n": 4,
+      "patched_classes": {
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "component_donor_summary": {
+    "layer_residual/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 1,
+      "patched_classes": {
+        "object_echo": 1
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 1,
+      "patched_classes": {
+        "object_echo": 1
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_channel_group/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 1,
+      "patched_classes": {
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "mlp_channel_group/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 1,
+      "patched_classes": {
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    }
+  },
+  "consistency_records": [
+    {
+      "degraded": 0,
+      "delta_sum": 10.0,
+      "exact_plus_multi_natural": true,
+      "exact_target": true,
+      "improved_total": 2,
+      "key": [
+        "p816_triangle_geometric_shape",
+        27,
+        "mlp_channel_group",
+        "mlp_topdiff_32",
+        16
+      ],
+      "multi_natural": true,
+      "natural_target_count": 1,
+      "target_total": 2
+    }
+  ],
+  "degraded_rows": 0,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 2.5,
+      "n": 2,
+      "patched_classes": {
+        "object_echo": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 2.5,
+      "n": 2,
+      "patched_classes": {
+        "object_echo": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_plus_any_natural_target_pairs": 1,
+  "exact_plus_multi_natural_target_pairs": 1,
+  "exact_target_rows": 1,
+  "improved_rows": 2,
+  "min_natural_targets": 1,
+  "model": "deepseek7b",
+  "multi_natural_target_pairs": 1,
+  "n_rows": 4,
+  "n_source_components": 2,
+  "natural_degraded_rows": 0,
+  "natural_improved_rows": 1,
+  "natural_target_rows": 1,
+  "phase": 827,
+  "quantization": "off",
+  "round": "smoke",
+  "source_round": "confirm",
+  "target_transition_rows": 2,
+  "timestamp": "2026-07-01 15:54:07",
+  "title": "Exact-Natural Consistency Constrained Search"
+}
