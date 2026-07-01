@@ -1,0 +1,149 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase decomposes Phase 821 successful or improved layer-level boundary transitions into attention, MLP, head, and MLP channel-group interventions.",
+  "by_case": {
+    "p816_cactus_desert_plant": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "unknown_other",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 5,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Desert plant",
+      "best_role": "category_writer_or_refiner"
+    },
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 1,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "root vegetable",
+      "best_role": "category_writer_or_refiner"
+    },
+    "p816_red_warm_color": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 2,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "red color",
+      "best_role": "category_writer_or_refiner"
+    },
+    "p816_winter_cold_season": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "unknown_other",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 5,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "cold season",
+      "best_role": "category_writer_or_refiner"
+    }
+  },
+  "component_kind_summary": {
+    "attention_head": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 128,
+      "patched_classes": {
+        "broad_near_miss": 32,
+        "close_near_miss": 32,
+        "unknown_other": 64
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 128
+      },
+      "target_transition_rows": 0
+    },
+    "attention_output": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "close_near_miss": 1,
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 4
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 3.25,
+      "n": 4,
+      "patched_classes": {
+        "target_equivalent": 4
+      },
+      "protocol_repaired_rows": 2,
+      "roles": {
+        "category_writer_or_refiner": 4
+      },
+      "target_transition_rows": 4
+    },
+    "mlp_channel_group": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 12,
+      "patched_classes": {
+        "broad_near_miss": 3,
+        "close_near_miss": 3,
+        "unknown_other": 6
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 12
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "close_near_miss": 1,
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 4
+      },
+      "target_transition_rows": 0
+    }
+  },
+  "degraded_rows": 0,
+  "dtype": "bfloat16",
+  "improved_rows": 4,
+  "mean_delta_boundary_rank": 0.08552631578947369,
+  "model": "glm4",
+  "n_cases": 4,
+  "n_rows": 152,
+  "phase": 822,
+  "protocol_repaired_rows": 2,
+  "quantization": "off",
+  "role_counts": {
+    "category_writer_or_refiner": 4,
+    "neutral": 148
+  },
+  "round": "confirm",
+  "source_round": "confirm",
+  "target_transition_rows": 4,
+  "timestamp": "2026-07-01 13:20:42",
+  "title": "Boundary-Transition Head / MLP Decomposition"
+}

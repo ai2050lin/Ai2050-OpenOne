@@ -1,0 +1,202 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase splits donor-recipient component differences from Phase 822 into readout-positive and readout-negative subspaces and tests whether partial subspace patches preserve, improve, or harm boundary transitions.",
+  "by_case": {
+    "p816_cactus_desert_plant": {
+      "any_negative_degraded": false,
+      "any_positive_target": false,
+      "baseline_class": "unknown_other",
+      "best_budget": 4096,
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 5,
+      "best_mode": "all",
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Desert plant"
+    },
+    "p816_winter_cold_season": {
+      "any_negative_degraded": false,
+      "any_positive_target": false,
+      "baseline_class": "unknown_other",
+      "best_budget": 4096,
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 5,
+      "best_mode": "all",
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "cold season"
+    }
+  },
+  "component_mode_summary": {
+    "layer_residual/abs_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    },
+    "layer_residual/all": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "protocol_repaired_rows": 2,
+      "target_transition_rows": 2
+    },
+    "layer_residual/negative_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    },
+    "layer_residual/positive_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    },
+    "layer_residual/random_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    }
+  },
+  "degraded_rows": 0,
+  "dtype": "bfloat16",
+  "improved_rows": 2,
+  "mean_delta_boundary_rank": 1.0,
+  "mode_summary": {
+    "abs_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    },
+    "all": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "protocol_repaired_rows": 2,
+      "target_transition_rows": 2
+    },
+    "negative_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    },
+    "positive_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    },
+    "random_topk": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "unknown_other": 2
+      },
+      "protocol_repaired_rows": 0,
+      "target_transition_rows": 0
+    }
+  },
+  "model": "glm4",
+  "n_cases": 2,
+  "n_rows": 10,
+  "n_source_components": 2,
+  "pair_summary": {
+    "negative_target_pairs": 0,
+    "paired_count": 2,
+    "pairs": [
+      {
+        "key": [
+          "glm4",
+          "p816_winter_cold_season",
+          8,
+          "layer_residual",
+          "whole_layer_residual",
+          16
+        ],
+        "negative_class": "unknown_other",
+        "negative_rank": 0,
+        "negative_target": false,
+        "positive_better": false,
+        "positive_class": "unknown_other",
+        "positive_rank": 0,
+        "positive_target": false
+      },
+      {
+        "key": [
+          "glm4",
+          "p816_cactus_desert_plant",
+          8,
+          "layer_residual",
+          "whole_layer_residual",
+          16
+        ],
+        "negative_class": "unknown_other",
+        "negative_rank": 0,
+        "negative_target": false,
+        "positive_better": false,
+        "positive_class": "unknown_other",
+        "positive_rank": 0,
+        "positive_target": false
+      }
+    ],
+    "positive_better_pairs": 0,
+    "positive_target_pairs": 0
+  },
+  "phase": 823,
+  "protocol_repaired_rows": 2,
+  "quantization": "off",
+  "round": "smoke",
+  "source_round": "confirm",
+  "target_transition_rows": 2,
+  "timestamp": "2026-07-01 14:18:52",
+  "title": "Beneficial / Harmful Boundary-Transition Subspace Split"
+}

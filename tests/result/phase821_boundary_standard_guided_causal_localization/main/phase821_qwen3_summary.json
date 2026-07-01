@@ -1,0 +1,93 @@
+{
+  "attn_implementation": "sdpa",
+  "baseline_classes": {
+    "broad_near_miss": 16,
+    "close_near_miss": 4
+  },
+  "boundary": "This phase tests whether an exact-choices donor residual state can causally move a no-choices generation across Phase 820 boundary classes.",
+  "by_case": {
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "baseline_rank": 4,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 32,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "root vegetable"
+    },
+    "p816_heart_body_organ": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 32,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "body organ"
+    },
+    "p816_oxygen_chemical_element": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 32,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "chemical element"
+    },
+    "p816_red_warm_color": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 32,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "warm color"
+    },
+    "p816_triangle_geometric_shape": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 32,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "geometric shape"
+    }
+  },
+  "degraded_rows": 3,
+  "dtype": "bfloat16",
+  "improved_cases": 5,
+  "improved_rows": 17,
+  "layers": [
+    32,
+    33,
+    34,
+    35
+  ],
+  "mean_delta_boundary_rank": 1.05,
+  "model": "qwen3",
+  "n_cases": 5,
+  "n_rows": 20,
+  "patch_kind": "exact_choices donor residual -> no_choices recipient, first generated token",
+  "patched_classes": {
+    "target_equivalent": 17,
+    "unknown_other": 3
+  },
+  "phase": 821,
+  "protocol_repaired_cases": 0,
+  "protocol_repaired_rows": 0,
+  "quantization": "off",
+  "round": "main",
+  "target_transition_cases": 5,
+  "target_transition_rows": 17,
+  "timestamp": "2026-07-01 12:53:46",
+  "title": "Boundary-Standard-Guided Causal Localization"
+}

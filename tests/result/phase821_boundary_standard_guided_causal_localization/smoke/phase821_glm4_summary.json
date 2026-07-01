@@ -1,0 +1,58 @@
+{
+  "attn_implementation": "sdpa",
+  "baseline_classes": {
+    "broad_near_miss": 2,
+    "unknown_other": 2
+  },
+  "boundary": "This phase tests whether an exact-choices donor residual state can causally move a no-choices generation across Phase 820 boundary classes.",
+  "by_case": {
+    "p816_cat_living_thing": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": -3,
+      "best_layer": 38,
+      "best_patched_class": "unknown_other",
+      "best_patched_generated": "living creature"
+    },
+    "p816_winter_cold_season": {
+      "any_improved": true,
+      "any_protocol_repaired": true,
+      "any_target_transition": true,
+      "baseline_class": "unknown_other",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 5,
+      "best_layer": 38,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "cold season"
+    }
+  },
+  "degraded_rows": 2,
+  "dtype": "bfloat16",
+  "improved_cases": 1,
+  "improved_rows": 2,
+  "layers": [
+    38,
+    39
+  ],
+  "mean_delta_boundary_rank": 1.0,
+  "model": "glm4",
+  "n_cases": 2,
+  "n_rows": 4,
+  "patch_kind": "exact_choices donor residual -> no_choices recipient, first generated token",
+  "patched_classes": {
+    "target_equivalent": 2,
+    "unknown_other": 2
+  },
+  "phase": 821,
+  "protocol_repaired_cases": 1,
+  "protocol_repaired_rows": 2,
+  "quantization": "off",
+  "round": "smoke",
+  "target_transition_cases": 1,
+  "target_transition_rows": 2,
+  "timestamp": "2026-07-01 12:50:26",
+  "title": "Boundary-Standard-Guided Causal Localization"
+}

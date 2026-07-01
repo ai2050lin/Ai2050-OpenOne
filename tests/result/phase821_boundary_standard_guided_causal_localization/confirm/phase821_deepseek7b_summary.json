@@ -1,0 +1,132 @@
+{
+  "attn_implementation": "sdpa",
+  "baseline_classes": {
+    "format_echo": 36,
+    "format_with_target": 6,
+    "object_echo": 6
+  },
+  "boundary": "This phase tests whether an exact-choices donor residual state can causally move a no-choices generation across Phase 820 boundary classes.",
+  "by_case": {
+    "p816_apple_edible_fruit": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 27,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word"
+    },
+    "p816_bus_public_transport": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 27,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word or"
+    },
+    "p816_cactus_desert_plant": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 27,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer is a plant"
+    },
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 22,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word or"
+    },
+    "p816_cat_living_thing": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 27,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer is a single word or phrase"
+    },
+    "p816_doctor_medical_worker": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 5,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word or"
+    },
+    "p816_salmon_aquatic_animal": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_with_target",
+      "baseline_rank": 2,
+      "best_delta_boundary_rank": 0,
+      "best_layer": 0,
+      "best_patched_class": "format_with_target",
+      "best_patched_generated": "Salmon is best described as a freshwater fish"
+    },
+    "p816_triangle_geometric_shape": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "object_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 27,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer is a single word or phrase"
+    }
+  },
+  "degraded_rows": 2,
+  "dtype": "bfloat16",
+  "improved_cases": 7,
+  "improved_rows": 10,
+  "layers": [
+    0,
+    5,
+    11,
+    16,
+    22,
+    27
+  ],
+  "mean_delta_boundary_rank": 0.16666666666666666,
+  "model": "deepseek7b",
+  "n_cases": 8,
+  "n_rows": 48,
+  "patch_kind": "exact_choices donor residual -> no_choices recipient, first generated token",
+  "patched_classes": {
+    "format_echo": 24,
+    "format_with_target": 4,
+    "generic_blocker": 12,
+    "object_echo": 6,
+    "unknown_other": 2
+  },
+  "phase": 821,
+  "protocol_repaired_cases": 0,
+  "protocol_repaired_rows": 0,
+  "quantization": "off",
+  "round": "confirm",
+  "target_transition_cases": 0,
+  "target_transition_rows": 0,
+  "timestamp": "2026-07-01 12:54:51",
+  "title": "Boundary-Standard-Guided Causal Localization"
+}

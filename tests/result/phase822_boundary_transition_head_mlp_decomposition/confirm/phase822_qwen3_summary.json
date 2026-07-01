@@ -1,0 +1,154 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase decomposes Phase 821 successful or improved layer-level boundary transitions into attention, MLP, head, and MLP channel-group interventions.",
+  "by_case": {
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 1,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "root vegetable",
+      "best_role": "category_writer_or_refiner"
+    },
+    "p816_heart_body_organ": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 2,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Body Organ",
+      "best_role": "category_writer_or_refiner"
+    },
+    "p816_laptop_electronic_device": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 1,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Electronic Devices",
+      "best_role": "category_writer_or_refiner"
+    },
+    "p816_winter_cold_season": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 2,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Winter Season",
+      "best_role": "category_writer_or_refiner"
+    }
+  },
+  "component_kind_summary": {
+    "attention_head": {
+      "degraded_rows": 1,
+      "improved_rows": 6,
+      "mean_delta_boundary_rank": 0.0703125,
+      "n": 128,
+      "patched_classes": {
+        "broad_near_miss": 57,
+        "close_near_miss": 64,
+        "target_equivalent": 6,
+        "unknown_other": 1
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "category_writer_or_refiner": 6,
+        "harmful_mixer": 1,
+        "neutral": 121
+      },
+      "target_transition_rows": 6
+    },
+    "attention_output": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "close_near_miss": 2,
+        "target_equivalent": 1
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "category_writer_or_refiner": 1,
+        "neutral": 3
+      },
+      "target_transition_rows": 1
+    },
+    "layer_residual": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 1.5,
+      "n": 4,
+      "patched_classes": {
+        "target_equivalent": 4
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "category_writer_or_refiner": 4
+      },
+      "target_transition_rows": 4
+    },
+    "mlp_channel_group": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 12,
+      "patched_classes": {
+        "broad_near_miss": 6,
+        "close_near_miss": 6
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 12
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 0.75,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "close_near_miss": 1,
+        "target_equivalent": 2
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "category_writer_or_refiner": 2,
+        "neutral": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "degraded_rows": 1,
+  "dtype": "bfloat16",
+  "improved_rows": 13,
+  "mean_delta_boundary_rank": 0.13157894736842105,
+  "model": "qwen3",
+  "n_cases": 4,
+  "n_rows": 152,
+  "phase": 822,
+  "protocol_repaired_rows": 0,
+  "quantization": "off",
+  "role_counts": {
+    "category_writer_or_refiner": 13,
+    "harmful_mixer": 1,
+    "neutral": 138
+  },
+  "round": "confirm",
+  "source_round": "confirm",
+  "target_transition_rows": 13,
+  "timestamp": "2026-07-01 13:20:01",
+  "title": "Boundary-Transition Head / MLP Decomposition"
+}

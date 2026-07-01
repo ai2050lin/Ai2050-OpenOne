@@ -1,0 +1,109 @@
+{
+  "attn_implementation": "sdpa",
+  "baseline_classes": {
+    "broad_near_miss": 12,
+    "close_near_miss": 12,
+    "unknown_other": 12
+  },
+  "boundary": "This phase tests whether an exact-choices donor residual state can causally move a no-choices generation across Phase 820 boundary classes.",
+  "by_case": {
+    "p816_cactus_desert_plant": {
+      "any_improved": true,
+      "any_protocol_repaired": true,
+      "any_target_transition": true,
+      "baseline_class": "unknown_other",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 5,
+      "best_layer": 8,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Desert plant"
+    },
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "baseline_rank": 4,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 39,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "root vegetable"
+    },
+    "p816_cat_living_thing": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 0,
+      "best_layer": 0,
+      "best_patched_class": "broad_near_miss",
+      "best_patched_generated": "Pet category"
+    },
+    "p816_heart_body_organ": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "close_near_miss",
+      "baseline_rank": 4,
+      "best_delta_boundary_rank": 0,
+      "best_layer": 0,
+      "best_patched_class": "close_near_miss",
+      "best_patched_generated": "Human body part"
+    },
+    "p816_red_warm_color": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 23,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "red color"
+    },
+    "p816_winter_cold_season": {
+      "any_improved": true,
+      "any_protocol_repaired": true,
+      "any_target_transition": true,
+      "baseline_class": "unknown_other",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 5,
+      "best_layer": 8,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "cold season"
+    }
+  },
+  "degraded_rows": 9,
+  "dtype": "bfloat16",
+  "improved_cases": 4,
+  "improved_rows": 12,
+  "layers": [
+    0,
+    8,
+    16,
+    23,
+    31,
+    39
+  ],
+  "mean_delta_boundary_rank": 0.6388888888888888,
+  "model": "glm4",
+  "n_cases": 6,
+  "n_rows": 36,
+  "patch_kind": "exact_choices donor residual -> no_choices recipient, first generated token",
+  "patched_classes": {
+    "broad_near_miss": 9,
+    "close_near_miss": 5,
+    "target_equivalent": 12,
+    "unknown_other": 10
+  },
+  "phase": 821,
+  "protocol_repaired_cases": 2,
+  "protocol_repaired_rows": 8,
+  "quantization": "off",
+  "round": "confirm",
+  "target_transition_cases": 4,
+  "target_transition_rows": 12,
+  "timestamp": "2026-07-01 12:54:37",
+  "title": "Boundary-Standard-Guided Causal Localization"
+}

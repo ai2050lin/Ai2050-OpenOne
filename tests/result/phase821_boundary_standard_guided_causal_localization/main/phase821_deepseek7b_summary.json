@@ -1,0 +1,96 @@
+{
+  "attn_implementation": "sdpa",
+  "baseline_classes": {
+    "format_echo": 12,
+    "format_with_target": 4,
+    "object_echo": 4
+  },
+  "boundary": "This phase tests whether an exact-choices donor residual state can causally move a no-choices generation across Phase 820 boundary classes.",
+  "by_case": {
+    "p816_apple_edible_fruit": {
+      "any_improved": true,
+      "any_protocol_repaired": true,
+      "any_target_transition": true,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 5,
+      "best_layer": 26,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "edible fruit"
+    },
+    "p816_bus_public_transport": {
+      "any_improved": true,
+      "any_protocol_repaired": true,
+      "any_target_transition": true,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 5,
+      "best_layer": 26,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "public transportation"
+    },
+    "p816_cat_living_thing": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 27,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer is a single word or phrase"
+    },
+    "p816_salmon_aquatic_animal": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "format_with_target",
+      "baseline_rank": 2,
+      "best_delta_boundary_rank": -1,
+      "best_layer": 26,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word or"
+    },
+    "p816_triangle_geometric_shape": {
+      "any_improved": true,
+      "any_protocol_repaired": true,
+      "any_target_transition": true,
+      "baseline_class": "object_echo",
+      "baseline_rank": 0,
+      "best_delta_boundary_rank": 5,
+      "best_layer": 26,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "geometric shape"
+    }
+  },
+  "degraded_rows": 4,
+  "dtype": "bfloat16",
+  "improved_cases": 4,
+  "improved_rows": 9,
+  "layers": [
+    24,
+    25,
+    26,
+    27
+  ],
+  "mean_delta_boundary_rank": 0.75,
+  "model": "deepseek7b",
+  "n_cases": 5,
+  "n_rows": 20,
+  "patch_kind": "exact_choices donor residual -> no_choices recipient, first generated token",
+  "patched_classes": {
+    "format_echo": 7,
+    "generic_blocker": 8,
+    "target_equivalent": 3,
+    "unknown_other": 2
+  },
+  "phase": 821,
+  "protocol_repaired_cases": 3,
+  "protocol_repaired_rows": 3,
+  "quantization": "off",
+  "round": "main",
+  "target_transition_cases": 3,
+  "target_transition_rows": 3,
+  "timestamp": "2026-07-01 12:54:07",
+  "title": "Boundary-Standard-Guided Causal Localization"
+}

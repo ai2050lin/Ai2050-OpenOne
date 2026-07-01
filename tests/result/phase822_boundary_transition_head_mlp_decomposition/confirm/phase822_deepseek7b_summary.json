@@ -1,0 +1,150 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase decomposes Phase 821 successful or improved layer-level boundary transitions into attention, MLP, head, and MLP channel-group interventions.",
+  "by_case": {
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 1,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word or",
+      "best_role": "protocol_verbalizer_not_answer_writer"
+    },
+    "p816_cat_living_thing": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "format_echo",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 5,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "living organism",
+      "best_role": "protocol_plus_category_repair"
+    },
+    "p816_doctor_medical_worker": {
+      "any_improved": true,
+      "any_target_transition": false,
+      "baseline_class": "format_echo",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 1,
+      "best_patched_class": "generic_blocker",
+      "best_patched_generated": "The answer should be a single word or",
+      "best_role": "protocol_verbalizer_not_answer_writer"
+    },
+    "p816_triangle_geometric_shape": {
+      "any_improved": true,
+      "any_target_transition": true,
+      "baseline_class": "object_echo",
+      "best_component_kind": "layer_residual",
+      "best_component_label": "whole_layer_residual",
+      "best_delta_boundary_rank": 5,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "geometric shape",
+      "best_role": "protocol_plus_category_repair"
+    }
+  },
+  "component_kind_summary": {
+    "attention_head": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 112,
+      "patched_classes": {
+        "format_echo": 84,
+        "object_echo": 28
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 112
+      },
+      "target_transition_rows": 0
+    },
+    "attention_output": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 4,
+      "patched_classes": {
+        "format_echo": 3,
+        "object_echo": 1
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 4
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 3.0,
+      "n": 4,
+      "patched_classes": {
+        "generic_blocker": 2,
+        "target_equivalent": 2
+      },
+      "protocol_repaired_rows": 2,
+      "roles": {
+        "protocol_plus_category_repair": 2,
+        "protocol_verbalizer_not_answer_writer": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_channel_group": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.4166666666666667,
+      "n": 12,
+      "patched_classes": {
+        "format_echo": 9,
+        "object_echo": 2,
+        "target_equivalent": 1
+      },
+      "protocol_repaired_rows": 1,
+      "roles": {
+        "neutral": 11,
+        "protocol_plus_category_repair": 1
+      },
+      "target_transition_rows": 1
+    },
+    "mlp_output": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 4,
+      "patched_classes": {
+        "format_echo": 3,
+        "object_echo": 1
+      },
+      "protocol_repaired_rows": 0,
+      "roles": {
+        "neutral": 4
+      },
+      "target_transition_rows": 0
+    }
+  },
+  "degraded_rows": 0,
+  "dtype": "bfloat16",
+  "improved_rows": 5,
+  "mean_delta_boundary_rank": 0.125,
+  "model": "deepseek7b",
+  "n_cases": 4,
+  "n_rows": 136,
+  "phase": 822,
+  "protocol_repaired_rows": 3,
+  "quantization": "off",
+  "role_counts": {
+    "neutral": 131,
+    "protocol_plus_category_repair": 3,
+    "protocol_verbalizer_not_answer_writer": 2
+  },
+  "round": "confirm",
+  "source_round": "confirm",
+  "target_transition_rows": 3,
+  "timestamp": "2026-07-01 13:21:09",
+  "title": "Boundary-Transition Head / MLP Decomposition"
+}

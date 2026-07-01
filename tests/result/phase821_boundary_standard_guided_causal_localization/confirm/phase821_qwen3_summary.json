@@ -1,0 +1,131 @@
+{
+  "attn_implementation": "sdpa",
+  "baseline_classes": {
+    "broad_near_miss": 30,
+    "close_near_miss": 18
+  },
+  "boundary": "This phase tests whether an exact-choices donor residual state can causally move a no-choices generation across Phase 820 boundary classes.",
+  "by_case": {
+    "p816_cactus_desert_plant": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "baseline_rank": 4,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 35,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "desert plants"
+    },
+    "p816_carrot_root_vegetable": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "baseline_rank": 4,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 35,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "root vegetable"
+    },
+    "p816_heart_body_organ": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 14,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Body Organ"
+    },
+    "p816_laptop_electronic_device": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "close_near_miss",
+      "baseline_rank": 4,
+      "best_delta_boundary_rank": 1,
+      "best_layer": 7,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Electronic Devices"
+    },
+    "p816_oxygen_chemical_element": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 0,
+      "best_layer": 0,
+      "best_patched_class": "broad_near_miss",
+      "best_patched_generated": "Gas"
+    },
+    "p816_red_warm_color": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 0,
+      "best_layer": 0,
+      "best_patched_class": "broad_near_miss",
+      "best_patched_generated": "Color"
+    },
+    "p816_triangle_geometric_shape": {
+      "any_improved": false,
+      "any_protocol_repaired": false,
+      "any_target_transition": false,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 0,
+      "best_layer": 0,
+      "best_patched_class": "broad_near_miss",
+      "best_patched_generated": "Geometry"
+    },
+    "p816_winter_cold_season": {
+      "any_improved": true,
+      "any_protocol_repaired": false,
+      "any_target_transition": true,
+      "baseline_class": "broad_near_miss",
+      "baseline_rank": 3,
+      "best_delta_boundary_rank": 2,
+      "best_layer": 21,
+      "best_patched_class": "target_equivalent",
+      "best_patched_generated": "Winter Season"
+    }
+  },
+  "degraded_rows": 20,
+  "dtype": "bfloat16",
+  "improved_cases": 5,
+  "improved_rows": 6,
+  "layers": [
+    0,
+    7,
+    14,
+    21,
+    28,
+    35
+  ],
+  "mean_delta_boundary_rank": -1.2083333333333333,
+  "model": "qwen3",
+  "n_cases": 8,
+  "n_rows": 48,
+  "patch_kind": "exact_choices donor residual -> no_choices recipient, first generated token",
+  "patched_classes": {
+    "broad_near_miss": 14,
+    "close_near_miss": 8,
+    "object_echo": 1,
+    "target_equivalent": 6,
+    "unknown_other": 19
+  },
+  "phase": 821,
+  "protocol_repaired_cases": 0,
+  "protocol_repaired_rows": 0,
+  "quantization": "off",
+  "round": "confirm",
+  "target_transition_cases": 5,
+  "target_transition_rows": 6,
+  "timestamp": "2026-07-01 12:54:21",
+  "title": "Boundary-Standard-Guided Causal Localization"
+}

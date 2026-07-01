@@ -77863,47 +77863,6 @@ R_{\text{new}} \downarrow
 C_{\text{token}}=1
 $$
 
-当前还没有满足。
-
-### 十、问题和硬伤
-
-1. alpha dose response 不能区分：
-
-```text
-真实 new-blocker suppression
-和
-target threshold rise。
-```
-
-2. 本阶段仍是 answer-position hidden-state route patch：
-
-```text
-不是 Q/K/V/O 内部空间；
-不是 neuron-level causal atlas。
-```
-
-3. new blocker 主要是 semantic / lexical competitor：
-
-```text
-说明下一步不能只处理 format / echo；
-必须进入语义竞争场的来源定位。
-```
-
-4. token closure 仍然为 0：
-
-```text
-即使 old suppression、new rate、identity anchor 同时改善，
-仍不足以让目标词元成为 top1。
-```
-
-5. 小模型偏差仍需谨慎：
-
-```text
-qwen3、GLM4、DS7B 的机制形态差异很大；
-特别是 DS7B 几乎把改善压缩成 threshold shift；
-这可能是小模型容量不足或蒸馏结构偏差造成的。
-```
-
 ### 十一、阶段性图谱更新
 
 当前图谱应进一步分成：
@@ -77983,6 +77942,45 @@ new-blocker rate stabilizer：已有剂量响应证据；
 true new-blocker suppressor：尚未证明；
 semantic competitor source fiber：尚未定位；
 token closure：尚未完成。
+```
+
+### 十、问题和硬伤
+
+1. alpha dose response 不能区分：
+
+```text
+真实 new-blocker suppression
+和
+target threshold rise。
+```
+
+2. 本阶段仍是 answer-position hidden-state route patch：
+
+```text
+不是 Q/K/V/O 内部空间；
+不是 neuron-level causal atlas。
+```
+
+3. new blocker 主要是 semantic / lexical competitor：
+
+```text
+说明下一步不能只处理 format / echo；
+必须进入语义竞争场的来源定位。
+```
+
+4. token closure 仍然为 0：
+
+```text
+即使 old suppression、new rate、identity anchor 同时改善，
+仍不足以让目标词元成为 top1。
+```
+
+5. 小模型偏差仍需谨慎：
+
+```text
+qwen3、GLM4、DS7B 的机制形态差异很大；
+特别是 DS7B 几乎把改善压缩成 threshold shift；
+这可能是小模型容量不足或蒸馏结构偏差造成的。
 ```
 
 ## Phase 803: semantic new-blocker source localization（语义新阻塞者来源定位） [2026-06-30 14:50]
@@ -79352,3 +79350,9949 @@ $$
 $$
 C_{\text{token}}=1
 $$
+
+## Phase 806: format-echo and identity-anchor residual suppressor search（格式回声与身份锚残余抑制器搜索） [2026-06-30 19:28]
+
+### 一、任务来源
+
+本阶段读取并审视了两份新上传内容：
+
+```text
+1. 对 AGI_GLM5_MEMO_TOTAL.md 的总体判断：
+   当前研究主线不是乱做，而是从“输出为什么错”推进到“全词表闭合为什么失败”；
+   但大量手工 patch（补丁）式 Phase 应该被统一实验矩阵压缩。
+
+2. 对 Phase 805 的判断：
+   Phase 805 是实质进展，但不是 token closure（词元闭合）；
+   它把语义抑制后的剩余失败定位到 format/echo、identity anchor、readout geometry
+   （格式/回声、身份锚、读出几何）等残余输出场。
+```
+
+这两个判断基本正确。Phase 805 仍是 residual audit（剩余审计），不是新的因果抑制器发现；因此 Phase 806 继续同一阶段性目标，但从“语义抑制是否有效”转向：
+
+```text
+固定 semantic suppression（语义抑制）之后，
+format/echo direction（格式/回声方向）和 identity-anchor direction（身份锚方向）
+是否能进一步减少 residual full-vocabulary blockers（剩余全词表阻塞者）。
+```
+
+### 二、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase806_format_echo_identity_residual_suppressor_search.py
+tests/glm5/run_phase806_format_echo_identity_residual_suppressor_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase806_format_echo_identity_residual_suppressor_search/
+```
+
+三轮测试：
+
+```text
+smoke：qwen3 / GLM4 / DS7B 各 1 case，确认脚本和数据正常；
+main：qwen3 / GLM4 / DS7B 各 3 case，主测试；
+confirm：qwen3 5 case，GLM4 3 case，DS7B 2 case，确认关键结论。
+```
+
+加载策略：
+
+```text
+不使用量化；
+优先 flash_attention_2；
+由于本机未安装 FlashAttention2，三模型均自动回退到 sdpa；
+模型按 qwen3 -> GLM4 -> DS7B 顺序加载和释放，避免显存叠加。
+```
+
+确认轮汇总文件：
+
+```text
+tests/result/phase806_format_echo_identity_residual_suppressor_search/confirm/phase806_cross_model_summary.md
+tests/result/phase806_format_echo_identity_residual_suppressor_search/confirm/phase806_cross_model_summary.json
+```
+
+### 三、测试原理
+
+Phase 806 继承 Phase 804/805 的投影框架。首先固定 target alpha（目标方向保留系数）和 semantic beta（语义抑制系数）：
+
+$$
+\Delta h_{\text{sem}}
+=
+\Delta h(\alpha)
+-
+\beta_{\text{sem}}
+\operatorname{proj}_{d_{\text{sem}\perp y}}
+\left(
+\Delta h(\alpha)
+\right)
+$$
+
+其中本阶段固定：
+
+$$
+\alpha=0.75
+$$
+
+$$
+\beta_{\text{sem}}=1
+$$
+
+然后在这个 semantic-suppressed logits（语义抑制后的输出）上重新抽取全词表中仍高于目标 token（词元）的 residual blockers（剩余阻塞者）：
+
+$$
+B_{\text{res}}
+=
+\{v\in V,\ v\ne y,\ z_v>z_y\}
+$$
+
+从这些 residual blockers（剩余阻塞者）中构造两类方向：
+
+$$
+d_{\text{fmt}}
+=
+\operatorname{mean}_{v\in B_{\text{format/echo}}} W_U[v]
+-
+W_U[y]
+$$
+
+$$
+d_{\text{id}}
+=
+\operatorname{mean}_{v\in B_{\text{identity-variant}}} W_U[v]
+-
+W_U[y]
+$$
+
+其中：
+
+```text
+B_format/echo：
+  high_frequency_or_format、echo_token、punctuation、whitespace_or_newline、number_or_symbol
+  （高频格式、回声、标点、空白、数字符号）
+
+B_identity-variant：
+  与目标答案规范化文本相同，但 token id（词元编号）不同的 surface variants（表面变体）
+```
+
+再把 donor-recipient delta（供体-受体差分）中的这两类方向剥离：
+
+$$
+\Delta h'
+=
+\Delta h_{\text{sem}}
+-
+\beta_{\text{fmt}}
+\operatorname{proj}_{d_{\text{fmt}\perp \{y,\text{sem}\}}}
+\left(
+\Delta h_{\text{sem}}
+\right)
+-
+\beta_{\text{id}}
+\operatorname{proj}_{d_{\text{id}\perp \{y,\text{sem},\text{fmt}\}}}
+\left(
+\Delta h_{\text{sem}}
+\right)
+$$
+
+测试四种组合：
+
+$$
+(\beta_{\text{fmt}},\beta_{\text{id}})
+\in
+\{(0,0),(1,0),(0,1),(1,1)\}
+$$
+
+判据不是“目标 logit 是否提高”，而是：
+
+$$
+N_{\text{res}}\downarrow
+$$
+
+$$
+S_{\text{format/echo}}>0
+$$
+
+$$
+S_{\text{identity}}>0
+$$
+
+$$
+A_{\text{identity}}\uparrow
+$$
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y>\max_{v\ne y}z_v
+\right]
+=1
+$$
+
+其中本阶段尤其关注：
+
+```text
+residual full-above count 是否下降；
+required bias to clear all 是否下降；
+format/echo tracked tokens 是否被压低；
+identity surface variants 是否被压低；
+identity anchor fragmented rate 是否下降；
+token closure 是否出现。
+```
+
+### 四、确认轮客观结果
+
+#### 1. qwen3
+
+semantic-only baseline（仅语义抑制基线）：
+
+```text
+residual blockers = 318.300
+semantic share = 0.322
+format/echo share = 0.510
+identity anchor fragmented rate = 1.000
+token closure = 0
+```
+
+format/echo beta=1，identity beta=0：
+
+```text
+residual blockers = 254.400
+blocker delta = -63.900
+required bias delta = -0.447
+format/echo suppression = 0.863
+format/echo still above = 0.921
+identity suppression = 0.075
+identity still above = 1.000
+identity anchor fragmented rate = 1.000
+token closure = 0
+```
+
+identity beta=1 单独作用：
+
+```text
+residual blockers = 331.600
+blocker delta = +13.300
+identity suppression = -0.968
+surface variant count delta = +0.200
+token closure = 0
+```
+
+判断：
+
+```text
+qwen3 中 format/echo residual direction（格式/回声残余方向）具有稳定正效应：
+它能减少全词表 residual blockers，并降低 required bias。
+
+但 identity direction（身份方向）不是有效修复方向：
+它没有降低 identity fragmentation，甚至会增加残余阻塞。
+```
+
+#### 2. GLM4
+
+semantic-only baseline：
+
+```text
+residual blockers = 131.833
+semantic share = 0.488
+format/echo share = 0.364
+identity anchor fragmented rate = 1.000
+token closure = 0
+```
+
+format/echo beta=1，identity beta=0：
+
+```text
+residual blockers = 142.833
+blocker delta = +11.000
+format/echo suppression = -0.082
+format/echo still above = 0.958
+token closure = 0
+```
+
+identity beta=1 单独作用：
+
+```text
+residual blockers = 136.667
+blocker delta = +4.833
+identity suppression = 0.082
+identity still above = 1.000
+token closure = 0
+```
+
+判断：
+
+```text
+GLM4 中 Phase 806 的两个残余方向都没有形成可靠 suppressor（抑制器）。
+format/echo projection（格式/回声投影）平均为负效应；
+identity projection（身份投影）有很弱局部效应，但不能改变 identity fragmentation，也不能减少整体 blockers。
+```
+
+#### 3. DS7B
+
+semantic-only baseline：
+
+```text
+residual blockers = 864.250
+semantic share = 0.402
+format/echo share = 0.538
+identity anchor fragmented rate = 1.000
+token closure = 0
+```
+
+identity beta=1 单独作用：
+
+```text
+residual blockers = 884.000
+blocker delta = +19.750
+identity suppression = 0.945
+identity still above = 0.917
+surface variant count delta = -0.250
+token closure = 0
+```
+
+format/echo beta=1，identity beta=0：
+
+```text
+residual blockers = 1374.750
+blocker delta = +510.500
+required bias delta = -2.303
+format/echo suppression = 1.978
+format/echo still above = 0.973
+token closure = 0
+```
+
+format/echo beta=1，identity beta=1：
+
+```text
+residual blockers = 1417.750
+blocker delta = +553.500
+identity suppression = 1.609
+surface variant count delta = -0.250
+token closure = 0
+```
+
+判断：
+
+```text
+DS7B 的结果最能说明“局部抑制不等于闭合”。
+format/echo tracked tokens（被追踪的格式/回声词元）确实被压低，
+identity surface variants（身份表面变体）也有轻微改善，
+但全词表 residual blockers 大量增加。
+
+这说明 DS7B 中方向投影造成了 new blocker emergence（新阻塞者涌现）或 readout field deformation（读出场变形）。
+```
+
+### 五、对上传内容的判断
+
+上传内容对 Phase 805 的判断基本正确：
+
+```text
+Phase 805 是实质进展；
+它不是 token closure；
+它把剩余瓶颈从抽象 residual direction 拆成 format/echo、identity anchor、semantic residual、readout geometry。
+```
+
+Phase 806 进一步收紧了这件事：
+
+```text
+format/echo residual direction 在 qwen3 上有方向级正证据；
+identity-anchor direction 仍没有修复身份锚碎片；
+GLM4 和 DS7B 中直接剥离残余方向容易导致回弹或新阻塞者；
+token closure 仍然为 0。
+```
+
+因此当前不能说已经找到完整 residual closer（剩余闭合器）。更准确说：
+
+```text
+已经找到 qwen3 中一个 format/echo residual suppressor-like direction（类似格式/回声残余抑制方向）；
+但还没有找到跨模型稳定的 format/echo suppressor；
+也没有找到 identity-anchor stabilizer；
+更没有完成 readout-geometry closure。
+```
+
+### 六、当前进展和核心拼图更新
+
+当前核心拼图应更新为：
+
+```text
+1. target booster（目标增强器）存在，但不能单独闭合；
+2. old blocker suppressor（旧阻塞者抑制器）有部分证据；
+3. semantic blocker direction（语义阻塞方向）可被方向级压低；
+4. residual blocker field（剩余阻塞场）主要由 format/echo、semantic residual、identity variants 组成；
+5. qwen3 中 format/echo direction 可减少 residual blockers；
+6. identity anchor fragmentation（身份锚碎片化）仍稳定存在；
+7. GLM4 / DS7B 的残余方向投影容易引发 new blocker emergence（新阻塞者涌现）；
+8. token closure fiber（词元闭合纤维）仍未找到。
+```
+
+图谱形状从 Phase 805 的：
+
+```text
+semantic suppressor -> residual blocker audit
+```
+
+推进为：
+
+```text
+semantic suppressor
+-> residual class directions
+-> format/echo partial suppressor
+-> identity-anchor unresolved
+-> readout geometry unresolved
+```
+
+### 七、问题、硬伤和边界
+
+1. Phase 806 是 direction-level projection（方向级投影），不是 neuron-level suppressor discovery（神经元级抑制器发现）。
+
+2. format/echo direction 的构造依赖 token classifier（词元分类器），类别边界仍是启发式。
+
+3. qwen3 的正结果不能直接上升为通用规律，因为 GLM4 与 DS7B 不复现。
+
+4. identity anchor fragmented rate 始终为 1，说明当前 identity direction 不是身份锚稳定器。
+
+5. DS7B 中出现强烈悖论：
+
+```text
+tracked format/echo tokens 被压低，
+但 full-vocab blockers 大幅增加。
+```
+
+这说明闭合问题不是“压低一类 token”这么简单，而是整个输出场要保持稳定。
+
+6. 小模型偏差仍然很重要：
+
+```text
+小模型可能把本应分离的语义、格式、身份、读出几何混在一起；
+直接做方向剥离会导致场变形；
+因此小模型上无法期待单点闭合，只能累积可复现图谱形状。
+```
+
+### 八、理论公式更新
+
+Phase 806 后，闭合公式应从 Phase 805 的静态剩余分解，进一步加入 new blocker emergence（新阻塞者涌现）项：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y>
+\max_{v\ne y}z_v
+\right]
+$$
+
+其中：
+
+$$
+z_y-\max_{v\ne y}z_v
+=
+T
++
+S_{\text{old}}
++
+S_{\text{sem}}
++
+S_{\text{fmt}}
++
+A_{\text{id}}
++
+G_{\text{readout}}
+-
+R_{\text{new}}
+$$
+
+各项含义：
+
+```text
+T：target boost（目标增强）
+S_old：old blocker suppression（旧阻塞者抑制）
+S_sem：semantic blocker suppression（语义阻塞者抑制）
+S_fmt：format/echo suppression（格式/回声抑制）
+A_id：identity anchor stabilization（身份锚稳定）
+G_readout：readout geometry closure（读出几何闭合）
+R_new：new blocker emergence（新阻塞者涌现）
+```
+
+Phase 806 的关键发现是：
+
+$$
+S_{\text{fmt}}>0
+\nRightarrow
+C_{\text{token}}=1
+$$
+
+并且在 DS7B 中甚至出现：
+
+$$
+S_{\text{fmt}}>0
+,\quad
+A_{\text{id}}>0
+,\quad
+R_{\text{new}}\uparrow\uparrow
+,\quad
+C_{\text{token}}=0
+$$
+
+因此真正的闭合条件必须写成：
+
+$$
+T
++
+S_{\text{old}}
++
+S_{\text{sem}}
++
+S_{\text{fmt}}
++
+A_{\text{id}}
++
+G_{\text{readout}}
+>
+R_{\text{new}}
+$$
+
+且同时满足：
+
+$$
+\operatorname{rank}(y)=1
+$$
+
+### 九、是否继续自动完成下一任务
+
+Phase 806 与 Phase 805 属于同一阶段性目标：
+
+```text
+从 semantic blocker suppression（语义阻塞者抑制）
+推进到 residual closure field（剩余闭合场）拆解。
+```
+
+但 Phase 806 已经把当前阶段再次收紧：
+
+```text
+format/echo 方向在 qwen3 有正效应；
+identity anchor 没有修复；
+GLM4/DS7B 出现场变形；
+token closure 仍为 0。
+```
+
+继续自动推进时，不应继续简单增加 beta 或重复方向剥离，而应进入新的同阶段子目标：
+
+```text
+Phase 807:
+readout geometry and new-blocker emergence audit
+（读出几何与新阻塞者涌现审计）
+```
+
+核心任务：
+
+```text
+1. 固定 semantic beta=1 和 qwen3 中有效的 format beta=1；
+2. 追踪新增 blockers 的来源类别和 logit 变化；
+3. 区分“真实 suppressor”与“读出场变形”；
+4. 建立 R_new（新阻塞者涌现）指标；
+5. 检查是否存在一个不显著提高 new blockers 的 readout geometry closer（读出几何闭合器）。
+```
+
+Phase 807 的闭合标准不应是局部类别 suppression（类别抑制），而应是：
+
+$$
+N_{\text{res}}\downarrow
+$$
+
+$$
+R_{\text{new}}\downarrow
+$$
+
+$$
+\operatorname{required\ bias}\downarrow
+$$
+
+$$
+A_{\text{id}}\uparrow
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+当前还没有满足。
+
+## Phase 807: readout geometry and new-blocker emergence audit（读出几何与新阻塞者涌现审计） [2026-06-30 19:46]
+
+### 一、任务来源与判断
+
+本阶段读取并分析了用户上传的 Phase 806 复盘内容。该内容的核心判断基本正确：Phase 806 的价值不是证明已经完成 token closure（词元闭合），而是把 semantic blocker suppression（语义阻塞者抑制）之后的剩余失败拆成三个部分：
+
+```text
+1. format/echo residual（格式 / 回声残余）
+2. identity anchor residual（身份锚残余）
+3. readout geometry / new-blocker emergence（读出几何 / 新阻塞者涌现）
+```
+
+Phase 806 的正结果需要收紧为：
+
+```text
+qwen3 存在局部 format/echo residual suppressor-like direction（格式 / 回声残余抑制器样方向）；
+identity anchor（身份锚）没有被修复；
+GLM4 与 DS7B 没有出现稳定同构效果；
+token closure（词元闭合）仍然为 0；
+因此还没有找到真正的 residual closure fiber（残余闭合纤维）。
+```
+
+所以 Phase 807 的任务不是继续加大 beta（强度）或重复 patch（补丁），而是审计一个更关键的问题：
+
+```text
+当一个方向压低旧 blocker（阻塞项）时，它是否同时制造了新的 blocker？
+```
+
+这一步直接关系到当前路线是否仍在提升解释力，还是开始退化为局部拟合。
+
+### 二、测试脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase807_readout_geometry_new_blocker_emergence_audit.py
+tests/glm5/run_phase807_readout_geometry_new_blocker_emergence_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase807_readout_geometry_new_blocker_emergence_audit/smoke/
+tests/result/phase807_readout_geometry_new_blocker_emergence_audit/main/
+tests/result/phase807_readout_geometry_new_blocker_emergence_audit/confirm/
+```
+
+本阶段依次完成：
+
+```text
+第一轮 smoke（冒烟测试）
+第二轮 main（主测试）
+第三轮 confirm（确认测试）
+```
+
+三轮均按 qwen3 -> GLM4 -> DS7B 顺序运行，避免同时加载模型导致 GPU 内存溢出。加载时优先开启 flash attention（闪存注意力），当前环境最终回退到 sdpa（缩放点积注意力），没有使用量化方案。
+
+### 三、测试原理
+
+Phase 807 固定 semantic-only baseline（仅语义抑制基线）：
+
+$$
+h_{\text{base}}
+=
+h
++ \alpha T
++ \beta_{\text{sem}} S_{\text{sem}}
+$$
+
+其中：
+
+$$
+\alpha = 0.75
+$$
+
+$$
+\beta_{\text{sem}} = 1
+$$
+
+然后在同一基线上叠加 residual projections（残余投影）：
+
+$$
+h_{\text{after}}
+=
+h_{\text{base}}
++ \beta_{\text{fmt}} S_{\text{fmt}}
++ \beta_{\text{id}} S_{\text{id}}
+$$
+
+本阶段测试四种组合：
+
+$$
+(\beta_{\text{fmt}}, \beta_{\text{id}})
+\in
+\{(0,0),(1,0),(0,1),(1,1)\}
+$$
+
+目标 token（目标词元）记为：
+
+$$
+y
+$$
+
+语义基线下超过目标 token 的阻塞集合为：
+
+$$
+B_{\text{base}}
+=
+\{v \ne y \mid z^{\text{base}}_v > z^{\text{base}}_y\}
+$$
+
+叠加残余投影后的阻塞集合为：
+
+$$
+B_{\text{after}}
+=
+\{v \ne y \mid z^{\text{after}}_v > z^{\text{after}}_y\}
+$$
+
+旧阻塞项被解决的集合：
+
+$$
+R_{\text{resolved}}
+=
+B_{\text{base}} \setminus B_{\text{after}}
+$$
+
+新涌现阻塞项集合：
+
+$$
+R_{\text{new}}
+=
+B_{\text{after}} \setminus B_{\text{base}}
+$$
+
+阻塞数量净变化：
+
+$$
+\Delta N
+=
+|B_{\text{after}}|
+-
+|B_{\text{base}}|
+=
+|R_{\text{new}}|
+-
+|R_{\text{resolved}}|
+$$
+
+token closure（词元闭合）仍然单独计量：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y >
+\max_{v \ne y} z_v
+\right]
+$$
+
+因此，一个方向不能只看是否压低旧 blocker，还必须同时满足：
+
+$$
+|R_{\text{resolved}}| > |R_{\text{new}}|
+$$
+
+$$
+\frac{|R_{\text{new}}|}{|B_{\text{base}}|}
+\le
+\eta
+$$
+
+$$
+\operatorname{required\ bias}_{\text{after}}
+<
+\operatorname{required\ bias}_{\text{base}}
+$$
+
+$$
+C_{\text{token}} = 1
+$$
+
+当前测试只发现部分 readout closer candidate（读出闭合候选），没有发现满足完整闭合标准的方向。
+
+### 四、客观结果
+
+确认轮最关键结果如下。
+
+qwen3：
+
+```text
+format-only residual projection（仅格式残余投影）最稳定。
+base blocker count: 318.300
+after blocker count: 254.400
+net delta: -63.900
+resolved old blockers: 68.000
+emerged new blockers: 4.100
+emergence rate: 0.012
+required bias delta: -0.447
+target logit delta: +0.059
+identity anchor fragmented rate: 1.000
+token closure gain rate: 0.000
+```
+
+这说明 qwen3 的 format/echo 方向确实像一个局部 readout closer candidate（读出闭合候选）：它明显减少旧 blockers，而且新 blockers 很少。但它没有解决 identity anchor（身份锚），也没有让目标 token 成为 top-1（第一名）。
+
+qwen3 的 identity-only residual projection（仅身份残余投影）表现较差：
+
+```text
+base blocker count: 318.300
+after blocker count: 331.600
+net delta: +13.300
+resolved old blockers: 4.200
+emerged new blockers: 17.500
+required bias delta: +0.838
+token closure gain rate: 0.000
+```
+
+这说明当前 identity anchor 方向不是稳定修复器，更像会引入新竞争项的场扰动。
+
+GLM4：
+
+```text
+identity-only: blocker count 131.833 -> 136.667
+format-only: blocker count 131.833 -> 142.833
+format + identity: blocker count 131.833 -> 149.833
+token closure gain rate: 0.000
+```
+
+GLM4 上三种残余投影都没有形成稳定 closer（闭合器），多数表现为 new-blocker emergence dominant（新阻塞者涌现占主导）。
+
+DS7B：
+
+```text
+identity-only: blocker count 864.250 -> 884.000
+format-only: blocker count 864.250 -> 1374.750
+format + identity: blocker count 864.250 -> 1417.750
+token closure gain rate: 0.000
+```
+
+DS7B 上 format/echo 投影虽然能压低一部分旧 blocker，但同时制造大量新 blocker，尤其是 semantic_or_lexical_competitor（语义或词汇竞争项）。这更像 local suppression global field deformation（局部抑制导致全局场变形），不是有效闭合。
+
+### 五、结果分析
+
+Phase 807 支持三个谨慎结论。
+
+第一，Phase 806 对 qwen3 的正结果是有效的，但必须收紧为：
+
+```text
+qwen3 存在局部 format/echo readout closer candidate；
+不是 token closure；
+不是跨模型稳定机制；
+不是完整残余闭合纤维。
+```
+
+第二，GLM4 与 DS7B 的结果说明，同一个方向在不同小模型中并不稳定。特别是 DS7B，局部压制旧 blocker 的同时会激活大量新的语义竞争项，这提示当前小模型内部结构较粗糙，局部方向可能混合了多个功能纤维。
+
+第三，当前真正瓶颈已经从：
+
+```text
+如何压低某一类 blocker
+```
+
+转向：
+
+```text
+如何在不制造新 blocker 的情况下重排 readout geometry（读出几何）
+```
+
+这比普通 patch（补丁）成功率更接近语言编码机制，因为它开始区分：
+
+```text
+局部 logit 改善
+vs
+全局竞争场重构
+```
+
+### 六、当前闭合标准与距离
+
+完整 residual closure（残余闭合）至少需要同时满足：
+
+$$
+N_{\text{after}} < N_{\text{base}}
+$$
+
+$$
+|R_{\text{new}}|
+\ll
+|R_{\text{resolved}}|
+$$
+
+$$
+\operatorname{required\ bias}_{\text{after}}
+<
+\operatorname{required\ bias}_{\text{base}}
+$$
+
+$$
+A_{\text{id}}
+\text{ 不再碎片化}
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+当前 qwen3 的 format-only 投影满足前三项的弱版本，但不满足：
+
+$$
+A_{\text{id}}
+\text{ 不再碎片化}
+$$
+
+也不满足：
+
+$$
+C_{\text{token}}=1
+$$
+
+GLM4 和 DS7B 则连稳定 blocker reduction（阻塞项减少）都没有跨模型满足。
+
+因此当前距离完整 token closure（词元闭合）仍较远，但解释力相比 Phase 806 有实质提升：我们已经能区分“有效压制旧 blocker”与“制造新 blocker 的场变形”。
+
+### 七、核心拼图更新
+
+本阶段新增的核心拼图是：
+
+```text
+readout closer candidate（读出闭合候选）
+```
+
+它不同于普通 suppressor（抑制器）。普通 suppressor 只回答：
+
+```text
+某类 blocker 是否下降？
+```
+
+readout closer candidate 必须回答：
+
+```text
+旧 blocker 是否下降？
+新 blocker 是否保持很低？
+required bias 是否下降？
+目标 token 是否更接近 top-1？
+```
+
+目前最接近该拼图的是 qwen3 的 format-only residual projection。
+
+但当前还缺少：
+
+```text
+identity anchor repair（身份锚修复）
+token-level final closure（词元级最终闭合）
+cross-model stable fiber（跨模型稳定纤维）
+```
+
+### 八、智能理论角度的理解
+
+语言生成不能被简化成一个目标向量增强过程。更接近当前证据的描述是：
+
+$$
+\text{Generation}
+=
+\text{route competition}
++
+\text{blocker suppression}
++
+\text{readout geometry reordering}
++
+\text{identity anchoring}
+$$
+
+其中 readout geometry（读出几何）不是最后一层的简单排序问题，而是多个路线、锚点、残余方向共同塑造的竞争场。
+
+Phase 807 的关键洞察是：
+
+```text
+破解语言编码机制不能只找“正向方向”，还要找“不会制造新竞争者的方向”。
+```
+
+这意味着未来的全局图谱不能只记录：
+
+```text
+某个 head / channel / unit 提升了目标 logit
+```
+
+还必须记录：
+
+```text
+它解决了哪些旧 blocker；
+制造了哪些新 blocker；
+这些新 blocker 属于什么类别；
+它是否稳定降低 required bias；
+它是否修复 identity anchor；
+它是否最终完成 token closure。
+```
+
+### 九、问题、硬伤与小模型偏差
+
+当前硬伤有四个。
+
+第一，确认轮 qwen3 只使用 5 个 case（样本），GLM4 3 个 case，DS7B 2 个 case。虽然 smoke/main/confirm 三轮趋势一致，但仍不足以宣称全局规律。
+
+第二，当前方向来自差分构造，可能混合多个真实功能纤维。尤其 DS7B 的大量 new blockers 表明，一个投影方向可能同时包含 suppressor（抑制器）和 field deformation（场变形）成分。
+
+第三，identity anchor fragmented rate（身份锚碎片化率）始终为 1.000，说明现有方向没有解决“这是谁的答案”这个更底层问题。
+
+第四，所有模型 token closure gain rate（词元闭合增益率）仍为 0.000，所以当前不能声称已经破解语言编码机制。
+
+小模型因素尤其重要。小模型容量较低，功能纤维可能被压缩、混叠和错位。因此 DS7B 或 GLM4 上的失败不能直接说明大模型没有对应机制；但它们足以说明：当前方法还没有找到跨模型稳定、可迁移的闭合结构。
+
+### 十、是否继续自动完成下一任务
+
+Phase 807 已经完成 Phase 806 提出的同阶段子目标：
+
+```text
+审计 residual projection（残余投影）到底是在 readout closer（读出闭合），还是在制造 new blockers（新阻塞者）。
+```
+
+下一步可以进入：
+
+```text
+Phase 808:
+qwen3 readout closer source localization with new-blocker control
+（带新阻塞者控制的 qwen3 读出闭合候选来源定位）
+```
+
+但 Phase 808 已经从“读出几何审计”转入“来源单元因果定位”，属于同一大方向下的新子阶段，不应在没有整理 Phase 807 边界后继续盲目自动测试。下一阶段应聚焦：
+
+```text
+1. 只以 qwen3 format-only closer candidate 为入口；
+2. 定位贡献该 closer 的 source heads / source MLP / residual units；
+3. 每个候选都必须同时报告 resolved blockers 与 emerged blockers；
+4. 严禁只用 target logit gain（目标 logit 增益）作为成功标准；
+5. 再用 GLM4 / DS7B 做边界验证，而不是强行寻找同构成功。
+```
+
+下一阶段闭合标准为：
+
+$$
+\Delta z_y > 0
+$$
+
+$$
+|R_{\text{resolved}}| \gg |R_{\text{new}}|
+$$
+
+$$
+\operatorname{required\ bias}\downarrow
+$$
+
+$$
+A_{\text{id}}\uparrow
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+当前还没有达到该标准。
+
+## Phase 808: readout closer source localization with new-blocker control（带新阻塞者控制的读出闭合候选来源定位） [2026-06-30 20:46]
+
+### 一、任务来源与总体判断
+
+本阶段分析了用户上传的两份 Phase 807 后续总结。其核心判断基本正确：
+
+```text
+语言生成不能继续只看 target logit（目标对数几率）是否提高；
+真正目标应是 full-vocabulary closure（全词表闭合）；
+局部 suppressor（局部抑制器）不等于 global readout closer（全局读出闭合器）；
+Phase 807 的价值是把 readout closer candidate（读出闭合候选）和 field-deforming suppressor（场变形抑制器）区分开。
+```
+
+附件中有些公式排版错误，例如集合定义和差值公式被换行破坏，但数学含义正确。应修正为：
+
+$$
+C_{\text{token}}(x,I)
+=
+\mathbf{1}
+\left[
+z_y^I(x)>
+\max_{v\in V,\ v\ne y}z_v^I(x)
+\right]
+$$
+
+$$
+B_{\text{full}}(x,I)
+=
+\{v\in V,\ v\ne y\mid z_v^I(x)>z_y^I(x)\}
+$$
+
+$$
+\Delta N
+=
+|B_{\text{after}}|
+-
+|B_{\text{base}}|
+=
+|R_{\text{new}}|
+-
+|R_{\text{resolved}}|
+$$
+
+综合 Phase 807 的结果，下一步确实应该进入 Phase 808：
+
+```text
+对 qwen3 中的 format-only readout closer candidate（仅格式方向读出闭合候选）
+进行 component-level source localization（组件级来源定位），
+同时继续控制 new-blocker emergence（新阻塞者涌现）。
+```
+
+本阶段已经完成该测试。
+
+### 二、测试脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase808_readout_closer_source_localization.py
+tests/glm5/run_phase808_readout_closer_source_localization_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase808_readout_closer_source_localization/smoke/
+tests/result/phase808_readout_closer_source_localization/main/
+tests/result/phase808_readout_closer_source_localization/confirm/
+```
+
+确认轮总表：
+
+```text
+tests/result/phase808_readout_closer_source_localization/confirm/phase808_cross_model_summary.md
+```
+
+本阶段按顺序完成三轮：
+
+```text
+smoke（冒烟测试）
+main（主测试）
+confirm（确认测试）
+```
+
+每轮均按以下顺序逐个加载模型：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+未使用量化。加载时优先尝试 flash attention（闪存注意力），当前环境缺少 FlashAttention2 包，因此自动回退到 sdpa（缩放点积注意力）。
+
+### 三、测试原理
+
+Phase 807 已经证明 qwen3 的 format-only residual projection（仅格式残余投影）是一个局部 readout closer candidate（读出闭合候选）。Phase 808 不再问：
+
+```text
+整个方向是否有效？
+```
+
+而是问：
+
+```text
+这个有效方向主要来自哪些 route component（路线组件）？
+```
+
+先固定 Phase 807 的有效设置：
+
+$$
+h_{\text{base}}
+=
+h
++\alpha T
++\beta_{\text{sem}}S_{\text{sem}}
+$$
+
+其中：
+
+$$
+\alpha=0.75
+$$
+
+$$
+\beta_{\text{sem}}=1
+$$
+
+然后使用 format-only residual projection：
+
+$$
+h_{\text{full}}
+=
+h_{\text{base}}
++\beta_{\text{fmt}}S_{\text{fmt}}
+$$
+
+其中：
+
+$$
+\beta_{\text{fmt}}=1
+$$
+
+$$
+\beta_{\text{id}}=0
+$$
+
+对于每个 route component（路线组件）：
+
+$$
+c_i\in\{attn:L,\ mlp:L\}
+$$
+
+构造两个测试。
+
+第一，single-component（单组件）测试：
+
+$$
+h_{\text{single},i}
+=
+h_{\text{base}}
++
+\Delta h_{\text{fmt},i}
+$$
+
+只把第 \(i\) 个组件从 semantic baseline（语义基线）推到 format closer（格式闭合候选）状态，其他组件保持语义基线。
+
+第二，leave-one-out（逐组件移除）测试：
+
+$$
+h_{\text{loo},i}
+=
+h_{\text{full}}
+\Delta h_{\text{fmt},i}
+$$
+
+也就是完整 format closer（格式闭合候选）中移除第 \(i\) 个组件的贡献，看闭合质量损失多少。
+
+组件来源分数主要看：
+
+$$
+\Delta N_{\text{single},i}
+=
+|B_{\text{single},i}|
+-
+|B_{\text{base}}|
+$$
+
+$$
+R_{\text{new},i}
+=
+B_{\text{single},i}
+\setminus
+B_{\text{base}}
+$$
+
+$$
+L^{N}_{\text{loo},i}
+=
+\Delta N_{\text{loo},i}
+-
+\Delta N_{\text{full}}
+$$
+
+$$
+L^{b}_{\text{loo},i}
+=
+b_{\text{loo},i}
+-
+b_{\text{full}}
+$$
+
+其中 \(L^{N}_{\text{loo},i}>0\) 表示移除该组件会让 blocker 数量变差，因此该组件对 closer（闭合候选）有贡献；\(L^{b}_{\text{loo},i}>0\) 表示移除该组件会提高 required bias（所需偏置），也说明该组件有贡献。
+
+一个 source closer candidate（闭合候选来源）至少要满足：
+
+$$
+\Delta N_{\text{single},i}<0
+$$
+
+$$
+|R_{\text{resolved},i}|>|R_{\text{new},i}|
+$$
+
+$$
+\frac{|R_{\text{new},i}|}{|B_{\text{base}}|}
+\le
+\eta
+$$
+
+$$
+b_{\text{single},i}
+-
+b_{\text{base}}
+\le
+0
+$$
+
+$$
+L^{N}_{\text{loo},i}>0
+$$
+
+仍然注意：这只是组件级来源定位，不是神经元级机制闭合。
+
+### 四、客观结果
+
+确认轮 qwen3 的最强结果集中在后层：
+
+```text
+mlp:L34
+single net delta: -25.500
+single resolved: 26.300
+single emerged: 0.800
+single emergence rate: 0.005
+single bias delta: -0.109
+loo net loss: 24.700
+loo bias loss: 0.128
+single token closure: 0.000
+```
+
+```text
+mlp:L35
+single net delta: -25.400
+single resolved: 28.300
+single emerged: 2.900
+single emergence rate: 0.025
+single bias delta: -0.234
+loo net loss: 20.800
+loo bias loss: 0.203
+single token closure: 0.000
+```
+
+辅助来源包括：
+
+```text
+attn:L34
+single net delta: -17.200
+single resolved: 17.400
+single emerged: 0.200
+loo net loss: 13.400
+```
+
+```text
+attn:L35
+single net delta: -17.400
+single resolved: 19.000
+single emerged: 1.600
+loo net loss: 9.600
+```
+
+所以 qwen3 中最稳定的来源结构是：
+
+```text
+后层 MLP L34/L35 为主；
+后层 attention L34/L35 为辅；
+L33 与 L31 有弱贡献；
+但没有 token closure。
+```
+
+GLM4 确认轮没有出现稳定 closer source（闭合来源）：
+
+```text
+mlp:L34 full net: +6.667
+mlp:L39 single net: +4.333
+mlp:L38 single net: +4.667
+attn:L29/L33/L35 single net 均为正
+single token closure: 0.000
+```
+
+这说明 GLM4 的 format-only residual projection（仅格式残余投影）主要仍是 new-blocker source / field deformer（新阻塞者来源 / 场变形器）。
+
+DS7B 确认轮出现一个有趣但不稳定的边界结果：
+
+```text
+attn:L27
+single net delta: -10.500
+single resolved: 10.500
+single emerged: 0.000
+single bias delta: -0.375
+loo net loss: 9.500
+label: source_closer_candidate_no_closure
+```
+
+```text
+attn:L26
+single net delta: -7.000
+single resolved: 7.000
+single emerged: 0.000
+single bias delta: -0.359
+loo net loss: 2.500
+```
+
+但 DS7B 的 MLP L26/L27 同时表现为强场变形：
+
+```text
+mlp:L27
+single net delta: +330.750
+single emerged: 425.000
+single emergence rate: 0.216
+```
+
+所以 DS7B 不是稳定复现 qwen3 的后层 MLP closer，而是出现：
+
+```text
+attention 局部 closer 信号
++
+MLP 大规模 new-blocker field deformation（新阻塞者场变形）
+```
+
+### 五、结果分析
+
+Phase 808 是实质进展。它把 Phase 807 的方向级结论继续下钻为组件级结论：
+
+```text
+qwen3 的 format-only closer candidate
+不是均匀分布在整条 route 上，
+而是主要集中在 L34/L35 的 MLP，
+并由 L34/L35 attention 辅助。
+```
+
+这说明 readout closer candidate（读出闭合候选）更像后层输出场重排机制，而不是早期语义路线机制。
+
+但这不是 token closure（词元闭合），原因很明确：
+
+```text
+1. single token closure gain rate 仍为 0；
+2. identity anchor（身份锚）没有被修复；
+3. qwen3 结果没有在 GLM4 上复现；
+4. DS7B 的对应结构发生角色错位，attention 有局部正效应，MLP 则容易制造大量新 blocker。
+```
+
+最保守的结论是：
+
+```text
+qwen3 后层 L34/L35 MLP 是 format-only readout closer candidate 的主要组件级来源；
+这不是跨模型通用层号；
+可迁移的可能是“后层输出场重排角色”，不是具体层号。
+```
+
+### 六、当前核心拼图更新
+
+Phase 808 新增的核心拼图是：
+
+```text
+component-level closer source（组件级闭合候选来源）
+```
+
+它位于以下链条中：
+
+```text
+format/echo suppressor-like direction（格式 / 回声类抑制方向）
+-> readout closer candidate（读出闭合候选）
+-> component-level source localization（组件级来源定位）
+```
+
+当前最可靠拼图：
+
+```text
+qwen3: mlp:L34 / mlp:L35
+```
+
+次级拼图：
+
+```text
+qwen3: attn:L34 / attn:L35
+```
+
+边界拼图：
+
+```text
+DS7B: attn:L27 / attn:L26 有局部 closer 信号；
+DS7B: mlp:L26 / mlp:L27 是强 field-deformation 风险点；
+GLM4: 暂无稳定 closer source。
+```
+
+### 七、硬伤与瓶颈
+
+第一，本阶段仍是 component-level（组件级），不是 head-level（注意力头级）或 neuron-level（神经元级）。虽然定位到了 L34/L35 MLP，但还没有拆到具体 MLP neuron / channel（神经元 / 通道）。
+
+第二，single-component（单组件）有效不等于 minimal sufficient circuit（最小充分回路）。当前只是证明组件对 closer candidate 有贡献，不是证明这些组件组合足以完成 token closure。
+
+第三，qwen3 的 source candidates（来源候选）仍然不能修复 identity anchor（身份锚）。因此它们更像：
+
+```text
+format/echo readout closer source
+```
+
+而不是：
+
+```text
+complete token identity closure source
+```
+
+第四，GLM4 和 DS7B 的跨模型结果不稳定。这可能来自小模型结构偏差，也可能说明当前方向构造仍混合多个功能纤维。
+
+第五，DS7B 的结果提示一个危险现象：
+
+```text
+某些 MLP 组件可以强烈降低 required bias，
+但同时释放大量新 blocker。
+```
+
+所以以后不能把 required bias（所需偏置）下降单独当成成功标准。
+
+### 八、智能理论角度的意义
+
+Phase 808 进一步支持当前理论：
+
+```text
+语言生成不是单点目标增强，
+而是后层输出场中的竞争闭合。
+```
+
+更具体地说，当前证据显示：
+
+$$
+\text{Token closure}
+\ne
+\text{semantic correctness}
+$$
+
+也不是：
+
+$$
+\text{Token closure}
+\ne
+\Delta z_y>0
+$$
+
+而更接近：
+
+$$
+\text{Token closure}
+=
+\text{semantic route}
++
+\text{format/echo control}
++
+\text{identity anchor}
++
+\text{readout geometry}
+-
+\text{new blocker emergence}
+$$
+
+Phase 808 的贡献是把其中的：
+
+$$
+\text{readout geometry}
+$$
+
+进一步局部化到 qwen3 的后层组件：
+
+$$
+G_{\text{readout}}^{\text{qwen3}}
+\approx
+g(\text{MLP}_{34},\text{MLP}_{35},\text{Attn}_{34},\text{Attn}_{35})
+$$
+
+但这个公式只能作为 qwen3 小模型上的局部近似，不能直接提升为通用数学定律。
+
+### 九、是否继续自动完成下一任务
+
+Phase 808 已经完成 Phase 807 提出的同阶段任务：
+
+```text
+定位 qwen3 format-only readout closer candidate 的组件级来源，
+并用 new-blocker control（新阻塞者控制）检验其有效性。
+```
+
+下一步与当前任务仍属于同一个大阶段：
+
+```text
+从方向级 closer candidate
+推进到最小充分闭合回路。
+```
+
+但 Phase 808 已经把问题收紧到一个更小的入口：
+
+```text
+qwen3 L34/L35 MLP + L34/L35 attention
+```
+
+因此下一阶段应是：
+
+```text
+Phase 809:
+late-layer closer source decomposition into head/channel units
+（后层闭合候选来源拆解到注意力头 / 通道单元）
+```
+
+阶段目标：
+
+```text
+1. 对 qwen3 L34/L35 attention 拆到 head 级；
+2. 对 qwen3 L34/L35 MLP 拆到 channel / neuron 级；
+3. 每个 head/channel 都必须报告 resolved old blockers 与 emerged new blockers；
+4. 找到少量不会制造新 blocker 的 source units；
+5. 再测试这些 source units 是否能与 identity anchor 修复方向组合。
+```
+
+Phase 809 的闭合标准不应是单个组件分数高，而应是：
+
+$$
+\Delta N_{\text{unit}}<0
+$$
+
+$$
+|R_{\text{new,unit}}|
+\ll
+|R_{\text{resolved,unit}}|
+$$
+
+$$
+L^{N}_{\text{loo,unit}}>0
+$$
+
+$$
+b_{\text{unit}}-b_{\text{base}}<0
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+当前仍未满足最后一项。
+
+## Phase 809: 后层闭合候选拆解到注意力头和通道单元 [2026-06-30 21:27]
+
+### 一、任务来源
+
+本阶段接续 Phase 808。
+
+Phase 808 已经把 qwen3 的 format-only readout closer candidate（格式读出闭合候选）定位到后层组件：
+
+```text
+qwen3:
+L34/L35 MLP 是主要来源；
+L34/L35 attention 是辅助来源。
+
+GLM4:
+没有稳定复现同类结构。
+
+DS7B:
+attention 有局部正信号；
+MLP 经常制造新 blocker。
+```
+
+本阶段附件中的两个判断基本正确：
+
+```text
+1. Phase 808 是实质进展，但不是 token closure。
+2. 如果继续只沿着局部 patch、局部 projection、局部 suppressor 搜索，会进入局部循环。
+3. 下一步不能只是继续找“更细的单点补丁”，而要把候选单元整理成 closure solver 的输入表。
+```
+
+因此 Phase 809 的目标不是证明已经闭合，而是回答一个更小的问题：
+
+```text
+Phase 808 的后层 closer candidate，
+到底由哪些 attention head 和 MLP channel / neuron-like unit 承载？
+这些 unit 是否能单独减少 blocker？
+这些 unit 会不会同时制造新 blocker？
+这些 unit 是否是后续全局闭合求解器的候选变量？
+```
+
+### 二、测试脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase809_late_layer_head_channel_closer_decomposition.py
+tests/glm5/run_phase809_late_layer_head_channel_closer_decomposition_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase809_late_layer_head_channel_closer_decomposition/smoke/
+tests/result/phase809_late_layer_head_channel_closer_decomposition/main/
+tests/result/phase809_late_layer_head_channel_closer_decomposition/confirm/
+```
+
+确认轮汇总：
+
+```text
+tests/result/phase809_late_layer_head_channel_closer_decomposition/confirm/phase809_cross_model_summary.md
+tests/result/phase809_late_layer_head_channel_closer_decomposition/confirm/phase809_cross_model_summary.json
+```
+
+三轮测试：
+
+```text
+smoke:
+确认脚本能加载模型、抽取候选、生成结果。
+
+main:
+qwen3、GLM4、DS7B 顺序主测试。
+
+confirm:
+扩大 qwen3 样本，保留 GLM4 和 DS7B 复核。
+```
+
+模型加载策略：
+
+```text
+bf16；
+不使用量化；
+优先尝试 flash_attention_2；
+本机 flash_attention_2 包不可用，自动回退到 sdpa；
+三个模型顺序加载和释放，避免显存溢出。
+```
+
+### 三、测试原理
+
+Phase 809 复用 Phase 807/808 的方向构造：
+
+```text
+target direction:
+目标词方向。
+
+semantic direction:
+语义路线方向。
+
+format direction:
+格式/回声/读出竞争方向。
+```
+
+先构造 semantic baseline（语义基线）：
+
+$$
+h_{\text{base}}
+=
+h
++
+\alpha T
++
+\beta_{\text{sem}}S_{\text{sem}}
+$$
+
+再构造 full closer（完整闭合候选方向）：
+
+$$
+h_{\text{full}}
+=
+h_{\text{base}}
++
+\beta_{\text{fmt}}S_{\text{fmt}}
+$$
+
+其中本轮使用：
+
+$$
+\alpha=0.75
+$$
+
+$$
+\beta_{\text{sem}}=1
+$$
+
+$$
+\beta_{\text{fmt}}=1
+$$
+
+然后把后层组件拆成两类 unit：
+
+```text
+1. attention head unit
+2. MLP channel unit
+```
+
+attention head 的原始贡献近似为：
+
+$$
+\Delta h_{\text{head}}
+=
+W^{O}_{[:,H]}
+\Delta a_{H}
+$$
+
+MLP channel 的原始贡献近似为：
+
+$$
+\Delta h_{\text{mlp},c}
+=
+W^{\text{down}}_{[:,c]}
+\Delta m_c
+$$
+
+对每个 unit，只取它在 format-only closer 子空间中的增量：
+
+$$
+\Delta h_{u}^{\text{fmt}}
+=
+\Pi(T,S_{\text{sem}},S_{\text{fmt}})(\Delta h_u)
+-
+\Pi(T,S_{\text{sem}})(\Delta h_u)
+$$
+
+单独注入测试：
+
+$$
+h_{\text{single},u}
+=
+h_{\text{base}}
++
+\Delta h_{u}^{\text{fmt}}
+$$
+
+leave-one-out（去一测试）：
+
+$$
+h_{\text{loo},u}
+=
+h_{\text{full}}
+-
+\Delta h_{u}^{\text{fmt}}
+$$
+
+blocker 集合定义：
+
+$$
+B(h)
+=
+\{v \neq y \mid z_v(h)>z_y(h)\}
+$$
+
+resolved old blockers（被解决旧阻断项）：
+
+$$
+R_{\text{resolved},u}
+=
+B(h_{\text{base}})
+\setminus
+B(h_{\text{single},u})
+$$
+
+emerged new blockers（新出现阻断项）：
+
+$$
+R_{\text{new},u}
+=
+B(h_{\text{single},u})
+\setminus
+B(h_{\text{base}})
+$$
+
+净 blocker 变化：
+
+$$
+\Delta N_u
+=
+|B(h_{\text{single},u})|
+-
+|B(h_{\text{base}})|
+$$
+
+leave-one-out 损失：
+
+$$
+L^{N}_{\text{loo},u}
+=
+\Delta N_{\text{loo},u}
+-
+\Delta N_{\text{full}}
+$$
+
+token closure（词元闭合）标准：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+[
+z_y(h)
+>
+\max_{v\neq y}z_v(h)
+]
+$$
+
+本阶段的严格闭合标准仍然是：
+
+$$
+\Delta N_u<0
+$$
+
+$$
+|R_{\text{new},u}|
+\ll
+|R_{\text{resolved},u}|
+$$
+
+$$
+L^{N}_{\text{loo},u}>0
+$$
+
+$$
+C_{\text{token}}=1
+$$
+
+### 四、客观结果
+
+#### 1. smoke 轮
+
+smoke 轮确认脚本正常：
+
+```text
+qwen3、GLM4、DS7B 均能顺序加载、释放显存、生成 rows / summary。
+```
+
+qwen3 在 smoke 中已经出现较清楚的 unit 候选：
+
+```text
+mlp_channel:mlp:L35:u935
+single net blocker delta = -4
+resolved = 5
+emerged = 1
+format suppression = 0.7257
+closure = 0
+```
+
+这说明：
+
+```text
+L35 MLP 的确存在可分解到 channel 级的 format closer 候选；
+但单个 channel 不能完成 token closure。
+```
+
+#### 2. main 轮
+
+main 轮 qwen3：
+
+```text
+n_cases = 2
+n_rows = 84
+```
+
+代表性结果：
+
+```text
+mlp_channel:mlp:L35:u228
+single net = -17
+resolved = 17
+emerged = 0
+loo net loss = 16
+closure = 0
+
+attention_head:attn:L34:u29
+single net = -17
+resolved = 17
+emerged = 0
+loo net loss = 6
+closure = 0
+
+mlp_channel:mlp:L35:u935
+single net = -4
+resolved = 4
+emerged = 0
+format suppression = 0.719
+loo net loss = 3
+closure = 0
+```
+
+main 轮 GLM4：
+
+```text
+n_cases = 2
+n_rows = 84
+```
+
+GLM4 只有很弱的单点信号：
+
+```text
+mlp_channel:mlp:L39:u9787
+single net = -3
+resolved = 4
+emerged = 1
+closure = 0
+```
+
+但整体上：
+
+```text
+多数 unit 为 neutral / weak / deformer；
+没有稳定 closer unit。
+```
+
+main 轮 DS7B：
+
+```text
+n_cases = 2
+n_rows = 84
+```
+
+DS7B 出现两类相反现象：
+
+```text
+部分 attention head / MLP channel 能减少旧 blocker；
+但大量 MLP channel 同时制造新 blocker，甚至使 full net delta 很差。
+```
+
+代表性结果：
+
+```text
+attention_head:attn:L27:u23
+single net = -6
+resolved = 7
+emerged = 1
+closure = 0
+
+mlp_channel:mlp:L27:u2295
+single net = -4
+resolved = 4
+emerged = 0
+closure = 0
+```
+
+#### 3. confirm 轮
+
+confirm 轮 qwen3：
+
+```text
+n_cases = 4
+n_rows = 220
+```
+
+标签分布：
+
+```text
+unit_closer_candidate_no_closure: 14
+unit_weak_reducer: 48
+unit_new_blocker_or_deformer: 52
+unit_neutral_or_mixed: 106
+```
+
+qwen3 代表性 unit：
+
+```text
+attention_head:attn:L34:u20
+single net = -5
+resolved = 5
+emerged = 0
+loo net loss = 17
+closure = 0
+
+mlp_channel:mlp:L35:u228
+single net = -27
+resolved = 27
+emerged = 0
+bias delta = -0.28125
+loo net loss = 7
+closure = 0
+
+mlp_channel:mlp:L34:u8061
+single net = -24
+resolved = 24
+emerged = 0
+closure = 0
+
+mlp_channel:mlp:L35:u935
+single net = -1.75
+resolved = 2.0
+emerged = 0.25
+format suppression = 0.355
+closure = 0
+```
+
+qwen3 group 级结果：
+
+```text
+mlp_channel:mlp:L35
+rows = 64
+single net = -1.5625
+resolved = 2.7031
+emerged = 1.1406
+closer candidate = 5
+weak reducer = 14
+new blocker / deformer = 11
+
+attention_head:attn:L35
+rows = 20
+single net = -0.75
+resolved = 2.4
+emerged = 1.65
+closer candidate = 1
+weak reducer = 7
+new blocker / deformer = 3
+```
+
+confirm 轮 GLM4：
+
+```text
+n_cases = 2
+n_rows = 110
+```
+
+标签分布：
+
+```text
+unit_closer_candidate_no_closure: 1
+unit_weak_reducer: 16
+unit_new_blocker_or_deformer: 31
+unit_neutral_or_mixed: 62
+```
+
+GLM4 结论：
+
+```text
+只有一个弱 closer candidate；
+整体不支持稳定后层 closer unit 图谱。
+```
+
+confirm 轮 DS7B：
+
+```text
+n_cases = 2
+n_rows = 104
+```
+
+标签分布：
+
+```text
+unit_closer_candidate_no_closure: 16
+unit_weak_reducer: 27
+unit_new_blocker_or_deformer: 30
+unit_neutral_or_mixed: 31
+```
+
+DS7B 代表性结果：
+
+```text
+mlp_channel:mlp:L27:u12657
+single net = -19
+resolved = 21
+emerged = 2
+loo net loss = 189
+closure = 0
+
+mlp_channel:mlp:L27:u13015
+single net = -28
+resolved = 39
+emerged = 11
+loo net loss = 184
+closure = 0
+
+mlp_channel:mlp:L26:u12837
+single net = -22
+resolved = 22
+emerged = 0
+loo net loss = 46
+closure = 0
+
+attention_head:attn:L27:u23
+single net = -5
+resolved = 5
+emerged = 0
+closure = 0
+```
+
+DS7B group 级结果：
+
+```text
+attention_head:attn:L27
+single net = -1.5
+resolved = 1.8
+emerged = 0.3
+closer candidate = 4
+
+mlp_channel:mlp:L27
+single net = 0.71875
+resolved = 6.9375
+emerged = 7.65625
+closer candidate = 3
+new blocker / deformer = 6
+```
+
+### 五、结果是否正确
+
+当前结果基本可信，但证据层级必须严格限定。
+
+可以确认：
+
+```text
+1. Phase 808 的后层 closer candidate 不是纯抽象方向；
+   它确实能被拆到 head / channel 级单元。
+
+2. qwen3 中，L35 MLP channel 与 L34/L35 attention head 有更清楚的 closer-like 信号。
+
+3. DS7B 中，也存在 unit 级正信号；
+   但 DS7B 的 MLP 单元更容易产生新 blocker，说明它的局部贡献更混杂。
+
+4. GLM4 没有稳定复现 qwen3 的结构。
+
+5. 所有模型、所有轮次中，单个 unit 均没有完成 token closure。
+```
+
+不能确认：
+
+```text
+1. 不能说已经找到了完整语言编码机制。
+2. 不能说某个 head/channel 就是完整答案。
+3. 不能说 qwen3 的 L35 channel 结构是跨模型不变量。
+4. 不能说继续做单点 patch 一定能闭合。
+```
+
+更准确的判断是：
+
+```text
+Phase 809 得到的是 closure solver candidate table，
+不是 closure solution。
+```
+
+### 六、理论进展
+
+本阶段把图谱粒度从：
+
+```text
+direction-level closer candidate
+```
+
+推进到：
+
+```text
+unit-level closer candidate
+```
+
+也就是从：
+
+$$
+S_{\text{fmt}}
+$$
+
+推进到：
+
+$$
+S_{\text{fmt}}
+\approx
+\sum_{u\in U}
+w_u
+\Delta h^{\text{fmt}}_u
+$$
+
+其中：
+
+$$
+U
+=
+U_{\text{head}}
+\cup
+U_{\text{mlp-channel}}
+$$
+
+但这个分解目前仍然是近似的、局部的、依赖任务路线的：
+
+$$
+S_{\text{fmt}}(x,y,m)
+\neq
+S_{\text{fmt}}^{\text{global}}
+$$
+
+这说明语言闭合不是单一方向问题，而更像：
+
+```text
+候选 token 场中的多单元约束满足问题。
+```
+
+更合理的表达是：
+
+$$
+z_y(h+\Delta h)
+>
+\max_{v\neq y}
+z_v(h+\Delta h)
+$$
+
+其中：
+
+$$
+\Delta h
+=
+\sum_{u\in U}
+w_u
+\Delta h^{\text{fmt}}_u
++
+\sum_{r\in R}
+\gamma_r
+\Delta h^{\text{route}}_r
++
+\Delta h_{\text{identity-anchor}}
+$$
+
+如果只搜索单个 unit：
+
+$$
+\Delta h
+=
+\Delta h_u
+$$
+
+通常只能减少部分 blocker：
+
+$$
+|B(h+\Delta h_u)|
+<
+|B(h)|
+$$
+
+但不能保证：
+
+$$
+B(h+\Delta h_u)
+=
+\varnothing
+$$
+
+因此 Phase 809 支持附件中的关键判断：
+
+```text
+局部 patch 不是 closure algorithm。
+```
+
+### 七、当前核心拼图
+
+本阶段后，当前图谱拼图更新为：
+
+```text
+1. target direction:
+   正确目标词方向可以提高目标 logit，但不能单独闭合。
+
+2. semantic route:
+   语义路线能改善候选区间，但会留下大量竞争 token。
+
+3. format / echo route:
+   格式和回声路线会影响读出竞争，不只是表层格式。
+
+4. suppressor:
+   某些 head / direction 能抑制错误路线，但局部 suppressor 不等于闭合。
+
+5. readout closer:
+   后层方向能减少 blocker，但不是最终 token closure。
+
+6. component source:
+   qwen3 L34/L35 MLP + attention 是 readout closer 的主要局部来源。
+
+7. unit source:
+   qwen3 的 L35 MLP channel 与 L34/L35 attention head 可以产生 unit-level closer-like 效果。
+
+8. cross-model instability:
+   GLM4 不稳定，DS7B 混杂，说明小模型内部结构存在明显偏差。
+
+9. full-vocabulary field:
+   闭合必须看全词表竞争，而不是只看 target logit。
+
+10. solver requirement:
+   下一步必须从 local patch search 转为 constrained closure solving。
+```
+
+### 八、问题、硬伤和瓶颈
+
+最重要硬伤：
+
+```text
+没有任何 unit 完成 token closure。
+```
+
+第二个硬伤：
+
+```text
+跨模型稳定性不足。
+```
+
+qwen3 有比较清楚的后层 unit 信号；GLM4 弱；DS7B 有正信号但混杂严重。这说明小模型测试很可能存在结构偏差：
+
+```text
+小模型可能把真实大模型中更清晰的功能纤维，
+压缩、混叠、折叠到少量粗糙 unit 中。
+```
+
+第三个硬伤：
+
+```text
+单点 unit 的 leave-one-out loss 很高，
+但 single patch 仍不能闭合。
+```
+
+这说明某些 unit 可能是必要成分，但不是充分成分：
+
+$$
+\text{necessary}
+\nRightarrow
+\text{sufficient}
+$$
+
+第四个硬伤：
+
+```text
+旧 blocker 被解决后，新 blocker 仍会出现。
+```
+
+这说明闭合不是“推动正确答案上升”这么简单，而是：
+
+$$
+\min_{\Delta h}
+|B(h+\Delta h)|
+$$
+
+同时还要约束：
+
+$$
+z_y(h+\Delta h)
+-
+z_v(h+\Delta h)
+>
+0
+\quad
+\forall v\neq y
+$$
+
+第五个硬伤：
+
+```text
+当前 unit ranking 仍依赖局部路线和局部投影。
+```
+
+如果继续只扩大 unit 数量，会进入：
+
+```text
+找到一个 reducer；
+发现它制造新 blocker；
+再找 suppressor；
+再发现 suppressor 损害 target；
+继续局部补丁循环。
+```
+
+这正是附件中指出的风险。
+
+### 九、闭合距离评估
+
+当前进度不是原地踏步。
+
+它从：
+
+```text
+组件级来源
+```
+
+推进到：
+
+```text
+单元级候选表
+```
+
+但距离真正 token closure 仍然较远。
+
+阶段性评估：
+
+```text
+机制定位进度：约 65%
+unit 级图谱进度：约 35%
+token closure 进度：约 20%
+跨模型稳定理论进度：约 25%
+完整语言编码机制进度：约 30%
+```
+
+这个百分比不是数学证明，只是基于当前证据的研究进度估计。
+
+当前已经接近：
+
+```text
+如何把局部路线拆成单元贡献。
+```
+
+但还没有完成：
+
+```text
+如何组合这些单元，使全词表竞争场闭合。
+```
+
+### 十、智能理论角度的反思
+
+语言能力至少包含三类结构：
+
+```text
+知识网络；
+推理路线；
+语法 / 格式系统。
+```
+
+当前实验说明：
+
+```text
+这些结构不是简单存放在一个语义向量里；
+而是在生成时被动态路由、竞争、抑制、读出。
+```
+
+更接近当前证据的理论表达是：
+
+$$
+\text{Language Generation}
+=
+\text{Route Selection}
++
+\text{Fiber Activation}
++
+\text{Competition Suppression}
++
+\text{Token Closure}
+$$
+
+或者写成：
+
+$$
+h_{t}^{L}
+=
+\mathcal{F}_{\theta}
+(
+x_{\le t},
+r,
+c,
+m
+)
+$$
+
+$$
+z_t
+=
+W_U h_t^{L}
+$$
+
+$$
+y_t
+=
+\arg\max_v z_{t,v}
+$$
+
+真正要破解的不是某个局部向量，而是：
+
+$$
+\mathcal{C}(x,y)
+=
+\{u,r,s \mid
+z_y(h+\Delta h_{u,r,s})
+>
+z_v(h+\Delta h_{u,r,s}),
+\forall v\neq y
+\}
+$$
+
+其中：
+
+```text
+u: head/channel/neuron-like unit
+r: route / fiber
+s: suppressor / gate
+```
+
+这更像一个动态约束系统，而不是静态语义图谱。
+
+### 十一、下一阶段任务
+
+Phase 809 已经完成 Phase 808 的同阶段下钻任务：
+
+```text
+把后层 closer candidate 拆到 attention head 和 MLP channel 级。
+```
+
+接下来的任务仍属于同一个大阶段：
+
+```text
+从局部方向和局部单元，推进到最小充分闭合回路。
+```
+
+但下一阶段不能再只是继续拆单点 unit。
+
+建议进入：
+
+```text
+Phase 810:
+minimal sufficient closure solver over unit candidate table
+（基于单元候选表的最小充分闭合求解器）
+```
+
+核心目标：
+
+```text
+1. 读取 Phase 809 的 unit candidate table；
+2. 不再单独测试一个 unit，而是搜索少量 unit 的组合；
+3. 组合必须同时满足 target margin、blocker count、new blocker control；
+4. 引入 identity anchor repair；
+5. 把每个组合分成 necessary / sufficient / deformer 三类；
+6. 输出最小充分闭合回路，而不是单点 patch 排名。
+```
+
+Phase 810 的目标函数应从单点分数改成全词表约束：
+
+$$
+\min_{w}
+\left[
+|B(h+\sum_u w_u\Delta h_u)|
++
+\lambda
+\|\mathbf{w}\|_0
++
+\mu
+|R_{\text{new}}|
+-
+\eta
+\left(
+z_y
+-
+\max_{v\neq y}z_v
+\right)
+\right]
+$$
+
+闭合标准：
+
+$$
+C_{\text{token}}=1
+$$
+
+$$
+|B(h+\Delta h)|=0
+$$
+
+$$
+|R_{\text{new}}|
+\le
+\epsilon
+$$
+
+$$
+\|\mathbf{w}\|_0
+\le
+k
+$$
+
+其中：
+
+```text
+k 应该先取 2 到 6；
+避免组合空间爆炸；
+先做 qwen3，再做 GLM4 和 DS7B 复核。
+```
+
+### 十二、阶段结论
+
+Phase 809 是实质进展，但不是闭合。
+
+最稳妥结论：
+
+```text
+后层 readout closer 可以拆到 head/channel unit；
+qwen3 的 L35 MLP channel 和 L34/L35 attention head 存在较清楚的局部 closer 信号；
+DS7B 有正信号但混杂严重；
+GLM4 没有稳定复现；
+所有单点 unit 均未完成 token closure。
+```
+
+因此当前研究方向应从：
+
+```text
+local patch search
+```
+
+转为：
+
+```text
+global closure solving over causal fiber candidates
+```
+
+也就是从“找一个有用单元”，转为“找到最小充分闭合回路”。
+
+## Phase 810: 最小充分闭合组合求解器与全词表竞争验证 [2026-06-30 21:40]
+
+### 一、任务
+
+本阶段接续 Phase 808 和 Phase 809。
+
+前一阶段已经把后层 readout closer 拆到较细的 head/channel unit，得到的主要事实是：
+
+```text
+1. qwen3 的 L35 MLP channel 和 L34/L35 attention head 有较稳定的局部 closer 信号；
+2. DS7B 有局部正信号，但混杂严重；
+3. GLM4 的局部 closer 信号较弱；
+4. 单个 unit 不能完成 token closure。
+```
+
+因此 Phase 810 不再问：
+
+```text
+哪个单元有正向 patch 效果？
+```
+
+而是改问：
+
+```text
+少量 unit 组合是否构成最小充分闭合回路？
+```
+
+这一步也是对最新判断的直接验证：
+
+```text
+如果继续沿着局部 patch / projection / suppressor 搜索，可能长期停在“局部改善但不闭合”的区域；
+真正需要的是面向全词表竞争场的 closure solver。
+```
+
+### 二、脚本和结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase810_minimal_sufficient_closure_solver.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase810_minimal_sufficient_closure_solver_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase810_minimal_sufficient_closure_solver/smoke/
+tests/result/phase810_minimal_sufficient_closure_solver/main/
+tests/result/phase810_minimal_sufficient_closure_solver/confirm/
+```
+
+三轮测试均已完成：
+
+```text
+smoke：确认脚本、加载、数据生成正常；
+main：主要测试；
+confirm：扩大组合数量和样本后确认关键结论。
+```
+
+模型依次测试：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+加载设置：
+
+```text
+bf16；
+quantization=off；
+优先 flash_attention_2；
+本机未安装 FlashAttention2，实际自动回退为 sdpa；
+每个模型测试完成后释放 GPU 显存。
+```
+
+### 三、测试原理
+
+Phase 810 的核心是把 Phase 809 找到的 unit candidate 作为候选因果纤维，然后做小组合搜索。
+
+基础状态：
+
+$$
+h_{\text{base}}
+=
+h
++
+\alpha T
++
+\beta_{\text{sem}}S_{\text{sem}}
+$$
+
+其中：
+
+```text
+h 是原始 residual state；
+T 是目标答案方向；
+S_sem 是语义或格式抑制方向；
+alpha 和 beta_sem 控制干预强度。
+```
+
+组合干预：
+
+$$
+\Delta h_{\mathcal{U}}
+=
+\sum_{u\in\mathcal{U}} w_u\Delta h_u
++
+\sum_{a\in\mathcal{A}}\beta_a\Delta h_{\text{id},a}
+$$
+
+其中：
+
+```text
+U 是候选 head/channel unit 集合；
+Delta h_u 是该 unit 的激活差分；
+Delta h_id 是 identity anchor；
+w_u 是组合权重；
+beta_a 是 identity anchor 强度。
+```
+
+全词表竞争集合：
+
+$$
+B(h)
+=
+\{v\neq y\mid z_v(h)>z_y(h)\}
+$$
+
+其中：
+
+```text
+y 是目标词元；
+z_y 是目标词元 logit；
+v 是词表中其他词元。
+```
+
+闭合标准：
+
+$$
+C_{\text{token}}(h)=1
+\iff
+|B(h)|=0
+$$
+
+也就是：
+
+```text
+目标词元必须超过全词表所有竞争词元。
+```
+
+本阶段优化目标不是单纯增加目标 logit，而是降低全词表未闭合竞争集合：
+
+$$
+J(\mathcal{U})
+=
+|B(h_{\text{base}}+\Delta h_{\mathcal{U}})|
++
+\lambda|\mathcal{U}|
++
+\mu|R_{\text{new}}|
+-
+\eta
+\left(
+z_y
+-
+\max_{v\neq y}z_v
+\right)
+$$
+
+其中：
+
+```text
+R_new 是新涌现 blocker 集合；
+lambda 惩罚组合复杂度；
+mu 惩罚新 blocker；
+eta 奖励目标词元相对最大竞争词元的 margin。
+```
+
+本阶段更严格的判定是：
+
+$$
+|B(h_{\text{base}}+\Delta h_{\mathcal{U}})|=0
+$$
+
+$$
+|R_{\text{new}}|\approx 0
+$$
+
+$$
+|\mathcal{U}|\le k
+$$
+
+当前实际取值：
+
+```text
+smoke：小样本、小组合；
+main：组合大小 2；
+confirm：候选池扩大，允许更多二元组合，保留 identity anchor。
+```
+
+### 四、main 轮结果
+
+main 轮三模型均未出现 token closure：
+
+```text
+qwen3：268 条有效行，0 条 token closure；
+GLM4：268 条有效行，0 条 token closure；
+DS7B：264 条有效行，0 条 token closure。
+```
+
+qwen3 的最好结果：
+
+```text
+case：plant:oak:grows_on_tree
+组合：mlp_channel:mlp:L35:u935 + attention_head:attn:L35:u0
+semantic above count：27
+after above count：20
+resolved blockers：7
+emerged blockers：0
+token closure：0
+```
+
+GLM4 的 main 轮现象：
+
+```text
+最好结果仍停留在 19 个 above token；
+多数 unit 是 mixed / neutral；
+少量组合会制造新 blocker；
+没有可靠 closer。
+```
+
+DS7B 的 main 轮现象：
+
+```text
+abstract:justice:category 上 identity anchor 有明显 reducer 效果；
+semantic above count 约 236；
+最好 after above count 约 217；
+减少了 19 个 blocker；
+但距离 token closure 仍很远。
+```
+
+### 五、confirm 轮结果
+
+confirm 轮扩大候选和组合后，结论没有反转。
+
+qwen3：
+
+```text
+n_cases：3
+n_valid_rows：618
+token_closure_rows：0
+combo_reducer_no_closure：405
+combo_new_blocker_or_deformer：133
+combo_mixed_or_neutral：80
+```
+
+qwen3 最好结果仍是：
+
+```text
+case：plant:oak:grows_on_tree
+组合：mlp_channel:mlp:L35:u935 + attention_head:attn:L35:u0
+semantic above count：27
+after above count：20
+resolved blockers：7
+emerged blockers：0
+token closure：0
+```
+
+这说明 qwen3 的 L35 MLP channel 与 L35 attention head 确实构成局部 blocker reducer，但不是充分闭合回路。
+
+GLM4：
+
+```text
+n_cases：2
+n_valid_rows：412
+token_closure_rows：0
+combo_reducer_no_closure：136
+combo_new_blocker_or_deformer：106
+combo_mixed_or_neutral：170
+```
+
+GLM4 的最好结果仍然只是维持或轻微改善：
+
+```text
+case：plant:wheat:edible
+after above count：19
+required bias：约 6.31 到 6.38
+token closure：0
+```
+
+这说明 GLM4 在这一批样本和候选单元上没有表现出稳定的最小闭合组合。
+
+DS7B：
+
+```text
+n_cases：2
+n_valid_rows：408
+token_closure_rows：0
+combo_reducer_no_closure：236
+combo_new_blocker_or_deformer：148
+combo_mixed_or_neutral：24
+```
+
+DS7B 最好结果：
+
+```text
+case：abstract:justice:category
+组合：identity_anchor:beta1 + mlp_channel:mlp:L27:u15791
+semantic above count：237
+full closer above count：221
+after above count：211
+resolved blockers：26
+emerged blockers：0
+token closure：0
+```
+
+这说明 DS7B 的 identity anchor 加部分 L27 MLP channel 可以明显减少 blocker，但剩余竞争词仍有 211 个，离闭合非常远。
+
+### 六、关键客观现象
+
+本阶段得到的稳定客观事实：
+
+```text
+1. 小组合比单点 unit 更有效；
+2. qwen3 的 L35 MLP channel + L35 attention head 可以稳定减少若干 blocker；
+3. DS7B 的 identity anchor + L27 MLP/head 可以减少更多 blocker；
+4. GLM4 的局部组合效果弱，而且新 blocker 风险更高；
+5. 三个模型均没有 token closure；
+6. 扩大到 confirm 轮以后，结论没有反转。
+```
+
+最重要的负结果：
+
+```text
+局部 unit 组合可以降低 blocker 数量，
+但不能让目标词元成为全词表第一。
+```
+
+这支持一个更严格的判断：
+
+```text
+局部 patch / projection / suppressor 搜索不是完整闭合算法；
+它只能提供候选纤维和局部几何信息。
+```
+
+### 七、对附件判断的审视
+
+附件中关于 Phase 808 的判断基本正确：
+
+```text
+Phase 808 是实质进展，但不是 token closure；
+它把问题从“是否有 closer”推进到“closer 来源在哪里”；
+qwen3 的后层 MLP 是主要来源，attention 更像辅助调制；
+DS7B 存在局部信号但混杂；
+GLM4 不稳定。
+```
+
+附件中关于“当前局部搜索可能长期不闭合”的判断也被 Phase 810 加强：
+
+```text
+小组合搜索能减少 blocker；
+但最优结果仍保留大量 above token；
+因此继续扩大局部组合池，可能更多是在优化局部拟合，而不是自然得到闭合。
+```
+
+需要收紧的地方是：
+
+```text
+不能说局部方法无价值；
+它已经提供了可复用的候选纤维、blocker 类型、模型差异和读出几何信息。
+但不能把局部改善误认为完整语言编码机制闭合。
+```
+
+### 八、当前图谱进展
+
+现在图谱已经从早期的：
+
+```text
+概念方向
+```
+
+推进到：
+
+```text
+源词元
+写入器
+骨架承载器
+重写器
+读出竞争
+blocker class
+new blocker emergence
+head/channel unit
+small closure combination
+```
+
+更具体地说，当前已经能看到：
+
+```text
+1. 特征不是只存在于单一语义向量，而是分布在多层 residual route 中；
+2. 后层 MLP channel 对 readout closer 有重要作用；
+3. attention head 更像选择、搬运、调制或局部纠偏；
+4. identity anchor 可以在 DS7B 中减少一部分大规模格式/空白/符号 blocker；
+5. blocker 不只是语义错误，还包括空白、标点、echo、高频格式词、候选值变体等；
+6. 新 blocker emergence 是闭合失败的核心原因之一。
+```
+
+当前图谱的整体形状更像：
+
+```text
+多条候选 causal fiber 在后层读出端汇合；
+每条 fiber 可以减少一类 blocker；
+但缺少一个能同时压低全部竞争族、维持目标身份、避免新 blocker 的全局控制结构。
+```
+
+### 九、问题和硬伤
+
+第一，仍未闭合：
+
+```text
+所有模型、所有轮次、所有小组合均无 token closure。
+```
+
+第二，目标提升和竞争压制仍不等价：
+
+```text
+某个组合可以减少 blocker；
+但它不一定提高目标词元到第一；
+也不一定防止其他类别 blocker 出现。
+```
+
+第三，小模型结构可能粗糙：
+
+```text
+qwen3、GLM4、DS7B 都是当前可测试的小模型；
+内部功能纤维可能被压缩、折叠或错位；
+因此不能把某个 head/channel 的具体编号直接外推为大模型通用机制。
+```
+
+第四，组合搜索仍是浅层：
+
+```text
+当前只搜索很小的 unit 组合；
+没有学习连续权重；
+没有按 blocker class 做专门约束；
+没有完整建模不同竞争词族之间的耦合。
+```
+
+第五，闭合标准比 patch 成功严格得多：
+
+```text
+patch 可以让正确答案 logit 上升；
+closure 要求正确答案超过全词表所有竞争词元。
+```
+
+### 十、理论进展
+
+Phase 810 没有完成新理论闭合，但对理论边界有明确推进。
+
+当前最稳妥理论应写成：
+
+```text
+语言生成不是单个语义向量被读出，
+而是条件化残差状态在全词表竞争场中完成闭合。
+局部 head/channel 是因果纤维的一部分，
+但完整输出需要全局竞争场约束。
+```
+
+统一表达：
+
+$$
+h_{t+1}
+=
+\Phi_{\theta}
+\left(
+h_t,
+x_{\le t},
+\mathcal{C}_t
+\right)
+$$
+
+读出：
+
+$$
+z_t
+=
+W_U h_t
+$$
+
+输出闭合：
+
+$$
+y_t
+=
+\arg\max_v z_{t,v}
+$$
+
+严格闭合条件：
+
+$$
+z_{t,y}
+>
+z_{t,v},
+\quad
+\forall v\neq y
+$$
+
+当前发现的关键困难是：
+
+$$
+\Delta z_y>0
+\not\Rightarrow
+z_y>\max_{v\neq y}z_v
+$$
+
+也就是说：
+
+```text
+提升正确答案，不等于完成输出闭合。
+```
+
+当前更合理的研究目标是：
+
+$$
+\Delta h^*
+=
+\arg\min_{\Delta h}
+\left[
+|B(h+\Delta h)|
++
+\mu|R_{\text{new}}|
++
+\lambda\Omega(\Delta h)
+\right]
+$$
+
+其中：
+
+```text
+Delta h* 不是单个 patch；
+它应是可以同时满足目标增强、竞争压制、新 blocker 控制的闭合控制量。
+```
+
+### 十一、阶段结论
+
+Phase 810 是实质进展，但不是 token closure。
+
+最稳妥结论：
+
+```text
+Phase 809 找到的 head/channel unit 可以作为 closure solver 的候选纤维；
+Phase 810 证明小组合确实比单点更能减少 blocker；
+但 qwen3、GLM4、DS7B 三模型均未完成 token closure；
+因此当前路线不能继续停留在局部 patch 扩展，而应转为 blocker-class constrained solver。
+```
+
+当前距离闭合仍较远：
+
+```text
+qwen3 最好还剩 20 个 above token；
+GLM4 最好还剩 19 个 above token；
+DS7B 最好还剩 211 个 above token。
+```
+
+闭合距离不是一个线性数量问题，而是结构问题：
+
+```text
+剩余 blocker 分布在候选值变体、格式词、echo token、空白、标点、高频词和语义竞争词中；
+单一 closer 难以同时处理这些类别。
+```
+
+### 十二、下一步
+
+下一阶段不应继续盲目扩大组合池。
+
+更合理的 Phase 811 是：
+
+```text
+blocker-class constrained closure solver
+```
+
+核心任务：
+
+```text
+1. 把 blocker 按类别拆开；
+2. 对 candidate value、format、echo、punctuation、whitespace、semantic competitor 分别建压制方向；
+3. 学习或搜索最小组合，使每一类 blocker 都下降；
+4. 同时约束 target identity 不丢失；
+5. 检查 new blocker emergence 是否被控制；
+6. 最后再判断是否接近 token closure。
+```
+
+新的目标函数应改成类别约束：
+
+$$
+J(\Delta h)
+=
+\sum_{c\in\mathcal{K}}
+\gamma_c
+|B_c(h+\Delta h)|
++
+\mu|R_{\text{new}}|
++
+\lambda\Omega(\Delta h)
+-
+\eta m_y(h+\Delta h)
+$$
+
+其中：
+
+$$
+B_c(h)
+=
+\{v\in B(h)\mid \operatorname{class}(v)=c\}
+$$
+
+$$
+m_y(h)
+=
+z_y(h)
+-
+\max_{v\neq y}z_v(h)
+$$
+
+如果 Phase 811 仍无法大幅降低各类 blocker，则应进一步转向：
+
+```text
+从局部干预搜索转为全局 causal fiber atlas；
+先画出完整阻塞族和控制族图谱；
+再寻找闭合回路。
+```
+
+## Phase 811: Blocker-Class Constrained Closure Solver 与按类闭合求解验证 [2026-06-30 23:30]
+
+### 一、任务来源
+
+本阶段读取并分析了用户上传的 Phase 809 到 Phase 810 总结，以及关于当前公式容易导致局部循环的分析。上传内容的核心判断是：
+
+```text
+Phase 809/810 是实质进展，不是失败；
+但局部 unit、局部 projection、局部 suppressor 只能作为 closure solver candidate table；
+不能直接当成完整 closure algorithm。
+```
+
+该判断基本正确。Phase 810 已经证明：
+
+```text
+小组合可以减少部分 blocker；
+但 qwen3、GLM4、DS7B 都没有 token closure；
+所以继续找下一个 head/channel 很可能进入局部循环。
+```
+
+因此本阶段继续推进 Phase 811，目标是把 Phase 810 的总 blocker 数求解，升级为 blocker-class constrained closure solver，即按 blocker 类别分别约束的闭合求解器。
+
+### 二、本阶段新增文件
+
+新增正式测试脚本：
+
+```text
+tests/glm5/phase811_blocker_class_constrained_closure_solver.py
+```
+
+新增三轮测试运行脚本：
+
+```text
+tests/glm5/run_phase811_blocker_class_constrained_closure_solver_round.sh
+```
+
+测试结果保存目录：
+
+```text
+tests/result/phase811_blocker_class_constrained_closure_solver/
+```
+
+已完成静态检查：
+
+```text
+python -m py_compile tests/glm5/phase811_blocker_class_constrained_closure_solver.py
+bash -n tests/glm5/run_phase811_blocker_class_constrained_closure_solver_round.sh
+```
+
+### 三、测试设置
+
+本阶段按照要求进行了三轮测试：
+
+```text
+1. smoke：冒烟测试，确认脚本、模型加载、结果格式正常；
+2. main：主测试，控制数据量和组合数，观察主要现象；
+3. confirm：确认测试，对重要结果扩大候选和样本进行复核。
+```
+
+模型顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载设置：
+
+```text
+bf16；
+不使用量化；
+优先尝试 flash_attention_2；
+本地环境缺少 FlashAttention2 包，因此自动回退为 sdpa；
+每个模型测试完成后释放 GPU memory。
+```
+
+这个回退不影响本阶段的逻辑判断，但需要记录：注意力实现不是 flash_attention_2，而是 sdpa。
+
+### 四、测试原理
+
+Phase 810 的目标函数主要关注总 blocker 数：
+
+$$
+B(h)=\{v\neq y\mid z_v(h)>z_y(h)\}
+$$
+
+$$
+C_{\text{token}}(h)=
+\mathbf{1}
+\left[
+|B(h)|=0
+\right]
+$$
+
+但 Phase 810 的负结果说明：
+
+```text
+只减少 blocker 总数还不够；
+因为剩余 blocker 属于不同功能类别。
+```
+
+因此 Phase 811 把 blocker 拆成类别：
+
+$$
+B_c(h)=
+\{v\in B(h)\mid \operatorname{class}(v)=c\}
+$$
+
+其中类别包括：
+
+```text
+candidate_list_or_case_value
+designated_contrast
+semantic_or_lexical_competitor
+echo_token
+high_frequency_or_format
+whitespace_or_newline
+punctuation
+number_or_symbol
+special_token
+other_token
+```
+
+类别加权 blocker 量定义为：
+
+$$
+W_B(h)=
+\sum_{c\in\mathcal{K}}
+\gamma_c |B_c(h)|
+$$
+
+类别覆盖率定义为：
+
+$$
+\operatorname{coverage}(h,h')
+=
+\frac{
+|\{c\mid |B_c(h')|<|B_c(h)|\}|
+}{
+|\{c\mid |B_c(h)|>0\}|
+}
+$$
+
+本阶段使用的新目标函数是：
+
+$$
+J_{\text{class}}(\Delta h)
+=
+\sum_{c\in\mathcal{K}}
+\gamma_c |B_c(h+\Delta h)|
++
+\mu |R_{\text{new}}|
++
+\lambda \Omega(\Delta h)
++
+\rho |\mathcal{K}_{\text{unreduced}}|
+-
+\eta m_y(h+\Delta h)
+-
+\kappa
+\sum_{c\in\mathcal{K}}
+\gamma_c |R_{\text{resolved},c}|
+$$
+
+其中：
+
+$$
+m_y(h)
+=
+z_y(h)-\max_{v\neq y}z_v(h)
+$$
+
+$$
+R_{\text{new}}
+=
+B(h+\Delta h)\setminus B(h)
+$$
+
+$$
+R_{\text{resolved},c}
+=
+B_c(h)\setminus B_c(h+\Delta h)
+$$
+
+$$
+\mathcal{K}_{\text{unreduced}}
+=
+\{c\mid |B_c(h+\Delta h)|\geq |B_c(h)|\}
+$$
+
+严格闭合标准仍然没有改变：
+
+$$
+z_y(h+\Delta h)>z_v(h+\Delta h),
+\quad
+\forall v\neq y
+$$
+
+也就是：
+
+$$
+B(h+\Delta h)=\varnothing
+$$
+
+### 五、Phase 811 与 Phase 810 的区别
+
+Phase 810 的问题是：
+
+```text
+总 above token 数下降，可能只是压低了容易压低的外围 blocker；
+但核心 blocker 类别可能完全没有动。
+```
+
+Phase 811 的改进是：
+
+```text
+不只看 above token 数；
+还看每一类 blocker 是否下降；
+并惩罚没有被压下的 blocker 类别。
+```
+
+所以本阶段不是继续做普通 patch，而是在检查：
+
+```text
+局部候选 unit 是否能形成跨 blocker 类别的闭合控制量。
+```
+
+### 六、冒烟测试结果
+
+冒烟测试结果：
+
+```text
+qwen3：34 个有效行，0 个 token closure；
+GLM4：35 个有效行，0 个 token closure；
+DS7B：28 个有效行，0 个 token closure。
+```
+
+最佳现象：
+
+```text
+qwen3：
+  best = mlp_channel:mlp:L35:u935
+  above = 21
+  class_weighted_delta = -5.75
+  coverage = 0.50
+  unreduced = candidate_list_or_case_value, designated_contrast, punctuation
+
+GLM4：
+  best = identity_anchor:beta0.5
+  above = 95
+  class_weighted_delta = -2.70
+  coverage = 0.143
+  unreduced = candidate_list_or_case_value, designated_contrast, echo_token, high_frequency_or_format, punctuation, whitespace_or_newline
+
+DS7B：
+  best = identity_anchor:beta1 + mlp_channel:mlp:L26:u9394
+  above = 341
+  class_weighted_delta = -30.30
+  coverage = 0.444
+  unreduced = candidate_list_or_case_value, designated_contrast, high_frequency_or_format, number_or_symbol, other_token
+```
+
+冒烟测试说明脚本和数据流正常，并且已经出现按类压制现象。
+
+### 七、主测试结果
+
+主测试结果：
+
+```text
+qwen3：268 个有效行，0 个 token closure；
+GLM4：268 个有效行，0 个 token closure；
+DS7B：264 个有效行，0 个 token closure。
+```
+
+qwen3 最佳行：
+
+```text
+case = plant:oak:grows_on_tree
+combo = mlp_channel:mlp:L35:u935 + attention_head:attn:L35:u0
+above = 20
+class_weighted_delta = -7.85
+coverage = 0.667
+unreduced = candidate_list_or_case_value, designated_contrast
+label = class_balanced_reducer_no_closure
+```
+
+GLM4 最佳行：
+
+```text
+case = plant:wheat:edible
+combo = mlp_channel:mlp:L38:u12913
+above = 19
+class_weighted_delta = 0.0
+coverage = 0.0
+unreduced = candidate_list_or_case_value, designated_contrast, echo_token, high_frequency_or_format, punctuation, semantic_or_lexical_competitor, whitespace_or_newline
+label = class_mixed_or_neutral
+```
+
+DS7B 最佳行：
+
+```text
+case = abstract:justice:category
+combo = identity_anchor:beta1 + identity_anchor:beta0.5
+above = 217
+class_weighted_delta = -24.20
+coverage = 0.60
+unreduced = designated_contrast, high_frequency_or_format, number_or_symbol, special_token
+label = class_balanced_reducer_no_closure
+```
+
+主测试的关键事实：
+
+```text
+qwen3 的外围类别被压下，但 candidate/value 变体和 designated contrast 没有压下；
+DS7B 可以大幅减少部分类别，但仍有大量 above token；
+GLM4 在本任务上没有形成稳定的按类压制结构。
+```
+
+### 八、确认测试结果
+
+确认测试扩大了 qwen3 的 case 数和候选组合，结果仍然一致：
+
+```text
+qwen3：618 个有效行，0 个 token closure；
+GLM4：412 个有效行，0 个 token closure；
+DS7B：408 个有效行，0 个 token closure。
+```
+
+qwen3 确认轮最佳行：
+
+```text
+case = plant:oak:grows_on_tree
+combo = mlp_channel:mlp:L35:u935 + attention_head:attn:L35:u0
+above = 20
+class_weighted_delta = -7.85
+coverage = 0.667
+reduced = echo_token, high_frequency_or_format, punctuation, whitespace_or_newline
+unreduced = candidate_list_or_case_value, designated_contrast
+label = class_balanced_reducer_no_closure
+```
+
+GLM4 确认轮最佳行：
+
+```text
+case = plant:wheat:edible
+combo = mlp_channel:mlp:L38:u12913
+above = 19
+class_weighted_delta = 0.0
+coverage = 0.0
+label = class_mixed_or_neutral
+```
+
+DS7B 确认轮最佳行：
+
+```text
+case = abstract:justice:category
+combo = identity_anchor:beta1 + mlp_channel:mlp:L27:u15791
+above = 211
+class_weighted_delta = -32.25
+coverage = 0.60
+reduced = candidate_list_or_case_value, echo_token, other_token, punctuation, semantic_or_lexical_competitor, whitespace_or_newline
+unreduced = designated_contrast, high_frequency_or_format, number_or_symbol, special_token
+label = class_balanced_reducer_no_closure
+```
+
+确认测试没有推翻主测试，反而强化了主测试结论。
+
+### 九、客观结论
+
+本阶段最重要的正结果：
+
+```text
+1. blocker-class constrained solver 是有效诊断框架；
+2. qwen3 和 DS7B 都能出现 class-balanced reducer；
+3. qwen3 的 L35 MLP channel + L35 attention head 组合稳定压低外围 blocker 类别；
+4. DS7B 的 identity anchor + L27 MLP/channel 或 head 组合能压低多个类别；
+5. 按类别拆解后，闭合失败不再是模糊的“还差几个 token”，而是能定位到具体未解决类别。
+```
+
+本阶段最重要的负结果：
+
+```text
+三模型三轮测试均没有 token closure；
+按类求解虽然减少了部分 blocker 类别，但没有自动消除所有 above token；
+candidate/value surface variant 和 designated contrast 是 qwen3 上最稳定的硬块；
+DS7B 的 format、number、special token 类硬块仍然存在；
+GLM4 当前结果较弱，说明该模型的小模型内部结构可能更粗糙或当前候选表不匹配。
+```
+
+因此最稳妥的判断是：
+
+```text
+Phase 811 是实质进展，但不是闭合阶段。
+它把问题从“寻找有用 patch”推进到“识别未闭合 blocker 类别”。
+```
+
+### 十、对上传理论的审视
+
+上传内容认为当前公式如果继续当局部评分公式，会导致循环。这个判断正确。
+
+原因是：
+
+```text
+局部 suppressor 可以压低一类 blocker；
+但可能释放或保留另一类 blocker；
+因此局部加法公式只能做诊断，不能保证闭合。
+```
+
+Phase 811 进一步验证了这个判断：
+
+```text
+qwen3 可以压低 echo、format、punctuation、whitespace；
+但 candidate/value 和 designated contrast 仍然不动；
+DS7B 可以压低 semantic competitor、echo、punctuation、whitespace；
+但 high-frequency、number、special、contrast 仍然不动。
+```
+
+这说明：
+
+```text
+当前公式已足够把失败分解成类别；
+但还没有成为能自动生成闭合控制量的动力学公式。
+```
+
+### 十一、当前理论进展
+
+当前语言编码机制研究从早期路线：
+
+```text
+找概念方向 -> 找 head/channel -> 做局部 patch
+```
+
+推进到：
+
+```text
+全词表竞争场 -> blocker 类别分解 -> candidate control fiber -> closure solver
+```
+
+最新更合理的闭合理论可以写成：
+
+$$
+h_{\text{close}}
+=
+h
++
+\Delta h_{\text{target}}
++
+\Delta h_{\text{identity}}
++
+\Delta h_{\text{class-control}}
++
+\Delta h_{\text{readout}}
+$$
+
+其中：
+
+$$
+\Delta h_{\text{class-control}}
+=
+\sum_{c\in\mathcal{K}}
+\Delta h_c
+$$
+
+每个类别控制量都必须满足：
+
+$$
+|B_c(h_{\text{close}})|<|B_c(h)|
+$$
+
+但完整闭合必须满足更强条件：
+
+$$
+\forall c\in\mathcal{K},
+\quad
+|B_c(h_{\text{close}})|=0
+$$
+
+也就是：
+
+$$
+B(h_{\text{close}})=\varnothing
+$$
+
+本阶段说明，现有控制量只满足弱条件：
+
+$$
+\exists c,
+\quad
+|B_c(h_{\text{close}})|<|B_c(h)|
+$$
+
+但尚未满足强条件。
+
+### 十二、问题和硬伤
+
+第一，candidate/value surface variant 还没有解决。
+
+```text
+例如 qwen3 中 " yes"、" Yes"、"Yes"、"YES"、" no" 等表面形式仍然高于目标 token；
+这说明 target identity 与 token surface identity 没有统一。
+```
+
+第二，designated contrast 没有被稳定压下。
+
+```text
+对二选一任务而言，contrast token 往往不是普通噪声；
+它可能是同一候选集结构中的镜像分支。
+```
+
+第三，按类压制仍然不是动力学闭合。
+
+```text
+当前求解器可以给每个类别打分；
+但还没有学到“如何同时压低所有类别又不损伤目标”的全局控制律。
+```
+
+第四，小模型偏差必须谨慎看待。
+
+```text
+qwen3、GLM4、DS7B 都是当前测试中的小模型；
+内部结构可能粗糙、冗余或偏置较大；
+因此局部 hard blocker 可能既包含真实语言机制，也包含小模型训练不足和结构简化造成的伪硬块。
+```
+
+第五，当前候选空间仍来自 Phase 809/810，不是全局因果纤维图谱。
+
+```text
+所以 Phase 811 的失败不能说明闭合不存在；
+只能说明当前候选表不足以完成闭合。
+```
+
+### 十三、阶段结论
+
+Phase 811 的结论是：
+
+```text
+blocker-class constrained solver 是正确方向；
+它显著提高了解释力；
+但它仍然只是诊断型和半求解型工具；
+尚未达到 token closure。
+```
+
+当前与闭合的距离：
+
+```text
+qwen3：最好仍剩 20 个 above token；
+GLM4：最好仍剩 19 个 above token，但几乎没有类别压制；
+DS7B：最好仍剩 211 个 above token。
+```
+
+因此闭合距离不是简单的数据量问题，而是机制缺口：
+
+```text
+需要专门解决 target surface identity、candidate/value variants、designated contrast 和 readout field reshaping。
+```
+
+### 十四、下一阶段任务
+
+Phase 812 应该继续处于同一个大阶段：
+
+```text
+从局部 patch 搜索转向闭合求解器和因果纤维图谱。
+```
+
+但 Phase 812 不应再盲目扩大组合池，而应专门攻击 Phase 811 暴露的硬块。
+
+建议标题：
+
+```text
+Phase 812: Candidate-Contrast Identity Closure Solver
+```
+
+核心目标：
+
+```text
+1. 专门建模 candidate_list_or_case_value 类 blocker；
+2. 专门建模 designated_contrast 类 blocker；
+3. 区分正确答案的 surface variant 与真正错误候选；
+4. 把 target identity 从单 token 提升为 answer identity equivalence class；
+5. 先判断是否能完成 answer-class closure；
+6. 再判断是否能收缩到 strict token closure。
+```
+
+新的闭合标准应分两层：
+
+答案类闭合：
+
+$$
+C_{\text{answer-class}}
+=
+\mathbf{1}
+\left[
+\max_{v\in E(y)}z_v
+>
+\max_{u\notin E(y)}z_u
+\right]
+$$
+
+严格词元闭合：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y>\max_{v\neq y}z_v
+\right]
+$$
+
+其中：
+
+$$
+E(y)
+=
+\{v\mid v \text{ is a surface variant of answer } y\}
+$$
+
+也就是说，下一阶段必须先回答：
+
+```text
+模型失败是因为没有选中正确答案语义？
+还是因为正确答案被多个 surface token 分裂，导致 strict token closure 难以成立？
+```
+
+如果答案类闭合能成立而严格词元闭合不成立，说明当前最大问题是 tokenizer/readout surface fragmentation。  
+如果答案类闭合也不能成立，说明还缺少更深的语义到读出场的控制纤维。
+
+### 十五、通俗总结
+
+这一步不是“又找了一个补丁”，而是把问题拆清楚了：
+
+```text
+有些 blocker 像格式词、空白、标点、echo token，是可以被当前候选组合压下去的；
+但有些 blocker 像候选值变体、大小写/空格版本、对立答案，是更硬的结构。
+```
+
+所以当前结论不是“无法闭合”，而是：
+
+```text
+不能只用局部 patch 闭合；
+必须先解决答案身份和词元表面形式分裂问题；
+再进入真正的全词表闭合。
+```
+
+## Phase 812: Candidate-Contrast Identity Closure Solver（候选-对比身份闭合求解器） [2026-07-01 08:39]
+
+### 一、任务来源和总体判断
+
+本阶段读取并复核了 Phase 811 的结论。附件中关于 Phase 811 的判断基本正确：Phase 811 是实质进展，但不是闭合阶段。它证明 blocker（阻塞者）不能继续被当成一个粗粒度集合处理，而必须按类别拆开；同时也暴露出最硬的两类 blocker（阻塞者）：
+
+```text
+1. candidate/value surface variants（候选值和答案表面形式变体）
+2. designated contrast（指定对立答案）
+```
+
+更准确地说，Phase 811 的硬伤不是“没有找到更强 patch（补丁）”，而是评价口径仍然把严格 target token（目标词元）当成唯一正确答案。Phase 812 因此把闭合标准拆成两层：
+
+```text
+第一层：answer-class closure（答案类闭合）
+第二层：strict token closure（严格词元闭合）
+```
+
+本阶段没有直接继续扩大局部 patch（补丁）池，而是编写了新的跨模型脚本，把 yes/no 等答案的多个 surface token（表面词元）合并成 answer equivalence class（答案等价类），再判断模型到底没有选中正确答案，还是正确答案已经胜出但被 tokenizer/readout surface fragmentation（分词器/读出表面碎片化）分裂。
+
+### 二、测试脚本和运行方式
+
+新增脚本：
+
+```text
+tests/glm5/phase812_candidate_contrast_identity_closure_solver.py
+tests/glm5/run_phase812_candidate_contrast_identity_closure_solver_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase812_candidate_contrast_identity_closure_solver/
+```
+
+运行了三轮：
+
+```text
+smoke（冒烟测试）
+main（主测试）
+confirm（确认测试）
+```
+
+三种模型按顺序运行：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+加载方式：
+
+```text
+bf16（bfloat16）
+quantization=off（不使用量化）
+flash_attention_2 优先尝试，但本机缺少 FlashAttention2 包，自动回退到 sdpa
+```
+
+脚本验证：
+
+```text
+python -m py_compile tests/glm5/phase812_candidate_contrast_identity_closure_solver.py
+bash -n tests/glm5/run_phase812_candidate_contrast_identity_closure_solver_round.sh
+```
+
+两项均通过。
+
+### 三、测试原理
+
+Phase 812 的核心不是继续问：
+
+```text
+target token（目标词元）是否超过所有词元？
+```
+
+而是先问：
+
+```text
+正确答案的等价词元集合是否已经超过所有非答案词元？
+```
+
+定义答案等价类：
+
+$$
+E(y)=\{v \mid \operatorname{norm}(\operatorname{text}(v))\in V(y)\}
+$$
+
+其中：
+
+$$
+V(y)=\{y,\operatorname{lower}(y),\operatorname{upper}(y),\operatorname{title}(y),\text{leading-space variants}\}
+$$
+
+答案类最强 logit（对数几率）：
+
+$$
+z_{E(y)}=\max_{v\in E(y)}z_v
+$$
+
+答案类闭合：
+
+$$
+C_{\text{answer-class}}
+=
+\mathbf{1}
+\left[
+z_{E(y)}
+>
+\max_{u\notin E(y)}z_u
+\right]
+$$
+
+严格词元闭合：
+
+$$
+C_{\text{token}}
+=
+\mathbf{1}
+\left[
+z_y>\max_{v\neq y}z_v
+\right]
+$$
+
+答案类上方的非答案数量：
+
+$$
+B_{\text{answer}}
+=
+\left|
+\{u\notin E(y)\mid z_u>z_{E(y)}\}
+\right|
+$$
+
+答案表面碎片数量：
+
+$$
+F_{\text{surface}}
+=
+\left|
+\{v\in E(y),v\neq y\mid z_v>z_y\}
+\right|
+$$
+
+对立答案等价类：
+
+$$
+E(c)=\{v \mid \operatorname{norm}(\operatorname{text}(v))\in V(c)\}
+$$
+
+对立答案是否被答案类压住：
+
+$$
+C_{\text{contrast-clear}}
+=
+\mathbf{1}
+\left[
+z_{E(y)}
+\ge
+\max_{u\in E(c)}z_u
+\right]
+$$
+
+本阶段的目标函数不再只惩罚全词表上方词元数量，而是优先惩罚答案类未闭合、对立答案未压制、答案表面碎片化：
+
+$$
+J_{812}
+=
+w_a B_{\text{answer}}
++w_c B_{\text{contrast}}
++w_s F_{\text{surface}}
++\gamma B_{\text{class-weighted}}
++\lambda\Omega
+$$
+
+其中：
+
+$$
+B_{\text{contrast}}
+=
+\left|
+\{u\in E(c)\mid z_u>z_{E(y)}\}
+\right|
+$$
+
+### 四、三轮客观结果
+
+#### 1. smoke（冒烟测试）
+
+```text
+qwen3:      valid=28,  answer_class_closure=28, token_closure=0
+GLM4:       valid=35,  answer_class_closure=35, token_closure=0
+DS7B:       valid=28,  answer_class_closure=28, token_closure=0
+```
+
+冒烟测试说明脚本和新指标正常，且三个模型都出现了同一种结构：
+
+```text
+answer-class closure 成立；
+strict token closure 不成立；
+失败原因主要是 surface fragmentation。
+```
+
+典型例子：
+
+```text
+answer = yes
+E(yes) = {" Yes", "Yes", "yes", " yes", "YES", " YES"}
+```
+
+模型最强的答案词元经常是：
+
+```text
+" yes" 或 " Yes"
+```
+
+而不是脚本指定的严格 target token（目标词元）。
+
+#### 2. main（主测试）
+
+```text
+qwen3:
+  valid=268
+  answer_class_closure=178
+  token_closure=0
+  best row: plant:oak:grows_on_tree
+  best combo: mlp_channel:mlp:L35:u935 + attention_head:attn:L35:u0
+  after_full_above_count=20
+  after_answer_class_above_count=0
+  surface_frag=4
+
+GLM4:
+  valid=268
+  answer_class_closure=268
+  token_closure=0
+  best row: plant:wheat:edible
+  best item: attention_head:attn:L29:u28
+  after_full_above_count=19
+  after_answer_class_above_count=0
+  surface_frag=4
+
+DS7B:
+  valid=264
+  answer_class_closure=5
+  token_closure=0
+  best row: tool:hammer:edible
+  best combo: mlp_channel:mlp:L27:u2295 + mlp_channel:mlp:L27:u16230
+  after_full_above_count=312
+  after_answer_class_above_count=0
+  surface_frag=4
+```
+
+#### 3. confirm（确认测试）
+
+```text
+qwen3:
+  valid=618
+  answer_class_closure=384
+  token_closure=0
+
+GLM4:
+  valid=412
+  answer_class_closure=412
+  token_closure=0
+
+DS7B:
+  valid=408
+  answer_class_closure=1
+  token_closure=0
+```
+
+确认测试强化了主结论：
+
+```text
+1. GLM4 的答案类闭合非常稳定；
+2. qwen3 的答案类闭合较稳定，但不是全覆盖；
+3. DS7B 只有极少数组合能达到答案类闭合；
+4. 三个模型都没有严格 token closure；
+5. strict token closure 失败的主要结构不是简单语义失败，而是正确答案的 surface variant（表面变体）压过指定 target token（目标词元）。
+```
+
+### 五、这是否支持附件判断
+
+支持，但需要收紧。
+
+附件说 Phase 811 是实质进展、不是闭合阶段，这是正确的。Phase 812 进一步说明：
+
+```text
+Phase 811 看到的一部分 candidate/value blocker，
+其实不是错误竞争者，
+而是正确答案的表面形式变体。
+```
+
+因此，过去把所有 target token 上方词元都当作 blocker（阻塞者）是不精确的。更严格的分解应该是：
+
+```text
+1. true non-answer blockers（真正非答案阻塞者）
+2. answer surface variants（正确答案表面变体）
+3. contrast answer variants（对立答案变体）
+4. format/echo/whitespace/punctuation blockers（格式、回声、空白、标点阻塞者）
+```
+
+这说明当前研究没有原地打转，而是在修正闭合标准本身。
+
+### 六、理论进展
+
+Phase 812 对理论最重要的贡献是：语言生成闭合不能直接等同于单一 token（词元）闭合。
+
+更准确的生成闭合应该有三层：
+
+```text
+1. answer-class closure（答案类闭合）
+2. canonical-surface closure（规范表面形式闭合）
+3. strict token closure（严格词元闭合）
+```
+
+对应关系：
+
+$$
+C_{\text{answer-class}}
+\Rightarrow
+C_{\text{canonical-surface}}
+\Rightarrow
+C_{\text{token}}
+$$
+
+但反过来不一定成立。Phase 812 说明很多时候第一层已经成立，而第三层不成立。
+
+这对“条件化相对状态-生成场闭合理论”的改进是：
+
+$$
+h_L
+=
+h_0
++\sum_{\ell=1}^{L}F_{\ell}(h_{\ell-1},c)
+$$
+
+读出场：
+
+$$
+z
+=
+W_U \cdot \operatorname{LN}(h_L)
+$$
+
+过去主要看：
+
+$$
+z_y-\max_{v\neq y}z_v
+$$
+
+现在必须先看：
+
+$$
+\max_{v\in E(y)}z_v
+-
+\max_{u\notin E(y)}z_u
+$$
+
+也就是说，语言编码机制中的“答案身份”不是单 token（词元），而是一个由 tokenizer（分词器）、大小写、空格、格式语境共同形成的局部等价类。
+
+### 七、问题、硬伤和瓶颈
+
+1. 答案等价类目前是启发式构造。
+
+当前只处理了大小写、前导空格、简单单 token（词元）变体，还没有覆盖：
+
+```text
+同义词
+多词答案
+缩写
+跨语言变体
+标点包裹变体
+上下文依赖别名
+```
+
+所以 answer-class closure（答案类闭合）不是最终语义闭合，只是比 strict token closure（严格词元闭合）更合理的一层。
+
+2. designated_contrast（指定对立答案）分类在旧指标里可能误标。
+
+在某些模型中，旧 blocker class（阻塞者类别）会把正确答案表面变体错误地归入 designated_contrast（指定对立答案）附近的竞争结构。Phase 812 用 contrast equivalence class（对立答案等价类）修正了一部分，但还没有完全解决所有读出标签误分问题。
+
+3. DS7B 的结构明显更粗糙。
+
+DS7B 在 main（主测试）和 confirm（确认测试）中 answer-class closure（答案类闭合）比例很低：
+
+```text
+main:    5 / 264
+confirm: 1 / 408
+```
+
+这说明小模型内部的读出场可能更碎、更噪、更依赖格式路线，不能直接把 DS7B 的失败当作真实语言编码机制的失败。它更可能反映：
+
+```text
+小模型容量不足
+读出场分布粗糙
+答案等价类和格式竞争混在一起
+局部 patch 难以稳定控制全词表
+```
+
+4. strict token closure（严格词元闭合）仍然没有完成。
+
+三轮测试中：
+
+```text
+token_closure = 0
+```
+
+这说明 Phase 812 不是最终闭合，而是把闭合失败的位置定位得更清楚：
+
+```text
+不是只有语义选择问题；
+还存在 canonical token selection（规范词元选择）问题。
+```
+
+### 八、当前是否接近完整语言编码机制
+
+本阶段提升了解释力，不是普通局部拟合。
+
+原因是它没有只提高 target token（目标词元）的 logit（对数几率），而是把生成失败拆成：
+
+```text
+1. 答案类是否胜出；
+2. 对立答案是否被压住；
+3. 正确答案内部表面形式如何竞争；
+4. 严格目标词元为何仍然落后。
+```
+
+但是，它还没有完成完整语言编码机制。当前最接近的结论是：
+
+```text
+语言生成不是单一语义向量直接读出一个 token；
+而是条件化残差轨迹把多个答案等价类、格式路线、回声路线、候选值路线推入同一个全词表竞争场；
+最后由读出几何决定答案类、表面形式、严格词元的多层闭合。
+```
+
+### 九、闭合标准重新定义
+
+当前阶段建议把闭合标准改为三层：
+
+第一层：答案身份闭合。
+
+$$
+\max_{v\in E(y)}z_v
+>
+\max_{u\notin E(y)}z_u
+$$
+
+第二层：规范表面形式闭合。
+
+$$
+z_{\hat{y}}
+>
+\max_{v\in E(y),v\neq \hat{y}}z_v
+$$
+
+其中：
+
+$$
+\hat{y}
+=
+\operatorname{Canonical}(y,c)
+$$
+
+第三层：严格词元闭合。
+
+$$
+z_y>\max_{v\neq y}z_v
+$$
+
+Phase 812 完成的是第一层诊断，尚未完成第二层和第三层。
+
+### 十、下一阶段任务
+
+下一阶段仍然属于同一个大阶段：从局部 patch（补丁）转向全词表闭合机制。但它已经是一个新的子目标，不应该继续盲目扩大 Phase 812 的组合池，而应该专门解决规范表面形式选择。
+
+建议：
+
+```text
+Phase 813: Canonical Surface Token Selector（规范表面词元选择器）
+```
+
+核心任务：
+
+```text
+1. 保持 answer-class closure（答案类闭合）；
+2. 在 E(y) 内部压低非规范表面变体；
+3. 找到 canonical token（规范词元）为什么输给 leading-space/capitalized variants（前导空格/大小写变体）；
+4. 判断 canonical selection（规范选择）是 tokenizer/readout 几何问题，还是上游残差轨迹问题；
+5. 再重新评估 strict token closure（严格词元闭合）。
+```
+
+建议目标函数：
+
+$$
+J_{813}
+=
+\left|
+\{v\in E(y),v\neq \hat{y}\mid z_v>z_{\hat{y}}\}
+\right|
++\alpha
+\left|
+\{u\notin E(y)\mid z_u>z_{E(y)}\}
+\right|
++\beta B_{\text{new}}
++\lambda\Omega
+$$
+
+如果 Phase 813 仍然不能把 answer-class closure（答案类闭合）推进到 canonical token closure（规范词元闭合），则说明当前小模型上的单点闭合路线已经接近边际收益递减区，需要转为更全局的读出几何图谱和 answer-equivalence manifold（答案等价流形）建模。
+
+### 十一、通俗总结
+
+Phase 812 证明了一件很关键的事：
+
+```text
+很多看起来挡住正确答案的词，其实不是错答案，
+而是正确答案的不同写法。
+```
+
+比如目标是：
+
+```text
+yes
+```
+
+但模型更想输出：
+
+```text
+" yes"、" Yes"、"YES"
+```
+
+那么严格说 target token（目标词元）没有闭合；但从答案意义上看，模型已经把答案类推到了最前面。
+
+所以当前研究距离最终闭合还有距离，但问题更清楚了：
+
+```text
+先完成“答案类闭合”；
+再完成“规范表面形式闭合”；
+最后才是“严格词元闭合”。
+```
+
+这一步不是最终胜利，但它把闭合失败从“全词表黑箱竞争”拆成了可以继续研究的三层结构。
+
+## Phase 813: canonical surface token selector 实测闭合审计 [2026-07-01 09:40]
+
+### 一、任务来源
+
+本阶段接续 Phase 812 的闭合标准修正。Phase 812 的核心判断是正确的：
+
+```text
+很多 strict token closure（严格词元闭合）失败，
+不是语义答案错了，
+而是正确答案在 tokenizer/readout surface（分词器/读出表面）中分裂成多个 surface variant（表面变体）。
+```
+
+因此本阶段不再只问：
+
+```text
+target token（目标词元）是否成为全词表第一？
+```
+
+而是专门测试：
+
+```text
+在已经尽量保持 answer-class closure（答案类闭合）的前提下，
+能否把正确答案等价类内部的 canonical surface token（规范表面词元）推到最高？
+```
+
+这一步属于同一个阶段性目标：把 token closure（词元闭合）拆成更细的可观测闭合层级。
+
+### 二、脚本和结果位置
+
+脚本：
+
+```text
+tests/glm5/phase813_canonical_surface_token_selector.py
+tests/glm5/run_phase813_canonical_surface_token_selector_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase813_canonical_surface_token_selector/smoke/
+tests/result/phase813_canonical_surface_token_selector/main/
+tests/result/phase813_canonical_surface_token_selector/confirm/
+```
+
+静态校验：
+
+```text
+python -m py_compile tests/glm5/phase813_canonical_surface_token_selector.py
+bash -n tests/glm5/run_phase813_canonical_surface_token_selector_round.sh
+```
+
+两项均通过。
+
+注意：测试时尝试开启 flash_attention_2（FlashAttention2，加速注意力实现），但本地环境没有安装对应包，因此自动回退到 sdpa（scaled dot product attention，缩放点积注意力）。未使用量化方案，三个模型按 qwen3、GLM4、DS7B 顺序依次测试，避免显存叠加。
+
+### 三、测试原理
+
+定义答案等价类：
+
+$$
+E(y)
+=
+\{v\mid \operatorname{norm}(\operatorname{text}(v))\in V(y)\}
+$$
+
+其中 \(V(y)\) 包括原始写法、小写、大写、首字母大写和带前导空格的常见变体。
+
+答案类最大 logit（对数几率）：
+
+$$
+z_{E(y)}
+=
+\max_{v\in E(y)}z_v
+$$
+
+答案类闭合：
+
+$$
+C_{\text{answer}}
+=
+\mathbf{1}
+\left[
+z_{E(y)}
+>
+\max_{u\notin E(y)}z_u
+\right]
+$$
+
+规范表面词元记为 \(\hat{y}\)。本阶段暂时把它设为原始 target token（目标词元）。
+
+规范表面词元闭合：
+
+$$
+C_{\text{canonical}}
+=
+\mathbf{1}
+\left[
+z_{\hat{y}}
+>
+\max_{v\in E(y), v\neq \hat{y}}z_v
+\right]
+$$
+
+严格有效规范闭合必须同时满足：
+
+$$
+C_{\text{valid-canonical}}
+=
+C_{\text{answer}}
+\cdot
+C_{\text{canonical}}
+$$
+
+也就是说，不能为了让某个表面形式胜出而丢掉整个答案类闭合。
+
+表面碎片化数量：
+
+$$
+F_{\text{surface}}
+=
+\left|
+\{v\in E(y),v\neq \hat{y}\mid z_v>z_{\hat{y}}\}
+\right|
+$$
+
+目标函数核心为：
+
+$$
+J_{813}
+=
+w_sF_{\text{surface}}
++
+w_aB_{\text{answer}}
++
+w_p(1-C_{\text{answer}})
+-
+w_m
+\left(
+z_{\hat{y}}-\max_{v\in E(y),v\neq \hat{y}}z_v
+\right)
++
+\Omega
+$$
+
+其中 \(B_{\text{answer}}\) 是压过答案类的非答案词元数量，\(\Omega\) 是新 blocker（阻塞者）和全词表副作用惩罚。
+
+### 四、三轮测试结果
+
+#### 1. 冒烟测试
+
+```text
+qwen3:
+valid rows = 38
+answer-class closure rows = 38
+canonical surface closure rows = 0
+strict token closure rows = 0
+
+GLM4:
+valid rows = 39
+answer-class closure rows = 39
+canonical surface closure rows = 0
+strict token closure rows = 0
+
+DS7B:
+valid rows = 29
+answer-class closure rows = 27
+canonical surface closure rows = 0
+strict token closure rows = 0
+```
+
+冒烟测试说明脚本和数据正常，同时初步暴露出：答案类闭合可以稳定出现，但规范表面词元闭合没有出现。
+
+#### 2. 主测试
+
+```text
+qwen3:
+valid rows = 280
+answer-class closure rows = 199
+canonical surface closure rows = 0
+strict token closure rows = 0
+
+GLM4:
+valid rows = 280
+answer-class closure rows = 280
+canonical surface closure rows = 0
+strict token closure rows = 0
+
+DS7B:
+valid rows = 276
+answer-class closure rows = 3
+canonical surface closure rows = 0
+strict token closure rows = 0
+```
+
+主测试的核心现象：
+
+```text
+answer-class closure（答案类闭合）与 canonical surface closure（规范表面词元闭合）明显分离。
+```
+
+qwen3 和 GLM4 能大量保持答案类闭合，但无法把指定 target token（目标词元）推成答案类内部第一。
+
+DS7B 更不稳定，大量组合会丢失答案类闭合，说明小模型内部结构粗糙、读出竞争强、局部 patch（补丁）副作用更大。
+
+#### 3. 确认测试
+
+确认测试扩大了 identity beta（恒等锚权重）和组合范围。
+
+```text
+qwen3:
+valid rows = 642
+answer-class closure rows = 487
+canonical surface closure rows = 0
+strict token closure rows = 0
+
+GLM4:
+valid rows = 428
+answer-class closure rows = 428
+canonical surface closure rows = 0
+strict token closure rows = 0
+
+DS7B:
+valid rows = 424
+answer-class closure rows = 1
+canonical surface closure rows = 1
+strict token closure rows = 0
+```
+
+DS7B 的 1 行 canonical surface closure（规范表面词元闭合）不是有效闭合，因为该行的 answer-class closure（答案类闭合）为 false（假）。也就是说，它只是让某个表面词元在答案类内部胜出，却没有让答案类胜过全词表非答案词元。
+
+按严格有效标准：
+
+$$
+C_{\text{valid-canonical}}
+=
+C_{\text{answer}}
+\cdot
+C_{\text{canonical}}
+$$
+
+三轮、三模型都没有得到有效规范表面闭合。
+
+### 五、关键客观现象
+
+#### 1. yes/no（是/否）类答案存在稳定表面偏置
+
+GLM4 在 wheat edible（小麦是否可食用）样本中，答案类已经闭合，但模型稳定偏向：
+
+```text
+" Yes"
+" yes"
+```
+
+而不是原始目标：
+
+```text
+yes
+```
+
+这说明很多失败不是语义失败，而是 prompt-conditioned surface prior（提示条件下的表面先验）问题。
+
+#### 2. 多词或非单词答案暴露 target token 定义硬伤
+
+qwen3 的 chair category（椅子的类别）样本中，目标答案是：
+
+```text
+furniture
+```
+
+但当前 canonical token（规范词元）被脚本取成：
+
+```text
+f
+```
+
+而答案等价类中真正自然的候选是：
+
+```text
+" furniture"
+" Furniture"
+```
+
+这说明当前把“原始 target token”当作 canonical token（规范词元）有明显硬伤。对于多 token（多词元）答案，严格单词元目标本身可能不是有效的答案单位。
+
+#### 3. DS7B 的不稳定性更强
+
+DS7B 在主测试和确认测试中，answer-class closure（答案类闭合）明显更少，且更容易出现：
+
+```text
+answer_class_reducer_no_closure（答案类减少但不闭合）
+canonical_surface_reducer_answer_not_closed（表面形式减少但答案类不闭合）
+class_new_blocker_or_deformer（新阻塞者或变形器）
+```
+
+这符合“小模型内部结构可能更粗糙”的风险判断：小模型可以提供机制线索，但不能直接当成完整语言编码机制。
+
+### 六、对 Phase 812 上传判断的审视
+
+Phase 812 的判断基本正确，而且被 Phase 813 加强：
+
+```text
+answer-class closure（答案类闭合）
+canonical surface closure（规范表面闭合）
+strict token closure（严格词元闭合）
+确实不是同一件事。
+```
+
+但 Phase 813 也指出 Phase 812 后续路线里存在一个更细硬伤：
+
+```text
+canonical token（规范词元）不能简单等于原始 target token（目标词元）。
+```
+
+对于 yes/no（是/否）问题，模型可能天然更偏向带前导空格或大写形式。
+
+对于 furniture（家具）这类答案，原始 target token 甚至可能只是一个子词元，不是完整答案表面形式。
+
+所以，Phase 812 的三层闭合框架正确，但第二层“规范表面形式”的定义还必须重写。
+
+### 七、当前进展
+
+本阶段不是 token closure（词元闭合）成功阶段，而是闭合标准进一步清晰化阶段。
+
+已经确认：
+
+```text
+1. 答案类闭合可以大量出现；
+2. 规范表面词元闭合不能靠当前局部组合稳定得到；
+3. 严格词元闭合仍然为 0；
+4. 单点 patch（补丁）继续扩大，很可能只会在错误的 canonical token（规范词元）定义上打转；
+5. 下一步必须先修正“答案单位”的定义。
+```
+
+这说明当前研究仍在提升解释力，不是单纯局部拟合。但如果继续沿当前脚本把目标固定为原始 target token，就会进入边际收益递减区。
+
+### 八、问题和硬伤
+
+#### 1. canonical token（规范词元）定义错误风险
+
+当前脚本把原始 target token 当成规范词元，这对单 token（单词元）答案勉强可用，但对多 token（多词元）答案会出错。
+
+更合理的单位应该是：
+
+```text
+prompt-conditioned answer unit（提示条件下的答案单位）
+```
+
+而不是裸字符串首词元。
+
+#### 2. strict token closure（严格词元闭合）可能不是第一优先闭合目标
+
+如果模型在语义上已经稳定选择 yes（是）答案类，但只是在 " Yes"、" yes"、yes 之间竞争，那么继续强迫 yes 成为 top1（第一名）可能是在研究 tokenizer/readout surface（分词器/读出表面），不是语言语义机制本身。
+
+#### 3. 小模型偏差
+
+小模型可能把真实大模型中更清晰的机制压缩、混叠、错位。特别是 DS7B：
+
+```text
+答案类闭合弱；
+新 blocker（阻塞者）多；
+局部组合副作用强；
+规范表面选择和答案类闭合容易互相破坏。
+```
+
+因此不能把 DS7B 的失败直接解释成真实语言机制不存在，只能说明当前小模型和当前干预口径下没有闭合。
+
+### 九、闭合距离
+
+当前距离最终闭合还很远：
+
+```text
+answer-class closure（答案类闭合）：
+已经在 qwen3 和 GLM4 上大量出现。
+
+canonical surface closure（规范表面闭合）：
+尚未得到有效正结果。
+
+strict token closure（严格词元闭合）：
+仍然为 0。
+```
+
+更准确地说，当前闭合进度不是从 0 直接冲到 token top1（词元第一），而是已经把闭合问题拆成了三段：
+
+```text
+语义答案是否选对；
+答案表面形式是否自然；
+最终词元是否全词表第一。
+```
+
+Phase 813 完成的是第二段问题的边界审计：当前定义下不闭合，而且定义本身有硬伤。
+
+### 十、下一阶段任务
+
+下一阶段仍然属于同一个大阶段：从局部补丁转向全词表闭合机制。但不能继续直接扩大 Phase 813 的搜索空间，必须先修正答案单位。
+
+建议：
+
+```text
+Phase 814: tokenizer-valid answer unit closure（分词器有效答案单位闭合）
+```
+
+核心目标：
+
+```text
+1. 不再把原始 target token 当成唯一 canonical token（规范词元）；
+2. 对每个 prompt（提示）自动选择最自然的 answer unit（答案单位）；
+3. 区分 raw target token（原始目标词元）、leading-space variant（前导空格变体）、capitalized variant（大写变体）、multi-token answer span（多词元答案片段）；
+4. 用新的答案单位重新测试 answer-class closure（答案类闭合）到 surface-unit closure（表面单位闭合）的距离。
+```
+
+可定义提示条件下的自然答案单位：
+
+$$
+\hat{y}_{\text{ctx}}
+=
+\arg\max_{v\in E(y)}
+z_v^{\text{base}}(x)
+$$
+
+其中 \(x\) 是当前 prompt（提示），\(z_v^{\text{base}}(x)\) 是未干预模型在当前提示下对答案变体 \(v\) 的原始 logit（对数几率）。
+
+对应闭合标准：
+
+$$
+C_{\text{unit}}
+=
+\mathbf{1}
+\left[
+z_{\hat{y}_{\text{ctx}}}
+>
+\max_{v\in E(y),v\neq \hat{y}_{\text{ctx}}}z_v
+\right]
+$$
+
+对多词元答案，还需要引入 answer span closure（答案片段闭合）：
+
+$$
+S(y)
+=
+(v_1,v_2,\ldots,v_k)
+$$
+
+$$
+z_{S(y)}
+=
+\sum_{i=1}^{k}
+z_{v_i\mid x,v_{<i}}
+$$
+
+如果 Phase 814 仍然不能在更合理的答案单位上闭合，再转向更全局的 readout geometry atlas（读出几何图谱）和 answer-equivalence manifold（答案等价流形）建模。
+
+### 十一、通俗总结
+
+Phase 813 证明了一件很重要的事：
+
+```text
+模型有时已经知道答案是 yes（是），
+但它更想输出 " Yes" 或 " yes"，
+而不是我们脚本指定的 yes。
+```
+
+更麻烦的是：
+
+```text
+有些答案比如 furniture（家具），
+脚本指定的目标词元竟然可能只是 f，
+这当然不应该被当成完整答案。
+```
+
+所以当前不是简单失败，而是发现了一个更底层的问题：
+
+```text
+在问“模型是否闭合到正确词元”之前，
+必须先问“哪个词元才是这个提示下真正合理的答案单位”。
+```
+
+这一步让研究从“追一个固定 target token（目标词元）”推进到“定义答案单位和读出表面几何”。这是继续破解语言编码机制必须补上的关键环节。
+
+## Phase 814: tokenizer-valid answer unit closure 实测验证 [2026-07-01 10:12]
+
+### 一、任务来源
+
+本阶段接续 Phase 813。上传内容对 Phase 813 的判断基本正确：Phase 813 不是普通 patch（补丁）阶段，而是一次闭合标准重构阶段。它指出原先把 raw target token（原始目标词元）当成唯一 canonical token（规范词元）的做法存在硬伤，特别是在 tokenizer（分词器）下，`yes`、` yes`、` Yes`、`YES` 可能都是同一个答案类的不同表面形式；而更复杂的答案还可能被拆成多个 token（词元）。
+
+因此，本阶段继续完成 Phase 814：不再只看 raw target token 是否第一，而是引入 prompt-conditioned answer unit（提示条件化答案单位），重新测试 answer-class closure（答案类闭合）、answer-unit closure（答案单位闭合）、raw canonical surface closure（原始规范表面闭合）和 strict token closure（严格词元闭合）的区别。
+
+### 二、脚本和结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase814_tokenizer_valid_answer_unit_closure.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase814_tokenizer_valid_answer_unit_closure_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase814_tokenizer_valid_answer_unit_closure/
+```
+
+三轮测试：
+
+```text
+smoke   : 冒烟测试，确认脚本和数据正常。
+main    : 主测试，控制规模但覆盖更多组合。
+confirm : 确认测试，用更大组合池验证关键结论。
+```
+
+加载设置：
+
+```text
+1. 不使用量化。
+2. 优先尝试 flash_attention_2。
+3. 本机缺少 FlashAttention2 包，三个模型均自动回退到 sdpa。
+4. 三个模型依次运行，避免 GPU 内存同时占用。
+```
+
+### 三、测试原理
+
+本阶段先定义 answer equivalence class（答案等价类）：
+
+$$
+E(y)=\{v\mid \operatorname{norm}(v)=\operatorname{norm}(y)\}
+$$
+
+其中 \(y\) 是目标答案文本，\(v\) 是 tokenizer（分词器）词表中的候选词元，\(\operatorname{norm}\) 表示去除大小写、前导空格等表面差异后的归一化。
+
+然后在当前 prompt（提示）和 recipient base state（接收侧基础状态）下，选择 context answer unit（上下文答案单位）：
+
+$$
+\hat{y}_{ctx}
+=
+\arg\max_{v\in E(y)}
+z^{base}_v(x)
+$$
+
+其中 \(z^{base}_v(x)\) 是未干预接收侧在提示 \(x\) 下对词元 \(v\) 的 logit（对数几率）。
+
+answer-class closure（答案类闭合）定义为：
+
+$$
+C_{answer}
+=
+\mathbf{1}
+\left[
+\max_{v\in E(y)}z_v
+>
+\max_{u\notin E(y)}z_u
+\right]
+$$
+
+answer-unit closure（答案单位闭合）定义为：
+
+$$
+C_{unit}
+=
+\mathbf{1}
+\left[
+z_{\hat{y}_{ctx}}
+>
+\max_{v\in E(y),v\neq \hat{y}_{ctx}}z_v
+\right]
+$$
+
+valid answer-unit closure（有效答案单位闭合）要求答案类和答案单位同时成立：
+
+$$
+C_{valid-unit}
+=
+C_{answer}\cdot C_{unit}
+$$
+
+作为对照，仍然保留 raw canonical surface closure（原始规范表面闭合）：
+
+$$
+C_{raw-canon}
+=
+\mathbf{1}
+\left[
+z_{y_{raw}}
+>
+\max_{v\in E(y),v\neq y_{raw}}z_v
+\right]
+$$
+
+strict token closure（严格词元闭合）仍然是最严格标准：
+
+$$
+C_{token}
+=
+\mathbf{1}
+\left[
+z_{y_{raw}}
+>
+\max_{u\neq y_{raw}}z_u
+\right]
+$$
+
+这四个标准形成从宽到严的层级：
+
+```text
+answer-class closure
+→ answer-unit closure
+→ raw canonical surface closure
+→ strict token closure
+```
+
+### 四、三轮客观结果
+
+#### 1. Smoke 轮
+
+| model | valid rows | answer class | answer unit | valid unit | raw canon | strict token |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 29 | 29 | 12 | 12 | 0 | 0 |
+| GLM4 | 39 | 39 | 39 | 39 | 0 | 0 |
+| DS7B | 29 | 27 | 29 | 27 | 0 | 0 |
+
+主要标签：
+
+```text
+qwen3 : answer_unit_closure_no_strict_token = 12
+GLM4  : answer_unit_closure_no_strict_token = 39
+DS7B  : answer_unit_closure_no_strict_token = 27
+```
+
+#### 2. Main 轮
+
+| model | valid rows | answer class | answer unit | valid unit | raw canon | strict token |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 280 | 199 | 70 | 70 | 0 | 0 |
+| GLM4 | 280 | 280 | 208 | 208 | 0 | 0 |
+| DS7B | 276 | 3 | 276 | 3 | 0 | 0 |
+
+主要标签：
+
+```text
+qwen3:
+  answer_unit_closure_no_strict_token = 70
+  answer_class_closure_unit_fragmented = 129
+
+GLM4:
+  answer_unit_closure_no_strict_token = 208
+  answer_class_closure_unit_fragmented = 72
+
+DS7B:
+  answer_unit_closure_answer_not_closed = 273
+  answer_unit_closure_no_strict_token = 3
+```
+
+#### 3. Confirm 轮
+
+| model | valid rows | answer class | answer unit | valid unit | raw canon | strict token |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 642 | 486 | 97 | 97 | 0 | 0 |
+| GLM4 | 428 | 428 | 323 | 323 | 0 | 0 |
+| DS7B | 424 | 1 | 423 | 1 | 1 | 0 |
+
+主要标签：
+
+```text
+qwen3:
+  answer_unit_closure_no_strict_token = 97
+  answer_class_closure_unit_fragmented = 389
+
+GLM4:
+  answer_unit_closure_no_strict_token = 323
+  answer_class_closure_unit_fragmented = 105
+
+DS7B:
+  answer_unit_closure_answer_not_closed = 422
+  answer_unit_closure_no_strict_token = 1
+```
+
+### 五、结果分析
+
+Phase 814 的正结果很明确：
+
+```text
+raw canonical surface closure 几乎始终为 0；
+strict token closure 始终为 0；
+但 answer-unit closure 在 Qwen3 和 GLM4 上大量出现，
+在 smoke 轮 DS7B 上也大量出现。
+```
+
+这说明 Phase 813 上传内容的核心判断是正确的：
+
+```text
+严格 raw token 闭合失败，
+不等于模型没有进入正确答案状态。
+```
+
+更准确地说，模型经常已经进入正确 answer class（答案类），甚至已经选中了提示下最自然的 answer unit（答案单位），但它不选择脚本指定的 raw target token（原始目标词元）。例如：
+
+```text
+目标答案: yes
+raw target token: yes
+context answer unit: " Yes"
+
+目标答案: no
+raw target token: no
+context answer unit: " No"
+```
+
+因此，旧标准会把很多实际已经进入答案表面状态的结果误判为失败。
+
+### 六、关键差异和模型差异
+
+GLM4 的结果最稳定：
+
+```text
+main    : 208 / 280 valid-unit closure
+confirm : 323 / 428 valid-unit closure
+```
+
+Qwen3 是部分稳定：
+
+```text
+main    : 70 / 280 valid-unit closure
+confirm : 97 / 642 valid-unit closure
+```
+
+Qwen3 更多停留在：
+
+```text
+answer_class_closure_unit_fragmented
+```
+
+也就是答案类已经闭合，但答案类内部的不同表面词元仍然分裂。
+
+DS7B 出现强烈异常：
+
+```text
+main    : answer unit = 276 / 276，但 valid unit = 3 / 276
+confirm : answer unit = 423 / 424，但 valid unit = 1 / 424
+```
+
+这说明 DS7B 经常让上下文答案单位在答案类内部胜出，但整个答案类没有压过非答案类全词表竞争者。也就是说：
+
+```text
+DS7B 的表面答案单位选择是稳定的，
+但全词表竞争闭合非常不稳定。
+```
+
+这符合“小模型内部结构可能较粗糙”的风险：它可能有局部表面偏好，但全局读出几何、格式 token（格式词元）、空白 token（空白词元）、echo token（回声词元）和语义竞争者没有被可靠压制。
+
+### 七、理论进展
+
+本阶段把闭合标准从一个固定目标词元，推进到四层标准：
+
+```text
+1. answer-class closure（答案类闭合）
+2. prompt-conditioned answer-unit closure（提示条件化答案单位闭合）
+3. raw canonical surface closure（原始规范表面闭合）
+4. strict token closure（严格词元闭合）
+```
+
+这带来一个重要修正：
+
+```text
+token closure（词元闭合）不是单一标准；
+它至少包含语义答案类、提示表面单位、原始目标词元和全词表竞争四个层级。
+```
+
+因此，完整语言编码机制不能只问：
+
+```text
+正确 token 有没有排第一？
+```
+
+而必须问：
+
+```text
+模型是否进入正确答案类？
+模型是否选中当前提示下合理的答案表面单位？
+答案单位是否压过答案类内部其他变体？
+答案类是否压过全词表其他竞争者？
+```
+
+这让研究从“单 token 成败”推进到“答案等价类与读出表面几何”。
+
+### 八、硬伤和瓶颈
+
+本阶段仍没有完成最终闭合，硬伤很清楚。
+
+第一，context answer unit（上下文答案单位）目前是根据 base logits（基础对数几率）选择的：
+
+$$
+\hat{y}_{ctx}
+=
+\arg\max_{v\in E(y)}
+z^{base}_v(x)
+$$
+
+这可能会继承模型自身的表面偏好，而不是得到真正规范的语言答案单位。它是一个可操作代理，不是最终数学定义。
+
+第二，本阶段仍主要处理单 token answer unit（单词元答案单位）。对于 multi-token answer span（多词元答案片段），仍需要显式建模：
+
+$$
+S(y)=(v_1,v_2,\ldots,v_k)
+$$
+
+$$
+z_{S(y)}
+=
+\sum_{i=1}^{k}
+z_{v_i\mid x,v_{<i}}
+$$
+
+第三，answer-unit closure 不等于全局 token closure。DS7B 已经证明，答案单位可以在答案类内部胜出，但整个答案类仍可能输给空白、格式、语义竞争者。
+
+第四，小模型可能把真实语言机制压缩成粗糙近似结构。因此 DS7B 的异常不能简单解释为理论失败，也不能简单解释为理论成功。它说明：
+
+```text
+小模型里的表面单位选择机制和全词表竞争闭合机制可能严重脱耦。
+```
+
+### 九、闭合距离
+
+当前闭合距离可以这样估计：
+
+```text
+answer-class closure:
+  已经有较强证据，尤其 GLM4 稳定。
+
+answer-unit closure:
+  已经有实测正结果，GLM4 最稳，Qwen3 部分成立，DS7B 局部成立但全局不稳。
+
+raw canonical surface closure:
+  基本失败，说明 raw target token 不是合适闭合标准。
+
+strict token closure:
+  仍未完成。
+```
+
+因此，本阶段不是最终 token closure（词元闭合），但明显提升了解释力。它不是普通 patch（补丁）局部拟合，而是修正了评价标准，把很多“失败”拆成了更细的真实机制状态。
+
+### 十、智能理论角度的关键洞察
+
+语言生成不像是在一个固定概念向量上读出唯一 token，而更像是在多个层级的竞争场中闭合：
+
+```text
+语义答案类
+→ 表面答案单位
+→ tokenizer 词元形态
+→ 全词表竞争
+```
+
+这说明语言编码机制至少包含两套耦合结构：
+
+```text
+1. answer-equivalence manifold（答案等价流形）：
+   负责把 yes / " yes" / " Yes" 等表面变体组织为同一答案类。
+
+2. readout competition field（读出竞争场）：
+   负责让答案类及其表面单位压过全词表中的格式、回声、空白和语义竞争者。
+```
+
+对应的统一表达可以写成：
+
+$$
+h_L(x)
+=
+F_{\theta}(x)
+$$
+
+$$
+z
+=
+W_U h_L(x)
+$$
+
+$$
+\mathcal{A}(y)
+=
+\{v\mid v\sim y\}
+$$
+
+$$
+C_{\text{language}}
+=
+C_{\text{answer}}
+\cdot
+C_{\text{unit}}
+\cdot
+C_{\text{competition}}
+$$
+
+其中：
+
+$$
+C_{\text{competition}}
+=
+\mathbf{1}
+\left[
+\max_{v\in\mathcal{A}(y)}z_v
+>
+\max_{u\notin\mathcal{A}(y)}z_u
+\right]
+$$
+
+这不是最终数学理论，但比单 token logit（单词元对数几率）更接近语言生成的真实闭合结构。
+
+### 十一、下一阶段任务
+
+Phase 815 应该继续处于同一阶段目标：破解 token closure（词元闭合）的标准和机制。因此不需要等待额外确认，下一步应继续推进。
+
+建议 Phase 815：
+
+```text
+Phase 815: multi-token answer-span and contrast-class closure
+```
+
+核心任务：
+
+```text
+1. 从单 token answer unit 扩展到 multi-token answer span。
+2. 对 yes/no 之外的答案建立 tokenizer-valid span。
+3. 同时建模 target answer class 和 contrast answer class。
+4. 不再只看答案单位内部胜出，而是要求：
+   answer span > contrast span > format / whitespace / echo blockers。
+5. 对 DS7B 的异常进行专门审计：
+   answer unit 已闭合但 answer class 未闭合时，究竟是哪类 blocker 压住了答案类。
+```
+
+新的闭合目标应从：
+
+```text
+单个 target token 排第一
+```
+
+改为：
+
+```text
+目标答案片段在答案等价流形中稳定，
+并且目标答案类在全词表竞争场中压过所有非答案路线。
+```
+
+这一步是从 Phase 814 继续走向真正 token closure（词元闭合）的必要阶段。
+
+## Phase 815: answer-span and contrast-class closure 审计 [2026-07-01 10:18]
+
+### 一、任务来源
+
+本阶段接续 Phase 814。Phase 814 已经证明：把 raw target token（原始目标词元）当成唯一闭合目标会误判大量结果。更合理的标准是 prompt-conditioned answer unit（提示条件化答案单位）。
+
+但 Phase 814 仍有两个未完成问题：
+
+```text
+1. answer unit（答案单位）是否真的等价于 answer span（答案片段）？
+2. answer unit 在答案类内部胜出后，contrast class（对比答案类）和全词表 blocker（阻塞者）是否已经被清除？
+```
+
+因此 Phase 815 不重新做模型前向推理，而是读取 Phase 814 的三轮保存结果，做 answer-span proxy（答案片段代理）和 contrast-class closure（对比类闭合）审计。
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase815_answer_span_contrast_closure_audit.py
+```
+
+运行脚本：
+
+```text
+tests/glm5/run_phase815_answer_span_contrast_closure_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase815_answer_span_contrast_closure_audit/
+```
+
+本阶段没有重新加载模型权重，也没有进行新的 patch（补丁）或 forward（前向传播），只加载 tokenizer（分词器）并审计 Phase 814 已保存的 rows（行）。
+
+### 三、测试原理
+
+对目标答案 \(y\)，先构造 surface span variants（表面片段变体）：
+
+$$
+\mathcal{S}(y)
+=
+\left\{
+(v_1,\ldots,v_k)
+\mid
+\operatorname{decode}(v_1,\ldots,v_k)\sim y
+\right\}
+$$
+
+其中 \(\sim\) 表示归一化后语义表面等价，例如：
+
+```text
+yes, " yes", " Yes", YES
+```
+
+理论上，真正的 answer-span score（答案片段分数）应写为：
+
+$$
+Z(S)
+=
+\sum_{i=1}^{k}
+z_{v_i\mid x,v_{<i}}
+$$
+
+但 Phase 814 保存的是下一词元全词表竞争结果，没有保存多步 rollout（展开生成）结果。因此 Phase 815 采用保守的 span proxy closure（答案片段代理闭合）：
+
+$$
+C_{\text{span-proxy}}
+=
+C_{\text{answer}}
+\cdot
+C_{\text{unit}}
+\cdot
+C_{\text{contrast}}
+\cdot
+V_{\text{surface}}
+$$
+
+其中：
+
+$$
+C_{\text{answer}}
+=
+\mathbf{1}
+\left[
+\max_{v\in E(y)}z_v
+>
+\max_{u\notin E(y)}z_u
+\right]
+$$
+
+$$
+C_{\text{unit}}
+=
+\mathbf{1}
+\left[
+z_{\hat{y}_{ctx}}
+>
+\max_{v\in E(y),v\neq \hat{y}_{ctx}}z_v
+\right]
+$$
+
+$$
+C_{\text{contrast}}
+=
+\mathbf{1}
+\left[
+\max_{c\in E(y_{\text{contrast}})}z_c
+\le
+\max_{v\in E(y)}z_v
+\right]
+$$
+
+$$
+V_{\text{surface}}
+=
+\mathbf{1}
+\left[
+\operatorname{norm}(\hat{y}_{ctx})
+=
+\operatorname{norm}(y)
+\right]
+$$
+
+这不是最终多词元闭合，只是回答一个更基础的问题：
+
+```text
+在当前单步读出结果里，
+答案类、答案单位、对比答案类是否已经同时满足？
+```
+
+### 四、客观结果
+
+#### 1. Smoke 轮
+
+| model | rows | span proxy | answer class | answer unit | contrast cleared | raw canon | strict token | unit closed but answer not closed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 29 | 12 | 29 | 12 | 29 | 0 | 0 | 0 |
+| GLM4 | 39 | 39 | 39 | 39 | 39 | 0 | 0 | 0 |
+| DS7B | 29 | 27 | 27 | 29 | 29 | 0 | 0 | 2 |
+
+#### 2. Main 轮
+
+| model | rows | span proxy | answer class | answer unit | contrast cleared | raw canon | strict token | unit closed but answer not closed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 280 | 70 | 199 | 70 | 280 | 0 | 0 | 0 |
+| GLM4 | 280 | 208 | 280 | 208 | 280 | 0 | 0 | 0 |
+| DS7B | 276 | 3 | 3 | 276 | 274 | 0 | 0 | 273 |
+
+#### 3. Confirm 轮
+
+| model | rows | span proxy | answer class | answer unit | contrast cleared | raw canon | strict token | unit closed but answer not closed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 642 | 97 | 486 | 97 | 642 | 0 | 0 | 0 |
+| GLM4 | 428 | 323 | 428 | 323 | 428 | 0 | 0 | 0 |
+| DS7B | 424 | 1 | 1 | 423 | 419 | 1 | 0 | 422 |
+
+多词元情况：
+
+```text
+qwen3 main    : target_has_multi_token_span = 140, target_requires_multi_token_span = 0
+qwen3 confirm : target_has_multi_token_span = 214, target_requires_multi_token_span = 0
+
+DS7B main     : target_has_multi_token_span = 138, target_requires_multi_token_span = 0
+DS7B confirm  : target_has_multi_token_span = 212, target_requires_multi_token_span = 0
+
+GLM4 main/confirm:
+  target_has_multi_token_span = 0
+  target_requires_multi_token_span = 0
+```
+
+这里要特别谨慎：当前数据里没有必须多词元才能表达的目标答案。因此 Phase 815 还没有真正验证 multi-token answer-span closure（多词元答案片段闭合），只是建立了审计标准，并确认了当前 yes/no 类任务仍主要是单词元闭合问题。
+
+### 五、关键发现
+
+第一，GLM4 最稳定：
+
+```text
+main    : 208 / 280 span-proxy closure
+confirm : 323 / 428 span-proxy closure
+```
+
+说明在 GLM4 上，Phase 814 的 answer-unit closure 基本经得住 contrast-class（对比类）审计。它不是简单的答案类内部表面偏好，而是较稳定地同时满足：
+
+```text
+answer class closed
+answer unit closed
+contrast class cleared
+surface valid
+```
+
+第二，Qwen3 的主要瓶颈是 unit fragmentation（答案单位碎裂）：
+
+```text
+main    : answer_closed_unit_fragmented = 129
+confirm : answer_closed_unit_fragmented = 389
+```
+
+这说明 Qwen3 经常已经进入正确 answer class（答案类），但同一答案类内部的表面变体仍在竞争，例如：
+
+```text
+" Yes" vs " yes" vs yes
+```
+
+第三，DS7B 的主要瓶颈不是答案单位内部，而是全词表竞争：
+
+```text
+main    : unit_closed_answer_not_closed = 273
+confirm : unit_closed_answer_not_closed = 422
+```
+
+对应 dominant blockers（主导阻塞者）：
+
+```text
+DS7B main:
+  semantic_or_lexical_competitor = 206
+  echo_token = 63
+  punctuation = 4
+
+DS7B confirm:
+  semantic_or_lexical_competitor = 319
+  echo_token = 103
+```
+
+也就是说，DS7B 中的 context answer unit（上下文答案单位）经常能在答案类内部排第一，但正确答案类整体仍输给大量 semantic / echo blockers（语义 / 回声阻塞者）。这解释了 Phase 814 中 DS7B 的异常：
+
+```text
+DS7B 不是不会选择 " No" 或 " Yes"；
+而是它没有把整个读出竞争场清理到答案类胜出。
+```
+
+### 六、对 Phase 813 判断的再审视
+
+上传内容中关于 Phase 813 的判断基本正确：
+
+```text
+严格 token closure 失败不能直接等价为机制失败；
+必须拆成 answer class、answer unit、canonical surface、strict token 四层。
+```
+
+Phase 814 和 Phase 815 共同证明了这点。但也必须收紧：
+
+```text
+answer unit closure 也不是最终闭合。
+```
+
+因为 DS7B 已经给出反例：
+
+```text
+answer unit closed
+但 answer class not closed
+```
+
+因此最终闭合标准必须同时包含：
+
+```text
+1. 答案类闭合；
+2. 答案单位闭合；
+3. 对比类清除；
+4. 全词表 blocker 清除；
+5. 多词元答案片段的连续生成闭合。
+```
+
+### 七、硬伤和瓶颈
+
+第一，本阶段没有新的模型前向传播，只是 Phase 814 结果的结构化再审计。因此它提升了解释力，但没有新增因果干预证据。
+
+第二，当前数据集主要是 yes/no 任务，没有真正 target_requires_multi_token_span（目标必须多词元片段）的样本。因此本阶段不能声称已经解决 multi-token answer span（多词元答案片段）。
+
+第三，span-proxy closure 仍然只基于第一步读出。真正的多词元闭合必须计算：
+
+$$
+Z(S)
+=
+\sum_{i=1}^{k}
+z_{v_i\mid x,v_{<i}}
+$$
+
+并且要在干预后重新 rollout（展开生成），而不是只读第一步 logits（对数几率）。
+
+第四，DS7B 的异常再次提醒：小模型内部可能把答案表面单位和全局竞争清理拆得很开。小模型上的局部闭合不能直接外推为大模型中的完整语言编码机制。
+
+### 八、当前理论进展
+
+本阶段把闭合公式进一步收紧为：
+
+$$
+C_{\text{readout}}
+=
+C_{\text{answer}}
+\cdot
+C_{\text{unit}}
+\cdot
+C_{\text{contrast}}
+\cdot
+C_{\text{blocker}}
+\cdot
+C_{\text{span}}
+$$
+
+其中 \(C_{\text{span}}\) 是未来需要真正测试的多步答案片段闭合：
+
+$$
+C_{\text{span}}
+=
+\mathbf{1}
+\left[
+Z(S_y)
+>
+\max_{S\notin \mathcal{S}(y)}Z(S)
+\right]
+$$
+
+现在已经实测较充分的是：
+
+```text
+C_answer
+C_unit
+C_contrast
+```
+
+尚未真正完成的是：
+
+```text
+C_blocker 的全局清理；
+C_span 的多步生成闭合。
+```
+
+### 九、下一阶段
+
+Phase 816 应该进入一个新子阶段：构造真正需要多词元答案的测试集，而不是继续在 yes/no 上细分。
+
+建议：
+
+```text
+Phase 816: multi-token answer-span benchmark construction and rollout closure
+```
+
+核心任务：
+
+```text
+1. 构造必须多词元回答的样本，例如 living thing、musical instrument、public transport、red color 等。
+2. 对每个答案建立 target span set 和 contrast span set。
+3. 在干预后做真实多步 rollout，而不是只看下一词元 logits。
+4. 对每一步记录：
+   answer span token 是否连续闭合；
+   contrast span 是否被压制；
+   format / echo / semantic blockers 是否重新涌现。
+5. 只在这个新数据集上判断 multi-token answer-span closure 是否成立。
+```
+
+Phase 815 到这里完成了当前标准审计目标。下一步虽然仍服务于 token closure（词元闭合）总目标，但需要新样本集和新的 rollout 测试设计，属于下一个子阶段，而不是继续在当前 Phase814/815 结果上机械追加统计。
+
+## Phase 816: multi-token answer-span benchmark and rollout closure [2026-07-01 10:43]
+
+### 一、任务来源
+
+本阶段接续 Phase 814-815。上传内容对 Phase 814 和 Phase 815 的判断基本正确：这两阶段不是继续寻找更强 patch（补丁），而是在修正闭合目标本身。过去把 raw target token（原始目标词元）当作唯一正确目标，会在 tokenizer（分词器）环境下产生大量误判。
+
+Phase 815 的硬伤是：它虽然提出 answer span（答案片段），但测试数据仍主要是 yes/no（是/否）单词元答案，没有真正的 target_requires_multi_token_span（目标必须多词元片段）样本。因此本阶段构造了真正多词元答案 benchmark（基准集），并进行跨模型 rollout closure（展开闭合）测试。
+
+### 二、脚本和结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase816_multi_token_answer_span_rollout_closure.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase816_multi_token_answer_span_rollout_closure_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase816_multi_token_answer_span_rollout_closure/
+```
+
+运行设置：
+
+```text
+1. 三轮测试：smoke / main / confirm。
+2. 三个模型依次运行：qwen3、GLM4、DS7B。
+3. 不使用量化。
+4. 优先尝试 flash_attention_2；本机缺少 FlashAttention2 包，自动回退到 sdpa。
+5. DS7B 在 model.generate 路径出现 segmentation fault，已改为手写 greedy rollout，避免底层生成接口不稳定。
+```
+
+### 三、测试数据
+
+本阶段构造了 20 个必须多词元回答的样本，例如：
+
+```text
+cat      -> living thing
+hammer   -> hand tool
+bus      -> public transport
+guitar   -> musical instrument
+rose     -> flowering plant
+chair    -> household furniture
+apple    -> edible fruit
+heart    -> body organ
+red      -> warm color
+salmon   -> aquatic animal
+oak      -> tall tree
+carrot   -> root vegetable
+laptop   -> electronic device
+spoon    -> eating utensil
+triangle -> geometric shape
+winter   -> cold season
+gold     -> precious metal
+oxygen   -> chemical element
+cactus   -> desert plant
+doctor   -> medical worker
+```
+
+每个样本包含：
+
+```text
+target answer span（目标答案片段）
+contrast answer span（对比答案片段）
+distractor spans（干扰片段）
+generic blockers（通用阻塞片段）
+```
+
+提示分为两类：
+
+```text
+exact_choices : 给出候选项，要求从候选短语中选一个。
+no_choices    : 不给候选项，只要求输出短类别短语。
+```
+
+### 四、测试原理
+
+对于一个答案片段：
+
+$$
+S=(v_1,\ldots,v_k)
+$$
+
+用 teacher-forced span score（强制答案片段评分）计算：
+
+$$
+Z(S)
+=
+\sum_{i=1}^{k}
+\log p(v_i\mid x,v_{<i})
+$$
+
+同时记录平均分：
+
+$$
+\bar{Z}(S)
+=
+\frac{1}{k}
+\sum_{i=1}^{k}
+\log p(v_i\mid x,v_{<i})
+$$
+
+span-score closure（片段评分闭合）定义为：
+
+$$
+C_{\text{span-score}}
+=
+\mathbf{1}
+\left[
+\bar{Z}(S_y)
+>
+\max_{S\notin \mathcal{S}(y)}\bar{Z}(S)
+\right]
+$$
+
+contrast cleared（对比片段清除）定义为：
+
+$$
+C_{\text{contrast}}
+=
+\mathbf{1}
+\left[
+\bar{Z}(S_y)
+>
+\max_{S\in\mathcal{S}(y_{\text{contrast}})}\bar{Z}(S)
+\right]
+$$
+
+rollout closure（展开闭合）用手写 greedy rollout（贪婪展开）测试：
+
+$$
+G(x)
+=
+(\hat{v}_1,\ldots,\hat{v}_m)
+$$
+
+如果展开文本以目标答案片段开头，则：
+
+$$
+C_{\text{rollout}}
+=
+1
+$$
+
+full span rollout closure（完整片段展开闭合）定义为：
+
+$$
+C_{\text{full}}
+=
+C_{\text{span-score}}
+\cdot
+C_{\text{contrast}}
+\cdot
+C_{\text{generic}}
+\cdot
+C_{\text{rollout}}
+$$
+
+### 五、客观结果
+
+#### 1. Smoke 轮
+
+候选项提示下，三个模型都完成闭合：
+
+| model | rows | multi-token rows | span-score | rollout | full |
+|---|---:|---:|---:|---:|---:|
+| qwen3 | 4 | 4 | 4 | 4 | 4 |
+| GLM4 | 4 | 4 | 4 | 4 | 4 |
+| DS7B | 4 | 4 | 4 | 4 | 4 |
+
+这说明脚本、数据和多词元评分流程正常。
+
+#### 2. Main 轮
+
+| model | rows | multi-token rows | span-score | rollout | full | strict step top1 |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 24 | 24 | 21 | 15 | 15 | 14 |
+| GLM4 | 24 | 24 | 21 | 17 | 17 | 14 |
+| DS7B | 24 | 24 | 12 | 10 | 10 | 10 |
+
+按提示类型拆开：
+
+```text
+exact_choices:
+  qwen3 : 12 / 12 full
+  GLM4  : 12 / 12 full
+  DS7B  : 9 / 12 full
+
+no_choices:
+  qwen3 : 3 / 12 full
+  GLM4  : 5 / 12 full
+  DS7B  : 1 / 12 full
+```
+
+#### 3. Confirm 轮
+
+| model | rows | multi-token rows | span-score | rollout | full | strict step top1 |
+|---|---:|---:|---:|---:|---:|---:|
+| qwen3 | 40 | 40 | 36 | 23 | 23 | 22 |
+| GLM4 | 40 | 40 | 36 | 27 | 27 | 22 |
+| DS7B | 40 | 40 | 18 | 14 | 14 | 15 |
+
+按提示类型拆开：
+
+```text
+exact_choices:
+  qwen3 : 20 / 20 full
+  GLM4  : 20 / 20 full
+  DS7B  : 13 / 20 full
+
+no_choices:
+  qwen3 : 3 / 20 full
+  GLM4  : 7 / 20 full
+  DS7B  : 1 / 20 full
+```
+
+### 六、关键发现
+
+第一，多词元闭合在候选项约束下可以非常稳定：
+
+```text
+qwen3 和 GLM4 在 exact_choices confirm 中都是 20 / 20。
+```
+
+这说明模型确实能连续输出多词元答案片段，不是只能做单 token answer unit（单词元答案单位）。
+
+第二，no_choices 条件下闭合明显下降：
+
+```text
+qwen3 : 3 / 20
+GLM4  : 7 / 20
+DS7B  : 1 / 20
+```
+
+这说明多词元答案片段闭合高度依赖 prompt constraint（提示约束）和 candidate set（候选集合）。没有候选项时，模型经常生成语义相关但表面不同的短语。
+
+第三，teacher-forced span score（强制片段评分）和 rollout（展开生成）会分叉：
+
+```text
+qwen3 confirm : span-score 36 / 40，但 rollout 23 / 40
+GLM4 confirm  : span-score 36 / 40，但 rollout 27 / 40
+DS7B confirm  : span-score 18 / 40，但 rollout 14 / 40
+```
+
+也就是说，目标片段在强制评分下可能优于候选干扰片段，但真实贪婪展开仍可能走向别的表面短语。这是 Phase 816 最重要的新发现之一：
+
+```text
+span score closure 不等于 rollout closure。
+```
+
+第四，DS7B 仍然最不稳定。它不仅 no_choices 较弱，exact_choices 也只有 13 / 20 full closure。这和 Phase 814-815 中 DS7B 的全词表竞争不稳定现象一致。
+
+### 七、失败样例
+
+no_choices 下，模型经常输出语义正确但表面不一致的短语：
+
+```text
+cat      target living thing        -> Domestic animal / Pet category
+hammer   target hand tool           -> Tools / Tool category
+chair    target household furniture -> Furniture / Furniture category
+apple    target edible fruit        -> Fruit / Fruit category
+doctor   target medical worker      -> Medical Professional / Health Professional
+```
+
+这说明 Phase 816 又遇到了 Phase 814 的同构问题：
+
+```text
+固定目标表面片段过窄。
+```
+
+区别是：
+
+```text
+Phase 814 是 token surface variant（词元表面变体）问题；
+Phase 816 是 phrase semantic alias（短语语义别名）问题。
+```
+
+### 八、硬伤
+
+第一，Phase 816 虽然完成了真正多词元测试，但 target phrase（目标短语）仍是人工指定的唯一短语。因此 no_choices 下的很多“失败”其实可能是语义别名成功。
+
+第二，当前 span score 只在预定义候选片段集合中比较，不是全语言空间比较。因此：
+
+$$
+C_{\text{span-score}}
+$$
+
+仍然是有限候选集合内闭合，不是完整语言空间闭合。
+
+第三，rollout closure 使用 exact prefix match（精确前缀匹配），会低估语义正确但表面不同的生成。
+
+第四，DS7B 的结果再次提示：小模型可能把候选约束、格式模仿、语义类别和自由生成拆得很散，不能直接外推为完整语言编码机制。
+
+### 九、小结
+
+Phase 816 的结论不是“多词元闭合已经完成”，而是：
+
+```text
+1. 多词元答案片段可以闭合；
+2. 候选项约束下闭合很强；
+3. 无候选项时，span score 和 rollout 明显分叉；
+4. 表面短语目标仍然过窄，必须引入语义别名等价类。
+```
+
+因此 Phase 816 是实质进展，不是普通 patch（补丁）拟合。它把闭合问题从单词元推进到了多词元连续生成，但也暴露出 phrase-level equivalence class（短语级等价类）这个新硬伤。
+
+## Phase 817: alias-aware answer-span audit [2026-07-01 10:43]
+
+### 一、任务来源
+
+Phase 816 的失败样例显示：no_choices（无候选项）下，模型经常生成语义正确但表面不同的短语。为了避免把这种情况误判为失败，本阶段读取 Phase 816 结果，加入人工可解释的 alias set（别名集合）进行审计。
+
+本阶段不重新进行模型前向传播，只审计 Phase 816 保存的 rollout rows（展开行）。
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase817_alias_aware_answer_span_audit.py
+```
+
+运行脚本：
+
+```text
+tests/glm5/run_phase817_alias_aware_answer_span_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase817_alias_aware_answer_span_audit/
+```
+
+### 三、测试原理
+
+对每个 case（样本），定义人工可解释别名集合：
+
+$$
+\mathcal{A}(y)
+=
+\{a_1,a_2,\ldots,a_n\}
+$$
+
+例如：
+
+```text
+living thing:
+  living thing, animal, mammal, domestic animal, pet
+
+household furniture:
+  household furniture, furniture, furniture category
+
+medical worker:
+  medical worker, medical professional, health professional, doctor
+```
+
+如果生成文本 \(G(x)\) 和任一别名归一化匹配，则：
+
+$$
+C_{\text{alias-rollout}}
+=
+\mathbf{1}
+\left[
+\exists a\in\mathcal{A}(y),
+\operatorname{norm}(G(x))\approx\operatorname{norm}(a)
+\right]
+$$
+
+alias full closure（别名完整闭合）定义为：
+
+$$
+C_{\text{alias-full}}
+=
+C_{\text{span-score}}
+\cdot
+C_{\text{alias-rollout}}
+\cdot
+C_{\text{contrast}}
+\cdot
+C_{\text{generic}}
+$$
+
+注意：这里的 alias set 是人工规则，不是最终数学等价类；它用于判断 Phase 816 的 exact rollout（精确展开）低估了多少。
+
+### 四、客观结果
+
+#### 1. Main 轮
+
+| model | rows | exact rollout | alias rollout | exact full | alias full | rollout gain | full gain |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 24 | 15 | 22 | 15 | 19 | 7 | 4 |
+| GLM4 | 24 | 17 | 24 | 17 | 21 | 7 | 4 |
+| DS7B | 24 | 10 | 13 | 10 | 10 | 3 | 0 |
+
+#### 2. Confirm 轮
+
+| model | rows | exact rollout | alias rollout | exact full | alias full | rollout gain | full gain |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 40 | 23 | 38 | 23 | 34 | 15 | 11 |
+| GLM4 | 40 | 27 | 40 | 27 | 36 | 13 | 9 |
+| DS7B | 40 | 14 | 17 | 14 | 14 | 3 | 0 |
+
+按 no_choices 拆开：
+
+```text
+qwen3 no_choices confirm:
+  exact rollout = 3 / 20
+  alias rollout = 18 / 20
+  exact full    = 3 / 20
+  alias full    = 14 / 20
+
+GLM4 no_choices confirm:
+  exact rollout = 7 / 20
+  alias rollout = 20 / 20
+  exact full    = 7 / 20
+  alias full    = 16 / 20
+
+DS7B no_choices confirm:
+  exact rollout = 1 / 20
+  alias rollout = 4 / 20
+  exact full    = 1 / 20
+  alias full    = 1 / 20
+```
+
+### 五、关键发现
+
+第一，Phase 816 的 exact rollout 标准确实过窄。引入 alias-aware rollout 后，Qwen3 和 GLM4 的 no_choices 成功率大幅上升：
+
+```text
+qwen3 : 3 / 20 -> 18 / 20
+GLM4  : 7 / 20 -> 20 / 20
+```
+
+这说明很多“失败”不是模型不知道答案，而是模型选择了另一个合理语义短语。
+
+第二，alias full closure 仍然低于 alias rollout：
+
+```text
+qwen3 alias rollout 38 / 40，但 alias full 34 / 40
+GLM4  alias rollout 40 / 40，但 alias full 36 / 40
+```
+
+说明 rollout（展开生成）语义正确，不代表 teacher-forced target span score（强制目标片段评分）也已经压过所有候选干扰。也就是说：
+
+```text
+生成语义正确
+和
+预定义目标片段评分闭合
+仍然不是同一个标准。
+```
+
+第三，DS7B 的 alias 提升很小：
+
+```text
+DS7B confirm:
+  exact rollout = 14
+  alias rollout = 17
+  exact full = 14
+  alias full = 14
+```
+
+这说明 DS7B 的问题不只是目标短语过窄，而是自由生成中经常输出格式符号、填空线、说明性句子或非目标类别。这和前面 DS7B 的全词表竞争不稳定一致。
+
+### 六、理论进展
+
+Phase 817 把闭合标准进一步从：
+
+```text
+fixed answer span（固定答案片段）
+```
+
+推进到：
+
+```text
+answer alias class（答案别名类）
+```
+
+更新后的闭合结构应写成：
+
+$$
+C_{\text{readout}}
+=
+C_{\text{answer-class}}
+\cdot
+C_{\text{alias-class}}
+\cdot
+C_{\text{span-score}}
+\cdot
+C_{\text{rollout}}
+\cdot
+C_{\text{blocker}}
+$$
+
+其中：
+
+$$
+C_{\text{alias-class}}
+=
+\mathbf{1}
+\left[
+G(x)\in\mathcal{A}(y)
+\right]
+$$
+
+这说明语言闭合不是“一个答案字符串闭合”，而是：
+
+```text
+一个任务条件下的答案等价类闭合。
+```
+
+### 七、硬伤
+
+第一，alias set（别名集合）是人工定义的，不是从模型内部机制自动得到的。因此它只能作为审计工具，不能作为最终语言编码理论。
+
+第二，Phase 817 没有重新把 alias spans（别名片段）加入 teacher-forced scoring（强制评分）候选集合。因此它只能证明 exact rollout 低估了成功率，不能证明 alias span score 本身已经闭合。
+
+第三，别名边界本身是困难问题。例如：
+
+```text
+cat -> domestic animal
+```
+
+是否等价于：
+
+```text
+cat -> living thing
+```
+
+在常识分类任务中基本合理，但不是严格同义。也就是说，短语级答案等价类本身需要更严格的数据标准。
+
+第四，这再次说明小模型测试存在偏差：模型可能生成语义上合理但和目标体系不一致的类别名，这会让“闭合成功率”强烈依赖评价标准。
+
+### 八、阶段性结论
+
+Phase 814-817 共同完成了一个重要阶段：
+
+```text
+闭合目标从 raw token
+推进到 answer unit
+再推进到 multi-token answer span
+最后推进到 phrase-level alias class。
+```
+
+当前最稳妥的结论是：
+
+```text
+1. 固定 raw token 标准错误；
+2. 固定 target phrase 标准仍然过窄；
+3. 语言闭合目标应是任务条件下的答案等价类；
+4. 强制片段评分、真实 rollout、全词表 blocker 清理是不同层级；
+5. DS7B 的自由生成和全词表竞争明显不稳定，不能用它的失败直接否定机制。
+```
+
+### 九、下一步
+
+接下来的任务仍服务于 token closure（词元闭合）总目标，但已经进入新的数据标准阶段。Phase 818 不应该继续临时添加人工别名，而应该构造更严格的 alias-span benchmark（别名片段基准集）：
+
+```text
+Phase 818: alias-span candidate scoring benchmark
+```
+
+核心任务：
+
+```text
+1. 对每个问题预先定义 target alias class、near-miss class、wrong class。
+2. 把 alias spans 全部加入 teacher-forced span scoring。
+3. 区分：
+   exact phrase closure
+   alias class closure
+   near-miss closure
+   wrong class closure
+4. 再次测试 rollout 是否落在 target alias class。
+```
+
+由于 alias class 的边界需要人工标准先固定，否则测试会变成主观补洞。因此 Phase 818 应先设计数据标准，再跑模型，而不是继续在当前 Phase 817 的人工临时别名表上机械扩大测试。
+
+## Phase 818: alias-span candidate scoring benchmark（别名片段候选评分基准） [2026-07-01 11:10]
+
+### 一、任务来源
+
+本阶段根据最新上传内容继续推进 Phase 816-817 的结论。上传内容的核心判断是正确的：
+
+```text
+Phase 816-817 的进展不是 token closure（词元闭合）已经完成，
+而是闭合对象已经从 raw token（原始词元）
+推进到 answer unit（答案单位）、
+multi-token answer span（多词元答案片段）、
+phrase-level alias class（短语级别名类）。
+```
+
+但该判断必须收紧。Phase 817 只是对 Phase 816 的 rollout（展开生成）结果做 alias-aware audit（别名感知审计），没有把 alias spans（别名片段）直接加入 teacher-forced scoring（强制评分）候选集合。因此 Phase 817 只能证明：
+
+```text
+exact phrase rollout（精确短语展开）低估了真实语义成功率。
+```
+
+它还不能证明：
+
+```text
+target alias class（目标别名类）在候选评分空间中已经闭合。
+```
+
+所以本阶段执行 Phase 818：
+
+```text
+alias-span candidate scoring benchmark
+```
+
+核心目标是把 target alias（目标别名）、near-miss（近似但不够精确的答案）、wrong answer（错误答案）和 generic blocker（通用阻塞片段）全部纳入同一候选评分场，重新测试闭合。
+
+### 二、脚本和结果路径
+
+脚本：
+
+```text
+tests/glm5/phase818_alias_span_candidate_scoring_benchmark.py
+tests/glm5/run_phase818_alias_span_candidate_scoring_benchmark_round.sh
+```
+
+结果：
+
+```text
+tests/result/phase818_alias_span_candidate_scoring_benchmark/smoke/
+tests/result/phase818_alias_span_candidate_scoring_benchmark/main/
+tests/result/phase818_alias_span_candidate_scoring_benchmark/confirm/
+```
+
+本阶段按要求依次测试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+模型加载设置：
+
+```text
+bf16
+quantization = off
+attn_implementation = flash_attention_2,sdpa,eager
+```
+
+实际运行中，三模型均尝试 flash_attention_2（FlashAttention2，闪存注意力二），但本地环境缺少 FlashAttention2 包，自动回退到 sdpa（scaled dot product attention，缩放点积注意力）并完成测试。没有使用量化。DS7B 继续使用手写 greedy rollout（贪婪展开），避免 model.generate 后端崩溃问题。
+
+### 三、测试原理
+
+对每个样本预先定义四类候选集合：
+
+```text
+A_y: target alias class（目标别名类）
+N_y: near-miss class（近似类）
+W_y: wrong class（错误类）
+B: generic blocker class（通用阻塞类）
+```
+
+其中 target alias class 包含精确目标短语和少量可接受别名；near-miss class 包含语义相关但粒度不完全正确的短语，例如：
+
+```text
+warm color -> color
+electronic device -> electronics
+chemical element -> gas
+cold season -> cold weather
+```
+
+这个区分很重要，因为 Phase 817 中一些人工 alias 太宽，会把“语义相关”误判成“答案等价”。
+
+对任意候选答案片段：
+
+$$
+S=(v_1,\ldots,v_k)
+$$
+
+强制评分为：
+
+$$
+Z(S\mid x)=
+\sum_{i=1}^{k}
+\log p(v_i\mid x,v_{<i})
+$$
+
+平均片段评分为：
+
+$$
+\bar{Z}(S\mid x)=
+\frac{1}{k}
+\sum_{i=1}^{k}
+\log p(v_i\mid x,v_{<i})
+$$
+
+目标别名类的最佳评分为：
+
+$$
+M_A(x)=
+\max_{S\in A_y}
+\bar{Z}(S\mid x)
+$$
+
+非目标别名竞争者的最佳评分为：
+
+$$
+M_{\neg A}(x)=
+\max_{S\in N_y\cup W_y\cup B}
+\bar{Z}(S\mid x)
+$$
+
+alias span-score closure（别名片段评分闭合）定义为：
+
+$$
+C_{\text{alias-score}}(x)=
+\mathbf{1}
+\left[
+M_A(x)>M_{\neg A}(x)
+\right]
+$$
+
+near-miss cleared（近似类清除）定义为：
+
+$$
+C_{\text{near}}(x)=
+\mathbf{1}
+\left[
+M_A(x)>
+\max_{S\in N_y}\bar{Z}(S\mid x)
+\right]
+$$
+
+wrong cleared（错误类清除）定义为：
+
+$$
+C_{\text{wrong}}(x)=
+\mathbf{1}
+\left[
+M_A(x)>
+\max_{S\in W_y}\bar{Z}(S\mid x)
+\right]
+$$
+
+generic cleared（通用阻塞清除）定义为：
+
+$$
+C_{\text{generic}}(x)=
+\mathbf{1}
+\left[
+M_A(x)>
+\max_{S\in B}\bar{Z}(S\mid x)
+\right]
+$$
+
+真实展开生成：
+
+$$
+G(x)=(\hat{v}_1,\ldots,\hat{v}_m)
+$$
+
+如果生成文本落入目标别名类：
+
+$$
+C_{\text{alias-rollout}}(x)=
+\mathbf{1}
+\left[
+G(x)\in A_y
+\right]
+$$
+
+本阶段的完整别名闭合定义为：
+
+$$
+C_{\text{alias-full}}(x)=
+C_{\text{alias-score}}(x)
+\cdot
+C_{\text{alias-rollout}}(x)
+\cdot
+C_{\text{near}}(x)
+\cdot
+C_{\text{wrong}}(x)
+\cdot
+C_{\text{generic}}(x)
+$$
+
+同时保留 exact phrase closure（精确短语闭合），用于衡量固定短语标准低估了多少：
+
+$$
+C_{\text{exact-full}}(x)=
+C_{\text{exact-score}}(x)
+\cdot
+C_{\text{exact-rollout}}(x)
+\cdot
+C_{\text{near}}(x)
+\cdot
+C_{\text{wrong}}(x)
+\cdot
+C_{\text{generic}}(x)
+$$
+
+### 四、关键实现修正
+
+初版匹配规则允许：
+
+```text
+generated phrase（生成短语）是 target alias（目标别名）的过短前缀
+```
+
+这会把：
+
+```text
+Geometry -> geometry shape
+```
+
+误判为 target alias。随后已修正匹配规则：
+
+```text
+1. 完全相等直接匹配；
+2. 生成文本可以在完整别名之后继续展开；
+3. 如果生成文本短于别名，只有生成文本至少包含两个词时才允许短别名匹配；
+4. 单词级过短前缀不再算目标别名。
+```
+
+因此最终结果使用修正后的更严格统计。
+
+### 五、客观结果
+
+#### 1. smoke 轮
+
+smoke 轮 4 个样本、只测 exact_choices。三模型全部通过：
+
+| model | rows | alias score | alias rollout | alias full |
+|---|---:|---:|---:|---:|
+| qwen3 | 4 | 4 | 4 | 4 |
+| GLM4 | 4 | 4 | 4 | 4 |
+| DS7B | 4 | 4 | 4 | 4 |
+
+说明脚本、候选集合、手写 rollout 和保存流程正常。
+
+#### 2. main 轮
+
+main 轮 12 个样本，每个样本测试 exact_choices 和 no_choices，共 24 行。
+
+| model | rows | exact score | alias score | exact rollout | alias rollout | exact full | alias full | near cleared | wrong cleared | generic cleared |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 24 | 15 | 21 | 14 | 20 | 14 | 20 | 21 | 24 | 24 |
+| GLM4 | 24 | 17 | 22 | 16 | 20 | 16 | 20 | 22 | 24 | 24 |
+| DS7B | 24 | 12 | 17 | 10 | 13 | 10 | 13 | 24 | 23 | 18 |
+
+按 no_choices 拆开：
+
+```text
+qwen3:
+  alias score   = 9 / 12
+  alias rollout = 8 / 12
+  alias full    = 8 / 12
+
+GLM4:
+  alias score   = 10 / 12
+  alias rollout = 8 / 12
+  alias full    = 8 / 12
+
+DS7B:
+  alias score   = 6 / 12
+  alias rollout = 4 / 12
+  alias full    = 4 / 12
+```
+
+#### 3. confirm 轮
+
+confirm 轮 20 个样本，每个样本测试 exact_choices 和 no_choices，共 40 行。
+
+| model | rows | exact score | alias score | exact rollout | alias rollout | exact full | alias full | near cleared | wrong cleared | generic cleared |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 | 40 | 24 | 34 | 22 | 32 | 22 | 31 | 34 | 40 | 39 |
+| GLM4 | 40 | 28 | 36 | 26 | 33 | 26 | 33 | 36 | 40 | 39 |
+| DS7B | 40 | 18 | 26 | 14 | 17 | 14 | 17 | 38 | 37 | 29 |
+
+按 no_choices 拆开：
+
+```text
+qwen3 no_choices:
+  alias score   = 14 / 20
+  alias rollout = 12 / 20
+  alias full    = 11 / 20
+  generation classes:
+    target_alias = 12
+    near_miss    = 5
+    other        = 3
+
+GLM4 no_choices:
+  alias score   = 16 / 20
+  alias rollout = 13 / 20
+  alias full    = 13 / 20
+  generation classes:
+    target_alias = 13
+    near_miss    = 4
+    other        = 3
+
+DS7B no_choices:
+  alias score   = 9 / 20
+  alias rollout = 4 / 20
+  alias full    = 4 / 20
+  generation classes:
+    target_alias = 4
+    other        = 16
+```
+
+confirm 轮标签分布：
+
+```text
+qwen3:
+  alias_score_and_rollout_closed           = 22
+  alias_class_closes_exact_phrase_fails    = 9
+  alias_score_closed_rollout_not_closed    = 3
+  near_miss_span_wins                      = 5
+  alias_rollout_closed_score_not_closed    = 1
+
+GLM4:
+  alias_score_and_rollout_closed           = 26
+  alias_class_closes_exact_phrase_fails    = 7
+  alias_score_closed_rollout_not_closed    = 3
+  near_miss_span_wins                      = 4
+
+DS7B:
+  alias_score_and_rollout_closed           = 14
+  alias_class_closes_exact_phrase_fails    = 3
+  alias_score_closed_rollout_not_closed    = 9
+  generic_blocker_span_wins                = 11
+  wrong_span_wins                          = 3
+```
+
+### 六、主要发现
+
+第一，上传内容关于 Phase 816-817 的主判断得到支持：固定 exact phrase（精确短语）确实过窄。confirm 轮中：
+
+```text
+qwen3 exact full = 22 / 40
+qwen3 alias full = 31 / 40
+
+GLM4 exact full = 26 / 40
+GLM4 alias full = 33 / 40
+
+DS7B exact full = 14 / 40
+DS7B alias full = 17 / 40
+```
+
+也就是说，把 alias span 直接加入 scoring（评分）候选集合后，qwen3 和 GLM4 均出现明确提升，不只是 rollout 后验补判。
+
+第二，exact_choices 仍然几乎完全闭合：
+
+```text
+qwen3 exact_choices alias full = 20 / 20
+GLM4 exact_choices alias full = 20 / 20
+DS7B exact_choices alias full = 13 / 20
+```
+
+这说明在有候选项约束时，qwen3 和 GLM4 的 answer span（答案片段）机制非常稳定；DS7B 即便有候选项，仍有格式输出、问号、解释句等问题。
+
+第三，no_choices 是当前真正困难区域：
+
+```text
+qwen3 no_choices alias full = 11 / 20
+GLM4 no_choices alias full = 13 / 20
+DS7B no_choices alias full = 4 / 20
+```
+
+这说明自由生成不只是“选对答案片段”，还要同时解决：
+
+```text
+1. 选择正确答案粒度；
+2. 避免 near-miss；
+3. 避免格式化/说明性输出；
+4. 在全词表竞争场中压过 generic blocker。
+```
+
+第四，near-miss class 是 Phase 818 新暴露的关键边界。qwen3 和 GLM4 的主要失败不再是 wrong answer，而是：
+
+```text
+warm color -> color
+electronic device -> electronics
+cold season -> cold weather
+chemical element -> gas
+living thing -> pet category
+body organ -> body part
+```
+
+这些不是完全错误，但也不是严格目标别名。这说明“答案等价类”的边界本身已经成为语言闭合的核心问题。
+
+第五，DS7B 的失败模式仍然更粗糙。confirm 轮 DS7B：
+
+```text
+generic_blocker_span_wins = 11
+wrong_span_wins = 3
+alias_score_closed_rollout_not_closed = 9
+```
+
+具体输出包括：
+
+```text
+___________
+[Answer]
+?
+</think>
+Answer must be one of the following
+```
+
+这说明 DS7B 的自由生成和格式路线竞争仍然明显不稳定。不能用 DS7B 的失败直接否定机制，但它能暴露小模型中格式/echo/占位符路线竞争的粗糙性。
+
+### 七、理论进展
+
+Phase 818 把闭合标准进一步从：
+
+```text
+fixed target phrase closure（固定目标短语闭合）
+```
+
+推进为：
+
+```text
+answer-class closure under explicit competitor classes
+（显式竞争类下的答案类闭合）
+```
+
+当前更合理的 readout closure（读出闭合）结构应写成：
+
+$$
+C_{\text{readout}}(x)=
+C_{\text{alias-score}}(x)
+\cdot
+C_{\text{alias-rollout}}(x)
+\cdot
+C_{\text{near}}(x)
+\cdot
+C_{\text{wrong}}(x)
+\cdot
+C_{\text{generic}}(x)
+$$
+
+它比 Phase 817 的公式更严格，因为 Phase 817 没有显式建模 near-miss class（近似类）。Phase 818 表明语言闭合不是：
+
+```text
+target token wins
+```
+
+也不是：
+
+```text
+target phrase wins
+```
+
+而更接近：
+
+```text
+task-conditioned answer equivalence class
+beats near-miss / wrong / generic classes
+and actual rollout lands in that class.
+```
+
+这一步对智能理论也有意义：语义不是一个孤立标签，而是一个有粒度边界的竞争区域。模型内部可能不是在读出“某个词”，而是在多条可生成路线之间选择一个粒度合适的答案类。
+
+### 八、问题和硬伤
+
+第一，target alias class 和 near-miss class 仍是人工定义的。它比 Phase 817 更严格，但还不是模型内部自然产生的数学等价类。
+
+第二，near-miss 的边界仍然有主观性。例如：
+
+```text
+gold -> metal
+red -> color
+oxygen -> gas
+winter -> cold weather
+```
+
+这些在常识上相关，甚至在宽松任务中可以接受，但在“best category phrase（最佳类别短语）”标准下不够精确。因此 Phase 818 的结果依赖评价标准。
+
+第三，alias score closure 和 alias rollout closure 仍不等价。qwen3、GLM4 都存在：
+
+```text
+alias_score_closed_rollout_not_closed
+alias_rollout_closed_score_not_closed
+```
+
+这说明 teacher-forced scoring（强制评分）和真实生成路线仍然是两个不同层级。
+
+第四，小模型偏差仍然显著。DS7B 的内部结构可能较粗糙，自由生成容易落到格式、占位符、解释句和 wrong span。它更适合作为“失败模式放大器”，不能作为最终语言编码机制的唯一证据。
+
+第五，当前仍未完成 token closure（词元闭合）。Phase 818 只完成了“闭合对象和评价标准”的一次重要修正，尚未解释内部哪些 head/channel/neuron 负责 answer class、near-miss boundary 和 rollout selection。
+
+### 九、阶段性结论
+
+Phase 818 是实质进展，且不是普通 patch（补丁）拟合。它把 Phase 817 的事后别名审计升级为候选评分基准，证明：
+
+```text
+1. 精确短语标准确实低估成功率；
+2. 把 alias spans 纳入 scoring 后，qwen3 和 GLM4 的闭合明显提升；
+3. no_choices 下的核心瓶颈不是 wrong answer，而是 answer granularity boundary（答案粒度边界）；
+4. near-miss class 已经成为语言闭合必须建模的对象；
+5. DS7B 的失败主要来自格式/通用阻塞/错误路线竞争，不应直接解释为语义机制不存在。
+```
+
+当前离最终闭合仍有明显距离。粗略评估：
+
+```text
+answer-span / alias-class evaluation standard: 约 65%-70%
+no_choices answer-class closure: qwen3 / GLM4 约 55%-65%
+DS7B no_choices closure: 约 20%
+完整语言编码机制破解: 仍低于 35%
+```
+
+### 十、下一步
+
+接下来的任务和当前任务处于同一个“大阶段”：继续破解 answer-class closure（答案类闭合）和语言读出闭合。但它已经不是 Phase 818 的机械延续，而是进入一个新的子阶段：
+
+```text
+Phase 819: automatic answer equivalence boundary discovery
+```
+
+核心任务不是继续手工扩 alias，而是从模型输出和候选评分中自动发现三类边界：
+
+```text
+1. target-equivalent class（目标等价类）
+2. near-miss class（近似但不够精确类）
+3. blocker / wrong class（阻塞和错误类）
+```
+
+建议 Phase 819 不急于做大模型因果干预，而先完成数据和评价标准：
+
+```text
+1. 从 Phase 816-818 的输出中收集所有 generated_clean。
+2. 建立 object -> generated phrase -> class 的人工最小标注表。
+3. 对每个样本构造 strict / medium / loose 三档闭合标准。
+4. 重新统计 exact phrase、strict alias、loose alias、near-miss 的差异。
+5. 再决定是否进入 head/channel/neuron 级别的因果定位。
+```
+
+如果直接继续做 patch，容易再次陷入局部拟合；如果先把答案等价类边界固定，后续机制图谱会更可靠。
+
+## Phase 819: automatic answer equivalence boundary discovery（自动答案等价边界发现） [2026-07-01 11:28]
+
+### 一、任务来源
+
+本阶段根据最新上传内容继续推进。上传内容对 Phase 818 的判断基本正确：
+
+```text
+Phase 818 是实质进展，不是普通 patch 拟合；
+它把闭合对象从 fixed phrase（固定短语）
+推进到 task-conditioned answer equivalence class（任务条件答案等价类）。
+```
+
+但上传内容也指出一个关键硬伤：
+
+```text
+target alias class 和 near-miss class 仍是人工定义。
+```
+
+因此继续沿着“手工扩 alias”推进会进入新的局部拟合循环。Phase 819 的目标不是重新跑模型，而是把 Phase 816-818 已有输出整理成可复查的边界图谱：
+
+```text
+object -> generated phrase -> boundary class
+```
+
+并建立 strict / medium / loose 三档闭合标准。
+
+### 二、是否需要重新模型测试
+
+本阶段不重新加载 qwen3、GLM4、DS7B。原因是：
+
+```text
+Phase 819 的目标是边界发现和评价标准固定，
+不是新增模型因果干预。
+```
+
+输入数据来自已有结果：
+
+```text
+tests/result/phase816_multi_token_answer_span_rollout_closure/
+tests/result/phase817_alias_aware_answer_span_audit/
+tests/result/phase818_alias_span_candidate_scoring_benchmark/
+```
+
+### 三、脚本和结果路径
+
+脚本：
+
+```text
+tests/glm5/phase819_automatic_answer_equivalence_boundary_discovery.py
+tests/glm5/run_phase819_automatic_answer_equivalence_boundary_discovery.sh
+```
+
+结果：
+
+```text
+tests/result/phase819_automatic_answer_equivalence_boundary_discovery/phase819_boundary_rows.jsonl
+tests/result/phase819_automatic_answer_equivalence_boundary_discovery/phase819_phrase_aggregates.jsonl
+tests/result/phase819_automatic_answer_equivalence_boundary_discovery/phase819_case_summary.json
+tests/result/phase819_automatic_answer_equivalence_boundary_discovery/phase819_summary.json
+tests/result/phase819_automatic_answer_equivalence_boundary_discovery/phase819_summary.md
+```
+
+### 四、测试原理
+
+Phase 819 读取 Phase 816-818 的所有 `generated_clean`（清洗后生成文本），对每个生成短语重新归类为：
+
+```text
+target_equivalent（目标等价）
+close_near_miss（近距离近似）
+broad_near_miss（宽泛近似）
+wrong（错误）
+generic_blocker（通用阻塞）
+format_echo（格式 / 回声 / 占位符）
+unknown_other（未知其他）
+```
+
+这里特别注意一点：初版脚本曾经把 Phase 817 的旧 alias 成功标签当作强证据，这会重新引入 Phase 817 的“alias 太宽”问题。已修正：
+
+```text
+Phase 817 的旧 alias 成功只保留为来源信息；
+Phase 819 使用当前更严格的边界规则重新分类。
+```
+
+同时加入最基础的单复数表面修正，例如：
+
+```text
+tool -> tools
+vegetable -> vegetables
+```
+
+这是为了避免 tokenizer / surface fragmentation（分词器 / 表面碎片化）造成明显误判。
+
+### 五、三档闭合标准
+
+严格闭合：
+
+$$
+C_{\text{strict}}(x)=
+\mathbf{1}
+\left[
+G(x)\in \mathcal{A}_{\text{target}}(y,c)
+\right]
+$$
+
+中等闭合：
+
+$$
+C_{\text{medium}}(x)=
+\mathbf{1}
+\left[
+G(x)\in
+\mathcal{A}_{\text{target}}(y,c)
+\cup
+\mathcal{A}_{\text{close}}(y,c)
+\right]
+$$
+
+宽松闭合：
+
+$$
+C_{\text{loose}}(x)=
+\mathbf{1}
+\left[
+G(x)\in
+\mathcal{A}_{\text{target}}(y,c)
+\cup
+\mathcal{A}_{\text{close}}(y,c)
+\cup
+\mathcal{A}_{\text{broad}}(y,c)
+\right]
+$$
+
+其中：
+
+```text
+strict 只接受目标等价类；
+medium 接受目标等价类和近距离近似；
+loose 接受目标等价类、近距离近似和宽泛近似。
+```
+
+对评分空间，也做三档重分析：
+
+$$
+C^{\text{score}}_{\text{strict}}(x)=
+\mathbf{1}
+\left[
+M_{\text{target}}(x)>
+\max(M_{\text{near}}(x),M_{\text{wrong}}(x),M_{\text{generic}}(x))
+\right]
+$$
+
+如果 best near-miss（最佳近似项）属于 close_near_miss，则 medium score closure（中等评分闭合）把它放入可接受集合；如果属于 broad_near_miss，则只在 loose score closure（宽松评分闭合）中接受。
+
+### 六、客观结果
+
+Phase 819 读取并重分析：
+
+```text
+boundary observations = 612
+unique generated phrase aggregates = 76
+```
+
+边界类别分布：
+
+| class | count |
+|---|---:|
+| target_equivalent | 447 |
+| format_echo | 75 |
+| unknown_other | 45 |
+| broad_near_miss | 33 |
+| close_near_miss | 9 |
+| wrong | 3 |
+
+以 Phase 818 confirm 轮为主复核，得到：
+
+| model / prompt | n | strict rollout | medium rollout | loose rollout | strict full | medium full | loose full |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| qwen3 / exact_choices | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
+| qwen3 / no_choices | 20 | 14 | 16 | 19 | 13 | 15 | 18 |
+| GLM4 / exact_choices | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
+| GLM4 / no_choices | 20 | 13 | 13 | 17 | 13 | 13 | 16 |
+| DS7B / exact_choices | 20 | 13 | 13 | 13 | 13 | 13 | 13 |
+| DS7B / no_choices | 20 | 4 | 4 | 4 | 4 | 4 | 4 |
+
+这说明：
+
+```text
+qwen3 no_choices:
+  strict full = 13 / 20
+  medium full = 15 / 20
+  loose full = 18 / 20
+
+GLM4 no_choices:
+  strict full = 13 / 20
+  medium full = 13 / 20
+  loose full = 16 / 20
+
+DS7B no_choices:
+  strict / medium / loose full 都是 4 / 20
+```
+
+### 七、主要发现
+
+第一，Phase 818 的结论进一步被收紧。qwen3 和 GLM4 的自由生成不是简单失败，而是存在明显的边界层次：
+
+```text
+strict < medium < loose
+```
+
+尤其 qwen3 no_choices：
+
+```text
+strict full = 13 / 20
+medium full = 15 / 20
+loose full = 18 / 20
+```
+
+说明很多“失败”处在近似边界，而不是纯错误。
+
+第二，GLM4 的中等标准没有明显提升：
+
+```text
+GLM4 no_choices:
+strict full = 13 / 20
+medium full = 13 / 20
+loose full = 16 / 20
+```
+
+这说明 GLM4 的 near-miss 更偏 broad_near_miss（宽泛近似），例如：
+
+```text
+pet category
+human body part
+color category
+plant life cycle
+```
+
+第三，DS7B 的问题不在语义粒度，而在格式路线和生成协议。DS7B no_choices：
+
+```text
+format_echo = 12 / 20
+target_equivalent = 4 / 20
+unknown_other = 4 / 20
+```
+
+所以 strict / medium / loose 标准都无法明显提升 DS7B。它的主要问题仍然是：
+
+```text
+格式 / 占位符 / 说明性路线压过答案路线。
+```
+
+第四，最常见的稳定目标等价短语包括：
+
+```text
+precious metal
+musical instrument
+living thing
+medical worker
+chemical element
+geometric shape
+eating utensil
+```
+
+这说明一部分答案类已经非常稳定，尤其在 exact_choices 中。
+
+第五，当前边界歧义短语主要集中在：
+
+```text
+pet category
+human body part
+electronics
+gas
+color
+color category
+geometry
+cold weather
+freshwater fish
+personal computing device
+```
+
+这些短语是下一步标准数据集最应该审查的对象。
+
+### 八、理论进展
+
+Phase 819 的理论进展不是新公式，而是把 Phase 818 的公式拆成可操作的边界层级。当前读出闭合不应只写成：
+
+$$
+C_{\text{readout}}
+=
+C_{\text{alias-score}}
+\cdot
+C_{\text{alias-rollout}}
+\cdot
+C_{\text{near}}
+\cdot
+C_{\text{wrong}}
+\cdot
+C_{\text{generic}}
+$$
+
+还要加上边界层级：
+
+$$
+\mathcal{B}(G(x),y,c)
+\in
+\left\{
+\text{target},
+\text{close-near},
+\text{broad-near},
+\text{wrong},
+\text{generic},
+\text{format},
+\text{unknown}
+\right\}
+$$
+
+于是三档闭合为：
+
+$$
+C_{\tau}(x)=
+\mathbf{1}
+\left[
+\mathcal{B}(G(x),y,c)\in \Omega_{\tau}
+\right],
+\quad
+\tau\in\{\text{strict},\text{medium},\text{loose}\}
+$$
+
+其中：
+
+$$
+\Omega_{\text{strict}}=\{\text{target}\}
+$$
+
+$$
+\Omega_{\text{medium}}=\{\text{target},\text{close-near}\}
+$$
+
+$$
+\Omega_{\text{loose}}=\{\text{target},\text{close-near},\text{broad-near}\}
+$$
+
+这说明语言闭合不是一个二值结果，而是具有评价半径：
+
+```text
+同一个生成结果，在 strict / medium / loose 下可能处于不同闭合层级。
+```
+
+这比单纯追求 token closure 更接近语言真实结构。
+
+### 九、问题和硬伤
+
+第一，Phase 819 仍然不是“自动发现模型内部真实等价类”。它是基于已有输出、候选表和基础规则的离线边界整理。
+
+第二，close_near_miss 和 broad_near_miss 的划分仍然是启发式。当前使用的是基础字符串重叠和候选类别信息，不是内部机制证据。
+
+第三，unknown_other 仍然较多：
+
+```text
+unknown_other = 45
+```
+
+其中一部分可能是合理答案，如：
+
+```text
+personal computing device
+freshwater fish
+seasonal weather patterns
+```
+
+也有一部分可能是真正错误或解释句。因此 Phase 819 仍需要人工审查表，而不能直接作为最终标准。
+
+第四，Phase 819 没有定位 head / channel / neuron。它服务于后续机制定位，但本身仍是数据标准阶段。
+
+第五，小模型偏差仍然存在。DS7B 的 format_echo 高达 75 条观察中的主要来源，说明小模型的生成协议不稳定会严重污染边界图谱。
+
+### 十、阶段性结论
+
+Phase 819 是 Phase 818 之后必要的同阶段推进。它没有继续做 patch，也没有重新跑模型，而是完成了一个关键转换：
+
+```text
+从 alias-aware scoring（别名评分）
+推进到 answer-boundary atlas（答案边界图谱）。
+```
+
+当前最稳妥的结论是：
+
+```text
+1. qwen3 和 GLM4 的 no_choices 失败大量集中在边界层级，而非纯错误；
+2. strict / medium / loose 三档标准能更客观地描述自由生成；
+3. DS7B 的失败主要是格式和协议路线竞争，不是简单语义缺失；
+4. 后续机制定位必须基于稳定的边界标准，否则会继续追局部 patch。
+```
+
+### 十一、下一步
+
+接下来的任务仍属于同一个大阶段：固定 answer equivalence boundary（答案等价边界）并服务于语言编码机制图谱。但 Phase 819 已经完成自动离线整理，下一步不应继续扩脚本，而应进入：
+
+```text
+Phase 820: answer boundary standard v1
+```
+
+核心任务：
+
+```text
+1. 人工审查 phase819_phrase_aggregates.jsonl 中的 76 个生成短语；
+2. 对 unknown_other、close_near_miss、broad_near_miss 做最终标注；
+3. 形成稳定的 strict / medium / loose 标准数据文件；
+4. 再用该标准复算 Phase 818；
+5. 标准稳定后，再回到 head / channel / neuron 机制定位。
+```
+
+这一步是否需要自动继续，要看是否允许进行人工标准整理。因为 Phase 820 需要对边界短语做人工审查，不能完全由脚本自动决定；否则会把启发式判断误当成真标准。
+
+## Phase 820: answer boundary standard v1（答案边界标准第一版）[2026-07-01 12:37]
+
+### 一、任务背景
+
+本阶段承接 Phase 819。Phase 819 已经证明：
+
+```text
+alias-aware scoring（别名感知评分）之后，
+真正需要固定的是 answer-boundary atlas（答案边界图谱），
+否则 strict / medium / loose closure（严格 / 中等 / 宽松闭合）会不断漂移。
+```
+
+本次上传内容对 Phase 819 的判断基本正确：Phase 819 不是机制闭合，而是评价边界固定阶段。它的重要性在于把“模型有没有答对”拆成更稳定的外部标准，而不是继续把所有 near miss（近似答案）、format echo（格式回声）、object echo（对象回声）混在一起。
+
+需要修正的一点是：Phase 820 不能被理解为“发现了模型内部等价类”。它只是建立一个用于复算 Phase 818 / Phase 819 的外部答案标准 v1。也就是说：
+
+```text
+answer boundary standard（答案边界标准）
+≠
+model internal equivalence class（模型内部等价类）
+```
+
+前者是研究者定义的评价口径；后者需要后续通过 head / channel / neuron（注意力头 / 通道 / 神经元）因果实验验证。
+
+### 二、本阶段是否需要模型测试
+
+本阶段不需要重新加载 qwen3、GLM4、DS7B 三个模型。
+
+原因是当前任务不是生成新结果，而是对 Phase 819 已经收集到的 76 个生成短语进行边界标准化，并用该标准离线复算 Phase 818 的 confirm（确认轮）结果。
+
+因此本阶段只进行了离线数据处理，没有占用 GPU，也没有引入新的模型生成偏差。
+
+### 三、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase820_answer_boundary_standard_v1.py
+tests/glm5/run_phase820_answer_boundary_standard_v1.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase820_answer_boundary_standard_v1/
+```
+
+核心输出：
+
+```text
+answer_boundary_standard_v1.jsonl
+phase820_reanalysis_rows.jsonl
+phase820_summary.json
+phase820_summary.md
+```
+
+脚本检查：
+
+```text
+python -m py_compile tests/glm5/phase820_answer_boundary_standard_v1.py
+bash -n tests/glm5/run_phase820_answer_boundary_standard_v1.sh
+```
+
+离线运行完成，未发生错误。
+
+### 四、测试原理
+
+Phase 819 的自动规则把生成短语分成若干边界类，但其中一部分仍然过粗，例如：
+
+```text
+vegetable
+freshwater fish
+hammer is a hand tool
+the correct phrase is aquatic animal
+triangle
+winter
+```
+
+这些短语不能简单用 exact match（精确匹配）或 alias match（别名匹配）判定。Phase 820 的核心做法是：
+
+```text
+1. 读取 Phase 819 的 phrase aggregates（短语聚合结果）；
+2. 对关键短语做人工标准 v1 修正；
+3. 为每个短语写入 final_boundary_class（最终边界类别）；
+4. 给每个类别定义 strict / medium / loose 三档接受规则；
+5. 用该标准复算 Phase 818 confirm 轮；
+6. 分离 semantic target present（语义目标出现）和 protocol valid（协议有效）。
+```
+
+这一步的关键不是提高分数，而是避免以下混淆：
+
+```text
+语义上接近
+≠
+格式上有效
+≠
+最终 token closure（词元闭合）
+```
+
+### 五、边界类别
+
+Phase 820 固定了以下类别：
+
+```text
+target_equivalent       目标等价
+close_near_miss         近距离近似
+broad_near_miss         宽泛近似
+wrong                   错误
+generic_blocker         泛化阻塞词
+format_echo             格式回声
+format_with_target      带目标的格式违规
+object_echo             对象回声
+unknown_other           未知其他
+```
+
+其中最重要的修正是：
+
+```text
+format_with_target（带目标的格式违规）：
+  语义上包含目标答案，
+  但违反“只输出短语”的协议，
+  因此不能算 strict / medium / loose closure。
+
+object_echo（对象回声）：
+  输出 apple / triangle / winter 这种对象本身，
+  不是输出 category phrase（类别短语），
+  因此不能算答案闭合。
+```
+
+### 六、数学定义
+
+设生成短语为 \(p\)，其最终边界类别为：
+
+```math
+B(p) \in \{
+\text{target\_equivalent},
+\text{close\_near\_miss},
+\text{broad\_near\_miss},
+\text{wrong},
+\text{generic\_blocker},
+\text{format\_echo},
+\text{format\_with\_target},
+\text{object\_echo},
+\text{unknown\_other}
+\}
+```
+
+三档接受集合定义为：
+
+```math
+\Omega_{\text{strict}}
+=
+\{\text{target\_equivalent}\}
+```
+
+```math
+\Omega_{\text{medium}}
+=
+\{\text{target\_equivalent},\text{close\_near\_miss}\}
+```
+
+```math
+\Omega_{\text{loose}}
+=
+\{\text{target\_equivalent},\text{close\_near\_miss},\text{broad\_near\_miss}\}
+```
+
+协议有效性定义为：
+
+```math
+P_{\text{valid}}(p)
+=
+\mathbf{1}
+\left[
+B(p)
+\notin
+\{\text{format\_echo},\text{format\_with\_target},\text{object\_echo}\}
+\right]
+```
+
+语义目标出现定义为：
+
+```math
+S_{\text{target}}(p)
+=
+\mathbf{1}
+\left[
+B(p)
+\in
+\{\text{target\_equivalent},\text{format\_with\_target}\}
+\right]
+```
+
+第 \(\tau\) 档 rollout（自然生成）接受为：
+
+```math
+R_{\tau}(p)
+=
+\mathbf{1}
+\left[
+B(p) \in \Omega_{\tau}
+\right]
+```
+
+其中：
+
+```math
+\tau \in \{\text{strict},\text{medium},\text{loose}\}
+```
+
+score closure（评分闭合）仍然使用 Phase 818 的候选竞争逻辑：
+
+```math
+C_{\text{score},\tau}
+=
+\mathbf{1}
+\left[
+\max s(\text{accepted}_{\tau})
+>
+\max s(\text{rejected}_{\tau})
+\right]
+```
+
+full closure v1（完整闭合第一版）定义为：
+
+```math
+C_{\text{full},\tau}^{v1}
+=
+C_{\text{score},\tau}
+\cdot
+R_{\tau}(p)
+\cdot
+C_{\text{wrong}}
+\cdot
+C_{\text{generic}}
+```
+
+其中：
+
+```math
+C_{\text{wrong}}
+=
+\mathbf{1}[\text{wrong blocker cleared}]
+```
+
+```math
+C_{\text{generic}}
+=
+\mathbf{1}[\text{generic blocker cleared}]
+```
+
+注意：format_with_target 虽然可能满足 \(S_{\text{target}}(p)=1\)，但由于 \(R_{\tau}(p)=0\)，不能算 full closure。
+
+### 七、标准数据结果
+
+Phase 820 共整理：
+
+```text
+standard rows: 76
+changed from Phase 819 heuristic class: 16
+```
+
+最终类别分布：
+
+```text
+target_equivalent: 40
+format_echo: 16
+broad_near_miss: 7
+close_near_miss: 4
+format_with_target: 3
+object_echo: 3
+unknown_other: 2
+wrong: 1
+```
+
+16 个关键修正包括：
+
+```text
+plant life cycle:
+  broad_near_miss -> unknown_other
+
+vegetable / vegetables:
+  target_equivalent -> close_near_miss
+
+hammer is a hand tool:
+  unknown_other -> format_with_target
+
+circulatory system:
+  unknown_other -> broad_near_miss
+
+human body part:
+  broad_near_miss -> close_near_miss
+
+electronics:
+  broad_near_miss -> close_near_miss
+
+personal computing device:
+  unknown_other -> target_equivalent
+
+o2:
+  unknown_other -> object_echo
+
+color:
+  close_near_miss -> broad_near_miss
+
+freshwater fish:
+  unknown_other -> target_equivalent
+
+salmon is best described as a freshwater fish:
+  unknown_other -> format_with_target
+
+the correct phrase is aquatic animal:
+  format_echo -> format_with_target
+
+geometry:
+  close_near_miss -> broad_near_miss
+
+triangle:
+  unknown_other -> object_echo
+
+winter:
+  unknown_other -> object_echo
+```
+
+这些修正说明 Phase 819 的自动边界规则总体可用，但在“对象回声”和“带目标的格式违规”上仍然容易误判。
+
+### 八、Phase 818 confirm 轮复算结果
+
+复算对象是 Phase 818 的 confirm 轮，每个模型 40 条，其中 exact_choices 20 条，no_choices 20 条。
+
+#### 1. qwen3
+
+exact_choices：
+
+```text
+strict full: 20 / 20
+medium full: 20 / 20
+loose full: 20 / 20
+```
+
+no_choices：
+
+```text
+strict rollout: 13 / 20
+medium rollout: 15 / 20
+loose rollout: 20 / 20
+
+strict full: 12 / 20
+medium full: 15 / 20
+loose full: 19 / 20
+
+semantic target present: 13 / 20
+protocol valid: 20 / 20
+```
+
+qwen3 的自由生成大量落在 broad_near_miss / close_near_miss（宽泛近似 / 近距离近似），协议较稳定，但严格答案边界仍不闭合。
+
+#### 2. GLM4
+
+exact_choices：
+
+```text
+strict full: 20 / 20
+medium full: 20 / 20
+loose full: 20 / 20
+```
+
+no_choices：
+
+```text
+strict rollout: 14 / 20
+medium rollout: 16 / 20
+loose rollout: 18 / 20
+
+strict full: 14 / 20
+medium full: 15 / 20
+loose full: 17 / 20
+
+semantic target present: 14 / 20
+protocol valid: 18 / 20
+```
+
+GLM4 与 qwen3 类似，但 no_choices 中仍有 unknown_other（未知其他），说明自由生成边界还不完全稳定。
+
+#### 3. DS7B
+
+exact_choices：
+
+```text
+strict full: 13 / 20
+medium full: 13 / 20
+loose full: 13 / 20
+
+semantic target present: 15 / 20
+protocol valid: 13 / 20
+```
+
+no_choices：
+
+```text
+strict rollout: 4 / 20
+medium rollout: 4 / 20
+loose rollout: 4 / 20
+
+strict full: 4 / 20
+medium full: 4 / 20
+loose full: 4 / 20
+
+semantic target present: 5 / 20
+protocol valid: 4 / 20
+```
+
+DS7B 的结果继续显示：主要问题不是答案边界太窄，而是 format/protocol route（格式 / 协议路线）和 object echo route（对象回声路线）竞争太强。
+
+### 九、对当前理论的推进
+
+Phase 820 的进展不是发现新 head（注意力头）或新 channel（通道），而是固定评价边界。它让后续研究可以更清楚地区分三类现象：
+
+```text
+1. 模型知道目标语义，但输出格式错误；
+2. 模型输出相关上位类 / 下位类，但没有严格闭合；
+3. 模型完全进入对象回声、格式回声、泛化阻塞或错误路线。
+```
+
+这对当前语言编码机制研究非常关键。因为如果答案边界不固定，后续所有 patch（补丁）、projection（投影）、suppression（抑制）、writer（写入器）实验都会面临同一个问题：
+
+```text
+到底是在修复语义路线，
+还是只是在修复评价口径？
+```
+
+Phase 820 把这个问题向前推进了一步。
+
+### 十、问题和硬伤
+
+第一，Phase 820 仍然是外部评价标准，不是内部机制证据。
+
+```text
+它告诉我们如何判定答案，
+但不告诉我们模型内部如何形成该答案。
+```
+
+第二，standard v1（标准第一版）仍然有少量人工判断成分。例如：
+
+```text
+freshwater fish 是否可算 aquatic animal 的 target equivalent；
+personal computing device 是否可算 electronic device 的 target equivalent；
+human body part 是否应为 close_near_miss。
+```
+
+这些判断在不同研究目的下可能需要调整。因此 Phase 820 只能称为 v1，而不是最终标准。
+
+第三，当前数据规模仍然较小。76 个短语来自 Phase 816-819 的有限任务集，不足以覆盖完整语言空间。
+
+第四，小模型偏差仍然需要保留。尤其是 DS7B 的格式路线不稳定，可能不是大模型真实机制的完整表现，而是小模型容量、训练分布、指令对齐不足共同造成的偏差。
+
+第五，Phase 820 仍然没有解决 token closure（词元闭合）。它只是让闭合标准更清楚：
+
+```text
+闭合不是“看起来相关”，
+闭合必须同时满足：
+自然生成有效，
+候选评分有效，
+错误路线压制，
+泛化阻塞压制。
+```
+
+### 十一、阶段性结论
+
+Phase 820 是 Phase 819 之后的必要同阶段推进，结论成立。
+
+本阶段完成了：
+
+```text
+answer-boundary atlas（答案边界图谱）
+→
+answer-boundary standard v1（答案边界标准第一版）
+```
+
+最重要的客观结果是：
+
+```text
+1. qwen3 / GLM4 在 exact_choices 下几乎完全闭合；
+2. qwen3 / GLM4 在 no_choices 下主要失败于边界层和严格短语粒度；
+3. DS7B 在 no_choices 下主要失败于格式回声和对象回声；
+4. format_with_target 必须单独列出，不能被误算为闭合；
+5. 后续机制实验必须使用固定边界标准复算，否则会继续出现评价口径漂移。
+```
+
+### 十二、下一步
+
+Phase 820 已经完成评价标准 v1 的建立。接下来的任务与当前任务处于同一个大阶段，但不再是“边界标准整理”，而应进入新的子阶段：
+
+```text
+Phase 821: boundary-standard-guided causal localization
+```
+
+建议目标：
+
+```text
+1. 使用 answer_boundary_standard_v1.jsonl 作为统一评价标准；
+2. 回到 Phase 818 的失败样本，按 target_equivalent / close_near_miss / broad_near_miss / format_echo / object_echo 分组；
+3. 分别定位这些失败类型对应的 head / channel / MLP writer / suppressor；
+4. 不再只问 correct target logit 是否上升，而是问路线是否从错误边界类迁移到目标边界类；
+5. 对 qwen3、GLM4、DS7B 分模型比较，谨慎区分小模型偏差和稳定机制。
+```
+
+本轮没有自动继续进入 Phase 821，因为它已经从离线标准整理切换到新的机制定位实验，需要重新设计测试脚本、数据量和模型运行计划。阶段性目标“固定 Phase 819 后的答案边界标准 v1”已经完成。
+
+## Phase 821: boundary-standard-guided causal localization（答案边界标准引导的因果定位）[2026-07-01 12:55]
+
+### 一、任务背景
+
+本阶段承接 Phase 820。上传内容对 Phase 820 的判断是正确的：
+
+```text
+Phase 820 不是模型内部机制闭合；
+也不是发现了模型内部真实等价类；
+而是建立 answer boundary standard v1（答案边界标准第一版）。
+```
+
+这个判断需要继续保留。Phase 820 的价值是固定评价标准，而不是替代机制定位。后续要破解语言编码机制，必须回到：
+
+```text
+哪些内部状态、层、head、channel、MLP writer、suppressor
+能让输出从一个边界类迁移到另一个边界类？
+```
+
+因此 Phase 821 的目标不是继续提高 target logit（目标词元对数几率），而是用 Phase 820 的边界标准来定义新的因果指标：
+
+```text
+boundary transition（边界迁移）。
+```
+
+### 二、本阶段核心修正
+
+在 Phase 821 运行过程中，发现 Phase 820 的 standard v1（标准第一版）存在一个小漏洞：
+
+```text
+p816_cactus_desert_plant:
+  "cactus" 不能按旧 alias（别名）规则算 target_equivalent；
+  它更接近 object_echo（对象回声）。
+
+  "cactus plants" 也不应算 strict target_equivalent；
+  它应是 close_near_miss（近距离近似），因为缺少 desert plant 粒度。
+```
+
+因此本阶段先修正了：
+
+```text
+tests/glm5/phase820_answer_boundary_standard_v1.py
+```
+
+新增覆盖项：
+
+```text
+cactus -> object_echo
+cactus plant -> close_near_miss
+cactus plants -> close_near_miss
+```
+
+并让 fallback_standard（回退标准）也遵守这些覆盖项。随后重跑 Phase 820 离线复算。
+
+修正后的 Phase 820 标准分布为：
+
+```text
+standard rows: 76
+changed from Phase 819 heuristic class: 17
+
+target_equivalent: 39
+format_echo: 16
+broad_near_miss: 7
+close_near_miss: 5
+format_with_target: 3
+object_echo: 3
+unknown_other: 2
+wrong: 1
+```
+
+这个修正说明：Phase 821 不只是机制定位，也反向审计了 Phase 820 的答案边界标准。当前标准仍应称为 v1，而不是最终标准。
+
+### 三、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase821_boundary_standard_guided_causal_localization.py
+tests/glm5/run_phase821_boundary_standard_guided_causal_localization_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase821_boundary_standard_guided_causal_localization/
+```
+
+已完成三轮：
+
+```text
+smoke（冒烟轮）
+main（主轮）
+confirm（确认轮）
+```
+
+每轮均按顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载策略：
+
+```text
+bf16
+quantization off（不使用量化）
+优先 flash_attention_2
+本地未安装 flash_attention_2，自动回退 sdpa
+每个模型测试后释放 GPU 显存
+```
+
+脚本检查：
+
+```text
+python -m py_compile tests/glm5/phase820_answer_boundary_standard_v1.py
+python -m py_compile tests/glm5/phase821_boundary_standard_guided_causal_localization.py
+bash -n tests/glm5/run_phase821_boundary_standard_guided_causal_localization_round.sh
+```
+
+均通过。
+
+### 四、测试原理
+
+Phase 821 使用 Phase 820 的 answer_boundary_standard_v1（答案边界标准第一版）作为统一评价标准。
+
+对每个模型，选取 Phase 818 confirm（确认轮）中 no_choices（无候选项）下未 strict full closure（严格完整闭合）的失败样本。
+
+本阶段的因果干预是：
+
+```text
+donor（供体）:
+  exact_choices prompt（带候选项提示）
+
+recipient（受体）:
+  no_choices prompt（无候选项提示）
+
+intervention（干预）:
+  将 donor 在某一层最后位置的 residual state（残差状态）
+  patch（补丁）到 recipient 的第一步生成位置。
+```
+
+也就是说，本阶段测试的是：
+
+```text
+候选约束条件下形成的残差状态，
+是否能把自由生成下的失败边界类推向目标边界类。
+```
+
+注意：这仍然是 layer-level residual intervention（层级残差干预），不是最终的 head / channel / neuron（注意力头 / 通道 / 神经元）级定位。
+
+### 五、边界迁移指标
+
+设边界类别为：
+
+```math
+B(p)
+\in
+\{
+T,C,B_r,FT,G,F,O,W,U
+\}
+```
+
+其中：
+
+```text
+T  = target_equivalent（目标等价）
+C  = close_near_miss（近距离近似）
+B_r = broad_near_miss（宽泛近似）
+FT = format_with_target（带目标的格式违规）
+G  = generic_blocker（泛化阻塞）
+F  = format_echo（格式回声）
+O  = object_echo（对象回声）
+W  = wrong（错误）
+U  = unknown_other（未知其他）
+```
+
+定义边界等级：
+
+```math
+r(T)=5
+```
+
+```math
+r(C)=4
+```
+
+```math
+r(B_r)=3
+```
+
+```math
+r(FT)=2
+```
+
+```math
+r(G)=1
+```
+
+```math
+r(F)=r(O)=r(W)=r(U)=0
+```
+
+边界迁移收益：
+
+```math
+\Delta r
+=
+r(B_{\text{after}})
+-
+r(B_{\text{before}})
+```
+
+本阶段不再以：
+
+```math
+\Delta z_y > 0
+```
+
+作为核心标准，而以：
+
+```math
+\Delta r > 0
+```
+
+和：
+
+```math
+B_{\text{after}} = T
+```
+
+作为更接近语言生成闭合的指标。
+
+### 六、完整闭合公式修正
+
+上传内容建议在 Phase 820 的完整闭合公式中显式加入协议有效性，这是正确修正。
+
+修正后的 full closure（完整闭合）应写成：
+
+```math
+C_{\text{full},\tau}^{v1}
+=
+C_{\text{score},\tau}
+\cdot
+R_{\tau}(p)
+\cdot
+C_{\text{wrong}}
+\cdot
+C_{\text{generic}}
+\cdot
+P_{\text{valid}}(p)
+```
+
+其中：
+
+```math
+P_{\text{valid}}(p)
+=
+\mathbf{1}
+\left[
+B(p)
+\notin
+\{F,FT,O\}
+\right]
+```
+
+这点很关键，因为：
+
+```text
+format_with_target（带目标的格式违规）
+虽然包含语义目标，
+但不能算生成闭合。
+```
+
+### 七、主轮结果
+
+main（主轮）设置：
+
+```text
+每模型最多 5 个失败样本
+后 4 层 residual patch
+max_new_tokens = 8
+```
+
+主轮结果：
+
+```text
+qwen3:
+  cases: 5
+  rows: 20
+  improved cases: 5 / 5
+  target transition cases: 5 / 5
+  protocol repaired cases: 0 / 5
+  mean delta rank: +1.05
+  improved rows: 17
+  degraded rows: 3
+
+GLM4:
+  cases: 5
+  rows: 20
+  improved cases: 3 / 5
+  target transition cases: 3 / 5
+  protocol repaired cases: 2 / 5
+  mean delta rank: +1.60
+  improved rows: 12
+  degraded rows: 8
+
+DS7B:
+  cases: 5
+  rows: 20
+  improved cases: 4 / 5
+  target transition cases: 3 / 5
+  protocol repaired cases: 3 / 5
+  mean delta rank: +0.75
+  improved rows: 9
+  degraded rows: 4
+```
+
+主轮显示：后层 donor residual（供体残差）确实能触发边界迁移，尤其 qwen3 的 broad_near_miss / close_near_miss 可以被推到 target_equivalent。
+
+典型例子：
+
+```text
+qwen3:
+  Circulatory System -> body organ
+  Vegetables -> root vegetable
+  Gas -> chemical element
+  Color -> warm color
+  Geometry -> geometric shape
+
+GLM4:
+  Plant Life Cycle -> desert plant
+  Color category -> warm color
+  Seasonal weather patterns -> cold season
+
+DS7B:
+  _________ -> edible fruit
+  _________ -> public transportation
+  Triangle -> geometric shape
+```
+
+但 DS7B 的结果在标准修正前包含 cactus -> cactus 的伪目标迁移；修正后不再把该情况计为 target_equivalent。
+
+### 八、确认轮结果
+
+confirm（确认轮）设置：
+
+```text
+qwen3: 8 个失败样本，6 个分散层
+GLM4: 6 个失败样本，6 个分散层
+DS7B: 8 个失败样本，6 个分散层
+```
+
+确认轮结果：
+
+```text
+qwen3:
+  cases: 8
+  rows: 48
+  improved cases: 5 / 8
+  target transition cases: 5 / 8
+  protocol repaired cases: 0 / 8
+  mean delta rank: -1.208
+  improved rows: 6
+  degraded rows: 20
+
+GLM4:
+  cases: 6
+  rows: 36
+  improved cases: 4 / 6
+  target transition cases: 4 / 6
+  protocol repaired cases: 2 / 6
+  mean delta rank: +0.639
+  improved rows: 12
+  degraded rows: 9
+
+DS7B:
+  cases: 8
+  rows: 48
+  improved cases: 7 / 8
+  target transition cases: 0 / 8
+  protocol repaired cases: 0 / 8
+  mean delta rank: +0.167
+  improved rows: 10
+  degraded rows: 2
+```
+
+确认轮更谨慎，也更有信息量。
+
+qwen3 的主轮强正结果主要来自后层；当加入早中层后，很多层会把输出推向 unknown_other（未知其他）或 object_echo（对象回声），所以平均 \(\Delta r\) 为负。这说明：
+
+```text
+qwen3 存在可用的后期边界修复层，
+但候选约束残差不是全层稳定修复器。
+```
+
+GLM4 的确认轮最稳定：
+
+```text
+6 个样本中 4 个出现 target transition；
+并且 L8、L31、L39 等层有稳定正迁移。
+```
+
+DS7B 的确认轮显示：
+
+```text
+很多 format_echo 可以被推到 generic_blocker，
+但不能稳定进入 target_equivalent。
+```
+
+这说明 DS7B 的 donor residual 可以修复一部分格式回声，但更多只是从“空白/格式回声”迁移到“说明性泛化阻塞”，没有完成类别答案闭合。
+
+### 九、按层结果
+
+确认轮按层统计：
+
+#### qwen3
+
+```text
+L0:
+  improve 0 / 8
+  target 0 / 8
+  mean delta -0.500
+
+L7:
+  improve 1 / 8
+  target 1 / 8
+  mean delta -0.250
+
+L14:
+  improve 1 / 8
+  target 1 / 8
+  mean delta -0.250
+
+L21:
+  improve 1 / 8
+  target 1 / 8
+  mean delta -1.750
+
+L28:
+  improve 0 / 8
+  target 0 / 8
+  mean delta -3.375
+
+L35:
+  improve 3 / 8
+  target 3 / 8
+  mean delta -1.125
+```
+
+qwen3 的关键现象是：后层有目标迁移，但也容易制造 unknown_other。说明 qwen3 的可修复信号存在，但不是直接“层越靠后越安全”。
+
+#### GLM4
+
+```text
+L0:
+  improve 0 / 6
+  target 0 / 6
+  mean delta 0.000
+
+L8:
+  improve 2 / 6
+  target 2 / 6
+  mean delta +1.667
+
+L16:
+  improve 1 / 6
+  target 1 / 6
+  mean delta +0.667
+
+L23:
+  improve 2 / 6
+  target 2 / 6
+  mean delta -0.667
+
+L31:
+  improve 3 / 6
+  target 3 / 6
+  mean delta +0.667
+
+L39:
+  improve 4 / 6
+  target 4 / 6
+  mean delta +1.500
+```
+
+GLM4 最接近“可定位的边界迁移机制”：多个层能把 unknown_other / broad_near_miss / close_near_miss 推向 target_equivalent。
+
+#### DS7B
+
+```text
+L0:
+  improve 0 / 8
+  target 0 / 8
+  mean delta 0.000
+
+L5:
+  improve 1 / 8
+  target 0 / 8
+  mean delta +0.125
+
+L11:
+  improve 1 / 8
+  target 0 / 8
+  mean delta +0.125
+
+L16:
+  improve 0 / 8
+  target 0 / 8
+  mean delta 0.000
+
+L22:
+  improve 1 / 8
+  target 0 / 8
+  mean delta 0.000
+
+L27:
+  improve 7 / 8
+  target 0 / 8
+  mean delta +0.750
+```
+
+DS7B 的 L27 很特殊：它能把 format_echo 推离空白/符号回声，但多数进入 generic_blocker。它更像 protocol verbalizer（协议说明生成器），不是 category answer writer（类别答案写入器）。
+
+### 十、阶段性进展
+
+Phase 821 是实质进展，但不是最终闭合。
+
+本阶段第一次把 Phase 820 的外部答案边界标准用于模型内部因果干预，证明：
+
+```text
+边界类不是只能被动观察；
+在某些模型、某些层、某些样本上，
+边界类可以被残差状态因果迁移。
+```
+
+这比普通 patch 的意义更大，因为指标从：
+
+```text
+target logit 是否上升
+```
+
+升级为：
+
+```text
+输出是否从错误边界类迁移到目标边界类。
+```
+
+当前最可靠的正结果是：
+
+```text
+GLM4:
+  多个层可把部分失败样本迁移到 target_equivalent。
+
+qwen3:
+  后层对 near-miss -> target 有强作用，
+  但早中层和部分后层会产生 unknown_other，整体不稳定。
+
+DS7B:
+  可以从 format_echo 迁移到 generic_blocker，
+  但不能稳定进入 target_equivalent。
+```
+
+### 十一、问题和硬伤
+
+第一，本阶段仍然不是 head / channel / neuron 级定位。
+
+```text
+当前干预对象是 layer residual state（层级残差状态）。
+```
+
+它只能说明某层残差携带了可迁移信号，不能说明具体是哪个注意力头、MLP 通道或神经元在写入该信号。
+
+第二，donor exact_choices residual（带候选项供体残差）是强干预。
+
+它可能把候选约束、答案词面、协议格式和目标类别一起搬运过去。因此当前正结果不能直接等价为：
+
+```text
+找到了自然状态下的 category writer。
+```
+
+更谨慎的说法应是：
+
+```text
+找到了能携带边界迁移信息的层级残差状态。
+```
+
+第三，qwen3 的确认轮平均 \(\Delta r\) 为负，说明强干预有明显副作用。
+
+它能制造目标迁移，但也能制造 unknown_other。这提示后续必须分解：
+
+```text
+有益子空间
+有害子空间
+协议子空间
+对象回声子空间
+类别答案子空间
+```
+
+第四，DS7B 的结果说明小模型偏差非常明显。
+
+DS7B 可以从 format_echo 推到 generic_blocker，但不能稳定推到 target_equivalent。这意味着它可能具有一部分协议说明路线，却缺少稳定的类别答案闭合路线。
+
+第五，Phase 821 反向暴露 Phase 820 标准仍需迭代。
+
+例如 cactus / cactus plants 的修正说明：
+
+```text
+answer boundary standard v1 仍不是最终答案等价类；
+机制测试会继续暴露评价标准漏洞。
+```
+
+### 十二、当前理论更新
+
+当前理论仍然保持：
+
+```text
+条件化输出场闭合理论
+```
+
+但 Phase 821 让理论多出一个关键实验对象：
+
+```text
+boundary transition operator（边界迁移算子）。
+```
+
+可以写成：
+
+```math
+\mathcal{T}_{\ell}^{D \rightarrow R}
+:
+B_{\text{before}}
+\rightarrow
+B_{\text{after}}
+```
+
+其中：
+
+```text
+D = donor context（供体上下文）
+R = recipient context（受体上下文）
+\ell = patch layer（补丁层）
+```
+
+边界迁移收益：
+
+```math
+\Delta r_{\ell}
+=
+r
+\left(
+B_{\text{after}}^{(\ell)}
+\right)
+-
+r
+\left(
+B_{\text{before}}
+\right)
+```
+
+如果：
+
+```math
+\Delta r_{\ell} > 0
+```
+
+说明该层残差状态含有正向边界迁移信息。
+
+如果：
+
+```math
+B_{\text{after}}^{(\ell)} = T
+```
+
+说明该层残差状态足以触发目标等价输出。
+
+如果：
+
+```math
+\Delta r_{\ell} < 0
+```
+
+说明该层残差状态会造成边界退化，可能携带了不适合当前 recipient context（受体上下文）的混合信息。
+
+### 十三、智能理论角度的洞察
+
+Phase 821 给出的关键洞察是：
+
+```text
+语言生成不是“答案向量读出”，
+而是“边界类迁移与闭合”。
+```
+
+知识网络方面：
+
+```text
+模型不是简单知道 cactus / desert plant / plant；
+它必须在任务条件下选择正确类别边界。
+```
+
+推理能力方面：
+
+```text
+推理不是只到相关概念；
+而是把 broad_near_miss、close_near_miss、object_echo、format_echo
+迁移到 target_equivalent。
+```
+
+语法系统方面：
+
+```text
+协议控制不是装饰层；
+它决定 format_with_target 和 target_equivalent 的边界。
+```
+
+因此，破解语言编码机制不能只找语义方向，而要找：
+
+```text
+1. 语义 / 类别写入路线；
+2. 对象回声抑制路线；
+3. 格式回声抑制路线；
+4. 协议有效路线；
+5. 边界迁移算子；
+6. 全词表竞争闭合条件。
+```
+
+### 十四、下一步
+
+接下来的任务仍然处于同一个大阶段：从答案边界标准进入机制图谱。但 Phase 821 已经完成层级残差定位，下一步应继续向更细颗粒度推进：
+
+```text
+Phase 822:
+boundary-transition head / MLP decomposition
+（边界迁移注意力头 / MLP 分解）
+```
+
+建议任务：
+
+```text
+1. 选取 Phase 821 中成功迁移的样本；
+2. 对成功层做 attention head 和 MLP channel 分解；
+3. 区分 target writer、near-miss refiner、protocol gate、format suppressor、object suppressor；
+4. 对 qwen3 / GLM4 / DS7B 分别建立角色图谱，而不是强行对齐层号；
+5. 对 DS7B 重点分析 format_echo -> generic_blocker 的机制，判断它是不是协议说明路线而非答案路线。
+```
+
+阶段性标准：
+
+```text
+最低标准：
+  找到能解释 Phase 821 成功迁移的 head / MLP 子组件。
+
+中等标准：
+  同一角色在多个样本上复现。
+
+高标准：
+  同一角色在 qwen3 和 GLM4 上可对应，DS7B 显示缺失或粗糙版本。
+```
+
+Phase 821 已完成当前阶段目标：证明边界标准可以进入因果定位，并得到第一批层级迁移证据。没有继续自动进入 Phase 822，因为下一步需要从层级残差进入 head / channel 级分解，属于新的实验子阶段。
+
+## Phase 822: boundary-transition head / MLP decomposition（边界迁移注意力头 / MLP 分解）[2026-07-01 13:21]
+
+### 一、任务背景
+
+本阶段承接 Phase 821。上传内容对 Phase 821 的判断基本正确：
+
+```text
+Phase 821 是从 answer boundary standard（答案边界标准）
+回到 internal causal localization（内部因果定位）的阶段。
+```
+
+Phase 821 已经证明：
+
+```text
+layer residual state（层级残差状态）
+可以让输出从一种 boundary class（边界类）
+迁移到另一种 boundary class（边界类）。
+```
+
+但 Phase 821 的硬伤也很清楚：
+
+```text
+它仍然只是 layer-level residual intervention（层级残差干预），
+不能说明具体是哪一个 attention head（注意力头）、
+MLP channel（MLP 通道）、
+或子空间在写入边界迁移信号。
+```
+
+因此 Phase 822 的任务是继续同一大阶段的下一步：
+
+```text
+从 layer residual transition（层级残差迁移）
+下钻到 attention / MLP / head / channel-group（注意力 / MLP / 注意力头 / 通道组）分解。
+```
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase822_boundary_transition_head_mlp_decomposition.py
+tests/glm5/run_phase822_boundary_transition_head_mlp_decomposition_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase822_boundary_transition_head_mlp_decomposition/
+```
+
+已完成三轮：
+
+```text
+smoke（冒烟轮）
+main（主轮）
+confirm（确认轮）
+```
+
+每轮均按顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载策略：
+
+```text
+bf16
+quantization off（不使用量化）
+优先 flash_attention_2
+本地 flash_attention_2 未安装，自动回退 sdpa
+每个模型测试完成后释放 GPU 显存
+```
+
+脚本检查：
+
+```text
+python -m py_compile tests/glm5/phase822_boundary_transition_head_mlp_decomposition.py
+bash -n tests/glm5/run_phase822_boundary_transition_head_mlp_decomposition_round.sh
+```
+
+均通过。
+
+### 三、测试原理
+
+Phase 822 从 Phase 821 confirm（确认轮）中读取成功或改善的 source rows（来源行），即：
+
+```text
+target_transition = true
+或
+improved_boundary = true
+```
+
+然后对相同 case（样本）和相同 layer（层）做组件分解。
+
+原始 Phase 821 干预是：
+
+```text
+whole layer residual patch（整层残差补丁）
+```
+
+Phase 822 将它拆成：
+
+```text
+1. whole_layer_residual（整层残差）
+2. whole_attention_output（整个注意力输出）
+3. whole_mlp_output（整个 MLP 输出）
+4. attention_head o_proj input slice（单个注意力头输出投影前切片）
+5. MLP top-difference channel group（MLP 差异最大通道组）
+```
+
+其中 MLP 通道组使用 donor exact_choices（供体带候选项）和 recipient no_choices（受体无候选项）之间的 down_proj input（下投影输入）差异，选择 top 1 / top 8 / top 32 通道组。
+
+本阶段仍使用 Phase 820 的 answer boundary standard v1（答案边界标准第一版）判定输出边界类。
+
+### 四、数学定义
+
+边界等级仍使用 Phase 821 的定义：
+
+```math
+r(T)=5
+```
+
+```math
+r(C)=4
+```
+
+```math
+r(B_r)=3
+```
+
+```math
+r(FT)=2
+```
+
+```math
+r(G)=1
+```
+
+```math
+r(F)=r(O)=r(W)=r(U)=0
+```
+
+边界迁移收益：
+
+```math
+\Delta r_m
+=
+r\left(B_{\text{after}}^{(m)}\right)
+-
+r\left(B_{\text{before}}\right)
+```
+
+其中 \(m\) 是被测试的组件：
+
+```math
+m
+\in
+\{
+\text{layer},
+\text{attention},
+\text{MLP},
+\text{head}_i,
+\text{MLP-channel-group}_k
+\}
+```
+
+如果：
+
+```math
+\Delta r_m > 0
+```
+
+说明该组件具有正向 boundary transition（边界迁移）作用。
+
+如果：
+
+```math
+B_{\text{after}}^{(m)} = T
+```
+
+说明该组件足以触发 target_equivalent（目标等价）输出。
+
+如果：
+
+```math
+\Delta r_m < 0
+```
+
+说明该组件可能是 harmful mixer（有害混合器）。
+
+### 五、三轮结果概览
+
+#### smoke（冒烟轮）
+
+```text
+qwen3:
+  cases: 1
+  rows: 11
+  target transition rows: 1
+  mean delta rank: +0.182
+
+GLM4:
+  cases: 1
+  rows: 11
+  target transition rows: 1
+  mean delta rank: +0.455
+
+DS7B:
+  cases: 1
+  rows: 11
+  target transition rows: 1
+  mean delta rank: +0.455
+```
+
+冒烟轮验证了：
+
+```text
+attention / MLP / head / channel-group hook 均可运行。
+```
+
+#### main（主轮）
+
+```text
+qwen3:
+  cases: 3
+  rows: 54
+  target transition rows: 10
+  improved rows: 10
+  degraded rows: 1
+  mean delta rank: +0.278
+
+GLM4:
+  cases: 3
+  rows: 54
+  target transition rows: 3
+  improved rows: 3
+  degraded rows: 0
+  mean delta rank: +0.222
+
+DS7B:
+  cases: 3
+  rows: 54
+  target transition rows: 3
+  improved rows: 4
+  degraded rows: 0
+  mean delta rank: +0.296
+```
+
+主轮显示：组件分解后仍存在边界迁移信号，但明显比整层残差稀疏。
+
+#### confirm（确认轮）
+
+```text
+qwen3:
+  cases: 4
+  rows: 152
+  target transition rows: 13
+  improved rows: 13
+  degraded rows: 1
+  mean delta rank: +0.132
+
+GLM4:
+  cases: 4
+  rows: 152
+  target transition rows: 4
+  improved rows: 4
+  degraded rows: 0
+  mean delta rank: +0.086
+
+DS7B:
+  cases: 4
+  rows: 136
+  target transition rows: 3
+  improved rows: 5
+  degraded rows: 0
+  mean delta rank: +0.125
+```
+
+确认轮说明：
+
+```text
+组件级迁移存在，但很稀疏；
+整层残差信号仍然强于单组件信号；
+不同模型的可分解性明显不同。
+```
+
+### 六、qwen3 结果
+
+qwen3 是本阶段最清楚的 head-level（注意力头级）正结果来源。
+
+confirm 轮中：
+
+```text
+target transition rows: 13
+```
+
+按组件分布：
+
+```text
+layer_residual: 4
+attention_output: 1
+mlp_output: 2
+attention_head: 6
+mlp_channel_group: 0
+```
+
+典型成功：
+
+```text
+p816_heart_body_organ:
+  baseline:
+    Circulatory System -> broad_near_miss
+
+  successful components:
+    whole_layer_residual -> Body Organ
+    whole_attention_output -> Body Organ
+    whole_mlp_output -> Body Organ
+    head_3 -> Body Organ
+    head_4 -> Body Organ
+    head_8 -> Body Organ
+    head_16 -> Body Organ
+    head_22 -> Body Organ
+    head_25 -> Body Organ
+```
+
+还有一个有害头：
+
+```text
+head_21:
+  Circulatory System -> 1
+  broad_near_miss -> unknown_other
+  delta rank = -3
+```
+
+qwen3 的结果说明：
+
+```text
+1. 某些 attention heads 可以单独触发 near-miss -> target 迁移；
+2. MLP output 在部分样本上也能触发目标迁移；
+3. MLP top-channel group 暂未复现目标迁移；
+4. 同一层内同时存在有益 head 和有害 head。
+```
+
+这是 Phase 822 最接近“具体内部机制”的正结果。
+
+### 七、GLM4 结果
+
+GLM4 在 Phase 821 中是最稳定的层级残差迁移模型，但 Phase 822 显示：
+
+```text
+confirm target transition rows: 4
+全部来自 whole_layer_residual
+```
+
+组件分布：
+
+```text
+layer_residual: 4 target transitions
+attention_output: 0
+mlp_output: 0
+attention_head: 0
+mlp_channel_group: 0
+```
+
+典型成功：
+
+```text
+Seasonal weather patterns -> cold season
+Plant Life Cycle -> Desert plant
+Color category -> red color
+Vegetable -> root vegetable
+```
+
+但这些成功在当前分解粒度下没有被单独 attention / MLP / head / channel group 复现。
+
+这说明：
+
+```text
+GLM4 的边界迁移信号可能是分布式残差组合；
+单独 attention 或 MLP 替换不足以复现；
+需要进一步做有益 / 有害子空间分解，而不是只按模块切开。
+```
+
+### 八、DS7B 结果
+
+DS7B 的确认轮：
+
+```text
+target transition rows: 3
+improved rows: 5
+```
+
+组件分布：
+
+```text
+layer_residual:
+  2 target transitions
+  2 generic blocker transitions
+
+mlp_channel_group:
+  1 target transition
+
+attention_output:
+  0
+
+attention_head:
+  0
+
+mlp_output:
+  0
+```
+
+典型现象：
+
+```text
+p816_triangle_geometric_shape:
+  baseline:
+    Triangle -> object_echo
+
+  whole_layer_residual:
+    geometric shape -> target_equivalent
+
+  mlp_topdiff_32:
+    polygon -> target_equivalent
+```
+
+但另一些样本：
+
+```text
+format_echo -> The answer should be a single word or
+```
+
+这类迁移只是：
+
+```text
+format_echo -> generic_blocker
+```
+
+不能算类别答案闭合。
+
+DS7B 的结果说明：
+
+```text
+1. DS7B 仍主要是 protocol verbalizer（协议说明器）路线；
+2. 但在 triangle 这种对象回声样本上，MLP top-channel group 有一次目标迁移；
+3. attention heads 未显示有效目标迁移；
+4. 小模型机制较粗糙，不能直接推广为真实语言编码机制。
+```
+
+### 九、阶段性进展
+
+Phase 822 是实质进展，但不是最终闭合。
+
+它完成了三件事：
+
+```text
+1. 第一次把 Phase 821 的层级边界迁移信号拆到组件级；
+2. 在 qwen3 中找到多个可单独触发目标迁移的 attention heads；
+3. 在 DS7B 中发现一个 MLP channel-group 可把 object_echo 推向 target_equivalent。
+```
+
+同时它也给出关键负结果：
+
+```text
+1. GLM4 的边界迁移信号目前无法被简单 attention / MLP 单模块复现；
+2. MLP top-channel group 在 qwen3 和 GLM4 中没有复现主要迁移；
+3. 大多数 head 是 neutral（中性）的；
+4. 单组件迁移远比整层残差迁移稀疏。
+```
+
+这说明：
+
+```text
+边界迁移不是单个组件普遍携带；
+而是少量组件、整层组合、以及可能的子空间共同作用。
+```
+
+### 十、问题和硬伤
+
+第一，本阶段虽然进入 head / MLP 分解，但仍不是完整 neuron-level atlas（神经元级图谱）。
+
+```text
+attention head 已经开始定位；
+MLP 还只是 top-difference channel group；
+没有完成单 neuron / 单 channel 的完整因果图谱。
+```
+
+第二，组件 patch 仍然是强干预。
+
+```text
+donor exact_choices 的组件状态
+仍然可能携带候选约束、答案词面、协议格式和目标类别的混合信息。
+```
+
+第三，GLM4 的负结果不能解释为没有 head / MLP 机制。
+
+更谨慎的解释是：
+
+```text
+当前按模块硬切的 patch 不足以分离 GLM4 的分布式边界迁移信号。
+```
+
+第四，qwen3 的 head 正结果还需要跨样本复现。
+
+目前最强的 head 级证据集中在：
+
+```text
+p816_heart_body_organ
+Circulatory System -> Body Organ
+```
+
+这说明它是真信号，但还不是全局机制。
+
+第五，DS7B 的 MLP channel-group 正结果只有局部案例。
+
+```text
+Triangle -> polygon / geometric shape
+```
+
+这可能说明 DS7B 有粗糙的 object_echo -> category route，但仍不稳定。
+
+### 十一、理论更新
+
+Phase 822 将 Phase 821 的边界迁移算子进一步拆成组件级：
+
+```math
+\mathcal{T}_{\ell}^{D \rightarrow R}
+\approx
+\sum_i
+\mathcal{T}_{\ell,h_i}^{D \rightarrow R}
+
++
+
+\mathcal{T}_{\ell,\text{MLP}}^{D \rightarrow R}
+
++
+
+\mathcal{T}_{\ell,\text{mix}}^{D \rightarrow R}
+```
+
+其中：
+
+```text
+h_i = attention head（注意力头）
+MLP = 多层感知机输出 / 通道组
+mix = 不能被当前单模块解释的混合项
+```
+
+本阶段结果说明：
+
+```text
+qwen3:
+  存在可单独触发边界迁移的 attention head。
+
+GLM4:
+  \mathcal{T}_{\ell,\text{mix}} 仍占主导。
+
+DS7B:
+  存在少量 MLP-channel-group 迁移，但 protocol verbalizer 仍强。
+```
+
+### 十二、智能理论角度的洞察
+
+Phase 822 的关键洞察是：
+
+```text
+语言的边界迁移不是均匀分布在所有组件中；
+它集中在少量可触发组件和更大的残差组合中。
+```
+
+从知识网络看：
+
+```text
+知识边界不是单一节点；
+它需要 attention / MLP / residual mix 共同把对象路线推向类别路线。
+```
+
+从推理能力看：
+
+```text
+推理不是单 head 完成；
+但少数 head 可以触发关键边界跳转。
+```
+
+从语法系统看：
+
+```text
+DS7B 的 generic blocker 迁移说明协议路线可以压过答案路线；
+语法 / 协议不是附属输出，而是竞争路线本身。
+```
+
+### 十三、下一步
+
+接下来的任务仍然处于同一个大阶段，但 Phase 822 已完成“组件级第一版分解”。下一步应进入：
+
+```text
+Phase 823:
+beneficial / harmful boundary-transition subspace split
+（有益 / 有害边界迁移子空间拆分）
+```
+
+原因是：
+
+```text
+1. qwen3 同一层中出现有益 heads 和 harmful head；
+2. GLM4 的整层残差信号不能被简单模块分解；
+3. DS7B 的整层残差同时包含 protocol verbalizer 和 category repair；
+4. 继续只按组件切分会进入边际收益递减。
+```
+
+Phase 823 建议任务：
+
+```text
+1. 对 Phase 822 成功与失败组件构造正负方向；
+2. 分离 beneficial subspace（有益子空间）和 harmful subspace（有害子空间）；
+3. 对 qwen3 的成功 heads 做跨样本复测；
+4. 对 GLM4 的 whole_layer_residual 做子空间投影，寻找为何单模块不复现；
+5. 对 DS7B 分离 protocol verbalizer 与 category answer repair。
+```
+
+阶段性标准：
+
+```text
+最低标准：
+  有益子空间能保留 target transition，同时减少 unknown_other / generic_blocker。
+
+中等标准：
+  有益 / 有害拆分能解释 qwen3 和 GLM4 的差异。
+
+高标准：
+  子空间角色可跨模型对应。
+```
+
+本阶段没有继续自动进入 Phase 823，因为下一步已经从组件分解转向子空间分解，需要重新设计方向构造和投影测试。
+
+## Phase 823: beneficial / harmful boundary-transition subspace split（有益 / 有害边界迁移子空间拆分） [2026-07-01 14:22]
+
+### 一、任务
+
+本阶段继续分析 Phase 822（第822阶段）附件中的判断是否正确，并在确认 Phase 822 已经完成组件级第一版分解之后，自动进入同一大阶段的下一步：
+
+```text
+Phase 823:
+beneficial / harmful boundary-transition subspace split
+（有益 / 有害边界迁移子空间拆分）
+```
+
+Phase 822 的关键发现是：
+
+```text
+1. qwen3 中部分 attention head（注意力头）可以单独触发 target_equivalent（目标等价）；
+2. 同一层也出现 harmful head（有害头）；
+3. GLM4 的整层残差迁移稳定，但单 attention / MLP 组件不能复现；
+4. DS7B 中存在少量 MLP channel group（MLP 通道组）迁移，但 protocol verbalizer（协议说明器）仍强。
+```
+
+所以 Phase 823 不再继续机械拆更多 head / channel，而是测试：
+
+```text
+同一个组件内部的 donor-recipient 差分，
+是否可以进一步拆成有益子空间和有害子空间。
+```
+
+### 二、对附件判断的审视
+
+附件对 Phase 822 的总体判断基本正确。
+
+正确部分：
+
+```text
+1. Phase 822 确实是实质进展；
+2. 它把 layer residual state（层残差状态）迁移下钻到 attention head / MLP / MLP channel group；
+3. qwen3 的 head-level 证据最清楚；
+4. GLM4 的信号更像分布式残差组合；
+5. DS7B 仍然受 protocol verbalizer 路线影响；
+6. 下一步应该做 beneficial / harmful subspace split，而不是继续只堆组件。
+```
+
+需要收紧的部分：
+
+```text
+1. attention head 触发 target_equivalent 不等于该 head 是自然生成中的稳定 category writer；
+2. top-difference MLP channel group 不等于 causal channel group；
+3. donor exact_choices 仍然携带候选约束、格式、答案词面和类别路线的混合信息；
+4. 小模型内部结构可能较粗糙，不能把 qwen3 / GLM4 / DS7B 的局部子空间直接当成真实语言编码机制。
+```
+
+### 三、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase823_beneficial_harmful_boundary_subspace_split.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase823_beneficial_harmful_boundary_subspace_split_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase823_beneficial_harmful_boundary_subspace_split/
+```
+
+三轮测试：
+
+```text
+smoke   : 2 个来源组件，budget=16
+main    : 最多 8 个来源组件，budget=16,64
+confirm : Phase 822 全部有效来源组件，budget=16,64,256
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+本阶段没有使用量化。加载时优先尝试 flash_attention_2，但本地环境没有安装 FlashAttention2 包，所以自动回退到 sdpa。每个模型测试完成后释放显存。
+
+### 四、测试原理
+
+Phase 823 从 Phase 822 confirm 结果中选择：
+
+```text
+target_transition = true
+或 improved_boundary = true
+或 degraded_boundary = true
+```
+
+的来源组件。
+
+对每个来源组件，构造：
+
+```text
+recipient = no_choices prompt（无候选项提示）
+donor     = exact_choices prompt（带候选项提示）
+```
+
+然后捕获同一层、同一组件上的状态：
+
+```math
+h_R^{(m)} = \text{recipient component state}
+```
+
+```math
+h_D^{(m)} = \text{donor component state}
+```
+
+组件差分为：
+
+```math
+\Delta h^{(m)} = h_D^{(m)} - h_R^{(m)}
+```
+
+为了给每个维度一个粗略的正负方向，本阶段使用 target first-token（目标首词元）和 baseline first-token（基线首词元）的 readout direction（读出方向）：
+
+```math
+u = W_U[y_{\text{target-first}}] - W_U[y_{\text{baseline-first}}]
+```
+
+其中：
+
+```text
+W_U = unembedding / lm_head（反嵌入 / 语言模型头）
+```
+
+对不同组件，使用不同的有效读出方向。
+
+对于 residual / attention output / MLP output：
+
+```math
+g^{(m)} = u
+```
+
+对于 attention head 的 o_proj input slice：
+
+```math
+g^{(h)} = W_{O,h}^{T} u
+```
+
+对于 MLP down_proj input channel group：
+
+```math
+g^{(c)} = W_{\text{down},c}^{T} u
+```
+
+每个维度的有益 / 有害粗评分为：
+
+```math
+s_i^{(m)} = \Delta h_i^{(m)} \cdot g_i^{(m)}
+```
+
+然后拆分：
+
+```math
+S_+^{(m)}(k) = \text{top-}k\{i \mid s_i^{(m)} > 0\}
+```
+
+```math
+S_-^{(m)}(k) = \text{top-}k\{i \mid s_i^{(m)} < 0\}
+```
+
+并测试五类 patch：
+
+```text
+all             : 整个组件差分
+positive_topk   : 只 patch 正向 top-k 子空间
+negative_topk   : 只 patch 负向 top-k 子空间
+abs_topk        : 只 patch 绝对值最大 top-k 子空间
+random_topk     : 随机 top-k 对照
+```
+
+干预形式为：
+
+```math
+h_{\text{patched},i}^{(m)}
+=
+h_{R,i}^{(m)}
++
+\alpha \left(h_{D,i}^{(m)} - h_{R,i}^{(m)}\right),
+\quad i \in S
+```
+
+其中：
+
+```text
+S = 被选择的子空间维度集合
+alpha = 1.0
+```
+
+评价仍然使用 Phase 820 的 answer boundary standard v1（答案边界标准第一版）：
+
+```math
+\Delta r
+=
+r(B_{\text{after}})
+-
+r(B_{\text{before}})
+```
+
+其中：
+
+```text
+target_equivalent = 5
+close_near_miss   = 4
+broad_near_miss   = 3
+format_with_target= 2
+generic_blocker   = 1
+format_echo / object_echo / wrong / unknown_other = 0
+```
+
+### 五、确认轮总体结果
+
+确认轮结果：
+
+```text
+qwen3:
+  source components = 14
+  rows = 182
+  improved = 43
+  target transitions = 43
+  degraded = 3
+  mean delta rank = +0.374
+  positive better pairs = 8 / 42
+
+GLM4:
+  source components = 4
+  rows = 52
+  improved = 9
+  target transitions = 9
+  degraded = 1
+  mean delta rank = +0.269
+  positive better pairs = 2 / 12
+
+DS7B:
+  source components = 5
+  rows = 65
+  improved = 19
+  target transitions = 17
+  degraded = 0
+  mean delta rank = +1.338
+  positive better pairs = 4 / 15
+```
+
+### 六、按模式汇总
+
+qwen3：
+
+```text
+all:
+  n=14, target=11, improved=11, degraded=0
+
+positive_topk:
+  n=42, target=10, improved=10, degraded=1
+
+negative_topk:
+  n=42, target=5, improved=5, degraded=2
+
+abs_topk:
+  n=42, target=12, improved=12, degraded=0
+
+random_topk:
+  n=42, target=5, improved=5, degraded=0
+```
+
+GLM4：
+
+```text
+all:
+  n=4, target=4, improved=4, degraded=0
+
+positive_topk:
+  n=12, target=2, improved=2, degraded=1
+
+negative_topk:
+  n=12, target=0, improved=0, degraded=0
+
+abs_topk:
+  n=12, target=3, improved=3, degraded=0
+
+random_topk:
+  n=12, target=0, improved=0, degraded=0
+```
+
+DS7B：
+
+```text
+all:
+  n=5, target=3, improved=5, degraded=0
+
+positive_topk:
+  n=15, target=4, improved=4, degraded=0
+
+negative_topk:
+  n=15, target=3, improved=3, degraded=0
+
+abs_topk:
+  n=15, target=5, improved=5, degraded=0
+
+random_topk:
+  n=15, target=2, improved=2, degraded=0
+```
+
+### 七、关键客观现象
+
+#### 1. qwen3：有正结果，但正负方向不干净
+
+qwen3 中，整体组件 patch 仍然最强：
+
+```text
+all: 11 / 14 target transitions
+```
+
+positive_topk 有一定效果：
+
+```text
+10 / 42 target transitions
+```
+
+但 negative_topk 也出现：
+
+```text
+5 / 42 target transitions
+```
+
+这说明：
+
+```text
+readout-sign（读出符号）不能干净地区分有益 / 有害维度。
+```
+
+典型现象：
+
+```text
+p816_heart_body_organ:
+  layer_residual positive_topk 64 -> Body Organ
+  layer_residual negative_topk 64 -> Body Organ
+  layer_residual positive_topk 256 -> 1
+  layer_residual negative_topk 256 -> 1
+```
+
+也就是说，某些预算下正负子空间都能触发 target_equivalent；某些预算下正负子空间又都会触发 unknown_other。
+
+这说明 qwen3 的边界迁移不是简单的：
+
+```text
+positive direction = answer
+negative direction = blocker
+```
+
+而更像：
+
+```text
+若干高能维度共同触发路线切换；
+读出符号只是一个粗筛选器。
+```
+
+#### 2. GLM4：整层残差最稳定，子空间只局部有效
+
+GLM4 的 all patch：
+
+```text
+4 / 4 target transitions
+```
+
+但 positive_topk 只有：
+
+```text
+2 / 12 target transitions
+```
+
+negative_topk 和 random_topk 都没有 target transition。
+
+典型现象：
+
+```text
+p816_carrot_root_vegetable:
+  positive_topk 16 -> 1 / unknown_other
+  positive_topk 64 -> Root vegetable
+  positive_topk 256 -> root vegetable
+  abs_topk 16/64/256 -> Root vegetable / root vegetable
+```
+
+这说明 GLM4 的边界迁移信号有一定稀疏可提取性，但只在部分案例和合适预算下成立；过小预算可能反而破坏边界。
+
+#### 3. DS7B：layer residual 正向子空间最清楚，但 MLP channel group 反向异常
+
+DS7B 的 layer_residual 中，positive_topk 对 triangle 案例非常清楚：
+
+```text
+p816_triangle_geometric_shape:
+  object_echo -> polygon / Geometric shape
+```
+
+并且：
+
+```text
+positive_topk 16 / 64 / 256 均能触发 target_equivalent。
+negative_topk 则保持 object_echo。
+```
+
+这是本阶段最接近“有益 / 有害拆分”的正例。
+
+但同一个 triangle 案例的 MLP channel group 出现反向现象：
+
+```text
+mlp_topdiff_32:
+  negative_topk -> polygon / target_equivalent
+  positive_topk -> object_echo
+```
+
+这说明：
+
+```text
+在 MLP channel group 上，
+target-vs-baseline first-token readout sign 可能和真实边界迁移方向相反。
+```
+
+因此，readout-sign 不能作为普适子空间方向，只能作为 Phase 823 的第一版粗代理。
+
+### 八、阶段性结论
+
+Phase 823 是实质进展，但不是子空间闭合。
+
+它证明了：
+
+```text
+1. 整个组件差分不是唯一有效对象；
+2. 部分子空间 patch 可以复现 target_equivalent；
+3. positive_topk 通常优于 random_topk；
+4. negative_topk 在部分模型 / 组件中确实更弱或更差；
+5. 但正负子空间没有被干净分离。
+```
+
+更严格地说，本阶段完成的是：
+
+```text
+从“组件是否有效”
+推进到
+“组件内部某些维度集合是否足以触发边界迁移”
+```
+
+但还没有完成：
+
+```text
+beneficial subspace（有益子空间）
+和 harmful subspace（有害子空间）
+的稳定、可泛化、可解释分离。
+```
+
+### 九、问题和硬伤
+
+第一，readout direction（读出方向）过于粗糙。
+
+本阶段使用：
+
+```math
+u = W_U[y_{\text{target-first}}] - W_U[y_{\text{baseline-first}}]
+```
+
+但真实答案闭合不是单个 first-token 问题，而是：
+
+```text
+answer boundary class（答案边界类）
+multi-token span（多词元片段）
+protocol validity（协议有效性）
+full-vocabulary competition（全词表竞争）
+```
+
+的组合。
+
+第二，正负符号不等于功能角色。
+
+qwen3 和 DS7B 都出现：
+
+```text
+negative_topk 也能生成 target_equivalent
+```
+
+说明负号不是天然 harmful。
+
+第三，abs_topk 经常比 positive_topk 更强。
+
+这说明：
+
+```text
+高能维度强度
+有时比 readout-sign 更能预测迁移效果。
+```
+
+第四，小模型结构偏差明显。
+
+```text
+qwen3:
+  正负方向混合，且同一预算可能突然转向 unknown_other。
+
+GLM4:
+  整层残差信号稳定，但子空间提取较难。
+
+DS7B:
+  layer residual 有清楚正例，但 MLP channel group 出现符号反向。
+```
+
+这些都说明小模型的内部机制较粗糙，不能直接当成真实语言编码机制。
+
+第五，仍然不是 neuron-level atlas（神经元级图谱）。
+
+本阶段选的是维度子集，不是单神经元自然功能图谱；并且 patch 仍然来自 donor exact_choices。
+
+### 十、理论更新
+
+Phase 823 把 Phase 822 的组件级迁移公式：
+
+```math
+\mathcal{T}_{\ell}^{D \rightarrow R}
+\approx
+\sum_i
+\mathcal{T}_{\ell,h_i}^{D \rightarrow R}
++
+\mathcal{T}_{\ell,\text{MLP}}^{D \rightarrow R}
++
+\mathcal{T}_{\ell,\text{mix}}^{D \rightarrow R}
+```
+
+进一步拆成：
+
+```math
+\mathcal{T}_{m}^{D \rightarrow R}
+=
+\mathcal{T}_{m,+}^{D \rightarrow R}
++
+\mathcal{T}_{m,-}^{D \rightarrow R}
++
+\mathcal{T}_{m,\text{abs}}^{D \rightarrow R}
++
+\epsilon_m
+```
+
+其中：
+
+```text
+m = component（组件）
+\mathcal{T}_{m,+} = readout-positive subspace transition（读出正向子空间迁移）
+\mathcal{T}_{m,-} = readout-negative subspace transition（读出负向子空间迁移）
+\mathcal{T}_{m,\text{abs}} = high-energy subspace transition（高能子空间迁移）
+\epsilon_m = 当前符号拆分不能解释的混合项
+```
+
+本阶段结果要求把理论收紧为：
+
+```text
+语言边界迁移不是简单正负线性投影；
+它更像高能子空间、读出方向、协议路线和边界类评价共同形成的非线性路线切换。
+```
+
+更接近当前现象的公式是：
+
+```math
+B_{\text{after}}
+=
+\mathcal{C}
+\left(
+h_R
++
+\Pi_{S}
+\left(h_D-h_R\right),
+\;
+\mathcal{P},
+\;
+\mathcal{V}
+\right)
+```
+
+其中：
+
+```text
+\mathcal{C} = boundary classifier / generation closure process（边界分类 / 生成闭合过程）
+\Pi_S = 子空间选择算子
+\mathcal{P} = prompt / protocol condition（提示 / 协议条件）
+\mathcal{V} = full vocabulary competition field（全词表竞争场）
+```
+
+Phase 823 说明：
+
+```math
+S
+\neq
+\{i \mid s_i>0\}
+```
+
+也就是说，真正的有益子空间不能简单等同于 readout-positive dimensions（读出正向维度）。
+
+### 十一、智能理论角度的洞察
+
+从知识网络看：
+
+```text
+类别答案不是单个知识节点被点亮；
+而是对象路线、类别路线、协议路线和竞争场共同切换。
+```
+
+从推理能力看：
+
+```text
+模型可以通过局部子空间完成边界跳转，
+但这个跳转不是稳定逻辑规则，
+而更像在多条路线之间改变吸引方向。
+```
+
+从语法 / 协议系统看：
+
+```text
+DS7B 的 generic_blocker 和 protocol verbalizer 仍然说明：
+协议路线本身是强竞争路线，
+不是输出表面的附属物。
+```
+
+从语言编码机制看：
+
+```text
+真正的编码机制不能只找“语义方向”；
+也不能只找“有益 head”；
+而必须刻画：
+条件化状态差分
++
+组件 / 子空间承载
++
+边界类迁移
++
+全词表竞争闭合。
+```
+
+### 十二、当前进度评估
+
+对“破解语言编码机制”的整体进度，本阶段略有提升，但还没有达到闭合。
+
+谨慎估计：
+
+```text
+结构拼图进度：约 42% -> 44%
+神经元级图谱进度：约 18% -> 20%
+完整 token closure 进度：约 25% -> 26%
+统一数学理论进度：约 34% -> 36%
+```
+
+提升原因：
+
+```text
+第一次验证了组件内部子空间可以部分复现边界迁移。
+```
+
+限制原因：
+
+```text
+正负子空间没有干净分离；
+readout-sign 代理不充分；
+小模型现象不稳定；
+仍未实现自然生成闭合。
+```
+
+### 十三、下一步 Phase
+
+下一阶段仍属于同一大阶段，但 Phase 823 已经完成第一版有益 / 有害子空间拆分。继续推进应进入：
+
+```text
+Phase 824:
+boundary-class-gradient subspace search
+（边界类梯度子空间搜索）
+```
+
+核心原因：
+
+```text
+Phase 823 证明 readout-sign 不够；
+下一步不能只用 target first-token 方向；
+必须直接围绕 boundary class transition（边界类迁移）构造搜索目标。
+```
+
+建议任务：
+
+```text
+1. 不再用 target token - baseline token 作为唯一方向；
+2. 以 boundary rank improvement（边界等级提升）为直接目标；
+3. 对 source component 内部做 small sparse search（小规模稀疏搜索）；
+4. 比较 positive_topk、abs_topk、causal greedy topk、random_topk；
+5. 重点测试 qwen3 的 heart/body-organ heads、GLM4 的 L8/L39 residual、DS7B 的 triangle L27 residual 与 MLP channel group；
+6. 输出可视化图谱格式，区分 answer-supporting dims、protocol dims、blocker dims、unstable dims。
+```
+
+阶段性闭合标准：
+
+```text
+最低标准：
+  causal greedy 子空间优于 readout-positive 和 random。
+
+中等标准：
+  子空间能在同一 case 多预算下稳定复现 target_equivalent。
+
+高标准：
+  同一类子空间能跨 case 或跨模型复用。
+```
+
+当前结论：
+
+```text
+Phase 823 证明“组件内部可拆”是正确方向；
+但也证明“读出符号正负拆分”不是最终答案。
+下一步必须从 readout-proxy split 进入 boundary-objective sparse search。
+```

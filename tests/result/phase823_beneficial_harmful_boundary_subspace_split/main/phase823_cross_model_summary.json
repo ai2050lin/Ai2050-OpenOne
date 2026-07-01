@@ -1,0 +1,1407 @@
+{
+  "model_summaries": {
+    "deepseek7b": {
+      "attn_implementation": "sdpa",
+      "boundary": "This phase splits donor-recipient component differences from Phase 822 into readout-positive and readout-negative subspaces and tests whether partial subspace patches preserve, improve, or harm boundary transitions.",
+      "by_case": {
+        "p816_carrot_root_vegetable": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "format_echo",
+          "best_budget": 3584,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 1,
+          "best_mode": "all",
+          "best_patched_class": "generic_blocker",
+          "best_patched_generated": "The answer should be a single word or"
+        },
+        "p816_cat_living_thing": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "format_echo",
+          "best_budget": 3584,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 5,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "living organism"
+        },
+        "p816_doctor_medical_worker": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "format_echo",
+          "best_budget": 3584,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 1,
+          "best_mode": "all",
+          "best_patched_class": "generic_blocker",
+          "best_patched_generated": "The answer should be a single word or"
+        },
+        "p816_triangle_geometric_shape": {
+          "any_negative_degraded": false,
+          "any_positive_target": true,
+          "baseline_class": "object_echo",
+          "best_budget": 3584,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 5,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "geometric shape"
+        }
+      },
+      "component_mode_summary": {
+        "layer_residual/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 1.25,
+          "n": 8,
+          "patched_classes": {
+            "format_echo": 6,
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "layer_residual/all": {
+          "degraded_rows": 0,
+          "improved_rows": 4,
+          "mean_delta_boundary_rank": 3.0,
+          "n": 4,
+          "patched_classes": {
+            "generic_blocker": 2,
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "layer_residual/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 8,
+          "patched_classes": {
+            "format_echo": 4,
+            "object_echo": 2,
+            "unknown_other": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "layer_residual/positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 1.25,
+          "n": 8,
+          "patched_classes": {
+            "format_echo": 4,
+            "target_equivalent": 2,
+            "unknown_other": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "layer_residual/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 8,
+          "patched_classes": {
+            "format_echo": 6,
+            "object_echo": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "mlp_channel_group/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 5.0,
+          "n": 2,
+          "patched_classes": {
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "mlp_channel_group/all": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 5.0,
+          "n": 1,
+          "patched_classes": {
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 1,
+          "target_transition_rows": 1
+        },
+        "mlp_channel_group/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 5.0,
+          "n": 2,
+          "patched_classes": {
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "mlp_channel_group/positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "object_echo": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "mlp_channel_group/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 2.5,
+          "n": 2,
+          "patched_classes": {
+            "object_echo": 1,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 1,
+          "target_transition_rows": 1
+        }
+      },
+      "degraded_rows": 0,
+      "dtype": "bfloat16",
+      "improved_rows": 14,
+      "mean_delta_boundary_rank": 1.3777777777777778,
+      "mode_summary": {
+        "abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 4,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 10,
+          "patched_classes": {
+            "format_echo": 6,
+            "target_equivalent": 4
+          },
+          "protocol_repaired_rows": 4,
+          "target_transition_rows": 4
+        },
+        "all": {
+          "degraded_rows": 0,
+          "improved_rows": 5,
+          "mean_delta_boundary_rank": 3.4,
+          "n": 5,
+          "patched_classes": {
+            "generic_blocker": 2,
+            "target_equivalent": 3
+          },
+          "protocol_repaired_rows": 3,
+          "target_transition_rows": 3
+        },
+        "negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 1.0,
+          "n": 10,
+          "patched_classes": {
+            "format_echo": 4,
+            "object_echo": 2,
+            "target_equivalent": 2,
+            "unknown_other": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 1.0,
+          "n": 10,
+          "patched_classes": {
+            "format_echo": 4,
+            "object_echo": 2,
+            "target_equivalent": 2,
+            "unknown_other": 2
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 2
+        },
+        "random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 0.5,
+          "n": 10,
+          "patched_classes": {
+            "format_echo": 6,
+            "object_echo": 3,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 1,
+          "target_transition_rows": 1
+        }
+      },
+      "model": "deepseek7b",
+      "n_cases": 4,
+      "n_rows": 45,
+      "n_source_components": 5,
+      "pair_summary": {
+        "negative_target_pairs": 2,
+        "paired_count": 10,
+        "pairs": [
+          {
+            "key": [
+              "deepseek7b",
+              "p816_triangle_geometric_shape",
+              27,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "object_echo",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": true,
+            "positive_class": "target_equivalent",
+            "positive_rank": 5,
+            "positive_target": true
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_triangle_geometric_shape",
+              27,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "object_echo",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": true,
+            "positive_class": "target_equivalent",
+            "positive_rank": 5,
+            "positive_target": true
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_triangle_geometric_shape",
+              27,
+              "mlp_channel_group",
+              "mlp_topdiff_32",
+              16
+            ],
+            "negative_class": "target_equivalent",
+            "negative_rank": 5,
+            "negative_target": true,
+            "positive_better": false,
+            "positive_class": "object_echo",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_triangle_geometric_shape",
+              27,
+              "mlp_channel_group",
+              "mlp_topdiff_32",
+              64
+            ],
+            "negative_class": "target_equivalent",
+            "negative_rank": 5,
+            "negative_target": true,
+            "positive_better": false,
+            "positive_class": "object_echo",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_cat_living_thing",
+              27,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "unknown_other",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_cat_living_thing",
+              27,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "unknown_other",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_doctor_medical_worker",
+              5,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "format_echo",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "format_echo",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_doctor_medical_worker",
+              5,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "format_echo",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "format_echo",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_carrot_root_vegetable",
+              22,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "format_echo",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "format_echo",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "deepseek7b",
+              "p816_carrot_root_vegetable",
+              22,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "format_echo",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "format_echo",
+            "positive_rank": 0,
+            "positive_target": false
+          }
+        ],
+        "positive_better_pairs": 2,
+        "positive_target_pairs": 2
+      },
+      "phase": 823,
+      "protocol_repaired_rows": 12,
+      "quantization": "off",
+      "round": "main",
+      "source_round": "confirm",
+      "target_transition_rows": 12,
+      "timestamp": "2026-07-01 14:20:05",
+      "title": "Beneficial / Harmful Boundary-Transition Subspace Split"
+    },
+    "glm4": {
+      "attn_implementation": "sdpa",
+      "boundary": "This phase splits donor-recipient component differences from Phase 822 into readout-positive and readout-negative subspaces and tests whether partial subspace patches preserve, improve, or harm boundary transitions.",
+      "by_case": {
+        "p816_cactus_desert_plant": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "unknown_other",
+          "best_budget": 4096,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 5,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "Desert plant"
+        },
+        "p816_carrot_root_vegetable": {
+          "any_negative_degraded": false,
+          "any_positive_target": true,
+          "baseline_class": "close_near_miss",
+          "best_budget": 4096,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 1,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "root vegetable"
+        },
+        "p816_red_warm_color": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "broad_near_miss",
+          "best_budget": 4096,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 2,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "red color"
+        },
+        "p816_winter_cold_season": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "unknown_other",
+          "best_budget": 4096,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 5,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "cold season"
+        }
+      },
+      "component_mode_summary": {
+        "layer_residual/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 0.25,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "target_equivalent": 2,
+            "unknown_other": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "layer_residual/all": {
+          "degraded_rows": 0,
+          "improved_rows": 4,
+          "mean_delta_boundary_rank": 3.25,
+          "n": 4,
+          "patched_classes": {
+            "target_equivalent": 4
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 4
+        },
+        "layer_residual/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "close_near_miss": 2,
+            "unknown_other": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "layer_residual/positive_topk": {
+          "degraded_rows": 1,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": -0.375,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "target_equivalent": 1,
+            "unknown_other": 5
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "layer_residual/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "close_near_miss": 2,
+            "unknown_other": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        }
+      },
+      "degraded_rows": 1,
+      "dtype": "bfloat16",
+      "improved_rows": 7,
+      "mean_delta_boundary_rank": 0.3333333333333333,
+      "mode_summary": {
+        "abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 0.25,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "target_equivalent": 2,
+            "unknown_other": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "all": {
+          "degraded_rows": 0,
+          "improved_rows": 4,
+          "mean_delta_boundary_rank": 3.25,
+          "n": 4,
+          "patched_classes": {
+            "target_equivalent": 4
+          },
+          "protocol_repaired_rows": 2,
+          "target_transition_rows": 4
+        },
+        "negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "close_near_miss": 2,
+            "unknown_other": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "positive_topk": {
+          "degraded_rows": 1,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": -0.375,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "target_equivalent": 1,
+            "unknown_other": 5
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 2,
+            "close_near_miss": 2,
+            "unknown_other": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        }
+      },
+      "model": "glm4",
+      "n_cases": 4,
+      "n_rows": 36,
+      "n_source_components": 4,
+      "pair_summary": {
+        "negative_target_pairs": 0,
+        "paired_count": 8,
+        "pairs": [
+          {
+            "key": [
+              "glm4",
+              "p816_winter_cold_season",
+              8,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "unknown_other",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_winter_cold_season",
+              8,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "unknown_other",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_cactus_desert_plant",
+              8,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "unknown_other",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_cactus_desert_plant",
+              8,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "unknown_other",
+            "negative_rank": 0,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_red_warm_color",
+              23,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_red_warm_color",
+              23,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_carrot_root_vegetable",
+              39,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "close_near_miss",
+            "negative_rank": 4,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "unknown_other",
+            "positive_rank": 0,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "glm4",
+              "p816_carrot_root_vegetable",
+              39,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "close_near_miss",
+            "negative_rank": 4,
+            "negative_target": false,
+            "positive_better": true,
+            "positive_class": "target_equivalent",
+            "positive_rank": 5,
+            "positive_target": true
+          }
+        ],
+        "positive_better_pairs": 1,
+        "positive_target_pairs": 1
+      },
+      "phase": 823,
+      "protocol_repaired_rows": 2,
+      "quantization": "off",
+      "round": "main",
+      "source_round": "confirm",
+      "target_transition_rows": 7,
+      "timestamp": "2026-07-01 14:19:48",
+      "title": "Beneficial / Harmful Boundary-Transition Subspace Split"
+    },
+    "qwen3": {
+      "attn_implementation": "sdpa",
+      "boundary": "This phase splits donor-recipient component differences from Phase 822 into readout-positive and readout-negative subspaces and tests whether partial subspace patches preserve, improve, or harm boundary transitions.",
+      "by_case": {
+        "p816_heart_body_organ": {
+          "any_negative_degraded": false,
+          "any_positive_target": true,
+          "baseline_class": "broad_near_miss",
+          "best_budget": 2560,
+          "best_component_kind": "mlp_output",
+          "best_component_label": "whole_mlp_output",
+          "best_delta_boundary_rank": 2,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "Body Organ"
+        },
+        "p816_winter_cold_season": {
+          "any_negative_degraded": false,
+          "any_positive_target": false,
+          "baseline_class": "broad_near_miss",
+          "best_budget": 2560,
+          "best_component_kind": "layer_residual",
+          "best_component_label": "whole_layer_residual",
+          "best_delta_boundary_rank": 2,
+          "best_mode": "all",
+          "best_patched_class": "target_equivalent",
+          "best_patched_generated": "Winter Season"
+        }
+      },
+      "component_mode_summary": {
+        "attention_head/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 0.5,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 6,
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "attention_head/all": {
+          "degraded_rows": 0,
+          "improved_rows": 4,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 4,
+          "patched_classes": {
+            "target_equivalent": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 4
+        },
+        "attention_head/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 0.5,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 6,
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "attention_head/positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 0.25,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 7,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "attention_head/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 0.25,
+          "n": 8,
+          "patched_classes": {
+            "broad_near_miss": 7,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "attention_output/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "attention_output/all": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 1,
+          "patched_classes": {
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "attention_output/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "attention_output/positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "attention_output/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "layer_residual/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 4,
+          "patched_classes": {
+            "broad_near_miss": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "layer_residual/all": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 2,
+          "patched_classes": {
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "layer_residual/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 0.5,
+          "n": 4,
+          "patched_classes": {
+            "broad_near_miss": 3,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "layer_residual/positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 0.5,
+          "n": 4,
+          "patched_classes": {
+            "broad_near_miss": 3,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "layer_residual/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 4,
+          "patched_classes": {
+            "broad_near_miss": 4
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "mlp_output/abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "mlp_output/all": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 1,
+          "patched_classes": {
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        },
+        "mlp_output/negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "mlp_output/positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        },
+        "mlp_output/random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 0,
+          "mean_delta_boundary_rank": 0.0,
+          "n": 2,
+          "patched_classes": {
+            "broad_near_miss": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 0
+        }
+      },
+      "degraded_rows": 0,
+      "dtype": "bfloat16",
+      "improved_rows": 16,
+      "mean_delta_boundary_rank": 0.4444444444444444,
+      "mode_summary": {
+        "abs_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 0.25,
+          "n": 16,
+          "patched_classes": {
+            "broad_near_miss": 14,
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "all": {
+          "degraded_rows": 0,
+          "improved_rows": 8,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 8,
+          "patched_classes": {
+            "target_equivalent": 8
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 8
+        },
+        "negative_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 3,
+          "mean_delta_boundary_rank": 0.375,
+          "n": 16,
+          "patched_classes": {
+            "broad_near_miss": 13,
+            "target_equivalent": 3
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 3
+        },
+        "positive_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 0.25,
+          "n": 16,
+          "patched_classes": {
+            "broad_near_miss": 14,
+            "target_equivalent": 2
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 2
+        },
+        "random_topk": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 0.125,
+          "n": 16,
+          "patched_classes": {
+            "broad_near_miss": 15,
+            "target_equivalent": 1
+          },
+          "protocol_repaired_rows": 0,
+          "target_transition_rows": 1
+        }
+      },
+      "model": "qwen3",
+      "n_cases": 2,
+      "n_rows": 72,
+      "n_source_components": 8,
+      "pair_summary": {
+        "negative_target_pairs": 3,
+        "paired_count": 16,
+        "pairs": [
+          {
+            "key": [
+              "qwen3",
+              "p816_winter_cold_season",
+              21,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_winter_cold_season",
+              21,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "mlp_output",
+              "whole_mlp_output",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "mlp_output",
+              "whole_mlp_output",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "layer_residual",
+              "whole_layer_residual",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "layer_residual",
+              "whole_layer_residual",
+              64
+            ],
+            "negative_class": "target_equivalent",
+            "negative_rank": 5,
+            "negative_target": true,
+            "positive_better": false,
+            "positive_class": "target_equivalent",
+            "positive_rank": 5,
+            "positive_target": true
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_output",
+              "whole_attention_output",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_output",
+              "whole_attention_output",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_8",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_8",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": true,
+            "positive_class": "target_equivalent",
+            "positive_rank": 5,
+            "positive_target": true
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_4",
+              16
+            ],
+            "negative_class": "target_equivalent",
+            "negative_rank": 5,
+            "negative_target": true,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_4",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_3",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_3",
+              64
+            ],
+            "negative_class": "target_equivalent",
+            "negative_rank": 5,
+            "negative_target": true,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_25",
+              16
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          },
+          {
+            "key": [
+              "qwen3",
+              "p816_heart_body_organ",
+              14,
+              "attention_head",
+              "head_25",
+              64
+            ],
+            "negative_class": "broad_near_miss",
+            "negative_rank": 3,
+            "negative_target": false,
+            "positive_better": false,
+            "positive_class": "broad_near_miss",
+            "positive_rank": 3,
+            "positive_target": false
+          }
+        ],
+        "positive_better_pairs": 1,
+        "positive_target_pairs": 2
+      },
+      "phase": 823,
+      "protocol_repaired_rows": 0,
+      "quantization": "off",
+      "round": "main",
+      "source_round": "confirm",
+      "target_transition_rows": 16,
+      "timestamp": "2026-07-01 14:19:30",
+      "title": "Beneficial / Harmful Boundary-Transition Subspace Split"
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 823,
+  "round": "main",
+  "status": "complete",
+  "timestamp": "2026-07-01 14:20:08"
+}
