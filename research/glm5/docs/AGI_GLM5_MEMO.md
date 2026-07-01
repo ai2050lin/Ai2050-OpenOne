@@ -91693,3 +91693,8127 @@ Phase 826 证明 natural objective 能改变搜索方向；
 下一步必须从“自然目标最大化”
 转向“exact-natural consistency 约束”。
 ```
+
+## Phase 827: exact-natural consistency constrained search [2026-07-01 16:12]
+
+### 一、任务来源
+
+本阶段读取并分析了用户上传的 Phase 825 / 826 总结。总体判断正确：
+
+```text
+Phase 825 / 826 是实质进展，但不是闭合阶段。
+```
+
+附件中最重要的判断是：
+
+```text
+Phase 825:
+  从 exact_choices donor 下的 sparse search
+  推进到 natural donor 是否能复用同一 sparse subspace。
+
+Phase 826:
+  把 natural donor 直接放进搜索目标。
+
+新问题:
+  natural target 上升时，exact target 可能下降。
+```
+
+该判断与实际结果一致。Phase 826 qwen3 的确认轮显示：
+
+```text
+exact target = 1
+natural target = 13
+natural degraded = 3
+exact + multi-natural pairs = 0
+```
+
+这说明 Phase 826 的目标函数过度偏向 natural target，不是闭合目标。
+
+因此本阶段继续同一阶段目标，进入：
+
+```text
+exact-natural consistency constrained search
+（精确供体与自然供体一致性约束搜索）
+```
+
+### 二、脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase827_exact_natural_consistency_constrained_search.py
+tests/glm5/run_phase827_exact_natural_consistency_constrained_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase827_exact_natural_consistency_constrained_search/
+```
+
+三轮测试均按 qwen3、GLM4、DS7B 顺序执行。未使用量化。优先尝试 flash_attention_2，但本地没有安装 FlashAttention2，因此自动回退到 sdpa。
+
+### 三、测试原理
+
+Phase 826 的排序目标是：
+
+```math
+K_{826}(S)
+=
+\left[
+C_{\text{natural-target}}(S),
+C_{\text{all-target}}(S),
+C_{\text{improved}}(S),
+-C_{\text{degraded}}(S),
+\sum \Delta r(S),
+C_{\text{exact-target}}(S)
+\right]
+```
+
+这个目标把 natural target 放在第一位，因此 qwen3 中出现：
+
+```text
+natural target 增加；
+exact target 被牺牲。
+```
+
+Phase 827 改为一致性优先：
+
+```math
+K_{827}(S)
+=
+\left[
+C_{\text{exact+multi-natural}}(S),
+C_{\text{multi-natural}}(S),
+C_{\text{exact-target}}(S),
+-C_{\text{degraded}}(S),
+C_{\text{all-target}}(S),
+C_{\text{improved}}(S),
+\sum \Delta r(S)
+\right]
+```
+
+其中：
+
+```math
+C_{\text{exact+multi-natural}}(S)
+=
+\mathbf{1}
+\left(
+B_{\text{exact},S}=T
+\land
+\sum_{N \in \mathcal{N}}
+\mathbf{1}(B_{N,S}=T)
+\ge k
+\right)
+```
+
+本阶段确认轮中：
+
+```text
+k = 2
+```
+
+即：
+
+```text
+exact_choices donor 必须 target；
+并且至少两个 natural donor 也必须 target；
+才算 exact+multi-natural consistency。
+```
+
+自然供体集合为：
+
+```math
+\mathcal{N}
+=
+\{
+\text{natural_category},
+\text{natural_question},
+\text{object_only}
+\}
+```
+
+子空间搜索仍为贪心：
+
+```math
+S_{t+1}
+=
+S_t
+\cup
+\arg\max_{G_j \subset \Omega_m}
+K_{827}(S_t \cup G_j)
+```
+
+候选池沿用 Phase 826 的多供体并集候选池：
+
+```math
+\Omega_m^{827}
+=
+\bigcup_{D \in \{exact\} \cup \mathcal{N}}
+\Omega_{m,D}
+```
+
+预算从 Phase 826 的 16 / 64 调整为：
+
+```text
+16 / 32
+```
+
+原因是当前 greedy_steps 与 group_size 实际最多选择 32 个维度，使用 16 / 32 可以避免“预算 64 但实际只选 20 或 32 维”的口径混乱。
+
+### 四、三轮结果
+
+#### 1. 冒烟轮
+
+```text
+qwen3:
+  source components = 2
+  rows = 4
+  exact target = 0
+  natural target = 0
+  exact + any natural = 0
+  exact + multi natural = 0
+
+GLM4:
+  source components = 2
+  rows = 4
+  exact target = 0
+  natural target = 0
+
+DS7B:
+  source components = 2
+  rows = 4
+  exact target = 1
+  natural target = 1
+  exact + any natural = 1
+  exact + multi natural = 1
+```
+
+冒烟轮确认脚本、模型加载、结果保存和一致性目标函数均正常。
+
+#### 2. 主轮
+
+```text
+qwen3:
+  source components = 4
+  rows = 24
+  exact target = 2
+  natural target = 4
+  natural degraded = 1
+  exact + any natural = 1
+  exact + multi natural = 0
+
+GLM4:
+  source components = 4
+  rows = 24
+  exact target = 0
+  natural target = 0
+  natural degraded = 0
+
+DS7B:
+  source components = 4
+  rows = 24
+  exact target = 2
+  natural target = 4
+  natural degraded = 0
+  exact + any natural = 2
+  exact + multi natural = 2
+```
+
+主轮说明：
+
+```text
+qwen3 开始保住 exact target，但还没有 multi-natural consistency；
+DS7B 仍然稳定；
+GLM4 继续失败。
+```
+
+#### 3. 确认轮
+
+```text
+qwen3:
+  source components = 8
+  rows = 64
+  exact target = 4
+  natural target = 15
+  natural degraded = 1
+  exact + any natural = 2
+  exact + multi natural = 2
+  multi-natural = 4
+
+GLM4:
+  source components = 4
+  rows = 32
+  exact target = 0
+  natural target = 0
+  natural degraded = 0
+  exact + any natural = 0
+  exact + multi natural = 0
+
+DS7B:
+  source components = 5
+  rows = 40
+  exact target = 3
+  natural target = 6
+  natural degraded = 0
+  exact + any natural = 2
+  exact + multi natural = 2
+  multi-natural = 2
+```
+
+### 五、确认轮 donor 结果
+
+qwen3：
+
+```text
+exact_choices:
+  n = 16
+  target = 4
+  improved = 4
+  degraded = 0
+  mean delta = 0.500
+
+natural_category:
+  n = 16
+  target = 3
+  improved = 3
+  degraded = 1
+  mean delta = 0.188
+
+natural_question:
+  n = 16
+  target = 3
+  improved = 3
+  degraded = 0
+  mean delta = 0.375
+
+object_only:
+  n = 16
+  target = 9
+  improved = 9
+  degraded = 0
+  mean delta = 1.125
+```
+
+GLM4：
+
+```text
+exact_choices:
+  n = 8
+  target = 0
+
+natural_category:
+  n = 8
+  target = 0
+
+natural_question:
+  n = 8
+  target = 0
+
+object_only:
+  n = 8
+  target = 0
+```
+
+DS7B：
+
+```text
+exact_choices:
+  n = 10
+  target = 3
+  improved = 3
+  degraded = 0
+  mean delta = 1.500
+
+natural_category:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+  mean delta = 1.000
+
+natural_question:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+  mean delta = 1.000
+
+object_only:
+  n = 10
+  target = 2
+  improved = 2
+  degraded = 0
+  mean delta = 1.000
+```
+
+### 六、关键客观现象
+
+#### 1. qwen3 的 exact-natural consistency 被拉起来
+
+Phase 826 qwen3 confirm：
+
+```text
+exact target = 1
+natural target = 13
+natural degraded = 3
+exact + multi-natural = 0
+```
+
+Phase 827 qwen3 confirm：
+
+```text
+exact target = 4
+natural target = 15
+natural degraded = 1
+exact + multi-natural = 2
+```
+
+这说明：
+
+```text
+exact-natural consistency 约束是有效的；
+它缓解了 Phase 826 的 exact target 被牺牲问题。
+```
+
+qwen3 的命中仍然集中于：
+
+```text
+p816_heart_body_organ
+```
+
+有效组件包括：
+
+```text
+L14 mlp_output whole_mlp_output
+L14 layer_residual whole_layer_residual
+L14 attention_output whole_attention_output
+L14 attention_head head_8
+L14 attention_head head_4
+L14 attention_head head_3
+L14 attention_head head_25
+```
+
+其中最明确的一致性现象：
+
+```text
+L14 layer_residual:
+  exact_choices -> Body Organ
+  natural_question -> Body Organ
+  object_only -> Body Organ
+```
+
+这比 Phase 826 更接近“同一因果纤维跨条件保持 boundary transition”。
+
+#### 2. DS7B 保持最干净的一致性
+
+DS7B confirm：
+
+```text
+exact target = 3
+natural target = 6
+natural degraded = 0
+exact + multi-natural = 2
+```
+
+命中集中于：
+
+```text
+p816_triangle_geometric_shape
+L27 mlp_channel_group mlp_topdiff_32
+```
+
+同一子空间在多个 donor 下稳定生成：
+
+```text
+polygon
+```
+
+典型一致性：
+
+```text
+exact_choices -> polygon
+natural_category -> polygon
+natural_question -> polygon
+object_only -> polygon
+```
+
+该结果是当前最干净的 exact-natural consistency 局部闭合。
+
+#### 3. GLM4 负结果再次稳定
+
+GLM4 三轮中：
+
+```text
+exact target = 0
+natural target = 0
+exact + multi-natural = 0
+```
+
+这说明：
+
+```text
+Phase 827 的一致性约束并没有解决 GLM4；
+GLM4 的有效路线可能不在当前组件层级、当前候选池或当前 prompt donor 集合中。
+```
+
+### 七、与 Phase 826 的比较
+
+最重要对比：
+
+```text
+qwen3:
+  Phase 826 exact + multi-natural = 0
+  Phase 827 exact + multi-natural = 2
+
+DS7B:
+  Phase 826 exact + multi-natural = 2
+  Phase 827 exact + multi-natural = 2
+
+GLM4:
+  Phase 826 exact + multi-natural = 0
+  Phase 827 exact + multi-natural = 0
+```
+
+这说明：
+
+```text
+Phase 827 对 qwen3 有实质改进；
+对 DS7B 保持稳定；
+对 GLM4 无效。
+```
+
+同时 qwen3 的 natural degraded：
+
+```text
+Phase 826: 3
+Phase 827: 1
+```
+
+说明一致性约束也降低了一部分自然退化。
+
+### 八、理论进展
+
+Phase 827 的理论价值是：
+
+```text
+把“自然路线目标”进一步收紧为“精确-自然一致性因果纤维”。
+```
+
+当前更准确的机制对象不是：
+
+```text
+natural donor 下能 target 的子空间
+```
+
+而是：
+
+```text
+exact donor 和多个 natural donor 下，都保持同一 boundary transition 的子空间。
+```
+
+因此 causal fiber 的定义应更新为：
+
+```math
+\mathcal{F}_{T,k}
+=
+\left\{
+S:
+B_{\text{exact},S}=T
+\land
+\sum_{N \in \mathcal{N}}
+\mathbf{1}(B_{N,S}=T)
+\ge k
+\land
+\sum_{D \in \{exact\}\cup\mathcal{N}}
+\mathbf{1}(D_{D,S}=1)
+=0
+\right\}
+```
+
+本阶段确认轮中：
+
+```text
+k = 2
+```
+
+qwen3 和 DS7B 都找到了非空的局部集合：
+
+```math
+\mathcal{F}_{T,2} \neq \varnothing
+```
+
+但这仍是局部结果。
+
+### 九、当前闭合距离
+
+Phase 827 达到的标准：
+
+```text
+1. qwen3 exact+multi-natural 从 0 提高到 2；
+2. DS7B 保持 exact+multi-natural = 2；
+3. qwen3 natural degraded 从 3 降到 1；
+4. GLM4 仍然没有突破。
+```
+
+没有达到的标准：
+
+```text
+1. 没有跨模型一致；
+2. 没有跨 case 复用；
+3. 没有跨 domain 复用；
+4. 仍然是人工 patch；
+5. 仍未证明模型自然生成时会自动选择该 route；
+6. 全词表 blocker 竞争仍未闭合。
+```
+
+因此当前不能说破解了语言编码机制。
+
+更准确地说：
+
+```text
+已经找到了局部 exact-natural consistency causal fiber 的证据。
+```
+
+### 十、问题、硬伤与瓶颈
+
+#### 1. qwen3 仍然 case-specific
+
+qwen3 的有效结果几乎都集中在：
+
+```text
+heart -> body organ
+```
+
+说明目前更像局部语义路线，而不是全局知识网络。
+
+#### 2. DS7B 仍然 domain-specific
+
+DS7B 的干净结果集中在：
+
+```text
+triangle -> polygon
+```
+
+这可能更接近规则化几何类别，不一定代表一般语言语义。
+
+#### 3. GLM4 稳定失败
+
+GLM4 连续 Phase 825 / 826 / 827 都没有自然迁移。
+
+这说明：
+
+```text
+当前算法不是跨模型通用；
+也可能说明小模型内部路线粗糙、分裂或不在当前组件粒度中。
+```
+
+#### 4. 候选搜索仍是局部贪心
+
+当前 greedy search 可能仍错过组合型 route。
+
+特别是：
+
+```text
+single component subspace
+```
+
+可能不足以表示完整语言路线。
+
+### 十一、当前进度评估
+
+谨慎估计：
+
+```text
+结构拼图进度：49% -> 51%
+神经元级图谱进度：24% -> 25%
+自然路线验证进度：24% -> 29%
+完整 token closure 进度：29% -> 31%
+统一数学理论进度：42% -> 44%
+```
+
+提升原因：
+
+```text
+1. exact-natural consistency 从目标函数层面得到验证；
+2. qwen3 从 Phase 826 的一致性 0 提升到 2；
+3. DS7B 的一致性结果保持稳定且无退化；
+4. 闭合标准进一步从 natural target 收紧到 causal fiber consistency。
+```
+
+限制原因：
+
+```text
+1. GLM4 仍失败；
+2. case/domain 仍窄；
+3. 仍是人工 patch；
+4. 还没有进入跨组件联合因果纤维。
+```
+
+### 十二、下一步 Phase
+
+下一步仍属于同一阶段，但 Phase 827 已经完成第一版 exact-natural consistency constrained search。
+
+新的瓶颈是：
+
+```text
+一致性因果纤维仍然局限在单组件、单 case。
+```
+
+下一阶段应进入：
+
+```text
+Phase 828:
+cross-component consistency fiber composition
+（跨组件一致性因果纤维组合）
+```
+
+核心目标：
+
+```text
+不再只搜索单一 component 内的 sparse subspace；
+而是组合 layer_residual、attention_output、attention_head、MLP group 等多个组件的 sparse fiber。
+```
+
+建议最低标准：
+
+```text
+qwen3 heart/body organ:
+  跨两个组件组合后 exact+multi-natural pairs 增加，
+  且 degraded 不增加。
+```
+
+中标准：
+
+```text
+DS7B triangle/polygon:
+  保持 exact+multi-natural consistency，
+  并验证 layer_residual + mlp_channel_group 是否互补。
+```
+
+高标准：
+
+```text
+GLM4 出现至少一个 exact+any-natural 或 natural target。
+```
+
+更高标准：
+
+```text
+同类组合 fiber 能跨 case 复用。
+```
+
+当前结论：
+
+```text
+Phase 827 证明 exact-natural consistency 约束是必要且有效的；
+但当前一致性仍是局部单组件现象。
+下一步应从单组件 sparse subspace，
+推进到跨组件 causal fiber composition。
+```
+
+## Phase 828: cross-component consistency fiber composition [2026-07-01 16:49]
+
+### 一、任务来源
+
+本阶段读取并分析了用户上传的 Phase 827 评估内容。总体判断正确：
+
+```text
+Phase 827 是实质进展，但不是最终闭合。
+它真正解决的是 Phase 826 暴露出的目标函数失衡：
+natural target 上升时 exact target 被牺牲。
+```
+
+Phase 827 已经证明：
+
+```text
+exact-natural consistency 约束是必要且有效的。
+```
+
+但它仍然局限于：
+
+```text
+single component sparse subspace
+```
+
+因此，本阶段继续同一研究链条，进入：
+
+```text
+cross-component consistency fiber composition
+（跨组件一致性因果纤维组合）
+```
+
+目标不是重新搜索更多单组件，而是验证：
+
+```text
+多个已经有效的单组件 sparse fiber 同时 patch 时，
+是否能形成更强的跨组件 causal fiber。
+```
+
+### 二、脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase828_cross_component_consistency_fiber_composition.py
+tests/glm5/run_phase828_cross_component_consistency_fiber_composition_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase828_cross_component_consistency_fiber_composition/
+```
+
+三轮测试仍按 qwen3、GLM4、DS7B 顺序执行。未使用量化。优先尝试 flash_attention_2，但本地没有安装 FlashAttention2，因此自动回退到 sdpa。
+
+### 三、测试原理
+
+Phase 827 的对象是单组件子空间：
+
+```math
+S_m
+```
+
+Phase 828 的对象变为两个组件的组合：
+
+```math
+S_{m_1,m_2}
+=
+S_{m_1}
+\oplus
+S_{m_2}
+```
+
+测试方式是：
+
+```text
+1. 从 Phase 827 confirm 结果中读取已经搜索出的 single-component selected_indices；
+2. 在同一 case、同一 budget 下选择两个不同组件；
+3. 对同一个 donor prompt，同时安装两个 component hook；
+4. 生成答案并重新计算 answer boundary class；
+5. 判断 exact + multi-natural consistency 是否被增强、保留或破坏。
+```
+
+组合 patch 形式：
+
+```math
+h_R
+\rightarrow
+h_R
++
+P_{S_{m_1}}(h_D^{m_1}-h_R^{m_1})
++
+P_{S_{m_2}}(h_D^{m_2}-h_R^{m_2})
+```
+
+评价标准：
+
+```math
+C_{\text{pair-exact+multi}}(S_{m_1},S_{m_2})
+=
+\mathbf{1}
+\left(
+B_{\text{exact}}=T
+\land
+\sum_{N \in \mathcal{N}}
+\mathbf{1}(B_N=T)
+\ge 2
+\right)
+```
+
+并记录：
+
+```text
+composition_new_exact_multi:
+  pair 达到 exact+multi，
+  但两个 single component 都没有达到。
+
+composition_preserve_exact_multi:
+  pair 达到 exact+multi，
+  但至少一个 single component 本来已经达到。
+```
+
+这个区分非常关键：
+
+```text
+new = 组合产生新能力；
+preserve = 组合没有破坏已有能力；
+```
+
+如果只有 preserve，没有 new，说明跨组件组合并没有发现新闭合路线。
+
+### 四、三轮结果
+
+#### 1. 冒烟轮
+
+```text
+qwen3:
+  groups = 4
+  pairs = 3
+  exact target = 3
+  natural target = 0
+  natural degraded = 0
+  pair exact+multi = 0
+
+GLM4:
+  groups = 4
+  pairs = 0
+  skipped model load = true
+  reason = no eligible same-case cross-component pairs
+
+DS7B:
+  groups = 4
+  pairs = 1
+  exact target = 1
+  natural target = 0
+  natural degraded = 0
+  pair exact+multi = 0
+```
+
+冒烟轮说明：
+
+```text
+多 hook 组合 patch 可以正常运行；
+但最小 donor 集合下没有自然一致性。
+```
+
+#### 2. 主轮
+
+```text
+qwen3:
+  groups = 6
+  pairs = 7
+  exact target = 6
+  natural target = 6
+  natural degraded = 3
+  pair exact+multi = 0
+  composition_new_exact_multi = 0
+  composition_preserve_exact_multi = 0
+
+GLM4:
+  groups = 6
+  pairs = 0
+  skipped model load = true
+
+DS7B:
+  groups = 6
+  pairs = 2
+  exact target = 2
+  natural target = 3
+  natural degraded = 0
+  pair exact+multi = 1
+  composition_new_exact_multi = 0
+  composition_preserve_exact_multi = 1
+```
+
+主轮说明：
+
+```text
+qwen3 跨组件组合没有形成 exact+multi；
+DS7B 可以保留已有 exact+multi；
+GLM4 没有合格跨组件 pair。
+```
+
+#### 3. 确认轮
+
+```text
+qwen3:
+  groups = 10
+  pairs = 12
+  exact target = 11
+  natural target = 18
+  natural degraded = 6
+  pair exact+multi = 7
+  composition_new_exact_multi = 0
+  composition_preserve_exact_multi = 7
+
+GLM4:
+  groups = 8
+  pairs = 0
+  skipped model load = true
+
+DS7B:
+  groups = 10
+  pairs = 2
+  exact target = 2
+  natural target = 5
+  natural degraded = 0
+  pair exact+multi = 2
+  composition_new_exact_multi = 0
+  composition_preserve_exact_multi = 2
+```
+
+### 五、确认轮 donor 结果
+
+qwen3：
+
+```text
+exact_choices:
+  n = 12
+  target = 11
+  degraded = 0
+  mean delta = 1.833
+
+natural_category:
+  n = 12
+  target = 0
+  degraded = 5
+  mean delta = -1.250
+
+natural_question:
+  n = 12
+  target = 7
+  degraded = 1
+  mean delta = 0.917
+
+object_only:
+  n = 12
+  target = 11
+  degraded = 0
+  mean delta = 1.833
+```
+
+DS7B：
+
+```text
+exact_choices:
+  n = 2
+  target = 2
+  degraded = 0
+
+natural_category:
+  n = 2
+  target = 1
+  degraded = 0
+
+natural_question:
+  n = 2
+  target = 2
+  degraded = 0
+
+object_only:
+  n = 2
+  target = 2
+  degraded = 0
+```
+
+GLM4：
+
+```text
+没有同一 case 下可组合的跨组件 pair；
+因此跳过模型加载，不制造假组合。
+```
+
+### 六、关键客观现象
+
+#### 1. qwen3 组合后保留已有一致性，但没有产生新一致性
+
+qwen3 confirm：
+
+```text
+pair exact+multi = 7
+composition_new_exact_multi = 0
+composition_preserve_exact_multi = 7
+```
+
+这说明：
+
+```text
+跨组件组合能够保留已有 exact+multi；
+但没有把原本不一致的两个单组件组合成新的 exact+multi。
+```
+
+典型保留组合：
+
+```text
+L14 layer_residual B32 + L14 attention_output B32
+L14 layer_residual B32 + L14 attention_head head_3 B32
+L14 layer_residual B16 + L14 mlp_output B16
+L14 layer_residual B16 + L14 attention_head head_4 B16
+```
+
+其中：
+
+```text
+exact_choices -> Body Organ
+natural_question -> Body Organ
+object_only -> Body Organ
+```
+
+但自然类别供体 natural_category 经常退化：
+
+```text
+natural_category -> "1" / unknown_other
+```
+
+这说明 qwen3 的跨组件组合存在明显 donor-specific interference（供体特异干扰）。
+
+#### 2. qwen3 的 natural_category 是主要冲突点
+
+qwen3 confirm 中：
+
+```text
+natural_category:
+  target = 0
+  degraded = 5
+
+natural_question:
+  target = 7
+  degraded = 1
+
+object_only:
+  target = 11
+  degraded = 0
+```
+
+这说明：
+
+```text
+同一个组合 patch 对不同 natural donor 的影响完全不同。
+```
+
+因此不能简单说“自然供体成功”或“自然供体失败”。更细的结论是：
+
+```text
+object_only 和 natural_question 路线可以承载 body organ；
+natural_category 路线容易被同一组合推入 protocol / unknown_other。
+```
+
+#### 3. DS7B 组合最稳定，但仍没有新能力
+
+DS7B confirm：
+
+```text
+pair exact+multi = 2
+composition_new_exact_multi = 0
+composition_preserve_exact_multi = 2
+natural degraded = 0
+```
+
+典型组合：
+
+```text
+L27 mlp_channel_group mlp_topdiff_32 B32
++
+L27 layer_residual whole_layer_residual B32
+```
+
+输出：
+
+```text
+exact_choices -> polygon
+natural_category -> polygon
+natural_question -> polygon
+object_only -> polygon
+```
+
+这说明：
+
+```text
+DS7B 的 triangle / polygon 因果纤维可以被跨组件组合保留；
+但 layer_residual + mlp_channel_group 没有产生超出单组件的新一致性。
+```
+
+#### 4. GLM4 暴露结构性不可测问题
+
+GLM4 Phase 827 confirm 中，每个 case 只有一个有效组件组：
+
+```text
+layer_residual only
+```
+
+因此 Phase 828 没有同 case 下的两个不同组件可组合。
+
+这不是模型成功或失败，而是：
+
+```text
+当前 Phase 827 的 GLM4 图谱粒度不足以进入 cross-component composition。
+```
+
+### 七、与 Phase 827 的关系
+
+Phase 827 证明：
+
+```text
+单组件 exact-natural consistency 可以成立。
+```
+
+Phase 828 证明：
+
+```text
+多个单组件 fiber 不能简单相加产生新 consistency；
+组合更多表现为 preserve 或 interference。
+```
+
+所以当前结论需要收紧：
+
+```text
+跨组件组合不是把两个有用 patch 叠加起来；
+它需要 non-interference constraint（非干扰约束）或 donor-specific gating（供体特异门控）。
+```
+
+### 八、理论进展
+
+Phase 828 对理论的贡献是负结果 + 边界收紧。
+
+它说明：
+
+```text
+causal fiber 不是普通集合加法；
+组件之间存在组合干扰。
+```
+
+原先可能以为：
+
+```math
+\mathcal{F}_{m_1}
+\oplus
+\mathcal{F}_{m_2}
+\Rightarrow
+\mathcal{F}_{m_1,m_2}
+```
+
+但 Phase 828 说明这不成立。
+
+更准确地说：
+
+```math
+\mathcal{F}_{m_1,m_2}
+\neq
+\mathcal{F}_{m_1}
+\oplus
+\mathcal{F}_{m_2}
+```
+
+必须加入非干扰条件：
+
+```math
+\mathcal{F}_{m_1,m_2}
+=
+\left\{
+(S_{m_1},S_{m_2}):
+C_{\text{exact+multi}}(S_{m_1},S_{m_2})=1
+\land
+D(S_{m_1},S_{m_2})=0
+\right\}
+```
+
+其中：
+
+```math
+D(S_{m_1},S_{m_2})
+=
+\sum_{D \in \{exact\}\cup\mathcal{N}}
+\mathbf{1}
+\left(
+B_{D,S_{m_1},S_{m_2}}
+\prec
+B_{D,\varnothing}
+\right)
+```
+
+更进一步，还需要 donor-specific interference：
+
+```math
+I_N(S_{m_1},S_{m_2})
+=
+\mathbf{1}
+\left(
+B_{N,S_{m_1}}=T
+\land
+B_{N,S_{m_1},S_{m_2}}\neq T
+\right)
+```
+
+qwen3 的 natural_category 就是当前最明显的干扰维度。
+
+### 九、问题与硬伤
+
+#### 1. 没有产生新 exact+multi
+
+确认轮中：
+
+```text
+qwen3 composition_new_exact_multi = 0
+DS7B composition_new_exact_multi = 0
+```
+
+这说明：
+
+```text
+当前组合策略没有发现新的闭合能力。
+```
+
+#### 2. qwen3 natural_category 退化严重
+
+qwen3：
+
+```text
+natural_category degraded = 5 / 12
+```
+
+这说明简单叠加会破坏部分自然路线。
+
+#### 3. GLM4 无可组合 pair
+
+GLM4 不是通过组合失败，而是当前图谱粒度不足。
+
+这提醒下一步：
+
+```text
+GLM4 需要先扩展组件定位，
+否则无法进入跨组件组合。
+```
+
+#### 4. 仍然是人工 patch
+
+Phase 828 仍然是人工 simultaneous patch，不是模型自然选择路线。
+
+### 十、当前进度评估
+
+谨慎估计：
+
+```text
+结构拼图进度：51% -> 52%
+神经元级图谱进度：25% -> 26%
+自然路线验证进度：29% -> 30%
+完整 token closure 进度：31% -> 31%
+统一数学理论进度：44% -> 45%
+```
+
+提升原因：
+
+```text
+1. 首次完成跨组件 simultaneous patch；
+2. 证明组合可 preserve 已有一致性；
+3. 证明简单组合不会自动产生新一致性；
+4. 发现 qwen3 natural_category donor-specific interference。
+```
+
+没有明显提高 closure 的原因：
+
+```text
+1. new exact+multi = 0；
+2. qwen3 组合带来退化；
+3. GLM4 无组合图谱；
+4. 仍未跨 case / domain。
+```
+
+### 十一、下一步 Phase
+
+Phase 828 完成了 cross-component composition 的第一版，但结果说明：
+
+```text
+简单 pair composition 不够；
+下一步必须加入 non-interference-aware composition。
+```
+
+下一阶段应进入：
+
+```text
+Phase 829:
+non-interference constrained component composition
+（非干扰约束的组件组合）
+```
+
+核心目标：
+
+```text
+组合前先判断每个 donor 下单组件是否安全；
+只组合不会破坏 exact / natural target 的组件；
+特别要把 qwen3 natural_category 的退化作为显式惩罚。
+```
+
+建议最低标准：
+
+```text
+qwen3 natural_category degraded 从 5 降低到 0 或 1，
+同时 pair exact+multi 不低于 Phase 828。
+```
+
+中标准：
+
+```text
+DS7B 保持 exact+multi = 2，degraded = 0。
+```
+
+高标准：
+
+```text
+出现 composition_new_exact_multi > 0。
+```
+
+当前结论：
+
+```text
+Phase 828 证明跨组件纤维组合不能简单叠加；
+组合主要保留已有一致性，同时可能产生供体特异干扰。
+下一步必须从 naive composition 转向 non-interference constrained composition。
+```
+
+## Phase 829: non-interference constrained component composition（非干扰约束组件组合） [2026-07-01 17:12]
+
+### 一、任务
+
+本阶段承接 Phase 828 的负结果。
+
+Phase 828 已经证明：
+
+```text
+两个有效单组件 causal fiber（因果纤维）不能简单相加；
+cross-component composition（跨组件组合）会 preserve（保留）已有一致性，也可能产生 donor-specific interference（供体特异干扰）。
+```
+
+因此 Phase 829 的任务不是继续盲目扩大 pair（组件对），而是加入第一层非干扰约束：
+
+```text
+先过滤掉单组件阶段已经出现 degraded_boundary（边界退化）的组件；
+再只保留至少有一个 exact+multi anchor（精确+多自然锚点）的 pair；
+最后重新做 simultaneous two-component patch（同步双组件补丁）。
+```
+
+使用脚本：
+
+```text
+tests/glm5/phase829_non_interference_constrained_component_composition.py
+tests/glm5/run_phase829_non_interference_constrained_component_composition_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase829_non_interference_constrained_component_composition/
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+本轮仍然不使用量化，优先尝试 flash_attention_2，环境中 FlashAttention2 不可用时自动回退到 sdpa。
+
+### 二、测试原理
+
+Phase 827 的单组件一致性标准为：
+
+```math
+C_{\text{single}}(S_m)
+=
+\mathbf{1}
+\left(
+B_{\text{exact},S_m}=T
+\land
+\sum_{N\in\mathcal{N}}
+\mathbf{1}(B_{N,S_m}=T)
+\ge k
+\right)
+```
+
+Phase 828 的简单组合为：
+
+```math
+h_R
+\rightarrow
+h_R
++
+P_{S_{m_1}}
+\left(
+h_D^{m_1}-h_R^{m_1}
+\right)
++
+P_{S_{m_2}}
+\left(
+h_D^{m_2}-h_R^{m_2}
+\right)
+```
+
+Phase 829 加入非干扰过滤：
+
+```math
+\mathcal{G}_{\text{safe}}
+=
+\left\{
+S_m:
+D(S_m)=0
+\right\}
+```
+
+其中：
+
+```math
+D(S_m)
+=
+\sum_{d\in\{\text{exact}\}\cup\mathcal{N}}
+\mathbf{1}
+\left(
+B_{d,S_m}\prec B_{d,\varnothing}
+\right)
+```
+
+组件对候选变为：
+
+```math
+\mathcal{P}_{829}
+=
+\left\{
+(S_{m_1},S_{m_2}):
+S_{m_1},S_{m_2}\in \mathcal{G}_{\text{safe}}
+\land
+\left[
+C_{\text{single}}(S_{m_1})=1
+\lor
+C_{\text{single}}(S_{m_2})=1
+\right]
+\right\}
+```
+
+也就是说，本阶段先排除已知有害组件，再测试组合是否仍能保留 exact-natural consistency（精确-自然一致性）。
+
+### 三、三轮测试结果
+
+#### 1. smoke（冒烟轮）
+
+```text
+qwen3:
+  pairs = 3
+  exact_target_rows = 3
+  natural_target_rows = 0
+  natural_degraded_rows = 0
+  pair_exact+multi = 0
+
+GLM4:
+  pairs = 0
+  跳过模型加载，原因是没有同 case 的可组合 pair。
+
+DS7B:
+  pairs = 1
+  exact_target_rows = 1
+  natural_target_rows = 0
+  natural_degraded_rows = 0
+  pair_exact+multi = 0
+```
+
+冒烟轮说明脚本、数据读取、模型加载和结果写入正常，但 donor 集合较窄，不作为机制结论。
+
+#### 2. main（主测试轮）
+
+```text
+qwen3:
+  groups = 16
+  eligible_groups = 15
+  pairs = 6
+  exact_target_rows = 6
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_degraded_rows = 0
+  pair_exact+multi = 0
+
+GLM4:
+  groups = 8
+  pairs = 0
+  跳过模型加载。
+
+DS7B:
+  groups = 10
+  eligible_groups = 10
+  pairs = 2
+  exact_target_rows = 2
+  natural_target_rows = 3
+  natural_degraded_rows = 0
+  pair_exact+multi = 1
+```
+
+#### 3. confirm（确认轮）
+
+```text
+qwen3:
+  groups = 16
+  eligible_groups = 15
+  raw_same_case_pairs = 42
+  safe_same_case_pairs_before_anchor = 36
+  anchor_excluded_pairs = 30
+  selected_pairs = 6
+  excluded_component_groups = {"single_degraded": 1}
+  exact_target_rows = 6
+  natural_target_rows = 11
+  natural_degraded_rows = 1
+  natural_category_degraded_rows = 0
+  pair_exact+multi = 5
+  composition_new_exact+multi = 0
+  composition_preserve_exact+multi = 5
+
+GLM4:
+  groups = 8
+  eligible_groups = 8
+  raw_same_case_pairs = 0
+  pairs = 0
+  仍然没有可组合 pair。
+
+DS7B:
+  groups = 10
+  eligible_groups = 10
+  pairs = 2
+  exact_target_rows = 2
+  natural_target_rows = 5
+  natural_degraded_rows = 0
+  natural_category_degraded_rows = 0
+  pair_exact+multi = 2
+  composition_new_exact+multi = 0
+  composition_preserve_exact+multi = 2
+```
+
+### 四、结果分析
+
+Phase 829 的判断是：
+
+```text
+非干扰过滤有效，但不是最终闭合。
+```
+
+有效的地方：
+
+```text
+1. qwen3 的 natural_category degraded 从 Phase 828 的 5 降到 0。
+2. qwen3 的 total natural degraded 从 Phase 828 的 6 降到 1。
+3. DS7B 仍保持 pair exact+multi = 2，degraded = 0。
+4. 说明 Phase 828 的一部分干扰确实来自单组件阶段已暴露的不安全组件。
+```
+
+没有达到的地方：
+
+```text
+1. qwen3 pair exact+multi 从 Phase 828 的 7 降到 5。
+2. composition_new_exact+multi 仍然为 0。
+3. GLM4 仍没有进入组合测试，因为候选图谱不足。
+4. 剩余的 1 个退化来自 qwen3:
+   L14 layer_residual B16 + L14 attention_output B16
+   在 natural_question donor 下生成 Human Anatomy，
+   从 broad_near_miss 退化到 unknown_other。
+```
+
+所以 Phase 829 的核心结论是：
+
+```text
+全局组件级安全过滤可以降低干扰，
+但不能完全预测 pair-level interference（组件对级干扰）。
+```
+
+这说明：
+
+```math
+D(S_{m_1})=0
+\land
+D(S_{m_2})=0
+\nRightarrow
+D(S_{m_1},S_{m_2})=0
+```
+
+也就是说：
+
+```text
+单组件安全不推出组合安全。
+```
+
+### 五、理论进展
+
+Phase 829 把 Phase 828 的公式进一步收紧为：
+
+```math
+\mathcal{F}_{m_1,m_2}^{\text{safe}}
+=
+\left\{
+(S_{m_1},S_{m_2}):
+C_{\text{pair}}(S_{m_1},S_{m_2})=1
+\land
+D(S_{m_1},S_{m_2})=0
+\right\}
+```
+
+而不是：
+
+```math
+\mathcal{F}_{m_1,m_2}
+=
+\mathcal{F}_{m_1}\oplus\mathcal{F}_{m_2}
+```
+
+当前更接近真实机制的判断是：
+
+```text
+语言生成机制不是组件集合加法；
+它更像在不同 donor / context（上下文）下选择不同子路线。
+```
+
+这直接引出下一阶段：
+
+```text
+donor-specific gating（供体特异门控）
+```
+
+### 六、硬伤
+
+```text
+1. Phase 829 仍然是人工 patch，不是模型自然门控。
+2. 单组件安全无法推出组合安全。
+3. qwen3 的结果集中在 heart -> body organ 单 case。
+4. DS7B 的结果集中在 triangle -> polygon / geometric shape 单 case。
+5. GLM4 没有可组合组件，说明前面候选图谱仍然不充分。
+6. 当前小模型内部结构可能较粗糙，容易把自然 route 压缩成少量强残差或少量 MLP 通道，不能直接外推到更大模型。
+```
+
+### 七、阶段判断
+
+Phase 829 与 Phase 828 属于同一阶段：
+
+```text
+从 naive cross-component composition
+推进到 non-interference constrained composition。
+```
+
+但 Phase 829 没有完成阶段目标，因为：
+
+```text
+qwen3 仍有 1 个 pair-level degraded；
+pair exact+multi 低于 Phase 828；
+new exact+multi 仍为 0。
+```
+
+因此继续自动进入同一阶段的下一步：
+
+```text
+Phase 830:
+donor-gated non-interference composition
+（供体门控非干扰组合）
+```
+
+## Phase 830: donor-gated non-interference composition（供体门控非干扰组合） [2026-07-01 17:16]
+
+### 一、任务
+
+Phase 829 证明：
+
+```text
+全局过滤不够；
+组件在某个 donor 下安全，不等于两个组件在该 donor 下组合安全。
+```
+
+Phase 830 进一步测试：
+
+```text
+如果同一个 pair 不再对所有 donor 固定全开，
+而是每个 donor 只启用该 donor 下已经 target_equivalent 的组件，
+是否能减少组合干扰？
+```
+
+使用脚本：
+
+```text
+tests/glm5/phase830_donor_gated_non_interference_composition.py
+tests/glm5/run_phase830_donor_gated_non_interference_composition_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase830_donor_gated_non_interference_composition/
+```
+
+门控模式：
+
+```text
+target_only
+```
+
+即：
+
+```text
+某个组件只有在对应 donor 的单组件测试中已经产生 target_equivalent，
+才会在该 donor 的组合测试中被启用。
+```
+
+### 二、测试原理
+
+Phase 829 的组合是：
+
+```math
+h_R
+\rightarrow
+h_R
++
+P_{S_{m_1}}(h_D^{m_1}-h_R^{m_1})
++
+P_{S_{m_2}}(h_D^{m_2}-h_R^{m_2})
+```
+
+Phase 830 加入 donor gate（供体门控）：
+
+```math
+g_d(S_m)
+=
+\mathbf{1}
+\left(
+B_{d,S_m}=T
+\right)
+```
+
+组合变为：
+
+```math
+h_R
+\rightarrow
+h_R
++
+g_d(S_{m_1})
+P_{S_{m_1}}(h_D^{m_1}-h_R^{m_1})
++
+g_d(S_{m_2})
+P_{S_{m_2}}(h_D^{m_2}-h_R^{m_2})
+```
+
+也就是说：
+
+```text
+同一个 pair 仍然存在，
+但每个 donor 下实际启用的 component subset（组件子集）不同。
+```
+
+这更接近真实模型可能存在的 route selection（路线选择）：
+
+```text
+模型不是把所有候选路线全部打开；
+而是在具体上下文中选择部分路线，关闭会干扰的路线。
+```
+
+### 三、三轮测试结果
+
+#### 1. smoke（冒烟轮）
+
+```text
+qwen3:
+  pairs = 3
+  exact_target_rows = 3
+  natural_target_rows = 2
+  natural_degraded_rows = 0
+  pair_exact+multi = 2
+  active_component_count_distribution = {"1": 5, "0": 1}
+
+GLM4:
+  pairs = 0
+
+DS7B:
+  pairs = 1
+  exact_target_rows = 1
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  pair_exact+multi = 1
+```
+
+#### 2. main（主测试轮）
+
+```text
+qwen3:
+  pairs = 6
+  exact_target_rows = 6
+  natural_target_rows = 8
+  natural_degraded_rows = 0
+  natural_category_degraded_rows = 0
+  pair_exact+multi = 2
+  active_component_count_distribution = {"1": 10, "2": 4, "0": 4}
+
+GLM4:
+  pairs = 0
+
+DS7B:
+  pairs = 2
+  exact_target_rows = 2
+  natural_target_rows = 4
+  natural_degraded_rows = 0
+  pair_exact+multi = 2
+```
+
+#### 3. confirm（确认轮）
+
+```text
+qwen3:
+  pairs = 6
+  exact_target_rows = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_degraded_rows = 0
+  pair_exact+multi = 6
+  composition_new_exact+multi = 0
+  composition_preserve_exact+multi = 6
+  active_component_count_distribution = {"0": 4, "1": 16, "2": 4}
+
+GLM4:
+  pairs = 0
+  仍无法进入组合测试。
+
+DS7B:
+  pairs = 2
+  exact_target_rows = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_degraded_rows = 0
+  pair_exact+multi = 2
+  composition_new_exact+multi = 0
+  composition_preserve_exact+multi = 2
+  active_component_count_distribution = {"1": 7, "2": 1}
+```
+
+### 四、结果分析
+
+Phase 830 是本轮的关键正结果。
+
+和 Phase 829 对比：
+
+```text
+qwen3:
+  Phase 829 confirm:
+    pair exact+multi = 5
+    natural_degraded_rows = 1
+    natural_category_target_rows = 0
+
+  Phase 830 confirm:
+    pair exact+multi = 6
+    natural_degraded_rows = 0
+    natural_category_target_rows = 2
+
+DS7B:
+  Phase 829 confirm:
+    pair exact+multi = 2
+    natural_degraded_rows = 0
+
+  Phase 830 confirm:
+    pair exact+multi = 2
+    natural_degraded_rows = 0
+    natural_category_target_rows = 2
+```
+
+这说明：
+
+```text
+donor-specific gating 可以消除 Phase 829 剩余的 pair-level interference，
+并且在 qwen3 上恢复 / 提高 exact+multi consistency。
+```
+
+但必须谨慎：
+
+```text
+Phase 830 不是发现了新的组合能力；
+composition_new_exact+multi 仍然为 0。
+```
+
+它证明的是：
+
+```text
+有效机制更像条件化 route selection（路线选择），
+而不是固定组件同时全开。
+```
+
+### 五、关键观察
+
+qwen3 的 active component distribution（实际启用组件数分布）为：
+
+```text
+0 active: 4 rows
+1 active: 16 rows
+2 active: 4 rows
+```
+
+DS7B 为：
+
+```text
+1 active: 7 rows
+2 active: 1 row
+```
+
+这非常关键，因为它说明：
+
+```text
+大多数成功不是靠两个组件同时打开；
+而是靠上下文选择一个主要组件，少量情况下两个组件共同工作。
+```
+
+这更接近：
+
+```text
+conditional route routing（条件化路线分配）
+```
+
+而不是：
+
+```text
+component addition（组件加法）
+```
+
+### 六、理论公式更新
+
+当前统一公式应从固定组合：
+
+```math
+\Delta h
+=
+\sum_i
+P_{S_i}
+\left(
+h_D^i-h_R^i
+\right)
+```
+
+升级为条件化门控组合：
+
+```math
+\Delta h(d,c)
+=
+\sum_i
+g_i(d,c)
+P_{S_i}
+\left(
+h_D^i(d)-h_R^i(c)
+\right)
+```
+
+其中：
+
+```math
+g_i(d,c)
+\in
+\{0,1\}
+```
+
+表示在 donor（供体）和 context（上下文）条件下，第 i 个组件是否应该启用。
+
+生成闭合标准也要从：
+
+```math
+C_{\text{pair}}(S_{m_1},S_{m_2})
+```
+
+升级为：
+
+```math
+C_{\text{gated}}
+\left(
+\{S_i\},
+g(d,c)
+\right)
+=
+\mathbf{1}
+\left(
+B_{\text{exact}}=T
+\land
+\sum_{N\in\mathcal{N}}
+\mathbf{1}(B_N=T)
+\ge k
+\land
+D=0
+\right)
+```
+
+当前最重要的负条件是：
+
+```math
+D
+=
+\sum_{d}
+\mathbf{1}
+\left(
+B_{d,\{S_i\},g}
+\prec
+B_{d,\varnothing}
+\right)
+=0
+```
+
+### 七、对 Phase 828 附件判断的复核
+
+附件对 Phase 828 的判断是正确的：
+
+```text
+Phase 828 是必要的负结果；
+简单跨组件组合不能产生新闭合；
+non-interference constraint 是下一步关键。
+```
+
+Phase 829 和 Phase 830 对这个判断做了进一步验证：
+
+```text
+1. 单组件非退化过滤确实降低干扰。
+2. 单组件安全仍不能保证组合安全。
+3. donor-specific gating 进一步降低干扰，并恢复 exact+multi。
+4. 机制更像条件化路线选择，而不是固定向量加法。
+```
+
+因此，当前研究没有原地打转，而是在从：
+
+```text
+patch success（补丁成功）
+```
+
+推进到：
+
+```text
+route selection rule（路线选择规则）
+```
+
+这是解释力提升，而不是单纯局部拟合。
+
+### 八、硬伤与边界
+
+必须强调：
+
+```text
+1. Phase 830 的 gate 是人工根据单组件结果构造的，不是模型内部自然 gate。
+2. composition_new_exact+multi 仍然为 0。
+3. qwen3 的证据集中在 heart -> body organ。
+4. DS7B 的证据集中在 triangle -> geometric shape。
+5. GLM4 缺少跨组件 pair，说明图谱候选仍不完整。
+6. target_only gate 可能过于理想化，因为真实模型未必有二值 gate。
+7. 当前小模型结构较粗糙，可能把真实大模型中的连续门控、分布式协同压缩成少数强组件。
+```
+
+所以闭合距离仍然明显存在。
+
+当前闭合标准应是：
+
+```text
+1. 同一规则能跨多个 case / domain 生效；
+2. gate 不是人工给定，而是能从模型内部状态预测；
+3. gated composition 能产生 new exact+multi，而不只是 preserve；
+4. GLM4 也能获得可组合图谱；
+5. 从 pair 扩展到 multi-component route graph；
+6. 能解释 full-vocabulary competition（全词表竞争），而不只是 target answer。
+```
+
+### 九、当前进度评估
+
+谨慎估计：
+
+```text
+结构拼图进度：52% -> 54%
+神经元级图谱进度：26% -> 27%
+自然路线验证进度：30% -> 33%
+完整 token closure 进度：31% -> 32%
+统一数学理论进度：45% -> 47%
+```
+
+提升原因：
+
+```text
+1. 证明了非干扰约束能显著降低组合退化。
+2. 证明了 donor-specific gating 能进一步消除 qwen3 剩余干扰。
+3. 从组件加法转向条件化路线选择，理论解释力提高。
+4. DS7B 在 gated composition 下保持稳定正结果。
+```
+
+没有更大提升的原因：
+
+```text
+1. 仍未发现新 exact+multi 能力。
+2. gate 仍是人工构造。
+3. 跨模型不完整，GLM4 仍缺失。
+4. 跨语义域与全局图谱仍未完成。
+```
+
+### 十、下一步 Phase
+
+Phase 830 已经说明：
+
+```text
+关键不只是找到 causal fiber，
+而是找到 gate predictor（门控预测器）。
+```
+
+下一阶段应进入：
+
+```text
+Phase 831:
+internal gate predictor search
+（内部门控预测器搜索）
+```
+
+目标：
+
+```text
+不再用人工 target_only 规则决定 g_i(d,c)，
+而是从模型内部状态中寻找能预测组件是否应该启用的信号。
+```
+
+最低标准：
+
+```text
+在 qwen3 heart -> body organ 中，
+用内部特征预测 Phase 830 的 active / inactive decision，
+并保持 natural_degraded = 0。
+```
+
+中标准：
+
+```text
+DS7B triangle -> geometric shape 也能用同一类 predictor 解释。
+```
+
+高标准：
+
+```text
+预测器可以跨 case / domain 泛化，
+并开始产生 composition_new_exact+multi > 0。
+```
+
+当前结论：
+
+```text
+Phase 829 证明单组件安全过滤有效但不充分；
+Phase 830 证明供体特异门控可以消除剩余组合干扰。
+语言机制图谱的下一层不是更多 patch，而是寻找模型内部自然 gate。
+```
+
+## Phase 831: internal gate predictor search（内部门控预测器搜索） [2026-07-01 18:20]
+
+### 一、任务
+
+本阶段复核最新上传内容对 Phase 829 / Phase 830 的判断，并继续推进 Phase 830 后面最自然的任务：
+
+```text
+不再使用人工 target_only gate（仅目标门控），
+而是从模型内部状态中寻找能预测 gate 的基础信号。
+```
+
+上传内容的总体判断是正确的：
+
+```text
+Phase 829 是必要的负结果收缩；
+Phase 830 是关键正结果；
+但二者都不是最终闭合。
+```
+
+尤其正确的是：
+
+```text
+Phase 830 的 gate 仍然是人工构造，
+composition_new_exact+multi 仍然为 0，
+因此不能说已经发现模型内部自然门控机制。
+```
+
+所以 Phase 831 的任务是：
+
+```text
+测试非常基础的 internal readout-alignment signal（内部读出对齐信号），
+能否预测 Phase 830 的 donor-specific gate（供体特异门控），
+并用预测 gate 实际生成，检验是否仍能保持 exact+multi 和 non-degradation。
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase831_internal_gate_predictor_search.py
+tests/glm5/run_phase831_internal_gate_predictor_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase831_internal_gate_predictor_search/
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+仍然不使用量化。优先尝试 flash_attention_2，环境中 FlashAttention2 不可用时自动回退到 sdpa。
+
+### 二、测试原理
+
+Phase 830 的人工 gate 是：
+
+```math
+g_i^{\text{oracle}}(d)
+=
+\mathbf{1}
+\left(
+B_{d,S_i}=T
+\right)
+```
+
+也就是：
+
+```text
+如果某个组件在单组件 donor 测试中已经产生 target_equivalent，
+就在组合时启用它。
+```
+
+Phase 831 尝试用内部状态直接预测这个 gate。
+
+对于组件 \(S_i\)、donor \(d\)、recipient context \(c\)，定义子空间读出对齐分数：
+
+```math
+a_i(d,c)
+=
+\sum_{j\in S_i}
+\left(
+h_D^i(d)-h_R^i(c)
+\right)_j
+r_j
+```
+
+其中：
+
+```text
+h_D^i(d)：donor 在组件 i 上的状态；
+h_R^i(c)：recipient 在组件 i 上的状态；
+r_j：目标 token 相对 baseline token 的 effective readout direction（有效读出方向）；
+S_i：Phase 827 / 829 选出的稀疏子空间。
+```
+
+本阶段比较三个最基础的 gate predictor（门控预测器）：
+
+#### 1. signed_sum_positive
+
+```math
+g_i(d,c)
+=
+\mathbf{1}
+\left(
+a_i(d,c)>0
+\right)
+```
+
+#### 2. positive_count_majority
+
+```math
+g_i(d,c)
+=
+\mathbf{1}
+\left(
+\#\{j\in S_i:a_{ij}>0\}
+>
+\#\{j\in S_i:a_{ij}<0\}
+\right)
+```
+
+#### 3. top_abs_positive
+
+```math
+g_i(d,c)
+=
+\mathbf{1}
+\left(
+a_{i,j^*}>0
+\right),
+\quad
+j^*
+=
+\arg\max_{j\in S_i}|a_{ij}|
+```
+
+这些不是统计分类器，只是基础的内部方向判断。
+
+评价分两层：
+
+```text
+1. decision accuracy:
+   预测 gate 是否接近 Phase 830 的人工 target_only gate。
+
+2. generation validation:
+   使用预测 gate 实际生成，检查 exact_target、natural_target、natural_degraded、pair exact+multi。
+```
+
+注意：
+
+```text
+decision accuracy 高，不一定生成更好；
+generation validation 才是最终判断。
+```
+
+### 三、三轮结果
+
+#### 1. smoke（冒烟轮）
+
+```text
+qwen3:
+  signed_sum_positive:
+    decision accuracy = 0.583
+    pair exact+multi = 0
+    natural_target_rows = 0
+    natural_degraded_rows = 0
+
+  positive_count_majority:
+    decision accuracy = 0.583
+    pair exact+multi = 0
+    natural_target_rows = 0
+    natural_degraded_rows = 0
+
+  top_abs_positive:
+    decision accuracy = 0.583
+    pair exact+multi = 0
+    natural_target_rows = 0
+    natural_degraded_rows = 0
+
+GLM4:
+  pairs = 0
+  跳过模型加载。
+
+DS7B:
+  signed_sum_positive:
+    decision accuracy = 0.250
+    pair exact+multi = 0
+
+  positive_count_majority:
+    decision accuracy = 0.250
+    pair exact+multi = 0
+
+  top_abs_positive:
+    decision accuracy = 0.250
+    pair exact+multi = 0
+```
+
+冒烟轮只说明脚本和数据生成正常，不作为机制结论。
+
+#### 2. main（主测试轮）
+
+```text
+qwen3:
+  signed_sum_positive:
+    decision accuracy = 0.611
+    pair exact+multi = 0
+    natural_target_rows = 6
+    natural_degraded_rows = 0
+
+  positive_count_majority:
+    decision accuracy = 0.639
+    pair exact+multi = 0
+    natural_target_rows = 6
+    natural_degraded_rows = 0
+
+  top_abs_positive:
+    decision accuracy = 0.611
+    pair exact+multi = 0
+    natural_target_rows = 6
+    natural_degraded_rows = 0
+
+GLM4:
+  pairs = 0
+
+DS7B:
+  signed_sum_positive:
+    decision accuracy = 0.333
+    pair exact+multi = 0
+    natural_target_rows = 1
+    natural_degraded_rows = 0
+
+  positive_count_majority:
+    decision accuracy = 0.750
+    pair exact+multi = 1
+    natural_target_rows = 3
+    natural_degraded_rows = 0
+
+  top_abs_positive:
+    decision accuracy = 0.250
+    pair exact+multi = 0
+    natural_target_rows = 0
+    natural_degraded_rows = 0
+```
+
+#### 3. confirm（确认轮）
+
+```text
+qwen3:
+  signed_sum_positive:
+    decision accuracy = 0.667
+    TP = 22
+    TN = 10
+    FP = 14
+    FN = 2
+    pair exact+multi = 6
+    natural_target_rows = 12
+    natural_degraded_rows = 0
+    natural_category_target_rows = 0
+    natural_category_degraded_rows = 0
+
+  positive_count_majority:
+    decision accuracy = 0.688
+    TP = 23
+    TN = 10
+    FP = 14
+    FN = 1
+    pair exact+multi = 5
+    natural_target_rows = 11
+    natural_degraded_rows = 1
+    natural_category_target_rows = 0
+    natural_category_degraded_rows = 0
+
+  top_abs_positive:
+    decision accuracy = 0.667
+    TP = 22
+    TN = 10
+    FP = 14
+    FN = 2
+    pair exact+multi = 6
+    natural_target_rows = 12
+    natural_degraded_rows = 0
+    natural_category_target_rows = 0
+    natural_category_degraded_rows = 0
+
+GLM4:
+  pairs = 0
+
+DS7B:
+  signed_sum_positive:
+    decision accuracy = 0.250
+    pair exact+multi = 0
+    natural_target_rows = 1
+    natural_degraded_rows = 0
+
+  positive_count_majority:
+    decision accuracy = 0.688
+    TP = 8
+    TN = 3
+    FP = 4
+    FN = 1
+    pair exact+multi = 2
+    natural_target_rows = 5
+    natural_degraded_rows = 0
+    natural_category_target_rows = 1
+    natural_category_degraded_rows = 0
+
+  top_abs_positive:
+    decision accuracy = 0.313
+    pair exact+multi = 0
+    natural_target_rows = 0
+    natural_degraded_rows = 0
+```
+
+### 四、结果分析
+
+Phase 831 是一个重要的诊断结果，但不是门控机制闭合。
+
+它说明：
+
+```text
+内部读出对齐信号确实有部分预测价值；
+但它不是跨模型统一 gate predictor。
+```
+
+更具体地说：
+
+```text
+qwen3:
+  signed_sum_positive / top_abs_positive 的生成效果最好：
+  pair exact+multi = 6，natural_degraded = 0。
+
+DS7B:
+  positive_count_majority 的生成效果最好：
+  pair exact+multi = 2，natural_degraded = 0。
+
+GLM4:
+  仍无可组合 pair。
+```
+
+这说明：
+
+```text
+qwen3 更像由少数强方向或总 readout sum 决定 gate；
+DS7B 更像由正向维度数量占优决定 gate。
+```
+
+但是不能过度总结，因为当前证据仍然集中在：
+
+```text
+qwen3: heart -> body organ
+DS7B: triangle -> geometric shape
+```
+
+### 五、关键负结果
+
+#### 1. 决策准确率不等于生成成功
+
+qwen3 中：
+
+```text
+positive_count_majority decision accuracy = 0.688
+signed_sum_positive decision accuracy = 0.667
+```
+
+但生成结果是：
+
+```text
+positive_count_majority:
+  pair exact+multi = 5
+  natural_degraded = 1
+
+signed_sum_positive:
+  pair exact+multi = 6
+  natural_degraded = 0
+```
+
+说明：
+
+```text
+模仿 Phase 830 的人工 gate，不等于生成最优 gate。
+```
+
+这个发现很重要，因为 Phase 830 的 target_only gate 本身只是人工代理，不是最终真理。
+
+#### 2. qwen3 的自然类别路线没有完全恢复
+
+Phase 830 中 qwen3：
+
+```text
+natural_category_target_rows = 2
+```
+
+Phase 831 最好的 qwen3 predictor 中：
+
+```text
+natural_category_target_rows = 0
+```
+
+虽然 pair exact+multi = 6 且 natural_degraded = 0，但 natural_category 路线没有被恢复。
+
+所以：
+
+```text
+readout-alignment predictor 可以保留总体 consistency，
+但还不能解释所有 natural donor route。
+```
+
+#### 3. DS7B 的最佳信号和 qwen3 不同
+
+DS7B 中：
+
+```text
+positive_count_majority 最好；
+signed_sum_positive 和 top_abs_positive 明显失败。
+```
+
+这说明当前 gate predictor 不是单一公式跨模型通用。
+
+### 六、理论公式更新
+
+Phase 830 的公式是：
+
+```math
+\Delta h(d,c)
+=
+\sum_i
+g_i(d,c)
+P_{S_i}
+\left(
+h_D^i(d)-h_R^i(c)
+\right)
+```
+
+Phase 831 进一步把 gate 写成内部信号函数：
+
+```math
+g_i(d,c)
+=
+\Gamma
+\left(
+\left\{
+\left(
+h_D^i(d)-h_R^i(c)
+\right)_j
+r_j
+\right\}_{j\in S_i}
+\right)
+```
+
+其中 \(\Gamma\) 不是固定为某个单一规则，而是当前候选规则集合：
+
+```math
+\Gamma_{\text{sum}}
+=
+\mathbf{1}
+\left(
+\sum_{j\in S_i} a_{ij}>0
+\right)
+```
+
+```math
+\Gamma_{\text{count}}
+=
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+>
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+```math
+\Gamma_{\text{top}}
+=
+\mathbf{1}
+\left(
+a_{i,\arg\max |a_{ij}|}>0
+\right)
+```
+
+当前结论是：
+
+```text
+\Gamma 不是纯粹任意人工规则；
+但也还没有收敛成跨模型统一函数。
+```
+
+### 七、硬伤与瓶颈
+
+```text
+1. Phase 831 仍然没有 composition_new_exact+multi。
+2. qwen3 与 DS7B 的最佳 predictor 不同。
+3. GLM4 仍没有可组合 pair。
+4. qwen3 的 natural_category target 没有恢复。
+5. 当前 gate predictor 只使用 readout-alignment，可能忽略了 protocol / route / blocker state。
+6. 小模型可能把真实连续 gate 压缩成粗糙的离散现象，导致跨模型差异变大。
+```
+
+因此，Phase 831 不能称为门控机制闭合。
+
+### 八、当前阶段判断
+
+Phase 831 与 Phase 830 属于同一阶段：
+
+```text
+从人工 donor-specific gate
+推进到 internal gate predictor。
+```
+
+阶段目标部分达成：
+
+```text
+qwen3:
+  有内部读出对齐信号可保持 pair exact+multi = 6 且 natural_degraded = 0。
+
+DS7B:
+  有另一种内部读出对齐信号可保持 pair exact+multi = 2 且 natural_degraded = 0。
+```
+
+但阶段目标没有完全达成：
+
+```text
+没有统一 predictor；
+没有恢复 qwen3 natural_category target；
+没有 GLM4；
+没有新组合能力。
+```
+
+所以不能继续在同一小样本上无限调 predictor。
+
+继续同一阶段会变成过拟合，下一步必须扩大 case/domain 或引入更完整的 gate signal。
+
+### 九、下一步 Phase
+
+下一阶段应进入：
+
+```text
+Phase 832:
+gate signal expansion beyond readout alignment
+（超越读出对齐的门控信号扩展）
+```
+
+核心问题：
+
+```text
+单纯 readout-alignment 不够；
+gate 可能同时依赖：
+1. readout direction（读出方向）；
+2. boundary state（边界状态）；
+3. blocker profile（阻塞者画像）；
+4. protocol state（协议状态）；
+5. donor route identity（供体路线身份）。
+```
+
+最低标准：
+
+```text
+在 qwen3 中恢复 natural_category_target_rows > 0，
+同时保持 natural_degraded = 0。
+```
+
+中标准：
+
+```text
+DS7B 不下降，继续保持 pair exact+multi = 2。
+```
+
+高标准：
+
+```text
+找到跨 qwen3 / DS7B 同构的 gate signal，
+而不是两个模型各用一个规则。
+```
+
+当前结论：
+
+```text
+Phase 831 证明内部 gate 信号有苗头，
+但 readout-alignment 单独不足以解释门控。
+下一步不能继续盲目 patch，而要扩展 gate signal 的观测维度。
+```
+
+## Phase 832: 超越读出对齐的路线边界门控验证 [2026-07-01 18:54]
+
+### 一、任务来源和总体判断
+
+本阶段基于 Phase 831 的结论继续推进。Phase 831 的上传分析判断基本正确：
+
+```text
+Phase 831 是重要诊断进展；
+但不是 gate mechanism closure；
+内部 readout-alignment signal 有苗头；
+但单独不足以成为跨模型统一门控。
+```
+
+Phase 832 的目标不是继续寻找更强的局部 patch，而是验证一个更具体的问题：
+
+```text
+如果 readout-alignment 不足，
+那么门控是否需要加入 donor route identity / route boundary？
+```
+
+换句话说，本阶段测试的是：
+
+```text
+gate 不是只看 donor-residual 是否朝 target readout 增加；
+还可能必须先判断 donor 组件本身属于哪一类 route。
+```
+
+本阶段结论：
+
+```text
+路线边界增强门控明显强于纯 readout 门控；
+它能恢复 qwen3 和 DS7B 的 natural_category target；
+但它仍然依赖单组件行为边界标签，不是天然内部门控闭合。
+```
+
+因此，Phase 832 是实质进展，但不是最终闭合。
+
+### 二、脚本和结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase832_gate_signal_expansion_beyond_readout.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase832_gate_signal_expansion_beyond_readout_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase832_gate_signal_expansion_beyond_readout/
+```
+
+三轮测试：
+
+```text
+smoke:
+  确认脚本、模型加载、生成结果正常。
+
+main:
+  扩大组件对和 donor prompt 范围。
+
+confirm:
+  扩大 donor prompt 到 exact_choices / natural_category / natural_question / object_only，
+  对重要结果进行确认。
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16；
+quantization=off；
+优先 flash_attention_2；
+本机 flash_attention_2 未安装，自动回退到 sdpa；
+逐模型加载和释放，避免 GPU 内存累积。
+```
+
+### 三、测试原理
+
+Phase 831 使用的是纯 readout-alignment gate：
+
+```math
+a_i(d,c)
+=
+\sum_{j\in S_i}
+\left(
+h_D^i(d)-h_R^i(c)
+\right)_j
+r_j
+```
+
+其中：
+
+```text
+i：组件；
+d：donor prompt；
+c：recipient context；
+S_i：组件的稀疏子空间；
+h_D^i(d)：donor 状态；
+h_R^i(c)：recipient 状态；
+r_j：target token 相对 baseline token 的 effective readout direction。
+```
+
+Phase 831 的基础门控是：
+
+```math
+g_i^{readout}(d,c)
+=
+\mathbf{1}
+\left(
+a_i(d,c)>0
+\right)
+```
+
+或：
+
+```math
+g_i^{count}(d,c)
+=
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+>
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+Phase 832 加入路线边界：
+
+```math
+C_i(d)
+=
+\operatorname{class}
+\left(
+\operatorname{SinglePatch}(i,d)
+\right)
+```
+
+其中：
+
+```text
+C_i(d) 表示组件 i 在 donor d 的单组件生成边界类别。
+```
+
+目标路线集合：
+
+```math
+\mathcal{T}
+=
+\{
+target\_equivalent
+\}
+```
+
+干净路线集合：
+
+```math
+\mathcal{C}
+=
+\{
+target\_equivalent,\ close\_near\_miss
+\}
+```
+
+本阶段测试的关键门控包括：
+
+#### 1. 纯读出门控
+
+```math
+g_i^{sum}(d,c)
+=
+\mathbf{1}(a_i(d,c)>0)
+```
+
+```math
+g_i^{count}(d,c)
+=
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+>
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+#### 2. 仅目标路线门控
+
+```math
+g_i^{target}(d)
+=
+\mathbf{1}
+\left(
+C_i(d)\in\mathcal{T}
+\right)
+```
+
+这是 Phase 830 oracle gate 的等价形式，用作上界参考。
+
+#### 3. 有目标路线时按路线，否则回退读出
+
+```math
+g_i^{target\_else\_sum}(d,c)
+=
+\begin{cases}
+\mathbf{1}(C_i(d)\in\mathcal{T}),
+& \exists k,\ C_k(d)\in\mathcal{T} \\
+\mathbf{1}(a_i(d,c)>0),
+& otherwise
+\end{cases}
+```
+
+```math
+g_i^{target\_else\_count}(d,c)
+=
+\begin{cases}
+\mathbf{1}(C_i(d)\in\mathcal{T}),
+& \exists k,\ C_k(d)\in\mathcal{T} \\
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+>
+\#\{j:a_{ij}<0\}
+\right),
+& otherwise
+\end{cases}
+```
+
+#### 4. 干净路线再叠加读出门控
+
+```math
+g_i^{clean\_sum}(d,c)
+=
+\mathbf{1}(C_i(d)\in\mathcal{C})
+\cdot
+\mathbf{1}(a_i(d,c)>0)
+```
+
+```math
+g_i^{clean\_count}(d,c)
+=
+\mathbf{1}(C_i(d)\in\mathcal{C})
+\cdot
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+>
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+### 四、确认轮结果
+
+#### qwen3
+
+```text
+pairs = 6
+```
+
+```text
+readout_signed_sum:
+  decision_acc = 0.667
+  pair_exact_plus_multi = 6
+  natural_target_rows = 12
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+readout_count:
+  decision_acc = 0.688
+  pair_exact_plus_multi = 5
+  natural_target_rows = 11
+  natural_degraded_rows = 1
+  natural_category_target_rows = 0
+
+route_target_only:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+route_target_else_signed_sum:
+  decision_acc = 0.896
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+route_target_else_count:
+  decision_acc = 0.896
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+route_clean_signed_sum:
+  decision_acc = 0.958
+  pair_exact_plus_multi = 6
+  natural_target_rows = 13
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+
+route_clean_count:
+  decision_acc = 0.979
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+qwen3 的关键现象：
+
+```text
+1. 纯 readout gate 可以保持 exact 类组合能力，但无法恢复 natural_category。
+2. route_target_only 和 route_target_else_* 能恢复 natural_category_target_rows = 2。
+3. route_clean_count 也能恢复 natural_category_target_rows = 2，且 false positive = 0，只有 1 个 false negative。
+4. readout_count 虽然 decision_acc 略高于 readout_signed_sum，但生成质量更差，出现 natural_degraded = 1。
+```
+
+#### DS7B
+
+```text
+pairs = 2
+```
+
+```text
+readout_signed_sum:
+  decision_acc = 0.250
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+readout_count:
+  decision_acc = 0.688
+  pair_exact_plus_multi = 2
+  natural_target_rows = 5
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+
+route_target_only:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+route_target_else_signed_sum:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+route_target_else_count:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+route_clean_signed_sum:
+  decision_acc = 0.562
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+route_clean_count:
+  decision_acc = 0.938
+  pair_exact_plus_multi = 2
+  natural_target_rows = 5
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+```
+
+DS7B 的关键现象：
+
+```text
+1. signed_sum 在 DS7B 上明显失败。
+2. count 类门控比 signed_sum 更适合 DS7B。
+3. 只要加入 target route boundary，DS7B 的 natural_category_target_rows 从 1 或 0 提升到 2。
+4. route_target_else_* 与 route_target_only 一致，说明本批 DS7B 样本中目标路线边界足够决定门控。
+```
+
+#### GLM4
+
+```text
+pairs = 0
+```
+
+GLM4 仍没有进入组合测试，不应强行得出机制结论。当前只能记录：
+
+```text
+在现有筛选条件和 Phase 829 pair 构造规则下，
+GLM4 缺少 eligible same-case component pairs。
+```
+
+这可能来自：
+
+```text
+1. GLM4 小模型内部结构更粗糙；
+2. 现有组件搜索条件偏向 qwen3 / DS7B；
+3. GLM4 的有效机制不在当前 layer / component / prompt 范围内；
+4. 当前 pair anchor 标准过严。
+```
+
+### 五、结果分析
+
+#### 1. 附件判断被 Phase 832 支持
+
+附件中认为：
+
+```text
+Phase 831 有内部信号苗头，但 readout-alignment 单独不足；
+下一步应扩展 boundary / route / blocker / protocol signal。
+```
+
+Phase 832 结果支持这个判断：
+
+```text
+纯 readout gate 在 qwen3 上不能恢复 natural_category；
+纯 readout signed_sum 在 DS7B 上几乎失败；
+加入 route boundary 后，qwen3 和 DS7B 都恢复 natural_category。
+```
+
+#### 2. route boundary 是当前最强拼图之一
+
+当前最明确的结构不是：
+
+```text
+某个组件是否朝 target logit 增加。
+```
+
+而是：
+
+```text
+某个 donor 状态进入组件后，是否已经落在 target-equivalent route。
+```
+
+因此更接近真实机制的表述是：
+
+```text
+模型不是简单叠加组件；
+模型先形成路线边界，
+再由边界决定哪些组件可以进入生成闭合。
+```
+
+#### 3. 纯局部评分公式仍然会循环
+
+Phase 831 的 readout score 可以解释一部分现象，但 Phase 832 显示：
+
+```text
+readout score 不是最终 gate variable。
+```
+
+如果继续只调 readout score，会落入：
+
+```text
+提高某些 exact 指标；
+丢失 natural_category；
+再调参；
+再丢失其他边界；
+```
+
+这说明单点局部公式已经接近边际收益递减。
+
+#### 4. 本阶段不是最终闭合
+
+最关键硬伤是：
+
+```text
+route boundary 来自 single-component behavioral class，
+不是从模型内部状态直接预测得到。
+```
+
+所以它相当于：
+
+```text
+行为边界标签 + 内部 readout score 的混合门控。
+```
+
+它证明了方向，但没有完成内生化。
+
+### 六、闭合标准和当前距离
+
+当前 gate mechanism closure 至少需要满足：
+
+```text
+1. 不依赖单组件生成标签；
+2. 仅从 donor / recipient 内部状态预测 gate；
+3. 在 qwen3 和 DS7B 上使用同构公式；
+4. 保持 exact_choices、natural_category、natural_question 等多提示成功；
+5. 不引入 natural_degraded；
+6. 最好能在 GLM4 或更多模型上找到对应结构。
+```
+
+Phase 832 已经满足：
+
+```text
+1. qwen3 route-boundary gate 恢复 natural_category；
+2. DS7B route-boundary gate 恢复 natural_category；
+3. exact 类组合能力没有下降；
+4. 没有 natural_degraded；
+5. 明确证明 readout-only 不够。
+```
+
+Phase 832 尚未满足：
+
+```text
+1. route boundary 仍然是行为标签；
+2. 没有内生 route-boundary predictor；
+3. GLM4 没有有效 pair；
+4. 没有扩展到更多语义域；
+5. 没有完成 token closure；
+6. 没有证明神经元级全局图谱。
+```
+
+当前距离闭合的估计：
+
+```text
+gate mechanism closure: 45% - 55%
+language encoding mechanism closure: 20% - 30%
+global neuron atlas: 10% - 15%
+```
+
+这个百分比不是统计结论，只是基于当前拼图完整度的研究进度估计。
+
+### 七、对小模型偏差的谨慎解释
+
+当前模型均为小模型或蒸馏模型，必须考虑：
+
+```text
+1. 小模型可能把真实连续门控压缩成粗糙离散边界；
+2. 小模型可能没有完整的多层冗余路线；
+3. 小模型中的 route boundary 可能更依赖少数层或少数组件；
+4. DS7B 与 qwen3 的最佳 readout predictor 不同，可能来自结构粗糙和训练差异；
+5. GLM4 无 pair 不等于 GLM4 没有机制，可能只是当前 atlas 方法没覆盖。
+```
+
+因此，当前结论只能说：
+
+```text
+在小模型上，route boundary 比 readout-only 更接近门控机制；
+不能直接断言真实大模型也使用同样离散门控。
+```
+
+### 八、当前理论进展
+
+本阶段将公式从：
+
+```math
+g_i(d,c)
+=
+f(a_i(d,c))
+```
+
+推进为：
+
+```math
+g_i(d,c)
+=
+F
+\left(
+a_i(d,c),
+C_i(d)
+\right)
+```
+
+更完整地写：
+
+```math
+y
+=
+\operatorname{Readout}
+\left[
+h_R(c)
++
+\sum_i
+g_i(d,c)
+\cdot
+P_{S_i}
+\left(
+h_D(d)-h_R(c)
+\right)
+\right]
+```
+
+其中：
+
+```math
+g_i(d,c)
+=
+F
+\left(
+\underbrace{a_i(d,c)}_{\text{readout alignment}},
+\underbrace{C_i(d)}_{\text{route boundary}},
+\underbrace{B(c)}_{\text{blocker profile}},
+\underbrace{Q(c,d)}_{\text{protocol state}}
+\right)
+```
+
+Phase 832 只验证了前两项：
+
+```text
+readout alignment + route boundary
+```
+
+尚未验证：
+
+```text
+blocker profile；
+protocol state；
+真正的内生 route-boundary predictor。
+```
+
+### 九、当前核心拼图更新
+
+截至 Phase 832，已积累的核心拼图是：
+
+```text
+1. 语言生成不是单 token logit 提升，而是全词表竞争场闭合。
+2. 单组件 patch 可以产生局部 route，但不能保证组合闭合。
+3. source / donor 状态携带可迁移信息，但其作用依赖受体上下文。
+4. layer residual、attention output、MLP output、attention head、MLP channel group 可以形成组合图谱。
+5. exact_choices 与 natural_category 是不同边界，不能混为一个成功指标。
+6. non-interference constraint 可以减少组合退化。
+7. donor-specific gate 比固定组件叠加更接近真实机制。
+8. readout-alignment 有部分内部门控信号，但跨模型不统一。
+9. route boundary 明显提升门控质量，是当前最接近生成闭合的关键拼图。
+10. route boundary 仍未内生化，是当前最大硬伤。
+```
+
+### 十、下一步 Phase
+
+Phase 832 与 Phase 831 属于同一大阶段：
+
+```text
+从人工 donor-specific gate
+推进到可解释 gate signal。
+```
+
+Phase 832 完成了这个阶段的一个重要子目标：
+
+```text
+证明 gate 必须包含 route boundary，
+不能只靠 readout-alignment。
+```
+
+接下来不应继续在同一批样本上微调 predictor，而应进入：
+
+```text
+Phase 833:
+internal route-boundary predictor search
+（内生路线边界预测器搜索）
+```
+
+核心任务：
+
+```text
+把 Phase 832 中依赖行为标签的 C_i(d)，
+替换为仅由模型内部状态计算出来的 \hat{C}_i(d,c)。
+```
+
+建议公式：
+
+```math
+\hat{C}_i(d,c)
+=
+\Phi
+\left(
+h_D^i(d),
+h_R^i(c),
+P_{S_i}(h_D^i(d)-h_R^i(c)),
+W_U,
+B(c)
+\right)
+```
+
+最低标准：
+
+```text
+qwen3:
+  natural_category_target_rows >= 2
+  natural_degraded_rows = 0
+  pair_exact_plus_multi = 6
+
+DS7B:
+  natural_category_target_rows >= 2
+  natural_degraded_rows = 0
+  pair_exact_plus_multi = 2
+```
+
+高标准：
+
+```text
+同一个内部 route-boundary predictor 同时解释 qwen3 和 DS7B；
+不再依赖 single-component behavioral class；
+GLM4 至少能找到候选 pair 或解释为什么当前结构不可见。
+```
+
+阶段性结论：
+
+```text
+Phase 832 证明 route boundary 是破解门控机制的关键变量；
+但 route boundary 仍然来自行为观测。
+下一步必须把 route boundary 内生化，
+否则研究会停留在行为图谱和人工门控之间，无法闭合语言编码机制。
+```
+
+## Phase 833: 内生路线边界预测器搜索 [2026-07-01 19:16]
+
+### 一、任务来源和总体判断
+
+本阶段读取并分析了关于 Phase 832 的最新上传内容。上传内容的判断基本正确：
+
+```text
+Phase 832 是实质进展；
+route boundary 是比 readout-alignment 更强的门控变量；
+但 Phase 832 仍不是 gate mechanism closure；
+最大硬伤是 route boundary 仍来自 single-component behavioral class。
+```
+
+因此，本阶段继续执行 Phase 832 记录中提出的下一步：
+
+```text
+Phase 833:
+internal route-boundary predictor search
+（内生路线边界预测器搜索）
+```
+
+核心问题：
+
+```text
+能否不用单组件行为边界标签 C_i(d) 作为 gate 输入，
+而是仅用内部状态特征、组件结构特征和 donor prompt protocol 特征，
+预测或近似 Phase 832 中的 route boundary gate？
+```
+
+本阶段结论：
+
+```text
+有重要正结果，但仍未闭合。
+```
+
+正结果：
+
+```text
+protocol + component structure 的简单代理规则
+在 qwen3 和 DS7B 上都能恢复 natural_category target。
+```
+
+负边界：
+
+```text
+qwen3 中恢复 natural_category target 的 count 规则会引入 1 条 natural_degraded；
+无退化的 sum / gain 规则只能恢复 1 条 natural_category target；
+DS7B 的最佳结构规则与 qwen3 仍不完全一致；
+GLM4 仍没有可组合 pair。
+```
+
+所以 Phase 833 证明：
+
+```text
+route boundary 有内部 / 结构 / 协议层面的可见影子；
+但还没有找到跨模型、无退化、完全内生的统一 gate predictor。
+```
+
+### 二、脚本和结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase833_internal_route_boundary_predictor_search.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase833_internal_route_boundary_predictor_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase833_internal_route_boundary_predictor_search/
+```
+
+三轮测试：
+
+```text
+smoke:
+  小规模确认脚本、模型加载、生成结果正常。
+
+main:
+  使用 qwen3 6 个 pair、DS7B 2 个 pair，扩大 predictor 集合。
+
+confirm:
+  donor prompt 扩展到 exact_choices / natural_category / natural_question / object_only，
+  对重要结果进行确认。
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16；
+quantization=off；
+优先 flash_attention_2；
+本机 flash_attention_2 未安装，自动回退到 sdpa；
+每个模型测试后释放 GPU 内存。
+```
+
+### 三、测试原理
+
+Phase 832 的门控上界是：
+
+```math
+g_i^{oracle}(d)
+=
+\mathbf{1}
+\left(
+C_i(d)\in\mathcal{T}
+\right)
+```
+
+其中：
+
+```math
+C_i(d)
+=
+\operatorname{class}
+\left(
+\operatorname{SinglePatch}(i,d)
+\right)
+```
+
+这很有效，但它依赖单组件行为标签。
+
+Phase 833 的任务是寻找：
+
+```math
+\hat{C}_i(d,c)
+=
+\Phi
+\left(
+h_D^i(d),
+h_R^i(c),
+P_{S_i}(h_D^i(d)-h_R^i(c)),
+R_i,
+Q(d)
+\right)
+```
+
+其中：
+
+```text
+h_D^i(d)：donor 状态；
+h_R^i(c)：recipient 状态；
+P_{S_i}：组件稀疏子空间投影；
+R_i：组件结构身份，例如 layer_residual / attention_output / attention_head / mlp_channel_group；
+Q(d)：donor prompt protocol，例如 exact_choices / natural_category / natural_question / object_only。
+```
+
+本阶段没有训练复杂分类器，只测试基础候选规则，避免把统计分类器误当作机制解释。
+
+内部读出差分仍定义为：
+
+```math
+a_i(d,c)
+=
+\sum_{j\in S_i}
+\left(
+h_D^i(d)-h_R^i(c)
+\right)_j
+r_j
+```
+
+新增的内部特征包括：
+
+```math
+\rho_i(d,c)
+=
+\frac{
+\sum_{j\in S_i}\mathbf{1}(a_{ij}>0)
+}{
+\sum_{j\in S_i}\mathbf{1}(a_{ij}>0)
++
+\sum_{j\in S_i}\mathbf{1}(a_{ij}<0)
+}
+```
+
+```math
+E_i^+(d,c)
+=
+\sum_{j\in S_i}
+\max(a_{ij},0)
+```
+
+```math
+E_i^-(d,c)
+=
+\sum_{j\in S_i}
+\max(-a_{ij},0)
+```
+
+```math
+\Delta_i^{score}(d,c)
+=
+\sum_{j\in S_i}
+h_D^i(d)_j r_j
+-
+\sum_{j\in S_i}
+h_R^i(c)_j r_j
+```
+
+测试的候选门控包括：
+
+#### 1. 纯内部读出类规则
+
+```math
+g_i^{selected\_sum}
+=
+\mathbf{1}(a_i(d,c)>0)
+```
+
+```math
+g_i^{selected\_count}
+=
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+>
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+```math
+g_i^{selected\_count\_ge}
+=
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+\ge
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+#### 2. 全组件读出类规则
+
+```math
+g_i^{full\_sum}
+=
+\mathbf{1}
+\left(
+\sum_j
+\left(
+h_D^i(d)-h_R^i(c)
+\right)_j r_j
+>
+0
+\right)
+```
+
+```math
+g_i^{full\_count}
+=
+\mathbf{1}
+\left(
+\#\{j:a_{ij}^{full}>0\}
+>
+\#\{j:a_{ij}^{full}<0\}
+\right)
+```
+
+#### 3. 结构代理规则
+
+```math
+g_i^{nonresidual\_count}
+=
+\mathbf{1}
+\left(
+R_i\ne layer\_residual
+\right)
+\cdot
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+\ge
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+#### 4. 协议 + 结构代理规则
+
+最重要的候选是：
+
+```math
+g_i^{cat\_nonresidual\_else\_count}
+=
+\begin{cases}
+\mathbf{1}(R_i\ne layer\_residual)
+\cdot
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+\ge
+\#\{j:a_{ij}<0\}
+\right),
+& Q(d)=natural\_category \\
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+\ge
+\#\{j:a_{ij}<0\}
+\right),
+& otherwise
+\end{cases}
+```
+
+含义：
+
+```text
+natural_category donor 下，layer_residual 容易走 broad_near_miss / category echo 路线；
+因此先用 component structure 抑制 layer_residual，
+再用内部 count signal 选择非残差组件。
+其他 donor prompt 暂时回退到内部 count signal。
+```
+
+这条规则不使用 single-component behavioral class 作为输入，但使用了：
+
+```text
+1. donor prompt protocol；
+2. component kind；
+3. selected subspace count signal。
+```
+
+因此它比 Phase 832 更内生，但仍不是纯神经状态闭合。
+
+### 四、确认轮结果
+
+#### qwen3
+
+```text
+pairs = 6
+```
+
+主要结果：
+
+```text
+selected_sum_positive:
+  decision_acc = 0.667
+  pair_exact_plus_multi = 6
+  natural_target_rows = 12
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+selected_count_majority:
+  decision_acc = 0.688
+  pair_exact_plus_multi = 5
+  natural_target_rows = 11
+  natural_degraded_rows = 1
+  natural_category_target_rows = 0
+
+selected_count_nonnegative:
+  decision_acc = 0.583
+  pair_exact_plus_multi = 5
+  natural_target_rows = 11
+  natural_degraded_rows = 1
+  natural_category_target_rows = 0
+
+non_residual_count_nonnegative:
+  decision_acc = 0.333
+  pair_exact_plus_multi = 0
+  natural_target_rows = 5
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+category_nonresidual_else_count_nonnegative:
+  decision_acc = 0.708
+  pair_exact_plus_multi = 6
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+  natural_category_target_rows = 2
+
+category_nonresidual_else_sum_positive:
+  decision_acc = 0.792
+  pair_exact_plus_multi = 6
+  natural_target_rows = 13
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+
+category_nonresidual_else_gain_positive:
+  decision_acc = 0.792
+  pair_exact_plus_multi = 6
+  natural_target_rows = 13
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+
+oracle_route_target_only:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+qwen3 的关键现象：
+
+```text
+1. 纯 readout / count 仍不能恢复 natural_category。
+2. non_residual_count 可以恢复 natural_category = 2，但会丢失 exact / natural_question / object_only 中大量 layer_residual target route。
+3. category_nonresidual_else_count 可以同时保持 pair_exact_plus_multi = 6，并恢复 natural_category = 2。
+4. 但 category_nonresidual_else_count 引入 1 条 natural_degraded。
+5. category_nonresidual_else_sum / gain 不退化，但只能恢复 natural_category = 1。
+```
+
+退化定位：
+
+```text
+qwen3 degraded row:
+  donor_variant = natural_question
+  pair = L14 layer_residual + L14 attention_output
+  active components = layer_residual + attention_output
+  baseline = Circulatory System
+  patched = Human Anatomy
+  boundary: broad_near_miss -> unknown_other
+```
+
+这说明：
+
+```text
+category_nonresidual_else_count 虽然能修复 natural_category，
+但在 natural_question 下仍会误激活 attention_output，
+导致与 layer_residual target route 干扰。
+```
+
+#### DS7B
+
+```text
+pairs = 2
+```
+
+主要结果：
+
+```text
+selected_sum_positive:
+  decision_acc = 0.250
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+selected_count_majority:
+  decision_acc = 0.688
+  pair_exact_plus_multi = 2
+  natural_target_rows = 5
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+
+selected_count_nonnegative:
+  decision_acc = 0.688
+  pair_exact_plus_multi = 2
+  natural_target_rows = 5
+  natural_degraded_rows = 0
+  natural_category_target_rows = 1
+
+non_residual_count_nonnegative:
+  decision_acc = 0.938
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+category_nonresidual_else_count_nonnegative:
+  decision_acc = 0.812
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+category_nonresidual_else_sum_positive:
+  decision_acc = 0.250
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+category_nonresidual_else_gain_positive:
+  decision_acc = 0.250
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+oracle_route_target_only:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+DS7B 的关键现象：
+
+```text
+1. selected_sum / gain 在 DS7B 上明显失败。
+2. count 类信号比 signed sum 更适合 DS7B。
+3. non_residual_count_nonnegative 几乎贴近 oracle：
+   pair_exact_plus_multi = 2
+   natural_target_rows = 6
+   natural_degraded_rows = 0
+   natural_category_target_rows = 2
+4. DS7B 的有效 route proxy 更像：
+   MLP channel group target route + layer_residual 抑制。
+```
+
+#### GLM4
+
+```text
+pairs = 0
+```
+
+GLM4 仍无 eligible same-case pair，不能进入本阶段机制结论。
+
+### 五、结果是否支持上传内容
+
+上传内容认为：
+
+```text
+Phase 832 证明 route boundary 是关键；
+但 route boundary 仍未内生化；
+下一步应做 internal route-boundary predictor。
+```
+
+Phase 833 支持这个判断，并进一步收紧：
+
+```text
+1. route boundary 确实有内部 / 结构 / 协议代理。
+2. 单纯 readout alignment 仍不够。
+3. component kind + donor protocol 可以解释部分 route boundary。
+4. 但还没有找到无退化、跨模型统一、全 donor 条件有效的 predictor。
+```
+
+所以，上传内容方向正确，但需要补充一个更严格的边界：
+
+```text
+route boundary 不是单一内部标量；
+它至少依赖 readout signal + component kind + donor protocol；
+并且还可能需要 blocker profile 才能避免 qwen3 natural_question 退化。
+```
+
+### 六、核心进展
+
+Phase 833 的实质进展是：
+
+```text
+第一次把 Phase 832 的行为路线边界 C_i(d)，
+部分替换为不使用行为标签的内部 / 结构 / 协议代理。
+```
+
+公式从：
+
+```math
+g_i(d,c)
+=
+F
+\left(
+a_i(d,c),
+C_i(d)
+\right)
+```
+
+推进为：
+
+```math
+g_i(d,c)
+=
+\hat{F}
+\left(
+a_i(d,c),
+R_i,
+Q(d)
+\right)
+```
+
+其中：
+
+```text
+R_i = component kind / component structure；
+Q(d) = donor prompt protocol。
+```
+
+最接近当前事实的机制表达是：
+
+```math
+g_i(d,c)
+=
+\Psi
+\left(
+\underbrace{P_{S_i}(h_D^i(d)-h_R^i(c))}_{\text{局部差分}},
+\underbrace{r_y}_{\text{目标读出方向}},
+\underbrace{R_i}_{\text{组件结构}},
+\underbrace{Q(d)}_{\text{供体协议}},
+\underbrace{B(c,d)}_{\text{阻塞者画像，尚未验证}}
+\right)
+```
+
+这比 Phase 832 更进一步，因为：
+
+```text
+Phase 832 需要 C_i(d) 行为标签；
+Phase 833 至少证明 R_i + Q(d) + count signal 可以逼近 C_i(d) 的一部分。
+```
+
+### 七、硬伤和瓶颈
+
+当前硬伤非常明确：
+
+```text
+1. qwen3 的最好无行为代理无法同时满足：
+   natural_category_target_rows = 2
+   natural_degraded_rows = 0
+
+2. DS7B 的最好规则是 non_residual_count_nonnegative；
+   qwen3 的最好折中规则是 category_nonresidual_else_count_nonnegative；
+   二者不是完全统一。
+
+3. qwen3 的退化来自 natural_question 下 attention_output 误激活，
+   说明仅靠 protocol + component kind 不足以区分所有 donor route。
+
+4. GLM4 仍没有 pair，跨模型证据缺失。
+
+5. 当前样本仍集中在 qwen3 heart/body organ 和 DS7B triangle/geometric shape；
+   还不是全局语言图谱。
+```
+
+因此，Phase 833 不能称为内部门控闭合。
+
+### 八、对小模型偏差的谨慎解释
+
+当前现象可能受到小模型结构粗糙影响：
+
+```text
+1. qwen3 把 natural_category 和 natural_question 的 route boundary 压在同一层 L14 的不同组件上；
+2. DS7B 更依赖 L27 MLP channel group；
+3. 小模型可能缺少更高层的冗余 gate，使得结构规则显得离散、粗糙；
+4. GLM4 没有 pair 可能是 atlas 覆盖不足，不是机制不存在；
+5. 大模型中 route boundary 可能是连续多变量，而不是当前这种简单的 non_residual / residual 分割。
+```
+
+所以当前结论只能写成：
+
+```text
+小模型中出现了 route-boundary 的内部 / 结构代理；
+但不能断言真实大模型使用同样规则。
+```
+
+### 九、当前阶段判断
+
+Phase 833 与 Phase 832 属于同一阶段：
+
+```text
+从行为路线边界 gate
+推进到内生 route-boundary proxy。
+```
+
+阶段目标部分达成：
+
+```text
+qwen3:
+  找到能恢复 natural_category_target_rows = 2 的无行为标签代理；
+  但会引入 1 条 natural_degraded。
+
+DS7B:
+  non_residual_count_nonnegative 基本接近 oracle；
+  natural_category_target_rows = 2；
+  natural_degraded = 0。
+```
+
+阶段目标未完全达成：
+
+```text
+没有统一无退化规则；
+没有 GLM4；
+没有 blocker profile；
+没有 token closure。
+```
+
+### 十、下一步 Phase
+
+下一阶段不应继续只改 count / sum 阈值，因为这会重新进入局部调参循环。
+
+应进入：
+
+```text
+Phase 834:
+blocker-aware internal route-boundary predictor
+（阻塞者感知的内生路线边界预测器）
+```
+
+核心目标：
+
+```text
+解释 qwen3 中为什么 category_nonresidual_else_count 能恢复 natural_category，
+但会在 natural_question 下误激活 attention_output 并退化。
+```
+
+下一步必须加入 blocker profile：
+
+```math
+B_i(d,c)
+=
+\operatorname{Profile}
+\left(
+\operatorname{TopKLogits}
+\left[
+h_R(c)+P_{S_i}(h_D^i(d)-h_R^i(c))
+\right]
+\right)
+```
+
+新的候选门控应为：
+
+```math
+g_i(d,c)
+=
+\Psi
+\left(
+a_i(d,c),
+R_i,
+Q(d),
+B_i(d,c)
+\right)
+```
+
+最低标准：
+
+```text
+qwen3:
+  pair_exact_plus_multi = 6
+  natural_category_target_rows = 2
+  natural_degraded_rows = 0
+
+DS7B:
+  pair_exact_plus_multi = 2
+  natural_category_target_rows = 2
+  natural_degraded_rows = 0
+```
+
+高标准：
+
+```text
+同一个 blocker-aware predictor 同时解释 qwen3 和 DS7B；
+不依赖 single-component behavioral class；
+能解释 qwen3 natural_question 的退化来源；
+能给 GLM4 提供候选搜索方向。
+```
+
+阶段性结论：
+
+```text
+Phase 833 证明 route boundary 不是完全外在行为标签，
+它已经在 component kind、donor protocol 和 selected count signal 中出现影子。
+
+但这个影子仍然不够：
+没有 blocker profile，就无法避免 qwen3 的 route interference。
+
+因此，下一阶段必须从 route-boundary proxy
+推进到 blocker-aware route-boundary proxy。
+```
+
+## Phase 834: 阻塞者感知的内生路线边界预测器 [2026-07-01 19:24]
+
+### 一、任务来源和总体判断
+
+Phase 833 发现：
+
+```text
+category_nonresidual_else_count_nonnegative
+可以在 qwen3 和 DS7B 上恢复 natural_category target。
+```
+
+但 qwen3 中存在一条关键退化：
+
+```text
+donor_variant = natural_question
+pair = L14 layer_residual + L14 attention_output
+active = layer_residual + attention_output
+baseline = Circulatory System
+patched = Human Anatomy
+boundary: broad_near_miss -> unknown_other
+```
+
+这说明：
+
+```text
+component kind + donor protocol + selected count
+仍然无法判断某些 false positive component 是否会引入新的 blocker。
+```
+
+因此，本阶段继续同一大阶段任务：
+
+```text
+从 route-boundary proxy
+推进到 blocker-aware route-boundary proxy。
+```
+
+核心问题：
+
+```text
+加入 first-step full-vocabulary blocker profile
+能不能过滤 Phase 833 中的 qwen3 误激活？
+```
+
+本阶段结论：
+
+```text
+qwen3 得到强正结果；
+DS7B 得到关键负结果；
+因此 Phase 834 是强正结果 + 跨模型边界收紧。
+```
+
+qwen3：
+
+```text
+category_count_rank_improved
+和
+category_count_above_decreased
+达到 oracle 的生成指标：
+pair_exact_plus_multi = 6
+natural_target_rows = 14
+natural_degraded_rows = 0
+natural_category_target_rows = 2
+```
+
+DS7B：
+
+```text
+rank / above-target 类 blocker-aware 规则失败；
+仍然是 category_nonresidual_else_count_nonnegative 最好：
+pair_exact_plus_multi = 2
+natural_target_rows = 6
+natural_degraded_rows = 0
+natural_category_target_rows = 2
+```
+
+所以：
+
+```text
+blocker-aware rank signal 可以解决 qwen3 的 route interference；
+但不是跨模型统一变量。
+```
+
+### 二、脚本和结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase834_blocker_aware_internal_route_boundary_predictor.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase834_blocker_aware_internal_route_boundary_predictor_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase834_blocker_aware_internal_route_boundary_predictor/
+```
+
+三轮测试：
+
+```text
+smoke:
+  小规模确认 first-step logits / blocker profile 正常。
+
+main:
+  扩大组件对和 predictor 集合。
+
+confirm:
+  donor prompt 覆盖 exact_choices / natural_category / natural_question / object_only。
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16；
+quantization=off；
+优先 flash_attention_2；
+本机 flash_attention_2 未安装，自动回退到 sdpa；
+逐模型加载和释放。
+```
+
+### 三、测试原理
+
+Phase 833 的门控可以写成：
+
+```math
+g_i(d,c)
+=
+\hat{F}
+\left(
+a_i(d,c),
+R_i,
+Q(d)
+\right)
+```
+
+Phase 834 加入首步全词表阻塞者画像：
+
+```math
+B_i(d,c)
+=
+\operatorname{Profile}
+\left(
+\operatorname{logits}
+\left[
+h_R(c)
++
+P_{S_i}
+\left(
+h_D^i(d)-h_R^i(c)
+\right)
+\right]
+\right)
+```
+
+实际记录两个最基础的 blocker 指标：
+
+```math
+rank_y^i(d,c)
+=
+1
++
+\#\{v:z_v^i(d,c)>z_y^i(d,c)\}
+```
+
+```math
+above_y^i(d,c)
+=
+\#\{v:z_v^i(d,c)>z_y^i(d,c)\}
+```
+
+其中：
+
+```text
+y：target first token；
+z_v：补丁后第一步词表 token v 的 logit；
+rank_y：target first token 的排名；
+above_y：高于 target first token 的 token 数量。
+```
+
+再与 no-patch baseline 比较：
+
+```math
+\Delta rank_y^i
+=
+rank_y^{baseline}
+-
+rank_y^i
+```
+
+```math
+\Delta above_y^i
+=
+above_y^{baseline}
+-
+above_y^i
+```
+
+测试的核心门控：
+
+```math
+g_i^{cat\_count\_rank\_improved}
+=
+g_i^{cat\_nonresidual\_else\_count}
+\cdot
+\mathbf{1}
+\left(
+rank_y^i < rank_y^{baseline}
+\right)
+```
+
+```math
+g_i^{cat\_count\_above\_decreased}
+=
+g_i^{cat\_nonresidual\_else\_count}
+\cdot
+\mathbf{1}
+\left(
+above_y^i < above_y^{baseline}
+\right)
+```
+
+注意：
+
+```text
+本阶段没有使用 single-component behavioral class 作为非 oracle predictor 输入；
+但使用了 target first token 的全词表排名，因此仍然是 target-aware proxy。
+```
+
+### 四、确认轮结果
+
+#### qwen3
+
+```text
+pairs = 6
+```
+
+主要结果：
+
+```text
+category_nonresidual_else_count_nonnegative:
+  decision_acc = 0.708
+  pair_exact_plus_multi = 6
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+  natural_category_target_rows = 2
+
+category_count_rank_improved:
+  decision_acc = 0.896
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+category_count_above_decreased:
+  decision_acc = 0.896
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+count_rank_improved:
+  decision_acc = 0.771
+  pair_exact_plus_multi = 6
+  natural_target_rows = 12
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+oracle_route_target_only:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+qwen3 关键结果：
+
+```text
+1. Phase 833 的退化被 category_count_rank_improved / above_decreased 消除。
+2. qwen3 的这两个 blocker-aware 规则在生成指标上等于 oracle。
+3. 简单 rank threshold 规则 rank <= 50 / 500 / 2000 全部失败。
+4. 有效的不是绝对排名，而是相对 baseline 是否改善。
+```
+
+这说明：
+
+```text
+qwen3 的 route interference 可以通过 first-step target-rank improvement 过滤。
+```
+
+#### DS7B
+
+```text
+pairs = 2
+```
+
+主要结果：
+
+```text
+category_nonresidual_else_count_nonnegative:
+  decision_acc = 0.812
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+
+category_count_rank_improved:
+  decision_acc = 0.375
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+category_count_above_decreased:
+  decision_acc = 0.375
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+category_count_rank_le2000:
+  decision_acc = 0.438
+  pair_exact_plus_multi = 0
+  natural_target_rows = 2
+  natural_degraded_rows = 0
+  natural_category_target_rows = 0
+
+oracle_route_target_only:
+  decision_acc = 1.000
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+DS7B 关键结果：
+
+```text
+1. first-step rank improvement 对 DS7B 不是有效 gate。
+2. DS7B 仍然由 nonresidual / MLP-channel count 结构主导。
+3. target-rank blocker profile 过度过滤，导致 target route 被关掉。
+```
+
+#### GLM4
+
+```text
+pairs = 0
+```
+
+仍无法进入组合测试。
+
+### 五、结果分析
+
+#### 1. qwen3 的退化被解释和修复
+
+Phase 833 中 qwen3 的问题是：
+
+```text
+natural_question 下 attention_output 误激活，
+把 broad_near_miss 推向 unknown_other。
+```
+
+Phase 834 显示：
+
+```text
+如果要求补丁后 target first token rank 相对 baseline 改善，
+这个误激活会被过滤掉。
+```
+
+因此 qwen3 的 qwen3-specific gate 现在更接近：
+
+```math
+g_i(d,c)
+=
+g_i^{cat\_nonresidual\_else\_count}
+\cdot
+\mathbf{1}
+\left(
+rank_y^i < rank_y^{baseline}
+\right)
+```
+
+这比 Phase 833 更接近全词表竞争机制。
+
+#### 2. DS7B 证明 rank-improvement 不是统一变量
+
+如果 rank-improvement 是统一 gate 变量，DS7B 应该也提升。
+
+实际结果：
+
+```text
+DS7B rank-improved:
+  pair_exact_plus_multi = 0
+  natural_category_target_rows = 0
+
+DS7B category_nonresidual_else_count:
+  pair_exact_plus_multi = 2
+  natural_category_target_rows = 2
+```
+
+说明：
+
+```text
+DS7B 的 target route 可能不表现为 target first-token rank immediate improvement；
+它可能需要后续 token / span / protocol verbalizer 才显现。
+```
+
+这和前面关于 small model / distilled model 粗糙性的判断一致。
+
+#### 3. 绝对 rank 阈值失败
+
+qwen3 和 DS7B 中：
+
+```text
+rank <= 50
+rank <= 500
+rank <= 2000
+```
+
+基本都失败。
+
+这说明：
+
+```text
+全词表竞争不是看 target token 绝对排名是否足够高；
+更重要的是相对于 baseline 的局部场变形方向。
+```
+
+这是一个重要客观现象。
+
+### 六、理论进展
+
+当前门控公式从 Phase 833 的：
+
+```math
+g_i(d,c)
+=
+\hat{F}
+\left(
+a_i(d,c),
+R_i,
+Q(d)
+\right)
+```
+
+推进为：
+
+```math
+g_i(d,c)
+=
+\hat{F}
+\left(
+a_i(d,c),
+R_i,
+Q(d),
+B_i(d,c)
+\right)
+```
+
+其中：
+
+```math
+B_i(d,c)
+=
+\left(
+rank_y^i(d,c),
+above_y^i(d,c),
+\Delta rank_y^i(d,c),
+\Delta above_y^i(d,c)
+\right)
+```
+
+目前最接近 qwen3 的公式是：
+
+```math
+g_i^{qwen3}(d,c)
+=
+\mathbf{1}
+\left(
+Q(d)=natural\_category
+\Rightarrow
+R_i\ne layer\_residual
+\right)
+\cdot
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+\ge
+\#\{j:a_{ij}<0\}
+\right)
+\cdot
+\mathbf{1}
+\left(
+rank_y^i < rank_y^{baseline}
+\right)
+```
+
+目前最接近 DS7B 的公式是：
+
+```math
+g_i^{DS7B}(d,c)
+=
+\mathbf{1}
+\left(
+Q(d)=natural\_category
+\Rightarrow
+R_i\ne layer\_residual
+\right)
+\cdot
+\mathbf{1}
+\left(
+\#\{j:a_{ij}>0\}
+\ge
+\#\{j:a_{ij}<0\}
+\right)
+```
+
+两者差异是：
+
+```text
+qwen3 需要 blocker-aware rank improvement；
+DS7B 加入 rank improvement 反而失败。
+```
+
+### 七、硬伤和瓶颈
+
+Phase 834 的硬伤：
+
+```text
+1. 没有统一 qwen3 与 DS7B。
+2. qwen3 的公式已经包含 target first-token rank，是 target-aware proxy，不是纯自然门控。
+3. DS7B 的 route 可能不是 first-token rank 可见，而是 span/protocol 层可见。
+4. GLM4 仍无 pair。
+5. 样本仍集中在少数 case，不能推广为全局语言机制。
+```
+
+因此，Phase 834 仍不能叫语言编码机制闭合。
+
+### 八、对小模型偏差的解释
+
+当前跨模型差异可能来自：
+
+```text
+1. qwen3 的 body organ route 在第一步 target token rank 中可见；
+2. DS7B 的 geometric shape route 可能在多 token span 或 verbalizer 中显现；
+3. 小模型可能把 route gate 分散到不同层级；
+4. 蒸馏模型可能让 first-token rank 与最终 span closure 脱钩；
+5. 真实大模型可能存在更稳定的统一 blocker-aware gate。
+```
+
+所以当前只能说：
+
+```text
+blocker-aware signal 是 qwen3 的有效门控补充；
+但不是小模型跨模型统一不变量。
+```
+
+### 九、当前阶段进度判断
+
+从 Phase 832 到 Phase 834，当前阶段的推进链是：
+
+```text
+Phase 832:
+  行为 route boundary 有效。
+
+Phase 833:
+  route boundary 在 component kind + donor protocol + count signal 中有影子。
+
+Phase 834:
+  qwen3 的误激活可以由 first-step blocker profile 过滤；
+  但 DS7B 不遵守同一 rank-improvement 规则。
+```
+
+阶段目标完成情况：
+
+```text
+qwen3:
+  已达到当前阶段最低标准。
+
+DS7B:
+  已由结构 count 规则达到当前阶段最低标准。
+
+跨模型统一:
+  未完成。
+
+GLM4:
+  未进入测试。
+```
+
+当前估计：
+
+```text
+gate mechanism closure: 55% - 60%
+language encoding mechanism closure: 25% - 30%
+global neuron atlas: 10% - 15%
+```
+
+### 十、下一步 Phase
+
+下一步不应继续调 first-token rank 阈值，因为绝对 rank 阈值已经失败。
+
+下一阶段应进入：
+
+```text
+Phase 835:
+span-aware / protocol-aware blocker profile
+（片段感知 / 协议感知阻塞者画像）
+```
+
+核心问题：
+
+```text
+DS7B 为什么在最终生成上成功，
+但 first-token target-rank improvement 不显示？
+```
+
+下一阶段应比较：
+
+```text
+1. first-token rank；
+2. answer span score；
+3. protocol-valid span；
+4. target-equivalent alias span；
+5. blocker class profile；
+6. component kind / donor protocol。
+```
+
+候选公式：
+
+```math
+g_i(d,c)
+=
+\Omega
+\left(
+a_i(d,c),
+R_i,
+Q(d),
+B_i^{token}(d,c),
+B_i^{span}(d,c),
+P_i^{protocol}(d,c)
+\right)
+```
+
+最低标准：
+
+```text
+qwen3:
+  保持 Phase 834 的 oracle-level 生成指标。
+
+DS7B:
+  找到为什么 rank-improved 失败但 count-rule 成功。
+```
+
+高标准：
+
+```text
+找出 qwen3 与 DS7B 的共同上层变量：
+不是 first-token rank，
+而可能是 answer-span / protocol-validity / blocker-class 的组合。
+```
+
+阶段性结论：
+
+```text
+Phase 834 把 qwen3 的 route interference 从现象推进到可过滤机制；
+但也证明 first-token blocker profile 不是统一答案。
+
+下一步必须从 token-level blocker profile
+推进到 span-level / protocol-level blocker profile。
+```
+
+## Phase 835: span-aware / protocol-aware blocker profile（片段感知 / 协议感知阻塞者画像） [2026-07-01 21:28]
+
+### 一、任务来源
+
+本阶段承接 Phase 833 / Phase 834。
+
+上传分析的核心判断基本正确：
+
+```text
+Phase 833 说明：
+  内生路线边界可以被 component kind（组件类型）、
+  donor protocol（供体协议）、
+  selected channel count（选中通道数量）等内部变量部分预测。
+
+Phase 834 说明：
+  qwen3 上 first-token target-rank improvement（第一词元目标排名改善）
+  可以过滤掉一批错误激活；
+  但 DS7B 上同一指标失效。
+
+因此下一步不能继续只调 first-token rank，
+必须进入 answer-span / protocol / blocker profile。
+```
+
+所以本阶段目标是：
+
+```text
+验证 DS7B 为什么在最终生成上成功，
+但 first-token target-rank improvement 不显示。
+
+测试 span score（答案片段评分）、
+protocol validity（协议有效性）、
+blocker class profile（阻塞者类别画像）
+是否能解释这一差异。
+```
+
+### 二、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase835_span_protocol_blocker_profile.py
+tests/glm5/run_phase835_span_protocol_blocker_profile_round.sh
+```
+
+结果位置：
+
+```text
+tests/result/phase835_span_protocol_blocker_profile/smoke/
+tests/result/phase835_span_protocol_blocker_profile/main/
+tests/result/phase835_span_protocol_blocker_profile/confirm/
+```
+
+跨模型确认结果：
+
+```text
+tests/result/phase835_span_protocol_blocker_profile/confirm/phase835_cross_model_summary.md
+tests/result/phase835_span_protocol_blocker_profile/confirm/phase835_cross_model_summary.json
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+测试配置：
+
+```text
+quantization = off
+dtype = bfloat16
+attn = flash_attention_2,sdpa,eager
+实际运行中 flash_attention_2 不可用，自动回退到 sdpa。
+```
+
+### 三、测试原理
+
+Phase 835 不是重新寻找 patch，而是在 Phase 834 的 blocker-aware gate 上增加 span 侧画像。
+
+对每个候选组件：
+
+```text
+1. 先计算无 patch 时的候选答案片段得分；
+2. 对单个 donor-component patch 计算 first-step logits；
+3. 用 patched first-step logits 替换候选答案第一个 token 的得分；
+4. 后续 token 仍使用 baseline teacher-forced score；
+5. 由此得到近似 patched span profile。
+```
+
+核心量：
+
+```math
+S_{\text{span}}(a \mid x)
+=
+\frac{1}{|a|}
+\sum_{t=1}^{|a|}
+\log p(a_t \mid x, a_{<t})
+```
+
+Phase 835 近似 patched span：
+
+```math
+S_{\text{span}}^{(i)}(a \mid x)
+\approx
+\frac{1}{|a|}
+\left[
+\log p_i(a_1 \mid x)
++
+\sum_{t=2}^{|a|}
+\log p(a_t \mid x, a_{<t})
+\right]
+```
+
+其中：
+
+```text
+i = 当前 donor-component patch
+a = 候选答案片段
+x = recipient prompt（接收端提示）
+```
+
+主要派生特征：
+
+```math
+M_{\text{non}}^{(i)}
+=
+S_{\text{target}}^{(i)}
+-
+S_{\text{best non-target}}^{(i)}
+```
+
+```math
+M_{\text{contrast}}^{(i)}
+=
+S_{\text{target}}^{(i)}
+-
+S_{\text{contrast}}^{(i)}
+```
+
+```math
+M_{\text{generic}}^{(i)}
+=
+S_{\text{target}}^{(i)}
+-
+S_{\text{generic blocker}}^{(i)}
+```
+
+测试 gate：
+
+```math
+g_i(d,c)
+=
+\Omega
+\left(
+A_i(d,c),
+R_i,
+Q(d),
+B_i^{token}(d,c),
+B_i^{span}(d,c),
+P_i^{protocol}(d,c)
+\right)
+```
+
+本阶段具体比较以下规则：
+
+```text
+category_nonresidual_else_count_nonnegative
+category_count_rank_improved
+category_count_span_margin_improved
+category_count_span_rank_improved
+category_count_span_closure
+category_count_span_or_rank_improved
+category_count_span_and_rank_improved
+category_count_span_contrast_cleared
+category_count_span_generic_cleared
+oracle_route_target_only
+```
+
+### 四、confirm 客观结果
+
+#### 1. qwen3
+
+最稳定规则仍然是：
+
+```text
+category_count_rank_improved
+```
+
+confirm 结果：
+
+```text
+decision accuracy = 0.8958333333
+TP = 23
+TN = 20
+FP = 4
+FN = 1
+pair_exact_plus_multi = 6
+natural_target_rows = 14
+natural_degraded_rows = 0
+natural_category_target_rows = 2
+```
+
+与 oracle 生成指标一致：
+
+```text
+oracle_route_target_only:
+  pair_exact_plus_multi = 6
+  natural_target_rows = 14
+  natural_degraded_rows = 0
+```
+
+span-only 规则没有超过 rank-improved。
+
+典型结果：
+
+```text
+category_count_span_margin_improved:
+  decision accuracy = 0.75
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+
+category_count_span_closure:
+  decision accuracy = 0.7083333333
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+
+category_count_span_rank_improved:
+  predicted_active = 0
+  pair_exact_plus_multi = 0
+```
+
+qwen3 的退化样本仍集中在：
+
+```text
+case = p816_heart_body_organ
+baseline = Circulatory System
+bad patched = Human Anatomy
+boundary: broad_near_miss -> unknown_other
+```
+
+对应说明：
+
+```text
+span-only / broad count 会重新激活错误路线；
+first-token target-rank improvement 可以过滤掉这类错误。
+```
+
+#### 2. GLM4
+
+GLM4 在本筛选条件下无可用 pair：
+
+```text
+pairs = 0
+skipped_model_load = true
+```
+
+因此不能从本阶段给出 GLM4 的机制结论。
+
+#### 3. DS7B
+
+DS7B 继续显示和 qwen3 不同的边界。
+
+宽松 count 规则：
+
+```text
+category_nonresidual_else_count_nonnegative:
+  decision accuracy = 0.8125
+  TP = 9
+  TN = 4
+  FP = 3
+  FN = 0
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+first-token rank-improved 失败：
+
+```text
+category_count_rank_improved:
+  decision accuracy = 0.375
+  TP = 2
+  TN = 4
+  FP = 3
+  FN = 7
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+```
+
+span margin / span rank / span closure 也失败：
+
+```text
+category_count_span_margin_improved:
+  decision accuracy = 0.3125
+  pair_exact_plus_multi = 0
+  natural_target_rows = 0
+
+category_count_span_rank_improved:
+  decision accuracy = 0.3125
+  pair_exact_plus_multi = 0
+
+category_count_span_closure:
+  decision accuracy = 0.3125
+  pair_exact_plus_multi = 0
+```
+
+唯一与宽松 count 同步成功的是：
+
+```text
+category_count_span_contrast_cleared:
+  decision accuracy = 0.8125
+  TP = 9
+  TN = 4
+  FP = 3
+  FN = 0
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+但是需要注意：
+
+```text
+span_contrast_cleared 并没有减少 false positive；
+它只是和宽松 count 规则在当前 DS7B 样本上同指标。
+```
+
+DS7B 的 false positive 主要是：
+
+```text
+case = p816_triangle_geometric_shape
+component = L27 layer_residual
+donor class = object_echo
+```
+
+这说明：
+
+```text
+DS7B 的 contrast-cleared 可能只是说明“没有被 contrast 阻塞”，
+不等于已经进入 target-equivalent route。
+```
+
+### 五、阶段判断
+
+Phase 835 是有效推进，但不是闭合。
+
+正确部分：
+
+```text
+1. qwen3 的错误路线可以被 first-token target-rank improvement 过滤。
+2. DS7B 确实不能用同一个 first-token rank 变量解释。
+3. answer-span / blocker-class 方向有必要，但简单 span margin 不是答案。
+4. contrast blocker 和 generic blocker 的区分开始出现价值。
+```
+
+负结果：
+
+```text
+1. span margin improvement 没有成为跨模型统一变量。
+2. span rank improvement 基本失效。
+3. DS7B 的 span_contrast_cleared 仍保留 false positive。
+4. GLM4 无可用 pair，无法参与机制判断。
+```
+
+### 六、硬伤
+
+Phase 835 最大硬伤：
+
+```text
+patched span score 只替换 first-step logits，
+后续 token 不是 patch 后真实前向。
+```
+
+这意味着：
+
+```text
+Phase 835 只能说明 first-token patch 对 span score 的近似影响；
+不能说明完整 answer span 在 patch 条件下真的闭合。
+```
+
+因此 Phase 835 的结论必须限定为：
+
+```text
+span-aware first-step approximation
+（片段感知的一步近似）
+```
+
+而不是：
+
+```text
+full span causal closure
+（完整片段因果闭合）
+```
+
+### 七、下一步
+
+下一步仍属于同一阶段性目标：
+
+```text
+route boundary gate mechanism
+（路线边界门控机制）
+```
+
+所以继续进入 Phase 836：
+
+```text
+full-span causal blocker profile
+（完整片段因果阻塞者画像）
+```
+
+目标：
+
+```text
+把 Phase 835 的 first-step span approximation
+升级为 stepwise patched span scoring。
+```
+
+## Phase 836: full-span causal blocker profile（完整片段因果阻塞者画像） [2026-07-01 21:28]
+
+### 一、任务
+
+Phase 836 直接处理 Phase 835 的硬伤：
+
+```text
+Phase 835 只替换 answer span 的第一个 token 得分；
+Phase 836 在候选答案每一个 teacher-forced prediction step 都安装 patch。
+```
+
+目标：
+
+```text
+验证 DS7B 的失败是否只是因为 Phase 835 的 first-step span approximation 太弱。
+```
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase836_full_span_causal_blocker_profile.py
+tests/glm5/run_phase836_full_span_causal_blocker_profile_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase836_full_span_causal_blocker_profile/smoke/
+tests/result/phase836_full_span_causal_blocker_profile/main/
+tests/result/phase836_full_span_causal_blocker_profile/confirm/
+```
+
+跨模型确认结果：
+
+```text
+tests/result/phase836_full_span_causal_blocker_profile/confirm/phase836_cross_model_summary.md
+tests/result/phase836_full_span_causal_blocker_profile/confirm/phase836_cross_model_summary.json
+```
+
+### 三、测试原理
+
+Phase 836 的核心变化：
+
+```text
+对候选答案 a = (a1, a2, ..., am)，
+每一步 t 都构造 prefix = x + a_<t，
+然后在该当前位置安装 patch，
+计算 p_i(a_t | x, a_<t)。
+```
+
+公式：
+
+```math
+S_{\text{full-span}}^{(i)}(a \mid x)
+=
+\frac{1}{|a|}
+\sum_{t=1}^{|a|}
+\log p_i(a_t \mid x, a_{<t})
+```
+
+与 Phase 835 的区别：
+
+```math
+S_{\text{phase835}}^{(i)}(a \mid x)
+\approx
+\frac{1}{|a|}
+\left[
+\log p_i(a_1 \mid x)
++
+\sum_{t=2}^{|a|}
+\log p(a_t \mid x, a_{<t})
+\right]
+```
+
+```math
+S_{\text{phase836}}^{(i)}(a \mid x)
+=
+\frac{1}{|a|}
+\sum_{t=1}^{|a|}
+\log p_i(a_t \mid x, a_{<t})
+```
+
+也就是说：
+
+```text
+Phase 836 是 teacher-forced full-span causal scoring，
+但仍然不是 free generation closure。
+```
+
+测试规则：
+
+```text
+category_nonresidual_else_count_nonnegative
+category_count_rank_improved
+category_count_fullspan_margin_improved
+category_count_fullspan_rank_improved
+category_count_fullspan_closure
+category_count_fullspan_or_rank_improved
+category_count_fullspan_and_rank_improved
+category_count_fullspan_contrast_cleared
+category_count_fullspan_generic_cleared
+oracle_route_target_only
+```
+
+### 四、confirm 客观结果
+
+#### 1. qwen3
+
+Phase 836 没有超过 Phase 834 / Phase 835 的 first-token rank 规则。
+
+最稳定规则仍然是：
+
+```text
+category_count_rank_improved
+category_count_fullspan_and_rank_improved
+```
+
+二者结果一致：
+
+```text
+decision accuracy = 0.8958333333
+TP = 23
+TN = 20
+FP = 4
+FN = 1
+pair_exact_plus_multi = 6
+natural_target_rows = 14
+natural_degraded_rows = 0
+natural_category_target_rows = 2
+```
+
+full-span-only 规则退回宽松 count 水平：
+
+```text
+category_count_fullspan_margin_improved:
+  decision accuracy = 0.7083333333
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+
+category_count_fullspan_closure:
+  decision accuracy = 0.7083333333
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+
+category_count_fullspan_contrast_cleared:
+  decision accuracy = 0.7083333333
+  natural_target_rows = 13
+  natural_degraded_rows = 1
+
+category_count_fullspan_rank_improved:
+  predicted_active = 0
+  pair_exact_plus_multi = 0
+```
+
+结论：
+
+```text
+qwen3 的 gate 仍然更接近 first-token blocker profile，
+不是 full-span margin profile。
+```
+
+#### 2. GLM4
+
+仍然无可用 pair：
+
+```text
+pairs = 0
+skipped_model_load = true
+```
+
+#### 3. DS7B
+
+DS7B 的结果与 Phase 835 一致。
+
+宽松 count：
+
+```text
+category_nonresidual_else_count_nonnegative:
+  decision accuracy = 0.8125
+  TP = 9
+  TN = 4
+  FP = 3
+  FN = 0
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+fullspan contrast cleared：
+
+```text
+category_count_fullspan_contrast_cleared:
+  decision accuracy = 0.8125
+  TP = 9
+  TN = 4
+  FP = 3
+  FN = 0
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+  natural_category_target_rows = 2
+```
+
+fullspan margin / rank / closure 继续失败：
+
+```text
+category_count_fullspan_margin_improved:
+  decision accuracy = 0.3125
+  pair_exact_plus_multi = 0
+  natural_target_rows = 0
+
+category_count_fullspan_rank_improved:
+  decision accuracy = 0.3125
+  pair_exact_plus_multi = 0
+
+category_count_fullspan_closure:
+  decision accuracy = 0.3125
+  pair_exact_plus_multi = 0
+
+category_count_fullspan_or_rank_improved:
+  decision accuracy = 0.375
+  pair_exact_plus_multi = 0
+  natural_target_rows = 1
+```
+
+结论：
+
+```text
+DS7B 的成功不是因为 Phase 835 忽略了后续 token；
+即使做 full-span teacher-forced patch scoring，
+target margin / target rank / span closure 仍然不能解释成功。
+```
+
+### 五、阶段性结论
+
+Phase 836 是重要负结果。
+
+它排除了一个自然假设：
+
+```text
+DS7B 不是 first-token rank 不动，
+但 full-span target margin 已经闭合。
+```
+
+实际结果是：
+
+```text
+DS7B 的成功更像：
+  selected component count + category / non-residual route + contrast blocker cleared
+
+而不是：
+  target span margin improved
+  target span rank improved
+  target span closure
+```
+
+qwen3 和 DS7B 的差异进一步清楚：
+
+```text
+qwen3:
+  gate signal 更接近 first-token target rank / above-target blocker profile。
+
+DS7B:
+  gate signal 更接近 route-component activation + contrast absence；
+  但仍存在 object_echo false positive，说明它不是精确 target gate。
+```
+
+### 六、理论公式更新
+
+当前不能写成一个简单统一 gate：
+
+```math
+g_i = \mathbf{1}[M_{\text{span}}^{(i)} > 0]
+```
+
+因为 qwen3 和 DS7B 都不支持这个结论。
+
+更合理的阶段公式是：
+
+```math
+g_i(d,c)
+=
+\Omega
+\left(
+C_i,
+Q_d,
+P_d,
+B_i^{token},
+B_i^{contrast},
+B_i^{generic},
+R_i
+\right)
+```
+
+其中：
+
+```text
+C_i = component route condition（组件路线条件）
+Q_d = donor protocol condition（供体协议条件）
+P_d = prompt protocol condition（接收提示协议条件）
+B_i^{token} = first-token blocker profile（第一词元阻塞者画像）
+B_i^{contrast} = contrast blocker clearance（对照阻塞者清除）
+B_i^{generic} = generic blocker clearance（通用阻塞者清除）
+R_i = route class / component kind（路线类别 / 组件类型）
+```
+
+模型特化近似：
+
+```math
+g_i^{qwen3}
+\approx
+\mathbf{1}
+\left[
+C_i
+\land
+\Delta rank_{\text{target}}^{(i)} < 0
+\right]
+```
+
+```math
+g_i^{DS7B}
+\approx
+\mathbf{1}
+\left[
+C_i
+\land
+B_{\text{contrast cleared}}^{(i)}
+\right]
+```
+
+但 DS7B 公式仍不闭合，因为：
+
+```text
+B_contrast_cleared 不能排除 object_echo false positive。
+```
+
+因此需要增加：
+
+```math
+E_i^{echo}
+=
+\text{object / surface echo route score}
+```
+
+下一版候选公式：
+
+```math
+g_i(d,c)
+=
+\Omega
+\left(
+C_i,
+Q_d,
+P_d,
+B_i^{token},
+B_i^{contrast},
+E_i^{echo},
+R_i
+\right)
+```
+
+### 七、当前图谱进展
+
+当前已经积累的拼图：
+
+```text
+1. source writer（源写入器）
+2. MLP / residual carrier（MLP / 残差承载器）
+3. rewriter（重写器）
+4. readout competition（读出竞争）
+5. top-k blocker（高排名阻塞者）
+6. blocker class（阻塞者类别）
+7. internal readout sign（内部读出符号）
+8. donor protocol gate（供体协议门控）
+9. component kind route（组件类型路线）
+10. selected channel count（选中通道数量）
+11. first-token blocker profile（第一词元阻塞者画像）
+12. span-level contrast blocker clearance（片段级对照阻塞者清除）
+13. object_echo false positive（对象回声误激活）
+```
+
+图谱形状从：
+
+```text
+单点 patch 成功 / 失败
+```
+
+推进到：
+
+```text
+source route -> component gate -> blocker profile -> vocabulary competition
+```
+
+但仍未达到：
+
+```text
+token closure
+```
+
+### 八、闭合标准和当前距离
+
+最低闭合标准：
+
+```text
+1. 在 qwen3 / DS7B 至少两个模型上找到同一层级的 gate 变量；
+2. 能保留 oracle-level generation；
+3. 能减少 false positive；
+4. 不引入 natural degraded rows；
+5. 能解释为什么某些 donor protocol 生效、某些不生效。
+```
+
+当前状态：
+
+```text
+qwen3:
+  生成层面接近 oracle；
+  gate 解释较清楚；
+  仍有 FP=4/FN=1。
+
+DS7B:
+  生成层面宽松规则可达 oracle；
+  但 gate 解释仍粗；
+  FP=3 未消除。
+
+GLM4:
+  无可用 pair。
+```
+
+进度估计：
+
+```text
+route boundary gate mechanism: 60% - 65%
+token closure: 30% - 35%
+language encoding mechanism: 28% - 32%
+global neuron atlas: 12% - 15%
+```
+
+### 九、小模型偏差
+
+需要谨慎解释：
+
+```text
+当前模型是小模型。
+小模型可能把真实大模型中的连续机制压缩成粗糙的局部技巧。
+```
+
+可能影响：
+
+```text
+1. qwen3 的 first-token rank gate 可能过于局部；
+2. DS7B 的 contrast-cleared gate 可能是蒸馏后的粗糙替代机制；
+3. GLM4 无 pair 可能是筛选口径不适配，而不是机制不存在；
+4. object_echo false positive 可能来自小模型语义路线未充分分化。
+```
+
+所以不能说：
+
+```text
+语言机制就是 first-token rank 或 contrast-cleared。
+```
+
+只能说：
+
+```text
+在当前小模型上，
+路线门控的可观测影子分别落在 first-token blocker profile 和 contrast blocker clearance 上。
+```
+
+### 十、下一步 Phase
+
+下一步仍属于当前阶段性目标：
+
+```text
+从 route boundary gate 推进到 gate error decomposition。
+```
+
+Phase 837 应该专门解决：
+
+```text
+DS7B 的 object_echo false positive。
+```
+
+建议标题：
+
+```text
+Phase 837:
+echo-route false positive decomposition
+（回声路线误激活拆解）
+```
+
+任务：
+
+```text
+1. 固定 DS7B 的 p816_triangle_geometric_shape；
+2. 比较 target-equivalent route 与 object_echo route；
+3. 对 L27 layer_residual / mlp_channel_group 做 echo score；
+4. 判断 false positive 是否来自：
+   - object surface echo；
+   - prompt copying；
+   - category route 未完成；
+   - contrast blocker 虽清除但 target route 未写入。
+```
+
+核心公式：
+
+```math
+g_i^{DS7B}
+=
+\mathbf{1}
+\left[
+C_i
+\land
+B_{\text{contrast cleared}}^{(i)}
+\land
+\neg E_i^{echo}
+\right]
+```
+
+最低目标：
+
+```text
+在 DS7B 上把 FP 从 3 降低，
+同时保持：
+  pair_exact_plus_multi = 2
+  natural_target_rows = 6
+  natural_degraded_rows = 0
+```
+
+如果 Phase 837 能做到，说明：
+
+```text
+DS7B 的 gate 不是 rank gate，
+而是 contrast cleared + echo suppression + component route 的组合。
+```
+
+如果做不到，则说明：
+
+```text
+当前 component-level / span-level 特征仍不够，
+需要进入更细的 neuron/channel route fiber。
+```
+
+## Phase 837: global gear response atlas pilot（全局齿轮响应图谱试点） [2026-07-01 23:05]
+
+### 一、任务来源
+
+本阶段承接 Phase 836，并吸收本轮上传的两个判断：
+
+```text
+1. Phase 836 是重要负结果：
+   DS7B 的成功不是因为 Phase 835 的 first-step span approximation 太弱。
+   即使 full-span teacher-forced patch scoring 也不能用 target margin / rank / closure 解释 DS7B。
+
+2. 当前研究不应继续只测局部齿轮的某个齿，
+   而应该建立 Global Gear Response Atlas（全局齿轮响应图谱）。
+```
+
+这个判断总体正确。
+
+前面大量阶段已经显示：
+
+```text
+局部 patch 可以产生结果；
+但局部 patch 容易把人工干预效果误认为自然机制。
+```
+
+Phase 837 因此不继续只拆 DS7B 的单个 object_echo false positive，而是先做一个全局试点：
+
+```text
+用标准化扰动测多个组件在多个 case / donor / 指标下的响应指纹。
+```
+
+这仍属于同一个阶段性目标：
+
+```text
+从局部 gate / blocker 测量
+推进到 route-boundary gear atlas（路线边界齿轮图谱）。
+```
+
+### 二、脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase837_global_gear_response_atlas_pilot.py
+tests/glm5/run_phase837_global_gear_response_atlas_pilot_round.sh
+```
+
+结果位置：
+
+```text
+tests/result/phase837_global_gear_response_atlas_pilot/smoke/
+tests/result/phase837_global_gear_response_atlas_pilot/main/
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/
+```
+
+确认结果：
+
+```text
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/phase837_cross_model_summary.md
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/phase837_cross_model_summary.json
+```
+
+逐行响应指纹：
+
+```text
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/phase837_qwen3_rows.jsonl
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/phase837_glm4_rows.jsonl
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/phase837_deepseek7b_rows.jsonl
+```
+
+执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+运行设置：
+
+```text
+quantization = off
+dtype = bfloat16
+attn = flash_attention_2,sdpa,eager
+实际 flash_attention_2 不可用，自动回退 sdpa。
+```
+
+### 三、测试原理
+
+本阶段把“组件是否有效”改成“组件响应指纹”。
+
+对每个模型，选取 Phase 827 已有组件池中的 top component groups（高价值组件组），跨多个 case 和 donor protocol 测响应。
+
+每一行响应指纹对应：
+
+```text
+model
+component group
+target case
+donor variant
+recipient context
+patch response
+```
+
+基础公式：
+
+```math
+\mathcal{G}_m:
+(x,d,c)
+\longrightarrow
+\Delta \Phi_m(x,d,c)
+```
+
+其中：
+
+```text
+m = component / subspace（组件 / 子空间）
+x = target task case（目标任务样本）
+d = donor condition（供体条件）
+c = recipient context（接收上下文）
+\Delta \Phi = 输出场变化画像
+```
+
+本阶段记录的响应画像：
+
+```math
+\Delta \Phi_m
+=
+\left(
+\Delta B,
+\Delta R_{\text{target}},
+\Delta S_{\text{target}},
+\Delta S_{\text{contrast}},
+\Delta S_{\text{generic}},
+\Delta E_{\text{echo}},
+\Delta P_{\text{protocol}},
+\Delta C_{\text{rollout}}
+\right)
+```
+
+具体指标包括：
+
+```text
+1. boundary class transition（边界类迁移）
+2. target transition（目标边界迁移）
+3. degraded boundary（边界退化）
+4. target first-token rank improvement（目标首词元排名改善）
+5. contrast span cleared（对照片段清除）
+6. generic blocker cleared（通用阻塞者清除）
+7. object echo span profile（对象回声片段画像）
+8. patched rollout output（补丁后自然展开输出）
+9. protocol validity（协议有效性）
+10. response type（响应类型）
+```
+
+候选齿轮响应类型：
+
+```text
+target_writer_candidate
+contrast_suppressor_candidate
+echo_suppressor_candidate
+echo_amplifier_or_unsuppressed
+first_token_blocker_reducer
+boundary_improver_non_target
+harmful_mixer
+neutral_or_unresolved
+```
+
+注意：
+
+```text
+这是响应图谱试点，不是最终齿轮分解。
+```
+
+### 四、数据规模
+
+confirm 轮：
+
+```text
+models = 3
+component groups per model = 8
+cases per model = 12
+donor variants = 4
+rows per model = 384
+total rows = 1152
+```
+
+donor variants：
+
+```text
+exact_choices
+natural_category
+natural_question
+object_only
+```
+
+### 五、confirm 客观结果
+
+#### 1. qwen3
+
+```text
+rows = 384
+target_transition_rows = 267
+improved_rows = 14
+degraded_rows = 4
+object_echo_rows = 0
+contrast_cleared_rows = 384
+echo_cleared_rows = 0
+target_rank_improved_rows = 191
+```
+
+响应类型：
+
+```text
+target_writer_candidate = 267
+echo_amplifier_or_unsuppressed = 113
+harmful_mixer = 4
+```
+
+复用候选：
+
+```text
+heart/body-organ 来源的 L14 组件在 9 个 case 上产生 target transition。
+```
+
+典型组件：
+
+```text
+p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B32
+p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B16
+p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B32
+p816_heart_body_organ::L14:attention_output:whole_attention_output:B32
+```
+
+观察：
+
+```text
+qwen3 的 L14 heart/body-organ 组件不像只服务于 heart case；
+它们在 bus / cat / chair / doctor / gold / guitar / oak / salmon 等多个 case 上出现 target_writer_candidate。
+```
+
+这说明：
+
+```text
+这些组件可能不是单一语义组件，
+而是更一般的 answer-category writer / boundary mover。
+```
+
+#### 2. GLM4
+
+```text
+rows = 384
+target_transition_rows = 320
+improved_rows = 0
+degraded_rows = 12
+object_echo_rows = 0
+contrast_cleared_rows = 384
+echo_cleared_rows = 0
+target_rank_improved_rows = 117
+```
+
+响应类型：
+
+```text
+target_writer_candidate = 320
+echo_amplifier_or_unsuppressed = 52
+harmful_mixer = 12
+```
+
+复用候选：
+
+```text
+winter / red / carrot / cactus 来源的 layer_residual 组件，
+在 10 个 case 上产生 target transition。
+```
+
+典型组件：
+
+```text
+p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B32
+p816_red_warm_color::L23:layer_residual:whole_layer_residual:B32
+p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B32
+p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B32
+```
+
+重要进展：
+
+```text
+前面 GLM4 因为没有 pair，无法进入组合测试；
+Phase 837 不依赖 pair，所以 GLM4 重新进入图谱。
+```
+
+这证明：
+
+```text
+全局齿轮响应图谱比 pair-composition pipeline 覆盖面更广。
+```
+
+#### 3. DS7B
+
+```text
+rows = 384
+target_transition_rows = 133
+improved_rows = 9
+degraded_rows = 7
+object_echo_rows = 45
+contrast_cleared_rows = 352
+echo_cleared_rows = 0
+target_rank_improved_rows = 185
+```
+
+响应类型：
+
+```text
+echo_amplifier_or_unsuppressed = 244
+target_writer_candidate = 133
+harmful_mixer = 7
+```
+
+object_echo 主要集中在：
+
+```text
+p816_triangle_geometric_shape = 23
+p816_oxygen_chemical_element = 22
+```
+
+典型 object_echo：
+
+```text
+triangle -> Triangle
+oxygen -> O2
+```
+
+这与 Phase 836 的判断一致：
+
+```text
+DS7B 的瓶颈确实集中在 object_echo / surface echo route。
+```
+
+复用候选：
+
+```text
+triangle/geometric-shape 来源的 L27 组件，
+在 chair / gold / laptop / oak / triangle 等 case 上产生 target_writer_candidate；
+但同一批组件也保留大量 echo_amplifier_or_unsuppressed。
+```
+
+典型组件：
+
+```text
+p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16
+p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B32
+p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B32
+p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16
+```
+
+### 六、关键进展
+
+#### 1. 从局部 patch 进入响应图谱
+
+Phase 837 不再只回答：
+
+```text
+某个组件是否能让某个 case 成功。
+```
+
+而是开始回答：
+
+```text
+某个组件在多个 case / donor / 指标下的响应形状是什么。
+```
+
+这更接近“齿轮形状”。
+
+#### 2. GLM4 重新进入研究对象
+
+之前 GLM4 因无可用 pair，经常无法进入组合阶段。
+
+Phase 837 说明：
+
+```text
+如果不用 pair 作为准入条件，
+GLM4 仍能显示大量 target_writer_candidate 响应。
+```
+
+这说明此前 GLM4 的缺席可能是：
+
+```text
+pair construction bottleneck（组件对构造瓶颈）
+```
+
+而不是：
+
+```text
+GLM4 内部没有相关机制。
+```
+
+#### 3. DS7B 的 object_echo 瓶颈被扩大验证
+
+Phase 836 只在局部组合中看到 DS7B object_echo false positive。
+
+Phase 837 在 384 行响应指纹中看到：
+
+```text
+object_echo_rows = 45
+```
+
+且集中在：
+
+```text
+triangle / oxygen
+```
+
+这说明 object_echo 不是偶然噪声，而是 DS7B 当前图谱中的稳定响应族。
+
+#### 4. contrast-cleared 不是充分条件
+
+三模型 contrast_cleared_rows 都很高：
+
+```text
+qwen3 = 384 / 384
+GLM4 = 384 / 384
+DS7B = 352 / 384
+```
+
+但 target_transition 差异很大：
+
+```text
+qwen3 = 267
+GLM4 = 320
+DS7B = 133
+```
+
+所以：
+
+```text
+contrast cleared 只是必要侧影之一，不是充分齿轮定义。
+```
+
+#### 5. target_rank_improved 也不是充分条件
+
+target_rank_improved_rows：
+
+```text
+qwen3 = 191
+GLM4 = 117
+DS7B = 185
+```
+
+但 target_transition：
+
+```text
+qwen3 = 267
+GLM4 = 320
+DS7B = 133
+```
+
+所以：
+
+```text
+rank improvement 不是跨模型统一齿轮变量。
+```
+
+### 七、当前理论修正
+
+附件中的齿轮理论方向正确，但需要严格收紧。
+
+不能直接说：
+
+```text
+已经能暴力算出齿轮形状。
+```
+
+只能说：
+
+```text
+已经能采集齿轮响应指纹的第一版。
+```
+
+当前公式应写成：
+
+```math
+F_m(x,d,c)
+=
+\Delta \Phi_m(x,d,c)
+```
+
+其中：
+
+```math
+\Delta \Phi_m
+=
+\left(
+\Delta B,
+\Delta R,
+\Delta S_{\text{target}},
+\Delta S_{\text{contrast}},
+\Delta S_{\text{generic}},
+\Delta E_{\text{echo}},
+\Delta P,
+\Delta C_{\text{rollout}}
+\right)
+```
+
+全局响应张量：
+
+```math
+\mathcal{X}_{m,t,d,k}
+=
+F_{m,k}(x_t,d,c)
+```
+
+当前只完成：
+
+```text
+\mathcal{X} 的初步采样。
+```
+
+还没有完成：
+
+```text
+1. 齿轮类型分解；
+2. 交互边估计；
+3. 未见 case 前瞻预测；
+4. 最小充分齿轮组合验证。
+```
+
+### 八、硬伤和风险
+
+#### 1. 齿轮分类规则仍然粗糙
+
+当前 response_type 是启发式分类。
+
+例如：
+
+```text
+echo_amplifier_or_unsuppressed
+```
+
+这个类混合了：
+
+```text
+1. 真正放大 echo；
+2. 没有压住 echo；
+3. target route 没写入；
+4. format route 仍然强。
+```
+
+下一步必须把它拆开。
+
+#### 2. echo_cleared_rows = 0 说明 echo 指标过严或定义不合适
+
+三模型都是：
+
+```text
+echo_cleared_rows = 0
+```
+
+这不应解释为没有 echo suppression。
+
+更可能说明：
+
+```text
+当前 echo_cleared 的二值标准太粗；
+需要改成 echo-risk score / echo-margin delta。
+```
+
+#### 3. target_transition 不等于自然机制
+
+Phase 837 仍然是 patch response atlas。
+
+它说明：
+
+```text
+某个组件在人工 donor / recipient 干预下具有某种响应形状。
+```
+
+不说明：
+
+```text
+模型自然运行时一定用这个组件完成该功能。
+```
+
+#### 4. 全局图谱还没有交互边
+
+本阶段主要是单组件响应。
+
+还没有系统测试：
+
+```text
+component-component interaction（组件交互）
+gear compatibility（齿轮相容）
+gear interference（齿轮干扰）
+minimal sufficient set（最小充分集合）
+```
+
+#### 5. 小模型偏差仍然重要
+
+当前模型为小模型，可能导致：
+
+```text
+1. qwen3 的 L14 类别写入组件过度通用；
+2. GLM4 的 layer residual 组件过度承担多功能；
+3. DS7B 的 object_echo 可能是蒸馏压缩造成的粗糙路线；
+4. 真正大模型中的齿轮可能更分散、更冗余、更条件化。
+```
+
+因此 Phase 837 的结论不能外推为真实语言编码机制，只能作为小模型图谱拼图。
+
+### 九、阶段判断
+
+Phase 837 是实质进展。
+
+它证明：
+
+```text
+全局齿轮响应图谱路线可行；
+并且比 pair-based composition pipeline 覆盖更广。
+```
+
+但它不是闭合。
+
+当前最客观的结论：
+
+```text
+1. qwen3 出现强 target-writer-like 响应族；
+2. GLM4 也出现强 target-writer-like 响应族，说明之前 pair 缺失不是机制缺失；
+3. DS7B 出现明显 echo-dominated 响应族，且 object_echo 集中在 triangle / oxygen；
+4. contrast-cleared 和 rank-improved 都不是充分齿轮变量；
+5. 齿轮图谱需要从响应采集进入响应分解和预测验证。
+```
+
+当前进度估计：
+
+```text
+global gear atlas: 15% - 20%
+route boundary gate mechanism: 62% - 67%
+token closure: 30% - 35%
+language encoding mechanism: 30% - 34%
+global neuron atlas: 12% - 16%
+```
+
+### 十、下一步 Phase
+
+下一步仍属于全局齿轮图谱阶段。
+
+Phase 838 应该做：
+
+```text
+gear response decomposition and prediction validation
+（齿轮响应分解与预测验证）
+```
+
+最低目标：
+
+```text
+1. 把 Phase 837 的 response_type 从粗分类改成连续 response vector；
+2. 计算组件之间的响应相似度；
+3. 找到跨 case 复用的 gear family；
+4. 用前 8 个 case 的响应预测后 4 个 case；
+5. 验证预测是否比随机组件选择更好。
+```
+
+建议指标：
+
+```text
+target writer score
+echo risk score
+harmful mixer score
+protocol damage score
+rank-blocker score
+span-blocker score
+cross-case reuse score
+```
+
+候选公式：
+
+```math
+Shape(m)
+=
+\left\{
+F_m(x,d,c)
+:
+x\in\mathcal{X},
+d\in\mathcal{D},
+c\in\mathcal{C}
+\right\}
+```
+
+相似度：
+
+```math
+Sim(m_i,m_j)
+=
+\operatorname{corr}
+\left(
+Shape(m_i),
+Shape(m_j)
+\right)
+```
+
+预测验证：
+
+```math
+\hat{Y}_{m,t}
+=
+\Psi
+\left(
+Shape_m^{train},
+Feature_t
+\right)
+```
+
+如果 Phase 838 成功，说明：
+
+```text
+齿轮图谱不只是记录现象，
+而开始具备预测未见任务的解释力。
+```
+
+## Phase 838: gear response decomposition and prediction validation（齿轮响应分解与预测验证） [2026-07-01 23:58]
+
+### 一、任务来源
+
+本阶段接续 Phase 837。新上传分析对 Phase 837 的判断基本正确：Phase 837 的关键价值不是 token closure（词元闭合），而是第一次把研究对象从局部 patch（补丁）推进到 global gear response fingerprint（全局齿轮响应指纹）采集。
+
+Phase 837 已经完成：
+
+```text
+1. qwen3 / GLM4 / DS7B 三模型确认轮；
+2. 每模型 384 行响应指纹；
+3. 总计 1152 行 patch response atlas（补丁响应图谱）；
+4. 初步 response_type（响应类型）分类。
+```
+
+但 Phase 837 仍然只是 pilot（试点），没有完成：
+
+```text
+1. continuous response vector（连续响应向量）；
+2. gear family decomposition（齿轮族分解）；
+3. component similarity（组件响应相似度）；
+4. held-out prediction（未见样本预测）；
+5. minimal sufficient gear set（最小充分齿轮集合）。
+```
+
+因此本阶段不重新加载模型，而是对 Phase 837 confirm 结果做离线分解与预测验证。这样可以先判断：
+
+```text
+齿轮图谱是否已经从“记录现象”，开始具备“预测未见 case（样本）”的能力。
+```
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase838_gear_response_decomposition_prediction.py
+```
+
+输入数据：
+
+```text
+tests/result/phase837_global_gear_response_atlas_pilot/confirm/
+```
+
+输出结果：
+
+```text
+tests/result/phase838_gear_response_decomposition_prediction/phase838_row_vectors.jsonl
+tests/result/phase838_gear_response_decomposition_prediction/phase838_component_vectors.jsonl
+tests/result/phase838_gear_response_decomposition_prediction/phase838_similarity_edges.jsonl
+tests/result/phase838_gear_response_decomposition_prediction/phase838_summary.json
+tests/result/phase838_gear_response_decomposition_prediction/phase838_summary.md
+```
+
+数据规模：
+
+```text
+row vectors = 1152
+component vectors = 24
+similarity edges = 84
+models = qwen3, GLM4, DS7B
+```
+
+本阶段没有新的模型 forward pass（前向计算），没有重新占用 GPU。原因是本阶段目标是验证 Phase 837 已采样响应张量是否可分解、是否有留出预测力，而不是继续扩大模型测试数据。
+
+### 三、测试原理
+
+Phase 837 的粗分类是：
+
+```text
+target_writer_candidate
+echo_amplifier_or_unsuppressed
+harmful_mixer
+```
+
+这个分类太粗，尤其是：
+
+```text
+echo_amplifier_or_unsuppressed
+```
+
+混合了：
+
+```text
+1. 真正放大 echo（回声）；
+2. 没有压住 echo；
+3. target route（目标路线）没有写入；
+4. format route（格式路线）仍然强；
+5. protocol（协议）没有闭合。
+```
+
+所以 Phase 838 把每一行响应拆成连续向量：
+
+```math
+v_{m,t,d}
+=
+\left(
+T,
+\Delta R,
+\Delta A,
+\Delta L,
+\Delta M_{tc},
+\Delta M_{tg},
+\Delta M_{te},
+B,
+P,
+E,
+H,
+Q
+\right)
+```
+
+其中：
+
+```text
+m = component（组件）
+t = case（样本）
+d = donor variant（供体变体）
+T = target success（目标成功）
+\Delta R = target rank gain（目标排名改善）
+\Delta A = above-target blocker gain（高于目标阻塞者减少）
+\Delta L = target logit gain（目标对数几率改善）
+\Delta M_{tc} = target vs contrast margin gain（目标-对照边际改善）
+\Delta M_{tg} = target vs generic blocker margin gain（目标-通用阻塞者边际改善）
+\Delta M_{te} = target vs echo margin gain（目标-回声边际改善）
+B = blocker reduction score（阻塞清除分）
+P = protocol validity / damage（协议有效 / 损伤）
+E = echo risk score（回声风险分）
+H = harm risk score（有害混合风险分）
+Q = target quality score（目标质量分）
+```
+
+目标质量分只是工程评分，不是理论定律：
+
+```math
+Q
+=
+T
++0.25\Delta R
++0.15\Delta A
++0.12\tanh(\Delta L/5)
++0.12\tanh(\Delta M_{\text{top}}/5)
++0.10\Delta R_{\text{span}}
++0.10\tanh(\Delta M_{tc}/2)
++0.06\tanh(\Delta M_{tg}/2)
++0.04\tanh(\Delta S_{\text{target}}/2)
+-0.85H_{\text{boundary}}
+-0.70E_{\text{object}}
+-0.35E_{\text{format}}
+-0.25F_{\text{target}}
+-0.30P_{\text{damage}}
+```
+
+这个公式的目的不是替代语言编码理论，而是把 Phase 837 的多指标响应压成一个可比较的响应形状。
+
+组件响应形状：
+
+```math
+Shape(m)
+=
+\left\{
+v_{m,t,d}
+:
+t\in \mathcal{T},
+d\in \mathcal{D}
+\right\}
+```
+
+组件相似度：
+
+```math
+Sim(m_i,m_j)
+=
+Corr
+\left(
+Shape(m_i),
+Shape(m_j)
+\right)
+```
+
+这里的 Corr（相关性）只作为基础相似度指标，不作为理论证明。
+
+留出预测验证：
+
+```math
+\text{Train}
+=
+\{t_1,\ldots,t_8\}
+```
+
+```math
+\text{Holdout}
+=
+\{t_9,\ldots,t_{12}\}
+```
+
+按训练样本上的组件质量分选择 top-k component（前 k 个组件），再看它们在 holdout case（留出样本）上的表现：
+
+```math
+Lift
+=
+\mathbb{E}_{m\in TopK_{train}}
+\left[
+Q_{holdout}(m)
+\right]
+-
+\mathbb{E}_{m\in All}
+\left[
+Q_{holdout}(m)
+\right]
+```
+
+如果 Lift 明显大于 0，说明响应图谱开始有预测力；如果接近 0，说明当前齿轮分解仍然主要是描述性图谱。
+
+### 四、客观结果
+
+#### 1. qwen3
+
+```text
+rows = 384
+components = 8
+clusters = 2
+family counts:
+  broad_target_writer_family = 3
+  conditional_target_writer_family = 5
+train-to-holdout pearson = -0.3670
+train-to-holdout spearman = -0.0238
+top-k lift quality = +0.0130
+top-k lift target rate = +0.0000
+```
+
+qwen3 的组件被分成两个主要簇：
+
+```text
+cluster 1:
+  attention_head / attention_output / mlp_output 混合簇
+
+cluster 2:
+  layer_residual 簇
+```
+
+最强相似边包括：
+
+```text
+mlp_output:B16 <-> mlp_output:B32 = 0.9812
+head_4 <-> attention_output:B16 = 0.9760
+head_3 <-> attention_output:B32 = 0.9693
+```
+
+解释：
+
+```text
+qwen3 的 L14 heart/body-organ 来源组件不是单一专用语义齿轮，
+而更像一组同源 category-boundary mover（类别边界移动齿轮）。
+```
+
+但是留出预测力很弱。top-k 在 holdout 上 target rate 没有超过随机平均，说明当前 qwen3 的齿轮形状还没有形成稳定预测器。
+
+#### 2. GLM4
+
+```text
+rows = 384
+components = 8
+clusters = 1
+family counts:
+  broad_target_writer_family = 8
+train-to-holdout pearson = +0.3766
+train-to-holdout spearman = 0.0000
+top-k lift quality = +0.0084
+top-k lift target rate = +0.0000
+```
+
+GLM4 的 8 个组件全部归为 broad_target_writer_family（宽目标写入齿轮族），并且全部聚成一个大簇。
+
+最强相似边：
+
+```text
+cactus L8 B16 <-> winter L8 B16 = 1.0000
+cactus L8 B32 <-> winter L8 B32 = 1.0000
+carrot L39 B16 <-> carrot L39 B32 = 0.9768
+red L23 B16 <-> red L23 B32 = 0.9746
+```
+
+解释：
+
+```text
+GLM4 的 layer_residual（层残差）齿轮响应高度同质化。
+```
+
+这有两种可能：
+
+```text
+1. GLM4 确实有非常通用的边界写入残差齿轮；
+2. 当前指标太粗，导致不同齿轮被压成同一形状。
+```
+
+需要谨慎：GLM4 holdout target rate 已经达到 1.0，因此 target-rate lift 为 0。这不是预测失败，而是指标饱和，无法继续区分组件差异。
+
+#### 3. DS7B
+
+```text
+rows = 384
+components = 8
+clusters = 5
+family counts:
+  echo_dominated_family = 7
+  weak_or_unresolved_family = 1
+train-to-holdout pearson = -0.3877
+train-to-holdout spearman = -0.1566
+top-k lift quality = +0.0777
+top-k lift target rate = +0.0547
+top-k holdout echo risk = 0.4375
+top-k holdout harm rate = 0.0000
+```
+
+DS7B 的结果最有信息量：
+
+```text
+1. 大多数组件属于 echo_dominated_family（回声主导齿轮族）；
+2. 组件没有像 GLM4 那样合成一个大簇，而是分裂成 5 个簇；
+3. top-k holdout quality 有 +0.0777 的提升；
+4. target rate 有 +0.0547 的提升；
+5. 但 echo risk 仍然高达 0.4375。
+```
+
+解释：
+
+```text
+DS7B 的齿轮形状差异最大，因此更容易从 Phase 837 的响应图谱中看到预测信号。
+但这个预测信号不是闭合信号，而是“低 harm、部分 target、仍高 echo”的混合响应。
+```
+
+这和 Phase 836 / 837 的判断一致：
+
+```text
+DS7B 的核心瓶颈不是没有 target route（目标路线），
+而是 object_echo / format_echo（对象回声 / 格式回声）路线没有被压住。
+```
+
+### 五、阶段进展
+
+Phase 838 相比 Phase 837 有三个进展。
+
+第一，response_type（响应类型）从粗标签变成了 continuous response vector（连续响应向量）：
+
+```text
+target_success
+target_rank_gain
+target_logit_gain
+span margin gain
+blocker_reduction_score
+echo_risk_score
+harm_risk_score
+target_quality_score
+```
+
+第二，组件不再只是单独列出，而是形成了 component similarity graph（组件相似图）：
+
+```text
+qwen3: 2 个簇
+GLM4: 1 个大簇
+DS7B: 5 个簇
+```
+
+第三，开始做 held-out prediction（留出预测）：
+
+```text
+qwen3: 弱预测，lift 约 +0.0130
+GLM4: target 指标饱和，lift 约 +0.0084
+DS7B: 有较明显质量 lift，约 +0.0777，但仍高 echo risk
+```
+
+这说明：
+
+```text
+齿轮图谱已经开始从“现象记录”进入“形状分解 + 弱预测验证”。
+```
+
+但还没有达到：
+
+```text
+能稳定预测未见任务上的闭合组件。
+```
+
+### 六、问题和硬伤
+
+#### 1. 预测力还弱
+
+qwen3 和 GLM4 的 target-rate lift 都是 0。qwen3 是因为 holdout 上 top-k 与平均组件差异小；GLM4 是因为 holdout target rate 已经饱和。
+
+DS7B 虽然有 +0.0777 quality lift，但相关系数为负，说明：
+
+```text
+训练样本上的最强组件不一定是留出样本上的最强组件。
+```
+
+也就是说，当前图谱还不是稳定预测器。
+
+#### 2. 数据量仍然偏小
+
+每模型只有：
+
+```text
+components = 8
+cases = 12
+donors = 4
+```
+
+这对响应形状分解只是试点，不足以建立稳定齿轮族。
+
+#### 3. 指标仍然来自人工 patch
+
+本阶段仍然基于 donor-to-recipient patch response（供体到接收体补丁响应），不能证明模型自然运行时使用同一个组件。
+
+当前证据等级是：
+
+```text
+artificial intervention response shape（人工干预响应形状）
+```
+
+不是：
+
+```text
+natural mechanism proof（自然机制证明）
+```
+
+#### 4. 相似度只是粗工具
+
+本阶段用了 Corr（相关性）做组件响应相似度，但它只是基础相似指标，不应该上升为理论公式。
+
+真实齿轮相似性可能需要：
+
+```text
+1. 边界迁移一致性；
+2. echo 风险一致性；
+3. blocker 清除一致性；
+4. protocol 保持一致性；
+5. component interaction（组件交互）一致性。
+```
+
+#### 5. 小模型偏差仍然明显
+
+当前三个模型都是小模型或蒸馏模型，可能导致：
+
+```text
+qwen3: 类别边界齿轮过度集中在 L14；
+GLM4: layer residual（层残差）表现过度同质；
+DS7B: echo route（回声路线）过强，可能来自蒸馏压缩和容量不足；
+真实大模型: 齿轮可能更分散、更条件化、更冗余。
+```
+
+### 七、理论影响
+
+Phase 838 支持一个谨慎结论：
+
+```text
+语言机制图谱不能只做局部 patch；
+但全局齿轮图谱也不能只停留在响应采样。
+它必须进一步证明：
+响应形状可以预测未见任务，
+并且组件组合可以形成最小充分闭合集合。
+```
+
+当前最合理的理论表述是：
+
+```math
+LanguageGeneration
+\neq
+\arg\max_y z_y
+```
+
+而更接近：
+
+```math
+LanguageGeneration
+=
+Closure
+\left(
+\mathcal{F}_{route},
+\mathcal{G}_{gear},
+\mathcal{B}_{blocker},
+\mathcal{P}_{protocol},
+\mathcal{R}_{readout}
+\right)
+```
+
+其中：
+
+```text
+\mathcal{F}_{route} = 路线场
+\mathcal{G}_{gear} = 齿轮响应图谱
+\mathcal{B}_{blocker} = 阻塞者竞争场
+\mathcal{P}_{protocol} = 协议 / 输出约束
+\mathcal{R}_{readout} = 读出几何
+```
+
+当前 Phase 838 只推进了：
+
+```text
+\mathcal{G}_{gear}
+```
+
+的一小部分，即：
+
+```text
+单组件响应形状 + 粗齿轮族 + 弱留出预测。
+```
+
+### 八、当前阶段判断
+
+Phase 838 是实质进展，但不是闭合。
+
+最客观的结论：
+
+```text
+1. Phase 837 的方向正确；
+2. Phase 838 已经把响应图谱转成连续齿轮形状；
+3. qwen3 出现两个主要组件簇；
+4. GLM4 出现一个高度同质的 broad target writer 簇；
+5. DS7B 出现碎片化 echo-dominated 齿轮族；
+6. DS7B 有最明显的 holdout lift，但 echo risk 仍高；
+7. 当前图谱开始有弱预测力，但离稳定预测和 token closure 还有明显距离。
+```
+
+进度估计：
+
+```text
+global gear atlas: 20% - 24%
+gear family decomposition: 18% - 22%
+interaction edge atlas: 5% - 8%
+token closure: 30% - 35%
+language encoding mechanism: 31% - 35%
+global neuron atlas: 12% - 16%
+```
+
+### 九、下一步 Phase
+
+下一步仍属于 global gear atlas（全局齿轮图谱）大阶段，但已经从离线响应分解转向新的模型干预阶段。
+
+建议 Phase 839：
+
+```text
+gear interaction edge and minimal sufficient set validation
+（齿轮交互边与最小充分集合验证）
+```
+
+最低目标：
+
+```text
+1. 使用 Phase 838 的 top train components（训练最强组件）作为候选；
+2. 对 holdout case（留出样本）测试 single / pair / small-set patch；
+3. 比较真实组合效果是否超过单组件；
+4. 记录 target lift、echo risk、harm risk、protocol damage；
+5. 判断是否存在 component interaction edge（组件交互边）；
+6. 尝试找到 minimal sufficient gear set（最小充分齿轮集合）。
+```
+
+关键公式：
+
+```math
+I(m_i,m_j)
+=
+Q(m_i+m_j)
+-
+\max
+\left(
+Q(m_i),
+Q(m_j)
+\right)
+```
+
+如果：
+
+```math
+I(m_i,m_j)>0
+```
+
+并且：
+
+```math
+E(m_i+m_j)
+\le
+\min
+\left(
+E(m_i),
+E(m_j)
+\right)
+```
+
+则说明二者可能存在正向交互边：
+
+```text
+一个组件负责 target route（目标路线），
+另一个组件负责 echo / blocker suppression（回声 / 阻塞抑制）。
+```
+
+如果 Phase 839 成功，global gear atlas（全局齿轮图谱）就会从：
+
+```text
+单组件响应形状图谱
+```
+
+推进到：
+
+```text
+组件交互传动图谱
+```
+
+这一步才更接近真正的语言编码机制。
+
+## Phase 839: gear interaction edge and minimal sufficient set validation（齿轮交互边与最小充分集合验证） [2026-07-02 00:27]
+
+### 一、任务来源
+
+本阶段接续 Phase 837 / Phase 838。
+
+新上传内容的判断基本正确：
+
+```text
+当前研究已经不能继续只测一个局部组件、一个局部补丁、一个局部案例。
+Phase 837 已经把局部 patch（补丁）降级为采样工具；
+Phase 838 已经把采样结果变成连续响应向量、组件相似图和弱留出预测。
+```
+
+因此下一步必须验证：
+
+```text
+齿轮之间是否存在 interaction edge（交互边）；
+组合齿轮是否真的超过单齿轮；
+是否存在 minimal sufficient gear set（最小充分齿轮集合）。
+```
+
+这一步仍属于 global gear atlas（全局齿轮图谱）大阶段，而且和当前任务处于同一阶段，所以继续自动完成。
+
+### 二、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase839_gear_interaction_edge_minimal_set.py
+tests/glm5/run_phase839_gear_interaction_edge_minimal_set_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase839_gear_interaction_edge_minimal_set/smoke/
+tests/result/phase839_gear_interaction_edge_minimal_set/main/
+tests/result/phase839_gear_interaction_edge_minimal_set/confirm/
+```
+
+核心结果文件：
+
+```text
+tests/result/phase839_gear_interaction_edge_minimal_set/confirm/phase839_cross_model_summary.md
+tests/result/phase839_gear_interaction_edge_minimal_set/confirm/phase839_cross_model_summary.json
+tests/result/phase839_gear_interaction_edge_minimal_set/confirm/phase839_qwen3_rows.jsonl
+tests/result/phase839_gear_interaction_edge_minimal_set/confirm/phase839_glm4_rows.jsonl
+tests/result/phase839_gear_interaction_edge_minimal_set/confirm/phase839_deepseek7b_rows.jsonl
+```
+
+运行方式：
+
+```text
+1. smoke（冒烟轮）：
+   每模型 2 个组件、2 个 holdout case、2 种 donor。
+
+2. main（主测试轮）：
+   每模型 3 个组件、4 个 holdout case、3 种 donor，包含 single / pair / set3。
+
+3. confirm（确认轮）：
+   每模型 4 个组件、4 个 holdout case、4 种 donor，包含 single / pair / set3 / set4。
+```
+
+模型加载：
+
+```text
+qwen3 -> GLM4 -> DS7B 顺序执行；
+bf16；
+quantization = off（未使用量化）；
+优先 flash_attention_2；
+本机缺少 flash_attention_2 包，自动 fallback 到 sdpa；
+每个模型完成后释放 GPU。
+```
+
+确认轮数据规模：
+
+```text
+qwen3: 240 rows
+GLM4: 240 rows
+DS7B: 240 rows
+total: 720 rows
+```
+
+### 三、测试原理
+
+Phase 838 已经得到组件响应形状：
+
+```math
+Shape(m)
+=
+\left\{
+v_{m,t,d}
+:
+t\in\mathcal{T},
+d\in\mathcal{D}
+\right\}
+```
+
+Phase 839 不再只看单组件，而是测试组合：
+
+```math
+C
+=
+\{m_1,m_2,\ldots,m_k\}
+```
+
+组合响应：
+
+```math
+v_{C,t,d}
+=
+\Phi
+\left(
+x_t,
+d,
+C
+\right)
+-
+\Phi
+\left(
+x_t,
+d,
+\varnothing
+\right)
+```
+
+其中：
+
+```text
+C = 组件集合
+t = holdout case（留出样本）
+d = donor variant（供体变体）
+\Phi = 输出场画像
+```
+
+交互增益定义为：
+
+```math
+I_Q(C)
+=
+Q(C)
+-
+\max_{m_i\in C}
+Q(m_i)
+```
+
+其中：
+
+```text
+Q = target quality score（目标质量分）
+```
+
+正交互边的初始判据：
+
+```math
+I_Q(C)>\theta
+```
+
+并且：
+
+```math
+E(C)
+\le
+\min_{m_i\in C}
+E(m_i)
++\epsilon_E
+```
+
+```math
+H(C)
+\le
+\min_{m_i\in C}
+H(m_i)
++\epsilon_H
+```
+
+其中：
+
+```text
+E = echo risk（回声风险）
+H = harm risk（有害风险）
+```
+
+但确认轮之后必须进一步收紧：
+
+```text
+positive interaction（正交互）不能只看 Q 提升；
+必须区分 strict target-positive interaction（严格目标正交互）。
+```
+
+严格口径：
+
+```math
+I_{\text{strict}}(C)=1
+```
+
+当且仅当：
+
+```math
+I_Q(C)>\theta
+```
+
+且：
+
+```math
+B(C)=T
+```
+
+且：
+
+```math
+E(C)\le \min E(m_i)+\epsilon_E
+```
+
+且：
+
+```math
+H(C)\le \min H(m_i)+\epsilon_H
+```
+
+其中：
+
+```text
+B(C)=T 表示组合输出的边界类必须是 target_equivalent（目标等价类）。
+```
+
+最小充分集合候选：
+
+```math
+M(C)=1
+```
+
+当且仅当：
+
+```math
+B(C)=T
+```
+
+且：
+
+```math
+Q(C)
+>
+\max_{S\subset C}
+Q(S)
++\theta
+```
+
+且：
+
+```math
+E(C)\le E_{\max},
+\quad
+H(C)\le H_{\max}
+```
+
+这个标准比普通正交互更严格。
+
+### 四、三轮测试结果
+
+#### 1. smoke（冒烟轮）
+
+```text
+qwen3:
+  rows = 12
+  target_rows = 6
+  object_echo_rows = 0
+  positive_interaction_rows = 0
+  minimal_sufficient_rows = 0
+
+GLM4:
+  rows = 12
+  target_rows = 12
+  object_echo_rows = 0
+  positive_interaction_rows = 0
+  minimal_sufficient_rows = 0
+
+DS7B:
+  rows = 12
+  target_rows = 9
+  object_echo_rows = 3
+  positive_interaction_rows = 0
+  minimal_sufficient_rows = 0
+```
+
+冒烟轮说明脚本、数据结构、模型加载和显存释放正常。
+
+#### 2. main（主测试轮）
+
+```text
+qwen3:
+  rows = 84
+  target_rows = 42
+  object_echo_rows = 0
+  format_echo_rows = 0
+  degraded_rows = 0
+  positive_interaction_rows = 3
+  minimal_sufficient_rows = 0
+
+GLM4:
+  rows = 84
+  target_rows = 84
+  object_echo_rows = 0
+  format_echo_rows = 0
+  degraded_rows = 0
+  positive_interaction_rows = 0
+  minimal_sufficient_rows = 0
+
+DS7B:
+  rows = 84
+  target_rows = 30
+  object_echo_rows = 29
+  format_echo_rows = 21
+  degraded_rows = 0
+  positive_interaction_rows = 6
+  minimal_sufficient_rows = 2
+```
+
+main 轮出现重要信号：
+
+```text
+qwen3 有正交互，但输出是 Gas / Geometry，属于 broad_near_miss（宽近似），不是严格闭合。
+DS7B 有正交互，其中一部分是真 target_equivalent（目标等价），一部分是 Oxygen is a gas 这类 unknown_other。
+GLM4 完全饱和，无法显示交互增益。
+```
+
+#### 3. confirm（确认轮）
+
+```text
+qwen3:
+  rows = 240
+  target_rows = 120
+  object_echo_rows = 0
+  format_echo_rows = 0
+  degraded_rows = 0
+  positive_interaction_rows = 8
+  strict_target_positive_rows = 0
+  minimal_sufficient_rows = 0
+  mean_quality = 0.4994
+  mean_echo_risk = 0.0000
+
+GLM4:
+  rows = 240
+  target_rows = 240
+  object_echo_rows = 0
+  format_echo_rows = 0
+  degraded_rows = 0
+  positive_interaction_rows = 0
+  strict_target_positive_rows = 0
+  minimal_sufficient_rows = 0
+  mean_quality = 1.0010
+  mean_echo_risk = 0.0000
+
+DS7B:
+  rows = 240
+  target_rows = 93
+  object_echo_rows = 55
+  format_echo_rows = 60
+  degraded_rows = 0
+  positive_interaction_rows = 13
+  strict_target_positive_rows = 6
+  minimal_sufficient_rows = 4
+  mean_quality = 0.0928
+  mean_echo_risk = 0.3542
+```
+
+确认轮的最重要结果是：
+
+```text
+DS7B 的组合确实产生了严格 target-positive interaction；
+但这个严格正结果只集中在 triangle -> polygon；
+oxygen 方向主要是 echo 被压成 Oxygen is a gas，但没有到 chemical element 目标闭合。
+```
+
+### 五、confirm 轮详细观察
+
+#### 1. qwen3
+
+qwen3 的组合结果：
+
+```text
+single:
+  n = 64
+  target = 32
+  broad_near_miss = 32
+  mean_quality = 0.4926
+
+pair:
+  n = 96
+  target = 48
+  broad_near_miss = 48
+  positive_interaction = 2
+  mean_quality = 0.4986
+
+set3:
+  n = 64
+  target = 32
+  broad_near_miss = 32
+  positive_interaction = 4
+  mean_quality = 0.5036
+
+set4:
+  n = 16
+  target = 8
+  broad_near_miss = 8
+  positive_interaction = 2
+  mean_quality = 0.5146
+```
+
+qwen3 的 8 行正交互全部是：
+
+```text
+broad_near_miss
+```
+
+典型输出：
+
+```text
+oxygen -> Gas
+triangle -> Geometry
+```
+
+结论：
+
+```text
+qwen3 的组合会把答案推向更上位或相邻类别，
+但没有把宽近似推进到 target_equivalent。
+```
+
+所以 qwen3 本阶段没有严格齿轮交互边。
+
+#### 2. GLM4
+
+GLM4 的结果：
+
+```text
+single target = 64 / 64
+pair target = 96 / 96
+set3 target = 64 / 64
+set4 target = 16 / 16
+positive_interaction = 0
+minimal_sufficient = 0
+```
+
+结论：
+
+```text
+GLM4 在当前 holdout case 和当前组件集合上完全 target 饱和。
+这不是机制闭合证明，而是指标饱和：
+单组件已经足够使边界类为 target_equivalent，
+组合无法再显示增益。
+```
+
+GLM4 需要更难的 case、更多 blocker class（阻塞者类别）或更细的协议评分才能继续区分齿轮交互。
+
+#### 3. DS7B
+
+DS7B 的组合结果：
+
+```text
+single:
+  n = 64
+  target = 21
+  object_echo = 23
+  format_echo = 16
+  unknown_other = 4
+  mean_quality = -0.0283
+  mean_echo_risk = 0.4844
+
+pair:
+  n = 96
+  target = 36
+  object_echo = 24
+  format_echo = 24
+  unknown_other = 12
+  positive_interaction = 7
+  minimal_sufficient = 4
+  mean_quality = 0.0690
+  mean_echo_risk = 0.3750
+
+set3:
+  n = 64
+  target = 28
+  object_echo = 8
+  format_echo = 16
+  unknown_other = 12
+  positive_interaction = 5
+  mean_quality = 0.1932
+  mean_echo_risk = 0.2500
+
+set4:
+  n = 16
+  target = 8
+  object_echo = 0
+  format_echo = 4
+  unknown_other = 4
+  positive_interaction = 1
+  mean_quality = 0.3180
+  mean_echo_risk = 0.1250
+```
+
+这个结果非常关键：
+
+```text
+随着组合规模从 single -> pair -> set3 -> set4 增大，
+DS7B 的 mean_echo_risk 明显下降：
+
+single: 0.4844
+pair:   0.3750
+set3:   0.2500
+set4:   0.1250
+```
+
+这说明：
+
+```text
+DS7B 的 echo route（回声路线）确实可以被组合齿轮压低。
+```
+
+但闭合仍然没有完成，因为：
+
+```text
+set4 虽然 object_echo = 0，
+但仍有 format_echo = 4，
+unknown_other = 4，
+target = 8 / 16。
+```
+
+严格 target-positive interaction：
+
+```text
+strict_target_positive_rows = 6
+```
+
+全部集中在：
+
+```text
+case = p816_triangle_geometric_shape
+output = polygon
+```
+
+最小充分集合候选：
+
+```text
+minimal_sufficient_rows = 4
+```
+
+具体为：
+
+```text
+triangle / natural_question:
+  mlp_topdiff_32:B16 + triangle L27 residual:B16 -> polygon
+  mlp_topdiff_32:B16 + cat L27 residual:B16 -> polygon
+
+triangle / object_only:
+  mlp_topdiff_32:B16 + triangle L27 residual:B16 -> polygon
+  mlp_topdiff_32:B16 + cat L27 residual:B16 -> polygon
+```
+
+这说明：
+
+```text
+DS7B 至少在 triangle -> polygon 这一局部路线中，
+存在 pair-level gear interaction（双组件齿轮交互）。
+```
+
+但它不是全局闭合，因为：
+
+```text
+oxygen 的正交互主要输出 Oxygen is a gas；
+它降低了 echo risk，但没有到 chemical element。
+```
+
+### 六、本阶段是否正确
+
+本阶段方向正确，而且比 Phase 838 更进一步。
+
+Phase 838 只证明：
+
+```text
+响应形状有弱预测信号。
+```
+
+Phase 839 证明：
+
+```text
+至少在 DS7B 的 triangle -> polygon 路线中，
+组合齿轮可以超过单组件，
+并形成严格 target-positive interaction。
+```
+
+但必须收紧结论：
+
+```text
+Phase 839 没有证明全局齿轮闭合；
+没有证明 qwen3 / GLM4 的交互边；
+没有证明 DS7B 的 oxygen 路线闭合；
+没有证明自然机制使用这些组件。
+```
+
+### 七、核心进展
+
+#### 1. 第一次验证到严格 pair-level gear interaction
+
+DS7B 的 triangle -> polygon 结果说明：
+
+```text
+组合齿轮不是简单平均；
+pair patch 可以在同一 holdout case 上超过最佳单组件。
+```
+
+这是从“单齿轮响应图谱”走向“传动图谱”的第一步。
+
+#### 2. 证明 echo risk 可以被组合规模压低
+
+DS7B 的 echo risk 随组合规模下降：
+
+```text
+single -> pair -> set3 -> set4
+0.4844 -> 0.3750 -> 0.2500 -> 0.1250
+```
+
+这支持一个重要判断：
+
+```text
+DS7B 的 echo failure（回声失败）可能不是单点 suppressor（抑制器）问题，
+而是多个齿轮共同压制的问题。
+```
+
+#### 3. 区分了“回声压低”和“目标闭合”
+
+oxygen 的输出：
+
+```text
+Oxygen is a gas
+```
+
+说明组合可以压低 object_echo，但仍然会落到 property route（属性路线）或 explanatory route（解释路线），没有进入 target class（目标类别）：
+
+```text
+chemical element
+```
+
+这证明：
+
+```text
+echo suppression（回声抑制）不是 token closure（词元闭合）的充分条件。
+```
+
+#### 4. 暴露 qwen3 的上位类别偏移
+
+qwen3 的组合把：
+
+```text
+oxygen -> Gas
+triangle -> Geometry
+```
+
+这不是错误噪声，而是一个明确现象：
+
+```text
+组合齿轮会推动到相邻或上位语义边界，
+但没有写入精确答案边界。
+```
+
+### 八、问题和硬伤
+
+#### 1. positive_interaction 标准必须收紧
+
+普通正交互会把：
+
+```text
+Gas
+Geometry
+Oxygen is a gas
+```
+
+也统计进去，因为它们改善了质量分或降低了 echo risk。
+
+但从语言编码机制闭合角度，必须使用：
+
+```text
+strict_target_positive_interaction
+```
+
+否则会把“更合理但不闭合”的输出误认为齿轮闭合。
+
+#### 2. DS7B 的正结果很局部
+
+严格正交互全部集中在：
+
+```text
+triangle -> polygon
+```
+
+没有扩展到：
+
+```text
+oxygen -> chemical element
+gold -> precious metal
+其他 holdout case
+```
+
+因此它是局部传动边，不是全局机制。
+
+#### 3. GLM4 指标饱和
+
+GLM4 当前数据无法显示交互，因为：
+
+```text
+single already target
+```
+
+这说明 GLM4 需要更难任务或更细指标，而不是继续用当前边界类统计。
+
+#### 4. set4 降低 echo，但不构成最小充分集合
+
+DS7B 的 set4 echo risk 最低，但 minimal_sufficient_rows = 0。
+
+这说明：
+
+```text
+更多组件可以压低回声，
+但不一定是最小充分闭合结构；
+甚至可能只是粗暴抑制。
+```
+
+#### 5. 仍然是人工 patch 干预
+
+当前证据仍然是：
+
+```text
+artificial patch interaction（人工补丁交互）
+```
+
+不是：
+
+```text
+natural route usage（自然路线使用）
+```
+
+下一步必须验证自然 forward（自然前向）中这些组件是否本来就协同激活。
+
+#### 6. 小模型偏差仍然明显
+
+当前模型可能存在：
+
+```text
+qwen3: 上位类别齿轮过强，精确类别齿轮不足；
+GLM4: 残差路线过度同质，当前指标饱和；
+DS7B: 蒸馏导致 echo / format route 粗糙，组合抑制效果明显但不稳定。
+```
+
+这些现象不能直接外推到大模型。
+
+### 九、理论影响
+
+Phase 839 支持把语言生成理解为：
+
+```math
+Closure
+\left(
+\mathcal{F}_{route},
+\mathcal{G}_{gear},
+\mathcal{E}_{interaction},
+\mathcal{B}_{blocker},
+\mathcal{P}_{protocol},
+\mathcal{R}_{readout}
+\right)
+```
+
+相对 Phase 838，新增的关键对象是：
+
+```math
+\mathcal{E}_{interaction}
+```
+
+也就是齿轮交互边。
+
+当前最合理的机制链条是：
+
+```text
+单组件响应形状
+  ->
+组件相似图
+  ->
+组件组合响应
+  ->
+交互边
+  ->
+最小充分集合
+  ->
+自然机制验证
+```
+
+Phase 839 走到了：
+
+```text
+交互边初步验证
+```
+
+但还没有完成：
+
+```text
+稳定最小充分集合 + 自然机制验证
+```
+
+### 十、阶段判断
+
+Phase 839 是实质进展。
+
+最客观结论：
+
+```text
+1. qwen3 有普通正交互，但都是 broad_near_miss，不是严格闭合；
+2. GLM4 单组件已饱和，当前交互测试无法区分；
+3. DS7B 存在严格 target-positive pair interaction；
+4. DS7B 的严格正结果集中在 triangle -> polygon；
+5. DS7B 的组合规模越大，echo risk 越低；
+6. echo risk 降低不等于目标闭合；
+7. 当前结果证明“齿轮交互边存在”，但只是在局部路线中存在。
+```
+
+进度估计：
+
+```text
+global gear atlas: 24% - 28%
+gear family decomposition: 20% - 24%
+interaction edge atlas: 12% - 16%
+minimal sufficient set: 6% - 10%
+token closure: 31% - 36%
+language encoding mechanism: 32% - 36%
+global neuron atlas: 12% - 16%
+```
+
+### 十一、下一步 Phase
+
+下一步仍属于 global gear atlas（全局齿轮图谱）阶段，但应严格收紧目标。
+
+建议 Phase 840：
+
+```text
+strict target interaction expansion and natural co-activation audit
+（严格目标交互扩展与自然协同激活审计）
+```
+
+最低目标：
+
+```text
+1. 只统计 strict_target_positive_interaction；
+2. 扩展 DS7B triangle -> polygon 的 pair interaction；
+3. 测试同类几何任务是否复用这条交互边；
+4. 对 oxygen -> chemical element 单独寻找 property route -> category route 的转换齿轮；
+5. 在无 patch 的自然 forward 中检查这些组件是否协同激活；
+6. 如果自然协同不存在，则把当前结果降级为人工补丁可达路线。
+```
+
+关键判据：
+
+```math
+NaturalUse(C,t)
+=
+1
+```
+
+当且仅当：
+
+```math
+Activation(C,t)
+\uparrow
+```
+
+且：
+
+```math
+PatchAblation(C,t)
+\Rightarrow
+B(t)\ne T
+```
+
+且：
+
+```math
+PatchRestore(C,t)
+\Rightarrow
+B(t)=T
+```
+
+如果 Phase 840 能做到这三点，齿轮交互边才从：
+
+```text
+人工 patch 可达
+```
+
+升级为：
+
+```text
+自然机制候选
+```

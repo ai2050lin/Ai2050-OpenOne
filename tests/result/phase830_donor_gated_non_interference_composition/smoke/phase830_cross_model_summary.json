@@ -1,0 +1,414 @@
+{
+  "model_summaries": {
+    "deepseek7b": {
+      "active_component_count_distribution": {
+        "1": 2
+      },
+      "attn_implementation": "sdpa",
+      "boundary": "This phase tests whether donor-specific gating can remove the remaining interference found after Phase 829 global safety filtering.",
+      "composition_new_exact_multi": 0,
+      "composition_preserve_exact_multi": 1,
+      "diagnostics": {
+        "anchor_excluded_pairs": 0,
+        "constraint": {
+          "max_single_degraded": 0,
+          "require_pair_anchor": true,
+          "require_signal": false,
+          "require_single_safe": true
+        },
+        "eligible_component_groups": 5,
+        "excluded_component_groups": {},
+        "raw_component_groups": 5,
+        "raw_same_case_pairs": 1,
+        "safe_same_case_pairs_before_anchor": 1,
+        "selected_pairs": 1
+      },
+      "donor_summary": {
+        "exact_choices": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 5.0,
+          "n": 1,
+          "patched_classes": {
+            "target_equivalent": 1
+          },
+          "target_transition_rows": 1
+        },
+        "natural_category": {
+          "degraded_rows": 0,
+          "improved_rows": 1,
+          "mean_delta_boundary_rank": 5.0,
+          "n": 1,
+          "patched_classes": {
+            "target_equivalent": 1
+          },
+          "target_transition_rows": 1
+        }
+      },
+      "dtype": "bfloat16",
+      "exact_target_rows": 1,
+      "gating_mode": "target_only",
+      "model": "deepseek7b",
+      "n_component_groups": 5,
+      "n_pairs": 1,
+      "n_rows": 2,
+      "natural_category_degraded_rows": 0,
+      "natural_category_target_rows": 1,
+      "natural_degraded_rows": 0,
+      "natural_target_rows": 1,
+      "pair_exact_plus_multi": 1,
+      "pair_records": [
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "degraded": 0,
+          "exact_plus_any": true,
+          "exact_plus_multi": true,
+          "exact_target": true,
+          "natural_target_count": 1,
+          "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+          "single_a_degraded": 0,
+          "single_a_natural_target_count": 3,
+          "single_b_degraded": 0,
+          "single_b_natural_target_count": 0,
+          "single_had_exact_multi": true,
+          "target_total": 2
+        }
+      ],
+      "phase": 830,
+      "quantization": "off",
+      "round": "smoke",
+      "selected_component_groups": [
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "label": "L27:mlp_channel_group:mlp_topdiff_32:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": true,
+          "single_exact_target": true,
+          "single_natural_target_count": 3
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "label": "L27:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_doctor_medical_worker",
+          "label": "L5:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_cat_living_thing",
+          "label": "L27:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_carrot_root_vegetable",
+          "label": "L22:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        }
+      ],
+      "selected_pairs": [
+        [
+          "L27:mlp_channel_group:mlp_topdiff_32:B16",
+          "L27:layer_residual:whole_layer_residual:B16"
+        ]
+      ],
+      "source_round": "confirm",
+      "timestamp": "2026-07-01 17:15:52",
+      "title": "Donor-Gated Non-Interference Composition"
+    },
+    "glm4": {
+      "active_component_count_distribution": {},
+      "attn_implementation": null,
+      "boundary": "This phase tests whether donor-specific gating can remove the remaining interference found after Phase 829 global safety filtering.",
+      "composition_new_exact_multi": 0,
+      "composition_preserve_exact_multi": 0,
+      "diagnostics": {
+        "anchor_excluded_pairs": 0,
+        "constraint": {
+          "max_single_degraded": 0,
+          "require_pair_anchor": true,
+          "require_signal": false,
+          "require_single_safe": true
+        },
+        "eligible_component_groups": 4,
+        "excluded_component_groups": {},
+        "raw_component_groups": 4,
+        "raw_same_case_pairs": 0,
+        "safe_same_case_pairs_before_anchor": 0,
+        "selected_pairs": 0
+      },
+      "donor_summary": {},
+      "dtype": "bfloat16",
+      "exact_target_rows": 0,
+      "gating_mode": "target_only",
+      "model": "glm4",
+      "n_component_groups": 4,
+      "n_pairs": 0,
+      "n_rows": 0,
+      "natural_category_degraded_rows": 0,
+      "natural_category_target_rows": 0,
+      "natural_degraded_rows": 0,
+      "natural_target_rows": 0,
+      "pair_exact_plus_multi": 0,
+      "pair_records": [],
+      "phase": 830,
+      "quantization": "off",
+      "round": "smoke",
+      "selected_component_groups": [
+        {
+          "case_id": "p816_winter_cold_season",
+          "label": "L8:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_red_warm_color",
+          "label": "L23:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_carrot_root_vegetable",
+          "label": "L39:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_cactus_desert_plant",
+          "label": "L8:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        }
+      ],
+      "selected_pairs": [],
+      "skip_reason": "no eligible donor-gated same-case cross-component pairs",
+      "skipped_model_load": true,
+      "source_round": "confirm",
+      "timestamp": "2026-07-01 17:15:46",
+      "title": "Donor-Gated Non-Interference Composition"
+    },
+    "qwen3": {
+      "active_component_count_distribution": {
+        "0": 1,
+        "1": 5
+      },
+      "attn_implementation": "sdpa",
+      "boundary": "This phase tests whether donor-specific gating can remove the remaining interference found after Phase 829 global safety filtering.",
+      "composition_new_exact_multi": 0,
+      "composition_preserve_exact_multi": 2,
+      "diagnostics": {
+        "anchor_excluded_pairs": 15,
+        "constraint": {
+          "max_single_degraded": 0,
+          "require_pair_anchor": true,
+          "require_signal": false,
+          "require_single_safe": true
+        },
+        "eligible_component_groups": 8,
+        "excluded_component_groups": {},
+        "raw_component_groups": 8,
+        "raw_same_case_pairs": 21,
+        "safe_same_case_pairs_before_anchor": 21,
+        "selected_pairs": 3
+      },
+      "donor_summary": {
+        "exact_choices": {
+          "degraded_rows": 0,
+          "improved_rows": 3,
+          "mean_delta_boundary_rank": 2.0,
+          "n": 3,
+          "patched_classes": {
+            "target_equivalent": 3
+          },
+          "target_transition_rows": 3
+        },
+        "natural_category": {
+          "degraded_rows": 0,
+          "improved_rows": 2,
+          "mean_delta_boundary_rank": 1.3333333333333333,
+          "n": 3,
+          "patched_classes": {
+            "broad_near_miss": 1,
+            "target_equivalent": 2
+          },
+          "target_transition_rows": 2
+        }
+      },
+      "dtype": "bfloat16",
+      "exact_target_rows": 3,
+      "gating_mode": "target_only",
+      "model": "qwen3",
+      "n_component_groups": 8,
+      "n_pairs": 3,
+      "n_rows": 6,
+      "natural_category_degraded_rows": 0,
+      "natural_category_target_rows": 2,
+      "natural_degraded_rows": 0,
+      "natural_target_rows": 2,
+      "pair_exact_plus_multi": 2,
+      "pair_records": [
+        {
+          "case_id": "p816_heart_body_organ",
+          "degraded": 0,
+          "exact_plus_any": true,
+          "exact_plus_multi": true,
+          "exact_target": true,
+          "natural_target_count": 1,
+          "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+          "single_a_degraded": 0,
+          "single_a_natural_target_count": 2,
+          "single_b_degraded": 0,
+          "single_b_natural_target_count": 2,
+          "single_had_exact_multi": true,
+          "target_total": 2
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "degraded": 0,
+          "exact_plus_any": false,
+          "exact_plus_multi": false,
+          "exact_target": true,
+          "natural_target_count": 0,
+          "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+          "single_a_degraded": 0,
+          "single_a_natural_target_count": 2,
+          "single_b_degraded": 0,
+          "single_b_natural_target_count": 1,
+          "single_had_exact_multi": true,
+          "target_total": 1
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "degraded": 0,
+          "exact_plus_any": true,
+          "exact_plus_multi": true,
+          "exact_target": true,
+          "natural_target_count": 1,
+          "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+          "single_a_degraded": 0,
+          "single_a_natural_target_count": 2,
+          "single_b_degraded": 0,
+          "single_b_natural_target_count": 1,
+          "single_had_exact_multi": true,
+          "target_total": 2
+        }
+      ],
+      "phase": 830,
+      "quantization": "off",
+      "round": "smoke",
+      "selected_component_groups": [
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": true,
+          "single_exact_target": true,
+          "single_natural_target_count": 2
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:attention_output:whole_attention_output:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 2
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:mlp_output:whole_mlp_output:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 1
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:attention_head:head_4:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 1
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:attention_head:head_3:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 1
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:attention_head:head_25:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 1
+        },
+        {
+          "case_id": "p816_winter_cold_season",
+          "label": "L21:layer_residual:whole_layer_residual:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        },
+        {
+          "case_id": "p816_heart_body_organ",
+          "label": "L14:attention_head:head_8:B16",
+          "single_degraded": 0,
+          "single_exact_plus_multi": false,
+          "single_exact_target": false,
+          "single_natural_target_count": 0
+        }
+      ],
+      "selected_pairs": [
+        [
+          "L14:layer_residual:whole_layer_residual:B16",
+          "L14:attention_output:whole_attention_output:B16"
+        ],
+        [
+          "L14:layer_residual:whole_layer_residual:B16",
+          "L14:mlp_output:whole_mlp_output:B16"
+        ],
+        [
+          "L14:layer_residual:whole_layer_residual:B16",
+          "L14:attention_head:head_4:B16"
+        ]
+      ],
+      "source_round": "confirm",
+      "timestamp": "2026-07-01 17:15:44",
+      "title": "Donor-Gated Non-Interference Composition"
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 830,
+  "round": "smoke",
+  "status": "complete",
+  "timestamp": "2026-07-01 17:15:55"
+}

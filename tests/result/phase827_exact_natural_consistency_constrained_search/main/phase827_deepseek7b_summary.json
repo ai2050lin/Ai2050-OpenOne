@@ -1,0 +1,190 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase prioritizes exact target plus multi-natural target consistency before natural-only gains.",
+  "budget_summary": {
+    "16": {
+      "degraded_rows": 0,
+      "improved_rows": 3,
+      "mean_delta_boundary_rank": 1.25,
+      "n": 12,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 3,
+        "target_equivalent": 3
+      },
+      "target_transition_rows": 3
+    },
+    "32": {
+      "degraded_rows": 0,
+      "improved_rows": 3,
+      "mean_delta_boundary_rank": 1.25,
+      "n": 12,
+      "patched_classes": {
+        "format_echo": 6,
+        "object_echo": 3,
+        "target_equivalent": 3
+      },
+      "target_transition_rows": 3
+    }
+  },
+  "component_donor_summary": {
+    "layer_residual/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 6,
+      "patched_classes": {
+        "format_echo": 4,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 6,
+      "patched_classes": {
+        "format_echo": 4,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 6,
+      "patched_classes": {
+        "format_echo": 4,
+        "object_echo": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_channel_group/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_channel_group/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_channel_group/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "consistency_records": [
+    {
+      "degraded": 0,
+      "delta_sum": 15.0,
+      "exact_plus_multi_natural": true,
+      "exact_target": true,
+      "improved_total": 3,
+      "key": [
+        "p816_triangle_geometric_shape",
+        27,
+        "mlp_channel_group",
+        "mlp_topdiff_32",
+        16
+      ],
+      "multi_natural": true,
+      "natural_target_count": 2,
+      "target_total": 3
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 15.0,
+      "exact_plus_multi_natural": true,
+      "exact_target": true,
+      "improved_total": 3,
+      "key": [
+        "p816_triangle_geometric_shape",
+        27,
+        "mlp_channel_group",
+        "mlp_topdiff_32",
+        32
+      ],
+      "multi_natural": true,
+      "natural_target_count": 2,
+      "target_total": 3
+    }
+  ],
+  "degraded_rows": 0,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.25,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 4,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.25,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 4,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.25,
+      "n": 8,
+      "patched_classes": {
+        "format_echo": 4,
+        "object_echo": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_plus_any_natural_target_pairs": 2,
+  "exact_plus_multi_natural_target_pairs": 2,
+  "exact_target_rows": 2,
+  "improved_rows": 6,
+  "min_natural_targets": 2,
+  "model": "deepseek7b",
+  "multi_natural_target_pairs": 2,
+  "n_rows": 24,
+  "n_source_components": 4,
+  "natural_degraded_rows": 0,
+  "natural_improved_rows": 4,
+  "natural_target_rows": 4,
+  "phase": 827,
+  "quantization": "off",
+  "round": "main",
+  "source_round": "confirm",
+  "target_transition_rows": 6,
+  "timestamp": "2026-07-01 15:58:34",
+  "title": "Exact-Natural Consistency Constrained Search"
+}

@@ -1,0 +1,172 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase composes Phase 827 single-component fibers and tests whether consistency survives or improves under simultaneous multi-component patching.",
+  "composition_new_exact_multi": 0,
+  "composition_preserve_exact_multi": 2,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 2.5,
+      "n": 2,
+      "patched_classes": {
+        "object_echo": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_target_rows": 2,
+  "model": "deepseek7b",
+  "n_component_groups": 10,
+  "n_pairs": 2,
+  "n_rows": 8,
+  "natural_degraded_rows": 0,
+  "natural_target_rows": 5,
+  "pair_exact_plus_multi": 2,
+  "pair_records": [
+    {
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": true,
+      "exact_target": true,
+      "natural_target_count": 3,
+      "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B32 + L27:layer_residual:whole_layer_residual:B32",
+      "single_a_natural_target_count": 3,
+      "single_b_natural_target_count": 0,
+      "single_had_exact_multi": true,
+      "target_total": 4
+    },
+    {
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": true,
+      "exact_target": true,
+      "natural_target_count": 2,
+      "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+      "single_a_natural_target_count": 3,
+      "single_b_natural_target_count": 0,
+      "single_had_exact_multi": true,
+      "target_total": 3
+    }
+  ],
+  "phase": 828,
+  "quantization": "off",
+  "round": "confirm",
+  "selected_component_groups": [
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "label": "L27:mlp_channel_group:mlp_topdiff_32:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": true,
+      "single_exact_target": true,
+      "single_natural_target_count": 3
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "label": "L27:mlp_channel_group:mlp_topdiff_32:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": true,
+      "single_exact_target": true,
+      "single_natural_target_count": 3
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "label": "L27:layer_residual:whole_layer_residual:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": true,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "label": "L27:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_doctor_medical_worker",
+      "label": "L5:layer_residual:whole_layer_residual:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_doctor_medical_worker",
+      "label": "L5:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_cat_living_thing",
+      "label": "L27:layer_residual:whole_layer_residual:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_cat_living_thing",
+      "label": "L27:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_carrot_root_vegetable",
+      "label": "L22:layer_residual:whole_layer_residual:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_carrot_root_vegetable",
+      "label": "L22:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    }
+  ],
+  "source_round": "confirm",
+  "timestamp": "2026-07-01 16:49:01",
+  "title": "Cross-Component Consistency Fiber Composition"
+}

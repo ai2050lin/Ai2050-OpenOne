@@ -1,0 +1,493 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase prioritizes exact target plus multi-natural target consistency before natural-only gains.",
+  "budget_summary": {
+    "16": {
+      "degraded_rows": 0,
+      "improved_rows": 9,
+      "mean_delta_boundary_rank": 0.5625,
+      "n": 32,
+      "patched_classes": {
+        "broad_near_miss": 23,
+        "target_equivalent": 9
+      },
+      "target_transition_rows": 9
+    },
+    "32": {
+      "degraded_rows": 1,
+      "improved_rows": 10,
+      "mean_delta_boundary_rank": 0.53125,
+      "n": 32,
+      "patched_classes": {
+        "broad_near_miss": 21,
+        "target_equivalent": 10,
+        "unknown_other": 1
+      },
+      "target_transition_rows": 10
+    }
+  },
+  "component_donor_summary": {
+    "attention_head/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.25,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 7,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "attention_head/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 6,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "attention_head/natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 0.25,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 7,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "attention_head/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 8,
+      "patched_classes": {
+        "broad_near_miss": 4,
+        "target_equivalent": 4
+      },
+      "target_transition_rows": 4
+    },
+    "attention_output/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "attention_output/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "attention_output/natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "attention_output/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "layer_residual/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "layer_residual/natural_category": {
+      "degraded_rows": 1,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": -0.75,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 3,
+        "unknown_other": 1
+      },
+      "target_transition_rows": 0
+    },
+    "layer_residual/natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "layer_residual/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 1.0,
+      "n": 4,
+      "patched_classes": {
+        "broad_near_miss": 2,
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    },
+    "mlp_output/exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 2,
+      "patched_classes": {
+        "broad_near_miss": 2
+      },
+      "target_transition_rows": 0
+    },
+    "mlp_output/object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 2,
+      "mean_delta_boundary_rank": 2.0,
+      "n": 2,
+      "patched_classes": {
+        "target_equivalent": 2
+      },
+      "target_transition_rows": 2
+    }
+  },
+  "consistency_records": [
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "mlp_output",
+        "whole_mlp_output",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "mlp_output",
+        "whole_mlp_output",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 6.0,
+      "exact_plus_multi_natural": true,
+      "exact_target": true,
+      "improved_total": 3,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "layer_residual",
+        "whole_layer_residual",
+        16
+      ],
+      "multi_natural": true,
+      "natural_target_count": 2,
+      "target_total": 3
+    },
+    {
+      "degraded": 1,
+      "delta_sum": 3.0,
+      "exact_plus_multi_natural": true,
+      "exact_target": true,
+      "improved_total": 3,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "layer_residual",
+        "whole_layer_residual",
+        32
+      ],
+      "multi_natural": true,
+      "natural_target_count": 2,
+      "target_total": 3
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 4.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 2,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_output",
+        "whole_attention_output",
+        16
+      ],
+      "multi_natural": true,
+      "natural_target_count": 2,
+      "target_total": 2
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": true,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_output",
+        "whole_attention_output",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 0,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_8",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_4",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 4.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 2,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_4",
+        32
+      ],
+      "multi_natural": true,
+      "natural_target_count": 2,
+      "target_total": 2
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_3",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": true,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_3",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 0,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_25",
+        16
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    },
+    {
+      "degraded": 0,
+      "delta_sum": 2.0,
+      "exact_plus_multi_natural": false,
+      "exact_target": false,
+      "improved_total": 1,
+      "key": [
+        "p816_heart_body_organ",
+        14,
+        "attention_head",
+        "head_25",
+        32
+      ],
+      "multi_natural": false,
+      "natural_target_count": 1,
+      "target_total": 1
+    }
+  ],
+  "degraded_rows": 1,
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 4,
+      "mean_delta_boundary_rank": 0.5,
+      "n": 16,
+      "patched_classes": {
+        "broad_near_miss": 12,
+        "target_equivalent": 4
+      },
+      "target_transition_rows": 4
+    },
+    "natural_category": {
+      "degraded_rows": 1,
+      "improved_rows": 3,
+      "mean_delta_boundary_rank": 0.1875,
+      "n": 16,
+      "patched_classes": {
+        "broad_near_miss": 12,
+        "target_equivalent": 3,
+        "unknown_other": 1
+      },
+      "target_transition_rows": 3
+    },
+    "natural_question": {
+      "degraded_rows": 0,
+      "improved_rows": 3,
+      "mean_delta_boundary_rank": 0.375,
+      "n": 16,
+      "patched_classes": {
+        "broad_near_miss": 13,
+        "target_equivalent": 3
+      },
+      "target_transition_rows": 3
+    },
+    "object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 9,
+      "mean_delta_boundary_rank": 1.125,
+      "n": 16,
+      "patched_classes": {
+        "broad_near_miss": 7,
+        "target_equivalent": 9
+      },
+      "target_transition_rows": 9
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_plus_any_natural_target_pairs": 2,
+  "exact_plus_multi_natural_target_pairs": 2,
+  "exact_target_rows": 4,
+  "improved_rows": 19,
+  "min_natural_targets": 2,
+  "model": "qwen3",
+  "multi_natural_target_pairs": 4,
+  "n_rows": 64,
+  "n_source_components": 8,
+  "natural_degraded_rows": 1,
+  "natural_improved_rows": 15,
+  "natural_target_rows": 15,
+  "phase": 827,
+  "quantization": "off",
+  "round": "confirm",
+  "source_round": "confirm",
+  "target_transition_rows": 19,
+  "timestamp": "2026-07-01 16:03:48",
+  "title": "Exact-Natural Consistency Constrained Search"
+}

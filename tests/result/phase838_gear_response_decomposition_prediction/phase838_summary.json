@@ -1,0 +1,407 @@
+{
+  "boundary": "Offline decomposition over Phase 837 confirm rows. It tests predictive signal in response fingerprints, not natural mechanism closure.",
+  "input_root": "tests/result/phase837_global_gear_response_atlas_pilot/confirm",
+  "model_summaries": {
+    "deepseek7b": {
+      "cases": [
+        "p816_cat_living_thing",
+        "p816_bus_public_transport",
+        "p816_guitar_musical_instrument",
+        "p816_chair_household_furniture",
+        "p816_heart_body_organ",
+        "p816_salmon_aquatic_animal",
+        "p816_oak_tall_tree",
+        "p816_laptop_electronic_device",
+        "p816_triangle_geometric_shape",
+        "p816_gold_precious_metal",
+        "p816_oxygen_chemical_element",
+        "p816_doctor_medical_worker"
+      ],
+      "clusters": [
+        [
+          "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B16",
+          "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B32",
+          "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+        ],
+        [
+          "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B32"
+        ],
+        [
+          "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B32"
+        ],
+        [
+          "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16"
+        ],
+        [
+          "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B32"
+        ]
+      ],
+      "family_counts": {
+        "echo_dominated_family": 7,
+        "weak_or_unresolved_family": 1
+      },
+      "holdout_cases": [
+        "p816_triangle_geometric_shape",
+        "p816_gold_precious_metal",
+        "p816_oxygen_chemical_element",
+        "p816_doctor_medical_worker"
+      ],
+      "model": "deepseek7b",
+      "n_components": 8,
+      "n_rows": 384,
+      "prediction": {
+        "all_holdout_quality": -0.03755173407855732,
+        "all_holdout_target_rate": 0.3203125,
+        "lift_vs_random_quality": 0.07769414477052392,
+        "lift_vs_random_target_rate": 0.0546875,
+        "model": "deepseek7b",
+        "n_components": 8,
+        "oracle_holdout_components": [
+          "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16",
+          "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B32"
+        ],
+        "oracle_holdout_quality": 0.20346996423838898,
+        "top_k": 2,
+        "top_train_components": [
+          "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16",
+          "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16"
+        ],
+        "top_train_holdout_echo_risk": 0.4375,
+        "top_train_holdout_harm_rate": 0.0,
+        "top_train_holdout_quality": 0.0401424106919666,
+        "top_train_holdout_target_rate": 0.375,
+        "train_to_holdout_pearson": -0.38774668794330064,
+        "train_to_holdout_spearman": -0.1566265060240964
+      },
+      "top_similarity_edges": [
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "pearson": 1.0,
+          "right": "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9528745668928665,
+          "right": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9378712811946869,
+          "right": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B32",
+          "pearson": 0.9378712811946869,
+          "right": "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9308446715531836,
+          "right": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9308446715531836,
+          "right": "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.919027575526379,
+          "right": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B32",
+          "pearson": 0.919027575526379,
+          "right": "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B32",
+          "pearson": 0.9069112862959037,
+          "right": "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B32",
+          "pearson": 0.8936574654687658,
+          "right": "p816_doctor_medical_worker::L5:layer_residual:whole_layer_residual:B16"
+        }
+      ],
+      "train_cases": [
+        "p816_cat_living_thing",
+        "p816_bus_public_transport",
+        "p816_guitar_musical_instrument",
+        "p816_chair_household_furniture",
+        "p816_heart_body_organ",
+        "p816_salmon_aquatic_animal",
+        "p816_oak_tall_tree",
+        "p816_laptop_electronic_device"
+      ]
+    },
+    "glm4": {
+      "cases": [
+        "p816_cat_living_thing",
+        "p816_bus_public_transport",
+        "p816_guitar_musical_instrument",
+        "p816_chair_household_furniture",
+        "p816_heart_body_organ",
+        "p816_salmon_aquatic_animal",
+        "p816_oak_tall_tree",
+        "p816_laptop_electronic_device",
+        "p816_triangle_geometric_shape",
+        "p816_gold_precious_metal",
+        "p816_oxygen_chemical_element",
+        "p816_doctor_medical_worker"
+      ],
+      "clusters": [
+        [
+          "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B16",
+          "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B32",
+          "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B16",
+          "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B32",
+          "p816_red_warm_color::L23:layer_residual:whole_layer_residual:B16",
+          "p816_red_warm_color::L23:layer_residual:whole_layer_residual:B32",
+          "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B16",
+          "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B32"
+        ]
+      ],
+      "family_counts": {
+        "broad_target_writer_family": 8
+      },
+      "holdout_cases": [
+        "p816_triangle_geometric_shape",
+        "p816_gold_precious_metal",
+        "p816_oxygen_chemical_element",
+        "p816_doctor_medical_worker"
+      ],
+      "model": "glm4",
+      "n_components": 8,
+      "n_rows": 384,
+      "prediction": {
+        "all_holdout_quality": 0.9932107368181275,
+        "all_holdout_target_rate": 1.0,
+        "lift_vs_random_quality": 0.00839479552693656,
+        "lift_vs_random_target_rate": 0.0,
+        "model": "glm4",
+        "n_components": 8,
+        "oracle_holdout_components": [
+          "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B16",
+          "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B32"
+        ],
+        "oracle_holdout_quality": 1.0251013868453505,
+        "top_k": 2,
+        "top_train_components": [
+          "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B16",
+          "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B32"
+        ],
+        "top_train_holdout_echo_risk": 0.0,
+        "top_train_holdout_harm_rate": 0.0,
+        "top_train_holdout_quality": 1.001605532345064,
+        "top_train_holdout_target_rate": 1.0,
+        "train_to_holdout_pearson": 0.3766200445100049,
+        "train_to_holdout_spearman": 0.0
+      },
+      "top_similarity_edges": [
+        {
+          "left": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B16",
+          "pearson": 1.0,
+          "right": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B32",
+          "pearson": 1.0,
+          "right": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.976849961506532,
+          "right": "p816_carrot_root_vegetable::L39:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_red_warm_color::L23:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9746211032008454,
+          "right": "p816_red_warm_color::L23:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9718474278775319,
+          "right": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9718474278775319,
+          "right": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B32",
+          "pearson": 0.9718474278775319,
+          "right": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9718474278775319,
+          "right": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B32"
+        },
+        {
+          "left": "p816_cactus_desert_plant::L8:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9700267884365229,
+          "right": "p816_red_warm_color::L23:layer_residual:whole_layer_residual:B16"
+        },
+        {
+          "left": "p816_red_warm_color::L23:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9700267884365229,
+          "right": "p816_winter_cold_season::L8:layer_residual:whole_layer_residual:B16"
+        }
+      ],
+      "train_cases": [
+        "p816_cat_living_thing",
+        "p816_bus_public_transport",
+        "p816_guitar_musical_instrument",
+        "p816_chair_household_furniture",
+        "p816_heart_body_organ",
+        "p816_salmon_aquatic_animal",
+        "p816_oak_tall_tree",
+        "p816_laptop_electronic_device"
+      ]
+    },
+    "qwen3": {
+      "cases": [
+        "p816_cat_living_thing",
+        "p816_bus_public_transport",
+        "p816_guitar_musical_instrument",
+        "p816_chair_household_furniture",
+        "p816_heart_body_organ",
+        "p816_salmon_aquatic_animal",
+        "p816_oak_tall_tree",
+        "p816_laptop_electronic_device",
+        "p816_triangle_geometric_shape",
+        "p816_gold_precious_metal",
+        "p816_oxygen_chemical_element",
+        "p816_doctor_medical_worker"
+      ],
+      "clusters": [
+        [
+          "p816_heart_body_organ::L14:attention_head:head_3:B32",
+          "p816_heart_body_organ::L14:attention_head:head_4:B32",
+          "p816_heart_body_organ::L14:attention_output:whole_attention_output:B16",
+          "p816_heart_body_organ::L14:attention_output:whole_attention_output:B32",
+          "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B16",
+          "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B32"
+        ],
+        [
+          "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B16",
+          "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B32"
+        ]
+      ],
+      "family_counts": {
+        "broad_target_writer_family": 3,
+        "conditional_target_writer_family": 5
+      },
+      "holdout_cases": [
+        "p816_triangle_geometric_shape",
+        "p816_gold_precious_metal",
+        "p816_oxygen_chemical_element",
+        "p816_doctor_medical_worker"
+      ],
+      "model": "qwen3",
+      "n_components": 8,
+      "n_rows": 384,
+      "prediction": {
+        "all_holdout_quality": 0.4947262383764211,
+        "all_holdout_target_rate": 0.5,
+        "lift_vs_random_quality": 0.012999165599117124,
+        "lift_vs_random_target_rate": 0.0,
+        "model": "qwen3",
+        "n_components": 8,
+        "oracle_holdout_components": [
+          "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B16",
+          "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B32"
+        ],
+        "oracle_holdout_quality": 0.529389633640243,
+        "top_k": 2,
+        "top_train_components": [
+          "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B16",
+          "p816_heart_body_organ::L14:attention_output:whole_attention_output:B16"
+        ],
+        "top_train_holdout_echo_risk": 0.0,
+        "top_train_holdout_harm_rate": 0.0,
+        "top_train_holdout_quality": 0.5077254039755382,
+        "top_train_holdout_target_rate": 0.5,
+        "train_to_holdout_pearson": -0.36702511530547605,
+        "train_to_holdout_spearman": -0.023809523809523808
+      },
+      "top_similarity_edges": [
+        {
+          "left": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B16",
+          "pearson": 0.9811867515875039,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B32"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_head:head_4:B32",
+          "pearson": 0.975977794557851,
+          "right": "p816_heart_body_organ::L14:attention_output:whole_attention_output:B16"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_head:head_3:B32",
+          "pearson": 0.9693198170119112,
+          "right": "p816_heart_body_organ::L14:attention_output:whole_attention_output:B32"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_head:head_4:B32",
+          "pearson": 0.9608104995118629,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B32"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_head:head_4:B32",
+          "pearson": 0.9590684138596229,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B16"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_output:whole_attention_output:B16",
+          "pearson": 0.9566197435212663,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B16"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_output:whole_attention_output:B16",
+          "pearson": 0.9562778599515527,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B32"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_output:whole_attention_output:B32",
+          "pearson": 0.9371550590171679,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B32"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:attention_output:whole_attention_output:B32",
+          "pearson": 0.9335263466731235,
+          "right": "p816_heart_body_organ::L14:mlp_output:whole_mlp_output:B16"
+        },
+        {
+          "left": "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B16",
+          "pearson": 0.9311231663425484,
+          "right": "p816_heart_body_organ::L14:layer_residual:whole_layer_residual:B32"
+        }
+      ],
+      "train_cases": [
+        "p816_cat_living_thing",
+        "p816_bus_public_transport",
+        "p816_guitar_musical_instrument",
+        "p816_chair_household_furniture",
+        "p816_heart_body_organ",
+        "p816_salmon_aquatic_animal",
+        "p816_oak_tall_tree",
+        "p816_laptop_electronic_device"
+      ]
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 838,
+  "result_root": "tests/result/phase838_gear_response_decomposition_prediction",
+  "similarity_threshold": 0.92,
+  "timestamp": "2026-07-01 23:58:08",
+  "top_k": 2,
+  "train_cases": 8
+}

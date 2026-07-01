@@ -1,0 +1,322 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase asks whether a simple internal readout-alignment signal can predict the donor-specific gates used manually in Phase 830.",
+  "diagnostics": {
+    "anchor_excluded_pairs": 0,
+    "constraint": {
+      "max_single_degraded": 0,
+      "require_pair_anchor": true,
+      "require_signal": false,
+      "require_single_safe": true
+    },
+    "eligible_component_groups": 10,
+    "excluded_component_groups": {},
+    "raw_component_groups": 10,
+    "raw_same_case_pairs": 2,
+    "safe_same_case_pairs_before_anchor": 2,
+    "selected_pairs": 2
+  },
+  "dtype": "bfloat16",
+  "mode_summaries": {
+    "positive_count_majority": {
+      "decision": {
+        "accuracy_vs_target_only": 0.6875,
+        "fn": 1,
+        "fp": 4,
+        "n": 16,
+        "oracle_active": 9,
+        "predicted_active": 12,
+        "tn": 3,
+        "tp": 8
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "1": 4,
+          "2": 4
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 2,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 2,
+            "mean_delta_boundary_rank": 5.0,
+            "n": 2,
+            "patched_classes": {
+              "target_equivalent": 2
+            },
+            "target_transition_rows": 2
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 1,
+            "mean_delta_boundary_rank": 2.5,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 1,
+              "target_equivalent": 1
+            },
+            "target_transition_rows": 1
+          },
+          "natural_question": {
+            "degraded_rows": 0,
+            "improved_rows": 2,
+            "mean_delta_boundary_rank": 5.0,
+            "n": 2,
+            "patched_classes": {
+              "target_equivalent": 2
+            },
+            "target_transition_rows": 2
+          },
+          "object_only": {
+            "degraded_rows": 0,
+            "improved_rows": 2,
+            "mean_delta_boundary_rank": 5.0,
+            "n": 2,
+            "patched_classes": {
+              "target_equivalent": 2
+            },
+            "target_transition_rows": 2
+          }
+        },
+        "exact_target_rows": 2,
+        "n_rows": 8,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 1,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 5,
+        "pair_exact_plus_multi": 2,
+        "pair_records": [
+          {
+            "case_id": "p816_triangle_geometric_shape",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 3,
+            "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B32 + L27:layer_residual:whole_layer_residual:B32",
+            "single_had_exact_multi": true,
+            "target_total": 4
+          },
+          {
+            "case_id": "p816_triangle_geometric_shape",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 2,
+            "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+            "single_had_exact_multi": true,
+            "target_total": 3
+          }
+        ]
+      }
+    },
+    "signed_sum_positive": {
+      "decision": {
+        "accuracy_vs_target_only": 0.25,
+        "fn": 7,
+        "fp": 5,
+        "n": 16,
+        "oracle_active": 9,
+        "predicted_active": 7,
+        "tn": 2,
+        "tp": 2
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "0": 2,
+          "1": 5,
+          "2": 1
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 0,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 1,
+            "mean_delta_boundary_rank": 2.5,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 1,
+              "target_equivalent": 1
+            },
+            "target_transition_rows": 1
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 2
+            },
+            "target_transition_rows": 0
+          },
+          "natural_question": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 2
+            },
+            "target_transition_rows": 0
+          },
+          "object_only": {
+            "degraded_rows": 0,
+            "improved_rows": 1,
+            "mean_delta_boundary_rank": 2.5,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 1,
+              "target_equivalent": 1
+            },
+            "target_transition_rows": 1
+          }
+        },
+        "exact_target_rows": 1,
+        "n_rows": 8,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 0,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 1,
+        "pair_exact_plus_multi": 0,
+        "pair_records": [
+          {
+            "case_id": "p816_triangle_geometric_shape",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": false,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B32 + L27:layer_residual:whole_layer_residual:B32",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          },
+          {
+            "case_id": "p816_triangle_geometric_shape",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": false,
+            "natural_target_count": 0,
+            "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+            "single_had_exact_multi": true,
+            "target_total": 0
+          }
+        ]
+      }
+    },
+    "top_abs_positive": {
+      "decision": {
+        "accuracy_vs_target_only": 0.3125,
+        "fn": 8,
+        "fp": 3,
+        "n": 16,
+        "oracle_active": 9,
+        "predicted_active": 4,
+        "tn": 4,
+        "tp": 1
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "0": 4,
+          "1": 4
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 0,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 1,
+            "mean_delta_boundary_rank": 2.5,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 1,
+              "target_equivalent": 1
+            },
+            "target_transition_rows": 1
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 2
+            },
+            "target_transition_rows": 0
+          },
+          "natural_question": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 2
+            },
+            "target_transition_rows": 0
+          },
+          "object_only": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 2,
+            "patched_classes": {
+              "object_echo": 2
+            },
+            "target_transition_rows": 0
+          }
+        },
+        "exact_target_rows": 1,
+        "n_rows": 8,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 0,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 0,
+        "pair_exact_plus_multi": 0,
+        "pair_records": [
+          {
+            "case_id": "p816_triangle_geometric_shape",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": true,
+            "natural_target_count": 0,
+            "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B32 + L27:layer_residual:whole_layer_residual:B32",
+            "single_had_exact_multi": true,
+            "target_total": 1
+          },
+          {
+            "case_id": "p816_triangle_geometric_shape",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": false,
+            "natural_target_count": 0,
+            "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+            "single_had_exact_multi": true,
+            "target_total": 0
+          }
+        ]
+      }
+    }
+  },
+  "model": "deepseek7b",
+  "n_component_groups": 10,
+  "n_decision_rows": 48,
+  "n_generation_rows": 24,
+  "n_pairs": 2,
+  "phase": 831,
+  "predictor_modes": [
+    "signed_sum_positive",
+    "positive_count_majority",
+    "top_abs_positive"
+  ],
+  "quantization": "off",
+  "round": "confirm",
+  "source_round": "confirm",
+  "timestamp": "2026-07-01 18:19:44",
+  "title": "Internal Gate Predictor Search"
+}

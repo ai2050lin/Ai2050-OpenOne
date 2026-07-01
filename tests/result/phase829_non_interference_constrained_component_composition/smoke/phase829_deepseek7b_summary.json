@@ -1,0 +1,125 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase tests whether Phase 828 interference can be reduced by excluding unsafe single-component groups before composition.",
+  "composition_new_exact_multi": 0,
+  "composition_preserve_exact_multi": 0,
+  "diagnostics": {
+    "anchor_excluded_pairs": 0,
+    "constraint": {
+      "max_single_degraded": 0,
+      "require_pair_anchor": true,
+      "require_signal": false,
+      "require_single_safe": true
+    },
+    "eligible_component_groups": 5,
+    "excluded_component_groups": {},
+    "raw_component_groups": 5,
+    "raw_same_case_pairs": 1,
+    "safe_same_case_pairs_before_anchor": 1,
+    "selected_pairs": 1
+  },
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 1,
+      "mean_delta_boundary_rank": 5.0,
+      "n": 1,
+      "patched_classes": {
+        "target_equivalent": 1
+      },
+      "target_transition_rows": 1
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 1,
+      "patched_classes": {
+        "object_echo": 1
+      },
+      "target_transition_rows": 0
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_target_rows": 1,
+  "model": "deepseek7b",
+  "n_component_groups": 5,
+  "n_pairs": 1,
+  "n_rows": 2,
+  "natural_category_degraded_rows": 0,
+  "natural_category_target_rows": 0,
+  "natural_degraded_rows": 0,
+  "natural_target_rows": 0,
+  "pair_exact_plus_multi": 0,
+  "pair_records": [
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "degraded": 0,
+      "exact_plus_any": false,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 0,
+      "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 3,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 0,
+      "single_had_exact_multi": true,
+      "target_total": 1
+    }
+  ],
+  "phase": 829,
+  "quantization": "off",
+  "round": "smoke",
+  "selected_component_groups": [
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "label": "L27:mlp_channel_group:mlp_topdiff_32:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": true,
+      "single_exact_target": true,
+      "single_natural_target_count": 3
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "label": "L27:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_doctor_medical_worker",
+      "label": "L5:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_cat_living_thing",
+      "label": "L27:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_carrot_root_vegetable",
+      "label": "L22:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    }
+  ],
+  "selected_pairs": [
+    [
+      "L27:mlp_channel_group:mlp_topdiff_32:B16",
+      "L27:layer_residual:whole_layer_residual:B16"
+    ]
+  ],
+  "source_round": "confirm",
+  "timestamp": "2026-07-01 17:11:28",
+  "title": "Non-Interference Constrained Component Composition"
+}

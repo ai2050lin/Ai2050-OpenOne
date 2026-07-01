@@ -1,0 +1,320 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase tests whether Phase 828 interference can be reduced by excluding unsafe single-component groups before composition.",
+  "composition_new_exact_multi": 0,
+  "composition_preserve_exact_multi": 0,
+  "diagnostics": {
+    "anchor_excluded_pairs": 30,
+    "constraint": {
+      "max_single_degraded": 0,
+      "require_pair_anchor": true,
+      "require_signal": false,
+      "require_single_safe": true
+    },
+    "eligible_component_groups": 15,
+    "excluded_component_groups": {
+      "single_degraded": 1
+    },
+    "raw_component_groups": 16,
+    "raw_same_case_pairs": 42,
+    "safe_same_case_pairs_before_anchor": 36,
+    "selected_pairs": 6
+  },
+  "donor_summary": {
+    "exact_choices": {
+      "degraded_rows": 0,
+      "improved_rows": 6,
+      "mean_delta_boundary_rank": 2.0,
+      "n": 6,
+      "patched_classes": {
+        "target_equivalent": 6
+      },
+      "target_transition_rows": 6
+    },
+    "natural_category": {
+      "degraded_rows": 0,
+      "improved_rows": 0,
+      "mean_delta_boundary_rank": 0.0,
+      "n": 6,
+      "patched_classes": {
+        "broad_near_miss": 6
+      },
+      "target_transition_rows": 0
+    },
+    "object_only": {
+      "degraded_rows": 0,
+      "improved_rows": 6,
+      "mean_delta_boundary_rank": 2.0,
+      "n": 6,
+      "patched_classes": {
+        "target_equivalent": 6
+      },
+      "target_transition_rows": 6
+    }
+  },
+  "dtype": "bfloat16",
+  "exact_target_rows": 6,
+  "model": "qwen3",
+  "n_component_groups": 16,
+  "n_pairs": 6,
+  "n_rows": 18,
+  "natural_category_degraded_rows": 0,
+  "natural_category_target_rows": 0,
+  "natural_degraded_rows": 0,
+  "natural_target_rows": 6,
+  "pair_exact_plus_multi": 0,
+  "pair_records": [
+    {
+      "case_id": "p816_heart_body_organ",
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 1,
+      "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 2,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 2,
+      "single_had_exact_multi": true,
+      "target_total": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 1,
+      "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 2,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 1,
+      "single_had_exact_multi": true,
+      "target_total": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 1,
+      "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 2,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 1,
+      "single_had_exact_multi": true,
+      "target_total": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 1,
+      "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_3:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 2,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 1,
+      "single_had_exact_multi": true,
+      "target_total": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 1,
+      "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_25:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 2,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 1,
+      "single_had_exact_multi": true,
+      "target_total": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "degraded": 0,
+      "exact_plus_any": true,
+      "exact_plus_multi": false,
+      "exact_target": true,
+      "natural_target_count": 1,
+      "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_8:B16",
+      "single_a_degraded": 0,
+      "single_a_natural_target_count": 2,
+      "single_b_degraded": 0,
+      "single_b_natural_target_count": 0,
+      "single_had_exact_multi": true,
+      "target_total": 2
+    }
+  ],
+  "phase": 829,
+  "quantization": "off",
+  "round": "main",
+  "selected_component_groups": [
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": true,
+      "single_exact_target": true,
+      "single_natural_target_count": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:layer_residual:whole_layer_residual:B32",
+      "single_degraded": 1,
+      "single_exact_plus_multi": true,
+      "single_exact_target": true,
+      "single_natural_target_count": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_output:whole_attention_output:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": true,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_3:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": true,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_output:whole_attention_output:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_4:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 2
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:mlp_output:whole_mlp_output:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:mlp_output:whole_mlp_output:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_8:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_4:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_3:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_25:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_25:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 1
+    },
+    {
+      "case_id": "p816_winter_cold_season",
+      "label": "L21:layer_residual:whole_layer_residual:B32",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_winter_cold_season",
+      "label": "L21:layer_residual:whole_layer_residual:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    },
+    {
+      "case_id": "p816_heart_body_organ",
+      "label": "L14:attention_head:head_8:B16",
+      "single_degraded": 0,
+      "single_exact_plus_multi": false,
+      "single_exact_target": false,
+      "single_natural_target_count": 0
+    }
+  ],
+  "selected_pairs": [
+    [
+      "L14:layer_residual:whole_layer_residual:B16",
+      "L14:attention_output:whole_attention_output:B16"
+    ],
+    [
+      "L14:layer_residual:whole_layer_residual:B16",
+      "L14:mlp_output:whole_mlp_output:B16"
+    ],
+    [
+      "L14:layer_residual:whole_layer_residual:B16",
+      "L14:attention_head:head_4:B16"
+    ],
+    [
+      "L14:layer_residual:whole_layer_residual:B16",
+      "L14:attention_head:head_3:B16"
+    ],
+    [
+      "L14:layer_residual:whole_layer_residual:B16",
+      "L14:attention_head:head_25:B16"
+    ],
+    [
+      "L14:layer_residual:whole_layer_residual:B16",
+      "L14:attention_head:head_8:B16"
+    ]
+  ],
+  "source_round": "confirm",
+  "timestamp": "2026-07-01 17:11:43",
+  "title": "Non-Interference Constrained Component Composition"
+}

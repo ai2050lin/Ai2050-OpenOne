@@ -1,0 +1,377 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase adds first-step full-vocabulary target-rank and blocker-count signals. It tests whether blocker awareness can remove the Phase 833 qwen3 degradation.",
+  "diagnostics": {
+    "anchor_excluded_pairs": 15,
+    "constraint": {
+      "max_single_degraded": 0,
+      "require_pair_anchor": true,
+      "require_signal": false,
+      "require_single_safe": true
+    },
+    "eligible_component_groups": 8,
+    "excluded_component_groups": {},
+    "raw_component_groups": 8,
+    "raw_same_case_pairs": 21,
+    "safe_same_case_pairs_before_anchor": 21,
+    "selected_pairs": 3
+  },
+  "dtype": "bfloat16",
+  "mode_summaries": {
+    "category_count_rank_improved": {
+      "decision": {
+        "accuracy_vs_target_only": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "n": 12,
+        "oracle_active": 5,
+        "predicted_active": 5,
+        "tn": 7,
+        "tp": 5
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "0": 1,
+          "1": 5
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 2,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 3,
+            "mean_delta_boundary_rank": 2.0,
+            "n": 3,
+            "patched_classes": {
+              "target_equivalent": 3
+            },
+            "target_transition_rows": 3
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 2,
+            "mean_delta_boundary_rank": 1.3333333333333333,
+            "n": 3,
+            "patched_classes": {
+              "broad_near_miss": 1,
+              "target_equivalent": 2
+            },
+            "target_transition_rows": 2
+          }
+        },
+        "exact_target_rows": 3,
+        "n_rows": 6,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 2,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 2,
+        "pair_exact_plus_multi": 2,
+        "pair_records": [
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": true,
+            "natural_target_count": 0,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 1
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          }
+        ]
+      }
+    },
+    "category_count_rank_le500": {
+      "decision": {
+        "accuracy_vs_target_only": 0.5833333333333334,
+        "fn": 5,
+        "fp": 0,
+        "n": 12,
+        "oracle_active": 5,
+        "predicted_active": 0,
+        "tn": 7,
+        "tp": 0
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "0": 6
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 0,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 3,
+            "patched_classes": {
+              "broad_near_miss": 3
+            },
+            "target_transition_rows": 0
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 0,
+            "mean_delta_boundary_rank": 0.0,
+            "n": 3,
+            "patched_classes": {
+              "broad_near_miss": 3
+            },
+            "target_transition_rows": 0
+          }
+        },
+        "exact_target_rows": 0,
+        "n_rows": 6,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 0,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 0,
+        "pair_exact_plus_multi": 0,
+        "pair_records": [
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": false,
+            "natural_target_count": 0,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 0
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": false,
+            "natural_target_count": 0,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 0
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": false,
+            "natural_target_count": 0,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+            "single_had_exact_multi": true,
+            "target_total": 0
+          }
+        ]
+      }
+    },
+    "category_nonresidual_else_count_nonnegative": {
+      "decision": {
+        "accuracy_vs_target_only": 0.75,
+        "fn": 0,
+        "fp": 3,
+        "n": 12,
+        "oracle_active": 5,
+        "predicted_active": 8,
+        "tn": 4,
+        "tp": 5
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "1": 4,
+          "2": 2
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 2,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 3,
+            "mean_delta_boundary_rank": 2.0,
+            "n": 3,
+            "patched_classes": {
+              "target_equivalent": 3
+            },
+            "target_transition_rows": 3
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 2,
+            "mean_delta_boundary_rank": 1.3333333333333333,
+            "n": 3,
+            "patched_classes": {
+              "broad_near_miss": 1,
+              "target_equivalent": 2
+            },
+            "target_transition_rows": 2
+          }
+        },
+        "exact_target_rows": 3,
+        "n_rows": 6,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 2,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 2,
+        "pair_exact_plus_multi": 2,
+        "pair_records": [
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": true,
+            "natural_target_count": 0,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 1
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          }
+        ]
+      }
+    },
+    "oracle_route_target_only": {
+      "decision": {
+        "accuracy_vs_target_only": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "n": 12,
+        "oracle_active": 5,
+        "predicted_active": 5,
+        "tn": 7,
+        "tp": 5
+      },
+      "generation": {
+        "active_component_count_distribution": {
+          "0": 1,
+          "1": 5
+        },
+        "composition_new_exact_multi": 0,
+        "composition_preserve_exact_multi": 2,
+        "donor_summary": {
+          "exact_choices": {
+            "degraded_rows": 0,
+            "improved_rows": 3,
+            "mean_delta_boundary_rank": 2.0,
+            "n": 3,
+            "patched_classes": {
+              "target_equivalent": 3
+            },
+            "target_transition_rows": 3
+          },
+          "natural_category": {
+            "degraded_rows": 0,
+            "improved_rows": 2,
+            "mean_delta_boundary_rank": 1.3333333333333333,
+            "n": 3,
+            "patched_classes": {
+              "broad_near_miss": 1,
+              "target_equivalent": 2
+            },
+            "target_transition_rows": 2
+          }
+        },
+        "exact_target_rows": 3,
+        "n_rows": 6,
+        "natural_category_degraded_rows": 0,
+        "natural_category_target_rows": 2,
+        "natural_degraded_rows": 0,
+        "natural_target_rows": 2,
+        "pair_exact_plus_multi": 2,
+        "pair_records": [
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": false,
+            "exact_plus_multi": false,
+            "exact_target": true,
+            "natural_target_count": 0,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+            "single_had_exact_multi": true,
+            "target_total": 1
+          },
+          {
+            "case_id": "p816_heart_body_organ",
+            "degraded": 0,
+            "exact_plus_any": true,
+            "exact_plus_multi": true,
+            "exact_target": true,
+            "natural_target_count": 1,
+            "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+            "single_had_exact_multi": true,
+            "target_total": 2
+          }
+        ]
+      }
+    }
+  },
+  "model": "qwen3",
+  "n_component_groups": 8,
+  "n_decision_rows": 48,
+  "n_generation_rows": 24,
+  "n_pairs": 3,
+  "phase": 834,
+  "predictor_modes": [
+    "category_nonresidual_else_count_nonnegative",
+    "category_count_rank_improved",
+    "category_count_rank_le500",
+    "oracle_route_target_only"
+  ],
+  "quantization": "off",
+  "round": "smoke",
+  "source_round": "confirm",
+  "timestamp": "2026-07-01 19:21:30",
+  "title": "Blocker-Aware Internal Route-Boundary Predictor"
+}

@@ -1,0 +1,993 @@
+{
+  "model_summaries": {
+    "deepseek7b": {
+      "attn_implementation": "sdpa",
+      "boundary": "This phase compares pure readout gates with route-boundary augmented gates. Route-boundary gates can be useful but are not yet an internal natural gate closure.",
+      "diagnostics": {
+        "anchor_excluded_pairs": 0,
+        "constraint": {
+          "max_single_degraded": 0,
+          "require_pair_anchor": true,
+          "require_signal": false,
+          "require_single_safe": true
+        },
+        "eligible_component_groups": 5,
+        "excluded_component_groups": {},
+        "raw_component_groups": 5,
+        "raw_same_case_pairs": 1,
+        "safe_same_case_pairs_before_anchor": 1,
+        "selected_pairs": 1
+      },
+      "dtype": "bfloat16",
+      "mode_summaries": {
+        "readout_count": {
+          "decision": {
+            "accuracy_vs_target_only": 0.25,
+            "fn": 1,
+            "fp": 2,
+            "n": 4,
+            "oracle_active": 2,
+            "predicted_active": 3,
+            "tn": 0,
+            "tp": 1
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 1,
+              "2": 1
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 0,
+                "mean_delta_boundary_rank": 0.0,
+                "n": 1,
+                "patched_classes": {
+                  "object_echo": 1
+                },
+                "target_transition_rows": 0
+              }
+            },
+            "exact_target_rows": 1,
+            "n_rows": 2,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": [
+              {
+                "case_id": "p816_triangle_geometric_shape",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              }
+            ]
+          }
+        },
+        "readout_signed_sum": {
+          "decision": {
+            "accuracy_vs_target_only": 0.25,
+            "fn": 2,
+            "fp": 1,
+            "n": 4,
+            "oracle_active": 2,
+            "predicted_active": 1,
+            "tn": 1,
+            "tp": 0
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "0": 1,
+              "1": 1
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 0,
+                "mean_delta_boundary_rank": 0.0,
+                "n": 1,
+                "patched_classes": {
+                  "object_echo": 1
+                },
+                "target_transition_rows": 0
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 0,
+                "mean_delta_boundary_rank": 0.0,
+                "n": 1,
+                "patched_classes": {
+                  "object_echo": 1
+                },
+                "target_transition_rows": 0
+              }
+            },
+            "exact_target_rows": 0,
+            "n_rows": 2,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": [
+              {
+                "case_id": "p816_triangle_geometric_shape",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": false,
+                "natural_target_count": 0,
+                "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+                "single_had_exact_multi": true,
+                "target_total": 0
+              }
+            ]
+          }
+        },
+        "route_target_else_count": {
+          "decision": {
+            "accuracy_vs_target_only": 1.0,
+            "fn": 0,
+            "fp": 0,
+            "n": 4,
+            "oracle_active": 2,
+            "predicted_active": 2,
+            "tn": 2,
+            "tp": 2
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 2
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 1,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              }
+            },
+            "exact_target_rows": 1,
+            "n_rows": 2,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 1,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 1,
+            "pair_exact_plus_multi": 1,
+            "pair_records": [
+              {
+                "case_id": "p816_triangle_geometric_shape",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              }
+            ]
+          }
+        },
+        "route_target_else_signed_sum": {
+          "decision": {
+            "accuracy_vs_target_only": 1.0,
+            "fn": 0,
+            "fp": 0,
+            "n": 4,
+            "oracle_active": 2,
+            "predicted_active": 2,
+            "tn": 2,
+            "tp": 2
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 2
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 1,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              }
+            },
+            "exact_target_rows": 1,
+            "n_rows": 2,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 1,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 1,
+            "pair_exact_plus_multi": 1,
+            "pair_records": [
+              {
+                "case_id": "p816_triangle_geometric_shape",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              }
+            ]
+          }
+        },
+        "route_target_only": {
+          "decision": {
+            "accuracy_vs_target_only": 1.0,
+            "fn": 0,
+            "fp": 0,
+            "n": 4,
+            "oracle_active": 2,
+            "predicted_active": 2,
+            "tn": 2,
+            "tp": 2
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 2
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 1,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 1,
+                "mean_delta_boundary_rank": 5.0,
+                "n": 1,
+                "patched_classes": {
+                  "target_equivalent": 1
+                },
+                "target_transition_rows": 1
+              }
+            },
+            "exact_target_rows": 1,
+            "n_rows": 2,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 1,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 1,
+            "pair_exact_plus_multi": 1,
+            "pair_records": [
+              {
+                "case_id": "p816_triangle_geometric_shape",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L27:mlp_channel_group:mlp_topdiff_32:B16 + L27:layer_residual:whole_layer_residual:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              }
+            ]
+          }
+        }
+      },
+      "model": "deepseek7b",
+      "n_component_groups": 5,
+      "n_decision_rows": 20,
+      "n_generation_rows": 10,
+      "n_pairs": 1,
+      "phase": 832,
+      "predictor_modes": [
+        "readout_signed_sum",
+        "readout_count",
+        "route_target_only",
+        "route_target_else_signed_sum",
+        "route_target_else_count"
+      ],
+      "quantization": "off",
+      "round": "smoke",
+      "source_round": "confirm",
+      "timestamp": "2026-07-01 18:52:31",
+      "title": "Gate Signal Expansion Beyond Readout"
+    },
+    "glm4": {
+      "attn_implementation": null,
+      "boundary": "This phase compares pure readout gates with route-boundary augmented gates. Route-boundary gates can be useful but are not yet an internal natural gate closure.",
+      "diagnostics": {
+        "anchor_excluded_pairs": 0,
+        "constraint": {
+          "max_single_degraded": 0,
+          "require_pair_anchor": true,
+          "require_signal": false,
+          "require_single_safe": true
+        },
+        "eligible_component_groups": 4,
+        "excluded_component_groups": {},
+        "raw_component_groups": 4,
+        "raw_same_case_pairs": 0,
+        "safe_same_case_pairs_before_anchor": 0,
+        "selected_pairs": 0
+      },
+      "dtype": "bfloat16",
+      "mode_summaries": {
+        "readout_count": {
+          "decision": {
+            "accuracy_vs_target_only": null,
+            "fn": 0,
+            "fp": 0,
+            "n": 0,
+            "oracle_active": 0,
+            "predicted_active": 0,
+            "tn": 0,
+            "tp": 0
+          },
+          "generation": {
+            "active_component_count_distribution": {},
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {},
+            "exact_target_rows": 0,
+            "n_rows": 0,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": []
+          }
+        },
+        "readout_signed_sum": {
+          "decision": {
+            "accuracy_vs_target_only": null,
+            "fn": 0,
+            "fp": 0,
+            "n": 0,
+            "oracle_active": 0,
+            "predicted_active": 0,
+            "tn": 0,
+            "tp": 0
+          },
+          "generation": {
+            "active_component_count_distribution": {},
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {},
+            "exact_target_rows": 0,
+            "n_rows": 0,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": []
+          }
+        },
+        "route_target_else_count": {
+          "decision": {
+            "accuracy_vs_target_only": null,
+            "fn": 0,
+            "fp": 0,
+            "n": 0,
+            "oracle_active": 0,
+            "predicted_active": 0,
+            "tn": 0,
+            "tp": 0
+          },
+          "generation": {
+            "active_component_count_distribution": {},
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {},
+            "exact_target_rows": 0,
+            "n_rows": 0,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": []
+          }
+        },
+        "route_target_else_signed_sum": {
+          "decision": {
+            "accuracy_vs_target_only": null,
+            "fn": 0,
+            "fp": 0,
+            "n": 0,
+            "oracle_active": 0,
+            "predicted_active": 0,
+            "tn": 0,
+            "tp": 0
+          },
+          "generation": {
+            "active_component_count_distribution": {},
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {},
+            "exact_target_rows": 0,
+            "n_rows": 0,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": []
+          }
+        },
+        "route_target_only": {
+          "decision": {
+            "accuracy_vs_target_only": null,
+            "fn": 0,
+            "fp": 0,
+            "n": 0,
+            "oracle_active": 0,
+            "predicted_active": 0,
+            "tn": 0,
+            "tp": 0
+          },
+          "generation": {
+            "active_component_count_distribution": {},
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {},
+            "exact_target_rows": 0,
+            "n_rows": 0,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": []
+          }
+        }
+      },
+      "model": "glm4",
+      "n_component_groups": 4,
+      "n_decision_rows": 0,
+      "n_generation_rows": 0,
+      "n_pairs": 0,
+      "phase": 832,
+      "predictor_modes": [
+        "readout_signed_sum",
+        "readout_count",
+        "route_target_only",
+        "route_target_else_signed_sum",
+        "route_target_else_count"
+      ],
+      "quantization": "off",
+      "round": "smoke",
+      "skip_reason": "no eligible same-case pairs for expanded gate prediction",
+      "skipped_model_load": true,
+      "source_round": "confirm",
+      "timestamp": "2026-07-01 18:52:22",
+      "title": "Gate Signal Expansion Beyond Readout"
+    },
+    "qwen3": {
+      "attn_implementation": "sdpa",
+      "boundary": "This phase compares pure readout gates with route-boundary augmented gates. Route-boundary gates can be useful but are not yet an internal natural gate closure.",
+      "diagnostics": {
+        "anchor_excluded_pairs": 15,
+        "constraint": {
+          "max_single_degraded": 0,
+          "require_pair_anchor": true,
+          "require_signal": false,
+          "require_single_safe": true
+        },
+        "eligible_component_groups": 8,
+        "excluded_component_groups": {},
+        "raw_component_groups": 8,
+        "raw_same_case_pairs": 21,
+        "safe_same_case_pairs_before_anchor": 21,
+        "selected_pairs": 3
+      },
+      "dtype": "bfloat16",
+      "mode_summaries": {
+        "readout_count": {
+          "decision": {
+            "accuracy_vs_target_only": 0.5833333333333334,
+            "fn": 0,
+            "fp": 5,
+            "n": 12,
+            "oracle_active": 5,
+            "predicted_active": 10,
+            "tn": 2,
+            "tp": 5
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 2,
+              "2": 4
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 3,
+                "mean_delta_boundary_rank": 2.0,
+                "n": 3,
+                "patched_classes": {
+                  "target_equivalent": 3
+                },
+                "target_transition_rows": 3
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 0,
+                "mean_delta_boundary_rank": 0.0,
+                "n": 3,
+                "patched_classes": {
+                  "broad_near_miss": 3
+                },
+                "target_transition_rows": 0
+              }
+            },
+            "exact_target_rows": 3,
+            "n_rows": 6,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": [
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              }
+            ]
+          }
+        },
+        "readout_signed_sum": {
+          "decision": {
+            "accuracy_vs_target_only": 0.5833333333333334,
+            "fn": 1,
+            "fp": 4,
+            "n": 12,
+            "oracle_active": 5,
+            "predicted_active": 8,
+            "tn": 3,
+            "tp": 4
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 4,
+              "2": 2
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 0,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 3,
+                "mean_delta_boundary_rank": 2.0,
+                "n": 3,
+                "patched_classes": {
+                  "target_equivalent": 3
+                },
+                "target_transition_rows": 3
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 0,
+                "mean_delta_boundary_rank": 0.0,
+                "n": 3,
+                "patched_classes": {
+                  "broad_near_miss": 3
+                },
+                "target_transition_rows": 0
+              }
+            },
+            "exact_target_rows": 3,
+            "n_rows": 6,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 0,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 0,
+            "pair_exact_plus_multi": 0,
+            "pair_records": [
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              }
+            ]
+          }
+        },
+        "route_target_else_count": {
+          "decision": {
+            "accuracy_vs_target_only": 0.9166666666666666,
+            "fn": 0,
+            "fp": 1,
+            "n": 12,
+            "oracle_active": 5,
+            "predicted_active": 6,
+            "tn": 6,
+            "tp": 5
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 6
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 2,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 3,
+                "mean_delta_boundary_rank": 2.0,
+                "n": 3,
+                "patched_classes": {
+                  "target_equivalent": 3
+                },
+                "target_transition_rows": 3
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 2,
+                "mean_delta_boundary_rank": 1.3333333333333333,
+                "n": 3,
+                "patched_classes": {
+                  "broad_near_miss": 1,
+                  "target_equivalent": 2
+                },
+                "target_transition_rows": 2
+              }
+            },
+            "exact_target_rows": 3,
+            "n_rows": 6,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 2,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 2,
+            "pair_exact_plus_multi": 2,
+            "pair_records": [
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              }
+            ]
+          }
+        },
+        "route_target_else_signed_sum": {
+          "decision": {
+            "accuracy_vs_target_only": 0.9166666666666666,
+            "fn": 0,
+            "fp": 1,
+            "n": 12,
+            "oracle_active": 5,
+            "predicted_active": 6,
+            "tn": 6,
+            "tp": 5
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "1": 6
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 2,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 3,
+                "mean_delta_boundary_rank": 2.0,
+                "n": 3,
+                "patched_classes": {
+                  "target_equivalent": 3
+                },
+                "target_transition_rows": 3
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 2,
+                "mean_delta_boundary_rank": 1.3333333333333333,
+                "n": 3,
+                "patched_classes": {
+                  "broad_near_miss": 1,
+                  "target_equivalent": 2
+                },
+                "target_transition_rows": 2
+              }
+            },
+            "exact_target_rows": 3,
+            "n_rows": 6,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 2,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 2,
+            "pair_exact_plus_multi": 2,
+            "pair_records": [
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              }
+            ]
+          }
+        },
+        "route_target_only": {
+          "decision": {
+            "accuracy_vs_target_only": 1.0,
+            "fn": 0,
+            "fp": 0,
+            "n": 12,
+            "oracle_active": 5,
+            "predicted_active": 5,
+            "tn": 7,
+            "tp": 5
+          },
+          "generation": {
+            "active_component_count_distribution": {
+              "0": 1,
+              "1": 5
+            },
+            "composition_new_exact_multi": 0,
+            "composition_preserve_exact_multi": 2,
+            "donor_summary": {
+              "exact_choices": {
+                "degraded_rows": 0,
+                "improved_rows": 3,
+                "mean_delta_boundary_rank": 2.0,
+                "n": 3,
+                "patched_classes": {
+                  "target_equivalent": 3
+                },
+                "target_transition_rows": 3
+              },
+              "natural_category": {
+                "degraded_rows": 0,
+                "improved_rows": 2,
+                "mean_delta_boundary_rank": 1.3333333333333333,
+                "n": 3,
+                "patched_classes": {
+                  "broad_near_miss": 1,
+                  "target_equivalent": 2
+                },
+                "target_transition_rows": 2
+              }
+            },
+            "exact_target_rows": 3,
+            "n_rows": 6,
+            "natural_category_degraded_rows": 0,
+            "natural_category_target_rows": 2,
+            "natural_degraded_rows": 0,
+            "natural_target_rows": 2,
+            "pair_exact_plus_multi": 2,
+            "pair_records": [
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_output:whole_attention_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": false,
+                "exact_plus_multi": false,
+                "exact_target": true,
+                "natural_target_count": 0,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:mlp_output:whole_mlp_output:B16",
+                "single_had_exact_multi": true,
+                "target_total": 1
+              },
+              {
+                "case_id": "p816_heart_body_organ",
+                "degraded": 0,
+                "exact_plus_any": true,
+                "exact_plus_multi": true,
+                "exact_target": true,
+                "natural_target_count": 1,
+                "pair_label": "L14:layer_residual:whole_layer_residual:B16 + L14:attention_head:head_4:B16",
+                "single_had_exact_multi": true,
+                "target_total": 2
+              }
+            ]
+          }
+        }
+      },
+      "model": "qwen3",
+      "n_component_groups": 8,
+      "n_decision_rows": 60,
+      "n_generation_rows": 30,
+      "n_pairs": 3,
+      "phase": 832,
+      "predictor_modes": [
+        "readout_signed_sum",
+        "readout_count",
+        "route_target_only",
+        "route_target_else_signed_sum",
+        "route_target_else_count"
+      ],
+      "quantization": "off",
+      "round": "smoke",
+      "source_round": "confirm",
+      "timestamp": "2026-07-01 18:52:20",
+      "title": "Gate Signal Expansion Beyond Readout"
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 832,
+  "round": "smoke",
+  "status": "complete",
+  "timestamp": "2026-07-01 18:52:33"
+}
