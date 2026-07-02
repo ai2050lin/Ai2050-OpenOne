@@ -1,0 +1,250 @@
+{
+  "phase": 847,
+  "title": "Context Gated Residual Audit",
+  "model": "deepseek7b",
+  "round": "main",
+  "source_phase845_round": "main",
+  "timestamp": "2026-07-02 10:06:33",
+  "residual_rows": 304,
+  "objects": [
+    "circle",
+    "rectangle",
+    "square",
+    "triangle"
+  ],
+  "prompt_variants": [
+    "natural_category",
+    "natural_question"
+  ],
+  "combo_counts": {
+    "pair": 240,
+    "triplet": 64
+  },
+  "interaction_threshold": 0.5,
+  "context_strength": {
+    "prompt_mean_abs_shift_from_global": 0.031044407894736843,
+    "object_mean_abs_shift_from_global": 0.029990748355263157,
+    "object_prompt_mean_abs_shift_from_global": 0.05356959292763158,
+    "n_global_combo_terms": 38,
+    "n_prompt_combo_terms": 76,
+    "n_object_combo_terms": 152,
+    "n_object_prompt_combo_terms": 304
+  },
+  "split_summary": {
+    "in_sample": {
+      "n_splits": 1,
+      "split_keys": [
+        "all"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 304,
+          "mae": 0.05356959292763158,
+          "rmse": 0.07847756589358142,
+          "sign_accuracy": 0.5526315789473685,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_combo": {
+          "n": 304,
+          "mae": 0.04625822368421053,
+          "rmse": 0.06416746655737195,
+          "sign_accuracy": 0.668918918918919,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_prompt_combo": {
+          "n": 304,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 301,
+            "synergy": 3
+          }
+        },
+        "prompt_combo": {
+          "n": 304,
+          "mae": 0.04561574835526316,
+          "rmse": 0.06929140237172143,
+          "sign_accuracy": 0.6588628762541806,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "object_combo": 0.007311369243421052,
+        "object_prompt_combo": 0.05356959292763158,
+        "prompt_combo": 0.007953844572368425
+      }
+    },
+    "object_holdout": {
+      "n_splits": 4,
+      "split_keys": [
+        "circle",
+        "rectangle",
+        "square",
+        "triangle"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 304,
+          "mae": 0.05888500548245614,
+          "rmse": 0.08801351362563119,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_combo": {
+          "n": 304,
+          "mae": 0.05888500548245614,
+          "rmse": 0.08801351362563119,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_prompt_combo": {
+          "n": 304,
+          "mae": 0.05888500548245614,
+          "rmse": 0.08801351362563119,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "prompt_combo": {
+          "n": 304,
+          "mae": 0.06082099780701754,
+          "rmse": 0.09238853649562859,
+          "sign_accuracy": 0.5217391304347826,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "object_combo": 0.0,
+        "object_prompt_combo": 0.0,
+        "prompt_combo": -0.0019359923245614048
+      }
+    },
+    "prompt_holdout": {
+      "n_splits": 2,
+      "split_keys": [
+        "natural_category",
+        "natural_question"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 304,
+          "mae": 0.0727282072368421,
+          "rmse": 0.1011484951267504,
+          "sign_accuracy": 0.4503311258278146,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_combo": {
+          "n": 304,
+          "mae": 0.09251644736842106,
+          "rmse": 0.1283349331147439,
+          "sign_accuracy": 0.33783783783783783,
+          "class_accuracy": 0.9802631578947368,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 301,
+            "synergy": 3
+          }
+        },
+        "object_prompt_combo": {
+          "n": 304,
+          "mae": 0.0727282072368421,
+          "rmse": 0.1011484951267504,
+          "sign_accuracy": 0.4503311258278146,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "prompt_combo": {
+          "n": 304,
+          "mae": 0.0727282072368421,
+          "rmse": 0.1011484951267504,
+          "sign_accuracy": 0.4503311258278146,
+          "class_accuracy": 0.9901315789473685,
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "object_combo": -0.019788240131578955,
+        "object_prompt_combo": 0.0,
+        "prompt_combo": 0.0
+      }
+    }
+  },
+  "n_predictions": 3648,
+  "boundary": "This phase audits whether Phase 845 interaction residuals are better explained by prompt/object context gates. It is residual transfer diagnostics, not route closure."
+}

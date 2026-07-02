@@ -1,0 +1,499 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase audits natural activation and first-step natural channel edits for the Phase 842 core channel. It still does not prove global geometry reuse or full token closure.",
+  "case_ids": [
+    "p816_triangle_geometric_shape"
+  ],
+  "core_candidates": [
+    {
+      "channel_id": 7899,
+      "channel_local_index": 8,
+      "classes": {
+        "object_echo": 7,
+        "target_equivalent": 8,
+        "unknown_other": 1
+      },
+      "flip_one_loss_rows": 4,
+      "leave_one_out_loss_rows": 4,
+      "mean_delta_quality_vs_full": -0.7426129137449673,
+      "n_rows": 16,
+      "single_target_rows": 4,
+      "zero_one_loss_rows": 0
+    }
+  ],
+  "dtype": "bfloat16",
+  "edit_modes": [
+    "original",
+    "zero",
+    "flip",
+    "half"
+  ],
+  "mode_summary": {
+    "flip": {
+      "classes": {
+        "target_equivalent": 3,
+        "unknown_other": 1
+      },
+      "mean_abs_channel_activation": 16.943359375,
+      "mean_channel_activation": -16.943359375,
+      "mean_target_minus_object_logit": 1.0703125,
+      "n": 4,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 1,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 3,
+      "unknown_other_rows": 1
+    },
+    "half": {
+      "classes": {
+        "target_equivalent": 2,
+        "unknown_other": 2
+      },
+      "mean_abs_channel_activation": 16.943359375,
+      "mean_channel_activation": -16.943359375,
+      "mean_target_minus_object_logit": 0.90625,
+      "n": 4,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 2,
+      "unknown_other_rows": 2
+    },
+    "original": {
+      "classes": {
+        "target_equivalent": 2,
+        "unknown_other": 2
+      },
+      "mean_abs_channel_activation": 16.943359375,
+      "mean_channel_activation": -16.943359375,
+      "mean_target_minus_object_logit": 0.8828125,
+      "n": 4,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 2,
+      "unknown_other_rows": 2
+    },
+    "zero": {
+      "classes": {
+        "target_equivalent": 3,
+        "unknown_other": 1
+      },
+      "mean_abs_channel_activation": 16.943359375,
+      "mean_channel_activation": -16.943359375,
+      "mean_target_minus_object_logit": 0.984375,
+      "n": 4,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 1,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 3,
+      "unknown_other_rows": 1
+    }
+  },
+  "model": "deepseek7b",
+  "n_cases": 1,
+  "n_rows": 16,
+  "object_summary": {
+    "triangle": {
+      "classes": {
+        "target_equivalent": 10,
+        "unknown_other": 6
+      },
+      "mean_abs_channel_activation": 16.943359375,
+      "mean_channel_activation": -16.943359375,
+      "mean_target_minus_object_logit": 0.9609375,
+      "n": 16,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 2,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 10,
+      "unknown_other_rows": 6
+    }
+  },
+  "original_target_rows": 2,
+  "phase": 843,
+  "prompt_variants": [
+    "natural_question",
+    "object_only",
+    "natural_category",
+    "exact_choices"
+  ],
+  "quantization": "off",
+  "round": "main",
+  "skipped_model_load": false,
+  "target_gained_vs_original_rows": 2,
+  "target_lost_vs_original_rows": 0,
+  "target_rows": 10,
+  "timestamp": "2026-07-02 08:45:21",
+  "title": "Core Channel Natural Route Validation",
+  "top_rows": [
+    {
+      "best_target_rank": 176,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "zero",
+      "generated": "Polygon",
+      "object": "triangle",
+      "object_rank": 89,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.0625,
+      "top_tokens": [
+        " Polygon",
+        " polygon",
+        " ",
+        " triangle",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 130,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "flip",
+      "generated": "polygon",
+      "object": "triangle",
+      "object_rank": 73,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.9375,
+      "top_tokens": [
+        " polygon",
+        " Polygon",
+        " polygons",
+        " triangle",
+        " "
+      ]
+    },
+    {
+      "best_target_rank": 58,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -1.7734375,
+      "edit_mode": "original",
+      "generated": "geometric shape",
+      "object": "triangle",
+      "object_rank": 518,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometric shape",
+      "prompt_variant": "exact_choices",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 4.25,
+      "top_tokens": [
+        " geometric",
+        " The",
+        " __",
+        " ?\n\n",
+        " Ge"
+      ]
+    },
+    {
+      "best_target_rank": 58,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -1.7734375,
+      "edit_mode": "zero",
+      "generated": "geometric shape",
+      "object": "triangle",
+      "object_rank": 503,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometric shape",
+      "prompt_variant": "exact_choices",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 4.21875,
+      "top_tokens": [
+        " geometric",
+        " The",
+        " __",
+        " ?\n\n",
+        " Ge"
+      ]
+    },
+    {
+      "best_target_rank": 58,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -1.7734375,
+      "edit_mode": "half",
+      "generated": "geometric shape",
+      "object": "triangle",
+      "object_rank": 503,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometric shape",
+      "prompt_variant": "exact_choices",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 4.21875,
+      "top_tokens": [
+        " geometric",
+        " The",
+        " __",
+        " ?\n\n",
+        " Ge"
+      ]
+    },
+    {
+      "best_target_rank": 58,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -1.7734375,
+      "edit_mode": "flip",
+      "generated": "geometric shape",
+      "object": "triangle",
+      "object_rank": 495,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometric shape",
+      "prompt_variant": "exact_choices",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 4.1875,
+      "top_tokens": [
+        " geometric",
+        " The",
+        " __",
+        " ?\n\n",
+        " Ge"
+      ]
+    },
+    {
+      "best_target_rank": 187,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -26.625,
+      "edit_mode": "flip",
+      "generated": "polygon",
+      "object": "triangle",
+      "object_rank": 554,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.8125,
+      "top_tokens": [
+        " polygon",
+        " geometry",
+        " Polygon",
+        " shape",
+        " polygons"
+      ]
+    },
+    {
+      "best_target_rank": 265,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -26.625,
+      "edit_mode": "zero",
+      "generated": "polygon",
+      "object": "triangle",
+      "object_rank": 757,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.6875,
+      "top_tokens": [
+        " polygon",
+        " geometry",
+        " shape",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 330,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -26.625,
+      "edit_mode": "half",
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 903,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.59375,
+      "top_tokens": [
+        " geometry",
+        " polygon",
+        " shape",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 420,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -26.625,
+      "edit_mode": "original",
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 1093,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.5,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " polygon",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 245,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "original",
+      "generated": "1",
+      "object": "triangle",
+      "object_rank": 121,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.1875,
+      "top_tokens": [
+        " ",
+        " [",
+        " geometry",
+        " Polygon",
+        " A"
+      ]
+    },
+    {
+      "best_target_rank": 216,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "half",
+      "generated": "1",
+      "object": "triangle",
+      "object_rank": 97,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.1875,
+      "top_tokens": [
+        " ",
+        " Polygon",
+        " polygon",
+        " [",
+        " geometry"
+      ]
+    },
+    {
+      "best_target_rank": 1431,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -20.75,
+      "edit_mode": "original",
+      "generated": "three-sided figure",
+      "object": "triangle",
+      "object_rank": 747,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "three-sided figure",
+      "prompt_variant": "object_only",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.03125,
+      "top_tokens": [
+        " three",
+        " \"",
+        " a",
+        " triangle",
+        " acute"
+      ]
+    },
+    {
+      "best_target_rank": 1206,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -20.75,
+      "edit_mode": "half",
+      "generated": "three-sided figure",
+      "object": "triangle",
+      "object_rank": 666,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "three-sided figure",
+      "prompt_variant": "object_only",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.0,
+      "top_tokens": [
+        " three",
+        " \"",
+        " triangle",
+        " a",
+        " acute"
+      ]
+    },
+    {
+      "best_target_rank": 1022,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -20.75,
+      "edit_mode": "zero",
+      "generated": "three-sided figure",
+      "object": "triangle",
+      "object_rank": 590,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "three-sided figure",
+      "prompt_variant": "object_only",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.90625,
+      "top_tokens": [
+        " three",
+        " triangle",
+        " \"",
+        " a",
+        " polygon"
+      ]
+    },
+    {
+      "best_target_rank": 740,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -20.75,
+      "edit_mode": "flip",
+      "generated": "triangle is a polygon with three sides",
+      "object": "triangle",
+      "object_rank": 435,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "three-sided figure",
+      "prompt_variant": "object_only",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.78125,
+      "top_tokens": [
+        " triangle",
+        " polygon",
+        " three",
+        " \"",
+        " a"
+      ]
+    }
+  ]
+}

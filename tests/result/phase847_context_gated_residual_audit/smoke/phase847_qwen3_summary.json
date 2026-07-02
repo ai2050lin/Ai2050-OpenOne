@@ -1,0 +1,105 @@
+{
+  "phase": 847,
+  "title": "Context Gated Residual Audit",
+  "model": "qwen3",
+  "round": "smoke",
+  "source_phase845_round": "smoke",
+  "timestamp": "2026-07-02 10:06:33",
+  "residual_rows": 12,
+  "objects": [
+    "triangle"
+  ],
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "combo_counts": {
+    "pair": 12
+  },
+  "interaction_threshold": 0.5,
+  "context_strength": {
+    "prompt_mean_abs_shift_from_global": 0.0,
+    "object_mean_abs_shift_from_global": 0.0,
+    "object_prompt_mean_abs_shift_from_global": 0.0,
+    "n_global_combo_terms": 12,
+    "n_prompt_combo_terms": 12,
+    "n_object_combo_terms": 12,
+    "n_object_prompt_combo_terms": 12
+  },
+  "split_summary": {
+    "in_sample": {
+      "n_splits": 1,
+      "split_keys": [
+        "all"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "object_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "object_prompt_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "prompt_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "object_combo": 0.0,
+        "object_prompt_combo": 0.0,
+        "prompt_combo": 0.0
+      }
+    }
+  },
+  "n_predictions": 48,
+  "boundary": "This phase audits whether Phase 845 interaction residuals are better explained by prompt/object context gates. It is residual transfer diagnostics, not route closure."
+}

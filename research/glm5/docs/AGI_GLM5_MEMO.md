@@ -99817,3 +99817,6468 @@ B(t)=T
 ```text
 自然机制候选
 ```
+
+## Phase 840: 严格目标交互扩展与自然协同激活审计 [2026-07-02 00:49]
+
+### 一、任务来源和总体判断
+
+本阶段读取并复核 Phase 839 的结论。Phase 839 的核心判断基本正确：
+
+```text
+Phase 839 不是最终闭合；
+但它已经从 single-gear response atlas（单齿轮响应图谱）
+推进到 gear interaction edge（齿轮交互边）验证。
+```
+
+需要保留的正确部分是：
+
+```text
+1. qwen3 的普通正交互主要是 broad_near_miss（宽近似），不能算严格闭合；
+2. GLM4 在当前任务上单组件已经大量 target_equivalent（目标等价），导致交互指标饱和；
+3. DS7B 在 triangle -> polygon（三角形 -> 多边形）局部路线中出现 strict target-positive pair interaction（严格目标正向双组件交互）；
+4. 这个结果只证明局部人工 patch 可达，不证明自然机制闭合。
+```
+
+本阶段继续同一 global gear atlas（全局齿轮图谱）阶段，目标是：
+
+```text
+1. 只从 Phase 839 confirm 结果中提取 strict target-positive interaction；
+2. 不再泛选普通 top component（顶部组件）；
+3. 扩展 DS7B 的严格 pair interaction（双组件交互）；
+4. 审计无 patch 的自然 donor forward（供体自然前向）中，这些组件是否共同呈正向读出支持。
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase840_strict_target_interaction_natural_coactivation.py
+tests/glm5/run_phase840_strict_target_interaction_natural_coactivation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase840_strict_target_interaction_natural_coactivation/
+```
+
+### 二、测试原理
+
+Phase 839 的组合评分容易把“更合理但不闭合”的输出算进去，所以 Phase 840 的候选入口进一步收紧。
+
+候选组合必须满足：
+
+```math
+C \in \mathcal{C}_{840}
+```
+
+当且仅当：
+
+```math
+B(Patch(C,t,d)) = T
+```
+
+且：
+
+```math
+I_Q(C,t,d) > \theta
+```
+
+且：
+
+```math
+E(C,t,d) \le \min_i E(m_i,t,d) + \epsilon_E
+```
+
+且：
+
+```math
+H(C,t,d) \le \min_i H(m_i,t,d) + \epsilon_H
+```
+
+其中：
+
+```text
+C = component set（组件集合）；
+m_i = component（组件）；
+B = boundary class（边界类别）；
+T = target_equivalent（目标等价类）；
+I_Q = interaction quality gain（交互质量增益）；
+E = echo risk（回声风险）；
+H = harm risk（有害风险）。
+```
+
+交互质量增益仍然使用：
+
+```math
+I_Q(C,t,d)
+=
+Q(C,t,d)
+-
+\max_i Q(m_i,t,d)
+```
+
+自然协同审计使用组件在 donor prompt（供体提示）中的有符号读出支持：
+
+```math
+s_m(t,d)
+=
+\sum_{j \in S_m}
+\left(
+h^{donor}_{m,j}
+-
+h^{recipient}_{m,j}
+\right)
+r_{m,j}
+```
+
+其中：
+
+```text
+S_m = selected indices（被选中的维度）；
+h^{donor} = donor natural forward activation（供体自然前向激活）；
+h^{recipient} = recipient baseline activation（受体基线激活）；
+r_m = effective readout direction（有效读出方向）。
+```
+
+本阶段初始自然协同标准定义为：
+
+```math
+NaturalAllPositive(C,t,d)
+=
+1
+```
+
+当且仅当：
+
+```math
+\forall m \in C,\quad s_m(t,d) > 0
+```
+
+这个标准很严格。它只能证明“全部组件都沿目标读出方向正向推动”，不能覆盖“一个组件正向承载、另一个组件负向抑制或重写”的互补结构。
+
+### 三、测试设置
+
+三轮测试：
+
+```text
+smoke:
+  max_candidates = 1
+  case_scope = candidate
+  donors = natural_question
+
+main:
+  max_candidates = 2
+  case_scope = candidate_plus_holdout
+  donors = natural_question, object_only, natural_category
+
+confirm:
+  max_candidates = 2
+  case_scope = candidate_plus_holdout
+  donors = natural_question, object_only, natural_category, exact_choices
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+注意：
+
+```text
+1. qwen3 和 GLM4 在 Phase 839 confirm 中没有 strict target-positive interaction candidate；
+2. 因此 Phase 840 对它们写入 skip summary（跳过摘要），不加载模型；
+3. DS7B 有 2 个严格 pair candidate，因此只加载 DS7B；
+4. 加载时尝试 flash_attention_2，但本地缺少 FlashAttention2 包，自动回退到 sdpa；
+5. 全程 bf16，无量化。
+```
+
+### 四、候选提取结果
+
+Phase 840 从 Phase 839 confirm 中提取到 DS7B 的两个 pair candidate：
+
+```text
+1. p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16
+   +
+   p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16
+
+2. p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16
+   +
+   p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16
+```
+
+这两个候选的 Phase 839 seed rows（种子行）都集中在：
+
+```text
+case = p816_triangle_geometric_shape
+output = polygon
+donor = natural_question / object_only
+```
+
+qwen3 和 GLM4：
+
+```text
+strict_candidates = 0
+```
+
+### 五、confirm 轮结果
+
+confirm 轮跨模型摘要：
+
+```text
+qwen3:
+  skipped_model_load = true
+  reason = no strict Phase 839 target-positive interaction candidates
+
+GLM4:
+  skipped_model_load = true
+  reason = no strict Phase 839 target-positive interaction candidates
+
+DS7B:
+  rows = 80
+  candidates = 2
+  cases = 4
+  target_rows = 30
+  strict_positive_rows = 4
+  natural_supported_strict_rows = 0
+  minimal_sufficient_rows = 4
+  object_echo_rows = 24
+  format_echo_rows = 20
+  mean_quality = 0.0415
+  mean_echo_risk = 0.4250
+  mean_natural_positive_ratio = 0.3000
+```
+
+两个 DS7B pair 的记录一致：
+
+```text
+每个 pair:
+  rows = 16
+  target_rows = 7
+  strict_positive_rows = 2
+  natural_supported_strict_rows = 0
+  minimal_sufficient_rows = 2
+  mean_quality = 0.1524
+  mean_echo_risk = 0.3125
+  mean_natural_positive_ratio = 0.2812
+```
+
+严格正交互只出现在：
+
+```text
+case = p816_triangle_geometric_shape
+donor = natural_question / object_only
+output = polygon
+```
+
+具体 4 行：
+
+```text
+1. triangle + natural_question + pair1 -> polygon
+2. triangle + natural_question + pair2 -> polygon
+3. triangle + object_only + pair1 -> polygon
+4. triangle + object_only + pair2 -> polygon
+```
+
+所有 4 行：
+
+```text
+minimal_sufficient_candidate = true
+natural_supported_strict_interaction = false
+```
+
+### 六、关键细节：不是全正协同，而是有符号互补结构
+
+Phase 840 最重要的新发现不是“自然协同失败”这么简单，而是：
+
+```text
+严格成功行呈现 residual positive + MLP-channel negative 的互补符号结构。
+```
+
+natural_question 中：
+
+```text
+layer_residual selected_signed_sum = +0.3159
+mlp_channel_group selected_signed_sum = -6.0559
+natural_positive_component_ratio = 0.5
+natural_all_selected_positive = false
+```
+
+object_only 中：
+
+```text
+layer_residual selected_signed_sum = +2.1080
+mlp_channel_group selected_signed_sum = -0.2604
+natural_positive_component_ratio = 0.5
+natural_all_selected_positive = false
+```
+
+这说明 Phase 840 不能简单得出：
+
+```text
+自然机制不存在。
+```
+
+更准确的判断是：
+
+```text
+当前 all-positive co-activation（全正协同激活）标准太窄；
+严格成功 pair 更像是 signed complementary gear（有符号互补齿轮）：
+
+residual 负责正向承载 / 读出推动；
+MLP channel group 可能负责负向抑制 / 重写 / 阻塞者调整。
+```
+
+因此：
+
+```text
+natural_supported_strict_rows = 0
+```
+
+只能说明：
+
+```text
+没有通过“全组件正向激活”的自然协同标准。
+```
+
+不能说明：
+
+```text
+没有自然有符号互补机制。
+```
+
+### 七、跨 case 结果
+
+对 DS7B 的两个严格 pair candidate 进行 candidate_plus_holdout 测试后：
+
+```text
+p816_triangle_geometric_shape:
+  target_equivalent = 6
+  object_echo = 2
+
+p816_gold_precious_metal:
+  target_equivalent = 8
+
+p816_oxygen_chemical_element:
+  unknown_other = 4
+  object_echo = 4
+
+p816_doctor_medical_worker:
+  format_echo = 8
+```
+
+解释：
+
+```text
+1. gold -> precious metal 出现 target_equivalent，但不是 strict_positive_interaction；
+   原因是组合没有明显超过最佳单组件，不能证明交互边复用。
+
+2. oxygen -> chemical element 没有闭合；
+   输出仍然落在 Oxygen is a gas / O2 等 property route（属性路线）或 object echo（对象回声）。
+
+3. doctor -> medical worker 触发 format_echo；
+   说明这条 DS7B L27 局部边不具有跨域稳定性。
+```
+
+因此，本阶段没有证明：
+
+```text
+triangle -> polygon 的局部交互边是全局语义齿轮。
+```
+
+### 八、对 Phase 839 附件判断的校正
+
+附件中说 Phase 839 是实质进展，这一点正确。
+
+但 Phase 840 进一步收紧后，需要加入三个边界：
+
+```text
+1. DS7B 的 strict interaction edge 只在 triangle -> polygon 的 natural_question/object_only 上稳定；
+2. 即使 pair 能复现 polygon，也没有通过 all-positive natural co-activation；
+3. 失败的原因不是完全没有自然结构，而可能是当前自然协同标准忽略了 signed complementary roles（有符号互补角色）。
+```
+
+换句话说，Phase 839 的“局部齿轮交互边存在”仍然成立；Phase 840 把它从：
+
+```text
+自然机制候选
+```
+
+暂时降级为：
+
+```text
+人工 patch 可达的有符号互补边候选。
+```
+
+### 九、理论进展
+
+Phase 840 对当前理论的改进是：
+
+```text
+不能把自然机制简单定义为所有组件都正向激活。
+```
+
+语言生成中的齿轮组合更可能是：
+
+```text
+positive carrier（正向承载器）
++
+negative suppressor / rewriter（负向抑制器 / 重写器）
++
+readout competition field（读出竞争场）
+```
+
+因此，统一公式需要从：
+
+```math
+NaturalUse(C,t)
+=
+\prod_{m \in C}
+\mathbf{1}[s_m(t)>0]
+```
+
+修改为：
+
+```math
+NaturalRoleUse(C,t)
+=
+\prod_{m \in C}
+\mathbf{1}
+\left[
+\operatorname{sign}(s_m(t))
+=
+\rho_m
+\right]
+```
+
+其中：
+
+```text
+\rho_m = role sign（角色符号）；
+\rho_m 可以是 +1，也可以是 -1；
++1 表示正向承载 / 读出推动；
+-1 表示抑制 / 重写 / 阻塞者调整。
+```
+
+更完整的闭合判据应变为：
+
+```math
+Closure(C,t)
+=
+\mathbf{1}
+\left[
+B(Patch(C,t)) = T
+\right]
+\cdot
+\mathbf{1}
+\left[
+I_Q(C,t) > \theta
+\right]
+\cdot
+\mathbf{1}
+\left[
+RolePattern(C,t) = \rho_C
+\right]
+\cdot
+\mathbf{1}
+\left[
+Ablation(C,t) \Rightarrow B(t) \ne T
+\right]
+```
+
+当前 Phase 840 只完成了前三项中的前两项，并对第三项发现了新的符号结构线索；还没有完成 ablation（消融）验证。
+
+### 十、问题和硬伤
+
+当前硬伤：
+
+```text
+1. 当前 p816 数据集中只有一个几何 case，无法真正测试 triangle -> polygon 边是否复用于 square / rectangle / circle；
+2. qwen3 和 GLM4 没有 Phase 839 严格候选，因此 Phase 840 没有对它们进行实际模型加载；
+3. natural co-activation 标准过窄，只识别全正协同，没有识别正负互补角色；
+4. DS7B 是小模型且为蒸馏模型，L27 局部边可能是粗糙压缩后的捷径，而不是大模型中的真实细粒度机制；
+5. 当前仍然是 patch restore（补丁恢复）证据，不是 natural ablation（自然消融）证据；
+6. gold 的 target_equivalent 不是 strict interaction，不能被当作跨域复用；
+7. oxygen 和 doctor 的失败说明这条边不是全局通用 category route（类别路线）。
+```
+
+### 十一、阶段进度评估
+
+本阶段对 global gear atlas 的进展是实质性的，但仍不闭合。
+
+估计进度：
+
+```text
+global gear atlas: 26% - 30%
+interaction edge atlas: 15% - 19%
+signed role decomposition: 6% - 10%
+minimal sufficient set: 8% - 12%
+natural mechanism validation: 4% - 7%
+token closure: 32% - 36%
+language encoding mechanism: 33% - 37%
+global neuron atlas: 12% - 16%
+```
+
+### 十二、下一阶段任务
+
+下一阶段仍属于同一个 global gear atlas（全局齿轮图谱）阶段，但目标必须从：
+
+```text
+co-activation audit（协同激活审计）
+```
+
+升级为：
+
+```text
+signed role interaction audit（有符号角色交互审计）
+```
+
+建议 Phase 841：
+
+```text
+signed complementary gear role validation
+（有符号互补齿轮角色验证）
+```
+
+最低任务：
+
+```text
+1. 不再要求所有组件 selected_signed_sum > 0；
+2. 为每个组件学习或归纳 role sign（角色符号）；
+3. 验证 strict rows 是否共享稳定的 role pattern；
+4. 对 MLP negative component 做 sign-flip / zero-out / selected-only ablation；
+5. 对 residual positive component 做同样 ablation；
+6. 如果负向 MLP 被移除后 polygon 消失，说明它不是反证，而是必要 suppressor / rewriter；
+7. 新增几何类 case：square, rectangle, circle, polygon 等，测试 triangle edge 是否真的复用；
+8. 对 oxygen 单独寻找 property route -> category route 的转换齿轮，不再套用 triangle edge。
+```
+
+阶段性结论：
+
+```text
+Phase 840 证明：
+DS7B 的 triangle -> polygon pair interaction 可以复现为严格目标正交互，
+但它不是全正自然协同；
+更像是 residual positive + MLP negative 的有符号互补齿轮。
+
+因此，当前研究继续接近语言编码机制，
+但必须从“找更多正向组件”转向“验证正负角色如何配合完成生成闭合”。
+```
+
+## Phase 841: 有符号互补齿轮角色验证 [2026-07-02 06:37]
+
+### 一、任务来源和总体判断
+
+本阶段复核上传的 Phase 840 分析。总体判断：附件内容基本正确，而且和 Phase 840 的 memo 记录一致。
+
+Phase 840 的关键结论不是：
+
+```text
+自然协同失败。
+```
+
+而是：
+
+```text
+all-positive co-activation（全正协同激活）标准失败；
+严格成功行呈现 residual positive + MLP-channel negative（残差正向 + MLP 通道负向）的有符号互补结构。
+```
+
+因此，Phase 841 继续属于 global gear atlas（全局齿轮图谱）阶段，不再扩大普通候选搜索，而是专门验证：
+
+```text
+负向 MLP channel group 是否真的是必要的 suppressor / rewriter（抑制器 / 重写器），
+还是只是 Phase 840 中偶然出现的负向读出符号。
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase841_signed_complementary_gear_role_validation.py
+tests/glm5/run_phase841_signed_complementary_gear_role_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase841_signed_complementary_gear_role_validation/
+```
+
+### 二、测试原理
+
+Phase 840 中，每个组件的自然 donor forward（供体自然前向）读出支持定义为：
+
+```math
+s_m(t,d)
+=
+\sum_{j \in S_m}
+\left(
+h^{donor}_{m,j}
+-
+h^{recipient}_{m,j}
+\right)
+r_{m,j}
+```
+
+Phase 841 根据 Phase 840 的 strict target-positive rows（严格目标正向行）归纳角色符号：
+
+```math
+\rho_m
+=
+\operatorname{sign}
+\left(
+\mathbb{E}_{(t,d)\in \mathcal{S}_{strict}}
+s_m(t,d)
+\right)
+```
+
+其中：
+
+```text
+\rho_m = role sign（角色符号）；
+\rho_m = +1 表示 positive carrier（正向承载器）；
+\rho_m = -1 表示 negative suppressor / rewriter（负向抑制器 / 重写器）。
+```
+
+然后对同一个 pair（双组件）做多种干预：
+
+```text
+pair_original: 原始双组件 patch；
+positive_only: 只保留正向角色组件；
+negative_only: 只保留负向角色组件；
+flip_positive: 翻转正向角色方向；
+flip_negative: 翻转负向角色方向；
+zero_positive: 正向角色 selected dims 置零；
+zero_negative: 负向角色 selected dims 置零；
+zero_all: 所有角色 selected dims 置零。
+```
+
+关键判据：
+
+```math
+RoleNeeded(m)
+=
+\mathbf{1}
+\left[
+B(Patch(C,t,d)) = T
+\right]
+\cdot
+\mathbf{1}
+\left[
+B(Perturb(C \setminus m,t,d)) \ne T
+\right]
+```
+
+更具体地：
+
+```text
+如果 pair_original 是 target_equivalent，
+而 positive_only 失败，
+说明被移除的 negative role 是必要的；
+
+如果 pair_original 是 target_equivalent，
+而 negative_only 失败，
+说明被移除的 positive role 是必要的；
+
+如果 flip_negative 失败，
+说明负向角色的方向本身重要；
+
+如果 zero_negative 不失败，
+说明“置零”不是等价于“移除 / 反向”，负向角色可能是方向性调制而不是简单数值幅度。
+```
+
+本阶段特别修正了一个口径问题：
+
+```text
+positive_only 失效表示“去掉负向 MLP 后失败”，应计入 negative_role_needed；
+negative_only 失效才表示“去掉正向 residual 后失败”，应计入 positive_role_needed。
+```
+
+### 三、测试设置
+
+三轮测试：
+
+```text
+smoke:
+  max_candidates = 1
+  case_scope = candidate
+  donor = natural_question
+  modes = pair_original, positive_only, negative_only, flip_negative, zero_negative
+
+main:
+  max_candidates = 2
+  case_scope = candidate
+  donors = natural_question, object_only
+  modes = pair_original, positive_only, negative_only, flip_positive, flip_negative, zero_positive, zero_negative
+
+confirm:
+  max_candidates = 2
+  case_scope = candidate_plus_holdout
+  donors = natural_question, object_only, natural_category, exact_choices
+  modes = pair_original, positive_only, negative_only, flip_positive, flip_negative, zero_positive, zero_negative, zero_all
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+执行情况：
+
+```text
+qwen3:
+  no Phase 840 strict role candidates，写入 skip summary，不加载模型；
+
+GLM4:
+  no Phase 840 strict role candidates，写入 skip summary，不加载模型；
+
+DS7B:
+  加载 bf16；
+  尝试 flash_attention_2，但本地缺包，自动回退 sdpa；
+  无量化；
+  三轮完成后释放 GPU。
+```
+
+### 四、角色符号归纳结果
+
+DS7B 从 Phase 840 strict rows 中归纳出 3 个角色：
+
+```text
+p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16
+  role = positive_carrier
+  mean_strict_selected_signed_sum = +1.2119
+  observations = 2
+
+p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16
+  role = positive_carrier
+  mean_strict_selected_signed_sum = +1.2119
+  observations = 2
+
+p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16
+  role = negative_suppressor_or_rewriter
+  mean_strict_selected_signed_sum = -3.1581
+  observations = 4
+```
+
+这验证了 Phase 840 的判断：
+
+```text
+strict target pair 不是两个组件全正；
+而是 residual positive + MLP-channel negative。
+```
+
+### 五、confirm 轮结果
+
+confirm 轮摘要：
+
+```text
+qwen3:
+  skipped_model_load = true
+  n_candidates = 0
+
+GLM4:
+  skipped_model_load = true
+  n_candidates = 0
+
+DS7B:
+  rows = 256
+  candidates = 2
+  roles = 3
+  cases = 4
+  pair_original_target_rows = 14
+  target_lost_vs_original_rows = 10
+  negative_role_needed_rows = 10
+  positive_role_needed_rows = 0
+  object_echo_rows = 66
+  format_echo_rows = 64
+```
+
+模式级结果：
+
+```text
+pair_original:
+  n = 32
+  target = 14
+
+positive_only:
+  n = 32
+  target = 8
+  lost_vs_original = 6
+  negative_role_needed = 6
+
+flip_negative:
+  n = 32
+  target = 10
+  lost_vs_original = 4
+  negative_role_needed = 4
+
+negative_only:
+  n = 32
+  target = 16
+  lost_vs_original = 0
+
+flip_positive:
+  n = 32
+  target = 16
+  lost_vs_original = 0
+
+zero_negative:
+  n = 32
+  target = 16
+  lost_vs_original = 0
+
+zero_positive:
+  n = 32
+  target = 14
+  lost_vs_original = 0
+
+zero_all:
+  n = 32
+  target = 16
+  lost_vs_original = 0
+```
+
+### 六、关键客观现象
+
+#### 1. 目标丢失全部指向负向 MLP 角色
+
+所有 target_lost_vs_original 行都发生在 triangle case（几何局部路线）中：
+
+```text
+triangle + natural_question + positive_only -> Triangle
+triangle + natural_question + flip_negative -> Triangle
+triangle + object_only + positive_only -> Triangle
+triangle + object_only + flip_negative -> Triangle
+triangle + exact_choices + positive_only -> Triangle
+```
+
+解释：
+
+```text
+positive_only 只保留 residual positive carrier；
+如果它从 polygon 退回 Triangle，说明被移除的 negative MLP role 是必要的。
+
+flip_negative 把负向 MLP 方向翻转；
+如果它从 polygon 退回 Triangle，说明负向方向本身有作用。
+```
+
+因此 Phase 841 的最强结果是：
+
+```text
+负向 MLP channel group 不是简单噪声；
+它在 triangle -> polygon 的局部闭合中具有方向性必要信号。
+```
+
+#### 2. 正向 residual 没有独立必要性信号
+
+confirm 中：
+
+```text
+positive_role_needed_rows = 0
+```
+
+同时：
+
+```text
+negative_only target_rows = 16
+flip_positive target_rows = 16
+```
+
+这说明：
+
+```text
+在当前 patch 设置下，仅负向 MLP role 就能产生或维持不少 target_equivalent 输出；
+正向 residual 更像辅助承载 / 对齐器，而不是严格必要齿轮。
+```
+
+注意：这不等于 residual 没有作用，因为：
+
+```text
+pair_original 的输出场、质量分、echo 风险仍然和 negative_only 不完全相同；
+但在当前目标边界下，residual 不是必要条件。
+```
+
+#### 3. zero_negative 没有破坏目标
+
+一个重要负结果：
+
+```text
+zero_negative target_rows = 16
+lost_vs_original = 0
+```
+
+这说明：
+
+```text
+负向 MLP 的必要性不是“把 selected dims 数值置零就会失败”；
+更像是方向性调制：
+  移除负向角色或翻转方向会退回 object_echo；
+  但置零可能形成另一条可达路径。
+```
+
+因此不能把机制简化为：
+
+```text
+某个负值越大越好。
+```
+
+更准确是：
+
+```text
+该 MLP channel group 改变了竞争场方向；
+不同 perturbation（扰动）对应不同路线，不是线性幅度消融。
+```
+
+#### 4. 跨 case 仍不稳定
+
+confirm 包含 4 个 case：
+
+```text
+p816_triangle_geometric_shape
+p816_gold_precious_metal
+p816_oxygen_chemical_element
+p816_doctor_medical_worker
+```
+
+结果：
+
+```text
+doctor 大量 format_echo；
+oxygen 仍落在 O2 / Oxygen is a gas；
+gold 可出现 target_equivalent，但没有提供 triangle edge 的严格角色闭合证据。
+```
+
+所以这条边仍然是：
+
+```text
+triangle / geometry 局部路线中的有符号角色候选。
+```
+
+不是：
+
+```text
+全局 category route（类别路线）。
+```
+
+### 七、对上传内容的判断
+
+上传内容中关于 Phase 840 的判断是正确的：
+
+```text
+Phase 840 是重要收紧阶段；
+不是新的全局闭合机制；
+关键发现是 all-positive 标准失败，但存在有符号互补结构；
+下一步应该验证 positive carrier + negative suppressor / rewriter 如何共同闭合。
+```
+
+Phase 841 在此基础上进一步推进：
+
+```text
+负向 MLP role 获得了更强证据：
+  positive_only 会丢失 polygon；
+  flip_negative 会丢失 polygon；
+  丢失后主要退回 Triangle object_echo。
+```
+
+同时也修正了一个理论边界：
+
+```text
+正向 residual 不是当前最强必要齿轮；
+负向 MLP channel group 更像是关键齿轮。
+```
+
+### 八、理论进展
+
+当前语言生成闭合不能写成简单的全正乘积：
+
+```math
+NaturalUse(C,t)
+=
+\prod_{m \in C}
+\mathbf{1}[s_m(t)>0]
+```
+
+应改写为有符号角色闭合：
+
+```math
+RoleClosure(C,t,d)
+=
+\mathbf{1}
+\left[
+B(Patch(C,t,d)) = T
+\right]
+\cdot
+\prod_{m \in C}
+\mathbf{1}
+\left[
+\operatorname{sign}(s_m(t,d)) = \rho_m
+\right]
+```
+
+其中：
+
+```text
+\rho_m = role sign（角色符号）
+```
+
+但 Phase 841 说明，还需要加入 perturbation necessity（扰动必要性）：
+
+```math
+RoleNecessary(m,C,t,d)
+=
+\mathbf{1}
+\left[
+B(Patch(C,t,d)) = T
+\right]
+\cdot
+\mathbf{1}
+\left[
+B(Perturb_m(C,t,d)) \ne T
+\right]
+```
+
+因此更接近当前证据的闭合公式是：
+
+```math
+SignedGearClosure(C,t,d)
+=
+\mathbf{1}
+\left[
+B(Patch(C,t,d)) = T
+\right]
+\cdot
+\mathbf{1}
+\left[
+I_Q(C,t,d) > \theta
+\right]
+\cdot
+\mathbf{1}
+\left[
+RolePattern(C,t,d) = \rho_C
+\right]
+\cdot
+\mathbf{1}
+\left[
+\exists m \in C,\ RoleNecessary(m,C,t,d)=1
+\right]
+```
+
+当前 Phase 841 对最后一项给出了正证据，但仍是人工 patch perturbation（补丁扰动）证据，不是自然无补丁消融证据。
+
+### 九、问题和硬伤
+
+当前硬伤：
+
+```text
+1. 负向 MLP 的必要性主要来自 positive_only 和 flip_negative；
+   zero_negative 没有破坏目标，说明机制不是简单幅度置零。
+
+2. negative_only 甚至比 pair_original 有更多 target rows；
+   说明 MLP channel group 可能本身就是强路线，residual 可能只是对齐或调节，而不是必要齿轮。
+
+3. 仍然没有自然 ablation；
+   目前只是 patch-mode perturbation。
+
+4. qwen3 / GLM4 无 Phase 840 strict role candidate，因此没有实际加载模型测试；
+   跨模型结论仍不足。
+
+5. 当前几何类样本太少；
+   triangle -> polygon 可能只是单点局部路线，不足以代表 geometry route。
+
+6. DS7B 是小模型且蒸馏模型；
+   负向 MLP 强路线可能是蒸馏压缩后的粗糙捷径。
+
+7. 输出边界仍依赖 target_equivalent 标准；
+   polygon 是 triangle 的可接受等价/具体类别，但是否等价于真正 “geometric shape” 语义路线，需要更多几何样本验证。
+```
+
+### 十、阶段进度评估
+
+Phase 841 是实质进展，因为它把 Phase 840 的“有符号互补线索”推进为 perturbation-level（扰动级）证据。
+
+估计进度：
+
+```text
+global gear atlas: 28% - 32%
+interaction edge atlas: 17% - 21%
+signed role decomposition: 10% - 15%
+minimal sufficient set: 9% - 13%
+natural mechanism validation: 5% - 8%
+token closure: 33% - 37%
+language encoding mechanism: 34% - 38%
+global neuron atlas: 13% - 17%
+```
+
+### 十一、下一阶段任务
+
+下一阶段仍属于 global gear atlas（全局齿轮图谱）阶段，但应该继续下钻负向 MLP 角色。
+
+建议 Phase 842：
+
+```text
+negative MLP gear mechanism decomposition
+（负向 MLP 齿轮机制拆解）
+```
+
+最低任务：
+
+```text
+1. 只围绕 DS7B 的 L27 mlp_topdiff_32:B16；
+2. 拆分 16 个 selected channels，做 channel-level leave-one-out；
+3. 测试哪些 channel 负责 polygon target，哪些 channel 负责 suppress Triangle object_echo；
+4. 对每个 channel 做 flip / zero / original 三种干预；
+5. 检查是否存在更小的 channel subset 可以复现 polygon；
+6. 新增几何样本 square / rectangle / circle / polygon，验证该 MLP 齿轮是否复用；
+7. 如果负向 MLP 子通道稳定控制 object_echo -> polygon 转换，再进入 natural ablation；
+8. 如果子通道不稳定，则把当前结果降级为 DS7B 局部捷径，而不是语言编码机制核心结构。
+```
+
+阶段性结论：
+
+```text
+Phase 841 证明：
+DS7B triangle -> polygon 的严格 pair 不是普通全正协同；
+目标丢失主要由负向 MLP role 被移除或翻转导致；
+负向 MLP channel group 是当前最值得下钻的关键齿轮。
+
+但该结论仍是小模型、局部几何路线、人工 patch perturbation 证据；
+还没有完成自然机制闭合，也不能外推为全局语言编码机制。
+```
+
+## Phase 842: 负向 MLP 齿轮通道级拆解 [2026-07-02 08:37]
+
+### 一、任务背景
+
+本阶段读取并分析了最新上传的 Phase 840 判断：
+
+```text
+Phase 840 没有发现新的全局闭合机制；
+但它把 Phase 839 的 strict target interaction edge
+推进到 natural donor forward coactivation 的检查；
+关键结论是 all-positive coactivation 失败，
+真正值得追踪的是 signed complementary structure。
+```
+
+这个判断基本正确，但需要结合当前 memo 中已经完成的 Phase 841 修正：
+
+```text
+Phase 841 已经证明：
+DS7B triangle -> polygon 的 strict pair
+不是普通全正协同；
+目标丢失主要发生在 negative MLP role 被移除或翻转时；
+因此下一步不应该继续找更大 patch，
+而应该拆解 negative MLP channel group 内部的齿轮结构。
+```
+
+因此本阶段继续同一阶段性目标：
+
+```text
+global gear atlas（全局齿轮图谱）
+-> signed role decomposition（有符号角色拆解）
+-> negative MLP gear channel decomposition（负向 MLP 齿轮通道级拆解）
+```
+
+### 二、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase842_negative_mlp_gear_channel_decomposition.py
+tests/glm5/run_phase842_negative_mlp_gear_channel_decomposition_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase842_negative_mlp_gear_channel_decomposition/smoke/
+tests/result/phase842_negative_mlp_gear_channel_decomposition/main/
+tests/result/phase842_negative_mlp_gear_channel_decomposition/confirm/
+```
+
+确认轮核心结果文件：
+
+```text
+tests/result/phase842_negative_mlp_gear_channel_decomposition/confirm/phase842_cross_model_summary.md
+tests/result/phase842_negative_mlp_gear_channel_decomposition/confirm/phase842_cross_model_summary.json
+tests/result/phase842_negative_mlp_gear_channel_decomposition/confirm/phase842_deepseek7b_summary.json
+tests/result/phase842_negative_mlp_gear_channel_decomposition/confirm/phase842_deepseek7b_rows.jsonl
+```
+
+### 三、测试对象
+
+本阶段只围绕 Phase 841 中唯一明确的 DS7B negative MLP role candidate：
+
+```text
+case: p816_triangle_geometric_shape
+component: L27:mlp_channel_group:mlp_topdiff_32:B16
+role: negative MLP role
+target route: triangle -> polygon / geometric shape
+```
+
+拆解的 16 个局部通道为：
+
+```text
+local indices:
+0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23
+
+global channel ids:
+1629, 2295, 12746, 14618,
+7899, 16847, 16257, 1645,
+1303, 6224, 3350, 2644,
+15305, 17523, 13970, 9305
+```
+
+供体提示：
+
+```text
+natural_question
+object_only
+natural_category
+exact_choices
+```
+
+### 四、测试原理
+
+Phase 841 只说明一个 MLP channel group 很重要，但 group 内可能有三种情况：
+
+```text
+1. 16 个通道共同形成分布式齿轮；
+2. 只有少数核心通道真正决定目标路线；
+3. 组内存在核心通道 + 辅助稳定通道。
+```
+
+因此本阶段对每个通道做四类干预：
+
+```text
+full_original:
+  使用完整 16-channel negative MLP group。
+
+single_original_j:
+  只使用第 j 个通道。
+
+leave_one_out_j:
+  使用完整 group，但移除第 j 个通道。
+
+flip_one_j:
+  使用完整 group，但把第 j 个通道方向翻转。
+
+zero_one_j:
+  使用完整 group，但把第 j 个通道置零。
+```
+
+基础公式：
+
+$$
+S = \{c_1, c_2, \ldots, c_{16}\}
+$$
+
+$$
+Y_{\mathrm{full}} = F(x; \mathrm{Patch}(S))
+$$
+
+$$
+Y_{\mathrm{single}}(c_j) = F(x; \mathrm{Patch}(\{c_j\}))
+$$
+
+$$
+Y_{\mathrm{loo}}(c_j) = F(x; \mathrm{Patch}(S \setminus \{c_j\}))
+$$
+
+$$
+Y_{\mathrm{flip}}(c_j) =
+F(x; \mathrm{Patch}(S \setminus \{c_j\}) + \mathrm{Patch}_{\alpha=-1}(\{c_j\}))
+$$
+
+$$
+Y_{\mathrm{zero}}(c_j) =
+F(x; \mathrm{Patch}(S \setminus \{c_j\}) + \mathrm{Patch}_{0}(\{c_j\}))
+$$
+
+核心通道的判定不是看单一指标，而是看组合证据：
+
+$$
+\mathrm{Core}(c_j)=1
+\quad \text{if} \quad
+\mathrm{Target}(Y_{\mathrm{single}}(c_j))
+\land
+\neg \mathrm{Target}(Y_{\mathrm{loo}}(c_j))
+\land
+\neg \mathrm{Target}(Y_{\mathrm{flip}}(c_j))
+$$
+
+其中：
+
+$$
+\mathrm{Target}(Y)=1
+$$
+
+表示输出属于 target_equivalent，包括：
+
+```text
+polygon
+geometric shape
+```
+
+但这仍是人工 patch 下的 target-equivalent 标准，不等价于自然语言机制闭合。
+
+### 五、三轮测试
+
+本阶段按三轮执行：
+
+```text
+第一轮 smoke：
+  只测试前 4 个通道，确认脚本和输出格式正常。
+
+第二轮 main：
+  测试 16 个通道，donor 使用 natural_question / object_only。
+
+第三轮 confirm：
+  测试 16 个通道，donor 扩展到 natural_question / object_only /
+  natural_category / exact_choices。
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+实际情况：
+
+```text
+qwen3:
+  未发现 Phase 841 negative MLP role candidate，因此跳过。
+
+GLM4:
+  未发现 Phase 841 negative MLP role candidate，因此跳过。
+
+DS7B:
+  完整执行 smoke / main / confirm。
+```
+
+注意：
+
+```text
+1. 本阶段没有使用量化。
+2. DS7B 使用 bfloat16。
+3. 尝试启用 flash attention，但本地未安装 FlashAttention2，实际 fallback 到 sdpa。
+4. 每轮按模型顺序执行，避免同时加载多个模型导致 GPU 内存溢出。
+```
+
+### 六、确认轮客观结果
+
+确认轮 cross-model summary：
+
+```text
+qwen3:
+  skipped = 1
+  negative components = 0
+  rows = 0
+
+GLM4:
+  skipped = 1
+  negative components = 0
+  rows = 0
+
+DS7B:
+  skipped = 0
+  negative components = 1
+  rows = 268
+  cases = 1
+  full-original target rows = 4
+  target lost vs full = 73
+  target gained vs full = 0
+  object_echo rows = 72
+  format_echo rows = 0
+```
+
+确认轮 mode-family summary：
+
+```text
+full:
+  n = 12
+  target = 9
+  lost vs full = 3
+  classes = {"object_echo": 3, "target_equivalent": 9}
+
+single_original:
+  n = 64
+  target = 4
+  lost vs full = 60
+  classes = {"object_echo": 60, "target_equivalent": 4}
+
+leave_one_out:
+  n = 64
+  target = 60
+  lost vs full = 4
+  classes = {"object_echo": 4, "target_equivalent": 60}
+
+flip_one:
+  n = 64
+  target = 59
+  lost vs full = 5
+  classes = {"object_echo": 4, "target_equivalent": 59, "unknown_other": 1}
+
+zero_one:
+  n = 64
+  target = 63
+  lost vs full = 1
+  classes = {"object_echo": 1, "target_equivalent": 63}
+```
+
+最关键的 channel record：
+
+```text
+local channel = 8
+global channel id = 7899
+
+single_target_rows = 4
+leave_one_out_loss_rows = 4
+flip_one_loss_rows = 4
+zero_one_loss_rows = 0
+mean_delta_quality_vs_full = -0.7426
+classes = {"object_echo": 7, "target_equivalent": 8, "unknown_other": 1}
+```
+
+次级候选：
+
+```text
+local channel = 23
+global channel id = 9305
+
+single_target_rows = 0
+leave_one_out_loss_rows = 0
+flip_one_loss_rows = 1
+zero_one_loss_rows = 0
+mean_delta_quality_vs_full = -0.4776
+
+local channel = 20
+global channel id = 15305
+
+single_target_rows = 0
+leave_one_out_loss_rows = 0
+flip_one_loss_rows = 0
+zero_one_loss_rows = 1
+mean_delta_quality_vs_full = -0.4789
+```
+
+### 七、关键客观现象
+
+现象 1：
+
+```text
+完整 negative MLP group 在 4 个 donor 下都能保持 target_equivalent 输出。
+```
+
+现象 2：
+
+```text
+single_original_8 在 4 个 donor 下全部输出 target_equivalent。
+```
+
+这说明：
+
+```text
+local channel 8 / global channel 7899
+单独就足以在当前人工 patch 条件下推动 triangle -> polygon。
+```
+
+现象 3：
+
+```text
+leave_one_out_8 在 4 个 donor 下全部丢失 target，
+输出退回 object_echo: Triangle。
+```
+
+这说明：
+
+```text
+channel 8 不是普通冗余通道；
+它对当前 group 的 target route 有必要性。
+```
+
+现象 4：
+
+```text
+flip_one_8 在 4 个 donor 下全部丢失 target。
+```
+
+其中：
+
+```text
+natural_question / object_only / natural_category -> Triangle
+exact_choices -> [Answer Here]
+```
+
+这说明：
+
+```text
+channel 8 的方向非常关键；
+它不是简单幅度贡献，而是带方向的路线齿轮。
+```
+
+现象 5：
+
+```text
+zero_one_8 没有造成 target loss。
+```
+
+这说明：
+
+```text
+当前机制不是“把 channel 8 幅度置零就失败”的简单模式；
+更像是方向性 patch 与 group 内其他通道之间存在补偿。
+```
+
+现象 6：
+
+```text
+绝大多数其他 single channel 都输出 Triangle，
+不能单独完成 polygon route。
+```
+
+这说明：
+
+```text
+Phase 841 的 negative MLP group 不是均匀分布式结构；
+它更接近 core channel + auxiliary channels。
+```
+
+### 八、对 Phase 840 判断的修正
+
+上传内容中 Phase 840 的主判断是正确的：
+
+```text
+不能把自然机制理解成 all-positive coactivation；
+signed complementary structure 更接近真实方向。
+```
+
+但 Phase 842 进一步收紧：
+
+```text
+signed complementary structure 不是只停留在
+residual positive + MLP negative 的组件级关系；
+在 MLP negative role 内部，
+至少存在一个强核心通道：
+local channel 8 / global channel 7899。
+```
+
+因此当前更准确的判断是：
+
+```text
+当前 DS7B triangle -> polygon 路线中，
+负向 MLP role 不是一个均匀 group；
+它包含一个可单独触发 target route、
+被移除/翻转后会破坏 target route 的核心齿轮通道。
+```
+
+### 九、理论进展
+
+本阶段不是 token closure，但解释力有提升。
+
+此前链条：
+
+```text
+strict pair interaction
+-> signed residual / MLP role
+-> negative MLP group
+```
+
+现在推进为：
+
+```text
+strict pair interaction
+-> signed residual / MLP role
+-> negative MLP group
+-> core channel inside negative MLP group
+```
+
+对应的机制图谱从：
+
+```text
+组件级齿轮图谱
+```
+
+推进到：
+
+```text
+组件内齿轮齿图谱
+```
+
+这个进展重要，因为它说明：
+
+```text
+局部失败不是只能用更大 patch 解释；
+至少在 DS7B 当前样本中，
+可以找到更小粒度的必要/充分候选。
+```
+
+### 十、问题和硬伤
+
+必须严格限制本阶段结论：
+
+```text
+1. 仍然是人工 patch 条件下的结果，
+   不是自然 forward 中的直接 ablation 结果。
+
+2. 只验证了 DS7B 的一个 case：
+   p816_triangle_geometric_shape。
+
+3. qwen3 / GLM4 没有 Phase 841 negative MLP candidate，
+   因此本阶段没有跨模型正结果。
+
+4. target_equivalent 包含 polygon / geometric shape，
+   这对 triangle -> geometric shape 合理，
+   但仍是评价规则，不是模型内部闭合证明。
+
+5. zero_one_8 不丢失 target，
+   说明 channel 8 的必要性依赖方向翻转/移除口径，
+   不能简单解释成“这个神经元幅度本身就是语义”。
+
+6. local channel 8 的 single success 可能是 DS7B 蒸馏小模型中的压缩捷径；
+   大模型中可能会分散到更多神经元或更多层。
+
+7. 当前没有证明 channel 8 在自然生成中必然被使用；
+   只能说明在 donor patch 条件下，它是强因果候选。
+
+8. 几何样本仍然太少；
+   triangle -> polygon 不能代表完整 geometry route。
+```
+
+### 十一、当前闭合距离
+
+本阶段对不同目标的进度估计：
+
+```text
+global gear atlas:
+  30% - 34%
+
+interaction edge atlas:
+  19% - 23%
+
+signed role decomposition:
+  14% - 18%
+
+component-internal gear decomposition:
+  6% - 10%
+
+minimal sufficient set:
+  11% - 15%
+
+natural mechanism validation:
+  5% - 8%
+
+token closure:
+  34% - 38%
+
+language encoding mechanism:
+  35% - 39%
+
+global neuron atlas:
+  14% - 18%
+```
+
+### 十二、下一阶段任务
+
+下一阶段仍属于同一个 global gear atlas 阶段，应继续自动推进到：
+
+```text
+Phase 843:
+core channel natural-route validation
+（核心通道自然路线验证）
+```
+
+最低任务：
+
+```text
+1. 围绕 DS7B local channel 8 / global channel 7899；
+2. 不只做 donor patch，而要检查 natural forward 中该 channel 的激活情况；
+3. 比较 triangle / square / rectangle / circle / polygon 等几何样本；
+4. 检查 channel 8 是否只在 triangle -> polygon 中有效，
+   还是对更广义 geometry route 有复用；
+5. 做 channel 8 的 natural activation suppression / replacement；
+6. 如果自然抑制 channel 8 导致 target route 失败，
+   才能从 patch-causal candidate 升级为 natural causal gear；
+7. 如果自然抑制无效，则将 channel 8 降级为 donor patch shortcut。
+```
+
+阶段性结论：
+
+```text
+Phase 842 证明：
+DS7B 的 negative MLP group 内部存在一个强核心通道
+local 8 / global 7899；
+它单独足以在 4 个 donor 下推动 polygon target；
+移除或翻转它会让输出退回 Triangle 或异常输出；
+但置零不破坏 target，说明机制不是简单幅度模型。
+
+因此当前最合理的下一步不是继续堆更大 patch，
+而是验证 channel 8 是否在自然 forward 中真实参与 geometry route。
+```
+
+## Phase 843: 核心通道自然路线验证 [2026-07-02 08:46]
+
+### 一、任务背景
+
+Phase 842 已经把 DS7B 的 negative MLP group 拆到通道级，并定位到一个强核心通道：
+
+```text
+model: DS7B
+layer: L27
+local channel index: 8
+global channel id: 7899
+
+Phase 842 证据：
+single_original_8 在 4 个 donor 下全部 target；
+leave_one_out_8 在 4 个 donor 下全部丢失 target；
+flip_one_8 在 4 个 donor 下全部丢失 target。
+```
+
+但是 Phase 842 仍然是 donor patch 条件下的结果。Phase 843 的目标是检查：
+
+```text
+channel 7899 是否在 natural forward 中也有可见轨迹？
+自然抑制 / 翻转这个通道，会不会改变 geometry route 的首 token 竞争？
+```
+
+这一步仍属于 global gear atlas（全局齿轮图谱）阶段，也属于 Phase 842 的自然延伸。
+
+### 二、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase843_core_channel_natural_route_validation.py
+tests/glm5/run_phase843_core_channel_natural_route_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase843_core_channel_natural_route_validation/smoke/
+tests/result/phase843_core_channel_natural_route_validation/main/
+tests/result/phase843_core_channel_natural_route_validation/confirm/
+```
+
+确认轮核心文件：
+
+```text
+tests/result/phase843_core_channel_natural_route_validation/confirm/phase843_cross_model_summary.md
+tests/result/phase843_core_channel_natural_route_validation/confirm/phase843_cross_model_summary.json
+tests/result/phase843_core_channel_natural_route_validation/confirm/phase843_deepseek7b_summary.json
+tests/result/phase843_core_channel_natural_route_validation/confirm/phase843_deepseek7b_rows.jsonl
+```
+
+验证：
+
+```text
+python -m py_compile tests/glm5/phase843_core_channel_natural_route_validation.py
+dry-run 通过；
+smoke / main / confirm 三轮完成；
+GPU 显存已释放。
+```
+
+### 三、测试对象
+
+核心通道来自 Phase 842 confirm：
+
+```text
+L27 MLP down input channel 7899
+local index in Phase 842 channel group: 8
+```
+
+跨模型情况：
+
+```text
+qwen3:
+  无 Phase 842 core channel candidate，跳过模型加载。
+
+GLM4:
+  无 Phase 842 core channel candidate，跳过模型加载。
+
+DS7B:
+  完整执行三轮测试。
+```
+
+注意：
+
+```text
+1. 未使用量化。
+2. DS7B 使用 bfloat16。
+3. 尝试 flash_attention_2，但本地未安装 FlashAttention2，实际 fallback 到 sdpa。
+4. 模型按 qwen3 -> GLM4 -> DS7B 顺序执行，避免 GPU 内存溢出。
+```
+
+### 四、测试原理
+
+Phase 843 不再只做 donor patch，而是在自然 forward 中捕获 L27 MLP down input 的 channel 7899。
+
+自然通道激活定义：
+
+$$
+a_c(x)=h^{\mathrm{mlp\_down\_input}}_{l,t,c}(x)
+$$
+
+其中：
+
+```text
+l = 27
+c = 7899
+t = answer position / last prompt token
+```
+
+自然编辑模式：
+
+$$
+a'_c(x)=a_c(x)
+$$
+
+$$
+a'_c(x)=0
+$$
+
+$$
+a'_c(x)=-a_c(x)
+$$
+
+$$
+a'_c(x)=0.5a_c(x)
+$$
+
+分别对应：
+
+```text
+original
+zero
+flip
+half
+```
+
+通道对 readout competition（读出竞争）的线性近似：
+
+$$
+G_c(y,z\mid x)
+=
+a_c(x)\cdot
+\left(W_U[y]-W_U[z]\right)^\top
+W_{\mathrm{down}}[:,c]
+$$
+
+其中：
+
+```text
+y = target token 或 polygon token
+z = object token 或 baseline token
+```
+
+自然编辑的目标变化：
+
+$$
+\Delta T_m(x)
+=
+\mathbb{1}[C(F_m(x))=\mathrm{target}]
+-
+\mathbb{1}[C(F_{\mathrm{original}}(x))=\mathrm{target}]
+$$
+
+这里的关键不是看某个 logit 是否升高，而是看输出边界分类是否改变：
+
+```text
+target_equivalent
+object_echo
+unknown_other
+```
+
+### 五、三轮测试设置
+
+smoke：
+
+```text
+case: triangle
+prompt: natural_question
+edit modes: original / zero / flip
+```
+
+main：
+
+```text
+case: triangle
+prompts: natural_question / object_only / natural_category / exact_choices
+edit modes: original / zero / flip / half
+```
+
+confirm：
+
+```text
+objects:
+  triangle / square / rectangle / circle / polygon
+
+prompts:
+  natural_question / object_only / natural_category
+
+edit modes:
+  original / zero / flip / half
+```
+
+注意：
+
+```text
+triangle 使用已有 p816 标准；
+square / rectangle / circle / polygon 是本阶段新增几何样本，
+边界分类更保守，只作为自然路线扩展观察，
+不能等价于已有标准闭合。
+```
+
+### 六、确认轮客观结果
+
+确认轮 cross-model summary：
+
+```text
+qwen3:
+  skipped = 1
+  rows = 0
+
+GLM4:
+  skipped = 1
+  rows = 0
+
+DS7B:
+  rows = 60
+  cases = 5
+  original target rows = 6
+  target rows = 28
+  target lost vs original = 1
+  target gained vs original = 5
+```
+
+DS7B mode summary：
+
+```text
+original:
+  n = 15
+  target = 6
+  object_echo = 2
+  unknown_other = 7
+  mean channel activation = -17.8292
+  mean target-minus-object logit = -0.8812
+
+zero:
+  n = 15
+  target = 7
+  target gained = 2
+  target lost = 1
+  object_echo = 3
+  unknown_other = 5
+  mean channel activation = -17.8292
+  mean target-minus-object logit = -0.7833
+
+flip:
+  n = 15
+  target = 8
+  target gained = 2
+  target lost = 0
+  object_echo = 3
+  unknown_other = 4
+  mean channel activation = -17.8292
+  mean target-minus-object logit = -0.6854
+
+half:
+  n = 15
+  target = 7
+  target gained = 1
+  target lost = 0
+  object_echo = 2
+  unknown_other = 6
+  mean channel activation = -17.8292
+  mean target-minus-object logit = -0.8427
+```
+
+DS7B object summary：
+
+```text
+triangle:
+  n = 12
+  target = 6
+  gained = 2
+  lost = 0
+  mean activation = -22.0000
+
+square:
+  n = 12
+  target = 7
+  gained = 3
+  lost = 0
+  mean activation = -14.1667
+
+rectangle:
+  n = 12
+  target = 4
+  gained = 0
+  lost = 0
+  object_echo = 6
+  mean activation = -19.4583
+
+circle:
+  n = 12
+  target = 3
+  gained = 0
+  lost = 1
+  mean activation = -10.3542
+
+polygon:
+  n = 12
+  target = 8
+  gained = 0
+  lost = 0
+  mean activation = -23.1667
+```
+
+关键转变样本：
+
+```text
+triangle / natural_question:
+  original -> "1" / unknown_other
+  zero -> "Polygon" / target_equivalent
+  flip -> "polygon" / target_equivalent
+
+square / natural_question:
+  original -> "1" / unknown_other
+  zero -> "Polygon" / target_equivalent
+  flip -> "polygon" / target_equivalent
+  half -> "Polygon" / target_equivalent
+
+circle / natural_category:
+  original -> "shape" / target_equivalent
+  zero -> "?" / unknown_other
+```
+
+### 七、关键客观现象
+
+现象 1：
+
+```text
+channel 7899 在 5 个几何对象、15 个 original rows 中平均激活为负。
+```
+
+这说明：
+
+```text
+Phase 842 中的 negative MLP core channel
+在 natural forward 中确实有稳定负向激活轨迹。
+```
+
+现象 2：
+
+```text
+zero / flip / half 并没有普遍破坏 target；
+相反，zero 和 flip 在 triangle / square 的 natural_question 中把 unknown_other 推到 target_equivalent。
+```
+
+这说明：
+
+```text
+channel 7899 不是简单 target generator；
+更像参与路线边界竞争的抑制/门控项。
+```
+
+现象 3：
+
+```text
+只有 1 个 target lost：
+circle / natural_category / zero
+从 shape 变成 ?。
+```
+
+这说明：
+
+```text
+channel 7899 在某些几何路线中仍有保护 target 的作用，
+但这个作用不是全局单向的。
+```
+
+现象 4：
+
+```text
+rectangle 中 object_echo 很强；
+自然编辑 channel 7899 不能清除 rectangle object_echo。
+```
+
+这说明：
+
+```text
+单个 core channel 不足以闭合完整 geometry route；
+不同几何对象的 object route / category route 竞争结构不同。
+```
+
+现象 5：
+
+```text
+polygon 自身的 target rows 最多，且编辑不改变整体边界。
+```
+
+这说明：
+
+```text
+当 object 本身就是 polygon 时，
+目标和对象在词表层高度重合；
+该样本不能简单当作 category abstraction 的强证据。
+```
+
+### 八、对 Phase 842 的修正
+
+Phase 842 的正确部分：
+
+```text
+在 donor patch 条件下，
+channel 7899 是 DS7B triangle -> polygon 路线的强核心通道。
+```
+
+Phase 843 的修正：
+
+```text
+在 natural forward 条件下，
+channel 7899 不表现为单纯“保 target”的通道；
+它更像一个带负激活的路线边界门控通道。
+```
+
+因此更准确的判断是：
+
+```text
+channel 7899 是 geometry route competition 中的重要齿轮齿；
+但它不是独立语言编码单元，
+也不是单点 token closure 的钥匙。
+```
+
+### 九、理论进展
+
+本阶段把研究从：
+
+```text
+patch 中哪个通道足以触发 target？
+```
+
+推进到：
+
+```text
+这个通道在自然 forward 中如何参与路线竞争？
+```
+
+这一步的理论价值是：
+
+```text
+donor patch sufficient channel
+不等于
+natural forward necessary channel。
+```
+
+因此当前齿轮图谱需要区分两类边：
+
+```text
+1. patch-causal edge:
+   人工 patch 条件下足以改变输出。
+
+2. natural-gating edge:
+   自然 forward 条件下参与路线边界调节。
+```
+
+当前 channel 7899 更接近：
+
+```text
+patch-causal core + natural-gating tooth
+```
+
+而不是：
+
+```text
+自然 target generator。
+```
+
+### 十、问题和硬伤
+
+当前硬伤：
+
+```text
+1. qwen3 / GLM4 没有 Phase 842 core channel candidate；
+   跨模型正结果仍然缺失。
+
+2. 新增几何样本没有完整人工审核标准；
+   square / rectangle / circle / polygon 只能作为扩展观察，
+   不能当作严格闭合标准。
+
+3. channel 7899 的自然编辑效果不单向；
+   既有 target gained，也有 target lost。
+
+4. target gained 主要集中在 natural_question 的格式失败样本；
+   可能部分反映 format route 被改变，而不一定是纯语义 route。
+
+5. rectangle object_echo 无法被单通道编辑清除；
+   说明完整 geometry route 至少需要多齿轮协同。
+
+6. polygon 样本存在 object = target-like 的混淆；
+   它不能证明 category abstraction。
+
+7. 本阶段只编辑 first-step 的 MLP down input；
+   还没有追踪多 token rollout 中 channel 7899 的持续作用。
+
+8. DS7B 是小模型 / 蒸馏模型；
+   该 channel 的强负激活可能是压缩后的粗糙门控，而不是大模型中的真实结构。
+```
+
+### 十一、闭合距离评估
+
+相比 Phase 842，本阶段主要提升 natural mechanism validation（自然机制验证）和 gear role taxonomy（齿轮角色分类）。
+
+估计进度：
+
+```text
+global gear atlas:
+  32% - 36%
+
+interaction edge atlas:
+  20% - 24%
+
+signed role decomposition:
+  16% - 20%
+
+component-internal gear decomposition:
+  8% - 12%
+
+natural mechanism validation:
+  7% - 10%
+
+geometry route atlas:
+  4% - 7%
+
+token closure:
+  34% - 38%
+
+language encoding mechanism:
+  35% - 39%
+
+global neuron atlas:
+  14% - 18%
+```
+
+### 十二、下一阶段任务
+
+下一阶段仍属于 global gear atlas，但任务应该从“单通道验证”转为“自然齿轮组合验证”。
+
+建议 Phase 844：
+
+```text
+geometry route natural gear set search
+（几何路线自然齿轮组搜索）
+```
+
+最低任务：
+
+```text
+1. 不再只盯 channel 7899；
+2. 以 triangle / square / rectangle / circle 为一组几何样本；
+3. 在 L27 附近搜索多个自然高响应 / 高读出耦合通道；
+4. 建立 geometry route 的 candidate gear set；
+5. 对 gear set 做 zero / flip / subset / leave-one-out；
+6. 检查是否能同时解释：
+   triangle -> polygon,
+   square -> polygon,
+   rectangle object_echo,
+   circle shape route；
+7. 如果单层不够，扩展到 L24-L30；
+8. 如果仍无法闭合，则说明 geometry route 是多层、多通道、多模板竞争系统。
+```
+
+阶段性结论：
+
+```text
+Phase 843 证明：
+channel 7899 不是 donor patch 中的偶然通道；
+它在自然 forward 的多个几何对象上有稳定负激活；
+自然编辑它会改变部分几何路线的输出边界。
+
+但它不是单点闭合钥匙；
+它更像 geometry route competition 中的负向门控齿轮齿。
+下一步必须搜索自然齿轮组，而不是继续把单通道神化。
+```
+
+## Phase 844: 几何路线自然齿轮组搜索 [2026-07-02 09:13]
+
+### 一、任务来源和判断
+
+本阶段读取并分析了最新上传内容，其中实际包含 Phase 842：负向 MLP 齿轮通道级拆解，以及 Phase 843：核心通道自然路线验证。
+
+对附件判断：
+
+```text
+总体正确。
+
+正确部分：
+1. Phase 842 的核心判断成立：
+   DS7B L27 negative MLP gear group 内部确实存在强候选通道，
+   其中 local 8 / global 7899 具有明显负向齿轮特征。
+
+2. Phase 843 的核心判断成立：
+   channel 7899 在自然 forward 中不是完全偶然的 patch 通道，
+   它在多种几何对象上存在稳定负激活，
+   但自然 zero / flip 不能单调闭合目标词。
+
+3. 两个阶段共同说明：
+   当前不应该继续把单个 channel 神化为 geometry route 的闭合钥匙，
+   而应该转向自然齿轮组搜索。
+
+需要收紧的地方：
+1. channel 7899 的证据强度仍然是 component-internal gear role，
+   不是完整 token closure。
+
+2. natural route evidence 证明其参与几何竞争，
+   但没有证明它是语义生成器。
+
+3. 负向通道很可能是门控齿轮、抑制齿轮或路线边界齿轮，
+   不能直接解释为“存储了几何语义”。
+```
+
+因此，本阶段继续执行同一阶段性目标：从 single-channel validation 转向 geometry route natural gear set search。
+
+### 二、本阶段脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase844_geometry_route_natural_gear_set_search.py
+tests/glm5/run_phase844_geometry_route_natural_gear_set_search_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase844_geometry_route_natural_gear_set_search/smoke/
+tests/result/phase844_geometry_route_natural_gear_set_search/main/
+tests/result/phase844_geometry_route_natural_gear_set_search/confirm/
+```
+
+本阶段按 qwen3 -> GLM4 -> DS7B 顺序执行。测试使用 bfloat16，不使用量化。脚本优先尝试 flash_attention_2；本机未安装 FlashAttention2 时自动回退 sdpa。每个模型测试结束后释放 GPU 显存，避免连续加载导致显存残留。
+
+DS7B 实际层数少于 qwen3 / GLM4，脚本已经增加 layer index 过滤。例如 confirm 轮的 L24-L30 会在 DS7B 上自动过滤为 L24-L27。
+
+### 三、测试原理
+
+本阶段不再寻找单个通道，而是在几何路线样本上寻找自然激活强、读出耦合强、符号稳定的 MLP down-input channel gear set。
+
+对象集合：
+
+```text
+triangle
+square
+rectangle
+circle
+polygon
+```
+
+提示类型：
+
+```text
+natural_question
+object_only
+natural_category
+```
+
+候选层：
+
+```text
+smoke:   L27
+main:    L26-L28
+confirm: L24-L30
+```
+
+核心量：
+
+```math
+a_{m,l,c}(x)=h^{\mathrm{mlp\_down\_input}}_{m,l,t,c}(x)
+```
+
+其中：
+
+```text
+m: 模型
+l: 层
+c: channel
+x: 输入样本
+t: 答案位置
+a: 该 channel 在自然 forward 中的激活
+```
+
+读出耦合：
+
+```math
+\rho_{m,l,c}(y,z)=
+\left(W_U[y]-W_U[z]\right)^\top W^{(m,l)}_{\mathrm{down}}[:,c]
+```
+
+其中：
+
+```text
+y: target token，例如 shape / polygon / geometric shape
+z: object token，例如 triangle / square / rectangle / circle
+\rho: 该 channel 经 W_down 后对 target-object 读出差的直接耦合
+```
+
+自然齿轮支持度：
+
+```math
+S_{m,l,c}(x)=
+\left|a_{m,l,c}(x)\right|
+\cdot
+\max_{y\in T(x),z\in O(x)}
+\left|\rho_{m,l,c}(y,z)\right|
+```
+
+带符号支持：
+
+```math
+\tilde{S}_{m,l,c}(x)=
+a_{m,l,c}(x)
+\cdot
+\rho_{m,l,c}(y^\*,z^\*)
+```
+
+候选齿轮评分：
+
+```math
+G_{m,l,c}=
+\mathrm{mean}_x(S_{m,l,c}(x))
+\cdot
+\log(1+n_{m,l,c})
+\cdot
+\mathrm{signConsistency}_{m,l,c}
+```
+
+其中：
+
+```text
+n: 该 channel 在样本中被命中的次数
+signConsistency: 激活符号一致性
+```
+
+干预方式：
+
+```math
+a'_{m,l,c}(x)=0
+```
+
+```math
+a'_{m,l,c}(x)=-a_{m,l,c}(x)
+```
+
+```math
+a'_{m,l,c}(x)=0.5a_{m,l,c}(x)
+```
+
+对齿轮集合：
+
+```math
+\mathcal{G}_k=
+\{(l_1,c_1),(l_2,c_2),\ldots,(l_k,c_k)\}
+```
+
+分别做：
+
+```text
+top1_zero / top1_flip / top1_half
+top4_zero / top4_flip / top4_half
+top8_zero / top8_flip / top8_half
+top12_zero / top12_flip / top12_half
+```
+
+评价标准不是只看 target logit，而是记录：
+
+```text
+1. target_equivalent 是否增加；
+2. target_equivalent 是否丢失；
+3. object_echo 是否增加；
+4. unknown_other 是否减少；
+5. target-object logit margin 是否变化；
+6. 输出是否只是 broad_near_miss，例如 Geometry；
+7. 是否跨对象、跨提示、跨模型复现。
+```
+
+### 四、三轮测试结果
+
+#### 1. Smoke 轮
+
+```text
+qwen3:
+  gears=4
+  rows=5
+  original_target_rows=0
+  target_rows=0
+  lost=0
+  gained=0
+
+GLM4:
+  gears=4
+  rows=5
+  original_target_rows=1
+  target_rows=4
+  lost=1
+  gained=0
+
+DS7B:
+  gears=4
+  rows=5
+  original_target_rows=0
+  target_rows=2
+  lost=0
+  gained=2
+```
+
+Smoke 轮主要验证脚本、数据生成和 hook 正常。DS7B 在 triangle 自然问题上出现 top4_zero / top4_flip 后从 unknown_other 进入 target_equivalent 的现象，说明齿轮组干预方向值得继续扩大。
+
+#### 2. Main 轮
+
+```text
+qwen3:
+  gears=8
+  rows=56
+  original_target_rows=2
+  target_rows=25
+  lost=0
+  gained=11
+
+GLM4:
+  gears=8
+  rows=56
+  original_target_rows=7
+  target_rows=48
+  lost=4
+  gained=3
+
+DS7B:
+  gears=8
+  rows=56
+  original_target_rows=4
+  target_rows=38
+  lost=0
+  gained=10
+```
+
+Main 轮的客观现象：
+
+```text
+1. qwen3 和 DS7B 中，齿轮组干预可以稳定增加 target_equivalent 行数；
+2. GLM4 本身原始 target 较高，干预既有 gain，也有 lost；
+3. 这说明齿轮组确实跨过了输出边界，但不同模型的路线边界方向不同；
+4. 这不是单点 closure，而是自然齿轮组对 geometry route competition 的边界扰动。
+```
+
+#### 3. Confirm 轮
+
+```text
+qwen3:
+  gears=12
+  rows=195
+  original_target_rows=2
+  target_rows=62
+  lost=0
+  gained=36
+
+GLM4:
+  gears=12
+  rows=195
+  original_target_rows=8
+  target_rows=104
+  lost=6
+  gained=6
+
+DS7B:
+  gears=12
+  rows=195
+  original_target_rows=6
+  target_rows=87
+  lost=11
+  gained=20
+```
+
+Confirm 轮最重要的客观结果：
+
+```text
+1. qwen3:
+   target_equivalent 从 original 2 行扩大到总计 62 行；
+   与 original 对比 gained=36，lost=0。
+
+2. GLM4:
+   target_equivalent 总计 104 行；
+   gained=6，lost=6。
+   说明它原始几何路线更强，但齿轮干预会打破部分已正确路线。
+
+3. DS7B:
+   target_equivalent 总计 87 行；
+   gained=20，lost=11。
+   说明齿轮组影响很强，但方向更不稳定，符合小模型 / 蒸馏模型路线粗糙的预期。
+```
+
+### 五、Confirm 轮核心齿轮
+
+qwen3 前六个齿轮：
+
+```text
+L29C1532  score=16.07  neg_ratio=0.00
+L30C2848  score=8.02   neg_ratio=1.00
+L30C1349  score=6.35   neg_ratio=0.92
+L27C2767  score=4.48   neg_ratio=1.00
+L29C4588  score=3.73   neg_ratio=1.00
+L30C5558  score=3.71   neg_ratio=1.00
+```
+
+GLM4 前六个齿轮：
+
+```text
+L28C2777   score=0.71  neg_ratio=0.00
+L30C6115   score=0.68  neg_ratio=0.00
+L26C6031   score=0.64  neg_ratio=0.00
+L28C8036   score=0.62  neg_ratio=0.13
+L29C10031  score=0.58  neg_ratio=0.00
+L27C10905  score=0.54  neg_ratio=1.00
+```
+
+DS7B 前六个齿轮：
+
+```text
+L27C15791  score=22.20  neg_ratio=1.00
+L27C1106   score=22.00  neg_ratio=1.00
+L27C15305  score=18.98  neg_ratio=1.00
+L25C4036   score=16.32  neg_ratio=0.00
+L27C13360  score=15.48  neg_ratio=0.00
+L27C2295   score=14.81  neg_ratio=1.00
+```
+
+观察：
+
+```text
+1. qwen3 和 DS7B 都出现强正负混合齿轮；
+2. DS7B 的齿轮支持度显著更大，且大量集中在 L27；
+3. GLM4 的齿轮分数整体更小，但 target rows 本身更高；
+4. 这提示不同模型内部路线形状不同：
+   qwen3 / DS7B 更容易被齿轮组推动过边界，
+   GLM4 更像已有较稳定 geometry route，因此干预既可能增强，也可能破坏。
+```
+
+### 六、关键进展
+
+本阶段不是最终闭合，但有实质进展：
+
+```text
+从：
+  single negative channel
+
+推进到：
+  multi-layer natural gear set
+
+从：
+  donor patch 中的局部有效通道
+
+推进到：
+  natural forward 中自然激活 + readout-coupling 的候选齿轮组
+
+从：
+  只看 target logit
+
+推进到：
+  target / object_echo / unknown / broad_near_miss 的边界分类
+```
+
+最重要的客观拼图：
+
+```text
+1. 几何路线不是单 channel 闭合；
+2. 几何路线存在自然高响应齿轮组；
+3. 齿轮组中有正齿轮和负齿轮；
+4. top1/top4/top8/top12 的干预效果不完全单调；
+5. 这说明路线不是简单加和，而是多齿轮竞争边界；
+6. qwen3 / GLM4 / DS7B 三模型都能找到可影响输出边界的候选齿轮；
+7. 但三模型齿轮位置和方向明显不同，说明小模型结构存在模型特异性。
+```
+
+### 七、问题和硬伤
+
+```text
+1. target_equivalent 标准仍然偏宽。
+   shape / polygon / geometric shape 都被归入 target_equivalent，
+   这适合做路线级分析，但不等于精确 token closure。
+
+2. broad_near_miss 仍然大量存在。
+   例如 Geometry 说明模型进入几何大域，
+   但没有进入目标类别闭合。
+
+3. 干预不是严格单调。
+   top12 不一定优于 top4，flip 不一定优于 zero，
+   说明齿轮之间有抵消、竞争和非线性门控。
+
+4. GLM4 和 DS7B 都出现 lost。
+   这说明部分齿轮不是单纯增强 target，
+   而是在改变路线边界。
+
+5. 当前算法仍然是自然激活 x 读出耦合的启发式。
+   它比单点 patch 更接近图谱，
+   但还没有真正得到齿轮之间的因果边。
+
+6. DS7B 是小模型 / 蒸馏模型。
+   其 L27 齿轮强度很高，可能是压缩后粗糙集中，
+   不能直接外推到更大模型。
+```
+
+### 八、理论进展
+
+本阶段对当前理论的改进是：
+
+```text
+语言生成不是单个语义向量被读出，
+而是多个自然齿轮集合在条件化残差轨迹上形成路线竞争。
+
+几何路线不是：
+  one channel -> one concept -> one token
+
+更接近：
+  gear set -> route boundary -> readout competition -> token / category output
+```
+
+当前更合理的机制表达为：
+
+```math
+r_{l+1}(x)
+=
+r_l(x)
++A_l(r_l(x))
++M_l(r_l(x))
+```
+
+其中 MLP 部分可拆成齿轮集合：
+
+```math
+M_l(r_l(x))
+=
+\sum_c a_{l,c}(x)W^{(l)}_{\mathrm{down}}[:,c]
+```
+
+在目标路线上，真正起作用的是齿轮集合的合成场：
+
+```math
+F_{\mathcal{G}}(x)
+=
+\sum_{(l,c)\in \mathcal{G}}
+a_{l,c}(x)W^{(l)}_{\mathrm{down}}[:,c]
+```
+
+输出边界由全词表竞争决定：
+
+```math
+y^\*(x)
+=
+\arg\max_y
+W_U[y]^\top r_L(x)
+```
+
+因此闭合标准不能只看：
+
+```math
+\Delta \mathrm{logit}(y_{\mathrm{target}})
+```
+
+而应该看目标集合相对竞争集合的边界：
+
+```math
+B(x)=
+\max_{y\in T(x)}
+W_U[y]^\top r_L(x)
+-
+\max_{z\in C(x)}
+W_U[z]^\top r_L(x)
+```
+
+其中：
+
+```text
+T(x): 目标等价集合，例如 shape / polygon / geometric shape
+C(x): 竞争集合，例如 object_echo / format / unknown / broad_near_miss
+```
+
+本阶段说明：
+
+```text
+齿轮组干预可以改变 B(x)，
+但还不能稳定、可预测、跨模型地把所有样本推入目标闭合区域。
+```
+
+### 九、闭合距离评估
+
+相比 Phase 843，本阶段明显提升了 natural gear-set atlas 的进度，但距离 token closure 仍有较大距离。
+
+估计进度：
+
+```text
+global gear atlas:
+  36% - 40%
+
+geometry route atlas:
+  10% - 14%
+
+natural gear-set discovery:
+  10% - 14%
+
+signed role decomposition:
+  18% - 22%
+
+interaction edge atlas:
+  21% - 25%
+
+route boundary model:
+  12% - 16%
+
+token closure:
+  35% - 39%
+
+language encoding mechanism:
+  36% - 40%
+
+global neuron atlas:
+  15% - 19%
+```
+
+谨慎结论：
+
+```text
+当前研究仍在提升解释力，
+不是单纯 patch 边际拟合。
+
+但如果下一步仍然只做 top-k channel search，
+会再次进入局部优化循环。
+
+真正下一步应该把齿轮组从“候选集合”推进到“齿轮之间的因果边和边界方程”。
+```
+
+### 十、下一阶段任务
+
+下一阶段仍属于同一阶段性目标：global gear atlas / geometry route atlas。
+
+建议 Phase 845：
+
+```text
+Phase 845: geometry gear interaction edge atlas
+（几何齿轮交互边图谱）
+```
+
+任务：
+
+```text
+1. 固定 Phase 844 发现的 qwen3 / GLM4 / DS7B top gear set；
+2. 不再只比较 top1/top4/top8/top12；
+3. 对齿轮集合做 pairwise / triplet interaction test；
+4. 区分 additive edge、synergy edge、antagonistic edge；
+5. 建立齿轮之间的有向或无向交互边；
+6. 对每条边记录：
+   gain / lost / object_echo / broad_near_miss / unknown 的变化；
+7. 对 triangle / square / rectangle / circle / polygon 分开建子图；
+8. 检查是否存在稳定复用的 geometry route interaction skeleton；
+9. 如果发现稳定骨架，再进入 boundary equation fitting；
+10. 如果没有稳定骨架，说明当前小模型的几何路线高度压缩且模型特异。
+```
+
+下一阶段的闭合标准不应是“某个通道提高了 target”，而应该是：
+
+```text
+1. 能找到稳定齿轮组；
+2. 能找到齿轮之间的稳定交互边；
+3. 能解释为什么 top4 有时优于 top12；
+4. 能解释为什么某些干预产生 gain，某些产生 lost；
+5. 能跨至少两个模型复现同类 interaction role；
+6. 能从交互图谱预测新样本的边界移动方向。
+```
+
+阶段性结论：
+
+```text
+Phase 844 证明：
+几何路线中确实存在自然齿轮组，
+它们在自然 forward 中有稳定激活和读出耦合，
+对 target_equivalent / object_echo / unknown 边界有可观影响。
+
+但 Phase 844 没有完成 token closure。
+当前最接近真实机制的图像是：
+多层正负齿轮集合通过非线性交互共同塑造 geometry route boundary。
+
+下一步必须从 gear set list 进入 gear interaction graph，
+否则只会继续在 top-k 通道搜索中循环。
+```
+
+## Phase 845: 几何齿轮交互边图谱 [2026-07-02 09:30]
+
+### 一、任务来源和阶段判断
+
+Phase 844 已经从单通道验证推进到自然齿轮组搜索，但仍然只得到 gear set list，还没有回答一个关键问题：
+
+```text
+这些齿轮之间是简单加和，
+还是存在协同、抵消、拮抗等非线性交互？
+```
+
+因此 Phase 845 继续属于当前 global gear atlas / geometry route atlas 阶段。它不是新开理论总结阶段，而是把 Phase 844 的 top gear set 继续下钻为 interaction edge atlas。
+
+本阶段执行了自动延续任务：
+
+```text
+Phase 844:
+  natural gear set search
+
+Phase 845:
+  geometry gear interaction edge atlas
+```
+
+下一步如果进入 boundary equation fitting，则已经从“测量齿轮交互边”进入“拟合边界方程和预测新样本”的新子阶段，因此本轮到 Phase 845 形成阶段性收束。
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase845_geometry_gear_interaction_edge_atlas.py
+tests/glm5/run_phase845_geometry_gear_interaction_edge_atlas_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase845_geometry_gear_interaction_edge_atlas/smoke/
+tests/result/phase845_geometry_gear_interaction_edge_atlas/main/
+tests/result/phase845_geometry_gear_interaction_edge_atlas/confirm/
+```
+
+执行说明：
+
+```text
+1. 复用 Phase 844 confirm 轮的 top gears；
+2. 不重新搜索候选齿轮；
+3. 对 top gear 做 single / pair / triplet 组合；
+4. 对每个组合执行 zero / flip；
+5. 逐模型执行 qwen3 -> GLM4 -> DS7B；
+6. bfloat16，不使用量化；
+7. 优先尝试 flash_attention_2，失败后自动回退 sdpa；
+8. 每个模型结束后释放 GPU 显存。
+```
+
+Smoke 初次执行时发现脚本有一处重复追加结果行的问题：
+
+```text
+预期单模型 21 行，
+实际产生 441 行。
+```
+
+原因是 `rows.extend(local_rows)` 缩进错误，导致 local_rows 被重复追加。该问题已修复，并重新执行 smoke / main / confirm。本阶段记录只使用修复后的结果。
+
+### 三、测试原理
+
+Phase 844 给出每个模型的 top gear：
+
+```text
+g_i=(l_i,c_i)
+```
+
+Phase 845 不再问单个齿轮是否有效，而是问齿轮组合是否满足近似加和。
+
+对每个样本 x，定义原始边界分数：
+
+```math
+B_0(x)
+=
+\max_{y\in T(x)} W_U[y]^\top r_L(x)
+-
+\max_{z\in C(x)} W_U[z]^\top r_L(x)
+```
+
+其中：
+
+```text
+T(x): target equivalent 集合，例如 shape / polygon / geometric shape
+C(x): 竞争集合，例如 object_echo / unknown / broad_near_miss
+```
+
+对齿轮集合 \(\mathcal{G}\) 进行某种干预 \(I\)，得到：
+
+```math
+B_{\mathcal{G},I}(x)
+=
+\max_{y\in T(x)} W_U[y]^\top r_L^{\mathcal{G},I}(x)
+-
+\max_{z\in C(x)} W_U[z]^\top r_L^{\mathcal{G},I}(x)
+```
+
+边界移动：
+
+```math
+\Delta_{\mathcal{G},I}(x)
+=
+B_{\mathcal{G},I}(x)-B_0(x)
+```
+
+如果齿轮之间完全加和，则 pair / triplet 的效果应该近似等于 single 效果之和：
+
+```math
+\widehat{\Delta}_{\mathcal{G},I}(x)
+=
+\sum_{g\in\mathcal{G}}
+\Delta_{\{g\},I}(x)
+```
+
+交互残差：
+
+```math
+R_{\mathcal{G},I}(x)
+=
+\Delta_{\mathcal{G},I}(x)
+-
+\widehat{\Delta}_{\mathcal{G},I}(x)
+```
+
+分类标准：
+
+```math
+R_{\mathcal{G},I}(x)>0.5
+\Rightarrow
+\mathrm{synergy}
+```
+
+```math
+R_{\mathcal{G},I}(x)<-0.5
+\Rightarrow
+\mathrm{antagonistic}
+```
+
+```math
+|R_{\mathcal{G},I}(x)|\le 0.5
+\Rightarrow
+\mathrm{additive}
+```
+
+本阶段同时记录：
+
+```text
+target_gained_vs_original
+target_lost_vs_original
+object_echo
+unknown_other
+broad_near_miss
+mean_margin_delta
+mean_interaction_residual
+```
+
+### 四、三轮测试结果
+
+#### 1. Smoke 轮
+
+```text
+qwen3:
+  gears=4
+  specs=21
+  rows=21
+  original_target_rows=0
+  target_rows=3
+  gained=3
+  lost=0
+  synergy=1
+  antagonistic=0
+  additive=11
+
+GLM4:
+  gears=4
+  specs=21
+  rows=21
+  original_target_rows=1
+  target_rows=21
+  gained=0
+  lost=0
+  synergy=0
+  antagonistic=0
+  additive=12
+
+DS7B:
+  gears=4
+  specs=21
+  rows=21
+  original_target_rows=0
+  target_rows=5
+  gained=5
+  lost=0
+  synergy=0
+  antagonistic=0
+  additive=12
+```
+
+Smoke 轮结论：
+
+```text
+脚本、组合生成、single / pair residual 计算正常。
+qwen3 和 DS7B 已出现从非目标到 target_equivalent 的边界移动。
+GLM4 原始目标较强，干预没有造成明显 gain/lost。
+```
+
+#### 2. Main 轮
+
+```text
+qwen3:
+  gears=6
+  specs=51
+  rows=408
+  original_target_rows=2
+  target_rows=164
+  gained=62
+  lost=0
+  synergy=17
+  antagonistic=15
+  additive=272
+
+GLM4:
+  gears=6
+  specs=51
+  rows=408
+  original_target_rows=7
+  target_rows=349
+  gained=20
+  lost=28
+  synergy=0
+  antagonistic=0
+  additive=304
+
+DS7B:
+  gears=6
+  specs=51
+  rows=408
+  original_target_rows=4
+  target_rows=269
+  gained=66
+  lost=1
+  synergy=3
+  antagonistic=0
+  additive=301
+```
+
+Main 轮结论：
+
+```text
+1. qwen3 明确出现非加和结构：
+   synergy 和 antagonistic 同时存在。
+
+2. GLM4 的齿轮组合更多表现为近似加和：
+   gain / lost 有变化，但 residual 没有超过当前阈值。
+
+3. DS7B 有大量 gained，少量 synergy，几乎没有 lost。
+
+4. 这说明三模型都能被齿轮组合改变路线边界，
+   但交互形状明显不同。
+```
+
+#### 3. Confirm 轮
+
+```text
+qwen3:
+  gears=6
+  specs=51
+  rows=765
+  original_target_rows=2
+  target_rows=185
+  gained=83
+  lost=0
+  synergy=19
+  antagonistic=15
+  additive=536
+
+GLM4:
+  gears=6
+  specs=51
+  rows=765
+  original_target_rows=8
+  target_rows=400
+  gained=20
+  lost=28
+  synergy=0
+  antagonistic=0
+  additive=570
+
+DS7B:
+  gears=6
+  specs=51
+  rows=765
+  original_target_rows=6
+  target_rows=378
+  gained=73
+  lost=1
+  synergy=3
+  antagonistic=0
+  additive=567
+```
+
+Confirm 轮结论：
+
+```text
+1. qwen3 的非加和结论被确认：
+   synergy=19，antagonistic=15。
+
+2. GLM4 的近似加和结论被确认：
+   additive=570，synergy=0，antagonistic=0。
+
+3. DS7B 的强边界推动 + 少量协同结论被确认：
+   gained=73，lost=1，synergy=3。
+
+4. 三模型均说明 Phase 844 的齿轮组不是无意义候选；
+   但不同模型的齿轮交互结构差异明显。
+```
+
+### 五、关键交互边
+
+qwen3 中最强非加和边主要集中在：
+
+```text
+L29C1532 + L27C2767
+L29C1532 + L30C2848 + L27C2767
+```
+
+Confirm 轮中：
+
+```text
+L29C1532 + L27C2767, flip:
+  synergy rows = 1
+  antagonistic rows = 6
+  mean residual = -0.9781
+  mean abs residual = 1.1865
+  gained = 2
+  lost = 0
+
+L29C1532 + L30C2848 + L27C2767, flip:
+  synergy rows = 2
+  antagonistic rows = 6
+  mean residual = -0.8771
+  mean abs residual = 1.2437
+  gained = 3
+  lost = 0
+```
+
+这说明 qwen3 中至少存在一类强拮抗 / 抵消边。重要的是，拮抗残差并不必然导致 target_lost；它可能表现为：
+
+```text
+边界 margin 下降，
+但输出仍留在 target_equivalent 或从 unknown 进入 target_equivalent。
+```
+
+GLM4 中没有超过阈值的 synergy / antagonistic：
+
+```text
+最大 edge mean abs residual 多数低于 0.1。
+```
+
+这说明 GLM4 的 Phase 844 top gears 在当前测试标准下更接近局部线性叠加。
+
+DS7B 中存在少量协同边：
+
+```text
+L27C13360 + L27C2295, flip:
+  synergy rows = 1
+  gained = 2
+
+L27C15791 + L27C1106 + L27C2295, flip:
+  synergy rows = 1
+  gained = 2
+
+L27C15791 + L27C2295, flip:
+  synergy rows = 1
+  gained = 2
+```
+
+DS7B 的整体 residual 较小，但 target gain 很多，说明它的 top gears 更像边界方向一致的粗糙推进器，而不是复杂拮抗网络。
+
+### 六、核心进展
+
+本阶段完成了一个重要推进：
+
+```text
+从：
+  gear set list
+
+推进到：
+  interaction edge atlas
+```
+
+新增核心拼图：
+
+```text
+1. 齿轮组不是简单 top-k 汇总；
+2. qwen3 中明确存在非加和交互；
+3. qwen3 同时存在 synergy 和 antagonistic；
+4. GLM4 更接近加和结构；
+5. DS7B 更像粗糙边界推进结构；
+6. pair / triplet 组合可以显著增加 target_equivalent；
+7. 但 pair / triplet 并不必然优于 single；
+8. top gear 的作用方向要通过 interaction residual 判断，不能只看单通道分数。
+```
+
+这解释了 Phase 844 中一个重要现象：
+
+```text
+为什么 top4 有时优于 top12？
+为什么 flip / zero / half 不单调？
+为什么某些强齿轮组合反而使 margin 下降？
+```
+
+答案很可能是：
+
+```text
+几何路线边界由多齿轮交互图谱决定，
+不是由单齿轮强度排序决定。
+```
+
+### 七、问题和硬伤
+
+```text
+1. 当前 interaction residual 只基于 target-object margin。
+   它没有完整覆盖全词表竞争场。
+
+2. residual 阈值 0.5 是工程阈值。
+   它适合初筛强边，但不是理论不变量。
+
+3. target_equivalent 仍然较宽。
+   shape / polygon / geometric shape 被合并后，有助于路线级分析，
+   但不能证明精确 token closure。
+
+4. triplet 只测试了有限组合。
+   当前不是完整组合爆破，不代表所有高阶交互都已发现。
+
+5. GLM4 的 near-additive 结果可能来自：
+   模型自身几何路线更稳定，
+   或者当前 Phase 844 top gear 对 GLM4 不是最合适的交互齿轮。
+
+6. DS7B 的强 gain 可能来自蒸馏小模型路线粗糙。
+   它支持“齿轮组影响边界”，但不能直接外推到大模型真实编码机制。
+
+7. 当前只验证几何子域。
+   还不能推广到 language-wide route graph。
+```
+
+### 八、智能理论和数学进展
+
+Phase 845 对理论的改进是：语言生成的局部机制不能只写成齿轮项的线性求和。
+
+更准确的形式应包含交互项：
+
+```math
+F_{\mathcal{G}}(x)
+=
+\sum_i F_{g_i}(x)
++
+\sum_{i<j} F_{g_i,g_j}^{\mathrm{int}}(x)
++
+\sum_{i<j<k} F_{g_i,g_j,g_k}^{\mathrm{int}}(x)
++\cdots
+```
+
+其中：
+
+```math
+F_{g_i}(x)
+=
+a_{g_i}(x)W_{\mathrm{down}}[:,g_i]
+```
+
+交互项不是额外人为假设，而是由深层非线性、残差竞争、读出边界共同造成：
+
+```math
+F_{g_i,g_j}^{\mathrm{int}}(x)
+\approx
+B_{g_i,g_j}(x)
+-
+B_{g_i}(x)
+-
+B_{g_j}(x)
++
+B_0(x)
+```
+
+当前路线边界可以写为：
+
+```math
+B(x)
+=
+\Phi
+\left(
+\sum_i F_{g_i}(x),
+\sum_{i<j}F_{g_i,g_j}^{\mathrm{int}}(x),
+C(x)
+\right)
+```
+
+其中：
+
+```text
+\Phi: 最终残差到全词表竞争边界的非线性映射
+C(x): prompt / object / format / route context
+```
+
+这说明当前理论从：
+
+```text
+条件化相对状态分解
+```
+
+推进为：
+
+```text
+条件化相对状态 + 齿轮交互边 + 输出竞争边界
+```
+
+也就是说，语言编码机制更像：
+
+```text
+多层齿轮图谱在上下文条件下形成动态相位边界，
+而不是单个概念向量被线性读出。
+```
+
+### 九、闭合距离评估
+
+相比 Phase 844，本阶段主要提升了 interaction edge atlas。
+
+估计进度：
+
+```text
+global gear atlas:
+  39% - 43%
+
+geometry route atlas:
+  14% - 18%
+
+natural gear-set discovery:
+  13% - 16%
+
+interaction edge atlas:
+  26% - 31%
+
+route boundary model:
+  16% - 20%
+
+signed role decomposition:
+  20% - 23%
+
+token closure:
+  36% - 40%
+
+language encoding mechanism:
+  38% - 42%
+
+global neuron atlas:
+  16% - 20%
+```
+
+谨慎判断：
+
+```text
+当前研究仍在提升解释力。
+Phase 845 不是普通 patch 提升局部拟合，
+因为它首次把 Phase 844 的齿轮集合拆成了交互残差图谱。
+
+但当前仍没有完成 token closure。
+它证明“齿轮交互边存在”，
+还没有证明“这些边可以预测任意新样本的生成闭合”。
+```
+
+### 十、下一阶段任务
+
+Phase 845 已经完成当前阶段性目标：
+
+```text
+single channel
+-> gear set
+-> interaction edge
+```
+
+下一阶段建议进入新子阶段：
+
+```text
+Phase 846: geometry boundary equation fitting
+（几何路线边界方程拟合）
+```
+
+任务：
+
+```text
+1. 固定 Phase 845 的 interaction edge；
+2. 不再继续盲目增加组合；
+3. 选出 qwen3 / DS7B 中稳定 gain 的边；
+4. 选出 qwen3 中稳定 antagonistic 的边；
+5. 用 single delta + pair residual + triplet residual 构建边界预测式；
+6. 用 holdout prompts / holdout objects 测试预测是否准确；
+7. 评价标准从“是否找到有用 patch”改为：
+   能否预测某个干预会让样本进入 target / object_echo / unknown 哪个区域；
+8. 如果预测失败，说明图谱仍缺少关键齿轮或上下文门控；
+9. 如果预测成功，说明 geometry route boundary 已经开始接近可计算机制。
+```
+
+阶段性结论：
+
+```text
+Phase 845 证明：
+几何齿轮不是简单并列组件，
+至少在 qwen3 中存在明确非加和交互；
+DS7B 有大量边界推进和少量协同；
+GLM4 更接近加和但仍有 gain/lost 边界替换。
+
+这一步把研究从“找齿轮”推进到“测齿轮之间的关系”。
+
+当前最关键的新拼图是：
+语言机制图谱必须包含 interaction edge，
+否则无法解释 top-k 齿轮组合的非单调现象。
+```
+
+## Phase 846: geometry boundary equation fitting（几何路线边界方程拟合） [2026-07-02 10:03]
+
+### 一、任务来源和对上传内容的判断
+
+本阶段读取并复核了最新上传内容中对 Phase 844 / Phase 845 的分析。
+
+总体判断：
+
+```text
+上传内容的大方向基本正确：
+Phase 844 把研究从单通道推进到自然齿轮集合；
+Phase 845 把自然齿轮集合继续推进到 pair / triplet interaction edge；
+下一步应该从“描述交互边”推进到“测试交互边是否可预测边界变化”。
+```
+
+但需要修正一点：
+
+```text
+上传内容中的多个数学公式发生了排版损坏。
+其中 R / F_int / S 等公式不能直接照抄，
+应按 Phase 844 / 845 脚本实际计算方式重新整理。
+```
+
+正确保留的核心判断是：
+
+```text
+1. Phase 844 证明自然齿轮集合可以明显影响几何路线边界；
+2. Phase 845 证明齿轮之间不是纯线性相加，至少 qwen3 存在明确非加和交互；
+3. 但 Phase 845 只是 interaction edge atlas，不是 boundary equation；
+4. 真正关键的问题变成：
+   interaction residual 是否能泛化预测新 object / prompt 下的边界变化？
+```
+
+因此本阶段继续完成：
+
+```text
+Phase 846: geometry boundary equation fitting
+```
+
+本阶段没有重新加载模型。
+原因是 Phase 845 已经完成 qwen3 / GLM4 / DS7B 的真实模型测试，本阶段目标是利用这些真实测试结果做方程拟合和留出验证。
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase846_geometry_boundary_equation_fitting.py
+tests/glm5/run_phase846_geometry_boundary_equation_fitting_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase846_geometry_boundary_equation_fitting/smoke/
+tests/result/phase846_geometry_boundary_equation_fitting/main/
+tests/result/phase846_geometry_boundary_equation_fitting/confirm/
+```
+
+输入数据来自：
+
+```text
+tests/result/phase845_geometry_gear_interaction_edge_atlas/{round}/phase845_{model}_rows.jsonl
+```
+
+三轮均完成：
+
+```text
+smoke:
+  qwen3 / GLM4 / DS7B
+
+main:
+  qwen3 / GLM4 / DS7B
+
+confirm:
+  qwen3 / GLM4 / DS7B
+```
+
+本阶段没有 GPU 占用，也没有重复模型生成。
+
+### 三、测试原理
+
+Phase 845 中每一行已有：
+
+```text
+original target-object margin
+干预后 target-object margin
+single / pair / triplet combo
+pair / triplet interaction_residual
+target_equivalent 是否出现
+```
+
+本阶段构造两个预测器：
+
+```text
+additive_only:
+  只使用单齿轮 delta 相加。
+
+interaction_equation:
+  单齿轮 delta 相加，再加上 Phase 845 学到的 pair / triplet residual。
+```
+
+然后做三类测试：
+
+```text
+in_sample:
+  在同一批样本中拟合和评估，只用于检查方程是否能描述已有结果。
+
+object_holdout:
+  留出一个 object，例如 triangle / square / circle，
+  用其它 object 拟合，再预测被留出的 object。
+
+prompt_holdout:
+  留出一个 prompt variant，
+  用其它 prompt variant 拟合，再预测被留出的 prompt。
+```
+
+评价目标有两类：
+
+```text
+1. margin delta 预测误差；
+2. target_equivalent / target_gain 边界分类。
+```
+
+### 四、数学公式
+
+设：
+
+```math
+B(x)
+=
+z_{\mathrm{target}}(x)
+-
+z_{\mathrm{object}}(x)
+```
+
+原始边界为：
+
+```math
+B_0(x)
+=
+z_{\mathrm{target}}^{0}(x)
+-
+z_{\mathrm{object}}^{0}(x)
+```
+
+单齿轮干预的边界变化为：
+
+```math
+\Delta_g(x)
+=
+B_g(x)-B_0(x)
+```
+
+齿轮集合 \(S\) 的真实边界变化为：
+
+```math
+\Delta_S(x)
+=
+B_S(x)-B_0(x)
+```
+
+纯加和预测为：
+
+```math
+\widehat{\Delta}_{\mathrm{add}}(S,x)
+=
+\sum_{g\in S}\overline{\Delta}_{g,m}^{\mathrm{train}}
+```
+
+其中 \(m\) 是 edit mode（zero / flip）。
+
+Phase 845 的交互残差定义为：
+
+```math
+R_S(x)
+=
+\Delta_S(x)
+-
+\sum_{g\in S}\Delta_g(x)
+```
+
+本阶段使用训练集平均残差：
+
+```math
+\overline{R}_{S,m}^{\mathrm{train}}
+=
+\frac{1}{|\mathcal{D}_{\mathrm{train}}|}
+\sum_{x\in \mathcal{D}_{\mathrm{train}}}
+R_S(x)
+```
+
+带交互项的预测式为：
+
+```math
+\widehat{\Delta}_{\mathrm{int}}(S,x)
+=
+\widehat{\Delta}_{\mathrm{add}}(S,x)
++
+\overline{R}_{S,m}^{\mathrm{train}}
+```
+
+边界分类使用训练集上拟合的阈值：
+
+```math
+\widehat{y}(S,x)
+=
+\mathbf{1}
+\left[
+B_0(x)+\widehat{\Delta}(S,x)
+\ge
+\tau
+\right]
+```
+
+这个公式不是最终语言编码公式，只是当前几何路线边界的工程近似。
+
+### 五、confirm 轮核心结果
+
+confirm 输入规模：
+
+```text
+每个模型：
+  source rows = 765
+  original rows = 15
+  single rows = 180
+  pair rows = 450
+  triplet rows = 120
+  prediction rows = 4500
+```
+
+#### qwen3
+
+```text
+object_holdout:
+  additive_only MAE = 0.9321
+  interaction_equation MAE = 0.9473
+  target accuracy = 0.5293 -> 0.5293
+  target F1 = 0.3225 -> 0.3250
+  gain F1 = 0.1833 -> 0.1877
+
+prompt_holdout:
+  additive_only MAE = 0.9134
+  interaction_equation MAE = 0.9209
+  target accuracy = 0.3973 -> 0.4027
+  target F1 = 0.1929 -> 0.1942
+  gain F1 = 0.0291 -> 0.0294
+```
+
+判断：
+
+```text
+qwen3 的交互边确实存在，
+但当前 residual 均值方程在 confirm 泛化中没有稳定提升，
+甚至在 margin MAE 上略微变差。
+```
+
+#### GLM4
+
+```text
+object_holdout:
+  additive_only MAE = 0.1623
+  interaction_equation MAE = 0.1624
+  target accuracy = 0.4800 -> 0.4813
+  target F1 = 0.5608 -> 0.5614
+
+prompt_holdout:
+  additive_only MAE = 0.1554
+  interaction_equation MAE = 0.1537
+  target accuracy = 0.4067 -> 0.4067
+  target F1 = 0.5340 -> 0.5350
+```
+
+判断：
+
+```text
+GLM4 基本接近 additive。
+interaction residual 对预测几乎没有实质贡献。
+```
+
+#### DS7B
+
+```text
+object_holdout:
+  additive_only MAE = 0.3201
+  interaction_equation MAE = 0.3179
+  target accuracy = 0.6627 -> 0.6627
+  target F1 = 0.6761 -> 0.6761
+
+prompt_holdout:
+  additive_only MAE = 0.2696
+  interaction_equation MAE = 0.2669
+  target accuracy = 0.6493 -> 0.6493
+  target F1 = 0.6700 -> 0.6700
+```
+
+判断：
+
+```text
+DS7B 的 interaction_equation 有稳定但很小的 margin MAE 改善。
+但边界分类几乎没有变化。
+这说明 residual 有弱预测信号，
+但还不是足以完成 route boundary closure 的主因。
+```
+
+### 六、本阶段客观结论
+
+Phase 846 的结果需要谨慎收紧：
+
+```text
+1. Phase 845 的 interaction edge 不是假的；
+2. 但用固定 residual 均值构造的边界方程，泛化预测能力很弱；
+3. qwen3 上，强交互存在，但残差跨 object / prompt 不稳定；
+4. GLM4 上，整体更接近加和结构；
+5. DS7B 上，有小幅稳定 MAE 改善，但不足以改变 target boundary；
+6. 当前还不能说 geometry route boundary equation 已经闭合；
+7. 只能说进入了“可预测方程雏形”的弱信号阶段。
+```
+
+最重要的负结果：
+
+```text
+single delta + pair/triplet residual mean
+不足以预测 holdout object / holdout prompt 的 target_equivalent 边界。
+```
+
+这说明 Phase 845 的交互边仍然缺少至少一种条件变量。
+
+### 七、硬伤和瓶颈
+
+```text
+1. 公式只使用 target-object margin，
+   没有完整覆盖全词表竞争场。
+
+2. target_equivalent 是生成文本分类，
+   不完全等价于 margin threshold。
+
+3. residual 用 combo/mode 平均值，
+   没有纳入 object / prompt / activation context。
+
+4. qwen3 的 residual 强但泛化弱，
+   说明强交互可能是条件依赖的，不是固定边。
+
+5. GLM4 / DS7B 的 strong interaction 类别太少，
+   分类准确率容易被 additive 类别占比抬高。
+
+6. 小模型内部路线可能更粗糙，
+   不能把 residual 弱泛化直接外推为大模型也弱。
+```
+
+### 八、理论进展
+
+本阶段把理论从：
+
+```text
+齿轮集合存在交互边
+```
+
+推进到：
+
+```text
+交互边必须进入可预测边界方程，
+但固定 residual 项不足以泛化。
+```
+
+因此更合理的公式应从：
+
+```math
+B(x)
+=
+\Phi
+\left(
+\sum_i F_{g_i}(x),
+\sum_{i<j}F_{g_i,g_j}^{\mathrm{int}}(x)
+\right)
+```
+
+升级为：
+
+```math
+B(x)
+=
+\Phi
+\left(
+\sum_i F_{g_i}(x),
+\sum_{i<j}G_c(x)F_{g_i,g_j}^{\mathrm{int}}(x),
+C(x)
+\right)
+```
+
+其中：
+
+```text
+G_c(x): 上下文门控项
+C(x): object / prompt / route / format 等条件状态
+```
+
+这意味着：
+
+```text
+interaction edge 可能不是静态边，
+而是被上下文门控激活或压低的动态边。
+```
+
+### 九、是否继续同阶段任务
+
+Phase 846 完成后，下一步直接问题是：
+
+```text
+为什么 residual equation 泛化弱？
+```
+
+这和 Phase 846 属于同一阶段：
+
+```text
+geometry boundary equation fitting
+```
+
+因此继续自动完成 Phase 847：
+
+```text
+context gated residual audit
+```
+
+---
+
+## Phase 847: context gated residual audit（上下文门控残差审计） [2026-07-02 10:06]
+
+### 一、任务
+
+Phase 846 表明：
+
+```text
+固定 interaction residual 均值不能稳定预测 holdout object / prompt。
+```
+
+本阶段继续追问：
+
+```text
+residual 是否主要由 object / prompt 上下文门控？
+```
+
+如果成立，说明 Phase 846 方程失败不是因为 interaction edge 不存在，而是因为缺少上下文门控项。
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase847_context_gated_residual_audit.py
+tests/glm5/run_phase847_context_gated_residual_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase847_context_gated_residual_audit/smoke/
+tests/result/phase847_context_gated_residual_audit/main/
+tests/result/phase847_context_gated_residual_audit/confirm/
+```
+
+同样没有重新加载模型，直接复用 Phase 845 的真实模型测试结果。
+
+### 三、测试原理
+
+只取 Phase 845 中 pair / triplet 且有 interaction_residual 的行。
+
+比较四种 residual 预测器：
+
+```text
+global_combo:
+  按 combo_type / edit_mode / combo_key 求 residual 均值。
+
+prompt_combo:
+  在 global_combo 基础上加入 prompt_variant 条件。
+
+object_combo:
+  在 global_combo 基础上加入 object 条件。
+
+object_prompt_combo:
+  同时加入 object 和 prompt_variant。
+```
+
+如果加入 object / prompt 后 residual 预测误差显著下降，说明 residual 有上下文门控特征。
+
+但需要注意：
+
+```text
+object_prompt_combo 在 confirm 中几乎是一行一个条件，
+in_sample 中可接近记忆，不代表泛化闭合。
+真正有意义的是 object_holdout / prompt_holdout。
+```
+
+### 四、数学公式
+
+Phase 845 residual：
+
+```math
+R_S(x)
+=
+\Delta_S(x)
+-
+\sum_{g\in S}\Delta_g(x)
+```
+
+静态 residual 均值：
+
+```math
+\overline{R}_{S,m}
+=
+\mathbb{E}_{x}
+\left[
+R_S(x)
+\right]
+```
+
+prompt 条件 residual：
+
+```math
+\overline{R}_{S,m,p}
+=
+\mathbb{E}_{x:p(x)=p}
+\left[
+R_S(x)
+\right]
+```
+
+object 条件 residual：
+
+```math
+\overline{R}_{S,m,o}
+=
+\mathbb{E}_{x:o(x)=o}
+\left[
+R_S(x)
+\right]
+```
+
+object + prompt 条件 residual：
+
+```math
+\overline{R}_{S,m,o,p}
+=
+\mathbb{E}_{x:o(x)=o,\ p(x)=p}
+\left[
+R_S(x)
+\right]
+```
+
+上下文门控强度可用条件均值相对全局均值的偏移估计：
+
+```math
+\Gamma_{\mathrm{object}}
+=
+\mathbb{E}_{S,m,o}
+\left[
+\left|
+\overline{R}_{S,m,o}
+-
+\overline{R}_{S,m}
+\right|
+\right]
+```
+
+```math
+\Gamma_{\mathrm{prompt}}
+=
+\mathbb{E}_{S,m,p}
+\left[
+\left|
+\overline{R}_{S,m,p}
+-
+\overline{R}_{S,m}
+\right|
+\right]
+```
+
+这不是理论不变量，只是当前数据中的门控强度估计。
+
+### 五、confirm 轮核心结果
+
+confirm residual 行数：
+
+```text
+每个模型：
+  residual rows = 570
+  pair rows = 450
+  triplet rows = 120
+```
+
+#### qwen3
+
+上下文偏移：
+
+```text
+prompt shift = 0.0747
+object shift = 0.1174
+object+prompt shift = 0.1613
+```
+
+in_sample：
+
+```text
+global_combo MAE = 0.1613
+prompt_combo MAE = 0.1384
+object_combo MAE = 0.1124
+object_prompt_combo MAE = 0.0000
+
+global class acc = 0.9351
+prompt class acc = 0.9526
+object class acc = 0.9526
+```
+
+holdout：
+
+```text
+object_holdout:
+  global_combo MAE = 0.1813
+  prompt_combo MAE = 0.1730
+  gain vs global = +0.0083
+
+prompt_holdout:
+  global_combo MAE = 0.1802
+  object_combo MAE = 0.1686
+  gain vs global = +0.0116
+```
+
+判断：
+
+```text
+qwen3 的 residual 明显存在上下文偏移。
+object 条件在 in_sample 中最强，
+在 prompt_holdout 中仍有一定泛化；
+prompt 条件在 object_holdout 中有小幅泛化。
+但提升幅度仍较小，不能支撑完整边界闭合。
+```
+
+#### GLM4
+
+上下文偏移：
+
+```text
+prompt shift = 0.0157
+object shift = 0.0255
+object+prompt shift = 0.0406
+```
+
+holdout：
+
+```text
+object_holdout:
+  global_combo MAE = 0.0447
+  prompt_combo MAE = 0.0486
+
+prompt_holdout:
+  global_combo MAE = 0.0438
+  object_combo MAE = 0.0487
+```
+
+判断：
+
+```text
+GLM4 的 residual 基本全是 additive 类。
+上下文条件在 in_sample 有轻微拟合能力，
+但 holdout 不提升，甚至略变差。
+```
+
+#### DS7B
+
+上下文偏移：
+
+```text
+prompt shift = 0.0215
+object shift = 0.0217
+object+prompt shift = 0.0403
+```
+
+holdout：
+
+```text
+object_holdout:
+  global_combo MAE = 0.0432
+  prompt_combo MAE = 0.0462
+
+prompt_holdout:
+  global_combo MAE = 0.0448
+  object_combo MAE = 0.0512
+```
+
+判断：
+
+```text
+DS7B 的 residual 大多数也是 additive。
+上下文条件 in_sample 有拟合能力，
+但 holdout 不提升。
+```
+
+### 六、本阶段客观结论
+
+Phase 847 的关键结果：
+
+```text
+1. qwen3 的 interaction residual 明显受 object / prompt 条件影响；
+2. 但这种条件影响只有很弱的 holdout 泛化；
+3. GLM4 / DS7B 的 residual 大多接近 additive，强交互类别很少；
+4. class accuracy 很高不能过度解读，因为 additive 类占绝大多数；
+5. 当前缺失的不是“是否存在齿轮交互”，而是“如何找到可泛化的上下文门控变量”。
+```
+
+这说明 Phase 846 的失败原因更明确：
+
+```text
+固定 residual 方程不够；
+object / prompt 条件能解释部分残差；
+但 object / prompt 仍然只是表层上下文变量，
+还没有触及模型内部真正的 route gate。
+```
+
+### 七、当前理论收紧
+
+当前更合理的边界公式是：
+
+```math
+B(x)
+=
+B_0(x)
++
+\sum_{g\in S}\Delta_g(x)
++
+\sum_{S_k\subseteq S}
+\alpha_k(x)R_{S_k}(x)
++
+\epsilon(x)
+```
+
+其中：
+
+```math
+\alpha_k(x)
+=
+\Psi_k
+\left(
+h_{\mathrm{route}}(x),
+h_{\mathrm{prompt}}(x),
+h_{\mathrm{object}}(x),
+h_{\mathrm{format}}(x)
+\right)
+```
+
+也就是说：
+
+```text
+交互边不是固定加法项；
+它更像被内部路线状态控制的动态门控项。
+```
+
+当前只用外部标签 object / prompt 近似 \(\alpha_k(x)\)，所以泛化弱是合理的。
+
+### 八、问题和硬伤
+
+```text
+1. object / prompt 是外部可读标签，不一定等于模型内部 gate。
+
+2. object_prompt_combo 在 in_sample 中接近记忆，不能当作泛化证据。
+
+3. strong interaction 类别数量少：
+   qwen3 有 synergy / antagonistic；
+   GLM4 confirm 全部为 additive；
+   DS7B confirm 只有少量 synergy。
+
+4. class accuracy 被 additive 类占比严重影响。
+   后续应更多使用 MAE / sign accuracy / strong-edge recall。
+
+5. 目前仍只在 geometry 子域，
+   不能说明全语言机制图谱已经成立。
+
+6. 当前模型是小模型，
+   小模型路线可能粗糙、压缩、蒸馏偏移，
+   所以 qwen3 / GLM4 / DS7B 差异不能直接解释为通用机制差异。
+```
+
+### 九、阶段性判断
+
+Phase 846 / 847 合起来完成了一个阶段性收束：
+
+```text
+Phase 845:
+  找到了 interaction edge。
+
+Phase 846:
+  测试 interaction edge 是否能进入可预测边界方程。
+
+Phase 847:
+  证明 residual 受上下文影响，但外部 object / prompt 条件不足以完成泛化闭合。
+```
+
+当前结论：
+
+```text
+研究仍然在提升解释力，
+不是单纯 patch 局部拟合。
+
+但从闭合标准看，
+仍未完成 geometry route boundary closure。
+```
+
+距离闭合还差：
+
+```text
+1. 找到内部 route gate；
+2. 用内部 gate 替代外部 object / prompt 标签；
+3. 在 holdout object / prompt 上稳定预测 residual；
+4. 从 margin delta 预测推进到全词表竞争场预测；
+5. 最后再回到 token closure。
+```
+
+### 十、下一阶段任务
+
+Phase 847 已经完成 Phase 846 的直接后续。
+
+下一步虽然仍服务于总目标，但已经是新的子阶段：
+
+```text
+Phase 848: internal route gate discovery
+（内部路线门控发现）
+```
+
+建议任务：
+
+```text
+1. 不再只用外部 object / prompt 标签解释 residual；
+2. 从 residual stream / MLP activation / attention route 中寻找 gate variable；
+3. 对 qwen3 优先做，因为 qwen3 residual 最强且上下文偏移最大；
+4. 目标不是继续提高 target logit，
+   而是找到能预测 residual sign / residual magnitude 的内部状态；
+5. 若内部 gate 能在 holdout object / prompt 泛化，
+   才说明 geometry route boundary equation 开始接近闭合。
+```
+
+当前阶段性结论：
+
+```text
+自然齿轮集合和 interaction edge 是真实拼图；
+但它们不是最终方程。
+当前缺失的核心拼图是 internal route gate。
+```
+
+## Phase 848: 内部路线门控发现 [2026-07-02 10:50]
+
+### 一、任务来源
+
+本阶段接续 Phase 846 / 847。
+
+上传内容对 Phase 846 / 847 的判断总体正确：
+
+```text
+Phase 846:
+  证明固定 residual mean 可以改善局部边界拟合，
+  但不能跨 object / prompt 稳定泛化。
+
+Phase 847:
+  证明 residual 受上下文影响，
+  但外部 object / prompt 标签仍不足以解释 residual。
+
+因此下一步不能继续只扩大外部标签，
+而应该寻找模型内部的 route gate。
+```
+
+需要修正的一点是：上传内容中的公式排版存在破损，部分符号不能直接引用为严格数学公式。
+但其核心判断是正确的：
+
+```text
+缺失项不是简单 residual 常数；
+缺失项更可能是随内部状态变化的 gate variable。
+```
+
+因此本阶段执行：
+
+```text
+Phase 848: internal route gate discovery
+（内部路线门控发现）
+```
+
+目标不是完成 token closure，也不是证明完整语言编码机制，
+而是先验证一个更小的问题：
+
+```text
+自然齿轮自身的内部激活形态，
+是否比固定 residual mean 更能解释 interaction residual。
+```
+
+### 二、测试文件和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase848_internal_route_gate_discovery.py
+tests/glm5/run_phase848_internal_route_gate_discovery_round.sh
+```
+
+结果位置：
+
+```text
+tests/result/phase848_internal_route_gate_discovery/smoke/
+tests/result/phase848_internal_route_gate_discovery/main/
+tests/result/phase848_internal_route_gate_discovery/confirm/
+```
+
+测试流程：
+
+```text
+1. 读取 Phase 845 的 pair / triplet residual rows；
+2. 读取 Phase 844 / 845 找到的 top geometry gears；
+3. 对每个模型重新捕获自然 prompt 下这些 gear 的 MLP down-input activation；
+4. 从内部激活中构造 gate feature；
+5. 比较外部标签 predictor 和内部 gate predictor 对 residual 的预测能力；
+6. 在 qwen3 / GLM4 / DS7B 上依次测试；
+7. 每个模型测试完成后释放 GPU。
+```
+
+执行轮次：
+
+```text
+第一轮 smoke:
+  验证脚本和数据链路。
+
+第二轮 main:
+  主要测试。
+
+第三轮 confirm:
+  重要结果确认。
+```
+
+加载方式：
+
+```text
+bf16；
+不使用量化；
+尝试开启 flash attention；
+当前环境缺少 flash_attn 时自动降级为 sdpa；
+模型按 qwen3 -> GLM4 -> DS7B 顺序逐个测试。
+```
+
+### 三、测试原理
+
+Phase 845 已经定义了齿轮组合的残差：
+
+$$
+R_S(x)=\Delta_S(x)-\sum_{g\in S}\Delta_g(x)
+$$
+
+其中：
+
+```text
+S:
+  一个 gear set，例如 pair 或 triplet。
+
+Delta_S(x):
+  同时干预 gear set 后的边界变化。
+
+Delta_g(x):
+  单独干预某个 gear 后的边界变化。
+
+R_S(x):
+  组合效应中无法被单齿轮线性相加解释的部分。
+```
+
+Phase 846 近似使用固定 residual mean：
+
+$$
+\hat R_S = \mathbb{E}_{train}[R_S]
+$$
+
+Phase 847 加入外部条件：
+
+$$
+\hat R_S(x)=\mathbb{E}_{train}[R_S \mid object(x), prompt\_type(x)]
+$$
+
+但外部标签不能稳定泛化。
+
+Phase 848 的核心假设是：
+
+$$
+R_S(x) \approx f(\kappa_S(x))
+$$
+
+其中内部 gate 不是外部 object / prompt 标签，而是自然前向传播中 gear 自身的激活形态。
+
+本阶段定义自然激活向量：
+
+$$
+a_S(x)=\left(a_{g_1}(x),a_{g_2}(x),\ldots,a_{g_k}(x)\right)
+$$
+
+符号模式：
+
+$$
+\sigma_S(x)=sign(a_S(x))
+$$
+
+强度：
+
+$$
+\rho_S(x)=\sum_{g\in S}|a_g(x)|
+$$
+
+负向激活数量：
+
+$$
+n^-_S(x)=\sum_{g\in S}\mathbf{1}[a_g(x)<0]
+$$
+
+内部 gate bucket：
+
+$$
+\kappa_S(x)=\left(\sigma_S(x),bucket(\rho_S(x)),n^-_S(x)\right)
+$$
+
+预测 residual：
+
+$$
+\hat R_S(x)=\mathbb{E}_{train}[R_S \mid combo(S),mode(S),\kappa_S(x)]
+$$
+
+更新后的边界方程为：
+
+$$
+\hat B_S(x)=B_0(x)+\sum_{g\in S}\Delta_g(x)+\hat R_S(x)
+$$
+
+本阶段评价的不是 token 是否闭合，而是：
+
+```text
+内部 gate predictor 是否能降低 residual MAE；
+内部 gate predictor 是否能提高 residual sign accuracy；
+内部 gate predictor 是否能提高 strong-edge recall / F1。
+```
+
+### 四、confirm 轮结果
+
+#### 1. qwen3
+
+confirm 数据：
+
+```text
+feature rows: 570
+unique prompts: 15
+residual class:
+  additive: 536
+  synergy: 19
+  antagonistic: 15
+
+sign patterns:
+  "+-": 200
+  "++": 58
+  "-+": 44
+  "--": 148
+  "+-+": 6
+  "+--": 26
+  "++-": 74
+  "+++": 14
+
+mean abs activation sum: 17.5632
+```
+
+object holdout：
+
+```text
+global_combo:
+  MAE = 0.1813
+  sign accuracy = 0.4491
+  strong F1 = 0.4688
+
+internal_count_combo:
+  MAE = 0.1757
+  sign accuracy = 0.5179
+  strong F1 = 0.4667
+
+internal_sign_combo:
+  MAE = 0.1763
+  sign accuracy = 0.5161
+  strong F1 = 0.4667
+
+internal_strength_combo:
+  MAE = 0.1706
+  sign accuracy = 0.5421
+  strong F1 = 0.4667
+
+prompt_combo:
+  MAE = 0.1730
+  sign accuracy = 0.4753
+  strong F1 = 0.5556
+```
+
+prompt holdout：
+
+```text
+global_combo:
+  MAE = 0.1802
+  sign accuracy = 0.4886
+  strong F1 = 0.4688
+
+internal_sign_combo:
+  MAE = 0.1815
+  sign accuracy = 0.5349
+  strong F1 = 0.4242
+
+internal_strength_combo:
+  MAE = 0.1797
+  sign accuracy = 0.5118
+  strong F1 = 0.4267
+
+object_combo:
+  MAE = 0.1686
+  sign accuracy = 0.5364
+  strong F1 = 0.4118
+```
+
+qwen3 结论：
+
+```text
+内部激活 gate 存在真实信号。
+
+在 object holdout 上：
+  internal_strength_combo 把 MAE 从 0.1813 降到 0.1706；
+  sign accuracy 从 0.4491 提高到 0.5421。
+
+但在 prompt holdout 上：
+  MAE 改善很弱；
+  strong F1 没有稳定提升。
+```
+
+因此 qwen3 支持：
+
+```text
+内部 gear activation shape 是 route gate 的候选信号。
+```
+
+但不支持：
+
+```text
+仅靠 top gear activation sign / strength 就能完成 residual closure。
+```
+
+#### 2. GLM4
+
+confirm 数据：
+
+```text
+feature rows: 570
+unique prompts: 15
+residual class:
+  additive: 570
+
+sign patterns:
+  "++": 278
+  "+-": 94
+  "-+": 70
+  "++-": 32
+  "+++": 80
+  "--": 8
+  "-+-": 2
+  "-++": 6
+
+mean abs activation sum: 5.2971
+```
+
+holdout 结果：
+
+```text
+object_holdout:
+  global_combo MAE = 0.0447
+  internal_sign_combo MAE = 0.0458
+  internal_strength_combo MAE = 0.0481
+
+prompt_holdout:
+  global_combo MAE = 0.0438
+  internal_sign_combo MAE = 0.0450
+  internal_strength_combo MAE = 0.0462
+```
+
+GLM4 结论：
+
+```text
+GLM4 在本阶段几乎全部为 additive。
+内部 gate predictor 没有改善 holdout residual。
+当前证据不支持 GLM4 存在与 qwen3 类似的强 interaction residual gate。
+```
+
+这可能有两种解释：
+
+```text
+1. GLM4 的 geometry route interaction 本来较弱；
+2. 当前 top gear / MLP activation 捕获方式没有命中 GLM4 的真实 gate。
+```
+
+不能直接断言 GLM4 没有内部门控机制。
+
+#### 3. DS7B
+
+confirm 数据：
+
+```text
+feature rows: 570
+unique prompts: 15
+residual class:
+  additive: 567
+  synergy: 3
+
+sign patterns:
+  "--": 212
+  "-+": 164
+  "++": 22
+  "+-": 52
+  "---": 68
+  "--+": 52
+
+mean abs activation sum: 157.7471
+```
+
+holdout 结果：
+
+```text
+object_holdout:
+  global_combo MAE = 0.0432
+  internal_sign_combo MAE = 0.0441
+  internal_strength_combo MAE = 0.0474
+
+prompt_holdout:
+  global_combo MAE = 0.0448
+  internal_sign_combo MAE = 0.0444
+  internal_strength_combo MAE = 0.0455
+```
+
+DS7B 结论：
+
+```text
+DS7B 只有极少量 synergy。
+internal_sign_combo 在 prompt holdout 上有极小改善，
+但幅度只有 0.0004 左右，不能视为稳定机制证据。
+```
+
+DS7B 更像是：
+
+```text
+当前 geometry gear set 下 interaction residual 很弱；
+或者蒸馏模型把 route gate 压缩成了更粗糙的结构。
+```
+
+### 五、阶段性正确结论
+
+本阶段的正确结论是：
+
+```text
+1. Phase 846 / 847 的问题定位正确：
+   固定 residual mean 和外部标签无法完成泛化闭合。
+
+2. qwen3 中存在内部激活形态信号：
+   gear activation sign / strength 能解释一部分 residual 变化。
+
+3. internal_strength 比单纯 sign 更接近 gate：
+   因为 object_holdout 中 internal_strength_combo 的 MAE 和 sign accuracy 都更好。
+
+4. 该信号目前是弱门控信号，不是完整门控变量：
+   strong F1 没有稳定提升；
+   prompt holdout 改善较弱。
+
+5. 跨模型并不一致：
+   qwen3 有信号；
+   GLM4 不支持；
+   DS7B 仅有极弱信号。
+```
+
+### 六、需要否定或收紧的结论
+
+不能说：
+
+```text
+已经找到 internal route gate；
+已经完成 geometry route boundary closure；
+已经找到语言编码机制；
+qwen3 结果可以直接推广到所有模型；
+GLM4 / DS7B 无信号就说明机制不存在。
+```
+
+更谨慎的表述是：
+
+```text
+Phase 848 找到了 qwen3 中一个可重复的内部 gate 候选信号；
+该信号可以改善 object holdout residual prediction；
+但还不足以解释 prompt holdout 和 strong interaction edge。
+```
+
+### 七、当前硬伤
+
+1. 当前只使用 top geometry gears 的 MLP down-input activation。
+
+```text
+这只是内部状态的一小部分。
+真正 gate 可能在：
+  residual stream；
+  attention route；
+  MLP output；
+  layernorm 后方向；
+  blocker field；
+  readout competition field。
+```
+
+2. additive 类占比过高。
+
+```text
+qwen3 confirm:
+  additive 536 / 570
+
+GLM4 confirm:
+  additive 570 / 570
+
+DS7B confirm:
+  additive 567 / 570
+```
+
+这会使 class accuracy 失真，
+必须更多看 MAE、sign accuracy、strong-edge F1。
+
+3. strong-edge recall 仍未被解决。
+
+```text
+qwen3 object_holdout:
+  internal_strength MAE 改善；
+  sign accuracy 改善；
+  strong F1 没有改善。
+```
+
+这说明当前 gate 特征能解释一般 residual，
+但还不能抓住最关键的强交互边。
+
+4. 跨模型不一致。
+
+```text
+qwen3:
+  有较明显 interaction residual gate 候选。
+
+GLM4:
+  本测试下近乎全 additive。
+
+DS7B:
+  interaction residual 很弱。
+```
+
+当前小模型结构可能粗糙或蒸馏偏移，
+所以不能把模型差异直接上升为通用语言机制差异。
+
+5. flash attention 未真正启用。
+
+```text
+本阶段尝试开启 flash attention；
+但当前环境缺少 flash_attn，
+实际降级为 sdpa。
+```
+
+这不影响结论方向，
+但后续大规模测试需要注意性能和显存风险。
+
+### 八、对当前理论的影响
+
+Phase 848 对理论有一个小但重要的推进：
+
+```text
+interaction residual 不是纯随机误差；
+它至少部分受内部 activation gate 调制。
+```
+
+因此边界方程应从：
+
+$$
+\hat B_S(x)=B_0(x)+\sum_{g\in S}\Delta_g(x)+\bar R_S
+$$
+
+推进为：
+
+$$
+\hat B_S(x)=B_0(x)+\sum_{g\in S}\Delta_g(x)+R_S(\kappa_S(x))
+$$
+
+其中：
+
+```text
+kappa_S(x):
+  不能只等同于 object / prompt；
+  必须来自模型内部状态。
+```
+
+但当前阶段还不能确定：
+
+```text
+\kappa_S(x) 的完整形式。
+```
+
+目前只知道：
+
+```text
+MLP gear activation sign / strength 是 kappa_S(x) 的一部分候选特征。
+```
+
+### 九、是否继续处于同一阶段
+
+Phase 848 与 Phase 846 / 847 属于同一条大链：
+
+```text
+geometry route boundary equation
+  -> residual context audit
+  -> internal route gate discovery
+```
+
+但 Phase 848 的直接目标已经完成：
+
+```text
+测试 top gear 内部激活是否能解释 residual。
+```
+
+结果是：
+
+```text
+有弱正结果，但未闭合。
+```
+
+下一步仍属于更大的 geometry route boundary closure 阶段，
+但已经是新的子任务：
+
+```text
+Phase 849:
+  residual-stream / blocker-field route gate expansion
+  （残差流 / 阻塞场路线门控扩展）
+```
+
+### 十、Phase 849 建议
+
+Phase 849 不应继续只扩大 top gear 数量。
+更合理的做法是同时加入三类内部 gate feature：
+
+```text
+1. residual stream direction gate
+   测量关键层 residual stream 在 target / blocker / geometry direction 上的投影。
+
+2. blocker field gate
+   测量 top blocker tokens 的 logit field 和 margin field。
+
+3. route competition gate
+   测量 target route 与 format / echo / generic route 的竞争强度。
+```
+
+候选公式：
+
+$$
+\kappa_S(x)=\left[
+\sigma_S(x),
+\rho_S(x),
+Proj_{target}(h_l(x)),
+Proj_{blocker}(h_l(x)),
+M_{target,blocker}(x)
+\right]
+$$
+
+其中：
+
+```text
+h_l(x):
+  第 l 层 residual stream。
+
+Proj_target:
+  指向目标词或目标方向的投影。
+
+Proj_blocker:
+  指向竞争词或阻塞方向的投影。
+
+M_target,blocker:
+  target 与 blocker 的 margin field。
+```
+
+Phase 849 的闭合标准应比 Phase 848 更严格：
+
+```text
+1. object_holdout 和 prompt_holdout 都要降低 MAE；
+2. sign accuracy 要同步提升；
+3. strong-edge F1 必须提升；
+4. 至少 qwen3 上稳定成立；
+5. 若 GLM4 / DS7B 仍无信号，需要记录为模型结构差异，而不是直接否定机制。
+```
+
+阶段性结论：
+
+```text
+Phase 848 已经证明：
+  internal route gate 的方向值得继续。
+
+但当前找到的是 gate 的影子，
+不是 gate 的完整形状。
+
+下一步必须从单一 gear activation，
+扩展到 residual stream + blocker field + route competition 的联合 gate。
+```
+
+## Phase 849: 残差流 / 阻塞场路线门控扩展 [2026-07-02 11:18]
+
+### 一、任务来源
+
+本阶段接续 Phase 848。
+
+上传内容对 Phase 848 的判断基本正确：
+
+```text
+Phase 848 不是 closure；
+但它证明 interaction residual 不是纯随机误差；
+qwen3 中至少存在由内部 activation pattern 调制的弱 gate 信号。
+```
+
+需要继续推进的关键点是：
+
+```text
+仅靠 top gear MLP down-input activation sign / strength 不够。
+下一步必须把 gate feature 扩展到：
+  residual stream；
+  blocker field；
+  route competition。
+```
+
+因此本阶段执行：
+
+```text
+Phase 849:
+Residual-stream / Blocker-field Route Gate Expansion
+（残差流 / 阻塞场路线门控扩展）
+```
+
+本阶段目标不是完成 token closure，
+而是验证：
+
+```text
+多源内部 gate feature 是否比 Phase 848 的 MLP-only gate 更能预测 interaction residual。
+```
+
+### 二、测试文件和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase849_residual_blocker_route_gate_expansion.py
+tests/glm5/run_phase849_residual_blocker_route_gate_expansion_round.sh
+```
+
+结果位置：
+
+```text
+tests/result/phase849_residual_blocker_route_gate_expansion/smoke/
+tests/result/phase849_residual_blocker_route_gate_expansion/main/
+tests/result/phase849_residual_blocker_route_gate_expansion/confirm/
+```
+
+测试轮次：
+
+```text
+smoke:
+  验证脚本和数据生成链路。
+
+main:
+  主要测试。
+
+confirm:
+  扩大到 15 个 prompt 的确认测试。
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16；
+不使用量化；
+尝试 flash attention；
+当前环境缺少 flash_attn，因此实际降级为 sdpa；
+每个模型测试完成后释放 GPU。
+```
+
+### 三、测试原理
+
+Phase 845 定义 interaction residual：
+
+$$
+R_S(x)=\Delta_S(x)-\sum_{g\in S}\Delta_g(x)
+$$
+
+Phase 848 的 gate feature 是：
+
+$$
+\kappa^{mlp}_S(x)=\left[\sigma_S(x),\rho_S(x),n^-_S(x)\right]
+$$
+
+其中：
+
+$$
+\sigma_S(x)=sign(a_S(x))
+$$
+
+$$
+\rho_S(x)=\sum_{g\in S}|a_g(x)|
+$$
+
+Phase 849 扩展为多源 gate：
+
+$$
+\kappa^{multi}_S(x)=
+\left[
+\sigma_S(x),
+\rho_S(x),
+P_{tb}(h_l(x)),
+P_{to}(h_l(x)),
+M_{tb}(x),
+E_{route}(x),
+B_{pressure}(x)
+\right]
+$$
+
+其中：
+
+```text
+P_tb(h_l):
+  residual stream 在 target - blocker 方向上的投影。
+
+P_to(h_l):
+  residual stream 在 target - object 方向上的投影。
+
+M_tb:
+  target 与 blocker 的 logit margin。
+
+E_route:
+  top1 route 与 target route 的竞争差距。
+
+B_pressure:
+  blocker logit 相对 target logit 的压力。
+```
+
+本阶段使用的预测器：
+
+```text
+global_combo:
+  只按 combo / mode 求 residual 均值。
+
+internal_strength_combo:
+  Phase 848 的 MLP activation sign + strength gate。
+
+residual_projection_combo:
+  使用 residual stream projection bucket。
+
+blocker_field_combo:
+  使用 target-blocker margin / object echo pressure / rank bucket。
+
+route_competition_combo:
+  使用 top1 role / route gap / top-k entropy。
+
+compact_joint_gate_combo:
+  使用 activation strength + residual projection + blocker margin。
+
+joint_gate_combo:
+  使用 activation sign / strength + residual projection + blocker margin + route gap。
+```
+
+所有预测器仍然使用基础条件均值：
+
+$$
+\hat R_S(x)=\mathbb{E}_{train}\left[R_S \mid combo(S),mode(S),\kappa_S(x)\right]
+$$
+
+评价指标：
+
+```text
+1. residual MAE；
+2. residual sign accuracy；
+3. strong-edge F1；
+4. object_holdout；
+5. prompt_holdout。
+```
+
+闭合标准不是 in-sample，而是 holdout。
+
+### 四、confirm 轮客观结果
+
+#### 1. qwen3
+
+confirm 数据：
+
+```text
+feature rows: 570
+unique prompts: 15
+
+residual class:
+  additive: 536
+  synergy: 19
+  antagonistic: 15
+
+top1 role:
+  blocker: 532
+  other: 38
+
+target rank bucket:
+  tail: 532
+  top100: 38
+
+mean target-blocker logit:
+  -12.7458
+
+mean blocker pressure:
+  12.7458
+
+mean residual target-blocker projection:
+  -6.1895
+```
+
+object_holdout：
+
+```text
+global_combo:
+  MAE = 0.1813
+  sign accuracy = 0.4491
+  strong F1 = 0.4688
+
+internal_strength_combo:
+  MAE = 0.1761
+  sign accuracy = 0.5344
+  strong F1 = 0.4688
+
+residual_projection_combo:
+  MAE = 0.1462
+  sign accuracy = 0.4919
+  strong F1 = 0.5556
+
+blocker_field_combo:
+  MAE = 0.1647
+  sign accuracy = 0.4936
+  strong F1 = 0.4333
+
+compact_joint_gate_combo:
+  MAE = 0.1396
+  sign accuracy = 0.5412
+  strong F1 = 0.5000
+
+joint_gate_combo:
+  MAE = 0.1377
+  sign accuracy = 0.5403
+  strong F1 = 0.5000
+```
+
+prompt_holdout：
+
+```text
+global_combo:
+  MAE = 0.1802
+  sign accuracy = 0.4886
+  strong F1 = 0.4688
+
+internal_strength_combo:
+  MAE = 0.1735
+  sign accuracy = 0.5127
+  strong F1 = 0.4507
+
+residual_projection_combo:
+  MAE = 0.1420
+  sign accuracy = 0.5383
+  strong F1 = 0.5429
+
+blocker_field_combo:
+  MAE = 0.1712
+  sign accuracy = 0.4810
+  strong F1 = 0.4333
+
+compact_joint_gate_combo:
+  MAE = 0.1732
+  sign accuracy = 0.5112
+  strong F1 = 0.5057
+
+joint_gate_combo:
+  MAE = 0.1733
+  sign accuracy = 0.5178
+  strong F1 = 0.5057
+```
+
+qwen3 结论：
+
+```text
+Phase 849 是 qwen3 上的实质正结果。
+
+residual_projection_combo 在 object_holdout 和 prompt_holdout 上都明显降低 MAE；
+并且 strong F1 从 0.4688 提升到：
+  object_holdout: 0.5556
+  prompt_holdout: 0.5429
+
+joint gate 在 object_holdout 上 MAE 最低：
+  0.1813 -> 0.1377
+```
+
+这说明：
+
+```text
+qwen3 的 interaction residual 不只受 MLP gear activation 调制；
+residual stream projection 是更强的 internal route gate 信号。
+```
+
+但仍需注意：
+
+```text
+joint_gate_combo 虽然 MAE 最好，
+但 strong F1 不如 residual_projection_combo。
+
+这说明更复杂的 joint gate 可能部分过拟合，
+而 residual stream projection 更接近可泛化门控变量。
+```
+
+#### 2. GLM4
+
+confirm 数据：
+
+```text
+feature rows: 570
+unique prompts: 15
+
+residual class:
+  additive: 570
+
+top1 role:
+  blocker: 570
+
+target rank bucket:
+  tail: 570
+
+mean target-blocker logit:
+  -8.2802
+
+mean blocker pressure:
+  8.2802
+
+mean residual target-blocker projection:
+  5.9103
+```
+
+object_holdout：
+
+```text
+global_combo:
+  MAE = 0.0447
+  sign accuracy = 0.4474
+
+internal_strength_combo:
+  MAE = 0.0475
+  sign accuracy = 0.4903
+
+residual_projection_combo:
+  MAE = 0.0551
+  sign accuracy = 0.4394
+
+blocker_field_combo:
+  MAE = 0.0534
+  sign accuracy = 0.4665
+
+joint_gate_combo:
+  MAE = 0.0550
+  sign accuracy = 0.4754
+```
+
+prompt_holdout：
+
+```text
+global_combo:
+  MAE = 0.0438
+  sign accuracy = 0.5175
+
+internal_strength_combo:
+  MAE = 0.0454
+  sign accuracy = 0.5431
+
+residual_projection_combo:
+  MAE = 0.0506
+  sign accuracy = 0.4560
+
+blocker_field_combo:
+  MAE = 0.0500
+  sign accuracy = 0.4842
+
+joint_gate_combo:
+  MAE = 0.0504
+  sign accuracy = 0.5070
+```
+
+GLM4 结论：
+
+```text
+GLM4 在 confirm 中仍然全部 additive。
+多源 gate feature 在 in-sample 上能拟合，
+但在 holdout 上普遍变差。
+```
+
+因此：
+
+```text
+Phase 849 没有在 GLM4 上找到可泛化 internal route gate。
+```
+
+谨慎解释：
+
+```text
+不能说 GLM4 没有 route gate；
+只能说当前 geometry gear set + residual/blocker feature 没有命中 GLM4 的 gate。
+```
+
+#### 3. DS7B
+
+confirm 数据：
+
+```text
+feature rows: 570
+unique prompts: 15
+
+residual class:
+  additive: 567
+  synergy: 3
+
+top1 role:
+  blocker: 532
+  other: 38
+
+target rank bucket:
+  tail: 570
+
+mean target-blocker logit:
+  -9.7000
+
+mean blocker pressure:
+  9.7000
+
+mean residual target-blocker projection:
+  133.5860
+```
+
+object_holdout：
+
+```text
+global_combo:
+  MAE = 0.0432
+  sign accuracy = 0.4482
+  strong F1 = 0.0000
+
+blocker_field_combo:
+  MAE = 0.0423
+  sign accuracy = 0.5785
+  strong F1 = 0.0000
+
+internal_strength_combo:
+  MAE = 0.0473
+  sign accuracy = 0.4583
+  strong F1 = 0.0000
+```
+
+prompt_holdout：
+
+```text
+global_combo:
+  MAE = 0.0448
+  sign accuracy = 0.4208
+  strong F1 = 0.0000
+
+blocker_field_combo:
+  MAE = 0.0423
+  sign accuracy = 0.5655
+  strong F1 = 0.0000
+
+internal_strength_combo:
+  MAE = 0.0457
+  sign accuracy = 0.4557
+  strong F1 = 0.0000
+```
+
+DS7B 结论：
+
+```text
+DS7B 的 blocker_field_combo 有弱正结果：
+  object_holdout MAE: 0.0432 -> 0.0423
+  prompt_holdout MAE: 0.0448 -> 0.0423
+  sign accuracy 明显提升。
+
+但 strong F1 仍为 0。
+```
+
+因此：
+
+```text
+DS7B 的 gate 更像 blocker-field / surface competition 信号，
+不是当前 residual projection 或 MLP activation gate。
+```
+
+### 五、main 与 confirm 的一致性
+
+main 轮中：
+
+```text
+qwen3:
+  residual_projection / joint gate 在 in-sample 强；
+  holdout 中 internal_strength 和 residual_projection 有部分改善；
+  route_competition 容易变差。
+
+GLM4:
+  in-sample 可拟合；
+  holdout 普遍变差。
+
+DS7B:
+  blocker_field 有弱信号；
+  strong-edge 仍不闭合。
+```
+
+confirm 轮基本复现：
+
+```text
+qwen3:
+  residual_projection 成为最稳定的泛化 gate。
+
+GLM4:
+  仍为负结果。
+
+DS7B:
+  blocker_field 弱正，strong-edge 仍失败。
+```
+
+### 六、阶段性正确结论
+
+本阶段的正确结论是：
+
+```text
+1. 上传内容判断正确：
+   Phase 848 的 gate 只是影子，必须扩展到 residual stream / blocker field。
+
+2. qwen3 上出现强于 Phase 848 的正结果：
+   residual stream projection 明显改善 object_holdout 和 prompt_holdout。
+
+3. qwen3 的 internal route gate 更接近 residual stream projection，
+   而不是单一 MLP gear activation。
+
+4. DS7B 的弱信号更接近 blocker field，
+   不是 residual projection。
+
+5. GLM4 当前仍没有可泛化 gate。
+
+6. route_competition_combo 在 qwen3 / GLM4 / DS7B 上常常变差，
+   说明当前 route competition 特征定义过粗。
+```
+
+### 七、不能得出的结论
+
+不能说：
+
+```text
+已经完成 geometry route boundary closure；
+已经找到完整 internal route gate；
+已经破解 language encoding mechanism；
+joint gate in-sample 指标高就代表机制正确；
+GLM4 没有 gate；
+DS7B 的 blocker signal 已经可以完成 closure。
+```
+
+更准确的判断是：
+
+```text
+Phase 849 找到了 qwen3 上更接近 gate 主体的 residual stream projection 信号；
+DS7B 出现 blocker-field 弱信号；
+GLM4 当前仍为负结果；
+整体仍未闭合。
+```
+
+### 八、问题和硬伤
+
+1. qwen3 虽然有正结果，但不是完整闭合。
+
+```text
+object_holdout:
+  joint gate MAE 最好；
+  residual projection strong F1 最好。
+
+prompt_holdout:
+  residual projection 最稳。
+
+这说明当前 gate feature 仍未统一。
+```
+
+2. route_competition 特征失败。
+
+```text
+route_competition_combo 在 qwen3 prompt_holdout 中：
+  MAE 从 0.1802 变为 0.2216；
+  strong F1 从 0.4688 降到 0.0769。
+```
+
+这说明当前 top1 role / route gap / top-k entropy 太粗，
+不能代表真正的 route competition。
+
+3. GLM4 仍然全部 additive。
+
+```text
+这可能是：
+  当前几何任务过简单；
+  GLM4 原始路线太强；
+  当前 gear set 没有命中 GLM4 交互边；
+  或 GLM4 的 gate 在其他组件中。
+```
+
+4. DS7B strong-edge 仍然为 0。
+
+```text
+DS7B 只有 3 个 synergy 样本；
+class imbalance 太严重；
+blocker_field 虽然改善 sign accuracy，
+但不能恢复 strong-edge recall。
+```
+
+5. 所有模型 top1 仍主要是 blocker。
+
+```text
+qwen3:
+  blocker 532 / 570
+
+GLM4:
+  blocker 570 / 570
+
+DS7B:
+  blocker 532 / 570
+```
+
+这说明输出竞争场仍被 blocker 控制，
+当前 gate 还只是解释 residual，
+没有真正完成输出场重排。
+
+6. 小模型偏差仍然必须保留。
+
+```text
+qwen3 / GLM4 / DS7B 可能存在结构压缩、蒸馏偏移、路线粗糙化；
+当前结果不能直接推断大模型或真实语言编码机制。
+```
+
+### 九、理论更新
+
+Phase 848 后，边界方程是：
+
+$$
+\hat B_S(x)=B_0(x)+\sum_{g\in S}\Delta_g(x)+R_S(\kappa^{mlp}_S(x))
+$$
+
+Phase 849 后，应更新为：
+
+$$
+\hat B_S(x)=B_0(x)+\sum_{g\in S}\Delta_g(x)+R_S(\kappa^{multi}_S(x))
+$$
+
+其中：
+
+$$
+\kappa^{multi}_S(x)=
+\left[
+\sigma_S(x),
+\rho_S(x),
+P_{tb}(h_l(x)),
+P_{to}(h_l(x)),
+M_{tb}(x),
+B_{pressure}(x)
+\right]
+$$
+
+但根据测试结果，应进一步收紧：
+
+```text
+qwen3:
+  P_tb(h_l) 和 P_to(h_l) 是最有效候选。
+
+DS7B:
+  M_tb / B_pressure 是弱候选。
+
+GLM4:
+  当前候选无效。
+```
+
+因此不能写成一个全模型统一公式，
+只能写成模型条件化版本：
+
+$$
+\kappa^{model}_S(x)=
+\begin{cases}
+\kappa^{residual}_S(x), & model=qwen3 \\
+\kappa^{blocker}_S(x), & model=DS7B \\
+unknown, & model=GLM4
+\end{cases}
+$$
+
+这不是理论倒退，而是更客观：
+
+```text
+同一抽象机制可能存在；
+但不同小模型中的可观测 gate 位置不同。
+```
+
+### 十、当前阶段性进展
+
+相对 Phase 848：
+
+```text
+Phase 848:
+  找到 qwen3 的 MLP activation gate 影子。
+
+Phase 849:
+  证明 qwen3 的 residual stream projection 更接近 gate 主体；
+  并且能同时改善 object_holdout / prompt_holdout；
+  strong-edge F1 也有提升。
+```
+
+这说明研究仍在提升解释力，
+不是单纯 patch 局部拟合。
+
+但边界仍然明确：
+
+```text
+还没有 full-vocabulary closure；
+还没有 token / span / rollout closure；
+还没有跨模型统一 gate；
+还没有解释 GLM4；
+还没有解决 DS7B strong-edge recall。
+```
+
+### 十一、是否继续处于同一阶段
+
+Phase 849 与 Phase 848 属于同一条大阶段：
+
+```text
+geometry route boundary closure
+  -> internal route gate discovery
+  -> residual / blocker gate expansion
+```
+
+本阶段已经完成 Phase 849 的直接目标：
+
+```text
+验证 residual stream / blocker field 是否比 MLP-only gate 更有效。
+```
+
+结果是：
+
+```text
+qwen3:
+  实质正结果。
+
+DS7B:
+  blocker-field 弱正结果。
+
+GLM4:
+  负结果。
+```
+
+下一步仍服务于同一个大方向，
+但已经是新的子任务：
+
+```text
+Phase 850:
+Strong-edge balanced route gate validation
+（强交互边均衡路线门控验证）
+```
+
+### 十二、Phase 850 建议
+
+Phase 849 暴露出一个新瓶颈：
+
+```text
+平均 residual MAE 可以改善；
+但 strong-edge recall 仍不稳定。
+```
+
+所以 Phase 850 不应继续用全部样本均匀训练，
+而应专门验证 strong-edge：
+
+```text
+1. 对 synergy / antagonistic / additive 做均衡抽样；
+2. 对 qwen3 使用 residual_projection gate；
+3. 对 DS7B 使用 blocker_field gate；
+4. 对 GLM4 改为寻找非几何或更困难对象，避免全 additive；
+5. 评价 strong-edge recall / precision / F1，而不是只看 MAE。
+```
+
+建议公式：
+
+$$
+Score_{strong}(S,x)=
+\lambda_1|R_S(x)|
++\lambda_2 sign(R_S(x))
++\lambda_3 BoundaryChange(S,x)
+$$
+
+下一阶段成功标准：
+
+```text
+最低标准：
+  qwen3 strong-edge F1 在 object_holdout 和 prompt_holdout 同时提升。
+
+中等标准：
+  qwen3 residual_projection gate 的 strong-edge recall 稳定超过 global_combo。
+
+高标准：
+  DS7B blocker_field gate 也能提升 strong-edge recall。
+
+更高标准：
+  找到 GLM4 的非 additive interaction 条件。
+```
+
+阶段性结论：
+
+```text
+Phase 849 把 gate 从 MLP activation 影子推进到了 residual stream / blocker field 的可检验结构。
+但它仍不是 closure。
+当前最接近 qwen3 语言路线门控的候选变量是 residual stream projection；
+DS7B 的候选变量更像 blocker field；
+GLM4 的 gate 仍未定位。
+```
+
+## Phase 850: 强交互边均衡路线门控验证与全局齿轮图谱修正 [2026-07-02 12:10]
+
+### 一、任务来源
+
+本阶段基于最新上传内容与 Phase 849 的完整结果继续推进。
+
+上传内容的总体判断基本正确：
+
+```text
+1. 历史研发记录不是分散实验，而是一条从局部 patch 逐步收紧到全局齿轮图谱的路线。
+2. Phase 849 的正结果不能只用平均 MAE 解释，必须单独检查 strong-edge。
+3. qwen3 的 residual_projection gate 是当前最值得继续验证的候选。
+4. DS7B 的 blocker_field gate 有弱信号，但泛化仍不清楚。
+5. GLM4 当前几乎全 additive，无法评价 strong-edge gate。
+```
+
+因此本阶段不再继续问：
+
+```text
+哪个组合能降低平均 residual MAE？
+```
+
+而是专门验证：
+
+```text
+哪些 gate 可以识别 synergy / antagonistic strong-edge？
+```
+
+### 二、执行内容
+
+新增脚本：
+
+```text
+tests/glm5/phase850_strong_edge_balanced_route_gate_validation.py
+tests/glm5/run_phase850_strong_edge_balanced_route_gate_validation_round.sh
+```
+
+输出目录：
+
+```text
+tests/result/phase850_strong_edge_balanced_route_gate_validation/
+```
+
+三轮测试：
+
+```text
+smoke:
+  使用 Phase 849 smoke 特征行，验证脚本和输出正常。
+
+main:
+  使用 Phase 849 main 特征行，进行主要验证。
+
+confirm:
+  使用 Phase 849 confirm 特征行，进行确认验证。
+```
+
+说明：
+
+```text
+本阶段没有重新加载模型，没有重新做 forward pass。
+它复用 Phase 849 已经由 qwen3 / GLM4 / DS7B 顺序生成的 feature rows。
+因此本阶段是评价口径和图谱结构验证，不是新的 GPU 前向测试。
+```
+
+编译与运行：
+
+```text
+python -m py_compile tests/glm5/phase850_strong_edge_balanced_route_gate_validation.py
+tests/glm5/run_phase850_strong_edge_balanced_route_gate_validation_round.sh smoke smoke
+tests/glm5/run_phase850_strong_edge_balanced_route_gate_validation_round.sh main main
+tests/glm5/run_phase850_strong_edge_balanced_route_gate_validation_round.sh confirm confirm
+```
+
+同时更新了全局齿轮图谱文档：
+
+```text
+research/MainAnalysis/20260701_01_全局齿轮图谱.md
+```
+
+新增内容包括：
+
+```text
+1. Phase 849-850 后的 strong-edge 证据层；
+2. 五类节点：state / route / gear / gate / boundary；
+3. 四类边：causal / interaction / transport / closure；
+4. 七级证据：L0 到 L7；
+5. Phase 851 的下一步任务定义。
+```
+
+### 三、测试原理
+
+Phase 849 的平均 residual 预测可以写成：
+
+$$
+\hat{R}_g(x)
+=
+E[R(x)\mid \kappa_g(x)]
+$$
+
+其中：
+
+```text
+R(x) = 实际残差交互
+\kappa_g(x) = 某种 gate key，例如 residual projection / blocker field
+```
+
+但平均残差不是本阶段核心。本阶段把样本划分成三类：
+
+$$
+c(x)
+=
+\begin{cases}
+\text{synergy}, & R(x) \ge \tau \\
+\text{antagonistic}, & R(x) \le -\tau \\
+\text{additive}, & |R(x)| < \tau
+\end{cases}
+$$
+
+其中：
+
+```text
+\tau = 0.5
+```
+
+强交互边定义为：
+
+$$
+s(x)
+=
+\mathbb{1}\left[c(x)\in\{\text{synergy},\text{antagonistic}\}\right]
+$$
+
+对每个 gate，统计同类 key 下的强边概率：
+
+$$
+P_{\text{strong}}(\kappa)
+=
+\frac{
+N_{\text{synergy}}(\kappa)+N_{\text{antagonistic}}(\kappa)+0.5
+}{
+N_{\text{total}}(\kappa)+1
+}
+$$
+
+然后在训练 split 内校准阈值：
+
+$$
+\theta_g
+=
+\arg\max_{\theta}
+F1_{\text{strong}}
+\left(
+s(x),
+\mathbb{1}[P_{\text{strong}}(\kappa_g(x))\ge \theta]
+\right)
+$$
+
+评价指标不再以 MAE 为主，而是：
+
+$$
+\left(
+Precision_{\text{strong}},
+Recall_{\text{strong}},
+F1_{\text{strong}},
+BalancedAccuracy,
+MacroF1
+\right)
+$$
+
+同时构造 balanced subset：
+
+```text
+全部 strong rows
++
+等量 additive rows
+```
+
+这样避免 570 行中大多数 additive 样本把失败掩盖掉。
+
+### 四、confirm 轮核心结果
+
+confirm 轮每个模型 570 行。
+
+#### 1. qwen3
+
+strong rows：
+
+```text
+34 / 570
+```
+
+raw 指标：
+
+```text
+in_sample:
+  global_combo strong F1 = 0.4688
+  residual_projection_combo strong F1 = 0.8923
+  blocker_field_combo strong F1 = 0.8657
+
+object_holdout:
+  global_combo strong F1 = 0.3947
+  residual_projection_combo strong F1 = 0.5313
+  blocker_field_combo strong F1 = 0.4000
+
+prompt_holdout:
+  global_combo strong F1 = 0.4054
+  residual_projection_combo strong F1 = 0.4839
+  blocker_field_combo strong F1 = 0.4333
+```
+
+balanced subset 指标：
+
+```text
+in_sample:
+  global_combo strong F1 = 0.5882
+  residual_projection_combo strong F1 = 0.9206
+
+object_holdout:
+  global_combo strong F1 = 0.5882
+  residual_projection_combo strong F1 = 0.6296
+
+prompt_holdout:
+  global_combo strong F1 = 0.5882
+  residual_projection_combo strong F1 = 0.6122
+```
+
+客观结论：
+
+```text
+qwen3 的 residual_projection_combo 在 raw 和 balanced 指标上都优于 global_combo。
+它不是最终闭合，但已经是当前最接近 strong-edge route gate 的候选。
+```
+
+#### 2. GLM4
+
+strong rows：
+
+```text
+0 / 570
+```
+
+所有 split：
+
+```text
+strong F1 = 0
+balanced strong-edge 不可评价
+```
+
+客观结论：
+
+```text
+GLM4 当前测试集没有产生可评价的 synergy / antagonistic。
+不能说 GLM4 没有 strong-edge gate，只能说当前数据没有触发它。
+```
+
+#### 3. DS7B
+
+strong rows：
+
+```text
+3 / 570
+```
+
+raw 指标：
+
+```text
+in_sample:
+  global_combo strong F1 = 0.1250
+  residual_projection_combo strong F1 = 0.6667
+  blocker_field_combo strong F1 = 1.0000
+
+object_holdout:
+  global_combo strong F1 = 0.0000
+  residual_projection_combo strong F1 = 0.0000
+  blocker_field_combo strong F1 = 0.0000
+
+prompt_holdout:
+  global_combo strong F1 = 0.0000
+  residual_projection_combo strong F1 = 0.0000
+  blocker_field_combo strong F1 = 0.0000
+```
+
+客观结论：
+
+```text
+DS7B 的 blocker_field 在样本内很强，但跨对象和跨提示完全失效。
+这支持 Phase 849 的弱正结果，但同时证明它还不能进入核心全局图谱。
+```
+
+### 五、main 轮对照
+
+main 轮与 confirm 轮方向一致。
+
+qwen3：
+
+```text
+source rows = 304
+strong rows = 32
+
+object_holdout:
+  global_combo strong F1 = 0.4054
+  residual_projection_combo strong F1 = 0.4483
+
+prompt_holdout:
+  global_combo strong F1 = 0.5357
+  residual_projection_combo strong F1 = 0.5556
+```
+
+DS7B：
+
+```text
+source rows = 304
+strong rows = 3
+
+in_sample blocker_field strong F1 = 0.6667
+object_holdout blocker_field strong F1 = 0.0000
+prompt_holdout blocker_field strong F1 = 0.0000
+```
+
+GLM4：
+
+```text
+strong rows = 0
+```
+
+这说明 confirm 轮不是偶然方向。
+
+### 六、对上传理论的判断
+
+上传内容中关于全局齿轮图谱的判断是正确的，但需要收紧。
+
+正确部分：
+
+```text
+1. 继续局部 patch 会进入边际收益递减区。
+2. 需要从局部齿轮形状转向全局响应图谱。
+3. 图谱应记录 route / gate / blocker / boundary / closure，而不是只记录 logit。
+4. 历史研究记录已经足以支撑“带证据等级的机制图谱”。
+5. Phase 849 的 qwen3 residual projection 是值得继续下钻的候选。
+```
+
+需要修正的部分：
+
+```text
+1. 不能把 DS7B blocker_field 样本内强结果解释为全局机制。
+2. GLM4 当前不是负结果，而是缺少 strong-edge 触发条件。
+3. 全局齿轮图谱不能只做聚类或响应矩阵，还必须包含 holdout strong-edge 证据。
+4. “齿轮形状”不能只由单点 residual 决定，必须由 full-vocab blocker / route boundary / exact-natural consistency 共同约束。
+```
+
+### 七、全局齿轮图谱的结构改进
+
+当前图谱应从：
+
+```text
+response table
+```
+
+升级为：
+
+```text
+evidence-typed causal gear atlas
+```
+
+图谱结构：
+
+$$
+\mathcal{G}_{\text{gear}}
+=
+\left(
+V_{\text{state}},
+V_{\text{route}},
+V_{\text{gear}},
+V_{\text{gate}},
+V_{\text{boundary}},
+E_{\text{causal}},
+E_{\text{interaction}},
+E_{\text{transport}},
+E_{\text{closure}},
+\Omega_{\text{evidence}}
+\right)
+$$
+
+证据函数：
+
+$$
+\Omega_{\text{evidence}}(e)
+=
+\left(
+L_0(e),L_1(e),L_2(e),L_3(e),L_4(e),L_5(e),L_6(e),L_7(e)
+\right)
+$$
+
+其中：
+
+```text
+L0 = activation correlation
+L1 = logit effect
+L2 = blocker effect
+L3 = route boundary effect
+L4 = holdout prediction
+L5 = strong-edge prediction
+L6 = exact-natural consistency
+L7 = rollout closure
+```
+
+本阶段把 qwen3 residual_projection gate 推进到接近 L5 的位置，但没有达到 L6 / L7。
+
+强边证据层：
+
+$$
+L_{\text{strong}}(g)
+=
+\left(
+F1_{\text{in}},
+F1_{\text{object}},
+F1_{\text{prompt}},
+Recall_{\text{object}},
+Recall_{\text{prompt}}
+\right)
+$$
+
+进入核心图谱的最低标准应为：
+
+$$
+F1_{\text{object}}(g) > F1_{\text{global}}
+\quad
+\text{and}
+\quad
+F1_{\text{prompt}}(g) > F1_{\text{global}}
+$$
+
+按这个标准：
+
+```text
+qwen3 residual_projection_combo:
+  暂时进入核心候选。
+
+DS7B blocker_field_combo:
+  暂时只能保留为样本内候选。
+
+GLM4:
+  需要重新设计能触发 strong-edge 的任务。
+```
+
+### 八、问题、硬伤和瓶颈
+
+硬伤一：
+
+```text
+strong rows 数量太少。
+qwen3 只有 34 / 570，DS7B 只有 3 / 570，GLM4 为 0。
+```
+
+这会导致：
+
+```text
+1. F1 对少量样本非常敏感；
+2. DS7B 的 1.0 in_sample F1 不能代表真实泛化；
+3. GLM4 无法比较。
+```
+
+硬伤二：
+
+```text
+本阶段仍复用 Phase 849 的 feature rows，没有增加新的模型前向数据。
+```
+
+因此它是评价口径收紧，不是新的神经机制发现。
+
+硬伤三：
+
+```text
+当前 gate 仍主要来自 residual / blocker 的统计 key。
+它能预测强边，但尚未证明内部自然路线如何闭合到 exact-natural generation。
+```
+
+硬伤四：
+
+```text
+小模型内部结构可能粗糙。
+```
+
+这意味着：
+
+```text
+1. qwen3 的 residual projection 可能是压缩模型里的代理机制；
+2. DS7B 的 blocker field 可能是蒸馏产生的局部捷径；
+3. GLM4 的 additive 形态可能来自测试任务过弱，也可能来自模型内部结构差异；
+4. 不能把三模型的结构差异直接上升为语言普遍机制。
+```
+
+### 九、智能理论角度的进展
+
+本阶段支持一个更谨慎的智能理论判断：
+
+```text
+语言编码机制不是单个语义向量；
+也不是单个 head / neuron / channel；
+而更像条件化路线门控系统。
+```
+
+局部形式：
+
+$$
+h_{t+1}
+=
+F
+\left(
+h_t,
+x_t,
+G_{\text{route}}(h_t),
+G_{\text{blocker}}(h_t),
+G_{\text{protocol}}(h_t)
+\right)
+$$
+
+输出闭合形式：
+
+$$
+y_t
+=
+\arg\max_{v\in V}
+\left[
+Readout_v(h_t)
+-
+Blocker_v(h_t)
++
+Protocol_v(h_t)
+\right]
+$$
+
+当前最关键的洞察：
+
+```text
+预测 target logit 不够；
+预测 average residual 也不够；
+必须预测少数决定生成路线的 strong-edge 和 blocker field。
+```
+
+这使“全局齿轮图谱”从解释工具变成了更接近语言编码机制的候选数学对象。
+
+### 十、阶段性结论
+
+Phase 850 是实质进展，但不是闭合。
+
+最稳结论：
+
+```text
+1. Phase 849 的 qwen3 residual_projection 正结果经 strong-edge 指标复验后仍成立。
+2. qwen3 residual_projection_combo 是当前最接近 strong-edge route gate 的候选。
+3. DS7B blocker_field_combo 只能解释样本内强边，不能解释 holdout。
+4. GLM4 当前数据没有 strong-edge，必须换任务或加难度。
+5. 全局齿轮图谱必须加入 strong-edge evidence，否则容易把平均拟合误判为机制闭合。
+```
+
+闭合距离评估：
+
+```text
+strong-edge gate 定位:
+  qwen3 约 45%-55%
+  DS7B 约 20%-30%
+  GLM4 暂不可评估
+
+全局齿轮图谱:
+  约 25%-35%
+
+语言编码机制闭合:
+  约 10%-15%
+```
+
+### 十一、下一阶段任务
+
+下一阶段仍属于同一个大方向：
+
+```text
+从局部齿轮响应图谱推进到可预测未见强边的机制图谱。
+```
+
+但它已经是新的子阶段，不应混入本阶段结论。
+
+建议下一阶段：
+
+```text
+Phase 851:
+Strong-edge data expansion and full-vocabulary blocker atlas
+（强交互边数据扩展与全词表阻塞者图谱）
+```
+
+任务：
+
+```text
+1. 为 qwen3 扩大 strong-edge 样本，确认 residual projection 是否稳定。
+2. 为 DS7B 增加强边样本，判断 blocker_field 是真实门控还是样本内拟合。
+3. 为 GLM4 构造更困难对象 / 提示 / 组合，先触发非 additive interaction。
+4. 把评价对象从 residual class 推向 full-vocabulary blocker field。
+5. 检查 strong-edge gate 是否能预测 exact-natural consistency。
+```
+
+最低成功标准：
+
+```text
+qwen3:
+  strong rows 至少扩展到当前的 3 倍以上；
+  residual_projection_combo 在 object_holdout 和 prompt_holdout 中继续优于 global_combo。
+
+DS7B:
+  strong rows 至少达到可评价数量；
+  blocker_field_combo 不能只在 in_sample 有效。
+
+GLM4:
+  必须先出现非 additive 样本，否则不能继续评价 gate。
+```
+
+最终判断：
+
+```text
+Phase 850 不是闭合阶段。
+它真正完成的是：
+把全局齿轮图谱从平均残差拟合，推进到 strong-edge 泛化证据。
+这一步显著降低了“局部 patch 拟合误判为机制”的风险。
+```

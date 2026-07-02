@@ -1,0 +1,812 @@
+{
+  "model_summaries": {
+    "deepseek7b": {
+      "attn_implementation": "sdpa",
+      "boundary": "This phase tests role-signed necessity with patch-mode perturbations. It is still patch evidence, not natural-route ablation of an unpatched model.",
+      "case_ids": [
+        "p816_triangle_geometric_shape"
+      ],
+      "case_summary": {
+        "p816_triangle_geometric_shape": {
+          "classes": {
+            "object_echo": 8,
+            "target_equivalent": 20
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": -0.48520487524096445,
+          "mean_quality": 0.5241613446446485,
+          "n": 28,
+          "negative_role_needed_rows": 8,
+          "object_echo_rows": 8,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 8,
+          "target_rows": 20
+        }
+      },
+      "donor_variants": [
+        "natural_question",
+        "object_only"
+      ],
+      "dtype": "bfloat16",
+      "format_echo_rows": 0,
+      "mode_summary": {
+        "flip_negative": {
+          "classes": {
+            "object_echo": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": -1.5459369110279813,
+          "mean_quality": -0.5365706911423683,
+          "n": 4,
+          "negative_role_needed_rows": 4,
+          "object_echo_rows": 4,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 4,
+          "target_rows": 0
+        },
+        "flip_positive": {
+          "classes": {
+            "target_equivalent": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": -0.14544263510763278,
+          "mean_quality": 0.8639235847779801,
+          "n": 4,
+          "negative_role_needed_rows": 0,
+          "object_echo_rows": 0,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 0,
+          "target_rows": 4
+        },
+        "negative_only": {
+          "classes": {
+            "target_equivalent": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": -0.07163530661436807,
+          "mean_quality": 0.9377309132712448,
+          "n": 4,
+          "negative_role_needed_rows": 0,
+          "object_echo_rows": 0,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 0,
+          "target_rows": 4
+        },
+        "pair_original": {
+          "classes": {
+            "target_equivalent": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": 0.0,
+          "mean_quality": 1.0093662198856128,
+          "n": 4,
+          "negative_role_needed_rows": 0,
+          "object_echo_rows": 0,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 0,
+          "target_rows": 4
+        },
+        "positive_only": {
+          "classes": {
+            "object_echo": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": -1.6012751697444827,
+          "mean_quality": -0.5919089498588697,
+          "n": 4,
+          "negative_role_needed_rows": 4,
+          "object_echo_rows": 4,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 4,
+          "target_rows": 0
+        },
+        "zero_negative": {
+          "classes": {
+            "target_equivalent": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": -0.053164876900787195,
+          "mean_quality": 0.9562013429848257,
+          "n": 4,
+          "negative_role_needed_rows": 0,
+          "object_echo_rows": 0,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 0,
+          "target_rows": 4
+        },
+        "zero_positive": {
+          "classes": {
+            "target_equivalent": 4
+          },
+          "degraded_rows": 0,
+          "format_echo_rows": 0,
+          "mean_delta_quality_vs_original": 0.021020772708500668,
+          "mean_quality": 1.0303869925941136,
+          "n": 4,
+          "negative_role_needed_rows": 0,
+          "object_echo_rows": 0,
+          "positive_role_needed_rows": 0,
+          "target_lost_vs_original_rows": 0,
+          "target_rows": 4
+        }
+      },
+      "model": "deepseek7b",
+      "modes": [
+        "pair_original",
+        "positive_only",
+        "negative_only",
+        "flip_positive",
+        "flip_negative",
+        "zero_positive",
+        "zero_negative"
+      ],
+      "n_candidates": 2,
+      "n_cases": 1,
+      "n_roles": 3,
+      "n_rows": 28,
+      "negative_role_needed_rows": 8,
+      "object_echo_rows": 8,
+      "pair_original_target_rows": 4,
+      "phase": 841,
+      "positive_role_needed_rows": 0,
+      "quantization": "off",
+      "role_signs": {
+        "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16": {
+          "budget": 16,
+          "component_kind": "layer_residual",
+          "component_label": "whole_layer_residual",
+          "layer_idx": 27,
+          "mean_strict_selected_signed_sum": 1.2119383811950684,
+          "role_name": "positive_carrier",
+          "role_sign": 1,
+          "strict_observation_count": 2,
+          "strict_signed_values": [
+            0.31589388847351074,
+            2.107982873916626
+          ]
+        },
+        "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16": {
+          "budget": 16,
+          "component_kind": "layer_residual",
+          "component_label": "whole_layer_residual",
+          "layer_idx": 27,
+          "mean_strict_selected_signed_sum": 1.2119383811950684,
+          "role_name": "positive_carrier",
+          "role_sign": 1,
+          "strict_observation_count": 2,
+          "strict_signed_values": [
+            0.31589388847351074,
+            2.107982873916626
+          ]
+        },
+        "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16": {
+          "budget": 16,
+          "component_kind": "mlp_channel_group",
+          "component_label": "mlp_topdiff_32",
+          "layer_idx": 27,
+          "mean_strict_selected_signed_sum": -3.158131465315819,
+          "role_name": "negative_suppressor_or_rewriter",
+          "role_sign": -1,
+          "strict_observation_count": 4,
+          "strict_signed_values": [
+            -6.055888652801514,
+            -6.055888652801514,
+            -0.2603742778301239,
+            -0.2603742778301239
+          ]
+        }
+      },
+      "round": "main",
+      "skip_reason": null,
+      "skipped_model_load": false,
+      "strict_candidates": [
+        {
+          "combo_kind": "pair",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "combo_labels": [
+            "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16",
+            "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+          ],
+          "max_interaction_gain": 0.08426703991383055,
+          "mean_quality": 1.0093662198856128,
+          "minimal_seed_rows": 2,
+          "n_components": 2,
+          "seed_case_ids": [
+            "p816_triangle_geometric_shape"
+          ],
+          "seed_donor_variants": [
+            "natural_question",
+            "object_only"
+          ],
+          "seed_outputs": [
+            "polygon"
+          ],
+          "seed_rows": [
+            {
+              "case_id": "p816_triangle_geometric_shape",
+              "donor_variant": "natural_question",
+              "interaction_quality_gain": 0.05900357331490558,
+              "minimal_sufficient_candidate": true,
+              "patched_generated": "polygon"
+            },
+            {
+              "case_id": "p816_triangle_geometric_shape",
+              "donor_variant": "object_only",
+              "interaction_quality_gain": 0.08426703991383055,
+              "minimal_sufficient_candidate": true,
+              "patched_generated": "polygon"
+            }
+          ],
+          "strict_seed_rows": 2
+        },
+        {
+          "combo_kind": "pair",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "combo_labels": [
+            "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16",
+            "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16"
+          ],
+          "max_interaction_gain": 0.08426703991383055,
+          "mean_quality": 1.0093662198856128,
+          "minimal_seed_rows": 2,
+          "n_components": 2,
+          "seed_case_ids": [
+            "p816_triangle_geometric_shape"
+          ],
+          "seed_donor_variants": [
+            "natural_question",
+            "object_only"
+          ],
+          "seed_outputs": [
+            "polygon"
+          ],
+          "seed_rows": [
+            {
+              "case_id": "p816_triangle_geometric_shape",
+              "donor_variant": "natural_question",
+              "interaction_quality_gain": 0.05900357331490558,
+              "minimal_sufficient_candidate": true,
+              "patched_generated": "polygon"
+            },
+            {
+              "case_id": "p816_triangle_geometric_shape",
+              "donor_variant": "object_only",
+              "interaction_quality_gain": 0.08426703991383055,
+              "minimal_sufficient_candidate": true,
+              "patched_generated": "polygon"
+            }
+          ],
+          "strict_seed_rows": 2
+        }
+      ],
+      "target_lost_vs_original_rows": 8,
+      "target_rows": 20,
+      "timestamp": "2026-07-02 06:35:57",
+      "title": "Signed Complementary Gear Role Validation",
+      "top_mode_rows": [
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.6421212046317821,
+          "donor_variant": "object_only",
+          "mode": "positive_only",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.5691434282890627,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.6421212046317821,
+          "donor_variant": "object_only",
+          "mode": "positive_only",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.5691434282890627,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.6330519663772507,
+          "donor_variant": "object_only",
+          "mode": "flip_negative",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.5600741900345314,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.6330519663772507,
+          "donor_variant": "object_only",
+          "mode": "flip_negative",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.5600741900345314,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.560429134857183,
+          "donor_variant": "natural_question",
+          "mode": "positive_only",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.6146744714286765,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.560429134857183,
+          "donor_variant": "natural_question",
+          "mode": "positive_only",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.6146744714286765,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.4588218556787118,
+          "donor_variant": "natural_question",
+          "mode": "flip_negative",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.5130671922502053,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -1.4588218556787118,
+          "donor_variant": "natural_question",
+          "mode": "flip_negative",
+          "negative_role_needed_signal": true,
+          "original_target_transition": true,
+          "patched_boundary_class": "object_echo",
+          "patched_generated": "Triangle",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": true,
+          "target_quality_score": -0.5130671922502053,
+          "target_transition": false
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.1856538682046568,
+          "donor_variant": "object_only",
+          "mode": "flip_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.8873239081380625,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.1856538682046568,
+          "donor_variant": "object_only",
+          "mode": "flip_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.8873239081380625,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.10523140201060877,
+          "donor_variant": "natural_question",
+          "mode": "flip_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.8405232614178978,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.10523140201060877,
+          "donor_variant": "natural_question",
+          "mode": "flip_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.8405232614178978,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.09342569075079088,
+          "donor_variant": "object_only",
+          "mode": "zero_negative",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9795520855919284,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.09342569075079088,
+          "donor_variant": "object_only",
+          "mode": "zero_negative",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9795520855919284,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.08426703991383055,
+          "donor_variant": "object_only",
+          "mode": "negative_only",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9887107364288887,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.08426703991383055,
+          "donor_variant": "object_only",
+          "mode": "negative_only",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9887107364288887,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.05900357331490558,
+          "donor_variant": "natural_question",
+          "mode": "negative_only",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.886751090113601,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.05900357331490558,
+          "donor_variant": "natural_question",
+          "mode": "negative_only",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.886751090113601,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.03168620049181348,
+          "donor_variant": "object_only",
+          "mode": "zero_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 1.1046639768345328,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.03168620049181348,
+          "donor_variant": "object_only",
+          "mode": "zero_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 1.1046639768345328,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.01290406305078351,
+          "donor_variant": "natural_question",
+          "mode": "zero_negative",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.932850600377723,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": -0.01290406305078351,
+          "donor_variant": "natural_question",
+          "mode": "zero_negative",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.932850600377723,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.01035534492518786,
+          "donor_variant": "natural_question",
+          "mode": "zero_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9561100083536944,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.01035534492518786,
+          "donor_variant": "natural_question",
+          "mode": "zero_positive",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9561100083536944,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.0,
+          "donor_variant": "object_only",
+          "mode": "pair_original",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 1.0729777763427193,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.0,
+          "donor_variant": "object_only",
+          "mode": "pair_original",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 1.0729777763427193,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.0,
+          "donor_variant": "natural_question",
+          "mode": "pair_original",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9457546634285066,
+          "target_transition": true
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16",
+          "delta_quality_vs_original": 0.0,
+          "donor_variant": "natural_question",
+          "mode": "pair_original",
+          "negative_role_needed_signal": false,
+          "original_target_transition": true,
+          "patched_boundary_class": "target_equivalent",
+          "patched_generated": "polygon",
+          "positive_role_needed_signal": false,
+          "target_lost_vs_original": false,
+          "target_quality_score": 0.9457546634285066,
+          "target_transition": true
+        }
+      ]
+    },
+    "glm4": {
+      "attn_implementation": null,
+      "boundary": "This phase tests role-signed necessity with patch-mode perturbations. It is still patch evidence, not natural-route ablation of an unpatched model.",
+      "case_ids": [],
+      "case_summary": {},
+      "donor_variants": [
+        "natural_question",
+        "object_only"
+      ],
+      "dtype": "bfloat16",
+      "format_echo_rows": 0,
+      "mode_summary": {},
+      "model": "glm4",
+      "modes": [
+        "pair_original",
+        "positive_only",
+        "negative_only",
+        "flip_positive",
+        "flip_negative",
+        "zero_positive",
+        "zero_negative"
+      ],
+      "n_candidates": 0,
+      "n_cases": 0,
+      "n_roles": 0,
+      "n_rows": 0,
+      "negative_role_needed_rows": 0,
+      "object_echo_rows": 0,
+      "pair_original_target_rows": 0,
+      "phase": 841,
+      "positive_role_needed_rows": 0,
+      "quantization": "off",
+      "role_signs": {},
+      "round": "main",
+      "skip_reason": "no Phase 840 strict role candidates",
+      "skipped_model_load": true,
+      "strict_candidates": [],
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 0,
+      "timestamp": "2026-07-02 06:35:43",
+      "title": "Signed Complementary Gear Role Validation",
+      "top_mode_rows": []
+    },
+    "qwen3": {
+      "attn_implementation": null,
+      "boundary": "This phase tests role-signed necessity with patch-mode perturbations. It is still patch evidence, not natural-route ablation of an unpatched model.",
+      "case_ids": [],
+      "case_summary": {},
+      "donor_variants": [
+        "natural_question",
+        "object_only"
+      ],
+      "dtype": "bfloat16",
+      "format_echo_rows": 0,
+      "mode_summary": {},
+      "model": "qwen3",
+      "modes": [
+        "pair_original",
+        "positive_only",
+        "negative_only",
+        "flip_positive",
+        "flip_negative",
+        "zero_positive",
+        "zero_negative"
+      ],
+      "n_candidates": 0,
+      "n_cases": 0,
+      "n_roles": 0,
+      "n_rows": 0,
+      "negative_role_needed_rows": 0,
+      "object_echo_rows": 0,
+      "pair_original_target_rows": 0,
+      "phase": 841,
+      "positive_role_needed_rows": 0,
+      "quantization": "off",
+      "role_signs": {},
+      "round": "main",
+      "skip_reason": "no Phase 840 strict role candidates",
+      "skipped_model_load": true,
+      "strict_candidates": [],
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 0,
+      "timestamp": "2026-07-02 06:35:40",
+      "title": "Signed Complementary Gear Role Validation",
+      "top_mode_rows": []
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase": 841,
+  "round": "main",
+  "status": "complete",
+  "timestamp": "2026-07-02 06:35:59"
+}

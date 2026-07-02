@@ -1,0 +1,1330 @@
+{
+  "phase": 846,
+  "round": "confirm",
+  "status": "complete",
+  "timestamp": "2026-07-02 10:03:17",
+  "model_summaries": {
+    "qwen3": {
+      "phase": 846,
+      "title": "Geometry Boundary Equation Fitting",
+      "model": "qwen3",
+      "round": "confirm",
+      "source_phase845_round": "confirm",
+      "timestamp": "2026-07-02 10:03:17",
+      "source_rows": 765,
+      "source_combo_counts": {
+        "original": 15,
+        "single": 180,
+        "pair": 450,
+        "triplet": 120
+      },
+      "source_objects": [
+        "circle",
+        "polygon",
+        "rectangle",
+        "square",
+        "triangle"
+      ],
+      "source_prompt_variants": [
+        "natural_category",
+        "natural_question",
+        "object_only"
+      ],
+      "split_types": [
+        "in_sample",
+        "object_holdout",
+        "prompt_holdout"
+      ],
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "mean_interaction_mae_improvement_over_additive": -0.003166666666666651,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.823725,
+              "rmse_delta": 1.252314489200341,
+              "sign_accuracy_delta": 0.7173333333333334,
+              "target": {
+                "n": 750,
+                "tp": 159,
+                "tn": 281,
+                "fp": 286,
+                "fn": 24,
+                "accuracy": 0.5866666666666667,
+                "precision": 0.35730337078651686,
+                "recall": 0.8688524590163934,
+                "f1": 0.5063694267515924
+              },
+              "gain": {
+                "n": 750,
+                "tp": 61,
+                "tn": 381,
+                "fp": 286,
+                "fn": 22,
+                "accuracy": 0.5893333333333334,
+                "precision": 0.17579250720461095,
+                "recall": 0.7349397590361446,
+                "f1": 0.2837209302325582
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 748,
+                "fp": 2,
+                "fn": 0,
+                "accuracy": 0.9973333333333333,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.5866666666666667,
+              "actual_target_rows": 183,
+              "predicted_target_rows": 445,
+              "actual_gain_rows": 83,
+              "predicted_gain_rows": 347,
+              "actual_lost_rows": 0,
+              "predicted_lost_rows": 2
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.8268916666666667,
+              "rmse_delta": 1.2375552035947506,
+              "sign_accuracy_delta": 0.7173333333333334,
+              "target": {
+                "n": 750,
+                "tp": 159,
+                "tn": 280,
+                "fp": 287,
+                "fn": 24,
+                "accuracy": 0.5853333333333334,
+                "precision": 0.35650224215246634,
+                "recall": 0.8688524590163934,
+                "f1": 0.5055643879173292
+              },
+              "gain": {
+                "n": 750,
+                "tp": 61,
+                "tn": 380,
+                "fp": 287,
+                "fn": 22,
+                "accuracy": 0.588,
+                "precision": 0.1752873563218391,
+                "recall": 0.7349397590361446,
+                "f1": 0.28306264501160094
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 748,
+                "fp": 2,
+                "fn": 0,
+                "accuracy": 0.9973333333333333,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.5853333333333334,
+              "actual_target_rows": 183,
+              "predicted_target_rows": 446,
+              "actual_gain_rows": 83,
+              "predicted_gain_rows": 348,
+              "actual_lost_rows": 0,
+              "predicted_lost_rows": 2
+            }
+          }
+        },
+        "object_holdout": {
+          "n_splits": 5,
+          "split_keys": [
+            "circle",
+            "polygon",
+            "rectangle",
+            "square",
+            "triangle"
+          ],
+          "mean_interaction_mae_improvement_over_additive": -0.015250000000000052,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.9320833333333334,
+              "rmse_delta": 1.3976332553151587,
+              "sign_accuracy_delta": 0.7013333333333334,
+              "target": {
+                "n": 750,
+                "tp": 84,
+                "tn": 313,
+                "fp": 254,
+                "fn": 99,
+                "accuracy": 0.5293333333333333,
+                "precision": 0.2485207100591716,
+                "recall": 0.45901639344262296,
+                "f1": 0.3224568138195777
+              },
+              "gain": {
+                "n": 750,
+                "tp": 34,
+                "tn": 413,
+                "fp": 254,
+                "fn": 49,
+                "accuracy": 0.596,
+                "precision": 0.11805555555555555,
+                "recall": 0.40963855421686746,
+                "f1": 0.18328840970350402
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 700,
+                "fp": 50,
+                "fn": 0,
+                "accuracy": 0.9333333333333333,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.5293333333333333,
+              "actual_target_rows": 183,
+              "predicted_target_rows": 338,
+              "actual_gain_rows": 83,
+              "predicted_gain_rows": 288,
+              "actual_lost_rows": 0,
+              "predicted_lost_rows": 50
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.9473333333333334,
+              "rmse_delta": 1.4055331023730175,
+              "sign_accuracy_delta": 0.7013333333333334,
+              "target": {
+                "n": 750,
+                "tp": 85,
+                "tn": 312,
+                "fp": 255,
+                "fn": 98,
+                "accuracy": 0.5293333333333333,
+                "precision": 0.25,
+                "recall": 0.4644808743169399,
+                "f1": 0.32504780114722753
+              },
+              "gain": {
+                "n": 750,
+                "tp": 35,
+                "tn": 412,
+                "fp": 255,
+                "fn": 48,
+                "accuracy": 0.596,
+                "precision": 0.1206896551724138,
+                "recall": 0.42168674698795183,
+                "f1": 0.1876675603217158
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 700,
+                "fp": 50,
+                "fn": 0,
+                "accuracy": 0.9333333333333333,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.5293333333333333,
+              "actual_target_rows": 183,
+              "predicted_target_rows": 340,
+              "actual_gain_rows": 83,
+              "predicted_gain_rows": 290,
+              "actual_lost_rows": 0,
+              "predicted_lost_rows": 50
+            }
+          }
+        },
+        "prompt_holdout": {
+          "n_splits": 3,
+          "split_keys": [
+            "natural_category",
+            "natural_question",
+            "object_only"
+          ],
+          "mean_interaction_mae_improvement_over_additive": -0.007549999999999983,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.913375,
+              "rmse_delta": 1.3455934303077954,
+              "sign_accuracy_delta": 0.7173333333333334,
+              "target": {
+                "n": 750,
+                "tp": 54,
+                "tn": 244,
+                "fp": 323,
+                "fn": 129,
+                "accuracy": 0.3973333333333333,
+                "precision": 0.14323607427055704,
+                "recall": 0.29508196721311475,
+                "f1": 0.19285714285714287
+              },
+              "gain": {
+                "n": 750,
+                "tp": 6,
+                "tn": 344,
+                "fp": 323,
+                "fn": 77,
+                "accuracy": 0.4666666666666667,
+                "precision": 0.0182370820668693,
+                "recall": 0.07228915662650602,
+                "f1": 0.029126213592233007
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 698,
+                "fp": 52,
+                "fn": 0,
+                "accuracy": 0.9306666666666666,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.3973333333333333,
+              "actual_target_rows": 183,
+              "predicted_target_rows": 377,
+              "actual_gain_rows": 83,
+              "predicted_gain_rows": 329,
+              "actual_lost_rows": 0,
+              "predicted_lost_rows": 52
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.920925,
+              "rmse_delta": 1.3565448748183133,
+              "sign_accuracy_delta": 0.7173333333333334,
+              "target": {
+                "n": 750,
+                "tp": 54,
+                "tn": 248,
+                "fp": 319,
+                "fn": 129,
+                "accuracy": 0.4026666666666667,
+                "precision": 0.1447721179624665,
+                "recall": 0.29508196721311475,
+                "f1": 0.19424460431654678
+              },
+              "gain": {
+                "n": 750,
+                "tp": 6,
+                "tn": 348,
+                "fp": 319,
+                "fn": 77,
+                "accuracy": 0.472,
+                "precision": 0.018461538461538463,
+                "recall": 0.07228915662650602,
+                "f1": 0.029411764705882356
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 698,
+                "fp": 52,
+                "fn": 0,
+                "accuracy": 0.9306666666666666,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.4026666666666667,
+              "actual_target_rows": 183,
+              "predicted_target_rows": 373,
+              "actual_gain_rows": 83,
+              "predicted_gain_rows": 325,
+              "actual_lost_rows": 0,
+              "predicted_lost_rows": 52
+            }
+          }
+        }
+      },
+      "overall_predictor_summary": {
+        "additive_only": {
+          "n": 2250,
+          "mae_delta": 0.8897277777777778,
+          "rmse_delta": 1.3332031573009242,
+          "sign_accuracy_delta": 0.712,
+          "target": {
+            "n": 2250,
+            "tp": 297,
+            "tn": 838,
+            "fp": 863,
+            "fn": 252,
+            "accuracy": 0.5044444444444445,
+            "precision": 0.2560344827586207,
+            "recall": 0.5409836065573771,
+            "f1": 0.34757167934464606
+          },
+          "gain": {
+            "n": 2250,
+            "tp": 101,
+            "tn": 1138,
+            "fp": 863,
+            "fn": 148,
+            "accuracy": 0.5506666666666666,
+            "precision": 0.10477178423236515,
+            "recall": 0.40562248995983935,
+            "f1": 0.1665292662819456
+          },
+          "lost": {
+            "n": 2250,
+            "tp": 0,
+            "tn": 2146,
+            "fp": 104,
+            "fn": 0,
+            "accuracy": 0.9537777777777777,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "boundary_change_accuracy": 0.5044444444444445,
+          "actual_target_rows": 549,
+          "predicted_target_rows": 1160,
+          "actual_gain_rows": 249,
+          "predicted_gain_rows": 964,
+          "actual_lost_rows": 0,
+          "predicted_lost_rows": 104
+        },
+        "interaction_equation": {
+          "n": 2250,
+          "mae_delta": 0.8983833333333333,
+          "rmse_delta": 1.3350755510714987,
+          "sign_accuracy_delta": 0.712,
+          "target": {
+            "n": 2250,
+            "tp": 298,
+            "tn": 840,
+            "fp": 861,
+            "fn": 251,
+            "accuracy": 0.5057777777777778,
+            "precision": 0.2571182053494392,
+            "recall": 0.5428051001821493,
+            "f1": 0.34894613583138173
+          },
+          "gain": {
+            "n": 2250,
+            "tp": 102,
+            "tn": 1140,
+            "fp": 861,
+            "fn": 147,
+            "accuracy": 0.552,
+            "precision": 0.1059190031152648,
+            "recall": 0.40963855421686746,
+            "f1": 0.16831683168316833
+          },
+          "lost": {
+            "n": 2250,
+            "tp": 0,
+            "tn": 2146,
+            "fp": 104,
+            "fn": 0,
+            "accuracy": 0.9537777777777777,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "boundary_change_accuracy": 0.5057777777777778,
+          "actual_target_rows": 549,
+          "predicted_target_rows": 1159,
+          "actual_gain_rows": 249,
+          "predicted_gain_rows": 963,
+          "actual_lost_rows": 0,
+          "predicted_lost_rows": 104
+        }
+      },
+      "n_predictions": 4500,
+      "boundary": "This phase fits a simple route-boundary equation from Phase 845 rows and tests it on in-sample, object-holdout, and prompt-holdout splits. It does not load models and does not claim token closure."
+    },
+    "glm4": {
+      "phase": 846,
+      "title": "Geometry Boundary Equation Fitting",
+      "model": "glm4",
+      "round": "confirm",
+      "source_phase845_round": "confirm",
+      "timestamp": "2026-07-02 10:03:17",
+      "source_rows": 765,
+      "source_combo_counts": {
+        "original": 15,
+        "single": 180,
+        "pair": 450,
+        "triplet": 120
+      },
+      "source_objects": [
+        "circle",
+        "polygon",
+        "rectangle",
+        "square",
+        "triangle"
+      ],
+      "source_prompt_variants": [
+        "natural_category",
+        "natural_question",
+        "object_only"
+      ],
+      "split_types": [
+        "in_sample",
+        "object_holdout",
+        "prompt_holdout"
+      ],
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "mean_interaction_mae_improvement_over_additive": -0.0007557210286458227,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.13694395345052085,
+              "rmse_delta": 0.21218518728328759,
+              "sign_accuracy_delta": 0.7346666666666667,
+              "target": {
+                "n": 750,
+                "tp": 330,
+                "tn": 233,
+                "fp": 125,
+                "fn": 62,
+                "accuracy": 0.7506666666666667,
+                "precision": 0.7252747252747253,
+                "recall": 0.8418367346938775,
+                "f1": 0.7792207792207791
+              },
+              "gain": {
+                "n": 750,
+                "tp": 20,
+                "tn": 633,
+                "fp": 97,
+                "fn": 0,
+                "accuracy": 0.8706666666666667,
+                "precision": 0.17094017094017094,
+                "recall": 1.0,
+                "f1": 0.291970802919708
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 660,
+                "fp": 62,
+                "fn": 28,
+                "accuracy": 0.88,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.7506666666666667,
+              "actual_target_rows": 392,
+              "predicted_target_rows": 455,
+              "actual_gain_rows": 20,
+              "predicted_gain_rows": 117,
+              "actual_lost_rows": 28,
+              "predicted_lost_rows": 62
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.13769967447916667,
+              "rmse_delta": 0.21171399982553943,
+              "sign_accuracy_delta": 0.7346666666666667,
+              "target": {
+                "n": 750,
+                "tp": 330,
+                "tn": 231,
+                "fp": 127,
+                "fn": 62,
+                "accuracy": 0.748,
+                "precision": 0.7221006564551422,
+                "recall": 0.8418367346938775,
+                "f1": 0.7773851590106008
+              },
+              "gain": {
+                "n": 750,
+                "tp": 20,
+                "tn": 631,
+                "fp": 99,
+                "fn": 0,
+                "accuracy": 0.868,
+                "precision": 0.16806722689075632,
+                "recall": 1.0,
+                "f1": 0.28776978417266186
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 660,
+                "fp": 62,
+                "fn": 28,
+                "accuracy": 0.88,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.748,
+              "actual_target_rows": 392,
+              "predicted_target_rows": 457,
+              "actual_gain_rows": 20,
+              "predicted_gain_rows": 119,
+              "actual_lost_rows": 28,
+              "predicted_lost_rows": 62
+            }
+          }
+        },
+        "object_holdout": {
+          "n_splits": 5,
+          "split_keys": [
+            "circle",
+            "polygon",
+            "rectangle",
+            "square",
+            "triangle"
+          ],
+          "mean_interaction_mae_improvement_over_additive": -9.457736545139262e-05,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.1623023952907986,
+              "rmse_delta": 0.24754723842827625,
+              "sign_accuracy_delta": 0.6853333333333333,
+              "target": {
+                "n": 750,
+                "tp": 249,
+                "tn": 111,
+                "fp": 247,
+                "fn": 143,
+                "accuracy": 0.48,
+                "precision": 0.5020161290322581,
+                "recall": 0.6352040816326531,
+                "f1": 0.5608108108108109
+              },
+              "gain": {
+                "n": 750,
+                "tp": 20,
+                "tn": 511,
+                "fp": 219,
+                "fn": 0,
+                "accuracy": 0.708,
+                "precision": 0.08368200836820083,
+                "recall": 1.0,
+                "f1": 0.15444015444015444
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 579,
+                "fp": 143,
+                "fn": 28,
+                "accuracy": 0.772,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.48,
+              "actual_target_rows": 392,
+              "predicted_target_rows": 496,
+              "actual_gain_rows": 20,
+              "predicted_gain_rows": 239,
+              "actual_lost_rows": 28,
+              "predicted_lost_rows": 143
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.16239697265625,
+              "rmse_delta": 0.24736525904662165,
+              "sign_accuracy_delta": 0.6906666666666667,
+              "target": {
+                "n": 750,
+                "tp": 249,
+                "tn": 112,
+                "fp": 246,
+                "fn": 143,
+                "accuracy": 0.48133333333333334,
+                "precision": 0.503030303030303,
+                "recall": 0.6352040816326531,
+                "f1": 0.5614430665163472
+              },
+              "gain": {
+                "n": 750,
+                "tp": 20,
+                "tn": 512,
+                "fp": 218,
+                "fn": 0,
+                "accuracy": 0.7093333333333334,
+                "precision": 0.08403361344537816,
+                "recall": 1.0,
+                "f1": 0.1550387596899225
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 579,
+                "fp": 143,
+                "fn": 28,
+                "accuracy": 0.772,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.48133333333333334,
+              "actual_target_rows": 392,
+              "predicted_target_rows": 495,
+              "actual_gain_rows": 20,
+              "predicted_gain_rows": 238,
+              "actual_lost_rows": 28,
+              "predicted_lost_rows": 143
+            }
+          }
+        },
+        "prompt_holdout": {
+          "n_splits": 3,
+          "split_keys": [
+            "natural_category",
+            "natural_question",
+            "object_only"
+          ],
+          "mean_interaction_mae_improvement_over_additive": 0.001645906575520828,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.1553524169921875,
+              "rmse_delta": 0.23736325529396513,
+              "sign_accuracy_delta": 0.6626666666666666,
+              "target": {
+                "n": 750,
+                "tp": 255,
+                "tn": 50,
+                "fp": 308,
+                "fn": 137,
+                "accuracy": 0.4066666666666667,
+                "precision": 0.45293072824156305,
+                "recall": 0.6505102040816326,
+                "f1": 0.5340314136125655
+              },
+              "gain": {
+                "n": 750,
+                "tp": 20,
+                "tn": 450,
+                "fp": 280,
+                "fn": 0,
+                "accuracy": 0.6266666666666667,
+                "precision": 0.06666666666666667,
+                "recall": 1.0,
+                "f1": 0.125
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 585,
+                "fp": 137,
+                "fn": 28,
+                "accuracy": 0.78,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.4066666666666667,
+              "actual_target_rows": 392,
+              "predicted_target_rows": 563,
+              "actual_gain_rows": 20,
+              "predicted_gain_rows": 300,
+              "actual_lost_rows": 28,
+              "predicted_lost_rows": 137
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.15370651041666666,
+              "rmse_delta": 0.23517829914554642,
+              "sign_accuracy_delta": 0.6826666666666666,
+              "target": {
+                "n": 750,
+                "tp": 256,
+                "tn": 49,
+                "fp": 309,
+                "fn": 136,
+                "accuracy": 0.4066666666666667,
+                "precision": 0.45309734513274336,
+                "recall": 0.6530612244897959,
+                "f1": 0.5350052246603971
+              },
+              "gain": {
+                "n": 750,
+                "tp": 20,
+                "tn": 449,
+                "fp": 281,
+                "fn": 0,
+                "accuracy": 0.6253333333333333,
+                "precision": 0.0664451827242525,
+                "recall": 1.0,
+                "f1": 0.12461059190031154
+              },
+              "lost": {
+                "n": 750,
+                "tp": 0,
+                "tn": 586,
+                "fp": 136,
+                "fn": 28,
+                "accuracy": 0.7813333333333333,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "boundary_change_accuracy": 0.4066666666666667,
+              "actual_target_rows": 392,
+              "predicted_target_rows": 565,
+              "actual_gain_rows": 20,
+              "predicted_gain_rows": 301,
+              "actual_lost_rows": 28,
+              "predicted_lost_rows": 136
+            }
+          }
+        }
+      },
+      "overall_predictor_summary": {
+        "additive_only": {
+          "n": 2250,
+          "mae_delta": 0.151532921911169,
+          "rmse_delta": 0.2328400766761439,
+          "sign_accuracy_delta": 0.6942222222222222,
+          "target": {
+            "n": 2250,
+            "tp": 834,
+            "tn": 394,
+            "fp": 680,
+            "fn": 342,
+            "accuracy": 0.5457777777777778,
+            "precision": 0.5508586525759577,
+            "recall": 0.7091836734693877,
+            "f1": 0.6200743494423792
+          },
+          "gain": {
+            "n": 2250,
+            "tp": 60,
+            "tn": 1594,
+            "fp": 596,
+            "fn": 0,
+            "accuracy": 0.7351111111111112,
+            "precision": 0.09146341463414634,
+            "recall": 1.0,
+            "f1": 0.16759776536312848
+          },
+          "lost": {
+            "n": 2250,
+            "tp": 0,
+            "tn": 1824,
+            "fp": 342,
+            "fn": 84,
+            "accuracy": 0.8106666666666666,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "boundary_change_accuracy": 0.5457777777777778,
+          "actual_target_rows": 1176,
+          "predicted_target_rows": 1514,
+          "actual_gain_rows": 60,
+          "predicted_gain_rows": 656,
+          "actual_lost_rows": 84,
+          "predicted_lost_rows": 342
+        },
+        "interaction_equation": {
+          "n": 2250,
+          "mae_delta": 0.1512677191840278,
+          "rmse_delta": 0.23189165681004484,
+          "sign_accuracy_delta": 0.7026666666666667,
+          "target": {
+            "n": 2250,
+            "tp": 835,
+            "tn": 392,
+            "fp": 682,
+            "fn": 341,
+            "accuracy": 0.5453333333333333,
+            "precision": 0.5504284772577456,
+            "recall": 0.7100340136054422,
+            "f1": 0.6201262532491645
+          },
+          "gain": {
+            "n": 2250,
+            "tp": 60,
+            "tn": 1592,
+            "fp": 598,
+            "fn": 0,
+            "accuracy": 0.7342222222222222,
+            "precision": 0.0911854103343465,
+            "recall": 1.0,
+            "f1": 0.16713091922005568
+          },
+          "lost": {
+            "n": 2250,
+            "tp": 0,
+            "tn": 1825,
+            "fp": 341,
+            "fn": 84,
+            "accuracy": 0.8111111111111111,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "boundary_change_accuracy": 0.5453333333333333,
+          "actual_target_rows": 1176,
+          "predicted_target_rows": 1517,
+          "actual_gain_rows": 60,
+          "predicted_gain_rows": 658,
+          "actual_lost_rows": 84,
+          "predicted_lost_rows": 341
+        }
+      },
+      "n_predictions": 4500,
+      "boundary": "This phase fits a simple route-boundary equation from Phase 845 rows and tests it on in-sample, object-holdout, and prompt-holdout splits. It does not load models and does not claim token closure."
+    },
+    "deepseek7b": {
+      "phase": 846,
+      "title": "Geometry Boundary Equation Fitting",
+      "model": "deepseek7b",
+      "round": "confirm",
+      "source_phase845_round": "confirm",
+      "timestamp": "2026-07-02 10:03:17",
+      "source_rows": 765,
+      "source_combo_counts": {
+        "original": 15,
+        "single": 180,
+        "pair": 450,
+        "triplet": 120
+      },
+      "source_objects": [
+        "circle",
+        "polygon",
+        "rectangle",
+        "square",
+        "triangle"
+      ],
+      "source_prompt_variants": [
+        "natural_category",
+        "natural_question",
+        "object_only"
+      ],
+      "split_types": [
+        "in_sample",
+        "object_holdout",
+        "prompt_holdout"
+      ],
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "mean_interaction_mae_improvement_over_additive": 0.0026513888888888837,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.2629708333333333,
+              "rmse_delta": 0.39043548180383003,
+              "sign_accuracy_delta": 0.6037483266398929,
+              "target": {
+                "n": 750,
+                "tp": 253,
+                "tn": 321,
+                "fp": 57,
+                "fn": 119,
+                "accuracy": 0.7653333333333333,
+                "precision": 0.8161290322580645,
+                "recall": 0.6801075268817204,
+                "f1": 0.7419354838709677
+              },
+              "gain": {
+                "n": 750,
+                "tp": 30,
+                "tn": 620,
+                "fp": 57,
+                "fn": 43,
+                "accuracy": 0.8666666666666667,
+                "precision": 0.3448275862068966,
+                "recall": 0.410958904109589,
+                "f1": 0.375
+              },
+              "lost": {
+                "n": 750,
+                "tp": 1,
+                "tn": 673,
+                "fp": 76,
+                "fn": 0,
+                "accuracy": 0.8986666666666666,
+                "precision": 0.012987012987012988,
+                "recall": 1.0,
+                "f1": 0.025641025641025647
+              },
+              "boundary_change_accuracy": 0.7653333333333333,
+              "actual_target_rows": 372,
+              "predicted_target_rows": 310,
+              "actual_gain_rows": 73,
+              "predicted_gain_rows": 87,
+              "actual_lost_rows": 1,
+              "predicted_lost_rows": 77
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.26031944444444444,
+              "rmse_delta": 0.38992637526204865,
+              "sign_accuracy_delta": 0.6106666666666667,
+              "target": {
+                "n": 750,
+                "tp": 254,
+                "tn": 321,
+                "fp": 57,
+                "fn": 118,
+                "accuracy": 0.7666666666666667,
+                "precision": 0.8167202572347267,
+                "recall": 0.6827956989247311,
+                "f1": 0.7437774524158126
+              },
+              "gain": {
+                "n": 750,
+                "tp": 30,
+                "tn": 620,
+                "fp": 57,
+                "fn": 43,
+                "accuracy": 0.8666666666666667,
+                "precision": 0.3448275862068966,
+                "recall": 0.410958904109589,
+                "f1": 0.375
+              },
+              "lost": {
+                "n": 750,
+                "tp": 1,
+                "tn": 674,
+                "fp": 75,
+                "fn": 0,
+                "accuracy": 0.9,
+                "precision": 0.013157894736842105,
+                "recall": 1.0,
+                "f1": 0.025974025974025976
+              },
+              "boundary_change_accuracy": 0.7666666666666667,
+              "actual_target_rows": 372,
+              "predicted_target_rows": 311,
+              "actual_gain_rows": 73,
+              "predicted_gain_rows": 87,
+              "actual_lost_rows": 1,
+              "predicted_lost_rows": 76
+            }
+          }
+        },
+        "object_holdout": {
+          "n_splits": 5,
+          "split_keys": [
+            "circle",
+            "polygon",
+            "rectangle",
+            "square",
+            "triangle"
+          ],
+          "mean_interaction_mae_improvement_over_additive": 0.0022013888888889,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.3200625,
+              "rmse_delta": 0.47614431219220305,
+              "sign_accuracy_delta": 0.48728246318607765,
+              "target": {
+                "n": 750,
+                "tp": 264,
+                "tn": 233,
+                "fp": 145,
+                "fn": 108,
+                "accuracy": 0.6626666666666666,
+                "precision": 0.6454767726161369,
+                "recall": 0.7096774193548387,
+                "f1": 0.6760563380281689
+              },
+              "gain": {
+                "n": 750,
+                "tp": 43,
+                "tn": 532,
+                "fp": 145,
+                "fn": 30,
+                "accuracy": 0.7666666666666667,
+                "precision": 0.22872340425531915,
+                "recall": 0.589041095890411,
+                "f1": 0.32950191570881227
+              },
+              "lost": {
+                "n": 750,
+                "tp": 1,
+                "tn": 671,
+                "fp": 78,
+                "fn": 0,
+                "accuracy": 0.896,
+                "precision": 0.012658227848101266,
+                "recall": 1.0,
+                "f1": 0.024999999999999998
+              },
+              "boundary_change_accuracy": 0.6626666666666666,
+              "actual_target_rows": 372,
+              "predicted_target_rows": 409,
+              "actual_gain_rows": 73,
+              "predicted_gain_rows": 188,
+              "actual_lost_rows": 1,
+              "predicted_lost_rows": 79
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.31786111111111115,
+              "rmse_delta": 0.47566501043112003,
+              "sign_accuracy_delta": 0.5106666666666667,
+              "target": {
+                "n": 750,
+                "tp": 264,
+                "tn": 233,
+                "fp": 145,
+                "fn": 108,
+                "accuracy": 0.6626666666666666,
+                "precision": 0.6454767726161369,
+                "recall": 0.7096774193548387,
+                "f1": 0.6760563380281689
+              },
+              "gain": {
+                "n": 750,
+                "tp": 43,
+                "tn": 532,
+                "fp": 145,
+                "fn": 30,
+                "accuracy": 0.7666666666666667,
+                "precision": 0.22872340425531915,
+                "recall": 0.589041095890411,
+                "f1": 0.32950191570881227
+              },
+              "lost": {
+                "n": 750,
+                "tp": 1,
+                "tn": 671,
+                "fp": 78,
+                "fn": 0,
+                "accuracy": 0.896,
+                "precision": 0.012658227848101266,
+                "recall": 1.0,
+                "f1": 0.024999999999999998
+              },
+              "boundary_change_accuracy": 0.6626666666666666,
+              "actual_target_rows": 372,
+              "predicted_target_rows": 409,
+              "actual_gain_rows": 73,
+              "predicted_gain_rows": 188,
+              "actual_lost_rows": 1,
+              "predicted_lost_rows": 79
+            }
+          }
+        },
+        "prompt_holdout": {
+          "n_splits": 3,
+          "split_keys": [
+            "natural_category",
+            "natural_question",
+            "object_only"
+          ],
+          "mean_interaction_mae_improvement_over_additive": 0.0027375000000000225,
+          "predictor_summary": {
+            "additive_only": {
+              "n": 750,
+              "mae_delta": 0.2696291666666667,
+              "rmse_delta": 0.39713500341508556,
+              "sign_accuracy_delta": 0.5706666666666667,
+              "target": {
+                "n": 750,
+                "tp": 267,
+                "tn": 220,
+                "fp": 158,
+                "fn": 105,
+                "accuracy": 0.6493333333333333,
+                "precision": 0.6282352941176471,
+                "recall": 0.717741935483871,
+                "f1": 0.6700125470514429
+              },
+              "gain": {
+                "n": 750,
+                "tp": 30,
+                "tn": 519,
+                "fp": 158,
+                "fn": 43,
+                "accuracy": 0.732,
+                "precision": 0.1595744680851064,
+                "recall": 0.410958904109589,
+                "f1": 0.22988505747126434
+              },
+              "lost": {
+                "n": 750,
+                "tp": 1,
+                "tn": 687,
+                "fp": 62,
+                "fn": 0,
+                "accuracy": 0.9173333333333333,
+                "precision": 0.015873015873015872,
+                "recall": 1.0,
+                "f1": 0.03125
+              },
+              "boundary_change_accuracy": 0.6493333333333333,
+              "actual_target_rows": 372,
+              "predicted_target_rows": 425,
+              "actual_gain_rows": 73,
+              "predicted_gain_rows": 188,
+              "actual_lost_rows": 1,
+              "predicted_lost_rows": 63
+            },
+            "interaction_equation": {
+              "n": 750,
+              "mae_delta": 0.26689166666666664,
+              "rmse_delta": 0.3973669441224949,
+              "sign_accuracy_delta": 0.582109479305741,
+              "target": {
+                "n": 750,
+                "tp": 267,
+                "tn": 220,
+                "fp": 158,
+                "fn": 105,
+                "accuracy": 0.6493333333333333,
+                "precision": 0.6282352941176471,
+                "recall": 0.717741935483871,
+                "f1": 0.6700125470514429
+              },
+              "gain": {
+                "n": 750,
+                "tp": 30,
+                "tn": 519,
+                "fp": 158,
+                "fn": 43,
+                "accuracy": 0.732,
+                "precision": 0.1595744680851064,
+                "recall": 0.410958904109589,
+                "f1": 0.22988505747126434
+              },
+              "lost": {
+                "n": 750,
+                "tp": 1,
+                "tn": 687,
+                "fp": 62,
+                "fn": 0,
+                "accuracy": 0.9173333333333333,
+                "precision": 0.015873015873015872,
+                "recall": 1.0,
+                "f1": 0.03125
+              },
+              "boundary_change_accuracy": 0.6493333333333333,
+              "actual_target_rows": 372,
+              "predicted_target_rows": 425,
+              "actual_gain_rows": 73,
+              "predicted_gain_rows": 188,
+              "actual_lost_rows": 1,
+              "predicted_lost_rows": 63
+            }
+          }
+        }
+      },
+      "overall_predictor_summary": {
+        "additive_only": {
+          "n": 2250,
+          "mae_delta": 0.28422083333333337,
+          "rmse_delta": 0.4230324977358418,
+          "sign_accuracy_delta": 0.553921568627451,
+          "target": {
+            "n": 2250,
+            "tp": 784,
+            "tn": 774,
+            "fp": 360,
+            "fn": 332,
+            "accuracy": 0.6924444444444444,
+            "precision": 0.6853146853146853,
+            "recall": 0.7025089605734767,
+            "f1": 0.6938053097345132
+          },
+          "gain": {
+            "n": 2250,
+            "tp": 103,
+            "tn": 1671,
+            "fp": 360,
+            "fn": 116,
+            "accuracy": 0.7884444444444444,
+            "precision": 0.2224622030237581,
+            "recall": 0.4703196347031963,
+            "f1": 0.3020527859237536
+          },
+          "lost": {
+            "n": 2250,
+            "tp": 3,
+            "tn": 2031,
+            "fp": 216,
+            "fn": 0,
+            "accuracy": 0.904,
+            "precision": 0.0136986301369863,
+            "recall": 1.0,
+            "f1": 0.027027027027027025
+          },
+          "boundary_change_accuracy": 0.6924444444444444,
+          "actual_target_rows": 1116,
+          "predicted_target_rows": 1144,
+          "actual_gain_rows": 219,
+          "predicted_gain_rows": 463,
+          "actual_lost_rows": 3,
+          "predicted_lost_rows": 219
+        },
+        "interaction_equation": {
+          "n": 2250,
+          "mae_delta": 0.28169074074074074,
+          "rmse_delta": 0.4227687581309226,
+          "sign_accuracy_delta": 0.5678079146287239,
+          "target": {
+            "n": 2250,
+            "tp": 785,
+            "tn": 774,
+            "fp": 360,
+            "fn": 331,
+            "accuracy": 0.6928888888888889,
+            "precision": 0.6855895196506551,
+            "recall": 0.703405017921147,
+            "f1": 0.6943830163644406
+          },
+          "gain": {
+            "n": 2250,
+            "tp": 103,
+            "tn": 1671,
+            "fp": 360,
+            "fn": 116,
+            "accuracy": 0.7884444444444444,
+            "precision": 0.2224622030237581,
+            "recall": 0.4703196347031963,
+            "f1": 0.3020527859237536
+          },
+          "lost": {
+            "n": 2250,
+            "tp": 3,
+            "tn": 2032,
+            "fp": 215,
+            "fn": 0,
+            "accuracy": 0.9044444444444445,
+            "precision": 0.013761467889908258,
+            "recall": 1.0,
+            "f1": 0.027149321266968326
+          },
+          "boundary_change_accuracy": 0.6928888888888889,
+          "actual_target_rows": 1116,
+          "predicted_target_rows": 1145,
+          "actual_gain_rows": 219,
+          "predicted_gain_rows": 463,
+          "actual_lost_rows": 3,
+          "predicted_lost_rows": 218
+        }
+      },
+      "n_predictions": 4500,
+      "boundary": "This phase fits a simple route-boundary equation from Phase 845 rows and tests it on in-sample, object-holdout, and prompt-holdout splits. It does not load models and does not claim token closure."
+    }
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ]
+}

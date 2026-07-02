@@ -1,0 +1,178 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase audits natural activation and first-step natural channel edits for the Phase 842 core channel. It still does not prove global geometry reuse or full token closure.",
+  "case_ids": [
+    "p816_triangle_geometric_shape"
+  ],
+  "core_candidates": [
+    {
+      "channel_id": 7899,
+      "channel_local_index": 8,
+      "classes": {
+        "object_echo": 7,
+        "target_equivalent": 8,
+        "unknown_other": 1
+      },
+      "flip_one_loss_rows": 4,
+      "leave_one_out_loss_rows": 4,
+      "mean_delta_quality_vs_full": -0.7426129137449673,
+      "n_rows": 16,
+      "single_target_rows": 4,
+      "zero_one_loss_rows": 0
+    }
+  ],
+  "dtype": "bfloat16",
+  "edit_modes": [
+    "original",
+    "zero",
+    "flip"
+  ],
+  "mode_summary": {
+    "flip": {
+      "classes": {
+        "target_equivalent": 1
+      },
+      "mean_abs_channel_activation": 18.625,
+      "mean_channel_activation": -18.625,
+      "mean_target_minus_object_logit": -0.9375,
+      "n": 1,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 1,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 1,
+      "unknown_other_rows": 0
+    },
+    "original": {
+      "classes": {
+        "unknown_other": 1
+      },
+      "mean_abs_channel_activation": 18.625,
+      "mean_channel_activation": -18.625,
+      "mean_target_minus_object_logit": -1.1875,
+      "n": 1,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 0,
+      "unknown_other_rows": 1
+    },
+    "zero": {
+      "classes": {
+        "target_equivalent": 1
+      },
+      "mean_abs_channel_activation": 18.625,
+      "mean_channel_activation": -18.625,
+      "mean_target_minus_object_logit": -1.0625,
+      "n": 1,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 1,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 1,
+      "unknown_other_rows": 0
+    }
+  },
+  "model": "deepseek7b",
+  "n_cases": 1,
+  "n_rows": 3,
+  "object_summary": {
+    "triangle": {
+      "classes": {
+        "target_equivalent": 2,
+        "unknown_other": 1
+      },
+      "mean_abs_channel_activation": 18.625,
+      "mean_channel_activation": -18.625,
+      "mean_target_minus_object_logit": -1.0625,
+      "n": 3,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 2,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 2,
+      "unknown_other_rows": 1
+    }
+  },
+  "original_target_rows": 0,
+  "phase": 843,
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "quantization": "off",
+  "round": "smoke",
+  "skipped_model_load": false,
+  "target_gained_vs_original_rows": 2,
+  "target_lost_vs_original_rows": 0,
+  "target_rows": 2,
+  "timestamp": "2026-07-02 08:44:55",
+  "title": "Core Channel Natural Route Validation",
+  "top_rows": [
+    {
+      "best_target_rank": 176,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "zero",
+      "generated": "Polygon",
+      "object": "triangle",
+      "object_rank": 89,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.0625,
+      "top_tokens": [
+        " Polygon",
+        " polygon",
+        " ",
+        " triangle",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 130,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "flip",
+      "generated": "polygon",
+      "object": "triangle",
+      "object_rank": 73,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.9375,
+      "top_tokens": [
+        " polygon",
+        " Polygon",
+        " polygons",
+        " triangle",
+        " "
+      ]
+    },
+    {
+      "best_target_rank": 245,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "channel_activation_original": -18.625,
+      "edit_mode": "original",
+      "generated": "1",
+      "object": "triangle",
+      "object_rank": 121,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.1875,
+      "top_tokens": [
+        " ",
+        " [",
+        " geometry",
+        " Polygon",
+        " A"
+      ]
+    }
+  ]
+}

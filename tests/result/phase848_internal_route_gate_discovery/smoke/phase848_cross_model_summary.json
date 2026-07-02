@@ -1,0 +1,822 @@
+{
+  "phase": 848,
+  "round": "smoke",
+  "status": "complete",
+  "timestamp": "2026-07-02 10:48:21",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "model_summaries": {
+    "qwen3": {
+      "phase": 848,
+      "title": "Internal Route Gate Discovery",
+      "model": "qwen3",
+      "round": "smoke",
+      "phase845_round": "smoke",
+      "timestamp": "2026-07-02 10:48:08",
+      "attn_implementation": "sdpa",
+      "dtype": "bfloat16",
+      "quantization": "off",
+      "n_rows": 12,
+      "n_feature_rows": 12,
+      "n_predictions": 72,
+      "n_unique_prompts": 1,
+      "top_gears": [
+        {
+          "channel_id": 1532,
+          "gear_key": "L29C1532",
+          "gear_rank": 1,
+          "gear_score": 16.068558430692867,
+          "layer_idx": 29,
+          "max_abs_support": 11.05610054731369,
+          "mean_abs_activation": 17.966666666666665,
+          "mean_abs_coeff": 0.3249633252620697,
+          "mean_abs_support": 5.795507390548786,
+          "mean_activation": 17.966666666666665,
+          "mean_signed_support": 0.3977546327592184,
+          "n": 15,
+          "neg_ratio": 0.0,
+          "pos_ratio": 1.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 2848,
+          "gear_key": "L30C2848",
+          "gear_rank": 2,
+          "gear_score": 8.015071849321407,
+          "layer_idx": 30,
+          "max_abs_support": 7.235517963767052,
+          "mean_abs_activation": 10.6875,
+          "mean_abs_coeff": 0.5409733057022095,
+          "mean_abs_support": 5.781652204692364,
+          "mean_activation": -10.6875,
+          "mean_signed_support": -5.2446324694901705,
+          "n": 3,
+          "neg_ratio": 1.0,
+          "pos_ratio": 0.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 1349,
+          "gear_key": "L30C1349",
+          "gear_rank": 3,
+          "gear_score": 6.351178642972136,
+          "layer_idx": 30,
+          "max_abs_support": 7.756138175725937,
+          "mean_abs_activation": 6.821514423076923,
+          "mean_abs_coeff": 0.28652992042211384,
+          "mean_abs_support": 2.5028731716313186,
+          "mean_activation": -6.662860576923077,
+          "mean_signed_support": -1.2660369550934634,
+          "n": 13,
+          "neg_ratio": 0.9230769230769231,
+          "pos_ratio": 0.07692307692307693,
+          "sign_consistency": 0.9230769230769231
+        },
+        {
+          "channel_id": 2767,
+          "gear_key": "L27C2767",
+          "gear_rank": 4,
+          "gear_score": 4.476247081309588,
+          "layer_idx": 27,
+          "max_abs_support": 3.339812183752656,
+          "mean_abs_activation": 17.446428571428573,
+          "mean_abs_coeff": 0.09820027649402618,
+          "mean_abs_support": 1.6529409534164838,
+          "mean_activation": -17.446428571428573,
+          "mean_signed_support": 0.703983601024707,
+          "n": 14,
+          "neg_ratio": 1.0,
+          "pos_ratio": 0.0,
+          "sign_consistency": 1.0
+        }
+      ],
+      "feature_summary": {
+        "n": 12,
+        "sign_patterns": {
+          "+-": 6,
+          "++": 2,
+          "-+": 2,
+          "--": 2
+        },
+        "neg_count": {
+          "1": 8,
+          "0": 2,
+          "2": 2
+        },
+        "mean_abs_sum": 29.267578125,
+        "mean_abs_mean": 14.6337890625,
+        "mean_original_margin": 0.9375,
+        "residual_classes": {
+          "additive": 11,
+          "synergy": 1
+        }
+      },
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "predictor_summary": {
+            "global_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 1,
+                "tn": 11,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "actual_classes": {
+                "additive": 11,
+                "synergy": 1
+              },
+              "predicted_classes": {
+                "additive": 11,
+                "synergy": 1
+              }
+            },
+            "internal_count_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 1,
+                "tn": 11,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "actual_classes": {
+                "additive": 11,
+                "synergy": 1
+              },
+              "predicted_classes": {
+                "additive": 11,
+                "synergy": 1
+              }
+            },
+            "internal_sign_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 1,
+                "tn": 11,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "actual_classes": {
+                "additive": 11,
+                "synergy": 1
+              },
+              "predicted_classes": {
+                "additive": 11,
+                "synergy": 1
+              }
+            },
+            "internal_strength_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 1,
+                "tn": 11,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "actual_classes": {
+                "additive": 11,
+                "synergy": 1
+              },
+              "predicted_classes": {
+                "additive": 11,
+                "synergy": 1
+              }
+            },
+            "object_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 1,
+                "tn": 11,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "actual_classes": {
+                "additive": 11,
+                "synergy": 1
+              },
+              "predicted_classes": {
+                "additive": 11,
+                "synergy": 1
+              }
+            },
+            "prompt_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 1,
+                "tn": 11,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "actual_classes": {
+                "additive": 11,
+                "synergy": 1
+              },
+              "predicted_classes": {
+                "additive": 11,
+                "synergy": 1
+              }
+            }
+          },
+          "mean_mae_gain_vs_global_combo": {
+            "internal_count_combo": 0.0,
+            "internal_sign_combo": 0.0,
+            "internal_strength_combo": 0.0,
+            "object_combo": 0.0,
+            "prompt_combo": 0.0
+          }
+        }
+      },
+      "boundary": "This phase tests whether natural internal activations of geometry gears form a route-gate signal for Phase 845 interaction residuals. It is a gate-discovery probe, not closure."
+    },
+    "glm4": {
+      "phase": 848,
+      "title": "Internal Route Gate Discovery",
+      "model": "glm4",
+      "round": "smoke",
+      "phase845_round": "smoke",
+      "timestamp": "2026-07-02 10:48:13",
+      "attn_implementation": "sdpa",
+      "dtype": "bfloat16",
+      "quantization": "off",
+      "n_rows": 12,
+      "n_feature_rows": 12,
+      "n_predictions": 72,
+      "n_unique_prompts": 1,
+      "top_gears": [
+        {
+          "channel_id": 2777,
+          "gear_key": "L28C2777",
+          "gear_rank": 1,
+          "gear_score": 0.7089506914517992,
+          "layer_idx": 28,
+          "max_abs_support": 1.0288929212838411,
+          "mean_abs_activation": 3.0598958333333335,
+          "mean_abs_coeff": 0.16712981462478638,
+          "mean_abs_support": 0.5113998233961562,
+          "mean_activation": 3.0598958333333335,
+          "mean_signed_support": -0.5113998233961562,
+          "n": 3,
+          "neg_ratio": 0.0,
+          "pos_ratio": 1.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 6115,
+          "gear_key": "L30C6115",
+          "gear_rank": 2,
+          "gear_score": 0.676936215813856,
+          "layer_idx": 30,
+          "max_abs_support": 0.3394600849132985,
+          "mean_abs_activation": 4.348958333333333,
+          "mean_abs_coeff": 0.05613518059253693,
+          "mean_abs_support": 0.2441531303881978,
+          "mean_activation": 4.348958333333333,
+          "mean_signed_support": 0.02859618566192997,
+          "n": 15,
+          "neg_ratio": 0.0,
+          "pos_ratio": 1.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 6031,
+          "gear_key": "L26C6031",
+          "gear_rank": 3,
+          "gear_score": 0.635292077195988,
+          "layer_idx": 26,
+          "max_abs_support": 0.8077384941279888,
+          "mean_abs_activation": 3.0494791666666665,
+          "mean_abs_coeff": 0.15027692914009094,
+          "mean_abs_support": 0.45826636464335024,
+          "mean_activation": 3.0494791666666665,
+          "mean_signed_support": -0.45826636464335024,
+          "n": 3,
+          "neg_ratio": 0.0,
+          "pos_ratio": 1.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 8036,
+          "gear_key": "L28C8036",
+          "gear_rank": 4,
+          "gear_score": 0.6229010842711385,
+          "layer_idx": 28,
+          "max_abs_support": 0.48145442456007004,
+          "mean_abs_activation": 3.535416666666667,
+          "mean_abs_coeff": 0.08842534627765417,
+          "mean_abs_support": 0.24071151033276691,
+          "mean_activation": 2.716666666666667,
+          "mean_signed_support": 0.10735323713937153,
+          "n": 15,
+          "neg_ratio": 0.13333333333333333,
+          "pos_ratio": 0.8666666666666667,
+          "sign_consistency": 0.8666666666666667
+        }
+      ],
+      "feature_summary": {
+        "n": 12,
+        "sign_patterns": {
+          "++": 6,
+          "+-": 4,
+          "-+": 2
+        },
+        "neg_count": {
+          "0": 6,
+          "1": 6
+        },
+        "mean_abs_sum": 5.994384765625,
+        "mean_abs_mean": 2.9971923828125,
+        "mean_original_margin": 1.390625,
+        "residual_classes": {
+          "additive": 12
+        }
+      },
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "predictor_summary": {
+            "global_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "internal_count_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "internal_sign_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "internal_strength_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "object_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "prompt_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            }
+          },
+          "mean_mae_gain_vs_global_combo": {
+            "internal_count_combo": 0.0,
+            "internal_sign_combo": 0.0,
+            "internal_strength_combo": 0.0,
+            "object_combo": 0.0,
+            "prompt_combo": 0.0
+          }
+        }
+      },
+      "boundary": "This phase tests whether natural internal activations of geometry gears form a route-gate signal for Phase 845 interaction residuals. It is a gate-discovery probe, not closure."
+    },
+    "deepseek7b": {
+      "phase": 848,
+      "title": "Internal Route Gate Discovery",
+      "model": "deepseek7b",
+      "round": "smoke",
+      "phase845_round": "smoke",
+      "timestamp": "2026-07-02 10:48:19",
+      "attn_implementation": "sdpa",
+      "dtype": "bfloat16",
+      "quantization": "off",
+      "n_rows": 12,
+      "n_feature_rows": 12,
+      "n_predictions": 72,
+      "n_unique_prompts": 1,
+      "top_gears": [
+        {
+          "channel_id": 15791,
+          "gear_key": "L27C15791",
+          "gear_rank": 1,
+          "gear_score": 22.195905674280667,
+          "layer_idx": 27,
+          "max_abs_support": 12.937524318695068,
+          "mean_abs_activation": 128.3,
+          "mean_abs_coeff": 0.061976096034049986,
+          "mean_abs_support": 8.00548076108098,
+          "mean_activation": -128.3,
+          "mean_signed_support": -2.1157652486115692,
+          "n": 15,
+          "neg_ratio": 1.0,
+          "pos_ratio": 0.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 1106,
+          "gear_key": "L27C1106",
+          "gear_rank": 2,
+          "gear_score": 21.99913005129076,
+          "layer_idx": 27,
+          "max_abs_support": 11.863838493824005,
+          "mean_abs_activation": 54.8,
+          "mean_abs_coeff": 0.1448742762207985,
+          "mean_abs_support": 7.934508957217137,
+          "mean_activation": -54.8,
+          "mean_signed_support": -2.213640162348747,
+          "n": 15,
+          "neg_ratio": 1.0,
+          "pos_ratio": 0.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 15305,
+          "gear_key": "L27C15305",
+          "gear_rank": 3,
+          "gear_score": 18.981064244051908,
+          "layer_idx": 27,
+          "max_abs_support": 10.334851786494255,
+          "mean_abs_activation": 91.61666666666666,
+          "mean_abs_coeff": 0.07414407804608344,
+          "mean_abs_support": 6.8459718139221275,
+          "mean_activation": -91.61666666666666,
+          "mean_signed_support": -2.044590825494379,
+          "n": 15,
+          "neg_ratio": 1.0,
+          "pos_ratio": 0.0,
+          "sign_consistency": 1.0
+        },
+        {
+          "channel_id": 4036,
+          "gear_key": "L25C4036",
+          "gear_rank": 4,
+          "gear_score": 16.3187157492613,
+          "layer_idx": 25,
+          "max_abs_support": 18.0410498380661,
+          "mean_abs_activation": 19.166666666666668,
+          "mean_abs_coeff": 0.6141633987426758,
+          "mean_abs_support": 11.771465142567953,
+          "mean_activation": 19.166666666666668,
+          "mean_signed_support": 11.771465142567953,
+          "n": 3,
+          "neg_ratio": 0.0,
+          "pos_ratio": 1.0,
+          "sign_consistency": 1.0
+        }
+      ],
+      "feature_summary": {
+        "n": 12,
+        "sign_patterns": {
+          "--": 6,
+          "-+": 6
+        },
+        "neg_count": {
+          "2": 6,
+          "1": 6
+        },
+        "mean_abs_sum": 124.425048828125,
+        "mean_abs_mean": 62.2125244140625,
+        "mean_original_margin": -1.1875,
+        "residual_classes": {
+          "additive": 12
+        }
+      },
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "predictor_summary": {
+            "global_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "internal_count_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "internal_sign_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "internal_strength_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "object_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            },
+            "prompt_combo": {
+              "n": 12,
+              "mae": 0.0,
+              "rmse": 0.0,
+              "sign_accuracy": 1.0,
+              "class_accuracy": 1.0,
+              "strong": {
+                "n": 12,
+                "tp": 0,
+                "tn": 12,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "actual_classes": {
+                "additive": 12
+              },
+              "predicted_classes": {
+                "additive": 12
+              }
+            }
+          },
+          "mean_mae_gain_vs_global_combo": {
+            "internal_count_combo": 0.0,
+            "internal_sign_combo": 0.0,
+            "internal_strength_combo": 0.0,
+            "object_combo": 0.0,
+            "prompt_combo": 0.0
+          }
+        }
+      },
+      "boundary": "This phase tests whether natural internal activations of geometry gears form a route-gate signal for Phase 845 interaction residuals. It is a gate-discovery probe, not closure."
+    }
+  }
+}

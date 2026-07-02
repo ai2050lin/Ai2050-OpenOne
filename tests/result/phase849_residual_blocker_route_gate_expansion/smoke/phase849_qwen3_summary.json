@@ -1,0 +1,311 @@
+{
+  "phase": 849,
+  "title": "Residual-stream / Blocker-field Route Gate Expansion",
+  "model": "qwen3",
+  "round": "smoke",
+  "phase845_round": "smoke",
+  "timestamp": "2026-07-02 11:17:20",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "n_rows": 12,
+  "n_feature_rows": 12,
+  "n_predictions": 84,
+  "n_unique_prompts": 1,
+  "top_gears": [
+    {
+      "channel_id": 1532,
+      "gear_key": "L29C1532",
+      "gear_rank": 1,
+      "gear_score": 16.068558430692867,
+      "layer_idx": 29,
+      "max_abs_support": 11.05610054731369,
+      "mean_abs_activation": 17.966666666666665,
+      "mean_abs_coeff": 0.3249633252620697,
+      "mean_abs_support": 5.795507390548786,
+      "mean_activation": 17.966666666666665,
+      "mean_signed_support": 0.3977546327592184,
+      "n": 15,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 2848,
+      "gear_key": "L30C2848",
+      "gear_rank": 2,
+      "gear_score": 8.015071849321407,
+      "layer_idx": 30,
+      "max_abs_support": 7.235517963767052,
+      "mean_abs_activation": 10.6875,
+      "mean_abs_coeff": 0.5409733057022095,
+      "mean_abs_support": 5.781652204692364,
+      "mean_activation": -10.6875,
+      "mean_signed_support": -5.2446324694901705,
+      "n": 3,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 1349,
+      "gear_key": "L30C1349",
+      "gear_rank": 3,
+      "gear_score": 6.351178642972136,
+      "layer_idx": 30,
+      "max_abs_support": 7.756138175725937,
+      "mean_abs_activation": 6.821514423076923,
+      "mean_abs_coeff": 0.28652992042211384,
+      "mean_abs_support": 2.5028731716313186,
+      "mean_activation": -6.662860576923077,
+      "mean_signed_support": -1.2660369550934634,
+      "n": 13,
+      "neg_ratio": 0.9230769230769231,
+      "pos_ratio": 0.07692307692307693,
+      "sign_consistency": 0.9230769230769231
+    },
+    {
+      "channel_id": 2767,
+      "gear_key": "L27C2767",
+      "gear_rank": 4,
+      "gear_score": 4.476247081309588,
+      "layer_idx": 27,
+      "max_abs_support": 3.339812183752656,
+      "mean_abs_activation": 17.446428571428573,
+      "mean_abs_coeff": 0.09820027649402618,
+      "mean_abs_support": 1.6529409534164838,
+      "mean_activation": -17.446428571428573,
+      "mean_signed_support": 0.703983601024707,
+      "n": 14,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    }
+  ],
+  "feature_summary": {
+    "n": 12,
+    "sign_patterns": {
+      "+-": 6,
+      "++": 2,
+      "-+": 2,
+      "--": 2
+    },
+    "top1_roles": {
+      "blocker": 12
+    },
+    "target_rank_buckets": {
+      "tail": 12
+    },
+    "residual_classes": {
+      "additive": 11,
+      "synergy": 1
+    },
+    "mean_abs_sum": 29.267578125,
+    "mean_target_minus_blocker_logit": -14.25,
+    "mean_blocker_pressure": 14.25,
+    "mean_route_gap": 14.25,
+    "mean_best_target_blocker_resid_final": -10.495817184448242,
+    "mean_best_target_object_resid_final": 1.1051998138427734
+  },
+  "split_summary": {
+    "in_sample": {
+      "n_splits": 1,
+      "split_keys": [
+        "all"
+      ],
+      "predictor_summary": {
+        "blocker_field_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "compact_joint_gate_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "global_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "internal_strength_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "joint_gate_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "residual_projection_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        },
+        "route_competition_combo": {
+          "n": 12,
+          "mae": 0.0,
+          "rmse": 0.0,
+          "sign_accuracy": 1.0,
+          "class_accuracy": 1.0,
+          "strong": {
+            "n": 12,
+            "tp": 1,
+            "tn": 11,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "actual_classes": {
+            "additive": 11,
+            "synergy": 1
+          },
+          "predicted_classes": {
+            "additive": 11,
+            "synergy": 1
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "blocker_field_combo": 0.0,
+        "compact_joint_gate_combo": 0.0,
+        "internal_strength_combo": 0.0,
+        "joint_gate_combo": 0.0,
+        "residual_projection_combo": 0.0,
+        "route_competition_combo": 0.0
+      }
+    }
+  },
+  "boundary": "This phase expands Phase 848 from MLP gear activation gates to residual-stream, blocker-field, and route-competition gate features. It is a route-gate expansion probe, not geometry closure."
+}

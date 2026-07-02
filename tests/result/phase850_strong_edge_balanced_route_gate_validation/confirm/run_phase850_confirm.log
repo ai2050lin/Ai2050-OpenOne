@@ -1,0 +1,4802 @@
+[Phase850] round=confirm source_phase849=confirm split_types=in_sample,object_holdout,prompt_holdout
+[2026-07-02 12:09:02] Phase 850 confirm: start qwen3
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 1/9 in_sample:all selected=residual_projection_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 2/9 object_holdout:circle selected=residual_projection_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 3/9 object_holdout:polygon selected=residual_projection_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 4/9 object_holdout:rectangle selected=residual_projection_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 5/9 object_holdout:square selected=residual_projection_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 6/9 object_holdout:triangle selected=blocker_field_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 7/9 prompt_holdout:natural_category selected=blocker_field_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 8/9 prompt_holdout:natural_question selected=joint_gate_combo
+[2026-07-02 12:09:04] qwen3/confirm: evaluated split 9/9 prompt_holdout:object_only selected=joint_gate_combo
+{
+  "model": "qwen3",
+  "round": "confirm",
+  "feature_summary": {
+    "n": 570,
+    "actual_classes": {
+      "additive": 536,
+      "synergy": 19,
+      "antagonistic": 15
+    },
+    "objects": {
+      "triangle": 114,
+      "square": 114,
+      "rectangle": 114,
+      "circle": 114,
+      "polygon": 114
+    },
+    "prompt_variants": {
+      "natural_question": 190,
+      "object_only": 190,
+      "natural_category": 190
+    },
+    "strong_rows": 34,
+    "mean_abs_residual": 0.14775219298245615,
+    "mean_strong_abs_residual": 1.4200367647058822
+  },
+  "split_summary": {
+    "in_sample": {
+      "selected_gate_counts": {
+        "residual_projection_combo": 1
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.8656716417910447,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.922739244951712,
+          "macro_f1": 0.8682676775983064
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.8333333333333333,
+          "strong_recall": 0.8823529411764706,
+          "balanced_accuracy": 0.9337137840210711,
+          "macro_f1": 0.8855806716820339
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.46875,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.7065956979806848,
+          "macro_f1": 0.500578273440727
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.6451612903225806,
+          "strong_recall": 0.8823529411764706,
+          "balanced_accuracy": 0.9141242317822651,
+          "macro_f1": 0.7208069230991866
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.8831168831168831,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 0.9916044776119404,
+          "macro_f1": 0.921420222925397
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.8923076923076922,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9246049165935031,
+          "macro_f1": 0.8906169817308128
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.8923076923076922,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9246049165935031,
+          "macro_f1": 0.8906169817308128
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.6756756756756757,
+          "strong_recall": 0.7352941176470589,
+          "balanced_accuracy": 0.8536545215100966,
+          "macro_f1": 0.7633748365455683
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.8923076923076922,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9246049165935031,
+          "macro_f1": 0.8906169817308128
+        }
+      },
+      "balanced": {
+        "blocker_field_combo": {
+          "n": 68,
+          "strong_f1": 0.9206349206349206,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9264705882352942,
+          "macro_f1": 0.8824108852555606
+        },
+        "compact_joint_gate_combo": {
+          "n": 68,
+          "strong_f1": 0.923076923076923,
+          "strong_recall": 0.8823529411764706,
+          "balanced_accuracy": 0.9264705882352942,
+          "macro_f1": 0.9256892707596934
+        },
+        "global_combo": {
+          "n": 68,
+          "strong_f1": 0.5882352941176471,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.6911764705882353,
+          "macro_f1": 0.5009803921568627
+        },
+        "internal_strength_combo": {
+          "n": 68,
+          "strong_f1": 0.8823529411764706,
+          "strong_recall": 0.8823529411764706,
+          "balanced_accuracy": 0.8823529411764706,
+          "macro_f1": 0.8063983488132095
+        },
+        "joint_gate_combo": {
+          "n": 68,
+          "strong_f1": 0.9855072463768115,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 0.9852941176470589,
+          "macro_f1": 0.9864778670748819
+        },
+        "model_default_gate": {
+          "n": 68,
+          "strong_f1": 0.9206349206349206,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9264705882352942,
+          "macro_f1": 0.884576357179097
+        },
+        "residual_projection_combo": {
+          "n": 68,
+          "strong_f1": 0.9206349206349206,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9264705882352942,
+          "macro_f1": 0.884576357179097
+        },
+        "route_competition_combo": {
+          "n": 68,
+          "strong_f1": 0.819672131147541,
+          "strong_recall": 0.7352941176470589,
+          "balanced_accuracy": 0.8382352941176471,
+          "macro_f1": 0.8103065134099617
+        },
+        "train_selected_gate": {
+          "n": 68,
+          "strong_f1": 0.9206349206349206,
+          "strong_recall": 0.8529411764705882,
+          "balanced_accuracy": 0.9264705882352942,
+          "macro_f1": 0.884576357179097
+        }
+      }
+    },
+    "object_holdout": {
+      "selected_gate_counts": {
+        "residual_projection_combo": 4,
+        "blocker_field_combo": 1
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.39999999999999997,
+          "strong_recall": 0.38235294117647056,
+          "balanced_accuracy": 0.6743854258121158,
+          "macro_f1": 0.4932833208302076
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.4210526315789474,
+          "strong_recall": 0.35294117647058826,
+          "balanced_accuracy": 0.6662093942054433,
+          "macro_f1": 0.5612716000527634
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.3947368421052631,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.6954016681299385,
+          "macro_f1": 0.49670008354218886
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.40506329113924056,
+          "strong_recall": 0.47058823529411764,
+          "balanced_accuracy": 0.7082418788410887,
+          "macro_f1": 0.5290937050448932
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.45901639344262296,
+          "strong_recall": 0.4117647058823529,
+          "balanced_accuracy": 0.6937554872695346,
+          "macro_f1": 0.5612339467761154
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.53125,
+          "strong_recall": 0.5,
+          "balanced_accuracy": 0.7378731343283582,
+          "macro_f1": 0.5145158435121261
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.53125,
+          "strong_recall": 0.5,
+          "balanced_accuracy": 0.7378731343283582,
+          "macro_f1": 0.5145158435121261
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.2631578947368421,
+          "strong_recall": 0.29411764705882354,
+          "balanced_accuracy": 0.6172080772607551,
+          "macro_f1": 0.456140350877193
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.5,
+          "strong_recall": 0.47058823529411764,
+          "balanced_accuracy": 0.7222344161545216,
+          "macro_f1": 0.5254402763696443
+        }
+      },
+      "balanced": {
+        "blocker_field_combo": {
+          "n": 68,
+          "strong_f1": 0.5416666666666667,
+          "strong_recall": 0.38235294117647056,
+          "balanced_accuracy": 0.6764705882352942,
+          "macro_f1": 0.4633333333333333
+        },
+        "compact_joint_gate_combo": {
+          "n": 68,
+          "strong_f1": 0.489795918367347,
+          "strong_recall": 0.35294117647058826,
+          "balanced_accuracy": 0.6323529411764706,
+          "macro_f1": 0.4756431308155446
+        },
+        "global_combo": {
+          "n": 68,
+          "strong_f1": 0.5882352941176471,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.6911764705882353,
+          "macro_f1": 0.5090449082858951
+        },
+        "internal_strength_combo": {
+          "n": 68,
+          "strong_f1": 0.5925925925925927,
+          "strong_recall": 0.47058823529411764,
+          "balanced_accuracy": 0.6764705882352942,
+          "macro_f1": 0.5019669551534226
+        },
+        "joint_gate_combo": {
+          "n": 68,
+          "strong_f1": 0.5490196078431372,
+          "strong_recall": 0.4117647058823529,
+          "balanced_accuracy": 0.6617647058823529,
+          "macro_f1": 0.4812324929971988
+        },
+        "model_default_gate": {
+          "n": 68,
+          "strong_f1": 0.6296296296296295,
+          "strong_recall": 0.5,
+          "balanced_accuracy": 0.7058823529411764,
+          "macro_f1": 0.4670862837660635
+        },
+        "residual_projection_combo": {
+          "n": 68,
+          "strong_f1": 0.6296296296296295,
+          "strong_recall": 0.5,
+          "balanced_accuracy": 0.7058823529411764,
+          "macro_f1": 0.4670862837660635
+        },
+        "route_competition_combo": {
+          "n": 68,
+          "strong_f1": 0.4166666666666667,
+          "strong_recall": 0.29411764705882354,
+          "balanced_accuracy": 0.5882352941176471,
+          "macro_f1": 0.42480359147025815
+        },
+        "train_selected_gate": {
+          "n": 68,
+          "strong_f1": 0.6037735849056604,
+          "strong_recall": 0.47058823529411764,
+          "balanced_accuracy": 0.6911764705882353,
+          "macro_f1": 0.4788810414070073
+        }
+      }
+    },
+    "prompt_holdout": {
+      "selected_gate_counts": {
+        "blocker_field_combo": 1,
+        "joint_gate_combo": 2
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.4333333333333333,
+          "strong_recall": 0.38235294117647056,
+          "balanced_accuracy": 0.6790496049165935,
+          "macro_f1": 0.47522045855379186
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.4782608695652174,
+          "strong_recall": 0.6470588235294118,
+          "balanced_accuracy": 0.7899473222124671,
+          "macro_f1": 0.5654756906796728
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.4054054054054054,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.6972673397717295,
+          "macro_f1": 0.49735251198665836
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.42553191489361697,
+          "strong_recall": 0.5882352941176471,
+          "balanced_accuracy": 0.7568042142230027,
+          "macro_f1": 0.5806028045083479
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.4489795918367347,
+          "strong_recall": 0.6470588235294118,
+          "balanced_accuracy": 0.784350307287094,
+          "macro_f1": 0.5579644381149338
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.4838709677419355,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.7084613696224759,
+          "macro_f1": 0.6088438717010146
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.4838709677419355,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.7084613696224759,
+          "macro_f1": 0.6088438717010146
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.03174603174603175,
+          "strong_recall": 0.029411764705882353,
+          "balanced_accuracy": 0.48858647936786653,
+          "macro_f1": 0.31445372949551226
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.40506329113924056,
+          "strong_recall": 0.47058823529411764,
+          "balanced_accuracy": 0.7082418788410887,
+          "macro_f1": 0.5164028870909173
+        }
+      },
+      "balanced": {
+        "blocker_field_combo": {
+          "n": 68,
+          "strong_f1": 0.5416666666666667,
+          "strong_recall": 0.38235294117647056,
+          "balanced_accuracy": 0.6764705882352942,
+          "macro_f1": 0.44753086419753085
+        },
+        "compact_joint_gate_combo": {
+          "n": 68,
+          "strong_f1": 0.7213114754098361,
+          "strong_recall": 0.6470588235294118,
+          "balanced_accuracy": 0.75,
+          "macro_f1": 0.5918373275236021
+        },
+        "global_combo": {
+          "n": 68,
+          "strong_f1": 0.5882352941176471,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.6911764705882353,
+          "macro_f1": 0.5009803921568627
+        },
+        "internal_strength_combo": {
+          "n": 68,
+          "strong_f1": 0.6896551724137931,
+          "strong_recall": 0.5882352941176471,
+          "balanced_accuracy": 0.7352941176470589,
+          "macro_f1": 0.6626229206874369
+        },
+        "joint_gate_combo": {
+          "n": 68,
+          "strong_f1": 0.7096774193548386,
+          "strong_recall": 0.6470588235294118,
+          "balanced_accuracy": 0.7352941176470589,
+          "macro_f1": 0.5827844651374062
+        },
+        "model_default_gate": {
+          "n": 68,
+          "strong_f1": 0.6122448979591837,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.7205882352941176,
+          "macro_f1": 0.5894252873563218
+        },
+        "residual_projection_combo": {
+          "n": 68,
+          "strong_f1": 0.6122448979591837,
+          "strong_recall": 0.4411764705882353,
+          "balanced_accuracy": 0.7205882352941176,
+          "macro_f1": 0.5894252873563218
+        },
+        "route_competition_combo": {
+          "n": 68,
+          "strong_f1": 0.05714285714285715,
+          "strong_recall": 0.029411764705882353,
+          "balanced_accuracy": 0.5147058823529411,
+          "macro_f1": 0.2244224422442244
+        },
+        "train_selected_gate": {
+          "n": 68,
+          "strong_f1": 0.6037735849056604,
+          "strong_recall": 0.47058823529411764,
+          "balanced_accuracy": 0.6911764705882353,
+          "macro_f1": 0.5194721744119335
+        }
+      }
+    }
+  }
+}
+[2026-07-02 12:09:04] Phase 850 confirm: done qwen3
+[2026-07-02 12:09:04] Phase 850 confirm: start glm4
+[2026-07-02 12:09:06] glm4/confirm: evaluated split 1/9 in_sample:all selected=global_combo
+[2026-07-02 12:09:06] glm4/confirm: evaluated split 2/9 object_holdout:circle selected=global_combo
+[2026-07-02 12:09:06] glm4/confirm: evaluated split 3/9 object_holdout:polygon selected=global_combo
+[2026-07-02 12:09:06] glm4/confirm: evaluated split 4/9 object_holdout:rectangle selected=global_combo
+[2026-07-02 12:09:06] glm4/confirm: evaluated split 5/9 object_holdout:square selected=global_combo
+[2026-07-02 12:09:07] glm4/confirm: evaluated split 6/9 object_holdout:triangle selected=global_combo
+[2026-07-02 12:09:07] glm4/confirm: evaluated split 7/9 prompt_holdout:natural_category selected=global_combo
+[2026-07-02 12:09:07] glm4/confirm: evaluated split 8/9 prompt_holdout:natural_question selected=global_combo
+[2026-07-02 12:09:07] glm4/confirm: evaluated split 9/9 prompt_holdout:object_only selected=global_combo
+{
+  "model": "glm4",
+  "round": "confirm",
+  "feature_summary": {
+    "n": 570,
+    "actual_classes": {
+      "additive": 570
+    },
+    "objects": {
+      "triangle": 114,
+      "square": 114,
+      "rectangle": 114,
+      "circle": 114,
+      "polygon": 114
+    },
+    "prompt_variants": {
+      "natural_question": 190,
+      "object_only": 190,
+      "natural_category": 190
+    },
+    "strong_rows": 0,
+    "mean_abs_residual": 0.04159669039542215,
+    "mean_strong_abs_residual": null
+  },
+  "split_summary": {
+    "in_sample": {
+      "selected_gate_counts": {
+        "global_combo": 1
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        }
+      },
+      "balanced": {}
+    },
+    "object_holdout": {
+      "selected_gate_counts": {
+        "global_combo": 5
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        }
+      },
+      "balanced": {}
+    },
+    "prompt_holdout": {
+      "selected_gate_counts": {
+        "global_combo": 3
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": null,
+          "macro_f1": 0.3333333333333333
+        }
+      },
+      "balanced": {}
+    }
+  }
+}
+[2026-07-02 12:09:07] Phase 850 confirm: done glm4
+[2026-07-02 12:09:07] Phase 850 confirm: start deepseek7b
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 1/9 in_sample:all selected=blocker_field_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 2/9 object_holdout:circle selected=global_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 3/9 object_holdout:polygon selected=blocker_field_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 4/9 object_holdout:rectangle selected=blocker_field_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 5/9 object_holdout:square selected=blocker_field_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 6/9 object_holdout:triangle selected=blocker_field_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 7/9 prompt_holdout:natural_category selected=residual_projection_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 8/9 prompt_holdout:natural_question selected=global_combo
+[2026-07-02 12:09:09] deepseek7b/confirm: evaluated split 9/9 prompt_holdout:object_only selected=route_competition_combo
+{
+  "model": "deepseek7b",
+  "round": "confirm",
+  "feature_summary": {
+    "n": 570,
+    "actual_classes": {
+      "additive": 567,
+      "synergy": 3
+    },
+    "objects": {
+      "triangle": 114,
+      "square": 114,
+      "rectangle": 114,
+      "circle": 114,
+      "polygon": 114
+    },
+    "prompt_variants": {
+      "natural_question": 190,
+      "object_only": 190,
+      "natural_category": 190
+    },
+    "strong_rows": 3,
+    "mean_abs_residual": 0.0371984649122807,
+    "mean_strong_abs_residual": 0.5416666666666666
+  },
+  "split_summary": {
+    "in_sample": {
+      "selected_gate_counts": {
+        "blocker_field_combo": 1
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.8571428571428571,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 0.9991181657848325,
+          "macro_f1": 0.6187534148699196
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.125,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 0.962962962962963,
+          "macro_f1": 0.36217948717948717
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.23529411764705882,
+          "strong_recall": 0.6666666666666666,
+          "balanced_accuracy": 0.8227513227513228,
+          "macro_f1": 0.4079059940984408
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.8571428571428571,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 0.9991181657848325,
+          "macro_f1": 0.6187534148699196
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.6666666666666666,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 0.9973544973544973,
+          "macro_f1": 0.5546713822575892
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        }
+      },
+      "balanced": {
+        "blocker_field_combo": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "compact_joint_gate_combo": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "global_combo": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "internal_strength_combo": {
+          "n": 6,
+          "strong_f1": 0.8,
+          "strong_recall": 0.6666666666666666,
+          "balanced_accuracy": 0.8333333333333333,
+          "macro_f1": 0.5523809523809523
+        },
+        "joint_gate_combo": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "model_default_gate": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "residual_projection_combo": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "route_competition_combo": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        },
+        "train_selected_gate": {
+          "n": 6,
+          "strong_f1": 1.0,
+          "strong_recall": 1.0,
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666
+        }
+      }
+    },
+    "object_holdout": {
+      "selected_gate_counts": {
+        "global_combo": 1,
+        "blocker_field_combo": 4
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.33245382585751976
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4991181657848324,
+          "macro_f1": 0.33215962441314556
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.46825396825396826,
+          "macro_f1": 0.3215258855585831
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.49559082892416223,
+          "macro_f1": 0.33097762073027087
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4991181657848324,
+          "macro_f1": 0.33215962441314556
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.33245382585751976
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.33245382585751976
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4947089947089947,
+          "macro_f1": 0.3306808134394341
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.33245382585751976
+        }
+      },
+      "balanced": {
+        "blocker_field_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "compact_joint_gate_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "global_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "internal_strength_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "joint_gate_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "model_default_gate": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "residual_projection_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "route_competition_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "train_selected_gate": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        }
+      }
+    },
+    "prompt_holdout": {
+      "selected_gate_counts": {
+        "residual_projection_combo": 1,
+        "global_combo": 1,
+        "route_competition_combo": 1
+      },
+      "raw": {
+        "blocker_field_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.33245382585751976
+        },
+        "compact_joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4991181657848324,
+          "macro_f1": 0.33215962441314556
+        },
+        "global_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.47354497354497355,
+          "macro_f1": 0.32339656729900634
+        },
+        "internal_strength_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4964726631393298,
+          "macro_f1": 0.3312739040894381
+        },
+        "joint_gate_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4991181657848324,
+          "macro_f1": 0.33215962441314556
+        },
+        "model_default_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.33245382585751976
+        },
+        "residual_projection_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4973544973544973,
+          "macro_f1": 0.3315696649029982
+        },
+        "route_competition_combo": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4973544973544973,
+          "macro_f1": 0.3315696649029982
+        },
+        "train_selected_gate": {
+          "n": 570,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.4973544973544973,
+          "macro_f1": 0.3315696649029982
+        }
+      },
+      "balanced": {
+        "blocker_field_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "compact_joint_gate_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "global_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "internal_strength_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "joint_gate_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "model_default_gate": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "residual_projection_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "route_competition_combo": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        },
+        "train_selected_gate": {
+          "n": 6,
+          "strong_f1": 0.0,
+          "strong_recall": 0.0,
+          "balanced_accuracy": 0.5,
+          "macro_f1": 0.2222222222222222
+        }
+      }
+    }
+  }
+}
+[2026-07-02 12:09:10] Phase 850 confirm: done deepseek7b
+{
+  "phase": 850,
+  "round": "confirm",
+  "status": "complete",
+  "timestamp": "2026-07-02 12:09:12",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "model_summaries": {
+    "qwen3": {
+      "phase": 850,
+      "title": "Strong-edge Balanced Route Gate Validation",
+      "model": "qwen3",
+      "round": "confirm",
+      "phase849_round": "confirm",
+      "timestamp": "2026-07-02 12:09:04",
+      "source_rows": 570,
+      "n_predictions": 15390,
+      "feature_summary": {
+        "n": 570,
+        "actual_classes": {
+          "additive": 536,
+          "synergy": 19,
+          "antagonistic": 15
+        },
+        "objects": {
+          "triangle": 114,
+          "square": 114,
+          "rectangle": 114,
+          "circle": 114,
+          "polygon": 114
+        },
+        "prompt_variants": {
+          "natural_question": 190,
+          "object_only": 190,
+          "natural_category": 190
+        },
+        "strong_rows": 34,
+        "mean_abs_residual": 0.14775219298245615,
+        "mean_strong_abs_residual": 1.4200367647058822
+      },
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "selected_gate_counts": {
+            "residual_projection_combo": 1
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 537,
+                "synergy": 15,
+                "antagonistic": 18
+              },
+              "strong": {
+                "n": 570,
+                "tp": 29,
+                "tn": 532,
+                "fp": 4,
+                "fn": 5,
+                "accuracy": 0.9842105263157894,
+                "precision": 0.8787878787878788,
+                "recall": 0.8529411764705882,
+                "f1": 0.8656716417910447
+              },
+              "balanced_accuracy": 0.922739244951712,
+              "macro_f1": 0.8682676775983064,
+              "class_accuracy": 0.980701754385965
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 532,
+                "synergy": 22,
+                "antagonistic": 16
+              },
+              "strong": {
+                "n": 570,
+                "tp": 30,
+                "tn": 528,
+                "fp": 8,
+                "fn": 4,
+                "accuracy": 0.9789473684210527,
+                "precision": 0.7894736842105263,
+                "recall": 0.8823529411764706,
+                "f1": 0.8333333333333333
+              },
+              "balanced_accuracy": 0.9337137840210711,
+              "macro_f1": 0.8855806716820339,
+              "class_accuracy": 0.9789473684210527
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 540,
+                "antagonistic": 30
+              },
+              "strong": {
+                "n": 570,
+                "tp": 15,
+                "tn": 521,
+                "fp": 15,
+                "fn": 19,
+                "accuracy": 0.9403508771929825,
+                "precision": 0.5,
+                "recall": 0.4411764705882353,
+                "f1": 0.46875
+              },
+              "balanced_accuracy": 0.7065956979806848,
+              "macro_f1": 0.500578273440727,
+              "class_accuracy": 0.9350877192982456
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 511,
+                "antagonistic": 18,
+                "synergy": 41
+              },
+              "strong": {
+                "n": 570,
+                "tp": 30,
+                "tn": 507,
+                "fp": 29,
+                "fn": 4,
+                "accuracy": 0.9421052631578948,
+                "precision": 0.5084745762711864,
+                "recall": 0.8823529411764706,
+                "f1": 0.6451612903225806
+              },
+              "balanced_accuracy": 0.9141242317822651,
+              "macro_f1": 0.7208069230991866,
+              "class_accuracy": 0.9350877192982456
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 527,
+                "synergy": 25,
+                "antagonistic": 18
+              },
+              "strong": {
+                "n": 570,
+                "tp": 34,
+                "tn": 527,
+                "fp": 9,
+                "fn": 0,
+                "accuracy": 0.9842105263157894,
+                "precision": 0.7906976744186046,
+                "recall": 1.0,
+                "f1": 0.8831168831168831
+              },
+              "balanced_accuracy": 0.9916044776119404,
+              "macro_f1": 0.921420222925397,
+              "class_accuracy": 0.9842105263157894
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 539,
+                "synergy": 19,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 570,
+                "tp": 29,
+                "tn": 534,
+                "fp": 2,
+                "fn": 5,
+                "accuracy": 0.987719298245614,
+                "precision": 0.9354838709677419,
+                "recall": 0.8529411764705882,
+                "f1": 0.8923076923076922
+              },
+              "balanced_accuracy": 0.9246049165935031,
+              "macro_f1": 0.8906169817308128,
+              "class_accuracy": 0.9842105263157894
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 539,
+                "synergy": 19,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 570,
+                "tp": 29,
+                "tn": 534,
+                "fp": 2,
+                "fn": 5,
+                "accuracy": 0.987719298245614,
+                "precision": 0.9354838709677419,
+                "recall": 0.8529411764705882,
+                "f1": 0.8923076923076922
+              },
+              "balanced_accuracy": 0.9246049165935031,
+              "macro_f1": 0.8906169817308128,
+              "class_accuracy": 0.9842105263157894
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 530,
+                "synergy": 22,
+                "antagonistic": 18
+              },
+              "strong": {
+                "n": 570,
+                "tp": 25,
+                "tn": 521,
+                "fp": 15,
+                "fn": 9,
+                "accuracy": 0.9578947368421052,
+                "precision": 0.625,
+                "recall": 0.7352941176470589,
+                "f1": 0.6756756756756757
+              },
+              "balanced_accuracy": 0.8536545215100966,
+              "macro_f1": 0.7633748365455683,
+              "class_accuracy": 0.956140350877193
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 539,
+                "synergy": 19,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 570,
+                "tp": 29,
+                "tn": 534,
+                "fp": 2,
+                "fn": 5,
+                "accuracy": 0.987719298245614,
+                "precision": 0.9354838709677419,
+                "recall": 0.8529411764705882,
+                "f1": 0.8923076923076922
+              },
+              "balanced_accuracy": 0.9246049165935031,
+              "macro_f1": 0.8906169817308128,
+              "class_accuracy": 0.9842105263157894
+            }
+          },
+          "balanced_summary": {
+            "blocker_field_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 39,
+                "synergy": 13,
+                "antagonistic": 16
+              },
+              "strong": {
+                "n": 68,
+                "tp": 29,
+                "tn": 34,
+                "fp": 0,
+                "fn": 5,
+                "accuracy": 0.9264705882352942,
+                "precision": 1.0,
+                "recall": 0.8529411764705882,
+                "f1": 0.9206349206349206
+              },
+              "balanced_accuracy": 0.9264705882352942,
+              "macro_f1": 0.8824108852555606,
+              "class_accuracy": 0.8970588235294118
+            },
+            "compact_joint_gate_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "synergy": 18,
+                "additive": 37,
+                "antagonistic": 13
+              },
+              "strong": {
+                "n": 68,
+                "tp": 30,
+                "tn": 33,
+                "fp": 1,
+                "fn": 4,
+                "accuracy": 0.9264705882352942,
+                "precision": 0.967741935483871,
+                "recall": 0.8823529411764706,
+                "f1": 0.923076923076923
+              },
+              "balanced_accuracy": 0.9264705882352942,
+              "macro_f1": 0.9256892707596934,
+              "class_accuracy": 0.9264705882352942
+            },
+            "global_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 51,
+                "antagonistic": 17
+              },
+              "strong": {
+                "n": 68,
+                "tp": 15,
+                "tn": 32,
+                "fp": 2,
+                "fn": 19,
+                "accuracy": 0.6911764705882353,
+                "precision": 0.8823529411764706,
+                "recall": 0.4411764705882353,
+                "f1": 0.5882352941176471
+              },
+              "balanced_accuracy": 0.6911764705882353,
+              "macro_f1": 0.5009803921568627,
+              "class_accuracy": 0.6470588235294118
+            },
+            "internal_strength_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "strong": {
+                "n": 68,
+                "tp": 30,
+                "tn": 30,
+                "fp": 4,
+                "fn": 4,
+                "accuracy": 0.8823529411764706,
+                "precision": 0.8823529411764706,
+                "recall": 0.8823529411764706,
+                "f1": 0.8823529411764706
+              },
+              "balanced_accuracy": 0.8823529411764706,
+              "macro_f1": 0.8063983488132095,
+              "class_accuracy": 0.8235294117647058
+            },
+            "joint_gate_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "synergy": 20,
+                "additive": 33,
+                "antagonistic": 15
+              },
+              "strong": {
+                "n": 68,
+                "tp": 34,
+                "tn": 33,
+                "fp": 1,
+                "fn": 0,
+                "accuracy": 0.9852941176470589,
+                "precision": 0.9714285714285714,
+                "recall": 1.0,
+                "f1": 0.9855072463768115
+              },
+              "balanced_accuracy": 0.9852941176470589,
+              "macro_f1": 0.9864778670748819,
+              "class_accuracy": 0.9852941176470589
+            },
+            "model_default_gate": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "synergy": 17,
+                "additive": 39,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 68,
+                "tp": 29,
+                "tn": 34,
+                "fp": 0,
+                "fn": 5,
+                "accuracy": 0.9264705882352942,
+                "precision": 1.0,
+                "recall": 0.8529411764705882,
+                "f1": 0.9206349206349206
+              },
+              "balanced_accuracy": 0.9264705882352942,
+              "macro_f1": 0.884576357179097,
+              "class_accuracy": 0.8970588235294118
+            },
+            "residual_projection_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "synergy": 17,
+                "additive": 39,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 68,
+                "tp": 29,
+                "tn": 34,
+                "fp": 0,
+                "fn": 5,
+                "accuracy": 0.9264705882352942,
+                "precision": 1.0,
+                "recall": 0.8529411764705882,
+                "f1": 0.9206349206349206
+              },
+              "balanced_accuracy": 0.9264705882352942,
+              "macro_f1": 0.884576357179097,
+              "class_accuracy": 0.8970588235294118
+            },
+            "route_competition_combo": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 41,
+                "synergy": 13,
+                "antagonistic": 14
+              },
+              "strong": {
+                "n": 68,
+                "tp": 25,
+                "tn": 32,
+                "fp": 2,
+                "fn": 9,
+                "accuracy": 0.8382352941176471,
+                "precision": 0.9259259259259259,
+                "recall": 0.7352941176470589,
+                "f1": 0.819672131147541
+              },
+              "balanced_accuracy": 0.8382352941176471,
+              "macro_f1": 0.8103065134099617,
+              "class_accuracy": 0.8235294117647058
+            },
+            "train_selected_gate": {
+              "n": 68,
+              "actual_classes": {
+                "synergy": 19,
+                "additive": 34,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "synergy": 17,
+                "additive": 39,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 68,
+                "tp": 29,
+                "tn": 34,
+                "fp": 0,
+                "fn": 5,
+                "accuracy": 0.9264705882352942,
+                "precision": 1.0,
+                "recall": 0.8529411764705882,
+                "f1": 0.9206349206349206
+              },
+              "balanced_accuracy": 0.9264705882352942,
+              "macro_f1": 0.884576357179097,
+              "class_accuracy": 0.8970588235294118
+            }
+          }
+        },
+        "object_holdout": {
+          "n_splits": 5,
+          "split_keys": [
+            "circle",
+            "polygon",
+            "rectangle",
+            "square",
+            "triangle"
+          ],
+          "selected_gate_counts": {
+            "residual_projection_combo": 4,
+            "blocker_field_combo": 1
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 539,
+                "synergy": 15,
+                "antagonistic": 16
+              },
+              "strong": {
+                "n": 570,
+                "tp": 13,
+                "tn": 518,
+                "fp": 18,
+                "fn": 21,
+                "accuracy": 0.9315789473684211,
+                "precision": 0.41935483870967744,
+                "recall": 0.38235294117647056,
+                "f1": 0.39999999999999997
+              },
+              "balanced_accuracy": 0.6743854258121158,
+              "macro_f1": 0.4932833208302076,
+              "class_accuracy": 0.9228070175438596
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 547,
+                "antagonistic": 13,
+                "synergy": 10
+              },
+              "strong": {
+                "n": 570,
+                "tp": 12,
+                "tn": 525,
+                "fp": 11,
+                "fn": 22,
+                "accuracy": 0.9421052631578948,
+                "precision": 0.5217391304347826,
+                "recall": 0.35294117647058826,
+                "f1": 0.4210526315789474
+              },
+              "balanced_accuracy": 0.6662093942054433,
+              "macro_f1": 0.5612716000527634,
+              "class_accuracy": 0.9385964912280702
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 528,
+                "antagonistic": 30,
+                "synergy": 12
+              },
+              "strong": {
+                "n": 570,
+                "tp": 15,
+                "tn": 509,
+                "fp": 27,
+                "fn": 19,
+                "accuracy": 0.9192982456140351,
+                "precision": 0.35714285714285715,
+                "recall": 0.4411764705882353,
+                "f1": 0.3947368421052631
+              },
+              "balanced_accuracy": 0.6954016681299385,
+              "macro_f1": 0.49670008354218886,
+              "class_accuracy": 0.9140350877192982
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 525,
+                "antagonistic": 23,
+                "synergy": 22
+              },
+              "strong": {
+                "n": 570,
+                "tp": 16,
+                "tn": 507,
+                "fp": 29,
+                "fn": 18,
+                "accuracy": 0.9175438596491228,
+                "precision": 0.35555555555555557,
+                "recall": 0.47058823529411764,
+                "f1": 0.40506329113924056
+              },
+              "balanced_accuracy": 0.7082418788410887,
+              "macro_f1": 0.5290937050448932,
+              "class_accuracy": 0.9105263157894737
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 543,
+                "synergy": 14,
+                "antagonistic": 13
+              },
+              "strong": {
+                "n": 570,
+                "tp": 14,
+                "tn": 523,
+                "fp": 13,
+                "fn": 20,
+                "accuracy": 0.9421052631578948,
+                "precision": 0.5185185185185185,
+                "recall": 0.4117647058823529,
+                "f1": 0.45901639344262296
+              },
+              "balanced_accuracy": 0.6937554872695346,
+              "macro_f1": 0.5612339467761154,
+              "class_accuracy": 0.9350877192982456
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 540,
+                "antagonistic": 20,
+                "synergy": 10
+              },
+              "strong": {
+                "n": 570,
+                "tp": 17,
+                "tn": 523,
+                "fp": 13,
+                "fn": 17,
+                "accuracy": 0.9473684210526315,
+                "precision": 0.5666666666666667,
+                "recall": 0.5,
+                "f1": 0.53125
+              },
+              "balanced_accuracy": 0.7378731343283582,
+              "macro_f1": 0.5145158435121261,
+              "class_accuracy": 0.9350877192982456
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 540,
+                "antagonistic": 20,
+                "synergy": 10
+              },
+              "strong": {
+                "n": 570,
+                "tp": 17,
+                "tn": 523,
+                "fp": 13,
+                "fn": 17,
+                "accuracy": 0.9473684210526315,
+                "precision": 0.5666666666666667,
+                "recall": 0.5,
+                "f1": 0.53125
+              },
+              "balanced_accuracy": 0.7378731343283582,
+              "macro_f1": 0.5145158435121261,
+              "class_accuracy": 0.9350877192982456
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 528,
+                "synergy": 19,
+                "antagonistic": 23
+              },
+              "strong": {
+                "n": 570,
+                "tp": 10,
+                "tn": 504,
+                "fp": 32,
+                "fn": 24,
+                "accuracy": 0.9017543859649123,
+                "precision": 0.23809523809523808,
+                "recall": 0.29411764705882354,
+                "f1": 0.2631578947368421
+              },
+              "balanced_accuracy": 0.6172080772607551,
+              "macro_f1": 0.456140350877193,
+              "class_accuracy": 0.8982456140350877
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "antagonistic": 15,
+                "synergy": 19
+              },
+              "predicted_classes": {
+                "additive": 540,
+                "antagonistic": 18,
+                "synergy": 12
+              },
+              "strong": {
+                "n": 570,
+                "tp": 16,
+                "tn": 522,
+                "fp": 14,
+                "fn": 18,
+                "accuracy": 0.9438596491228071,
+                "precision": 0.5333333333333333,
+                "recall": 0.47058823529411764,
+                "f1": 0.5
+              },
+              "balanced_accuracy": 0.7222344161545216,
+              "macro_f1": 0.5254402763696443,
+              "class_accuracy": 0.9333333333333333
+            }
+          },
+          "balanced_summary": {
+            "blocker_field_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "additive": 54,
+                "synergy": 4,
+                "antagonistic": 10
+              },
+              "strong": {
+                "n": 68,
+                "tp": 13,
+                "tn": 33,
+                "fp": 1,
+                "fn": 21,
+                "accuracy": 0.6764705882352942,
+                "precision": 0.9285714285714286,
+                "recall": 0.38235294117647056,
+                "f1": 0.5416666666666667
+              },
+              "balanced_accuracy": 0.6764705882352942,
+              "macro_f1": 0.4633333333333333,
+              "class_accuracy": 0.6029411764705882
+            },
+            "compact_joint_gate_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "additive": 53,
+                "antagonistic": 13,
+                "synergy": 2
+              },
+              "strong": {
+                "n": 68,
+                "tp": 12,
+                "tn": 31,
+                "fp": 3,
+                "fn": 22,
+                "accuracy": 0.6323529411764706,
+                "precision": 0.8,
+                "recall": 0.35294117647058826,
+                "f1": 0.489795918367347
+              },
+              "balanced_accuracy": 0.6323529411764706,
+              "macro_f1": 0.4756431308155446,
+              "class_accuracy": 0.6029411764705882
+            },
+            "global_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "antagonistic": 16,
+                "additive": 51,
+                "synergy": 1
+              },
+              "strong": {
+                "n": 68,
+                "tp": 15,
+                "tn": 32,
+                "fp": 2,
+                "fn": 19,
+                "accuracy": 0.6911764705882353,
+                "precision": 0.8823529411764706,
+                "recall": 0.4411764705882353,
+                "f1": 0.5882352941176471
+              },
+              "balanced_accuracy": 0.6911764705882353,
+              "macro_f1": 0.5090449082858951,
+              "class_accuracy": 0.6470588235294118
+            },
+            "internal_strength_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "antagonistic": 16,
+                "additive": 48,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 68,
+                "tp": 16,
+                "tn": 30,
+                "fp": 4,
+                "fn": 18,
+                "accuracy": 0.6764705882352942,
+                "precision": 0.8,
+                "recall": 0.47058823529411764,
+                "f1": 0.5925925925925927
+              },
+              "balanced_accuracy": 0.6764705882352942,
+              "macro_f1": 0.5019669551534226,
+              "class_accuracy": 0.6176470588235294
+            },
+            "joint_gate_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "additive": 51,
+                "antagonistic": 13,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 68,
+                "tp": 14,
+                "tn": 31,
+                "fp": 3,
+                "fn": 20,
+                "accuracy": 0.6617647058823529,
+                "precision": 0.8235294117647058,
+                "recall": 0.4117647058823529,
+                "f1": 0.5490196078431372
+              },
+              "balanced_accuracy": 0.6617647058823529,
+              "macro_f1": 0.4812324929971988,
+              "class_accuracy": 0.6029411764705882
+            },
+            "model_default_gate": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "additive": 48,
+                "antagonistic": 16,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 68,
+                "tp": 17,
+                "tn": 31,
+                "fp": 3,
+                "fn": 17,
+                "accuracy": 0.7058823529411765,
+                "precision": 0.85,
+                "recall": 0.5,
+                "f1": 0.6296296296296295
+              },
+              "balanced_accuracy": 0.7058823529411764,
+              "macro_f1": 0.4670862837660635,
+              "class_accuracy": 0.6029411764705882
+            },
+            "residual_projection_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "additive": 48,
+                "antagonistic": 16,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 68,
+                "tp": 17,
+                "tn": 31,
+                "fp": 3,
+                "fn": 17,
+                "accuracy": 0.7058823529411765,
+                "precision": 0.85,
+                "recall": 0.5,
+                "f1": 0.6296296296296295
+              },
+              "balanced_accuracy": 0.7058823529411764,
+              "macro_f1": 0.4670862837660635,
+              "class_accuracy": 0.6029411764705882
+            },
+            "route_competition_combo": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "antagonistic": 12,
+                "additive": 54,
+                "synergy": 2
+              },
+              "strong": {
+                "n": 68,
+                "tp": 10,
+                "tn": 30,
+                "fp": 4,
+                "fn": 24,
+                "accuracy": 0.5882352941176471,
+                "precision": 0.7142857142857143,
+                "recall": 0.29411764705882354,
+                "f1": 0.4166666666666667
+              },
+              "balanced_accuracy": 0.5882352941176471,
+              "macro_f1": 0.42480359147025815,
+              "class_accuracy": 0.5588235294117647
+            },
+            "train_selected_gate": {
+              "n": 68,
+              "actual_classes": {
+                "antagonistic": 15,
+                "synergy": 19,
+                "additive": 34
+              },
+              "predicted_classes": {
+                "additive": 49,
+                "antagonistic": 14,
+                "synergy": 5
+              },
+              "strong": {
+                "n": 68,
+                "tp": 16,
+                "tn": 31,
+                "fp": 3,
+                "fn": 18,
+                "accuracy": 0.6911764705882353,
+                "precision": 0.8421052631578947,
+                "recall": 0.47058823529411764,
+                "f1": 0.6037735849056604
+              },
+              "balanced_accuracy": 0.6911764705882353,
+              "macro_f1": 0.4788810414070073,
+              "class_accuracy": 0.6029411764705882
+            }
+          }
+        },
+        "prompt_holdout": {
+          "n_splits": 3,
+          "split_keys": [
+            "natural_category",
+            "natural_question",
+            "object_only"
+          ],
+          "selected_gate_counts": {
+            "blocker_field_combo": 1,
+            "joint_gate_combo": 2
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 544,
+                "synergy": 6,
+                "antagonistic": 20
+              },
+              "strong": {
+                "n": 570,
+                "tp": 13,
+                "tn": 523,
+                "fp": 13,
+                "fn": 21,
+                "accuracy": 0.9403508771929825,
+                "precision": 0.5,
+                "recall": 0.38235294117647056,
+                "f1": 0.4333333333333333
+              },
+              "balanced_accuracy": 0.6790496049165935,
+              "macro_f1": 0.47522045855379186,
+              "class_accuracy": 0.9315789473684211
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 512,
+                "antagonistic": 26,
+                "synergy": 32
+              },
+              "strong": {
+                "n": 570,
+                "tp": 22,
+                "tn": 500,
+                "fp": 36,
+                "fn": 12,
+                "accuracy": 0.9157894736842105,
+                "precision": 0.3793103448275862,
+                "recall": 0.6470588235294118,
+                "f1": 0.4782608695652174
+              },
+              "balanced_accuracy": 0.7899473222124671,
+              "macro_f1": 0.5654756906796728,
+              "class_accuracy": 0.9052631578947369
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 530,
+                "antagonistic": 30,
+                "synergy": 10
+              },
+              "strong": {
+                "n": 570,
+                "tp": 15,
+                "tn": 511,
+                "fp": 25,
+                "fn": 19,
+                "accuracy": 0.9228070175438596,
+                "precision": 0.375,
+                "recall": 0.4411764705882353,
+                "f1": 0.4054054054054054
+              },
+              "balanced_accuracy": 0.6972673397717295,
+              "macro_f1": 0.49735251198665836,
+              "class_accuracy": 0.9175438596491228
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 510,
+                "antagonistic": 28,
+                "synergy": 32
+              },
+              "strong": {
+                "n": 570,
+                "tp": 20,
+                "tn": 496,
+                "fp": 40,
+                "fn": 14,
+                "accuracy": 0.9052631578947369,
+                "precision": 0.3333333333333333,
+                "recall": 0.5882352941176471,
+                "f1": 0.42553191489361697
+              },
+              "balanced_accuracy": 0.7568042142230027,
+              "macro_f1": 0.5806028045083479,
+              "class_accuracy": 0.9017543859649123
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 506,
+                "antagonistic": 26,
+                "synergy": 38
+              },
+              "strong": {
+                "n": 570,
+                "tp": 22,
+                "tn": 494,
+                "fp": 42,
+                "fn": 12,
+                "accuracy": 0.9052631578947369,
+                "precision": 0.34375,
+                "recall": 0.6470588235294118,
+                "f1": 0.4489795918367347
+              },
+              "balanced_accuracy": 0.784350307287094,
+              "macro_f1": 0.5579644381149338,
+              "class_accuracy": 0.8947368421052632
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 542,
+                "antagonistic": 10,
+                "synergy": 18
+              },
+              "strong": {
+                "n": 570,
+                "tp": 15,
+                "tn": 523,
+                "fp": 13,
+                "fn": 19,
+                "accuracy": 0.9438596491228071,
+                "precision": 0.5357142857142857,
+                "recall": 0.4411764705882353,
+                "f1": 0.4838709677419355
+              },
+              "balanced_accuracy": 0.7084613696224759,
+              "macro_f1": 0.6088438717010146,
+              "class_accuracy": 0.9385964912280702
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 542,
+                "antagonistic": 10,
+                "synergy": 18
+              },
+              "strong": {
+                "n": 570,
+                "tp": 15,
+                "tn": 523,
+                "fp": 13,
+                "fn": 19,
+                "accuracy": 0.9438596491228071,
+                "precision": 0.5357142857142857,
+                "recall": 0.4411764705882353,
+                "f1": 0.4838709677419355
+              },
+              "balanced_accuracy": 0.7084613696224759,
+              "macro_f1": 0.6088438717010146,
+              "class_accuracy": 0.9385964912280702
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 541,
+                "antagonistic": 15,
+                "synergy": 14
+              },
+              "strong": {
+                "n": 570,
+                "tp": 1,
+                "tn": 508,
+                "fp": 28,
+                "fn": 33,
+                "accuracy": 0.8929824561403509,
+                "precision": 0.034482758620689655,
+                "recall": 0.029411764705882353,
+                "f1": 0.03174603174603175
+              },
+              "balanced_accuracy": 0.48858647936786653,
+              "macro_f1": 0.31445372949551226,
+              "class_accuracy": 0.8912280701754386
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 536,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 525,
+                "synergy": 25,
+                "antagonistic": 20
+              },
+              "strong": {
+                "n": 570,
+                "tp": 16,
+                "tn": 507,
+                "fp": 29,
+                "fn": 18,
+                "accuracy": 0.9175438596491228,
+                "precision": 0.35555555555555557,
+                "recall": 0.47058823529411764,
+                "f1": 0.40506329113924056
+              },
+              "balanced_accuracy": 0.7082418788410887,
+              "macro_f1": 0.5164028870909173,
+              "class_accuracy": 0.9087719298245615
+            }
+          },
+          "balanced_summary": {
+            "blocker_field_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 54,
+                "synergy": 2,
+                "antagonistic": 12
+              },
+              "strong": {
+                "n": 68,
+                "tp": 13,
+                "tn": 33,
+                "fp": 1,
+                "fn": 21,
+                "accuracy": 0.6764705882352942,
+                "precision": 0.9285714285714286,
+                "recall": 0.38235294117647056,
+                "f1": 0.5416666666666667
+              },
+              "balanced_accuracy": 0.6764705882352942,
+              "macro_f1": 0.44753086419753085,
+              "class_accuracy": 0.6029411764705882
+            },
+            "compact_joint_gate_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 41,
+                "antagonistic": 19,
+                "synergy": 8
+              },
+              "strong": {
+                "n": 68,
+                "tp": 22,
+                "tn": 29,
+                "fp": 5,
+                "fn": 12,
+                "accuracy": 0.75,
+                "precision": 0.8148148148148148,
+                "recall": 0.6470588235294118,
+                "f1": 0.7213114754098361
+              },
+              "balanced_accuracy": 0.75,
+              "macro_f1": 0.5918373275236021,
+              "class_accuracy": 0.6617647058823529
+            },
+            "global_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 51,
+                "antagonistic": 17
+              },
+              "strong": {
+                "n": 68,
+                "tp": 15,
+                "tn": 32,
+                "fp": 2,
+                "fn": 19,
+                "accuracy": 0.6911764705882353,
+                "precision": 0.8823529411764706,
+                "recall": 0.4411764705882353,
+                "f1": 0.5882352941176471
+              },
+              "balanced_accuracy": 0.6911764705882353,
+              "macro_f1": 0.5009803921568627,
+              "class_accuracy": 0.6470588235294118
+            },
+            "internal_strength_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 44,
+                "antagonistic": 16,
+                "synergy": 8
+              },
+              "strong": {
+                "n": 68,
+                "tp": 20,
+                "tn": 30,
+                "fp": 4,
+                "fn": 14,
+                "accuracy": 0.7352941176470589,
+                "precision": 0.8333333333333334,
+                "recall": 0.5882352941176471,
+                "f1": 0.6896551724137931
+              },
+              "balanced_accuracy": 0.7352941176470589,
+              "macro_f1": 0.6626229206874369,
+              "class_accuracy": 0.7058823529411765
+            },
+            "joint_gate_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 40,
+                "antagonistic": 19,
+                "synergy": 9
+              },
+              "strong": {
+                "n": 68,
+                "tp": 22,
+                "tn": 28,
+                "fp": 6,
+                "fn": 12,
+                "accuracy": 0.7352941176470589,
+                "precision": 0.7857142857142857,
+                "recall": 0.6470588235294118,
+                "f1": 0.7096774193548386
+              },
+              "balanced_accuracy": 0.7352941176470589,
+              "macro_f1": 0.5827844651374062,
+              "class_accuracy": 0.6470588235294118
+            },
+            "model_default_gate": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 53,
+                "antagonistic": 9,
+                "synergy": 6
+              },
+              "strong": {
+                "n": 68,
+                "tp": 15,
+                "tn": 34,
+                "fp": 0,
+                "fn": 19,
+                "accuracy": 0.7205882352941176,
+                "precision": 1.0,
+                "recall": 0.4411764705882353,
+                "f1": 0.6122448979591837
+              },
+              "balanced_accuracy": 0.7205882352941176,
+              "macro_f1": 0.5894252873563218,
+              "class_accuracy": 0.6764705882352942
+            },
+            "residual_projection_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 53,
+                "antagonistic": 9,
+                "synergy": 6
+              },
+              "strong": {
+                "n": 68,
+                "tp": 15,
+                "tn": 34,
+                "fp": 0,
+                "fn": 19,
+                "accuracy": 0.7205882352941176,
+                "precision": 1.0,
+                "recall": 0.4411764705882353,
+                "f1": 0.6122448979591837
+              },
+              "balanced_accuracy": 0.7205882352941176,
+              "macro_f1": 0.5894252873563218,
+              "class_accuracy": 0.6764705882352942
+            },
+            "route_competition_combo": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 67,
+                "antagonistic": 1
+              },
+              "strong": {
+                "n": 68,
+                "tp": 1,
+                "tn": 34,
+                "fp": 0,
+                "fn": 33,
+                "accuracy": 0.5147058823529411,
+                "precision": 1.0,
+                "recall": 0.029411764705882353,
+                "f1": 0.05714285714285715
+              },
+              "balanced_accuracy": 0.5147058823529411,
+              "macro_f1": 0.2244224422442244,
+              "class_accuracy": 0.5
+            },
+            "train_selected_gate": {
+              "n": 68,
+              "actual_classes": {
+                "additive": 34,
+                "synergy": 19,
+                "antagonistic": 15
+              },
+              "predicted_classes": {
+                "additive": 49,
+                "synergy": 6,
+                "antagonistic": 13
+              },
+              "strong": {
+                "n": 68,
+                "tp": 16,
+                "tn": 31,
+                "fp": 3,
+                "fn": 18,
+                "accuracy": 0.6911764705882353,
+                "precision": 0.8421052631578947,
+                "recall": 0.47058823529411764,
+                "f1": 0.6037735849056604
+              },
+              "balanced_accuracy": 0.6911764705882353,
+              "macro_f1": 0.5194721744119335,
+              "class_accuracy": 0.6176470588235294
+            }
+          }
+        }
+      },
+      "boundary": "This phase re-evaluates Phase 849 gates with strong-edge-focused calibrated class predictors and balanced metrics. It does not run new model forward passes and does not claim closure."
+    },
+    "glm4": {
+      "phase": 850,
+      "title": "Strong-edge Balanced Route Gate Validation",
+      "model": "glm4",
+      "round": "confirm",
+      "phase849_round": "confirm",
+      "timestamp": "2026-07-02 12:09:07",
+      "source_rows": 570,
+      "n_predictions": 15390,
+      "feature_summary": {
+        "n": 570,
+        "actual_classes": {
+          "additive": 570
+        },
+        "objects": {
+          "triangle": 114,
+          "square": 114,
+          "rectangle": 114,
+          "circle": 114,
+          "polygon": 114
+        },
+        "prompt_variants": {
+          "natural_question": 190,
+          "object_only": 190,
+          "natural_category": 190
+        },
+        "strong_rows": 0,
+        "mean_abs_residual": 0.04159669039542215,
+        "mean_strong_abs_residual": null
+      },
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "selected_gate_counts": {
+            "global_combo": 1
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            }
+          },
+          "balanced_summary": {}
+        },
+        "object_holdout": {
+          "n_splits": 5,
+          "split_keys": [
+            "circle",
+            "polygon",
+            "rectangle",
+            "square",
+            "triangle"
+          ],
+          "selected_gate_counts": {
+            "global_combo": 5
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            }
+          },
+          "balanced_summary": {}
+        },
+        "prompt_holdout": {
+          "n_splits": 3,
+          "split_keys": [
+            "natural_category",
+            "natural_question",
+            "object_only"
+          ],
+          "selected_gate_counts": {
+            "global_combo": 3
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 570
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 570,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": null,
+              "macro_f1": 0.3333333333333333,
+              "class_accuracy": 1.0
+            }
+          },
+          "balanced_summary": {}
+        }
+      },
+      "boundary": "This phase re-evaluates Phase 849 gates with strong-edge-focused calibrated class predictors and balanced metrics. It does not run new model forward passes and does not claim closure."
+    },
+    "deepseek7b": {
+      "phase": 850,
+      "title": "Strong-edge Balanced Route Gate Validation",
+      "model": "deepseek7b",
+      "round": "confirm",
+      "phase849_round": "confirm",
+      "timestamp": "2026-07-02 12:09:09",
+      "source_rows": 570,
+      "n_predictions": 15390,
+      "feature_summary": {
+        "n": 570,
+        "actual_classes": {
+          "additive": 567,
+          "synergy": 3
+        },
+        "objects": {
+          "triangle": 114,
+          "square": 114,
+          "rectangle": 114,
+          "circle": 114,
+          "polygon": 114
+        },
+        "prompt_variants": {
+          "natural_question": 190,
+          "object_only": 190,
+          "natural_category": 190
+        },
+        "strong_rows": 3,
+        "mean_abs_residual": 0.0371984649122807,
+        "mean_strong_abs_residual": 0.5416666666666666
+      },
+      "split_summary": {
+        "in_sample": {
+          "n_splits": 1,
+          "split_keys": [
+            "all"
+          ],
+          "selected_gate_counts": {
+            "blocker_field_combo": 1
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 567,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 566,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 566,
+                "fp": 1,
+                "fn": 0,
+                "accuracy": 0.9982456140350877,
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571
+              },
+              "balanced_accuracy": 0.9991181657848325,
+              "macro_f1": 0.6187534148699196,
+              "class_accuracy": 0.9982456140350877
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 525,
+                "synergy": 45
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 525,
+                "fp": 42,
+                "fn": 0,
+                "accuracy": 0.9263157894736842,
+                "precision": 0.06666666666666667,
+                "recall": 1.0,
+                "f1": 0.125
+              },
+              "balanced_accuracy": 0.962962962962963,
+              "macro_f1": 0.36217948717948717,
+              "class_accuracy": 0.9263157894736842
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 556,
+                "synergy": 14
+              },
+              "strong": {
+                "n": 570,
+                "tp": 2,
+                "tn": 555,
+                "fp": 12,
+                "fn": 1,
+                "accuracy": 0.9771929824561404,
+                "precision": 0.14285714285714285,
+                "recall": 0.6666666666666666,
+                "f1": 0.23529411764705882
+              },
+              "balanced_accuracy": 0.8227513227513228,
+              "macro_f1": 0.4079059940984408,
+              "class_accuracy": 0.9771929824561404
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 566,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 566,
+                "fp": 1,
+                "fn": 0,
+                "accuracy": 0.9982456140350877,
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571
+              },
+              "balanced_accuracy": 0.9991181657848325,
+              "macro_f1": 0.6187534148699196,
+              "class_accuracy": 0.9982456140350877
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 567,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 564,
+                "synergy": 6
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 564,
+                "fp": 3,
+                "fn": 0,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.5,
+                "recall": 1.0,
+                "f1": 0.6666666666666666
+              },
+              "balanced_accuracy": 0.9973544973544973,
+              "macro_f1": 0.5546713822575892,
+              "class_accuracy": 0.9947368421052631
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 567,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 3,
+                "tn": 567,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            }
+          },
+          "balanced_summary": {
+            "blocker_field_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "compact_joint_gate_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "global_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "internal_strength_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 4,
+                "synergy": 2
+              },
+              "strong": {
+                "n": 6,
+                "tp": 2,
+                "tn": 3,
+                "fp": 0,
+                "fn": 1,
+                "accuracy": 0.8333333333333334,
+                "precision": 1.0,
+                "recall": 0.6666666666666666,
+                "f1": 0.8
+              },
+              "balanced_accuracy": 0.8333333333333333,
+              "macro_f1": 0.5523809523809523,
+              "class_accuracy": 0.8333333333333334
+            },
+            "joint_gate_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "model_default_gate": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "residual_projection_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "route_competition_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            },
+            "train_selected_gate": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 6,
+                "tp": 3,
+                "tn": 3,
+                "fp": 0,
+                "fn": 0,
+                "accuracy": 1.0,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0
+              },
+              "balanced_accuracy": 1.0,
+              "macro_f1": 0.6666666666666666,
+              "class_accuracy": 1.0
+            }
+          }
+        },
+        "object_holdout": {
+          "n_splits": 5,
+          "split_keys": [
+            "circle",
+            "polygon",
+            "rectangle",
+            "square",
+            "triangle"
+          ],
+          "selected_gate_counts": {
+            "global_combo": 1,
+            "blocker_field_combo": 4
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 567,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.33245382585751976,
+              "class_accuracy": 0.9947368421052631
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 569,
+                "synergy": 1
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 566,
+                "fp": 1,
+                "fn": 3,
+                "accuracy": 0.9929824561403509,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4991181657848324,
+              "macro_f1": 0.33215962441314556,
+              "class_accuracy": 0.9929824561403509
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 534,
+                "synergy": 36
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 531,
+                "fp": 36,
+                "fn": 3,
+                "accuracy": 0.9315789473684211,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.46825396825396826,
+              "macro_f1": 0.3215258855585831,
+              "class_accuracy": 0.9315789473684211
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 565,
+                "synergy": 5
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 562,
+                "fp": 5,
+                "fn": 3,
+                "accuracy": 0.9859649122807017,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.49559082892416223,
+              "macro_f1": 0.33097762073027087,
+              "class_accuracy": 0.9859649122807017
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 569,
+                "synergy": 1
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 566,
+                "fp": 1,
+                "fn": 3,
+                "accuracy": 0.9929824561403509,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4991181657848324,
+              "macro_f1": 0.33215962441314556,
+              "class_accuracy": 0.9929824561403509
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 567,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.33245382585751976,
+              "class_accuracy": 0.9947368421052631
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 567,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.33245382585751976,
+              "class_accuracy": 0.9947368421052631
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 564,
+                "synergy": 6
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 561,
+                "fp": 6,
+                "fn": 3,
+                "accuracy": 0.9842105263157894,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4947089947089947,
+              "macro_f1": 0.3306808134394341,
+              "class_accuracy": 0.9842105263157894
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 567,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.33245382585751976,
+              "class_accuracy": 0.9947368421052631
+            }
+          },
+          "balanced_summary": {
+            "blocker_field_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "compact_joint_gate_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "global_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "internal_strength_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "joint_gate_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "model_default_gate": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "residual_projection_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "route_competition_combo": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "train_selected_gate": {
+              "n": 6,
+              "actual_classes": {
+                "synergy": 3,
+                "additive": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            }
+          }
+        },
+        "prompt_holdout": {
+          "n_splits": 3,
+          "split_keys": [
+            "natural_category",
+            "natural_question",
+            "object_only"
+          ],
+          "selected_gate_counts": {
+            "residual_projection_combo": 1,
+            "global_combo": 1,
+            "route_competition_combo": 1
+          },
+          "raw_summary": {
+            "blocker_field_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 567,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.33245382585751976,
+              "class_accuracy": 0.9947368421052631
+            },
+            "compact_joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 569,
+                "synergy": 1
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 566,
+                "fp": 1,
+                "fn": 3,
+                "accuracy": 0.9929824561403509,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4991181657848324,
+              "macro_f1": 0.33215962441314556,
+              "class_accuracy": 0.9929824561403509
+            },
+            "global_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 540,
+                "synergy": 30
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 537,
+                "fp": 30,
+                "fn": 3,
+                "accuracy": 0.9421052631578948,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.47354497354497355,
+              "macro_f1": 0.32339656729900634,
+              "class_accuracy": 0.9421052631578948
+            },
+            "internal_strength_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 566,
+                "synergy": 4
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 563,
+                "fp": 4,
+                "fn": 3,
+                "accuracy": 0.987719298245614,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4964726631393298,
+              "macro_f1": 0.3312739040894381,
+              "class_accuracy": 0.987719298245614
+            },
+            "joint_gate_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 569,
+                "synergy": 1
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 566,
+                "fp": 1,
+                "fn": 3,
+                "accuracy": 0.9929824561403509,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4991181657848324,
+              "macro_f1": 0.33215962441314556,
+              "class_accuracy": 0.9929824561403509
+            },
+            "model_default_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 570
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 567,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.9947368421052631,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.33245382585751976,
+              "class_accuracy": 0.9947368421052631
+            },
+            "residual_projection_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 564,
+                "fp": 3,
+                "fn": 3,
+                "accuracy": 0.9894736842105263,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4973544973544973,
+              "macro_f1": 0.3315696649029982,
+              "class_accuracy": 0.9894736842105263
+            },
+            "route_competition_combo": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 564,
+                "fp": 3,
+                "fn": 3,
+                "accuracy": 0.9894736842105263,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4973544973544973,
+              "macro_f1": 0.3315696649029982,
+              "class_accuracy": 0.9894736842105263
+            },
+            "train_selected_gate": {
+              "n": 570,
+              "actual_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 567,
+                "synergy": 3
+              },
+              "strong": {
+                "n": 570,
+                "tp": 0,
+                "tn": 564,
+                "fp": 3,
+                "fn": 3,
+                "accuracy": 0.9894736842105263,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.4973544973544973,
+              "macro_f1": 0.3315696649029982,
+              "class_accuracy": 0.9894736842105263
+            }
+          },
+          "balanced_summary": {
+            "blocker_field_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "compact_joint_gate_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "global_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "internal_strength_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "joint_gate_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "model_default_gate": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "residual_projection_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "route_competition_combo": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            },
+            "train_selected_gate": {
+              "n": 6,
+              "actual_classes": {
+                "additive": 3,
+                "synergy": 3
+              },
+              "predicted_classes": {
+                "additive": 6
+              },
+              "strong": {
+                "n": 6,
+                "tp": 0,
+                "tn": 3,
+                "fp": 0,
+                "fn": 3,
+                "accuracy": 0.5,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0
+              },
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.2222222222222222,
+              "class_accuracy": 0.5
+            }
+          }
+        }
+      },
+      "boundary": "This phase re-evaluates Phase 849 gates with strong-edge-focused calibrated class predictors and balanced metrics. It does not run new model forward passes and does not claim closure."
+    }
+  }
+}

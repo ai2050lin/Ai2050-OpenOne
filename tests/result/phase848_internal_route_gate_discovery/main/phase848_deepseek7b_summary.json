@@ -1,0 +1,646 @@
+{
+  "phase": 848,
+  "title": "Internal Route Gate Discovery",
+  "model": "deepseek7b",
+  "round": "main",
+  "phase845_round": "main",
+  "timestamp": "2026-07-02 10:48:44",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "n_rows": 304,
+  "n_feature_rows": 304,
+  "n_predictions": 5472,
+  "n_unique_prompts": 8,
+  "top_gears": [
+    {
+      "channel_id": 15791,
+      "gear_key": "L27C15791",
+      "gear_rank": 1,
+      "gear_score": 22.195905674280667,
+      "layer_idx": 27,
+      "max_abs_support": 12.937524318695068,
+      "mean_abs_activation": 128.3,
+      "mean_abs_coeff": 0.061976096034049986,
+      "mean_abs_support": 8.00548076108098,
+      "mean_activation": -128.3,
+      "mean_signed_support": -2.1157652486115692,
+      "n": 15,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 1106,
+      "gear_key": "L27C1106",
+      "gear_rank": 2,
+      "gear_score": 21.99913005129076,
+      "layer_idx": 27,
+      "max_abs_support": 11.863838493824005,
+      "mean_abs_activation": 54.8,
+      "mean_abs_coeff": 0.1448742762207985,
+      "mean_abs_support": 7.934508957217137,
+      "mean_activation": -54.8,
+      "mean_signed_support": -2.213640162348747,
+      "n": 15,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 15305,
+      "gear_key": "L27C15305",
+      "gear_rank": 3,
+      "gear_score": 18.981064244051908,
+      "layer_idx": 27,
+      "max_abs_support": 10.334851786494255,
+      "mean_abs_activation": 91.61666666666666,
+      "mean_abs_coeff": 0.07414407804608344,
+      "mean_abs_support": 6.8459718139221275,
+      "mean_activation": -91.61666666666666,
+      "mean_signed_support": -2.044590825494379,
+      "n": 15,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 4036,
+      "gear_key": "L25C4036",
+      "gear_rank": 4,
+      "gear_score": 16.3187157492613,
+      "layer_idx": 25,
+      "max_abs_support": 18.0410498380661,
+      "mean_abs_activation": 19.166666666666668,
+      "mean_abs_coeff": 0.6141633987426758,
+      "mean_abs_support": 11.771465142567953,
+      "mean_activation": 19.166666666666668,
+      "mean_signed_support": 11.771465142567953,
+      "n": 3,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 13360,
+      "gear_key": "L27C13360",
+      "gear_rank": 5,
+      "gear_score": 15.479356843058417,
+      "layer_idx": 27,
+      "max_abs_support": 8.110270638018847,
+      "mean_abs_activation": 83.06666666666666,
+      "mean_abs_coeff": 0.0665958732366562,
+      "mean_abs_support": 5.5829978384077545,
+      "mean_activation": 83.06666666666666,
+      "mean_signed_support": -0.8326948070588212,
+      "n": 15,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 2295,
+      "gear_key": "L27C2295",
+      "gear_rank": 6,
+      "gear_score": 14.808911958628538,
+      "layer_idx": 27,
+      "max_abs_support": 10.081236205995083,
+      "mean_abs_activation": 45.766666666666666,
+      "mean_abs_coeff": 0.11530290991067886,
+      "mean_abs_support": 5.341185960918665,
+      "mean_activation": -45.766666666666666,
+      "mean_signed_support": -2.3499960971375304,
+      "n": 15,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    }
+  ],
+  "feature_summary": {
+    "n": 304,
+    "sign_patterns": {
+      "--": 104,
+      "-+": 92,
+      "++": 14,
+      "+-": 30,
+      "---": 34,
+      "--+": 30
+    },
+    "neg_count": {
+      "2": 134,
+      "1": 122,
+      "0": 14,
+      "3": 34
+    },
+    "mean_abs_sum": 151.33895753559312,
+    "mean_abs_mean": 67.71561883625232,
+    "mean_original_margin": -0.5234375,
+    "residual_classes": {
+      "additive": 301,
+      "synergy": 3
+    }
+  },
+  "split_summary": {
+    "in_sample": {
+      "n_splits": 1,
+      "split_keys": [
+        "all"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 304,
+          "mae": 0.05356959292763158,
+          "rmse": 0.07847756589358142,
+          "sign_accuracy": 0.5526315789473685,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_count_combo": {
+          "n": 304,
+          "mae": 0.051493479793233085,
+          "rmse": 0.07739059479359152,
+          "sign_accuracy": 0.5880398671096345,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_sign_combo": {
+          "n": 304,
+          "mae": 0.051493479793233085,
+          "rmse": 0.07739059479359152,
+          "sign_accuracy": 0.5880398671096345,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_strength_combo": {
+          "n": 304,
+          "mae": 0.04846650317199248,
+          "rmse": 0.07298427006078105,
+          "sign_accuracy": 0.6033333333333334,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_combo": {
+          "n": 304,
+          "mae": 0.04625822368421053,
+          "rmse": 0.06416746655737195,
+          "sign_accuracy": 0.668918918918919,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "prompt_combo": {
+          "n": 304,
+          "mae": 0.04561574835526316,
+          "rmse": 0.06929140237172143,
+          "sign_accuracy": 0.6588628762541806,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "internal_count_combo": 0.0020761131343984968,
+        "internal_sign_combo": 0.0020761131343984968,
+        "internal_strength_combo": 0.005103089755639105,
+        "object_combo": 0.007311369243421052,
+        "prompt_combo": 0.007953844572368425
+      }
+    },
+    "object_holdout": {
+      "n_splits": 4,
+      "split_keys": [
+        "circle",
+        "rectangle",
+        "square",
+        "triangle"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 304,
+          "mae": 0.05888500548245614,
+          "rmse": 0.08801351362563119,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_count_combo": {
+          "n": 304,
+          "mae": 0.05959429824561404,
+          "rmse": 0.08833834045826076,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_sign_combo": {
+          "n": 304,
+          "mae": 0.05959429824561404,
+          "rmse": 0.08833834045826076,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_strength_combo": {
+          "n": 304,
+          "mae": 0.06220103481359649,
+          "rmse": 0.0927663845810922,
+          "sign_accuracy": 0.5033112582781457,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_combo": {
+          "n": 304,
+          "mae": 0.05888500548245614,
+          "rmse": 0.08801351362563119,
+          "sign_accuracy": 0.5364238410596026,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "prompt_combo": {
+          "n": 304,
+          "mae": 0.06082099780701754,
+          "rmse": 0.09238853649562859,
+          "sign_accuracy": 0.5217391304347826,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "internal_count_combo": -0.000709292763157893,
+        "internal_sign_combo": -0.000709292763157893,
+        "internal_strength_combo": -0.0033160293311403563,
+        "object_combo": 0.0,
+        "prompt_combo": -0.0019359923245614048
+      }
+    },
+    "prompt_holdout": {
+      "n_splits": 2,
+      "split_keys": [
+        "natural_category",
+        "natural_question"
+      ],
+      "predictor_summary": {
+        "global_combo": {
+          "n": 304,
+          "mae": 0.0727282072368421,
+          "rmse": 0.1011484951267504,
+          "sign_accuracy": 0.4503311258278146,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_count_combo": {
+          "n": 304,
+          "mae": 0.07189727247807016,
+          "rmse": 0.10041693609717621,
+          "sign_accuracy": 0.46179401993355484,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_sign_combo": {
+          "n": 304,
+          "mae": 0.07189727247807016,
+          "rmse": 0.10041693609717621,
+          "sign_accuracy": 0.46179401993355484,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "internal_strength_combo": {
+          "n": 304,
+          "mae": 0.07216711211622806,
+          "rmse": 0.1015814155676596,
+          "sign_accuracy": 0.4633333333333333,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        },
+        "object_combo": {
+          "n": 304,
+          "mae": 0.09251644736842106,
+          "rmse": 0.1283349331147439,
+          "sign_accuracy": 0.33783783783783783,
+          "class_accuracy": 0.9802631578947368,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 298,
+            "fp": 3,
+            "fn": 3,
+            "accuracy": 0.9802631578947368,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 301,
+            "synergy": 3
+          }
+        },
+        "prompt_combo": {
+          "n": 304,
+          "mae": 0.0727282072368421,
+          "rmse": 0.1011484951267504,
+          "sign_accuracy": 0.4503311258278146,
+          "class_accuracy": 0.9901315789473685,
+          "strong": {
+            "n": 304,
+            "tp": 0,
+            "tn": 301,
+            "fp": 0,
+            "fn": 3,
+            "accuracy": 0.9901315789473685,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "actual_classes": {
+            "additive": 301,
+            "synergy": 3
+          },
+          "predicted_classes": {
+            "additive": 304
+          }
+        }
+      },
+      "mean_mae_gain_vs_global_combo": {
+        "internal_count_combo": 0.0008309347587719257,
+        "internal_sign_combo": 0.0008309347587719257,
+        "internal_strength_combo": 0.0005610951206140302,
+        "object_combo": -0.019788240131578955,
+        "prompt_combo": 0.0
+      }
+    }
+  },
+  "boundary": "This phase tests whether natural internal activations of geometry gears form a route-gate signal for Phase 845 interaction residuals. It is a gate-discovery probe, not closure."
+}

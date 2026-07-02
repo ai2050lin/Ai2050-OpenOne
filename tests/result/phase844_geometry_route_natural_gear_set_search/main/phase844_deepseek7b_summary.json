@@ -1,0 +1,1963 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase searches natural high-response/readout-coupled MLP gear sets for geometry route cases. It is a gear-set atlas probe, not a proof of global token closure.",
+  "case_ids": [
+    "p816_triangle_geometric_shape",
+    "p844_square_geometric_shape",
+    "p844_rectangle_geometric_shape",
+    "p844_circle_geometric_shape"
+  ],
+  "dtype": "bfloat16",
+  "layer_indices": [
+    26,
+    27
+  ],
+  "model": "deepseek7b",
+  "n_candidate_sample_rows": 1024,
+  "n_cases": 4,
+  "n_gears": 8,
+  "n_rows": 56,
+  "object_summary": {
+    "circle": {
+      "classes": {
+        "target_equivalent": 11,
+        "unknown_other": 3
+      },
+      "mean_target_minus_object_logit": -1.7985491071428572,
+      "n": 14,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 4,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 11,
+      "unknown_other_rows": 3
+    },
+    "rectangle": {
+      "classes": {
+        "target_equivalent": 7,
+        "unknown_other": 7
+      },
+      "mean_target_minus_object_logit": -0.6160714285714286,
+      "n": 14,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 7,
+      "unknown_other_rows": 7
+    },
+    "square": {
+      "classes": {
+        "target_equivalent": 11,
+        "unknown_other": 3
+      },
+      "mean_target_minus_object_logit": 0.27566964285714285,
+      "n": 14,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 4,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 11,
+      "unknown_other_rows": 3
+    },
+    "triangle": {
+      "classes": {
+        "broad_near_miss": 2,
+        "target_equivalent": 9,
+        "unknown_other": 3
+      },
+      "mean_target_minus_object_logit": 0.32589285714285715,
+      "n": 14,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 2,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 9,
+      "unknown_other_rows": 3
+    }
+  },
+  "original_target_rows": 4,
+  "phase": 844,
+  "prompt_variants": [
+    "natural_question",
+    "natural_category"
+  ],
+  "quantization": "off",
+  "round": "main",
+  "subset_summary": {
+    "original": {
+      "classes": {
+        "target_equivalent": 4,
+        "unknown_other": 4
+      },
+      "mean_target_minus_object_logit": -0.5234375,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 4,
+      "unknown_other_rows": 4
+    },
+    "top1_flip": {
+      "classes": {
+        "target_equivalent": 4,
+        "unknown_other": 4
+      },
+      "mean_target_minus_object_logit": -0.5,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 4,
+      "unknown_other_rows": 4
+    },
+    "top1_zero": {
+      "classes": {
+        "target_equivalent": 4,
+        "unknown_other": 4
+      },
+      "mean_target_minus_object_logit": -0.515625,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 4,
+      "unknown_other_rows": 4
+    },
+    "top4_flip": {
+      "classes": {
+        "target_equivalent": 7,
+        "unknown_other": 1
+      },
+      "mean_target_minus_object_logit": 0.0859375,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 3,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 7,
+      "unknown_other_rows": 1
+    },
+    "top4_zero": {
+      "classes": {
+        "target_equivalent": 7,
+        "unknown_other": 1
+      },
+      "mean_target_minus_object_logit": -0.2734375,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 3,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 7,
+      "unknown_other_rows": 1
+    },
+    "top8_flip": {
+      "classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 6,
+        "unknown_other": 1
+      },
+      "mean_target_minus_object_logit": -0.7568359375,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 2,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 6,
+      "unknown_other_rows": 1
+    },
+    "top8_zero": {
+      "classes": {
+        "broad_near_miss": 1,
+        "target_equivalent": 6,
+        "unknown_other": 1
+      },
+      "mean_target_minus_object_logit": -0.689453125,
+      "n": 8,
+      "object_echo_rows": 0,
+      "target_gained_vs_original_rows": 2,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 6,
+      "unknown_other_rows": 1
+    }
+  },
+  "target_gained_vs_original_rows": 10,
+  "target_lost_vs_original_rows": 0,
+  "target_rows": 38,
+  "timestamp": "2026-07-02 09:10:05",
+  "title": "Geometry Route Natural Gear Set Search",
+  "top_gears": [
+    {
+      "channel_id": 1106,
+      "gear_score": 16.246980791475394,
+      "layer_idx": 27,
+      "max_abs_support": 11.863838493824005,
+      "mean_abs_activation": 54.5625,
+      "mean_abs_coeff": 0.1347965281456709,
+      "mean_abs_support": 7.394319615326822,
+      "mean_activation": -54.5625,
+      "mean_signed_support": -2.7098471797071397,
+      "n": 8,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 15791,
+      "gear_score": 14.803871833216343,
+      "layer_idx": 27,
+      "max_abs_support": 9.24706655740738,
+      "mean_abs_activation": 116.4375,
+      "mean_abs_coeff": 0.05774828419089317,
+      "mean_abs_support": 6.737532424274832,
+      "mean_activation": -116.4375,
+      "mean_signed_support": -2.44791243923828,
+      "n": 8,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 2295,
+      "gear_score": 13.553293247494112,
+      "layer_idx": 27,
+      "max_abs_support": 10.081236205995083,
+      "mean_abs_activation": 50.03125,
+      "mean_abs_coeff": 0.1208053957670927,
+      "mean_abs_support": 6.168369581922889,
+      "mean_activation": -50.03125,
+      "mean_signed_support": -3.1411354755982757,
+      "n": 8,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 15305,
+      "gear_score": 12.774333976012006,
+      "layer_idx": 27,
+      "max_abs_support": 9.110981959849596,
+      "mean_abs_activation": 83.84375,
+      "mean_abs_coeff": 0.06841988209635019,
+      "mean_abs_support": 5.81384993949905,
+      "mean_activation": -83.84375,
+      "mean_signed_support": -2.3224225149315316,
+      "n": 8,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 13360,
+      "gear_score": 12.031574898138238,
+      "layer_idx": 27,
+      "max_abs_support": 8.110270638018847,
+      "mean_abs_activation": 85.0625,
+      "mean_abs_coeff": 0.06393595971167088,
+      "mean_abs_support": 5.475805715192109,
+      "mean_activation": 85.0625,
+      "mean_signed_support": -1.0940345524577424,
+      "n": 8,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 18866,
+      "gear_score": 8.188802965427143,
+      "layer_idx": 27,
+      "max_abs_support": 5.175617337226868,
+      "mean_abs_activation": 77.75,
+      "mean_abs_coeff": 0.04789253883063793,
+      "mean_abs_support": 3.7268848391249776,
+      "mean_activation": 77.75,
+      "mean_signed_support": 0.7916142836329527,
+      "n": 8,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 13399,
+      "gear_score": 7.8118266356840795,
+      "layer_idx": 26,
+      "max_abs_support": 4.433345507830381,
+      "mean_abs_activation": 25.875,
+      "mean_abs_coeff": 0.13683944009244442,
+      "mean_abs_support": 3.5553155177040026,
+      "mean_activation": -25.875,
+      "mean_signed_support": 0.41419612371828407,
+      "n": 8,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0
+    },
+    {
+      "channel_id": 10821,
+      "gear_score": 7.542393303110533,
+      "layer_idx": 26,
+      "max_abs_support": 6.349815204739571,
+      "mean_abs_activation": 7.9609375,
+      "mean_abs_coeff": 0.42958401143550873,
+      "mean_abs_support": 3.432691123569384,
+      "mean_activation": 7.9609375,
+      "mean_signed_support": 3.432691123569384,
+      "n": 8,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0
+    }
+  ],
+  "top_rows": [
+    {
+      "best_target_rank": 1139,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 232,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.15625,
+      "top_tokens": [
+        " shape",
+        " ",
+        " A",
+        " circle",
+        " Circle"
+      ]
+    },
+    {
+      "best_target_rank": 871,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 230,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.875,
+      "top_tokens": [
+        " shape",
+        " ",
+        " A",
+        " circle",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 936,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 286,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.40625,
+      "top_tokens": [
+        " shape",
+        " circle",
+        " shapes",
+        " ",
+        " Circle"
+      ]
+    },
+    {
+      "best_target_rank": 211,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 91,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.09375,
+      "top_tokens": [
+        " shape",
+        " Polygon",
+        " polygon",
+        " geometry",
+        " "
+      ]
+    },
+    {
+      "best_target_rank": 544,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 283,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.90625,
+      "top_tokens": [
+        " shape",
+        " ",
+        " A",
+        " Circle",
+        " circle"
+      ]
+    },
+    {
+      "best_target_rank": 182,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "Polygon",
+      "object": "triangle",
+      "object_rank": 113,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.59375,
+      "top_tokens": [
+        " Polygon",
+        " ",
+        " geometry",
+        " polygon",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 128,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "Polygon",
+      "object": "square",
+      "object_rank": 81,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.59375,
+      "top_tokens": [
+        " Polygon",
+        " polygon",
+        " shape",
+        " ",
+        " square"
+      ]
+    },
+    {
+      "best_target_rank": 228,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "Polygon",
+      "object": "square",
+      "object_rank": 159,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.5,
+      "top_tokens": [
+        " Polygon",
+        " shape",
+        " ",
+        " polygon",
+        " square"
+      ]
+    },
+    {
+      "best_target_rank": 182,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "Polygon",
+      "object": "square",
+      "object_rank": 155,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.25,
+      "top_tokens": [
+        " Polygon",
+        " polygon",
+        " ",
+        " shape",
+        " square"
+      ]
+    },
+    {
+      "best_target_rank": 130,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "Polygon",
+      "object": "triangle",
+      "object_rank": 130,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": true,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.0,
+      "top_tokens": [
+        " Polygon",
+        " polygon",
+        " geometry",
+        " ",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 243,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "triangle",
+      "object_rank": 1244,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 2.28125,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " polygon",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 6569,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 925,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.2578125,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " ?\n\n",
+        " geometry",
+        " __"
+      ]
+    },
+    {
+      "best_target_rank": 532,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "square",
+      "object": "rectangle",
+      "object_rank": 126,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.1875,
+      "top_tokens": [
+        " square",
+        " ",
+        " A",
+        " Rectangle",
+        " shape"
+      ]
+    },
+    {
+      "best_target_rank": 554,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "square",
+      "object": "rectangle",
+      "object_rank": 127,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.1875,
+      "top_tokens": [
+        " square",
+        " ",
+        " A",
+        " Rectangle",
+        " shape"
+      ]
+    },
+    {
+      "best_target_rank": 565,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "square",
+      "object": "rectangle",
+      "object_rank": 128,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.125,
+      "top_tokens": [
+        " square",
+        " ",
+        " A",
+        " Rectangle",
+        " shape"
+      ]
+    },
+    {
+      "best_target_rank": 3824,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 808,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.015625,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " ?\n\n",
+        " geometry",
+        " __"
+      ]
+    },
+    {
+      "best_target_rank": 732,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "1",
+      "object": "circle",
+      "object_rank": 189,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.0,
+      "top_tokens": [
+        " ",
+        " shape",
+        " A",
+        " [",
+        " circle"
+      ]
+    },
+    {
+      "best_target_rank": 751,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "1",
+      "object": "circle",
+      "object_rank": 188,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -2.0,
+      "top_tokens": [
+        " ",
+        " shape",
+        " A",
+        " [",
+        " circle"
+      ]
+    },
+    {
+      "best_target_rank": 769,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "1",
+      "object": "circle",
+      "object_rank": 191,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.96875,
+      "top_tokens": [
+        " ",
+        " shape",
+        " A",
+        " [",
+        " circle"
+      ]
+    },
+    {
+      "best_target_rank": 317,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 1131,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.875,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " polygon",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 3733,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 903,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.8125,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " ?\n\n",
+        " __",
+        " geometry"
+      ]
+    },
+    {
+      "best_target_rank": 426,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "square",
+      "object": "rectangle",
+      "object_rank": 119,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.78125,
+      "top_tokens": [
+        " square",
+        " Rectangle",
+        " paralle",
+        " shape",
+        " A"
+      ]
+    },
+    {
+      "best_target_rank": 2966,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 797,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.75,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " ?\n\n",
+        " __",
+        " geometry"
+      ]
+    },
+    {
+      "best_target_rank": 2430,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 715,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.6875,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " ?\n\n",
+        " [",
+        " geometry"
+      ]
+    },
+    {
+      "best_target_rank": 2489,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 722,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.6875,
+      "top_tokens": [
+        " ?\n",
+        " shape",
+        " ?\n\n",
+        " geometry",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 2507,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_circle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "shape",
+      "object": "circle",
+      "object_rank": 742,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.65625,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " ?\n\n",
+        " geometry",
+        " ["
+      ]
+    },
+    {
+      "best_target_rank": 420,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 1093,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.5,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " polygon",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 422,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 1120,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.5,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " polygon",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 433,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 1134,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.46875,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " polygon",
+        " Geometry",
+        " ?\n"
+      ]
+    },
+    {
+      "best_target_rank": 363,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "parallelogram",
+      "object": "rectangle",
+      "object_rank": 119,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.40625,
+      "top_tokens": [
+        " paralle",
+        " square",
+        " Rectangle",
+        " shape",
+        " rectangle"
+      ]
+    },
+    {
+      "best_target_rank": 451,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 1036,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.21875,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " Geometry",
+        " ?\n",
+        " polygon"
+      ]
+    },
+    {
+      "best_target_rank": 320,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "square",
+      "object": "rectangle",
+      "object_rank": 144,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.21875,
+      "top_tokens": [
+        " square",
+        " Rectangle",
+        " ",
+        " A",
+        " shape"
+      ]
+    },
+    {
+      "best_target_rank": 571,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1536,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.21875,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " __",
+        " Shape"
+      ]
+    },
+    {
+      "best_target_rank": 245,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "1",
+      "object": "triangle",
+      "object_rank": 121,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.1875,
+      "top_tokens": [
+        " ",
+        " [",
+        " geometry",
+        " Polygon",
+        " A"
+      ]
+    },
+    {
+      "best_target_rank": 248,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "1",
+      "object": "triangle",
+      "object_rank": 115,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.1875,
+      "top_tokens": [
+        " ",
+        " Polygon",
+        " [",
+        " geometry",
+        " polygon"
+      ]
+    },
+    {
+      "best_target_rank": 256,
+      "boundary_class": "unknown_other",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "1",
+      "object": "triangle",
+      "object_rank": 120,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.15625,
+      "top_tokens": [
+        " ",
+        " Polygon",
+        " [",
+        " geometry",
+        " polygon"
+      ]
+    },
+    {
+      "best_target_rank": 1338,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 2932,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.09375,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " ?\n\n",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 1375,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 3058,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.09375,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " ?\n\n",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 1360,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 2942,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 1.0625,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " ?\n\n",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 228,
+      "boundary_class": "broad_near_miss",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "geometry",
+      "object": "triangle",
+      "object_rank": 109,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -1.0,
+      "top_tokens": [
+        " geometry",
+        " Polygon",
+        " ",
+        " [",
+        " polygon"
+      ]
+    },
+    {
+      "best_target_rank": 227,
+      "boundary_class": "broad_near_miss",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "geometry",
+      "object": "triangle",
+      "object_rank": 110,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.90625,
+      "top_tokens": [
+        " geometry",
+        " Polygon",
+        " ",
+        " triangle",
+        " polygon"
+      ]
+    },
+    {
+      "best_target_rank": 968,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 1895,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.90625,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " Geometry",
+        " ?\n\n"
+      ]
+    },
+    {
+      "best_target_rank": 539,
+      "boundary_class": "target_equivalent",
+      "case_id": "p816_triangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "geometry shape",
+      "object": "triangle",
+      "object_rank": 957,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "geometry shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.75,
+      "top_tokens": [
+        " geometry",
+        " shape",
+        " Geometry",
+        " ?\n",
+        " ?\n\n"
+      ]
+    },
+    {
+      "best_target_rank": 727,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 1229,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.71875,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " Shape",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 817,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1381,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top4_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.71875,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " ?\n\n",
+        " Shape"
+      ]
+    },
+    {
+      "best_target_rank": 1265,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 2070,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.625,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " Geometry",
+        " ?\n\n"
+      ]
+    },
+    {
+      "best_target_rank": 278,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "1",
+      "object": "square",
+      "object_rank": 336,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.21875,
+      "top_tokens": [
+        " ",
+        " Polygon",
+        " polygon",
+        " shape",
+        " square"
+      ]
+    },
+    {
+      "best_target_rank": 282,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "1",
+      "object": "square",
+      "object_rank": 340,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.21875,
+      "top_tokens": [
+        " ",
+        " Polygon",
+        " polygon",
+        " shape",
+        " square"
+      ]
+    },
+    {
+      "best_target_rank": 206,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 4,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305"
+      ],
+      "generated": "square",
+      "object": "rectangle",
+      "object_rank": 187,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "square",
+      "prompt_variant": "natural_question",
+      "subset_name": "top4_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": -0.21875,
+      "top_tokens": [
+        " square",
+        " shape",
+        " Rectangle",
+        " A",
+        " "
+      ]
+    },
+    {
+      "best_target_rank": 1267,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "square",
+      "object_rank": 1491,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.203125,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " Geometry",
+        " shapes"
+      ]
+    },
+    {
+      "best_target_rank": 271,
+      "boundary_class": "unknown_other",
+      "case_id": "p844_square_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "1",
+      "object": "square",
+      "object_rank": 310,
+      "original_boundary_class": "unknown_other",
+      "original_generated": "1",
+      "prompt_variant": "natural_question",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.15625,
+      "top_tokens": [
+        " ",
+        " Polygon",
+        " polygon",
+        " shape",
+        " square"
+      ]
+    },
+    {
+      "best_target_rank": 1094,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1248,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.15625,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " geometry",
+        " ?\n\n",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 1109,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "original",
+      "gear_count": 0,
+      "gear_keys": [],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1231,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "original",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.125,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " geometry",
+        " ?\n\n",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 1130,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 1,
+      "gear_keys": [
+        "L27C1106"
+      ],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1256,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top1_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.125,
+      "top_tokens": [
+        " shape",
+        " ?\n",
+        " geometry",
+        " ?\n\n",
+        " Geometry"
+      ]
+    },
+    {
+      "best_target_rank": 1047,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "zero",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1128,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_zero",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.09375,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " ?\n",
+        " shapes",
+        " ?\n\n"
+      ]
+    },
+    {
+      "best_target_rank": 1052,
+      "boundary_class": "target_equivalent",
+      "case_id": "p844_rectangle_geometric_shape",
+      "edit_mode": "flip",
+      "gear_count": 8,
+      "gear_keys": [
+        "L27C1106",
+        "L27C15791",
+        "L27C2295",
+        "L27C15305",
+        "L27C13360",
+        "L27C18866",
+        "L26C13399",
+        "L26C10821"
+      ],
+      "generated": "shape",
+      "object": "rectangle",
+      "object_rank": 1107,
+      "original_boundary_class": "target_equivalent",
+      "original_generated": "shape",
+      "prompt_variant": "natural_category",
+      "subset_name": "top8_flip",
+      "target_gained_vs_original": false,
+      "target_lost_vs_original": false,
+      "target_minus_object_logit": 0.0625,
+      "top_tokens": [
+        " shape",
+        " geometry",
+        " shapes",
+        " ?\n",
+        " __"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "attn_implementation": "sdpa",
+  "boundary": "This phase tests role-signed necessity with patch-mode perturbations. It is still patch evidence, not natural-route ablation of an unpatched model.",
+  "case_ids": [
+    "p816_triangle_geometric_shape"
+  ],
+  "case_summary": {
+    "p816_triangle_geometric_shape": {
+      "classes": {
+        "object_echo": 2,
+        "target_equivalent": 3
+      },
+      "degraded_rows": 0,
+      "format_echo_rows": 0,
+      "mean_delta_quality_vs_original": -0.6404891271523148,
+      "mean_quality": 0.3105407207005816,
+      "n": 5,
+      "negative_role_needed_rows": 2,
+      "object_echo_rows": 2,
+      "positive_role_needed_rows": 0,
+      "target_lost_vs_original_rows": 2,
+      "target_rows": 3
+    }
+  },
+  "donor_variants": [
+    "natural_question"
+  ],
+  "dtype": "bfloat16",
+  "format_echo_rows": 0,
+  "mode_summary": {
+    "flip_negative": {
+      "classes": {
+        "object_echo": 1
+      },
+      "degraded_rows": 0,
+      "format_echo_rows": 0,
+      "mean_delta_quality_vs_original": -1.527577900121532,
+      "mean_quality": -0.5765480522686356,
+      "n": 1,
+      "negative_role_needed_rows": 1,
+      "object_echo_rows": 1,
+      "positive_role_needed_rows": 0,
+      "target_lost_vs_original_rows": 1,
+      "target_rows": 0
+    },
+    "negative_only": {
+      "classes": {
+        "target_equivalent": 1
+      },
+      "degraded_rows": 0,
+      "format_echo_rows": 0,
+      "mean_delta_quality_vs_original": -0.0567393067915537,
+      "mean_quality": 0.8942905410613426,
+      "n": 1,
+      "negative_role_needed_rows": 0,
+      "object_echo_rows": 0,
+      "positive_role_needed_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 1
+    },
+    "pair_original": {
+      "classes": {
+        "target_equivalent": 1
+      },
+      "degraded_rows": 0,
+      "format_echo_rows": 0,
+      "mean_delta_quality_vs_original": 0.0,
+      "mean_quality": 0.9510298478528963,
+      "n": 1,
+      "negative_role_needed_rows": 0,
+      "object_echo_rows": 0,
+      "positive_role_needed_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 1
+    },
+    "positive_only": {
+      "classes": {
+        "object_echo": 1
+      },
+      "degraded_rows": 0,
+      "format_echo_rows": 0,
+      "mean_delta_quality_vs_original": -1.6216193542231847,
+      "mean_quality": -0.6705895063702884,
+      "n": 1,
+      "negative_role_needed_rows": 1,
+      "object_echo_rows": 1,
+      "positive_role_needed_rows": 0,
+      "target_lost_vs_original_rows": 1,
+      "target_rows": 0
+    },
+    "zero_negative": {
+      "classes": {
+        "target_equivalent": 1
+      },
+      "degraded_rows": 0,
+      "format_echo_rows": 0,
+      "mean_delta_quality_vs_original": 0.0034909253746966407,
+      "mean_quality": 0.954520773227593,
+      "n": 1,
+      "negative_role_needed_rows": 0,
+      "object_echo_rows": 0,
+      "positive_role_needed_rows": 0,
+      "target_lost_vs_original_rows": 0,
+      "target_rows": 1
+    }
+  },
+  "model": "deepseek7b",
+  "modes": [
+    "pair_original",
+    "positive_only",
+    "negative_only",
+    "flip_negative",
+    "zero_negative"
+  ],
+  "n_candidates": 1,
+  "n_cases": 1,
+  "n_roles": 3,
+  "n_rows": 5,
+  "negative_role_needed_rows": 2,
+  "object_echo_rows": 2,
+  "pair_original_target_rows": 1,
+  "phase": 841,
+  "positive_role_needed_rows": 0,
+  "quantization": "off",
+  "role_signs": {
+    "p816_cat_living_thing::L27:layer_residual:whole_layer_residual:B16": {
+      "budget": 16,
+      "component_kind": "layer_residual",
+      "component_label": "whole_layer_residual",
+      "layer_idx": 27,
+      "mean_strict_selected_signed_sum": 1.2119383811950684,
+      "role_name": "positive_carrier",
+      "role_sign": 1,
+      "strict_observation_count": 2,
+      "strict_signed_values": [
+        0.31589388847351074,
+        2.107982873916626
+      ]
+    },
+    "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16": {
+      "budget": 16,
+      "component_kind": "layer_residual",
+      "component_label": "whole_layer_residual",
+      "layer_idx": 27,
+      "mean_strict_selected_signed_sum": 1.2119383811950684,
+      "role_name": "positive_carrier",
+      "role_sign": 1,
+      "strict_observation_count": 2,
+      "strict_signed_values": [
+        0.31589388847351074,
+        2.107982873916626
+      ]
+    },
+    "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16": {
+      "budget": 16,
+      "component_kind": "mlp_channel_group",
+      "component_label": "mlp_topdiff_32",
+      "layer_idx": 27,
+      "mean_strict_selected_signed_sum": -3.158131465315819,
+      "role_name": "negative_suppressor_or_rewriter",
+      "role_sign": -1,
+      "strict_observation_count": 4,
+      "strict_signed_values": [
+        -6.055888652801514,
+        -6.055888652801514,
+        -0.2603742778301239,
+        -0.2603742778301239
+      ]
+    }
+  },
+  "round": "smoke",
+  "skip_reason": null,
+  "skipped_model_load": false,
+  "strict_candidates": [
+    {
+      "combo_kind": "pair",
+      "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+      "combo_labels": [
+        "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16",
+        "p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16"
+      ],
+      "max_interaction_gain": 0.08426703991383055,
+      "mean_quality": 1.0093662198856128,
+      "minimal_seed_rows": 2,
+      "n_components": 2,
+      "seed_case_ids": [
+        "p816_triangle_geometric_shape"
+      ],
+      "seed_donor_variants": [
+        "natural_question",
+        "object_only"
+      ],
+      "seed_outputs": [
+        "polygon"
+      ],
+      "seed_rows": [
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "donor_variant": "natural_question",
+          "interaction_quality_gain": 0.05900357331490558,
+          "minimal_sufficient_candidate": true,
+          "patched_generated": "polygon"
+        },
+        {
+          "case_id": "p816_triangle_geometric_shape",
+          "donor_variant": "object_only",
+          "interaction_quality_gain": 0.08426703991383055,
+          "minimal_sufficient_candidate": true,
+          "patched_generated": "polygon"
+        }
+      ],
+      "strict_seed_rows": 2
+    }
+  ],
+  "target_lost_vs_original_rows": 2,
+  "target_rows": 3,
+  "timestamp": "2026-07-02 06:35:32",
+  "title": "Signed Complementary Gear Role Validation",
+  "top_mode_rows": [
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+      "delta_quality_vs_original": -1.6216193542231847,
+      "donor_variant": "natural_question",
+      "mode": "positive_only",
+      "negative_role_needed_signal": true,
+      "original_target_transition": true,
+      "patched_boundary_class": "object_echo",
+      "patched_generated": "Triangle",
+      "positive_role_needed_signal": false,
+      "target_lost_vs_original": true,
+      "target_quality_score": -0.6705895063702884,
+      "target_transition": false
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+      "delta_quality_vs_original": -1.527577900121532,
+      "donor_variant": "natural_question",
+      "mode": "flip_negative",
+      "negative_role_needed_signal": true,
+      "original_target_transition": true,
+      "patched_boundary_class": "object_echo",
+      "patched_generated": "Triangle",
+      "positive_role_needed_signal": false,
+      "target_lost_vs_original": true,
+      "target_quality_score": -0.5765480522686356,
+      "target_transition": false
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+      "delta_quality_vs_original": -0.0567393067915537,
+      "donor_variant": "natural_question",
+      "mode": "negative_only",
+      "negative_role_needed_signal": false,
+      "original_target_transition": true,
+      "patched_boundary_class": "target_equivalent",
+      "patched_generated": "polygon",
+      "positive_role_needed_signal": false,
+      "target_lost_vs_original": false,
+      "target_quality_score": 0.8942905410613426,
+      "target_transition": true
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+      "delta_quality_vs_original": 0.0034909253746966407,
+      "donor_variant": "natural_question",
+      "mode": "zero_negative",
+      "negative_role_needed_signal": false,
+      "original_target_transition": true,
+      "patched_boundary_class": "target_equivalent",
+      "patched_generated": "polygon",
+      "positive_role_needed_signal": false,
+      "target_lost_vs_original": false,
+      "target_quality_score": 0.954520773227593,
+      "target_transition": true
+    },
+    {
+      "case_id": "p816_triangle_geometric_shape",
+      "combo_label": "p816_triangle_geometric_shape::L27:mlp_channel_group:mlp_topdiff_32:B16 + p816_triangle_geometric_shape::L27:layer_residual:whole_layer_residual:B16",
+      "delta_quality_vs_original": 0.0,
+      "donor_variant": "natural_question",
+      "mode": "pair_original",
+      "negative_role_needed_signal": false,
+      "original_target_transition": true,
+      "patched_boundary_class": "target_equivalent",
+      "patched_generated": "polygon",
+      "positive_role_needed_signal": false,
+      "target_lost_vs_original": false,
+      "target_quality_score": 0.9510298478528963,
+      "target_transition": true
+    }
+  ]
+}
