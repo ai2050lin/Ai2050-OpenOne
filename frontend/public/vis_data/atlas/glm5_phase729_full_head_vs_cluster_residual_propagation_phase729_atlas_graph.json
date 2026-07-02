@@ -1,0 +1,1447 @@
+{
+  "schema_version": "atlas_graph_v1",
+  "title": "Phase 729 Full-Head vs Channel-Cluster Residual Propagation Atlas",
+  "model_info": {
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 729,
+    "timestamp": "2026-06-28 18:12:57",
+    "evidence_type": "residual and component propagation under cluster/full-head ablation"
+  },
+  "layout": {
+    "x": "intervention/site offset",
+    "y": "layer index",
+    "z": "model lane"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "type": "model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -12,
+          0,
+          -8.0
+        ],
+        "role": "tested_model"
+      },
+      {
+        "id": "qwen3:phase:729",
+        "type": "phase",
+        "label": "Phase 729",
+        "model": "qwen3",
+        "position": [
+          -9,
+          3,
+          -8.0
+        ],
+        "role": "propagation_phase"
+      },
+      {
+        "id": "qwen3:boundary:likelihood_generation_split",
+        "type": "failure",
+        "label": "likelihood/generation split",
+        "model": "qwen3",
+        "position": [
+          12,
+          22,
+          -8.0
+        ],
+        "role": "propagation_boundary",
+        "evidence_level": "boundary"
+      },
+      {
+        "id": "qwen3:intervention:category_cluster",
+        "type": "intervention",
+        "label": "category_cluster",
+        "model": "qwen3",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 7.1122660489157425,
+        "mean_mlp_component_vs_input": 0.5363183452938923,
+        "mean_attn_component_vs_input": 0.46132864825622383
+      },
+      {
+        "id": "qwen3:site:category_cluster:hidden_33",
+        "type": "layer",
+        "label": "hidden_33",
+        "model": "qwen3",
+        "layer": 32,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 5.891205657612193,
+        "mean_delta_norm": 5.891205657612193,
+        "mean_amplification_vs_source": 7.1122660489157425,
+        "mean_cos_with_final_delta": 0.5188079340891405
+      },
+      {
+        "id": "qwen3:site:category_cluster:hidden_32",
+        "type": "layer",
+        "label": "hidden_32",
+        "model": "qwen3",
+        "layer": 31,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 4.901833881031383,
+        "mean_delta_norm": 4.901833881031383,
+        "mean_amplification_vs_source": 5.709855322082267,
+        "mean_cos_with_final_delta": 0.41535611179741944
+      },
+      {
+        "id": "qwen3:site:category_cluster:hidden_31",
+        "type": "layer",
+        "label": "hidden_31",
+        "model": "qwen3",
+        "layer": 30,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 4.1925095753236254,
+        "mean_delta_norm": 4.1925095753236254,
+        "mean_amplification_vs_source": 4.713835114592889,
+        "mean_cos_with_final_delta": 0.34793354909528384
+      },
+      {
+        "id": "qwen3:site:category_cluster:hidden_30",
+        "type": "layer",
+        "label": "hidden_30",
+        "model": "qwen3",
+        "layer": 29,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 3.472469145601446,
+        "mean_delta_norm": 3.472469145601446,
+        "mean_amplification_vs_source": 3.908312576678595,
+        "mean_cos_with_final_delta": 0.2885103455998681
+      },
+      {
+        "id": "qwen3:site:category_cluster:hidden_36",
+        "type": "layer",
+        "label": "hidden_36",
+        "model": "qwen3",
+        "layer": 35,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 3.157098900188099,
+        "mean_delta_norm": 3.157098900188099,
+        "mean_amplification_vs_source": 4.138106237433129,
+        "mean_cos_with_final_delta": 1.0000000270930203
+      },
+      {
+        "id": "qwen3:site:category_cluster:hidden_29",
+        "type": "layer",
+        "label": "hidden_29",
+        "model": "qwen3",
+        "layer": 28,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 3.0924969261342827,
+        "mean_delta_norm": 3.0924969261342827,
+        "mean_amplification_vs_source": 3.1912621664893326,
+        "mean_cos_with_final_delta": 0.2427774484861981
+      },
+      {
+        "id": "qwen3:intervention:category_full_head",
+        "type": "intervention",
+        "label": "category_full_head",
+        "model": "qwen3",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 2.6524438736073765,
+        "mean_mlp_component_vs_input": 0.5170510927319868,
+        "mean_attn_component_vs_input": 0.40706327350193944
+      },
+      {
+        "id": "qwen3:site:category_full_head:hidden_33",
+        "type": "layer",
+        "label": "hidden_33",
+        "model": "qwen3",
+        "layer": 32,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 27.98737783865495,
+        "mean_delta_norm": 27.98737783865495,
+        "mean_amplification_vs_source": 2.6524438736073765,
+        "mean_cos_with_final_delta": 0.6039312928915024
+      },
+      {
+        "id": "qwen3:site:category_full_head:hidden_32",
+        "type": "layer",
+        "label": "hidden_32",
+        "model": "qwen3",
+        "layer": 31,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 24.592920758507468,
+        "mean_delta_norm": 24.592920758507468,
+        "mean_amplification_vs_source": 2.306461360884463,
+        "mean_cos_with_final_delta": 0.5334640592336655
+      },
+      {
+        "id": "qwen3:site:category_full_head:hidden_31",
+        "type": "layer",
+        "label": "hidden_31",
+        "model": "qwen3",
+        "layer": 30,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 21.650412234393034,
+        "mean_delta_norm": 21.650412234393034,
+        "mean_amplification_vs_source": 2.019615150031268,
+        "mean_cos_with_final_delta": 0.4743756800889969
+      },
+      {
+        "id": "qwen3:site:category_full_head:hidden_30",
+        "type": "layer",
+        "label": "hidden_30",
+        "model": "qwen3",
+        "layer": 29,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 18.736450758847322,
+        "mean_delta_norm": 18.736450758847322,
+        "mean_amplification_vs_source": 1.7546751912231053,
+        "mean_cos_with_final_delta": 0.42471231655641034
+      },
+      {
+        "id": "qwen3:site:category_full_head:hidden_29",
+        "type": "layer",
+        "label": "hidden_29",
+        "model": "qwen3",
+        "layer": 28,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 16.469412792812694,
+        "mean_delta_norm": 16.469412792812694,
+        "mean_amplification_vs_source": 1.5104550984089942,
+        "mean_cos_with_final_delta": 0.3642513785849918
+      },
+      {
+        "id": "qwen3:site:category_full_head:hidden_28",
+        "type": "layer",
+        "label": "hidden_28",
+        "model": "qwen3",
+        "layer": 27,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 14.754747596654026,
+        "mean_delta_norm": 14.754747596654026,
+        "mean_amplification_vs_source": 1.3221812319506003,
+        "mean_cos_with_final_delta": 0.32350592958656227
+      },
+      {
+        "id": "qwen3:intervention:category_plus_fruit_cluster",
+        "type": "intervention",
+        "label": "category_plus_fruit_cluster",
+        "model": "qwen3",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 8.02044888459071,
+        "mean_mlp_component_vs_input": 0.6049800874390642,
+        "mean_attn_component_vs_input": 0.7152007022400129
+      },
+      {
+        "id": "qwen3:site:category_plus_fruit_cluster:hidden_33",
+        "type": "layer",
+        "label": "hidden_33",
+        "model": "qwen3",
+        "layer": 32,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 8.079525925896384,
+        "mean_delta_norm": 8.079525925896384,
+        "mean_amplification_vs_source": 8.02044888459071,
+        "mean_cos_with_final_delta": 0.5506789101795717
+      },
+      {
+        "id": "qwen3:site:category_plus_fruit_cluster:hidden_32",
+        "type": "layer",
+        "label": "hidden_32",
+        "model": "qwen3",
+        "layer": 31,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 7.145031777295199,
+        "mean_delta_norm": 7.145031777295199,
+        "mean_amplification_vs_source": 6.744222565480372,
+        "mean_cos_with_final_delta": 0.4651207801970569
+      },
+      {
+        "id": "qwen3:site:category_plus_fruit_cluster:hidden_31",
+        "type": "layer",
+        "label": "hidden_31",
+        "model": "qwen3",
+        "layer": 30,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 6.338382309133356,
+        "mean_delta_norm": 6.338382309133356,
+        "mean_amplification_vs_source": 5.720130568601923,
+        "mean_cos_with_final_delta": 0.4107169739224694
+      },
+      {
+        "id": "qwen3:site:category_plus_fruit_cluster:hidden_30",
+        "type": "layer",
+        "label": "hidden_30",
+        "model": "qwen3",
+        "layer": 29,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 5.5031819343566895,
+        "mean_delta_norm": 5.5031819343566895,
+        "mean_amplification_vs_source": 4.868645528516658,
+        "mean_cos_with_final_delta": 0.36044988103888254
+      },
+      {
+        "id": "qwen3:site:category_plus_fruit_cluster:hidden_29",
+        "type": "layer",
+        "label": "hidden_29",
+        "model": "qwen3",
+        "layer": 28,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 5.104040135036815,
+        "mean_delta_norm": 5.104040135036815,
+        "mean_amplification_vs_source": 4.276955931938537,
+        "mean_cos_with_final_delta": 0.3112899512052536
+      },
+      {
+        "id": "qwen3:site:category_plus_fruit_cluster:hidden_28",
+        "type": "layer",
+        "label": "hidden_28",
+        "model": "qwen3",
+        "layer": 27,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 4.412675375288183,
+        "mean_delta_norm": 4.412675375288183,
+        "mean_amplification_vs_source": 3.559492629923322,
+        "mean_cos_with_final_delta": 0.27185617319562216
+      },
+      {
+        "id": "glm4:model",
+        "type": "model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -12,
+          0,
+          0.0
+        ],
+        "role": "tested_model"
+      },
+      {
+        "id": "glm4:phase:729",
+        "type": "phase",
+        "label": "Phase 729",
+        "model": "glm4",
+        "position": [
+          -9,
+          3,
+          0.0
+        ],
+        "role": "propagation_phase"
+      },
+      {
+        "id": "glm4:boundary:likelihood_generation_split",
+        "type": "failure",
+        "label": "likelihood/generation split",
+        "model": "glm4",
+        "position": [
+          12,
+          22,
+          0.0
+        ],
+        "role": "propagation_boundary",
+        "evidence_level": "boundary"
+      },
+      {
+        "id": "glm4:intervention:category_cluster",
+        "type": "intervention",
+        "label": "category_cluster",
+        "model": "glm4",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 10.783793896043582,
+        "mean_mlp_component_vs_input": 0.4645691607180998,
+        "mean_attn_component_vs_input": 0.3892245624453676
+      },
+      {
+        "id": "glm4:site:category_cluster:hidden_40",
+        "type": "layer",
+        "label": "hidden_40",
+        "model": "glm4",
+        "layer": 39,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 2.5985499295321377,
+        "mean_delta_norm": 2.5985499295321377,
+        "mean_amplification_vs_source": 10.783793896043582,
+        "mean_cos_with_final_delta": 1.0000000270930203
+      },
+      {
+        "id": "glm4:site:category_cluster:hidden_33",
+        "type": "layer",
+        "label": "hidden_33",
+        "model": "glm4",
+        "layer": 32,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.2238295511765913,
+        "mean_delta_norm": 1.2238295511765913,
+        "mean_amplification_vs_source": 4.498132116956703,
+        "mean_cos_with_final_delta": 0.33131923932920804
+      },
+      {
+        "id": "glm4:site:category_cluster:hidden_32",
+        "type": "layer",
+        "label": "hidden_32",
+        "model": "glm4",
+        "layer": 31,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.0809908482161434,
+        "mean_delta_norm": 1.0809908482161434,
+        "mean_amplification_vs_source": 3.914664744980575,
+        "mean_cos_with_final_delta": 0.2821245803074403
+      },
+      {
+        "id": "glm4:site:category_cluster:hidden_31",
+        "type": "layer",
+        "label": "hidden_31",
+        "model": "glm4",
+        "layer": 30,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.0006947409022937,
+        "mean_delta_norm": 1.0006947409022937,
+        "mean_amplification_vs_source": 3.5101705212077636,
+        "mean_cos_with_final_delta": 0.2555868537588553
+      },
+      {
+        "id": "glm4:site:category_cluster:hidden_30",
+        "type": "layer",
+        "label": "hidden_30",
+        "model": "glm4",
+        "layer": 29,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 0.9280022057619962,
+        "mean_delta_norm": 0.9280022057619962,
+        "mean_amplification_vs_source": 3.157753247636923,
+        "mean_cos_with_final_delta": 0.23828340524976904
+      },
+      {
+        "id": "glm4:site:category_cluster:hidden_29",
+        "type": "layer",
+        "label": "hidden_29",
+        "model": "glm4",
+        "layer": 28,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 0.812844224951484,
+        "mean_delta_norm": 0.812844224951484,
+        "mean_amplification_vs_source": 2.7174228711167867,
+        "mean_cos_with_final_delta": 0.19161148166114633
+      },
+      {
+        "id": "glm4:intervention:category_full_head",
+        "type": "intervention",
+        "label": "category_full_head",
+        "model": "glm4",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 3.9775664525101164,
+        "mean_mlp_component_vs_input": 0.4050649703629984,
+        "mean_attn_component_vs_input": 0.3431242011348526
+      },
+      {
+        "id": "glm4:site:category_full_head:hidden_40",
+        "type": "layer",
+        "label": "hidden_40",
+        "model": "glm4",
+        "layer": 39,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 5.405590761791576,
+        "mean_delta_norm": 5.405590761791576,
+        "mean_amplification_vs_source": 3.9775664525101164,
+        "mean_cos_with_final_delta": 1.0000001192092896
+      },
+      {
+        "id": "glm4:site:category_full_head:hidden_33",
+        "type": "layer",
+        "label": "hidden_33",
+        "model": "glm4",
+        "layer": 32,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 3.096919509497556,
+        "mean_delta_norm": 3.096919509497556,
+        "mean_amplification_vs_source": 1.9262371220702854,
+        "mean_cos_with_final_delta": 0.4020353284749118
+      },
+      {
+        "id": "glm4:site:category_full_head:hidden_32",
+        "type": "layer",
+        "label": "hidden_32",
+        "model": "glm4",
+        "layer": 31,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 2.920829187739979,
+        "mean_delta_norm": 2.920829187739979,
+        "mean_amplification_vs_source": 1.7795647376409385,
+        "mean_cos_with_final_delta": 0.35704605145887897
+      },
+      {
+        "id": "glm4:site:category_full_head:hidden_31",
+        "type": "layer",
+        "label": "hidden_31",
+        "model": "glm4",
+        "layer": 30,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 2.7383812205357985,
+        "mean_delta_norm": 2.7383812205357985,
+        "mean_amplification_vs_source": 1.6078938207843907,
+        "mean_cos_with_final_delta": 0.3318616504018957
+      },
+      {
+        "id": "glm4:site:category_full_head:hidden_30",
+        "type": "layer",
+        "label": "hidden_30",
+        "model": "glm4",
+        "layer": 29,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 2.577849182215604,
+        "mean_delta_norm": 2.577849182215604,
+        "mean_amplification_vs_source": 1.480094965640609,
+        "mean_cos_with_final_delta": 0.3111277866092595
+      },
+      {
+        "id": "glm4:site:category_full_head:hidden_29",
+        "type": "layer",
+        "label": "hidden_29",
+        "model": "glm4",
+        "layer": 28,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 2.3948383087461647,
+        "mean_delta_norm": 2.3948383087461647,
+        "mean_amplification_vs_source": 1.3469856642140554,
+        "mean_cos_with_final_delta": 0.2850422595034946
+      },
+      {
+        "id": "glm4:intervention:category_plus_fruit_cluster",
+        "type": "intervention",
+        "label": "category_plus_fruit_cluster",
+        "model": "glm4",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 12.441394122223931,
+        "mean_mlp_component_vs_input": 0.4645691607180998,
+        "mean_attn_component_vs_input": 0.3892245624453676
+      },
+      {
+        "id": "glm4:site:category_plus_fruit_cluster:hidden_40",
+        "type": "layer",
+        "label": "hidden_40",
+        "model": "glm4",
+        "layer": 39,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 3.3918937878175215,
+        "mean_delta_norm": 3.3918937878175215,
+        "mean_amplification_vs_source": 12.441394122223931,
+        "mean_cos_with_final_delta": 1.000000067732551
+      },
+      {
+        "id": "glm4:site:category_plus_fruit_cluster:hidden_33",
+        "type": "layer",
+        "label": "hidden_33",
+        "model": "glm4",
+        "layer": 32,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.7900863831693477,
+        "mean_delta_norm": 1.7900863831693477,
+        "mean_amplification_vs_source": 5.688817641852345,
+        "mean_cos_with_final_delta": 0.4179863916202025
+      },
+      {
+        "id": "glm4:site:category_plus_fruit_cluster:hidden_32",
+        "type": "layer",
+        "label": "hidden_32",
+        "model": "glm4",
+        "layer": 31,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.6750101907686754,
+        "mean_delta_norm": 1.6750101907686754,
+        "mean_amplification_vs_source": 5.205237463658417,
+        "mean_cos_with_final_delta": 0.37984380329197104
+      },
+      {
+        "id": "glm4:site:category_plus_fruit_cluster:hidden_31",
+        "type": "layer",
+        "label": "hidden_31",
+        "model": "glm4",
+        "layer": 30,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.5922880362380634,
+        "mean_delta_norm": 1.5922880362380634,
+        "mean_amplification_vs_source": 4.812759895161363,
+        "mean_cos_with_final_delta": 0.35500219802964816
+      },
+      {
+        "id": "glm4:site:category_plus_fruit_cluster:hidden_30",
+        "type": "layer",
+        "label": "hidden_30",
+        "model": "glm4",
+        "layer": 29,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 1.5192893716421993,
+        "mean_delta_norm": 1.5192893716421993,
+        "mean_amplification_vs_source": 4.4559820824541205,
+        "mean_cos_with_final_delta": 0.3356743570078503
+      },
+      {
+        "id": "glm4:site:category_plus_fruit_cluster:hidden_29",
+        "type": "layer",
+        "label": "hidden_29",
+        "model": "glm4",
+        "layer": 28,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 0.812844224951484,
+        "mean_delta_norm": 0.812844224951484,
+        "mean_amplification_vs_source": 2.7174228711167867,
+        "mean_cos_with_final_delta": 0.14395506104285066
+      },
+      {
+        "id": "deepseek7b:model",
+        "type": "model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -12,
+          0,
+          8.0
+        ],
+        "role": "tested_model"
+      },
+      {
+        "id": "deepseek7b:phase:729",
+        "type": "phase",
+        "label": "Phase 729",
+        "model": "deepseek7b",
+        "position": [
+          -9,
+          3,
+          8.0
+        ],
+        "role": "propagation_phase"
+      },
+      {
+        "id": "deepseek7b:boundary:likelihood_generation_split",
+        "type": "failure",
+        "label": "likelihood/generation split",
+        "model": "deepseek7b",
+        "position": [
+          12,
+          22,
+          8.0
+        ],
+        "role": "propagation_boundary",
+        "evidence_level": "boundary"
+      },
+      {
+        "id": "deepseek7b:intervention:category_cluster",
+        "type": "intervention",
+        "label": "category_cluster",
+        "model": "deepseek7b",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 4.105330811702732,
+        "mean_mlp_component_vs_input": 0.6834833498895154,
+        "mean_attn_component_vs_input": 0.3290324100501805
+      },
+      {
+        "id": "deepseek7b:site:category_cluster:hidden_27",
+        "type": "layer",
+        "label": "hidden_27",
+        "model": "deepseek7b",
+        "layer": 26,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 31.437394749034535,
+        "mean_delta_norm": 31.437394749034535,
+        "mean_amplification_vs_source": 4.105330811702732,
+        "mean_cos_with_final_delta": 0.4949944629757242
+      },
+      {
+        "id": "deepseek7b:site:category_cluster:hidden_26",
+        "type": "layer",
+        "label": "hidden_26",
+        "model": "deepseek7b",
+        "layer": 25,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 25.508483453230426,
+        "mean_delta_norm": 25.508483453230426,
+        "mean_amplification_vs_source": 3.3369260474657847,
+        "mean_cos_with_final_delta": 0.40065184387971053
+      },
+      {
+        "id": "deepseek7b:site:category_cluster:hidden_25",
+        "type": "layer",
+        "label": "hidden_25",
+        "model": "deepseek7b",
+        "layer": 24,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 21.666743625294078,
+        "mean_delta_norm": 21.666743625294078,
+        "mean_amplification_vs_source": 2.8232237683686465,
+        "mean_cos_with_final_delta": 0.33429406786506827
+      },
+      {
+        "id": "deepseek7b:site:category_cluster:hidden_24",
+        "type": "layer",
+        "label": "hidden_24",
+        "model": "deepseek7b",
+        "layer": 23,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 17.470803434198555,
+        "mean_delta_norm": 17.470803434198555,
+        "mean_amplification_vs_source": 2.2724311536237347,
+        "mean_cos_with_final_delta": 0.2764263102276759
+      },
+      {
+        "id": "deepseek7b:site:category_cluster:hidden_23",
+        "type": "layer",
+        "label": "hidden_23",
+        "model": "deepseek7b",
+        "layer": 22,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 13.867547642100941,
+        "mean_delta_norm": 13.867547642100941,
+        "mean_amplification_vs_source": 1.8093194627697293,
+        "mean_cos_with_final_delta": 0.210331597619436
+      },
+      {
+        "id": "deepseek7b:site:category_cluster:L24_mlp_out",
+        "type": "cluster",
+        "label": "L24_mlp_out",
+        "model": "deepseek7b",
+        "layer": 24,
+        "role": "mlp_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 10.352818575772373,
+        "mean_delta_norm": 10.352818575772373,
+        "mean_amplification_vs_source": 1.3531086681671942,
+        "mean_cos_with_final_delta": 0.1913087312978777
+      },
+      {
+        "id": "deepseek7b:intervention:category_full_head",
+        "type": "intervention",
+        "label": "category_full_head",
+        "model": "deepseek7b",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 3.042024367565591,
+        "mean_mlp_component_vs_input": 0.6259405024935131,
+        "mean_attn_component_vs_input": 0.25545659536928844
+      },
+      {
+        "id": "deepseek7b:site:category_full_head:hidden_27",
+        "type": "layer",
+        "label": "hidden_27",
+        "model": "deepseek7b",
+        "layer": 26,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 97.0697135925293,
+        "mean_delta_norm": 97.0697135925293,
+        "mean_amplification_vs_source": 3.042024367565591,
+        "mean_cos_with_final_delta": 0.6585652882402594
+      },
+      {
+        "id": "deepseek7b:site:category_full_head:hidden_26",
+        "type": "layer",
+        "label": "hidden_26",
+        "model": "deepseek7b",
+        "layer": 25,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 80.18538561734286,
+        "mean_delta_norm": 80.18538561734286,
+        "mean_amplification_vs_source": 2.5144960877111235,
+        "mean_cos_with_final_delta": 0.5450608730316162
+      },
+      {
+        "id": "deepseek7b:site:category_full_head:hidden_25",
+        "type": "layer",
+        "label": "hidden_25",
+        "model": "deepseek7b",
+        "layer": 24,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 68.96200908314098,
+        "mean_delta_norm": 68.96200908314098,
+        "mean_amplification_vs_source": 2.158441260814264,
+        "mean_cos_with_final_delta": 0.46974726901812985
+      },
+      {
+        "id": "deepseek7b:site:category_full_head:hidden_24",
+        "type": "layer",
+        "label": "hidden_24",
+        "model": "deepseek7b",
+        "layer": 23,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 57.53518642078746,
+        "mean_delta_norm": 57.53518642078746,
+        "mean_amplification_vs_source": 1.7993290952170058,
+        "mean_cos_with_final_delta": 0.3911390656774694
+      },
+      {
+        "id": "deepseek7b:site:category_full_head:hidden_23",
+        "type": "layer",
+        "label": "hidden_23",
+        "model": "deepseek7b",
+        "layer": 22,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 48.37487654252486,
+        "mean_delta_norm": 48.37487654252486,
+        "mean_amplification_vs_source": 1.514151512713996,
+        "mean_cos_with_final_delta": 0.3152135637673465
+      },
+      {
+        "id": "deepseek7b:site:category_full_head:hidden_22",
+        "type": "layer",
+        "label": "hidden_22",
+        "model": "deepseek7b",
+        "layer": 21,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 37.35903419147838,
+        "mean_delta_norm": 37.35903419147838,
+        "mean_amplification_vs_source": 1.1685681115922135,
+        "mean_cos_with_final_delta": 0.24513704837723213
+      },
+      {
+        "id": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "type": "intervention",
+        "label": "category_plus_fruit_cluster",
+        "model": "deepseek7b",
+        "role": "propagation_intervention",
+        "evidence_level": "residual_propagation",
+        "max_layer_out_amplification": 4.105330811702732,
+        "mean_mlp_component_vs_input": 0.6834833498895154,
+        "mean_attn_component_vs_input": 0.3290324100501805
+      },
+      {
+        "id": "deepseek7b:site:category_plus_fruit_cluster:hidden_27",
+        "type": "layer",
+        "label": "hidden_27",
+        "model": "deepseek7b",
+        "layer": 26,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 31.437394749034535,
+        "mean_delta_norm": 31.437394749034535,
+        "mean_amplification_vs_source": 4.105330811702732,
+        "mean_cos_with_final_delta": 0.44177873381836846
+      },
+      {
+        "id": "deepseek7b:site:category_plus_fruit_cluster:hidden_26",
+        "type": "layer",
+        "label": "hidden_26",
+        "model": "deepseek7b",
+        "layer": 25,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 25.508483453230426,
+        "mean_delta_norm": 25.508483453230426,
+        "mean_amplification_vs_source": 3.3369260474657847,
+        "mean_cos_with_final_delta": 0.3545081051574512
+      },
+      {
+        "id": "deepseek7b:site:category_plus_fruit_cluster:hidden_25",
+        "type": "layer",
+        "label": "hidden_25",
+        "model": "deepseek7b",
+        "layer": 24,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 21.666743625294078,
+        "mean_delta_norm": 21.666743625294078,
+        "mean_amplification_vs_source": 2.8232237683686465,
+        "mean_cos_with_final_delta": 0.29389450851489196
+      },
+      {
+        "id": "deepseek7b:site:category_plus_fruit_cluster:hidden_24",
+        "type": "layer",
+        "label": "hidden_24",
+        "model": "deepseek7b",
+        "layer": 23,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 17.470803434198555,
+        "mean_delta_norm": 17.470803434198555,
+        "mean_amplification_vs_source": 2.2724311536237347,
+        "mean_cos_with_final_delta": 0.24176151915030045
+      },
+      {
+        "id": "deepseek7b:site:category_plus_fruit_cluster:hidden_23",
+        "type": "layer",
+        "label": "hidden_23",
+        "model": "deepseek7b",
+        "layer": 22,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 13.867547642100941,
+        "mean_delta_norm": 13.867547642100941,
+        "mean_amplification_vs_source": 1.8093194627697293,
+        "mean_cos_with_final_delta": 0.1821693175218322
+      },
+      {
+        "id": "deepseek7b:site:category_plus_fruit_cluster:hidden_28",
+        "type": "layer",
+        "label": "hidden_28",
+        "model": "deepseek7b",
+        "layer": 27,
+        "role": "layer_out_propagation_site",
+        "evidence_level": "propagation_metric",
+        "score": 10.393997170708396,
+        "mean_delta_norm": 10.393997170708396,
+        "mean_amplification_vs_source": 1.4536679624652795,
+        "mean_cos_with_final_delta": 1.0000001246278936
+      }
+    ],
+    "edges": [
+      {
+        "source": "qwen3:model",
+        "target": "qwen3:phase:729",
+        "relation": "contains",
+        "weight": 0
+      },
+      {
+        "source": "qwen3:phase:729",
+        "target": "qwen3:intervention:category_cluster",
+        "relation": "tested_by",
+        "weight": 7.1122660489157425,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:site:category_cluster:hidden_33",
+        "relation": "upstream_of",
+        "weight": 5.891205657612193,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:site:category_cluster:hidden_32",
+        "relation": "upstream_of",
+        "weight": 4.901833881031383,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:site:category_cluster:hidden_31",
+        "relation": "upstream_of",
+        "weight": 4.1925095753236254,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:site:category_cluster:hidden_30",
+        "relation": "upstream_of",
+        "weight": 3.472469145601446,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:site:category_cluster:hidden_36",
+        "relation": "upstream_of",
+        "weight": 3.157098900188099,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:site:category_cluster:hidden_29",
+        "relation": "upstream_of",
+        "weight": 3.0924969261342827,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_cluster",
+        "target": "qwen3:boundary:likelihood_generation_split",
+        "relation": "weak_generation_effect",
+        "weight": 7.1122660489157425,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:phase:729",
+        "target": "qwen3:intervention:category_full_head",
+        "relation": "tested_by",
+        "weight": 2.6524438736073765,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_full_head",
+        "target": "qwen3:site:category_full_head:hidden_33",
+        "relation": "upstream_of",
+        "weight": 27.98737783865495,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_full_head",
+        "target": "qwen3:site:category_full_head:hidden_32",
+        "relation": "upstream_of",
+        "weight": 24.592920758507468,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_full_head",
+        "target": "qwen3:site:category_full_head:hidden_31",
+        "relation": "upstream_of",
+        "weight": 21.650412234393034,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_full_head",
+        "target": "qwen3:site:category_full_head:hidden_30",
+        "relation": "upstream_of",
+        "weight": 18.736450758847322,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_full_head",
+        "target": "qwen3:site:category_full_head:hidden_29",
+        "relation": "upstream_of",
+        "weight": 16.469412792812694,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_full_head",
+        "target": "qwen3:site:category_full_head:hidden_28",
+        "relation": "weak_generation_effect",
+        "weight": 14.754747596654026,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:phase:729",
+        "target": "qwen3:intervention:category_plus_fruit_cluster",
+        "relation": "tested_by",
+        "weight": 8.02044888459071,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:site:category_plus_fruit_cluster:hidden_33",
+        "relation": "upstream_of",
+        "weight": 8.079525925896384,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:site:category_plus_fruit_cluster:hidden_32",
+        "relation": "upstream_of",
+        "weight": 7.145031777295199,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:site:category_plus_fruit_cluster:hidden_31",
+        "relation": "upstream_of",
+        "weight": 6.338382309133356,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:site:category_plus_fruit_cluster:hidden_30",
+        "relation": "upstream_of",
+        "weight": 5.5031819343566895,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:site:category_plus_fruit_cluster:hidden_29",
+        "relation": "upstream_of",
+        "weight": 5.104040135036815,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:site:category_plus_fruit_cluster:hidden_28",
+        "relation": "upstream_of",
+        "weight": 4.412675375288183,
+        "phase": 729
+      },
+      {
+        "source": "qwen3:intervention:category_plus_fruit_cluster",
+        "target": "qwen3:boundary:likelihood_generation_split",
+        "relation": "weak_generation_effect",
+        "weight": 8.02044888459071,
+        "phase": 729
+      },
+      {
+        "source": "glm4:model",
+        "target": "glm4:phase:729",
+        "relation": "contains",
+        "weight": 0
+      },
+      {
+        "source": "glm4:phase:729",
+        "target": "glm4:intervention:category_cluster",
+        "relation": "tested_by",
+        "weight": 10.783793896043582,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:site:category_cluster:hidden_40",
+        "relation": "upstream_of",
+        "weight": 2.5985499295321377,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:site:category_cluster:hidden_33",
+        "relation": "upstream_of",
+        "weight": 1.2238295511765913,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:site:category_cluster:hidden_32",
+        "relation": "upstream_of",
+        "weight": 1.0809908482161434,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:site:category_cluster:hidden_31",
+        "relation": "upstream_of",
+        "weight": 1.0006947409022937,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:site:category_cluster:hidden_30",
+        "relation": "upstream_of",
+        "weight": 0.9280022057619962,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:site:category_cluster:hidden_29",
+        "relation": "upstream_of",
+        "weight": 0.812844224951484,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_cluster",
+        "target": "glm4:boundary:likelihood_generation_split",
+        "relation": "weak_generation_effect",
+        "weight": 10.783793896043582,
+        "phase": 729
+      },
+      {
+        "source": "glm4:phase:729",
+        "target": "glm4:intervention:category_full_head",
+        "relation": "tested_by",
+        "weight": 3.9775664525101164,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_full_head",
+        "target": "glm4:site:category_full_head:hidden_40",
+        "relation": "upstream_of",
+        "weight": 5.405590761791576,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_full_head",
+        "target": "glm4:site:category_full_head:hidden_33",
+        "relation": "upstream_of",
+        "weight": 3.096919509497556,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_full_head",
+        "target": "glm4:site:category_full_head:hidden_32",
+        "relation": "upstream_of",
+        "weight": 2.920829187739979,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_full_head",
+        "target": "glm4:site:category_full_head:hidden_31",
+        "relation": "upstream_of",
+        "weight": 2.7383812205357985,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_full_head",
+        "target": "glm4:site:category_full_head:hidden_30",
+        "relation": "weak_generation_effect",
+        "weight": 2.577849182215604,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_full_head",
+        "target": "glm4:site:category_full_head:hidden_29",
+        "relation": "weak_generation_effect",
+        "weight": 2.3948383087461647,
+        "phase": 729
+      },
+      {
+        "source": "glm4:phase:729",
+        "target": "glm4:intervention:category_plus_fruit_cluster",
+        "relation": "tested_by",
+        "weight": 12.441394122223931,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:site:category_plus_fruit_cluster:hidden_40",
+        "relation": "upstream_of",
+        "weight": 3.3918937878175215,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:site:category_plus_fruit_cluster:hidden_33",
+        "relation": "upstream_of",
+        "weight": 1.7900863831693477,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:site:category_plus_fruit_cluster:hidden_32",
+        "relation": "upstream_of",
+        "weight": 1.6750101907686754,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:site:category_plus_fruit_cluster:hidden_31",
+        "relation": "upstream_of",
+        "weight": 1.5922880362380634,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:site:category_plus_fruit_cluster:hidden_30",
+        "relation": "upstream_of",
+        "weight": 1.5192893716421993,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:site:category_plus_fruit_cluster:hidden_29",
+        "relation": "upstream_of",
+        "weight": 0.812844224951484,
+        "phase": 729
+      },
+      {
+        "source": "glm4:intervention:category_plus_fruit_cluster",
+        "target": "glm4:boundary:likelihood_generation_split",
+        "relation": "weak_generation_effect",
+        "weight": 12.441394122223931,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:phase:729",
+        "relation": "contains",
+        "weight": 0
+      },
+      {
+        "source": "deepseek7b:phase:729",
+        "target": "deepseek7b:intervention:category_cluster",
+        "relation": "tested_by",
+        "weight": 4.105330811702732,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:site:category_cluster:hidden_27",
+        "relation": "upstream_of",
+        "weight": 31.437394749034535,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:site:category_cluster:hidden_26",
+        "relation": "upstream_of",
+        "weight": 25.508483453230426,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:site:category_cluster:hidden_25",
+        "relation": "upstream_of",
+        "weight": 21.666743625294078,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:site:category_cluster:hidden_24",
+        "relation": "upstream_of",
+        "weight": 17.470803434198555,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:site:category_cluster:hidden_23",
+        "relation": "upstream_of",
+        "weight": 13.867547642100941,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:site:category_cluster:L24_mlp_out",
+        "relation": "supports_likelihood",
+        "weight": 10.352818575772373,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_cluster",
+        "target": "deepseek7b:boundary:likelihood_generation_split",
+        "relation": "weak_generation_effect",
+        "weight": 4.105330811702732,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:phase:729",
+        "target": "deepseek7b:intervention:category_full_head",
+        "relation": "tested_by",
+        "weight": 3.042024367565591,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_full_head",
+        "target": "deepseek7b:site:category_full_head:hidden_27",
+        "relation": "upstream_of",
+        "weight": 97.0697135925293,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_full_head",
+        "target": "deepseek7b:site:category_full_head:hidden_26",
+        "relation": "upstream_of",
+        "weight": 80.18538561734286,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_full_head",
+        "target": "deepseek7b:site:category_full_head:hidden_25",
+        "relation": "upstream_of",
+        "weight": 68.96200908314098,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_full_head",
+        "target": "deepseek7b:site:category_full_head:hidden_24",
+        "relation": "upstream_of",
+        "weight": 57.53518642078746,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_full_head",
+        "target": "deepseek7b:site:category_full_head:hidden_23",
+        "relation": "upstream_of",
+        "weight": 48.37487654252486,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_full_head",
+        "target": "deepseek7b:site:category_full_head:hidden_22",
+        "relation": "weak_generation_effect",
+        "weight": 37.35903419147838,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:phase:729",
+        "target": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "relation": "tested_by",
+        "weight": 4.105330811702732,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:site:category_plus_fruit_cluster:hidden_27",
+        "relation": "upstream_of",
+        "weight": 31.437394749034535,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:site:category_plus_fruit_cluster:hidden_26",
+        "relation": "upstream_of",
+        "weight": 25.508483453230426,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:site:category_plus_fruit_cluster:hidden_25",
+        "relation": "upstream_of",
+        "weight": 21.666743625294078,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:site:category_plus_fruit_cluster:hidden_24",
+        "relation": "upstream_of",
+        "weight": 17.470803434198555,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:site:category_plus_fruit_cluster:hidden_23",
+        "relation": "upstream_of",
+        "weight": 13.867547642100941,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:site:category_plus_fruit_cluster:hidden_28",
+        "relation": "weak_generation_effect",
+        "weight": 10.393997170708396,
+        "phase": 729
+      },
+      {
+        "source": "deepseek7b:intervention:category_plus_fruit_cluster",
+        "target": "deepseek7b:boundary:likelihood_generation_split",
+        "relation": "weak_generation_effect",
+        "weight": 4.105330811702732,
+        "phase": 729
+      }
+    ]
+  },
+  "metrics": {
+    "node_count": 72,
+    "edge_count": 72,
+    "source_phase": 729
+  },
+  "source_files": [
+    "results/glm5_phase729_full_head_vs_cluster_residual_propagation/phase729_cross_model_summary.json"
+  ]
+}

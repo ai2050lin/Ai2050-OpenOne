@@ -3,12 +3,12 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import axios from 'axios';
 import {
   Activity, ArrowRightLeft, BarChart, BarChart2,
-  Bot,
+  BookOpen, Bot,
   Brain, CheckCircle, GitBranch, Globe, Globe2,
   Grid3x3, HelpCircle, Layers,
-  Maximize2, Minimize2, Network, RefreshCw, RotateCcw,
+  Database, Maximize2, Minimize2, Network, RefreshCw, RotateCcw,
   Scale,
-  Settings, Share2, Sparkles, Target, Terminal, TrendingUp, X
+  Settings, Share2, Sparkles, Target, TrendingUp, X
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -52,8 +52,16 @@ import GrammarRoleMatrixRenderer from './neural_vis/renderers/GrammarRoleMatrixR
 import CausalChainRenderer from './neural_vis/renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './neural_vis/renderers/DarkMatterFlowRenderer';
 import NeuralNetworkRenderer, { activationToColor } from './neural_vis/renderers/NeuralNetworkRenderer';
+import AtlasGraphRenderer from './neural_vis/renderers/AtlasGraphRenderer';
 import SceneHelpers from './neural_vis/components/SceneHelpers';
 import useVisData from './neural_vis/hooks/useVisData';
+import {
+  RESEARCH_PLUGINS,
+  getPluginLayerItems,
+  getPluginWindowState,
+  getResearchPluginById,
+  makeLayerVisibility,
+} from './plugins/researchPlugins';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
@@ -1657,6 +1665,144 @@ const buildGuideConclusion = ({ tab, activeTab, analysisResult, topologyResults,
   }
 };
 
+function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNodes, atlasEdges, researchCycle, activeResearchPlugin }) {
+  const phaseLabel = activeFileMeta?.phase ? `Phase ${activeFileMeta.phase}` : 'Current phase';
+  const graphLabel = `${atlasNodes.length || 0} nodes / ${atlasEdges.length || 0} edges`;
+  const routeLabel = activeResearchPlugin?.shortName || activeResearchPlugin?.name || '研究路线';
+
+  return (
+    <group>
+      <group position={[0, 50, -18]}>
+        <Text fontSize={0.62} color="#e0f2fe" anchorX="center">
+          {routeLabel}
+        </Text>
+        <Text position={[0, -0.62, 0]} fontSize={0.3} color="#93c5fd" anchorX="center">
+          插件化研究路线 · 共享3D主空间
+        </Text>
+      </group>
+
+      {layerVisibility.theory && (
+        <group position={[-18, 12, -10]}>
+          <mesh>
+            <sphereGeometry args={[1.1, 24, 24]} />
+            <meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={0.45} transparent opacity={0.82} />
+          </mesh>
+          <Text position={[0, 1.8, 0]} fontSize={0.55} color="#cffafe" anchorX="center">
+            理论层
+          </Text>
+          <Text position={[0, 1.1, 0]} fontSize={0.3} color="#7dd3fc" anchorX="center">
+            最新理论 / 历史证据 / Phase映射
+          </Text>
+          <mesh position={[2.8, -1.2, 0]}>
+            <boxGeometry args={[2.4, 0.12, 0.12]} />
+            <meshStandardMaterial color="#0891b2" emissive="#0891b2" emissiveIntensity={0.3} />
+          </mesh>
+          <Text position={[4.4, -1.2, 0]} fontSize={0.28} color="#bae6fd" anchorX="left">
+            {phaseLabel}
+          </Text>
+        </group>
+      )}
+
+      {layerVisibility.aiOrbit && (
+        <group position={[17, 8, 8]}>
+          <mesh>
+            <torusGeometry args={[3.1, 0.035, 12, 96]} />
+            <meshStandardMaterial color="#a78bfa" emissive="#7c3aed" emissiveIntensity={0.6} transparent opacity={0.75} />
+          </mesh>
+          {['讨论', '综合', '脚本', '运行', '图谱'].map((label, index) => {
+            const angle = (index / 5) * Math.PI * 2;
+            const x = Math.cos(angle) * 3.1;
+            const y = Math.sin(angle) * 1.45;
+            return (
+              <group key={label} position={[x, y, 0]}>
+                <mesh>
+                  <sphereGeometry args={[0.34, 16, 16]} />
+                  <meshStandardMaterial color={researchCycle.running ? '#c084fc' : '#7c3aed'} emissive="#a855f7" emissiveIntensity={0.5} />
+                </mesh>
+                <Text position={[0, 0.58, 0]} fontSize={0.22} color="#ede9fe" anchorX="center">
+                  {label}
+                </Text>
+              </group>
+            );
+          })}
+          <Text position={[0, 2.4, 0]} fontSize={0.48} color="#ede9fe" anchorX="center">
+            AI研究循环
+          </Text>
+          <Text position={[0, 1.85, 0]} fontSize={0.28} color="#c4b5fd" anchorX="center">
+            {researchCycle.running ? `第 ${researchCycle.round || 1} / ${researchCycle.total} 轮` : `${researchCycle.modeLabel} · 待启动`}
+          </Text>
+        </group>
+      )}
+
+      {layerVisibility.boundary && (
+        <group position={[0, 3.5, -17]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[8.5, 0.04, 12, 128]} />
+            <meshStandardMaterial color="#ef4444" emissive="#dc2626" emissiveIntensity={0.38} transparent opacity={0.55} />
+          </mesh>
+          <Text position={[0, 1.2, 0]} fontSize={0.42} color="#fecaca" anchorX="center">
+            失败边界层
+          </Text>
+          <Text position={[0, 0.65, 0]} fontSize={0.28} color="#fca5a5" anchorX="center">
+            weak / null / boundary evidence
+          </Text>
+        </group>
+      )}
+
+      {layerVisibility.features && (
+        <group position={[-14, 7, 12]}>
+          <mesh>
+            <icosahedronGeometry args={[1.2, 1]} />
+            <meshStandardMaterial color="#facc15" emissive="#eab308" emissiveIntensity={0.45} transparent opacity={0.78} />
+          </mesh>
+          <Text position={[0, 1.75, 0]} fontSize={0.42} color="#fef3c7" anchorX="center">
+            特征空间层
+          </Text>
+          <Text position={[0, 1.15, 0]} fontSize={0.26} color="#fde68a" anchorX="center">
+            SAE / dictionary / feature clusters
+          </Text>
+        </group>
+      )}
+
+      {layerVisibility.causalPath && (
+        <group position={[13, 15, -8]}>
+          <mesh rotation={[0, 0, Math.PI / 4]}>
+            <boxGeometry args={[5.2, 0.08, 0.08]} />
+            <meshStandardMaterial color="#22c55e" emissive="#16a34a" emissiveIntensity={0.42} transparent opacity={0.82} />
+          </mesh>
+          <Text position={[0, 0.9, 0]} fontSize={0.4} color="#bbf7d0" anchorX="center">
+            因果路径层
+          </Text>
+          <Text position={[0, 0.35, 0]} fontSize={0.24} color="#86efac" anchorX="center">
+            patch / ablation / restore
+          </Text>
+        </group>
+      )}
+
+      {layerVisibility.dynamics && (
+        <group position={[15, 4, 13]}>
+          <mesh>
+            <torusKnotGeometry args={[1.1, 0.08, 80, 8]} />
+            <meshStandardMaterial color="#fb7185" emissive="#e11d48" emissiveIntensity={0.38} transparent opacity={0.72} />
+          </mesh>
+          <Text position={[0, 1.65, 0]} fontSize={0.4} color="#ffe4e6" anchorX="center">
+            动力学层
+          </Text>
+          <Text position={[0, 1.1, 0]} fontSize={0.24} color="#fda4af" anchorX="center">
+            spike / replay / control state
+          </Text>
+        </group>
+      )}
+
+      {layerVisibility.atlas && atlasNodes.length > 0 && (
+        <Text position={[0, 55, -12]} fontSize={0.55} color="#bfdbfe" anchorX="center">
+          {phaseLabel} · {graphLabel}
+        </Text>
+      )}
+    </group>
+  );
+}
+
 export default function App() {
   const [lang, setLang] = useState('zh');
   const [helpTab, setHelpTab] = useState('outline'); // Selected tab in Help Modal
@@ -1847,6 +1993,26 @@ export default function App() {
   // DNN层可视化状态
   const [showDNNLayers, setShowDNNLayers] = useState(true);
   const [visibleComponents, setVisibleComponents] = useState(['attention', 'ffn', 'layer_norm']);
+  const [researchMode, setResearchMode] = useState('evidence');
+  const [researchLayerVisibility, setResearchLayerVisibility] = useState({
+    network: true,
+    atlas: true,
+    theory: false,
+    aiOrbit: false,
+    boundary: true,
+  });
+  const [researchCycle, setResearchCycle] = useState({
+    mode: 'semi_auto',
+    modeLabel: '半自动',
+    running: false,
+    round: 1,
+    total: 10,
+  });
+  const [activeResearchPluginId, setActiveResearchPluginId] = useState('language-mechanism');
+  const [pluginWindowVisibility, setPluginWindowVisibility] = useState(() => (
+    getPluginWindowState(getResearchPluginById('language-mechanism'))
+  ));
+  const [showResearchDetails, setShowResearchDetails] = useState(false);
   const appleNeuronWorkspace = useAppleNeuronWorkspace();
   const isAppleMainView = inputPanelTab === 'main';
 
@@ -1947,12 +2113,25 @@ export default function App() {
   }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getSubPhaseProgress]);
 
   // ---- 可视化数据系统 (neural-vis) ----
-  const { dataFiles, activeData: visData, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect } = useVisData();
+  const { dataFiles, activeData: visData, activeFileMeta, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect, setActiveFileMeta: setActiveFileMetaDirect } = useVisData();
   const visFileInputRef = useRef();
   const [viewMode, setViewMode] = useState('all'); // 渲染器模式
   const [highlightedLayer, setHighlightedLayer] = useState(null);
 
   // 可视化数据分类
+  const schemaVersion = visData?.schema_version || '1.0';
+  const isAtlasGraph = schemaVersion === 'atlas_graph_v1';
+  const atlasGraph = isAtlasGraph ? visData?.graph : null;
+  const atlasNodes = Array.isArray(atlasGraph?.nodes) ? atlasGraph.nodes : [];
+  const atlasEdges = Array.isArray(atlasGraph?.edges)
+    ? atlasGraph.edges
+    : Array.isArray(atlasGraph?.links)
+    ? atlasGraph.links
+    : [];
+  const atlasLayerCount = atlasNodes.reduce((maxLayer, node) => {
+    const layer = Number(node?.layer);
+    return Number.isFinite(layer) ? Math.max(maxLayer, layer + 1) : maxLayer;
+  }, 0);
   const visualizations = visData?.visualizations || [];
   const byType = {
     trajectory: visualizations.filter(v => v.type === 'trajectory'),
@@ -1966,7 +2145,7 @@ export default function App() {
     causal_chain: visualizations.filter(v => v.type === 'causal_chain'),
     dark_matter_flow: visualizations.filter(v => v.type === 'dark_matter_flow'),
   };
-  const nLayers = visData?.model_info?.n_layers || 36;
+  const nLayers = visData?.model_info?.n_layers || atlasLayerCount || 36;
 
   // 维度视角过滤渲染器
   const getActiveRenderers = useCallback(() => {
@@ -2025,6 +2204,7 @@ export default function App() {
         setFpSubPhase(0);
         setFpPlaying(true);
         setShowDNNLayers(true);
+        setResearchLayerVisibility((prev) => ({ ...prev, network: true }));
       })
       .catch(err => {
         console.error('[ForwardPass] Failed to load data:', err);
@@ -2742,6 +2922,156 @@ export default function App() {
     }
   })();
 
+  const activeResearchPlugin = getResearchPluginById(activeResearchPluginId);
+  const activePluginLayerItems = getPluginLayerItems(activeResearchPlugin);
+  const activePluginPanels = activeResearchPlugin?.panels || [];
+  const currentResearchPhase = activeFileMeta?.phase ?? visData?.model_info?.phase ?? visData?.metrics?.source_phase ?? '-';
+  const currentResearchModeLabel = {
+    configure: '配置模式',
+    theory: '理论模式',
+    ai_loop: 'AI循环',
+    evidence: '证据模式',
+  }[researchMode] || '证据模式';
+  const currentResearchTarget = activeResearchPlugin?.target || '语言编码机制';
+  const selectedAtlasLabel = activeFileMeta?.label || activeFileMeta?.filename || (isAtlasGraph ? '已加载机制图谱' : '未加载机制图谱');
+  const toggleResearchLayer = (key) => {
+    const nextValue = !researchLayerVisibility[key];
+    if (key === 'network') {
+      setShowDNNLayers(nextValue);
+    }
+    if (key === 'atlas' && nextValue) {
+      setFpMode('demo');
+    }
+    setResearchLayerVisibility((prev) => {
+      return { ...prev, [key]: !prev[key] };
+    });
+  };
+  const applyResearchPlugin = (pluginId) => {
+    const plugin = getResearchPluginById(pluginId);
+    setActiveResearchPluginId(plugin.id);
+    setPluginWindowVisibility(getPluginWindowState(plugin));
+    setResearchMode(plugin.defaultMode || 'evidence');
+    setResearchLayerVisibility(makeLayerVisibility(plugin.defaultLayers || []));
+    setInputPanelTab(plugin.workspaceTab || 'main');
+    setSystemType(plugin.workspaceTab === 'snn' ? 'snn' : plugin.workspaceTab === 'icspb' ? 'icspb' : 'dnn');
+    if (plugin.defaultMode === 'theory') {
+      setLeftPanelTab('renderer');
+    } else if (plugin.defaultMode === 'ai_loop') {
+      setLeftPanelTab('animation');
+    } else {
+      setLeftPanelTab('dimension');
+    }
+    if ((plugin.defaultLayers || []).includes('atlas')) {
+      setFpMode('demo');
+    }
+  };
+  const applyResearchMode = (mode) => {
+    setResearchMode(mode);
+    if (mode === 'configure') {
+      setLeftPanelTab('dimension');
+    } else if (mode === 'theory') {
+      setLeftPanelTab('renderer');
+      setResearchLayerVisibility((prev) => ({ ...prev, theory: true, atlas: true }));
+    } else if (mode === 'ai_loop') {
+      setLeftPanelTab('animation');
+      setResearchLayerVisibility((prev) => ({ ...prev, aiOrbit: true, atlas: true }));
+    } else {
+      setLeftPanelTab('renderer');
+      setResearchLayerVisibility((prev) => ({ ...prev, atlas: true, boundary: true }));
+    }
+  };
+  const modeLabelMap = {
+    configure: '配置',
+    theory: '理论',
+    ai_loop: 'AI循环',
+    evidence: '证据',
+  };
+  const researchModes = (activeResearchPlugin?.modes || ['configure', 'evidence', 'theory', 'ai_loop'])
+    .map((mode) => ({ id: mode, label: modeLabelMap[mode] || mode }));
+  const researchLayerItems = activePluginLayerItems.length ? activePluginLayerItems : [
+    { id: 'network', label: '网络结构层', detail: 'layer / head / channel / cluster' },
+    { id: 'atlas', label: '机制图谱层', detail: 'atlas graph nodes / edges' },
+    { id: 'theory', label: '理论连接层', detail: '理论假设连接实验证据' },
+    { id: 'aiOrbit', label: 'AI研究轨道层', detail: '讨论 / 综合 / 脚本 / 运行 / 图谱' },
+    { id: 'boundary', label: '失败边界层', detail: 'weak / null / boundary' },
+  ];
+  const coreResearchLayerIds = new Set(['network', 'atlas', 'aiOrbit']);
+  const visibleResearchLayerItems = showResearchDetails
+    ? researchLayerItems
+    : researchLayerItems.filter((item) => coreResearchLayerIds.has(item.id));
+  const primaryPluginAction = (activeResearchPlugin?.actions || []).find((action) => (
+    ['start_ai_cycle', 'open_ai_loop', 'load_latest_atlas', 'switch_snn', 'switch_icspb'].includes(action.id)
+  )) || activeResearchPlugin?.actions?.[0];
+  const showSimpleAiCycle = activeResearchPluginId === 'ai-research-loop' || researchMode === 'ai_loop';
+  const togglePluginWindow = (panelId) => {
+    setPluginWindowVisibility((prev) => ({ ...prev, [panelId]: !prev[panelId] }));
+  };
+  const handlePluginAction = (actionId) => {
+    if (actionId === 'open_ai_loop') {
+      applyResearchMode('ai_loop');
+      setShowAIRnD(true);
+      return;
+    }
+    if (actionId === 'start_ai_cycle') {
+      applyResearchMode('ai_loop');
+      setResearchCycle((prev) => ({ ...prev, running: true }));
+      setShowAIRnD(true);
+      return;
+    }
+    if (actionId === 'open_theory' || actionId === 'open_roadmap') {
+      setBlueprintInitialTab(actionId === 'open_roadmap' ? 'roadmap' : 'progress');
+      setShowBlueprint(true);
+      applyResearchMode('theory');
+      return;
+    }
+    if (actionId === 'load_latest_atlas') {
+      const latest = dataFiles[0];
+      if (latest?.filename) {
+        setFpMode('demo');
+        loadDataFile(latest.filename);
+        applyResearchMode('evidence');
+      }
+      return;
+    }
+    if (actionId === 'run_patch' || actionId === 'run_path_patch') {
+      setStructureTab('causal');
+      setLeftPanelTab('renderer');
+      applyResearchMode('evidence');
+      return;
+    }
+    if (actionId === 'set_feature_mode') {
+      setStructureTab('features');
+      setResearchLayerVisibility((prev) => ({ ...prev, features: true, atlas: true }));
+      applyResearchMode('evidence');
+      return;
+    }
+    if (actionId === 'switch_snn') {
+      setInputPanelTab('snn');
+      setSystemType('snn');
+      return;
+    }
+    if (actionId === 'switch_icspb') {
+      setInputPanelTab('icspb');
+      setSystemType('icspb');
+    }
+  };
+  const cockpitCardStyle = {
+    marginBottom: 12,
+    padding: '12px',
+    borderRadius: 10,
+    background: 'rgba(255,255,255,0.045)',
+    border: '1px solid rgba(255,255,255,0.09)',
+  };
+  const cockpitTitleStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+    color: '#dfe8ff',
+    fontSize: 13,
+    fontWeight: 800,
+  };
+
   const appleMainPanelConfig = (() => {
     switch (appleNeuronWorkspace.analysisMode) {
       case 'static':
@@ -2829,10 +3159,10 @@ export default function App() {
   ];
   const showGlobalResonanceField = inputPanelTab !== 'dnn' && inputPanelTab !== 'snn';
   const infoPanelTitle = isAppleMainView
-    ? `数据面板 · DNN / ${currentAlgorithmInfo.name}`
+    ? `插件上下文 · ${activeResearchPlugin?.shortName || 'DNN'}`
     : `${t('panels.modelInfo')} · ${activeFunctionPanel.label}`;
   const operationPanelTitle = isAppleMainView
-    ? `操作面板 · DNN / ${currentAlgorithmInfo.name}`
+    ? `操作面板 · ${activeResearchPlugin?.shortName || currentAlgorithmInfo.name}`
     : isICSPBFunctionType
     ? `操作面板 · ICSPB / ${currentAlgorithmInfo.name}`
     : hasOperationPanelContent
@@ -2861,49 +3191,6 @@ export default function App() {
         <Settings size={20} />
       </button>
 
-
-      {/* Project Genesis Blueprint Button - Strategic Roadmap */}
-      <button
-        onClick={() => {
-          setBlueprintInitialTab('roadmap');
-          setShowBlueprint(true);
-        }}
-        style={{
-          position: 'absolute', top: 20, left: 70, zIndex: 101,
-          background: showBlueprint ? '#4488ff' : 'rgba(20, 20, 25, 0.8)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '8px',
-          padding: '8px',
-          cursor: 'pointer',
-          color: '#00d2ff',
-          backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 0 10px rgba(0, 210, 255, 0.3)'
-        }}
-        title="Project Genesis: 战略层级路线图"
-      >
-        <Brain size={20} />
-      </button>
-
-      {/* AI R&D Button */}
-      <button
-        onClick={() => setShowAIRnD(true)}
-        style={{
-          position: 'absolute', top: 20, left: 110, zIndex: 101,
-          background: showAIRnD ? '#a78bfa' : 'rgba(20, 20, 25, 0.8)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '8px',
-          padding: '8px',
-          cursor: 'pointer',
-          color: '#a78bfa',
-          backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 0 10px rgba(167, 139, 250, 0.3)'
-        }}
-        title="AI 自动研发: 自动逆向工程研究"
-      >
-        <Terminal size={20} />
-      </button>
 
       {/* Global Config Panel */}
 
@@ -3016,6 +3303,353 @@ export default function App() {
             {/* ===== Main模式: 三Tab设计(维度/渲染器/动画) ===== */}
             {inputPanelTab === 'main' && (
               <>
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ ...cockpitCardStyle, background: 'linear-gradient(135deg, rgba(79,172,254,0.12), rgba(168,85,247,0.08))', border: '1px solid rgba(125,190,255,0.24)' }}>
+                    <div style={cockpitTitleStyle}>
+                      <Brain size={15} color="#7dd3fc" />
+                      研究驾驶舱
+                    </div>
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 5 }}>研究路线插件</div>
+                      <select
+                        value={activeResearchPluginId}
+                        onChange={(event) => applyResearchPlugin(event.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '9px 10px',
+                          background: 'rgba(2,6,23,0.72)',
+                          border: '1px solid rgba(125,211,252,0.24)',
+                          borderRadius: 8,
+                          color: '#e0f2fe',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          outline: 'none',
+                        }}
+                      >
+                        {RESEARCH_PLUGINS.map((plugin) => (
+                          <option key={plugin.id} value={plugin.id}>
+                            {plugin.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div style={{ marginTop: 7, padding: '8px', borderRadius: 8, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                          <span style={{ color: '#e0f2fe', fontSize: 12, fontWeight: 900 }}>{activeResearchPlugin?.shortName}</span>
+                          <span style={{ color: '#93c5fd', fontSize: 10 }}>{activeResearchPlugin?.status}</span>
+                        </div>
+                        <div style={{ color: '#8ea5c5', fontSize: 10, lineHeight: 1.45 }}>{currentResearchTarget}</div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, marginBottom: 10 }}>
+                      {[
+                        ['目标', currentResearchTarget],
+                        ['Phase', currentResearchPhase],
+                        ['图谱', isAtlasGraph ? `${atlasNodes.length} / ${atlasEdges.length}` : '未加载'],
+                        ['模式', currentResearchModeLabel],
+                      ].map(([label, value]) => (
+                        <div key={label} style={{ padding: '7px 8px', borderRadius: 7, background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                          <div style={{ fontSize: 9, color: '#7f95bb', marginBottom: 2 }}>{label}</div>
+                          <div style={{ fontSize: 12, color: '#eef7ff', fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(researchModes.length, 4)}, minmax(0, 1fr))`, gap: 5 }}>
+                      {researchModes.map((mode) => (
+                        <button
+                          key={mode.id}
+                          onClick={() => applyResearchMode(mode.id)}
+                          style={{
+                            padding: '7px 6px',
+                            borderRadius: 8,
+                            border: researchMode === mode.id ? '1px solid rgba(125,211,252,0.55)' : '1px solid rgba(255,255,255,0.09)',
+                            background: researchMode === mode.id ? 'rgba(14,165,233,0.18)' : 'rgba(255,255,255,0.035)',
+                            color: researchMode === mode.id ? '#e0f2fe' : '#8ea5c5',
+                            cursor: 'pointer',
+                            fontSize: 11,
+                            fontWeight: 800,
+                          }}
+                        >
+                          {mode.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                      {primaryPluginAction && (
+                        <button
+                          onClick={() => handlePluginAction(primaryPluginAction.id)}
+                          style={{
+                            flex: 1,
+                            padding: '8px 10px',
+                            borderRadius: 8,
+                            border: '1px solid rgba(125,211,252,0.26)',
+                            background: 'rgba(14,165,233,0.1)',
+                            color: '#dbeafe',
+                            cursor: 'pointer',
+                            fontSize: 11,
+                            fontWeight: 900,
+                          }}
+                        >
+                          {primaryPluginAction.label}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowResearchDetails((prev) => !prev)}
+                        style={{
+                          width: 74,
+                          padding: '8px 10px',
+                          borderRadius: 8,
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          background: showResearchDetails ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.035)',
+                          color: '#cbd5e1',
+                          cursor: 'pointer',
+                          fontSize: 11,
+                          fontWeight: 850,
+                        }}
+                      >
+                        {showResearchDetails ? '收起' : '更多'}
+                      </button>
+                    </div>
+                    {showResearchDetails && (
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 5 }}>窗口</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                          {activePluginPanels.map((panel) => {
+                            const enabled = !!pluginWindowVisibility[panel.id];
+                            return (
+                              <button
+                                key={panel.id}
+                                onClick={() => togglePluginWindow(panel.id)}
+                                style={{
+                                  padding: '6px 8px',
+                                  borderRadius: 999,
+                                  border: enabled ? '1px solid rgba(34,211,238,0.42)' : '1px solid rgba(255,255,255,0.09)',
+                                  background: enabled ? 'rgba(34,211,238,0.12)' : 'rgba(255,255,255,0.035)',
+                                  color: enabled ? '#cffafe' : '#8ea5c5',
+                                  cursor: 'pointer',
+                                  fontSize: 10,
+                                  fontWeight: 800,
+                                }}
+                              >
+                                {panel.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {!!activeResearchPlugin?.actions?.length && (
+                          <>
+                            <div style={{ fontSize: 10, color: '#7f95bb', margin: '9px 0 5px' }}>动作</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(activeResearchPlugin.actions.length, 3)}, minmax(0, 1fr))`, gap: 5 }}>
+                              {activeResearchPlugin.actions.map((action) => (
+                                <button
+                                  key={action.id}
+                                  onClick={() => handlePluginAction(action.id)}
+                                  style={{
+                                    padding: '7px 7px',
+                                    borderRadius: 8,
+                                    border: '1px solid rgba(125,211,252,0.18)',
+                                    background: 'rgba(14,165,233,0.08)',
+                                    color: '#dbeafe',
+                                    cursor: 'pointer',
+                                    fontSize: 10,
+                                    fontWeight: 850,
+                                  }}
+                                >
+                                  {action.label}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={cockpitCardStyle}>
+                    <div style={cockpitTitleStyle}>
+                      <Layers size={15} color="#4facfe" />
+                      3D 图层
+                    </div>
+                    <div style={{ display: 'grid', gap: 6 }}>
+                      {visibleResearchLayerItems.map((item) => {
+                        const enabled = !!researchLayerVisibility[item.id];
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => toggleResearchLayer(item.id)}
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: '44px 1fr',
+                              alignItems: 'center',
+                              gap: 8,
+                              width: '100%',
+                              padding: '8px',
+                              borderRadius: 8,
+                              border: enabled ? '1px solid rgba(79,172,254,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                              background: enabled ? 'rgba(79,172,254,0.09)' : 'rgba(255,255,255,0.03)',
+                              color: enabled ? '#dff4ff' : '#7f95bb',
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                            }}
+                          >
+                            <span style={{
+                              padding: '3px 0',
+                              borderRadius: 999,
+                              textAlign: 'center',
+                              fontSize: 10,
+                              fontWeight: 900,
+                              background: enabled ? 'rgba(34,211,238,0.16)' : 'rgba(255,255,255,0.05)',
+                              color: enabled ? '#67e8f9' : '#64748b',
+                            }}>
+                              {enabled ? 'ON' : 'OFF'}
+                            </span>
+                            <span>
+                              <span style={{ display: 'block', fontSize: 12, fontWeight: 800 }}>{item.label}</span>
+                              <span style={{ display: 'block', fontSize: 9, color: enabled ? '#8bd3ff' : '#5f718d', marginTop: 2 }}>{item.detail}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {showResearchDetails && (
+                  <div style={cockpitCardStyle}>
+                    <div style={cockpitTitleStyle}>
+                      <BookOpen size={15} color="#22d3ee" />
+                      理论与历史
+                    </div>
+                    <div style={{ fontSize: 11, color: '#8ea5c5', lineHeight: 1.55, marginBottom: 8 }}>
+                      最新理论挂接到当前 3D 图谱，点击理论模式会在空间中显示理论节点和 Phase 证据连接。
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
+                      {[
+                        ['支持', isAtlasGraph ? atlasEdges.filter((edge) => ['supports_likelihood', 'changes_generation'].includes(edge.relation)).length : 0, '#22d3ee'],
+                        ['边界', isAtlasGraph ? atlasNodes.filter((node) => node.evidence_level === 'boundary' || node.type === 'failure').length : 0, '#f87171'],
+                        ['历史', dataFiles.length || 0, '#a78bfa'],
+                      ].map(([label, value, color]) => (
+                        <div key={label} style={{ padding: '7px 8px', borderRadius: 7, background: 'rgba(0,0,0,0.18)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                          <div style={{ fontSize: 9, color: '#7f95bb' }}>{label}</div>
+                          <div style={{ fontSize: 15, color, fontWeight: 900 }}>{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  )}
+
+                  {showSimpleAiCycle && (
+                  <div style={cockpitCardStyle}>
+                    <div style={cockpitTitleStyle}>
+                      <Bot size={15} color="#c084fc" />
+                      AI 研究循环
+                    </div>
+                    {showResearchDetails && (
+                    <div style={{ display: 'flex', gap: 5, marginBottom: 8 }}>
+                      {[
+                        ['observe', '观察'],
+                        ['semi_auto', '半自动'],
+                        ['auto', '自动'],
+                      ].map(([mode, label]) => (
+                        <button
+                          key={mode}
+                          onClick={() => setResearchCycle((prev) => ({ ...prev, mode, modeLabel: label }))}
+                          style={{
+                            flex: 1,
+                            padding: '7px 6px',
+                            borderRadius: 8,
+                            border: researchCycle.mode === mode ? '1px solid rgba(192,132,252,0.5)' : '1px solid rgba(255,255,255,0.09)',
+                            background: researchCycle.mode === mode ? 'rgba(168,85,247,0.16)' : 'rgba(255,255,255,0.035)',
+                            color: researchCycle.mode === mode ? '#f3e8ff' : '#8ea5c5',
+                            cursor: 'pointer',
+                            fontSize: 11,
+                            fontWeight: 800,
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    )}
+                    <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 8 }}>
+                      {researchCycle.running ? `运行中 · 第 ${researchCycle.round || 1} / ${researchCycle.total} 轮` : `${researchCycle.modeLabel} · 未启动`}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        onClick={() => {
+                          applyResearchMode('ai_loop');
+                          setResearchCycle((prev) => ({ ...prev, running: true }));
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: '9px 12px',
+                          borderRadius: 8,
+                          border: '1px solid rgba(168,85,247,0.42)',
+                          background: 'rgba(168,85,247,0.16)',
+                          color: '#f3e8ff',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontWeight: 900,
+                        }}
+                      >
+                        启动循环
+                      </button>
+                      <button
+                        onClick={() => setResearchCycle((prev) => ({ ...prev, running: false }))}
+                        style={{
+                          width: 72,
+                          padding: '9px 10px',
+                          borderRadius: 8,
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          background: 'rgba(255,255,255,0.04)',
+                          color: '#d8e6ff',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontWeight: 800,
+                        }}
+                      >
+                        暂停
+                      </button>
+                    </div>
+                  </div>
+                  )}
+
+                  {showResearchDetails && (
+                  <div style={cockpitCardStyle}>
+                    <div style={cockpitTitleStyle}>
+                      <Database size={15} color="#7dd3fc" />
+                      数据与 Phase
+                    </div>
+                    <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={selectedAtlasLabel}>
+                      当前：{selectedAtlasLabel}
+                    </div>
+                    <div style={{ display: 'grid', gap: 5 }}>
+                      {dataFiles.slice(0, 3).map((file) => (
+                        <button
+                          key={file.filename}
+                          onClick={() => {
+                            setFpMode('demo');
+                            loadDataFile(file.filename);
+                            applyResearchMode('evidence');
+                          }}
+                          style={{
+                            padding: '7px 8px',
+                            borderRadius: 7,
+                            border: activeFileMeta?.filename === file.filename ? '1px solid rgba(125,211,252,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                            background: activeFileMeta?.filename === file.filename ? 'rgba(14,165,233,0.14)' : 'rgba(255,255,255,0.03)',
+                            color: '#dbeafe',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            fontSize: 10,
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {file.label || file.filename}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  )}
+                </div>
+
                 {/* ---- 模式切换: 生成模式 / 演示模式 ---- */}
                 <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
@@ -3329,6 +3963,7 @@ export default function App() {
                           const version = data.schema_version || '1.0';
                           if (version !== '1.0' && version !== '2.0') { /* allow non-schema files too */ }
                           setActiveDataDirect(data);
+                          setActiveFileMetaDirect({ filename: path, label: path.split('/').pop(), source: 'preset' });
                         }).catch(err => setErrorDirect(err.message));
                         return;
                       }
@@ -3367,7 +4002,7 @@ export default function App() {
                     <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(79,172,254,0.06)', borderRadius: 8, border: '1px solid rgba(79,172,254,0.15)' }}>
                       <div style={{ fontSize: 11, color: '#4facfe', fontWeight: 600, marginBottom: 2 }}>✓ 已加载</div>
                       <div style={{ fontSize: 10, color: '#7f95bb' }}>
-                        {visData.schema_version ? `Schema v${visData.schema_version}` : '自定义格式'}
+                        {visData.schema_version ? `Schema ${isAtlasGraph ? visData.schema_version : `v${visData.schema_version}`}` : '自定义格式'}
                         {visData.tokens?.length ? ` · ${visData.tokens.length} tokens` : ''}
                         {visData.layers?.length ? ` · ${visData.layers.length} layers` : ''}
                       </div>
@@ -3516,7 +4151,11 @@ export default function App() {
                     <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                         <span style={{ fontSize: 14, color: '#dfe8ff', fontWeight: 700 }}>🧱 DNN层结构</span>
-                        <button onClick={() => setShowDNNLayers(!showDNNLayers)}
+                        <button onClick={() => {
+                          const nextVisible = !showDNNLayers;
+                          setShowDNNLayers(nextVisible);
+                          setResearchLayerVisibility((prev) => ({ ...prev, network: nextVisible }));
+                        }}
                           style={{
                             padding: '5px 14px', borderRadius: '999px', fontSize: 11, fontWeight: 700,
                             background: showDNNLayers ? 'rgba(79,172,254,0.15)' : 'rgba(255,255,255,0.04)',
@@ -3654,10 +4293,22 @@ export default function App() {
                           📊 数据摘要
                         </div>
                         <div style={{ fontSize: 10, lineHeight: 1.6, color: '#7f95bb' }}>
-                          <div>Schema: <span style={{ color: '#4facfe' }}>v{visData.schema_version || '1.0'}</span></div>
-                          <div>Model: <span style={{ color: '#4ecdc4' }}>{visData.model || '-'}</span></div>
-                          <div>Layers: {visData.model_info?.n_layers || '-'} | d_model: {visData.model_info?.d_model || '-'}</div>
-                          <div>可视化对象: <span style={{ color: '#ffe66d' }}>{visualizations.length}</span></div>
+                          <div>Schema: <span style={{ color: '#4facfe' }}>{isAtlasGraph ? schemaVersion : `v${schemaVersion}`}</span></div>
+                          {isAtlasGraph && (
+                            <div>Phase: <span style={{ color: '#4facfe' }}>{activeFileMeta?.phase ?? visData.model_info?.phase ?? visData.metrics?.source_phase ?? '-'}</span></div>
+                          )}
+                          <div>Model: <span style={{ color: '#4ecdc4' }}>{visData.model_info?.model || visData.model || '-'}</span></div>
+                          <div>Layers: {nLayers || '-'} | d_model: {visData.model_info?.d_model || '-'}</div>
+                          {isAtlasGraph ? (
+                            <>
+                              <div>机制图谱: <span style={{ color: '#ffe66d' }}>{atlasNodes.length}</span> nodes · <span style={{ color: '#ffe66d' }}>{atlasEdges.length}</span> edges</div>
+                              {activeFileMeta?.source && (
+                                <div title={activeFileMeta.source} style={{ wordBreak: 'break-word' }}>Source: <span style={{ color: '#7dd3fc' }}>{activeFileMeta.source}</span></div>
+                              )}
+                            </>
+                          ) : (
+                            <div>可视化对象: <span style={{ color: '#ffe66d' }}>{visualizations.length}</span></div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -3948,6 +4599,65 @@ export default function App() {
                   </div>
                 ) : isAppleMainView ? (
                   <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div style={{ display: 'grid', gap: 8, marginBottom: 10 }}>
+                      <div style={{
+                        padding: 10,
+                        borderRadius: 10,
+                        background: 'linear-gradient(135deg, rgba(14,165,233,0.12), rgba(15,23,42,0.72))',
+                        border: '1px solid rgba(125,211,252,0.18)',
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+                          <div style={{ color: '#e0f2fe', fontSize: 13, fontWeight: 900 }}>{activeResearchPlugin?.name}</div>
+                          <div style={{ color: '#93c5fd', fontSize: 10 }}>{activeResearchPlugin?.routeType}</div>
+                        </div>
+                        <div style={{ color: '#9fb6d8', fontSize: 11, lineHeight: 1.55 }}>{activeResearchPlugin?.focus}</div>
+                      </div>
+
+                      {activePluginPanels.filter((panel) => pluginWindowVisibility[panel.id]).map((panel) => {
+                        const panelMetric = {
+                          overview: `${activeResearchPlugin?.layers3D?.length || 0} 图层`,
+                          evidence: isAtlasGraph ? `${atlasNodes.length} 节点 / ${atlasEdges.length} 边` : '待加载图谱',
+                          experiment: researchCycle.running ? `第 ${researchCycle.round}/${researchCycle.total} 轮` : '待运行',
+                          theory: researchMode === 'theory' ? '已挂接3D理论层' : '可打开理论层',
+                          'feature-map': researchLayerVisibility.features ? '特征层已开启' : '特征层未开启',
+                          path: researchLayerVisibility.causalPath ? '因果路径已开启' : '路径层未开启',
+                          'agent-log': researchCycle.running ? '循环运行中' : '循环待启动',
+                          boundary: researchLayerVisibility.boundary ? '边界层已开启' : '边界层未开启',
+                          dynamics: researchLayerVisibility.dynamics ? '动力学层已开启' : '动力学层未开启',
+                          control: inputPanelTab === 'icspb' ? 'ICSPB已进入' : '可切换进入',
+                        }[panel.id] || '已打开';
+
+                        return (
+                          <div
+                            key={panel.id}
+                            style={{
+                              padding: 9,
+                              borderRadius: 9,
+                              background: 'rgba(255,255,255,0.035)',
+                              border: '1px solid rgba(255,255,255,0.08)',
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                              <span style={{ color: '#e5f0ff', fontSize: 12, fontWeight: 850 }}>{panel.label}</span>
+                              <span style={{ color: '#7dd3fc', fontSize: 10 }}>{panelMetric}</span>
+                            </div>
+                            <div style={{ color: '#7f95bb', fontSize: 10, lineHeight: 1.45 }}>
+                              {panel.id === 'overview' && `目标：${currentResearchTarget}`}
+                              {panel.id === 'evidence' && `当前图谱：${selectedAtlasLabel}`}
+                              {panel.id === 'experiment' && '建议按 activation patch、path patch、ablation、restore 的矩阵推进验证。'}
+                              {panel.id === 'theory' && '理论命题需要绑定支持证据、反例、边界和下一步验证任务。'}
+                              {panel.id === 'feature-map' && 'SAE 特征层会作为第二坐标系，与神经元/通道图谱并行显示。'}
+                              {panel.id === 'path' && '因果路径窗口关注上游源、关键边、剂量响应和闭合验证。'}
+                              {panel.id === 'agent-log' && 'AI循环日志应记录讨论、综合、脚本、参数、输出和回写图谱。'}
+                              {panel.id === 'boundary' && '失败边界优先显示弱效应、无效干预和被反证的候选机制。'}
+                              {panel.id === 'dynamics' && '动力学窗口关注时序稳定、回放、脉冲活动与控制状态。'}
+                              {panel.id === 'control' && '控制窗口用于集中管理该路线的参数、模型和运行模式。'}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
                     {/* 详情Tab内容 */}
                     {infoPanelTab === 'detail' && (
                       <div style={{ fontSize: 12, lineHeight: 1.6, overflowY: 'auto' }}>
@@ -5085,7 +5795,7 @@ export default function App() {
                 animationMode={activeScenario ? 'forward_pass' : appleNeuronWorkspace.animationMode}
                 scanMechanismData={appleNeuronWorkspace.scanMechanismData}
                 languageFocus={appleNeuronWorkspace.languageFocus}
-                showDNNLayers={showDNNLayers}
+                showDNNLayers={showDNNLayers && researchLayerVisibility.network}
                 visibleComponents={visibleComponents}
                 animProgress={animProgress}
                 activeScenario={activeScenario}
@@ -5109,10 +5819,27 @@ export default function App() {
                 />
               )}
 
+              <ResearchSpaceOverlay
+                layerVisibility={researchLayerVisibility}
+                activeFileMeta={activeFileMeta}
+                atlasNodes={atlasNodes}
+                atlasEdges={atlasEdges}
+                researchCycle={researchCycle}
+                activeResearchPlugin={activeResearchPlugin}
+              />
+
               {visData && (
                 <>
                   {/* 场景辅助 (地面网格 + 层号标尺) */}
                   <SceneHelpers nLayers={nLayers} />
+
+                  {/* 机制图谱测试结果 */}
+                  {isAtlasGraph && researchLayerVisibility.atlas && (
+                    <AtlasGraphRenderer
+                      graph={atlasGraph}
+                      onHoverNode={setHoveredInfo}
+                    />
+                  )}
 
                   {/* v1.0 渲染器 */}
                   {byType.layer_stack.filter(() => filterByMode('all')).map(ls => (

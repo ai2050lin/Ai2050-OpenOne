@@ -1,3 +1,468 @@
+不是 301-594 每个 Phase 都在做同一种测试。它是一条逐步收紧的路线：
+
+**先拆语言状态变量 → 再找组件/层/通道 → 再验证能否生成 → 最后进入闭合微世界和候选排序图谱。**
+
+我按阶段压缩如下，参考文件为 [AGI_GLM5_MEMO_20260625.md](D:/AI2050/Ai2050-OpenOne/research/glm5/docs/AGI_GLM5_MEMO_20260625.md:5)。
+
+**1. Phase 301-312：功能子空间分解**
+核心问题：语言 hidden state（隐藏状态）里到底有哪些可分离成分？  
+解决对象：I/R/C/O/S，即 identity（词元身份）、role（角色）、construction/frame（构式）、operator（操作符）、scope（作用域）。  
+测试原理：构造最小对 prompt，提取差分方向，做正交化、因果 patch、归一化注入，判断方向是否真的改变输出。
+
+核心公式：
+
+$$
+h_l(x)
+=
+I_l(x)
++
+\alpha_R R_l
++
+\alpha_C C_l
++
+\alpha_O O_l
++
+\alpha_S S_l
++
+U_l
+$$
+
+$$
+O_{\perp R}
+=
+O
+-
+\operatorname{Proj}_R(O)
+=
+O
+-
+\frac{\langle O,R\rangle}{\|R\|^2}R
+$$
+
+这一阶段最大结论：Qwen3/GLM4 更像正交子空间编码；DS7B 更像共享主轴加差分读取，很多方向在激活空间共线，但输出因果效果不同。
+
+**2. Phase 313-320：读出层与关系方向验证**
+核心问题：差分方向为什么有效？是 W_U（输出层读出）直接放大，还是中间层传播放大？  
+测试原理：比较 W_U gain（输出层增益）和 Jacobian gain（传播增益），再做关系级 causal patch（因果修补）和随机/模板/否定控制。
+
+核心公式：
+
+$$
+G_{W_U}(v)
+=
+\frac{\|W_U v\|}{\|v\|}
+$$
+
+$$
+G_J(v)
+=
+\frac{\|J_{l\to out}v\|}{\|v\|}
+$$
+
+$$
+\text{amplification}(v)
+=
+\frac{G_J(v)}{G_{W_U}(v)}
+$$
+
+结论：W_U 本身没有选择性差分放大；真正的放大发生在中间层传播过程。
+
+**3. Phase 321-347：对象-属性 Binding（绑定）与 MLP 机制**
+核心问题：模型如何把 object（对象）和 attribute/value（属性/值）绑定起来？  
+测试原理：slot（槽位）验证、对象-属性替换、层归因、Attention vs MLP 分解、gate/up 交互分解、W_down 通道结构分析。
+
+层归因公式：
+
+$$
+h_N
+=
+h_0
++
+\sum_l
+\left(
+a_l + m_l
+\right)
+$$
+
+$$
+\Delta_{\text{binding},l}
+=
+\left(
+W_U[y]-W_U[c]
+\right)^\top
+\left(
+h_{l+1}-h_l
+\right)
+$$
+
+MLP 交互公式：
+
+$$
+\operatorname{MLP}(h)
+=
+W_{\text{down}}
+\left(
+\operatorname{SiLU}(W_g h)
+\odot
+W_u h
+\right)
+$$
+
+$$
+\text{interaction}
+=
+CC - CR - RC + RR
+$$
+
+结论：binding 主要不是 embedding 预编码，而是 transformer 层计算出来的；MLP 的 gate × up 交互贡献很大，W_down 本身呈正负通道近似 50/50 对称，微偏置来自激活差异。
+
+**4. Phase 348-386：类别因子、RMSNorm 与真实因果方向**
+核心问题：category（类别）到底是不是独立方向？还是 object identity（对象身份）的一部分？  
+测试原理：PCA、SVD、ANOVA（方差分解）、RMSNorm Jacobian、category centroid（类别质心）因果注入。
+
+ANOVA 分解：
+
+$$
+\Delta h
+=
+\mu
++
+I_{\text{object}}
++
+A_{\text{category}}
++
+\epsilon
+$$
+
+方差占比：
+
+$$
+R_A^2
+=
+\frac{\|A_{\text{category}}\|^2}
+{\|\Delta h-\mu\|^2}
+$$
+
+因果注入：
+
+$$
+h' = h + \beta A_{\text{category}}
+$$
+
+$$
+\Delta D
+=
+D(h') - D(h)
+$$
+
+结论：纯 category 方差很小，但 category centroid 的因果效力显著；也就是说，类别信号不一定“大”，但方向非常准。
+
+**5. Phase 387-400：兼容性、值偏好与上下文交互**
+核心问题：模型输出正确属性，是因为有 compatibility gradient（兼容性梯度），还是因为 value bias（值偏好）？  
+测试原理：correct/incorrect mirror test（正确/错误镜像测试）、neutral prompt（中性提示）、per-object 分解。
+
+核心判据：
+
+$$
+\cos
+\left(
+\Delta h_{\text{correct}},
+\Delta h_{\text{incorrect}}
+\right)
+$$
+
+如果是纯兼容性梯度，应该满足：
+
+$$
+\Delta T_{\text{correct}}>0,\quad
+\Delta C_{\text{correct}}<0
+$$
+
+$$
+\Delta T_{\text{incorrect}}>0,\quad
+\Delta C_{\text{incorrect}}<0
+$$
+
+结论：兼容性不是静态方向，而是对象编码与当前 value context（值上下文）交互后的结果。
+
+**6. Phase 401-414：连续属性与规则重编码**
+核心问题：speed、type 等连续/多属性语义是否也是同一套机制？  
+测试原理：多候选分布、动态规则、路径级中介、词频控制、W_U 候选方向结构。
+
+核心公式：
+
+$$
+D
+=
+z_{\text{target}}
+-
+z_{\text{competitor}}
+$$
+
+$$
+\Delta D_{\text{path}}
+=
+D_{\text{patched}}
+-
+D_{\text{base}}
+$$
+
+结论：语义不是一个单独概念向量，而是候选竞争场里的动态重排。
+
+**7. Phase 415-460：自然运输方向、共享/私有通道与读出接口**
+核心问题：知识能不能沿自然方向 transport（运输）？对象-属性绑定是否通过 shared/private（共享/私有）通道实现？  
+测试原理：虚构对象、规则反转、attention head 消融、对象解锁门控、候选族边际动力学、多跳路径验证。
+
+核心公式：
+
+$$
+d_{\text{transport}}
+=
+h_{\text{target context}}
+-
+h_{\text{source context}}
+$$
+
+$$
+h' = h + \alpha d_{\text{transport}}
+$$
+
+$$
+\Delta \ell_y
+=
+\ell_y(h')-\ell_y(h)
+$$
+
+结论：读出接口比单个语义方向更重要；候选族整体会重新分布，不能只看目标 token。
+
+**8. Phase 461-499：参数级语义码、DCF 与 RMSNorm/Gain 闭环**
+核心问题：语义码是否能追到参数结构、神经元写入器、RMSNorm gain（增益门）？  
+测试原理：W_down 行结构、neuron writer（神经元写入者）、跨语言语义/语言码正交分解、DCF、刹车-释放机制、final RMSNorm/gain 分解。
+
+核心公式：
+
+$$
+q_y
+=
+g \odot W_U[y]
+$$
+
+$$
+D
+=
+\langle h, q_y-q_c\rangle
+$$
+
+$$
+\Delta D
+=
+\langle \Delta h, q_y-q_c\rangle
+$$
+
+结论：语义显化不是 hidden state 单独决定，而是 hidden state 与 RMSNorm gain、读出方向共同决定。
+
+**9. Phase 500-523：Gain-Support Alignment 与正交语义场**
+核心问题：GLM5 路线的 gain gate（增益门）和 GPT5 路线的 support path（支持路径）能否统一？  
+测试原理：比较类别语义方向 \(v_c\) 与普通读出方向 \(w_D\)、gain 加权读出方向 \(g\odot w_D\) 的对齐；再分解 parallel/perpendicular（平行/正交）成分。
+
+核心公式：
+
+$$
+v_c
+=
+h_{\text{rich}}
+-
+h_{\text{neutral}}
+$$
+
+$$
+q_c
+=
+g \odot
+\left(
+W_U[y]-W_U[c]
+\right)
+$$
+
+$$
+v_c
+=
+v_{\parallel}
++
+v_{\perp}
+$$
+
+$$
+v_{\parallel}
+=
+\operatorname{Proj}_{q_c}(v_c)
+$$
+
+结论：可读语义只占高维语义场的极低维投影；大量语义能量在正交空间，但不是噪声。
+
+**10. Phase 524-550：语义选择性、接口矩阵与生成闭合**
+核心问题：rank improvement（排名提升）能不能变成真实 generation hit（生成命中）？  
+测试原理：category interface response matrix（类别接口响应矩阵）、top-k competition trajectory（前 K 竞争轨迹）、generation closure audit（生成闭合审计）、label gate vs paraphrase gate（标签门/改写门）分离。
+
+核心公式：
+
+$$
+\text{hit}
+=
+\mathbf{1}
+[
+\operatorname{Generate}(h') \in Y_{\text{target}}
+]
+$$
+
+$$
+\Delta \text{hit}
+=
+\text{hit}_{\text{patched}}
+-
+\text{hit}_{\text{base}}
+$$
+
+结论：hidden geometry 可以移动 margin，readout competition 可以移动 rank，但真正是否生成目标，还取决于 generation policy gate（生成策略门）。
+
+**11. Phase 551-574：路径恢复、供体特异性、token fork 与格式/回声瓶颈**
+核心问题：为什么语义方向明明有效，生成却跑到 object echo（对象回声）、format token（格式词）或 generic output（泛化输出）？  
+测试原理：route restore（路径恢复）、wrong donor control（错误供体控制）、prototype injection（原型注入）、prefix fork（前缀分叉）、step0 logit field（第 0 步词表场）、format gate/echo path 审计。
+
+核心公式：
+
+$$
+B_{\text{echo}}
+=
+z_{\text{object}}
+-
+z_{\text{target}}
+$$
+
+$$
+B_{\text{format}}
+=
+z_{\text{format}}
+-
+z_{\text{target}}
+$$
+
+$$
+h' = h + \alpha d_{\text{semantic}} - \lambda d_{\text{echo}}
+$$
+
+结论：压低 object echo 后，概率质量经常流向 other/generic，而不是 clean synonym；说明路径瓶颈不是单纯读出问题。
+
+**12. Phase 575-594：闭合语义微世界与候选排序图谱**
+核心问题：在可控 micro-world（微世界）里，模型能否完成对象-类别、对象-关系-值检索，并进一步组合推理？  
+测试原理：人工对象/关系/值表、全字符串 logprob、注意力边消融、ORV 检索、两跳组合、candidate ranking audit（候选排序审计）、atlas-guided patch（图谱引导修补）、conditional transformation atlas（条件化状态变换图谱）。
+
+全字符串评分：
+
+$$
+\log P(a_{1:m}\mid x)
+=
+\sum_{t=1}^{m}
+\log P(a_t\mid x,a_{<t})
+$$
+
+候选排序分解：
+
+$$
+D_{i,j}
+=
+score_{\text{after}}(i,j)
+-
+score_{\text{base}}(i,j)
+$$
+
+$$
+common_i
+=
+\frac{1}{|V|}
+\sum_j D_{i,j}
+$$
+
+$$
+specific_{i,j}
+=
+D_{i,j}
+-
+common_i
+$$
+
+$$
+margin\_gain
+=
+D_{i,\text{correct}}
+-
+D_{i,\text{old-top-wrong}}
+$$
+
+Phase 594 的最终收紧公式：
+
+$$
+\Delta h_{\text{update}}
+=
+h^{repair}_{l+1,pos}
+-
+h^{base}_{l+1,pos}
+-
+\left(
+h^{repair}_{l,pos}
+-
+h^{base}_{l,pos}
+\right)
+$$
+
+$$
+specific\_margin
+=
+specific_{\text{correct}}
+-
+specific_{\text{old-top-wrong}}
+$$
+
+结论：真正缺口不是候选集合没被激活，而是 correct-specific ranking（正确候选特异排序）不足。Phase 593 证明 projection node（投影节点）不等于 causal node（因果节点）；Phase 594 把问题升级为条件化状态变换，而不是静态向量 patch。
+
+**总路线一句话**
+Phase 301-594 的推进逻辑是：
+
+```text
+功能方向分解
+→ 组件/层/通道定位
+→ 类别/属性/关系绑定
+→ RMSNorm/gain 读出接口
+→ 高维语义场
+→ 生成策略门
+→ 路径瓶颈
+→ 闭合微世界
+→ 候选特异排序与条件化状态变换
+```
+
+最重要的理论变化是：  
+早期以为“找到一个语义方向就能解释语言编码”，后期逐步证明不够。更接近真实机制的是：
+
+$$
+\text{Language Mechanism}
+=
+\text{Semantic Field}
++
+\text{Readout Interface}
++
+\text{Policy Gate}
++
+\text{Candidate Ranking}
++
+\text{Conditional State Transformation}
+$$
+
+也就是说，语言编码不是单个概念向量，而是一套高维状态场、读出门、生成门、候选竞争和条件化更新共同闭合的系统。
+
+
+
+
+
 下面按“推进逻辑”来讲。Phase 600 到 Phase 700 的主线不是零散测试，而是在追问同一个问题：
 
 模型为什么有时已经“知道答案”，却不能稳定输出正确答案？

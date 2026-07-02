@@ -1,0 +1,707 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "phase": 745,
+        "relation": "produces_state",
+        "source": "qwen3:model",
+        "target": "qwen3:combo_state"
+      },
+      {
+        "phase": 745,
+        "relation": "feeds_competition_field",
+        "source": "qwen3:combo_state",
+        "target": "qwen3:route_competition_field"
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_route_representatives:1.0",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_route_representatives:1.25",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_route_centroids:1.0",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_route_centroids:1.25",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_all_topk_competitors:1.0",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_all_topk_competitors:1.25",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_current_top:1.25",
+        "weight": 0.3
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "qwen3:route_competition_field",
+        "target": "qwen3:condition:suppress_current_top_class:1.25",
+        "weight": 0.3
+      },
+      {
+        "phase": 745,
+        "relation": "produces_state",
+        "source": "glm4:model",
+        "target": "glm4:combo_state"
+      },
+      {
+        "phase": 745,
+        "relation": "feeds_competition_field",
+        "source": "glm4:combo_state",
+        "target": "glm4:route_competition_field"
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_class:punctuation_or_stop:1.0",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_class:punctuation_or_stop:1.25",
+        "weight": 1.0
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_current_top_class:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_route_representatives:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_route_centroids:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_all_topk_competitors:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_route_centroids:1.0",
+        "weight": 0.8
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "glm4:route_competition_field",
+        "target": "glm4:condition:suppress_route_representatives:1.0",
+        "weight": 0.8
+      },
+      {
+        "phase": 745,
+        "relation": "produces_state",
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:combo_state"
+      },
+      {
+        "phase": 745,
+        "relation": "feeds_competition_field",
+        "source": "deepseek7b:combo_state",
+        "target": "deepseek7b:route_competition_field"
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_route_representatives:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_route_centroids:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_all_topk_competitors:1.25",
+        "weight": 0.9
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_route_representatives:1.0",
+        "weight": 0.85
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_route_centroids:1.0",
+        "weight": 0.85
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_all_topk_competitors:1.0",
+        "weight": 0.85
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_current_top_class:1.25",
+        "weight": 0.65
+      },
+      {
+        "phase": 745,
+        "relation": "tested_by",
+        "source": "deepseek7b:route_competition_field",
+        "target": "deepseek7b:condition:suppress_current_top:1.25",
+        "weight": 0.5
+      }
+    ],
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -28,
+          0,
+          -12.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:combo_state",
+        "label": "joint+topK",
+        "model": "qwen3",
+        "position": [
+          -10,
+          0,
+          -12.0
+        ],
+        "role": "near_closure_state",
+        "type": "state"
+      },
+      {
+        "id": "qwen3:route_competition_field",
+        "label": "route competition field",
+        "model": "qwen3",
+        "position": [
+          8,
+          0,
+          -12.0
+        ],
+        "role": "multi_route_competition",
+        "type": "competition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "qwen3:condition:suppress_route_representatives:1.0",
+        "label": "suppress_route_representatives@1.0",
+        "mean_margin_gain": 7.534375,
+        "model": "qwen3",
+        "position": [
+          26,
+          1.0,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "qwen3:condition:suppress_route_representatives:1.25",
+        "label": "suppress_route_representatives@1.25",
+        "mean_margin_gain": 7.534375,
+        "model": "qwen3",
+        "position": [
+          26,
+          1.0,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "qwen3:condition:suppress_route_centroids:1.0",
+        "label": "suppress_route_centroids@1.0",
+        "mean_margin_gain": 7.534375,
+        "model": "qwen3",
+        "position": [
+          26,
+          1.0,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "qwen3:condition:suppress_route_centroids:1.25",
+        "label": "suppress_route_centroids@1.25",
+        "mean_margin_gain": 7.534375,
+        "model": "qwen3",
+        "position": [
+          26,
+          1.0,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "qwen3:condition:suppress_all_topk_competitors:1.0",
+        "label": "suppress_all_topk_competitors@1.0",
+        "mean_margin_gain": 7.534375,
+        "model": "qwen3",
+        "position": [
+          26,
+          1.0,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "qwen3:condition:suppress_all_topk_competitors:1.25",
+        "label": "suppress_all_topk_competitors@1.25",
+        "mean_margin_gain": 7.534375,
+        "model": "qwen3",
+        "position": [
+          26,
+          1.0,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.3,
+        "id": "qwen3:condition:suppress_current_top:1.25",
+        "label": "suppress_current_top@1.25",
+        "mean_margin_gain": 6.696875,
+        "model": "qwen3",
+        "position": [
+          26,
+          0.3,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.3,
+        "id": "qwen3:condition:suppress_current_top_class:1.25",
+        "label": "suppress_current_top_class@1.25",
+        "mean_margin_gain": 6.696875,
+        "model": "qwen3",
+        "position": [
+          26,
+          0.3,
+          -12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 1.0,
+        "type": "intervention_condition"
+      },
+      {
+        "id": "glm4:model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -28,
+          0,
+          0.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "glm4:combo_state",
+        "label": "joint+topK",
+        "model": "glm4",
+        "position": [
+          -10,
+          0,
+          0.0
+        ],
+        "role": "near_closure_state",
+        "type": "state"
+      },
+      {
+        "id": "glm4:route_competition_field",
+        "label": "route competition field",
+        "model": "glm4",
+        "position": [
+          8,
+          0,
+          0.0
+        ],
+        "role": "multi_route_competition",
+        "type": "competition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "glm4:condition:suppress_class:punctuation_or_stop:1.0",
+        "label": "suppress_class:punctuation_or_stop@1.0",
+        "mean_margin_gain": 0.0,
+        "model": "glm4",
+        "position": [
+          26,
+          1.0,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 1.0,
+        "id": "glm4:condition:suppress_class:punctuation_or_stop:1.25",
+        "label": "suppress_class:punctuation_or_stop@1.25",
+        "mean_margin_gain": 0.0,
+        "model": "glm4",
+        "position": [
+          26,
+          1.0,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.0,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "glm4:condition:suppress_current_top_class:1.25",
+        "label": "suppress_current_top_class@1.25",
+        "mean_margin_gain": 0.70625,
+        "model": "glm4",
+        "position": [
+          26,
+          0.9,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.4,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "glm4:condition:suppress_route_representatives:1.25",
+        "label": "suppress_route_representatives@1.25",
+        "mean_margin_gain": 0.70625,
+        "model": "glm4",
+        "position": [
+          26,
+          0.9,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.4,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "glm4:condition:suppress_route_centroids:1.25",
+        "label": "suppress_route_centroids@1.25",
+        "mean_margin_gain": 0.70625,
+        "model": "glm4",
+        "position": [
+          26,
+          0.9,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.4,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "glm4:condition:suppress_all_topk_competitors:1.25",
+        "label": "suppress_all_topk_competitors@1.25",
+        "mean_margin_gain": 0.70625,
+        "model": "glm4",
+        "position": [
+          26,
+          0.9,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.4,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.8,
+        "id": "glm4:condition:suppress_route_centroids:1.0",
+        "label": "suppress_route_centroids@1.0",
+        "mean_margin_gain": 0.703125,
+        "model": "glm4",
+        "position": [
+          26,
+          0.8,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.3,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.8,
+        "id": "glm4:condition:suppress_route_representatives:1.0",
+        "label": "suppress_route_representatives@1.0",
+        "mean_margin_gain": 0.7,
+        "model": "glm4",
+        "position": [
+          26,
+          0.8,
+          0.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.3,
+        "type": "intervention_condition"
+      },
+      {
+        "id": "deepseek7b:model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -28,
+          0,
+          12.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:combo_state",
+        "label": "joint+topK",
+        "model": "deepseek7b",
+        "position": [
+          -10,
+          0,
+          12.0
+        ],
+        "role": "near_closure_state",
+        "type": "state"
+      },
+      {
+        "id": "deepseek7b:route_competition_field",
+        "label": "route competition field",
+        "model": "deepseek7b",
+        "position": [
+          8,
+          0,
+          12.0
+        ],
+        "role": "multi_route_competition",
+        "type": "competition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "deepseek7b:condition:suppress_route_representatives:1.25",
+        "label": "suppress_route_representatives@1.25",
+        "mean_margin_gain": 2.35,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.9,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.85,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "deepseek7b:condition:suppress_route_centroids:1.25",
+        "label": "suppress_route_centroids@1.25",
+        "mean_margin_gain": 2.35,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.9,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.85,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.9,
+        "id": "deepseek7b:condition:suppress_all_topk_competitors:1.25",
+        "label": "suppress_all_topk_competitors@1.25",
+        "mean_margin_gain": 2.35,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.9,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.85,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.85,
+        "id": "deepseek7b:condition:suppress_route_representatives:1.0",
+        "label": "suppress_route_representatives@1.0",
+        "mean_margin_gain": 2.346875,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.85,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.8,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.85,
+        "id": "deepseek7b:condition:suppress_route_centroids:1.0",
+        "label": "suppress_route_centroids@1.0",
+        "mean_margin_gain": 2.346875,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.85,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.8,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.85,
+        "id": "deepseek7b:condition:suppress_all_topk_competitors:1.0",
+        "label": "suppress_all_topk_competitors@1.0",
+        "mean_margin_gain": 2.346875,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.85,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.8,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.65,
+        "id": "deepseek7b:condition:suppress_current_top_class:1.25",
+        "label": "suppress_current_top_class@1.25",
+        "mean_margin_gain": 2.178125,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.65,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.85,
+        "type": "intervention_condition"
+      },
+      {
+        "donor_top1_rate": 0.5,
+        "id": "deepseek7b:condition:suppress_current_top:1.25",
+        "label": "suppress_current_top@1.25",
+        "mean_margin_gain": 2.04375,
+        "model": "deepseek7b",
+        "position": [
+          26,
+          0.5,
+          12.0
+        ],
+        "role": "route_level_suppression_test",
+        "route_shift_rate": 0.8,
+        "type": "intervention_condition"
+      }
+    ]
+  },
+  "layout": {
+    "x": "model -> combo state -> route field -> tested suppression condition",
+    "y": "donor top1 rate",
+    "z": "model lane"
+  },
+  "metrics": {
+    "edge_count": 30,
+    "node_count": 33,
+    "source_phase": 745
+  },
+  "model_info": {
+    "evidence_type": "final-norm route-level geometric suppression measured against joint+threshold-component state",
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 745,
+    "round": "confirm",
+    "timestamp": "2026-06-29 09:18:21"
+  },
+  "schema_version": "atlas_graph_v1",
+  "source_files": [
+    "results/glm5_phase745_route_level_multi_competitor_suppression/confirm/phase745_cross_model_summary.json"
+  ],
+  "title": "Phase 745 Route-Level Multi-Competitor Suppression (confirm)"
+}

@@ -1,0 +1,341 @@
+{
+  "graph": {
+    "edges": [
+      {
+        "phase": 742,
+        "relation": "tests_combined_closure",
+        "source": "qwen3:model",
+        "target": "qwen3:threshold_closure"
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "qwen3:combo:joint_add_top1",
+        "target": "qwen3:threshold_closure",
+        "top1_rate": 0.0,
+        "weight": 0.16591957373389696
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "qwen3:combo:joint_add_top2",
+        "target": "qwen3:threshold_closure",
+        "top1_rate": 0.0,
+        "weight": 0.31425391914447803
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "qwen3:combo:joint_add_top3",
+        "target": "qwen3:threshold_closure",
+        "top1_rate": 0.0,
+        "weight": 0.3287907123730181
+      },
+      {
+        "phase": 742,
+        "relation": "tests_combined_closure",
+        "source": "glm4:model",
+        "target": "glm4:threshold_closure"
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "glm4:combo:joint_add_top1",
+        "target": "glm4:threshold_closure",
+        "top1_rate": 0.16666666666666666,
+        "weight": 0.6704020591538629
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "glm4:combo:joint_add_top2",
+        "target": "glm4:threshold_closure",
+        "top1_rate": 0.3333333333333333,
+        "weight": 0.8658616921432297
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "glm4:combo:joint_add_top3",
+        "target": "glm4:threshold_closure",
+        "top1_rate": 0.5,
+        "weight": 0.9138902576673945
+      },
+      {
+        "phase": 742,
+        "relation": "tests_combined_closure",
+        "source": "deepseek7b:model",
+        "target": "deepseek7b:threshold_closure"
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "deepseek7b:combo:joint_add_top1",
+        "target": "deepseek7b:threshold_closure",
+        "top1_rate": 0.0,
+        "weight": 0.2912136743829042
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "deepseek7b:combo:joint_add_top2",
+        "target": "deepseek7b:threshold_closure",
+        "top1_rate": 0.08333333333333333,
+        "weight": 0.5476789866698432
+      },
+      {
+        "phase": 742,
+        "relation": "joint_add_effect",
+        "source": "deepseek7b:combo:joint_add_top3",
+        "target": "deepseek7b:threshold_closure",
+        "top1_rate": 0.08333333333333333,
+        "weight": 0.5717840324557165
+      }
+    ],
+    "nodes": [
+      {
+        "id": "qwen3:model",
+        "label": "qwen3",
+        "model": "qwen3",
+        "position": [
+          -26,
+          0,
+          -10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "qwen3:threshold_closure",
+        "label": "combined threshold closure",
+        "model": "qwen3",
+        "position": [
+          24,
+          0,
+          -10.0
+        ],
+        "role": "closure_target",
+        "type": "readout"
+      },
+      {
+        "combo_components": [
+          "L34:attn_out"
+        ],
+        "id": "qwen3:combo:joint_add_top1",
+        "label": "joint_add_top1",
+        "model": "qwen3",
+        "position": [
+          0,
+          0.1690147692061917,
+          -10.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "combo_components": [
+          "L34:attn_out",
+          "L31:attn_out"
+        ],
+        "id": "qwen3:combo:joint_add_top2",
+        "label": "joint_add_top2",
+        "model": "qwen3",
+        "position": [
+          0,
+          0.31734910453237875,
+          -10.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "combo_components": [
+          "L34:attn_out",
+          "L31:attn_out",
+          "L33:mlp_out"
+        ],
+        "id": "qwen3:combo:joint_add_top3",
+        "label": "joint_add_top3",
+        "model": "qwen3",
+        "position": [
+          0,
+          0.3318859026628466,
+          -10.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "id": "glm4:model",
+        "label": "glm4",
+        "model": "glm4",
+        "position": [
+          -26,
+          0,
+          0.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "glm4:threshold_closure",
+        "label": "combined threshold closure",
+        "model": "glm4",
+        "position": [
+          24,
+          0,
+          0.0
+        ],
+        "role": "closure_target",
+        "type": "readout"
+      },
+      {
+        "combo_components": [
+          "L38:mlp_out"
+        ],
+        "id": "glm4:combo:joint_add_top1",
+        "label": "joint_add_top1",
+        "model": "glm4",
+        "position": [
+          0,
+          0.698740710938476,
+          0.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "combo_components": [
+          "L38:mlp_out",
+          "L39:mlp_out"
+        ],
+        "id": "glm4:combo:joint_add_top2",
+        "label": "joint_add_top2",
+        "model": "glm4",
+        "position": [
+          0,
+          0.8942003427433917,
+          0.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "combo_components": [
+          "L38:mlp_out",
+          "L39:mlp_out",
+          "L37:mlp_out"
+        ],
+        "id": "glm4:combo:joint_add_top3",
+        "label": "joint_add_top3",
+        "model": "glm4",
+        "position": [
+          0,
+          0.9422289444072075,
+          0.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "id": "deepseek7b:model",
+        "label": "deepseek7b",
+        "model": "deepseek7b",
+        "position": [
+          -26,
+          0,
+          10.0
+        ],
+        "role": "tested_model",
+        "type": "model"
+      },
+      {
+        "id": "deepseek7b:threshold_closure",
+        "label": "combined threshold closure",
+        "model": "deepseek7b",
+        "position": [
+          24,
+          0,
+          10.0
+        ],
+        "role": "closure_target",
+        "type": "readout"
+      },
+      {
+        "combo_components": [
+          "L26:attn_out"
+        ],
+        "id": "deepseek7b:combo:joint_add_top1",
+        "label": "joint_add_top1",
+        "model": "deepseek7b",
+        "position": [
+          0,
+          0.3040614032486795,
+          10.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "combo_components": [
+          "L26:attn_out",
+          "L27:attn_out"
+        ],
+        "id": "deepseek7b:combo:joint_add_top2",
+        "label": "joint_add_top2",
+        "model": "deepseek7b",
+        "position": [
+          0,
+          0.5605267224479942,
+          10.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      },
+      {
+        "combo_components": [
+          "L26:attn_out",
+          "L27:attn_out",
+          "L27:mlp_out"
+        ],
+        "id": "deepseek7b:combo:joint_add_top3",
+        "label": "joint_add_top3",
+        "model": "deepseek7b",
+        "position": [
+          0,
+          0.5846317609014673,
+          10.0
+        ],
+        "role": "cumulative_threshold_source",
+        "type": "component_combo"
+      }
+    ]
+  },
+  "layout": {
+    "x": "model -> component combo -> threshold closure",
+    "y": "threshold fraction",
+    "z": "model lane"
+  },
+  "metrics": {
+    "edge_count": 12,
+    "node_count": 15,
+    "source_phase": 742
+  },
+  "model_info": {
+    "evidence_type": "cumulative donor-recipient component delta add tested against final readout threshold closure",
+    "model": "cross_model",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "phase": 742,
+    "round": "main",
+    "timestamp": "2026-06-29 07:27:26"
+  },
+  "schema_version": "atlas_graph_v1",
+  "source_files": [
+    "results/glm5_phase742_combined_threshold_component_closure/main/phase742_cross_model_summary.json"
+  ],
+  "title": "Phase 742 Combined Threshold Component Closure (main)"
+}

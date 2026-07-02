@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 export default function useVisData() {
   const [dataFiles, setDataFiles] = useState([]);
   const [activeData, setActiveData] = useState(null);
+  const [activeFileMeta, setActiveFileMeta] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -33,12 +34,13 @@ export default function useVisData() {
         throw new Error(`Unsupported schema: ${version}`);
       }
       setActiveData(data);
+      setActiveFileMeta(dataFiles.find((file) => file.filename === filepath) || { filename: filepath });
     } catch (e) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dataFiles]);
 
   const loadLocalFile = useCallback((file) => {
     const reader = new FileReader();
@@ -50,6 +52,7 @@ export default function useVisData() {
           throw new Error(`Unsupported schema: ${version}`);
         }
         setActiveData(data);
+        setActiveFileMeta({ filename: file.name, label: file.name, source: 'local' });
       } catch (err) {
         setError(err.message);
       }
@@ -57,5 +60,5 @@ export default function useVisData() {
     reader.readAsText(file);
   }, []);
 
-  return { dataFiles, activeData, loading, error, loadDataManifest, loadDataFile, loadLocalFile, setActiveData, setError };
+  return { dataFiles, activeData, activeFileMeta, loading, error, loadDataManifest, loadDataFile, loadLocalFile, setActiveData, setError, setActiveFileMeta };
 }
