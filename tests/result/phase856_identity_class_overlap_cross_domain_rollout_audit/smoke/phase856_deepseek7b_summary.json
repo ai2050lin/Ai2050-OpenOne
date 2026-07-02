@@ -1,0 +1,1083 @@
+{
+  "phase": 856,
+  "title": "Identity-Class Overlap and Cross-Domain Rollout Audit",
+  "model": "deepseek7b",
+  "round": "smoke",
+  "timestamp": "2026-07-02 19:34:39",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "n_cases": 6,
+  "case_ids": [
+    "p856_001_geometry_triangle",
+    "p856_002_geometry_square",
+    "p856_006_animal_dog",
+    "p856_007_animal_cat",
+    "p856_011_tool_hammer",
+    "p856_012_tool_screwdriver"
+  ],
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "overall": {
+    "n": 6,
+    "first_token_answer_class": 1,
+    "first_token_clear_answer_class": 1,
+    "first_token_strict": 1,
+    "first_token_identity_class_overlap": 0,
+    "rollout_answer_class": 1,
+    "rollout_clear_answer_class": 1,
+    "rollout_identity_class_overlap": 0,
+    "rollout_strict_canonical": 1,
+    "rollout_object_echo": 0,
+    "rollout_other_or_format": 5,
+    "rollout_labels": {
+      "other": 4,
+      "format_or_empty": 1,
+      "strict_canonical": 1
+    },
+    "mean_class_blocker_count": 1.1666666666666667,
+    "mean_class_rank": 2.1666666666666665,
+    "mean_class_minus_object_logit": 3.4270833333333335,
+    "first_token_predicts_rollout": {
+      "n": 6,
+      "tp": 1,
+      "tn": 5,
+      "fp": 0,
+      "fn": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "clear_first_predicts_clear_rollout": {
+      "n": 6,
+      "tp": 1,
+      "tn": 5,
+      "fp": 0,
+      "fn": 0,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "domain_summary": {
+    "animal": {
+      "n": 2,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "first_token_strict": 0,
+      "first_token_identity_class_overlap": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_strict_canonical": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 2,
+      "rollout_labels": {
+        "other": 1,
+        "format_or_empty": 1
+      },
+      "mean_class_blocker_count": 1.0,
+      "mean_class_rank": 2.0,
+      "mean_class_minus_object_logit": 3.703125,
+      "first_token_predicts_rollout": {
+        "n": 2,
+        "tp": 0,
+        "tn": 2,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "clear_first_predicts_clear_rollout": {
+        "n": 2,
+        "tp": 0,
+        "tn": 2,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "geometry": {
+      "n": 2,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "first_token_strict": 0,
+      "first_token_identity_class_overlap": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_strict_canonical": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 2,
+      "rollout_labels": {
+        "other": 2
+      },
+      "mean_class_blocker_count": 1.5,
+      "mean_class_rank": 2.5,
+      "mean_class_minus_object_logit": 0.53125,
+      "first_token_predicts_rollout": {
+        "n": 2,
+        "tp": 0,
+        "tn": 2,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "clear_first_predicts_clear_rollout": {
+        "n": 2,
+        "tp": 0,
+        "tn": 2,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "tool": {
+      "n": 2,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "first_token_strict": 1,
+      "first_token_identity_class_overlap": 0,
+      "rollout_answer_class": 1,
+      "rollout_clear_answer_class": 1,
+      "rollout_identity_class_overlap": 0,
+      "rollout_strict_canonical": 1,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "strict_canonical": 1,
+        "other": 1
+      },
+      "mean_class_blocker_count": 1.0,
+      "mean_class_rank": 2.0,
+      "mean_class_minus_object_logit": 6.046875,
+      "first_token_predicts_rollout": {
+        "n": 2,
+        "tp": 1,
+        "tn": 1,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "clear_first_predicts_clear_rollout": {
+        "n": 2,
+        "tp": 1,
+        "tn": 1,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  },
+  "overlap_summary": {
+    "member_not_alias": {
+      "n": 6,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "first_token_strict": 1,
+      "first_token_identity_class_overlap": 0,
+      "rollout_answer_class": 1,
+      "rollout_clear_answer_class": 1,
+      "rollout_identity_class_overlap": 0,
+      "rollout_strict_canonical": 1,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 4,
+        "format_or_empty": 1,
+        "strict_canonical": 1
+      },
+      "mean_class_blocker_count": 1.1666666666666667,
+      "mean_class_rank": 2.1666666666666665,
+      "mean_class_minus_object_logit": 3.4270833333333335,
+      "first_token_predicts_rollout": {
+        "n": 6,
+        "tp": 1,
+        "tn": 5,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "clear_first_predicts_clear_rollout": {
+        "n": 6,
+        "tp": 1,
+        "tn": 5,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  },
+  "prompt_summary": {
+    "natural_question": {
+      "n": 6,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "first_token_strict": 1,
+      "first_token_identity_class_overlap": 0,
+      "rollout_answer_class": 1,
+      "rollout_clear_answer_class": 1,
+      "rollout_identity_class_overlap": 0,
+      "rollout_strict_canonical": 1,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 4,
+        "format_or_empty": 1,
+        "strict_canonical": 1
+      },
+      "mean_class_blocker_count": 1.1666666666666667,
+      "mean_class_rank": 2.1666666666666665,
+      "mean_class_minus_object_logit": 3.4270833333333335,
+      "first_token_predicts_rollout": {
+        "n": 6,
+        "tp": 1,
+        "tn": 5,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "clear_first_predicts_clear_rollout": {
+        "n": 6,
+        "tp": 1,
+        "tn": 5,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  },
+  "top_mismatch_rows": [
+    {
+      "domain": "geometry",
+      "object": "triangle",
+      "overlap_kind": "member_not_alias",
+      "prompt_variant": "natural_question",
+      "class_best_token": " Polygon",
+      "object_best_token": " triangle",
+      "class_blocker_count": 2,
+      "generated_clean": "1",
+      "rollout_label": "other",
+      "top_tokens": [
+        {
+          "token_id": 220,
+          "token": " ",
+          "logit": 15.5,
+          "role": "format_space"
+        },
+        {
+          "token_id": 508,
+          "token": " [",
+          "logit": 15.1875,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 48159,
+          "token": " Polygon",
+          "logit": 15.0625,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 17047,
+          "token": " geometry",
+          "logit": 15.0625,
+          "role": "other"
+        },
+        {
+          "token_id": 362,
+          "token": " A",
+          "logit": 14.8125,
+          "role": "other"
+        },
+        {
+          "token_id": 29372,
+          "token": " polygon",
+          "logit": 14.75,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 38918,
+          "token": " Geometry",
+          "logit": 14.6875,
+          "role": "other"
+        },
+        {
+          "token_id": 21495,
+          "token": " triangle",
+          "logit": 14.625,
+          "role": "object_echo"
+        },
+        {
+          "token_id": 68159,
+          "token": " polygons",
+          "logit": 13.9375,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 38031,
+          "token": " Triangle",
+          "logit": 13.875,
+          "role": "object_echo"
+        },
+        {
+          "token_id": 6083,
+          "token": " shape",
+          "logit": 13.6875,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 1019,
+          "token": "**\n",
+          "logit": 13.0,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 4229,
+          "token": " Ge",
+          "logit": 12.6875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 320,
+          "token": " (",
+          "logit": 12.6875,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 36237,
+          "token": " Angle",
+          "logit": 12.6875,
+          "role": "other"
+        },
+        {
+          "token_id": 22526,
+          "token": " Shape",
+          "logit": 12.5,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 20816,
+          "token": " shapes",
+          "logit": 12.4375,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 264,
+          "token": " a",
+          "logit": 12.375,
+          "role": "other"
+        },
+        {
+          "token_id": 56177,
+          "token": "**\n\n",
+          "logit": 12.375,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 3070,
+          "token": " **",
+          "logit": 12.3125,
+          "role": "format_punct"
+        }
+      ]
+    },
+    {
+      "domain": "tool",
+      "object": "screwdriver",
+      "overlap_kind": "member_not_alias",
+      "prompt_variant": "natural_question",
+      "class_best_token": " tools",
+      "object_best_token": " screw",
+      "class_blocker_count": 2,
+      "generated_clean": "1",
+      "rollout_label": "other",
+      "top_tokens": [
+        {
+          "token_id": 508,
+          "token": " [",
+          "logit": 12.75,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 220,
+          "token": " ",
+          "logit": 12.75,
+          "role": "format_space"
+        },
+        {
+          "token_id": 7375,
+          "token": " tools",
+          "logit": 12.4375,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 13852,
+          "token": " Tools",
+          "logit": 11.5625,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 5392,
+          "token": " tool",
+          "logit": 11.5625,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 362,
+          "token": " A",
+          "logit": 11.25,
+          "role": "other"
+        },
+        {
+          "token_id": 320,
+          "token": " (",
+          "logit": 10.875,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 24026,
+          "token": " Construction",
+          "logit": 9.625,
+          "role": "other"
+        },
+        {
+          "token_id": 5547,
+          "token": " Work",
+          "logit": 9.5625,
+          "role": "other"
+        },
+        {
+          "token_id": 715,
+          "token": " \n",
+          "logit": 9.5625,
+          "role": "format_space"
+        },
+        {
+          "token_id": 16,
+          "token": "1",
+          "logit": 9.3125,
+          "role": "number"
+        },
+        {
+          "token_id": 21974,
+          "token": " -\n\n",
+          "logit": 8.9375,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 3070,
+          "token": " **",
+          "logit": 8.75,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 18702,
+          "token": " Safety",
+          "logit": 8.5625,
+          "role": "other"
+        },
+        {
+          "token_id": 8536,
+          "token": " Hand",
+          "logit": 8.5,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 11791,
+          "token": " Technology",
+          "logit": 8.4375,
+          "role": "other"
+        },
+        {
+          "token_id": 39261,
+          "token": " Sharp",
+          "logit": 8.25,
+          "role": "other"
+        },
+        {
+          "token_id": 4710,
+          "token": " \n\n",
+          "logit": 8.1875,
+          "role": "format_space"
+        },
+        {
+          "token_id": 13474,
+          "token": " Tool",
+          "logit": 8.1875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 17374,
+          "token": " Tech",
+          "logit": 8.1875,
+          "role": "other"
+        }
+      ]
+    },
+    {
+      "domain": "geometry",
+      "object": "square",
+      "overlap_kind": "member_not_alias",
+      "prompt_variant": "natural_question",
+      "class_best_token": " Polygon",
+      "object_best_token": " square",
+      "class_blocker_count": 1,
+      "generated_clean": "1",
+      "rollout_label": "other",
+      "top_tokens": [
+        {
+          "token_id": 220,
+          "token": " ",
+          "logit": 15.9375,
+          "role": "format_space"
+        },
+        {
+          "token_id": 48159,
+          "token": " Polygon",
+          "logit": 15.8125,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 29372,
+          "token": " polygon",
+          "logit": 15.5,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 6083,
+          "token": " shape",
+          "logit": 15.4375,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 9334,
+          "token": " square",
+          "logit": 15.1875,
+          "role": "object_echo"
+        },
+        {
+          "token_id": 17047,
+          "token": " geometry",
+          "logit": 14.8125,
+          "role": "other"
+        },
+        {
+          "token_id": 29136,
+          "token": " quadr",
+          "logit": 14.75,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 68159,
+          "token": " polygons",
+          "logit": 14.5625,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 362,
+          "token": " A",
+          "logit": 14.125,
+          "role": "other"
+        },
+        {
+          "token_id": 52484,
+          "token": " geometric",
+          "logit": 13.875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 20816,
+          "token": " shapes",
+          "logit": 13.875,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 22526,
+          "token": " Shape",
+          "logit": 13.8125,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 63948,
+          "token": " Quadr",
+          "logit": 13.75,
+          "role": "answer_class"
+        },
+        {
+          "token_id": 38918,
+          "token": " Geometry",
+          "logit": 13.6875,
+          "role": "other"
+        },
+        {
+          "token_id": 15619,
+          "token": " Square",
+          "logit": 13.6875,
+          "role": "object_echo"
+        },
+        {
+          "token_id": 19280,
+          "token": " Rectangle",
+          "logit": 13.625,
+          "role": "other"
+        },
+        {
+          "token_id": 508,
+          "token": " [",
+          "logit": 13.4375,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 12671,
+          "token": " circle",
+          "logit": 13.4375,
+          "role": "other"
+        },
+        {
+          "token_id": 320,
+          "token": " (",
+          "logit": 13.25,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 4229,
+          "token": " Ge",
+          "logit": 13.1875,
+          "role": "strict_target"
+        }
+      ]
+    },
+    {
+      "domain": "animal",
+      "object": "dog",
+      "overlap_kind": "member_not_alias",
+      "prompt_variant": "natural_question",
+      "class_best_token": " animal",
+      "object_best_token": " dog",
+      "class_blocker_count": 1,
+      "generated_clean": "[pet",
+      "rollout_label": "other",
+      "top_tokens": [
+        {
+          "token_id": 508,
+          "token": " [",
+          "logit": 12.875,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 9864,
+          "token": " animal",
+          "logit": 12.125,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 21292,
+          "token": " Animal",
+          "logit": 12.0625,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 6753,
+          "token": " pet",
+          "logit": 11.8125,
+          "role": "other"
+        },
+        {
+          "token_id": 220,
+          "token": " ",
+          "logit": 11.6875,
+          "role": "format_space"
+        },
+        {
+          "token_id": 9898,
+          "token": " animals",
+          "logit": 11.5,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 320,
+          "token": " (",
+          "logit": 11.4375,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 6862,
+          "token": "pet",
+          "logit": 10.5,
+          "role": "other"
+        },
+        {
+          "token_id": 362,
+          "token": " A",
+          "logit": 10.4375,
+          "role": "other"
+        },
+        {
+          "token_id": 36921,
+          "token": " noun",
+          "logit": 10.0625,
+          "role": "other"
+        },
+        {
+          "token_id": 21974,
+          "token": " -\n\n",
+          "logit": 10.0,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 33358,
+          "token": " biology",
+          "logit": 9.9375,
+          "role": "other"
+        },
+        {
+          "token_id": 2980,
+          "token": " Can",
+          "logit": 9.3125,
+          "role": "other"
+        },
+        {
+          "token_id": 21806,
+          "token": " Answer",
+          "logit": 9.3125,
+          "role": "other"
+        },
+        {
+          "token_id": 1304,
+          "token": " __",
+          "logit": 9.25,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 2272,
+          "token": " life",
+          "logit": 9.25,
+          "role": "other"
+        },
+        {
+          "token_id": 5562,
+          "token": " dog",
+          "logit": 9.1875,
+          "role": "object_echo"
+        },
+        {
+          "token_id": 2805,
+          "token": " short",
+          "logit": 9.0625,
+          "role": "other"
+        },
+        {
+          "token_id": 105787,
+          "token": "宠物",
+          "logit": 9.0,
+          "role": "other"
+        },
+        {
+          "token_id": 715,
+          "token": " \n",
+          "logit": 9.0,
+          "role": "format_space"
+        }
+      ]
+    },
+    {
+      "domain": "animal",
+      "object": "cat",
+      "overlap_kind": "member_not_alias",
+      "prompt_variant": "natural_question",
+      "class_best_token": " animal",
+      "object_best_token": " Cat",
+      "class_blocker_count": 1,
+      "generated_clean": "[ ]",
+      "rollout_label": "format_or_empty",
+      "top_tokens": [
+        {
+          "token_id": 508,
+          "token": " [",
+          "logit": 13.9375,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 9864,
+          "token": " animal",
+          "logit": 12.25,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 320,
+          "token": " (",
+          "logit": 11.9375,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 9898,
+          "token": " animals",
+          "logit": 11.875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 21292,
+          "token": " Animal",
+          "logit": 11.6875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 220,
+          "token": " ",
+          "logit": 11.5,
+          "role": "format_space"
+        },
+        {
+          "token_id": 1304,
+          "token": " __",
+          "logit": 10.875,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 6753,
+          "token": " pet",
+          "logit": 10.8125,
+          "role": "other"
+        },
+        {
+          "token_id": 434,
+          "token": " F",
+          "logit": 10.5625,
+          "role": "other"
+        },
+        {
+          "token_id": 2805,
+          "token": " short",
+          "logit": 10.4375,
+          "role": "other"
+        },
+        {
+          "token_id": 33358,
+          "token": " biology",
+          "logit": 10.125,
+          "role": "other"
+        },
+        {
+          "token_id": 21974,
+          "token": " -\n\n",
+          "logit": 10.0625,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 98914,
+          "token": " fauna",
+          "logit": 9.8125,
+          "role": "other"
+        },
+        {
+          "token_id": 6862,
+          "token": "pet",
+          "logit": 9.6875,
+          "role": "other"
+        },
+        {
+          "token_id": 21806,
+          "token": " Answer",
+          "logit": 9.6875,
+          "role": "other"
+        },
+        {
+          "token_id": 362,
+          "token": " A",
+          "logit": 9.5625,
+          "role": "other"
+        },
+        {
+          "token_id": 25103,
+          "token": " pets",
+          "logit": 9.5625,
+          "role": "other"
+        },
+        {
+          "token_id": 36921,
+          "token": " noun",
+          "logit": 9.375,
+          "role": "other"
+        },
+        {
+          "token_id": 715,
+          "token": " \n",
+          "logit": 9.125,
+          "role": "format_space"
+        },
+        {
+          "token_id": 4710,
+          "token": " \n\n",
+          "logit": 9.0625,
+          "role": "format_space"
+        }
+      ]
+    },
+    {
+      "domain": "tool",
+      "object": "hammer",
+      "overlap_kind": "member_not_alias",
+      "prompt_variant": "natural_question",
+      "class_best_token": " tool",
+      "object_best_token": " H",
+      "class_blocker_count": 0,
+      "generated_clean": "tool",
+      "rollout_label": "strict_canonical",
+      "top_tokens": [
+        {
+          "token_id": 5392,
+          "token": " tool",
+          "logit": 12.875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 508,
+          "token": " [",
+          "logit": 12.0625,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 13852,
+          "token": " Tools",
+          "logit": 11.9375,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 7375,
+          "token": " tools",
+          "logit": 11.6875,
+          "role": "strict_target"
+        },
+        {
+          "token_id": 220,
+          "token": " ",
+          "logit": 10.75,
+          "role": "format_space"
+        },
+        {
+          "token_id": 362,
+          "token": " A",
+          "logit": 10.375,
+          "role": "other"
+        },
+        {
+          "token_id": 21292,
+          "token": " Animal",
+          "logit": 10.25,
+          "role": "other"
+        },
+        {
+          "token_id": 21974,
+          "token": " -\n\n",
+          "logit": 9.625,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 83749,
+          "token": " percussion",
+          "logit": 9.375,
+          "role": "other"
+        },
+        {
+          "token_id": 5547,
+          "token": " Work",
+          "logit": 9.25,
+          "role": "other"
+        },
+        {
+          "token_id": 320,
+          "token": " (",
+          "logit": 9.1875,
+          "role": "format_punct"
+        },
+        {
+          "token_id": 24026,
+          "token": " Construction",
+          "logit": 9.125,
+          "role": "other"
+        },
+        {
+          "token_id": 5166,
+          "token": " Art",
+          "logit": 9.0625,
+          "role": "other"
+        },
+        {
+          "token_id": 12131,
+          "token": " Wood",
+          "logit": 9.0625,
+          "role": "other"
+        },
+        {
+          "token_id": 102011,
+          "token": "工具",
+          "logit": 8.9375,
+          "role": "other"
+        },
+        {
+          "token_id": 715,
+          "token": " \n",
+          "logit": 8.875,
+          "role": "format_space"
+        },
+        {
+          "token_id": 5586,
+          "token": " Action",
+          "logit": 8.6875,
+          "role": "other"
+        },
+        {
+          "token_id": 7579,
+          "token": " wood",
+          "logit": 8.625,
+          "role": "other"
+        },
+        {
+          "token_id": 8086,
+          "token": " construction",
+          "logit": 8.625,
+          "role": "other"
+        },
+        {
+          "token_id": 1304,
+          "token": " __",
+          "logit": 8.5625,
+          "role": "format_punct"
+        }
+      ]
+    }
+  ],
+  "boundary": "This phase audits natural cross-domain first-token answer-class closure and short rollout closure. It is not a gear intervention phase and does not prove global causal closure."
+}

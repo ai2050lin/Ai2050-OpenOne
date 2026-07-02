@@ -106282,3 +106282,2816 @@ Phase 850 不是闭合阶段。
 把全局齿轮图谱从平均残差拟合，推进到 strong-edge 泛化证据。
 这一步显著降低了“局部 patch 拟合误判为机制”的风险。
 ```
+
+## Phase 851: 全局齿轮图谱结构审计与协议-语义正交性预筛 [2026-07-02 12:46]
+
+### 一、任务来源
+
+本阶段基于最新上传内容继续推进。
+
+上传内容提出：
+
+```text
+从局部响应图谱
+升级为
+状态-路线-齿轮-边界-闭合图谱
+```
+
+并提出三个增强模块：
+
+```text
+1. hierarchical gating hypothesis
+   分层门控假设。
+
+2. counterfactual min-cut
+   反事实最小割。
+
+3. protocol-semantic orthogonality audit
+   协议-语义正交性审计。
+```
+
+总体判断：
+
+```text
+方向正确，但不能直接当作已验证理论。
+它是图谱工程的合理升级方案，
+当前需要做的是把这些概念转成可运行的审计标准。
+```
+
+因此本阶段没有直接进行新的模型前向测试，而是先对 Phase 849 / Phase 850 已有数据进行结构审计。
+
+原因：
+
+```text
+1. Phase 850 已经暴露 strong-edge 样本不足。
+2. GLM4 当前没有 strong-edge，直接测试 gate 没有评价对象。
+3. DS7B strong-edge 只有 3 条，不能直接上升为机制结论。
+4. 如果不先固定图谱准入标准，新一轮前向测试很容易继续变成局部 patch 搜索。
+```
+
+### 二、执行内容
+
+新增脚本：
+
+```text
+tests/glm5/phase851_global_atlas_schema_orthogonality_audit.py
+tests/glm5/run_phase851_global_atlas_schema_orthogonality_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase851_global_atlas_schema_orthogonality_audit/
+```
+
+三轮运行：
+
+```text
+tests/glm5/run_phase851_global_atlas_schema_orthogonality_audit_round.sh smoke smoke smoke
+tests/glm5/run_phase851_global_atlas_schema_orthogonality_audit_round.sh main main main
+tests/glm5/run_phase851_global_atlas_schema_orthogonality_audit_round.sh confirm confirm confirm
+```
+
+confirm 轮主要输出：
+
+```text
+tests/result/phase851_global_atlas_schema_orthogonality_audit/confirm/phase851_cross_model_atlas_audit.json
+tests/result/phase851_global_atlas_schema_orthogonality_audit/confirm/phase851_cross_model_atlas_audit.md
+tests/result/phase851_global_atlas_schema_orthogonality_audit/confirm/phase851_cross_model_atlas_nodes.jsonl
+tests/result/phase851_global_atlas_schema_orthogonality_audit/confirm/phase851_cross_model_atlas_edges.jsonl
+```
+
+同时更新了：
+
+```text
+research/MainAnalysis/20260701_01_全局齿轮图谱.md
+```
+
+新增 Phase 851 结构审计章节。
+
+说明：
+
+```text
+本阶段不加载 qwen3 / GLM4 / DS7B。
+不做新 forward pass。
+这是 schema audit / candidate ranking，
+不是新的模型机制闭合实验。
+```
+
+### 三、测试原理
+
+本阶段把 Phase 850 的 strong-edge 指标转成图谱证据等级。
+
+图谱结构：
+
+$$
+\mathcal{G}_{\text{atlas}}
+=
+\left(
+V_{\text{state}},
+V_{\text{route}},
+V_{\text{gear}},
+V_{\text{gate}},
+V_{\text{boundary}},
+E_{\text{causal}},
+E_{\text{interaction}},
+E_{\text{transport}},
+E_{\text{closure}},
+\Omega_{\text{evidence}}
+\right)
+$$
+
+证据等级：
+
+$$
+\Omega_{\text{evidence}}(e)
+=
+\left(
+L_0(e),L_1(e),L_2(e),L_3(e),L_4(e),L_5(e),L_6(e),L_7(e)
+\right)
+$$
+
+本阶段实际使用的 gate 等级：
+
+```text
+L0_untriggered:
+  没有 strong-edge 样本，无法评价。
+
+L2_weak_strong_edge_signal:
+  有 strong-edge，但 gate 没有稳定 holdout 预测。
+
+L3_in_sample_only:
+  样本内有效，object / prompt holdout 失败。
+
+L4_partial_holdout_candidate:
+  部分 holdout 指标有效，但 balanced 或 raw 证据不完整。
+
+L5_strong_edge_holdout_candidate:
+  raw 和 balanced 中 object / prompt holdout 同时优于 global baseline。
+```
+
+协议-语义正交性审计使用简单组间解释率。
+
+对任意特征 \(z\)，按 object（对象）分组：
+
+$$
+\eta^2_{\text{object}}(z)
+=
+\frac{
+\sum_o n_o(\bar{z}_o-\bar{z})^2
+}{
+\sum_i(z_i-\bar{z})^2
+}
+$$
+
+按 prompt_variant（提示变体）分组：
+
+$$
+\eta^2_{\text{prompt}}(z)
+=
+\frac{
+\sum_p n_p(\bar{z}_p-\bar{z})^2
+}{
+\sum_i(z_i-\bar{z})^2
+}
+$$
+
+分类规则：
+
+```text
+prompt_eta 明显大于 object_eta:
+  protocol_like
+
+object_eta 明显大于 prompt_eta:
+  semantic_like
+
+两者都高:
+  entangled_or_shared
+
+两者都低:
+  low_axis_signal
+```
+
+反事实最小割目前只做预筛，不做真实 ablation。
+
+预筛公式：
+
+$$
+Lift(g)
+=
+\frac{
+P(\text{strong}\mid g\in S)
+}{
+P(\text{strong})
+}
+$$
+
+含义：
+
+```text
+某个 gear 出现在组合 S 中时，
+strong-edge 发生率相对全局基线提高多少。
+```
+
+### 四、confirm 轮核心结果
+
+#### 1. qwen3 gate 证据
+
+```text
+global_combo:
+  L2_weak_strong_edge_signal
+  in_sample F1 = 0.4688
+  object_holdout F1 = 0.3947
+  prompt_holdout F1 = 0.4054
+
+residual_projection_combo:
+  L5_strong_edge_holdout_candidate
+  in_sample F1 = 0.8923
+  object_holdout F1 = 0.5312
+  prompt_holdout F1 = 0.4839
+  object balanced F1 = 0.6296
+  prompt balanced F1 = 0.6122
+
+internal_strength_combo:
+  L5_strong_edge_holdout_candidate
+  但 object / prompt holdout 只略高于 global，
+  强度弱于 residual_projection。
+
+blocker_field_combo:
+  L4_partial_holdout_candidate
+  in_sample F1 = 0.8657
+  object_holdout F1 = 0.4000
+  prompt_holdout F1 = 0.4333
+```
+
+结论：
+
+```text
+qwen3 residual_projection_combo 仍是当前最强核心候选。
+internal_strength_combo 可保留为弱核心候选。
+blocker_field_combo 不能进入 L5 核心，只能作为部分候选。
+```
+
+#### 2. GLM4 gate 证据
+
+```text
+strong rows = 0 / 570
+
+所有 gate:
+  L0_untriggered
+```
+
+结论：
+
+```text
+GLM4 当前不是机制负结果，而是没有触发可评价的 strong-edge。
+下一步必须先构造更困难任务。
+```
+
+#### 3. DS7B gate 证据
+
+```text
+global_combo:
+  L2_weak_strong_edge_signal
+
+residual_projection_combo:
+  L3_in_sample_only
+
+blocker_field_combo:
+  L3_in_sample_only
+  in_sample F1 = 1.0000
+  object_holdout F1 = 0.0000
+  prompt_holdout F1 = 0.0000
+```
+
+结论：
+
+```text
+DS7B blocker_field 不能进入核心图谱。
+它当前更像样本内局部信号或小模型捷径。
+```
+
+### 五、协议-语义正交性审计结果
+
+#### 1. qwen3
+
+protocol-like 特征：
+
+```text
+resid_target_blocker_span:
+  object_eta = 0.0961
+  prompt_eta = 0.8284
+
+topk_entropy:
+  object_eta = 0.0478
+  prompt_eta = 0.8008
+
+best_target_object_resid_final:
+  object_eta = 0.1432
+  prompt_eta = 0.6394
+
+original_margin:
+  object_eta = 0.1803
+  prompt_eta = 0.5513
+```
+
+semantic-like 特征：
+
+```text
+best_target_blocker_resid_final:
+  object_eta = 0.4819
+  prompt_eta = 0.1769
+
+neg_count:
+  object_eta = 0.1126
+  prompt_eta = 0.0039
+
+signed_sum:
+  object_eta = 0.0878
+  prompt_eta = 0.0053
+```
+
+entangled 特征：
+
+```text
+blocker_pressure:
+  object_eta = 0.3428
+  prompt_eta = 0.3550
+
+route_gap:
+  object_eta = 0.3428
+  prompt_eta = 0.3550
+
+target_minus_blocker_logit:
+  object_eta = 0.3428
+  prompt_eta = 0.3550
+```
+
+解释：
+
+```text
+qwen3 中协议相关变量和语义相关变量已经能部分区分，
+但 blocker / route-gap 仍高度纠缠。
+这支持“分层门控”，也说明不能直接训练一个黑盒 \Psi。
+```
+
+#### 2. GLM4
+
+protocol-like 特征非常强：
+
+```text
+target_blocker_resid_final:
+  prompt_eta = 0.9614
+
+object_blocker_resid_final:
+  prompt_eta = 0.9579
+
+best_target_blocker_resid_final:
+  prompt_eta = 0.9016
+```
+
+semantic-like 特征：
+
+```text
+object_minus_blocker_logit:
+  object_eta = 0.5931
+  prompt_eta = 0.1615
+```
+
+解释：
+
+```text
+GLM4 不是没有结构；
+而是当前任务主要触发 protocol / prompt 方向变化，
+没有触发 strong-edge interaction。
+```
+
+#### 3. DS7B
+
+protocol-like 特征：
+
+```text
+object_minus_blocker_logit:
+  prompt_eta = 0.7163
+
+blocker_pressure:
+  prompt_eta = 0.5705
+
+route_gap:
+  prompt_eta = 0.5705
+```
+
+semantic-like 特征：
+
+```text
+best_target_object_resid_final:
+  object_eta = 0.8508
+```
+
+entangled 特征：
+
+```text
+original_margin:
+  object_eta = 0.4568
+  prompt_eta = 0.3605
+
+object_echo_pressure:
+  object_eta = 0.4568
+  prompt_eta = 0.3605
+```
+
+解释：
+
+```text
+DS7B 有强语义对象信号，
+但 strong-edge holdout 失败，
+说明对象信号没有稳定转成路线门控。
+```
+
+### 六、反事实最小割预筛结果
+
+confirm 轮中：
+
+qwen3：
+
+```text
+L29C1532:
+  total = 270
+  strong = 30
+  strong_rate = 0.1111
+  lift = 1.6667
+  status = counterfactual_min_cut_candidate
+
+L27C2767:
+  total = 180
+  strong = 20
+  strong_rate = 0.1111
+  lift = 1.6667
+  status = counterfactual_min_cut_candidate
+```
+
+DS7B：
+
+```text
+L27C2295:
+  total = 180
+  strong = 3
+  strong_rate = 0.0167
+  lift = 3.0000
+  status = counterfactual_min_cut_candidate
+```
+
+但 DS7B 的 strong 总数太少，所以低置信。
+
+GLM4：
+
+```text
+没有 strong-edge，无法产生最小割候选。
+```
+
+结论：
+
+```text
+反事实最小割思路正确，
+但 Phase 851 只能给出预候选。
+真正验证必须在下一阶段做 ablation / restoration。
+```
+
+### 七、对上传方案的审慎判断
+
+正确部分：
+
+```text
+1. 从局部响应图谱升级到状态-路线-齿轮-边界-闭合图谱是必要方向。
+2. I/R/F/O/S 分解有助于防止语义和语法混淆。
+3. R_S(x) 和 alpha_j(x) 是描述非线性交互的关键对象。
+4. full-vocabulary blocker 和 exact-natural consistency 是闭合标准中不可缺少的部分。
+5. 分层门控、最小割、正交性审计都能转成可执行工程步骤。
+```
+
+需要收紧的部分：
+
+```text
+1. 不能说现有砖块已经足够砌成完整建筑。
+   目前还缺 strong-edge 扩展数据和 full-vocab blocker 验证。
+
+2. 分层门控不能写成新的黑盒神经网络。
+   否则只是用小黑盒拟合大黑盒。
+
+3. counterfactual min-cut 不能只靠 lift 统计。
+   必须做真实消融和恢复。
+
+4. protocol-semantic orthogonality 目前只是低成本审计，
+   不是完整正交分解。
+```
+
+### 八、智能理论进展
+
+本阶段把智能理论中的“语言机制图谱”进一步具体化：
+
+```text
+语言生成不是语义向量直接读出；
+而是状态、路线、齿轮、门控、边界、闭合共同构成的动态系统。
+```
+
+一个更稳妥的公式是：
+
+$$
+h_{t+1}
+=
+F
+\left(
+h_t,
+x_t,
+G_{\text{macro}}(x_t),
+G_{\text{meso}}(x_t),
+G_{\text{micro}}(h_t,x_t)
+\right)
+$$
+
+其中：
+
+```text
+G_macro:
+  prompt / task / protocol 级路线选择。
+
+G_meso:
+  sign pattern / combo type / edit mode 级中观门控。
+
+G_micro:
+  residual projection / blocker pressure / route gap 级局部强边门控。
+```
+
+输出不是单个 target token，而是竞争场闭合：
+
+$$
+y_t
+=
+\arg\max_{v\in V}
+\left[
+Readout_v(h_t)
+-
+Blocker_v(h_t)
++
+Protocol_v(h_t)
+-
+Echo_v(h_t)
+\right]
+$$
+
+当前最接近机制图谱的对象不是：
+
+```text
+单个 neuron；
+单个 head；
+单个语义方向。
+```
+
+而是：
+
+```text
+能跨 object / prompt 预测 strong-edge 的 gate edge。
+```
+
+### 九、当前硬伤
+
+硬伤一：
+
+```text
+本阶段仍未新增模型前向数据。
+```
+
+它只是图谱结构审计，不是新机制发现。
+
+硬伤二：
+
+```text
+strong-edge 样本仍不足。
+```
+
+尤其是：
+
+```text
+GLM4 = 0
+DS7B = 3
+```
+
+硬伤三：
+
+```text
+正交性审计只是基于 object / prompt 分组的 eta^2。
+它不能证明真正神经子空间正交。
+```
+
+硬伤四：
+
+```text
+最小割候选只是统计预筛。
+没有真实 ablation / restoration 就不能叫因果瓶颈。
+```
+
+硬伤五：
+
+```text
+小模型偏差仍然严重。
+```
+
+可能存在：
+
+```text
+1. 小模型路线粗糙；
+2. 蒸馏模型使用捷径；
+3. 局部通道承担过多功能；
+4. GLM4 与 qwen3 / DS7B 的模块契约不同。
+```
+
+### 十、阶段性结论
+
+Phase 851 是必要的图谱工程进展，但不是模型机制闭合。
+
+它完成的是：
+
+```text
+1. 把上传的战略升级方案转成可运行审计脚本。
+2. 把 gate 候选写入证据等级。
+3. 初步区分 protocol-like / semantic-like / entangled 特征。
+4. 给出反事实最小割预候选。
+5. 明确下一轮必须重新进行模型前向测试。
+```
+
+最重要的客观结果：
+
+```text
+qwen3 residual_projection_combo:
+  L5 strong-edge holdout candidate。
+
+qwen3 internal_strength_combo:
+  弱 L5 candidate。
+
+qwen3 blocker_field_combo:
+  L4 partial candidate。
+
+DS7B blocker_field_combo:
+  L3 in-sample only。
+
+GLM4:
+  L0 untriggered。
+```
+
+当前进度评估：
+
+```text
+全局齿轮图谱 schema:
+  约 40%
+
+strong-edge gate 机制定位:
+  qwen3 约 50%
+  DS7B 约 20%
+  GLM4 暂不可评价
+
+语言编码机制闭合:
+  约 10%-15%
+```
+
+### 十一、下一阶段任务
+
+Phase 851 已经完成结构审计。
+
+下一步仍属于全局齿轮图谱大方向，但已经是新的前向测试阶段：
+
+```text
+Phase 852:
+Strong-edge Expansion Forward Test
+（强交互边扩展前向测试）
+```
+
+核心任务：
+
+```text
+1. qwen3:
+   扩大 strong-edge 样本，验证 residual_projection 是否仍为 L5。
+
+2. DS7B:
+   增加强边样本，判断 blocker_field 是否只是样本内捷径。
+
+3. GLM4:
+   构造更困难任务，先触发非 additive interaction。
+
+4. qwen3 min-cut:
+   对 L29C1532 / L27C2767 做 ablation / restoration。
+
+5. full-vocabulary blocker:
+   把输出画像从 residual class 扩展到全词表 blocker field。
+```
+
+最低成功标准：
+
+```text
+1. qwen3 strong rows 至少扩大到当前 3 倍以上。
+2. qwen3 residual_projection 在 object / prompt holdout 中继续优于 global。
+3. DS7B strong rows 达到可评价数量。
+4. GLM4 至少出现可评价的 synergy / antagonistic。
+5. min-cut 候选经过真实干预后仍能改变 strong-edge 或 blocker field。
+```
+
+最终判断：
+
+```text
+Phase 851 把“战略上正确的全局齿轮图谱”变成了“可审计的 atlas schema”。
+它没有完成闭合，但显著提高了后续实验的约束力。
+下一步必须回到模型前向测试，否则会停留在图谱设计层。
+```
+
+## Phase 852: 智能理论与全局齿轮图谱最新整合 [2026-07-02 16:11]
+
+### 一、任务
+
+本阶段没有进行新的模型测试，任务是读取附件中关于 Phase 20-848 历史研究对“全局齿轮图谱”的分析，并与当前研究进展、Phase 850-851 的 atlas schema / strong-edge gate / orthogonality audit 结果合并，更新 `research/IntelligentTheory.md`。
+
+核心问题：
+
+```text
+当前理论是否真正参考了附件中的分析？
+如果参考不足，应如何把附件中的历史主线正式并入最新智能理论？
+```
+
+### 二、判断
+
+原 `IntelligentTheory.md` 已经部分吸收附件方向，例如：
+
+```text
+相对编码
+条件化状态
+生成场闭合
+协议门控
+全词表竞争
+```
+
+但是吸收不完整。原理论仍偏向“状态公式 + 生成闭合公式”，没有充分把附件中的历史主线组织成可操作的全局图谱：
+
+```text
+语法方向
+→ 语义属性
+→ 局部算子 / Jacobian
+→ 语法因果回路
+→ 约束动力学
+→ 关系 / 算子伪影审计
+→ 子空间拓扑
+→ Attention / MLP 契约
+→ Identity-Role-Frame-Operator 分解
+```
+
+本阶段已把附件正式并入理论体系，最新理论名称更新为：
+
+```text
+预测充分相对状态—全局齿轮图谱—生成场闭合理论
+```
+
+### 三、更新内容
+
+已在 `research/IntelligentTheory.md` 中补充：
+
+```text
+7.7 2026-07-02 最新整合：预测充分相对状态—全局齿轮图谱—生成场闭合理论
+```
+
+核心更新包括：
+
+```text
+1. 明确判断：当前理论此前只部分参考附件，本次更新后正式吸收附件历史分析。
+2. 把语言机制从“状态闭合公式”升级为“四层结构”：
+   预测充分相对状态
+   全局齿轮图谱
+   条件化路线门控
+   生成场闭合
+3. 把图谱从组件响应表升级为：
+   状态变量图谱
+   路线图谱
+   齿轮交互图谱
+   边界闭合图谱
+   自然一致性验证图谱
+4. 加入 Phase 850-851 的最新证据等级：
+   qwen3 residual_projection_combo 接近 L5 strong-edge holdout candidate
+   qwen3 internal_strength_combo 为弱 L5 candidate
+   qwen3 blocker_field_combo 为 L4 partial candidate
+   DS7B blocker_field_combo 为 L3 in-sample only
+   GLM4 当前为 L0 untriggered
+5. 修正整体进度评估。
+```
+
+### 四、核心公式
+
+预测充分状态等价类：
+
+```text
+h_a ~_pred h_b
+  iff
+P(. | h_a, x_<=t) ≈ P(. | h_b, x_<=t)
+```
+
+角色纤维状态分解：
+
+```text
+h_l(x,r)
+  =
+M_l(x)
++ A_l(r)
++ B_l(x,r)
++ epsilon_l
+```
+
+全局齿轮图谱：
+
+```text
+G_language
+  =
+(
+  V_s,
+  V_r,
+  V_g,
+  V_a,
+  V_b,
+  E_c,
+  E_i,
+  E_t,
+  E_f,
+  Omega
+)
+```
+
+条件齿轮边：
+
+```text
+E_ij(x)
+  =
+alpha_ij(x) * R_ij(x)
+
+alpha_ij(x)
+  =
+Psi_ij(
+  h_route,
+  h_object,
+  h_prompt,
+  h_format,
+  h_blocker,
+  h_operator
+)
+```
+
+边界竞争场：
+
+```text
+B^(k)(x)
+  =
+B_0^(k)(x)
++ sum_g Delta_g^(k)(x)
++ sum_{S_j subset S} alpha_j(x) R_{S_j}^{(k)}(x)
++ epsilon^(k)(x)
+```
+
+多层闭合：
+
+```text
+Closure(x)
+  =
+C_token(x)
+* C_class(x)
+* C_span(x)
+* C_protocol(x)
+* C_blocker(x)
+* C_exact-natural(x)
+
+C_blocker(x)
+  =
+1[B_full(x) = empty]
+```
+
+### 五、理论进展
+
+最新理论的关键进展是：把“语言编码机制”从静态语义图谱或单点 patch 机制，转成一个可审计的条件动力系统：
+
+```text
+输入 / prompt protocol
+→ identity / role / frame / operator / scope / binding
+→ semantic / object / category / format / echo / protocol / blocker routes
+→ reader / router / carrier / writer / rewriter / suppressor / gate gears
+→ macro / meso / micro conditional gates
+→ token / answer-class / span / rollout boundaries
+→ full-vocabulary blocker + exact-natural consistency + natural generation rollout
+```
+
+最重要的收紧是：
+
+```text
+当前最接近机制不变量的对象，不是齿轮本体，
+而是能在 holdout 中预测 strong-edge 的条件齿轮边。
+```
+
+### 六、问题和硬伤
+
+当前理论仍不能视为语言编码机制闭合：
+
+```text
+1. qwen3 strong-edge gate 证据较强，但 GLM4 / DS7B 没有同等级证据。
+2. 小模型内部结构可能粗糙，局部齿轮可能是压缩后的替代机制。
+3. orthogonality audit 只能区分 protocol-like / semantic-like / entangled，不能直接证明因果路线。
+4. counterfactual min-cut 仍是候选，尚未完成强干预验证。
+5. full-vocabulary blocker field 尚未闭合。
+6. 当前公式能做机制诊断，还不能稳定预测自然生成全过程。
+```
+
+### 七、进度修正
+
+更严格的进度评估：
+
+```text
+理论组织完整度：
+  82% - 88%
+
+图谱 schema 可执行度：
+  45% - 55%
+
+跨模型稳定机制证据：
+  20% - 30%
+
+完整语言编码机制闭合：
+  10% - 18%
+```
+
+这比之前“机制闭合度 70%-78%”更谨慎。旧数字更接近理论组织成熟度，不应直接解释为语言编码机制已经接近闭合。
+
+### 八、下一阶段
+
+本阶段属于理论整合阶段，和 Phase 851 处于同一个大阶段：全局齿轮图谱建设。
+
+接下来应进入新的模型前向验证阶段：
+
+```text
+Phase 853:
+Global Gear Atlas Strong-Edge Expansion and Natural Closure Validation
+```
+
+核心目标：
+
+```text
+1. 扩大 qwen3 residual_projection strong-edge 样本。
+2. 判断 protocol-like / semantic-like / entangled 特征是否跨模型稳定。
+3. 对 counterfactual min-cut 候选做 do-style 干预。
+4. 测试 strong-edge gate 是否能改善 full-vocabulary blocker field。
+5. 把验证标准推进到 exact-natural consistency 和 natural rollout closure。
+```
+
+阶段性闭合标准：
+
+```text
+条件齿轮边必须跨对象、跨 prompt、跨语义域、跨模型，
+并在自然生成中稳定改变 blocker field，
+才能从“机制候选图谱”推进到“语言编码机制闭合图谱”。
+```
+
+## Phase 853: 强交互边扩展与自然闭合验证 [2026-07-02 16:58]
+
+### 一、任务
+
+本阶段承接 Phase 851 / Phase 852。
+
+Phase 851 是 schema audit / candidate ranking，Phase 852 是理论整合，二者都不是新的模型机制闭合实验。根据最新附件判断，当前必须回到模型前向测试，否则会停留在图谱设计层。
+
+本阶段目标：
+
+```text
+1. 扩大 qwen3 residual_projection strong-edge 样本。
+2. 判断 GLM4 是否只是未触发。
+3. 判断 DS7B blocker_field 是否仍是样本内捷径。
+4. 把 strong-edge 与 exact-natural consistency 放在同一测试里。
+5. 检查扩展 gear / combo 后是否能推动自然闭合。
+```
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase853_strong_edge_expansion_natural_closure_validation.py
+tests/glm5/run_phase853_strong_edge_expansion_natural_closure_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase853_strong_edge_expansion_natural_closure_validation/
+```
+
+三轮测试：
+
+```text
+smoke:
+  1 object / 1 prompt / top4 gears
+
+main:
+  5 objects / 3 prompts / top8 gears / 18 pairs / 8 triplets
+
+confirm:
+  5 objects / 3 prompts / top10 gears / 24 pairs / 12 triplets
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16
+quantization off
+flash_attention_2 优先
+本机未安装 FlashAttention2，自动回退 sdpa
+```
+
+说明：
+
+```text
+没有使用量化。
+每次只加载一个模型，完成后释放 GPU。
+```
+
+### 三、测试原理
+
+本阶段重新运行模型前向传播，不只是复用旧表。
+
+对每个模型：
+
+```text
+1. 读取 Phase 844 top gears。
+2. 加入 Phase 851 counterfactual min-cut pre-candidates。
+3. 构造 single / pair / triplet / focus combo。
+4. 对 object / prompt 逐一做原始输出、单齿轮干预、组合齿轮干预。
+5. 计算组合交互残差。
+6. 采集 residual_projection / blocker_field / route_gap 等 gate feature。
+7. 复用 Phase 850 的 strong-edge holdout 评价。
+8. 同时计算 natural output boundary 和 exact-natural consistency。
+```
+
+交互残差公式：
+
+```text
+R_S(x)
+  =
+Delta_S(x)
+  -
+sum_{g in S} Delta_g(x)
+```
+
+strong-edge 定义：
+
+```text
+R_S(x) >= 0.5:
+  synergy
+
+R_S(x) <= -0.5:
+  antagonistic
+
+otherwise:
+  additive
+```
+
+自然一致性定义：
+
+```text
+exact_natural_consistency
+  =
+target_transition
+and
+best_target_rank == 1
+```
+
+这比只看 target logit 更严格，因为它要求自然输出边界和首词元竞争同时通过。
+
+### 四、confirm 轮核心结果
+
+```text
+qwen3:
+  rows = 1395
+  interaction rows = 1080
+  strong rows = 62
+  classes = additive 1018 / synergy 33 / antagonistic 29
+  strong rows 中 target_equivalent = 38
+  exact-natural strong = 0
+
+GLM4:
+  rows = 1395
+  interaction rows = 1080
+  strong rows = 1
+  classes = additive 1079 / antagonistic 1
+  exact-natural strong = 0
+
+DS7B:
+  rows = 1425
+  interaction rows = 1110
+  strong rows = 8
+  classes = additive 1102 / synergy 8
+  strong rows 中 target_equivalent = 5
+  exact-natural strong = 0
+```
+
+相对 Phase 850：
+
+```text
+qwen3 strong rows:
+  34 -> 62
+
+GLM4 strong rows:
+  0 -> 1
+
+DS7B strong rows:
+  3 -> 8
+```
+
+客观结果：
+
+```text
+扩展 gear / combo 能增加 strong-edge；
+但 strong-edge 没有推进到 exact-natural closure。
+```
+
+### 五、gate holdout 结果
+
+confirm 轮 qwen3：
+
+```text
+global_combo:
+  in_sample F1 = 0.4098
+  object_holdout F1 = 0.3151
+  prompt_holdout F1 = 0.3684
+  object balanced F1 = 0.5227
+  prompt balanced F1 = 0.6022
+
+residual_projection_combo:
+  in_sample F1 = 0.8500
+  object_holdout F1 = 0.4167
+  prompt_holdout F1 = 0.4615
+  object balanced F1 = 0.5376
+  prompt balanced F1 = 0.5581
+```
+
+判断：
+
+```text
+residual_projection_combo 在 raw object / prompt holdout 上仍优于 global；
+但 balanced prompt holdout 低于 global。
+```
+
+因此，Phase 850 / 851 对 qwen3 residual_projection 的 L5 判断需要收紧：
+
+```text
+原 confirm 集:
+  L5 strong-edge holdout candidate。
+
+Phase 853 扩展集:
+  更稳妥地降为 L4 partial holdout candidate。
+```
+
+这不是推翻 residual_projection，而是说明它仍是强候选，但没有跨扩展集稳定通过严格 L5。
+
+GLM4：
+
+```text
+strong rows = 1 / 1080
+object_holdout F1 = 0
+prompt_holdout F1 = 0
+exact-natural = 0
+```
+
+DS7B：
+
+```text
+strong rows = 8 / 1110
+object_holdout F1 = 0
+prompt_holdout F1 = 0
+exact-natural = 0
+```
+
+### 六、理论进展
+
+Phase 853 最重要的进展是把 Phase 851 / 852 的图谱理论拉回真实模型前向测试。
+
+得到的拼图：
+
+```text
+1. strong-edge 可以通过扩展 gear / combo 被增加。
+2. qwen3 residual_projection 仍然是最强候选。
+3. GLM4 在当前 geometry route 上仍极难触发 strong-edge。
+4. DS7B blocker_field 仍像样本内捷径。
+5. strong-edge 与 natural closure 之间存在明显断层。
+```
+
+最关键结论：
+
+```text
+strong-edge 是机制入口，
+但不是生成闭合。
+```
+
+也就是说，当前图谱能看到局部条件齿轮边如何改变边界场，但还没有看到它如何清空 full-vocabulary blocker field 并通过 exact-natural boundary。
+
+### 七、问题和硬伤
+
+```text
+1. qwen3 strong rows 从 34 增加到 62，但未达到 3 倍扩展目标。
+2. qwen3 residual_projection 在扩展集上不再满足严格 L5。
+3. GLM4 仍几乎未触发 strong-edge。
+4. DS7B holdout 继续失败。
+5. 三模型 exact-natural strong 全部为 0。
+6. 当前 blocker 只做了 proxy，尚未做完整 full-vocabulary blocker field 清空验证。
+7. Phase 851 min-cut 候选已进入 focus combo，但还没有做真正 do-style ablation / restoration。
+8. 当前任务仍是 geometry route，小模型内部机制可能较粗糙，不能上升为完整语言编码机制。
+```
+
+### 八、阶段性结论
+
+本阶段不是闭合阶段，而是一次重要收紧：
+
+```text
+Phase 853 证明：
+扩大组合可以增加 strong-edge，
+但 strong-edge 不能自动变成 exact-natural closure。
+```
+
+对当前理论的修正：
+
+```text
+条件齿轮边是必要对象；
+但仅有条件齿轮边还不足以破解语言编码机制。
+
+必须继续加入：
+full-vocabulary blocker field
+answer-class closure
+span closure
+rollout closure
+```
+
+### 九、下一阶段
+
+下一阶段仍属于全局齿轮图谱大阶段，但任务应从“扩大 strong-edge”转向“解释 strong-edge 为什么不能闭合”：
+
+```text
+Phase 854:
+Full-Vocabulary Blocker Field and Min-Cut Causal Validation
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 的 strong-edge rows 做 full-vocabulary blocker field 分解。
+2. 只保留 strong-edge 中 target_equivalent 但 exact-natural 失败的样本。
+3. 找出阻止 exact-natural 的 top blocker / format blocker / object echo blocker。
+4. 对 qwen3 L29C1532 / L27C2767 做 do-style ablation / restoration。
+5. 判断 min-cut 候选是否能改变 blocker field，而不是只改变 residual。
+6. GLM4 需要另设更困难任务触发 strong-edge，不宜继续在当前 geometry route 上堆组合。
+7. DS7B 需要区分 blocker_field 样本内捷径和真实因果门控。
+```
+
+## Phase 854: 全词表阻塞场与最小割因果验证 [2026-07-02 17:28]
+
+### 一、任务背景
+
+本阶段接续 Phase 853。
+
+Phase 853 的核心结果是：
+
+```text
+strong-edge 可以通过扩展 gear / combo 增加；
+但三模型 strong-edge 的 exact-natural consistency 均为 0。
+```
+
+这说明：
+
+```text
+strong-edge 是机制入口；
+但 strong-edge 不等于 natural generation closure。
+```
+
+因此 Phase 854 不继续扩大 strong-edge 数量，而是检查：
+
+```text
+Phase 853 中 target_equivalent 但 exact-natural 失败的 strong-edge，
+到底是目标类没有赢得首词元竞争，
+还是 strict token 标准过窄、别名 / 格式 / rollout 没有闭合？
+```
+
+### 二、脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase854_full_vocab_blocker_min_cut_validation.py
+tests/glm5/run_phase854_full_vocab_blocker_min_cut_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase854_full_vocab_blocker_min_cut_validation/
+```
+
+已完成三轮：
+
+```text
+smoke
+main
+confirm
+```
+
+模型运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+运行设置：
+
+```text
+bf16
+quantization = off
+flash_attention_2 优先
+环境缺少 FlashAttention2，因此自动回退 sdpa
+```
+
+### 三、测试原理
+
+Phase 854 从 Phase 853 confirm 结果中抽取 interaction rows，分为三类：
+
+```text
+strong_target_not_exact:
+  strong-edge 且自然边界进入 target_equivalent，
+  但 exact-natural consistency 失败。
+
+strong_non_target_or_unknown:
+  strong-edge 但自然边界不是目标类。
+
+additive_control:
+  非 strong-edge 的加和对照行。
+```
+
+对每个 source row 计算四类条件：
+
+```text
+original:
+  原始状态。
+
+full_combo:
+  Phase 853 中的完整组合齿轮干预。
+
+candidate_only:
+  只保留一个候选齿轮。
+
+without_candidate:
+  在 full_combo 中去掉一个候选齿轮。
+```
+
+其中 without_candidate 用于 leave-one-gear min-cut 检查：
+
+```text
+如果 full_combo 清空 blocker，
+但去掉某个 candidate 后 blocker 重新出现，
+则该 candidate 暂记为 necessary_blocker_reducer。
+```
+
+### 四、核心公式
+
+Phase 853 使用的 strict exact-natural 标准为：
+
+```text
+exact_natural_consistency
+  =
+target_transition
+and
+best_target_rank == 1
+```
+
+Phase 854 发现这个标准过粗，因为模型可能输出：
+
+```text
+Geometry
+Shape
+Polygon
+polygon
+shape
+```
+
+这些并不等于 canonical first token，但属于同一答案类。
+
+因此本阶段加入 answer-class closure：
+
+```text
+C_answer-class(x)
+  =
+1[
+  max_{t in A(y)} z_t(x)
+  >
+  max_{u notin A(y)} z_u(x)
+]
+```
+
+其中：
+
+```text
+A(y):
+  目标答案类别的首词元别名集合。
+```
+
+本阶段使用的几何答案类别名包括：
+
+```text
+geometric
+Geometric
+geometry
+Geometry
+shape
+Shape
+polygon
+Polygon
+以及带前置空格的变体
+```
+
+全词表 blocker 定义为：
+
+```text
+B_full(x)
+  =
+{
+  u notin A(y):
+  z_u(x) > max_{t in A(y)} z_t(x)
+}
+```
+
+answer-class blocker closure 为：
+
+```text
+C_full-blocker(x)
+  =
+1[B_full(x)=empty]
+```
+
+min-cut 候选验证：
+
+```text
+g 是 necessary_blocker_reducer
+
+当且仅当：
+
+full_combo 相对 original 减少 answer-class blocker，
+且 without_g 相对 full_combo 重新增加 blocker。
+```
+
+### 五、confirm 轮客观结果
+
+#### 1. qwen3
+
+```text
+source rows = 60
+full combo rows = 60
+answer-class closure = 42
+strict token closure = 0
+improved class blockers = 11
+worsened class blockers = 18
+necessary blocker reducer = 10
+```
+
+source group：
+
+```text
+strong_target_not_exact = 32
+strong_non_target_or_unknown = 16
+additive_control = 12
+```
+
+其中：
+
+```text
+strong_target_not_exact answer-class closure = 23 / 32
+```
+
+full_combo 条件均值：
+
+```text
+mean strict blocker count = 667.77
+mean class blocker count = 0.83
+mean strict best target rank = 668.77
+mean class best target rank = 1.83
+mean class-object logit = 3.60
+```
+
+qwen3 未闭合的 class blocker 主要包括：
+
+```text
+Shapes
+quadr
+Circle
+```
+
+其中 Shapes / quadr 可能仍属于几何答案类，说明当前 alias set 偏保守。
+
+#### 2. GLM4
+
+```text
+source rows = 13
+full combo rows = 13
+answer-class closure = 12
+strict token closure = 0
+improved class blockers = 1
+worsened class blockers = 0
+necessary blocker reducer = 2
+```
+
+source group：
+
+```text
+strong_non_target_or_unknown = 1
+additive_control = 12
+strong_target_not_exact = 0
+```
+
+full_combo 条件均值：
+
+```text
+mean strict blocker count = 324.08
+mean class blocker count = 0.23
+mean strict best target rank = 325.08
+mean class best target rank = 1.23
+mean class-object logit = 2.39
+```
+
+解释：
+
+```text
+GLM4 当前几乎没有 strong_target_not_exact 样本，
+所以 answer-class closure 高不能说明 GLM4 已触发核心机制。
+它仍是 under-triggered 状态。
+```
+
+#### 3. DS7B
+
+```text
+source rows = 20
+full combo rows = 20
+answer-class closure = 17
+strict token closure = 0
+improved class blockers = 5
+worsened class blockers = 3
+necessary blocker reducer = 2
+```
+
+source group：
+
+```text
+strong_target_not_exact = 5
+strong_non_target_or_unknown = 3
+additive_control = 12
+```
+
+其中：
+
+```text
+strong_target_not_exact answer-class closure = 5 / 5
+```
+
+full_combo 条件均值：
+
+```text
+mean strict blocker count = 458.45
+mean class blocker count = 0.75
+mean strict best target rank = 459.45
+mean class best target rank = 1.75
+mean class-object logit = 0.03
+```
+
+DS7B 未闭合 blocker 主要是：
+
+```text
+format_space
+```
+
+说明 DS7B 的失败更像格式 / 空格首 token 竞争，而不只是语义目标失败。
+
+### 六、min-cut 结果
+
+qwen3：
+
+```text
+edge rows = 157
+necessary_blocker_reducer = 10
+single_sufficient_partial_reducer = 2
+candidate_harmful_or_antagonistic = 22
+weak_or_no_min_cut_effect = 123
+phase851_candidate_edges = 74
+necessary_phase851_candidate_edges = 10
+```
+
+GLM4：
+
+```text
+edge rows = 31
+necessary_blocker_reducer = 2
+single_sufficient_partial_reducer = 1
+weak_or_no_min_cut_effect = 28
+phase851_candidate_edges = 0
+```
+
+DS7B：
+
+```text
+edge rows = 50
+necessary_blocker_reducer = 2
+single_sufficient_partial_reducer = 7
+candidate_harmful_or_antagonistic = 3
+weak_or_no_min_cut_effect = 38
+phase851_candidate_edges = 12
+necessary_phase851_candidate_edges = 0
+```
+
+判断：
+
+```text
+leave-one-gear 能找到少量 necessary blocker reducer，
+但比例很低。
+min-cut 候选仍是稀疏局部因果边，不是完整路径闭合。
+```
+
+### 七、对 Phase 853 的修正
+
+Phase 853 的结论：
+
+```text
+strong-edge 不等于 exact-natural closure。
+```
+
+Phase 854 的新修正：
+
+```text
+strong-edge 中有相当一部分已经达到 answer-class blocker closure；
+但 strict canonical token、span、protocol、rollout 仍未闭合。
+```
+
+因此，Phase 853 的 exact-natural strong = 0 不能简单理解为：
+
+```text
+目标答案类完全没有赢。
+```
+
+更准确的解释是：
+
+```text
+目标答案类经常已经赢得首词元场；
+但输出还没有收敛到 canonical token 和自然生成协议。
+```
+
+这把失败位置从“是否找到答案类”向后移动到了：
+
+```text
+alias selection
+format boundary
+span construction
+rollout stability
+```
+
+### 八、理论进展
+
+当前全局齿轮图谱需要从单一闭合标准升级为分层闭合：
+
+```text
+strong-edge
+  ->
+answer-class first-token closure
+  ->
+strict token closure
+  ->
+span closure
+  ->
+protocol closure
+  ->
+rollout closure
+```
+
+这说明：
+
+```text
+全局齿轮图谱已经能解释一部分答案类首词元场重排；
+但还不能解释 canonical token、别名选择、格式协议和后续自然展开。
+```
+
+从智能理论角度看，语言生成不是单一 token 选择，而是：
+
+```text
+答案类别场
++ 别名选择场
++ 格式协议场
++ 后续 rollout 场
+```
+
+共同闭合的结果。
+
+因此，破解语言编码机制不能只看：
+
+```text
+target logit
+strong-edge
+single canonical token
+```
+
+而要看：
+
+```text
+answer-class field
+full-vocabulary blocker field
+alias field
+span field
+rollout field
+```
+
+### 九、问题和硬伤
+
+```text
+1. strict token closure 三模型仍全部为 0。
+2. answer-class alias set 仍不完整，Shapes / quadr 等可能被误判为 blocker。
+3. qwen3 full combo 60 条中有 18 条 worsened class blockers，说明部分组合会破坏答案类场。
+4. qwen3 157 条候选边中只有 10 条 necessary blocker reducer，min-cut 仍稀疏。
+5. DS7B 的 answer-class closure 可能是小模型压缩捷径，不能直接外推到大模型。
+6. GLM4 当前 strong 样本太少，仍不能判断其真实机制。
+7. 本阶段仍是 first-step blocker audit，没有验证 span closure 和 natural rollout。
+8. 小模型内部结构可能较为粗糙，局部齿轮可能承担多个功能，导致 blocker / alias / format 混在同一通道中。
+```
+
+### 十、闭合标准距离
+
+当前进度应严格分层：
+
+```text
+strong-edge detection:
+  qwen3 已有较强证据。
+
+answer-class first-token closure:
+  qwen3 / DS7B 在当前几何任务上已有明显正结果。
+
+strict token closure:
+  三模型均为 0。
+
+span closure:
+  未验证。
+
+rollout closure:
+  未验证。
+
+跨模型稳定机制：
+  仍弱。
+```
+
+总体判断：
+
+```text
+离完整语言编码机制闭合仍远；
+但已经从“找局部 strong-edge”
+推进到“定位闭合失败发生在哪一层”。
+```
+
+### 十一、下一阶段
+
+下一阶段仍属于当前全局齿轮图谱大阶段，应继续自动推进到：
+
+```text
+Phase 855:
+Answer-Class Alias Field and Rollout Closure Validation
+```
+
+核心任务：
+
+```text
+1. 扩展答案类别名集合，加入 Geometry / Shapes / quadrilateral / polygon / shape 等真实生成别名。
+2. 验证 answer-class closure 是否能预测 span closure。
+3. 对 qwen3 的 10 条 necessary blocker reducer 做更多对象和 prompt 的复测。
+4. 对 blocker worsened 的组合单独建立 harmful gear atlas。
+5. GLM4 需要更换或增加任务触发路线，不宜继续在当前 geometry route 上低效堆组合。
+6. DS7B 需要更多对照区分 answer-class 捷径和真实路线闭合。
+```
+
+阶段结论：
+
+```text
+Phase 854 是实质进展，但不是闭合阶段。
+它证明 Phase 853 的 exact-natural=0 不能简单视为目标类失败；
+大量 strong-edge 已经进入 answer-class blocker closure。
+下一步必须验证从 answer-class closure 到 span / rollout closure 的关系。
+```
+
+## Phase 855: 答案类别名场与短 Rollout 闭合验证 [2026-07-02 17:38]
+
+### 一、任务背景
+
+Phase 854 证明：
+
+```text
+strict token closure = 0
+但 answer-class blocker closure 大量存在。
+```
+
+这说明 Phase 853 的 exact-natural strong = 0 不能简单视为目标类失败。
+
+Phase 855 继续验证：
+
+```text
+answer-class first-token closure
+是否能预测短 greedy rollout 的答案类闭合？
+```
+
+这一步仍属于当前全局齿轮图谱阶段，因为它直接检查：
+
+```text
+first-token field
+->
+short rollout field
+```
+
+之间是否存在稳定关系。
+
+### 二、脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase855_answer_class_alias_rollout_closure_validation.py
+tests/glm5/run_phase855_answer_class_alias_rollout_closure_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase855_answer_class_alias_rollout_closure_validation/
+```
+
+已完成三轮：
+
+```text
+smoke
+main
+confirm
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+运行设置：
+
+```text
+bf16
+quantization = off
+flash_attention_2 优先
+环境缺少 FlashAttention2，因此自动回退 sdpa
+```
+
+### 三、测试原理
+
+从 Phase 854 confirm 的 full_combo rows 中选择：
+
+```text
+strong_target_class_closed
+strong_target_class_open
+strong_other
+additive_control
+```
+
+对每行运行：
+
+```text
+original
+full_combo
+without_necessary
+```
+
+其中 without_necessary 来自 Phase 854 的 necessary_blocker_reducer。
+
+本阶段将 answer-class alias set 扩展为：
+
+```text
+geometric shape
+geometric shapes
+geometry
+geometric
+shape
+shapes
+polygon / polygons
+quadrilateral / quadrilaterals
+round shape
+closed curve
+```
+
+但仍然优先把对象自身输出记为 object_echo，用于检测身份路线和类别路线的纠缠。
+
+### 四、核心公式
+
+answer-class first-token closure：
+
+```text
+C_answer-class(x)
+  =
+1[
+  max_{t in A(y)} z_t(x)
+  >
+  max_{u notin A(y)} z_u(x)
+]
+```
+
+短 rollout 答案类闭合：
+
+```text
+C_alias-rollout(x)
+  =
+1[
+  Rollout(x) in AliasSpan(A(y))
+]
+```
+
+身份-类别分离：
+
+```text
+C_id-class-sep(x)
+  =
+1[
+  Rollout(x)
+  notin
+  I(o) \\ A(y)
+]
+```
+
+其中：
+
+```text
+A(y):
+  答案类别名集合。
+
+I(o):
+  对象身份词集合。
+```
+
+当对象名本身也可能是类别词时，例如：
+
+```text
+object = polygon
+answer alias includes polygon
+```
+
+需要进入 identity-class overlap audit，不能简单判定成功或失败。
+
+### 五、confirm 轮客观结果
+
+#### 1. qwen3
+
+```text
+sources = 60
+full_combo first-token answer-class closure = 57
+full_combo rollout answer-class = 57
+strict rollout = 0
+object echo = 3
+first-token -> rollout F1 = 1.0000
+```
+
+source group：
+
+```text
+strong_target_not_exact = 32
+strong_non_target_or_unknown = 16
+additive_control = 12
+```
+
+qwen3 full_combo 的 rollout labels：
+
+```text
+answer_alias = 57
+object_echo = 3
+```
+
+qwen3 strong_target_not_exact：
+
+```text
+32 / 32 rollout answer-class
+```
+
+典型输出：
+
+```text
+Shape
+Geometry
+Shapes
+polygon
+Polygon
+quadrilateral
+Quadrilateral
+```
+
+判断：
+
+```text
+在当前 geometry route 上，
+qwen3 的 expanded answer-class first-token closure
+几乎可以预测短 rollout answer-class closure。
+```
+
+但注意：
+
+```text
+strict canonical rollout = 0
+```
+
+因此这不是 exact-natural closure，而是答案类别名闭合。
+
+#### 2. GLM4
+
+```text
+sources = 13
+full_combo first-token answer-class closure = 12
+full_combo rollout answer-class = 12
+strict rollout = 7
+object echo = 0
+first-token -> rollout F1 = 1.0000
+```
+
+典型输出：
+
+```text
+Geometric Shape
+Shape
+A perfect circle
+```
+
+判断：
+
+```text
+GLM4 在当前 full_combo 样本中 rollout 质量不弱，
+但由于 Phase 853 / 854 中 strong-edge 触发样本太少，
+仍不能说明 GLM4 的 strong-edge gate 已定位。
+```
+
+#### 3. DS7B
+
+```text
+sources = 20
+full_combo first-token answer-class closure = 17
+full_combo rollout answer-class = 5
+strict rollout = 0
+object echo = 12
+first-token -> rollout F1 = 0.4545
+```
+
+DS7B full_combo 的 rollout labels：
+
+```text
+answer_alias = 5
+object_echo = 12
+other = 3
+```
+
+典型输出：
+
+```text
+shape
+Polygon
+polygon
+1
+```
+
+关键问题：
+
+```text
+DS7B 首词元场经常进入答案类 token，
+但短 rollout 经常转成 object_echo。
+```
+
+尤其 polygon 样本存在身份-类别重叠：
+
+```text
+object = polygon
+answer-class alias 也包含 polygon
+```
+
+因此 DS7B 暴露出的不是单纯失败，而是：
+
+```text
+object identity route
+与
+answer-class route
+高度纠缠。
+```
+
+### 六、without_necessary 结果
+
+qwen3：
+
+```text
+without_necessary n = 10
+first-token answer-class = 1
+rollout answer-class = 1
+other = 9
+```
+
+这说明 Phase 854 的 necessary_blocker_reducer 在 qwen3 中不仅影响首词元 blocker，也会影响短 rollout。
+
+GLM4：
+
+```text
+without_necessary n = 1
+rollout answer-class = 0
+```
+
+DS7B：
+
+```text
+without_necessary n = 2
+rollout answer-class = 0
+```
+
+但 GLM4 和 DS7B 的 without_necessary 样本太少，不能外推。
+
+### 七、理论进展
+
+Phase 855 把闭合层级推进为：
+
+```text
+strong-edge
+  ->
+answer-class first-token closure
+  ->
+answer-class rollout closure
+  ->
+strict canonical rollout
+  ->
+identity-class separation
+  ->
+cross-domain rollout closure
+```
+
+当前最重要的新结论：
+
+```text
+qwen3:
+  first-token answer-class closure 基本预测短 rollout answer-class closure。
+
+DS7B:
+  first-token answer-class closure 不能预测短 rollout，
+  因为对象身份复读大量出现。
+```
+
+这说明：
+
+```text
+语言编码机制不是单一 token 闭合问题，
+而是答案类、对象身份、别名、格式、rollout 多层路线的对齐问题。
+```
+
+从智能理论角度看，当前公式需要显式区分：
+
+```text
+I(o):
+  object identity field
+
+A(y):
+  answer-class alias field
+
+R(x):
+  rollout field
+```
+
+完整闭合不只是：
+
+```text
+max target logit
+```
+
+而是：
+
+```text
+answer-class field
++ identity separation
++ alias span
++ rollout stability
+```
+
+的共同闭合。
+
+### 八、问题和硬伤
+
+```text
+1. Phase 855 仍是 geometry route 局部实验，不能外推到完整语言。
+2. qwen3 strict canonical rollout 仍为 0。
+3. DS7B 出现严重 object_echo / answer-class alias 重叠。
+4. GLM4 strong-edge 触发不足，不能因为 rollout 质量好就判断机制已定位。
+5. without_necessary 样本数量少，只能说明 qwen3 局部必要性，不能证明完整路径。
+6. 分类器仍是规则型 alias 判定，不等于真正语义等价判定。
+7. 小模型中身份路线和类别路线可能高度压缩到同一通道或相邻通道，导致当前结果偏差。
+```
+
+### 九、闭合距离
+
+当前应分层评估：
+
+```text
+qwen3 geometry answer-class rollout:
+  已有强正结果。
+
+strict canonical rollout:
+  仍失败。
+
+identity-class separation:
+  DS7B 暴露明显问题。
+
+cross-domain rollout:
+  未验证。
+
+full language closure:
+  仍远未完成。
+```
+
+总体判断：
+
+```text
+Phase 855 是实质进展；
+它把 Phase 854 的 answer-class first-token closure
+推进到 qwen3 的短 rollout closure。
+
+但它同时证明：
+不同小模型的 first-token field 与 rollout field 关系差异很大，
+尤其 DS7B 不能用 first-token closure 直接推断生成闭合。
+```
+
+### 十、下一阶段
+
+下一阶段仍属于全局齿轮图谱大阶段，但应转入：
+
+```text
+Phase 856:
+Identity-Class Overlap and Cross-Domain Rollout Audit
+```
+
+核心任务：
+
+```text
+1. 对 polygon / circle / triangle 等对象身份词和类别词重叠样本单独建表。
+2. 构造 object != answer-alias 的几何样本，避免 polygon 这种重叠。
+3. 扩展到 animal / tool / color / abstract，验证 qwen3 first-token -> rollout 关系是否跨域成立。
+4. 对 DS7B 的 object_echo route 做单独干预，判断是小模型捷径还是真实身份路线。
+5. 对 qwen3 necessary blocker reducer 做跨 prompt / 跨对象复测。
+```
+
+阶段结论：
+
+```text
+Phase 855 是当前全局齿轮图谱的一次重要推进。
+qwen3 的答案类别名首词元闭合已经能预测短 rollout；
+但 strict canonical closure 和跨域机制仍未完成。
+DS7B 暴露身份-类别纠缠，是下一阶段必须拆开的瓶颈。
+```
+
+## Phase 856: Identity-Class Overlap and Cross-Domain Rollout Audit [2026-07-02 19:37]
+
+### 一、任务来源
+
+本阶段根据 Phase 854-855 的结果继续推进。
+
+Phase 854 证明：
+
+```text
+strict token closure = 0
+answer-class first-token closure 大量存在
+```
+
+Phase 855 进一步证明：
+
+```text
+qwen3 几何任务中：
+  first-token answer-class closure 基本等价于短 rollout answer-class closure
+
+DS7B 几何任务中：
+  first-token answer-class closure 与短 rollout 断裂明显
+  主要表现为 object_echo
+```
+
+但 Phase 855 仍有一个关键疑问：
+
+```text
+这是几何局部任务现象，
+还是跨语义域的通用现象？
+```
+
+所以 Phase 856 的目标是做跨域自然提示审计，而不是继续寻找新的局部 patch。
+
+### 二、测试脚本和结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase856_identity_class_overlap_cross_domain_rollout_audit.py
+tests/glm5/run_phase856_identity_class_overlap_cross_domain_rollout_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase856_identity_class_overlap_cross_domain_rollout_audit/
+```
+
+执行方式：
+
+```text
+smoke
+main
+confirm
+```
+
+三轮均按以下顺序执行：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+测试中没有使用量化。
+脚本优先尝试 flash_attention_2，但当前环境未安装 FlashAttention2，自动降级为 SDPA。
+三模型均能顺序加载、释放显存，没有出现 OOM。
+
+### 三、测试原理
+
+本阶段不做 gear intervention，只做自然生成边界审计。
+
+核心问题是：
+
+```text
+如果模型首词元场已经进入答案类别区域，
+短 rollout 是否仍然停留在答案类别区域？
+```
+
+测试对象分为八个语义域：
+
+```text
+geometry
+animal
+tool
+color
+material
+abstract
+plant
+object
+```
+
+提示类型分为三类：
+
+```text
+natural_question:
+  What category is apple?
+
+natural_category:
+  apple belongs to the category of
+
+object_only:
+  apple
+```
+
+评价标签分为：
+
+```text
+strict_canonical:
+  rollout 直接生成 canonical answer
+
+answer_alias:
+  rollout 生成答案类别别名
+
+identity_class_overlap:
+  对象身份词与答案类别名重叠，不能简单算纯成功或纯失败
+
+object_echo:
+  rollout 复述对象身份
+
+format_or_empty:
+  输出主要是格式或空白
+
+other:
+  不属于以上类别
+```
+
+本阶段中途发现一个评价口径问题：
+
+```text
+first-token 评分使用了扩展 alias variants，
+但 rollout 分类最初只使用原始 alias。
+```
+
+这会把：
+
+```text
+Tools
+Hand tools
+materials
+Mammals
+```
+
+错误标为 other。
+
+已经修正为：
+
+```text
+first-token field
+rollout classification
+```
+
+都使用同一套 alias variants。
+最终结果以修正后的重跑结果为准。
+
+### 四、核心公式
+
+答案类别首词元闭合：
+
+```text
+C_answer-class(x)
+  =
+  1[
+    max_{t in A(y)} z_t(x)
+    >
+    max_{u notin A(y)} z_u(x)
+  ]
+```
+
+短 rollout 答案类闭合：
+
+```text
+C_rollout-class(x, p)
+  =
+  1[
+    Rollout(x, p)
+    in AliasSpan(A(y))
+  ]
+```
+
+clear rollout 闭合：
+
+```text
+C_clear-rollout(x, p)
+  =
+  1[
+    Rollout(x, p)
+    in AliasSpan(A(y)) \\ I(o)
+  ]
+```
+
+对象复读路线：
+
+```text
+C_object-echo(x, p)
+  =
+  1[
+    Rollout(x, p)
+    in I(o) \\ A(y)
+  ]
+```
+
+提示门控：
+
+```text
+G_prompt(p)
+  =
+  1[
+    p opens category-answer route
+  ]
+```
+
+因此更完整的短程生成闭合应写成：
+
+```text
+C_short-closure(x, p)
+  =
+  G_prompt(p)
+  *
+  C_answer-class(x)
+  *
+  C_clear-rollout(x, p)
+  *
+  (1 - C_object-echo(x, p))
+```
+
+该公式仍只是诊断公式，不是完整语言编码机制公式。
+
+### 五、confirm 轮总体结果
+
+confirm 轮共 114 行 / 模型。
+
+```text
+qwen3:
+  rows = 114
+  first-token answer-class = 41
+  clear first = 34
+  rollout answer-class = 41
+  clear rollout = 37
+  object_echo = 10
+  first->rollout F1 = 0.9756
+  clear F1 = 0.9296
+
+GLM4:
+  rows = 114
+  first-token answer-class = 45
+  clear first = 38
+  rollout answer-class = 46
+  clear rollout = 38
+  object_echo = 5
+  first->rollout F1 = 0.9670
+  clear F1 = 1.0
+
+DS7B:
+  rows = 114
+  first-token answer-class = 32
+  clear first = 23
+  rollout answer-class = 34
+  clear rollout = 24
+  object_echo = 13
+  first->rollout F1 = 0.9697
+  clear F1 = 0.9787
+```
+
+客观结论：
+
+```text
+1. 三个模型中，first-token answer-class closure 都较强预测短 rollout answer-class closure。
+2. GLM4 的 clear first -> clear rollout 最稳定。
+3. qwen3 的 answer-class rollout 稳定，但 clear rollout 低一些，说明 identity overlap 仍会抬高表面成功率。
+4. DS7B 在跨域自然提示下没有复现 Phase 855 那种严重全局断裂。
+5. DS7B 仍有最高 object_echo 数量，说明对象身份路线竞争仍较强。
+```
+
+### 六、prompt gate 结果
+
+qwen3：
+
+```text
+natural_category:
+  n = 38
+  first = 22
+  rollout = 22
+  clear = 19
+  object_echo = 2
+  F1 = 1.0
+
+natural_question:
+  n = 38
+  first = 19
+  rollout = 18
+  clear = 17
+  object_echo = 2
+  F1 = 0.9730
+
+object_only:
+  n = 38
+  first = 0
+  rollout = 1
+  clear = 1
+  object_echo = 6
+```
+
+GLM4：
+
+```text
+natural_category:
+  first = 25
+  rollout = 25
+  clear = 21
+  object_echo = 1
+  F1 = 1.0
+
+natural_question:
+  first = 20
+  rollout = 19
+  clear = 17
+  object_echo = 2
+  F1 = 0.9744
+
+object_only:
+  first = 0
+  rollout = 2
+  object_echo = 2
+```
+
+DS7B：
+
+```text
+natural_category:
+  first = 13
+  rollout = 13
+  clear = 12
+  object_echo = 0
+  F1 = 1.0
+
+natural_question:
+  first = 9
+  rollout = 11
+  clear = 7
+  object_echo = 4
+  F1 = 0.9
+
+object_only:
+  first = 10
+  rollout = 10
+  clear = 5
+  object_echo = 9
+  F1 = 1.0
+```
+
+关键现象：
+
+```text
+prompt 本身是 route gate。
+
+natural_question / natural_category:
+  更容易打开 answer-class route。
+
+object_only:
+  更容易打开 identity echo route。
+```
+
+### 七、跨域结果
+
+qwen3：
+
+```text
+color / geometry / material / plant / tool:
+  first->rollout 关系较强。
+
+abstract:
+  clear closure 弱，object_echo 多。
+
+object:
+  clear rollout 较弱，身份-类别边界更混乱。
+```
+
+GLM4：
+
+```text
+animal / color / geometry / material / object / plant / tool:
+  clear first->clear rollout 基本稳定。
+
+abstract:
+  仍然弱，容易走 object_echo 或 other。
+```
+
+DS7B：
+
+```text
+tool:
+  answer-class route 很强。
+
+animal / geometry / object / plant:
+  first->rollout 关系尚可。
+
+abstract / material:
+  clear rollout 弱，object_echo 和 format_or_empty 较多。
+```
+
+### 八、对附件判断的分析
+
+附件中认为 Phase 854 和 Phase 855 是重要收紧，这个判断是正确的。
+
+正确部分：
+
+```text
+1. Phase 854-855 确实把失败位置从 simple target token 推进到 answer-class / identity / rollout 分层边界。
+2. identity-class overlap 是必须单独审计的问题。
+3. 跨域 rollout audit 是必要阶段。
+4. object_echo route 不能混在普通失败里，必须作为独立路线。
+```
+
+需要收紧的部分：
+
+```text
+1. Phase 855 中 DS7B 的断裂不能外推为全域自然提示断裂。
+2. qwen3 的几何强结果不能直接外推为全语言闭合。
+3. first-token answer-class closure 是强诊断指标，不是完整生成闭合。
+4. clear rollout 比 answer-class rollout 更严格，后续必须优先报告。
+```
+
+### 九、理论进展
+
+本阶段把闭合层级从：
+
+```text
+strict token
+answer-class token
+alias rollout
+```
+
+推进到：
+
+```text
+prompt-gated answer-class rollout
+clear rollout
+object echo route
+identity-class overlap audit
+```
+
+这说明语言生成闭合不是单点状态：
+
+```text
+不是：
+  一个 target token 排名第一
+
+而是：
+  prompt gate
+  + answer-class field
+  + identity separation
+  + rollout stability
+  + blocker suppression
+```
+
+的联合结果。
+
+### 十、问题、硬伤和瓶颈
+
+```text
+1. 本阶段是自然提示审计，不是因果齿轮干预。
+2. alias 分类仍是规则型，不能等价于真正语义等价判断。
+3. object_only 提示本身与类别问答任务不同，不能简单当作失败样本。
+4. 抽象域和材料域边界模糊，canonical answer 可能过粗。
+5. 小模型可能把身份路线、类别路线、格式路线压缩在相邻或同一组件中。
+6. first-token 与短 rollout 关系较强，但仍不能预测长 rollout、推理链、语法协议稳定性。
+7. 目前没有证明 qwen3 necessary blocker reducer 跨域仍必要。
+8. DS7B object_echo route 还没有做显式抑制或替换，不能判断它是小模型捷径还是真实身份路线。
+```
+
+### 十一、闭合距离评估
+
+当前闭合层级：
+
+```text
+strict canonical token closure:
+  仍未完成。
+
+answer-class first-token closure:
+  已有较强证据。
+
+short rollout answer-class closure:
+  跨域自然提示下已有较强诊断关系。
+
+clear rollout closure:
+  部分成立，但仍受 identity overlap 影响。
+
+object echo route separation:
+  已经识别，但未因果闭合。
+
+prompt gate mechanism:
+  已观察到，但未定位齿轮。
+
+full language encoding closure:
+  仍远未完成。
+```
+
+如果按“完整语言编码机制闭合”评估，当前进度仍只能算：
+
+```text
+12% - 20%
+```
+
+比 Phase 855 略有提升，因为跨域自然提示审计已经完成；但提升幅度不能过大，因为本阶段没有完成新的因果齿轮定位。
+
+### 十二、下一阶段任务
+
+下一阶段仍属于全局齿轮图谱阶段，应进入：
+
+```text
+Phase 857:
+Prompt-Gated Causal Gear Rollout Validation
+```
+
+核心任务：
+
+```text
+1. 在 natural_question / natural_category / object_only 三类 prompt gate 下，复测同一 gear combo。
+2. 验证 qwen3 necessary blocker reducer 是否跨 prompt、跨语义域仍然必要。
+3. 对 DS7B object_echo route 做显式 suppression / replacement。
+4. 把 answer-class、clear-rollout、object_echo 三类边界分开计分。
+5. 每条候选齿轮边必须同时报告：
+   first-token field
+   full-vocabulary blocker field
+   rollout answer-class
+   clear rollout
+   object echo
+   prompt gate dependence
+```
+
+阶段性结论：
+
+```text
+Phase 856 证明：
+  first-token answer-class closure 是短 rollout answer-class closure 的强诊断指标，
+  但它受到 prompt gate 和 identity-class overlap 的强烈调制。
+
+因此，下一步不能继续只测局部 patch 成功率，
+必须把 prompt gate、clear rollout、object echo route 接回因果齿轮图谱。
+```

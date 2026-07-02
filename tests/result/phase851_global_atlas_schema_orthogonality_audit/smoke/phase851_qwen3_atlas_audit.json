@@ -1,0 +1,590 @@
+{
+  "phase": 851,
+  "title": "Global Atlas Schema and Orthogonality Audit",
+  "model": "qwen3",
+  "phase849_round": "smoke",
+  "phase850_round": "smoke",
+  "timestamp": "2026-07-02 12:44:52",
+  "source_rows": 12,
+  "feature_summary": {
+    "n": 12,
+    "actual_classes": {
+      "additive": 11,
+      "synergy": 1
+    },
+    "objects": {
+      "triangle": 12
+    },
+    "prompt_variants": {
+      "natural_question": 12
+    },
+    "strong_rows": 1,
+    "mean_abs_residual": 0.15104166666666666,
+    "mean_strong_abs_residual": 0.8125
+  },
+  "gate_evidence": [
+    {
+      "predictor": "global_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "internal_strength_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "residual_projection_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "blocker_field_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "route_competition_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "compact_joint_gate_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "joint_gate_combo",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "model_default_gate",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    },
+    {
+      "predictor": "train_selected_gate",
+      "evidence_level": "L3_in_sample_only",
+      "in_sample_raw_f1": 1.0,
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null,
+      "object_holdout_balanced_f1": null,
+      "prompt_holdout_balanced_f1": null,
+      "object_holdout_raw_recall": null,
+      "prompt_holdout_raw_recall": null
+    }
+  ],
+  "hierarchical_gating_readiness": {
+    "macro_prompt_strong_rate_range": 0.0,
+    "semantic_object_strong_rate_range": 0.0,
+    "meso_sign_pattern_strong_rate_range": 0.5,
+    "meso_combo_type_strong_rate_range": 0.0,
+    "best_micro_gate_by_min_holdout_f1": null,
+    "macro_groups": [
+      {
+        "group": "natural_question",
+        "n": 12,
+        "strong": 1,
+        "strong_rate": 0.08333333333333333,
+        "class_counts": {
+          "additive": 11,
+          "synergy": 1
+        }
+      }
+    ],
+    "semantic_groups": [
+      {
+        "group": "triangle",
+        "n": 12,
+        "strong": 1,
+        "strong_rate": 0.08333333333333333,
+        "class_counts": {
+          "additive": 11,
+          "synergy": 1
+        }
+      }
+    ],
+    "meso_sign_groups": [
+      {
+        "group": "++",
+        "n": 2,
+        "strong": 0,
+        "strong_rate": 0.0,
+        "class_counts": {
+          "additive": 2
+        }
+      },
+      {
+        "group": "+-",
+        "n": 6,
+        "strong": 0,
+        "strong_rate": 0.0,
+        "class_counts": {
+          "additive": 6
+        }
+      },
+      {
+        "group": "-+",
+        "n": 2,
+        "strong": 0,
+        "strong_rate": 0.0,
+        "class_counts": {
+          "additive": 2
+        }
+      },
+      {
+        "group": "--",
+        "n": 2,
+        "strong": 1,
+        "strong_rate": 0.5,
+        "class_counts": {
+          "additive": 1,
+          "synergy": 1
+        }
+      }
+    ],
+    "meso_combo_groups": [
+      {
+        "group": "pair",
+        "n": 12,
+        "strong": 1,
+        "strong_rate": 0.08333333333333333,
+        "class_counts": {
+          "additive": 11,
+          "synergy": 1
+        }
+      }
+    ]
+  },
+  "orthogonality_audit": [
+    {
+      "feature": "actual_residual",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 0.109375
+    },
+    {
+      "feature": "actual_delta",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 0.171875
+    },
+    {
+      "feature": "expected_additive_delta",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 0.0625
+    },
+    {
+      "feature": "abs_mean",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 14.6337890625
+    },
+    {
+      "feature": "abs_sum",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 29.267578125
+    },
+    {
+      "feature": "signed_mean",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": -2.0537109375
+    },
+    {
+      "feature": "signed_sum",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": -4.107421875
+    },
+    {
+      "feature": "max_abs",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 21.333333333333332
+    },
+    {
+      "feature": "min_abs",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 7.934244791666667
+    },
+    {
+      "feature": "pos_count",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 1.0
+    },
+    {
+      "feature": "neg_count",
+      "object_eta": 0.0,
+      "prompt_eta": 0.0,
+      "axis_class": "low_axis_signal",
+      "mean": 1.0
+    }
+  ],
+  "top_protocol_like_features": [],
+  "top_semantic_like_features": [],
+  "top_entangled_features": [],
+  "gear_min_cut_candidates": [
+    {
+      "gear": "L30C2848",
+      "total": 6,
+      "strong": 1,
+      "strong_rate": 0.16666666666666666,
+      "lift_vs_baseline": 2.0,
+      "class_counts": {
+        "additive": 5,
+        "synergy": 1
+      },
+      "audit_status": "low_support"
+    },
+    {
+      "gear": "L27C2767",
+      "total": 6,
+      "strong": 1,
+      "strong_rate": 0.16666666666666666,
+      "lift_vs_baseline": 2.0,
+      "class_counts": {
+        "additive": 5,
+        "synergy": 1
+      },
+      "audit_status": "low_support"
+    },
+    {
+      "gear": "L29C1532",
+      "total": 6,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "lift_vs_baseline": 0.0,
+      "class_counts": {
+        "additive": 6
+      },
+      "audit_status": "low_support"
+    },
+    {
+      "gear": "L30C1349",
+      "total": 6,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "lift_vs_baseline": 0.0,
+      "class_counts": {
+        "additive": 6
+      },
+      "audit_status": "low_support"
+    }
+  ],
+  "combo_strong_edge_candidates": [
+    {
+      "combo_key": "L30C2848+L27C2767",
+      "total": 2,
+      "strong": 1,
+      "strong_rate": 0.5,
+      "class_counts": {
+        "additive": 1,
+        "synergy": 1
+      },
+      "combo_type": "pair",
+      "gear_count": 2,
+      "gear_keys": [
+        "L30C2848",
+        "L27C2767"
+      ]
+    },
+    {
+      "combo_key": "L29C1532+L30C2848",
+      "total": 2,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "class_counts": {
+        "additive": 2
+      },
+      "combo_type": "pair",
+      "gear_count": 2,
+      "gear_keys": [
+        "L29C1532",
+        "L30C2848"
+      ]
+    },
+    {
+      "combo_key": "L29C1532+L30C1349",
+      "total": 2,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "class_counts": {
+        "additive": 2
+      },
+      "combo_type": "pair",
+      "gear_count": 2,
+      "gear_keys": [
+        "L29C1532",
+        "L30C1349"
+      ]
+    },
+    {
+      "combo_key": "L29C1532+L27C2767",
+      "total": 2,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "class_counts": {
+        "additive": 2
+      },
+      "combo_type": "pair",
+      "gear_count": 2,
+      "gear_keys": [
+        "L29C1532",
+        "L27C2767"
+      ]
+    },
+    {
+      "combo_key": "L30C2848+L30C1349",
+      "total": 2,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "class_counts": {
+        "additive": 2
+      },
+      "combo_type": "pair",
+      "gear_count": 2,
+      "gear_keys": [
+        "L30C2848",
+        "L30C1349"
+      ]
+    },
+    {
+      "combo_key": "L30C1349+L27C2767",
+      "total": 2,
+      "strong": 0,
+      "strong_rate": 0.0,
+      "class_counts": {
+        "additive": 2
+      },
+      "combo_type": "pair",
+      "gear_count": 2,
+      "gear_keys": [
+        "L30C1349",
+        "L27C2767"
+      ]
+    }
+  ],
+  "atlas_nodes": [
+    {
+      "node_id": "qwen3:state:residual_stream",
+      "node_type": "state",
+      "evidence": "observed_from_phase849_feature_rows"
+    },
+    {
+      "node_id": "qwen3:boundary:strong_edge",
+      "node_type": "boundary",
+      "strong_rows": 1
+    },
+    {
+      "node_id": "qwen3:gate:global_combo",
+      "node_type": "gate",
+      "predictor": "global_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:internal_strength_combo",
+      "node_type": "gate",
+      "predictor": "internal_strength_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:residual_projection_combo",
+      "node_type": "gate",
+      "predictor": "residual_projection_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:blocker_field_combo",
+      "node_type": "gate",
+      "predictor": "blocker_field_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:route_competition_combo",
+      "node_type": "gate",
+      "predictor": "route_competition_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:compact_joint_gate_combo",
+      "node_type": "gate",
+      "predictor": "compact_joint_gate_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:joint_gate_combo",
+      "node_type": "gate",
+      "predictor": "joint_gate_combo",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:model_default_gate",
+      "node_type": "gate",
+      "predictor": "model_default_gate",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "node_id": "qwen3:gate:train_selected_gate",
+      "node_type": "gate",
+      "predictor": "train_selected_gate",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    }
+  ],
+  "atlas_edges": [
+    {
+      "source": "qwen3:gate:global_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:internal_strength_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:residual_projection_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:blocker_field_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:route_competition_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:compact_joint_gate_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:joint_gate_combo",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:model_default_gate",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    },
+    {
+      "source": "qwen3:gate:train_selected_gate",
+      "target": "qwen3:boundary:strong_edge",
+      "edge_type": "interaction_prediction",
+      "evidence_level": "L3_in_sample_only",
+      "object_holdout_raw_f1": null,
+      "prompt_holdout_raw_f1": null
+    }
+  ],
+  "boundary": "This phase is an atlas-schema audit over existing Phase 849/850 rows. It does not run new model forward passes and does not prove closure."
+}

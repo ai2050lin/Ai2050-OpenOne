@@ -1,18 +1,13 @@
 
-
-智能理论
-
+# 智能理论
 
 
-
-
-
-研发路线：
+## 研发路线：
     DNN语言结构分析 -> 脑编码机制 -> 智能的数学统一理论 -> 即使学习模型测试
 
 
 
-一，路线分析
+## 一，路线分析
 	当前AI和AGI（人脑）的区别：
 		1，实时学习，人脑可以不停的接受新信息。
 		2，准确理解，比如可以准确理解某个数学概念，或者其他人的想法。
@@ -40,7 +35,7 @@
 
 
 
-二，语言特性分析
+## 二，语言特性分析
 	语言的三个核心要素：
 		网络知识
 		逻辑推理
@@ -93,7 +88,7 @@
 
 
 
-三，语言编码机制
+## 三，语言编码机制
 
 		当前最重要的总判断：
 			语言编码不是一个固定语义轴系统，也不是简单的 token 向量存储系统，而是“相对状态 + 条件化变换 + 候选竞争 + 读出门控”的动态系统。
@@ -201,6 +196,47 @@
 				当前已经找到“路线/读出底座”的强因果证据；
 				还没有完全找到“可迁移语义身份代码”的最小因果单元。
 
+		Phase 708-851 后的最新更新：
+			这之后的研究把“机制图谱”从局部读出通道继续推进到全局齿轮图谱。附件中的 Phase 20-848 历史分析已经被部分吸收，但原文件仍停留在“条件化相对状态—生成场闭合”的主框架，对“状态-路线-齿轮-边界-闭合图谱”的吸收不够完整。
+
+			最重要的修正是：
+				语言编码机制不能只写成状态轨迹进入生成场；
+				还必须写成带证据等级的全局齿轮图谱。
+
+			当前更准确的机制图应写成：
+
+				input tokens / prompt protocol
+					-> state variables:
+						identity / role / frame / operator / scope / binding
+					-> route variables:
+						semantic / object / category / format / echo / protocol / blocker
+					-> gear functions:
+						reader / router / carrier / writer / rewriter / suppressor / gate
+					-> conditional gate:
+						macro prompt gate
+						+ meso protocol/sign gate
+						+ micro residual_projection/blocker gate
+					-> boundary transition:
+						token boundary / answer-class boundary / span boundary / rollout boundary
+					-> closure:
+						full-vocabulary blocker cleared
+						+ exact-natural consistency
+						+ natural generation rollout。
+
+			Phase 850-851 的最严格结果是：
+				qwen3 residual_projection_combo 进入 L5 strong-edge holdout candidate；
+				qwen3 internal_strength_combo 是弱 L5 candidate；
+				qwen3 blocker_field_combo 只能算 L4 partial candidate；
+				DS7B blocker_field_combo 只有 L3 in-sample only；
+				GLM4 当前为 L0 untriggered，因为没有 strong-edge 样本。
+
+			这说明：
+				当前最接近语言编码机制的对象，不是单个神经元、head、channel 或语义方向；
+				而是能跨 object / prompt 预测 strong-edge 的 gate edge。
+
+			因此，当前语言编码机制应升级为：
+				语言输出 = 预测充分相对状态 + 全局齿轮图谱 + 条件化路线门控 + 全词表竞争闭合 + 自然生成一致性。
+
 		当前最严格的限制：
 			1，很多结果仍是 projection-level evidence，不等于因果修复。
 			2，单点 residual patch 往往失败，说明状态不是可简单加法移植对象。
@@ -212,7 +248,7 @@
 
 
 
-四，智能理论
+## 四，智能理论
 		智能定义：
 			智能是一个系统在持续输入中形成相对状态网络，并能根据目标、上下文和反馈，对世界对象、关系、规则、候选行动进行重编码、选择和修正的能力。
 			更通俗地说，智能不是“存了多少知识”，而是能否把当前问题放进正确的关系网络里，找到可执行路径，并在竞争答案中选出最合适的一个。
@@ -262,7 +298,7 @@
 			7，能否解释和修复自己的错误路径。
 
 
-五，数学体系：
+## 五，数学体系：
 		第一性原理：
 			目前最接近第一性原理的表述是：
 				智能系统不是存储孤立概念，而是在上下文中把对象、关系、规则、候选、目标函数重编码为可读出的相对状态。
@@ -681,7 +717,7 @@
 
 
 
-六，非线性理论体系
+## 六，非线性理论体系
 
 	为什么需要单独的非线性理论体系：
 		早期研究（Phase 301-594）主要用线性子空间、方向投影、activation patching 分析语言编码。
@@ -963,7 +999,7 @@
 
 
 
-七，研究阶段历史记录
+## 七，研究阶段历史记录
 		阶段一：基础方向分解与操作符机制（Phase 301-312）
 			核心任务：
 				分解 identity、role、frame、construction、operator、scope、norm、position。
@@ -2015,18 +2051,27 @@
 	7.2 当前最有效完整理论的明确陈述
 
 		理论名称：
-			条件化相对状态—生成场闭合理论（含非线性扩展）。
+			预测充分相对状态—全局齿轮图谱—生成场闭合理论。
 
-			它吸收了原来的“相对编码—复用差分—条件化机制图谱理论”，但把生成端单独提升为生成场闭合层。
+			它吸收了原来的“相对编码—复用差分—条件化机制图谱理论”和“条件化相对状态—生成场闭合理论”，并把附件中的 Phase 20-848 历史收束结果正式并入：
+				角色纤维；
+				条件非线性属性；
+				因果证据等级；
+				状态转移动力学；
+				Attention/MLP 功能契约；
+				Identity-Role-Frame-Operator-Scope 分解；
+				protocol field；
+				full-vocabulary blocker field；
+				answer-class / span / rollout / exact-natural 闭合。
 
 		核心命题：
 			深度神经网络的语言能力不是由孤立概念向量、孤立语法模板或单个注意力头完成，
 			而是由同一参数骨架在不同输入边界和语义条件下生成不同状态轨迹。
 			这些状态轨迹在极低维流形上运动，经过非线性算子变换、Jacobian链旋转放大、
 			RMSNorm各向异性调制，最终进入softmax概率竞争，形成自回归执行。
-			语言生成不是简单读出知识，而是状态轨迹进入词表竞争后的非线性自回归执行。
+			语言生成不是简单读出知识，而是状态轨迹经过全局齿轮图谱的条件化门控，进入词表竞争后的非线性自回归执行。
 
-		理论的两层结构：
+		理论的三层结构：
 
 			第一层（线性/局部线性部分，已较成熟）：
 				相对编码：概念不是固定坐标点，而是在关系网络中的相对差异。
@@ -2034,7 +2079,15 @@
 				条件化图谱：机制节点G={u_i, r_i, s_i, e_i}，节点状态是条件B的函数。
 				这一层用线性叠加近似有效，但只在局部邻域和单点patch中成立。
 
-			第二层（非线性部分，当前瓶颈所在）：
+			第二层（全局齿轮图谱层，Phase 849-851 后新增）：
+				状态节点：identity / role / frame / operator / scope / binding。
+				路线节点：semantic / object / category / format / echo / protocol / blocker。
+				齿轮节点：reader / router / carrier / writer / rewriter / suppressor / gate。
+				边界节点：token / answer-class / span / rollout / exact-natural。
+				证据节点：L0 activation correlation 到 L7 rollout closure。
+				这一层解决“图谱不是响应表，而是带证据等级的机制候选图”的问题。
+
+			第三层（非线性闭合部分，当前瓶颈所在）：
 				流形约束：dim(M)≈65-75 << d_model，h在低维弯曲流形上运动。
 				Jacobian链：δ_{l+k}≈J_{l+k-1}·...·J_l·δ_l，放大但旋转，无贯穿全模型的方向。
 				RMSNorm动力学：δh^{l+1}=D_norm·J_l·δh^l，存在α*临界值掩盖各向异性。
@@ -2047,8 +2100,36 @@
 			输入 x = (F, C, R, O, G, B)
 			状态轨迹 h_l = Φ_l(h_{l-1}, x)  其中 Φ_l 含注意力softmax + MLP非线性 + RMSNorm
 			读出 P(x_{t+1}|x_{≤t}) = softmax(W_U · LN(h_{L,t}))
-			机制图谱 G = {u_i, r_i, s_i(B), e_i}  节点状态依赖条件B
-			关键：从h_l到P的非线性变换链不能用线性差分叠加完整描述。
+			机制图谱从旧的 G = {u_i, r_i, s_i(B), e_i} 升级为：
+
+				\mathcal{G}_{language}
+					=
+					(
+						V_s,
+						V_r,
+						V_g,
+						V_a,
+						V_b,
+						E_c,
+						E_i,
+						E_t,
+						E_f,
+						\Omega
+					)
+
+			其中：
+				V_s 是状态变量节点；
+				V_r 是路线节点；
+				V_g 是齿轮节点；
+				V_a 是 answer boundary 节点；
+				V_b 是 blocker 节点；
+				E_c 是因果边；
+				E_i 是交互边；
+				E_t 是跨层输运边；
+				E_f 是闭合纤维边；
+				\Omega 是证据等级与泛化标准。
+
+			关键：从 h_l 到 P 的非线性变换链不能用线性差分叠加完整描述；从局部组件到语言输出的路径也不能只用“组件响应表”描述，必须用带条件门控和闭合证据的全局图谱描述。
 
 	7.3 完整计算例子
 
@@ -2489,3 +2570,444 @@
 				哪些局部机制把状态推入正确预测充分等价类；
 				哪些局部机制负责让目标路线在生成场中完成闭合；
 				哪些竞争路线导致预测充分但生成不闭合。
+
+	7.7 2026-07-02 最新整合：预测充分相对状态—全局齿轮图谱—生成场闭合理论
+
+		对“当前理论是否参考附件”的判断：
+			已有理论已经部分参考了附件中的主线，例如相对编码、条件化状态、生成场闭合、协议门控、全词表竞争等。
+			但是原理论仍主要围绕“状态公式”和“生成闭合公式”展开，对附件中 Phase 20-848 形成的历史主线吸收不够完整：
+				它还没有把语法方向、语义属性、Jacobian链、语法因果回路、约束动力学、子空间拓扑、Attention/MLP契约、Identity-Role-Frame-Operator 分解统一成一个可操作的全局图谱。
+
+			本次更新后，当前理论应明确参考并吸收附件分析。
+			最新理论不是把附件作为外部说明，而是把附件作为“全局齿轮图谱”的历史证据来源。
+
+		最新理论名称：
+			预测充分相对状态—全局齿轮图谱—生成场闭合理论。
+
+		最简核心判断：
+			语言编码机制不是静态语义图谱，也不是单个神经元、head、channel、SAE feature 或固定方向。
+			更接近真实机制的是：
+				模型在输入条件下形成预测充分相对状态；
+				这些状态经过全局齿轮图谱中的路线、齿轮和边界门控；
+				最后在全词表竞争场、答案类别、span、协议格式和自然生成 rollout 中完成或失败闭合。
+
+		当前理论的四层结构：
+
+			第一层：预测充分相对状态
+				状态不是绝对坐标点，而是相对任务、对象、角色、句框、协议和候选竞争形成的条件状态。
+				最重要的不变量不是某个方向，而是给定上下文后的预测分布等价类。
+
+			第二层：全局齿轮图谱
+				图谱不再是组件响应表，而是：
+					状态变量图谱；
+					路线图谱；
+					齿轮交互图谱；
+					边界闭合图谱；
+					自然一致性验证图谱。
+
+			第三层：条件化路线门控
+				同一个齿轮在不同对象、prompt、协议、blocker 场中可能完全改变作用。
+				因此齿轮边不是静态边，而是条件边：
+					语义条件决定对象路线；
+					协议条件决定格式路线；
+					blocker 场决定竞争边界；
+					internal gate 决定 residual projection / blocker route 是否成为 strong edge。
+
+			第四层：生成场闭合
+				first-token logit 胜出不等于语言机制闭合。
+				真正闭合至少要经过：
+					token boundary；
+					answer-class boundary；
+					span boundary；
+					protocol boundary；
+					full-vocabulary blocker boundary；
+					exact-natural consistency；
+					natural generation rollout。
+
+		核心公式 1：预测充分状态等价类
+
+			两个内部状态 h_a, h_b 如果在当前任务边界下给出等价预测分布，则可视为同一预测充分等价类：
+
+				h_a \sim_{pred} h_b
+					\Longleftrightarrow
+					P(\cdot | h_a, x_{\le t})
+					\approx
+					P(\cdot | h_b, x_{\le t})
+
+			这说明语言编码的目标不是恢复某个“真实概念向量”，而是定位哪些机制把状态推入正确预测充分等价类。
+
+		核心公式 2：角色纤维状态分解
+
+			附件中的历史结论应正式纳入理论：
+
+				h_l(x,r)
+					=
+					M_l(x)
+					+
+					A_l(r)
+					+
+					B_l(x,r)
+					+
+					\epsilon_l
+
+			其中：
+				M_l(x)：语义共享底座；
+				A_l(r)：角色平均偏移；
+				B_l(x,r)：对象和角色的交互项；
+				\epsilon_l：未解释残差。
+
+			这意味着语法、语义和角色不是几条独立方向，而是在共享流形上的条件纤维。
+
+		核心公式 3：全局齿轮图谱
+
+			机制图谱应从旧的局部节点集合升级为：
+
+				\mathcal{G}_{language}
+					=
+					(
+						V_s,
+						V_r,
+						V_g,
+						V_a,
+						V_b,
+						E_c,
+						E_i,
+						E_t,
+						E_f,
+						\Omega
+					)
+
+			其中：
+				V_s：状态变量，identity / role / frame / operator / scope / binding；
+				V_r：路线变量，semantic / object / category / format / echo / protocol / blocker；
+				V_g：齿轮变量，reader / router / carrier / writer / rewriter / suppressor / gate；
+				V_a：答案边界变量，token / answer-class / span / rollout；
+				V_b：blocker 变量，top-k blocker / full-vocabulary blocker / alias blocker；
+				E_c：因果边，表示可干预的方向性影响；
+				E_i：交互边，表示非线性协同或抵消；
+				E_t：传输边，表示跨层、跨位置、跨组件的信息搬运；
+				E_f：闭合边，表示能否通过自然生成边界；
+				\Omega：证据等级，从 L0 activation correlation 到 L7 rollout closure。
+
+		核心公式 4：条件齿轮边
+
+			静态边不足以描述当前结果，齿轮边应写成：
+
+				E_{ij}(x)
+					=
+					\alpha_{ij}(x)
+					\cdot
+					R_{ij}(x)
+
+				\alpha_{ij}(x)
+					=
+					\Psi_{ij}
+					(
+						h_{route},
+						h_{object},
+						h_{prompt},
+						h_{format},
+						h_{blocker},
+						h_{operator}
+					)
+
+			其中：
+				R_{ij}(x) 是可观测交互残差；
+				\alpha_{ij}(x) 是内部路线门控；
+				\Psi_{ij} 是需要通过 holdout 和 exact-natural consistency 验证的门控函数。
+
+			Phase 850-851 的结果表明：
+				qwen3 residual_projection_combo 已接近 L5 strong-edge holdout candidate；
+				qwen3 internal_strength_combo 是弱 L5 candidate；
+				qwen3 blocker_field_combo 仍是 L4 partial candidate；
+				DS7B blocker_field_combo 只有 L3 in-sample only；
+				GLM4 在当前样本上为 L0 untriggered。
+
+			因此，当前最接近机制不变量的不是“齿轮本体”，而是“条件齿轮边”。
+
+		核心公式 5：边界竞争场
+
+			候选 k 的边界应写成：
+
+				B^{(k)}(x)
+					=
+					B_0^{(k)}(x)
+					+
+					\sum_g
+						\Delta_g^{(k)}(x)
+					+
+					\sum_{S_j \subset S}
+						\alpha_j(x)
+						R_{S_j}^{(k)}(x)
+					+
+					\epsilon^{(k)}(x)
+
+			其中：
+				B_0^{(k)} 是自然基线；
+				\Delta_g^{(k)} 是单齿轮贡献；
+				R_{S_j}^{(k)} 是组合交互残差；
+				\alpha_j(x) 是路线门控；
+				\epsilon^{(k)} 是当前图谱尚未解释的部分。
+
+			这个公式比单点 patch 更合理，因为它承认语言输出是全词表竞争场，不是 target logit 的单变量问题。
+
+		核心公式 6：闭合标准
+
+			完整闭合不应再定义为 target token 排名第一，而应定义为多层闭合：
+
+				Closure(x)
+					=
+					C_{token}(x)
+					\cdot
+					C_{class}(x)
+					\cdot
+					C_{span}(x)
+					\cdot
+					C_{protocol}(x)
+					\cdot
+					C_{blocker}(x)
+					\cdot
+					C_{exact-natural}(x)
+
+				C_{blocker}(x)
+					=
+					\mathbf{1}
+					[
+						B_{full}(x)
+						=
+						\emptyset
+					]
+
+			只有同时满足 token、类别、短语、协议、blocker 清空和自然生成一致性，才接近语言编码机制闭合。
+
+		与附件相比的最新进展：
+			1，附件主要给出“全局齿轮图谱应该如何从历史研究中升级”的理论方向。
+			2，Phase 850-851 已经把这个方向落到可测 schema：
+				state / route / gear / boundary / evidence；
+				protocol-semantic orthogonality audit；
+				counterfactual min-cut pre-candidate；
+				strong-edge holdout gate validation。
+			3，qwen3 上 residual projection gate 的 holdout 表现说明：至少存在部分可预测的条件路线边。
+			4，GLM4 和 DS7B 的弱触发或不触发说明：小模型结构差异很大，不能把 qwen3 的机制直接升格为通用语言编码机制。
+
+		对 7.6 进度评估的严格修正：
+			如果按“理论组织完整度”评估，当前大约是 82% 到 88%。
+			如果按“图谱 schema 可执行度”评估，当前大约是 45% 到 55%。
+			如果按“跨模型稳定机制证据”评估，当前大约是 20% 到 30%。
+			如果按“完整语言编码机制闭合”评估，当前只能算 10% 到 18%。
+
+			原因是：
+				理论框架已经比较完整；
+				qwen3 上出现了较强 strong-edge gate 证据；
+				但跨模型一致性、自然 rollout 闭合、神经元级全局图谱、训练来源回溯仍未完成。
+
+		Phase 853 后的实证修正：
+			Phase 853 已经完成一轮新的跨模型前向测试，不再只是 schema audit。
+			confirm 轮结果为：
+				qwen3：1395 行，1080 条 interaction rows，62 条 strong-edge；
+				GLM4：1395 行，1080 条 interaction rows，1 条 strong-edge；
+				DS7B：1425 行，1110 条 interaction rows，8 条 strong-edge。
+
+			最重要的结果不是 strong-edge 数量增加，而是：
+				三模型 strong-edge 的 exact-natural consistency 均为 0。
+
+			qwen3 residual_projection_combo 在扩展集上仍优于 global raw object / prompt holdout：
+				object F1：0.4167 vs global 0.3151；
+				prompt F1：0.4615 vs global 0.3684。
+			但 balanced prompt holdout 不再优于 global：
+				residual_projection balanced prompt F1 = 0.5581；
+				global balanced prompt F1 = 0.6022。
+
+			因此，Phase 850-851 中的 qwen3 L5 strong-edge candidate 需要收紧：
+				在原始 confirm 集上可以称为 L5 候选；
+				在 Phase 853 扩展集上更稳妥地降为 L4 partial holdout candidate。
+
+			理论含义：
+				strong-edge 是重要的机制入口；
+				但 strong-edge 不等于 natural generation closure；
+				条件齿轮边必须继续穿过 full-vocabulary blocker field 和 exact-natural boundary，才可能接近语言编码机制闭合。
+
+		Phase 854 后的实证修正：
+			Phase 854 对 Phase 853 的 strong-edge rows 做了 full-vocabulary blocker field 和 leave-one-gear min-cut 验证。
+			confirm 轮结果为：
+				qwen3：60 条 source rows，60 条 full combo rows，42 条 answer-class closure，0 条 strict token closure，10 条 necessary blocker reducer；
+				GLM4：13 条 source rows，13 条 full combo rows，12 条 answer-class closure，0 条 strict token closure，2 条 necessary blocker reducer；
+				DS7B：20 条 source rows，20 条 full combo rows，17 条 answer-class closure，0 条 strict token closure，2 条 necessary blocker reducer。
+
+			这说明 Phase 853 的 exact-natural strong = 0 不能简单理解为“目标类完全没有赢得首词元竞争”。
+			更准确的分解是：
+				1，strict token closure 全部为 0，说明原始 target first-token 标准过严，且模型常选择 Geometry / Shape / Polygon 等别名或大小写变体；
+				2，answer-class closure 在 qwen3 和 DS7B 上大量存在，说明很多 strong-edge 已经把首词元场推到答案类区域；
+				3，但 natural rollout / span / protocol 仍未闭合，因此不能说已经完成语言生成闭合。
+
+			因此闭合标准需要分层：
+
+				C_{strict-token}(x)
+					=
+					\mathbf{1}
+					[
+						\operatorname{rank}(t_{canonical})=1
+					]
+
+				C_{answer-class}(x)
+					=
+					\mathbf{1}
+					[
+						\max_{t\in A(y)}
+						z_t(x)
+						>
+						\max_{u\notin A(y)}
+						z_u(x)
+					]
+
+				C_{full-blocker}(x)
+					=
+					\mathbf{1}
+					[
+						\{u\notin A(y): z_u(x)>\max_{t\in A(y)}z_t(x)\}
+						=
+						\emptyset
+					]
+
+			其中 A(y) 是答案类别的首词元别名集合，例如 geometric / geometry / shape / polygon 及其大小写和空格变体。
+			这比单一 exact-natural 更合理，因为语言输出不是单个 canonical token 的竞争，而是答案类、格式、别名和 rollout 的共同闭合。
+
+			Phase 854 也收紧了 min-cut 判断：
+				qwen3 157 条候选边中只有 10 条 necessary blocker reducer，且 22 条 candidate_harmful_or_antagonistic；
+				DS7B 50 条候选边中只有 2 条 necessary blocker reducer；
+				GLM4 的 2 条 necessary reducer 来自极少 strong-other 样本，不能外推。
+
+			理论含义：
+				当前 strong-edge 更像“局部答案类首词元场的重新排序”，还不是稳定的全局自然生成闭合；
+				部分齿轮在 leave-one-out 中有必要性，但必要边很稀疏，说明 min-cut 仍是候选，不是完整因果路径。
+
+		Phase 855 后的实证修正：
+			Phase 855 扩展了 answer-class alias set，并验证 first-token answer-class closure 是否能预测短 greedy rollout。
+			confirm 轮结果为：
+				qwen3：60 条 full combo rows，57 条 first-token answer-class closure，57 条 rollout answer-class，predictor F1 = 1.0；
+				GLM4：13 条 full combo rows，12 条 first-token answer-class closure，12 条 rollout answer-class，其中 7 条 strict canonical rollout，predictor F1 = 1.0；
+				DS7B：20 条 full combo rows，17 条 first-token answer-class closure，只有 5 条 rollout answer-class，predictor F1 = 0.4545。
+
+			这说明：
+				1，在 qwen3 当前几何任务上，expanded answer-class first-token closure 几乎等价于短 rollout answer-class closure；
+				2，GLM4 虽然 strong-edge 触发不足，但在现有 full combo 样本中 strict canonical rollout 反而更强；
+				3，DS7B 出现明显 first-token / rollout 断裂，主要表现为 object_echo，尤其 polygon 这种对象词与答案类别名重叠的情况。
+
+			因此，闭合层级需要再增加一层“身份-类别重叠审计”：
+
+				C_{alias-rollout}(x)
+					=
+					\mathbf{1}
+					[
+						\operatorname{Rollout}(x)
+						\in
+						\operatorname{AliasSpan}(A(y))
+					]
+
+				C_{id-class-sep}(x)
+					=
+					\mathbf{1}
+					[
+						\operatorname{Rollout}(x)
+						\notin
+						I(o)
+						\setminus
+						A(y)
+					]
+
+			其中：
+				AliasSpan(A(y)) 表示答案类别名可以形成的短片段；
+				I(o) 表示对象身份词集合；
+				当 I(o) 与 A(y) 重叠时，需要单独标记，不应简单算作成功或失败。
+
+			理论含义：
+				qwen3 的几何路线已经从 answer-class first-token field 推进到短 rollout field；
+				但这仍是几何局部路线，不是语言编码机制闭合；
+				DS7B 暴露出小模型中“答案类 token”和“对象身份 token”纠缠的问题，这是后续必须拆开的新瓶颈。
+
+		Phase 856 后的实证修正：
+			Phase 856 对 Phase 855 的结论做了跨语义域自然提示审计。
+			本阶段没有继续做新的 gear intervention，而是使用 natural_question / natural_category / object_only 三类提示，
+			在 geometry / animal / tool / color / material / abstract / plant / object 八个语义域上验证：
+				first-token answer-class closure 是否能预测短 rollout answer-class closure；
+				identity-class overlap 是否是局部几何任务的特殊问题；
+				object_echo 是否是 DS7B 的全局失败模式。
+
+			confirm 轮结果为：
+				qwen3：114 行，41 条 first-token answer-class，41 条 rollout answer-class，37 条 clear rollout，object_echo 10，first->rollout F1 = 0.9756；
+				GLM4：114 行，45 条 first-token answer-class，46 条 rollout answer-class，38 条 clear rollout，object_echo 5，first->rollout F1 = 0.9670；
+				DS7B：114 行，32 条 first-token answer-class，34 条 rollout answer-class，24 条 clear rollout，object_echo 13，first->rollout F1 = 0.9697。
+
+			这说明 Phase 855 的 DS7B 结论必须收紧：
+				DS7B 在几何 full-combo 样本中出现严重 first-token / rollout 断裂；
+				但在跨域自然提示下，并没有表现为全局 rollout 断裂；
+				更准确地说，DS7B 的 object_echo route 更强，尤其在 object_only 和抽象 / 材料 / 几何等边界模糊条件下更容易出现。
+
+			Phase 856 也修正了 qwen3 的判断：
+				qwen3 的跨域 first-token answer-class 与短 rollout answer-class 关系仍然较强；
+				但 clear rollout 明显低于 answer-class rollout，说明 identity-class overlap 和别名范围仍会抬高表面成功率；
+				object_only 提示几乎不形成 answer-class route，说明自然问题结构本身就是一种 route gate。
+
+			因此，闭合公式需要显式加入 prompt-gate 和 clear-class 两层：
+
+				C_{rollout-class}(x,p)
+					=
+					\mathbf{1}
+					[
+						\operatorname{Rollout}(x,p)
+						\in
+						\operatorname{AliasSpan}(A(y))
+					]
+
+				C_{clear-rollout}(x,p)
+					=
+					\mathbf{1}
+					[
+						\operatorname{Rollout}(x,p)
+						\in
+						\operatorname{AliasSpan}(A(y))
+						\setminus
+						I(o)
+					]
+
+				G_{prompt}(p)
+					=
+					\mathbf{1}
+					[
+						p
+						\text{ supplies a category-question route}
+					]
+
+			其中：
+				p 是提示协议；
+				G_{prompt}(p) 不是语义答案本身，而是是否打开类别回答路线的条件；
+				C_{clear-rollout} 比 C_{rollout-class} 更严格，因为它排除了对象身份词与答案类别名重叠造成的表面成功。
+
+			理论含义：
+				first-token answer-class closure 可以作为短 rollout answer-class closure 的强诊断指标；
+				但它只有在自然问题 / 自然类别提示下更稳定，在 object_only 条件下并不成立；
+				因此语言闭合不是“状态单点胜出”，而是 prompt gate、答案类别场、身份分离场和 rollout 场的联合闭合。
+
+		当前硬伤：
+			1，小模型内部结构可能粗糙，局部齿轮可能是压缩后的替代机制，不一定对应大模型真实机制。
+			2，strong-edge gate 目前主要在 qwen3 上成立，GLM4 和 DS7B 尚未形成同等级证据。
+			3，orthogonality audit 只能区分 protocol-like / semantic-like / entangled 特征，不能自动证明因果路线。
+			4，counterfactual min-cut 已开始做 leave-one-gear 验证，但 necessary blocker reducer 数量很少，尚未形成完整路径。
+			5，full-vocabulary blocker field 在 answer-class 层经常闭合；但 strict canonical token、clear rollout 和完整 span 仍未闭合。
+			6，DS7B 的严重断裂不是全域自然提示结论，而是更集中于身份-类别重叠、object_only、材料 / 抽象等边界模糊条件。
+			7，当前公式可诊断 first-token 到短 rollout 的局部关系，但还不能稳定预测多 token 自然生成全过程。
+			8，规则型 alias 分类仍可能低估或高估语义等价，后续需要把分类器本身纳入审计。
+
+		下一阶段任务：
+			下一阶段应进入：
+
+				Phase 857：Prompt-Gated Causal Gear Rollout Validation
+
+			核心目标不是再扩大自然提示统计，而是把 Phase 856 的自然审计结果接回因果齿轮图谱：
+				1，在 natural_question / natural_category / object_only 三类 prompt gate 下分别测试同一齿轮组合；
+				2，验证 qwen3 necessary blocker reducer 是否跨语义域、跨 prompt 仍然必要；
+				3，对 DS7B object_echo route 做显式抑制或替换，判断它是小模型捷径还是可迁移身份路线；
+				4，把 clear rollout、identity overlap、object echo 分开作为三个读出边界，而不是混在一个成功率里；
+				5，要求每条候选齿轮边同时报告 first-token、answer-class、clear-rollout、blocker field 和自然生成片段。
+
+			只有当条件齿轮边能够跨对象、跨 prompt、跨语义域、跨模型，并在自然生成中稳定改变 blocker field，才能把当前理论从“机制候选图谱”推进到“语言编码机制闭合图谱”。

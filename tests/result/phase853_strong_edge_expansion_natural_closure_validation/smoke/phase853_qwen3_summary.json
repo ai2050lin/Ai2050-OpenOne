@@ -1,0 +1,687 @@
+{
+  "phase": 853,
+  "title": "Strong-edge Expansion and Natural Closure Validation",
+  "model": "qwen3",
+  "round": "smoke",
+  "timestamp": "2026-07-02 16:41:02",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "phase844_round": "confirm",
+  "phase851_round": "confirm",
+  "n_cases": 1,
+  "case_ids": [
+    "p816_triangle_geometric_shape"
+  ],
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "n_gears": 4,
+  "gears": [
+    {
+      "channel_id": 1532,
+      "gear_score": 16.068558430692867,
+      "layer_idx": 29,
+      "max_abs_support": 11.05610054731369,
+      "mean_abs_activation": 17.966666666666665,
+      "mean_abs_coeff": 0.3249633252620697,
+      "mean_abs_support": 5.795507390548786,
+      "mean_activation": 17.966666666666665,
+      "mean_signed_support": 0.3977546327592184,
+      "n": 15,
+      "neg_ratio": 0.0,
+      "pos_ratio": 1.0,
+      "sign_consistency": 1.0,
+      "gear_rank": 1,
+      "gear_key": "L29C1532",
+      "source": "phase844_top_gear"
+    },
+    {
+      "channel_id": 2848,
+      "gear_score": 8.015071849321407,
+      "layer_idx": 30,
+      "max_abs_support": 7.235517963767052,
+      "mean_abs_activation": 10.6875,
+      "mean_abs_coeff": 0.5409733057022095,
+      "mean_abs_support": 5.781652204692364,
+      "mean_activation": -10.6875,
+      "mean_signed_support": -5.2446324694901705,
+      "n": 3,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0,
+      "gear_rank": 2,
+      "gear_key": "L30C2848",
+      "source": "phase844_top_gear"
+    },
+    {
+      "channel_id": 1349,
+      "gear_score": 6.351178642972136,
+      "layer_idx": 30,
+      "max_abs_support": 7.756138175725937,
+      "mean_abs_activation": 6.821514423076923,
+      "mean_abs_coeff": 0.28652992042211384,
+      "mean_abs_support": 2.5028731716313186,
+      "mean_activation": -6.662860576923077,
+      "mean_signed_support": -1.2660369550934634,
+      "n": 13,
+      "neg_ratio": 0.9230769230769231,
+      "pos_ratio": 0.07692307692307693,
+      "sign_consistency": 0.9230769230769231,
+      "gear_rank": 3,
+      "gear_key": "L30C1349",
+      "source": "phase844_top_gear"
+    },
+    {
+      "channel_id": 2767,
+      "gear_score": 4.476247081309588,
+      "layer_idx": 27,
+      "max_abs_support": 3.339812183752656,
+      "mean_abs_activation": 17.446428571428573,
+      "mean_abs_coeff": 0.09820027649402618,
+      "mean_abs_support": 1.6529409534164838,
+      "mean_activation": -17.446428571428573,
+      "mean_signed_support": 0.703983601024707,
+      "n": 14,
+      "neg_ratio": 1.0,
+      "pos_ratio": 0.0,
+      "sign_consistency": 1.0,
+      "gear_rank": 4,
+      "gear_key": "L27C2767",
+      "source": "phase844_top_gear"
+    }
+  ],
+  "n_rows": 23,
+  "n_interaction_rows": 14,
+  "n_feature_rows": 14,
+  "closure_summary": {
+    "usable_interaction_rows": 14,
+    "classes": {
+      "additive": 12,
+      "synergy": 2
+    },
+    "strong_rows": 2,
+    "all_rows": {
+      "n": 14,
+      "target_transition": 2,
+      "target_gained_vs_original": 2,
+      "target_lost_vs_original": 0,
+      "exact_natural_consistency": 0,
+      "top1_role_proxy": {
+        "blocker_or_other": 14
+      },
+      "boundary_classes": {
+        "broad_near_miss": 12,
+        "target_equivalent": 2
+      },
+      "mean_abs_residual": 0.22767857142857142,
+      "mean_target_minus_object_logit": 1.1964285714285714
+    },
+    "strong_rows_summary": {
+      "n": 2,
+      "target_transition": 0,
+      "target_gained_vs_original": 0,
+      "target_lost_vs_original": 0,
+      "exact_natural_consistency": 0,
+      "top1_role_proxy": {
+        "blocker_or_other": 2
+      },
+      "boundary_classes": {
+        "broad_near_miss": 2
+      },
+      "mean_abs_residual": 0.875,
+      "mean_target_minus_object_logit": 1.5625
+    },
+    "by_combo_type": {
+      "focus": {
+        "n": 2,
+        "target_transition": 0,
+        "target_gained_vs_original": 0,
+        "target_lost_vs_original": 0,
+        "exact_natural_consistency": 0,
+        "top1_role_proxy": {
+          "blocker_or_other": 2
+        },
+        "boundary_classes": {
+          "broad_near_miss": 2
+        },
+        "mean_abs_residual": 0.6875,
+        "mean_target_minus_object_logit": 1.71875
+      },
+      "pair": {
+        "n": 12,
+        "target_transition": 2,
+        "target_gained_vs_original": 2,
+        "target_lost_vs_original": 0,
+        "exact_natural_consistency": 0,
+        "top1_role_proxy": {
+          "blocker_or_other": 12
+        },
+        "boundary_classes": {
+          "broad_near_miss": 10,
+          "target_equivalent": 2
+        },
+        "mean_abs_residual": 0.15104166666666666,
+        "mean_target_minus_object_logit": 1.109375
+      }
+    },
+    "by_prompt": {
+      "natural_question": {
+        "n": 14,
+        "target_transition": 2,
+        "target_gained_vs_original": 2,
+        "target_lost_vs_original": 0,
+        "exact_natural_consistency": 0,
+        "top1_role_proxy": {
+          "blocker_or_other": 14
+        },
+        "boundary_classes": {
+          "broad_near_miss": 12,
+          "target_equivalent": 2
+        },
+        "mean_abs_residual": 0.22767857142857142,
+        "mean_target_minus_object_logit": 1.1964285714285714
+      }
+    },
+    "by_object": {
+      "triangle": {
+        "n": 14,
+        "target_transition": 2,
+        "target_gained_vs_original": 2,
+        "target_lost_vs_original": 0,
+        "exact_natural_consistency": 0,
+        "top1_role_proxy": {
+          "blocker_or_other": 14
+        },
+        "boundary_classes": {
+          "broad_near_miss": 12,
+          "target_equivalent": 2
+        },
+        "mean_abs_residual": 0.22767857142857142,
+        "mean_target_minus_object_logit": 1.1964285714285714
+      }
+    }
+  },
+  "feature_summary": {
+    "n": 14,
+    "actual_classes": {
+      "additive": 12,
+      "synergy": 2
+    },
+    "objects": {
+      "triangle": 14
+    },
+    "prompt_variants": {
+      "natural_question": 14
+    },
+    "strong_rows": 2,
+    "mean_abs_residual": 0.22767857142857142,
+    "mean_strong_abs_residual": 0.875
+  },
+  "gate_split_summary": {
+    "in_sample": {
+      "n_splits": 1,
+      "split_keys": [
+        "all"
+      ],
+      "selected_gate_counts": {
+        "global_combo": 1
+      },
+      "raw_summary": {
+        "blocker_field_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "compact_joint_gate_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "global_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "internal_strength_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "joint_gate_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "model_default_gate": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "residual_projection_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "route_competition_combo": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "train_selected_gate": {
+          "n": 14,
+          "actual_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 12,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 14,
+            "tp": 2,
+            "tn": 12,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        }
+      },
+      "balanced_summary": {
+        "blocker_field_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "compact_joint_gate_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "global_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "internal_strength_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "joint_gate_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "model_default_gate": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "residual_projection_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "route_competition_combo": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        },
+        "train_selected_gate": {
+          "n": 4,
+          "actual_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "predicted_classes": {
+            "additive": 2,
+            "synergy": 2
+          },
+          "strong": {
+            "n": 4,
+            "tp": 2,
+            "tn": 2,
+            "fp": 0,
+            "fn": 0,
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "balanced_accuracy": 1.0,
+          "macro_f1": 0.6666666666666666,
+          "class_accuracy": 1.0
+        }
+      }
+    }
+  },
+  "boundary": "This phase runs new forward passes and evaluates whether expanded gear interactions create more strong-edge rows and whether those strong edges reach natural output closure. It is not final language closure."
+}
