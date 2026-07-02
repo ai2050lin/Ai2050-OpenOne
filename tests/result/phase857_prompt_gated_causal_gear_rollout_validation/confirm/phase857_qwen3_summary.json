@@ -1,0 +1,527 @@
+{
+  "phase": 857,
+  "title": "Prompt-Gated Causal Gear Rollout Validation",
+  "model": "qwen3",
+  "round": "confirm",
+  "timestamp": "2026-07-02 21:30:30",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "source_round": "confirm",
+  "n_sources": 10,
+  "source_groups": {
+    "strong_target_not_exact": 3,
+    "additive_control": 7
+  },
+  "n_rows": 90,
+  "condition_summary": {
+    "full_combo": {
+      "n": 30,
+      "first_token_answer_class": 17,
+      "first_token_clear_answer_class": 17,
+      "rollout_answer_class": 17,
+      "rollout_clear_answer_class": 17,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 13,
+      "rollout_labels": {
+        "other": 13,
+        "answer_alias": 17
+      },
+      "mean_class_blocker_count": 3.5,
+      "mean_class_rank": 4.5,
+      "mean_class_minus_object_logit": 1.4229166666666666,
+      "first_token_predicts_rollout": {
+        "n": 30,
+        "tp": 17,
+        "tn": 13,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "original": {
+      "n": 30,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 28,
+      "rollout_labels": {
+        "other": 28,
+        "answer_alias": 2
+      },
+      "mean_class_blocker_count": 2.6,
+      "mean_class_rank": 3.6,
+      "mean_class_minus_object_logit": 1.3125,
+      "first_token_predicts_rollout": {
+        "n": 30,
+        "tp": 2,
+        "tn": 28,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "without_necessary": {
+      "n": 30,
+      "first_token_answer_class": 3,
+      "first_token_clear_answer_class": 3,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 27,
+      "rollout_labels": {
+        "other": 27,
+        "answer_alias": 3
+      },
+      "mean_class_blocker_count": 2.5,
+      "mean_class_rank": 3.5,
+      "mean_class_minus_object_logit": 2.4270833333333335,
+      "first_token_predicts_rollout": {
+        "n": 30,
+        "tp": 3,
+        "tn": 27,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  },
+  "prompt_summary": {
+    "natural_category": {
+      "n": 30,
+      "first_token_answer_class": 14,
+      "first_token_clear_answer_class": 14,
+      "rollout_answer_class": 14,
+      "rollout_clear_answer_class": 14,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 16,
+      "rollout_labels": {
+        "answer_alias": 14,
+        "other": 16
+      },
+      "mean_class_blocker_count": 0.5333333333333333,
+      "mean_class_rank": 1.5333333333333334,
+      "mean_class_minus_object_logit": 2.904166666666667,
+      "first_token_predicts_rollout": {
+        "n": 30,
+        "tp": 14,
+        "tn": 16,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "natural_question": {
+      "n": 30,
+      "first_token_answer_class": 8,
+      "first_token_clear_answer_class": 8,
+      "rollout_answer_class": 8,
+      "rollout_clear_answer_class": 8,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 22,
+      "rollout_labels": {
+        "other": 22,
+        "answer_alias": 8
+      },
+      "mean_class_blocker_count": 0.8,
+      "mean_class_rank": 1.8,
+      "mean_class_minus_object_logit": 2.504166666666667,
+      "first_token_predicts_rollout": {
+        "n": 30,
+        "tp": 8,
+        "tn": 22,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "object_only": {
+      "n": 30,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 30,
+      "rollout_labels": {
+        "other": 30
+      },
+      "mean_class_blocker_count": 7.266666666666667,
+      "mean_class_rank": 8.266666666666667,
+      "mean_class_minus_object_logit": -0.24583333333333332,
+      "first_token_predicts_rollout": {
+        "n": 30,
+        "tp": 0,
+        "tn": 30,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    }
+  },
+  "prompt_condition_summary": {
+    "natural_category::full_combo": {
+      "n": 10,
+      "first_token_answer_class": 10,
+      "first_token_clear_answer_class": 10,
+      "rollout_answer_class": 10,
+      "rollout_clear_answer_class": 10,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "answer_alias": 10
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_rank": 1.0,
+      "mean_class_minus_object_logit": 2.95,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 10,
+        "tn": 0,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "natural_category::original": {
+      "n": 10,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 8,
+      "rollout_labels": {
+        "answer_alias": 2,
+        "other": 8
+      },
+      "mean_class_blocker_count": 0.8,
+      "mean_class_rank": 1.8,
+      "mean_class_minus_object_logit": 2.3375,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 2,
+        "tn": 8,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "natural_category::without_necessary": {
+      "n": 10,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 8,
+      "rollout_labels": {
+        "answer_alias": 2,
+        "other": 8
+      },
+      "mean_class_blocker_count": 0.8,
+      "mean_class_rank": 1.8,
+      "mean_class_minus_object_logit": 3.425,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 2,
+        "tn": 8,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "natural_question::full_combo": {
+      "n": 10,
+      "first_token_answer_class": 7,
+      "first_token_clear_answer_class": 7,
+      "rollout_answer_class": 7,
+      "rollout_clear_answer_class": 7,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 3,
+      "rollout_labels": {
+        "other": 3,
+        "answer_alias": 7
+      },
+      "mean_class_blocker_count": 0.4,
+      "mean_class_rank": 1.4,
+      "mean_class_minus_object_logit": 2.3375,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 7,
+        "tn": 3,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "natural_question::original": {
+      "n": 10,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 10,
+      "rollout_labels": {
+        "other": 10
+      },
+      "mean_class_blocker_count": 1.0,
+      "mean_class_rank": 2.0,
+      "mean_class_minus_object_logit": 1.925,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 0,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "natural_question::without_necessary": {
+      "n": 10,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "rollout_answer_class": 1,
+      "rollout_clear_answer_class": 1,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 9,
+      "rollout_labels": {
+        "other": 9,
+        "answer_alias": 1
+      },
+      "mean_class_blocker_count": 1.0,
+      "mean_class_rank": 2.0,
+      "mean_class_minus_object_logit": 3.25,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 1,
+        "tn": 9,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "object_only::full_combo": {
+      "n": 10,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 10,
+      "rollout_labels": {
+        "other": 10
+      },
+      "mean_class_blocker_count": 10.1,
+      "mean_class_rank": 11.1,
+      "mean_class_minus_object_logit": -1.01875,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 0,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "object_only::original": {
+      "n": 10,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 10,
+      "rollout_labels": {
+        "other": 10
+      },
+      "mean_class_blocker_count": 6.0,
+      "mean_class_rank": 7.0,
+      "mean_class_minus_object_logit": -0.325,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 0,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    "object_only::without_necessary": {
+      "n": 10,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 10,
+      "rollout_labels": {
+        "other": 10
+      },
+      "mean_class_blocker_count": 5.7,
+      "mean_class_rank": 6.7,
+      "mean_class_minus_object_logit": 0.60625,
+      "first_token_predicts_rollout": {
+        "n": 10,
+        "tp": 0,
+        "tn": 10,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    }
+  },
+  "source_group_summary": {
+    "additive_control": {
+      "n": 63,
+      "first_token_answer_class": 14,
+      "first_token_clear_answer_class": 14,
+      "rollout_answer_class": 14,
+      "rollout_clear_answer_class": 14,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 49,
+      "rollout_labels": {
+        "other": 49,
+        "answer_alias": 14
+      },
+      "mean_class_blocker_count": 2.492063492063492,
+      "mean_class_rank": 3.492063492063492,
+      "mean_class_minus_object_logit": 0.9503968253968254,
+      "first_token_predicts_rollout": {
+        "n": 63,
+        "tp": 14,
+        "tn": 49,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "strong_target_not_exact": {
+      "n": 27,
+      "first_token_answer_class": 8,
+      "first_token_clear_answer_class": 8,
+      "rollout_answer_class": 8,
+      "rollout_clear_answer_class": 8,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 19,
+      "rollout_labels": {
+        "other": 19,
+        "answer_alias": 8
+      },
+      "mean_class_blocker_count": 3.740740740740741,
+      "mean_class_rank": 4.7407407407407405,
+      "mean_class_minus_object_logit": 3.5185185185185186,
+      "first_token_predicts_rollout": {
+        "n": 27,
+        "tp": 8,
+        "tn": 19,
+        "fp": 0,
+        "fn": 0,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  },
+  "full_vs_original": {
+    "n_pairs": 30,
+    "left_condition": "original",
+    "right_condition": "full_combo",
+    "answer_class_gain": 15,
+    "answer_class_loss": 0,
+    "clear_rollout_gain": 15,
+    "clear_rollout_loss": 0,
+    "rollout_class_gain": 15,
+    "rollout_class_loss": 0,
+    "object_echo_reduced": 0,
+    "object_echo_induced": 0,
+    "mean_blocker_reduction": -0.9,
+    "mean_class_minus_object_gain": 0.11041666666666666
+  },
+  "without_necessary_vs_full": {
+    "n_pairs": 30,
+    "left_condition": "full_combo",
+    "right_condition": "without_necessary",
+    "answer_class_gain": 1,
+    "answer_class_loss": 15,
+    "clear_rollout_gain": 1,
+    "clear_rollout_loss": 15,
+    "rollout_class_gain": 1,
+    "rollout_class_loss": 15,
+    "object_echo_reduced": 0,
+    "object_echo_induced": 0,
+    "mean_blocker_reduction": 1.0,
+    "mean_class_minus_object_gain": 1.0041666666666667
+  },
+  "top_mismatch_rows": [],
+  "boundary": "This is a causal replay audit over Phase 854 gear combos under Phase 856 prompt gates. It tests prompt-gated boundary changes, not a newly discovered global closure mechanism."
+}

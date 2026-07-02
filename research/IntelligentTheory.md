@@ -2988,6 +2988,60 @@
 				但它只有在自然问题 / 自然类别提示下更稳定，在 object_only 条件下并不成立；
 				因此语言闭合不是“状态单点胜出”，而是 prompt gate、答案类别场、身份分离场和 rollout 场的联合闭合。
 
+		Phase 857 后的实证修正：
+			Phase 857 把 Phase 856 的自然提示审计接回 Phase 854 的因果齿轮组合。
+			本阶段不是重新搜索新齿轮，而是重放 Phase 854 的 full_combo 和 necessary blocker reducer，
+			在 natural_question / natural_category / object_only 三类 prompt gate 下比较：
+				original；
+				full_combo；
+				without_necessary。
+
+			confirm 轮结果为：
+				qwen3：10 个 source，90 行；full_combo 相对 original 带来 15 个 clear rollout gain，0 个 clear rollout loss；without_necessary 相对 full_combo 造成 15 个 clear rollout loss；
+				GLM4：10 个 source，63 行；full_combo 降低 blocker 并提升 class-object margin，但 clear rollout gain/loss 均为 0；
+				DS7B：10 个 source，66 行；full_combo 带来 9 个 clear rollout gain，0 个 clear rollout loss；without_necessary 造成 3 个 clear rollout loss。
+
+			这说明：
+				qwen3 和 DS7B 的部分 Phase 854 几何齿轮组合确实能在 prompt gate 下因果推动短 rollout 边界；
+				qwen3 的 necessary reducer 在 natural_question / natural_category 上有较强必要性；
+				GLM4 的齿轮组合主要改变 blocker / margin，不足以改变当前 rollout 边界。
+
+			但 transfer 轮结果非常关键：
+				把同一批 Phase 854 几何齿轮迁移到 geometry / animal / tool / color / material / abstract 六个目标域后，
+				qwen3 只有 1 个 clear rollout gain；
+				GLM4 clear rollout gain 为 0；
+				DS7B clear rollout gain 为 0。
+
+			因此 Phase 857 的结论必须严格限定：
+				已有因果齿轮边主要是几何局部路线齿轮；
+				它们能跨 prompt gate 起作用；
+				但尚不能证明跨语义域通用。
+
+			当前闭合公式需要加入 domain-transfer gate：
+
+				G_{domain}(d_s,d_t)
+					=
+					\mathbf{1}
+					[
+						\text{gear edge found in source domain } d_s
+						\text{ transfers to target domain } d_t
+					]
+
+				C_{causal-rollout}(x,p,g)
+					=
+					C_{short-closure}(x,p)
+					\cdot
+					\mathbf{1}
+					[
+						\operatorname{Intervene}(g)
+						\text{ changes clear rollout boundary}
+					]
+
+			理论含义：
+				prompt gate 已经从自然统计关系推进到局部因果齿轮验证；
+				但全局语言编码机制仍缺少跨 domain transfer；
+				下一步应从“几何齿轮迁移”改为“各语义域内独立发现齿轮，再比较是否同构”。
+
 		当前硬伤：
 			1，小模型内部结构可能粗糙，局部齿轮可能是压缩后的替代机制，不一定对应大模型真实机制。
 			2，strong-edge gate 目前主要在 qwen3 上成立，GLM4 和 DS7B 尚未形成同等级证据。
@@ -2997,17 +3051,18 @@
 			6，DS7B 的严重断裂不是全域自然提示结论，而是更集中于身份-类别重叠、object_only、材料 / 抽象等边界模糊条件。
 			7，当前公式可诊断 first-token 到短 rollout 的局部关系，但还不能稳定预测多 token 自然生成全过程。
 			8，规则型 alias 分类仍可能低估或高估语义等价，后续需要把分类器本身纳入审计。
+			9，Phase 857 证明了 prompt-gated 局部因果边，但跨域 transfer 很弱，说明几何齿轮不能直接当成通用语言齿轮。
 
 		下一阶段任务：
 			下一阶段应进入：
 
-				Phase 857：Prompt-Gated Causal Gear Rollout Validation
+				Phase 858：Cross-Domain Independent Gear Discovery and Isomorphism Audit
 
-			核心目标不是再扩大自然提示统计，而是把 Phase 856 的自然审计结果接回因果齿轮图谱：
-				1，在 natural_question / natural_category / object_only 三类 prompt gate 下分别测试同一齿轮组合；
-				2，验证 qwen3 necessary blocker reducer 是否跨语义域、跨 prompt 仍然必要；
-				3，对 DS7B object_echo route 做显式抑制或替换，判断它是小模型捷径还是可迁移身份路线；
-				4，把 clear rollout、identity overlap、object echo 分开作为三个读出边界，而不是混在一个成功率里；
-				5，要求每条候选齿轮边同时报告 first-token、answer-class、clear-rollout、blocker field 和自然生成片段。
+			核心目标不是继续把几何齿轮迁移到其他域，而是在 animal / tool / color / material / abstract 等语义域内分别发现局部齿轮：
+				1，每个语义域独立搜索 answer-class / clear-rollout / object-echo 齿轮；
+				2，再比较这些齿轮是否与 geometry 齿轮同层、同方向、同响应指纹；
+				3，判断是否存在跨域同构齿轮，还是每个域都有专用齿轮；
+				4，把 domain-transfer 从后验观察升级为前置验证标准；
+				5，对 DS7B object_echo route 做域内干预，而不是只用几何齿轮迁移。
 
 			只有当条件齿轮边能够跨对象、跨 prompt、跨语义域、跨模型，并在自然生成中稳定改变 blocker field，才能把当前理论从“机制候选图谱”推进到“语言编码机制闭合图谱”。

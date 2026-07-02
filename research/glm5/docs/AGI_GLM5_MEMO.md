@@ -109095,3 +109095,509 @@ Phase 856 证明：
 因此，下一步不能继续只测局部 patch 成功率，
 必须把 prompt gate、clear rollout、object echo route 接回因果齿轮图谱。
 ```
+
+## Phase 857: Prompt-Gated Causal Gear Rollout Validation [2026-07-02 21:34]
+
+### 一、任务来源
+
+本阶段根据 Phase 856 的结论继续推进。
+
+Phase 856 已经证明：
+
+```text
+first-token answer-class closure
+  是
+short rollout answer-class closure
+  的强诊断指标。
+```
+
+但 Phase 856 仍然只是自然提示审计，不是因果齿轮干预。
+
+本阶段要回答：
+
+```text
+Phase 854 中发现的齿轮组合，
+在不同 prompt gate 下是否真的能因果改变 answer-class / clear-rollout / object-echo 边界？
+```
+
+也就是说，本阶段把：
+
+```text
+自然提示统计关系
+```
+
+接回：
+
+```text
+因果齿轮图谱
+```
+
+### 二、测试脚本和结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase857_prompt_gated_causal_gear_rollout_validation.py
+tests/glm5/run_phase857_prompt_gated_causal_gear_rollout_validation_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase857_prompt_gated_causal_gear_rollout_validation/
+```
+
+已执行轮次：
+
+```text
+smoke
+main
+confirm
+transfer
+```
+
+每轮都按顺序运行：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+测试中没有使用量化。
+脚本优先尝试 flash_attention_2，但当前环境没有安装 FlashAttention2，自动降级为 SDPA。
+三模型均能顺序加载和释放显存。
+
+### 三、测试原理
+
+本阶段不重新搜索齿轮，而是从 Phase 854 读取：
+
+```text
+full_combo rows
+necessary_blocker_reducer edges
+```
+
+对每个 source gear combo，在三类 prompt gate 下重放：
+
+```text
+natural_question
+natural_category
+object_only
+```
+
+每个样本比较三种条件：
+
+```text
+original:
+  不做齿轮干预
+
+full_combo:
+  重放 Phase 854 的完整齿轮组合
+
+without_necessary:
+  移除 Phase 854 标记为 necessary_blocker_reducer 的候选齿轮
+```
+
+核心评价不再只看 target logit，而是分开报告：
+
+```text
+first-token answer-class
+rollout answer-class
+clear rollout
+object echo
+full-vocabulary blocker field
+class-object margin
+```
+
+### 四、核心公式
+
+prompt-gated causal rollout effect：
+
+```text
+E_clear(g, x, p)
+  =
+  C_clear-rollout(Intervene(g, x, p))
+  -
+  C_clear-rollout(x, p)
+```
+
+necessary reducer loss：
+
+```text
+L_necessary(g_i, G, x, p)
+  =
+  C_clear-rollout(Intervene(G, x, p))
+  -
+  C_clear-rollout(Intervene(G \\ {g_i}, x, p))
+```
+
+domain transfer gate：
+
+```text
+G_domain(d_s, d_t)
+  =
+  1[
+    gear edge discovered in source domain d_s
+    transfers to target domain d_t
+  ]
+```
+
+更严格的局部因果闭合：
+
+```text
+C_causal-rollout(x, p, G)
+  =
+  G_prompt(p)
+  *
+  C_answer-class(x)
+  *
+  C_clear-rollout(Intervene(G, x, p))
+  *
+  (1 - C_object-echo(Intervene(G, x, p)))
+```
+
+这个公式仍然不是完整语言编码机制公式，只是短 rollout 因果边界公式。
+
+### 五、confirm 轮结果
+
+confirm 轮使用 Phase 854 的 10 个 source rows / 模型。
+
+qwen3：
+
+```text
+sources = 10
+rows = 90
+
+full_combo vs original:
+  answer_class_gain = 15
+  rollout_class_gain = 15
+  clear_rollout_gain = 15
+  clear_rollout_loss = 0
+
+without_necessary vs full_combo:
+  answer_class_loss = 15
+  rollout_class_loss = 15
+  clear_rollout_loss = 15
+```
+
+GLM4：
+
+```text
+sources = 10
+rows = 63
+
+full_combo vs original:
+  answer_class_gain = 0
+  rollout_class_gain = 0
+  clear_rollout_gain = 0
+  clear_rollout_loss = 0
+  mean_blocker_reduction = 1.7333
+  mean_class-object_margin_gain = 0.5010
+
+without_necessary vs full_combo:
+  clear_rollout_loss = 0
+```
+
+DS7B：
+
+```text
+sources = 10
+rows = 66
+
+full_combo vs original:
+  answer_class_gain = 10
+  rollout_class_gain = 10
+  clear_rollout_gain = 9
+  clear_rollout_loss = 0
+
+without_necessary vs full_combo:
+  answer_class_loss = 3
+  rollout_class_loss = 3
+  clear_rollout_loss = 3
+```
+
+客观结论：
+
+```text
+1. qwen3 的 Phase 854 necessary blocker reducer 在 prompt gate 下有明显因果必要性。
+2. DS7B 也出现部分 prompt-gated causal gear effect，但弱于 qwen3。
+3. GLM4 的 full_combo 能改变 blocker / margin，但未改变 rollout 边界。
+4. object_only 基本没有被这些几何齿轮推入 clear rollout，说明 prompt gate 是强边界。
+```
+
+### 六、prompt gate 细分
+
+qwen3：
+
+```text
+natural_category:
+  original clear = 2 / 10
+  full_combo clear = 10 / 10
+
+natural_question:
+  original clear = 0 / 10
+  full_combo clear = 7 / 10
+
+object_only:
+  original clear = 0 / 10
+  full_combo clear = 0 / 10
+```
+
+GLM4：
+
+```text
+natural_category:
+  original clear = 10 / 10
+  full_combo clear = 10 / 10
+
+natural_question:
+  original clear = 10 / 10
+  full_combo clear = 10 / 10
+
+object_only:
+  original clear = 0 / 10
+  full_combo clear = 0 / 10
+```
+
+DS7B：
+
+```text
+natural_category:
+  original clear = 0 / 10
+  full_combo clear = 4 / 10
+
+natural_question:
+  original clear = 0 / 10
+  full_combo clear = 5 / 10
+
+object_only:
+  original clear = 0 / 10
+  full_combo clear = 0 / 10
+```
+
+关键现象：
+
+```text
+同一齿轮组合在 natural_question / natural_category 下有效；
+在 object_only 下基本无效。
+```
+
+这说明：
+
+```text
+prompt gate 不是表面模板变量，
+而是齿轮因果效应能否进入 answer-class route 的边界条件。
+```
+
+### 七、transfer 轮结果
+
+为了检验 Phase 854 几何齿轮是否是通用语言齿轮，本阶段增加 transfer 轮。
+
+transfer 轮把同一批几何齿轮迁移到：
+
+```text
+geometry
+animal
+tool
+color
+material
+abstract
+```
+
+每个域 1 个目标样本，使用：
+
+```text
+natural_question
+natural_category
+```
+
+qwen3：
+
+```text
+sources = 2
+rows = 72
+
+full_combo vs original:
+  clear_rollout_gain = 1
+  clear_rollout_loss = 0
+```
+
+GLM4：
+
+```text
+sources = 2
+rows = 60
+
+full_combo vs original:
+  clear_rollout_gain = 0
+  clear_rollout_loss = 0
+```
+
+DS7B：
+
+```text
+sources = 2
+rows = 72
+
+full_combo vs original:
+  clear_rollout_gain = 0
+  clear_rollout_loss = 0
+```
+
+transfer 轮结论：
+
+```text
+Phase 854 的几何齿轮不是自动通用语言齿轮。
+```
+
+它们可以跨 prompt gate 起作用，但跨语义域迁移很弱。
+
+### 八、附件判断是否正确
+
+附件中对 Phase 856 的判断基本正确：
+
+```text
+1. Phase 856 是自然提示审计，不是因果齿轮干预。
+2. Phase 856 的下一步确实应该进入 Prompt-Gated Causal Gear Rollout Validation。
+3. prompt gate 是路线门控，而不是表面模板。
+4. clear rollout、object_echo、identity-class overlap 必须分开计分。
+```
+
+Phase 857 对附件判断做出的新增收紧：
+
+```text
+1. prompt-gated causal gear effect 已经在 qwen3 和 DS7B 的几何局部路线中出现。
+2. qwen3 necessary reducer 跨两个 prompt gate 有明显必要性。
+3. 但几何齿轮跨语义域 transfer 很弱。
+4. 因此不能把 geometry gear works 直接升级为 language gear found。
+```
+
+### 九、理论进展
+
+本阶段把图谱从：
+
+```text
+natural prompt audit
+```
+
+推进到：
+
+```text
+prompt-gated causal replay
+```
+
+当前图谱形状应更新为：
+
+```text
+local domain gear
+  ->
+prompt-gated causal effect
+  ->
+answer-class / clear-rollout boundary
+  ->
+domain-transfer test
+  ->
+cross-domain isomorphism audit
+```
+
+也就是说：
+
+```text
+局部齿轮因果边存在；
+但全局语言齿轮同构还没有证明。
+```
+
+### 十、问题和硬伤
+
+```text
+1. Phase 857 重放的是 Phase 854 几何齿轮，不是跨域独立搜索。
+2. confirm 正结果主要来自 geometry 内部，不能外推到完整语言。
+3. transfer 轮样本量小，但已经显示跨域迁移很弱。
+4. GLM4 的 blocker/margin 改善未转化成 rollout 边界，说明读出改善与自然生成仍可分离。
+5. DS7B 的 object_echo route 没有被本阶段齿轮显式压制。
+6. object_only 是 prompt gate 对照，不是类别回答失败样本。
+7. alias 分类仍是规则型，抽象和材料域仍可能存在分类偏差。
+8. 小模型可能把 domain-specific gears 压缩在少数层或通道中，导致齿轮形状不代表大模型。
+```
+
+### 十一、闭合距离评估
+
+当前可以认为已经推进到：
+
+```text
+prompt-gated local causal rollout edge
+```
+
+但还没有推进到：
+
+```text
+cross-domain universal causal gear
+```
+
+闭合层级：
+
+```text
+strict canonical token closure:
+  未完成。
+
+answer-class first-token closure:
+  已有较强证据。
+
+short rollout answer-class closure:
+  已有跨域自然提示证据。
+
+prompt-gated causal rollout:
+  qwen3 / DS7B 几何局部成立。
+
+domain transfer:
+  很弱。
+
+cross-domain gear isomorphism:
+  未完成。
+
+full language encoding closure:
+  仍远未完成。
+```
+
+如果按完整语言编码机制闭合评估，当前进度约为：
+
+```text
+14% - 22%
+```
+
+比 Phase 856 略有进展，因为已经从自然统计回到因果齿轮重放；
+但 transfer 负结果阻止了更高估计。
+
+### 十二、下一阶段任务
+
+下一阶段仍属于全局齿轮图谱阶段，应进入：
+
+```text
+Phase 858:
+Cross-Domain Independent Gear Discovery and Isomorphism Audit
+```
+
+核心任务：
+
+```text
+1. 不再只迁移几何齿轮，而是在 animal / tool / color / material / abstract 等域内独立搜索齿轮。
+2. 每个域都分别报告 answer-class、clear-rollout、object_echo、blocker field。
+3. 比较不同域齿轮是否同层、同方向、同响应指纹。
+4. 将 domain transfer 从后验观察升级为前置闭合标准。
+5. 对 DS7B object_echo route 做域内干预，而不是只用几何齿轮迁移。
+```
+
+阶段性结论：
+
+```text
+Phase 857 证明：
+  prompt-gated causal gear effect 在几何局部路线中成立；
+  qwen3 necessary reducer 具有跨 prompt gate 必要性；
+  DS7B 也有部分正结果；
+  但几何齿轮跨语义域迁移很弱。
+
+因此，全局齿轮图谱下一步必须从：
+  几何齿轮迁移
+转向：
+  跨域独立齿轮发现 + 同构审计。
+```
