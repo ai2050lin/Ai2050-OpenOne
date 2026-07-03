@@ -1,0 +1,1173 @@
+{
+  "phase": 884,
+  "title": "Atlas Coverage Expansion and Stable Boundary Search",
+  "model": "deepseek7b",
+  "round": "coverage_stable_boundary",
+  "timestamp": "2026-07-03 01:58:48",
+  "status": "complete",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "selected_candidates": [
+    {
+      "candidate_source": "phase883_positive_atlas_edge",
+      "source_phase": "phase880",
+      "source_evidence_label": "gear_set_minimal_cut_candidate",
+      "source_atlas_score": 12.3,
+      "source_candidate_key": "L27C15369+L26C8587:zero",
+      "candidate_key": "L27C15369+L26C8587:zero",
+      "parent_candidate_key": "L27C15369+L26C8587:zero",
+      "gear_key": "L27C15369+L26C8587",
+      "gear_keys": [
+        "L27C15369",
+        "L26C8587"
+      ],
+      "gears": [
+        {
+          "layer_idx": 27,
+          "channel_id": 15369,
+          "gear_key": "L27C15369"
+        },
+        {
+          "layer_idx": 26,
+          "channel_id": 8587,
+          "gear_key": "L26C8587"
+        }
+      ],
+      "edit_mode": "zero",
+      "discovery_domain": "color",
+      "source_eval_domain": "color",
+      "source_control_type": "counterfactual_subset"
+    },
+    {
+      "candidate_source": "phase883_positive_atlas_edge",
+      "source_phase": "phase882",
+      "source_evidence_label": "weak_modulator",
+      "source_atlas_score": 0.875,
+      "source_candidate_key": "L27C1851:flip",
+      "candidate_key": "L27C1851:flip",
+      "parent_candidate_key": "L27C1851:flip",
+      "gear_key": "L27C1851",
+      "gear_keys": [
+        "L27C1851"
+      ],
+      "gears": [
+        {
+          "layer_idx": 27,
+          "channel_id": 1851,
+          "gear_key": "L27C1851"
+        }
+      ],
+      "edit_mode": "flip",
+      "discovery_domain": "material",
+      "source_eval_domain": "color",
+      "source_control_type": "discovered"
+    },
+    {
+      "candidate_source": "phase883_positive_atlas_edge",
+      "source_phase": "phase881",
+      "source_evidence_label": "repair_candidate",
+      "source_atlas_score": 0.5666666666666665,
+      "source_candidate_key": "L27C16651:flip",
+      "candidate_key": "L27C16651:flip",
+      "parent_candidate_key": "L27C16651:flip",
+      "gear_key": "L27C16651",
+      "gear_keys": [
+        "L27C16651"
+      ],
+      "gears": [
+        {
+          "layer_idx": 27,
+          "channel_id": 16651,
+          "gear_key": "L27C16651"
+        }
+      ],
+      "edit_mode": "flip",
+      "discovery_domain": "animal",
+      "source_eval_domain": "animal",
+      "source_control_type": "none"
+    }
+  ],
+  "eval_domains": [
+    "geometry",
+    "animal",
+    "tool",
+    "color",
+    "material",
+    "abstract",
+    "plant",
+    "object"
+  ],
+  "case_count": 32,
+  "prompt_variants": [
+    "natural_question",
+    "natural_category",
+    "object_only",
+    "classification"
+  ],
+  "summary": {
+    "n": 1024,
+    "models": {
+      "deepseek7b": 1024
+    },
+    "eval_domains": {
+      "geometry": 128,
+      "animal": 128,
+      "tool": 128,
+      "color": 128,
+      "material": 128,
+      "abstract": 128,
+      "plant": 128,
+      "object": 128
+    },
+    "condition_types": {
+      "full": 384,
+      "proper_subset": 256,
+      "same_layer_random": 384
+    },
+    "closure_from_open": 22,
+    "answer_gain": 20,
+    "domain_specific_closure": 21,
+    "cross_domain_closure": 1,
+    "intervened_boundary_closed": 270,
+    "mean_blocker_reduction": -0.0576171875,
+    "candidate_groups": [
+      {
+        "model": "deepseek7b",
+        "control_type": "proper_subset",
+        "condition_type": "proper_subset",
+        "candidate_key": "L27C15369:subset0:zero",
+        "n": 128,
+        "closure_from_open": 6,
+        "answer_gain": 5,
+        "domain_specific_closure": 6,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 37,
+        "clean_like_closure": 1,
+        "nonclean_like_closure": 5,
+        "mean_blocker_reduction": 0.078125,
+        "mean_rank_improvement": 0.078125,
+        "mean_class_logit_delta": 0.138916015625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "red"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 2.125,
+        "delta_vs_source_atlas": -10.175,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C16651:flip",
+        "n": 128,
+        "closure_from_open": 5,
+        "answer_gain": 7,
+        "domain_specific_closure": 5,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 36,
+        "clean_like_closure": 5,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.1640625,
+        "mean_rank_improvement": -0.1640625,
+        "mean_class_logit_delta": 0.206787109375,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "animal"
+        ],
+        "closure_objects": [
+          "cat",
+          "dog",
+          "fish"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question"
+        ],
+        "source_atlas_score": 0.5666666666666665,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 5,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 2.08515625,
+        "delta_vs_source_atlas": 1.5184895833333334,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "proper_subset",
+        "condition_type": "proper_subset",
+        "candidate_key": "L26C8587:subset1:zero",
+        "n": 128,
+        "closure_from_open": 2,
+        "answer_gain": 1,
+        "domain_specific_closure": 2,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 33,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 2,
+        "mean_blocker_reduction": -0.0390625,
+        "mean_rank_improvement": -0.0390625,
+        "mean_class_logit_delta": 0.02490234375,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "red"
+        ],
+        "closure_prompts": [
+          "natural_category",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 1.86328125,
+        "delta_vs_source_atlas": -10.43671875,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C1851:flip",
+        "n": 128,
+        "closure_from_open": 1,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 1,
+        "intervened_boundary_closed": 32,
+        "clean_like_closure": 1,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.234375,
+        "mean_rank_improvement": -0.234375,
+        "mean_class_logit_delta": -0.00439453125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "animal"
+        ],
+        "closure_objects": [
+          "cat"
+        ],
+        "closure_prompts": [
+          "natural_category"
+        ],
+        "source_atlas_score": 0.875,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 1,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -0.2734375,
+        "delta_vs_source_atlas": -1.1484375,
+        "evidence_label": "cross_domain_side_effect"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C15369+L26C8587:zero",
+        "n": 128,
+        "closure_from_open": 8,
+        "answer_gain": 7,
+        "domain_specific_closure": 8,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 39,
+        "clean_like_closure": 3,
+        "nonclean_like_closure": 5,
+        "mean_blocker_reduction": 0.0859375,
+        "mean_rank_improvement": 0.0859375,
+        "mean_class_logit_delta": 0.20947265625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "green",
+          "red"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 6,
+        "full_closure_for_minimality": 8,
+        "proper_subset_failure_rate": 0.75,
+        "phase884_score": -0.7492187499999998,
+        "delta_vs_source_atlas": -13.049218750000001,
+        "evidence_label": "proper_subset_not_minimal"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C10750:random:flip",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.015625,
+        "mean_rank_improvement": -0.015625,
+        "mean_class_logit_delta": -0.001220703125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 0.5666666666666665,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.74375,
+        "delta_vs_source_atlas": -2.3104166666666663,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C4180:random:flip",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.0234375,
+        "mean_rank_improvement": -0.0234375,
+        "mean_class_logit_delta": -0.000244140625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 0.875,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.74453125,
+        "delta_vs_source_atlas": -2.61953125,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C459+L26C14243:random:zero",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.1484375,
+        "mean_rank_improvement": -0.1484375,
+        "mean_class_logit_delta": -0.0050048828125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.75703125,
+        "delta_vs_source_atlas": -14.057031250000001,
+        "evidence_label": "same_layer_random_control"
+      }
+    ],
+    "evidence_label_counts": {
+      "stable_boundary_candidate": 3,
+      "cross_domain_side_effect": 1,
+      "proper_subset_not_minimal": 1,
+      "same_layer_random_control": 3
+    },
+    "positive_phase884_score_edges": 3,
+    "negative_phase884_score_edges": 5,
+    "top_score_edges": [
+      {
+        "model": "deepseek7b",
+        "control_type": "proper_subset",
+        "condition_type": "proper_subset",
+        "candidate_key": "L27C15369:subset0:zero",
+        "n": 128,
+        "closure_from_open": 6,
+        "answer_gain": 5,
+        "domain_specific_closure": 6,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 37,
+        "clean_like_closure": 1,
+        "nonclean_like_closure": 5,
+        "mean_blocker_reduction": 0.078125,
+        "mean_rank_improvement": 0.078125,
+        "mean_class_logit_delta": 0.138916015625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "red"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 2.125,
+        "delta_vs_source_atlas": -10.175,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C16651:flip",
+        "n": 128,
+        "closure_from_open": 5,
+        "answer_gain": 7,
+        "domain_specific_closure": 5,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 36,
+        "clean_like_closure": 5,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.1640625,
+        "mean_rank_improvement": -0.1640625,
+        "mean_class_logit_delta": 0.206787109375,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "animal"
+        ],
+        "closure_objects": [
+          "cat",
+          "dog",
+          "fish"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question"
+        ],
+        "source_atlas_score": 0.5666666666666665,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 5,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 2.08515625,
+        "delta_vs_source_atlas": 1.5184895833333334,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "proper_subset",
+        "condition_type": "proper_subset",
+        "candidate_key": "L26C8587:subset1:zero",
+        "n": 128,
+        "closure_from_open": 2,
+        "answer_gain": 1,
+        "domain_specific_closure": 2,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 33,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 2,
+        "mean_blocker_reduction": -0.0390625,
+        "mean_rank_improvement": -0.0390625,
+        "mean_class_logit_delta": 0.02490234375,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "red"
+        ],
+        "closure_prompts": [
+          "natural_category",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 1.86328125,
+        "delta_vs_source_atlas": -10.43671875,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C1851:flip",
+        "n": 128,
+        "closure_from_open": 1,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 1,
+        "intervened_boundary_closed": 32,
+        "clean_like_closure": 1,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.234375,
+        "mean_rank_improvement": -0.234375,
+        "mean_class_logit_delta": -0.00439453125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "animal"
+        ],
+        "closure_objects": [
+          "cat"
+        ],
+        "closure_prompts": [
+          "natural_category"
+        ],
+        "source_atlas_score": 0.875,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 1,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -0.2734375,
+        "delta_vs_source_atlas": -1.1484375,
+        "evidence_label": "cross_domain_side_effect"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C15369+L26C8587:zero",
+        "n": 128,
+        "closure_from_open": 8,
+        "answer_gain": 7,
+        "domain_specific_closure": 8,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 39,
+        "clean_like_closure": 3,
+        "nonclean_like_closure": 5,
+        "mean_blocker_reduction": 0.0859375,
+        "mean_rank_improvement": 0.0859375,
+        "mean_class_logit_delta": 0.20947265625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "green",
+          "red"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 6,
+        "full_closure_for_minimality": 8,
+        "proper_subset_failure_rate": 0.75,
+        "phase884_score": -0.7492187499999998,
+        "delta_vs_source_atlas": -13.049218750000001,
+        "evidence_label": "proper_subset_not_minimal"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C10750:random:flip",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.015625,
+        "mean_rank_improvement": -0.015625,
+        "mean_class_logit_delta": -0.001220703125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 0.5666666666666665,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.74375,
+        "delta_vs_source_atlas": -2.3104166666666663,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C4180:random:flip",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.0234375,
+        "mean_rank_improvement": -0.0234375,
+        "mean_class_logit_delta": -0.000244140625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 0.875,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.74453125,
+        "delta_vs_source_atlas": -2.61953125,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C459+L26C14243:random:zero",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.1484375,
+        "mean_rank_improvement": -0.1484375,
+        "mean_class_logit_delta": -0.0050048828125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.75703125,
+        "delta_vs_source_atlas": -14.057031250000001,
+        "evidence_label": "same_layer_random_control"
+      }
+    ],
+    "bottom_score_edges": [
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C459+L26C14243:random:zero",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.1484375,
+        "mean_rank_improvement": -0.1484375,
+        "mean_class_logit_delta": -0.0050048828125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.75703125,
+        "delta_vs_source_atlas": -14.057031250000001,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C4180:random:flip",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.0234375,
+        "mean_rank_improvement": -0.0234375,
+        "mean_class_logit_delta": -0.000244140625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 0.875,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.74453125,
+        "delta_vs_source_atlas": -2.61953125,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "same_layer_random",
+        "condition_type": "same_layer_random",
+        "candidate_key": "L27C10750:random:flip",
+        "n": 128,
+        "closure_from_open": 0,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 31,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.015625,
+        "mean_rank_improvement": -0.015625,
+        "mean_class_logit_delta": -0.001220703125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [],
+        "closure_objects": [],
+        "closure_prompts": [],
+        "source_atlas_score": 0.5666666666666665,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -1.74375,
+        "delta_vs_source_atlas": -2.3104166666666663,
+        "evidence_label": "same_layer_random_control"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C15369+L26C8587:zero",
+        "n": 128,
+        "closure_from_open": 8,
+        "answer_gain": 7,
+        "domain_specific_closure": 8,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 39,
+        "clean_like_closure": 3,
+        "nonclean_like_closure": 5,
+        "mean_blocker_reduction": 0.0859375,
+        "mean_rank_improvement": 0.0859375,
+        "mean_class_logit_delta": 0.20947265625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "green",
+          "red"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 6,
+        "full_closure_for_minimality": 8,
+        "proper_subset_failure_rate": 0.75,
+        "phase884_score": -0.7492187499999998,
+        "delta_vs_source_atlas": -13.049218750000001,
+        "evidence_label": "proper_subset_not_minimal"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C1851:flip",
+        "n": 128,
+        "closure_from_open": 1,
+        "answer_gain": 0,
+        "domain_specific_closure": 0,
+        "cross_domain_closure": 1,
+        "intervened_boundary_closed": 32,
+        "clean_like_closure": 1,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.234375,
+        "mean_rank_improvement": -0.234375,
+        "mean_class_logit_delta": -0.00439453125,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "animal"
+        ],
+        "closure_objects": [
+          "cat"
+        ],
+        "closure_prompts": [
+          "natural_category"
+        ],
+        "source_atlas_score": 0.875,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 1,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": -0.2734375,
+        "delta_vs_source_atlas": -1.1484375,
+        "evidence_label": "cross_domain_side_effect"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "proper_subset",
+        "condition_type": "proper_subset",
+        "candidate_key": "L26C8587:subset1:zero",
+        "n": 128,
+        "closure_from_open": 2,
+        "answer_gain": 1,
+        "domain_specific_closure": 2,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 33,
+        "clean_like_closure": 0,
+        "nonclean_like_closure": 2,
+        "mean_blocker_reduction": -0.0390625,
+        "mean_rank_improvement": -0.0390625,
+        "mean_class_logit_delta": 0.02490234375,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "red"
+        ],
+        "closure_prompts": [
+          "natural_category",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 1.86328125,
+        "delta_vs_source_atlas": -10.43671875,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "none",
+        "condition_type": "full",
+        "candidate_key": "L27C16651:flip",
+        "n": 128,
+        "closure_from_open": 5,
+        "answer_gain": 7,
+        "domain_specific_closure": 5,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 36,
+        "clean_like_closure": 5,
+        "nonclean_like_closure": 0,
+        "mean_blocker_reduction": -0.1640625,
+        "mean_rank_improvement": -0.1640625,
+        "mean_class_logit_delta": 0.206787109375,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "animal"
+        ],
+        "closure_objects": [
+          "cat",
+          "dog",
+          "fish"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question"
+        ],
+        "source_atlas_score": 0.5666666666666665,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 5,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 2.08515625,
+        "delta_vs_source_atlas": 1.5184895833333334,
+        "evidence_label": "stable_boundary_candidate"
+      },
+      {
+        "model": "deepseek7b",
+        "control_type": "proper_subset",
+        "condition_type": "proper_subset",
+        "candidate_key": "L27C15369:subset0:zero",
+        "n": 128,
+        "closure_from_open": 6,
+        "answer_gain": 5,
+        "domain_specific_closure": 6,
+        "cross_domain_closure": 0,
+        "intervened_boundary_closed": 37,
+        "clean_like_closure": 1,
+        "nonclean_like_closure": 5,
+        "mean_blocker_reduction": 0.078125,
+        "mean_rank_improvement": 0.078125,
+        "mean_class_logit_delta": 0.138916015625,
+        "coverage_domains": [
+          "abstract",
+          "animal",
+          "color",
+          "geometry",
+          "material",
+          "object",
+          "plant",
+          "tool"
+        ],
+        "closure_domains": [
+          "color"
+        ],
+        "closure_objects": [
+          "blue",
+          "red"
+        ],
+        "closure_prompts": [
+          "classification",
+          "natural_category",
+          "natural_question",
+          "object_only"
+        ],
+        "source_atlas_score": 12.3,
+        "proper_subset_also_closed": 0,
+        "full_closure_for_minimality": 0,
+        "proper_subset_failure_rate": 0.0,
+        "phase884_score": 2.125,
+        "delta_vs_source_atlas": -10.175,
+        "evidence_label": "stable_boundary_candidate"
+      }
+    ]
+  },
+  "boundary": "Phase884 expands atlas coverage from Phase883 positive non-side-effect edges. It searches stable boundary evidence, not full language closure."
+}

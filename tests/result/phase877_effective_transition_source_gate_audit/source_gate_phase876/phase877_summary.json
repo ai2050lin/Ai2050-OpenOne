@@ -1,0 +1,2303 @@
+{
+  "phase": 877,
+  "title": "Effective Transition Source-Gate Audit",
+  "timestamp": "2026-07-02 19:38:55",
+  "phase875_rows": "tests/result/phase875_nonclean_output_transition_route_audit/combined_phase876/phase875_route_rows.jsonl",
+  "target_round": "validation_phase876",
+  "summary": {
+    "n_effective_all_rounds": 33,
+    "n_effective_target_round": 12,
+    "target_round": "validation_phase876",
+    "target_transition_class_counts": {
+      "clean_causal_transition": 4,
+      "nonclean_output_transition": 8
+    },
+    "target_route_counts": {
+      "clean_causal_transition": 4,
+      "format_recovery": 3,
+      "semantic_pressure_transition": 3,
+      "protocol_pressure_transition": 2
+    },
+    "target_model_domain_counts": {
+      "deepseek7b:animal": 10,
+      "deepseek7b:color": 2
+    },
+    "target_candidate_counts": {
+      "L27C16651+L24C3875:scale_up": 1,
+      "L27C16651+L24C3875:flip": 4,
+      "L27C16651+L24C3875:half": 2,
+      "L27C16651+L24C3875:zero": 3,
+      "L27C15369+L26C8587:flip": 1,
+      "L27C15369+L26C8587:zero": 1
+    },
+    "target_source_gate_counts": {
+      "clean_blocker_weakening_gate": 4,
+      "format_recovery_gate": 3,
+      "semantic_answer_lift_gate": 3,
+      "protocol_pressure_gate": 2
+    },
+    "target_prompt_gate_counts": {
+      "format_prompt_gate": 3,
+      "direct_prompt_gate": 3,
+      "echo_prompt_gate": 6
+    },
+    "target_field_gate_counts": {
+      "semantic_field_gate": 10,
+      "protocol_field_gate": 2
+    },
+    "target_transition_label_counts": {
+      "other->strict_canonical": 6,
+      "format_or_empty->answer_alias": 3,
+      "other->answer_alias": 3
+    },
+    "target_by_candidate": {
+      "L27C15369+L26C8587:flip": {
+        "n": 1,
+        "transition_class_counts": {
+          "clean_causal_transition": 1
+        },
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "source_gate_counts": {
+          "clean_blocker_weakening_gate": 1
+        },
+        "prompt_gate_counts": {
+          "direct_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 1
+        },
+        "edit_mode_counts": {
+          "flip": 1
+        },
+        "objects": [
+          "navy"
+        ],
+        "prompts": [
+          "nonclean_direct"
+        ],
+        "mean_answer_delta": 1.4375,
+        "mean_blocker_reduction": 3.0,
+        "mean_original_blocker_delta": -0.041666666666666664,
+        "mean_target_margin": 0.8125,
+        "mean_field_class_blocker_count": 3.0
+      },
+      "L27C15369+L26C8587:zero": {
+        "n": 1,
+        "transition_class_counts": {
+          "clean_causal_transition": 1
+        },
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "source_gate_counts": {
+          "clean_blocker_weakening_gate": 1
+        },
+        "prompt_gate_counts": {
+          "direct_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 1
+        },
+        "edit_mode_counts": {
+          "zero": 1
+        },
+        "objects": [
+          "navy"
+        ],
+        "prompts": [
+          "nonclean_direct"
+        ],
+        "mean_answer_delta": 0.6875,
+        "mean_blocker_reduction": 3.0,
+        "mean_original_blocker_delta": -0.041666666666666664,
+        "mean_target_margin": 0.0625,
+        "mean_field_class_blocker_count": 3.0
+      },
+      "L27C16651+L24C3875:flip": {
+        "n": 4,
+        "transition_class_counts": {
+          "clean_causal_transition": 1,
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "clean_causal_transition": 1,
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1,
+          "protocol_pressure_transition": 1
+        },
+        "source_gate_counts": {
+          "clean_blocker_weakening_gate": 1,
+          "format_recovery_gate": 1,
+          "semantic_answer_lift_gate": 1,
+          "protocol_pressure_gate": 1
+        },
+        "prompt_gate_counts": {
+          "direct_prompt_gate": 1,
+          "echo_prompt_gate": 2,
+          "format_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 2,
+          "format_or_empty->answer_alias": 1,
+          "other->answer_alias": 1
+        },
+        "edit_mode_counts": {
+          "flip": 4
+        },
+        "objects": [
+          "bat",
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure",
+          "format_pressure",
+          "nonclean_direct"
+        ],
+        "mean_answer_delta": 2.546875,
+        "mean_blocker_reduction": 1.5,
+        "mean_original_blocker_delta": 0.03125,
+        "mean_target_margin": 1.96875,
+        "mean_field_class_blocker_count": 1.5
+      },
+      "L27C16651+L24C3875:half": {
+        "n": 2,
+        "transition_class_counts": {
+          "nonclean_output_transition": 2
+        },
+        "route_counts": {
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1
+        },
+        "source_gate_counts": {
+          "format_recovery_gate": 1,
+          "semantic_answer_lift_gate": 1
+        },
+        "prompt_gate_counts": {
+          "echo_prompt_gate": 2
+        },
+        "transition_label_counts": {
+          "format_or_empty->answer_alias": 1,
+          "other->answer_alias": 1
+        },
+        "edit_mode_counts": {
+          "half": 2
+        },
+        "objects": [
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_answer_delta": 1.03125,
+        "mean_blocker_reduction": 1.5,
+        "mean_original_blocker_delta": 0.046875,
+        "mean_target_margin": 0.46875,
+        "mean_field_class_blocker_count": 1.5
+      },
+      "L27C16651+L24C3875:scale_up": {
+        "n": 1,
+        "transition_class_counts": {
+          "clean_causal_transition": 1
+        },
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "source_gate_counts": {
+          "clean_blocker_weakening_gate": 1
+        },
+        "prompt_gate_counts": {
+          "format_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 1
+        },
+        "edit_mode_counts": {
+          "scale_up": 1
+        },
+        "objects": [
+          "seal"
+        ],
+        "prompts": [
+          "format_pressure"
+        ],
+        "mean_answer_delta": 1.3125,
+        "mean_blocker_reduction": 1.0,
+        "mean_original_blocker_delta": -0.0625,
+        "mean_target_margin": 1.125,
+        "mean_field_class_blocker_count": 1.0
+      },
+      "L27C16651+L24C3875:zero": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1,
+          "protocol_pressure_transition": 1
+        },
+        "source_gate_counts": {
+          "format_recovery_gate": 1,
+          "semantic_answer_lift_gate": 1,
+          "protocol_pressure_gate": 1
+        },
+        "prompt_gate_counts": {
+          "echo_prompt_gate": 2,
+          "format_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "format_or_empty->answer_alias": 1,
+          "other->answer_alias": 1,
+          "other->strict_canonical": 1
+        },
+        "edit_mode_counts": {
+          "zero": 3
+        },
+        "objects": [
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure",
+          "format_pressure"
+        ],
+        "mean_answer_delta": 1.4791666666666667,
+        "mean_blocker_reduction": 1.3333333333333333,
+        "mean_original_blocker_delta": 0.0625,
+        "mean_target_margin": 1.0208333333333333,
+        "mean_field_class_blocker_count": 1.3333333333333333
+      }
+    },
+    "target_by_source_gate": {
+      "clean_blocker_weakening_gate": {
+        "n": 4,
+        "transition_class_counts": {
+          "clean_causal_transition": 4
+        },
+        "route_counts": {
+          "clean_causal_transition": 4
+        },
+        "source_gate_counts": {
+          "clean_blocker_weakening_gate": 4
+        },
+        "prompt_gate_counts": {
+          "format_prompt_gate": 1,
+          "direct_prompt_gate": 3
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 4
+        },
+        "edit_mode_counts": {
+          "scale_up": 1,
+          "flip": 2,
+          "zero": 1
+        },
+        "objects": [
+          "bat",
+          "navy",
+          "seal"
+        ],
+        "prompts": [
+          "format_pressure",
+          "nonclean_direct"
+        ],
+        "mean_answer_delta": 1.21875,
+        "mean_blocker_reduction": 2.25,
+        "mean_original_blocker_delta": -0.05208333333333333,
+        "mean_target_margin": 0.640625,
+        "mean_field_class_blocker_count": 2.25
+      },
+      "format_recovery_gate": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "format_recovery": 3
+        },
+        "source_gate_counts": {
+          "format_recovery_gate": 3
+        },
+        "prompt_gate_counts": {
+          "echo_prompt_gate": 3
+        },
+        "transition_label_counts": {
+          "format_or_empty->answer_alias": 3
+        },
+        "edit_mode_counts": {
+          "flip": 1,
+          "half": 1,
+          "zero": 1
+        },
+        "objects": [
+          "sheep"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_answer_delta": 1.8958333333333333,
+        "mean_blocker_reduction": 2.0,
+        "mean_original_blocker_delta": 0.010416666666666666,
+        "mean_target_margin": 1.6041666666666667,
+        "mean_field_class_blocker_count": 2.0
+      },
+      "protocol_pressure_gate": {
+        "n": 2,
+        "transition_class_counts": {
+          "nonclean_output_transition": 2
+        },
+        "route_counts": {
+          "protocol_pressure_transition": 2
+        },
+        "source_gate_counts": {
+          "protocol_pressure_gate": 2
+        },
+        "prompt_gate_counts": {
+          "format_prompt_gate": 2
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 2
+        },
+        "edit_mode_counts": {
+          "flip": 1,
+          "zero": 1
+        },
+        "objects": [
+          "wolf"
+        ],
+        "prompts": [
+          "format_pressure"
+        ],
+        "mean_answer_delta": 0.625,
+        "mean_blocker_reduction": 1.0,
+        "mean_original_blocker_delta": 0.0625,
+        "mean_target_margin": 0.375,
+        "mean_field_class_blocker_count": 1.0
+      },
+      "semantic_answer_lift_gate": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "semantic_pressure_transition": 3
+        },
+        "source_gate_counts": {
+          "semantic_answer_lift_gate": 3
+        },
+        "prompt_gate_counts": {
+          "echo_prompt_gate": 3
+        },
+        "transition_label_counts": {
+          "other->answer_alias": 3
+        },
+        "edit_mode_counts": {
+          "flip": 1,
+          "half": 1,
+          "zero": 1
+        },
+        "objects": [
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_answer_delta": 2.7708333333333335,
+        "mean_blocker_reduction": 1.0,
+        "mean_original_blocker_delta": 0.10416666666666667,
+        "mean_target_margin": 1.9166666666666667,
+        "mean_field_class_blocker_count": 1.0
+      }
+    },
+    "target_by_object_prompt": {
+      "bat::nonclean_direct": {
+        "n": 1,
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1
+        },
+        "edit_modes": [
+          "flip"
+        ],
+        "transition_labels": {
+          "other->strict_canonical": 1
+        },
+        "source_gates": {
+          "clean_blocker_weakening_gate": 1
+        },
+        "field_gates": {
+          "semantic_field_gate": 1
+        },
+        "mean_answer_delta": 1.4375,
+        "mean_blocker_reduction": 2.0,
+        "mean_original_blocker_delta": -0.0625,
+        "mean_target_margin": 0.5625
+      },
+      "navy::nonclean_direct": {
+        "n": 2,
+        "route_counts": {
+          "clean_causal_transition": 2
+        },
+        "candidate_counts": {
+          "L27C15369+L26C8587:flip": 1,
+          "L27C15369+L26C8587:zero": 1
+        },
+        "edit_modes": [
+          "flip",
+          "zero"
+        ],
+        "transition_labels": {
+          "other->strict_canonical": 2
+        },
+        "source_gates": {
+          "clean_blocker_weakening_gate": 2
+        },
+        "field_gates": {
+          "semantic_field_gate": 2
+        },
+        "mean_answer_delta": 1.0625,
+        "mean_blocker_reduction": 3.0,
+        "mean_original_blocker_delta": -0.041666666666666664,
+        "mean_target_margin": 0.4375
+      },
+      "seal::format_pressure": {
+        "n": 1,
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:scale_up": 1
+        },
+        "edit_modes": [
+          "scale_up"
+        ],
+        "transition_labels": {
+          "other->strict_canonical": 1
+        },
+        "source_gates": {
+          "clean_blocker_weakening_gate": 1
+        },
+        "field_gates": {
+          "semantic_field_gate": 1
+        },
+        "mean_answer_delta": 1.3125,
+        "mean_blocker_reduction": 1.0,
+        "mean_original_blocker_delta": -0.0625,
+        "mean_target_margin": 1.125
+      },
+      "sheep::echo_pressure": {
+        "n": 3,
+        "route_counts": {
+          "format_recovery": 3
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1,
+          "L27C16651+L24C3875:half": 1,
+          "L27C16651+L24C3875:zero": 1
+        },
+        "edit_modes": [
+          "flip",
+          "half",
+          "zero"
+        ],
+        "transition_labels": {
+          "format_or_empty->answer_alias": 3
+        },
+        "source_gates": {
+          "format_recovery_gate": 3
+        },
+        "field_gates": {
+          "semantic_field_gate": 3
+        },
+        "mean_answer_delta": 1.8958333333333333,
+        "mean_blocker_reduction": 2.0,
+        "mean_original_blocker_delta": 0.010416666666666666,
+        "mean_target_margin": 1.6041666666666667
+      },
+      "wolf::echo_pressure": {
+        "n": 3,
+        "route_counts": {
+          "semantic_pressure_transition": 3
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1,
+          "L27C16651+L24C3875:half": 1,
+          "L27C16651+L24C3875:zero": 1
+        },
+        "edit_modes": [
+          "flip",
+          "half",
+          "zero"
+        ],
+        "transition_labels": {
+          "other->answer_alias": 3
+        },
+        "source_gates": {
+          "semantic_answer_lift_gate": 3
+        },
+        "field_gates": {
+          "semantic_field_gate": 3
+        },
+        "mean_answer_delta": 2.7708333333333335,
+        "mean_blocker_reduction": 1.0,
+        "mean_original_blocker_delta": 0.10416666666666667,
+        "mean_target_margin": 1.9166666666666667
+      },
+      "wolf::format_pressure": {
+        "n": 2,
+        "route_counts": {
+          "protocol_pressure_transition": 2
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1,
+          "L27C16651+L24C3875:zero": 1
+        },
+        "edit_modes": [
+          "flip",
+          "zero"
+        ],
+        "transition_labels": {
+          "other->strict_canonical": 2
+        },
+        "source_gates": {
+          "protocol_pressure_gate": 2
+        },
+        "field_gates": {
+          "protocol_field_gate": 2
+        },
+        "mean_answer_delta": 0.625,
+        "mean_blocker_reduction": 1.0,
+        "mean_original_blocker_delta": 0.0625,
+        "mean_target_margin": 0.375
+      }
+    },
+    "target_nonclean_original_blocker_diagnostic": {
+      "n_nonclean": 8,
+      "original_blocker_not_reduced": 8,
+      "original_blocker_reduced": 0,
+      "reducible_original_blockers": 0,
+      "reason_counts": {
+        "field_not_strict_admissible": 6,
+        "not_phase866_pair_rule": 8,
+        "original_blocker_not_reduced": 8,
+        "field_tag:semantic_other_pressure": 6,
+        "field_tag:protocol_pressure": 2
+      },
+      "by_route": {
+        "format_recovery": {
+          "n": 3,
+          "transition_class_counts": {
+            "nonclean_output_transition": 3
+          },
+          "route_counts": {
+            "format_recovery": 3
+          },
+          "source_gate_counts": {
+            "format_recovery_gate": 3
+          },
+          "prompt_gate_counts": {
+            "echo_prompt_gate": 3
+          },
+          "transition_label_counts": {
+            "format_or_empty->answer_alias": 3
+          },
+          "edit_mode_counts": {
+            "flip": 1,
+            "half": 1,
+            "zero": 1
+          },
+          "objects": [
+            "sheep"
+          ],
+          "prompts": [
+            "echo_pressure"
+          ],
+          "mean_answer_delta": 1.8958333333333333,
+          "mean_blocker_reduction": 2.0,
+          "mean_original_blocker_delta": 0.010416666666666666,
+          "mean_target_margin": 1.6041666666666667,
+          "mean_field_class_blocker_count": 2.0
+        },
+        "protocol_pressure_transition": {
+          "n": 2,
+          "transition_class_counts": {
+            "nonclean_output_transition": 2
+          },
+          "route_counts": {
+            "protocol_pressure_transition": 2
+          },
+          "source_gate_counts": {
+            "protocol_pressure_gate": 2
+          },
+          "prompt_gate_counts": {
+            "format_prompt_gate": 2
+          },
+          "transition_label_counts": {
+            "other->strict_canonical": 2
+          },
+          "edit_mode_counts": {
+            "flip": 1,
+            "zero": 1
+          },
+          "objects": [
+            "wolf"
+          ],
+          "prompts": [
+            "format_pressure"
+          ],
+          "mean_answer_delta": 0.625,
+          "mean_blocker_reduction": 1.0,
+          "mean_original_blocker_delta": 0.0625,
+          "mean_target_margin": 0.375,
+          "mean_field_class_blocker_count": 1.0
+        },
+        "semantic_pressure_transition": {
+          "n": 3,
+          "transition_class_counts": {
+            "nonclean_output_transition": 3
+          },
+          "route_counts": {
+            "semantic_pressure_transition": 3
+          },
+          "source_gate_counts": {
+            "semantic_answer_lift_gate": 3
+          },
+          "prompt_gate_counts": {
+            "echo_prompt_gate": 3
+          },
+          "transition_label_counts": {
+            "other->answer_alias": 3
+          },
+          "edit_mode_counts": {
+            "flip": 1,
+            "half": 1,
+            "zero": 1
+          },
+          "objects": [
+            "wolf"
+          ],
+          "prompts": [
+            "echo_pressure"
+          ],
+          "mean_answer_delta": 2.7708333333333335,
+          "mean_blocker_reduction": 1.0,
+          "mean_original_blocker_delta": 0.10416666666666667,
+          "mean_target_margin": 1.9166666666666667,
+          "mean_field_class_blocker_count": 1.0
+        }
+      }
+    },
+    "same_source_multi_route_candidates": {
+      "L27C16651+L24C3875:flip": {
+        "n": 4,
+        "transition_class_counts": {
+          "clean_causal_transition": 1,
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "clean_causal_transition": 1,
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1,
+          "protocol_pressure_transition": 1
+        },
+        "source_gate_counts": {
+          "clean_blocker_weakening_gate": 1,
+          "format_recovery_gate": 1,
+          "semantic_answer_lift_gate": 1,
+          "protocol_pressure_gate": 1
+        },
+        "prompt_gate_counts": {
+          "direct_prompt_gate": 1,
+          "echo_prompt_gate": 2,
+          "format_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "other->strict_canonical": 2,
+          "format_or_empty->answer_alias": 1,
+          "other->answer_alias": 1
+        },
+        "edit_mode_counts": {
+          "flip": 4
+        },
+        "objects": [
+          "bat",
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure",
+          "format_pressure",
+          "nonclean_direct"
+        ],
+        "mean_answer_delta": 2.546875,
+        "mean_blocker_reduction": 1.5,
+        "mean_original_blocker_delta": 0.03125,
+        "mean_target_margin": 1.96875,
+        "mean_field_class_blocker_count": 1.5
+      },
+      "L27C16651+L24C3875:half": {
+        "n": 2,
+        "transition_class_counts": {
+          "nonclean_output_transition": 2
+        },
+        "route_counts": {
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1
+        },
+        "source_gate_counts": {
+          "format_recovery_gate": 1,
+          "semantic_answer_lift_gate": 1
+        },
+        "prompt_gate_counts": {
+          "echo_prompt_gate": 2
+        },
+        "transition_label_counts": {
+          "format_or_empty->answer_alias": 1,
+          "other->answer_alias": 1
+        },
+        "edit_mode_counts": {
+          "half": 2
+        },
+        "objects": [
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_answer_delta": 1.03125,
+        "mean_blocker_reduction": 1.5,
+        "mean_original_blocker_delta": 0.046875,
+        "mean_target_margin": 0.46875,
+        "mean_field_class_blocker_count": 1.5
+      },
+      "L27C16651+L24C3875:zero": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1,
+          "protocol_pressure_transition": 1
+        },
+        "source_gate_counts": {
+          "format_recovery_gate": 1,
+          "semantic_answer_lift_gate": 1,
+          "protocol_pressure_gate": 1
+        },
+        "prompt_gate_counts": {
+          "echo_prompt_gate": 2,
+          "format_prompt_gate": 1
+        },
+        "transition_label_counts": {
+          "format_or_empty->answer_alias": 1,
+          "other->answer_alias": 1,
+          "other->strict_canonical": 1
+        },
+        "edit_mode_counts": {
+          "zero": 3
+        },
+        "objects": [
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure",
+          "format_pressure"
+        ],
+        "mean_answer_delta": 1.4791666666666667,
+        "mean_blocker_reduction": 1.3333333333333333,
+        "mean_original_blocker_delta": 0.0625,
+        "mean_target_margin": 1.0208333333333333,
+        "mean_field_class_blocker_count": 1.3333333333333333
+      }
+    },
+    "target_rows": [
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "clean_causal_transition",
+        "primary_route": "clean_causal_transition",
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "format_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:scale_up",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "scale_up",
+        "source_purity_class": "harmful_or_unstable",
+        "source_predict_clean_mixed": false,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_001_animal_seal",
+        "object": "seal",
+        "prompt_variant": "format_pressure",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "marine biology",
+        "intervened_generated_clean": "animal",
+        "base_top1_role": "other",
+        "base_top1_token": "marine",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "marine",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "marine",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 1.3125,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": -0.0625,
+        "object_delta": 0.0,
+        "target_margin": 1.125,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": true,
+        "original_blocker_reduced": true,
+        "nonclean_transition_reasons": []
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "clean_causal_transition",
+        "primary_route": "clean_causal_transition",
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "direct_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_002_animal_bat",
+        "object": "bat",
+        "prompt_variant": "nonclean_direct",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "plural",
+        "intervened_generated_clean": "animal",
+        "base_top1_role": "other",
+        "base_top1_token": " plural",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animal",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " plural",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " plural",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 1.4375,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": -0.0625,
+        "object_delta": 0.0625,
+        "target_margin": 0.5625,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": true,
+        "original_blocker_reduced": true,
+        "nonclean_transition_reasons": []
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "format_recovery",
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_005_animal_sheep",
+        "object": "sheep",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "format_or_empty->answer_alias",
+        "base_generated_clean": "",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 3.1875,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": 0.0,
+        "object_delta": 0.34375,
+        "target_margin": 2.875,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "format_recovery",
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:half",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "half",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_005_animal_sheep",
+        "object": "sheep",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "format_or_empty->answer_alias",
+        "base_generated_clean": "",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 0.875,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": 0.03125,
+        "object_delta": 0.125,
+        "target_margin": 0.5625,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "format_recovery",
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_005_animal_sheep",
+        "object": "sheep",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "format_or_empty->answer_alias",
+        "base_generated_clean": "",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "intervened_best_non_target_role": "format_punct",
+        "intervened_best_non_target_token": ":",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 1.625,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": 0.0,
+        "object_delta": 0.15625,
+        "target_margin": 1.375,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "semantic_pressure_transition",
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "other->answer_alias",
+        "base_generated_clean": "food",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 4.75,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.125,
+        "object_delta": -0.0625,
+        "target_margin": 3.875,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "semantic_pressure_transition",
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:half",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "half",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "other->answer_alias",
+        "base_generated_clean": "food",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 1.1875,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.0625,
+        "object_delta": 0.0,
+        "target_margin": 0.375,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "semantic_pressure_transition",
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "other->answer_alias",
+        "base_generated_clean": "food",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 2.375,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.125,
+        "object_delta": -0.0625,
+        "target_margin": 1.5,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "protocol_pressure_transition",
+        "route_tags": [
+          "protocol_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "protocol_pressure_gate",
+        "field_gates": [
+          "protocol_field_gate"
+        ],
+        "prompt_gate": "format_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "format_pressure",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "category",
+        "intervened_generated_clean": "animal",
+        "base_top1_role": "other",
+        "base_top1_token": "category",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "category",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "category",
+        "field_tags": [
+          "protocol_pressure"
+        ],
+        "field_top10_role_counts": {
+          "protocol_word": 1
+        },
+        "pressure_values": {
+          "semantic": 0.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 1.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "protocol",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 0.8125,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.0625,
+        "object_delta": -0.03125,
+        "target_margin": 0.5625,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:protocol_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "protocol_pressure_transition",
+        "route_tags": [
+          "protocol_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "protocol_pressure_gate",
+        "field_gates": [
+          "protocol_field_gate"
+        ],
+        "prompt_gate": "format_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "format_pressure",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "category",
+        "intervened_generated_clean": "animal",
+        "base_top1_role": "other",
+        "base_top1_token": "category",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "category",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "category",
+        "field_tags": [
+          "protocol_pressure"
+        ],
+        "field_top10_role_counts": {
+          "protocol_word": 1
+        },
+        "pressure_values": {
+          "semantic": 0.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 1.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "protocol",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 0.4375,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.0625,
+        "object_delta": 0.0,
+        "target_margin": 0.1875,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:protocol_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "clean_causal_transition",
+        "primary_route": "clean_causal_transition",
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "direct_prompt_gate",
+        "candidate_key": "L27C15369+L26C8587:flip",
+        "gear_keys": [
+          "L27C15369",
+          "L26C8587"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "object_side_effect_risk",
+        "source_predict_clean_mixed": false,
+        "model": "deepseek7b",
+        "domain": "color",
+        "case_id": "p876_017_color_navy",
+        "object": "navy",
+        "prompt_variant": "nonclean_direct",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "one word",
+        "intervened_generated_clean": "color",
+        "base_top1_role": "other",
+        "base_top1_token": " one",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " color",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " one",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " one",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 2,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 2.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 3.0
+        },
+        "dominant_pressure": "format",
+        "dominant_pressure_value": 2.0,
+        "answer_delta": 1.4375,
+        "blocker_reduction": 3.0,
+        "clear_blocker_reduction": 3.0,
+        "original_blocker_delta": -0.041666666666666664,
+        "object_delta": 0.0,
+        "target_margin": 0.8125,
+        "base_clear_rank": 4.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 3.0,
+        "field_clear_class_blocker_count": 3.0,
+        "reducible_original_blockers": true,
+        "original_blocker_reduced": true,
+        "nonclean_transition_reasons": []
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "clean_causal_transition",
+        "primary_route": "clean_causal_transition",
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "direct_prompt_gate",
+        "candidate_key": "L27C15369+L26C8587:zero",
+        "gear_keys": [
+          "L27C15369",
+          "L26C8587"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "object_side_effect_risk",
+        "source_predict_clean_mixed": false,
+        "model": "deepseek7b",
+        "domain": "color",
+        "case_id": "p876_017_color_navy",
+        "object": "navy",
+        "prompt_variant": "nonclean_direct",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "one word",
+        "intervened_generated_clean": "color",
+        "base_top1_role": "other",
+        "base_top1_token": " one",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " color",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " one",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " one",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 2,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 2.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 3.0
+        },
+        "dominant_pressure": "format",
+        "dominant_pressure_value": 2.0,
+        "answer_delta": 0.6875,
+        "blocker_reduction": 3.0,
+        "clear_blocker_reduction": 3.0,
+        "original_blocker_delta": -0.041666666666666664,
+        "object_delta": 0.0,
+        "target_margin": 0.0625,
+        "base_clear_rank": 4.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 3.0,
+        "field_clear_class_blocker_count": 3.0,
+        "reducible_original_blockers": true,
+        "original_blocker_reduced": true,
+        "nonclean_transition_reasons": []
+      }
+    ],
+    "target_nonclean_rows": [
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "format_recovery",
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_005_animal_sheep",
+        "object": "sheep",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "format_or_empty->answer_alias",
+        "base_generated_clean": "",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 3.1875,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": 0.0,
+        "object_delta": 0.34375,
+        "target_margin": 2.875,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "format_recovery",
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:half",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "half",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_005_animal_sheep",
+        "object": "sheep",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "format_or_empty->answer_alias",
+        "base_generated_clean": "",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 0.875,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": 0.03125,
+        "object_delta": 0.125,
+        "target_margin": 0.5625,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "format_recovery",
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_005_animal_sheep",
+        "object": "sheep",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "format_or_empty->answer_alias",
+        "base_generated_clean": "",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "intervened_best_non_target_role": "format_punct",
+        "intervened_best_non_target_token": ":",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 2.0
+        },
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 1.625,
+        "blocker_reduction": 2.0,
+        "clear_blocker_reduction": 2.0,
+        "original_blocker_delta": 0.0,
+        "object_delta": 0.15625,
+        "target_margin": 1.375,
+        "base_clear_rank": 3.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "semantic_pressure_transition",
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "other->answer_alias",
+        "base_generated_clean": "food",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 4.75,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.125,
+        "object_delta": -0.0625,
+        "target_margin": 3.875,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "semantic_pressure_transition",
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:half",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "half",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "other->answer_alias",
+        "base_generated_clean": "food",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 1.1875,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.0625,
+        "object_delta": 0.0,
+        "target_margin": 0.375,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "semantic_pressure_transition",
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "prompt_gate": "echo_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "echo_pressure",
+        "transition_label": "other->answer_alias",
+        "base_generated_clean": "food",
+        "intervened_generated_clean": "animals",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "pressure_values": {
+          "semantic": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 2.375,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.125,
+        "object_delta": -0.0625,
+        "target_margin": 1.5,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "protocol_pressure_transition",
+        "route_tags": [
+          "protocol_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "protocol_pressure_gate",
+        "field_gates": [
+          "protocol_field_gate"
+        ],
+        "prompt_gate": "format_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "flip",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "format_pressure",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "category",
+        "intervened_generated_clean": "animal",
+        "base_top1_role": "other",
+        "base_top1_token": "category",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "category",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "category",
+        "field_tags": [
+          "protocol_pressure"
+        ],
+        "field_top10_role_counts": {
+          "protocol_word": 1
+        },
+        "pressure_values": {
+          "semantic": 0.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 1.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "protocol",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 0.8125,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.0625,
+        "object_delta": -0.03125,
+        "target_margin": 0.5625,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:protocol_pressure"
+        ]
+      },
+      {
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "transition_class": "nonclean_output_transition",
+        "primary_route": "protocol_pressure_transition",
+        "route_tags": [
+          "protocol_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "protocol_pressure_gate",
+        "field_gates": [
+          "protocol_field_gate"
+        ],
+        "prompt_gate": "format_prompt_gate",
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "edit_mode": "zero",
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "source_predict_clean_mixed": true,
+        "model": "deepseek7b",
+        "domain": "animal",
+        "case_id": "p876_006_animal_wolf",
+        "object": "wolf",
+        "prompt_variant": "format_pressure",
+        "transition_label": "other->strict_canonical",
+        "base_generated_clean": "category",
+        "intervened_generated_clean": "animal",
+        "base_top1_role": "other",
+        "base_top1_token": "category",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "category",
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "category",
+        "field_tags": [
+          "protocol_pressure"
+        ],
+        "field_top10_role_counts": {
+          "protocol_word": 1
+        },
+        "pressure_values": {
+          "semantic": 0.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 1.0,
+          "blocker_count": 1.0
+        },
+        "dominant_pressure": "protocol",
+        "dominant_pressure_value": 1.0,
+        "answer_delta": 0.4375,
+        "blocker_reduction": 1.0,
+        "clear_blocker_reduction": 1.0,
+        "original_blocker_delta": 0.0625,
+        "object_delta": 0.0,
+        "target_margin": 0.1875,
+        "base_clear_rank": 2.0,
+        "intervened_clear_rank": 1.0,
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "reducible_original_blockers": false,
+        "original_blocker_reduced": false,
+        "nonclean_transition_reasons": [
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:protocol_pressure"
+        ]
+      }
+    ]
+  },
+  "boundary": "Offline source/gate audit; no new model run and no closure claim."
+}

@@ -1,0 +1,1916 @@
+{
+  "phase": 878,
+  "title": "Full-Vocabulary Blocker Displacement Audit",
+  "timestamp": "2026-07-02 19:39:00",
+  "phase877_rows": "tests/result/phase877_effective_transition_source_gate_audit/source_gate_phase876/phase877_source_gate_rows.jsonl",
+  "phase876_root": "tests/result/phase876_nonclean_route_causal_validation/validation",
+  "summary": {
+    "n_rows": 12,
+    "n_pair_found": 12,
+    "transition_class_counts": {
+      "clean_causal_transition": 4,
+      "nonclean_output_transition": 8
+    },
+    "route_counts": {
+      "clean_causal_transition": 4,
+      "format_recovery": 3,
+      "semantic_pressure_transition": 3,
+      "protocol_pressure_transition": 2
+    },
+    "model_domain_counts": {
+      "deepseek7b:animal": 10,
+      "deepseek7b:color": 2
+    },
+    "candidate_counts": {
+      "L27C16651+L24C3875:scale_up": 1,
+      "L27C16651+L24C3875:flip": 4,
+      "L27C16651+L24C3875:half": 2,
+      "L27C16651+L24C3875:zero": 3,
+      "L27C15369+L26C8587:flip": 1,
+      "L27C15369+L26C8587:zero": 1
+    },
+    "nonclean_displacement": {
+      "n": 8,
+      "blocker_set_changed": 8,
+      "top_set_changed": 4,
+      "count_reduced_without_original_blocker_reduction": 8,
+      "target_rank_reached_top1": 8,
+      "mean_blocker_count_reduction_raw": 1.375,
+      "mean_target_rank_improvement": 1.375,
+      "mean_target_logit_delta_raw": 1.90625,
+      "mean_original_blocker_delta": 0.05859375
+    },
+    "clean_reference": {
+      "n": 4,
+      "blocker_set_changed": 4,
+      "top_set_changed": 1,
+      "target_rank_reached_top1": 4,
+      "mean_blocker_count_reduction_raw": 2.25,
+      "mean_target_rank_improvement": 2.25,
+      "mean_target_logit_delta_raw": 1.21875,
+      "mean_original_blocker_delta": -0.05208333333333333
+    },
+    "by_route": {
+      "clean_causal_transition": {
+        "n": 4,
+        "transition_class_counts": {
+          "clean_causal_transition": 4
+        },
+        "route_counts": {
+          "clean_causal_transition": 4
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:scale_up": 1,
+          "L27C16651+L24C3875:flip": 1,
+          "L27C15369+L26C8587:flip": 1,
+          "L27C15369+L26C8587:zero": 1
+        },
+        "objects": [
+          "bat",
+          "navy",
+          "seal"
+        ],
+        "prompts": [
+          "format_pressure",
+          "nonclean_direct"
+        ],
+        "mean_blocker_count_reduction_raw": 2.25,
+        "mean_target_rank_improvement": 2.25,
+        "mean_target_logit_delta_raw": 1.21875,
+        "mean_original_blocker_delta": -0.05208333333333333,
+        "mean_top_token_overlap_ratio": 0.9545454545454546,
+        "blocker_set_changed": 4,
+        "top_set_changed": 1,
+        "count_reduced_without_original_blocker_reduction": 0,
+        "target_rank_reached_top1": 4
+      },
+      "format_recovery": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "format_recovery": 3
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1,
+          "L27C16651+L24C3875:half": 1,
+          "L27C16651+L24C3875:zero": 1
+        },
+        "objects": [
+          "sheep"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_blocker_count_reduction_raw": 2.0,
+        "mean_target_rank_improvement": 2.0,
+        "mean_target_logit_delta_raw": 1.8958333333333333,
+        "mean_original_blocker_delta": 0.010416666666666666,
+        "mean_top_token_overlap_ratio": 0.9393939393939394,
+        "blocker_set_changed": 3,
+        "top_set_changed": 1,
+        "count_reduced_without_original_blocker_reduction": 3,
+        "target_rank_reached_top1": 3
+      },
+      "protocol_pressure_transition": {
+        "n": 2,
+        "transition_class_counts": {
+          "nonclean_output_transition": 2
+        },
+        "route_counts": {
+          "protocol_pressure_transition": 2
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1,
+          "L27C16651+L24C3875:zero": 1
+        },
+        "objects": [
+          "wolf"
+        ],
+        "prompts": [
+          "format_pressure"
+        ],
+        "mean_blocker_count_reduction_raw": 1.0,
+        "mean_target_rank_improvement": 1.0,
+        "mean_target_logit_delta_raw": 0.625,
+        "mean_original_blocker_delta": 0.0625,
+        "mean_top_token_overlap_ratio": 0.8181818181818182,
+        "blocker_set_changed": 2,
+        "top_set_changed": 2,
+        "count_reduced_without_original_blocker_reduction": 2,
+        "target_rank_reached_top1": 2
+      },
+      "semantic_pressure_transition": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "semantic_pressure_transition": 3
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 1,
+          "L27C16651+L24C3875:half": 1,
+          "L27C16651+L24C3875:zero": 1
+        },
+        "objects": [
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_blocker_count_reduction_raw": 1.0,
+        "mean_target_rank_improvement": 1.0,
+        "mean_target_logit_delta_raw": 2.7708333333333335,
+        "mean_original_blocker_delta": 0.10416666666666667,
+        "mean_top_token_overlap_ratio": 0.9393939393939394,
+        "blocker_set_changed": 3,
+        "top_set_changed": 1,
+        "count_reduced_without_original_blocker_reduction": 3,
+        "target_rank_reached_top1": 3
+      }
+    },
+    "by_candidate": {
+      "L27C15369+L26C8587:flip": {
+        "n": 1,
+        "transition_class_counts": {
+          "clean_causal_transition": 1
+        },
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "candidate_counts": {
+          "L27C15369+L26C8587:flip": 1
+        },
+        "objects": [
+          "navy"
+        ],
+        "prompts": [
+          "nonclean_direct"
+        ],
+        "mean_blocker_count_reduction_raw": 3.0,
+        "mean_target_rank_improvement": 3.0,
+        "mean_target_logit_delta_raw": 1.4375,
+        "mean_original_blocker_delta": -0.041666666666666664,
+        "mean_top_token_overlap_ratio": 1.0,
+        "blocker_set_changed": 1,
+        "top_set_changed": 0,
+        "count_reduced_without_original_blocker_reduction": 0,
+        "target_rank_reached_top1": 1
+      },
+      "L27C15369+L26C8587:zero": {
+        "n": 1,
+        "transition_class_counts": {
+          "clean_causal_transition": 1
+        },
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "candidate_counts": {
+          "L27C15369+L26C8587:zero": 1
+        },
+        "objects": [
+          "navy"
+        ],
+        "prompts": [
+          "nonclean_direct"
+        ],
+        "mean_blocker_count_reduction_raw": 3.0,
+        "mean_target_rank_improvement": 3.0,
+        "mean_target_logit_delta_raw": 0.6875,
+        "mean_original_blocker_delta": -0.041666666666666664,
+        "mean_top_token_overlap_ratio": 1.0,
+        "blocker_set_changed": 1,
+        "top_set_changed": 0,
+        "count_reduced_without_original_blocker_reduction": 0,
+        "target_rank_reached_top1": 1
+      },
+      "L27C16651+L24C3875:flip": {
+        "n": 4,
+        "transition_class_counts": {
+          "clean_causal_transition": 1,
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "clean_causal_transition": 1,
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1,
+          "protocol_pressure_transition": 1
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:flip": 4
+        },
+        "objects": [
+          "bat",
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure",
+          "format_pressure",
+          "nonclean_direct"
+        ],
+        "mean_blocker_count_reduction_raw": 1.5,
+        "mean_target_rank_improvement": 1.5,
+        "mean_target_logit_delta_raw": 2.546875,
+        "mean_original_blocker_delta": 0.03125,
+        "mean_top_token_overlap_ratio": 0.8636363636363636,
+        "blocker_set_changed": 4,
+        "top_set_changed": 3,
+        "count_reduced_without_original_blocker_reduction": 3,
+        "target_rank_reached_top1": 4
+      },
+      "L27C16651+L24C3875:half": {
+        "n": 2,
+        "transition_class_counts": {
+          "nonclean_output_transition": 2
+        },
+        "route_counts": {
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:half": 2
+        },
+        "objects": [
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure"
+        ],
+        "mean_blocker_count_reduction_raw": 1.5,
+        "mean_target_rank_improvement": 1.5,
+        "mean_target_logit_delta_raw": 1.03125,
+        "mean_original_blocker_delta": 0.046875,
+        "mean_top_token_overlap_ratio": 1.0,
+        "blocker_set_changed": 2,
+        "top_set_changed": 0,
+        "count_reduced_without_original_blocker_reduction": 2,
+        "target_rank_reached_top1": 2
+      },
+      "L27C16651+L24C3875:scale_up": {
+        "n": 1,
+        "transition_class_counts": {
+          "clean_causal_transition": 1
+        },
+        "route_counts": {
+          "clean_causal_transition": 1
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:scale_up": 1
+        },
+        "objects": [
+          "seal"
+        ],
+        "prompts": [
+          "format_pressure"
+        ],
+        "mean_blocker_count_reduction_raw": 1.0,
+        "mean_target_rank_improvement": 1.0,
+        "mean_target_logit_delta_raw": 1.3125,
+        "mean_original_blocker_delta": -0.0625,
+        "mean_top_token_overlap_ratio": 0.8181818181818182,
+        "blocker_set_changed": 1,
+        "top_set_changed": 1,
+        "count_reduced_without_original_blocker_reduction": 0,
+        "target_rank_reached_top1": 1
+      },
+      "L27C16651+L24C3875:zero": {
+        "n": 3,
+        "transition_class_counts": {
+          "nonclean_output_transition": 3
+        },
+        "route_counts": {
+          "format_recovery": 1,
+          "semantic_pressure_transition": 1,
+          "protocol_pressure_transition": 1
+        },
+        "candidate_counts": {
+          "L27C16651+L24C3875:zero": 3
+        },
+        "objects": [
+          "sheep",
+          "wolf"
+        ],
+        "prompts": [
+          "echo_pressure",
+          "format_pressure"
+        ],
+        "mean_blocker_count_reduction_raw": 1.3333333333333333,
+        "mean_target_rank_improvement": 1.3333333333333333,
+        "mean_target_logit_delta_raw": 1.4791666666666667,
+        "mean_original_blocker_delta": 0.0625,
+        "mean_top_token_overlap_ratio": 0.9393939393939394,
+        "blocker_set_changed": 3,
+        "top_set_changed": 1,
+        "count_reduced_without_original_blocker_reduction": 3,
+        "target_rank_reached_top1": 3
+      }
+    },
+    "rows": [
+      {
+        "answer_delta": 1.3125,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "marine",
+        "base_clear_rank": 2.0,
+        "base_generated_clean": "marine biology",
+        "base_top1_role": "other",
+        "base_top1_token": "marine",
+        "blocker_reduction": 1.0,
+        "candidate_key": "L27C16651+L24C3875:scale_up",
+        "case_id": "p876_001_animal_seal",
+        "clear_blocker_reduction": 1.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "scale_up",
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "marine",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animal",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [],
+        "object": "seal",
+        "object_delta": 0.0,
+        "original_blocker_delta": -0.0625,
+        "original_blocker_reduced": true,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "clean_causal_transition",
+        "prompt_gate": "format_prompt_gate",
+        "prompt_variant": "format_pressure",
+        "reducible_original_blockers": true,
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "source_predict_clean_mixed": false,
+        "source_purity_class": "harmful_or_unstable",
+        "target_margin": 1.125,
+        "transition_class": "clean_causal_transition",
+        "transition_label": "other->strict_canonical",
+        "raw_pair_found": true,
+        "base_blocker_count": 1.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 1.0,
+        "base_target_rank": 2.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 1.0,
+        "base_target_logit": 14.8125,
+        "intervened_target_logit": 16.125,
+        "target_logit_delta_raw": 1.3125,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": "marine",
+        "intervened_top1_token_raw": "animal",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 15.0625,
+            "role": "other_blocker",
+            "token": "marine",
+            "token_id": 84443
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 1,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 1,
+        "added_top_token_count": 1,
+        "persistent_top_token_count": 9,
+        "top_token_overlap_ratio": 0.8181818181818182,
+        "base_top_role_counts": {
+          "other_blocker": 8,
+          "strict_target": 1,
+          "protocol_word": 1
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "other_blocker": 7,
+          "protocol_word": 1
+        },
+        "top_role_delta": {
+          "other_blocker": -1,
+          "protocol_word": 0,
+          "strict_target": 1
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": true,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": false
+      },
+      {
+        "answer_delta": 1.4375,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " plural",
+        "base_clear_rank": 3.0,
+        "base_generated_clean": "plural",
+        "base_top1_role": "other",
+        "base_top1_token": " plural",
+        "blocker_reduction": 2.0,
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "case_id": "p876_002_animal_bat",
+        "clear_blocker_reduction": 2.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "flip",
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " plural",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animal",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animal",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [],
+        "object": "bat",
+        "object_delta": 0.0625,
+        "original_blocker_delta": -0.0625,
+        "original_blocker_reduced": true,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 2.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "clean_causal_transition",
+        "prompt_gate": "direct_prompt_gate",
+        "prompt_variant": "nonclean_direct",
+        "reducible_original_blockers": true,
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 0.5625,
+        "transition_class": "clean_causal_transition",
+        "transition_label": "other->strict_canonical",
+        "raw_pair_found": true,
+        "base_blocker_count": 2.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 2.0,
+        "base_target_rank": 3.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 2.0,
+        "base_target_logit": 12.5625,
+        "intervened_target_logit": 14.0,
+        "target_logit_delta_raw": 1.4375,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " plural",
+        "intervened_top1_token_raw": " animal",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.9375,
+            "logit": 13.5,
+            "role": "other_blocker",
+            "token": " plural",
+            "token_id": 38498
+          },
+          {
+            "gap_vs_threshold": 0.0625,
+            "logit": 12.625,
+            "role": "format_punct",
+            "token": " __",
+            "token_id": 1304
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 2,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "format_punct": 3,
+          "strict_target": 2
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "other_blocker": 5,
+          "format_punct": 3
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": false
+      },
+      {
+        "answer_delta": 3.1875,
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "base_clear_rank": 3.0,
+        "base_generated_clean": "",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "blocker_reduction": 2.0,
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "case_id": "p876_005_animal_sheep",
+        "clear_blocker_reduction": 2.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "flip",
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animals",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ],
+        "object": "sheep",
+        "object_delta": 0.34375,
+        "original_blocker_delta": 0.0,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 2.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "format_recovery",
+        "prompt_gate": "echo_prompt_gate",
+        "prompt_variant": "echo_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 2.875,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "format_or_empty->answer_alias",
+        "raw_pair_found": true,
+        "base_blocker_count": 2.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 2.0,
+        "base_target_rank": 3.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 2.0,
+        "base_target_logit": 13.8125,
+        "intervened_target_logit": 17.0,
+        "target_logit_delta_raw": 3.1875,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " food",
+        "intervened_top1_token_raw": " animals",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 14.0625,
+            "role": "other_blocker",
+            "token": " food",
+            "token_id": 3607
+          },
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 14.0625,
+            "role": "format_punct",
+            "token": ":",
+            "token_id": 25
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 2,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 1,
+        "added_top_token_count": 1,
+        "persistent_top_token_count": 9,
+        "top_token_overlap_ratio": 0.8181818181818182,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "format_punct": 3,
+          "strict_target": 2
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 3,
+          "other_blocker": 4,
+          "format_punct": 3
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": -1,
+          "strict_target": 1
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": true,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 0.875,
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "base_clear_rank": 3.0,
+        "base_generated_clean": "",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "blocker_reduction": 2.0,
+        "candidate_key": "L27C16651+L24C3875:half",
+        "case_id": "p876_005_animal_sheep",
+        "clear_blocker_reduction": 2.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "half",
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animals",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ],
+        "object": "sheep",
+        "object_delta": 0.125,
+        "original_blocker_delta": 0.03125,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 2.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "format_recovery",
+        "prompt_gate": "echo_prompt_gate",
+        "prompt_variant": "echo_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 0.5625,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "format_or_empty->answer_alias",
+        "raw_pair_found": true,
+        "base_blocker_count": 2.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 2.0,
+        "base_target_rank": 3.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 2.0,
+        "base_target_logit": 13.8125,
+        "intervened_target_logit": 14.6875,
+        "target_logit_delta_raw": 0.875,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " food",
+        "intervened_top1_token_raw": " animals",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 14.0625,
+            "role": "other_blocker",
+            "token": " food",
+            "token_id": 3607
+          },
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 14.0625,
+            "role": "format_punct",
+            "token": ":",
+            "token_id": 25
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 2,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "format_punct": 3,
+          "strict_target": 2
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "other_blocker": 5,
+          "format_punct": 3
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 1.625,
+        "base_best_non_target_role": "format_punct",
+        "base_best_non_target_token": ":",
+        "base_clear_rank": 3.0,
+        "base_generated_clean": "",
+        "base_top1_role": "format_punct",
+        "base_top1_token": ":",
+        "blocker_reduction": 2.0,
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "case_id": "p876_005_animal_sheep",
+        "clear_blocker_reduction": 2.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic+format",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "zero",
+        "field_class_blocker_count": 2.0,
+        "field_clear_class_blocker_count": 2.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 1,
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "format_punct",
+        "intervened_best_non_target_token": ":",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animals",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ],
+        "object": "sheep",
+        "object_delta": 0.15625,
+        "original_blocker_delta": 0.0,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 2.0,
+          "format": 1.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "format_recovery",
+        "prompt_gate": "echo_prompt_gate",
+        "prompt_variant": "echo_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "semantic_pressure",
+          "format_recovery",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "format_recovery_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 1.375,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "format_or_empty->answer_alias",
+        "raw_pair_found": true,
+        "base_blocker_count": 2.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 2.0,
+        "base_target_rank": 3.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 2.0,
+        "base_target_logit": 13.8125,
+        "intervened_target_logit": 15.4375,
+        "target_logit_delta_raw": 1.625,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " food",
+        "intervened_top1_token_raw": " animals",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 14.0625,
+            "role": "other_blocker",
+            "token": " food",
+            "token_id": 3607
+          },
+          {
+            "gap_vs_threshold": 0.25,
+            "logit": 14.0625,
+            "role": "format_punct",
+            "token": ":",
+            "token_id": 25
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 2,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "format_punct": 3,
+          "strict_target": 2
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "format_punct": 3,
+          "other_blocker": 5
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 4.75,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "base_clear_rank": 2.0,
+        "base_generated_clean": "food",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "blocker_reduction": 1.0,
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "case_id": "p876_006_animal_wolf",
+        "clear_blocker_reduction": 1.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "flip",
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animals",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ],
+        "object": "wolf",
+        "object_delta": -0.0625,
+        "original_blocker_delta": 0.125,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "semantic_pressure_transition",
+        "prompt_gate": "echo_prompt_gate",
+        "prompt_variant": "echo_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 3.875,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "other->answer_alias",
+        "raw_pair_found": true,
+        "base_blocker_count": 1.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 1.0,
+        "base_target_rank": 2.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 1.0,
+        "base_target_logit": 14.5,
+        "intervened_target_logit": 19.25,
+        "target_logit_delta_raw": 4.75,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " food",
+        "intervened_top1_token_raw": " animals",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.75,
+            "logit": 15.25,
+            "role": "other_blocker",
+            "token": " food",
+            "token_id": 3607
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 1,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 1,
+        "added_top_token_count": 1,
+        "persistent_top_token_count": 9,
+        "top_token_overlap_ratio": 0.8181818181818182,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "strict_target": 2,
+          "format_punct": 2,
+          "protocol_word": 1
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 3,
+          "other_blocker": 5,
+          "format_punct": 1,
+          "protocol_word": 1
+        },
+        "top_role_delta": {
+          "format_punct": -1,
+          "other_blocker": 0,
+          "protocol_word": 0,
+          "strict_target": 1
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": true,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 1.1875,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "base_clear_rank": 2.0,
+        "base_generated_clean": "food",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "blocker_reduction": 1.0,
+        "candidate_key": "L27C16651+L24C3875:half",
+        "case_id": "p876_006_animal_wolf",
+        "clear_blocker_reduction": 1.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "half",
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animals",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ],
+        "object": "wolf",
+        "object_delta": 0.0,
+        "original_blocker_delta": 0.0625,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "semantic_pressure_transition",
+        "prompt_gate": "echo_prompt_gate",
+        "prompt_variant": "echo_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 0.375,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "other->answer_alias",
+        "raw_pair_found": true,
+        "base_blocker_count": 1.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 1.0,
+        "base_target_rank": 2.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 1.0,
+        "base_target_logit": 14.5,
+        "intervened_target_logit": 15.6875,
+        "target_logit_delta_raw": 1.1875,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " food",
+        "intervened_top1_token_raw": " animals",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.75,
+            "logit": 15.25,
+            "role": "other_blocker",
+            "token": " food",
+            "token_id": 3607
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 1,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "strict_target": 2,
+          "format_punct": 2,
+          "protocol_word": 1
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "other_blocker": 5,
+          "format_punct": 2,
+          "protocol_word": 1
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "protocol_word": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 2.375,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " food",
+        "base_clear_rank": 2.0,
+        "base_generated_clean": "food",
+        "base_top1_role": "other",
+        "base_top1_token": " food",
+        "blocker_reduction": 1.0,
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "case_id": "p876_006_animal_wolf",
+        "clear_blocker_reduction": 1.0,
+        "domain": "animal",
+        "dominant_pressure": "semantic",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "zero",
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " food",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animals",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " animals",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "field_not_strict_admissible",
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:semantic_other_pressure"
+        ],
+        "object": "wolf",
+        "object_delta": -0.0625,
+        "original_blocker_delta": 0.125,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "semantic_pressure_transition",
+        "prompt_gate": "echo_prompt_gate",
+        "prompt_variant": "echo_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "semantic_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "semantic_answer_lift_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 1.5,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "other->answer_alias",
+        "raw_pair_found": true,
+        "base_blocker_count": 1.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 1.0,
+        "base_target_rank": 2.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 1.0,
+        "base_target_logit": 14.5,
+        "intervened_target_logit": 16.875,
+        "target_logit_delta_raw": 2.375,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " food",
+        "intervened_top1_token_raw": " animals",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.75,
+            "logit": 15.25,
+            "role": "other_blocker",
+            "token": " food",
+            "token_id": 3607
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 1,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 5,
+          "strict_target": 2,
+          "format_punct": 2,
+          "protocol_word": 1
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "other_blocker": 5,
+          "format_punct": 2,
+          "protocol_word": 1
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "protocol_word": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 0.8125,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "category",
+        "base_clear_rank": 2.0,
+        "base_generated_clean": "category",
+        "base_top1_role": "other",
+        "base_top1_token": "category",
+        "blocker_reduction": 1.0,
+        "candidate_key": "L27C16651+L24C3875:flip",
+        "case_id": "p876_006_animal_wolf",
+        "clear_blocker_reduction": 1.0,
+        "domain": "animal",
+        "dominant_pressure": "protocol",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "flip",
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "field_gates": [
+          "protocol_field_gate"
+        ],
+        "field_tags": [
+          "protocol_pressure"
+        ],
+        "field_top10_role_counts": {
+          "protocol_word": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "category",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animal",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:protocol_pressure"
+        ],
+        "object": "wolf",
+        "object_delta": -0.03125,
+        "original_blocker_delta": 0.0625,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 1.0,
+          "semantic": 0.0
+        },
+        "primary_route": "protocol_pressure_transition",
+        "prompt_gate": "format_prompt_gate",
+        "prompt_variant": "format_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "protocol_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "protocol_pressure_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 0.5625,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "other->strict_canonical",
+        "raw_pair_found": true,
+        "base_blocker_count": 1.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 1.0,
+        "base_target_rank": 2.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 1.0,
+        "base_target_logit": 11.625,
+        "intervened_target_logit": 12.4375,
+        "target_logit_delta_raw": 0.8125,
+        "base_top1_role_raw": "protocol_word",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": "category",
+        "intervened_top1_token_raw": "animal",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.1875,
+            "logit": 11.8125,
+            "role": "protocol_word",
+            "token": "category",
+            "token_id": 5471
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 1,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 1,
+        "added_top_token_count": 1,
+        "persistent_top_token_count": 9,
+        "top_token_overlap_ratio": 0.8181818181818182,
+        "base_top_role_counts": {
+          "protocol_word": 1,
+          "strict_target": 1,
+          "other_blocker": 8
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "protocol_word": 1,
+          "other_blocker": 7
+        },
+        "top_role_delta": {
+          "other_blocker": -1,
+          "protocol_word": 0,
+          "strict_target": 1
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": true,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 0.4375,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": "category",
+        "base_clear_rank": 2.0,
+        "base_generated_clean": "category",
+        "base_top1_role": "other",
+        "base_top1_token": "category",
+        "blocker_reduction": 1.0,
+        "candidate_key": "L27C16651+L24C3875:zero",
+        "case_id": "p876_006_animal_wolf",
+        "clear_blocker_reduction": 1.0,
+        "domain": "animal",
+        "dominant_pressure": "protocol",
+        "dominant_pressure_value": 1.0,
+        "edit_mode": "zero",
+        "field_class_blocker_count": 1.0,
+        "field_clear_class_blocker_count": 1.0,
+        "field_gates": [
+          "protocol_field_gate"
+        ],
+        "field_tags": [
+          "protocol_pressure"
+        ],
+        "field_top10_role_counts": {
+          "protocol_word": 1
+        },
+        "gear_keys": [
+          "L27C16651",
+          "L24C3875"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": "category",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "animal",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": "animal",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [
+          "not_phase866_pair_rule",
+          "original_blocker_not_reduced",
+          "field_tag:protocol_pressure"
+        ],
+        "object": "wolf",
+        "object_delta": 0.0,
+        "original_blocker_delta": 0.0625,
+        "original_blocker_reduced": false,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 1.0,
+          "format": 0.0,
+          "object_echo": 0.0,
+          "protocol": 1.0,
+          "semantic": 0.0
+        },
+        "primary_route": "protocol_pressure_transition",
+        "prompt_gate": "format_prompt_gate",
+        "prompt_variant": "format_pressure",
+        "reducible_original_blockers": false,
+        "route_tags": [
+          "protocol_pressure",
+          "answer_lift",
+          "blocker_count_reduced",
+          "original_blocker_not_reduced",
+          "not_clean_pair_rule"
+        ],
+        "source_gate": "protocol_pressure_gate",
+        "source_predict_clean_mixed": true,
+        "source_purity_class": "clean_mixed_answer_blocker_route",
+        "target_margin": 0.1875,
+        "transition_class": "nonclean_output_transition",
+        "transition_label": "other->strict_canonical",
+        "raw_pair_found": true,
+        "base_blocker_count": 1.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 1.0,
+        "base_target_rank": 2.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 1.0,
+        "base_target_logit": 11.625,
+        "intervened_target_logit": 12.0625,
+        "target_logit_delta_raw": 0.4375,
+        "base_top1_role_raw": "protocol_word",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": "category",
+        "intervened_top1_token_raw": "animal",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.1875,
+            "logit": 11.8125,
+            "role": "protocol_word",
+            "token": "category",
+            "token_id": 5471
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 1,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 1,
+        "added_top_token_count": 1,
+        "persistent_top_token_count": 9,
+        "top_token_overlap_ratio": 0.8181818181818182,
+        "base_top_role_counts": {
+          "protocol_word": 1,
+          "strict_target": 1,
+          "other_blocker": 8
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 2,
+          "protocol_word": 1,
+          "other_blocker": 7
+        },
+        "top_role_delta": {
+          "other_blocker": -1,
+          "protocol_word": 0,
+          "strict_target": 1
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": true,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": true
+      },
+      {
+        "answer_delta": 1.4375,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " one",
+        "base_clear_rank": 4.0,
+        "base_generated_clean": "one word",
+        "base_top1_role": "other",
+        "base_top1_token": " one",
+        "blocker_reduction": 3.0,
+        "candidate_key": "L27C15369+L26C8587:flip",
+        "case_id": "p876_017_color_navy",
+        "clear_blocker_reduction": 3.0,
+        "domain": "color",
+        "dominant_pressure": "format",
+        "dominant_pressure_value": 2.0,
+        "edit_mode": "flip",
+        "field_class_blocker_count": 3.0,
+        "field_clear_class_blocker_count": 3.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 2,
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C15369",
+          "L26C8587"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " one",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "color",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " color",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [],
+        "object": "navy",
+        "object_delta": 0.0,
+        "original_blocker_delta": -0.041666666666666664,
+        "original_blocker_reduced": true,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 3.0,
+          "format": 2.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "clean_causal_transition",
+        "prompt_gate": "direct_prompt_gate",
+        "prompt_variant": "nonclean_direct",
+        "reducible_original_blockers": true,
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "source_predict_clean_mixed": false,
+        "source_purity_class": "object_side_effect_risk",
+        "target_margin": 0.8125,
+        "transition_class": "clean_causal_transition",
+        "transition_label": "other->strict_canonical",
+        "raw_pair_found": true,
+        "base_blocker_count": 3.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 3.0,
+        "base_target_rank": 4.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 3.0,
+        "base_target_logit": 13.125,
+        "intervened_target_logit": 14.5625,
+        "target_logit_delta_raw": 1.4375,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " one",
+        "intervened_top1_token_raw": " color",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.625,
+            "logit": 13.75,
+            "role": "other_blocker",
+            "token": " one",
+            "token_id": 825
+          },
+          {
+            "gap_vs_threshold": 0.1875,
+            "logit": 13.3125,
+            "role": "format_punct",
+            "token": " ___",
+            "token_id": 7436
+          },
+          {
+            "gap_vs_threshold": 0.1875,
+            "logit": 13.3125,
+            "role": "format_punct",
+            "token": " __",
+            "token_id": 1304
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 3,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 1,
+          "format_punct": 8,
+          "strict_target": 1
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 1,
+          "other_blocker": 1,
+          "format_punct": 8
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": false
+      },
+      {
+        "answer_delta": 0.6875,
+        "base_best_non_target_role": "other",
+        "base_best_non_target_token": " one",
+        "base_clear_rank": 4.0,
+        "base_generated_clean": "one word",
+        "base_top1_role": "other",
+        "base_top1_token": " one",
+        "blocker_reduction": 3.0,
+        "candidate_key": "L27C15369+L26C8587:zero",
+        "case_id": "p876_017_color_navy",
+        "clear_blocker_reduction": 3.0,
+        "domain": "color",
+        "dominant_pressure": "format",
+        "dominant_pressure_value": 2.0,
+        "edit_mode": "zero",
+        "field_class_blocker_count": 3.0,
+        "field_clear_class_blocker_count": 3.0,
+        "field_gates": [
+          "semantic_field_gate"
+        ],
+        "field_tags": [
+          "semantic_other_pressure"
+        ],
+        "field_top10_role_counts": {
+          "format_punct": 2,
+          "other_blocker": 1
+        },
+        "gear_keys": [
+          "L27C15369",
+          "L26C8587"
+        ],
+        "intervened_best_non_target_role": "other",
+        "intervened_best_non_target_token": " one",
+        "intervened_clear_rank": 1.0,
+        "intervened_generated_clean": "color",
+        "intervened_top1_role": "strict_target",
+        "intervened_top1_token": " color",
+        "model": "deepseek7b",
+        "nonclean_transition_reasons": [],
+        "object": "navy",
+        "object_delta": 0.0,
+        "original_blocker_delta": -0.041666666666666664,
+        "original_blocker_reduced": true,
+        "phase": 877,
+        "phase872_round": "validation_phase876",
+        "pressure_values": {
+          "blocker_count": 3.0,
+          "format": 2.0,
+          "object_echo": 0.0,
+          "protocol": 0.0,
+          "semantic": 1.0
+        },
+        "primary_route": "clean_causal_transition",
+        "prompt_gate": "direct_prompt_gate",
+        "prompt_variant": "nonclean_direct",
+        "reducible_original_blockers": true,
+        "route_tags": [
+          "clean_causal_transition"
+        ],
+        "source_gate": "clean_blocker_weakening_gate",
+        "source_predict_clean_mixed": false,
+        "source_purity_class": "object_side_effect_risk",
+        "target_margin": 0.0625,
+        "transition_class": "clean_causal_transition",
+        "transition_label": "other->strict_canonical",
+        "raw_pair_found": true,
+        "base_blocker_count": 3.0,
+        "intervened_blocker_count": 0.0,
+        "blocker_count_reduction_raw": 3.0,
+        "base_target_rank": 4.0,
+        "intervened_target_rank": 1.0,
+        "target_rank_improvement": 3.0,
+        "base_target_logit": 13.125,
+        "intervened_target_logit": 13.8125,
+        "target_logit_delta_raw": 0.6875,
+        "base_top1_role_raw": "other_blocker",
+        "intervened_top1_role_raw": "strict_target",
+        "base_top1_token_raw": " one",
+        "intervened_top1_token_raw": " color",
+        "base_blocker_tokens": [
+          {
+            "gap_vs_threshold": 0.625,
+            "logit": 13.75,
+            "role": "other_blocker",
+            "token": " one",
+            "token_id": 825
+          },
+          {
+            "gap_vs_threshold": 0.1875,
+            "logit": 13.3125,
+            "role": "format_punct",
+            "token": " ___",
+            "token_id": 7436
+          },
+          {
+            "gap_vs_threshold": 0.1875,
+            "logit": 13.3125,
+            "role": "format_punct",
+            "token": " __",
+            "token_id": 1304
+          }
+        ],
+        "intervened_blocker_tokens": [],
+        "removed_blocker_token_count": 3,
+        "added_blocker_token_count": 0,
+        "persistent_blocker_token_count": 0,
+        "base_top_token_count": 10,
+        "intervened_top_token_count": 10,
+        "removed_top_token_count": 0,
+        "added_top_token_count": 0,
+        "persistent_top_token_count": 10,
+        "top_token_overlap_ratio": 1.0,
+        "base_top_role_counts": {
+          "other_blocker": 1,
+          "format_punct": 8,
+          "strict_target": 1
+        },
+        "intervened_top_role_counts": {
+          "strict_target": 1,
+          "other_blocker": 1,
+          "format_punct": 8
+        },
+        "top_role_delta": {
+          "format_punct": 0,
+          "other_blocker": 0,
+          "strict_target": 0
+        },
+        "blocker_set_changed": true,
+        "top_set_changed": false,
+        "target_rank_reached_top1": true,
+        "count_reduced_without_original_blocker_reduction": false
+      }
+    ]
+  },
+  "boundary": "Saved top-token/top-blocker displacement audit; no new model run and no closure claim."
+}

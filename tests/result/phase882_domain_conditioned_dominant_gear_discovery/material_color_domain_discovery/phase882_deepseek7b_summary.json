@@ -1,0 +1,886 @@
+{
+  "phase": 882,
+  "title": "Domain-Conditioned Dominant Gear Discovery and Control Audit",
+  "model": "deepseek7b",
+  "round": "material_color_domain_discovery",
+  "timestamp": "2026-07-03 00:34:01",
+  "status": "complete",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "discovery_domains": [
+    "material",
+    "color"
+  ],
+  "eval_domains": [
+    "animal",
+    "material",
+    "color"
+  ],
+  "prompt_variants": [
+    "nonclean_direct",
+    "semantic_pressure",
+    "echo_pressure",
+    "format_pressure"
+  ],
+  "edit_modes": [
+    "flip",
+    "zero"
+  ],
+  "layer_indices": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+  ],
+  "n_discovered_candidates": 2,
+  "n_candidates_with_controls": 4,
+  "top_discovered_candidates": [
+    {
+      "phase": 882,
+      "model": "deepseek7b",
+      "candidate_source": "phase882_domain_readout_activation_search",
+      "control_type": "discovered",
+      "discovery_domain": "material",
+      "gear_key": "L27C1851",
+      "gear": {
+        "layer_idx": 27,
+        "channel_id": 1851,
+        "gear_key": "L27C1851"
+      },
+      "layer_idx": 27,
+      "channel_id": 1851,
+      "n": 5,
+      "mean_activation": -316.0,
+      "mean_abs_activation": 316.0,
+      "mean_readout_coeff": -0.022153615951538086,
+      "mean_abs_readout_coeff": 0.04931173101067543,
+      "mean_signed_support": 6.83925076648593,
+      "mean_abs_support": 14.956561204046011,
+      "max_abs_support": 25.657512471079826,
+      "sign_consistency": 0.6,
+      "candidate_role": "positive_class_support_candidate",
+      "discovery_score": 26.755110049506392
+    },
+    {
+      "phase": 882,
+      "model": "deepseek7b",
+      "candidate_source": "phase882_domain_readout_activation_search",
+      "control_type": "discovered",
+      "discovery_domain": "color",
+      "gear_key": "L27C1851",
+      "gear": {
+        "layer_idx": 27,
+        "channel_id": 1851,
+        "gear_key": "L27C1851"
+      },
+      "layer_idx": 27,
+      "channel_id": 1851,
+      "n": 6,
+      "mean_activation": -384.8333333333333,
+      "mean_abs_activation": 384.8333333333333,
+      "mean_readout_coeff": 0.00556489871814847,
+      "mean_abs_readout_coeff": 0.03630913281813264,
+      "mean_signed_support": 0.8128350237384439,
+      "mean_abs_support": 14.565643242560327,
+      "max_abs_support": 34.182475090026855,
+      "sign_consistency": 0.6666666666666666,
+      "candidate_role": "positive_class_support_candidate",
+      "discovery_score": 29.731994766408853
+    }
+  ],
+  "n_candidate_sample_rows": 6144,
+  "n_rows": 576,
+  "summary": {
+    "n": 576,
+    "models": {
+      "deepseek7b": 576
+    },
+    "discovery_domains": {
+      "material": 288,
+      "color": 288
+    },
+    "eval_domains": {
+      "animal": 192,
+      "material": 192,
+      "color": 192
+    },
+    "control_types": {
+      "discovered": 288,
+      "same_layer_random": 288
+    },
+    "closure_from_open": 4,
+    "answer_gain": 4,
+    "domain_specific_closure": 0,
+    "cross_domain_closure": 4,
+    "intervened_boundary_closed": 92,
+    "mean_blocker_reduction": -2.0416666666666665,
+    "mean_rank_improvement": -2.0416666666666665,
+    "mean_class_logit_delta": -0.2742784288194444
+  },
+  "by_control_type": {
+    "discovered": {
+      "n": 288,
+      "models": {
+        "deepseek7b": 288
+      },
+      "discovery_domains": {
+        "material": 144,
+        "color": 144
+      },
+      "eval_domains": {
+        "animal": 96,
+        "material": 96,
+        "color": 96
+      },
+      "control_types": {
+        "discovered": 288
+      },
+      "closure_from_open": 4,
+      "answer_gain": 4,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 4,
+      "intervened_boundary_closed": 44,
+      "mean_blocker_reduction": -4.104166666666667,
+      "mean_rank_improvement": -4.104166666666667,
+      "mean_class_logit_delta": -0.5465494791666666
+    },
+    "same_layer_random": {
+      "n": 288,
+      "models": {
+        "deepseek7b": 288
+      },
+      "discovery_domains": {
+        "material": 144,
+        "color": 144
+      },
+      "eval_domains": {
+        "animal": 96,
+        "material": 96,
+        "color": 96
+      },
+      "control_types": {
+        "same_layer_random": 288
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 48,
+      "mean_blocker_reduction": 0.020833333333333332,
+      "mean_rank_improvement": 0.020833333333333332,
+      "mean_class_logit_delta": -0.002007378472222222
+    }
+  },
+  "by_discovery_eval_domain": {
+    "discovered|color|animal": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "color": 48
+      },
+      "eval_domains": {
+        "animal": 48
+      },
+      "control_types": {
+        "discovered": 48
+      },
+      "closure_from_open": 2,
+      "answer_gain": 2,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 2,
+      "intervened_boundary_closed": 13,
+      "mean_blocker_reduction": -5.375,
+      "mean_rank_improvement": -5.375,
+      "mean_class_logit_delta": -0.6282552083333334
+    },
+    "discovered|color|color": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "color": 48
+      },
+      "eval_domains": {
+        "color": 48
+      },
+      "control_types": {
+        "discovered": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 6,
+      "mean_blocker_reduction": 11.020833333333334,
+      "mean_rank_improvement": 11.020833333333334,
+      "mean_class_logit_delta": -0.1123046875
+    },
+    "discovered|color|material": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "color": 48
+      },
+      "eval_domains": {
+        "material": 48
+      },
+      "control_types": {
+        "discovered": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 3,
+      "mean_blocker_reduction": -17.958333333333332,
+      "mean_rank_improvement": -17.958333333333332,
+      "mean_class_logit_delta": -0.8990885416666666
+    },
+    "discovered|material|animal": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "material": 48
+      },
+      "eval_domains": {
+        "animal": 48
+      },
+      "control_types": {
+        "discovered": 48
+      },
+      "closure_from_open": 2,
+      "answer_gain": 2,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 2,
+      "intervened_boundary_closed": 13,
+      "mean_blocker_reduction": -5.375,
+      "mean_rank_improvement": -5.375,
+      "mean_class_logit_delta": -0.6282552083333334
+    },
+    "discovered|material|color": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "material": 48
+      },
+      "eval_domains": {
+        "color": 48
+      },
+      "control_types": {
+        "discovered": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 6,
+      "mean_blocker_reduction": 11.020833333333334,
+      "mean_rank_improvement": 11.020833333333334,
+      "mean_class_logit_delta": -0.1123046875
+    },
+    "discovered|material|material": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "material": 48
+      },
+      "eval_domains": {
+        "material": 48
+      },
+      "control_types": {
+        "discovered": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 3,
+      "mean_blocker_reduction": -17.958333333333332,
+      "mean_rank_improvement": -17.958333333333332,
+      "mean_class_logit_delta": -0.8990885416666666
+    },
+    "same_layer_random|color|animal": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "color": 48
+      },
+      "eval_domains": {
+        "animal": 48
+      },
+      "control_types": {
+        "same_layer_random": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": 0.0,
+      "mean_rank_improvement": 0.0,
+      "mean_class_logit_delta": -0.0026041666666666665
+    },
+    "same_layer_random|color|color": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "color": 48
+      },
+      "eval_domains": {
+        "color": 48
+      },
+      "control_types": {
+        "same_layer_random": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 6,
+      "mean_blocker_reduction": 0.0,
+      "mean_rank_improvement": 0.0,
+      "mean_class_logit_delta": -0.0013020833333333333
+    },
+    "same_layer_random|color|material": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "color": 48
+      },
+      "eval_domains": {
+        "material": 48
+      },
+      "control_types": {
+        "same_layer_random": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 6,
+      "mean_blocker_reduction": -0.020833333333333332,
+      "mean_rank_improvement": -0.020833333333333332,
+      "mean_class_logit_delta": 0.0
+    },
+    "same_layer_random|material|animal": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "material": 48
+      },
+      "eval_domains": {
+        "animal": 48
+      },
+      "control_types": {
+        "same_layer_random": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": -0.041666666666666664,
+      "mean_rank_improvement": -0.041666666666666664,
+      "mean_class_logit_delta": -0.005208333333333333
+    },
+    "same_layer_random|material|color": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "material": 48
+      },
+      "eval_domains": {
+        "color": 48
+      },
+      "control_types": {
+        "same_layer_random": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 6,
+      "mean_blocker_reduction": 0.22916666666666666,
+      "mean_rank_improvement": 0.22916666666666666,
+      "mean_class_logit_delta": -0.0029296875
+    },
+    "same_layer_random|material|material": {
+      "n": 48,
+      "models": {
+        "deepseek7b": 48
+      },
+      "discovery_domains": {
+        "material": 48
+      },
+      "eval_domains": {
+        "material": 48
+      },
+      "control_types": {
+        "same_layer_random": 48
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 6,
+      "mean_blocker_reduction": -0.041666666666666664,
+      "mean_rank_improvement": -0.041666666666666664,
+      "mean_class_logit_delta": 0.0
+    }
+  },
+  "by_candidate": {
+    "discovered|color|L27C1851:flip": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 9,
+      "mean_blocker_reduction": -4.486111111111111,
+      "mean_rank_improvement": -4.486111111111111,
+      "mean_class_logit_delta": -0.564453125
+    },
+    "discovered|color|L27C1851:zero": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 2,
+      "answer_gain": 2,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 2,
+      "intervened_boundary_closed": 13,
+      "mean_blocker_reduction": -3.7222222222222223,
+      "mean_rank_improvement": -3.7222222222222223,
+      "mean_class_logit_delta": -0.5286458333333334
+    },
+    "discovered|material|L27C1851:flip": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 9,
+      "mean_blocker_reduction": -4.486111111111111,
+      "mean_rank_improvement": -4.486111111111111,
+      "mean_class_logit_delta": -0.564453125
+    },
+    "discovered|material|L27C1851:zero": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 2,
+      "answer_gain": 2,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 2,
+      "intervened_boundary_closed": 13,
+      "mean_blocker_reduction": -3.7222222222222223,
+      "mean_rank_improvement": -3.7222222222222223,
+      "mean_class_logit_delta": -0.5286458333333334
+    },
+    "same_layer_random|color|L27C14480:flip": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": -0.013888888888888888,
+      "mean_rank_improvement": -0.013888888888888888,
+      "mean_class_logit_delta": -0.0008680555555555555
+    },
+    "same_layer_random|color|L27C14480:zero": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": 0.0,
+      "mean_rank_improvement": 0.0,
+      "mean_class_logit_delta": -0.001736111111111111
+    },
+    "same_layer_random|material|L27C12125:flip": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": -0.1111111111111111,
+      "mean_rank_improvement": -0.1111111111111111,
+      "mean_class_logit_delta": -0.0030381944444444445
+    },
+    "same_layer_random|material|L27C12125:zero": {
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": 0.20833333333333334,
+      "mean_rank_improvement": 0.20833333333333334,
+      "mean_class_logit_delta": -0.002387152777777778
+    }
+  },
+  "candidate_evidence_labels": [
+    {
+      "key": "discovered|color|L27C1851:zero",
+      "control_type": "discovered",
+      "evidence_label": "side_effect_or_non_specific",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 2,
+      "answer_gain": 2,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 2,
+      "intervened_boundary_closed": 13,
+      "mean_blocker_reduction": -3.7222222222222223,
+      "mean_rank_improvement": -3.7222222222222223,
+      "mean_class_logit_delta": -0.5286458333333334
+    },
+    {
+      "key": "discovered|material|L27C1851:zero",
+      "control_type": "discovered",
+      "evidence_label": "side_effect_or_non_specific",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 2,
+      "answer_gain": 2,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 2,
+      "intervened_boundary_closed": 13,
+      "mean_blocker_reduction": -3.7222222222222223,
+      "mean_rank_improvement": -3.7222222222222223,
+      "mean_class_logit_delta": -0.5286458333333334
+    },
+    {
+      "key": "discovered|color|L27C1851:flip",
+      "control_type": "discovered",
+      "evidence_label": "no_repair",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 9,
+      "mean_blocker_reduction": -4.486111111111111,
+      "mean_rank_improvement": -4.486111111111111,
+      "mean_class_logit_delta": -0.564453125
+    },
+    {
+      "key": "discovered|material|L27C1851:flip",
+      "control_type": "discovered",
+      "evidence_label": "no_repair",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "discovered": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 9,
+      "mean_blocker_reduction": -4.486111111111111,
+      "mean_rank_improvement": -4.486111111111111,
+      "mean_class_logit_delta": -0.564453125
+    },
+    {
+      "key": "same_layer_random|color|L27C14480:flip",
+      "control_type": "same_layer_random",
+      "evidence_label": "no_repair",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": -0.013888888888888888,
+      "mean_rank_improvement": -0.013888888888888888,
+      "mean_class_logit_delta": -0.0008680555555555555
+    },
+    {
+      "key": "same_layer_random|color|L27C14480:zero",
+      "control_type": "same_layer_random",
+      "evidence_label": "no_repair",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "color": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": 0.0,
+      "mean_rank_improvement": 0.0,
+      "mean_class_logit_delta": -0.001736111111111111
+    },
+    {
+      "key": "same_layer_random|material|L27C12125:flip",
+      "control_type": "same_layer_random",
+      "evidence_label": "no_repair",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": -0.1111111111111111,
+      "mean_rank_improvement": -0.1111111111111111,
+      "mean_class_logit_delta": -0.0030381944444444445
+    },
+    {
+      "key": "same_layer_random|material|L27C12125:zero",
+      "control_type": "same_layer_random",
+      "evidence_label": "no_repair",
+      "n": 72,
+      "models": {
+        "deepseek7b": 72
+      },
+      "discovery_domains": {
+        "material": 72
+      },
+      "eval_domains": {
+        "animal": 24,
+        "material": 24,
+        "color": 24
+      },
+      "control_types": {
+        "same_layer_random": 72
+      },
+      "closure_from_open": 0,
+      "answer_gain": 0,
+      "domain_specific_closure": 0,
+      "cross_domain_closure": 0,
+      "intervened_boundary_closed": 12,
+      "mean_blocker_reduction": 0.20833333333333334,
+      "mean_rank_improvement": 0.20833333333333334,
+      "mean_class_logit_delta": -0.002387152777777778
+    }
+  ],
+  "boundary": "Candidate discovery uses class-vs-object readout-coupled MLP activations, then tests single-gear edits with same-layer random controls and cross-domain evaluation. This is atlas construction, not closure."
+}
