@@ -1,0 +1,172 @@
+{
+  "phase": 869,
+  "title": "Blocker Field Conditional Gate Audit",
+  "timestamp": "2026-07-03 08:15:59",
+  "source_round": "holdout",
+  "source_phase867": "tests/result/phase867_clean_route_holdout_prediction/holdout",
+  "source_phase868": "tests/result/phase868_conditional_route_transfer_failure_taxonomy/holdout/phase868_rows.jsonl",
+  "summaries": [
+    {
+      "model_domain": "deepseek7b:animal",
+      "n_contexts": 12,
+      "mean_class_blocker_count": 5.166666666666667,
+      "mean_clear_class_blocker_count": 5.166666666666667,
+      "mean_class_minus_object_logit": 3.2604166666666665,
+      "mean_object_rank": 38.666666666666664,
+      "top1_role_counts": {
+        "none": 7,
+        "format_punct": 2,
+        "format_space": 1,
+        "other_blocker": 2
+      },
+      "top10_role_counts": {
+        "format_punct": 10,
+        "format_space": 6,
+        "protocol_word": 9,
+        "object_echo": 2,
+        "other_blocker": 13
+      },
+      "top10_role_per_context": {
+        "other_blocker": 1.0833333333333333,
+        "format_punct": 0.8333333333333334,
+        "protocol_word": 0.75,
+        "format_space": 0.5,
+        "object_echo": 0.16666666666666666
+      },
+      "top_tokens": {
+        " \"": 4,
+        " ": 4,
+        " most": 3,
+        " '": 2,
+        " The": 2,
+        " category": 2,
+        " C": 2,
+        " B": 2
+      },
+      "field_profile": [
+        "semantic_other_pressure"
+      ],
+      "transfer_status_counts": {
+        "source_clean_failed": 3,
+        "stable_nonclean": 1
+      },
+      "transfer_failure_reasons": {
+        "original_blocker_not_negative": 4,
+        "no_clear_gain": 2,
+        "clear_loss": 1,
+        "answer_not_lifted": 1,
+        "blocker_not_reduced": 1,
+        "format_or_other_side_effect": 1
+      }
+    },
+    {
+      "model_domain": "deepseek7b:color",
+      "n_contexts": 12,
+      "mean_class_blocker_count": 17.5,
+      "mean_clear_class_blocker_count": 17.5,
+      "mean_class_minus_object_logit": 1.9375,
+      "mean_object_rank": 37.333333333333336,
+      "top1_role_counts": {
+        "format_punct": 4,
+        "none": 3,
+        "other_blocker": 5
+      },
+      "top10_role_counts": {
+        "format_punct": 18,
+        "other_blocker": 17,
+        "format_space": 7,
+        "protocol_word": 8,
+        "object_echo": 6
+      },
+      "top10_role_per_context": {
+        "format_punct": 1.5,
+        "other_blocker": 1.4166666666666667,
+        "protocol_word": 0.6666666666666666,
+        "format_space": 0.5833333333333334,
+        "object_echo": 0.5
+      },
+      "top_tokens": {
+        " ?\n": 4,
+        " ?\n\n": 4,
+        " most": 4,
+        " ": 4,
+        "ioneer": 3,
+        " the": 3,
+        " a": 3,
+        " B": 3
+      },
+      "field_profile": [
+        "format_pressure",
+        "semantic_other_pressure"
+      ],
+      "transfer_status_counts": {
+        "stable_nonclean": 2,
+        "emergent_clean": 2
+      },
+      "transfer_failure_reasons": {
+        "original_blocker_not_negative": 1,
+        "no_clear_gain": 1,
+        "clear_loss": 1,
+        "answer_not_lifted": 1,
+        "blocker_not_reduced": 1,
+        "format_or_other_side_effect": 1
+      }
+    },
+    {
+      "model_domain": "qwen3:material",
+      "n_contexts": 12,
+      "mean_class_blocker_count": 58.333333333333336,
+      "mean_clear_class_blocker_count": 58.333333333333336,
+      "mean_class_minus_object_logit": -1.6979166666666667,
+      "mean_object_rank": 14.083333333333334,
+      "top1_role_counts": {
+        "format_space": 6,
+        "other_blocker": 1,
+        "format_punct": 4,
+        "none": 1
+      },
+      "top10_role_counts": {
+        "format_space": 28,
+        "object_echo": 12,
+        "format_punct": 35,
+        "other_blocker": 14,
+        "protocol_word": 7
+      },
+      "top10_role_per_context": {
+        "format_punct": 2.9166666666666665,
+        "format_space": 2.3333333333333335,
+        "other_blocker": 1.1666666666666667,
+        "object_echo": 1.0,
+        "protocol_word": 0.5833333333333334
+      },
+      "top_tokens": {
+        " ": 8,
+        " \n": 8,
+        " \n\n": 7,
+        " (": 5,
+        " \"": 5,
+        " ?\n": 4,
+        " ?\n\n": 4,
+        " '": 4
+      },
+      "field_profile": [
+        "high_blocker_count",
+        "object_above_class",
+        "format_pressure",
+        "object_echo_pressure",
+        "semantic_other_pressure"
+      ],
+      "transfer_status_counts": {
+        "source_clean_failed": 3,
+        "stable_nonclean": 1
+      },
+      "transfer_failure_reasons": {
+        "original_blocker_not_negative": 3,
+        "no_clear_gain": 3,
+        "answer_not_lifted": 1,
+        "blocker_not_reduced": 1
+      }
+    }
+  ],
+  "boundary": "Offline blocker field description; no new intervention and no predictive closure."
+}

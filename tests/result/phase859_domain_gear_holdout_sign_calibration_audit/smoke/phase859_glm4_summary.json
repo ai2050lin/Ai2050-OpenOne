@@ -1,0 +1,345 @@
+{
+  "phase": 859,
+  "title": "Domain Gear Holdout and Sign Calibration Audit",
+  "model": "glm4",
+  "round": "smoke",
+  "timestamp": "2026-07-02 22:12:44",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "source_phase858_round": "confirm",
+  "n_cases": 3,
+  "domains": [
+    "animal",
+    "geometry",
+    "tool"
+  ],
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "n_rows": 12,
+  "condition_summary": {
+    "alternate_mode": {
+      "n": 3,
+      "first_token_answer_class": 3,
+      "first_token_clear_answer_class": 3,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 3
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 2.9375
+    },
+    "best_holdout": {
+      "n": 3,
+      "first_token_answer_class": 3,
+      "first_token_clear_answer_class": 3,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 2,
+        "answer_alias": 1
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 2.96875
+    },
+    "original": {
+      "n": 3,
+      "first_token_answer_class": 3,
+      "first_token_clear_answer_class": 3,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 2,
+        "answer_alias": 1
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 2.9166666666666665
+    },
+    "same_layer_control": {
+      "n": 3,
+      "first_token_answer_class": 3,
+      "first_token_clear_answer_class": 3,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 3
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 2.9479166666666665
+    }
+  },
+  "domain_summary": {
+    "animal": {
+      "n": 4,
+      "first_token_answer_class": 4,
+      "first_token_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 4
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 1.84375
+    },
+    "geometry": {
+      "n": 4,
+      "first_token_answer_class": 4,
+      "first_token_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "answer_alias": 2,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 1.71875
+    },
+    "tool": {
+      "n": 4,
+      "first_token_answer_class": 4,
+      "first_token_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 4
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 5.265625
+    }
+  },
+  "best_holdout_effects": [
+    {
+      "condition_type": "best_holdout",
+      "domain": "geometry",
+      "candidate_key": "L32C4909:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L32C4909"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.125,
+      "effect_score": 0.01875
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "animal",
+      "candidate_key": "L29C4696+L29C13502:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C4696",
+        "L29C13502"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0625,
+      "effect_score": 0.009375
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "tool",
+      "candidate_key": "L31C13504+L32C12804:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L31C13504",
+        "L32C12804"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.03125,
+      "effect_score": -0.0046875
+    }
+  ],
+  "alternate_mode_effects": [
+    {
+      "condition_type": "alternate_mode",
+      "domain": "animal",
+      "candidate_key": "L29C4696+L29C13502:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C4696",
+        "L29C13502"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0625,
+      "effect_score": 0.009375
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "geometry",
+      "candidate_key": "L32C4909:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L32C4909"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0,
+      "effect_score": 0.0
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "tool",
+      "candidate_key": "L31C13504+L32C12804:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L31C13504",
+        "L32C12804"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0,
+      "effect_score": 0.0
+    }
+  ],
+  "same_layer_control_effects": [
+    {
+      "condition_type": "same_layer_control",
+      "domain": "tool",
+      "candidate_key": "L31C13362+L32C4909:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L31C13362",
+        "L32C4909"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.09375,
+      "effect_score": 0.014062499999999999
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "animal",
+      "candidate_key": "L29C9345+L29C9345:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C9345",
+        "L29C9345"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0,
+      "effect_score": 0.0
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "geometry",
+      "candidate_key": "L32C13340:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L32C13340"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0,
+      "effect_score": 0.0
+    }
+  ],
+  "shared_exact_probe_effects": [],
+  "calibration_summary": {
+    "best_domains_positive": 2,
+    "best_domains_clear_gain": 0,
+    "alternate_domains_clear_gain": 0,
+    "control_domains_clear_gain": 0,
+    "shared_probe_domains_clear_gain": 0
+  },
+  "boundary": "This phase validates Phase 858 top domain gears on held-out objects and compares best mode, alternate mode, and same-layer controls. It is sign calibration and holdout audit, not final closure."
+}

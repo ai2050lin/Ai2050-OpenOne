@@ -1,0 +1,337 @@
+{
+  "phase": 862,
+  "round": "confirm_scale15",
+  "timestamp": "2026-07-03 01:56:41",
+  "status": "complete",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "model_summaries": {
+    "qwen3": {
+      "phase": 862,
+      "title": "Negative-Blocker Sign Mechanism Audit",
+      "model": "qwen3",
+      "round": "confirm_scale15",
+      "timestamp": "2026-07-03 01:56:20",
+      "status": "complete",
+      "attn_implementation": "sdpa",
+      "dtype": "bfloat16",
+      "quantization": "off",
+      "target_signatures": [
+        {
+          "model": "qwen3",
+          "domain": "material",
+          "gear_keys": [
+            "L31C4800",
+            "L31C2257"
+          ],
+          "level": 6,
+          "candidate_role": "negative_blocker",
+          "best_mode": "flip",
+          "depth_band": "late"
+        }
+      ],
+      "domains": [
+        "material"
+      ],
+      "prompt_variants": [
+        "natural_question",
+        "natural_category",
+        "classification"
+      ],
+      "edit_modes": [
+        "scale_up"
+      ],
+      "include_single_channels": false,
+      "n_rows": 30,
+      "condition_summary": {
+        "full_set": {
+          "n": 15,
+          "rollout_clear_answer_class": 5,
+          "rollout_answer_class": 7,
+          "first_token_answer_class": 7,
+          "mean_class_blocker_count": 6.466666666666667,
+          "mean_class_minus_object_logit": -0.4375,
+          "mean_original_blocker_delta": 0.010416666666666666,
+          "rollout_labels": {
+            "object_echo": 1,
+            "other": 7,
+            "answer_alias": 4,
+            "strict_canonical": 1,
+            "identity_class_overlap": 2
+          }
+        },
+        "original": {
+          "n": 15,
+          "rollout_clear_answer_class": 5,
+          "rollout_answer_class": 7,
+          "first_token_answer_class": 7,
+          "mean_class_blocker_count": 5.133333333333334,
+          "mean_class_minus_object_logit": -0.19583333333333333,
+          "mean_original_blocker_delta": 0.0,
+          "rollout_labels": {
+            "object_echo": 1,
+            "other": 7,
+            "answer_alias": 4,
+            "strict_canonical": 1,
+            "identity_class_overlap": 2
+          }
+        }
+      },
+      "domain_summary": {
+        "material": {
+          "n": 30,
+          "rollout_clear_answer_class": 10,
+          "rollout_answer_class": 14,
+          "first_token_answer_class": 14,
+          "mean_class_blocker_count": 5.8,
+          "mean_class_minus_object_logit": -0.31666666666666665,
+          "mean_original_blocker_delta": 0.003623188405797101,
+          "rollout_labels": {
+            "object_echo": 2,
+            "other": 14,
+            "answer_alias": 8,
+            "strict_canonical": 2,
+            "identity_class_overlap": 4
+          }
+        }
+      },
+      "pair_effects": [
+        {
+          "domain": "material",
+          "condition_type": "full_set",
+          "subset_name": "full",
+          "edit_mode": "scale_up",
+          "n_pairs": 15,
+          "clear_rollout_gain": 0,
+          "clear_rollout_loss": 0,
+          "rollout_gain": 0,
+          "rollout_loss": 0,
+          "first_gain": 0,
+          "first_loss": 0,
+          "mean_class_blocker_reduction": -1.3333333333333333,
+          "mean_class_minus_object_gain": -0.24166666666666667,
+          "mean_original_blocker_delta": 0.010416666666666666,
+          "mean_answer_delta": -0.2,
+          "mean_object_delta": 0.041666666666666664,
+          "mean_strict_delta": -0.44583333333333336,
+          "blocker_weakening_supported": false,
+          "answer_lift_supported": false
+        }
+      ],
+      "sign_mechanism_by_domain": {
+        "material": {
+          "clear_gain_modes": [],
+          "blocker_weakening_modes": [],
+          "answer_lift_modes": [],
+          "zero_and_flip_both_clear": false,
+          "zero_and_flip_both_weaken_blockers": false,
+          "scale_down_clear": false,
+          "scale_up_clear": false,
+          "interpretation": "mode_specific_or_unresolved"
+        }
+      },
+      "boundary": "This phase audits why Level 6 negative-blocker gears show sign ambiguity. It does not search for new gears and does not prove language closure."
+    },
+    "glm4": {
+      "phase": 862,
+      "title": "Negative-Blocker Sign Mechanism Audit",
+      "model": "glm4",
+      "round": "confirm_scale15",
+      "timestamp": "2026-07-03 01:56:22",
+      "status": "no_level6_target",
+      "target_signatures": [],
+      "prompt_variants": [
+        "natural_question",
+        "natural_category",
+        "classification"
+      ],
+      "edit_modes": [
+        "scale_up"
+      ]
+    },
+    "deepseek7b": {
+      "phase": 862,
+      "title": "Negative-Blocker Sign Mechanism Audit",
+      "model": "deepseek7b",
+      "round": "confirm_scale15",
+      "timestamp": "2026-07-03 01:56:39",
+      "status": "complete",
+      "attn_implementation": "sdpa",
+      "dtype": "bfloat16",
+      "quantization": "off",
+      "target_signatures": [
+        {
+          "model": "deepseek7b",
+          "domain": "animal",
+          "gear_keys": [
+            "L27C16651",
+            "L24C3875"
+          ],
+          "level": 6,
+          "candidate_role": "negative_blocker",
+          "best_mode": "flip",
+          "depth_band": "late"
+        },
+        {
+          "model": "deepseek7b",
+          "domain": "color",
+          "gear_keys": [
+            "L27C15369",
+            "L26C8587"
+          ],
+          "level": 6,
+          "candidate_role": "negative_blocker",
+          "best_mode": "flip",
+          "depth_band": "late"
+        }
+      ],
+      "domains": [
+        "animal",
+        "color"
+      ],
+      "prompt_variants": [
+        "natural_question",
+        "natural_category",
+        "classification"
+      ],
+      "edit_modes": [
+        "scale_up"
+      ],
+      "include_single_channels": false,
+      "n_rows": 60,
+      "condition_summary": {
+        "full_set": {
+          "n": 30,
+          "rollout_clear_answer_class": 5,
+          "rollout_answer_class": 6,
+          "first_token_answer_class": 5,
+          "mean_class_blocker_count": 3.0,
+          "mean_class_minus_object_logit": 2.25,
+          "mean_original_blocker_delta": 0.0246875,
+          "rollout_labels": {
+            "other": 19,
+            "format_or_empty": 5,
+            "strict_canonical": 5,
+            "identity_class_overlap": 1
+          }
+        },
+        "original": {
+          "n": 30,
+          "rollout_clear_answer_class": 8,
+          "rollout_answer_class": 9,
+          "first_token_answer_class": 10,
+          "mean_class_blocker_count": 1.9,
+          "mean_class_minus_object_logit": 2.832291666666667,
+          "mean_original_blocker_delta": 0.0,
+          "rollout_labels": {
+            "other": 17,
+            "format_or_empty": 4,
+            "strict_canonical": 8,
+            "identity_class_overlap": 1
+          }
+        }
+      },
+      "domain_summary": {
+        "animal": {
+          "n": 30,
+          "rollout_clear_answer_class": 4,
+          "rollout_answer_class": 4,
+          "first_token_answer_class": 10,
+          "mean_class_blocker_count": 2.3666666666666667,
+          "mean_class_minus_object_logit": 2.8854166666666665,
+          "mean_original_blocker_delta": 0.017187499999999998,
+          "rollout_labels": {
+            "other": 22,
+            "format_or_empty": 4,
+            "strict_canonical": 4
+          }
+        },
+        "color": {
+          "n": 30,
+          "rollout_clear_answer_class": 9,
+          "rollout_answer_class": 11,
+          "first_token_answer_class": 5,
+          "mean_class_blocker_count": 2.533333333333333,
+          "mean_class_minus_object_logit": 2.196875,
+          "mean_original_blocker_delta": 0.003125,
+          "rollout_labels": {
+            "strict_canonical": 9,
+            "format_or_empty": 5,
+            "other": 14,
+            "identity_class_overlap": 2
+          }
+        }
+      },
+      "pair_effects": [
+        {
+          "domain": "animal",
+          "condition_type": "full_set",
+          "subset_name": "full",
+          "edit_mode": "scale_up",
+          "n_pairs": 15,
+          "clear_rollout_gain": 0,
+          "clear_rollout_loss": 2,
+          "rollout_gain": 0,
+          "rollout_loss": 2,
+          "first_gain": 0,
+          "first_loss": 2,
+          "mean_class_blocker_reduction": -1.4,
+          "mean_class_minus_object_gain": -0.6083333333333333,
+          "mean_original_blocker_delta": 0.04583333333333333,
+          "mean_answer_delta": -0.575,
+          "mean_object_delta": 0.03333333333333333,
+          "mean_strict_delta": -0.85,
+          "blocker_weakening_supported": false,
+          "answer_lift_supported": false
+        },
+        {
+          "domain": "color",
+          "condition_type": "full_set",
+          "subset_name": "full",
+          "edit_mode": "scale_up",
+          "n_pairs": 15,
+          "clear_rollout_gain": 0,
+          "clear_rollout_loss": 1,
+          "rollout_gain": 0,
+          "rollout_loss": 1,
+          "first_gain": 0,
+          "first_loss": 3,
+          "mean_class_blocker_reduction": -0.8,
+          "mean_class_minus_object_gain": -0.55625,
+          "mean_original_blocker_delta": 0.007386363636363636,
+          "mean_answer_delta": -0.725,
+          "mean_object_delta": -0.16875,
+          "mean_strict_delta": -0.7333333333333333,
+          "blocker_weakening_supported": false,
+          "answer_lift_supported": false
+        }
+      ],
+      "sign_mechanism_by_domain": {
+        "animal": {
+          "clear_gain_modes": [],
+          "blocker_weakening_modes": [],
+          "answer_lift_modes": [],
+          "zero_and_flip_both_clear": false,
+          "zero_and_flip_both_weaken_blockers": false,
+          "scale_down_clear": false,
+          "scale_up_clear": false,
+          "interpretation": "mode_specific_or_unresolved"
+        },
+        "color": {
+          "clear_gain_modes": [],
+          "blocker_weakening_modes": [],
+          "answer_lift_modes": [],
+          "zero_and_flip_both_clear": false,
+          "zero_and_flip_both_weaken_blockers": false,
+          "scale_down_clear": false,
+          "scale_up_clear": false,
+          "interpretation": "mode_specific_or_unresolved"
+        }
+      },
+      "boundary": "This phase audits why Level 6 negative-blocker gears show sign ambiguity. It does not search for new gears and does not prove language closure."
+    }
+  }
+}

@@ -1,0 +1,390 @@
+{
+  "phase": 860,
+  "title": "Replicated Domain Gear Evidence Ladder",
+  "model": "deepseek7b",
+  "round": "smoke",
+  "timestamp": "2026-07-02 23:09:05",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "source_phase858_round": "confirm",
+  "source_phase859_round": "holdout",
+  "target_domains": [
+    "animal",
+    "color"
+  ],
+  "n_cases": 6,
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "n_rows": 24,
+  "condition_summary": {
+    "alternate_mode": {
+      "n": 6,
+      "first_token_answer_class": 6,
+      "first_token_clear_answer_class": 6,
+      "rollout_answer_class": 6,
+      "rollout_clear_answer_class": 6,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 6
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 4.479166666666667
+    },
+    "best_holdout": {
+      "n": 6,
+      "first_token_answer_class": 6,
+      "first_token_clear_answer_class": 6,
+      "rollout_answer_class": 6,
+      "rollout_clear_answer_class": 6,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 6
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 7.3125
+    },
+    "original": {
+      "n": 6,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 3,
+      "rollout_labels": {
+        "other": 2,
+        "format_or_empty": 1,
+        "strict_canonical": 3
+      },
+      "mean_class_blocker_count": 0.8333333333333334,
+      "mean_class_minus_object_logit": 2.2135416666666665
+    },
+    "same_layer_control": {
+      "n": 6,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 4,
+      "rollout_labels": {
+        "other": 3,
+        "format_or_empty": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 1.3333333333333333,
+      "mean_class_minus_object_logit": 1.6354166666666667
+    }
+  },
+  "domain_summary": {
+    "animal": {
+      "n": 12,
+      "first_token_answer_class": 7,
+      "first_token_clear_answer_class": 7,
+      "rollout_answer_class": 7,
+      "rollout_clear_answer_class": 7,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 3,
+        "strict_canonical": 7,
+        "format_or_empty": 2
+      },
+      "mean_class_blocker_count": 0.5,
+      "mean_class_minus_object_logit": 4.403645833333333
+    },
+    "color": {
+      "n": 12,
+      "first_token_answer_class": 8,
+      "first_token_clear_answer_class": 8,
+      "rollout_answer_class": 10,
+      "rollout_clear_answer_class": 10,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 2,
+      "rollout_labels": {
+        "strict_canonical": 10,
+        "other": 2
+      },
+      "mean_class_blocker_count": 0.5833333333333334,
+      "mean_class_minus_object_logit": 3.4166666666666665
+    }
+  },
+  "split_summary": {
+    "phase858_seen": {
+      "n": 16,
+      "first_token_answer_class": 10,
+      "first_token_clear_answer_class": 10,
+      "rollout_answer_class": 12,
+      "rollout_clear_answer_class": 12,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 4,
+      "rollout_labels": {
+        "other": 2,
+        "strict_canonical": 12,
+        "format_or_empty": 2
+      },
+      "mean_class_blocker_count": 0.5,
+      "mean_class_minus_object_logit": 4.716796875
+    },
+    "phase859_holdout_seen": {
+      "n": 8,
+      "first_token_answer_class": 5,
+      "first_token_clear_answer_class": 5,
+      "rollout_answer_class": 5,
+      "rollout_clear_answer_class": 5,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 3,
+      "rollout_labels": {
+        "strict_canonical": 5,
+        "other": 3
+      },
+      "mean_class_blocker_count": 0.625,
+      "mean_class_minus_object_logit": 2.296875
+    }
+  },
+  "best_effects": [
+    {
+      "condition_type": "best_holdout",
+      "domain": "animal",
+      "candidate_key": "L27C16651+L24C3875:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L27C16651",
+        "L24C3875"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 2,
+      "first_loss": 0,
+      "rollout_gain": 2,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 2,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.6666666666666666,
+      "mean_class_minus_object_gain": 4.177083333333333,
+      "split_clear_gain": {
+        "phase858_seen": 2,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 2
+      },
+      "effect_score": 12.7265625
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "color",
+      "candidate_key": "L27C15369+L26C8587:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L27C15369",
+        "L26C8587"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 2,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 6.020833333333333,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 1
+      },
+      "prompt_clear_gain": {
+        "natural_question": 1
+      },
+      "effect_score": 8.053125
+    }
+  ],
+  "alternate_effects": [
+    {
+      "condition_type": "alternate_mode",
+      "domain": "animal",
+      "candidate_key": "L27C16651+L24C3875:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L27C16651",
+        "L24C3875"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 2,
+      "first_loss": 0,
+      "rollout_gain": 2,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 2,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.6666666666666666,
+      "mean_class_minus_object_gain": 2.0520833333333335,
+      "split_clear_gain": {
+        "phase858_seen": 2,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 2
+      },
+      "effect_score": 12.4078125
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "color",
+      "candidate_key": "L27C15369+L26C8587:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L27C15369",
+        "L26C8587"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 2,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 2.4791666666666665,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 1
+      },
+      "prompt_clear_gain": {
+        "natural_question": 1
+      },
+      "effect_score": 7.5218750000000005
+    }
+  ],
+  "same_layer_control_effects": [
+    {
+      "condition_type": "same_layer_control",
+      "domain": "color",
+      "candidate_key": "L27C2295+L26C1297:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L27C2295",
+        "L26C1297"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": -0.3333333333333333,
+      "mean_class_minus_object_gain": -0.3333333333333333,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 0
+      },
+      "effect_score": -0.09999999999999999
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "animal",
+      "candidate_key": "L27C1106+L24C7235:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L27C1106",
+        "L24C7235"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 0,
+      "first_loss": 1,
+      "rollout_gain": 0,
+      "rollout_loss": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 1,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": -0.6666666666666666,
+      "mean_class_minus_object_gain": -0.8229166666666666,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 0
+      },
+      "effect_score": -6.2234375
+    }
+  ],
+  "evidence_ladder": {
+    "animal": {
+      "level": 5,
+      "label": "replicated_control_filtered_domain_gear",
+      "reasons": [
+        "phase858_candidate",
+        "phase859_holdout_source",
+        "phase860_clear_gain_no_loss",
+        "same_layer_control_clear_zero",
+        "alternate_mode_has_clear_gain_sign_ambiguous"
+      ],
+      "best_clear_gain": 2,
+      "best_clear_loss": 0,
+      "alternate_clear_gain": 2,
+      "control_clear_gain": 0,
+      "split_hits": 1,
+      "prompt_hits": 1
+    },
+    "color": {
+      "level": 4,
+      "label": "replicated_domain_edge",
+      "reasons": [
+        "phase858_candidate",
+        "phase859_holdout_source",
+        "phase860_clear_gain_no_loss",
+        "alternate_mode_has_clear_gain_sign_ambiguous"
+      ],
+      "best_clear_gain": 1,
+      "best_clear_loss": 0,
+      "alternate_clear_gain": 1,
+      "control_clear_gain": 0,
+      "split_hits": 1,
+      "prompt_hits": 1
+    }
+  },
+  "ladder_summary": {
+    "max_level": 5,
+    "domains_level_4_plus": 2,
+    "domains_level_5_plus": 1,
+    "domains_level_6": 0,
+    "domains_with_sign_ambiguity": 2
+  },
+  "boundary": "This phase replicates Phase 859 positive domain gears across all available base cases and expanded prompt gates. It builds a domain evidence ladder; it does not prove cross-domain universal language closure."
+}

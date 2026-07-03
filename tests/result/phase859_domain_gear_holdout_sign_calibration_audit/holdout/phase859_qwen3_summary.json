@@ -1,0 +1,787 @@
+{
+  "phase": 859,
+  "title": "Domain Gear Holdout and Sign Calibration Audit",
+  "model": "qwen3",
+  "round": "holdout",
+  "timestamp": "2026-07-02 22:13:23",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "source_phase858_round": "confirm",
+  "n_cases": 16,
+  "domains": [
+    "abstract",
+    "animal",
+    "color",
+    "geometry",
+    "material",
+    "object",
+    "plant",
+    "tool"
+  ],
+  "prompt_variants": [
+    "natural_question",
+    "natural_category"
+  ],
+  "n_rows": 128,
+  "condition_summary": {
+    "alternate_mode": {
+      "n": 32,
+      "first_token_answer_class": 20,
+      "first_token_clear_answer_class": 18,
+      "rollout_answer_class": 19,
+      "rollout_clear_answer_class": 17,
+      "rollout_object_echo": 4,
+      "rollout_other_or_format": 9,
+      "rollout_labels": {
+        "other": 9,
+        "object_echo": 4,
+        "strict_canonical": 9,
+        "answer_alias": 8,
+        "identity_class_overlap": 2
+      },
+      "mean_class_blocker_count": 29.5625,
+      "mean_class_minus_object_logit": 1.435546875
+    },
+    "best_holdout": {
+      "n": 32,
+      "first_token_answer_class": 20,
+      "first_token_clear_answer_class": 18,
+      "rollout_answer_class": 20,
+      "rollout_clear_answer_class": 19,
+      "rollout_object_echo": 3,
+      "rollout_other_or_format": 9,
+      "rollout_labels": {
+        "other": 9,
+        "object_echo": 3,
+        "strict_canonical": 9,
+        "answer_alias": 10,
+        "identity_class_overlap": 1
+      },
+      "mean_class_blocker_count": 29.78125,
+      "mean_class_minus_object_logit": 1.615234375
+    },
+    "original": {
+      "n": 32,
+      "first_token_answer_class": 18,
+      "first_token_clear_answer_class": 16,
+      "rollout_answer_class": 18,
+      "rollout_clear_answer_class": 17,
+      "rollout_object_echo": 3,
+      "rollout_other_or_format": 11,
+      "rollout_labels": {
+        "other": 11,
+        "object_echo": 3,
+        "strict_canonical": 8,
+        "answer_alias": 9,
+        "identity_class_overlap": 1
+      },
+      "mean_class_blocker_count": 30.125,
+      "mean_class_minus_object_logit": 1.3828125
+    },
+    "same_layer_control": {
+      "n": 32,
+      "first_token_answer_class": 17,
+      "first_token_clear_answer_class": 15,
+      "rollout_answer_class": 17,
+      "rollout_clear_answer_class": 15,
+      "rollout_object_echo": 2,
+      "rollout_other_or_format": 13,
+      "rollout_labels": {
+        "other": 12,
+        "object_echo": 2,
+        "strict_canonical": 7,
+        "answer_alias": 8,
+        "format_or_empty": 1,
+        "identity_class_overlap": 2
+      },
+      "mean_class_blocker_count": 29.3125,
+      "mean_class_minus_object_logit": 0.7109375
+    }
+  },
+  "domain_summary": {
+    "abstract": {
+      "n": 16,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_object_echo": 8,
+      "rollout_other_or_format": 8,
+      "rollout_labels": {
+        "other": 8,
+        "object_echo": 8
+      },
+      "mean_class_blocker_count": 162.0,
+      "mean_class_minus_object_logit": -7.94140625
+    },
+    "animal": {
+      "n": 16,
+      "first_token_answer_class": 4,
+      "first_token_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 12,
+      "rollout_labels": {
+        "other": 12,
+        "strict_canonical": 4
+      },
+      "mean_class_blocker_count": 1.9375,
+      "mean_class_minus_object_logit": 2.21875
+    },
+    "color": {
+      "n": 16,
+      "first_token_answer_class": 16,
+      "first_token_clear_answer_class": 16,
+      "rollout_answer_class": 16,
+      "rollout_clear_answer_class": 16,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 16
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 6.734375
+    },
+    "geometry": {
+      "n": 16,
+      "first_token_answer_class": 11,
+      "first_token_clear_answer_class": 11,
+      "rollout_answer_class": 10,
+      "rollout_clear_answer_class": 10,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 5,
+        "answer_alias": 10,
+        "object_echo": 1
+      },
+      "mean_class_blocker_count": 0.3125,
+      "mean_class_minus_object_logit": 4.9921875
+    },
+    "material": {
+      "n": 16,
+      "first_token_answer_class": 5,
+      "first_token_clear_answer_class": 5,
+      "rollout_answer_class": 5,
+      "rollout_clear_answer_class": 5,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 11,
+      "rollout_labels": {
+        "other": 11,
+        "answer_alias": 3,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 10.6875,
+      "mean_class_minus_object_logit": -2.1640625
+    },
+    "object": {
+      "n": 16,
+      "first_token_answer_class": 8,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 8,
+      "rollout_clear_answer_class": 2,
+      "rollout_object_echo": 3,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 4,
+        "object_echo": 3,
+        "format_or_empty": 1,
+        "answer_alias": 2,
+        "identity_class_overlap": 6
+      },
+      "mean_class_blocker_count": 62.5625,
+      "mean_class_minus_object_logit": -4.3828125
+    },
+    "plant": {
+      "n": 16,
+      "first_token_answer_class": 16,
+      "first_token_clear_answer_class": 16,
+      "rollout_answer_class": 16,
+      "rollout_clear_answer_class": 16,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "answer_alias": 8,
+        "strict_canonical": 8
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 3.76953125
+    },
+    "tool": {
+      "n": 16,
+      "first_token_answer_class": 15,
+      "first_token_clear_answer_class": 15,
+      "rollout_answer_class": 15,
+      "rollout_clear_answer_class": 15,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "answer_alias": 12,
+        "other": 1,
+        "strict_canonical": 3
+      },
+      "mean_class_blocker_count": 0.0625,
+      "mean_class_minus_object_logit": 7.0625
+    }
+  },
+  "best_holdout_effects": [
+    {
+      "condition_type": "best_holdout",
+      "domain": "material",
+      "candidate_key": "L31C4800+L31C2257:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L31C4800",
+        "L31C2257"
+      ],
+      "n_pairs": 4,
+      "first_gain": 1,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 3.75,
+      "mean_class_minus_object_gain": 0.9375,
+      "effect_score": 6.703125
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "geometry",
+      "candidate_key": "L29C1532:zero:positive_supporter",
+      "candidate_role": "positive_supporter",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C1532"
+      ],
+      "n_pairs": 4,
+      "first_gain": 1,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.25,
+      "mean_class_minus_object_gain": -0.453125,
+      "effect_score": 5.969531249999999
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "color",
+      "candidate_key": "L29C3701+L32C4478:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C3701",
+        "L32C4478"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.84375,
+      "effect_score": 0.1265625
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "object",
+      "candidate_key": "L30C5438+L31C409:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C5438",
+        "L31C409"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.5,
+      "mean_class_minus_object_gain": -0.015625,
+      "effect_score": 0.07265624999999999
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "tool",
+      "candidate_key": "L29C7451+L31C8854:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C7451",
+        "L31C8854"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.484375,
+      "effect_score": 0.07265624999999999
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "animal",
+      "candidate_key": "L27C811+L32C5164:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L27C811",
+        "L32C5164"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.125,
+      "effect_score": 0.01875
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "plant",
+      "candidate_key": "L30C2274:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C2274"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.046875,
+      "effect_score": -0.007031249999999999
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "abstract",
+      "candidate_key": "L30C8725:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C8725"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": -1.75,
+      "mean_class_minus_object_gain": -0.015625,
+      "effect_score": -0.26484375
+    }
+  ],
+  "alternate_mode_effects": [
+    {
+      "condition_type": "alternate_mode",
+      "domain": "geometry",
+      "candidate_key": "L29C1532:alternate:flip",
+      "candidate_role": "positive_supporter",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C1532"
+      ],
+      "n_pairs": 4,
+      "first_gain": 2,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 1,
+      "mean_blocker_reduction": 0.5,
+      "mean_class_minus_object_gain": -0.984375,
+      "effect_score": 5.92734375
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "material",
+      "candidate_key": "L31C4800+L31C2257:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L31C4800",
+        "L31C2257"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 2.5,
+      "mean_class_minus_object_gain": 0.46875,
+      "effect_score": 0.4453125
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "color",
+      "candidate_key": "L29C3701+L32C4478:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C3701",
+        "L32C4478"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.46875,
+      "effect_score": 0.0703125
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "tool",
+      "candidate_key": "L29C7451+L31C8854:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C7451",
+        "L31C8854"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.296875,
+      "effect_score": 0.04453125
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "animal",
+      "candidate_key": "L27C811+L32C5164:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L27C811",
+        "L32C5164"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.125,
+      "effect_score": 0.01875
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "abstract",
+      "candidate_key": "L30C8725:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C8725"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.03125,
+      "effect_score": 0.0046875
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "plant",
+      "candidate_key": "L30C2274:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C2274"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.015625,
+      "effect_score": 0.00234375
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "object",
+      "candidate_key": "L30C5438+L31C409:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C5438",
+        "L31C409"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 1,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 1.5,
+      "mean_class_minus_object_gain": 0.0,
+      "effect_score": -2.775
+    }
+  ],
+  "same_layer_control_effects": [
+    {
+      "condition_type": "same_layer_control",
+      "domain": "abstract",
+      "candidate_key": "L30C2992:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C2992"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 2.75,
+      "mean_class_minus_object_gain": 0.03125,
+      "effect_score": 0.4171875
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "material",
+      "candidate_key": "L31C7206+L31C7206:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L31C7206",
+        "L31C7206"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0,
+      "effect_score": 0.0
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "geometry",
+      "candidate_key": "L29C2964:same_layer_control:zero",
+      "candidate_role": "same_layer_control",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C2964"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.03125,
+      "effect_score": -0.0046875
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "color",
+      "candidate_key": "L29C3814+L32C8386:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C3814",
+        "L32C8386"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.75,
+      "effect_score": -0.11249999999999999
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "animal",
+      "candidate_key": "L27C8459+L32C9411:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L27C8459",
+        "L32C9411"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": -0.75,
+      "mean_class_minus_object_gain": -0.5,
+      "effect_score": -0.1875
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "plant",
+      "candidate_key": "L30C6966:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C6966"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -2.140625,
+      "effect_score": -0.32109375
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "object",
+      "candidate_key": "L30C5834+L31C7755:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C5834",
+        "L31C7755"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 1,
+      "object_echo_reduced": 1,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 4.75,
+      "mean_class_minus_object_gain": 0.171875,
+      "effect_score": -1.26171875
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "tool",
+      "candidate_key": "L29C8006+L31C9209:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C8006",
+        "L31C9209"
+      ],
+      "n_pairs": 4,
+      "first_gain": 0,
+      "first_loss": 1,
+      "rollout_gain": 0,
+      "rollout_loss": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 1,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": -0.25,
+      "mean_class_minus_object_gain": -2.15625,
+      "effect_score": -6.3609375
+    }
+  ],
+  "shared_exact_probe_effects": [],
+  "calibration_summary": {
+    "best_domains_positive": 6,
+    "best_domains_clear_gain": 2,
+    "alternate_domains_clear_gain": 1,
+    "control_domains_clear_gain": 0,
+    "shared_probe_domains_clear_gain": 0
+  },
+  "boundary": "This phase validates Phase 858 top domain gears on held-out objects and compares best mode, alternate mode, and same-layer controls. It is sign calibration and holdout audit, not final closure."
+}

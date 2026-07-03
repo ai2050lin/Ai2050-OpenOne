@@ -1,0 +1,403 @@
+{
+  "phase": 862,
+  "title": "Negative-Blocker Sign Mechanism Audit",
+  "model": "deepseek7b",
+  "round": "smoke",
+  "timestamp": "2026-07-03 01:53:19",
+  "status": "complete",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "target_signatures": [
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "gear_keys": [
+        "L27C16651",
+        "L24C3875"
+      ],
+      "level": 6,
+      "candidate_role": "negative_blocker",
+      "best_mode": "flip",
+      "depth_band": "late"
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "color",
+      "gear_keys": [
+        "L27C15369",
+        "L26C8587"
+      ],
+      "level": 6,
+      "candidate_role": "negative_blocker",
+      "best_mode": "flip",
+      "depth_band": "late"
+    }
+  ],
+  "domains": [
+    "animal",
+    "color"
+  ],
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "edit_modes": [
+    "zero",
+    "flip"
+  ],
+  "include_single_channels": true,
+  "n_rows": 14,
+  "condition_summary": {
+    "full_set": {
+      "n": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "first_token_answer_class": 4,
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 6.71875,
+      "mean_original_blocker_delta": 0.0,
+      "rollout_labels": {
+        "strict_canonical": 4
+      }
+    },
+    "original": {
+      "n": 2,
+      "rollout_clear_answer_class": 1,
+      "rollout_answer_class": 1,
+      "first_token_answer_class": 0,
+      "mean_class_blocker_count": 1.0,
+      "mean_class_minus_object_logit": 2.28125,
+      "mean_original_blocker_delta": 0.0,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 1
+      }
+    },
+    "single_channel": {
+      "n": 8,
+      "rollout_clear_answer_class": 6,
+      "rollout_answer_class": 6,
+      "first_token_answer_class": 4,
+      "mean_class_blocker_count": 0.5,
+      "mean_class_minus_object_logit": 4.109375,
+      "mean_original_blocker_delta": -0.0078125,
+      "rollout_labels": {
+        "strict_canonical": 6,
+        "other": 2
+      }
+    }
+  },
+  "domain_summary": {
+    "animal": {
+      "n": 7,
+      "rollout_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "first_token_answer_class": 4,
+      "mean_class_blocker_count": 0.42857142857142855,
+      "mean_class_minus_object_logit": 4.982142857142857,
+      "mean_original_blocker_delta": -0.03571428571428571,
+      "rollout_labels": {
+        "other": 3,
+        "strict_canonical": 4
+      }
+    },
+    "color": {
+      "n": 7,
+      "rollout_clear_answer_class": 7,
+      "rollout_answer_class": 7,
+      "first_token_answer_class": 4,
+      "mean_class_blocker_count": 0.42857142857142855,
+      "mean_class_minus_object_logit": 4.205357142857143,
+      "mean_original_blocker_delta": 0.026785714285714284,
+      "rollout_labels": {
+        "strict_canonical": 7
+      }
+    }
+  },
+  "pair_effects": [
+    {
+      "domain": "animal",
+      "condition_type": "full_set",
+      "subset_name": "full",
+      "edit_mode": "flip",
+      "n_pairs": 1,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 4.8125,
+      "mean_original_blocker_delta": -0.0625,
+      "mean_answer_delta": 4.25,
+      "mean_object_delta": -0.5625,
+      "mean_strict_delta": 4.25,
+      "blocker_weakening_supported": true,
+      "answer_lift_supported": true
+    },
+    {
+      "domain": "animal",
+      "condition_type": "full_set",
+      "subset_name": "full",
+      "edit_mode": "zero",
+      "n_pairs": 1,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 2.375,
+      "mean_original_blocker_delta": -0.0625,
+      "mean_answer_delta": 2.1875,
+      "mean_object_delta": -0.1875,
+      "mean_strict_delta": 2.1875,
+      "blocker_weakening_supported": true,
+      "answer_lift_supported": true
+    },
+    {
+      "domain": "animal",
+      "condition_type": "single_channel",
+      "subset_name": "single0",
+      "edit_mode": "flip",
+      "n_pairs": 1,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 3.9375,
+      "mean_original_blocker_delta": -0.1875,
+      "mean_answer_delta": 4.125,
+      "mean_object_delta": 0.1875,
+      "mean_strict_delta": 4.125,
+      "blocker_weakening_supported": true,
+      "answer_lift_supported": true
+    },
+    {
+      "domain": "animal",
+      "condition_type": "single_channel",
+      "subset_name": "single0",
+      "edit_mode": "zero",
+      "n_pairs": 1,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 1.9375,
+      "mean_original_blocker_delta": -0.0625,
+      "mean_answer_delta": 2.0625,
+      "mean_object_delta": 0.125,
+      "mean_strict_delta": 2.0625,
+      "blocker_weakening_supported": true,
+      "answer_lift_supported": true
+    },
+    {
+      "domain": "animal",
+      "condition_type": "single_channel",
+      "subset_name": "single1",
+      "edit_mode": "flip",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 0,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.875,
+      "mean_original_blocker_delta": 0.0625,
+      "mean_answer_delta": 0.125,
+      "mean_object_delta": -0.75,
+      "mean_strict_delta": 0.125,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "animal",
+      "condition_type": "single_channel",
+      "subset_name": "single1",
+      "edit_mode": "zero",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 0,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.375,
+      "mean_original_blocker_delta": 0.0625,
+      "mean_answer_delta": 0.0625,
+      "mean_object_delta": -0.3125,
+      "mean_strict_delta": 0.0625,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "color",
+      "condition_type": "full_set",
+      "subset_name": "full",
+      "edit_mode": "flip",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 7.5,
+      "mean_original_blocker_delta": 0.0625,
+      "mean_answer_delta": 7.6875,
+      "mean_object_delta": 0.1875,
+      "mean_strict_delta": 7.6875,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "color",
+      "condition_type": "full_set",
+      "subset_name": "full",
+      "edit_mode": "zero",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 3.0625,
+      "mean_original_blocker_delta": 0.0625,
+      "mean_answer_delta": 3.1875,
+      "mean_object_delta": 0.125,
+      "mean_strict_delta": 3.1875,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "color",
+      "condition_type": "single_channel",
+      "subset_name": "single0",
+      "edit_mode": "flip",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 4.6875,
+      "mean_original_blocker_delta": 0.0,
+      "mean_answer_delta": 4.8125,
+      "mean_object_delta": 0.125,
+      "mean_strict_delta": 4.8125,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "color",
+      "condition_type": "single_channel",
+      "subset_name": "single0",
+      "edit_mode": "zero",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 1,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 2.375,
+      "mean_original_blocker_delta": 0.0,
+      "mean_answer_delta": 2.4375,
+      "mean_object_delta": 0.0625,
+      "mean_strict_delta": 2.4375,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "color",
+      "condition_type": "single_channel",
+      "subset_name": "single1",
+      "edit_mode": "flip",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 0,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.25,
+      "mean_original_blocker_delta": 0.0625,
+      "mean_answer_delta": 0.1875,
+      "mean_object_delta": -0.0625,
+      "mean_strict_delta": 0.1875,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    },
+    {
+      "domain": "color",
+      "condition_type": "single_channel",
+      "subset_name": "single1",
+      "edit_mode": "zero",
+      "n_pairs": 1,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "first_gain": 0,
+      "first_loss": 0,
+      "mean_class_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "mean_original_blocker_delta": 0.0,
+      "mean_answer_delta": 0.125,
+      "mean_object_delta": -0.0625,
+      "mean_strict_delta": 0.125,
+      "blocker_weakening_supported": false,
+      "answer_lift_supported": false
+    }
+  ],
+  "sign_mechanism_by_domain": {
+    "animal": {
+      "clear_gain_modes": [
+        "flip",
+        "zero"
+      ],
+      "blocker_weakening_modes": [
+        "flip",
+        "zero"
+      ],
+      "answer_lift_modes": [
+        "flip",
+        "zero"
+      ],
+      "zero_and_flip_both_clear": true,
+      "zero_and_flip_both_weaken_blockers": true,
+      "scale_down_clear": false,
+      "scale_up_clear": false,
+      "interpretation": "shared_blocker_weakening"
+    },
+    "color": {
+      "clear_gain_modes": [],
+      "blocker_weakening_modes": [],
+      "answer_lift_modes": [],
+      "zero_and_flip_both_clear": false,
+      "zero_and_flip_both_weaken_blockers": false,
+      "scale_down_clear": false,
+      "scale_up_clear": false,
+      "interpretation": "mode_specific_or_unresolved"
+    }
+  },
+  "boundary": "This phase audits why Level 6 negative-blocker gears show sign ambiguity. It does not search for new gears and does not prove language closure."
+}

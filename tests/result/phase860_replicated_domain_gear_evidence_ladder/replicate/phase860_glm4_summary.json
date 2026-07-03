@@ -1,0 +1,294 @@
+{
+  "phase": 860,
+  "title": "Replicated Domain Gear Evidence Ladder",
+  "model": "glm4",
+  "round": "replicate",
+  "timestamp": "2026-07-02 23:11:44",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "source_phase858_round": "confirm",
+  "source_phase859_round": "holdout",
+  "target_domains": [
+    "color"
+  ],
+  "n_cases": 5,
+  "prompt_variants": [
+    "natural_question",
+    "natural_category",
+    "classification"
+  ],
+  "n_rows": 60,
+  "condition_summary": {
+    "alternate_mode": {
+      "n": 15,
+      "first_token_answer_class": 14,
+      "first_token_clear_answer_class": 12,
+      "rollout_answer_class": 14,
+      "rollout_clear_answer_class": 12,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "strict_canonical": 12,
+        "identity_class_overlap": 2,
+        "other": 1
+      },
+      "mean_class_blocker_count": 0.06666666666666667,
+      "mean_class_minus_object_logit": 2.1625
+    },
+    "best_holdout": {
+      "n": 15,
+      "first_token_answer_class": 14,
+      "first_token_clear_answer_class": 12,
+      "rollout_answer_class": 14,
+      "rollout_clear_answer_class": 12,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "strict_canonical": 12,
+        "identity_class_overlap": 2,
+        "other": 1
+      },
+      "mean_class_blocker_count": 0.06666666666666667,
+      "mean_class_minus_object_logit": 2.3270833333333334
+    },
+    "original": {
+      "n": 15,
+      "first_token_answer_class": 13,
+      "first_token_clear_answer_class": 11,
+      "rollout_answer_class": 13,
+      "rollout_clear_answer_class": 11,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "strict_canonical": 11,
+        "object_echo": 1,
+        "identity_class_overlap": 2,
+        "other": 1
+      },
+      "mean_class_blocker_count": 0.13333333333333333,
+      "mean_class_minus_object_logit": 2.029166666666667
+    },
+    "same_layer_control": {
+      "n": 15,
+      "first_token_answer_class": 11,
+      "first_token_clear_answer_class": 9,
+      "rollout_answer_class": 11,
+      "rollout_clear_answer_class": 9,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 3,
+      "rollout_labels": {
+        "strict_canonical": 9,
+        "other": 3,
+        "object_echo": 1,
+        "identity_class_overlap": 2
+      },
+      "mean_class_blocker_count": 0.4666666666666667,
+      "mean_class_minus_object_logit": 1.1791666666666667
+    }
+  },
+  "domain_summary": {
+    "color": {
+      "n": 60,
+      "first_token_answer_class": 52,
+      "first_token_clear_answer_class": 44,
+      "rollout_answer_class": 52,
+      "rollout_clear_answer_class": 44,
+      "rollout_object_echo": 2,
+      "rollout_other_or_format": 6,
+      "rollout_labels": {
+        "strict_canonical": 44,
+        "other": 6,
+        "object_echo": 2,
+        "identity_class_overlap": 8
+      },
+      "mean_class_blocker_count": 0.18333333333333332,
+      "mean_class_minus_object_logit": 1.9244791666666667
+    }
+  },
+  "split_summary": {
+    "new_replication": {
+      "n": 12,
+      "first_token_answer_class": 8,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 8,
+      "rollout_clear_answer_class": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 4,
+      "rollout_labels": {
+        "identity_class_overlap": 8,
+        "other": 4
+      },
+      "mean_class_blocker_count": 0.3333333333333333,
+      "mean_class_minus_object_logit": 0.0
+    },
+    "phase858_seen": {
+      "n": 24,
+      "first_token_answer_class": 23,
+      "first_token_clear_answer_class": 23,
+      "rollout_answer_class": 23,
+      "rollout_clear_answer_class": 23,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "strict_canonical": 23,
+        "other": 1
+      },
+      "mean_class_blocker_count": 0.041666666666666664,
+      "mean_class_minus_object_logit": 2.6197916666666665
+    },
+    "phase859_holdout_seen": {
+      "n": 24,
+      "first_token_answer_class": 21,
+      "first_token_clear_answer_class": 21,
+      "rollout_answer_class": 21,
+      "rollout_clear_answer_class": 21,
+      "rollout_object_echo": 2,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "object_echo": 2,
+        "strict_canonical": 21,
+        "other": 1
+      },
+      "mean_class_blocker_count": 0.25,
+      "mean_class_minus_object_logit": 2.19140625
+    }
+  },
+  "best_effects": [
+    {
+      "condition_type": "best_holdout",
+      "domain": "color",
+      "candidate_key": "L30C7088+L30C11128:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C7088",
+        "L30C11128"
+      ],
+      "n_pairs": 15,
+      "n_cases": 5,
+      "n_prompts": 3,
+      "first_gain": 1,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 1,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.06666666666666667,
+      "mean_class_minus_object_gain": 0.29791666666666666,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 1,
+        "new_replication": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 1,
+        "natural_category": 0,
+        "classification": 0
+      },
+      "effect_score": 7.0546875
+    }
+  ],
+  "alternate_effects": [
+    {
+      "condition_type": "alternate_mode",
+      "domain": "color",
+      "candidate_key": "L30C7088+L30C11128:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C7088",
+        "L30C11128"
+      ],
+      "n_pairs": 15,
+      "n_cases": 5,
+      "n_prompts": 3,
+      "first_gain": 1,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 1,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.06666666666666667,
+      "mean_class_minus_object_gain": 0.13333333333333333,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 1,
+        "new_replication": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 1,
+        "natural_category": 0,
+        "classification": 0
+      },
+      "effect_score": 7.029999999999999
+    }
+  ],
+  "same_layer_control_effects": [
+    {
+      "condition_type": "same_layer_control",
+      "domain": "color",
+      "candidate_key": "L30C5760+L30C5760:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C5760",
+        "L30C5760"
+      ],
+      "n_pairs": 15,
+      "n_cases": 5,
+      "n_prompts": 3,
+      "first_gain": 0,
+      "first_loss": 2,
+      "rollout_gain": 0,
+      "rollout_loss": 2,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 2,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": -0.3333333333333333,
+      "mean_class_minus_object_gain": -0.85,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 0,
+        "new_replication": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 0,
+        "natural_category": 0,
+        "classification": 0
+      },
+      "effect_score": -12.1775
+    }
+  ],
+  "evidence_ladder": {
+    "color": {
+      "level": 4,
+      "label": "replicated_domain_edge",
+      "reasons": [
+        "phase858_candidate",
+        "phase859_holdout_source",
+        "phase860_clear_gain_no_loss",
+        "alternate_mode_has_clear_gain_sign_ambiguous"
+      ],
+      "best_clear_gain": 1,
+      "best_clear_loss": 0,
+      "alternate_clear_gain": 1,
+      "control_clear_gain": 0,
+      "split_hits": 1,
+      "prompt_hits": 1
+    }
+  },
+  "ladder_summary": {
+    "max_level": 4,
+    "domains_level_4_plus": 1,
+    "domains_level_5_plus": 0,
+    "domains_level_6": 0,
+    "domains_with_sign_ambiguity": 1
+  },
+  "boundary": "This phase replicates Phase 859 positive domain gears across all available base cases and expanded prompt gates. It builds a domain evidence ladder; it does not prove cross-domain universal language closure."
+}

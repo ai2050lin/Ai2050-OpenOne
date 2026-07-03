@@ -1,0 +1,390 @@
+{
+  "phase": 860,
+  "title": "Replicated Domain Gear Evidence Ladder",
+  "model": "qwen3",
+  "round": "smoke",
+  "timestamp": "2026-07-02 23:08:41",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "source_phase858_round": "confirm",
+  "source_phase859_round": "holdout",
+  "target_domains": [
+    "geometry",
+    "material"
+  ],
+  "n_cases": 6,
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "n_rows": 24,
+  "condition_summary": {
+    "alternate_mode": {
+      "n": 6,
+      "first_token_answer_class": 4,
+      "first_token_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "answer_alias": 4,
+        "object_echo": 1,
+        "other": 1
+      },
+      "mean_class_blocker_count": 1.8333333333333333,
+      "mean_class_minus_object_logit": 1.5833333333333333
+    },
+    "best_holdout": {
+      "n": 6,
+      "first_token_answer_class": 4,
+      "first_token_clear_answer_class": 4,
+      "rollout_answer_class": 4,
+      "rollout_clear_answer_class": 4,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "answer_alias": 4,
+        "object_echo": 1
+      },
+      "mean_class_blocker_count": 0.8333333333333334,
+      "mean_class_minus_object_logit": 1.8541666666666667
+    },
+    "original": {
+      "n": 6,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "rollout_answer_class": 1,
+      "rollout_clear_answer_class": 1,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 4,
+      "rollout_labels": {
+        "other": 4,
+        "object_echo": 1,
+        "answer_alias": 1
+      },
+      "mean_class_blocker_count": 3.8333333333333335,
+      "mean_class_minus_object_logit": 0.8333333333333334
+    },
+    "same_layer_control": {
+      "n": 6,
+      "first_token_answer_class": 1,
+      "first_token_clear_answer_class": 1,
+      "rollout_answer_class": 1,
+      "rollout_clear_answer_class": 1,
+      "rollout_object_echo": 1,
+      "rollout_other_or_format": 4,
+      "rollout_labels": {
+        "other": 4,
+        "object_echo": 1,
+        "answer_alias": 1
+      },
+      "mean_class_blocker_count": 3.8333333333333335,
+      "mean_class_minus_object_logit": 0.9583333333333334
+    }
+  },
+  "domain_summary": {
+    "geometry": {
+      "n": 12,
+      "first_token_answer_class": 5,
+      "first_token_clear_answer_class": 5,
+      "rollout_answer_class": 5,
+      "rollout_clear_answer_class": 5,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 7,
+      "rollout_labels": {
+        "other": 7,
+        "answer_alias": 5
+      },
+      "mean_class_blocker_count": 0.5833333333333334,
+      "mean_class_minus_object_logit": 3.3958333333333335
+    },
+    "material": {
+      "n": 12,
+      "first_token_answer_class": 5,
+      "first_token_clear_answer_class": 5,
+      "rollout_answer_class": 5,
+      "rollout_clear_answer_class": 5,
+      "rollout_object_echo": 4,
+      "rollout_other_or_format": 3,
+      "rollout_labels": {
+        "object_echo": 4,
+        "answer_alias": 5,
+        "other": 3
+      },
+      "mean_class_blocker_count": 4.583333333333333,
+      "mean_class_minus_object_logit": -0.78125
+    }
+  },
+  "split_summary": {
+    "phase858_seen": {
+      "n": 16,
+      "first_token_answer_class": 7,
+      "first_token_clear_answer_class": 7,
+      "rollout_answer_class": 7,
+      "rollout_clear_answer_class": 7,
+      "rollout_object_echo": 4,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 5,
+        "answer_alias": 7,
+        "object_echo": 4
+      },
+      "mean_class_blocker_count": 3.375,
+      "mean_class_minus_object_logit": 0.7734375
+    },
+    "phase859_holdout_seen": {
+      "n": 8,
+      "first_token_answer_class": 3,
+      "first_token_clear_answer_class": 3,
+      "rollout_answer_class": 3,
+      "rollout_clear_answer_class": 3,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 5,
+      "rollout_labels": {
+        "other": 5,
+        "answer_alias": 3
+      },
+      "mean_class_blocker_count": 1.0,
+      "mean_class_minus_object_logit": 2.375
+    }
+  },
+  "best_effects": [
+    {
+      "condition_type": "best_holdout",
+      "domain": "geometry",
+      "candidate_key": "L29C1532:zero:positive_supporter",
+      "candidate_role": "positive_supporter",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C1532"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 2,
+      "first_loss": 0,
+      "rollout_gain": 2,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 2,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.6666666666666666,
+      "mean_class_minus_object_gain": 0.375,
+      "split_clear_gain": {
+        "phase858_seen": 1,
+        "phase859_holdout_seen": 1
+      },
+      "prompt_clear_gain": {
+        "natural_question": 2
+      },
+      "effect_score": 12.15625
+    },
+    {
+      "condition_type": "best_holdout",
+      "domain": "material",
+      "candidate_key": "L31C4800+L31C2257:flip:negative_blocker",
+      "candidate_role": "negative_blocker",
+      "mode": "flip",
+      "gear_keys": [
+        "L31C4800",
+        "L31C2257"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 1,
+      "first_loss": 0,
+      "rollout_gain": 1,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 1,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 5.333333333333333,
+      "mean_class_minus_object_gain": 1.6666666666666667,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 1
+      },
+      "prompt_clear_gain": {
+        "natural_question": 1
+      },
+      "effect_score": 7.05
+    }
+  ],
+  "alternate_effects": [
+    {
+      "condition_type": "alternate_mode",
+      "domain": "geometry",
+      "candidate_key": "L29C1532:alternate:flip",
+      "candidate_role": "positive_supporter",
+      "mode": "flip",
+      "gear_keys": [
+        "L29C1532"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 3,
+      "first_loss": 0,
+      "rollout_gain": 3,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 3,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 0.625,
+      "split_clear_gain": {
+        "phase858_seen": 2,
+        "phase859_holdout_seen": 1
+      },
+      "prompt_clear_gain": {
+        "natural_question": 3
+      },
+      "effect_score": 18.24375
+    },
+    {
+      "condition_type": "alternate_mode",
+      "domain": "material",
+      "candidate_key": "L31C4800+L31C2257:alternate:zero",
+      "candidate_role": "negative_blocker",
+      "mode": "zero",
+      "gear_keys": [
+        "L31C4800",
+        "L31C2257"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 3.0,
+      "mean_class_minus_object_gain": 0.875,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 0
+      },
+      "effect_score": 0.5812499999999999
+    }
+  ],
+  "same_layer_control_effects": [
+    {
+      "condition_type": "same_layer_control",
+      "domain": "material",
+      "candidate_key": "L31C7206+L31C7206:same_layer_control:flip",
+      "candidate_role": "same_layer_control",
+      "mode": "flip",
+      "gear_keys": [
+        "L31C7206",
+        "L31C7206"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.16666666666666666,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 0
+      },
+      "effect_score": 0.024999999999999998
+    },
+    {
+      "condition_type": "same_layer_control",
+      "domain": "geometry",
+      "candidate_key": "L29C2964:same_layer_control:zero",
+      "candidate_role": "same_layer_control",
+      "mode": "zero",
+      "gear_keys": [
+        "L29C2964"
+      ],
+      "n_pairs": 3,
+      "n_cases": 3,
+      "n_prompts": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.08333333333333333,
+      "split_clear_gain": {
+        "phase858_seen": 0,
+        "phase859_holdout_seen": 0
+      },
+      "prompt_clear_gain": {
+        "natural_question": 0
+      },
+      "effect_score": 0.012499999999999999
+    }
+  ],
+  "evidence_ladder": {
+    "geometry": {
+      "level": 5,
+      "label": "replicated_control_filtered_domain_gear",
+      "reasons": [
+        "phase858_candidate",
+        "phase859_holdout_source",
+        "phase860_clear_gain_no_loss",
+        "same_layer_control_clear_zero",
+        "alternate_mode_has_clear_gain_sign_ambiguous"
+      ],
+      "best_clear_gain": 2,
+      "best_clear_loss": 0,
+      "alternate_clear_gain": 3,
+      "control_clear_gain": 0,
+      "split_hits": 2,
+      "prompt_hits": 1
+    },
+    "material": {
+      "level": 4,
+      "label": "replicated_domain_edge",
+      "reasons": [
+        "phase858_candidate",
+        "phase859_holdout_source",
+        "phase860_clear_gain_no_loss"
+      ],
+      "best_clear_gain": 1,
+      "best_clear_loss": 0,
+      "alternate_clear_gain": 0,
+      "control_clear_gain": 0,
+      "split_hits": 1,
+      "prompt_hits": 1
+    }
+  },
+  "ladder_summary": {
+    "max_level": 5,
+    "domains_level_4_plus": 2,
+    "domains_level_5_plus": 1,
+    "domains_level_6": 0,
+    "domains_with_sign_ambiguity": 1
+  },
+  "boundary": "This phase replicates Phase 859 positive domain gears across all available base cases and expanded prompt gates. It builds a domain evidence ladder; it does not prove cross-domain universal language closure."
+}

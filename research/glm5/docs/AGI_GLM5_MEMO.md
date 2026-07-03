@@ -109601,3 +109601,5491 @@ Phase 857 证明：
 转向：
   跨域独立齿轮发现 + 同构审计。
 ```
+
+## Phase 858: Cross-Domain Independent Gear Discovery and Isomorphism Audit [2026-07-02 22:07]
+
+### 一、任务来源
+
+本阶段读取并分析了最新上传内容。
+
+附件中的判断基本正确：
+
+```text
+1. 当前全局齿轮图谱整体方向合理。
+2. 继续追求单点 token closure 容易陷入局部 patch 循环。
+3. 更合理路线是：
+   先完成可评分全局图谱，
+   再从图谱特性中寻找语言编码机制的不变量，
+   最后做闭合验证。
+4. Phase 857 已经证明 prompt-gated causal gear effect 在几何局部路线中成立；
+   但 transfer 轮显示几何齿轮跨语义域迁移很弱。
+```
+
+因此，本阶段继续处于同一个全局齿轮图谱大阶段，目标从：
+
+```text
+geometry gear transfer
+```
+
+推进到：
+
+```text
+cross-domain independent gear discovery + isomorphism audit
+```
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase858_cross_domain_independent_gear_isomorphism_audit.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase858_cross_domain_independent_gear_isomorphism_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase858_cross_domain_independent_gear_isomorphism_audit/
+```
+
+三轮测试：
+
+```text
+smoke:
+  geometry / animal / tool
+  每域 1 个对象
+  natural_question
+
+main:
+  geometry / animal / tool / color / material / abstract
+  每域 1 个对象
+  natural_question / natural_category
+
+confirm:
+  geometry / animal / tool / color / material / abstract / plant / object
+  每域 2 个对象
+  natural_question / natural_category
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16
+quantization = off
+```
+
+FlashAttention2 不可用，脚本自动回退：
+
+```text
+flash_attention_2 failed -> sdpa
+```
+
+### 三、测试原理
+
+Phase 857 的问题是：
+
+```text
+把几何齿轮迁移到其他语义域。
+```
+
+这只能测试 transfer，不能发现各语义域自己的齿轮。
+
+Phase 858 改为：
+
+```text
+每个语义域内部独立发现候选齿轮。
+```
+
+核心扫描量是 class-vs-object readout support：
+
+```text
+s_{d,l,c}(x,p)
+  =
+  a_{l,c}(x,p)
+  *
+  [ (W_U[t_d(x)] - W_U[o(x)]) W_down_l ]_c
+```
+
+其中：
+
+```text
+d = semantic domain
+x = object case
+p = prompt gate
+l = layer
+c = MLP channel
+a_{l,c}(x,p) = answer position 的 MLP down 输入激活
+t_d(x) = 该域答案类别 token
+o(x) = 对象自身 token
+```
+
+按符号分为：
+
+```text
+negative blocker gears:
+  G^-_d = TopK(-s_{d,l,c})
+
+positive supporter gears:
+  G^+_d = TopK(s_{d,l,c})
+```
+
+然后用：
+
+```text
+zero
+flip
+```
+
+做因果验证，记录：
+
+```text
+first-token answer-class
+clear rollout
+object echo
+class blocker count
+class-object margin
+```
+
+### 四、同构审计公式
+
+本阶段把同构分成两级。
+
+exact channel 同构：
+
+```text
+I_exact(d_i,d_j)
+  =
+  | G^*_{d_i} ∩ G^*_{d_j} |
+```
+
+layer-level 同构：
+
+```text
+I_layer(d_i,d_j)
+  =
+  | L(G^*_{d_i}) ∩ L(G^*_{d_j}) |
+```
+
+解释：
+
+```text
+I_exact > 0:
+  强同构证据，说明不同域可能共享同一个通道级齿轮。
+
+I_layer > 0 但 I_exact = 0:
+  弱同构证据，只能说明层级形状相似。
+```
+
+### 五、smoke 轮结果
+
+smoke 轮用于确认脚本和数据格式。
+
+```text
+qwen3:
+  candidates = 432
+  rows = 21
+  positive domains = 3
+  clear-gain domains = 1
+  exact shared best gear = 0
+  shared best layer = 2
+
+GLM4:
+  candidates = 432
+  rows = 21
+  positive domains = 3
+  clear-gain domains = 0
+  exact shared best gear = 0
+  shared best layer = 2
+
+DS7B:
+  candidates = 144
+  rows = 21
+  positive domains = 3
+  clear-gain domains = 0
+  exact shared best gear = 0
+  shared best layer = 1
+```
+
+smoke 轮结论：
+
+```text
+脚本可以正常生成候选、执行干预、保存跨模型汇总。
+```
+
+### 六、main 轮结果
+
+main 轮为六域测试。
+
+```text
+qwen3:
+  candidates = 3339
+  rows = 108
+  positive domains = 6
+  clear-gain domains = 1
+  exact shared best gear = 0
+  shared best layer = 3
+
+GLM4:
+  candidates = 3270
+  rows = 108
+  positive domains = 6
+  clear-gain domains = 0
+  exact shared best gear = 0
+  shared best layer = 3
+
+DS7B:
+  candidates = 1439
+  rows = 108
+  positive domains = 6
+  clear-gain domains = 1
+  exact shared best gear = 0
+  shared best layer = 2
+```
+
+main 轮结论：
+
+```text
+1. 域内读出支撑扫描能找到有正向分数的候选齿轮。
+2. 但 clear rollout 边界改变仍然稀疏。
+3. exact shared best gear 未出现。
+```
+
+### 七、confirm 轮结果
+
+confirm 轮扩大到八域、每域两个对象。
+
+```text
+qwen3:
+  candidates = 14120
+  rows = 288
+  positive domains = 8
+  clear-gain domains = 2
+  exact shared best gear = 0
+  shared best layer = 4
+
+GLM4:
+  candidates = 13931
+  rows = 288
+  positive domains = 7
+  clear-gain domains = 3
+  exact shared best gear = 1
+  shared best layer = 3
+
+DS7B:
+  candidates = 5258
+  rows = 288
+  positive domains = 6
+  clear-gain domains = 4
+  exact shared best gear = 0
+  shared best layer = 3
+```
+
+### 八、confirm 轮代表性域内边
+
+qwen3：
+
+```text
+animal:
+  L27C811 + L32C5164 flip
+  clear rollout gain = 3 / 4
+
+geometry:
+  L29C1532 zero
+  clear rollout gain = 2 / 4
+```
+
+GLM4：
+
+```text
+material:
+  L32C8466 flip
+  clear rollout gain = 2 / 8
+
+plant:
+  L32C8466 + L26C1162 flip
+  clear rollout gain = 2 / 4
+
+object:
+  L29C1214 + L30C6115 zero
+  clear rollout gain = 1 / 4
+```
+
+DS7B：
+
+```text
+animal:
+  L27C16651 + L24C3875 flip
+  clear rollout gain = 4 / 4
+
+color:
+  L27C15369 + L26C8587 flip
+  clear rollout gain = 1 / 4
+
+material:
+  L26C11106 flip
+  clear rollout gain = 1 / 4
+
+tool:
+  L27C15841 flip
+  clear rollout gain = 1 / 4
+```
+
+### 九、同构审计结果
+
+exact shared best gear：
+
+```text
+qwen3:
+  none
+
+GLM4:
+  L32C8466 shared by material / plant
+
+DS7B:
+  none
+```
+
+shared best layer：
+
+```text
+qwen3:
+  L32: animal / color
+  L29: color / geometry / tool
+  L30: abstract / object / plant
+  L31: material / object / tool
+
+GLM4:
+  L32: geometry / material / plant / tool
+  L29: abstract / animal / object
+  L30: color / object
+
+DS7B:
+  L27: abstract / animal / color / plant / tool
+  L24: animal / geometry / object
+  L26: color / material
+```
+
+### 十、附件判断是否正确
+
+附件中提出“先完成图谱，再根据图谱特性破解语言编码机制”的判断是正确的。
+
+Phase 858 支持这个方向：
+
+```text
+1. 几何齿轮迁移弱，不代表没有全局图谱。
+2. 各语义域内部可以独立发现有效齿轮。
+3. 图谱中已经出现 domain-local causal edge。
+4. 但 exact-channel cross-domain isomorphism 仍然弱。
+```
+
+因此更准确的结论是：
+
+```text
+先完成全局图谱是必要路线；
+但当前图谱还只能叫机制候选图谱，
+不能叫语言编码机制闭合图谱。
+```
+
+### 十一、理论进展
+
+Phase 858 把图谱从：
+
+```text
+geometry gear transfer test
+```
+
+推进到：
+
+```text
+domain-local gear discovery
+  ->
+domain-local causal edge
+  ->
+layer-level isomorphism
+  ->
+exact-channel isomorphism candidate
+```
+
+这是实质进展。
+
+但它仍不是闭合，因为：
+
+```text
+1. clear rollout gain 只覆盖部分域。
+2. exact shared gear 极少。
+3. shared layer 不能直接等于 shared mechanism。
+4. 还没有跨对象 holdout 验证。
+5. 还没有多 token span closure。
+```
+
+### 十二、重要问题和硬伤
+
+```text
+1. 读出支撑公式只能产生候选，不等价于真实因果角色。
+2. positive supporter 被 zero 后也可能产生 clear gain，说明符号标签需要二次校准。
+3. 每域 confirm 只有两个对象，仍不足以证明 domain-level invariant。
+4. GLM4 的 L32C8466 是重要候选，但只有 material / plant 两域共享，不能直接外推。
+5. qwen3 / DS7B 主要是 shared layer，而不是 shared exact gear。
+6. 小模型可能把多个真实机制压缩到少数层或通道，所以 shared layer 可能是粗糙压缩伪影。
+7. 规则 alias 分类仍然可能影响 clear rollout 统计。
+8. 当前干预只作用于第一步生成，不能说明完整长程生成闭合。
+```
+
+### 十三、当前闭合距离
+
+当前证据等级：
+
+```text
+domain-local candidate discovery:
+  已完成第一版。
+
+domain-local causal edge:
+  部分成立。
+
+layer-level isomorphism:
+  有明显信号。
+
+exact-channel cross-domain isomorphism:
+  很弱，只有 GLM4 一个候选。
+
+cross-object holdout:
+  未完成。
+
+cross-model invariant:
+  未完成。
+
+short rollout closure:
+  部分域成立。
+
+full language encoding closure:
+  未完成。
+```
+
+如果按完整语言编码机制闭合评估，当前进度约为：
+
+```text
+16% - 24%
+```
+
+相比 Phase 857 略有提升，因为已经从几何迁移进入跨域独立发现；
+但 exact isomorphism 稀疏，阻止更高估计。
+
+### 十四、智能理论角度的关键洞察
+
+当前结果说明：
+
+```text
+语言机制很可能不是一个静态语义图谱；
+也不是单个通用齿轮到处复用；
+而更像：
+  不同语义域在相似层级位置形成局部齿轮，
+  再通过 prompt gate 和 blocker field 进入生成竞争场。
+```
+
+这意味着要破解语言编码机制，不能只找：
+
+```text
+single universal channel
+```
+
+而要找：
+
+```text
+层级形状
+域内齿轮
+跨域同构
+边界门控
+生成闭合
+```
+
+组成的系统。
+
+第一性原理上的收紧：
+
+```text
+自回归训练不是直接写入静态概念表，
+而是在每一步生成中形成：
+  状态 -> 路线 -> 齿轮 -> 边界 -> 闭合
+的条件化动力系统。
+```
+
+### 十五、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，应进入：
+
+```text
+Phase 859:
+Domain Gear Holdout and Sign Calibration Audit
+```
+
+核心任务：
+
+```text
+1. 对 Phase 858 的 top domain gears 做 holdout 对象验证。
+2. 把 readout support sign 和 intervention effect sign 分开校准。
+3. 专门验证 GLM4 L32C8466 是否能从 material / plant 外推到其他 living / physical domains。
+4. 对 qwen3 / DS7B 的 shared layer shape 做同层不同通道对照。
+5. 建立三档证据等级：
+   domain-local causal edge；
+   layer-shape isomorphism；
+   exact-channel isomorphism。
+6. 继续记录 first-token、clear rollout、object echo、blocker field、margin，而不是只看单个 target logit。
+```
+
+阶段性结论：
+
+```text
+Phase 858 证明：
+  跨域独立齿轮发现是可行的；
+  域内 causal edge 比几何迁移更强；
+  layer-level shape 有跨域信号；
+  exact-channel isomorphism 仍然稀疏；
+  全局语言齿轮尚未闭合。
+
+因此，当前路线应继续先完成可评分全局齿轮图谱，
+再从图谱中提取稳定不变量，
+最后再做语言编码机制闭合验证。
+```
+
+## Phase 859: Domain Gear Holdout and Sign Calibration Audit [2026-07-02 22:15]
+
+### 一、任务来源
+
+Phase 858 完成后，下一任务仍属于同一个全局齿轮图谱阶段。
+
+Phase 858 的关键结论是：
+
+```text
+1. 跨域独立齿轮发现可行。
+2. 域内 causal edge 比几何齿轮迁移更强。
+3. layer-level shape 有跨域信号。
+4. exact-channel isomorphism 仍然稀疏。
+```
+
+因此本阶段继续自动推进到：
+
+```text
+Phase 859:
+Domain Gear Holdout and Sign Calibration Audit
+```
+
+目标不是重新大规模搜索，而是检验 Phase 858 的 top domain gears 是否能跨对象保持作用，并校准 readout support sign 与 intervention effect sign 的关系。
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase859_domain_gear_holdout_sign_calibration_audit.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase859_domain_gear_holdout_sign_calibration_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase859_domain_gear_holdout_sign_calibration_audit/
+```
+
+测试模型：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16
+quantization = off
+flash_attention_2 unavailable -> sdpa fallback
+```
+
+### 三、测试原理
+
+本阶段读取 Phase 858 confirm 的每域最佳齿轮，在 Phase 858 没有使用过的对象上测试：
+
+```text
+original
+best_holdout
+alternate_mode
+same_layer_control
+shared_exact_probe
+```
+
+含义：
+
+```text
+best_holdout:
+  Phase 858 每域最佳齿轮和最佳干预模式。
+
+alternate_mode:
+  同一齿轮，但 zero / flip 模式互换。
+
+same_layer_control:
+  同层其他高 readout-support 通道。
+
+shared_exact_probe:
+  Phase 858 中出现 exact shared best gear 的齿轮，在所有 holdout 域上测试。
+```
+
+### 四、符号校准公式
+
+Phase 858 使用 readout support 产生候选：
+
+```text
+s_{d,l,c}(x,p)
+  =
+  a_{l,c}(x,p)
+  *
+  [ (W_U[t_d(x)] - W_U[o(x)]) W_down_l ]_c
+```
+
+但 Phase 858 已经显示：
+
+```text
+readout support sign != intervention effect sign
+```
+
+因此本阶段加入校准函数：
+
+```text
+Calib(g,d)
+  =
+  (
+    sign_readout(g,d),
+    sign_intervene(g,d),
+    Delta C_holdout(g,d)
+  )
+```
+
+更严格的 domain-local holdout causal gear 标准：
+
+```text
+Delta C_train(g,d) > 0
+and
+Delta C_holdout(g,d) > 0
+and
+Delta C_control(L(g),d) <= 0
+```
+
+其中：
+
+```text
+Delta C_train:
+  Phase 858 中训练对象上的边界改善。
+
+Delta C_holdout:
+  Phase 859 中未见对象上的边界改善。
+
+Delta C_control:
+  same-layer control 的边界改善。
+```
+
+### 五、smoke 轮结果
+
+smoke 轮用于确认流程。
+
+```text
+qwen3:
+  rows = 12
+  best positive domains = 3
+  best clear domains = 1
+  alternate clear domains = 1
+  control clear domains = 0
+
+GLM4:
+  rows = 12
+  best positive domains = 2
+  best clear domains = 0
+  alternate clear domains = 0
+  control clear domains = 0
+
+DS7B:
+  rows = 12
+  best positive domains = 2
+  best clear domains = 0
+  alternate clear domains = 0
+  control clear domains = 0
+```
+
+### 六、holdout 轮结果
+
+holdout 轮使用八个语义域、每域最多两个未见对象、两个 prompt gate。
+
+```text
+qwen3:
+  rows = 128
+  best positive domains = 6
+  best clear domains = 2
+  alternate clear domains = 1
+  same-layer control clear domains = 0
+  shared probe clear domains = 0
+
+GLM4:
+  rows = 160
+  best positive domains = 7
+  best clear domains = 1
+  alternate clear domains = 1
+  same-layer control clear domains = 0
+  shared probe clear domains = 0
+
+DS7B:
+  rows = 128
+  best positive domains = 6
+  best clear domains = 2
+  alternate clear domains = 2
+  same-layer control clear domains = 0
+  shared probe clear domains = 0
+```
+
+### 七、代表性 holdout 正结果
+
+qwen3：
+
+```text
+material:
+  L31C4800 + L31C2257 flip
+  clear rollout gain = 1 / 4
+
+geometry:
+  L29C1532 zero
+  clear rollout gain = 1 / 4
+```
+
+GLM4：
+
+```text
+color:
+  L30C7088 + L30C11128 flip
+  clear rollout gain = 1 / 4
+```
+
+DS7B：
+
+```text
+color:
+  L27C15369 + L26C8587 flip
+  clear rollout gain = 2 / 4
+
+animal:
+  L27C16651 + L24C3875 flip
+  clear rollout gain = 1 / 4
+```
+
+### 八、关键负结果
+
+same-layer control：
+
+```text
+qwen3 = 0 clear domains
+GLM4 = 0 clear domains
+DS7B = 0 clear domains
+```
+
+shared exact probe：
+
+```text
+qwen3 = 0 clear domains
+GLM4 = 0 clear domains
+DS7B = 0 clear domains
+```
+
+这说明：
+
+```text
+1. Phase 858 的 top gears 不是简单同层伪影。
+2. 但 Phase 858 的 exact shared gear 候选仍不能稳定跨域外推。
+3. GLM4 L32C8466 不能直接升级为 universal gear。
+```
+
+### 九、理论进展
+
+Phase 859 把证据等级从：
+
+```text
+domain-local causal edge
+```
+
+推进到：
+
+```text
+domain-local holdout causal gear candidate
+```
+
+但只是一部分域成立。
+
+当前全局齿轮图谱证据等级应改成：
+
+```text
+Level 1:
+  readout-support candidate
+
+Level 2:
+  domain-local causal edge
+
+Level 3:
+  domain-local holdout causal gear
+
+Level 4:
+  layer-shape isomorphism
+
+Level 5:
+  exact-channel isomorphism candidate
+
+Level 6:
+  cross-domain holdout invariant
+```
+
+当前达到：
+
+```text
+少量 Level 3；
+较多 Level 4；
+很少 Level 5；
+尚未达到 Level 6。
+```
+
+### 十、问题和硬伤
+
+```text
+1. holdout clear gain 仍然只覆盖少数域。
+2. alternate mode 也有少量 clear gain，说明干预符号不是简单由 readout support sign 决定。
+3. shared exact probe 为 0，说明跨域通用齿轮仍未成立。
+4. same-layer control 为 0 是好信号，但样本量仍不够大。
+5. 当前仍只验证短 rollout，不是完整 span closure。
+6. 小模型可能把真实机制压缩到粗糙层段，导致 Level 4 形状信号和真实大模型机制存在偏差。
+```
+
+### 十一、闭合距离评估
+
+当前证据：
+
+```text
+候选发现:
+  已形成第一版。
+
+域内因果边:
+  部分成立。
+
+holdout 域内齿轮:
+  少量成立。
+
+same-layer 排伪:
+  初步正面。
+
+跨域 exact invariant:
+  未成立。
+
+完整语言编码闭合:
+  未完成。
+```
+
+完整语言编码机制闭合进度可谨慎评估为：
+
+```text
+17% - 25%
+```
+
+### 十二、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，但目标应从继续扩大候选转为建立可重复证据等级：
+
+```text
+Phase 860:
+Replicated Domain Gear Evidence Ladder
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 material / geometry、GLM4 color、DS7B color / animal 做重复对象扩展。
+2. 对 alternate mode 正结果做独立校准。
+3. 对 same-layer control 加大样本，确认它真的无效。
+4. 把 Level 1-6 证据等级写入 atlas schema。
+5. 只把通过 holdout + control 的齿轮放入高置信图谱。
+```
+
+阶段性结论：
+
+```text
+Phase 859 证明：
+  Phase 858 的部分域内齿轮能跨对象保持作用；
+  same-layer control 暂未解释这些正结果；
+  readout sign 与 intervention sign 需要分开校准；
+  shared exact gear 仍未形成跨域 holdout invariant。
+
+因此，当前图谱正在提升解释力，
+但仍不是完整语言编码机制。
+下一步应建立可重复证据等级，而不是继续无边界扩大局部 patch。
+```
+
+## Phase 860: Replicated Domain Gear Evidence Ladder [2026-07-02 23:12]
+
+### 一、任务来源
+
+本阶段读取并分析了最新上传内容。
+
+附件对 Phase 858 和 Phase 859 的判断基本正确：
+
+```text
+1. Phase 858 和 Phase 859 是实质进展。
+2. 研究已经从 geometry gear transfer 转向 domain-local gear discovery。
+3. 当前仍是机制候选图谱，不是语言编码机制闭合图谱。
+4. exact-channel cross-domain isomorphism 仍然弱。
+5. 下一步应建立可重复证据等级，而不是继续扩大普通候选池。
+```
+
+因此，本阶段继续同一全局齿轮图谱阶段，执行：
+
+```text
+Phase 860:
+Replicated Domain Gear Evidence Ladder
+```
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase860_replicated_domain_gear_evidence_ladder.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase860_replicated_domain_gear_evidence_ladder_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase860_replicated_domain_gear_evidence_ladder/
+```
+
+### 三、测试目标
+
+Phase 860 不重新搜索齿轮，只选择 Phase 859 holdout 中已经出现 clear gain 的域：
+
+```text
+qwen3:
+  material
+  geometry
+
+GLM4:
+  color
+
+DS7B:
+  color
+  animal
+```
+
+测试条件：
+
+```text
+original
+best_holdout
+alternate_mode
+same_layer_control
+```
+
+prompt gate 扩展为：
+
+```text
+natural_question
+natural_category
+classification
+```
+
+每个目标域最多使用 5 个基础对象。
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+加载方式：
+
+```text
+bf16
+quantization = off
+flash_attention_2 unavailable -> sdpa fallback
+```
+
+### 四、严格证据等级
+
+本阶段先发现一个问题：
+
+```text
+如果 clear gain 同时伴随 clear loss，
+不能进入高置信图谱。
+```
+
+因此在测试中途收紧了证据等级，并重新运行 replicate 轮。
+
+严格等级：
+
+```text
+Level 4:
+  replicated_domain_edge
+  有 clear gain，且 clear loss = 0。
+
+Level 5:
+  replicated_control_filtered_domain_gear
+  clear gain >= 2
+  clear loss = 0
+  same-layer control clear gain = 0。
+
+Level 6:
+  strong_domain_invariant_candidate
+  Level 5
+  multi-split support
+  multi-prompt support。
+```
+
+高置信图谱公式：
+
+```text
+G_high
+  =
+  {
+    g:
+      Delta C_rep(g,d) > 0,
+      Delta C_loss(g,d) = 0,
+      Delta C_control(L(g),d) = 0,
+      H_split(g,d) >= 2,
+      H_prompt(g,d) >= 2
+  }
+```
+
+符号歧义标记：
+
+```text
+SignAmbiguous(g,d)
+  =
+  1[ Delta C_alternate(g,d) > 0 ]
+```
+
+### 五、smoke 轮结果
+
+smoke 轮用于确认流程。
+
+```text
+qwen3:
+  rows = 24
+  max level = 5
+  Level 4+ domains = 2
+  Level 5+ domains = 1
+  Level 6 domains = 0
+  sign ambiguous domains = 1
+
+GLM4:
+  rows = 12
+  max level = 4
+  Level 4+ domains = 1
+  Level 5+ domains = 0
+  Level 6 domains = 0
+  sign ambiguous domains = 1
+
+DS7B:
+  rows = 24
+  max level = 5
+  Level 4+ domains = 2
+  Level 5+ domains = 1
+  Level 6 domains = 0
+  sign ambiguous domains = 2
+```
+
+### 六、replicate 轮结果
+
+严格口径下的最终 replicate 结果：
+
+```text
+qwen3:
+  rows = 120
+  max level = 6
+  Level 4+ domains = 1
+  Level 5+ domains = 1
+  Level 6 domains = 1
+  sign ambiguous domains = 2
+
+GLM4:
+  rows = 60
+  max level = 4
+  Level 4+ domains = 1
+  Level 5+ domains = 0
+  Level 6 domains = 0
+  sign ambiguous domains = 1
+
+DS7B:
+  rows = 120
+  max level = 6
+  Level 4+ domains = 2
+  Level 5+ domains = 2
+  Level 6 domains = 2
+  sign ambiguous domains = 2
+```
+
+### 七、详细证据阶梯
+
+qwen3：
+
+```text
+material:
+  gear = L31C4800 + L31C2257
+  level = 6
+  clear gain/loss = 5 / 0
+  split hits = 3
+  prompt hits = 3
+  alternate clear = 2
+  same-layer control clear = 0
+
+geometry:
+  gear = L29C1532
+  level = 3
+  clear gain/loss = 3 / 1
+  split hits = 2
+  prompt hits = 2
+  alternate clear = 5
+  same-layer control clear = 0
+```
+
+GLM4：
+
+```text
+color:
+  gear = L30C7088 + L30C11128
+  level = 4
+  clear gain/loss = 1 / 0
+  split hits = 1
+  prompt hits = 1
+  alternate clear = 1
+  same-layer control clear = 0
+```
+
+DS7B：
+
+```text
+animal:
+  gear = L27C16651 + L24C3875
+  level = 6
+  clear gain/loss = 10 / 0
+  split hits = 3
+  prompt hits = 3
+  alternate clear = 6
+  same-layer control clear = 0
+
+color:
+  gear = L27C15369 + L26C8587
+  level = 6
+  clear gain/loss = 5 / 0
+  split hits = 2
+  prompt hits = 3
+  alternate clear = 5
+  same-layer control clear = 0
+```
+
+### 八、客观结论
+
+```text
+1. qwen3 material 已进入 Level 6 strong domain invariant candidate。
+2. DS7B animal / color 进入 Level 6。
+3. GLM4 color 只有 Level 4，还不能进入高置信图谱。
+4. qwen3 geometry 因 clear loss = 1 被降为 Level 3。
+5. 所有 Level 6 候选都有 alternate mode clear gain，说明齿轮有效，但干预符号解释没有闭合。
+6. same-layer control 继续为 0，说明这些正结果不是简单同层伪影。
+```
+
+### 九、理论进展
+
+Phase 860 把图谱从：
+
+```text
+少量 holdout causal gear
+```
+
+推进到：
+
+```text
+可分级的高置信域内图谱
+```
+
+当前高置信域内图谱：
+
+```text
+qwen3 material:
+  L31C4800 + L31C2257
+
+DS7B animal:
+  L27C16651 + L24C3875
+
+DS7B color:
+  L27C15369 + L26C8587
+```
+
+中置信候选：
+
+```text
+GLM4 color:
+  L30C7088 + L30C11128
+```
+
+降档候选：
+
+```text
+qwen3 geometry:
+  L29C1532
+```
+
+### 十、问题和硬伤
+
+```text
+1. Level 6 仍然是 domain-local，不是 cross-domain universal gear。
+2. 所有 Level 6 都有 sign ambiguity，说明 zero / flip 的机制解释仍不清楚。
+3. DS7B 的 Level 6 结果很强，但 DS7B 是小模型，可能存在结构压缩或蒸馏偏差。
+4. qwen3 geometry 出现 clear loss，说明单看 gain 会高估图谱质量。
+5. GLM4 仍偏弱，只达到 Level 4。
+6. 当前仍然是短 rollout，不是完整 span / long rollout closure。
+```
+
+### 十一、闭合距离评估
+
+当前证据等级：
+
+```text
+Level 1 readout-support candidate:
+  已完成。
+
+Level 2 domain-local causal edge:
+  多域成立。
+
+Level 3 domain-local holdout source:
+  部分成立。
+
+Level 4 replicated domain edge:
+  qwen3 / GLM4 / DS7B 均有。
+
+Level 5 control-filtered domain gear:
+  qwen3 / DS7B 有。
+
+Level 6 strong domain invariant candidate:
+  qwen3 material，DS7B animal/color。
+
+cross-domain universal invariant:
+  未完成。
+
+full language encoding closure:
+  未完成。
+```
+
+完整语言编码机制闭合进度可谨慎上调为：
+
+```text
+19% - 27%
+```
+
+上调原因：
+
+```text
+已经出现可重复、控制过滤、跨 prompt 和跨 split 的域内强不变量候选。
+```
+
+不能更高的原因：
+
+```text
+它们仍然不是跨域通用齿轮，也没有解释完整多 token 生成。
+```
+
+### 十二、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，但应该从“找更强单域齿轮”转向“比较高置信齿轮的结构指纹”：
+
+```text
+Phase 861:
+High-Confidence Domain Gear Structure Comparison
+```
+
+核心任务：
+
+```text
+1. 只使用 Phase 860 Level 6 齿轮。
+2. 比较 qwen3 material 与 DS7B animal/color 的层级位置、prompt 响应、split 响应、alternate-mode 响应。
+3. 检查是否存在跨模型的抽象结构指纹，而不是通道编号同构。
+4. 单独解释 alternate mode 为什么也有效。
+5. 把高置信图谱和普通候选图谱分开保存。
+```
+
+阶段性结论：
+
+```text
+Phase 860 是实质进展：
+  它第一次从候选图谱中筛出了少量高置信域内强不变量候选。
+
+但 Phase 860 仍不是语言编码机制闭合：
+  这些强齿轮是 domain-local；
+  exact cross-domain invariant 未成立；
+  sign calibration 未闭合；
+  short rollout 之外的生成过程仍未解释。
+```
+
+## Phase 861: High-Confidence Domain Gear Structure Comparison [2026-07-02 23:18]
+
+### 一、任务
+
+根据 Phase 860 的结论，下一步仍然属于“全局齿轮图谱”阶段。
+
+但 Phase 861 不继续做新模型干预，而是只读取 Phase 860 replicate 轮的 Level 6 高置信齿轮，比较这些齿轮是否共享更抽象的结构指纹。
+
+脚本：
+
+```text
+tests/glm5/phase861_high_confidence_domain_gear_structure_comparison.py
+```
+
+结果：
+
+```text
+tests/result/phase861_high_confidence_domain_gear_structure_comparison/
+```
+
+### 二、测试原理
+
+Phase 860 已经筛出了少量 Level 6 齿轮。
+
+Phase 861 问的问题不是：
+
+```text
+哪个齿轮还能提高 clear rollout？
+```
+
+而是：
+
+```text
+这些高置信齿轮是否共享同一种结构形状？
+```
+
+因此定义结构指纹：
+
+```text
+Fingerprint(g,d)
+  =
+  (
+    layer_band,
+    gear_count,
+    candidate_role,
+    best_mode,
+    split_vector,
+    prompt_vector,
+    control_gain,
+    alternate_gain
+  )
+```
+
+其中：
+
+```text
+split_vector
+  =
+  [
+    phase858_seen_gain,
+    phase859_holdout_seen_gain,
+    new_replication_gain
+  ]
+
+prompt_vector
+  =
+  [
+    natural_question_gain,
+    natural_category_gain,
+    classification_gain
+  ]
+```
+
+### 三、结果
+
+本阶段只纳入 Phase 860 的 Level 6 齿轮，共 3 个：
+
+```text
+DS7B animal:
+  gear = L27C16651 + L24C3875
+  depth = late, mean_norm_layer = 0.944
+  role = negative_blocker
+  best_mode = flip
+  clear gain/loss = 10 / 0
+  alternate clear gain = 6
+  same-layer control clear gain = 0
+  split vector = [6, 2, 2]
+  prompt vector = [4, 2, 4]
+
+DS7B color:
+  gear = L27C15369 + L26C8587
+  depth = late, mean_norm_layer = 0.981
+  role = negative_blocker
+  best_mode = flip
+  clear gain/loss = 5 / 0
+  alternate clear gain = 5
+  same-layer control clear gain = 0
+  split vector = [3, 2, 0]
+  prompt vector = [1, 2, 2]
+
+qwen3 material:
+  gear = L31C4800 + L31C2257
+  depth = late, mean_norm_layer = 0.886
+  role = negative_blocker
+  best_mode = flip
+  clear gain/loss = 5 / 0
+  alternate clear gain = 2
+  same-layer control clear gain = 0
+  split vector = [1, 1, 3]
+  prompt vector = [2, 1, 2]
+```
+
+汇总：
+
+```text
+Level 6 signatures = 3
+depth_band = late: 3 / 3
+gear_count = two-channel: 3 / 3
+candidate_role = negative_blocker: 3 / 3
+best_mode = flip: 3 / 3
+same-layer control clear gain = 0: 3 / 3
+sign ambiguous = 3 / 3
+new replication supported = 2 / 3
+average normalized layer = 0.937
+average best clear gain = 6.667
+average alternate / best ratio = 0.667
+```
+
+### 四、数学记录
+
+Phase 860 的高置信集合为：
+
+```text
+G_high
+  =
+  {
+    g:
+    Delta C_rep(g,d) > 0,
+    Delta C_loss(g,d) = 0,
+    Delta C_control(L(g),d) = 0,
+    H_split(g,d) >= 2,
+    H_prompt(g,d) >= 2
+  }
+```
+
+Phase 861 后应升级为带结构指纹的集合：
+
+```text
+G_high_shape
+  =
+  {
+    (g,d):
+    g in G_high,
+    Band(g) = late,
+    Count(g) = 2,
+    Role(g,d) = negative_blocker,
+    Mode*(g,d) = flip,
+    Delta C_control(L(g),d) = 0
+  }
+```
+
+同时必须保留符号歧义约束：
+
+```text
+For all (g,d) in G_high_shape:
+  SignAmbiguous(g,d) = 1
+```
+
+也就是：
+
+```text
+Delta C_alternate(g,d) > 0
+```
+
+### 五、判断附件内容是否正确
+
+附件中关于 Phase 858 / 859 的判断基本正确：
+
+```text
+1. 研究确实已经从 geometry transfer 推进到 domain-local gear discovery。
+2. 当前结果确实不是语言编码闭合。
+3. exact cross-domain isomorphism 没有成立。
+4. 更合理的下一步不是继续扩大普通候选，而是建立证据等级和结构比较。
+```
+
+但需要进一步收紧：
+
+```text
+1. Phase 860 证明不是所有 holdout 正结果都能升级；
+   qwen3 geometry 因 clear loss 被降档。
+
+2. Phase 861 证明当前最稳定的不是 exact gear，
+   而是 late-layer two-channel negative-blocker 结构指纹。
+
+3. 所有 Level 6 都 sign ambiguous，
+   所以不能把 flip / zero 的效果直接解释为清楚的符号机制。
+```
+
+### 六、理论进展
+
+当前进展从：
+
+```text
+domain-local candidate gear
+```
+
+推进到：
+
+```text
+domain-local strong gear shape
+```
+
+这比单点 patch 更有解释力，因为它开始约束齿轮的整体形状：
+
+```text
+后期层
+双通道
+负向阻塞
+flip 有效
+同层 control 无效
+```
+
+这说明全局齿轮图谱的下一步不应只追求更多候选数量，而应追求：
+
+```text
+结构指纹是否可迁移
+```
+
+### 七、问题和硬伤
+
+```text
+1. 结构指纹相似，不等于语言编码机制闭合。
+2. 当前 Level 6 只覆盖 qwen3 material 和 DS7B animal/color。
+3. GLM4 没有 Level 6，说明跨模型稳定性仍不足。
+4. DS7B color 没有 new replication clear gain，泛化弱于另外两个 Level 6。
+5. alternate mode 也有效，说明 sign mechanism 没有解释清楚。
+6. 所有结论来自小模型，可能反映的是压缩后的粗结构，而不是完整大模型中的精细编码结构。
+```
+
+### 八、小模型偏差
+
+小模型可能带来三类偏差：
+
+```text
+1. 通道合并偏差：
+   一个通道可能承载多个大模型中的细齿轮。
+
+2. 符号粗糙偏差：
+   zero 和 flip 都有效，可能是因为小模型中负向阻塞器不够分离。
+
+3. 域内过强偏差：
+   某些 domain-local gear 在小模型中表现强，但在大模型中可能拆成多个更细路线。
+```
+
+所以当前结论应被限定为：
+
+```text
+small-model domain-local structural fingerprint
+```
+
+不能升级为：
+
+```text
+universal language encoding mechanism
+```
+
+### 九、闭合距离
+
+当前闭合等级：
+
+```text
+domain-local candidate:
+  已完成较多。
+
+domain-local holdout causal gear:
+  部分完成。
+
+domain-local strong structural fingerprint:
+  首次形成。
+
+cross-domain exact invariant:
+  未完成。
+
+sign mechanism closure:
+  未完成。
+
+full token / span closure:
+  未完成。
+```
+
+完整语言编码机制闭合进度保持谨慎：
+
+```text
+20% - 28%
+```
+
+比 Phase 860 略有提升的原因：
+
+```text
+高置信候选不再只是点状组件，而开始表现出共同结构形状。
+```
+
+不能大幅提升的原因：
+
+```text
+共同形状仍然很粗；
+符号机制未闭合；
+跨模型只有 qwen3 和 DS7B，GLM4 未进入 Level 6。
+```
+
+### 十、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，但应进入符号机制审计：
+
+```text
+Phase 862:
+Negative-Blocker Sign Mechanism Audit
+```
+
+核心任务：
+
+```text
+1. 只使用 Phase 861 的三个 Level 6 齿轮。
+2. 对双通道组合分别测试 zero / flip / scale-down / scale-up。
+3. 拆出 blocker token、answer token、format token 的全词表位移。
+4. 判断 alternate mode 有效的原因：
+   是共同削弱 blocker；
+   还是小模型符号粗糙导致的等效扰动。
+```
+
+阶段性结论：
+
+```text
+Phase 861 是实质进展：
+  它把高置信域内齿轮从“实例列表”推进为“结构指纹”。
+
+但 Phase 861 仍不是闭合：
+  它没有解释 sign ambiguity；
+  没有形成 cross-domain universal gear；
+  也没有完成长程生成闭合。
+```
+
+## Phase 862: Negative-Blocker Sign Mechanism Audit [2026-07-03 01:57]
+
+### 一、任务
+
+根据 Phase 861 的结论，当前全局齿轮图谱已经出现了少量 Level 6 高置信域内齿轮，但它们全部存在 sign ambiguity。
+
+本阶段目标不是搜索新齿轮，而是只审计 Phase 861 的三个 Level 6 齿轮：
+
+```text
+qwen3 material:
+  L31C4800 + L31C2257
+
+DS7B animal:
+  L27C16651 + L24C3875
+
+DS7B color:
+  L27C15369 + L26C8587
+```
+
+核心问题：
+
+```text
+zero 和 flip 都有效，是因为符号机制粗糙？
+还是因为它们都在削弱同一类 negative blocker？
+```
+
+脚本：
+
+```text
+tests/glm5/phase862_negative_blocker_sign_mechanism_audit.py
+tests/glm5/run_phase862_negative_blocker_sign_mechanism_audit_round.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase862_negative_blocker_sign_mechanism_audit/
+```
+
+### 二、测试原理
+
+本阶段对每个 Level 6 齿轮做四种干预：
+
+```text
+zero:
+  将目标通道置零。
+
+flip:
+  将目标通道取反。
+
+half:
+  将目标通道缩小到 0.5。
+
+scale_up:
+  将目标通道放大。
+```
+
+主测试：
+
+```text
+round = main
+scale_up_factor = 2.0
+prompt variants = natural_question, natural_category, classification
+cases per domain = 5
+single-channel decomposition = on
+```
+
+确认测试：
+
+```text
+round = confirm_scale15
+scale_up_factor = 1.5
+edit mode = scale_up
+single-channel decomposition = off
+```
+
+每个条件记录：
+
+```text
+1. clear rollout gain / loss
+2. class blocker count reduction
+3. original top blocker token logit delta
+4. answer token logit delta
+5. object token logit delta
+6. first-token answer class
+7. rollout answer class
+```
+
+### 三、数学公式
+
+对齿轮 g、语义域 d、干预模式 m，定义：
+
+```text
+Delta C_m(g,d)
+  =
+  clear_rollout_gain_m(g,d)
+  -
+  clear_rollout_loss_m(g,d)
+```
+
+blocker 削弱量：
+
+```text
+B_m(g,d)
+  =
+  blocker_count(original,d)
+  -
+  blocker_count(intervened_m,d)
+```
+
+原始 top blocker logit 位移：
+
+```text
+Delta z_blocker_m(g,d)
+  =
+  z_m(t_blocker)
+  -
+  z_original(t_blocker)
+```
+
+answer 位移：
+
+```text
+Delta z_answer_m(g,d)
+  =
+  z_m(t_answer)
+  -
+  z_original(t_answer)
+```
+
+判断 blocker weakening：
+
+```text
+BlockerWeakening_m(g,d)
+  =
+  [
+    Delta C_m(g,d) > 0
+    and
+    B_m(g,d) > 0
+    and
+    Delta z_blocker_m(g,d) < 0
+  ]
+```
+
+符号歧义类型：
+
+```text
+SignAmbiguityType(g,d)
+  =
+  shared_blocker_weakening
+```
+
+当：
+
+```text
+BlockerWeakening_zero(g,d) = true
+and
+BlockerWeakening_flip(g,d) = true
+```
+
+否则标记为：
+
+```text
+mode_specific_or_unresolved
+```
+
+### 四、主测试结果
+
+#### qwen3 material
+
+```text
+flip:
+  clear gain/loss = 5 / 0
+  blocker reduction = 2.4000
+  original blocker delta = -0.1984
+  answer delta = 0.7583
+
+half:
+  clear gain/loss = 2 / 0
+  blocker reduction = 0.9333
+  original blocker delta = -0.0807
+  answer delta = 0.1833
+
+zero:
+  clear gain/loss = 2 / 0
+  blocker reduction = 1.7333
+  original blocker delta = -0.0927
+  answer delta = 0.4083
+
+scale_up:
+  clear gain/loss = 0 / 0
+  blocker reduction = -2.4667
+  original blocker delta = 0.0286
+  answer delta = -0.4292
+```
+
+判断：
+
+```text
+qwen3 material = shared_blocker_weakening
+```
+
+#### DS7B animal
+
+```text
+flip:
+  clear gain/loss = 10 / 0
+  blocker reduction = 1.2667
+  original blocker delta = -0.2382
+  answer delta = 2.9750
+
+half:
+  clear gain/loss = 5 / 0
+  blocker reduction = 0.6000
+  original blocker delta = -0.0618
+  answer delta = 0.6292
+
+zero:
+  clear gain/loss = 6 / 0
+  blocker reduction = 0.8667
+  original blocker delta = -0.1083
+  answer delta = 1.3208
+
+scale_up:
+  clear gain/loss = 0 / 3
+  blocker reduction = -2.5333
+  original blocker delta = 0.0792
+  answer delta = -0.9854
+```
+
+判断：
+
+```text
+DS7B animal = shared_blocker_weakening
+```
+
+#### DS7B color
+
+```text
+flip:
+  clear gain/loss = 5 / 0
+  blocker reduction = 1.1333
+  original blocker delta = -0.0006
+  answer delta = 4.9250
+
+half:
+  clear gain/loss = 2 / 0
+  blocker reduction = 0.6667
+  original blocker delta = 0.0037
+  answer delta = 0.8833
+
+zero:
+  clear gain/loss = 5 / 0
+  blocker reduction = 1.1333
+  original blocker delta = 0.0045
+  answer delta = 1.9792
+
+scale_up:
+  clear gain/loss = 0 / 2
+  blocker reduction = -2.0667
+  original blocker delta = -0.0196
+  answer delta = -1.2542
+```
+
+判断：
+
+```text
+DS7B color = mode_specific_or_unresolved
+```
+
+原因：
+
+```text
+zero / half 虽然有 clear gain，
+但没有满足 original blocker delta < 0 的 blocker weakening 判据。
+它更像 answer lift 或混合路线。
+```
+
+### 五、确认测试结果
+
+scale_up_factor = 1.5 时：
+
+```text
+qwen3 material:
+  clear gain/loss = 0 / 0
+  blocker reduction = -1.3333
+  answer delta = -0.2000
+
+DS7B animal:
+  clear gain/loss = 0 / 2
+  blocker reduction = -1.4000
+  answer delta = -0.5750
+
+DS7B color:
+  clear gain/loss = 0 / 1
+  blocker reduction = -0.8000
+  answer delta = -0.7250
+```
+
+结论：
+
+```text
+scale_up 无效不是因为 2.0 扰动过强；
+较弱的 1.5 增强也没有产生 clear gain。
+```
+
+### 六、单通道拆解
+
+qwen3 material：
+
+```text
+single0:
+  flip clear gain = 1
+  zero clear gain = 1
+
+single1:
+  flip clear gain = 4
+  half clear gain = 2
+  zero clear gain = 2
+```
+
+DS7B animal：
+
+```text
+single0:
+  flip clear gain = 9
+  half clear gain = 5
+  zero clear gain = 6
+
+single1:
+  flip clear gain = 1
+  zero clear loss = 1
+```
+
+DS7B color：
+
+```text
+single0:
+  flip clear gain = 5
+  half clear gain = 2
+  zero clear gain = 3
+
+single1:
+  flip clear gain = 2
+  zero clear gain = 1
+```
+
+单通道结果说明：
+
+```text
+双通道组合不是完全对称协同；
+更像 dominant channel + auxiliary channel。
+```
+
+### 七、判断附件内容是否正确
+
+附件对 Phase 860 / 861 的判断基本正确：
+
+```text
+1. Phase 860 / 861 确实是全局齿轮图谱的实质推进。
+2. 当前不是语言编码机制闭合。
+3. 当前最稳定的是结构指纹，而不是 exact-channel universal gear。
+4. sign mechanism closure 是下一关键瓶颈。
+```
+
+Phase 862 对附件判断的进一步补充是：
+
+```text
+sign ambiguity 不是一个单一现象。
+
+qwen3 material 和 DS7B animal：
+  可以解释为 shared blocker weakening。
+
+DS7B color：
+  仍然是 mode-specific or unresolved。
+```
+
+### 八、理论进展
+
+Phase 862 把：
+
+```text
+SignAmbiguous(g,d) = 1
+```
+
+拆成：
+
+```text
+SignAmbiguityType(g,d)
+```
+
+这让图谱从“发现符号歧义”推进到“分类符号歧义来源”。
+
+当前可以加入全局齿轮图谱的新层：
+
+```text
+negative-blocker sign layer:
+  Type A: shared blocker weakening
+  Type B: answer-lift / unresolved mixed route
+```
+
+### 九、问题和硬伤
+
+```text
+1. DS7B color 没有被 blocker weakening 完全解释。
+2. 单通道拆解显示双通道组合内部存在主通道 / 辅助通道不对称。
+3. GLM4 没有 Level 6 目标，跨模型证据仍不足。
+4. scale_up 产生 loss，说明这些通道可能确实具有 negative-blocker 性质，但还不能说明完整路线闭合。
+5. 当前仍是短 rollout，尚未进入 span / long rollout closure。
+6. 小模型可能把多个真实机制压缩到一个粗通道中，导致 zero / flip / half 都出现近似有效。
+```
+
+### 十、小模型偏差
+
+Phase 862 更加强化了小模型偏差问题：
+
+```text
+1. 符号粗糙：
+   zero / flip / half 都能产生 clear gain，说明通道不是简单正负方向。
+
+2. 通道合并：
+   单通道拆解显示主通道已经很强，双通道不一定是严格协同。
+
+3. 路线混合：
+   DS7B color 可能同时包含 answer lift 和 blocker weakening。
+```
+
+所以当前结论仍应限定为：
+
+```text
+small-model high-confidence domain gear sign audit
+```
+
+不能升级为：
+
+```text
+language universal sign mechanism closure
+```
+
+### 十一、闭合距离
+
+当前闭合等级：
+
+```text
+domain-local high-confidence gear:
+  已有少量。
+
+domain-local structural fingerprint:
+  已形成。
+
+sign ambiguity classification:
+  初步形成。
+
+dominant / auxiliary channel decomposition:
+  尚未完成。
+
+cross-domain invariant:
+  未完成。
+
+span / long rollout closure:
+  未完成。
+```
+
+完整语言编码机制闭合进度可谨慎评估为：
+
+```text
+21% - 29%
+```
+
+小幅提升原因：
+
+```text
+已经部分解释了 sign ambiguity 的来源。
+```
+
+不能大幅提升原因：
+
+```text
+还没有完成主通道 / 辅助通道角色分离；
+GLM4 没有 Level 6 目标；
+DS7B color 仍未解释清楚。
+```
+
+### 十二、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，应进入：
+
+```text
+Phase 863:
+Dominant-Channel and Auxiliary-Channel Role Split Audit
+```
+
+核心任务：
+
+```text
+1. 只测试 Phase 862 的三组 Level 6 齿轮。
+2. 区分主通道和辅助通道。
+3. 对每个通道分别记录 answer lift、blocker weakening、object echo、format token 位移。
+4. 重点解释 DS7B color 为什么 zero / half 有 clear gain，但 blocker weakening 不明显。
+```
+
+阶段性结论：
+
+```text
+Phase 862 是实质推进：
+  它把 sign ambiguity 从一个黑箱拆成了至少两类。
+
+但 Phase 862 仍不是语言编码机制闭合：
+  它只解释了一部分 negative-blocker 符号现象；
+  没有形成跨域通用齿轮；
+  没有完成长程生成闭合。
+```
+
+## Phase 863: Dominant-Channel and Auxiliary-Channel Role Split Audit [2026-07-03 01:57]
+
+### 一、任务
+
+Phase 863 是 Phase 862 的离线延续，不重新加载模型，不做新干预，只读取 Phase 862 main 轮的单通道拆解结果。
+
+核心问题：
+
+```text
+Phase 861/862 中的 two-channel gear 是否真的是两个通道对称协同？
+还是其中一个是主通道，另一个只是辅助通道？
+```
+
+脚本：
+
+```text
+tests/glm5/phase863_dominant_auxiliary_channel_role_split_audit.py
+```
+
+结果目录：
+
+```text
+tests/result/phase863_dominant_auxiliary_channel_role_split_audit/
+```
+
+### 二、测试原理
+
+对每个双通道齿轮：
+
+```text
+g = {c_1, c_2}
+```
+
+比较：
+
+```text
+full set:
+  c_1 + c_2
+
+single0:
+  c_1
+
+single1:
+  c_2
+```
+
+记录每个通道的：
+
+```text
+1. total clear gain
+2. total clear loss
+3. blocker weakening modes
+4. answer lift modes
+5. mean blocker reduction
+6. mean answer delta
+```
+
+定义主通道：
+
+```text
+c_dom
+  =
+  argmax_c total_clear_gain(c)
+```
+
+主通道贡献比例：
+
+```text
+Share(c_dom)
+  =
+  total_clear_gain(c_dom)
+  /
+  total_clear_gain(full_set)
+```
+
+### 三、结果
+
+#### qwen3 material
+
+```text
+full set:
+  gain/loss = 9 / 0
+
+dominant channel:
+  L31C2257
+  gain/loss = 8 / 0
+  gain share = 0.889
+  role = dominant_answer_and_blocker_channel
+
+auxiliary channel:
+  L31C4800
+  gain/loss = 2 / 0
+  role = auxiliary_mixed_channel
+```
+
+#### DS7B animal
+
+```text
+full set:
+  gain/loss = 21 / 3
+
+dominant channel:
+  L27C16651
+  gain/loss = 20 / 2
+  gain share = 0.952
+  role = dominant_answer_and_blocker_channel
+
+auxiliary channel:
+  L24C3875
+  gain/loss = 1 / 1
+  role = auxiliary_mixed_channel
+```
+
+#### DS7B color
+
+```text
+full set:
+  gain/loss = 12 / 2
+
+dominant channel:
+  L27C15369
+  gain/loss = 10 / 2
+  gain share = 0.833
+  role = dominant_answer_lift_channel
+
+auxiliary channel:
+  L26C8587
+  gain/loss = 3 / 1
+  role = auxiliary_answer_lift_channel
+```
+
+### 四、核心发现
+
+Phase 863 证明：
+
+```text
+two-channel gear
+```
+
+不能简单理解成两个通道对称协同。
+
+更准确的结构是：
+
+```text
+two-channel gear
+  =
+  dominant channel
+  +
+  auxiliary channel
+```
+
+当前三个 Level 6 齿轮中，dominant channel 解释了绝大部分 clear gain：
+
+```text
+qwen3 material:
+  88.9%
+
+DS7B animal:
+  95.2%
+
+DS7B color:
+  83.3%
+```
+
+### 五、对 Phase 861 / 862 的修正
+
+Phase 861 的结构指纹是：
+
+```text
+late-layer two-channel negative-blocker
+```
+
+Phase 862 进一步发现：
+
+```text
+部分 sign ambiguity 来自 shared blocker weakening。
+```
+
+Phase 863 继续修正为：
+
+```text
+late-layer two-channel gear
+  =
+  dominant route channel
+  +
+  auxiliary route channel
+```
+
+并且 dominant route channel 至少分成两类：
+
+```text
+dominant_answer_and_blocker_channel:
+  qwen3 material
+  DS7B animal
+
+dominant_answer_lift_channel:
+  DS7B color
+```
+
+### 六、问题和硬伤
+
+```text
+1. DS7B animal 的 full set 和 dominant channel 都有 clear loss，说明强通道不是无风险闭合通道。
+2. DS7B color 更像 answer-lift 齿轮，不是纯 negative-blocker 齿轮。
+3. auxiliary channel 的功能仍不清楚，可能是稳定器、格式扰动器、或者小模型压缩伪影。
+4. 当前仍没有分离 object echo 和 format token 的副作用。
+5. 本阶段是离线分析，依赖 Phase 862 数据，没有新增干预证据。
+```
+
+### 七、小模型偏差
+
+Phase 863 进一步说明，小模型中的双通道组合可能不是大模型中的真实双组件机制，而是：
+
+```text
+1. 一个粗主通道承载大部分路线作用；
+2. 一个弱辅助通道承载局部补偿或副作用；
+3. 多个真实机制被压缩到同一通道中。
+```
+
+因此当前结论应限定为：
+
+```text
+small-model dominant-channel role split
+```
+
+不能升级为：
+
+```text
+complete neuron-level route decomposition
+```
+
+### 八、闭合距离
+
+当前进度：
+
+```text
+domain-local high-confidence gear:
+  已有少量。
+
+high-confidence structural fingerprint:
+  已完成初步形状。
+
+sign ambiguity type:
+  已初步分类。
+
+dominant / auxiliary channel split:
+  已形成第一版。
+
+answer-lift vs blocker-weakening route separation:
+  未完成。
+
+object / format side-effect separation:
+  未完成。
+
+cross-domain universal invariant:
+  未完成。
+```
+
+完整语言编码机制闭合进度保持：
+
+```text
+22% - 30%
+```
+
+不能更高的原因：
+
+```text
+当前只是把 Level 6 齿轮内部拆出主通道和辅助通道；
+还没有建立可预测的路线方程；
+没有跨域闭合；
+没有长程生成闭合。
+```
+
+### 九、下一阶段
+
+下一阶段如果继续，应该进入：
+
+```text
+Phase 864:
+Answer-Lift vs Blocker-Weakening Route Separation
+```
+
+核心任务：
+
+```text
+1. 对 dominant_answer_lift_channel 和 dominant_answer_and_blocker_channel 分开建模。
+2. 重点解释 DS7B color 为什么主要通过 answer lift，而不是 blocker weakening。
+3. 把 Level 6 齿轮从“负向阻塞器”粗标签改成更细的路线角色标签。
+4. 增加 object echo / format token side-effect 记录。
+```
+
+阶段性结论：
+
+```text
+Phase 863 是实质推进：
+  它证明 Level 6 双通道齿轮内部不是对称协同，而是主通道 + 辅助通道结构。
+
+但 Phase 863 仍不是闭合：
+  它只是角色拆分；
+  没有完成 answer-lift 和 blocker-weakening 的完整路线分离；
+  没有形成全局语言编码机制。
+```
+
+## Phase 864: Answer-Lift vs Blocker-Weakening Route Separation [2026-07-03 07:59]
+
+### 一、任务
+
+附件对 Phase 862 / 863 的判断基本正确：
+
+```text
+1. Phase 862 / 863 是实质推进。
+2. 它们不是语言编码机制闭合。
+3. sign ambiguity 不能当作单一现象。
+4. two-channel gear 不是对称协同，而是 dominant channel + auxiliary channel。
+```
+
+本阶段继续同一全局齿轮图谱阶段，不重新加载模型，只读取 Phase 862 / 863 的结果，把每个干预路线拆成：
+
+```text
+answer lift
+blocker weakening
+object echo side-effect
+format side-effect
+harmful / blocker amplifying
+```
+
+脚本：
+
+```text
+tests/glm5/phase864_answer_lift_vs_blocker_weakening_route_separation.py
+```
+
+结果：
+
+```text
+tests/result/phase864_answer_lift_vs_blocker_weakening_route_separation/
+```
+
+### 二、测试原理
+
+对每个干预条件，读取：
+
+```text
+1. answer delta
+2. blocker count reduction
+3. original blocker logit delta
+4. object delta
+5. object echo induced / reduced
+6. format or other induced / reduced
+7. clear gain / loss
+```
+
+并给出路线分类：
+
+```text
+mixed_answer_lift_and_blocker_weakening
+answer_lift_dominant
+mixed_answer_blocker_with_object_side_effect
+answer_lift_with_object_echo_side_effect
+harmful_or_blocker_amplifying
+weak_or_unresolved
+```
+
+### 三、数学公式
+
+answer lift：
+
+```text
+A(g,d,m)
+  =
+  Delta z_answer(g,d,m)
+```
+
+blocker weakening：
+
+```text
+B(g,d,m)
+  =
+  blocker_count_original
+  -
+  blocker_count_intervened
+```
+
+原始 blocker 位移：
+
+```text
+Z_b(g,d,m)
+  =
+  z_intervened(t_blocker)
+  -
+  z_original(t_blocker)
+```
+
+object 副作用：
+
+```text
+O(g,d,m)
+  =
+  Delta z_object(g,d,m)
+```
+
+混合路线判据：
+
+```text
+MixedAnswerBlocker(g,d,m)
+  =
+  [
+    Delta C(g,d,m) > 0
+    and
+    A(g,d,m) > 0
+    and
+    B(g,d,m) > 0
+    and
+    Z_b(g,d,m) < 0
+  ]
+```
+
+object 风险判据：
+
+```text
+ObjectRisk(g,d,m)
+  =
+  [
+    O(g,d,m) > 0.25
+    or
+    object_echo_induced > 0
+  ]
+```
+
+### 四、full-set 结果
+
+```text
+qwen3 material:
+  flip:
+    route = mixed_answer_lift_and_blocker_weakening
+    gain/loss = 5 / 0
+    answer delta = 0.7583
+    blocker reduction = 2.4000
+    blocker delta = -0.1058
+    object delta = -0.3000
+
+  half:
+    route = mixed_answer_lift_and_blocker_weakening
+    gain/loss = 2 / 0
+
+  zero:
+    route = mixed_answer_lift_and_blocker_weakening
+    gain/loss = 2 / 0
+
+  scale_up:
+    route = weak_or_unresolved
+    gain/loss = 0 / 0
+
+DS7B animal:
+  flip:
+    route = mixed_answer_lift_and_blocker_weakening
+    gain/loss = 10 / 0
+    answer delta = 2.9750
+    blocker reduction = 1.2667
+    blocker delta = -0.1429
+    object delta = -0.1417
+
+  half:
+    route = mixed_answer_lift_and_blocker_weakening
+    gain/loss = 5 / 0
+
+  zero:
+    route = mixed_answer_lift_and_blocker_weakening
+    gain/loss = 6 / 0
+
+  scale_up:
+    route = harmful_or_blocker_amplifying
+    gain/loss = 0 / 3
+
+DS7B color:
+  flip:
+    route = mixed_answer_blocker_with_object_side_effect
+    gain/loss = 5 / 0
+    answer delta = 4.9250
+    blocker reduction = 1.1333
+    blocker delta = -0.0004
+    object delta = 1.2458
+
+  half:
+    route = answer_lift_dominant
+    gain/loss = 2 / 0
+    answer delta = 0.8833
+    blocker delta = 0.0027
+    object delta = 0.2188
+
+  zero:
+    route = answer_lift_with_object_echo_side_effect
+    gain/loss = 5 / 0
+    answer delta = 1.9792
+    blocker delta = 0.0033
+    object delta = 0.4833
+
+  scale_up:
+    route = harmful_or_blocker_amplifying
+    gain/loss = 0 / 2
+```
+
+### 五、结论
+
+```text
+qwen3 material:
+  clean mixed answer-lift + blocker-weakening route。
+
+DS7B animal:
+  clean mixed answer-lift + blocker-weakening route，但 scale_up 有损害。
+
+DS7B color:
+  主要是 answer-lift route，并伴随 object side-effect risk。
+```
+
+这进一步修正了 Phase 861 的粗标签：
+
+```text
+late-layer two-channel negative-blocker
+```
+
+应改成：
+
+```text
+late-layer route gear
+  =
+  answer-lift component
+  +
+  blocker-weakening component
+  +
+  side-effect component
+```
+
+## Phase 865: Route Purity and Side-Effect Filter [2026-07-03 07:59]
+
+### 一、任务
+
+Phase 865 继续同一阶段，不重新测试模型，而是在 Phase 864 的路线分离基础上增加图谱净化层。
+
+目标：
+
+```text
+有 clear gain 的路线不一定能进入高置信干净图谱；
+必须过滤 object echo / format side-effect / harmful route。
+```
+
+脚本：
+
+```text
+tests/glm5/phase865_route_purity_and_side_effect_filter.py
+```
+
+结果：
+
+```text
+tests/result/phase865_route_purity_and_side_effect_filter/
+```
+
+### 二、路线纯度分类
+
+```text
+RoutePurity(g,d,m)
+  in
+  {
+    clean_mixed_answer_blocker_route,
+    clean_answer_lift_route,
+    object_side_effect_risk,
+    harmful_or_unstable,
+    inactive_or_weak
+  }
+```
+
+### 三、结果
+
+full-set 路线分类：
+
+```text
+clean_mixed_answer_blocker_route: 6
+clean_answer_lift_route: 1
+object_side_effect_risk: 2
+harmful_or_unstable: 2
+inactive_or_weak: 1
+```
+
+干净 mixed 路线：
+
+```text
+qwen3 material:
+  flip
+  half
+  zero
+
+DS7B animal:
+  flip
+  half
+  zero
+```
+
+干净 answer-lift 路线：
+
+```text
+DS7B color:
+  half
+```
+
+降档路线：
+
+```text
+DS7B color:
+  flip -> object_side_effect_risk
+  zero -> object_side_effect_risk
+
+DS7B animal:
+  scale_up -> harmful_or_unstable
+
+DS7B color:
+  scale_up -> harmful_or_unstable
+
+qwen3 material:
+  scale_up -> inactive_or_weak
+```
+
+### 四、理论进展
+
+Phase 865 证明：
+
+```text
+clear gain 不等于 clean route。
+```
+
+一个路线要进入较干净的高置信机制图谱，至少需要：
+
+```text
+1. clear gain > 0
+2. clear loss = 0
+3. answer delta > 0
+4. 如果是 mixed route：
+   blocker reduction > 0
+   original blocker delta < 0
+5. object delta 不超过风险阈值
+6. 不诱发 object echo / format side-effect
+```
+
+当前可写成：
+
+```text
+G_route
+  =
+  {
+    (g,d,m):
+    Delta C(g,d,m) > 0
+  }
+```
+
+但真正进入干净图谱的是：
+
+```text
+G_clean
+  =
+  {
+    (g,d,m) in G_route:
+    RoutePurity(g,d,m) in clean classes
+  }
+```
+
+### 五、问题和硬伤
+
+```text
+1. DS7B color 的 zero / flip 有 clear gain，但因 object side-effect 被降档。
+2. DS7B animal 的 scale_up 明确有害。
+3. qwen3 material 的 scale_up 不闭合，说明增强通道不是可靠方案。
+4. 当前净化层仍是基于短 rollout，不是 span closure。
+5. object_delta 阈值 0.25 是实用筛选阈值，还不是理论不变量。
+```
+
+### 六、小模型偏差
+
+Phase 865 进一步说明小模型可能把多条路线压缩到一个通道中：
+
+```text
+DS7B color 同时有 answer lift 和 object echo side-effect；
+这可能是小模型压缩后语义对象和答案类没有充分分离。
+```
+
+因此当前不能把 DS7B color 的强 gain 视为机制闭合。
+
+### 七、闭合距离
+
+当前进度：
+
+```text
+route separation:
+  初步完成。
+
+route purity filtering:
+  初步完成。
+
+clean mixed route candidate:
+  qwen3 material zero/flip/half；
+  DS7B animal zero/flip/half。
+
+clean answer-lift route:
+  DS7B color half。
+
+predictive equation:
+  未完成。
+
+cross-domain invariant:
+  未完成。
+
+span / long rollout closure:
+  未完成。
+```
+
+完整语言编码机制闭合进度谨慎评估为：
+
+```text
+23% - 31%
+```
+
+提升原因：
+
+```text
+已经把 Level 6 齿轮从“有效”进一步过滤为“干净有效”和“有副作用有效”。
+```
+
+不能更高的原因：
+
+```text
+仍没有预测方程；
+仍没有跨域不变量；
+仍没有长程生成闭合。
+```
+
+### 八、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，但应该进入预测方程，而不是继续扩大候选池：
+
+```text
+Phase 866:
+Clean Route Predictive Equation Fitting
+```
+
+核心任务：
+
+```text
+1. 只使用 clean_mixed_answer_blocker_route。
+2. 检查 answer_delta、blocker_reduction、blocker_delta、object_delta 与 clear gain 的关系。
+3. 建立最小经验判据，不使用复杂统计模型。
+4. 验证能否预测哪些干预会产生 clean gain。
+```
+
+阶段性结论：
+
+```text
+Phase 864 / 865 是实质推进：
+  它们把高置信齿轮进一步拆成路线类型，并过滤掉副作用路线。
+
+但仍不是语言编码机制闭合：
+  当前只是 route-level atlas purification；
+  没有形成全局预测公式；
+  没有跨域通用机制。
+```
+
+## Phase 866: Clean Route Predictive Equation Fitting [2026-07-03 08:03]
+
+### 一、任务
+
+本阶段读取 Phase 865 的路线纯度结果，不重新加载模型，不做新的神经网络推理，而是检查一个更收紧的问题：
+
+```text
+在已经完成路线净化后，
+能否用最小经验判据区分 clean_mixed_answer_blocker_route
+和 object / echo / format 副作用路线？
+```
+
+这一步属于全局齿轮图谱阶段，不是语言编码机制闭合阶段。
+
+### 二、输入数据
+
+输入文件：
+
+```text
+tests/result/phase865_route_purity_and_side_effect_filter/phase865_route_purity_rows.jsonl
+```
+
+输出文件：
+
+```text
+tests/result/phase866_clean_route_predictive_equation_fitting/phase866_summary.json
+tests/result/phase866_clean_route_predictive_equation_fitting/phase866_rule_details.jsonl
+tests/result/phase866_clean_route_predictive_equation_fitting/phase866_summary.md
+```
+
+测试脚本：
+
+```text
+tests/glm5/phase866_clean_route_predictive_equation_fitting.py
+```
+
+### 三、测试原理
+
+本阶段只比较基础判据，不使用复杂统计模型。
+
+测试了三条规则：
+
+```text
+answer_blocker_object_rule:
+  answer_delta > 0
+  blocker_reduction > 0
+  original_blocker_delta < 0
+  object_delta <= 0.25
+  object_echo_induced = 0
+  format_or_other_induced = 0
+
+answer_blocker_only_rule:
+  answer_delta > 0
+  blocker_reduction > 0
+  original_blocker_delta < 0
+
+answer_only_object_rule:
+  answer_delta > 0
+  object_delta <= 0.25
+  object_echo_induced = 0
+  format_or_other_induced = 0
+```
+
+目标标签为：
+
+```text
+clean_mixed_answer_blocker_route
+```
+
+也就是同时满足 answer lift 和 blocker weakening，且没有明显 object / echo / format 副作用的路线。
+
+### 四、核心公式
+
+当前样本内最小经验判据为：
+
+```text
+CleanMixedRoute(g,d,m)
+  =
+  [answer_delta(g,d,m) > 0]
+  and [blocker_reduction(g,d,m) > 0]
+  and [original_blocker_delta(g,d,m) < 0]
+  and [object_delta(g,d,m) <= 0.25]
+  and [object_echo_induced(g,d,m) = 0]
+  and [format_or_other_induced(g,d,m) = 0]
+```
+
+其中：
+
+```text
+answer_delta:
+  answer token 的 logit 改变量。
+
+blocker_reduction:
+  原始 blocker 被削弱的幅度。
+
+original_blocker_delta:
+  原始 blocker 的 logit 改变量，负值表示被削弱。
+
+object_delta:
+  object token 的 logit 改变量，用于检测 object echo side-effect。
+
+object_echo_induced:
+  是否诱发 object echo。
+
+format_or_other_induced:
+  是否诱发 format 或其他异常 blocker。
+```
+
+### 五、客观结果
+
+在 full_set 上：
+
+```text
+answer_blocker_object_rule:
+  TP=6, FP=0, FN=0, TN=6
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+
+answer_blocker_only_rule:
+  TP=6, FP=1, FN=0, TN=5
+  precision=0.857
+  recall=1.000
+  accuracy=0.917
+
+answer_only_object_rule:
+  TP=6, FP=1, FN=0, TN=5
+  precision=0.857
+  recall=1.000
+  accuracy=0.917
+```
+
+在 dominant_channel 上：
+
+```text
+answer_blocker_object_rule:
+  TP=6, FP=0, FN=0, TN=6
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+在 full_and_dominant 上：
+
+```text
+answer_blocker_object_rule:
+  TP=12, FP=0, FN=0, TN=12
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+
+answer_blocker_only_rule:
+  TP=12, FP=2, FN=0, TN=10
+  precision=0.857
+  recall=1.000
+  accuracy=0.917
+```
+
+### 六、结果分析
+
+这个结果支持 Phase 862-865 的收紧判断：
+
+```text
+单纯 answer lift 不够；
+单纯 blocker weakening 不够；
+必须同时加入 object / echo / format 副作用过滤。
+```
+
+也就是说，当前全局齿轮图谱的核心边不能只记录：
+
+```text
+clear gain edge
+```
+
+而应升级为：
+
+```text
+clean predictive edge
+```
+
+当前可写成：
+
+```text
+G_clean
+  =
+  {
+    (g,d,m):
+      CleanMixedRoute(g,d,m)
+  }
+```
+
+进入 clean mixed route 的仍然是：
+
+```text
+qwen3 material:
+  zero / flip / half
+
+DS7B animal:
+  zero / flip / half
+```
+
+DS7B color half 是 clean_answer_lift_route，不属于 clean_mixed_answer_blocker_route。
+
+DS7B color zero / flip 仍因 object side-effect 不能进入核心干净图谱。
+
+### 七、问题、硬伤和瓶颈
+
+```text
+1. 当前判据是样本内经验公式，不是跨域不变量。
+2. object_delta <= 0.25 是当前阶段的实用阈值，不是理论常数。
+3. 样本量仍然较小，只覆盖 Phase 862-865 形成的高置信路线。
+4. 该公式只解释 clean mixed answer-blocker route，
+   还不能解释 pure answer-lift route。
+5. 没有测试长程 rollout，因此不是 span closure。
+6. 没有在新 domain / object / prompt 上做 holdout，
+   因此不能说已经具有预测泛化能力。
+```
+
+### 八、小模型偏差
+
+当前模型是小模型，结构可能较粗糙。
+
+这会导致：
+
+```text
+1. answer route、object route、format route 被压缩到同一个通道附近。
+2. DS7B color 这种强 gain 可能同时包含 answer lift 和 object echo。
+3. clean / side-effect 的边界可能比大模型更混杂。
+4. 当前阈值可能是小模型局部几何产物，不能直接外推。
+```
+
+因此 Phase 866 的 1.000 结果只能视为当前数据内的强收紧，不能视为语言编码机制闭合。
+
+### 九、智能理论进展
+
+本阶段使理论从：
+
+```text
+某个齿轮是否有效
+```
+
+推进到：
+
+```text
+某条齿轮边是否干净、可预测、无副作用
+```
+
+这对智能理论很关键，因为语言生成不是只提高正确词元，而是在全词表竞争场中完成：
+
+```text
+answer 上升
++ blocker 下降
++ object / format / echo 不被错误诱发
+```
+
+更接近当前的第一性原理表述是：
+
+```text
+语言生成闭合
+  =
+  目标路线被激活
+  + 竞争路线被压制
+  + 副作用路线不被误开
+  + 这些条件在后续 token 中保持稳定
+```
+
+Phase 866 只完成了前三项中的局部单步判据，还没有完成后续 token 的稳定性。
+
+### 十、闭合距离
+
+当前阶段完成度谨慎评估：
+
+```text
+全局齿轮图谱：
+  31% - 38%
+
+语言编码机制闭合：
+  24% - 32%
+```
+
+相比 Phase 865 提升的原因：
+
+```text
+已经从 route purity filtering
+推进到 clean route predictive rule。
+```
+
+不能更高的原因：
+
+```text
+没有 holdout；
+没有跨域不变量；
+没有长程 rollout；
+没有覆盖 pure answer-lift route；
+没有形成完整生成闭合。
+```
+
+### 十一、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，应继续 Phase 866 的方向，而不是回到局部 patch 搜索。
+
+建议阶段：
+
+```text
+Phase 867:
+Clean Route Holdout Prediction
+```
+
+核心任务：
+
+```text
+1. 使用新的 domain / object / prompt。
+2. 固定 Phase 866 的 CleanMixedRoute 判据，不重新调阈值。
+3. 检查 qwen3、GLM4、DS7B 中是否仍能预测 clean gain。
+4. 若失败，记录失败来自 answer lift、blocker weakening、object echo、format side-effect 中哪一项。
+5. 不追求单次 patch 成功率，而追求图谱判据的可迁移性。
+```
+
+阶段性结论：
+
+```text
+Phase 866 是实质推进：
+  它把干净齿轮边从经验分类推进到最小预测判据。
+
+但仍不是闭合：
+  当前公式是样本内经验规则；
+  需要 holdout 和长程 rollout 才能判断是否接近语言编码机制。
+```
+
+## Phase 867: Clean Route Holdout Prediction [2026-07-03 08:12]
+
+### 一、任务
+
+本阶段继续 Phase 866 的同一阶段目标：
+
+```text
+检查 clean route 最小判据是否能迁移到新的 object 和 prompt。
+```
+
+本阶段进行了真实模型测试，按顺序依次运行：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+测试设置：
+
+```text
+bf16；
+不使用量化；
+flash_attention_2 优先，失败后回退 sdpa；
+一个模型完成并释放 GPU 后再测试下一个模型。
+```
+
+### 二、脚本和结果文件
+
+测试脚本：
+
+```text
+tests/glm5/phase867_clean_route_holdout_prediction.py
+tests/glm5/run_phase867_clean_route_holdout_prediction_round.sh
+```
+
+结果文件：
+
+```text
+tests/result/phase867_clean_route_holdout_prediction/holdout/phase867_qwen3_summary.json
+tests/result/phase867_clean_route_holdout_prediction/holdout/phase867_glm4_summary.json
+tests/result/phase867_clean_route_holdout_prediction/holdout/phase867_deepseek7b_summary.json
+tests/result/phase867_clean_route_holdout_prediction/holdout/phase867_cross_model_summary.json
+tests/result/phase867_clean_route_holdout_prediction/holdout/phase867_cross_model_summary.md
+```
+
+### 三、测试原理
+
+本阶段不重新搜索齿轮，不调整阈值。
+
+输入候选来自：
+
+```text
+Phase 865 full-set route purity rows
+```
+
+固定使用 Phase 866 的判据：
+
+```text
+CleanMixedRoute(g,d,m)
+  =
+  [answer_delta > 0]
+  and [blocker_reduction > 0]
+  and [original_blocker_delta < 0]
+  and [object_delta <= 0.25]
+  and [object_echo_induced = 0]
+  and [format_or_other_induced = 0]
+```
+
+但在 holdout 中额外要求：
+
+```text
+clear_rollout_gain > 0
+clear_rollout_loss = 0
+```
+
+否则不能视为 holdout clean。
+
+### 四、测试数据
+
+qwen3：
+
+```text
+material holdout:
+  stone
+  paper
+  cotton
+  rubber
+```
+
+DS7B：
+
+```text
+animal holdout:
+  horse
+  cow
+  lion
+  whale
+
+color holdout:
+  purple
+  orange
+  black
+  white
+```
+
+prompt：
+
+```text
+holdout_category_short
+holdout_kind_phrase
+holdout_label
+```
+
+GLM4：
+
+```text
+no_phase865_candidates
+```
+
+### 五、客观结果
+
+整体结果：
+
+```text
+n = 12
+source_clean_count = 6
+holdout_clean_count = 2
+TP = 0
+FP = 6
+FN = 2
+TN = 4
+precision = 0.000
+recall = 0.000
+accuracy = 0.333
+```
+
+qwen3 material：
+
+```text
+source clean:
+  zero
+  flip
+  half
+
+holdout clean:
+  none
+
+source_to_holdout:
+  TP=0
+  FP=3
+  FN=0
+  TN=1
+  accuracy=0.250
+```
+
+DS7B animal：
+
+```text
+source clean:
+  zero
+  flip
+  half
+
+holdout clean:
+  none
+```
+
+DS7B color：
+
+```text
+source clean_mixed:
+  none
+
+holdout clean_mixed:
+  half
+  zero
+```
+
+### 六、结果分析
+
+这是一个重要负结果：
+
+```text
+Phase 866 的样本内 clean route 判据不能直接迁移到新 object / prompt。
+```
+
+更准确地说：
+
+```text
+source clean gear
+  不等于
+holdout clean gear
+```
+
+尤其是：
+
+```text
+qwen3 material 的 source clean zero / flip / half 在 holdout 中全部失败。
+DS7B animal 的 source clean zero / flip / half 在 holdout 中全部失败。
+DS7B color 的非 clean 来源路线在 holdout 中反而出现 clean_mixed。
+```
+
+这说明路线纯度不是齿轮自身的固定属性，而是条件化属性。
+
+### 七、理论修正
+
+Phase 867 后，理论中不能再写成：
+
+```text
+RoutePurity(g,d,m)
+```
+
+而应写成：
+
+```text
+RoutePurity(g,d,m | x)
+```
+
+其中：
+
+```text
+x = object + prompt + blocker field
+```
+
+也就是说：
+
+```text
+同一个齿轮组合，
+在不同 object / prompt / blocker field 下，
+可能从 clean 变成 non-clean，
+也可能从 non-clean 变成 clean。
+```
+
+### 八、小模型偏差
+
+本阶段进一步暴露小模型粗糙结构的影响：
+
+```text
+1. 小模型中的 route boundary 可能非常窄。
+2. 齿轮在 seen object 上有效，不代表在 holdout object 上有效。
+3. DS7B color 的 emergent clean 说明 route purity 可能随 prompt/object 快速切换。
+4. 小模型可能把 answer、object、format、blocker 多条路线压缩在相邻通道或同一通道组内。
+```
+
+因此不能把当前局部 clean 边当成全局语言编码机制。
+
+### 九、闭合距离
+
+Phase 867 使闭合评估下调：
+
+```text
+全局齿轮图谱：
+  30% - 36%
+
+语言编码机制闭合：
+  22% - 29%
+```
+
+下调原因：
+
+```text
+clean route 判据没有通过 holdout；
+source clean 不能直接迁移；
+路线纯度必须条件化。
+```
+
+### 十、阶段结论
+
+```text
+Phase 867 是重要负结果：
+  它排除了“样本内 clean route = 稳定可迁移 clean route”的过强假设。
+
+它没有推翻前面的图谱价值：
+  Phase 862-866 仍然有效地完成了局部路线拆分和样本内净化。
+
+但它说明下一步必须研究：
+  blocker field 的条件化门控。
+```
+
+## Phase 868: Conditional Route Transfer Failure Taxonomy [2026-07-03 08:12]
+
+### 一、任务
+
+本阶段不重新跑模型，只读取 Phase 867 holdout 结果，对迁移失败进行分类。
+
+目标：
+
+```text
+把 Phase 867 的负结果拆成具体失败原因，
+判断 clean route 迁移失败主要卡在哪个条件。
+```
+
+### 二、脚本和结果文件
+
+脚本：
+
+```text
+tests/glm5/phase868_conditional_route_transfer_failure_taxonomy.py
+```
+
+结果：
+
+```text
+tests/result/phase868_conditional_route_transfer_failure_taxonomy/holdout/phase868_summary.json
+tests/result/phase868_conditional_route_transfer_failure_taxonomy/holdout/phase868_rows.jsonl
+tests/result/phase868_conditional_route_transfer_failure_taxonomy/holdout/phase868_summary.md
+```
+
+### 三、分类标准
+
+迁移状态：
+
+```text
+stable_clean:
+  source clean and holdout clean
+
+source_clean_failed:
+  source clean but holdout not clean
+
+emergent_clean:
+  source not clean but holdout clean
+
+stable_nonclean:
+  source not clean and holdout not clean
+```
+
+失败原因：
+
+```text
+no_clear_gain
+clear_loss
+answer_not_lifted
+blocker_not_reduced
+original_blocker_not_negative
+object_side_effect
+format_or_other_side_effect
+```
+
+### 四、客观结果
+
+迁移状态：
+
+```text
+n_rows = 12
+
+source_clean_failed = 6
+stable_nonclean = 4
+emergent_clean = 2
+stable_clean = 0
+```
+
+失败原因：
+
+```text
+original_blocker_not_negative = 8
+no_clear_gain = 6
+answer_not_lifted = 3
+blocker_not_reduced = 3
+clear_loss = 2
+format_or_other_side_effect = 2
+```
+
+按模型/领域：
+
+```text
+qwen3:material:
+  source_clean_failed = 3
+  stable_nonclean = 1
+  main reasons:
+    original_blocker_not_negative = 3
+    no_clear_gain = 3
+
+DS7B:animal:
+  source_clean_failed = 3
+  stable_nonclean = 1
+  main reasons:
+    original_blocker_not_negative = 4
+    no_clear_gain = 2
+
+DS7B:color:
+  emergent_clean = 2
+  stable_nonclean = 2
+```
+
+### 五、关键结论
+
+最重要的失败点不是 object side-effect，而是：
+
+```text
+original_blocker_not_negative
+```
+
+这说明：
+
+```text
+blocker weakening route
+  不是齿轮本身的固定方向；
+  它依赖当前 blocker field。
+```
+
+也就是说，Phase 862-866 中的 clean 路线，在新条件下失效，主要是因为：
+
+```text
+原始 blocker 的身份、强度、角色或 logit 位置发生变化；
+同一个齿轮不再稳定削弱这些 blocker。
+```
+
+### 六、理论公式修正
+
+Phase 868 后，公式应从：
+
+```text
+CleanMixedRoute(g,d,m)
+```
+
+升级为：
+
+```text
+CleanMixedRoute(g,d,m | x)
+  =
+  AnswerLift(g,d,m | x)
+  and BlockerWeakening(g,d,m | x)
+  and NoSideEffect(g,d,m | x)
+  and OutputGain(g,d,m | x)
+```
+
+其中：
+
+```text
+x = object + prompt + blocker field
+```
+
+更具体地说：
+
+```text
+BlockerWeakening(g,d,m | x)
+  =
+  OriginalBlockerDelta(g,d,m | B_x) < 0
+```
+
+而：
+
+```text
+B_x
+  =
+  {
+    token_id,
+    role,
+    rank,
+    logit,
+    relation_to_answer,
+    relation_to_object
+  }
+```
+
+### 七、问题和硬伤
+
+```text
+1. Phase 868 只是离线分类，没有新因果干预。
+2. blocker field 还没有被系统编码，只是通过失败原因间接暴露。
+3. 当前没有建立 blocker field -> clean route 的预测公式。
+4. holdout 样本仍然不大。
+5. GLM4 没有可进入 Phase865 的候选，因此无法提供对照闭合。
+```
+
+### 八、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段，但研究对象必须从 gear 本身转向 blocker field：
+
+```text
+Phase 869:
+Blocker Field Conditional Gate Audit
+```
+
+核心任务：
+
+```text
+1. 对每个 case 的原始 blocker field 建立基础描述。
+2. 记录 blocker 的 token、role、rank、logit、是否 object / format / semantic competitor。
+3. 检查 source clean 失败是否可由 blocker field 形状预测。
+4. 检查 emergent clean 是否来自 blocker field 更适合该 gear。
+5. 不再只按 gear_key 判断路线，而按 gear_key + blocker_field 判断路线。
+```
+
+阶段性结论：
+
+```text
+Phase 867 / 868 是实质推进：
+  它们把 clean route 从固定齿轮属性改写为条件化齿轮-竞争场属性。
+
+但仍不是闭合：
+  blocker field 的数学结构还没有完成；
+  生成闭合还没有跨 token 验证。
+```
+
+## Phase 869: Blocker Field Conditional Gate Audit [2026-07-03 08:12]
+
+### 一、任务
+
+本阶段继续 Phase 867 / 868 的结论，不重新跑模型，只读取：
+
+```text
+Phase 867 original rows
+Phase 868 transfer taxonomy
+```
+
+目标是把迁移失败从：
+
+```text
+gear 不稳定
+```
+
+进一步拆成：
+
+```text
+gear 在什么 blocker field 下不稳定
+```
+
+这一步仍属于全局齿轮图谱阶段，不是语言编码机制闭合。
+
+### 二、脚本和结果文件
+
+脚本：
+
+```text
+tests/glm5/phase869_blocker_field_conditional_gate_audit.py
+```
+
+结果：
+
+```text
+tests/result/phase869_blocker_field_conditional_gate_audit/holdout/phase869_summary.json
+tests/result/phase869_blocker_field_conditional_gate_audit/holdout/phase869_model_domain_rows.jsonl
+tests/result/phase869_blocker_field_conditional_gate_audit/holdout/phase869_summary.md
+```
+
+### 三、测试原理
+
+对每个 model-domain 的原始竞争场统计：
+
+```text
+class_blocker_count
+clear_class_blocker_count
+class_minus_object_logit
+object_rank
+top1 blocker role
+top10 blocker role distribution
+transfer_status_counts
+transfer_failure_reasons
+```
+
+这个阶段不使用复杂统计学，只做基础分布审计。
+
+### 四、客观结果
+
+qwen3 material：
+
+```text
+n_contexts = 12
+mean_class_blocker_count = 58.33
+mean_clear_class_blocker_count = 58.33
+mean_class_minus_object_logit = -1.70
+mean_object_rank = 14.08
+
+top10_role_per_context:
+  format_punct = 2.92
+  format_space = 2.33
+  other_blocker = 1.17
+  object_echo = 1.00
+  protocol_word = 0.58
+
+field_profile:
+  high_blocker_count
+  object_above_class
+  format_pressure
+  object_echo_pressure
+  semantic_other_pressure
+
+transfer:
+  source_clean_failed = 3
+  stable_nonclean = 1
+```
+
+DS7B animal：
+
+```text
+n_contexts = 12
+mean_class_blocker_count = 5.17
+mean_clear_class_blocker_count = 5.17
+mean_class_minus_object_logit = 3.26
+mean_object_rank = 38.67
+
+top10_role_per_context:
+  other_blocker = 1.08
+  format_punct = 0.83
+  protocol_word = 0.75
+  format_space = 0.50
+  object_echo = 0.17
+
+field_profile:
+  semantic_other_pressure
+
+transfer:
+  source_clean_failed = 3
+  stable_nonclean = 1
+```
+
+DS7B color：
+
+```text
+n_contexts = 12
+mean_class_blocker_count = 17.50
+mean_clear_class_blocker_count = 17.50
+mean_class_minus_object_logit = 1.94
+mean_object_rank = 37.33
+
+top10_role_per_context:
+  format_punct = 1.50
+  other_blocker = 1.42
+  protocol_word = 0.67
+  format_space = 0.58
+  object_echo = 0.50
+
+field_profile:
+  format_pressure
+  semantic_other_pressure
+
+transfer:
+  stable_nonclean = 2
+  emergent_clean = 2
+```
+
+### 五、结果分析
+
+Phase 869 显示，Phase 867 的 holdout 失败不是一种统一失败。
+
+qwen3 material：
+
+```text
+原始 blocker field 很重；
+class 被 object 压住；
+format / object / semantic pressure 同时存在；
+因此 source clean 很难迁移。
+```
+
+DS7B animal：
+
+```text
+blocker 数量不高；
+object 也没有压过 class；
+但 original blocker direction 仍然不稳定；
+说明失败可能来自 blocker 身份变化，而不是 blocker 总量。
+```
+
+DS7B color：
+
+```text
+field 压力中等；
+format + semantic pressure 混合；
+出现 emergent clean，说明 source side-effect risk 在新 blocker field 中可能消失。
+```
+
+### 六、理论公式
+
+Phase 869 后，图谱边应从：
+
+```text
+CleanMixedRoute(g,d,m | x)
+```
+
+进一步写成：
+
+```text
+EdgeClean(g,d,m,x)
+  =
+  GearEffect(g,d,m,x)
+  and FieldAdmissible(B_x)
+```
+
+其中：
+
+```text
+FieldAdmissible(B_x)
+  =
+  not TooManyBlockers(B_x)
+  and not ObjectDominatesClass(B_x)
+  and not FormatDominates(B_x)
+  and ReducibleOriginalBlockers(B_x,g,m)
+```
+
+当前这仍是经验框架，不是最终数学定律。
+
+### 七、问题和硬伤
+
+```text
+1. Phase 869 只是 blocker field 的描述性审计。
+2. FieldAdmissible 还没有形成可验证判据。
+3. DS7B animal 的失败不能只由 blocker_count 解释。
+4. qwen3 material 的高 blocker_count 可能与 prompt 模板强相关。
+5. 当前还没有跨 token rollout 的稳定性测试。
+```
+
+### 八、智能理论进展
+
+本阶段对智能理论的关键推进是：
+
+```text
+语言生成不是 gear 单独决定；
+也不是 blocker 单独决定；
+而是 gear 与当前竞争场共同决定。
+```
+
+这更接近真实语言编码机制：
+
+```text
+生成状态
+  =
+  当前语义/协议/对象输入形成的竞争场
+  +
+  可被该竞争场激活或抑制的齿轮路线
+```
+
+因此，破解语言编码机制的下一步不是继续找更多局部齿轮，而是建立：
+
+```text
+blocker field -> gear route admissibility
+```
+
+的基础映射。
+
+### 九、闭合距离
+
+当前进度谨慎评估：
+
+```text
+全局齿轮图谱：
+  32% - 39%
+
+语言编码机制闭合：
+  23% - 30%
+```
+
+相比 Phase 868 略有回升的原因：
+
+```text
+已经开始显式刻画 blocker field；
+不再只停留在 gear transfer failure。
+```
+
+不能更高的原因：
+
+```text
+FieldAdmissible 没有形成稳定判据；
+没有验证 blocker field 能否预测 clean route；
+没有完成长程生成闭合。
+```
+
+### 十、下一阶段
+
+下一阶段仍属于全局齿轮图谱阶段：
+
+```text
+Phase 870:
+Blocker Field Admissibility Rule
+```
+
+核心任务：
+
+```text
+1. 用 Phase 867-869 的数据建立 FieldAdmissible 的最小经验判据。
+2. 不训练复杂模型。
+3. 检查 high_blocker_count、object_above_class、format_pressure 是否能解释 source_clean_failed。
+4. 检查 DS7B color emergent_clean 是否对应更可化解的 blocker field。
+5. 如果判据失败，记录失败类型，而不是继续局部 patch。
+```
+
+阶段性结论：
+
+```text
+Phase 869 是实质推进：
+  它把全局齿轮图谱从 gear atlas 推进到 conditional gear-field atlas。
+
+但仍不是闭合：
+  当前只是发现 blocker field 是关键条件；
+  还没有破解 blocker field 的可准入规则。
+```
+
+## Phase 870: Blocker Field Admissibility Rule [2026-07-03 08:44]
+
+### 一、任务
+
+本阶段继续 Phase 869 的方向，把 blocker field 从 model-domain 级摘要推进到单样本级规则审计。
+
+任务：
+
+```text
+建立 blocker field admissibility 的最小经验判据，
+检查它是否能解释 clean transition。
+```
+
+本阶段不重新跑模型，读取 Phase 867 paired original/intervened rows。
+
+### 二、脚本和结果文件
+
+脚本：
+
+```text
+tests/glm5/phase870_blocker_field_admissibility_rule.py
+```
+
+结果：
+
+```text
+tests/result/phase870_blocker_field_admissibility_rule/holdout/phase870_summary.json
+tests/result/phase870_blocker_field_admissibility_rule/holdout/phase870_pair_rows.jsonl
+tests/result/phase870_blocker_field_admissibility_rule/holdout/phase870_summary.md
+```
+
+### 三、测试原理
+
+把每条候选干预拆成单样本级：
+
+```text
+model + domain + object + prompt + candidate mode
+```
+
+共：
+
+```text
+n = 144
+```
+
+记录：
+
+```text
+field_class_blocker_count
+field_class_minus_object_logit
+field_format_pressure
+field_object_echo_pressure
+field_semantic_other_pressure
+answer_delta
+blocker_reduction
+original_blocker_delta
+object_delta
+clear_gain / clear_loss
+```
+
+### 四、规则
+
+Phase 870 的基础 field rule：
+
+```text
+field_base_admissible
+  =
+  blocker_count < 20
+  and class_minus_object_logit >= 0
+  and format_pressure < 3
+```
+
+严格 field rule：
+
+```text
+field_strict_admissible
+  =
+  field_base_admissible
+  and semantic_other_pressure = 0
+```
+
+最终样本内规则：
+
+```text
+field_strict_plus_effect_rule
+  =
+  field_strict_admissible
+  and answer_delta > 0
+  and blocker_reduction > 0
+  and original_blocker_delta < 0
+  and object_delta <= 0.25
+  and object_echo_induced = 0
+  and format_or_other_induced = 0
+```
+
+### 五、客观结果
+
+在 Phase 867 holdout rows 内：
+
+```text
+source_predict_clean_mixed:
+  TP=1, FP=71, FN=3, TN=69
+  precision=0.014
+  recall=0.250
+  accuracy=0.486
+
+phase866_pair_rule:
+  TP=4, FP=16, FN=0, TN=124
+  precision=0.200
+  recall=1.000
+  accuracy=0.889
+
+field_plus_effect_rule:
+  TP=4, FP=1, FN=0, TN=139
+  precision=0.800
+  recall=1.000
+  accuracy=0.993
+
+field_strict_plus_effect_rule:
+  TP=4, FP=0, FN=0, TN=140
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+真实 clean transition：
+
+```text
+qwen3 material:
+  rubber + holdout_kind_phrase + flip
+
+DS7B color:
+  purple + holdout_category_short + flip
+  purple + holdout_category_short + half
+  purple + holdout_category_short + zero
+```
+
+共同特征：
+
+```text
+field_low_pressure
+answer_delta > 0
+blocker_reduction > 0
+original_blocker_delta < 0
+```
+
+### 六、结果分析
+
+Phase 870 是强正结果，但只能限定为样本内：
+
+```text
+FieldAdmissible 显著减少误报。
+```
+
+从 Phase 866 到 Phase 870：
+
+```text
+FP:
+  16 -> 0
+```
+
+但这个结果来自同一批 Phase 867 rows，因此不能当成跨数据规律。
+
+### 七、问题和硬伤
+
+```text
+1. 样本内规则可能过拟合。
+2. blocker_count < 20、format_pressure < 3 是经验阈值。
+3. semantic_other_pressure = 0 可能只是当前样本的边界。
+4. 还没有外部 validation。
+```
+
+### 八、阶段结论
+
+```text
+Phase 870 证明：
+  blocker field 对 clean route 有强解释力。
+
+但 Phase 870 没有证明：
+  FieldAdmissible 是稳定充分条件。
+```
+
+因此必须进入外部验证。
+
+## Phase 871: Field Admissibility External Validation [2026-07-03 08:44]
+
+### 一、任务
+
+本阶段对 Phase 870 的样本内规则做外部验证。
+
+使用新的 object 和 prompt，重新依次运行：
+
+```text
+qwen3
+GLM4
+DS7B
+```
+
+设置：
+
+```text
+bf16
+quantization off
+flash_attention_2 first, sdpa fallback
+sequential model loading
+```
+
+### 二、脚本和结果文件
+
+模型测试脚本：
+
+```text
+tests/glm5/phase871_field_admissibility_external_validation.py
+tests/glm5/run_phase871_field_admissibility_external_validation_round.sh
+```
+
+外部验证结果：
+
+```text
+tests/result/phase871_field_admissibility_external_validation/validation/phase871_cross_model_summary.json
+tests/result/phase871_field_admissibility_external_validation/validation/phase871_qwen3_summary.json
+tests/result/phase871_field_admissibility_external_validation/validation/phase871_deepseek7b_summary.json
+tests/result/phase871_field_admissibility_external_validation/validation/phase871_glm4_summary.json
+```
+
+规则评分结果：
+
+```text
+tests/result/phase870_blocker_field_admissibility_rule/validation_phase871/phase870_summary.json
+tests/result/phase870_blocker_field_admissibility_rule/validation_phase871/phase870_pair_rows.jsonl
+tests/result/phase870_blocker_field_admissibility_rule/validation_phase871/phase870_summary.md
+```
+
+### 三、外部验证数据
+
+新对象：
+
+```text
+material:
+  ceramic
+  leather
+  silk
+  concrete
+
+animal:
+  elephant
+  rabbit
+  shark
+  eagle
+
+color:
+  cyan
+  magenta
+  brown
+  gray
+```
+
+新 prompt：
+
+```text
+validation_direct
+validation_question
+validation_table
+```
+
+### 四、aggregate 结果
+
+candidate aggregate 层：
+
+```text
+n = 12
+source_clean_count = 6
+holdout_clean_count = 0
+TP = 0
+FP = 6
+FN = 0
+TN = 6
+precision = 0.000
+recall = 0.000
+accuracy = 0.500
+```
+
+qwen3 material：
+
+```text
+source clean:
+  zero / flip / half
+
+validation clean:
+  none
+```
+
+DS7B animal：
+
+```text
+source clean:
+  zero / flip / half
+
+validation clean:
+  none
+```
+
+DS7B color：
+
+```text
+aggregate validation clean:
+  none
+```
+
+GLM4：
+
+```text
+no_phase865_candidates
+```
+
+### 五、单样本规则外部验证
+
+在 Phase 871 validation rows 上：
+
+```text
+phase866_pair_rule:
+  TP=1, FP=11, FN=0, TN=132
+  precision=0.083
+  recall=1.000
+  accuracy=0.924
+
+field_plus_effect_rule:
+  TP=1, FP=1, FN=0, TN=142
+  precision=0.500
+  recall=1.000
+  accuracy=0.993
+
+field_strict_plus_effect_rule:
+  TP=1, FP=1, FN=0, TN=142
+  precision=0.500
+  recall=1.000
+  accuracy=0.993
+```
+
+FieldAdmissible 仍显著降低误报：
+
+```text
+FP:
+  11 -> 1
+```
+
+但不再完美：
+
+```text
+precision:
+  1.000 -> 0.500
+```
+
+### 六、关键样本对比
+
+真阳性：
+
+```text
+DS7B color:
+  cyan + validation_direct + flip
+
+field:
+  field_low_pressure
+
+effect:
+  answer_delta = 2.1875
+  blocker_reduction = 1.0
+  original_blocker_delta = -0.0625
+
+rollout:
+  other -> strict_canonical
+```
+
+误报：
+
+```text
+qwen3 material:
+  concrete + validation_direct + flip
+
+field:
+  field_low_pressure
+
+effect:
+  answer_delta = 0.625
+  blocker_reduction = 2.0
+  original_blocker_delta = -0.0625
+
+rollout:
+  other -> other
+```
+
+这说明：
+
+```text
+FieldAdmissible + GearEffect
+  仍不足以保证输出转入 strict_canonical。
+```
+
+### 七、理论公式更新
+
+Phase 869 / 870 的公式是：
+
+```text
+EdgeClean(g,d,m,x)
+  =
+  GearEffect(g,d,m,x)
+  and FieldAdmissible(B_x)
+```
+
+Phase 871 后必须升级为：
+
+```text
+EdgeClean(g,d,m,x)
+  =
+  FieldAdmissible(B_x)
+  and GearEffect(g,d,m,x)
+  and OutputGateOpen(g,d,m,x)
+```
+
+新增缺失项：
+
+```text
+OutputGateOpen(g,d,m,x)
+```
+
+### 八、小模型偏差
+
+Phase 871 进一步说明：
+
+```text
+1. 小模型中 field_low_pressure 也不保证输出切换。
+2. qwen3 material 和 DS7B color 的 low-pressure field 行为不同。
+3. 这可能来自小模型内部 route/readout 压缩。
+4. 也可能来自 answer token 与 canonical output token 的映射差异。
+```
+
+因此当前结论仍限定为：
+
+```text
+small-model conditional gear-field atlas
+```
+
+### 九、闭合距离
+
+Phase 871 后，进度谨慎评估：
+
+```text
+全局齿轮图谱：
+  33% - 40%
+
+语言编码机制闭合：
+  23% - 30%
+```
+
+图谱进度略升，因为：
+
+```text
+FieldAdmissible 被外部验证为有效的误报压缩器。
+```
+
+闭合进度不能升高，因为：
+
+```text
+FieldAdmissible 不是充分条件；
+OutputGateOpen 尚未建模；
+aggregate holdout clean 仍为 0。
+```
+
+### 十、下一阶段
+
+下一阶段不应继续调 FieldAdmissible 阈值，而应进入：
+
+```text
+Phase 872:
+Output Gate / Readout Transition Audit
+```
+
+核心任务：
+
+```text
+1. 比较 qwen3 concrete 误报与 DS7B cyan 真阳性。
+2. 二者都满足 field_low_pressure + positive GearEffect。
+3. 差别在 rollout 是否 other -> strict_canonical。
+4. 需要找出 OutputGateOpen 的可观测条件。
+```
+
+阶段性结论：
+
+```text
+Phase 870 是样本内强正结果；
+Phase 871 是外部验证收紧。
+
+当前最新结论：
+  FieldAdmissible 是必要的误报压缩条件，
+  但不是 EdgeClean 的充分条件。
+
+下一块拼图：
+  output/readout transition gate。
+```
+
+## Phase 872: Output Gate / Readout Transition Audit [2026-07-03 09:27]
+
+### 一、任务
+
+本阶段接续 Phase 870 / 871 的收紧结果。
+
+Phase 871 已经证明：
+
+```text
+FieldAdmissible + GearEffect
+```
+
+不是 clean transition 的充分条件。
+
+因此本阶段不继续调整 blocker field 阈值，而是审计：
+
+```text
+OutputGateOpen
+```
+
+也就是：
+
+```text
+为什么同样 field_low_pressure + positive GearEffect，
+有的样本进入 strict_canonical，
+有的样本仍停留在 other？
+```
+
+### 二、脚本与数据
+
+新增脚本：
+
+```text
+tests/glm5/phase872_output_gate_readout_transition_audit.py
+```
+
+本阶段没有重新跑模型，使用已有结果做离线审计：
+
+```text
+tests/result/phase867_clean_route_holdout_prediction/holdout
+tests/result/phase871_field_admissibility_external_validation/validation
+```
+
+输出结果：
+
+```text
+tests/result/phase872_output_gate_readout_transition_audit/holdout_phase867/
+tests/result/phase872_output_gate_readout_transition_audit/validation_phase871/
+```
+
+### 三、测试原理
+
+本阶段把 output/readout gate 拆成第一步全词表竞争条件。
+
+最小输出状态门定义为：
+
+```text
+OutputGateRaw(x')
+  =
+  Top1Role(y_1) in {strict_target, answer_class}
+  and
+  Logit(best_target) > Logit(best_non_target)
+```
+
+其中：
+
+```text
+x' = T_g(x)
+```
+
+表示施加齿轮干预后的状态。
+
+这个判据比：
+
+```text
+target rank = 1
+blocker count = 0
+```
+
+更严格，因为它要求 target token 真正在全词表 top1 竞争中压过 format / object / other token。
+
+### 四、关键对比
+
+Phase 871 的误报：
+
+```text
+qwen3 material concrete + validation_direct + flip
+
+field:
+  field_low_pressure
+
+effect:
+  answer_delta = 0.625
+  blocker_reduction = 2.0
+  original_blocker_delta = -0.0625
+
+readout:
+  target rank = 1
+  blocker count = 0
+  top1 role = format_space
+  target margin vs non-target = 0.0
+
+rollout:
+  other -> other
+```
+
+Phase 871 的真阳性：
+
+```text
+DS7B color cyan + validation_direct + flip
+
+field:
+  field_low_pressure
+
+effect:
+  answer_delta = 2.1875
+  blocker_reduction = 1.0
+  original_blocker_delta = -0.0625
+
+readout:
+  top1 role = strict_target
+  target margin vs non-target = 1.1875
+
+rollout:
+  other -> strict_canonical
+```
+
+这说明：
+
+```text
+rank=1 仍不足够；
+必须看 target 是否真正压过非目标 token。
+```
+
+### 五、Phase 872 结果
+
+Phase 867 holdout：
+
+```text
+output_gate_raw_rule -> intervened_rollout_clear_answer_class
+  TP=49, FP=0, FN=0, TN=95
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+Phase 871 validation：
+
+```text
+output_gate_raw_rule -> intervened_rollout_clear_answer_class
+  TP=53, FP=0, FN=0, TN=91
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+但对 clean transition：
+
+```text
+output_gate_raw_rule -> target_clean_transition
+  Phase 871:
+    TP=1, FP=52, FN=0, TN=91
+    precision=0.019
+    recall=1.000
+```
+
+### 六、解释
+
+这个结果非常重要：
+
+```text
+OutputGateRaw 稳定预测 answer-class 输出状态；
+但它不预测 clean causal transition。
+```
+
+原因是：
+
+```text
+很多样本已经处于 answer-class 输出状态，
+并不是当前齿轮干预把它们从 other 推到 answer-class。
+```
+
+因此必须区分：
+
+```text
+OutputStateOpen:
+  输出状态是否已经打开。
+
+StateTransition:
+  是否由当前干预导致状态切换。
+
+CleanCausalEdge:
+  是否存在干净因果边。
+```
+
+### 七、公式修正
+
+Phase 871 公式为：
+
+```text
+EdgeClean(g,d,m,x)
+  =
+  FieldAdmissible(B_x)
+  and GearEffect(g,d,m,x)
+  and OutputGateOpen(g,d,m,x)
+```
+
+Phase 872 后必须拆为：
+
+```text
+OutputStateOpen(x')
+  =
+  TargetTop1(x')
+  and TargetBeatsNonTarget(x')
+```
+
+```text
+StateTransition(x,x')
+  =
+  not OutputStateOpen(x)
+  and OutputStateOpen(x')
+```
+
+```text
+CleanCausalEdge(g,d,m,x)
+  =
+  FieldAdmissible(B_x)
+  and GearEffect(g,d,m,x)
+  and OutputStateOpen(T_g(x))
+  and StateTransition(x,T_g(x))
+  and NoSideEffect(x,T_g(x))
+```
+
+这一步把之前混在一起的三件事拆开：
+
+```text
+输出是否正确；
+输出是否由干预导致改变；
+因果路线是否干净。
+```
+
+### 八、谨慎结论
+
+Phase 872 是实质进展，但不是闭合。
+
+它说明：
+
+```text
+读出状态门可以通过第一步全词表竞争清楚观测；
+但语言编码机制闭合还需要解释：
+为什么某些齿轮能打开这个门，
+以及为什么某些输出状态已经打开但不是因果转移。
+```
+
+## Phase 873: Output Gate External Replication [2026-07-03 09:27]
+
+### 一、任务
+
+Phase 872 的 OutputGateRaw 结果非常强，但仍可能是 Phase 867 / 871 数据偶然成立。
+
+因此本阶段新增对象与提示，进行外部复验。
+
+新增脚本：
+
+```text
+tests/glm5/phase873_output_gate_external_replication.py
+tests/glm5/run_phase873_output_gate_external_replication_round.sh
+```
+
+### 二、模型测试
+
+运行命令：
+
+```text
+bash tests/glm5/run_phase873_output_gate_external_replication_round.sh replication 6 replication_direct,replication_sentence,replication_form 1
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+运行设置：
+
+```text
+bf16
+quantization = off
+flash_attention_2 attempted
+sdpa fallback
+```
+
+flash 回退原因：
+
+```text
+flash_attn package is not installed
+```
+
+模型结果：
+
+```text
+qwen3:
+  status=complete
+  rows=90
+  domain=material
+
+GLM4:
+  status=no_phase865_candidates
+
+DS7B:
+  status=complete
+  rows=180
+  domains=animal,color
+```
+
+### 三、新增数据
+
+新增对象：
+
+```text
+material:
+  glass, steel, wool, clay, plastic, sand
+
+animal:
+  tiger, dolphin, sparrow, turtle, goat, bear
+
+color:
+  red, green, yellow, pink, silver, beige
+```
+
+新增提示：
+
+```text
+replication_direct
+replication_sentence
+replication_form
+```
+
+结果目录：
+
+```text
+tests/result/phase873_output_gate_external_replication/replication/
+```
+
+### 四、聚合层结果
+
+Phase 873 cross-model aggregate：
+
+```text
+n=12
+TP=0
+FP=6
+FN=1
+TN=5
+precision=0.000
+recall=0.000
+accuracy=0.417
+source_clean_count=6
+holdout_clean_count=1
+```
+
+这再次证明：
+
+```text
+source clean 不能直接迁移。
+```
+
+并且新增一个重要现象：
+
+```text
+存在 source_nonclean -> holdout_clean 的情况。
+```
+
+### 五、Phase 870 / 872 规则复验
+
+先把 Phase 870 规则套到 Phase 873 数据：
+
+```text
+field_strict_plus_effect_rule -> target_clean_transition
+  TP=0, FP=0, FN=0, TN=216
+```
+
+本轮没有任何样本同时满足严格场准入与 clean gear effect。
+
+再用 Phase 872 输出门规则：
+
+```text
+output_gate_raw_rule -> intervened_rollout_clear_answer_class
+  TP=68
+  FP=0
+  FN=0
+  TN=148
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+strict canonical 更难：
+
+```text
+output_gate_raw_rule -> intervened_rollout_strict_canonical
+  TP=44
+  FP=24
+  FN=0
+  TN=148
+  precision=0.647
+  recall=1.000
+  accuracy=0.889
+```
+
+说明：
+
+```text
+OutputGateRaw 对 answer-class 输出状态稳定；
+但 strict-canonical 还受格式、别名、单复数、协议表达影响。
+```
+
+### 六、关键样本
+
+Phase 873 出现两个 output clean transition：
+
+```text
+DS7B animal goat + replication_direct + flip
+  object_echo -> strict_canonical
+  top1 role = strict_target
+  target margin vs non-target = 0.625
+
+DS7B color red + replication_direct + flip
+  other -> strict_canonical
+  top1 role = strict_target
+  target margin vs non-target = 0.3125
+```
+
+但它们不满足当前严格 clean-route 条件。
+
+例如：
+
+```text
+goat:
+  field_tags = object_dominates_class + object_echo_pressure
+  original_blocker_delta = 0.125
+
+red:
+  field_tags = semantic_other_pressure
+  original_blocker_delta = 0.0625
+```
+
+这说明：
+
+```text
+strict output transition 可以发生在当前 CleanCausalEdge 公式之外。
+```
+
+### 七、理论进展
+
+Phase 873 对理论的最大修正是：
+
+```text
+OutputStateOpen 不是 CleanCausalEdge 的充分证据；
+CleanCausalEdge 也不是所有 strict output transition 的必要条件。
+```
+
+因此当前图谱至少要拆为三层：
+
+```text
+1. 输出状态层：
+   OutputStateOpen
+
+2. 状态转移层：
+   StateTransition
+
+3. 干净因果边层：
+   CleanCausalEdge
+```
+
+### 八、硬伤和边界
+
+当前仍有几个硬伤：
+
+```text
+1. OutputGateRaw 使用的是第一步 logits，
+   它解释读出状态，但不是深层因果来源。
+
+2. strict canonical 与 answer-class closure 不是同一个目标。
+
+3. Phase 873 的 field_strict_plus_effect 没有正例，
+   所以无法在新增数据中验证 CleanCausalEdge 充分性。
+
+4. GLM4 仍没有 Phase865 候选，跨模型完整性不足。
+
+5. 当前模型仍是小模型，route/readout 可能被压缩，
+   输出门和因果路线可能比大模型更纠缠。
+```
+
+### 九、当前进度
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  35% - 42%
+
+语言编码机制闭合：
+  24% - 31%
+```
+
+图谱进度略升，因为：
+
+```text
+输出状态门被稳定观测到。
+```
+
+闭合进度只小幅升高，因为：
+
+```text
+输出状态门不是因果闭合；
+状态转移机制尚未拆开。
+```
+
+### 十、下一阶段
+
+下一阶段应进入：
+
+```text
+Phase 874:
+State Transition Decomposition
+```
+
+任务：
+
+```text
+1. 区分 output state 与 output transition。
+2. 区分 answer-class closure 与 strict-canonical closure。
+3. 审计 goat/red 这类 strict output transition 为什么不满足 clean-route 条件。
+4. 重新定义闭合标准：
+   不能把输出已正确误判为因果边有效；
+   也不能把非 clean-route 的 strict transition 直接丢掉。
+```
+
+阶段性结论：
+
+```text
+Phase 872 / 873 没有完成语言编码闭合，
+但把“输出门”从抽象缺失项推进为可观测读出状态判据。
+
+当前最重要的新拼图是：
+  target top1 dominance 对 answer-class 输出状态有稳定解释力。
+
+当前最大瓶颈是：
+  还不知道这种读出状态如何由深层齿轮和 blocker field 因果地产生。
+```
+
+## Phase 874: State Transition Decomposition [2026-07-03 09:53]
+
+### 一、任务
+
+本阶段接续 Phase 872 / 873。
+
+Phase 872 / 873 已经证明：
+
+```text
+OutputStateOpen
+```
+
+可以稳定解释 answer-class 输出状态，但不能直接解释 clean causal transition。
+
+因此 Phase 874 的任务是：
+
+```text
+区分 output state、output transition、clean causal edge。
+```
+
+本阶段没有重新进行模型测试，因为 Phase 872 的 rows 已经包含：
+
+```text
+base rollout
+intervened rollout
+base output gate
+intervened output gate
+field tags
+gear effect
+side effect
+```
+
+足够做状态转移分解。
+
+### 二、脚本与结果
+
+新增脚本：
+
+```text
+tests/glm5/phase874_state_transition_decomposition.py
+```
+
+输入数据：
+
+```text
+tests/result/phase872_output_gate_readout_transition_audit/holdout_phase867/
+tests/result/phase872_output_gate_readout_transition_audit/validation_phase871/
+tests/result/phase872_output_gate_readout_transition_audit/replication_phase873/
+```
+
+输出结果：
+
+```text
+tests/result/phase874_state_transition_decomposition/combined/
+```
+
+结果文件：
+
+```text
+phase874_summary.json
+phase874_summary.md
+phase874_transition_rows.jsonl
+```
+
+总样本数：
+
+```text
+n = 504
+```
+
+### 三、测试原理
+
+Phase 874 正式拆成三层。
+
+第一层：输出状态。
+
+```text
+OutputStateOpen(x')
+  =
+  TargetTop1(x')
+  and TargetBeatsNonTarget(x')
+```
+
+第二层：观测输出转移。
+
+```text
+ObservedOutputTransition(x,x')
+  =
+  not RolloutClear(x)
+  and OutputStateOpen(x')
+```
+
+第三层：干净因果边。
+
+```text
+CleanCausalEdge(g,d,m,x)
+  =
+  ObservedOutputTransition(x,T_g(x))
+  and FieldAdmissible(B_x)
+  and GearEffect(g,d,m,x)
+  and NoSideEffect(x,T_g(x))
+```
+
+其中：
+
+```text
+x' = T_g(x)
+```
+
+表示施加齿轮干预后的状态。
+
+### 四、核心结果
+
+输出状态层：
+
+```text
+intervened_output_state_open -> intervened_rollout_clear_answer_class
+  TP=170
+  FP=0
+  FN=0
+  TN=334
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+输出转移层：
+
+```text
+observed_clear_transition_rule -> target_output_clean_transition
+  TP=21
+  FP=0
+  FN=0
+  TN=483
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+干净因果边层：
+
+```text
+clean_causal_edge_rule -> target_clean_transition
+  TP=5
+  FP=0
+  FN=0
+  TN=499
+  precision=1.000
+  recall=1.000
+  accuracy=1.000
+```
+
+### 五、结构分布
+
+504 个样本被分为：
+
+```text
+answer_class_stable_closed: 311
+answer_class_stable_open:   149
+answer_class_loss:          23
+nonclean_output_transition: 16
+clean_causal_transition:    5
+```
+
+这说明：
+
+```text
+输出状态打开很常见；
+输出状态转移较少；
+干净因果转移更少。
+```
+
+### 六、非干净输出转移
+
+所有 output transition：
+
+```text
+21
+```
+
+其中：
+
+```text
+clean_causal_transition = 5
+nonclean_output_transition = 16
+```
+
+非干净输出转移的主要原因：
+
+```text
+field_not_strict_admissible: 16
+not_phase866_pair_rule:      16
+original_blocker_not_reduced:16
+semantic_other_pressure:     10
+object_dominates/object_echo:6
+format_dominates:            2
+```
+
+观测转移形态：
+
+```text
+other -> strict_canonical:          10
+object_echo -> strict_canonical:    6
+format_or_empty -> strict_canonical:5
+```
+
+### 七、关键解释
+
+Phase 874 证明：
+
+```text
+CleanCausalEdge 是 OutputTransition 的子集。
+```
+
+但反过来不成立：
+
+```text
+OutputTransition 不一定是 CleanCausalEdge。
+```
+
+例如：
+
+```text
+DS7B animal goat + replication_direct + flip
+  object_echo -> strict_canonical
+  但 field_tags = object_dominates_class + object_echo_pressure
+  original_blocker_delta = 0.125
+  不满足 clean causal edge。
+
+DS7B color red + replication_direct + flip
+  other -> strict_canonical
+  但 field_tags = semantic_other_pressure
+  original_blocker_delta = 0.0625
+  不满足 clean causal edge。
+```
+
+因此这些样本不是无效结果，而是：
+
+```text
+nonclean output transition
+```
+
+它们可能对应另一类有效路线。
+
+### 八、理论进展
+
+Phase 874 把当前理论从：
+
+```text
+寻找一个统一闭合公式
+```
+
+推进到：
+
+```text
+分层状态转移动力学
+```
+
+当前最稳妥的层级是：
+
+```text
+Level 1:
+  OutputStateOpen
+
+Level 2:
+  ObservedOutputTransition
+
+Level 3:
+  CleanCausalEdge
+
+Level 4:
+  NoncleanOutputTransition
+
+Level 5:
+  Cross-model / cross-domain / cross-prompt prediction
+```
+
+这对破解语言编码机制很重要：
+
+```text
+如果只研究 clean route，
+会漏掉大量真实有效的输出转移。
+```
+
+### 九、问题和硬伤
+
+当前仍有硬伤：
+
+```text
+1. Phase 874 是离线分解，没有新增干预。
+
+2. observed_clear_transition_rule 使用 base rollout，
+   因此它是状态分解公式，不是纯前向预测公式。
+
+3. CleanCausalEdge 在当前数据上完美，
+   但正例只有 5 个，样本仍少。
+
+4. NoncleanOutputTransition 的内部路线还没有拆开。
+
+5. 小模型中 route / readout 可能压缩，
+   clean 与 nonclean route 的边界可能比大模型更粗糙。
+```
+
+### 十、闭合距离
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  37% - 44%
+
+语言编码机制闭合：
+  25% - 32%
+```
+
+图谱进度提高的原因：
+
+```text
+状态层、转移层、干净因果边层已经被明确拆开。
+```
+
+闭合进度仍然有限的原因：
+
+```text
+还不能预测 nonclean output transition 的来源；
+也不能从深层齿轮结构直接推出 OutputStateOpen。
+```
+
+### 十一、下一阶段
+
+下一阶段应进入：
+
+```text
+Phase 875:
+Nonclean Output Transition Route Audit
+```
+
+任务：
+
+```text
+1. 专门研究 16 个 nonclean_output_transition。
+2. 区分 semantic-pressure transition、object-echo recovery、format recovery。
+3. 判断它们是脏路线，还是另一类有效路线。
+4. 扩展 clean-only 图谱，避免只研究干净边而漏掉真实机制。
+```
+
+阶段性结论：
+
+```text
+Phase 874 没有完成语言编码机制闭合，
+但完成了一次非常关键的结构拆分：
+
+输出状态 != 输出转移 != 干净因果边。
+
+下一块拼图不是继续调 clean route，
+而是审计 nonclean output transition。
+```

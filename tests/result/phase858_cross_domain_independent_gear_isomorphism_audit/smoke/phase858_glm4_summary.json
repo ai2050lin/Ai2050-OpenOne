@@ -1,0 +1,3351 @@
+{
+  "phase": 858,
+  "title": "Cross-Domain Independent Gear Discovery and Isomorphism Audit",
+  "model": "glm4",
+  "round": "smoke",
+  "timestamp": "2026-07-02 22:00:17",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "quantization": "off",
+  "domains": [
+    "animal",
+    "geometry",
+    "tool"
+  ],
+  "n_cases": 3,
+  "prompt_variants": [
+    "natural_question"
+  ],
+  "layer_indices": [
+    26,
+    28,
+    30
+  ],
+  "n_candidate_gears": 432,
+  "n_rows": 21,
+  "overall": {
+    "n": 21,
+    "first_token_answer_class": 14,
+    "first_token_clear_answer_class": 14,
+    "rollout_answer_class": 14,
+    "rollout_clear_answer_class": 14,
+    "rollout_identity_class_overlap": 0,
+    "rollout_object_echo": 0,
+    "rollout_other_or_format": 7,
+    "rollout_labels": {
+      "other": 7,
+      "strict_canonical": 14
+    },
+    "mean_class_blocker_count": 0.6190476190476191,
+    "mean_class_minus_object_logit": 2.9851190476190474
+  },
+  "domain_summary": {
+    "animal": {
+      "n": 7,
+      "first_token_answer_class": 0,
+      "first_token_clear_answer_class": 0,
+      "rollout_answer_class": 0,
+      "rollout_clear_answer_class": 0,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 7,
+      "rollout_labels": {
+        "other": 7
+      },
+      "mean_class_blocker_count": 1.8571428571428572,
+      "mean_class_minus_object_logit": 1.7678571428571428
+    },
+    "geometry": {
+      "n": 7,
+      "first_token_answer_class": 7,
+      "first_token_clear_answer_class": 7,
+      "rollout_answer_class": 7,
+      "rollout_clear_answer_class": 7,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 7
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 2.125
+    },
+    "tool": {
+      "n": 7,
+      "first_token_answer_class": 7,
+      "first_token_clear_answer_class": 7,
+      "rollout_answer_class": 7,
+      "rollout_clear_answer_class": 7,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 0,
+      "rollout_labels": {
+        "strict_canonical": 7
+      },
+      "mean_class_blocker_count": 0.0,
+      "mean_class_minus_object_logit": 5.0625
+    }
+  },
+  "condition_summary": {
+    "negative_blocker_combo_flip": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.3333333333333333,
+      "mean_class_minus_object_logit": 3.3958333333333335
+    },
+    "negative_blocker_combo_zero": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.6666666666666666,
+      "mean_class_minus_object_logit": 3.1145833333333335
+    },
+    "negative_blocker_single_flip": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.6666666666666666,
+      "mean_class_minus_object_logit": 3.1875
+    },
+    "negative_blocker_single_zero": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.6666666666666666,
+      "mean_class_minus_object_logit": 2.9895833333333335
+    },
+    "original": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.6666666666666666,
+      "mean_class_minus_object_logit": 2.8333333333333335
+    },
+    "positive_supporter_combo_zero": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.6666666666666666,
+      "mean_class_minus_object_logit": 2.6666666666666665
+    },
+    "positive_supporter_single_zero": {
+      "n": 3,
+      "first_token_answer_class": 2,
+      "first_token_clear_answer_class": 2,
+      "rollout_answer_class": 2,
+      "rollout_clear_answer_class": 2,
+      "rollout_identity_class_overlap": 0,
+      "rollout_object_echo": 0,
+      "rollout_other_or_format": 1,
+      "rollout_labels": {
+        "other": 1,
+        "strict_canonical": 2
+      },
+      "mean_class_blocker_count": 0.6666666666666666,
+      "mean_class_minus_object_logit": 2.7083333333333335
+    }
+  },
+  "top_candidate_gears": [
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C2432",
+      "layer_idx": 30,
+      "channel_id": 2432,
+      "n": 1,
+      "support_sum": -0.24747148156166077,
+      "abs_support_sum": 0.24747148156166077,
+      "support_mean": -0.24747148156166077,
+      "abs_support_mean": 0.24747148156166077,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.24747148156166077,
+      "activation_abs_mean": 3.265625,
+      "coeff_abs_mean": 0.07578074187040329,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C10059",
+      "layer_idx": 30,
+      "channel_id": 10059,
+      "n": 1,
+      "support_sum": 0.21108925342559814,
+      "abs_support_sum": 0.21108925342559814,
+      "support_mean": 0.21108925342559814,
+      "abs_support_mean": 0.21108925342559814,
+      "positive_support_sum": 0.21108925342559814,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 3.15625,
+      "coeff_abs_mean": 0.0668797641992569,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C6115",
+      "layer_idx": 30,
+      "channel_id": 6115,
+      "n": 1,
+      "support_sum": 0.14942336082458496,
+      "abs_support_sum": 0.14942336082458496,
+      "support_mean": 0.14942336082458496,
+      "abs_support_mean": 0.14942336082458496,
+      "positive_support_sum": 0.14942336082458496,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 4.90625,
+      "coeff_abs_mean": 0.03045571595430374,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C6860",
+      "layer_idx": 30,
+      "channel_id": 6860,
+      "n": 1,
+      "support_sum": 0.14859218895435333,
+      "abs_support_sum": 0.14859218895435333,
+      "support_mean": 0.14859218895435333,
+      "abs_support_mean": 0.14859218895435333,
+      "positive_support_sum": 0.14859218895435333,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.6875,
+      "coeff_abs_mean": 0.08805462718009949,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C9923",
+      "layer_idx": 30,
+      "channel_id": 9923,
+      "n": 1,
+      "support_sum": 0.12646350264549255,
+      "abs_support_sum": 0.12646350264549255,
+      "support_mean": 0.12646350264549255,
+      "abs_support_mean": 0.12646350264549255,
+      "positive_support_sum": 0.12646350264549255,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 5.09375,
+      "coeff_abs_mean": 0.02482719160616398,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C3701",
+      "layer_idx": 28,
+      "channel_id": 3701,
+      "n": 1,
+      "support_sum": 0.1106303408741951,
+      "abs_support_sum": 0.1106303408741951,
+      "support_mean": 0.1106303408741951,
+      "abs_support_mean": 0.1106303408741951,
+      "positive_support_sum": 0.1106303408741951,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 5.0625,
+      "coeff_abs_mean": 0.021852906793355942,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C7104",
+      "layer_idx": 28,
+      "channel_id": 7104,
+      "n": 1,
+      "support_sum": -0.09743423014879227,
+      "abs_support_sum": 0.09743423014879227,
+      "support_mean": -0.09743423014879227,
+      "abs_support_mean": 0.09743423014879227,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.09743423014879227,
+      "activation_abs_mean": 4.75,
+      "coeff_abs_mean": 0.020512469112873077,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C5370",
+      "layer_idx": 28,
+      "channel_id": 5370,
+      "n": 1,
+      "support_sum": 0.08786512166261673,
+      "abs_support_sum": 0.08786512166261673,
+      "support_mean": 0.08786512166261673,
+      "abs_support_mean": 0.08786512166261673,
+      "positive_support_sum": 0.08786512166261673,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 4.03125,
+      "coeff_abs_mean": 0.021795999258756638,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C13422",
+      "layer_idx": 28,
+      "channel_id": 13422,
+      "n": 1,
+      "support_sum": 0.08376855403184891,
+      "abs_support_sum": 0.08376855403184891,
+      "support_mean": 0.08376855403184891,
+      "abs_support_mean": 0.08376855403184891,
+      "positive_support_sum": 0.08376855403184891,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.1328125,
+      "coeff_abs_mean": 0.07394741475582123,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C13454",
+      "layer_idx": 28,
+      "channel_id": 13454,
+      "n": 1,
+      "support_sum": 0.07039149105548859,
+      "abs_support_sum": 0.07039149105548859,
+      "support_mean": 0.07039149105548859,
+      "abs_support_mean": 0.07039149105548859,
+      "positive_support_sum": 0.07039149105548859,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 2.28125,
+      "coeff_abs_mean": 0.0308565441519022,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C8826",
+      "layer_idx": 26,
+      "channel_id": 8826,
+      "n": 1,
+      "support_sum": -0.061147019267082214,
+      "abs_support_sum": 0.061147019267082214,
+      "support_mean": -0.061147019267082214,
+      "abs_support_mean": 0.061147019267082214,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.061147019267082214,
+      "activation_abs_mean": 1.0234375,
+      "coeff_abs_mean": 0.05974670499563217,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C1335",
+      "layer_idx": 30,
+      "channel_id": 1335,
+      "n": 1,
+      "support_sum": 0.059517111629247665,
+      "abs_support_sum": 0.059517111629247665,
+      "support_mean": 0.059517111629247665,
+      "abs_support_mean": 0.059517111629247665,
+      "positive_support_sum": 0.059517111629247665,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 7.6875,
+      "coeff_abs_mean": 0.007742063142359257,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C12811",
+      "layer_idx": 28,
+      "channel_id": 12811,
+      "n": 1,
+      "support_sum": 0.056388575583696365,
+      "abs_support_sum": 0.056388575583696365,
+      "support_mean": 0.056388575583696365,
+      "abs_support_mean": 0.056388575583696365,
+      "positive_support_sum": 0.056388575583696365,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.5859375,
+      "coeff_abs_mean": 0.03555535897612572,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C11990",
+      "layer_idx": 28,
+      "channel_id": 11990,
+      "n": 1,
+      "support_sum": 0.05573289841413498,
+      "abs_support_sum": 0.05573289841413498,
+      "support_mean": 0.05573289841413498,
+      "abs_support_mean": 0.05573289841413498,
+      "positive_support_sum": 0.05573289841413498,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.390625,
+      "coeff_abs_mean": 0.04007758945226669,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C9056",
+      "layer_idx": 30,
+      "channel_id": 9056,
+      "n": 1,
+      "support_sum": -0.05322928726673126,
+      "abs_support_sum": 0.05322928726673126,
+      "support_mean": -0.05322928726673126,
+      "abs_support_mean": 0.05322928726673126,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.05322928726673126,
+      "activation_abs_mean": 3.109375,
+      "coeff_abs_mean": 0.017118966206908226,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C13200",
+      "layer_idx": 30,
+      "channel_id": 13200,
+      "n": 1,
+      "support_sum": -0.04995144531130791,
+      "abs_support_sum": 0.04995144531130791,
+      "support_mean": -0.04995144531130791,
+      "abs_support_mean": 0.04995144531130791,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.04995144531130791,
+      "activation_abs_mean": 1.4296875,
+      "coeff_abs_mean": 0.034938715398311615,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C440",
+      "layer_idx": 26,
+      "channel_id": 440,
+      "n": 1,
+      "support_sum": -0.04904467239975929,
+      "abs_support_sum": 0.04904467239975929,
+      "support_mean": -0.04904467239975929,
+      "abs_support_mean": 0.04904467239975929,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.04904467239975929,
+      "activation_abs_mean": 0.61328125,
+      "coeff_abs_mean": 0.07997093349695206,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C923",
+      "layer_idx": 26,
+      "channel_id": 923,
+      "n": 1,
+      "support_sum": 0.04825276881456375,
+      "abs_support_sum": 0.04825276881456375,
+      "support_mean": 0.04825276881456375,
+      "abs_support_mean": 0.04825276881456375,
+      "positive_support_sum": 0.04825276881456375,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.8203125,
+      "coeff_abs_mean": 0.02650795876979828,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C9924",
+      "layer_idx": 26,
+      "channel_id": 9924,
+      "n": 1,
+      "support_sum": 0.044736601412296295,
+      "abs_support_sum": 0.044736601412296295,
+      "support_mean": 0.044736601412296295,
+      "abs_support_mean": 0.044736601412296295,
+      "positive_support_sum": 0.044736601412296295,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.4609375,
+      "coeff_abs_mean": 0.03062184527516365,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C12189",
+      "layer_idx": 28,
+      "channel_id": 12189,
+      "n": 1,
+      "support_sum": 0.0435013547539711,
+      "abs_support_sum": 0.0435013547539711,
+      "support_mean": 0.0435013547539711,
+      "abs_support_mean": 0.0435013547539711,
+      "positive_support_sum": 0.0435013547539711,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.4921875,
+      "coeff_abs_mean": 0.02915273979306221,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C8868",
+      "layer_idx": 30,
+      "channel_id": 8868,
+      "n": 1,
+      "support_sum": -0.043424978852272034,
+      "abs_support_sum": 0.043424978852272034,
+      "support_mean": -0.043424978852272034,
+      "abs_support_mean": 0.043424978852272034,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.043424978852272034,
+      "activation_abs_mean": 1.5546875,
+      "coeff_abs_mean": 0.027931643649935722,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C8696",
+      "layer_idx": 28,
+      "channel_id": 8696,
+      "n": 1,
+      "support_sum": -0.03963103145360947,
+      "abs_support_sum": 0.03963103145360947,
+      "support_mean": -0.03963103145360947,
+      "abs_support_mean": 0.03963103145360947,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.03963103145360947,
+      "activation_abs_mean": 1.46875,
+      "coeff_abs_mean": 0.026982828974723816,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C6905",
+      "layer_idx": 28,
+      "channel_id": 6905,
+      "n": 1,
+      "support_sum": 0.038789547979831696,
+      "abs_support_sum": 0.038789547979831696,
+      "support_mean": 0.038789547979831696,
+      "abs_support_mean": 0.038789547979831696,
+      "positive_support_sum": 0.038789547979831696,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.15625,
+      "coeff_abs_mean": 0.033547718077898026,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C5439",
+      "layer_idx": 28,
+      "channel_id": 5439,
+      "n": 1,
+      "support_sum": -0.037164557725191116,
+      "abs_support_sum": 0.037164557725191116,
+      "support_mean": -0.037164557725191116,
+      "abs_support_mean": 0.037164557725191116,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.037164557725191116,
+      "activation_abs_mean": 1.234375,
+      "coeff_abs_mean": 0.030107997357845306,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C9839",
+      "layer_idx": 26,
+      "channel_id": 9839,
+      "n": 1,
+      "support_sum": 0.03694572672247887,
+      "abs_support_sum": 0.03694572672247887,
+      "support_mean": 0.03694572672247887,
+      "abs_support_mean": 0.03694572672247887,
+      "positive_support_sum": 0.03694572672247887,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.0390625,
+      "coeff_abs_mean": 0.03555678948760033,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C4426",
+      "layer_idx": 28,
+      "channel_id": 4426,
+      "n": 1,
+      "support_sum": -0.03681867942214012,
+      "abs_support_sum": 0.03681867942214012,
+      "support_mean": -0.03681867942214012,
+      "abs_support_mean": 0.03681867942214012,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.03681867942214012,
+      "activation_abs_mean": 1.328125,
+      "coeff_abs_mean": 0.027722299098968506,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C2107",
+      "layer_idx": 30,
+      "channel_id": 2107,
+      "n": 1,
+      "support_sum": 0.036166172474622726,
+      "abs_support_sum": 0.036166172474622726,
+      "support_mean": 0.036166172474622726,
+      "abs_support_mean": 0.036166172474622726,
+      "positive_support_sum": 0.036166172474622726,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.2265625,
+      "coeff_abs_mean": 0.0294857956469059,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C13347",
+      "layer_idx": 26,
+      "channel_id": 13347,
+      "n": 1,
+      "support_sum": -0.03370058164000511,
+      "abs_support_sum": 0.03370058164000511,
+      "support_mean": -0.03370058164000511,
+      "abs_support_mean": 0.03370058164000511,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.03370058164000511,
+      "activation_abs_mean": 1.0546875,
+      "coeff_abs_mean": 0.03195314481854439,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C1323",
+      "layer_idx": 30,
+      "channel_id": 1323,
+      "n": 1,
+      "support_sum": -0.033631548285484314,
+      "abs_support_sum": 0.033631548285484314,
+      "support_mean": -0.033631548285484314,
+      "abs_support_mean": 0.033631548285484314,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.033631548285484314,
+      "activation_abs_mean": 1.0234375,
+      "coeff_abs_mean": 0.03286135941743851,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C12967",
+      "layer_idx": 30,
+      "channel_id": 12967,
+      "n": 1,
+      "support_sum": -0.033252473920583725,
+      "abs_support_sum": 0.033252473920583725,
+      "support_mean": -0.033252473920583725,
+      "abs_support_mean": 0.033252473920583725,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.033252473920583725,
+      "activation_abs_mean": 1.5,
+      "coeff_abs_mean": 0.022168315947055817,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C2331",
+      "layer_idx": 26,
+      "channel_id": 2331,
+      "n": 1,
+      "support_sum": -0.033027663826942444,
+      "abs_support_sum": 0.033027663826942444,
+      "support_mean": -0.033027663826942444,
+      "abs_support_mean": 0.033027663826942444,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.033027663826942444,
+      "activation_abs_mean": 1.96875,
+      "coeff_abs_mean": 0.016775956377387047,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C6459",
+      "layer_idx": 30,
+      "channel_id": 6459,
+      "n": 1,
+      "support_sum": 0.032485462725162506,
+      "abs_support_sum": 0.032485462725162506,
+      "support_mean": 0.032485462725162506,
+      "abs_support_mean": 0.032485462725162506,
+      "positive_support_sum": 0.032485462725162506,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.94140625,
+      "coeff_abs_mean": 0.034507378935813904,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C9905",
+      "layer_idx": 30,
+      "channel_id": 9905,
+      "n": 1,
+      "support_sum": -0.0322888121008873,
+      "abs_support_sum": 0.0322888121008873,
+      "support_mean": -0.0322888121008873,
+      "abs_support_mean": 0.0322888121008873,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.0322888121008873,
+      "activation_abs_mean": 1.796875,
+      "coeff_abs_mean": 0.01796942576766014,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C2314",
+      "layer_idx": 30,
+      "channel_id": 2314,
+      "n": 1,
+      "support_sum": 0.031985897570848465,
+      "abs_support_sum": 0.031985897570848465,
+      "support_mean": 0.031985897570848465,
+      "abs_support_mean": 0.031985897570848465,
+      "positive_support_sum": 0.031985897570848465,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.4765625,
+      "coeff_abs_mean": 0.021662406623363495,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C11127",
+      "layer_idx": 28,
+      "channel_id": 11127,
+      "n": 1,
+      "support_sum": 0.03180284425616264,
+      "abs_support_sum": 0.03180284425616264,
+      "support_mean": 0.03180284425616264,
+      "abs_support_mean": 0.03180284425616264,
+      "positive_support_sum": 0.03180284425616264,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.8671875,
+      "coeff_abs_mean": 0.017032485455274582,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C9438",
+      "layer_idx": 26,
+      "channel_id": 9438,
+      "n": 1,
+      "support_sum": 0.031802836805582047,
+      "abs_support_sum": 0.031802836805582047,
+      "support_mean": 0.031802836805582047,
+      "abs_support_mean": 0.031802836805582047,
+      "positive_support_sum": 0.031802836805582047,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.140625,
+      "coeff_abs_mean": 0.027881938964128494,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C10475",
+      "layer_idx": 30,
+      "channel_id": 10475,
+      "n": 1,
+      "support_sum": -0.031638551503419876,
+      "abs_support_sum": 0.031638551503419876,
+      "support_mean": -0.031638551503419876,
+      "abs_support_mean": 0.031638551503419876,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.031638551503419876,
+      "activation_abs_mean": 0.90625,
+      "coeff_abs_mean": 0.03491150587797165,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C117",
+      "layer_idx": 30,
+      "channel_id": 117,
+      "n": 1,
+      "support_sum": -0.031382083892822266,
+      "abs_support_sum": 0.031382083892822266,
+      "support_mean": -0.031382083892822266,
+      "abs_support_mean": 0.031382083892822266,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.031382083892822266,
+      "activation_abs_mean": 0.8828125,
+      "coeff_abs_mean": 0.03554784879088402,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C8405",
+      "layer_idx": 30,
+      "channel_id": 8405,
+      "n": 1,
+      "support_sum": -0.03125475347042084,
+      "abs_support_sum": 0.03125475347042084,
+      "support_mean": -0.03125475347042084,
+      "abs_support_mean": 0.03125475347042084,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.03125475347042084,
+      "activation_abs_mean": 1.1640625,
+      "coeff_abs_mean": 0.026849720627069473,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C11911",
+      "layer_idx": 28,
+      "channel_id": 11911,
+      "n": 1,
+      "support_sum": -0.03040614351630211,
+      "abs_support_sum": 0.03040614351630211,
+      "support_mean": -0.03040614351630211,
+      "abs_support_mean": 0.03040614351630211,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.03040614351630211,
+      "activation_abs_mean": 2.28125,
+      "coeff_abs_mean": 0.013328720815479755,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C4294",
+      "layer_idx": 30,
+      "channel_id": 4294,
+      "n": 1,
+      "support_sum": 0.030324624851346016,
+      "abs_support_sum": 0.030324624851346016,
+      "support_mean": 0.030324624851346016,
+      "abs_support_mean": 0.030324624851346016,
+      "positive_support_sum": 0.030324624851346016,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.1015625,
+      "coeff_abs_mean": 0.027528736740350723,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C10316",
+      "layer_idx": 30,
+      "channel_id": 10316,
+      "n": 1,
+      "support_sum": 0.029994506388902664,
+      "abs_support_sum": 0.029994506388902664,
+      "support_mean": 0.029994506388902664,
+      "abs_support_mean": 0.029994506388902664,
+      "positive_support_sum": 0.029994506388902664,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.92578125,
+      "coeff_abs_mean": 0.03239912912249565,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C2371",
+      "layer_idx": 30,
+      "channel_id": 2371,
+      "n": 1,
+      "support_sum": -0.029900945723056793,
+      "abs_support_sum": 0.029900945723056793,
+      "support_mean": -0.029900945723056793,
+      "abs_support_mean": 0.029900945723056793,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.029900945723056793,
+      "activation_abs_mean": 1.25,
+      "coeff_abs_mean": 0.023920755833387375,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C4539",
+      "layer_idx": 30,
+      "channel_id": 4539,
+      "n": 1,
+      "support_sum": -0.029891550540924072,
+      "abs_support_sum": 0.029891550540924072,
+      "support_mean": -0.029891550540924072,
+      "abs_support_mean": 0.029891550540924072,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.029891550540924072,
+      "activation_abs_mean": 3.359375,
+      "coeff_abs_mean": 0.008897949941456318,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C3898",
+      "layer_idx": 30,
+      "channel_id": 3898,
+      "n": 1,
+      "support_sum": 0.02950437366962433,
+      "abs_support_sum": 0.02950437366962433,
+      "support_mean": 0.02950437366962433,
+      "abs_support_mean": 0.02950437366962433,
+      "positive_support_sum": 0.02950437366962433,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.84375,
+      "coeff_abs_mean": 0.016002371907234192,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C687",
+      "layer_idx": 28,
+      "channel_id": 687,
+      "n": 1,
+      "support_sum": 0.02888275310397148,
+      "abs_support_sum": 0.02888275310397148,
+      "support_mean": 0.02888275310397148,
+      "abs_support_mean": 0.02888275310397148,
+      "positive_support_sum": 0.02888275310397148,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.79296875,
+      "coeff_abs_mean": 0.03642357140779495,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C10448",
+      "layer_idx": 30,
+      "channel_id": 10448,
+      "n": 1,
+      "support_sum": -0.028844201937317848,
+      "abs_support_sum": 0.028844201937317848,
+      "support_mean": -0.028844201937317848,
+      "abs_support_mean": 0.028844201937317848,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.028844201937317848,
+      "activation_abs_mean": 1.5390625,
+      "coeff_abs_mean": 0.018741410225629807,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C6257",
+      "layer_idx": 28,
+      "channel_id": 6257,
+      "n": 1,
+      "support_sum": 0.02881741337478161,
+      "abs_support_sum": 0.02881741337478161,
+      "support_mean": 0.02881741337478161,
+      "abs_support_mean": 0.02881741337478161,
+      "positive_support_sum": 0.02881741337478161,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.0703125,
+      "coeff_abs_mean": 0.02692429907619953,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C3628",
+      "layer_idx": 30,
+      "channel_id": 3628,
+      "n": 1,
+      "support_sum": -0.028726475313305855,
+      "abs_support_sum": 0.028726475313305855,
+      "support_mean": -0.028726475313305855,
+      "abs_support_mean": 0.028726475313305855,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.028726475313305855,
+      "activation_abs_mean": 0.9921875,
+      "coeff_abs_mean": 0.028952667489647865,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C5145",
+      "layer_idx": 30,
+      "channel_id": 5145,
+      "n": 1,
+      "support_sum": -0.028516976162791252,
+      "abs_support_sum": 0.028516976162791252,
+      "support_mean": -0.028516976162791252,
+      "abs_support_mean": 0.028516976162791252,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.028516976162791252,
+      "activation_abs_mean": 3.90625,
+      "coeff_abs_mean": 0.007300345692783594,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C3046",
+      "layer_idx": 28,
+      "channel_id": 3046,
+      "n": 1,
+      "support_sum": 0.02844446524977684,
+      "abs_support_sum": 0.02844446524977684,
+      "support_mean": 0.02844446524977684,
+      "abs_support_mean": 0.02844446524977684,
+      "positive_support_sum": 0.02844446524977684,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.66015625,
+      "coeff_abs_mean": 0.04308747500181198,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C11691",
+      "layer_idx": 30,
+      "channel_id": 11691,
+      "n": 1,
+      "support_sum": 0.026127859950065613,
+      "abs_support_sum": 0.026127859950065613,
+      "support_mean": 0.026127859950065613,
+      "abs_support_mean": 0.026127859950065613,
+      "positive_support_sum": 0.026127859950065613,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.8125,
+      "coeff_abs_mean": 0.03215736523270607,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C164",
+      "layer_idx": 30,
+      "channel_id": 164,
+      "n": 1,
+      "support_sum": 0.026118582114577293,
+      "abs_support_sum": 0.026118582114577293,
+      "support_mean": 0.026118582114577293,
+      "abs_support_mean": 0.026118582114577293,
+      "positive_support_sum": 0.026118582114577293,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.97265625,
+      "coeff_abs_mean": 0.026852838695049286,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C698",
+      "layer_idx": 26,
+      "channel_id": 698,
+      "n": 1,
+      "support_sum": 0.02604464441537857,
+      "abs_support_sum": 0.02604464441537857,
+      "support_mean": 0.02604464441537857,
+      "abs_support_mean": 0.02604464441537857,
+      "positive_support_sum": 0.02604464441537857,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.484375,
+      "coeff_abs_mean": 0.053769588470458984,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C12304",
+      "layer_idx": 26,
+      "channel_id": 12304,
+      "n": 1,
+      "support_sum": 0.025414802134037018,
+      "abs_support_sum": 0.025414802134037018,
+      "support_mean": 0.025414802134037018,
+      "abs_support_mean": 0.025414802134037018,
+      "positive_support_sum": 0.025414802134037018,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.8984375,
+      "coeff_abs_mean": 0.028287779539823532,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C9818",
+      "layer_idx": 26,
+      "channel_id": 9818,
+      "n": 1,
+      "support_sum": 0.025314096361398697,
+      "abs_support_sum": 0.025314096361398697,
+      "support_mean": 0.025314096361398697,
+      "abs_support_mean": 0.025314096361398697,
+      "positive_support_sum": 0.025314096361398697,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.71875,
+      "coeff_abs_mean": 0.014728201553225517,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C12870",
+      "layer_idx": 26,
+      "channel_id": 12870,
+      "n": 1,
+      "support_sum": 0.024612445384263992,
+      "abs_support_sum": 0.024612445384263992,
+      "support_mean": 0.024612445384263992,
+      "abs_support_mean": 0.024612445384263992,
+      "positive_support_sum": 0.024612445384263992,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.953125,
+      "coeff_abs_mean": 0.025822892785072327,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C8054",
+      "layer_idx": 28,
+      "channel_id": 8054,
+      "n": 1,
+      "support_sum": 0.024381820112466812,
+      "abs_support_sum": 0.024381820112466812,
+      "support_mean": 0.024381820112466812,
+      "abs_support_mean": 0.024381820112466812,
+      "positive_support_sum": 0.024381820112466812,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 3.484375,
+      "coeff_abs_mean": 0.006997473072260618,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C7488",
+      "layer_idx": 30,
+      "channel_id": 7488,
+      "n": 1,
+      "support_sum": -0.023907680064439774,
+      "abs_support_sum": 0.023907680064439774,
+      "support_mean": -0.023907680064439774,
+      "abs_support_mean": 0.023907680064439774,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.023907680064439774,
+      "activation_abs_mean": 2.015625,
+      "coeff_abs_mean": 0.011861174367368221,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C13203",
+      "layer_idx": 30,
+      "channel_id": 13203,
+      "n": 1,
+      "support_sum": -0.023580025881528854,
+      "abs_support_sum": 0.023580025881528854,
+      "support_mean": -0.023580025881528854,
+      "abs_support_mean": 0.023580025881528854,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.023580025881528854,
+      "activation_abs_mean": 1.046875,
+      "coeff_abs_mean": 0.02252420410513878,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C11160",
+      "layer_idx": 30,
+      "channel_id": 11160,
+      "n": 1,
+      "support_sum": -0.023175742477178574,
+      "abs_support_sum": 0.023175742477178574,
+      "support_mean": -0.023175742477178574,
+      "abs_support_mean": 0.023175742477178574,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.023175742477178574,
+      "activation_abs_mean": 0.8515625,
+      "coeff_abs_mean": 0.02721554972231388,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C2757",
+      "layer_idx": 28,
+      "channel_id": 2757,
+      "n": 1,
+      "support_sum": 0.023060267791152,
+      "abs_support_sum": 0.023060267791152,
+      "support_mean": 0.023060267791152,
+      "abs_support_mean": 0.023060267791152,
+      "positive_support_sum": 0.023060267791152,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.6640625,
+      "coeff_abs_mean": 0.03472604975104332,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C6396",
+      "layer_idx": 26,
+      "channel_id": 6396,
+      "n": 1,
+      "support_sum": 0.02296334132552147,
+      "abs_support_sum": 0.02296334132552147,
+      "support_mean": 0.02296334132552147,
+      "abs_support_mean": 0.02296334132552147,
+      "positive_support_sum": 0.02296334132552147,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.046875,
+      "coeff_abs_mean": 0.021935131400823593,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C3003",
+      "layer_idx": 28,
+      "channel_id": 3003,
+      "n": 1,
+      "support_sum": 0.02294776402413845,
+      "abs_support_sum": 0.02294776402413845,
+      "support_mean": 0.02294776402413845,
+      "abs_support_mean": 0.02294776402413845,
+      "positive_support_sum": 0.02294776402413845,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.4296875,
+      "coeff_abs_mean": 0.016050895676016808,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C12266",
+      "layer_idx": 30,
+      "channel_id": 12266,
+      "n": 1,
+      "support_sum": -0.022416921332478523,
+      "abs_support_sum": 0.022416921332478523,
+      "support_mean": -0.022416921332478523,
+      "abs_support_mean": 0.022416921332478523,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.022416921332478523,
+      "activation_abs_mean": 2.203125,
+      "coeff_abs_mean": 0.010175056755542755,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C10279",
+      "layer_idx": 26,
+      "channel_id": 10279,
+      "n": 1,
+      "support_sum": -0.022332489490509033,
+      "abs_support_sum": 0.022332489490509033,
+      "support_mean": -0.022332489490509033,
+      "abs_support_mean": 0.022332489490509033,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.022332489490509033,
+      "activation_abs_mean": 1.5546875,
+      "coeff_abs_mean": 0.014364616945385933,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C3671",
+      "layer_idx": 26,
+      "channel_id": 3671,
+      "n": 1,
+      "support_sum": 0.022093093022704124,
+      "abs_support_sum": 0.022093093022704124,
+      "support_mean": 0.022093093022704124,
+      "abs_support_mean": 0.022093093022704124,
+      "positive_support_sum": 0.022093093022704124,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.578125,
+      "coeff_abs_mean": 0.013999583199620247,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C9214",
+      "layer_idx": 26,
+      "channel_id": 9214,
+      "n": 1,
+      "support_sum": 0.022084515541791916,
+      "abs_support_sum": 0.022084515541791916,
+      "support_mean": 0.022084515541791916,
+      "abs_support_mean": 0.022084515541791916,
+      "positive_support_sum": 0.022084515541791916,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.37890625,
+      "coeff_abs_mean": 0.058284908533096313,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C1670",
+      "layer_idx": 28,
+      "channel_id": 1670,
+      "n": 1,
+      "support_sum": 0.02207363210618496,
+      "abs_support_sum": 0.02207363210618496,
+      "support_mean": 0.02207363210618496,
+      "abs_support_mean": 0.02207363210618496,
+      "positive_support_sum": 0.02207363210618496,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.03125,
+      "coeff_abs_mean": 0.021404733881354332,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C1236",
+      "layer_idx": 26,
+      "channel_id": 1236,
+      "n": 1,
+      "support_sum": -0.02198837697505951,
+      "abs_support_sum": 0.02198837697505951,
+      "support_mean": -0.02198837697505951,
+      "abs_support_mean": 0.02198837697505951,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.02198837697505951,
+      "activation_abs_mean": 1.3359375,
+      "coeff_abs_mean": 0.016459135338664055,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C3184",
+      "layer_idx": 30,
+      "channel_id": 3184,
+      "n": 1,
+      "support_sum": 0.021851880475878716,
+      "abs_support_sum": 0.021851880475878716,
+      "support_mean": 0.021851880475878716,
+      "abs_support_mean": 0.021851880475878716,
+      "positive_support_sum": 0.021851880475878716,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 2.796875,
+      "coeff_abs_mean": 0.007812962867319584,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C7219",
+      "layer_idx": 30,
+      "channel_id": 7219,
+      "n": 1,
+      "support_sum": 0.02164546772837639,
+      "abs_support_sum": 0.02164546772837639,
+      "support_mean": 0.02164546772837639,
+      "abs_support_mean": 0.02164546772837639,
+      "positive_support_sum": 0.02164546772837639,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 2.3125,
+      "coeff_abs_mean": 0.009360202588140965,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C2100",
+      "layer_idx": 28,
+      "channel_id": 2100,
+      "n": 1,
+      "support_sum": 0.021617744117975235,
+      "abs_support_sum": 0.021617744117975235,
+      "support_mean": 0.021617744117975235,
+      "abs_support_mean": 0.021617744117975235,
+      "positive_support_sum": 0.021617744117975235,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 0.81640625,
+      "coeff_abs_mean": 0.026479151099920273,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C12442",
+      "layer_idx": 30,
+      "channel_id": 12442,
+      "n": 1,
+      "support_sum": -0.021497441455721855,
+      "abs_support_sum": 0.021497441455721855,
+      "support_mean": -0.021497441455721855,
+      "abs_support_mean": 0.021497441455721855,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.021497441455721855,
+      "activation_abs_mean": 0.80078125,
+      "coeff_abs_mean": 0.02684558555483818,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L26C4641",
+      "layer_idx": 26,
+      "channel_id": 4641,
+      "n": 1,
+      "support_sum": 0.021489039063453674,
+      "abs_support_sum": 0.021489039063453674,
+      "support_mean": 0.021489039063453674,
+      "abs_support_mean": 0.021489039063453674,
+      "positive_support_sum": 0.021489039063453674,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.328125,
+      "coeff_abs_mean": 0.01617998257279396,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C663",
+      "layer_idx": 30,
+      "channel_id": 663,
+      "n": 1,
+      "support_sum": -0.02132764831185341,
+      "abs_support_sum": 0.02132764831185341,
+      "support_mean": -0.02132764831185341,
+      "abs_support_mean": 0.02132764831185341,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.02132764831185341,
+      "activation_abs_mean": 0.92578125,
+      "coeff_abs_mean": 0.023037459701299667,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L30C672",
+      "layer_idx": 30,
+      "channel_id": 672,
+      "n": 1,
+      "support_sum": -0.0211555864661932,
+      "abs_support_sum": 0.0211555864661932,
+      "support_mean": -0.0211555864661932,
+      "abs_support_mean": 0.0211555864661932,
+      "positive_support_sum": 0.0,
+      "negative_support_sum": -0.0211555864661932,
+      "activation_abs_mean": 0.921875,
+      "coeff_abs_mean": 0.022948432713747025,
+      "pos_count": 0,
+      "neg_count": 1,
+      "polarity": "negative_blocker",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C2965",
+      "layer_idx": 28,
+      "channel_id": 2965,
+      "n": 1,
+      "support_sum": 0.02108108438551426,
+      "abs_support_sum": 0.02108108438551426,
+      "support_mean": 0.02108108438551426,
+      "abs_support_mean": 0.02108108438551426,
+      "positive_support_sum": 0.02108108438551426,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.3125,
+      "coeff_abs_mean": 0.016061779111623764,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C357",
+      "layer_idx": 28,
+      "channel_id": 357,
+      "n": 1,
+      "support_sum": 0.02087353728711605,
+      "abs_support_sum": 0.02087353728711605,
+      "support_mean": 0.02087353728711605,
+      "abs_support_mean": 0.02087353728711605,
+      "positive_support_sum": 0.02087353728711605,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 1.328125,
+      "coeff_abs_mean": 0.015716545283794403,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    },
+    {
+      "row_kind": "phase858_domain_candidate_gear",
+      "phase": 858,
+      "model": "glm4",
+      "round": "smoke",
+      "domain": "animal",
+      "gear_key": "L28C2672",
+      "layer_idx": 28,
+      "channel_id": 2672,
+      "n": 1,
+      "support_sum": 0.020835012197494507,
+      "abs_support_sum": 0.020835012197494507,
+      "support_mean": 0.020835012197494507,
+      "abs_support_mean": 0.020835012197494507,
+      "positive_support_sum": 0.020835012197494507,
+      "negative_support_sum": 0.0,
+      "activation_abs_mean": 4.3125,
+      "coeff_abs_mean": 0.004831307101994753,
+      "pos_count": 1,
+      "neg_count": 0,
+      "polarity": "positive_supporter",
+      "object_count": {
+        "dog": 1
+      },
+      "prompt_count": {
+        "natural_question": 1
+      }
+    }
+  ],
+  "candidate_effects": [
+    {
+      "candidate_key": "L30C2432+L28C7104:flip:negative_blocker",
+      "condition_type": "negative_blocker_combo_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C2432",
+        "L28C7104"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 0.5625,
+      "effect_score": 0.234375
+    },
+    {
+      "candidate_key": "L28C10241+L28C13510:flip:negative_blocker",
+      "condition_type": "negative_blocker_combo_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C10241",
+        "L28C13510"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.6875,
+      "effect_score": 0.103125
+    },
+    {
+      "candidate_key": "L28C10241:flip:negative_blocker",
+      "condition_type": "negative_blocker_single_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C10241"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.5,
+      "effect_score": 0.075
+    },
+    {
+      "candidate_key": "L28C6279+L30C6115:flip:negative_blocker",
+      "condition_type": "negative_blocker_combo_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C6279",
+        "L30C6115"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.4375,
+      "effect_score": 0.065625
+    },
+    {
+      "candidate_key": "L28C6279:flip:negative_blocker",
+      "condition_type": "negative_blocker_single_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C6279"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.375,
+      "effect_score": 0.056249999999999994
+    },
+    {
+      "candidate_key": "L28C10241+L28C13510:zero:negative_blocker",
+      "condition_type": "negative_blocker_combo_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C10241",
+        "L28C13510"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.34375,
+      "effect_score": 0.0515625
+    },
+    {
+      "candidate_key": "L30C2432+L28C7104:zero:negative_blocker",
+      "condition_type": "negative_blocker_combo_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C2432",
+        "L28C7104"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.3125,
+      "effect_score": 0.046875
+    },
+    {
+      "candidate_key": "L28C10241:zero:negative_blocker",
+      "condition_type": "negative_blocker_single_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C10241"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.21875,
+      "effect_score": 0.0328125
+    },
+    {
+      "candidate_key": "L30C2432:flip:negative_blocker",
+      "condition_type": "negative_blocker_single_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C2432"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "effect_score": 0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C6279:zero:negative_blocker",
+      "condition_type": "negative_blocker_single_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C6279"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "effect_score": 0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C6279+L30C6115:zero:negative_blocker",
+      "condition_type": "negative_blocker_combo_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C6279",
+        "L30C6115"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "effect_score": 0.028124999999999997
+    },
+    {
+      "candidate_key": "L30C2432:zero:negative_blocker",
+      "condition_type": "negative_blocker_single_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C2432"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0625,
+      "effect_score": 0.009375
+    },
+    {
+      "candidate_key": "L30C10059:zero:positive_supporter",
+      "condition_type": "positive_supporter_single_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C10059"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.0625,
+      "effect_score": -0.009375
+    },
+    {
+      "candidate_key": "L30C10059+L30C6115:zero:positive_supporter",
+      "condition_type": "positive_supporter_combo_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C10059",
+        "L30C6115"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.0625,
+      "effect_score": -0.009375
+    },
+    {
+      "candidate_key": "L28C8036:zero:positive_supporter",
+      "condition_type": "positive_supporter_single_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C8036"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.125,
+      "effect_score": -0.01875
+    },
+    {
+      "candidate_key": "L28C8036+L30C8894:zero:positive_supporter",
+      "condition_type": "positive_supporter_combo_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C8036",
+        "L30C8894"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.1875,
+      "effect_score": -0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C9043:zero:positive_supporter",
+      "condition_type": "positive_supporter_single_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C9043"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.1875,
+      "effect_score": -0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C9043+L28C12672:zero:positive_supporter",
+      "condition_type": "positive_supporter_combo_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C9043",
+        "L28C12672"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.25,
+      "effect_score": -0.0375
+    }
+  ],
+  "top_effects": [
+    {
+      "candidate_key": "L30C2432+L28C7104:flip:negative_blocker",
+      "condition_type": "negative_blocker_combo_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C2432",
+        "L28C7104"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 1.0,
+      "mean_class_minus_object_gain": 0.5625,
+      "effect_score": 0.234375
+    },
+    {
+      "candidate_key": "L28C10241+L28C13510:flip:negative_blocker",
+      "condition_type": "negative_blocker_combo_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C10241",
+        "L28C13510"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.6875,
+      "effect_score": 0.103125
+    },
+    {
+      "candidate_key": "L28C10241:flip:negative_blocker",
+      "condition_type": "negative_blocker_single_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C10241"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.5,
+      "effect_score": 0.075
+    },
+    {
+      "candidate_key": "L28C6279+L30C6115:flip:negative_blocker",
+      "condition_type": "negative_blocker_combo_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C6279",
+        "L30C6115"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.4375,
+      "effect_score": 0.065625
+    },
+    {
+      "candidate_key": "L28C6279:flip:negative_blocker",
+      "condition_type": "negative_blocker_single_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "flip",
+      "gear_keys": [
+        "L28C6279"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.375,
+      "effect_score": 0.056249999999999994
+    },
+    {
+      "candidate_key": "L28C10241+L28C13510:zero:negative_blocker",
+      "condition_type": "negative_blocker_combo_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C10241",
+        "L28C13510"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.34375,
+      "effect_score": 0.0515625
+    },
+    {
+      "candidate_key": "L30C2432+L28C7104:zero:negative_blocker",
+      "condition_type": "negative_blocker_combo_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C2432",
+        "L28C7104"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.3125,
+      "effect_score": 0.046875
+    },
+    {
+      "candidate_key": "L28C10241:zero:negative_blocker",
+      "condition_type": "negative_blocker_single_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C10241"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.21875,
+      "effect_score": 0.0328125
+    },
+    {
+      "candidate_key": "L30C2432:flip:negative_blocker",
+      "condition_type": "negative_blocker_single_flip",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "flip",
+      "gear_keys": [
+        "L30C2432"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "effect_score": 0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C6279:zero:negative_blocker",
+      "condition_type": "negative_blocker_single_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C6279"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "effect_score": 0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C6279+L30C6115:zero:negative_blocker",
+      "condition_type": "negative_blocker_combo_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C6279",
+        "L30C6115"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.1875,
+      "effect_score": 0.028124999999999997
+    },
+    {
+      "candidate_key": "L30C2432:zero:negative_blocker",
+      "condition_type": "negative_blocker_single_zero",
+      "candidate_role": "negative_blocker",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C2432"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": 0.0625,
+      "effect_score": 0.009375
+    },
+    {
+      "candidate_key": "L30C10059:zero:positive_supporter",
+      "condition_type": "positive_supporter_single_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C10059"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.0625,
+      "effect_score": -0.009375
+    },
+    {
+      "candidate_key": "L30C10059+L30C6115:zero:positive_supporter",
+      "condition_type": "positive_supporter_combo_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "animal",
+      "mode": "zero",
+      "gear_keys": [
+        "L30C10059",
+        "L30C6115"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.0625,
+      "effect_score": -0.009375
+    },
+    {
+      "candidate_key": "L28C8036:zero:positive_supporter",
+      "condition_type": "positive_supporter_single_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C8036"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.125,
+      "effect_score": -0.01875
+    },
+    {
+      "candidate_key": "L28C8036+L30C8894:zero:positive_supporter",
+      "condition_type": "positive_supporter_combo_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "geometry",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C8036",
+        "L30C8894"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.1875,
+      "effect_score": -0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C9043:zero:positive_supporter",
+      "condition_type": "positive_supporter_single_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C9043"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.1875,
+      "effect_score": -0.028124999999999997
+    },
+    {
+      "candidate_key": "L28C9043+L28C12672:zero:positive_supporter",
+      "condition_type": "positive_supporter_combo_zero",
+      "candidate_role": "positive_supporter",
+      "domain": "tool",
+      "mode": "zero",
+      "gear_keys": [
+        "L28C9043",
+        "L28C12672"
+      ],
+      "n_pairs": 1,
+      "first_gain": 0,
+      "first_loss": 0,
+      "rollout_gain": 0,
+      "rollout_loss": 0,
+      "clear_rollout_gain": 0,
+      "clear_rollout_loss": 0,
+      "object_echo_reduced": 0,
+      "object_echo_induced": 0,
+      "mean_blocker_reduction": 0.0,
+      "mean_class_minus_object_gain": -0.25,
+      "effect_score": -0.0375
+    }
+  ],
+  "isomorphism_audit": {
+    "n_domains": 3,
+    "domains_with_positive_effect": 3,
+    "domains_with_clear_gain": 0,
+    "best_by_domain": {
+      "animal": {
+        "candidate_key": "L30C2432+L28C7104:flip:negative_blocker",
+        "condition_type": "negative_blocker_combo_flip",
+        "candidate_role": "negative_blocker",
+        "domain": "animal",
+        "mode": "flip",
+        "gear_keys": [
+          "L30C2432",
+          "L28C7104"
+        ],
+        "n_pairs": 1,
+        "first_gain": 0,
+        "first_loss": 0,
+        "rollout_gain": 0,
+        "rollout_loss": 0,
+        "clear_rollout_gain": 0,
+        "clear_rollout_loss": 0,
+        "object_echo_reduced": 0,
+        "object_echo_induced": 0,
+        "mean_blocker_reduction": 1.0,
+        "mean_class_minus_object_gain": 0.5625,
+        "effect_score": 0.234375
+      },
+      "tool": {
+        "candidate_key": "L28C10241+L28C13510:flip:negative_blocker",
+        "condition_type": "negative_blocker_combo_flip",
+        "candidate_role": "negative_blocker",
+        "domain": "tool",
+        "mode": "flip",
+        "gear_keys": [
+          "L28C10241",
+          "L28C13510"
+        ],
+        "n_pairs": 1,
+        "first_gain": 0,
+        "first_loss": 0,
+        "rollout_gain": 0,
+        "rollout_loss": 0,
+        "clear_rollout_gain": 0,
+        "clear_rollout_loss": 0,
+        "object_echo_reduced": 0,
+        "object_echo_induced": 0,
+        "mean_blocker_reduction": 0.0,
+        "mean_class_minus_object_gain": 0.6875,
+        "effect_score": 0.103125
+      },
+      "geometry": {
+        "candidate_key": "L28C6279+L30C6115:flip:negative_blocker",
+        "condition_type": "negative_blocker_combo_flip",
+        "candidate_role": "negative_blocker",
+        "domain": "geometry",
+        "mode": "flip",
+        "gear_keys": [
+          "L28C6279",
+          "L30C6115"
+        ],
+        "n_pairs": 1,
+        "first_gain": 0,
+        "first_loss": 0,
+        "rollout_gain": 0,
+        "rollout_loss": 0,
+        "clear_rollout_gain": 0,
+        "clear_rollout_loss": 0,
+        "object_echo_reduced": 0,
+        "object_echo_induced": 0,
+        "mean_blocker_reduction": 0.0,
+        "mean_class_minus_object_gain": 0.4375,
+        "effect_score": 0.065625
+      }
+    },
+    "shared_best_gears": {},
+    "shared_best_layers": {
+      "L30": [
+        "animal",
+        "geometry"
+      ],
+      "L28": [
+        "animal",
+        "geometry",
+        "tool"
+      ]
+    },
+    "exact_gear_isomorphism_count": 0,
+    "layer_isomorphism_count": 2,
+    "boundary": "Exact shared gear keys across domains are strong isomorphism evidence. Shared layers without shared channels are only weak shape evidence."
+  },
+  "boundary": "This phase independently discovers domain-local MLP gear candidates through class-vs-object readout support and validates them by zero/flip interventions. It is an atlas discovery/isomorphism audit, not language encoding closure."
+}
