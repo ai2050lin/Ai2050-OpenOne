@@ -1,0 +1,294 @@
+{
+  "phase": 911,
+  "model": "glm4",
+  "status": "dry_run",
+  "selected_rows": [
+    {
+      "answer_aliases": [
+        "animal",
+        "living thing",
+        "living creature",
+        "creature"
+      ],
+      "canonical_answer": "animal",
+      "case_id": "p856_009_animal_fish",
+      "case_split": "phase856_base",
+      "edit_mode": "flip",
+      "eval_domain": "animal",
+      "gear_keys": [
+        "L35C8824"
+      ],
+      "generated_clean": "animal",
+      "generated_ids": [
+        9859,
+        198,
+        1234,
+        25,
+        7640,
+        12889,
+        198,
+        1957,
+        25,
+        1633,
+        198,
+        1234
+      ],
+      "generated_text": " animal\nItem: fish tank\nClass: object\nItem",
+      "is_component": false,
+      "is_source_candidate": true,
+      "model": "glm4",
+      "object": "fish",
+      "phase": 899,
+      "phase898_no_single_pair_keys": [],
+      "phase898_single_closure_keys": [
+        "L35C8824"
+      ],
+      "prompt_variant": "classification",
+      "protocol_drift": true,
+      "rollout_answer_class": true,
+      "rollout_bad_transition": true,
+      "rollout_class_no_echo_no_protocol": false,
+      "rollout_clear_answer_class": true,
+      "rollout_clear_answer_no_protocol": false,
+      "rollout_identity_class_overlap": false,
+      "rollout_label": "strict_canonical",
+      "rollout_object_echo": false,
+      "rollout_other_or_format": false,
+      "rollout_relation": "source_candidate_single",
+      "rollout_strict_canonical": true,
+      "row_kind": "phase899_rollout_protocol_audit_row",
+      "source_key": "phase897_single_candidate::animal::L35C8824",
+      "source_subset_key": "L35C8824",
+      "source_type": "phase897_single_candidate",
+      "subset_key": "L35C8824",
+      "subset_size": 1
+    },
+    {
+      "answer_aliases": [
+        "animal",
+        "living thing",
+        "living creature",
+        "creature"
+      ],
+      "canonical_answer": "animal",
+      "case_id": "p856_009_animal_fish",
+      "case_split": "phase856_base",
+      "edit_mode": "zero",
+      "eval_domain": "animal",
+      "gear_keys": [
+        "L35C8824"
+      ],
+      "generated_clean": "animal",
+      "generated_ids": [
+        9859,
+        198,
+        1234,
+        25,
+        7640,
+        12889,
+        198,
+        1957,
+        25,
+        1633,
+        198,
+        1234
+      ],
+      "generated_text": " animal\nItem: fish tank\nClass: object\nItem",
+      "is_component": false,
+      "is_source_candidate": true,
+      "model": "glm4",
+      "object": "fish",
+      "phase": 899,
+      "phase898_no_single_pair_keys": [],
+      "phase898_single_closure_keys": [
+        "L35C8824"
+      ],
+      "prompt_variant": "classification",
+      "protocol_drift": true,
+      "rollout_answer_class": true,
+      "rollout_bad_transition": true,
+      "rollout_class_no_echo_no_protocol": false,
+      "rollout_clear_answer_class": true,
+      "rollout_clear_answer_no_protocol": false,
+      "rollout_identity_class_overlap": false,
+      "rollout_label": "strict_canonical",
+      "rollout_object_echo": false,
+      "rollout_other_or_format": false,
+      "rollout_relation": "source_candidate_single",
+      "rollout_strict_canonical": true,
+      "row_kind": "phase899_rollout_protocol_audit_row",
+      "source_key": "phase897_single_candidate::animal::L35C8824",
+      "source_subset_key": "L35C8824",
+      "source_type": "phase897_single_candidate",
+      "subset_key": "L35C8824",
+      "subset_size": 1
+    }
+  ],
+  "specs": [
+    {
+      "control_label": "route_only_alpha_1",
+      "control_family": "prompt_preserving_route_control",
+      "control_kind": "route_only",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "alpha": 1.0
+    },
+    {
+      "control_label": "route_logit_mask_blocker_top1",
+      "control_family": "logit_blocker_mask_diagnostic",
+      "control_kind": "logit_mask",
+      "neural_intervention": false,
+      "diagnostic_only": true,
+      "mask_topk_blockers": 1
+    },
+    {
+      "control_label": "route_logit_mask_blocker_top3",
+      "control_family": "logit_blocker_mask_diagnostic",
+      "control_kind": "logit_mask",
+      "neural_intervention": false,
+      "diagnostic_only": true,
+      "mask_topk_blockers": 3
+    },
+    {
+      "control_label": "route_logit_mask_blocker_top8",
+      "control_family": "logit_blocker_mask_diagnostic",
+      "control_kind": "logit_mask",
+      "neural_intervention": false,
+      "diagnostic_only": true,
+      "mask_topk_blockers": 8
+    },
+    {
+      "control_label": "route_logit_mask_blocker_top16",
+      "control_family": "logit_blocker_mask_diagnostic",
+      "control_kind": "logit_mask",
+      "neural_intervention": false,
+      "diagnostic_only": true,
+      "mask_topk_blockers": 16
+    },
+    {
+      "control_label": "route_logit_mask_blocker_top32",
+      "control_family": "logit_blocker_mask_diagnostic",
+      "control_kind": "logit_mask",
+      "neural_intervention": false,
+      "diagnostic_only": true,
+      "mask_topk_blockers": 32
+    },
+    {
+      "control_label": "route_plus_unembed_margin_top1_beta_0.05",
+      "control_family": "internal_readout_margin_direction",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.05
+    },
+    {
+      "control_label": "route_plus_unembed_margin_top1_beta_0.1",
+      "control_family": "internal_readout_margin_direction",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.1
+    },
+    {
+      "control_label": "route_plus_unembed_margin_top1_beta_0.25",
+      "control_family": "internal_readout_margin_direction",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.25
+    },
+    {
+      "control_label": "route_plus_unembed_margin_top1_beta_0.5",
+      "control_family": "internal_readout_margin_direction",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.5
+    },
+    {
+      "control_label": "route_minus_unembed_blocker_top1_beta_0.1",
+      "control_family": "internal_readout_blocker_suppression",
+      "control_kind": "readout_direction",
+      "direction_kind": "minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.1
+    },
+    {
+      "control_label": "route_minus_unembed_blocker_top3_beta_0.1",
+      "control_family": "internal_readout_blocker_suppression",
+      "control_kind": "readout_direction",
+      "direction_kind": "minus_blocker_top3_mean",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.1
+    },
+    {
+      "control_label": "route_plus_unembed_eos_beta_0.1",
+      "control_family": "internal_readout_eos_boost",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_boost",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.1
+    },
+    {
+      "control_label": "route_minus_unembed_blocker_top1_beta_0.25",
+      "control_family": "internal_readout_blocker_suppression",
+      "control_kind": "readout_direction",
+      "direction_kind": "minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.25
+    },
+    {
+      "control_label": "route_minus_unembed_blocker_top3_beta_0.25",
+      "control_family": "internal_readout_blocker_suppression",
+      "control_kind": "readout_direction",
+      "direction_kind": "minus_blocker_top3_mean",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.25
+    },
+    {
+      "control_label": "route_plus_unembed_eos_beta_0.25",
+      "control_family": "internal_readout_eos_boost",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_boost",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.25
+    },
+    {
+      "control_label": "route_minus_unembed_blocker_top1_beta_0.5",
+      "control_family": "internal_readout_blocker_suppression",
+      "control_kind": "readout_direction",
+      "direction_kind": "minus_blocker_top1",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.5
+    },
+    {
+      "control_label": "route_minus_unembed_blocker_top3_beta_0.5",
+      "control_family": "internal_readout_blocker_suppression",
+      "control_kind": "readout_direction",
+      "direction_kind": "minus_blocker_top3_mean",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.5
+    },
+    {
+      "control_label": "route_plus_unembed_eos_beta_0.5",
+      "control_family": "internal_readout_eos_boost",
+      "control_kind": "readout_direction",
+      "direction_kind": "eos_boost",
+      "neural_intervention": true,
+      "diagnostic_only": false,
+      "beta": 0.5
+    }
+  ]
+}

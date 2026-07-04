@@ -1,0 +1,202 @@
+{
+  "phase": 910,
+  "model": "glm4",
+  "status": "dry_run",
+  "selected_rows": [
+    {
+      "answer_aliases": [
+        "animal",
+        "living thing",
+        "living creature",
+        "creature"
+      ],
+      "canonical_answer": "animal",
+      "case_id": "p856_009_animal_fish",
+      "case_split": "phase856_base",
+      "edit_mode": "flip",
+      "eval_domain": "animal",
+      "gear_keys": [
+        "L35C8824"
+      ],
+      "generated_clean": "animal",
+      "generated_ids": [
+        9859,
+        198,
+        1234,
+        25,
+        7640,
+        12889,
+        198,
+        1957,
+        25,
+        1633,
+        198,
+        1234
+      ],
+      "generated_text": " animal\nItem: fish tank\nClass: object\nItem",
+      "is_component": false,
+      "is_source_candidate": true,
+      "model": "glm4",
+      "object": "fish",
+      "phase": 899,
+      "phase898_no_single_pair_keys": [],
+      "phase898_single_closure_keys": [
+        "L35C8824"
+      ],
+      "prompt_variant": "classification",
+      "protocol_drift": true,
+      "rollout_answer_class": true,
+      "rollout_bad_transition": true,
+      "rollout_class_no_echo_no_protocol": false,
+      "rollout_clear_answer_class": true,
+      "rollout_clear_answer_no_protocol": false,
+      "rollout_identity_class_overlap": false,
+      "rollout_label": "strict_canonical",
+      "rollout_object_echo": false,
+      "rollout_other_or_format": false,
+      "rollout_relation": "source_candidate_single",
+      "rollout_strict_canonical": true,
+      "row_kind": "phase899_rollout_protocol_audit_row",
+      "source_key": "phase897_single_candidate::animal::L35C8824",
+      "source_subset_key": "L35C8824",
+      "source_type": "phase897_single_candidate",
+      "subset_key": "L35C8824",
+      "subset_size": 1
+    }
+  ],
+  "specs": [
+    {
+      "control_label": "L0_attn_output_last_scale_0.75",
+      "control_family": "prompt_intact_output_scale",
+      "control_kind": "component_scale",
+      "factor": 0.75,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_attn_output_last_scale_0.50",
+      "control_family": "prompt_intact_output_scale",
+      "control_kind": "component_scale",
+      "factor": 0.5,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_promptzero_delta_alpha_0.05",
+      "control_family": "prompt_intact_counterfactual_direction",
+      "control_kind": "output_delta",
+      "alpha": 0.05,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false,
+      "direction_source": "prompt_all_zero_minus_baseline_l0_attention_output"
+    },
+    {
+      "control_label": "L0_promptzero_delta_alpha_0.1",
+      "control_family": "prompt_intact_counterfactual_direction",
+      "control_kind": "output_delta",
+      "alpha": 0.1,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false,
+      "direction_source": "prompt_all_zero_minus_baseline_l0_attention_output"
+    },
+    {
+      "control_label": "L0_promptzero_delta_alpha_0.25",
+      "control_family": "prompt_intact_counterfactual_direction",
+      "control_kind": "output_delta",
+      "alpha": 0.25,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false,
+      "direction_source": "prompt_all_zero_minus_baseline_l0_attention_output"
+    },
+    {
+      "control_label": "L0_promptzero_delta_alpha_0.5",
+      "control_family": "prompt_intact_counterfactual_direction",
+      "control_kind": "output_delta",
+      "alpha": 0.5,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false,
+      "direction_source": "prompt_all_zero_minus_baseline_l0_attention_output"
+    },
+    {
+      "control_label": "L0_promptzero_delta_alpha_1",
+      "control_family": "prompt_intact_counterfactual_direction",
+      "control_kind": "output_delta",
+      "alpha": 1.0,
+      "prompt_input_intact": true,
+      "prompt_all_zero_used": false,
+      "direction_source": "prompt_all_zero_minus_baseline_l0_attention_output"
+    },
+    {
+      "control_label": "L0_input_prompt_all_half",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "prompt_all",
+      "factor": 0.5,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_prompt_first8_half",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "prompt_first8",
+      "factor": 0.5,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_prompt_first8_zero",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "prompt_first8",
+      "factor": 0.0,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_prompt_last8_half",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "prompt_last8",
+      "factor": 0.5,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_prompt_last8_zero",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "prompt_last8",
+      "factor": 0.0,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_answer_prefix_last_half",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "answer_prefix_last",
+      "factor": 0.5,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_period_half",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "period_token",
+      "factor": 0.5,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    },
+    {
+      "control_label": "L0_input_period_zero",
+      "control_family": "limited_span_adjustment",
+      "control_kind": "input_span_scale",
+      "span_kind": "period_token",
+      "factor": 0.0,
+      "prompt_input_intact": false,
+      "prompt_all_zero_used": false
+    }
+  ]
+}

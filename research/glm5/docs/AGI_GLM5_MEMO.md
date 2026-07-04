@@ -3929,3 +3929,3913 @@ Phase908/909 是重要图谱进展；
 不是闭合；
 下一步已经从同阶段细审计转入新的 prompt-preserving route reconstruction 阶段，因此本轮不继续自动启动新测试。
 ```
+
+## Phase 910: 保持提示结构的终止路线重建 [2026-07-03 21:28]
+
+### 一、任务判断
+
+本阶段读取并复核了最新上传内容中对 Phase908/909 的判断。总体结论是：
+
+```text
+附件判断基本正确。
+Phase908/909 证明 L0 attention 中存在 EOS proximity（结束符近邻）边界；
+但最强证据来自 prompt_all_zero（整体提示清零）这类强破坏干预；
+因此它们是图谱推进，不是自然终止动作闭合。
+```
+
+Phase908/909 的正确部分是：
+
+```text
+1. L0 attention 的确能显著改变 EOS rank（结束符排名）；
+2. prompt_all 是最强来源片段；
+3. EOS proximity 可以被制造出来；
+4. 但 patched_eos_top1 = 0，strict clean closure = 0；
+5. 因此不能把“接近 EOS”误判成“自然选择 EOS”。
+```
+
+需要收紧的部分是：
+
+```text
+prompt_all_zero 只能作为反事实来源定位工具，不能作为自然机制证据。
+如果要继续推进，必须在保持 prompt（提示）和 answer-prefix（答案前缀）结构的条件下，
+测试这条 termination route（终止路线）是否可复用。
+```
+
+因此本阶段执行 Phase910：
+
+```text
+Prompt-preserving termination route reconstruction
+保持提示结构的终止路线重建
+```
+
+### 二、测试脚本和结果路径
+
+测试脚本：
+
+```text
+tests/glm5/phase910_prompt_preserving_termination_route_reconstruction.py
+tests/glm5/run_phase910_prompt_preserving_termination_route_reconstruction.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase910_prompt_preserving_termination_route_reconstruction/prompt_preserving_termination_route_reconstruction/
+```
+
+核心结果文件：
+
+```text
+phase910_cross_model_summary.md
+phase910_cross_model_summary.json
+phase910_qwen3_rows.jsonl
+phase910_glm4_rows.jsonl
+phase910_deepseek7b_rows.jsonl
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型按顺序单独加载和释放，避免 GPU 内存叠加。
+
+### 三、测试原理
+
+Phase910 不再把 prompt_all_zero 当作有效测试干预，而只把它当作构造反事实方向的来源。
+
+设 baseline（基线）下 L0 attention 在最后 token（词元）的输出为：
+
+$$
+h^{0}_{attn}(x)
+$$
+
+设 prompt_all_zero 反事实下对应输出为：
+
+$$
+h^{0}_{attn}(x_{\text{prompt-zero}})
+$$
+
+构造 prompt-conditioned counterfactual direction（提示条件反事实方向）：
+
+$$
+d_{\text{prompt}}(x)
+=
+h^{0}_{attn}(x_{\text{prompt-zero}})
+-
+h^{0}_{attn}(x)
+$$
+
+然后在保持原始 prompt 输入结构不变的情况下，只对 L0 attention 输出做方向注入：
+
+$$
+\tilde{h}^{0}_{attn}(x;\alpha)
+=
+h^{0}_{attn}(x)
+
+\alpha d_{\text{prompt}}(x)
+$$
+
+其中：
+
+$$
+\alpha \in \{0.05, 0.1, 0.25, 0.5, 1.0\}
+$$
+
+这类干预记为 prompt-intact（提示输入完整）干预。它不破坏 prompt token（提示词元）输入，只测试 Phase909 找到的方向是否能作为 L0 attention output route-state adjustment（早层注意力输出路线状态调整）被复用。
+
+同时设置弱对照：
+
+$$
+\tilde{h}^{0}_{attn}(x;\lambda)
+=
+\lambda h^{0}_{attn}(x)
+$$
+
+其中：
+
+$$
+\lambda \in \{0.75, 0.5\}
+$$
+
+另设 limited-span adjustment（局部片段调整）作为边界参考，包括：
+
+```text
+prompt_all_half
+prompt_first8_half / prompt_first8_zero
+prompt_last8_half / prompt_last8_zero
+answer_prefix_last_half
+period_half / period_zero
+```
+
+这些局部片段调整不是 strict prompt-preserving（严格保持提示）证据，只用于判断来源边界。
+
+主要观测量：
+
+$$
+\Delta r_{EOS}
+=
+r_{patched}(EOS)
+-
+r_{base}(EOS)
+$$
+
+$$
+\Delta z_{EOS}
+=
+z_{patched}(EOS)
+-
+z_{base}(EOS)
+$$
+
+$$
+\Delta z_{next}
+=
+z_{patched}(next_{base})
+-
+z_{base}(next_{base})
+$$
+
+$$
+\Delta M_{EOS,next}
+=
+
+\left[
+z_{patched}(EOS)-z_{patched}(next_{base})
+\right]
+-
+\left[
+z_{base}(EOS)-z_{base}(next_{base})
+\right]
+$$
+
+全词表 blocker（阻塞词元）边界：
+
+$$
+B(x)
+=
+\arg\max_{v \ne EOS} z_v(x)
+$$
+
+$$
+M_{EOS,B}
+=
+z(EOS)-z(B)
+$$
+
+闭合不能只看 EOS rank（结束符排名），还必须看：
+
+$$
+M_{EOS,B} > 0
+$$
+
+否则只是 EOS proximity（结束符近邻），不是 EOS action closure（结束符动作闭合）。
+
+### 四、总体结果
+
+三模型总计：
+
+```text
+rows = 1020
+eos_rank_improved = 461
+eos_rank_improved_100 = 407
+eos_rank_improved_1000 = 237
+patched_eos_top1 = 0
+patched_eos_top5 = 0
+patched_eos_top10 = 4
+patched_eos_top50 = 18
+prompt_preserving_eos_top1 = 0
+prompt_preserving_eos_top10 = 4
+prompt_preserving_eos_top50 = 15
+strict_clean_candidate = 0
+direct_eos_lift = 427
+continuation_suppressed = 539
+protocol_suppressed = 597
+next_top_changed = 295
+next_category_changed = 195
+```
+
+只看 prompt-intact（提示输入完整）子集：
+
+```text
+rows = 476
+eos_rank_improved = 196
+eos_rank_improved_100 = 160
+eos_rank_improved_1000 = 62
+patched_eos_top1 = 0
+patched_eos_top5 = 0
+patched_eos_top10 = 4
+patched_eos_top50 = 15
+prompt_preserving_eos_top1 = 0
+prompt_preserving_eos_top10 = 4
+prompt_preserving_eos_top50 = 15
+strict_clean_candidate = 0
+direct_eos_lift = 191
+continuation_suppressed = 168
+protocol_suppressed = 188
+next_top_changed = 65
+next_category_changed = 45
+```
+
+客观现象：
+
+```text
+1. prompt-preserving 条件下确实能复现 EOS top50；
+2. GLM4 出现 EOS top10；
+3. 但 EOS top1 仍为 0；
+4. strict clean candidate 仍为 0；
+5. 因此本阶段是正结果，但不是闭合。
+```
+
+### 五、分模型结果
+
+qwen3：
+
+```text
+rows = 270
+prompt_intact_rows = 126
+patched_eos_top1 = 0
+patched_eos_top10 = 0
+patched_eos_top50 = 0
+prompt_preserving_eos_top10 = 0
+prompt_preserving_eos_top50 = 0
+evidence = prompt_preserving_route_improves_eos_but_not_near
+```
+
+GLM4：
+
+```text
+rows = 255
+prompt_intact_rows = 119
+patched_eos_top1 = 0
+patched_eos_top10 = 4
+patched_eos_top50 = 16
+prompt_preserving_eos_top10 = 4
+prompt_preserving_eos_top50 = 15
+evidence = prompt_preserving_route_reaches_eos_top10
+```
+
+DS7B：
+
+```text
+rows = 495
+prompt_intact_rows = 231
+patched_eos_top1 = 0
+patched_eos_top10 = 0
+patched_eos_top50 = 2
+prompt_preserving_eos_top10 = 0
+prompt_preserving_eos_top50 = 0
+evidence = prompt_preserving_route_improves_eos_but_not_near
+```
+
+模型差异非常清楚：
+
+```text
+GLM4 支持 prompt-preserving EOS proximity reconstruction；
+qwen3 只出现方向性改善，没有进入近邻区；
+DS7B 的少量 top50 来自 period_zero 这类局部输入破坏，不属于 prompt-preserving 证据。
+```
+
+### 六、最关键控制项
+
+GLM4 最强控制项：
+
+```text
+control = L0_promptzero_delta_alpha_1
+family = prompt_intact_counterfactual_direction
+prompt_input_intact = true
+prompt_all_zero_used = false
+rows = 17
+eos_rank_improved = 15
+eos_rank_improved_100 = 15
+eos_rank_improved_1000 = 15
+patched_eos_top1 = 0
+patched_eos_top5 = 0
+patched_eos_top10 = 4
+patched_eos_top50 = 15
+prompt_preserving_eos_top10 = 4
+prompt_preserving_eos_top50 = 15
+direct_eos_lift = 15
+continuation_suppressed = 17
+protocol_suppressed = 17
+median_eos_rank_delta = -22243
+median_eos_logit_delta = +7.2036
+median_next_logit_delta = -11.9922
+median_eos_vs_next_margin_delta = +11.8896
+median_eos_margin_vs_full_vocab_blocker = -2.4375
+blocker_categories = {"other": 17}
+```
+
+这个结果非常重要，因为它说明：
+
+```text
+Phase909 找到的 prompt-conditioned direction（提示条件方向）
+不是只能在 prompt_all_zero 破坏条件下生效；
+它可以在保持原始 prompt 输入结构的情况下，
+通过 L0 attention output route adjustment（早层注意力输出路线调整）
+把 GLM4 的 EOS 拉入 top10/top50。
+```
+
+但是它也暴露出硬边界：
+
+```text
+EOS 仍然不是 top1；
+EOS 与 full-vocabulary blocker 的中位 margin 仍为 -2.4375；
+blocker 主要落在 other 类，其中 GLM4 近邻样本常见 blocker 包括 token "a"；
+所以这不是 EOS action closure，而是 termination proximity route reconstruction。
+```
+
+DS7B 最接近控制项：
+
+```text
+control = L0_input_period_zero
+family = limited_span_adjustment
+prompt_input_intact = false
+rows = 33
+patched_eos_top50 = 2
+prompt_preserving_eos_top50 = 0
+median_eos_margin_vs_full_vocab_blocker = -28.2656
+```
+
+该结果不能作为 prompt-preserving 证据。DS7B 中 blocker 仍极强，近邻样本中常见 `<think>` 相关竞争场，因此 DS7B 的终止路线尚未被本阶段方法重建。
+
+### 七、阶段进展
+
+Phase910 的进展可以概括为：
+
+```text
+从“prompt_all_zero 破坏能产生 EOS proximity”
+推进到
+“GLM4 中 prompt-conditioned direction 可在 prompt-intact 输出层复用”。
+```
+
+这比 Phase908/909 更接近自然机制，因为：
+
+```text
+1. 没有把 prompt 输入整体清零作为测试控制；
+2. 保持了原始 prompt 和 answer-prefix 结构；
+3. 干预位置从 input destruction（输入破坏）转为 output route-state adjustment（输出路线状态调整）；
+4. 成功达到 prompt-preserving EOS top10；
+5. 同时保留 full-vocabulary blocker 审计，没有只看目标 logit。
+```
+
+但它距离闭合仍然很远：
+
+```text
+1. patched_eos_top1 = 0；
+2. strict_clean_candidate = 0；
+3. qwen3 和 DS7B 没有跨模型复现 top10；
+4. GLM4 的成功需要 alpha = 1.0 的完整反事实方向，不是小幅 alpha；
+5. EOS 仍被全词表 blocker 压住；
+6. 当前证据是“路线近邻重建”，不是“自然终止动作选择”。
+```
+
+### 八、理论更新
+
+当前理论应从：
+
+```text
+L0 attention contains EOS boundary source
+L0 attention 含有 EOS 边界来源
+```
+
+升级为：
+
+```text
+L0 attention contains a prompt-conditioned termination proximity route,
+but the route is separated from natural EOS action closure by a full-vocabulary blocker field.
+
+L0 attention 含有提示条件化的终止近邻路线，
+但这条路线与自然 EOS 动作闭合之间仍隔着全词表阻塞场。
+```
+
+对应分层结构：
+
+```text
+1. prompt-conditioned route source
+   提示条件化路线来源
+
+2. termination proximity field
+   终止近邻场
+
+3. continuation/protocol suppression field
+   续写/协议抑制场
+
+4. full-vocabulary blocker field
+   全词表阻塞场
+
+5. missing EOS action gate
+   尚未定位的 EOS 动作门
+```
+
+当前公式应写成：
+
+$$
+z_{EOS}
+=
+F_{EOS}
+\Delta_{\text{route}}
+\Delta_{\text{termination-proximity}}
+\Delta_{\text{suppression}}
+-B_{\text{full-vocab}}
+ + \epsilon
+$$
+
+其中闭合条件不是：
+
+$$
+rank(EOS) \le 50
+$$
+
+也不是：
+
+$$
+rank(EOS) \le 10
+$$
+
+而是至少需要：
+
+$$
+rank(EOS)=1
+$$
+
+并且：
+
+$$
+z(EOS) > \max_{v \ne EOS} z(v)
+$$
+
+同时满足自然输出一致性：
+
+$$
+Y_{\text{patched}}
+\approx
+Y_{\text{natural-clean}}
+$$
+
+当前 Phase910 只证明：
+
+$$
+\exists \alpha:
+\quad
+rank_{\tilde{h}^{0}_{attn}(x;\alpha)}(EOS)
+\le 10
+\quad
+\text{in GLM4}
+$$
+
+没有证明：
+
+$$
+\exists \alpha:
+\quad
+rank_{\tilde{h}^{0}_{attn}(x;\alpha)}(EOS)
+=1
+$$
+
+也没有证明：
+
+$$
+Y_{\text{patched}}
+=
+Y_{\text{natural-clean}}
+$$
+
+### 九、小模型偏差影响
+
+当前三模型都是小模型或较小规模模型，结果必须谨慎解释。
+
+可能偏差：
+
+```text
+1. 小模型终止路线可能更粗糙，EOS action gate 不完整；
+2. qwen3/DS7B 可能把终止、格式、解释模式纠缠在同一组早层结构里；
+3. GLM4 的 L0 route 可复用性可能是模型结构特例；
+4. DS7B 的 `<think>` blocker 可能来自对齐模板或训练格式，而不是通用语言机制；
+5. prompt-preserving top10 不跨模型复现，说明不能把 GLM4 结果直接上升为普遍结论。
+```
+
+因此，本阶段最稳妥的客观结论是：
+
+```text
+GLM4 中存在可复用的 prompt-conditioned termination proximity route；
+qwen3 和 DS7B 尚未验证同等级路线；
+全词表 blocker 是从 EOS proximity 到 EOS action closure 的主要可见瓶颈。
+```
+
+### 十、闭合距离评估
+
+当前阶段相对 closure（闭合）的距离：
+
+```text
+已经完成：
+  L0 attention 来源定位；
+  prompt_all 来源边界；
+  prompt-preserving 方向复用；
+  GLM4 EOS top10/top50 近邻重建；
+  full-vocabulary blocker 审计。
+
+尚未完成：
+  EOS top1；
+  strict clean answer；
+  blocker displacement；
+  qwen3/DS7B 跨模型复现；
+  natural route gate 定位；
+  多 token rollout closure。
+```
+
+进度估计：
+
+```text
+全局齿轮图谱:
+  95% - 96%
+
+语言编码机制闭合:
+  48% - 52%
+```
+
+图谱进度提升原因：
+
+```text
+termination route 已从强破坏来源定位推进到 prompt-intact 输出路线复用。
+```
+
+闭合进度仍低的原因：
+
+```text
+EOS action gate 未定位；
+full-vocabulary blocker 未解除；
+strict clean 输出仍为 0。
+```
+
+### 十一、下一阶段任务
+
+Phase910 已完成 prompt-preserving termination route reconstruction（保持提示结构的终止路线重建）阶段目标。
+
+下一阶段不应继续无差别扩大 alpha，也不应回到 prompt_all_zero 破坏路线，而应进入：
+
+```text
+Phase911:
+Full-vocabulary blocker displacement after prompt-preserving termination reconstruction
+保持提示结构终止路线重建后的全词表阻塞者迁移审计
+```
+
+核心问题：
+
+```text
+既然 GLM4 已经能把 EOS 拉入 top10，
+为什么 EOS 仍然无法成为 top1？
+```
+
+Phase911 任务：
+
+```text
+1. 固定 GLM4 的 L0_promptzero_delta_alpha_1 成功路线；
+2. 提取所有 EOS top10/top50 样本的 full-vocabulary blocker；
+3. 对 blocker token、blocker category、blocker layer/source 做归因；
+4. 优先分析 GLM4 中常见 token "a" 及 other 类 blocker；
+5. 在 qwen3/DS7B 中对照 `<think>`、field_word、protocol token 等 blocker；
+6. 测试是否存在 blocker-specific suppressor route（阻塞者特异抑制路线）；
+7. 判断 termination closure 缺口是 EOS lift 不够，还是 blocker field 未迁移。
+```
+
+成功标准：
+
+```text
+最低标准：
+  在 GLM4 prompt-preserving top10 样本中，把 EOS 与 blocker 的 margin 提升到接近 0。
+
+中等标准：
+  出现 prompt-preserving EOS top5。
+
+高标准：
+  出现 prompt-preserving EOS top1。
+
+最高标准：
+  strict_clean_candidate > 0，并且不是由 prompt 破坏导致。
+```
+
+阶段边界判断：
+
+```text
+Phase910 已完成当前阶段；
+Phase911 属于同一条 clean protocol edge graph（干净协议边图谱）主线，
+但已经从 termination route reconstruction（终止路线重建）
+切换到 blocker displacement（阻塞者迁移）子阶段。
+```
+
+## Phase 911: 保持提示结构终止路线后的全词表阻塞者迁移审计 [2026-07-03 23:39]
+
+### 一、任务判断
+
+本阶段读取并复核了最新上传内容中对 Phase910 的分析。总体判断：
+
+```text
+附件分析基本正确。
+Phase910 的确完成了从 prompt_all_zero 强破坏定位
+到 prompt-intact termination proximity route reconstruction
+的关键转换。
+```
+
+Phase910 可以确认的部分：
+
+```text
+1. GLM4 中 L0_promptzero_delta_alpha_1 可在 prompt 输入完整条件下复用；
+2. GLM4 出现 prompt-preserving EOS top10 / top50；
+3. qwen3 与 DS7B 没有同级复现；
+4. EOS top1 = 0；
+5. strict clean candidate = 0；
+6. 因此它是 termination proximity route reconstruction，不是 EOS action closure。
+```
+
+附件要求下一步从：
+
+```text
+EOS lift / EOS proximity
+```
+
+转向：
+
+```text
+full-vocabulary blocker displacement
+全词表阻塞者迁移
+```
+
+这个判断正确。本阶段因此继续执行 Phase911：
+
+```text
+Full-vocabulary blocker displacement after prompt-preserving termination reconstruction
+保持提示结构终止路线重建后的全词表阻塞者迁移审计
+```
+
+### 二、测试脚本和结果路径
+
+测试脚本：
+
+```text
+tests/glm5/phase911_full_vocab_blocker_displacement_audit.py
+tests/glm5/run_phase911_full_vocab_blocker_displacement_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase911_full_vocab_blocker_displacement_audit/full_vocab_blocker_displacement_audit/
+```
+
+核心结果文件：
+
+```text
+phase911_cross_model_summary.md
+phase911_cross_model_summary.json
+phase911_qwen3_rows.jsonl
+phase911_glm4_rows.jsonl
+phase911_deepseek7b_rows.jsonl
+```
+
+模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型按顺序加载、测试、释放，避免 GPU 内存叠加。
+
+### 三、测试原理
+
+Phase911 固定 Phase910 中的 prompt-preserving route：
+
+$$
+\tilde{h}^{0}_{attn}(x)
+=
+h^{0}_{attn}(x)
+
+d_{\text{prompt}}(x)
+$$
+
+其中：
+
+$$
+d_{\text{prompt}}(x)
+=
+h^{0}_{attn}(x_{\text{prompt-zero}})
+-
+h^{0}_{attn}(x)
+$$
+
+然后在 route-only（只加终止路线）结果上定位全词表 blocker：
+
+$$
+B(x)
+=
+\arg\max_{v \ne EOS} z_v(x)
+$$
+
+EOS 与 blocker 的边界为：
+
+$$
+M_{EOS,B}
+=
+z(EOS)-z(B)
+$$
+
+如果：
+
+$$
+M_{EOS,B} < 0
+$$
+
+则 EOS 即使进入 top10 / top50，也仍然没有动作支配权。
+
+本阶段设置两类控制。
+
+第一类是 internal readout-direction intervention（内部读出方向干预）：
+
+$$
+\tilde{h}^{0}_{attn}(x)
+=
+h^{0}_{attn}(x)
+
+d_{\text{prompt}}(x)
+
+\beta u
+$$
+
+其中 \(u\) 包括：
+
+$$
+u_1
+=
+\operatorname{norm}(W_{EOS}-W_{B})
+$$
+
+$$
+u_2
+=
+\operatorname{norm}(-W_{B})
+$$
+
+$$
+u_3
+=
+\operatorname{norm}(-\frac{1}{3}\sum_{i=1}^{3} W_{B_i})
+$$
+
+$$
+u_4
+=
+\operatorname{norm}(W_{EOS})
+$$
+
+并测试：
+
+$$
+\beta \in \{0.05,0.1,0.25,0.5\}
+$$
+
+第二类是 logit-level blocker mask diagnostic（对数几率层阻塞者遮蔽诊断）：
+
+$$
+z(B_{1:k})
+\leftarrow
+-\infty
+$$
+
+其中：
+
+$$
+k \in \{1,3,8,16,32\}
+$$
+
+注意：logit mask（对数几率遮蔽）只用于判断 blocker field（阻塞场）的形状，不能作为自然闭合证据。
+
+闭合证据必须来自：
+
+```text
+internal intervention（内部干预）
+```
+
+而不是：
+
+```text
+logit-level diagnostic mask（对数几率层诊断遮蔽）
+```
+
+### 四、总体结果
+
+三模型总计：
+
+```text
+rows = 1292
+internal_rows = 952
+diagnostic_rows = 340
+
+route_eos_top10 = 76
+route_eos_top50 = 285
+
+internal_eos_top1 = 0
+internal_eos_top5 = 0
+internal_eos_top10 = 57
+internal_eos_top50 = 210
+internal_eos_margin_nonnegative = 0
+internal_strict_clean_candidate = 0
+
+diagnostic_eos_top1 = 25
+diagnostic_eos_top5 = 36
+diagnostic_eos_top10 = 51
+diagnostic_eos_top50 = 75
+diagnostic_eos_margin_nonnegative = 25
+diagnostic_strict_clean_candidate = 25
+```
+
+最重要的客观结论：
+
+```text
+logit mask diagnostic 可以在 GLM4 中制造 EOS top1；
+internal readout-direction intervention 不能制造 EOS top1；
+因此 blocker bottleneck 存在，但当前内部方向干预没有找到真实 blocker displacement route。
+```
+
+### 五、分模型结果
+
+qwen3：
+
+```text
+rows = 342
+internal_rows = 252
+diagnostic_rows = 90
+route_eos_top10 = 0
+route_eos_top50 = 0
+internal_eos_top1 = 0
+internal_eos_top10 = 0
+diagnostic_eos_top1 = 0
+diagnostic_eos_top10 = 0
+median_route_eos_margin_vs_blocker = -13.921875
+evidence = no_route_near_and_no_blocker_displacement
+```
+
+qwen3 的主要 route blocker：
+
+```text
+"\n\n" 类空行 / 换行 continuation；
+Okay；
+The。
+```
+
+GLM4：
+
+```text
+rows = 323
+internal_rows = 238
+diagnostic_rows = 85
+route_eos_top10 = 76
+route_eos_top50 = 285
+internal_eos_top1 = 0
+internal_eos_top5 = 0
+internal_eos_top10 = 57
+internal_eos_top50 = 210
+internal_eos_margin_nonnegative = 0
+internal_strict_clean_candidate = 0
+diagnostic_eos_top1 = 25
+diagnostic_eos_top5 = 36
+diagnostic_eos_top10 = 51
+diagnostic_eos_top50 = 75
+diagnostic_eos_margin_nonnegative = 25
+median_route_eos_margin_vs_blocker = -2.4375
+evidence = logit_mask_diagnostic_shows_narrow_blocker_bottleneck
+```
+
+GLM4 的主要 route blocker：
+
+```text
+"a": 285
+" Fish": 38
+```
+
+DS7B：
+
+```text
+rows = 627
+internal_rows = 462
+diagnostic_rows = 165
+route_eos_top10 = 0
+route_eos_top50 = 0
+internal_eos_top1 = 0
+internal_eos_top10 = 0
+diagnostic_eos_top1 = 0
+diagnostic_eos_top10 = 0
+median_route_eos_margin_vs_blocker = -15.09375
+evidence = no_route_near_and_no_blocker_displacement
+```
+
+DS7B 的主要 route blocker：
+
+```text
+"</think>": 361
+The: 95
+Category: 76
+Wait: 38
+```
+
+这说明 DS7B 的阻塞场不是简单 token "a" 问题，而是 reasoning/protocol field（推理/协议场）仍强占输出。
+
+### 六、GLM4 关键控制项
+
+GLM4 route-only：
+
+```text
+control = route_only_alpha_1
+rows = 17
+patched_eos_top1 = 0
+patched_eos_top5 = 0
+patched_eos_top10 = 4
+patched_eos_top50 = 15
+median_eos_margin_vs_blocker = -2.4375
+route_blockers = {"a": 15, " Fish": 2}
+```
+
+最强内部干预：
+
+```text
+control = route_minus_unembed_blocker_top1_beta_0.1
+rows = 17
+internal_eos_top1 = 0
+internal_eos_top5 = 0
+internal_eos_top10 = 5
+internal_eos_top50 = 15
+median_patched_eos_margin_vs_blocker = -2.375
+route_blockers = {"a": 15, " Fish": 2}
+patched_blockers = {"a": 15, " Fish": 2}
+```
+
+解释：
+
+```text
+内部方向干预只能轻微改善 EOS top10；
+没有让 EOS 进入 top5/top1；
+没有让 EOS margin 变为非负；
+也没有真正迁移 blocker token。
+```
+
+GLM4 logit mask diagnostic：
+
+```text
+route_logit_mask_blocker_top1:
+  top1 = 0
+  top10 = 4
+  median margin = -1.78125
+
+route_logit_mask_blocker_top3:
+  top1 = 0
+  top10 = 6
+  median margin = -1.3125
+
+route_logit_mask_blocker_top8:
+  top1 = 0
+  top5 = 6
+  top10 = 11
+  median margin = -0.5625
+
+route_logit_mask_blocker_top16:
+  top1 = 10
+  top5 = 15
+  top10 = 15
+  median margin = +0.09375
+
+route_logit_mask_blocker_top32:
+  top1 = 15
+  top5 = 15
+  top10 = 15
+  median margin = +0.78125
+```
+
+这个结果非常关键。它说明：
+
+```text
+GLM4 的 termination closure 缺口不是无限宽的全词表噪声；
+而是一个大约 top16-top32 范围内的 blocker band（阻塞带）。
+```
+
+但它也说明：
+
+```text
+单独移除 top1 blocker "a" 不够；
+移除 top3 也不够；
+移除 top8 只能让部分样本进入 top5/top10；
+需要移除 top16/top32 才出现 EOS top1。
+```
+
+因此 GLM4 当前瓶颈更准确地说是：
+
+```text
+narrow-but-not-single-token blocker band
+窄但非单词元阻塞带
+```
+
+而不是：
+
+```text
+single blocker token
+单一阻塞词元
+```
+
+### 七、阶段进展
+
+Phase911 的正结果：
+
+```text
+1. 证明 GLM4 的 EOS closure 缺口主要落在有限 blocker band；
+2. 证明 top16/top32 blocker mask 可以让 EOS top1；
+3. 证明 full-vocabulary blocker field 必须纳入闭合标准；
+4. 进一步解释 Phase910 为什么 top10 仍不能闭合。
+```
+
+Phase911 的负结果：
+
+```text
+1. internal readout-direction intervention 没有产生 EOS top1；
+2. internal readout-direction intervention 没有让 EOS margin 非负；
+3. qwen3 / DS7B 没有 route-level EOS near；
+4. DS7B 的 reasoning/protocol blocker 仍极强；
+5. 所有“top1 / strict clean”都来自 diagnostic mask，不是内部因果闭合。
+```
+
+因此本阶段不能写成：
+
+```text
+完成 blocker displacement；
+完成 EOS action closure。
+```
+
+只能写成：
+
+```text
+定位了 GLM4 的有限 blocker band；
+证明当前内部方向干预不能迁移该 blocker band。
+```
+
+### 八、理论更新
+
+Phase910 的公式是：
+
+$$
+z_{EOS}
+=
+F_{EOS}
++
+\Delta_{\text{route}}
++
+\Delta_{\text{termination-proximity}}
++
+\Delta_{\text{suppression}}
+-
+B_{\text{full-vocab}}
++
+\epsilon
+$$
+
+Phase911 之后，应把 blocker 从单点项改成 blocker band（阻塞带）：
+
+$$
+B_{\text{full-vocab}}
+\Rightarrow
+\mathcal{B}_{k}(x)
+=
+\{B_1(x),B_2(x),...,B_k(x)\}
+$$
+
+GLM4 的经验结果显示：
+
+$$
+k \approx 16\text{ to }32
+$$
+
+因此闭合条件应写成：
+
+$$
+z(EOS)
+>
+\max_{v \notin \{EOS\}} z(v)
+$$
+
+也就是：
+
+$$
+z(EOS)
+>
+\max_{B_i \in \mathcal{B}_{k}(x)} z(B_i)
+$$
+
+但当前内部干预只达到：
+
+$$
+\Delta M_{EOS,B}
+\approx
+0
+$$
+
+并没有达到：
+
+$$
+M_{EOS,B} > 0
+$$
+
+对于 GLM4，诊断遮蔽给出的事实是：
+
+$$
+\operatorname{mask}(\mathcal{B}_{16})
+\Rightarrow
+EOSTop1 > 0
+$$
+
+$$
+\operatorname{mask}(\mathcal{B}_{32})
+\Rightarrow
+EOSTop1 \approx EOSProximityTop50
+$$
+
+但这不是自然机制：
+
+$$
+\operatorname{mask}(\mathcal{B}_{k})
+\ne
+\text{InternalCausalDisplacement}(\mathcal{B}_{k})
+$$
+
+所以最新理论应更新为：
+
+```text
+条件化输出场闭合理论
++
+有限阻塞带理论
+```
+
+也就是：
+
+```text
+语言终止不是只需要拉高 EOS；
+也不是只需要压低一个 blocker；
+而是需要在 prompt-conditioned termination route 成立之后，
+迁移一个有限宽度的 blocker band，
+最后触发 EOS action gate。
+```
+
+### 九、小模型偏差影响
+
+本阶段小模型偏差非常明显。
+
+GLM4：
+
+```text
+存在清晰的 finite blocker band；
+但可能是 GLM4 架构或训练模板特有。
+```
+
+qwen3：
+
+```text
+route 本身没有把 EOS 拉入 near zone；
+因此 blocker displacement 测试没有进入有效工作区。
+```
+
+DS7B：
+
+```text
+route 本身没有进入 EOS near zone；
+blocker 主要是 </think>、The、Category、Wait；
+说明 reasoning/protocol field 仍占主导。
+```
+
+因此，不能把 GLM4 的 top16/top32 blocker band 直接推广为通用语言机制。更稳妥的表述是：
+
+```text
+在 GLM4 的 clean protocol edge graph 中，
+EOS closure 缺口表现为有限 blocker band；
+在 qwen3/DS7B 中，本阶段尚未进入相同的 termination proximity 工作区。
+```
+
+### 十、问题和硬伤
+
+当前最大硬伤：
+
+```text
+internal_eos_top1 = 0
+internal_eos_margin_nonnegative = 0
+internal_strict_clean_candidate = 0
+```
+
+这说明：
+
+```text
+当前内部方向干预没有找到真实 blocker displacement route。
+```
+
+第二个硬伤：
+
+```text
+GLM4 的 top1 来自 logit mask diagnostic。
+```
+
+这只能说明：
+
+```text
+如果强行移除 blocker band，EOS 可以赢。
+```
+
+不能说明：
+
+```text
+模型内部自然存在移除 blocker band 的路线。
+```
+
+第三个硬伤：
+
+```text
+top16/top32 才能使 EOS top1。
+```
+
+这说明 blocker 不是单点，而是一段竞争带。下一步不能只盯 token "a"，必须定位整段 blocker band 的来源。
+
+第四个硬伤：
+
+```text
+qwen3 / DS7B 无同级复现。
+```
+
+这说明当前仍是模型局部图谱，不是跨模型语言编码机制闭合。
+
+### 十一、总体进度评估
+
+图谱进展：
+
+```text
+全局齿轮图谱:
+  96% - 97%
+```
+
+理由：
+
+```text
+Phase911 把 termination closure 缺口从“全词表 blocker”
+细化为 GLM4 中的 finite blocker band。
+```
+
+闭合进展：
+
+```text
+语言编码机制闭合:
+  49% - 53%
+```
+
+理由：
+
+```text
+虽然 logit mask 诊断能制造 EOS top1，
+但内部因果干预仍为 0；
+因此闭合进度只能小幅上升。
+```
+
+当前闭合阶梯：
+
+```text
+Level 1: AnswerClassPrefix
+  已较稳定
+
+Level 2: ProtocolContinuationFieldMapped
+  已图谱化
+
+Level 3: PromptConditionedRoute
+  GLM4 成立
+
+Level 4: PromptPreservingEOSProximity
+  GLM4 成立
+
+Level 5: FiniteBlockerBandLocated
+  GLM4 成立
+
+Level 6: InternalBlockerDisplacement
+  未完成
+
+Level 7: EOSActionDominance
+  未完成
+
+Level 8: StrictCleanAnswer
+  未完成
+
+Level 9: CrossModelTerminationIsomorphism
+  未完成
+```
+
+### 十二、下一阶段任务
+
+Phase911 已完成 blocker displacement audit（阻塞者迁移审计）阶段目标。
+
+下一阶段不应继续扩大 readout beta，也不应继续只做 logit mask。因为本阶段已经说明：
+
+```text
+logit mask 可以诊断瓶颈；
+但 readout-direction 不能迁移瓶颈。
+```
+
+下一阶段应进入：
+
+```text
+Phase912:
+Finite blocker band source localization
+有限阻塞带来源定位
+```
+
+核心任务：
+
+```text
+1. 固定 GLM4 的 route-only alpha=1；
+2. 锁定 top16/top32 blocker band；
+3. 不再只看 top1 blocker "a"；
+4. 对 blocker band 做 layer/component/source attribution；
+5. 测试 blocker band 是否来自 early attention、late MLP、LM head prior 或 protocol continuation field；
+6. 找到能整体降低 blocker band 的内部组件，而不是手动 mask logits。
+```
+
+成功标准：
+
+```text
+最低标准：
+  找到一个内部组件，其干预能显著降低 top16 blocker band 的整体 logit。
+
+中等标准：
+  在 GLM4 prompt-preserving route 基础上，internal_eos_top5 > 0。
+
+高标准：
+  internal_eos_top1 > 0。
+
+最高标准：
+  internal_strict_clean_candidate > 0，并且不依赖 logit mask。
+```
+
+阶段边界判断：
+
+```text
+Phase911 已完成当前 blocker displacement audit；
+Phase912 属于同一 clean protocol edge graph 主线，
+但已经切换到 blocker band source localization 子阶段。
+```
+
+## Phase 912: 有限阻塞带来源定位 [2026-07-04 00:40]
+
+### 一、对上传内容的判断
+
+上传内容对 Phase911 的分析基本正确，但需要严格限定证据层级。
+
+正确部分：
+
+```text
+1. Phase910 的 GLM4 prompt-preserving termination route 不是 EOS 动作闭合；
+2. Phase911 证明 GLM4 的缺口更像有限 blocker band，而不是无限宽的全词表混乱；
+3. logit mask top16/top32 可以把 EOS 推到 top1，说明 blocker band 的宽度有限；
+4. 内部 readout-direction intervention 仍不能自然完成 blocker displacement；
+5. 下一阶段应该定位 blocker band 的内部来源，而不是继续增大 beta 或继续手动 mask logits。
+```
+
+需要收紧的部分：
+
+```text
+1. logit mask 是诊断工具，不是内部机制；
+2. component suppression 是来源定位工具，不等于自然路线；
+3. EOS 进入 top5/top10 只能说明边界接近，不能说明闭合；
+4. 小模型内部结构较粗糙，qwen3 与 DS7B 的路线失败不能直接外推到大模型语言机制。
+```
+
+因此，Phase912 的任务被定义为：
+
+```text
+Finite blocker band source localization
+有限阻塞带来源定位
+```
+
+目标不是制造 EOS top1，而是回答：
+
+```text
+GLM4 route-only 之后压住 EOS 的 top16/top32 blocker band，
+主要来自哪些 layer/component/source？
+```
+
+### 二、测试脚本与结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase912_finite_blocker_band_source_localization.py
+tests/glm5/run_phase912_finite_blocker_band_source_localization.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase912_finite_blocker_band_source_localization/finite_blocker_band_source_localization/
+```
+
+核心结果文件：
+
+```text
+phase912_cross_model_summary.md
+phase912_cross_model_summary.json
+phase912_qwen3_summary.json
+phase912_glm4_summary.json
+phase912_deepseek7b_summary.json
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型按顺序执行，避免 GPU 显存叠加。
+
+### 三、测试原理
+
+Phase912 固定 Phase910 的 prompt-preserving route，不再使用 prompt-all-zero 作为直接测试控制，只把它用于提取路线方向：
+
+$$
+d_{\text{prompt}}
+=
+h^{0}_{attn}(x_{\text{prompt-zero}})
+-
+h^{0}_{attn}(x)
+$$
+
+在保持原始 prompt 输入完整的情况下，把该方向注入第 0 层 attention 输出：
+
+$$
+\tilde{h}^{0}_{attn}(x)
+=
+h^{0}_{attn}(x)
++
+d_{\text{prompt}}
+$$
+
+在 route-only 输出上定义有限阻塞带：
+
+$$
+B_k(x)
+=
+\operatorname{TopK}_{v\ne EOS}
+\left(
+z_v(\tilde{x})
+\right)
+$$
+
+其中：
+
+```text
+k = 16 或 32
+B_k(x) 是 route-only 后排在 EOS 前面的有限 blocker band 候选集合。
+```
+
+随后对每一层、每一类组件做输出压制：
+
+$$
+y_{\ell,c}^{\prime}
+=
+\gamma y_{\ell,c}
+$$
+
+其中：
+
+$$
+\gamma \in \{0.5, 0.0\}
+$$
+
+然后观察 blocker band 的整体变化：
+
+$$
+\Delta \operatorname{mean}(B_k)
+=
+\frac{1}{k}
+\sum_{v\in B_k}
+\left(
+z'_v-z_v
+\right)
+$$
+
+并同时观察 EOS 与全词表最高非 EOS token 的边界：
+
+$$
+M_{EOS,B}
+=
+z'(EOS)
+-
+\max_{v\ne EOS} z'(v)
+$$
+
+本阶段闭合标准仍然严格：
+
+```text
+最低来源定位标准：
+  band16 或 band32 的 mean logit 明显下降。
+
+中等进展标准：
+  GLM4 source intervention 后 EOS 进入 top5/top10。
+
+闭合标准：
+  EOS top1 > 0；
+  margin >= 0；
+  strict clean candidate > 0；
+  且不依赖 logit mask。
+```
+
+### 四、总体结果
+
+跨模型总结果：
+
+```text
+rows = 9076
+source_rows = 9008
+route_rows = 68
+
+route_eos_top10 = 4
+route_eos_top50 = 15
+
+source_eos_top1 = 0
+source_eos_top5 = 3
+source_eos_top10 = 592
+source_eos_top50 = 2326
+
+source_margin_nonnegative = 0
+source_strict_clean_candidate = 0
+strict_clean_candidate = 0
+
+band16_source_candidate = 800
+band16_strong_source_candidate = 383
+band32_source_candidate = 730
+band32_strong_source_candidate = 337
+```
+
+核心判断：
+
+```text
+Phase912 找到了大量 blocker band source candidate；
+但没有完成 EOS top1；
+没有完成 margin 非负；
+没有完成 strict clean candidate。
+```
+
+所以本阶段是：
+
+```text
+正结果：有限阻塞带可以被内部组件定位；
+负结果：来源定位还没有转化为自然闭合路线。
+```
+
+### 五、分模型结果
+
+#### 1. qwen3
+
+```text
+rows = 2610
+source_rows = 2592
+route_rows = 18
+
+route_eos_top10 = 0
+route_eos_top50 = 0
+
+source_eos_top1 = 0
+source_eos_top5 = 0
+source_eos_top10 = 0
+source_eos_top50 = 0
+
+band16_source_candidate = 173
+band16_strong_source_candidate = 90
+band32_source_candidate = 140
+band32_strong_source_candidate = 76
+
+median_band16_mean_delta = -0.0234375
+median_band32_mean_delta = -0.01953125
+median_eos_logit_delta = 0.0
+```
+
+qwen3 的主要 blocker：
+
+```text
+"\n\n" / "Okay" / "The"
+```
+
+qwen3 能定位若干 blocker band 来源，但 EOS 仍完全没有进入 top50。说明在 qwen3 上，Phase910/911 的终止路线本身没有进入可闭合区域，Phase912 的来源定位不能被解释为闭合接近。
+
+#### 2. GLM4
+
+```text
+rows = 2737
+source_rows = 2720
+route_rows = 17
+
+route_eos_top10 = 4
+route_eos_top50 = 15
+
+source_eos_top1 = 0
+source_eos_top5 = 3
+source_eos_top10 = 592
+source_eos_top50 = 2326
+
+source_margin_nonnegative = 0
+source_strict_clean_candidate = 0
+
+band16_source_candidate = 179
+band16_strong_source_candidate = 98
+band32_source_candidate = 179
+band32_strong_source_candidate = 93
+```
+
+GLM4 是本阶段最重要的正结果来源。
+
+最强可解释来源 1：
+
+```text
+L0 attention zero
+layer = 0
+bucket = early
+component = attention
+factor = 0.0
+
+rows = 17
+source_eos_top5 = 2
+source_eos_top10 = 13
+source_eos_top50 = 15
+source_margin_nonnegative = 0
+
+band16_source_candidate = 17
+band16_strong_source_candidate = 6
+median_band16_mean_delta = -0.88671875
+median_band16_max_delta = -1.125
+median_eos_logit_delta = +0.1875
+
+route blockers:
+  "a" = 15
+  " Fish" = 2
+```
+
+最强可解释来源 2：
+
+```text
+L4 MLP zero
+layer = 4
+bucket = early
+component = MLP
+factor = 0.0
+
+rows = 17
+source_eos_top5 = 1
+source_eos_top10 = 12
+source_eos_top50 = 17
+
+band16_source_candidate = 3
+band16_strong_source_candidate = 2
+median_band16_mean_delta = -0.326171875
+median_band16_max_delta = -0.625
+median_eos_logit_delta = +0.40625
+```
+
+重要负结果：
+
+```text
+GLM4 late MLP 也能强烈降低 blocker band，
+但经常同时压低 EOS 或破坏输出场。
+```
+
+例子：
+
+```text
+L38 MLP zero:
+  band16_source_candidate = 17
+  band16_strong_source_candidate = 17
+  median_band16_mean_delta = -3.460693359375
+  median_eos_logit_delta = -3.5625
+  source_eos_top10 = 0
+
+L39 MLP zero:
+  median_band16_mean_delta = -2.5810546875
+  median_eos_logit_delta = -7.2773
+
+L35 MLP zero:
+  median_band16_mean_delta = -5.32635498046875
+  median_eos_logit_delta = -6.8633
+```
+
+这说明 late MLP 很可能是 blocker band 的强承载区，但直接压制它并不是 clean termination route，因为它把 EOS 和 blocker 一起破坏。
+
+GLM4 的当前结构图像更像：
+
+```text
+early attention / early MLP:
+  route-coupled source，可以降低 blocker 并让 EOS 接近 top5/top10。
+
+late MLP:
+  high-energy carrier source，可以强烈改变 blocker band，
+  但与 EOS / 输出场纠缠严重，不能直接作为自然闭合路线。
+```
+
+#### 3. DS7B
+
+```text
+rows = 3729
+source_rows = 3696
+route_rows = 33
+
+route_eos_top10 = 0
+route_eos_top50 = 0
+
+source_eos_top1 = 0
+source_eos_top5 = 0
+source_eos_top10 = 0
+source_eos_top50 = 0
+
+band16_source_candidate = 448
+band16_strong_source_candidate = 195
+band32_source_candidate = 411
+band32_strong_source_candidate = 168
+
+median_band16_mean_delta = -0.03125
+median_band32_mean_delta = -0.03125
+median_eos_logit_delta = -0.046875
+```
+
+DS7B 的主要 blocker：
+
+```text
+"</think>" / "The" / "Category" / "Wait"
+```
+
+最强来源：
+
+```text
+L27 MLP zero:
+  band16_strong_source_candidate = 33
+  median_band16_mean_delta = -7.970703125
+  median_eos_logit_delta = +0.5156
+  source_eos_top50 = 0
+
+L27 attention zero:
+  band16_strong_source_candidate = 33
+  median_band16_mean_delta = -4.0
+  median_eos_logit_delta = -1.0625
+  source_eos_top50 = 0
+```
+
+DS7B 显示 late layer 的 protocol / reasoning continuation blocker 很强，但 EOS 没有进入近邻区域。因此 DS7B 的结果主要是 blocker source map，不是 termination closure map。
+
+### 六、理论进展
+
+Phase912 的理论进展不是闭合，而是把 Phase911 的有限阻塞带从输出现象推进到内部来源定位。
+
+当前拼图更新为：
+
+```text
+1. EOS 终止路线在 GLM4 上可进入近邻区；
+2. 近邻区被有限 blocker band 压住；
+3. blocker band 不是单一 token，而是 top16/top32 的竞争带；
+4. logit mask 证明该竞争带足以决定 EOS top1；
+5. 内部 readout 方向不能自然迁移竞争带；
+6. Phase912 证明 blocker band 有可定位的内部组件来源；
+7. GLM4 中最有价值的来源不是最强 late MLP，而是 L0 attention 与 L4 MLP 这类 route-coupled early source；
+8. late MLP 是高能承载区，但与 EOS 和输出场纠缠，直接消融不是闭合路线。
+```
+
+这把当前理论从：
+
+```text
+找到终止方向
+```
+
+推进为：
+
+```text
+终止路线 + 有限阻塞带 + 阻塞带来源图谱
+```
+
+### 七、问题、硬伤与瓶颈
+
+硬伤 1：
+
+```text
+source_eos_top1 = 0
+source_margin_nonnegative = 0
+source_strict_clean_candidate = 0
+```
+
+说明 Phase912 没有完成动作闭合。
+
+硬伤 2：
+
+```text
+component suppression 是强消融。
+```
+
+它可以定位来源，但不等于模型自然执行了该路线。尤其 factor=0.0 可能造成非自然状态。
+
+硬伤 3：
+
+```text
+late MLP 降低 blocker band 的同时经常降低 EOS。
+```
+
+这说明 blocker 与 EOS 在 late output field 中高度纠缠。不能简单把 late MLP 当成“坏齿轮”删除。
+
+硬伤 4：
+
+```text
+qwen3 与 DS7B 没有 route_eos_top50。
+```
+
+跨模型结果不能解释成统一闭合机制，只能解释成不同小模型中存在不同的 blocker source map。
+
+硬伤 5：
+
+```text
+当前只做 layer/component 粒度，没有拆到 head/channel/direction 子空间。
+```
+
+GLM4 L0 attention 和 L4 MLP 是来源定位，不是最终机制单元。
+
+### 八、闭合距离评估
+
+当前闭合标准：
+
+```text
+Level 1: EOS 进入 top50
+Level 2: EOS 进入 top10
+Level 3: EOS 进入 top5
+Level 4: EOS top1
+Level 5: EOS margin >= 0
+Level 6: strict clean candidate
+Level 7: exact natural consistency
+Level 8: cross-model transferable route
+```
+
+Phase912 的位置：
+
+```text
+GLM4:
+  到达 Level 3 的局部候选；
+  未到达 Level 4。
+
+qwen3:
+  未到达 Level 1。
+
+DS7B:
+  未到达 Level 1。
+
+跨模型：
+  未形成 transferable closure。
+```
+
+总体进度判断：
+
+```text
+终止路线图谱进度：约 55%
+EOS 动作闭合进度：约 25%
+跨模型闭合进度：约 10%
+语言编码机制整体破解进度：仍低于 20%
+```
+
+这个百分比不是理论定量，只是根据当前证据层级的谨慎估计。
+
+### 九、智能理论角度的关键洞察
+
+Phase912 支持一个更稳健的判断：
+
+```text
+语言模型不是只靠一个 token 方向决定动作，
+而是在一个有限竞争场中完成状态选择。
+```
+
+EOS 不是“有没有被抬高”的问题，而是：
+
+```text
+终止状态能否在有限 blocker band 中获得动作支配权。
+```
+
+从智能理论看，这更接近：
+
+```text
+状态路线选择
++
+有限竞争边界
++
+局部来源齿轮
++
+输出场闭合
+```
+
+也就是说，语言机制的关键不是单点 logit，而是：
+
+$$
+\text{Action}(x)
+=
+\arg\max_{a\in \mathcal{A}}
+\left[
+S_{\text{route}}(a|x)
+-
+C_{\text{blocker}}(a|x)
+-
+R_{\text{protocol}}(a|x)
+\right]
+$$
+
+其中：
+
+```text
+S_route:
+  路线支持量。
+
+C_blocker:
+  阻塞竞争量。
+
+R_protocol:
+  协议延续约束量。
+```
+
+Phase912 的新增拼图是：
+
+```text
+C_blocker 不是抽象输出噪声，
+而是能在 layer/component 层面定位来源。
+```
+
+### 十、下一阶段任务
+
+Phase912 已完成当前子阶段目标：
+
+```text
+有限 blocker band source localization 完成。
+```
+
+下一阶段不应继续做大范围消融，也不应继续追求粗暴 top1。
+
+建议进入：
+
+```text
+Phase913:
+Route-preserving blocker band disentanglement
+保持路线的阻塞带解耦
+```
+
+核心任务：
+
+```text
+1. 聚焦 GLM4；
+2. 固定 Phase910 prompt-preserving route；
+3. 只围绕 L0 attention 与 L4 MLP 做细粒度拆解；
+4. 把 L0 attention 拆到 head/source-position；
+5. 把 L4 MLP 拆到 channel/direction；
+6. 用较温和的 factor 或方向投影替代 factor=0.0；
+7. 检查是否存在“降低 blocker band 但不降低 EOS”的子方向；
+8. 再测试是否能从 EOS top5/top10 推进到 EOS top1/margin>=0。
+```
+
+成功标准：
+
+```text
+最低标准：
+  找到 L0 attention 或 L4 MLP 内部子单元，
+  能稳定降低 band16 mean logit，
+  且 median_eos_logit_delta >= 0。
+
+中等标准：
+  source_eos_top5 明显增加。
+
+高标准：
+  source_eos_top1 > 0。
+
+最高标准：
+  strict clean candidate > 0，
+  且不依赖 logit mask 或全组件消融。
+```
+
+阶段边界判断：
+
+```text
+Phase912 与 Phase911 属于同一 clean protocol edge graph 主线，
+并完成了 blocker band source localization 子阶段。
+
+Phase913 仍属于同一主线，
+但已经进入 source disentanglement 子阶段。
+它不是 Phase912 的剩余测试，而是下一阶段的大任务。
+```
+
+## Phase 913: 保持路线的阻塞带解耦 [2026-07-04 02:40]
+
+### 一、对上传内容的判断
+
+上传内容对 Phase912 的判断基本正确，而且边界意识是必要的：
+
+```text
+Phase912 是 blocker band source localization positive；
+不是 EOS action closure positive。
+```
+
+也就是说，Phase912 已经证明：
+
+```text
+1. GLM4 的 EOS 缺口更像有限 blocker band；
+2. 该 blocker band 有 layer / component 来源；
+3. 但 source localization 不等于 blocker displacement；
+4. 粗粒度 component suppression 不能直接写成自然闭合路线。
+```
+
+上传内容建议 Phase913 进入：
+
+```text
+Route-preserving blocker band disentanglement
+保持路线的阻塞带解耦
+```
+
+这个方向是正确的。原因是 Phase912 最大硬伤正是：
+
+```text
+整层或整组件压制能定位来源，
+但不能说明模型内部存在干净的子方向。
+```
+
+因此本阶段继续同一 clean protocol edge graph 主线，但从：
+
+```text
+blocker band source localization
+阻塞带来源定位
+```
+
+推进到：
+
+```text
+source subunit disentanglement
+来源子单元解耦
+```
+
+### 二、测试脚本与结果位置
+
+测试脚本：
+
+```text
+tests/glm5/phase913_route_preserving_blocker_band_disentanglement.py
+tests/glm5/run_phase913_route_preserving_blocker_band_disentanglement.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase913_route_preserving_blocker_band_disentanglement/route_preserving_blocker_band_disentanglement/
+```
+
+核心结果文件：
+
+```text
+phase913_cross_model_summary.md
+phase913_cross_model_summary.json
+phase913_route_near_posthoc_summary.md
+phase913_route_near_posthoc_summary.json
+phase913_qwen3_summary.json
+phase913_glm4_summary.json
+phase913_deepseek7b_summary.json
+```
+
+三模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、测试原理
+
+Phase913 固定 Phase910 / Phase912 的 prompt-preserving route：
+
+$$
+d_{\text{prompt}}
+=
+h^{0}_{attn}(x_{\text{prompt-zero}})
+-
+h^{0}_{attn}(x)
+$$
+
+$$
+\tilde{h}^{0}_{attn}(x)
+=
+h^{0}_{attn}(x)
++
+d_{\text{prompt}}
+$$
+
+在 route-only 输出上定义有限阻塞带：
+
+$$
+B_k(x)
+=
+\operatorname{TopK}_{v\ne EOS}
+\left(
+z_v(\tilde{x})
+\right)
+$$
+
+Phase913 不再做整组件置零，而是测试三类子单元：
+
+```text
+1. L0 attention head scale：
+   第0层 attention 的单个 head 输出缩放。
+
+2. L0 attention input span scale：
+   第0层 attention 输入中不同 span 的温和缩放。
+
+3. L4 MLP channel group scale：
+   第4层 MLP down_proj 输入 channel group 的温和缩放。
+```
+
+缩放因子：
+
+$$
+\gamma \in \{0.75, 0.5, 0.25\}
+$$
+
+对于 L4 MLP channel group，本阶段用 route-only 状态下的 down_proj 输入激活和 blocker / EOS 读出差异选 channel group。
+
+设第4层 MLP down_proj 输入为：
+
+$$
+a_j(x)
+$$
+
+down_proj 第 j 个 channel 的输出方向为：
+
+$$
+w^{down}_j
+$$
+
+阻塞带相对 EOS 的 channel 支持分数为：
+
+$$
+Score_j
+=
+a_j(x)
+\left[
+\frac{1}{|B_k|}
+\sum_{v\in B_k}
+W_U(v)\cdot w^{down}_j
+-
+W_U(EOS)\cdot w^{down}_j
+\right]
+$$
+
+选择高分 channel group 后做温和缩放：
+
+$$
+a'_j(x)
+=
+\gamma a_j(x)
+$$
+
+核心判据不是“blocker 降低”本身，而是：
+
+$$
+\Delta \operatorname{mean}(B_{16}) \le -0.25
+$$
+
+且：
+
+$$
+\Delta z(EOS) \ge 0
+$$
+
+更强判据还要求：
+
+$$
+\Delta rank(EOS) \le 0
+$$
+
+含义：
+
+```text
+只有降低 blocker band 且不降低 EOS 的子单元，
+才算 route-preserving disentangle candidate。
+```
+
+闭合标准仍然不变：
+
+```text
+EOS top1 > 0
+margin >= 0
+strict clean candidate > 0
+```
+
+### 四、总体结果
+
+跨模型结果：
+
+```text
+rows = 8444
+source_rows = 8376
+route_rows = 68
+
+route_eos_top10 = 4
+route_eos_top50 = 15
+
+source_eos_top1 = 0
+source_eos_top5 = 33
+source_eos_top10 = 503
+source_eos_top50 = 1982
+
+source_margin_nonnegative = 0
+source_strict_clean_candidate = 0
+strict_clean_candidate = 0
+
+route_preserving_disentangle_candidate = 241
+strong_route_preserving_disentangle_candidate = 143
+```
+
+表面看，这是一个明显正结果：三模型都有子单元候选。
+
+但必须进一步收紧：
+
+```text
+qwen3 与 DS7B route-only 均没有进入 EOS top50；
+因此它们的候选不是终止闭合候选，
+而是 blocker / protocol field 的结构扰动。
+```
+
+真正与 Phase910-912 终止路线直接相关的，仍主要是 GLM4。
+
+### 五、分模型结果
+
+#### 1. qwen3
+
+```text
+rows = 2340
+source_rows = 2322
+route_rows = 18
+
+route_eos_top10 = 0
+route_eos_top50 = 0
+
+source_eos_top1 = 0
+source_eos_top5 = 0
+source_eos_top10 = 0
+source_eos_top50 = 0
+
+route_preserving_disentangle_candidate = 76
+strong_route_preserving_disentangle_candidate = 22
+```
+
+qwen3 的候选全部来自：
+
+```text
+L0 attention span
+```
+
+但是 route-only EOS rank 仍然远离 top50。后验 route-near 收紧后：
+
+```text
+route_top50 子集不存在；
+全部候选都属于 route_not_top50。
+```
+
+所以 qwen3 的结果只能说明：
+
+```text
+L0 prompt/span 输入会影响 blocker field；
+但 qwen3 没有进入 termination near zone。
+```
+
+#### 2. GLM4
+
+总体：
+
+```text
+rows = 2210
+source_rows = 2193
+route_rows = 17
+
+route_eos_top10 = 4
+route_eos_top50 = 15
+
+source_eos_top1 = 0
+source_eos_top5 = 2
+source_eos_top10 = 466
+source_eos_top50 = 1933
+
+source_margin_nonnegative = 0
+source_strict_clean_candidate = 0
+
+route_preserving_disentangle_candidate = 41
+strong_route_preserving_disentangle_candidate = 20
+```
+
+这是本阶段最重要结果，但必须分成两层看。
+
+第一层：总表中的强效 L0 span 结果。
+
+```text
+L0_attention_span_prompt_all_scale_0.25:
+  patched_eos_top5 = 2
+  band16_mean_delta = -6.4841
+  eos_delta = +4.3125
+  route_eos_rank = 174
+  patched_eos_rank = 5
+```
+
+这个结果看起来很强，但它来自：
+
+```text
+p856_009_animal_fish
+```
+
+而且 route-only EOS rank 是 174，不属于 route_top50。它说明：
+
+```text
+L0 prompt span 可以强烈改变输出边界；
+但这不是 GLM4 已经进入近邻区后的干净闭合路线。
+```
+
+第二层：route_top50 子集的收紧结果。
+
+后验 route-near 统计：
+
+```text
+GLM4 route_top50:
+  rows = 1935
+  unique_cases = 8
+  top5 = 0
+  top10 = 462
+  margin>=0 = 0
+  weak_disentangle = 17
+  strong_disentangle = 0
+
+weak families:
+  L4 MLP channel group = 16
+  L0 attention span = 1
+```
+
+这才是更可信的 Phase913 正结果：
+
+```text
+在 GLM4 route-near 样本中，
+L4 MLP channel group 能小幅降低 blocker band，
+同时不降低 EOS。
+```
+
+代表例子：
+
+```text
+p885_049_animal_insect:
+  control = L4_mlp_channels_top_abs_64_scale_0.25
+  route_rank = 12
+  patched_rank = 7
+  band16_delta = -0.271484375
+  eos_delta = +0.25
+  blocker = "a" -> "a"
+  margin = -1.59375
+
+p856_022_material_iron:
+  control = L4_mlp_channels_top_abs_64_scale_0.25
+  route_rank = 15
+  patched_rank = 9
+  band16_delta = -0.32421875
+  eos_delta = +0.1875
+  blocker = "a" -> "a"
+  margin = -1.6875
+
+p885_048_animal_lizard:
+  control = L4_mlp_channels_top_abs_64_scale_0.25
+  route_rank = 17
+  patched_rank = 11
+  band16_delta = -0.27734375
+  eos_delta = +0.1875
+  blocker = "a" -> "a"
+  margin = -1.96875
+```
+
+这说明：
+
+```text
+Phase913 找到了比整层消融更干净的 L4 MLP 子方向迹象；
+但幅度仍小，不能越过 top1 / margin 边界。
+```
+
+#### 3. DS7B
+
+```text
+rows = 3894
+source_rows = 3861
+route_rows = 33
+
+route_eos_top10 = 0
+route_eos_top50 = 0
+
+source_eos_top1 = 0
+source_eos_top5 = 31
+source_eos_top10 = 37
+source_eos_top50 = 49
+
+route_preserving_disentangle_candidate = 124
+strong_route_preserving_disentangle_candidate = 101
+```
+
+DS7B 看起来有大量 top5，但 route-only 没有任何 top50，因此这些不是 termination proximity closure。
+
+主要来自：
+
+```text
+L0 attention span prompt_all / prompt_last8 / last8_before_period
+```
+
+例子：
+
+```text
+cat:
+  route_rank = 697
+  patched_rank = 3
+
+fish:
+  route_rank = 13727
+  patched_rank = 4
+
+triangle:
+  route_rank = 24118
+  patched_rank = 4
+```
+
+这更像：
+
+```text
+prompt/protocol field 强扰动可以制造 EOS 接近；
+但它不是自然终止路线。
+```
+
+### 六、理论进展
+
+Phase913 的核心进展不是闭合，而是把 Phase912 的来源定位进一步拆成两种不同机制：
+
+```text
+1. L0 attention span:
+   高影响、强扰动、可大幅改变 EOS rank，
+   但容易发生在 route_not_top50 样本中；
+   更像 prompt / protocol field control。
+
+2. L4 MLP channel group:
+   影响较小，但在 GLM4 route_top50 样本中更干净；
+   能降低 blocker band 且不降低 EOS；
+   更接近真正的 blocker-band disentanglement 子方向。
+```
+
+这修正了 Phase912 的粗判断：
+
+```text
+Phase912:
+  L0 attention 和 L4 MLP 都是 route-coupled early source。
+
+Phase913:
+  L0 attention 更像高影响 prompt/span gate；
+  L4 MLP channel group 更像 route-near blocker band fine control。
+```
+
+当前拼图更新为：
+
+```text
+1. GLM4 EOS route 可进入 top50/top10；
+2. 有限 blocker band 主要表现为 "a" / " Fish" 等；
+3. L0 span 可强烈重排输出场，但不一定是 clean closure；
+4. L4 MLP channel group 在 route-near 样本中能小幅改善 EOS rank；
+5. 但仍不能产生 EOS top1、margin 非负或 strict clean；
+6. qwen3 / DS7B 的同类现象主要是 prompt/protocol field 强扰动，不是终止闭合。
+```
+
+### 七、问题、硬伤与瓶颈
+
+硬伤 1：
+
+```text
+source_eos_top1 = 0
+source_margin_nonnegative = 0
+source_strict_clean_candidate = 0
+```
+
+闭合仍然没有发生。
+
+硬伤 2：
+
+```text
+GLM4 route_top50 子集没有 top5 提升。
+```
+
+总表中的 top5 主要来自 route_not_top50 的 fish 样本，不能当成 route-near closure。
+
+硬伤 3：
+
+```text
+L4 MLP channel group 的效果很小。
+```
+
+典型 band16_delta 约为 -0.25 到 -0.35，EOS rank 可从 12/15/17 改到 7/9/11，但仍远离 top1。
+
+硬伤 4：
+
+```text
+L0 span 干预虽然强，但可能是 prompt field disruption。
+```
+
+尤其 prompt_all scale 0.25 虽不是置零，但已经是强扰动。
+
+硬伤 5：
+
+```text
+小模型结构可能粗糙。
+```
+
+DS7B 的 `</think>`、Category、Wait 等 blocker 表明 reasoning template / protocol field 与终止机制纠缠严重；这不应被直接外推为大模型通用终止机制。
+
+### 八、闭合距离评估
+
+当前闭合等级：
+
+```text
+Level 1: EOS top50
+Level 2: EOS top10
+Level 3: EOS top5
+Level 4: EOS top1
+Level 5: margin >= 0
+Level 6: strict clean
+Level 7: exact natural consistency
+Level 8: cross-model transferable route
+```
+
+Phase913 的位置：
+
+```text
+GLM4 route-near:
+  稳定在 Level 1 / Level 2；
+  route_top50 子集没有新增 Level 3；
+  未达到 Level 4。
+
+GLM4 route-not-top50:
+  L0 span 可以制造 Level 3；
+  但这不算 clean termination route。
+
+qwen3:
+  未达到 Level 1。
+
+DS7B:
+  可以由 L0 span 强扰动制造 top5；
+  但 route-only 未达到 Level 1，因此不算终止路线闭合。
+```
+
+谨慎进度估计：
+
+```text
+全局齿轮图谱进度：约 96% - 97%
+终止路线图谱进度：约 58%
+EOS 动作闭合进度：约 27%
+跨模型闭合进度：约 10%
+完整语言编码机制破解：仍约 20% 或更低
+```
+
+### 九、智能理论角度的洞察
+
+Phase913 支持一个更细的机制图像：
+
+```text
+语言输出不是单一路线控制，
+而是 route support、prompt/protocol gate、blocker band fine control 三者叠加。
+```
+
+可以写成：
+
+$$
+z(a|x)
+=
+S_{\text{route}}(a|x)
++
+G_{\text{prompt}}(a|x)
++
+C_{\text{mlp}}(a|x)
+-
+B_{\text{blocker}}(a|x)
+$$
+
+其中：
+
+```text
+S_route:
+  终止路线支持。
+
+G_prompt:
+  prompt / protocol span gate。
+
+C_mlp:
+  MLP channel-level fine control。
+
+B_blocker:
+  有限阻塞带竞争项。
+```
+
+Phase913 的关键洞察是：
+
+```text
+L0 span 更像 G_prompt；
+L4 MLP channel group 更像 C_mlp；
+二者不能混为同一个 blocker displacement route。
+```
+
+也就是说，真正靠近破解语言编码机制的不是“哪个组件影响最大”，而是：
+
+```text
+哪个子结构在正确状态区间内，以正确方向移动边界。
+```
+
+### 十、下一阶段任务
+
+Phase913 已完成本阶段目标：
+
+```text
+从整组件来源定位推进到子单元解耦；
+并发现 GLM4 route-near 中更可信的正结果主要来自 L4 MLP channel group。
+```
+
+下一阶段应进入：
+
+```text
+Phase914:
+GLM4 route-near L4 MLP channel group holdout validation
+GLM4 近邻路线第4层 MLP 通道组保留验证
+```
+
+核心任务：
+
+```text
+1. 只保留 GLM4 route_top50 样本；
+2. 聚焦 L4_mlp_channels_top_abs_64 / band16_support / band32_support；
+3. 扩大 prompt variant / case variant，避免 fish 或少数 case 主导；
+4. 测试 factor = 0.9 / 0.8 / 0.7 / 0.6 / 0.5 / 0.4 / 0.3；
+5. 检查是否存在可重复的 monotonic boundary movement；
+6. 记录 EOS rank 是否能稳定从 12-20 区间推进到 top5；
+7. 如果不能进入 top5，则说明 L4 MLP 只是小幅调边界，不是动作门。
+```
+
+成功标准：
+
+```text
+最低标准：
+  route_top50 子集上，L4 MLP channel group 的 weak candidate 跨 case 重复出现。
+
+中等标准：
+  route_top50 子集出现稳定 top5。
+
+高标准：
+  EOS top1 > 0 或 margin >= 0。
+
+最高标准：
+  strict clean candidate > 0，并通过 exact-natural consistency。
+```
+
+阶段边界判断：
+
+```text
+Phase913 已完成 source subunit disentanglement 第一轮；
+Phase914 仍属于同一 clean protocol edge graph 主线，
+但进入 holdout validation / monotonic boundary validation 子阶段。
+```
+
+## Phase 914: GLM4 route-near L4 MLP 通道组保留验证 [2026-07-04 03:09]
+
+### 一、任务来源与判断
+
+本阶段读取并分析了最新上传的 Phase913 判断。附件的核心判断基本正确：
+
+```text
+Phase913 不是闭合阶段；
+它把 Phase912 的有限阻塞带来源定位推进到了来源子单元解耦；
+L0 attention span 更像 prompt / protocol gate；
+L4 MLP channel group 更像 route-near blocker-band fine control；
+qwen3 和 DS7B 没有稳定进入 route_top50，因此不能把它们的候选扰动解释为终止闭合。
+```
+
+本阶段进一步修正了一个容易误读的位置：
+
+```text
+source_eos_top5 不能直接等价于 L4 MLP 把 EOS 推入 top5。
+必须区分：
+1. route-only 已经 top5；
+2. L4 MLP 从非 top5 推入 top5。
+```
+
+因此 Phase914 的任务不是继续扩大所有局部 patch，而是只在 route-near 条件下验证：
+
+```text
+GLM4 的 L4 MLP channel group 是否能跨 prompt / case holdout 稳定移动有限阻塞带；
+它是否只是弱边界调节器，还是已经接近 termination action gate。
+```
+
+### 二、测试脚本与结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase914_l4_mlp_route_near_holdout_validation.py
+```
+
+新增顺序运行脚本：
+
+```text
+tests/glm5/run_phase914_l4_mlp_route_near_holdout_validation.sh
+```
+
+结果保存目录：
+
+```text
+tests/result/phase914_l4_mlp_route_near_holdout_validation/l4_mlp_route_near_holdout_validation/
+```
+
+核心结果文件：
+
+```text
+phase914_qwen3_summary.json
+phase914_glm4_summary.json
+phase914_deepseek7b_summary.json
+phase914_cross_model_summary.json
+phase914_cross_model_summary.md
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三个模型依次加载、测试、释放显存，没有并行占用 GPU。
+
+静态检查：
+
+```text
+python -m py_compile tests/glm5/phase914_l4_mlp_route_near_holdout_validation.py
+bash -n tests/glm5/run_phase914_l4_mlp_route_near_holdout_validation.sh
+git diff --check
+```
+
+均通过。
+
+### 三、测试原理
+
+Phase914 的测试流程如下：
+
+```text
+1. 从 Phase899 的 source candidate 中取样；
+2. 扩展 prompt variant 和同领域 holdout case；
+3. 对每个样本先构造保持 prompt 结构的 route-only 状态；
+4. 只在 route_eos_rank <= 50 的样本上进入 L4 MLP channel group 测试；
+5. 测试 L4 MLP layer=4 的多个通道组；
+6. factor 从 0.9 到 0.3，观察 blocker band 是否按强度稳定下移；
+7. 记录 EOS rank、EOS logit、full-vocab blocker band、margin、strict clean。
+```
+
+本阶段使用的通道组：
+
+```text
+top_abs_64
+band16_support_32
+band16_support_64
+band32_support_64
+low_abs_64
+```
+
+测试因子：
+
+```text
+0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3
+```
+
+数据展开后，每个模型最多 96 个 eval item。GLM4 中进入 route_top50 的样本会展开为：
+
+```text
+7 factors * 5 channel groups = 35 个 L4 MLP 干预点
+```
+
+qwen3 和 DS7B 如果没有 route_top50 样本，则只记录 route-only 行，不把非 route-near 干预计入证据。
+
+### 四、核心数学公式
+
+设 route-only 状态下的 logits 为：
+
+$$
+z^{route}(x)
+$$
+
+设 L4 MLP 通道组干预后的 logits 为：
+
+$$
+z^{patch}_{g,f}(x)
+$$
+
+其中：
+
+$$
+g \in G_{L4}
+$$
+
+表示 L4 MLP 通道组，\(f\) 表示缩放因子。
+
+EOS 的路线排名为：
+
+$$
+r_{route}(x)=rank_{EOS}(z^{route}(x))
+$$
+
+EOS logit 增量为：
+
+$$
+\Delta z_{EOS}(x,g,f)
+=
+z^{patch}_{g,f}(EOS)
+-
+z^{route}(EOS)
+$$
+
+EOS rank 增量为：
+
+$$
+\Delta r_{EOS}(x,g,f)
+=
+rank_{EOS}(z^{patch}_{g,f})
+-
+rank_{EOS}(z^{route})
+$$
+
+令 route 状态下的前 16 个非 EOS blocker token 构成有限阻塞带：
+
+$$
+B_{16}(x)=TopNonEOS_{16}(z^{route}(x))
+$$
+
+阻塞带均值变化为：
+
+$$
+\Delta B_{16}(x,g,f)
+=
+\frac{1}{|B_{16}|}
+\sum_{b\in B_{16}}
+\left(
+z^{patch}_{g,f}(b)-z^{route}(b)
+\right)
+$$
+
+弱候选标准：
+
+$$
+W(x,g,f)=
+\mathbf{1}
+\left[
+r_{route}(x)\le 50
+\right]
+\mathbf{1}
+\left[
+\Delta B_{16}(x,g,f)\le -0.25
+\right]
+\mathbf{1}
+\left[
+\Delta z_{EOS}(x,g,f)\ge 0
+\right]
+\mathbf{1}
+\left[
+\Delta r_{EOS}(x,g,f)\le 0
+\right]
+$$
+
+强候选标准：
+
+$$
+S(x,g,f)=
+W(x,g,f)
+\cdot
+\mathbf{1}
+\left[
+\Delta B_{16}(x,g,f)\le -0.35
+\right]
+\cdot
+\mathbf{1}
+\left[
+rank_{EOS}(z^{patch}_{g,f})
+\le
+rank_{EOS}(z^{route})-3
+\right]
+$$
+
+真实 top5 推进标准：
+
+$$
+P_5(x,g,f)=
+\mathbf{1}
+\left[
+rank_{EOS}(z^{route})>5
+\right]
+\mathbf{1}
+\left[
+rank_{EOS}(z^{patch}_{g,f})\le 5
+\right]
+$$
+
+单调阻塞带标准。令：
+
+$$
+f_1 < f_2 < \cdots < f_n
+$$
+
+其中较小的 factor 表示更强抑制，则：
+
+$$
+M_B(x,g)=
+\mathbf{1}
+\left[
+\Delta B_{16}(x,g,f_i)
+\le
+\Delta B_{16}(x,g,f_{i+1})
+\quad
+\forall i
+\right]
+$$
+
+如果 \(M_B=1\)，说明更强抑制没有产生更弱的 blocker-band 下移。
+
+### 五、客观结果
+
+跨模型总体结果：
+
+```text
+rows: 1688
+route_rows: 288
+source_rows: 1400
+route_near_route_rows: 40
+route_near_source_rows: 1400
+route_eos_top5: 2
+route_eos_top10: 23
+route_eos_top50: 40
+source_eos_top1: 0
+source_eos_top5: 52
+source_eos_top10: 714
+source_eos_top50: 1400
+source_margin_nonnegative: 0
+strict_clean_candidate: 0
+source_strict_clean_candidate: 0
+weak_holdout_candidate: 12
+strong_holdout_candidate: 0
+source_promoted_top5_from_non_top5: 8
+source_promoted_top5_unique_eval_keys: 5
+source_top5_already_route_top5: 44
+source_promoted_top10_from_non_top10: 21
+source_rank_improved: 482
+```
+
+分模型结果：
+
+```text
+qwen3:
+  eval_items: 96
+  route_top50: 0
+  L4 MLP source rows: 0
+  evidence: no_route_near_samples_for_l4_holdout
+
+GLM4:
+  eval_items: 96
+  route_top50: 40
+  L4 MLP source rows: 1400
+  route_eos_top5: 2
+  source_eos_top5: 52
+  promoted_top5_from_non_top5: 8
+  promoted_top5_unique_eval_keys: 5
+  source_eos_top10: 714
+  promoted_top10_from_non_top10: 21
+  weak_holdout_candidate: 12
+  strong_holdout_candidate: 0
+  margin_nonnegative: 0
+  strict_clean_candidate: 0
+
+DS7B:
+  eval_items: 96
+  route_top50: 0
+  L4 MLP source rows: 0
+  evidence: no_route_near_samples_for_l4_holdout
+```
+
+GLM4 的通道组结果集中在：
+
+```text
+top_abs_64 factor=0.3:
+  rows: 40
+  source_eos_top5: 7
+  source_eos_top10: 32
+  weak: 5
+  median_band16_delta: -0.16015625
+  median_eos_delta: 0.15625
+
+top_abs_64 factor=0.4:
+  rows: 40
+  source_eos_top5: 5
+  source_eos_top10: 27
+  weak: 7
+  median_band16_delta: -0.146484375
+  median_eos_delta: 0.125
+```
+
+真实从非 top5 推入 top5 的行：
+
+```text
+total: 8
+unique_eval_keys: 5
+
+top_abs_64 factor=0.3:
+  5 rows
+
+top_abs_64 factor=0.4:
+  3 rows
+```
+
+对应样本集中在：
+
+```text
+p856_038_object_object | natural_question | same_domain_holdout_case | route_rank=7:
+  6 rows
+
+p856_009_animal_fish | question_plain | source_case_prompt_variant | route_rank=7:
+  2 rows
+```
+
+GLM4 单调性统计：
+
+```text
+monotonic_groups: 200
+band_monotonic: 36
+eos_nonnegative_all: 73
+any_weak_holdout_candidate: 7
+any_strong_holdout_candidate: 0
+```
+
+这说明 L4 MLP 的确存在一部分可重复的 blocker-band 边界移动，但单调性并不普遍。
+
+### 六、结果分析
+
+Phase914 支持附件中的主要判断，但把结论进一步收紧：
+
+```text
+GLM4 route-near L4 MLP channel group 是真实弱正结果；
+它能在部分 holdout 条件下下压有限 blocker band，并把 EOS 从 rank 7 推入 rank 5；
+但它没有把 EOS 推到 top1，也没有获得 margin >= 0，更没有 strict clean。
+```
+
+最重要的校正是：
+
+```text
+source_eos_top5 = 52
+但其中 44 行 route-only 已经 top5；
+真实由 L4 MLP 从非 top5 推入 top5 的只有 8 行。
+```
+
+因此不能说：
+
+```text
+L4 MLP 完成了 termination action closure。
+```
+
+更准确的表述是：
+
+```text
+L4 MLP top_abs_64 是 GLM4 route-near 条件下的弱边界调节器；
+它能移动 blocker band 和少量 rank boundary；
+但它不是完整 EOS 动作门。
+```
+
+qwen3 和 DS7B 的结果继续支持前面判断：
+
+```text
+二者在本阶段扩展数据中没有进入 route_top50；
+因此不能在它们身上验证 L4 MLP route-near 细调；
+也不能把它们的其他扰动解释为 clean termination mechanism。
+```
+
+### 七、理论进展
+
+本阶段对全局齿轮图谱的推进不是“找到闭合”，而是完成了一个更干净的分层：
+
+```text
+G_prompt:
+  L0 attention span 一类结构，影响 prompt / protocol route。
+
+S_route:
+  route-only 后 EOS 进入可竞争区间。
+
+C_boundary:
+  GLM4 L4 MLP top_abs_64 一类结构，在 route-near 条件下移动有限 blocker band。
+
+A_action:
+  尚未找到。它应该负责从 blocker-band near miss 推进到 EOS top1 / margin >= 0 / strict clean。
+```
+
+这使得当前图谱从：
+
+```text
+source candidate 是否有效
+```
+
+推进到：
+
+```text
+source candidate 属于哪一层机制：
+prompt gate / route carrier / blocker-band boundary adjuster / action gate。
+```
+
+这一点比单纯追求局部 top5 更重要。
+
+### 八、问题、硬伤与瓶颈
+
+当前结果仍有明显硬伤：
+
+```text
+1. 没有 top1。
+2. 没有 margin >= 0。
+3. 没有 strict clean。
+4. strong_holdout_candidate = 0。
+5. promoted top5 只有 8 行、5 个唯一评估键。
+6. qwen3 和 DS7B 没有 route-near 样本，跨模型普遍性不足。
+7. 单调性只有 36 / 200，不是普遍几何规律。
+8. top_abs_64 最有效，但这是较粗的通道集合，还没有分解为更小的稳定齿轮。
+9. GLM4 结果可能受小模型结构粗糙影响，不可直接外推到更大模型。
+```
+
+尤其需要注意：
+
+```text
+top5 不是闭合；
+rank 7 -> rank 5 仍然只是 near-boundary movement；
+只要 EOS 没有超过最大 blocker，就不能称为 action closure。
+```
+
+### 九、闭合标准与当前距离
+
+本阶段采用的严格闭合标准：
+
+```text
+最低闭合：
+  EOS 从非 top5 推入 top5，且跨 case / prompt 重复。
+
+中等闭合：
+  EOS margin >= 0。
+
+强闭合：
+  EOS top1。
+
+最高闭合：
+  strict clean candidate > 0，并通过 exact-natural consistency。
+```
+
+Phase914 达到：
+
+```text
+最低闭合的弱版本：
+  yes，GLM4 中存在 8 行 promoted top5。
+
+中等闭合：
+  no，margin_nonnegative = 0。
+
+强闭合：
+  no，source_eos_top1 = 0。
+
+最高闭合：
+  no，strict_clean_candidate = 0。
+```
+
+当前距离评估：
+
+```text
+clean protocol edge graph:
+  约 65%。
+
+GLM4 route-near L4 MLP boundary adjuster:
+  约 45%。
+
+termination action gate closure:
+  约 20%。
+
+完整语言编码机制闭合:
+  约 18%-22%。
+```
+
+这个百分比不是理论结论，只是根据当前证据层级的工作进度估计。
+
+### 十、智能理论角度的关键洞察
+
+Phase914 的关键洞察是：
+
+```text
+语言生成不是一个单一开关；
+也不是某个通道把正确 token 直接推到第一名；
+它更像多层边界系统：
+prompt gate 决定路线，
+route carrier 把 EOS 放进竞争区，
+boundary adjuster 移动局部 blocker band，
+action gate 决定最后是否跨过全词表竞争边界。
+```
+
+这对智能理论有一个重要含义：
+
+```text
+语言编码机制可能不是“单个语义向量 + 单个语法向量”的线性组合，
+而是状态、路线、边界和动作门的动态耦合系统。
+```
+
+当前最可靠的路线不是继续无限搜索局部 patch，而是继续完善图谱：
+
+```text
+先把每个齿轮属于哪一层机制标清楚；
+再研究层与层之间的因果连接；
+最后寻找能把 near-boundary 推到 strict clean 的缺失动作门。
+```
+
+### 十一、下一阶段任务
+
+Phase914 的阶段性目标已经完成：
+
+```text
+验证 Phase913 的 L4 MLP route-near 候选；
+区分 route-only top5 与 L4 promoted top5；
+确认 L4 MLP 是弱边界调节器，而不是完整动作门。
+```
+
+下一阶段建议进入：
+
+```text
+Phase915:
+near-boundary action gate search after L4 MLP boundary adjustment
+L4 MLP 边界调节后的近邻动作门搜索
+```
+
+核心任务：
+
+```text
+1. 只选 GLM4 promoted_top5 和 weak_holdout_candidate 样本；
+2. 固定 L4 top_abs_64 factor=0.3 / 0.4 作为 boundary precondition；
+3. 在此基础上搜索最后的 action gate：
+   attention output residual；
+   late MLP residual；
+   unembedding-adjacent blocker suppressor；
+   EOS-specific positive carrier；
+4. 判断是否能从 rank 5 / rank 7 推进到 margin >= 0 或 top1；
+5. 如果仍失败，则说明缺失机制不在 L4 boundary adjuster，而在更后层的全词表竞争动作门。
+```
+
+阶段边界判断：
+
+```text
+Phase915 与 Phase914 属于同一 clean protocol edge graph 大主线；
+但 Phase914 的 holdout / monotonic boundary validation 子目标已经完成；
+Phase915 是新的 action-gate 子阶段，不应混入 Phase914 的结论。
+```
+
+## Phase 915: L4 MLP 边界调节后的近邻动作门搜索 [2026-07-04 04:00]
+
+### 一、任务来源与判断
+
+本阶段读取并分析了最新上传的 Phase914 评估。附件判断基本正确，而且比 Phase913 更严格：
+
+```text
+Phase914 不是 EOS action gate closure；
+它确认 GLM4 L4 MLP top_abs_64 是弱 blocker-band boundary adjuster；
+它能在少量 route-near 样本中把 EOS 从 rank 7 附近推到 rank 5 附近；
+但没有 top1、没有 margin >= 0、没有 strict clean。
+```
+
+附件给出的下一步是：
+
+```text
+Phase915:
+Near-boundary Action Gate Search after L4 MLP Boundary Adjustment
+L4 MLP 边界调节后的近邻动作门搜索
+```
+
+这个任务和 Phase914 属于同一条 clean protocol edge graph 大主线，并且是 Phase914 的自然后续，因此本阶段自动继续完成。
+
+本阶段核心问题从：
+
+```text
+L4 MLP 是否能移动边界？
+```
+
+收紧为：
+
+```text
+当 EOS 已经进入 rank 5 / rank 7 附近时，
+最后是谁决定 EOS 不能越过最高 blocker？
+```
+
+### 二、测试脚本与结果文件
+
+新增测试脚本：
+
+```text
+tests/glm5/phase915_near_boundary_action_gate_search.py
+```
+
+新增顺序运行脚本：
+
+```text
+tests/glm5/run_phase915_near_boundary_action_gate_search.sh
+```
+
+结果保存目录：
+
+```text
+tests/result/phase915_near_boundary_action_gate_search/near_boundary_action_gate_search/
+```
+
+核心结果文件：
+
+```text
+phase915_qwen3_summary.json
+phase915_glm4_summary.json
+phase915_deepseek7b_summary.json
+phase915_cross_model_summary.json
+phase915_cross_model_summary.md
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+由于 qwen3 和 DS7B 在 Phase914 中没有 route-near 候选，本阶段对它们生成零候选 summary，不强行执行不符合前提的 action-gate 搜索。
+
+静态检查：
+
+```text
+python -m py_compile tests/glm5/phase915_near_boundary_action_gate_search.py
+bash -n tests/glm5/run_phase915_near_boundary_action_gate_search.sh
+git diff --check
+```
+
+均通过。
+
+### 三、测试原理
+
+Phase915 的测试对象来自 Phase914：
+
+```text
+1. 只选择 GLM4 中 top_abs_64 factor=0.3 / 0.4 的近边界候选；
+2. 候选必须满足 promoted_top5_from_non_top5 或 weak_holdout_candidate；
+3. 固定 Phase914 的 route + L4 MLP boundary precondition；
+4. 在这个预条件上叠加 action-gate 候选；
+5. 判断是否能从 near-boundary 推进到 margin >= 0 / EOS top1 / strict clean。
+```
+
+本阶段选出的 Phase914 候选：
+
+```text
+qwen3: 0
+GLM4: 12
+DS7B: 0
+```
+
+GLM4 候选分布：
+
+```text
+object promoted_top5: 6
+animal promoted_top5: 2
+animal weak_holdout: 3
+material weak_holdout: 1
+```
+
+动作门候选类型：
+
+```text
+1. readout_action_vector:
+   在 l0_output / late MLP / late attention 上叠加 unembedding 方向。
+
+2. component_output_scale:
+   缩放 late MLP / late attention 输出。
+
+3. logit_mask_diagnostic:
+   直接 mask boundary state 下的 top blocker。
+   这是诊断上限，不是自然神经机制证据。
+```
+
+测试位置：
+
+```text
+l0_output
+L39_mlp
+L39_attn
+L36_mlp
+L36_attn
+```
+
+readout 方向：
+
+```text
+eos_minus_blocker_top1
+minus_blocker_top1
+minus_blocker_top3_mean
+eos_boost
+```
+
+readout beta：
+
+```text
+0.05, 0.1, 0.25, 0.5
+```
+
+component scale：
+
+```text
+0.0, 0.5, 1.5
+```
+
+### 四、核心数学公式
+
+Phase914 的边界预条件记为：
+
+$$
+z^{B}(x)
+=
+z^{route+L4}(x)
+$$
+
+动作门候选干预后为：
+
+$$
+z^{A}_{s,d,\beta}(x)
+$$
+
+其中 \(s\) 是作用位置，\(d\) 是 readout 方向，\(\beta\) 是干预强度。
+
+边界状态下的 EOS margin：
+
+$$
+M_B(x)
+=
+z^{B}(EOS)
+-
+\max_{v\ne EOS}z^{B}(v)
+$$
+
+动作候选后的 EOS margin：
+
+$$
+M_A(x,s,d,\beta)
+=
+z^{A}_{s,d,\beta}(EOS)
+-
+\max_{v\ne EOS}z^{A}_{s,d,\beta}(v)
+$$
+
+margin 推进量：
+
+$$
+\Delta M_A(x,s,d,\beta)
+=
+M_A(x,s,d,\beta)-M_B(x)
+$$
+
+rank 推进量：
+
+$$
+\Delta r_A(x,s,d,\beta)
+=
+rank_{EOS}(z^{A}_{s,d,\beta})
+-
+rank_{EOS}(z^{B})
+$$
+
+弱动作候选：
+
+$$
+W_A(x,s,d,\beta)
+=
+\mathbf{1}
+\left[
+\Delta r_A < 0
+\right]
+\mathbf{1}
+\left[
+\Delta z_{EOS}\ge 0
+\right]
+\mathbf{1}
+\left[
+\Delta M_A > 0
+\right]
+$$
+
+动作门闭合标准：
+
+$$
+A_{close}(x)
+=
+\mathbf{1}
+\left[
+M_A(x)\ge 0
+\right]
+\mathbf{1}
+\left[
+rank_{EOS}(z^A)=1
+\right]
+\mathbf{1}
+\left[
+StrictClean(x)=1
+\right]
+$$
+
+诊断 mask 的含义：
+
+$$
+z^{diag}_{mask}(b_i)=-\infty
+$$
+
+它只能说明阻塞瓶颈存在，不能说明模型内部自然存在同等动作门。
+
+### 五、客观结果
+
+跨模型总体：
+
+```text
+selected_phase914_candidates: 12
+rows: 1152
+boundary_rows: 12
+action_rows: 1104
+diagnostic_rows: 36
+
+boundary_top1: 0
+boundary_top5: 8
+boundary_margin_nonnegative: 0
+
+action_top1: 0
+action_top5: 617
+action_top10: 795
+action_margin_nonnegative: 0
+action_promoted_margin: 0
+action_promoted_top1: 0
+action_promoted_top5: 4
+action_rank_improved: 131
+weak_action_candidate: 106
+action_strict_clean_candidate: 0
+
+diagnostic_top1: 9
+diagnostic_margin_nonnegative: 9
+diagnostic_promoted_margin: 9
+```
+
+分模型结果：
+
+```text
+qwen3:
+  selected_phase914_candidates: 0
+  evidence: no_phase914_near_boundary_candidates
+
+GLM4:
+  selected_phase914_candidates: 12
+  rows: 1152
+  action_rows: 1104
+  action_top1: 0
+  action_margin_nonnegative: 0
+  action_promoted_margin: 0
+  action_promoted_top5: 4
+  weak_action_candidate: 106
+  action_strict_clean_candidate: 0
+  diagnostic_margin_nonnegative: 9
+  evidence: diagnostic_blocker_mask_can_close_margin
+
+DS7B:
+  selected_phase914_candidates: 0
+  evidence: no_phase914_near_boundary_candidates
+```
+
+GLM4 的 boundary blocker 非常集中：
+
+```text
+boundary_blocker_tokens_top12:
+  "a": 1152
+```
+
+这说明 Phase915 的近边界失败不是分散到大量 blocker，而是高度集中在 token `"a"`。
+
+最强自然神经候选：
+
+```text
+L39_mlp_output_scale_1.5:
+  rows: 12
+  action_top1: 0
+  action_margin_nonnegative: 0
+  action_promoted_margin: 0
+  action_promoted_top5: 2
+  weak_action_candidate: 12
+  action_rank_improved: 12
+  median_margin_delta: +0.9375
+  mean_eos_delta: +0.4244791667
+```
+
+最佳个别自然动作行：
+
+```text
+p856_009_animal_fish question_plain:
+  control: L39_mlp_output_scale_1.5
+  boundary_rank: 5
+  patched_rank: 2
+  patched_margin: -0.125
+  margin_delta: +0.8125
+
+p856_038_object_object natural_question:
+  control: L39_mlp_output_scale_1.5
+  boundary_rank: 5
+  patched_rank: 2
+  patched_margin: -0.1875 / -0.25
+  margin_delta: +0.9375
+```
+
+诊断结果：
+
+```text
+diagnostic_mask_boundary_blocker_top8:
+  diagnostic_top1: 9
+  diagnostic_margin_nonnegative: 9
+  diagnostic_promoted_margin: 9
+```
+
+也就是说，如果直接移除边界状态下的前 8 个 blocker，EOS 可以在 9 个诊断行中越过边界。
+
+### 六、结果分析
+
+本阶段形成一个关键的负结果和一个关键诊断结果：
+
+```text
+负结果：
+  当前测试到的自然神经 action candidates 没有完成 margin >= 0 / EOS top1 / strict clean。
+
+诊断结果：
+  直接 mask top blocker 可以完成 margin / top1，说明 near-boundary 的最后瓶颈真实存在。
+```
+
+这说明：
+
+```text
+L4 MLP 已经把 EOS 推到 near-boundary；
+但最后不是简单地加一个 unembedding readout direction 就能闭合；
+最高 blocker "a" 仍然压住 EOS；
+自然动作门如果存在，应该是更精细的 blocker suppressor / output selector，而不是粗 readout boost。
+```
+
+最值得注意的是：
+
+```text
+L39_mlp_output_scale_1.5 是强弱正结果：
+  它在 12/12 行中改善 rank；
+  median margin delta 为 +0.9375；
+  最好能把 rank 5 推到 rank 2；
+  但仍然没有跨过 margin >= 0。
+```
+
+因此它更像：
+
+```text
+late MLP action-adjacent amplifier
+晚层 MLP 动作邻近放大器
+```
+
+但还不是动作门本身。
+
+### 七、理论进展
+
+Phase915 把图谱从 Phase914 的：
+
+```text
+G_prompt -> S_route -> C_boundary -> ? action
+```
+
+推进为：
+
+```text
+G_prompt -> S_route -> C_boundary -> A_adjacent -> B_a_blocker -> A_action missing
+```
+
+其中：
+
+```text
+C_boundary:
+  L4 MLP top_abs_64。
+
+A_adjacent:
+  L39 MLP output_scale_1.5，能接近动作边界。
+
+B_a_blocker:
+  token "a" 是最主要全词表阻塞者。
+
+A_action:
+  仍未找到。
+```
+
+这使当前图谱比 Phase914 更具体：
+
+```text
+缺失的不是“有没有终止路线”；
+也不只是“有没有边界调节器”；
+缺失的是能自然压下 "a" blocker 并让 EOS 跨过 margin 的最后动作结构。
+```
+
+### 八、问题、硬伤与瓶颈
+
+本阶段仍不能称为闭合，硬伤如下：
+
+```text
+1. action_margin_nonnegative = 0。
+2. action_top1 = 0。
+3. action_strict_clean_candidate = 0。
+4. action_promoted_margin = 0。
+5. diagnostic mask 成功，但它不是自然神经机制。
+6. L39_mlp_output_scale_1.5 是整组件缩放，过粗。
+7. qwen3 和 DS7B 没有 Phase914 near-boundary 候选，不能做同构验证。
+8. GLM4 是小模型，"a" blocker 可能是小模型协议/模板压缩伪影。
+9. 当前还没有定位到 L39 MLP 内部的具体 channel / subspace。
+```
+
+尤其要警惕：
+
+```text
+diagnostic_top1 = 9
+不能解释为 action gate closure。
+```
+
+它只能说明：
+
+```text
+如果最高 blocker 被移除，EOS 有能力上位；
+但模型内部是否有自然移除该 blocker 的齿轮，还没有证明。
+```
+
+### 九、闭合标准与当前距离
+
+本阶段闭合标准：
+
+```text
+最低动作进展：
+  在 L4 boundary precondition 后进一步提升 rank / margin。
+
+中等动作闭合：
+  action_margin_nonnegative > 0。
+
+强动作闭合：
+  action_top1 > 0。
+
+最高动作闭合：
+  action_strict_clean_candidate > 0。
+```
+
+Phase915 达到：
+
+```text
+最低动作进展：
+  达到。action_rank_improved = 131，weak_action_candidate = 106。
+
+中等动作闭合：
+  未达到。action_margin_nonnegative = 0。
+
+强动作闭合：
+  未达到。action_top1 = 0。
+
+最高动作闭合：
+  未达到。action_strict_clean_candidate = 0。
+```
+
+进度评估：
+
+```text
+clean protocol edge graph:
+  约 68%。
+
+GLM4 route-near boundary + action-adjacent chain:
+  约 52%。
+
+termination action gate closure:
+  约 23%。
+
+完整语言编码机制闭合:
+  约 19%-23%。
+```
+
+这些百分比仍然只是基于当前证据层级的工作进度估计。
+
+### 十、智能理论角度的关键洞察
+
+Phase915 给出了一个非常清楚的机制拼图：
+
+```text
+语义答案已经存在；
+终止路线已经把 EOS 拉入竞争区；
+L4 MLP 可以把 EOS 推到 rank 5 附近；
+L39 MLP 可以进一步把 EOS 推到 rank 2 附近；
+但一个简单 token "a" 仍然能压住 EOS；
+这说明最后的输出动作不是“答案正确”问题，而是全词表竞争中的动作选择问题。
+```
+
+从智能理论角度看：
+
+```text
+语言能力不只是语义 + 语法；
+还包含一个输出动作系统。
+```
+
+这个动作系统至少包括：
+
+```text
+1. 何时停止；
+2. 如何压制协议续写；
+3. 如何压制泛化冠词 / 列表词 / 模板词；
+4. 如何让 EOS 从 near-boundary 真正跨过全词表 margin。
+```
+
+Phase915 的关键洞察是：
+
+```text
+“知道答案”与“停止输出”之间存在一层独立动作门。
+```
+
+这层动作门目前没有被 L4 MLP 或 L39 MLP 整组件缩放完整捕捉。
+
+### 十一、下一阶段任务
+
+Phase915 已完成当前阶段目标：
+
+```text
+在 L4 MLP boundary precondition 后搜索 near-boundary action gate；
+确认当前 readout / late residual 粗干预不能完成自然闭合；
+确认 "a" blocker 是近边界阶段的主要瓶颈；
+确认 diagnostic mask 可以闭合，但不是自然机制证据。
+```
+
+下一阶段建议进入：
+
+```text
+Phase916:
+L39 MLP channel-level "a" blocker suppressor localization
+第39层 MLP 通道级 "a" 阻塞者抑制器定位
+```
+
+核心任务：
+
+```text
+1. 固定 Phase914 L4 top_abs_64 boundary precondition；
+2. 聚焦 Phase915 中最强的 L39_mlp_output_scale_1.5；
+3. 捕获 L39 MLP down_proj 输入通道；
+4. 根据 EOS vs "a" 的 readout 投影，拆分：
+   eos_support channels；
+   a_blocker_support channels；
+   margin_support channels；
+5. 分别测试放大 / 抑制这些 channel；
+6. 判断是否能从 patched_margin=-0.125/-0.25 推到 margin >= 0。
+```
+
+阶段边界判断：
+
+```text
+Phase916 与 Phase915 属于同一 clean protocol edge graph 大主线，
+但 Phase915 的 near-boundary action-gate first scan 已完成。
+Phase916 是新的 channel-level blocker suppressor localization 子阶段，
+不能把 Phase915 的 diagnostic mask 结果直接当作自然闭合。
+```
