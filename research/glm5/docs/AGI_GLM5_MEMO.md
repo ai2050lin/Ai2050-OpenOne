@@ -129289,3 +129289,957 @@ period 后 continuation 是当前 clean closure 的直接瓶颈。
 ```
 
 图谱进度继续上升，因为 stop/action 边界被拆开。闭合进度不提高，因为 strict clean 仍为 0，且 EOS action 尚未进入自然竞争。
+
+## Phase 906: EOS 动作边界测试 [2026-07-03 20:08]
+
+### 一、任务来源
+
+本阶段接续 Phase903-905。附件中对 Phase903、Phase904、Phase905 的综合判断基本正确：
+
+```text
+Phase903:
+  协议续写不是单 token 问题，而是 protocol continuation field。
+
+Phase904:
+  协议续写场可以被压低、重排，但 termination action 没有闭合。
+
+Phase905:
+  stop_top1 全部是 period top1，不是 EOS / 真实终止动作。
+```
+
+因此 Phase906 不再使用宽泛的：
+
+$$
+StopSet = EOS \cup Period
+$$
+
+而是直接拆开：
+
+```text
+period boundary
+EOS action
+post-period continuation
+```
+
+核心问题变成：
+
+```text
+EOS 是不可用，还是可用但自然竞争极弱？
+句号之后为什么不是 EOS，而是继续进入 explanation / field / other continuation？
+```
+
+### 二、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase906_eos_action_boundary_test.py
+tests/glm5/run_phase906_eos_action_boundary_test.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase906_eos_action_boundary_test/eos_action_boundary_test/
+```
+
+核心结果：
+
+```text
+phase906_cross_model_summary.json
+phase906_cross_model_summary.md
+phase906_qwen3_rows.jsonl
+phase906_glm4_rows.jsonl
+phase906_deepseek7b_rows.jsonl
+```
+
+### 三、测试原理
+
+测试对象仍然使用 Phase899/903/904 已经确认的 selected answer drift rows：
+
+```text
+qwen3: 18
+GLM4: 17
+DS7B: 33
+合计: 68
+```
+
+每条样本先生成 answer-prefix，然后做四类审计：
+
+```text
+1. baseline answer-prefix 处 EOS / period / protocol rank；
+2. 强制 period 后，读取下一步 logits；
+3. 强制 period 后继续 rollout，观察是否 clean；
+4. 强制 EOS，检查 tokenizer / generation path 是否能形成 clean stop；
+5. 在 period 后 logits 上做 protocol / newline / comma / field-explanation mask 对照。
+```
+
+闭合停止公式继续使用 Phase905 修正后的口径：
+
+$$
+ClosureStop(x)
+=
+EOSAction(x)
+\lor
+\left[
+PeriodBoundary(x)
+\land
+\neg ContinuationAfterPeriod(x)
+\right]
+$$
+
+Phase906 重点测：
+
+$$
+EOSRank(x,t_{answer})
+$$
+
+以及：
+
+$$
+EOSRank(x,t_{answer}+Period)
+$$
+
+如果 EOS 只在 forced condition 下 clean，而自然 logits 中不竞争，则说明：
+
+$$
+EOSAvailable(x)=1
+$$
+
+但：
+
+$$
+EOSActionNatural(x)=0
+$$
+
+### 四、跨模型总体结果
+
+```text
+rows: 68
+
+baseline_eos_top1: 0
+baseline_eos_top10: 0
+baseline_eos_top50: 14
+
+after_period_eos_top1: 0
+after_period_eos_top10: 0
+after_period_eos_top50: 0
+
+period_forced_protocol_drift: 50
+period_forced_strict_protocol_drift: 68
+period_forced_strict_clean_answer_no_protocol: 0
+
+eos_forced_generation_would_stop: 68
+eos_forced_strict_clean_answer_no_protocol: 68
+
+mask_protocol_eos_top1: 0
+mask_protocol_plus_period_eos_top1: 0
+
+period_after_generated_eos: 9
+```
+
+最关键的事实：
+
+```text
+强制 EOS:
+  68/68 都能得到 strict clean。
+
+自然 answer-prefix:
+  EOS top1 = 0
+  EOS top10 = 0
+
+强制 period 后:
+  EOS top1 = 0
+  EOS top10 = 0
+  EOS top50 = 0
+
+mask protocol / protocol+period:
+  EOS top1 = 0
+```
+
+这说明：
+
+```text
+EOS 不是 tokenizer / generation config 完全不可用；
+EOS 是可用的；
+但它在自然输出竞争场中极弱。
+```
+
+### 五、分模型结果
+
+#### qwen3
+
+```text
+rows: 18
+
+baseline_eos_top1: 0
+baseline_eos_top10: 0
+baseline_eos_top50: 0
+baseline_median_eos_rank: 29326.5
+baseline_median_period_rank: 3.0
+baseline_median_protocol_rank: 1.0
+
+after_period_eos_top1: 0
+after_period_eos_top10: 0
+after_period_eos_top50: 0
+after_period_median_eos_rank: 12182.5
+after_period_median_protocol_rank: 1.5
+
+after_period_next_top_categories:
+  explanation: 9
+  other: 9
+
+period_forced_strict_clean_answer_no_protocol: 0
+eos_forced_strict_clean_answer_no_protocol: 18
+```
+
+qwen3 的现象是：
+
+```text
+period 边界很近；
+EOS 极远；
+period 后仍进入 explanation / other continuation。
+```
+
+#### GLM4
+
+```text
+rows: 17
+
+baseline_eos_top1: 0
+baseline_eos_top10: 0
+baseline_eos_top50: 12
+baseline_median_eos_rank: 36.0
+baseline_median_period_rank: 7.0
+baseline_median_protocol_rank: 1.0
+
+after_period_eos_top1: 0
+after_period_eos_top10: 0
+after_period_eos_top50: 0
+after_period_median_eos_rank: 22255.0
+after_period_median_protocol_rank: 2.0
+
+after_period_next_top_categories:
+  field_word: 8
+  other: 9
+
+period_forced_strict_clean_answer_no_protocol: 0
+eos_forced_strict_clean_answer_no_protocol: 17
+```
+
+GLM4 的现象非常关键：
+
+```text
+answer-prefix 处 EOS 有一定接近度；
+但 period forced 后 EOS 直接跌出 top50；
+句号不是把模型带向 EOS，而是带向 field / other continuation。
+```
+
+#### DS7B
+
+```text
+rows: 33
+
+baseline_eos_top1: 0
+baseline_eos_top10: 0
+baseline_eos_top50: 2
+baseline_median_eos_rank: 147.0
+baseline_median_period_rank: 8.0
+baseline_median_protocol_rank: 1.0
+
+after_period_eos_top1: 0
+after_period_eos_top10: 0
+after_period_eos_top50: 0
+after_period_median_eos_rank: 14086.0
+after_period_median_protocol_rank: 2.0
+
+after_period_next_top_categories:
+  explanation: 7
+  field_word: 4
+  other: 22
+
+period_after_generated_eos: 9
+period_forced_strict_clean_answer_no_protocol: 0
+eos_forced_strict_clean_answer_no_protocol: 33
+```
+
+DS7B 有 9 条 period forced rollout 中后续生成过 EOS，但这些都不是 strict clean。样例表现为：
+
+```text
+.\n</think>\n\nanimal.
+.\n</think>\n\nPolygon.
+.\n</think>\n\nshape.
+```
+
+这说明 DS7B 的 EOS / special boundary 可能更接近 chat / reasoning template 边界，而不是干净答案终止。
+
+### 六、正确性分析
+
+Phase906 支持附件中的主判断，并进一步收紧：
+
+```text
+不是 EOS 不能用；
+而是自然输出场几乎不选择 EOS。
+```
+
+因为：
+
+```text
+forced EOS strict clean = 68/68
+natural EOS top1 = 0/68
+after-period EOS top50 = 0/68
+```
+
+所以当前瓶颈不是：
+
+```text
+tokenizer 没有 EOS
+generation config 完全禁止 EOS
+```
+
+而更像：
+
+```text
+模型内部 continuation prior 极强；
+EOS action 没有进入自然竞争场；
+period 后不是停机态，而是新的续写态。
+```
+
+### 七、数学公式更新
+
+当前输出理论主体仍然保持：
+
+```text
+条件化输出场闭合理论
+```
+
+但终止部分需要更严格拆分：
+
+$$
+Output(x)
+=
+F(
+S_{answer}(x),
+S_{protocol}(x),
+S_{period}(x),
+S_{EOS}(x),
+A_{substitution}(x),
+T_{termination}(x)
+)
+$$
+
+其中：
+
+```text
+S_answer:
+  语义答案场
+
+S_protocol:
+  协议续写场
+
+S_period:
+  句号/标点边界场
+
+S_EOS:
+  EOS 竞争场
+
+A_substitution:
+  协议替代图
+
+T_termination:
+  真实终止动作场
+```
+
+Phase906 给出：
+
+$$
+EOSAvailable(x)=1
+$$
+
+但：
+
+$$
+EOSRank(x,t_{answer}) \gg 1
+$$
+
+并且：
+
+$$
+EOSRank(x,t_{answer}+Period) \gg 1
+$$
+
+所以：
+
+$$
+EOSActionNatural(x)=0
+$$
+
+强制 EOS 条件：
+
+$$
+ForceEOS(x) \Rightarrow Clean_{strict}(x)
+$$
+
+自然条件：
+
+$$
+PeriodBoundary(x) \Rightarrow ContinuationAfterPeriod(x)
+$$
+
+因此：
+
+$$
+PeriodBoundary(x) \not\Rightarrow EOSAction(x)
+$$
+
+### 八、图谱更新
+
+Phase906 后，全局齿轮图谱应改为：
+
+```text
+semantic answer field
+  -> answer prefix
+  -> protocol continuation field
+  -> period boundary
+  -> post-period continuation field
+  -/-> natural EOS action
+
+forced EOS
+  -> strict clean
+```
+
+这条边很关键：
+
+```text
+forced EOS 可以 clean；
+natural EOS 不竞争。
+```
+
+也就是说：
+
+```text
+终止能力存在；
+终止选择机制缺失。
+```
+
+### 九、问题和硬伤
+
+#### 1. forced EOS 不是机制闭合
+
+虽然：
+
+```text
+eos_forced_strict_clean_answer_no_protocol = 68
+```
+
+但这是外部强制，不是模型自然选择，不能记为 closure positive。
+
+#### 2. period 后 EOS 竞争更弱
+
+GLM4 最明显：
+
+```text
+baseline median EOS rank: 36
+after-period median EOS rank: 22255
+```
+
+这说明 period 不是通向 EOS 的自然桥，而可能触发新的续写状态。
+
+#### 3. mask protocol 仍不能让 EOS top1
+
+即便做：
+
+```text
+mask_protocol
+mask_protocol_plus_period
+```
+
+EOS top1 仍为 0。这说明 EOS 不只是被 newline/comma/field/explanation 压住；还有大量 other continuation 或模型模板续写竞争者。
+
+#### 4. 小模型偏差
+
+小模型可能把 EOS、chat template、reasoning trace、自然文本续写压缩在纠缠机制里。DS7B 的 `</think>` 现象尤其说明，当前结果可能混入蒸馏 / chat 格式边界，不宜直接外推到大模型。
+
+### 十、当前进度
+
+```text
+全局齿轮图谱:
+  92% - 95%
+
+语言编码机制闭合:
+  45% - 50%
+```
+
+图谱进度上升，因为 EOS 可用性与自然竞争缺口已被分开。闭合进度只小幅上升，因为自然 strict clean 仍为 0。
+
+### 十一、下一阶段
+
+Phase906 已经完成 EOS action boundary test 的最低和中等目标：
+
+```text
+最低目标:
+  证明 EOS 是否被模型自然压制。
+  结果：是，自然压制明显。
+
+中等目标:
+  区分 EOS 竞争失败与 tokenizer / generation config 不允许。
+  结果：EOS 可 forced clean，说明不是完全不可用。
+```
+
+下一阶段如果继续，应进入：
+
+```text
+Phase907:
+Post-Period Continuation Source Mapping
+句号后续写来源图谱
+```
+
+目标：
+
+```text
+1. 找到 period 后 explanation / field / other continuation 的来源组件；
+2. 检查是否存在组件置零能显著提升 EOS rank；
+3. 判断 post-period continuation 是协议场延伸，还是独立 continuation field；
+4. 不再把 forced EOS 当作闭合，只把它当作可用性对照。
+```
+
+## Phase 907: 句号后续写来源图谱 [2026-07-03 20:14]
+
+### 一、任务来源
+
+Phase906 证明：
+
+```text
+forced EOS 可以 clean；
+natural EOS 不竞争；
+period 后进入 continuation state。
+```
+
+因此 Phase907 继续同一阶段目标，但不再问：
+
+```text
+EOS 能不能强制干净？
+```
+
+而是问：
+
+```text
+period 后的 continuation state 来自哪些组件？
+哪些组件置零能拉近 EOS？
+这种拉近是否足够形成 EOS action？
+```
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase907_post_period_continuation_source_mapping.py
+tests/glm5/run_phase907_post_period_continuation_source_mapping.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase907_post_period_continuation_source_mapping/post_period_continuation_source_mapping/
+```
+
+核心结果：
+
+```text
+phase907_cross_model_summary.json
+phase907_cross_model_summary.md
+phase907_qwen3_rows.jsonl
+phase907_glm4_rows.jsonl
+phase907_deepseek7b_rows.jsonl
+```
+
+### 三、测试原理
+
+Phase907 使用 Phase899 选出的 68 条 answer drift rows。流程：
+
+```text
+1. 生成 answer-prefix；
+2. 强制追加 period；
+3. 在 period 后位置读取 baseline logits；
+4. 对每一层 attention / MLP 做 last-token component-zero；
+5. 记录 EOS rank、protocol rank、next-top category 变化。
+```
+
+干预公式：
+
+$$
+h_{\ell}^{kind}(x,t_{period+1})
+\leftarrow
+0
+$$
+
+EOS 排名变化：
+
+$$
+\Delta rank_{EOS}^{\ell,kind}(x)
+=
+rank_{patched}(EOS \mid x,Period)
+-
+rank_{base}(EOS \mid x,Period)
+$$
+
+若：
+
+$$
+\Delta rank_{EOS}^{\ell,kind}(x)<0
+$$
+
+说明该组件置零后 EOS 更接近竞争区。
+
+但闭合要求更高：
+
+$$
+rank_{patched}(EOS)=1
+$$
+
+或至少：
+
+$$
+rank_{patched}(EOS)\le 10
+$$
+
+才可以说出现 EOS action 近邻。
+
+### 四、总体结果
+
+跨模型统计：
+
+```text
+rows: 4504
+
+eos_rank_improved: 2105
+eos_rank_improved_100: 1903
+eos_rank_improved_1000: 1306
+
+patched_eos_top1: 0
+patched_eos_top10: 13
+patched_eos_top50: 17
+
+protocol_rank1_removed: 258
+next_top_changed: 1291
+next_category_changed: 942
+```
+
+关键结论：
+
+```text
+大量组件能改善 EOS rank；
+但没有任何组件把 EOS 推到 top1；
+只有 GLM4 出现 EOS top10 / top50 近邻；
+qwen3 和 DS7B 仍然只是“拉近但不近”。
+```
+
+因此 Phase907 是 source mapping positive，但不是 closure positive。
+
+### 五、分模型结果
+
+#### qwen3
+
+```text
+component_rows: 1296
+eos_rank_improved: 606
+eos_rank_improved_100: 521
+eos_rank_improved_1000: 244
+
+patched_eos_top1: 0
+patched_eos_top10: 0
+patched_eos_top50: 0
+
+protocol_rank1_removed: 53
+next_top_changed: 278
+next_category_changed: 262
+median_eos_rank_delta: 37.5
+```
+
+主要 transition：
+
+```text
+explanation -> explanation: 571
+other -> other: 463
+other -> explanation: 159
+```
+
+qwen3 的结论：
+
+```text
+period 后 continuation 场可以被扰动；
+部分组件能改善 EOS rank；
+但 EOS 仍完全进不了 top50。
+```
+
+#### GLM4
+
+```text
+component_rows: 1360
+eos_rank_improved: 757
+eos_rank_improved_100: 662
+eos_rank_improved_1000: 464
+
+patched_eos_top1: 0
+patched_eos_top10: 13
+patched_eos_top50: 17
+
+protocol_rank1_removed: 39
+next_top_changed: 295
+next_category_changed: 189
+median_eos_rank_delta: -54.0
+```
+
+最强组件：
+
+```text
+L0 attention / field_word:
+  rows: 8
+  patched_eos_top50: 8
+  patched_eos_top10: 6
+  eos_rank_improved_1000: 8
+  mean_eos_rank_delta: -18323.375
+  category transition: field_word -> other
+
+L0 attention / other:
+  rows: 9
+  patched_eos_top50: 7
+  patched_eos_top10: 7
+  eos_rank_improved_1000: 7
+  mean_eos_rank_delta: -22756.4444
+```
+
+GLM4 的结论：
+
+```text
+period 后 EOS action 的近邻边界确实存在；
+但 L0 attention 置零只是把 EOS 拉到 top10/top50，
+仍不能让 EOS top1。
+```
+
+这说明 GLM4 的 period 后 continuation 很可能强烈依赖早层 attention 的格式/位置/模板信息。
+
+#### DS7B
+
+```text
+component_rows: 1848
+eos_rank_improved: 742
+eos_rank_improved_100: 720
+eos_rank_improved_1000: 598
+
+patched_eos_top1: 0
+patched_eos_top10: 0
+patched_eos_top50: 0
+
+protocol_rank1_removed: 166
+next_top_changed: 718
+next_category_changed: 491
+median_eos_rank_delta: 708.5
+```
+
+强信号主要在中后层 MLP：
+
+```text
+L23 MLP / other:
+  eos_rank_improved_1000: 21/22
+  mean_eos_rank_delta: -6409.59
+
+L27 MLP / other:
+  eos_rank_improved_1000: 21/22
+  mean_eos_rank_delta: -17870.14
+
+L20 MLP / other:
+  eos_rank_improved_1000: 21/22
+  mean_eos_rank_delta: -8789.14
+```
+
+但：
+
+```text
+patched_eos_top50: 0
+```
+
+DS7B 的结论：
+
+```text
+中后层 MLP 对 post-period continuation 有明显影响；
+但 EOS 仍远离自然竞争区。
+```
+
+### 六、正确性分析
+
+Phase907 进一步支持 Phase906：
+
+```text
+EOS action 不是完全不可达；
+但自然竞争场里 EOS 极弱。
+```
+
+更准确地说：
+
+```text
+组件干预可以拉近 EOS；
+拉近不等于 EOS action；
+EOS top1 仍为 0。
+```
+
+所以当前不能说：
+
+```text
+找到了终止控制齿轮；
+找到了 EOS source；
+完成了 clean closure。
+```
+
+只能说：
+
+```text
+找到了 post-period continuation source candidates；
+发现 GLM4 的 L0 attention 是重要近邻边界；
+发现 DS7B 的中后层 MLP 能显著改善 EOS rank 但不够近；
+qwen3 的 EOS 缺口仍非常大。
+```
+
+### 七、理论更新
+
+Phase907 后，终止缺口应拆成两层：
+
+```text
+1. EOS rank proximity
+   EOS 排名接近度
+
+2. EOS action dominance
+   EOS 动作支配
+```
+
+公式：
+
+$$
+EOSProximity(x)
+=
+\mathbb{1}[rank(EOS\mid x)\le K]
+$$
+
+其中：
+
+$$
+K \in \{10,50\}
+$$
+
+而真正动作：
+
+$$
+EOSAction(x)
+=
+\mathbb{1}[rank(EOS\mid x)=1]
+\land
+\neg ContinuationAfterEOS(x)
+$$
+
+Phase907 结果：
+
+$$
+EOSProximity_{GLM4}(x)>0
+$$
+
+但：
+
+$$
+EOSAction(x)=0
+$$
+
+也就是说：
+
+```text
+GLM4 已出现 EOS proximity；
+三模型均未出现 EOS action。
+```
+
+### 八、图谱更新
+
+最新图谱：
+
+```text
+semantic answer field
+  -> answer prefix
+  -> period boundary
+  -> post-period continuation field
+       qwen3: explanation / other
+       GLM4: field_word / other, L0 attention sensitive
+       DS7B: other / explanation / field_word, mid-late MLP sensitive
+  -> EOS proximity field
+       GLM4: weak positive
+       qwen3: absent
+       DS7B: improved but still far
+  -/-> EOS action dominance
+  -/-> strict clean closure
+```
+
+### 九、硬伤和瓶颈
+
+#### 1. EOS top1 仍为 0
+
+这是最硬的边界：
+
+```text
+patched_eos_top1 = 0 / 4504
+```
+
+说明自然闭合仍没有出现。
+
+#### 2. GLM4 的 L0 attention 可能是分布外扰动
+
+L0 attention 置零影响巨大，可能说明早层 template / position / prompt 信息强烈参与 period 后续写；但也可能是粗粒度置零导致的异常分布外扰动。需要下一阶段做更细粒度验证。
+
+#### 3. DS7B 的 EOS 改善不进入 top50
+
+DS7B 的 rank delta 很大，但 top50 仍为 0，说明它的 continuation field 有大量强竞争者。
+
+#### 4. qwen3 的 EOS 缺口最大
+
+qwen3 即便大量组件改善 EOS rank，也完全无法进入 top50，说明 qwen3 的 EOS action 与当前 answer-prefix/period 路线可能基本断开。
+
+### 十、下一阶段任务
+
+Phase907 已经完成 post-period continuation source mapping。下一阶段不应继续扩大粗粒度置零，而应对 GLM4 的 L0 attention 近邻边界做细化：
+
+```text
+Phase908:
+GLM4 L0 Attention EOS-Proximity Fine Audit
+GLM4 第 0 层注意力 EOS 近邻边界细审计
+```
+
+目标：
+
+```text
+1. 确认 L0 attention 不是分布外假阳性；
+2. 分 head / token position / prompt part 做更细粒度拆解；
+3. 判断它究竟是在压低 field continuation，还是在提升 EOS；
+4. 检查能否从 EOS top10/top50 推到 EOS top1。
+```
+
+### 十一、阶段结论
+
+Phase907 是重要正结果 + 重要负结果：
+
+```text
+正结果:
+  找到了 period 后续写的来源组件和 EOS proximity 近邻边界。
+
+负结果:
+  没有任何组件使 EOS top1；
+  strict clean closure 仍未出现。
+```
+
+总体进度评估：
+
+```text
+全局齿轮图谱:
+  93% - 95%
+
+语言编码机制闭合:
+  46% - 50%
+```
+
+图谱进度继续上升，因为 post-period continuation source 已经开始定位。闭合进度只小幅上升，因为 EOS action dominance 仍为 0。

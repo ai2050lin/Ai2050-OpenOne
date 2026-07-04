@@ -1,0 +1,51 @@
+{
+  "phase": 906,
+  "title": "EOS Action Boundary Test",
+  "model": "deepseek7b",
+  "status": "complete",
+  "timestamp": "2026-07-03 20:07:13",
+  "attn_implementation": "sdpa",
+  "overall": {
+    "rows": 33,
+    "answer_prefix_seen": 33,
+    "baseline_eos_top1": 0,
+    "baseline_eos_top10": 0,
+    "baseline_eos_top50": 2,
+    "baseline_median_eos_rank": 147.0,
+    "baseline_median_period_rank": 8.0,
+    "baseline_median_protocol_rank": 1.0,
+    "after_period_eos_top1": 0,
+    "after_period_eos_top10": 0,
+    "after_period_eos_top50": 0,
+    "after_period_median_eos_rank": 14086.0,
+    "after_period_median_protocol_rank": 2.0,
+    "after_period_next_top_categories": {
+      "explanation": 7,
+      "field_word": 4,
+      "other": 22
+    },
+    "period_after_first_categories": {
+      "explanation": 7,
+      "field_word": 4,
+      "other": 22
+    },
+    "period_after_second_categories": {
+      "comma": 9,
+      "newline": 14,
+      "other": 10
+    },
+    "period_after_generated_eos": 9,
+    "period_forced_protocol_drift": 18,
+    "period_forced_strict_protocol_drift": 33,
+    "period_forced_strict_clean_answer_no_protocol": 0,
+    "eos_forced_generation_would_stop": 33,
+    "eos_forced_strict_clean_answer_no_protocol": 33,
+    "mask_newline_eos_top1": 0,
+    "mask_comma_eos_top1": 0,
+    "mask_field_explanation_eos_top1": 0,
+    "mask_protocol_eos_top1": 0,
+    "mask_protocol_plus_period_eos_top1": 0
+  },
+  "evidence_label": "eos_forced_clean_but_not_naturally_competitive",
+  "boundary": "Phase906 separates EOS action from period boundary. Forced EOS is a control, not a natural closure result."
+}

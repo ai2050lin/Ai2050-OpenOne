@@ -585,7 +585,7 @@ def summarize_round(round_name: str) -> dict[str, Any]:
             best_controls.append(best)
     best_controls.sort(
         key=lambda row: (
-            row.get("clean_answer_no_protocol") or 0,
+            row.get("strict_clean_answer_no_protocol") or 0,
             row.get("protocol_rank1_removed") or 0,
             row.get("stop_rank_improved") or 0,
             row.get("protocol_logit_reduced_strong") or 0,
