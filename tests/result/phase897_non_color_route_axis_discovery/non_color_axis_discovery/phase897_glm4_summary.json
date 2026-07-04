@@ -1,0 +1,874 @@
+{
+  "phase": 897,
+  "title": "Non-Color Route Axis Discovery and Domain-Specific Pair Search",
+  "model": "glm4",
+  "status": "complete",
+  "timestamp": "2026-07-03 14:13:04",
+  "attn_implementation": "sdpa",
+  "layers_to_capture": [
+    35,
+    36,
+    39
+  ],
+  "domains": [
+    "animal",
+    "material",
+    "tool",
+    "plant",
+    "abstract",
+    "object",
+    "geometry"
+  ],
+  "overall": {
+    "candidate_axes": 28,
+    "history_candidate_axes": 0,
+    "activation_candidate_axes": 28,
+    "selected_conditions": 140,
+    "search_rows": 1400,
+    "condition_rows": 140,
+    "single_axis_closure_conditions": 9,
+    "pair_closure_conditions": 12,
+    "no_single_pair_conditions": 3,
+    "known_axis_minimal_pair_conditions": 2
+  },
+  "domain_groups": [
+    {
+      "model": "glm4",
+      "domain": "material",
+      "candidate_u_size": 4,
+      "conditions": 24,
+      "single_axis_closure_conditions": 1,
+      "pair_closure_conditions": 3,
+      "no_single_pair_conditions": 2,
+      "known_axis_minimal_pair_conditions": 2,
+      "single_keys": {
+        "L39C638": 1
+      },
+      "pair_keys": {
+        "L39C638+L39C1630": 1,
+        "L39C638+L39C2682": 1
+      },
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "candidate_u_size": 4,
+      "conditions": 16,
+      "single_axis_closure_conditions": 1,
+      "pair_closure_conditions": 2,
+      "no_single_pair_conditions": 1,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L39C11316": 1
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "candidate_u_size": 4,
+      "conditions": 24,
+      "single_axis_closure_conditions": 4,
+      "pair_closure_conditions": 4,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L35C8824": 4
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "candidate_u_size": 4,
+      "conditions": 20,
+      "single_axis_closure_conditions": 2,
+      "pair_closure_conditions": 2,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L39C13470": 2
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "candidate_u_size": 4,
+      "conditions": 16,
+      "single_axis_closure_conditions": 1,
+      "pair_closure_conditions": 1,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L36C4366": 1
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "candidate_u_size": 4,
+      "conditions": 20,
+      "single_axis_closure_conditions": 0,
+      "pair_closure_conditions": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {},
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "candidate_u_size": 4,
+      "conditions": 20,
+      "single_axis_closure_conditions": 0,
+      "pair_closure_conditions": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {},
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    }
+  ],
+  "single_domain_groups": [
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L35C8824",
+      "rows": 24,
+      "closure_from_open": 4,
+      "mean_target_lift": 0.033854166666666664,
+      "mean_blocker_reduction": 0.041666666666666664
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C13470",
+      "rows": 20,
+      "closure_from_open": 2,
+      "mean_target_lift": 0.09375,
+      "mean_blocker_reduction": 0.05
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L36C4366",
+      "rows": 16,
+      "closure_from_open": 1,
+      "mean_target_lift": 0.140625,
+      "mean_blocker_reduction": 0.0625
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C11316",
+      "rows": 16,
+      "closure_from_open": 1,
+      "mean_target_lift": 0.001953125,
+      "mean_blocker_reduction": -0.5625
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C638",
+      "rows": 24,
+      "closure_from_open": 1,
+      "mean_target_lift": -0.013020833333333334,
+      "mean_blocker_reduction": -0.08333333333333333
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C12772",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.1765625,
+      "mean_blocker_reduction": -0.95
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C2948",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.128125,
+      "mean_blocker_reduction": 0.55
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C2948",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.12239583333333333,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C5585",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.1171875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C2682",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.09635416666666667,
+      "mean_blocker_reduction": -0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C10302",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0703125,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L35C13692",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0625,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C12338",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.059895833333333336,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C2682",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0234375,
+      "mean_blocker_reduction": -0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C12200",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.01875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C1630",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.018229166666666668,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L36C13679",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.009375,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C3167",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.0078125,
+      "mean_blocker_reduction": -0.08333333333333333
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C3167",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.01953125,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C8235",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.040625,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C13632",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.052734375,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C11316",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.0625,
+      "mean_blocker_reduction": -0.1
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C7280",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.0796875,
+      "mean_blocker_reduction": -0.35
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C3930",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.090625,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C3652",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.1796875,
+      "mean_blocker_reduction": 0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C12040",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.190625,
+      "mean_blocker_reduction": -0.1
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C3652",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.246875,
+      "mean_blocker_reduction": 0.2
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C664",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.6276041666666666,
+      "mean_blocker_reduction": -0.625
+    }
+  ],
+  "pair_domain_groups": [
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C638+L39C1630",
+      "rows": 24,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 1,
+      "known_axis_minimal_pair_closure": 1,
+      "mean_target_lift": 0.020833333333333332,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C638+L39C2682",
+      "rows": 24,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 1,
+      "known_axis_minimal_pair_closure": 1,
+      "mean_target_lift": 0.08072916666666667,
+      "mean_blocker_reduction": -0.2916666666666667
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C11316+L39C5585",
+      "rows": 16,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 1,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.11328125,
+      "mean_blocker_reduction": -0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C3652+L39C11316",
+      "rows": 16,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 1,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.205078125,
+      "mean_blocker_reduction": 0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L35C8824+L39C2948",
+      "rows": 24,
+      "closure_from_open": 4,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.14583333333333334,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C12338+L35C8824",
+      "rows": 24,
+      "closure_from_open": 4,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.078125,
+      "mean_blocker_reduction": 0.041666666666666664
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C11316+L39C13470",
+      "rows": 20,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.05,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L35C8824+L39C664",
+      "rows": 24,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.2864583333333333,
+      "mean_blocker_reduction": -0.25
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C10302+L36C4366",
+      "rows": 16,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.25,
+      "mean_blocker_reduction": 0.0625
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C3167+L36C4366",
+      "rows": 16,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.1171875,
+      "mean_blocker_reduction": 0.0625
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C2948+L39C12772",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.3125,
+      "mean_blocker_reduction": -0.4
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C2682+L36C4366",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.19921875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C13470+L35C13692",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.184375,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C12338+L39C2948",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.16927083333333334,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C2682+L39C10302",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.1328125,
+      "mean_blocker_reduction": -0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C2682+L39C1630",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.11979166666666667,
+      "mean_blocker_reduction": -0.041666666666666664
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C12772+L39C7280",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.1109375,
+      "mean_blocker_reduction": -1.15
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C2682+L39C3167",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.078125,
+      "mean_blocker_reduction": -0.20833333333333334
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C3167+L39C10302",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.07421875,
+      "mean_blocker_reduction": -0.0625
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C13632+L39C5585",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.048828125,
+      "mean_blocker_reduction": 0.3125
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C2948+L39C7280",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.0421875,
+      "mean_blocker_reduction": 0.1
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C11316+L35C13692",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.028125,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C12200+L36C13679",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.021875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C1630+L39C3167",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.005208333333333333,
+      "mean_blocker_reduction": -0.08333333333333333
+    },
+    {
+      "model": "glm4",
+      "domain": "plant",
+      "subset_key": "L39C3167+L39C2682",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.00390625,
+      "mean_blocker_reduction": -0.0625
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C12200+L39C8235",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.015625,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "material",
+      "subset_key": "L39C638+L39C3167",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.020833333333333332,
+      "mean_blocker_reduction": -0.125
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C8235+L36C13679",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.021875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C3652+L39C5585",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.068359375,
+      "mean_blocker_reduction": 0.8125
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C11316+L39C13632",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.068359375,
+      "mean_blocker_reduction": -0.3125
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C12200+L39C3930",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.071875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C3652+L39C12772",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.0765625,
+      "mean_blocker_reduction": -0.6
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C12040+L39C13470",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.08125,
+      "mean_blocker_reduction": -0.1
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L36C13679+L39C3930",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.084375,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C12040+L35C13692",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.096875,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "geometry",
+      "subset_key": "L39C8235+L39C3930",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.125,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C3652+L39C2948",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.140625,
+      "mean_blocker_reduction": 0.05
+    },
+    {
+      "model": "glm4",
+      "domain": "tool",
+      "subset_key": "L39C11316+L39C12040",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.240625,
+      "mean_blocker_reduction": -0.1
+    },
+    {
+      "model": "glm4",
+      "domain": "object",
+      "subset_key": "L39C3652+L39C13632",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.251953125,
+      "mean_blocker_reduction": 0.375
+    },
+    {
+      "model": "glm4",
+      "domain": "abstract",
+      "subset_key": "L39C3652+L39C7280",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.3359375,
+      "mean_blocker_reduction": -0.45
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C2948+L39C664",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.5260416666666666,
+      "mean_blocker_reduction": -0.75
+    },
+    {
+      "model": "glm4",
+      "domain": "animal",
+      "subset_key": "L39C12338+L39C664",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.5859375,
+      "mean_blocker_reduction": -0.6666666666666666
+    }
+  ],
+  "evidence_label": "domain_specific_known_axis_minimal_pair_candidates",
+  "boundary": "Phase897 discovers candidate axes by late-MLP domain-specific activation plus prior atlas history, then tests domain-local single/pair interventions. It is candidate_U discovery, not global closure."
+}

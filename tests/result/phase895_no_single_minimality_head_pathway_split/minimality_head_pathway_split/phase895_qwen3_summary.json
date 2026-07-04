@@ -1,0 +1,239 @@
+{
+  "phase": 895,
+  "title": "No-Single Closure Minimality and Multi-Head Pathway Split",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 09:07:05",
+  "attn_implementation": "sdpa",
+  "model_gear_keys": [
+    "L31C2257"
+  ],
+  "subset_specs": [
+    "L31C2257"
+  ],
+  "focus_subset_key": "L31C2257",
+  "selected_conditions": 11,
+  "output_minimality_rows": 11,
+  "output_condition_rows": 11,
+  "output_head_split_rows": 77,
+  "output_rollout_rows": 77,
+  "overall": {
+    "focus_closure_from_open": 11,
+    "known_axis_minimal_candidate": 0,
+    "any_single_axis_closure": 11,
+    "any_alternative_pair_closure": 0,
+    "model_u_not_required_for_focus_closure": 11,
+    "head_closure_lost": 31,
+    "head_target_damage_gt_0_25": 11,
+    "head_blocker_damage_gt_0": 31,
+    "rollout_class_hit": 60,
+    "rollout_answer_like_no_echo": 39,
+    "rollout_class_lost_vs_none": 17,
+    "rollout_protocol_drift_added_vs_none": 0,
+    "rollout_object_echo_added_vs_none": 2
+  },
+  "subset_groups": [
+    {
+      "model": "qwen3",
+      "subset_key": "L31C2257",
+      "n_rows": 11,
+      "closure_from_open": 11,
+      "mean_target_lift": 0.7386363636363636,
+      "mean_blocker_reduction": 2.3636363636363638,
+      "top_blocker_roles": {
+        "none": 11
+      }
+    }
+  ],
+  "head_groups": [
+    {
+      "model": "qwen3",
+      "head_set": "L31H19+L31H26+L31H30+L31H12+L31H17",
+      "n_rows": 11,
+      "closure_lost": 10,
+      "target_damage_gt_0_25": 7,
+      "blocker_damage_gt_0": 10,
+      "mean_target_damage": 0.42045454545454547,
+      "mean_blocker_damage": 1.4545454545454546,
+      "pathway_labels": {
+        "blocker_boundary_candidate": 4,
+        "target_and_blocker_boundary_candidate": 6,
+        "target_lift_damage_candidate": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H19",
+      "n_rows": 11,
+      "closure_lost": 6,
+      "target_damage_gt_0_25": 0,
+      "blocker_damage_gt_0": 6,
+      "mean_target_damage": 0.1590909090909091,
+      "mean_blocker_damage": 0.6363636363636364,
+      "pathway_labels": {
+        "blocker_boundary_candidate": 6,
+        "weak_or_no_damage": 5
+      }
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H26",
+      "n_rows": 11,
+      "closure_lost": 6,
+      "target_damage_gt_0_25": 1,
+      "blocker_damage_gt_0": 6,
+      "mean_target_damage": 0.13636363636363635,
+      "mean_blocker_damage": 0.6363636363636364,
+      "pathway_labels": {
+        "blocker_boundary_candidate": 5,
+        "target_and_blocker_boundary_candidate": 1,
+        "weak_or_no_damage": 5
+      }
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H17",
+      "n_rows": 11,
+      "closure_lost": 4,
+      "target_damage_gt_0_25": 2,
+      "blocker_damage_gt_0": 4,
+      "mean_target_damage": 0.17045454545454544,
+      "mean_blocker_damage": 0.45454545454545453,
+      "pathway_labels": {
+        "blocker_boundary_candidate": 4,
+        "target_lift_damage_candidate": 2,
+        "weak_or_no_damage": 5
+      }
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H30",
+      "n_rows": 11,
+      "closure_lost": 3,
+      "target_damage_gt_0_25": 0,
+      "blocker_damage_gt_0": 3,
+      "mean_target_damage": 0.022727272727272728,
+      "mean_blocker_damage": 0.36363636363636365,
+      "pathway_labels": {
+        "blocker_boundary_candidate": 3,
+        "weak_or_no_damage": 8
+      }
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H12",
+      "n_rows": 11,
+      "closure_lost": 2,
+      "target_damage_gt_0_25": 1,
+      "blocker_damage_gt_0": 2,
+      "mean_target_damage": 0.03409090909090909,
+      "mean_blocker_damage": 0.18181818181818182,
+      "pathway_labels": {
+        "blocker_boundary_candidate": 1,
+        "target_and_blocker_boundary_candidate": 1,
+        "weak_or_no_damage": 9
+      }
+    },
+    {
+      "model": "qwen3",
+      "head_set": "none",
+      "n_rows": 11,
+      "closure_lost": 0,
+      "target_damage_gt_0_25": 0,
+      "blocker_damage_gt_0": 0,
+      "mean_target_damage": 0.0,
+      "mean_blocker_damage": 0.0,
+      "pathway_labels": {
+        "none_control": 11
+      }
+    }
+  ],
+  "rollout_groups": [
+    {
+      "model": "qwen3",
+      "head_set": "L31H19+L31H26+L31H30+L31H12+L31H17",
+      "n_rows": 11,
+      "class_hit": 6,
+      "answer_like_no_echo": 3,
+      "object_echo": 4,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 5,
+      "object_echo_added_vs_none": 1,
+      "protocol_drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H30",
+      "n_rows": 11,
+      "class_hit": 8,
+      "answer_like_no_echo": 5,
+      "object_echo": 3,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 3,
+      "object_echo_added_vs_none": 0,
+      "protocol_drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H12",
+      "n_rows": 11,
+      "class_hit": 8,
+      "answer_like_no_echo": 5,
+      "object_echo": 4,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 3,
+      "object_echo_added_vs_none": 1,
+      "protocol_drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H19",
+      "n_rows": 11,
+      "class_hit": 9,
+      "answer_like_no_echo": 6,
+      "object_echo": 3,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 2,
+      "object_echo_added_vs_none": 0,
+      "protocol_drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H26",
+      "n_rows": 11,
+      "class_hit": 9,
+      "answer_like_no_echo": 6,
+      "object_echo": 3,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 2,
+      "object_echo_added_vs_none": 0,
+      "protocol_drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H17",
+      "n_rows": 11,
+      "class_hit": 9,
+      "answer_like_no_echo": 6,
+      "object_echo": 3,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 2,
+      "object_echo_added_vs_none": 0,
+      "protocol_drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "head_set": "none",
+      "n_rows": 11,
+      "class_hit": 11,
+      "answer_like_no_echo": 8,
+      "object_echo": 3,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 0,
+      "object_echo_added_vs_none": 0,
+      "protocol_drift_added_vs_none": 0
+    }
+  ],
+  "evidence_label": "head_pathway_fragility_without_pair_minimality",
+  "boundary": "Phase895 checks known-axis minimality, full-vocabulary blocker ranks, and whether multi-head zero affects target lift, blocker reduction, or rollout protocol. It is still not full long-horizon language closure."
+}

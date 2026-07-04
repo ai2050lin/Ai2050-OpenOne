@@ -120755,3 +120755,8537 @@ Phase885 是实质图谱进展，也是关键收紧。
 
 holdout-supported local subspace boundary gear candidate。
 ```
+
+## Phase 886: 局部子空间边界齿轮分解 [2026-07-03 04:13]
+
+### 一、任务
+
+本阶段分析最新附件中对 Phase885 的判断是否正确，并继续完成下一阶段：
+
+```text
+Phase886:
+Local Subspace Boundary Gear Decomposition
+局部子空间边界齿轮分解
+```
+
+附件的核心判断是：
+
+```text
+Phase885 证明了 holdout-supported stable boundary candidate，
+但没有证明 signed minimal gear。
+
+opposite-mode reproduction 不是简单噪声，
+更可能说明当前齿轮单位不是单一带符号方向，
+而是局部子空间边界调制单元。
+```
+
+这个判断基本正确。
+
+本阶段没有重新进行 CUDA 前向推理，而是复用 Phase885 已经完成的 qwen3、GLM4、DS7B 跨模型干预结果，进行高性能离线分解。原因是 Phase886 的核心问题不是扩大模型推理量，而是检查同一候选的 candidate / opposite / random / neighbor 是否作用于同一批 blocker-token 边界。
+
+### 二、测试脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase886_local_subspace_boundary_decomposition.py
+tests/glm5/run_phase886_local_subspace_boundary_decomposition.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase886_local_subspace_boundary_decomposition/local_subspace_decomposition/
+```
+
+生成结果：
+
+```text
+phase886_qwen3_pairs.jsonl
+phase886_qwen3_summary.json
+phase886_glm4_pairs.jsonl
+phase886_glm4_summary.json
+phase886_deepseek7b_pairs.jsonl
+phase886_deepseek7b_summary.json
+phase886_cross_model_summary.json
+phase886_cross_model_summary.md
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B -> cross-model summary
+```
+
+虽然本阶段没有占用 GPU，但分析对象来自 Phase885 的真实跨模型模型测试结果。
+
+### 三、测试原理
+
+Phase885 已经对每个候选进行了：
+
+```text
+candidate intervention
+same-layer random control
+neighbor-channel control
+opposite-mode control
+```
+
+Phase886 不再只看 candidate 是否 closure，而是对同一 case、同一 prompt、同一候选，比较：
+
+```text
+candidate removed blockers
+opposite removed blockers
+candidate residual blockers
+opposite residual blockers
+```
+
+核心问题：
+
+```text
+如果 candidate 和 opposite 都能 closure，
+它们是否删除的是同一批 blocker-token？
+
+如果是，则说明它不是 signed scalar gear，
+而更像 local subspace boundary gear。
+```
+
+### 四、核心公式
+
+边界闭合：
+
+```text
+BoundaryClosed(G, x, p)
+  =
+  [class_blocker_count(G, x, p) = 0]
+  and
+  [class_best_rank(G, x, p) = 1]
+```
+
+从开放边界到闭合边界：
+
+```text
+ClosureFromOpen(G, x, p, m)
+  =
+  not BoundaryClosed(empty, x, p)
+  and
+  BoundaryClosed(G_m, x, p)
+```
+
+candidate 删除的 blocker 集合：
+
+```text
+Removed_candidate
+  =
+  BaseBlockers - IntervenedBlockers_candidate
+```
+
+opposite 删除的 blocker 集合：
+
+```text
+Removed_opposite
+  =
+  BaseBlockers - IntervenedBlockers_opposite
+```
+
+同一 blocker 边界重合度：
+
+```text
+J_removed
+  =
+  |Removed_candidate intersect Removed_opposite|
+  /
+  |Removed_candidate union Removed_opposite|
+```
+
+局部子空间边界齿轮判据：
+
+```text
+LocalSubspaceBoundaryGear(g)
+  =
+  HoldoutRepair(g)
+  and
+  ControlSeparation_random_neighbor(g)
+  and
+  OppositeModeReproduction(g)
+  and
+  J_removed(g) > threshold
+```
+
+这和 signed minimal gear 不同：
+
+```text
+SignedMinimalGear(g)
+  =
+  HoldoutRepair(g)
+  and
+  not OppositeModeReproduction(g)
+  and
+  not RandomControlReproduction(g)
+  and
+  not NeighborControlReproduction(g)
+```
+
+Phase886 的重点是确认：
+
+```text
+SignedMinimalGear 不成立；
+LocalSubspaceBoundaryGear 更合理。
+```
+
+### 五、客观结果
+
+整体结果：
+
+```text
+source_rows = 2016
+paired_rows = 504
+candidate_closure = 45
+opposite_closure = 46
+both_closure = 36
+candidate_only_closure = 9
+opposite_only_closure = 10
+same_blocker_direction = 66
+mean_removed_jaccard = 0.3912
+mean_residual_jaccard = 0.9299
+random_closure = 0
+neighbor_closure = 0
+```
+
+这说明：
+
+```text
+1. candidate 和 opposite 的 closure 数量几乎相等；
+2. 36 个 pair 中 candidate 和 opposite 同时 closure；
+3. random / neighbor control 没有 closure；
+4. opposite reproduction 不是简单随机泄漏；
+5. 当前候选更像局部子空间边界调制，而不是单一方向因果齿轮。
+```
+
+共享删除 blocker 的角色分布：
+
+```text
+format_punct = 57
+other_blocker = 44
+object_echo = 8
+format_space = 6
+protocol_word = 5
+```
+
+这个分布很重要：
+
+```text
+主要被移动的是 format / protocol / other blocker，
+不是单纯 semantic target。
+```
+
+说明当前边界齿轮更接近：
+
+```text
+输出竞争场边界调制器
+```
+
+而不是：
+
+```text
+语义答案通道。
+```
+
+### 六、候选组结果
+
+DS7B animal 候选：
+
+```text
+candidate = L27C16651:flip
+label = same_blocker_local_subspace_boundary
+n_pairs = 102
+candidate_closure = 22
+opposite_closure = 17
+both_closure = 17
+candidate_only_closure = 5
+opposite_only_closure = 0
+same_blocker_direction = 25
+mean_removed_jaccard = 0.7333
+random_closure = 0
+neighbor_closure = 0
+candidate_clean_like = 20
+candidate_nonclean_like = 2
+opposite_clean_like = 13
+opposite_nonclean_like = 4
+```
+
+这是当前最强的局部子空间边界齿轮候选。
+
+qwen3 material 候选：
+
+```text
+candidate = L31C2257:flip
+label = same_blocker_local_subspace_boundary
+n_pairs = 102
+candidate_closure = 8
+opposite_closure = 4
+both_closure = 4
+candidate_only_closure = 4
+opposite_only_closure = 0
+same_blocker_direction = 12
+mean_removed_jaccard = 0.5486
+random_closure = 0
+neighbor_closure = 0
+candidate_clean_like = 5
+candidate_nonclean_like = 3
+opposite_clean_like = 1
+opposite_nonclean_like = 3
+```
+
+qwen3 有正结果，但弱于 DS7B animal。
+
+DS7B color 候选 1：
+
+```text
+candidate = L27C15369:subset0:zero
+label = same_blocker_local_subspace_boundary
+n_pairs = 102
+candidate_closure = 11
+opposite_closure = 17
+both_closure = 11
+candidate_only_closure = 0
+opposite_only_closure = 6
+same_blocker_direction = 16
+mean_removed_jaccard = 0.5801
+random_closure = 0
+neighbor_closure = 0
+candidate_clean_like = 2
+candidate_nonclean_like = 9
+opposite_clean_like = 3
+opposite_nonclean_like = 14
+```
+
+DS7B color 候选 2：
+
+```text
+candidate = L26C8587:subset1:zero
+label = same_blocker_local_subspace_boundary
+n_pairs = 102
+candidate_closure = 4
+opposite_closure = 8
+both_closure = 4
+candidate_only_closure = 0
+opposite_only_closure = 4
+same_blocker_direction = 13
+mean_removed_jaccard = 0.5254
+random_closure = 0
+neighbor_closure = 0
+candidate_clean_like = 0
+candidate_nonclean_like = 4
+opposite_clean_like = 3
+opposite_nonclean_like = 5
+```
+
+color 路线继续显示：
+
+```text
+存在局部子空间边界效应，
+但 nonclean-like 比例偏高。
+```
+
+GLM4 负对照：
+
+```text
+candidate = L31C6437:flip
+label = negative_no_local_boundary
+candidate_closure = 0
+opposite_closure = 0
+
+candidate = L31C6437:zero
+label = negative_no_local_boundary
+candidate_closure = 0
+opposite_closure = 0
+```
+
+GLM4 继续没有形成稳定边界证据。
+
+### 七、对附件判断的评估
+
+附件判断基本正确：
+
+```text
+1. Phase885 不应被解释为 signed minimal gear；
+2. opposite-mode reproduction 是关键证据；
+3. 当前齿轮单位需要升级为 local subspace boundary gear；
+4. qwen3 material、DS7B animal、DS7B color 应分开看；
+5. GLM4 应继续保留为负对照；
+6. 不能把局部 holdout repair 误判为语言编码机制闭合。
+```
+
+Phase886 对附件的补充是：
+
+```text
+opposite-mode reproduction 不只是 closure 复现，
+而且经常移除同一批 blocker-token。
+```
+
+这比 Phase885 更进一步。
+
+### 八、理论进展
+
+Phase886 将当前图谱标签从：
+
+```text
+holdout-supported but sign-nonminimal boundary gear
+```
+
+推进为：
+
+```text
+same-blocker local subspace boundary gear candidate
+```
+
+更准确的描述：
+
+```text
+当前候选不是某个方向的答案齿轮，
+而是在局部状态空间中移动 format / protocol / blocker 边界的调制单元。
+```
+
+这支持最新理论结构：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+稳定边界候选层
++
+局部子空间边界齿轮层
++
+blocker-token 边界迁移层
+```
+
+### 九、问题、硬伤和瓶颈
+
+必须严格限制结论：
+
+```text
+1. Phase886 不是语言编码机制闭合。
+2. Phase886 没有找到 signed minimal gear。
+3. Phase886 没有完成 blocker-token minimal cut。
+4. Phase886 使用的是 Phase885 的离线结果，没有新增更大规模前向测试。
+5. mean_removed_jaccard 整体只有 0.3912，说明不是所有 pair 都共享删除集合。
+6. color 路线 nonclean-like 偏高，仍可能混入格式转移或输出污染。
+7. GLM4 仍无正结果，跨模型同构仍未建立。
+8. 小模型可能把真实机制压缩成粗通道，导致 flip / zero 都能触发同一局部边界。
+```
+
+因此当前结论应写成：
+
+```text
+存在 holdout-supported same-blocker local subspace boundary gear candidate。
+```
+
+不能写成：
+
+```text
+完成语言编码机制闭合；
+找到单通道最小因果齿轮；
+找到跨模型通用不变量。
+```
+
+### 十、闭合距离
+
+当前完成：
+
+```text
+1. stable boundary candidate；
+2. holdout-supported boundary candidate；
+3. opposite-mode reproduction 定位；
+4. same-blocker local subspace evidence；
+5. random / neighbor control separation；
+6. clean-like / nonclean-like 分流；
+7. GLM4 negative control。
+```
+
+仍未完成：
+
+```text
+1. blocker-token minimal cut；
+2. local subspace basis decomposition；
+3. direction-set intervention；
+4. long rollout closure；
+5. cross-model structural isomorphism；
+6. large-model confirmation。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  64% - 70%
+
+语言编码机制闭合：
+  35% - 41%
+```
+
+### 十一、智能理论洞察
+
+Phase886 给出一个关键洞察：
+
+```text
+语言生成边界可能不是由一个单向语义向量决定，
+而是由局部子空间对全词表竞争场中的 blocker 边界进行调制。
+```
+
+第一性原理上，语言输出不是：
+
+```text
+target logit 上升
+```
+
+而更像：
+
+```text
+target / blocker / format / protocol / echo 之间的边界重排。
+```
+
+因此“破解语言编码机制”的下一步不应继续只搜索单个强 patch，而应继续完成：
+
+```text
+blocker-token minimal cut
+local subspace basis
+direction set
+clean / nonclean route split
+cross-model structural comparison
+```
+
+### 十二、下一阶段
+
+Phase886 仍属于全局齿轮图谱阶段，且和 Phase885、Phase884 属于同一阶段性目标：
+
+```text
+优先完成图谱，而不是提前追求闭合。
+```
+
+当前子目标已经完成，下一阶段仍属于同一阶段性目标，应继续自动推进：
+
+```text
+Phase887:
+Blocker-token Minimal Cut and Subspace Basis Probe
+阻塞词元最小割与子空间基探针
+```
+
+任务：
+
+```text
+1. 对 DS7B L27C16651 animal 候选做 blocker-token minimal cut；
+2. 对 qwen3 L31C2257 material 候选做 shared removed blocker 子集验证；
+3. 对 DS7B color 候选分开验证 clean-like / nonclean-like blocker 子集；
+4. 检查同一 blocker-token 是否由少数方向基控制；
+5. 如果可能，加入 half / scale_up / projection-style 子方向测试；
+6. 继续保留 GLM4 作为负对照；
+7. 不把局部最小割误判为语言闭合，只把它作为全局齿轮图谱的一层。
+```
+
+## Phase 887: 阻塞词元最小割与子空间基探针 [2026-07-03 04:41]
+
+### 一、任务
+
+本阶段分析最新附件中对 Phase886 的判断是否正确，并继续执行 Phase887：
+
+```text
+Blocker-token Minimal Cut and Subspace Basis Probe
+阻塞词元最小割与子空间基探针
+```
+
+附件判断基本正确：
+
+```text
+1. Phase886 将机制单位从 signed scalar gear 收紧为 local subspace boundary gear；
+2. DS7B animal 是当前最强正结果；
+3. qwen3 material 有正结果但弱于 DS7B animal；
+4. DS7B color 有子空间边界效应，但 nonclean-like 偏高；
+5. GLM4 仍是稳定负对照；
+6. 下一步应做 blocker-token minimal cut，而不是继续追求局部 patch 强度。
+```
+
+本阶段继续沿用“优先完成图谱，而不是提前追求闭合”的阶段性目标。
+
+### 二、脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase887_blocker_minimal_cut_subspace_basis_probe.py
+tests/glm5/run_phase887_blocker_minimal_cut_subspace_basis_probe.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase887_blocker_minimal_cut_subspace_basis_probe/blocker_minimal_cut_probe/
+```
+
+结果文件：
+
+```text
+phase887_qwen3_cut_rows.jsonl
+phase887_qwen3_summary.json
+phase887_glm4_cut_rows.jsonl
+phase887_glm4_summary.json
+phase887_deepseek7b_cut_rows.jsonl
+phase887_deepseek7b_summary.json
+phase887_cross_model_summary.json
+phase887_cross_model_summary.md
+```
+
+执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B -> cross-model summary
+```
+
+说明：
+
+```text
+本阶段未重新进行 CUDA 前向测试，
+而是复用 Phase885/886 的真实跨模型干预结果进行离线最小割估计。
+```
+
+因此结论应称为：
+
+```text
+observed blocker-token minimal cut signal
+观测阻塞词元最小割信号
+```
+
+不能称为：
+
+```text
+internal causal minimal cut closure
+内部因果最小割闭合
+```
+
+### 三、测试原理
+
+Phase886 已经得到：
+
+```text
+BaseBlockers
+Removed_candidate
+Removed_opposite
+SharedRemoved = Removed_candidate intersect Removed_opposite
+```
+
+Phase887 继续问：
+
+```text
+这些 shared removed blockers 是否已经覆盖当前可观测 top-k blocker 边界？
+是否存在 base_blocker_count = 1 的 exact single-blocker cut？
+```
+
+### 四、核心公式
+
+candidate 删除集合：
+
+```text
+Removed_candidate
+  =
+  BaseBlockers - IntervenedBlockers_candidate
+```
+
+opposite 删除集合：
+
+```text
+Removed_opposite
+  =
+  BaseBlockers - IntervenedBlockers_opposite
+```
+
+共享删除集合：
+
+```text
+SharedRemoved
+  =
+  Removed_candidate intersect Removed_opposite
+```
+
+观测 top-k 完整共享割：
+
+```text
+ObservedTopKSharedCut(S)
+  =
+  SameBoundaryClosure
+  and
+  BaseBlockers subset SharedRemoved
+  and
+  base_blocker_count <= observed_topk
+```
+
+单阻塞词元精确割：
+
+```text
+ExactSingleBlockerCut(t)
+  =
+  SameBoundaryClosure
+  and
+  base_blocker_count = 1
+  and
+  SharedRemoved = {t}
+```
+
+注意：
+
+```text
+ExactSingleBlockerCut 是输出边界观测意义上的必要割。
+它还不是内部隐藏状态方向基的因果闭合。
+```
+
+### 五、总体结果
+
+Phase887 总体结果：
+
+```text
+paired_rows = 504
+same_boundary_closure = 36
+shared_complete_topk_cut = 35
+exact_single_blocker_cut = 23
+candidate_complete_topk_cut = 42
+opposite_complete_topk_cut = 45
+```
+
+这说明：
+
+```text
+1. Phase886 的 36 个 candidate/opposite 同时闭合 pair 中，
+   35 个能在观测 top-k blocker 上形成完整共享割；
+
+2. 23 个 pair 是 exact single-blocker cut；
+
+3. candidate 和 opposite 的 top-k complete cut 数量接近；
+
+4. 最小割信号不是 GLM4 泛化噪声，因为 GLM4 为 0。
+```
+
+### 六、候选组结果
+
+DS7B animal：
+
+```text
+candidate = L27C16651:flip
+label = single_token_minimal_cut_signal
+n_pairs = 102
+same_boundary_closure = 17
+shared_complete_topk_cut = 17
+exact_single_blocker_cut = 9
+candidate_complete_topk_cut = 21
+opposite_complete_topk_cut = 17
+mean_exact_cut_size = 1.76
+exact_clean_like = 16
+exact_nonclean_like = 4
+exact_cut_role_counts:
+  format_punct = 13
+  format_space = 2
+  other_blocker = 15
+objects_with_exact_cut:
+  bird, cat, cow, dog, fish, horse, insect, lizard, mammal, shark
+```
+
+这是当前最强结果，已经达到 Phase887 的最低成功标准：
+
+```text
+确认 DS7B animal 中存在一组 blocker-token 对 boundary closure 有观测反事实必要性。
+```
+
+qwen3 material：
+
+```text
+candidate = L31C2257:flip
+label = topk_complete_minimal_cut_signal
+n_pairs = 102
+same_boundary_closure = 4
+shared_complete_topk_cut = 4
+exact_single_blocker_cut = 2
+candidate_complete_topk_cut = 7
+opposite_complete_topk_cut = 4
+mean_exact_cut_size = 1.75
+exact_clean_like = 2
+exact_nonclean_like = 3
+exact_cut_role_counts:
+  format_punct = 1
+  format_space = 2
+  other_blocker = 4
+objects_with_exact_cut:
+  ceramic, metal, wood
+```
+
+qwen3 有最小割信号，但弱于 DS7B animal。
+
+DS7B color L27C15369：
+
+```text
+candidate = L27C15369:subset0:zero
+label = single_token_minimal_cut_signal
+n_pairs = 102
+same_boundary_closure = 11
+shared_complete_topk_cut = 11
+exact_single_blocker_cut = 9
+candidate_complete_topk_cut = 11
+opposite_complete_topk_cut = 17
+mean_exact_cut_size = 1.18
+exact_clean_like = 3
+exact_nonclean_like = 9
+exact_cut_role_counts:
+  format_punct = 6
+  object_echo = 2
+  other_blocker = 5
+```
+
+DS7B color L26C8587：
+
+```text
+candidate = L26C8587:subset1:zero
+label = single_token_minimal_cut_signal
+n_pairs = 102
+same_boundary_closure = 4
+shared_complete_topk_cut = 3
+exact_single_blocker_cut = 3
+candidate_complete_topk_cut = 3
+opposite_complete_topk_cut = 7
+mean_exact_cut_size = 1.00
+exact_clean_like = 0
+exact_nonclean_like = 3
+exact_cut_role_counts:
+  format_punct = 3
+```
+
+color 路线继续显示：
+
+```text
+最小割信号存在，
+但主要偏向 nonclean-like / format transition。
+```
+
+GLM4：
+
+```text
+L31C6437:flip
+  same_boundary_closure = 0
+  shared_complete_topk_cut = 0
+  exact_single_blocker_cut = 0
+
+L31C6437:zero
+  same_boundary_closure = 0
+  shared_complete_topk_cut = 0
+  exact_single_blocker_cut = 0
+```
+
+GLM4 继续是负对照。
+
+### 七、具体 token 观察
+
+DS7B animal 的 top exact cut token 包括：
+
+```text
+token = " ["
+role = format_punct
+n = 6
+
+token = " noun"
+role = other_blocker
+n = 6
+
+token = " \""
+role = format_punct
+n = 5
+
+token = " like"
+role = other_blocker
+n = 3
+```
+
+这说明 animal 的最小割不是纯语义词元，而是：
+
+```text
+format boundary
+prompt/protocol boundary
+category-word blocker
+```
+
+DS7B color 的 top exact cut 更偏：
+
+```text
+format_punct
+object_echo
+other_blocker
+```
+
+这解释了为什么 color 的 nonclean-like 比例高。
+
+### 八、理论进展
+
+Phase887 将 Phase886 的：
+
+```text
+same-blocker local subspace boundary gear candidate
+```
+
+进一步推进为：
+
+```text
+observed blocker-token minimal cut signal
+```
+
+但必须注意，当前是观测输出边界层面的最小割，不是内部隐藏状态的真正最小因果割。
+
+更准确的图谱层级：
+
+```text
+stable boundary candidate
+-> holdout-supported boundary
+-> same-blocker local subspace boundary
+-> observed blocker-token minimal cut signal
+```
+
+### 九、问题和硬伤
+
+必须严格限制：
+
+```text
+1. 本阶段没有重新进行 CUDA 前向干预；
+2. 当前 minimal cut 是基于 Phase886 输出 blocker 集合的观测估计；
+3. top-k complete cut 依赖 observed_topk，不能保证覆盖全词表所有 blocker；
+4. exact single-blocker cut 更强，但仍是输出边界层，不是内部机制层；
+5. 子空间基分解仍未完成；
+6. direction-set intervention 仍未完成；
+7. long rollout closure 仍未完成；
+8. cross-model isomorphism 仍未建立；
+9. 小模型可能把多个真实机制压缩到少数通道和格式 blocker 上。
+```
+
+因此，当前不能写成：
+
+```text
+完成 blocker-token minimal cut closure。
+```
+
+只能写成：
+
+```text
+发现 observed blocker-token minimal cut signal。
+```
+
+### 十、闭合距离
+
+当前完成：
+
+```text
+1. stable boundary candidate；
+2. holdout-supported boundary；
+3. same-blocker local subspace boundary；
+4. observed blocker-token minimal cut signal；
+5. DS7B animal exact single-blocker cut；
+6. qwen3 material weak top-k cut；
+7. DS7B color nonclean-like cut；
+8. GLM4 negative control。
+```
+
+仍未完成：
+
+```text
+1. internal causal minimal cut；
+2. local subspace basis decomposition；
+3. direction-set intervention；
+4. projection-style subspace intervention；
+5. long rollout closure；
+6. cross-model structural isomorphism；
+7. large-model confirmation。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  66% - 72%
+
+语言编码机制闭合：
+  36% - 42%
+```
+
+### 十一、智能理论洞察
+
+Phase887 的关键洞察：
+
+```text
+语言输出边界中的关键阻塞者，经常不是语义目标的反义或竞争概念，
+而是 format / protocol / category-word / object-echo 这类输出状态边界。
+```
+
+这说明语言生成的第一性结构更像：
+
+```text
+条件化输出边界重排系统
+```
+
+而不是：
+
+```text
+静态语义向量检索系统。
+```
+
+知识网络、推理和语法在这里的统一解释是：
+
+```text
+知识网络：
+  哪些目标边界可被局部子空间调制。
+
+推理能力：
+  如何连续重排 blocker / target / protocol 边界。
+
+语法系统：
+  format / protocol blocker 的竞争边界控制。
+```
+
+### 十二、下一阶段
+
+Phase887 仍属于全局齿轮图谱阶段，和 Phase884-886 属于同一阶段性目标。
+
+当前子目标已经完成，下一阶段仍应继续推进：
+
+```text
+Phase888:
+Direction-set Intervention and Internal Subspace Basis Probe
+方向集合干预与内部子空间基探针
+```
+
+任务：
+
+```text
+1. 围绕 DS7B L27C16651 animal 候选做 direction-set intervention；
+2. 对 exact single-blocker cut token 做 restore / mask / suppress 反事实测试；
+3. 比较 flip / zero / half / scale_up 的方向稳定性；
+4. 尝试 projection-style 子空间干预；
+5. 对 qwen3 material 做弱信号复核；
+6. 对 DS7B color 分离 clean-like / nonclean-like direction；
+7. 继续保留 GLM4 负对照；
+8. 目标不是语言闭合，而是把 observed minimal cut 推进为 internal causal subspace evidence。
+```
+
+## Phase 888: 方向集合干预与内部子空间基探针 [2026-07-03 05:18]
+
+### 一、任务
+
+本阶段分析最新附件中对 Phase887 的判断是否正确，并继续执行：
+
+```text
+Phase888:
+Direction-set Intervention and Internal Subspace Basis Probe
+方向集合干预与内部子空间基探针
+```
+
+附件判断基本正确：
+
+```text
+Phase887 不是内部因果闭合，
+而是 observed blocker-token minimal cut signal。
+
+下一步必须从 observed cut 进入 direction-set intervention，
+检查内部通道方向是否稳定控制输出边界。
+```
+
+本阶段进行了真实 CUDA 模型前向测试，顺序为：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型完成后释放 GPU 显存。
+
+### 二、脚本和结果路径
+
+新增脚本：
+
+```text
+tests/glm5/phase888_direction_set_internal_subspace_probe.py
+tests/glm5/run_phase888_direction_set_internal_subspace_probe.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase888_direction_set_internal_subspace_probe/direction_set_probe/
+```
+
+生成结果：
+
+```text
+phase888_qwen3_rows.jsonl
+phase888_qwen3_summary.json
+phase888_glm4_rows.jsonl
+phase888_glm4_summary.json
+phase888_deepseek7b_rows.jsonl
+phase888_deepseek7b_summary.json
+phase888_cross_model_summary.json
+phase888_cross_model_summary.md
+```
+
+### 三、测试原理
+
+Phase888 对 Phase887 的 exact / top-k cut 样本进行两类测试：
+
+```text
+1. 内部方向集合干预：
+   zero / flip / half / scale_up
+
+2. 输出 cut-token 反事实：
+   base mask
+   base suppress
+   intervened restore
+```
+
+含义：
+
+```text
+如果多个内部方向都能 closure，
+说明存在 direction-set boundary signal。
+
+如果 restore cut-token 后边界重新打开，
+说明 cut-token 与内部方向存在更强耦合。
+
+如果 restore 不重新打开，
+说明闭合可能来自 target lift 或分布式边界迁移，
+不能把 observed cut 写成内部单 token 必要性。
+```
+
+### 四、核心公式
+
+内部方向干预：
+
+```text
+h'_c =
+  0                    if mode = zero
+  -h_c                 if mode = flip
+  0.5 h_c              if mode = half
+  alpha h_c            if mode = scale_up
+```
+
+方向集合闭合：
+
+```text
+DirectionSetClosure(g, x, p)
+  =
+  count_m [
+    not BoundaryClosed(empty, x, p)
+    and
+    BoundaryClosed(g_m, x, p)
+  ]
+```
+
+输出 cut-token mask：
+
+```text
+MaskCutTokens(logits, C)
+  =
+  logits[t] = -infinity
+  for t in C
+```
+
+restore 反事实：
+
+```text
+RestoreReopen(g_m, C)
+  =
+  BoundaryClosed(g_m)
+  and
+  not BoundaryClosed(Restore(logits_gm, logits_base, C))
+```
+
+### 五、总体结果
+
+跨模型结果：
+
+```text
+source_rows = 59
+output_rows = 236
+mode_closure_from_open = 88
+restored_reopens_boundary = 3
+restored_increases_blockers = 3
+base_mask_boundary_closed = 140
+base_suppress_boundary_closed = 140
+unique_base_mask_closed_cases = 35
+unique_multi_mode_closure_cases = 35
+```
+
+解释：
+
+```text
+1. 内部方向集合确实能大量产生 closure；
+2. base mask / suppress 能闭合 35 个唯一 case，说明 observed cut token 对输出层边界足够重要；
+3. 但 restore cut-token 只重开 3 次，说明大部分内部 closure 不是单 cut-token 必要机制；
+4. scale_up 没有产生 closure，主要有效方向是 zero / flip，half 部分有效。
+```
+
+### 六、候选组结果
+
+DS7B animal：
+
+```text
+candidate = L27C16651:flip
+label = direction_set_boundary_signal_no_restore
+n_source_cases = 21
+mode_closure_from_open = 42
+restored_reopens_boundary = 0
+base_mask_closed_cases = 17
+multi_mode_closure_cases = 17
+closure_modes:
+  flip = 17
+  zero = 17
+  half = 8
+```
+
+说明：
+
+```text
+DS7B animal 方向集合边界信号很强，
+但 restore cut-token 不重开。
+```
+
+这意味着它不是内部单 cut-token 必要性，更像：
+
+```text
+distributed target lift / boundary migration
+```
+
+qwen3 material：
+
+```text
+candidate = L31C2257:flip
+label = direction_set_internal_subspace_signal
+n_source_cases = 8
+mode_closure_from_open = 10
+restored_reopens_boundary = 3
+base_mask_closed_cases = 4
+multi_mode_closure_cases = 4
+closure_modes:
+  flip = 4
+  zero = 4
+  half = 2
+restore_reopen_modes:
+  flip = 1
+  zero = 1
+  half = 1
+```
+
+qwen3 的 restore-reopen 具体集中在：
+
+```text
+object = metal
+prompt = natural_question
+cut token = " Metallic"
+```
+
+这是当前唯一出现的 cut-token 与内部方向耦合证据。
+
+DS7B color：
+
+```text
+L27C15369:
+  mode_closure_from_open = 30
+  restored_reopens_boundary = 0
+  closure_modes:
+    flip = 11
+    zero = 11
+    half = 8
+
+L26C8587:
+  mode_closure_from_open = 6
+  restored_reopens_boundary = 0
+  closure_modes:
+    flip = 3
+    zero = 3
+```
+
+color 继续偏向方向集合边界信号，但没有内部 cut-token 必要性。
+
+GLM4：
+
+```text
+L31C6437:flip = 0
+L31C6437:zero = 0
+```
+
+GLM4 继续为负对照。
+
+### 七、理论进展
+
+Phase888 将 Phase887 的：
+
+```text
+observed blocker-token minimal cut signal
+```
+
+推进为：
+
+```text
+direction-set boundary signal
+```
+
+但只在 qwen3 material 中发现少量：
+
+```text
+internal cut-token coupling
+```
+
+因此当前不能写成：
+
+```text
+internal causal minimal cut closure
+```
+
+更准确是：
+
+```text
+内部方向集合能移动边界；
+输出 cut-token 在输出层足够重要；
+但二者大多数情况下不是一一必要耦合。
+```
+
+### 八、问题和硬伤
+
+```text
+1. restore-reopen 只有 3 次，且只出现在 qwen3；
+2. DS7B 虽然 closure 多，但 restore 不重开；
+3. scale_up 没有提供正结果；
+4. projection-style intervention 尚未真正完成；
+5. 仍未完成 full-vocab cut；
+6. 仍未完成 long rollout closure；
+7. GLM4 仍无结构同构；
+8. 小模型可能把真实机制压缩成粗方向集合。
+```
+
+### 九、阶段结论
+
+Phase888 是正结果加关键收紧：
+
+```text
+正结果：
+  zero / flip / half 方向集合能够稳定移动输出边界。
+
+负结果：
+  observed cut-token 大多不是内部方向闭合的单点必要因果。
+```
+
+当前图谱标签应更新为：
+
+```text
+direction-set boundary signal
+with weak internal cut-token coupling
+```
+
+## Phase 889: restore 失败与方向剖面诊断 [2026-07-03 05:18]
+
+### 一、任务
+
+Phase888 完成后，出现一个同阶段问题：
+
+```text
+为什么 DS7B 方向集合大量 closure，
+但 restore cut-token 不让边界重新打开？
+```
+
+Phase889 读取 Phase888 的 236 行真实前向结果，进行离线机制分类，不重新加载模型。
+
+新增脚本：
+
+```text
+tests/glm5/phase889_restore_failure_direction_profile.py
+tests/glm5/run_phase889_restore_failure_direction_profile.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase889_restore_failure_direction_profile/direction_set_probe/
+```
+
+### 二、分类原理
+
+对每个 Phase888 输出行分类：
+
+```text
+cut_token_coupled_internal_signal:
+  mode closure 后，restore cut-token 使边界重新打开。
+
+target_lift_or_distributed_boundary:
+  mode closure 后，restore cut-token 不重开，
+  且 class logit 有明显上升或边界分布式变化。
+
+no_internal_closure:
+  内部方向干预没有 closure。
+```
+
+### 三、总体结果
+
+```text
+source_rows = 236
+mode_closure_from_open = 88
+restored_reopens_boundary = 3
+no_restore_closure = 85
+```
+
+机制标签：
+
+```text
+qwen3:
+  cut_token_coupled_internal_signal = 3
+  target_lift_or_distributed_boundary = 7
+  no_internal_closure = 22
+
+DS7B:
+  target_lift_or_distributed_boundary = 78
+  no_internal_closure = 94
+
+GLM4:
+  no_internal_closure = 32
+```
+
+### 四、候选组结果
+
+qwen3 material：
+
+```text
+label = internal_cut_token_coupling
+mode_closure_from_open = 10
+restored_reopens_boundary = 3
+mean_closure_class_logit_delta = 0.500
+mean_closure_cut_token_delta = -0.067
+closure_modes:
+  flip = 4
+  zero = 4
+  half = 2
+```
+
+DS7B animal：
+
+```text
+label = distributed_target_lift_direction_set
+mode_closure_from_open = 42
+restored_reopens_boundary = 0
+mean_closure_class_logit_delta = 2.360
+mean_closure_cut_token_delta = -0.086
+closure_modes:
+  flip = 17
+  zero = 17
+  half = 8
+```
+
+DS7B color：
+
+```text
+L27C15369:
+  label = distributed_target_lift_direction_set
+  mode_closure_from_open = 30
+  restored_reopens_boundary = 0
+  mean_closure_class_logit_delta = 1.948
+
+L26C8587:
+  label = distributed_target_lift_direction_set
+  mode_closure_from_open = 6
+  restored_reopens_boundary = 0
+  mean_closure_class_logit_delta = 0.490
+```
+
+GLM4：
+
+```text
+negative_no_direction_profile
+```
+
+### 五、理论收紧
+
+Phase889 是重要负结果：
+
+```text
+DS7B 的 observed blocker-token cut 不是内部单 token 必要因果。
+```
+
+更准确解释是：
+
+```text
+DS7B 的 direction-set closure 主要来自 target logit lift
+或分布式 blocker boundary migration。
+```
+
+qwen3 material 出现少量内部 cut-token 耦合，但范围很窄。
+
+### 六、对当前理论的影响
+
+当前理论应从：
+
+```text
+observed minimal cut -> internal cut-token causality
+```
+
+收紧为：
+
+```text
+observed minimal cut
+-> direction-set boundary signal
+-> mostly distributed target-lift / boundary migration
+-> rare internal cut-token coupling
+```
+
+### 七、闭合距离
+
+当前完成：
+
+```text
+1. direction-set boundary signal；
+2. DS7B target-lift / distributed-boundary 诊断；
+3. qwen3 rare cut-token coupling；
+4. GLM4 negative control；
+5. scale_up negative result。
+```
+
+仍未完成：
+
+```text
+1. projection-style subspace intervention；
+2. internal basis vector decomposition；
+3. distributed blocker set restore；
+4. full-vocab minimal cut；
+5. long rollout closure；
+6. cross-model isomorphism。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  68% - 74%
+
+语言编码机制闭合：
+  37% - 43%
+```
+
+### 八、下一阶段
+
+Phase888-889 仍属于全局齿轮图谱阶段，当前子目标已经完成。
+
+下一阶段仍属于同一阶段性目标，应继续推进：
+
+```text
+Phase890:
+Distributed Restore and Projection-style Subspace Intervention
+分布式恢复与投影式子空间干预
+```
+
+任务：
+
+```text
+1. 对 DS7B animal 做 distributed blocker restore，而不是 single cut-token restore；
+2. 构造多 blocker set restore，检查是否能重开边界；
+3. 尝试 projection-style 子空间干预；
+4. 区分 target-lift、blocker-suppression、format-route transition；
+5. 对 qwen3 的 Metallic cut-token coupling 做 holdout 复核；
+6. 继续保留 GLM4 负对照；
+7. 不把 direction-set signal 误写成语言编码闭合。
+```
+
+## Phase 890: 分布式恢复与投影等价子空间干预 [2026-07-03 05:38]
+
+### 一、任务
+
+本阶段读取最新上传分析，判断基本正确：
+
+```text
+Phase888:
+  direction-set boundary signal 成立。
+
+Phase889:
+  大多数 direction-set closure 不是 single cut-token internal causality，
+  而是 distributed target-lift / boundary migration。
+```
+
+因此继续执行同一全局齿轮图谱阶段的下一步：
+
+```text
+Distributed Restore and Projection-style Subspace Intervention
+分布式恢复与投影式子空间干预
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase890_distributed_restore_projection_subspace.py
+tests/glm5/run_phase890_distributed_restore_projection_subspace.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase890_distributed_restore_projection_subspace/distributed_restore_projection/
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 二、测试原理
+
+Phase890 不再只恢复 single cut-token，而是构造多种 restore set：
+
+```text
+exact_cut
+shared_removed
+base_blockers
+candidate_removed
+opposite_removed
+role:<role>
+```
+
+测试逻辑：
+
+```text
+1. 先对内部 gear 做方向干预；
+2. 如果方向干预使边界从 open 变成 closed；
+3. 再把 restore set 的 logits 恢复为 base logits；
+4. 如果恢复后边界重新打开，说明 restore set 与内部闭合存在必要耦合；
+5. 如果恢复后仍然闭合，说明闭合更像 target lift 或 distributed boundary migration。
+```
+
+### 三、核心公式
+
+边界闭合：
+
+```text
+BoundaryClosed(logits)
+  =
+  [rank(target_class) = 1]
+  and
+  [class_blocker_count = 0]
+```
+
+分布式恢复：
+
+```text
+Restore(logits_m, logits_0, C)_t
+  =
+  logits_0(t), if t in C
+  logits_m(t), if t not in C
+```
+
+恢复重开边界：
+
+```text
+RestoreReopen(m, C)
+  =
+  BoundaryClosed(logits_m)
+  and
+  not BoundaryClosed(Restore(logits_m, logits_0, C))
+```
+
+分布式恢复重开：
+
+```text
+DistributedRestoreReopen(m, C)
+  =
+  RestoreReopen(m, C)
+  and
+  [|C| > 1 or C is shared/base/candidate/opposite blocker set]
+```
+
+目标提升：
+
+```text
+TargetLift(m)
+  =
+  logit_m(target_class) - logit_0(target_class)
+```
+
+阻塞者减少：
+
+```text
+BlockerReduction(m)
+  =
+  blocker_count_0 - blocker_count_m
+```
+
+当前 projection-style 干预的边界：
+
+```text
+proj_out:
+  h' = h - Pi_U(h)
+
+proj_reflect:
+  h' = h - 2 Pi_U(h)
+```
+
+但本阶段候选大多是单通道候选，所以当前实现只能视为：
+
+```text
+single-axis projection equivalent
+单轴投影等价
+```
+
+不能误写为完整多维子空间投影。
+
+### 四、总体结果
+
+```text
+source_rows = 59
+output_rows = 486
+mode_closure_from_open = 228
+restore_reopens_boundary = 5
+distributed_restore_reopens_boundary = 0
+projection_style_closure = 104
+base_suppress_boundary_closed = 228
+```
+
+唯一案例统计：
+
+```text
+unique_source_cases = 59
+unique_closure_cases = 35
+unique_projection_closure_cases = 35
+unique_restore_cases = 1
+unique_distributed_restore_cases = 0
+```
+
+### 五、跨模型结果
+
+qwen3：
+
+```text
+candidate = L31C2257:flip
+source_cases = 8
+rows = 66
+mode_closure_from_open = 26
+restore_reopens_boundary = 5
+distributed_restore_reopens_boundary = 0
+projection_style_closure = 12
+unique_restore_cases = 1
+```
+
+restore 全部来自：
+
+```text
+case = p856_025_material_metal
+object = metal
+prompt_variant = natural_question
+restore_set_type = exact_cut
+token_id = 86871
+```
+
+这说明 qwen3 的 Metallic cut-token coupling 仍然存在，但没有形成 holdout 泛化。
+
+GLM4：
+
+```text
+source_cases = 8
+mode_closure_from_open = 0
+restore_reopens_boundary = 0
+projection_style_closure = 0
+```
+
+继续是负对照。
+
+DS7B：
+
+```text
+source_cases = 43
+rows = 372
+mode_closure_from_open = 202
+restore_reopens_boundary = 0
+distributed_restore_reopens_boundary = 0
+projection_style_closure = 92
+unique_closure_cases = 31
+```
+
+候选：
+
+```text
+L27C16651:flip:
+  closures = 130
+  projection_style_closure = 60
+  restore = 0
+  mean_class_delta = 2.580
+
+L27C15369:subset0:zero:
+  closures = 60
+  projection_style_closure = 26
+  restore = 0
+  mean_class_delta = 2.130
+
+L26C8587:subset1:zero:
+  closures = 12
+  projection_style_closure = 6
+  restore = 0
+  mean_class_delta = 0.490
+```
+
+### 六、机制拆分
+
+离线拆分结果：
+
+```text
+qwen3 L31C2257:
+  closure_rows = 26
+  class_delta_positive = 21
+  blocker_reduction_positive = 26
+  restore_reopen = 5
+  distributed_restore = 0
+
+DS7B L27C16651:
+  closure_rows = 130
+  class_delta_positive = 130
+  blocker_reduction_positive = 130
+  restore_reopen = 0
+
+DS7B L27C15369:
+  closure_rows = 60
+  class_delta_positive = 60
+  blocker_reduction_positive = 60
+  restore_reopen = 0
+
+DS7B L26C8587:
+  closure_rows = 12
+  class_delta_positive = 12
+  blocker_reduction_positive = 12
+  restore_reopen = 0
+```
+
+因此 DS7B 的闭合更像：
+
+```text
+target lift + boundary migration
+```
+
+而不是：
+
+```text
+distributed blocker restore 可逆闭合
+```
+
+### 七、理论进展
+
+Phase890 的关键贡献是一个负结果：
+
+```text
+distributed blocker set restore 没有重开 DS7B 边界。
+```
+
+这把 DS7B 从：
+
+```text
+observed blocker-token minimal cut
+```
+
+进一步收紧为：
+
+```text
+target-lift dominated boundary migration
+```
+
+qwen3 的结论也被收紧：
+
+```text
+不是跨样本 cut-token holdout 泛化，
+而是单一 metal natural_question 案例上的 exact cut-token coupling。
+```
+
+当前图谱应新增：
+
+```text
+V_single_axis_projection_equivalent
+V_distributed_restore_failure
+V_target_lift_dominated_boundary_migration
+V_rare_exact_cut_token_coupling
+
+E_projection_equivalent_closure
+E_restore_no_reopen
+E_exact_cut_reopen_single_case
+E_distributed_restore_negative
+```
+
+### 八、问题和硬伤
+
+1. projection-style 仍只是单轴等价，不是完整子空间投影。
+2. distributed restore 没有重开 DS7B 边界，说明 blocker set 不是内部必要切断点。
+3. qwen3 restore 只覆盖一个唯一案例，不能证明 holdout 泛化。
+4. GLM4 继续负，跨模型结构同构仍未建立。
+5. 当前模型都是小模型，内部结构可能粗糙；DS7B 的强 target lift 可能是小模型把多条机制压缩到单层 / 单通道后的粗糙近似。
+
+### 九、闭合距离
+
+当前完成：
+
+```text
+1. direction-set boundary signal；
+2. single exact cut-token coupling 的 qwen3 复核；
+3. DS7B distributed restore negative；
+4. DS7B target-lift dominated boundary migration；
+5. GLM4 negative control；
+6. single-axis projection equivalent closure。
+```
+
+仍未完成：
+
+```text
+1. true multi-dimensional projection subspace intervention；
+2. internal basis vector decomposition；
+3. full-vocab minimal cut；
+4. target-lift source pathway；
+5. long rollout closure；
+6. cross-model isomorphism。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  70% - 76%
+
+语言编码机制闭合：
+  38% - 43%
+```
+
+### 十、智能理论洞察
+
+当前更像看到了一条第一性原理线索：
+
+```text
+语言输出不是由单个阻塞词元被切断决定，
+而是由目标簇、阻塞簇、协议簇和读出边界共同形成竞争场。
+```
+
+从智能理论看，深度网络内部可能不是静态概念图谱，而是：
+
+```text
+条件化边界迁移系统
+```
+
+也就是：
+
+```text
+状态进入网络后，
+路线齿轮改变目标簇和阻塞簇的相对高度，
+输出场边界随之迁移，
+自然语言 token 只是这个迁移后的表面结果。
+```
+
+### 十一、下一阶段
+
+Phase890 仍属于全局齿轮图谱阶段，并完成了 Phase889 后提出的 distributed restore / projection-equivalent 子目标。
+
+下一阶段仍属于同一大阶段，但已经是新的子任务：
+
+```text
+Phase891:
+Target-Lift Source Pathway and True Projection Subspace Audit
+目标提升来源路径与真实投影子空间审计
+```
+
+目标：
+
+```text
+1. 不再只恢复 blocker logits；
+2. 追踪 DS7B target logit lift 来自哪个内部路径；
+3. 构造多通道 / 多层 U 子空间，做真正 Pi_U 投影；
+4. 对 qwen3 metal 做更多 material holdout；
+5. 保留 GLM4 负对照；
+6. 继续优先完成图谱，不急于声称语言编码闭合。
+```
+
+## Phase 891: 目标提升来源路径与多轴投影子空间审计 [2026-07-03 06:08]
+
+### 一、任务
+
+本阶段读取最新上传分析，判断基本正确：
+
+```text
+Phase890 是关键负结果：
+  distributed restore 不能重开 DS7B 边界；
+  DS7B 更像 target-lift dominated boundary migration；
+  qwen3 只有 rare exact cut-token coupling；
+  GLM4 继续负对照。
+```
+
+因此继续同一全局齿轮图谱阶段，执行：
+
+```text
+Phase891:
+Target-Lift Source Pathway and True Projection Subspace Audit
+目标提升来源路径与真实投影子空间审计
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase891_target_lift_source_pathway_projection_audit.py
+tests/glm5/run_phase891_target_lift_source_pathway_projection_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase891_target_lift_source_pathway_projection_audit/target_lift_source_projection/
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 二、测试原理
+
+Phase891 不再恢复输出 blocker logits，而是追踪 Phase890 暴露出的 target lift：
+
+```text
+1. 对候选齿轮做方向干预；
+2. 检查 target logit lift 与 boundary closure；
+3. 在同一干预下粗消融当前层 MLP output；
+4. 在同一干预下粗消融当前层 attention output；
+5. 比较 target lift 是否保留、闭合是否丢失；
+6. 构造 candidate_axis / same_layer_U / model_U，测试多轴坐标子空间是否比单轴更强。
+```
+
+注意：
+
+```text
+MLP / attention output ablation 是粗组件消融，
+不是神经元级闭合。
+```
+
+### 三、核心公式
+
+目标提升：
+
+```text
+TargetLift(m)
+  =
+  logit_m(target_class) - logit_0(target_class)
+```
+
+阻塞者减少：
+
+```text
+BlockerReduction(m)
+  =
+  blocker_count_0 - blocker_count_m
+```
+
+组件保留率：
+
+```text
+Retention(component)
+  =
+  TargetLift(m with component scaled)
+  /
+  TargetLift(m without component control)
+```
+
+闭合丢失：
+
+```text
+ClosureLost(component)
+  =
+  BoundaryClosed(m without component control)
+  and
+  not BoundaryClosed(m with component scaled)
+```
+
+多轴坐标子空间：
+
+```text
+U_model
+  =
+  span({axis_i | axis_i is selected gear channel})
+```
+
+本阶段仍然不是任意基真实投影，而是：
+
+```text
+multi-axis coordinate subspace
+多轴坐标子空间
+```
+
+比 Phase890 的 single-axis projection equivalent 前进了一步，但仍未达到完整 Level 8。
+
+### 四、总体结果
+
+```text
+selected_sources = 35
+output_rows = 1200
+none_closure_from_open = 151
+multi_axis_none_closure = 93
+mlp_zero_closure_lost = 64
+attn_zero_closure_lost = 33
+```
+
+跨模型候选标签：
+
+```text
+mixed_component_target_lift = 4
+negative_no_target_lift_pathway = 2
+```
+
+### 五、模型结果
+
+qwen3：
+
+```text
+candidate = L31C2257:flip
+selected_sources = 6
+none_closure_from_open = 10
+multi_axis_none_closure = 0
+mlp_zero_closure_lost = 4
+attn_zero_closure_lost = 4
+mean_none_target_lift = 0.500
+```
+
+解释：
+
+```text
+qwen3 仍是窄机制；
+组件消融结果混合；
+没有多轴 U，因为当前只有单候选通道。
+```
+
+GLM4：
+
+```text
+selected_sources = 4
+none_closure_from_open = 0
+multi_axis_none_closure = 0
+mlp_zero_closure_lost = 0
+attn_zero_closure_lost = 0
+```
+
+继续负对照。
+
+DS7B：
+
+```text
+selected_sources = 25
+output_rows = 1050
+none_closure_from_open = 141
+multi_axis_none_closure = 93
+mlp_zero_closure_lost = 60
+attn_zero_closure_lost = 29
+mean_none_target_lift = 2.437
+mean_mlp_zero_lift_retention = 0.174
+mean_attn_zero_lift_retention = -0.976
+```
+
+候选组：
+
+```text
+L27C15369:
+  none_closure = 69
+  multi_axis_closure = 46
+  mlp_zero_lost = 19
+  attn_zero_lost = 14
+
+L27C16651:
+  none_closure = 57
+  multi_axis_closure = 38
+  mlp_zero_lost = 36
+  attn_zero_lost = 11
+
+L26C8587:
+  none_closure = 15
+  multi_axis_closure = 9
+  mlp_zero_lost = 5
+  attn_zero_lost = 4
+```
+
+### 六、多轴子空间结果
+
+DS7B gear set 对比：
+
+```text
+candidate_axis:
+  closures = 48
+  mean_target_lift = 2.060
+
+model_U:
+  closures = 51
+  mean_target_lift = 2.929
+
+same_layer_U:
+  closures = 42
+  mean_target_lift = 2.269
+```
+
+重要细节：
+
+```text
+L26C8587:
+  candidate_axis mean_lift = 0.490
+  model_U mean_lift = 3.056
+
+L27C15369:
+  candidate_axis mean_lift = 1.989
+  model_U mean_lift = 3.125
+
+L27C16651:
+  candidate_axis mean_lift = 2.641
+  model_U mean_lift = 2.632
+```
+
+这说明：
+
+```text
+model_U 对 L26C8587 和 L27C15369 有明显增强；
+对 L27C16651 没有明显增强；
+多轴坐标子空间存在初步正结果，但不是统一增强。
+```
+
+### 七、机制解释
+
+DS7B 不是单一来源：
+
+```text
+MLP zero 更常让 closure 丢失；
+attention zero 对 target lift 数值破坏也很强；
+因此标签应写成 mixed_component_target_lift。
+```
+
+更准确的当前图谱边：
+
+```text
+target-lift dominated boundary migration
+with mixed MLP / attention pathway dependency
+and partial multi-axis coordinate-subspace enhancement
+```
+
+不能写成：
+
+```text
+MLP-only target lift
+```
+
+也不能写成：
+
+```text
+true projection subspace closure
+```
+
+### 八、问题和硬伤
+
+1. MLP / attention 消融是粗组件级，不是神经元级。
+2. Retention ratio 在 target lift 很小或符号翻转时不稳定，不能单独作为结论。
+3. 多轴 U 仍是 coordinate axes，不是学习出的任意基子空间。
+4. qwen3 仍没有多轴泛化。
+5. GLM4 继续负，跨模型同构未建立。
+6. 当前仍是 first-token 边界，不是 long rollout closure。
+7. 小模型可能把多条机制压缩到少数通道，导致路径归因偏粗。
+
+### 九、理论进展
+
+Phase891 把 Phase890 的：
+
+```text
+target-lift dominated boundary migration
+```
+
+进一步拆成：
+
+```text
+target lift source pathway:
+  mixed MLP / attention dependency
+
+projection subspace:
+  multi-axis coordinate U has partial positive signal
+```
+
+当前新增图谱节点：
+
+```text
+V_target_lift_source_pathway
+V_mixed_component_target_lift
+V_multi_axis_coordinate_subspace
+V_component_ablation_diagnostic
+
+E_mlp_zero_closure_loss
+E_attn_zero_lift_damage
+E_model_U_lift_enhancement
+E_glm4_negative_pathway_control
+```
+
+### 十、闭合距离
+
+当前完成：
+
+```text
+1. target lift source pathway 初步审计；
+2. DS7B mixed component dependency；
+3. DS7B model_U 多轴增强信号；
+4. qwen3 窄机制继续成立；
+5. GLM4 负对照继续成立。
+```
+
+仍未完成：
+
+```text
+1. arbitrary-basis true projection subspace；
+2. neuron-level target-lift source path；
+3. full-vocab minimal cut；
+4. rollout closure；
+5. cross-model structural isomorphism。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  72% - 78%
+
+语言编码机制闭合：
+  39% - 44%
+```
+
+### 十一、下一阶段
+
+Phase891 仍属于全局齿轮图谱阶段，并且与 Phase890 处于同一阶段性目标：
+
+```text
+先完成图谱，
+再根据图谱特性逼近语言编码机制。
+```
+
+下一阶段仍应继续自动推进：
+
+```text
+Phase892:
+Neuron-level Target-Lift Path and Learned Subspace Basis Probe
+神经元级目标提升路径与学习子空间基探针
+```
+
+任务：
+
+```text
+1. 对 DS7B L27C16651 / L27C15369 / L26C8587 做更细粒度 MLP output attribution；
+2. 把 model_U 从坐标轴集合升级为 PCA / SVD 低维基或差分方向基；
+3. 检查 model_U 增强是否来自 L27C15369 与 L26C8587 互补；
+4. 对 qwen3 material 扩大 holdout；
+5. 继续保留 GLM4 负对照；
+6. 不把 mixed component pathway 误写成闭合。
+```
+
+## Phase 892: 通道互补与坐标基目标提升探针 [2026-07-03 06:43]
+
+### 一、任务
+
+本阶段读取最新上传分析，判断基本正确：
+
+```text
+Phase891 不是闭合阶段，
+而是把 Phase890 的 target-lift dominated boundary migration
+继续细化为 mixed MLP / attention pathway dependency
+和 partial multi-axis coordinate-subspace enhancement。
+```
+
+因此 Phase892 继续同一全局齿轮图谱阶段，执行更细粒度的通道互补测试：
+
+```text
+Channel Complementarity and Coordinate Basis Probe
+通道互补与坐标基目标提升探针
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase892_channel_complementarity_coordinate_basis_probe.py
+tests/glm5/run_phase892_channel_complementarity_coordinate_basis_probe.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase892_channel_complementarity_coordinate_basis_probe/channel_complementarity_coordinate_basis/
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 二、测试原理
+
+Phase892 不直接使用 PCA / SVD，而先做更基础、更可解释的穷举子集前向：
+
+```text
+1. 读取 Phase891 的核心候选通道；
+2. 构造所有非空通道子集：
+   single axis
+   pair axes
+   three-axis model_U
+3. 对每个 source case 和 edit mode 做真实前向；
+4. 计算 target lift、blocker reduction、boundary closure；
+5. 比较组合子集是否超过最佳单轴；
+6. 比较组合子集是否超过简单加和预期。
+```
+
+本阶段检测的是：
+
+```text
+coordinate-axis complementarity
+坐标轴互补
+```
+
+不是：
+
+```text
+arbitrary-basis learned projection subspace
+任意基学习投影子空间
+```
+
+### 三、核心公式
+
+目标提升：
+
+```text
+TargetLift(S, m)
+  =
+  logit_{S,m}(target_class) - logit_0(target_class)
+```
+
+最佳单轴增益：
+
+```text
+BestSingle(S, m)
+  =
+  max_{i in S} TargetLift({i}, m)
+```
+
+互补增益：
+
+```text
+Complementarity(S, m)
+  =
+  TargetLift(S, m) - BestSingle(S, m)
+```
+
+加和残差：
+
+```text
+Residual(S, m)
+  =
+  TargetLift(S, m)
+  -
+  sum_{i in S} TargetLift({i}, m)
+```
+
+组合独有闭合：
+
+```text
+ClosureWithoutSingle(S, m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in S} BoundaryClosed({i},m)
+```
+
+### 四、总体结果
+
+```text
+selected_sources = 29
+output_rows = 483
+closure_from_open = 238
+single_axis_closure = 73
+multi_axis_closure = 165
+positive_complementarity_rows = 47
+closure_without_single_axis_closure = 0
+mean_multi_complementarity_over_best = 0.159
+mean_interaction_residual_vs_additive = 0.126
+```
+
+### 五、模型结果
+
+qwen3：
+
+```text
+candidate = L31C2257
+closure_from_open = 10
+single_axis_closure = 10
+multi_axis_closure = 0
+positive_complementarity_rows = 0
+mean_target_lift = 0.500
+```
+
+结论：
+
+```text
+qwen3 仍是 single-axis dominant narrow material mechanism。
+```
+
+GLM4：
+
+```text
+closure_from_open = 0
+```
+
+继续是负对照。
+
+DS7B：
+
+```text
+selected_sources = 22
+output_rows = 462
+closure_from_open = 228
+single_axis_closure = 63
+multi_axis_closure = 165
+positive_complementarity_rows = 47
+closure_without_single_axis_closure = 0
+mean_target_lift = 2.326
+mean_multi_complementarity_over_best = 0.478
+mean_interaction_residual_vs_additive = 0.378
+```
+
+### 六、DS7B 通道互补结果
+
+候选组：
+
+```text
+L27C15369:
+  evidence = multi_axis_target_lift_complementarity
+  closures = 104
+  single_axis_closure = 29
+  multi_axis_closure = 75
+  positive_complementarity_rows = 31
+  mean_complementarity = 0.698
+  best_subset = L26C8587 + L27C15369
+  best_subset_mean_lift = 3.149
+
+L26C8587:
+  evidence = multi_axis_target_lift_complementarity
+  closures = 48
+  single_axis_closure = 15
+  multi_axis_closure = 33
+  positive_complementarity_rows = 16
+  mean_complementarity = 0.818
+  best_subset = L26C8587 + L27C15369
+  best_subset_mean_lift = 3.090
+
+L27C16651:
+  evidence = single_axis_dominant_target_lift
+  closures = 76
+  single_axis_closure = 19
+  multi_axis_closure = 57
+  positive_complementarity_rows = 0
+  best_subset = L27C16651
+  best_subset_mean_lift = 2.641
+```
+
+子集汇总：
+
+```text
+L26C8587:
+  closures = 12
+  mean_lift = 0.490
+
+L27C15369:
+  closures = 32
+  mean_lift = 1.867
+
+L27C16651:
+  closures = 19
+  mean_lift = 2.641
+
+L26C8587 + L27C15369:
+  closures = 32
+  mean_lift = 3.133
+  mean_complementarity = 1.266
+  positive_complementarity_rows = 24
+
+L26C8587 + L27C16651:
+  closures = 31
+  mean_lift = 1.798
+  mean_complementarity = -0.010
+
+L27C15369 + L27C16651:
+  closures = 51
+  mean_lift = 2.140
+  mean_complementarity = -0.016
+
+L26C8587 + L27C15369 + L27C16651:
+  closures = 51
+  mean_lift = 2.929
+  mean_complementarity = 0.773
+```
+
+### 七、关键进展
+
+Phase892 直接验证了 Phase891 的猜测：
+
+```text
+DS7B color route 中存在 L26C8587 与 L27C15369 的互补轴。
+```
+
+但同时也收紧：
+
+```text
+1. L27C16651 仍是 single-axis dominant；
+2. 没有出现 closure_without_single_axis_closure；
+3. 因此多轴互补是 target lift 增强，不是组合独有闭合。
+```
+
+最准确图谱标签：
+
+```text
+DS7B color:
+  coordinate-axis target-lift complementarity
+
+DS7B animal:
+  single-axis dominant target lift
+
+qwen3 material:
+  single-axis narrow mechanism
+
+GLM4:
+  negative under current candidates
+```
+
+### 八、问题和硬伤
+
+1. 本阶段仍是坐标轴组合，不是任意基 learned subspace。
+2. 没有发现组合独有闭合，说明互补强度还不足以形成独立闭合证据。
+3. qwen3 没有多轴结构，GLM4 继续负，跨模型同构仍未建立。
+4. 仍是 first-token boundary，不是 long rollout closure。
+5. 小模型可能把真实机制压缩到少数轴，使互补结构偏粗糙。
+
+### 九、理论进展
+
+Phase892 把：
+
+```text
+partial multi-axis coordinate-subspace enhancement
+```
+
+进一步拆成：
+
+```text
+color route:
+  L26C8587 + L27C15369 互补增强
+
+animal route:
+  L27C16651 单轴主导
+```
+
+新增图谱节点：
+
+```text
+V_coordinate_axis_complementarity
+V_color_route_complementary_pair
+V_single_axis_dominant_target_lift
+V_pairwise_target_lift_residual
+
+E_L26C8587_L27C15369_complementarity
+E_L27C16651_single_axis_dominance
+E_no_closure_without_single_axis
+E_glm4_negative_complementarity_control
+```
+
+### 十、闭合距离
+
+当前完成：
+
+```text
+1. DS7B 通道级互补拆分；
+2. color route 互补轴定位；
+3. animal route 单轴主导定位；
+4. qwen3 单轴窄机制复核；
+5. GLM4 负对照复核。
+```
+
+仍未完成：
+
+```text
+1. 任意基 learned subspace；
+2. attention head-level attribution；
+3. neuron-level full pathway；
+4. long rollout closure；
+5. cross-model structural isomorphism。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  74% - 80%
+
+语言编码机制闭合：
+  40% - 45%
+```
+
+### 十一、下一阶段
+
+Phase892 仍属于同一个全局齿轮图谱阶段。
+
+下一步不应再只枚举坐标轴组合，而应进入：
+
+```text
+Phase893:
+Attention-head Attribution and Pairwise Complementarity Holdout
+注意力头归因与成对互补留出验证
+```
+
+任务：
+
+```text
+1. 检查 L26C8587 + L27C15369 的互补是否在更多 color holdout 上稳定；
+2. 对 target lift 损伤强的 attention 路径做 head-level attribution；
+3. 继续区分 color complementary pair 与 animal single-axis route；
+4. 检查互补是否能推进到 rollout；
+5. 继续保留 qwen3 / GLM4 负对照。
+```
+
+## Phase 893: 注意力头归因与成对互补留出验证 [2026-07-03 07:26]
+
+### 一、任务来源
+
+本阶段读取并核对 Phase892 外部分析。该分析基本正确：
+
+```text
+Phase892 证明了 DS7B color route 中 L26C8587 + L27C15369 存在 coordinate-axis target-lift complementarity；
+但 Phase892 没有证明组合独有闭合，因为 closure_without_single_axis_closure = 0。
+```
+
+因此本阶段继续同一阶段性目标：
+
+```text
+全局齿轮图谱优先
++
+互补通道留出验证
++
+attention head-level attribution 初筛
+```
+
+本阶段没有直接进入任意基 learned subspace，也没有声称语言编码机制闭合。
+
+### 二、测试脚本与运行方式
+
+新增脚本：
+
+```text
+tests/glm5/phase893_attention_head_complementarity_holdout_probe.py
+tests/glm5/run_phase893_attention_head_complementarity_holdout_probe.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase893_attention_head_complementarity_holdout_probe/attention_head_complementarity_holdout/
+```
+
+按要求顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+没有并发加载多个模型，避免 GPU 显存溢出。
+
+### 三、测试原理
+
+Phase893 做两件事。
+
+第一，扩大测试范围，检查 Phase892 中的互补对是否能穿过更多留出样本：
+
+```text
+DS7B:
+  color + animal
+  base + phase885_extended_holdout
+  110 case-prompt
+
+qwen3:
+  material
+  55 case-prompt
+
+GLM4:
+  color + material
+  110 case-prompt
+```
+
+第二，只在高信号样本上做 attention head zeroing：
+
+```text
+对已经产生 target lift 的 subset row，
+逐个 zero 对应 layer 的 attention head output projection 输入切片，
+观察 target lift 是否下降、closure 是否丢失。
+```
+
+### 四、核心公式
+
+目标提升：
+
+```text
+TargetLift(S, m)
+  =
+  logit_{S,m}(target_class)
+  -
+  logit_0(target_class)
+```
+
+互补增益：
+
+```text
+Complementarity(S, m)
+  =
+  TargetLift(S,m)
+  -
+  max_{i in S} TargetLift({i},m)
+```
+
+组合独有闭合：
+
+```text
+ClosureWithoutSingle(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in S} BoundaryClosed({i},m)
+```
+
+注意力头损伤：
+
+```text
+HeadDamage(h; S,m)
+  =
+  TargetLift(S,m)
+  -
+  TargetLift(head_zero(h), S,m)
+```
+
+注意力头闭合丢失：
+
+```text
+HeadClosureLoss(h; S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not BoundaryClosed(head_zero(h), S,m)
+```
+
+### 五、总体结果
+
+```text
+selected_case_prompts = 275
+output_subset_rows = 2805
+output_head_rows = 960
+closure_from_open = 399
+multi_axis_closure = 284
+positive_complementarity_rows = 68
+holdout_positive_complementarity_rows = 28
+closure_without_single_axis_closure = 14
+head_test_sources = 24
+head_zero_closure_lost = 26
+head_zero_damage_gt_0_25 = 31
+mean_multi_complementarity_over_best = 0.138
+mean_head_target_lift_damage_vs_none = 0.035
+```
+
+### 六、模型结果
+
+qwen3：
+
+```text
+subset = L31C2257
+closure_from_open = 14
+holdout_closure_from_open = 5
+positive_complementarity_rows = 0
+closure_without_single_axis_closure = 0
+head_zero_closure_lost = 26
+head_zero_damage_gt_0_25 = 3
+```
+
+解释：
+
+```text
+qwen3 material 仍是 single-axis narrow mechanism；
+但 L31 层若干 attention head 会让闭合丢失，说明 qwen3 的窄机制也依赖注意力路径。
+```
+
+GLM4：
+
+```text
+closure_from_open = 0
+positive_complementarity_rows = 0
+head_zero_closure_lost = 0
+head_zero_damage_gt_0_25 = 0
+```
+
+继续是负对照。
+
+DS7B：
+
+```text
+selected_case_prompts = 110
+output_subset_rows = 2310
+output_head_rows = 448
+closure_from_open = 385
+multi_axis_closure = 284
+positive_complementarity_rows = 68
+holdout_positive_complementarity_rows = 28
+closure_without_single_axis_closure = 14
+head_zero_closure_lost = 0
+head_zero_damage_gt_0_25 = 28
+```
+
+### 七、DS7B 子集结构
+
+```text
+L26C8587 + L27C15369:
+  relation = ds7b_color_complementary_pair
+  closure = 46
+  holdout_closure = 21
+  positive_complementarity_rows = 34
+  holdout_positive_complementarity_rows = 14
+  closure_without_single_axis_closure = 7
+  mean_lift_on_closure = 3.067
+  mean_complementarity = 1.306
+
+L26C8587 + L27C15369 + L27C16651:
+  relation = model_U
+  closure = 94
+  holdout_closure = 47
+  positive_complementarity_rows = 34
+  holdout_positive_complementarity_rows = 14
+  closure_without_single_axis_closure = 7
+  mean_lift_on_closure = 2.798
+  mean_complementarity = 0.628
+
+L27C16651:
+  relation = ds7b_animal_single_axis
+  closure = 52
+  holdout_closure = 29
+  mean_lift_on_closure = 2.439
+```
+
+关键变化：
+
+```text
+Phase892:
+  closure_without_single_axis_closure = 0
+
+Phase893:
+  closure_without_single_axis_closure = 14
+```
+
+这不是简单推翻 Phase892，因为 Phase893 的测试集更宽，加入了更多 base + holdout case-prompt。
+更准确的写法是：
+
+```text
+在更宽 holdout 条件下，
+DS7B 的 L26C8587 + L27C15369 互补对出现了少量组合独有闭合候选。
+```
+
+其中 14 行来自 7 个条件，每个条件同时被 pair 和 model_U 记录：
+
+```text
+color green natural_question zero
+color green natural_category zero
+color color natural_category zero
+color black natural_category zero
+color brown natural_category zero
+color violet natural_category zero
+color violet question_plain flip
+```
+
+### 八、注意力头归因结果
+
+DS7B 中 target lift damage 较明显的 head：
+
+```text
+L26H3:
+  damage_gt_0_25 = 4
+  mean_damage = 0.617
+  max_damage = 1.875
+
+L26H7:
+  damage_gt_0_25 = 6
+  mean_damage = 0.492
+  max_damage = 0.750
+
+L26H11:
+  damage_gt_0_25 = 5
+  mean_damage = 0.367
+  max_damage = 0.625
+
+L26H14:
+  damage_gt_0_25 = 3
+  mean_damage = 0.273
+  max_damage = 0.875
+```
+
+但 DS7B：
+
+```text
+head_zero_closure_lost = 0
+```
+
+所以当前只能说：
+
+```text
+L26 attention heads are target-lift damage candidates.
+```
+
+不能说：
+
+```text
+single attention head is a closure-critical causal path.
+```
+
+qwen3 则出现：
+
+```text
+head_zero_closure_lost = 26
+```
+
+这说明 qwen3 的材料单轴窄机制虽然没有多轴互补，但其 first-token boundary 对部分 L31 attention head 更脆弱。
+
+### 九、理论进展
+
+Phase893 把 Phase892 的标签从：
+
+```text
+coordinate-axis target-lift complementarity
+```
+
+推进为：
+
+```text
+holdout-stable pairwise complementarity
++
+weak closure-without-single candidates
++
+attention-head target-lift damage candidates
+```
+
+新增图谱节点：
+
+```text
+V_holdout_pairwise_complementarity
+V_weak_closure_without_single_candidate
+V_attention_head_target_lift_damage
+V_qwen3_attention_fragile_single_axis
+V_ds7b_L26_attention_damage_field
+```
+
+新增图谱边：
+
+```text
+E_L26C8587_L27C15369_holdout_complementarity
+E_L26C8587_L27C15369_weak_no_single_closure
+E_L26H3_target_lift_damage
+E_L26H7_target_lift_damage
+E_L26H11_target_lift_damage
+E_L26H14_target_lift_damage
+E_qwen3_L31_heads_closure_fragility
+E_glm4_negative_holdout_control
+```
+
+### 十、问题、硬伤与闭合距离
+
+硬伤：
+
+```text
+1. closure_without_single_axis_closure 只有 14 行，而且集中在少量 color 条件；
+2. 组合独有闭合还没有做 rollout；
+3. DS7B head zero 只降低 target lift，没有单头造成 closure loss；
+4. qwen3 的 head closure loss 与 DS7B 的 head damage 不是同构结构；
+5. GLM4 继续负，跨模型同构仍未建立；
+6. 本阶段仍是坐标轴组合，不是任意基 learned subspace。
+```
+
+闭合标准仍然没有达到：
+
+```text
+1. holdout-stable no-single closure；
+2. attention/MLP full pathway causal closure；
+3. full-vocabulary blocker field closure；
+4. long rollout closure；
+5. cross-model structural isomorphism。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  76% - 82%
+
+语言编码机制闭合：
+  42% - 47%
+```
+
+### 十一、第一性原理洞察
+
+当前更像是：
+
+```text
+语言输出边界不是单个齿轮决定，
+而是多个局部坐标轴在特定状态下改变 target/blocker 竞争场。
+```
+
+Phase893 的重要性在于：
+
+```text
+互补对不是只在 Phase892 原始样本中有效，
+而是在更宽 holdout 中仍能形成 target lift，并且少量产生组合独有闭合。
+```
+
+但这仍然是小模型上的粗糙机制。小模型可能把真实语言机制压缩为少数高影响通道和 head，导致：
+
+```text
+1. 某些组合闭合被放大；
+2. 某些跨模型结构不稳定；
+3. head-level attribution 可能只反映压缩后的局部瓶颈。
+```
+
+### 十二、下一阶段
+
+Phase893 仍属于“全局齿轮图谱优先”阶段，下一步应继续自动推进：
+
+```text
+Phase894:
+Weak No-Single Closure Replication and Rollout Boundary Probe
+弱组合独有闭合复验与 rollout 边界探针
+```
+
+任务：
+
+```text
+1. 专门复验 Phase893 的 7 个 no-single closure 条件；
+2. 增加同类 color holdout，确认是否稳定；
+3. 对 L26C8587 + L27C15369 做 first-token + short rollout 对照；
+4. 对 L26H3 / L26H7 / L26H11 / L26H14 做组合 head zero，而不是只做单头；
+5. 检查 qwen3 L31 head closure loss 是否只是窄模型偏差。
+```
+
+## Phase 894: 弱组合独有闭合复验与 rollout 边界探针 [2026-07-03 08:50]
+
+### 一、任务
+
+本阶段根据上传的 Phase893 分析继续推进。附件判断基本正确：
+
+```text
+Phase893 的价值不是完成语言编码机制闭合，
+而是把 Phase892 的方向集合边界信号推进到：
+留出稳定成对互补 + 弱组合独有闭合候选。
+```
+
+但 Phase893 仍有三个明显缺口：
+
+```text
+1. no-single closure 条件数量少，需要复验；
+2. 结果只停在 first-token 边界，没有 rollout 检查；
+3. DS7B head_zero 只做了单头损伤，没有组合 head zero。
+```
+
+因此 Phase894 的任务是：
+
+```text
+1. 复验 Phase893 的 7 个弱组合独有闭合条件；
+2. 增加同类 color holdout，检查是否能扩展；
+3. 比较 single-axis / pair / model_U 的 first-token 边界；
+4. 对 no-single 条件做 short rollout；
+5. 对 DS7B L26 heads 和 qwen3 L31 heads 做组合 head zero。
+```
+
+### 二、测试脚本与结果位置
+
+脚本：
+
+```text
+tests/glm5/phase894_weak_no_single_closure_rollout_probe.py
+tests/glm5/run_phase894_weak_no_single_closure_rollout_probe.sh
+```
+
+结果：
+
+```text
+tests/result/phase894_weak_no_single_closure_rollout_probe/weak_no_single_closure_rollout/
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、测试原理
+
+本阶段不是搜索全新大齿轮，而是对 Phase893 的候选边界做复验。核心比较对象是：
+
+```text
+single axis:
+  L26C8587
+  L27C15369
+  L27C16651
+
+pair:
+  L26C8587 + L27C15369
+
+model_U:
+  L26C8587 + L27C15369 + L27C16651
+```
+
+对于每个条件，记录：
+
+```text
+1. 原始状态是否 target 已经闭合；
+2. 单轴干预是否闭合；
+3. 成对干预是否闭合；
+4. 成对闭合是否不是任何单轴闭合；
+5. short rollout 是否仍命中 class token；
+6. head zero 后是否丢失闭合。
+```
+
+### 四、核心公式
+
+target lift：
+
+```text
+TargetLift(S,m)
+  =
+  Margin_after(S,m)
+  -
+  Margin_before(m)
+```
+
+互补增益：
+
+```text
+Complementarity(S,m)
+  =
+  TargetLift(S,m)
+  -
+  max_{i in S} TargetLift({i},m)
+```
+
+组合独有闭合：
+
+```text
+NoSingleClosure(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in S} BoundaryClosed({i},m)
+```
+
+rollout 弱边界命中：
+
+```text
+RolloutNoSingleHit(S,m)
+  =
+  RolloutClassHit(S,m)
+  and
+  not any_{i in S} RolloutClassHit({i},m)
+```
+
+组合 head 闭合损失：
+
+```text
+HeadSetClosureLoss(H;S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not BoundaryClosed(head_zero(H),S,m)
+```
+
+### 五、总体结果
+
+跨模型汇总：
+
+```text
+selected_conditions = 381
+output_first_rows = 933
+output_rollout_rows = 123
+output_head_rows = 176
+
+closure_from_open = 115
+closure_without_single_axis_closure = 22
+unique_no_single_conditions = 11
+
+phase893_exact_conditions = 7
+phase893_exact_no_single_replicated = 7
+expanded_pair_no_single_conditions = 4
+
+rollout_class_hit = 93
+rollout_without_single_axis_hit = 22
+
+head_combo_closure_lost = 40
+head_combo_damage_gt_0_25 = 38
+```
+
+证据标签：
+
+```text
+DS7B:
+  replicated_and_expanded_weak_no_single_closure
+
+qwen3:
+  first_token_closure_without_no_single_extension
+
+GLM4:
+  negative_under_phase894_candidates
+```
+
+### 六、DS7B 结果
+
+DS7B 是本阶段的主要正结果模型。
+
+L26C8587 + L27C15369：
+
+```text
+n_rows = 138
+closure_from_open = 36
+closure_without_single_axis_closure = 11
+exact_no_single_replicated = 7
+expanded_no_single = 4
+mean_target_lift_on_closure = 3.568
+mean_complementarity_over_best = 0.767
+objects_no_single = black,brown,color,cyan,gray,green,grey,navy,violet
+```
+
+model_U：
+
+```text
+L26C8587 + L27C15369 + L27C16651
+
+closure_from_open = 36
+closure_without_single_axis_closure = 11
+exact_no_single_replicated = 7
+expanded_no_single = 4
+mean_target_lift_on_closure = 3.547
+mean_complementarity_over_best = 0.790
+```
+
+单轴对照：
+
+```text
+L27C15369:
+  closure_from_open = 24
+  closure_without_single_axis_closure = 0
+
+L26C8587:
+  closure_from_open = 8
+  closure_without_single_axis_closure = 0
+
+L27C16651:
+  closure_from_open = 0
+```
+
+Phase893 的 7 个 no-single 条件全部复验成功：
+
+```text
+green natural_question zero
+green natural_category zero
+color natural_category zero
+black natural_category zero
+brown natural_category zero
+violet natural_category zero
+violet question_plain flip
+```
+
+新增 4 个同类 no-single 条件：
+
+```text
+gray natural_category zero
+grey natural_category zero
+cyan natural_category flip
+navy natural_category flip
+```
+
+这说明 Phase893 的弱组合独有闭合不是单次偶然，但仍集中在 color route。
+
+### 七、rollout 结果
+
+DS7B short rollout：
+
+```text
+L26C8587 + L27C15369:
+  rows = 28
+  rollout_class_hit = 28
+  rollout_without_single_axis_hit = 11
+  object_echo = 5
+
+model_U:
+  rows = 28
+  rollout_class_hit = 28
+  rollout_without_single_axis_hit = 11
+  object_echo = 5
+
+L27C15369:
+  rows = 28
+  rollout_class_hit = 16
+  rollout_without_single_axis_hit = 0
+
+L26C8587:
+  rows = 28
+  rollout_class_hit = 10
+  rollout_without_single_axis_hit = 0
+```
+
+典型现象：
+
+```text
+pair/model_U 在 no-single first-token 条件上，
+short rollout 也更容易继续命中 color class。
+```
+
+但这不是长程自然生成闭合。原因是：
+
+```text
+1. rollout 是 first-step intervention 后的短生成；
+2. 部分输出仍有 object echo；
+3. 还没有验证多步自然状态下的稳定边界。
+```
+
+### 八、组合 head zero 结果
+
+DS7B：
+
+```text
+L26H3 + L26H7 + L26H11 + L26H14:
+  rows = 11
+  closure_lost = 4
+  damage_gt_0_25 = 8
+  mean_damage = 0.511
+  max_damage = 1.625
+
+L26H7 + L26H11:
+  closure_lost = 2
+  damage_gt_0_25 = 8
+  mean_damage = 0.347
+  max_damage = 0.688
+
+L26H7:
+  closure_lost = 1
+  damage_gt_0_25 = 2
+```
+
+这比 Phase893 更进一步：
+
+```text
+Phase893:
+  DS7B 单头 head zero 主要是 target lift damage，没有 closure loss。
+
+Phase894:
+  DS7B 多 head 组合 zero 可造成少量 closure loss。
+```
+
+但仍不能写成完整 attention causal path，因为：
+
+```text
+1. closure_lost 只有 4 / 11；
+2. head set 是候选组合，不是最小割；
+3. 还没有证明它们解释全部 blocker field。
+```
+
+qwen3：
+
+```text
+L31H19 + L31H26 + L31H30 + L31H12 + L31H17:
+  rows = 11
+  closure_lost = 10
+  damage_gt_0_25 = 7
+  mean_damage = 0.420
+  max_damage = 0.750
+```
+
+qwen3 仍表现为：
+
+```text
+L31C2257 是 single-axis narrow mechanism；
+但 L31 attention heads 对该窄机制闭合很脆弱。
+```
+
+GLM4：
+
+```text
+closure_from_open = 0
+closure_without_single_axis_closure = 0
+```
+
+继续作为负对照。
+
+### 九、当前进展
+
+Phase894 支持如下客观结论：
+
+```text
+1. DS7B color route 的 L26C8587 + L27C15369 组合独有闭合可复验；
+2. Phase893 的 7 个 no-single 条件全部保留；
+3. 新增 4 个同类 color no-single 条件；
+4. short rollout 给出弱支持，但还不是长程闭合；
+5. DS7B 多 head 组合 zero 可以造成少量 closure loss；
+6. qwen3 仍是窄机制 + attention fragile；
+7. GLM4 继续负。
+```
+
+因此图谱标签可以升级为：
+
+```text
+holdout-stable pairwise target-lift complementarity
++
+replicated weak no-single closure candidate
++
+short-rollout boundary support
++
+multi-head attention closure-loss candidate
+```
+
+但不能升级为：
+
+```text
+full token closure
+full language coding mechanism closure
+learned independent subspace closure
+cross-model isomorphic circuit
+```
+
+### 十、问题、硬伤与闭合距离
+
+主要硬伤：
+
+```text
+1. no-single 条件仍集中在 color route；
+2. rollout 仍然很短，而且是干预后 rollout；
+3. object echo 说明输出协议没有完全分离；
+4. DS7B head set closure_lost 数量有限；
+5. qwen3 与 DS7B 的结构不同构；
+6. GLM4 没有出现同类正结果；
+7. 当前仍是坐标轴组合，不是自动发现的连续子空间。
+```
+
+闭合标准仍未达到：
+
+```text
+1. full-vocabulary blocker field closure；
+2. no-single closure 的跨语义域稳定；
+3. attention/MLP 最小割闭合；
+4. long rollout natural closure；
+5. qwen3 / GLM4 / DS7B 的结构同构。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  78% - 83%
+
+语言编码机制闭合：
+  43% - 48%
+```
+
+### 十一、小模型偏差分析
+
+当前模型是小模型，结果可能存在明显压缩偏差：
+
+```text
+1. DS7B 可能把 color route 压缩到少量强通道；
+2. qwen3 可能把 material route 压缩为单轴窄机制；
+3. GLM4 负结果可能来自候选齿轮未对齐，也可能来自模型内部路线不同；
+4. 多 head zero 的 closure loss 可能是压缩瓶颈，不一定对应大模型真实机制。
+```
+
+因此本阶段更适合作为：
+
+```text
+全局齿轮图谱的边界拼图
+```
+
+而不是：
+
+```text
+语言编码机制的最终证明。
+```
+
+### 十二、第一性原理洞察
+
+Phase894 加强了一个判断：
+
+```text
+语言输出不是单个语义特征直接写出答案，
+而是多个局部坐标轴在特定状态下共同移动 target/blocker 边界。
+```
+
+更重要的是：
+
+```text
+单轴能提高 target，
+但成对组合才在少量条件下越过 blocker 边界。
+```
+
+这说明当前研究的重点不应回到单点 patch，而应继续向：
+
+```text
+状态 -> 路线 -> 齿轮组合 -> 边界迁移 -> rollout 稳定性
+```
+
+推进。
+
+### 十三、下一阶段
+
+Phase894 和下一阶段仍属于同一个阶段性目标：
+
+```text
+优先完成全局齿轮图谱，
+再从图谱特性中反推语言编码机制。
+```
+
+下一阶段应继续自动推进为：
+
+```text
+Phase895:
+No-Single Closure Minimality and Multi-Head Pathway Split
+组合独有闭合最小性与多头路径拆分
+```
+
+任务：
+
+```text
+1. 判断 L26C8587 + L27C15369 是否是 no-single closure 的最小组合；
+2. 区分 L26H3/H7/H11/H14 中哪些 head 影响 route，哪些影响 blocker；
+3. 对 11 个 no-single 条件做 full-vocab blocker rank 记录；
+4. 增加非 color 语义域，检查是否仍有组合独有闭合；
+5. 将 short rollout 扩展为多步自然状态边界稳定测试。
+```
+
+## Phase 895: 组合独有闭合最小性与多头路径拆分 [2026-07-03 09:08]
+
+### 一、任务
+
+本阶段根据上传的 Phase894 分析继续推进。附件判断基本正确：
+
+```text
+Phase894 已经把 DS7B color route 的 L26C8587 + L27C15369
+从 weak no-single closure candidate
+推进为 replicated weak no-single closure candidate。
+```
+
+但 Phase894 仍留下两个关键问题：
+
+```text
+1. L26C8587 + L27C15369 是否只是有效 pair，还是当前已知坐标轴集合内的最小 pair；
+2. L26H3/H7/H11/H14 多头 zero 造成 closure loss 时，影响的是 target lift、blocker reduction，还是 rollout 协议。
+```
+
+因此 Phase895 的任务是：
+
+```text
+1. 对 Phase894 的 11 个 DS7B no-single 条件做最小性审计；
+2. 加入替代 pair：
+   L26C8587 + L27C16651
+   L27C15369 + L27C16651
+3. 对 full-vocab blocker rank 做记录；
+4. 对 L26 head set 做 target / blocker / rollout 拆分；
+5. 保留 qwen3 与 GLM4 对照。
+```
+
+### 二、测试脚本与结果位置
+
+脚本：
+
+```text
+tests/glm5/phase895_no_single_minimality_head_pathway_split.py
+tests/glm5/run_phase895_no_single_minimality_head_pathway_split.sh
+```
+
+结果：
+
+```text
+tests/result/phase895_no_single_minimality_head_pathway_split/minimality_head_pathway_split/
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、测试原理
+
+本阶段不是扩大新搜索，而是对 Phase894 的已确认边界做更严格分解。
+
+DS7B 比较集合：
+
+```text
+single:
+  L26C8587
+  L27C15369
+  L27C16651
+
+pair:
+  L26C8587 + L27C15369
+  L26C8587 + L27C16651
+  L27C15369 + L27C16651
+
+model_U:
+  L26C8587 + L27C15369 + L27C16651
+```
+
+如果目标 pair 闭合，而所有 single 与替代 pair 都不闭合，则写成：
+
+```text
+known-axis minimal pair candidate
+当前已知坐标轴集合内的最小 pair 候选
+```
+
+这不是全局最小割，因为未穷举所有通道、所有 head、所有连续子空间。
+
+### 四、核心公式
+
+已知坐标轴最小候选：
+
+```text
+KnownAxisMinimal(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in U} BoundaryClosed({i},m)
+  and
+  not any_{P in AltPairs(U,S)} BoundaryClosed(P,m)
+```
+
+其中：
+
+```text
+U = {L26C8587, L27C15369, L27C16651}
+S = {L26C8587, L27C15369}
+```
+
+full-vocab blocker reduction：
+
+```text
+BlockerReduction(S,m)
+  =
+  BlockerCount_before(m)
+  -
+  BlockerCount_after(S,m)
+```
+
+head target damage：
+
+```text
+HeadTargetDamage(H;S,m)
+  =
+  TargetLift(S,m)
+  -
+  TargetLift(head_zero(H),S,m)
+```
+
+head blocker damage：
+
+```text
+HeadBlockerDamage(H;S,m)
+  =
+  BlockerReduction(S,m)
+  -
+  BlockerReduction(head_zero(H),S,m)
+```
+
+rollout class loss：
+
+```text
+RolloutClassLoss(H;S,m)
+  =
+  RolloutClassHit(S,m)
+  and
+  not RolloutClassHit(head_zero(H),S,m)
+```
+
+### 五、总体结果
+
+跨模型汇总：
+
+```text
+selected_conditions = 46
+output_minimality_rows = 112
+output_condition_rows = 46
+output_head_split_rows = 200
+output_rollout_rows = 176
+
+focus_closure_from_open = 22
+known_axis_minimal_candidate = 11
+any_single_axis_closure = 11
+any_alternative_pair_closure = 0
+model_u_not_required_for_focus_closure = 22
+
+head_closure_lost = 40
+head_target_damage_gt_0_25 = 38
+head_blocker_damage_gt_0 = 40
+
+rollout_class_hit = 150
+rollout_answer_like_no_echo = 121
+rollout_class_lost_vs_none = 26
+rollout_object_echo_added_vs_none = 2
+rollout_protocol_drift_added_vs_none = 0
+```
+
+注意：
+
+```text
+any_single_axis_closure = 11 主要来自 qwen3 的 single-axis control；
+DS7B 的 11 个 no-single 条件中 any_single_axis_closure = 0。
+```
+
+### 六、DS7B 最小性结果
+
+DS7B：
+
+```text
+selected_conditions = 11
+focus_subset = L26C8587 + L27C15369
+
+focus_closure_from_open = 11
+known_axis_minimal_candidate = 11
+any_single_axis_closure = 0
+any_alternative_pair_closure = 0
+model_u_not_required_for_focus_closure = 11
+```
+
+子集结果：
+
+```text
+L26C8587 + L27C15369:
+  closure = 11 / 11
+  mean_target_lift = 1.830
+  mean_blocker_reduction = 2.364
+
+L26C8587 + L27C15369 + L27C16651:
+  closure = 11 / 11
+  mean_target_lift = 1.818
+  mean_blocker_reduction = 2.364
+
+L27C15369 + L27C16651:
+  closure = 0 / 11
+  mean_target_lift = 0.801
+  mean_blocker_reduction = 1.000
+
+L26C8587 + L27C16651:
+  closure = 0 / 11
+  mean_target_lift = 0.472
+  mean_blocker_reduction = 0.455
+
+L27C15369:
+  closure = 0 / 11
+  mean_target_lift = 0.795
+  mean_blocker_reduction = 1.091
+
+L26C8587:
+  closure = 0 / 11
+  mean_target_lift = 0.466
+  mean_blocker_reduction = 0.545
+
+L27C16651:
+  closure = 0 / 11
+  mean_target_lift = 0.017
+  mean_blocker_reduction = 0.000
+```
+
+客观结论：
+
+```text
+在当前 U = {L26C8587, L27C15369, L27C16651} 的已知坐标轴集合内，
+L26C8587 + L27C15369 是 11 个 color no-single 条件的最小 pair 候选。
+```
+
+更谨慎地说：
+
+```text
+它不是全局最小割；
+它是当前已知三轴集合中的最小闭合 pair。
+```
+
+### 七、DS7B 多头路径拆分
+
+DS7B head set：
+
+```text
+L26H3 + L26H7 + L26H11 + L26H14:
+  closure_lost = 4 / 11
+  target_damage_gt_0_25 = 8 / 11
+  blocker_damage_gt_0 = 4 / 11
+  mean_target_damage = 0.511
+  mean_blocker_damage = 0.364
+  label:
+    target_and_blocker_boundary_candidate = 4
+    target_lift_damage_candidate = 4
+    weak_or_no_damage = 3
+
+L26H7 + L26H11:
+  closure_lost = 2 / 11
+  target_damage_gt_0_25 = 8 / 11
+  blocker_damage_gt_0 = 2 / 11
+  mean_target_damage = 0.347
+  mean_blocker_damage = 0.182
+
+L26H7:
+  closure_lost = 1 / 11
+  target_damage_gt_0_25 = 2 / 11
+  blocker_damage_gt_0 = 1 / 11
+```
+
+这说明：
+
+```text
+DS7B L26 head set 不是纯 target lift 放大器；
+在少量条件上，它同时影响 target lift 与 blocker reduction。
+```
+
+但：
+
+```text
+closure_lost 仍只有 4 / 11；
+不能写成完整 attention pathway closure。
+```
+
+### 八、DS7B rollout 路径
+
+DS7B rollout：
+
+```text
+none:
+  class_hit = 11 / 11
+  answer_like_no_echo = 10 / 11
+  object_echo = 1 / 11
+
+L26H3 + L26H7 + L26H11 + L26H14:
+  class_hit = 7 / 11
+  answer_like_no_echo = 7 / 11
+  object_echo = 0 / 11
+  class_lost_vs_none = 4 / 11
+
+L26H7 + L26H11:
+  class_hit = 9 / 11
+  answer_like_no_echo = 8 / 11
+  class_lost_vs_none = 2 / 11
+
+L26H7:
+  class_hit = 10 / 11
+  answer_like_no_echo = 9 / 11
+  class_lost_vs_none = 1 / 11
+```
+
+因此：
+
+```text
+多头 zero 对 first-token closure loss 与 short rollout class loss 是一致的弱证据。
+```
+
+但它仍是：
+
+```text
+short rollout pathway evidence
+```
+
+不是：
+
+```text
+long rollout natural closure。
+```
+
+### 九、qwen3 与 GLM4 对照
+
+qwen3：
+
+```text
+focus_subset = L31C2257
+focus_closure_from_open = 11
+known_axis_minimal_candidate = 0
+any_single_axis_closure = 11
+head_closure_lost = 31
+head_blocker_damage_gt_0 = 31
+rollout_class_lost_vs_none = 17
+```
+
+qwen3 继续支持：
+
+```text
+single-axis narrow mechanism
++
+attention fragile boundary
+```
+
+但不支持 DS7B 式 pair minimality。
+
+GLM4：
+
+```text
+focus_closure_from_open = 0
+head_closure_lost = 0
+```
+
+继续是当前候选下的负对照。
+
+### 十、当前进展
+
+Phase895 支持如下客观结论：
+
+```text
+1. DS7B color route 的 L26C8587 + L27C15369 在当前三轴集合内是最小 pair 候选；
+2. L27C16651 不增加 color no-single closure；
+3. 替代 pair 均无法闭合；
+4. full-vocab blocker count 上，目标 pair 将 blocker count 降到 0；
+5. DS7B L26 多头组合同时影响 target lift 与 blocker reduction；
+6. 多头 zero 会造成 short rollout class loss；
+7. qwen3 与 DS7B 仍不同构；
+8. GLM4 继续负。
+```
+
+因此图谱标签可从 Phase894 的：
+
+```text
+replicated weak no-single closure candidate
+```
+
+升级为：
+
+```text
+known-axis minimal replicated no-single pair candidate
+```
+
+中文：
+
+```text
+当前已知坐标轴集合内的最小复验组合独有闭合 pair 候选
+```
+
+但不能升级为：
+
+```text
+global minimal cut
+full attention pathway closure
+cross-model invariant circuit
+long rollout closure
+```
+
+### 十一、问题、硬伤与闭合距离
+
+主要硬伤：
+
+```text
+1. 最小性只在已知三轴 U 内成立；
+2. 没有穷举所有 channel / head / MLP 组合；
+3. 没有学习连续子空间；
+4. DS7B head closure_lost 仍只有 4 / 11；
+5. rollout 仍是短生成；
+6. 非 color 领域未出现同类 pair minimality；
+7. qwen3 / GLM4 / DS7B 仍无结构同构。
+```
+
+闭合标准仍未达到：
+
+```text
+1. global minimal cut；
+2. full-vocabulary causal blocker closure；
+3. long rollout natural closure；
+4. cross-domain no-single structure；
+5. cross-model structural isomorphism。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱：
+  80% - 84%
+
+语言编码机制闭合：
+  44% - 49%
+```
+
+### 十二、小模型偏差分析
+
+Phase895 的正结果主要来自 DS7B color route，小模型偏差仍需保留：
+
+```text
+1. DS7B 可能把真实 color route 压缩成两个强通道；
+2. L26 head set 的 closure_lost 可能是压缩瓶颈，而不是通用 attention path；
+3. qwen3 显示完全不同的 single-axis + fragile-attention 形态；
+4. GLM4 当前负结果说明候选空间仍不完整。
+```
+
+因此当前只能写成：
+
+```text
+DS7B color route known-axis minimal pair candidate
+```
+
+不能写成：
+
+```text
+language universal minimal circuit。
+```
+
+### 十三、第一性原理洞察
+
+Phase895 加强的核心洞察是：
+
+```text
+语言输出边界不是由单个概念通道决定，
+而是至少存在“弱轴 + 强轴”的组合门槛。
+```
+
+在 DS7B color route 中：
+
+```text
+L27C15369 提供主要 target lift；
+L26C8587 提供必要互补；
+两者合并后才把 full-vocab blocker count 降到 0。
+```
+
+这更接近“齿轮啮合”的形状：
+
+```text
+单轴转动能推动边界，
+但不能完成越界；
+特定双轴啮合才能跨过 blocker。
+```
+
+### 十四、下一阶段
+
+Phase895 与下一阶段仍属于同一个阶段性目标：
+
+```text
+优先完成全局齿轮图谱，
+再从图谱特性反推语言编码机制。
+```
+
+下一阶段应继续自动推进为：
+
+```text
+Phase896:
+Cross-Domain No-Single Pair Search and Long Rollout Stability
+跨领域组合独有 pair 搜索与长 rollout 稳定性
+```
+
+任务：
+
+```text
+1. 在 material / animal / tool / plant / abstract 中搜索类似 known-axis minimal pair；
+2. 对 DS7B color 11 条件做更长 rollout；
+3. 对 rollout 输出做 answer-like / object echo / protocol drift 分类；
+4. 检查 L26H7 是否是最小 head-pathway 候选；
+5. 扩大 blocker rank 记录到更多 prompt 形态。
+```
+
+## Phase 896: 跨领域组合独有 pair 搜索与长 rollout 稳定性 [2026-07-03 09:30]
+
+### 一、任务来源
+
+本阶段针对上传分析中的 Phase895 判断进行复核和继续推进。
+
+上传分析的核心判断基本正确：
+
+```text
+Phase895 不是普通局部 patch 成功，
+而是把 DS7B color route 中的候选结构从“弱组合闭合”
+收紧为 known-axis minimal pair candidate。
+```
+
+但需要保留严格边界：
+
+```text
+Phase895 只证明 DS7B color route 中存在候选最小 pair；
+没有证明该 pair 跨语义域通用；
+没有证明该 pair 是语言编码机制闭合。
+```
+
+因此本阶段继续测试两个问题：
+
+```text
+1. L26C8587 + L27C15369 是否能跨 domain 复用为 no-single pair；
+2. 该 pair 在更长 rollout 中是否仍保持 answer-like 输出，而不是 object echo 或 protocol drift。
+```
+
+### 二、测试脚本与结果文件
+
+脚本：
+
+```text
+tests/glm5/phase896_cross_domain_pair_search_long_rollout.py
+tests/glm5/run_phase896_cross_domain_pair_search_long_rollout.sh
+```
+
+结果：
+
+```text
+tests/result/phase896_cross_domain_pair_search_long_rollout/cross_domain_pair_search_long_rollout/phase896_cross_model_summary.json
+tests/result/phase896_cross_domain_pair_search_long_rollout/cross_domain_pair_search_long_rollout/phase896_cross_model_summary.md
+tests/result/phase896_cross_domain_pair_search_long_rollout/cross_domain_pair_search_long_rollout/phase896_qwen3_summary.json
+tests/result/phase896_cross_domain_pair_search_long_rollout/cross_domain_pair_search_long_rollout/phase896_glm4_summary.json
+tests/result/phase896_cross_domain_pair_search_long_rollout/cross_domain_pair_search_long_rollout/phase896_deepseek7b_summary.json
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三个模型依次加载和释放，没有并行占用 GPU。
+
+### 三、测试原理
+
+本阶段没有只看 target logit，而是继续沿用 full-vocabulary blocker boundary 标准。
+
+对于每个条件，记录：
+
+```text
+base state:
+  无干预自然输出边界
+
+single axis:
+  单个候选通道干预
+
+pair axis:
+  两个候选通道组合干预
+
+model_U:
+  候选通道集合干预
+
+long rollout:
+  首步干预后继续自然生成多 token
+```
+
+判定重点：
+
+```text
+no-single pair:
+  pair 能从 open boundary 变成 closed boundary，
+  且 pair 中任一 single 都不能闭合。
+
+known-axis minimal pair:
+  no-single pair 成立，
+  且候选坐标轴集合中的其他 pair 不成立。
+
+cross-domain known-axis minimal pair:
+  known-axis minimal pair 成立，
+  且 domain 不是 Phase895 的 color。
+
+long rollout stable:
+  rollout 输出保持 class answer-like，
+  且没有 object echo，
+  且没有 protocol drift。
+```
+
+### 四、核心公式
+
+full-vocab boundary closure：
+
+```text
+BoundaryClosed(S, x)
+  =
+  ClassRank(S, x) = 1
+  and
+  FullClassBlockerCount(S, x) = 0
+```
+
+no-single pair：
+
+```text
+NoSinglePair(a, b, x)
+  =
+  BoundaryClosed({a,b}, x)
+  and
+  not BoundaryClosed({a}, x)
+  and
+  not BoundaryClosed({b}, x)
+```
+
+已知坐标轴最小 pair：
+
+```text
+KnownAxisMinimalPair(a, b, U, x)
+  =
+  NoSinglePair(a,b,x)
+  and
+  for all {c,d} subset U, {c,d} != {a,b}:
+    not BoundaryClosed({c,d}, x)
+```
+
+跨领域复用条件：
+
+```text
+CrossDomainPair(a, b, x)
+  =
+  KnownAxisMinimalPair(a,b,U,x)
+  and
+  Domain(x) != color
+```
+
+长 rollout 稳定性：
+
+```text
+LongRolloutStable(S, x, T)
+  =
+  ClassHit(S,x,T)
+  and
+  ClearAnswer(S,x,T)
+  and
+  not ObjectEcho(S,x,T)
+  and
+  not ProtocolDrift(S,x,T)
+```
+
+head rollout 损伤：
+
+```text
+HeadRolloutLoss(H; S, x, T)
+  =
+  LongRolloutStable(S,x,T)
+  and
+  not LongRolloutStable(head_zero(H), S, x, T)
+```
+
+### 五、测试规模
+
+跨模型总计：
+
+```text
+selected_conditions: 952
+search_rows: 3400
+condition_rows: 952
+long_rollout_rows: 140
+```
+
+DS7B：
+
+```text
+selected_conditions: 408
+search_rows: 2856
+condition_rows: 408
+long_rollout_rows: 132
+```
+
+qwen3：
+
+```text
+selected_conditions: 272
+```
+
+GLM4：
+
+```text
+selected_conditions: 272
+```
+
+覆盖 domain：
+
+```text
+animal
+color
+material
+geometry
+tool
+abstract
+plant
+object
+```
+
+### 六、主要结果
+
+跨模型总体结果：
+
+```text
+focus_closure_from_open: 41
+no_single_pair_conditions: 11
+known_axis_minimal_pair_conditions: 11
+cross_domain_known_axis_minimal_pair_conditions: 0
+phase895_known_axis_replicated: 11
+rollout_class_hit: 39
+rollout_clear_answer: 36
+rollout_answer_like_no_echo: 36
+rollout_object_echo: 0
+rollout_protocol_drift: 0
+```
+
+最关键结果：
+
+```text
+Phase895 的 DS7B color pair 完整复现：
+  L26C8587 + L27C15369
+  replicated = 11 / 11
+
+但该 known-axis minimal pair 没有跨 domain 扩展：
+  cross_domain_known_axis_minimal_pair_conditions = 0
+```
+
+这说明：
+
+```text
+L26C8587 + L27C15369 是 DS7B color route 的强候选 pair，
+但不是当前证据下的跨领域通用 pair。
+```
+
+### 七、DS7B 细节
+
+DS7B color：
+
+```text
+conditions: 138
+focus_closure_from_open: 36
+no_single_pair_conditions: 11
+known_axis_minimal_pair_conditions: 11
+phase895_replicated: 11
+pair_key:
+  L26C8587 + L27C15369 = 11
+```
+
+DS7B animal：
+
+```text
+conditions: 66
+focus_closure_from_open: 1
+no_single_pair_conditions: 0
+known_axis_minimal_pair_conditions: 0
+```
+
+animal 中存在一些 pair closure：
+
+```text
+L27C15369 + L27C16651:
+  closure = 39
+
+L26C8587 + L27C16651:
+  closure = 38
+```
+
+但它们不是 no-single pair，因为单轴或其他路径可以解释，不满足最小组合独有标准。
+
+DS7B 其他 domain：
+
+```text
+material: known-axis minimal pair = 0
+geometry: known-axis minimal pair = 0
+tool: known-axis minimal pair = 0
+plant: known-axis minimal pair = 0
+object: known-axis minimal pair = 0
+abstract: known-axis minimal pair = 0
+```
+
+### 八、长 rollout 结果
+
+对 DS7B color 的核心 pair：
+
+```text
+L26C8587 + L27C15369
+```
+
+无 head zero 时：
+
+```text
+rows: 11
+class_hit: 11 / 11
+clear_answer: 10 / 11
+answer_like_no_echo: 10 / 11
+object_echo: 0 / 11
+protocol_drift: 0 / 11
+```
+
+L26H7 zero：
+
+```text
+class_hit: 10 / 11
+clear_answer: 9 / 11
+class_lost_vs_none: 1 / 11
+```
+
+L26H7 + L26H11 zero：
+
+```text
+class_hit: 9 / 11
+clear_answer: 8 / 11
+class_lost_vs_none: 2 / 11
+```
+
+L26H3 + L26H7 + L26H11 + L26H14 zero：
+
+```text
+class_hit: 7 / 11
+clear_answer: 7 / 11
+class_lost_vs_none: 4 / 11
+clear_lost_vs_none: 3 / 11
+```
+
+这说明：
+
+```text
+L26 head set 的损伤不只停留在 first-token boundary，
+会传导到较长 rollout 的 class answer-like 稳定性。
+```
+
+但仍需谨慎：
+
+```text
+当前 rollout 是首步干预后自然续写，
+不是全程自然闭合，
+也不是完整多步因果路径闭合。
+```
+
+### 九、对照模型结果
+
+qwen3：
+
+```text
+focus_closure_from_open: 4
+no_single_pair_conditions: 0
+known_axis_minimal_pair_conditions: 0
+```
+
+qwen3 仍更像：
+
+```text
+single-axis narrow mechanism
++
+attention fragile boundary
+```
+
+不是 DS7B 式 pair-minimal 结构。
+
+GLM4：
+
+```text
+focus_closure_from_open: 0
+no_single_pair_conditions: 0
+known_axis_minimal_pair_conditions: 0
+```
+
+GLM4 在当前候选坐标轴下仍是负对照。
+
+### 十、对上传分析的复核
+
+上传分析关于 Phase895 的判断基本正确：
+
+```text
+Phase895 是 Phase884 以来最重要的结构收紧之一；
+DS7B color route 中的 L26C8587 + L27C15369
+确实应标记为 known-axis minimal pair candidate。
+```
+
+但 Phase896 后必须增加一个限制：
+
+```text
+该 pair 没有跨语义域复用。
+```
+
+因此现在最准确的写法是：
+
+```text
+DS7B color route known-axis minimal pair candidate,
+with long-rollout answer-like stability,
+but no cross-domain minimal-pair generalization under current axes.
+```
+
+不能写成：
+
+```text
+universal semantic pair；
+global language pair；
+language encoding closure。
+```
+
+### 十一、理论进展
+
+Phase896 的实质进展有三点：
+
+```text
+1. 复现了 Phase895 的 DS7B color minimal-pair 候选；
+2. 证明该 pair 不是当前候选轴下的跨领域通用结构；
+3. 证明该 pair 的影响可以进入较长 rollout 的 answer-like 稳定性。
+```
+
+这让图谱从：
+
+```text
+single-token full-vocab boundary
+```
+
+推进到：
+
+```text
+single-token boundary
+  ->
+short/medium rollout answer-like stability
+```
+
+但同时把理论从：
+
+```text
+可能存在一个跨领域通用 pair
+```
+
+收紧为：
+
+```text
+不同语义域可能需要不同坐标轴；
+color route 的 pair 不能直接外推到 material / animal / tool / abstract。
+```
+
+### 十二、硬伤与瓶颈
+
+当前主要硬伤：
+
+```text
+1. cross-domain known-axis minimal pair = 0；
+2. 非颜色 domain 的候选坐标轴明显不足；
+3. animal 中有 pair closure，但不是 no-single minimal pair；
+4. long rollout 仍是首步干预后续写，不是完整多步闭合；
+5. qwen3 / GLM4 与 DS7B 图谱形状不一致；
+6. 当前模型均为小模型，内部结构可能被压缩、偏移或粗糙化。
+```
+
+尤其需要注意：
+
+```text
+不能因为 color pair 成功，就把同一 pair 强行外推到全部 domain；
+不能因为跨领域失败，就否定 pair mechanism；
+更合理的解释是：需要先完成 domain-specific axis discovery。
+```
+
+### 十三、闭合标准与当前距离
+
+语言编码机制闭合至少需要：
+
+```text
+1. 跨 domain 找到各自的有效坐标轴；
+2. 解释不同 domain 的 boundary transition；
+3. 解释 blocker field 如何被压低；
+4. 解释 target / protocol / object echo 如何分离；
+5. 在 holdout prompt 和 long rollout 中稳定预测；
+6. 跨模型至少保持结构同构，而不是只在 DS7B color 中成立。
+```
+
+Phase896 当前距离：
+
+```text
+全局齿轮图谱:
+  81% - 85%
+
+语言编码机制闭合:
+  44% - 49%
+```
+
+图谱继续前进，但闭合仍没有大幅推进，因为跨领域 minimal pair 没有成立。
+
+### 十四、第一性原理洞察
+
+Phase896 给出的关键洞察是：
+
+```text
+语言机制很可能不是一个单一通用齿轮组，
+而是 domain-specific route + shared protocol field 的组合。
+```
+
+更基础地说：
+
+```text
+语义域不是只改变 object token，
+而可能改变内部可用坐标轴、边界方向和 blocker 场。
+```
+
+因此破解语言编码机制不能只做：
+
+```text
+找到一个强 pair，然后全局复用。
+```
+
+而应转为：
+
+```text
+先为每个语义域发现本域坐标轴，
+再比较这些坐标轴之间是否存在同构关系。
+```
+
+### 十五、下一阶段
+
+Phase896 与下一阶段仍属于同一阶段性目标：
+
+```text
+优先完成全局齿轮图谱，
+再根据图谱特性破解语言编码机制。
+```
+
+下一阶段应继续自动推进为：
+
+```text
+Phase897:
+Non-Color Route Axis Discovery and Domain-Specific Pair Search
+非颜色路线坐标轴发现与领域内 pair 搜索
+```
+
+任务：
+
+```text
+1. 不再强行复用 color axes；
+2. 分别在 material / animal / tool / plant / abstract / object 中搜索本域 source axis；
+3. 对每个 domain 建立 candidate_U；
+4. 在各自 candidate_U 内做 no-single pair 与 known-axis minimal pair 搜索；
+5. 再比较不同 domain 的 pair 是否存在结构同构；
+6. 继续使用 qwen3 / GLM4 / DS7B 顺序测试；
+7. 对重要正结果增加更大 prompt 变体和长 rollout 验证。
+```
+
+## Phase 897: 非颜色路线坐标轴发现与领域内 pair 搜索 [2026-07-03 14:18]
+
+### 一、任务来源
+
+本阶段接续 Phase896。
+
+Phase896 已证明：
+
+```text
+DS7B color route 的 L26C8587 + L27C15369 可以复现为 known-axis minimal pair；
+但这个 pair 没有跨 domain 复用。
+```
+
+因此 Phase897 不再强行复用 color axes，而是转向：
+
+```text
+Non-Color Route Axis Discovery
+非颜色路线坐标轴发现。
+```
+
+核心任务：
+
+```text
+1. 为 animal / material / tool / plant / abstract / object / geometry 建立 candidate_U；
+2. 在每个 domain 的 candidate_U 内测试 single-axis 和 pair-axis；
+3. 找出 no-single pair 与 known-axis minimal pair 的候选；
+4. 为下一阶段 holdout 复验筛选对象。
+```
+
+### 二、测试脚本与结果文件
+
+脚本：
+
+```text
+tests/glm5/phase897_non_color_route_axis_discovery.py
+tests/glm5/run_phase897_non_color_route_axis_discovery.sh
+```
+
+结果：
+
+```text
+tests/result/phase897_non_color_route_axis_discovery/non_color_axis_discovery/phase897_cross_model_summary.json
+tests/result/phase897_non_color_route_axis_discovery/non_color_axis_discovery/phase897_cross_model_summary.md
+tests/result/phase897_non_color_route_axis_discovery/non_color_axis_discovery/phase897_qwen3_candidate_axes.jsonl
+tests/result/phase897_non_color_route_axis_discovery/non_color_axis_discovery/phase897_glm4_candidate_axes.jsonl
+tests/result/phase897_non_color_route_axis_discovery/non_color_axis_discovery/phase897_deepseek7b_candidate_axes.jsonl
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、测试原理
+
+Phase897 分两步：
+
+```text
+第一步：候选坐标轴发现
+  使用 late-layer MLP down_proj 输入激活；
+  计算某 domain 的平均绝对激活与其他 domain 的差值；
+  选出本域最突出的通道。
+
+第二步：领域内因果测试
+  对每个 domain 的 candidate_U 做 single / pair 干预；
+  使用 full-vocab blocker boundary 判断是否闭合；
+  标记 no-single pair 与 known-axis minimal pair。
+```
+
+候选轴分数：
+
+```text
+AxisScore(g,d)
+  =
+  MeanAbsActivation(g | domain=d)
+  -
+  MeanAbsActivation(g | domain!=d)
+```
+
+领域候选集合：
+
+```text
+U_d
+  =
+  TopK_g AxisScore(g,d)
+  union
+  HistoryAxes(d)
+```
+
+其中 HistoryAxes 来自 Phase884 / Phase896 中已经产生过 closure 的非颜色候选轴。
+
+### 四、核心公式
+
+领域内闭合：
+
+```text
+BoundaryClosed(S,x,d)
+  =
+  ClassRank(S,x,d) = 1
+  and
+  FullClassBlockerCount(S,x,d) = 0
+```
+
+领域内 no-single pair：
+
+```text
+DomainNoSinglePair(a,b,x,d)
+  =
+  BoundaryClosed({a,b},x,d)
+  and
+  not BoundaryClosed({a},x,d)
+  and
+  not BoundaryClosed({b},x,d)
+```
+
+领域内已知轴最小 pair：
+
+```text
+DomainKnownAxisMinimalPair(a,b,U_d,x,d)
+  =
+  DomainNoSinglePair(a,b,x,d)
+  and
+  for all {c,e} subset U_d, {c,e}!={a,b}:
+    not BoundaryClosed({c,e},x,d)
+```
+
+### 五、测试规模
+
+跨模型总计：
+
+```text
+candidate_axes: 84
+activation_candidate_axes: 79
+history_candidate_axes: 5
+selected_conditions: 420
+search_rows: 4200
+condition_rows: 420
+```
+
+每个模型：
+
+```text
+candidate_axes: 28
+selected_conditions: 140
+search_rows: 1400
+```
+
+### 六、主要结果
+
+跨模型总体：
+
+```text
+single_axis_closure_conditions: 46
+pair_closure_conditions: 49
+no_single_pair_conditions: 8
+known_axis_minimal_pair_conditions: 4
+```
+
+这说明：
+
+```text
+非颜色 domain 确实可以通过 domain-specific candidate_U 找到新的候选轴；
+但 Phase897 的 pair 候选支持度很低，不能直接升级为稳定机制。
+```
+
+### 七、分模型结果
+
+qwen3：
+
+```text
+single_axis_closure_conditions: 17
+pair_closure_conditions: 17
+no_single_pair_conditions: 4
+known_axis_minimal_pair_conditions: 1
+```
+
+主要候选：
+
+```text
+material:
+  L31C2257 single-axis closure = 7 / 24
+
+geometry:
+  L31C2414 single-axis closure = 4 / 20
+
+animal:
+  L32C5295 + L35C2290
+  known-axis minimal pair = 1 condition
+```
+
+GLM4：
+
+```text
+single_axis_closure_conditions: 9
+pair_closure_conditions: 12
+no_single_pair_conditions: 3
+known_axis_minimal_pair_conditions: 2
+```
+
+主要候选：
+
+```text
+material:
+  L39C638 + L39C1630
+  L39C638 + L39C2682
+
+animal:
+  L35C8824 single-axis closure = 4 / 24
+```
+
+这说明 GLM4 不是“没有机制”，而是前面候选轴缺失。
+
+DS7B：
+
+```text
+single_axis_closure_conditions: 20
+pair_closure_conditions: 20
+no_single_pair_conditions: 1
+known_axis_minimal_pair_conditions: 1
+```
+
+主要候选：
+
+```text
+animal:
+  L27C16651 single-axis closure = 11 / 24
+
+geometry:
+  L27C15791 + L27C15305
+  known-axis minimal pair = 1 condition
+```
+
+### 八、结果边界
+
+Phase897 的结果是正结果，但证据层级必须降低：
+
+```text
+1. 候选轴多数来自 activation-domain specificity，不是历史复验轴；
+2. known-axis minimal pair 条件数很少；
+3. 部分 pair 的平均 target_lift 为负，说明 closure 可能来自 blocker field 变化，而非稳定 target push；
+4. no-single pair 还没有经过扩大 prompt/object 的 holdout 复验。
+```
+
+因此 Phase897 只能写成：
+
+```text
+domain-specific candidate_U discovery succeeded;
+several weak domain-local pair candidates were found.
+```
+
+不能写成：
+
+```text
+non-color domain pair mechanism closed。
+```
+
+### 九、阶段判断
+
+Phase897 与下一阶段仍属于同一个阶段性目标：
+
+```text
+优先完成全局齿轮图谱。
+```
+
+由于 Phase897 产生了低支持正结果，必须继续进入：
+
+```text
+Phase898:
+Domain Axis Holdout Validation
+领域坐标轴 holdout 复验
+```
+
+任务：
+
+```text
+1. 读取 Phase897 的 pair / single 候选；
+2. 扩大 object 与 prompt 变体；
+3. 检查 no-single pair 是否保持；
+4. 对不稳定候选降权；
+5. 对稳定 single route 与 pair route 分层记录。
+```
+
+## Phase 898: 领域坐标轴 holdout 复验 [2026-07-03 14:18]
+
+### 一、任务来源
+
+Phase897 发现多个非颜色 domain 候选，但多数支持度很低。
+
+本阶段进行扩大复验：
+
+```text
+1. 复验 Phase897 的 pair candidates；
+2. 复验 Phase897 的 strong single candidates；
+3. 使用更多 object 与 prompt；
+4. 判断 Phase897 正结果是否稳定。
+```
+
+### 二、测试脚本与结果文件
+
+脚本：
+
+```text
+tests/glm5/phase898_domain_axis_holdout_validation.py
+tests/glm5/run_phase898_domain_axis_holdout_validation.sh
+```
+
+结果：
+
+```text
+tests/result/phase898_domain_axis_holdout_validation/domain_axis_holdout_validation/phase898_cross_model_summary.json
+tests/result/phase898_domain_axis_holdout_validation/domain_axis_holdout_validation/phase898_cross_model_summary.md
+tests/result/phase898_domain_axis_holdout_validation/domain_axis_holdout_validation/phase898_qwen3_summary.json
+tests/result/phase898_domain_axis_holdout_validation/domain_axis_holdout_validation/phase898_glm4_summary.json
+tests/result/phase898_domain_axis_holdout_validation/domain_axis_holdout_validation/phase898_deepseek7b_summary.json
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、测试原理
+
+Phase898 对每个 Phase897 来源建立复验集合：
+
+```text
+Pair source:
+  测试 a、b、a+b 三种干预；
+  判断 pair 是否闭合；
+  判断 pair 闭合时 component single 是否不闭合。
+
+Single source:
+  测试单轴是否在更多 object/prompt 下继续闭合。
+```
+
+复验稳定性：
+
+```text
+HoldoutSupport(S)
+  =
+  count_x BoundaryClosed(S,x)
+```
+
+复验 no-single：
+
+```text
+HoldoutNoSinglePair(a,b)
+  =
+  count_x [
+    BoundaryClosed({a,b},x)
+    and
+    not BoundaryClosed({a},x)
+    and
+    not BoundaryClosed({b},x)
+  ]
+```
+
+### 四、测试规模
+
+跨模型总计：
+
+```text
+sources: 13
+rows: 1832
+condition_rows: 840
+source_candidate_closure_conditions: 78
+single_axis_closure_conditions: 72
+pair_closure_conditions: 21
+no_single_pair_conditions: 11
+```
+
+### 五、主要结果
+
+最稳定的 single-axis：
+
+```text
+DS7B animal:
+  L27C16651
+  source_candidate_closure = 25 / 88
+
+GLM4 animal:
+  L35C8824
+  source_candidate_closure = 12 / 88
+
+qwen3 material:
+  L31C2257
+  source_candidate_closure = 9 / 88
+
+qwen3 geometry:
+  L31C2414
+  source_candidate_closure = 6 / 40
+
+DS7B geometry:
+  L27C15791
+  source_candidate_closure = 5 / 40
+```
+
+pair holdout：
+
+```text
+qwen3 geometry:
+  L31C3531 + L35C935
+  source_candidate_closure = 5 / 40
+  no_single_pair = 3 / 40
+
+DS7B geometry:
+  L27C15791 + L27C15305
+  source_candidate_closure = 7 / 40
+  no_single_pair = 2 / 40
+
+GLM4 material:
+  L39C638 + L39C1630
+  source_candidate_closure = 2 / 88
+  no_single_pair = 1 / 88
+
+GLM4 object:
+  L39C11316 + L39C5585
+  source_candidate_closure = 2 / 32
+  no_single_pair = 1 / 32
+```
+
+### 六、Phase897 正结果的复验结论
+
+Phase898 保留了 Phase897 的部分信号，但强度明显分层：
+
+```text
+稳定层：
+  single-axis routes 更稳定。
+
+弱候选层：
+  no-single pairs 存在，但多数只覆盖少数 object/prompt。
+
+未闭合层：
+  没有任何非颜色 pair 达到 Phase895 DS7B color pair 的强度。
+```
+
+最重要对比：
+
+```text
+Phase895 / Phase896 DS7B color pair:
+  11 / 11 复验
+  long rollout answer-like 稳定
+
+Phase897 / Phase898 non-color pairs:
+  no-single 条件存在
+  但支持度最高只有 3 / 40 或 2 / 40
+```
+
+因此当前图谱应写成：
+
+```text
+non-color domain-specific weak pair candidates
+```
+
+不能写成：
+
+```text
+non-color pair closure。
+```
+
+### 七、理论进展
+
+Phase897-898 共同完成了一次重要推进：
+
+```text
+从“color axes 无法跨领域复用”
+推进到
+“非颜色 domain 可以建立自己的 candidate_U，并产生可复验但弱的 pair/single 信号”。
+```
+
+当前图谱新增层：
+
+```text
+DomainSpecificAxisDiscoveryLayer
+  |
+  |-- stable single-axis route
+  |     |-- DS7B animal: L27C16651
+  |     |-- GLM4 animal: L35C8824
+  |     |-- qwen3 material: L31C2257
+  |
+  |-- weak domain-local pair candidate
+        |-- qwen3 geometry: L31C3531 + L35C935
+        |-- DS7B geometry: L27C15791 + L27C15305
+        |-- GLM4 material/object weak pairs
+```
+
+### 八、问题与硬伤
+
+主要硬伤：
+
+```text
+1. 非颜色 pair 的 holdout 支持度低；
+2. 很多 pair closure 伴随 single-axis closure，不满足独有组合；
+3. pair 平均 target_lift 有时为负，说明可能是 blocker field 的局部重排；
+4. activation-specificity 选轴可能偏向高激活协议/格式通道；
+5. 还没有 long rollout 复验；
+6. 小模型结构粗糙，可能把真实机制压缩成少数晚层强轴。
+```
+
+因此，Phase898 后更稳妥的判断是：
+
+```text
+当前 atlas-first 路线有效；
+但非颜色 domain 尚处于 candidate_U 建设与弱边筛选阶段。
+```
+
+### 九、闭合标准与当前距离
+
+非颜色 domain 要达到 Phase895 级别的强证据，至少需要：
+
+```text
+1. no-single pair 在更多 object/prompt 中稳定；
+2. alternative pair 不闭合；
+3. blocker count 稳定降到 0；
+4. target lift 与 blocker reduction 方向一致；
+5. rollout answer-like 稳定；
+6. 跨模型存在结构同构。
+```
+
+当前进度：
+
+```text
+全局齿轮图谱:
+  83% - 87%
+
+语言编码机制闭合:
+  45% - 50%
+```
+
+图谱进展明显增加，因为非颜色 domain 终于有了 candidate_U。
+但闭合只小幅提高，因为 pair 稳定性仍弱。
+
+### 十、第一性原理洞察
+
+Phase897-898 给出的关键洞察是：
+
+```text
+语言机制的基本单位可能不是“统一语义 pair”，
+而是“领域内坐标轴 + 边界阻塞场 + 协议读出”的局部组合。
+```
+
+更具体：
+
+```text
+animal / material / geometry 等 domain
+可能各自拥有不同的 route axes；
+其中部分 domain 主要表现为 single-axis route，
+另一些 domain 会出现弱 pair route。
+```
+
+这说明全局图谱应优先完成：
+
+```text
+domain-specific axis atlas
+```
+
+再进一步寻找：
+
+```text
+cross-domain isomorphism
+```
+
+而不是直接寻找：
+
+```text
+one universal language pair。
+```
+
+### 十一、下一阶段
+
+Phase898 与下一阶段仍属于同一个阶段性目标：
+
+```text
+优先完成全局齿轮图谱。
+```
+
+下一阶段应继续为：
+
+```text
+Phase899:
+Domain Axis Rollout and Protocol/Object Echo Audit
+领域坐标轴 rollout 与协议/对象回声审计
+```
+
+任务：
+
+```text
+1. 对 Phase898 保留的 strong single routes 做 rollout；
+2. 对 Phase898 保留的 weak pair candidates 做 rollout；
+3. 区分 answer-like、object echo、protocol drift、format-only；
+4. 检查 pair 是否只修复 first-token boundary，还是能进入自然输出；
+5. 对不稳定 pair 降为 weak atlas edge。
+```
+
+## Phase 899: 领域坐标轴 rollout 与协议/对象回声审计 [2026-07-03 17:01]
+
+### 一、对上传分析的判断
+
+上传分析对 Phase897（第897阶段）和 Phase898（第898阶段）的总体判断基本正确：当前路线不应继续强行迁移 DS7B（DeepSeek 七十亿蒸馏模型）颜色 pair（组合），而应建立 domain-specific axis atlas（领域特异坐标轴图谱）。Phase897 负责发现非颜色领域 candidate_U（候选坐标轴集合），Phase898 负责在 holdout（留出）对象和提示上复验这些候选。
+
+但 Phase899 的结果进一步收紧了这个判断：Phase898 的 source_candidate_closure（来源候选首词闭合）不能直接写成 rollout closure（长输出闭合）。更准确地说，Phase897-898 发现的是 answer-class edge（答案类别边）或 first-token boundary edge（首词边界边），还不是 clean protocol edge（干净协议边）。
+
+### 二、测试脚本与数据位置
+
+新增脚本：
+
+```text
+tests/glm5/phase899_domain_axis_rollout_protocol_audit.py
+tests/glm5/run_phase899_domain_axis_rollout_protocol_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase899_domain_axis_rollout_protocol_audit/domain_axis_rollout_protocol_audit/
+```
+
+运行顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+实际运行均使用本地模型、CUDA、顺序加载与释放显存；FlashAttention2 不可用时自动回退到 sdpa（缩放点积注意力）。
+
+### 三、测试原理
+
+Phase899 不重新搜索全域通道，而是读取 Phase898 中已经满足 source_candidate_closure（来源候选首词闭合）的条件。对每个条件生成三类 rollout（长输出）：
+
+```text
+base_original:
+  不做齿轮干预；
+
+component_single:
+  对 pair（组合）的单个组件分别干预；
+
+source_candidate:
+  对 Phase898 的来源候选 single（单轴）或 pair（组合）干预。
+```
+
+每条 rollout 记录四类现象：
+
+```text
+answer_class:
+  输出开头属于目标答案类别；
+
+object_echo:
+  输出回到对象词，而不是类别词；
+
+protocol_drift:
+  输出进入格式字段、解释文本、列表、过长短语等非短答案协议；
+
+clean_answer_no_protocol:
+  输出是答案类别，且没有对象回声、没有协议漂移、满足短答案约束。
+```
+
+### 四、核心公式
+
+首词边界闭合：
+
+$$
+FirstTokenClosed(S,x)
+=
+\mathbf{1}
+[
+ClassRank(S,x)=1
+]
+\cdot
+\mathbf{1}
+[
+FullClassBlockerCount(S,x)=0
+]
+$$
+
+答案类别 rollout：
+
+$$
+AnswerClassRollout(S,x)
+=
+\mathbf{1}
+[
+Generated(S,x)
+\text{ starts with target answer class}
+]
+$$
+
+协议漂移：
+
+$$
+ProtocolDrift(S,x)
+=
+\mathbf{1}
+[
+Generated(S,x)
+\text{ enters format field / list / explanation / long phrase}
+]
+$$
+
+干净短答案闭合：
+
+$$
+CleanProtocolRollout(S,x)
+=
+AnswerClassRollout(S,x)
+\cdot
+(1-ObjectEcho(S,x))
+\cdot
+(1-ProtocolDrift(S,x))
+$$
+
+Phase899 的关键判据是：
+
+$$
+FirstTokenClosed(S,x)
+\centernot\Rightarrow
+CleanProtocolRollout(S,x)
+$$
+
+### 五、跨模型结果
+
+总体：
+
+```text
+sources = 13
+selected_conditions = 77
+rollout_rows = 196
+source_candidate_rows = 77
+component_rows = 42
+base_rows = 77
+```
+
+source_candidate（来源候选）总结果：
+
+```text
+answer_class = 68 / 77
+clean_answer_no_protocol = 0 / 77
+protocol_drift = 77 / 77
+object_echo = 1 / 77
+```
+
+按关系拆分：
+
+```text
+source_candidate_pair:
+  rows = 21
+  answer_class = 17
+  clean_answer_no_protocol = 0
+  protocol_drift = 21
+
+source_candidate_single:
+  rows = 56
+  answer_class = 51
+  clean_answer_no_protocol = 0
+  protocol_drift = 56
+  object_echo = 1
+
+component_single:
+  rows = 42
+  answer_class = 10
+  clean_answer_no_protocol = 0
+  protocol_drift = 42
+
+base_original:
+  rows = 77
+  answer_class = 0
+  clean_answer_no_protocol = 0
+```
+
+按模型拆分：
+
+```text
+qwen3:
+  source_candidate_rows = 22
+  answer_class = 18
+  clean_answer_no_protocol = 0
+  protocol_drift = 22
+
+GLM4:
+  source_candidate_rows = 19
+  answer_class = 17
+  clean_answer_no_protocol = 0
+  protocol_drift = 19
+  object_echo = 1
+
+DS7B:
+  source_candidate_rows = 36
+  answer_class = 33
+  clean_answer_no_protocol = 0
+  protocol_drift = 36
+```
+
+代表性现象：
+
+```text
+DS7B geometry:
+  shape, object, figure, geometric solid.
+  The answer is ...
+
+GLM4 object:
+  Vehicle
+  Category: Car
+  Category: Machine
+
+qwen3 geometry:
+  geometric shape
+  Okay, so I need to classify the item ...
+```
+
+这些输出都说明：候选轴能够把类别词拉到输出开头，但生成过程随后进入解释、字段、列表或模板续写，因此不能算干净短答案协议闭合。
+
+### 六、结果分析
+
+Phase899 是一个重要负结果，也是一次评价标准收紧。
+
+正结果：
+
+```text
+1. Phase897-898 的领域坐标轴不是纯噪声；
+2. source_candidate 对 answer_class 的影响很强：
+   68 / 77 条首词闭合条件在 rollout 中继续以答案类别开头；
+3. source_candidate 明显强于 component_single：
+   source_candidate answer_class = 68 / 77；
+   component_single answer_class = 10 / 42。
+```
+
+负结果：
+
+```text
+1. clean_answer_no_protocol = 0 / 77；
+2. 所有 source_candidate 输出都出现 protocol_drift；
+3. Phase898 的 first-token closure 不能直接升级为 natural rollout closure；
+4. 当前候选轴更像 semantic answer-class route（语义答案类别路线），不是 full output protocol route（完整输出协议路线）。
+```
+
+因此，Phase899 后的图谱边标签必须拆开：
+
+```text
+first_token_boundary_edge
+answer_class_rollout_edge
+clean_protocol_edge
+```
+
+不能再把这三者混写成 closure edge（闭合边）。
+
+### 七、理论进展
+
+Phase899 对当前理论有一个关键修正：
+
+```text
+语言输出不是单层边界问题，
+而至少是三层耦合问题：
+
+1. semantic class activation（语义类别激活）；
+2. blocker suppression（阻塞者压制）；
+3. protocol / stopping control（协议与停止控制）。
+```
+
+Phase897-898 主要验证了第 1 层和部分第 2 层；Phase899 说明第 3 层没有闭合。
+
+更准确的机制图谱结构应改为：
+
+```text
+DomainAxis
+  -> FirstTokenBoundary
+  -> AnswerClassPrefix
+  -> ProtocolStopGate
+  -> CleanNaturalAnswer
+```
+
+当前已经看到：
+
+```text
+DomainAxis -> AnswerClassPrefix
+```
+
+但没有看到：
+
+```text
+AnswerClassPrefix -> ProtocolStopGate -> CleanNaturalAnswer
+```
+
+这说明全局齿轮图谱应优先补充 protocol gear（协议齿轮）和 stop/short-answer gear（停止/短答齿轮），而不是继续只扩大 semantic axis（语义轴）搜索。
+
+### 八、问题、硬伤与小模型偏差
+
+主要硬伤：
+
+```text
+1. rollout 审计使用 greedy（贪心）生成，可能放大小模型的解释性续写倾向；
+2. max_new_tokens = 12，能观察到协议漂移，但还没有测试强停止符、采样温度、或显式 stop rule；
+3. protocol_drift 的规则仍是工程定义，虽然比单纯 answer_class 更严格，但需要更多人工审计样本校准；
+4. 当前干预只作用于 step 0（第一生成步），没有在后续生成步继续控制协议齿轮；
+5. 小模型可能把语义类别和输出协议压缩在粗糙的晚层通道中，导致真实机制被扭曲。
+```
+
+因此，Phase899 不能说明“领域坐标轴无效”，只能说明：
+
+```text
+领域坐标轴不足以独立完成自然输出闭合。
+```
+
+### 九、闭合标准与当前距离
+
+更严格的闭合标准应为：
+
+```text
+1. FirstTokenClosed 成立；
+2. AnswerClassRollout 成立；
+3. ObjectEcho = 0；
+4. ProtocolDrift = 0；
+5. 在 holdout objects/prompts 上稳定；
+6. component_single 与 alternative pair 不能解释掉 source_candidate；
+7. 跨模型存在结构同构或功能同构。
+```
+
+Phase899 满足：
+
+```text
+1. FirstTokenClosed：在 Phase898 条件中成立；
+2. AnswerClassRollout：68 / 77 成立；
+3. ObjectEcho：基本受控，仅 1 / 77；
+```
+
+Phase899 未满足：
+
+```text
+ProtocolDrift = 0；
+CleanProtocolRollout > 0；
+后续步协议控制闭合。
+```
+
+当前进度评估：
+
+```text
+全局齿轮图谱:
+  84% - 88%
+
+语言编码机制闭合:
+  43% - 48%
+```
+
+图谱进度上升，因为 atlas edge（图谱边）标签更精细；闭合进度不升反降，因为 Phase899 排除了“首词闭合等于自然输出闭合”的乐观解释。
+
+### 十、第一性原理洞察
+
+Phase899 的核心洞察是：
+
+```text
+语言能力不是“找到正确语义类别”就结束；
+语言输出还需要一个独立的协议/停止控制系统。
+```
+
+从智能理论角度看，这意味着：
+
+```text
+知识网络:
+  提供 answer class（答案类别）；
+
+推理/选择:
+  将 answer class 推到竞争场前方；
+
+语法/协议系统:
+  决定输出是否停在正确粒度，还是继续解释、列举、套模板。
+```
+
+当前研究已经能局部控制前两者，但还没有控制第三者。
+
+### 十一、下一阶段任务
+
+Phase899 与下一阶段仍属于同一个阶段性目标：
+
+```text
+优先完成全局齿轮图谱，而不是直接宣称语言编码机制闭合。
+```
+
+下一阶段应进入：
+
+```text
+Phase900:
+Protocol Stop Gate Discovery
+协议停止门发现
+```
+
+任务：
+
+```text
+1. 从 Phase899 的 answer_class_but_drift rows 中提取协议漂移类型；
+2. 区分 explanation drift、field drift、list drift、object echo；
+3. 在后续生成步 step=1/2 上寻找能抑制协议漂移的 head/channel；
+4. 测试 semantic axis + protocol stop gear 是否能从 answer_class edge 推进到 clean_protocol edge；
+5. 如果找不到，说明当前小模型缺少可分离协议停止齿轮，图谱中必须标注为 unresolved protocol closure gap。
+```
+
+## Phase 900: 协议停止门有限控制预筛 [2026-07-03 17:47]
+
+### 一、对上传分析的判断
+
+上传分析对 Phase899（第899阶段）的判断基本正确，而且必须采用其中的关键收紧：
+
+```text
+DomainAxis -> FirstTokenBoundary -> AnswerClassPrefix
+```
+
+并不推出：
+
+```text
+AnswerClassPrefix -> ProtocolStopGate -> CleanNaturalAnswer
+```
+
+Phase899 的核心结果：
+
+```text
+source_candidate:
+  answer_class = 68 / 77
+  clean_answer_no_protocol = 0 / 77
+  protocol_drift = 77 / 77
+```
+
+说明领域坐标轴不是噪声，它们确实能推动 answer-class edge（答案类别边）；但它们不能单独完成 clean protocol edge（干净协议边）。Phase900 因此继续同一阶段目标：寻找最简单的 protocol stop gate（协议停止门）是否存在。
+
+### 二、测试脚本与数据位置
+
+新增脚本：
+
+```text
+tests/glm5/phase900_protocol_stop_gate_discovery.py
+tests/glm5/run_phase900_protocol_stop_gate_discovery.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase900_protocol_stop_gate_discovery/protocol_stop_gate_discovery/
+```
+
+运行顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+三模型均使用本地 CUDA 顺序加载；FlashAttention2 不可用时自动回退到 sdpa（缩放点积注意力）。
+
+### 三、测试原理
+
+Phase900 不重新做全域搜索，而是读取 Phase899 中最关键的失败样本：
+
+```text
+is_source_candidate = true
+rollout_answer_class = true
+protocol_drift = true
+```
+
+也就是：
+
+```text
+答案类别已经被拉出来，但输出协议仍然漂移。
+```
+
+共选中：
+
+```text
+qwen3: 18
+GLM4: 17
+DS7B: 33
+total: 68
+```
+
+对这些样本测试以下有限控制：
+
+```text
+1. source_step0_only:
+   Phase899 原始设置，语义轴只在 step=0 生效；
+
+2. source_repeat_step1:
+   语义轴延续到 step=1；
+
+3. source_repeat_step1_2:
+   语义轴延续到 step=1/2；
+
+4. source_after_zero_step1_2:
+   step=0 用原语义轴，step=1/2 对同一轴归零；
+
+5. source_after_flip_step1_2:
+   step=0 用原语义轴，step=1/2 对同一轴翻转；
+
+6. head_zero_step1 / head_zero_step1_2:
+   在 step=1 或 step=1/2 对历史重要 head 或同层前几个 head 做 zero。
+```
+
+这不是全模型穷举，而是 protocol stop gate（协议停止门）的低成本预筛。
+
+### 四、核心公式
+
+协议缺口样本：
+
+$$
+ProtocolGap(S,x)
+=
+AnswerClassRollout(S,x)
+\cdot
+ProtocolDrift(S,x)
+$$
+
+有限控制：
+
+$$
+C \in
+\{
+RepeatAxis,
+ZeroAxisAfterAnswer,
+FlipAxisAfterAnswer,
+HeadZero_{1},
+HeadZero_{1,2}
+\}
+$$
+
+控制后干净协议闭合：
+
+$$
+ControlledClean(C,S,x)
+=
+AnswerClassRollout(C,S,x)
+\cdot
+(1-ObjectEcho(C,S,x))
+\cdot
+(1-ProtocolDrift(C,S,x))
+$$
+
+漂移类型计数：
+
+$$
+D(C,S,x)
+=
+D_{field}
++D_{explanation}
++D_{list}
++D_{long}
+$$
+
+弱改善定义：
+
+$$
+WeakReduction(C,S,x)
+=
+\mathbf{1}
+[
+D(C,S,x)<D(Base,S,x)
+]
+$$
+
+Phase900 的关键判据：
+
+$$
+\exists C:
+ControlledClean(C,S,x)=1
+$$
+
+如果不存在，则说明简单 step=1/2 控制没有找到协议停止门。
+
+### 五、跨模型结果
+
+总体：
+
+```text
+selected_answer_drift_rows = 68
+control_rows = 1606
+```
+
+总体结论：
+
+```text
+clean_answer_no_protocol = 0
+```
+
+所有模型、所有测试控制都没有把输出变成 clean short answer（干净短答案）。
+
+#### qwen3
+
+```text
+selected_answer_drift_rows = 18
+control_rows = 526
+
+baseline:
+  answer_class = 18 / 18
+  clean_answer_no_protocol = 0 / 18
+  protocol_drift = 18 / 18
+
+non_baseline:
+  rows = 508
+  answer_class = 508 / 508
+  clean_answer_no_protocol = 0 / 508
+  protocol_drift = 508 / 508
+  drift_type_count_reduced = 3
+```
+
+最好的弱改善控制：
+
+```text
+head_zero_step1_2::L31H19+L31H26+L31H30+L31H12+L31H17
+drift_type_count_reduced = 3 / 18
+clean_answer_no_protocol = 0
+```
+
+#### GLM4
+
+```text
+selected_answer_drift_rows = 17
+control_rows = 255
+
+baseline:
+  answer_class = 17 / 17
+  clean_answer_no_protocol = 0 / 17
+  protocol_drift = 17 / 17
+  field_drift = 17 / 17
+  long_phrase_drift = 17 / 17
+
+non_baseline:
+  rows = 238
+  answer_class = 238 / 238
+  clean_answer_no_protocol = 0 / 238
+  protocol_drift = 238 / 238
+  drift_type_count_reduced = 0
+```
+
+GLM4 的协议漂移最硬：所有测试控制都无法减少字段漂移和长短语漂移。
+
+#### DS7B
+
+```text
+selected_answer_drift_rows = 33
+control_rows = 825
+
+baseline:
+  answer_class = 33 / 33
+  clean_answer_no_protocol = 0 / 33
+  protocol_drift = 33 / 33
+  field_drift = 10
+  explanation_drift = 10
+  list_drift = 20
+  long_phrase_drift = 27
+
+non_baseline:
+  rows = 792
+  answer_class = 784 / 792
+  clean_answer_no_protocol = 0 / 792
+  protocol_drift = 792 / 792
+  drift_type_count_reduced = 18
+```
+
+最好的弱改善控制：
+
+```text
+semantic_axis_repeated_to_step1_2
+drift_type_count_reduced = 2 / 33
+clean_answer_no_protocol = 0
+```
+
+### 六、结果分析
+
+Phase900 是一个重要负结果，也是 Phase899 的自然下钻。
+
+正结果：
+
+```text
+1. answer_class 在所有控制中大体保持；
+2. qwen3 和 DS7B 出现极少量 drift_type_count_reduction；
+3. 说明某些 head/后续轴控制能轻微改变漂移形态。
+```
+
+负结果：
+
+```text
+1. clean_answer_no_protocol 始终为 0；
+2. protocol_drift 始终为 100%；
+3. 语义轴继续生效、归零、翻转，都不能变成停止门；
+4. 历史重要 attention heads 或同层前几个 heads 做 zero，也不能变成停止门；
+5. GLM4 没有任何漂移类型减少。
+```
+
+所以更准确结论是：
+
+```text
+当前没有找到简单的 step=1/2 protocol stop gate。
+```
+
+但不能写成：
+
+```text
+协议停止门不存在。
+```
+
+因为 Phase900 没有穷举全部 head、MLP channel、连续子空间、token-level stop logit 控制，也没有测试显式 EOS/stop token 路线。
+
+### 七、漂移类型拼图
+
+Phase900 将 protocol drift（协议漂移）细分为：
+
+```text
+field_drift:
+  Category:, Item:, Class:, Subclass: 等字段输出；
+
+explanation_drift:
+  Okay, so / I need / The answer is 等解释性续写；
+
+list_drift:
+  comma list, or list, 1./2. 等枚举；
+
+long_phrase_drift:
+  超过短答案约束的长短语。
+```
+
+各模型主要形态：
+
+```text
+qwen3:
+  explanation_drift + long_phrase_drift 为主；
+
+GLM4:
+  field_drift + long_phrase_drift 为主；
+
+DS7B:
+  list_drift + long_phrase_drift，同时混有 field / explanation。
+```
+
+这说明三模型虽然都失败在 protocol stop（协议停止），但失败形态不同。
+
+### 八、理论进展
+
+Phase900 对理论的改进是：
+
+```text
+ProtocolStopGate 不是语义轴本身的简单延续；
+也不是少量已知 answer-class head 的简单归零；
+它更可能是独立的生成步状态控制、EOS/stop token 竞争、或更高阶协议子空间。
+```
+
+最新结构应写成：
+
+```text
+SemanticAxis
+  -> AnswerClassPrefix
+  -> DriftMode
+      |-- field drift
+      |-- explanation drift
+      |-- list drift
+      |-- long phrase drift
+  -> unresolved ProtocolStopGate
+```
+
+这意味着全局齿轮图谱必须把 clean protocol edge（干净协议边）拆成：
+
+```text
+1. answer-class prefix edge；
+2. drift-mode edge；
+3. stop-token competitiveness edge；
+4. stop gate control edge。
+```
+
+Phase900 只测试了第 4 层中的少量简单控制，结果为负。
+
+### 九、问题、硬伤与小模型偏差
+
+主要硬伤：
+
+```text
+1. Phase900 不是全 head / 全 channel 穷举；
+2. 同层 head 只取前几个 head 和少量历史 head；
+3. 语义轴后续控制只测试 repeat / zero / flip，没有测试连续强度扫描；
+4. 没有直接测 EOS、句号、换行等 stop token 的 logit 竞争；
+5. 没有测试 step=3 以后更长程的协议恢复；
+6. greedy 生成可能放大小模型模板续写；
+7. 小模型内部可能没有干净可分离的 stop gear，而大模型可能存在。
+```
+
+因此 Phase900 只能支持：
+
+```text
+未发现简单协议停止门。
+```
+
+不能支持：
+
+```text
+不存在协议停止门。
+```
+
+### 十、闭合标准与当前距离
+
+Phase900 后，干净协议闭合标准更严格：
+
+```text
+1. AnswerClassRollout = 1；
+2. ObjectEcho = 0；
+3. ProtocolDrift = 0；
+4. short answer constraint 成立；
+5. 控制在 holdout prompts / objects 上稳定；
+6. 控制不破坏 answer_class；
+7. 控制能跨模型复现或至少形成功能同构。
+```
+
+Phase900 满足：
+
+```text
+answer_class 基本保留。
+```
+
+Phase900 未满足：
+
+```text
+ProtocolDrift = 0；
+CleanProtocolRollout > 0；
+跨模型 clean protocol 控制。
+```
+
+当前进度评估：
+
+```text
+全局齿轮图谱:
+  85% - 89%
+
+语言编码机制闭合:
+  42% - 47%
+```
+
+图谱进度略升，因为 protocol drift 类型被拆得更细；闭合进度继续保持保守，因为 Phase900 进一步排除了“简单后续步控制即可闭合”的乐观解释。
+
+### 十一、第一性原理洞察
+
+Phase900 给出的关键洞察是：
+
+```text
+语义正确性和输出终止性是两个不同问题。
+```
+
+知识网络提供：
+
+```text
+answer class
+```
+
+推理/竞争场提供：
+
+```text
+answer-class prefix
+```
+
+但语法/协议系统还必须提供：
+
+```text
+when to stop
+how short to answer
+whether to avoid format template
+whether to avoid list/explanation continuation
+```
+
+当前研究已经能把语义类别推出来，但还没有破解“输出粒度控制”的编码机制。
+
+### 十二、下一阶段
+
+Phase900 与下一阶段仍属于同一个阶段性目标：
+
+```text
+优先完成全局齿轮图谱，并定位 clean protocol edge 的缺口。
+```
+
+下一阶段应进入：
+
+```text
+Phase901:
+Stop Token Competitiveness Audit
+停止词竞争力审计
+```
+
+任务：
+
+```text
+1. 在 answer-class prefix 之后读取 step=1 logits；
+2. 测量 EOS、句号、短换行、逗号、Category、Item、The、I 等 token 的 rank / margin；
+3. 判断模型是否根本没有把 stop token 放进竞争区；
+4. 如果 stop token rank 极低，则说明 clean protocol 不是简单 head/channel 控制问题，而是 stop-token field 没有被建起来；
+5. 如果 stop token 已接近 top-k，再继续寻找能把 stop token 推过边界的 stop gear。
+```
+
+## Phase 901: 停止词竞争力审计 [2026-07-03 17:51]
+
+### 一、阶段目的
+
+Phase900 没有找到简单的 step=1/2 protocol stop gate（协议停止门）。因此 Phase901 继续同一阶段目标，但不再先做控制，而是直接审计 answer-class prefix（答案类别前缀）之后的下一步 logits（对数几率）：
+
+```text
+答案类别已经出现后，
+EOS / 句号 / 换行 / 字段 / 解释 / 列表 token
+到底谁在竞争场前面？
+```
+
+这个阶段回答的是：
+
+```text
+clean protocol 失败，是因为 stop token 根本不在竞争区？
+还是 stop token 已经接近，但被协议续写 token 压住？
+```
+
+### 二、测试脚本与数据位置
+
+新增脚本：
+
+```text
+tests/glm5/phase901_stop_token_competitiveness_audit.py
+tests/glm5/run_phase901_stop_token_competitiveness_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase901_stop_token_competitiveness_audit/stop_token_competitiveness_audit/
+```
+
+运行顺序：
+
+```text
+qwen3 -> glm4 -> deepseek7b
+```
+
+### 三、测试原理
+
+Phase901 读取 Phase899 中的同一批样本：
+
+```text
+is_source_candidate = true
+rollout_answer_class = true
+protocol_drift = true
+```
+
+共 68 条。
+
+对每条样本：
+
+```text
+1. 使用 Phase899 的 source_candidate 干预；
+2. 自回归推进到最短 answer-class prefix 成立的位置；
+3. 在下一步读取 logits；
+4. 计算 EOS、period、newline、field、explanation、list、protocol group 的 rank / margin。
+```
+
+这样避免把多 token 答案短语误判为“应该停止”的位置。
+
+### 四、核心公式
+
+答案类别前缀：
+
+$$
+t^*
+=
+\min_t
+\left[
+AnswerClassPrefix(y_{\le t})=1
+\right]
+$$
+
+停止词竞争力：
+
+$$
+StopRank(x)
+=
+Rank
+\left(
+\max_{z\in \mathcal{T}_{stop}}
+logit(z\mid x,y_{\le t^*})
+\right)
+$$
+
+协议续写竞争力：
+
+$$
+ProtocolRank(x)
+=
+Rank
+\left(
+\max_{z\in \mathcal{T}_{protocol}}
+logit(z\mid x,y_{\le t^*})
+\right)
+$$
+
+硬停止竞争力：
+
+$$
+EOSRank(x)
+=
+Rank
+\left(
+logit(EOS\mid x,y_{\le t^*})
+\right)
+$$
+
+关键判据：
+
+$$
+StopRank \le 10
+\quad
+\land
+\quad
+ProtocolRank = 1
+$$
+
+表示：
+
+```text
+停止词接近竞争区，
+但协议续写仍然压在前面。
+```
+
+### 五、跨模型结果
+
+总体：
+
+```text
+rows = 68
+answer_prefix_seen = 68
+stop_top10 = 61 / 68
+stop_top50 = 68 / 68
+stop_top100 = 68 / 68
+period_top50 = 68 / 68
+eos_top100 = 22 / 68
+median_stop_rank = 6
+median_eos_rank = 147
+median_protocol_rank = 1
+```
+
+下一 token top1 分布：
+
+```text
+\n: 34
+\n\n: 6
+,: 20
+.: 7
+Kingdom: 1
+```
+
+这说明：
+
+```text
+1. 句号 / soft stop（软停止）并不远；
+2. EOS / hard stop（硬结束）整体仍弱；
+3. protocol token（协议续写 token）通常排第一。
+```
+
+#### qwen3
+
+```text
+rows = 18
+stop_top10 = 18 / 18
+period_top50 = 18 / 18
+eos_top100 = 0 / 18
+median_stop_rank = 3
+median_eos_rank = 29326.5
+median_protocol_rank = 2
+next_top_tokens:
+  "." = 7
+  "\n" = 8
+  "\n\n" = 3
+median_stop_margin_vs_top = -5.3125
+```
+
+qwen3 的句号常接近甚至成为 top1，但 EOS 极弱；即使输出句号，后续仍继续生成，所以句号不是硬停止门。
+
+#### GLM4
+
+```text
+rows = 17
+stop_top10 = 12 / 17
+stop_top50 = 17 / 17
+eos_top100 = 12 / 17
+period_top50 = 17 / 17
+median_stop_rank = 7
+median_eos_rank = 36
+median_protocol_rank = 1
+next_top_tokens:
+  "\n" = 16
+  " Kingdom" = 1
+median_stop_margin_vs_top = -2.6875
+```
+
+GLM4 的 EOS 比 qwen3 更接近，但换行协议几乎总是 top1。
+
+#### DS7B
+
+```text
+rows = 33
+stop_top10 = 31 / 33
+stop_top50 = 33 / 33
+eos_top100 = 10 / 33
+period_top50 = 33 / 33
+median_stop_rank = 8
+median_eos_rank = 147
+median_protocol_rank = 1
+next_top_tokens:
+  "," = 20
+  "\n" = 10
+  "\n\n" = 3
+median_stop_margin_vs_top = -4.375
+```
+
+DS7B 主要输给 comma/list drift（逗号/列表漂移）和换行协议。
+
+### 六、结果分析
+
+Phase901 是一个重要收紧，同时也是一个正结果。
+
+正结果：
+
+```text
+1. stop token 不是完全缺失；
+2. period / soft stop 在所有样本中进入 top50；
+3. stop group 在 61 / 68 中进入 top10；
+4. 说明 clean protocol edge 不是完全不可达。
+```
+
+负结果：
+
+```text
+1. protocol_rank median = 1；
+2. next_top_token 多为 "\n"、","、"\n\n"；
+3. EOS 只有 22 / 68 进入 top100；
+4. qwen3 的 EOS rank 极低；
+5. 句号即使接近，也不是 hard stop，不能阻止继续生成。
+```
+
+因此 Phase901 的结论不是：
+
+```text
+模型没有停止信号。
+```
+
+而是：
+
+```text
+停止信号存在，但输给协议续写信号；
+hard EOS 竞争力不足；
+soft stop 不能自动变成生成停止。
+```
+
+### 七、理论进展
+
+Phase901 把 Phase900 的 unresolved ProtocolStopGate（未解决协议停止门）进一步拆成两个问题：
+
+```text
+1. stop-token availability（停止 token 可达性）；
+2. stop-token selection / termination control（停止 token 选择与终止控制）。
+```
+
+当前结果显示：
+
+```text
+soft stop availability 较强；
+hard EOS availability 较弱；
+protocol continuation selection 极强。
+```
+
+图谱结构应更新为：
+
+```text
+AnswerClassPrefix
+  -> SoftStopTokenNearBoundary
+  -> ProtocolContinuationDominates
+  -> HardEOSWeak
+  -> CleanProtocolGap
+```
+
+这比 Phase900 的“未找到停止门”更具体。
+
+### 八、问题和硬伤
+
+主要硬伤：
+
+```text
+1. Phase901 是 logit audit（对数几率审计），不是因果干预；
+2. token group 是工程分组，仍需人工校准；
+3. period 被归入 stop group，但它不是 EOS；
+4. 只测 answer-prefix 后一步，没有测更长程 stopping trajectory；
+5. 没有直接把 EOS / period patch 进去测试后续行为；
+6. 小模型可能天然偏向续写模板，导致 protocol token 过强。
+```
+
+因此 Phase901 不能说明：
+
+```text
+已经找到协议停止门。
+```
+
+只能说明：
+
+```text
+停止竞争场的形状更清楚了：
+soft stop 接近，hard EOS 弱，protocol continuation 占优。
+```
+
+### 九、闭合标准与当前距离
+
+Phase901 后 clean protocol closure（干净协议闭合）至少需要：
+
+```text
+1. AnswerClassPrefix 成立；
+2. period / EOS / stop token 进入 top-k；
+3. protocol continuation token 不再 rank=1；
+4. EOS 或真正停止动作能胜出；
+5. 后续 rollout 不进入解释、字段、列表、长短语；
+6. 控制在 holdout 上稳定。
+```
+
+当前满足：
+
+```text
+1. AnswerClassPrefix = 68 / 68；
+2. StopTop50 = 68 / 68；
+3. StopTop10 = 61 / 68。
+```
+
+当前未满足：
+
+```text
+1. ProtocolRank 仍接近 1；
+2. EOSTop100 只有 22 / 68；
+3. hard stop 没有胜出；
+4. clean protocol rollout 仍为 0。
+```
+
+当前进度评估：
+
+```text
+全局齿轮图谱:
+  86% - 90%
+
+语言编码机制闭合:
+  43% - 48%
+```
+
+图谱进度继续上升，因为 clean protocol gap（干净协议缺口）从“未知”变成了“soft stop 近、protocol continuation 强、hard EOS 弱”的明确形状。闭合进度只小幅回升，因为还没有因果控制成功。
+
+### 十、第一性原理洞察
+
+Phase901 的关键洞察是：
+
+```text
+自然语言回答的“停止”不是一个普通语义类别；
+它是一个输出控制动作。
+```
+
+模型已经知道：
+
+```text
+应该说 animal / material / shape / vehicle
+```
+
+也部分知道：
+
+```text
+可以接句号。
+```
+
+但它更倾向于：
+
+```text
+换行、逗号、字段、列表、解释。
+```
+
+所以语言编码机制至少包括：
+
+```text
+semantic answer field（语义答案场）
+protocol continuation field（协议续写场）
+termination control field（终止控制场）
+```
+
+目前前两者已经可见，第三者尚未被因果定位。
+
+### 十一、下一阶段
+
+Phase901 与下一阶段仍属于同一个阶段性目标：完成全局齿轮图谱中 clean protocol edge（干净协议边）的定位。
+
+下一阶段应进入：
+
+```text
+Phase902:
+Protocol Continuation Suppressor Search
+协议续写抑制器搜索
+```
+
+任务：
+
+```text
+1. 不再把 stop token 当唯一目标；
+2. 直接针对 rank=1 的 protocol continuation token 做 suppressor search；
+3. 分别抑制 newline、comma、Category/Item/Class、explanation opener；
+4. 测试是否能让 period/EOS 或更短答案胜出；
+5. 如果成功，再组合 semantic axis + protocol suppressor；
+6. 如果失败，说明协议续写是分布式场，不是单点 stop gate。
+```
+
+## Phase 902: 协议续写抑制器搜索 [2026-07-03 18:15]
+
+### 一、对上传内容的判断
+
+上传内容对 Phase900 / Phase901 的判断基本正确。当前不能再写成“模型没有停止信号”，更准确的事实链是：
+
+```text
+DomainAxis（领域坐标轴）
+  -> AnswerClassPrefix（答案类别前缀）
+  -> SoftStopTokenNearBoundary（软停止 token 靠近边界）
+  -> ProtocolContinuationDominates（协议续写占优）
+  -> CleanProtocolGap（干净协议缺口）
+```
+
+Phase900 只排除了简单 step=1/2 协议停止门，没有排除所有停止门。Phase901 证明 stop token 并非缺失，period / soft stop 已经靠近竞争区，但 EOS / hard stop 仍弱，协议续写 token 多数仍在 rank=1。因此 Phase902 继续同一阶段性目标：定位 clean protocol edge（干净协议边）的失败形状。
+
+### 二、测试原理
+
+本阶段读取 Phase899 中满足以下条件的样本：
+
+```text
+is_source_candidate = true
+rollout_answer_class = true
+protocol_drift = true
+```
+
+总样本：
+
+```text
+qwen3: 18
+GLM4: 17
+DS7B: 33
+total: 68
+```
+
+Phase902 不再只看 stop token 是否存在，而是在 answer-class prefix 后，对 protocol continuation token 做有限抑制器搜索。测试控制包括：
+
+```text
+1. baseline_after_answer_prefix
+2. source_repeat_after_prefix
+3. gear_half_after_prefix
+4. gear_zero_after_prefix
+5. gear_flip_after_prefix
+6. head_zero_after_prefix
+```
+
+控制生效位置是答案前缀后的前两个后续步：
+
+```text
+suppress_steps = 2
+```
+
+这样可以同时覆盖：
+
+```text
+1. 第一步直接输出 newline / comma / field token 的情况；
+2. qwen3 先输出 period，但第二步继续解释或换行的情况。
+```
+
+核心指标：
+
+$$
+P_0(x)=\arg\max_{z\in \mathcal{T}_{protocol}} logit(z\mid x,y_{\le t^*})
+$$
+
+$$
+\Delta_{protocol}(C,x)
+=
+logit_C(P_0(x)\mid x,y_{\le t^*})
+-
+logit_0(P_0(x)\mid x,y_{\le t^*})
+$$
+
+$$
+Removed(C,x)
+=
+\mathbf{1}
+[
+ProtocolRank_0(x)=1
+\land
+ProtocolRank_C(x)>1
+]
+$$
+
+$$
+Clean(C,x)
+=
+AnswerClass(C,x)
+\cdot
+(1-ObjectEcho(C,x))
+\cdot
+(1-ProtocolDrift(C,x))
+$$
+
+其中：
+
+```text
+Delta_protocol < 0 表示协议续写 token 被压低；
+Removed = 1 表示 protocol rank=1 被移除；
+Clean = 1 才表示真正短答案干净闭合。
+```
+
+### 三、脚本与结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase902_protocol_continuation_suppressor_search.py
+tests/glm5/run_phase902_protocol_continuation_suppressor_search.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase902_protocol_continuation_suppressor_search/protocol_continuation_suppressor_search/
+```
+
+关键结果文件：
+
+```text
+phase902_cross_model_summary.md
+phase902_cross_model_summary.json
+phase902_qwen3_rows.jsonl
+phase902_glm4_rows.jsonl
+phase902_deepseek7b_rows.jsonl
+```
+
+### 四、跨模型客观结果
+
+总体结果：
+
+```text
+selected_answer_drift_rows = 68
+control_rows = 973
+non_base_clean_answer_no_protocol = 0
+non_base_protocol_drift = 905
+non_base_protocol_rank1_removed = 8
+non_base_protocol_logit_delta_negative = 281
+non_base_protocol_logit_delta_below_minus_0_5 = 57
+non_base_next_top_changed = 28
+non_base_stop_rank_improved = 5
+non_base_stop_top1 = 110
+```
+
+结论非常明确：
+
+```text
+有限抑制器可以轻微压低协议续写 logit；
+少数样本可以移除 protocol rank=1；
+但 clean_answer_no_protocol 仍然是 0。
+```
+
+### 五、分模型结果
+
+#### qwen3
+
+```text
+selected_rows = 18
+control_rows = 308
+
+baseline:
+  clean_answer_no_protocol = 0
+  protocol_top1 = 8 / 18
+  stop_top1 = 7 / 18
+  stop_top10 = 18 / 18
+  next_top_tokens = {newline: 8, double_newline: 3, period: 7}
+
+non_baseline:
+  clean_answer_no_protocol = 0
+  protocol_rank1_removed = 2 / 290
+  protocol_logit_delta_negative = 72 / 290
+  protocol_logit_delta_below_minus_0_5 = 17 / 290
+  next_top_changed = 2 / 290
+  stop_rank_improved = 0 / 290
+  stop_top1 = 110 / 290
+```
+
+qwen3 的关键现象是：period 已经经常是 top1，但 rollout 仍然进入解释或换行，所以问题不是“句号不可达”，而是 soft stop 不能变成 hard termination。
+
+最佳控制：
+
+```text
+head_zero_after_prefix::L31H0+L31H1+L31H2+L31H3
+clean = 0
+protocol_rank1_removed = 2 / 16
+next_top_changed = 2 / 16
+```
+
+#### GLM4
+
+```text
+selected_rows = 17
+control_rows = 170
+
+baseline:
+  clean_answer_no_protocol = 0
+  protocol_top1 = 16 / 17
+  stop_top1 = 0 / 17
+  stop_top10 = 12 / 17
+  next_top_tokens = {newline: 16, " Kingdom": 1}
+
+non_baseline:
+  clean_answer_no_protocol = 0
+  protocol_rank1_removed = 0 / 153
+  protocol_logit_delta_negative = 55 / 153
+  protocol_logit_delta_below_minus_0_5 = 0 / 153
+  next_top_changed = 0 / 153
+  stop_rank_improved = 5 / 153
+```
+
+GLM4 的 newline protocol field 最硬。有限控制能造成很弱的 logit 变化，但不能改变 top1，也不能产生 clean rollout。
+
+#### DS7B
+
+```text
+selected_rows = 33
+control_rows = 495
+
+baseline:
+  clean_answer_no_protocol = 0
+  protocol_top1 = 30 / 33
+  stop_top1 = 0 / 33
+  stop_top10 = 31 / 33
+  next_top_tokens = {comma: 20, newline: 10, double_newline: 3}
+
+non_baseline:
+  clean_answer_no_protocol = 0
+  protocol_rank1_removed = 6 / 462
+  protocol_logit_delta_negative = 154 / 462
+  protocol_logit_delta_below_minus_0_5 = 40 / 462
+  next_top_changed = 26 / 462
+  stop_rank_improved = 0 / 462
+```
+
+DS7B 比 GLM4 更容易发生 next_top_changed，但主要是在 comma / newline / 其他延续 token 之间切换，仍然不进入 clean protocol closure。
+
+最佳控制：
+
+```text
+head_zero_after_prefix::L26H3+L26H7+L26H11+L26H14
+clean = 0
+protocol_rank1_removed = 1 / 33
+protocol_logit_delta_below_minus_0_5 = 5 / 33
+```
+
+### 六、阶段结论
+
+Phase902 是一个重要负结果，也是一次图谱收紧：
+
+```text
+简单 gear 置零 / 翻转 / 减半；
+简单 source repeat；
+有限历史 head / 同层 head 置零；
+
+都不能把 AnswerClassPrefix 之后的协议续写转成 clean short answer。
+```
+
+这说明 clean protocol edge 不太像一个局部开关：
+
+```text
+不是：
+  找到某个 head / channel -> 关掉 -> 短答案闭合
+
+更像：
+  answer prefix 后进入一个分布式 protocol continuation attractor
+  stop token 靠近但无法控制终止动作
+```
+
+当前图谱应更新为：
+
+```text
+DomainAxis
+  -> AnswerClassPrefix
+  -> StopNearBoundary
+  -> ProtocolContinuationAttractor
+      - qwen3: period 可达，但后续继续
+      - GLM4: newline protocol 极强
+      - DS7B: comma/list 与 newline protocol 极强
+  -> CleanProtocolGap
+```
+
+### 七、硬伤和边界
+
+本阶段不能说明协议控制完全无法闭合，原因是：
+
+```text
+1. 控制集合仍然有限；
+2. head 搜索只覆盖历史 head 与同层前若干 head；
+3. gear 控制只覆盖 source gears，没有覆盖全模型 protocol gears；
+4. suppress_steps = 2，只测试短程边界；
+5. protocol token group 仍是工程分组；
+6. 小模型可能有更强模板续写惯性，导致 protocol continuation 被放大。
+```
+
+所以 Phase902 只能证明：
+
+```text
+没有发现简单局部协议续写抑制器；
+协议续写场具有分布式、吸引子式特征；
+clean protocol closure 仍未完成。
+```
+
+不能证明：
+
+```text
+协议停止机制不存在；
+语言编码机制无法闭合。
+```
+
+### 八、对智能理论的影响
+
+当前结果进一步支持：
+
+```text
+语言输出不是单纯 semantic token selection；
+至少包含 semantic answer field、protocol continuation field、termination control field 三个场。
+```
+
+更重要的是，termination control 不是普通语义分类，而是对生成轨迹的停止动作控制。当前模型已经具备：
+
+```text
+1. 把对象映射到答案类别；
+2. 把答案类别 token 推到前排；
+3. 让 period / stop token 靠近边界。
+```
+
+但还没有稳定完成：
+
+```text
+4. 让 hard stop / termination action 胜过 protocol continuation。
+```
+
+这意味着语言编码机制中的“答案是什么”和“回答到哪里结束”在小模型里可能是分开的齿轮系统。
+
+### 九、进度评估
+
+```text
+全局齿轮图谱:
+  87% - 91%
+
+语言编码机制闭合:
+  43% - 48%
+```
+
+图谱进度继续上升，因为协议缺口形状进一步明确：不是 stop token 缺失，也不是简单局部 suppressor 可修复，而是 protocol continuation attractor 占优。闭合进度没有明显上升，因为 clean_answer_no_protocol 仍为 0。
+
+### 十、下一阶段
+
+Phase902 完成了 Phase901 提出的有限协议续写抑制器预筛。下一步仍服务于 clean protocol edge，但已经从“简单 suppressor search”进入更大的图谱阶段：
+
+```text
+Phase903:
+Protocol Continuation Field Mapping
+协议续写场图谱化
+```
+
+下一阶段不应继续盲目扩大局部 patch，而应：
+
+```text
+1. 对 newline / comma / field / explanation continuation 分别建图；
+2. 区分 prompt protocol prior 与 answer-prefix 后续写 prior；
+3. 找 protocol continuation 的全模型来源层、来源 head、来源 MLP 通道；
+4. 把 qwen3 的 soft-stop-after-period 与 GLM4 / DS7B 的 newline/comma drift 分开；
+5. 先完成 protocol continuation field graph，再尝试 termination control closure。
+```
+
+阶段性判断：
+
+```text
+当前任务与 Phase901 / Phase902 属于同一 clean protocol edge 定位阶段；
+本阶段已完成有限抑制器预筛；
+下一任务属于更大一层的协议续写场图谱化阶段，应作为新的阶段继续。
+```
+
+## Phase 903: 协议续写场图谱化 [2026-07-03 18:58]
+
+### 一、对上传内容的判断
+
+上传内容对 Phase902 的判断基本正确。最重要的收紧是：
+
+```text
+Phase901:
+  stop token 并非缺失，soft stop 已经靠近边界。
+
+Phase902:
+  简单局部抑制器不能把协议续写变成干净短答案。
+
+Phase903:
+  应从“找一个 suppressor”转向“画出 protocol continuation field”。
+```
+
+需要严格限定：Phase902 不是证明协议停止机制不存在，而是证明当前有限控制没有找到简单局部协议续写抑制器。上传内容中提出的 Phase903 方向正确：先按 newline / comma / field / explanation / list 等漂移模式建图，再考虑 termination control closure（终止控制闭合）。
+
+### 二、Phase903 测试目标
+
+本阶段继续同一阶段性目标：定位 clean protocol edge（干净协议边）的失败来源。但任务层级从：
+
+```text
+Can we suppress one protocol token?
+能不能压低某个协议 token？
+```
+
+升级为：
+
+```text
+Where does the protocol continuation field come from?
+协议续写场从哪里来？
+```
+
+具体测试三件事：
+
+```text
+1. prompt protocol prior（提示协议先验）与 answer-prefix continuation prior（答案前缀续写先验）的差异；
+2. 逐层 attention / MLP 组件置零对协议 token logit 的影响；
+3. 协议 token 之间的替代关系。
+```
+
+### 三、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase903_protocol_continuation_field_mapping.py
+tests/glm5/run_phase903_protocol_continuation_field_mapping.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase903_protocol_continuation_field_mapping/protocol_continuation_field_mapping/
+```
+
+关键结果：
+
+```text
+phase903_cross_model_summary.md
+phase903_cross_model_summary.json
+phase903_qwen3_state_rows.jsonl
+phase903_qwen3_component_rows.jsonl
+phase903_glm4_state_rows.jsonl
+phase903_glm4_component_rows.jsonl
+phase903_deepseek7b_state_rows.jsonl
+phase903_deepseek7b_component_rows.jsonl
+```
+
+### 四、测试原理
+
+样本仍然来自 Phase899：
+
+```text
+is_source_candidate = true
+rollout_answer_class = true
+protocol_drift = true
+```
+
+样本量：
+
+```text
+qwen3: 18
+GLM4: 17
+DS7B: 33
+total: 68
+```
+
+非重叠协议类别重新定义为：
+
+```text
+newline
+comma
+field_word
+explanation
+list_word
+period
+eos
+```
+
+协议场：
+
+$$
+\mathcal{T}_{protocol}
+=
+\mathcal{T}_{newline}
+\cup
+\mathcal{T}_{comma}
+\cup
+\mathcal{T}_{field}
+\cup
+\mathcal{T}_{explanation}
+\cup
+\mathcal{T}_{list}
+$$
+
+停止场：
+
+$$
+\mathcal{T}_{stop}
+=
+\mathcal{T}_{period}
+\cup
+\mathcal{T}_{EOS}
+$$
+
+答案前缀位置：
+
+$$
+t^*
+=
+\min_t[
+AnswerClassPrefix(y_{\le t})=1
+]
+$$
+
+协议最佳类别：
+
+$$
+c^*(x)
+=
+\arg\max_{c\in \mathcal{C}_{protocol}}
+\max_{z\in \mathcal{T}_c}
+logit(z\mid x,y_{\le t^*})
+$$
+
+逐层组件置零：
+
+$$
+\Delta_{l,k}^{protocol}(x)
+=
+logit_{zero(l,k)}(P_0(x))
+-
+logit_{base}(P_0(x))
+$$
+
+其中：
+
+```text
+l: layer
+k: attention 或 MLP
+P_0(x): baseline 下最强协议 token
+```
+
+协议替代边：
+
+$$
+Substitution(C,x)
+=
+c_{base}(x)
+\rightarrow
+c_C(x)
+$$
+
+含义是：置零某个组件后，最高输出或协议最佳类别从一个协议类型切到另一个协议类型。
+
+### 五、跨模型总体结果
+
+```text
+selected_answer_drift_rows = 68
+state_rows = 68
+component_rows = 4504
+component_protocol_logit_reduced = 2309
+component_protocol_logit_reduced_strong = 873
+component_protocol_rank1_removed = 66
+component_next_top_changed = 417
+component_stop_rank_improved = 738
+```
+
+这说明：
+
+```text
+协议续写场确实有可观察的逐层组件来源；
+置零 attention / MLP 能大量压低协议 token；
+但主要结果仍是协议内部替代，不是干净终止。
+```
+
+### 六、状态先验结果
+
+#### qwen3
+
+```text
+rows = 18
+prompt_next_top_categories = {list_word: 5, other: 13}
+answer_next_top_categories = {newline: 11, period: 7}
+prompt_protocol_best_categories = {list_word: 18}
+answer_protocol_best_categories = {newline: 18}
+answer_protocol_top1 = 11 / 18
+answer_stop_top1 = 7 / 18
+answer_stop_top10 = 18 / 18
+median_protocol_rank_delta_answer_minus_prompt = -5
+```
+
+解释：
+
+```text
+qwen3 在 prompt 阶段的协议先验偏 list_word；
+答案前缀后统一切到 newline protocol；
+同时 period 有 7 / 18 成为 top1，但并不产生 hard termination。
+```
+
+#### GLM4
+
+```text
+rows = 17
+prompt_next_top_categories = {other: 17}
+answer_next_top_categories = {newline: 16, other: 1}
+prompt_protocol_best_categories = {explanation: 8, field_word: 2, list_word: 7}
+answer_protocol_best_categories = {newline: 17}
+answer_protocol_top1 = 16 / 17
+answer_stop_top1 = 0 / 17
+answer_stop_top10 = 12 / 17
+median_protocol_rank_delta_answer_minus_prompt = -38
+```
+
+解释：
+
+```text
+GLM4 的协议续写不是简单继承 prompt prior；
+答案前缀后 newline protocol 被极强激活；
+这是当前最硬的 newline continuation field。
+```
+
+#### DS7B
+
+```text
+rows = 33
+prompt_next_top_categories = {list_word: 9, other: 24}
+answer_next_top_categories = {comma: 20, newline: 13}
+prompt_protocol_best_categories = {explanation: 5, list_word: 28}
+answer_protocol_best_categories = {comma: 18, newline: 15}
+answer_protocol_top1 = 33 / 33
+answer_stop_top1 = 0 / 33
+answer_stop_top10 = 31 / 33
+median_protocol_rank_delta_answer_minus_prompt = -2
+```
+
+解释：
+
+```text
+DS7B 的答案前缀后协议场不是单一 newline；
+而是 comma / newline 双吸引子；
+这解释了 Phase902 中压低一个协议 token 后经常转向另一个协议 token。
+```
+
+### 七、组件来源结果
+
+#### qwen3
+
+```text
+component_rows = 1296
+protocol_logit_reduced = 575
+protocol_logit_reduced_strong = 147
+protocol_rank1_removed = 1
+next_top_changed = 101
+stop_rank_improved = 140
+```
+
+按组件：
+
+```text
+attention:
+  strong_reduced = 62
+  rank1_removed = 1
+  next_top_changed = 57
+  stop_rank_improved = 67
+
+MLP:
+  strong_reduced = 85
+  rank1_removed = 0
+  next_top_changed = 44
+  stop_rank_improved = 73
+```
+
+最强组件：
+
+```text
+L35 MLP newline:
+  rows = 18
+  strong_reduced = 18
+  mean_delta = -12.1597
+
+L35 attention newline:
+  rows = 18
+  strong_reduced = 18
+  mean_delta = -2.2222
+```
+
+qwen3 的 newline field 明显集中在末层附近，但移除 rank1 很少，说明它更像已成形的输出场，而不是单点开关。
+
+#### GLM4
+
+```text
+component_rows = 1360
+protocol_logit_reduced = 711
+protocol_logit_reduced_strong = 173
+protocol_rank1_removed = 13
+next_top_changed = 36
+stop_rank_improved = 307
+```
+
+按组件：
+
+```text
+attention:
+  strong_reduced = 47
+  rank1_removed = 11
+  next_top_changed = 21
+  stop_rank_improved = 131
+
+MLP:
+  strong_reduced = 126
+  rank1_removed = 2
+  next_top_changed = 15
+  stop_rank_improved = 176
+```
+
+最强组件：
+
+```text
+L39 MLP newline:
+  rows = 17
+  strong_reduced = 17
+  mean_delta = -2.2684
+
+L38 attention newline:
+  rows = 17
+  strong_reduced = 8
+  rank1_removed = 6
+  mean_delta = -0.9522
+
+L22 attention newline:
+  rows = 17
+  strong_reduced = 10
+  rank1_removed = 4
+  mean_delta = -0.3860
+```
+
+GLM4 的 newline field 有末层 MLP 强来源，也有中后层 attention 对 rank1 的影响，但仍不形成干净停止。
+
+#### DS7B
+
+```text
+component_rows = 1848
+protocol_logit_reduced = 1023
+protocol_logit_reduced_strong = 553
+protocol_rank1_removed = 52
+next_top_changed = 280
+stop_rank_improved = 291
+```
+
+按组件：
+
+```text
+attention:
+  strong_reduced = 267
+  rank1_removed = 44
+  next_top_changed = 153
+  stop_rank_improved = 121
+  mean_delta = -0.6699
+
+MLP:
+  strong_reduced = 286
+  rank1_removed = 8
+  next_top_changed = 127
+  stop_rank_improved = 170
+  mean_delta = -0.0554
+```
+
+按协议类别：
+
+```text
+comma:
+  rows = 1008
+  strong_reduced = 294
+  rank1_removed = 21
+  next_top_changed = 25
+  mean_delta = -0.2833
+
+newline:
+  rows = 840
+  strong_reduced = 259
+  rank1_removed = 31
+  next_top_changed = 255
+  mean_delta = -0.4579
+```
+
+最强组件：
+
+```text
+L27 attention comma:
+  rows = 18
+  strong_reduced = 18
+  rank1_removed = 11
+  mean_delta = -8.6632
+
+L0 attention comma:
+  rows = 18
+  strong_reduced = 18
+  rank1_removed = 6
+  mean_delta = -8.4861
+
+L27 attention newline:
+  rows = 15
+  strong_reduced = 15
+  rank1_removed = 6
+  mean_delta = -7.6896
+
+L0 attention newline:
+  rows = 15
+  strong_reduced = 15
+  rank1_removed = 5
+  mean_delta = -8.8167
+```
+
+DS7B 的协议场来源最清楚：attention 对 comma/newline 的 rank1 更敏感，MLP 也能压低 logit，但更像分布式调制。
+
+### 八、协议替代图
+
+跨模型最高 token 替代关系：
+
+```text
+comma -> list_word: 4
+comma -> newline: 48
+comma -> other: 21
+newline -> comma: 73
+newline -> newline: 195
+newline -> other: 45
+other -> newline: 20
+other -> other: 2
+period -> newline: 6
+period -> other: 1
+period -> period: 2
+```
+
+关键现象：
+
+```text
+1. comma 和 newline 之间存在明显互相替代；
+2. qwen3 的 period 被扰动后常转向 newline；
+3. DS7B 的 comma/newline 双吸引子最明显；
+4. GLM4 的 newline 场最刚性，替代较少。
+```
+
+因此 Phase903 支持 Phase902 的判断：
+
+```text
+协议漂移不是某个 token 的孤立问题；
+它是一个 protocol continuation field。
+```
+
+### 九、阶段结论
+
+Phase903 是实质图谱进展，不是闭合阶段。
+
+它第一次把 Phase902 的“协议续写吸引子”拆成可观察结构：
+
+```text
+prompt prior:
+  list_word / explanation / other
+
+answer-prefix continuation prior:
+  qwen3 -> newline + period
+  GLM4 -> newline
+  DS7B -> comma + newline
+
+component sources:
+  qwen3 -> late MLP / late attention newline field
+  GLM4 -> late MLP newline + mid/late attention rank influence
+  DS7B -> attention-sensitive comma/newline field
+
+substitution graph:
+  comma <-> newline
+  period -> newline
+```
+
+这比 Phase902 更进一步，因为它不再只说“局部抑制失败”，而是说明失败后的替代路径是什么。
+
+### 十、硬伤和边界
+
+必须谨慎：
+
+```text
+1. 组件置零是粗粒度干预，不等于真实内部机制完全归因；
+2. attention / MLP 输出整体置零可能引入分布外扰动；
+3. 本阶段没有继续做 clean rollout，所以不能宣称闭合改善；
+4. protocol category 仍是工程分组；
+5. 只扫描 answer-prefix 边界，没有扫描更长轨迹；
+6. 小模型可能放大模板续写，真实大模型协议场可能更可控。
+```
+
+因此本阶段结论只能写成：
+
+```text
+协议续写场已有可观察来源和替代关系；
+但 termination control field 尚未定位；
+clean protocol closure 仍为 0。
+```
+
+### 十一、理论进展
+
+当前理论应更新为：
+
+```text
+条件化输出场闭合理论
+  + 语义答案场
+  + 停止竞争场
+  + 协议续写场
+  + 协议替代图
+  + 未闭合终止控制场
+```
+
+更准确的语言输出公式：
+
+$$
+Output(x)
+=
+F(
+S_{answer}(x),
+S_{stop}(x),
+S_{protocol}(x),
+A_{substitution}(x),
+T_{termination}(x)
+)
+$$
+
+其中：
+
+```text
+S_answer: 语义答案场
+S_stop: 停止 token 竞争场
+S_protocol: 协议续写场
+A_substitution: 协议替代图
+T_termination: 终止控制场
+```
+
+当前已经较清楚的是：
+
+```text
+S_answer
+S_stop
+S_protocol
+A_substitution
+```
+
+仍未闭合的是：
+
+```text
+T_termination
+```
+
+### 十二、进度评估
+
+```text
+全局齿轮图谱:
+  89% - 92%
+
+语言编码机制闭合:
+  44% - 49%
+```
+
+图谱进度上升，因为协议续写场已经从抽象判断变成了可分解的组件来源和替代图。闭合进度只小幅上升，因为没有产生 clean_answer_no_protocol。
+
+### 十三、下一阶段
+
+Phase903 与 Phase902 属于同一 clean protocol edge 大阶段，但已经完成了协议续写场的第一版图谱化。下一阶段应继续在同一阶段性目标下自动推进：
+
+```text
+Phase904:
+Termination Control Candidate Search
+终止控制候选搜索
+```
+
+目标不是继续压低 newline/comma，而是寻找：
+
+```text
+1. period 后为什么继续；
+2. EOS 为什么不胜出；
+3. 是否存在 termination action 的来源层或 head；
+4. stop token 与 protocol token 的差分方向；
+5. 能否构造 semantic axis + protocol field map + termination candidate 的组合测试。
+```
+
+成功标准：
+
+```text
+最低标准:
+  找到 period 后继续的主要来源层 / 组件。
+
+中等标准:
+  找到能提高 EOS / stop action 相对 protocol 的组件。
+
+高标准:
+  在 holdout 上让 protocol continuation rank 明显下降且 stop rank 明显上升。
+
+最高标准:
+  clean_answer_no_protocol > 0。
+```
+
+## Phase 904: 终止控制候选搜索 [2026-07-03 19:13]
+
+### 一、任务来源
+
+本阶段接续 Phase903。Phase903 已经把 Phase902 的负结果推进成协议续写场图谱：
+
+```text
+newline continuation
+comma/list continuation
+field/explanation continuation
+period 后继续
+stop / EOS 弱竞争
+```
+
+附件中关于 Phase902 的判断基本正确：Phase902 没有证明“永远无法闭合”，但证明了单纯压低局部协议续写组件不足以产生 clean answer closure。更准确地说：
+
+```text
+协议续写不是一个可由单点 suppressor 直接关闭的局部噪声项；
+它更像是答案场之后自然接管的 protocol continuation field。
+```
+
+因此 Phase904 的目标不是继续寻找更强的 newline / comma suppressor，而是把 Phase903 得到的 top protocol-source components 当作 termination control candidates，测试它们是否能在 rollout 中产生真实终止。
+
+### 二、测试脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase904_termination_control_candidate_search.py
+tests/glm5/run_phase904_termination_control_candidate_search.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase904_termination_control_candidate_search/termination_control_candidate_search/
+```
+
+核心结果文件：
+
+```text
+phase904_cross_model_summary.json
+phase904_cross_model_summary.md
+phase904_qwen3_rows.jsonl
+phase904_glm4_rows.jsonl
+phase904_deepseek7b_rows.jsonl
+```
+
+### 三、测试原理
+
+Phase904 使用 Phase899 中已经确认的 selected answer drift rows：
+
+```text
+qwen3: 18
+GLM4: 17
+DS7B: 33
+合计: 68
+```
+
+每个模型读取 Phase903 的 top protocol continuation components，按模型选择 8 个候选组件，候选来源包括：
+
+```text
+attention_zero_L*
+mlp_zero_L*
+newline-source components
+comma-source components
+```
+
+然后在 answer-prefix 已经生成之后，对候选组件做前 2 个 suffix step 的 component-zero intervention，再 rollout 8 个 token，观察是否从协议续写转为真实终止。
+
+干预形式：
+
+$$
+h_{\ell}^{kind}(x,t) \leftarrow 0,\quad t \in \{t_{answer+1}, t_{answer+2}\}
+$$
+
+其中：
+
+```text
+kind ∈ {attention, mlp}
+t_answer 表示答案前缀之后的生成位置
+```
+
+协议 token logit 变化：
+
+$$
+\Delta^{protocol}_{C}(x)
+=
+z_C(p_0 \mid x) - z_0(p_0 \mid x)
+$$
+
+其中：
+
+```text
+C: 候选控制组件
+p_0: baseline protocol-best token
+z_C: 干预后的 logit
+z_0: baseline logit
+```
+
+stop rank 改善：
+
+$$
+G_{stop}(C,x)
+=
+rank_0(s_0 \mid x) - rank_C(s_0 \mid x)
+$$
+
+若：
+
+$$
+G_{stop}(C,x) > 0
+$$
+
+说明 stop token 排名上升。
+
+严格 clean 判定改为：
+
+$$
+Clean_{strict}(C,x)
+=
+AnswerClass(C,x)
+\land
+\neg ObjectEcho(C,x)
+\land
+\neg ProtocolDrift(C,x)
+\land
+\neg StrictProtocolDrift(C,x)
+$$
+
+这个修正确认非常重要。初始宽松统计中曾出现 6 个 nominal clean，但人工核查发现它们包含：
+
+```text
+animal, mammal, quadruped,
+Animal.Humanity. 1.
+```
+
+这类输出不是 clean answer，而是协议/枚举/异常续写。因此本阶段最终以 strict clean 为准。
+
+### 四、总体结果
+
+跨模型统计：
+
+```text
+candidate_count: 24
+control_rows: 612
+selected_answer_drift_rows: 68
+
+non_base_clean_answer_no_protocol: 6
+non_base_strict_clean_answer_no_protocol: 0
+non_base_protocol_drift: 535
+non_base_strict_protocol_drift: 541
+non_base_protocol_logit_reduced_strong: 380
+non_base_protocol_rank1_removed: 48
+non_base_stop_rank_improved: 92
+non_base_stop_top1: 55
+non_base_next_top_changed: 102
+```
+
+关键结论：
+
+```text
+名义 clean = 6
+严格 clean = 0
+```
+
+因此本阶段不能记为 closure positive，而应记为：
+
+```text
+termination competition can be shifted,
+but termination action is not closed.
+```
+
+中文解释：
+
+```text
+候选组件可以移动协议续写竞争场，
+可以让部分 protocol rank1 被移除，
+也可以让 stop rank 改善，
+但没有产生可靠的干净停机。
+```
+
+### 五、分模型结果
+
+#### qwen3
+
+```text
+selected_answer_drift_rows: 18
+candidate_count: 8
+control_rows: 162
+
+non_base_strict_clean_answer_no_protocol: 0
+non_base_protocol_drift: 140
+non_base_protocol_logit_reduced_strong: 85
+non_base_protocol_rank1_removed: 0
+non_base_stop_rank_improved: 35
+non_base_stop_top1: 55
+non_base_next_top_changed: 15
+```
+
+最佳候选：
+
+```text
+attention_zero_L34
+source_category: newline
+rows: 18
+strict_clean: 0
+protocol_drift: 18
+protocol_rank1_removed: 0
+stop_rank_improved: 8
+first_suffix_categories:
+  newline: 11
+  period: 7
+```
+
+qwen3 的结果说明：stop token 竞争可以被提高，甚至 non-base stop_top1 达到 55，但只要 rollout 继续产生 newline / explanation / field_word，就不能算 clean closure。
+
+#### GLM4
+
+```text
+selected_answer_drift_rows: 17
+candidate_count: 8
+control_rows: 153
+
+non_base_strict_clean_answer_no_protocol: 0
+non_base_protocol_drift: 136
+non_base_protocol_logit_reduced_strong: 85
+non_base_protocol_rank1_removed: 12
+non_base_stop_rank_improved: 26
+non_base_stop_top1: 0
+non_base_next_top_changed: 14
+```
+
+最佳候选：
+
+```text
+attention_zero_L38
+source_category: newline
+rows: 17
+strict_clean: 0
+protocol_drift: 17
+protocol_rank1_removed: 6
+stop_rank_improved: 2
+first_suffix_categories:
+  comma: 1
+  newline: 9
+  other: 7
+```
+
+GLM4 的结果说明：它更明显表现为 competition shift，而不是 stop activation。协议 rank1 可以被移除，但替代项仍属于协议续写或异常续写。
+
+#### DS7B
+
+```text
+selected_answer_drift_rows: 33
+candidate_count: 8
+control_rows: 297
+
+non_base_strict_clean_answer_no_protocol: 0
+non_base_protocol_drift: 259
+non_base_protocol_logit_reduced_strong: 210
+non_base_protocol_rank1_removed: 36
+non_base_stop_rank_improved: 31
+non_base_stop_top1: 0
+non_base_next_top_changed: 73
+```
+
+最佳候选：
+
+```text
+attention_zero_L27
+source_category: comma
+rows: 33
+strict_clean: 0
+protocol_drift: 32
+protocol_rank1_removed: 17
+stop_rank_improved: 0
+first_suffix_categories:
+  comma: 12
+  newline: 4
+  other: 17
+```
+
+DS7B 的结果最能说明当前瓶颈：逗号协议续写场很强，attention_zero_L27 可以显著压低 comma continuation，并移除 17 个 rank1 protocol cases，但替代输出不是稳定 stop，而是 other / newline / comma 的重新分配。
+
+### 六、正确性分析
+
+附件中 Phase902 的判断可以保留，但需要加一条更严格边界：
+
+```text
+Phase902/903/904 共同证明的是：
+协议续写场可以被分解、压低、重排；
+但终止控制场尚未被找到。
+```
+
+不能说：
+
+```text
+找到了 clean answer closure
+找到了完整 termination gear
+找到了语言编码闭合
+```
+
+因为：
+
+```text
+1. strict clean = 0；
+2. nominal clean 全部可能被严格审计排除；
+3. stop rank 改善没有稳定转换为 rollout 停止；
+4. protocol rank1 removed 后常出现 protocol substitution。
+```
+
+更准确的图谱位置是：
+
+```text
+semantic answer field 已经较稳定；
+protocol continuation field 已经可图谱化；
+protocol substitution graph 已经出现；
+termination control field 仍缺关键来源。
+```
+
+### 七、理论进展
+
+本阶段最大的进展不是找到闭合，而是修正了闭合标准：
+
+```text
+只看 answer class 是不够的；
+只看 protocol logit 下降是不够的；
+只看 stop rank 改善也是不够的；
+必须看 rollout 后是否真的没有协议拖尾。
+```
+
+因此 clean closure 的层级应改为：
+
+$$
+\Delta z_{protocol} < 0
+\Rightarrow
+rank(protocol) \downarrow
+\Rightarrow
+rank(stop) \uparrow
+\Rightarrow
+StopAction
+\Rightarrow
+Clean_{strict}
+$$
+
+Phase904 只达到：
+
+$$
+\Delta z_{protocol} < 0
+,\quad
+rank(protocol) \downarrow
+,\quad
+rank(stop) \uparrow
+$$
+
+但没有达到：
+
+$$
+StopAction
+\Rightarrow
+Clean_{strict}
+$$
+
+这说明 stop token 竞争场和真实终止动作之间存在缺失环节。
+
+### 八、核心硬伤
+
+#### 1. stop rank 不是 stop action
+
+qwen3 出现很多 stop_top1，但 rollout 仍然不是严格 clean。这说明：
+
+```text
+stop token 的 next-token 竞争优势
+不等于模型进入终止动作状态。
+```
+
+可能存在：
+
+```text
+termination control state
+decode policy boundary
+special-token suppression
+chat-template prior
+answer-prefix continuation prior
+```
+
+这些因素在当前局部 component-zero 中没有被控制。
+
+#### 2. protocol substitution 仍然存在
+
+DS7B 的 attention_zero_L27 可以移除大量 comma rank1，但输出转向 other / newline，而不是终止。这说明：
+
+```text
+协议续写不是单 token 问题，
+而是多候选替代场。
+```
+
+#### 3. 小模型偏差仍然明显
+
+当前 qwen3、GLM4、DS7B 都是小模型或较粗糙结构模型。小模型可能把：
+
+```text
+语义答案
+格式协议
+枚举习惯
+解释性续写
+终止控制
+```
+
+压缩在相互纠缠的通道里，导致局部干预容易产生 abnormal continuation，而不是清晰机制切换。因此结果不能直接外推为大模型完整语言机制。
+
+### 九、当前图谱更新
+
+Phase904 后，全局齿轮图谱应加入一个明确负边：
+
+```text
+protocol-source component
+  -> protocol logit reduction
+  -> protocol rank shift
+  -> stop rank partial improvement
+  -/-> strict clean termination
+```
+
+也就是说：
+
+```text
+协议续写源组件不是终止控制组件；
+终止控制不是协议抑制的自然副产物；
+终止机制可能是独立 state/action，而不是单纯 competition winner。
+```
+
+最新图谱形状：
+
+```text
+Semantic Answer Field
+  -> Answer Prefix
+  -> Protocol Continuation Field
+       -> newline route
+       -> comma/list route
+       -> field/explanation route
+       -> substitution graph
+  -> weak Stop Competition Field
+  -> missing Termination Action Field
+```
+
+### 十、下一阶段任务
+
+Phase904 仍属于 clean protocol edge 大阶段，但已经完成了“从 Phase903 候选组件寻找 termination control”的子任务。下一步不应继续简单扩大 component-zero 搜索，而应切换到：
+
+```text
+Phase905:
+Stop Action vs Stop Token Boundary Audit
+终止动作与停止 token 边界审计
+```
+
+核心问题：
+
+```text
+为什么 stop_top1 仍然不能 clean？
+EOS / special stop token 是否被 tokenizer、chat template、generation config 或模型内部 continuation prior 分离？
+period + EOS 与 period + newline 的边界在哪里？
+termination action 是否不是 residual component，而是 decode-time / template-conditioned control？
+```
+
+建议 Phase905 测试：
+
+```text
+1. 对 stop_top1 但 rollout 不 clean 的 qwen3 rows 做逐步解码审计；
+2. 比较 greedy logits、实际 generated ids、special-token allowed set；
+3. 构造 period-only、EOS-forced、newline-forbidden 三类对照；
+4. 区分 token-level stop competitiveness 与 generation-level termination action；
+5. 再判断是否需要回到模型内部寻找 termination-action source。
+```
+
+成功标准：
+
+```text
+最低标准:
+  解释 stop_top1 为什么没有 clean。
+
+中等标准:
+  区分 stop token competition failure 和 decode/template stop action failure。
+
+高标准:
+  找到 period + EOS 或 semantic answer + EOS 的可复现边界。
+
+最高标准:
+  在 holdout 上得到 strict_clean_answer_no_protocol > 0 且人工核查通过。
+```
+
+### 十一、阶段结论
+
+Phase904 是重要负结果：
+
+```text
+终止候选组件可以移动竞争场，
+但没有完成严格 clean closure。
+```
+
+这进一步支持当前主线：
+
+```text
+先完成图谱，再破解闭合。
+```
+
+因为现在已经更清楚地知道：
+
+```text
+协议续写场和终止控制场不是同一个东西；
+压低协议续写不自动等于终止；
+stop token 排名提升不自动等于 stop action。
+```
+
+总体进度评估：
+
+```text
+全局齿轮图谱:
+  90% - 93%
+
+语言编码机制闭合:
+  44% - 49%
+```
+
+图谱进度继续上升，因为 termination-control 缺口被更精确地定位。闭合进度不明显上升，因为 strict clean 仍为 0。
+
+## Phase 905: 终止动作与停止 token 边界审计 [2026-07-03 19:17]
+
+### 一、任务来源
+
+Phase904 出现一个关键现象：
+
+```text
+qwen3 的 non-base stop_top1 = 55
+但 strict_clean_answer_no_protocol = 0
+```
+
+这说明 Phase904 中的 stop_top1 不能直接解释为 clean termination。Phase905 因此不再继续加载模型做新干预，而是先审计 Phase904 已保存的 rollout 行数据，回答一个基础问题：
+
+```text
+stop_top1 到底是 EOS / 真实终止动作胜出，
+还是 period / 句号 token 胜出后继续生成？
+```
+
+### 二、脚本和结果文件
+
+新增脚本：
+
+```text
+tests/glm5/phase905_stop_action_boundary_audit.py
+tests/glm5/run_phase905_stop_action_boundary_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase905_stop_action_boundary_audit/stop_action_boundary_audit/
+```
+
+核心结果：
+
+```text
+phase905_stop_action_boundary_summary.json
+phase905_stop_action_boundary_summary.md
+```
+
+### 三、测试原理
+
+Phase905 只读取 Phase904 的 jsonl 行数据，不重新运行模型。它对每条 non-baseline row 统计：
+
+```text
+stop_top1
+stop_best_category
+first_suffix_category
+second_suffix_category
+protocol_drift
+strict_protocol_drift
+strict_clean_answer_no_protocol
+```
+
+边界判定：
+
+$$
+StopTop1(x)
+=
+rank(stop\_best \mid x) = 1
+$$
+
+其中 Phase903/904 的 stop 集合为：
+
+$$
+StopSet = EOS \cup Period
+$$
+
+因此必须进一步拆开：
+
+$$
+StopTop1(x)
+=
+EOSTop1(x)
+\lor
+PeriodTop1(x)
+$$
+
+真正接近终止动作的条件不是：
+
+$$
+StopTop1(x)
+$$
+
+而是：
+
+$$
+EOSFirst(x)
+\lor
+\bigl(PeriodFirst(x) \land \neg ContinuationAfterPeriod(x)\bigr)
+$$
+
+如果：
+
+$$
+PeriodFirst(x)
+\land
+ContinuationAfterPeriod(x)
+$$
+
+则只能说明“句号胜出”，不能说明“终止动作胜出”。
+
+### 四、总体结果
+
+Phase905 汇总：
+
+```text
+rows: 544
+strict_clean_answer_no_protocol: 0
+protocol_drift: 535
+strict_protocol_drift: 541
+
+stop_top1: 55
+stop_top1_strict_clean: 0
+stop_top1_protocol_drift: 55
+stop_top1_strict_protocol_drift: 54
+
+stop_top1_period_best: 55
+stop_top1_eos_best: 0
+stop_top1_period_first_suffix: 55
+stop_top1_eos_first_suffix: 0
+stop_top1_period_then_continuation: 55
+stop_top1_decoded_special_marker: 5
+```
+
+核心事实非常清楚：
+
+```text
+所有 stop_top1 都是 period；
+没有任何 stop_top1 是 EOS；
+所有 period top1 后都继续生成；
+stop_top1_strict_clean = 0。
+```
+
+因此 Phase904 中 qwen3 的 stop_top1 不是终止动作，而是：
+
+```text
+period-as-punctuation
+句号作为标点符号
+```
+
+### 五、分模型结果
+
+#### qwen3
+
+```text
+non_baseline rows: 144
+stop_top1: 55
+stop_top1_period_best: 55
+stop_top1_eos_best: 0
+stop_top1_period_first_suffix: 55
+stop_top1_eos_first_suffix: 0
+stop_top1_period_then_continuation: 55
+stop_top1_strict_clean: 0
+```
+
+样例：
+
+```text
+Animal.Humanity. 1.
+Animal. The cow is a domesticated animal
+Shapes. The category that best describes a
+Material. The answer is "Materials". The
+```
+
+这些输出共同说明：
+
+```text
+句号不是终止动作；
+句号更像答案后的局部标点边界；
+句号后仍然会进入 explanation / field / protocol continuation。
+```
+
+#### GLM4
+
+```text
+non_baseline rows: 136
+stop_top1: 0
+strict_clean_answer_no_protocol: 0
+```
+
+GLM4 没有出现 stop_top1 边界可审计现象。它的 Phase904 主要是 protocol rank1 removed 和 next_top_changed，但没有进入 stop_top1。
+
+#### DS7B
+
+```text
+non_baseline rows: 264
+stop_top1: 0
+strict_clean_answer_no_protocol: 0
+```
+
+DS7B 同样没有 stop_top1。它的主要现象仍然是 comma protocol field 被压低后发生 substitution，而不是 stop action。
+
+### 六、正确性分析
+
+Phase905 进一步修正 Phase901/904 的 stop 口径：
+
+```text
+把 EOS 和 period 合并为 stop set，有助于早期发现“停止附近 token 是否有竞争力”；
+但在闭合阶段，EOS 和 period 必须拆开。
+```
+
+原因是：
+
+```text
+period 是语言内部的标点 token；
+EOS 是生成过程中的终止 token；
+两者都可能位于答案边界附近，
+但机制含义不同。
+```
+
+因此之前的：
+
+$$
+StopSet = EOS \cup Period
+$$
+
+只能用于粗审计，不能用于闭合判定。闭合判定必须改为：
+
+$$
+ClosureStop(x)
+=
+EOSAction(x)
+\lor
+\left[
+PeriodBoundary(x)
+\land
+\neg ContinuationAfterPeriod(x)
+\right]
+$$
+
+Phase905 的结果是：
+
+$$
+PeriodBoundary(x)=1
+$$
+
+但：
+
+$$
+ContinuationAfterPeriod(x)=1
+$$
+
+所以：
+
+$$
+ClosureStop(x)=0
+$$
+
+### 七、理论进展
+
+Phase905 的关键进展是把“停止”拆成三层：
+
+```text
+1. punctuation boundary
+   标点边界
+
+2. answer boundary
+   答案边界
+
+3. generation termination action
+   生成终止动作
+```
+
+当前实验已经能推动第一层：
+
+```text
+period / 句号
+```
+
+但尚未推动第三层：
+
+```text
+EOS / true generation termination
+```
+
+这解释了为什么：
+
+```text
+protocol logit 降低
+stop rank 改善
+period top1
+```
+
+仍然不能得到 clean answer closure。
+
+新的图谱边应写为：
+
+```text
+protocol suppressor
+  -> period boundary
+  -> post-period continuation
+  -/-> EOS termination action
+```
+
+而不是：
+
+```text
+protocol suppressor
+  -> stop action
+```
+
+### 八、问题和硬伤
+
+#### 1. Phase901/904 的 stop set 过宽
+
+早期把 period 和 EOS 合并是合理的探索策略，但会产生误读：
+
+```text
+stop_top1 可能只是句号 top1。
+```
+
+以后所有 closure 统计必须同时报告：
+
+```text
+period_top1
+eos_top1
+period_then_continuation
+eos_first
+strict_clean
+```
+
+#### 2. 句号后仍有强 continuation prior
+
+qwen3 的 55 个 stop_top1 全部 period 后继续，说明模型内部存在：
+
+```text
+post-period continuation prior
+```
+
+它可能来自：
+
+```text
+解释性文本习惯
+chat template 续写习惯
+问答格式续写习惯
+训练语料中句号后继续文本的强先验
+```
+
+#### 3. EOS 仍未进入自然竞争
+
+本轮没有出现 EOS best 或 EOS first。说明真正瓶颈已经更清楚：
+
+```text
+不是让 period 胜出；
+而是让 EOS action 或 no-continuation state 胜出。
+```
+
+### 九、对当前研究路线的影响
+
+Phase905 支持“先完成图谱再闭合”的路线：
+
+```text
+现在图谱已经知道：
+semantic answer field 可以形成答案；
+protocol field 会接管答案后续；
+component intervention 可以压低 protocol；
+period boundary 可以被推高；
+但 EOS / termination action 仍未进入自然路线。
+```
+
+这比继续盲目搜索更有价值，因为失败位置已经从：
+
+```text
+不知道为什么不 clean
+```
+
+变成：
+
+```text
+period boundary 与 EOS action 之间缺一层机制。
+```
+
+### 十、下一阶段任务
+
+Phase905 已经完成 stop_top1 边界审计。下一阶段不应继续把 period 当作 stop，而应进入新子阶段：
+
+```text
+Phase906:
+EOS Action Boundary Test
+EOS 动作边界测试
+```
+
+建议测试：
+
+```text
+1. period-forced 后观察下一步 logits；
+2. EOS-forced 与 period-forced 对比；
+3. newline-forbidden / explanation-forbidden 对照；
+4. 直接测 EOS rank、EOS logit、EOS margin；
+5. 区分模型内部 EOS 弱竞争与 generation config / tokenizer special-token 边界。
+```
+
+成功标准：
+
+```text
+最低标准:
+  证明 EOS 是否被模型自然压制。
+
+中等标准:
+  找到 period 后 continuation 的主要 token 类型。
+
+高标准:
+  找到能把 period 后 continuation 转成 EOS 的干预变量。
+
+最高标准:
+  strict_clean_answer_no_protocol > 0 且人工核查通过。
+```
+
+### 十一、阶段结论
+
+Phase905 是一个重要诊断结果：
+
+```text
+Phase904 的 stop_top1 不是终止动作；
+它全部是 period top1。
+```
+
+更严格地说：
+
+```text
+period boundary 已经可被局部干预推高；
+EOS termination action 仍然没有被找到；
+period 后 continuation 是当前 clean closure 的直接瓶颈。
+```
+
+总体进度评估：
+
+```text
+全局齿轮图谱:
+  91% - 94%
+
+语言编码机制闭合:
+  44% - 49%
+```
+
+图谱进度继续上升，因为 stop/action 边界被拆开。闭合进度不提高，因为 strict clean 仍为 0，且 EOS action 尚未进入自然竞争。

@@ -1,0 +1,97 @@
+{
+  "phase": 901,
+  "title": "Stop Token Competitiveness Audit",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 17:51:23",
+  "attn_implementation": "sdpa",
+  "overall": {
+    "rows": 18,
+    "answer_prefix_seen": 18,
+    "stop_top10": 18,
+    "stop_top50": 18,
+    "stop_top100": 18,
+    "eos_top100": 0,
+    "period_top50": 18,
+    "mean_stop_rank": 4.166666666666667,
+    "median_stop_rank": 3.0,
+    "mean_eos_rank": 34988.444444444445,
+    "median_eos_rank": 29326.5,
+    "mean_period_rank": 4.166666666666667,
+    "median_period_rank": 3.0,
+    "mean_protocol_rank": 1.8333333333333333,
+    "median_protocol_rank": 2.0,
+    "next_top_tokens": {
+      "\n": 8,
+      "\n\n": 3,
+      ".": 7
+    }
+  },
+  "domain_summaries": {
+    "animal": {
+      "rows": 1,
+      "answer_prefix_seen": 1,
+      "stop_top10": 1,
+      "stop_top50": 1,
+      "stop_top100": 1,
+      "eos_top100": 0,
+      "period_top50": 1,
+      "mean_stop_rank": 1.0,
+      "median_stop_rank": 1.0,
+      "mean_eos_rank": 19988.0,
+      "median_eos_rank": 19988.0,
+      "mean_period_rank": 1.0,
+      "median_period_rank": 1.0,
+      "mean_protocol_rank": 2.0,
+      "median_protocol_rank": 2.0,
+      "next_top_tokens": {
+        ".": 1
+      }
+    },
+    "geometry": {
+      "rows": 9,
+      "answer_prefix_seen": 9,
+      "stop_top10": 9,
+      "stop_top50": 9,
+      "stop_top100": 9,
+      "eos_top100": 0,
+      "period_top50": 9,
+      "mean_stop_rank": 2.6666666666666665,
+      "median_stop_rank": 3.0,
+      "mean_eos_rank": 22322.333333333332,
+      "median_eos_rank": 22305.0,
+      "mean_period_rank": 2.6666666666666665,
+      "median_period_rank": 3.0,
+      "mean_protocol_rank": 1.5555555555555556,
+      "median_protocol_rank": 1.0,
+      "next_top_tokens": {
+        "\n": 5,
+        ".": 4
+      }
+    },
+    "material": {
+      "rows": 8,
+      "answer_prefix_seen": 8,
+      "stop_top10": 8,
+      "stop_top50": 8,
+      "stop_top100": 8,
+      "eos_top100": 0,
+      "period_top50": 8,
+      "mean_stop_rank": 6.25,
+      "median_stop_rank": 8.0,
+      "mean_eos_rank": 51112.875,
+      "median_eos_rank": 60670.0,
+      "mean_period_rank": 6.25,
+      "median_period_rank": 8.0,
+      "mean_protocol_rank": 2.125,
+      "median_protocol_rank": 2.0,
+      "next_top_tokens": {
+        "\n": 3,
+        "\n\n": 3,
+        ".": 2
+      }
+    }
+  },
+  "evidence_label": "stop_token_competitive_in_some_rows",
+  "boundary": "Phase901 measures whether EOS/period stop tokens are competitive after answer-class prefix. It is a logit audit, not a causal stop-gate intervention."
+}

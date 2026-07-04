@@ -1,0 +1,128 @@
+{
+  "phase": 898,
+  "title": "Domain Axis Holdout Validation",
+  "model": "deepseek7b",
+  "status": "complete",
+  "timestamp": "2026-07-03 14:17:54",
+  "attn_implementation": "sdpa",
+  "sources": [
+    {
+      "model": "deepseek7b",
+      "source_type": "phase897_pair_candidate",
+      "domain": "geometry",
+      "subset_key": "L27C15791+L27C15305",
+      "subset_size": 2,
+      "phase897_closure_from_open": 6,
+      "phase897_no_single_pair": 1,
+      "phase897_known_minimal": 1,
+      "phase897_mean_target_lift": -1.253125,
+      "phase897_mean_blocker_reduction": 0.35
+    },
+    {
+      "model": "deepseek7b",
+      "source_type": "phase897_single_candidate",
+      "domain": "animal",
+      "subset_key": "L27C16651",
+      "subset_size": 1,
+      "phase897_closure_from_open": 11,
+      "phase897_no_single_pair": 0,
+      "phase897_known_minimal": 0,
+      "phase897_mean_target_lift": 2.1354166666666665,
+      "phase897_mean_blocker_reduction": 0.5833333333333334
+    },
+    {
+      "model": "deepseek7b",
+      "source_type": "phase897_single_candidate",
+      "domain": "geometry",
+      "subset_key": "L27C15791",
+      "subset_size": 1,
+      "phase897_closure_from_open": 5,
+      "phase897_no_single_pair": 0,
+      "phase897_known_minimal": 0,
+      "phase897_mean_target_lift": -0.796875,
+      "phase897_mean_blocker_reduction": 0.5
+    }
+  ],
+  "overall": {
+    "sources": 3,
+    "rows": 248,
+    "condition_rows": 168,
+    "source_candidate_closure_conditions": 37,
+    "single_axis_closure_conditions": 35,
+    "pair_closure_conditions": 7,
+    "no_single_pair_conditions": 2
+  },
+  "source_summaries": [
+    {
+      "model": "deepseek7b",
+      "source_type": "phase897_pair_candidate",
+      "domain": "geometry",
+      "subset_key": "L27C15791+L27C15305",
+      "subset_size": 2,
+      "phase897_closure_from_open": 6,
+      "phase897_no_single_pair": 1,
+      "phase897_known_minimal": 1,
+      "phase897_mean_target_lift": -1.253125,
+      "phase897_mean_blocker_reduction": 0.35,
+      "source_key": "phase897_pair_candidate::geometry::L27C15791+L27C15305",
+      "conditions": 40,
+      "source_candidate_closure": 7,
+      "single_axis_closure_conditions": 5,
+      "pair_closure_conditions": 7,
+      "no_single_pair_conditions": 2,
+      "single_keys": {
+        "L27C15305": 3,
+        "L27C15791": 5
+      },
+      "pair_keys": {
+        "L27C15791+L27C15305": 2
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "source_type": "phase897_single_candidate",
+      "domain": "animal",
+      "subset_key": "L27C16651",
+      "subset_size": 1,
+      "phase897_closure_from_open": 11,
+      "phase897_no_single_pair": 0,
+      "phase897_known_minimal": 0,
+      "phase897_mean_target_lift": 2.1354166666666665,
+      "phase897_mean_blocker_reduction": 0.5833333333333334,
+      "source_key": "phase897_single_candidate::animal::L27C16651",
+      "conditions": 88,
+      "source_candidate_closure": 25,
+      "single_axis_closure_conditions": 25,
+      "pair_closure_conditions": 0,
+      "no_single_pair_conditions": 0,
+      "single_keys": {
+        "L27C16651": 25
+      },
+      "pair_keys": {}
+    },
+    {
+      "model": "deepseek7b",
+      "source_type": "phase897_single_candidate",
+      "domain": "geometry",
+      "subset_key": "L27C15791",
+      "subset_size": 1,
+      "phase897_closure_from_open": 5,
+      "phase897_no_single_pair": 0,
+      "phase897_known_minimal": 0,
+      "phase897_mean_target_lift": -0.796875,
+      "phase897_mean_blocker_reduction": 0.5,
+      "source_key": "phase897_single_candidate::geometry::L27C15791",
+      "conditions": 40,
+      "source_candidate_closure": 5,
+      "single_axis_closure_conditions": 5,
+      "pair_closure_conditions": 0,
+      "no_single_pair_conditions": 0,
+      "single_keys": {
+        "L27C15791": 5
+      },
+      "pair_keys": {}
+    }
+  ],
+  "evidence_label": "holdout_no_single_pair_supported",
+  "boundary": "Phase898 re-tests Phase897 domain axes on expanded objects and prompts. It validates candidate stability, not full language mechanism closure."
+}

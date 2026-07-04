@@ -1,0 +1,85 @@
+{
+  "phase": 890,
+  "title": "Distributed Restore and Projection-style Subspace Intervention",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 05:35:20",
+  "attn_implementation": "sdpa",
+  "edit_modes": [
+    "zero",
+    "flip",
+    "half",
+    "scale_up",
+    "proj_out",
+    "proj_reflect"
+  ],
+  "selected_source_rows": 8,
+  "output_rows": 66,
+  "overall": {
+    "mode_closure_from_open": 26,
+    "restore_reopens_boundary": 5,
+    "distributed_restore_reopens_boundary": 0,
+    "projection_style_closure": 12,
+    "base_suppress_boundary_closed": 24,
+    "closure_modes": {
+      "flip": 6,
+      "half": 2,
+      "proj_out": 6,
+      "proj_reflect": 6,
+      "zero": 6
+    },
+    "restore_reopen_set_types": {
+      "exact_cut": 5
+    }
+  },
+  "candidate_groups": [
+    {
+      "model": "qwen3",
+      "parent_candidate_key": "L31C2257:flip",
+      "evidence_label": "projection_equivalent_direction_signal",
+      "n_source_cases": 8,
+      "n_rows": 66,
+      "mode_closure_from_open": 26,
+      "restore_reopens_boundary": 5,
+      "distributed_restore_reopens_boundary": 0,
+      "projection_style_rows": 22,
+      "projection_style_closure": 12,
+      "restore_reopen_set_types": {
+        "exact_cut": 5
+      },
+      "closure_modes": {
+        "flip": 6,
+        "half": 2,
+        "proj_out": 6,
+        "proj_reflect": 6,
+        "zero": 6
+      },
+      "projection_closure_modes": {
+        "proj_out": 6,
+        "proj_reflect": 6
+      },
+      "base_suppress_set_types": {
+        "exact_cut": 24
+      },
+      "mean_closure_class_logit_delta": 0.5817307692307693,
+      "mean_closure_restore_token_delta": -0.022435897435897436,
+      "objects": [
+        "ceramic",
+        "chair",
+        "metal",
+        "wood"
+      ],
+      "prompt_variants": [
+        "classification",
+        "natural_category",
+        "natural_question",
+        "object_only",
+        "type_of_completion"
+      ]
+    }
+  ],
+  "evidence_label_counts": {
+    "projection_equivalent_direction_signal": 1
+  },
+  "boundary": "Phase890 tests distributed blocker-set restore and single-axis projection-equivalent interventions. For current mostly single-channel candidates, projection-style modes degenerate to axis projection equivalents."
+}

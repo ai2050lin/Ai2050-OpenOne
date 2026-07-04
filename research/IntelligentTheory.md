@@ -5546,3 +5546,1641 @@ LocalSubspaceBoundaryGear 更合理。
 5. blocker-token minimal cut 未完成；
 6. 小模型可能把真实机制压缩成粗糙局部子空间。
 ```
+
+## Phase886 更新：同阻塞边界局部子空间齿轮
+
+Phase886 复用 Phase885 的跨模型干预结果，对 candidate / opposite / random / neighbor 进行同 case、同 prompt 配对分析。
+
+关键结果：
+
+```text
+source_rows = 2016
+paired_rows = 504
+candidate_closure = 45
+opposite_closure = 46
+both_closure = 36
+same_blocker_direction = 66
+mean_removed_jaccard = 0.3912
+random_closure = 0
+neighbor_closure = 0
+```
+
+这使理论从：
+
+```text
+holdout-supported but sign-nonminimal boundary gear
+```
+
+进一步收紧为：
+
+```text
+same-blocker local subspace boundary gear candidate
+```
+
+核心变化是：
+
+```text
+opposite-mode 不只是复现 closure，
+而且在多组候选中与 candidate 移除了相同或相近的 blocker-token 集合。
+```
+
+因此当前智能理论中，“齿轮”的最小单位不能写成：
+
+```text
+单通道 + 单符号方向
+```
+
+而应写成：
+
+```text
+局部子空间 + 输出边界调制 + 条件化状态。
+```
+
+### Phase886 公式
+
+```text
+Removed_candidate
+  =
+  BaseBlockers - IntervenedBlockers_candidate
+
+Removed_opposite
+  =
+  BaseBlockers - IntervenedBlockers_opposite
+
+J_removed
+  =
+  |Removed_candidate intersect Removed_opposite|
+  /
+  |Removed_candidate union Removed_opposite|
+```
+
+局部子空间边界齿轮：
+
+```text
+LocalSubspaceBoundaryGear(g)
+  =
+  HoldoutRepair(g)
+  and
+  ControlSeparation_random_neighbor(g)
+  and
+  OppositeModeReproduction(g)
+  and
+  J_removed(g) > threshold
+```
+
+当前语言机制的更准确表达：
+
+```text
+LanguageGeneration(x)
+  =
+  BoundaryRearrangement(
+    TargetField,
+    BlockerField,
+    FormatField,
+    ProtocolField,
+    EchoField,
+    LocalSubspaceState(x)
+  )
+```
+
+也就是说，语言生成不能只看 target logit，而要看全词表竞争场中的边界重排。
+
+### 理论边界
+
+Phase886 仍不是闭合：
+
+```text
+1. blocker-token minimal cut 未完成；
+2. local subspace basis 未完成；
+3. direction-set intervention 未完成；
+4. long rollout closure 未完成；
+5. cross-model structural isomorphism 未完成；
+6. large-model confirmation 未完成。
+```
+
+当前最稳妥的理论状态：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+稳定边界候选层
++
+同阻塞边界局部子空间齿轮层
++
+blocker-token 边界迁移层
+```
+
+## Phase887 更新：观测阻塞词元最小割信号
+
+Phase887 继续使用 Phase885/886 的跨模型干预结果，对 blocker-token minimal cut 进行离线估计。
+
+核心结果：
+
+```text
+paired_rows = 504
+same_boundary_closure = 36
+shared_complete_topk_cut = 35
+exact_single_blocker_cut = 23
+candidate_complete_topk_cut = 42
+opposite_complete_topk_cut = 45
+```
+
+这说明 Phase886 中的 same-blocker boundary evidence 进一步收紧为：
+
+```text
+observed blocker-token minimal cut signal
+```
+
+但它仍不是：
+
+```text
+internal causal minimal cut closure
+```
+
+因为当前最小割来自输出边界的可观测 blocker 集合，还没有完成内部隐藏状态方向基的反事实干预。
+
+### Phase887 公式
+
+```text
+SharedRemoved
+  =
+  Removed_candidate intersect Removed_opposite
+```
+
+观测 top-k 完整共享割：
+
+```text
+ObservedTopKSharedCut(S)
+  =
+  SameBoundaryClosure
+  and
+  BaseBlockers subset SharedRemoved
+  and
+  base_blocker_count <= observed_topk
+```
+
+单阻塞词元精确割：
+
+```text
+ExactSingleBlockerCut(t)
+  =
+  SameBoundaryClosure
+  and
+  base_blocker_count = 1
+  and
+  SharedRemoved = {t}
+```
+
+最新理论层级：
+
+```text
+stable boundary candidate
+-> holdout-supported boundary
+-> same-blocker local subspace boundary
+-> observed blocker-token minimal cut signal
+-> internal causal subspace basis
+```
+
+其中最后一层仍未完成。
+
+### 理论含义
+
+Phase887 显示，关键阻塞词元经常不是纯语义竞争词，而是：
+
+```text
+format_punct
+format_space
+protocol / category word
+object_echo
+other_blocker
+```
+
+因此，语言生成机制更像：
+
+```text
+条件化输出边界重排系统
+```
+
+而不是：
+
+```text
+静态语义向量检索系统。
+```
+
+当前理论状态更新为：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+稳定边界候选层
++
+同阻塞边界局部子空间齿轮层
++
+观测阻塞词元最小割层
+```
+
+## Phase888-889 更新：方向集合边界信号与分布式边界迁移
+
+Phase888 进行了真实跨模型 CUDA 前向测试，顺序为：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+测试模式：
+
+```text
+zero
+flip
+half
+scale_up
+```
+
+并加入输出层 cut-token 反事实：
+
+```text
+base mask
+base suppress
+intervened restore
+```
+
+核心结果：
+
+```text
+source_rows = 59
+output_rows = 236
+mode_closure_from_open = 88
+restored_reopens_boundary = 3
+unique_base_mask_closed_cases = 35
+unique_multi_mode_closure_cases = 35
+```
+
+Phase889 继续诊断 restore 失败：
+
+```text
+mode_closure_from_open = 88
+restored_reopens_boundary = 3
+no_restore_closure = 85
+```
+
+这说明：
+
+```text
+内部方向集合可以稳定移动输出边界；
+但 observed cut-token 大多数不是内部单点必要因果。
+```
+
+### 理论公式
+
+方向集合干预：
+
+```text
+h'_c =
+  0        if mode = zero
+  -h_c     if mode = flip
+  0.5 h_c  if mode = half
+  alpha h_c if mode = scale_up
+```
+
+方向集合边界信号：
+
+```text
+DirectionSetBoundarySignal(g, x, p)
+  =
+  count_m [
+    not BoundaryClosed(empty, x, p)
+    and
+    BoundaryClosed(g_m, x, p)
+  ]
+```
+
+内部 cut-token 耦合：
+
+```text
+InternalCutTokenCoupling(g_m, C)
+  =
+  BoundaryClosed(g_m)
+  and
+  not BoundaryClosed(Restore(logits_gm, logits_base, C))
+```
+
+分布式边界迁移：
+
+```text
+DistributedBoundaryMigration(g_m, C)
+  =
+  BoundaryClosed(g_m)
+  and
+  BoundaryClosed(Restore(logits_gm, logits_base, C))
+```
+
+Phase888-889 结果显示：
+
+```text
+qwen3 material:
+  rare InternalCutTokenCoupling
+
+DS7B animal / color:
+  mostly DistributedBoundaryMigration
+
+GLM4:
+  negative
+```
+
+### 理论收紧
+
+原假设：
+
+```text
+observed blocker-token cut
+-> internal cut-token causality
+```
+
+被收紧为：
+
+```text
+observed blocker-token cut
+-> direction-set boundary signal
+-> mostly distributed target-lift / boundary migration
+-> rare internal cut-token coupling
+```
+
+因此语言生成机制更准确地写成：
+
+```text
+LanguageGeneration
+  =
+  ConditionalBoundaryRearrangement(
+    target lift,
+    blocker suppression,
+    format/protocol transition,
+    local direction set,
+    distributed output field
+  )
+```
+
+当前最新理论状态：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+稳定边界候选层
++
+同阻塞边界局部子空间齿轮层
++
+观测阻塞词元最小割层
++
+方向集合边界信号层
++
+分布式边界迁移层
+```
+
+## Phase890 更新：分布式恢复失败与目标提升主导边界迁移
+
+Phase890 继续 Phase888-889 的结论，进行了真实跨模型前向测试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+本阶段新增：
+
+```text
+distributed restore
+projection-equivalent intervention
+unique-case restore audit
+```
+
+总体结果：
+
+```text
+source_rows = 59
+output_rows = 486
+mode_closure_from_open = 228
+restore_reopens_boundary = 5
+distributed_restore_reopens_boundary = 0
+projection_style_closure = 104
+unique_source_cases = 59
+unique_closure_cases = 35
+unique_restore_cases = 1
+unique_distributed_restore_cases = 0
+```
+
+核心收紧：
+
+```text
+DS7B:
+  distributed restore 不重开边界；
+  closure 全部伴随 target logit lift 和 blocker reduction；
+  因此更像 target-lift dominated boundary migration。
+
+qwen3:
+  restore reopen 只发生在 p856_025_material_metal / natural_question；
+  不是 holdout 泛化，只是 rare exact cut-token coupling。
+
+GLM4:
+  继续负。
+```
+
+### 新理论表达
+
+原表达：
+
+```text
+observed blocker-token cut
+-> internal causal cut
+```
+
+继续收紧为：
+
+```text
+observed blocker-token cut
+-> direction-set boundary signal
+-> distributed restore failure
+-> target-lift dominated boundary migration
+```
+
+因此当前语言生成公式应写成：
+
+```text
+LanguageGeneration(x)
+  =
+  BoundaryMove(
+    TargetLift(x),
+    BlockerField(x),
+    ProtocolField(x),
+    RouteGear(x),
+    ReadoutGeometry(x)
+  )
+```
+
+其中：
+
+```text
+TargetLift(m)
+  =
+  logit_m(target_class) - logit_0(target_class)
+
+BlockerReduction(m)
+  =
+  blocker_count_0 - blocker_count_m
+
+RestoreReopen(m, C)
+  =
+  BoundaryClosed(logits_m)
+  and
+  not BoundaryClosed(Restore(logits_m, logits_0, C))
+```
+
+Phase890 的实证约束是：
+
+```text
+DS7B:
+  TargetLift > 0
+  BlockerReduction > 0
+  RestoreReopen = 0
+
+qwen3:
+  RestoreReopen > 0 only in one exact metal case
+```
+
+### 对全局齿轮图谱的影响
+
+当前图谱新增层：
+
+```text
+V_distributed_restore_failure
+V_target_lift_dominated_boundary_migration
+V_single_axis_projection_equivalent
+V_rare_exact_cut_token_coupling
+```
+
+并且必须把 projection-style 证据降级标注为：
+
+```text
+single-axis projection equivalent
+```
+
+因为当前候选多为单通道候选，还不是完整多维子空间投影。
+
+当前理论状态更新为：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+稳定边界候选层
++
+同阻塞边界局部子空间齿轮层
++
+观测阻塞词元最小割层
++
+方向集合边界信号层
++
+分布式恢复失败层
++
+目标提升主导边界迁移层
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱:
+  70% - 76%
+
+语言编码机制闭合:
+  38% - 43%
+```
+
+## Phase891 更新：目标提升来源路径与多轴坐标子空间
+
+Phase891 继续 Phase890 的关键负结果：
+
+```text
+distributed restore 不能重开 DS7B 边界。
+```
+
+因此本阶段不再追问 blocker restore，而是追问：
+
+```text
+target lift 来自哪里？
+多轴 U 是否比单轴更稳定？
+```
+
+测试结果：
+
+```text
+selected_sources = 35
+output_rows = 1200
+none_closure_from_open = 151
+multi_axis_none_closure = 93
+mlp_zero_closure_lost = 64
+attn_zero_closure_lost = 33
+```
+
+DS7B：
+
+```text
+none_closure_from_open = 141
+multi_axis_none_closure = 93
+mlp_zero_closure_lost = 60
+attn_zero_closure_lost = 29
+mean_none_target_lift = 2.437
+```
+
+qwen3：
+
+```text
+none_closure_from_open = 10
+multi_axis_none_closure = 0
+mlp_zero_closure_lost = 4
+attn_zero_closure_lost = 4
+```
+
+GLM4：
+
+```text
+none_closure_from_open = 0
+```
+
+### 理论收紧
+
+Phase890 的表述：
+
+```text
+target-lift dominated boundary migration
+```
+
+在 Phase891 后应细化为：
+
+```text
+target-lift dominated boundary migration
+with mixed MLP / attention pathway dependency
+and partial multi-axis coordinate-subspace enhancement
+```
+
+中文：
+
+```text
+目标提升主导边界迁移，
+但目标提升来源不是单一 MLP 或单一 attention，
+而是混合组件路径；
+多轴坐标子空间在 DS7B 上有部分增强。
+```
+
+### 新公式
+
+目标提升来源路径：
+
+```text
+SourcePath(TargetLift)
+  =
+  Compare(
+    TargetLift(m),
+    TargetLift(m with MLP output scaled),
+    TargetLift(m with attention output scaled)
+  )
+```
+
+闭合丢失：
+
+```text
+ClosureLost(component)
+  =
+  BoundaryClosed(m)
+  and
+  not BoundaryClosed(m with component scaled)
+```
+
+多轴坐标子空间：
+
+```text
+U_model
+  =
+  span(axis_1, axis_2, ..., axis_k)
+```
+
+当前限制：
+
+```text
+U_model 仍是 selected channel axes 的坐标子空间，
+不是任意基 true projection subspace。
+```
+
+### 对全局齿轮图谱的影响
+
+新增节点：
+
+```text
+V_target_lift_source_pathway
+V_mixed_component_target_lift
+V_multi_axis_coordinate_subspace
+V_component_ablation_diagnostic
+```
+
+当前理论状态更新为：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+稳定边界候选层
++
+同阻塞边界局部子空间齿轮层
++
+观测阻塞词元最小割层
++
+方向集合边界信号层
++
+分布式恢复失败层
++
+目标提升主导边界迁移层
++
+混合组件目标提升路径层
++
+多轴坐标子空间层
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱:
+  72% - 78%
+
+语言编码机制闭合:
+  39% - 44%
+```
+
+## Phase892 更新：通道互补与坐标基目标提升
+
+Phase892 继续 Phase891 的 mixed component target lift，做更细的通道子集测试。
+
+本阶段不直接使用复杂学习基，而是先做基础穷举：
+
+```text
+single axis
+pair axes
+three-axis model_U
+```
+
+总体结果：
+
+```text
+selected_sources = 29
+output_rows = 483
+closure_from_open = 238
+single_axis_closure = 73
+multi_axis_closure = 165
+positive_complementarity_rows = 47
+closure_without_single_axis_closure = 0
+```
+
+DS7B：
+
+```text
+closure_from_open = 228
+single_axis_closure = 63
+multi_axis_closure = 165
+positive_complementarity_rows = 47
+mean_multi_complementarity_over_best = 0.478
+mean_interaction_residual_vs_additive = 0.378
+```
+
+关键发现：
+
+```text
+L26C8587 + L27C15369:
+  mean_lift = 3.133
+  mean_complementarity = 1.266
+  positive_complementarity_rows = 24
+
+L27C16651:
+  single-axis dominant
+  best_subset = L27C16651
+```
+
+### 理论收紧
+
+Phase891 的表述：
+
+```text
+partial multi-axis coordinate-subspace enhancement
+```
+
+在 Phase892 后应继续拆开：
+
+```text
+color route:
+  coordinate-axis target-lift complementarity
+  strongest pair = L26C8587 + L27C15369
+
+animal route:
+  single-axis dominant target lift
+  strongest axis = L27C16651
+```
+
+### 新公式
+
+坐标轴互补：
+
+```text
+Complementarity(S,m)
+  =
+  TargetLift(S,m)
+  -
+  max_{i in S} TargetLift({i},m)
+```
+
+加和残差：
+
+```text
+Residual(S,m)
+  =
+  TargetLift(S,m)
+  -
+  sum_{i in S} TargetLift({i},m)
+```
+
+组合独有闭合：
+
+```text
+ClosureWithoutSingle(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in S} BoundaryClosed({i},m)
+```
+
+Phase892 的约束：
+
+```text
+Complementarity(L26C8587 + L27C15369) > 0
+ClosureWithoutSingle = 0
+```
+
+因此当前仍是：
+
+```text
+target-lift complementarity
+```
+
+不是：
+
+```text
+independent multi-axis closure
+```
+
+### 当前理论状态
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+方向集合边界信号层
++
+目标提升主导边界迁移层
++
+混合组件目标提升路径层
++
+多轴坐标子空间层
++
+颜色路线通道互补层
++
+动物路线单轴主导层
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱:
+  74% - 80%
+
+语言编码机制闭合:
+  40% - 45%
+```
+
+## Phase893 更新：留出互补、弱组合独有闭合与注意力头损伤
+
+Phase893 接续 Phase892，对 `L26C8587 + L27C15369` 做更宽的 holdout 验证，并加入 head-level attribution 初筛。
+
+总体结果：
+
+```text
+selected_case_prompts = 275
+output_subset_rows = 2805
+output_head_rows = 960
+closure_from_open = 399
+multi_axis_closure = 284
+positive_complementarity_rows = 68
+holdout_positive_complementarity_rows = 28
+closure_without_single_axis_closure = 14
+```
+
+### 关键修正
+
+Phase892 的结论：
+
+```text
+多轴互补存在；
+但 closure_without_single_axis_closure = 0。
+```
+
+Phase893 的新结果：
+
+```text
+在更宽 color holdout 中，
+L26C8587 + L27C15369 出现 7 个 weak no-single closure 条件；
+pair 与 model_U 同时记录，因此总行数为 14。
+```
+
+因此当前理论标签应改为：
+
+```text
+holdout-stable pairwise target-lift complementarity
++
+weak no-single closure candidate
+```
+
+但不能直接升级为：
+
+```text
+stable independent multi-axis closure
+```
+
+### 注意力头边界
+
+DS7B 的 L26 head 中存在 target lift damage candidate：
+
+```text
+L26H3, L26H7, L26H11, L26H14
+```
+
+但：
+
+```text
+DS7B head_zero_closure_lost = 0
+```
+
+所以当前只能写成：
+
+```text
+attention-head target-lift damage
+```
+
+不能写成：
+
+```text
+attention-head closure-critical causal path
+```
+
+qwen3 则相反：
+
+```text
+L31C2257 是 single-axis narrow mechanism；
+但 qwen3 L31 heads 有 head_zero_closure_lost = 26。
+```
+
+这说明不同小模型的机制压缩方式可能不同，跨模型不能直接对齐。
+
+### 公式更新
+
+互补增益仍为：
+
+```text
+Complementarity(S,m)
+  =
+  TargetLift(S,m)
+  -
+  max_{i in S} TargetLift({i},m)
+```
+
+组合独有闭合成为新的候选层：
+
+```text
+ClosureWithoutSingle(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in S} BoundaryClosed({i},m)
+```
+
+注意力头损伤：
+
+```text
+HeadDamage(h; S,m)
+  =
+  TargetLift(S,m)
+  -
+  TargetLift(head_zero(h), S,m)
+```
+
+闭合关键头还需要满足：
+
+```text
+HeadClosureLoss(h; S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not BoundaryClosed(head_zero(h), S,m)
+```
+
+Phase893 的结果是：
+
+```text
+DS7B:
+  HeadDamage > 0 exists
+  HeadClosureLoss = 0
+
+qwen3:
+  HeadClosureLoss > 0
+  but no multi-axis complementarity
+```
+
+### 当前理论状态
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+方向集合边界信号层
++
+目标提升主导边界迁移层
++
+混合组件目标提升路径层
++
+多轴坐标子空间层
++
+留出稳定成对互补层
++
+弱组合独有闭合候选层
++
+注意力头目标提升损伤层
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱:
+  76% - 82%
+
+语言编码机制闭合:
+  42% - 47%
+```
+
+## Phase894 理论更新：弱组合独有闭合复验与短 rollout 边界支持
+
+Phase894 对 Phase893 的弱 no-single closure 候选做了复验。结果显示：
+
+```text
+DS7B 的 L26C8587 + L27C15369 不是只在原始少量样本上有效。
+Phase893 的 7 个 no-single closure 条件全部复验成功，
+并在同类 color holdout 中新增 4 个 no-single 条件。
+```
+
+因此当前理论可以从：
+
+```text
+weak no-single closure candidate
+```
+
+收紧为：
+
+```text
+replicated weak no-single closure candidate
+```
+
+但仍不能写成：
+
+```text
+full token closure
+```
+
+原因是 no-single 条件仍集中在 color route，并且 rollout 只是短程干预后 rollout。
+
+### 结果拼图
+
+DS7B：
+
+```text
+L26C8587 + L27C15369:
+  closure_from_open = 36
+  closure_without_single_axis_closure = 11
+  exact_no_single_replicated = 7
+  expanded_no_single = 4
+  mean_target_lift_on_closure = 3.568
+  mean_complementarity_over_best = 0.767
+
+model_U:
+  closure_without_single_axis_closure = 11
+  mean_complementarity_over_best = 0.790
+```
+
+单轴对照：
+
+```text
+L27C15369:
+  closure_from_open = 24
+  closure_without_single_axis_closure = 0
+
+L26C8587:
+  closure_from_open = 8
+  closure_without_single_axis_closure = 0
+```
+
+qwen3：
+
+```text
+L31C2257:
+  closure_from_open = 11
+  closure_without_single_axis_closure = 0
+```
+
+GLM4：
+
+```text
+closure_from_open = 0
+```
+
+### 公式更新
+
+组合独有闭合仍是：
+
+```text
+NoSingleClosure(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in S} BoundaryClosed({i},m)
+```
+
+Phase894 增加复验约束：
+
+```text
+ReplicatedNoSingleClosure(S,m)
+  =
+  NoSingleClosure(S,m)
+  at Phase893
+  and
+  NoSingleClosure(S,m)
+  at Phase894
+```
+
+短 rollout 弱支持：
+
+```text
+RolloutNoSingleHit(S,m)
+  =
+  RolloutClassHit(S,m)
+  and
+  not any_{i in S} RolloutClassHit({i},m)
+```
+
+组合注意力头闭合损失：
+
+```text
+HeadSetClosureLoss(H;S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not BoundaryClosed(head_zero(H),S,m)
+```
+
+### 图谱理论状态
+
+当前理论结构应更新为：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+方向集合边界信号层
++
+目标提升主导边界迁移层
++
+混合组件目标提升路径层
++
+多轴坐标子空间层
++
+留出稳定成对互补层
++
+复验型弱组合独有闭合候选层
++
+短 rollout 边界支持层
++
+多头 attention closure-loss 候选层
+```
+
+注意力部分也需要收紧：
+
+```text
+Phase893:
+  DS7B 单头 head zero 主要是 target lift damage。
+
+Phase894:
+  DS7B 多头组合 zero 可造成少量 closure loss。
+```
+
+但它仍只是：
+
+```text
+multi-head attention closure-loss candidate
+```
+
+不是：
+
+```text
+attention pathway closure
+```
+
+### 当前理论边界
+
+当前更可靠的说法是：
+
+```text
+语言输出边界存在组合齿轮效应。
+单轴可以提升 target，
+但少量条件下需要成对组合才能越过 blocker 边界。
+```
+
+仍然不能说：
+
+```text
+已经破解语言编码机制。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱:
+  78% - 83%
+
+语言编码机制闭合:
+  43% - 48%
+```
+
+## Phase895 理论更新：已知坐标轴最小 pair 候选
+
+Phase895 对 Phase894 的 DS7B color no-single 条件做了最小性审计。核心结果是：
+
+```text
+在 U = {L26C8587, L27C15369, L27C16651} 的已知三轴集合内，
+L26C8587 + L27C15369 对 11 个 no-single 条件全部闭合；
+所有 single 与替代 pair 均不闭合。
+```
+
+这使理论标签从：
+
+```text
+replicated weak no-single closure candidate
+```
+
+收紧为：
+
+```text
+known-axis minimal replicated no-single pair candidate
+```
+
+但这仍不是全局最小割，因为没有穷举所有通道、head、MLP 与连续子空间。
+
+### 结果拼图
+
+DS7B：
+
+```text
+L26C8587 + L27C15369:
+  closure = 11 / 11
+  mean_target_lift = 1.830
+  mean_blocker_reduction = 2.364
+
+L26C8587 + L27C15369 + L27C16651:
+  closure = 11 / 11
+  mean_target_lift = 1.818
+  mean_blocker_reduction = 2.364
+
+L27C15369 + L27C16651:
+  closure = 0 / 11
+
+L26C8587 + L27C16651:
+  closure = 0 / 11
+
+all singles:
+  closure = 0 / 11
+```
+
+qwen3：
+
+```text
+L31C2257:
+  single-axis closure = 11 / 11
+  head_closure_lost = 31
+```
+
+GLM4：
+
+```text
+current candidates:
+  closure = 0
+```
+
+### 公式更新
+
+已知坐标轴最小性：
+
+```text
+KnownAxisMinimal(S,m)
+  =
+  BoundaryClosed(S,m)
+  and
+  not any_{i in U} BoundaryClosed({i},m)
+  and
+  not any_{P in AltPairs(U,S)} BoundaryClosed(P,m)
+```
+
+blocker reduction：
+
+```text
+BlockerReduction(S,m)
+  =
+  BlockerCount_before(m)
+  -
+  BlockerCount_after(S,m)
+```
+
+head blocker damage：
+
+```text
+HeadBlockerDamage(H;S,m)
+  =
+  BlockerReduction(S,m)
+  -
+  BlockerReduction(head_zero(H),S,m)
+```
+
+当前路线边界公式应更新为：
+
+```text
+BoundaryTransition
+  =
+  F(
+    DomainState,
+    PromptGate,
+    KnownAxisMinimalPair,
+    TargetLift,
+    BlockerReduction,
+    HeadSetBoundary,
+    RolloutState
+  )
+```
+
+### 理论状态
+
+当前理论结构更新为：
+
+```text
+条件化输出场闭合理论
++
+证据校准全局齿轮图谱
++
+留出稳定成对互补层
++
+复验型弱组合独有闭合候选层
++
+已知坐标轴最小 pair 候选层
++
+full-vocab blocker reduction 层
++
+多头 target/blocker 路径拆分层
++
+短 rollout 路径损失层
+```
+
+更准确的理论表述：
+
+```text
+在 DS7B color route 中，
+语言输出边界不是单轴概念通道写出答案，
+而是弱轴 L26C8587 与强轴 L27C15369 共同降低 blocker field，
+使目标类别跨过 full-vocab boundary。
+```
+
+仍然不能写成：
+
+```text
+跨模型通用语言编码机制。
+```
+
+谨慎评估：
+
+```text
+全局齿轮图谱:
+  80% - 84%
+
+语言编码机制闭合:
+  44% - 49%
+```
+
+## Phase896 理论更新：领域内 pair 与跨领域坐标轴不足
+
+Phase896 继续验证 Phase895 的 known-axis minimal pair candidate，但把结论进一步收紧。
+
+### 核心事实
+
+```text
+DS7B color route:
+  L26C8587 + L27C15369
+  phase895_known_axis_replicated = 11 / 11
+  no_single_pair_conditions = 11
+  known_axis_minimal_pair_conditions = 11
+
+cross-domain:
+  cross_domain_known_axis_minimal_pair_conditions = 0
+```
+
+因此当前理论不能把该 pair 写成跨领域通用语言机制，只能写成：
+
+```text
+DS7B color route known-axis minimal pair candidate
+```
+
+### 更新后的判定公式
+
+no-single pair：
+
+```text
+NoSinglePair(a,b,x)
+  =
+  BoundaryClosed({a,b},x)
+  and
+  not BoundaryClosed({a},x)
+  and
+  not BoundaryClosed({b},x)
+```
+
+已知坐标轴最小 pair：
+
+```text
+KnownAxisMinimalPair(a,b,U,x)
+  =
+  NoSinglePair(a,b,x)
+  and
+  for all {c,d} subset U, {c,d} != {a,b}:
+    not BoundaryClosed({c,d},x)
+```
+
+跨领域 pair：
+
+```text
+CrossDomainPair(a,b,x)
+  =
+  KnownAxisMinimalPair(a,b,U,x)
+  and
+  Domain(x) != color
+```
+
+Phase896 的结果是：
+
+```text
+KnownAxisMinimalPair(L26C8587,L27C15369,U_color,x_color) 成立；
+CrossDomainPair(L26C8587,L27C15369,x_non_color) 未成立。
+```
+
+### 长 rollout 层
+
+Phase896 增加了 rollout 稳定性层：
+
+```text
+LongRolloutStable(S,x,T)
+  =
+  ClassHit(S,x,T)
+  and
+  ClearAnswer(S,x,T)
+  and
+  not ObjectEcho(S,x,T)
+  and
+  not ProtocolDrift(S,x,T)
+```
+
+DS7B color 核心 pair：
+
+```text
+none:
+  class_hit = 11 / 11
+  clear_answer = 10 / 11
+  answer_like_no_echo = 10 / 11
+  object_echo = 0 / 11
+  protocol_drift = 0 / 11
+
+L26H3 + L26H7 + L26H11 + L26H14 zero:
+  class_hit = 7 / 11
+  clear_answer = 7 / 11
+```
+
+这说明 L26 attention pathway 对 rollout answer-like 稳定性有影响，但仍不是完整多步闭合。
+
+### 理论形状修正
+
+当前应把语言输出图谱写成：
+
+```text
+DomainState
+  ->
+DomainSpecificAxis
+  ->
+KnownAxisPair / SingleAxis
+  ->
+FullVocabBoundary
+  ->
+RolloutAnswerStability
+```
+
+而不是：
+
+```text
+UniversalPair
+  ->
+AllDomainsClosure
+```
+
+### 当前进度
+
+```text
+全局齿轮图谱:
+  81% - 85%
+
+语言编码机制闭合:
+  44% - 49%
+```
+
+### 下一步理论要求
+
+Phase896 后，理论主线应从“复用 color pair”转为：
+
+```text
+Non-Color Route Axis Discovery
+```
+
+也就是先为 material / animal / tool / plant / abstract / object 分别寻找本域坐标轴，再比较这些坐标轴是否存在结构同构。
+
+## Phase897-898 理论更新：领域坐标轴图谱与弱 pair 分层
+
+Phase897-898 完成了 Phase896 后的关键转向：
+
+```text
+不再强行复用 DS7B color pair，
+而是为非颜色 domain 建立各自的 candidate_U。
+```
+
+### 新增事实
+
+Phase897：
+
+```text
+candidate_axes = 84
+search_rows = 4200
+single_axis_closure_conditions = 46
+pair_closure_conditions = 49
+no_single_pair_conditions = 8
+known_axis_minimal_pair_conditions = 4
+```
+
+Phase898 holdout：
+
+```text
+sources = 13
+rows = 1832
+condition_rows = 840
+source_candidate_closure_conditions = 78
+single_axis_closure_conditions = 72
+pair_closure_conditions = 21
+no_single_pair_conditions = 11
+```
+
+### 理论分层
+
+当前非颜色图谱应分为两层：
+
+```text
+stable single-axis route
+  |-- DS7B animal: L27C16651
+  |-- GLM4 animal: L35C8824
+  |-- qwen3 material: L31C2257
+  |-- qwen3 geometry: L31C2414
+
+weak domain-local pair candidate
+  |-- qwen3 geometry: L31C3531 + L35C935
+  |-- DS7B geometry: L27C15791 + L27C15305
+  |-- GLM4 material/object weak pairs
+```
+
+### 更新公式
+
+领域坐标轴发现：
+
+```text
+AxisScore(g,d)
+  =
+  MeanAbsActivation(g | domain=d)
+  -
+  MeanAbsActivation(g | domain!=d)
+```
+
+领域候选集合：
+
+```text
+U_d
+  =
+  TopK_g AxisScore(g,d)
+  union
+  HistoryAxes(d)
+```
+
+领域内 pair 判定：
+
+```text
+DomainNoSinglePair(a,b,x,d)
+  =
+  BoundaryClosed({a,b},x,d)
+  and
+  not BoundaryClosed({a},x,d)
+  and
+  not BoundaryClosed({b},x,d)
+```
+
+holdout 支持度：
+
+```text
+HoldoutSupport(S,d)
+  =
+  count_x BoundaryClosed(S,x,d)
+```
+
+当前最准确的理论表述：
+
+```text
+语言图谱不是 one universal pair，
+而是 domain-specific route axes
+和 shared blocker/protocol field 的组合。
+```
+
+### 进度更新
+
+```text
+全局齿轮图谱:
+  83% - 87%
+
+语言编码机制闭合:
+  45% - 50%
+```
+
+闭合没有大幅增加，因为非颜色 pair 仍弱；但图谱解释力增加，因为非颜色 domain 已经开始有 candidate_U。

@@ -1,0 +1,104 @@
+{
+  "phase": 904,
+  "model": "qwen3",
+  "status": "dry_run",
+  "selected_rows": [
+    {
+      "answer_aliases": [
+        "animal",
+        "living thing",
+        "living creature",
+        "creature",
+        "mammal"
+      ],
+      "canonical_answer": "animal",
+      "case_id": "p885_046_animal_cow",
+      "case_split": "phase885_extended_holdout",
+      "edit_mode": "flip",
+      "eval_domain": "animal",
+      "gear_keys": [
+        "L32C5295",
+        "L35C2290"
+      ],
+      "generated_clean": "Animal",
+      "generated_ids": [
+        21292,
+        13,
+        576,
+        19362,
+        374,
+        264,
+        12728,
+        657,
+        9864,
+        16626,
+        9226,
+        369
+      ],
+      "generated_text": " Animal. The cow is a domesticated animal commonly raised for",
+      "is_component": false,
+      "is_source_candidate": true,
+      "model": "qwen3",
+      "object": "cow",
+      "phase": 899,
+      "phase898_no_single_pair_keys": [
+        "L32C5295+L35C2290"
+      ],
+      "phase898_single_closure_keys": [],
+      "prompt_variant": "natural_question",
+      "protocol_drift": true,
+      "rollout_answer_class": true,
+      "rollout_bad_transition": true,
+      "rollout_class_no_echo_no_protocol": false,
+      "rollout_clear_answer_class": true,
+      "rollout_clear_answer_no_protocol": false,
+      "rollout_identity_class_overlap": false,
+      "rollout_label": "strict_canonical",
+      "rollout_object_echo": false,
+      "rollout_other_or_format": false,
+      "rollout_relation": "source_candidate_pair",
+      "rollout_strict_canonical": true,
+      "row_kind": "phase899_rollout_protocol_audit_row",
+      "source_key": "phase897_pair_candidate::animal::L32C5295+L35C2290",
+      "source_subset_key": "L32C5295+L35C2290",
+      "source_type": "phase897_pair_candidate",
+      "subset_key": "L32C5295+L35C2290",
+      "subset_size": 2
+    }
+  ],
+  "candidates": [
+    {
+      "control_type": "component_zero",
+      "control_label": "mlp_zero_L35",
+      "layer_idx": 35,
+      "component_kind": "mlp",
+      "source_category": "newline",
+      "phase903_strong": 18,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 0,
+      "phase903_mean_delta": -12.159722222222221
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L35",
+      "layer_idx": 35,
+      "component_kind": "attention",
+      "source_category": "newline",
+      "phase903_strong": 18,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 3,
+      "phase903_mean_delta": -2.2222222222222223
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L34",
+      "layer_idx": 34,
+      "component_kind": "attention",
+      "source_category": "newline",
+      "phase903_strong": 13,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 8,
+      "phase903_mean_delta": -0.7430555555555556
+    }
+  ]
+}

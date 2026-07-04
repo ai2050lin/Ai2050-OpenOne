@@ -1,0 +1,157 @@
+{
+  "phase": 896,
+  "title": "Cross-Domain No-Single Pair Search and Long Rollout Stability",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 09:26:50",
+  "attn_implementation": "sdpa",
+  "model_gear_keys": [
+    "L31C2257"
+  ],
+  "subset_specs": [
+    "L31C2257"
+  ],
+  "focus_subset_key": "L31C2257",
+  "selected_conditions": 272,
+  "output_search_rows": 272,
+  "output_condition_rows": 272,
+  "output_long_rollout_rows": 8,
+  "overall": {
+    "focus_closure_from_open": 4,
+    "no_single_pair_conditions": 0,
+    "known_axis_minimal_pair_conditions": 0,
+    "cross_domain_known_axis_minimal_pair_conditions": 0,
+    "phase895_known_axis_replicated": 0,
+    "rollout_class_hit": 2,
+    "rollout_clear_answer": 2,
+    "rollout_answer_like_no_echo": 2,
+    "rollout_object_echo": 0,
+    "rollout_other_or_format": 6,
+    "rollout_protocol_drift": 0,
+    "rollout_class_lost_vs_none": 2,
+    "rollout_clear_lost_vs_none": 2
+  },
+  "domain_groups": [
+    {
+      "model": "qwen3",
+      "domain": "abstract",
+      "conditions": 20,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "animal",
+      "conditions": 44,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "color",
+      "conditions": 92,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "geometry",
+      "conditions": 20,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "material",
+      "conditions": 44,
+      "focus_closure_from_open": 4,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "object",
+      "conditions": 16,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "plant",
+      "conditions": 16,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    },
+    {
+      "model": "qwen3",
+      "domain": "tool",
+      "conditions": 20,
+      "focus_closure_from_open": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "phase895_replicated": 0,
+      "pair_keys": {}
+    }
+  ],
+  "pair_domain_groups": [],
+  "rollout_groups": [
+    {
+      "model": "qwen3",
+      "domain": "material",
+      "subset_key": "L31C2257",
+      "head_set": "L31H19+L31H26+L31H30+L31H12+L31H17",
+      "rows": 4,
+      "class_hit": 0,
+      "clear_answer": 0,
+      "strict_canonical": 0,
+      "answer_like_no_echo": 0,
+      "object_echo": 0,
+      "other_or_format": 4,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 2,
+      "clear_lost_vs_none": 2,
+      "echo_added_vs_none": 0,
+      "drift_added_vs_none": 0
+    },
+    {
+      "model": "qwen3",
+      "domain": "material",
+      "subset_key": "L31C2257",
+      "head_set": "none",
+      "rows": 4,
+      "class_hit": 2,
+      "clear_answer": 2,
+      "strict_canonical": 1,
+      "answer_like_no_echo": 2,
+      "object_echo": 0,
+      "other_or_format": 2,
+      "protocol_drift": 0,
+      "class_lost_vs_none": 0,
+      "clear_lost_vs_none": 0,
+      "echo_added_vs_none": 0,
+      "drift_added_vs_none": 0
+    }
+  ],
+  "evidence_label": "focus_closure_without_pair_minimality",
+  "boundary": "Phase896 searches known-axis no-single pairs across existing domains and extends rollout length. Rollout remains first-step intervention rollout, not natural long-horizon closure."
+}

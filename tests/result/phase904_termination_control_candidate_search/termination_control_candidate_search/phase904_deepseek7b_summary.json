@@ -1,0 +1,566 @@
+{
+  "phase": 904,
+  "title": "Termination Control Candidate Search",
+  "model": "deepseek7b",
+  "status": "complete",
+  "timestamp": "2026-07-03 19:13:44",
+  "attn_implementation": "sdpa",
+  "selected_answer_drift_rows": 33,
+  "candidates": [
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L27",
+      "layer_idx": 27,
+      "component_kind": "attention",
+      "source_category": "comma",
+      "phase903_strong": 18,
+      "phase903_removed": 11,
+      "phase903_stop_improved": 0,
+      "phase903_mean_delta": -8.663194444444445
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L0",
+      "layer_idx": 0,
+      "component_kind": "attention",
+      "source_category": "comma",
+      "phase903_strong": 18,
+      "phase903_removed": 6,
+      "phase903_stop_improved": 0,
+      "phase903_mean_delta": -8.48611111111111
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L25",
+      "layer_idx": 25,
+      "component_kind": "attention",
+      "source_category": "comma",
+      "phase903_strong": 18,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 1,
+      "phase903_mean_delta": -1.3645833333333333
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "mlp_zero_L16",
+      "layer_idx": 16,
+      "component_kind": "mlp",
+      "source_category": "comma",
+      "phase903_strong": 17,
+      "phase903_removed": 4,
+      "phase903_stop_improved": 0,
+      "phase903_mean_delta": -1.2013888888888888
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L23",
+      "layer_idx": 23,
+      "component_kind": "attention",
+      "source_category": "comma",
+      "phase903_strong": 17,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 0,
+      "phase903_mean_delta": -1.3055555555555556
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "mlp_zero_L17",
+      "layer_idx": 17,
+      "component_kind": "mlp",
+      "source_category": "comma",
+      "phase903_strong": 16,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 6,
+      "phase903_mean_delta": -0.9027777777777778
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "attention_zero_L16",
+      "layer_idx": 16,
+      "component_kind": "attention",
+      "source_category": "comma",
+      "phase903_strong": 16,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 3,
+      "phase903_mean_delta": -0.6909722222222222
+    },
+    {
+      "control_type": "component_zero",
+      "control_label": "mlp_zero_L27",
+      "layer_idx": 27,
+      "component_kind": "mlp",
+      "source_category": "newline",
+      "phase903_strong": 15,
+      "phase903_removed": 0,
+      "phase903_stop_improved": 9,
+      "phase903_mean_delta": -3.4541666666666666
+    }
+  ],
+  "overall": {
+    "selected_answer_drift_rows": 33,
+    "candidate_count": 8,
+    "control_rows": 297,
+    "baseline": {
+      "rows": 33,
+      "answer_class": 33,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 0,
+      "protocol_logit_reduced_strong": 0,
+      "protocol_rank1_removed": 0,
+      "stop_rank_improved": 0,
+      "stop_top1": 0,
+      "stop_top10": 31,
+      "next_top_changed": 0,
+      "mean_protocol_logit_delta": 0.0,
+      "median_protocol_logit_delta": 0.0,
+      "first_suffix_categories": {
+        "comma": 20,
+        "newline": 13
+      },
+      "second_suffix_categories": {
+        "explanation": 2,
+        "field_word": 10,
+        "other": 21
+      },
+      "labels": {
+        "answer_alias": 12,
+        "strict_canonical": 21
+      }
+    },
+    "non_baseline": {
+      "rows": 264,
+      "answer_class": 234,
+      "clean_answer_no_protocol": 2,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 2,
+      "protocol_drift": 259,
+      "strict_protocol_drift": 262,
+      "object_echo": 0,
+      "protocol_logit_reduced": 243,
+      "protocol_logit_reduced_strong": 210,
+      "protocol_rank1_removed": 36,
+      "stop_rank_improved": 31,
+      "stop_top1": 0,
+      "stop_top10": 165,
+      "next_top_changed": 73,
+      "mean_protocol_logit_delta": -2.882694128787879,
+      "median_protocol_logit_delta": -1.3125,
+      "first_suffix_categories": {
+        "comma": 134,
+        "list_word": 4,
+        "newline": 90,
+        "other": 36
+      },
+      "second_suffix_categories": {
+        "comma": 13,
+        "explanation": 21,
+        "field_word": 60,
+        "newline": 13,
+        "other": 157
+      },
+      "labels": {
+        "answer_alias": 88,
+        "other": 30,
+        "strict_canonical": 146
+      }
+    },
+    "best_control": {
+      "rows": 33,
+      "answer_class": 22,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 32,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 33,
+      "protocol_logit_reduced_strong": 33,
+      "protocol_rank1_removed": 17,
+      "stop_rank_improved": 0,
+      "stop_top1": 0,
+      "stop_top10": 7,
+      "next_top_changed": 20,
+      "mean_protocol_logit_delta": -8.22064393939394,
+      "median_protocol_logit_delta": -8.6875,
+      "first_suffix_categories": {
+        "comma": 12,
+        "newline": 4,
+        "other": 17
+      },
+      "second_suffix_categories": {
+        "comma": 12,
+        "other": 21
+      },
+      "labels": {
+        "answer_alias": 8,
+        "other": 11,
+        "strict_canonical": 14
+      },
+      "control_label": "attention_zero_L27",
+      "control_type": "component_zero",
+      "layer_idx": 27,
+      "component_kind": "attention",
+      "source_category": "comma"
+    }
+  },
+  "control_summaries": [
+    {
+      "rows": 33,
+      "answer_class": 22,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 32,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 33,
+      "protocol_logit_reduced_strong": 33,
+      "protocol_rank1_removed": 17,
+      "stop_rank_improved": 0,
+      "stop_top1": 0,
+      "stop_top10": 7,
+      "next_top_changed": 20,
+      "mean_protocol_logit_delta": -8.22064393939394,
+      "median_protocol_logit_delta": -8.6875,
+      "first_suffix_categories": {
+        "comma": 12,
+        "newline": 4,
+        "other": 17
+      },
+      "second_suffix_categories": {
+        "comma": 12,
+        "other": 21
+      },
+      "labels": {
+        "answer_alias": 8,
+        "other": 11,
+        "strict_canonical": 14
+      },
+      "control_label": "attention_zero_L27",
+      "control_type": "component_zero",
+      "layer_idx": 27,
+      "component_kind": "attention",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 18,
+      "clean_answer_no_protocol": 2,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 2,
+      "protocol_drift": 29,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 33,
+      "protocol_logit_reduced_strong": 33,
+      "protocol_rank1_removed": 11,
+      "stop_rank_improved": 0,
+      "stop_top1": 0,
+      "stop_top10": 0,
+      "next_top_changed": 20,
+      "mean_protocol_logit_delta": -8.636363636363637,
+      "median_protocol_logit_delta": -7.75,
+      "first_suffix_categories": {
+        "comma": 8,
+        "list_word": 4,
+        "newline": 10,
+        "other": 11
+      },
+      "second_suffix_categories": {
+        "comma": 1,
+        "explanation": 3,
+        "field_word": 5,
+        "newline": 9,
+        "other": 15
+      },
+      "labels": {
+        "answer_alias": 8,
+        "other": 15,
+        "strict_canonical": 10
+      },
+      "control_label": "attention_zero_L0",
+      "control_type": "component_zero",
+      "layer_idx": 0,
+      "component_kind": "attention",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 33,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 28,
+      "protocol_logit_reduced_strong": 23,
+      "protocol_rank1_removed": 4,
+      "stop_rank_improved": 2,
+      "stop_top1": 0,
+      "stop_top10": 23,
+      "next_top_changed": 8,
+      "mean_protocol_logit_delta": -0.928030303030303,
+      "median_protocol_logit_delta": -0.75,
+      "first_suffix_categories": {
+        "comma": 14,
+        "newline": 15,
+        "other": 4
+      },
+      "second_suffix_categories": {
+        "explanation": 11,
+        "field_word": 8,
+        "other": 14
+      },
+      "labels": {
+        "answer_alias": 12,
+        "strict_canonical": 21
+      },
+      "control_label": "mlp_zero_L16",
+      "control_type": "component_zero",
+      "layer_idx": 16,
+      "component_kind": "mlp",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 32,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 31,
+      "protocol_logit_reduced_strong": 20,
+      "protocol_rank1_removed": 1,
+      "stop_rank_improved": 11,
+      "stop_top1": 0,
+      "stop_top10": 31,
+      "next_top_changed": 5,
+      "mean_protocol_logit_delta": -0.6837121212121212,
+      "median_protocol_logit_delta": -0.5,
+      "first_suffix_categories": {
+        "comma": 18,
+        "newline": 14,
+        "other": 1
+      },
+      "second_suffix_categories": {
+        "explanation": 1,
+        "field_word": 12,
+        "newline": 1,
+        "other": 19
+      },
+      "labels": {
+        "answer_alias": 12,
+        "other": 1,
+        "strict_canonical": 20
+      },
+      "control_label": "mlp_zero_L17",
+      "control_type": "component_zero",
+      "layer_idx": 17,
+      "component_kind": "mlp",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 32,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 31,
+      "object_echo": 0,
+      "protocol_logit_reduced": 25,
+      "protocol_logit_reduced_strong": 17,
+      "protocol_rank1_removed": 1,
+      "stop_rank_improved": 5,
+      "stop_top1": 0,
+      "stop_top10": 31,
+      "next_top_changed": 5,
+      "mean_protocol_logit_delta": -0.4375,
+      "median_protocol_logit_delta": -0.5,
+      "first_suffix_categories": {
+        "comma": 18,
+        "newline": 14,
+        "other": 1
+      },
+      "second_suffix_categories": {
+        "explanation": 1,
+        "field_word": 12,
+        "newline": 1,
+        "other": 19
+      },
+      "labels": {
+        "answer_alias": 12,
+        "other": 1,
+        "strict_canonical": 20
+      },
+      "control_label": "attention_zero_L16",
+      "control_type": "component_zero",
+      "layer_idx": 16,
+      "component_kind": "attention",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 32,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 33,
+      "protocol_logit_reduced_strong": 33,
+      "protocol_rank1_removed": 1,
+      "stop_rank_improved": 2,
+      "stop_top1": 0,
+      "stop_top10": 24,
+      "next_top_changed": 4,
+      "mean_protocol_logit_delta": -1.2803030303030303,
+      "median_protocol_logit_delta": -1.375,
+      "first_suffix_categories": {
+        "comma": 23,
+        "newline": 9,
+        "other": 1
+      },
+      "second_suffix_categories": {
+        "field_word": 9,
+        "newline": 1,
+        "other": 23
+      },
+      "labels": {
+        "answer_alias": 12,
+        "other": 1,
+        "strict_canonical": 20
+      },
+      "control_label": "attention_zero_L25",
+      "control_type": "component_zero",
+      "layer_idx": 25,
+      "component_kind": "attention",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 32,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 31,
+      "protocol_logit_reduced_strong": 22,
+      "protocol_rank1_removed": 1,
+      "stop_rank_improved": 0,
+      "stop_top1": 0,
+      "stop_top10": 19,
+      "next_top_changed": 6,
+      "mean_protocol_logit_delta": -0.8541666666666666,
+      "median_protocol_logit_delta": -0.75,
+      "first_suffix_categories": {
+        "comma": 23,
+        "newline": 9,
+        "other": 1
+      },
+      "second_suffix_categories": {
+        "explanation": 1,
+        "field_word": 8,
+        "newline": 1,
+        "other": 23
+      },
+      "labels": {
+        "answer_alias": 12,
+        "other": 1,
+        "strict_canonical": 20
+      },
+      "control_label": "attention_zero_L23",
+      "control_type": "component_zero",
+      "layer_idx": 23,
+      "component_kind": "attention",
+      "source_category": "comma"
+    },
+    {
+      "rows": 33,
+      "answer_class": 33,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 29,
+      "protocol_logit_reduced_strong": 29,
+      "protocol_rank1_removed": 0,
+      "stop_rank_improved": 11,
+      "stop_top1": 0,
+      "stop_top10": 30,
+      "next_top_changed": 5,
+      "mean_protocol_logit_delta": -2.0208333333333335,
+      "median_protocol_logit_delta": -1.625,
+      "first_suffix_categories": {
+        "comma": 18,
+        "newline": 15
+      },
+      "second_suffix_categories": {
+        "explanation": 4,
+        "field_word": 6,
+        "other": 23
+      },
+      "labels": {
+        "answer_alias": 12,
+        "strict_canonical": 21
+      },
+      "control_label": "mlp_zero_L27",
+      "control_type": "component_zero",
+      "layer_idx": 27,
+      "component_kind": "mlp",
+      "source_category": "newline"
+    },
+    {
+      "rows": 33,
+      "answer_class": 33,
+      "clean_answer_no_protocol": 0,
+      "strict_clean_answer_no_protocol": 0,
+      "class_no_echo_no_protocol": 0,
+      "protocol_drift": 33,
+      "strict_protocol_drift": 33,
+      "object_echo": 0,
+      "protocol_logit_reduced": 0,
+      "protocol_logit_reduced_strong": 0,
+      "protocol_rank1_removed": 0,
+      "stop_rank_improved": 0,
+      "stop_top1": 0,
+      "stop_top10": 31,
+      "next_top_changed": 0,
+      "mean_protocol_logit_delta": 0.0,
+      "median_protocol_logit_delta": 0.0,
+      "first_suffix_categories": {
+        "comma": 20,
+        "newline": 13
+      },
+      "second_suffix_categories": {
+        "explanation": 2,
+        "field_word": 10,
+        "other": 21
+      },
+      "labels": {
+        "answer_alias": 12,
+        "strict_canonical": 21
+      },
+      "control_label": "baseline",
+      "control_type": "baseline",
+      "layer_idx": null,
+      "component_kind": null,
+      "source_category": null
+    }
+  ],
+  "evidence_label": "termination_candidate_changes_competition_without_clean_rollout",
+  "boundary": "Phase904 applies top Phase903 layer-component candidates during the first answer-prefix suffix steps. It is a candidate rollout test, not exhaustive termination-control closure."
+}

@@ -1,0 +1,86 @@
+{
+  "phase": 888,
+  "title": "Direction-set Intervention and Internal Subspace Basis Probe",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 05:15:22",
+  "attn_implementation": "sdpa",
+  "edit_modes": [
+    "zero",
+    "flip",
+    "half",
+    "scale_up"
+  ],
+  "selected_source_rows": 8,
+  "output_rows": 32,
+  "overall": {
+    "mode_closure_from_open": 10,
+    "restored_reopens_boundary": 3,
+    "restored_increases_blockers": 3,
+    "base_mask_boundary_closed": 16,
+    "base_suppress_boundary_closed": 16,
+    "mode_counts": {
+      "flip": 8,
+      "half": 8,
+      "scale_up": 8,
+      "zero": 8
+    },
+    "closure_modes": {
+      "flip": 4,
+      "half": 2,
+      "zero": 4
+    },
+    "restore_reopen_modes": {
+      "flip": 1,
+      "half": 1,
+      "zero": 1
+    }
+  },
+  "candidate_groups": [
+    {
+      "model": "qwen3",
+      "parent_candidate_key": "L31C2257:flip",
+      "evidence_label": "direction_set_internal_subspace_signal",
+      "n_source_cases": 8,
+      "n_rows": 32,
+      "source_exact_single_cases": 2,
+      "source_shared_complete_cases": 4,
+      "mode_closure_from_open": 10,
+      "restored_reopens_boundary": 3,
+      "restored_increases_blockers": 3,
+      "base_mask_closed_cases": 4,
+      "base_suppress_closed_cases": 4,
+      "multi_mode_closure_cases": 4,
+      "stable_restore_cases": 1,
+      "closure_modes": {
+        "flip": 4,
+        "half": 2,
+        "zero": 4
+      },
+      "restore_reopen_modes": {
+        "flip": 1,
+        "half": 1,
+        "zero": 1
+      },
+      "mean_cut_token_delta": -0.014583333333333334,
+      "mean_mode_blocker_reduction": 1.15625,
+      "objects": [
+        "ceramic",
+        "chair",
+        "metal",
+        "wood"
+      ],
+      "prompt_variants": [
+        "classification",
+        "natural_category",
+        "natural_question",
+        "object_only",
+        "type_of_completion"
+      ]
+    }
+  ],
+  "evidence_label_counts": {
+    "direction_set_internal_subspace_signal": 1
+  },
+  "boundary": "Phase888 performs real internal channel direction-set interventions plus output cut-token mask/suppress/restore counterfactuals. It is internal subspace evidence probing, not closure."
+}

@@ -1,0 +1,131 @@
+{
+  "phase": 894,
+  "title": "Weak No-Single Closure Replication and Rollout Boundary Probe",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 08:48:21",
+  "attn_implementation": "sdpa",
+  "model_gear_keys": [
+    "L31C2257"
+  ],
+  "subset_specs": [
+    "L31C2257"
+  ],
+  "selected_conditions": 99,
+  "output_first_rows": 99,
+  "output_rollout_rows": 11,
+  "output_head_rows": 77,
+  "overall": {
+    "closure_from_open": 11,
+    "closure_without_single_axis_closure": 0,
+    "unique_no_single_conditions": 0,
+    "phase893_exact_conditions": 0,
+    "phase893_exact_no_single_replicated": 0,
+    "expanded_pair_no_single_conditions": 0,
+    "rollout_class_hit": 11,
+    "rollout_without_single_axis_hit": 0,
+    "head_combo_closure_lost": 31,
+    "head_combo_damage_gt_0_25": 11
+  },
+  "subset_groups": [
+    {
+      "model": "qwen3",
+      "subset_key": "L31C2257",
+      "subset_relation": "model_U",
+      "n_rows": 99,
+      "closure_from_open": 11,
+      "closure_without_single_axis_closure": 0,
+      "exact_no_single_replicated": 0,
+      "expanded_no_single": 0,
+      "mean_target_lift_on_closure": 0.7386363636363636,
+      "mean_complementarity_over_best": 0.0,
+      "modes": {
+        "flip": 6,
+        "half": 2,
+        "zero": 3
+      },
+      "objects_no_single": []
+    }
+  ],
+  "rollout_groups": [
+    {
+      "model": "qwen3",
+      "subset_key": "L31C2257",
+      "n_rows": 11,
+      "rollout_class_hit": 11,
+      "rollout_without_single_axis_hit": 0,
+      "object_echo": 3
+    }
+  ],
+  "head_groups": [
+    {
+      "model": "qwen3",
+      "head_set": "L31H19+L31H26+L31H30+L31H12+L31H17",
+      "n_rows": 11,
+      "closure_lost_vs_none": 10,
+      "damage_gt_0_25": 7,
+      "mean_damage": 0.42045454545454547,
+      "max_damage": 0.75
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H19",
+      "n_rows": 11,
+      "closure_lost_vs_none": 6,
+      "damage_gt_0_25": 0,
+      "mean_damage": 0.1590909090909091,
+      "max_damage": 0.25
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H26",
+      "n_rows": 11,
+      "closure_lost_vs_none": 6,
+      "damage_gt_0_25": 1,
+      "mean_damage": 0.13636363636363635,
+      "max_damage": 0.375
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H17",
+      "n_rows": 11,
+      "closure_lost_vs_none": 4,
+      "damage_gt_0_25": 2,
+      "mean_damage": 0.17045454545454544,
+      "max_damage": 0.375
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H30",
+      "n_rows": 11,
+      "closure_lost_vs_none": 3,
+      "damage_gt_0_25": 0,
+      "mean_damage": 0.022727272727272728,
+      "max_damage": 0.125
+    },
+    {
+      "model": "qwen3",
+      "head_set": "L31H12",
+      "n_rows": 11,
+      "closure_lost_vs_none": 2,
+      "damage_gt_0_25": 1,
+      "mean_damage": 0.03409090909090909,
+      "max_damage": 0.375
+    },
+    {
+      "model": "qwen3",
+      "head_set": "none",
+      "n_rows": 11,
+      "closure_lost_vs_none": 0,
+      "damage_gt_0_25": 0,
+      "mean_damage": 0.0,
+      "max_damage": 0.0
+    }
+  ],
+  "evidence_label": "first_token_closure_without_no_single_extension",
+  "condition_source_counts": {
+    "phase856_base": 45,
+    "phase885_extended_holdout": 54
+  },
+  "boundary": "Phase894 replicates weak no-single closure candidates and checks short rollout. Short rollout is still first-step intervention rollout, not full long-horizon generation closure."
+}

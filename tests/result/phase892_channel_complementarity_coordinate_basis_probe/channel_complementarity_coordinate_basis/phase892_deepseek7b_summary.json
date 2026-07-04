@@ -1,0 +1,170 @@
+{
+  "phase": 892,
+  "title": "Channel Complementarity and Coordinate Basis Probe",
+  "model": "deepseek7b",
+  "status": "complete",
+  "timestamp": "2026-07-03 06:43:02",
+  "attn_implementation": "sdpa",
+  "selected_sources": 22,
+  "output_rows": 462,
+  "model_gear_keys": [
+    "L26C8587",
+    "L27C15369",
+    "L27C16651"
+  ],
+  "edit_modes": [
+    "zero",
+    "flip",
+    "half"
+  ],
+  "overall": {
+    "closure_from_open": 228,
+    "single_axis_closure": 63,
+    "multi_axis_closure": 165,
+    "positive_complementarity_rows": 47,
+    "closure_without_single_axis_closure": 0,
+    "mean_target_lift": 2.3259320175438596,
+    "mean_multi_complementarity_over_best": 0.47765151515151516,
+    "mean_interaction_residual_vs_additive": 0.3776515151515151
+  },
+  "candidate_groups": [
+    {
+      "model": "deepseek7b",
+      "parent_candidate_key": "L27C15369:subset0:zero",
+      "evidence_label": "multi_axis_target_lift_complementarity",
+      "n_rows": 189,
+      "n_source_cases": 9,
+      "closure_from_open": 104,
+      "single_axis_closure": 29,
+      "multi_axis_closure": 75,
+      "positive_complementarity_rows": 31,
+      "closure_without_single_axis_closure": 0,
+      "mean_target_lift": 2.3197115384615383,
+      "mean_multi_complementarity_over_best": 0.6983333333333334,
+      "mean_interaction_residual_vs_additive": 0.565,
+      "closure_subset_types": {
+        "1_axis": 29,
+        "2_axis": 52,
+        "3_axis": 23
+      },
+      "closure_subset_relations": {
+        "model_U": 23,
+        "other_axis": 6,
+        "parent_axis": 23,
+        "with_parent_axis": 46,
+        "without_parent_axis": 6
+      },
+      "closure_modes": {
+        "flip": 38,
+        "half": 28,
+        "zero": 38
+      },
+      "best_subset": {
+        "subset_key": "L26C8587+L27C15369",
+        "mean_target_lift": 3.1494565217391304,
+        "n": 23
+      },
+      "objects": [
+        "blue",
+        "chair",
+        "color",
+        "orange",
+        "purple",
+        "red"
+      ]
+    },
+    {
+      "model": "deepseek7b",
+      "parent_candidate_key": "L26C8587:subset1:zero",
+      "evidence_label": "multi_axis_target_lift_complementarity",
+      "n_rows": 84,
+      "n_source_cases": 4,
+      "closure_from_open": 48,
+      "single_axis_closure": 15,
+      "multi_axis_closure": 33,
+      "positive_complementarity_rows": 16,
+      "closure_without_single_axis_closure": 0,
+      "mean_target_lift": 1.8515625,
+      "mean_multi_complementarity_over_best": 0.8181818181818182,
+      "mean_interaction_residual_vs_additive": 0.6060606060606061,
+      "closure_subset_types": {
+        "1_axis": 15,
+        "2_axis": 24,
+        "3_axis": 9
+      },
+      "closure_subset_relations": {
+        "model_U": 9,
+        "other_axis": 9,
+        "parent_axis": 6,
+        "with_parent_axis": 15,
+        "without_parent_axis": 9
+      },
+      "closure_modes": {
+        "flip": 18,
+        "half": 12,
+        "zero": 18
+      },
+      "best_subset": {
+        "subset_key": "L26C8587+L27C15369",
+        "mean_target_lift": 3.0902777777777777,
+        "n": 9
+      },
+      "objects": [
+        "blue",
+        "chair",
+        "color",
+        "red"
+      ]
+    },
+    {
+      "model": "deepseek7b",
+      "parent_candidate_key": "L27C16651:flip",
+      "evidence_label": "single_axis_dominant_target_lift",
+      "n_rows": 189,
+      "n_source_cases": 9,
+      "closure_from_open": 76,
+      "single_axis_closure": 19,
+      "multi_axis_closure": 57,
+      "positive_complementarity_rows": 0,
+      "closure_without_single_axis_closure": 0,
+      "mean_target_lift": 2.6340460526315788,
+      "mean_multi_complementarity_over_best": -0.009868421052631578,
+      "mean_interaction_residual_vs_additive": -0.0010964912280701754,
+      "closure_subset_types": {
+        "1_axis": 19,
+        "2_axis": 38,
+        "3_axis": 19
+      },
+      "closure_subset_relations": {
+        "model_U": 19,
+        "parent_axis": 19,
+        "with_parent_axis": 38
+      },
+      "closure_modes": {
+        "flip": 32,
+        "half": 12,
+        "zero": 32
+      },
+      "best_subset": {
+        "subset_key": "L27C16651",
+        "mean_target_lift": 2.6414473684210527,
+        "n": 19
+      },
+      "objects": [
+        "bird",
+        "chair",
+        "cow",
+        "fish",
+        "insect",
+        "lizard",
+        "mammal",
+        "shark"
+      ]
+    }
+  ],
+  "evidence_label_counts": {
+    "multi_axis_target_lift_complementarity": 2,
+    "single_axis_dominant_target_lift": 1
+  },
+  "boundary": "Phase892 tests coordinate-axis channel subsets. It is finer than component ablation, but it is not an arbitrary learned projection basis."
+}

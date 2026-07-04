@@ -1,0 +1,880 @@
+{
+  "phase": 897,
+  "title": "Non-Color Route Axis Discovery and Domain-Specific Pair Search",
+  "model": "deepseek7b",
+  "status": "complete",
+  "timestamp": "2026-07-03 14:13:43",
+  "attn_implementation": "sdpa",
+  "layers_to_capture": [
+    24,
+    25,
+    26,
+    27
+  ],
+  "domains": [
+    "animal",
+    "material",
+    "tool",
+    "plant",
+    "abstract",
+    "object",
+    "geometry"
+  ],
+  "overall": {
+    "candidate_axes": 28,
+    "history_candidate_axes": 4,
+    "activation_candidate_axes": 24,
+    "selected_conditions": 140,
+    "search_rows": 1400,
+    "condition_rows": 140,
+    "single_axis_closure_conditions": 20,
+    "pair_closure_conditions": 20,
+    "no_single_pair_conditions": 1,
+    "known_axis_minimal_pair_conditions": 1
+  },
+  "domain_groups": [
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "candidate_u_size": 4,
+      "conditions": 20,
+      "single_axis_closure_conditions": 5,
+      "pair_closure_conditions": 6,
+      "no_single_pair_conditions": 1,
+      "known_axis_minimal_pair_conditions": 1,
+      "single_keys": {
+        "L24C3099": 1,
+        "L27C15207": 2,
+        "L27C15305": 3,
+        "L27C15791": 5
+      },
+      "pair_keys": {
+        "L27C15791+L27C15305": 1
+      },
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "candidate_u_size": 4,
+      "conditions": 24,
+      "single_axis_closure_conditions": 11,
+      "pair_closure_conditions": 11,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L26C8587": 1,
+        "L27C15369": 2,
+        "L27C16651": 11
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "history_phase884": 2,
+        "history_phase896_pair_domain": 2
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "candidate_u_size": 4,
+      "conditions": 24,
+      "single_axis_closure_conditions": 2,
+      "pair_closure_conditions": 1,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L27C18590": 2
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "candidate_u_size": 4,
+      "conditions": 20,
+      "single_axis_closure_conditions": 1,
+      "pair_closure_conditions": 1,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L27C1552": 1
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "candidate_u_size": 4,
+      "conditions": 20,
+      "single_axis_closure_conditions": 1,
+      "pair_closure_conditions": 1,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {
+        "L27C11093": 1
+      },
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "candidate_u_size": 4,
+      "conditions": 16,
+      "single_axis_closure_conditions": 0,
+      "pair_closure_conditions": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {},
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "candidate_u_size": 4,
+      "conditions": 16,
+      "single_axis_closure_conditions": 0,
+      "pair_closure_conditions": 0,
+      "no_single_pair_conditions": 0,
+      "known_axis_minimal_pair_conditions": 0,
+      "single_keys": {},
+      "pair_keys": {},
+      "candidate_sources": {
+        "activation_domain_specificity": 4
+      }
+    }
+  ],
+  "single_domain_groups": [
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C16651",
+      "rows": 24,
+      "closure_from_open": 11,
+      "mean_target_lift": 2.1354166666666665,
+      "mean_blocker_reduction": 0.5833333333333334
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15791",
+      "rows": 20,
+      "closure_from_open": 5,
+      "mean_target_lift": -0.796875,
+      "mean_blocker_reduction": 0.5
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15305",
+      "rows": 20,
+      "closure_from_open": 3,
+      "mean_target_lift": -0.45625,
+      "mean_blocker_reduction": -0.1
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C18590",
+      "rows": 24,
+      "closure_from_open": 2,
+      "mean_target_lift": 0.4010416666666667,
+      "mean_blocker_reduction": 1.8333333333333333
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C15369",
+      "rows": 24,
+      "closure_from_open": 2,
+      "mean_target_lift": 0.018229166666666668,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15207",
+      "rows": 20,
+      "closure_from_open": 2,
+      "mean_target_lift": -0.13125,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C11093",
+      "rows": 20,
+      "closure_from_open": 1,
+      "mean_target_lift": 0.221875,
+      "mean_blocker_reduction": 0.1
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L26C8587",
+      "rows": 24,
+      "closure_from_open": 1,
+      "mean_target_lift": 0.015625,
+      "mean_blocker_reduction": 0.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C1552",
+      "rows": 20,
+      "closure_from_open": 1,
+      "mean_target_lift": -0.109375,
+      "mean_blocker_reduction": -1.05
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L24C3099",
+      "rows": 20,
+      "closure_from_open": 1,
+      "mean_target_lift": -1.20625,
+      "mean_blocker_reduction": -4.85
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C1709",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.359375,
+      "mean_blocker_reduction": -0.1875
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C3817",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.3072916666666667,
+      "mean_blocker_reduction": -0.041666666666666664
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C13559",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0859375,
+      "mean_blocker_reduction": 0.7916666666666666
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L25C15220",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.060546875,
+      "mean_blocker_reduction": 0.25
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C11125",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0400390625,
+      "mean_blocker_reduction": -17.75
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C1851",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0,
+      "mean_blocker_reduction": 0.041666666666666664
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C11730",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": 0.0,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C179",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.0234375,
+      "mean_blocker_reduction": -0.4375
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C7072",
+      "rows": 24,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.046875,
+      "mean_blocker_reduction": 0.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C9417",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.1005859375,
+      "mean_blocker_reduction": 3.875
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C15801",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.134375,
+      "mean_blocker_reduction": 0.3
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C12935",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.278125,
+      "mean_blocker_reduction": -0.15
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C13015",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.2900390625,
+      "mean_blocker_reduction": -0.5625
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C7733",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.30078125,
+      "mean_blocker_reduction": -0.875
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C1109",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.3078125,
+      "mean_blocker_reduction": -2.15
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L25C9862",
+      "rows": 16,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.30859375,
+      "mean_blocker_reduction": -1.0
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C4374",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.353125,
+      "mean_blocker_reduction": -2.4
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L24C18781",
+      "rows": 20,
+      "closure_from_open": 0,
+      "mean_target_lift": -0.796875,
+      "mean_blocker_reduction": -0.65
+    }
+  ],
+  "pair_domain_groups": [
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15791+L27C15305",
+      "rows": 20,
+      "closure_from_open": 6,
+      "no_single_pair_closure": 1,
+      "known_axis_minimal_pair_closure": 1,
+      "mean_target_lift": -1.253125,
+      "mean_blocker_reduction": 0.35
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C16651+L27C1851",
+      "rows": 24,
+      "closure_from_open": 11,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 2.1354166666666665,
+      "mean_blocker_reduction": 0.5833333333333334
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C16651+L26C8587",
+      "rows": 24,
+      "closure_from_open": 11,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 2.1354166666666665,
+      "mean_blocker_reduction": 0.5833333333333334
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C16651+L27C15369",
+      "rows": 24,
+      "closure_from_open": 11,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 2.1328125,
+      "mean_blocker_reduction": 0.5833333333333334
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15791+L27C15207",
+      "rows": 20,
+      "closure_from_open": 5,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.925,
+      "mean_blocker_reduction": 0.65
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15305+L27C15207",
+      "rows": 20,
+      "closure_from_open": 3,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.60625,
+      "mean_blocker_reduction": 0.0
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C1851+L27C15369",
+      "rows": 24,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.005208333333333333,
+      "mean_blocker_reduction": 0.041666666666666664
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L24C3099+L27C15207",
+      "rows": 20,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -1.34375,
+      "mean_blocker_reduction": -4.5
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15305+L24C3099",
+      "rows": 20,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -1.621875,
+      "mean_blocker_reduction": -5.6
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "geometry",
+      "subset_key": "L27C15791+L24C3099",
+      "rows": 20,
+      "closure_from_open": 2,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -1.959375,
+      "mean_blocker_reduction": -4.5
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C7072+L27C18590",
+      "rows": 24,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.3489583333333333,
+      "mean_blocker_reduction": 1.625
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C11093+L27C11730",
+      "rows": 20,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.23125,
+      "mean_blocker_reduction": 0.1
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C15369+L26C8587",
+      "rows": 24,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.013020833333333334,
+      "mean_blocker_reduction": 0.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "animal",
+      "subset_key": "L27C1851+L26C8587",
+      "rows": 24,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.010416666666666666,
+      "mean_blocker_reduction": 0.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C1552+L27C15801",
+      "rows": 20,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.240625,
+      "mean_blocker_reduction": 0.05
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C1109+L27C1552",
+      "rows": 20,
+      "closure_from_open": 1,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.4109375,
+      "mean_blocker_reduction": -2.85
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C18590+L27C3817",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.7239583333333334,
+      "mean_blocker_reduction": 1.5
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C13559+L27C18590",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.4869791666666667,
+      "mean_blocker_reduction": 2.0833333333333335
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C13559+L27C3817",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.3802083333333333,
+      "mean_blocker_reduction": 0.4583333333333333
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C179+L27C1709",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.328125,
+      "mean_blocker_reduction": -0.4375
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C7072+L27C3817",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.25,
+      "mean_blocker_reduction": -0.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L25C15220+L27C11125",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.091796875,
+      "mean_blocker_reduction": -18.25
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L25C9862+L27C1709",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.08984375,
+      "mean_blocker_reduction": -1.25
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C7733+L27C1709",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.0625,
+      "mean_blocker_reduction": -1.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "material",
+      "subset_key": "L27C13559+L27C7072",
+      "rows": 24,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": 0.046875,
+      "mean_blocker_reduction": 0.4583333333333333
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L25C15220+L27C9417",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.025390625,
+      "mean_blocker_reduction": 4.125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C11093+L27C12935",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.04375,
+      "mean_blocker_reduction": -0.05
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C11125+L27C9417",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.0634765625,
+      "mean_blocker_reduction": -10.8125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C179+L25C9862",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.1953125,
+      "mean_blocker_reduction": -1.1875
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C13015+L25C15220",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.216796875,
+      "mean_blocker_reduction": -0.6875
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C12935+L27C11730",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.25625,
+      "mean_blocker_reduction": -0.2
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C13015+L27C11125",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.2626953125,
+      "mean_blocker_reduction": -18.8125
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C7733+L27C179",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.3046875,
+      "mean_blocker_reduction": -1.75
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "object",
+      "subset_key": "L27C13015+L27C9417",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.3935546875,
+      "mean_blocker_reduction": 3.625
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C1109+L27C15801",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.4484375,
+      "mean_blocker_reduction": -1.65
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C4374+L27C1552",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.4625,
+      "mean_blocker_reduction": -3.45
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C4374+L27C15801",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.48125,
+      "mean_blocker_reduction": -2.7
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "plant",
+      "subset_key": "L27C7733+L25C9862",
+      "rows": 16,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.541015625,
+      "mean_blocker_reduction": -2.5625
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L27C11093+L24C18781",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.609375,
+      "mean_blocker_reduction": -0.55
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "abstract",
+      "subset_key": "L27C1109+L27C4374",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.6640625,
+      "mean_blocker_reduction": -5.1
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L24C18781+L27C11730",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -0.803125,
+      "mean_blocker_reduction": -0.7
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "tool",
+      "subset_key": "L24C18781+L27C12935",
+      "rows": 20,
+      "closure_from_open": 0,
+      "no_single_pair_closure": 0,
+      "known_axis_minimal_pair_closure": 0,
+      "mean_target_lift": -1.0625,
+      "mean_blocker_reduction": -0.9
+    }
+  ],
+  "evidence_label": "domain_specific_known_axis_minimal_pair_candidates",
+  "boundary": "Phase897 discovers candidate axes by late-MLP domain-specific activation plus prior atlas history, then tests domain-local single/pair interventions. It is candidate_U discovery, not global closure."
+}

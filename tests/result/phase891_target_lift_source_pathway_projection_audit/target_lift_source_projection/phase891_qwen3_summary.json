@@ -1,0 +1,69 @@
+{
+  "phase": 891,
+  "title": "Target-Lift Source Pathway and True Projection Subspace Audit",
+  "model": "qwen3",
+  "status": "complete",
+  "timestamp": "2026-07-03 06:06:16",
+  "attn_implementation": "sdpa",
+  "selected_sources": 6,
+  "output_rows": 90,
+  "model_gear_keys": [
+    "L31C2257"
+  ],
+  "edit_modes": [
+    "zero",
+    "flip",
+    "half"
+  ],
+  "control_types": [
+    "none",
+    "mlp_zero",
+    "attn_zero",
+    "mlp_half",
+    "attn_half"
+  ],
+  "overall": {
+    "none_closure_from_open": 10,
+    "multi_axis_none_closure": 0,
+    "mlp_zero_closure_lost": 4,
+    "attn_zero_closure_lost": 4,
+    "mean_none_target_lift": 0.5,
+    "mean_mlp_zero_lift_retention": 2.305357142857143,
+    "mean_attn_zero_lift_retention": -1.1970238095238095
+  },
+  "candidate_groups": [
+    {
+      "model": "qwen3",
+      "parent_candidate_key": "L31C2257:flip",
+      "evidence_label": "mixed_component_target_lift",
+      "n_rows": 90,
+      "n_source_cases": 6,
+      "none_closure_from_open": 10,
+      "multi_axis_none_closure": 0,
+      "mean_none_target_lift": 0.5,
+      "mean_none_blocker_reduction": 1.6,
+      "mlp_zero_closure_lost": 4,
+      "attn_zero_closure_lost": 4,
+      "mean_mlp_zero_lift_retention": 2.305357142857143,
+      "mean_attn_zero_lift_retention": -1.1970238095238095,
+      "closure_modes": {
+        "flip": 4,
+        "half": 2,
+        "zero": 4
+      },
+      "gear_set_types": {
+        "candidate_axis": 10
+      },
+      "objects": [
+        "ceramic",
+        "chair",
+        "metal",
+        "wood"
+      ]
+    }
+  ],
+  "evidence_label_counts": {
+    "mixed_component_target_lift": 1
+  },
+  "boundary": "Phase891 audits target-lift source using broad component scaling. MLP/attention output ablation is coarse and should not be read as neuron-level closure."
+}

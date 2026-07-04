@@ -1,0 +1,161 @@
+{
+  "phase": 888,
+  "title": "Direction-set Intervention and Internal Subspace Basis Probe",
+  "model": "deepseek7b",
+  "status": "complete",
+  "timestamp": "2026-07-03 05:15:45",
+  "attn_implementation": "sdpa",
+  "edit_modes": [
+    "zero",
+    "flip",
+    "half",
+    "scale_up"
+  ],
+  "selected_source_rows": 43,
+  "output_rows": 172,
+  "overall": {
+    "mode_closure_from_open": 78,
+    "restored_reopens_boundary": 0,
+    "restored_increases_blockers": 0,
+    "base_mask_boundary_closed": 124,
+    "base_suppress_boundary_closed": 124,
+    "mode_counts": {
+      "flip": 43,
+      "half": 43,
+      "scale_up": 43,
+      "zero": 43
+    },
+    "closure_modes": {
+      "flip": 31,
+      "half": 16,
+      "zero": 31
+    },
+    "restore_reopen_modes": {}
+  },
+  "candidate_groups": [
+    {
+      "model": "deepseek7b",
+      "parent_candidate_key": "L27C16651:flip",
+      "evidence_label": "direction_set_boundary_signal_no_restore",
+      "n_source_cases": 21,
+      "n_rows": 84,
+      "source_exact_single_cases": 9,
+      "source_shared_complete_cases": 17,
+      "mode_closure_from_open": 42,
+      "restored_reopens_boundary": 0,
+      "restored_increases_blockers": 0,
+      "base_mask_closed_cases": 17,
+      "base_suppress_closed_cases": 17,
+      "multi_mode_closure_cases": 17,
+      "stable_restore_cases": 0,
+      "closure_modes": {
+        "flip": 17,
+        "half": 8,
+        "zero": 17
+      },
+      "restore_reopen_modes": {},
+      "mean_cut_token_delta": -0.06155960648148148,
+      "mean_mode_blocker_reduction": -0.19047619047619047,
+      "objects": [
+        "bird",
+        "cat",
+        "chair",
+        "cow",
+        "dog",
+        "fish",
+        "horse",
+        "insect",
+        "lizard",
+        "mammal",
+        "shark"
+      ],
+      "prompt_variants": [
+        "classification",
+        "natural_category",
+        "natural_question",
+        "object_only",
+        "question_plain"
+      ]
+    },
+    {
+      "model": "deepseek7b",
+      "parent_candidate_key": "L27C15369:subset0:zero",
+      "evidence_label": "direction_set_boundary_signal_no_restore",
+      "n_source_cases": 15,
+      "n_rows": 60,
+      "source_exact_single_cases": 9,
+      "source_shared_complete_cases": 11,
+      "mode_closure_from_open": 30,
+      "restored_reopens_boundary": 0,
+      "restored_increases_blockers": 0,
+      "base_mask_closed_cases": 11,
+      "base_suppress_closed_cases": 11,
+      "multi_mode_closure_cases": 11,
+      "stable_restore_cases": 0,
+      "closure_modes": {
+        "flip": 11,
+        "half": 8,
+        "zero": 11
+      },
+      "restore_reopen_modes": {},
+      "mean_cut_token_delta": 0.01278409090909091,
+      "mean_mode_blocker_reduction": -0.13333333333333333,
+      "objects": [
+        "black",
+        "blue",
+        "chair",
+        "color",
+        "orange",
+        "purple",
+        "red"
+      ],
+      "prompt_variants": [
+        "classification",
+        "natural_category",
+        "natural_question",
+        "object_only",
+        "question_plain"
+      ]
+    },
+    {
+      "model": "deepseek7b",
+      "parent_candidate_key": "L26C8587:subset1:zero",
+      "evidence_label": "direction_set_boundary_signal_no_restore",
+      "n_source_cases": 7,
+      "n_rows": 28,
+      "source_exact_single_cases": 3,
+      "source_shared_complete_cases": 3,
+      "mode_closure_from_open": 6,
+      "restored_reopens_boundary": 0,
+      "restored_increases_blockers": 0,
+      "base_mask_closed_cases": 3,
+      "base_suppress_closed_cases": 3,
+      "multi_mode_closure_cases": 3,
+      "stable_restore_cases": 0,
+      "closure_modes": {
+        "flip": 3,
+        "zero": 3
+      },
+      "restore_reopen_modes": {},
+      "mean_cut_token_delta": 0.0546875,
+      "mean_mode_blocker_reduction": 0.17857142857142858,
+      "objects": [
+        "blue",
+        "chair",
+        "color",
+        "red"
+      ],
+      "prompt_variants": [
+        "classification",
+        "natural_category",
+        "natural_question",
+        "object_only",
+        "question_plain"
+      ]
+    }
+  ],
+  "evidence_label_counts": {
+    "direction_set_boundary_signal_no_restore": 3
+  },
+  "boundary": "Phase888 performs real internal channel direction-set interventions plus output cut-token mask/suppress/restore counterfactuals. It is internal subspace evidence probing, not closure."
+}
