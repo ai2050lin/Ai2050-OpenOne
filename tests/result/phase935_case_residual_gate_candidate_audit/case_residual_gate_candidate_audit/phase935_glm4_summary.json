@@ -1,0 +1,858 @@
+{
+  "phase": 935,
+  "title": "Case Residual Gate Candidate Audit",
+  "model": "glm4",
+  "status": "complete",
+  "timestamp": "2026-07-04 18:14:02",
+  "state_rows": 30,
+  "case_summary": [
+    {
+      "target_case_id": "p856_021_material_wood",
+      "states": 10,
+      "fixed_success_2_25": 10,
+      "residual_needed_2_25": 0,
+      "true_loso_repair_success_2_25": 10,
+      "size_control_success_2_25": 10,
+      "true_beats_controls_2_25": 0,
+      "opening_threshold_median": 2.15,
+      "route_delta_norm_mean": 0.03778054565191269,
+      "boundary_eos_rank_median": 8.0,
+      "margin_pos_mean_score_mean": 0.21281516253948213
+    },
+    {
+      "target_case_id": "p856_035_object_chair",
+      "states": 10,
+      "fixed_success_2_25": 0,
+      "residual_needed_2_25": 10,
+      "true_loso_repair_success_2_25": 10,
+      "size_control_success_2_25": 0,
+      "true_beats_controls_2_25": 10,
+      "opening_threshold_median": 2.1,
+      "route_delta_norm_mean": 0.03601239249110222,
+      "boundary_eos_rank_median": 9.0,
+      "margin_pos_mean_score_mean": 0.21762279272079468
+    },
+    {
+      "target_case_id": "p885_047_animal_shark",
+      "states": 10,
+      "fixed_success_2_25": 10,
+      "residual_needed_2_25": 0,
+      "true_loso_repair_success_2_25": 10,
+      "size_control_success_2_25": 10,
+      "true_beats_controls_2_25": 0,
+      "opening_threshold_median": 2.0,
+      "route_delta_norm_mean": 0.03890377655625343,
+      "boundary_eos_rank_median": 5.0,
+      "margin_pos_mean_score_mean": 0.22798119783401488
+    }
+  ],
+  "top_feature_splits": [
+    {
+      "feature": "target_route_delta_norm",
+      "target": "residual_needed_2_25",
+      "threshold": 0.036896469071507454,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_boundary_eos_margin_vs_blocker",
+      "target": "residual_needed_2_25",
+      "threshold": -5.078125,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_boundary_eos_rank",
+      "target": "residual_needed_2_25",
+      "threshold": 8.5,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "boundary_period_gap_vs_eos",
+      "target": "residual_needed_2_25",
+      "threshold": 5.078125,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "boundary_punctuation_gap_vs_eos",
+      "target": "residual_needed_2_25",
+      "threshold": 5.078125,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_max_score",
+      "target": "residual_needed_2_25",
+      "threshold": 1.3660572171211243,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_min_score",
+      "target": "residual_needed_2_25",
+      "threshold": 0.06339829787611961,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_eos_support_mean_score",
+      "target": "residual_needed_2_25",
+      "threshold": 0.41953757405281067,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_neg_margin_mean_score",
+      "target": "residual_needed_2_25",
+      "threshold": -0.14916343241930008,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_route_delta_norm",
+      "target": "true_beats_controls_2_25",
+      "threshold": 0.036896469071507454,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_boundary_eos_margin_vs_blocker",
+      "target": "true_beats_controls_2_25",
+      "threshold": -5.078125,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_boundary_eos_rank",
+      "target": "true_beats_controls_2_25",
+      "threshold": 8.5,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "boundary_period_gap_vs_eos",
+      "target": "true_beats_controls_2_25",
+      "threshold": 5.078125,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "boundary_punctuation_gap_vs_eos",
+      "target": "true_beats_controls_2_25",
+      "threshold": 5.078125,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_max_score",
+      "target": "true_beats_controls_2_25",
+      "threshold": 1.3660572171211243,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_min_score",
+      "target": "true_beats_controls_2_25",
+      "threshold": 0.06339829787611961,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_eos_support_mean_score",
+      "target": "true_beats_controls_2_25",
+      "threshold": 0.41953757405281067,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_neg_margin_mean_score",
+      "target": "true_beats_controls_2_25",
+      "threshold": -0.14916343241930008,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_route_delta_norm",
+      "target": "fixed_success_2_25",
+      "threshold": 0.036896469071507454,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_boundary_eos_margin_vs_blocker",
+      "target": "fixed_success_2_25",
+      "threshold": -5.078125,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "target_boundary_eos_rank",
+      "target": "fixed_success_2_25",
+      "threshold": 8.5,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "boundary_period_gap_vs_eos",
+      "target": "fixed_success_2_25",
+      "threshold": 5.078125,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "boundary_punctuation_gap_vs_eos",
+      "target": "fixed_success_2_25",
+      "threshold": 5.078125,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_max_score",
+      "target": "fixed_success_2_25",
+      "threshold": 1.3660572171211243,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_min_score",
+      "target": "fixed_success_2_25",
+      "threshold": 0.06339829787611961,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_eos_support_mean_score",
+      "target": "fixed_success_2_25",
+      "threshold": 0.41953757405281067,
+      "polarity": "ge_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_neg_margin_mean_score",
+      "target": "fixed_success_2_25",
+      "threshold": -0.14916343241930008,
+      "polarity": "le_true",
+      "correct": 30,
+      "total": 30,
+      "accuracy": 1.0,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_activation_abs_median",
+      "target": "residual_needed_2_25",
+      "threshold": 0.081787109375,
+      "polarity": "ge_true",
+      "correct": 29,
+      "total": 30,
+      "accuracy": 0.9666666666666667,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_activation_abs_median",
+      "target": "true_beats_controls_2_25",
+      "threshold": 0.081787109375,
+      "polarity": "ge_true",
+      "correct": 29,
+      "total": 30,
+      "accuracy": 0.9666666666666667,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_activation_abs_median",
+      "target": "fixed_success_2_25",
+      "threshold": 0.081787109375,
+      "polarity": "le_true",
+      "correct": 29,
+      "total": 30,
+      "accuracy": 0.9666666666666667,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "phase925_factor",
+      "target": "residual_needed_2_25",
+      "threshold": 0.75,
+      "polarity": "ge_true",
+      "correct": 25,
+      "total": 30,
+      "accuracy": 0.8333333333333334,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "phase925_factor",
+      "target": "true_beats_controls_2_25",
+      "threshold": 0.75,
+      "polarity": "ge_true",
+      "correct": 25,
+      "total": 30,
+      "accuracy": 0.8333333333333334,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "phase925_factor",
+      "target": "fixed_success_2_25",
+      "threshold": 0.75,
+      "polarity": "le_true",
+      "correct": 25,
+      "total": 30,
+      "accuracy": 0.8333333333333334,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "opening_threshold_factor",
+      "target": "residual_needed_2_25",
+      "threshold": 2.05,
+      "polarity": "ge_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_activation_abs_top",
+      "target": "residual_needed_2_25",
+      "threshold": 32.75,
+      "polarity": "le_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_mean_score",
+      "target": "residual_needed_2_25",
+      "threshold": 0.21527249366044998,
+      "polarity": "ge_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "opening_threshold_factor",
+      "target": "true_beats_controls_2_25",
+      "threshold": 2.05,
+      "polarity": "ge_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_activation_abs_top",
+      "target": "true_beats_controls_2_25",
+      "threshold": 32.75,
+      "polarity": "le_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_mean_score",
+      "target": "true_beats_controls_2_25",
+      "threshold": 0.21527249366044998,
+      "polarity": "ge_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 10,
+      "false_count": 20,
+      "true_cases": [
+        "p856_035_object_chair"
+      ],
+      "false_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "opening_threshold_factor",
+      "target": "fixed_success_2_25",
+      "threshold": 2.05,
+      "polarity": "le_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_activation_abs_top",
+      "target": "fixed_success_2_25",
+      "threshold": 32.75,
+      "polarity": "ge_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    },
+    {
+      "feature": "l39_margin_pos_mean_score",
+      "target": "fixed_success_2_25",
+      "threshold": 0.21527249366044998,
+      "polarity": "le_true",
+      "correct": 20,
+      "total": 30,
+      "accuracy": 0.6666666666666666,
+      "true_count": 20,
+      "false_count": 10,
+      "true_cases": [
+        "p856_021_material_wood",
+        "p885_047_animal_shark"
+      ],
+      "false_cases": [
+        "p856_035_object_chair"
+      ],
+      "case_confounded": true
+    }
+  ],
+  "target_counts": {
+    "fixed_success_2_25": 20,
+    "residual_needed_2_25": 10,
+    "true_loso_repair_success_2_25": 30,
+    "size_control_success_2_25": 20,
+    "true_beats_controls_2_25": 10
+  },
+  "evidence_label": "case_residual_gate_candidate_case_confounded",
+  "boundary": "observational gate-candidate audit only; no causal natural gate claim"
+}

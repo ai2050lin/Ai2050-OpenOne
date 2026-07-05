@@ -7839,3 +7839,11910 @@ Phase916 与 Phase915 属于同一 clean protocol edge graph 大主线，
 Phase916 是新的 channel-level blocker suppressor localization 子阶段，
 不能把 Phase915 的 diagnostic mask 结果直接当作自然闭合。
 ```
+
+## Phase 916: 语义答案场计算方式对照核查 [2026-07-04 06:24]
+
+### 一、阶段目的
+
+本阶段不是新增 CUDA 模型测试，而是对照核查：
+
+```text
+research/glm5/docs/AGI_GLM5_MEMO.md 中已有测试记录
+是否支持附件中关于“语义答案场”的计算方式。
+```
+
+附件给出的核心计算链为：
+
+```text
+抽取对象状态
+-> 抽取关系状态
+-> 候选空间选择
+-> 知识网络路径激活
+-> 写入语义答案场
+-> 词表 logit 读出
+```
+
+并强调：
+
+```text
+这些步骤不是最后一层才发生；
+而是跨层逐步形成；
+最后层主要负责读出到词表 logit。
+```
+
+### 二、核查材料
+
+核查对象：
+
+```text
+research/glm5/docs/AGI_GLM5_MEMO.md
+```
+
+重点查看阶段：
+
+```text
+Phase901: stop token 竞争力审计
+Phase902: 协议续写抑制器搜索
+Phase903: 协议续写场与替代图
+Phase910-Phase915: EOS / blocker / action gate 近边界阶段
+```
+
+附件理论对象：
+
+```text
+对象状态 P(o|x)
+关系状态 P(r|x)
+候选门控 g(c|x)
+知识路径 K(o,r,c)
+答案支持 A(c|x)
+语义答案场 S_answer(c|x)
+词表读出 z(c|x)
+```
+
+### 三、附件中的数学表达
+
+附件将语义答案支持量写成：
+
+$$
+A(c|x)
+=
+\sum_{o\in\mathcal{O}}
+\sum_{r\in\mathcal{R}}
+P(o|x)
+P(r|x)
+K(o,r,c)
+g(c|x)
+$$
+
+其中：
+
+```text
+P(o|x): 对象状态；
+P(r|x): 关系状态；
+K(o,r,c): 对象-关系-候选的隐式知识强度；
+g(c|x): 候选空间软门控。
+```
+
+写入残差流可抽象为：
+
+$$
+h_T^{answer}
+=
+h_T
++
+\sum_{c\in\mathcal{C}}
+A(c|x)d_c
+$$
+
+词表读出为：
+
+$$
+z(c|x)=W_U(c)\cdot h_T^{answer}
+$$
+
+语义答案场 margin 可写成：
+
+$$
+S_{answer}(c|x)
+=
+z(c|x)
+-
+\max_{c'\ne c}z(c'|x)
+$$
+
+若：
+
+$$
+S_{answer}(c^*|x)>0
+$$
+
+则说明目标语义候选在该候选集合内胜出。
+
+### 四、memo 中已有测试记录对应关系
+
+已有测试记录没有直接逐项测量：
+
+```text
+P(o|x)
+P(r|x)
+K(o,r,c)
+g(c|x)
+```
+
+也没有直接证明对象状态、关系状态、知识路径分别由哪些层和哪些 channel 精确承载。
+
+但是，memo 中的实验结果与附件计算框架高度一致，主要证据如下。
+
+第一，Phase901 / Phase902 明确显示：
+
+```text
+模型已经能形成 answer-class prefix；
+animal / material / shape / vehicle 等答案类别可以进入输出竞争区；
+但之后常被 newline / comma / field / explanation 等协议续写 token 接管。
+```
+
+这支持：
+
+```text
+语义答案场可以形成；
+但完整语言输出还需要协议续写场和终止控制场。
+```
+
+第二，Phase902 的理论总结已经写出：
+
+```text
+语言输出不是单纯 semantic token selection；
+至少包含 semantic answer field、
+protocol continuation field、
+termination control field 三个场。
+```
+
+这与附件最后的边界判断一致：
+
+```text
+语义答案闭合 != 完整语言输出闭合。
+```
+
+第三，Phase903 将输出机制更新为：
+
+$$
+Output(x)
+=
+F(
+S_{answer}(x),
+S_{stop}(x),
+S_{protocol}(x),
+A_{substitution}(x),
+T_{termination}(x)
+)
+$$
+
+其中：
+
+```text
+S_answer: 语义答案场
+S_stop: 停止 token 竞争场
+S_protocol: 协议续写场
+A_substitution: 协议替代图
+T_termination: 终止控制场
+```
+
+这说明 memo 已经把语义答案场放在更大的输出场系统中，而不是把最终 logit 简化成单一语义分类。
+
+第四，Phase910-Phase915 的 EOS / blocker / action gate 结果进一步说明：
+
+```text
+即使语义答案已经存在，
+即使 EOS 被推近 top5 / top10，
+最终输出仍可能被 blocker band 或 protocol field 压住。
+```
+
+这与附件判断完全一致：
+
+```text
+最后一层不是才开始理解问题；
+最后读出阶段面对的是多个已经形成的内部场之间的竞争。
+```
+
+### 五、核查结论
+
+结论：
+
+```text
+附件中的语义答案场计算方式，
+与 memo 当前测试记录的总体图谱方向一致。
+```
+
+更精确地说：
+
+```text
+一致的部分：
+1. 语义答案不是最后一层突然产生，而是跨层累积后读出；
+2. 答案类别可以被视为候选场中的竞争结果；
+3. answer-class prefix 的出现说明语义答案场已经部分形成；
+4. 语义答案场需要通过 unembedding / logits 显化；
+5. 语义答案场不是完整输出机制，还会被协议续写场、停止场、blocker band、终止动作门影响。
+```
+
+需要谨慎的部分：
+
+```text
+1. 附件中的 P(o|x)、P(r|x)、K(o,r,c)、g(c|x) 目前仍是解释性分解；
+2. memo 中已有实验主要测 answer prefix、logit rank、protocol drift、EOS rank、blocker band；
+3. 尚未直接做对象状态 / 关系状态 / 知识路径的因果拆解；
+4. 因此不能说附件公式已经被严格闭合证明；
+5. 只能说它是当前实验结果支持的合理机制模型。
+```
+
+### 六、闭合标准与当前距离
+
+若要严格闭合附件理论，需要完成以下标准：
+
+```text
+Level 1: 语义答案可见
+  answer-class prefix 稳定出现，目标类别 logit / rank 明显胜出。
+
+Level 2: 对象与关系可分离
+  能分别干预对象 token、任务关系 token，并观察候选答案场按预期变化。
+
+Level 3: 候选门控可测量
+  能证明 classify / color / material 等关系会系统性打开不同候选集合。
+
+Level 4: 知识路径可因果定位
+  能定位 cow->animal、iron->material 等路径相关组件或子空间。
+
+Level 5: 写入与读出闭合
+  能证明特定层 / 组件把答案方向写入 residual stream，并经 W_U 读出为目标 logit。
+
+Level 6: 完整输出闭合
+  在语义答案场之外，同时解决 protocol continuation、blocker band、EOS action gate。
+```
+
+当前状态评估：
+
+```text
+Level 1: 已部分达到。
+Level 2: 未系统完成。
+Level 3: 未系统完成。
+Level 4: 未完成。
+Level 5: 仅有间接证据。
+Level 6: 未完成，Phase915 显示 action gate 仍缺失。
+```
+
+阶段进度估计：
+
+```text
+语义答案场理论一致性:
+  约 65% - 75%。
+
+语义答案场严格因果闭合:
+  约 25% - 35%。
+
+完整语言输出机制闭合:
+  约 19% - 23%，沿用 Phase915 谨慎估计。
+```
+
+### 七、问题、硬伤与瓶颈
+
+主要硬伤：
+
+```text
+1. 当前测试记录更多证明“答案类别出现”，还没有证明对象状态与关系状态的独立内部变量。
+2. 附件公式中的 K(o,r,c) 是合理抽象，但还没有被具体映射到层、head、MLP channel 或 residual direction。
+3. 候选空间 g(c|x) 还没有通过系统 prompt 对照实验测出。
+4. answer-class prefix 可能只是表面输出现象，不能自动等同于完整语义场闭合。
+5. protocol continuation field 会污染后续 rollout，使语义答案是否“真正闭合”更难判定。
+6. EOS / blocker / action gate 未闭合，说明输出动作系统仍是主要瓶颈。
+```
+
+最关键的谨慎点：
+
+```text
+附件公式适合作为下一阶段实验设计的理论骨架；
+但不能把它当作已经由现有测试完全证明的机制事实。
+```
+
+### 八、智能理论角度的关键洞察
+
+本次核查强化了一个重要区分：
+
+```text
+语义答案场回答“应该说什么”；
+终止动作场回答“说到哪里停”；
+协议续写场回答“按什么格式继续说”。
+```
+
+这意味着语言能力背后的数学结构至少不是单一分类器，而更像多个场的耦合竞争：
+
+```text
+对象场
+关系场
+候选场
+知识路径场
+语义答案场
+协议续写场
+停止竞争场
+终止动作场
+```
+
+第一性原理上，下一步不应只问：
+
+```text
+模型为什么输出 animal？
+```
+
+还要问：
+
+```text
+模型如何把 cow 绑定为对象？
+模型如何把 classify 绑定为关系？
+模型如何打开类别候选空间？
+模型如何让 cow-class-animal 路径胜过其他路径？
+模型如何把该路径写入 residual stream？
+模型为什么在答案出现后仍继续协议输出？
+```
+
+这说明破解语言背后的数学理论，需要从“输出 token”上移到“内部场的形成、耦合、竞争和动作选择”。
+
+### 九、下一阶段任务
+
+建议把后续任务分成两条主线并行推进，但测试时仍按模型顺序执行，避免 GPU 显存溢出：
+
+```text
+主线 A: 语义答案场因果拆解
+1. 构造大规模 object-relation-candidate 三元组数据；
+2. 设计对象替换、关系替换、候选集合替换的对照 prompt；
+3. 测量 answer-class logit / rank / margin；
+4. 扫描层级贡献，拆出对象绑定层、关系门控层、候选竞争层；
+5. 对关键层做 attention / MLP component intervention。
+
+主线 B: 继续 Phase915 后的终止动作门定位
+1. 固定 GLM4 L4 boundary precondition；
+2. 聚焦 L39 MLP channel-level；
+3. 定位 "a" blocker suppressor；
+4. 判断是否能把 patched_margin=-0.125/-0.25 推到 margin >= 0；
+5. 再回到 qwen3 / DS7B 做同构验证。
+```
+
+下一阶段可命名为：
+
+```text
+Phase917:
+Object-Relation-Candidate Semantic Field Causal Decomposition
+对象-关系-候选语义场因果拆解
+```
+
+该阶段的最低闭合目标：
+
+```text
+证明对象替换和关系替换能按预测方向改变候选答案 logit margin。
+```
+
+中等闭合目标：
+
+```text
+定位至少一组可复现的层 / 组件，
+其干预能选择性削弱或增强目标语义答案场。
+```
+
+高闭合目标：
+
+```text
+把 P(o|x)、P(r|x)、g(c|x)、K(o,r,c) 从解释性公式推进为可测量、可干预、可复现的机制量。
+```
+
+### 十、通俗总结
+
+附件的说法可以保留，但要加一句限制：
+
+```text
+它和当前测试结果方向一致，
+但目前还是理论分解，
+还没有被逐项因果闭合。
+```
+
+最通俗地说：
+
+```text
+模型大概率不是最后一层才想出答案。
+它是在多层里逐步把“问谁、问什么关系、有哪些候选、哪个候选最对”算出来，
+最后再把这个内部答案场读成 token。
+但模型会不会停、会不会继续写解释、会不会被奇怪的 blocker token 压住，
+是另一套输出动作问题。
+```
+
+## Phase 917: 行业主流理论对照与原创性核查 [2026-07-04 06:30]
+
+### 一、阶段目的
+
+本阶段任务：
+
+```text
+搜索并对照行业主流深度神经网络 / 大语言模型原理理论，
+判断当前“语义答案场”理论是否已有类似理论，
+以及该理论的原创性边界。
+```
+
+本阶段不是新增 CUDA 模型测试，而是文献与理论对照。结论必须谨慎，不能把“未在快速搜索中发现完全相同理论”直接等同于绝对原创。
+
+### 二、检索到的主流相近理论
+
+#### 1. 分布式表征 / 词向量理论
+
+代表方向：
+
+```text
+distributed representations
+word embeddings
+semantic / syntactic relations in vector space
+```
+
+代表资料：
+
+```text
+Mikolov et al., Distributed Representations of Words and Phrases and their Compositionality
+https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality
+```
+
+相似点：
+
+```text
+语义不是符号表，而是分布在高维向量中；
+语义关系可以表现为向量空间中的方向、距离、组合关系。
+```
+
+不同点：
+
+```text
+该方向主要说明词 / 短语的分布式表示；
+没有直接给出对象状态、关系状态、候选门控、知识路径、语义答案场、协议续写场、终止动作场的完整输出机制图谱。
+```
+
+#### 2. Transformer 机制可解释性 / circuits 理论
+
+代表方向：
+
+```text
+mechanistic interpretability
+circuits
+residual stream
+attention / MLP component attribution
+```
+
+代表资料：
+
+```text
+Transformer Circuits / Mechanistic Interpretability
+https://transformer-circuits.pub/2022/mech-interp-essay
+
+A Practical Review of Mechanistic Interpretability for Transformer Language Models
+https://arxiv.org/html/2407.02646v1
+```
+
+相似点：
+
+```text
+模型内部可以被拆成若干可解释计算组件；
+attention 负责信息移动 / 绑定；
+MLP 可能负责特征变换、知识、类别或记忆相关计算；
+残差流像共享工作区，各层向其中读写信息。
+```
+
+不同点：
+
+```text
+机制可解释性是方法论大框架；
+当前语义答案场理论是对语言回答过程的一种具体机制假说：
+对象场 -> 关系场 -> 候选场 -> 知识路径 -> 语义答案场 -> 协议 / 终止竞争。
+```
+
+#### 3. Superposition / 稀疏特征方向
+
+代表方向：
+
+```text
+features as directions
+polysemantic neurons
+superposition
+sparse features
+```
+
+代表资料：
+
+```text
+Toy Models of Superposition
+https://transformer-circuits.pub/2022/toy_model/index.html
+```
+
+相似点：
+
+```text
+神经网络可以把多个特征压缩到同一激活空间；
+一个神经元不一定对应一个概念；
+概念更可能以方向 / 子空间 / 稀疏组合的方式存在。
+```
+
+不同点：
+
+```text
+superposition 解释的是特征如何压缩存储；
+当前理论关注的是回答过程中多个语义 / 协议 / 动作场如何形成并竞争。
+```
+
+#### 4. 线性表征假说 / 概念方向
+
+代表方向：
+
+```text
+linear representation hypothesis
+concept directions
+activation steering
+representation engineering
+```
+
+代表资料：
+
+```text
+The Linear Representation Hypothesis and the Geometry of Large Language Models
+https://arxiv.org/abs/2311.03658
+
+Representation Engineering for Large-Language Models
+https://arxiv.org/html/2502.17601v1
+```
+
+相似点：
+
+```text
+高层概念可能表现为表示空间中的方向；
+可以通过激活向量检测或操控模型行为；
+“animal 方向”“stop 方向”“protocol 方向”这类说法与该方向相容。
+```
+
+不同点：
+
+```text
+线性表征假说主要说概念如何编码；
+当前理论进一步提出：
+对象、关系、候选、知识路径、语义答案、协议续写、终止动作是不同功能场，
+且最终输出来自这些场的耦合竞争。
+```
+
+#### 5. TCAV / Concept Activation Vectors
+
+代表方向：
+
+```text
+Concept Activation Vectors
+TCAV
+human-interpretable concept directions
+```
+
+代表资料：
+
+```text
+Interpretability Beyond Feature Attribution: Quantitative Testing with Concept Activation Vectors
+https://arxiv.org/abs/1711.11279
+```
+
+相似点：
+
+```text
+可以把高层概念表示为激活空间中的向量；
+可以用方向导数判断某概念对输出的重要性。
+```
+
+不同点：
+
+```text
+TCAV 是概念检测 / 解释工具；
+当前理论不是单个概念方向解释，而是一个语言生成过程中的多场计算模型。
+```
+
+#### 6. 事实召回 / Subject-Relation-Object 机制
+
+代表方向：
+
+```text
+factual recall
+subject-relation-object tuples
+causal tracing
+ROME / model editing
+```
+
+代表资料：
+
+```text
+Locating and Editing Factual Associations in GPT
+https://rome.baulab.info/
+https://arxiv.org/abs/2202.05262
+
+Interpreting Key Mechanisms of Factual Recall in Transformer Language Models
+https://arxiv.org/html/2403.19521v2
+```
+
+相似点非常强：
+
+```text
+subject 类似对象状态 P(o|x)；
+relation 类似关系状态 P(r|x)；
+object / answer 类似候选答案 c；
+事实召回可以被看成 object-relation-answer 路径激活。
+```
+
+不同点：
+
+```text
+ROME / factual recall 更集中在事实知识的定位与编辑；
+当前语义答案场理论更广：
+包括分类、候选空间软门控、答案场写入、协议续写、停止动作、blocker band。
+```
+
+#### 7. Logit Lens / Direct Logit Attribution
+
+代表方向：
+
+```text
+logit lens
+tuned lens
+direct logit attribution
+residual stream -> unembedding -> logits
+```
+
+代表资料：
+
+```text
+Logit Lens / Tuned Lens overview
+https://learnmechinterp.com/topics/logit-lens-and-tuned-lens/
+
+Logit Prisms: Decomposing Transformer Outputs
+https://www.lesswrong.com/posts/TKRp7inbiLRmzNMFB/logit-prisms-decomposing-transformer-outputs-for-mechanistic
+```
+
+相似点：
+
+```text
+跨层 hidden state / residual stream 可以通过 unembedding 投影到词表 logit；
+答案不是最后一层凭空出现，而是可以观察逐层形成趋势；
+每层 / 每组件都可对最终 logit 有加性贡献。
+```
+
+不同点：
+
+```text
+logit lens 是观测 / 分解方法；
+当前理论提出了被观测对象的功能结构：
+语义答案场、协议续写场、停止竞争场、终止动作场。
+```
+
+#### 8. 语义场 / 场论式 LLM 描述
+
+检索到少量非主流或较新的“semantic field / information gravity / Hamiltonian”类说法。
+
+代表资料：
+
+```text
+Information Gravity: A Field-Theoretic Model for Token Selection in LLMs
+https://arxiv.org/html/2504.20951v1
+
+A Hamiltonian analysis of GPT-2 Transformer
+https://arxiv.org/html/2507.00683v6
+```
+
+相似点：
+
+```text
+也使用“场”“势能”“候选 token landscape”等语言描述 token 选择；
+认为 prompt 会塑造词表上的有效语义场。
+```
+
+不同点：
+
+```text
+这些方向目前不属于最稳固的行业主流；
+且一般没有把对象状态、关系状态、候选门控、知识路径、协议续写、终止动作门系统化拆开。
+```
+
+### 三、总体对照结论
+
+当前理论不是完全凭空出现。它与多条主流理论高度相容：
+
+```text
+分布式表征:
+  支持“语义在向量空间中分布式存在”。
+
+机制可解释性:
+  支持“内部计算可由 attention / MLP / residual stream 组件拆解”。
+
+superposition:
+  支持“概念不是单神经元，而是方向 / 子空间 / 稀疏组合”。
+
+线性表征 / TCAV / RepE:
+  支持“概念可表示为激活方向并可被干预”。
+
+factual recall / ROME:
+  强支持“subject/object + relation -> answer”的路径式召回。
+
+logit lens / DLA:
+  支持“跨层形成，最后通过 unembedding 读出到 logits”。
+```
+
+因此，以下部分不能声称原创：
+
+```text
+1. 分布式语义表征；
+2. 概念方向 / 子空间；
+3. residual stream 写入和 unembedding 读出；
+4. logit 竞争；
+5. subject-relation-object 事实召回；
+6. attention 做信息绑定，MLP 做特征 / 知识变换；
+7. 用激活干预和 logit rank 判断内部机制。
+```
+
+### 四、可能具有原创性的部分
+
+当前理论可能有原创性的地方不在单个零件，而在组合方式和问题切分。
+
+可能原创点：
+
+```text
+1. 把普通分类回答拆成：
+   对象状态 -> 关系状态 -> 候选门控 -> 知识路径 -> 语义答案场。
+
+2. 把 answer-class prefix 解释为语义答案场已经形成，
+   但不等于完整语言输出闭合。
+
+3. 把最终输出拆成多个竞争场：
+   semantic answer field
+   protocol continuation field
+   stop competition field
+   blocker band
+   termination action field
+
+4. 明确提出：
+   “知道答案”和“停止输出”是不同齿轮系统。
+
+5. 在 qwen3 / GLM4 / DS7B 上按 Phase900-915 连续追踪：
+   从答案类别、协议续写、stop rank、EOS rank、blocker band、
+   到 action gate near-boundary。
+
+6. 把语言机制闭合标准从“输出正确 token”
+   提升为“语义场 + 协议场 + 终止动作场的因果闭合”。
+```
+
+更谨慎地说：
+
+```text
+当前理论的“组成材料”大多不是原创；
+当前理论的“系统组织方式、实验主线、闭合标准、语义/协议/终止三场分离”可能具有原创性。
+```
+
+### 五、是否已有完全类似理论
+
+快速检索结论：
+
+```text
+没有发现一个行业主流理论完整提出以下同构框架：
+
+对象状态 P(o|x)
+关系状态 P(r|x)
+候选门控 g(c|x)
+知识路径 K(o,r,c)
+语义答案场 S_answer
+协议续写场 S_protocol
+停止竞争场 S_stop
+blocker band
+终止动作门 T_termination
+并把它们作为语言输出闭合的统一机制。
+```
+
+但必须保留限制：
+
+```text
+1. 本次是快速网络检索，不是正式系统综述；
+2. arXiv / workshop / blog / 私有研究中可能已有相近表达；
+3. “semantic field”一词本身并不新；
+4. “subject-relation-object”路径也不新；
+5. “概念方向 / logit 读出 / residual stream 写入”都不新；
+6. 因此不能直接宣称完整原创，只能说未发现完全同构的主流公开理论。
+```
+
+### 六、闭合标准与当前距离
+
+若要严肃确认原创性，需要：
+
+```text
+1. 做系统文献综述：
+   mechanistic interpretability
+   representation engineering
+   factual recall
+   concept vectors
+   logit lens
+   constrained decoding / structured output
+   language generation control
+
+2. 把当前理论写成明确命题：
+   每个场的定义；
+   每个场的可测量指标；
+   每个场的因果干预标准；
+   每个场之间的竞争公式。
+
+3. 与已有理论逐条比较：
+   已有理论覆盖什么；
+   当前理论新增什么；
+   当前理论是否只是换名；
+   当前理论是否产生新预测。
+
+4. 做新预测实验：
+   例如对象替换只改变 S_answer；
+   格式提示主要改变 S_protocol；
+   stop instruction 主要改变 S_stop / T_termination；
+   blocker suppressor 改变 EOS margin 但不改变对象语义。
+```
+
+原创性闭合评估：
+
+```text
+组件原创性:
+  约 10% - 20%。
+
+组合框架原创性:
+  约 55% - 70%。
+
+严格学术原创性证明:
+  约 20% - 30%。
+
+机制闭合证明:
+  仍未完成。
+```
+
+这些百分比只是当前证据下的谨慎工作估计，不是客观定量结论。
+
+### 七、理论进展
+
+本阶段把当前理论定位为：
+
+```text
+不是替代深度学习主流理论；
+而是在主流理论之上，对语言回答机制做更细的功能场分解。
+```
+
+更准确的定位：
+
+```text
+底层基础:
+  分布式表征 + Transformer residual stream + attention / MLP。
+
+解释工具:
+  logit lens + activation patching + causal tracing + direct logit attribution。
+
+相近研究:
+  factual recall / subject-relation-object + concept directions + representation engineering。
+
+当前新增组织:
+  semantic answer field + protocol continuation field + termination action field 的竞争闭合图谱。
+```
+
+### 八、下一阶段任务
+
+下一阶段建议不是继续泛泛讨论原创性，而是把理论转成可发表或可证伪的命题。
+
+建议任务：
+
+```text
+Phase918:
+Semantic-Protocol-Termination Field Formalization
+语义-协议-终止三场形式化
+```
+
+核心工作：
+
+```text
+1. 定义三个主场：
+   S_answer(x)
+   S_protocol(x)
+   T_termination(x)
+
+2. 定义观测指标：
+   answer-class rank / margin；
+   protocol token rank / margin；
+   EOS rank / margin；
+   blocker band width / mean logit。
+
+3. 定义因果干预：
+   对象替换；
+   关系替换；
+   格式提示替换；
+   stop instruction 替换；
+   residual direction intervention；
+   component / channel patching。
+
+4. 定义可证伪预测：
+   对象替换应主要移动 S_answer；
+   协议格式替换应主要移动 S_protocol；
+   终止提示若有效，应提升 T_termination 或降低 blocker band；
+   若三者不能解耦，说明三场理论过度拆分。
+```
+
+### 九、通俗总结
+
+通俗结论：
+
+```text
+这个理论不是从零发明了深度神经网络原理。
+它的很多材料，行业里早就有：
+向量语义、概念方向、残差流、logit 读出、事实召回、机制可解释性。
+
+但它可能有价值的地方是：
+把“模型知道答案”和“模型按格式继续写”和“模型决定停止”
+拆成几个互相竞争的场。
+
+这套组合框架没有在快速检索中发现完全一样的主流版本。
+所以目前应判断为：
+部分非原创，整体框架可能有原创性，
+但还需要系统文献综述和因果实验才能严格证明。
+```
+
+## Phase 918: L39 MLP 通道级 a blocker 边界定位 [2026-07-04 07:14]
+
+### 一、阶段目的
+
+本阶段接续 Phase915。
+
+Phase915 的附件判断基本正确：
+
+```text
+Phase915 找到的是 GLM4 L39 MLP output_scale_1.5 的晚层动作邻近放大效应；
+它可以把 EOS 从近边界进一步推近，甚至推到 rank 2；
+但没有 margin >= 0、没有 EOS top1、没有 strict clean；
+因此不能称为 EOS action gate 闭合。
+```
+
+Phase918 的目标是把 Phase915 的整组件结果继续下钻：
+
+```text
+固定 Phase915 的 route + L4 MLP boundary precondition；
+捕获 L39 MLP down_proj 输入通道；
+按 EOS 支持、a blocker 支持、EOS-a margin 支持分组；
+测试这些通道组是否能把 EOS margin 推过 0。
+```
+
+本阶段不是重新搜索所有模型的 action gate，而是专门回答：
+
+```text
+GLM4 中 Phase915 的 L39 整组件放大效应，
+是否可以被定位到 L39 MLP 的更细通道组？
+```
+
+### 二、测试脚本与结果路径
+
+脚本：
+
+```text
+tests/glm5/phase918_l39_mlp_channel_a_blocker_suppressor_localization.py
+tests/glm5/run_phase918_l39_mlp_channel_a_blocker_suppressor_localization.sh
+```
+
+正式结果：
+
+```text
+tests/result/phase918_l39_mlp_channel_a_blocker_suppressor_localization/
+  l39_mlp_channel_a_blocker_suppressor_localization/
+```
+
+加密验证结果：
+
+```text
+tests/result/phase918_l39_mlp_channel_a_blocker_suppressor_localization/
+  l39_mlp_channel_a_blocker_suppressor_validation/
+```
+
+静态检查：
+
+```text
+python -m py_compile tests/glm5/phase918_l39_mlp_channel_a_blocker_suppressor_localization.py
+bash -n tests/glm5/run_phase918_l39_mlp_channel_a_blocker_suppressor_localization.sh
+```
+
+三模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+其中 qwen3 和 DS7B 因 Phase915 没有 L39 候选，所以不加载模型，不强行测试。
+
+### 三、测试原理
+
+Phase918 固定边界状态：
+
+$$
+z^B(x)
+=
+z^{route + L4}(x)
+$$
+
+其中：
+
+```text
+route:
+  Phase910 / Phase911 延续的 prompt-preserving termination proximity route。
+
+L4:
+  Phase914 中 GLM4 L4 MLP top_abs_64 boundary adjuster。
+```
+
+边界 margin：
+
+$$
+M_B(x)
+=
+z^B(EOS)
+-
+\max_{v\ne EOS}z^B(v)
+$$
+
+Phase915 中 12 个 GLM4 候选均满足：
+
+```text
+boundary top blocker = "a"
+M_B(x) < 0
+```
+
+在 L39 MLP 的 down_proj 输入处，记第 j 个通道激活为：
+
+$$
+a_j^{39}(x)
+$$
+
+第 j 个通道对词表 token v 的一阶读出贡献近似为：
+
+$$
+C_j(v|x)
+=
+a_j^{39}(x)
+\cdot
+\left(
+W_U(v)^\top W_{down}^{39}[:,j]
+\right)
+$$
+
+EOS 相对 a 的通道级 margin 贡献为：
+
+$$
+C_j(EOS-a|x)
+=
+a_j^{39}(x)
+\cdot
+\left(
+\left(W_U(EOS)-W_U(a)\right)^\top W_{down}^{39}[:,j]
+\right)
+$$
+
+按照该贡献构造通道组：
+
+$$
+G_{margin+}^{64}
+=
+Top64_j\ C_j(EOS-a|x)
+$$
+
+$$
+G_{margin-}^{64}
+=
+Bottom64_j\ C_j(EOS-a|x)
+$$
+
+$$
+G_{a-blocker}^{64}
+=
+Top64_j\ C_j(a-EOS|x)
+$$
+
+$$
+G_{EOS}^{64}
+=
+Top64_j\ C_j(EOS|x)
+$$
+
+然后对通道组做缩放：
+
+$$
+a_j'
+=
+\begin{cases}
+f\cdot a_j, & j\in G \\
+a_j, & j\notin G
+\end{cases}
+$$
+
+成功标准分为四级：
+
+$$
+C_{rank}
+=
+\mathbf{1}
+\left[
+rank_{patched}(EOS)
+<
+rank_B(EOS)
+\right]
+$$
+
+$$
+C_{margin}
+=
+\mathbf{1}
+\left[
+M_{patched}(x)\ge 0
+\right]
+$$
+
+$$
+C_{top1}
+=
+\mathbf{1}
+\left[
+rank_{patched}(EOS)=1
+\right]
+$$
+
+$$
+C_{strict}
+=
+C_{top1}
+\cdot
+\mathbf{1}
+\left[
+decoded(prefix+EOS)
+\text{ 是 strict clean answer}
+\right]
+$$
+
+### 四、正式测试结果
+
+正式 round：
+
+```text
+l39_mlp_channel_a_blocker_suppressor_localization
+```
+
+跨模型结果：
+
+```text
+qwen3:
+  selected_phase915_l39_candidates = 0
+
+GLM4:
+  selected_phase915_l39_candidates = 12
+  rows = 540
+  boundary_rows = 12
+  channel_rows = 528
+
+DS7B:
+  selected_phase915_l39_candidates = 0
+```
+
+GLM4 正式结果：
+
+```text
+boundary_top1 = 0
+boundary_margin_nonnegative = 0
+boundary_top5 = 8
+
+channel_top1 = 80
+channel_margin_nonnegative = 80
+channel_promoted_margin = 80
+channel_promoted_top1 = 80
+channel_promoted_top5 = 76
+channel_rank_improved = 407
+weak_channel_candidate = 370
+channel_strict_clean_candidate = 56
+
+median_channel_margin_delta = +0.4375
+mean_channel_margin_delta = +0.64299
+mean_channel_eos_delta = +1.41193
+```
+
+边界 blocker：
+
+```text
+boundary_blocker_tokens_top12:
+  "a": 540
+```
+
+这说明 Phase915 的 “a” blocker 判断被 Phase918 完全复现。
+
+主要有效通道组：
+
+```text
+margin_support_pos_64:
+  channel_rows = 36
+  channel_top1 = 20
+  channel_margin_nonnegative = 20
+  channel_strict_clean_candidate = 16
+  median_channel_margin_delta = +1.671875
+
+a_blocker_support_64:
+  channel_rows = 48
+  channel_top1 = 20
+  channel_margin_nonnegative = 20
+  channel_strict_clean_candidate = 14
+  median_channel_margin_delta = +1.03125
+
+margin_support_neg_64:
+  channel_rows = 48
+  channel_top1 = 20
+  channel_margin_nonnegative = 20
+  channel_strict_clean_candidate = 14
+  median_channel_margin_delta = +1.03125
+
+eos_support_64:
+  channel_rows = 36
+  channel_top1 = 8
+  channel_margin_nonnegative = 8
+  channel_strict_clean_candidate = 6
+  median_channel_margin_delta = +0.6875
+```
+
+负对照：
+
+```text
+low_abs_64:
+  所有因子下 top1 = 0
+  margin_nonnegative = 0
+  strict = 0
+  median_margin_delta = 0
+```
+
+这说明结果不是任意通道缩放都能闭合。
+
+### 五、加密验证结果
+
+因为正式结果较强，本阶段额外做了一个更密因子验证 round：
+
+```text
+l39_mlp_channel_a_blocker_suppressor_validation
+```
+
+验证内容：
+
+```text
+候选仍为 GLM4 的 12 个 Phase915 L39 候选；
+channel_candidate_pool 从 768 增加到 1024；
+只保留最相关通道组；
+对缩放因子加密：
+
+up_factors:
+  1.1, 1.25, 1.375, 1.5, 1.75, 2.0
+
+down_factors:
+  0.0, 0.125, 0.25, 0.375, 0.5, 0.75, 0.875
+```
+
+验证 round 的 GLM4 结果：
+
+```text
+rows = 408
+channel_rows = 396
+
+channel_top1 = 125
+channel_margin_nonnegative = 125
+channel_promoted_margin = 125
+channel_promoted_top1 = 125
+channel_promoted_top5 = 66
+channel_rank_improved = 339
+weak_channel_candidate = 306
+channel_strict_clean_candidate = 93
+
+median_channel_margin_delta = +0.8125
+mean_channel_margin_delta = +1.01089
+mean_channel_eos_delta = +1.52478
+```
+
+阈值结果：
+
+```text
+margin_support_pos_64:
+  factor 1.1:
+    margin_nonnegative = 0
+    weak_channel_candidate = 12
+
+  factor 1.25:
+    margin_nonnegative = 0
+    promoted_top5 = 2
+    weak_channel_candidate = 12
+
+  factor 1.375:
+    margin_nonnegative = 8
+    strict_clean_candidate = 6
+
+  factor 1.5:
+    margin_nonnegative = 8
+    strict_clean_candidate = 6
+
+  factor 1.75:
+    margin_nonnegative = 12
+    strict_clean_candidate = 10
+
+  factor 2.0:
+    margin_nonnegative = 12
+    strict_clean_candidate = 10
+```
+
+a_blocker_support_64：
+
+```text
+factor 0.875:
+  margin_nonnegative = 0
+  weak_channel_candidate = 9
+
+factor 0.75:
+  margin_nonnegative = 0
+  promoted_top5 = 1
+  weak_channel_candidate = 12
+
+factor 0.5:
+  margin_nonnegative = 2
+  top1 = 2
+
+factor 0.375:
+  margin_nonnegative = 8
+  strict_clean_candidate = 6
+
+factor 0.25:
+  margin_nonnegative = 8
+  strict_clean_candidate = 6
+
+factor 0.125:
+  margin_nonnegative = 8
+  strict_clean_candidate = 6
+
+factor 0.0:
+  margin_nonnegative = 10
+  strict_clean_candidate = 8
+```
+
+覆盖范围：
+
+```text
+validation closed unique states = 12 / 12
+```
+
+即所有 12 个 GLM4 Phase915 L39 候选，在至少一种通道组和因子下可以达到 margin >= 0。
+
+### 六、需要特别谨慎的地方
+
+本阶段结果很强，但不能直接写成自然 action gate 闭合。
+
+原因如下。
+
+第一，通道组是按当前样本的 L39 activation 和 EOS/a readout 贡献构造的：
+
+$$
+G(x)
+=
+TopK_j\ C_j(EOS-a|x)
+$$
+
+因此它是 case-conditioned channel group，不是已经证明的全局固定通道。
+
+第二，部分强结果来自 factor=2.0 或 factor=0.0：
+
+```text
+这证明这些通道有因果杠杆；
+但不等于模型自然运行时会把这些通道调到相同强度。
+```
+
+第三，所谓 a_blocker_support_64 的抑制并不总是表现为 "a" logit 下降。
+
+实际观察到：
+
+```text
+a_logit_support_64 可以显著压低 "a" logit，
+但不能完成 EOS margin closure。
+
+a_blocker_support_64 / margin_support_neg_64 可以完成 margin closure，
+但很多闭合行中 "a" logit 也会上升；
+只是 EOS 上升更多。
+```
+
+所以当前更准确的机制标签不是：
+
+```text
+找到了纯 a suppressor。
+```
+
+而是：
+
+```text
+找到了 L39 MLP 中可以控制 EOS-vs-a margin 的有符号通道子空间；
+其中一部分表现为 EOS 支持增强，
+一部分表现为负 margin 通道移除，
+但还没有证明存在自然触发的纯 blocker suppression gate。
+```
+
+第四，qwen3 和 DS7B 不是阴性反证。
+
+它们在 Phase914 / Phase915 没有形成同构近边界候选，所以本阶段没有同构测试对象：
+
+```text
+qwen3 = no_phase915_l39_candidates
+DS7B = no_phase915_l39_candidates
+```
+
+这只能说明：
+
+```text
+当前 L39 通道级结果是 GLM4 条件链上的机制候选；
+不能直接推广到所有小模型。
+```
+
+### 七、对附件判断的修正
+
+附件中 Phase915 的核心判断应保留：
+
+```text
+Phase915 是 late MLP action-adjacent amplifier found,
+but action gate not closed.
+```
+
+Phase918 对它的推进是：
+
+```text
+Phase915 的整组件 L39 MLP output_scale_1.5 效应，
+不是完全粗糙的组件幻觉；
+它可以下钻到 L39 MLP 的有符号通道组。
+```
+
+但标签必须继续收紧：
+
+```text
+不是：
+  EOS action gate closed
+
+而是：
+  L39 MLP signed margin subspace can causally close the EOS-vs-a boundary under Phase915 boundary precondition.
+```
+
+中文表述：
+
+```text
+在 Phase915 的边界预条件下，
+GLM4 L39 MLP 存在带符号的 margin 子空间；
+该子空间的通道级干预可以把 EOS 相对 "a" 的边界推过 0，
+并在相当多样本中产生 EOS top1 / strict clean。
+```
+
+### 八、阶段进展
+
+Phase918 相比 Phase915 的核心进展：
+
+```text
+Phase915:
+  L39 MLP whole-output scale 有效，但没有 margin closure。
+
+Phase918:
+  L39 MLP channel-level signed margin groups 可以 margin closure / top1 / strict clean。
+```
+
+这说明失败位置进一步收窄：
+
+```text
+不是 L4 boundary adjuster 不够；
+也不是 L39 MLP 整组件完全无关；
+而是 L39 MLP 内部存在可操控的 EOS-vs-a margin 子空间。
+```
+
+当前进度估计：
+
+```text
+GLM4 局部 EOS-vs-a 边界机制定位:
+  从 Phase915 的约 45% 提升到约 65% - 72%。
+
+GLM4 自然 action gate 闭合:
+  约 35% - 45%。
+
+完整语言输出机制闭合:
+  约 22% - 27%。
+```
+
+这里的估计仍然谨慎，因为：
+
+```text
+Phase918 完成的是人工通道干预闭合；
+不是自然运行中 gate 变量的闭合。
+```
+
+### 九、硬伤与瓶颈
+
+主要硬伤：
+
+```text
+1. 通道组按每个样本重新计算，尚未证明存在跨样本固定通道组。
+2. 通道分组使用了 readout 方向 W_U(EOS)-W_U(a)，存在目标导向搜索成分。
+3. factor=2.0 / factor=0.0 是强干预，不能直接对应自然动态。
+4. a_blocker_support_64 的闭合不是纯 "a" logit suppression，更多是 EOS 相对增长更强。
+5. qwen3 / DS7B 没有对应候选，跨模型证据仍不足。
+6. 当前只处理 EOS-vs-a 近边界，不等于全词表 blocker field 全部闭合。
+```
+
+最关键瓶颈：
+
+```text
+还没有找到自然控制变量 alpha(x)，
+能够解释为什么模型原始运行时没有自动把 L39 margin 子空间推到闭合状态。
+```
+
+可以写成：
+
+$$
+a_j'(x)
+=
+\alpha_j(x)a_j(x)
+$$
+
+Phase918 证明的是：
+
+$$
+\exists G,\exists f:
+M(z^{B+I(G,f)}(x))\ge 0
+$$
+
+但还没有证明：
+
+$$
+\alpha_j^{natural}(x)
+\approx
+f
+$$
+
+也没有证明：
+
+$$
+\alpha_j(x)
+=
+\Psi(
+route(x),
+protocol(x),
+semantic(x),
+blocker(x)
+)
+$$
+
+### 十、智能理论角度的关键洞察
+
+本阶段给出一个重要拼图：
+
+```text
+语言输出最后并不是一个单纯 token logit 竞争；
+它包含可分解的 margin 子空间。
+```
+
+EOS 失败不是简单因为：
+
+```text
+EOS 不够强。
+```
+
+而更像：
+
+```text
+EOS 支持子空间、
+a blocker / protocol 子空间、
+margin 正负子空间，
+在 L39 附近发生最后竞争。
+```
+
+这与前面语义答案场理论一致：
+
+```text
+语义答案场解决“该说什么”；
+协议续写场解决“继续按什么格式写”；
+终止动作场解决“现在是否停止”。
+```
+
+Phase918 说明终止动作场中至少存在一种具体可测结构：
+
+```text
+晚层 MLP 有符号 margin 子空间。
+```
+
+但它不是完整第一性原理。
+
+真正要破解语言编码机制，还需要回答：
+
+```text
+1. 这些 margin 通道为什么在某些语义 / 协议状态下被打开？
+2. 是哪个上游 route / protocol / semantic 状态控制 L39 通道门控？
+3. 这些通道是 GLM4 特有补丁，还是小模型中粗糙显现出的普遍结构？
+4. 是否存在跨样本稳定的齿轮形状，而不是每个样本重新计算一个局部方向？
+```
+
+### 十一、下一阶段任务
+
+下一个任务仍属于当前阶段：
+
+```text
+从 L39 通道级人工闭合，
+推进到 L39 通道组的跨样本稳定性与自然门控来源验证。
+```
+
+建议 Phase919：
+
+```text
+Frozen L39 Signed Margin Group Transfer Validation
+冻结 L39 有符号 margin 通道组迁移验证
+```
+
+核心做法：
+
+```text
+1. 从每个 source case 提取 G_margin_pos_64 / G_margin_neg_64 / G_a_blocker_64；
+2. 固定这些通道 ID，不再按目标样本重新计算；
+3. 将 source G 应用于其他 target case；
+4. 分离 source=target 与 source!=target；
+5. 判断闭合是 case-specific 还是有可迁移的全局通道形状。
+```
+
+最低成功标准：
+
+```text
+source!=target 时仍有稳定 rank_improved / margin_delta > 0。
+```
+
+中等成功标准：
+
+```text
+source!=target 时出现 margin >= 0。
+```
+
+高成功标准：
+
+```text
+存在一个或少数组 frozen channel groups，
+可以在多个对象域 / prompt variant 上复现 EOS-vs-a margin closure。
+```
+
+若 Phase919 失败，则说明：
+
+```text
+Phase918 的通道组主要是 case-conditioned readout alignment；
+图谱应转向寻找上游 alpha_j(x) 门控变量。
+```
+
+若 Phase919 成功，则说明：
+
+```text
+L39 MLP 中可能存在更接近全局齿轮形状的 EOS-vs-a margin gear。
+```
+
+### 十二、通俗总结
+
+Phase915 像是发现：
+
+```text
+把 L39 MLP 整体音量调大一点，EOS 会更接近赢。
+```
+
+Phase918 进一步发现：
+
+```text
+不是整个 L39 都有用；
+L39 里面确实有一批通道，
+专门影响 EOS 和 "a" 之间的最后边界。
+```
+
+更重要的是：
+
+```text
+这些通道不是只能让 EOS 靠近；
+在 GLM4 的 12 个近边界状态里，
+它们可以把 EOS 推到 margin >= 0，
+很多情况下还能推成 top1 和 strict clean。
+```
+
+但还不能说已经破解动作门：
+
+```text
+因为这是人工调通道；
+还不知道模型自然运行时为什么没有自动这么调。
+```
+
+所以当前最稳妥结论是：
+
+```text
+GLM4 的 EOS-vs-a 最后边界已经从“整组件现象”
+缩小到了“L39 MLP 有符号通道子空间”。
+
+下一步要看这个子空间是全局齿轮，
+还是每个样本临时算出来的局部方向。
+```
+
+## Phase 919: 冻结 L39 有符号边界通道组跨样本迁移验证 [2026-07-04 07:45]
+
+### 一、任务来源和判断
+
+本阶段先分析 Phase918（第918阶段）附件判断是否正确，然后继续完成同一阶段目标。
+
+附件对 Phase918 的判断基本正确：
+
+```text
+Phase918 是人工通道级因果闭合正结果；
+不是自然 action gate（动作门）闭合；
+关键硬边界是通道组按每个样本的激活和读出方向重新计算。
+```
+
+这条边界非常重要。Phase918 已经证明 L39 MLP（第39层多层感知机）内部存在可以推动 EOS（结束符）超过 `"a"` blocker（“a”阻塞者）的有符号通道子空间，但还不能说明这个子空间是固定全局齿轮，还是每个样本临时重算出来的局部方向。
+
+因此本阶段继续做 Phase919（第919阶段）：
+
+```text
+冻结来源样本的 L39 通道组编号；
+把同一组通道编号迁移到其他目标样本；
+只让目标样本自己重建 route（路线）和 L4 boundary（第4层边界）；
+观察 frozen source group（冻结来源通道组）是否仍能推动目标样本闭合。
+```
+
+如果 source=target（来源等于目标）成功，而 source!=target（来源不等于目标）失败，说明 Phase918 更像样本条件化读出对齐。
+
+如果 source!=target（来源不等于目标）仍大量成功，说明 L39 有符号边界通道不是纯局部拟合，而是至少具有明显共享通道族或近似全局齿轮性质。
+
+### 二、测试脚本和结果位置
+
+新增测试脚本：
+
+```text
+tests/glm5/phase919_frozen_l39_signed_margin_group_transfer_validation.py
+```
+
+新增顺序运行脚本：
+
+```text
+tests/glm5/run_phase919_frozen_l39_signed_margin_group_transfer_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase919_frozen_l39_signed_margin_group_transfer_validation/frozen_l39_signed_margin_group_transfer_validation/
+```
+
+核心结果文件：
+
+```text
+phase919_qwen3_summary.json
+phase919_glm4_summary.json
+phase919_deepseek7b_summary.json
+phase919_glm4_rows.jsonl
+phase919_cross_model_summary.json
+phase919_cross_model_summary.md
+```
+
+三模型按 qwen3（通义千问三代小模型）、GLM4（智谱四代小模型）、DS7B（DeepSeek 7B 小模型）顺序执行。qwen3 和 DS7B 在当前 Phase915（第915阶段）筛选条件下没有可用 L39 近边界候选，因此没有加载模型做无意义迁移；GLM4 有 12 个候选，完成完整前向测试。
+
+### 三、测试原理
+
+#### 1. 目标边界状态
+
+对每个目标样本 \(x_t\)，先重建 Phase918 使用的目标边界状态：
+
+$$
+z_t^B
+=
+F(x_t;\ route_t,\ L4_t)
+$$
+
+其中：
+
+```text
+route_t：
+  目标样本自己的 prompt-preserving termination route（保持提示结构的终止路线）。
+
+L4_t：
+  目标样本自己的 L4 MLP top_abs_64 boundary precondition（第4层多层感知机最高绝对值64通道边界预条件）。
+
+z_t^B：
+  目标样本经过 route + L4 之后的近边界状态。
+```
+
+目标边界差定义为：
+
+$$
+M_t^B
+=
+z_t^B(EOS)
+-
+\max_{v\ne EOS}z_t^B(v)
+$$
+
+在这 12 个 GLM4 目标状态中，目标边界 blocker（阻塞者）均为 `"a"`，且边界差仍为负。
+
+#### 2. 来源通道组冻结
+
+对来源样本 \(x_s\)，Phase918 的通道组为：
+
+$$
+G_s^{margin+}
+=
+Top64_j
+\left[
+a_j^{39}(x_s)
+\cdot
+\left(
+(W_U(EOS)-W_U(a))^\top W_{down}^{39}[:,j]
+\right)
+\right]
+$$
+
+$$
+G_s^{margin-}
+=
+Bottom64_j
+\left[
+a_j^{39}(x_s)
+\cdot
+\left(
+(W_U(EOS)-W_U(a))^\top W_{down}^{39}[:,j]
+\right)
+\right]
+$$
+
+$$
+G_s^{a-blocker}
+=
+Top64_j
+\left[
+a_j^{39}(x_s)
+\cdot
+\left(
+(W_U(a)-W_U(EOS))^\top W_{down}^{39}[:,j]
+\right)
+\right]
+$$
+
+$$
+G_s^{EOS}
+=
+Top64_j
+\left[
+a_j^{39}(x_s)
+\cdot
+\left(
+W_U(EOS)^\top W_{down}^{39}[:,j]
+\right)
+\right]
+$$
+
+Phase919 的关键约束是：
+
+```text
+G_s 一旦从来源样本算出，就不再按目标样本重算；
+目标样本只接受来源样本冻结下来的通道编号。
+```
+
+#### 3. 冻结迁移干预
+
+对目标样本 \(x_t\)，把来源通道组 \(G_s\) 应用到目标 L39 MLP（第39层多层感知机）下投影输入：
+
+$$
+a_{t,j}^{39\prime}
+=
+\begin{cases}
+f\cdot a_{t,j}^{39}, & j\in G_s \\
+a_{t,j}^{39}, & j\notin G_s
+\end{cases}
+$$
+
+对应输出状态为：
+
+$$
+z_{t\leftarrow s}^{B,G,f}
+=
+F(x_t;\ route_t,\ L4_t,\ scale(G_s,f))
+$$
+
+闭合评价：
+
+$$
+M_{t\leftarrow s}^{G,f}
+=
+z_{t\leftarrow s}^{B,G,f}(EOS)
+-
+\max_{v\ne EOS}z_{t\leftarrow s}^{B,G,f}(v)
+$$
+
+核心观察量：
+
+$$
+\Delta M_{t\leftarrow s}
+=
+M_{t\leftarrow s}^{G,f}
+-
+M_t^B
+$$
+
+并区分：
+
+```text
+self：
+  s=t，来源和目标是同一个状态。
+
+cross_same_case：
+  s!=t，但 case_id（样本编号）相同。
+
+cross_same_domain：
+  s!=t，case_id 不同，但 eval_domain（评估域）相同。
+
+cross_domain：
+  s!=t，eval_domain 也不同。
+```
+
+### 四、测试数据和干预范围
+
+当前 Phase915 筛选条件下的候选数量：
+
+```text
+qwen3: 0
+GLM4: 12
+DS7B: 0
+```
+
+GLM4 实际测试：
+
+```text
+目标状态数: 12
+来源状态数: 12
+通道组与因子组合: 21
+总前向结果行: 3024
+self 行: 252
+cross 行: 2772
+```
+
+测试通道组：
+
+```text
+margin_support_pos_64
+eos_support_64
+a_blocker_support_64
+margin_support_neg_64
+a_logit_support_64
+```
+
+测试因子：
+
+```text
+margin_support_pos_64: 1.375, 1.5, 1.75, 2.0
+eos_support_64: 1.75, 2.0
+a_blocker_support_64 / margin_support_neg_64 / a_logit_support_64:
+  0.0, 0.125, 0.25, 0.375, 0.5
+```
+
+### 五、客观结果
+
+#### 1. 跨模型总体结果
+
+```text
+qwen3:
+  no_phase915_l39_candidates
+
+GLM4:
+  frozen_cross_strict_clean_transfer_found
+
+DS7B:
+  no_phase915_l39_candidates
+```
+
+qwen3 和 DS7B 的 0 候选不是 Phase919 的负迁移证据，只说明在当前 Phase915 的 `"a"` blocker 近边界筛选条件下，没有可进入 Phase919 的 L39 候选。
+
+#### 2. GLM4 cross transfer（跨样本迁移）结果
+
+GLM4 的 cross 行，即 source!=target：
+
+```text
+cross rows: 2772
+cross top1: 1313
+cross margin >= 0: 1313
+cross weak transfer candidate: 2112
+cross strict clean: 985
+cross target states with top1: 12 / 12
+cross target states with margin >= 0: 12 / 12
+cross target states with weak transfer: 12 / 12
+cross target states with strict clean: 10 / 12
+median cross margin delta: 1.25
+mean cross EOS logit delta: 1.9225
+median cross native group overlap: 55 / 64
+```
+
+这是强正结果。冻结来源通道组不是只能在 self（同样本）里复现，而是在 source!=target（跨样本）时仍能大量把 EOS 推成 top1（第一名）和 margin>=0（边界差非负）。
+
+#### 3. self（同样本）结果
+
+```text
+self rows: 252
+self top1: 125
+self margin >= 0: 125
+self weak transfer candidate: 192
+self strict clean: 93
+median self margin delta: 1.25
+mean self EOS logit delta: 2.0022
+median self native group overlap: 64 / 64
+```
+
+self 结果基本复现 Phase918 的强通道级闭合现象。
+
+#### 4. cross_domain（跨语义域）结果
+
+最关键的是 cross_domain（跨语义域）仍然很强：
+
+```text
+cross_domain rows: 1722
+cross_domain top1: 752
+cross_domain margin >= 0: 752
+cross_domain weak transfer candidate: 1312
+cross_domain strict clean: 552
+median cross_domain margin delta: 1.1875
+mean cross_domain EOS logit delta: 1.8876
+median cross_domain native group overlap: 54 / 64
+```
+
+这说明冻结通道组的作用不是只在同一个 case（样本）附近成立，跨 eval_domain（评估域）也大量有效。
+
+#### 5. 最强控制项
+
+最强正结果来自冻结的正 margin（边界差）通道：
+
+```text
+frozen_L39_margin_support_pos_64_scale_2
+cross_domain rows: 82
+cross_domain top1: 82
+cross_domain margin >= 0: 82
+cross_domain strict clean: 68
+target states with top1: 12 / 12
+median margin delta: 3.125
+mean EOS logit delta: 3.9459
+median native group overlap: 51 / 64
+```
+
+较弱但仍很强的正 margin 因子：
+
+```text
+frozen_L39_margin_support_pos_64_scale_1.75
+cross_domain rows: 82
+cross_domain top1: 80
+cross_domain margin >= 0: 80
+cross_domain strict clean: 66
+target states with top1: 12 / 12
+median margin delta: 2.390625
+```
+
+冻结的 `"a"` blocker 支持通道抑制也有效：
+
+```text
+frozen_L39_a_blocker_support_64_scale_0
+cross_domain rows: 82
+cross_domain top1: 61
+cross_domain margin >= 0: 61
+cross_domain strict clean: 47
+target states with top1: 9 / 12
+median margin delta: 2.25
+```
+
+但 `a_logit_support_64` 仍然不能完成闭合：
+
+```text
+a_logit_support_64 cross rows:
+  top1: 0
+  margin >= 0: 0
+  strict clean: 0
+```
+
+这和 Phase918 一致：单纯抑制 `"a"` logit（对数几率）支持通道，不等于完成 EOS-vs-a 边界闭合。真正有效的是 EOS-a margin（结束符减“a”边界差）方向和 `"a"` 相对 EOS 的竞争方向，而不是只看 `"a"` 自身 logit。
+
+### 六、结论是否正确
+
+Phase918 附件提出的下一步是冻结通道组迁移验证，这个方向完全正确，而且 Phase919 给出了强正结果：
+
+```text
+Phase918 的 L39 通道组不是纯样本内局部拟合；
+冻结来源通道编号后，跨目标样本仍然大量有效；
+L39 MLP 中存在可迁移的 EOS-vs-a signed margin channel family（有符号边界通道族）。
+```
+
+但结论必须继续收紧：
+
+```text
+Phase919 证明的是 frozen channel IDs（冻结通道编号）具有跨样本可迁移性；
+不是自然 action gate（动作门）已经闭合；
+不是完整语言编码机制闭合；
+也不是跨模型通用结论。
+```
+
+最稳妥表述：
+
+```text
+在 GLM4 的 Phase915 近边界 EOS-vs-a 状态中，
+L39 MLP 存在一组高度共享、可冻结迁移的有符号边界通道族。
+它比 Phase918 的“按样本重算通道组”更接近全局齿轮，
+但仍需要 consensus group（共识通道组）和负控制验证。
+```
+
+### 七、核心进展
+
+#### 1. 从局部通道方向推进到共享通道族
+
+Phase918 的硬伤是：
+
+```text
+每个样本都重新计算 G(x)；
+所以无法排除 case-conditioned readout alignment（样本条件化读出对齐）。
+```
+
+Phase919 把它推进为：
+
+```text
+G_s 在来源样本计算后冻结；
+迁移到目标样本仍大量成功。
+```
+
+这说明通道组背后不是完全任意的局部方向，而是存在可复用结构。
+
+#### 2. “全局齿轮图谱”得到一个更硬的节点
+
+当前全局齿轮图谱中，L39 MLP 可标记为：
+
+```text
+L39 MLP:
+  late boundary signed margin gear（后期有符号边界齿轮）
+
+作用对象:
+  EOS vs "a" near-boundary competition（结束符对“a”的近边界竞争）
+
+证据级别:
+  channel-level artificial causal closure（通道级人工因果闭合）
+  + frozen cross-state transfer（冻结跨状态迁移）
+
+尚未达到:
+  natural gate closure（自然门控闭合）
+```
+
+#### 3. 复用差分机制更清楚
+
+Phase919 说明当前机制不像“每个样本一个完全不同的方向”，而像：
+
+```text
+模型在 L39 MLP 中保留了一批共享边界通道；
+不同样本激活这些通道的强度和组合略有变化；
+但核心通道族高度重合并可迁移。
+```
+
+中位 overlap（重合）为：
+
+```text
+self: 64 / 64
+cross: 55 / 64
+cross_domain: 54 / 64
+```
+
+这既是正证据，也是硬边界：
+
+```text
+正证据:
+  跨域仍有约 54 / 64 通道重合，说明存在共享通道族。
+
+硬边界:
+  也可能说明 Phase919 成功主要来自来源组和目标原生组高度重合；
+  还没有证明一个更小、更稳定、更可解释的 consensus gear（共识齿轮）已经闭合。
+```
+
+### 八、问题、硬伤和瓶颈
+
+#### 1. 候选池仍然很窄
+
+当前有效候选为：
+
+```text
+GLM4: 12
+qwen3: 0
+DS7B: 0
+```
+
+所以 Phase919 是 GLM4 内部、Phase915 近边界 EOS-vs-a 条件下的强结果，不能外推到所有模型、所有终止场景或完整语言生成。
+
+#### 2. 仍然依赖人工 route + L4 边界预条件
+
+目标状态 \(z_t^B\) 仍由人工 route（路线）和 L4 boundary（第4层边界）构造：
+
+$$
+z_t^B
+=
+F(x_t;\ route_t,\ L4_t)
+$$
+
+自然模型没有自动进入这个状态。因此自然闭合仍未完成。
+
+#### 3. 强因子不等于自然调节
+
+最强结果使用：
+
+```text
+margin_support_pos_64 scale 2.0
+a_blocker_support_64 scale 0.0
+```
+
+这说明通道组有因果能力，但还不知道模型自然运行时是否存在相同强度、相同方向的调节变量。
+
+#### 4. 高 overlap 需要更严格负控制
+
+cross_domain 的 native group overlap 中位数约为：
+
+```text
+54 / 64
+```
+
+这说明来源组和目标组本来就高度相似。它支持“共享通道族”判断，但还不能证明：
+
+```text
+任意冻结来源组都携带独立可迁移结构；
+或者一个很小的固定子集足以解释全部闭合。
+```
+
+必须做随机同规模通道组、频率共识通道组、打乱来源组、holdout（留出）验证。
+
+#### 5. 仍未破解自然 gate（门）
+
+目前知道：
+
+```text
+调哪些通道可以让 EOS 赢；
+还不知道模型自然什么时候、为什么、由谁调这些通道。
+```
+
+这就是当前和真正语言编码机制闭合之间的最大距离。
+
+### 九、当前闭合标准和距离
+
+对 EOS-vs-a near-boundary（结束符对“a”的近边界）子问题，较严格闭合标准应至少包括：
+
+```text
+1. 固定或低维 consensus channel set（共识通道集合）能跨 holdout 样本预测闭合；
+2. 随机同规模通道组、打乱通道组、低重合通道组不能达到同等效果；
+3. gate predictor（门控预测器）能从自然激活中预测这些通道何时被调节；
+4. 不依赖人工 route + L4 预条件，或能解释自然模型为什么没有进入闭合状态；
+5. full-vocabulary blocker（全词表阻塞者）被系统处理，而不是只处理 `"a"`；
+6. exact-natural rollout（严格自然续写）稳定通过。
+```
+
+Phase919 当前达到：
+
+```text
+通道级人工因果能力: 强
+冻结跨样本迁移: 强
+GLM4 内部共享通道族证据: 强
+自然门控解释: 弱
+跨模型证据: 无
+全语言编码机制闭合: 未完成
+```
+
+谨慎估计：
+
+```text
+EOS-vs-a L39 边界子问题进度: 约 55% - 60%
+clean protocol edge graph（干净协议边图谱）进度: 约 35% - 40%
+完整语言编码机制进度: 约 15% - 20%
+```
+
+这些百分比不是理论定论，只是根据当前证据覆盖范围给出的阶段性估计。
+
+### 十、智能理论角度的洞察
+
+Phase919 对智能理论的意义在于：
+
+```text
+语言生成不是单个 token logit（词元对数几率）被局部推高；
+而是不同层级齿轮在全词表竞争场中移动边界。
+```
+
+当前观察到的结构更像：
+
+```text
+前中层:
+  route（路线）、protocol（协议）、format（格式）把状态推近某个边界。
+
+后层:
+  L39 MLP 这类 late margin gear（后期边界齿轮）负责最后竞争边界。
+
+通道层:
+  不是单个 neuron（神经元）独立编码语义，
+  而是一组可复用的 signed channel family（有符号通道族）控制 margin（边界差）。
+```
+
+从第一性原理看，语言编码机制可能不是：
+
+```text
+概念 -> 单向量 -> 词元
+```
+
+而更像：
+
+```text
+状态场 -> 路线场 -> 协议场 -> 边界场 -> 全词表竞争闭合
+```
+
+Phase919 给出的关键拼图是：
+
+```text
+边界场中存在可迁移的通道齿轮；
+这些齿轮可以跨样本复用；
+因此全局齿轮图谱不是只记录局部 patch（补丁），而可以逐步逼近共享内部结构。
+```
+
+### 十一、下一阶段任务
+
+当前任务和下一任务仍处于同一阶段性目标：
+
+```text
+优先完成 clean protocol edge graph（干净协议边图谱）和全局齿轮图谱；
+暂不把目标提前升级为完整自然闭合。
+```
+
+下一阶段建议为：
+
+```text
+Phase920:
+Consensus L39 Signed Margin Gear Negative-control and Holdout Validation
+（共识 L39 有符号边界齿轮负控制与留出验证）
+```
+
+具体任务：
+
+```text
+1. 从 12 个 GLM4 来源状态统计 channel frequency（通道频率），构造 consensus G*（共识通道组）。
+2. 用 G* 直接迁移到所有目标状态，不再使用每个来源状态的独立 G_s。
+3. 做 leave-one-case-out（留一案例）和 leave-one-domain-out（留一领域）验证。
+4. 加入 random same-size channels（同规模随机通道）、activation-matched random channels（激活匹配随机通道）、shuffled source group（打乱来源组）作为负控制。
+5. 测试更自然的低因子：
+   1.125, 1.25, 1.375
+   观察是否存在低幅度可迁移边界移动。
+6. 对 full-vocabulary blocker（全词表阻塞者）记录 `"a"` 以外的替代阻塞者是否被引入。
+7. 如果 consensus G* 通过 holdout，再进入 gate predictor（门控预测器）定位阶段。
+```
+
+闭合判据：
+
+```text
+如果 consensus G* 在 holdout cross_domain 中仍显著优于随机和打乱控制，
+并覆盖大部分目标状态，
+则 L39 signed margin gear（第39层有符号边界齿轮）可以从“共享通道族”
+升级为“近似全局齿轮节点”。
+
+如果 consensus G* 明显下降，
+说明 Phase919 的成功主要依赖来源组和目标组的高重合局部选择，
+需要继续做更细的子簇划分。
+```
+
+### 十二、通俗总结
+
+Phase918 证明：
+
+```text
+在 GLM4 里，L39 MLP 里面确实有一批通道，
+能把 EOS 从被 "a" 压住，推到超过 "a"。
+```
+
+Phase919 进一步证明：
+
+```text
+这些通道不是只能在一个样本里有效；
+把一个样本找到的通道编号冻结下来，
+换到别的样本里，仍然经常有效。
+```
+
+这很重要，因为它说明我们看到的不是单点补丁，而更像一批共享齿轮。
+
+但还不能说已经破解语言机制：
+
+```text
+我们现在知道“拨哪些齿轮能让 EOS 赢”，
+还不知道模型自然运行时“为什么没有自己拨这些齿轮”，
+也不知道这个机制能否跨模型、跨更多语言任务稳定成立。
+```
+
+所以下一步不是急着宣布闭合，而是把这批通道压缩成更稳定的共识齿轮，并用随机负控制和留出样本验证它是否真的是全局结构。
+
+## Phase 920: 共识 L39 有符号边界齿轮留出与负控制验证 [2026-07-04 07:52]
+
+### 一、任务来源
+
+Phase919（第919阶段）证明：
+
+```text
+冻结来源样本的 L39 有符号边界通道组，
+迁移到其他目标样本后仍大量有效。
+```
+
+但 Phase919 仍有一个硬问题：
+
+```text
+来源组和目标原生组的 overlap（重合）较高；
+所以需要验证：
+  是不是存在更稳定的 consensus gear（共识齿轮）？
+  还是只因为每个来源组都和目标组碰巧高度重合？
+```
+
+因此本阶段继续同一阶段性目标，完成 Phase920：
+
+```text
+把多个来源样本的 L39 通道组压缩成 consensus group（共识通道组）；
+加入 leave-one-case（留一案例）和 leave-one-domain（留一领域）；
+再加入 random（随机）、rotated（旋转错位）、a-logit-only（只看“a”自身）的负控制。
+```
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/glm5/phase920_consensus_l39_signed_margin_gear_holdout_controls.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase920_consensus_l39_signed_margin_gear_holdout_controls.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase920_consensus_l39_signed_margin_gear_holdout_controls/consensus_l39_signed_margin_gear_holdout_controls/
+```
+
+核心结果：
+
+```text
+phase920_glm4_rows.jsonl
+phase920_glm4_summary.json
+phase920_cross_model_summary.json
+phase920_cross_model_summary.md
+```
+
+三模型顺序仍为：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+当前筛选条件下：
+
+```text
+qwen3: 0 candidates
+GLM4: 12 candidates
+DS7B: 0 candidates
+```
+
+因此实际前向测试集中在 GLM4。
+
+### 三、测试原理
+
+#### 1. 共识通道组
+
+对某个通道组类型 \(k\)，每个来源状态 \(x_s\) 有一个通道集合：
+
+$$
+G_s^k
+$$
+
+Phase920 统计所有训练来源状态中的通道频率：
+
+$$
+freq_k(j)
+=
+\sum_{s\in \mathcal{T}}
+\mathbf{1}[j\in G_s^k]
+$$
+
+取频率最高的 64 个通道：
+
+$$
+G_{cons}^{k}
+=
+Top64_j\ freq_k(j)
+$$
+
+这一步从 Phase919 的“每个来源一个冻结组”推进为“一个可复用共识组”。
+
+#### 2. 留出验证
+
+对目标样本 \(x_t\)，训练集合分三类：
+
+$$
+\mathcal{T}_{all}
+=
+\{x_s\}
+$$
+
+$$
+\mathcal{T}_{case}(t)
+=
+\{x_s:\ case(s)\ne case(t)\}
+$$
+
+$$
+\mathcal{T}_{domain}(t)
+=
+\{x_s:\ domain(s)\ne domain(t)\}
+$$
+
+分别得到：
+
+$$
+G_{all}^{k},\quad
+G_{loo-case}^{k}(t),\quad
+G_{loo-domain}^{k}(t)
+$$
+
+如果 leave-one-case（留一案例）和 leave-one-domain（留一领域）仍然有效，说明不是目标样本泄漏造成的。
+
+#### 3. 负控制
+
+负控制包括：
+
+```text
+random_all_64:
+  从 L39 通道空间随机抽取64个通道。
+
+rotated_consensus:
+  把共识通道整体错位旋转，保留数量但破坏真实通道编号。
+
+consensus_a_logit_support_64:
+  只取支持 "a" 自身 logit 的通道，测试“单纯压 a”是否足够。
+```
+
+如果正向共识组和负控制没有明显分离，则不能把 Phase919 升级为稳定齿轮。
+
+#### 4. 统一评价公式
+
+对目标边界状态：
+
+$$
+z_t^B
+=
+F(x_t;\ route_t,\ L4_t)
+$$
+
+对共识组或负控制组 \(G\) 做缩放：
+
+$$
+a_{t,j}^{39\prime}
+=
+\begin{cases}
+f\cdot a_{t,j}^{39}, & j\in G \\
+a_{t,j}^{39}, & j\notin G
+\end{cases}
+$$
+
+输出：
+
+$$
+z_{t}^{B,G,f}
+=
+F(x_t;\ route_t,\ L4_t,\ scale(G,f))
+$$
+
+边界差：
+
+$$
+M_t^{G,f}
+=
+z_t^{B,G,f}(EOS)
+-
+\max_{v\ne EOS}z_t^{B,G,f}(v)
+$$
+
+边界改变量：
+
+$$
+\Delta M_t^{G,f}
+=
+M_t^{G,f}
+-
+M_t^B
+$$
+
+### 四、客观结果
+
+#### 1. 总体结果
+
+GLM4 完成：
+
+```text
+target states: 12
+total rows: 540
+positive rows: 432
+negative rows: 108
+```
+
+总体：
+
+```text
+all top1: 226
+all margin >= 0: 226
+all strict clean: 174
+all weak candidate: 439
+```
+
+#### 2. 正向共识组结果
+
+positive consensus（正向共识）：
+
+```text
+positive rows: 432
+positive top1: 226
+positive margin >= 0: 226
+positive strict clean: 174
+positive weak candidate: 432
+median margin delta: 1.4375
+mean EOS logit delta: 2.6059
+median native overlap: 54 / 64
+target states with top1: 12 / 12
+target states with margin >= 0: 12 / 12
+target states with strict clean: 10 / 12
+```
+
+#### 3. 负控制结果
+
+negative controls（负控制）：
+
+```text
+negative rows: 108
+negative top1: 0
+negative margin >= 0: 0
+negative strict clean: 0
+negative weak candidate: 7
+median margin delta: 0.078125
+mean EOS logit delta: -0.5463
+median native overlap: 0 / 64
+```
+
+这个分离很关键：
+
+```text
+正向共识组大量闭合；
+负控制没有任何 top1 或 margin>=0；
+说明结果不是“随便调64个通道就能闭合”。
+```
+
+#### 4. 留一案例结果
+
+leave-one-case（留一案例）：
+
+```text
+rows: 144
+top1: 74
+margin >= 0: 74
+strict clean: 58
+weak candidate: 144
+median margin delta: 1.40625
+mean EOS logit delta: 2.5634
+median native overlap: 53.5 / 64
+target states with top1: 12 / 12
+target states with margin >= 0: 12 / 12
+target states with strict clean: 10 / 12
+```
+
+#### 5. 留一领域结果
+
+leave-one-domain（留一领域）：
+
+```text
+rows: 144
+top1: 74
+margin >= 0: 74
+strict clean: 58
+weak candidate: 144
+median margin delta: 1.40625
+mean EOS logit delta: 2.5629
+median native overlap: 53.5 / 64
+target states with top1: 12 / 12
+target states with margin >= 0: 12 / 12
+target states with strict clean: 10 / 12
+```
+
+leave-one-case 和 leave-one-domain 结果几乎一致，说明共识通道组不是简单记住某个 case（样本）或某个 domain（领域）。
+
+#### 6. 最强正控制
+
+```text
+consensus_margin_support_pos_64_all_train_scale_2
+rows: 12
+top1: 12
+margin >= 0: 12
+strict clean: 10
+median margin delta: 3.40625
+overlap: 57.5 / 64
+```
+
+留出版本也不下降到失效：
+
+```text
+consensus_margin_support_pos_64_leave_one_case_scale_2
+rows: 12
+top1: 12
+margin >= 0: 12
+strict clean: 10
+median margin delta: 3.1875
+overlap: 52 / 64
+```
+
+```text
+consensus_margin_support_pos_64_leave_one_domain_scale_2
+rows: 12
+top1: 12
+margin >= 0: 12
+strict clean: 10
+median margin delta: 3.1875
+overlap: 52 / 64
+```
+
+较低因子仍有作用，但不闭合：
+
+```text
+scale 1.375:
+  top1: 8 / 12
+  margin >= 0: 8 / 12
+  strict clean: 6 / 12
+
+scale 1.25:
+  top1: 0 / 12
+  margin >= 0: 0 / 12
+  但 weak candidate: 12 / 12
+```
+
+这说明低幅度调节已经推动边界，但尚不足以闭合。
+
+### 五、结论是否正确
+
+Phase920 给出比 Phase919 更强、更干净的结论：
+
+```text
+L39 有符号边界通道不是只能按来源样本单独迁移；
+多个来源样本压缩出的 consensus group（共识组）也能留出泛化；
+并且明显击败随机、错位和 a-logit-only 负控制。
+```
+
+因此，当前 L39 MLP 节点可以从：
+
+```text
+shared channel family（共享通道族）
+```
+
+谨慎升级为：
+
+```text
+approximate global signed margin gear
+（近似全局有符号边界齿轮）
+```
+
+但仍不能升级为自然闭合，因为：
+
+```text
+1. 仍依赖人工 route + L4 预条件；
+2. 最强闭合仍需要 scale 1.75 或 2.0；
+3. 仍只在 GLM4 的 12 个 EOS-vs-a 近边界状态中验证；
+4. 还没有找到自然 gate variable（门控变量）；
+5. 还没有解释模型自然运行时为什么没有自动拨动这个齿轮。
+```
+
+### 六、核心进展
+
+Phase920 是当前全局齿轮图谱中的重要收紧：
+
+```text
+Phase918:
+  按样本重算通道组，可以人工闭合。
+
+Phase919:
+  冻结来源通道组，跨样本仍能闭合。
+
+Phase920:
+  压缩成共识通道组，留一案例/领域仍能闭合，
+  且负控制不能闭合。
+```
+
+这条链条说明：
+
+```text
+L39 EOS-vs-a 边界齿轮不是普通 patch（补丁）；
+它已经具备图谱节点所需的稳定性、可迁移性和负控制分离。
+```
+
+### 七、硬伤和瓶颈
+
+#### 1. 仍是人工齿轮，不是自然齿轮
+
+当前知道：
+
+```text
+调 consensus margin gear（共识边界齿轮）可以让 EOS 赢。
+```
+
+但还不知道：
+
+```text
+自然模型里谁调它？
+什么时候调？
+为什么在原始状态没有调到闭合？
+```
+
+#### 2. 强因子仍偏人工
+
+最稳定闭合来自：
+
+```text
+scale 1.75
+scale 2.0
+```
+
+较低因子：
+
+```text
+scale 1.125 和 1.25
+```
+
+主要表现为 weak candidate（弱候选），没有直接闭合。
+
+这说明自然门控如果存在，可能不是简单小幅度单齿轮调节，而可能需要多个齿轮协同。
+
+#### 3. 数据范围仍小
+
+当前有效目标状态仍是 12 个，来源仍是 GLM4。虽然负控制分离很强，但还不能推广到：
+
+```text
+更多 blocker（阻塞者）
+更多自然提示
+更多语义域
+qwen3 / DS7B
+完整多步续写
+```
+
+#### 4. overlap 仍高
+
+共识组和目标原生组 overlap 仍约：
+
+```text
+52 - 57.5 / 64
+```
+
+这支持全局齿轮判断，但也提示：
+
+```text
+真正最小齿轮可能比64通道更小；
+需要继续压缩到 top16 / top32 或频率阈值组。
+```
+
+### 八、闭合标准和当前距离
+
+对 L39 EOS-vs-a 子问题，Phase920 已满足：
+
+```text
+1. 共识通道组可跨目标状态闭合；
+2. 留一案例和留一领域仍有效；
+3. 随机、错位、a-logit-only 负控制不能闭合；
+4. 全词表 top1 和 margin>=0 被同时记录；
+5. strict clean 大量出现。
+```
+
+仍未满足：
+
+```text
+1. 自然 gate（门）来源定位；
+2. 低因子自然强度闭合；
+3. route + L4 不人工化；
+4. 跨模型复现；
+5. 多 blocker 与多步 rollout（续写）闭合。
+```
+
+阶段性估计：
+
+```text
+L39 EOS-vs-a 边界齿轮子问题进度: 约 65% - 70%
+clean protocol edge graph（干净协议边图谱）进度: 约 40% - 45%
+完整语言编码机制进度: 约 18% - 22%
+```
+
+### 九、智能理论洞察
+
+Phase920 对“语言背后数学结构”的提示更清楚：
+
+```text
+语言模型内部可能存在可复用的边界齿轮；
+这些齿轮不是语义概念本身，
+而是控制全词表竞争场中某类状态转换的操作结构。
+```
+
+这类结构更接近：
+
+```text
+operator（操作符）
+```
+
+而不是：
+
+```text
+feature label（特征标签）
+```
+
+也就是说，语言能力可能不是简单由“词义向量”组成，而是由：
+
+```text
+状态空间
+路线
+协议
+边界齿轮
+门控变量
+全词表竞争
+```
+
+共同形成。Phase920 找到的是其中一个后层边界齿轮。
+
+### 十、下一阶段任务
+
+Phase918-920 已经完成了当前小阶段目标：
+
+```text
+证明 L39 MLP 中存在可压缩、可留出泛化、能击败负控制的 EOS-vs-a signed margin gear。
+```
+
+接下来进入同一大方向下的下一子阶段，但任务性质发生变化：
+
+```text
+从“齿轮是否存在”
+转向“自然门控变量在哪里”。
+```
+
+建议 Phase921：
+
+```text
+Natural Gate Variable Search for Consensus L39 Signed Margin Gear
+（共识 L39 有符号边界齿轮的自然门控变量搜索）
+```
+
+具体做法：
+
+```text
+1. 固定 Phase920 的 consensus margin gear（共识边界齿轮）。
+2. 不再直接强行 scale 2.0，而是测自然状态中哪些上游变量预测该齿轮激活不足。
+3. 候选变量包括：
+   L4 boundary group activation（第4层边界组激活）
+   L0 route delta norm（第0层路线差分范数）
+   attention entropy（注意力熵）
+   prefix protocol token（前缀协议词元）
+   blocker gap（阻塞者差距）
+4. 建立简单可解释门控评分，不使用复杂黑盒拟合。
+5. 如果找到门控变量，再做低因子联动干预。
+```
+
+是否继续自动执行：
+
+```text
+Phase921 属于同一总路线，
+但已经从“共识齿轮存在性验证”进入“自然门控来源定位”子阶段。
+当前 Phase918-920 的阶段性目标已经完成；
+下一步应作为新子阶段启动。
+```
+
+### 十一、通俗总结
+
+Phase920 说明：
+
+```text
+不是每次都要临时找一批新通道；
+把多个样本里经常出现的通道合成一批“共识通道”，
+这批通道也能让 EOS 赢。
+```
+
+而且：
+
+```text
+随机通道不行；
+错位通道不行；
+只看 "a" 自身 logit 的通道也不行。
+```
+
+所以现在可以更有把握地说：
+
+```text
+GLM4 的 L39 MLP 里确实有一个比较稳定的 EOS-vs-a 边界齿轮。
+```
+
+但还没破解自然机制：
+
+```text
+我们知道这个齿轮存在，也知道拨它有用；
+下一步要找模型自然状态中控制这个齿轮的“手柄”在哪里。
+```
+
+## Phase 921: 共识 L39 有符号边界齿轮的自然门控变量诊断 [2026-07-04 08:53]
+
+### 一、任务来源和判断
+
+本阶段先分析上传附件对 Phase919（第919阶段）和 Phase920（第920阶段）的判断。附件判断基本正确：
+
+```text
+Phase919:
+  冻结来源样本 L39 通道组后，跨样本、跨领域仍大量有效。
+
+Phase920:
+  压缩为 consensus group（共识通道组）后，
+  leave-one-case（留一案例）和 leave-one-domain（留一领域）仍有效，
+  并且 random（随机）、rotated（错位）、a-logit-only（只看“a”自身对数几率）负控制不能闭合。
+```
+
+因此当前理论标签应保持为：
+
+```text
+条件化输出场闭合理论
++
+近似全局 L39 有符号边界齿轮
++
+自然门控变量缺失
+```
+
+不要改理论名。Phase919-920 证明了“齿轮存在，而且人工拨动有效”，但没有证明“模型自然运行时会自动拨动这个齿轮”。本阶段继续完成同一总路线下的下一步：Phase921（第921阶段），目标是诊断自然门控变量候选。
+
+### 二、脚本和结果位置
+
+新增测试脚本：
+
+```text
+tests/glm5/phase921_natural_gate_variable_search_for_l39_margin_gear.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase921_natural_gate_variable_search_for_l39_margin_gear.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase921_natural_gate_variable_search_for_l39_margin_gear/natural_gate_variable_search_for_l39_margin_gear/
+```
+
+核心结果文件：
+
+```text
+phase921_qwen3_summary.json
+phase921_glm4_summary.json
+phase921_deepseek7b_summary.json
+phase921_glm4_state_rows.jsonl
+phase921_glm4_factor_rows.jsonl
+phase921_cross_model_summary.json
+phase921_cross_model_summary.md
+```
+
+三模型按顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+当前 Phase915 条件下候选池仍为：
+
+```text
+qwen3: 0
+GLM4: 12
+DS7B: 0
+```
+
+进一步核查 Phase915 原始池：
+
+```text
+GLM4 L39_mlp_output_scale_1.5 rows: 12
+boundary blocker token = "a": 12
+weak/rank candidate: 12
+unique candidate keys: 12
+```
+
+因此 Phase921 无法在当前条件下继续扩展更多 L39 `"a"` blocker 候选；这是结果边界，不是脚本截断造成的。
+
+### 三、测试原理
+
+#### 1. 固定 Phase920 共识齿轮
+
+Phase921 固定 Phase920 中的：
+
+```text
+consensus_margin_support_pos_64
+```
+
+即：
+
+$$
+G_{cons}^{margin+}
+=
+Top64_j\ freq_{margin+}(j)
+$$
+
+其中：
+
+$$
+freq_{margin+}(j)
+=
+\sum_{s\in \mathcal{T}}
+\mathbf{1}[j\in G_s^{margin+}]
+$$
+
+本阶段不再每个样本重新寻找通道组，也不再换成来源冻结组，而是固定同一个共识齿轮。
+
+#### 2. 测低因子闭合阈值
+
+对每个目标状态 \(x_t\)，在同一个共识齿轮上测试：
+
+```text
+1.125, 1.25, 1.375, 1.5, 1.75, 2.0
+```
+
+干预为：
+
+$$
+a_{t,j}^{39\prime}
+=
+\begin{cases}
+f\cdot a_{t,j}^{39}, & j\in G_{cons}^{margin+}\\
+a_{t,j}^{39}, & j\notin G_{cons}^{margin+}
+\end{cases}
+$$
+
+输出：
+
+$$
+z_t^{B,G,f}
+=
+F(x_t;\ route_t,\ L4_t,\ scale(G_{cons}^{margin+},f))
+$$
+
+边界差：
+
+$$
+M_t^{G,f}
+=
+z_t^{B,G,f}(EOS)
+-
+\max_{v\ne EOS} z_t^{B,G,f}(v)
+$$
+
+记录每个状态的最小闭合因子：
+
+$$
+f_t^{margin}
+=
+\min\{f: M_t^{G,f}\ge 0\}
+$$
+
+同时记录：
+
+$$
+f_t^{top1}
+=
+\min\{f: rank_t^{G,f}(EOS)=1\}
+$$
+
+$$
+f_t^{strict}
+=
+\min\{f: StrictClean_t^{G,f}=1\}
+$$
+
+#### 3. 自然门控变量候选
+
+本阶段不训练复杂模型，只采集简单可解释变量：
+
+```text
+route_delta_norm:
+  终止路线差分范数。
+
+route_eos_rank:
+  route 状态下 EOS 排名。
+
+boundary_eos_rank:
+  route + L4 边界状态下 EOS 排名。
+
+boundary_gap_to_zero:
+  EOS 到闭合边界还差多少。
+
+protocol_vs_eos:
+  协议续写项相对 EOS 的优势。
+
+l4_activation_abs_top:
+  L4 边界组最高激活幅度。
+
+consensus_margin_support_sum:
+  L39 共识齿轮在自然边界状态中的 EOS-vs-a margin 支持总量。
+
+consensus_activation_abs_mean / median:
+  共识齿轮自然激活强度。
+```
+
+定义一个简单诊断量：
+
+$$
+Pressure_{gate}(x)
+=
+Gap_{boundary}(x)
+-
+Support_{consensus}(x)
+$$
+
+其中：
+
+$$
+Gap_{boundary}(x)
+=
+-M_t^B
+$$
+
+$$
+Support_{consensus}(x)
+=
+\sum_{j\in G_{cons}^{margin+}}
+a_j^{39}(x)
+\cdot
+\left(
+(W_U(EOS)-W_U(a))^\top W_{down}^{39}[:,j]
+\right)
+$$
+
+该量不是最终理论，只是诊断：如果 gap（缺口）小、共识齿轮自然支持大，低因子更容易闭合。
+
+#### 4. 简单阈值分离
+
+把状态分为：
+
+```text
+低因子可闭合:
+  f <= 1.375 时 margin >= 0。
+
+低因子不可闭合:
+  f > 1.375 才能 margin >= 0。
+```
+
+对每个候选变量只做简单阈值扫描：
+
+$$
+\hat{y}(x)
+=
+\mathbf{1}[v(x)\ge \theta]
+$$
+
+或：
+
+$$
+\hat{y}(x)
+=
+\mathbf{1}[v(x)\le \theta]
+$$
+
+记录 best threshold accuracy（最佳阈值准确率）。这不是训练复杂模型，只是检查变量是否有明显分离能力。
+
+### 四、客观结果
+
+#### 1. 因子响应
+
+GLM4 完成：
+
+```text
+state rows: 12
+factor response rows: 72
+```
+
+按因子统计：
+
+```text
+factor 1.125:
+  top1: 0 / 12
+  margin >= 0: 0 / 12
+  strict clean: 0 / 12
+  median margin: -0.75
+
+factor 1.25:
+  top1: 0 / 12
+  margin >= 0: 0 / 12
+  strict clean: 0 / 12
+  median margin: -0.3125
+
+factor 1.375:
+  top1: 8 / 12
+  margin >= 0: 8 / 12
+  strict clean: 6 / 12
+  median margin: 0.125
+
+factor 1.5:
+  top1: 8 / 12
+  margin >= 0: 8 / 12
+  strict clean: 6 / 12
+  median margin: 0.5
+
+factor 1.75:
+  top1: 12 / 12
+  margin >= 0: 12 / 12
+  strict clean: 10 / 12
+  median margin: 1.4375
+
+factor 2.0:
+  top1: 12 / 12
+  margin >= 0: 12 / 12
+  strict clean: 10 / 12
+  median margin: 2.25
+```
+
+结论：
+
+```text
+1.125 和 1.25 太弱，不能闭合；
+1.375 是明显转折点；
+1.75 以上基本全闭合；
+strict clean 仍有 2 / 12 状态没有完全通过。
+```
+
+#### 2. 低因子闭合标签
+
+```text
+low_factor_1375_margin: 8 / 12
+low_factor_1375_top1: 8 / 12
+low_factor_1375_strict: 6 / 12
+```
+
+这说明 12 个状态内部存在难易差异，不是所有状态都需要同等强度的齿轮拨动。
+
+#### 3. 候选变量分离结果
+
+在小样本 12 个状态中，多个变量可以把 “1.375 可闭合” 和 “1.375 不可闭合” 分开。
+
+排名靠前的变量：
+
+```text
+route_eos_rank:
+  positive mean: 7.0
+  negative mean: 16.5
+  best threshold: <= 7
+  accuracy: 1.0
+
+boundary_eos_rank:
+  positive mean: 5.0
+  negative mean: 12.0
+  best threshold: <= 5
+  accuracy: 1.0
+
+protocol_blocker_pressure:
+  positive mean: 1.578125
+  negative mean: 3.609375
+  best threshold: <= 1.6875
+  accuracy: 1.0
+
+protocol_vs_eos:
+  positive mean: 0.4765625
+  negative mean: 1.578125
+  best threshold: <= 0.5625
+  accuracy: 1.0
+
+boundary_gap_to_zero:
+  positive mean: 1.1015625
+  negative mean: 2.03125
+  best threshold: <= 1.1875
+  accuracy: 1.0
+
+consensus_margin_support_sum:
+  positive mean: 19.3698
+  negative mean: 17.8396
+  best threshold: >= 18.5634
+  accuracy: 1.0
+
+consensus_activation_abs_mean:
+  positive mean: 15.4130
+  negative mean: 14.1987
+  best threshold: >= 14.8412
+  accuracy: 1.0
+```
+
+这些结果说明：
+
+```text
+低因子能否闭合，和三个因素同时相关：
+1. EOS 已经在 route/boundary 中多接近；
+2. protocol / blocker 压力有多大；
+3. L39 共识齿轮在自然状态中已经有多少 margin 支持。
+```
+
+#### 4. 状态层面观察
+
+低因子不容易闭合的状态通常表现为：
+
+```text
+boundary_gap_to_zero 更大；
+protocol_vs_eos 更大；
+consensus_margin_support_sum 更低；
+route_eos_rank / boundary_eos_rank 更差。
+```
+
+例如 hard group（较难组）平均：
+
+```text
+boundary_gap_to_zero: 2.03125
+protocol_vs_eos: 1.578125
+consensus_margin_support_sum: 17.8396
+boundary_eos_rank: 12.0
+```
+
+easy group（较易组）平均：
+
+```text
+boundary_gap_to_zero: 1.1015625
+protocol_vs_eos: 0.4765625
+consensus_margin_support_sum: 19.3698
+boundary_eos_rank: 5.0
+```
+
+### 五、结论是否正确
+
+附件提出 Phase921 应寻找自然门控变量，这个判断正确。Phase921 第一轮结果说明：
+
+```text
+自然门控变量不是完全无迹可寻；
+低因子能否拨动 L39 共识齿轮，和 route 接近度、boundary gap、protocol pressure、共识齿轮自然支持量有清晰关系。
+```
+
+但结论必须严格收紧：
+
+```text
+Phase921 没有证明自然 action gate 已经找到；
+只是找到了候选门控变量和低因子闭合难易之间的诊断关联。
+```
+
+最谨慎结论：
+
+```text
+GLM4 的 EOS-vs-a 近边界状态中，
+L39 共识齿轮的低因子闭合难易，
+可以被 route/boundary/protocol/L39-support 一组简单变量分离。
+这些变量是 natural gate candidate（自然门控候选），
+还不是 natural gate mechanism（自然门控机制）。
+```
+
+### 六、问题和硬伤
+
+#### 1. 样本数仍然太小
+
+当前有效状态：
+
+```text
+12 states
+4 cases
+3 domains
+```
+
+case 分布：
+
+```text
+p856_038_object_object: 6
+p856_009_animal_fish: 4
+p856_022_material_iron: 1
+p856_008_animal_bird: 1
+```
+
+因此阈值准确率 1.0 不能过度解读，可能有重复 case 影响。
+
+#### 2. 变量不是因果门，只是诊断变量
+
+例如：
+
+```text
+boundary_gap_to_zero 小 -> 更容易低因子闭合
+```
+
+这可能只是状态接近边界的结果，不一定是模型内部主动控制 L39 齿轮的门。
+
+#### 3. 没有做上游变量因果干预
+
+本阶段没有直接干预：
+
+```text
+protocol_vs_eos
+boundary_gap
+route_eos_rank
+```
+
+因此不能说明改变这些变量就会自然触发 L39 齿轮。
+
+#### 4. 仍依赖人工 route + L4 + L39 共识齿轮
+
+Phase921 仍是在人工构造的近边界状态上进行诊断，不是原始自然生成过程。
+
+### 七、理论进展
+
+Phase921 对全局齿轮图谱的推进是：
+
+```text
+L39 齿轮本身已经较稳定；
+现在开始看到它的上游门控候选：
+  route 接近度
+  boundary gap
+  protocol pressure
+  L39 自然 margin support
+```
+
+这让图谱从：
+
+```text
+semantic answer
+  -> prompt / protocol gate
+  -> termination route
+  -> L4 boundary adjuster
+  -> L39 consensus signed margin gear
+  -> artificial closure
+```
+
+推进到：
+
+```text
+semantic answer
+  -> prompt / protocol gate
+  -> termination route
+  -> L4 boundary adjuster
+  -> gate candidate variables
+  -> L39 consensus signed margin gear
+  -> low-factor closure difficulty
+```
+
+还没有到：
+
+```text
+natural gate closure
+```
+
+### 八、闭合标准和当前距离
+
+Phase921 当前达到：
+
+```text
+1. 固定共识齿轮；
+2. 得到每个状态的最小闭合因子；
+3. 找到能分离低因子闭合难易的候选变量；
+4. 确认 route / boundary / protocol / L39-support 都参与门控候选图谱。
+```
+
+未达到：
+
+```text
+1. 候选变量的因果干预验证；
+2. 更大样本验证；
+3. 原始自然状态验证；
+4. 跨模型验证；
+5. 多 blocker 验证；
+6. 多步 rollout 验证。
+```
+
+阶段性估计：
+
+```text
+L39 EOS-vs-a 边界齿轮子问题进度: 约 70%
+自然门控变量定位进度: 约 20% - 25%
+clean protocol edge graph（干净协议边图谱）进度: 约 42% - 46%
+完整语言编码机制进度: 约 18% - 22%
+```
+
+### 九、下一阶段任务
+
+当前 Phase921 已完成自然门控变量的第一轮诊断。下一步如果继续同一子阶段，应做：
+
+```text
+Phase922:
+Candidate Gate Variable Causal Coupling Test
+（候选门控变量因果联动测试）
+```
+
+任务：
+
+```text
+1. 固定 Phase920 consensus margin gear（共识边界齿轮）。
+2. 挑选 Phase921 最清晰变量：
+   boundary_gap_to_zero
+   protocol_vs_eos
+   consensus_margin_support_sum
+   route_eos_rank / boundary_eos_rank
+3. 不直接使用 scale 2.0，而测试低因子：
+   L39 factor = 1.125, 1.25, 1.375
+4. 对上游变量做可解释小干预：
+   轻微增强 L4 boundary adjuster；
+   或轻微增强 route delta；
+   或抑制 protocol continuation pressure。
+5. 检查联动是否比单独低因子更强。
+```
+
+成功标准：
+
+```text
+如果低因子 L39 + 上游候选变量小干预
+明显强于低因子 L39 单独干预，
+则说明候选变量不只是相关诊断，
+而可能进入自然门控因果链。
+```
+
+### 十、通俗总结
+
+Phase920 之前我们知道：
+
+```text
+L39 里有一个齿轮，拨它能让 EOS 赢。
+```
+
+Phase921 进一步看到：
+
+```text
+有些状态轻轻拨一点就能赢；
+有些状态必须拨很大才行。
+```
+
+这些差异不是随机的。更容易赢的状态通常已经满足：
+
+```text
+EOS 排名更靠前；
+离边界更近；
+协议续写压力更小；
+L39 共识齿轮自然支持更强。
+```
+
+所以现在的客观拼图是：
+
+```text
+我们不仅找到了齿轮，
+还开始看到“什么时候需要拨多大”的候选门控线索。
+```
+
+但还不能说已经找到自然门控机制，因为还没有证明改变这些线索会让模型自然拨动齿轮。
+
+## Phase 922: 候选门控变量因果耦合测试 [2026-07-04 09:13]
+
+### 一、任务来源与附件判断核查
+
+本阶段读取并分析了最新附件中关于 Phase921（第921阶段）的判断。总体看，附件判断基本正确，但需要严格限定证据层级：
+
+```text
+Phase921 不是自然门控机制闭合；
+Phase921 只是发现了自然状态变量与低强度 L39 齿轮成功率之间的诊断关联。
+```
+
+附件提出的下一步是合理的：固定 Phase920（第920阶段）的 L39 consensus margin gear（共识边界齿轮），在低强度 L39 干预下，对 Phase921（第921阶段）候选变量做小幅上游干预，检查是否真的能增强边界闭合。这正是 Phase922（第922阶段）完成的任务。
+
+### 二、测试脚本与结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase922_candidate_gate_variable_causal_coupling_test.py
+tests/glm5/run_phase922_candidate_gate_variable_causal_coupling_test.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase922_candidate_gate_variable_causal_coupling_test/candidate_gate_variable_causal_coupling_test/
+```
+
+核心输出：
+
+```text
+phase922_qwen3_summary.json
+phase922_glm4_summary.json
+phase922_deepseek7b_summary.json
+phase922_glm4_rows.jsonl
+phase922_cross_model_summary.json
+phase922_cross_model_summary.md
+```
+
+### 三、测试原理
+
+Phase921（第921阶段）给出的候选变量包括：
+
+```text
+route_eos_rank（路线后 EOS 排名）
+boundary_eos_rank（边界后 EOS 排名）
+boundary_gap_to_zero（边界距离零点）
+protocol_vs_eos（协议续写压力相对 EOS 的优势）
+consensus_margin_support_sum（共识边界齿轮自然支持）
+```
+
+Phase922（第922阶段）不再只看相关性，而是做因果耦合筛查：
+
+```text
+固定 L39 共识齿轮；
+把 L39 factor（L39 缩放因子）限定在低强度；
+在低强度 L39 的基础上叠加可解释的小幅上游干预；
+比较叠加干预是否强于 L39-only（仅 L39）基线。
+```
+
+低强度 L39 因子：
+
+```text
+1.125
+1.25
+1.375
+```
+
+上游小干预：
+
+```text
+route_alpha_1.125
+route_alpha_1.25
+l4_boundary_1.05
+l4_boundary_1.10
+protocol_last8_0.90
+protocol_answer_last_0.90
+route + L4 组合
+route + protocol 组合
+L4 + protocol 组合
+route + L4 + protocol 组合
+```
+
+同时加入方向对照：
+
+```text
+route_alpha_0.875_direction_control
+l4_boundary_0.95_direction_control
+protocol_last8_1.10_direction_control
+```
+
+### 四、核心公式
+
+目标不是直接最大化 EOS logit（EOS 对数几率），而是检查 EOS 与当前 blocker（阻塞词）的边界差值：
+
+$$
+M(x)=z_{\mathrm{EOS}}(x)-z_{\mathrm{blocker}}(x)
+$$
+
+L39-only（仅 L39）低强度基线为：
+
+$$
+M_{\mathrm{L39}}(x,f)
+=
+M\left(x;\;G_{39}\times f\right)
+$$
+
+候选上游变量耦合干预为：
+
+$$
+M_{\mathrm{coupled}}(x,f,u)
+=
+M\left(x;\;G_{39}\times f,\;U(u)\right)
+$$
+
+相对 L39-only（仅 L39）的增益为：
+
+$$
+\Delta M_{\mathrm{couple}}(x,f,u)
+=
+M_{\mathrm{coupled}}(x,f,u)-M_{\mathrm{L39}}(x,f)
+$$
+
+闭合判断：
+
+$$
+\mathrm{closure}(x,f,u)=
+\mathbf{1}\left[
+M_{\mathrm{coupled}}(x,f,u)\ge 0
+\land
+\mathrm{rank}_{\mathrm{EOS}}=1
+\right]
+$$
+
+新增闭合判断：
+
+$$
+\mathrm{new\_closure}
+=
+\mathbf{1}\left[
+M_{\mathrm{L39}}(x,f)<0
+\land
+M_{\mathrm{coupled}}(x,f,u)\ge 0
+\right]
+$$
+
+### 五、跨模型结果
+
+跨模型总结果：
+
+```text
+qwen3: 没有 Phase915 L39 候选，未进入 Phase922 实测。
+GLM4: 12 个状态进入测试。
+DS7B: 没有 Phase915 L39 候选，未进入 Phase922 实测。
+```
+
+GLM4（GLM4 模型）测试规模：
+
+```text
+状态数: 12
+L39-only rows（仅 L39 行）: 36
+candidate_plus rows（候选正向干预行）: 360
+direction_control rows（方向对照行）: 108
+总 rows（总行数）: 504
+```
+
+Phase920（第920阶段）共识组诊断：
+
+```text
+train_state_count: 12
+contributing_state_count: 12
+unique_channel_count: 94
+chosen_size: 64
+chosen_min_frequency: 6
+chosen_median_frequency: 12.0
+chosen_max_frequency: 12
+```
+
+这说明 Phase922 使用的 L39 共识齿轮不是单个样本齿轮，而是 12 个状态上复现频率较高的一组通道。
+
+### 六、GLM4 客观结果
+
+L39-only（仅 L39）低强度基线：
+
+```text
+rows: 36
+top1（第一名）: 8
+margin_nonnegative（边界非负）: 8
+strict_clean_candidate（严格干净候选）: 6
+median_margin_delta_vs_target_boundary: 0.84375
+mean_margin_delta_vs_target_boundary: 0.8420138888888888
+median_patched_margin: -0.5625
+```
+
+candidate_plus（候选正向干预）整体：
+
+```text
+rows: 360
+top1: 80
+margin_nonnegative: 80
+strict_clean_candidate: 60
+improved_margin_vs_l39_only: 133
+worsened_margin_vs_l39_only: 123
+new_margin_closure_vs_l39_only: 0
+new_top1_vs_l39_only: 0
+new_strict_vs_l39_only: 0
+mean_margin_delta_vs_l39_only: 0.021527777777777778
+```
+
+direction_control（方向对照）整体：
+
+```text
+rows: 108
+top1: 26
+margin_nonnegative: 26
+strict_clean_candidate: 18
+improved_margin_vs_l39_only: 55
+worsened_margin_vs_l39_only: 17
+new_margin_closure_vs_l39_only: 2
+new_top1_vs_l39_only: 2
+new_strict_vs_l39_only: 0
+mean_margin_delta_vs_l39_only: 0.03935185185185185
+```
+
+最关键结果：
+
+```text
+candidate_plus 正向候选干预：
+  可以轻微移动 margin；
+  但没有新增闭合。
+
+direction_control 方向对照：
+  出现 2 个新增 margin/top1 闭合；
+  但没有新增 strict clean 闭合。
+```
+
+### 七、新增闭合细节
+
+两个新增闭合都来自同一个方向对照：
+
+```text
+control_label: route_alpha_0.875_direction_control
+l39_factor: 1.25
+case: p856_009_animal_fish
+object: fish
+eval_domain: animal
+```
+
+两个状态分别是：
+
+```text
+p856_009_animal_fish | question_plain | flip
+p856_009_animal_fish | question_plain | zero
+```
+
+数值：
+
+```text
+L39-only margin: -0.125
+patched margin: 0.0
+margin_delta_vs_l39_only: 0.125
+patched_eos_rank: 1
+patched_blocker_token: a
+```
+
+这说明它们不是强闭合，而是贴边闭合：
+
+```text
+margin 从 -0.125 推到 0.0；
+EOS 排到第一；
+但 strict clean 没有新增。
+```
+
+### 八、对 Phase921 判断的修正
+
+Phase921（第921阶段）的候选变量判断需要更新为：
+
+```text
+候选变量确实与低强度 L39 成功率有关；
+候选变量也能通过小干预轻微移动边界；
+但是当前正向候选干预没有带来新增闭合；
+新增闭合反而来自 route_alpha_0.875 方向对照。
+```
+
+所以 Phase922（第922阶段）不能写成：
+
+```text
+自然门控变量因果成立。
+```
+
+更准确的结论是：
+
+```text
+候选门控变量存在弱因果耦合迹象；
+但方向性不干净；
+当前还没有找到可靠的自然门控因果变量。
+```
+
+证据标签：
+
+```text
+candidate_moves_margin_but_direction_control_only_adds_closure
+```
+
+### 九、为什么这个结果重要
+
+如果 route_alpha（路线强度）越大越好，那么 `route_alpha_1.125` 和 `route_alpha_1.25` 应该比 `route_alpha_0.875` 更容易新增闭合。
+
+但实际结果是：
+
+```text
+route_alpha_1.25:
+  mean_margin_delta_vs_l39_only = 0.1440972222222222
+  new_margin_closure = 0
+
+route_alpha_0.875_direction_control:
+  mean_margin_delta_vs_l39_only = 0.07291666666666667
+  new_margin_closure = 2
+```
+
+这说明当前现象不符合简单单调门控假设：
+
+```text
+route 越强，EOS 越容易闭合。
+```
+
+更可能的机制是：
+
+```text
+路线强度存在局部最优；
+过强 route 可能同时增强 EOS 与 blocker；
+较弱 route 反而可能减少某些 blocker 对抗；
+L39 齿轮需要与 route 边界位置发生匹配，而不是简单叠加。
+```
+
+### 十、问题、硬伤与瓶颈
+
+第一，样本仍然小。
+
+```text
+GLM4 只有 12 个可用状态；
+qwen3 和 DS7B 没有进入 Phase922 的 L39 候选；
+新增闭合只有 2 行，且来自同一 fish case。
+```
+
+第二，新增闭合太贴边。
+
+```text
+margin = 0.0
+不是大幅超过边界；
+因此很可能是局部边界扰动，不是稳定自然机制。
+```
+
+第三，方向性不干净。
+
+```text
+正向候选干预没有新增闭合；
+方向对照反而新增闭合；
+说明 Phase921 候选变量不能直接解释为自然门控旋钮。
+```
+
+第四，小模型偏差仍然重要。
+
+```text
+GLM4 当前小模型内部结构可能较粗糙；
+L39 边界齿轮可能是压缩后的局部替代结构；
+在更大模型里 route / protocol / boundary 的分工可能更清晰。
+```
+
+### 十一、闭合标准与当前距离
+
+自然门控闭合至少需要满足：
+
+```text
+1. 候选变量干预在多个 case 上稳定新增闭合；
+2. 正向干预优于方向对照；
+3. margin 不只是贴边到 0，而是有稳定正间隔；
+4. strict clean 也同步新增；
+5. qwen3、GLM4、DS7B 至少有两个模型可复现；
+6. 能预测未见状态的低强度 L39 成功/失败。
+```
+
+Phase922 当前只满足：
+
+```text
+候选正向干预可以轻微移动 margin；
+direction control 暴露了 route 方向非单调问题。
+```
+
+距离自然门控闭合仍然较远。
+
+阶段性估计：
+
+```text
+L39 EOS-vs-a 边界齿轮子问题进度: 约 72%
+候选自然门控变量因果验证进度: 约 25% - 30%
+route-response（路线响应）方向性理解进度: 约 10% - 15%
+clean protocol edge graph（干净协议边图谱）进度: 约 43% - 47%
+完整语言编码机制进度: 约 18% - 22%
+```
+
+### 十二、智能理论角度的关键洞察
+
+Phase922（第922阶段）的关键洞察不是“找到了门控变量”，而是：
+
+```text
+语言生成边界不是单调加法系统；
+局部齿轮与上游路线之间存在匹配关系；
+正确的路线强度可能不是越大越好，而是要落在某个边界位置。
+```
+
+这更接近一个动态齿轮系统：
+
+```text
+一个齿轮能否推动输出，
+不只取决于齿轮本身的强度，
+还取决于它与上游 route state（路线状态）、
+protocol pressure（协议压力）、
+blocker field（阻塞词场）之间的相位匹配。
+```
+
+因此，破解语言编码机制不能只问：
+
+```text
+哪个组件提高 EOS？
+```
+
+而应该问：
+
+```text
+在什么路线状态下，
+哪个齿轮以什么强度，
+能把全词表竞争边界推过稳定阈值？
+```
+
+### 十三、下一阶段任务
+
+当前任务与下一任务仍属于同一阶段：
+
+```text
+自然门控变量因果验证阶段。
+```
+
+下一步应继续自动完成：
+
+```text
+Phase923:
+Route Alpha Response Curve Audit
+（路线强度响应曲线审计）
+```
+
+目标：
+
+```text
+1. 固定 L39 consensus margin gear（共识边界齿轮）。
+2. 固定 L39 factor = 1.125, 1.25, 1.375。
+3. 系统扫描 route_alpha:
+   0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5
+4. 判断 route_alpha 是否单调；
+5. 判断新增闭合是否只存在于局部 alpha 区间；
+6. 将 route_alpha 响应曲线加入全局齿轮图谱。
+```
+
+成功标准：
+
+```text
+如果 route_alpha 响应存在稳定峰值区间，
+则说明 Phase922 的方向对照不是随机噪声，
+而是路线-齿轮匹配曲线的一个切面。
+
+如果没有稳定峰值，只是 fish 个例，
+则 Phase922 的新增闭合应降级为局部偶然边界扰动。
+```
+
+### 十四、通俗总结
+
+Phase921（第921阶段）像是发现：
+
+```text
+有些门旁边有几个刻度，看起来和开门难度有关。
+```
+
+Phase922（第922阶段）真的去拨这些刻度，结果发现：
+
+```text
+正向拨动刻度，门会松一点，但没有真正多开几扇门；
+反向拨动其中一个路线刻度，反而让两个贴边的门刚好开了。
+```
+
+所以现在不能说已经找到门控开关。更准确地说：
+
+```text
+门附近确实有机械联动；
+但这个联动不是简单的“往大拨就更好”；
+下一步必须画出路线强度的完整响应曲线。
+```
+
+## Phase 923: 路线强度响应曲线审计 [2026-07-04 09:18]
+
+### 一、任务来源
+
+Phase922（第922阶段）发现一个关键异常：
+
+```text
+candidate_plus（候选正向干预）可以轻微移动 margin（边界差值），但没有新增闭合；
+route_alpha_0.875_direction_control（路线强度 0.875 方向对照）反而新增了 2 个贴边闭合。
+```
+
+这个结果不能直接解释为自然门控变量成立，也不能简单解释为随机噪声。最合理的下一步，是把 route_alpha（路线强度）从单点对照扩展为完整响应曲线。
+
+所以 Phase923（第923阶段）继续同一阶段任务：
+
+```text
+自然门控变量因果验证阶段；
+具体子任务是 route-response curve（路线响应曲线）审计。
+```
+
+### 二、脚本与结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase923_route_alpha_response_curve_audit.py
+tests/glm5/run_phase923_route_alpha_response_curve_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase923_route_alpha_response_curve_audit/route_alpha_response_curve_audit/
+```
+
+核心输出：
+
+```text
+phase923_qwen3_summary.json
+phase923_glm4_summary.json
+phase923_deepseek7b_summary.json
+phase923_glm4_rows.jsonl
+phase923_glm4_curves.jsonl
+phase923_cross_model_summary.json
+phase923_cross_model_summary.md
+```
+
+### 三、测试原理
+
+本阶段固定：
+
+```text
+Phase920 consensus L39 margin gear（共识 L39 边界齿轮）
+L4 boundary spec（L4 边界调节器）
+protocol pressure（协议压力）不额外干预
+```
+
+只扫描 route_alpha（路线强度）：
+
+```text
+0.5
+0.625
+0.75
+0.875
+1.0
+1.125
+1.25
+1.375
+1.5
+```
+
+L39 factor（L39 缩放因子）仍固定为低强度：
+
+```text
+1.125
+1.25
+1.375
+```
+
+因此每条曲线对应：
+
+```text
+一个状态 x
+一个 L39 factor
+九个 route_alpha 点
+```
+
+### 四、核心公式
+
+路线强度响应函数：
+
+$$
+M_{\alpha}(x,f)
+=
+z_{\mathrm{EOS}}\left(x;\alpha\Delta r,\;G_{39}f\right)
+-
+z_{\mathrm{blocker}}\left(x;\alpha\Delta r,\;G_{39}f\right)
+$$
+
+其中：
+
+```text
+alpha 是 route_alpha（路线强度）
+Delta r 是 Phase910/911 以来使用的 route delta（路线差分）
+G39 是 Phase920 的 L39 consensus margin gear（共识边界齿轮）
+f 是 L39 factor（L39 缩放因子）
+```
+
+相对 alpha=1 的增益：
+
+$$
+\Delta M_{\alpha}(x,f)
+=
+M_{\alpha}(x,f)-M_{1.0}(x,f)
+$$
+
+每条曲线的最佳路线强度：
+
+$$
+\alpha^\*(x,f)
+=
+\arg\max_{\alpha} M_{\alpha}(x,f)
+$$
+
+如果路线强度是简单单调门控，则应出现：
+
+$$
+\alpha_1 < \alpha_2
+\Rightarrow
+M_{\alpha_1}(x,f)\le M_{\alpha_2}(x,f)
+$$
+
+或至少多数曲线接近单调。但 Phase923（第923阶段）结果并不支持这一点。
+
+### 五、跨模型结果
+
+```text
+qwen3: 没有 Phase915 L39 候选，未进入 Phase923 实测。
+GLM4: 12 个状态进入测试。
+DS7B: 没有 Phase915 L39 候选，未进入 Phase923 实测。
+```
+
+GLM4（GLM4 模型）规模：
+
+```text
+状态数: 12
+L39 factor 数: 3
+route_alpha 数: 9
+总 rows: 324
+响应曲线数: 36
+```
+
+### 六、GLM4 核心结果
+
+响应曲线摘要：
+
+```text
+curve_count: 36
+best_alpha_distribution:
+  0.875: 12
+  1.25: 16
+  1.375: 8
+best_alpha_lt_1: 12
+best_alpha_eq_1: 0
+best_alpha_gt_1: 24
+monotonic_non_decreasing: 0
+monotonic_non_increasing: 0
+with_closure_alpha: 10
+median_best_margin_delta_vs_alpha1: 0.1875
+mean_best_margin_delta_vs_alpha1: 0.1953125
+```
+
+最重要的客观现象：
+
+```text
+36 条曲线中，没有一条是单调上升；
+36 条曲线中，也没有一条是单调下降；
+最佳 alpha 从不等于 1.0；
+最佳 alpha 分布在 0.875、1.25、1.375 三个区域。
+```
+
+这直接否定了简单假设：
+
+```text
+route 越强，EOS 越容易赢。
+```
+
+也否定另一个简单假设：
+
+```text
+route 越弱，EOS 越容易赢。
+```
+
+更符合结果的解释是：
+
+```text
+route_alpha 是路线-齿轮匹配参数；
+不同状态需要不同 route 强度；
+L39 齿轮不是单独工作，而是依赖 route state（路线状态）的边界位置。
+```
+
+### 七、按 alpha 分组的结果
+
+GLM4：
+
+```text
+alpha=0.875:
+  rows: 36
+  top1: 10
+  margin_nonnegative: 10
+  strict_clean_candidate: 6
+  improved_margin_vs_alpha1: 27
+  new_margin_closure_vs_alpha1: 2
+  lost_margin_closure_vs_alpha1: 0
+  mean_margin_delta_vs_alpha1: 0.07291666666666667
+  median_patched_margin: -0.5
+
+alpha=1.25:
+  rows: 36
+  top1: 8
+  margin_nonnegative: 8
+  strict_clean_candidate: 6
+  improved_margin_vs_alpha1: 32
+  new_margin_closure_vs_alpha1: 0
+  lost_margin_closure_vs_alpha1: 0
+  mean_margin_delta_vs_alpha1: 0.1440972222222222
+  median_patched_margin: -0.375
+
+alpha=1.375:
+  rows: 36
+  top1: 8
+  margin_nonnegative: 8
+  strict_clean_candidate: 6
+  improved_margin_vs_alpha1: 21
+  new_margin_closure_vs_alpha1: 0
+  lost_margin_closure_vs_alpha1: 0
+  mean_margin_delta_vs_alpha1: 0.1032986111111111
+  median_patched_margin: -0.4375
+
+alpha=0.75:
+  rows: 36
+  top1: 3
+  margin_nonnegative: 3
+  strict_clean_candidate: 3
+  improved_margin_vs_alpha1: 11
+  new_margin_closure_vs_alpha1: 0
+  lost_margin_closure_vs_alpha1: 5
+  mean_margin_delta_vs_alpha1: -0.1605902777777778
+  median_patched_margin: -0.75
+
+alpha=0.625:
+  rows: 36
+  top1: 0
+  margin_nonnegative: 0
+  strict_clean_candidate: 0
+  lost_margin_closure_vs_alpha1: 8
+  mean_margin_delta_vs_alpha1: -4.694444444444445
+
+alpha=0.5:
+  rows: 36
+  top1: 0
+  margin_nonnegative: 0
+  strict_clean_candidate: 0
+  lost_margin_closure_vs_alpha1: 8
+  mean_margin_delta_vs_alpha1: -12.883246527777779
+```
+
+这个分布说明：
+
+```text
+0.5 和 0.625 明显破坏路线；
+0.75 部分破坏闭合；
+0.875 在少数贴边状态上最好；
+1.25 和 1.375 在整体 margin 上更强；
+1.5 没有继续变好。
+```
+
+### 八、新增闭合细节
+
+新增闭合仍然只有 2 行，完全复现 Phase922（第922阶段）的情况：
+
+```text
+case: p856_009_animal_fish
+object: fish
+eval_domain: animal
+prompt_variant: question_plain
+edit_mode: flip / zero
+L39 factor: 1.25
+route_alpha: 0.875
+```
+
+数值：
+
+```text
+alpha1_margin: -0.125
+patched_margin: 0.0
+margin_delta_vs_alpha1: 0.125
+patched_eos_rank: 1
+strict_clean_candidate: False
+```
+
+因此新增闭合仍然必须谨慎解释：
+
+```text
+它不是稳定强闭合；
+它是 fish 两个贴边状态的 alpha=0.875 局部边界现象。
+```
+
+### 九、对 Phase922 的进一步解释
+
+Phase922（第922阶段）看到 route_alpha_0.875_direction_control 比正向 route_alpha 更容易新增闭合。Phase923（第923阶段）说明：
+
+```text
+这不是单点偶然结果；
+完整响应曲线确实存在非单调结构。
+```
+
+但 Phase923 同时说明：
+
+```text
+0.875 并不是全局最佳；
+它只在 12 条曲线中成为最佳 alpha；
+另有 24 条曲线的最佳 alpha 大于 1。
+```
+
+所以更准确的结论是：
+
+```text
+route_alpha 不是自然门控开关；
+route_alpha 是状态依赖的匹配变量。
+```
+
+### 十、图谱进展
+
+Phase923（第923阶段）把全局齿轮图谱推进了一步：
+
+```text
+之前图谱记录的是：
+  哪个齿轮有效；
+  哪个方向有效；
+  哪个 blocker 被压制。
+
+现在图谱需要增加：
+  route-response curve（路线响应曲线）；
+  alpha_peak（最佳路线强度）；
+  alpha_nonmonotonicity（路线非单调性）；
+  route-gear matching（路线-齿轮匹配）。
+```
+
+新的图谱字段建议：
+
+```text
+state_key
+l39_factor
+best_route_alpha
+best_margin
+alpha1_margin
+best_margin_delta_vs_alpha1
+closure_alphas
+is_monotonic_non_decreasing
+is_monotonic_non_increasing
+route_alpha_peak_region
+```
+
+### 十一、问题、硬伤与瓶颈
+
+第一，跨模型仍不完整。
+
+```text
+qwen3 和 DS7B 没有 Phase915 L39 候选；
+Phase923 的实证主体仍然只有 GLM4。
+```
+
+第二，新增闭合仍然太少。
+
+```text
+new_margin_closure_vs_alpha1 = 2
+new_top1_vs_alpha1 = 2
+new_strict_vs_alpha1 = 0
+```
+
+第三，闭合边界太弱。
+
+```text
+patched_margin = 0.0
+```
+
+这不是强正边界，只是刚好碰到边界。
+
+第四，响应曲线虽然非单调，但仍是小模型局部曲线。
+
+```text
+小模型内部结构可能粗糙；
+route_alpha 曲线可能是压缩后结构的局部投影；
+不能直接当作通用语言编码规律。
+```
+
+第五，当前只扫描 route_alpha，没有同时扫描 protocol pressure（协议压力）和 blocker field（阻塞词场）。
+
+```text
+真实自然门控可能是三变量曲面，
+而不是一维 route_alpha 曲线。
+```
+
+### 十二、闭合标准与当前距离
+
+如果要把 route-response（路线响应）升级为自然门控机制，需要满足：
+
+```text
+1. alpha peak（最佳 alpha）在更多 case 上稳定可预测；
+2. best_alpha 能由自然状态变量预测；
+3. 选择 best_alpha 后能显著新增 margin/top1/strict clean 闭合；
+4. 不只是 fish 个例；
+5. 至少两个模型复现；
+6. 能预测 holdout state（留出状态）的响应峰值。
+```
+
+Phase923 当前只满足：
+
+```text
+route_alpha 非单调；
+存在状态依赖峰值；
+best_alpha 分布不是随机平铺，而集中在 0.875、1.25、1.375。
+```
+
+但还没有满足：
+
+```text
+稳定新增 strict clean 闭合；
+跨模型复现；
+可预测峰值。
+```
+
+阶段性估计：
+
+```text
+L39 EOS-vs-a 边界齿轮子问题进度: 约 73%
+route-response 曲线定位进度: 约 25%
+自然门控变量因果验证进度: 约 30%
+clean protocol edge graph（干净协议边图谱）进度: 约 44% - 48%
+完整语言编码机制进度: 约 19% - 23%
+```
+
+### 十三、智能理论角度的关键洞察
+
+Phase923（第923阶段）最重要的洞察是：
+
+```text
+语言生成边界可能不是简单加法场；
+而是状态依赖的响应曲面。
+```
+
+如果把 L39 共识齿轮看成一个局部执行器，把 route_delta（路线差分）看成上游路线状态，那么输出边界更像：
+
+$$
+M = F(G_{39}, \alpha, P, B, x)
+$$
+
+其中：
+
+```text
+G39 是 L39 齿轮；
+alpha 是路线强度；
+P 是 protocol pressure（协议压力）；
+B 是 blocker field（阻塞词场）；
+x 是当前状态。
+```
+
+Phase923 说明：
+
+```text
+F 对 alpha 不是单调函数。
+```
+
+这意味着全局齿轮图谱不能只记录：
+
+```text
+齿轮方向；
+齿轮强度；
+齿轮目标。
+```
+
+还必须记录：
+
+```text
+齿轮与路线状态的匹配曲线。
+```
+
+这可能是破解语言编码机制的重要拼图：语言不是由单个神经元或单个方向直接编码，而是由多个局部齿轮在状态空间中的相位匹配完成。
+
+### 十四、下一阶段任务
+
+Phase923 仍属于自然门控变量因果验证阶段，但已经完成了 route_alpha 一维曲线审计。下一步应转向二维曲面：
+
+```text
+Phase924:
+Route Alpha × Protocol Pressure Response Surface
+（路线强度 × 协议压力响应曲面）
+```
+
+目标：
+
+```text
+1. 固定 Phase920 L39 consensus gear。
+2. 固定 L39 factor = 1.25 和 1.375。
+3. 扫描 route_alpha:
+   0.75, 0.875, 1.0, 1.125, 1.25, 1.375
+4. 扫描 protocol span factor:
+   0.85, 0.9, 1.0, 1.1
+5. 观察 best_alpha 是否受 protocol pressure 改变。
+6. 检查 fish 个例是否只是局部偶然，还是二维曲面上的一个峰。
+```
+
+成功标准：
+
+```text
+如果 route_alpha 峰值会随 protocol pressure 系统移动，
+则说明自然门控不是一维旋钮，而是 route-protocol 联合曲面。
+
+如果二维曲面仍然只有 fish 个例贴边，
+则应把当前路线降级为局部边界扰动，
+转向更广泛的状态采样和图谱扩展。
+```
+
+### 十五、通俗总结
+
+Phase922（第922阶段）像是发现：
+
+```text
+把路线旋钮拧小一点，有两扇门反而开了。
+```
+
+Phase923（第923阶段）把旋钮从小到大完整转了一圈，结果看到：
+
+```text
+这个旋钮不是越大越好；
+也不是越小越好；
+每个状态都有自己的最佳位置。
+```
+
+所以当前最真实的结论是：
+
+```text
+我们不是找到了一个简单开关；
+而是看到了齿轮系统里的匹配曲线。
+```
+
+这对全局齿轮图谱很重要，因为后续图谱必须从“组件有效性表”升级为“状态响应曲面图”。
+
+## Phase 924: 路线强度与协议压力二维响应曲面审计 [2026-07-04 09:23]
+
+### 一、任务来源
+
+Phase923（第923阶段）已经证明：
+
+```text
+route_alpha（路线强度）不是单调旋钮；
+不同状态存在不同 alpha_peak（路线强度峰值）；
+但新增闭合仍然只出现在 fish 的两个贴边状态。
+```
+
+因此 Phase924（第924阶段）继续同一阶段任务，把一维 route_alpha curve（路线强度曲线）扩展为二维曲面：
+
+```text
+route_alpha × protocol_span_factor
+路线强度 × 协议压力
+```
+
+目标不是追求新的闭合，而是判断：
+
+```text
+Phase923 看到的路线峰值是否会被 protocol pressure（协议压力）系统调制。
+```
+
+### 二、脚本与结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase924_route_protocol_response_surface_audit.py
+tests/glm5/run_phase924_route_protocol_response_surface_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase924_route_protocol_response_surface_audit/route_protocol_response_surface_audit/
+```
+
+核心输出：
+
+```text
+phase924_qwen3_summary.json
+phase924_glm4_summary.json
+phase924_deepseek7b_summary.json
+phase924_glm4_rows.jsonl
+phase924_glm4_surfaces.jsonl
+phase924_cross_model_summary.json
+phase924_cross_model_summary.md
+```
+
+注意：第一次直接执行 runner（运行脚本）时出现一次底层 segmentation fault（段错误），未产生可用实验结果。随后按 qwen3、GLM4、DS7B 单模型顺序重跑，三模型结果完整，并重新执行 summarize-round（汇总轮次）。qwen3 完整参数无候选路径也单独复核通过，因此最终记录以单模型顺序重跑结果为准。
+
+### 三、测试原理
+
+固定：
+
+```text
+Phase920 consensus L39 margin gear（共识 L39 边界齿轮）
+L4 boundary spec（L4 边界调节器）
+```
+
+扫描：
+
+```text
+L39 factor:
+  1.25
+  1.375
+
+route_alpha:
+  0.75
+  0.875
+  1.0
+  1.125
+  1.25
+  1.375
+
+protocol_span_factor:
+  0.85
+  0.9
+  1.0
+  1.1
+
+protocol_span_kind:
+  last8_before_period
+```
+
+GLM4（GLM4 模型）总规模：
+
+```text
+状态数: 12
+L39 factor 数: 2
+route_alpha 数: 6
+protocol factor 数: 4
+总 rows: 576
+二维曲面数: 24
+```
+
+### 四、核心公式
+
+二维响应曲面：
+
+$$
+M_{\alpha,p}(x,f)
+=
+z_{\mathrm{EOS}}\left(x;\alpha\Delta r,\;pP,\;G_{39}f\right)
+-
+z_{\mathrm{blocker}}\left(x;\alpha\Delta r,\;pP,\;G_{39}f\right)
+$$
+
+其中：
+
+```text
+alpha 是 route_alpha（路线强度）；
+p 是 protocol_span_factor（协议压力因子）；
+P 是 last8_before_period 的 L0 attention input span（第0层注意力输入片段）；
+G39 是 L39 consensus margin gear（共识边界齿轮）；
+f 是 L39 factor（L39 缩放因子）。
+```
+
+基点：
+
+$$
+M_{\mathrm{base}}(x,f)=M_{1.0,1.0}(x,f)
+$$
+
+曲面增益：
+
+$$
+\Delta M_{\alpha,p}(x,f)
+=
+M_{\alpha,p}(x,f)-M_{\mathrm{base}}(x,f)
+$$
+
+最佳坐标：
+
+$$
+(\alpha^\*,p^\*)
+=
+\arg\max_{\alpha,p} M_{\alpha,p}(x,f)
+$$
+
+### 五、跨模型结果
+
+```text
+qwen3: 没有 Phase915 L39 候选，未进入 Phase924 实测。
+GLM4: 12 个状态进入测试。
+DS7B: 没有 Phase915 L39 候选，未进入 Phase924 实测。
+```
+
+跨模型整体：
+
+```text
+selected_phase915_l39_candidates: 12
+target_state_count: 12
+all_rows: 576
+all_top1: 174
+all_margin_nonnegative: 174
+all_strict_clean_candidate: 132
+surface_base_rows: 24
+surface_base_top1: 8
+surface_base_margin_nonnegative: 8
+non_base_rows: 552
+non_base_top1: 166
+non_base_margin_nonnegative: 166
+non_base_new_top1_vs_surface_base: 2
+non_base_new_margin_closure_vs_surface_base: 2
+```
+
+### 六、GLM4 二维曲面摘要
+
+```text
+surface_count: 24
+best_alpha_distribution:
+  0.75: 4
+  0.875: 4
+  1.125: 4
+  1.25: 9
+  1.375: 3
+
+best_protocol_distribution:
+  0.85: 1
+  0.9: 10
+  1.0: 10
+  1.1: 3
+
+best_coord_is_base: 0
+best_alpha_lt_1: 8
+best_alpha_eq_1: 0
+best_alpha_gt_1: 16
+best_protocol_lt_1: 11
+best_protocol_eq_1: 10
+best_protocol_gt_1: 3
+with_closure_coord: 10
+median_best_margin_delta_vs_surface_base: 0.1875
+mean_best_margin_delta_vs_surface_base: 0.21354166666666666
+```
+
+核心现象：
+
+```text
+24 个二维曲面中，没有一个曲面的最佳坐标是基点 alpha=1.0 且 protocol=1.0；
+best protocol factor 有 11 个小于 1，有 10 个等于 1，有 3 个大于 1；
+说明 protocol pressure 会改变最优坐标。
+```
+
+### 七、按 protocol factor 分组结果
+
+```text
+protocol=1.0:
+  rows: 144
+  top1: 45
+  margin_nonnegative: 45
+  new_margin_closure: 2
+  lost_margin_closure: 5
+  mean_delta_vs_base: 0.018663194444444444
+
+protocol=0.85:
+  rows: 144
+  top1: 46
+  margin_nonnegative: 46
+  new_margin_closure: 0
+  lost_margin_closure: 2
+  mean_delta_vs_base: 0.027777777777777776
+
+protocol=0.9:
+  rows: 144
+  top1: 46
+  margin_nonnegative: 46
+  new_margin_closure: 0
+  lost_margin_closure: 2
+  mean_delta_vs_base: 0.013020833333333334
+
+protocol=1.1:
+  rows: 144
+  top1: 37
+  margin_nonnegative: 37
+  new_margin_closure: 0
+  lost_margin_closure: 11
+  mean_delta_vs_base: -0.5786675347222222
+```
+
+解释：
+
+```text
+轻微降低 protocol pressure（0.85 / 0.9）整体上不坏，甚至 top1 数略高；
+提高 protocol pressure 到 1.1 会明显破坏边界，lost closure 增加到 11。
+```
+
+这说明 protocol pressure 不是无关变量，而是会参与 L39 齿轮是否有效。
+
+### 八、二维坐标结果
+
+最强新增闭合坐标仍然是：
+
+```text
+route_alpha = 0.875
+protocol_span_factor = 1.0
+```
+
+数值：
+
+```text
+rows: 24
+top1: 10
+margin_nonnegative: 10
+strict_clean_candidate: 6
+new_margin_closure: 2
+new_top1: 2
+lost_margin_closure: 0
+mean_delta_vs_base: 0.08333333333333333
+```
+
+较强但不新增闭合的坐标包括：
+
+```text
+route_alpha=1.25, protocol=1.0:
+  mean_delta_vs_base: 0.1328125
+  new_closure: 0
+
+route_alpha=1.375, protocol=1.1:
+  mean_delta_vs_base: 0.10416666666666667
+  new_closure: 0
+
+route_alpha=1.125, protocol=0.85:
+  mean_delta_vs_base: 0.09114583333333333
+  new_closure: 0
+```
+
+这说明：
+
+```text
+最大平均 margin 增益不等于新增闭合；
+新增闭合只发生在非常贴边的局部区域；
+闭合是边界位置问题，不是平均增益问题。
+```
+
+### 九、新增闭合细节
+
+新增闭合仍然只有 2 行，和 Phase922 / Phase923 完全一致：
+
+```text
+case: p856_009_animal_fish
+object: fish
+eval_domain: animal
+prompt_variant: question_plain
+edit_mode: flip / zero
+L39 factor: 1.25
+route_alpha: 0.875
+protocol_span_factor: 1.0
+```
+
+数值：
+
+```text
+surface_base_margin: -0.125
+patched_margin: 0.0
+margin_delta_vs_surface_base: 0.125
+patched_eos_rank: 1
+strict_clean_candidate: False
+```
+
+所以二维曲面没有把新增闭合从 fish 个例扩展到更多状态。
+
+### 十、对 Phase923 的修正
+
+Phase923（第923阶段）提出：
+
+```text
+route_alpha 可能是状态依赖匹配变量。
+```
+
+Phase924（第924阶段）进一步说明：
+
+```text
+route_alpha 的最佳点确实会被 protocol pressure 调制；
+但是 protocol 调制没有带来新的稳定闭合；
+当前新增闭合仍然只是 fish 的贴边局部峰。
+```
+
+因此当前图谱应记录：
+
+```text
+route-protocol response surface 存在；
+best coordinate 不等于自然基点；
+protocol pressure 会改变 margin 曲面；
+但闭合仍然没有扩展到稳定多样本。
+```
+
+### 十一、问题、硬伤与瓶颈
+
+第一，强正结论仍然不足。
+
+```text
+new_margin_closure_vs_surface_base = 2
+new_top1_vs_surface_base = 2
+new_strict_vs_surface_base = 0
+```
+
+第二，新增闭合仍是同一个 fish 个例。
+
+```text
+没有跨 object / material / animal 多样化扩展。
+```
+
+第三，二维曲面证明了结构复杂性，但没有证明自然门控。
+
+```text
+best_coord_is_base = 0
+```
+
+这说明自然基点不是最优实验坐标，但不等于模型自然生成时真的会选择这些坐标。
+
+第四，protocol factor 的解释仍然粗糙。
+
+```text
+当前 protocol_span_factor 只是 last8_before_period 输入缩放；
+它是协议压力代理变量，不是真正完整的 protocol field（协议场）。
+```
+
+第五，跨模型仍然只有 GLM4 实测。
+
+```text
+qwen3 和 DS7B 无 L39 候选；
+不能把 GLM4 小模型曲面当成通用结构。
+```
+
+### 十二、闭合标准与当前距离
+
+二维曲面如果要进入自然门控闭合，需要满足：
+
+```text
+1. 最佳坐标能预测 holdout state；
+2. 曲面峰值能新增 strict clean 闭合；
+3. 新增闭合跨多个 case / domain；
+4. protocol factor 的含义能从代理变量升级为明确协议场变量；
+5. 至少两个模型复现；
+6. 曲面能解释 blocker field（阻塞词场）变化，而不只是 EOS margin。
+```
+
+Phase924 当前满足：
+
+```text
+二维曲面存在；
+protocol pressure 参与最优坐标；
+自然基点不是最佳实验坐标。
+```
+
+Phase924 当前不满足：
+
+```text
+稳定新增闭合；
+strict clean 新增；
+跨模型复现；
+协议场真实解码。
+```
+
+阶段性估计：
+
+```text
+L39 EOS-vs-a 边界齿轮子问题进度: 约 74%
+route-protocol response surface（路线-协议响应曲面）进度: 约 25% - 30%
+自然门控变量因果验证进度: 约 32%
+全局齿轮图谱结构进度: 约 50%
+完整语言编码机制进度: 约 19% - 23%
+```
+
+### 十三、智能理论角度的关键洞察
+
+Phase924（第924阶段）的关键洞察是：
+
+```text
+语言生成边界至少是二维响应曲面，不是一维旋钮。
+```
+
+如果把语言生成看作全词表竞争场，那么当前结果说明：
+
+$$
+M = F(G_{39},\alpha,p,x)
+$$
+
+其中：
+
+```text
+G39 是局部边界齿轮；
+alpha 是 route state（路线状态）强度；
+p 是 protocol pressure（协议压力）；
+x 是语义/句法状态。
+```
+
+而且：
+
+$$
+\arg\max_{\alpha,p} F(G_{39},\alpha,p,x)
+\ne
+(1.0,1.0)
+$$
+
+这意味着：
+
+```text
+模型自然状态不是实验最优状态；
+解释语言编码机制不能只找哪个组件有效；
+必须画出状态响应曲面，理解齿轮在不同路线和协议压力下如何咬合。
+```
+
+### 十四、阶段性收束与下一步
+
+从 Phase921 到 Phase924 的链条是：
+
+```text
+Phase921:
+  发现候选自然门控变量的诊断关联。
+
+Phase922:
+  发现候选正向变量只轻微移动 margin，方向对照反而新增贴边闭合。
+
+Phase923:
+  证明 route_alpha 响应非单调，存在状态依赖峰值。
+
+Phase924:
+  证明 protocol pressure 会调制二维最佳坐标，但仍没有扩展新增闭合。
+```
+
+因此当前阶段目标已经完成一轮：
+
+```text
+候选门控变量不是简单自然开关；
+更像 route-protocol-state response surface（路线-协议-状态响应曲面）。
+```
+
+下一步不应继续只围绕 fish 贴边闭合打转。更合理的阶段性任务是：
+
+```text
+Phase925:
+Response Surface Generalization Dataset Expansion
+（响应曲面泛化数据扩展）
+```
+
+目标：
+
+```text
+1. 扩展状态来源，不只依赖 Phase915 的 L39_mlp_output_scale_1.5 候选。
+2. 采集更多 near-boundary states（近边界状态）。
+3. 每个 case 至少形成多条曲面。
+4. 判断 best_alpha / best_protocol 是否可由自然状态变量预测。
+5. 如果仍只有少数贴边闭合，就把当前路线从“闭合路线”降级为“图谱特征路线”。
+```
+
+### 十五、通俗总结
+
+Phase924 像是把一个旋钮升级成了一个二维控制面板：
+
+```text
+横轴是路线强度；
+纵轴是协议压力。
+```
+
+结果发现：
+
+```text
+每个状态确实有不同的最佳位置；
+协议压力确实会改变最佳位置；
+但真正新增开门的仍然只有 fish 的两扇贴边小门。
+```
+
+所以当前不能说已经找到自然门控机制。更准确地说：
+
+```text
+我们已经看到齿轮系统存在响应曲面；
+但闭合还没有从局部个例扩展成通用规律。
+```
+
+下一步应该扩大图谱采样，而不是继续在同一个贴边个例上反复调参。
+
+## Phase 925: 响应曲面泛化数据扩展 [2026-07-04 09:47]
+
+### 一、对附件判断的核查
+
+附件对 Phase921 到 Phase924 的总体判断基本正确。当前主线不应写成“已经找到自然动作门”，更准确的表述是：
+
+```text
+已经发现 L39 MLP EOS-vs-a 有符号边界齿轮；
+人工干预可以在少数贴边状态上推动 EOS 胜出；
+自然门控变量还没有闭合；
+当前更像 route-protocol-state response surface 的雏形。
+```
+
+需要收紧的一点是：附件中的部分公式排版出现损坏，不能按原式直接引用；但它表达的核心含义是正确的，即以 EOS 相对 blocker 的 margin、route alpha 响应曲线、route-protocol 二维曲面作为主要观测对象。
+
+本阶段采纳附件中正确的部分，执行 Phase925：
+
+```text
+Response Surface Generalization Dataset Expansion
+响应曲面泛化数据扩展
+```
+
+本阶段不是新的模型前向因果干预，而是对已有 Phase914 / Phase915 / Phase924 结果进行跨模型离线整理，目标是摆脱 Phase924 只围绕 fish 局部贴边状态的限制，为下一轮更大范围曲面测试准备候选状态。
+
+### 二、脚本与输出
+
+新增脚本：
+
+```text
+tests/glm5/phase925_response_surface_generalization_dataset_expansion.py
+tests/glm5/run_phase925_response_surface_generalization_dataset_expansion.sh
+```
+
+输出目录：
+
+```text
+tests/result/phase925_response_surface_generalization_dataset_expansion/response_surface_generalization_dataset_expansion/
+```
+
+关键输出文件：
+
+```text
+phase925_qwen3_summary.json
+phase925_glm4_summary.json
+phase925_deepseek7b_summary.json
+phase925_glm4_selected_surface_seeds.jsonl
+phase925_cross_model_summary.json
+phase925_cross_model_summary.md
+```
+
+脚本已通过：
+
+```text
+python -m py_compile tests/glm5/phase925_response_surface_generalization_dataset_expansion.py
+bash -n tests/glm5/run_phase925_response_surface_generalization_dataset_expansion.sh
+```
+
+### 三、测试原理
+
+Phase924 已经证明二维曲面存在：
+
+```text
+route_alpha x protocol_span_factor
+```
+
+但新增闭合集中在 fish 局部状态。因此 Phase925 的任务不是继续调参，而是先扩大候选状态集合。
+
+每个候选状态用如下 key 固定：
+
+```text
+state_key =
+case_id |
+prompt_variant |
+source_subset_key |
+edit_mode |
+eval_kind |
+group_kind |
+factor
+```
+
+候选筛选条件：
+
+```text
+C(x)=1[
+  usable_boundary(x)
+  and (
+    near_margin(x)
+    or top10(x)
+    or weak_holdout(x)
+    or strong_holdout(x)
+    or (top50(x) and blocker_is_target(x) and rank_near(x))
+  )
+]
+```
+
+其中：
+
+```text
+near_margin(x): -2.0 <= M(x) <= 0.5
+rank_near(x): EOS_rank <= 50
+target_blocker_token: a
+M(x)=z_EOS(x)-z_blocker(x)
+```
+
+候选排序分数是一个可解释的基础加权分数：
+
+```text
+S(x)=
+200 * I_strong
++ 120 * I_weak
++ 70 * I_top5
++ 40 * I_top10
++ 25 * I_blocker_is_a
++ 10 * max(0, 4 - |M|)
++ 10 * max(0, 64-rank)/64
++ 3 * max(0, -band16_mean_logit_delta)
++ eos_logit_delta_vs_route
+```
+
+这个分数只用于选择下一轮曲面测试的候选种子，不作为机制闭合证据。
+
+### 四、客观结果
+
+跨模型汇总：
+
+```text
+phase914_rows_total: 1688
+candidate_unique_states_total: 1380
+selected_surface_seeds_total: 96
+selected_new_surface_seed_vs_phase924: 84
+selected_already_surface_tested_phase924: 12
+selected_present_in_phase915_boundary_set: 12
+selected_top50: 96
+selected_top10: 70
+selected_top5: 18
+selected_weak_holdout_candidate: 12
+selected_strict_clean_candidate: 0
+selected_strong_holdout_candidate: 0
+selected_unique_cases: 10
+selected_unique_domains: 3
+selected_unique_prompt_variants: 4
+selected_unique_groups: 5
+```
+
+分模型结果：
+
+```text
+qwen3:
+  phase914_rows: 96
+  candidate_unique_states: 0
+  selected_surface_seeds: 0
+  evidence: no_expandable_response_surface_candidates
+
+GLM4:
+  phase914_rows: 1496
+  candidate_unique_states: 1380
+  selected_surface_seeds: 96
+  evidence: expanded_surface_seed_set_ready
+
+DS7B:
+  phase914_rows: 96
+  candidate_unique_states: 0
+  selected_surface_seeds: 0
+  evidence: no_expandable_response_surface_candidates
+```
+
+GLM4 精选种子的结构：
+
+```text
+domains:
+  animal: 36
+  material: 30
+  object: 30
+
+cases:
+  p856_008_animal_bird: 10
+  p856_021_material_wood: 10
+  p856_022_material_iron: 10
+  p856_009_animal_fish: 10
+  p856_038_object_object: 10
+  p885_047_animal_shark: 10
+  p856_036_object_car: 10
+  p856_035_object_chair: 10
+  p856_023_material_plastic: 10
+  p856_010_animal_mammal: 6
+
+groups:
+  top_abs_64: 36
+  low_abs_64: 24
+  band32_support_64: 15
+  band16_support_64: 11
+  band16_support_32: 10
+
+blockers:
+  a: 66
+  " .": 30
+
+median_margin: -1.984375
+mean_margin: -2.515625
+median_rank: 9.0
+median_score: 103.16015625
+```
+
+### 五、结果分析
+
+Phase925 支持附件中的关键判断：
+
+```text
+下一步应从局部贴边闭合转向响应曲面泛化。
+```
+
+正结果：
+
+```text
+1. GLM4 不再只剩 fish 单点。
+2. 候选状态扩展到 10 个 case。
+3. 候选状态覆盖 animal / material / object 三个语义域。
+4. 候选状态包含 4 类 prompt variant 和 5 类边界齿轮组。
+5. 84 个 selected seed 是 Phase924 没有测试过的新曲面种子。
+```
+
+负结果：
+
+```text
+1. qwen3 和 DS7B 在已有 Phase914 数据中没有可扩展候选。
+2. selected_strict_clean_candidate 仍为 0。
+3. selected_strong_holdout_candidate 仍为 0。
+4. 这不是新的自然闭合证据，只是为下一轮因果曲面测试建立数据底座。
+5. GLM4 的候选中有 30 个 blocker 是 " ."，说明阻塞边已经不只是一条 EOS-vs-a 边，需要在下一阶段区分 a blocker 与 punctuation blocker。
+```
+
+### 六、闭合标准与当前距离
+
+当前闭合不能定义为“找到了某个能提升 EOS logit 的齿轮”。更严格的闭合应至少分三层：
+
+```text
+1. 曲面复现闭合：
+   在不同 case、domain、prompt、gear group 上复现稳定的 response surface 结构。
+
+2. 坐标预测闭合：
+   只用自然状态变量预测 best_alpha 和 best_protocol coordinate，
+   并在 holdout seed 上成立。
+
+3. 因果动作闭合：
+   使用预测坐标进行干预后，
+   EOS 在 full-vocabulary blocker 场中稳定胜出，
+   且满足 exact-natural / strict-clean 标准。
+```
+
+Phase925 只完成了第 1 层之前的数据准备：
+
+```text
+GLM4:
+  已形成可测的泛化曲面种子集合。
+
+qwen3 / DS7B:
+  当前已有数据没有形成对应候选集合。
+
+strict causal closure:
+  仍未完成。
+```
+
+所以当前离语言编码机制闭合仍然很远。Phase925 的价值是把下一步测试从“局部调鱼样本”推进到“跨 case / domain 的曲面验证”。
+
+### 七、问题、硬伤与瓶颈
+
+1. 数据来源偏置：
+
+```text
+Phase925 依赖 Phase914/915/924 既有结果。
+它能扩大已有图谱，但不能证明没有被既有实验设计漏掉的状态。
+```
+
+2. 跨模型不充分：
+
+```text
+qwen3 和 DS7B 没有候选，不等于不存在类似机制；
+也可能是 Phase914 的测试入口不适合这两个小模型。
+```
+
+3. 选择分数不是机制公式：
+
+```text
+S(x) 只是候选排序规则。
+不能把它解释成模型内部真实门控函数。
+```
+
+4. 阻塞者结构变复杂：
+
+```text
+候选 blocker 同时包含 a 和 " ."。
+这说明 termination / protocol edge 不是单一 EOS-vs-a 边，
+下一阶段必须区分语义 blocker、冠词 blocker、标点 blocker。
+```
+
+5. 小模型偏差仍然存在：
+
+```text
+当前测试模型较小，内部路线可能粗糙、离散、局部化。
+因此 GLM4 上形成的候选曲面不能直接外推到更大模型或真实语言机制。
+```
+
+### 八、智能理论角度的阶段洞察
+
+这一阶段进一步说明：
+
+```text
+语言生成不像一个单点开关；
+更像一个状态场中的边界迁移过程。
+```
+
+目前看到的结构是：
+
+```text
+semantic object state
+protocol continuation pressure
+route intensity
+signed boundary gear
+full-vocabulary blocker field
+```
+
+这些变量共同决定 EOS 是否能穿过阻塞带。也就是说，要破解语言背后的数学结构，第一性原理可能不是“找到一个特征”，而是：
+
+```text
+找到状态变量如何改变边界曲面的形状。
+```
+
+Phase925 把这个方向推进了一步：先建立足够大的状态采样，而不是继续在单个局部案例上追求闭合。
+
+### 九、下一阶段任务
+
+当前阶段性目标已经完成：
+
+```text
+扩展 response surface 泛化候选数据集。
+```
+
+下一阶段仍属于同一条 response-surface 主线，但已经进入新的 GPU 因果测试阶段，不应与本阶段的离线索引结果混为一个结论。
+
+建议 Phase926：
+
+```text
+Generalized Route-Protocol Surface Validation
+泛化路线-协议曲面验证
+```
+
+任务：
+
+```text
+1. 以 Phase925 的 96 个 GLM4 selected seeds 为主测试集。
+2. 先做平衡子集测试，例如每个 domain / blocker / group 取代表种子。
+3. 再扩大到完整 96 seed。
+4. 对每个 seed 重新画 route_alpha x protocol_span_factor 曲面。
+5. 检查 best coordinate 是否能跨 case / domain 形成稳定规律。
+6. 单独标记 blocker=a 与 blocker=" ." 的曲面差异。
+7. 如果曲面稳定，再进入 best-coordinate predictor。
+```
+
+如果 Phase926 仍然只在极少数贴边状态产生闭合，则当前路线应进一步收紧为：
+
+```text
+response surface graph construction
+响应曲面图谱构建
+```
+
+而不是继续声称接近语言编码机制闭合。
+
+### 十、通俗总结
+
+Phase925 做的事情很简单：
+
+```text
+以前我们只有几块可疑拼图，尤其 fish 很突出；
+现在先把更多可疑拼图从旧实验里挑出来，
+组成一个更大的候选集合。
+```
+
+结果是：
+
+```text
+GLM4 找到了 96 个值得下一轮画曲面的状态；
+这些状态覆盖 10 个样本、3 个语义域；
+但 qwen3 和 DS7B 还没有对应候选；
+也还没有任何新的闭合。
+```
+
+所以 Phase925 是图谱推进，不是机制闭合。下一步要真正把这些点拿去画曲面，看看它们是不是同一套语言边界规律的不同切片。
+
+## Phase 926: 泛化路线-协议曲面验证 [2026-07-04 12:31]
+
+### 一、对附件判断的核查
+
+附件对 Phase925 的判断基本正确，而且证据层级收得很必要：
+
+```text
+Phase925 不是闭合实验；
+不是自然动作门被找到；
+不是新的前向因果干预；
+而是响应曲面候选状态扩容。
+```
+
+本阶段采纳这个边界，继续执行同一条 response-surface 主线中的下一步：
+
+```text
+Phase926:
+Generalized Route-Protocol Surface Validation
+泛化路线-协议曲面验证
+```
+
+它与 Phase925 属于同一个阶段性目标：
+
+```text
+先完成响应曲面图谱扩展与验证，再讨论闭合。
+```
+
+但 Phase926 已经不是离线索引，而是新的 GPU 前向因果曲面测试。
+
+### 二、脚本与输出
+
+新增脚本：
+
+```text
+tests/glm5/phase926_generalized_route_protocol_surface_validation.py
+tests/glm5/run_phase926_generalized_route_protocol_surface_validation.sh
+```
+
+输出目录：
+
+```text
+tests/result/phase926_generalized_route_protocol_surface_validation/generalized_route_protocol_surface_validation/
+```
+
+关键输出：
+
+```text
+phase926_qwen3_summary.json
+phase926_glm4_summary.json
+phase926_deepseek7b_summary.json
+phase926_glm4_rows.jsonl
+phase926_glm4_surfaces.jsonl
+phase926_cross_model_summary.json
+phase926_cross_model_summary.md
+```
+
+脚本检查：
+
+```text
+python -m py_compile tests/glm5/phase926_generalized_route_protocol_surface_validation.py
+bash -n tests/glm5/run_phase926_generalized_route_protocol_surface_validation.sh
+```
+
+### 三、测试原理
+
+Phase926 从 Phase925 的 selected seeds 中抽取平衡子集，避免继续只测 fish。
+
+本轮 GLM4 实测子集：
+
+```text
+selected seeds: 30
+unique cases: 9
+unique domains: 3
+unique groups: 4
+blocker classes:
+  article_a: 18
+  punctuation_period: 12
+new_vs_phase924: 22
+median_seed_margin: -2.15625
+median_seed_rank: 9.0
+```
+
+每个 seed 扫描：
+
+```text
+L39 factor:
+  1.25, 1.375
+
+route_alpha:
+  0.75, 0.875, 1.0, 1.125, 1.25, 1.375
+
+protocol_span_factor:
+  0.85, 0.9, 1.0, 1.1
+
+protocol_span_kind:
+  last8_before_period
+```
+
+因此 GLM4 实际测试规模：
+
+```text
+30 seeds * 2 L39 factors * 6 route_alpha * 4 protocol_factor
+= 1440 forward coordinates
+
+surface_count:
+  60
+```
+
+核心边界差仍然是：
+
+```text
+M(x, alpha, p, f)
+= z_EOS(x; alpha, p, f) - z_blocker(x; alpha, p, f)
+```
+
+相对曲面基线：
+
+```text
+base coordinate:
+  alpha = 1.0
+  protocol_factor = 1.0
+
+Delta M =
+M(x, alpha, p, f) - M(x, 1.0, 1.0, f)
+```
+
+新增闭合判断：
+
+```text
+new_top1_vs_surface_base =
+  base_EOS_top1 = false
+  and patched_EOS_top1 = true
+
+new_margin_closure_vs_surface_base =
+  base_margin < 0
+  and patched_margin >= 0
+
+new_strict_vs_surface_base =
+  base_strict_clean = false
+  and patched_strict_clean = true
+```
+
+### 四、客观结果
+
+跨模型运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+qwen3 和 DS7B 因 Phase925 没有 selected seeds，本阶段不加载模型做无意义前向，直接记录：
+
+```text
+qwen3:
+  evidence: no_phase925_surface_seeds
+
+DS7B:
+  evidence: no_phase925_surface_seeds
+```
+
+GLM4 完成全部 1440 个坐标：
+
+```text
+rows: 1440
+surfaces: 60
+target_state_count: 30
+expected_rows_if_all_reconstructed: 1440
+```
+
+总体结果：
+
+```text
+all_rows: 1440
+all_top1: 97
+all_margin_nonnegative: 97
+all_strict_clean_candidate: 57
+
+surface_base_rows: 60
+surface_base_top1: 5
+surface_base_margin_nonnegative: 5
+surface_base_strict_clean_candidate: 3
+
+non_base_rows: 1380
+non_base_top1: 92
+non_base_margin_nonnegative: 92
+non_base_strict_clean_candidate: 54
+
+non_base_improved_margin_vs_surface_base: 542
+non_base_lost_margin_closure_vs_surface_base: 25
+non_base_new_margin_closure_vs_surface_base: 2
+non_base_new_top1_vs_surface_base: 2
+non_base_new_strict_vs_surface_base: 0
+```
+
+曲面结构：
+
+```text
+surface_count: 60
+best_coord_is_base: 8
+best_alpha_lt_1: 11
+best_alpha_eq_1: 14
+best_alpha_gt_1: 35
+best_protocol_lt_1: 31
+best_protocol_eq_1: 11
+best_protocol_gt_1: 18
+with_closure_coord: 6
+median_best_margin_delta_vs_surface_base: 0.1875
+mean_best_margin_delta_vs_surface_base: 0.20729166666666668
+```
+
+最佳 alpha 分布：
+
+```text
+0.75: 2
+0.875: 9
+1.0: 14
+1.125: 6
+1.25: 24
+1.375: 5
+```
+
+最佳 protocol factor 分布：
+
+```text
+0.85: 13
+0.9: 18
+1.0: 11
+1.1: 18
+```
+
+真正新增闭合只有 2 个坐标：
+
+```text
+case:
+  p856_009_animal_fish
+
+prompt:
+  question_plain
+
+source_subset:
+  L35C8824
+
+edit_mode:
+  zero
+
+group:
+  band32_support_64
+
+L4 factor:
+  0.4
+
+L39 factor:
+  1.375
+
+coords:
+  alpha=1.375, protocol=0.85
+  alpha=1.375, protocol=0.9
+
+base:
+  rank=2
+  margin=-0.0625
+
+patched:
+  rank=1
+  margin=0.0625
+  strict_clean=false
+```
+
+### 五、结果分析
+
+Phase926 有两个同时成立的结论。
+
+正结果：
+
+```text
+响应曲面结构确实泛化到 Phase925 的更大 seed 集合。
+```
+
+证据：
+
+```text
+1. 60 张曲面中只有 8 张最佳坐标仍是 base。
+2. 52 张曲面的最佳坐标离开了 (alpha=1.0, protocol=1.0)。
+3. best_alpha 覆盖 0.75 到 1.375 的多个点。
+4. best_protocol 覆盖 0.85 / 0.9 / 1.0 / 1.1。
+5. 542 个非基线坐标相对 base 改善 margin。
+```
+
+负结果：
+
+```text
+闭合没有泛化。
+```
+
+证据：
+
+```text
+1. 新增 top1 / margin 闭合只有 2 个坐标。
+2. 这 2 个坐标仍然来自 fish。
+3. 新增 strict clean 为 0。
+4. punctuation_period blocker 没有产生任何 top1 / margin 闭合。
+5. qwen3 和 DS7B 仍没有 Phase925 种子，因此没有跨模型正证据。
+```
+
+这说明 Phase925 的“候选扩容”是有用的，但 Phase926 把它进一步收紧为：
+
+```text
+曲面形状泛化；
+闭合事件不泛化。
+```
+
+### 六、article blocker 与 punctuation blocker 的差异
+
+按 Phase925 seed blocker class 分组：
+
+```text
+article_a:
+  surfaces: 36
+  best_coord_is_base: 8
+  top1 rows: 97
+  new_top1_vs_surface_base: 2
+  closure states: 6
+
+punctuation_period:
+  surfaces: 24
+  best_coord_is_base: 0
+  top1 rows: 0
+  new_top1_vs_surface_base: 0
+  closure states: 0
+```
+
+这很重要：
+
+```text
+punctuation_period 曲面不是静态的；
+它的 best coordinate 全部偏离 base；
+但它没有带来 EOS 闭合。
+```
+
+因此 “.” blocker 不能简单当成 “a” blocker 的同类替代。它更可能属于 protocol continuation field 的另一条边。
+
+### 七、闭合标准与当前距离
+
+当前应区分三层结果：
+
+```text
+1. response surface existence:
+   已经较强。
+
+2. response surface generalization:
+   在 GLM4 的 30 个 Phase925 种子上成立。
+
+3. causal closure generalization:
+   未成立。
+```
+
+严格闭合至少需要：
+
+```text
+1. 新增闭合不只集中于 fish。
+2. 新增闭合跨 domain / case / blocker class 出现。
+3. 新增 strict clean > 0，并且不是基线已有。
+4. best coordinate 可以由自然状态变量预测，而不是事后搜索。
+5. qwen3 / DS7B 至少有可对应入口，不能长期只有 GLM4。
+```
+
+Phase926 距离这些标准仍然明显不足：
+
+```text
+new_top1_vs_surface_base: 2
+new_strict_vs_surface_base: 0
+new closure case coverage: 1
+new closure blocker class: article_a only
+cross-model closure: none
+```
+
+### 八、问题、硬伤与瓶颈
+
+1. 新增闭合仍然局部：
+
+```text
+新增闭合仍然是 fish，说明闭合事件可能依赖局部贴边状态。
+```
+
+2. 曲面搜索仍是后验：
+
+```text
+best_alpha / best_protocol 是扫描得到，不是自然变量预测得到。
+```
+
+3. punctuation blocker 未被解决：
+
+```text
+标点阻塞者有曲面变化，但没有闭合。
+这说明它可能需要不同的协议边齿轮，而不是 L39 EOS-vs-a 齿轮。
+```
+
+4. 全局 consensus group 可能过粗：
+
+```text
+本轮使用一个全局 L39 consensus group。
+对于 article_a 和 punctuation_period 混合集合，这可能过度平均。
+下一步可能要按 blocker class 或 route family 分组。
+```
+
+5. 小模型偏差仍然存在：
+
+```text
+当前正结果主要来自 GLM4。
+qwen3 / DS7B 没有 Phase925 入口，不应被解释为机制不存在；
+更可能是入口、层位或 blocker 类型不匹配。
+```
+
+### 九、智能理论角度的阶段洞察
+
+Phase926 强化了一个关键判断：
+
+```text
+语言机制中的齿轮不是单个开关；
+更像一个状态依赖响应曲面。
+```
+
+但它也说明：
+
+```text
+响应曲面存在，不等于闭合机制破解。
+```
+
+更可能的结构是：
+
+```text
+不同 blocker class 对应不同边界族；
+article_a 边界可以被 L39 EOS-vs-a 齿轮推动；
+punctuation_period 边界虽然受 route/protocol 改变影响，
+但需要另一套协议终止齿轮或更上游状态变量。
+```
+
+所以破解语言编码机制的第一性原理应继续从：
+
+```text
+单一答案 token 的 logit 提升
+```
+
+转向：
+
+```text
+状态变量如何塑造 full-vocabulary blocker field 的边界曲面。
+```
+
+### 十、下一阶段任务
+
+Phase926 完成了“泛化曲面验证”的第一轮平衡子集测试。下一阶段仍属于同一大阶段，但应收紧为：
+
+```text
+Phase927:
+Blocker-Class-Split Response Surface Validation
+阻塞者类别分裂响应曲面验证
+```
+
+建议任务：
+
+```text
+1. 分开建立 article_a 曲面和 punctuation_period 曲面。
+2. 对 article_a 使用当前 L39 consensus signed margin gear。
+3. 对 punctuation_period 重新寻找协议终止齿轮，不能默认沿用 EOS-vs-a 齿轮。
+4. 比较两类 blocker 的 best_alpha / best_protocol 分布。
+5. 测试是否存在 punctuation-specific protocol gear。
+6. 如果 punctuation 仍不能闭合，则把它标记为独立阻塞边界族。
+```
+
+阶段性结论应写成：
+
+```text
+响应曲面图谱继续成立；
+但闭合路线必须按 blocker class 分裂。
+```
+
+### 十一、通俗总结
+
+Phase926 像是把 Phase925 挑出来的 30 个候选点真的拿去画了小地图。
+
+结果是：
+
+```text
+地图确实有地形；
+大多数地方的最高点不在默认位置；
+说明响应曲面不是幻觉。
+```
+
+但真正打开门的地方仍然很少：
+
+```text
+只有 fish 的 2 个新坐标从 rank=2 推到 rank=1；
+没有新的严格干净闭合；
+标点阻塞者完全没有被打开。
+```
+
+所以当前不是“找到了自然门控机制”，而是：
+
+```text
+确认了响应曲面图谱值得继续做；
+同时确认闭合问题必须按 blocker 类型拆开。
+```
+
+## Phase 927: 阻塞者类别分裂响应曲面审计 [2026-07-04 13:14]
+
+### 一、对附件判断的核查
+
+附件对 Phase926 的判断正确，尤其是这句收紧：
+
+```text
+响应曲面结构泛化了；
+闭合事件没有泛化。
+```
+
+Phase926 的证据层级应严格限定为：
+
+```text
+route_alpha 和 protocol_span_factor 确实改变边界曲面；
+多数曲面的最佳坐标不在默认点；
+但新增闭合仍然只有 fish 的两个贴边坐标；
+punctuation_period 没有闭合；
+qwen3 / DS7B 仍没有对应入口。
+```
+
+本阶段采纳附件中正确的部分，继续完成 Phase927：
+
+```text
+Blocker-Class-Split Response Surface Audit
+阻塞者类别分裂响应曲面审计
+```
+
+Phase927 不是新的 GPU 前向实验，而是对 Phase926 已产生的 1440 个前向坐标和 60 张曲面进行离线分层审计。目标是验证：
+
+```text
+article_a 和 punctuation_period 是否已经形成客观可分的响应曲面族。
+```
+
+### 二、脚本与输出
+
+新增脚本：
+
+```text
+tests/glm5/phase927_blocker_class_split_response_surface_audit.py
+tests/glm5/run_phase927_blocker_class_split_response_surface_audit.sh
+```
+
+输出目录：
+
+```text
+tests/result/phase927_blocker_class_split_response_surface_audit/blocker_class_split_response_surface_audit/
+```
+
+关键输出：
+
+```text
+phase927_qwen3_summary.json
+phase927_glm4_summary.json
+phase927_deepseek7b_summary.json
+phase927_glm4_class_summaries.jsonl
+phase927_cross_model_summary.json
+phase927_cross_model_summary.md
+```
+
+脚本检查：
+
+```text
+python -m py_compile tests/glm5/phase927_blocker_class_split_response_surface_audit.py
+bash -n tests/glm5/run_phase927_blocker_class_split_response_surface_audit.sh
+```
+
+### 三、测试原理
+
+Phase927 读取 Phase926 的：
+
+```text
+phase926_{model}_rows.jsonl
+phase926_{model}_surfaces.jsonl
+phase926_{model}_selected_seeds.jsonl
+```
+
+然后按 seed blocker class 分组：
+
+```text
+article_a:
+  seed blocker token == "a"
+
+punctuation_period:
+  seed blocker token.strip() in {".", "。"}
+```
+
+对每类 blocker 统计：
+
+```text
+1. selected seeds
+2. rows
+3. surfaces
+4. best_coord_is_base
+5. best_alpha_distribution
+6. best_protocol_distribution
+7. top1 / margin_nonnegative / strict_clean
+8. new_top1_vs_surface_base
+9. new_margin_closure_vs_surface_base
+10. new_strict_vs_surface_base
+11. closure surface count
+12. patched blocker class transition
+```
+
+本阶段不引入新的机制假设，只判断两类 blocker 在同一批 Phase926 曲面中是否表现不同。
+
+### 四、客观结果
+
+跨模型结果：
+
+```text
+qwen3:
+  rows: 0
+  surfaces: 0
+  evidence: no_blocker_class_data
+
+GLM4:
+  rows: 1440
+  surfaces: 60
+  classes:
+    article_a
+    punctuation_period
+  evidence: blocker_class_split_confirmed_article_closes_punctuation_moves_only
+
+DS7B:
+  rows: 0
+  surfaces: 0
+  evidence: no_blocker_class_data
+```
+
+总体分裂结果：
+
+```text
+article_a:
+  selected_seeds: 18
+  rows: 864
+  surfaces: 36
+  best_coord_is_base: 8
+  top1: 97
+  new_top1_vs_surface_base: 2
+  new_margin_closure_vs_surface_base: 2
+  new_strict_vs_surface_base: 0
+  with_closure_coord: 6
+
+punctuation_period:
+  selected_seeds: 12
+  rows: 576
+  surfaces: 24
+  best_coord_is_base: 0
+  top1: 0
+  new_top1_vs_surface_base: 0
+  new_margin_closure_vs_surface_base: 0
+  new_strict_vs_surface_base: 0
+  with_closure_coord: 0
+```
+
+article_a 最佳 alpha 分布：
+
+```text
+1.25: 16
+1.0: 10
+1.375: 4
+1.125: 4
+0.75: 2
+```
+
+article_a 最佳 protocol 分布：
+
+```text
+1.0: 11
+1.1: 2
+0.9: 17
+0.85: 6
+```
+
+punctuation_period 最佳 alpha 分布：
+
+```text
+0.875: 9
+1.375: 1
+1.25: 8
+1.125: 2
+1.0: 4
+```
+
+punctuation_period 最佳 protocol 分布：
+
+```text
+0.85: 7
+1.1: 16
+0.9: 1
+```
+
+新增闭合仍只有 2 行：
+
+```text
+class:
+  article_a
+
+case:
+  p856_009_animal_fish
+
+domain:
+  animal
+
+group:
+  band32_support_64
+
+L39 factor:
+  1.375
+
+coords:
+  alpha=1.375, protocol=0.85
+  alpha=1.375, protocol=0.9
+
+base margin:
+  -0.0625
+
+patched margin:
+  0.0625
+
+strict_clean:
+  false
+```
+
+### 五、结果分析
+
+Phase927 给出一个清晰的客观结论：
+
+```text
+article_a 和 punctuation_period 已经不能混为一类 blocker。
+```
+
+原因：
+
+```text
+1. article_a 有 97 个 top1 rows，punctuation_period 为 0。
+2. article_a 有 6 张 closure surfaces，punctuation_period 为 0。
+3. article_a 有 2 个新增 top1 / margin closure，punctuation_period 为 0。
+4. punctuation_period 的 24 张曲面中 best_coord_is_base 为 0，说明它不是静态无响应。
+5. punctuation_period 的曲面会移动，但当前 EOS-vs-a 齿轮不能把它闭合。
+```
+
+因此 Phase926 的判断可以进一步收紧为：
+
+```text
+响应曲面泛化；
+闭合不泛化；
+闭合失败主要表现为 blocker class mismatch。
+```
+
+### 六、闭合标准与当前距离
+
+当前还没有达到闭合。严格闭合至少需要：
+
+```text
+1. article_a 之外的 blocker class 也能出现新增闭合。
+2. punctuation_period 至少出现非基线 top1 / margin closure。
+3. 新增 strict_clean > 0。
+4. 闭合不只集中于 fish。
+5. best coordinate 能由自然状态变量预测，而不是事后扫描得到。
+6. qwen3 / DS7B 至少建立对应入口。
+```
+
+Phase927 的距离：
+
+```text
+article_a:
+  有少量贴边闭合，但 strict_clean=0，case coverage 仍很窄。
+
+punctuation_period:
+  曲面响应存在，但 closure=0。
+
+cross-model:
+  qwen3 / DS7B 没有可审计数据。
+```
+
+所以 Phase927 是 blocker graph 的结构进展，不是机制闭合。
+
+### 七、问题、硬伤与瓶颈
+
+1. Phase927 是离线审计：
+
+```text
+它没有发现新的齿轮，只是证明已有曲面结果必须按 blocker class 分裂。
+```
+
+2. punctuation_period 没有闭合：
+
+```text
+这说明标点边界可能需要独立的 protocol termination gear。
+```
+
+3. article_a 的闭合仍局部：
+
+```text
+新增闭合仍然来自 fish 的贴边状态，margin 只从 -0.0625 到 0.0625。
+```
+
+4. patched blocker 转换复杂：
+
+```text
+article_a 组中 patched blocker class 包含 article_a 和 other。
+说明即使 seed blocker 是 a，干预后 blocker field 也可能迁移到其他词元。
+```
+
+5. 小模型偏差仍然存在：
+
+```text
+当前分裂证据只来自 GLM4。
+qwen3 / DS7B 没有入口，不能作为跨模型定律。
+```
+
+### 八、智能理论角度的阶段洞察
+
+Phase927 的关键洞察是：
+
+```text
+语言输出闭合不是一个统一 blocker 的问题；
+而是多个 blocker class 边界族的组合问题。
+```
+
+在当前图谱中至少要分成：
+
+```text
+article_a edge:
+  可以被当前 L39 EOS-vs-a 边界齿轮部分推动。
+
+punctuation_period edge:
+  受 route/protocol 坐标影响，但不能被当前齿轮闭合。
+```
+
+这意味着第一性原理要从：
+
+```text
+寻找一个通用 EOS closure gear
+```
+
+转为：
+
+```text
+为不同 blocker class 建立不同的边界齿轮族和响应曲面族。
+```
+
+### 九、下一阶段任务
+
+Phase927 完成了当前 blocker-class split 阶段目标：
+
+```text
+证明 article_a 与 punctuation_period 在响应曲面和闭合行为上客观分裂。
+```
+
+下一阶段属于新的 gear search 阶段，不应把它和 Phase927 的离线审计混成同一个证据层级。
+
+建议 Phase928：
+
+```text
+Punctuation-Specific Protocol Gear Search
+标点阻塞专属协议齿轮搜索
+```
+
+任务：
+
+```text
+1. 只选择 punctuation_period seeds。
+2. 不再使用 article_a 的 L39 consensus group 作为唯一齿轮。
+3. 搜索与句号 / 终止 / protocol continuation 相关的 L39 或更上游通道组。
+4. 测试这些通道组能否让 punctuation_period 出现 margin / top1 closure。
+5. 与 article_a gear 做负控制，避免把两类 blocker 混淆。
+6. 如果仍不闭合，则将 punctuation_period 标记为独立未解边界族。
+```
+
+### 十、通俗总结
+
+Phase927 就是把 Phase926 的结果按阻塞者类型拆开看。
+
+结果非常清楚：
+
+```text
+“a” 这类阻塞者还有少量能被当前齿轮推开的门；
+“.” 这类阻塞者虽然地图会变形，但门完全没开。
+```
+
+所以现在不能再说“找一个 EOS 齿轮解决所有终止问题”。更准确的是：
+
+```text
+不同阻塞者像不同门锁；
+当前钥匙只对 a 锁有一点作用；
+对句号锁完全打不开。
+```
+
+下一步要单独找句号锁的钥匙。
+
+## Phase 928: 标点阻塞专属协议齿轮搜索 [2026-07-04 13:39]
+
+### 一、任务来源和判断
+
+用户上传的 Phase927 分析基本正确。Phase927 的关键贡献不是闭合，而是把原来混在一起的 non-clean blocker field 拆成至少两类：
+
+```text
+article_a blocker
+punctuation_period blocker
+```
+
+Phase927 结果显示：同一套 L39 EOS-vs-a consensus gear 对 article_a 还有少量闭合能力，但对 punctuation_period 只造成边界移动，不造成 margin/top1 closure。因此继续沿用一个统一阻塞场是不正确的。
+
+本阶段没有直接追求完整语言编码机制闭合，而是执行附件建议的下一步：
+
+```text
+Punctuation-Specific Protocol Gear Search
+标点阻塞专属协议齿轮搜索
+```
+
+目标是检查 punctuation_period 是否存在自己的 L39 通道规则，避免把 article_a 齿轮误当成所有终止/协议边的通用齿轮。
+
+### 二、测试脚本和数据
+
+新增脚本：
+
+```text
+tests/glm5/phase928_punctuation_specific_protocol_gear_search.py
+tests/glm5/run_phase928_punctuation_specific_protocol_gear_search.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase928_punctuation_specific_protocol_gear_search/punctuation_specific_protocol_gear_search/
+```
+
+跨模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+实际可用数据：
+
+```text
+qwen3: 0 punctuation_period seed
+GLM4: 12 punctuation_period seeds
+DS7B: 0 punctuation_period seed
+```
+
+因此本阶段有效模型仍然只有 GLM4。qwen3 和 DS7B 不是负结果，只是当前上游候选集中没有可继续测试的 punctuation_period seed。
+
+### 三、测试原理
+
+Phase928 使用同一坐标下的 coordinate-only 结果作为基线，再叠加候选 L39 通道组，比较候选齿轮是否带来额外边界移动。
+
+记：
+
+```text
+M(s, alpha, p, g, f) = logit(EOS) - logit(best blocker)
+```
+
+其中：
+
+```text
+s     = punctuation_period seed state
+alpha = route_delta scale
+p     = protocol span scale
+g     = L39 candidate channel group
+f     = channel scale factor
+```
+
+同坐标基线为：
+
+```text
+M_base(s, alpha, p) = M(s, alpha, p, coordinate_only, 1.0)
+```
+
+候选齿轮增量为：
+
+```text
+Delta_g = M(s, alpha, p, g, f) - M_base(s, alpha, p)
+```
+
+新增闭合候选标准：
+
+```text
+new_margin_closure: M_base < 0 且 M_candidate >= 0
+new_top1_closure:   base top1 = false 且 candidate top1 = true
+strict_clean:       当前脚本中的更严格 clean 标准
+```
+
+测试坐标：
+
+```text
+(alpha, protocol) =
+(1.0, 1.0)
+(0.875, 1.1)
+(1.25, 1.1)
+(0.875, 0.85)
+(1.25, 0.85)
+(1.375, 0.85)
+(1.375, 0.9)
+```
+
+候选组包括：
+
+```text
+eos_support_64
+margin_support_pos_64
+a_blocker_support_64
+a_logit_support_64
+margin_support_neg_64
+band_blocker_support_64
+top_abs_64
+low_abs_64
+```
+
+注意：这里的 `margin_support_pos_64` 不是固定 64 个通道 ID，而是在每个 state 上按当前边界重新选出的正向 margin-support 通道集合。因此本阶段验证的是一种局部通道选择规则，不是固定神经元列表的全局通用性。
+
+### 四、主要结果
+
+GLM4 完成：
+
+```text
+selected punctuation seeds: 12
+rows: 2268
+coordinate baseline rows: 84
+candidate rows: 2184
+unique states: 12
+unique cases: 3
+```
+
+总体结果：
+
+```text
+candidate top1: 28
+candidate margin_nonnegative: 28
+candidate strict_clean: 0
+new_top1_vs_coordinate_base: 28
+new_margin_closure_vs_coordinate_base: 28
+new_strict_vs_coordinate_base: 0
+target_state_coverage_top1: 4
+target_state_coverage_margin: 4
+target_state_coverage_strict: 0
+```
+
+最强组：
+
+```text
+margin_support_pos_64, factor = 2.0
+rows: 84
+top1: 28
+margin_nonnegative: 28
+strict: 0
+new_top1: 28
+new_margin: 28
+mean margin delta: 4.410714285714286
+```
+
+次强但未闭合的组：
+
+```text
+eos_support_64, factor = 2.0
+top1: 0
+new_margin: 0
+mean margin delta: 2.9367559523809526
+
+a_blocker_support_64 / margin_support_neg_64, factor = 0.25
+top1: 0
+new_margin: 0
+mean margin delta: 2.5922619047619047
+```
+
+新增闭合候选分布：
+
+```text
+new rows: 28
+case: p885_047_animal_shark only
+candidate group: margin_support_pos_64 only
+factor: 2.0 only
+strict_clean: 0
+patched blocker token: " ." remains visible as blocker field
+```
+
+这说明 Phase928 的强正结果只覆盖一个自然 case 的四个 state，不应解释为 punctuation mechanism closure。
+
+### 五、客观分析
+
+正结果：
+
+```text
+punctuation_period 不是完全打不开；
+article_a gear 失败后，punctuation-specific margin_support_pos_64 规则可以在 GLM4 上把部分 punctuation state 推到 EOS top1 / margin >= 0。
+```
+
+这支持 Phase927 的分裂判断：
+
+```text
+不同 blocker class 需要不同齿轮规则。
+```
+
+负结果和边界：
+
+```text
+1. strict_clean 仍为 0。
+2. 真实闭合只发生在 shark case，未覆盖全部 3 个 case。
+3. factor = 2.0 属于较强人工放大，不是自然门控。
+4. qwen3 / DS7B 没有上游 punctuation seeds，不能提供跨模型验证。
+5. 候选组是按 state 重算的 margin-support 规则，不是固定通道集合。
+```
+
+因此本阶段证据层级应写为：
+
+```text
+punctuation-specific candidate gear found
+```
+
+不能写为：
+
+```text
+punctuation protocol edge closure
+clean termination closure
+language encoding mechanism closure
+```
+
+### 六、闭合距离
+
+当前闭合标准至少需要：
+
+```text
+1. 多 case、多 seed 上稳定 margin/top1 closure。
+2. strict_clean > 0，并解释 non-clean output transition。
+3. 低 factor 或自然 gate 条件下仍然成立。
+4. 不只在 GLM4 上成立，至少需要跨模型或跨结构对照。
+5. 能预测什么状态需要 punctuation gear，而不是事后搜索。
+```
+
+Phase928 距离闭合仍然很远，但它把 Phase927 的负结果变成了一个可继续验证的候选齿轮方向。
+
+### 七、下一步任务
+
+Phase928 的下一步仍属于同一阶段目标：验证 punctuation-specific gear 是否只是 shark case 偶然结果，还是能在更大的 punctuation seed 集合上保持。
+
+因此继续执行 Phase929：
+
+```text
+Punctuation Margin Gear Holdout Validation
+标点 margin 齿轮保持性验证
+```
+
+## Phase 929: 标点 margin 齿轮保持性验证 [2026-07-04 13:39]
+
+### 一、任务
+
+Phase929 接续 Phase928 的候选齿轮结果，不再扩大搜索空间，而是固定主要候选规则：
+
+```text
+L39 margin_support_pos_64
+```
+
+并在更多 punctuation_period seeds 上验证：
+
+```text
+1. Phase928 的 positive signal 是否能跨 seed / case 保持；
+2. 需要多大 factor 才能打开边界；
+3. EOS-support 控制和 negative-margin 控制是否也能闭合；
+4. 是否出现 strict_clean。
+```
+
+### 二、测试脚本和数据
+
+新增脚本：
+
+```text
+tests/glm5/phase929_punctuation_margin_gear_holdout_validation.py
+tests/glm5/run_phase929_punctuation_margin_gear_holdout_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase929_punctuation_margin_gear_holdout_validation/punctuation_margin_gear_holdout_validation/
+```
+
+数据来源：
+
+```text
+Phase925 selected punctuation_period seeds
+```
+
+GLM4 可用：
+
+```text
+selected punctuation seeds: 30
+cases: 3
+max per case: 10
+```
+
+qwen3 / DS7B：
+
+```text
+0 punctuation_period seed
+```
+
+### 三、测试原理
+
+沿用 Phase928 的同坐标差分：
+
+```text
+Delta_g = M_candidate(s, alpha, p, g, f) - M_coordinate_base(s, alpha, p)
+```
+
+Phase929 不再全量搜索多种通道，而是测试 factor 曲线：
+
+```text
+margin_support_pos_64 factors:
+1.25, 1.5, 1.75, 2.0, 2.25
+```
+
+并加入两个控制：
+
+```text
+eos_support_64 factor = 2.0
+margin_support_neg_64 factor = 0.25
+```
+
+总量：
+
+```text
+30 states * 7 coordinates * 8 specs = 1680 rows
+```
+
+其中：
+
+```text
+coordinate baseline rows: 210
+candidate/control rows: 1470
+```
+
+### 四、主要结果
+
+GLM4 总体：
+
+```text
+rows: 1680
+unique states: 30
+unique cases: 3
+candidate top1: 270
+candidate margin_nonnegative: 270
+candidate strict_clean: 0
+new_top1_vs_coordinate_base: 270
+new_margin_closure_vs_coordinate_base: 270
+new_strict_vs_coordinate_base: 0
+target_state_coverage_top1: 30
+target_state_coverage_margin: 30
+target_state_coverage_strict: 0
+improved_margin_vs_coordinate_base: 1470
+worsened_margin_vs_coordinate_base: 0
+```
+
+factor 曲线：
+
+```text
+margin_support_pos_64 factor 1.25:
+top1 = 0, new_margin = 0
+
+margin_support_pos_64 factor 1.5:
+top1 = 0, new_margin = 0
+
+margin_support_pos_64 factor 1.75:
+top1 = 0, new_margin = 0
+
+margin_support_pos_64 factor 2.0:
+top1 = 70, new_margin = 70, states = 10
+case coverage = p885_047_animal_shark only
+
+margin_support_pos_64 factor 2.25:
+top1 = 200, new_margin = 200, states = 30
+case coverage = chair / material_wood / shark
+```
+
+控制组：
+
+```text
+eos_support_64 factor 2.0:
+top1 = 0, new_margin = 0
+mean margin delta = 2.919642857142857
+
+margin_support_neg_64 factor 0.25:
+top1 = 0, new_margin = 0
+mean margin delta = 2.625297619047619
+```
+
+新增 margin/top1 rows 分布：
+
+```text
+total new margin/top1 rows: 270
+
+case distribution:
+p885_047_animal_shark: 140
+p856_035_object_chair: 70
+p856_021_material_wood: 60
+
+phase928_selected_seed = false: 160
+phase928_selected_seed = true: 110
+
+phase928_new_closure_seed = false: 214
+phase928_new_closure_seed = true: 56
+
+patched blocker token:
+" .": 200
+" .\n": 70
+
+strict_clean: 0
+```
+
+证据标签：
+
+```text
+punctuation_margin_gear_unseen_seed_positive
+```
+
+### 五、客观分析
+
+Phase929 明显加强了 Phase928 的结论：
+
+```text
+Phase928: margin_support_pos_64 * 2.0 只在 shark case 打开 4 个 state。
+Phase929: margin_support_pos_64 * 2.25 在 30 个 punctuation states 上全部出现 top1/margin closure。
+```
+
+这说明 `margin_support_pos_64` 不是单个 shark seed 的偶然结果，而是一个可复用的 punctuation boundary opening 规则。
+
+但结果同时说明：
+
+```text
+1. factor 阈值偏高。
+2. factor 2.0 只打开 shark，2.25 才覆盖全部 3 个 case。
+3. strict_clean 始终为 0。
+4. patched blocker 仍主要是 punctuation token，说明非干净输出转移没有解决。
+5. 这仍然是手动通道放大，不是自然门控。
+```
+
+所以 Phase929 应被视为：
+
+```text
+punctuation boundary can be force-opened by a margin-support gear rule
+```
+
+而不是：
+
+```text
+punctuation termination naturally closes
+```
+
+### 六、理论进展
+
+Phase927-929 形成了一个比较清楚的拼图：
+
+```text
+1. blocker field 至少按类别分裂。
+2. article_a 和 punctuation_period 不共享同一把钥匙。
+3. punctuation_period 的有效方向不是普通 EOS-support，而是更贴近边界 margin 的 support channel group。
+4. response surface 的存在不等于 closure；closure 还需要足够强的 gear amplitude。
+5. 当前小模型中的有效机制更像“边界可被强制打开”，不是“自然协议边已经闭合”。
+```
+
+从智能理论角度看，这支持一个更谨慎的方向：
+
+```text
+语言输出不是单个 token logit 被抬高；
+而是多个 blocker class 在不同边界规则下竞争；
+同一个 EOS/终止动作，可能需要按 blocker class 进入不同的局部齿轮规则。
+```
+
+但目前还不能说这些规则就是语言背后的完整数学结构。它们更像是局部投影下看到的“齿轮齿面”。
+
+### 七、闭合标准和当前距离
+
+严格闭合标准：
+
+```text
+1. 在自然模型运行中识别同一类 margin-support gear 的 gate variable。
+2. 不使用 2.0 / 2.25 这种强人工放大，也能预测自然闭合。
+3. strict_clean > 0，并能解释 punctuation blocker 到 EOS 的干净转移。
+4. 在未见 case / 未见 prompt / 未见 domain 上保持。
+5. 至少在 qwen3、GLM4、DS7B 中两个模型上出现同构现象，或明确解释为什么小模型结构不同。
+```
+
+当前距离：
+
+```text
+已完成：
+punctuation-specific candidate gear rule identified;
+larger seed validation positive;
+factor threshold roughly定位到 2.0-2.25 区间。
+
+未完成：
+natural gate;
+strict clean;
+cross-model;
+fixed-channel stability;
+full-vocabulary blocker transition explanation。
+```
+
+### 八、硬伤和瓶颈
+
+当前最大硬伤：
+
+```text
+1. 需要 factor 2.25 才能覆盖全部 punctuation seeds，说明自然强度仍未知。
+2. 通道组按 state 重算，尚未证明存在固定全局齿轮。
+3. strict_clean = 0，说明输出形态仍不是干净 EOS closure。
+4. qwen3 / DS7B 无可比 seeds，跨模型证据缺失。
+5. 小模型内部结构可能粗糙，强行放大得到的齿轮响应可能偏离大模型真实机制。
+```
+
+### 九、下一阶段任务
+
+Phase928-929 已完成当前阶段的目标：
+
+```text
+找到并验证 punctuation-specific margin gear candidate。
+```
+
+下一阶段不应继续简单扩大 factor 搜索，而应转向：
+
+```text
+Phase930: Natural Gate and Strict-Clean Transition Audit
+自然门控与 strict-clean 转移审计
+```
+
+建议任务：
+
+```text
+1. 在 factor 2.0-2.25 区间做更细曲线，定位每个 case 的 opening threshold。
+2. 搜索什么自然变量预测 threshold：route norm、protocol span entropy、period blocker gap、margin_support_pos_64 activation magnitude。
+3. 检查 strict_clean=0 的原因：EOS 已 top1 但 punctuation blocker field 是否仍残留。
+4. 区分“强行打开 margin”和“自然终止动作完成”。
+5. 尝试固定通道交集/并集，验证 state-specific group 是否能收缩为稳定通道家族。
+```
+
+下一任务已经进入自然门控和输出转移解释阶段，和 Phase928-929 的候选齿轮搜索/保持性验证不是完全同一小阶段，因此本轮在 Phase929 后停止自动推进。
+
+### 十、通俗总结
+
+Phase927 说：
+
+```text
+句号阻塞和 a 阻塞不是同一把锁。
+```
+
+Phase928 找到一把可能的句号锁钥匙：
+
+```text
+margin_support_pos_64 * 2.0
+```
+
+但它只在一个 case 上开门。
+
+Phase929 把测试扩大到 30 个句号阻塞状态，结果发现：
+
+```text
+factor 2.25 时，30 个状态都能被推到 EOS top1 / margin >= 0。
+```
+
+这很重要，说明句号锁确实有自己的开锁方向。
+
+但现在还不是最终破解，因为：
+
+```text
+这把钥匙是我们用手强行拧的；
+模型自然状态下什么时候自己拧这把钥匙，还不知道；
+而且输出还不是严格干净闭合。
+```
+
+下一步要找的不是更大的力气，而是模型内部自然启动这把钥匙的开关。
+
+## Phase 930: 自然门控与 strict-clean 转移审计 [2026-07-04 15:08]
+
+### 一、任务判断
+
+用户上传的 Phase928-929 复盘基本正确，且证据层级收紧是必要的。
+
+Phase928-929 不能证明：
+
+```text
+标点终止自然闭合；
+自然动作门已经找到；
+语言编码机制已经破解。
+```
+
+它们只能证明：
+
+```text
+punctuation_period blocker 需要独立齿轮；
+margin_support_pos_64 规则可以强行打开标点边界；
+但 strict_clean 仍为 0。
+```
+
+因此本阶段继续执行附件建议的 Phase930：
+
+```text
+Natural Gate and Strict-Clean Transition Audit
+自然门控与 strict-clean 转移审计
+```
+
+本阶段目标不是寻找更大 factor，而是回答：
+
+```text
+1. 每个 punctuation state 的 opening threshold 是多少；
+2. 哪些状态变量能预测 threshold；
+3. 为什么 EOS top1 后 strict_clean 仍为 0；
+4. state-specific margin group 是否有固定化迹象。
+```
+
+### 二、测试脚本和数据
+
+新增脚本：
+
+```text
+tests/glm5/phase930_natural_gate_strict_clean_transition_audit.py
+tests/glm5/run_phase930_natural_gate_strict_clean_transition_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase930_natural_gate_strict_clean_transition_audit/natural_gate_strict_clean_transition_audit/
+```
+
+跨模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+有效数据：
+
+```text
+qwen3: 0 punctuation_period seed
+GLM4: 30 punctuation_period seeds
+DS7B: 0 punctuation_period seed
+```
+
+qwen3 / DS7B 仍然是无入口，不是机制阴性。
+
+### 三、测试原理
+
+Phase930 细扫 Phase929 已定位的强制打开区间：
+
+```text
+factor = 2.00, 2.05, 2.10, 2.15, 2.20, 2.25
+```
+
+仍使用同坐标基线：
+
+```text
+M_base(s, alpha, p) = M(s, alpha, p, coordinate_only, 1.0)
+M_candidate(s, alpha, p, f) = M(s, alpha, p, margin_support_pos_64, f)
+```
+
+opening threshold 定义为：
+
+```text
+f_open(s) = min f such that:
+  M_candidate >= 0
+  or EOS top1 = true
+```
+
+候选自然门控变量不使用复杂模型，只做单变量阈值审计：
+
+```text
+route_delta_norm
+boundary EOS margin vs blocker
+boundary EOS rank
+period / punctuation gap vs EOS
+L39 activation magnitude
+L39 margin_support_pos_64 mean / max / min score
+L39 eos_support_64 mean score
+L39 margin_support_neg_64 mean score
+phase925 boundary factor
+```
+
+同时记录 strict-clean 相关 flags：
+
+```text
+prefix_eos_rollout_answer_class
+prefix_eos_protocol_drift
+prefix_eos_strict_protocol_drift
+prefix_eos_rollout_object_echo
+prefix_eos_strict_clean_answer_no_protocol
+```
+
+### 四、主要结果
+
+GLM4 完成：
+
+```text
+states: 30
+rows: 1470
+coordinate baseline rows: 210
+candidate rows: 1260
+unique cases: 3
+```
+
+总体：
+
+```text
+candidate top1: 774
+candidate margin_nonnegative: 774
+candidate strict_clean: 0
+new_top1_vs_coordinate_base: 774
+new_margin_closure_vs_coordinate_base: 774
+new_strict_vs_coordinate_base: 0
+target_state_coverage_top1: 30
+target_state_coverage_margin: 30
+target_state_coverage_strict: 0
+median patched margin: 0.0
+```
+
+threshold 结果：
+
+```text
+opened states: 30 / 30
+opened_at_or_below_2.00: 10
+opened_at_or_below_2.10: 22
+opened_at_or_below_2.25: 30
+strict_clean_at_opening: 0
+threshold median: 2.10
+threshold mean: 2.08
+```
+
+按 case：
+
+```text
+p885_047_animal_shark:
+  states = 10
+  threshold_median = 2.00
+  <=2.00 = 10
+
+p856_035_object_chair:
+  states = 10
+  threshold_median = 2.10
+  <=2.10 = 10
+
+p856_021_material_wood:
+  states = 10
+  threshold_median = 2.15
+  <=2.10 = 2
+  <=2.25 = 10
+```
+
+factor 曲线：
+
+```text
+2.00: top1 = 70, states = 10
+2.05: top1 = 70, states = 10
+2.10: top1 = 98, states = 22
+2.15: top1 = 164, states = 30
+2.20: top1 = 172, states = 30
+2.25: top1 = 200, states = 30
+```
+
+### 五、门控候选变量
+
+Phase930 找到了一批 threshold gate candidate，但必须注意：它们只是状态变量和 opening threshold 的强相关阈值，不是自然门控机制。
+
+对 `opened_at_or_below_2.00`，多个变量达到 30/30 的单阈值分离：
+
+```text
+target_route_delta_norm >= 0.03834216110408306
+target_boundary_eos_margin_vs_blocker >= -4.0
+target_boundary_eos_rank <= 6
+boundary_period_gap_vs_eos <= 4.0
+boundary_punctuation_gap_vs_eos <= 4.0
+l39_activation_abs_top >= 32.75
+l39_margin_pos_mean_score >= 0.22324757277965546
+l39_margin_pos_min_score >= 0.07634490728378296
+l39_eos_support_mean_score >= 0.46091899275779724
+```
+
+对 `opened_at_or_below_2.10`，较强变量包括：
+
+```text
+target_boundary_blocker_logit >= 12.4375
+l39_activation_abs_median >= 0.074462890625
+l39_margin_pos_mean_score >= 0.21317481994628906
+l39_neg_margin_mean_score >= -0.15297437459230423
+```
+
+这些结果说明：
+
+```text
+opening threshold 不是完全随机；
+边界初始难度、punctuation gap、L39 margin-support 强度都可能是自然门控候选。
+```
+
+但当前只有 30 个 GLM4 states，并且 case 与阈值强相关，因此不能把这些阈值变量直接写成自然门控公式。
+
+### 六、strict-clean = 0 的原因
+
+所有 threshold rows 中：
+
+```text
+prefix_eos_rollout_answer_class: false 30 / 30
+prefix_eos_protocol_drift: true 30 / 30
+prefix_eos_strict_protocol_drift: true 30 / 30
+prefix_eos_rollout_object_echo: false 30 / 30
+prefix_eos_strict_clean_answer_no_protocol: false 30 / 30
+```
+
+top1 rows 中同样：
+
+```text
+strict_clean_candidate: false 774 / 774
+prefix_eos_rollout_answer_class: false 774 / 774
+prefix_eos_protocol_drift: true 774 / 774
+prefix_eos_strict_protocol_drift: true 774 / 774
+```
+
+样例前缀包括：
+
+```text
+" Natural Material\nCategory:"
+" Furniture\nCategory: Se"
+" marine life\nCategory:"
+```
+
+这说明 strict_clean=0 的主要原因不是 EOS rank 不够，而是：
+
+```text
+当前状态仍处于协议/字段中间；
+答案类尚未形成干净短答案；
+protocol drift 仍然存在；
+强制 EOS top1 只是终止了一个未完成的协议场。
+```
+
+因此：
+
+```text
+EOS top1 / margin closure != strict-clean answer closure
+```
+
+### 七、固定化迹象
+
+Phase930 还记录了 `margin_support_pos_64` 的通道稳定性：
+
+```text
+state_count: 30
+group_size_median: 64
+union_size: 105
+intersection_size: 31
+channels_in_at_least_half_states: 59
+channels_in_at_least_quarter_states: 97
+```
+
+这说明 state-specific group 不是完全任意的。30 个状态中存在：
+
+```text
+31 个全体交集通道；
+59 个半数以上出现的高频通道；
+105 个总并集通道。
+```
+
+这给下一步固定齿轮因果验证提供了直接入口。
+
+### 八、结论
+
+Phase930 的证据标签：
+
+```text
+threshold_gate_candidate_found_without_strict_clean
+```
+
+阶段结论：
+
+```text
+1. punctuation margin gear 的 opening threshold 被定位到 2.00-2.25；
+2. 不同 case 阈值不同：shark 最低，chair 中等，wood 较高；
+3. 多个状态变量可以预测低阈值，但还不是自然门控机制；
+4. strict_clean=0 的直接原因是协议场未完成，而不是单纯 EOS 排名不足；
+5. state-specific group 存在显著固定化迹象。
+```
+
+下一任务仍属于同一阶段，因为附件明确要求测试固定通道稳定性。因此继续执行 Phase931。
+
+## Phase 931: 固定标点 margin 齿轮因果验证 [2026-07-04 15:08]
+
+### 一、任务
+
+Phase930 显示：
+
+```text
+margin_support_pos_64 state-specific groups
+union size = 105
+intersection size = 31
+channels in at least half states = 59
+```
+
+Phase931 要验证：
+
+```text
+这些高频/交集通道是否只是统计重合，
+还是可以作为固定 punctuation margin gear 产生因果效果。
+```
+
+### 二、测试脚本和数据
+
+新增脚本：
+
+```text
+tests/glm5/phase931_fixed_punctuation_margin_gear_causal_validation.py
+tests/glm5/run_phase931_fixed_punctuation_margin_gear_causal_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase931_fixed_punctuation_margin_gear_causal_validation/fixed_punctuation_margin_gear_causal_validation/
+```
+
+有效数据：
+
+```text
+GLM4: 30 punctuation states
+qwen3 / DS7B: 0 punctuation seed
+```
+
+### 三、测试原理
+
+Phase931 从 Phase930 的 state-specific 通道组中构造固定组：
+
+```text
+fixed_intersection_all: 31 channels
+fixed_topfreq_31: 31 channels
+fixed_topfreq_64: 64 channels
+fixed_half_or_more: 59 channels
+```
+
+对照组：
+
+```text
+state_specific_margin_support_pos_64
+```
+
+测试 factor：
+
+```text
+2.10, 2.25
+```
+
+每个 state 仍使用 7 个 route/protocol 坐标和 coordinate-only 同坐标基线。
+
+### 四、主要结果
+
+GLM4 总体：
+
+```text
+rows: 2310
+coordinate baseline rows: 210
+candidate rows: 2100
+unique states: 30
+unique cases: 3
+candidate top1: 720
+candidate margin_nonnegative: 720
+candidate strict_clean: 0
+new_top1_vs_coordinate_base: 720
+new_margin_closure_vs_coordinate_base: 720
+new_strict_vs_coordinate_base: 0
+target_state_coverage_top1: 30
+target_state_coverage_strict: 0
+```
+
+按组：
+
+```text
+state_specific_margin_support_pos_64, factor 2.25:
+  top1 = 200
+  states = 30
+  mean delta = 5.430654761904762
+
+fixed_topfreq_64, factor 2.25:
+  top1 = 122
+  states = 20
+  mean delta = 4.613988095238096
+
+fixed_half_or_more, factor 2.25:
+  top1 = 96
+  states = 20
+  mean delta = 4.442261904761905
+
+fixed_topfreq_64, factor 2.10:
+  top1 = 70
+  states = 10
+  mean delta = 4.045535714285714
+
+fixed_half_or_more, factor 2.10:
+  top1 = 70
+  states = 10
+  mean delta = 3.892261904761905
+
+fixed_intersection_all, factor 2.25:
+  top1 = 32
+  states = 10
+  mean delta = 3.624702380952381
+
+fixed_topfreq_31, factor 2.25:
+  top1 = 32
+  states = 10
+  mean delta = 3.624702380952381
+```
+
+固定组覆盖：
+
+```text
+fixed_topfreq_64:
+  states = 20
+  cases = shark + material_wood
+
+fixed_half_or_more:
+  states = 20
+  cases = shark + material_wood
+
+fixed_intersection_all / fixed_topfreq_31:
+  states = 10
+  case = shark only
+
+state_specific:
+  states = 30
+  cases = shark + material_wood + chair
+```
+
+所有 fixed top1 rows：
+
+```text
+strict_clean: 0
+patched blocker: punctuation_period
+```
+
+### 五、客观分析
+
+Phase931 是一个重要正结果，但仍不是闭合。
+
+正结果：
+
+```text
+state-specific margin_support_pos_64 不是完全不可固定；
+固定 top-frequency 64 通道组可以在 20/30 states 上产生因果 top1/margin closure；
+固定交集 31 通道组也能打开 shark case。
+```
+
+这说明 punctuation margin gear 可以从：
+
+```text
+G_punct(x)
+```
+
+部分收缩为：
+
+```text
+G_punct_common
+```
+
+但负结果同样明确：
+
+```text
+1. fixed_topfreq_64 未覆盖 chair case。
+2. intersection_31 只覆盖 shark。
+3. state-specific 仍显著强于 fixed group。
+4. strict_clean 仍然为 0。
+5. 仍需强 factor 2.10-2.25。
+```
+
+因此 Phase931 的证据层级应写为：
+
+```text
+fixed punctuation margin gear causal positive, partial coverage
+```
+
+不能写为：
+
+```text
+fixed global punctuation gear closure
+```
+
+### 六、理论进展
+
+Phase930-931 使标点边界图谱从：
+
+```text
+状态特异强制打开规则
+```
+
+推进为：
+
+```text
+半固定齿轮族 + 状态补偿项
+```
+
+更准确的形式是：
+
+```text
+G_punct(x) = G_common + G_case(x) + G_residual(x)
+```
+
+当前证据对应：
+
+```text
+G_common:
+  fixed_topfreq_64 可覆盖 20/30 states。
+
+G_case(x):
+  chair case 仍需要 state-specific 补偿。
+
+G_residual(x):
+  strict-clean 转移和自然门控仍未解释。
+```
+
+这比 Phase929 的 “每个 state 重算通道组” 更进一步，但还没有达到全局固定机制。
+
+### 七、闭合距离
+
+当前已完成：
+
+```text
+1. punctuation-specific gear candidate found。
+2. opening threshold 定位到 2.00-2.25。
+3. threshold candidate variables identified。
+4. strict_clean=0 的协议场原因被定位。
+5. fixed top-frequency group 在 20/30 states 上因果有效。
+```
+
+仍未完成：
+
+```text
+1. fixed group 覆盖全部 30 states。
+2. chair case 的补偿机制。
+3. strict_clean > 0。
+4. 自然 gate，而非人工 factor。
+5. qwen3 / DS7B 跨模型入口。
+```
+
+### 八、下一阶段任务
+
+Phase930-931 已完成附件要求的同阶段目标：
+
+```text
+自然门控候选审计；
+strict-clean 失败定位；
+固定通道稳定性与因果验证。
+```
+
+下一任务已经进入新的小阶段：
+
+```text
+Phase932: Fixed Gear Repair and Case-Specific Residual Audit
+固定齿轮修复与 case-specific 残差审计
+```
+
+建议任务：
+
+```text
+1. 以 fixed_topfreq_64 为公共齿轮基座。
+2. 专门分析 chair case 缺失的 residual channels。
+3. 测试 G_common + G_chair_residual 是否覆盖 30/30。
+4. 同时继续追踪 strict_clean，避免只优化 top1/margin。
+5. 为 qwen3 / DS7B 重构 punctuation seeds，解决跨模型入口缺失。
+```
+
+本轮到 Phase931 停止自动推进，因为下一步已经从“自然门控/固定化审计”转向“公共齿轮修复与残差补偿”，属于新的阶段目标。
+
+### 九、通俗总结
+
+Phase930 做的是：
+
+```text
+这把句号锁钥匙，到底要用多大力气才能打开？
+```
+
+结果是：
+
+```text
+shark 大约 2.00；
+chair 大约 2.10；
+wood 大约 2.15；
+所有状态 2.25 内都能打开。
+```
+
+但 strict-clean 仍然是 0，因为模型还卡在类似：
+
+```text
+Category:
+```
+
+这样的协议字段里。EOS 第一不等于答案已经干净完成。
+
+Phase931 做的是：
+
+```text
+这把钥匙是不是每次都完全不同？
+```
+
+结果是：
+
+```text
+不是完全不同。
+高频 64 通道固定组能打开 20/30 个状态；
+但 chair 还需要额外补偿。
+```
+
+所以现在更准确的图像是：
+
+```text
+标点锁有一把公共钥匙；
+但不同锁孔还需要一点局部齿形；
+而且门打开后，房间里还没有整理干净。
+```
+
+## Phase 932: 固定公共齿轮修复与 case-specific 残差审计 [2026-07-04 16:08]
+
+### 一、对上传分析的判断
+
+上传分析对 Phase930/931 的证据层级限定是正确的。Phase930/931 没有证明自然门控、strict-clean 闭合或语言编码机制闭合，只证明了更窄的事实：
+
+```text
+1. punctuation_period blocker 有独立 margin gear。
+2. state-specific margin_support_pos_64 可以在人工 factor 下打开 30/30 GLM4 states。
+3. fixed_topfreq_64 公共齿轮不是无效的，可覆盖 20/30 states。
+4. chair case 是 fixed_topfreq_64 的主要缺口。
+5. strict_clean 始终为 0，自然 gate 仍未找到。
+```
+
+因此本阶段继续沿着附件建议的方向做 Phase932：不再泛化为“闭合”，而是验证下式中的中间结构：
+
+```text
+G_punct(x) = G_common + G_case(x) + G_residual(x)
+```
+
+其中：
+
+```text
+G_common:
+  Phase931 中的 fixed_topfreq_64。
+
+G_case(x):
+  从每个 case 的 margin_support_pos_64 稳定通道中，扣除 fixed_topfreq_64 后得到的 case residual。
+
+G_residual(x):
+  strict-clean 转移、自然 gate、协议场清理等尚未解释的剩余机制。
+```
+
+### 二、测试脚本与测试范围
+
+新增脚本：
+
+```text
+tests/glm5/phase932_fixed_gear_repair_case_residual_audit.py
+tests/glm5/run_phase932_fixed_gear_repair_case_residual_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase932_fixed_gear_repair_case_residual_audit/fixed_gear_repair_case_residual_audit/
+```
+
+测试顺序按要求依次执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+其中 qwen3 和 DS7B 当前仍没有 punctuation_period seeds，因此没有加载模型，也没有产生有效干预结果。GLM4 完成 30 个 punctuation states、3 个 case、4410 行干预测试。
+
+### 三、测试原理
+
+Phase931 的固定公共组：
+
+```text
+G_common = fixed_topfreq_64
+```
+
+Phase930 的每个 state 都有一个：
+
+```text
+G_state(s) = margin_support_pos_64(s)
+```
+
+对每个 case 定义：
+
+```text
+G_case_inter(c) = intersection_s_in_c G_state(s)
+G_case_union(c) = union_s_in_c G_state(s)
+```
+
+再扣除公共齿轮：
+
+```text
+R_case_inter(c) = G_case_inter(c) - G_common
+R_case_union(c) = G_case_union(c) - G_common
+```
+
+本阶段比较以下候选通道组：
+
+```text
+1. fixed_topfreq_64
+2. chair_inter_residual_only
+3. chair_union_residual_only
+4. case_inter_residual_only
+5. case_union_residual_only
+6. fixed_topfreq_64 + chair_inter_residual
+7. fixed_topfreq_64 + chair_union_residual
+8. fixed_topfreq_64 + case_inter_residual
+9. fixed_topfreq_64 + case_union_residual
+10. state_specific_margin_support_pos_64
+```
+
+每组在同一坐标体系下测试：
+
+```text
+route_alpha / protocol_factor:
+1.0:1.0
+0.875:1.1
+1.25:1.1
+0.875:0.85
+1.25:0.85
+1.375:0.85
+1.375:0.9
+
+factor:
+2.1, 2.25
+```
+
+判定指标保持 Phase930/931 口径：
+
+```text
+new_top1_vs_coordinate_base
+new_margin_closure_vs_coordinate_base
+new_strict_vs_coordinate_base
+target_state_coverage_top1
+```
+
+### 四、case residual 库存
+
+GLM4 的 Phase930 state feature 统计得到：
+
+```text
+p856_021_material_wood:
+  states = 10
+  intersection = 58
+  union = 69
+  inter_residual = 2
+  union_residual = 9
+  inter_residual channels = [3164, 4051]
+
+p856_035_object_chair:
+  states = 10
+  intersection = 63
+  union = 65
+  inter_residual = 17
+  union_residual = 19
+  inter_residual channels =
+    [1298, 3310, 3377, 3930, 4265, 4407, 6491, 7282, 7310,
+     7907, 10417, 10822, 10874, 11002, 11558, 12040, 12860]
+
+p885_047_animal_shark:
+  states = 10
+  intersection = 64
+  union = 64
+  inter_residual = 13
+  union_residual = 13
+```
+
+这与 Phase931 的缺口一致：chair 不是没有可识别稳定通道，而是这些稳定通道大量落在 fixed_topfreq_64 之外。
+
+### 五、客观结果
+
+GLM4 总体：
+
+```text
+rows = 4410
+coordinate_baseline_rows = 210
+candidate_rows = 4200
+unique_states = 30
+unique_cases = 3
+top1 = 1698
+margin_nonnegative = 1698
+strict_clean_candidate = 0
+new_top1_vs_coordinate_base = 1698
+new_margin_closure_vs_coordinate_base = 1698
+new_strict_vs_coordinate_base = 0
+target_state_coverage_top1 = 30
+target_state_coverage_strict = 0
+worsened_margin_vs_coordinate_base = 560
+```
+
+关键组覆盖率：
+
+```text
+fixed_topfreq_64, factor=2.25:
+  coverage = 20/30
+  wood = 10/10
+  chair = 0/10
+  shark = 10/10
+  top1 rows = 122/210
+  strict_clean = 0
+
+fixed_plus_chair_inter_residual, factor=2.25:
+  coverage = 20/30
+  wood = 0/10
+  chair = 10/10
+  shark = 10/10
+  top1 rows = 140/210
+  strict_clean = 0
+
+fixed_plus_case_inter_residual, factor=2.25:
+  coverage = 30/30
+  wood = 10/10
+  chair = 10/10
+  shark = 10/10
+  top1 rows = 202/210
+  strict_clean = 0
+
+fixed_plus_case_union_residual, factor=2.25:
+  coverage = 30/30
+  wood = 10/10
+  chair = 10/10
+  shark = 10/10
+  top1 rows = 210/210
+  strict_clean = 0
+
+state_specific_margin_support_pos_64, factor=2.25:
+  coverage = 30/30
+  top1 rows = 200/210
+  strict_clean = 0
+```
+
+低 factor 下：
+
+```text
+fixed_plus_case_union_residual, factor=2.1:
+  coverage = 30/30
+  top1 rows = 158/210
+
+fixed_plus_case_inter_residual, factor=2.1:
+  coverage = 22/30
+  top1 rows = 123/210
+
+state_specific_margin_support_pos_64, factor=2.1:
+  coverage = 22/30
+  top1 rows = 98/210
+```
+
+残差单独使用：
+
+```text
+chair_inter_residual_only:
+  coverage = 0/30
+
+chair_union_residual_only:
+  coverage = 0/30
+
+case_inter_residual_only:
+  coverage = 0/30
+
+case_union_residual_only:
+  coverage = 0/30
+```
+
+### 六、结果分析
+
+本阶段最重要的正结果：
+
+```text
+fixed_topfreq_64 + case residual 可以把 Phase931 的 20/30 coverage 修复到 30/30。
+```
+
+这支持以下结构：
+
+```text
+punctuation_period margin gear 不是完全 state-specific；
+存在公共齿轮骨架 G_common；
+但每个 case 仍需要少量 case residual 齿形补偿。
+```
+
+尤其 chair：
+
+```text
+fixed_topfreq_64 在 chair 上为 0/10；
+fixed_topfreq_64 + chair residual 在 chair 上为 10/10；
+chair residual only 仍为 0/10。
+```
+
+这说明 chair residual 不是独立钥匙，而更像公共钥匙上的局部齿形补偿。
+
+同时有一个重要负结果：
+
+```text
+fixed_topfreq_64 + chair residual 不能修复 wood；
+wood 从 fixed_topfreq_64 的 10/10 变为 0/10。
+```
+
+这说明 residual 不是单调通用增强项，而是 case-specific 的边界结构。错误 residual 可能破坏其他 case 的闭合。
+
+### 七、严格审视与硬伤
+
+本阶段不能过度解释，原因如下：
+
+```text
+1. case residual 是从同一批 10 个 states 中统计得到的，存在 within-case overfit 风险。
+2. fixed_plus_case_union_residual 的 group size 大于 fixed_topfreq_64，可能包含“更大组导致更强干预”的因素。
+3. 人工 factor 仍为 2.1/2.25，不是自然 gate。
+4. strict_clean_candidate 仍为 0，没有从 EOS top1 进入干净答案闭合。
+5. qwen3 / DS7B 没有 punctuation seeds，跨模型证据仍缺失。
+6. 结果只针对 punctuation_period blocker，不代表全部协议边、语义边或语言生成闭合。
+```
+
+因此证据层级应严格写为：
+
+```text
+公共齿轮 + case residual 在 GLM4 punctuation_period blocker 上完成了人工打开覆盖修复；
+不是自然门控闭合；
+不是 strict-clean 闭合；
+不是语言编码机制闭合。
+```
+
+### 八、闭合标准与当前距离
+
+当前闭合标准至少包括：
+
+```text
+1. fixed/common gear 可以跨 state、跨 case、跨模型稳定预测边界迁移。
+2. case residual 的定义不能依赖目标 state 本身，必须通过 holdout 验证。
+3. 人工 factor 要被自然 gate 变量替代。
+4. EOS top1 后必须进入 strict-clean answer，而不是协议字段漂移。
+5. qwen3、GLM4、DS7B 至少要有可比较入口。
+```
+
+Phase932 完成的是第 1 条的一部分：
+
+```text
+在 GLM4 内部，公共齿轮 + case residual 可以覆盖 30/30 punctuation states。
+```
+
+但第 2-5 条均未完成。因此距离机制闭合仍较远，当前更像完成了 punctuation margin gear map 的一个结构拼图。
+
+### 九、智能理论洞察
+
+从智能理论角度看，本阶段给出的关键线索是：
+
+```text
+语言边界状态可能不是由单一神经元、单一方向或单一通道组决定；
+而是由公共骨架 + case-specific 齿形共同决定。
+```
+
+这比“每个状态独立找 patch”更接近可组合结构：
+
+```text
+G_common:
+  负责 punctuation_period 边界打开的公共动力学骨架。
+
+G_case:
+  负责不同语义对象/输出场景下的局部齿形补偿。
+
+G_residual:
+  负责自然 gate、strict-clean、协议场清理等还未测出的部分。
+```
+
+如果后续 holdout 能证明 case residual 不依赖目标 state 本身，那么全局齿轮图谱会从“局部通道集合”进一步升级为“可组合齿轮结构”。
+
+### 十、下一步任务与阶段判断
+
+Phase932 后的下一任务仍属于同一个阶段目标，因为它直接检验 Phase932 的主要硬伤：
+
+```text
+Phase933:
+  leave-one-state-out case residual holdout
+
+问题：
+  如果计算某个 state 的 case residual 时，把这个 state 从统计中拿掉，
+  fixed_topfreq_64 + case residual 是否仍能修复该 state？
+```
+
+如果 holdout 仍能覆盖 chair 和 wood，那么 Phase932 的 case residual 结构更可信；如果覆盖明显下降，则 Phase932 可能只是同批状态上的 residual 过拟合。
+
+因此本轮不在 Phase932 停止，继续自动推进 Phase933。
+
+### 十一、通俗总结
+
+Phase931 发现：
+
+```text
+公共钥匙能打开 20 把锁，但打不开 chair 的 10 把锁。
+```
+
+Phase932 发现：
+
+```text
+chair 不是完全没有规律。
+只要在公共钥匙上加 chair 自己的齿形，chair 的 10 把锁都能打开。
+```
+
+但也发现：
+
+```text
+chair 的齿形不能乱装到 wood 上；
+装错了反而打不开。
+```
+
+所以当前结论是：
+
+```text
+标点边界确实像“公共齿轮 + 局部齿形补偿”；
+但这仍是人工打开，不是自然闭合。
+```
+
+## Phase 933: leave-one-state-out case residual holdout 审计 [2026-07-04 16:15]
+
+### 一、任务动机
+
+Phase932 得到强正结果：
+
+```text
+fixed_topfreq_64 + case residual
+可以把 GLM4 punctuation_period blocker 从 20/30 修复到 30/30。
+```
+
+但 Phase932 有一个必须立刻审计的硬伤：
+
+```text
+case residual 是从同一批 10 个 states 中统计出来的；
+如果目标 state 自己参与了 residual 统计，
+那么 fixed + residual 的成功可能包含同批状态泄漏。
+```
+
+因此 Phase933 做 leave-one-state-out（LOSO）验证：对每个目标 state，计算 case residual 时排除这个 state，只使用同 case 其他 9 个 states。
+
+### 二、测试脚本与结果目录
+
+新增脚本：
+
+```text
+tests/glm5/phase933_loso_case_residual_holdout_audit.py
+tests/glm5/run_phase933_loso_case_residual_holdout_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase933_loso_case_residual_holdout_audit/loso_case_residual_holdout_audit/
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+qwen3 与 DS7B 仍没有 punctuation_period seeds，因此本阶段有效干预结果仍只来自 GLM4。
+
+### 三、测试原理
+
+对目标 state：
+
+```text
+s_i in case c
+```
+
+先从同 case 中排除它：
+
+```text
+H_c^{-i} = {s_j | s_j in case c, j != i}
+```
+
+再定义：
+
+```text
+G_loso_inter(c, i) = intersection_{s in H_c^{-i}} G_state(s)
+G_loso_union(c, i) = union_{s in H_c^{-i}} G_state(s)
+```
+
+扣除公共齿轮：
+
+```text
+R_loso_inter(c, i) = G_loso_inter(c, i) - G_common
+R_loso_union(c, i) = G_loso_union(c, i) - G_common
+```
+
+测试组：
+
+```text
+1. fixed_topfreq_64
+2. loso_case_inter_residual_only
+3. loso_case_union_residual_only
+4. fixed_topfreq_64 + loso_case_inter_residual
+5. fixed_topfreq_64 + loso_case_union_residual
+6. state_specific_margin_support_pos_64
+```
+
+坐标与 factor 保持 Phase932 口径：
+
+```text
+7 个 route_alpha / protocol_factor 坐标
+factor = 2.1, 2.25
+```
+
+### 四、LOSO residual 库存
+
+GLM4 中，每个目标 state 都用同 case 其他 9 个 states 计算 residual。库存范围：
+
+```text
+p856_021_material_wood:
+  states = 10
+  holdout_each = 9
+  inter_residual_size = 2..2
+  union_residual_size = 9..9
+
+p856_035_object_chair:
+  states = 10
+  holdout_each = 9
+  inter_residual_size = 17..17
+  union_residual_size = 19..19
+
+p885_047_animal_shark:
+  states = 10
+  holdout_each = 9
+  inter_residual_size = 13..13
+  union_residual_size = 13..13
+```
+
+这说明 Phase932 的 case residual 并非由某个单独目标 state 决定。至少在这批 10-state case 内，residual 库存相当稳定。
+
+### 五、客观结果
+
+GLM4 总体：
+
+```text
+rows = 2730
+coordinate_baseline_rows = 210
+candidate_rows = 2520
+unique_states = 30
+unique_cases = 3
+top1 = 1183
+margin_nonnegative = 1183
+strict_clean_candidate = 0
+new_top1_vs_coordinate_base = 1183
+new_margin_closure_vs_coordinate_base = 1183
+new_strict_vs_coordinate_base = 0
+improved_margin_vs_coordinate_base = 2498
+worsened_margin_vs_coordinate_base = 0
+target_state_coverage_top1 = 30
+target_state_coverage_strict = 0
+```
+
+关键覆盖结果：
+
+```text
+fixed_topfreq_64, factor=2.25:
+  coverage = 20/30
+  wood = 10/10
+  chair = 0/10
+  shark = 10/10
+  top1 rows = 122/210
+  strict_clean = 0
+
+fixed_plus_loso_case_inter_residual, factor=2.25:
+  coverage = 30/30
+  wood = 10/10
+  chair = 10/10
+  shark = 10/10
+  top1 rows = 202/210
+  strict_clean = 0
+
+fixed_plus_loso_case_union_residual, factor=2.25:
+  coverage = 30/30
+  wood = 10/10
+  chair = 10/10
+  shark = 10/10
+  top1 rows = 210/210
+  strict_clean = 0
+
+state_specific_margin_support_pos_64, factor=2.25:
+  coverage = 30/30
+  top1 rows = 200/210
+  strict_clean = 0
+```
+
+低 factor 下：
+
+```text
+fixed_plus_loso_case_union_residual, factor=2.1:
+  coverage = 30/30
+  top1 rows = 158/210
+
+fixed_plus_loso_case_inter_residual, factor=2.1:
+  coverage = 22/30
+  top1 rows = 123/210
+
+state_specific_margin_support_pos_64, factor=2.1:
+  coverage = 22/30
+  top1 rows = 98/210
+```
+
+残差单独使用：
+
+```text
+loso_case_inter_residual_only:
+  coverage = 0/30
+
+loso_case_union_residual_only:
+  coverage = 0/30
+```
+
+chair case 单独看，factor=2.25：
+
+```text
+fixed_topfreq_64:
+  chair top1 rows = 0/70
+  chair state coverage = 0/10
+
+fixed_plus_loso_case_inter_residual:
+  chair top1 rows = 70/70
+  chair state coverage = 10/10
+
+fixed_plus_loso_case_union_residual:
+  chair top1 rows = 70/70
+  chair state coverage = 10/10
+
+loso residual only:
+  chair state coverage = 0/10
+```
+
+### 六、结果分析
+
+Phase933 强化了 Phase932 的正结果：
+
+```text
+即使排除目标 state，
+同 case 其他 9 个 states 得到的 residual 仍然可以修复目标 state。
+```
+
+这说明：
+
+```text
+case residual 至少不是单个目标 state 泄漏；
+而是 case 内较稳定的补偿齿形。
+```
+
+更重要的是：
+
+```text
+residual only 仍然 0/30；
+fixed_topfreq_64 only 仍然 20/30；
+fixed_topfreq_64 + LOSO case residual 才到 30/30。
+```
+
+所以结构更像：
+
+```text
+公共齿轮骨架 + case-specific 齿形补偿
+```
+
+而不是：
+
+```text
+公共齿轮无效；
+case residual 自己就是完整机制。
+```
+
+### 七、严格审视与硬伤
+
+Phase933 解决了 Phase932 的一个硬伤，但没有解决全部问题：
+
+```text
+已收紧：
+  排除目标 state 后仍能修复，降低了 within-case 单点泄漏风险。
+
+仍未解决：
+  1. 仍是同 case 内 holdout，不是新 case holdout。
+  2. 仍是 GLM4 单模型，qwen3 / DS7B 没有 punctuation seeds。
+  3. 仍依赖人工 factor = 2.1 / 2.25。
+  4. strict_clean_candidate 仍为 0。
+  5. union residual 的 group size 更大，可能有“更大组更强”的因素，需要控制组大小。
+  6. 当前只测 punctuation_period，不代表所有 clean protocol edge。
+```
+
+因此证据层级应写为：
+
+```text
+GLM4 punctuation_period blocker 中，
+公共齿轮 + LOSO case residual 可以稳定修复人工边界打开；
+但自然门控、strict-clean 和跨模型闭合仍未完成。
+```
+
+### 八、闭合距离
+
+当前图谱进展：
+
+```text
+1. punctuation_period 边界存在公共齿轮 fixed_topfreq_64。
+2. chair 缺口可由 case residual 修复。
+3. residual 在 LOSO 下仍稳定。
+4. residual only 无法独立闭合，说明它是补偿齿形而非完整钥匙。
+```
+
+距离闭合仍有：
+
+```text
+1. 自然 gate 未找到。
+2. strict-clean = 0。
+3. 跨模型入口缺失。
+4. 新 case / 新语义域 holdout 未完成。
+5. group-size 等干预强度混杂还需控制。
+```
+
+### 九、智能理论洞察
+
+这一阶段对“全局齿轮图谱”的意义比较明确：
+
+```text
+语言边界齿轮不是完全全局固定；
+也不是完全状态特异；
+它呈现出“公共骨架 + case 稳定补偿”的中间结构。
+```
+
+这类结构可能是后续破解语言编码机制的重要入口，因为它符合可组合机制的形式：
+
+```text
+全局规则:
+  fixed_topfreq_64
+
+局部条件:
+  case residual
+
+尚未解释的动态门:
+  natural gate / protocol cleanup
+```
+
+如果未来能找到自然 gate 来选择这些 residual，而不是人工指定 case residual，那么图谱才会从“可人工打开”迈向“可预测自然生成”。
+
+### 十、下一阶段任务
+
+Phase932/933 已经完成当前小阶段目标：
+
+```text
+验证 fixed common gear + case residual 是否能修复 Phase931 的 chair 缺口；
+并用 LOSO 排除目标 state 泄漏。
+```
+
+下一阶段不应继续单纯扩大 factor，而应进入：
+
+```text
+Phase934: case residual gate and size-control audit
+```
+
+重点：
+
+```text
+1. 控制 group size，比较同大小随机 residual、同大小非 case residual、case residual。
+2. 寻找能预测 case residual 是否需要开启的自然变量。
+3. 构造新 case / 新语义域 punctuation states，测试 residual 是否可以外推。
+4. 继续追踪 strict-clean，不能只追 top1/margin。
+5. 为 qwen3 / DS7B 重构 punctuation seed 入口。
+```
+
+Phase934 属于下一个子阶段，因为它已经从“case residual 是否稳定有效”转向“case residual 为什么会被选择、是否只是组大小效应”。本轮到 Phase933 作为当前阶段性目标的收束点。
+
+### 十一、通俗总结
+
+Phase932 说：
+
+```text
+chair 的钥匙齿形可以补上。
+```
+
+Phase933 进一步说：
+
+```text
+就算不看这把 chair 锁本身，
+只看其他 chair 锁，也能推回这把锁需要的齿形。
+```
+
+这比 Phase932 更稳。当前图像是：
+
+```text
+公共钥匙确实存在；
+每类锁还有稳定的小齿形；
+但钥匙怎么自然长出来、门打开后怎么直接给干净答案，还没破解。
+```
+
+## Phase 934: case residual size-control 审计 [2026-07-04 18:14]
+
+### 一、对上传分析的判断
+
+上传分析对 Phase932/933 的判断基本正确。Phase932/933 的核心贡献不是自然闭合，而是把 punctuation_period blocker 的边界齿轮结构从：
+
+```text
+state-specific margin gear
+```
+
+收紧为：
+
+```text
+common gear + case residual
+```
+
+也就是：
+
+```text
+G_punct(x) = G_common + G_case(x) + G_residual(x)
+```
+
+其中当前证据支持：
+
+```text
+G_common:
+  fixed_topfreq_64，覆盖 20/30。
+
+G_case(x):
+  LOSO case residual，修复到 30/30。
+
+G_residual(x):
+  natural gate、strict-clean、协议清理仍未解释。
+```
+
+但是上传分析也指出一个关键硬伤：union residual 组更大，可能存在 group-size 混杂。因此 Phase934 不继续扩大 factor，而是做同大小控制。
+
+### 二、测试脚本与范围
+
+新增脚本：
+
+```text
+tests/glm5/phase934_case_residual_size_control_audit.py
+tests/glm5/run_phase934_case_residual_size_control_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase934_case_residual_size_control_audit/case_residual_size_control_audit/
+```
+
+测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+qwen3 和 DS7B 仍无 punctuation_period seeds，因此没有有效干预数据；GLM4 完成 30 states、4410 rows。
+
+### 三、测试原理
+
+Phase933 已证明：
+
+```text
+fixed_topfreq_64 + LOSO case residual -> 30/30
+```
+
+Phase934 要问：
+
+```text
+这是因为 residual 齿形匹配，
+还是因为通道数变多？
+```
+
+因此对每个目标 state，保留真实组：
+
+```text
+fixed_topfreq_64 + loso_case_inter_residual
+fixed_topfreq_64 + loso_case_union_residual
+```
+
+同时构造同大小控制：
+
+```text
+fixed_topfreq_64 + noncase_inter_size_control
+fixed_topfreq_64 + noncase_union_size_control
+fixed_topfreq_64 + global_inter_size_control
+fixed_topfreq_64 + global_union_size_control
+fixed_topfreq_64 + pseudorandom_inter_size_control
+fixed_topfreq_64 + pseudorandom_union_size_control
+```
+
+其中 control 组和真实 LOSO residual 保持相同 residual size：
+
+```text
+wood:
+  inter size = 2
+  union size = 9
+
+chair:
+  inter size = 17
+  union size = 19
+
+shark:
+  inter size = 13
+  union size = 13
+```
+
+判定指标仍然是：
+
+```text
+new_top1_vs_coordinate_base
+new_margin_closure_vs_coordinate_base
+new_strict_vs_coordinate_base
+target_state_coverage_top1
+```
+
+### 四、客观结果
+
+GLM4 总体：
+
+```text
+rows = 4410
+candidate_rows = 4200
+unique_states = 30
+unique_cases = 3
+top1 = 2317
+margin_nonnegative = 2317
+strict_clean_candidate = 0
+new_top1_vs_coordinate_base = 2317
+new_margin_closure_vs_coordinate_base = 2317
+new_strict_vs_coordinate_base = 0
+target_state_coverage_top1 = 30
+target_state_coverage_strict = 0
+```
+
+关键覆盖：
+
+```text
+fixed_topfreq_64, factor=2.25:
+  coverage = 20/30
+  wood = 10/10
+  chair = 0/10
+  shark = 10/10
+
+fixed_plus_loso_case_inter_residual, factor=2.25:
+  coverage = 30/30
+  wood = 10/10
+  chair = 10/10
+  shark = 10/10
+
+fixed_plus_loso_case_union_residual, factor=2.25:
+  coverage = 30/30
+  wood = 10/10
+  chair = 10/10
+  shark = 10/10
+
+state_specific_margin_support_pos_64, factor=2.25:
+  coverage = 30/30
+```
+
+同大小控制：
+
+```text
+fixed_plus_noncase_inter_size_control, factor=2.25:
+  coverage = 20/30
+
+fixed_plus_global_inter_size_control, factor=2.25:
+  coverage = 20/30
+
+fixed_plus_pseudorandom_inter_size_control, factor=2.25:
+  coverage = 20/30
+
+fixed_plus_noncase_union_size_control, factor=2.25:
+  coverage = 20/30
+
+fixed_plus_global_union_size_control, factor=2.25:
+  coverage = 20/30
+
+fixed_plus_pseudorandom_union_size_control, factor=2.25:
+  coverage = 19/30
+```
+
+chair case 单独看，factor=2.25：
+
+```text
+fixed_topfreq_64:
+  chair coverage = 0/10
+
+fixed_plus_loso_case_inter_residual:
+  chair coverage = 10/10
+
+fixed_plus_loso_case_union_residual:
+  chair coverage = 10/10
+
+所有同大小 size-control:
+  chair coverage = 0/10
+```
+
+### 五、结果分析
+
+Phase934 的关键正结果：
+
+```text
+真实 LOSO case residual 可以修复 chair；
+同大小 noncase/global/pseudorandom residual 不能修复 chair。
+```
+
+这排除了一个主要混杂：
+
+```text
+不是只要多加 17/19 个通道就能修复 chair。
+```
+
+更准确的结构是：
+
+```text
+fixed_topfreq_64 提供公共骨架；
+case residual 提供齿形匹配；
+错误 residual 或同大小控制无法替代真实 residual。
+```
+
+这比 Phase932/933 更进一步支持“齿形匹配”解释。
+
+### 六、硬伤与边界
+
+仍必须严格限制证据：
+
+```text
+1. 这仍是 GLM4 单模型，qwen3 / DS7B 没有入口。
+2. 仍是人工 factor = 2.1 / 2.25。
+3. strict_clean_candidate 仍为 0。
+4. 同大小控制排除了 size，但没有找到 natural gate。
+5. 仍是同 case 内 residual，不是新 case 外推。
+6. 当前只针对 punctuation_period blocker。
+```
+
+因此 Phase934 证明的是：
+
+```text
+case residual 的优势不是简单 group-size 效应；
+但还不是自然门控闭合，也不是 strict-clean 闭合。
+```
+
+### 七、闭合距离
+
+当前已收紧：
+
+```text
+1. fixed common gear 存在。
+2. LOSO case residual 稳定。
+3. residual only 无效。
+4. 同大小错配 residual 不能修复 chair。
+```
+
+仍未完成：
+
+```text
+1. natural gate。
+2. strict-clean。
+3. new case holdout。
+4. qwen3 / DS7B 跨模型入口。
+5. protocol cleanup route。
+```
+
+### 八、智能理论洞察
+
+Phase934 对智能理论的价值是：它支持“语言边界齿轮具有形状匹配”这一拼图。
+
+这不是简单的线性增强：
+
+```text
+more channels -> stronger closure
+```
+
+而更像：
+
+```text
+right common skeleton + right local teeth -> boundary opens
+wrong same-size teeth -> boundary remains blocked
+```
+
+如果这种结构在更多 blocker class、更多 case、更多模型上复现，那么全局齿轮图谱将从“通道集合图谱”升级为“齿形组合图谱”。
+
+### 九、阶段判断
+
+Phase934 完成了 Phase933 后直接暴露的 group-size 混杂审计。下一步仍在同一子阶段内，因为还需要审计：
+
+```text
+case residual 是否有可观测 gate candidate。
+```
+
+因此继续自动执行 Phase935。
+
+### 十、通俗总结
+
+Phase934 问：
+
+```text
+chair 被修好，是不是只是因为多加了一些通道？
+```
+
+结果是：
+
+```text
+不是。
+同样数量的错配通道，修不好 chair；
+只有 chair 对应的 residual 齿形能修好。
+```
+
+所以更像：
+
+```text
+不是钥匙更大；
+而是齿形对上了。
+```
+
+## Phase 935: case residual gate candidate 审计 [2026-07-04 18:14]
+
+### 一、任务动机
+
+Phase934 排除了主要 group-size 混杂，但还没有回答：
+
+```text
+模型自然状态下如何知道什么时候需要 case residual？
+```
+
+因此 Phase935 不做新模型推理，而是读取 Phase930 阈值特征和 Phase934 成败结果，审计 residual-needed 的候选门控变量。
+
+### 二、测试脚本与结果目录
+
+新增脚本：
+
+```text
+tests/glm5/phase935_case_residual_gate_candidate_audit.py
+tests/glm5/run_phase935_case_residual_gate_candidate_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase935_case_residual_gate_candidate_audit/case_residual_gate_candidate_audit/
+```
+
+Phase935 不加载模型，只做跨模型结果读取：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+qwen3 / DS7B 无 Phase934 有效状态，因此结果仍只有 GLM4。
+
+### 三、测试原理
+
+对每个 state 定义：
+
+```text
+fixed_success_2_25:
+  fixed_topfreq_64 是否成功打开。
+
+residual_needed_2_25:
+  fixed_topfreq_64 是否失败。
+
+true_loso_repair_success_2_25:
+  fixed + true LOSO case residual 是否成功。
+
+size_control_success_2_25:
+  fixed + 同大小控制 residual 是否成功。
+
+true_beats_controls_2_25:
+  true LOSO residual 成功且 size-control 失败。
+```
+
+然后用 Phase930 的可观测变量做单变量阈值分裂：
+
+```text
+target_route_delta_norm
+target_boundary_eos_margin_vs_blocker
+target_boundary_eos_rank
+boundary_period_gap_vs_eos
+boundary_punctuation_gap_vs_eos
+l39_margin_pos_* score
+l39_eos_support_mean_score
+l39_neg_margin_mean_score
+phase925_factor
+opening_threshold_factor
+```
+
+注意：这不是因果门控训练，只是候选变量审计。
+
+### 四、客观结果
+
+GLM4 状态数：
+
+```text
+state_rows = 30
+fixed_success_2_25 = 20
+residual_needed_2_25 = 10
+true_loso_repair_success_2_25 = 30
+size_control_success_2_25 = 20
+true_beats_controls_2_25 = 10
+```
+
+按 case：
+
+```text
+wood:
+  states = 10
+  fixed_success = 10
+  residual_needed = 0
+  true_repair = 10
+  size_control = 10
+  true_beats_controls = 0
+
+chair:
+  states = 10
+  fixed_success = 0
+  residual_needed = 10
+  true_repair = 10
+  size_control = 0
+  true_beats_controls = 10
+
+shark:
+  states = 10
+  fixed_success = 10
+  residual_needed = 0
+  true_repair = 10
+  size_control = 10
+  true_beats_controls = 0
+```
+
+候选 split：
+
+```text
+residual_needed_2_25:
+  target_route_delta_norm <= 0.036896469071507454
+  accuracy = 30/30
+  true = 10
+  false = 20
+  case_confounded = true
+
+target_boundary_eos_margin_vs_blocker <= -5.078125
+  accuracy = 30/30
+  case_confounded = true
+
+target_boundary_eos_rank >= 8.5
+  accuracy = 30/30
+  case_confounded = true
+
+boundary_period_gap_vs_eos >= 5.078125
+  accuracy = 30/30
+  case_confounded = true
+
+l39_eos_support_mean_score <= 0.41953757405281067
+  accuracy = 30/30
+  case_confounded = true
+```
+
+### 五、结果分析
+
+Phase935 找到了高准确候选变量，但不能写成自然门控，因为：
+
+```text
+residual_needed_2_25 的 true cases 只有 chair；
+false cases 是 wood + shark。
+```
+
+所以所有 30/30 的 split 都是：
+
+```text
+case-confounded candidate
+```
+
+它们说明：
+
+```text
+chair 状态在边界难度、EOS rank、period gap、L39 支持强度上确实不同；
+但还不能证明模型使用这些变量自然选择 chair residual。
+```
+
+当前最严谨表述：
+
+```text
+发现 residual-needed 的可观测候选变量；
+但候选变量与 case 标签完全纠缠；
+尚未找到脱离 case 标签的 natural gate。
+```
+
+### 六、硬伤与边界
+
+Phase935 的硬伤：
+
+```text
+1. 只有 3 个 case，每个 case 10 states。
+2. residual_needed 只出现在 chair 一个 case。
+3. 高准确 split 可能只是识别 chair，而不是识别 gate。
+4. 没有新 case holdout。
+5. 没有自然激活因果干预。
+6. strict_clean 仍为 0。
+```
+
+因此证据层级必须收紧为：
+
+```text
+case residual gate candidate found, but case-confounded；
+not natural gate closure。
+```
+
+### 七、闭合标准与当前距离
+
+Phase934/935 后，当前完成：
+
+```text
+1. case residual 不是 group-size 效应。
+2. residual-needed 有可观测候选变量。
+3. 这些变量暂时完全 case-confounded。
+```
+
+仍未完成：
+
+```text
+1. 脱离 case 标签的自然 gate。
+2. 新 case / 新语义域 holdout。
+3. strict-clean。
+4. 跨模型入口。
+```
+
+### 八、智能理论洞察
+
+Phase935 对智能理论的启发是：
+
+```text
+case residual 可能不是被一个抽象通用 gate 直接选择；
+它目前更像和对象/语义场、边界难度、协议压力共同纠缠。
+```
+
+这说明破解语言编码机制不能只找一个 scalar gate，而要继续把图谱拆成：
+
+```text
+semantic case identity
+boundary difficulty
+protocol pressure
+residual gear selection
+strict cleanup transition
+```
+
+### 九、阶段性收束
+
+Phase934/935 已完成当前子阶段目标：
+
+```text
+1. group-size 混杂审计完成；
+2. case residual gate candidate 审计完成；
+3. 结论严格收紧为 case-confounded candidate，而不是 natural gate。
+```
+
+下一阶段应进入：
+
+```text
+Phase936: new case / new semantic-domain residual holdout
+```
+
+核心任务：
+
+```text
+1. 构造更多 punctuation_period states。
+2. 增加新 object / 新 semantic domain。
+3. 测试 case residual 能否外推到未参与残差统计的新 case。
+4. 尝试重建 qwen3 / DS7B punctuation seeds。
+5. strict-clean 继续作为硬指标，不因 top1/margin 成功而放宽。
+```
+
+这已经是新阶段目标，本轮停止自动推进。
+
+### 十、通俗总结
+
+Phase935 问：
+
+```text
+模型怎么知道 chair 需要额外齿形？
+```
+
+结果是：
+
+```text
+我们能找到一些信号把 chair 分出来；
+但这些信号目前还只是“chair 的特征”，
+不能证明它们就是模型自然使用的门控。
+```
+
+所以当前图像是：
+
+```text
+齿形匹配是真的；
+但自动选齿形的机关还没找到。
+```
+
+## Phase 936: 同 case 候选状态的 case residual 迁移留出审计 [2026-07-04 18:33]
+
+### 一、问题来源
+
+最新附件对 Phase934/935 的判断基本正确：
+
+```text
+Phase934 证明 case residual 的有效性不能被同大小 group control 解释；
+Phase935 找到了 residual-needed 的候选观测变量；
+但这些变量仍与 case 标签纠缠，不能写成自然门控。
+```
+
+附件建议下一步做：
+
+```text
+new case / new semantic-domain residual holdout
+```
+
+这个方向正确，但先检查数据池后发现一个重要限制：
+
+```text
+当前 Phase925 可用 punctuation_period seed 只覆盖 GLM4 的 3 个旧 case：
+p856_021_material_wood
+p856_035_object_chair
+p885_047_animal_shark
+
+qwen3 / DS7B 没有 punctuation_period candidate seeds。
+```
+
+因此 Phase936 不能声称完成新 case 泛化，只能在现有数据上做更窄的检验：
+
+```text
+case residual 是否能从 Phase930 训练状态迁移到同 case 的未见 candidate 状态。
+```
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase936_same_case_candidate_residual_holdout.py
+tests/glm5/run_phase936_same_case_candidate_residual_holdout.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase936_same_case_candidate_residual_holdout/same_case_candidate_residual_holdout/
+```
+
+脚本按顺序尝试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+qwen3 和 DS7B 因缺少 punctuation_period holdout seeds 跳过；GLM4 完成模型加载、测试和显存释放。
+
+### 三、测试原理
+
+Phase930/932/933 使用的是 selected states。Phase936 改用 Phase925 candidate states 中未出现在 selected/training key 里的 punctuation_period 状态。
+
+训练状态残差：
+
+```text
+G_common = fixed_topfreq_64
+
+R_train_case_inter(c) =
+  intersection_s_in_train(c) G_state(s) - G_common
+
+R_train_case_union(c) =
+  union_s_in_train(c) G_state(s) - G_common
+```
+
+在未见 candidate 状态 s' 上测试：
+
+```text
+G_test_inter(s') = G_common + R_train_case_inter(case(s'))
+G_test_union(s') = G_common + R_train_case_union(case(s'))
+```
+
+对照组：
+
+```text
+1. coordinate_only
+2. fixed_topfreq_64
+3. fixed + train_case_inter_residual
+4. fixed + train_case_union_residual
+5. fixed + noncase_inter_size_control
+6. fixed + noncase_union_size_control
+7. fixed + pseudorandom_inter_size_control
+8. fixed + pseudorandom_union_size_control
+9. state_specific_margin_support_pos_64
+```
+
+缩放因子：
+
+```text
+2.1
+2.25
+```
+
+判定指标：
+
+```text
+top1
+margin_nonnegative
+strict_clean_candidate
+target_state_coverage_top1
+mean_margin_delta_vs_coordinate_base
+```
+
+### 四、客观结果
+
+GLM4 数据可用性：
+
+```text
+phase925_selected_punctuation_keys = 30
+candidate_punctuation_rows = 264
+deduped_unseen_punctuation_states = 234
+selected_holdout_states = 90
+
+selected_holdout_cases:
+  wood  = 30
+  chair = 30
+  shark = 30
+
+new_case_available = false
+```
+
+实际运行：
+
+```text
+rows = 10710
+coordinate_baseline_rows = 630
+candidate_rows = 10080
+unique_states = 90
+unique_cases = 3
+candidate_top1 = 5840
+candidate_margin_nonnegative = 5840
+candidate_strict_clean_candidate = 0
+target_state_coverage_top1 = 90
+target_state_coverage_strict = 0
+```
+
+主要 coverage：
+
+```text
+fixed_plus_train_case_inter_residual, factor=2.25:
+  all = 90/90
+  wood = 30/30
+  chair = 30/30
+  shark = 30/30
+
+fixed_plus_train_case_union_residual, factor=2.25:
+  all = 90/90
+  wood = 30/30
+  chair = 30/30
+  shark = 30/30
+
+state_specific_margin_support_pos_64, factor=2.25:
+  all = 90/90
+```
+
+关键对照：
+
+```text
+fixed_topfreq_64, factor=2.25:
+  all = 60/90
+  wood = 30/30
+  chair = 0/30
+  shark = 30/30
+
+fixed_plus_noncase_inter_size_control, factor=2.25:
+  all = 60/90
+  chair = 0/30
+
+fixed_plus_noncase_union_size_control, factor=2.25:
+  all = 60/90
+  chair = 0/30
+
+fixed_plus_pseudorandom_inter_size_control, factor=2.25:
+  all = 59/90
+  chair = 0/30
+
+fixed_plus_pseudorandom_union_size_control, factor=2.25:
+  all = 55/90
+  chair = 0/30
+```
+
+chair case 的 2.25 结果：
+
+```text
+fixed_plus_train_case_union_residual:
+  top1 rows = 210/210
+  states = 30/30
+  mean_delta = 6.735714285714286
+
+fixed_plus_train_case_inter_residual:
+  top1 rows = 210/210
+  states = 30/30
+  mean_delta = 6.663988095238095
+
+fixed_topfreq_64:
+  top1 rows = 0/210
+  states = 0/30
+  mean_delta = 4.64702380952381
+
+noncase / pseudorandom size controls:
+  top1 states = 0/30
+```
+
+### 五、结果分析
+
+Phase936 的正结果：
+
+```text
+用 Phase930/selected states 统计出来的 train_case_residual，
+可以迁移到同 case 的未见 candidate states。
+```
+
+这比 Phase933 的 leave-one-state-out 更进一步，因为测试状态不是 selected states 内部留一，而是来自 Phase925 candidate pool 的更大未见集合。
+
+最关键现象是 chair：
+
+```text
+fixed_topfreq_64 无法修复 chair：0/30
+同大小 noncase / pseudorandom controls 也无法修复 chair：0/30
+train_case_residual 可以修复 chair：30/30
+```
+
+因此当前证据支持：
+
+```text
+chair 的 residual 齿形不是单个 selected state 的偶然特征；
+它至少在同 case 的未见 candidate 状态中稳定存在。
+```
+
+但证据不能升级为：
+
+```text
+new semantic-domain generalization
+natural gate closure
+strict-clean closure
+language encoding closure
+```
+
+因为新 case 不存在，且 strict_clean 仍为 0。
+
+### 六、硬伤与边界
+
+Phase936 的主要边界：
+
+```text
+1. 只完成 GLM4，qwen3 / DS7B 没有 punctuation_period seeds。
+2. 只有 wood/chair/shark 三个旧 case。
+3. 未见 candidate states 仍来自同一数据生成体系，可能和 selected states 共享模板偏差。
+4. factor=2.25 仍是人为缩放，不是自然门控。
+5. strict_clean_candidate = 0。
+6. patched_blocker_class 仍全部是 punctuation_period，没有进入完整 blocker 类迁移。
+```
+
+因此最严格结论是：
+
+```text
+same-case residual shape transfer positive；
+not new-case residual generalization。
+```
+
+### 七、闭合标准与当前距离
+
+当前已经完成：
+
+```text
+1. 固定公共齿轮能处理 wood/shark。
+2. chair 需要 case residual。
+3. case residual 不是同大小 group control。
+4. case residual 可迁移到同 case 未见 candidate states。
+```
+
+距离闭合仍差：
+
+```text
+1. 新 case / 新语义域 holdout。
+2. 跨模型 qwen3 / DS7B 复现。
+3. 自然门控变量，不依赖 case 标签选择 residual。
+4. strict-clean 输出清理。
+5. 从 punctuation_period 扩展到更多 blocker 类。
+```
+
+### 八、智能理论洞察
+
+Phase936 说明当前图谱里有一类比较稳定的对象-边界残差齿形：
+
+```text
+同一个语义对象 case 内，
+不同表面状态可能共享一部分 residual gear geometry。
+```
+
+这符合“先完成图谱再追求闭合”的路线：
+
+```text
+先证明齿形在局部对象域内稳定；
+再测试它是否跨对象、跨语义域、跨模型稳定；
+最后才讨论自然门控和语言编码机制闭合。
+```
+
+当前更像是在拼出：
+
+```text
+object-specific residual manifold
+```
+
+而不是已经找到：
+
+```text
+universal language coding mechanism
+```
+
+### 九、下一阶段任务
+
+Phase936 已完成当前可用数据池内的同 case 未见状态迁移审计。下一阶段不应继续在这三个旧 case 上反复加补丁，而应先扩展数据：
+
+```text
+Phase937: punctuation_period 新 case / 新语义域 seed 构造与审计
+```
+
+任务：
+
+```text
+1. 为 GLM4 构造新 object / material / animal / action / abstract cases。
+2. 为 qwen3 和 DS7B 重建 punctuation_period candidate seeds。
+3. 保留 wood/chair/shark 作为旧域参考。
+4. 测试 train_case_residual 是否能跨 case 外推，或是否只能在同 case 内稳定。
+5. 若新 case 中再次出现 residual-needed，重新审计 gate candidate 是否仍 case-confounded。
+```
+
+这属于数据扩展与新阶段，不应把 Phase936 的同 case 正结果过度外推。
+
+### 十、通俗总结
+
+Phase936 问：
+
+```text
+chair 的额外齿形是不是只对原来的 10 个样本有效？
+```
+
+结果是：
+
+```text
+不是。
+在另外 30 个没参与残差统计的 chair 候选状态上，
+同一个 chair residual 仍然有效。
+```
+
+但它还没有回答：
+
+```text
+这个齿形能不能迁移到新的物体、新语义域、别的模型？
+模型是不是自然知道什么时候该用它？
+```
+
+所以当前结论是：
+
+```text
+同 case 齿形稳定性增强；
+跨域泛化与自然门控仍未完成。
+```
+
+## Phase 937: 语义复用-差分状态图谱审计 [2026-07-04 22:09]
+
+### 一、问题来源
+
+最新附件提出的问题是：
+
+```text
+如果要知道深度神经网络的编码机制，
+水果如何复用神经元？
+不同水果如何差异化？
+颜色属性如何跨物体复用？
+功能在网络内部的脉络是什么？
+```
+
+附件中的总体方向基本正确：
+
+```text
+概念不是单点神经元；
+概念更像分布式状态场。
+
+水果、颜色、功能不是孤立点；
+它们可能表现为共享因子、差异因子、关系绑定和候选门控。
+```
+
+但必须收紧证据层级：
+
+```text
+“水果公共子空间”
+“红色属性方向”
+“功能关系路径”
+
+这些目前是待验证结构，
+不能直接写成已经发现的真实机制。
+```
+
+Phase936 已经给出一个输出边界层面的复用-差分例子：
+
+```text
+G_common 可处理 wood / shark；
+chair 需要 R_case(chair)；
+R_case(chair) 可迁移到同 case 未见状态。
+```
+
+Phase937 的任务是把这个思路前移到语义状态层，先做非干预型图谱审计：
+
+```text
+对象、类别、颜色、功能是否在隐藏状态中表现出可观测的共享与差分结构？
+```
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/glm5/phase937_semantic_reuse_difference_state_atlas.py
+tests/glm5/run_phase937_semantic_reuse_difference_state_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase937_semantic_reuse_difference_state_atlas/semantic_reuse_difference_state_atlas/
+```
+
+本阶段按顺序完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型跑完后释放显存。
+
+### 三、测试数据
+
+构造 5 个语义域：
+
+```text
+fruit
+animal
+vehicle
+tool
+material
+```
+
+每个语义域 6 个对象，共 30 个对象。
+
+每个对象测试 3 类关系：
+
+```text
+category
+color
+function
+```
+
+每类关系 2 个模板，因此每个模型：
+
+```text
+30 objects * 3 relations * 2 templates = 180 prompts
+```
+
+示例：
+
+```text
+In one word, an apple is a type of
+The typical color of an apple is
+An apple can often
+```
+
+目标标签：
+
+```text
+category:
+  fruit / animal / vehicle / tool / material
+
+color:
+  red / yellow / gray / silver / white / ...
+
+function:
+  eat / fly / swim / transport / cut / ...
+```
+
+### 四、测试原理
+
+对每个 prompt 提取多个 hidden index 的最后 token 状态：
+
+```text
+h_l(x)
+```
+
+自动选层：
+
+```text
+0, 1/4, 1/2, 3/4, final
+```
+
+对某个 relation 和 hidden index，计算：
+
+#### 1. 同目标标签复用差
+
+```text
+same_target_mean_cos =
+  mean cos(h_i, h_j), target_i = target_j
+
+diff_target_mean_cos =
+  mean cos(h_i, h_j), target_i != target_j
+
+target_reuse_gap =
+  same_target_mean_cos - diff_target_mean_cos
+```
+
+如果 `target_reuse_gap > 0`，说明同一类别、颜色或功能的状态更相似。
+
+#### 2. 跨域同属性复用差
+
+```text
+same_target_cross_domain_mean_cos =
+  mean cos(h_i, h_j),
+  target_i = target_j, domain_i != domain_j
+
+diff_target_cross_domain_mean_cos =
+  mean cos(h_i, h_j),
+  target_i != target_j, domain_i != domain_j
+
+cross_domain_target_gap =
+  same_target_cross_domain_mean_cos
+  -
+  diff_target_cross_domain_mean_cos
+```
+
+这个指标更接近：
+
+```text
+红色是否跨 apple / car / cardinal 复用？
+transport 是否跨 car / bus / train 复用？
+```
+
+#### 3. 模板留出最近中心分类
+
+用一个模板形成各 target label 的中心：
+
+```text
+\mu_y = mean h_l(x), target(x)=y
+```
+
+再用另一个模板测试：
+
+```text
+\hat y =
+argmax_y cos(h_l(x), \mu_y)
+```
+
+得到：
+
+```text
+template_holdout_centroid_accuracy
+```
+
+这个指标用来减少模板文字本身造成的伪相似。
+
+#### 4. 对象差异残差稳定性
+
+对每个 target label 中心：
+
+```text
+r_o(x) = h_l(x) - \mu_{target(x)}
+```
+
+比较同对象跨模板 residual 与同标签不同对象 residual：
+
+```text
+object_residual_stability_gap
+```
+
+这个指标尝试观察：
+
+```text
+公共因子去掉后，对象差异是否仍稳定。
+```
+
+### 五、客观结果
+
+#### qwen3
+
+总体：
+
+```text
+evidence = semantic_reuse_difference_signals_observed
+target_rank_mean = 153.80555555555554
+target_rank_top1 = 190 / 900 layer-rows
+target_rank_top10 = 580 / 900 layer-rows
+```
+
+最佳 relation 结果：
+
+```text
+category, hidden_idx=9:
+  accuracy = 0.7333333333333333
+  chance = 0.2
+  target_reuse_gap = 0.020418443916497164
+
+color, hidden_idx=36:
+  accuracy = 0.8
+  chance = 0.1
+  target_reuse_gap = 0.031255529731637144
+  cross_domain_target_gap = 0.010465477100007226
+  object_residual_stability_gap = 0.4881557787932582
+
+function, hidden_idx=27:
+  accuracy = 0.5666666666666667
+  chance = 0.05555555555555555
+  target_reuse_gap = 0.02034485157879451
+  cross_domain_target_gap = 0.009549365870738291
+```
+
+qwen3 的结果是本阶段最清楚的正结果：
+
+```text
+类别、颜色、功能三类 relation 都有高于机会水平的模板留出分类；
+颜色 relation 同时出现正 target_reuse_gap 和正 cross_domain_target_gap。
+```
+
+#### GLM4
+
+总体：
+
+```text
+evidence = semantic_reuse_difference_signal_weak_or_absent
+target_rank_mean = 13242.555555555555
+target_rank_top1 = 95 / 900 layer-rows
+target_rank_top10 = 230 / 900 layer-rows
+```
+
+最佳 relation 结果：
+
+```text
+category, hidden_idx=10:
+  accuracy = 0.21666666666666667
+  chance = 0.2
+  target_reuse_gap = -0.025527800928161648
+
+color, hidden_idx=30:
+  accuracy = 0.16666666666666666
+  chance = 0.1
+  target_reuse_gap = -0.009039415745926038
+  cross_domain_target_gap = -0.0048782713576625
+
+function, hidden_idx=30:
+  accuracy = 0.05
+  chance = 0.05555555555555555
+  target_reuse_gap = -0.05293570986330637
+```
+
+GLM4 在这套英文模板上的语义复用-差分信号很弱。这个负结果重要，因为它提醒：
+
+```text
+Phase936 的 GLM4 输出边界齿轮结果，
+不能直接推出 GLM4 在英文语义状态层也有清晰的同构结构。
+```
+
+也可能说明：
+
+```text
+GLM4 对这些英文模板/目标词的状态组织方式不同；
+需要增加中文模板或 GLM4 更自然的问题格式。
+```
+
+#### DS7B
+
+总体：
+
+```text
+evidence = semantic_reuse_difference_signals_observed
+target_rank_mean = 3300.45
+target_rank_top1 = 95 / 900 layer-rows
+target_rank_top10 = 310 / 900 layer-rows
+```
+
+最佳 relation 结果：
+
+```text
+category, hidden_idx=14:
+  accuracy = 0.7333333333333333
+  chance = 0.2
+  target_reuse_gap = 0.01603701621896092
+
+color, hidden_idx=7:
+  accuracy = 0.9333333333333333
+  chance = 0.1
+  target_reuse_gap = -0.00021244926287533605
+  cross_domain_target_gap = -0.0020608995187471058
+
+function, hidden_idx=14:
+  accuracy = 0.55
+  chance = 0.05555555555555555
+  target_reuse_gap = -0.03201946720304272
+  cross_domain_target_gap = 0.055684905580318245
+```
+
+DS7B 的结果显示：
+
+```text
+category 有较清楚复用信号；
+function 有较强跨域同目标 gap；
+color 的最近中心分类很强，但 pairwise reuse gap 接近 0 或略负。
+```
+
+所以 DS7B 的 color 结果不能简单写成“颜色公共子空间已找到”，更可能是：
+
+```text
+centroid 分类能区分颜色标签；
+但全局 pairwise 同色相似性未稳定超过异色相似性。
+```
+
+### 六、结果分析
+
+Phase937 的正结果：
+
+```text
+qwen3 和 DS7B 在隐藏状态中出现了可观测的语义复用/差分信号。
+```
+
+最可信的现象：
+
+```text
+1. qwen3 的 category / color / function 均高于机会水平。
+2. qwen3 的 color 有正跨域同属性 gap。
+3. DS7B 的 category 和 function 有明显高于机会水平的模板留出分类。
+4. 部分功能标签跨域出现正 gap，例如 transport / eat / hold 这类关系可能存在弱复用。
+```
+
+负结果同样重要：
+
+```text
+1. GLM4 在当前英文模板上信号弱。
+2. 多数 object_residual_stability_gap 为负。
+3. DS7B color 分类高，但 pairwise 同色复用 gap 不强。
+```
+
+这说明当前数据支持：
+
+```text
+隐藏状态中存在 relation-conditioned semantic clustering。
+```
+
+但还不能证明：
+
+```text
+存在干净的水果公共子空间；
+存在干净的红色方向；
+存在可直接复用的功能神经元组；
+对象差异残差已稳定分离。
+```
+
+### 七、与 Phase936 的关系
+
+Phase936 是输出边界层：
+
+```text
+G_common + R_case(chair)
+```
+
+Phase937 是语义状态层：
+
+```text
+category / color / function 的 hidden-state reuse-difference atlas
+```
+
+二者共同支持一个更谨慎的结构：
+
+```text
+模型内部可能同时存在：
+
+1. 语义状态层的 relation-conditioned clustering；
+2. 输出边界层的 common gear + case residual；
+3. 二者之间尚未建立因果桥。
+```
+
+也就是说：
+
+```text
+语义复用信号存在；
+边界齿轮复用信号也存在；
+但从语义复用到输出边界齿轮的传递链还没有闭合。
+```
+
+### 八、硬伤与边界
+
+Phase937 的硬伤：
+
+```text
+1. 非干预实验，只是 hidden state 几何审计。
+2. 使用英文模板，GLM4 可能不适配。
+3. 只有 2 个模板，模板留出强度还不够。
+4. 颜色和功能标签分布不完全均衡。
+5. object_residual_stability_gap 多数为负，说明差异残差分解方法还粗糙。
+6. 没有证明这些方向会因果影响输出。
+7. 没有 patch / ablation / cross-domain causal transfer。
+```
+
+因此证据层级应写成：
+
+```text
+semantic reuse-difference state signals observed in qwen3 and DS7B；
+weak/absent in GLM4 under current English prompts；
+not causal semantic factor closure。
+```
+
+### 九、闭合标准与当前距离
+
+若要证明“水果如何复用、颜色如何跨对象复用”，闭合标准至少需要：
+
+```text
+1. 观测层：
+   同类别 / 同属性 / 同功能在模板留出下稳定聚类。
+
+2. 跨域层：
+   同颜色或同功能跨不同对象域仍稳定相似。
+
+3. 差分层：
+   去掉公共因子后，对象差异 residual 可稳定复现。
+
+4. 因果层：
+   patch / ablation 某个候选方向会按预期改变答案或候选 logit。
+
+5. 跨模型层：
+   qwen3 / GLM4 / DS7B 至少有部分同构指标。
+```
+
+Phase937 目前完成：
+
+```text
+观测层：部分完成，qwen3 和 DS7B 较强。
+跨域层：部分完成，qwen3 color 和 DS7B function 有正结果。
+差分层：未完成，多数 residual gap 为负。
+因果层：未开始。
+跨模型层：不一致，GLM4 当前弱。
+```
+
+因此距离“编码机制闭合”仍然较远。
+
+### 十、智能理论洞察
+
+Phase937 给出的关键拼图是：
+
+```text
+语言编码机制不应只看最后输出齿轮；
+也不能只看单点神经元；
+需要把语义状态层和输出边界层连成图谱。
+```
+
+当前最谨慎公式可以写成：
+
+```text
+h_l(x)
+  contains:
+    relation-conditioned semantic clustering
+    domain/category factors
+    attribute/function weak reuse factors
+    template/context components
+    object-specific residue
+```
+
+而输出阶段仍然是：
+
+```text
+G_eff(x)
+=
+G_common
+∪ R_case(case(x))
+∪ R_state(x)
+```
+
+尚未闭合的关键桥是：
+
+```text
+semantic factor
+  -> natural gate
+  -> boundary gear / case residual
+  -> clean output
+```
+
+### 十一、下一阶段任务
+
+Phase937 完成了当前阶段的第一步：
+
+```text
+跨模型语义复用-差分状态图谱审计。
+```
+
+下一步进入新的因果子阶段：
+
+```text
+Phase938: semantic factor causal transfer audit
+```
+
+建议任务：
+
+```text
+1. 增加中文模板，重新测试 GLM4。
+2. 为 category / color / function 构造方向：
+   d_y = mean(h | target=y) - mean(h | target!=y)
+3. 在留出对象和跨域对象上做方向 patch。
+4. 测试目标 label logit/rank 是否按预期移动。
+5. 加入随机方向和错配标签方向对照。
+6. 若因果方向成立，再连接到 Phase936 的 boundary gear。
+```
+
+这已经是新的因果测试子阶段，不应把 Phase937 的观测正结果提前写成机制闭合。
+
+### 十二、通俗总结
+
+Phase937 问：
+
+```text
+水果、颜色、功能这些东西，
+在模型隐藏状态里有没有“同类更像同类”的迹象？
+```
+
+结果是：
+
+```text
+qwen3 有比较清楚的迹象；
+DS7B 也有一部分迹象；
+GLM4 在当前英文模板上不明显。
+```
+
+这说明：
+
+```text
+“复用 + 差分”的方向值得继续；
+但现在看到的只是隐藏状态图谱信号，
+还不是因果机制。
+```
+
+下一步要做的是：
+
+```text
+把这些候选方向拿去做 patch / ablation，
+看它们是否真的能改变颜色、类别、功能答案。
+```
+
+## Phase 938: 语义因子因果迁移审计 [2026-07-04 22:25]
+
+### 一、对附件判断的核对
+
+附件中对 Phase937 的判断基本正确，尤其是证据层级收得比较稳：
+
+```text
+Phase937 不是语义编码机制闭合；
+不是证明“水果/颜色/功能”的自然因果齿轮；
+而是证明在 qwen3 和 DS7B 的隐藏状态中，
+已经能观察到 relation-conditioned semantic clustering 的图谱信号。
+```
+
+这部分判断应保留。
+
+同时，附件提出的下一步也正确：
+
+```text
+不能继续停在相似度/聚类观察；
+必须把候选语义方向拿去做因果迁移审计；
+看它们是否能在留出模板上推动目标 label 的 logit / margin / rank。
+```
+
+因此本阶段接续 Phase937，进入 Phase938。
+
+### 二、本阶段任务
+
+本阶段测试目标：
+
+```text
+从 Phase937 观察到的语义状态图谱中，
+为 category / color / function 构造候选语义方向；
+再把这些方向迁移 patch 到另一模板，
+检查目标 label 是否按预期移动。
+```
+
+测试不是直接闭合语言编码机制，而是验证一条较短的因果链：
+
+```text
+relation-conditioned semantic factor
+  -> hidden-state direction patch
+  -> target label logit / margin / rank movement
+```
+
+### 三、测试脚本和结果位置
+
+新增脚本：
+
+```text
+tests/glm5/phase938_semantic_factor_causal_transfer_audit.py
+tests/glm5/run_phase938_semantic_factor_causal_transfer_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase938_semantic_factor_causal_transfer_audit/semantic_factor_causal_transfer_audit/
+```
+
+核心结果文件：
+
+```text
+phase938_cross_model_summary.md
+phase938_cross_model_summary.json
+phase938_qwen3_summary.json
+phase938_glm4_summary.json
+phase938_deepseek7b_summary.json
+phase938_qwen3_rows.jsonl
+phase938_glm4_rows.jsonl
+phase938_deepseek7b_rows.jsonl
+```
+
+### 四、测试原理
+
+对每个模型、关系类型、标签和候选层，构造语义方向：
+
+```text
+d_{r,y,l,t}
+=
+mean(h_l(x) | relation=r, target=y, template=t)
+-
+mean(h_l(x) | relation=r, target!=y, template=t)
+```
+
+其中：
+
+```text
+r: category / color / function
+y: 目标标签
+l: 候选隐藏层
+t: 训练模板
+h_l(x): 第 l 层最后位置 hidden state
+```
+
+然后在另一模板上做迁移 patch：
+
+```text
+h'_l(x) = h_l(x) + alpha * d_{r,y,l,t}
+```
+
+比较：
+
+```text
+baseline
+target_direction
+wrong_label_direction
+random_same_norm
+negative_target_direction
+```
+
+输出指标：
+
+```text
+target logit delta = z'_y - z_y
+
+target margin delta
+=
+(z'_y - max_{y' != y} z'_{y'})
+-
+(z_y - max_{y' != y} z_{y'})
+
+rank improved
+new relation winner
+```
+
+### 五、数据规模
+
+本阶段按 qwen3、GLM4、DS7B 顺序运行，避免同时占用 GPU。
+
+```text
+每个模型 direction specs: 38
+每个模型结果 rows: 1368
+三模型总 rows: 4104
+关系类型: category / color / function
+patch alpha: 0.5 / 1.0
+```
+
+这比 Phase937 更进一步，因为它不再只观察隐藏状态相似度，而是做方向迁移干预。
+
+### 六、客观结果
+
+#### 1. qwen3
+
+总体结果：
+
+```text
+target_direction alpha=1.0:
+  mean logit delta  = +0.4453
+  mean margin delta = +0.6525
+  rank improved     = 70 / 152
+  new winner        = 18 / 152
+
+random_same_norm alpha=1.0:
+  mean margin delta = -0.0140
+
+wrong_label_direction alpha=1.0:
+  mean margin delta = -0.9552
+
+negative_target_direction alpha=1.0:
+  mean margin delta = -0.9741
+```
+
+分关系结果：
+
+```text
+category target alpha=1.0:
+  margin delta = +0.3042
+  random control best = +0.0302
+
+color target alpha=1.0:
+  margin delta = +0.7315
+  random control best = +0.0231
+
+function target alpha=1.0:
+  margin delta = +1.0905
+  random control best = -0.1365
+```
+
+qwen3 是本阶段最干净的正结果：
+
+```text
+target direction 明显优于随机方向、错配方向和反方向；
+三类关系均出现正向 margin 迁移；
+function 和 color 最强，category 较弱但仍为正。
+```
+
+#### 2. GLM4
+
+总体结果：
+
+```text
+target_direction alpha=1.0:
+  mean logit delta  = +4.4645
+  mean margin delta = +2.2177
+  rank improved     = 104 / 152
+  new winner        = 63 / 152
+```
+
+但控制项也很大：
+
+```text
+random_same_norm alpha=1.0:
+  mean margin delta = +1.9296
+
+wrong_label_direction alpha=1.0:
+  mean margin delta = +1.3991
+
+negative_target_direction alpha=1.0:
+  mean margin delta = +1.2804
+```
+
+分关系看：
+
+```text
+category:
+  target margin delta = +2.2708
+  control best        = +2.1879
+  target-control gap  = +0.0829
+
+color:
+  target margin delta = +1.8600
+  control best        = +1.8953
+  target-control gap  = -0.0353
+
+function:
+  target margin delta = +2.6423
+  control best        = +1.5975
+  target-control gap  = +1.0448
+```
+
+GLM4 的结果不能简单写成干净因果正结果。更谨慎的判断是：
+
+```text
+function 方向存在较清楚的 target-specific 正结果；
+category / color 下 target direction 与控制方向差距很小；
+GLM4 当前更像对隐藏状态扰动高度敏感，
+需要中文模板、方向正交化和 size-control 复测。
+```
+
+运行层面还发现：
+
+```text
+GLM4 结果已经完整写出；
+但 Python 进程在释放资源/退出阶段出现 segmentation fault；
+因此后续 DS7B 改为单独继续运行。
+```
+
+这不影响已保存结果，但属于工程稳定性硬伤，需要后续修复。
+
+#### 3. DS7B
+
+总体结果：
+
+```text
+target_direction alpha=1.0:
+  mean logit delta  = +0.3828
+  mean margin delta = +0.3458
+  rank improved     = 77 / 152
+  new winner        = 5 / 152
+
+random_same_norm alpha=1.0:
+  mean margin delta = +0.0646
+
+wrong_label_direction alpha=1.0:
+  mean margin delta = -0.3181
+
+negative_target_direction alpha=1.0:
+  mean margin delta = -0.4819
+```
+
+分关系结果：
+
+```text
+category target alpha=1.0:
+  margin delta = +0.6365
+  random control best = +0.1278
+
+color target alpha=1.0:
+  margin delta = +0.1481
+  random control best = +0.0318
+
+function target alpha=1.0:
+  margin delta = +0.1678
+  random control best = +0.0115
+```
+
+DS7B 的结果为正，但弱于 qwen3：
+
+```text
+category 最强；
+color / function 有正向迁移但幅度较小；
+整体仍优于错配方向和反方向。
+```
+
+### 七、跨模型判断
+
+本阶段最稳的现象：
+
+```text
+qwen3:
+  语义方向具有较干净的因果迁移效果。
+
+DS7B:
+  语义方向也有因果迁移效果，但强度较弱。
+
+GLM4:
+  存在 target movement，
+  但 category / color 被强控制项污染；
+  function 较可信。
+```
+
+因此 Phase938 的总判断是：
+
+```text
+semantic factor causal transfer 有初步正结果；
+但只在 qwen3 最清晰，DS7B 次之，GLM4 需要重测和收紧。
+```
+
+不能写成：
+
+```text
+已经发现跨模型共享语义编码机制；
+已经闭合水果/颜色/功能复用规则；
+已经完成语义场到输出边界的自然路线闭合。
+```
+
+### 八、和 Phase937 的关系
+
+Phase937 证明的是：
+
+```text
+隐藏状态中存在 relation-conditioned semantic clustering 信号。
+```
+
+Phase938 进一步证明：
+
+```text
+至少在 qwen3 和 DS7B 中，
+从这些聚类构造出的差分方向，
+可以在留出模板上推动目标标签的 logit / margin / rank。
+```
+
+所以证据层级从：
+
+```text
+observational state map
+```
+
+推进到：
+
+```text
+direction-level causal transfer
+```
+
+但仍然没有到：
+
+```text
+natural gate closure
+boundary gear closure
+full vocabulary closure
+multi-token semantic generation closure
+```
+
+### 九、闭合标准与当前距离
+
+若要真正回答“水果如何复用神经元、颜色如何跨对象复用、不同对象如何差异化”，至少还需要：
+
+```text
+1. 语义方向跨模板稳定。
+2. 语义方向跨语言稳定，尤其需要中文模板复测 GLM4。
+3. target direction 必须显著强于 same-norm random / wrong label / negative direction。
+4. 方向 patch 不能只是 generic perturbation。
+5. 方向要能预测未见对象、未见属性组合。
+6. 方向要连接到 boundary gear / clean protocol edge。
+7. 多 token 生成路径必须能解释，而不是只解释第一 token label。
+```
+
+Phase938 当前完成：
+
+```text
+1. qwen3: 完成较好。
+2. DS7B: 部分完成。
+3. GLM4: function 部分完成；category / color 未完成。
+4. boundary gear 连接: 未完成。
+5. full-vocab blocker: 未完成。
+6. 多 token 自然生成: 未完成。
+```
+
+因此距离语言编码机制闭合仍然较远。
+
+### 十、问题、硬伤和瓶颈
+
+当前主要硬伤：
+
+```text
+1. GLM4 控制项过强，说明当前方向 patch 混入了大量 generic perturbation。
+2. 仍是第一 token label 测试，没有进入自然多 token 生成。
+3. direction 是人工构造，不等于模型自然 gate。
+4. 样本关系只有 category / color / function 三类，语义空间仍很小。
+5. 未把 Phase936 的 case residual / boundary gear 与语义方向连接起来。
+6. GLM4 运行结束存在 segmentation fault，工程稳定性不足。
+```
+
+因此本阶段不能做大理论收束，只能作为图谱中的一块因果拼图。
+
+### 十一、智能理论角度的关键洞察
+
+本阶段最重要的拼图不是“语义已经闭合”，而是：
+
+```text
+语义状态图谱中的某些差分方向，
+已经可以作为可干预变量，
+影响输出竞争场。
+```
+
+这说明当前路线应继续把语言机制拆成三层：
+
+```text
+semantic state layer:
+  类别、颜色、功能、对象差异等语义状态因子。
+
+gate / route layer:
+  哪些状态因子在当前上下文被调用。
+
+boundary / output layer:
+  这些状态因子如何进入 token 竞争场并击败 blocker。
+```
+
+Phase938 只连接了第一层到输出 label 的短桥，还没有找到自然 gate。
+
+### 十二、下一阶段任务
+
+Phase938 已完成当前阶段的因果迁移第一步。
+
+下一阶段建议为：
+
+```text
+Phase939: 中文模板与方向特异性收紧审计
+```
+
+具体任务：
+
+```text
+1. 增加中文模板，优先重测 GLM4。
+2. 对 target direction 做 generic perturbation 扣除：
+   d_specific = d_target - projection(d_target, random/generic subspace)
+3. 增加 same-size / same-norm / same-logit-baseline 控制。
+4. 检查 direction 在未见对象和未见属性组合上的迁移。
+5. 把通过审计的 semantic direction 接到 Phase936 的 boundary gear。
+```
+
+这仍属于当前“语义状态图谱 -> 因果方向 -> 输出边界”的阶段性目标，但 Phase939 已经是新的收紧子阶段，需要单独执行。
+
+### 十三、通俗总结
+
+Phase937 只是看到：
+
+```text
+同类东西在模型隐藏状态里更像同类。
+```
+
+Phase938 做的是：
+
+```text
+把“像同类”的方向拿出来，
+轻轻推一下模型隐藏状态，
+看答案会不会往对应类别、颜色、功能移动。
+```
+
+结果是：
+
+```text
+qwen3 移动得比较干净；
+DS7B 也会移动，但弱一些；
+GLM4 会移动，不过很多非目标方向也会让它动，
+所以 GLM4 还不能算干净正结果。
+```
+
+这说明：
+
+```text
+语义复用方向确实可能是语言编码机制的一部分；
+但现在只找到了一段短因果链，
+还没有破解完整编码机制。
+```
+
+## Phase 939: 中文模板与方向特异性收紧审计 [2026-07-04 22:54]
+
+### 一、对附件判断的核对
+
+附件对 Phase938 的判断基本正确：
+
+```text
+Phase938 的证据层级应写成 direction-level causal transfer positive；
+不能写成 semantic mechanism closure；
+不能写成 natural semantic gate closure；
+也不能写成 full language coding closure。
+```
+
+其中最应保留的判断是：
+
+```text
+qwen3 的语义方向较干净；
+DS7B 有正迁移但较弱；
+GLM4 的 function 较可信，category / color 受 generic perturbation 污染。
+```
+
+附件提出的 Phase939 方向也正确：
+
+```text
+下一步不是继续堆 patch；
+而是确认 target direction 是否仍然具有目标特异性，
+并用中文模板复测 GLM4。
+```
+
+但附件中的 generic subspace 公式有一个需要修正的点：
+
+```text
+若把 -d_target 放入 generic subspace 再投影扣除，
+那么 d_target 会被自己的反方向张成的空间完全扣掉，
+导致 d_specific 接近 0。
+```
+
+因此本阶段采用更严格但不自毁的定义：
+
+```text
+generic basis = {wrong_mean_direction, template_or_language_shift}
+negative_target_direction 只作为控制项，不参与正交化扣除。
+```
+
+### 二、本阶段任务
+
+Phase939 的目标是：
+
+```text
+在中英文模板下，
+检查 Phase938 的语义方向是否仍然是 target-specific semantic factor，
+而不是模板、语言或通用扰动带来的假因果方向。
+```
+
+新增脚本：
+
+```text
+tests/glm5/phase939_bilingual_specificity_tightening_audit.py
+tests/glm5/run_phase939_bilingual_specificity_tightening_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase939_bilingual_specificity_tightening_audit/bilingual_specificity_tightening_audit/
+```
+
+### 三、测试原理
+
+本阶段保留 Phase938 的目标方向：
+
+```text
+d_target
+=
+mean(h_l | target=y, train_template)
+-
+mean(h_l | target!=y, train_template)
+```
+
+同时构造两个通用干扰方向：
+
+```text
+d_wrong_mean = mean(d_wrong_label)
+
+d_template_shift
+=
+mean(h_l | train_template)
+-
+mean(h_l | test_template)
+```
+
+然后做三种扣除：
+
+```text
+d_wrong_removed
+=
+d_target - Proj_{d_wrong_mean}(d_target)
+
+d_template_removed
+=
+d_target - Proj_{d_template_shift}(d_target)
+
+d_specific
+=
+d_target - Proj_{span(d_wrong_mean, d_template_shift)}(d_target)
+```
+
+patch 公式仍然是：
+
+```text
+h'_l(x) = h_l(x) + alpha * d
+```
+
+本阶段 alpha 固定为：
+
+```text
+alpha = 1.0
+```
+
+对照组包括：
+
+```text
+target_direction
+wrong_mean_subtracted
+template_subtracted
+specific_direction
+wrong_label_direction
+wrong_mean_direction
+random_same_norm
+negative_target_direction
+template_shift_same_norm
+```
+
+特异性指标：
+
+```text
+SpecificityGain(d)
+=
+DeltaMargin(d)
+-
+max(
+  DeltaMargin(wrong_label_direction),
+  DeltaMargin(wrong_mean_direction),
+  DeltaMargin(random_same_norm),
+  DeltaMargin(negative_target_direction),
+  DeltaMargin(template_shift_same_norm)
+)
+```
+
+只有当：
+
+```text
+DeltaMargin(d) > 0
+SpecificityGain(d) > 0
+```
+
+才认为方向在该 relation / language_pair 下有目标特异性。
+
+### 四、测试数据
+
+本阶段三模型顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+样本：
+
+```text
+对象数: 30
+关系: category / color / function
+语言: English / Chinese
+每种语言每个关系模板数: 2
+每模型输入样本数: 360
+```
+
+方向规格和结果行：
+
+```text
+qwen3:
+  direction_specs = 228
+  rows = 9120
+
+GLM4:
+  direction_specs = 192
+  rows = 7650
+
+DS7B:
+  direction_specs = 228
+  rows = 9120
+```
+
+GLM4 的 direction_specs 少于 qwen3 / DS7B，说明当前标签支持度、tokenizer 或有效方向构造存在模型差异，后续分析不能强行同构解释。
+
+### 五、客观结果
+
+#### 1. qwen3
+
+总体：
+
+```text
+target_direction:
+  mean margin delta = +0.4625
+
+template_subtracted:
+  mean margin delta = +0.4602
+
+specific_direction:
+  mean margin delta = +0.3084
+
+random_same_norm:
+  mean margin delta = -0.0377
+
+wrong_mean_direction:
+  mean margin delta = -0.4036
+
+negative_target_direction:
+  mean margin delta = -0.7163
+
+wrong_label_direction:
+  mean margin delta = -0.7344
+```
+
+qwen3 的正结果比较干净。扣除 wrong_mean 和 template_shift 后，specific_direction 仍为正，且明显高于多数控制项。
+
+重要 relation / language_pair：
+
+```text
+function en->en:
+  specific margin = +0.9063
+  control best    = +0.1891
+  gain            = +0.7171
+
+function zh->en:
+  specific margin = +0.8347
+  control best    = +0.2368
+  gain            = +0.5979
+
+color en->zh:
+  specific margin = +0.5911
+  control best    = +0.0761
+  gain            = +0.5150
+
+color zh->zh:
+  specific margin = +0.3976
+  control best    = +0.0521
+  gain            = +0.3455
+```
+
+但 qwen3 也暴露了一个限制：
+
+```text
+category 在正交化后明显变弱；
+category en->zh 的控制项很强；
+function en->zh 也被 template_shift_same_norm 控制项压住。
+```
+
+所以 qwen3 的可靠结论是：
+
+```text
+color / function 的双语特异性较强；
+category 仍不稳定。
+```
+
+#### 2. GLM4
+
+总体：
+
+```text
+target_direction:
+  mean margin delta = +2.2863
+
+specific_direction:
+  mean margin delta = +2.3994
+
+random_same_norm:
+  mean margin delta = +1.9768
+
+wrong_label_direction:
+  mean margin delta = +1.9000
+
+wrong_mean_direction:
+  mean margin delta = +1.8809
+
+negative_target_direction:
+  mean margin delta = +1.6942
+```
+
+GLM4 仍然存在强烈的 generic perturbation：
+
+```text
+几乎所有方向都会大幅推动 margin；
+所以不能只看 target_direction 或 specific_direction 的绝对值。
+```
+
+但中文模板确实带来一个重要改善：
+
+```text
+color zh->zh:
+  specific margin = +0.5956
+  control best    = -0.0184
+  gain            = +0.6140
+```
+
+这说明：
+
+```text
+GLM4 在中文模板下的 color 方向比 Phase938 的英文 color 更干净。
+```
+
+其他结果：
+
+```text
+color zh->en:
+  specific margin = +4.3619
+  control best    = +3.9258
+  gain            = +0.4361
+
+function en->en:
+  specific margin = +3.7821
+  control best    = +3.5946
+  gain            = +0.1875
+
+function zh->en:
+  specific margin = +4.0328
+  control best    = +3.8709
+  gain            = +0.1619
+```
+
+这些方向虽然 gain 为正，但 control best 也非常高，因此更谨慎地写成：
+
+```text
+GLM4 的 color zh->zh 是本阶段最干净的改善；
+function 仍有弱特异性；
+category 仍未通过特异性收紧；
+GLM4 的高绝对 margin 仍大量来自通用扰动。
+```
+
+category 结果：
+
+```text
+category zh->en specific:
+  margin = +4.0457
+  control best = +4.1603
+  gain = -0.1146
+
+category zh->zh specific:
+  margin = -0.1642
+  control best = +0.1026
+  gain = -0.2668
+```
+
+因此 GLM4 的 category 不能算正结果。
+
+#### 3. DS7B
+
+总体：
+
+```text
+target_direction:
+  mean margin delta = +0.2305
+
+template_subtracted:
+  mean margin delta = +0.2236
+
+specific_direction:
+  mean margin delta = +0.0700
+
+random_same_norm:
+  mean margin delta = -0.0078
+
+wrong_label_direction:
+  mean margin delta = -0.1524
+
+wrong_mean_direction:
+  mean margin delta = -0.1962
+
+negative_target_direction:
+  mean margin delta = -0.2758
+```
+
+DS7B 在 raw target_direction 上仍为正，但扣除后明显变弱。
+
+较稳结果：
+
+```text
+function en->en specific:
+  margin = +0.1809
+  control best = -0.0296
+  gain = +0.2105
+
+function zh->zh specific:
+  margin = +0.2646
+  control best = +0.2432
+  gain = +0.0214
+```
+
+弱或失败结果：
+
+```text
+category specific 多数为负或低于控制；
+color specific 多数接近 0；
+function en->zh / zh->en 被控制项压住。
+```
+
+因此 DS7B 的结论应收紧为：
+
+```text
+raw semantic transfer 仍存在；
+specific semantic transfer 只部分保留；
+跨语言特异性弱。
+```
+
+### 六、跨模型结论
+
+本阶段自动证据标签：
+
+```text
+bilingual_specific_semantic_transfer_retained: 2
+partial_specific_semantic_transfer_retained: 1
+```
+
+但人工校准后应写得更谨慎：
+
+```text
+qwen3:
+  color / function 的双语特异性较强；
+  category 不稳定。
+
+GLM4:
+  中文 color 明显改善；
+  function 有弱特异性；
+  category 仍失败；
+  通用扰动仍很强。
+
+DS7B:
+  raw transfer 为正；
+  正交化后只剩部分 function；
+  color / category 特异性不足。
+```
+
+所以 Phase939 的真实进展不是“完成语义方向闭合”，而是：
+
+```text
+把 Phase938 的正结果拆成了三类：
+
+1. 稳定特异方向：
+   qwen3 color/function；
+   GLM4 zh color。
+
+2. 有 raw transfer 但被控制项污染的方向：
+   GLM4 function；
+   DS7B 部分 category/function。
+
+3. 当前不稳定或失败方向：
+   多数 category；
+   DS7B color；
+   qwen3 en->zh category/function 的部分跨语方向。
+```
+
+### 七、理论进展
+
+Phase938 的公式是：
+
+```text
+semantic direction -> target label competition
+```
+
+Phase939 进一步拆成：
+
+```text
+raw semantic direction
+  =
+target-specific component
++
+template/language component
++
+wrong-label/generic component
++
+noise
+```
+
+当前更谨慎的表示是：
+
+```text
+d_target
+=
+d_specific
++
+P_wrong(d_target)
++
+P_template(d_target)
++
+epsilon
+```
+
+本阶段证明：
+
+```text
+部分 relation / language_pair 中 d_specific 仍有正因果作用；
+但很多 raw transfer 不是纯语义特异方向。
+```
+
+这对全局图谱很关键：
+
+```text
+语义因果图谱不能只记录 target_direction 是否有效；
+必须记录 specificity gain、language_pair、relation、control_best。
+```
+
+### 八、闭合标准与当前距离
+
+如果目标是解释“水果、颜色、功能如何复用神经元，并形成语言输出”，闭合标准至少仍包括：
+
+```text
+1. hidden-state semantic clustering。
+2. direction-level causal transfer。
+3. target-specific gain after controls。
+4. cross-language / cross-template retention。
+5. unseen object / unseen attribute generalization。
+6. semantic direction -> boundary gear bridge。
+7. multi-token natural rollout。
+8. full-vocabulary blocker suppression。
+```
+
+Phase939 当前完成情况：
+
+```text
+1. hidden-state semantic clustering:
+   Phase937 部分完成。
+
+2. direction-level causal transfer:
+   Phase938 完成初步正结果。
+
+3. target-specific gain:
+   Phase939 部分完成。
+
+4. cross-language retention:
+   qwen3 color/function 较好；
+   GLM4 color 有改善；
+   DS7B 较弱。
+
+5. unseen object / unseen attribute:
+   未完成。
+
+6. boundary gear bridge:
+   未完成。
+
+7. multi-token rollout:
+   未完成。
+
+8. full-vocabulary blocker:
+   未完成。
+```
+
+因此距离完整语言编码机制闭合仍然较远。
+
+### 九、问题、硬伤和瓶颈
+
+主要问题：
+
+```text
+1. 本阶段中文模板仍要求英文 label 输出，
+   因此它测试的是中文 prompt route + English label competition，
+   还不是纯中文 label 语义闭合。
+
+2. GLM4 的绝对 logit / margin 变化仍非常大，
+   说明其 hidden-state patch 对输出场整体扰动很强。
+
+3. category 方向在三模型中都不够稳，
+   可能 category 更依赖对象域、任务协议或更上层 route。
+
+4. DS7B 在正交化后明显变弱，
+   说明 Phase938 的部分正迁移可能混入模板/通用扰动。
+
+5. 仍然只测第一 token label，
+   没有进入自然多 token 生成。
+```
+
+### 十、智能理论角度的洞察
+
+本阶段给出的关键拼图是：
+
+```text
+语义复用不是一个单纯方向；
+它至少被 relation、language、template、label-specific component 共同调制。
+```
+
+更接近当前事实的三层图谱是：
+
+```text
+semantic state layer:
+  产生 raw target direction。
+
+specificity filter layer:
+  从 raw direction 中分离 target-specific component。
+
+output competition layer:
+  target-specific component 和 generic perturbation 同时影响 label margin。
+```
+
+因此后续破解语言机制不能只问：
+
+```text
+有没有一个 red direction？
+有没有一个 fruit direction？
+```
+
+而应问：
+
+```text
+在什么 relation、语言、模板、对象域下，
+red / fruit / function 的 target-specific component 能从 generic field 中分离出来？
+```
+
+### 十一、下一阶段任务
+
+Phase939 完成的是：
+
+```text
+中文模板与方向特异性收紧审计。
+```
+
+下一步自然是：
+
+```text
+Phase940: semantic direction -> boundary gear bridge audit
+```
+
+但 Phase940 已经切换到输出边界齿轮层，不属于 Phase939 的未完成尾部。
+
+建议 Phase940 只选择通过 Phase939 的方向：
+
+```text
+qwen3 color/function；
+GLM4 zh color；
+DS7B function en->en。
+```
+
+测试它们是否影响：
+
+```text
+Phase936 的 common gear；
+case residual；
+punctuation_period blocker；
+protocol / EOS boundary。
+```
+
+不能把未通过特异性审计的 category 方向直接拿去做边界桥，否则容易把 generic perturbation 误写成语义机制。
+
+### 十二、通俗总结
+
+Phase938 说明：
+
+```text
+某些语义方向一推，答案会往目标词移动。
+```
+
+Phase939 追问：
+
+```text
+这个移动是真的因为“语义方向”，
+还是因为随便推一下模型都会动？
+```
+
+结果是：
+
+```text
+qwen3 的颜色和功能方向比较像真的；
+GLM4 用中文问颜色时明显变干净；
+DS7B 只保留一小部分功能方向；
+类别方向整体还不稳。
+```
+
+所以当前更稳的结论是：
+
+```text
+语义编码机制中确实存在可干预的特异方向；
+但这些方向不是全局固定齿轮，
+而是受语言、模板、关系和模型结构共同调制。
+```
+
+## Phase 940: 语义方向到输出边界竞争桥接审计 [2026-07-04 23:18]
+
+### 一、对上传分析的判断
+
+上传内容对 Phase939 的判断基本正确，而且指出的下一步是必要的：
+
+```text
+Phase938 证明：部分语义方向可以移动目标关系 margin。
+Phase939 收紧：这些方向必须先经过 target-specific / template / wrong-label / noise 分解。
+下一步不应继续扩大语义方向本身，而应检查：
+这些通过审计的语义方向，是否能进入输出边界竞争场。
+```
+
+这条判断是正确的。尤其是 Phase939 修正后的公式很关键：generic subspace 不能把 `-d_target` 放进去，否则会把目标方向本身也投影掉，导致“特异性”被人为削弱。
+
+但必须收紧证据层级：
+
+```text
+Phase940 不能直接声称完成了 channel-level boundary gear closure。
+原因是 Phase936 的 same-case candidate residual holdout 在跨模型上并不完整：
+qwen3 和 DS7B 当时缺少可用 punctuation_period holdout seeds；
+GLM4 才有较完整的通道级边界残差信号。
+```
+
+因此本阶段把任务限定为：
+
+```text
+语义方向 -> first-token output boundary competition 的桥接审计。
+```
+
+也就是先问一个更基础、更客观的问题：
+
+```text
+通过 Phase939 特异性审计的语义方向，
+是否不仅能提高 relation target margin，
+还会同步改善 target 对 period / EOS / protocol / punctuation 等边界 token 的竞争优势？
+```
+
+### 二、测试脚本和结果位置
+
+新增正式测试脚本：
+
+```text
+tests/glm5/phase940_semantic_boundary_bridge_audit.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase940_semantic_boundary_bridge_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase940_semantic_boundary_bridge_audit/semantic_boundary_bridge_audit/
+```
+
+核心结果文件：
+
+```text
+phase940_cross_model_summary.json
+phase940_cross_model_summary.md
+phase940_qwen3_summary.json
+phase940_glm4_summary.json
+phase940_deepseek7b_summary.json
+```
+
+### 三、测试原理
+
+Phase940 不重新发明语义方向，而是复用 Phase939 中已经通过特异性筛选的方向。筛选条件为：
+
+```text
+direction_type = specific_direction
+specific margin >= 0.05
+specificity gain >= 0.05
+```
+
+然后在每个样本的目标层上进行方向干预：
+
+```text
+h'_l = h_l + alpha * d
+```
+
+其中：
+
+```text
+h_l : 指定层最后位置 hidden state
+d   : Phase939 构造出的语义方向或控制方向
+alpha = 1.0
+```
+
+对每个通过筛选的方向，同时测试：
+
+```text
+specific_direction
+target_direction
+random_same_norm
+wrong_mean_direction
+template_shift_same_norm
+negative_target_direction
+baseline
+```
+
+这样可以区分：
+
+```text
+语义特异方向导致的边界移动；
+目标均值方向导致的边界移动；
+模板/语言平移导致的边界移动；
+随机同范数扰动导致的边界移动；
+错误标签均值导致的边界移动；
+反向目标扰动导致的边界移动。
+```
+
+### 四、边界竞争指标
+
+本阶段定义多个边界 token 集合：
+
+```text
+period      : ".", "。"
+punctuation : ".", "。", ",", "，", ":", "：", ";", "；"
+protocol    : "\n", ":", "：", "Answer", "答案"
+eos         : tokenizer.eos_token_id
+all_boundary = period + punctuation + protocol + eos
+```
+
+对每个样本，计算：
+
+```text
+B_all = max logit(boundary tokens)
+M_boundary = z_target - B_all
+Delta M_boundary = M_boundary_after - M_boundary_before
+```
+
+同时保留：
+
+```text
+Delta M_relation = target logit 相对同关系其他标签的 margin 变化
+Delta M_period   = target logit 相对 period token 的 margin 变化
+Delta M_eos      = target logit 相对 EOS token 的 margin 变化
+Delta B_all      = boundary best logit 的变化
+```
+
+桥接增益定义为：
+
+```text
+BridgeGain(d)
+  = Delta M_boundary(d)
+    - max Delta M_boundary(control directions)
+```
+
+其中控制方向包括：
+
+```text
+random_same_norm
+wrong_mean_direction
+template_shift_same_norm
+negative_target_direction
+```
+
+一个关系-语言对被视为正桥接，需要同时满足：
+
+```text
+Delta M_relation(specific_direction) > 0
+Delta M_boundary(specific_direction) > 0
+BridgeGain(specific_direction) > 0.02
+```
+
+### 五、测试规模
+
+三个模型依次运行，避免 GPU 显存叠加：
+
+```text
+qwen3      : sample_count = 360, selected_specs = 140, rows = 3332
+GLM4       : sample_count = 360, selected_specs = 91,  rows = 2177
+DS7B       : sample_count = 360, selected_specs = 14,  rows = 266
+```
+
+跨模型证据标签：
+
+```text
+semantic_boundary_bridge_positive         : 2
+partial_semantic_boundary_bridge_positive : 1
+```
+
+具体为：
+
+```text
+qwen3 : semantic_boundary_bridge_positive
+GLM4  : semantic_boundary_bridge_positive
+DS7B  : partial_semantic_boundary_bridge_positive
+```
+
+### 六、qwen3 结果
+
+qwen3 的整体条件均值：
+
+```text
+specific_direction:
+  relation margin delta = +0.5278
+  boundary margin delta = +0.5390
+  period margin delta   = +0.5621
+  eos margin delta      = +0.6287
+  boundary logit delta  = -0.0576
+
+target_direction:
+  relation margin delta = +0.7495
+  boundary margin delta = +0.6516
+
+template_shift_same_norm:
+  relation margin delta = +0.0714
+  boundary margin delta = +0.0898
+
+random_same_norm:
+  relation margin delta = -0.0183
+  boundary margin delta = -0.0757
+
+wrong_mean_direction:
+  relation margin delta = -0.6091
+  boundary margin delta = -0.4062
+
+negative_target_direction:
+  relation margin delta = -1.0969
+  boundary margin delta = -1.0476
+```
+
+qwen3 的主要正桥接关系：
+
+```text
+function zh->en:
+  relation margin delta = +0.8347
+  boundary margin delta = +0.5370
+  control best          = -0.1801
+  bridge gain           = +0.7171
+
+color en->en:
+  relation margin delta = +0.4097
+  boundary margin delta = +0.6563
+  control best          = +0.0359
+  bridge gain           = +0.6204
+
+color zh->en:
+  relation margin delta = +0.2957
+  boundary margin delta = +0.4358
+  control best          = -0.0255
+  bridge gain           = +0.4612
+
+color zh->zh:
+  relation margin delta = +0.3976
+  boundary margin delta = +0.5006
+  control best          = +0.3264
+  bridge gain           = +0.1742
+
+color en->zh:
+  relation margin delta = +0.5911
+  boundary margin delta = +0.7052
+  control best          = +0.5718
+  bridge gain           = +0.1334
+
+function en->en:
+  relation margin delta = +0.9063
+  boundary margin delta = +0.6283
+  control best          = +0.5691
+  bridge gain           = +0.0592
+
+function zh->zh:
+  relation margin delta = +0.3680
+  boundary margin delta = +0.1632
+  control best          = +0.1332
+  bridge gain           = +0.0300
+```
+
+qwen3 的现象比较干净：
+
+```text
+specific_direction 同时提高 relation margin 和 boundary margin；
+random / wrong / negative 控制方向多数为负或很弱；
+template_shift 有少量正效应，但明显低于特异方向。
+```
+
+这说明在 qwen3 上，Phase939 过滤后的 color / function 语义方向，确实能进入输出边界竞争场。
+
+### 七、GLM4 结果
+
+GLM4 的整体条件均值：
+
+```text
+specific_direction:
+  relation margin delta = +3.5308
+  boundary margin delta = +9.9671
+  period margin delta   = +9.5171
+  eos margin delta      = +7.9242
+  boundary logit delta  = -0.9648
+
+target_direction:
+  relation margin delta = +3.4900
+  boundary margin delta = +9.6799
+
+random_same_norm:
+  relation margin delta = +2.9718
+  boundary margin delta = +9.3555
+
+template_shift_same_norm:
+  relation margin delta = +2.8549
+  boundary margin delta = +8.8991
+
+wrong_mean_direction:
+  relation margin delta = +2.5117
+  boundary margin delta = +8.4842
+
+negative_target_direction:
+  relation margin delta = +2.1510
+  boundary margin delta = +7.9535
+```
+
+GLM4 的主要正桥接关系：
+
+```text
+color en->en:
+  relation margin delta = +4.0087
+  boundary margin delta = +12.1239
+  control best          = +10.4992
+  bridge gain           = +1.6247
+
+function zh->en:
+  relation margin delta = +4.0328
+  boundary margin delta = +10.8615
+  control best          = +10.5739
+  bridge gain           = +0.2876
+
+color zh->en:
+  relation margin delta = +4.3619
+  boundary margin delta = +12.2581
+  control best          = +12.0449
+  bridge gain           = +0.2133
+
+function en->en:
+  relation margin delta = +3.7821
+  boundary margin delta = +12.2093
+  control best          = +12.0892
+  bridge gain           = +0.1201
+
+color zh->zh:
+  relation margin delta = +0.5956
+  boundary margin delta = +1.1806
+  control best          = +1.1571
+  bridge gain           = +0.0234
+```
+
+GLM4 必须谨慎解释：
+
+```text
+specific_direction 的绝对边界移动很强；
+但 random / template / wrong / negative 控制方向也会产生很大的正边界移动。
+```
+
+所以 GLM4 的结论不是：
+
+```text
+发现了干净的语义到边界齿轮闭合。
+```
+
+而是：
+
+```text
+GLM4 的输出边界场对 hidden-state perturbation 高度敏感；
+specific_direction 在若干关系上仍有超过控制组的 bridge gain；
+但控制组过强，说明它还不是严格干净的机制证据。
+```
+
+其中 `color en->en` 的 bridge gain 最大，证据较强；其他关系虽然为正，但离控制组较近。
+
+### 八、DS7B 结果
+
+DS7B 只有一个通过 Phase939 筛选的关系-语言对：
+
+```text
+function en->en
+```
+
+整体条件均值：
+
+```text
+specific_direction:
+  relation margin delta = +0.1809
+  boundary margin delta = +0.0724
+  period margin delta   = +0.1127
+  eos margin delta      = +0.1275
+  boundary logit delta  = -0.0576
+
+target_direction:
+  relation margin delta = +0.1036
+  boundary margin delta = -0.0263
+
+wrong_mean_direction:
+  relation margin delta = -0.0444
+  boundary margin delta = -0.0115
+
+random_same_norm:
+  boundary margin delta = -0.1645
+
+template_shift_same_norm:
+  boundary margin delta = -0.2056
+
+negative_target_direction:
+  boundary margin delta = -0.5247
+```
+
+正桥接：
+
+```text
+function en->en:
+  relation margin delta = +0.1809
+  boundary margin delta = +0.0724
+  control best          = -0.0115
+  bridge gain           = +0.0839
+```
+
+DS7B 是弱正结果：
+
+```text
+方向正确；
+但覆盖面很窄；
+效应量较小；
+不能外推到 color / category / 中文模板。
+```
+
+### 九、阶段性结论
+
+Phase940 的客观结论是：
+
+```text
+通过 Phase939 特异性审计的部分语义方向，
+确实不只移动 relation target margin，
+也会同步移动 target 对输出边界 token 的竞争优势。
+```
+
+跨模型排序：
+
+```text
+qwen3:
+  证据最干净。
+  color / function 多个语言对都有正 bridge gain。
+
+GLM4:
+  边界场移动最强。
+  但控制扰动也很强，说明存在 generic perturbation sensitivity。
+  证据是正的，但不是干净闭合。
+
+DS7B:
+  只有 function en->en 弱正。
+  更像小模型粗糙结构中的局部可复现信号。
+```
+
+因此本阶段把 Phase939 的语义方向推进了一步：
+
+```text
+semantic-specific direction
+  -> relation margin
+  -> first-token boundary competition
+```
+
+但还没有推进到：
+
+```text
+semantic-specific direction
+  -> channel-level boundary gear
+  -> natural gate
+  -> multi-token rollout closure
+```
+
+### 十、闭合标准与当前距离
+
+如果要称为“语义方向到边界齿轮闭合”，至少需要满足：
+
+```text
+1. 同一个语义方向在 holdout objects / holdout templates 上稳定复现；
+2. 该方向能移动 target-vs-boundary margin；
+3. 该方向能对应到明确的 layer / channel / feature 边界齿轮；
+4. 通道级边界齿轮的干预可以复现方向级效果；
+5. 语义方向 + 边界齿轮的组合干预可以解释 residual；
+6. natural generation 下能改变真实输出，而不是只改变 one-step logit；
+7. 多 token rollout 中不会被后续协议/终止路线覆盖。
+```
+
+Phase940 当前只满足：
+
+```text
+第 1 条的部分前置条件；
+第 2 条的一步 logit 版本；
+少量跨模型弱复现。
+```
+
+尚未满足：
+
+```text
+第 3-7 条。
+```
+
+所以闭合距离仍然较远。更准确地说：
+
+```text
+Phase940 是 semantic-to-boundary bridge evidence；
+不是 semantic-boundary gear closure。
+```
+
+### 十一、问题、硬伤和瓶颈
+
+1. 边界 token 集合仍是代理定义。
+
+```text
+period / EOS / punctuation / protocol tokens 可以代表一部分边界竞争，
+但不能覆盖所有 nonclean output transition。
+```
+
+2. GLM4 控制方向过强。
+
+```text
+这说明 GLM4 的 hidden space 对扰动整体敏感，
+specific_direction 的正结果需要继续用更严格的 normalized control 和 low-strength alpha 扫描复核。
+```
+
+3. DS7B 覆盖面太窄。
+
+```text
+DS7B 只有 function en->en 通过筛选，
+不能判断其它语义关系是否不存在桥接，还是因为小模型内部结构粗糙导致信号被埋没。
+```
+
+4. 仍然是 first-token logit 审计。
+
+```text
+它没有测试自然生成过程中的多 token 路线切换，
+也没有测试 clean protocol edge 对最终输出的覆盖。
+```
+
+5. 尚未连接 Phase936 的通道级边界残差信号。
+
+```text
+本阶段没有证明语义方向使用了同一个 boundary gear；
+只证明语义方向可以移动输出边界竞争。
+```
+
+### 十二、智能理论层面的关键洞察
+
+当前结果支持一个更谨慎的图谱结构：
+
+```text
+语义不是直接等于答案 token；
+语义方向首先改变候选答案之间的关系 margin；
+随后这种变化会进入输出边界场，
+与 period / EOS / protocol / punctuation 等非语义路线竞争。
+```
+
+这说明“语言编码机制”的破解不能只看：
+
+```text
+水果是什么方向；
+颜色是什么方向；
+功能是什么方向。
+```
+
+还必须看：
+
+```text
+这些语义方向如何穿过输出边界；
+什么时候被协议路线截断；
+什么时候被终止路线覆盖；
+什么时候进入自然回答路线。
+```
+
+也就是说，编码机制至少包括两层拼图：
+
+```text
+语义分布结构；
+输出边界/协议控制结构。
+```
+
+Phase940 的价值在于第一次把两者之间建立了可测量的桥：
+
+```text
+不是只说“方向像语义”；
+而是测量“方向是否能改变边界竞争”。
+```
+
+### 十三、下一阶段任务
+
+Phase941 应进入新的子阶段：
+
+```text
+Semantic Direction to Channel-Level Boundary Gear Audit
+```
+
+具体任务：
+
+```text
+1. 先在 GLM4 上复用 Phase936 中已有的 punctuation / EOS / protocol 边界残差信号；
+2. 检查 Phase940 中通过的 semantic-specific directions 是否与这些边界残差信号同层、同通道或同子空间重合；
+3. 对 qwen3 和 DS7B 重新寻找可用的 boundary holdout seeds，补齐 Phase936 当时缺失的通道级数据；
+4. 做 low-alpha 扫描，排除 GLM4 的 generic perturbation sensitivity；
+5. 做 semantic direction + boundary gear 的组合干预，检查是否存在加和、互补或互相覆盖。
+```
+
+建议的最小公式：
+
+```text
+Delta_total = Effect(d_semantic + g_boundary)
+Delta_sem   = Effect(d_semantic)
+Delta_bound = Effect(g_boundary)
+Residual    = Delta_total - Delta_sem - Delta_bound
+```
+
+如果：
+
+```text
+Residual 接近 0
+```
+
+说明语义方向和边界齿轮近似线性拼接；
+
+如果：
+
+```text
+Residual 显著为正或为负
+```
+
+说明二者之间存在门控或竞争。
+
+Phase941 与 Phase940 属于同一大阶段：
+
+```text
+先完成图谱，再追求闭合。
+```
+
+但 Phase941 已经是新的通道级子任务，不应把 Phase940 的 first-token bridge 直接自动升级为闭合结论。
+
+### 十四、通俗总结
+
+Phase939 问的是：
+
+```text
+这个语义方向是不是真的像“颜色/功能”的方向？
+```
+
+Phase940 继续问：
+
+```text
+如果它是真的语义方向，
+它能不能把答案从句号、结束符、格式符号这些边界竞争里推出来？
+```
+
+答案是：
+
+```text
+qwen3 上比较明确；
+GLM4 上很强但不够干净；
+DS7B 上只有一个弱正结果。
+```
+
+所以当前拼图多了一块：
+
+```text
+部分语义方向不仅影响“选哪个语义答案”，
+还会影响“模型要不要继续输出答案、是否被边界 token 截断”。
+```
+
+但它还不是最终闭合。下一步要把这个方向级现象追到具体层、通道和边界齿轮上。
