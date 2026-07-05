@@ -32786,3 +32786,315 @@ logs/frontend.pid
 4. 整理 start/stop/status 脚本，避免人工维护 PID。
 5. 之后再接入 qwen3、GLM4、DS7B 的受控实验入口。
 ```
+
+## Phase 195: Phase944 Integrated Mechanism Trace and Visualization Client [2026-07-05]
+
+### 目标
+
+本阶段把前面讨论的三个方案整合为一个可运行、可保存、可展示的机制分析闭环：
+
+```text
+方案一：不只记录最大神经元，而是记录 embedding -> residual stream -> attention/MLP -> W_U -> next token 的完整计算脉络。
+方案二：同步记录 O/R/A/C/F/M/K/S_answer/B/G/N/P/T 机制因子。
+方案三：把生成过程组织成 上文状态 -> 条件化路由 -> 候选空间打开 -> 知识路径激活 -> 输出边界竞争 -> 下一 token。
+```
+
+本阶段优先目标是颜色编码机制，测试 prompt 为：
+
+```text
+A red cube is placed on the table. The color of the cube is
+```
+
+目标 token 为：
+
+```text
+red
+```
+
+### 生成脚本与文件
+
+新增核心脚本：
+
+```text
+tests/glm5/phase944_integrated_mechanism_trace.py
+```
+
+新增前端可视化组件：
+
+```text
+frontend/src/components/mechanism/MechanismTraceExplorer.jsx
+frontend/src/components/mechanism/MechanismTraceExplorer.css
+```
+
+修改前端入口：
+
+```text
+frontend/src/App.jsx
+```
+
+生成前端静态数据：
+
+```text
+frontend/public/vis_data/mechanism_trace/manifest.json
+frontend/public/vis_data/mechanism_trace/phase944_qwen3_red_cube_trace.json
+frontend/public/vis_data/mechanism_trace/phase944_glm4_red_cube_trace.json
+frontend/public/vis_data/mechanism_trace/phase944_deepseek7b_red_cube_trace.json
+```
+
+生成原始实验结果：
+
+```text
+tests/result/phase944_integrated_mechanism_trace/phase944_qwen3_red_cube_trace/phase944_qwen3_integrated_mechanism_trace.json
+tests/result/phase944_integrated_mechanism_trace/phase944_glm4_red_cube_trace/phase944_glm4_integrated_mechanism_trace.json
+tests/result/phase944_integrated_mechanism_trace/phase944_deepseek7b_red_cube_trace/phase944_deepseek7b_integrated_mechanism_trace.json
+```
+
+### 测试原理
+
+本阶段不再只寻找“最大的几个神经元”，而是记录完整的生成链路。
+
+核心流程：
+
+```text
+1. 输入 prompt，得到 token embedding。
+2. 对每一层保存 answer position 的 residual state。
+3. 通过 forward hook 捕获每层 attention output 和 MLP output。
+4. 将每层 residual、attention、MLP 向量投影到 W_U 的候选 token 行。
+5. 构造颜色候选场，计算 target color 与 strongest competitor 的竞争关系。
+6. 同步计算 O/R/A/C/F/M/K/S_answer/B/G/N/P/T 机制因子。
+7. 保存为 mechanism_trace_v1 JSON，供前端直接读取和展示。
+```
+
+核心读出公式：
+
+```text
+score_l(token) = h_l · W_U[token]
+```
+
+颜色候选场：
+
+```text
+p_l(c) = softmax({h_l · W_U[c] | c in Colors})
+```
+
+目标颜色边际：
+
+```text
+K_l = score_l(target_color) - max_{c != target_color} score_l(c)
+```
+
+候选门控：
+
+```text
+M_l = 1 - H(p_l) / log(|Colors|)
+```
+
+边界齿轮：
+
+```text
+G_l = K_l - K_{l-1}
+```
+
+自然 gate：
+
+```text
+N_l = ||component_l|| / ||residual_l||
+```
+
+全词表闭合与候选闭合分开记录：
+
+```text
+global_closed = target_global_rank == 1
+candidate_closed = target_rank_within_color_candidates == 1
+```
+
+这个区分很关键：候选颜色内部 red 排第一，不代表全词表下一 token 一定输出 red。
+
+### 机制因子定义
+
+```text
+O = object factor，对象因子，h_l · W_U[token(object)]
+R = relation factor，关系因子，h_l · W_U[token(relation)]
+A = attribute factor，属性因子，h_l · (W_U[target_attribute] - mean(W_U[other_attributes]))
+C = category factor，类别因子，颜色类别整体读出均值
+F = function factor，功能因子，answer/word/color 等协议 token 的读出均值
+M = candidate gate，候选门控，颜色候选分布的尖锐程度
+K = knowledge path，知识路径，目标颜色相对最强颜色竞争者的 margin
+S_answer = semantic answer field，语义答案场，目标答案 token 的直接读出
+B = blocker field，阻断场，最强错误颜色候选读出
+G = boundary gear，边界齿轮，本层 margin 相对上一层的变化
+N = natural gate，自然 gate，attention/MLP 更新幅度相对 residual 的比例
+P = output protocol，输出协议，协议 token 相对颜色 token 的读出偏置
+T = termination action，终止动作，句号、换行、EOS 等终止 token 的读出强度
+```
+
+### 三模型结果
+
+Qwen3：
+
+```text
+target_global_rank = 1
+next_token = " red"
+final_margin_vs_color_competitor = 5.172491073608398
+final_competitor_label = blue
+global_closed = true
+candidate_closed = true
+recorded_layers = 37
+```
+
+GLM4：
+
+```text
+target_global_rank = 1
+next_token = " red"
+final_margin_vs_color_competitor = 3.9285354614257812
+final_competitor_label = blue
+global_closed = true
+candidate_closed = true
+recorded_layers = 41
+```
+
+DeepSeek7B：
+
+```text
+target_global_rank = 5
+next_token = " determined"
+final_margin_vs_color_competitor = 0.4698371887207031
+final_competitor_label = white
+global_closed = false
+candidate_closed = true
+recorded_layers = 29
+```
+
+### 关键发现
+
+本阶段最重要发现是：
+
+```text
+候选场闭合不等于全词表输出闭合。
+```
+
+DeepSeek7B 在颜色候选集合内部已经让 red 排第一，但全词表真实 next token 是 " determined"，red 的全局 rank 只有 5。
+
+这说明颜色机制至少有两层闭合：
+
+```text
+1. 局部语义候选闭合：颜色候选空间内部选对。
+2. 全局输出协议闭合：全词表竞争中目标 token 真正成为 next token。
+```
+
+因此后续破解编码机制时，不能只看某个语义类别内部的 margin，还必须检查全词表输出协议、终止动作、自然语言续写惯性和 blocker field。
+
+### 前端可视化
+
+前端新增“机制 Trace”入口：
+
+```text
+左上角 GitBranch 图标按钮
+```
+
+可视化客户端现在可以：
+
+```text
+1. 读取 frontend/public/vis_data/mechanism_trace/manifest.json。
+2. 选择 qwen3 / glm4 / deepseek7b 的测试结果。
+3. 查看 prompt、tokens、目标对象、目标属性、下一 token。
+4. 查看每层 residual margin 曲线。
+5. 查看 O/R/A/C/F/M/K/S_answer/B/G/N/P/T 每个机制因子。
+6. 查看颜色候选分数、概率、target rank、competitor。
+7. 查看 attention 和 MLP component 对候选场的贡献。
+8. 查看当前层 raw JSON 和完整 Trace JSON。
+```
+
+本地客户端：
+
+```text
+http://127.0.0.1:5174/
+```
+
+数据接口验证：
+
+```text
+/vis_data/mechanism_trace/manifest.json -> 200 OK
+/vis_data/mechanism_trace/phase944_qwen3_red_cube_trace.json -> 200 OK
+/vis_data/mechanism_trace/phase944_glm4_red_cube_trace.json -> 200 OK
+/vis_data/mechanism_trace/phase944_deepseek7b_red_cube_trace.json -> 200 OK
+```
+
+### 工程验证
+
+脚本验证：
+
+```text
+python -m py_compile tests/glm5/phase944_integrated_mechanism_trace.py -> OK
+```
+
+前端构建：
+
+```text
+npm run build -> OK
+```
+
+注意：
+
+```text
+Vite build 仍提示部分 bundle 大于 500 kB，这是既有前端体积问题，不影响本阶段功能。
+```
+
+### 理论进展
+
+本阶段把“颜色编码特征发现”推进为“可复用的全链路机制 Trace”。
+
+新的理论判断：
+
+```text
+同一个神经网络参数能在不同上下文中生成正确下文，
+不是因为单个神经元保存了完整答案，
+而是因为上下文状态在 residual stream 中打开了特定候选空间，
+再通过 attention/MLP 的条件化路由、
+W_U 输出边界竞争、
+输出协议和终止动作共同完成 next-token closure。
+```
+
+因此一个更准确的破解路线应是：
+
+```text
+context state
+  -> conditioned routing
+  -> candidate-space opening
+  -> knowledge-path activation
+  -> output-boundary competition
+  -> next-token closure
+```
+
+而不是：
+
+```text
+找到最大神经元 = 找到编码机制
+```
+
+### 下一步任务
+
+建议下一阶段进入 Phase945：
+
+```text
+1. 扩展 prompt 数据集，不只测试 red cube。
+2. 对颜色、形状、材质、类别、关系分别生成批量 Trace。
+3. 对每个模型统计哪些层稳定打开 candidate field。
+4. 区分 candidate_closed 和 global_closed 的失败类型。
+5. 对 DeepSeek7B 的 global_closed=false 做专项审计：
+   - 是否 output protocol 太弱
+   - 是否 continuation inertia 太强
+   - 是否 answer position 需要更明确的 instruction prompt
+   - 是否 blocker field 来自非颜色 token，而不是颜色候选内部
+6. 将 Trace JSON 进一步压缩为可检索机制图谱：
+   node = factor/layer/token/component
+   edge = margin gain/component contribution/routing relation
+```
+
+阶段性结论：
+
+```text
+Phase944 已经完成从“特征神经元列表”到“全链路机制脉络”的第一版转型。
+它还没有完成全局编码图谱，但已经提供了可预测、可验证、可复用的图谱数据格式和可视化入口。
+```

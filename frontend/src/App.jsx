@@ -20,6 +20,7 @@ import { MODEL_CONFIGS } from './blueprint/appleNeuron/constants';
 import ICSPBPanel from './components/FiberNetPanel';
 import LanguageResearchControlPanel from './components/LanguageResearchControlPanel';
 import LanguageResearchDataPanel from './components/LanguageResearchDataPanel';
+import MechanismTraceExplorer from './components/mechanism/MechanismTraceExplorer';
 import ReverseEngineeringDataPanel from './components/reverse/ReverseEngineeringDataPanel';
 
 import ReverseEngineeringOverlay from './components/reverse/ReverseEngineeringOverlay';
@@ -2333,6 +2334,7 @@ export default function App() {
 
   // Global Visibility State
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+  const [showMechanismTrace, setShowMechanismTrace] = useState(false);
   const [compForm, setCompForm] = useState({
     layer_idx: 0,
     raw_phrases: "black, cat, black cat\nParis, France, Paris France\nking, man, king",
@@ -3190,6 +3192,28 @@ export default function App() {
       >
         <Settings size={20} />
       </button>
+
+      <button
+        onClick={() => setShowMechanismTrace(true)}
+        style={{
+          position: 'absolute', top: 20, left: 66, zIndex: 101,
+          background: showMechanismTrace ? '#1f9d62' : 'rgba(20, 20, 25, 0.8)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '8px',
+          padding: '8px',
+          cursor: 'pointer',
+          color: 'white',
+          backdropFilter: 'blur(10px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}
+        title="机制 Trace"
+      >
+        <GitBranch size={20} />
+      </button>
+
+      {showMechanismTrace && (
+        <MechanismTraceExplorer onClose={() => setShowMechanismTrace(false)} />
+      )}
 
 
       {/* Global Config Panel */}
