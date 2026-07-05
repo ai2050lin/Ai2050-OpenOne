@@ -19746,3 +19746,2523 @@ DS7B 上只有一个弱正结果。
 ```
 
 但它还不是最终闭合。下一步要把这个方向级现象追到具体层、通道和边界齿轮上。
+
+## Phase 941: 语义方向残差坐标子空间桥接审计 [2026-07-04 23:42]
+
+### 一、对上传分析的判断
+
+上传内容对 Phase940 的判断基本正确：
+
+```text
+Phase940 是 semantic-to-boundary bridge evidence；
+不是 semantic-boundary gear closure；
+不是 channel-level boundary gear closure；
+也不是 natural generation closure。
+```
+
+它指出的关键硬伤也正确：
+
+```text
+Phase940 只证明语义方向可以移动 first-token boundary competition；
+但尚未证明这些方向对应到明确的 layer / channel / feature 边界齿轮。
+```
+
+所以 Phase941 继续同一大阶段：
+
+```text
+先完成图谱，再追求闭合。
+```
+
+但本阶段不直接跳到 MLP neuron / natural gate，而是先做更保守的一步：
+
+```text
+检查 Phase940 的 semantic-specific direction，
+其边界桥接效应是否集中在残差流坐标子空间中。
+```
+
+这一步的证据层级定义为：
+
+```text
+residual-coordinate subspace bridge evidence
+残差坐标子空间桥接证据
+```
+
+不能定义为：
+
+```text
+MLP channel closure；
+boundary gear closure；
+natural generation closure。
+```
+
+### 二、测试脚本和结果位置
+
+新增正式脚本：
+
+```text
+tests/glm5/phase941_semantic_direction_coordinate_bridge_audit.py
+```
+
+新增运行脚本：
+
+```text
+tests/glm5/run_phase941_semantic_direction_coordinate_bridge_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase941_semantic_direction_coordinate_bridge_audit/semantic_direction_coordinate_bridge_audit/
+```
+
+核心结果文件：
+
+```text
+phase941_cross_model_summary.json
+phase941_cross_model_summary.md
+phase941_qwen3_summary.json
+phase941_glm4_summary.json
+phase941_deepseek7b_summary.json
+```
+
+### 三、测试原理
+
+Phase941 只使用 Phase940 中已经通过正桥接条件的 relation / language pair：
+
+```text
+Delta M_relation(specific_direction) > 0
+Delta M_boundary(specific_direction) > 0
+BridgeGain(specific_direction) > 0.02
+```
+
+然后对每个通过筛选的 `specific_direction` 做残差坐标拆分。
+
+设：
+
+```text
+d = d_specific
+```
+
+取绝对值最大的 top-k 坐标：
+
+```text
+d_topk_raw = P_topk(d)
+```
+
+再构造同范数版本：
+
+```text
+d_topk_same_norm
+  = d_topk_raw / ||d_topk_raw|| * ||d||
+```
+
+同时构造两个控制：
+
+```text
+d_randomk_same_norm:
+  随机 k 个坐标，同范数。
+
+d_bottomk_same_norm:
+  绝对值最小 k 个坐标，同范数。
+```
+
+干预形式仍然是：
+
+```text
+h'_l = h_l + alpha * d_subspace
+```
+
+本轮使用：
+
+```text
+top_k = 64, 256
+alpha = 0.25, 0.5, 1.0
+```
+
+加入 alpha 扫描是为了处理 Phase940 暴露出的 GLM4 问题：
+
+```text
+如果只有 alpha=1.0 有效，
+可能只是强扰动造成的假象；
+如果 alpha=0.25 / 0.5 仍然保留同向效应，
+说明子空间桥接更稳定。
+```
+
+### 四、核心指标
+
+完整特异方向边界效应：
+
+```text
+Delta M_full = Delta M_boundary(d_specific)
+```
+
+top-k 原始子方向边界效应：
+
+```text
+Delta M_topk_raw = Delta M_boundary(d_topk_raw)
+```
+
+原始 top-k 复现比例：
+
+```text
+ConcentrationRatio(k)
+  = Delta M_topk_raw / Delta M_full
+```
+
+同范数 top-k 相对控制的桥接增益：
+
+```text
+CoordinateGain(k)
+  = Delta M_boundary(d_topk_same_norm)
+    - max(
+        Delta M_boundary(d_randomk_same_norm),
+        Delta M_boundary(d_bottomk_same_norm)
+      )
+```
+
+正坐标桥接的最低条件：
+
+```text
+ConcentrationRatio(k) >= 0.25
+CoordinateGain(k) > 0.02
+relation margin delta(topk_same_norm) > 0
+boundary margin delta(topk_same_norm) > 0
+```
+
+### 五、测试规模
+
+三个模型依次运行，避免 GPU 显存叠加：
+
+```text
+qwen3:
+  selected_specs = 56
+  rows = 4368
+  selected pairs =
+    color en->en
+    color en->zh
+    color zh->en
+    color zh->zh
+    function en->en
+    function zh->en
+    function zh->zh
+
+GLM4:
+  selected_specs = 39
+  rows = 3220
+  selected pairs =
+    color en->en
+    color zh->en
+    color zh->zh
+    function en->en
+    function zh->en
+
+DS7B:
+  selected_specs = 8
+  rows = 560
+  selected pairs =
+    function en->en
+```
+
+跨模型证据标签：
+
+```text
+coordinate_concentrated_semantic_boundary_bridge_positive         : 2
+partial_coordinate_concentrated_semantic_boundary_bridge_positive : 1
+```
+
+具体为：
+
+```text
+qwen3 : coordinate_concentrated_semantic_boundary_bridge_positive
+GLM4  : coordinate_concentrated_semantic_boundary_bridge_positive
+DS7B  : partial_coordinate_concentrated_semantic_boundary_bridge_positive
+```
+
+### 六、qwen3 结果
+
+qwen3 完整特异方向在 alpha 扫描中保持稳定正效应：
+
+```text
+alpha = 1.0:
+  full_specific relation margin delta = +0.5349
+  full_specific boundary margin delta = +0.4649
+
+alpha = 0.5:
+  full_specific relation margin delta = +0.3077
+  full_specific boundary margin delta = +0.2670
+
+alpha = 0.25:
+  full_specific relation margin delta = +0.1659
+  full_specific boundary margin delta = +0.1532
+```
+
+top-256 坐标子方向也保持正效应：
+
+```text
+topk_raw, k=256, alpha=1.0:
+  relation margin delta = +0.2454
+  boundary margin delta = +0.1601
+  norm fraction         = 0.7057
+
+topk_raw, k=256, alpha=0.5:
+  relation margin delta = +0.1376
+  boundary margin delta = +0.1016
+
+topk_raw, k=256, alpha=0.25:
+  relation margin delta = +0.0649
+  boundary margin delta = +0.0593
+```
+
+随机和底部坐标控制整体很弱：
+
+```text
+randomk_same_norm, k=256, alpha=1.0:
+  boundary margin delta = -0.0131
+
+randomk_same_norm, k=256, alpha=0.5:
+  boundary margin delta = +0.0110
+
+randomk_same_norm, k=256, alpha=0.25:
+  boundary margin delta = +0.0162
+
+bottomk_same_norm, k=256, alpha=1.0:
+  boundary margin delta = -0.0755
+```
+
+主要正坐标桥接：
+
+```text
+color en->zh, k=256, alpha=1.0:
+  full boundary delta = +0.7906
+  topk raw boundary   = +0.3453
+  raw fraction        = 0.4368
+  gain vs control     = +0.3906
+  joint score         = +0.3359
+
+color en->en, k=256, alpha=1.0:
+  full boundary delta = +0.6154
+  topk raw boundary   = +0.2380
+  raw fraction        = 0.3867
+  gain vs control     = +0.3341
+  joint score         = +0.2380
+
+color en->zh, k=256, alpha=0.5:
+  full boundary delta = +0.4328
+  topk raw boundary   = +0.2125
+  raw fraction        = 0.4910
+  gain vs control     = +0.1797
+
+color en->zh, k=256, alpha=0.25:
+  full boundary delta = +0.2453
+  topk raw boundary   = +0.1391
+  raw fraction        = 0.5669
+  gain vs control     = +0.1063
+
+function en->en, k=256, alpha=0.5:
+  full boundary delta = +0.3156
+  topk raw boundary   = +0.1500
+  raw fraction        = 0.4752
+  gain vs control     = +0.1563
+```
+
+qwen3 的客观结论：
+
+```text
+Phase940 的语义到边界桥接，
+在 qwen3 上不是平均分散在所有残差坐标中；
+top-256 坐标能稳定复现约 35%-57% 的边界效应；
+并且在 alpha=0.25 / 0.5 下仍可观察到。
+```
+
+但也要注意：
+
+```text
+top-64 整体不稳定；
+这说明它不是极少数单坐标齿轮，
+更像中等宽度的残差子空间。
+```
+
+### 七、GLM4 结果
+
+GLM4 的完整特异方向效应仍然极强：
+
+```text
+alpha = 1.0:
+  full_specific relation margin delta = +3.0433
+  full_specific boundary margin delta = +9.6272
+
+alpha = 0.5:
+  full_specific relation margin delta = +2.9077
+  full_specific boundary margin delta = +9.5453
+
+alpha = 0.25:
+  full_specific relation margin delta = +2.8204
+  full_specific boundary margin delta = +9.4708
+```
+
+top-k 原始坐标几乎复现完整边界效应：
+
+```text
+topk_raw, k=64, alpha=1.0:
+  relation margin delta = +2.7758
+  boundary margin delta = +9.4267
+  norm fraction         = 0.4304
+
+topk_raw, k=256, alpha=1.0:
+  relation margin delta = +2.8542
+  boundary margin delta = +9.4771
+  norm fraction         = 0.6212
+```
+
+主要正坐标桥接：
+
+```text
+function zh->en, k=64, alpha=1.0:
+  full boundary delta = +11.5895
+  topk raw boundary   = +11.2809
+  raw fraction        = 0.9734
+  gain vs control     = +0.2513
+
+color zh->en, k=64, alpha=1.0:
+  full boundary delta = +12.4557
+  topk raw boundary   = +12.3775
+  raw fraction        = 0.9937
+  gain vs control     = +0.2281
+
+color zh->zh, k=256, alpha=1.0:
+  full boundary delta = +1.0078
+  topk raw boundary   = +0.6130
+  raw fraction        = 0.6082
+  gain vs control     = +0.1944
+
+function zh->en, k=64, alpha=0.5:
+  full boundary delta = +11.4437
+  topk raw boundary   = +11.2614
+  raw fraction        = 0.9841
+  gain vs control     = +0.1263
+
+color zh->en, k=64, alpha=0.5:
+  full boundary delta = +12.4994
+  topk raw boundary   = +12.3557
+  raw fraction        = 0.9885
+  gain vs control     = +0.1187
+```
+
+但是 GLM4 的控制仍然非常强：
+
+```text
+randomk_same_norm, k=256, alpha=1.0:
+  boundary margin delta = +9.3649
+
+bottomk_same_norm, k=256, alpha=1.0:
+  boundary margin delta = +9.3750
+
+randomk_same_norm, k=64, alpha=0.25:
+  boundary margin delta = +9.3837
+```
+
+所以 GLM4 的结论必须双重表述：
+
+```text
+正面：
+  语义方向的边界效应在 top-64 / top-256 残差坐标上高度集中。
+
+负面：
+  随机同范数和底部同范数坐标也能强烈移动边界场；
+  因此 GLM4 仍然存在严重 generic perturbation sensitivity。
+```
+
+GLM4 不能被解释为干净通道齿轮闭合。
+
+更稳的写法是：
+
+```text
+GLM4 显示出残差坐标集中形状；
+但该形状嵌在一个高度扰动敏感的输出边界场中。
+```
+
+### 八、DS7B 结果
+
+DS7B 进入测试的只有：
+
+```text
+function en->en
+```
+
+完整特异方向是弱正：
+
+```text
+alpha = 1.0:
+  full_specific relation margin delta = +0.3812
+  full_specific boundary margin delta = +0.0625
+
+alpha = 0.5:
+  full_specific relation margin delta = +0.1656
+  full_specific boundary margin delta = +0.0219
+
+alpha = 0.25:
+  full_specific relation margin delta = +0.1281
+  full_specific boundary margin delta = +0.0219
+```
+
+最好的局部坐标桥接出现在：
+
+```text
+function en->en, k=256, alpha=0.5:
+  full boundary delta = +0.0219
+  topk raw boundary   = +0.0125
+  raw fraction        = 0.5714
+  topk_same boundary  = +0.0781
+  control best        = -0.1344
+  gain vs control     = +0.2125
+  joint score         = +0.0781
+```
+
+但 DS7B 的负面信号也很明显：
+
+```text
+k=256, alpha=1.0:
+  topk_raw boundary = -0.0563
+
+k=64, alpha=1.0:
+  topk_same boundary = -0.2250
+
+randomk_same_norm, k=64, alpha=1.0:
+  boundary margin delta = +0.0813
+```
+
+所以 DS7B 只能写成：
+
+```text
+partial_coordinate_concentrated_semantic_boundary_bridge_positive
+```
+
+不能写成稳定复现。
+
+### 九、阶段性结论
+
+Phase941 的客观结果是：
+
+```text
+qwen3:
+  Phase940 的语义-边界桥接可以被 top-256 残差坐标子空间稳定部分复现；
+  top-64 不稳定；
+  说明是中等宽度残差子空间，不是单点坐标。
+
+GLM4:
+  top-64 / top-256 坐标几乎复现完整边界效应；
+  但随机和底部同范数控制也非常强；
+  说明有集中形状，但通用扰动敏感性仍然没有解除。
+
+DS7B:
+  只有 function en->en 的 alpha=0.5 / k=256 出现局部正结果；
+  覆盖面和稳定性不足。
+```
+
+因此，本阶段把 Phase940 的链条推进为：
+
+```text
+semantic-specific direction
+  -> relation margin
+  -> first-token boundary competition
+  -> residual-coordinate subspace concentration
+```
+
+但仍未推进到：
+
+```text
+MLP neuron channel；
+attention head；
+natural gate；
+multi-token rollout；
+full-vocabulary closure。
+```
+
+### 十、闭合标准与当前距离
+
+如果要称为“语义方向到边界齿轮闭合”，还需要：
+
+```text
+1. 从 residual coordinate 子空间进一步定位到具体 MLP / attention 组件；
+2. 证明这些组件在 holdout objects / holdout templates 上复现；
+3. 证明它们和 Phase936 的 boundary residual / punctuation gear 有交集或因果等价；
+4. 用 ablation / patch 双向验证这些组件；
+5. 证明自然生成中的 clean output transition 会因此改变；
+6. 证明多 token rollout 不被后续 protocol / EOS 路线覆盖。
+```
+
+Phase941 当前完成的是：
+
+```text
+第 1 条之前的 residual-coordinate 前置定位；
+第 2 条之前的方向级样本复现；
+第 3 条之前的边界竞争子空间线索。
+```
+
+所以它离闭合仍然较远。当前最准确的证据等级是：
+
+```text
+coordinate-subspace bridge evidence。
+```
+
+不是：
+
+```text
+gear closure。
+```
+
+### 十一、问题、硬伤和瓶颈
+
+1. residual coordinate 不等于真实神经元通道。
+
+```text
+残差坐标可能是多个 MLP / attention 组件混合后的基底；
+不能直接把 top-k residual coordinates 写成模型内部原生齿轮。
+```
+
+2. qwen3 的 top-64 不稳定。
+
+```text
+这说明语义-边界桥接不是极稀疏单点机制；
+更可能是中等宽度子空间。
+```
+
+3. GLM4 仍有严重通用扰动敏感性。
+
+```text
+即使 alpha=0.25，random / bottom 控制仍能强烈推动边界 margin；
+这使得 GLM4 的正结果不能作为干净机制证据。
+```
+
+4. DS7B 覆盖太窄。
+
+```text
+只有 function en->en；
+小模型内部结构可能粗糙，导致 color / category 信号没有通过前置筛选。
+```
+
+5. 仍是 one-step logit 审计。
+
+```text
+没有自然生成；
+没有多 token；
+没有 strict clean；
+没有完整 blocker field。
+```
+
+### 十二、智能理论层面的关键洞察
+
+Phase941 给出一个新的图谱线索：
+
+```text
+语义方向不是均匀地撒在整个隐藏空间里；
+至少在 qwen3 和 GLM4 中，
+能进入边界竞争的语义方向具有残差坐标子空间集中性。
+```
+
+但这种集中性不是单点的：
+
+```text
+qwen3 需要大约 top-256 级别才较稳定；
+top-64 常常不足。
+```
+
+这更像：
+
+```text
+语义-边界接口是一个中等宽度的子空间结构，
+而不是单个神经元开关。
+```
+
+从破解语言编码机制的角度看，这很重要：
+
+```text
+语言能力背后的数学结构可能不是“一个属性一个神经元”，
+而是“属性方向 + 中等宽度接口子空间 + 输出边界竞争场”的组合。
+```
+
+这与前面“水果如何复用神经元、颜色如何复用神经元”的问题相连：
+
+```text
+对象/属性可能先形成可复用语义方向；
+这些方向再通过若干残差坐标子空间接入输出竞争；
+最终还要经过协议、终止、格式等边界路线筛选。
+```
+
+### 十三、下一阶段任务
+
+Phase942 应进入：
+
+```text
+Semantic Boundary Coordinate Consensus and Holdout Audit
+```
+
+核心任务：
+
+```text
+1. 从 Phase941 中导出每个模型、每个 relation / language pair 的 top-k coordinate 集合；
+2. 检查不同对象、模板、语言之间的 top-k 坐标重叠率；
+3. 构造 consensus coordinate group；
+4. 用 holdout objects / holdout templates 测试 consensus group 是否仍能移动 boundary margin；
+5. 再把 consensus residual coordinates 映射回 MLP / attention 组件。
+```
+
+下一阶段的关键公式：
+
+```text
+C_consensus(r, lang)
+  = intersection_or_weighted_vote(
+      TopK(d_specific_i)
+    )
+```
+
+然后测试：
+
+```text
+h'_l = h_l + alpha * P_C(d_specific)
+```
+
+如果 consensus group 在留出样本上仍然有效，才能继续往 MLP / attention 组件映射。
+
+Phase942 仍属于“先完成图谱，再追求闭合”的大阶段，但已经是新的 consensus / holdout 子任务。
+
+### 十四、通俗总结
+
+Phase940 发现：
+
+```text
+有些语义方向能把答案从句号、结束符、格式符号这些边界竞争中推出来。
+```
+
+Phase941 继续问：
+
+```text
+这种推动是不是分散在整个隐藏空间？
+还是集中在一部分坐标里？
+```
+
+结果是：
+
+```text
+qwen3:
+  主要集中在 top-256 这种中等宽度子空间；
+  不是单个坐标。
+
+GLM4:
+  坐标集中非常明显；
+  但整个边界场也对随机扰动很敏感。
+
+DS7B:
+  只有一个局部弱正结果。
+```
+
+所以当前拼图又多了一块：
+
+```text
+语义到边界的桥，不只是一个抽象方向；
+它在残差空间里有可测的子空间形状。
+```
+
+但这仍然不是最终齿轮。下一步要看这些子空间是否能在留出样本上形成稳定共识，再映射到真正的模型组件。
+
+## Phase 942: 语义边界共识坐标留出验证 [2026-07-05 00:54]
+
+### 一、对上传内容的判断
+
+上传内容对 Phase941 的判断基本正确，而且证据层级收得稳：
+
+```text
+Phase941 不是 MLP channel closure；
+不是 boundary gear closure；
+不是 natural generation closure；
+而是 semantic-specific direction 在 residual coordinate subspace 上的桥接审计。
+```
+
+Phase941 的关键结论是：
+
+```text
+qwen3:
+  top-256 residual coordinates 能稳定复现一部分语义到边界的移动；
+  top-64 不稳定。
+
+GLM4:
+  坐标集中很强；
+  但 random / bottom 控制也很强，说明存在严重通用扰动敏感性。
+
+DS7B:
+  只有 function en->en 的弱覆盖。
+```
+
+因此，继续进入 Phase942 是合理的。Phase942 与 Phase941 属于同一大阶段：
+
+```text
+先完成全局齿轮图谱；
+再尝试机制闭合。
+```
+
+但 Phase942 已经不是继续看单个方向是否能动边界，而是检查：
+
+```text
+多个训练方向中反复出现的 residual coordinate group，
+能否在留出 semantic direction 上继续移动 boundary margin。
+```
+
+### 二、本阶段任务
+
+本阶段完成：
+
+```text
+Semantic Boundary Coordinate Consensus and Holdout Audit
+```
+
+脚本：
+
+```text
+tests/glm5/phase942_semantic_boundary_coordinate_consensus_holdout.py
+tests/glm5/run_phase942_semantic_boundary_coordinate_consensus_holdout.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase942_semantic_boundary_coordinate_consensus_holdout/semantic_boundary_coordinate_consensus_holdout/
+```
+
+三模型按顺序测试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+避免同时加载导致 GPU 显存溢出。
+
+### 三、测试原理
+
+Phase942 复用 Phase940/941 中已经通过正桥接条件的 relation / language pair，不重新扩大样本边界。
+
+对每个 relation / language pair，将 direction spec 按确定性顺序分成训练组和留出组：
+
+```text
+train specs:
+  用来投票形成 consensus coordinate group
+
+holdout specs:
+  不参与投票，只用于验证共识坐标是否还能移动边界
+```
+
+核心构造为：
+
+```text
+C_consensus(r, lang)
+  = VoteTopK(
+      TopK(d_specific_i), i in train specs
+    )
+```
+
+其中：
+
+```text
+d_specific_i = semantic-specific direction
+C_consensus = 训练方向 top-k 坐标投票得到的共识坐标集合
+```
+
+在留出方向上测试：
+
+```text
+d_consensus_raw = P_C(d_holdout)
+```
+
+以及同范数版本：
+
+```text
+d_consensus_same =
+  d_consensus_raw / ||d_consensus_raw|| * ||d_holdout||
+```
+
+边界移动指标：
+
+```text
+Delta M_boundary =
+  M_boundary(patched) - M_boundary(base)
+```
+
+共识坐标解释比例：
+
+```text
+ConsensusRatio =
+  Delta M_boundary(d_consensus_raw)
+  / Delta M_boundary(d_full)
+```
+
+控制增益：
+
+```text
+ConsensusGain =
+  Delta M_boundary(d_consensus_same)
+  - max(
+      Delta M_boundary(randomk_same_norm),
+      Delta M_boundary(bottomk_same_norm)
+    )
+```
+
+本阶段正结果需要同时满足：
+
+```text
+ConsensusRatio >= 0.10
+ConsensusGain > 0.02
+joint_consensus_holdout_score > 0.02
+```
+
+注意：这是 spec-level holdout，不是严格 object-level holdout。
+
+### 四、测试规模
+
+统一设置：
+
+```text
+top_k = 256
+consensus_k = 256
+alpha = 0.5, 1.0
+max_specs_per_pair = 12
+```
+
+实际输出规模：
+
+```text
+qwen3:
+  rows = 2040
+  evidence = consensus_coordinate_holdout_positive
+
+GLM4:
+  rows = 1485
+  evidence = partial_consensus_coordinate_holdout_positive
+
+DS7B:
+  rows = 180
+  evidence = partial_consensus_coordinate_holdout_positive
+```
+
+跨模型汇总：
+
+```text
+consensus_coordinate_holdout_positive: 1
+partial_consensus_coordinate_holdout_positive: 2
+```
+
+### 五、qwen3 结果
+
+qwen3 是本阶段最清晰的正结果。
+
+总体条件均值：
+
+```text
+full_specific alpha=1.0:
+  relation margin delta = +0.4624
+  boundary margin delta = +0.5029
+
+consensus_same_norm alpha=1.0:
+  relation margin delta = +0.1695
+  boundary margin delta = +0.1191
+
+randomk_same_norm alpha=1.0:
+  boundary margin delta = -0.0458
+
+bottomk_same_norm alpha=1.0:
+  boundary margin delta = +0.0136
+```
+
+这说明：
+
+```text
+qwen3 的 consensus coordinate group
+在留出 direction 上仍能移动 boundary margin；
+并且整体优于 random / bottom 控制。
+```
+
+最强子结果：
+
+```text
+relation = function
+language_pair = en->en
+alpha = 1.0
+
+full boundary delta = +1.0156
+consensus raw boundary delta = +0.2500
+consensus raw fraction = 0.2462
+consensus same boundary delta = +0.4063
+control best boundary delta = -0.2031
+gain = +0.6094
+joint score = +0.2708
+overlap recall = 0.2318
+jaccard = 0.1312
+```
+
+其他正结果：
+
+```text
+color en->zh, alpha=1.0:
+  full boundary = +0.7813
+  consensus raw = +0.1491
+  raw fraction = 0.1909
+  consensus same = +0.2770
+  control best = +0.0938
+  gain = +0.1832
+
+color en->en, alpha=1.0:
+  full boundary = +0.7332
+  consensus raw = +0.1106
+  raw fraction = 0.1508
+  consensus same = +0.1947
+  control best = +0.1154
+  gain = +0.0793
+```
+
+负面和弱点也很明确：
+
+```text
+color zh->en:
+  alpha=1.0 时 consensus same boundary = +0.0852
+  control best = +0.1108
+  gain = -0.0256
+
+color zh->zh:
+  consensus raw 接近 0 或为负；
+  gain 为负。
+
+function zh->zh:
+  full boundary 本身为负；
+  不适合作为正桥接证据。
+```
+
+qwen3 的客观结论：
+
+```text
+存在跨留出 direction 的 residual coordinate consensus；
+但这个 consensus 对语言方向敏感，
+不是所有 relation / language pair 都成立。
+```
+
+### 六、GLM4 结果
+
+GLM4 是部分正结果，但必须谨慎解释。
+
+总体条件均值：
+
+```text
+full_specific alpha=1.0:
+  relation margin delta = +2.7965
+  boundary margin delta = +9.1438
+
+consensus_raw alpha=1.0:
+  relation margin delta = +2.4684
+  boundary margin delta = +8.8384
+
+consensus_same_norm alpha=1.0:
+  relation margin delta = +2.4395
+  boundary margin delta = +8.8740
+
+randomk_same_norm alpha=1.0:
+  boundary margin delta = +8.8548
+
+bottomk_same_norm alpha=1.0:
+  boundary margin delta = +8.8018
+```
+
+这说明：
+
+```text
+GLM4 的 consensus coordinate group 可以复现巨大 boundary movement；
+但 random / bottom 控制也几乎同样巨大。
+```
+
+因此，GLM4 不能被解释为干净共识坐标闭合。
+
+最强可用子结果：
+
+```text
+relation = function
+language_pair = zh->en
+alpha = 1.0
+
+full boundary delta = +9.2795
+consensus raw boundary delta = +9.0139
+raw fraction = 0.9714
+consensus same boundary delta = +9.5266
+control best boundary delta = +9.0676
+gain = +0.4590
+joint score = +0.4590
+overlap recall = 0.1050
+jaccard = 0.0556
+```
+
+这个结果说明：
+
+```text
+function zh->en 中存在可留出的共识坐标信号；
+但 overlap 很低，且模型边界场非常容易被一般扰动推动。
+```
+
+其他 GLM4 子结果多为：
+
+```text
+raw fraction 很高；
+但 gain <= 0 或接近 0。
+```
+
+例如：
+
+```text
+color en->en:
+  consensus raw fraction 接近 1；
+  但 control best 更高，gain 为负。
+
+function en->en:
+  consensus raw fraction 接近 1；
+  但 gain 强烈为负。
+```
+
+GLM4 的客观结论：
+
+```text
+存在 boundary-sensitive residual coordinate field；
+但它不是干净的 semantic boundary consensus gear。
+```
+
+### 七、DS7B 结果
+
+DS7B 只有 function en->en 进入测试，因此证据覆盖很窄。
+
+结果：
+
+```text
+relation = function
+language_pair = en->en
+alpha = 1.0
+
+full boundary delta = +0.1250
+consensus raw boundary delta = +0.0521
+raw fraction = 0.4167
+consensus same boundary delta = +0.2604
+control best boundary delta = +0.1823
+gain = +0.0781
+joint score = +0.0781
+overlap recall = 0.2233
+jaccard = 0.1262
+```
+
+alpha=0.5 时：
+
+```text
+full boundary delta = +0.0677
+consensus raw boundary delta = -0.0521
+consensus same boundary delta = +0.0521
+control best boundary delta = +0.0208
+gain = +0.0313
+```
+
+DS7B 的客观结论：
+
+```text
+存在一个局部 partial positive；
+但只覆盖 function en->en，
+不能外推为 DS7B 的稳定语义边界共识坐标机制。
+```
+
+考虑到 DS7B 当前是小模型、结构可能粗糙，这个结果只能作为弱拼图。
+
+### 八、本阶段理论进展
+
+Phase942 将 Phase941 的结论推进了一步：
+
+```text
+Phase941:
+  单个 semantic-specific direction 的 boundary effect
+  可以被 top-256 residual coordinate subspace 部分复现。
+
+Phase942:
+  多个训练 direction 反复出现的 consensus coordinate group
+  在 holdout direction 上仍能部分复现 boundary effect。
+```
+
+因此，当前可谨慎写成：
+
+```text
+语义方向到输出边界竞争之间，
+存在可复用的 residual coordinate group。
+```
+
+但不能写成：
+
+```text
+已经找到语义齿轮；
+已经找到 MLP channel；
+已经完成语言编码机制闭合。
+```
+
+更准确的图谱位置是：
+
+```text
+Semantic-specific direction
+  -> residual coordinate consensus group
+  -> first-token boundary margin movement
+```
+
+这是一个可测的图谱边，但还不是底层组件闭合。
+
+### 九、严格审视和硬伤
+
+1. 留出粒度仍不够强。
+
+```text
+Phase942 是 spec-level holdout；
+不是严格 object-level holdout；
+也不是完全独立语义域 holdout。
+```
+
+2. consensus coordinate 是 residual coordinate，不是神经元或通道。
+
+```text
+残差坐标可能混合了多个 MLP / attention 来源；
+也可能受 LayerNorm 和 readout basis 影响。
+```
+
+3. GLM4 的控制问题严重。
+
+```text
+random / bottom 控制也能大幅推动 boundary margin；
+因此 GLM4 的大数值不能直接解释为干净机制。
+```
+
+4. qwen3 的正结果不均匀。
+
+```text
+function en->en 最清晰；
+color en->zh / en->en 有正结果；
+zh->zh 和部分 zh->en 弱或失败。
+```
+
+5. DS7B 覆盖太窄。
+
+```text
+只有 function en->en；
+不能作为跨关系、跨语言的稳定证据。
+```
+
+6. 仍然是 one-step logit 审计。
+
+```text
+没有自然生成；
+没有多 token rollout；
+没有 full-vocab blocker closure；
+没有最小割闭合。
+```
+
+### 十、闭合距离
+
+当前完成的是：
+
+```text
+residual coordinate consensus holdout evidence
+```
+
+距离闭合还差：
+
+```text
+1. object-level holdout；
+2. template-level holdout；
+3. component-level mapping；
+4. MLP / attention 因果干预；
+5. full-vocab blocker control；
+6. natural generation rollout；
+7. minimal sufficient set / minimal cut。
+```
+
+所以 Phase942 仍然是图谱推进，不是机制闭合。
+
+### 十一、智能理论层面的关键洞察
+
+Phase942 给出的第一性线索是：
+
+```text
+语言语义不是只靠某个单点神经元进入输出竞争；
+也不是完全分散在整个隐藏空间；
+而是会通过一组中等宽度、可复用的 residual coordinate group
+接入边界竞争。
+```
+
+这与“水果如何复用神经元、颜色属性如何复用神经元”的问题相连：
+
+```text
+对象/属性可能先形成方向性结构；
+不同对象共享部分坐标；
+不同属性在共享坐标上有不同投影；
+最终通过边界竞争场决定 token 输出。
+```
+
+但目前还只能说：
+
+```text
+看到了残差坐标层面的复用痕迹；
+还没有看到底层组件层面的真实齿轮形状。
+```
+
+### 十二、下一阶段任务
+
+Phase943 应继续同一大阶段，进入：
+
+```text
+Consensus Coordinate Artifact Export and Component Mapping Audit
+```
+
+核心任务：
+
+```text
+1. 导出每个模型、relation、language pair 的 consensus coordinate indices；
+2. 记录 vote count、signed vote、mean abs weight；
+3. 检查 consensus coordinate 与 lm_head 输出差分方向的重合；
+4. 检查 consensus coordinate 与 MLP down_proj / attention o_proj 输出基的粗略重合；
+5. 如果能找到组件候选，再进入 channel/head-level causal patch。
+```
+
+下一阶段的关键不是继续追求更大 margin，而是回答：
+
+```text
+这些 residual consensus coordinates 到底来自哪些模型组件？
+```
+
+如果不能映射回组件，当前图谱会停留在 residual readout 层，无法进入真正的齿轮机制。
+
+### 十三、通俗总结
+
+Phase941 发现：
+
+```text
+语义方向推动答案时，不是所有隐藏维度都同等重要；
+top-256 这种中等宽度坐标子空间很关键。
+```
+
+Phase942 继续问：
+
+```text
+这些重要坐标是不是只对某一个样本有效？
+还是能在别的留出语义方向上继续有效？
+```
+
+结果是：
+
+```text
+qwen3:
+  是，有比较清楚的共识坐标留出正结果。
+
+GLM4:
+  有局部正结果，但模型对一般扰动过于敏感。
+
+DS7B:
+  有一个局部弱正结果，但覆盖太窄。
+```
+
+所以当前拼图可以更新为：
+
+```text
+语义方向 -> 残差共识坐标组 -> 输出边界移动
+```
+
+但这还不是最终机制。下一步要把这些残差坐标组映射回真正的 MLP / attention 组件，看看它们是不是由可复用的底层齿轮产生。
+
+## Phase 943: 共识坐标导出与组件静态映射审计 [2026-07-05 01:01]
+
+### 一、阶段判断
+
+Phase942 已经证明：
+
+```text
+在 qwen3 中，semantic-specific direction 的 residual coordinate consensus
+可以在留出 direction 上复现一部分 boundary margin movement。
+
+在 GLM4 和 DS7B 中，也有部分正结果，但证据较弱或受控制项干扰。
+```
+
+因此下一步不是继续追求更大的 logit margin，而是回答：
+
+```text
+这些 consensus residual coordinates 是否能映射回真实模型组件？
+```
+
+Phase943 继续同一条“先完成图谱，再追求闭合”的路线，但性质变成：
+
+```text
+artifact export + static component mapping audit
+```
+
+它不是因果干预阶段，不证明 MLP channel / attention head 已经闭合。
+
+### 二、本阶段任务
+
+本阶段新增脚本：
+
+```text
+tests/glm5/phase943_consensus_coordinate_component_mapping_audit.py
+tests/glm5/run_phase943_consensus_coordinate_component_mapping_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase943_consensus_coordinate_component_mapping_audit/consensus_coordinate_component_mapping_audit/
+```
+
+输出文件包括：
+
+```text
+phase943_qwen3_consensus_records.jsonl
+phase943_glm4_consensus_records.jsonl
+phase943_deepseek7b_consensus_records.jsonl
+phase943_cross_model_summary.md
+phase943_cross_model_summary.json
+```
+
+其中 `consensus_records.jsonl` 已保存：
+
+```text
+1. consensus coordinate indices；
+2. vote count / vote histogram；
+3. readout energy lift；
+4. MLP down_proj row energy lift；
+5. attention o_proj row energy lift；
+6. top MLP column candidates；
+7. top attention head candidates。
+```
+
+### 三、测试原理和公式
+
+Phase943 复用 Phase942 的共识坐标：
+
+```text
+C = C_consensus(r, lang)
+```
+
+对任意向量 `v`，计算其在共识坐标中的能量比例：
+
+```text
+E_C(v) = ||v_C||^2 / ||v||^2
+```
+
+因为 `C` 的宽度固定为 256，所以用随机期望宽度作为基线：
+
+```text
+E_random = |C| / d_model
+```
+
+定义 lift：
+
+```text
+Lift_C(v) = E_C(v) / E_random
+```
+
+readout 审计中使用：
+
+```text
+v_boundary = W_U[target_label] - mean(W_U[boundary_tokens])
+v_relation = W_U[target_label] - mean(W_U[other_relation_labels])
+```
+
+检查：
+
+```text
+Lift_C(v_boundary)
+Lift_C(v_relation)
+```
+
+组件静态映射中，对 MLP 或 attention 输出矩阵 `W` 使用：
+
+```text
+R_C(W) = ||W[C, :]||^2 / ||W||^2
+Lift_C(W) = R_C(W) / (|C| / d_model)
+```
+
+对 MLP channel 候选：
+
+```text
+Lift_C(W_down[:, j])
+```
+
+对 attention head 候选：
+
+```text
+Lift_C(W_o[:, head_slice])
+```
+
+注意：这些都是静态权重几何指标。它们只能给出候选来源，不能证明自然前向时该 channel/head 真的激活并产生该坐标组。
+
+### 四、测试规模
+
+三模型顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+实际记录数：
+
+```text
+qwen3:
+  records = 7
+
+GLM4:
+  records = 5
+
+DS7B:
+  records = 1
+```
+
+对应筛选关系：
+
+```text
+qwen3:
+  color en->en / en->zh / zh->en / zh->zh
+  function en->en / zh->en / zh->zh
+
+GLM4:
+  color en->en / zh->en / zh->zh
+  function en->en / zh->en
+
+DS7B:
+  function en->en
+```
+
+### 五、跨模型总结果
+
+证据标签：
+
+```text
+residual_consensus_export_with_component_candidates: 1
+residual_consensus_export_with_weak_component_candidates: 2
+```
+
+模型汇总：
+
+```text
+qwen3:
+  readout boundary lift mean = 0.9316
+  readout relation lift mean = 0.9008
+  MLP down row lift mean = 0.9768
+  attention o row lift mean = 0.9539
+  max MLP column lift mean = 5.8457
+  max attention head lift mean = 1.3202
+
+GLM4:
+  readout boundary lift mean = 1.1225
+  readout relation lift mean = 0.9573
+  MLP down row lift mean = 0.9802
+  attention o row lift mean = 1.1016
+  max MLP column lift mean = 10.1750
+  max attention head lift mean = 2.8773
+
+DS7B:
+  readout boundary lift mean = 1.0237
+  readout relation lift mean = 0.7782
+  MLP down row lift mean = 0.9898
+  attention o row lift mean = 0.9618
+  max MLP column lift mean = 10.8440
+  max attention head lift mean = 2.0283
+```
+
+总体客观现象：
+
+```text
+1. 整体 MLP down / attention o 的 row energy lift 接近 1；
+2. readout boundary lift 只有 GLM4 明显高于 1；
+3. 但 top MLP columns 出现很高 lift；
+4. 部分 attention heads 也出现高于随机宽度的 lift。
+```
+
+这说明：
+
+```text
+共识坐标不是整个 MLP/attention 输出矩阵的全局偏置；
+更像是少量 MLP channel / attention head 子块中存在候选集中。
+```
+
+### 六、qwen3 结果
+
+qwen3：
+
+```text
+evidence = residual_consensus_export_with_weak_component_candidates
+records = 7
+```
+
+qwen3 的总体特点：
+
+```text
+readout lift 不强；
+整体 MLP/attention row lift 不强；
+但 top MLP column lift 稳定偏高。
+```
+
+具体候选：
+
+```text
+color en->zh:
+  hidden_idx = 36
+  readout boundary lift = 0.9068
+  MLP row lift = 0.9861
+  attention row lift = 0.8899
+  max MLP column lift = 6.7194
+  max attention head lift = 1.2358
+  top MLP column ids = 2509, 1579, 310
+
+color zh->zh:
+  hidden_idx = 36
+  readout boundary lift = 1.0070
+  max MLP column lift = 6.4837
+  top MLP column ids = 2509, 134, 1579
+  top attention head = head 5, lift = 1.2626
+
+function en->en:
+  hidden_idx = 27
+  readout boundary lift = 0.8459
+  max MLP column lift = 6.3458
+  top MLP column ids = 2, 3, 376
+  top attention heads = head 0 / 1 / 2
+```
+
+qwen3 的重要现象：
+
+```text
+color 相关 consensus coordinates 多次指向 MLP column 2509；
+function 相关 consensus coordinates 多次指向 MLP column 2 / 3。
+```
+
+但必须注意：
+
+```text
+这是静态权重集中；
+还没有证明这些 channels 在自然样本中被激活；
+也没有证明 ablation/patch 后 boundary movement 会消失。
+```
+
+### 七、GLM4 结果
+
+GLM4：
+
+```text
+evidence = residual_consensus_export_with_component_candidates
+records = 5
+```
+
+GLM4 的总体特点：
+
+```text
+readout boundary lift mean = 1.1225；
+attention o row lift mean = 1.1016；
+top MLP column 和 top attention head lift 都更强。
+```
+
+最强候选：
+
+```text
+color en->en:
+  hidden_idx = 30
+  readout boundary lift = 1.1145
+  attention o row lift = 1.1289
+  max MLP column lift = 12.0063
+  max attention head lift = 3.9425
+  top MLP column ids = 5532, 8633, 1165
+  top attention head = head 31
+
+function en->en:
+  hidden_idx = 30
+  readout boundary lift = 1.1438
+  attention o row lift = 1.1270
+  max MLP column lift = 11.9764
+  max attention head lift = 3.5002
+  top MLP column ids = 5532, 8633, 1165
+  top attention head = head 31
+
+function zh->en:
+  hidden_idx = 30
+  readout boundary lift = 1.1364
+  MLP row lift = 1.0228
+  attention o row lift = 1.1353
+  max MLP column lift = 11.9211
+  max attention head lift = 2.9451
+  top MLP column ids = 5532, 8633, 1165
+  top attention head = head 31
+```
+
+GLM4 的关键现象：
+
+```text
+多个 relation / language pair 反复出现同一组高 lift MLP columns：
+  5532, 8633, 1165
+
+多个关系也反复出现 attention head 31。
+```
+
+这比 qwen3 更像可复用组件候选。
+
+但 Phase942 已经显示：
+
+```text
+GLM4 的 boundary field 对 random / bottom 控制非常敏感。
+```
+
+因此这里的组件候选仍然不能直接解释为干净语义齿轮。
+
+### 八、DS7B 结果
+
+DS7B：
+
+```text
+evidence = residual_consensus_export_with_weak_component_candidates
+records = 1
+```
+
+唯一记录：
+
+```text
+function en->en:
+  hidden_idx = 14
+  readout boundary lift = 1.0237
+  readout relation lift = 0.7782
+  MLP row lift = 0.9898
+  attention row lift = 0.9618
+  max MLP column lift = 10.8440
+  max attention head lift = 2.0283
+  top MLP column ids = 3033, 16221, 6030
+  top attention head = head 7
+```
+
+DS7B 的结果说明：
+
+```text
+存在静态组件候选；
+但只有一个 relation / language pair，
+不能说明 DS7B 有稳定跨语义共识组件。
+```
+
+### 九、本阶段理论进展
+
+Phase943 把图谱链条从：
+
+```text
+semantic direction
+  -> residual coordinate consensus
+  -> boundary margin movement
+```
+
+推进到：
+
+```text
+semantic direction
+  -> residual coordinate consensus
+  -> candidate MLP columns / candidate attention heads
+  -> boundary margin movement
+```
+
+但其中组件环节目前只是静态候选：
+
+```text
+candidate MLP columns / candidate attention heads
+```
+
+还不是：
+
+```text
+causal MLP channels / causal attention heads
+```
+
+当前最有价值的候选是：
+
+```text
+qwen3 color:
+  MLP column 2509, 1579, 134, 310
+
+qwen3 function:
+  MLP column 2, 3, 106, 376
+  attention heads 0, 1, 2
+
+GLM4 cross-relation:
+  MLP column 5532, 8633, 1165
+  attention head 31
+
+DS7B function en->en:
+  MLP column 3033, 16221, 6030
+  attention head 7
+```
+
+### 十、严格审视和硬伤
+
+1. 静态权重不等于自然激活。
+
+```text
+某个 MLP column 的输出权重集中在 C，
+不代表该 channel 在目标样本中被激活。
+```
+
+2. 整体 row lift 接近 1。
+
+```text
+qwen3 / DS7B 的 MLP down 和 attention o 整体 row energy lift 都接近随机宽度；
+说明共识坐标不是整个组件输出矩阵的全局方向。
+```
+
+3. top column lift 可能受小范数列影响。
+
+```text
+某些 column 的总能量可能较小；
+高 lift 不一定意味着高绝对贡献。
+```
+
+本阶段记录了 column_energy，但还没有加入激活强度：
+
+```text
+actual contribution = activation_j(x) * W_down[:, j]
+```
+
+4. attention head 只是 o_proj 几何候选。
+
+```text
+没有读取自然注意力权重；
+没有 head ablation；
+没有 head patch。
+```
+
+5. readout lift 不稳定。
+
+```text
+qwen3 readout boundary lift mean < 1；
+DS7B relation lift < 1；
+只有 GLM4 readout boundary lift 略高。
+```
+
+这说明 residual consensus coordinates 不一定直接等于 lm_head readout 坐标。
+
+6. 仍未接入 natural generation。
+
+```text
+Phase943 没有测试生成；
+没有 full-vocab blocker closure；
+没有 multi-token rollout。
+```
+
+### 十一、闭合距离
+
+Phase943 当前完成：
+
+```text
+consensus coordinate artifact export
+static readout/component mapping
+candidate component list
+```
+
+距离闭合还差：
+
+```text
+1. activation-weighted MLP contribution；
+2. MLP channel ablation / patch；
+3. attention head ablation / patch；
+4. channel/head 与 Phase942 boundary movement 的因果对应；
+5. random same-layer channel/head 控制；
+6. object-level holdout；
+7. natural rollout；
+8. blocker-token minimal cut。
+```
+
+所以当前结果只能写作：
+
+```text
+component candidate mapping
+```
+
+不能写作：
+
+```text
+component causal closure
+```
+
+### 十二、智能理论层面的关键洞察
+
+Phase943 对“编码机制长什么样”提供了一个更具体的线索：
+
+```text
+属性/语义不是单纯存在于一个方向；
+它可能通过 residual coordinate group 接入输出边界；
+而这些 residual coordinate group 的来源，
+可能进一步分散在少量 MLP columns 和少量 attention heads 中。
+```
+
+这支持一种更具体的图谱结构：
+
+```text
+object / attribute state
+  -> semantic-specific direction
+  -> residual coordinate consensus group
+  -> sparse component candidates
+  -> output boundary competition
+```
+
+但仍需谨慎：
+
+```text
+当前看到的是权重几何上的候选；
+还没有看到自然前向里的激活齿轮。
+```
+
+破解语言编码机制的下一步，不应再停留在 residual coordinate 层，而要进入：
+
+```text
+activation-weighted component contribution
+```
+
+也就是对每个样本计算：
+
+```text
+MLP contribution_j(x) = a_j(x) * W_down[:, j]
+```
+
+然后看：
+
+```text
+P_C(MLP contribution_j(x))
+```
+
+是否真的解释 Phase942 中的 boundary movement。
+
+### 十三、下一阶段任务
+
+Phase944 应进入新的子阶段：
+
+```text
+Activation-Weighted Component Causal Audit
+```
+
+任务：
+
+```text
+1. 对 Phase943 的 top MLP columns 记录自然激活 a_j(x)；
+2. 计算 activation-weighted contribution 是否落在 C_consensus；
+3. 对 top channel 做 ablation；
+4. 对 top channel 做 same-layer random channel 控制；
+5. 对 GLM4 特别加入通用扰动控制，防止把敏感边界场误判为语义机制；
+6. 对 qwen3 优先测试 function en->en 和 color en->zh；
+7. 对 DS7B 只作为弱参考，不做强结论。
+```
+
+Phase944 与 Phase943 相关，但它已经从“静态映射”进入“组件因果干预”子阶段。为了避免把静态候选直接误升级为因果闭合，本阶段先在 Phase943 停止。
+
+### 十四、通俗总结
+
+Phase942 找到的是：
+
+```text
+哪些残差坐标像一组稳定接口。
+```
+
+Phase943 继续问：
+
+```text
+这些接口可能从哪些模型部件来？
+```
+
+结果是：
+
+```text
+qwen3:
+  没有很强的整体组件集中；
+  但有若干 MLP column 候选反复出现。
+
+GLM4:
+  候选最明显，尤其 MLP 5532/8633/1165 和 attention head 31；
+  但 GLM4 本身边界场太敏感，需要严控。
+
+DS7B:
+  只有 function en->en 的弱候选。
+```
+
+所以当前拼图又前进了一格：
+
+```text
+残差共识坐标组已经可以导出；
+并且能找到一批候选 MLP columns / attention heads。
+```
+
+但真正要证明它们是“齿轮”，还必须做下一阶段的激活加权和因果干预。
+
+## Phase 944: 激活加权 MLP 通道因果审计 [2026-07-05 01:31]
+
+### 一、对最新上传分析的判断
+
+最新上传内容的总体判断基本正确，而且证据层级控制得比较稳。
+
+当前机制公式：
+
+```text
+A(y|x) = sum_{o,r} P(o|x) P(r|x) K(o,r,y) g(y|x)
+```
+
+可以作为全局编码图谱中“语义答案场”的理论骨架，但不能单独完成全局编码图谱。它还缺少五个关键环节：
+
+```text
+1. P(o|x), P(r|x), K(o,r,y), g(y|x) 的可测量化；
+2. semantic factor -> channel gear -> natural gate -> clean rollout 的因果链；
+3. 自然门控来源；
+4. full-vocab blocker 和 strict-clean 输出协议闭合；
+5. qwen3 / GLM4 / DS7B 的跨模型一致性。
+```
+
+因此，本阶段没有继续做抽象理论总结，而是把 Phase943 得到的候选 MLP columns 推进到一个更客观的测试问题：
+
+```text
+这些候选 MLP 通道是否在自然激活加权后，仍然指向 Phase942 的共识残差坐标，
+并且在通道干预时比同层随机通道更能移动 target-vs-boundary margin？
+```
+
+这一步对应最新理论里的关键缺口：
+
+```text
+把抽象语义方向接到具体通道齿轮。
+```
+
+### 二、测试脚本和结果文件
+
+新增正式测试脚本：
+
+```text
+tests/glm5/phase944_activation_weighted_mlp_channel_causal_audit.py
+```
+
+新增顺序运行脚本：
+
+```text
+tests/glm5/run_phase944_activation_weighted_mlp_channel_causal_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase944_activation_weighted_mlp_channel_causal_audit/activation_weighted_mlp_channel_causal_audit/
+```
+
+核心汇总文件：
+
+```text
+phase944_cross_model_summary.md
+phase944_cross_model_summary.json
+```
+
+测试已经依次完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+避免了三个模型同时占用 GPU。
+
+### 三、测试原理
+
+Phase943 只是从静态权重上发现了候选 MLP columns。Phase944 进一步加入样本的自然激活：
+
+```text
+Contribution_G(x) = sum_{j in G} a_j(x) W_down[:, j]
+```
+
+其中：
+
+```text
+a_j(x): 样本 x 在该 MLP channel 上的自然激活
+W_down[:, j]: 该 channel 写回 residual stream 的方向
+G: Phase943 给出的 top MLP channel group
+```
+
+再计算该贡献落入 Phase942 共识残差坐标 C 的能量比例：
+
+```text
+E_C(v) = ||P_C(v)||^2 / ||v||^2
+```
+
+为了消除维度大小影响，使用 lift：
+
+```text
+Lift_C(v) = E_C(v) / (|C| / d_model)
+```
+
+然后做通道级因果干预：
+
+```text
+a'_j = f a_j,  j in G
+```
+
+本阶段使用：
+
+```text
+f = 0.0   candidate_ablate
+f = 1.5   candidate_boost
+```
+
+并加入同层随机通道控制：
+
+```text
+same-layer random MLP columns
+```
+
+主要观察：
+
+```text
+Delta target-vs-boundary margin
+Delta relation margin
+Delta target logit
+Delta boundary logit
+```
+
+关键判据不是只看候选通道有没有效果，而是看它是否超过同层随机通道：
+
+```text
+slope_gain =
+  [DeltaBoundary(candidate_boost) - DeltaBoundary(candidate_ablate)]
+  -
+  [DeltaBoundary(random_boost) - DeltaBoundary(random_ablate)]
+```
+
+本阶段的强正结果标准：
+
+```text
+activation-weighted lift gap > 0.25
+and
+boundary slope gain > 0.02
+```
+
+### 四、测试数据和范围
+
+测试从 Phase943 的候选记录出发，选择每个模型的 top-3 MLP columns，并在 Phase942 的 holdout 语义样本上重新评估。
+
+qwen3 进入正式测试的候选：
+
+```text
+color en->en:     hidden 36, channels 2509,16,249
+color en->zh:     hidden 36, channels 2509,1579,310
+color zh->en:     hidden 36, channels 134,310,2509
+color zh->zh:     hidden 36, channels 2509,134,1579
+function en->en:  hidden 27, channels 2,3,376
+function zh->en:  hidden 27, channels 106,2,3
+function zh->zh:  hidden 27, channels 58,2,3
+```
+
+GLM4 进入正式测试的候选：
+
+```text
+color en->en:     hidden 30, channels 5532,8633,1165
+color zh->en:     hidden 30, channels 4906,260,5775
+color zh->zh:     hidden 30, channels 5532,8633,1165
+function en->en:  hidden 30, channels 5532,8633,1165
+function zh->en:  hidden 30, channels 5532,8633,1165
+```
+
+DS7B 进入正式测试的候选：
+
+```text
+function en->en:  hidden 14, channels 3033,16221,6030
+```
+
+### 五、跨模型结果
+
+总体证据标签：
+
+```text
+activation_weighted_mlp_channel_causal_positive: 1
+partial_activation_weighted_mlp_channel_causal_positive: 1
+activation_weighted_mlp_channel_causal_weak_or_mixed: 1
+```
+
+也就是：
+
+```text
+qwen3:      正结果
+GLM4:       部分正结果
+DS7B:       弱/混合结果
+```
+
+#### 1. qwen3
+
+qwen3 给出了本阶段最干净的正结果。
+
+最强结果来自：
+
+```text
+relation: color
+pair: en->en
+hidden: 36
+channels: 2509,16,249
+```
+
+结果：
+
+```text
+candidate activation lift: 4.8014
+random activation lift:    1.0991
+activation gap:            +3.7023
+candidate boundary slope:  +0.6779
+random boundary slope:     -0.0120
+slope gain:                +0.6899
+```
+
+对应干预均值：
+
+```text
+candidate_ablate boundary delta: -0.4471
+candidate_boost boundary delta:  +0.2308
+random_ablate boundary delta:    +0.0048
+random_boost boundary delta:     -0.0072
+```
+
+这说明该通道组不是单纯“权重方向像”，而是在自然激活加权后，确实能解释一部分 boundary movement。
+
+function 方向也有正结果：
+
+```text
+function zh->en, hidden 27, channels 106,2,3
+activation gap: +3.7149
+slope gain:     +0.0521
+
+function zh->zh, hidden 27, channels 58,2,3
+activation gap: +3.4679
+slope gain:     +0.0404
+```
+
+但 qwen3 并非所有候选都成立。例如：
+
+```text
+function en->en: activation gap +6.2542, slope gain -0.0208
+color zh->zh:    activation gap +5.0951, slope gain -0.0216
+```
+
+这说明：
+
+```text
+高 activation-weighted coordinate lift 不必然等于正向边界因果齿轮。
+```
+
+#### 2. GLM4
+
+GLM4 的 activation-weighted coordinate signal 很强，但因果解释不干净。
+
+一个部分正结果：
+
+```text
+relation: function
+pair: zh->en
+hidden: 30
+channels: 5532,8633,1165
+candidate activation lift: 6.2488
+random activation lift:    0.9594
+activation gap:            +5.2894
+candidate boundary slope:  -0.0039
+random boundary slope:     -0.0469
+slope gain:                +0.0430
+```
+
+但是该结果有严重污染：
+
+```text
+candidate_ablate boundary delta: +2.0781
+candidate_boost boundary delta:  +2.0742
+random_ablate boundary delta:    +2.1237
+random_boost boundary delta:     +2.0768
+```
+
+候选通道和随机通道都能造成很大的 boundary delta，说明 GLM4 在这些样本上的边界场存在通用敏感性。本阶段不能把 GLM4 的结果直接写成 clean causal gear，只能写成：
+
+```text
+partial activation-weighted MLP channel causal positive
+```
+
+GLM4 对当前理论的贡献是负向收紧：
+
+```text
+即使候选通道强烈落在共识坐标上，也可能只是处在一个高敏感边界层，
+并不等于语义方向已经通过专用齿轮闭合到输出。
+```
+
+#### 3. DS7B
+
+DS7B 只有一个进入测试的候选：
+
+```text
+relation: function
+pair: en->en
+hidden: 14
+channels: 3033,16221,6030
+```
+
+结果：
+
+```text
+candidate activation lift: 11.2583
+random activation lift:    1.0643
+activation gap:            +10.1940
+candidate boundary slope:  -0.0208
+random boundary slope:     -0.0156
+slope gain:                -0.0052
+```
+
+这说明 DS7B 存在非常强的 coordinate concentration，但没有表现出正向 boundary causal slope。
+
+因此 DS7B 本阶段只能作为弱/混合参考，不能给强机制结论。
+
+### 六、阶段结论
+
+Phase944 的正结果是：
+
+```text
+在 qwen3 中，Phase943 的部分 MLP column 候选已经通过了 activation-weighted + causal intervention 审计。
+```
+
+更具体地说：
+
+```text
+qwen3 color en->en 的 hidden 36 / channels 2509,16,249
+是当前最像“语义坐标 -> MLP 通道齿轮 -> boundary movement”的候选链。
+```
+
+但是 Phase944 也给出重要负结果：
+
+```text
+1. 高 activation-weighted lift 不等于边界因果正结果；
+2. GLM4 的强通道信号容易混入通用边界敏感性；
+3. DS7B 的坐标集中不自动转化为 causal boundary movement；
+4. Phase943 的静态候选不能直接升级为机制闭合。
+```
+
+因此，本阶段不是语言编码机制闭合，也不是完整全局编码图谱完成，而是完成了一个关键桥接：
+
+```text
+static component candidate
+->
+activation-weighted component candidate
+->
+partial causal gear evidence
+```
+
+### 七、对当前理论公式的修正
+
+原公式：
+
+```text
+A(y|x) = sum_{o,r} P(o|x) P(r|x) K(o,r,y) g(y|x)
+```
+
+仍然适合作为语义答案场骨架，但 Phase944 说明必须增加一个可测通道层：
+
+```text
+K(o,r,y)
+not only semantic path strength
+but also measurable component route:
+
+K(o,r,y)
+  -> C_consensus(o,r)
+  -> Contribution_G(x)
+  -> BoundaryMovement(y, B_x)
+```
+
+更接近当前证据的公式应写成：
+
+```text
+CleanOutput(y|x)
+=
+SemanticAnswer(y|x)
+and CandidateWinner(y|x)
+and ActivationWeightedGear(G,x)
+and FieldAdmissible(B_x)
+and NaturalGate(G,x)
+and NoProtocolDrift(x)
+```
+
+其中 Phase944 只推进了：
+
+```text
+ActivationWeightedGear(G,x)
+```
+
+还没有推进：
+
+```text
+NaturalGate(G,x)
+NoProtocolDrift(x)
+strict-clean rollout
+```
+
+### 八、闭合标准和当前距离
+
+一个更严格的闭合标准仍然应保持为：
+
+```text
+CleanCausalEdge
+=
+GearEffect
+and FieldAdmissible
+and OutputTransition
+and NoSideEffect
+```
+
+如果用于全局编码图谱，则还要再加：
+
+```text
+SemanticFactorMeasurable
+and CrossObjectHoldout
+and CrossRelationHoldout
+and CrossTemplateHoldout
+and CrossModelRobustness
+and NaturalGate
+and StrictCleanRollout
+```
+
+Phase944 已经满足或部分满足：
+
+```text
+1. 部分 GearEffect: qwen3 color/function 有正结果；
+2. 部分 SemanticFactorMeasurable: 共识坐标 C 可以被 MLP contribution 解释；
+3. 部分随机对照: candidate group 超过 same-layer random group。
+```
+
+Phase944 尚未满足：
+
+```text
+1. 没有自然门控；
+2. 没有 strict-clean rollout；
+3. 没有 attention head 因果审计；
+4. 没有 full-vocab blocker class 的完整闭合；
+5. 没有对象级大规模 holdout；
+6. 没有把 group 内每个 channel 的方向符号拆开；
+7. GLM4 和 DS7B 还不能给跨模型强结论。
+```
+
+所以当前距离闭合仍然较远，但距离“可测量全局编码图谱”近了一步。
+
+### 九、硬伤和瓶颈
+
+当前最大硬伤不是公式错误，而是变量还不够可测：
+
+```text
+P(o|x), P(r|x), K(o,r,y), g(y|x)
+```
+
+仍需要映射到：
+
+```text
+residual coordinate
+MLP channel contribution
+attention head route
+candidate blocker class
+natural gate score
+rollout transition
+```
+
+第二个硬伤是 group-level 通道可能混合了多个作用：
+
+```text
+同一组 channels 里可能同时存在 answer lift、blocker weakening、protocol drift、副作用。
+```
+
+第三个硬伤是当前干预仍然是人工缩放：
+
+```text
+a'_j = f a_j
+```
+
+这不能替代自然门控。真正的机制闭合必须回答：
+
+```text
+模型自然状态下为什么、何时、由谁启动这个 channel group？
+```
+
+第四个硬伤是小模型偏差。qwen3、GLM4、DS7B 的内部结构可能比大模型粗糙，尤其 GLM4 的通用边界敏感性和 DS7B 的弱转换结果，都不能轻易外推。
+
+### 十、智能理论进展
+
+从智能理论角度看，Phase944 支持一个更具体的第一性原理方向：
+
+```text
+语言编码不是单个概念向量直接读出答案，
+而是语义因子先形成可复用残差坐标，
+再通过具体组件的自然激活加权贡献写入候选竞争边界。
+```
+
+也就是说：
+
+```text
+对象、关系、属性不是孤立神经元；
+它们更像一组可复用坐标接口。
+```
+
+这些接口是否产生输出，还要经过：
+
+```text
+component contribution
+candidate boundary
+protocol continuation
+termination gate
+```
+
+Phase944 对“水果/颜色/功能如何复用神经元”的启示是：
+
+```text
+不要先找 apple neuron / red neuron；
+先找 object-relation coordinate；
+再检查哪些 MLP channel 在自然激活加权后稳定写入该 coordinate；
+最后看这些写入是否能移动 full-vocab boundary。
+```
+
+### 十一、下一阶段任务
+
+Phase945 应继续沿着当前图谱优先路线，但进入更细的子任务：
+
+```text
+MLP Channel Sign Decomposition and Object-Level Holdout Audit
+```
+
+具体任务：
+
+```text
+1. 对 qwen3 color en->en 的 channels 2509,16,249 逐个做 ablate/boost；
+2. 对 qwen3 function zh->en 的 channels 106,2,3 逐个做 ablate/boost；
+3. 区分 support channel、suppressor channel、mixed side-effect channel；
+4. 加入对象级 holdout，例如 apple/banana/car/shark 等跨类别样本；
+5. 检查同一 channel 是否复用到 color、function、category 等不同关系；
+6. GLM4 加入更强 random/control perturbation，专门剔除通用边界敏感性；
+7. DS7B 只做弱参考，不作为闭合依据。
+```
+
+Phase945 与 Phase944 属于同一条大路线：
+
+```text
+全局编码图谱可测量化。
+```
+
+但它已经从 group-level causal audit 进入 single-channel sign decomposition，因此不应把 Phase944 的结果和 Phase945 的结论混写。本阶段先完成 Phase944，并把下一阶段固定为更严格的分解验证。
+
+### 十二、通俗总结
+
+这次测试可以简单理解为：
+
+```text
+以前我们看到一些齿轮“长得像”可能有用；
+这次开始检查这些齿轮在模型真正运行时有没有被转起来，
+以及转动它们会不会真的推动输出边界。
+```
+
+结果是：
+
+```text
+qwen3 有一组比较像真齿轮的 MLP channels；
+GLM4 有强信号，但边界太敏感，容易误判；
+DS7B 有方向集中，但没有稳定推动输出。
+```
+
+所以当前结论是：
+
+```text
+机制公式可以当骨架；
+Phase944 开始把骨架接到可测通道；
+但距离自然门控和 strict-clean 输出闭合仍然很远。
+```
