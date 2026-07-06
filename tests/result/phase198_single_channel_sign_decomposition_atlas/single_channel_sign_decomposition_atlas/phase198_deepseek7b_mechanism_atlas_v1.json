@@ -1,0 +1,162 @@
+{
+  "schema_version": "mechanism_atlas_v1",
+  "phase": 198,
+  "source_phase": 944,
+  "title": "Single-Channel Sign Decomposition Atlas",
+  "model": "deepseek7b",
+  "created_at": "2026-07-05T07:42:37",
+  "nodes": [
+    {
+      "id": "axis:deepseek7b:function:en->en:h14",
+      "kind": "axis_node",
+      "domain": "function",
+      "model": "deepseek7b"
+    },
+    {
+      "id": "component:deepseek7b:L13:mlp_channel:16221",
+      "kind": "component_node",
+      "component_type": "mlp_channel",
+      "model": "deepseek7b",
+      "layer_idx": 13,
+      "channel_id": 16221
+    },
+    {
+      "id": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "boundary_node",
+      "boundary_type": "full_vocab",
+      "model": "deepseek7b"
+    },
+    {
+      "id": "component:deepseek7b:L13:mlp_channel:3033",
+      "kind": "component_node",
+      "component_type": "mlp_channel",
+      "model": "deepseek7b",
+      "layer_idx": 13,
+      "channel_id": 3033
+    },
+    {
+      "id": "component:deepseek7b:L13:mlp_channel:6030",
+      "kind": "component_node",
+      "component_type": "mlp_channel",
+      "model": "deepseek7b",
+      "layer_idx": 13,
+      "channel_id": 6030
+    },
+    {
+      "id": "component:deepseek7b:L13:mlp_channel:3380",
+      "kind": "component_node",
+      "component_type": "mlp_channel",
+      "model": "deepseek7b",
+      "layer_idx": 13,
+      "channel_id": 3380
+    },
+    {
+      "id": "component:deepseek7b:L13:mlp_channel:18897",
+      "kind": "component_node",
+      "component_type": "mlp_channel",
+      "model": "deepseek7b",
+      "layer_idx": 13,
+      "channel_id": 18897
+    },
+    {
+      "id": "component:deepseek7b:L13:mlp_channel:5261",
+      "kind": "component_node",
+      "component_type": "mlp_channel",
+      "model": "deepseek7b",
+      "layer_idx": 13,
+      "channel_id": 5261
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:deepseek7b|function|en->en|h14|candidate|c16221",
+      "source": "axis:deepseek7b:function:en->en:h14",
+      "target": "component:deepseek7b:L13:mlp_channel:16221",
+      "then": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "axis_to_component_to_boundary",
+      "model": "deepseek7b",
+      "domain": "function",
+      "evidence_level": "L3_transition_or_correlational",
+      "single_channel_sign": "near_zero_or_correlational",
+      "boundary_slope": 0.015625,
+      "relation_slope": 0.0,
+      "channel_source": "candidate",
+      "failure_or_risk": null
+    },
+    {
+      "id": "edge:deepseek7b|function|en->en|h14|candidate|c3033",
+      "source": "axis:deepseek7b:function:en->en:h14",
+      "target": "component:deepseek7b:L13:mlp_channel:3033",
+      "then": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "axis_to_component_to_boundary",
+      "model": "deepseek7b",
+      "domain": "function",
+      "evidence_level": "L3_transition_or_correlational",
+      "single_channel_sign": "mixed_side_effect_channel",
+      "boundary_slope": -0.005208333333333336,
+      "relation_slope": 0.03125,
+      "channel_source": "candidate",
+      "failure_or_risk": "group_level_mixed"
+    },
+    {
+      "id": "edge:deepseek7b|function|en->en|h14|candidate|c6030",
+      "source": "axis:deepseek7b:function:en->en:h14",
+      "target": "component:deepseek7b:L13:mlp_channel:6030",
+      "then": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "axis_to_component_to_boundary",
+      "model": "deepseek7b",
+      "domain": "function",
+      "evidence_level": "L4_component_causal_node",
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "boundary_slope": -0.04166666666666667,
+      "relation_slope": -0.010416666666666668,
+      "channel_source": "candidate",
+      "failure_or_risk": null
+    },
+    {
+      "id": "edge:deepseek7b|function|en->en|h14|same_layer_random|c3380",
+      "source": "axis:deepseek7b:function:en->en:h14",
+      "target": "component:deepseek7b:L13:mlp_channel:3380",
+      "then": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "axis_to_component_to_boundary",
+      "model": "deepseek7b",
+      "domain": "function",
+      "evidence_level": "L4_component_causal_node",
+      "single_channel_sign": "support_channel",
+      "boundary_slope": 0.020833333333333336,
+      "relation_slope": 0.03125,
+      "channel_source": "same_layer_random",
+      "failure_or_risk": null
+    },
+    {
+      "id": "edge:deepseek7b|function|en->en|h14|same_layer_random|c18897",
+      "source": "axis:deepseek7b:function:en->en:h14",
+      "target": "component:deepseek7b:L13:mlp_channel:18897",
+      "then": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "axis_to_component_to_boundary",
+      "model": "deepseek7b",
+      "domain": "function",
+      "evidence_level": "L3_transition_or_correlational",
+      "single_channel_sign": "mixed_side_effect_channel",
+      "boundary_slope": -0.005208333333333336,
+      "relation_slope": -0.020833333333333332,
+      "channel_source": "same_layer_random",
+      "failure_or_risk": "group_level_mixed"
+    },
+    {
+      "id": "edge:deepseek7b|function|en->en|h14|same_layer_random|c5261",
+      "source": "axis:deepseek7b:function:en->en:h14",
+      "target": "component:deepseek7b:L13:mlp_channel:5261",
+      "then": "boundary:deepseek7b:function:en->en:full_vocab",
+      "kind": "axis_to_component_to_boundary",
+      "model": "deepseek7b",
+      "domain": "function",
+      "evidence_level": "L4_component_causal_node",
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "boundary_slope": -0.026041666666666664,
+      "relation_slope": -0.03125,
+      "channel_source": "same_layer_random",
+      "failure_or_risk": null
+    }
+  ]
+}

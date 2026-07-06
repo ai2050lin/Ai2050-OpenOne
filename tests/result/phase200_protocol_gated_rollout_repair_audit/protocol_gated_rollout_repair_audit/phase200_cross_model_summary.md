@@ -1,0 +1,40 @@
+# Phase 200 protocol-gated rollout repair audit
+
+| model | edge | protocol | base stable | ablate stable | boost stable | base clear | drift |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| qwen3 | qwen3|color|en->en|h36|c16|mixed_side_effect_channel | plain | 0 | 0 | 0 | 9 | 16 |
+| qwen3 | qwen3|color|en->en|h36|c16|mixed_side_effect_channel | short_answer | 0 | 0 | 0 | 8 | 16 |
+| qwen3 | qwen3|color|en->en|h36|c16|mixed_side_effect_channel | stop_explicit | 0 | 0 | 0 | 8 | 16 |
+| qwen3 | qwen3|color|en->en|h36|c249|support_channel | plain | 0 | 0 | 0 | 9 | 16 |
+| qwen3 | qwen3|color|en->en|h36|c249|support_channel | short_answer | 0 | 0 | 0 | 8 | 16 |
+| qwen3 | qwen3|color|en->en|h36|c249|support_channel | stop_explicit | 0 | 0 | 0 | 8 | 16 |
+| qwen3 | qwen3|function|en->en|h27|c3|support_channel | plain | 0 | 0 | 0 | 1 | 11 |
+| qwen3 | qwen3|function|en->en|h27|c3|support_channel | short_answer | 0 | 0 | 0 | 2 | 12 |
+| qwen3 | qwen3|function|en->en|h27|c3|support_channel | stop_explicit | 0 | 0 | 0 | 0 | 12 |
+| qwen3 | qwen3|function|zh->zh|h27|c2|support_channel | plain | 0 | 0 | 0 | 0 | 10 |
+| qwen3 | qwen3|function|zh->zh|h27|c2|support_channel | short_answer | 0 | 0 | 0 | 2 | 12 |
+| qwen3 | qwen3|function|zh->zh|h27|c2|support_channel | stop_explicit | 0 | 0 | 0 | 0 | 12 |
+| qwen3 | qwen3|function|zh->zh|h27|c58|support_channel | plain | 0 | 0 | 0 | 0 | 10 |
+| qwen3 | qwen3|function|zh->zh|h27|c58|support_channel | short_answer | 0 | 0 | 0 | 2 | 12 |
+| qwen3 | qwen3|function|zh->zh|h27|c58|support_channel | stop_explicit | 0 | 0 | 0 | 0 | 12 |
+| glm4 | glm4|color|en->en|h30|c1165|support_channel | plain | 0 | 0 | 0 | 7 | 16 |
+| glm4 | glm4|color|en->en|h30|c1165|support_channel | short_answer | 3 | 3 | 3 | 7 | 9 |
+| glm4 | glm4|color|en->en|h30|c1165|support_channel | stop_explicit | 8 | 8 | 8 | 9 | 1 |
+| glm4 | glm4|color|en->en|h30|c5532|suppressor_or_blocker_channel | plain | 0 | 0 | 0 | 7 | 16 |
+| glm4 | glm4|color|en->en|h30|c5532|suppressor_or_blocker_channel | short_answer | 3 | 3 | 3 | 7 | 9 |
+| glm4 | glm4|color|en->en|h30|c5532|suppressor_or_blocker_channel | stop_explicit | 8 | 8 | 8 | 9 | 1 |
+| glm4 | glm4|function|en->en|h30|c5532|suppressor_or_blocker_channel | plain | 0 | 0 | 0 | 0 | 9 |
+| glm4 | glm4|function|en->en|h30|c5532|suppressor_or_blocker_channel | short_answer | 0 | 0 | 0 | 0 | 7 |
+| glm4 | glm4|function|en->en|h30|c5532|suppressor_or_blocker_channel | stop_explicit | 3 | 3 | 3 | 3 | 2 |
+| glm4 | glm4|function|zh->en|h30|c1165|mixed_side_effect_channel | plain | 0 | 0 | 0 | 4 | 12 |
+| glm4 | glm4|function|zh->en|h30|c1165|mixed_side_effect_channel | short_answer | 0 | 0 | 0 | 0 | 10 |
+| glm4 | glm4|function|zh->en|h30|c1165|mixed_side_effect_channel | stop_explicit | 2 | 2 | 2 | 4 | 6 |
+| glm4 | glm4|function|zh->en|h30|c5532|suppressor_or_blocker_channel | plain | 0 | 0 | 0 | 4 | 12 |
+| glm4 | glm4|function|zh->en|h30|c5532|suppressor_or_blocker_channel | short_answer | 0 | 0 | 0 | 0 | 10 |
+| glm4 | glm4|function|zh->en|h30|c5532|suppressor_or_blocker_channel | stop_explicit | 2 | 2 | 2 | 4 | 6 |
+| deepseek7b | deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel | plain | 0 | 0 | 0 | 0 | 10 |
+| deepseek7b | deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel | short_answer | 0 | 0 | 0 | 4 | 12 |
+| deepseek7b | deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel | stop_explicit | 0 | 0 | 0 | 4 | 12 |
+| deepseek7b | deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel | plain | 0 | 0 | 0 | 0 | 10 |
+| deepseek7b | deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel | short_answer | 0 | 0 | 0 | 4 | 12 |
+| deepseek7b | deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel | stop_explicit | 0 | 0 | 0 | 4 | 12 |

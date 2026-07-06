@@ -1,0 +1,535 @@
+{
+  "phase": 200,
+  "source_phase": 199,
+  "title": "Protocol-Gated Rollout Repair Audit",
+  "model": "deepseek7b",
+  "selected_edges": [
+    {
+      "phase": 198,
+      "source_phase": 944,
+      "channel_record_key": "deepseek7b|function|en->en|h14|candidate|c6030",
+      "record_key": "deepseek7b|function|en->en|h14",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "hidden_idx": 14,
+      "layer_idx": 13,
+      "channel_source": "candidate",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "boundary_slope": -0.04166666666666667,
+      "relation_slope": -0.010416666666666668,
+      "target_logit_slope": 0.0,
+      "protocol_margin_slope": -0.010416666666666668,
+      "period_margin_slope": -0.026041666666666668,
+      "eos_margin_slope": -0.022786458333333332,
+      "ablate_boundary_delta": 0.005208333333333333,
+      "boost_boundary_delta": -0.036458333333333336,
+      "ablate_relation_delta": 0.026041666666666668,
+      "boost_relation_delta": 0.015625,
+      "rows": 12,
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel"
+    },
+    {
+      "phase": 198,
+      "source_phase": 944,
+      "channel_record_key": "deepseek7b|function|en->en|h14|candidate|c3033",
+      "record_key": "deepseek7b|function|en->en|h14",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "hidden_idx": 14,
+      "layer_idx": 13,
+      "channel_source": "candidate",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "boundary_slope": -0.005208333333333336,
+      "relation_slope": 0.03125,
+      "target_logit_slope": 0.03645833333333333,
+      "protocol_margin_slope": 0.020833333333333336,
+      "period_margin_slope": -0.005208333333333336,
+      "eos_margin_slope": 0.01171875,
+      "ablate_boundary_delta": -0.041666666666666664,
+      "boost_boundary_delta": -0.046875,
+      "ablate_relation_delta": -0.03125,
+      "boost_relation_delta": 0.0,
+      "rows": 12,
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel"
+    }
+  ],
+  "prompt_protocols": [
+    "plain",
+    "short_answer",
+    "stop_explicit"
+  ],
+  "status": "complete",
+  "timestamp": "2026-07-05 17:10:07",
+  "sample_count": 360,
+  "selected_relation_language_pairs": [
+    "function:en->en"
+  ],
+  "selected_phase940_bridge_rows": [
+    {
+      "relation": "function",
+      "language_pair": "en->en",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 38,
+      "relation_margin_delta_mean": 0.18092105263157895,
+      "boundary_margin_delta_mean": 0.07236842105263158,
+      "period_margin_delta_mean": 0.11266447368421052,
+      "eos_margin_delta_mean": 0.12746710526315788,
+      "boundary_logit_delta_mean": -0.05756578947368421,
+      "control_best_boundary_margin_delta": -0.011513157894736841,
+      "boundary_bridge_gain_vs_best_control": 0.08388157894736842,
+      "joint_bridge_score": 0.07236842105263158,
+      "rank_improved": 21,
+      "new_relation_winner_target": 1
+    }
+  ],
+  "hidden_by_relation": {
+    "category": 14,
+    "color": 7,
+    "function": 14
+  },
+  "direction_specs_all": 228,
+  "candidate_pair_count": 1,
+  "rows": 216,
+  "condition_rows": [
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "plain",
+      "condition": "ablate",
+      "rows": 12,
+      "rollout_clear_answer_class": 0,
+      "protocol_drift": 11,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "other": 12
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "plain",
+      "condition": "baseline",
+      "rows": 12,
+      "rollout_clear_answer_class": 0,
+      "protocol_drift": 10,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "other": 12
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "plain",
+      "condition": "boost",
+      "rows": 12,
+      "rollout_clear_answer_class": 0,
+      "protocol_drift": 10,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "other": 12
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "short_answer",
+      "condition": "ablate",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "short_answer",
+      "condition": "baseline",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "short_answer",
+      "condition": "boost",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "stop_explicit",
+      "condition": "ablate",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "stop_explicit",
+      "condition": "baseline",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 3033,
+      "single_channel_sign": "mixed_side_effect_channel",
+      "prompt_protocol": "stop_explicit",
+      "condition": "boost",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "plain",
+      "condition": "ablate",
+      "rows": 12,
+      "rollout_clear_answer_class": 0,
+      "protocol_drift": 11,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "other": 12
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "plain",
+      "condition": "baseline",
+      "rows": 12,
+      "rollout_clear_answer_class": 0,
+      "protocol_drift": 10,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "other": 12
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "plain",
+      "condition": "boost",
+      "rows": 12,
+      "rollout_clear_answer_class": 0,
+      "protocol_drift": 10,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "other": 12
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "short_answer",
+      "condition": "ablate",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "short_answer",
+      "condition": "baseline",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "short_answer",
+      "condition": "boost",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "stop_explicit",
+      "condition": "ablate",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "stop_explicit",
+      "condition": "baseline",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "model": "deepseek7b",
+      "relation": "function",
+      "language_pair": "en->en",
+      "channel_id": 6030,
+      "single_channel_sign": "suppressor_or_blocker_channel",
+      "prompt_protocol": "stop_explicit",
+      "condition": "boost",
+      "rows": 12,
+      "rollout_clear_answer_class": 4,
+      "protocol_drift": 12,
+      "long_rollout_stable": 0,
+      "rollout_object_echo": 0,
+      "labels": {
+        "strict_canonical": 4,
+        "other": 8
+      }
+    }
+  ],
+  "protocol_eval_rows": [
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "prompt_protocol": "plain",
+      "baseline_stable": 0,
+      "ablate_stable": 0,
+      "boost_stable": 0,
+      "baseline_clear": 0,
+      "ablate_clear": 0,
+      "boost_clear": 0,
+      "baseline_drift": 10,
+      "ablate_drift": 11,
+      "boost_drift": 10,
+      "stable_gain_short_protocol": null,
+      "stable_gain_boost": 0,
+      "stable_loss_ablate": 0
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "prompt_protocol": "short_answer",
+      "baseline_stable": 0,
+      "ablate_stable": 0,
+      "boost_stable": 0,
+      "baseline_clear": 4,
+      "ablate_clear": 4,
+      "boost_clear": 4,
+      "baseline_drift": 12,
+      "ablate_drift": 12,
+      "boost_drift": 12,
+      "stable_gain_short_protocol": null,
+      "stable_gain_boost": 0,
+      "stable_loss_ablate": 0
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c3033|mixed_side_effect_channel",
+      "prompt_protocol": "stop_explicit",
+      "baseline_stable": 0,
+      "ablate_stable": 0,
+      "boost_stable": 0,
+      "baseline_clear": 4,
+      "ablate_clear": 4,
+      "boost_clear": 4,
+      "baseline_drift": 12,
+      "ablate_drift": 12,
+      "boost_drift": 12,
+      "stable_gain_short_protocol": null,
+      "stable_gain_boost": 0,
+      "stable_loss_ablate": 0
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "prompt_protocol": "plain",
+      "baseline_stable": 0,
+      "ablate_stable": 0,
+      "boost_stable": 0,
+      "baseline_clear": 0,
+      "ablate_clear": 0,
+      "boost_clear": 0,
+      "baseline_drift": 10,
+      "ablate_drift": 11,
+      "boost_drift": 10,
+      "stable_gain_short_protocol": null,
+      "stable_gain_boost": 0,
+      "stable_loss_ablate": 0
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "prompt_protocol": "short_answer",
+      "baseline_stable": 0,
+      "ablate_stable": 0,
+      "boost_stable": 0,
+      "baseline_clear": 4,
+      "ablate_clear": 4,
+      "boost_clear": 4,
+      "baseline_drift": 12,
+      "ablate_drift": 12,
+      "boost_drift": 12,
+      "stable_gain_short_protocol": null,
+      "stable_gain_boost": 0,
+      "stable_loss_ablate": 0
+    },
+    {
+      "edge_key": "deepseek7b|function|en->en|h14|c6030|suppressor_or_blocker_channel",
+      "prompt_protocol": "stop_explicit",
+      "baseline_stable": 0,
+      "ablate_stable": 0,
+      "boost_stable": 0,
+      "baseline_clear": 4,
+      "ablate_clear": 4,
+      "boost_clear": 4,
+      "baseline_drift": 12,
+      "ablate_drift": 12,
+      "boost_drift": 12,
+      "stable_gain_short_protocol": null,
+      "stable_gain_boost": 0,
+      "stable_loss_ablate": 0
+    }
+  ],
+  "boundary": "Prompt-protocol repair plus single-channel ablate/boost; no internal stop/protocol component is patched."
+}

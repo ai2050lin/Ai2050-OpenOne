@@ -33098,3 +33098,5130 @@ context state
 Phase944 已经完成从“特征神经元列表”到“全链路机制脉络”的第一版转型。
 它还没有完成全局编码图谱，但已经提供了可预测、可验证、可复用的图谱数据格式和可视化入口。
 ```
+
+## Phase 196: Phase944 机制 Trace 后的研究方案与客户端改进审计 [2026-07-05 07:19]
+
+### 一、任务范围
+
+本阶段读取并分析了 `research/gpt5/docs/AGI_GPT5_MEMO.md` 的最新记录。当前 GPT5 备忘录最新阶段是 Phase195，标题为：
+
+```text
+Phase944 Integrated Mechanism Trace and Visualization Client
+```
+
+需要注意编号关系：
+
+```text
+GPT5 memo phase = 195
+GLM5 / test script phase = 944
+```
+
+因此本阶段作为 GPT5 备忘录的 Phase196 追加，不把两个阶段序列混用。
+
+本阶段没有运行新的 CUDA 模型测试，也没有改动前端代码；工作性质是研究方案审计和客户端方案设计。读取对象包括：
+
+```text
+research/gpt5/docs/AGI_GPT5_MEMO.md
+frontend/src/components/mechanism/MechanismTraceExplorer.jsx
+frontend/src/components/mechanism/MechanismTraceExplorer.css
+frontend/public/vis_data/mechanism_trace/manifest.json
+tests/glm5/phase944_integrated_mechanism_trace.py
+```
+
+### 二、最新记录的核心结论复核
+
+Phase195 / Phase944 的核心进展是把单一颜色任务拆成了可观察的机制链：
+
+```text
+context state
+  -> conditioned routing
+  -> candidate-space opening
+  -> knowledge-path activation
+  -> output-boundary competition
+  -> next-token closure
+```
+
+其中最关键的发现是：
+
+```text
+candidate_closed != global_closed
+```
+
+也就是：
+
+```text
+候选颜色空间内部选对 red
+不等于
+全词表真实 next token 一定输出 red
+```
+
+三模型结果中，Qwen3 和 GLM4 同时完成候选闭合与全局闭合；DeepSeek7B 只完成候选闭合，没有完成全词表闭合：
+
+```text
+Qwen3:
+candidate_closed = true
+global_closed = true
+next_token = " red"
+
+GLM4:
+candidate_closed = true
+global_closed = true
+next_token = " red"
+
+DeepSeek7B:
+candidate_closed = true
+global_closed = false
+next_token = " determined"
+target_global_rank = 5
+```
+
+这说明“语义答案场”与“输出协议场”至少是两个不同齿轮。破解语言编码不能只看语义候选集合内的 margin，还必须同时追踪全词表阻塞者、协议续写惯性、终止动作和 answer-position 条件。
+
+### 三、现有研究方案的主要问题
+
+当前 Phase944 的方案已经比单点神经元搜索更接近真实机制，但仍有几个硬伤。
+
+#### 1. 样本太小，不能外推为机制规律
+
+当前可视化数据只有：
+
+```text
+red cube / color
+3 个模型
+每个模型 1 条 prompt
+```
+
+这个结果只能证明 Trace 框架可用，不能证明颜色机制、属性机制或输出协议机制已经稳定定位。尤其 DeepSeek7B 的失败可能来自 prompt 风格、tokenization、模型 instruction habit、颜色词竞争，也可能来自真正的 output protocol gap。
+
+#### 2. 候选空间过窄
+
+当前 candidate field 主要是颜色候选。这个设计适合验证 red cube，但还不能解释语言能力的完整结构。至少需要扩展到：
+
+```text
+颜色: red / blue / green / white / black ...
+形状: cube / sphere / cylinder / pyramid ...
+材质: wood / metal / plastic / glass ...
+类别: animal / tool / fruit / vehicle ...
+关系: color-of / shape-of / made-of / located-in / used-for ...
+动作: move / fall / open / close ...
+否定: is / is not
+比较: bigger / smaller / same / different
+```
+
+只有当同一套 Trace 因子能覆盖这些任务，才能说它在逼近语言背后的通用数学结构，而不是为颜色任务定制了一套解释。
+
+#### 3. 缺少失败分类学
+
+Phase944 已经发现 DeepSeek7B 的失败，但还没有把失败分成可检索类型。建议把失败类型至少拆成：
+
+```text
+F1: candidate_not_open
+候选空间没有打开，目标在候选内部也不占优。
+
+F2: candidate_open_global_blocked
+候选空间内部选对，但全词表被非候选 token 阻塞。
+
+F3: candidate_competitor_error
+候选空间打开，但强竞争者是同类错误候选。
+
+F4: protocol_inertia_error
+模型进入解释、续写、列表、限定词等协议惯性。
+
+F5: termination_or_format_error
+语义答案已出现，但停止/格式控制失败。
+
+F6: tokenization_alias_error
+目标词的空格 token、大小写、同义词、词片段导致评估口径错位。
+```
+
+其中 DeepSeek7B 当前最像：
+
+```text
+F2 + F4
+candidate_open_global_blocked + protocol_inertia_error
+```
+
+但还不能确认，需要下一阶段通过批量 prompt 和 blocker token 审计验证。
+
+#### 4. 当前因子多，但缺少“必要性”和“可替代性”测试
+
+Phase944 记录了 O/R/A/C/F/M/K/S_answer/B/G/N/P/T 这些机制因子。但这些因子目前主要是观测量，还不是因果变量。
+
+下一步要从：
+
+```text
+factor trace
+```
+
+升级为：
+
+```text
+factor necessity / sufficiency / substitutability test
+```
+
+也就是分别问：
+
+```text
+去掉这个因子，闭合是否消失？
+增强这个因子，闭合是否恢复？
+换成另一个同类因子，行为是否按预测改变？
+```
+
+否则因子曲线容易变成解释性图表，而不是编码机制。
+
+### 四、改进后的研究方案
+
+建议下一阶段不要只做一个更漂亮的 Trace，而是建立“批量机制审计流水线”。阶段目标应是：
+
+```text
+从单样本机制 Trace
+升级为
+跨任务、跨模型、跨失败类型的机制图谱构建器
+```
+
+#### 1. 数据集设计
+
+先做一个中等规模、结构清晰的数据集，不急于复杂自然语言。建议：
+
+```text
+属性类:
+  颜色 8 类 × 物体 20 类 = 160 条
+  形状 6 类 × 物体 20 类 = 120 条
+  材质 6 类 × 物体 20 类 = 120 条
+
+关系类:
+  located-in / used-for / part-of / made-of 各 80 条 = 320 条
+
+控制类:
+  改写 prompt 5 个模板
+  answer-prefix 明确/不明确 2 个条件
+  instruction / plain completion 2 个条件
+```
+
+最小第一轮：
+
+```text
+每模型 300-500 条
+三模型合计 900-1500 条
+```
+
+重要结论复测：
+
+```text
+每模型 1000+ 条
+三模型合计 3000+ 条
+```
+
+这符合当前项目要求：重要测试不能用太少样本得结论。
+
+#### 2. 核心指标
+
+保留 Phase944 的指标，但增加闭合分层：
+
+```text
+candidate_rank = 目标在候选集合内的 rank
+global_rank = 目标在全词表内的 rank
+blocker_type = 全词表 top1 的类型
+margin_candidate = target_score - max(other_candidate_score)
+margin_global = target_logit - top_non_target_logit
+protocol_bias = mean(protocol_token_logits) - mean(answer_candidate_logits)
+termination_bias = mean(termination_logits) - target_logit
+closure_gap = global_rank - candidate_rank
+```
+
+最重要的新公式是：
+
+```text
+closure_gap = global_rank - candidate_rank
+```
+
+若：
+
+```text
+candidate_rank = 1
+global_rank > 1
+```
+
+则说明语义候选已经闭合，但输出边界没有闭合。
+
+再定义：
+
+```text
+protocol_block = logit(top_protocol_or_continuation) - logit(target)
+```
+
+若：
+
+```text
+protocol_block > 0
+```
+
+则说明全局失败来自协议/续写 token，而不是同类语义候选。
+
+#### 3. 实验分层
+
+建议按三层推进：
+
+```text
+Layer A: Observation Trace
+记录每层 O/R/A/C/F/M/K/S_answer/B/G/N/P/T。
+
+Layer B: Failure Taxonomy
+把每条样本归类为 F1-F6。
+
+Layer C: Causal Repair
+对每类失败做最小干预：增强答案场、抑制协议场、移动 answer-position、替换 prompt 模板。
+```
+
+这比直接寻找“大统一神经元”更稳，因为它先把失败形状拆开，再定位因果齿轮。
+
+#### 4. DeepSeek7B 专项
+
+DeepSeek7B 当前是最有价值的失败样本。下一步不应只记录它失败，而要做四个对照：
+
+```text
+1. prompt 明确化:
+   "Answer with one color word only:"
+
+2. answer prefix 对照:
+   "The answer is"
+   "Color:"
+   "It is"
+
+3. blocker 审计:
+   top1 token 是否属于 explanation / adjective / continuation / format token
+
+4. target injection repair:
+   在不破坏 prompt 的前提下增强 S_answer 或 P，看 global_closed 是否恢复
+```
+
+如果 prompt 明确化即可修复 DeepSeek7B，那么失败更偏协议场；如果必须增强 S_answer 才修复，则说明答案场强度不足；如果两者都不能修复，则需要追踪更早层的 routing / candidate opening。
+
+### 五、客户端改进方案
+
+当前客户端 `MechanismTraceExplorer` 已经完成单 Trace 展示，包括：
+
+```text
+manifest 读取
+模型选择
+prompt / token / summary 展示
+层列表
+factor tiles
+candidate table
+attention / mlp component table
+raw JSON 查看
+```
+
+下一步客户端应从“查看器”升级为“机制审计工作台”。
+
+#### 1. 增加跨模型对比视图
+
+当前每次只能看一个 trace。建议增加：
+
+```text
+Compare Mode
+```
+
+核心展示：
+
+```text
+Qwen3 / GLM4 / DeepSeek7B 同一 prompt 的并排摘要
+candidate_closed / global_closed 对比
+target_global_rank 对比
+final_margin 对比
+top blocker 对比
+关键层 margin 曲线对比
+```
+
+这能直接暴露“同一语义候选闭合，为什么某模型全局失败”。
+
+#### 2. 增加失败类型过滤器
+
+manifest item 需要追加字段：
+
+```text
+failure_type
+closure_gap
+blocker_type
+task_type
+attribute_type
+prompt_template
+```
+
+前端增加筛选：
+
+```text
+只看 candidate_closed=true && global_closed=false
+只看 protocol_blocker
+只看 color / shape / material
+只看 DeepSeek7B 失败样本
+```
+
+这样客户端才能支持批量研究，而不是打开一个 JSON 看一次。
+
+#### 3. 增加关键层自动定位
+
+当前层列表只显示 margin。建议自动标出：
+
+```text
+candidate_open_layer:
+M 第一次超过阈值的层
+
+knowledge_jump_layer:
+G 最大正跃迁层
+
+global_block_layer:
+target_global_rank 开始进入 topK 但没有 top1 的层
+
+protocol_takeover_layer:
+P 或 blocker field 超过 S_answer 的层
+```
+
+前端可用不同小标签标记：
+
+```text
+OPEN
+JUMP
+BLOCK
+TAKEOVER
+```
+
+#### 4. 增加曲线视图
+
+目前因子以 tile 展示，不利于看动力学。建议增加：
+
+```text
+Factor Curves
+```
+
+至少画：
+
+```text
+K_l: target vs competitor margin
+M_l: candidate gate
+S_answer_l: answer field
+B_l: blocker field
+P_l: protocol field
+G_l: boundary gear
+```
+
+研究上最有用的是叠加：
+
+```text
+S_answer_l - B_l
+K_l
+P_l
+```
+
+如果：
+
+```text
+K_l > 0
+但
+S_answer_l - B_l < 0
+```
+
+就说明候选语义正确，但全词表边界仍被阻塞。
+
+#### 5. 增加 Trace 到图谱的导出入口
+
+Phase195 已经提出 node/edge 图谱：
+
+```text
+node = factor/layer/token/component
+edge = margin gain/component contribution/routing relation
+```
+
+客户端应该提供：
+
+```text
+Export Graph
+```
+
+生成：
+
+```text
+mechanism_graph_v1.json
+```
+
+基本结构：
+
+```text
+nodes:
+  layer_factor nodes
+  token nodes
+  component nodes
+
+edges:
+  layer_to_layer margin_delta
+  component_to_candidate contribution
+  blocker_to_output competition
+```
+
+这能把单条 Trace 压缩成可检索、可比较的机制图谱。
+
+#### 6. 增加审计标注层
+
+客户端需要允许研究者给样本添加人工判定：
+
+```text
+failure_type
+important_layer
+suspected_mechanism
+next_test
+notes
+```
+
+保存位置建议为：
+
+```text
+tests/result/mechanism_trace_audit/
+```
+
+或者导出为浏览器下载 JSON，后续再统一汇总进仓库。
+
+这一步很重要，因为当前项目处于“拼图阶段”，许多洞察需要人工严谨标注，而不是一开始就强行自动化。
+
+### 六、理论进展
+
+本阶段的理论收紧是：
+
+```text
+语言输出不是单一语义向量读出，
+而是至少由候选语义场、全词表边界场、协议续写场共同决定。
+```
+
+更基础地说，当前证据支持一个三层模型：
+
+```text
+1. semantic candidate field
+   决定“可能答案集合里哪个对”
+
+2. global output boundary
+   决定“全词表下一 token 真实输出什么”
+
+3. protocol / termination field
+   决定“模型是在回答、解释、续写、列举还是停止”
+```
+
+因此破解语言背后的数学结构，第一性问题不应写成：
+
+```text
+red 编码在哪个神经元？
+```
+
+而应写成：
+
+```text
+在给定上下文状态下，模型如何把一个候选语义场提升为全词表边界中的实际动作？
+```
+
+这个问题更接近语言能力的本体，因为语言不是静态表征，而是状态到动作的闭合。
+
+### 七、严格审视：问题、硬伤和瓶颈
+
+#### 1. 当前 Trace 仍然偏 logit lens
+
+很多指标来自 residual 到 W_U 的投影。这能提供有用线索，但不能直接等价于模型自然计算过程。LayerNorm、后续层变换和非线性路由可能改变解释。
+
+#### 2. attention / MLP component 粒度仍粗
+
+当前只看到 attention 和 MLP 总贡献，还没有分 head、MLP channel、source token。真正机制很可能藏在更细粒度的组合中。
+
+#### 3. 因果闭合不足
+
+Phase944 是强观察框架，不是强因果框架。后续必须加入最小干预和 repair 测试，否则容易形成“看起来合理”的解释图。
+
+#### 4. tokenization 可能污染结论
+
+不同模型对 `" red"`、`"red"`、大小写、标点、换行的 tokenization 不同。必须在每个样本中记录 target token variants，否则 global_rank 可能被评估口径影响。
+
+#### 5. 客户端还不能承载大样本
+
+当前单 JSON 展示没问题，但当 trace 增加到几百或几千条时，需要索引、过滤、聚合和延迟加载。否则研究者仍然只能人工翻样本，无法形成机制地图。
+
+### 八、阶段性大任务
+
+下一阶段建议不是“小修 UI”，而是启动一个大任务：
+
+```text
+Phase197:
+Batch Mechanism Trace Atlas and Failure Taxonomy
+批量机制 Trace 图谱与失败分类学
+```
+
+阶段目标：
+
+```text
+1. 生成 300-500 条结构化 prompt；
+2. 三模型逐个 CUDA 测试，避免显存溢出；
+3. 输出 mechanism_trace_batch_v1；
+4. 自动归类 closure state 和 failure_type；
+5. 前端支持 batch manifest、过滤、跨模型对比和关键层标记；
+6. 对 DeepSeek7B 的 candidate_closed=true/global_closed=false 做专项复测；
+7. 从 batch trace 生成 mechanism_graph_v1。
+```
+
+成功标准不是“画出更多曲线”，而是：
+
+```text
+能回答每一类失败为什么失败；
+能预测某类 prompt 是否会 global_closed；
+能用最小干预修复至少一类失败；
+能把单样本 Trace 压缩成跨模型可比较的机制图谱。
+```
+
+### 九、通俗总结
+
+Phase944 已经证明：模型不是简单地“知道 red 就输出 red”。它可能已经在颜色候选里选中了 red，但最后真正输出时，被解释性词、续写习惯或其他全词表 token 抢走了位置。
+
+所以后续研究要从“找答案在哪里”升级为“答案怎样赢得输出权”。客户端也要从“看一条曲线”升级为“批量比较谁赢、谁输、为什么输、在哪一层开始输”。这才更接近破解语言背后数学结构的主路。
+
+## Phase 197: 最新完整智能理论与全局图谱完成方案 [2026-07-05 07:26]
+
+### 一、任务范围
+
+本阶段读取并整理：
+
+```text
+research/glm5/docs/AGI_GLM5_MEMO.md
+research/IntelligentTheory.md
+```
+
+目标是从最新记录中整理当前最完整的理论，并给出完成全局图谱的最可行方案。
+
+本阶段没有运行新的 CUDA 模型测试，也没有新增测试脚本；性质是理论整理、路线收敛和图谱工程方案设计。
+
+### 二、最新事实基础
+
+`research/IntelligentTheory.md` 当前总框架已经从早期的“相对编码 + 条件化变换 + 候选竞争”扩展为：
+
+```text
+预测充分相对状态
+  -> 全局齿轮图谱
+  -> 条件化路线门控
+  -> 全词表竞争闭合
+  -> 自然生成一致性
+```
+
+GLM5 最新 Phase944 则进一步把图谱从 residual coordinate 层推进到 component candidate 层：
+
+```text
+static component candidate
+  -> activation-weighted component candidate
+  -> partial causal gear evidence
+```
+
+Phase944 最强正结果来自 qwen3：
+
+```text
+qwen3 color en->en
+hidden 36 / channels 2509, 16, 249
+activation lift = 4.8014
+boundary slope = +0.6779
+candidate_ablate boundary delta = -0.4471
+candidate_boost boundary delta = +0.2308
+```
+
+但 GLM4 和 DS7B 给出重要负向约束：
+
+```text
+GLM4:
+activation lift 强，但 candidate boundary slope 接近 0，
+说明强通道信号可能混入通用边界敏感性。
+
+DS7B:
+coordinate concentration 很强，
+但没有形成稳定正向 boundary causal slope。
+```
+
+因此当前不能说已经完成语言编码机制闭合，只能说：
+
+```text
+语义残差坐标已经开始接到可测 MLP 通道齿轮；
+但自然门控、全词表 blocker、strict-clean rollout 仍未闭合。
+```
+
+### 三、当前最新完整理论
+
+当前最稳妥的完整理论应写成：
+
+```text
+语言输出不是语义向量直接读出，
+而是相对状态网络在上下文中形成候选场，
+再经由组件齿轮、协议场、全词表边界和自然生成门共同完成动作闭合。
+```
+
+更具体的机制链是：
+
+```text
+Input / Prompt Protocol
+  -> State Variables
+     identity / role / frame / operator / scope / binding
+  -> Domain Route Axes
+     color / material / animal / tool / geometry / abstract ...
+  -> Candidate Field
+     candidate_open + candidate_specific_ranking
+  -> Component Gears
+     MLP channel / attention head / source token route
+  -> Boundary Field
+     target token vs candidate competitor vs full-vocab blocker
+  -> Protocol Field
+     short answer / prose / list / echo / punctuation / EOS
+  -> Natural Rollout
+     first token + phrase likelihood + multi-token clean answer
+```
+
+这条链路说明：语言能力不是单点编码，而是“状态-路线-齿轮-边界-生成”的动态系统。
+
+### 四、核心数学表达
+
+#### 1. 状态层
+
+第 `l` 层、位置 `p` 的状态可写成：
+
+```text
+h_l(p)
+  =
+  I_l(p)
+  + R_l(p)
+  + F_l(p)
+  + C_l(p)
+  + O_l(p)
+  + S_l(p)
+  + K_l(p)
+  + B_l(p)
+  + Q_l(p)
+  + N_l(p)
+  + eps_l(p)
+```
+
+其中：
+
+```text
+I = identity，对象/token 身份
+R = role，功能角色
+F = frame，局部格式
+C = construction，构式/语法
+O = operator，否定/规则/控制符
+S = scope，作用域
+K = knowledge anchor，知识锚
+B = binding，对象-关系-值绑定
+Q = candidate competition，候选竞争
+N = norm/gain，范数和读出增益
+```
+
+#### 2. 语义答案场
+
+旧公式：
+
+```text
+A(y|x) = sum_{o,r} P(o|x) P(r|x) K(o,r,y) g(y|x)
+```
+
+仍可作为语义答案场骨架，但 Phase944 证明必须增加可测组件层：
+
+```text
+K(o,r,y)
+  -> C_consensus(o,r)
+  -> Contribution_G(x)
+  -> BoundaryMovement(y, B_x)
+```
+
+因此更准确的输出闭合公式是：
+
+```text
+CleanOutput(y|x)
+  =
+  SemanticAnswer(y|x)
+  and CandidateWinner(y|x)
+  and ActivationWeightedGear(G,x)
+  and FieldAdmissible(B_x)
+  and NaturalGate(G,x)
+  and NoProtocolDrift(x)
+```
+
+当前 Phase944 主要推进了：
+
+```text
+ActivationWeightedGear(G,x)
+```
+
+尚未闭合：
+
+```text
+NaturalGate(G,x)
+NoProtocolDrift(x)
+StrictCleanRollout(x)
+```
+
+#### 3. 领域坐标轴层
+
+IntelligentTheory 最新 Phase897-898 已经修正了“一个 universal pair 解决所有领域”的过强假设。当前应写成：
+
+```text
+语言图谱不是 one universal pair，
+而是 domain-specific route axes
+和 shared blocker/protocol field 的组合。
+```
+
+领域轴评分：
+
+```text
+AxisScore(g,d)
+  =
+  MeanAbsActivation(g | domain=d)
+  -
+  MeanAbsActivation(g | domain!=d)
+```
+
+领域候选集合：
+
+```text
+U_d
+  =
+  TopK_g AxisScore(g,d)
+  union
+  HistoryAxes(d)
+```
+
+领域最小 pair 判定：
+
+```text
+DomainNoSinglePair(a,b,x,d)
+  =
+  BoundaryClosed({a,b},x,d)
+  and not BoundaryClosed({a},x,d)
+  and not BoundaryClosed({b},x,d)
+```
+
+#### 4. 干净因果边标准
+
+全局图谱中的边不能只记录“有效”，必须记录证据等级。当前严格标准应保持为：
+
+```text
+CleanCausalEdge
+  =
+  GearEffect
+  and FieldAdmissible
+  and OutputTransition
+  and NoSideEffect
+```
+
+用于全局编码图谱时，还要加：
+
+```text
+SemanticFactorMeasurable
+and CrossObjectHoldout
+and CrossRelationHoldout
+and CrossTemplateHoldout
+and CrossModelRobustness
+and NaturalGate
+and StrictCleanRollout
+```
+
+### 五、当前理论的最重要结论
+
+#### 1. 编码本体不是单神经元，而是可复用坐标接口 + 组件齿轮
+
+当前证据不支持：
+
+```text
+apple neuron
+red neuron
+one universal semantic vector
+```
+
+更接近事实的是：
+
+```text
+object-relation coordinate
+  -> residual consensus coordinate
+  -> sparse MLP / attention component candidates
+  -> activation-weighted causal gear
+  -> full-vocab boundary movement
+```
+
+#### 2. 语义候选闭合不等于输出闭合
+
+候选集合内 target 排第一，只能说明语义候选场有效；全词表里仍可能被 protocol、prose、punctuation、EOS、echo、generic token 抢走输出权。
+
+因此全局图谱必须同时记录：
+
+```text
+candidate_closed
+global_closed
+protocol_drift
+blocker_class
+rollout_clean
+```
+
+#### 3. 领域轴优先于通用轴
+
+Phase897-898 已经说明，非颜色 domain 需要先建立各自的 candidate_U。当前路线不应强行复用 color pair 到 material / animal / tool / abstract，而应先为每个 domain 找本域坐标轴，再比较结构同构。
+
+#### 4. 图谱比闭合更优先
+
+目前最可行路线不是直接宣称语言机制闭合，而是先完成：
+
+```text
+证据校准全局齿轮图谱
+```
+
+当图谱足够完整后，闭合会自然变成若干可测边的组合问题。
+
+### 六、完成图谱的最可行方案
+
+最可行方案是四层推进：
+
+```text
+Layer 1: Domain Axis Atlas
+Layer 2: Component Gear Atlas
+Layer 3: Boundary / Protocol Atlas
+Layer 4: Natural Rollout Closure Atlas
+```
+
+不要先追求“大统一公式”，而是把每条边做成可审计对象。
+
+#### Layer 1: Domain Axis Atlas
+
+目标：
+
+```text
+为 color / material / animal / tool / geometry / category / function / abstract
+分别建立领域坐标轴集合 U_d。
+```
+
+每个 domain 记录：
+
+```text
+axis_id
+model
+layer
+channel_or_coordinate
+domain
+AxisScore
+single_axis_support
+pair_support
+holdout_support
+failure_cases
+```
+
+最小测试规模：
+
+```text
+每 domain 至少 100-200 条结构化样本；
+每模型至少 800-1500 条；
+三模型逐个 CUDA 测试，避免显存溢出。
+```
+
+#### Layer 2: Component Gear Atlas
+
+目标：
+
+```text
+把 residual consensus coordinate 映射到 MLP channel / attention head / source-token route。
+```
+
+每个候选组件必须通过：
+
+```text
+1. static contribution
+2. activation-weighted contribution
+3. ablate/boost causal slope
+4. random same-layer control
+5. single-channel sign decomposition
+6. object/template holdout
+```
+
+Phase945 最应优先做：
+
+```text
+qwen3 color en->en channels 2509, 16, 249 单通道 ablate/boost；
+qwen3 function zh->en channels 106, 2, 3 单通道 ablate/boost；
+区分 support / suppressor / mixed side-effect channel。
+```
+
+#### Layer 3: Boundary / Protocol Atlas
+
+目标：
+
+```text
+解释为什么候选选对后，真实输出仍可能失败。
+```
+
+每个样本记录：
+
+```text
+candidate_rank
+global_rank
+target_logit
+top_blocker_token
+blocker_class
+protocol_score
+termination_score
+closure_gap
+```
+
+关键公式：
+
+```text
+closure_gap = global_rank - candidate_rank
+```
+
+若：
+
+```text
+candidate_rank = 1
+global_rank > 1
+```
+
+说明语义候选闭合，但全词表边界失败。
+
+blocker 分类至少包括：
+
+```text
+semantic_competitor
+protocol_token
+prose_continuation
+punctuation
+eos_or_stop
+echo_token
+generic_token
+tokenization_alias
+```
+
+#### Layer 4: Natural Rollout Closure Atlas
+
+目标：
+
+```text
+把 first-token 边界推进到完整自然生成。
+```
+
+不能只看 next token，要同时记录：
+
+```text
+first_token_closed
+phrase_likelihood_winner
+short_answer_hit
+clear_answer
+object_echo
+protocol_drift
+multi_token_clean
+```
+
+长 rollout 稳定性公式：
+
+```text
+LongRolloutStable(S,x,T)
+  =
+  ClassHit(S,x,T)
+  and ClearAnswer(S,x,T)
+  and not ObjectEcho(S,x,T)
+  and not ProtocolDrift(S,x,T)
+```
+
+只有到这一层，才接近真正的语言输出闭合。
+
+### 七、图谱数据结构建议
+
+建议把图谱统一为：
+
+```text
+mechanism_atlas_v1
+```
+
+核心节点：
+
+```text
+state_node:
+  identity / role / relation / binding / candidate_field
+
+axis_node:
+  domain axis / known-axis pair / single-axis route
+
+component_node:
+  MLP channel / attention head / source token group
+
+boundary_node:
+  target / semantic competitor / blocker class / protocol token
+
+rollout_node:
+  first token / phrase / multi-token answer
+```
+
+核心边：
+
+```text
+state_to_axis
+axis_to_component
+component_to_boundary
+boundary_to_protocol
+protocol_to_rollout
+```
+
+每条边必须带证据等级：
+
+```text
+L1 correlation / clustering
+L2 projection node
+L3 transition node
+L4 component causal node
+L5 hidden causal repair node
+L6 generation closure
+```
+
+当前最重要的是把 L2/L3/L4 分清楚，不要把 projection node 误写成 component causal node。
+
+### 八、最短可执行路线
+
+如果以最快完成“可用图谱”为目标，建议按下面顺序：
+
+```text
+Step 1:
+整理 Phase897-898 的 domain axis 候选，生成 domain_axis_atlas_v1。
+
+Step 2:
+执行 Phase945，先只做 qwen3 最强通道的 single-channel sign decomposition。
+
+Step 3:
+为每条样本补充 blocker_class 和 closure_gap，生成 boundary_protocol_atlas_v1。
+
+Step 4:
+把 Phase944 integrated mechanism trace 接入 batch manifest，客户端支持按 domain/model/failure_type 过滤。
+
+Step 5:
+对 qwen3 的强通道做 300-500 条 holdout；
+若稳定，再扩到 GLM4；
+DS7B 暂作弱参考。
+
+Step 6:
+只选择通过 L4 的边进入 natural rollout；
+不要把所有候选都跑长生成，节省 GPU。
+
+Step 7:
+把通过 rollout 的边标记为 L6 generation closure candidate。
+```
+
+这条路线比全面搜索所有模型所有通道更可行，因为它先抓最强证据链，把图谱格式和证据标准跑通。
+
+### 九、严格审视：问题和硬伤
+
+#### 1. 变量仍不够可测
+
+理论中的：
+
+```text
+P(o|x), P(r|x), K(o,r,y), g(y|x)
+```
+
+仍需要映射到：
+
+```text
+residual coordinate
+MLP channel contribution
+attention head route
+candidate blocker class
+natural gate score
+rollout transition
+```
+
+否则公式仍只是漂亮骨架。
+
+#### 2. group-level 通道可能混合多种功能
+
+同一组 channels 里可能同时存在：
+
+```text
+answer lift
+blocker weakening
+protocol drift
+format side-effect
+suppressor release
+```
+
+所以必须做 single-channel sign decomposition。
+
+#### 3. 人工 ablate/boost 不等于自然门控
+
+当前干预：
+
+```text
+a'_j = f a_j
+```
+
+只能说明通道能推动边界，不能说明模型自然运行时为什么启动该通道。自然门控仍是最大缺口。
+
+#### 4. 小模型偏差不能忽视
+
+qwen3、GLM4、DS7B 的结构都可能与更大模型或人脑差异很大。GLM4 的通用边界敏感性、DS7B 的坐标集中但边界弱，都说明跨模型结论必须谨慎。
+
+#### 5. 客户端还缺图谱级工作流
+
+现在客户端能看单条 Trace，但图谱完成需要：
+
+```text
+batch manifest
+domain/failure filters
+cross-model comparison
+evidence-level badge
+edge drill-down
+rollout result table
+manual audit annotation
+```
+
+否则研究者仍然无法从大量碎片中完成拼图。
+
+### 十、理论进展
+
+本阶段的理论收敛是：
+
+```text
+智能的基本单位不是概念向量，
+而是上下文状态中可复用的对象-关系坐标接口；
+这些接口只有通过组件齿轮、边界竞争、协议门和自然生成，
+才变成语言动作。
+```
+
+从第一性原理看，语言背后的数学结构更像：
+
+```text
+相对状态网络上的条件化路线选择系统
+```
+
+而不是：
+
+```text
+固定欧氏空间中的全局语义坐标系
+```
+
+如果要破解这个结构，下一步最关键的不是再提出更高层数学名词，而是把每个变量都落到可测节点、可测边和可复现实验上。
+
+### 十一、下一阶段任务
+
+建议下一阶段进入：
+
+```text
+Phase198:
+Evidence-Calibrated Mechanism Atlas v1
+证据校准机制图谱 v1
+```
+
+任务：
+
+```text
+1. 定义 mechanism_atlas_v1 JSON schema；
+2. 汇总 domain_axis_atlas、component_gear_atlas、boundary_protocol_atlas；
+3. 对 qwen3 Phase944 强通道做 Phase945 single-channel sign decomposition；
+4. 加入 blocker_class 和 closure_gap；
+5. 客户端支持 batch atlas 浏览；
+6. 只把 L4 以上边送入 natural rollout；
+7. 建立 L1-L6 证据等级面板。
+```
+
+阶段成功标准：
+
+```text
+不是证明 AGI 理论完成，
+而是让每个机制候选都有统一位置、统一证据等级、统一失败原因和下一步测试入口。
+```
+
+### 十二、通俗总结
+
+当前最完整的理论可以简单说成：
+
+```text
+模型先在上下文里形成“这个对象在这个关系下应该找什么答案”的状态，
+再用某些 MLP 通道或 attention 路线推动候选答案，
+最后这个候选还要打赢全词表里的解释、续写、标点、停止符和错误答案，
+才能真正输出干净答案。
+```
+
+所以完成图谱的最可行方法不是一次找出终极公式，而是把这条链拆成可测节点：
+
+```text
+领域坐标轴 -> 组件齿轮 -> 边界竞争 -> 协议控制 -> 自然生成
+```
+
+每条边都标清楚证据等级。等这些边足够多、足够干净、能跨对象和模板复现，语言背后的数学结构才会自然浮现。
+
+## Phase 198: 单通道符号分解机制图谱初测 [2026-07-05 07:42]
+
+### 一、任务判断
+
+本阶段读取并分析了附件内容。附件对 Phase197 的总体判断基本正确：
+
+```text
+1. Phase197 的方向正确：从“语义向量/概念神经元”推进到“相对状态 -> 领域路线 -> 候选场 -> 组件齿轮 -> 全词表边界 -> 协议控制 -> 自然生成”。
+2. 当前不能说已经破解语言编码机制。
+3. 当前第一优先级应是完成证据校准图谱，而不是继续无目标堆 patch。
+4. Phase944 的 group-level MLP channel 结果必须做 single-channel sign decomposition。
+```
+
+附件需要收紧的一点是：它提出的多个公式仍有理论化倾向。当前阶段更应优先把它们落到客观可测字段：
+
+```text
+channel_id
+boundary_slope
+relation_slope
+target_logit_slope
+protocol_margin_slope
+single_channel_sign
+random_control
+evidence_level
+```
+
+因此本阶段没有继续做抽象理论总结，而是直接执行一个跨模型单通道符号分解测试。
+
+### 二、测试脚本与结果位置
+
+新增测试脚本：
+
+```text
+tests/gpt5/phase198_single_channel_sign_decomposition_atlas.py
+tests/gpt5/run_phase198_single_channel_sign_decomposition_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase198_single_channel_sign_decomposition_atlas/single_channel_sign_decomposition_atlas/
+```
+
+核心输出：
+
+```text
+phase198_qwen3_summary.json
+phase198_qwen3_rows.jsonl
+phase198_qwen3_mechanism_atlas_v1.json
+
+phase198_glm4_summary.json
+phase198_glm4_rows.jsonl
+phase198_glm4_mechanism_atlas_v1.json
+
+phase198_deepseek7b_summary.json
+phase198_deepseek7b_rows.jsonl
+phase198_deepseek7b_mechanism_atlas_v1.json
+
+phase198_cross_model_summary.json
+phase198_cross_model_summary.md
+phase198_cross_model_mechanism_atlas_v1.json
+```
+
+工程验证：
+
+```text
+python -m py_compile tests/gpt5/phase198_single_channel_sign_decomposition_atlas.py -> OK
+```
+
+模型测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型测试后释放 GPU，再加载下一个模型，避免显存叠加。
+
+### 三、测试原理
+
+Phase944 测试的是通道组：
+
+```text
+G = {c1, c2, c3}
+```
+
+本阶段把它拆成单通道：
+
+```text
+g = ci
+```
+
+对每个通道做：
+
+```text
+ablate: a'_g = 0.0 * a_g
+boost : a'_g = 1.5 * a_g
+```
+
+边界斜率定义为：
+
+```text
+boundary_slope(g)
+  =
+  DeltaBoundary(boost_g)
+  -
+  DeltaBoundary(ablate_g)
+```
+
+关系候选斜率定义为：
+
+```text
+relation_slope(g)
+  =
+  DeltaRelationMargin(boost_g)
+  -
+  DeltaRelationMargin(ablate_g)
+```
+
+单通道符号判定：
+
+```text
+support_channel:
+  boundary_slope > 0.02
+  and relation_slope >= -0.02
+
+suppressor_or_blocker_channel:
+  boundary_slope < -0.02
+
+near_zero_or_correlational:
+  abs(boundary_slope) <= 0.02
+  and abs(relation_slope) <= 0.02
+
+mixed_side_effect_channel:
+  其他混合情况
+```
+
+这比 Phase944 更严格，因为它不允许把一个通道组的平均正结果直接解释为每个通道都是真正支持齿轮。
+
+### 四、测试规模
+
+本阶段复用 Phase944 的 activation-weighted MLP channel records：
+
+```text
+qwen3:
+  records = 7
+  row-level interventions = 1392
+
+GLM4:
+  records = 5
+  row-level interventions = 1044
+
+DS7B:
+  records = 1
+  row-level interventions = 144
+```
+
+合计：
+
+```text
+records = 13
+row-level interventions = 2580
+```
+
+每条 record 拆分：
+
+```text
+3 candidate channels
+3 same-layer random channels
+每个 channel 做 ablate / boost
+```
+
+### 五、跨模型总结果
+
+跨模型 evidence：
+
+```text
+single_channel_support_positive: 1
+single_channel_mixed_sign_decomposition_positive: 1
+single_channel_suppressor_only: 1
+```
+
+对应模型：
+
+```text
+qwen3:
+  single_channel_support_positive
+
+GLM4:
+  single_channel_mixed_sign_decomposition_positive
+
+DS7B:
+  single_channel_suppressor_only
+```
+
+这说明附件提出的关键担心成立：
+
+```text
+group-level 通道正结果确实会混入 support / suppressor / mixed / near-zero 多种通道。
+```
+
+### 六、qwen3 客观结果
+
+qwen3 总体结果：
+
+```text
+candidate_sign_counts:
+  support_channel: 4
+  mixed_side_effect_channel: 2
+  near_zero_or_correlational: 15
+```
+
+最强单通道：
+
+```text
+relation = color
+language_pair = en->en
+hidden_idx = 36
+layer_idx = 35
+channel = 249
+sign = support_channel
+rows = 26
+boundary_slope = 0.5432692307692308
+relation_slope = 0.03245192307692307
+target_logit_slope = 0.5865384615384616
+ablate_boundary_delta = -0.3581730769230769
+boost_boundary_delta = 0.18509615384615385
+```
+
+这说明 Phase944 中 qwen3 color en->en 的组级正结果，主要不是平均分散到 2509 / 16 / 249 三个通道，而是由 `channel 249` 提供最强边界推动。
+
+同组内另外两个通道：
+
+```text
+channel 16:
+  sign = mixed_side_effect_channel
+  boundary_slope = 0.12980769230769232
+  relation_slope = -0.03365384615384616
+
+channel 2509:
+  sign = near_zero_or_correlational
+  boundary_slope = 0.0
+  relation_slope = 0.0
+```
+
+因此 Phase944 里提到的：
+
+```text
+qwen3 color en->en hidden 36 / channels 2509,16,249
+```
+
+必须修正为：
+
+```text
+qwen3 color en->en hidden 36:
+  channel 249 是当前最强 support gear；
+  channel 16 是 mixed side-effect gear；
+  channel 2509 在本阶段单通道测试中近似 near-zero。
+```
+
+qwen3 function 方向也有弱正单通道：
+
+```text
+function zh->zh channel 2:
+  boundary_slope = 0.05598958333333333
+  relation_slope = -0.009114583333333332
+  sign = support_channel
+
+function zh->zh channel 58:
+  boundary_slope = 0.02734375
+  relation_slope = 0.013020833333333332
+  sign = support_channel
+
+function en->en channel 3:
+  boundary_slope = 0.020833333333333336
+  relation_slope = 0.04166666666666667
+  sign = support_channel
+```
+
+qwen3 结论：
+
+```text
+qwen3 支持“少数单通道可作为 L4 component causal edge 候选”，
+但不支持“Phase944 组内所有 top channels 都是语义支持齿轮”。
+```
+
+### 七、GLM4 客观结果
+
+GLM4 总体结果：
+
+```text
+candidate_sign_counts:
+  mixed_side_effect_channel: 2
+  support_channel: 1
+  near_zero_or_correlational: 9
+  suppressor_or_blocker_channel: 3
+```
+
+最强正边界斜率来自：
+
+```text
+relation = function
+language_pair = zh->en
+hidden_idx = 30
+layer_idx = 29
+channel = 1165
+sign = mixed_side_effect_channel
+rows = 12
+boundary_slope = 0.04817708333333348
+relation_slope = -0.02473958333333326
+target_logit_slope = -0.05078125
+```
+
+它不能解释为干净 support channel，因为：
+
+```text
+boundary_slope > 0
+但 relation_slope < 0
+且 target_logit_slope < 0
+```
+
+较干净的弱 support：
+
+```text
+relation = color
+language_pair = en->en
+channel = 1165
+sign = support_channel
+boundary_slope = 0.03125
+relation_slope = 0.004807692307692307
+target_logit_slope = 0.021634615384615384
+```
+
+明显 suppressor / blocker：
+
+```text
+function zh->en channel 5532:
+  boundary_slope = -0.02994791666666652
+
+color en->en channel 5532:
+  boundary_slope = -0.040865384615384616
+
+function en->en channel 5532:
+  boundary_slope = -0.08333333333333393
+```
+
+GLM4 结论：
+
+```text
+GLM4 的 Phase944 group-level 信号确实高度混合；
+同一候选组中存在 support、suppressor、near-zero 和 mixed side-effect。
+因此 GLM4 不能作为干净语义齿轮闭合证据，但非常适合作为“通用边界敏感性/混合齿轮”的负向校准样本。
+```
+
+### 八、DS7B 客观结果
+
+DS7B 总体结果：
+
+```text
+candidate_sign_counts:
+  near_zero_or_correlational: 1
+  mixed_side_effect_channel: 1
+  suppressor_or_blocker_channel: 1
+```
+
+三个候选通道：
+
+```text
+channel 16221:
+  sign = near_zero_or_correlational
+  boundary_slope = 0.015625
+  relation_slope = 0.0
+
+channel 3033:
+  sign = mixed_side_effect_channel
+  boundary_slope = -0.005208333333333336
+  relation_slope = 0.03125
+
+channel 6030:
+  sign = suppressor_or_blocker_channel
+  boundary_slope = -0.04166666666666667
+  relation_slope = -0.010416666666666668
+```
+
+DS7B 结论：
+
+```text
+DS7B 的 Phase944 coordinate concentration 没有转化为正向单通道边界齿轮；
+本阶段更支持“DS7B 只有弱/混合/抑制性参考”，不能作为机制闭合依据。
+```
+
+### 九、对附件判断的核验
+
+附件正确部分：
+
+```text
+1. Phase197 主路线正确。
+2. 不能把 group-level channel 直接写成语义齿轮。
+3. 必须做 single-channel sign decomposition。
+4. GLM4 / DS7B 的负结果非常重要，能防止 qwen3 过拟合。
+5. 当前测试仍是小模型机制候选图谱，不是语言编码最终图谱。
+```
+
+本阶段进一步修正：
+
+```text
+1. qwen3 的 strongest gear 从 group {2509,16,249} 收紧到 channel 249。
+2. qwen3 channel 2509 在单通道层面不再是强支持齿轮。
+3. GLM4 的 channel 1165 在不同 relation / language_pair 下可表现为 support 或 mixed side-effect。
+4. GLM4 channel 5532 多处表现为 suppressor / blocker。
+5. DS7B 的候选组没有出现 support_channel。
+```
+
+### 十、理论进展
+
+本阶段不做大的理论改名，只给出一个客观收紧：
+
+```text
+组件齿轮不是“通道组 = 功能单元”，
+而是组内存在不同符号的微齿轮。
+```
+
+更准确的图谱边应从：
+
+```text
+residual consensus coordinate
+  -> top MLP channel group
+  -> boundary movement
+```
+
+收紧为：
+
+```text
+residual consensus coordinate
+  -> single MLP channel sign
+  -> boundary / relation / protocol slope vector
+```
+
+其中每个单通道至少要记录：
+
+```text
+(boundary_slope, relation_slope, target_logit_slope, protocol_margin_slope)
+```
+
+而不是只记录一个“有效/无效”标签。
+
+### 十一、严格审视与硬伤
+
+#### 1. 仍不是自然门控
+
+本阶段仍使用人工缩放：
+
+```text
+a'_g = factor * a_g
+```
+
+它只能证明通道被缩放时会影响边界，不能证明模型自然状态下何时启动该通道。
+
+#### 2. 仍不是自然 rollout 闭合
+
+本阶段只测 first-token boundary metrics，没有测试完整短答生成。因此最高只能算 L4 component causal candidate，不能算 L6 generation closure。
+
+#### 3. 样本规模仍偏中等
+
+本阶段 row-level interventions 为 2580，但实际 record 数只有 13，DS7B 只有 1 条 record。因此强结论只能给 qwen3 color/function 局部图谱，不能扩展为跨模型通用规律。
+
+#### 4. 随机对照也出现少量 support
+
+例如 DS7B same-layer random channel 3380 出现：
+
+```text
+boundary_slope = 0.020833333333333336
+relation_slope = 0.03125
+```
+
+这说明阈值附近的 weak support 必须谨慎处理，不能只凭 `boundary_slope > 0.02` 就写成干净语义机制。
+
+#### 5. 小模型偏差仍然明显
+
+GLM4 和 DS7B 的结果支持附件提醒：小模型内部机制可能更粗糙，通道更混合，协议/边界场更容易污染语义解释。
+
+### 十二、阶段性结论
+
+Phase198 完成了 Phase197 提出的证据校准图谱中的一个关键子任务：
+
+```text
+group-level component candidate
+  -> single-channel sign decomposition
+  -> mechanism_atlas_v1 edge
+```
+
+当前最可靠的正边：
+
+```text
+qwen3 color en->en h36 / L35 / MLP channel 249
+```
+
+证据：
+
+```text
+support_channel
+boundary_slope = 0.5432692307692308
+relation_slope = 0.03245192307692307
+rows = 26
+```
+
+当前最重要的负边 / 混合边：
+
+```text
+GLM4 channel 5532:
+  多处 suppressor_or_blocker_channel
+
+DS7B candidate channels:
+  无 support_channel
+```
+
+因此当前图谱应新增：
+
+```text
+support edge:
+  qwen3 L35 C249 color en->en
+
+mixed edge:
+  qwen3 L35 C16 color en->en
+  GLM4 L29 C1165 function zh->en
+
+suppressor edge:
+  GLM4 L29 C5532
+  DS7B L13 C6030
+```
+
+### 十三、下一阶段是否属于同一阶段
+
+当前阶段目标是：
+
+```text
+把 Phase944 的 group-level 通道候选拆成 single-channel sign atlas。
+```
+
+这个目标已经完成。
+
+接下来的任务是：
+
+```text
+Phase199:
+L4 support edge natural-gate and rollout closure audit
+```
+
+它与当前任务属于同一条“大路线”：
+
+```text
+证据校准全局机制图谱
+```
+
+但不属于同一个直接子阶段。原因是它要从：
+
+```text
+single-channel first-token boundary
+```
+
+进入：
+
+```text
+natural gate + multi-token rollout
+```
+
+证据等级从 L4 推向 L5/L6，测试目标、指标和脚本结构都需要单独设计。因此本阶段不把 Phase199 混入 Phase198 结果，避免把单通道边界正结果提前写成自然生成闭合。
+
+### 十四、下一阶段任务
+
+Phase199 建议只选最强边，不要大范围铺开：
+
+```text
+primary:
+  qwen3 color en->en L35 C249
+
+secondary:
+  qwen3 function zh->zh L26 C2
+  qwen3 function zh->zh L26 C58
+  qwen3 function en->en L26 C3
+
+negative controls:
+  qwen3 color en->en L35 C2509
+  GLM4 L29 C5532
+  DS7B L13 C6030
+```
+
+测试目标：
+
+```text
+1. 自然激活强度是否预测 success / failure；
+2. support channel 在自然样本中是否由特定 state variable 启动；
+3. ablate C249 是否破坏自然短答；
+4. boost C249 是否修复 candidate_closed=true/global_closed=false；
+5. 多 token rollout 是否保持 clear_answer 且无 protocol_drift。
+```
+
+只有 Phase199 通过后，qwen3 L35 C249 才能从：
+
+```text
+L4 component causal candidate
+```
+
+升级为：
+
+```text
+L5/L6 generation closure candidate
+```
+
+### 十五、通俗总结
+
+这次测试证明了一件很关键的事：
+
+```text
+之前看到的一组“可能有用的齿轮”，其实不是一个整体齿轮。
+里面有真正推动答案的齿轮，也有副作用齿轮、刹车齿轮，还有看起来相关但实际不动边界的齿轮。
+```
+
+最清楚的正结果是：
+
+```text
+qwen3 的 color en->en 任务里，L35 的 MLP channel 249 是当前最像真齿轮的单通道。
+```
+
+但这仍然不是最终破解。下一步要问：
+
+```text
+模型自然运行时为什么会启动 C249？
+启动后能不能真的让完整答案稳定输出？
+```
+
+这就是从“单通道边界齿轮”走向“自然生成闭合”的下一块拼图。
+
+## Phase 199: L4 单通道边到自然门控与短 rollout 闭合审计 [2026-07-05 07:58]
+
+### 一、任务判断
+
+本阶段读取并分析了新附件。附件对 Phase197 和 Phase198 的判断基本正确：
+
+```text
+1. Phase197 的机制链路线正确；
+2. Phase198 的单通道符号分解是实质进展；
+3. qwen3 L35 C249 是当前最清楚的 L4 component causal candidate；
+4. 但 C249 仍没有自然门控和自然生成闭合证据；
+5. 下一步应从 L4 first-token boundary 推进到 natural gate + rollout audit。
+```
+
+这与 Phase198 属于同一条大路线：
+
+```text
+证据校准全局机制图谱
+```
+
+并且附件明确要求继续完成阶段性目标。因此本阶段继续执行 Phase199。
+
+### 二、测试脚本与结果位置
+
+新增脚本：
+
+```text
+tests/gpt5/phase199_l4_edge_natural_gate_rollout_audit.py
+tests/gpt5/run_phase199_l4_edge_natural_gate_rollout_audit.sh
+```
+
+正式结果目录：
+
+```text
+tests/result/phase199_l4_edge_natural_gate_rollout_audit/l4_edge_natural_gate_rollout_audit_strict/
+```
+
+注意：本阶段先跑了一轮非严格口径，发现 `clean_generated` 会在句号处截断，例如：
+
+```text
+raw generated = "red. What is the most common color"
+cleaned = "red"
+```
+
+这会把明显的后续协议漂移误判为 clean rollout。因此脚本已修正为同时检查 raw continuation，并以 strict round 作为正式结果。
+
+工程验证：
+
+```text
+python -m py_compile tests/gpt5/phase199_l4_edge_natural_gate_rollout_audit.py -> OK
+```
+
+模型测试顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、测试目标
+
+Phase198 证明若干单通道可以推动 first-token boundary。Phase199 问更严格的问题：
+
+```text
+这些 L4 单通道边是否能影响自然短生成？
+```
+
+具体测试：
+
+```text
+1. baseline 生成；
+2. ablate: a'_g = 0.0 * a_g；
+3. boost : a'_g = 1.5 * a_g；
+4. 检查 clear_answer；
+5. 检查 raw protocol_drift；
+6. 检查 long_rollout_stable；
+7. 记录自然激活 activation_abs 是否区分 stable / unstable。
+```
+
+严格 rollout 稳定标准：
+
+```text
+long_rollout_stable
+  =
+  rollout_clear_answer_class
+  and not rollout_object_echo
+  and not protocol_drift(raw_generated)
+```
+
+其中 protocol_drift 使用 raw generated，不只看清洗后的首短语。
+
+### 四、测试规模
+
+测试边：
+
+```text
+qwen3: 7 edges
+GLM4: 6 edges
+DS7B: 2 edges
+total: 15 edges
+```
+
+row-level rollout：
+
+```text
+qwen3: 360 rows
+GLM4: 270 rows
+DS7B: 72 rows
+total: 702 rows
+```
+
+每条边最多 24 个样本，每个样本测试：
+
+```text
+baseline
+ablate
+boost
+```
+
+### 五、跨模型总结果
+
+正式 strict round 的核心结果非常清楚：
+
+```text
+15 / 15 条边：
+  baseline long_rollout_stable = 0
+  ablate   long_rollout_stable = 0
+  boost    long_rollout_stable = 0
+```
+
+也就是说：
+
+```text
+没有任何一条 L4 单通道边通过严格自然 rollout 闭合。
+```
+
+这不是小修正，而是重要负结果：
+
+```text
+first-token boundary gear
+  !=
+natural generation closure gear
+```
+
+### 六、qwen3 结果
+
+qwen3 测试：
+
+```text
+rows = 360
+edges = 7
+```
+
+总计：
+
+```text
+baseline stable = 0
+ablate stable   = 0
+boost stable    = 0
+
+baseline clear_answer = 36
+ablate clear_answer   = 36
+boost clear_answer    = 36
+```
+
+最关键边：
+
+```text
+qwen3 color en->en h36 L35 C249
+sign = support_channel
+Phase198 boundary_slope = 0.5432692307692308
+```
+
+Phase199 strict rollout：
+
+```text
+baseline_stable = 0
+ablate_stable   = 0
+boost_stable    = 0
+
+baseline_clear = 11
+ablate_clear   = 11
+boost_clear    = 11
+```
+
+解释：
+
+```text
+C249 能推动 first-token boundary；
+但在当前短 rollout 中，ablate / boost 都没有改变 clear answer 数量；
+raw continuation 中存在续写，因此 strict stable = 0。
+```
+
+负控：
+
+```text
+qwen3 color en->en C2509 near_zero:
+  baseline_clear = 11
+  ablate_clear = 11
+  boost_clear = 11
+  stable 全为 0
+```
+
+这说明：
+
+```text
+C249 的 L4 边界正效应是真实的；
+但它没有自动转化为 L6 natural rollout closure。
+```
+
+### 七、GLM4 结果
+
+GLM4 测试：
+
+```text
+rows = 270
+edges = 6
+```
+
+总计：
+
+```text
+baseline stable = 0
+ablate stable   = 0
+boost stable    = 0
+
+baseline clear_answer = 28
+ablate clear_answer   = 28
+boost clear_answer    = 28
+```
+
+GLM4 color en->en C1165：
+
+```text
+sign = support_channel
+baseline_clear = 10
+ablate_clear   = 10
+boost_clear    = 10
+stable 全为 0
+```
+
+GLM4 C5532 suppressor / blocker：
+
+```text
+color en->en:
+  baseline_clear = 10
+  ablate_clear = 10
+  boost_clear = 10
+  stable 全为 0
+
+function en->en:
+  clear 全为 0
+  stable 全为 0
+```
+
+结论：
+
+```text
+GLM4 的边界敏感性没有在本阶段转化为自然短生成控制；
+Phase198 的 mixed / suppressor 分类仍然成立，但不是 rollout closure。
+```
+
+### 八、DS7B 结果
+
+DS7B 测试：
+
+```text
+rows = 72
+edges = 2
+```
+
+总计：
+
+```text
+baseline stable = 0
+ablate stable   = 0
+boost stable    = 0
+
+baseline clear_answer = 0
+ablate clear_answer   = 0
+boost clear_answer    = 0
+```
+
+测试边：
+
+```text
+DS7B function en->en C3033 mixed_side_effect
+DS7B function en->en C6030 suppressor_or_blocker
+```
+
+结果：
+
+```text
+两条边都没有 clear_answer，也没有 stable rollout。
+```
+
+这进一步支持 Phase198 的判断：
+
+```text
+DS7B 当前只能作为弱/混合/抑制性参考，
+不能作为机制闭合依据。
+```
+
+### 九、评估口径修正
+
+本阶段最重要的方法论修正是：
+
+```text
+不能只用 cleaned generated 判断 rollout closure。
+```
+
+原因：
+
+```text
+clean_generated 会在 ".", ",", ";", ":" 等位置截断；
+这适合判断 first answer span，
+但不适合判断 protocol drift。
+```
+
+例如：
+
+```text
+generated = "red. What is the most common color"
+```
+
+清洗后可能得到：
+
+```text
+red
+```
+
+如果只看 cleaned，就会误以为 clean rollout 成立。严格口径必须同时检查 raw continuation。
+
+因此后续所有 rollout closure 都应同时记录：
+
+```text
+generated_raw
+generated_clean
+clear_answer_from_clean
+protocol_drift_from_raw
+strict_rollout_stable
+```
+
+### 十、理论进展
+
+本阶段不提出新理论，只给出一个重要负边：
+
+```text
+L4 first-token boundary edge
+  -/-> L6 natural rollout closure
+```
+
+当前更准确的图谱层级是：
+
+```text
+single MLP channel sign
+  -> first-token boundary movement
+  -> first answer span
+  -> raw continuation protocol control
+  -> strict rollout closure
+```
+
+Phase198 完成了：
+
+```text
+single MLP channel sign -> first-token boundary movement
+```
+
+Phase199 证明尚未完成：
+
+```text
+first-token boundary movement -> strict rollout closure
+```
+
+### 十一、严格审视与硬伤
+
+#### 1. 当前 prompt 本身容易诱发续写
+
+例如：
+
+```text
+A common color for an apple is
+```
+
+模型自然输出：
+
+```text
+red. What is the most common color ...
+```
+
+这说明 prompt protocol 本身没有强约束“只回答一个词并停止”。因此 Phase199 的负结果可能部分来自 prompt protocol，而不是 C249 完全无用。
+
+#### 2. 单通道缩放可能不足以控制多 token 策略
+
+C249 可能只影响第一步答案 token 边界，而后续停止/续写由其他协议齿轮控制。不能要求 C249 单独完成：
+
+```text
+answer selection + stop control
+```
+
+#### 3. strict stable = 0 是真实负结果，但不是最终否定
+
+它证明：
+
+```text
+当前测试条件下，L4 边没有升级到 L6。
+```
+
+但不能证明：
+
+```text
+C249 对所有生成闭合都无用。
+```
+
+下一步需要加入更明确的 prompt protocol 和 stop/protocol edge。
+
+#### 4. 小模型偏差仍然重要
+
+qwen3 / GLM4 / DS7B 在短生成中都有明显续写、格式、协议问题。小模型可能把答案选择和终止控制拆得更粗糙，因此结果不能直接外推到大模型或人脑。
+
+### 十二、阶段性结论
+
+Phase199 是一个重要负结果：
+
+```text
+qwen3 L35 C249 是强 L4 first-token boundary support edge，
+但不是 L6 natural rollout closure edge。
+```
+
+跨模型共同事实：
+
+```text
+1. first-token clear answer 可以出现；
+2. ablate / boost 单通道不改变 clear answer 数量；
+3. raw continuation 产生 protocol drift；
+4. strict long_rollout_stable 全部为 0。
+```
+
+因此当前图谱应新增一条明确边界：
+
+```text
+L4 component causal edge
+  does not imply
+L6 generation closure
+```
+
+### 十三、下一阶段是否属于同一阶段
+
+当前 Phase199 的直接目标是：
+
+```text
+测试 L4 support edge 是否能自然升级到 L5/L6 rollout closure。
+```
+
+该目标已经完成，结果为负。
+
+下一阶段仍属于同一条大路线：
+
+```text
+证据校准全局机制图谱
+```
+
+但直接子目标应切换为：
+
+```text
+Protocol-Gated Rollout Repair Audit
+协议门控的 rollout 修复审计
+```
+
+它不应继续盲目扩大 C249 patch，而应加入：
+
+```text
+1. 明确 short-answer prompt protocol；
+2. stop / punctuation / EOS / prose continuation 分类；
+3. C249 + protocol edge 的组合测试；
+4. raw continuation drift 作为硬指标。
+```
+
+因此本阶段不继续自动混入下一子阶段，避免把 Phase199 的负结果用更强 prompt 直接掩盖。
+
+### 十四、下一阶段任务
+
+建议 Phase200：
+
+```text
+Protocol-Gated Rollout Repair Audit
+协议门控的 rollout 修复审计
+```
+
+优先测试：
+
+```text
+qwen3 color en->en L35 C249
+```
+
+对照条件：
+
+```text
+prompt_plain:
+  A common color for an apple is
+
+prompt_short_answer:
+  Answer with one English color word only. The color of an apple is
+
+prompt_stop_explicit:
+  Answer with one English color word and then stop. The color of an apple is
+```
+
+干预组合：
+
+```text
+baseline
+C249 ablate
+C249 boost
+protocol suppress / stop edge candidate
+C249 boost + protocol suppress
+```
+
+目标不是证明 C249 单独闭合，而是测试：
+
+```text
+answer-selection gear + protocol gate
+```
+
+是否必须组合才能形成 strict rollout closure。
+
+### 十五、通俗总结
+
+这次测试说明：
+
+```text
+C249 像是能把第一个答案词推向 red 的齿轮，
+但它不是让模型“只回答 red 然后停下”的完整机制。
+```
+
+模型会先说出正确开头，然后继续写别的东西。也就是说：
+
+```text
+选答案的齿轮
+和
+回答到哪里停止的齿轮
+不是同一个东西。
+```
+
+下一步要找的是这两个齿轮如何配合，而不是继续单独放大 C249。
+
+## Phase 200: 协议门控 rollout 修复审计 [2026-07-05 17:10]
+
+### 一、任务来源与判断
+
+本阶段分析了附件中对 Phase199 的判断。附件的核心判断基本正确：
+
+```text
+L4 first-token boundary gear != L6 natural rollout closure gear
+```
+
+Phase199 的严格 raw generated 审计说明，qwen3 L35 C249 等边可以影响第一答案词边界，但不能自动保证模型只输出一个答案词后停止。因此不能把 C249 直接解释为完整回答闭合机制。正确的下一步不是继续盲目放大 C249，而是测试：
+
+```text
+answer-selection gear + prompt/protocol gate
+```
+
+能否形成严格 rollout closure。
+
+### 二、本阶段完成内容
+
+新增正式测试脚本：
+
+```text
+tests/gpt5/phase200_protocol_gated_rollout_repair_audit.py
+tests/gpt5/run_phase200_protocol_gated_rollout_repair_audit.sh
+```
+
+结果保存位置：
+
+```text
+tests/result/phase200_protocol_gated_rollout_repair_audit/protocol_gated_rollout_repair_audit/
+```
+
+跨模型汇总文件：
+
+```text
+phase200_cross_model_summary.json
+phase200_cross_model_summary.md
+```
+
+执行顺序为：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型测试完成后释放 GPU 显存，再加载下一个模型。
+
+### 三、测试原理
+
+本阶段不再只测试自然 prompt，而是加入三类 prompt protocol：
+
+```text
+plain:
+  原始自然问题
+
+short_answer:
+  Answer with one English color/verb/category word only...
+
+stop_explicit:
+  Answer with exactly one English color/verb/category word and no explanation...
+```
+
+每条候选边测试三种条件：
+
+```text
+baseline
+ablate: channel factor = 0.0
+boost: channel factor = 1.5
+```
+
+严格稳定性仍使用 Phase199 的 raw generated 判据，不使用清洗后的短 answer span 判断闭合。
+
+### 四、基本数学记号
+
+设候选通道为第 \(l\) 层 MLP 通道 \(c\)，通道激活为：
+
+```text
+a_{l,c}
+```
+
+干预后激活为：
+
+```text
+a'_{l,c} = s · a_{l,c}
+```
+
+其中：
+
+```text
+s = 0.0   ablate
+s = 1.5   boost
+```
+
+对每个样本记录三个核心指标：
+
+```text
+clear = 是否出现目标答案类别
+drift = raw continuation 是否发生协议漂移
+stable = clear 且没有 protocol drift 且没有 object echo
+```
+
+本阶段真正关心的因果差分是：
+
+```text
+Δstable_boost = stable(boost) - stable(baseline)
+Δstable_ablate = stable(baseline) - stable(ablate)
+```
+
+若 prompt protocol 能提升 stable，但通道 ablate/boost 的 Δstable 为 0，则说明修复主要来自外部协议提示，不是该单通道内部机制。
+
+### 五、客观结果
+
+总数据量：
+
+```text
+qwen3: 612 rows
+GLM4: 585 rows
+DS7B: 216 rows
+cross-model condition rows: 108
+protocol eval rows: 36
+```
+
+#### 1. qwen3
+
+聚合结果：
+
+```text
+plain baseline:        rows=68, stable=0, clear=19, drift=63
+short_answer baseline: rows=68, stable=0, clear=22, drift=68
+stop_explicit baseline:rows=68, stable=0, clear=16, drift=68
+```
+
+ablate 与 boost 后：
+
+```text
+所有 qwen3 条件 stable = 0
+所有 qwen3 protocol/channel 组合 Δstable_boost = 0
+所有 qwen3 protocol/channel 组合 Δstable_ablate = 0
+```
+
+特别是核心边：
+
+```text
+qwen3|color|en->en|h36|c249|support_channel
+```
+
+在 plain、short_answer、stop_explicit 三种协议下，baseline/ablate/boost 的 stable 全部为 0。
+
+#### 2. GLM4
+
+GLM4 出现了有限的 prompt protocol 修复：
+
+```text
+plain baseline:        rows=65, stable=0,  clear=22, drift=65
+short_answer baseline: rows=65, stable=6,  clear=14, drift=45
+stop_explicit baseline:rows=65, stable=23, clear=29, drift=16
+```
+
+但是通道干预没有带来 stable 增益：
+
+```text
+short_answer:
+  baseline stable=6
+  ablate stable=6
+  boost stable=6
+
+stop_explicit:
+  baseline stable=23
+  ablate stable=23
+  boost stable=23
+```
+
+非零 stable 主要集中在 GLM4 的 color en->en 与部分 function 条件上，例如：
+
+```text
+glm4|color|en->en|h30|c1165|support_channel
+stop_explicit: baseline/ablate/boost stable = 8/8/8
+
+glm4|color|en->en|h30|c5532|suppressor_or_blocker_channel
+stop_explicit: baseline/ablate/boost stable = 8/8/8
+```
+
+这说明显式停止 prompt 可以让 GLM4 更容易闭合，但当前这些单通道边没有解释闭合增益。
+
+#### 3. DS7B
+
+聚合结果：
+
+```text
+plain baseline:        rows=24, stable=0, clear=0, drift=20
+short_answer baseline: rows=24, stable=0, clear=8, drift=24
+stop_explicit baseline:rows=24, stable=0, clear=8, drift=24
+```
+
+DS7B 的 short_answer / stop_explicit 能提高 clear，但 drift 仍然很高，stable 仍为 0。
+
+### 六、结果分析
+
+本阶段得到两个可靠现象：
+
+```text
+1. qwen3 的 C249 类边不是严格回答闭合机制；
+2. GLM4 的显式停止 prompt 可以产生部分稳定闭合，但不是由当前测试的 C1165/C5532 单通道干预造成。
+```
+
+这进一步支持 Phase199 的负结果：
+
+```text
+answer selection 与 rollout closure 是可分离机制。
+```
+
+更准确地说：
+
+```text
+first-token answer boundary
+prompt-level instruction following
+raw continuation stopping / anti-prose drift
+```
+
+至少应当作为三个不同层面的现象处理。
+
+### 七、问题、硬伤与瓶颈
+
+1. 本阶段的 protocol gate 是外部 prompt gate，不是内部 stop/protocol edge。
+
+因此 GLM4 的 stable 提升不能解释为内部闭合通道被定位，只能说明模型在强提示下具备部分短答闭合能力。
+
+2. qwen3 在 stop_explicit 下仍然 stable=0，说明其问题不只是缺少短答提示，也可能是小模型 instruction-following 或停止策略较粗糙。
+
+3. DS7B 的 clear 可被短答提示提高，但 drift 同时保持很高，说明“答对类别”和“停止生成”仍然脱耦。
+
+4. 当前候选边来自 Phase198 的单通道符号分解，并非专门从 stop/EOS/punctuation/prose continuation 维度定位。因此没有真正测试到内部停止齿轮。
+
+### 八、理论进展
+
+Phase200 把 Phase199 的负结果推进了一步：
+
+```text
+C249 不是完整闭合机制
+外部 stop prompt 可在 GLM4 上修复部分闭合
+但当前单通道边不承担这个修复
+```
+
+这意味着语言背后的机制图谱不能只画“语义答案方向”，还必须加入：
+
+```text
+1. 答案选择坐标
+2. 协议约束坐标
+3. 停止/标点/EOS 坐标
+4. prose continuation 抑制坐标
+```
+
+更接近第一性原理的表述是：
+
+```text
+一个完整语言行为不是单个语义向量，而是多个机制坐标在生成时序上的组合闭包。
+```
+
+目前已经看到的拼图是：
+
+```text
+模型可以先选中正确答案词，
+但如果没有停止坐标或反续写坐标配合，
+它仍会继续生成解释、问题回声或协议漂移。
+```
+
+### 九、下一阶段大任务
+
+当前 Phase200 与 Phase199 属于同一阶段性目标：
+
+```text
+从 L4 first-token edge 推进到 L6 natural rollout closure mechanism
+```
+
+Phase200 已完成该阶段中的“外部协议门控是否足够”的测试。结果表明外部协议门控在 GLM4 上部分有效，但没有定位内部机制。因此下一步不应继续自动做同类 prompt 强化，而应进入新的子阶段：
+
+```text
+Phase201: Stop / EOS / Punctuation / Prose-Continuation Component Localization
+```
+
+建议下一阶段优先构造四类对照 logit/rollout 指标：
+
+```text
+target answer token
+period / punctuation token
+EOS token
+prose continuation token set: because, and, it, usually, which, that, what, is
+```
+
+并用通道级因果测试寻找：
+
+```text
+提高 period/EOS 或压低 prose continuation 的内部组件
+```
+
+只有找到这类组件后，才适合做：
+
+```text
+answer-selection edge + stop/prose-control edge
+```
+
+的组合 patch。
+
+### 十、通俗总结
+
+这次测试可以理解成：
+
+```text
+我们已经找到一些“让模型说出正确第一个词”的零件，
+但还没找到“让模型说完就停”的零件。
+```
+
+给 GLM4 加一句“只回答一个词，不要解释”，确实能让它部分停住；但把当前找到的单个通道放大或关掉，并不会改变这个停住能力。
+
+所以现在最重要的下一步不是继续追 C249，而是专门去找：
+
+```text
+停止、句号、EOS、抑制继续解释
+```
+
+这些机制坐标。只有把“选答案”和“控制停止”两类坐标拼起来，才可能画出真正的自然语言生成闭合图谱。
+
+## Phase 201: 停止、结束符、标点与解释续写组件定位图谱 [2026-07-05 17:45]
+
+### 一、任务判断
+
+本阶段分析了附件中对 Phase200 的判断。附件结论基本正确：
+
+```text
+Phase199 证明首词元答案边界不等于自然生成闭合；
+Phase200 证明外部提示协议可部分修复 GLM4 闭合，但当前答案选择通道不解释该修复；
+下一步必须定位内部 stop / punctuation / EOS / anti-prose 组件。
+```
+
+这与当前进展处于同一个阶段性目标：
+
+```text
+从 L4 answer-selection edge 推进到 L5c/L5d stop/prose control edge，
+再为 L6 strict rollout closure 做组合准备。
+```
+
+因此本阶段继续自动完成 Phase201，而不是继续围绕 C249 做单通道闭合 patch。
+
+### 二、本阶段完成内容
+
+新增正式测试脚本：
+
+```text
+tests/gpt5/phase201_stop_prose_component_atlas.py
+tests/gpt5/run_phase201_stop_prose_component_atlas.sh
+```
+
+结果保存位置：
+
+```text
+tests/result/phase201_stop_prose_component_atlas/stop_prose_component_atlas/
+```
+
+跨模型汇总：
+
+```text
+phase201_cross_model_summary.json
+phase201_cross_model_summary.md
+```
+
+执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型测试完成后释放 GPU 显存，再加载下一个模型。
+
+### 三、测试原理
+
+Phase201 不再在“回答前”位置只测答案 token，而是在“回答后”位置测停止控制。
+
+例如：
+
+```text
+The color of an apple is red
+```
+
+在这个位置，下一 token 的竞争不再是 red 是否胜出，而是：
+
+```text
+句号 / 换行 / EOS
+vs
+because / and / usually / which / that / what / is / it / the / a ...
+```
+
+本阶段构造三种协议：
+
+```text
+plain
+short_answer
+stop_explicit
+```
+
+每个样本先把目标答案追加到 prompt 尾部，然后计算下一 token logits。
+
+### 四、数学指标
+
+停止集合：
+
+```text
+V_stop = {EOS, period, newline}
+```
+
+解释续写集合：
+
+```text
+V_prose = {because, and, usually, which, that, what, is, it, the, a, an, this ...}
+```
+
+对象复读集合：
+
+```text
+V_echo = object token set
+```
+
+停止边界：
+
+```text
+m_stop = max z(V_stop) - max z(V_prose)
+```
+
+解释续写边界：
+
+```text
+m_prose = max z(V_prose) - max z(V_stop)
+```
+
+对象复读边界：
+
+```text
+m_echo = max z(V_echo) - max z(V_stop)
+```
+
+组件搜索先计算通道激活与这些 margin 的相关性：
+
+```text
+stop_candidate:       Corr(a_g, m_stop)
+anti_prose_candidate: Corr(a_g, -m_prose)
+echo_suppress:        Corr(a_g, -m_echo)
+```
+
+然后只对候选通道做因果验证：
+
+```text
+ablate: a'_g = 0.0 * a_g
+boost:  a'_g = 1.5 * a_g
+```
+
+评价不再只看答案 token，而看：
+
+```text
+Δstop_margin
+Δprose_margin
+Δecho_margin
+Δperiod_vs_prose_margin
+Δeos_vs_prose_margin
+```
+
+### 五、数据量
+
+token group 大小：
+
+```text
+EOS: 1
+period: 4
+newline: 2
+stop: 7
+prose: 48
+```
+
+三模型数据量：
+
+```text
+qwen3:     metric_rows=192, scan_rows=576, causal_rows=252
+GLM4:      metric_rows=177, scan_rows=576, causal_rows=242
+DS7B:      metric_rows=36,  scan_rows=144, causal_rows=216
+```
+
+### 六、客观结果
+
+#### 1. qwen3
+
+qwen3 的 post-answer stop margin 本身并不低，尤其在 stop_explicit 下更高：
+
+```text
+color en->en:
+plain        stop_margin=4.222
+short_answer stop_margin=6.896
+stop_explicit stop_margin=8.694
+```
+
+但候选通道因果验证没有得到正向 stop/prose 修复：
+
+```text
+positive causal candidate rows: 0
+```
+
+典型候选反而表现为：
+
+```text
+qwen3 color en->zh stop_explicit L26 C2192
+ablate: Δstop=-0.054, Δprose=+0.054
+boost:  Δstop=-0.071, Δprose=+0.071
+```
+
+这说明 qwen3 的问题可能不在“回答后 logit 停止边界”本身，而在真实 rollout 的时序执行、协议服从或生成策略上。
+
+#### 2. GLM4
+
+GLM4 得到本阶段最强正结果。
+
+基础 post-answer 指标中，function en->en 的 plain 条件明显偏向续写：
+
+```text
+GLM4 function en->en plain:
+stop_margin=-9.240
+prose_margin=+9.240
+echo_margin=+5.145
+```
+
+加入 short_answer / stop_explicit 后转为正 stop margin：
+
+```text
+short_answer:  stop_margin=1.389
+stop_explicit: stop_margin=1.764
+```
+
+这与 Phase200 中 GLM4 可被外部协议部分修复相互印证。
+
+最强因果候选集中在：
+
+```text
+GLM4 color zh->en plain
+```
+
+代表性结果：
+
+```text
+anti_prose_candidate L35 C1018 boost:
+rows=14
+Δstop_margin=+2.048
+Δprose_margin=-2.048
+Δecho_margin=-1.184
+score=4.095
+
+anti_prose_candidate L23 C616 ablate:
+rows=14
+Δstop_margin=+2.039
+Δprose_margin=-2.039
+Δecho_margin=-1.182
+score=4.078
+
+anti_prose_candidate L29 C7118 ablate:
+rows=14
+Δstop_margin=+2.034
+Δprose_margin=-2.034
+Δecho_margin=-1.186
+score=4.069
+```
+
+同一批通道也会被 stop_candidate 规则选出，说明这里更准确的命名应是：
+
+```text
+stop-vs-prose boundary control candidate
+```
+
+而不是纯停止神经元或纯反续写神经元。
+
+#### 3. DS7B
+
+DS7B 只有极弱正结果：
+
+```text
+echo_suppress_candidate L16 C6402 boost:
+rows=12
+Δstop_margin=+0.021
+Δprose_margin=-0.021
+Δecho_margin=+0.005
+score=0.016
+```
+
+这个强度太低，只能作为弱参考，不能作为稳定机制证据。
+
+### 七、结果分析
+
+本阶段得到三个客观现象。
+
+第一，Phase201 初步建立了可操作的内部 stop/prose 指标：
+
+```text
+回答后位置的 stop/prose logit margin 可以被测量；
+通道激活可以与该 margin 做相关筛选；
+候选通道可以做 ablate/boost 因果验证。
+```
+
+第二，GLM4 存在明显的 stop-vs-prose boundary control 候选，尤其是：
+
+```text
+L35 C1018
+L23 C616
+L29 C7118
+```
+
+这些候选能在 post-answer 位置显著提高 stop margin、降低 prose margin，并降低 echo margin。
+
+第三，跨模型稳健性仍弱：
+
+```text
+qwen3 没有正候选；
+GLM4 有强候选；
+DS7B 只有极弱候选。
+```
+
+因此当前不能把 GLM4 候选写成通用语言机制，只能写成：
+
+```text
+GLM4 小模型中的 stop/prose 边界候选。
+```
+
+### 八、硬伤与风险
+
+1. 当前测试仍是 post-answer logit 测试，不是完整 rollout closure。
+
+它证明的是：
+
+```text
+组件可改变回答后下一 token 的 stop/prose 竞争。
+```
+
+还没有证明：
+
+```text
+组件可在自然生成中稳定输出正确答案并停止。
+```
+
+2. GLM4 的强候选存在 ablate 和 boost 同向改善的现象。
+
+这说明通道可能不是简单线性单调齿轮，而可能涉及：
+
+```text
+激活符号混合
+层归一化 / 残差重排
+局部非线性
+候选筛选偏差
+同一通道承担多功能
+```
+
+因此不能过早命名为“停止神经元”。
+
+3. qwen3 的 post-answer stop margin 高，但 Phase199/200 rollout stable 仍为 0。
+
+这说明：
+
+```text
+logit 停止倾向
+和
+实际多 token 生成轨迹闭合
+仍然不是同一个指标。
+```
+
+后续必须把 stop/prose logit 指标接回 raw rollout。
+
+4. DS7B 数据量和候选强度都偏弱，只能当负控或弱参照。
+
+5. 当前扫描层数有限，只扫中后层若干位置，还不是完整全层图谱。
+
+### 九、理论进展
+
+Phase201 把 Phase200 后提出的缺口变成了可测对象：
+
+```text
+停止控制不是抽象猜测；
+它可以被具体写成 stop/prose/echo logit margin；
+也可以在 MLP 通道层面寻找候选边。
+```
+
+最新拼图应更新为：
+
+```text
+答案选择边：qwen3 C249 是强 L4 候选；
+外部协议层：GLM4 stop_explicit 可部分修复行为；
+内部 stop/prose 层：GLM4 L35 C1018 / L23 C616 / L29 C7118 是 post-answer 候选；
+完整 rollout 闭合：仍未完成。
+```
+
+这支持当前统一理论：
+
+```text
+语言动作闭合 = 答案选择 + 协议服从 + 停止控制 + 反续写抑制 + 反复读控制。
+```
+
+但必须强调：
+
+```text
+Phase201 只完成了 L5c/L5d 的候选定位初步；
+还没有完成 L6。
+```
+
+### 十、下一阶段任务
+
+当前 Phase201 仍属于同一阶段性目标：
+
+```text
+把答案选择边与停止 / 反续写边拼成可验证组合机制。
+```
+
+Phase201 已经完成“post-answer stop/prose 候选定位初测”。下一阶段应继续同一阶段目标，进入：
+
+```text
+Phase202: Stop-Prose Candidate Natural Rollout Repair Audit
+```
+
+核心任务：
+
+```text
+1. 选 GLM4 L35 C1018、L23 C616、L29 C7118；
+2. 在自然生成 prompt 上测试单独 ablate/boost；
+3. 在 answer-selected prompt 上测试 post-answer continuation；
+4. 检查 raw generated 的 stable / drift / echo；
+5. 若 GLM4 候选能降低 drift，再测试与答案选择边的组合。
+```
+
+对于 qwen3，不应直接组合 C249，因为 Phase201 没有找到 qwen3 的正 stop/prose 候选。qwen3 应先扩大 stop/prose 搜索层和样本，而不是硬做组合。
+
+### 十一、通俗总结
+
+这次测试相当于问：
+
+```text
+模型已经说出答案后，下一步更想打句号，还是更想继续解释？
+```
+
+结果是：
+
+```text
+GLM4 里找到了一些能明显把“继续解释”推向“更像停止”的候选通道；
+qwen3 没找到；
+DS7B 只有很弱信号。
+```
+
+所以我们向前走了一步：停止/反续写不再只是理论缺口，而是已经有了可测的候选边。但这还不是最终闭合。下一步要看这些候选边能不能真的让 raw generation 少漂移、少解释、少复读。
+
+## Phase 202: 停止/解释续写候选的自然生成修复审计 [2026-07-05 19:59]
+
+### 一、任务判断
+
+本阶段分析了附件中对 Phase201 的判断。附件核心判断正确：
+
+```text
+Phase201 是实质进展，但不是闭合。
+post-answer stop/prose margin
+≠
+natural rollout stop
+≠
+strict language action closure
+```
+
+Phase201 已经把停止控制、解释续写抑制、对象复读抑制变成可测的内部指标，并在 GLM4 中找到：
+
+```text
+L35 C1018
+L23 C616
+L29 C7118
+```
+
+但这些只是 L5c/L5d 候选，还没有证明能修复 raw rollout。因此本阶段继续同一阶段性目标，进入 Phase202：
+
+```text
+把 Phase201 的 stop/prose 候选接回自然生成轨迹。
+```
+
+### 二、本阶段完成内容
+
+新增正式脚本：
+
+```text
+tests/gpt5/phase202_stop_prose_rollout_repair_audit.py
+tests/gpt5/run_phase202_stop_prose_rollout_repair_audit.sh
+```
+
+结果保存位置：
+
+```text
+tests/result/phase202_stop_prose_rollout_repair_audit/stop_prose_rollout_repair_audit/
+```
+
+跨模型汇总：
+
+```text
+phase202_cross_model_summary.json
+phase202_cross_model_summary.md
+```
+
+执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型完成后释放 GPU 显存，再加载下一个模型。
+
+### 三、测试原理
+
+Phase202 对 Phase201 候选做 raw generation 审计。
+
+每个候选通道测试：
+
+```text
+baseline
+ablate: channel factor = 0.0
+boost:  channel factor = 1.5
+```
+
+每个样本测试两类 rollout mode：
+
+```text
+natural:
+  从普通 prompt 直接生成。
+
+post_answer:
+  先把答案 teacher-forced 到 prompt 尾部，再生成后续 token。
+```
+
+例如：
+
+```text
+natural:
+  The color of a horse is
+
+post_answer:
+  The color of a horse is brown
+```
+
+三类 prompt protocol：
+
+```text
+plain
+short_answer
+stop_explicit
+```
+
+本阶段不再只看单步 stop margin，而看 raw generated 文本是否真的：
+
+```text
+答案清楚
+不漂移
+不解释续写
+不复读对象
+严格稳定
+```
+
+### 四、判定公式
+
+候选修复有效定义为：
+
+```text
+RepairEffective(g)
+=
+stable_delta > 0
+and drift_delta < 0
+and clear_delta >= 0
+```
+
+同时记录：
+
+```text
+echo_delta
+prose_delta
+clear_delta
+stable_delta
+drift_delta
+```
+
+如果候选只改变 Phase201 的 post-answer logit margin，但不能改变 raw rollout，则仍停留在 L5c/L5d，不能升级为 L6。
+
+### 五、测试对象与数据量
+
+qwen3：
+
+```text
+3 个弱/负候选
+rows = 756
+```
+
+GLM4：
+
+```text
+3 个 Phase201 强候选：
+L35 C1018
+L23 C616
+L29 C7118
+rows = 756
+```
+
+DS7B：
+
+```text
+3 个弱候选
+rows = 648
+```
+
+总结果：
+
+```text
+repair_effective count = 0
+```
+
+### 六、客观结果
+
+#### 1. qwen3
+
+qwen3 没有任何有效修复：
+
+```text
+repair_effective = 0
+stable_delta 全部为 0
+```
+
+少数条件出现极小 drift 下降：
+
+```text
+qwen3 L26 C2192 natural plain boost:
+stable_delta = 0
+drift_delta = -1
+prose_delta = -1
+clear_delta = 0
+repair_effective = false
+```
+
+但因为 stable 没有提升，所以不能算修复。
+
+qwen3 在 post_answer stop_explicit 中常见输出：
+
+```text
+".\nThe answer is brown. The color"
+". The color of a flower is red"
+```
+
+这说明它即使先出现停止标点，也会继续进入解释、答案声明或新问题轨迹。
+
+#### 2. GLM4
+
+GLM4 的 Phase201 强候选没有升级为 rollout 修复：
+
+```text
+repair_effective = 0
+```
+
+聚合结果显示，候选通道 ablate/boost 对 natural rollout 的 stable/drift 基本没有影响：
+
+```text
+natural plain:
+baseline stable=0, drift=42, clear=6
+ablate   stable=0, drift=42, clear=6
+boost    stable=0, drift=42, clear=6
+
+natural short_answer:
+baseline stable=12, drift=24, clear=18
+ablate   stable=12, drift=24, clear=18
+boost    stable=12, drift=24, clear=18
+
+natural stop_explicit:
+baseline stable=18, drift=6, clear=24
+ablate   stable=18, drift=6, clear=24
+boost    stable=18, drift=6, clear=24
+```
+
+这说明 GLM4 的稳定提升主要仍来自外部 prompt protocol，而不是这三个单通道候选。
+
+post_answer 抽样显示：
+
+```text
+".Brown. Brown. Brown. Brown"
+".brown. brown. brown. brown"
+```
+
+即 GLM4 在回答后常能先打句号，但随后重复答案词。因此：
+
+```text
+句号出现
+≠
+序列真正停止
+```
+
+这解释了为什么 Phase201 的 stop margin 正结果没有变成 L6。
+
+#### 3. DS7B
+
+DS7B 也没有有效修复：
+
+```text
+repair_effective = 0
+stable_delta 全部为 0
+```
+
+部分 ablate 还让 drift 增加：
+
+```text
+natural plain ablate:
+drift_delta = +1
+prose_delta = +1
+```
+
+DS7B 仍只能作为弱参考或负控。
+
+### 七、关键负结果
+
+Phase202 是一个重要负结果：
+
+```text
+Phase201 的 post-answer stop/prose 单步边界候选
+没有直接修复 raw rollout。
+```
+
+更精确地说：
+
+```text
+L5c/L5d single-step stop/prose margin candidate
+≠
+L6 sequence-level rollout closure candidate
+```
+
+这进一步收紧了机制层级：
+
+```text
+答案选择边界
+≠
+回答后停止边界
+≠
+序列级停止链
+≠
+严格自然生成闭合
+```
+
+### 八、问题、硬伤与瓶颈
+
+1. GLM4 的 Phase201 强候选只影响单步 logit 边界，不能保证后续 token 序列停止。
+
+2. post_answer 模式显示“先句号、后复读”的现象：
+
+```text
+stop token 可以出现，
+但生成器仍继续输出后续 token。
+```
+
+这说明停止控制可能不在单个 MLP 通道，而在：
+
+```text
+EOS 触发
+generation stopping rule
+多步状态链
+attention / residual / norm 协同
+```
+
+3. 外部 prompt protocol 仍然比单通道干预更强：
+
+```text
+GLM4 stop_explicit baseline stable=18
+ablate/boost stable 仍然=18
+```
+
+4. qwen3 再次证明 post-answer stop 倾向不能推出 strict rollout stable。
+
+5. 当前测试仍是单通道干预，尚未测试多组件组合、全层搜索、注意力头和层归一化/增益。
+
+### 九、理论进展
+
+Phase202 没有给出 L6 正结果，但它补上了一块关键拼图：
+
+```text
+单步停止边界不是完整停止机制。
+```
+
+因此统一理论需要把停止控制再拆成两层：
+
+```text
+token-level stop/prose boundary
+sequence-level stop-chain controller
+```
+
+语言动作闭合现在至少需要：
+
+```text
+1. answer selection
+2. protocol following
+3. post-answer stop/prose boundary
+4. sequence-level stop chain
+5. anti-echo control
+6. generation termination execution
+```
+
+Phase201 找到了第 3 层候选。
+Phase202 证明第 3 层单独不足以完成第 4-6 层。
+
+### 十、下一阶段任务
+
+Phase202 仍属于同一阶段性目标：
+
+```text
+从答案选择边推进到严格自然生成闭合。
+```
+
+但当前子阶段已经完成：
+
+```text
+Phase201: 找 post-answer stop/prose 候选；
+Phase202: 检查这些候选是否修复 raw rollout；
+结果：没有修复。
+```
+
+下一步不应继续盲目 boost 这三个 GLM4 通道，而应进入：
+
+```text
+Phase203: Sequence-Level Stop Chain and EOS Execution Audit
+```
+
+建议 Phase203 直接测生成过程每一步：
+
+```text
+t=1,2,3,4...
+stop margin
+EOS rank
+period rank
+prose token rank
+echo token rank
+actual emitted token
+whether generation should have stopped but did not
+```
+
+核心问题从：
+
+```text
+哪个通道提高句号/停止边界？
+```
+
+升级为：
+
+```text
+为什么模型已经生成句号后还继续生成？
+```
+
+### 十一、通俗总结
+
+这次测试说明：
+
+```text
+我们找到的 GLM4 通道，确实像是能让“句号/停止”在下一步竞争中更强；
+但它们不能让模型真正停下来。
+```
+
+模型会出现一种很关键的失败：
+
+```text
+brown. Brown. Brown. Brown
+```
+
+也就是说：
+
+```text
+打了句号
+不等于
+生成停止。
+```
+
+所以真正缺的不是单步“想打句号”的齿轮，而是序列级“打完句号就结束”的控制链。下一步要研究的就是这条停止链。
+
+## Phase 203: 阶段性总总结与全局图谱破解方案 [2026-07-05 20:13]
+
+### 一、总判断
+
+截至 Phase202，当前研究已经完成了一个重要转向：
+
+```text
+从“寻找语义答案齿轮”
+转向
+“构建语言动作的全局机制图谱”
+```
+
+最核心的成果不是已经闭合，而是已经证明了多层机制之间不能混为一谈：
+
+```text
+答案选择边界
+≠
+回答后停止边界
+≠
+序列级停止链
+≠
+严格自然生成闭合
+```
+
+这说明早期“找到语义方向 / 找到答案通道 / patch 一个组件就能闭合”的路线已经被实验证伪。当前最可靠的路线是：
+
+```text
+先完成全局图谱拼图，
+再做组合闭合验证。
+```
+
+### 二、已经完成的主要成果
+
+#### 1. 排除了固定概念向量路线
+
+已有结果反复说明，模型内部不像存着一个固定“apple = 苹果概念向量”。更合理的结构是：
+
+```text
+对象身份
++ 领域路线
++ 关系差分
++ 候选场
++ 协议/停止/续写控制
+```
+
+也就是相对状态中的条件化组合，而不是孤立概念向量。
+
+#### 2. 建立了答案选择边界证据
+
+Phase198 找到 qwen3 的强 L4 答案选择边：
+
+```text
+qwen3 L35 C249
+```
+
+它能推动首词元答案边界，例如颜色任务中的目标答案词。
+
+但 Phase199/200 证明：
+
+```text
+C249 不能形成严格自然生成闭合。
+```
+
+所以它是答案选择候选，不是完整语言行为候选。
+
+#### 3. 建立了 raw generated（原始生成）审计标准
+
+Phase199 纠正了一个重要方法问题：
+
+```text
+cleaned generated（清洗后文本）
+不能用于判断生成闭合。
+```
+
+必须看 raw generated（原始生成），因为模型常常先输出正确答案，然后继续解释、复读、换题或补全新问题。
+
+#### 4. 证明了外部提示协议有效但不是内部机制定位
+
+Phase200 发现：
+
+```text
+GLM4 在 stop_explicit（显式停止提示）下 stable（稳定生成）提升。
+```
+
+但 ablate/boost 当前候选通道不改变稳定性。因此：
+
+```text
+外部 prompt protocol（提示协议）
+≠
+内部 protocol edge（协议边）
+```
+
+#### 5. 建立了 stop/prose/echo 边界指标
+
+Phase201 把停止控制从抽象理论变成可测指标：
+
+```text
+stop margin（停止边界）
+prose margin（解释续写边界）
+echo margin（复读边界）
+```
+
+并在 GLM4 中找到 post-answer（回答后）候选：
+
+```text
+GLM4 L35 C1018
+GLM4 L23 C616
+GLM4 L29 C7118
+```
+
+这些候选能改变回答后单步 stop/prose 竞争。
+
+#### 6. 证明单步停止边界不等于序列停止链
+
+Phase202 把 Phase201 候选接回 raw rollout（原始生成展开），结果：
+
+```text
+repair_effective count = 0
+```
+
+GLM4 的强候选没有修复自然生成。典型失败是：
+
+```text
+brown. Brown. Brown. Brown
+```
+
+这说明：
+
+```text
+打句号
+不等于
+真正停止。
+```
+
+### 三、当前积累的核心拼图
+
+当前核心拼图完整列出如下。
+
+```text
+1. 相对编码：固定概念向量路线被削弱，条件化相对状态路线增强。
+2. 复用差分：概念更像共享路线 + 对象差分 + 关系差分。
+3. 条件化路线：领域、模板、语言、关系会启动不同路线。
+4. 预测充分状态：状态包含完成预测动作所需变量，但变量仍未完全可测化。
+5. 身份变量：对象身份参与生成，不只是类别标签。
+6. 角色变量：答案槽、主语、宾语等角色影响输出。
+7. 领域变量：颜色领域最强，功能领域较弱，其他领域不足。
+8. 关系变量：color（颜色）、function（功能）等关系路线可测。
+9. 绑定变量：对象-关系-值绑定可破坏和部分恢复。
+10. 候选场：模型会形成候选答案集合。
+11. 候选闭合：候选集合内目标可胜出，但不等于全词表胜出。
+12. 全词表边界：阻断项和全词表竞争很关键。
+13. 闭合间隙：候选闭合与真实生成闭合不同。
+14. 协议场：短答、解释、标点、停止会改变输出。
+15. 外部协议修复：GLM4 可被显式停止提示部分修复。
+16. 内部协议边：尚未稳定定位。
+17. 协议漂移：raw generated 中的解释、换题、复读是硬指标。
+18. 答案选择边：qwen3 C249 是强 L4 候选。
+19. 混合副作用边：qwen3 C16 等不能写成纯语义齿轮。
+20. 近零负控：qwen3 C2509 修正了组级误判。
+21. GLM4 C1165/C5532：有支持/压制迹象，但不解释闭合。
+22. DS7B 通道组：信号弱，主要作负控。
+23. L4 不推出 L6：首词元答案边界不推出自然闭合。
+24. clear（答案清楚）与 stable（稳定生成）分离。
+25. post-answer stop margin（回答后停止边界）可测。
+26. prose margin（解释续写边界）可测。
+27. echo margin（复读边界）可测。
+28. GLM4 stop/prose 候选：C1018/C616/C7118。
+29. 单步 stop/prose 候选不推出 raw rollout 修复。
+30. 序列级停止链是新缺口。
+31. 句号不是终止执行：period（句号）出现后模型仍可继续生成。
+32. EOS（结束符）执行机制未定位。
+33. 注意力路由仍可能参与停止链，但未系统测试。
+34. 残差流可能承载状态协调和停止状态传播。
+35. MLP（多层感知机）通道能影响边界，但功能混合严重。
+36. LayerNorm/gain（层归一化/增益）可能控制输出强度和续写倾向。
+37. 词表读出层承载答案词、停止词、解释词、复读词竞争。
+38. 生成轨迹本身成为必须建图的对象。
+39. patch（补丁式干预）边际收益递减已经出现。
+40. 全局图谱优先级高于单点闭合。
+41. 小模型偏差显著，跨模型稳健性弱。
+42. 证据等级 L1-L6 已基本清楚，但 L6 仍缺。
+```
+
+### 四、统一机制公式的改进
+
+当前不应改理论名词。理论主体仍保持：
+
+```text
+预测充分相对状态
+→ 全局齿轮图谱
+→ 条件化路线门控
+→ 全词表竞争闭合
+→ 自然生成一致性
+```
+
+但公式必须从线性语义读出升级为条件化动态图谱。
+
+#### 1. 条件化状态转移公式
+
+$$
+s_{l+1}
+=
+\Phi_l
+\left(
+s_l,\,
+\rho_l(s_l,x),\,
+\gamma_l(s_l,x),\,
+\pi(x),\,
+\tau_l(s_l,x),\,
+\kappa_l(s_l,x),\,
+\eta_l(s_l,x),\,
+\chi_l(s_l,x)
+\right)
++
+\varepsilon_l
+$$
+
+其中：
+
+```text
+s_l = 第 l 层有效状态
+ρ_l = 路线门控
+γ_l = 增益 / 归一化控制
+π(x) = 协议场
+τ_l = 停止 / 续写控制器
+κ_l = 反解释续写控制器
+η_l = 复读抑制控制器
+χ_l = 序列级停止链控制器
+ε_l = 未解释残差
+```
+
+关键新增是：
+
+```text
+χ_l = 序列级停止链控制器
+```
+
+Phase202 证明，只测单步停止边界不足以解释真实停止。
+
+#### 2. 答案选择公式
+
+$$
+m_{\mathrm{ans}}(y \mid x)
+=
+z_1(y \mid x)
+-
+\max_{v \in \mathcal{V},\,v \ne y}
+z_1(v \mid x)
+$$
+
+这个公式回答：
+
+```text
+第一个答案词是否胜出？
+```
+
+qwen3 C249 主要属于这一层。
+
+#### 3. 回答后停止边界公式
+
+$$
+m_{\mathrm{stop}}(t)
+=
+\max_{v \in V_{\mathrm{stop}}} z_t(v)
+-
+\max_{v \in V_{\mathrm{prose}}} z_t(v)
+$$
+
+其中：
+
+```text
+V_stop = EOS（结束符）、period（句号）、newline（换行）
+V_prose = because（因为）、and（和）、usually（通常）等解释续写词
+```
+
+#### 4. 解释续写边界公式
+
+$$
+m_{\mathrm{prose}}(t)
+=
+\max_{v \in V_{\mathrm{prose}}} z_t(v)
+-
+\max_{v \in V_{\mathrm{stop}}} z_t(v)
+$$
+
+#### 5. 复读边界公式
+
+$$
+m_{\mathrm{echo}}(t)
+=
+\max_{v \in V_{\mathrm{echo}}} z_t(v)
+-
+\max_{v \in V_{\mathrm{stop}}} z_t(v)
+$$
+
+#### 6. 序列级停止链公式
+
+$$
+\mathrm{StopChain}(x)
+=
+\prod_{t=1}^{T}
+\mathbf{1}
+\left[
+m_{\mathrm{stop}}(t)>0
+\land
+m_{\mathrm{prose}}(t)<0
+\land
+m_{\mathrm{echo}}(t)<0
+\land
+\mathrm{ExecStop}(t)=1
+\right]
+$$
+
+这里最重要的是：
+
+```text
+ExecStop(t) = 停止执行是否真正发生
+```
+
+Phase202 说明：
+
+```text
+period（句号）出现
+不等于
+ExecStop（停止执行）发生。
+```
+
+#### 7. 严格语言动作闭合公式
+
+$$
+\mathrm{StrictClosure}(x,y)
+=
+\mathrm{AnswerSelected}(x,y)
+\land
+\mathrm{AnswerSpanClear}(x,y)
+\land
+\mathrm{ProtocolSatisfied}(x)
+\land
+\mathrm{StopControlled}(x)
+\land
+\mathrm{ProseSuppressed}(x)
+\land
+\mathrm{EchoSuppressed}(x)
+\land
+\mathrm{StopChainExecuted}(x)
+\land
+\mathrm{RawRolloutStable}(x)
+$$
+
+#### 8. 全局图谱公式
+
+$$
+\mathcal{G}_{atlas}
+=
+\left(
+\mathcal{V}_{state},
+\mathcal{V}_{axis},
+\mathcal{V}_{answer},
+\mathcal{V}_{boundary},
+\mathcal{V}_{protocol},
+\mathcal{V}_{stop},
+\mathcal{V}_{anti\text{-}prose},
+\mathcal{V}_{anti\text{-}echo},
+\mathcal{V}_{stop\text{-}chain},
+\mathcal{V}_{rollout},
+\mathcal{E},
+\mathcal{Q}
+\right)
+$$
+
+每条边记录：
+
+$$
+e
+=
+\left(
+v_i \rightarrow v_j,\,
+m,\,
+d,\,
+l,\,
+p,\,
+g,\,
+\boldsymbol{\beta}_g,\,
+q,\,
+f
+\right)
+$$
+
+功能斜率向量：
+
+$$
+\boldsymbol{\beta}_g
+=
+\left(
+\beta_{\mathrm{ans}},
+\beta_{\mathrm{stop}},
+\beta_{\mathrm{prose}},
+\beta_{\mathrm{echo}},
+\beta_{\mathrm{protocol}},
+\beta_{\mathrm{drift}},
+\beta_{\mathrm{rollout}},
+\beta_{\mathrm{exec}}
+\right)
+$$
+
+其中：
+
+```text
+β_exec = 停止执行斜率
+```
+
+这是 Phase202 后必须加入的新维度。
+
+### 五、最新完整理论
+
+当前最新理论可以表述为：
+
+```text
+语言智能不是固定语义向量空间中的直接读出，
+而是预测充分的相对状态网络，
+在上下文协议中形成领域路线、候选答案场和答案选择边界；
+随后还必须通过协议控制、停止边界、反解释续写、反复读和序列级停止执行，
+把正确答案转化为干净、有限、符合协议的语言动作。
+```
+
+核心更新是：
+
+```text
+自然生成一致性必须拆成：
+答案选择一致性
+协议一致性
+停止边界一致性
+解释续写抑制一致性
+复读抑制一致性
+停止执行一致性
+```
+
+### 六、闭合标准与当前距离
+
+当前闭合等级仍合理，但需要加入停止执行层：
+
+```text
+L1: 相关证据
+L2: 投影节点
+L3: 状态转移节点
+L4: 答案边界组件因果边
+L5a: 自然门控证据
+L5b: 协议门控证据
+L5c: 停止边界候选
+L5d: 反解释续写候选
+L5e: 复读抑制候选
+L5f: 序列级停止执行候选
+L6: 严格自然生成闭合
+```
+
+当前完成度估计：
+
+```text
+理论主体：约 77%
+统一机制公式：约 65%
+全局图谱框架：约 48%
+答案选择层：约 38%
+协议层：约 22%
+停止边界层：约 24%
+反解释续写层：约 22%
+复读抑制层：约 12%
+序列级停止链：约 5%
+严格自然生成闭合：约 7%
+跨模型稳健性：约 20%
+```
+
+综合评估：
+
+```text
+整体语言编码机制破解进度：约 33% 到 34%
+距离完整闭合：约 66% 到 67%
+```
+
+考虑当前 qwen3、GLM4、DS7B 都是小模型，外推到更大模型或真实语言编码机制时应打折：
+
+```text
+小模型偏差折扣：30% 到 50%
+```
+
+因此，当前结果应写成：
+
+```text
+小模型机制候选图谱中的阶段性规律，
+不能直接写成通用语言智能机制定律。
+```
+
+### 七、围绕语言三大核心特性的反思
+
+#### 1. 知识网络
+
+知识网络解决的是：
+
+```text
+应该答什么？
+```
+
+它包含：
+
+```text
+对象身份
+类别复用
+领域路线
+关系路线
+候选值场
+上下文绑定
+```
+
+但 Phase199-202 证明：
+
+```text
+知道答案
+≠
+完成语言动作。
+```
+
+知识网络只能把 red（红色）、brown（棕色）、green（绿色）等候选推上来，不能保证模型回答后停止。
+
+#### 2. 推理能力
+
+推理能力不应只理解为链式逻辑推导，而应理解为：
+
+```text
+状态更新
+约束传播
+候选过滤
+边界重排
+协议检查
+停止检查
+执行检查
+```
+
+也就是说，真正的语言推理不仅要判断答案，还要判断：
+
+```text
+当前是否已经回答完？
+是否应该解释？
+是否应该停止？
+是否已经违反协议？
+是否正在复读？
+```
+
+#### 3. 语法系统
+
+语法系统不只是词序规则，而是语言动作控制系统。
+
+它至少包含：
+
+```text
+答案槽控制
+短答协议
+标点控制
+EOS（结束符）控制
+解释续写抑制
+对象复读抑制
+停止执行控制
+```
+
+Phase202 的关键洞察是：
+
+```text
+句号属于语法表层；
+停止执行属于生成控制。
+```
+
+二者不同。
+
+### 八、全局图谱总结
+
+#### 1. 特征分布在哪里
+
+当前判断：
+
+```text
+残差流：状态协调、跨层传递、候选接口。
+MLP（多层感知机）门控：领域路线、候选推动、边界调节。
+MLP 写回：词表方向、答案/停止/续写竞争。
+注意力头：源词路由、绑定、作用域、答案槽位置。
+LayerNorm/gain（层归一化/增益）：边界放大、续写倾向、停止倾向。
+词表读出：答案词、句号、EOS、解释词、复读词竞争。
+生成器循环：序列级停止链和执行层。
+```
+
+#### 2. 复用差分机制
+
+当前更合理的复用差分公式是：
+
+$$
+\mathrm{ConceptUse}(o,r,d,\pi)
+=
+\mathrm{SharedDomainRoute}(d)
++
+\mathrm{CategoryReuse}(o,d)
++
+\mathrm{ObjectDifference}(o)
++
+\mathrm{RelationDifference}(r)
++
+\mathrm{ProtocolModifier}(\pi)
++
+\mathrm{StopModifier}(\pi)
++
+\mathrm{AntiProseModifier}(\pi)
++
+\mathrm{EchoSuppressor}(\pi,o)
++
+\mathrm{ExecutionController}(\pi,t)
+$$
+
+#### 3. 整体形状
+
+当前全局图谱整体形状是：
+
+```text
+高维相对状态网络
+→ 领域路线漏斗
+→ 稀疏答案选择齿轮
+→ 全词表竞争场
+→ 协议 / 停止 / 反续写 / 反复读控制场
+→ 序列级停止执行链
+→ 自然生成轨迹
+```
+
+#### 4. 如何改进特征分析算法
+
+下一步算法应从“找强通道”改成“画轨迹图谱”：
+
+```text
+1. 对每一步生成记录 logits、rank、实际 token。
+2. 同时记录 answer/stop/prose/echo/protocol 多维边界。
+3. 按成功轨迹、漂移轨迹、复读轨迹分组。
+4. 找差异组件，而不是先 patch。
+5. patch 只用于最后证据升级。
+6. 建立组件的多维功能斜率向量。
+```
+
+### 九、接下来的研究方案
+
+下一阶段应放在一个 Phase 中：
+
+```text
+Phase204: Global Trajectory Atlas and Stop-Execution Mechanism Mapping
+阶段 204：全局生成轨迹图谱与停止执行机制定位
+```
+
+阶段目标：
+
+```text
+第一优先级：完成全局轨迹图谱拼图。
+第二优先级：定位序列级停止执行机制。
+第三优先级：为组合闭合准备候选。
+```
+
+核心任务：
+
+```text
+1. 对 qwen3、GLM4、DS7B 逐 token 记录生成轨迹。
+2. 每一步记录 answer、stop、prose、echo、EOS、period 的 logit/rank。
+3. 记录实际输出 token 与理论 stop margin 是否一致。
+4. 专门统计“句号后继续生成”的失败类型。
+5. 比较 stable、drift、echo、prose 四类轨迹的内部状态差异。
+6. 扩展组件候选到 attention head（注意力头）、residual stream（残差流）、LayerNorm/gain（层归一化/增益）。
+7. 建立 stop-chain atlas（停止链图谱）。
+8. 只在候选稳定后做最小组合 patch。
+```
+
+阶段成功标准：
+
+```text
+不是立刻 L6 闭合，
+而是建立可解释的序列级失败图谱：
+为什么答对后继续解释？
+为什么打句号后继续生成？
+为什么 EOS 不触发？
+为什么对象会被复读？
+```
+
+### 十、最终关键洞察
+
+当前最重要的洞察是：
+
+```text
+语言编码机制不是“语义答案编码”一个问题，
+而是“语言动作闭合编码”问题。
+```
+
+要破解深度神经网络中的脉络和编码机制，必须从单点特征转为全局轨迹：
+
+```text
+答案从哪里来？
+为什么这个答案胜出？
+为什么输出成这种格式？
+为什么继续解释？
+为什么复读？
+为什么句号后还不停？
+EOS 为什么没有执行？
+```
+
+只有把这些问题放在同一张全局图谱中，才可能真正接近语言背后的数学结构。
+
+## Phase 204: 全局生成轨迹图谱与停止执行机制定位 [2026-07-06 00:03]
+
+### 一、任务判断
+
+本阶段分析了两个附件中对 Phase202/203 的判断。核心判断正确：
+
+```text
+Phase202 是关键负结果；
+Phase203 的阶段性收束方向正确；
+下一步必须从单步 stop/prose margin 转向逐 token 生成轨迹。
+```
+
+因此本阶段继续同一阶段性目标：
+
+```text
+从答案选择边推进到严格自然生成闭合。
+```
+
+但本阶段不做新的 patch，而是优先完成全局轨迹拼图。
+
+### 二、本阶段完成内容
+
+新增正式脚本：
+
+```text
+tests/gpt5/phase204_global_trajectory_stop_execution_atlas.py
+tests/gpt5/run_phase204_global_trajectory_stop_execution_atlas.sh
+```
+
+结果保存位置：
+
+```text
+tests/result/phase204_global_trajectory_stop_execution_atlas/global_trajectory_stop_execution_atlas/
+```
+
+跨模型汇总：
+
+```text
+phase204_cross_model_summary.json
+phase204_cross_model_summary.md
+```
+
+执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+### 三、算法原理
+
+Phase204 不再只问：
+
+```text
+下一 token 的 stop margin 是否为正？
+```
+
+而是逐 token 记录：
+
+```text
+actual emitted token（实际输出词元）
+EOS rank（结束符排名）
+period rank（句号排名）
+prose rank（解释续写词排名）
+echo rank（复读词排名）
+stop margin（停止边界）
+prose margin（解释续写边界）
+echo margin（复读边界）
+period_seen（是否已经出现句号）
+continued_after_period（句号后是否继续生成）
+ended_with_eos（是否真正 EOS 结束）
+```
+
+本阶段使用两种轨迹模式：
+
+```text
+natural:
+  从原始 prompt 自然生成。
+
+post_answer:
+  先把目标答案追加到 prompt 尾部，再继续生成。
+```
+
+这分别测试：
+
+```text
+模型能否自己选答案并停止；
+答案已经给出后模型能否真正停止。
+```
+
+### 四、核心公式
+
+逐步停止边界：
+
+$$
+m_{\mathrm{stop}}(t)
+=
+\max_{v \in V_{\mathrm{stop}}} z_t(v)
+-
+\max_{v \in V_{\mathrm{prose}}} z_t(v)
+$$
+
+解释续写边界：
+
+$$
+m_{\mathrm{prose}}(t)
+=
+\max_{v \in V_{\mathrm{prose}}} z_t(v)
+-
+\max_{v \in V_{\mathrm{stop}}} z_t(v)
+$$
+
+复读边界：
+
+$$
+m_{\mathrm{echo}}(t)
+=
+\max_{v \in V_{\mathrm{echo}}} z_t(v)
+-
+\max_{v \in V_{\mathrm{stop}}} z_t(v)
+$$
+
+序列级停止执行判据：
+
+$$
+\mathrm{StopExecuted}(x)
+=
+\exists t
+\left[
+\mathrm{EOS}_t = 1
+\lor
+\left(
+\mathrm{Period}_t = 1
+\land
+\neg \mathrm{Continue}_{t+1:T}
+\right)
+\right]
+$$
+
+Phase204 特别关注失败类型：
+
+$$
+\mathrm{PeriodButContinue}(x)
+=
+\exists t
+\left[
+\mathrm{Period}_t = 1
+\land
+\mathrm{Continue}_{t+1:T}=1
+\right]
+$$
+
+### 五、数据量
+
+本阶段生成轨迹数据量：
+
+```text
+qwen3:     token_rows=2304, trajectory_rows=288
+GLM4:      token_rows=2160, trajectory_rows=270
+DS7B:      token_rows=576,  trajectory_rows=72
+```
+
+每条轨迹最多生成 8 步。
+
+### 六、客观结果
+
+#### 1. qwen3
+
+qwen3 没有 strict stable：
+
+```text
+natural plain:        rows=48, stable=0, drift=44, clear=9
+natural short_answer: rows=48, stable=0, drift=48, clear=20
+natural stop_explicit:rows=48, stable=0, drift=48, clear=24
+```
+
+句号后继续生成非常普遍：
+
+```text
+post_answer short_answer:
+period_seen=48
+continued_after_period=48
+ended_with_eos=0
+
+post_answer stop_explicit:
+period_seen=48
+continued_after_period=48
+ended_with_eos=0
+```
+
+典型轨迹：
+
+```text
+natural plain:
+red. What is the most common color
+
+post_answer short_answer:
+. The color of a banana is yellow
+```
+
+这说明 qwen3 常常能生成答案和句号，但句号后会继续进入新问题或解释轨迹。
+
+#### 2. GLM4
+
+GLM4 同样没有 EOS 结束：
+
+```text
+ended_with_eos=0
+```
+
+自然 short_answer 条件中：
+
+```text
+rows=45
+period_seen=44
+continued_after_period=44
+```
+
+post_answer stop_explicit 条件中：
+
+```text
+rows=45
+period_seen=45
+continued_after_period=45
+ended_with_eos=0
+```
+
+典型轨迹：
+
+```text
+post_answer stop_explicit:
+.\nWhat is the color of a banana
+
+post_answer short_answer:
+object is ______.\n.\n red__The
+```
+
+GLM4 的问题不是不会输出句号，而是句号后仍继续生成。
+
+#### 3. DS7B
+
+DS7B 也没有 EOS 结束：
+
+```text
+ended_with_eos=0
+```
+
+自然 short_answer 与 stop_explicit：
+
+```text
+period_seen=12
+continued_after_period=12
+stable=0
+```
+
+典型轨迹：
+
+```text
+natural plain:
+drink from it.1234
+
+natural short_answer:
+hold something. So, the verb should
+
+post_answer short_answer:
+something. So, the verb should be
+```
+
+DS7B 的失败形态是句号后进入数字序列、解释句或继续补全。
+
+### 七、关键发现
+
+Phase204 得到一个跨模型强现象：
+
+```text
+period（句号）出现很常见；
+continued_after_period（句号后继续）也很常见；
+ended_with_eos（EOS 结束）几乎为 0。
+```
+
+这说明停止执行机制至少分为两层：
+
+```text
+1. 生成停止形态 token，例如句号；
+2. 真正终止 generation loop（生成循环）。
+```
+
+Phase201/202 主要触及第 1 层。
+Phase204 证明第 2 层仍未定位。
+
+### 八、问题和硬伤
+
+1. 当前测试仍只记录 logits 和实际 token，还没有定位导致停止执行失败的内部组件。
+
+2. post_answer 模式中，clear 指标不完全适合作为答案正确性指标，因为答案已经被 teacher-forced 到 prompt 中；该模式更适合分析停止执行。
+
+3. qwen3、GLM4、DS7B 都是小模型，停止执行机制可能比大模型更粗糙，因此外推需要 30% 到 50% 折扣。
+
+4. 当前最多生成 8 步，只能观察短轨迹失败，尚未覆盖更长生成。
+
+5. 当前还没有比较 attention head（注意力头）、residual stream（残差流）、LayerNorm/gain（层归一化/增益）在停止链中的作用。
+
+### 九、理论进展
+
+Phase204 把“停止控制”进一步拆成：
+
+```text
+stop token boundary（停止词元边界）
+period emission（句号输出）
+EOS competitiveness（结束符竞争）
+termination execution（终止执行）
+post-period continuation（句号后继续）
+```
+
+因此，语言动作闭合公式必须包含：
+
+```text
+StopChainExecuted
+```
+
+而不能只包含：
+
+```text
+StopMarginPositive
+```
+
+更精确地说：
+
+$$
+\mathrm{StrictClosure}(x,y)
+=
+\mathrm{AnswerSelected}(x,y)
+\land
+\mathrm{ProtocolSatisfied}(x)
+\land
+\mathrm{PeriodOrEOSAvailable}(x)
+\land
+\mathrm{StopChainExecuted}(x)
+\land
+\neg \mathrm{PostPeriodContinuation}(x)
+\land
+\mathrm{RawRolloutStable}(x)
+$$
+
+### 十、下一阶段任务
+
+Phase204 已经完成轨迹图谱初测，下一步仍属于同一阶段性目标。建议进入：
+
+```text
+Phase205: Stop-Execution Source Localization Audit
+阶段 205：停止执行失败的源头定位审计
+```
+
+核心任务：
+
+```text
+1. 选择 period 后继续生成的失败轨迹；
+2. 捕获 period 前后每一步的 hidden state（隐藏状态）、MLP activation（多层感知机激活）、attention output（注意力输出）；
+3. 比较 period 后继续轨迹与少数短停轨迹的差异；
+4. 搜索 EOS rank 上不去的源头；
+5. 检查是否存在专门压制 EOS 或推动 next-question/prose 的组件；
+6. 暂时不做大规模 patch，先完成源头图谱。
+```
+
+### 十一、通俗总结
+
+这次测试回答了一个非常具体的问题：
+
+```text
+模型打了句号以后，会不会真的停？
+```
+
+答案是：
+
+```text
+大多数时候不会。
+```
+
+qwen3 会生成：
+
+```text
+red. What is the most common color
+```
+
+GLM4 会生成：
+
+```text
+.\nWhat is the color of a banana
+```
+
+DS7B 会生成：
+
+```text
+something. So, the verb should be
+```
+
+因此，当前真正要破解的不是“句号怎么生成”，而是：
+
+```text
+为什么句号没有触发停止执行？
+```
+
+这就是下一步全局图谱中最关键的脉络。
+
+## Phase 205: 停止执行失败的源头定位审计 [2026-07-06 03:03]
+
+### 一、对附件判断的审查
+
+附件中对 Phase204 的核心判断基本正确，而且需要保留其中最重要的修正：
+
+```text
+句号不是模型内部天然停止信号。
+句号、EOS、外部 stop sequence、生成循环终止执行必须分层分析。
+```
+
+Phase204 已经证明三个小模型普遍存在：
+
+```text
+period_seen 高；
+continued_after_period 高；
+ended_with_eos 近似为 0。
+```
+
+但这不能简单写成“模型停止机制坏了”。更谨慎的解释是：当前调用端没有设置句号 stop sequence，模型也没有稳定把短答任务转化为 EOS 竞争胜出。因此 Phase205 的任务不是继续 patch，而是定位句号前后 EOS 竞争和续写竞争如何变化。
+
+### 二、测试脚本和结果路径
+
+新增跨模型脚本：
+
+```text
+tests/gpt5/phase205_stop_execution_source_localization_audit.py
+tests/gpt5/run_phase205_stop_execution_source_localization_audit.sh
+```
+
+结果保存：
+
+```text
+tests/result/phase205_stop_execution_source_localization_audit/stop_execution_source_localization_audit/
+```
+
+主要结果文件：
+
+```text
+phase205_qwen3_summary.json
+phase205_glm4_summary.json
+phase205_deepseek7b_summary.json
+phase205_cross_model_summary.json
+phase205_cross_model_summary.md
+phase205_*_state_rows.jsonl
+phase205_*_transition_rows.jsonl
+phase205_*_top_mlp_delta_rows.jsonl
+```
+
+三个模型按 qwen3、GLM4、DS7B 顺序加载和释放，避免 GPU 显存叠加。FlashAttention2 不可用时自动回退到 sdpa。每个模型选取 Phase204 中 period 后继续生成的失败轨迹 36 条，记录句号前、句号后、继续一个 token 后三个状态。
+
+### 三、算法原理
+
+Phase205 将停止执行失败拆成三类状态：
+
+```text
+before_period：即将输出句号之前；
+after_period：已经输出句号之后；
+after_continue1：句号后又继续输出一个 token 之后。
+```
+
+对每个状态记录：
+
+```text
+EOS rank；
+period rank；
+prose rank；
+echo rank；
+stop margin；
+prose margin；
+echo margin；
+selected layers residual norm；
+selected layers MLP down_proj input RMS；
+selected layers attention output norm；
+MLP 通道绝对跃迁最大项。
+```
+
+核心不是一次性证明闭合，而是记录状态跃迁：
+
+$$
+\Delta s_{\text{句号}}
+=
+s_{\text{after period}}
+-
+s_{\text{before period}}
+$$
+
+$$
+\Delta s_{\text{继续}}
+=
+s_{\text{after continue1}}
+-
+s_{\text{after period}}
+$$
+
+EOS 竞争力变化：
+
+$$
+\Delta r_{\text{EOS}}
+=
+r_{\text{EOS}}(t+1)-r_{\text{EOS}}(t)
+$$
+
+其中 rank 越小竞争力越强，所以：
+
+$$
+\Delta r_{\text{EOS}} > 0
+$$
+
+表示 EOS 竞争力变差。
+
+停止执行需要区分两个目标：
+
+$$
+\mathrm{ModelStopExecuted}(x)
+=
+\exists t[\mathrm{EOS}_t=1]
+$$
+
+$$
+\mathrm{TaskStopSatisfied}(x)
+=
+\exists t[
+\mathrm{Period}_t=1
+\land
+\neg \mathrm{Continue}_{t+1:T}
+]
+$$
+
+更完整的序列状态可写成：
+
+$$
+h_{t+1}
+=
+F_\theta(h_t, y_t, p_t, c_t)
+$$
+
+$$
+\delta_t
+=
+D_\theta(h_t, y_{\le t}, x)
+$$
+
+$$
+\xi_t
+=
+E_\theta(\delta_t, z_t(\mathrm{EOS}), R_{\text{decode}})
+$$
+
+其中：
+
+```text
+h_t 是生成状态；
+y_t 是当前输出 token；
+p_t 是协议变量；
+c_t 是上下文变量；
+delta_t 是完成状态；
+xi_t 是终止执行状态；
+R_decode 是解码器规则，包括 EOS、max_new_tokens、外部 stop sequence。
+```
+
+### 四、客观结果
+
+#### 1. qwen3
+
+样本：
+
+```text
+state rows = 108
+transition rows = 72
+scanned layers = 12, 18, 23, 28, 33
+```
+
+状态均值：
+
+```text
+before_period: eos_rank_mean = 57029.17, period_rank_mean = 1.56, prose_rank_mean = 10.08
+after_period: eos_rank_mean = 43261.58, period_rank_mean = 437.14, prose_rank_mean = 1.06
+after_continue1: eos_rank_mean = 97597.78, period_rank_mean = 518.92, prose_rank_mean = 148.50
+```
+
+关键跃迁：
+
+```text
+before_period -> after_period:
+EOS rank mean delta = -13767.58
+stop margin mean delta = -27.01
+prose margin mean delta = +27.01
+
+after_period -> after_continue1:
+EOS rank mean delta = +54336.19
+stop margin mean delta = +24.55
+prose margin mean delta = -24.55
+```
+
+解释：qwen3 在句号前 period rank 已经非常强，但 after_period 状态里 prose rank 反而变成最强，说明句号并没有维持完成状态；继续一个 token 后 EOS 排名大幅恶化。
+
+最大 MLP 跃迁通道：
+
+```text
+L12 C22 mean_abs_delta = 1.04
+L18 C5159 mean_abs_delta = 2.03
+L23 C1283 mean_abs_delta = 8.32
+L28 C205 mean_abs_delta = 9.54
+L33 C1986 mean_abs_delta = 13.60
+```
+
+#### 2. GLM4
+
+样本：
+
+```text
+state rows = 108
+transition rows = 72
+scanned layers = 14, 20, 25, 31, 37
+```
+
+状态均值：
+
+```text
+before_period: eos_rank_mean = 1413.31, period_rank_mean = 17.14, prose_rank_mean = 1.44
+after_period: eos_rank_mean = 326.72, period_rank_mean = 2.00, prose_rank_mean = 5.86
+after_continue1: eos_rank_mean = 9495.08, period_rank_mean = 333.14, prose_rank_mean = 9.28
+```
+
+关键跃迁：
+
+```text
+before_period -> after_period:
+EOS rank mean delta = -1086.58
+stop margin mean delta = +7.09
+prose margin mean delta = -7.09
+
+after_period -> after_continue1:
+EOS rank mean delta = +9168.36
+stop margin mean delta = -13.60
+prose margin mean delta = +13.60
+```
+
+解释：GLM4 在 after_period 时比 qwen3 更接近停止状态，EOS rank 也明显改善，但只要继续一个 token，EOS rank 迅速恶化，说明完成状态不稳定，不能跨步保持。
+
+最大 MLP 跃迁通道：
+
+```text
+L14 C2167 mean_abs_delta = 0.30
+L20 C1865 mean_abs_delta = 1.16
+L25 C9938 mean_abs_delta = 3.74
+L31 C11903 mean_abs_delta = 5.36
+L37 C8035 mean_abs_delta = 10.82
+```
+
+#### 3. DS7B
+
+样本：
+
+```text
+state rows = 108
+transition rows = 72
+scanned layers = 9, 14, 18, 22, 26
+```
+
+状态均值：
+
+```text
+before_period: eos_rank_mean = 6833.97, period_rank_mean = 1.03, prose_rank_mean = 12.22
+after_period: eos_rank_mean = 889.97, period_rank_mean = 534.92, prose_rank_mean = 2.28
+after_continue1: eos_rank_mean = 6085.58, period_rank_mean = 606.06, prose_rank_mean = 76.25
+```
+
+关键跃迁按协议分组后均显示同一方向：before_period 到 after_period 时 EOS rank 改善，但 after_period 到 after_continue1 时 EOS rank 重新变差。
+
+```text
+natural + stop_explicit:
+after_period -> after_continue1 EOS rank delta = +1785.00
+
+post_answer + plain:
+after_period -> after_continue1 EOS rank delta = +15036.75
+
+post_answer + short_answer:
+after_period -> after_continue1 EOS rank delta = +3942.17
+
+post_answer + stop_explicit:
+after_period -> after_continue1 EOS rank delta = +873.20
+```
+
+最大 MLP 跃迁通道：
+
+```text
+L9 C271 mean_abs_delta = 6.55
+L14 C11019 mean_abs_delta = 2.64
+L18 C17901 mean_abs_delta = 4.50
+L22 C15320 mean_abs_delta = 25.57
+L26 C264 mean_abs_delta = 44.56
+```
+
+### 五、阶段性判断
+
+Phase205 支持附件中的核心修正：
+
+```text
+period emission 不等于 EOS competition；
+EOS competition 不等于 generation-loop termination；
+generation-loop termination 还受解码规则和外部 stop sequence 控制。
+```
+
+三模型共同现象：
+
+```text
+1. before_period 阶段，period 通常很强；
+2. after_period 阶段，EOS rank 往往改善，但很少直接成为稳定终止；
+3. after_continue1 阶段，EOS rank 普遍恶化；
+4. 句号后的完成状态不能稳定保持；
+5. 中后层 MLP 通道和残差状态出现较大跃迁，是下一步建图候选区域。
+```
+
+最重要的新拼图是：
+
+```text
+停止执行失败不是“没有句号齿轮”，而是“句号后完成状态没有被锁住，EOS 没有稳定胜出，继续生成一步后状态会重新滑入叙述/复读/新任务轨道”。
+```
+
+### 六、问题、硬伤和谨慎解释
+
+第一，Phase205 主要使用失败轨迹，短停或 EOS 正样本不足，因此目前更像失败源头图谱，不是成功机制图谱。
+
+第二，attention output 只按层记录整体 norm，没有分 head，不足以定位注意力头是否携带完成状态。
+
+第三，MLP 通道跃迁是绝对变化排序，不等于因果证明。下一步仍需做通道级 ablation、boost、direction patch 或路径 patch 验证。
+
+第四，teacher-forced post-answer 和 self-generated natural 仍未完全解耦。虽然 DS7B 分组显示多个协议方向一致，但 qwen3 和 GLM4 当前样本主要集中在 post_answer + stop_explicit。
+
+第五，当前模型都是小模型，短答协议、EOS 控制、任务完成状态可能与更大模型有 30% 到 50% 偏差。因此结论应限定为：
+
+```text
+小模型中的停止执行失败轨迹图谱。
+```
+
+不能直接上升为所有语言模型的停止机制定律。
+
+### 七、对智能理论的更新
+
+当前理论不需要换名词，但需要把“动作完成”正式并入统一机制。语言能力不只是选出正确 token，而是要在知识网络、推理链、语法系统之后执行正确动作。
+
+统一机制应暂时写成：
+
+$$
+s_{t+1}
+=
+\Phi_\theta(
+s_t,
+x,
+y_{\le t},
+r_t,
+p_t,
+b_t
+)
+$$
+
+$$
+z_t
+=
+W_U s_t
+$$
+
+$$
+a_t
+=
+\arg\max_{v \in V} z_t(v)
+$$
+
+$$
+\mathrm{Close}(t)
+=
+\mathrm{AnswerCorrect}(t)
+\land
+\mathrm{BoundaryStable}(t)
+\land
+\mathrm{DoneStateStable}(t)
+\land
+\mathrm{NoDrift}(t+1:T)
+$$
+
+这里的关键更新是：
+
+```text
+DoneStateStable 不能由 period 或单步 stop margin 代替。
+```
+
+语言的三个核心特性在本阶段的对应关系：
+
+```text
+知识网络：决定候选答案和对象-属性绑定；
+推理能力：决定关系路径和答案选择；
+语法系统：决定句号、续写词、复读词、换行等形式；
+编码机制：必须同时解释答案选择和完成状态保持。
+```
+
+Phase205 说明语法系统能产出句号，但智能动作系统没有稳定完成闭合。这是“语言形式正确但动作未完成”的典型失败。
+
+### 八、下一阶段任务
+
+当前任务和下一任务仍属于同一阶段性目标：完成全局轨迹图谱，第一优先级仍是拼图，不是闭合。
+
+建议进入：
+
+```text
+Phase206: 成功/失败对照的完成状态保持图谱
+```
+
+核心目标：
+
+```text
+1. 增加成功对照：收集 EOS 结束、外部 stop sequence 结束、句号后无续写的轨迹；
+2. 在相同 prompt 上比较 natural、post_answer、forced_period、forced_eos；
+3. 全层扫描 EOS rank、prose rank、echo rank 的跃迁源；
+4. 对 Phase205 的候选通道做小规模因果验证；
+5. 将 attention head 拆开，定位是否存在完成状态读取头；
+6. 明确区分内部 ModelStopExecuted 和外部 TaskStopSatisfied；
+7. 不做大规模线性 patch，优先完成成功/失败状态差分图谱。
+```
+
+通俗总结：模型不是不会打句号，而是打完句号以后没有稳定进入“我已经答完了”的状态。句号像写在纸上的标点，EOS 才像真正按下停止键。现在看到的问题是：三个小模型经常写了句号，却没有按停止键；一旦多走一步，状态会重新滑向续写。下一步要找的就是“答完了”这个状态在网络里到底在哪里、怎么保持、为什么会丢失。
