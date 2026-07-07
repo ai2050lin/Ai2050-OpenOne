@@ -49131,3 +49131,4090 @@ Phase228: module-tree calibrated gate/up causal validation
    token trigger → gate/up/product → residual write → readout regime
    的机制图谱为第一目标。
 ```
+
+## Phase 228: 模块树校准后的 gate/up/product 因果验证 [2026-07-07 02:39]
+
+### 1. 对附件判断的校准
+
+本次附件对 Phase226 和 Phase227 的判断基本正确。
+
+正确部分：
+
+```text
+1. Phase226/227 的方向确实是必要校准：
+   从人工干预修复输出，
+   转向自然触发源如何形成关键 MLP product state。
+
+2. Phase226 的核心负结果成立：
+   channel activation / hidden projection success-like
+   不等于最终 readout closure。
+
+3. Phase227 的核心推进成立：
+   只看 down projection input 不够，
+   必须拆 gate projection、up projection、product、down projection。
+
+4. qwen3 的 up projection 大幅波动不能过度解释，
+   product / recomputed_product 更接近真实 residual write 前态。
+```
+
+需要修正和补充的部分：
+
+```text
+1. Phase227 中 GLM4 只捕获到 product，不代表 GLM4 没有 gate/up。
+   更可能是 GLM4 使用 fused gate_up_proj，需要拆分融合输出。
+
+2. token deletion 只能证明 token-level sensitivity，
+   不能直接称为严格因果来源。
+
+3. DS7B 的巨大 rank 变化仍然只能作为敏感性证据，
+   不能作为闭合证据。
+```
+
+因此 Phase228 的任务是：
+
+```text
+先校准模型 MLP module tree，
+再做小幅 gate/up/product/down_out 因果 patch。
+```
+
+### 2. 本阶段脚本和结果
+
+新增脚本：
+
+```text
+/tests/gpt5/phase228_module_tree_gateup_causal_validation.py
+/tests/gpt5/run_phase228_module_tree_gateup_causal_validation.sh
+```
+
+结果目录：
+
+```text
+/tests/result/phase228_module_tree_gateup_causal_validation/module_tree_gateup_causal_validation/
+```
+
+三模型顺序测试：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+输出规模：
+
+```text
+qwen3:
+patch_rows=540
+
+GLM4:
+patch_rows=540
+
+DS7B:
+patch_rows=450
+
+cross-model:
+patch_rows=1530
+channel_score_rows=1152
+```
+
+脚本检查：
+
+```text
+python -m py_compile: 通过
+bash -n runner: 通过
+```
+
+### 3. 算法原理
+
+#### 3.1 模块树审计
+
+先检查每个模型目标层的 MLP 结构：
+
+```text
+qwen3 L29:
+split_gate_up
+gate_proj + up_proj + down_proj
+
+GLM4 L30:
+merged_gate_up
+gate_up_proj + down_proj
+
+DS7B L24:
+split_gate_up
+gate_proj + up_proj + down_proj
+```
+
+其中 GLM4 的 `gate_up_proj` 需要按最后一维拆成：
+
+```math
+\mathrm{gate}, \mathrm{up}
+=
+\mathrm{split}(\mathrm{gate\_up\_proj}(h))
+```
+
+#### 3.2 product 重算校准
+
+对每个模型检查：
+
+```math
+z_{\mathrm{recompute}}
+=
+\phi(g) \odot u
+```
+
+是否等于真实 down projection input：
+
+```math
+z_{\mathrm{down\_input}}
+```
+
+误差：
+
+```math
+\mathrm{RelError}
+=
+\frac{
+\|z_{\mathrm{recompute}} - z_{\mathrm{down\_input}}\|
+}{
+\|z_{\mathrm{down\_input}}\|+\epsilon
+}
+```
+
+如果误差很小，说明 gate/up 拆分和 product 捕获是可信的。
+
+#### 3.3 小幅因果 patch
+
+对 success/drift 均值差分：
+
+```math
+\Delta c
+=
+\mu_{S,c} - \mu_{D,c}
+```
+
+其中：
+
+```text
+c ∈ {gate, up, gate_up_pair, product, down_out}
+```
+
+对 drift rows 使用：
+
+```math
+c' = c + \alpha \Delta c
+```
+
+对 success rows 使用：
+
+```math
+c' = c - \alpha \Delta c
+```
+
+其中：
+
+```text
+α ∈ {0.25, 0.5, 1.0}
+```
+
+通道范围：
+
+```text
+all
+top16 positive write channels
+top64 positive write channels
+```
+
+读出指标：
+
+```text
+target_rank_delta
+target_logit_delta
+prose_margin_delta
+echo_margin_delta
+top_token_changed
+```
+
+解释：
+
+```text
+drift rows:
+target_logit_delta > 0 / rank_delta > 0 表示朝目标修复方向移动。
+
+success rows:
+target_logit_delta < 0 / rank_delta < 0 表示破坏成功态。
+```
+
+### 4. 模块树审计结果
+
+#### 4.1 qwen3
+
+```text
+layer=L29
+mlp_class=Qwen3MLP
+mlp_type=split_gate_up
+
+gate_proj: [9728, 2560]
+up_proj:   [9728, 2560]
+down_proj: [2560, 9728]
+```
+
+#### 4.2 GLM4
+
+```text
+layer=L30
+mlp_class=GlmMLP
+mlp_type=merged_gate_up
+
+gate_up_proj: [27392, 4096]
+down_proj:    [4096, 13696]
+```
+
+校准结论：
+
+```text
+Phase227 没捕获到 GLM4 gate/up 是工具限制，
+不是模型没有 gate/up。
+
+GLM4 的 gate/up 藏在 fused gate_up_proj 中。
+```
+
+#### 4.3 DS7B
+
+```text
+layer=L24
+mlp_class=Qwen2MLP
+mlp_type=split_gate_up
+
+gate_proj: [18944, 3584]
+up_proj:   [18944, 3584]
+down_proj: [3584, 18944]
+```
+
+### 5. product 重算校准结果
+
+三模型的 product 重算都高度吻合真实 down-input：
+
+```text
+qwen3:
+n=4
+rel_error_mean=0.001675
+rel_error_max=0.001717
+cosine_min=0.999998
+
+GLM4:
+n=4
+rel_error_mean=0.001352
+rel_error_max=0.001648
+cosine_min=0.999998
+
+DS7B:
+n=4
+rel_error_mean=0.001937
+rel_error_max=0.002512
+cosine_min=0.999997
+```
+
+这说明：
+
+```text
+1. qwen3 / DS7B 的 gate_proj + up_proj 捕获可信。
+2. GLM4 的 gate_up_proj fused split 捕获可信。
+3. product 确实是 gate/up 之后、down_proj 之前的真实写入前态。
+```
+
+这是 Phase228 最硬的正结果。
+
+### 6. 因果 patch 结果
+
+#### 6.1 qwen3 explain：product patch 有弱正向修复效果
+
+qwen3 drift rows 中，L29 product patch 在 step=2 有最清楚的正向效果：
+
+```text
+drift product top16 alpha=1.0 step=2:
+target_logit_delta=+0.9375
+target_rank_delta=+98.33
+top_token_changed=0/3
+
+drift product top64 alpha=1.0 step=2:
+target_logit_delta=+0.7917
+target_rank_delta=+82.00
+top_token_changed=2/3
+
+drift product top16 alpha=0.5 step=2:
+target_logit_delta=+0.5625
+target_rank_delta=+58.67
+top_token_changed=0/3
+```
+
+同一方向的 gate_up_pair 也有较弱正向效果：
+
+```text
+drift gate_up_pair top16 alpha=1.0 step=2:
+target_logit_delta=+0.4583
+target_rank_delta=+47.67
+top_token_changed=2/3
+```
+
+解释：
+
+```text
+qwen3 L29 product delta 能因果性提高目标 logit 和目标 rank，
+但多数情况下仍没有稳定跨过 top-token threshold。
+```
+
+这与 Phase225/226 一致：
+
+```text
+product/residual shift 可以改善目标排名，
+但不自动完成最终读出闭合。
+```
+
+#### 6.2 qwen3 success rows：反向 patch 能破坏成功态
+
+qwen3 success rows 中，反向 patch 在 step=2 能降低目标：
+
+```text
+success gate_up_pair all alpha=1.0:
+target_logit_delta=-1.1042
+target_rank_delta=-50.33
+
+success down_out all alpha=1.0:
+target_logit_delta=-0.7917
+target_rank_delta=-61.67
+
+success product all alpha=1.0:
+target_logit_delta=-0.7292
+target_rank_delta=-61.33
+```
+
+说明：
+
+```text
+qwen3 L29 gate_up/product/down_out 对 explain 目标状态有因果影响。
+```
+
+但它仍是局部因果，不是闭合。
+
+#### 6.3 GLM4 repeat：gate/up 捕获已修复，但 patch 效果弱且方向不稳定
+
+GLM4 drift rows 中，正向 logit 改善很小：
+
+```text
+drift gate top16 alpha=0.25 step=1:
+target_logit_delta=+0.0208
+target_rank_delta=0
+
+drift up top16 alpha=0.25 step=2:
+target_logit_delta=+0.0208
+target_rank_delta=-0.33
+
+drift gate_up_pair top16 alpha=0.25 step=2:
+target_logit_delta=+0.0208
+target_rank_delta=-0.33
+```
+
+更大 alpha 下，很多 patch 反而降低 target logit：
+
+```text
+drift gate_up_pair all alpha=1.0 step=2:
+target_logit_delta=-0.5625
+target_rank_delta=-9.67
+
+drift product all alpha=1.0 step=2:
+target_logit_delta=-0.3750
+target_rank_delta=-7.67
+```
+
+解释：
+
+```text
+GLM4 L30 repeat 的 fused gate/up/product 已经可观测，
+但 success-drift delta 不是稳定修复方向。
+```
+
+这说明 Phase226 中看到的 Answer anchor 强效，更可能是：
+
+```text
+prompt-level readout regime / continuation regime 触发
+```
+
+而不是单靠 L30 product delta 就能修复 repeat。
+
+#### 6.4 DS7B：数值反应强，但稳定性仍不足
+
+DS7B drift rows 中有正向 logit 效果：
+
+```text
+drift up all alpha=1.0 step=2:
+target_logit_delta=+0.9805
+target_rank_delta=+9581
+
+drift gate_up_pair all alpha=1.0 step=1:
+target_logit_delta=+0.4063
+target_rank_delta=+2509
+
+drift product all alpha=1.0 step=1:
+target_logit_delta=+0.2148
+target_rank_delta=+1944
+```
+
+但 success rows 反向 patch 的破坏极强：
+
+```text
+success gate all alpha=1.0 step=2:
+target_logit_delta=-4.2813
+target_rank_delta=-19845.67
+
+success product all alpha=1.0 step=2:
+target_logit_delta=-3.5000
+target_rank_delta=-30977.33
+
+success down_out all alpha=1.0 step=2:
+target_logit_delta=-3.4531
+target_rank_delta=-30359.67
+```
+
+这说明：
+
+```text
+DS7B 的 L24 MLP 内部组件对目标读出高度敏感。
+```
+
+但因为：
+
+```text
+1. drift rows 只有 2 条；
+2. rank_delta 巨大；
+3. 此前 DS7B 行为闭合弱；
+```
+
+所以仍只能作为敏感性证据，不能作为稳定机制闭合。
+
+### 7. 本阶段核心进展
+
+核心进展 1：
+
+```text
+GLM4 gate/up 捕获问题已解决：
+GLM4 是 merged_gate_up，不是没有 gate/up。
+```
+
+核心进展 2：
+
+```text
+三模型 product 重算均与真实 down-input 高度一致。
+product 是可信的 residual write 前态。
+```
+
+核心进展 3：
+
+```text
+qwen3 L29 product patch 对 explain drift 有弱正向因果效果：
+target logit 和 rank 均改善。
+```
+
+核心进展 4：
+
+```text
+success rows 的反向 patch 可以破坏目标状态，
+说明 gate/up/product/down_out 不是旁观变量，而是因果链条的一部分。
+```
+
+核心负结果：
+
+```text
+GLM4 和 DS7B 的 success-drift product delta 不能稳定解释为通用修复方向。
+```
+
+因此当前还不能写成：
+
+```text
+PromptTrigger → gate/up/product → correct output
+```
+
+只能写成：
+
+```text
+PromptTrigger → gate/up/product → local readout pressure
+```
+
+其中 final output 仍受：
+
+```text
+ReadoutRegimeSelection
+TopTokenThreshold
+CompetitorTransition
+```
+
+控制。
+
+### 8. 问题、硬伤和瓶颈
+
+#### 8.1 patch 是局部线性近似
+
+本阶段 patch 是：
+
+```math
+c' = c + \alpha(\mu_S-\mu_D)
+```
+
+这仍然是假设均值差分可以代表自然因果方向。
+
+问题：
+
+```text
+真实运行可能不是线性差分；
+尤其 gate/up/product 是非线性耦合。
+```
+
+因此 patch 有用只能说明“相关方向有局部因果效应”，不能说明它就是自然算法。
+
+#### 8.2 success-drift 均值可能混合多个子模式
+
+如果 success rows 内部有多个模式：
+
+```text
+success mode A
+success mode B
+success mode C
+```
+
+那么：
+
+```math
+\mu_S-\mu_D
+```
+
+可能不是任何真实运行路径，而是混合平均方向。
+
+GLM4 的弱/反向 patch 很可能与此有关。
+
+#### 8.3 top token 仍很少闭合
+
+qwen3 product patch 能改善 logit/rank，但：
+
+```text
+top_token_changed 很少稳定变成目标 token。
+```
+
+这继续证明：
+
+```text
+ReadoutRegimeSelection 是独立瓶颈。
+```
+
+#### 8.4 DS7B 仍有小模型粗糙性
+
+DS7B 的 rank 变化过大，说明内部编码可能更粗糙。
+
+分析 DS7B 时应保留：
+
+```text
+30% 到 50% 偏差空间
+```
+
+### 9. 当前完整图谱更新
+
+```text
+PromptToken / PromptSpan
+→ InstructionFrame
+→ AnswerAnchor
+→ StepCondition
+→ gate projection
+→ up projection
+→ gated product
+→ down projection
+→ residual write
+→ local readout pressure
+→ readout regime selection
+→ top-token threshold
+→ output pattern
+```
+
+其中 Phase228 确认较强的是：
+
+```text
+gate/up → product → down_out
+```
+
+以及：
+
+```text
+product/down_out 对 local readout pressure 有因果影响。
+```
+
+仍未确认的是：
+
+```text
+local readout pressure 如何切换到正确 readout regime。
+```
+
+### 10. 当前进度估计
+
+```text
+小模型模式机制图谱：约 75%
+StatePath：约 61%
+StateWriteCause：约 45%
+StateWriteSource：约 39%
+NaturalTrigger → ChannelActivation：约 20%
+TokenTrigger → Gate/Up/Product：约 16%
+MLP/ResidualWrite：约 54%
+activation-gated channel mechanism：约 27%
+ResidualPropagation：约 21%
+ReadoutPath：约 34%
+ReadoutRegimeSelection：约 11%
+路径因果机制：约 40%
+模型内部自然闭合：约 42%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 11. 阶段边界判断和下一步
+
+Phase228 仍属于 Phase226/227 的同一大阶段：
+
+```text
+自然触发源 → MLP product → residual write 的机制图谱。
+```
+
+但 Phase228 已经完成了该阶段的工具校准和第一轮因果验证。
+
+下一步如果继续同阶段，不应再做普通 gate/up/product patch，而应转向 readout regime 的来源：
+
+```text
+Phase229: readout regime selection source atlas
+（读出机制选择来源图谱）
+```
+
+核心任务：
+
+```text
+1. 固定 qwen3 L29 product patch 有效样本，
+   追踪为什么 rank/logit 改善仍不跨 top token threshold。
+
+2. 对 Then / The / For / Answer 等 competitor token 建立 readout competitor atlas。
+
+3. 区分：
+   target pressure
+   prose pressure
+   continuation pressure
+   echo/repeat pressure
+   answer-boundary pressure。
+
+4. 不再以“目标 token 是否 top1”作为唯一指标，
+   而是画出多个读出机制之间的竞争图谱。
+```
+
+## Phase 229: 读出机制选择来源图谱 [2026-07-07 03:08]
+
+### 1. 对 Phase228 附件判断的校准
+
+附件对 Phase228 的判断基本正确。
+
+Phase228 的性质应定义为：
+
+```text
+工具校准 + 局部因果验证
+```
+
+它完成了两个硬进展：
+
+```text
+1. GLM4 的 gate/up 捕获问题被修复：
+   GLM4 是 merged_gate_up，不是没有 gate/up。
+
+2. 三模型 product recompute 与真实 down-input 高度一致：
+   product 是 residual write 前态。
+```
+
+但附件指出的一个问题也成立：
+
+```text
+Phase226 / Phase228 的 rank_delta 文字说明容易混淆。
+```
+
+本阶段统一记法为：
+
+```math
+\Delta r_{\mathrm{improve}}
+=
+r_{\mathrm{base}} - r_{\mathrm{new}}
+```
+
+因此：
+
+```text
+rank_improve > 0 表示目标排名改善。
+rank_improve < 0 表示目标排名变差。
+```
+
+### 2. 本阶段目标
+
+Phase228 已经证明：
+
+```text
+gate/up/product → residual write → local readout pressure
+```
+
+但没有闭合：
+
+```text
+local readout pressure → correct output
+```
+
+Phase229 的任务是把 readout regime selection（读出机制选择）拆开，不再只看 top1 是否目标词，而是观察目标词被哪些机制压住：
+
+```text
+Then / The / For / Answer / Because / comma / period / newline / echo / prose / be-continuation
+```
+
+### 3. 脚本和结果
+
+新增脚本：
+
+```text
+/tests/gpt5/phase229_readout_regime_selection_atlas.py
+/tests/gpt5/run_phase229_readout_regime_selection_atlas.sh
+```
+
+结果目录：
+
+```text
+/tests/result/phase229_readout_regime_selection_atlas/readout_regime_selection_atlas/
+```
+
+三模型顺序测试：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+结果规模：
+
+```text
+qwen3: regime_rows=432
+GLM4: regime_rows=432
+DS7B: regime_rows=324
+cross-model: regime_rows=1188
+```
+
+脚本检查：
+
+```text
+python -m py_compile: 通过
+bash -n runner: 通过
+```
+
+### 4. 算法原理
+
+对每个上下文或 patch 结果，计算：
+
+```text
+target_logit
+target_rank
+top_token
+winning_regime
+target_margin_vs_winner
+```
+
+其中：
+
+```math
+\mathrm{TargetMargin}
+=
+\mathrm{logit}_{target}
+-
+\max_{r \in R, r \ne target} \mathrm{logit}_r
+```
+
+如果：
+
+```text
+target_logit_delta > 0
+rank_improve > 0
+target_margin_vs_winner < 0
+```
+
+说明：
+
+```text
+目标压力已经增强，但仍没有跨过读出机制 winner。
+```
+
+这就是 Phase225 到 Phase229 一直追踪的关键断点。
+
+读出机制集合：
+
+```text
+target
+then_continuation
+the_continuation
+for_continuation
+answer_boundary
+because_reason
+be_continuation
+comma_repeat
+period_stop
+colon_boundary
+newline_boundary
+space_boundary
+prose
+echo
+stop
+```
+
+### 5. 关键结果
+
+#### 5.1 qwen3：目标压力增强后常被 period / because / comma / echo 压住
+
+qwen3 drift 中，product patch 能改善目标，但 winner 仍是 period_stop：
+
+```text
+drift patch_product_top16_a1 step=2:
+target_logit_delta=+0.8438
+rank_improve=+93.5
+target_margin_vs_winner=-20.3438
+winner=period_stop
+top_token=.\n
+```
+
+同一类结果：
+
+```text
+patch_product_top64_a1 step=2:
+target_logit_delta=+0.6562
+rank_improve=+76.0
+target_margin_vs_winner=-20.4688
+winner=period_stop
+
+patch_gate_up_pair_top64_a1 step=2:
+target_logit_delta=+0.8750
+rank_improve=+124.0
+target_margin_vs_winner=-21.8750
+winner=period_stop
+```
+
+qwen3 drift 在 step=3 常被 because_reason 压住：
+
+```text
+patch_product_top16_a1 step=3:
+target_logit_delta=+0.4375
+rank_improve=+170.0
+target_margin_vs_winner=-28.2500
+winner=because_reason
+top_token=Because
+```
+
+解释：
+
+```text
+qwen3 的 product patch 确实增强目标压力，
+但 period_stop 和 because_reason 的读出机制仍大幅领先。
+```
+
+这解释了为什么 Phase228 看到 rank/logit 改善，却很少 top1 闭合。
+
+#### 5.2 qwen3 自然变体可强烈切换读出机制
+
+qwen3 drift repeat_instruction：
+
+```text
+step=3:
+target_logit_delta=+5.6562
+rank_improve=+620.5
+target_margin_vs_winner=-5.9688
+winner=answer_boundary
+top_token=Answer
+```
+
+qwen3 drift no_answer_anchor：
+
+```text
+step=2:
+target_logit_delta=+3.8125
+rank_improve=+243.0
+target_margin_vs_winner=-10.0000
+winner=period_stop
+top_token=.
+
+step=3:
+target_logit_delta=+2.4375
+rank_improve=+444.5
+target_margin_vs_winner=-16.1875
+winner=because_reason
+top_token=Because
+```
+
+说明：
+
+```text
+自然 prompt 变体能同时增强 target pressure 和切换 readout regime。
+但 regime winner 仍可能不是 target。
+```
+
+#### 5.3 GLM4：Answer anchor 移除稳定切到 For continuation
+
+GLM4 repeat 中，no_answer_anchor 的结果非常稳定：
+
+```text
+success no_answer_anchor step=1:
+target_logit_delta=-8.4224
+rank_improve=-5467.0
+target_margin_vs_winner=-12.4849
+winner=for_continuation
+top_token=For
+
+drift no_answer_anchor step=1:
+target_logit_delta=-7.2902
+rank_improve=-6151.25
+target_margin_vs_winner=-12.6027
+winner=for_continuation
+top_token=For
+```
+
+这把 Phase226/227 的判断进一步收紧：
+
+```text
+GLM4 repeat 的 Answer anchor 不是单纯通道触发；
+它还强控制 readout regime selection。
+```
+
+GLM4 中，explain_instruction 会把 winner 切到 because_reason 或 newline_boundary：
+
+```text
+success explain_instruction step=3:
+winner=because_reason
+top_token=because
+
+success explain_instruction step=2:
+winner=newline_boundary
+top_token=\n
+```
+
+#### 5.4 DS7B：目标压力和排名变化很大，但 winner 通常仍是 be/echo/newline
+
+DS7B drift product patch：
+
+```text
+patch_product_top64_a1 step=3:
+target_logit_delta=+1.3750
+rank_improve=+322.0
+target_margin_vs_winner=-16.9375
+winner=be_continuation
+top_token=are
+```
+
+DS7B natural repeat_instruction：
+
+```text
+drift repeat_instruction step=2:
+target_logit_delta=+1.1055
+rank_improve=+14899.0
+target_margin_vs_winner=-11.2148
+winner=newline_boundary
+top_token=orses
+```
+
+说明：
+
+```text
+DS7B 的目标压力变化很大，
+但读出 winner 仍经常是 be_continuation / echo / newline_boundary。
+```
+
+由于 DS7B 样本少且 rank 变化巨大，仍只作为敏感性参考。
+
+### 6. Phase229 结论
+
+Phase229 的核心结果：
+
+```text
+local readout pressure 和 readout regime winner 是两层不同机制。
+```
+
+更具体：
+
+```text
+1. qwen3:
+   product patch 增强 target pressure，
+   但 period_stop / because_reason / echo 仍常压过 target。
+
+2. GLM4:
+   Answer anchor 强控制 for_continuation / repeat regime 的切换。
+
+3. DS7B:
+   目标压力敏感，但 winner 常被 be / echo / newline 控制。
+```
+
+因此当前图谱应更新为：
+
+```text
+product/down_out
+→ target pressure
+→ competitor pressure field
+→ readout regime winner
+→ top-token threshold
+```
+
+不能再写成：
+
+```text
+product/down_out → target token
+```
+
+## Phase 230: 读出阈值障碍量化 [2026-07-07 03:09]
+
+### 1. 阶段目标
+
+Phase229 画出了读出机制 winner。
+
+Phase230 不再重新跑模型，而是基于 Phase229 的 1188 条记录量化：
+
+```text
+目标压力已经增加，但距离跨过 winner 还差多少。
+```
+
+这一步仍属于同一阶段，因为它继续处理：
+
+```text
+local readout pressure → top-token threshold
+```
+
+### 2. 脚本和结果
+
+新增脚本：
+
+```text
+/tests/gpt5/phase230_readout_threshold_barrier_analysis.py
+```
+
+结果目录：
+
+```text
+/tests/result/phase230_readout_threshold_barrier_analysis/readout_threshold_barrier_analysis/
+```
+
+输入：
+
+```text
+Phase229 regime_rows=1188
+```
+
+输出：
+
+```text
+barrier_rows=321
+closure_candidate_rows=59
+```
+
+其中 barrier row 定义为：
+
+```text
+target_logit_delta > 0
+target_margin_vs_winner < 0
+```
+
+即：
+
+```text
+目标压力增加了，但仍未跨过 winner。
+```
+
+### 3. 公式
+
+剩余阈值障碍：
+
+```math
+\mathrm{RemainingGap}
+=
+-
+\mathrm{TargetMargin}
+```
+
+其中：
+
+```math
+\mathrm{TargetMargin}
+=
+\mathrm{logit}_{target}
+-
+\mathrm{logit}_{winner}
+```
+
+压力效率：
+
+```math
+\mathrm{PressureEfficiency}
+=
+\frac{
+\Delta \mathrm{TargetMargin}
+}{
+\Delta \mathrm{TargetLogit}
+}
+```
+
+解释：
+
+```text
+RemainingGap 越大，说明目标距离 winner 越远。
+PressureEfficiency 越高，说明目标 logit 增加更有效地缩小了与 winner 的差距。
+```
+
+### 4. 关键 barrier 结果
+
+#### 4.1 qwen3: because_reason 是最大阈值障碍之一
+
+qwen3 drift step=3：
+
+```text
+patch_product_top16_a1:
+target_logit_delta=+0.4375
+rank_improve=+170.0
+winner=because_reason
+remaining_gap=28.25
+top_token=Because
+```
+
+同类结果：
+
+```text
+patch_product_top16_a0.5:
+target_logit_delta=+0.3125
+rank_improve=+89.0
+remaining_gap=29.375
+winner=because_reason
+
+patch_gate_up_pair_top16_a1:
+target_logit_delta=+0.2500
+rank_improve=+121.0
+remaining_gap=28.6875
+winner=because_reason
+```
+
+说明：
+
+```text
+qwen3 explain 中，because_reason 是非常强的后续解释机制。
+即使 product patch 提升目标，也很难越过 because readout。
+```
+
+#### 4.2 qwen3: period_stop 是 step=2 的主要障碍
+
+qwen3 drift step=2：
+
+```text
+patch_product_top16_a1:
+target_logit_delta=+0.8438
+rank_improve=+93.5
+winner=period_stop
+remaining_gap=20.3438
+top_token=.\n
+
+patch_product_top64_a1:
+target_logit_delta=+0.6562
+rank_improve=+76.0
+winner=period_stop
+remaining_gap=20.4688
+```
+
+说明：
+
+```text
+step=2 的失败不是目标完全没动，
+而是 period_stop 阈值障碍太强。
+```
+
+#### 4.3 DS7B: be_continuation 是常见障碍
+
+DS7B drift step=3：
+
+```text
+patch_product_top64_a1:
+target_logit_delta=+1.3750
+rank_improve=+322.0
+winner=be_continuation
+remaining_gap=16.9375
+top_token=are
+```
+
+多个 gate_up/product patch 都落在：
+
+```text
+winner=be_continuation
+remaining_gap≈17
+```
+
+说明：
+
+```text
+DS7B 的目标压力增长常被 be_continuation 机制压住。
+```
+
+#### 4.4 GLM4: barrier 更少，主要问题是 regime switch
+
+GLM4 的 barrier_rows 明显少于 qwen3 / DS7B。
+
+这不是说明 GLM4 更闭合，而是说明：
+
+```text
+GLM4 经常不是“目标压力增加但还差一点”，
+而是直接被 no_answer_anchor / explain_instruction 切换到 For / newline / because 等 regime。
+```
+
+例如：
+
+```text
+no_answer_anchor step=1:
+winner=for_continuation
+target_logit_delta 大幅下降
+```
+
+这属于：
+
+```text
+regime switch failure
+```
+
+而不是：
+
+```text
+threshold barrier failure
+```
+
+### 5. 本阶段新增拼图
+
+新增拼图 1：
+
+```text
+读出失败至少分两类：
+
+1. threshold barrier failure:
+   target pressure 增强，但 winner 仍领先。
+
+2. regime switch failure:
+   prompt/anchor 改变后，模型直接切到另一个读出机制。
+```
+
+新增拼图 2：
+
+```text
+qwen3 explain 的主要 threshold barrier:
+period_stop
+because_reason
+echo
+```
+
+新增拼图 3：
+
+```text
+GLM4 repeat 的主要失败:
+For continuation / newline / because 的 regime switch。
+```
+
+新增拼图 4：
+
+```text
+DS7B explain 的主要 threshold barrier:
+be_continuation
+echo
+newline_boundary。
+```
+
+### 6. 问题和硬伤
+
+#### 6.1 regime groups 仍是人工定义
+
+当前 Then / The / For / Answer / because 等组是人工指定。
+
+它能解释当前现象，但还不是自动发现的完整读出机制图谱。
+
+#### 6.2 winner 是词元级 winner，不等于完整生成轨迹
+
+本阶段只看 next-token readout。
+
+真实输出模式还包括：
+
+```text
+后续多 token rollout
+```
+
+所以 Phase230 仍不是最终输出闭合。
+
+#### 6.3 barrier 不能直接用 logit 差线性修复
+
+RemainingGap 很大时，不能简单认为补一个等量 logit 就能闭合。
+
+因为补 target 可能同时改变 competitor field。
+
+### 7. 当前图谱更新
+
+```text
+PromptTrigger
+→ gate/up/product
+→ residual write
+→ local target pressure
+→ competitor pressure field
+→ readout regime winner
+→ threshold barrier / regime switch
+→ top token
+→ rollout pattern
+```
+
+### 8. 当前进度估计
+
+```text
+小模型模式机制图谱：约 76%
+StatePath：约 62%
+StateWriteCause：约 46%
+StateWriteSource：约 40%
+NaturalTrigger → ChannelActivation：约 21%
+TokenTrigger → Gate/Up/Product：约 17%
+MLP/ResidualWrite：约 55%
+ReadoutPressure：约 22%
+ReadoutRegimeSelection：约 17%
+TopTokenThreshold：约 19%
+路径因果机制：约 41%
+模型内部自然闭合：约 43%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 9. 阶段边界判断
+
+Phase229 和 Phase230 仍属于同一大阶段：
+
+```text
+自然触发源 → MLP product → residual write → readout pressure → readout regime
+```
+
+本阶段已经完成：
+
+```text
+1. readout regime 初步图谱；
+2. threshold barrier 初步量化；
+3. threshold barrier failure 与 regime switch failure 的区分。
+```
+
+下一步如果继续，应进入更具体的因果验证：
+
+```text
+Phase231: competitor pressure causal suppression
+（竞争读出压力因果抑制验证）
+```
+
+但这已经是新的子阶段：
+
+```text
+从“画出读出竞争图谱”
+转向“因果抑制竞争机制”。
+```
+
+因此本轮自动推进到 Phase230 后可以收束，不继续无限增加 patch。
+
+## Phase 231: 竞争读出压力理想抑制预算 [2026-07-07 03:21]
+
+### 1. 本阶段任务
+
+本阶段继续分析 Phase229/230 的结果是否正确，并把正确部分向前推进一步。
+
+Phase229/230 的核心判断是正确的：
+
+```text
+target logit 增强
+target rank 改善
+不等于 target token 成为 top token。
+```
+
+更准确地说，读出失败至少分为两类：
+
+```text
+1. threshold barrier failure:
+   目标压力增强，但竞争读出机制仍然领先。
+
+2. regime switch failure:
+   prompt 或 anchor 改变后，模型直接进入另一套读出机制。
+```
+
+Phase231 不继续盲目增加 product patch，而是检查一个更直接的问题：
+
+```text
+如果只在读出层压低当前 winner，需要多大竞争抑制预算，
+target margin 才能过零？
+```
+
+注意：本阶段是 readout-level oracle suppression（读出层理想抑制）测试，不等于已经找到模型内部真实抑制通道。
+
+### 2. 测试脚本和结果文件
+
+脚本：
+
+```text
+tests/gpt5/phase231_competitor_pressure_oracle_suppression.py
+```
+
+输入：
+
+```text
+tests/result/phase230_readout_threshold_barrier_analysis/readout_threshold_barrier_analysis/
+```
+
+输出：
+
+```text
+tests/result/phase231_competitor_pressure_oracle_suppression/competitor_pressure_oracle_suppression/
+```
+
+本阶段没有重新加载模型，因为它复用 Phase229/230 已经完成的 qwen3、GLM4、DS7B 三模型读出结果。
+
+总数据量：
+
+```text
+input_barrier_rows = 321
+suppression_rows = 3210
+```
+
+### 3. 算法原理
+
+Phase230 已经给出每条 threshold barrier row：
+
+```text
+target_margin_vs_winner < 0
+target_logit_delta > 0
+```
+
+其中：
+
+```text
+remaining_margin_gap = - target_margin_vs_winner
+```
+
+Phase231 假设对当前 winning_regime 施加一个读出层理想抑制预算：
+
+```text
+b ∈ {1,2,4,8,12,16,20,24,28,32}
+```
+
+核心公式：
+
+$$
+\mathrm{PostMargin}(b)
+=
+\mathrm{TargetMargin}
++
+b
+$$
+
+闭合判定：
+
+$$
+\mathrm{OracleClose}(b)
+=
+\mathbf{1}
+\left[
+\mathrm{PostMargin}(b) \ge 0
+\right]
+$$
+
+也就是：
+
+```text
+如果只压低当前 winner 的读出压力 b 个 logit 单位，
+target 是否能超过 winner。
+```
+
+这个测试的意义不是证明真实模型可以线性抑制，而是量化：
+
+```text
+当前失败到底是小阈值差，还是巨大竞争场。
+```
+
+### 4. 关键结果
+
+#### 4.1 qwen3
+
+qwen3 的 threshold barrier rows：
+
+```text
+rows = 188
+```
+
+整体预算闭合率：
+
+```text
+b=8:  closed 48 / 188, closure_rate=0.2553
+b=16: closed 122 / 188, closure_rate=0.6489
+b=20: closed 144 / 188, closure_rate=0.7660
+b=24: closed 170 / 188, closure_rate=0.9043
+b=28: closed 170 / 188, closure_rate=0.9043
+b=32: closed 188 / 188, closure_rate=1.0000
+```
+
+主要竞争机制：
+
+```text
+success / echo:
+rows=52
+median_remaining_gap=12.6250
+
+drift / period_stop:
+rows=40
+median_remaining_gap=20.5000
+p90_remaining_gap=22.6875
+
+drift / because_reason:
+rows=24
+median_remaining_gap=29.1875
+p90_remaining_gap=29.8125
+```
+
+解释：
+
+```text
+qwen3 的 period_stop 和 because_reason 不是小障碍。
+尤其 because_reason，需要接近 30 个 logit 级别的 winner 抑制才稳定过阈值。
+```
+
+因此，qwen3 中单纯继续增强 target pressure 很可能进入边际收益递减区。
+下一步更应该找：
+
+```text
+because_reason / period_stop 的自然触发源和写入路径。
+```
+
+#### 4.2 GLM4
+
+GLM4 的 threshold barrier rows 很少：
+
+```text
+rows = 13
+```
+
+整体预算闭合率：
+
+```text
+b=1: closed 7 / 13, closure_rate=0.5385
+b=2: closed 9 / 13, closure_rate=0.6923
+b=4: closed 11 / 13, closure_rate=0.8462
+b=8: closed 13 / 13, closure_rate=1.0000
+```
+
+主要 gap：
+
+```text
+drift / the_continuation:
+rows=4
+median_remaining_gap=1.7656
+
+drift / because_reason:
+rows=4
+median_remaining_gap=0.8750
+
+drift / comma_repeat:
+rows=2
+median_remaining_gap=4.5625
+```
+
+解释：
+
+```text
+GLM4 在 threshold barrier 行里并不厚。
+它的问题更像 Phase230 判断的 regime switch failure：
+模型经常不是“差一点过不了阈值”，
+而是直接切到 For / newline / because 等读出机制。
+```
+
+所以 GLM4 后续不应优先做大幅 competitor suppression，而应优先研究：
+
+```text
+prompt anchor 如何触发 regime switch。
+```
+
+#### 4.3 DS7B
+
+DS7B 的 threshold barrier rows：
+
+```text
+rows = 120
+```
+
+整体预算闭合率：
+
+```text
+b=8:  closed 0 / 120, closure_rate=0.0000
+b=12: closed 10 / 120, closure_rate=0.0833
+b=16: closed 78 / 120, closure_rate=0.6500
+b=20: closed 118 / 120, closure_rate=0.9833
+b=24: closed 120 / 120, closure_rate=1.0000
+```
+
+主要竞争机制：
+
+```text
+drift / be_continuation:
+rows=28
+median_remaining_gap=17.3438
+
+drift / the_continuation:
+rows=28
+median_remaining_gap=12.4043
+
+success / be_continuation:
+rows=20
+median_remaining_gap=15.3438
+
+success / prose:
+rows=20
+median_remaining_gap=15.3066
+```
+
+解释：
+
+```text
+DS7B 的主要障碍不是 because_reason，而是 be_continuation / the_continuation / prose 续写场。
+```
+
+这说明三模型读出竞争结构不同：
+
+```text
+qwen3: period_stop / because_reason 很强。
+GLM4: threshold barrier 薄，regime switch 更关键。
+DS7B: be/the/prose continuation field 更强。
+```
+
+### 5. 本阶段新增拼图
+
+新增拼图 1：
+
+```text
+读出失败不是一个统一障碍。
+不同模型的竞争读出场形状不同。
+```
+
+新增拼图 2：
+
+```text
+qwen3 的 because_reason 是大阈值障碍，
+不是小幅 target pressure patch 能自然闭合的对象。
+```
+
+新增拼图 3：
+
+```text
+GLM4 的 threshold barrier 很薄，
+说明它的主要失败更可能在 regime switch 层，
+不是 winner margin 层。
+```
+
+新增拼图 4：
+
+```text
+DS7B 的 continuation field 更强，
+尤其 be_continuation / the_continuation / prose。
+```
+
+新增拼图 5：
+
+```text
+competitor suppression 的下一步不能直接假设全局有效，
+必须按 winner regime 分别找内部来源。
+```
+
+### 6. 问题、硬伤和边界
+
+#### 6.1 这是 oracle，不是真实内部抑制
+
+本阶段只在读出层做理想预算：
+
+```text
+PostMargin = TargetMargin + b
+```
+
+真实模型内部抑制某个通道时，可能同时改变：
+
+```text
+target pressure
+competitor pressure
+其他读出机制
+后续 rollout
+```
+
+所以不能把本阶段当成真实因果闭合。
+
+#### 6.2 只压 winner 可能过于理想
+
+真实读出竞争不是只存在一个 winner。
+
+压低当前 winner 后，可能出现第二个 competitor 继续压住 target。
+
+因此 Phase231 的 closure_rate 是上界，不是实际干预成功率。
+
+#### 6.3 仍是 next-token 读出，不是完整输出轨迹
+
+本阶段仍然只处理 top token 阈值，不处理后续多 token 生成轨迹。
+
+### 7. 理论进展
+
+当前更稳妥的机制链条是：
+
+```text
+PromptPattern
+→ Gate/Up/Product
+→ ResidualWrite
+→ TargetPressure
+→ CompetitorPressureField
+→ ReadoutRegimeSelection
+→ ThresholdBarrier
+→ TopToken
+→ RolloutPattern
+```
+
+Phase231 对这条链的贡献是：
+
+```text
+把 CompetitorPressureField 的强度第一次按模型和 winner regime 量化。
+```
+
+这比继续讨论“目标向量是否存在”更接近真实编码机制，因为它承认：
+
+```text
+语言输出不是单一目标方向，
+而是多个模式场同时竞争。
+```
+
+### 8. 下一步任务
+
+Phase231 仍属于：
+
+```text
+readout pressure / readout regime / threshold barrier
+```
+
+这一大阶段。
+
+但下一步应从读出层 oracle 进入内部来源验证：
+
+```text
+Phase232: competitor source localization
+（竞争读出压力来源定位）
+```
+
+目标不是继续调 target patch，而是分别定位：
+
+```text
+qwen3:
+because_reason / period_stop 的内部来源。
+
+GLM4:
+regime switch 的 prompt anchor 来源。
+
+DS7B:
+be_continuation / the_continuation / prose 的内部来源。
+```
+
+优先级：
+
+```text
+1. 先定位 competitor source；
+2. 再做 source-level causal suppression；
+3. 最后才回到 target closure。
+```
+
+这样可以避免继续在线性补丁上做边际收益递减的 patch。
+
+### 9. 阶段结论
+
+Phase231 证明：
+
+```text
+Phase229/230 的判断基本正确。
+```
+
+更具体地说：
+
+```text
+qwen3 的失败是厚阈值障碍；
+GLM4 的失败主要是机制切换；
+DS7B 的失败是 continuation field 压制。
+```
+
+所以，破解语言编码机制的下一块拼图不是“再增强目标词”，而是：
+
+```text
+找出不同 competitor regime 的自然触发源和内部写入路径。
+```
+
+这一步如果完成，才有可能从：
+
+```text
+读出层图谱
+```
+
+推进到：
+
+```text
+真实内部因果机制图谱。
+```
+
+## Phase 232: 竞争读出来源候选定位 [2026-07-07 03:34]
+
+### 1. 本阶段任务
+
+本阶段分析 Phase231 的判断是否正确，并继续推进同一阶段任务。
+
+Phase231 的方向是正确的：
+
+```text
+target logit 增强
+target rank 改善
+不等于 target token 胜出；
+读出失败需要区分 target pressure 和 competitor pressure。
+```
+
+但 Phase231 只是 readout-level oracle suppression（读出层理想抑制），不能说明模型内部哪里产生了 because_reason、period_stop、for_continuation、be_continuation 等竞争压力。
+
+因此 Phase232 的目标是：
+
+```text
+从 Phase229 的自然 prompt 变体和 MLP patch 变体中，
+定位 competitor regime 的来源候选。
+```
+
+注意：本阶段仍不是内部因果闭合，而是 source candidate localization（来源候选定位）。
+
+### 2. 脚本和结果
+
+脚本：
+
+```text
+tests/gpt5/phase232_competitor_source_localization.py
+```
+
+输入：
+
+```text
+tests/result/phase229_readout_regime_selection_atlas/readout_regime_selection_atlas/
+```
+
+输出：
+
+```text
+tests/result/phase232_competitor_source_localization/competitor_source_localization/
+```
+
+数据量：
+
+```text
+input_rows = 1188
+pressure_source_rows = 4536
+switch_source_rows = 51
+coupling_rows = 3024
+priority_rows = 160
+```
+
+本阶段没有重新加载模型，原因是 Phase232 是对 Phase229 已经完成的三模型读出行进行来源候选分析。
+
+### 3. 算法原理
+
+Phase229 每一行已经包含：
+
+```text
+regime_delta[r]
+target_logit_delta
+winning_regime
+base_winning_regime
+winning_regime_changed
+variant
+step
+component
+channel_scope
+```
+
+Phase232 对每个候选 regime 计算三类指标。
+
+#### 3.1 pressure source（压力来源）
+
+对某个 regime：
+
+$$
+\Delta z_r
+=
+z_r^{variant}
+-
+z_r^{base}
+$$
+
+竞争相对目标优势：
+
+$$
+\mathrm{CompAdv}_r
+=
+\Delta z_r
+-
+\Delta z_{target}
+$$
+
+如果：
+
+```text
+CompAdv_r 明显为正
+```
+
+说明该 prompt 变体或 patch 变体更偏向抬高 competitor，而不是抬高 target。
+
+#### 3.2 switch source（切换来源）
+
+如果：
+
+$$
+\mathrm{Winner}_{base}
+\ne
+\mathrm{Winner}_{variant}
+$$
+
+则记录：
+
+```text
+base_winning_regime → winning_regime
+```
+
+这用于定位 regime switch failure 的来源。
+
+#### 3.3 patch coupling（补丁耦合）
+
+对 MLP patch 行计算：
+
+```text
+target_delta > 0 且 competitor_delta > 0
+```
+
+如果 target 和 competitor 同涨，说明当前 patch 不是纯 target 修复，而是可能同时增强某个竞争机制。
+
+### 4. 关键结果
+
+#### 4.1 GLM4：regime switch 来源最清楚
+
+GLM4 的来源候选最强，且主要来自自然 prompt 变体。
+
+最强结果：
+
+```text
+success / no_answer_anchor / step=1
+regime = for_continuation
+rows = 4
+changed_to_rate = 1.0000
+winner_rate = 1.0000
+mean_target_delta = -8.4224
+mean_regime_delta = +9.0820
+mean_competitor_minus_target_delta = +17.5044
+top_token = For
+```
+
+drift 组同样成立：
+
+```text
+drift / no_answer_anchor / step=1
+regime = for_continuation
+rows = 4
+changed_to_rate = 1.0000
+winner_rate = 1.0000
+mean_target_delta = -7.2902
+mean_regime_delta = +8.8633
+mean_competitor_minus_target_delta = +16.1535
+top_token = For
+```
+
+这说明：
+
+```text
+GLM4 去掉 AnswerAnchor 后，
+不是薄阈值失败，
+而是强烈切换到 For continuation。
+```
+
+另外：
+
+```text
+success / explain_instruction / step=3
+regime = because_reason
+rows = 4
+changed_to_rate = 1.0000
+winner_rate = 1.0000
+mean_target_delta = -4.9531
+mean_regime_delta = +8.5781
+top_token = because
+```
+
+以及：
+
+```text
+success / explain_instruction / step=2
+regime = newline_boundary
+rows = 4
+changed_to_rate = 1.0000
+winner_rate = 1.0000
+mean_target_delta = -6.0078
+mean_regime_delta = +3.6719
+top_token = newline
+```
+
+GLM4 的结论比较稳定：
+
+```text
+AnswerAnchor 控制 repeat regime；
+no_answer_anchor 触发 For continuation；
+explain_instruction 触发 newline / because。
+```
+
+这与 Phase230/231 的判断一致：GLM4 不是厚 threshold barrier 为主，而是 regime switch 为主。
+
+#### 4.2 qwen3：because/period 来源更分散
+
+qwen3 的强候选主要来自自然 prompt 变体，但不是直接 winner switch，而是 competitor 相对 target 的压力优势。
+
+代表结果：
+
+```text
+drift / no_answer_anchor / step=1
+regime = because_reason
+rows = 4
+winner_rate = 0.0000
+mean_target_delta = -12.0625
+mean_regime_delta = +4.4688
+mean_competitor_minus_target_delta = +16.5312
+top_token = The / Then
+```
+
+同一条件下 period_stop 也增强：
+
+```text
+drift / no_answer_anchor / step=1
+regime = period_stop
+rows = 4
+mean_target_delta = -12.0625
+mean_regime_delta = +0.6719
+mean_competitor_minus_target_delta = +12.7344
+```
+
+另外：
+
+```text
+drift / because_removed / step=2
+regime = period_stop
+rows = 4
+winner_rate = 1.0000
+mean_target_delta = -1.2812
+mean_regime_delta = +2.5000
+top_token = . / .\n
+```
+
+这说明：
+
+```text
+qwen3 的 because_reason / period_stop 不是单一 prompt 开关。
+no_answer_anchor 会削弱 target 并相对增强 because/period；
+because_removed 反而会让 period_stop 直接成为 winner。
+```
+
+qwen3 的一个重要正面切换：
+
+```text
+drift / repeat_instruction / step=3
+base_winning_regime = because_reason
+winning_regime = answer_boundary
+rows = 4
+mean_target_delta = +5.6562
+mean_margin_delta_vs_winner = +24.2188
+top_token = Answer
+```
+
+但它仍没有完成最终目标闭合，因为：
+
+```text
+target_margin_vs_winner = -5.9688
+```
+
+解释：
+
+```text
+repeat_instruction 可以把 qwen3 从 because_reason 拉到 answer_boundary，
+但 answer_boundary 不是目标答案本身。
+```
+
+这说明 qwen3 的下一步不能只找 because 抑制，还要区分：
+
+```text
+answer boundary
+target answer
+period stop
+because reason
+```
+
+四者之间的竞争关系。
+
+#### 4.3 DS7B：continuation 来源仍弱，样本权重较低
+
+DS7B 的候选结果明显更弱，且每桶 rows 多为 2 或 4。
+
+可观察结果：
+
+```text
+drift / patch_product_top64_a1 / step=2
+regime = be_continuation
+rows = 2
+mean_target_delta = -1.6484
+mean_regime_delta = +2.8906
+mean_competitor_minus_target_delta = +4.5391
+top_token = orses
+```
+
+类似结果：
+
+```text
+drift / patch_product_all_a1 / step=2
+regime = be_continuation
+rows = 2
+mean_target_delta = -1.0078
+mean_regime_delta = +3.0156
+mean_competitor_minus_target_delta = +4.0234
+```
+
+以及：
+
+```text
+drift / patch_gate_up_pair_top64_a1 / step=2
+regime = be_continuation
+rows = 2
+mean_target_delta = -1.5078
+mean_regime_delta = +2.6094
+mean_competitor_minus_target_delta = +4.1172
+```
+
+解释：
+
+```text
+DS7B 的 be_continuation 可能和 product / gate_up patch 有耦合，
+但当前样本太少，只能作为低权重候选。
+```
+
+DS7B 的 echo 候选也存在：
+
+```text
+drift / no_instruction / step=1
+regime = echo
+rows = 2
+changed_to_rate = 1.0000
+winner_rate = 1.0000
+mean_regime_delta = +2.1250
+```
+
+但仍需加大样本后再判断。
+
+### 5. 本阶段新增拼图
+
+新增拼图 1：
+
+```text
+GLM4 的主要失败来源从读出层进一步定位到 prompt anchor：
+no_answer_anchor → For continuation；
+explain_instruction → newline / because。
+```
+
+新增拼图 2：
+
+```text
+qwen3 的 because/period 不是简单开关，
+而是多 prompt 条件共同改变 target 与 competitor 的相对压力。
+```
+
+新增拼图 3：
+
+```text
+qwen3 repeat_instruction 可以把 because_reason winner 拉到 answer_boundary，
+但 answer_boundary 不等于 target answer。
+```
+
+新增拼图 4：
+
+```text
+DS7B 的 be_continuation 与 product/gate_up patch 有候选耦合，
+但当前样本量不足，只能低权重记录。
+```
+
+新增拼图 5：
+
+```text
+competitor source localization 必须区分三类来源：
+prompt source；
+MLP patch coupling source；
+winner switch source。
+```
+
+### 6. 问题和硬伤
+
+#### 6.1 每桶样本量偏小
+
+很多候选每桶只有：
+
+```text
+rows = 2 到 4
+```
+
+所以 Phase232 是候选定位，不是强统计结论。
+
+#### 6.2 来源定位仍停留在读出结果层
+
+本阶段没有重新 hook 模型内部激活。
+
+因此当前只能说：
+
+```text
+某些 prompt/patch 条件与 competitor pressure 上升或 winner switch 有关。
+```
+
+还不能说：
+
+```text
+某个 layer/channel/head 是 because_reason 或 period_stop 的真实来源。
+```
+
+#### 6.3 regime group 仍是人工集合
+
+because_reason、period_stop、for_continuation 等仍是人工词元组。
+
+这适合当前机制追踪，但还不是自动发现的完整读出图谱。
+
+#### 6.4 qwen3 的来源关系复杂
+
+qwen3 中：
+
+```text
+no_answer_anchor 会相对增强 because/period；
+because_removed 会触发 period_stop；
+repeat_instruction 会拉到 answer_boundary。
+```
+
+这说明 qwen3 的读出机制不是单一 competitor source，而是多个边界机制联动。
+
+### 7. 理论进展
+
+Phase232 对机制链条的更新是：
+
+```text
+PromptPattern
+→ PromptAnchor / InstructionFrame
+→ Gate/Up/Product
+→ ResidualWrite
+→ TargetPressure
+→ CompetitorPressureField
+→ ReadoutRegimeSwitch
+→ ThresholdBarrier
+→ TopToken
+```
+
+核心进展不是提出新理论，而是把：
+
+```text
+CompetitorPressureField
+```
+
+进一步拆成：
+
+```text
+prompt source
+patch coupling source
+winner switch source
+```
+
+更谨慎的公式：
+
+$$
+\mathrm{CompetitorSource}_r
+=
+S_{prompt,r}
++
+S_{patch,r}
++
+S_{switch,r}
+$$
+
+其中：
+
+```text
+S_prompt,r = prompt / anchor 对 regime r 的压力影响；
+S_patch,r = MLP patch 对 regime r 的耦合影响；
+S_switch,r = winner 从其他 regime 切换到 r 的影响。
+```
+
+当前只完成候选定位，还没有完成内部因果来源闭合。
+
+### 8. 下一步任务
+
+Phase232 仍属于同一阶段：
+
+```text
+readout pressure / readout regime / threshold barrier / competitor source
+```
+
+下一步应进入：
+
+```text
+Phase233: competitor source hook causal validation
+（竞争来源 hook 级因果验证）
+```
+
+优先测试对象：
+
+```text
+GLM4:
+no_answer_anchor → for_continuation；
+explain_instruction → newline / because。
+
+qwen3:
+no_answer_anchor → because/period 相对增强；
+because_removed → period_stop；
+repeat_instruction → answer_boundary。
+
+DS7B:
+product/gate_up patch → be_continuation。
+```
+
+测试要求：
+
+```text
+1. 三模型依次运行，避免 GPU OOM；
+2. 样本量需要大于 Phase232 当前每桶 2 到 4 的规模；
+3. 先做自然 prompt 触发下的 layer/channel pressure map；
+4. 再做 source-level suppression，不要直接做 target patch；
+5. 记录 target、winner、second competitor，避免只压 winner 后被第二机制接管。
+```
+
+### 9. 阶段结论
+
+Phase232 证明：
+
+```text
+Phase231 的判断基本正确，但还只是上界；
+真正下一步必须定位 competitor source。
+```
+
+当前最可靠的来源候选是：
+
+```text
+GLM4 的 no_answer_anchor / explain_instruction regime switch。
+```
+
+当前中等可靠的候选是：
+
+```text
+qwen3 的 no_answer_anchor / because_removed / repeat_instruction 对 because、period、answer_boundary 的联动。
+```
+
+当前低权重候选是：
+
+```text
+DS7B 的 product/gate_up 与 be_continuation 耦合。
+```
+
+因此，接下来最可行的突破不是继续增加读出层公式，而是做 hook 级来源验证：
+
+```text
+从 prompt source 找到内部写入位置，
+再从内部写入位置做 source-level causal suppression。
+```
+
+## Phase 233: 竞争来源 hook 级因果验证 [2026-07-07 03:51]
+
+### 1. 本阶段任务
+
+本阶段分析 Phase232 的判断是否正确，并继续完成同一阶段任务。
+
+Phase232 的结论基本正确：
+
+```text
+Phase232 不是闭合验证，
+而是 competitor source localization（竞争来源候选定位）。
+```
+
+它指出：
+
+```text
+GLM4:
+主要是 prompt anchor 触发 regime switch。
+
+qwen3:
+because_reason / period_stop 来源更分散。
+
+DS7B:
+be_continuation 与 product / gate_up patch 有低权重候选耦合。
+```
+
+Phase233 的目标是把这些候选推进到 hook 级验证：
+
+```text
+在模型内部采集 full prompt 与 variant prompt 的 gate/up/product/down_out 差分；
+再把这个差分从 variant prompt 中减回去；
+观察 competitor regime 是否下降、target margin 是否改善、winner 是否改变。
+```
+
+这一步不是继续增强 target，而是做 source-level causal suppression（来源级因果抑制）。
+
+### 2. 脚本和运行方式
+
+脚本：
+
+```text
+tests/gpt5/phase233_competitor_source_hook_causal_validation.py
+```
+
+顺序运行脚本：
+
+```text
+tests/gpt5/run_phase233_competitor_source_hook_causal_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase233_competitor_source_hook_causal_validation/competitor_source_hook_causal_validation/
+```
+
+本阶段按顺序加载模型：
+
+```text
+1. qwen3
+2. GLM4
+3. DS7B
+```
+
+运行记录：
+
+```text
+qwen3:
+observation_rows = 540
+suppression_rows = 3240
+
+GLM4:
+observation_rows = 540
+suppression_rows = 3240
+
+DS7B:
+observation_rows = 288
+suppression_rows = 1728
+
+cross-model:
+observation_rows = 1368
+suppression_rows = 8208
+```
+
+DS7B 样本仍少：
+
+```text
+success_rows = 6
+drift_rows = 2
+```
+
+因此 DS7B 结果继续低权重处理。
+
+### 3. 算法原理
+
+对同一个样本、同一个 step，比较：
+
+```text
+full prompt
+variant prompt
+```
+
+在 source layer 的内部状态差分：
+
+$$
+\Delta h_c
+=
+h_c^{variant}
+-
+h_c^{full}
+$$
+
+其中组件：
+
+```text
+c ∈ {gate, up, product, down_out}
+```
+
+然后在 variant prompt 上做来源抑制：
+
+$$
+h_c^{patched}
+=
+h_c^{variant}
+-
+\alpha \Delta h_c
+$$
+
+其中：
+
+```text
+alpha ∈ {0.5, 1.0}
+```
+
+观察读出变化：
+
+$$
+\Delta z_r^{suppress}
+=
+z_r^{patched}
+-
+z_r^{variant}
+$$
+
+以及：
+
+$$
+\Delta \mathrm{Margin}^{suppress}
+=
+\mathrm{TargetMargin}^{patched}
+-
+\mathrm{TargetMargin}^{variant}
+$$
+
+如果：
+
+```text
+regime_suppression_delta < 0
+target_margin_delta_after_suppression > 0
+```
+
+说明该内部差分对 competitor regime 有因果贡献，而且抑制它能改善 target margin。
+
+但更严格还要看：
+
+```text
+winner_changed_by_suppression
+```
+
+因为只降低 competitor 不等于输出闭合。
+
+### 4. 关键结果
+
+#### 4.1 GLM4: no_answer_anchor → For continuation 得到最强 hook 支持
+
+Prompt source observation：
+
+```text
+success / no_answer_anchor / step=1 / for_continuation
+rows = 10
+winner_switch_rate = 1.0000
+mean_target_delta = -8.3561
+mean_regime_delta = +9.0469
+mean_competitor_minus_target_delta = +17.4029
+variant_winner = for_continuation
+top_token = For
+```
+
+drift 组也成立：
+
+```text
+drift / no_answer_anchor / step=1 / for_continuation
+rows = 10
+winner_switch_rate = 1.0000
+mean_target_delta = -3.9463
+mean_regime_delta = +7.1797
+mean_competitor_minus_target_delta = +11.1260
+top_token = For
+```
+
+来源抑制结果：
+
+```text
+success / no_answer_anchor / step=1 / down_out / alpha=1.0 / for_continuation
+rows = 10
+regime_reduction_rate = 1.0000
+target_margin_help_rate = 1.0000
+mean_regime_suppression_delta = -1.1250
+mean_target_delta_after_suppression = +3.3186
+mean_target_margin_delta_after_suppression = +4.4436
+winner_changed_rate = 0.0000
+suppressed_winner = for_continuation
+```
+
+product 与 gate_up_pair 也类似：
+
+```text
+product alpha=1.0:
+mean_regime_suppression_delta = -1.1062
+mean_target_delta_after_suppression = +3.3467
+mean_target_margin_delta_after_suppression = +4.4529
+
+gate_up_pair alpha=1.0:
+mean_regime_suppression_delta = -1.1187
+mean_target_delta_after_suppression = +3.2936
+mean_target_margin_delta_after_suppression = +4.4123
+```
+
+判断：
+
+```text
+GLM4 的 no_answer_anchor → For continuation 有明确 hook 级因果贡献。
+```
+
+但也有一个重要硬结果：
+
+```text
+winner_changed_rate = 0
+```
+
+说明 source suppression 能降低 For pressure、改善 target margin，但还不足以把 winner 从 For continuation 拉走。
+
+所以这是强因果贡献，不是闭合。
+
+#### 4.2 GLM4: explain_instruction → newline / because 也得到支持
+
+Prompt observation：
+
+```text
+success / explain_instruction / step=2 / because_reason
+rows = 10
+winner_switch_rate = 1.0000
+mean_target_delta = -5.5812
+mean_regime_delta = +7.5422
+mean_competitor_minus_target_delta = +13.1234
+variant_winner = newline_boundary
+top_token = newline
+```
+
+```text
+success / explain_instruction / step=3 / because_reason
+rows = 10
+winner_switch_rate = 1.0000
+mean_target_delta = -4.4062
+mean_regime_delta = +8.6594
+mean_competitor_minus_target_delta = +13.0656
+variant_winner = because_reason
+top_token = because
+```
+
+来源抑制：
+
+```text
+success / explain_instruction / step=2 / down_out / because_reason
+rows = 10
+regime_reduction_rate = 1.0000
+target_margin_help_rate = 1.0000
+mean_regime_suppression_delta = -0.2437
+mean_target_delta_after_suppression = +1.8500
+mean_target_margin_delta_after_suppression = +1.9688
+winner_changed_rate = 0.0000
+```
+
+判断：
+
+```text
+explain_instruction 的 newline / because 来源也有 hook 级因果贡献，
+但仍未让 winner 改变。
+```
+
+#### 4.3 qwen3: no_answer_anchor 的 because/period 来源得到部分支持
+
+Prompt observation：
+
+```text
+success / no_answer_anchor / step=1 / because_reason
+rows = 10
+winner_switch_rate = 1.0000
+mean_target_delta = -5.3719
+mean_regime_delta = +2.7375
+mean_competitor_minus_target_delta = +8.1094
+variant_winner = then_continuation
+top_token = Then
+```
+
+```text
+drift / no_answer_anchor / step=1 / because_reason
+rows = 10
+winner_switch_rate = 0.8000
+mean_target_delta = -10.9062
+mean_regime_delta = +3.5000
+mean_competitor_minus_target_delta = +14.4062
+variant_winner = then_continuation / the_continuation
+```
+
+来源抑制：
+
+```text
+success / no_answer_anchor / step=1 / product / alpha=1.0 / because_reason
+rows = 10
+regime_reduction_rate = 1.0000
+target_margin_help_rate = 1.0000
+mean_regime_suppression_delta = -0.9062
+mean_target_delta_after_suppression = -0.0906
+mean_target_margin_delta_after_suppression = +0.6844
+winner_changed_rate = 0.5000
+```
+
+period_stop 也类似：
+
+```text
+success / no_answer_anchor / step=1 / product / alpha=1.0 / period_stop
+rows = 10
+regime_reduction_rate = 1.0000
+target_margin_help_rate = 1.0000
+mean_regime_suppression_delta = -1.2000
+mean_target_margin_delta_after_suppression = +0.6844
+winner_changed_rate = 0.5000
+```
+
+判断：
+
+```text
+qwen3 的 no_answer_anchor 内部差分确实影响 because/period pressure。
+```
+
+但 winner 改变后并不稳定进入 target answer，而是分散到：
+
+```text
+answer_boundary
+echo
+the_continuation
+then_continuation
+```
+
+这验证了 Phase232 的判断：
+
+```text
+qwen3 不是单一 competitor source；
+它是多个边界机制联动。
+```
+
+#### 4.4 qwen3: repeat_instruction 不是简单 answer 修复
+
+Prompt observation：
+
+```text
+success / repeat_instruction / step=2
+winner = comma_repeat
+top_token = comma
+target_delta = +4.9656
+```
+
+这说明 repeat_instruction 能显著提高 target pressure，但也强烈触发：
+
+```text
+comma_repeat
+```
+
+drift step=3 有部分 answer_boundary：
+
+```text
+drift / repeat_instruction / step=3 / answer_boundary
+rows = 10
+winner_switch_rate = 0.4000
+mean_target_delta = +1.1625
+mean_regime_delta = +3.9375
+top_token 包含 Answer
+```
+
+判断：
+
+```text
+repeat_instruction 不是纯 answer 修复；
+它会同时打开 comma_repeat / answer_boundary / be_continuation 等机制。
+```
+
+#### 4.5 DS7B: 有弱因果信号，但仍低权重
+
+Prompt observation：
+
+```text
+drift / no_instruction / step=1 / be_continuation
+rows = 2
+winner_switch_rate = 1.0000
+mean_target_delta = -0.0625
+mean_regime_delta = +2.7500
+variant_winner = echo
+```
+
+来源抑制中：
+
+```text
+success / short_answer_instruction / step=3 / product / alpha=1.0 / be_continuation
+rows = 6
+regime_reduction_rate = 1.0000
+target_margin_help_rate = 1.0000
+mean_regime_suppression_delta = -0.3958
+mean_target_margin_delta_after_suppression = +0.1836
+winner_changed_rate = 0.0000
+```
+
+判断：
+
+```text
+DS7B 的 be_continuation 有内部来源信号，
+但样本少、效应小、winner 不变，因此只能低权重记录。
+```
+
+### 5. 本阶段新增拼图
+
+新增拼图 1：
+
+```text
+GLM4 的 no_answer_anchor → For continuation 已从候选定位推进到 hook 级因果贡献。
+```
+
+新增拼图 2：
+
+```text
+GLM4 的 source suppression 可以降低 For pressure 并改善 target margin，
+但不足以改变 winner。
+```
+
+新增拼图 3：
+
+```text
+qwen3 的 no_answer_anchor 对 because/period 有内部来源贡献，
+但抑制后会被 answer_boundary / echo / the / then 等第二竞争机制接管。
+```
+
+新增拼图 4：
+
+```text
+repeat_instruction 对 qwen3 不是纯修复，
+它同时触发 comma_repeat / answer_boundary 等模式。
+```
+
+新增拼图 5：
+
+```text
+DS7B 的 be_continuation 有弱 source-level 因果信号，
+但当前不能作为强证据。
+```
+
+### 6. 问题和硬伤
+
+#### 6.1 source suppression 是均值差分，不是精确通道定位
+
+本阶段使用：
+
+```text
+mean(variant - full)
+```
+
+作为来源差分。
+
+这能验证该内部组件是否有因果贡献，但还没有精确到：
+
+```text
+具体 channel
+具体 head
+具体 token position
+```
+
+#### 6.2 抑制能改善 margin，但多数不能改变 winner
+
+最典型的是 GLM4：
+
+```text
+For pressure 降低；
+target margin 改善；
+winner 仍是 For。
+```
+
+这说明 competitor field 很可能不是单点来源，而是：
+
+```text
+prompt anchor 改变后形成的整体状态场。
+```
+
+#### 6.3 qwen3 有第二竞争机制接管
+
+qwen3 抑制 because/period 后，经常转到：
+
+```text
+answer_boundary
+echo
+the_continuation
+then_continuation
+```
+
+这证明 Phase231 的担忧成立：
+
+```text
+只压当前 winner 后，第二 competitor 可能接管。
+```
+
+#### 6.4 DS7B 样本仍不足
+
+DS7B 只有：
+
+```text
+success_rows = 6
+drift_rows = 2
+```
+
+因此只作为敏感性参考。
+
+### 7. 理论进展
+
+Phase233 对机制链的推进是：
+
+```text
+PromptAnchor
+→ MLP gate/up/product/down_out source delta
+→ CompetitorPressure
+→ TargetMargin
+→ WinnerRegime
+```
+
+更准确的公式：
+
+$$
+\Delta z_r
+=
+F_r
+\left(
+h^{variant}
+\right)
+-
+F_r
+\left(
+h^{full}
+\right)
+$$
+
+来源抑制：
+
+$$
+h^{patched}
+=
+h^{variant}
+-
+\alpha
+\left(
+h^{variant}
+-
+h^{full}
+\right)
+$$
+
+如果：
+
+$$
+z_r(h^{patched}) < z_r(h^{variant})
+$$
+
+则说明该内部差分对 regime r 有因果贡献。
+
+但闭合还需要：
+
+$$
+\mathrm{Winner}(h^{patched})
+=
+\mathrm{TargetRegime}
+$$
+
+当前大多数结果还没有满足这个条件。
+
+### 8. 阶段边界判断
+
+Phase233 仍属于同一阶段：
+
+```text
+readout pressure / readout regime / threshold barrier / competitor source
+```
+
+本阶段完成了：
+
+```text
+source candidate
+→ hook-level causal contribution
+```
+
+但没有完成：
+
+```text
+source-level full closure
+```
+
+所以可以继续自动推进到下一步，但下一步必须收紧目标，不应继续扩展理论名词。
+
+### 9. 下一步任务
+
+下一阶段建议：
+
+```text
+Phase234: second competitor takeover atlas
+（第二竞争机制接管图谱）
+```
+
+原因：
+
+```text
+Phase233 已经证明压低当前 competitor 后，
+很多情况下 winner 不变或被第二 competitor 接管。
+```
+
+下一步应记录：
+
+```text
+1. 当前 winner；
+2. 抑制后 winner；
+3. 抑制前 second competitor；
+4. 抑制后 second competitor；
+5. target margin 是否改善；
+6. 是否进入 target answer、answer_boundary、the/then、echo、comma、newline 等机制。
+```
+
+优先模型：
+
+```text
+GLM4:
+no_answer_anchor / For continuation。
+
+qwen3:
+no_answer_anchor / because-period-the-then-answer boundary 联动。
+
+DS7B:
+低权重保留。
+```
+
+### 10. 阶段结论
+
+Phase233 是一个正结果，但不是闭合结果。
+
+它证明：
+
+```text
+Phase232 找到的部分 competitor source 不是纯相关；
+至少在 GLM4 和 qwen3 中，内部 gate/up/product/down_out 差分对 competitor pressure 有因果贡献。
+```
+
+同时它也证明：
+
+```text
+只找到当前 competitor source 还不够；
+抑制当前 competitor 后，winner 可能仍不变，或被第二竞争机制接管。
+```
+
+因此下一步不能再只问：
+
+```text
+如何压低当前 winner？
+```
+
+而要问：
+
+```text
+整个 competitor field 的接管顺序是什么？
+```
+
+这是完成真实读出图谱和语言编码机制闭合前必须补上的拼图。
+
+## Phase 234: 模式族图谱计划与测试矩阵 [2026-07-07 04:12]
+
+### 1. 本阶段任务
+
+本阶段综合两部分内容：
+
+```text
+1. Phase233 的校准：
+   hook-level causal contribution 成立，但 source-level full closure 未完成。
+
+2. 模式族系统规划：
+   不能继续只围绕单个模式、单个 patch、单个 competitor 迭代，
+   需要进入 PatternFamily Atlas Program（模式族图谱计划）。
+```
+
+Phase233 的判断基本正确：
+
+```text
+GLM4 和 qwen3 的部分 competitor source 不是纯相关；
+内部 gate/up/product/down_out 差分对 competitor pressure 有因果贡献。
+```
+
+但 Phase233 同时证明：
+
+```text
+抑制当前 competitor 后，
+winner 可能仍不变，
+也可能被第二竞争机制接管。
+```
+
+所以原本建议的：
+
+```text
+second competitor takeover atlas
+```
+
+不应丢掉，而应纳入更大的：
+
+```text
+readout_competition（竞争读出模式族）
+```
+
+作为后续模式族图谱计划中的优先模式。
+
+### 2. 本阶段是否进行模型测试
+
+本阶段没有重新进行 CUDA 模型测试。
+
+原因：
+
+```text
+当前任务是建立模式族分类、模式清单、测试层级和机器可读测试矩阵。
+```
+
+这属于实验设计和数据结构阶段。真正的三模型测试应放到下一阶段：
+
+```text
+Phase235: behavior_family_benchmark
+```
+
+届时再按要求依次运行：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+### 3. 新增脚本和结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase234_pattern_family_atlas_matrix.py
+```
+
+输出目录：
+
+```text
+tests/result/phase234_pattern_family_atlas_matrix/pattern_family_atlas_matrix/
+```
+
+生成结果：
+
+```text
+families = 9
+modes = 72
+seed_test_cases = 36
+test_levels = 8
+```
+
+输出文件：
+
+```text
+phase234_pattern_family_atlas_matrix.json
+phase234_pattern_family_atlas_matrix.md
+phase234_pattern_family_rows.jsonl
+phase234_pattern_mode_rows.jsonl
+phase234_seed_test_case_rows.jsonl
+phase234_program_phase_rows.jsonl
+```
+
+同时更新了：
+
+```text
+research/MainAnalysis/20260707_03_语言的模式族测试方案.md
+```
+
+在尾部补充了 Phase234 可执行测试矩阵。
+
+### 4. 九大模式族
+
+Phase234 将语言模式族整理为九类：
+
+```text
+1. content_knowledge（内容知识模式族）
+2. output_protocol（输出协议模式族）
+3. reasoning_constraint（推理约束模式族）
+4. syntax_structure（语法结构模式族）
+5. language_action（语言动作模式族）
+6. cross_lingual（跨语言模式族）
+7. readout_competition（竞争读出模式族）
+8. state_drift（状态维持与漂移模式族）
+9. closure（闭合模式族）
+```
+
+这些不是语义分类，而是内部运行机制分类。
+
+其中当前最高优先级是：
+
+```text
+content_knowledge
+output_protocol
+readout_competition
+closure
+```
+
+原因：
+
+```text
+它们直接连接当前已有结果：
+对象-关系-值任务、
+explain/repeat 输出协议、
+读出竞争、
+模型闭合失败。
+```
+
+### 5. 统一测试层级
+
+每个模式都按八层记录：
+
+```text
+Level 1: behavior
+Level 2: prompt_trigger
+Level 3: gate_up_product
+Level 4: residual_state
+Level 5: readout_competition
+Level 6: competitor_source
+Level 7: rollout
+Level 8: closure
+```
+
+核心目的是避免：
+
+```text
+每个模式重新发明一套指标。
+```
+
+以后每个模式都按同一套字段积累：
+
+```text
+行为表现；
+prompt 触发；
+MLP 内部状态；
+残差写入；
+读出竞争；
+竞争来源；
+多 token 展开；
+闭合状态。
+```
+
+### 6. 机器可读种子测试集
+
+Phase234 先生成 36 个种子测试用例。
+
+主体来自：
+
+```text
+content_knowledge / object_relation_value
+```
+
+并交叉四种输出协议：
+
+```text
+short
+explain
+repeat
+list
+```
+
+种子对象包括：
+
+```text
+apple → color → red
+banana → color → yellow
+grass → color → green
+snow → color → white
+coal → color → black
+lemon → taste → sour
+hammer → function → hit
+wheel → part_of → car
+```
+
+另外加入特殊样例：
+
+```text
+reason_negation_0001
+syntax_boundary_0001
+readout_takeover_0001
+closure_stop_0001
+```
+
+这些样例用于把已有 readout competition 和 closure 问题接入模式族计划。
+
+### 7. 与 Phase233 的衔接
+
+Phase233 的关键问题：
+
+```text
+current winner 被压低后，
+second competitor 接管。
+```
+
+已经在 Phase234 中进入：
+
+```text
+readout_competition / second_competitor_takeover
+```
+
+这说明下一步不应只做单一：
+
+```text
+For suppression
+because suppression
+period suppression
+```
+
+而要做：
+
+```text
+winner sequence / competitor takeover sequence
+```
+
+也就是记录：
+
+```text
+winner_before
+second_before
+winner_after
+second_after
+target_margin_delta
+rollout_pattern
+```
+
+### 8. 后续阶段安排
+
+Phase234 生成了如下阶段路线：
+
+```text
+Phase234:
+pattern_family_matrix
+建立模式族、模式、测试层级、样例任务的机器可读矩阵。
+
+Phase235:
+behavior_family_benchmark
+先跑行为层模式分类，覆盖 qwen3、GLM4、DS7B。
+
+Phase236:
+prompt_trigger_family_atlas
+对高差异模式做 prompt trigger 和 anchor 消融。
+
+Phase237:
+gate_product_family_atlas
+采集 gate/up/product/down_out 跨模式差分。
+
+Phase238:
+readout_competition_family_atlas
+统一记录 winner、second competitor、remaining gap。
+
+Phase239:
+source_suppression_family_validation
+选择最稳定模式做 source-level suppression。
+
+Phase240:
+closure_candidate_family_validation
+选择少数模式尝试完整闭合。
+```
+
+### 9. 当前判断
+
+这次规划是必要的。
+
+原因：
+
+```text
+Phase209 到 Phase233 已经证明：
+单个模式中的局部因果链可以被追踪，
+但语言机制不可能只靠单个模式闭合。
+```
+
+要破解语言编码机制，必须比较：
+
+```text
+模式族之间的共用机制；
+模式之间的差分机制；
+模式组合时的竞争机制；
+闭合模式和漂移模式的区别。
+```
+
+### 10. 问题和硬伤
+
+#### 10.1 目前只是矩阵，不是测试结果
+
+Phase234 生成的是：
+
+```text
+测试结构
+```
+
+不是模型行为结果。
+
+下一阶段必须实际跑三模型行为层测试。
+
+#### 10.2 种子测试仍偏内容知识
+
+当前 36 个种子测试主要从对象-关系-值扩展。
+
+否定、翻译、条件推理、语法嵌套还只是少量特殊样例。
+
+Phase235 需要扩充这些模式族的数据量。
+
+#### 10.3 小模型偏差仍需保留
+
+即使后续跑 qwen3、GLM4、DS7B，也必须保留：
+
+```text
+30% 到 50% 小模型偏差空间。
+```
+
+不能把小模型中的粗糙竞争场直接当成真实语言编码机制。
+
+### 11. 阶段结论
+
+Phase234 完成了从：
+
+```text
+单模式机制追踪
+```
+
+到：
+
+```text
+模式族图谱计划
+```
+
+的结构化过渡。
+
+当前最可行路线是：
+
+```text
+先用 Phase234 的矩阵做 Phase235 行为层大样本测试；
+再选择稳定差异最大的模式进入 hook 级机制测试；
+最后用少数模式做闭合验证。
+```
+
+这比继续单点 patch 更有希望积累真实客观现象的拼图。
+
+## Phase 235: 模式图谱固定数据契约与客户端索引 [2026-07-07 04:43]
+
+### 1. 本阶段任务
+
+本阶段分析了 Phase234 之后的补充要求：
+
+```text
+1. 所有测试必须输出固定数据格式，方便可视化客户端读取；
+2. 可视化客户端需要独立的模式图谱界面；
+3. 核心任务是追踪每个模式在深度神经网络内部的脉络，并进行跨数据统计。
+```
+
+判断结果：
+
+```text
+以上补充是正确的，而且应该优先于继续扩大行为测试。
+```
+
+原因是，如果没有固定数据契约，后续 qwen3、GLM4、DS7B 的每次测试都会变成孤立记录，不能稳定进入图谱，也不能积累全局模式脉络。
+
+### 2. 已完成工作
+
+新增脚本：
+
+```text
+tests/gpt5/phase235_pattern_atlas_data_contract.py
+```
+
+生成固定数据包：
+
+```text
+tests/result/pattern_family_atlas/v1/
+```
+
+输出文件：
+
+```text
+manifest.json
+schema.json
+client_index.json
+families.jsonl
+modes.jsonl
+test_cases.jsonl
+runs.jsonl
+observations.jsonl
+metrics.jsonl
+graph_nodes.jsonl
+graph_edges.jsonl
+progress.json
+summary.md
+phase235_summary.json
+```
+
+新增客户端规范：
+
+```text
+frontend/PATTERN_ATLAS_CLIENT_SPEC.md
+```
+
+同时更新主研究文档：
+
+```text
+research/MainAnalysis/20260707_04_语言模式图谱+可视化客户端方案.md
+```
+
+### 3. 客观输出结果
+
+本阶段生成的数据规模：
+
+```text
+模式族：9
+模式：72
+种子测试项：36
+图谱节点：81
+已知机制边：5
+JSONL 总行数：208
+```
+
+数据包入口：
+
+```text
+tests/result/pattern_family_atlas/v1/manifest.json
+```
+
+客户端索引：
+
+```text
+tests/result/pattern_family_atlas/v1/client_index.json
+```
+
+当前支持的客户端页面：
+
+```text
+模式图谱总览；
+模式族详情；
+单模式详情；
+机制链路图；
+跨模型对比。
+```
+
+### 4. 已导入的机制边
+
+本阶段没有宣称发现新的模型机制，而是把 Phase229 到 Phase233 中较稳定的机制证据导入图谱：
+
+```text
+GLM4 no_answer_anchor -> For 延续竞争；
+GLM4 explain 指令 -> because 竞争；
+qwen3 no_answer_anchor -> because/period 竞争；
+qwen3 period 抑制 -> second competitor takeover；
+DS7B short_answer -> be continuation 弱候选。
+```
+
+这些边目前主要属于：
+
+```text
+输出协议；
+读出竞争；
+局部 hook 因果支持。
+```
+
+它们还不能代表完整语言编码机制。
+
+### 5. 固定证据公式
+
+本阶段采用的证据分数为：
+
+$$
+\boxed{
+E
+=
+0.15B
++
+0.15S
++
+0.20R
++
+0.25H
++
+0.15C
++
+0.10M
+}
+$$
+
+其中：
+
+```text
+B = 行为一致性；
+S = 状态一致性；
+R = 读出一致性；
+H = hook 因果支持；
+C = 闭合支持；
+M = 跨模型一致性。
+```
+
+需要注意：
+
+```text
+这个公式只是证据聚合公式，不是最终智能理论公式。
+```
+
+### 6. 当前统一机制表达
+
+当前仍然保留 Phase234 的核心骨架：
+
+$$
+\boxed{
+\mathrm{LanguageMechanism}
+=
+\sum_i
+\alpha_i(x,t)
+P_i(x,t)
+}
+$$
+
+其中每个模式脉络为：
+
+$$
+\boxed{
+P_i
+=
+\mathrm{TriggerTrace}_i
+\circ
+\mathrm{GateProductTrace}_i
+\circ
+\mathrm{ResidualWriteTrace}_i
+\circ
+\mathrm{ReadoutTrace}_i
+\circ
+\mathrm{CompetitorTrace}_i
+\circ
+\mathrm{RolloutTrace}_i
+\circ
+\mathrm{ClosureTrace}_i
+}
+$$
+
+模式族之间的关系仍然表达为：
+
+$$
+\boxed{
+P_i
+=
+P_{\mathrm{shared}}
++
+\Delta P_i
+}
+$$
+
+本阶段的进展不是修改理论名词，而是把这个公式落到可积累的数据结构中。
+
+### 7. 严格审视
+
+第一，Phase235 不是模型行为测试。
+
+`observations.jsonl` 当前只有格式占位记录，不能当作 qwen3、GLM4、DS7B 的新实验结论。
+
+第二，当前机制边分布不均衡。
+
+读出竞争和输出协议证据较多，但知识网络、语法系统、推理约束、跨语言模式仍然缺少等价强度的 hook 级证据。
+
+第三，小模型偏差仍然很大。
+
+当前测试模型可能存在：
+
+```text
+30% 到 50% 的内部结构偏差。
+```
+
+所以图谱中的边应当被看作“小模型可观测脉络”，不能直接等同于真实语言能力的完整数学结构。
+
+### 8. 阶段判断
+
+Phase235 与 Phase234 属于同一阶段性目标：
+
+```text
+从单模式机制追踪转向模式族全局图谱。
+```
+
+本阶段完成了这一目标中最基础的一环：
+
+```text
+让后续所有测试可以进入同一套固定数据格式和同一个客户端入口。
+```
+
+因此当前阶段可以继续自动推进到下一步。
+
+### 9. 下一阶段任务
+
+Phase236 应该执行：
+
+```text
+模式族行为基准测试。
+```
+
+具体要求：
+
+```text
+1. 使用 qwen3、GLM4、DS7B 依次测试，避免 GPU 内存溢出；
+2. 使用 Phase234 的模式族和模式矩阵；
+3. 扩大重点模式族的数据量；
+4. 每个 case 的输出写入 observations.jsonl；
+5. 每个模式和模式族的统计写入 metrics.jsonl；
+6. 更新 progress.json、graph_nodes.jsonl、graph_edges.jsonl；
+7. 不急于理论闭合，优先找稳定成功、稳定漂移和跨模型分歧。
+```
+
+Phase236 的核心问题不是：
+
+```text
+某个 patch 能不能修复输出。
+```
+
+而是：
+
+```text
+不同语言模式族在三模型中的自然行为分布是什么，
+哪些模式值得进入 hook 级机制追踪。
+```
+
+## Phase 236: 模式族行为基准测试与图谱回写 [2026-07-07 04:51]
+
+### 1. 本阶段任务
+
+Phase235 完成固定数据契约后，Phase236 继续同一阶段目标：
+
+```text
+把模式族图谱从结构计划推进到真实跨模型行为观测。
+```
+
+本阶段执行了 qwen3、GLM4、DS7B 三个模型的顺序测试，并把测试结果写入固定数据包：
+
+```text
+tests/result/pattern_family_atlas/v1/
+```
+
+### 2. 新增脚本
+
+测试脚本：
+
+```text
+tests/gpt5/phase236_pattern_family_behavior_benchmark.py
+```
+
+顺序运行脚本：
+
+```text
+tests/gpt5/run_phase236_pattern_family_behavior_benchmark.sh
+```
+
+三模型执行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型完成后释放 CUDA 显存，再加载下一个模型。
+
+脚本检查：
+
+```text
+python -m py_compile: 通过
+bash -n: 通过
+```
+
+### 3. 输出目录
+
+独立 Phase236 结果：
+
+```text
+tests/result/phase236_pattern_family_behavior_benchmark/pattern_family_behavior_benchmark/
+```
+
+客户端图谱回写：
+
+```text
+tests/result/pattern_family_atlas/v1/
+```
+
+回写文件包括：
+
+```text
+observations.jsonl
+metrics.jsonl
+graph_edges.jsonl
+progress.json
+summary.md
+```
+
+### 4. 算法原理
+
+本阶段不做 hook，不进入内部激活干预，只做行为层和读出层轻量观测。
+
+对每个 case：
+
+```text
+1. 读取 prompt 和 target；
+2. 计算下一 token logits；
+3. 记录 target token rank、target logit、target margin；
+4. greedy 生成最多 24 个新 token；
+5. 根据输出是否包含目标词、是否以目标词开始、是否符合协议、是否过生成，得到行为评分；
+6. 写入固定 observations / metrics / graph_edges。
+```
+
+行为评分公式为：
+
+$$
+\boxed{
+S_{\mathrm{behavior}}
+=
+0.45 I_{\mathrm{contains}}
++
+0.25 I_{\mathrm{starts}}
++
+0.30 I_{\mathrm{pattern}}
+}
+$$
+
+其中：
+
+```text
+I_contains = 输出包含目标词；
+I_starts = 输出以目标词或目标首词元开始；
+I_pattern = 输出协议匹配。
+```
+
+读出边距为：
+
+$$
+\boxed{
+M_{\mathrm{target}}
+=
+\ell_{\mathrm{target}}
+-
+\max_j \ell_{\mathrm{regime}_j}
+}
+$$
+
+其中 `regime_j` 包括：
+
+```text
+because
+period
+comma
+For
+The
+be/is/are
+newline
+Answer
+```
+
+### 5. 客观测试结果
+
+跨模型总量：
+
+```text
+case_rows: 132
+observation_rows: 1056
+metric_rows: 60
+graph_edges: 36
+```
+
+总分布：
+
+```text
+mean_behavior_score: 0.6462
+pattern_match_rate: 0.6288
+```
+
+漂移类型：
+
+```text
+none: 83
+wrong_or_missing_target: 30
+over_generation: 19
+```
+
+分模型结果：
+
+```text
+qwen3:
+mean_behavior_score = 0.7307
+pattern_match_rate = 0.6591
+
+GLM4:
+mean_behavior_score = 0.6580
+pattern_match_rate = 0.6136
+
+DS7B:
+mean_behavior_score = 0.5500
+pattern_match_rate = 0.6136
+```
+
+### 6. 主要现象
+
+第一，简单模式存在一定跨模型稳定性。
+
+少量 closure、cross_lingual、language_action、reasoning_constraint、syntax_structure 样例表现较好。
+
+但这些模式族样例数量仍少，不能提前理论总结。
+
+第二，content_knowledge 暴露明显目标定义问题。
+
+失败集中出现在：
+
+```text
+hammer -> hit
+lemon taste -> sour
+wheel part_of -> car
+```
+
+模型常给出：
+
+```text
+drive
+strike
+tart
+rim
+vehicle
+```
+
+这些不一定是模型机制失败，可能是测试目标词过窄或关系定义歧义。
+
+第三，output_protocol 仍存在过生成。
+
+即使要求 one word，模型仍可能继续解释或重复提示。这与前面阶段关于停止控制和输出协议分离的结论一致。
+
+### 7. 严格审视
+
+第一，Phase236 是行为层基准，不是机制闭合。
+
+它只能回答：
+
+```text
+哪些模式输出稳定；
+哪些模式容易漂移；
+哪些模式值得进入 hook 追踪。
+```
+
+不能证明内部真实路径。
+
+第二，评分规则存在硬伤。
+
+当前评分过度依赖目标字符串匹配，不能正确处理：
+
+```text
+同义词；
+上位词；
+解释性正确答案；
+中文翻译变体；
+关系歧义。
+```
+
+第三，模式族数据不均衡。
+
+content_knowledge 样例多，其他模式族样例少，因此跨模式族比较还不公平。
+
+第四，小模型偏差仍然存在。
+
+当前模型内部结构可能较粗糙，行为漂移可能混合了：
+
+```text
+真实语言机制；
+小模型能力不足；
+提示格式脆弱；
+评分规则误差。
+```
+
+因此仍然保留：
+
+```text
+30% 到 50% 的偏差空间。
+```
+
+### 8. 理论进展
+
+本阶段没有修改统一理论名称，也不引入新的大理论。
+
+更准确的进展是：
+
+```text
+语言模式图谱开始有了可持续积累的行为层观测。
+```
+
+当前机制公式仍保持：
+
+$$
+\boxed{
+\mathrm{LanguageMechanism}
+=
+\sum_i
+\alpha_i(x,t)
+P_i(x,t)
+}
+$$
+
+其中：
+
+$$
+\boxed{
+P_i
+=
+\mathrm{TriggerTrace}_i
+\circ
+\mathrm{GateProductTrace}_i
+\circ
+\mathrm{ResidualWriteTrace}_i
+\circ
+\mathrm{ReadoutTrace}_i
+\circ
+\mathrm{CompetitorTrace}_i
+\circ
+\mathrm{RolloutTrace}_i
+\circ
+\mathrm{ClosureTrace}_i
+}
+$$
+
+Phase236 只补上了：
+
+$$
+\boxed{
+\mathrm{BehaviorObservation}
+\rightarrow
+\mathrm{PatternAtlas}
+}
+$$
+
+还没有补上：
+
+$$
+\boxed{
+\mathrm{BehaviorObservation}
+\rightarrow
+\mathrm{InternalTrace}
+\rightarrow
+\mathrm{CausalClosure}
+}
+$$
+
+### 9. 阶段结论
+
+Phase236 是正确推进。
+
+它完成了：
+
+```text
+固定格式
+-> 跨模型行为测试
+-> 客户端图谱回写
+```
+
+这一条基础链路。
+
+但它也暴露了一个关键问题：
+
+```text
+如果测试目标本身有歧义，后续 hook 追踪会追踪到评分误差，而不是真实机制差异。
+```
+
+### 10. 下一阶段任务
+
+Phase237 应该进入：
+
+```text
+prompt trigger / anchor 消融图谱。
+```
+
+但在进入更深 hook 之前，必须先修正 Phase236 暴露的问题：
+
+```text
+1. 为 content_knowledge 增加同义目标集合；
+2. 消除 function、taste、part_of 等关系歧义；
+3. 平衡 reasoning、syntax、cross_lingual、language_action 的样例数量；
+4. 区分“语义等价但目标词不同”和“真实模式漂移”；
+5. 再选稳定漂移模式进入 prompt trigger 和内部脉络追踪。
+```

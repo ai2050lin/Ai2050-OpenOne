@@ -1,0 +1,3824 @@
+{
+  "phase": 233,
+  "source_phase": 232,
+  "title": "Competitor source hook causal validation",
+  "status": "complete",
+  "timestamp": "2026-07-07 03:48:57",
+  "model": "qwen3",
+  "filter_rows": [
+    {
+      "phase": 233,
+      "row_kind": "phase233_source_row_count",
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "pattern_id": "answer_explain",
+      "success_rows": 10,
+      "drift_rows": 10
+    }
+  ],
+  "observation_rows": 540,
+  "suppression_rows": 3240,
+  "top_prompt_summary": [
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -5.371875,
+      "mean_regime_delta": 2.7375,
+      "mean_competitor_minus_target_delta": 8.109375,
+      "winner_switch_rate": 1.0,
+      "variant_winners": {
+        "then_continuation": 10
+      },
+      "variant_top_tokens": {
+        " Then": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -5.371875,
+      "mean_regime_delta": 2.25,
+      "mean_competitor_minus_target_delta": 7.621875,
+      "winner_switch_rate": 1.0,
+      "variant_winners": {
+        "then_continuation": 10
+      },
+      "variant_top_tokens": {
+        " Then": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -5.371875,
+      "mean_regime_delta": 0.25,
+      "mean_competitor_minus_target_delta": 5.621875,
+      "winner_switch_rate": 1.0,
+      "variant_winners": {
+        "then_continuation": 10
+      },
+      "variant_top_tokens": {
+        " Then": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 4.965625,
+      "mean_regime_delta": 1.403125,
+      "mean_competitor_minus_target_delta": -3.5625,
+      "winner_switch_rate": 1.0,
+      "variant_winners": {
+        "comma_repeat": 10
+      },
+      "variant_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 4.965625,
+      "mean_regime_delta": -1.95625,
+      "mean_competitor_minus_target_delta": -6.921875,
+      "winner_switch_rate": 1.0,
+      "variant_winners": {
+        "comma_repeat": 10
+      },
+      "variant_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 4.965625,
+      "mean_regime_delta": -2.0125,
+      "mean_competitor_minus_target_delta": -6.978125,
+      "winner_switch_rate": 1.0,
+      "variant_winners": {
+        "comma_repeat": 10
+      },
+      "variant_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -10.90625,
+      "mean_regime_delta": 3.5,
+      "mean_competitor_minus_target_delta": 14.40625,
+      "winner_switch_rate": 0.8,
+      "variant_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -10.90625,
+      "mean_regime_delta": -0.08125,
+      "mean_competitor_minus_target_delta": 10.825,
+      "winner_switch_rate": 0.8,
+      "variant_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -10.90625,
+      "mean_regime_delta": -0.1875,
+      "mean_competitor_minus_target_delta": 10.71875,
+      "winner_switch_rate": 0.8,
+      "variant_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 1,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 5.0,
+      "mean_regime_delta": 2.26875,
+      "mean_competitor_minus_target_delta": -2.73125,
+      "winner_switch_rate": 0.8,
+      "variant_winners": {
+        "space_boundary": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " brown": 4,
+        " Red": 2,
+        " red": 2,
+        " black": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 1,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 5.0,
+      "mean_regime_delta": 1.8625,
+      "mean_competitor_minus_target_delta": -3.1375,
+      "winner_switch_rate": 0.8,
+      "variant_winners": {
+        "space_boundary": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " brown": 4,
+        " Red": 2,
+        " red": 2,
+        " black": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 1,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 5.0,
+      "mean_regime_delta": -2.8625,
+      "mean_competitor_minus_target_delta": -7.8625,
+      "winner_switch_rate": 0.8,
+      "variant_winners": {
+        "space_boundary": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " brown": 4,
+        " Red": 2,
+        " red": 2,
+        " black": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 3.5625,
+      "mean_regime_delta": 1.3125,
+      "mean_competitor_minus_target_delta": -2.25,
+      "winner_switch_rate": 0.6,
+      "variant_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "variant_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 3.5625,
+      "mean_regime_delta": -0.2375,
+      "mean_competitor_minus_target_delta": -3.8,
+      "winner_switch_rate": 0.6,
+      "variant_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "variant_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 1,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 7.5625,
+      "mean_regime_delta": 2.04375,
+      "mean_competitor_minus_target_delta": -5.51875,
+      "winner_switch_rate": 0.6,
+      "variant_winners": {
+        "echo": 4,
+        "space_boundary": 4,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " brown": 5,
+        " red": 4,
+        " white": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 3.5625,
+      "mean_regime_delta": -1.975,
+      "mean_competitor_minus_target_delta": -5.5375,
+      "winner_switch_rate": 0.6,
+      "variant_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "variant_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 1,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 7.5625,
+      "mean_regime_delta": 0.9375,
+      "mean_competitor_minus_target_delta": -6.625,
+      "winner_switch_rate": 0.6,
+      "variant_winners": {
+        "echo": 4,
+        "space_boundary": 4,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " brown": 5,
+        " red": 4,
+        " white": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 1,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 7.5625,
+      "mean_regime_delta": -0.95625,
+      "mean_competitor_minus_target_delta": -8.51875,
+      "winner_switch_rate": 0.6,
+      "variant_winners": {
+        "echo": 4,
+        "space_boundary": 4,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " brown": 5,
+        " red": 4,
+        " white": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 1.1625,
+      "mean_regime_delta": 3.9375,
+      "mean_competitor_minus_target_delta": 2.775,
+      "winner_switch_rate": 0.4,
+      "variant_winners": {
+        "answer_boundary": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Answer": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 1.1625,
+      "mean_regime_delta": 1.9,
+      "mean_competitor_minus_target_delta": 0.7375,
+      "winner_switch_rate": 0.4,
+      "variant_winners": {
+        "answer_boundary": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Answer": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 1.1625,
+      "mean_regime_delta": -8.553125,
+      "mean_competitor_minus_target_delta": -9.715625,
+      "winner_switch_rate": 0.4,
+      "variant_winners": {
+        "answer_boundary": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Answer": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -4.253125,
+      "mean_regime_delta": 4.0625,
+      "mean_competitor_minus_target_delta": 8.315625,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "echo": 1
+      },
+      "variant_top_tokens": {
+        " a": 9,
+        "Wh": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -4.253125,
+      "mean_regime_delta": 1.79375,
+      "mean_competitor_minus_target_delta": 6.046875,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "echo": 1
+      },
+      "variant_top_tokens": {
+        " a": 9,
+        "Wh": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -4.253125,
+      "mean_regime_delta": -0.38125,
+      "mean_competitor_minus_target_delta": 3.871875,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "echo": 1
+      },
+      "variant_top_tokens": {
+        " a": 9,
+        "Wh": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -2.884375,
+      "mean_regime_delta": 0.325,
+      "mean_competitor_minus_target_delta": 3.209375,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "answer_boundary": 1
+      },
+      "variant_top_tokens": {
+        " a": 9,
+        "Answer": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 0.159375,
+      "mean_regime_delta": 2.496875,
+      "mean_competitor_minus_target_delta": 2.3375,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "variant_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -2.884375,
+      "mean_regime_delta": -1.21875,
+      "mean_competitor_minus_target_delta": 1.665625,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "answer_boundary": 1
+      },
+      "variant_top_tokens": {
+        " a": 9,
+        "Answer": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 0.159375,
+      "mean_regime_delta": 1.4625,
+      "mean_competitor_minus_target_delta": 1.303125,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "variant_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -2.884375,
+      "mean_regime_delta": -1.94375,
+      "mean_competitor_minus_target_delta": 0.940625,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "answer_boundary": 1
+      },
+      "variant_top_tokens": {
+        " a": 9,
+        "Answer": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 2,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -0.290625,
+      "mean_regime_delta": 0.43125,
+      "mean_competitor_minus_target_delta": 0.721875,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "variant_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 2,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -0.290625,
+      "mean_regime_delta": -0.0125,
+      "mean_competitor_minus_target_delta": 0.278125,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "variant_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 3,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 0.6125,
+      "mean_regime_delta": -0.41875,
+      "mean_competitor_minus_target_delta": -1.03125,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "echo": 1
+      },
+      "variant_top_tokens": {
+        " a": 5,
+        " red": 2,
+        " not": 2,
+        "Reason": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 0.159375,
+      "mean_regime_delta": -0.9875,
+      "mean_competitor_minus_target_delta": -1.146875,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "variant_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 3,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 0.6125,
+      "mean_regime_delta": -0.81875,
+      "mean_competitor_minus_target_delta": -1.43125,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "echo": 1
+      },
+      "variant_top_tokens": {
+        " a": 5,
+        " red": 2,
+        " not": 2,
+        "Reason": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 2,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -0.290625,
+      "mean_regime_delta": -2.85625,
+      "mean_competitor_minus_target_delta": -2.565625,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "variant_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 3,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 0.6125,
+      "mean_regime_delta": -2.496875,
+      "mean_competitor_minus_target_delta": -3.109375,
+      "winner_switch_rate": 0.1,
+      "variant_winners": {
+        "prose": 9,
+        "echo": 1
+      },
+      "variant_top_tokens": {
+        " a": 5,
+        " red": 2,
+        " not": 2,
+        "Reason": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -0.25,
+      "mean_regime_delta": 5.3125,
+      "mean_competitor_minus_target_delta": 5.5625,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -0.25,
+      "mean_regime_delta": 2.0125,
+      "mean_competitor_minus_target_delta": 2.2625,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 1.4375,
+      "mean_regime_delta": 3.2625,
+      "mean_competitor_minus_target_delta": 1.825,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "variant_top_tokens": {
+        ".": 4,
+        " can": 4,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -0.7125,
+      "mean_regime_delta": 1.1125,
+      "mean_competitor_minus_target_delta": 1.825,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "variant_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 1.4375,
+      "mean_regime_delta": 2.175,
+      "mean_competitor_minus_target_delta": 0.7375,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "variant_top_tokens": {
+        ".": 4,
+        " can": 4,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 1,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 0.63125,
+      "mean_regime_delta": 0.74375,
+      "mean_competitor_minus_target_delta": 0.1125,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "echo": 10
+      },
+      "variant_top_tokens": {
+        " Horse": 3,
+        " Cherry": 2,
+        " Car": 2,
+        " Dog": 2,
+        " White": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 1,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 0.425,
+      "mean_regime_delta": 0.35,
+      "mean_competitor_minus_target_delta": -0.075,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "echo": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " Red": 4,
+        " Brown": 4,
+        " Shark": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -0.7125,
+      "mean_regime_delta": -0.85,
+      "mean_competitor_minus_target_delta": -0.1375,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "variant_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 1,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 0.63125,
+      "mean_regime_delta": 0.403125,
+      "mean_competitor_minus_target_delta": -0.228125,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "echo": 10
+      },
+      "variant_top_tokens": {
+        " Horse": 3,
+        " Cherry": 2,
+        " Car": 2,
+        " Dog": 2,
+        " White": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 1,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": 0.425,
+      "mean_regime_delta": -0.125,
+      "mean_competitor_minus_target_delta": -0.55,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "echo": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " Red": 4,
+        " Brown": 4,
+        " Shark": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 3,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": -0.1,
+      "mean_regime_delta": -0.6625,
+      "mean_competitor_minus_target_delta": -0.5625,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Reason": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 1,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 0.425,
+      "mean_regime_delta": -0.925,
+      "mean_competitor_minus_target_delta": -1.35,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "echo": 8,
+        "the_continuation": 2
+      },
+      "variant_top_tokens": {
+        " Red": 4,
+        " Brown": 4,
+        " Shark": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 3,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "mean_target_delta": -0.1,
+      "mean_regime_delta": -1.65,
+      "mean_competitor_minus_target_delta": -1.55,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Reason": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -0.7125,
+      "mean_regime_delta": -2.3,
+      "mean_competitor_minus_target_delta": -1.5875,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "variant_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 1,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": 0.63125,
+      "mean_regime_delta": -1.559375,
+      "mean_competitor_minus_target_delta": -2.190625,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "echo": 10
+      },
+      "variant_top_tokens": {
+        " Horse": 3,
+        " Cherry": 2,
+        " Car": 2,
+        " Dog": 2,
+        " White": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -0.25,
+      "mean_regime_delta": -2.753125,
+      "mean_competitor_minus_target_delta": -2.503125,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "regime": "period_stop",
+      "rows": 10,
+      "mean_target_delta": 1.4375,
+      "mean_regime_delta": -1.25,
+      "mean_competitor_minus_target_delta": -2.6875,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "variant_top_tokens": {
+        ".": 4,
+        " can": 4,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 3,
+      "regime": "because_reason",
+      "rows": 10,
+      "mean_target_delta": -0.1,
+      "mean_regime_delta": -5.9765625,
+      "mean_competitor_minus_target_delta": -5.8765625,
+      "winner_switch_rate": 0.0,
+      "variant_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "variant_top_tokens": {
+        "Reason": 4,
+        " be": 4,
+        " a": 2
+      }
+    }
+  ],
+  "top_suppression_summary": [
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -1.2125,
+      "mean_target_delta_after_suppression": -0.090625,
+      "mean_target_margin_delta_after_suppression": 0.659375,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -1.2,
+      "mean_target_delta_after_suppression": -0.090625,
+      "mean_target_margin_delta_after_suppression": 0.684375,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.90625,
+      "mean_target_delta_after_suppression": -0.090625,
+      "mean_target_margin_delta_after_suppression": 0.684375,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.88125,
+      "mean_target_delta_after_suppression": -0.090625,
+      "mean_target_margin_delta_after_suppression": 0.659375,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.625,
+      "mean_target_delta_after_suppression": 0.0125,
+      "mean_target_margin_delta_after_suppression": 0.3875,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.61875,
+      "mean_target_delta_after_suppression": 0.009375,
+      "mean_target_margin_delta_after_suppression": 0.446875,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.6,
+      "mean_target_delta_after_suppression": 0.365625,
+      "mean_target_margin_delta_after_suppression": 0.740625,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.3,
+      "mean_regime_suppression_delta": -0.58125,
+      "mean_target_delta_after_suppression": -0.003125,
+      "mean_target_margin_delta_after_suppression": 0.434375,
+      "suppressed_winners": {
+        "then_continuation": 7,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 7,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.375,
+      "mean_target_delta_after_suppression": 0.009375,
+      "mean_target_margin_delta_after_suppression": 0.446875,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.3,
+      "mean_regime_suppression_delta": -0.34375,
+      "mean_target_delta_after_suppression": -0.003125,
+      "mean_target_margin_delta_after_suppression": 0.434375,
+      "suppressed_winners": {
+        "then_continuation": 7,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 7,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.2625,
+      "mean_target_delta_after_suppression": 0.0125,
+      "mean_target_margin_delta_after_suppression": 0.3875,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.25625,
+      "mean_target_delta_after_suppression": 0.365625,
+      "mean_target_margin_delta_after_suppression": 0.740625,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": 0.15,
+      "mean_target_delta_after_suppression": 0.009375,
+      "mean_target_margin_delta_after_suppression": 0.446875,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.3,
+      "mean_regime_suppression_delta": 0.1875,
+      "mean_target_delta_after_suppression": -0.003125,
+      "mean_target_margin_delta_after_suppression": 0.434375,
+      "suppressed_winners": {
+        "then_continuation": 7,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 7,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": 0.2125,
+      "mean_target_delta_after_suppression": -0.090625,
+      "mean_target_margin_delta_after_suppression": 0.684375,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": 0.225,
+      "mean_target_delta_after_suppression": -0.090625,
+      "mean_target_margin_delta_after_suppression": 0.659375,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.325,
+      "mean_target_delta_after_suppression": 0.0125,
+      "mean_target_margin_delta_after_suppression": 0.3875,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 1.0,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": 0.3875,
+      "mean_target_delta_after_suppression": 0.365625,
+      "mean_target_margin_delta_after_suppression": 0.740625,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.9,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -1.08125,
+      "mean_target_delta_after_suppression": -0.04375,
+      "mean_target_margin_delta_after_suppression": 0.80625,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.9,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": -0.990625,
+      "mean_target_delta_after_suppression": -0.04375,
+      "mean_target_margin_delta_after_suppression": 0.80625,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.9,
+      "winner_changed_rate": 0.5,
+      "mean_regime_suppression_delta": 0.2875,
+      "mean_target_delta_after_suppression": -0.04375,
+      "mean_target_margin_delta_after_suppression": 0.80625,
+      "suppressed_winners": {
+        "then_continuation": 5,
+        "answer_boundary": 2,
+        "the_continuation": 2,
+        "echo": 1
+      },
+      "suppressed_top_tokens": {
+        " Then": 5,
+        " Answer": 2,
+        " The": 2,
+        " Whale": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.2,
+      "mean_regime_suppression_delta": -1.19375,
+      "mean_target_delta_after_suppression": -0.075,
+      "mean_target_margin_delta_after_suppression": 0.525,
+      "suppressed_winners": {
+        "then_continuation": 6,
+        "echo": 2,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 6,
+        " Apple": 2,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.2,
+      "mean_regime_suppression_delta": -1.1625,
+      "mean_target_delta_after_suppression": -0.1125,
+      "mean_target_margin_delta_after_suppression": 0.5125,
+      "suppressed_winners": {
+        "then_continuation": 6,
+        "echo": 2,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 6,
+        " Apple": 2,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.2,
+      "mean_regime_suppression_delta": -0.8125,
+      "mean_target_delta_after_suppression": -0.075,
+      "mean_target_margin_delta_after_suppression": 0.525,
+      "suppressed_winners": {
+        "then_continuation": 6,
+        "echo": 2,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 6,
+        " Apple": 2,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.2,
+      "mean_regime_suppression_delta": -0.8,
+      "mean_target_delta_after_suppression": -0.1125,
+      "mean_target_margin_delta_after_suppression": 0.5125,
+      "suppressed_winners": {
+        "then_continuation": 6,
+        "echo": 2,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 6,
+        " Apple": 2,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.66875,
+      "mean_target_delta_after_suppression": 0.2375,
+      "mean_target_margin_delta_after_suppression": 0.5375,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.65,
+      "mean_target_delta_after_suppression": 0.00625,
+      "mean_target_margin_delta_after_suppression": 0.40625,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.3875,
+      "mean_target_delta_after_suppression": 0.2375,
+      "mean_target_margin_delta_after_suppression": 0.5375,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.275,
+      "mean_target_delta_after_suppression": 0.00625,
+      "mean_target_margin_delta_after_suppression": 0.40625,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1375,
+      "mean_target_delta_after_suppression": 0.2,
+      "mean_target_margin_delta_after_suppression": 0.25,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.125,
+      "mean_target_delta_after_suppression": 0.2,
+      "mean_target_margin_delta_after_suppression": 0.225,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.3,
+      "mean_target_delta_after_suppression": 0.00625,
+      "mean_target_margin_delta_after_suppression": 0.40625,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.4,
+      "mean_target_delta_after_suppression": 0.2,
+      "mean_target_margin_delta_after_suppression": 0.225,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.4125,
+      "mean_target_delta_after_suppression": 0.2,
+      "mean_target_margin_delta_after_suppression": 0.25,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.2,
+      "mean_regime_suppression_delta": 0.65,
+      "mean_target_delta_after_suppression": -0.1125,
+      "mean_target_margin_delta_after_suppression": 0.5125,
+      "suppressed_winners": {
+        "then_continuation": 6,
+        "echo": 2,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 6,
+        " Apple": 2,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.2,
+      "mean_regime_suppression_delta": 0.675,
+      "mean_target_delta_after_suppression": -0.075,
+      "mean_target_margin_delta_after_suppression": 0.525,
+      "suppressed_winners": {
+        "then_continuation": 6,
+        "echo": 2,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 6,
+        " Apple": 2,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.7,
+      "mean_target_delta_after_suppression": 0.2,
+      "mean_target_margin_delta_after_suppression": 0.225,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.725,
+      "mean_target_delta_after_suppression": 0.2375,
+      "mean_target_margin_delta_after_suppression": 0.5375,
+      "suppressed_winners": {
+        "then_continuation": 8,
+        "the_continuation": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 8,
+        " The": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.8,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.75,
+      "mean_target_delta_after_suppression": 0.2,
+      "mean_target_margin_delta_after_suppression": 0.25,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.7,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0625,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.1,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.7,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.20625,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.1,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.7,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.25,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.1,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.4,
+      "mean_regime_suppression_delta": -1.0125,
+      "mean_target_delta_after_suppression": -0.175,
+      "mean_target_margin_delta_after_suppression": 0.5,
+      "suppressed_winners": {
+        "then_continuation": 4,
+        "echo": 2,
+        "the_continuation": 2,
+        "answer_boundary": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 4,
+        " Apple": 2,
+        " The": 2,
+        " Answer": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.4,
+      "mean_regime_suppression_delta": -0.90625,
+      "mean_target_delta_after_suppression": -0.175,
+      "mean_target_margin_delta_after_suppression": 0.5,
+      "suppressed_winners": {
+        "then_continuation": 4,
+        "echo": 2,
+        "the_continuation": 2,
+        "answer_boundary": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 4,
+        " Apple": 2,
+        " The": 2,
+        " Answer": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.2,
+      "mean_target_delta_after_suppression": 0.125,
+      "mean_target_margin_delta_after_suppression": 0.15,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1875,
+      "mean_target_delta_after_suppression": 0.0625,
+      "mean_target_margin_delta_after_suppression": 0.1625,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.15,
+      "mean_target_delta_after_suppression": 0.0875,
+      "mean_target_margin_delta_after_suppression": 0.0625,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.15,
+      "mean_target_delta_after_suppression": 0.05,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1125,
+      "mean_target_delta_after_suppression": 0.075,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.075,
+      "mean_target_delta_after_suppression": 0.0625,
+      "mean_target_margin_delta_after_suppression": 0.1625,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0625,
+      "mean_target_delta_after_suppression": -0.0625,
+      "mean_target_margin_delta_after_suppression": -0.0375,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Reason": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.03125,
+      "mean_target_delta_after_suppression": 0.0625,
+      "mean_target_margin_delta_after_suppression": 0.1625,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.025,
+      "mean_target_delta_after_suppression": 0.05,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.0,
+      "mean_target_delta_after_suppression": 0.05,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.00625,
+      "mean_target_delta_after_suppression": 0.075,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.0125,
+      "mean_target_delta_after_suppression": 0.075,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.025,
+      "mean_target_delta_after_suppression": 0.125,
+      "mean_target_margin_delta_after_suppression": 0.15,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.0375,
+      "mean_target_delta_after_suppression": 0.0875,
+      "mean_target_margin_delta_after_suppression": 0.0625,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.0375,
+      "mean_target_delta_after_suppression": 0.0875,
+      "mean_target_margin_delta_after_suppression": 0.0625,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.05,
+      "mean_target_delta_after_suppression": 0.125,
+      "mean_target_margin_delta_after_suppression": 0.15,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.05,
+      "mean_target_delta_after_suppression": 0.0125,
+      "mean_target_margin_delta_after_suppression": 0.0125,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.05,
+      "mean_target_delta_after_suppression": 0.0125,
+      "mean_target_margin_delta_after_suppression": 0.0125,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.05,
+      "mean_target_delta_after_suppression": -0.0625,
+      "mean_target_margin_delta_after_suppression": -0.0375,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Reason": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.1875,
+      "mean_target_delta_after_suppression": 0.0125,
+      "mean_target_margin_delta_after_suppression": 0.0125,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.1984375,
+      "mean_target_delta_after_suppression": -0.0625,
+      "mean_target_margin_delta_after_suppression": -0.0375,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Reason": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.6,
+      "winner_changed_rate": 0.4,
+      "mean_regime_suppression_delta": 0.7,
+      "mean_target_delta_after_suppression": -0.175,
+      "mean_target_margin_delta_after_suppression": 0.5,
+      "suppressed_winners": {
+        "then_continuation": 4,
+        "echo": 2,
+        "the_continuation": 2,
+        "answer_boundary": 2
+      },
+      "suppressed_top_tokens": {
+        " Then": 4,
+        " Apple": 2,
+        " The": 2,
+        " Answer": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.9,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.2,
+      "mean_target_delta_after_suppression": 0.08125,
+      "mean_target_margin_delta_after_suppression": 0.20625,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.9,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.15,
+      "mean_target_delta_after_suppression": 0.01875,
+      "mean_target_margin_delta_after_suppression": -0.00625,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.9,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.125,
+      "mean_target_delta_after_suppression": 0.025,
+      "mean_target_margin_delta_after_suppression": -0.0375,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.9,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1125,
+      "mean_target_delta_after_suppression": -0.05,
+      "mean_target_margin_delta_after_suppression": 0.075,
+      "suppressed_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "suppressed_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.9,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1,
+      "mean_target_delta_after_suppression": -0.05,
+      "mean_target_margin_delta_after_suppression": 0.075,
+      "suppressed_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "suppressed_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.01875,
+      "mean_target_delta_after_suppression": 0.14375,
+      "mean_target_margin_delta_after_suppression": 0.09375,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.2,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.0125,
+      "mean_target_delta_after_suppression": -0.05,
+      "mean_target_margin_delta_after_suppression": 0.075,
+      "suppressed_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "suppressed_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.36875,
+      "mean_target_delta_after_suppression": 0.14375,
+      "mean_target_margin_delta_after_suppression": 0.09375,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.40625,
+      "mean_target_delta_after_suppression": 0.08125,
+      "mean_target_margin_delta_after_suppression": 0.20625,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.4125,
+      "mean_target_delta_after_suppression": 0.14375,
+      "mean_target_margin_delta_after_suppression": 0.09375,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.41875,
+      "mean_target_delta_after_suppression": 0.01875,
+      "mean_target_margin_delta_after_suppression": -0.00625,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.4375,
+      "mean_target_delta_after_suppression": 0.025,
+      "mean_target_margin_delta_after_suppression": -0.0375,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.475,
+      "mean_target_delta_after_suppression": 0.08125,
+      "mean_target_margin_delta_after_suppression": 0.20625,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.525,
+      "mean_target_delta_after_suppression": 0.025,
+      "mean_target_margin_delta_after_suppression": -0.0375,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.0,
+      "target_margin_help_rate": 0.5,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": 0.5375,
+      "mean_target_delta_after_suppression": 0.01875,
+      "mean_target_margin_delta_after_suppression": -0.00625,
+      "suppressed_winners": {
+        "comma_repeat": 10
+      },
+      "suppressed_top_tokens": {
+        ",": 10
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 1.0,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.3875,
+      "mean_target_delta_after_suppression": -0.325,
+      "mean_target_margin_delta_after_suppression": -0.225,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        ".": 4,
+        " can": 4,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.325,
+      "mean_target_delta_after_suppression": 0.075,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.3125,
+      "mean_target_delta_after_suppression": -0.025,
+      "mean_target_margin_delta_after_suppression": 0.175,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.9,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.25,
+      "mean_target_delta_after_suppression": -0.18125,
+      "mean_target_margin_delta_after_suppression": -0.09375,
+      "suppressed_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "suppressed_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.225,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.1625,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.7,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.225,
+      "mean_target_delta_after_suppression": -0.18125,
+      "mean_target_margin_delta_after_suppression": -0.09375,
+      "suppressed_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "suppressed_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.2,
+      "mean_target_delta_after_suppression": -0.325,
+      "mean_target_margin_delta_after_suppression": -0.225,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        ".": 4,
+        " can": 4,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1125,
+      "mean_target_delta_after_suppression": -0.05,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.1,
+      "mean_target_delta_after_suppression": 0.075,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0875,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.1625,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0875,
+      "mean_target_delta_after_suppression": 0.075,
+      "mean_target_margin_delta_after_suppression": 0.05,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "because_removed",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0875,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.0375,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        " can": 4,
+        ".": 2,
+        ".\n": 2,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 3,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.075,
+      "mean_target_delta_after_suppression": -0.0875,
+      "mean_target_margin_delta_after_suppression": -0.1875,
+      "suppressed_winners": {
+        "answer_boundary": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Answer": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 3,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0625,
+      "mean_target_delta_after_suppression": 0.0375,
+      "mean_target_margin_delta_after_suppression": 0.1625,
+      "suppressed_winners": {
+        "because_reason": 4,
+        "be_continuation": 4,
+        "prose": 2
+      },
+      "suppressed_top_tokens": {
+        "Because": 4,
+        " be": 4,
+        " a": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "product",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.8,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.025,
+      "mean_target_delta_after_suppression": 0.15,
+      "mean_target_margin_delta_after_suppression": 0.1,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.025,
+      "mean_target_delta_after_suppression": -0.325,
+      "mean_target_margin_delta_after_suppression": -0.225,
+      "suppressed_winners": {
+        "be_continuation": 6,
+        "period_stop": 4
+      },
+      "suppressed_top_tokens": {
+        ".": 4,
+        " can": 4,
+        " is": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "drift",
+      "variant": "repeat_instruction",
+      "step": 2,
+      "component": "down_out",
+      "alpha": 0.5,
+      "regime": "because_reason",
+      "rows": 10,
+      "regime_reduction_rate": 0.6,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0125,
+      "mean_target_delta_after_suppression": 0.15,
+      "mean_target_margin_delta_after_suppression": 0.15,
+      "suppressed_winners": {
+        "comma_repeat": 6,
+        "be_continuation": 4
+      },
+      "suppressed_top_tokens": {
+        ",": 6,
+        " is": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "because_removed",
+      "step": 1,
+      "component": "gate_up_pair",
+      "alpha": 0.5,
+      "regime": "answer_boundary",
+      "rows": 10,
+      "regime_reduction_rate": 0.4,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0125,
+      "mean_target_delta_after_suppression": 0.03125,
+      "mean_target_margin_delta_after_suppression": -0.05625,
+      "suppressed_winners": {
+        "echo": 10
+      },
+      "suppressed_top_tokens": {
+        " Horse": 3,
+        " Cherry": 2,
+        " Car": 2,
+        " Dog": 2,
+        " White": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "spec_id": "qwen3_explain_competitor_hook",
+      "source_group": "success",
+      "variant": "no_answer_anchor",
+      "step": 2,
+      "component": "gate_up_pair",
+      "alpha": 1.0,
+      "regime": "period_stop",
+      "rows": 10,
+      "regime_reduction_rate": 0.5,
+      "target_margin_help_rate": 0.4,
+      "winner_changed_rate": 0.0,
+      "mean_regime_suppression_delta": -0.0125,
+      "mean_target_delta_after_suppression": -0.18125,
+      "mean_target_margin_delta_after_suppression": -0.09375,
+      "suppressed_winners": {
+        "be_continuation": 9,
+        "period_stop": 1
+      },
+      "suppressed_top_tokens": {
+        " is": 9,
+        ".": 1
+      }
+    }
+  ]
+}

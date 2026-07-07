@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "phase_id": "Phase235",
+  "created_at": "2026-07-07T13:43:50.446471+00:00",
+  "entrypoint": "manifest.json",
+  "views": [
+    {
+      "view_id": "pattern_atlas_overview",
+      "title": "模式图谱总览",
+      "required_files": [
+        "manifest.json",
+        "progress.json",
+        "families.jsonl",
+        "graph_nodes.jsonl",
+        "graph_edges.jsonl"
+      ],
+      "widgets": [
+        "global_progress",
+        "family_cards",
+        "priority_queue",
+        "recent_phase_updates"
+      ]
+    },
+    {
+      "view_id": "family_detail",
+      "title": "模式族详情",
+      "required_files": [
+        "families.jsonl",
+        "modes.jsonl",
+        "metrics.jsonl",
+        "graph_nodes.jsonl",
+        "graph_edges.jsonl"
+      ],
+      "widgets": [
+        "mode_table",
+        "evidence_summary",
+        "failure_summary",
+        "next_phase"
+      ]
+    },
+    {
+      "view_id": "mode_detail",
+      "title": "单模式详情",
+      "required_files": [
+        "modes.jsonl",
+        "observations.jsonl",
+        "metrics.jsonl",
+        "graph_edges.jsonl"
+      ],
+      "widgets": [
+        "behavior_distribution",
+        "readout_margin",
+        "source_evidence",
+        "rollout_trace",
+        "closure_flags"
+      ]
+    },
+    {
+      "view_id": "mechanism_graph",
+      "title": "机制链路图",
+      "required_files": [
+        "graph_nodes.jsonl",
+        "graph_edges.jsonl"
+      ],
+      "widgets": [
+        "node_graph",
+        "edge_table",
+        "evidence_filter"
+      ]
+    },
+    {
+      "view_id": "model_compare",
+      "title": "模型对比",
+      "required_files": [
+        "observations.jsonl",
+        "metrics.jsonl",
+        "graph_edges.jsonl"
+      ],
+      "widgets": [
+        "model_matrix",
+        "competitor_distribution",
+        "small_model_bias_warning"
+      ]
+    }
+  ]
+}
