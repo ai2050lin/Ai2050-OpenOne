@@ -40892,3 +40892,2001 @@ Phase212: 小规模切换点因果验证
 ```
 
 通俗总结：Phase211 没有证明“某个层控制某个模式”，但把搜索范围缩小了。现在最值得验证的是 list 模式的成功/漂移分叉，尤其 qwen3 的 layer 32 和 GLM4 的 layer 29/35。下一步只做少量精确干预，看看这些候选点是不是能真的推动模式从漂移回到目标轨迹。
+
+## Phase 212: 小规模切换点因果验证 [2026-07-06 19:53]
+
+### 一、任务判断
+
+本轮输入对 Phase211 的判断正确：
+
+```text
+Phase211 已经从“模式差异”推进到“成功轨迹和漂移轨迹在哪些层-步位置分叉”；
+但 Phase211 仍然只是 SwitchPointCandidate（切换点候选），不是 SwitchPointCause（切换点因果）。
+```
+
+因此，当前继续任务仍属于同一阶段目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+但本轮不适合大规模 patch。更合理的做法是：
+
+```text
+只选 Phase211 中最清楚的少数候选点；
+做单 layer-step hidden-state mean patch；
+验证候选点是否有方向性因果影响。
+```
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase212_switchpoint_causal_validation.py
+tests/gpt5/run_phase212_switchpoint_causal_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase212_switchpoint_causal_validation/switchpoint_causal_validation/
+```
+
+核心文件：
+
+```text
+phase212_cross_model_summary.json
+phase212_cross_model_summary.md
+phase212_qwen3_summary.json
+phase212_glm4_summary.json
+phase212_deepseek7b_summary.json
+phase212_*_patch_rollout_rows.jsonl
+phase212_*_candidate_summary_rows.jsonl
+```
+
+### 三、验证方法
+
+对每个候选点：
+
+```text
+1. 选择同一 model / pattern / failure_mode / layer / step；
+2. 从 Phase210 trajectory rows 中取 success 轨迹和 drift 轨迹；
+3. 重新加载模型；
+4. 在该 layer-step 重新计算 success mean hidden state；
+5. 重新计算 drift mean hidden state；
+6. 对 drift 轨迹做 success_mean patch；
+7. 对 success 轨迹做 drift_mean patch；
+8. 比较 patch 前后输出模式是否改变。
+```
+
+核心干预：
+
+$$
+\boxed{
+h_{l,t}^{patched}
+=
+\mathbb{E}
+\left[
+h_{l,t}
+\mid
+\mathrm{success}
+\right]
+}
+$$
+
+用于 drift trajectory repair（漂移轨迹修复）。
+
+反向干预：
+
+$$
+\boxed{
+h_{l,t}^{patched}
+=
+\mathbb{E}
+\left[
+h_{l,t}
+\mid
+\mathrm{drift}
+\right]
+}
+$$
+
+用于 success trajectory damage（成功轨迹破坏）。
+
+本轮只 patch 一个 layer-step，不做多层、多步组合。
+
+### 四、候选点
+
+验证候选：
+
+```text
+qwen3:
+  answer_list -> other_or_wrong
+  layer 32, step 11
+
+qwen3:
+  answer_list -> short_answer
+  layer 32, step 9
+
+GLM4:
+  answer_list -> repeat_answer
+  layer 29, step 8
+
+GLM4:
+  answer_list -> echo_then_answer
+  layer 35, step 8
+
+DS7B:
+  answer_explain -> other_or_wrong
+  layer 26, step 7
+
+DS7B:
+  answer_list -> other_or_wrong
+  layer 24, step 7
+```
+
+### 五、客观结果
+
+总结果：
+
+```text
+rollout rows: 92
+total repair match gain: 0
+total damage match loss: 2
+```
+
+按候选点：
+
+```text
+qwen3 answer_list -> other_or_wrong, L32 S11:
+  success rows = 8
+  drift rows = 6
+  repair gain = 0
+  damage loss = 0
+
+qwen3 answer_list -> short_answer, L32 S9:
+  success rows = 8
+  drift rows = 2
+  repair gain = 0
+  damage loss = 0
+
+GLM4 answer_list -> repeat_answer, L29 S8:
+  success rows = 1
+  drift rows = 8
+  repair gain = 0
+  damage loss = 0
+
+GLM4 answer_list -> echo_then_answer, L35 S8:
+  success rows = 1
+  drift rows = 2
+  repair gain = -2
+  damage loss = 0
+
+DS7B answer_explain -> other_or_wrong, L26 S7:
+  success rows = 6
+  drift rows = 2
+  repair gain = 2
+  damage loss = 0
+
+DS7B answer_list -> other_or_wrong, L24 S7:
+  success rows = 6
+  drift rows = 2
+  repair gain = 0
+  damage loss = 2
+```
+
+### 六、核心发现
+
+第一，qwen3 的两个高分候选被初步否定。
+
+```text
+qwen3 answer_list L32 S11:
+  success_mean patch 不能把 other_or_wrong 修复为 list；
+  drift_mean patch 也不能破坏成功 list。
+
+qwen3 answer_list L32 S9:
+  success_mean patch 不能把 short_answer 修复为 list；
+  还会把 short_answer 推到 echo_then_answer；
+  drift_mean patch 不能破坏成功 list。
+```
+
+这说明：
+
+```text
+qwen3 layer 32 的高 switchpoint score 更像相关/放大/读出代理；
+不是单点充分因果控制点。
+```
+
+第二，GLM4 的 list 候选也没有正向修复。
+
+```text
+GLM4 answer_list -> repeat_answer, L29 S8:
+  repair gain = 0
+  damage loss = 0
+
+GLM4 answer_list -> echo_then_answer, L35 S8:
+  repair gain = -2
+  damage loss = 0
+```
+
+其中第二个候选出现负向结果：
+
+```text
+success_mean patch 反而让 baseline 判为 list 的 drift eval rows 变回 echo_then_answer。
+```
+
+这说明：
+
+```text
+GLM4 的候选点很可能不是简单“success mean state 越多越好”；
+模式状态可能依赖样本、位置、前文轨迹和多点组合。
+```
+
+第三，DS7B answer_explain 出现弱正因果信号。
+
+```text
+DS7B answer_explain -> other_or_wrong, L26 S7:
+  drift baseline: 0/2 match；
+  success_mean patch: 2/2 match；
+  repair gain = 2。
+```
+
+生成前缀从：
+
+```text
+Horses are primarily used for transportation, but they are also...
+```
+
+变为：
+
+```text
+Horses are primarily used for because they are excellent at carrying...
+```
+
+这不是高质量答案，但分类上进入 explain_answer。
+
+严格结论：
+
+```text
+DS7B layer 26 step 7 对 explain 模式有方向性因果影响候选；
+但样本只有 2 条 drift，且输出质量不高，不能视为闭合。
+```
+
+第四，DS7B answer_list 出现反向破坏信号。
+
+```text
+DS7B answer_list -> other_or_wrong, L24 S7:
+  success baseline: 4/6 match；
+  drift_mean patch: 2/6 match；
+  damage loss = 2。
+```
+
+这说明：
+
+```text
+drift mean state 可以削弱 list 成功轨迹；
+但 success mean state 不能修复 drift trajectory。
+```
+
+这更像：
+
+```text
+list 成功需要多条件共同维持；
+单点 drift state 足以扰乱部分成功轨迹；
+单点 success state 不足以修复完整漂移。
+```
+
+### 七、对 Phase211 的校正
+
+Phase211 的 switchpoint score 有用，但不能直接等同因果强度。
+
+本轮结果显示：
+
+```text
+高分候选可能是：
+1. 相关点；
+2. 放大点；
+3. 读出点；
+4. 局部扰动敏感点；
+5. 真实因果切换点。
+```
+
+Phase212 只支持少量弱因果信号：
+
+```text
+DS7B explain L26 S7: repair positive；
+DS7B list L24 S7: damage positive。
+```
+
+不支持：
+
+```text
+qwen3 list L32 S9/S11 是单点因果开关；
+GLM4 list L29/L35 是单点因果开关。
+```
+
+### 八、问题和硬伤
+
+第一，样本量仍小。
+
+尤其 GLM4 的 success rows 只有 1，DS7B drift rows 只有 2。不能把单个候选的结果过度泛化。
+
+第二，patch 方式很粗糙。
+
+本轮直接替换 layer output 的 last-token hidden state：
+
+```text
+h_l,t = mean_success 或 mean_drift
+```
+
+这可能破坏样本特异性，也可能引入分布外状态。
+
+第三，单点 patch 可能不足。
+
+模式切换可能不是一个 layer-step，而是：
+
+```text
+多层连续窗口；
+多 token 累积；
+attention route + residual state + readout margin 的组合。
+```
+
+第四，分类器仍然启发式。
+
+DS7B explain repair 的文本质量并不好，只是进入 explain_answer 分类。因此它是方向性证据，不是质量闭合。
+
+第五，小模型偏差仍然很大。
+
+DS7B 的 positive result 可能与 reasoning/explain 偏置有关，不一定代表通用语言机制。
+
+### 九、理论进展
+
+当前理论不改名。Phase212 增加因果层级区分：
+
+```text
+SwitchPointCandidate != SwitchPointCause
+```
+
+更严格地说：
+
+$$
+\boxed{
+\mathrm{Candidate}(l,t)
+\not\Rightarrow
+\mathrm{Cause}(l,t)
+}
+$$
+
+因果证据需要：
+
+$$
+\boxed{
+\mathrm{Patch}
+\left(
+h_{l,t}^{success}
+\to
+h_{l,t}^{drift}
+\right)
+\Rightarrow
+\Delta \mathrm{PatternMatch} > 0
+}
+$$
+
+或：
+
+$$
+\boxed{
+\mathrm{Patch}
+\left(
+h_{l,t}^{drift}
+\to
+h_{l,t}^{success}
+\right)
+\Rightarrow
+\Delta \mathrm{PatternMatch} < 0
+}
+$$
+
+Phase212 目前只得到弱版本：
+
+```text
+部分候选有方向性影响；
+多数候选不具备单点充分因果控制。
+```
+
+### 十、当前阶段判断
+
+当前任务和下一任务仍属于同一阶段性目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+Phase209 到 Phase212 的进展链条：
+
+```text
+Phase209:
+  输出模式图谱。
+
+Phase210:
+  hidden-state 模式差分图谱。
+
+Phase211:
+  成功/漂移切换点候选图谱。
+
+Phase212:
+  小规模切换点因果验证，发现多数高分点非单点因果，少数 DS7B 点有弱方向性影响。
+```
+
+### 十一、下一阶段任务
+
+下一阶段不应继续盲目扩大单点 patch。
+
+建议进入：
+
+```text
+Phase213: 多点窗口因果验证与 prompt 触发轨迹分析
+```
+
+重点：
+
+```text
+1. 对 DS7B positive candidate 做复测，增加样本和相邻 layer/step 窗口；
+2. 对 qwen3 / GLM4 的 list 失败，改用多点窗口 patch，而不是单点；
+3. 对 prompt 中 list/explain/repeat/target_seeded 触发词做 token-level hidden-state 轨迹分析；
+4. 区分 cause point、amplification point、readout point；
+5. 输出 multi_site_pattern_causal_window_atlas_v1。
+```
+
+通俗总结：Phase212 是一次必要的“踩刹车”。它没有证明 qwen3/GLM4 的高分切换点是单点开关，反而说明很多高分点只是相关或放大位置。真正有价值的是 DS7B 的 explain/list 出现弱方向性因果信号。下一步要从“单点”升级到“小窗口”和“prompt 触发轨迹”，否则会在单点 patch 上进入边际收益递减。
+
+## Phase 213: 窗口方向补丁与 Prompt 触发态图谱 [2026-07-06 20:07]
+
+### 一、任务判断
+
+本轮输入对 Phase212 的判断正确：
+
+```text
+Phase212 没有否定动态模式网络路线；
+它校准了因果层级；
+高分切换点不等于单点因果开关；
+后续应从单点 patch 升级为小窗口方向补丁和 prompt token 触发轨迹分析。
+```
+
+因此，本轮继续同一阶段目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+但不继续盲目扩大单点 patch，而是测试：
+
+```text
+1. 多 layer-step 小窗口方向补丁是否比单点均值替换更有效；
+2. prompt 结束态是否已经携带模式成败差异。
+```
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase213_window_direction_prompt_trigger.py
+tests/gpt5/run_phase213_window_direction_prompt_trigger.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase213_window_direction_prompt_trigger/window_direction_prompt_trigger/
+```
+
+核心文件：
+
+```text
+phase213_cross_model_summary.json
+phase213_cross_model_summary.md
+phase213_qwen3_summary.json
+phase213_glm4_summary.json
+phase213_deepseek7b_summary.json
+phase213_*_window_rollout_rows.jsonl
+phase213_*_window_summary_rows.jsonl
+phase213_*_prompt_trigger_rows.jsonl
+```
+
+### 三、方法
+
+Phase212 使用直接均值替换：
+
+$$
+h_{l,t}^{patched}
+=
+\mu_{\mathrm{success}}
+$$
+
+Phase213 改为更温和的方向补丁：
+
+$$
+\boxed{
+h_{l,t}^{\prime}
+=
+h_{l,t}
++
+\lambda
+\left(
+\mu_{\mathrm{success}}(l,t)
+-
+\mu_{\mathrm{drift}}(l,t)
+\right)
+}
+$$
+
+用于 drift trajectory repair。
+
+反向破坏：
+
+$$
+\boxed{
+h_{l,t}^{\prime}
+=
+h_{l,t}
+-
+\lambda
+\left(
+\mu_{\mathrm{success}}(l,t)
+-
+\mu_{\mathrm{drift}}(l,t)
+\right)
+}
+$$
+
+用于 success trajectory damage。
+
+本轮使用：
+
+```text
+direction_scale = 0.7
+每个窗口包含 3 层 x 2 步 = 6 个 direction sites。
+```
+
+同时记录 prompt 结束处 hidden state：
+
+```text
+prompt_trigger_rows = 920
+```
+
+这只是 prompt last-token trigger state（提示末词元触发态），还不是完整 token-level 触发词轨迹。
+
+### 四、候选窗口
+
+qwen3：
+
+```text
+answer_list -> other_or_wrong
+layers = 31, 32, 33
+steps = 10, 11
+
+answer_list -> short_answer
+layers = 31, 32, 33
+steps = 8, 9
+```
+
+GLM4：
+
+```text
+answer_list -> repeat_answer
+layers = 28, 29, 30
+steps = 7, 8
+
+answer_list -> echo_then_answer
+layers = 34, 35, 36
+steps = 7, 8
+```
+
+DS7B：
+
+```text
+answer_explain -> other_or_wrong
+layers = 25, 26, 27
+steps = 6, 7
+
+answer_list -> other_or_wrong
+layers = 23, 24, 25
+steps = 6, 7
+```
+
+### 五、客观结果
+
+总结果：
+
+```text
+rollout rows: 92
+prompt trigger rows: 920
+total repair match gain: 0
+total damage match loss: 0
+```
+
+按模型：
+
+```text
+qwen3:
+  rollout rows = 40
+  prompt trigger rows = 240
+  repair gain = 0
+  damage loss = 0
+
+GLM4:
+  rollout rows = 20
+  prompt trigger rows = 480
+  repair gain = -2
+  damage loss = 0
+
+DS7B:
+  rollout rows = 32
+  prompt trigger rows = 200
+  repair gain = 2
+  damage loss = 0
+```
+
+按候选：
+
+```text
+qwen3 answer_list -> other_or_wrong:
+  window L31/32/33 S10/11
+  repair gain = 0
+  damage loss = 0
+
+qwen3 answer_list -> short_answer:
+  window L31/32/33 S8/9
+  repair gain = 0
+  damage loss = 0
+
+GLM4 answer_list -> repeat_answer:
+  window L28/29/30 S7/8
+  repair gain = 0
+  damage loss = 0
+
+GLM4 answer_list -> echo_then_answer:
+  window L34/35/36 S7/8
+  repair gain = -2
+  damage loss = 0
+
+DS7B answer_explain -> other_or_wrong:
+  window L25/26/27 S6/7
+  repair gain = 2
+  damage loss = 0
+
+DS7B answer_list -> other_or_wrong:
+  window L23/24/25 S6/7
+  repair gain = 0
+  damage loss = 0
+```
+
+### 六、核心发现
+
+第一，窗口方向补丁没有带来跨模型净收益。
+
+```text
+总 repair gain = 0
+总 damage loss = 0
+```
+
+这说明：
+
+```text
+把单点扩展成 3 层 x 2 步窗口，仍不足以稳定修复 qwen3/GLM4 的 list 漂移。
+```
+
+第二，qwen3 的 list 漂移进一步被确认不是简单后层窗口问题。
+
+```text
+qwen3 两个窗口都是 0 repair / 0 damage。
+```
+
+但 window patch 会改变漂移类型：
+
+```text
+other_or_wrong 有部分转为 next_task_or_format；
+short_answer 有部分转为 explain_answer。
+```
+
+所以窗口方向不是完全无效，而是没有沿目标 list 模式方向闭合。
+
+第三，GLM4 复现负向结果。
+
+```text
+GLM4 answer_list -> echo_then_answer:
+repair gain = -2
+```
+
+这和 Phase212 的负向结果一致。
+
+说明：
+
+```text
+GLM4 的 list/echo 边界不是简单 success-minus-drift 方向；
+方向补丁可能破坏局部样本结构，反而加强 echo_then_answer。
+```
+
+第四，DS7B explain 的弱正因果信号被复现。
+
+```text
+Phase212:
+DS7B explain L26 S7 repair gain = 2
+
+Phase213:
+DS7B explain L25/26/27 S6/7 repair gain = 2
+```
+
+这说明：
+
+```text
+DS7B explain 模式确实存在可干预的局部窗口；
+但样本仍只有 2 条 drift，且输出质量仍未证明干净闭合。
+```
+
+第五，DS7B list 的 damage 信号没有在窗口方向补丁中复现。
+
+Phase212：
+
+```text
+DS7B list L24 S7 damage loss = 2
+```
+
+Phase213：
+
+```text
+DS7B list L23/24/25 S6/7 damage loss = 0
+```
+
+说明：
+
+```text
+DS7B list 的单点 damage 可能较脆弱；
+窗口方向补丁没有稳定复现。
+```
+
+第六，prompt 结束态已产生 920 条记录。
+
+初步观察显示：
+
+```text
+不同 pattern 的 prompt_last_residual_norm 存在差异；
+但当前只记录 prompt 末词元，不足以定位 list/explain/repeat 等触发词本身。
+```
+
+它可作为下一轮 prompt token-level trajectory 的底层材料。
+
+### 七、问题和硬伤
+
+第一，窗口方向仍不够细。
+
+本轮使用：
+
+```text
+success_mean - drift_mean
+```
+
+这仍是均值方向，可能掩盖子簇、样本特异结构和具体触发词作用。
+
+第二，窗口选择仍基于 Phase211 高分点。
+
+如果 Phase211 高分点主要是 amplification/readout point（放大/读出点），窗口 patch 仍可能无法触及 cause point（原因点）。
+
+第三，prompt 分析仍然粗糙。
+
+本轮只看 prompt last-token state，没有逐 token 分析：
+
+```text
+three；
+plausible；
+answers；
+because；
+same answer word；
+final answer only；
+one word；
+Answer:
+```
+
+第四，样本量仍受 Phase210 限制。
+
+尤其 GLM4 success rows 和 DS7B drift rows 太少。需要更平衡的数据才能强验证。
+
+第五，小模型偏差仍然明显。
+
+DS7B explain 正信号可能来自模型的强解释/推理偏置，不能直接外推。
+
+### 八、理论进展
+
+Phase213 进一步支持：
+
+```text
+模式因果不是单点，也不只是简单小窗口均值方向。
+```
+
+更严格公式应从点扩展到路径：
+
+$$
+\boxed{
+\mathrm{PatternCause}
+\neq
+\mathrm{Point}(l,t)
+}
+$$
+
+也不一定等于简单窗口：
+
+$$
+\boxed{
+\mathrm{PatternCause}
+\neq
+\sum_{(l,t)\in W}
+\left(
+\mu_{\mathrm{success}}(l,t)
+-
+\mu_{\mathrm{drift}}(l,t)
+\right)
+}
+$$
+
+更可能是：
+
+$$
+\boxed{
+\mathrm{PatternCause}
+=
+\mathrm{TriggerPath}
+\circ
+\mathrm{RoutePath}
+\circ
+\mathrm{StatePath}
+\circ
+\mathrm{ReadoutPath}
+}
+$$
+
+其中：
+
+```text
+TriggerPath = prompt 触发词形成的模式启动路径；
+RoutePath = attention / residual 路由路径；
+StatePath = 多层多步状态维持路径；
+ReadoutPath = 输出边界和词表竞争路径。
+```
+
+当前闭合标准不变：
+
+$$
+\boxed{
+\mathrm{ModelClose}
+=
+\mathrm{AnswerCorrect}
+\land
+\mathrm{PatternMatched}
+\land
+\mathrm{BoundaryStable}
+\land
+\mathrm{DoneStateStable}
+\land
+\mathrm{ModelStopExecuted}
+\land
+\mathrm{NoDrift}
+}
+$$
+
+### 九、当前阶段判断
+
+当前任务和下一任务仍属于同一阶段性目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+Phase209 到 Phase213 的连续进展：
+
+```text
+Phase209:
+  输出模式图谱。
+
+Phase210:
+  hidden-state 模式差分图谱。
+
+Phase211:
+  成功/漂移切换点候选图谱。
+
+Phase212:
+  单点因果校准，发现多数候选非单点因果。
+
+Phase213:
+  窗口方向补丁验证，发现简单窗口方向仍不能跨模型修复，DS7B explain 弱正信号复现。
+```
+
+### 十、下一阶段任务
+
+下一步不应继续扩大 patch 规模，而应转向：
+
+```text
+Phase214: Prompt 触发词级轨迹与模式路径分解
+```
+
+重点：
+
+```text
+1. 对 prompt 中的触发词做 token-level hidden-state 轨迹；
+2. 对 list/explain/repeat/short/target_seeded 提取触发词位置；
+3. 比较 trigger token、Answer: token、生成 step 1、漂移 step 的状态路径；
+4. 区分 TriggerPath、RoutePath、StatePath、ReadoutPath；
+5. 只在路径明确后再做组件级因果验证。
+```
+
+通俗总结：Phase213 再次提醒我们，模式不是一个点，也不是简单小窗口。qwen3 和 GLM4 的 list 漂移无法靠后层方向补丁修复；DS7B explain 有可复现弱因果信号，但仍不闭合。下一步要回到模式触发源头，看 prompt 里的触发词如何启动路径，否则 patch 会一直在后层放大点附近打转。
+
+## Phase 214: Prompt 触发词级轨迹与模式路径分解 [2026-07-06 21:12]
+
+### 一、任务判断
+
+本轮分析的附件判断基本正确。
+
+Phase213 的核心意义不是简单的“窗口方向补丁失败”，而是说明：
+
+```text
+语言模式因果不是单点；
+也不是简单 3 层 x 2 步窗口均值方向；
+更可能是 prompt 触发、路由、状态维持、读出共同形成的路径机制。
+```
+
+因此继续扩大同类 patch（补丁）不是第一优先级。
+
+当前任务和下一步任务仍处于同一阶段：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+Phase214 进入：
+
+```text
+Prompt 触发词级轨迹与模式路径分解。
+```
+
+它不是闭合验证，而是路径图谱初版。
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase214_prompt_trigger_token_path_atlas.py
+tests/gpt5/run_phase214_prompt_trigger_token_path_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase214_prompt_trigger_token_path_atlas/prompt_trigger_token_path_atlas/
+```
+
+运行方式：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型按顺序加载和释放，没有并发占用 GPU。
+
+### 三、算法原理
+
+Phase214 不做干预，只做轨迹记录。
+
+核心问题从：
+
+```text
+能否用后层 patch 修复漂移？
+```
+
+改为：
+
+```text
+prompt 中的触发词状态，是否和后续生成模式成功/漂移有关？
+```
+
+对每个 prompt（提示）定位触发词：
+
+```text
+answer_short:
+  one English color word
+  only
+
+answer_explain:
+  answer first
+  short reason
+  because
+
+answer_list:
+  three
+  plausible
+  short answers
+  commas
+
+answer_repeat:
+  exactly
+  same answer word
+  twice
+  comma
+
+answer_target_seeded:
+  likely
+  final answer
+  only
+
+common:
+  Answer:
+```
+
+对每个触发词 token（词元）记录多层 hidden state（隐藏状态）：
+
+$$
+\boxed{
+h^{prompt}_{l,p}
+}
+$$
+
+其中：
+
+```text
+l = layer（层）；
+p = prompt 内触发词 token 位置。
+```
+
+再记录触发词到生成阶段 anchor（锚点）的路径相似度：
+
+```text
+prompt_last；
+gen_after_step_1；
+gen_after_step_2；
+gen_after_step_3；
+gen_after_step_6；
+gen_after_final。
+```
+
+核心指标：
+
+$$
+\boxed{
+R_{trigger \to anchor}(l)
+=
+\cos
+\left(
+h^{prompt}_{l,p},
+h^{anchor}_{l}
+\right)
+}
+$$
+
+以及成功/漂移差分：
+
+$$
+\boxed{
+\Delta R(l)
+=
+\mathbb{E}
+\left[
+R_{trigger \to anchor}(l)
+\mid success
+\right]
+-
+\mathbb{E}
+\left[
+R_{trigger \to anchor}(l)
+\mid drift
+\right]
+}
+$$
+
+这不是因果证明，只是路径相关图谱。
+
+### 四、客观结果
+
+总结果：
+
+```text
+selected trajectory rows = 340
+trigger token rows = 14794
+path rows = 88764
+success/drift delta rows = 2754
+```
+
+分模型：
+
+```text
+qwen3:
+  selected trajectory rows = 150
+  trigger token rows = 5400
+  path rows = 32400
+  selected layers = 3,6,11,18,24,29,31,32,33
+
+GLM4:
+  selected trajectory rows = 150
+  trigger token rows = 7722
+  path rows = 46332
+  selected layers = 3,7,12,20,27,28,29,30,32,34,35,36,37
+
+DS7B:
+  selected trajectory rows = 40
+  trigger token rows = 1672
+  path rows = 10032
+  selected layers = 2,5,9,14,18,22,23,24,25,26,27
+```
+
+### 五、主要现象
+
+第一，Phase214 确认 prompt 触发路径值得继续追。
+
+三模型都能形成大量：
+
+```text
+trigger token -> generation anchor
+```
+
+的 success/drift（成功/漂移）差分记录。
+
+这说明 Phase213 后转向 prompt token-level trajectory（提示词元级轨迹）是正确方向。
+
+第二，DS7B 的 explain/list 触发路径出现强差异，但样本很少。
+
+未过滤时，DS7B 最强差异集中在 L27：
+
+```text
+answer_list:
+  list_three -> gen_after_step_1 L27
+  success rows = 6
+  drift rows = 2
+  cosine delta = +0.869056
+
+answer_list:
+  list_plausible -> gen_after_step_1 L27
+  success rows = 6
+  drift rows = 2
+  cosine delta = +0.807151
+
+answer_explain:
+  explain_because -> gen_after_step_1 L27
+  success rows = 6
+  drift rows = 2
+  cosine delta = +0.799727
+```
+
+解释：
+
+```text
+DS7B 的 explain/list 成功样本中，prompt 触发词状态与生成第 1 步后状态更接近；
+这和 Phase212/213 中 DS7B explain 有弱可干预信号相互呼应。
+```
+
+但硬伤也很明显：
+
+```text
+drift rows 只有 2；
+不能作为强因果证据；
+更像路径候选。
+```
+
+第三，过滤到 success/drift 都不少于 5 后，qwen3 和 GLM4 的稳定信号更有参考价值。
+
+qwen3 较强信号：
+
+```text
+answer_repeat:
+  answer_slot -> gen_after_step_6 L32
+  success rows = 18
+  drift rows = 12
+  cosine delta = -0.23044
+
+answer_repeat:
+  answer_slot -> gen_after_step_6 L29
+  success rows = 18
+  drift rows = 12
+  cosine delta = -0.22032
+
+answer_explain:
+  explain_because -> gen_after_step_3 L3
+  success rows = 15
+  drift rows = 15
+  cosine delta = -0.21612
+```
+
+GLM4 较强信号：
+
+```text
+answer_explain:
+  answer_slot -> gen_after_step_6 L7
+  success rows = 7
+  drift rows = 23
+  cosine delta = +0.31286
+
+answer_target_seeded:
+  answer_slot -> gen_after_step_6 L7
+  success rows = 15
+  drift rows = 15
+  cosine delta = -0.30322
+
+answer_target_seeded:
+  answer_slot -> gen_after_step_6 L3
+  success rows = 15
+  drift rows = 15
+  cosine delta = -0.29609
+```
+
+这些结果说明：
+
+```text
+触发路径差异不只在后层；
+早层和中层已经出现 success/drift 分叉；
+Answer: 这个回答槽位置本身可能是重要的模式路由节点。
+```
+
+第四，GLM4 list 的极大差异不可靠。
+
+未过滤时，GLM4 answer_list 有很大的差异：
+
+```text
+answer_list answer_slot -> gen_after_step_6 L7
+success rows = 1
+drift rows = 29
+cosine delta = -0.682425
+```
+
+但 success rows 只有 1。
+
+严格判断：
+
+```text
+这不能作为强现象；
+只能说明 GLM4 list 成功样本过少，当前图谱不平衡。
+```
+
+第五，qwen3 的 repeat 和 explain 比 list 更适合做下一轮路径拆解。
+
+qwen3 list 有成功和漂移，但强差异不如 repeat/explain 稳定。
+
+这提示：
+
+```text
+如果下一轮做 attention/head route（注意力头路由）或 component-level validation（组件级验证），
+qwen3 repeat/explain 可能比 list 更适合作为第一批样本。
+```
+
+### 六、理论进展
+
+Phase214 支持把模式机制从点和窗口继续升级到路径。
+
+当前公式保持：
+
+$$
+\boxed{
+h_{t+1}
+=
+\sum_k
+\alpha_k(x,t)T_k(h_t)
++
+\varepsilon_t
+}
+$$
+
+Phase214 进一步补充：
+
+$$
+\boxed{
+\alpha_k(x,t)
+\text{ 不是只在生成阶段产生，}
+\text{而可能从 prompt trigger token 开始形成。}
+}
+$$
+
+因此模式因果公式应写成：
+
+$$
+\boxed{
+\mathrm{PatternCause}
+=
+\mathrm{TriggerPath}
+\circ
+\mathrm{RoutePath}
+\circ
+\mathrm{StatePath}
+\circ
+\mathrm{ReadoutPath}
+}
+$$
+
+Phase214 当前只完成：
+
+$$
+\boxed{
+\mathrm{TriggerPath}
+\to
+\mathrm{StatePath}
+\text{ 的相关图谱初版}
+}
+$$
+
+尚未完成：
+
+```text
+RoutePath 的 attention head（注意力头）分解；
+MLP channel（多层感知机通道）分解；
+ReadoutPath 的词表竞争分解；
+因果干预验证。
+```
+
+### 七、问题和硬伤
+
+第一，Phase214 仍是相关性图谱，不是因果闭合。
+
+当前只能说明：
+
+```text
+某些 prompt 触发词状态和后续成功/漂移有差异。
+```
+
+不能说明：
+
+```text
+改写这些触发词状态一定会修复漂移。
+```
+
+第二，样本仍不平衡。
+
+最明显的是：
+
+```text
+GLM4 answer_list success rows 太少；
+DS7B answer_explain/list drift rows 太少；
+answer_short 几乎没有成功闭合样本。
+```
+
+第三，触发词定位仍是字符串级启发式。
+
+本轮定位：
+
+```text
+three；
+plausible；
+because；
+same answer word；
+final answer；
+Answer:
+```
+
+但真实触发可能跨多个 token，甚至不是单个短语。
+
+第四，尚未加入 attention head。
+
+附件建议记录：
+
+```text
+A^{prompt}_{l,h,p}
+```
+
+本轮没有做 attention head 输出或注意力权重图谱，只完成 residual stream（残差流）触发轨迹。
+
+第五，小模型偏差仍需 30% 到 50% 折扣。
+
+这些结果更准确地说是：
+
+```text
+小模型 prompt-trigger path atlas（提示触发路径图谱）。
+```
+
+不能直接外推为通用语言机制。
+
+### 八、阶段性结论
+
+Phase214 的核心结论：
+
+```text
+prompt 触发词状态确实能形成 success/drift 路径差异；
+模式分叉很可能早于后层 readout；
+后层 patch 失败的原因，可能是它在已经分叉后的状态路径上修补，而不是在触发/路由源头修补。
+```
+
+更通俗地说：
+
+```text
+模型不是到输出末端才决定“解释、列表、复读、短答”；
+这些模式很可能在 prompt 中的触发词和 Answer: 槽位附近就开始分叉。
+```
+
+但这仍不是闭合。
+
+### 九、下一阶段任务
+
+下一步仍属于同一阶段性目标，应该继续自动推进到：
+
+```text
+Phase215: TriggerPath -> RoutePath 的注意力路由图谱
+```
+
+优先选择样本更平衡、信号更稳的模式：
+
+```text
+qwen3 answer_repeat；
+qwen3 answer_explain；
+GLM4 answer_target_seeded；
+GLM4 answer_explain；
+DS7B answer_explain/list 只作为弱候选保留。
+```
+
+Phase215 应完成：
+
+```text
+1. 对触发词 token 和 Answer: token 提取 attention pattern（注意力模式）；
+2. 记录触发词是否被生成阶段早期 token 回读；
+3. 区分 trigger point（触发点）、route point（路由点）、state point（状态点）、readout point（读出点）；
+4. 只在路由图谱明确后，再做组件级因果干预。
+```
+
+当前总体进展估计：
+
+```text
+小模型模式机制图谱：约 56%
+路径因果机制：约 9%
+模型内部自然闭合：约 30%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 33% 到 38%
+```
+
+## Phase 215: Prompt 触发词注意力路由图谱 [2026-07-06 21:28]
+
+### 一、任务判断
+
+本轮附件对 Phase214 的评估基本正确。
+
+Phase214 的价值不是闭合，而是把研究从：
+
+```text
+后层 patch 修补
+```
+
+推进到：
+
+```text
+prompt trigger path（提示触发路径）
+```
+
+它说明模式分叉很可能早于后层 readout（读出）。
+
+因此 Phase215 继续同一阶段性目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+本轮不做干预，而是补齐 Phase214 缺失的 RoutePath（路由路径）初版。
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase215_prompt_attention_route_atlas.py
+tests/gpt5/run_phase215_prompt_attention_route_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase215_prompt_attention_route_atlas/prompt_attention_route_atlas/
+```
+
+运行方式：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型顺序运行，使用 eager attention（逐头注意力输出），每个模型完成后释放显存。
+
+### 三、算法原理
+
+Phase215 的核心问题：
+
+```text
+生成早期 token 是否通过 attention head 回读 prompt 中的触发词、Answer:、对象词、关系词、目标答案词？
+```
+
+对每条轨迹，在以下 anchor（锚点）取最后 token 作为 query（查询位置）：
+
+```text
+prompt_last；
+gen_after_step_1；
+gen_after_step_3；
+gen_after_step_6。
+```
+
+对 prompt 侧 source group（源位置组）计算每层每头注意力质量：
+
+```text
+trigger:any；
+trigger:具体触发词；
+answer_slot；
+object；
+target_label；
+relation；
+question_prefix；
+instruction_to_answer；
+prompt_all。
+```
+
+核心公式：
+
+$$
+\boxed{
+M_{l,h}^{G}(q)
+=
+\sum_{p\in G}
+A_{l,h}(q,p)
+}
+$$
+
+其中：
+
+```text
+M = 某层某头对源位置组 G 的注意力质量；
+l = layer（层）；
+h = head（注意力头）；
+q = 当前 anchor 的 query 位置；
+p = prompt 中的 source token 位置；
+A = attention matrix（注意力矩阵）。
+```
+
+成功/漂移路由差分：
+
+$$
+\boxed{
+\Delta M_{l,h}^{G}
+=
+\mathbb{E}
+\left[
+M_{l,h}^{G}
+\mid success
+\right]
+-
+\mathbb{E}
+\left[
+M_{l,h}^{G}
+\mid drift
+\right]
+}
+$$
+
+这仍是相关图谱，不是因果证明。
+
+### 四、客观结果
+
+总结果：
+
+```text
+selected trajectory rows = 111
+attention route rows = 113408
+summary rows = 16320
+route delta rows = 8160
+```
+
+分模型：
+
+```text
+qwen3:
+  selected trajectory rows = 48
+  attention route rows = 49152
+  route delta rows = 3072
+  selected layers = 3,6,11,24,29,31,32,33
+
+GLM4:
+  selected trajectory rows = 47
+  attention route rows = 48128
+  route delta rows = 3072
+  selected layers = 3,7,12,20,27,28,29,30
+
+DS7B:
+  selected trajectory rows = 16
+  attention route rows = 16128
+  route delta rows = 2016
+  selected layers = 2,5,14,22,23,24,25,26,27
+```
+
+样本分布：
+
+```text
+qwen3:
+  answer_explain success/drift = 8/8
+  answer_list success/drift = 8/8
+  answer_repeat success/drift = 8/8
+
+GLM4:
+  answer_explain success/drift = 7/8
+  answer_repeat success/drift = 8/8
+  answer_target_seeded success/drift = 8/8
+
+DS7B:
+  answer_explain success/drift = 6/2
+  answer_list success/drift = 6/2
+```
+
+### 五、主要现象
+
+第一，RoutePath 候选成立。
+
+三模型都出现：
+
+```text
+success 与 drift 在生成早期对 prompt 源 token 的注意力质量不同。
+```
+
+这说明 Phase214 的 TriggerPath（触发路径）不是孤立相关现象。
+
+更合理的图谱是：
+
+```text
+prompt trigger token
+-> attention route
+-> generation state
+-> readout/output
+```
+
+第二，GLM4 的 target_seeded 路由信号最稳。
+
+GLM4 在 answer_target_seeded 中出现多个强触发词路由差异：
+
+```text
+answer_target_seeded gen_after_step_6 L29H28
+success/drift = 8/8
+trigger:any delta = +0.6162
+
+answer_target_seeded gen_after_step_6 L29H10
+success/drift = 8/8
+trigger:any delta = +0.5537
+
+answer_target_seeded gen_after_step_6 L29H18
+success/drift = 8/8
+trigger:any delta = +0.5504
+
+answer_target_seeded gen_after_step_6 L29H11
+success/drift = 8/8
+trigger:any delta = +0.5383
+
+answer_target_seeded gen_after_step_6 L29H25
+success/drift = 8/8
+trigger:any delta = +0.5132
+```
+
+这些 head 集中在：
+
+```text
+L29 附近；
+gen_after_step_6；
+target_final_answer / trigger:any。
+```
+
+解释：
+
+```text
+GLM4 的目标答案种子模式，可能存在较清楚的触发词回读路由。
+成功轨迹在生成后期更强回读 final answer / 触发指令区域。
+```
+
+第三，GLM4 的 repeat/explain 也有路由候选。
+
+例如：
+
+```text
+answer_repeat gen_after_step_3 L12H21
+success/drift = 8/8
+trigger:any delta = +0.5219
+
+answer_explain gen_after_step_3 L12H18
+success/drift = 7/8
+trigger:any delta = -0.4386
+
+answer_explain gen_after_step_1 L20H25
+success/drift = 7/8
+trigger:any delta = -0.3503
+```
+
+这说明 GLM4 的路由不只限于 target_seeded。
+
+但 target_seeded 最集中、最稳定。
+
+第四，qwen3 的 explain/repeat 有较稳 RoutePath 候选。
+
+qwen3 强触发词路由差异：
+
+```text
+answer_explain gen_after_step_3 L3H15
+success/drift = 8/8
+trigger:any delta = -0.4903
+
+answer_explain gen_after_step_6 L29H11
+success/drift = 8/8
+trigger:any delta = +0.3799
+
+answer_explain gen_after_step_1 L11H3
+success/drift = 8/8
+trigger:any delta = +0.3744
+
+answer_repeat prompt_last L31H26
+success/drift = 8/8
+trigger:any delta = -0.3544
+
+answer_repeat gen_after_step_1 L29H11
+success/drift = 8/8
+trigger:any delta = +0.3533
+```
+
+这与 Phase214 的判断一致：
+
+```text
+qwen3 repeat/explain 比 list 更适合作为下一轮路径拆解对象。
+```
+
+第五，DS7B 信号很强但仍不稳。
+
+DS7B 的 answer_explain/list 出现大量强差异：
+
+```text
+answer_explain gen_after_step_1 L24H20
+success/drift = 6/2
+trigger:any delta = -0.8713
+answer_slot delta = -0.8745
+
+answer_explain gen_after_step_1 L24H16
+success/drift = 6/2
+trigger:any delta = -0.8330
+
+answer_list gen_after_step_1 L24H20
+success/drift = 6/2
+trigger:any delta = -0.6579
+```
+
+这和 Phase212/213/214 中 DS7B explain/list 的弱正信号互相呼应。
+
+但必须谨慎：
+
+```text
+drift rows 只有 2；
+这些强差异只能作为候选，不能作为强结论。
+```
+
+第六，RoutePath 不只是触发词，也包括 question_prefix（问题区域）和 instruction_to_answer（指令到回答槽区域）。
+
+聚合统计显示，强差异频繁出现在：
+
+```text
+question_prefix；
+instruction_to_answer；
+trigger:any；
+answer_slot；
+object。
+```
+
+这说明真实路由路径可能不是“只回读一个触发词”，而是：
+
+```text
+问题内容 + 指令结构 + 回答槽 + 触发词
+```
+
+共同形成模式路由。
+
+### 六、理论进展
+
+Phase215 把 Phase214 的路径公式补上了一块。
+
+此前：
+
+$$
+\boxed{
+\mathrm{TriggerPath}
+\to
+\mathrm{StatePath}
+}
+$$
+
+现在增加：
+
+$$
+\boxed{
+\mathrm{TriggerPath}
+\to
+\mathrm{RoutePath}
+\to
+\mathrm{StatePath}
+}
+$$
+
+模式因果主公式保持：
+
+$$
+\boxed{
+\mathrm{PatternCause}
+=
+\mathrm{TriggerPath}
+\circ
+\mathrm{RoutePath}
+\circ
+\mathrm{StatePath}
+\circ
+\mathrm{ReadoutPath}
+}
+$$
+
+Phase215 的贡献是：
+
+```text
+RoutePath 有了逐头注意力候选；
+但还没有证明这些 head 是因果组件。
+```
+
+更精确地说：
+
+$$
+\boxed{
+\mathrm{RouteCandidate}_{l,h,G}
+=
+\Delta M_{l,h}^{G}
+}
+$$
+
+其中：
+
+```text
+G = prompt source group（提示源位置组）。
+```
+
+如果某个 head 在多个样本中对 G 的注意力差分稳定，则它是 RoutePath 候选。
+
+### 七、问题和硬伤
+
+第一，本轮仍是注意力相关图谱，不是因果验证。
+
+注意力质量差异不能自动等于：
+
+```text
+该 head 决定模式成功/漂移。
+```
+
+下一步必须做 head-level causal validation（注意力头级因果验证）。
+
+第二，attention mass（注意力质量）只说明读了哪里，不说明写了什么。
+
+即使 head 回读 trigger token（触发词），也可能只是旁观。
+
+需要后续结合：
+
+```text
+head output；
+residual delta；
+readout margin；
+generation behavior。
+```
+
+第三，source group 仍较粗。
+
+本轮分组：
+
+```text
+trigger:any；
+question_prefix；
+instruction_to_answer；
+answer_slot；
+object；
+target_label。
+```
+
+但真实路由可能依赖：
+
+```text
+短语结构；
+相邻 token；
+标点；
+对象-关系组合；
+句式整体。
+```
+
+第四，DS7B 样本仍不足。
+
+DS7B 强结果不能直接当强证据。
+
+第五，小模型偏差仍需 30% 到 50% 折扣。
+
+当前结果仍是：
+
+```text
+small-model route atlas（小模型路由图谱）。
+```
+
+### 八、阶段性结论
+
+Phase215 的核心结论：
+
+```text
+prompt 触发词和回答槽不只是静态提示；
+生成早期确实存在对这些 prompt 源位置的差分回读路由；
+这种路由差异和 success/drift 模式分叉相关。
+```
+
+这支持当前路线：
+
+```text
+语言编码机制不是点；
+不是简单窗口；
+而是触发、路由、状态维持、读出的路径网络。
+```
+
+通俗说：
+
+```text
+模型在回答时会回头看 prompt 中的关键位置；
+成功和漂移的区别，可能部分来自“看回哪里、哪个 head 看、什么时候看”。
+```
+
+### 九、下一阶段任务
+
+下一步仍属于同一阶段目标。
+
+建议进入：
+
+```text
+Phase216: 路由头因果校准与写入作用验证
+```
+
+优先候选：
+
+```text
+GLM4 answer_target_seeded:
+  L29H28
+  L29H10
+  L29H18
+  L29H11
+  L29H25
+
+qwen3 answer_explain:
+  L3H15
+  L29H11
+  L11H3
+
+qwen3 answer_repeat:
+  L31H26
+  L29H11
+
+DS7B answer_explain/list:
+  L24H20
+  L24H16
+  L25H1
+  仅作为弱候选保留。
+```
+
+Phase216 不应直接做大规模 patch。
+
+应先做小规模校准：
+
+```text
+1. head ablation（注意力头消融）是否降低 PatternMatched；
+2. source-restricted ablation（限制源位置的消融）是否比全 head 更精确；
+3. head output norm / residual delta 是否和模式差异一致；
+4. 如果因果弱，则回退到更完整的 source group，而不是继续硬 patch。
+```
+
+当前进度估计：
+
+```text
+小模型模式机制图谱：约 58%
+TriggerPath：约 38%
+RoutePath：约 18%
+StatePath：约 35%
+ReadoutPath：约 20%
+路径因果机制：约 12%
+模型内部自然闭合：约 30%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 34% 到 39%
+```

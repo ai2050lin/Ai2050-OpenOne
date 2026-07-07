@@ -1,0 +1,197 @@
+{
+  "phase": 212,
+  "source_phase": 211,
+  "title": "Switchpoint Causal Validation",
+  "status": "complete",
+  "timestamp": "2026-07-06 19:52:42",
+  "model": "glm4",
+  "phase210_round": "minimal_pattern_transition_atlas",
+  "rollout_rows": 20,
+  "candidate_summaries": [
+    {
+      "phase": 212,
+      "source_phase": 211,
+      "row_kind": "phase212_candidate_summary_row",
+      "model": "glm4",
+      "candidate": {
+        "pattern_id": "answer_list",
+        "failure_mode": "repeat_answer",
+        "layer_idx": 29,
+        "step": 8
+      },
+      "candidate_key": "glm4|answer_list|repeat_answer|L29|S8",
+      "available_success_rows": 1,
+      "available_drift_rows": 8,
+      "group_rows": [
+        {
+          "source_group": "drift",
+          "patch_condition": "none",
+          "rows": 6,
+          "pattern_match": 2,
+          "answer_present": 6,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "repeat_answer": 4,
+            "list_answer": 2
+          },
+          "failure_modes": {
+            "repeat_answer": 4,
+            "match": 2
+          },
+          "top_generated_prefixes": {
+            " red, green, or yellow\nAnswer: red, green": 2,
+            " red, pink, or white\nAnswer: red, pink": 2,
+            " red, crimson, scarlet\n1. The cardinal is": 2
+          }
+        },
+        {
+          "source_group": "drift",
+          "patch_condition": "success_mean",
+          "rows": 6,
+          "pattern_match": 2,
+          "answer_present": 6,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "repeat_answer": 4,
+            "list_answer": 2
+          },
+          "failure_modes": {
+            "repeat_answer": 4,
+            "match": 2
+          },
+          "top_generated_prefixes": {
+            " red, green, or yellow\n: red, green,": 2,
+            " red, pink, or white\n: red, pink,": 2,
+            " red, crimson, scarlet\n: The cardinal is a": 2
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "none",
+          "rows": 1,
+          "pattern_match": 1,
+          "answer_present": 1,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 1
+          },
+          "failure_modes": {
+            "match": 1
+          },
+          "top_generated_prefixes": {
+            " white, brown, black\nAnswer: light, medium,": 1
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "drift_mean",
+          "rows": 1,
+          "pattern_match": 1,
+          "answer_present": 1,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 1
+          },
+          "failure_modes": {
+            "match": 1
+          },
+          "top_generated_prefixes": {
+            " white, brown, black\nAnswer color of wood\nAnswer": 1
+          }
+        }
+      ],
+      "repair_match_gain": 0,
+      "damage_match_loss": 0,
+      "status": "complete"
+    },
+    {
+      "phase": 212,
+      "source_phase": 211,
+      "row_kind": "phase212_candidate_summary_row",
+      "model": "glm4",
+      "candidate": {
+        "pattern_id": "answer_list",
+        "failure_mode": "echo_then_answer",
+        "layer_idx": 35,
+        "step": 8
+      },
+      "candidate_key": "glm4|answer_list|echo_then_answer|L35|S8",
+      "available_success_rows": 1,
+      "available_drift_rows": 2,
+      "group_rows": [
+        {
+          "source_group": "drift",
+          "patch_condition": "none",
+          "rows": 2,
+          "pattern_match": 2,
+          "answer_present": 2,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 2
+          },
+          "failure_modes": {
+            "match": 2
+          },
+          "top_generated_prefixes": {
+            " The spoon is used for eating, stirring, and measuring.\n": 2
+          }
+        },
+        {
+          "source_group": "drift",
+          "patch_condition": "success_mean",
+          "rows": 2,
+          "pattern_match": 0,
+          "answer_present": 2,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "echo_then_answer": 2
+          },
+          "failure_modes": {
+            "echo_then_answer": 2
+          },
+          "top_generated_prefixes": {
+            " The spoon is used for eating,: for stirring in a": 2
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "none",
+          "rows": 1,
+          "pattern_match": 1,
+          "answer_present": 1,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 1
+          },
+          "failure_modes": {
+            "match": 1
+          },
+          "top_generated_prefixes": {
+            " white, brown, black\nAnswer: light, medium,": 1
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "drift_mean",
+          "rows": 1,
+          "pattern_match": 1,
+          "answer_present": 1,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 1
+          },
+          "failure_modes": {
+            "match": 1
+          },
+          "top_generated_prefixes": {
+            " white, brown, black\nAnswer utensils, furniture,": 1
+          }
+        }
+      ],
+      "repair_match_gain": -2,
+      "damage_match_loss": 0,
+      "status": "complete"
+    }
+  ],
+  "boundary": "Single layer-step hidden-state mean patch. Positive result is directional causal evidence, not full closure."
+}

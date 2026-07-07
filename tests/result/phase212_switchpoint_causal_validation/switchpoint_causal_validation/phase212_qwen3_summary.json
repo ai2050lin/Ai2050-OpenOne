@@ -1,0 +1,201 @@
+{
+  "phase": 212,
+  "source_phase": 211,
+  "title": "Switchpoint Causal Validation",
+  "status": "complete",
+  "timestamp": "2026-07-06 19:52:21",
+  "model": "qwen3",
+  "phase210_round": "minimal_pattern_transition_atlas",
+  "rollout_rows": 40,
+  "candidate_summaries": [
+    {
+      "phase": 212,
+      "source_phase": 211,
+      "row_kind": "phase212_candidate_summary_row",
+      "model": "qwen3",
+      "candidate": {
+        "pattern_id": "answer_list",
+        "failure_mode": "other_or_wrong",
+        "layer_idx": 32,
+        "step": 11
+      },
+      "candidate_key": "qwen3|answer_list|other_or_wrong|L32|S11",
+      "available_success_rows": 8,
+      "available_drift_rows": 6,
+      "group_rows": [
+        {
+          "source_group": "drift",
+          "patch_condition": "none",
+          "rows": 6,
+          "pattern_match": 0,
+          "answer_present": 0,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "other_or_wrong": 6
+          },
+          "failure_modes": {
+            "other_or_wrong": 6
+          },
+          "top_generated_prefixes": {
+            " 1. To make windows and doors 2. To": 2,
+            " 1. Transportation 2. Agriculture 3. Recreation": 2,
+            " 1. A type of animal 2. A common": 2
+          }
+        },
+        {
+          "source_group": "drift",
+          "patch_condition": "success_mean",
+          "rows": 6,
+          "pattern_match": 0,
+          "answer_present": 0,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "other_or_wrong": 6
+          },
+          "failure_modes": {
+            "other_or_wrong": 6
+          },
+          "top_generated_prefixes": {
+            " 1. To make windows and doors 2 is used": 2,
+            " 1. Transportation 2. Agriculture 3 is a": 2,
+            " 1. A type of animal 2. is used": 2
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "none",
+          "rows": 6,
+          "pattern_match": 6,
+          "answer_present": 6,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 6
+          },
+          "failure_modes": {
+            "match": 6
+          },
+          "top_generated_prefixes": {
+            " red, pink, purple\nOkay, the user is asking": 2,
+            " red, blue, green\nOkay, the user asked,": 2,
+            " brown, black, white\nOkay, the user is asking": 2
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "drift_mean",
+          "rows": 6,
+          "pattern_match": 6,
+          "answer_present": 6,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 6
+          },
+          "failure_modes": {
+            "match": 6
+          },
+          "top_generated_prefixes": {
+            " red, pink, purple\nOkay, the user. asked": 2,
+            " red, blue, green\nOkay, the user. asked": 2,
+            " brown, black, white\nOkay, the user. asked": 2
+          }
+        }
+      ],
+      "repair_match_gain": 0,
+      "damage_match_loss": 0,
+      "status": "complete"
+    },
+    {
+      "phase": 212,
+      "source_phase": 211,
+      "row_kind": "phase212_candidate_summary_row",
+      "model": "qwen3",
+      "candidate": {
+        "pattern_id": "answer_list",
+        "failure_mode": "short_answer",
+        "layer_idx": 32,
+        "step": 9
+      },
+      "candidate_key": "qwen3|answer_list|short_answer|L32|S9",
+      "available_success_rows": 8,
+      "available_drift_rows": 2,
+      "group_rows": [
+        {
+          "source_group": "drift",
+          "patch_condition": "none",
+          "rows": 2,
+          "pattern_match": 0,
+          "answer_present": 2,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "short_answer": 2
+          },
+          "failure_modes": {
+            "short_answer": 2
+          },
+          "top_generated_prefixes": {
+            " 1. To hold liquid 2. To drink from": 2
+          }
+        },
+        {
+          "source_group": "drift",
+          "patch_condition": "success_mean",
+          "rows": 2,
+          "pattern_match": 0,
+          "answer_present": 2,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "echo_then_answer": 2
+          },
+          "failure_modes": {
+            "echo_then_answer": 2
+          },
+          "top_generated_prefixes": {
+            " 1. To hold liquid 2 the cup is used": 2
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "none",
+          "rows": 6,
+          "pattern_match": 6,
+          "answer_present": 6,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 6
+          },
+          "failure_modes": {
+            "match": 6
+          },
+          "top_generated_prefixes": {
+            " red, pink, purple\nOkay, the user is asking": 2,
+            " red, blue, green\nOkay, the user asked,": 2,
+            " brown, black, white\nOkay, the user is asking": 2
+          }
+        },
+        {
+          "source_group": "success",
+          "patch_condition": "drift_mean",
+          "rows": 6,
+          "pattern_match": 6,
+          "answer_present": 6,
+          "ended_with_eos": 0,
+          "output_patterns": {
+            "list_answer": 6
+          },
+          "failure_modes": {
+            "match": 6
+          },
+          "top_generated_prefixes": {
+            " red, pink, purple\nOkay,. So the user": 2,
+            " red, blue, green\nOkay,. The user asked": 2,
+            " brown, black, white\nOkay,. So the question": 2
+          }
+        }
+      ],
+      "repair_match_gain": 0,
+      "damage_match_loss": 0,
+      "status": "complete"
+    }
+  ],
+  "boundary": "Single layer-step hidden-state mean patch. Positive result is directional causal evidence, not full closure."
+}
