@@ -1,0 +1,217 @@
+{
+  "phase": 218,
+  "source_phase": 217,
+  "title": "Source Restricted Value Ablation",
+  "status": "complete",
+  "timestamp": "2026-07-06 22:24:29",
+  "model": "qwen3",
+  "headset_count": 2,
+  "filter_rows": 32,
+  "reproducible_success_rows": 16,
+  "reproducible_drift_rows": 12,
+  "rollout_rows": 80,
+  "source_value_rows": 1280,
+  "summary_rows": 20,
+  "effect_rows": [
+    {
+      "headset_id": "qwen3_explain_route_set",
+      "condition": "block_answer_slot",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 4
+      },
+      "success_patch_outputs": {
+        "explain_answer": 4
+      },
+      "drift_base_outputs": {
+        "echo_then_answer": 3,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 4
+      }
+    },
+    {
+      "headset_id": "qwen3_explain_route_set",
+      "condition": "block_instruction_to_answer",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 4
+      },
+      "success_patch_outputs": {
+        "explain_answer": 4
+      },
+      "drift_base_outputs": {
+        "echo_then_answer": 3,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "echo_then_answer": 3,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "headset_id": "qwen3_explain_route_set",
+      "condition": "block_trigger:any",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 4
+      },
+      "success_patch_outputs": {
+        "explain_answer": 4
+      },
+      "drift_base_outputs": {
+        "echo_then_answer": 3,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "echo_then_answer": 3,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "headset_id": "qwen3_explain_route_set",
+      "condition": "block_question_prefix",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 4
+      },
+      "success_patch_outputs": {
+        "explain_answer": 4
+      },
+      "drift_base_outputs": {
+        "echo_then_answer": 3,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 4
+      }
+    },
+    {
+      "headset_id": "qwen3_repeat_route_set",
+      "condition": "block_answer_slot",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "repeat_answer": 4
+      },
+      "success_patch_outputs": {
+        "repeat_answer": 4
+      },
+      "drift_base_outputs": {
+        "list_answer": 4
+      },
+      "drift_patch_outputs": {
+        "list_answer": 4
+      }
+    },
+    {
+      "headset_id": "qwen3_repeat_route_set",
+      "condition": "block_instruction_to_answer",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "repeat_answer": 4
+      },
+      "success_patch_outputs": {
+        "repeat_answer": 4
+      },
+      "drift_base_outputs": {
+        "list_answer": 4
+      },
+      "drift_patch_outputs": {
+        "list_answer": 4
+      }
+    },
+    {
+      "headset_id": "qwen3_repeat_route_set",
+      "condition": "block_trigger:any",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "repeat_answer": 4
+      },
+      "success_patch_outputs": {
+        "repeat_answer": 4
+      },
+      "drift_base_outputs": {
+        "list_answer": 4
+      },
+      "drift_patch_outputs": {
+        "list_answer": 4
+      }
+    },
+    {
+      "headset_id": "qwen3_repeat_route_set",
+      "condition": "block_question_prefix",
+      "success_rows": 4,
+      "drift_rows": 4,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "repeat_answer": 4
+      },
+      "success_patch_outputs": {
+        "repeat_answer": 4
+      },
+      "drift_base_outputs": {
+        "list_answer": 4
+      },
+      "drift_patch_outputs": {
+        "list_answer": 4
+      }
+    }
+  ],
+  "total_damage_match_loss": 0,
+  "total_repair_match_gain": 0
+}

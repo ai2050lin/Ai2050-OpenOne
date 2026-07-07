@@ -1,0 +1,128 @@
+{
+  "phase": 217,
+  "source_phase": 216,
+  "title": "Reproducible Baseline and Headset Validation",
+  "status": "complete",
+  "timestamp": "2026-07-06 22:10:13",
+  "model": "qwen3",
+  "headset_count": 2,
+  "filter_rows": 32,
+  "reproducible_success_rows": 16,
+  "reproducible_drift_rows": 14,
+  "rollout_rows": 72,
+  "norm_rows": 1200,
+  "summary_rows": 12,
+  "norm_summary_rows": 100,
+  "effect_rows": [
+    {
+      "headset_id": "qwen3_explain_route_set",
+      "condition": "headset_anchor_step",
+      "success_rows": 6,
+      "drift_rows": 6,
+      "success_base_match": 6,
+      "success_patch_match": 6,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 6
+      },
+      "success_patch_outputs": {
+        "explain_answer": 6
+      },
+      "drift_base_outputs": {
+        "list_answer": 3,
+        "repeat_answer": 2,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "list_answer": 3,
+        "repeat_answer": 2,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "headset_id": "qwen3_explain_route_set",
+      "condition": "headset_all_steps",
+      "success_rows": 6,
+      "drift_rows": 6,
+      "success_base_match": 6,
+      "success_patch_match": 6,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 6
+      },
+      "success_patch_outputs": {
+        "explain_answer": 6
+      },
+      "drift_base_outputs": {
+        "list_answer": 3,
+        "repeat_answer": 2,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "list_answer": 3,
+        "repeat_answer": 2,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "headset_id": "qwen3_repeat_route_set",
+      "condition": "headset_anchor_step",
+      "success_rows": 6,
+      "drift_rows": 6,
+      "success_base_match": 6,
+      "success_patch_match": 6,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "repeat_answer": 6
+      },
+      "success_patch_outputs": {
+        "repeat_answer": 6
+      },
+      "drift_base_outputs": {
+        "list_answer": 5,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "list_answer": 5,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "headset_id": "qwen3_repeat_route_set",
+      "condition": "headset_all_steps",
+      "success_rows": 6,
+      "drift_rows": 6,
+      "success_base_match": 6,
+      "success_patch_match": 6,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "repeat_answer": 6
+      },
+      "success_patch_outputs": {
+        "repeat_answer": 6
+      },
+      "drift_base_outputs": {
+        "list_answer": 5,
+        "other_or_wrong": 1
+      },
+      "drift_patch_outputs": {
+        "list_answer": 5,
+        "other_or_wrong": 1
+      }
+    }
+  ],
+  "total_damage_match_loss": 0,
+  "total_repair_match_gain": 0
+}

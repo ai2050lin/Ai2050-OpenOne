@@ -42890,3 +42890,4544 @@ ReadoutPath：约 20%
 任务层产品闭合：约 55%
 通用语言机制外推置信：约 34% 到 39%
 ```
+
+## Phase 216: 路由头因果校准与写入作用验证 [2026-07-06 21:44]
+
+### 一、任务判断
+
+本轮附件对 Phase215 的判断基本正确。
+
+Phase215 已经证明：
+
+```text
+success/drift 在 prompt source 回读路径上存在差异；
+RoutePath 候选成立；
+但注意力质量只说明“读哪里”，不说明“写什么”，更不说明因果控制。
+```
+
+因此 Phase216 继续同一阶段目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+本轮进入小规模 head-level causal calibration（注意力头级因果校准），但仍不追求闭合。
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase216_route_head_causal_calibration.py
+tests/gpt5/run_phase216_route_head_causal_calibration.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase216_route_head_causal_calibration/route_head_causal_calibration/
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型顺序加载和释放，没有并发占用 GPU。
+
+### 三、算法原理
+
+Phase216 从 Phase215 的 RouteCandidate（路由候选）中选取 top heads（高分注意力头），做小规模消融。
+
+消融方式：
+
+```text
+在 self_attn.o_proj 输入前，把指定 head 的 head slice 置零。
+```
+
+对每个候选 head 测试三种条件：
+
+```text
+none:
+  不消融。
+
+ablate_anchor_step:
+  只在候选 anchor 对应生成步消融。
+
+ablate_all_steps:
+  每个生成步都消融该 head。
+```
+
+核心公式：
+
+$$
+\boxed{
+z'_{l,h,t}
+=
+0
+}
+$$
+
+其中：
+
+```text
+z_{l,h,t} = 第 l 层第 h 个注意力头在生成步 t 的 o_proj 输入切片；
+z' = 消融后的 head 输出切片。
+```
+
+观测指标：
+
+```text
+PatternMatched 是否下降；
+drift 是否被修复；
+输出模式是否改变。
+```
+
+定义：
+
+$$
+\boxed{
+\mathrm{Damage}
+=
+\mathrm{Match}_{success,none}
+-
+\mathrm{Match}_{success,ablate}
+}
+$$
+
+$$
+\boxed{
+\mathrm{Repair}
+=
+\mathrm{Match}_{drift,ablate}
+-
+\mathrm{Match}_{drift,none}
+}
+$$
+
+如果：
+
+```text
+Damage > 0
+```
+
+说明该 head 对成功模式可能有必要性。
+
+如果：
+
+```text
+Repair > 0
+```
+
+说明该 head 可能支持漂移或竞争模式。
+
+### 四、候选范围
+
+qwen3：
+
+```text
+answer_explain:
+  L3H15
+  L29H11
+  L11H3
+
+answer_repeat:
+  L31H26
+  L29H11
+```
+
+GLM4：
+
+```text
+answer_target_seeded:
+  L29H28
+  L29H10
+  L29H18
+  L29H11
+  L29H25
+
+answer_repeat:
+  L12H21
+
+answer_explain:
+  L12H18
+```
+
+DS7B：
+
+```text
+answer_explain:
+  L24H20
+  L24H16
+
+answer_list:
+  L24H20
+```
+
+其中 DS7B 仍为弱样本候选。
+
+### 五、客观结果
+
+总体：
+
+```text
+candidate count = 15
+rollout rows = 342
+effect rows = 30
+total damage match loss = 1
+total repair match gain = 0
+```
+
+分模型：
+
+```text
+qwen3:
+  rollout rows = 120
+  damage = 0
+  repair = 0
+
+GLM4:
+  rollout rows = 168
+  damage = -3
+  repair = 0
+
+DS7B:
+  rollout rows = 54
+  damage = 4
+  repair = 0
+```
+
+### 六、主要现象
+
+第一，qwen3 的 RoutePath 候选没有单头必要性证据。
+
+qwen3 所有候选：
+
+```text
+damage = 0
+repair = 0
+```
+
+具体基线可复现性较好：
+
+```text
+answer_explain:
+  success none = 4/4 explain_answer
+
+answer_repeat:
+  success none = 4/4 repeat_answer
+```
+
+但消融：
+
+```text
+ablate_anchor_step；
+ablate_all_steps；
+```
+
+都没有降低 PatternMatched。
+
+严格结论：
+
+```text
+qwen3 的 L3H15、L29H11、L11H3、L31H26 等 head 是路由差异候选，
+但不是当前测试下的单头必要因果组件。
+```
+
+第二，GLM4 target_seeded 的强路由候选没有通过必要性验证。
+
+Phase215 中 GLM4 target_seeded 的 L29 heads 是最强 RoutePath 候选。
+
+但 Phase216 发现：
+
+```text
+GLM4 answer_target_seeded success rows 在 none 条件下并未复现成功；
+success none = 0/4；
+输出全部是 repeat_answer。
+```
+
+例如：
+
+```text
+L29H28:
+  success none output = repeat_answer 4/4
+
+L29H10:
+  success none output = repeat_answer 4/4
+
+L29H18:
+  success none output = repeat_answer 4/4
+```
+
+因此这些候选不能用于强必要性判断。
+
+严格结论：
+
+```text
+GLM4 target_seeded 的 route delta 很强，
+但当前小规模重生成基线不稳定；
+不能说明 L29 heads 是 target_seeded 成功模式的必要因果组件。
+```
+
+第三，GLM4 explain L12H18 出现“负 damage”。
+
+结果：
+
+```text
+glm4 answer_explain L12H18 ablate_all_steps:
+  damage = -3
+  repair = 0
+```
+
+解释：
+
+```text
+none 条件下 success rows 只有 1/4 匹配 explain_answer；
+ablate_all_steps 后变为 4/4 explain_answer。
+```
+
+这不是必要性证据，而是说明：
+
+```text
+该 head 可能支持竞争/漂移成分；
+或者 none 基线本身不稳定。
+```
+
+这值得保留为后续“竞争路由头”候选，但不能当闭合。
+
+第四，DS7B explain L24H16 出现弱正因果信号。
+
+结果：
+
+```text
+deepseek7b answer_explain L24H16 ablate_all_steps:
+  success none = 4/4 explain_answer
+  success ablate_all_steps = 0/4 explain_answer
+  damage = 4
+  repair = 0
+```
+
+输出从：
+
+```text
+explain_answer 4/4
+```
+
+变为：
+
+```text
+echo_then_answer 2/4
+other_or_wrong 2/4
+```
+
+这说明：
+
+```text
+DS7B L24H16 对 explain 模式有必要性候选。
+```
+
+但必须低权重：
+
+```text
+DS7B drift rows 只有 2；
+小模型 explain 偏置明显；
+只有一个 head 在本轮显示强 damage。
+```
+
+第五，repair 仍然完全没有出现。
+
+总体：
+
+```text
+total repair match gain = 0
+```
+
+这说明：
+
+```text
+消融高路由差异 head 不能把 drift 修复成 success。
+```
+
+换句话说：
+
+```text
+这些 head 即便参与成功模式，也不是简单“漂移开关”。
+```
+
+### 七、理论进展
+
+Phase216 进一步收紧 Phase215 的结论。
+
+Phase215：
+
+$$
+\boxed{
+\mathrm{RouteCandidate}_{l,h,G}
+=
+\Delta M_{l,h}^{G}
+}
+$$
+
+Phase216 证明：
+
+$$
+\boxed{
+\mathrm{RouteCandidate}
+\not\Rightarrow
+\mathrm{RouteCause}
+}
+$$
+
+更严格地说：
+
+$$
+\boxed{
+\Delta M_{l,h}^{G}
+\text{ 高}
+\not\Rightarrow
+\mathrm{Damage}_{l,h}>0
+}
+$$
+
+当前更合理的路径因果判断应是：
+
+$$
+\boxed{
+\mathrm{RouteCause}_{l,h}
+=
+\mathrm{RouteDifference}_{l,h}
+\land
+\mathrm{WriteEffect}_{l,h}
+\land
+\mathrm{BehaviorEffect}_{l,h}
+}
+$$
+
+其中：
+
+```text
+RouteDifference = 注意力路由差异；
+WriteEffect = head output 对 residual state 有可测写入；
+BehaviorEffect = 消融或干预改变输出模式。
+```
+
+Phase216 当前只在 DS7B L24H16 上看到弱 BehaviorEffect。
+
+### 八、问题和硬伤
+
+第一，source-restricted ablation 尚未完成。
+
+本轮做的是：
+
+```text
+full head ablation（整头消融）
+```
+
+还没有做：
+
+```text
+只阻断该 head 对 trigger/Answer:/instruction 的读取。
+```
+
+所以不能区分：
+
+```text
+head 本身重要；
+还是 head 对某个 source group 的读取重要。
+```
+
+第二，head output 写入仍未直接测量。
+
+本轮只看行为变化，没有直接记录：
+
+```text
+head output norm；
+head output direction；
+residual delta；
+readout margin。
+```
+
+第三，GLM4 target_seeded 基线不可复现。
+
+这是本轮最大硬伤之一。
+
+Phase215 的强路由信号不能直接进入 Phase216 的因果结论，因为：
+
+```text
+success rows 在重新生成时已经不 success。
+```
+
+后续必须先做：
+
+```text
+baseline reproducibility filter（基线可复现过滤）。
+```
+
+第四，单头消融可能太弱。
+
+模式路径可能由多个 head 共同实现。
+
+因此：
+
+```text
+单头 damage = 0
+```
+
+不能证明该 head 完全无用，只能说明它不是单头必要组件。
+
+第五，小模型偏差仍然存在。
+
+当前结果仍只能叫：
+
+```text
+small-model route head calibration（小模型路由头校准）。
+```
+
+### 九、阶段性结论
+
+Phase216 的核心结论：
+
+```text
+强 RoutePath 候选多数没有通过单头因果校准；
+路由差异不是单头因果；
+DS7B explain L24H16 是唯一弱正必要性候选；
+GLM4 target_seeded 的强路由信号受基线不可复现限制；
+qwen3 explain/repeat 路由候选更像分布式路径，不是单头开关。
+```
+
+这和前面 Phase212/213 的负结果一致：
+
+```text
+语言模式机制不是单点；
+不是单窗口；
+也不是单 head。
+```
+
+更可能是：
+
+```text
+多源 prompt 信息
+-> 多头路由集合
+-> residual state 写入
+-> MLP/attention 状态维持
+-> readout 竞争
+```
+
+### 十、下一阶段任务
+
+下一步仍属于同一阶段目标。
+
+不应继续盲目扩大 head patch。
+
+建议进入：
+
+```text
+Phase217: 可复现基线过滤与多头路由集合验证
+```
+
+核心任务：
+
+```text
+1. 先重新生成所有 Phase215 候选样本，保留 none 条件下可复现 success/drift 的样本；
+2. 对同一 pattern 的多个 route heads 做 head set ablation（头集合消融）；
+3. 记录 head output norm 与 residual delta；
+4. 对 GLM4 target_seeded 重新建立可复现样本集；
+5. 对 DS7B L24H16 做扩大样本复测，但仍低权重解释。
+```
+
+当前进度估计：
+
+```text
+小模型模式机制图谱：约 59%
+TriggerPath：约 38%
+RoutePath：约 21%
+RouteCause：约 6%
+StatePath：约 35%
+ReadoutPath：约 20%
+路径因果机制：约 13%
+模型内部自然闭合：约 30%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 34% 到 39%
+```
+
+## Phase 217: 可复现基线过滤与多头路由集合验证 [2026-07-06 22:12]
+
+### 一、任务判断
+
+本轮附件对 Phase216 的判断基本正确。
+
+Phase216 的关键结果是：
+
+```text
+RouteCandidate 不等于 RouteCause；
+单个 attention head 的高路由差异，大多不能推出行为因果；
+GLM4 target_seeded 的强路由信号受 baseline reproducibility 失败限制。
+```
+
+因此 Phase217 继续同一阶段目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+本轮优先解决：
+
+```text
+1. none 条件下 success/drift 是否可复现；
+2. head set 是否比 single head 更有行为影响；
+3. head output norm 是否能作为 WriteEffect 的轻量代理。
+```
+
+### 二、测试脚本
+
+新增脚本：
+
+```text
+tests/gpt5/phase217_reproducible_headset_validation.py
+tests/gpt5/run_phase217_reproducible_headset_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase217_reproducible_headset_validation/reproducible_headset_validation/
+```
+
+运行顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+三模型顺序加载和释放，避免显存重叠。
+
+### 三、算法原理
+
+Phase217 分两步。
+
+第一步，baseline reproducibility filter（基线可复现过滤）。
+
+对 Phase215/216 的候选样本重新生成 none 条件：
+
+```text
+原 success 样本：
+  none 条件仍 PatternMatched 才保留。
+
+原 drift 样本：
+  none 条件仍 PatternDrift 才保留。
+```
+
+公式：
+
+$$
+\boxed{
+\mathrm{KeepSuccess}(x)
+=
+\mathrm{PatternMatched}
+\left(
+G_{\mathrm{none}}(x)
+\right)
+}
+$$
+
+$$
+\boxed{
+\mathrm{KeepDrift}(x)
+=
+\neg
+\mathrm{PatternMatched}
+\left(
+G_{\mathrm{none}}(x)
+\right)
+}
+$$
+
+第二步，head set ablation（头集合消融）。
+
+对同一模式的多个 route heads 组成集合：
+
+$$
+\boxed{
+H_{\mathrm{set}}
+=
+\{(l_i,h_i)\}_{i=1}^{n}
+}
+$$
+
+消融：
+
+$$
+\boxed{
+z'_{l,h,t}=0,
+\quad
+(l,h)\in H_{\mathrm{set}}
+}
+$$
+
+测试条件：
+
+```text
+none；
+headset_anchor_step；
+headset_all_steps。
+```
+
+同时在 none 条件记录 head output norm：
+
+$$
+\boxed{
+\|O_{l,h,t}\|_2
+}
+$$
+
+这只是 WriteEffect（写入作用）的轻量代理，不是完整方向验证。
+
+### 四、测试范围
+
+qwen3：
+
+```text
+qwen3_explain_route_set:
+  L3H15
+  L11H3
+  L29H11
+
+qwen3_repeat_route_set:
+  L31H26
+  L29H11
+```
+
+GLM4：
+
+```text
+glm4_target_seeded_l29_route_set:
+  L29H28
+  L29H10
+  L29H18
+  L29H11
+  L29H25
+
+glm4_repeat_route_set:
+  L12H21
+
+glm4_explain_competition_route_set:
+  L12H18
+```
+
+DS7B：
+
+```text
+deepseek7b_explain_l24_route_set:
+  L24H20
+  L24H16
+
+deepseek7b_list_l24_route_set:
+  L24H20
+```
+
+### 五、客观结果
+
+总体：
+
+```text
+headset count = 7
+filter rows = 95
+reproducible success rows = 38
+reproducible drift rows = 40
+rollout rows = 198
+head output norm rows = 2754
+effect rows = 14
+total damage match loss = 4
+total repair match gain = 0
+```
+
+分模型：
+
+```text
+qwen3:
+  filter rows = 32
+  reproducible success rows = 16
+  reproducible drift rows = 14
+  rollout rows = 72
+  norm rows = 1200
+  damage = 0
+  repair = 0
+
+GLM4:
+  filter rows = 47
+  reproducible success rows = 12
+  reproducible drift rows = 22
+  rollout rows = 84
+  norm rows = 1092
+  damage = 0
+  repair = 0
+
+DS7B:
+  filter rows = 16
+  reproducible success rows = 10
+  reproducible drift rows = 4
+  rollout rows = 42
+  norm rows = 462
+  damage = 4
+  repair = 0
+```
+
+### 六、主要现象
+
+第一，qwen3 在可复现过滤后仍无 head set 因果信号。
+
+qwen3：
+
+```text
+qwen3_explain_route_set:
+  kept success = 6
+  kept drift = 6
+  damage = 0
+  repair = 0
+
+qwen3_repeat_route_set:
+  kept success = 6
+  kept drift = 6
+  damage = 0
+  repair = 0
+```
+
+输出保持：
+
+```text
+explain success -> explain_answer 6/6
+repeat success -> repeat_answer 6/6
+```
+
+head set 消融后仍没有破坏成功，也没有修复漂移。
+
+严格结论：
+
+```text
+qwen3 explain/repeat 的路由差异不是这些小 head set 的必要因果。
+```
+
+这比 Phase216 的单头负结果更强。
+
+第二，GLM4 target_seeded 的基线不可复现被确认。
+
+GLM4：
+
+```text
+glm4_target_seeded_l29_route_set:
+  kept success = 0
+  kept drift = 6
+```
+
+也就是说：
+
+```text
+Phase215 中最强的 GLM4 target_seeded RoutePath 候选，
+在 Phase217 的 none 重生成中没有可复现 success 样本。
+```
+
+因此：
+
+```text
+它不能进入成功必要性验证；
+只能说明 GLM4 的 target_seeded 轨迹在当前生成设置下非常不稳定。
+```
+
+第三，GLM4 repeat/explain 在可复现过滤后也无 head set 行为影响。
+
+```text
+glm4_repeat_route_set:
+  kept success = 6
+  kept drift = 6
+  damage = 0
+  repair = 0
+
+glm4_explain_competition_route_set:
+  kept success = 4
+  kept drift = 6
+  damage = 0
+  repair = 0
+```
+
+Phase216 中 GLM4 L12H18 的负 damage 没有在可复现过滤 + head set 条件下形成稳定结论。
+
+严格结论：
+
+```text
+GLM4 当前没有可靠 RouteCause。
+```
+
+第四，DS7B explain L24 head set 复现弱正必要性信号。
+
+结果：
+
+```text
+deepseek7b_explain_l24_route_set:
+  kept success = 6
+  kept drift = 2
+  headset_all_steps damage = 4
+  repair = 0
+```
+
+输出从：
+
+```text
+success none:
+  explain_answer 6/6
+```
+
+变成：
+
+```text
+headset_all_steps:
+  explain_answer 2/6
+  echo_then_answer 2/6
+  other_or_wrong 2/6
+```
+
+这复现并扩展了 Phase216 的 DS7B explain L24H16 信号。
+
+但仍要低权重解释：
+
+```text
+drift rows = 2；
+DS7B 是小模型；
+explain 模式可能有训练偏置；
+repair 仍然为 0。
+```
+
+第五，DS7B list L24 head set 没有行为影响。
+
+```text
+deepseek7b_list_l24_route_set:
+  kept success = 4
+  kept drift = 2
+  damage = 0
+  repair = 0
+```
+
+说明：
+
+```text
+DS7B 的 explain 路由信号比 list 更接近因果。
+```
+
+第六，head output norm 记录显示“强写入不等于修复”。
+
+head output norm 已正常记录：
+
+```text
+norm rows = 2754
+```
+
+典型现象：
+
+```text
+GLM4 target_seeded L29 heads 在 drift_repro 中 norm 很高：
+  L29H18 step4 norm ≈ 30.82
+  L29H28 step4 norm ≈ 30.57
+  L29H10 step5 norm ≈ 30.10
+```
+
+但：
+
+```text
+damage = 0
+repair = 0
+```
+
+这说明：
+
+```text
+强 head output / 强路由可能服务于漂移模式，而不是目标成功模式；
+仅看范数和注意力质量都不够。
+```
+
+### 七、理论进展
+
+Phase217 进一步收紧路径因果公式。
+
+Phase216 给出：
+
+$$
+\boxed{
+\mathrm{RouteCause}_{l,h}
+=
+\mathrm{RouteDifference}_{l,h}
+\land
+\mathrm{WriteEffect}_{l,h}
+\land
+\mathrm{BehaviorEffect}_{l,h}
+}
+$$
+
+Phase217 进一步加入可复现条件：
+
+$$
+\boxed{
+\mathrm{RouteCause}
+=
+\mathrm{ReproducibleBaseline}
+\land
+\mathrm{RouteDifference}
+\land
+\mathrm{WriteEffect}
+\land
+\mathrm{BehaviorEffect}
+}
+$$
+
+并且：
+
+$$
+\boxed{
+\mathrm{RouteSetCandidate}
+\not\Rightarrow
+\mathrm{RouteSetCause}
+}
+$$
+
+当前只有：
+
+```text
+DS7B explain L24 head set
+```
+
+达到弱 RouteSetCause 候选。
+
+### 八、问题和硬伤
+
+第一，source-restricted ablation 仍未完成。
+
+本轮是 head set 整体消融，仍不能区分：
+
+```text
+head 本身重要；
+还是 head 对某个 source group 的读取重要。
+```
+
+第二，WriteEffect 只用了 norm 代理。
+
+本轮记录：
+
+```text
+head output norm
+```
+
+但没有计算：
+
+```text
+head output direction；
+success-drift 写入方向；
+residual delta；
+readout margin delta。
+```
+
+第三，GLM4 target_seeded 不稳定问题仍未解决。
+
+它可能是：
+
+```text
+采样/贪心展开导致；
+模式本身不稳；
+分类启发式偏差；
+prompt seed 与 repeat 模式冲突。
+```
+
+第四，repair 仍然完全为 0。
+
+Phase217：
+
+```text
+total repair match gain = 0
+```
+
+说明当前消融方法不能把 drift 修成 success。
+
+第五，小模型偏差仍然需要 30% 到 50% 折扣。
+
+尤其 DS7B explain 的正信号不能过度外推。
+
+### 九、阶段性结论
+
+Phase217 的核心结论：
+
+```text
+可复现过滤是必要的；
+qwen3 和 GLM4 的路由候选在 head set 消融下仍没有行为因果；
+DS7B explain L24 head set 是当前唯一可复现弱必要性候选；
+强注意力路由和强 head output norm 都不等于目标模式因果；
+RouteCause 需要更细的 source-restricted 和方向写入验证。
+```
+
+这再次支持：
+
+```text
+语言模式机制不是单点；
+不是单窗口；
+不是单 head；
+也不是简单 head set。
+```
+
+更可能是：
+
+```text
+多源触发
+-> 多头路由
+-> 有方向的状态写入
+-> MLP/attention 状态维持
+-> readout 竞争
+```
+
+### 十、下一阶段任务
+
+下一步仍属于同一阶段目标。
+
+建议进入：
+
+```text
+Phase218: 源位置限制消融与写入方向验证
+```
+
+优先对象：
+
+```text
+DS7B explain L24H16/L24H20：
+  低权重但目前唯一可复现弱必要性候选。
+
+qwen3 explain/repeat：
+  作为负对照，验证 source-restricted 是否仍无效。
+
+GLM4 target_seeded：
+  先改进 prompt 或过滤策略，暂不作为因果主对象。
+```
+
+Phase218 应完成：
+
+```text
+1. 对 DS7B explain L24 head set 做 source group restricted ablation；
+2. 比较阻断 answer_slot / instruction_to_answer / trigger:any 的效果；
+3. 计算 head output 与 success-drift 方向的 cosine；
+4. 同时记录 residual delta 和输出模式变化；
+5. 如果 source-restricted 仍不能定位，则转向 MLP/StatePath。
+```
+
+当前进度估计：
+
+```text
+小模型模式机制图谱：约 60%
+TriggerPath：约 38%
+RoutePath：约 23%
+RouteCause：约 8%
+StatePath：约 35%
+ReadoutPath：约 20%
+路径因果机制：约 14%
+模型内部自然闭合：约 30%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 34% 到 39%
+```
+
+## Phase 218: 源位置限制消融与写入方向验证 [2026-07-06 22:26]
+
+### 0. 对附件判断的校准
+
+Phase217 的判断基本正确，而且 Phase218 的任务方向也是正确的。
+
+Phase217 已经把一个关键混淆拆开：
+
+```text
+RouteCandidate（路由候选） != RouteCause（路由因果）
+HeadSetCandidate（头集合候选） != HeadSetCause（头集合因果）
+```
+
+Phase217 的 head set 消融中，qwen3 和 GLM4 的可复现候选没有稳定因果效应；DS7B 的 explain L24 head set 出现过弱必要性信号，但样本量和效应都偏弱。因此附件提出的 Phase218 是合理的：不能继续只看“哪些 head 注意到哪些 token”，而要看候选 head 是否真的从特定源位置读取并写入了会改变输出模式的状态。
+
+本阶段继续同一阶段性目标：从模式候选推进到路径因果候选。任务仍属于 Phase209 到 Phase217 形成的“语言是动态模式网络”的机制图谱阶段，没有切换到最终理论闭合阶段。
+
+### 1. 测试文件和结果文件
+
+测试脚本：
+
+```text
+tests/gpt5/phase218_source_restricted_value_ablation.py
+tests/gpt5/run_phase218_source_restricted_value_ablation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase218_source_restricted_value_ablation/source_restricted_value_ablation/
+```
+
+关键结果文件：
+
+```text
+phase218_cross_model_summary.json
+phase218_cross_model_summary.md
+phase218_qwen3_summary.json
+phase218_glm4_summary.json
+phase218_deepseek7b_summary.json
+```
+
+### 2. 算法原理
+
+本阶段实现的是近似的 source-restricted value ablation（源位置限制 value 消融）。
+
+由于不同模型的注意力实现和缓存结构不完全一致，直接修改 attention probability（注意力概率）容易在模型间失效。因此本阶段选择一个更稳定的跨模型接口：在候选层的 `v_proj` 输出处，对指定源 token 位置、指定 KV head 的 value 向量置零。
+
+设某层第 \(l\) 层的 value 投影为：
+
+$$
+V_l = X_l W^V_l
+$$
+
+对候选 head set 中的 query head \(h\)，根据 GQA/MQA 的 head 分组映射到 KV head：
+
+$$
+k(h)=\left\lfloor \frac{h}{H_q / H_{kv}} \right\rfloor
+$$
+
+对源位置集合 \(S\) 进行限制消融：
+
+$$
+V'_{l,t,k(h)} =
+\begin{cases}
+0, & t \in S \\
+V_{l,t,k(h)}, & t \notin S
+\end{cases}
+$$
+
+然后比较 baseline（基线）输出和 patch（补丁/消融）输出：
+
+$$
+\Delta_{\text{damage}} =
+\text{match}_{success}^{base}
+-
+\text{match}_{success}^{patch}
+$$
+
+$$
+\Delta_{\text{repair}} =
+\text{match}_{drift}^{patch}
+-
+\text{match}_{drift}^{base}
+$$
+
+本阶段测试的源位置组：
+
+```text
+answer_slot：答案槽位附近
+instruction_to_answer：指令到答案之间的区域
+trigger:any：Phase214/215 识别的触发 token 区域
+question_prefix：问题前缀区域
+```
+
+测试对象：
+
+```text
+qwen3:
+  qwen3_explain_route_set
+  qwen3_repeat_route_set
+
+GLM4:
+  glm4_repeat_route_set
+  glm4_explain_competition_route_set
+
+DS7B:
+  deepseek7b_explain_l24_route_set
+  deepseek7b_list_l24_route_set
+```
+
+### 3. 客观测试结果
+
+跨模型汇总：
+
+```text
+headset_count: 6
+filter_rows: 79
+reproducible_success_rows: 30
+reproducible_drift_rows: 26
+rollout_rows: 180
+source_value_rows: 1920
+effect_rows: 24
+total_damage_match_loss: 0
+total_repair_match_gain: 0
+```
+
+分模型结果：
+
+```text
+qwen3:
+  filter_rows: 32
+  reproducible_success_rows: 16
+  reproducible_drift_rows: 12
+  rollout_rows: 80
+  source_value_rows: 1280
+  damage: 0
+  repair: 0
+
+GLM4:
+  filter_rows: 31
+  reproducible_success_rows: 12
+  reproducible_drift_rows: 10
+  rollout_rows: 70
+  source_value_rows: 448
+  damage: 0
+  repair: 0
+
+DS7B:
+  filter_rows: 16
+  reproducible_success_rows: 2
+  reproducible_drift_rows: 4
+  rollout_rows: 30
+  source_value_rows: 192
+  damage: 0
+  repair: 0
+```
+
+重要现象：
+
+```text
+1. qwen3 explain/repeat 的候选 head set 继续为负对照：
+   阻断 answer_slot、instruction_to_answer、trigger:any、question_prefix 后，
+   成功样本仍保持目标模式，漂移样本没有被修复。
+
+2. GLM4 repeat/explain_competition 的候选 head set 也没有行为因果效应：
+   所有源位置限制消融下 damage=0，repair=0。
+
+3. DS7B explain L24 head set 在 Phase217 的 all-step head set 消融中曾有弱 damage，
+   但本阶段只阻断候选源位置 value 后，damage 消失。
+
+4. DS7B list L24 head set 没有可用成功样本保留，只能作为漂移侧观察；
+   结果同样没有 repair。
+```
+
+### 4. 当前结论
+
+本阶段得到一个重要负结果：
+
+```text
+Phase217 中的弱必要性 head set，
+不能被进一步定位为“从 answer_slot / instruction_to_answer / trigger:any /
+question_prefix 这些源位置读取 value 并造成输出模式”的因果路径。
+```
+
+这说明当前 RoutePath（路由路径）仍主要是相关图谱，不是闭合因果图谱。
+
+更严格地说：
+
+```text
+候选 head 注意到某些源位置
+  不等于
+这些源位置的 value 写入决定了最终模式。
+
+全 head 输出消融有弱效应
+  不等于
+源位置限制 value 消融可以定位原因。
+```
+
+这进一步支持 Phase217 的校准：RouteCandidate 和 HeadSetCandidate 还不能升级为 RouteCause。
+
+### 5. 进展
+
+本阶段推进了三个拼图：
+
+```text
+1. 方法上：
+   建立了跨 qwen3、GLM4、DS7B 的源位置限制 value 消融框架。
+
+2. 证据上：
+   对 Phase217 中最值得追踪的 DS7B explain L24 候选做了更严格定位，
+   结果没有定位出源位置因果。
+
+3. 路线判断上：
+   继续沿 RoutePath 打补丁的收益下降，
+   下一步应转向 StatePath / MLP / residual write 的因果验证。
+```
+
+### 6. 问题、硬伤和限制
+
+本阶段结果不能过度解释，主要硬伤如下：
+
+```text
+1. 本阶段是 value 投影处的近似源位置消融，
+   不是直接在 attention probability 上做精确源位置屏蔽。
+
+2. 对 GQA/MQA 模型，query head 到 KV head 的映射可能造成共享 KV head 被一起阻断；
+   因此它既可能过度阻断，也可能无法精确对应单个 query head。
+
+3. source group 仍然较粗：
+   answer_slot、instruction_to_answer、trigger:any、question_prefix
+   可能没有覆盖真正的因果源 token。
+
+4. DS7B 可复现成功样本只有 2 条，
+   所以 DS7B 的负结果方向有价值，但强度有限。
+
+5. 当前小模型内部结构可能比真实强模型粗糙，
+   对通用语言编码机制的外推仍可能有 30% 到 50% 偏差。
+
+6. 本阶段只证明“当前源位置 value 阻断未定位到因果”，
+   不能证明注意力完全无因果作用。
+```
+
+### 7. 对语言模式网络图谱的含义
+
+Phase209 到 Phase218 的累计结果显示：
+
+```text
+语言模式确实可以在模型内部形成可观测分叉：
+  repeat / list / explain / target_seeded 等模式有稳定轨迹差异。
+
+触发 token 和注意力路由可以构成候选图谱：
+  TriggerPath 和 RoutePath 能描述模式分布。
+
+但是当前候选图谱还没有闭合到因果：
+  阻断窗口方向、阻断候选 head、阻断候选源位置 value，
+  都没有稳定修复 drift，也没有跨模型稳定 damage。
+```
+
+这对“语言是动态模式网络”的理论是一次收紧，而不是否定。
+
+更接近当前事实的表述应为：
+
+```text
+语言任务中的模式不是单个语义向量，也不是单个概念神经元；
+它更像由触发状态、候选路由、残差状态写入、读出竞争共同构成的动态模式网络。
+
+当前已较清楚的是模式候选图谱；
+尚未闭合的是模式因果路径。
+```
+
+### 8. 当前进度估计
+
+只根据当前测试进展估计：
+
+```text
+小模型模式机制图谱：约 61%
+TriggerPath：约 38%
+RoutePath：约 25%
+RouteCause：约 8%
+SourcePath：约 10%
+StatePath：约 35%
+MLP/ResidualWrite：约 18%
+ReadoutPath：约 20%
+路径因果机制：约 14%
+模型内部自然闭合：约 30%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 34% 到 39%
+```
+
+### 9. 下一阶段任务：Phase219
+
+Phase219 不应继续优先扩大 head route 补丁，而应转向 StatePath / MLP / residual write。
+
+建议阶段目标：
+
+```text
+Phase219: 模式状态写入路径与 MLP 因果验证
+```
+
+核心任务：
+
+```text
+1. 从 Phase209/214/215 的 success-drift 样本中，抽取每层 residual delta。
+
+2. 在关键 token 窗口比较：
+   success 模式状态
+   drift 模式状态
+   baseline 状态
+
+3. 对 MLP 输出、attention 输出、residual stream 分别做 patch/ablation：
+   不再只问“哪个 head 注意了哪里”，
+   而是问“哪个模块把状态写成了目标模式”。
+
+4. 先做必要性测试：
+   success 状态中移除某层 MLP/attention/residual 写入，
+   看目标模式是否坍塌。
+
+5. 再做充分性测试：
+   drift 状态中加入 success-drift 方向，
+   看是否能把漂移样本拉回目标模式。
+
+6. 如果 MLP/StatePath 能产生稳定 damage 或 repair，
+   再回头解释 RoutePath 是读源、调度、还是旁路相关信号。
+```
+
+Phase219 的优先模型顺序：
+
+```text
+1. qwen3 explain/repeat：负对照和样本量较稳定。
+2. GLM4 repeat/explain_competition：检查是否存在状态写入竞争。
+3. DS7B explain：保留 L24 线索，但不再把它当作主因果假设。
+```
+
+阶段性判断：
+
+```text
+当前任务与下一任务仍处于同一阶段：
+  完成语言模式网络的全局图谱和因果拼图。
+
+可以继续自动推进：
+  下一步应实现 Phase219 的 StatePath/MLP 写入因果脚本，
+  而不是继续在 RoutePath 上做边际收益很低的 head/source patch。
+```
+
+## Phase 219: 模式状态写入路径与 MLP 因果验证 [2026-07-06 22:46]
+
+### 0. 对附件判断的校准
+
+附件对 Phase218 的判断基本正确。Phase218 不是普通失败，而是一次路线止损：它证明当前 RoutePath（路由路径）和 SourcePath（源位置路径）还不能升级为 RouteCause（路由因果）。
+
+更准确地说：
+
+```text
+模型看回哪里
+  不等于
+这些信息已经被写入成决定输出模式的状态。
+```
+
+因此附件提出的 Phase219 方向是正确的：下一步不应继续优先做 head/source patch，而应转向 StatePath（状态路径）、MLP write（多层感知机写入）、residual write（残差写入）和 ReadoutPath（读出路径）。
+
+本阶段仍属于同一个阶段性目标：完成语言模式网络的全局机制图谱和路径因果拼图。当前不是最终理论闭合阶段，而是从候选图谱进入因果图谱的关键阶段。
+
+### 1. 测试文件和结果文件
+
+新增测试脚本：
+
+```text
+tests/gpt5/phase219_state_write_mlp_causal_validation.py
+tests/gpt5/run_phase219_state_write_mlp_causal_validation.sh
+```
+
+第一轮结果目录：
+
+```text
+tests/result/phase219_state_write_mlp_causal_validation/state_write_mlp_causal_validation/
+```
+
+扩大确认轮结果目录：
+
+```text
+tests/result/phase219_state_write_mlp_causal_validation/state_write_mlp_causal_validation_confirm/
+```
+
+关键结果文件：
+
+```text
+phase219_cross_model_summary.json
+phase219_cross_model_summary.md
+phase219_qwen3_summary.json
+phase219_glm4_summary.json
+phase219_deepseek7b_summary.json
+phase219_*_effect_rows.jsonl
+phase219_*_write_score_rows.jsonl
+phase219_*_write_summary_rows.jsonl
+```
+
+### 2. 算法原理
+
+本阶段目标是验证：
+
+```text
+到底是哪个模块把当前状态写成了目标输出模式？
+```
+
+不再优先问：
+
+```text
+哪个 attention head（注意力头）看了哪个 token？
+```
+
+本阶段对每个模型和模式选择少量高价值层，对可复现 success（成功）和 drift（漂移）样本计算每层每步的状态方向。
+
+定义第 \(l\) 层、第 \(t\) 步的 success-drift 状态方向：
+
+$$
+v_{l,t}^{S-D}
+=
+\mathbb{E}\left[h_{l,t}\mid success\right]
+-
+\mathbb{E}\left[h_{l,t}\mid drift\right]
+$$
+
+模块写入分数：
+
+$$
+\mathrm{WriteScore}_{m,l,t}
+=
+\cos\left(
+O_{m,l,t},
+v_{l,t}^{S-D}
+\right)
+$$
+
+其中：
+
+```text
+m = resid / mlp / attn
+resid = residual stream（残差流）
+mlp = MLP output（多层感知机输出）
+attn = attention output（注意力输出）
+```
+
+行为干预分成四类：
+
+```text
+1. resid_add_Lx:
+   在第 x 层残差状态加入 success-drift 方向。
+
+2. resid_sub_Lx:
+   在第 x 层残差状态减去 success-drift 方向。
+
+3. mlp_zero_Lx:
+   将第 x 层 MLP 在当前生成位置的输出置零。
+
+4. attn_zero_Lx:
+   将第 x 层 attention output 在当前生成位置的输出置零。
+```
+
+对应公式：
+
+$$
+h'_{l,t}
+=
+h_{l,t}
++
+\lambda v_{l,t}^{S-D}
+$$
+
+$$
+h'_{l,t}
+=
+h_{l,t}
+-
+\lambda v_{l,t}^{S-D}
+$$
+
+$$
+O'_{mlp,l,t}=0
+$$
+
+$$
+O'_{attn,l,t}=0
+$$
+
+评价仍使用：
+
+$$
+\Delta_{\mathrm{damage}}
+=
+\mathrm{match}_{success}^{base}
+-
+\mathrm{match}_{success}^{patch}
+$$
+
+$$
+\Delta_{\mathrm{repair}}
+=
+\mathrm{match}_{drift}^{patch}
+-
+\mathrm{match}_{drift}^{base}
+$$
+
+### 3. 测试对象
+
+本阶段选择对象：
+
+```text
+qwen3:
+  qwen3_explain_state_write
+  qwen3_repeat_state_write
+
+GLM4:
+  glm4_repeat_state_write
+  glm4_explain_competition_state_write
+
+DS7B:
+  deepseek7b_explain_state_write
+```
+
+候选层来自前面 Phase213、Phase217 的高信号层：
+
+```text
+qwen3 explain: L11 / L29 / L31 / L33
+qwen3 repeat: L29 / L31 / L32 / L33
+GLM4 repeat/explain: L12 / L28 / L29 / L30
+DS7B explain: L24 / L25 / L26 / L27
+```
+
+### 4. 第一轮客观结果
+
+第一轮参数：
+
+```text
+max_filter_rows: 8
+max_direction_rows: 6
+max_eval_rows: 3
+max_steps: 6
+```
+
+跨模型汇总：
+
+```text
+spec_count: 5
+filter_rows: 71
+reproducible_success_rows: 19
+reproducible_drift_rows: 24
+rollout_rows: 357
+write_score_rows: 540
+effect_rows: 64
+write_summary_rows: 96
+total_damage_match_loss: 32
+total_repair_match_gain: 29
+```
+
+分模型：
+
+```text
+qwen3:
+  filter_rows: 32
+  reproducible_success_rows: 10
+  reproducible_drift_rows: 12
+  rollout_rows: 204
+  write_score_rows: 288
+  damage: 24
+  repair: 19
+
+GLM4:
+  filter_rows: 31
+  reproducible_success_rows: 9
+  reproducible_drift_rows: 10
+  rollout_rows: 153
+  write_score_rows: 252
+  damage: 8
+  repair: 10
+
+DS7B:
+  filter_rows: 8
+  reproducible_success_rows: 0
+  reproducible_drift_rows: 2
+  rollout_rows: 0
+  write_score_rows: 0
+  damage: 0
+  repair: 0
+```
+
+第一轮已经出现与 Phase215 到 Phase218 完全不同的现象：
+
+```text
+RoutePath / SourcePath 干预基本为 0；
+StatePath / residual direction 干预出现明显 damage 和 repair。
+```
+
+### 5. 扩大确认轮结果
+
+由于第一轮出现重要正结果，按项目要求加大样本进行确认。
+
+确认轮参数：
+
+```text
+max_filter_rows: 12
+max_direction_rows: 8
+max_eval_rows: 5
+max_steps: 6
+```
+
+确认轮跨模型汇总：
+
+```text
+spec_count: 5
+filter_rows: 99
+reproducible_success_rows: 28
+reproducible_drift_rows: 36
+rollout_rows: 595
+write_score_rows: 792
+effect_rows: 64
+write_summary_rows: 96
+total_damage_match_loss: 66
+total_repair_match_gain: 50
+```
+
+确认轮分模型：
+
+```text
+qwen3:
+  filter_rows: 48
+  rollout_rows: 340
+  write_score_rows: 432
+  damage: 48
+  repair: 30
+
+GLM4:
+  filter_rows: 43
+  rollout_rows: 255
+  write_score_rows: 360
+  damage: 18
+  repair: 20
+
+DS7B:
+  filter_rows: 8
+  reproducible_success_rows: 0
+  reproducible_drift_rows: 2
+  rollout_rows: 0
+  write_score_rows: 0
+```
+
+确认轮关键现象：
+
+```text
+1. qwen3 explain:
+   resid_add_L31 将 drift 从 0/5 修复到 5/5 explain_answer；
+   resid_add_L29 将 drift 修复到 4/5；
+   resid_sub_L29/L31/L33 将 success 从 5/5 破坏到 0/5。
+
+2. qwen3 repeat:
+   resid_sub_L31 将 repeat success 从 5/5 破坏到 0/5；
+   resid_sub_L33 也将 repeat success 从 5/5 破坏到 0/5。
+
+3. GLM4 repeat:
+   resid_sub_L28 将 repeat success 从 5/5 破坏到 0/5；
+   resid_sub_L29/L30 也有明显 damage。
+
+4. GLM4 explain_competition:
+   成功样本只有 1 条，权重较低；
+   但 drift 样本中 resid_add_L28/L29/L30 可将 4/4 修复成 explain_answer。
+
+5. DS7B:
+   explain 任务没有可复现成功样本，不能参与本阶段行为因果判断。
+```
+
+### 6. WriteScore 结果
+
+确认轮最高的 write score（写入分数）集中在 residual stream（残差流），其次是部分 MLP 和 attention output：
+
+```text
+qwen3 explain drift:
+  L33 resid: cosine approx -0.387
+  L31 resid: cosine approx -0.365
+  L29 resid: cosine approx -0.331
+
+GLM4 repeat success:
+  L12 resid: cosine approx 0.361
+  L28 resid: cosine approx 0.315
+  L30 mlp: cosine approx 0.302
+  L30 resid: cosine approx 0.301
+
+qwen3 repeat success:
+  L32 resid: cosine approx 0.300
+  L29 resid: cosine approx 0.289
+  L31 resid: cosine approx 0.283
+  L32 mlp: cosine approx 0.264
+```
+
+这说明：
+
+```text
+模式成功/漂移的方向在 residual stream 中最明显；
+MLP 有可见写入关系，但当前第一轮还没有证明 MLP 是唯一或主因；
+attention output 有局部作用，但不如 residual direction 稳定。
+```
+
+### 7. 当前结论
+
+Phase219 是 Phase209 以来最重要的正结果之一。
+
+当前可以谨慎升级：
+
+```text
+StatePath（状态路径）从候选图谱升级为初步因果路径。
+```
+
+更精确的结论：
+
+```text
+1. 对 qwen3 explain，success-drift residual direction 具有强充分性：
+   加入方向可将 drift 修复成 explain_answer。
+
+2. 对 qwen3 explain/repeat 和 GLM4 repeat，success-drift residual direction 具有强必要性：
+   减去方向可破坏原本成功的输出模式。
+
+3. MLP output 与状态方向有明显相关和部分行为效应，
+   但当前不能证明 MLP 是唯一源头。
+
+4. attention output 也有局部修复作用，
+   但它更像参与状态写入或竞争路径，而不是前几轮设想中的独立 RouteCause。
+```
+
+与 Phase218 的组合结论是：
+
+```text
+RoutePath 是候选调度层；
+StatePath / residual write 更接近当前模式因果层。
+```
+
+### 8. 重要问题和硬伤
+
+本阶段虽是正结果，但仍不能过度总结。
+
+主要硬伤：
+
+```text
+1. residual direction patch 是人工加入方向，
+   证明的是状态方向具备行为因果作用，
+   还没有证明模型自然运行时具体由哪个模块生成该方向。
+
+2. MLP zero 和 attention zero 是粗粒度模块消融，
+   可能破坏多个功能，不是精细通道级因果。
+
+3. qwen3 结果最强，GLM4 次之；
+   DS7B 因没有可复现成功样本，本阶段无法验证。
+
+4. GLM4 explain_competition 的 success 样本只有 1 条，
+   其中 repair 信号需要低权重处理。
+
+5. 当前方向按 success-drift 均值构造，
+   可能包含多个混合因素：答案内容、输出格式、解释模式、长度倾向、停止倾向。
+
+6. max_steps 只有 6，
+   对长解释、列表和停止闭合仍不足。
+
+7. 当前小模型结构粗糙，
+   对真实语言编码机制外推仍需 30% 到 50% 折扣。
+```
+
+### 9. 对全局图谱的更新
+
+当前全局机制图谱应更新为：
+
+```text
+PromptTrigger（提示触发）
+→ CandidateRoutePath（候选路由）
+→ StateWritePath（状态写入）
+→ StateMaintainPath（状态维持）
+→ ReadoutCompetition（读出竞争）
+→ OutputPattern（输出模式）
+→ ClosureOrDrift（闭合或漂移）
+```
+
+Phase219 后，权重应调整：
+
+```text
+TriggerPath:
+  仍是模式启动层。
+
+RoutePath:
+  降级为候选调度层和相关图谱。
+
+StatePath:
+  升级为当前最接近行为因果的路径。
+
+MLP/Attention write:
+  是 StatePath 的候选生成模块，需要下一阶段细化。
+
+ReadoutPath:
+  仍未闭合，但已经可以被 residual direction 明显影响。
+```
+
+### 10. 统一机制公式更新
+
+保持理论名词不变，但把状态写入放到更核心位置。
+
+当前模式因果公式：
+
+$$
+\mathrm{PatternCause}
+=
+\mathrm{TriggerPath}
+\circ
+\mathrm{CandidateRoutePath}
+\circ
+\mathrm{StateWritePath}
+\circ
+\mathrm{StateMaintainPath}
+\circ
+\mathrm{ReadoutPath}
+$$
+
+StateWriteCause（状态写入因果）暂定为：
+
+$$
+\mathrm{StateWriteCause}_{m,l,t}
+=
+\mathrm{ReproducibleBaseline}
+\land
+\mathrm{StateDifference}_{l,t}
+\land
+\mathrm{WriteScore}_{m,l,t}
+\land
+\mathrm{BehaviorEffect}_{m,l,t}
+$$
+
+本阶段已经初步满足：
+
+```text
+ReproducibleBaseline: qwen3/GLM4 部分成立
+StateDifference: 成立
+BehaviorEffect: qwen3/GLM4 明显成立
+WriteScore: residual 强，MLP/attention 部分成立
+```
+
+但还未完全满足：
+
+```text
+ModuleWriteEffect 的自然来源定位。
+```
+
+因此不能说完整闭合，只能说 StatePath 进入强候选因果层。
+
+### 11. 当前进度估计
+
+只根据当前测试进展估计：
+
+```text
+小模型模式机制图谱：约 65%
+TriggerPath：约 38%
+RoutePath：约 25%
+RouteCause：约 8%
+SourcePath：约 10%
+StatePath：约 48%
+StateWriteCause：约 28%
+MLP/ResidualWrite：约 32%
+ReadoutPath：约 23%
+路径因果机制：约 25%
+模型内部自然闭合：约 33%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 38% 到 43%
+```
+
+### 12. 下一阶段任务：Phase220
+
+Phase219 和下一步仍处于同一个阶段性目标：完成语言模式网络的全局图谱和因果拼图。
+
+下一步不应立刻理论收束，而应继续客观拼图。
+
+建议 Phase220：
+
+```text
+Phase220: StateWrite 来源定位与 MLP/Attention 精细因果分解
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 explain 的 L29/L31/L33 residual direction 做精细定位：
+   分解该方向来自 MLP、attention output、还是前层 residual accumulation。
+
+2. 对 qwen3 repeat 的 L31/L33 residual_sub 强 damage 做复测：
+   判断 repeat 模式是否依赖同一类状态方向。
+
+3. 对 GLM4 repeat 的 L28/L29/L30 做确认：
+   检查是否是跨模型的 repeat StatePath。
+
+4. 对 MLP 做更细粒度通道级测试：
+   找出 top channels，再做 channel zero / channel boost。
+
+5. 对 residual direction 做 scale sweep：
+   测试 0.25 / 0.5 / 1.0 / 1.5 / 2.0，
+   判断是否存在连续剂量效应。
+
+6. 对 direction 做因子拆分：
+   区分答案内容方向、解释格式方向、复读格式方向、长度/停止方向。
+```
+
+Phase220 的优先级：
+
+```text
+第一优先级：
+  qwen3 explain L29/L31/L33 residual direction。
+
+第二优先级：
+  qwen3 repeat L31/L33 和 GLM4 repeat L28/L29/L30。
+
+第三优先级：
+  DS7B 需要先改造 prompt 或样本选择，让 explain success 可复现，否则暂不作为主因果对象。
+```
+
+阶段性判断：
+
+```text
+可以继续自动推进 Phase220。
+当前最重要的问题已经从“模式是否有状态方向”变成：
+  这个状态方向由哪些自然模块写入？
+```
+
+## Phase 220: StateWrite 来源定位与 MLP/Attention 精细因果分解 [2026-07-06 23:24]
+
+### 0. 对附件判断的校准
+
+附件对 Phase219 的判断基本正确。Phase219 是 Phase209 以来最重要的正结果之一，因为它第一次把模式机制从：
+
+```text
+候选图谱 / 路由相关
+```
+
+推进到：
+
+```text
+可干预的 residual state direction（残差状态方向）
+```
+
+但附件的谨慎意见也正确：Phase219 证明了 residual direction（残差方向）具有行为因果作用，却没有证明这个方向在模型自然运行中由哪个模块写入。
+
+因此 Phase220 的任务是合理的：
+
+```text
+不再问“状态方向是否有效”，
+而是问“状态方向是谁写进去的”。
+```
+
+当前任务与 Phase219 处于同一阶段性目标：完成语言模式网络的全局机制图谱和路径因果拼图，尚未进入最终理论闭合阶段。
+
+### 1. 新增测试文件和结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase220_state_write_source_decomposition.py
+tests/gpt5/run_phase220_state_write_source_decomposition.sh
+```
+
+第一轮结果目录：
+
+```text
+tests/result/phase220_state_write_source_decomposition/state_write_source_decomposition/
+```
+
+扩大确认轮结果目录：
+
+```text
+tests/result/phase220_state_write_source_decomposition/state_write_source_decomposition_confirm/
+```
+
+关键结果文件：
+
+```text
+phase220_cross_model_summary.json
+phase220_cross_model_summary.md
+phase220_*_effect_rows.jsonl
+phase220_*_source_alignment_rows.jsonl
+phase220_*_source_summary_rows.jsonl
+```
+
+### 2. 测试目标
+
+Phase220 做三件事：
+
+```text
+1. residual direction 剂量扫描：
+   测试 StatePath 是否存在连续剂量/阈值效应。
+
+2. 模块来源对齐：
+   比较 MLP/attention 的 success-drift 模块方向与 residual direction 的对齐程度。
+
+3. 模块方向干预：
+   测试移除模块输出在 residual direction 上的投影，或加入模块 success-drift 方向，
+   是否能复制 residual direction 的行为效应。
+```
+
+### 3. 算法公式
+
+残差方向仍定义为：
+
+$$
+v_{l,t}^{S-D}
+=
+\mathbb{E}\left[h_{l,t}\mid success\right]
+-
+\mathbb{E}\left[h_{l,t}\mid drift\right]
+$$
+
+模块方向定义为：
+
+$$
+u_{m,l,t}^{S-D}
+=
+\mathbb{E}\left[O_{m,l,t}\mid success\right]
+-
+\mathbb{E}\left[O_{m,l,t}\mid drift\right]
+$$
+
+模块来源对齐分数：
+
+$$
+\mathrm{SourceAlign}_{m,l,t}
+=
+\cos\left(
+u_{m,l,t}^{S-D},
+v_{l,t}^{S-D}
+\right)
+$$
+
+残差剂量扫描：
+
+$$
+h'_{l,t}
+=
+h_{l,t}
++
+\lambda v_{l,t}^{S-D}
+$$
+
+$$
+h'_{l,t}
+=
+h_{l,t}
+-
+\lambda v_{l,t}^{S-D}
+$$
+
+本阶段使用：
+
+```text
+lambda = 0.25 / 0.5 / 1.0 / 1.5 / 2.0
+```
+
+模块投影移除：
+
+$$
+O'_{m,l,t}
+=
+O_{m,l,t}
+-
+\left(
+O_{m,l,t}\cdot \hat{v}_{l,t}^{S-D}
+\right)
+\hat{v}_{l,t}^{S-D}
+$$
+
+模块方向加入：
+
+$$
+O'_{m,l,t}
+=
+O_{m,l,t}
++
+u_{m,l,t}^{S-D}
+$$
+
+其中：
+
+```text
+m = MLP 或 attention output
+```
+
+### 4. 测试对象
+
+本阶段优先对象：
+
+```text
+qwen3 explain:
+  L29 / L31 / L33
+  scale layer: L31
+
+qwen3 repeat:
+  L31 / L33
+  scale layer: L31
+
+GLM4 repeat:
+  L28 / L29 / L30
+  scale layer: L28
+
+DS7B explain:
+  L24
+  仍作为低权重观察对象
+```
+
+### 5. 第一轮客观结果
+
+第一轮参数：
+
+```text
+max_filter_rows: 12
+max_direction_rows: 8
+max_eval_rows: 4
+max_source_steps: 3
+max_steps: 6
+```
+
+跨模型汇总：
+
+```text
+spec_count: 4
+filter_rows: 80
+reproducible_success_rows: 27
+reproducible_drift_rows: 32
+rollout_rows: 520
+source_alignment_rows: 48
+effect_rows: 62
+source_summary_rows: 16
+total_damage_match_loss: 52
+total_repair_match_gain: 12
+```
+
+分模型：
+
+```text
+qwen3:
+  filter_rows: 48
+  reproducible_success_rows: 17
+  reproducible_drift_rows: 18
+  rollout_rows: 336
+  source_alignment_rows: 30
+  damage: 34
+  repair: 12
+
+GLM4:
+  filter_rows: 24
+  reproducible_success_rows: 10
+  reproducible_drift_rows: 12
+  rollout_rows: 184
+  source_alignment_rows: 18
+  damage: 18
+  repair: 0
+
+DS7B:
+  filter_rows: 8
+  reproducible_success_rows: 0
+  reproducible_drift_rows: 2
+  rollout_rows: 0
+  source_alignment_rows: 0
+```
+
+### 6. 扩大确认轮结果
+
+因为第一轮继续出现强行为效应和稳定 MLP 对齐，所以增加评估样本与 source steps。
+
+确认轮参数：
+
+```text
+max_filter_rows: 12
+max_direction_rows: 10
+max_eval_rows: 5
+max_source_steps: 4
+max_steps: 6
+```
+
+确认轮跨模型汇总：
+
+```text
+spec_count: 4
+filter_rows: 80
+reproducible_success_rows: 27
+reproducible_drift_rows: 32
+rollout_rows: 650
+source_alignment_rows: 64
+effect_rows: 62
+source_summary_rows: 16
+total_damage_match_loss: 64
+total_repair_match_gain: 16
+```
+
+确认轮分模型：
+
+```text
+qwen3:
+  rollout_rows: 420
+  source_alignment_rows: 40
+  damage: 43
+  repair: 16
+
+GLM4:
+  rollout_rows: 230
+  source_alignment_rows: 24
+  damage: 21
+  repair: 0
+
+DS7B:
+  仍无可复现 explain success，不能参与本阶段因果判断。
+```
+
+### 7. 剂量扫描结果
+
+qwen3 explain L31 的 residual add 呈现明显阈值/剂量效应：
+
+```text
+resid_add_L31_s0.25:
+  drift repair = 0/5
+
+resid_add_L31_s0.5:
+  drift repair = 4/5
+
+resid_add_L31_s1.0:
+  drift repair = 5/5
+
+resid_add_L31_s1.5:
+  drift repair = 1/5，并出现 echo_then_answer 增加
+
+resid_add_L31_s2.0:
+  drift repair = 5/5，但 success damage = 3/5
+```
+
+这说明 qwen3 explain 的 residual direction 不是单点偶然补丁，而是有可观察的剂量响应；但剂量过大时也会破坏原有成功轨迹或引入格式漂移。
+
+qwen3 explain L31 的 residual sub：
+
+```text
+scale 0.25: success damage = 0/5
+scale 0.5: success damage = 0/5
+scale 1.0: success damage = 5/5
+scale 1.5: success damage = 5/5
+scale 2.0: success damage = 5/5
+```
+
+qwen3 repeat L31 的 residual sub：
+
+```text
+scale 0.25: success damage = 1/5
+scale 0.5: success damage = 1/5
+scale 1.0: success damage = 5/5
+scale 1.5: success damage = 5/5
+scale 2.0: success damage = 5/5
+```
+
+GLM4 repeat L28 的 residual sub：
+
+```text
+scale 0.25: success damage = 1/5
+scale 0.5: success damage = 3/5
+scale 1.0: success damage = 5/5
+scale 1.5: success damage = 5/5
+scale 2.0: success damage = 5/5
+```
+
+结论：
+
+```text
+residual direction 存在稳定阈值效应；
+大约在 scale 1.0 附近进入强行为控制区。
+```
+
+### 8. 模块来源对齐结果
+
+确认轮中，MLP 与 residual direction 的对齐显著高于 attention。
+
+最高来源对齐：
+
+```text
+GLM4 repeat L28 MLP:
+  cosine approx 0.497
+  norm_ratio approx 0.289
+
+GLM4 repeat L30 MLP:
+  cosine approx 0.468
+  norm_ratio approx 0.284
+
+qwen3 explain L29 MLP:
+  cosine approx 0.452
+  norm_ratio approx 0.415
+
+qwen3 repeat L31 MLP:
+  cosine approx 0.430
+  norm_ratio approx 0.343
+
+qwen3 explain L31 MLP:
+  cosine approx 0.430
+  norm_ratio approx 0.376
+
+qwen3 explain L29 attention:
+  cosine approx 0.409
+  norm_ratio approx 0.262
+
+qwen3 explain L33 MLP:
+  cosine approx 0.391
+  norm_ratio approx 0.427
+```
+
+整体观察：
+
+```text
+1. MLP 的 module-to-residual alignment 普遍高于 attention。
+2. MLP 的 norm_ratio 大约在 0.26 到 0.43 之间，说明单层 MLP 方向能解释 residual direction 的一部分，但不是全部。
+3. attention 也有局部对齐，尤其 qwen3 explain L29 attention，但整体弱于 MLP。
+```
+
+### 9. 模块干预结果
+
+模块投影移除和模块方向加入没有完整复制 residual direction 的强效应。
+
+典型结果：
+
+```text
+qwen3 explain:
+  mlp_proj_remove_L29/L31/L33: damage=0, repair=0
+  attn_proj_remove_L29/L31/L33: damage=0, repair=0
+  mlp_sdm_add_L33: damage=2/5, repair=0
+
+GLM4 repeat:
+  mlp_proj_remove_L28: damage=1/5
+  mlp_proj_remove_L30: damage=1/5
+  repair=0
+```
+
+这说明：
+
+```text
+MLP/attention 模块方向与 residual direction 对齐，
+但单步、单模块、粗投影级干预还不能完全解释 residual 状态方向。
+```
+
+换句话说：
+
+```text
+residual direction 更像多层累积状态；
+MLP 是强候选写入源；
+attention 是局部参与者；
+但自然 StateWriteSource 还没有闭合。
+```
+
+### 10. 当前结论
+
+Phase220 的主要结论：
+
+```text
+1. Phase219 的 residual direction 行为因果被再次确认。
+
+2. residual direction 不是随机单点补丁，而是存在明确阈值/剂量效应。
+
+3. MLP 与 residual direction 的对齐稳定高于 attention，
+   因此 MLP 应升级为 StateWriteSource 的第一候选。
+
+4. 但模块投影移除和模块方向加入没有完全复制 residual direction 的行为效应，
+   说明状态方向更可能来自多层 MLP + residual accumulation，而不是单层单模块。
+
+5. DS7B 继续由于缺少可复现 success 样本而无法参与该阶段判断。
+```
+
+严谨表述：
+
+```text
+StatePath 已有强行为因果；
+MLP 是 StateWriteSource 的强候选；
+但 StateWriteSource 还未闭合。
+```
+
+### 11. 问题、硬伤和限制
+
+本阶段仍有重要限制：
+
+```text
+1. 模块投影移除只移除模块输出在 residual direction 上的线性投影，
+   不能覆盖非线性门控、LayerNorm 变化、后续层放大等机制。
+
+2. module_sdm_add 使用模块 success-drift 均值方向，
+   它可能比真正自然写入更粗糙，也可能没有正确的上下文条件门控。
+
+3. MLP source alignment 高，只说明它方向相近，
+   不能证明它独立生成完整 residual direction。
+
+4. residual direction 可能混合解释格式、答案内容、长度、停止和漂移抑制等多个因子。
+
+5. qwen3 explain 的 resid_add 在 scale 1.5/2.0 时会引入 success damage 或 echo drift，
+   说明方向不是纯解释模式因子。
+
+6. 当前仍以对象-关系-值模式族为主，通用语言机制外推需要谨慎。
+
+7. 小模型内部结构可能较粗糙，对真实强模型语言编码机制仍需 30% 到 50% 折扣。
+```
+
+### 12. 对全局图谱的更新
+
+当前图谱可以进一步细化为：
+
+```text
+PromptTrigger
+→ CandidateRoutePath
+→ MLP-dominant StateWriteSource
+→ ResidualAccumulation
+→ StateMaintainPath
+→ ReadoutCompetition
+→ OutputPattern
+```
+
+更细的候选机制：
+
+```text
+MLP 写入一部分模式方向；
+attention 提供局部上下文调度/补充写入；
+residual stream 累积多层方向；
+读出层将累积状态转换成 explain/repeat 等输出模式。
+```
+
+### 13. 当前进度估计
+
+只根据当前测试进展估计：
+
+```text
+小模型模式机制图谱：约 67%
+TriggerPath：约 38%
+CandidateRoutePath：约 25%
+RouteCause：约 8%
+SourcePath：约 10%
+StatePath：约 52%
+StateWriteCause：约 34%
+StateWriteSource：约 22%
+MLP/ResidualWrite：约 38%
+ReadoutPath：约 24%
+路径因果机制：约 29%
+模型内部自然闭合：约 35%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 39% 到 44%
+```
+
+### 14. 下一阶段任务：Phase221
+
+Phase221 仍属于同一个阶段性目标，应继续自动推进。
+
+建议阶段标题：
+
+```text
+Phase221: MLP 通道级 StateWriteSource 定位与因子拆分
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 explain L29/L31/L33 MLP 做 channel-level scan：
+   找出对 residual direction 投影贡献最大的通道。
+
+2. 对 GLM4 repeat L28/L30 MLP 做 channel-level scan：
+   检查 repeat 模式是否存在跨模型 MLP 通道写入结构。
+
+3. 对 top channels 做 channel zero / channel boost：
+   验证它们是否能产生 damage 或 repair。
+
+4. 做方向因子拆分：
+   将 residual direction 分成 content / format / drift-control / length-stop。
+
+5. 将 Phase220 的 scale sweep 作为剂量基准：
+   对通道补丁也做 0.25 / 0.5 / 1.0 / 1.5 / 2.0。
+```
+
+优先级：
+
+```text
+第一优先级：
+  qwen3 explain L29/L31 MLP channel scan。
+
+第二优先级：
+  GLM4 repeat L28/L30 MLP channel scan。
+
+第三优先级：
+  qwen3 repeat L31 MLP channel scan。
+
+DS7B:
+  先解决可复现 success 样本问题，否则暂不作为主线。
+```
+
+## Phase 221: MLP 通道级 StateWriteSource 定位与因子拆分初测 [2026-07-07 00:02]
+
+### 0. 对附件判断的校准
+
+附件对 Phase220 的判断基本正确。
+
+Phase219 证明：
+
+```text
+success-drift residual direction 具有行为因果作用。
+```
+
+Phase220 进一步证明：
+
+```text
+这个 residual direction 存在剂量/阈值效应；
+MLP 比 attention 更像 StateWriteSource 的第一候选；
+但单层模块方向干预不能完整复制 residual direction 的强效应。
+```
+
+因此 Phase221 的方向是合理的：继续向 MLP channel（多层感知机通道）级下钻，测试是否存在更精细的 StateWriteSource 候选。
+
+需要强调：本阶段仍属于同一阶段性目标，即完成语言模式网络的全局图谱和路径因果拼图。当前不应理论收束，而应继续积累客观拼图。
+
+### 1. 新增测试文件和结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase221_mlp_channel_statewrite_source.py
+tests/gpt5/run_phase221_mlp_channel_statewrite_source.sh
+```
+
+第一轮结果目录：
+
+```text
+tests/result/phase221_mlp_channel_statewrite_source/mlp_channel_statewrite_source/
+```
+
+扩大确认轮结果目录：
+
+```text
+tests/result/phase221_mlp_channel_statewrite_source/mlp_channel_statewrite_source_confirm/
+```
+
+关键结果文件：
+
+```text
+phase221_cross_model_summary.json
+phase221_cross_model_summary.md
+phase221_*_channel_score_rows.jsonl
+phase221_*_effect_rows.jsonl
+phase221_*_rollout_rows.jsonl
+```
+
+### 2. 算法原理
+
+Phase221 的核心问题：
+
+```text
+如果 MLP 是 StateWriteSource 的第一候选，
+那么哪些 MLP channel 对 residual direction 的写入贡献最大？
+```
+
+对 MLP down projection（下投影）输入通道 \(c\)，设：
+
+$$
+z_{l,t,c}
+$$
+
+为第 \(l\) 层、第 \(t\) 步 MLP down-proj 输入的第 \(c\) 个通道。
+
+success-drift 通道差分：
+
+$$
+\Delta z_{l,t,c}
+=
+\mathbb{E}\left[z_{l,t,c}\mid success\right]
+-
+\mathbb{E}\left[z_{l,t,c}\mid drift\right]
+$$
+
+down projection 中该通道的输出方向：
+
+$$
+W^{down}_{l,:,c}
+$$
+
+通道对 residual direction 的写入分数：
+
+$$
+\mathrm{ChannelWriteScore}_{l,t,c}
+=
+\left|
+\Delta z_{l,t,c}
+\cdot
+\left(
+W^{down}_{l,:,c}
+\cdot
+\hat{v}_{l,t}^{S-D}
+\right)
+\right|
+$$
+
+其中：
+
+```text
+v_{l,t}^{S-D} = success-drift residual direction；
+W_down column = 单个 MLP channel 写入 residual stream 的方向；
+ChannelWriteScore = 通道激活差分乘以该通道输出方向与 residual direction 的对齐。
+```
+
+然后选择 top channels，测试：
+
+```text
+mlpchan_zero:
+  将 top K 通道在当前生成位置置零。
+
+mlpchan_boost:
+  将 top K 通道按 success-drift Δz 方向增强。
+```
+
+测试 \(K\)：
+
+```text
+K = 4 / 16 / 64
+```
+
+### 3. 测试对象
+
+本阶段测试：
+
+```text
+qwen3:
+  qwen3_explain_l29_l31_mlp_channels
+  qwen3_repeat_l31_mlp_channels
+
+GLM4:
+  glm4_repeat_l28_l30_mlp_channels
+
+DS7B:
+  deepseek7b_explain_l24_mlp_channels
+```
+
+### 4. 第一轮客观结果
+
+第一轮参数：
+
+```text
+max_filter_rows: 12
+max_direction_rows: 8
+max_eval_rows: 4
+max_channel_steps: 3
+top_channels: 64
+```
+
+跨模型汇总：
+
+```text
+spec_count: 4
+filter_rows: 80
+reproducible_success_rows: 27
+reproducible_drift_rows: 32
+rollout_rows: 264
+channel_score_rows: 960
+effect_rows: 30
+channel_summary_rows: 5
+total_damage_match_loss: 6
+total_repair_match_gain: 8
+```
+
+分模型：
+
+```text
+qwen3:
+  rollout_rows: 160
+  channel_score_rows: 576
+  damage: 0
+  repair: 8
+
+GLM4:
+  rollout_rows: 104
+  channel_score_rows: 384
+  damage: 6
+  repair: 0
+
+DS7B:
+  无可复现 explain success，未进入通道因果测试。
+```
+
+第一轮主要效应：
+
+```text
+qwen3 explain L29:
+  mlpchan_zero_L29_K16 repair = 3/4
+  mlpchan_zero_L29_K64 repair = 3/4
+
+GLM4 repeat L30:
+  mlpchan_zero_L30_K4 damage = 2/4
+  mlpchan_zero_L30_K16 damage = 2/4
+  mlpchan_zero_L30_K64 damage = 2/4
+
+qwen3 explain L31:
+  mlpchan_boost_L31_K16 repair = 1/4
+  mlpchan_boost_L31_K64 repair = 1/4
+```
+
+### 5. 扩大确认轮结果
+
+确认轮参数：
+
+```text
+max_filter_rows: 12
+max_direction_rows: 10
+max_eval_rows: 5
+max_channel_steps: 4
+top_channels: 96
+```
+
+确认轮跨模型汇总：
+
+```text
+spec_count: 4
+filter_rows: 80
+reproducible_success_rows: 27
+reproducible_drift_rows: 32
+rollout_rows: 330
+channel_score_rows: 1920
+effect_rows: 30
+channel_summary_rows: 5
+total_damage_match_loss: 6
+total_repair_match_gain: 10
+```
+
+确认轮主要效应：
+
+```text
+qwen3 explain L29:
+  mlpchan_zero_L29_K16 repair = 4/5
+  mlpchan_zero_L29_K64 repair = 4/5
+  success 保持 5/5，不产生 damage。
+
+GLM4 repeat L30:
+  mlpchan_zero_L30_K4 damage = 2/5
+  mlpchan_zero_L30_K16 damage = 2/5
+  mlpchan_zero_L30_K64 damage = 2/5
+
+qwen3 explain L31:
+  mlpchan_boost_L31_K16 repair = 1/5
+  mlpchan_boost_L31_K64 repair = 1/5
+```
+
+### 6. 通道候选
+
+确认轮中重复出现的高分通道包括：
+
+```text
+qwen3 explain L29:
+  channel 6627
+  channel 5880
+  channel 1070
+  channel 4057
+  channel 199
+  channel 5347
+
+qwen3 explain L31:
+  channel 580
+  channel 1735
+  channel 4800
+  channel 9219
+  channel 8384
+  channel 2779
+
+qwen3 repeat L31:
+  channel 6567
+  channel 9407
+  channel 4350
+  channel 3298
+  channel 9219
+
+GLM4 repeat L28:
+  channel 12792
+  channel 742
+  channel 13262
+  channel 5867
+  channel 1260
+
+GLM4 repeat L30:
+  channel 7088
+  channel 9374
+  channel 9892
+  channel 670
+  channel 5760
+  channel 6118
+```
+
+这些不是单神经元机制证明，只是 MLP channel-level StateWriteSource 候选。
+
+### 7. 当前结论
+
+Phase221 得到的是弱正结果，而不是强闭合。
+
+主要结论：
+
+```text
+1. MLP channel 组能产生部分行为效应。
+
+2. qwen3 explain L29 top channel zero 可以修复 drift，
+   但这更像移除了竞争/漂移写入，而不是直接加入 explain 写入。
+
+3. GLM4 repeat L30 top channel zero 可以破坏 repeat success，
+   说明该层 top channels 对 repeat 模式有部分必要性。
+
+4. qwen3 explain L31 top channel boost 只有很弱 repair，
+   说明简单通道增强不能复制 residual direction 的强充分性。
+
+5. qwen3 repeat L31 通道组虽然有高 ChannelWriteScore，
+   但 zero/boost 行为效应基本为 0，提示 repeat 的必要性可能来自更分布式 residual accumulation。
+```
+
+严谨表述：
+
+```text
+MLP channel 是 StateWriteSource 的局部候选；
+但单层 top channel 组只能解释 residual direction 的一部分行为效应；
+StateWriteSource 仍未闭合。
+```
+
+### 8. 问题和硬伤
+
+本阶段限制很明显：
+
+```text
+1. 通道选择基于线性 down-proj 贡献分数，
+   不能覆盖 MLP 内部门控、非线性和 LayerNorm 影响。
+
+2. top channel zero 有时修复 drift，
+   说明这些通道可能支持竞争模式或漂移抑制失败，
+   不能简单解释成“目标模式写入通道”。
+
+3. top channel boost 效果弱，
+   说明通道 Δz 缺少上下文门控或多层协同。
+
+4. K=4/16/64 效果差异不大，
+   说明当前 topK 不是非常干净的稀疏机制，也可能是通道排序还不够准确。
+
+5. DS7B 继续缺少可复现 success，无法参与判断。
+
+6. 当前测试仍集中在对象-关系-值模式族，外推到完整语言机制仍要谨慎。
+
+7. 小模型结构可能粗糙，对真实强模型编码机制仍需 30% 到 50% 折扣。
+```
+
+### 9. 对全局图谱的更新
+
+当前图谱不应改成“单通道机制”，而应更新为：
+
+```text
+PromptTrigger
+→ CandidateRoutePath
+→ distributed MLP channel groups
+→ ResidualAccumulation
+→ StateMaintainPath
+→ ReadoutCompetition
+→ OutputPattern
+```
+
+更具体地说：
+
+```text
+MLP channel groups 提供局部写入或竞争抑制；
+residual stream 才是强行为控制载体；
+StateWriteSource 可能是多层、多通道、带门控的组合机制。
+```
+
+### 10. 当前进度估计
+
+只根据当前测试进展估计：
+
+```text
+小模型模式机制图谱：约 68%
+TriggerPath：约 38%
+CandidateRoutePath：约 25%
+RouteCause：约 8%
+SourcePath：约 10%
+StatePath：约 53%
+StateWriteCause：约 35%
+StateWriteSource：约 25%
+MLP/ResidualWrite：约 40%
+MLP channel source：约 14%
+ReadoutPath：约 24%
+路径因果机制：约 30%
+模型内部自然闭合：约 35%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 39% 到 44%
+```
+
+### 11. 下一阶段任务：Phase222
+
+Phase222 仍属于同一阶段，应继续客观拼图。
+
+建议阶段标题：
+
+```text
+Phase222: StateWrite 因子拆分与竞争通道分离
+```
+
+核心任务：
+
+```text
+1. 将 qwen3 explain 的 residual direction 拆分为：
+   explain-format 因子、answer-content 因子、echo/competition 因子、length/stop 因子。
+
+2. 对 qwen3 explain L29 的 top zero-repair channels 做竞争通道分析：
+   判断它们是在写入 explain，还是在写入 other_or_wrong/echo 竞争模式。
+
+3. 对 GLM4 repeat L30 的 top damage channels 做必要性复测：
+   分离 repeat-format 与 next_task_or_format 竞争。
+
+4. 做正负通道分组：
+   positive target channels；
+   negative competitor channels；
+   mixed channels。
+
+5. 不再只看总 repair/damage，
+   还要看 output_pattern 从哪一类漂移变到哪一类目标或竞争模式。
+```
+
+当前最关键的新问题：
+
+```text
+MLP 通道到底是在写目标模式，
+还是在抑制竞争模式？
+```
+
+## Phase 222: StateWrite 因子拆分与竞争通道分离 [2026-07-07 00:21]
+
+### 1. 本阶段任务
+
+本阶段继续 Phase221 的同一阶段目标：分析 Phase221 关于 MLP channel（多层感知机通道）结果的判断是否正确，并继续完成 StateWriteSource（状态写入来源）的客观拼图。
+
+Phase221 的判断基本正确：
+
+```text
+MLP channel group（多层感知机通道组）已经能产生局部因果效应；
+但 top channel（高分通道）不能直接解释成目标模式写入通道。
+```
+
+Phase222 的改进是把 Phase221 的绝对值通道排序改成 signed channel split（带符号通道拆分），分别测试 positive channel group（正向通道组）和 negative channel group（负向通道组）的 zero（置零）与 boost（增强）效应。
+
+### 2. 脚本与结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase222_statewrite_factor_competition.py
+tests/gpt5/run_phase222_statewrite_factor_competition.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase222_statewrite_factor_competition/statewrite_factor_competition/
+```
+
+已完成检查：
+
+```text
+python -m py_compile tests/gpt5/phase222_statewrite_factor_competition.py
+bash -n tests/gpt5/run_phase222_statewrite_factor_competition.sh
+```
+
+已按 qwen3、GLM4、DS7B 顺序加载本地 CUDA 模型测试，每个模型测试后释放显存。
+
+### 3. 算法原理和公式
+
+成功轨迹和漂移轨迹之间的通道激活差分为：
+
+$$
+\Delta z_{l,t,c}
+=
+\mathbb{E}[z_{l,t,c}\mid success]
+-
+\mathbb{E}[z_{l,t,c}\mid drift]
+$$
+
+成功-漂移 residual direction（残差方向）单位向量为：
+
+$$
+\hat v_{l,t}^{S-D}
+=
+\frac{
+v_{l,t}^{S-D}
+}{
+\left\|v_{l,t}^{S-D}\right\|
+}
+$$
+
+带符号通道写入分数为：
+
+$$
+\boxed{
+\mathrm{SignedChannelScore}_{l,t,c}
+=
+\Delta z_{l,t,c}
+\cdot
+\left(
+W^{down}_{l,:,c}
+\cdot
+\hat v_{l,t}^{S-D}
+\right)
+}
+$$
+
+正向候选通道和负向候选通道分别为：
+
+$$
+\boxed{
+C^{+}_{l,t,K}
+=
+\operatorname{TopK}_{c}
+\left(
+\mathrm{SignedChannelScore}_{l,t,c}
+\right)
+}
+$$
+
+$$
+\boxed{
+C^{-}_{l,t,K}
+=
+\operatorname{TopK}_{c}
+\left(
+-
+\mathrm{SignedChannelScore}_{l,t,c}
+\right)
+}
+$$
+
+置零干预：
+
+$$
+\boxed{
+z'_{l,t,c}=0,
+\quad c\in C^{+}_{l,t,K}\ \text{or}\ C^{-}_{l,t,K}
+}
+$$
+
+增强干预：
+
+$$
+\boxed{
+z'_{l,t,c}
+=
+z_{l,t,c}
+\alpha\Delta z_{l,t,c},
+\quad c\in C^{+}_{l,t,K}\ \text{or}\ C^{-}_{l,t,K}
+}
+$$
+
+本轮参数：
+
+```text
+alpha = 1.0
+K = 4, 16, 64
+max_eval_rows = 5
+max_channel_steps = 4
+max_steps = 6
+top_channels = 96
+```
+
+本阶段还新增 output_pattern transition（输出模式转移）记录，不只看总 damage/repair（破坏/修复）。
+
+### 4. 总体结果
+
+跨模型汇总：
+
+```text
+spec_count = 4
+filter_rows = 80
+reproducible_success_rows = 27
+reproducible_drift_rows = 32
+rollout_rows = 630
+channel_score_rows = 3840
+total_damage_match_loss = 6
+total_repair_match_gain = 10
+```
+
+分模型结果：
+
+```text
+qwen3:
+  rollout_rows = 380
+  channel_score_rows = 2304
+  damage = 0
+  repair = 10
+
+GLM4:
+  rollout_rows = 250
+  channel_score_rows = 1536
+  damage = 6
+  repair = 0
+
+DS7B:
+  reproducible_success_rows = 0
+  rollout_rows = 0
+  channel_score_rows = 0
+```
+
+DS7B 仍缺少可复现 success（成功样本），所以本阶段不把 DS7B 纳入通道因果判断。
+
+### 5. 关键客观结果
+
+#### 5.1 qwen3 explain L29 positive zero 修复 drift
+
+```text
+qwen3_explain_l29_l31_signed_channel_split
+
+mlpchan_pos_zero_L29_K16:
+  success: 5/5 -> 5/5
+  drift:   0/5 -> 4/5
+  damage = 0
+  repair = 4
+
+mlpchan_pos_zero_L29_K64:
+  success: 5/5 -> 5/5
+  drift:   0/5 -> 4/5
+  damage = 0
+  repair = 4
+```
+
+输出模式转移：
+
+```text
+other_or_wrong -> explain_answer: 4 rows
+```
+
+这个结果确认 Phase221 的现象稳定存在：qwen3 explain（解释模式）L29 的一组 MLP channel 被置零后，可以把 drift（漂移）修复成 explain_answer（解释回答）。
+
+但新的关键校准是：
+
+```text
+产生 repair 的不是 negative group（负向组），而是 positive group（正向组）。
+```
+
+因此不能简单认为：
+
+```text
+positive = 目标通道；
+negative = 竞争通道。
+```
+
+更准确的解释是：
+
+```text
+signed score 只描述成功-漂移均值差分沿 residual direction 的线性投影；
+zero 干预改变的是当前样本的实际通道激活；
+所以 positive channel 被置零后仍可能修复 drift。
+```
+
+#### 5.2 qwen3 explain L31 positive boost 弱修复
+
+```text
+mlpchan_pos_boost_L31_K16:
+  drift: 0/5 -> 1/5
+  repair = 1
+
+mlpchan_pos_boost_L31_K64:
+  drift: 0/5 -> 1/5
+  repair = 1
+```
+
+这说明 L31 positive channel（正向通道）可能包含少量 explain target factor（解释目标因子），但增强通道不能复制 Phase219/Phase220 的 residual direction（残差方向）强效应。
+
+#### 5.3 qwen3 repeat L31 高分通道仍无目标修复
+
+qwen3 repeat（复读模式）L31 的 positive channel（正向通道）有高分候选：
+
+```text
+channel 6567:
+  signed = 5.4276, step = 3
+  signed = 4.9498, step = 1
+
+channel 9407:
+  signed = 3.1673, step = 3
+```
+
+但行为层面：
+
+```text
+damage = 0
+repair = 0
+```
+
+这继续证明：
+
+```text
+高 signed channel score（带符号通道分数）不等于行为因果闭合。
+```
+
+#### 5.4 GLM4 repeat L30 positive zero 破坏 repeat success
+
+```text
+glm4_repeat_l28_l30_signed_channel_split
+
+mlpchan_pos_zero_L30_K4:
+  success: 5/5 -> 3/5
+  damage = 2
+
+mlpchan_pos_zero_L30_K16:
+  success: 5/5 -> 3/5
+  damage = 2
+
+mlpchan_pos_zero_L30_K64:
+  success: 5/5 -> 3/5
+  damage = 2
+```
+
+输出模式转移包括：
+
+```text
+repeat_answer -> next_task_or_format
+repeat_answer -> echo_then_answer
+repeat_answer -> other_or_wrong
+```
+
+说明 GLM4 L30 positive channel group（正向通道组）对 repeat_answer（复读回答）有局部必要性，但它不是完整 repeat（复读）机制。
+
+#### 5.5 negative channel group 基本无行为效应
+
+本轮重要负结果：
+
+```text
+qwen3 explain L29/L31 negative zero/boost:
+  damage = 0
+  repair = 0
+
+GLM4 repeat L28/L30 negative zero/boost:
+  damage = 0
+  repair = 0
+```
+
+因此 Phase221 附件里的“竞争/漂移通道可能在 negative group（负向组）”需要进一步校准：
+
+```text
+竞争效应不一定落在 signed negative group；
+它可能落在 positive group 中，
+因为竞争效应可能由当前激活值、上下文门控和置零后的后续层反应共同决定。
+```
+
+### 6. 关键通道候选
+
+qwen3 explain L29 positive group（正向组）：
+
+```text
+channel 6627:
+  step = 3
+  signed = 3.7097
+  delta_z = -19.8707
+  down_dot = -0.1867
+
+channel 5880:
+  step = 2
+  signed = 2.4408
+  delta_z = 10.4733
+  down_dot = 0.2330
+
+channel 1070:
+  step = 3
+  signed = 2.0806
+  delta_z = -11.3188
+  down_dot = -0.1838
+```
+
+qwen3 explain L31 positive group（正向组）：
+
+```text
+channel 580:
+  step = 2
+  signed = 5.1658
+  delta_z = 19.5678
+  down_dot = 0.2640
+
+channel 1735:
+  step = 3
+  signed = 2.9321
+  delta_z = 16.0600
+  down_dot = 0.1826
+```
+
+GLM4 repeat L30 positive group（正向组）：
+
+```text
+channel 7088:
+  step = 1
+  signed = 1.2031
+  delta_z = 3.4872
+  down_dot = 0.3450
+
+channel 9374:
+  step = 1
+  signed = 0.7667
+  delta_z = 2.4661
+  down_dot = 0.3109
+```
+
+这些通道进入后续候选池，但不能称为单神经元机制。
+
+### 7. 对当前路线的判断
+
+Phase222 支持 Phase221 的主判断，但给出一个更重要的修正：
+
+```text
+MLP channel group 是局部因果候选；
+但是 positive / negative score 不是通道语义标签。
+```
+
+当前更合理的三因子解释是：
+
+```text
+1. 成功-漂移均值差分；
+2. down projection 写入方向；
+3. 当前样本的实际通道激活与上下文门控。
+```
+
+因此，StateWriteSource（状态写入来源）不能只靠线性通道分数闭合。
+
+### 8. 问题和硬伤
+
+```text
+1. signed score 仍是线性近似，只看 down projection 与 residual direction 的点积。
+
+2. zero 干预和 boost 干预回答的问题不同：
+   zero 更像必要性/移除测试；
+   boost 更像充分性/增强测试。
+
+3. positive / negative 的符号不是语义符号，只是相对 residual direction 的投影符号。
+
+4. qwen3 explain L29 positive zero 能 repair，
+   说明通道角色混有门控、竞争、格式切换或漂移抑制解除。
+
+5. GLM4 repeat L30 positive zero 只 damage 2/5，
+   说明 repeat 模式不是单层单通道闭合。
+
+6. qwen3 repeat L31 高分通道行为无效，
+   说明通道高分可能只是相关项、可补偿项或被后续层吸收。
+
+7. 当前模型是小模型，
+   内部编码机制可能比强模型粗糙，结果外推到真实语言编码机制需要保留 30% 到 50% 不确定性。
+```
+
+### 9. 全局图谱更新
+
+截至 Phase222，全局图谱应更新为：
+
+```text
+PromptTrigger
+→ CandidateRoutePath
+→ MLP gated channel groups
+→ ResidualAccumulation
+→ StateMaintainPath
+→ ReadoutCompetition
+→ OutputPattern
+```
+
+局部图谱为：
+
+```text
+success-drift residual direction
+→ signed channel candidates
+→ context-gated channel activation
+→ channel zero/boost causal response
+→ output_pattern transition
+```
+
+核心进展是：
+
+```text
+MLP channel 的符号分数不是最终机制；
+真正机制更可能是“通道候选 + 当前激活 + 上下文门控 + 残差累积”的组合。
+```
+
+### 10. 智能理论角度的关键洞察
+
+如果语言是动态模式网络，那么局部通道不应理解成一个概念或一个语义标签，而更像模式网络中的小控制因子。
+
+当前结果支持：
+
+```text
+知识网络：对象-关系-值模式在 residual state 中被激活；
+推理能力：多步模式状态在 residual stream 中维持和转移；
+语法系统：格式/边界/续写模式参与 ReadoutCompetition；
+编码机制：MLP channel groups 负责局部状态写入或竞争平衡。
+```
+
+但这仍不是闭合。当前公式只能解释部分局部行为，不能完整模拟真实运行机制。
+
+### 11. 当前进度估计
+
+```text
+小模型模式机制图谱：约 69%
+StatePath：约 54%
+StateWriteCause：约 37%
+StateWriteSource：约 28%
+MLP/ResidualWrite：约 42%
+MLP channel source：约 18%
+signed channel factor split：约 12%
+context-gated channel mechanism：约 8%
+ReadoutPath：约 24%
+路径因果机制：约 31%
+模型内部自然闭合：约 36%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 39% 到 44%
+```
+
+### 12. 下一阶段任务：Phase223
+
+Phase223 仍属于同一阶段，应继续客观拼图。
+
+建议标题：
+
+```text
+Phase223: 通道因果角色的激活态分层与门控验证
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 explain L29 positive zero-repair 通道做激活态分层：
+   分别统计 success、drift、patched drift 中这些通道的实际 z 值。
+
+2. 不只按 signed score 选通道，
+   还要按 drift 当前激活强度、success 当前激活强度、zero 后变化方向选通道。
+
+3. 对同一通道做三种干预：
+   zero 当前值；
+   clamp 到 success 均值；
+   clamp 到 drift 均值。
+
+4. 判断 qwen3 explain L29 的 repair 来自：
+   移除竞争激活，
+   恢复目标激活，
+   解除后续层门控，
+   还是改变首词元/格式边界。
+
+5. 对 GLM4 repeat L30 positive damage 通道做同样分析：
+   判断它们是 repeat-format 必要通道，
+   还是维持 repeat 与 echo 之间边界的门控通道。
+```
+
+Phase223 的重点不是继续给公式 patch（补丁），而是把通道角色从分数排序推进到激活态角色分类。
+
+## Phase 223: 通道因果角色的激活态分层与门控验证 [2026-07-07 00:31]
+
+### 1. 本阶段任务
+
+Phase223 继续 Phase222 的同一阶段目标：解释为什么 qwen3 explain（解释模式）L29 的 positive channel（正向通道）被 zero（置零）后可以修复 drift（漂移），以及 GLM4 repeat（复读模式）L30 positive channel 为什么具有局部必要性。
+
+Phase222 已经证明：
+
+```text
+signed positive / signed negative 不能直接解释为目标通道 / 竞争通道。
+```
+
+Phase223 因此把通道角色从“分数排序”推进到“激活态分层”，对同一批通道比较三类干预：
+
+```text
+zero 当前激活；
+clamp 到 success 均值；
+clamp 到 drift 均值。
+```
+
+### 2. 脚本与结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase223_channel_activation_gate_validation.py
+tests/gpt5/run_phase223_channel_activation_gate_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase223_channel_activation_gate_validation/channel_activation_gate_validation/
+```
+
+已完成检查：
+
+```text
+python -m py_compile tests/gpt5/phase223_channel_activation_gate_validation.py
+bash -n tests/gpt5/run_phase223_channel_activation_gate_validation.sh
+```
+
+已按 qwen3、GLM4、DS7B 顺序运行，模型之间释放 GPU 显存。
+
+### 3. 算法原理和公式
+
+Phase223 继续使用 Phase222 的 signed channel score（带符号通道分数）选择候选通道：
+
+$$
+\mathrm{SignedChannelScore}_{l,t,c}
+=
+\Delta z_{l,t,c}
+\cdot
+\left(
+W^{down}_{l,:,c}
+\cdot
+\hat v_{l,t}^{S-D}
+\right)
+$$
+
+但新增激活态统计：
+
+$$
+\boxed{
+\mu^{S}_{l,t,c}
+=
+\mathbb{E}[z_{l,t,c}\mid success]
+}
+$$
+
+$$
+\boxed{
+\mu^{D}_{l,t,c}
+=
+\mathbb{E}[z_{l,t,c}\mid drift]
+}
+$$
+
+三类干预为：
+
+$$
+\boxed{
+z'_{l,t,c}=0
+}
+$$
+
+$$
+\boxed{
+z'_{l,t,c}=\mu^{S}_{l,t,c}
+}
+$$
+
+$$
+\boxed{
+z'_{l,t,c}=\mu^{D}_{l,t,c}
+}
+$$
+
+测试参数：
+
+```text
+max_eval_rows = 5
+max_channel_steps = 4
+max_steps = 6
+top_channels = 96
+K = 4, 16, 64
+```
+
+### 4. 总体结果
+
+跨模型汇总：
+
+```text
+spec_count = 3
+filter_rows = 56
+reproducible_success_rows = 17
+reproducible_drift_rows = 20
+rollout_rows = 560
+channel_score_rows = 2304
+activation_stat_rows = 288
+total_damage_match_loss = 15
+total_repair_match_gain = 12
+```
+
+分模型结果：
+
+```text
+qwen3:
+  rollout_rows = 370
+  channel_score_rows = 1536
+  activation_stat_rows = 192
+  damage = 2
+  repair = 12
+
+GLM4:
+  rollout_rows = 190
+  channel_score_rows = 768
+  activation_stat_rows = 96
+  damage = 13
+  repair = 0
+
+DS7B:
+  reproducible_success_rows = 0
+  rollout_rows = 0
+```
+
+DS7B 仍没有可复现 success（成功样本），继续作为客观空缺记录。
+
+### 5. 关键客观结果
+
+#### 5.1 qwen3 explain L29：success clamp 与 zero 都能修复 drift
+
+最强结果：
+
+```text
+qwen3_explain_l29_l31_activation_gate
+
+mlpchan_pos_success_L29_K64:
+  success: 5/5 -> 5/5
+  drift:   0/5 -> 4/5
+  damage = 0
+  repair = 4
+
+mlpchan_pos_zero_L29_K16:
+  success: 5/5 -> 5/5
+  drift:   0/5 -> 4/5
+  damage = 0
+  repair = 4
+
+mlpchan_pos_zero_L29_K64:
+  success: 5/5 -> 5/5
+  drift:   0/5 -> 4/5
+  damage = 0
+  repair = 4
+```
+
+这比 Phase222 更进一步：
+
+```text
+zero 修复说明移除当前激活可以释放 explain；
+success clamp 也修复说明把通道拉到 success 激活态同样可以释放 explain。
+```
+
+因此 qwen3 L29 positive channels（正向通道）不是纯目标写入通道，也不是纯竞争通道，而更像 gating-sensitive state channels（门控敏感状态通道）。
+
+#### 5.2 qwen3 explain L29：drift clamp 会轻微破坏 success
+
+```text
+mlpchan_pos_drift_L29_K16:
+  success: 5/5 -> 4/5
+  damage = 1
+
+mlpchan_pos_drift_L29_K64:
+  success: 5/5 -> 4/5
+  damage = 1
+```
+
+这说明：
+
+```text
+L29 positive channel 的 drift 激活态确实带有破坏 explain 的成分。
+```
+
+但破坏只有 1/5，说明它不是完整控制器，只是局部状态因子。
+
+#### 5.3 GLM4 repeat L30：drift clamp 强破坏 repeat success
+
+最强 GLM4 结果：
+
+```text
+glm4_repeat_l30_activation_gate
+
+mlpchan_pos_drift_L30_K4:
+  success: 5/5 -> 1/5
+  damage = 4
+
+mlpchan_pos_drift_L30_K64:
+  success: 5/5 -> 3/5
+  damage = 2
+
+mlpchan_pos_zero_L30_K4/K16/K64:
+  success: 5/5 -> 3/5
+  damage = 2
+```
+
+这说明 GLM4 L30 positive channels（正向通道）具有更明确的 repeat state（复读状态）必要性：
+
+```text
+把 success 样本中的这些通道拉到 drift 均值，
+比单纯 zero 更强地破坏 repeat_answer。
+```
+
+这比 Phase222 的 zero 结果更接近“激活态因果”。
+
+#### 5.4 negative channel group 继续基本无效
+
+```text
+qwen3 negative zero/success/drift:
+  damage = 0
+  repair = 0
+
+GLM4 negative zero/success/drift:
+  damage = 0
+  repair = 0
+```
+
+这连续两阶段说明：
+
+```text
+当前 signed negative group 不是主要行为因果组。
+```
+
+竞争或漂移因素更可能藏在 positive group 的不同激活态中，而不是简单落在 negative group。
+
+### 6. 激活态证据
+
+qwen3 explain L29 的关键通道出现明显 success/drift 均值差：
+
+```text
+L29 step=3 channel 6627:
+  success_z = -24.3968
+  drift_z   = -4.5260
+  delta     = -19.8707
+  signed    = 3.7097
+
+L29 step=2 channel 5880:
+  success_z = -5.5684
+  drift_z   = -16.0417
+  delta     = 10.4733
+  signed    = 2.4408
+
+L29 step=3 channel 1070:
+  success_z = -9.7355
+  drift_z   = 1.5833
+  delta     = -11.3188
+  signed    = 2.0806
+```
+
+GLM4 repeat L30 关键通道：
+
+```text
+L30 step=1 channel 7088:
+  success_z = 2.8844
+  drift_z   = -0.6029
+  delta     = 3.4872
+  signed    = 1.2031
+```
+
+这些结果说明：通道差异不是微小噪声，而是具有较大激活态差分的局部结构。
+
+### 7. 当前结论
+
+Phase223 的核心结论：
+
+```text
+StateWriteSource 不是简单的“高分通道写目标模式”；
+更像是 MLP positive channel group 的激活态门控。
+```
+
+对 qwen3 explain：
+
+```text
+L29 positive channels 的 zero 和 success clamp 都能 repair drift；
+drift clamp 会轻微 damage success；
+说明 L29 更像 explain/drift 的状态门控层。
+```
+
+对 GLM4 repeat：
+
+```text
+L30 positive channels 的 drift clamp 强破坏 repeat success；
+说明 L30 更像 repeat 状态的必要激活态层。
+```
+
+这比 Phase222 更进一步，因为它把通道角色从“符号分数”推进到了“激活态因果”。
+
+### 8. 问题和硬伤
+
+```text
+1. clamp 到均值仍然是粗干预，不等于真实上下文门控。
+
+2. success_z / drift_z 是样本均值，可能掩盖多种子模式。
+
+3. K=64 的 success clamp 才在 qwen3 L29 repair 4/5，
+   K=4/K16 的 success clamp 未同样强，说明有效因子可能较分布式。
+
+4. GLM4 L30 K4 drift clamp damage 4/5，
+   但 K16 反而只有 1/5，说明 topK 通道之间可能存在相互抵消。
+
+5. 当前只测对象-关系-值任务族，
+   还不能外推到完整语法、推理和知识网络。
+
+6. 小模型内部编码机制可能粗糙，
+   对真实语言编码机制仍需保留 30% 到 50% 不确定性。
+```
+
+### 9. 全局图谱更新
+
+当前图谱应进一步更新为：
+
+```text
+PromptTrigger
+→ CandidateRoutePath
+→ MLP gated channel activation
+→ ResidualAccumulation
+→ StateMaintainPath
+→ ReadoutCompetition
+→ OutputPattern
+```
+
+局部机制图谱：
+
+```text
+signed channel candidate
+→ success/drift activation state
+→ zero / success-clamp / drift-clamp response
+→ residual state shift
+→ output pattern transition
+```
+
+这说明全局图谱的第一优先级应继续放在：
+
+```text
+激活态图谱；
+门控图谱；
+多层残差累积图谱。
+```
+
+### 10. 智能理论角度的关键洞察
+
+本阶段更支持“语言是动态模式网络”的路线。模式不是某个静态概念向量，而是：
+
+```text
+局部通道激活态
++ 残差状态累积
++ 输出读出竞争
+```
+
+共同形成的运行状态。
+
+对语言三核心特性的反思：
+
+```text
+知识网络：对象-关系-值不是单点知识，而是可被激活态维持的状态模式。
+
+推理能力：推理可能依赖状态路径在多层中的连续转移，而不是单步符号规则。
+
+语法系统：格式、解释、复读、停止等语法/输出结构，可能共享同一套状态门控机制。
+```
+
+所以破解编码机制的关键，不是找一个“概念神经元”，而是完成：
+
+```text
+通道激活态图谱
+→ 残差状态图谱
+→ 输出竞争图谱
+```
+
+### 11. 当前进度估计
+
+```text
+小模型模式机制图谱：约 70%
+StatePath：约 55%
+StateWriteCause：约 39%
+StateWriteSource：约 31%
+MLP/ResidualWrite：约 45%
+MLP channel source：约 22%
+activation-gated channel mechanism：约 14%
+ReadoutPath：约 24%
+路径因果机制：约 32%
+模型内部自然闭合：约 37%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 12. 阶段性判断与下一步
+
+Phase222 和 Phase223 已经完成了一个阶段性小闭环：
+
+```text
+绝对值通道分数
+→ 带符号通道分组
+→ 激活态 clamp 验证
+```
+
+结论是：
+
+```text
+StateWriteSource 的局部候选已经从 MLP 模块推进到 MLP positive channel activation state；
+但它仍未闭合到完整机制公式。
+```
+
+下一步如果继续同一大阶段，应进入 Phase224：
+
+```text
+Phase224: 多层激活态传播与 ResidualAccumulation 闭环验证
+```
+
+核心任务：
+
+```text
+1. 检查 qwen3 L29 通道激活态改变后，L31/L33 residual direction 是否随之改变。
+
+2. 检查 GLM4 L30 drift clamp 破坏 repeat 后，后续层 readout competition 如何变化。
+
+3. 从单层通道因果推进到多层传播因果：
+   channel activation -> residual shift -> later layer state -> output readout。
+```
+
+由于 Phase222-223 已经完成本轮“通道符号与激活态校准”的阶段性目标，下一轮应把重点从单层通道转移到多层传播闭环。
+
+## Phase 224: 多层激活态传播与 ResidualAccumulation 闭环验证 [2026-07-07 00:47]
+
+### 1. 本阶段任务
+
+本阶段分析附件中关于 Phase222/223 的判断是否正确，并继续推进同一大阶段目标。
+
+附件的核心判断基本正确：
+
+```text
+Phase222/223 没有完成最终闭合；
+但已经把 MLP channel 机制从高分排序推进到带符号分组 + 激活态因果验证。
+```
+
+需要保留的关键校准是：
+
+```text
+positive / negative score 不是通道语义标签；
+真正有效的是通道激活态、上下文门控、残差累积和读出竞争。
+```
+
+因此 Phase224 不再继续扩大单层通道 patch（补丁），而是检查：
+
+```text
+单层通道激活态改变后，
+是否沿后续层传播成 residual state shift（残差状态迁移），
+并最终影响 readout competition（读出竞争）。
+```
+
+### 2. 脚本与结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase224_multilayer_activation_propagation.py
+tests/gpt5/run_phase224_multilayer_activation_propagation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase224_multilayer_activation_propagation/multilayer_activation_propagation/
+```
+
+已完成语法检查：
+
+```text
+python -m py_compile tests/gpt5/phase224_multilayer_activation_propagation.py
+bash -n tests/gpt5/run_phase224_multilayer_activation_propagation.sh
+```
+
+已按 qwen3、GLM4、DS7B 顺序使用本地 CUDA 模型测试，并在每个模型后释放显存。
+
+### 3. 算法原理
+
+Phase224 的核心测量对象是：通道干预后，后续层 hidden state（隐藏状态）相对 success-drift residual direction（成功-漂移残差方向）的投影变化。
+
+对第 \(l_s\) 层 source channel（源通道）做干预：
+
+$$
+z'_{l_s,t,c}
+\in
+\left\{
+0,\ \mu^{S}_{l_s,t,c},\ \mu^{D}_{l_s,t,c}
+\right\}
+$$
+
+然后在后续观测层 \(l_o\) 捕获 hidden state：
+
+$$
+h^{base}_{l_o,t},
+\quad
+h^{patched}_{l_o,t}
+$$
+
+传播差分为：
+
+$$
+\boxed{
+\Delta h^{patch}_{l_o,t}
+=
+h^{patched}_{l_o,t}
+-
+h^{base}_{l_o,t}
+}
+$$
+
+相对 success-drift residual direction 的投影迁移为：
+
+$$
+\boxed{
+\mathrm{ProjectionShift}_{l_o,t}
+=
+\Delta h^{patch}_{l_o,t}
+\cdot
+\hat v^{S-D}_{l_o,t}
+}
+$$
+
+方向余弦为：
+
+$$
+\boxed{
+\mathrm{PropagationCos}_{l_o,t}
+=
+\cos
+\left(
+\Delta h^{patch}_{l_o,t},
+v^{S-D}_{l_o,t}
+\right)
+}
+$$
+
+同时记录 readout competition（读出竞争）指标：
+
+```text
+top token 是否改变；
+target rank 是否改善；
+prose / echo / stop margin 是否变化。
+```
+
+本阶段重点不是直接生成完整回答，而是做更细的多层传播观测。
+
+### 4. 测试配置
+
+```text
+qwen3:
+  pattern = answer_explain
+  source layer = L29
+  observe layers = L29, L31, L33
+
+GLM4:
+  pattern = answer_repeat
+  source layer = L30
+  observe layers = L30, L31, L32
+
+DS7B:
+  pattern = answer_explain
+  source layer = L24
+  observe layers = L24, L25, L26
+```
+
+干预条件：
+
+```text
+mlpchan_pos_zero
+mlpchan_pos_success
+mlpchan_pos_drift
+K = 4, 16, 64
+```
+
+### 5. 总体结果
+
+跨模型汇总：
+
+```text
+spec_count = 3
+filter_rows = 56
+reproducible_success_rows = 17
+reproducible_drift_rows = 20
+propagation_rows = 1296
+channel_score_rows = 1152
+total_top_token_changed = 141
+total_target_rank_improved = 219
+```
+
+分模型结果：
+
+```text
+qwen3:
+  propagation_rows = 648
+  channel_score_rows = 576
+  top_token_changed = 27
+  target_rank_improved = 198
+
+GLM4:
+  propagation_rows = 648
+  channel_score_rows = 576
+  top_token_changed = 114
+  target_rank_improved = 21
+
+DS7B:
+  reproducible_success_rows = 0
+  propagation_rows = 0
+```
+
+DS7B 仍然缺少可复现 success（成功样本），因此不能参与传播因果判断。
+
+### 6. qwen3 explain：L29 激活态会传播到 L31/L33
+
+qwen3 最强传播结果来自 drift 样本上的 L29 success clamp：
+
+```text
+qwen3_explain_l29_to_l31_l33_propagation
+condition = mlpchan_pos_success_L29_K64
+source_group = drift_repro
+
+observe L29:
+  mean_projection_shift = +19.0338
+  mean_cos = +0.3932
+  top_token_changed = 3
+  target_rank_improved = 5
+
+observe L31:
+  mean_projection_shift = +22.7522
+  mean_cos = +0.3898
+  top_token_changed = 3
+  target_rank_improved = 5
+
+observe L33:
+  mean_projection_shift = +25.0593
+  mean_cos = +0.3530
+  top_token_changed = 3
+  target_rank_improved = 5
+```
+
+这说明：
+
+```text
+把 qwen3 drift 样本的 L29 positive channels 拉到 success 激活态，
+会在 L29、L31、L33 形成沿 success-drift direction 的正向 residual shift。
+```
+
+这正是 Phase224 要找的多层传播证据。
+
+qwen3 L29 zero 也产生同向传播：
+
+```text
+condition = mlpchan_pos_zero_L29_K64
+source_group = drift_repro
+
+observe L29:
+  mean_projection_shift = +11.4991
+  mean_cos = +0.2563
+  target_rank_improved = 7
+
+observe L31:
+  mean_projection_shift = +15.1672
+  mean_cos = +0.2715
+  target_rank_improved = 7
+
+observe L33:
+  mean_projection_shift = +18.0175
+  mean_cos = +0.2693
+  target_rank_improved = 7
+```
+
+这解释了 Phase222/223 中 L29 zero 可以 repair drift 的原因：
+
+```text
+zero 不是简单删除目标通道；
+它会把 drift residual state 推向 success-drift direction 的正向区域，
+并且这种迁移会传播到 L31/L33。
+```
+
+反向验证也成立。对 success 样本做 L29 drift clamp：
+
+```text
+condition = mlpchan_pos_drift_L29_K64
+source_group = success_repro
+
+observe L29:
+  mean_projection_shift = -18.4517
+  mean_cos = -0.3840
+
+observe L31:
+  mean_projection_shift = -21.8817
+  mean_cos = -0.3688
+
+observe L33:
+  mean_projection_shift = -25.9240
+  mean_cos = -0.3535
+```
+
+这说明 qwen3 L29 positive channel activation state（正向通道激活态）确实是 explain/drift residual state 的可传播因子。
+
+### 7. GLM4 repeat：L30 干预产生反向 residual shift 和强 readout 扰动
+
+GLM4 的主要结果不同于 qwen3。
+
+success 样本上 L30 zero：
+
+```text
+condition = mlpchan_pos_zero_L30_K64
+source_group = success_repro
+
+observe L30:
+  mean_projection_shift = -3.4881
+  mean_cos = -0.3392
+  top_token_changed = 2
+
+observe L31:
+  mean_projection_shift = -3.5755
+  mean_cos = -0.3115
+  top_token_changed = 2
+
+observe L32:
+  mean_projection_shift = -3.9675
+  mean_cos = -0.3158
+  top_token_changed = 2
+```
+
+success 样本上 L30 drift clamp：
+
+```text
+condition = mlpchan_pos_drift_L30_K64
+source_group = success_repro
+
+observe L30:
+  mean_projection_shift = -3.5139
+  mean_cos = -0.4103
+
+observe L31:
+  mean_projection_shift = -3.6013
+  mean_cos = -0.3831
+
+observe L32:
+  mean_projection_shift = -3.7960
+  mean_cos = -0.3775
+```
+
+这与 Phase223 的行为结果一致：
+
+```text
+GLM4 L30 drift clamp 会强破坏 repeat success；
+Phase224 进一步显示，它会把 L30/L31/L32 residual state 推离 repeat success direction。
+```
+
+GLM4 的 top token changed（首选词元改变）总数为 114，远高于 qwen3 的 27，但 target rank improved（目标排名改善）只有 21，远低于 qwen3 的 198。
+
+这说明：
+
+```text
+qwen3 explain L29 干预更像目标方向修复；
+GLM4 repeat L30 干预更像读出竞争扰动和 repeat 状态破坏。
+```
+
+### 8. 本阶段是否证明闭合
+
+没有闭合，但明显推进。
+
+已经得到的客观拼图：
+
+```text
+1. qwen3 L29 positive channel activation state 可以沿 L31/L33 传播成正向 residual shift。
+
+2. qwen3 L29 zero 和 success clamp 都能让 drift residual state 靠近 explain success direction。
+
+3. qwen3 L29 drift clamp 会让 success residual state 远离 explain success direction。
+
+4. GLM4 L30 zero / drift clamp 会让 repeat success residual state 远离 repeat direction。
+
+5. readout competition 已经受到传播结果影响：
+   qwen3 主要表现为 target rank improved；
+   GLM4 主要表现为 top token changed。
+```
+
+但仍未闭合，因为：
+
+```text
+1. 只观测到传播相关，不等于完整自然生成链条；
+2. 只覆盖 qwen3 explain 和 GLM4 repeat 两个强对象；
+3. 没有证明哪些上游机制自然产生这些 channel activation state；
+4. 没有解决 DoneStateStable 和 ModelStopExecuted；
+5. DS7B 仍然缺少可复现 success，跨三模型闭合不足。
+```
+
+### 9. 对附件判断的校准
+
+附件中关于 Phase222/223 的判断总体正确：
+
+```text
+当前路线应从单通道得分转到 activation state + residual accumulation + readout competition。
+```
+
+Phase224 给出的新增校准是：
+
+```text
+qwen3 explain L29 已经出现较清楚的多层传播链；
+GLM4 repeat L30 也有传播链，但表现为破坏 repeat state 和扰动 readout；
+两者不是同一种机制形状。
+```
+
+因此不能简单说“找到了通用 MLP 通道机制”。更严谨的说法是：
+
+```text
+不同模式族可能共享“通道激活态 -> 残差传播 -> 读出竞争”的大框架，
+但具体方向、强度、修复/破坏形态不同。
+```
+
+### 10. 当前全局图谱
+
+更新后的图谱：
+
+```text
+PromptTrigger
+→ CandidateRoutePath
+→ MLP gated channel activation
+→ ResidualPropagation
+→ ResidualAccumulation
+→ StateMaintainPath
+→ ReadoutCompetition
+→ OutputPattern
+```
+
+局部因果链：
+
+```text
+L29/L30 positive channel activation state
+→ same-layer residual shift
+→ later-layer residual shift
+→ readout metric change
+→ output pattern change
+```
+
+其中 Phase224 主要补上：
+
+```text
+same-layer residual shift
+→ later-layer residual shift
+→ readout metric change
+```
+
+这比 Phase223 的单层激活态验证更接近机制闭环。
+
+### 11. 问题和硬伤
+
+```text
+1. Phase224 仍是人工干预，不是自然因果链完整追踪。
+
+2. residual direction 仍然是 success-drift 均值方向，可能混合内容、格式、长度、停止、读出竞争等因子。
+
+3. qwen3 target rank improved 很多，但 top token changed 较少，说明 readout 变化可能还没有完全跨过解码阈值。
+
+4. GLM4 top token changed 很多，但 target rank improved 少，说明 GLM4 干预更多是扰动，而不是目标修复。
+
+5. 当前只测强对象：
+   qwen3 explain L29；
+   GLM4 repeat L30。
+   还不能外推到完整语言机制。
+
+6. DS7B 继续无稳定 success，三模型闭合不足。
+
+7. 小模型内部结构可能较粗糙，对强模型和真实语言编码机制仍需 30% 到 50% 折扣。
+```
+
+### 12. 智能理论角度的关键洞察
+
+Phase224 支持“语言是动态模式网络”的更具体版本：
+
+```text
+语言模式不是只存在于单层；
+它会通过局部通道激活态改变残差状态，
+再沿后续层传播并改变读出竞争。
+```
+
+这对知识网络、推理能力、语法系统的统一解释是：
+
+```text
+知识网络：对象-关系-值状态可以通过 residual propagation 被维持和放大。
+
+推理能力：推理可能是多层状态传播，而不是单步符号操作。
+
+语法系统：解释、复读、格式、边界等输出模式可能通过同一类传播链进入读出竞争。
+```
+
+因此破解语言编码机制的下一步，不是再找更多单通道，而是完成：
+
+```text
+通道激活态图谱
+→ 多层残差传播图谱
+→ 读出竞争图谱
+```
+
+### 13. 当前进度估计
+
+```text
+小模型模式机制图谱：约 71%
+StatePath：约 57%
+StateWriteCause：约 41%
+StateWriteSource：约 33%
+MLP/ResidualWrite：约 47%
+MLP channel source：约 24%
+activation-gated channel mechanism：约 17%
+ResidualPropagation：约 15%
+ReadoutPath：约 26%
+路径因果机制：约 34%
+模型内部自然闭合：约 38%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 14. 下一阶段任务
+
+Phase224 仍属于同一大阶段，并补上了多层传播证据。
+
+下一步 Phase225 应继续同一阶段，但要从“传播观测”推进到“读出竞争闭环”：
+
+```text
+Phase225: ReadoutCompetition 与输出阈值跨越验证
+```
+
+核心任务：
+
+```text
+1. 对 qwen3 explain L29 干预后 target rank improved 但 top token 未必改变的样本，
+   测试需要多大 residual/readout margin 才能跨过输出阈值。
+
+2. 对 GLM4 repeat L30 干预后 top token changed 但 target rank 不改善的样本，
+   分析它是在破坏 repeat、触发 echo、还是转向 next_task_or_format。
+
+3. 将 propagation shift 与 output_pattern transition 直接关联，
+   建立 residual shift -> readout margin -> output token 的最小闭环。
+```

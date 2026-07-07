@@ -1,0 +1,118 @@
+{
+  "phase": 217,
+  "source_phase": 216,
+  "title": "Reproducible Baseline and Headset Validation",
+  "status": "complete",
+  "timestamp": "2026-07-06 22:12:16",
+  "model": "deepseek7b",
+  "headset_count": 2,
+  "filter_rows": 16,
+  "reproducible_success_rows": 10,
+  "reproducible_drift_rows": 4,
+  "rollout_rows": 42,
+  "norm_rows": 462,
+  "summary_rows": 12,
+  "norm_summary_rows": 60,
+  "effect_rows": [
+    {
+      "headset_id": "deepseek7b_explain_l24_route_set",
+      "condition": "headset_all_steps",
+      "success_rows": 6,
+      "drift_rows": 2,
+      "success_base_match": 6,
+      "success_patch_match": 2,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 4,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 6
+      },
+      "success_patch_outputs": {
+        "echo_then_answer": 2,
+        "other_or_wrong": 2,
+        "explain_answer": 2
+      },
+      "drift_base_outputs": {
+        "other_or_wrong": 2
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 2
+      }
+    },
+    {
+      "headset_id": "deepseek7b_explain_l24_route_set",
+      "condition": "headset_anchor_step",
+      "success_rows": 6,
+      "drift_rows": 2,
+      "success_base_match": 6,
+      "success_patch_match": 6,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "explain_answer": 6
+      },
+      "success_patch_outputs": {
+        "explain_answer": 6
+      },
+      "drift_base_outputs": {
+        "other_or_wrong": 2
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 2
+      }
+    },
+    {
+      "headset_id": "deepseek7b_list_l24_route_set",
+      "condition": "headset_anchor_step",
+      "success_rows": 4,
+      "drift_rows": 2,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "list_answer": 4
+      },
+      "success_patch_outputs": {
+        "list_answer": 4
+      },
+      "drift_base_outputs": {
+        "other_or_wrong": 2
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 2
+      }
+    },
+    {
+      "headset_id": "deepseek7b_list_l24_route_set",
+      "condition": "headset_all_steps",
+      "success_rows": 4,
+      "drift_rows": 2,
+      "success_base_match": 4,
+      "success_patch_match": 4,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_base_outputs": {
+        "list_answer": 4
+      },
+      "success_patch_outputs": {
+        "list_answer": 4
+      },
+      "drift_base_outputs": {
+        "other_or_wrong": 2
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 2
+      }
+    }
+  ],
+  "total_damage_match_loss": 4,
+  "total_repair_match_gain": 0
+}

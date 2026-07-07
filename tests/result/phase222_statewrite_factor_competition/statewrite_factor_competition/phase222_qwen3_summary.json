@@ -1,0 +1,3080 @@
+{
+  "phase": 222,
+  "source_phase": 221,
+  "title": "StateWrite Factor Competition Signed Channel Split",
+  "status": "complete",
+  "timestamp": "2026-07-07 00:18:56",
+  "model": "qwen3",
+  "spec_count": 2,
+  "filter_rows": 48,
+  "reproducible_success_rows": 17,
+  "reproducible_drift_rows": 18,
+  "rollout_rows": 380,
+  "channel_score_rows": 2304,
+  "summary_rows": 76,
+  "transition_rows": 91,
+  "effect_rows": [
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L29_K16",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 4,
+      "damage_match_loss": 0,
+      "repair_match_gain": 4,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "explain_answer": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L29_K64",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 4,
+      "damage_match_loss": 0,
+      "repair_match_gain": 4,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "explain_answer": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 1,
+      "damage_match_loss": 0,
+      "repair_match_gain": 1,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 4,
+        "explain_answer": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 1,
+      "damage_match_loss": 0,
+      "repair_match_gain": 1,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 4,
+        "explain_answer": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L29_K16",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L29_K4",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L29_K64",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L31_K16",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L31_K4",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L31_K64",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L29_K16",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L29_K4",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L29_K64",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L31_K16",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L31_K4",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L31_K64",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L29_K16",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L29_K4",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L29_K64",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L31_K4",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L29_K4",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "explain_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 5
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L31_K16",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L31_K4",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_neg_boost_L31_K64",
+      "channel_kind": "neg",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L31_K16",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L31_K4",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_neg_zero_L31_K64",
+      "channel_kind": "neg",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L31_K4",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "channel_kind": "pos",
+      "channel_action": "boost",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 3,
+        "next_task_or_format": 2
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 3,
+        "next_task_or_format": 2
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "next_task_or_format": 4,
+        "other_or_wrong": 1
+      }
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "channel_kind": "pos",
+      "channel_action": "zero",
+      "success_rows": 5,
+      "drift_rows": 5,
+      "success_base_match": 5,
+      "success_patch_match": 5,
+      "drift_base_match": 0,
+      "drift_patch_match": 0,
+      "damage_match_loss": 0,
+      "repair_match_gain": 0,
+      "success_patch_outputs": {
+        "repeat_answer": 5
+      },
+      "drift_patch_outputs": {
+        "other_or_wrong": 3,
+        "next_task_or_format": 2
+      }
+    }
+  ],
+  "top_transition_rows": [
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L29_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L29_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L29_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L29_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L29_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L29_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L29_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L29_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L29_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L29_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L29_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L29_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L31_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L31_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L31_K4",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L31_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L31_K16",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L31_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L31_K64",
+      "from_output_pattern": "explain_answer",
+      "to_output_pattern": "explain_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:cherry:color:en_1|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "fruit:cherry:color:en_0|answer_explain",
+          "generated": " Cherry is red.\nBecause cher"
+        },
+        {
+          "trajectory_id": "animal:horse:color:zh_0|answer_explain",
+          "generated": " Horse is a color. Because"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L29_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L29_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L29_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L29_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L29_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L29_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L29_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L29_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L29_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L29_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L31_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L31_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L31_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L31_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L31_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L31_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L31_K4",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L31_K4",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L31_K4",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L31_K16",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L31_K16",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_zero_L31_K64",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " Red, Red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "success_repro",
+      "condition": "mlpchan_neg_boost_L31_K64",
+      "from_output_pattern": "repeat_answer",
+      "to_output_pattern": "repeat_answer",
+      "rows": 5,
+      "examples": [
+        {
+          "trajectory_id": "fruit:apple:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        },
+        {
+          "trajectory_id": "animal:cardinal:color:en_1|answer_repeat",
+          "generated": " red, red. The cardinal"
+        },
+        {
+          "trajectory_id": "vehicle:car:color:en_1|answer_repeat",
+          "generated": " red, red. \n\nWait"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L29_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "explain_answer",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood is brown.\nBecause wood"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood is brown.\nBecause wood"
+        },
+        {
+          "trajectory_id": "material:wood:color:en_0|answer_explain",
+          "generated": " Wood is brown.\nBecause wood"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L29_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "explain_answer",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood is brown.\nBecause wood"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood is brown.\nBecause wood"
+        },
+        {
+          "trajectory_id": "material:wood:color:en_0|answer_explain",
+          "generated": " Wood is brown.\nBecause wood"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:en_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "material:wood:color:zh_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:zh_1|answer_explain",
+          "generated": " Wood can be various colors,"
+        },
+        {
+          "trajectory_id": "material:wood:color:en_0|answer_explain",
+          "generated": " Wood can be various colors,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K4",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L31_K4",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L31_K4",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L31_K16",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L31_K16",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_zero_L31_K64",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_neg_boost_L31_K64",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 4,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " white, white. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 2,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 2,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "next_task_or_format",
+      "rows": 2,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        },
+        {
+          "trajectory_id": "animal:shark:color:en_0|answer_repeat",
+          "generated": " black, black. Answer:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K16",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 2,
+      "examples": [
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " black, white. Whale is"
+        },
+        {
+          "trajectory_id": "animal:whale:color:en_0|answer_repeat",
+          "generated": " black, white. Whale is"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K64",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 2,
+      "examples": [
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " black, white. Whale is"
+        },
+        {
+          "trajectory_id": "animal:whale:color:en_0|answer_repeat",
+          "generated": " black, white. Whale is"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "from_output_pattern": "next_task_or_format",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 2,
+      "examples": [
+        {
+          "trajectory_id": "animal:whale:color:zh_0|answer_repeat",
+          "generated": " black, white. Whale is"
+        },
+        {
+          "trajectory_id": "animal:whale:color:en_0|answer_repeat",
+          "generated": " black, white. Whale is"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L29_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 1,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L29_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 1,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is a dark color,"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K16",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "explain_answer",
+      "rows": 1,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is gray.\nReason:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_boost_L31_K64",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "explain_answer",
+      "rows": 1,
+      "examples": [
+        {
+          "trajectory_id": "animal:shark:color:zh_0|answer_explain",
+          "generated": " Shark is gray.\nReason:"
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "source_group": "drift_repro",
+      "condition": "mlpchan_pos_zero_L31_K4",
+      "from_output_pattern": "other_or_wrong",
+      "to_output_pattern": "other_or_wrong",
+      "rows": 1,
+      "examples": [
+        {
+          "trajectory_id": "tool:cup:function:en_1|answer_repeat",
+          "generated": " cup, container. \n\nWait"
+        }
+      ]
+    }
+  ],
+  "channel_summary_rows": [
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "layer_idx": 29,
+      "channel_kind": "neg",
+      "rows": 384,
+      "top_channels": [
+        {
+          "step": 1,
+          "rank": 1,
+          "channel_id": 1943,
+          "signed_channel_score": -0.567456066608429,
+          "delta_z": 7.744698524475098,
+          "down_col_dot_resid_unit": -0.07327026128768921
+        },
+        {
+          "step": 4,
+          "rank": 1,
+          "channel_id": 1132,
+          "signed_channel_score": -0.3202786445617676,
+          "delta_z": -3.884579658508301,
+          "down_col_dot_resid_unit": 0.08244872838258743
+        },
+        {
+          "step": 4,
+          "rank": 2,
+          "channel_id": 1943,
+          "signed_channel_score": -0.2661280930042267,
+          "delta_z": 7.844028949737549,
+          "down_col_dot_resid_unit": -0.03392747417092323
+        },
+        {
+          "step": 3,
+          "rank": 1,
+          "channel_id": 543,
+          "signed_channel_score": -0.21275269985198975,
+          "delta_z": 4.894321918487549,
+          "down_col_dot_resid_unit": -0.04346929118037224
+        },
+        {
+          "step": 4,
+          "rank": 3,
+          "channel_id": 1,
+          "signed_channel_score": -0.17363591492176056,
+          "delta_z": -6.542782783508301,
+          "down_col_dot_resid_unit": 0.026538541540503502
+        },
+        {
+          "step": 1,
+          "rank": 2,
+          "channel_id": 543,
+          "signed_channel_score": -0.1464025378227234,
+          "delta_z": 2.7745535373687744,
+          "down_col_dot_resid_unit": -0.052766162902116776
+        },
+        {
+          "step": 4,
+          "rank": 4,
+          "channel_id": 543,
+          "signed_channel_score": -0.14494694769382477,
+          "delta_z": 3.3693034648895264,
+          "down_col_dot_resid_unit": -0.0430198572576046
+        },
+        {
+          "step": 4,
+          "rank": 5,
+          "channel_id": 23,
+          "signed_channel_score": -0.13755667209625244,
+          "delta_z": -3.602585554122925,
+          "down_col_dot_resid_unit": 0.038182761520147324
+        },
+        {
+          "step": 3,
+          "rank": 2,
+          "channel_id": 296,
+          "signed_channel_score": -0.12947151064872742,
+          "delta_z": -2.423084259033203,
+          "down_col_dot_resid_unit": 0.05343252792954445
+        },
+        {
+          "step": 3,
+          "rank": 3,
+          "channel_id": 535,
+          "signed_channel_score": -0.12536880373954773,
+          "delta_z": -2.680896759033203,
+          "down_col_dot_resid_unit": 0.04676375910639763
+        },
+        {
+          "step": 4,
+          "rank": 6,
+          "channel_id": 2698,
+          "signed_channel_score": -0.11967875808477402,
+          "delta_z": -2.352329730987549,
+          "down_col_dot_resid_unit": 0.050876691937446594
+        },
+        {
+          "step": 3,
+          "rank": 4,
+          "channel_id": 2858,
+          "signed_channel_score": -0.11955699324607849,
+          "delta_z": 3.297438859939575,
+          "down_col_dot_resid_unit": -0.036257531493902206
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "layer_idx": 29,
+      "channel_kind": "pos",
+      "rows": 384,
+      "top_channels": [
+        {
+          "step": 3,
+          "rank": 1,
+          "channel_id": 6627,
+          "signed_channel_score": 3.7097275257110596,
+          "delta_z": -19.8707218170166,
+          "down_col_dot_resid_unit": -0.18669314682483673
+        },
+        {
+          "step": 2,
+          "rank": 1,
+          "channel_id": 5880,
+          "signed_channel_score": 2.4407827854156494,
+          "delta_z": 10.473272323608398,
+          "down_col_dot_resid_unit": 0.2330487221479416
+        },
+        {
+          "step": 3,
+          "rank": 2,
+          "channel_id": 1070,
+          "signed_channel_score": 2.080578565597534,
+          "delta_z": -11.31882381439209,
+          "down_col_dot_resid_unit": -0.18381579220294952
+        },
+        {
+          "step": 1,
+          "rank": 1,
+          "channel_id": 1070,
+          "signed_channel_score": 1.7872856855392456,
+          "delta_z": -6.753348350524902,
+          "down_col_dot_resid_unit": -0.2646517753601074
+        },
+        {
+          "step": 3,
+          "rank": 3,
+          "channel_id": 4057,
+          "signed_channel_score": 1.5858393907546997,
+          "delta_z": -9.561569213867188,
+          "down_col_dot_resid_unit": -0.1658555567264557
+        },
+        {
+          "step": 4,
+          "rank": 1,
+          "channel_id": 199,
+          "signed_channel_score": 1.57142972946167,
+          "delta_z": 8.85549259185791,
+          "down_col_dot_resid_unit": 0.17745254933834076
+        },
+        {
+          "step": 2,
+          "rank": 2,
+          "channel_id": 5347,
+          "signed_channel_score": 1.5075151920318604,
+          "delta_z": -9.7392578125,
+          "down_col_dot_resid_unit": -0.15478748083114624
+        },
+        {
+          "step": 2,
+          "rank": 3,
+          "channel_id": 1070,
+          "signed_channel_score": 1.3311847448349,
+          "delta_z": -8.2559232711792,
+          "down_col_dot_resid_unit": -0.16123996675014496
+        },
+        {
+          "step": 3,
+          "rank": 4,
+          "channel_id": 8989,
+          "signed_channel_score": 1.1823713779449463,
+          "delta_z": -8.491928100585938,
+          "down_col_dot_resid_unit": -0.1392347365617752
+        },
+        {
+          "step": 4,
+          "rank": 2,
+          "channel_id": 1070,
+          "signed_channel_score": 1.090144157409668,
+          "delta_z": -7.862374305725098,
+          "down_col_dot_resid_unit": -0.13865330815315247
+        },
+        {
+          "step": 3,
+          "rank": 5,
+          "channel_id": 1132,
+          "signed_channel_score": 1.0566301345825195,
+          "delta_z": 5.945568561553955,
+          "down_col_dot_resid_unit": 0.17771725356578827
+        },
+        {
+          "step": 1,
+          "rank": 2,
+          "channel_id": 6627,
+          "signed_channel_score": 1.0060380697250366,
+          "delta_z": -7.160715103149414,
+          "down_col_dot_resid_unit": -0.14049407839775085
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "layer_idx": 31,
+      "channel_kind": "neg",
+      "rows": 384,
+      "top_channels": [
+        {
+          "step": 3,
+          "rank": 1,
+          "channel_id": 577,
+          "signed_channel_score": -0.37264496088027954,
+          "delta_z": -7.086437702178955,
+          "down_col_dot_resid_unit": 0.0525856539607048
+        },
+        {
+          "step": 4,
+          "rank": 1,
+          "channel_id": 3298,
+          "signed_channel_score": -0.3182692527770996,
+          "delta_z": -3.4899086952209473,
+          "down_col_dot_resid_unit": 0.09119701385498047
+        },
+        {
+          "step": 4,
+          "rank": 2,
+          "channel_id": 446,
+          "signed_channel_score": -0.2728111147880554,
+          "delta_z": -1.8664201498031616,
+          "down_col_dot_resid_unit": 0.14616811275482178
+        },
+        {
+          "step": 3,
+          "rank": 2,
+          "channel_id": 3298,
+          "signed_channel_score": -0.22247394919395447,
+          "delta_z": 2.827194929122925,
+          "down_col_dot_resid_unit": -0.07869070023298264
+        },
+        {
+          "step": 4,
+          "rank": 3,
+          "channel_id": 825,
+          "signed_channel_score": -0.17303605377674103,
+          "delta_z": -5.145926475524902,
+          "down_col_dot_resid_unit": 0.033625829964876175
+        },
+        {
+          "step": 3,
+          "rank": 3,
+          "channel_id": 763,
+          "signed_channel_score": -0.1724121868610382,
+          "delta_z": 3.1678059101104736,
+          "down_col_dot_resid_unit": -0.054426372051239014
+        },
+        {
+          "step": 2,
+          "rank": 1,
+          "channel_id": 6121,
+          "signed_channel_score": -0.1346331685781479,
+          "delta_z": -1.841174840927124,
+          "down_col_dot_resid_unit": 0.0731235146522522
+        },
+        {
+          "step": 3,
+          "rank": 4,
+          "channel_id": 2983,
+          "signed_channel_score": -0.12961344420909882,
+          "delta_z": -3.075730085372925,
+          "down_col_dot_resid_unit": 0.04214070737361908
+        },
+        {
+          "step": 2,
+          "rank": 2,
+          "channel_id": 7928,
+          "signed_channel_score": -0.11152351647615433,
+          "delta_z": 1.4154459238052368,
+          "down_col_dot_resid_unit": -0.07879037410020828
+        },
+        {
+          "step": 1,
+          "rank": 1,
+          "channel_id": 4325,
+          "signed_channel_score": -0.11122841387987137,
+          "delta_z": 1.5000640153884888,
+          "down_col_dot_resid_unit": -0.07414910942316055
+        },
+        {
+          "step": 3,
+          "rank": 5,
+          "channel_id": 167,
+          "signed_channel_score": -0.09973609447479248,
+          "delta_z": -1.1758276224136353,
+          "down_col_dot_resid_unit": 0.08482203632593155
+        },
+        {
+          "step": 3,
+          "rank": 6,
+          "channel_id": 3910,
+          "signed_channel_score": -0.0973845049738884,
+          "delta_z": -0.685244619846344,
+          "down_col_dot_resid_unit": 0.14211641252040863
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_explain_l29_l31_signed_channel_split",
+      "layer_idx": 31,
+      "channel_kind": "pos",
+      "rows": 384,
+      "top_channels": [
+        {
+          "step": 2,
+          "rank": 1,
+          "channel_id": 580,
+          "signed_channel_score": 5.1657633781433105,
+          "delta_z": 19.567848205566406,
+          "down_col_dot_resid_unit": 0.26399239897727966
+        },
+        {
+          "step": 3,
+          "rank": 1,
+          "channel_id": 1735,
+          "signed_channel_score": 2.9320759773254395,
+          "delta_z": 16.059988021850586,
+          "down_col_dot_resid_unit": 0.18257024884223938
+        },
+        {
+          "step": 1,
+          "rank": 1,
+          "channel_id": 4800,
+          "signed_channel_score": 1.9085501432418823,
+          "delta_z": -9.118698120117188,
+          "down_col_dot_resid_unit": -0.20930072665214539
+        },
+        {
+          "step": 1,
+          "rank": 2,
+          "channel_id": 9219,
+          "signed_channel_score": 1.8988991975784302,
+          "delta_z": 10.383184432983398,
+          "down_col_dot_resid_unit": 0.182882159948349
+        },
+        {
+          "step": 3,
+          "rank": 2,
+          "channel_id": 8384,
+          "signed_channel_score": 1.8035664558410645,
+          "delta_z": -12.040108680725098,
+          "down_col_dot_resid_unit": -0.1497965306043625
+        },
+        {
+          "step": 2,
+          "rank": 2,
+          "channel_id": 2779,
+          "signed_channel_score": 1.687170386314392,
+          "delta_z": -16.525564193725586,
+          "down_col_dot_resid_unit": -0.10209456831216812
+        },
+        {
+          "step": 1,
+          "rank": 3,
+          "channel_id": 577,
+          "signed_channel_score": 1.3958849906921387,
+          "delta_z": -11.356398582458496,
+          "down_col_dot_resid_unit": -0.12291616946458817
+        },
+        {
+          "step": 3,
+          "rank": 3,
+          "channel_id": 9219,
+          "signed_channel_score": 1.3236777782440186,
+          "delta_z": 13.841703414916992,
+          "down_col_dot_resid_unit": 0.09562969207763672
+        },
+        {
+          "step": 3,
+          "rank": 4,
+          "channel_id": 4350,
+          "signed_channel_score": 1.1280184984207153,
+          "delta_z": -10.051525115966797,
+          "down_col_dot_resid_unit": -0.11222361773252487
+        },
+        {
+          "step": 3,
+          "rank": 5,
+          "channel_id": 3526,
+          "signed_channel_score": 1.1092240810394287,
+          "delta_z": -8.27687931060791,
+          "down_col_dot_resid_unit": -0.1340147703886032
+        },
+        {
+          "step": 4,
+          "rank": 1,
+          "channel_id": 6516,
+          "signed_channel_score": 1.0949585437774658,
+          "delta_z": -12.206008911132812,
+          "down_col_dot_resid_unit": -0.08970651775598526
+        },
+        {
+          "step": 3,
+          "rank": 6,
+          "channel_id": 1441,
+          "signed_channel_score": 1.0429545640945435,
+          "delta_z": -9.100167274475098,
+          "down_col_dot_resid_unit": -0.1146082803606987
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "layer_idx": 31,
+      "channel_kind": "neg",
+      "rows": 384,
+      "top_channels": [
+        {
+          "step": 1,
+          "rank": 1,
+          "channel_id": 577,
+          "signed_channel_score": -0.9661674499511719,
+          "delta_z": -4.921289443969727,
+          "down_col_dot_resid_unit": 0.19632405042648315
+        },
+        {
+          "step": 3,
+          "rank": 1,
+          "channel_id": 577,
+          "signed_channel_score": -0.5186589956283569,
+          "delta_z": -3.0445313453674316,
+          "down_col_dot_resid_unit": 0.1703575849533081
+        },
+        {
+          "step": 2,
+          "rank": 1,
+          "channel_id": 6869,
+          "signed_channel_score": -0.33231112360954285,
+          "delta_z": -3.5286619663238525,
+          "down_col_dot_resid_unit": 0.094174824655056
+        },
+        {
+          "step": 3,
+          "rank": 2,
+          "channel_id": 2855,
+          "signed_channel_score": -0.22834017872810364,
+          "delta_z": 2.0134034156799316,
+          "down_col_dot_resid_unit": -0.11341004818677902
+        },
+        {
+          "step": 3,
+          "rank": 3,
+          "channel_id": 8374,
+          "signed_channel_score": -0.1467549353837967,
+          "delta_z": 2.3885741233825684,
+          "down_col_dot_resid_unit": -0.061440397053956985
+        },
+        {
+          "step": 1,
+          "rank": 2,
+          "channel_id": 1,
+          "signed_channel_score": -0.13622531294822693,
+          "delta_z": -2.5375003814697266,
+          "down_col_dot_resid_unit": 0.053684841841459274
+        },
+        {
+          "step": 1,
+          "rank": 3,
+          "channel_id": 108,
+          "signed_channel_score": -0.12714333832263947,
+          "delta_z": 1.9353516101837158,
+          "down_col_dot_resid_unit": -0.06569521129131317
+        },
+        {
+          "step": 1,
+          "rank": 4,
+          "channel_id": 26,
+          "signed_channel_score": -0.1127719134092331,
+          "delta_z": 1.1707885265350342,
+          "down_col_dot_resid_unit": -0.09632133692502975
+        },
+        {
+          "step": 2,
+          "rank": 2,
+          "channel_id": 2855,
+          "signed_channel_score": -0.10042927414178848,
+          "delta_z": 2.4445924758911133,
+          "down_col_dot_resid_unit": -0.04108221456408501
+        },
+        {
+          "step": 4,
+          "rank": 1,
+          "channel_id": 5335,
+          "signed_channel_score": -0.09736879169940948,
+          "delta_z": -0.8841797113418579,
+          "down_col_dot_resid_unit": 0.11012330651283264
+        },
+        {
+          "step": 3,
+          "rank": 4,
+          "channel_id": 6,
+          "signed_channel_score": -0.0935247391462326,
+          "delta_z": -1.282983422279358,
+          "down_col_dot_resid_unit": 0.07289629429578781
+        },
+        {
+          "step": 1,
+          "rank": 5,
+          "channel_id": 9,
+          "signed_channel_score": -0.0925602838397026,
+          "delta_z": 1.1275877952575684,
+          "down_col_dot_resid_unit": -0.08208698779344559
+        }
+      ]
+    },
+    {
+      "spec_id": "qwen3_repeat_l31_signed_channel_split",
+      "layer_idx": 31,
+      "channel_kind": "pos",
+      "rows": 384,
+      "top_channels": [
+        {
+          "step": 3,
+          "rank": 1,
+          "channel_id": 6567,
+          "signed_channel_score": 5.427565574645996,
+          "delta_z": 16.722509384155273,
+          "down_col_dot_resid_unit": 0.32456645369529724
+        },
+        {
+          "step": 1,
+          "rank": 1,
+          "channel_id": 6567,
+          "signed_channel_score": 4.949769973754883,
+          "delta_z": 17.39631462097168,
+          "down_col_dot_resid_unit": 0.28452980518341064
+        },
+        {
+          "step": 3,
+          "rank": 2,
+          "channel_id": 9407,
+          "signed_channel_score": 3.167288064956665,
+          "delta_z": 15.954764366149902,
+          "down_col_dot_resid_unit": 0.19851675629615784
+        },
+        {
+          "step": 1,
+          "rank": 2,
+          "channel_id": 4350,
+          "signed_channel_score": 2.298314332962036,
+          "delta_z": -11.086706161499023,
+          "down_col_dot_resid_unit": -0.20730361342430115
+        },
+        {
+          "step": 1,
+          "rank": 3,
+          "channel_id": 9407,
+          "signed_channel_score": 1.8780854940414429,
+          "delta_z": 11.804327011108398,
+          "down_col_dot_resid_unit": 0.1591014415025711
+        },
+        {
+          "step": 3,
+          "rank": 3,
+          "channel_id": 3298,
+          "signed_channel_score": 1.6574785709381104,
+          "delta_z": -5.346875190734863,
+          "down_col_dot_resid_unit": -0.30999013781547546
+        },
+        {
+          "step": 3,
+          "rank": 4,
+          "channel_id": 4350,
+          "signed_channel_score": 1.5481231212615967,
+          "delta_z": -9.54860782623291,
+          "down_col_dot_resid_unit": -0.16213077306747437
+        },
+        {
+          "step": 1,
+          "rank": 4,
+          "channel_id": 9219,
+          "signed_channel_score": 1.5001933574676514,
+          "delta_z": 11.274072647094727,
+          "down_col_dot_resid_unit": 0.13306578993797302
+        },
+        {
+          "step": 2,
+          "rank": 1,
+          "channel_id": 6567,
+          "signed_channel_score": 1.450673222541809,
+          "delta_z": 7.806445121765137,
+          "down_col_dot_resid_unit": 0.18583019077777863
+        },
+        {
+          "step": 2,
+          "rank": 2,
+          "channel_id": 9219,
+          "signed_channel_score": 1.3209538459777832,
+          "delta_z": -9.601122856140137,
+          "down_col_dot_resid_unit": -0.13758327066898346
+        },
+        {
+          "step": 3,
+          "rank": 5,
+          "channel_id": 8463,
+          "signed_channel_score": 1.234002709388733,
+          "delta_z": -8.1240234375,
+          "down_col_dot_resid_unit": -0.15189550817012787
+        },
+        {
+          "step": 2,
+          "rank": 3,
+          "channel_id": 529,
+          "signed_channel_score": 0.8482563495635986,
+          "delta_z": -6.945215225219727,
+          "down_col_dot_resid_unit": -0.12213535606861115
+        }
+      ]
+    }
+  ],
+  "total_damage_match_loss": 0,
+  "total_repair_match_gain": 10
+}
