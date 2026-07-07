@@ -47431,3 +47431,1703 @@ Phase225: ReadoutCompetition 与输出阈值跨越验证
 3. 将 propagation shift 与 output_pattern transition 直接关联，
    建立 residual shift -> readout margin -> output token 的最小闭环。
 ```
+
+## Phase 225: ReadoutCompetition 与输出阈值跨越验证 [2026-07-07 01:19]
+
+### 1. 本阶段任务
+
+本阶段分析附件中对 Phase224 的判断，并继续完成同一大阶段任务。附件判断基本正确：
+
+```text
+Phase224 已经从单层通道激活态推进到多层 residual propagation（残差传播）候选闭环；
+但仍未完成自然机制闭合。
+```
+
+Phase224 的关键缺口是：
+
+```text
+qwen3 explain:
+  target rank improved 很多，但 top token changed 较少。
+
+GLM4 repeat:
+  top token changed 很多，但 target rank improved 很少。
+```
+
+因此 Phase225 不重新加载模型，而是复用 Phase224 的 readout metric（读出指标）和 Phase223 的 output_pattern（输出模式）结果，分析：
+
+```text
+residual shift
+→ readout margin
+→ target rank
+→ top token threshold
+→ output pattern
+```
+
+### 2. 脚本与结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase225_readout_competition_threshold.py
+tests/gpt5/run_phase225_readout_competition_threshold.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase225_readout_competition_threshold/readout_competition_threshold/
+```
+
+已完成检查：
+
+```text
+python -m py_compile tests/gpt5/phase225_readout_competition_threshold.py
+bash -n tests/gpt5/run_phase225_readout_competition_threshold.sh
+```
+
+本阶段属于结果再分析，不需要重新加载 qwen3、GLM4、DS7B；它直接读取 Phase224/223 的客观结果。
+
+### 3. 算法原理
+
+Phase225 继续使用 Phase224 的传播指标：
+
+$$
+\boxed{
+\mathrm{ProjectionShift}_{l,t}
+=
+\Delta h^{patch}_{l,t}
+\cdot
+\hat v^{S-D}_{l,t}
+}
+$$
+
+然后增加 readout threshold（读出阈值）分析：
+
+$$
+\boxed{
+\Delta r
+=
+r_{base}
+-
+r_{patch}
+}
+$$
+
+其中 \(r\) 是 target rank（目标排名），数值越小表示目标越接近 top token。
+
+同时记录：
+
+$$
+\boxed{
+\Delta m_{prose}
+=
+m^{patch}_{prose}
+-
+m^{base}_{prose}
+}
+$$
+
+$$
+\boxed{
+\Delta m_{echo}
+=
+m^{patch}_{echo}
+-
+m^{base}_{echo}
+}
+$$
+
+$$
+\boxed{
+\Delta m_{stop}
+=
+m^{patch}_{stop}
+-
+m^{base}_{stop}
+}
+$$
+
+并统计：
+
+```text
+top_token_changed；
+target_rank_improved；
+min_abs_shift_for_top_change；
+min_abs_shift_for_rank_improve；
+top_token_pairs。
+```
+
+### 4. 总体结果
+
+跨模型汇总：
+
+```text
+propagation_rows = 1296
+threshold_rows = 108
+behavior_correlation_rows = 18
+total_top_token_changed = 141
+total_rank_improved = 219
+```
+
+分模型：
+
+```text
+qwen3:
+  propagation_rows = 648
+  threshold_rows = 54
+  top_token_changed = 27
+  rank_improved = 198
+
+GLM4:
+  propagation_rows = 648
+  threshold_rows = 54
+  top_token_changed = 114
+  rank_improved = 21
+
+DS7B:
+  propagation_rows = 0
+```
+
+DS7B 仍因没有可复现 success 样本而不能参与因果判断。
+
+### 5. qwen3 explain：rank 改善先于 top token 跨阈值
+
+qwen3 中最关键的条件仍是 L29 positive zero/success clamp。
+
+```text
+qwen3_explain_l29_to_l31_l33_propagation
+condition = mlpchan_pos_zero_L29_K64
+source_group = drift_repro
+
+observe L29:
+  projection_shift = +11.4991
+  top_token_changed = 3
+  rank_improved = 7
+  prose_margin_delta = +1.4427
+  top_token_pairs = can -> is
+
+observe L31:
+  projection_shift = +15.1672
+  top_token_changed = 3
+  rank_improved = 7
+
+observe L33:
+  projection_shift = +18.0175
+  top_token_changed = 3
+  rank_improved = 7
+```
+
+success clamp 也类似：
+
+```text
+condition = mlpchan_pos_success_L29_K64
+source_group = drift_repro
+
+observe L29:
+  projection_shift = +19.0338
+  top_token_changed = 3
+  rank_improved = 5
+  prose_margin_delta = +1.1510
+
+observe L31:
+  projection_shift = +22.7522
+  top_token_changed = 3
+  rank_improved = 5
+
+observe L33:
+  projection_shift = +25.0593
+  top_token_changed = 3
+  rank_improved = 5
+```
+
+重要细节：
+
+```text
+qwen3 的 rank_improved 远多于 top_token_changed。
+```
+
+例如：
+
+```text
+mlpchan_pos_success_L29_K16:
+  total_rank_improved = 27
+  total_top_token_changed = 0
+  behavior repair = 0
+
+mlpchan_pos_success_L29_K64:
+  total_rank_improved = 21
+  total_top_token_changed = 9
+  behavior repair = 4
+```
+
+这说明：
+
+```text
+qwen3 explain 的 residual shift 会先改善目标排名；
+只有当 readout margin 足够大时，才跨过 top token 阈值并修复 output pattern。
+```
+
+所以 Phase224 看到的“target rank improved 但 top token changed 少”不是矛盾，而是读出阈值效应。
+
+### 6. GLM4 repeat：top token 改变多，但多为扰动
+
+GLM4 的最强 readout 变化来自 L30 zero：
+
+```text
+glm4_repeat_l30_to_l31_l32_propagation
+condition = mlpchan_pos_zero_L30_K64
+
+total_top_token_changed = 18
+total_rank_improved = 3
+success_damage_match_loss = 2
+drift_repair_match_gain = 0
+success_patch_outputs:
+  repeat_answer = 3
+  echo_then_answer = 1
+  other_or_wrong = 1
+drift_patch_outputs:
+  echo_then_answer = 2
+  next_task_or_format = 1
+  other_or_wrong = 2
+```
+
+top token pairs（首选词元转移）包括：
+
+```text
+Green -> The
+White -> Blue
+White -> The
+Red -> Cardinal
+Red -> The
+```
+
+这说明 GLM4 的 top token changed 不是目标修复，而是：
+
+```text
+repeat state 被破坏；
+echo / next_task_or_format / other_or_wrong 竞争增强；
+readout 被扰动。
+```
+
+GLM4 drift clamp 更明显：
+
+```text
+mlpchan_pos_drift_L30_K4:
+  success_damage_match_loss = 4
+  total_top_token_changed = 15
+  total_rank_improved = 0
+```
+
+这与 Phase223 的行为结果一致：
+
+```text
+GLM4 L30 positive channel activation state 对 repeat success 有必要性；
+把它拉到 drift 激活态会破坏 repeat，而不是修复 drift。
+```
+
+### 7. 输出阈值规律
+
+当前可以得到一个谨慎规律：
+
+```text
+qwen3 explain:
+  positive residual shift
+  → prose margin 上升
+  → target rank 改善
+  → 只有部分样本跨 top token 阈值
+  → 部分 drift 修复为 explain_answer
+
+GLM4 repeat:
+  negative residual shift
+  → repeat state 被破坏
+  → top token 频繁改变
+  → 但 target rank 不改善
+  → 输出转向 echo / format / other
+```
+
+这说明 ReadoutCompetition（读出竞争）不是单一指标，需要分成：
+
+```text
+目标排名改善；
+最高词元阈值跨越；
+竞争模式增强；
+输出模式转移。
+```
+
+### 8. 与行为输出的关联
+
+Phase225 将 Phase224 的传播指标与 Phase223 的输出模式关联起来后，得到：
+
+```text
+qwen3 mlpchan_pos_zero_L29_K64:
+  mean_layer_projection_shift = +3.7813
+  total_top_token_changed = 9
+  total_rank_improved = 33
+  drift_repair_match_gain = 4
+
+qwen3 mlpchan_pos_success_L29_K64:
+  mean_layer_projection_shift = +10.6432
+  total_top_token_changed = 9
+  total_rank_improved = 21
+  drift_repair_match_gain = 4
+
+GLM4 mlpchan_pos_zero_L30_K64:
+  mean_layer_projection_shift = -2.5523
+  total_top_token_changed = 18
+  total_rank_improved = 3
+  success_damage_match_loss = 2
+
+GLM4 mlpchan_pos_drift_L30_K4:
+  mean_layer_projection_shift = -1.2371
+  total_top_token_changed = 15
+  total_rank_improved = 0
+  success_damage_match_loss = 4
+```
+
+这说明：
+
+```text
+qwen3 的正向 residual/readout 变化与 repair 相关；
+GLM4 的 readout 改变主要与 damage 和模式漂移相关。
+```
+
+### 9. 问题和硬伤
+
+```text
+1. Phase225 是对 Phase224/223 结果的再分析，不是新模型干预。
+
+2. readout margin 指标仍是代理指标，不能完全等价于完整输出概率地形。
+
+3. target rank improved 不一定意味着正确输出，尤其在 GLM4 中已经证明会出现强扰动。
+
+4. qwen3 的 top token changed 仍然只有一部分，说明还有未解释的解码阈值、后续生成稳定性和模式维持问题。
+
+5. GLM4 的 repeat 结果说明 readout competition 可以被扰动，但目标修复路径仍不清楚。
+
+6. DS7B 仍缺少可复现 success。
+
+7. 当前仍是小模型、对象-关系-值任务族，外推到完整语言编码机制需要 30% 到 50% 折扣。
+```
+
+### 10. 当前结论
+
+Phase225 完成了一个更小的 readout 闭环：
+
+```text
+residual propagation
+→ readout rank / margin change
+→ top token threshold crossing
+→ output pattern repair or damage
+```
+
+但这个闭环不是全局闭合。
+
+最重要的客观结论：
+
+```text
+1. qwen3 explain 的 L29 通道激活态可以通过 residual propagation 改善 target rank，
+   但需要更大 readout margin 才能跨 top token 阈值。
+
+2. GLM4 repeat 的 L30 通道干预会强烈改变 top token，
+   但多数不是目标修复，而是 repeat state 破坏和竞争模式增强。
+
+3. ReadoutCompetition 必须拆成 rank improvement、top-token threshold、competitor transition 三层。
+```
+
+### 11. 全局图谱更新
+
+当前图谱：
+
+```text
+PromptTrigger
+→ CandidateRoutePath
+→ MLP gated channel activation
+→ ResidualPropagation
+→ ResidualAccumulation
+→ ReadoutRankShift
+→ TopTokenThreshold
+→ OutputPattern
+```
+
+局部闭环：
+
+```text
+L29/L30 positive channel activation
+→ later-layer residual shift
+→ readout margin shift
+→ target rank / competitor rank change
+→ top token threshold crossing
+→ pattern repair or damage
+```
+
+### 12. 当前进度估计
+
+```text
+小模型模式机制图谱：约 72%
+StatePath：约 58%
+StateWriteCause：约 42%
+StateWriteSource：约 34%
+MLP/ResidualWrite：约 48%
+MLP channel source：约 25%
+activation-gated channel mechanism：约 18%
+ResidualPropagation：约 18%
+ReadoutPath：约 30%
+路径因果机制：约 36%
+模型内部自然闭合：约 39%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 13. 下一阶段任务
+
+Phase225 仍属于同一大阶段，并完成了 readout threshold（读出阈值）初步闭环。
+
+下一步 Phase226 应避免继续堆 patch，而要验证自然链条来源：
+
+```text
+Phase226: Natural Trigger 到 Channel Activation 的上游来源验证
+```
+
+核心任务：
+
+```text
+1. 找出 qwen3 explain L29 positive channel activation state 是由哪些 prompt token / 上游层状态自然触发的。
+
+2. 对 GLM4 repeat L30 positive channel activation state 做同样的上游来源分析。
+
+3. 连接：
+   PromptTrigger
+   → upstream residual state
+   → MLP gate/up activation
+   → positive channel activation
+   → residual propagation
+   → readout threshold。
+```
+
+## Phase 226: 自然触发源到通道激活的初步验证 [2026-07-07 01:44]
+
+### 1. 对 Phase225 附件判断的校准
+
+Phase225 的核心判断基本正确。
+
+它补上了 Phase224 之后必须区分的一层：
+
+```text
+residual shift（残差状态移动）
+≠ rank improvement（目标排名改善）
+≠ top-token threshold crossing（跨过最高词元阈值）
+≠ target repair（目标模式修复）
+```
+
+Phase225 证明：
+
+```text
+1. qwen3 explain 中，L29 positive channel（正向通道）干预可以多次改善目标 rank，
+   但不一定让目标词元跨过 top token threshold。
+
+2. GLM4 repeat 中，L30 positive channel 干预容易改变 top token，
+   但大量变化不是目标修复，而是 repeat state（重复状态）被破坏后竞争词元切换。
+
+3. 因此继续堆 readout patch（读出补丁）会进入边际收益递减区。
+```
+
+所以 Phase226 的方向应从“继续修输出”转为验证自然链条来源：
+
+```text
+PromptTrigger（提示触发）
+→ upstream residual state（上游残差状态）
+→ MLP channel activation（MLP 通道激活）
+→ residual propagation（残差传播）
+→ readout threshold（读出阈值）
+```
+
+### 2. 本阶段测试目标
+
+本阶段不再人工 clamp（钳制）或 zero（清零）通道，而是只改变自然 prompt（提示词）结构，观察关键通道是否自然进入 success-like state（成功样本相似状态）或 drift-like state（漂移样本相似状态）。
+
+测试对象：
+
+```text
+qwen3: explain 模式，source layer L29，observe layers L11/L29/L31/L33
+GLM4: repeat 模式，source layer L30，observe layers L12/L28/L30/L32
+DS7B: explain 模式，source layer L24，observe layers L20/L24/L26/L27
+```
+
+prompt 变体：
+
+```text
+full（完整提示）
+no_instruction（去掉任务说明）
+short_answer_instruction（短答指令）
+no_answer_anchor（去掉 Answer: 锚点）
+repeat_instruction（把 explain 改成 repeat）
+because_removed（移除 because 相关结构）
+explain_instruction（把 repeat 改成 explain）
+comma_removed（移除逗号结构）
+```
+
+### 3. 算法原理
+
+核心思想：
+
+```text
+如果某个自然 prompt 变体能把 MLP channel state 推向 success-like state，
+说明它可能包含该通道激活的自然上游触发源。
+
+如果 channel state 接近 success-like state，但 readout 仍失败，
+说明通道激活只是必要拼图之一，不是完整闭合机制。
+```
+
+#### 3.1 通道激活轴公式
+
+令：
+
+```text
+z_l(x)
+```
+
+表示第 l 层 MLP down projection input（下投影输入）中的通道激活向量。
+
+令：
+
+```text
+μ_S
+```
+
+表示 success rows（成功样本）的平均通道状态。
+
+令：
+
+```text
+μ_D
+```
+
+表示 drift rows（漂移样本）的平均通道状态。
+
+对 top-K positive channels（前 K 个正向通道）计算：
+
+```math
+\mathrm{ActivationAxis}_K(x)
+=
+\frac{1}{K}
+\sum_{i \in C_K}
+\frac{z_i(x)-\mu_{D,i}}{\mu_{S,i}-\mu_{D,i}+\epsilon}
+```
+
+解释：
+
+```text
+ActivationAxis ≈ 0：接近 drift-like state
+ActivationAxis ≈ 1：接近 success-like state
+ActivationAxis < 0：比 drift 更偏离 success
+ActivationAxis > 1：超过 success 平均方向，可能是过强激活或异常状态
+```
+
+自然变体相对 full prompt 的变化为：
+
+```math
+\Delta \mathrm{Axis}_K
+=
+\mathrm{ActivationAxis}_K(x_{\mathrm{variant}})
+-
+\mathrm{ActivationAxis}_K(x_{\mathrm{full}})
+```
+
+#### 3.2 隐状态投影公式
+
+令：
+
+```math
+d_l = \mu_{S,l}^{h} - \mu_{D,l}^{h}
+```
+
+表示第 l 层 hidden state（隐状态）的 success-drift 方向。
+
+自然变体的投影变化：
+
+```math
+\Delta \mathrm{Proj}_l(x)
+=
+\langle h_l(x_{\mathrm{variant}})-h_l(x_{\mathrm{full}}), d_l \rangle
+```
+
+解释：
+
+```text
+正值：自然变体把 hidden state 推向 success direction（成功方向）
+负值：自然变体把 hidden state 推离 success direction
+```
+
+#### 3.3 读出层指标
+
+记录：
+
+```text
+target_rank_delta（目标词排名变化）
+target_logit_delta（目标 logit 变化）
+top_token_changed（最高词元是否改变）
+prose_logit_delta（prose 类竞争词变化）
+echo_logit_delta（echo/repeat 类竞争词变化）
+```
+
+其中：
+
+```text
+rank_delta < 0 表示目标排名改善
+rank_delta > 0 表示目标排名变差
+```
+
+### 4. 脚本和结果文件
+
+新增脚本：
+
+```text
+/tests/gpt5/phase226_natural_trigger_channel_activation.py
+/tests/gpt5/run_phase226_natural_trigger_channel_activation.sh
+```
+
+结果目录：
+
+```text
+/tests/result/phase226_natural_trigger_channel_activation/natural_trigger_channel_activation/
+```
+
+三模型依次测试，避免 GPU 显存叠加：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+规模：
+
+```text
+qwen3: activation_rows=648, hidden_rows=864, readout_rows=216
+GLM4: activation_rows=648, hidden_rows=864, readout_rows=216
+DS7B: activation_rows=432, hidden_rows=576, readout_rows=144
+cross-model total:
+activation_rows=1728
+hidden_rows=2304
+readout_rows=576
+channel_score_rows=1728
+```
+
+脚本检查：
+
+```text
+python -m py_compile: 通过
+bash -n runner: 通过
+```
+
+### 5. 关键客观结果
+
+#### 5.1 GLM4 repeat：Answer 锚点是强自然触发源
+
+GLM4 repeat success rows 中，移除 Answer anchor 后：
+
+```text
+variant=no_answer_anchor, step=1, layer=L30
+
+K=4:
+axis=-0.6807
+delta_axis=-1.6599
+success_closer=0
+
+K=16:
+axis=-0.3347
+delta_axis=-1.3872
+success_closer=0
+
+K=64:
+axis=0.0092
+delta_axis=-1.0138
+success_closer=0
+```
+
+GLM4 repeat drift rows 中，同一变体：
+
+```text
+variant=no_answer_anchor, step=1, layer=L30
+
+K=4:
+axis=-0.6748
+delta_axis=-0.8954
+success_closer=0
+
+K=16:
+axis=-0.3417
+delta_axis=-0.5685
+success_closer=0
+```
+
+说明：
+
+```text
+对 GLM4 repeat 来说，Answer: 不是普通文本边界，
+而是 L30 repeat-related positive channel state 的强自然触发源之一。
+
+移除 Answer anchor 后，success rows 的通道状态从 success-like 明显塌回 drift-like 或更低。
+```
+
+读出层也同步发生大变化：
+
+```text
+GLM4 success no_answer_anchor step=1:
+top_token_changed=6/6
+rank_delta=-5285.67
+prose_delta=+1.7344
+echo_delta=-2.25
+top token 主要变为 For
+
+GLM4 drift no_answer_anchor step=1:
+top_token_changed=6/6
+rank_delta=-5263.67
+prose_delta=+0.9948
+echo_delta=-3.1771
+top token 主要变为 For
+```
+
+谨慎解释：
+
+```text
+rank_delta 改善并不等于 repeat 修复。
+这里更像是 Answer anchor 被移除后，模型进入新的 prose/continuation readout regime（散文续写读出机制）。
+```
+
+#### 5.2 qwen3 explain：Answer 锚点控制的不是单一通道，而是通道与读出的边界条件
+
+qwen3 explain drift rows 中，移除 Answer anchor 后：
+
+```text
+variant=no_answer_anchor, step=1, layer=L29
+
+K=64:
+axis=0.7352
+delta_axis=+0.7388
+success_closer=6
+
+K=16:
+axis=0.6337
+delta_axis=+0.6378
+success_closer=6
+
+K=4:
+axis=0.3203
+delta_axis=+0.4749
+success_closer=6
+```
+
+这说明：
+
+```text
+在 qwen3 drift rows 中，移除 Answer anchor 反而能把 L29 选定通道推向 success-like side。
+```
+
+但读出结果并没有闭合，反而明显破坏：
+
+```text
+qwen3 success no_answer_anchor step=1:
+top_token_changed=6/6
+rank_delta=-740.67
+prose_delta=-5.375
+echo_delta=-10.7708
+top token 主要变为 Then
+
+qwen3 drift no_answer_anchor step=1:
+top_token_changed=6/6
+rank_delta=-691.67
+prose_delta=-5.6667
+echo_delta=-9.0
+top token 主要为 Then / The
+```
+
+隐状态投影同样出现强移动：
+
+```text
+qwen3 drift no_answer_anchor step=1:
+L33 projection delta=+89.1919
+L31 projection delta=+73.0376
+L29 projection delta=+46.3266
+```
+
+说明：
+
+```text
+qwen3 explain 的 Answer anchor 不是简单的“激活正向通道”按钮。
+它同时参与 readout boundary（读出边界）、文本续写 regime（续写机制）和 explain/repeat 竞争模式切换。
+
+所以 qwen3 中出现了：
+
+channel state 更像 success，
+hidden projection 更像 success，
+但 top token 仍然进入 Then/The 续写模式。
+```
+
+这是非常重要的负结果：
+
+```text
+ChannelActivation alone is not closure.
+（单独通道激活不是闭合。）
+```
+
+#### 5.3 qwen3 指令内容影响后续生成步的自然状态
+
+qwen3 drift rows 中，repeat_instruction 在 step=3：
+
+```text
+variant=repeat_instruction, step=3
+L33 projection delta=+63.5865
+L31 projection delta=+42.4876
+L29 projection delta=+36.0306
+
+readout:
+top_token_changed=4/6
+rank_delta=+402.33
+prose_delta=-15.3542
+top tokens 包括 Answer / be
+```
+
+qwen3 success rows 中，同一变体在 step=3：
+
+```text
+L33 projection delta=-43.1403
+L31 projection delta=-37.9783
+L29 projection delta=-27.2162
+```
+
+说明：
+
+```text
+自然触发源不是单个 token。
+它至少包含：
+
+1. instruction content（任务说明内容）
+2. answer anchor（回答锚点）
+3. generated prefix（已生成前缀）
+4. current decoding step（当前解码步）
+```
+
+#### 5.4 DS7B 结果只能作为弱参考
+
+DS7B explain drift rows 中，no_answer_anchor 在 L24：
+
+```text
+variant=no_answer_anchor, step=1, layer=L24
+
+K=64:
+axis=0.7240
+delta_axis=+0.7240
+success_closer=2
+
+K=16:
+axis=0.6035
+delta_axis=+0.6035
+success_closer=2
+
+K=4:
+axis=0.5988
+delta_axis=+0.5988
+success_closer=2
+```
+
+但 DS7B 的 drift 样本数量只有 2，且此前行为闭合较弱，所以只能说明：
+
+```text
+DS7B 对自然 prompt trigger 也高度敏感。
+```
+
+不能据此推出稳定机制。
+
+### 6. 阶段性结论
+
+Phase226 得到的是：
+
+```text
+自然触发源存在。
+```
+
+但不是：
+
+```text
+自然触发源已经闭合。
+```
+
+更准确的结果是：
+
+```text
+1. GLM4 repeat 的 Answer anchor 是 L30 repeat-related channel state 的强自然触发源。
+
+2. qwen3 explain 的自然触发机制更复杂，
+   Answer anchor 同时影响 channel activation、hidden state projection 和 readout boundary。
+
+3. MLP channel activation 可以与 readout threshold 脱钩。
+
+4. 因此 “找到正向通道” 不是终点，
+   还必须找到该通道写入 residual 后如何进入 readout regime。
+```
+
+新的拼图更新：
+
+```text
+PromptTrigger
+→ InstructionFrame
+→ AnswerAnchor
+→ GeneratedPrefix
+→ StepCondition
+→ MLPChannelActivation
+→ ResidualStateShift
+→ ReadoutRegimeSelection
+→ TopTokenThreshold
+→ OutputPattern
+```
+
+其中关键新增节点是：
+
+```text
+ReadoutRegimeSelection（读出机制选择）
+```
+
+它解释了为什么：
+
+```text
+channel state success-like
+hidden projection success-like
+但 top token 仍可能进入 Then / The / For 这类续写模式。
+```
+
+### 7. 问题、硬伤和瓶颈
+
+#### 7.1 prompt 变体仍然过粗
+
+当前变体是结构级干预：
+
+```text
+去掉 instruction
+去掉 Answer:
+替换 explain/repeat
+移除 comma/because
+```
+
+它能定位自然来源的大区域，但不能精确定位：
+
+```text
+哪个 token
+哪个位置
+哪个上游层
+哪个 gate/up channel
+哪个 residual write path
+```
+
+#### 7.2 ActivationAxis 可能混合多个子模式
+
+Phase226 使用 Phase210 的 success/drift 均值构造方向。
+
+问题是：
+
+```text
+success rows 内部可能不止一种 success mode。
+drift rows 内部也可能有多个 drift mode。
+```
+
+所以 axis 接近 1 不一定代表真正功能闭合，只代表接近某个均值方向。
+
+#### 7.3 DS7B 证据弱
+
+DS7B 的样本量和行为闭合都偏弱。
+
+本阶段只能把 DS7B 当作：
+
+```text
+跨模型敏感性参考
+```
+
+不能作为机制闭合证据。
+
+#### 7.4 还没有拆开 gate/up 机制
+
+当前抓取的是 MLP down projection input。
+
+但真实链条应拆成：
+
+```text
+input hidden state
+→ gate projection
+→ up projection
+→ activation function
+→ gated product
+→ down projection
+→ residual write
+```
+
+现在只看到了中后段，还没有看到上游 gate 如何打开。
+
+### 8. 智能理论角度的谨慎洞察
+
+从智能理论看，语言更像动态模式网络，而不是单一语义向量。
+
+本阶段支持：
+
+```text
+语言输出 = 模式触发 + 状态写入 + 读出竞争
+```
+
+更具体：
+
+```text
+Prompt 不是单纯提供语义。
+Prompt 在模型内部同时设置：
+
+1. 任务模式
+2. 输出边界
+3. 生成步状态
+4. 候选读出空间
+5. MLP channel activation 条件
+```
+
+因此语法、逻辑、标点、结束、复述、解释，可能不是彼此独立的模块，而是同一个动态模式网络在不同层级上的表现。
+
+但当前不能把这一点总结成最终理论，因为还缺：
+
+```text
+1. token-level trigger attribution（词元级触发归因）
+2. gate/up causal path（门控/上投影因果路径）
+3. residual write map（残差写入图谱）
+4. readout regime switch（读出机制切换）
+5. 跨模型稳定复现
+```
+
+### 9. 当前进度估计
+
+```text
+小模型模式机制图谱：约 73%
+StatePath：约 59%
+StateWriteCause：约 43%
+StateWriteSource：约 36%
+NaturalTrigger → ChannelActivation：约 12%
+MLP/ResidualWrite：约 49%
+activation-gated channel mechanism：约 20%
+ResidualPropagation：约 19%
+ReadoutPath：约 32%
+ReadoutRegimeSelection：约 8%
+路径因果机制：约 37%
+模型内部自然闭合：约 40%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 10. 下一阶段任务
+
+Phase226 和 Phase225 属于同一阶段性目标：
+
+```text
+从人工干预修复，转向自然机制来源定位。
+```
+
+Phase226 已完成第一轮自然触发源粗定位，但没有完成闭合。
+
+下一阶段仍属于同一阶段，应继续自动推进：
+
+```text
+Phase227: token-level trigger attribution and gate/up decomposition
+（词元级触发归因与 gate/up 分解）
+```
+
+核心任务：
+
+```text
+1. 对 Answer:、instruction、generated prefix 做 token-level ablation（词元级消融）。
+
+2. 在 qwen3 L29、GLM4 L30、DS7B L24 拆分：
+   gate projection
+   up projection
+   activation product
+   down projection input
+   residual write。
+
+3. 找出自然 prompt token 如何打开 positive channel。
+
+4. 检查该 positive channel 是否真的写入目标 residual direction，
+   以及为何有时进入 Then/The/For 读出机制。
+
+5. 把目标从 “修复输出” 改成 “画出自然触发到读出的机制图谱”。
+```
+
+## Phase 227: 词元触发与 gate/up/product 分解 [2026-07-07 01:51]
+
+### 1. 阶段目标
+
+Phase226 已经证明：
+
+```text
+自然 prompt trigger（自然提示触发源）确实会改变关键 MLP channel state（通道状态）。
+```
+
+但 Phase226 仍然是粗定位，它没有回答：
+
+```text
+1. 到底是哪个 token / 哪个片段触发了通道变化？
+2. 通道变化来自 gate projection、up projection，还是 gated product？
+3. channel state 变化为什么有时不能进入正确 readout regime？
+```
+
+Phase227 因此继续同一阶段性目标：
+
+```text
+从人工干预修复，转向自然机制来源定位。
+```
+
+但本阶段不继续修输出，只拆内部机制。
+
+### 2. 测试脚本和结果
+
+新增脚本：
+
+```text
+/tests/gpt5/phase227_token_trigger_gateup_decomposition.py
+/tests/gpt5/run_phase227_token_trigger_gateup_decomposition.sh
+```
+
+结果目录：
+
+```text
+/tests/result/phase227_token_trigger_gateup_decomposition/token_trigger_gateup_decomposition/
+```
+
+三模型顺序测试：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+输出规模：
+
+```text
+qwen3:
+activation_rows=5184
+hidden_rows=1728
+readout_rows=432
+
+GLM4:
+activation_rows=1296
+hidden_rows=1728
+readout_rows=432
+
+DS7B:
+activation_rows=3888
+hidden_rows=1296
+readout_rows=324
+
+cross-model:
+activation_rows=10368
+hidden_rows=4752
+readout_rows=1188
+channel_score_rows=1728
+```
+
+脚本检查：
+
+```text
+python -m py_compile: 通过
+bash -n runner: 通过
+```
+
+### 3. 算法原理
+
+本阶段把 Phase226 的 down projection input（下投影输入）扩展为四个组件：
+
+```text
+gate projection output（门控投影输出）
+up projection output（上投影输出）
+product / down projection input（门控乘积 / 下投影输入）
+recomputed product（重算门控乘积）
+```
+
+对 LLaMA/Qwen/DeepSeek 类 MLP，基本结构是：
+
+```math
+g_l(x) = W^{gate}_l h_l(x)
+```
+
+```math
+u_l(x) = W^{up}_l h_l(x)
+```
+
+```math
+z_l(x) = \phi(g_l(x)) \odot u_l(x)
+```
+
+```math
+\Delta h_l(x) = W^{down}_l z_l(x)
+```
+
+其中：
+
+```text
+g_l: gate output（门控输出）
+u_l: up output（上投影输出）
+z_l: gated product（门控乘积，也就是 down input）
+φ: activation function（激活函数）
+⊙: elementwise product（逐元素乘法）
+```
+
+对每个组件独立计算 success-drift axis（成功-漂移轴）：
+
+```math
+\mathrm{Axis}_{K,c}(x)
+=
+\frac{1}{K}
+\sum_{i \in C_K}
+\frac{c_i(x)-\mu_{D,c,i}}{\mu_{S,c,i}-\mu_{D,c,i}+\epsilon}
+```
+
+其中：
+
+```text
+c ∈ {gate, up, product, recomputed_product}
+C_K 是 Phase221/222 选出的 positive write channels（正向写入通道）
+```
+
+自然变体的影响：
+
+```math
+\Delta \mathrm{Axis}_{K,c}
+=
+\mathrm{Axis}_{K,c}(x_{\mathrm{variant}})
+-
+\mathrm{Axis}_{K,c}(x_{\mathrm{full}})
+```
+
+词元触发方式：
+
+```text
+1. 保留 Phase226 的结构变体：
+   no_instruction
+   short_answer_instruction
+   no_answer_anchor
+   repeat_instruction / explain_instruction
+   because_removed / comma_removed
+
+2. 新增 token-level removal（词元级删除）：
+   对 Answer、冒号、because、same、twice、comma、reason、以及 prompt 尾部邻近 token 做逐个删除。
+```
+
+### 4. 关键客观结果
+
+#### 4.1 qwen3 explain：gate/up/product 不同步，up 组件波动最大
+
+qwen3 L29 暴露出完整组件：
+
+```text
+components = gate, up, product, recomputed_product
+```
+
+最强变化集中在 up component（上投影组件），尤其是 step=3 的 K=4：
+
+```text
+drift short_answer_instruction step=3 up K=4:
+axis=3.3289
+delta_axis=+29.4829
+success_closer=0
+
+drift repeat_instruction step=3 up K=4:
+axis=-4.3436
+delta_axis=+21.8105
+success_closer=0
+
+drift no_instruction step=3 up K=4:
+axis=-5.7025
+delta_axis=+20.4515
+success_closer=0
+
+success no_instruction step=3 up K=4:
+axis=15.2370
+delta_axis=+18.4728
+success_closer=4
+```
+
+但是 product / recomputed_product 的变化明显更小：
+
+```text
+drift no_answer_anchor step=1 product K=4:
+axis=0.3254
+delta_axis=+0.8706
+success_closer=4
+
+drift drop_tok_3_apple/cardinal step=1 product K=64:
+axis≈0.894
+delta_axis≈+0.882
+success_closer=2
+```
+
+这说明：
+
+```text
+qwen3 的 up projection 对 prompt token 非常敏感，
+但真正进入 down input 的 product 会被 gate 调制压缩。
+```
+
+因此不能只看 up 或 gate 的大幅变化，必须看：
+
+```text
+gate × up → product → residual write
+```
+
+#### 4.2 qwen3 explain：词元删除能改变隐藏状态，但不等于读出闭合
+
+qwen3 hidden projection（隐状态投影）中，多个词元级删除造成强移动：
+
+```text
+drift drop_tok_3_cardinal step=1:
+L33 projection_delta=+126.9386
+L31 projection_delta=+93.4874
+L29 projection_delta=+63.7177
+
+drift no_answer_anchor step=1:
+L33 projection_delta=+88.0596
+L31 projection_delta=+71.8746
+L29 projection_delta=+44.5747
+```
+
+读出层中：
+
+```text
+drift no_answer_anchor step=1:
+top_token_changed=4/4
+rank_delta=-646.5
+top_tokens=The / Then
+
+success no_answer_anchor step=1:
+top_token_changed=4/4
+rank_delta=-622.5
+top_tokens=Then
+
+drift repeat_instruction step=3:
+top_token_changed=4/4
+rank_delta=+620.5
+top_tokens=Answer
+```
+
+结论：
+
+```text
+qwen3 中，删除 Answer anchor 或修改 instruction 会强烈改变 hidden state 和 readout，
+但它经常把输出推入 Then/The/Answer 等读出机制，
+不是稳定目标修复。
+```
+
+#### 4.3 GLM4 repeat：组件捕获只稳定得到 product，但 Answer anchor 仍是最强触发源
+
+GLM4 本轮只稳定捕获到：
+
+```text
+component = product
+```
+
+这可能是模型 MLP 模块命名或结构封装不同，gate/up 没有被当前 hook 命中。
+
+但 product 结果非常清楚：
+
+```text
+success no_answer_anchor step=1 product K=4:
+axis=-0.6802
+delta_axis=-1.6802
+success_closer=0
+
+drift no_answer_anchor step=1 product K=4:
+axis=-0.6818
+delta_axis=-1.3373
+success_closer=0
+
+success no_answer_anchor step=1 product K=16:
+axis=-0.3351
+delta_axis=-1.3351
+success_closer=0
+
+success no_answer_anchor step=1 product K=64:
+axis=0.0062
+delta_axis=-0.9938
+success_closer=0
+```
+
+读出层同步显示：
+
+```text
+GLM4 drift no_answer_anchor step=1:
+top_token_changed=4/4
+rank_delta=-6151.25
+top_token=For
+
+GLM4 success no_answer_anchor step=1:
+top_token_changed=4/4
+rank_delta=-5467.0
+top_token=For
+```
+
+这进一步支持 Phase226：
+
+```text
+GLM4 repeat 的 Answer anchor 是强自然触发源。
+移除它会让 L30 product state 从 repeat-related success state 塌回非目标读出机制。
+```
+
+但这仍不是 repeat 修复，而是 readout regime switch（读出机制切换）。
+
+#### 4.4 DS7B：gate/product 都对 Answer anchor 敏感，但证据仍弱
+
+DS7B L24 暴露出完整组件：
+
+```text
+components = gate, up, product, recomputed_product
+```
+
+drift no_answer_anchor step=1：
+
+```text
+gate K=64:
+axis=0.9797
+delta_axis=+0.9797
+success_closer=2
+
+gate K=16:
+axis=0.9540
+delta_axis=+0.9540
+success_closer=2
+
+product K=64:
+axis=0.7240
+delta_axis=+0.7240
+success_closer=2
+
+product K=16:
+axis=0.6035
+delta_axis=+0.6035
+success_closer=2
+```
+
+这说明 DS7B 也对 Answer anchor 高度敏感。
+
+但 DS7B 的读出 rank 变化极大：
+
+```text
+drop_tok_6_Answer step=1 rank_delta=-51866
+no_answer_anchor step=1 rank_delta 可达 ±27000 级别
+```
+
+结合此前 DS7B drift 样本量偏小和行为闭合弱，本阶段仍只能把 DS7B 作为：
+
+```text
+弱参考 / 敏感性证据
+```
+
+不能作为稳定机制闭合证据。
+
+### 5. 本阶段新增核心拼图
+
+新增拼图 1：
+
+```text
+up projection sensitivity（上投影敏感性）很高，
+但 product 才是实际进入 residual write 的关键前态。
+```
+
+新增拼图 2：
+
+```text
+gate 调制会压缩或重塑 up 的大幅变化。
+所以只看单个投影输出会夸大 prompt token 的真实写入效果。
+```
+
+新增拼图 3：
+
+```text
+Answer anchor 在 GLM4 repeat 中是强 product-state trigger。
+```
+
+新增拼图 4：
+
+```text
+qwen3 explain 的自然触发不是单 token 控制，
+而是 answer anchor + instruction + generated prefix + step condition 的组合。
+```
+
+新增拼图 5：
+
+```text
+hidden state 朝 success direction 移动后，
+仍可能进入 Then/The/For/Answer 等非目标 readout regime。
+```
+
+所以当前全局图谱更新为：
+
+```text
+PromptToken / PromptSpan
+→ InstructionFrame
+→ AnswerAnchor
+→ StepCondition
+→ gate projection
+→ up projection
+→ gated product
+→ down projection
+→ residual write
+→ hidden trajectory
+→ readout regime selection
+→ top-token threshold
+→ output pattern
+```
+
+### 6. 问题和硬伤
+
+#### 6.1 qwen3 up K=4 的极端值不能过度解释
+
+qwen3 up component 在 K=4 上出现很大的 axis 和 delta_axis。
+
+原因可能是：
+
+```text
+1. K=4 太小，少数通道分母很小会放大 axis。
+2. up projection 不是最终写入态。
+3. gate 可能把 up 的大幅变化压制掉。
+```
+
+所以更可靠的是：
+
+```text
+product / recomputed_product
+```
+
+而不是单独的 up 极值。
+
+#### 6.2 GLM4 gate/up 没有被当前 hook 完整捕获
+
+GLM4 本轮只稳定得到 product。
+
+这不是机制结论，而是工具限制：
+
+```text
+当前 hook 可能没有覆盖 GLM4 的真实 gate/up 命名或封装路径。
+```
+
+后续如果要精细拆 GLM4，必须先做 module tree audit（模块树审计）。
+
+#### 6.3 token 删除不是严格因果归因
+
+删除一个 token 会同时改变：
+
+```text
+tokenization（分词）
+position（位置）
+attention context（注意力上下文）
+prompt formatting（提示格式）
+readout boundary（读出边界）
+```
+
+所以当前只能叫：
+
+```text
+token-level sensitivity（词元级敏感性）
+```
+
+还不能叫严格因果来源。
+
+#### 6.4 小模型偏差仍然明显
+
+当前三模型都是小模型，内部结构可能更粗糙。
+
+尤其 DS7B 的巨大 rank 跳变说明：
+
+```text
+小模型可能把多个机制压在同一个粗糙方向上。
+```
+
+因此外推到真实语言编码机制时，需要保留 30% 到 50% 偏差空间。
+
+### 7. 阶段性结论
+
+Phase227 的结论：
+
+```text
+自然触发到 MLP product 的链条已经看到，但还没有闭合。
+```
+
+更准确地说：
+
+```text
+1. GLM4 repeat:
+   Answer anchor → L30 product state 的证据较强。
+
+2. qwen3 explain:
+   prompt token 会强烈改变 gate/up/product 和 hidden trajectory，
+   但 readout regime selection 仍是主要未解节点。
+
+3. DS7B:
+   Answer anchor 敏感性存在，但稳定性不足。
+```
+
+本阶段最重要的负结果：
+
+```text
+不是所有 channel/product success-like shift 都能形成正确输出。
+```
+
+这说明最终图谱里必须保留：
+
+```text
+ReadoutRegimeSelection
+```
+
+不能把它简化成：
+
+```text
+residual direction → top token
+```
+
+### 8. 当前进度估计
+
+```text
+小模型模式机制图谱：约 74%
+StatePath：约 60%
+StateWriteCause：约 44%
+StateWriteSource：约 38%
+NaturalTrigger → ChannelActivation：约 18%
+TokenTrigger → Gate/Up/Product：约 10%
+MLP/ResidualWrite：约 51%
+activation-gated channel mechanism：约 23%
+ResidualPropagation：约 20%
+ReadoutPath：约 33%
+ReadoutRegimeSelection：约 10%
+路径因果机制：约 38%
+模型内部自然闭合：约 41%
+任务层产品闭合：约 55%
+通用语言机制外推置信：约 40% 到 45%
+```
+
+### 9. 阶段边界判断和下一步
+
+Phase226 + Phase227 已完成当前阶段的第一轮目标：
+
+```text
+自然 prompt trigger 到 MLP channel/product state 的初步图谱。
+```
+
+下一个任务仍然相关，但已经进入新的验证阶段，不应继续无限自动堆测试。
+
+下一阶段建议：
+
+```text
+Phase228: module-tree calibrated gate/up causal validation
+（模块树校准后的 gate/up 因果验证）
+```
+
+核心任务：
+
+```text
+1. 先审计 qwen3、GLM4、DS7B 的 MLP module tree，确认 gate/up/down 的真实路径。
+
+2. 对 qwen3 和 DS7B 做 gate-only、up-only、product-only 的小幅 patch，
+   验证 product 是否真是 residual write 的有效前态。
+
+3. 对 GLM4 先补齐 gate/up 捕获，再重复同样验证。
+
+4. 不以输出修复为第一目标，而以：
+   token trigger → gate/up/product → residual write → readout regime
+   的机制图谱为第一目标。
+```
