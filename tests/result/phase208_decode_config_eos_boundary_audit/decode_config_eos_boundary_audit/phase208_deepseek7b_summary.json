@@ -1,0 +1,1107 @@
+{
+  "phase": 208,
+  "source_phase": 207,
+  "title": "Decode Config Audit and EOS Induction Boundary Search",
+  "model": "deepseek7b",
+  "prompt_protocols": [
+    "short_answer",
+    "stop_explicit",
+    "eos_instruction",
+    "final_answer",
+    "chat_eos"
+  ],
+  "sampling_temperatures": [
+    0.7,
+    1.0
+  ],
+  "sampling_seeds": [
+    11,
+    23,
+    37
+  ],
+  "status": "complete",
+  "timestamp": "2026-07-06 17:12:38",
+  "sample_count": 360,
+  "selected_relation_language_pairs": [
+    "function:en->en"
+  ],
+  "selected_phase940_bridge_rows": [
+    {
+      "relation": "function",
+      "language_pair": "en->en",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 38,
+      "relation_margin_delta_mean": 0.18092105263157895,
+      "boundary_margin_delta_mean": 0.07236842105263158,
+      "period_margin_delta_mean": 0.11266447368421052,
+      "eos_margin_delta_mean": 0.12746710526315788,
+      "boundary_logit_delta_mean": -0.05756578947368421,
+      "control_best_boundary_margin_delta": -0.011513157894736841,
+      "boundary_bridge_gain_vs_best_control": 0.08388157894736842,
+      "joint_bridge_score": 0.07236842105263158,
+      "rank_improved": 21,
+      "new_relation_winner_target": 1
+    }
+  ],
+  "hidden_by_relation": {
+    "category": 14,
+    "color": 7,
+    "function": 14
+  },
+  "direction_specs_all": 228,
+  "candidate_pair_count": 1,
+  "config_audit": {
+    "tokenizer_eos_token_id": 151643,
+    "tokenizer_eos_token": "<｜end▁of▁sentence｜>",
+    "tokenizer_pad_token_id": 151643,
+    "tokenizer_pad_token": "<｜end▁of▁sentence｜>",
+    "tokenizer_bos_token_id": 151646,
+    "tokenizer_bos_token": "<｜begin▁of▁sentence｜>",
+    "generation_config_eos_token_id": 151643,
+    "generation_config_pad_token_id": null,
+    "generation_config_forced_eos_token_id": null,
+    "generation_config_max_new_tokens": null,
+    "model_config_eos_token_id": 151643,
+    "model_config_pad_token_id": null,
+    "manual_max_steps": 32,
+    "stopping_criteria": "default generate EOS stopping for generate modes; manual greedy stops when emitted token id is in eos group"
+  },
+  "prompt_count": 36,
+  "decode_rows": 324,
+  "manual_token_rows": 1133,
+  "eos_positive_count": 1,
+  "decode_summary_rows": [
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "answer_boundary",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " A": 1
+      },
+      "top_generated_prefixes": {
+        " A\n\n<think>\nOkay, so I've got this question here": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 6
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to answer the question: \"A commo": 3,
+        "Okay, so I need to figure out a common use for a": 3
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "empty_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1
+      },
+      "top_generated_prefixes": {
+        " sucht)\n<think>\n\n</think>\n\nIt seems like your me": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "end_now",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 12.0,
+      "top_first_tokens": {
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 23.833333333333332,
+      "top_first_tokens": {
+        "**\n\n": 5,
+        "**\n": 1
+      },
+      "top_generated_prefixes": {
+        "**\n\nAlright, so I need to figure out a common us": 2,
+        "**\n\n**Question:** A common use for a glass is to": 2,
+        "**\n</think>\n\nride\n\n**Answer:** ride": 1,
+        "**\n\n**Question:** A common use for a dog is to\n\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 26.333333333333332,
+      "top_first_tokens": {
+        " What": 3,
+        " ?\n\n": 2,
+        " The": 1
+      },
+      "top_generated_prefixes": {
+        " ?\n\nThe cup is a function because it has a singl": 2,
+        " What is the primary function of a glass object?": 2,
+        " What is the function of a horse?\n</think>\n\nWhat": 1,
+        " The function of a dog is to please its owner.\n<": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_marker",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{\\dfrac{1}{2}}\n\n**Step-by-Step Explanatio": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 2,
+        " hold": 2,
+        " carry": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{something}.\n\nA common use for a cup is t": 2,
+        " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+        " carry something on its back. So, the word \"back": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "single_word_done",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out the answer to thi": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "space_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "2": 1
+      },
+      "top_generated_prefixes": {
+        "2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 31.833333333333332,
+      "top_first_tokens": {
+        " hold": 4,
+        " pull": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold water. What is another common use for a gl": 2,
+        " hold water. What is the common use for a spoon?": 1,
+        " hold water. What is a common use for a spoon?\n\n": 1,
+        " pull a cart. What is the subject of this senten": 1,
+        " fetch objects. So, what is the verb form?\n\nThe ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "answer_boundary",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " \n\\boxed{12}\n\n<think>\nTo determine the number of": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 6
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to figure out a common use for a": 6
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "empty_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1
+      },
+      "top_generated_prefixes": {
+        " sucht,\n<think>\n\n</think>\n\nIt seems like your me": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "end_now",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 12.0,
+      "top_first_tokens": {
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "**\n\n": 6
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 2,
+        "**\n\n---\n\n**Question:** A common use for a glass ": 2,
+        "**\n\n**Question:** A common use for a horse is to": 1,
+        "**\n\n**Question:** A common use for a dog is to\n\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ?\n\n": 4,
+        " ": 2
+      },
+      "top_generated_prefixes": {
+        " ?\n\nThe cup is a function because it has a singl": 2,
+        " ?\n\nThe glass is used for drinking water. So, th": 1,
+        " ?\n\nThe question is asking for the function of a": 1,
+        " 6000\nBut wait, the question is about the horse'": 1,
+        " 6\n\nQuestion object: dog\nRelation: function\nAnsw": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_marker",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{12}\n\nWait, hold on. I think I made a mis": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " ride": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. So, the verb should be in the p": 2,
+        " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+        " ride. So, the answer is \\boxed{ride}.\n\n**Step-b": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "single_word_done",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out what the answer i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "space_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        "                                ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " carry": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. The verb should be in the prese": 2,
+        " hold water. What is the common use for a glass?": 2,
+        " carry a load. What is the subject of this sente": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "answer_boundary",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1,
+        " ": 1,
+        " A": 1
+      },
+      "top_generated_prefixes": {
+        "\n11\n<think>\nTo find the value of 11, I recognize": 1,
+        " \n\\boxed{1}\n\nWait, that can't be right. I think ": 1,
+        " A\n\n<think>\nOkay, so I've got this problem here ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "answer_boundary",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " D": 1,
+        " ": 1,
+        " A": 1
+      },
+      "top_generated_prefixes": {
+        " D\n\n<think>\nAlright, so I've got this math probl": 1,
+        " \n\\<think>\nAlright, so I need to figure out how ": 1,
+        " A\n\n<think>\nOkay, so I need to solve this proble": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 15,
+        "Alright": 3
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to figure out a common use for a": 7,
+        "Okay, so I need to answer the question: \"A commo": 2,
+        "Alright, I need to figure out a common use for a": 1,
+        "Okay, so I need to figure out the answer to the ": 1,
+        "Okay, so I have this question here: \"A common us": 1,
+        "Okay, so I need to figure out what the user is a": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 13,
+        "Alright": 5
+      },
+      "top_generated_prefixes": {
+        "Okay, so I have this question here: \"A common us": 2,
+        "Okay, I'm trying to figure out a common use for ": 1,
+        "Okay, so I need to figure out a common use for a": 1,
+        "Alright, I need to figure out a common use for a": 1,
+        "Okay, so I need to answer with a single English ": 1,
+        "Okay, so I need to figure out the answer to \"A c": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "empty_completion",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 3
+      },
+      "top_generated_prefixes": {
+        " sucht:\n\\\n2\n\\ \n1\n\\( \n2 \n\\)\n\\( \n1\n\\)\n\\( \n2 \n\\)\n\\(": 1,
+        " sucht,.\n  D\n  E\n  F\n  G\n  H\n  I\n  J\n  K\n  L\n  M": 1,
+        " sucht, -, \n<think>\n\n</think>\n\nIt seems like you": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "empty_completion",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1,
+        " FIFO": 1,
+        " implode": 1
+      },
+      "top_generated_prefixes": {
+        " sucht:\n\n\n A\n B\n C\n D\n E\n F\n G\n H\n I\n J\n K\n L\n M": 1,
+        " FIFO,.\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl": 1,
+        " implode, a, the,<think>\n\n</think>\n\nSure! Please": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "end_now",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 25.333333333333332,
+      "top_first_tokens": {
+        " \n\n": 2,
+        " Wait": 1
+      },
+      "top_generated_prefixes": {
+        " Wait, no, actually, please make sure to respond": 1,
+        " \n\n</think>\n\nThe situation in Israel-Palestine i": 1,
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "end_now",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 25.333333333333332,
+      "top_first_tokens": {
+        " Wait": 1,
+        "**\n\n": 1,
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " Wait, no—actually, please make sure to put the ": 1,
+        "**\n\n**Solution:**\n\nWe need to find all the integ": 1,
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 28.5,
+      "top_first_tokens": {
+        "**\n\n": 11,
+        " \n\n": 3,
+        " To": 1,
+        " Do": 1,
+        " Use": 1,
+        "**\n": 1
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 1,
+        " To indicate the end, I'll put three dots.\n\nA. H": 1,
+        "**\n\n**Question:** A common use for a cup is to\n\n": 1,
+        "**\n\n**Question:** A common use for a glass is to": 1,
+        " \n\nThe options are: ride, carry, feed, or work.\n": 1,
+        " Do not add any additional text.\n\nThe question i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 28.833333333333332,
+      "top_first_tokens": {
+        "**\n\n": 7,
+        " Use": 2,
+        " \n\n": 2,
+        " To": 1,
+        " Please": 1,
+        " Do": 1,
+        "  \n": 1,
+        " The": 1
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 1,
+        " To help, I'll think through the primary functio": 1,
+        "**\n\n**<space>**\n</think>\n\nhold water.": 1,
+        " Use the following formats:\nIf the question is \"": 1,
+        " Please provide it using the exact same format a": 1,
+        " Do not include any additional text.\n\nWhat is th": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 30.0,
+      "top_first_tokens": {
+        " ?\n\n": 5,
+        " ": 4,
+        " The": 3,
+        " ?\n": 3,
+        " \\": 1,
+        " What": 1,
+        " what": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{c}\n\nQuestion object: cup\nRelation: relat": 1,
+        " The glass is used to create a rainbow.\n</think>": 1,
+        " 2x + 5 = 9\n\nQuestion object: cup\nRelation: func": 1,
+        " ?\n\nWhat is the function of a glass object?\n\nI n": 1,
+        " The horse is a function.\nHmm, this doesn't make": 1,
+        " ?\nThe question is asking for the function of a ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 30.22222222222222,
+      "top_first_tokens": {
+        " ?\n\n": 5,
+        " The": 3,
+        " ": 3,
+        " ?\n": 3,
+        " \\": 1,
+        " What": 1,
+        " ...\n": 1,
+        " \n": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{c}\n\nQuestion object: cup\nRelation: relat": 1,
+        " The glass serves to contain liquid. \n\nAnother a": 1,
+        " 292\n\nQuestion object: cup\nRelation: material\nAn": 1,
+        " ?\n\nIs it the case that the function of glass is": 1,
+        " The horse is a __ function. ( )\nA) a\nB) an\nC) t": 1,
+        " ?\nThe question is: \"What is the function of a d": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_marker",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 3
+      },
+      "top_generated_prefixes": {
+        " \\boxed{2}\n\nWait, hold on. Earlier, I thought th": 1,
+        " \\boxed{1}\n\nWait, I think I made a mistake there": 1,
+        " \\boxed{2}\n</think>\n\nTo solve the problem, we ne": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_marker",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 3
+      },
+      "top_generated_prefixes": {
+        " \\boxed{2187}\n\nWait, no, I think I might have me": 1,
+        " \\boxed{45}\n</think>\n\nTo solve the problem, we n": 1,
+        " \\boxed{2}\n</think>\n\nTo solve the problem, we ne": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.61111111111111,
+      "top_first_tokens": {
+        " hold": 6,
+        " contain": 2,
+        " ride": 2,
+        " fetch": 2,
+        " \\": 2,
+        " serve": 1,
+        " store": 1,
+        " carry": 1
+      },
+      "top_generated_prefixes": {
+        " contain something. Which one is correct: \"conta": 1,
+        " hold water. What is the subject? (Please do not": 1,
+        " hold something. So, what is the correct verb to": 1,
+        " hold something. What is the most appropriate di": 1,
+        " ride. So, a horse can be ridden. Therefore, a h": 1,
+        " fetch objects. So, a \\boxed{fetch} the object.\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.22222222222222,
+      "top_first_tokens": {
+        " hold": 4,
+        " contain": 2,
+        " serve": 2,
+        " ride": 2,
+        " \\": 2,
+        " measure": 1,
+        " get": 1,
+        " store": 1
+      },
+      "top_generated_prefixes": {
+        " contain 95% of all liquids.\"\n\nIs this a correct": 1,
+        " serve water to people.\n\nIs it TRUE or FALSE?\n\nW": 1,
+        " measure out amounts of a liquid, such as water ": 1,
+        " hold something. What is the common use for a gl": 1,
+        " ride it. Therefore, a common use for a horse is": 1,
+        " get lost in the snow.\n\nThe sentence above can b": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "single_word_done",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 2,
+        ".\n\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out the answer here. ": 1,
+        "\nAlright, so I need to figure out what the next ": 1,
+        ".\n\nSo, I think the answer is red. Maybe the ques": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "single_word_done",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 2,
+        ".\n\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I have to come up with a single word a": 1,
+        "\nAlright, let's try to figure this out. So, the ": 1,
+        ".\n\nSo, I think we should...\n\nWait, no, I don't w": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "space_completion",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "4": 2,
+        "2": 1
+      },
+      "top_generated_prefixes": {
+        "4 4 4\n3 3 3 3 3 3 3\n2 2 2 2 2 2 ": 1,
+        "4 2 3 1 4 5 1 2 3 4 5 5 5 5 5 5 ": 1,
+        "2 2 1\n1 2 3 2 3 1 1 2 2 1 1 2 2 ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "space_completion",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "4": 2,
+        "5": 1
+      },
+      "top_generated_prefixes": {
+        "4 4 4;   \n    4 4 4 4];\n  $number = (string)$num": 1,
+        "4 2 3 1 4 5`, which represents a graph of `n=12`": 1,
+        "5 4 3 2 10\n\nWait, sorry, perhaps I'm overcomplic": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.555555555555557,
+      "top_first_tokens": {
+        " hold": 9,
+        " serve": 2,
+        " carry": 2,
+        " contain": 1,
+        " ride": 1,
+        " fetch": 1,
+        " pull": 1,
+        " {": 1
+      },
+      "top_generated_prefixes": {
+        " hold something, so the verb should be \"hold.\"\n\n": 1,
+        " hold water. The statement \"A glass of water is ": 1,
+        " serve coffee. A common use for a cup is to serv": 1,
+        " contain food. What is the common noun that is t": 1,
+        " ride, but some people prefer to use a car for t": 1,
+        " carry food. Which of the following is the corre": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.38888888888889,
+      "top_first_tokens": {
+        " hold": 4,
+        " contain": 2,
+        " carry": 2,
+        " serve": 1,
+        " ride": 1,
+        " __": 1,
+        " make": 1,
+        " pour": 1
+      },
+      "top_generated_prefixes": {
+        " hold something, so I put a cup on the table. Ho": 1,
+        " hold drinks. The statement \"A glass of water is": 1,
+        " serve coffee. A common use for a glass is to dr": 1,
+        " contain food. What is the answer?\n\nThe answer i": 1,
+        " ride. A common use for a zebra is to observe. A": 1,
+        " carry food.\n\nSo, which option is correct?\n\nIs i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "answer_boundary",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " \n\\boxed{22}\n\n<think>\nTo determine the number of": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 6
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to figure out a common use for a": 6
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "empty_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1
+      },
+      "top_generated_prefixes": {
+        " sucht,\n\n\n\n\n<think>\n\n</think>\n\nHello! It seems l": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "end_now",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 1,
+      "avg_steps": 13.0,
+      "top_first_tokens": {
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " \n\n</think>\n\nHello! How can I assist you today?<": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "**\n\n": 6
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 2,
+        "**\n\n---\n\n**Question:** A common use for a glass ": 2,
+        "**\n\n**Question:** A common use for a horse is to": 1,
+        "**\n\n**Question:** A common use for a dog is to\n\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ?\n\n": 4,
+        " ": 2
+      },
+      "top_generated_prefixes": {
+        " ?\n\nThe cup is a function because it has a singl": 2,
+        " ?\n\nThe glass is used for drinking water. So, th": 2,
+        " 1000\n\nQuestion object: horse\nRelation: function": 1,
+        " 100\n\nQuestion object: dog\nRelation: function\nAn": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_marker",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{12}\n\nWait, hold on. I think I made a mis": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " ride": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. So, the verb should be in the p": 2,
+        " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+        " ride. So, the answer is \\boxed{ride}.\n\n**Step-b": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "single_word_done",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out what the answer i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "space_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        "     , , , , , , , , , , , , , , , , , , , , , ,": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " carry": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. The verb should be in the prese": 2,
+        " hold water. What is the common use for a glass?": 2,
+        " carry a load. What is the subject of this sente": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    }
+  ],
+  "manual_generate_compare_summary": {
+    "rows": 36,
+    "first_token_matches": 36,
+    "manual_eos": 1,
+    "generate_eos": 0
+  },
+  "boundary": "Decode audit only. Sampling EOS, if any, is stochastic and must not be merged with greedy ModelStopExecuted."
+}

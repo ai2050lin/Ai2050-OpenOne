@@ -38225,3 +38225,2670 @@ Phase206: 成功/失败对照的完成状态保持图谱
 ```
 
 通俗总结：模型不是不会打句号，而是打完句号以后没有稳定进入“我已经答完了”的状态。句号像写在纸上的标点，EOS 才像真正按下停止键。现在看到的问题是：三个小模型经常写了句号，却没有按停止键；一旦多走一步，状态会重新滑向续写。下一步要找的就是“答完了”这个状态在网络里到底在哪里、怎么保持、为什么会丢失。
+
+## Phase 206: 成功/失败对照的完成状态保持图谱 [2026-07-06 14:09]
+
+### 一、对附件判断的审查
+
+附件对 Phase205 的判断基本正确。Phase205 的真正价值不是 L6 闭合，而是把停止失败拆成了状态跃迁问题：
+
+```text
+before_period -> after_period -> after_continue1
+```
+
+本阶段保留附件中最关键的修正：
+
+```text
+句号不是停止。
+EOS 也不会自动胜出。
+停止执行必须区分内部 ModelStopExecuted 和外部 TaskStopSatisfied。
+```
+
+因此 Phase206 继续同一阶段性目标：优先完成全局轨迹图谱拼图，而不是直接做大规模 patch。
+
+### 二、测试脚本和结果路径
+
+新增脚本：
+
+```text
+tests/gpt5/phase206_done_state_contrast_atlas.py
+tests/gpt5/run_phase206_done_state_contrast_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase206_done_state_contrast_atlas/done_state_contrast_atlas/
+```
+
+主要输出：
+
+```text
+phase206_qwen3_summary.json
+phase206_glm4_summary.json
+phase206_deepseek7b_summary.json
+phase206_cross_model_summary.json
+phase206_cross_model_summary.md
+phase206_*_trajectory_rows.jsonl
+phase206_*_token_rows.jsonl
+phase206_*_state_rows.jsonl
+phase206_*_forced_delta_rows.jsonl
+```
+
+三模型按 qwen3、GLM4、DS7B 顺序测试，每个模型测试后释放显存。
+
+### 三、算法原理
+
+Phase206 构造两类停止定义：
+
+$$
+\mathrm{ModelStopExecuted}(x)
+=
+\exists t[\mathrm{EOS}_t=1]
+$$
+
+$$
+\mathrm{TaskStopSatisfied}(x)
+=
+\mathrm{ModelStopExecuted}(x)
+\lor
+\mathrm{ExternalStopExecuted}(x)
+\lor
+[
+\mathrm{PeriodSeen}(x)
+\land
+\neg \mathrm{ContinuedAfterPeriod}(x)
+]
+$$
+
+其中：
+
+```text
+ModelStopExecuted = 模型自然生成 EOS；
+TaskStopSatisfied = 任务层面停止满足，可以由客户端 stop rule 截断。
+```
+
+测试对照：
+
+```text
+external_stop_rule = none：不设置客户端停止序列，只看模型内部是否 EOS；
+external_stop_rule = period：客户端把句号作为停止规则，模拟外部 stop sequence。
+```
+
+并重放状态：
+
+```text
+before_answer
+after_answer
+forced_period
+forced_eos
+after_period
+after_continue1
+after_continue2
+```
+
+注意：forced_eos 是把 EOS 符号放入上下文后的状态代理，不等于模型自然生成 EOS 的成功样本。这一点后面作为硬伤保留。
+
+### 四、客观结果
+
+#### 1. 总体结果
+
+```text
+qwen3:
+none rows = 504, model_stop_executed = 0, task_stop_satisfied = 12
+period rows = 504, model_stop_executed = 0, task_stop_satisfied = 374
+
+GLM4:
+none rows = 402, model_stop_executed = 0, task_stop_satisfied = 11
+period rows = 402, model_stop_executed = 0, task_stop_satisfied = 233
+
+DS7B:
+none rows = 72, model_stop_executed = 0, task_stop_satisfied = 1
+period rows = 72, model_stop_executed = 0, task_stop_satisfied = 61
+```
+
+最强结果：
+
+```text
+三个模型的 ModelStopExecuted 全部为 0。
+客户端 period stop rule 大幅提高 TaskStopSatisfied。
+```
+
+这说明：当前主要瓶颈不是“客户端无法让任务停止”，而是“模型内部没有自然 EOS 闭合”。
+
+#### 2. qwen3
+
+无客户端停止：
+
+```text
+natural plain: rows 84, task_stop_satisfied 7, period_seen 36, continued_after_period 29
+natural short_answer: rows 84, task_stop_satisfied 0, period_seen 56, continued_after_period 56
+natural stop_explicit: rows 84, task_stop_satisfied 2, period_seen 68, continued_after_period 66
+post_answer plain: rows 84, task_stop_satisfied 1, period_seen 51, continued_after_period 50
+post_answer short_answer: rows 84, task_stop_satisfied 0, period_seen 78, continued_after_period 78
+post_answer stop_explicit: rows 84, task_stop_satisfied 2, period_seen 84, continued_after_period 82
+```
+
+客户端句号停止：
+
+```text
+natural plain: task_stop_satisfied 37 / 84
+natural short_answer: task_stop_satisfied 56 / 84
+natural stop_explicit: task_stop_satisfied 68 / 84
+post_answer plain: task_stop_satisfied 51 / 84
+post_answer short_answer: task_stop_satisfied 78 / 84
+post_answer stop_explicit: task_stop_satisfied 84 / 84
+```
+
+状态均值：
+
+```text
+after_answer: eos_rank_mean = 75597.58, prose_rank_mean = 8.48, stop_margin_mean = 6.64
+forced_period: eos_rank_mean = 53235.81, prose_rank_mean = 1.21, stop_margin_mean = -10.53
+after_period none fail: eos_rank_mean = 49110.39, prose_rank_mean = 3.53, stop_margin_mean = -11.35
+after_continue1 none fail: eos_rank_mean = 115744.13, prose_rank_mean = 102.53, stop_margin_mean = -0.44
+```
+
+qwen3 的关键现象：
+
+```text
+客户端句号停止几乎可以修复任务输出；
+但内部 EOS 从未自然执行；
+forced_period 和 after_period 都显示 prose 竞争很强，说明句号后不是稳定完成状态。
+```
+
+#### 3. GLM4
+
+无客户端停止：
+
+```text
+natural plain: task_stop_satisfied 0 / 67
+natural short_answer: task_stop_satisfied 1 / 67
+natural stop_explicit: task_stop_satisfied 10 / 67
+post_answer plain: task_stop_satisfied 0 / 67
+post_answer short_answer: task_stop_satisfied 0 / 67
+post_answer stop_explicit: task_stop_satisfied 0 / 67
+```
+
+客户端句号停止：
+
+```text
+natural plain: task_stop_satisfied 14 / 67
+natural short_answer: task_stop_satisfied 62 / 67
+natural stop_explicit: task_stop_satisfied 21 / 67
+post_answer plain: task_stop_satisfied 9 / 67
+post_answer short_answer: task_stop_satisfied 60 / 67
+post_answer stop_explicit: task_stop_satisfied 67 / 67
+```
+
+状态均值：
+
+```text
+after_answer: eos_rank_mean = 4322.29, prose_rank_mean = 7.73, stop_margin_mean = -0.65
+forced_period: eos_rank_mean = 933.40, prose_rank_mean = 1.25, stop_margin_mean = -6.46
+after_period none fail: eos_rank_mean = 4579.63, prose_rank_mean = 17.62, stop_margin_mean = -0.93
+after_continue1 none fail: eos_rank_mean = 9600.62, prose_rank_mean = 49.53, stop_margin_mean = -1.71
+```
+
+GLM4 的关键现象：
+
+```text
+post_answer + stop_explicit 在无客户端停止时 67 / 67 都继续；
+客户端 period stop 后 67 / 67 任务停止满足；
+说明 GLM4 的短答任务更像客户端协议问题，而不是内部 EOS 成功。
+```
+
+#### 4. DS7B
+
+无客户端停止：
+
+```text
+natural plain: task_stop_satisfied 0 / 12
+natural short_answer: task_stop_satisfied 0 / 12
+natural stop_explicit: task_stop_satisfied 0 / 12
+post_answer plain: task_stop_satisfied 1 / 12
+post_answer short_answer: task_stop_satisfied 0 / 12
+post_answer stop_explicit: task_stop_satisfied 0 / 12
+```
+
+客户端句号停止：
+
+```text
+natural plain: task_stop_satisfied 6 / 12
+natural short_answer: task_stop_satisfied 12 / 12
+natural stop_explicit: task_stop_satisfied 12 / 12
+post_answer plain: task_stop_satisfied 9 / 12
+post_answer short_answer: task_stop_satisfied 12 / 12
+post_answer stop_explicit: task_stop_satisfied 10 / 12
+```
+
+状态均值：
+
+```text
+after_answer: eos_rank_mean = 2097.67, prose_rank_mean = 6.69, stop_margin_mean = -1.41
+forced_period: eos_rank_mean = 657.61, prose_rank_mean = 4.17, stop_margin_mean = -5.45
+after_period none fail: eos_rank_mean = 824.25, prose_rank_mean = 2.42, stop_margin_mean = -7.33
+after_continue1 none fail: eos_rank_mean = 8614.40, prose_rank_mean = 51.38, stop_margin_mean = -4.66
+```
+
+DS7B 的样本数较少，但方向和前两者一致：无客户端停止时几乎没有任务闭合，period stop rule 显著提高任务停止满足。
+
+### 五、forced_period 与 forced_eos 的结果
+
+forced_period 的方向整体仍支持 Phase205：
+
+```text
+qwen3 after_answer -> forced_period:
+EOS rank delta = -4876.25 到 -32599.25，但 stop margin delta 为负，prose margin 上升。
+
+GLM4 after_answer -> forced_period:
+EOS rank delta = -1627.06 到 -5596.63，但 stop margin delta 为负，prose margin 上升。
+
+DS7B after_answer -> forced_period:
+EOS rank delta 约 -1172.33 到 -1634.50，部分协议下 stop margin 仍下降。
+```
+
+解释：强制句号通常能让 EOS 排名改善，但并不稳定提升停止边界；句号后仍可能激活续写轨道。
+
+forced_eos 的结果不一致：
+
+```text
+qwen3 forced_eos 使 EOS rank 大幅改善；
+GLM4 forced_eos 在 short_answer / stop_explicit 下反而使 EOS rank 变差；
+DS7B forced_eos 明显使 EOS rank 变差。
+```
+
+这个结果不能直接解释为“EOS 破坏完成状态”。更谨慎的解释是：
+
+```text
+把 EOS token 放入上下文后再预测下一 token，可能进入训练分布之外；
+不同 tokenizer 对 eos_token 字符串的处理可能不同；
+自然生成 EOS 成功样本仍然缺失。
+```
+
+因此 forced_eos 目前只能作为上下文代理审计，不是成功停止正样本。
+
+### 六、阶段性结论
+
+Phase206 的最重要进展是把 Phase205 的失败图谱扩展为成功/失败对照图谱，并得到一个非常清楚的拆分：
+
+```text
+客户端 TaskStopSatisfied 可以通过 period stop rule 大幅提高；
+模型内部 ModelStopExecuted 在本轮三个模型中仍为 0；
+句号后无续写可以由客户端规则实现，但这不等于模型内部完成状态闭合。
+```
+
+这说明当前的全局图谱至少需要三条分离边：
+
+```text
+1. period emission -> client task stop
+句号输出 -> 客户端任务停止
+
+2. period emission -> temporary EOS improvement
+句号输出 -> EOS 竞争短暂改善
+
+3. period emission -/-> model EOS execution
+句号输出不能推出模型内部 EOS 执行
+```
+
+当前最强负结果：
+
+```text
+在 qwen3、GLM4、DS7B 本轮样本中，自然生成 EOS 结束为 0。
+```
+
+当前最强正结果：
+
+```text
+外部 period stop rule 能显著提升任务级停止满足。
+```
+
+### 七、问题和硬伤
+
+第一，Phase206 仍然没有收集到自然 EOS 成功样本，因此 done state 的真正成功正样本仍不足。
+
+第二，period stop rule 是客户端截断，不是模型内部机制。它可以让产品体验闭合，但不能证明内部智能动作闭合。
+
+第三，forced_eos 是上下文代理，不是自然 EOS 成功。特别是 DS7B 上 forced_eos 后 EOS rank 反而大幅恶化，提示该指标必须谨慎。
+
+第四，attention head 仍未拆分，本轮只记录了多层 residual norm，尚未定位完成状态读取头。
+
+第五，DS7B 可用样本只有 72 条轨迹，明显少于 qwen3 和 GLM4，跨模型统计权重应降低。
+
+第六，当前三个模型均为小模型，EOS 控制和短答协议可能有 30% 到 50% 偏差，不能直接外推到大模型或人脑语言机制。
+
+### 八、对研究方案和客户端方案的改进
+
+研究方案：
+
+```text
+1. 继续把 ModelStopExecuted 和 TaskStopSatisfied 分开记录；
+2. 不再把句号后无续写当作内部闭合；
+3. 优先寻找自然 EOS 正样本，或者构造更接近训练分布的 EOS 诱导提示；
+4. 对 after_period success/fail 做方向差分，但必须标注 success 很少；
+5. 下一步拆 attention head，检查是否存在完成状态读取头；
+6. 对 Phase205/206 的候选层做小规模因果验证，而不是大规模盲目 patch。
+```
+
+客户端方案：
+
+```text
+1. 对短答任务显式设置 stop sequence，例如 "."、"。" 或 "\n"；
+2. 将客户端停止称为 TaskStopSatisfied，不称为 ModelStopExecuted；
+3. 保留生成后校验：答案是否清楚、是否漂移、是否复读；
+4. 对 GLM4 和 qwen3 的 post_answer + stop_explicit 类任务，period stop rule 能显著改善用户可见输出；
+5. 不能依赖模型自然 EOS 停止，至少在当前小模型上不可靠。
+```
+
+### 九、统一公式更新
+
+当前闭合公式必须拆成模型闭合和任务闭合：
+
+$$
+\mathrm{ModelClose}(x,y)
+=
+\mathrm{AnswerCorrect}(x,y)
+\land
+\mathrm{BoundaryStable}(x,y)
+\land
+\mathrm{DoneStateStable}(x)
+\land
+\mathrm{ModelStopExecuted}(x)
+\land
+\mathrm{NoDrift}(x)
+$$
+
+$$
+\mathrm{TaskClose}(x,y)
+=
+\mathrm{AnswerCorrect}(x,y)
+\land
+\mathrm{BoundaryStable}(x,y)
+\land
+\mathrm{TaskStopSatisfied}(x)
+\land
+\mathrm{NoDrift}(x)
+$$
+
+其中：
+
+$$
+\mathrm{TaskStopSatisfied}(x)
+=
+\mathrm{ModelStopExecuted}(x)
+\lor
+\mathrm{ExternalStopExecuted}(x)
+\lor
+[
+\mathrm{PeriodSeen}(x)
+\land
+\neg \mathrm{ContinuedAfterPeriod}(x)
+]
+$$
+
+Phase206 证明：在当前三个小模型中，TaskClose 可以通过客户端规则接近，但 ModelClose 仍未出现。
+
+### 十、下一阶段任务
+
+当前任务和下一任务仍属于同一阶段性目标：完成全局图谱拼图。建议进入：
+
+```text
+Phase207: 自然 EOS 正样本搜索与注意力头完成状态图谱
+```
+
+核心任务：
+
+```text
+1. 扩大提示类型，专门搜索自然 EOS 结束样本；
+2. 比较 EOS 成功、period 客户端成功、period 后继续失败三类轨迹；
+3. 将 attention output 从层级 norm 拆成 head 级输出；
+4. 对 after_period success/fail 做残差方向差分；
+5. 对 qwen3 L33 C1986、GLM4 L37 C8035、DS7B L26 C264 等候选只做小规模验证；
+6. 输出 done_state_success_fail_atlas_v2 和 eos_positive_sample_bank。
+```
+
+通俗总结：这次结果说明，客户端可以“看见句号就停”，所以产品层面的短答可以被修好；但模型自己并没有真正按下 EOS 停止键。也就是说，外部可以把回答剪干净，内部却还没有稳定的“我答完了”机制。下一步要先找到自然 EOS 正样本，否则完成状态图谱仍然缺真正的正例。
+
+## Phase 207: 自然 EOS 正样本搜索与注意力头完成状态图谱 [2026-07-06 16:07]
+
+### 一、对附件判断的审查
+
+附件对 Phase206 的判断正确。Phase206 已经把三种停止彻底拆开：
+
+```text
+模型内部停止 != 任务层面停止 != 客户端截断
+```
+
+本阶段继续同一阶段性目标：完成全局轨迹图谱拼图。Phase207 的核心不是闭合，而是专门回答：
+
+```text
+扩大提示类型和生成步数后，能否找到自然 EOS 正样本？
+如果找不到，是否可以至少建立失败轨迹的 attention head 候选图谱？
+```
+
+### 二、测试脚本和结果路径
+
+新增脚本：
+
+```text
+tests/gpt5/phase207_eos_positive_head_atlas.py
+tests/gpt5/run_phase207_eos_positive_head_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase207_eos_positive_head_atlas/eos_positive_head_atlas/
+```
+
+主要输出：
+
+```text
+phase207_qwen3_summary.json
+phase207_glm4_summary.json
+phase207_deepseek7b_summary.json
+phase207_cross_model_summary.json
+phase207_cross_model_summary.md
+phase207_*_trajectory_rows.jsonl
+phase207_*_token_rows.jsonl
+phase207_*_state_rows.jsonl
+phase207_*_head_rows.jsonl
+phase207_*_eos_positive_sample_bank.jsonl
+```
+
+本轮按 qwen3、GLM4、DS7B 顺序测试，每个模型测试后释放显存。
+
+### 三、算法原理
+
+Phase207 扩大了自然 EOS 搜索空间：
+
+```text
+prompt_protocols =
+plain,
+short_answer,
+stop_explicit,
+eos_instruction,
+final_answer,
+chat_eos
+
+max_steps = 32
+decoding = greedy_manual_argmax
+do_sample = false
+external_stop_sequence = none
+```
+
+记录解码配置：
+
+```text
+eos_token_id
+eos_token
+pad_token_id
+pad_token
+generation_config_eos_token_id
+generation_config_pad_token_id
+max_steps
+do_sample
+temperature
+```
+
+轨迹被分为：
+
+```text
+model_eos_success：自然生成 EOS；
+period_client_success_proxy：出现句号且未继续；
+period_continue_fail：出现句号后继续；
+no_period_fail：没有句号也没有 EOS。
+```
+
+注意：本轮不设置客户端 stop sequence，所以 `period_client_success_proxy` 只表示如果客户端截断可以任务停止，不表示模型内部停止。
+
+注意力头图谱采用 `self_attn.o_proj` 的输入作为 head 级输出代理。对每个选中层，把 o_proj 输入按 attention head 拆分，记录每个 head 的范数。该指标是：
+
+```text
+attention head output proxy
+注意力头输出代理
+```
+
+不是因果证明。
+
+### 四、客观结果
+
+#### 1. 总体结果
+
+```text
+qwen3:
+prompt_count = 432
+trajectory_rows = 432
+eos_positive_count = 0
+
+GLM4:
+prompt_count = 342
+trajectory_rows = 342
+eos_positive_count = 0
+
+DS7B:
+prompt_count = 72
+trajectory_rows = 72
+eos_positive_count = 0
+```
+
+跨模型汇总：
+
+```text
+total_eos_positive_count = 0
+```
+
+这是一条强负结果：在扩大提示族、最大生成 32 步、无客户端 stop sequence 的条件下，三个小模型仍没有自然生成 EOS。
+
+#### 2. qwen3
+
+轨迹统计：
+
+```text
+chat_eos: period_continue_fail 72 / 72
+eos_instruction: no_period_fail 2, period_continue_fail 70
+final_answer: no_period_fail 26, period_continue_fail 46
+plain: no_period_fail 9, period_continue_fail 63
+short_answer: no_period_fail 4, period_continue_fail 68
+stop_explicit: no_period_fail 6, period_continue_fail 66
+```
+
+典型现象：
+
+```text
+chat_eos 触发 <think> 轨迹和长续写；
+eos_instruction 常出现 “Done.” 复读；
+short_answer 和 stop_explicit 仍会转入连续问答/解释轨道。
+```
+
+关键状态均值：
+
+```text
+chat_eos after_prompt:
+eos_rank_mean = 5.5
+prose_rank_mean = 66909.17
+stop_margin_mean = 11.44
+
+chat_eos after_period:
+eos_rank_mean = 84756.83
+prose_rank_mean = 7.83
+stop_margin_mean = -19.43
+
+chat_eos after_continue1:
+eos_rank_mean = 111466.67
+prose_rank_mean = 72.67
+stop_margin_mean = -1.31
+```
+
+解释：qwen3 在 chat prompt 起点上 EOS rank 可以很强，但模型仍没有生成 EOS；一旦进入句号后状态，EOS 竞争迅速丢失。这说明高 EOS rank 起点不等于 ModelStopExecuted。
+
+头部候选：
+
+```text
+L26 H22 norm_mean = 22.55
+L33 H21 norm_mean = 18.61
+L33 H6 norm_mean = 16.93
+L26 H20 norm_mean = 16.87
+L33 H7 norm_mean = 15.95
+```
+
+这些是失败轨迹中的高范数注意力头候选，不是 done-state 成功头。
+
+#### 3. GLM4
+
+轨迹统计：
+
+```text
+chat_eos: no_period_fail 29, period_continue_fail 28
+eos_instruction: no_period_fail 1, period_continue_fail 56
+final_answer: no_period_fail 56, period_continue_fail 1
+plain: no_period_fail 48, period_continue_fail 9
+short_answer: period_continue_fail 57 / 57
+stop_explicit: period_continue_fail 57 / 57
+```
+
+典型现象：
+
+```text
+eos_instruction 多次生成 “Do not add any additional information...” 但仍继续；
+final_answer 倾向 Answer: red: red 复读；
+chat_eos 会出现 <|user|> 复现和继续对话轨道。
+```
+
+头部候选：
+
+```text
+L29 H19 norm_mean = 39.80
+L37 H10 norm_mean = 33.21
+L29 H31 norm_mean = 32.30
+L37 H7 norm_mean = 26.41
+L37 H29 norm_mean = 26.38
+```
+
+解释：GLM4 的强活动集中在中后层若干 attention head，但由于没有 EOS 成功样本，只能作为失败/续写轨道候选。
+
+#### 4. DS7B
+
+轨迹统计：
+
+```text
+chat_eos: period_continue_fail 12 / 12
+eos_instruction: no_period_fail 8, period_continue_fail 4
+final_answer: no_period_fail 8, period_continue_fail 4
+plain: no_period_fail 2, period_continue_fail 10
+short_answer: period_continue_fail 12 / 12
+stop_explicit: period_continue_fail 12 / 12
+```
+
+典型现象：
+
+```text
+chat_eos 进入 “Okay, so I need to figure out...” 推理续写；
+short_answer 继续输出 “So, the answer is...” 和步骤解释；
+stop_explicit 仍可能进入问题复述或解释。
+```
+
+头部候选：
+
+```text
+L26 H2 norm_mean = 26.84
+L26 H0 norm_mean = 21.72
+L26 H20 norm_mean = 18.79
+L26 H18 norm_mean = 17.08
+L26 H8 norm_mean = 16.88
+```
+
+DS7B 样本量较小，候选头只能低权重参考。
+
+### 五、阶段性判断
+
+Phase207 得到的是负结果，但价值很高：
+
+```text
+扩大提示族 + 32 步生成 + 无外部 stop sequence
+仍然找不到自然 EOS 正样本。
+```
+
+这进一步强化 Phase206 的分层结论：
+
+```text
+客户端可以任务闭合；
+模型内部 EOS 闭合仍未出现；
+句号、显式停止提示、chat 模板都不能可靠诱导 ModelStopExecuted。
+```
+
+本阶段还得到一个新的细节：
+
+```text
+chat_eos 并不等于 EOS 诱导；
+在 qwen3 和 DS7B 上它常触发 reasoning/prose 轨道；
+在 GLM4 上它可能触发对话标记复现。
+```
+
+### 六、问题和硬伤
+
+第一，Phase207 没有找到自然 EOS 正样本，所以仍不能构建真正的 done-state 成功方向。
+
+第二，attention head 结果只是 o_proj 输入范数代理，不能说明某个 head 因果控制完成状态。
+
+第三，因为没有成功类，head 图谱主要是失败轨道候选图谱，不是成功/失败差分图谱。
+
+第四，本轮只用 greedy decoding。采样可能偶然产生 EOS，但那会引入随机性；如果后续使用 sampling，必须固定 seed、多轮重复，并与 greedy 分开记录。
+
+第五，当前模型都是小模型，EOS 控制可能显著弱于更大模型，因此不能把 “EOS 正样本为 0” 外推为语言模型普遍规律。
+
+### 七、对理论和方案的更新
+
+当前统一公式不需要改名，但需要增加一条更严格的观测：
+
+$$
+\mathrm{EOSRankHigh}(t)
+\not\Rightarrow
+\mathrm{ModelStopExecuted}(t)
+$$
+
+qwen3 的 chat_eos after_prompt 中 EOS rank 很高，但仍没有自然生成 EOS，说明 EOS 竞争力只是必要候选，不是执行停止本身。
+
+模型闭合仍保持：
+
+$$
+\mathrm{ModelClose}(x,y)
+=
+\mathrm{AnswerCorrect}(x,y)
+\land
+\mathrm{BoundaryStable}(x,y)
+\land
+\mathrm{DoneStateStable}(x)
+\land
+\mathrm{ModelStopExecuted}(x)
+\land
+\mathrm{NoDrift}(x)
+$$
+
+任务闭合仍保持：
+
+$$
+\mathrm{TaskClose}(x,y)
+=
+\mathrm{AnswerCorrect}(x,y)
+\land
+\mathrm{BoundaryStable}(x,y)
+\land
+\mathrm{TaskStopSatisfied}(x)
+\land
+\mathrm{NoDrift}(x)
+$$
+
+Phase207 说明：当前只能比较任务闭合和失败轨迹，模型闭合正例仍缺失。
+
+### 八、客户端方案更新
+
+工程上更明确：
+
+```text
+不要期待小模型自然 EOS 停止；
+短答任务必须设置客户端 stop sequence；
+句号、中文句号、换行都应纳入可配置停止规则；
+客户端还要做答案清楚度、复读、漂移校验；
+chat template 不一定提升短答闭合，可能触发思维链或对话续写。
+```
+
+### 九、下一阶段任务
+
+当前任务仍属于同一阶段性目标：完成全局图谱拼图。Phase207 未找到 EOS 正样本，因此下一步不应立即做 done-state 成功差分，而应先改进正样本搜索策略。
+
+建议进入：
+
+```text
+Phase208: 解码配置审计与 EOS 诱导边界搜索
+```
+
+核心任务：
+
+```text
+1. 使用 model.generate 与手写 greedy 对照，确认 EOS 停止配置没有误差；
+2. 记录 generation_config、eos_token_id、pad_token_id、forced_eos_token_id、stopping_criteria；
+3. 加入 sampling 但固定 seed，分温度搜索自然 EOS；
+4. 测试极短 completion、空白 completion、特殊结束提示、chat template 结束边界；
+5. 明确区分 greedy 无 EOS、sampling 偶发 EOS、客户端 stop 三类机制；
+6. 若仍无 EOS，转向寻找“高 EOS rank 但未执行 EOS”的解码/词表读出原因。
+```
+
+通俗总结：这次专门去找“模型自己按下 EOS 停止键”，但三个小模型都没有按。更有意思的是，qwen3 在某些 chat 起点上 EOS 排名很高，却仍然不选 EOS，说明“停的信号在附近”不等于“真正停”。现在最稳的结论是：产品可以靠客户端停止规则闭合，但模型内部自然停止还没有找到正样本。下一步要先审计解码配置，再尝试更系统的 EOS 诱导搜索。
+
+## Phase 208: 解码配置审计与 EOS 诱导边界搜索 [2026-07-06 17:35]
+
+### 一、对附件判断的审查
+
+附件对 Phase207 的判断基本正确。Phase207 的强负结果是：
+
+```text
+扩大 prompt 类型；
+max_steps 提高到 32；
+greedy decoding；
+无 external stop sequence；
+仍找不到自然 EOS 正样本。
+```
+
+但附件也指出一个关键风险：必须先排查解码配置和 EOS/pad token 处理，否则可能把实现问题误判成模型机制。Phase208 因此继续同一阶段性目标：完成全局图谱拼图，优先做解码配置审计，而不是理论收束或大规模 patch。
+
+### 二、测试脚本和结果路径
+
+新增脚本：
+
+```text
+tests/gpt5/phase208_decode_config_eos_boundary_audit.py
+tests/gpt5/run_phase208_decode_config_eos_boundary_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase208_decode_config_eos_boundary_audit/decode_config_eos_boundary_audit_fixed/
+```
+
+说明：第一次运行发现 `pad_token_id == eos_token_id` 时，generate 输出解析会把 EOS 当作 padding 误删。已修正脚本：当 pad 与 EOS 相同，generate 解析强制 batch=1，并保留 EOS token。以下结论以 fixed round 为准。
+
+主要输出：
+
+```text
+phase208_qwen3_summary.json
+phase208_glm4_summary.json
+phase208_deepseek7b_summary.json
+phase208_cross_model_summary.json
+phase208_cross_model_summary.md
+phase208_*_decode_rows.jsonl
+phase208_*_manual_token_rows.jsonl
+phase208_*_manual_generate_compare_rows.jsonl
+phase208_*_eos_positive_rows.jsonl
+```
+
+### 三、算法原理
+
+Phase208 对比四类解码机制：
+
+```text
+manual_greedy：手写逐步 argmax；
+generate_greedy：model.generate 的 greedy；
+generate_beam：beam search；
+generate_sample：固定 seed 的 sampling。
+```
+
+采样参数：
+
+```text
+temperature = 0.7, 1.0
+seed = 11, 23, 37
+top_p = 0.95
+```
+
+记录配置：
+
+```text
+tokenizer_eos_token_id
+tokenizer_pad_token_id
+generation_config_eos_token_id
+generation_config_pad_token_id
+generation_config_forced_eos_token_id
+model_config_eos_token_id
+model_config_pad_token_id
+```
+
+核心判据：
+
+$$
+\mathrm{ModelStopExecuted}(x)
+=
+\exists t[y_t=\mathrm{EOS}]
+$$
+
+在 greedy 下：
+
+$$
+\mathrm{ModelStopExecuted}(t)
+=
+\mathbf{1}
+[
+\arg\max_{v \in \mathcal{V}} z_t(v)=\mathrm{EOS}
+]
+$$
+
+Phase208 特别区分：
+
+```text
+greedy EOS；
+generate API EOS；
+beam EOS；
+sampling EOS；
+client stop。
+```
+
+这些不能混合解释。
+
+### 四、配置审计结果
+
+#### 1. qwen3
+
+```text
+tokenizer_eos_token_id = 151645
+tokenizer_pad_token_id = 151643
+generation_config_eos_token_id = [151645, 151643]
+generation_config_pad_token_id = 151643
+```
+
+manual 与 generate greedy：
+
+```text
+rows = 96
+first_token_matches = 96
+manual_eos = 0
+generate_eos = 0
+```
+
+结论：qwen3 的手写 greedy 和 generate greedy 首 token 完全一致，且都没有 EOS。Phase207 对 qwen3 的 0 EOS 判断基本稳固。
+
+#### 2. GLM4
+
+```text
+tokenizer_eos_token_id = 151329
+tokenizer_pad_token_id = 151329
+generation_config_eos_token_id = [151329, 151336, 151338]
+generation_config_pad_token_id = 151329
+```
+
+manual 与 generate greedy：
+
+```text
+rows = 96
+first_token_matches = 92
+manual_eos = 0
+generate_eos = 0
+```
+
+结论：GLM4 的 pad 和 EOS 相同，而且 generation_config 有多个 EOS token。修正解析后发现 greedy 仍无 EOS，但 sampling 有少量 EOS。
+
+#### 3. DS7B
+
+```text
+tokenizer_eos_token_id = 151643
+tokenizer_pad_token_id = 151643
+generation_config_eos_token_id = 151643
+generation_config_pad_token_id = null
+```
+
+manual 与 generate greedy：
+
+```text
+rows = 36
+first_token_matches = 36
+manual_eos = 1
+generate_eos = 1
+```
+
+结论：DS7B 的 pad 和 EOS 相同。修正解析后，manual greedy 与 generate greedy 在 `End the response now.` 特殊提示上都能生成 EOS。
+
+### 五、客观结果
+
+跨模型 fixed 汇总：
+
+```text
+qwen3 eos_positive_count = 0
+GLM4 eos_positive_count = 5
+DS7B eos_positive_count = 37
+total_eos_positive_count = 42
+```
+
+#### 1. qwen3
+
+```text
+manual_greedy: EOS = 0
+generate_greedy: EOS = 0
+generate_beam: EOS = 0
+generate_sample: EOS = 0
+```
+
+qwen3 在本轮所有解码模式中仍无 EOS。chat_eos 继续稳定触发 `<think>`：
+
+```text
+chat_eos first token = <think>
+```
+
+结论：qwen3 的内部 EOS 闭合仍未找到正样本。它是本轮最稳的负结果。
+
+#### 2. GLM4
+
+GLM4 fixed 后出现 5 条 EOS，全部来自 sampling：
+
+```text
+generate_sample + eos_instruction + temperature 0.7: 2 / 57
+generate_sample + final_answer + temperature 1.0: 1 / 57
+generate_sample + short_answer + temperature 1.0: 2 / 60
+```
+
+典型正样本：
+
+```text
+No additional comments or questions are allowed.
+Greenish brown. END.<|endoftext|>
+```
+
+也有低质量样本：
+
+```text
+?\n<|endoftext|>
+\n<|endoftext|>
+1.5g<|endoftext|>
+```
+
+结论：GLM4 不是完全不能 EOS，但 EOS 主要是 sampling 偶发，而且内容质量不稳定。不能把它当成稳定 ModelClose。
+
+#### 3. DS7B
+
+DS7B fixed 后出现 37 条 EOS：
+
+```text
+manual_greedy + end_now: 1 / 1
+generate_greedy + end_now: 1 / 1
+generate_beam + end_now: 1 / 1
+generate_beam + eos_instruction: 4 / 6
+generate_beam + final_answer: 4 / 6
+generate_sample 多协议下均有若干 EOS。
+```
+
+关键正样本：
+
+```text
+Prompt:
+End the response now.
+
+Output:
+</think>
+
+Hello! How can I assist you today?<｜end▁of▁sentence｜>
+```
+
+另一些 beam 正样本：
+
+```text
+drink<｜end▁of▁sentence｜>
+to hold liquids.<｜end▁of▁sentence｜>
+What is the function of a horse?<｜end▁of▁sentence｜>
+```
+
+结论：DS7B 可以自然生成 EOS，但很多 EOS 正样本仍不是严格短答闭合，有的先进入 `</think>`、问句复述或解释轨道，然后才 EOS。因此这是 ModelStopExecuted 正样本，不等于 L6 ModelClose。
+
+### 六、阶段性判断
+
+Phase208 修正了 Phase207 的一个过强结论：
+
+```text
+“三个模型都没有自然 EOS” 不再成立。
+```
+
+更准确的新结论是：
+
+```text
+qwen3：多解码模式下仍未找到 EOS；
+GLM4：greedy 无 EOS，sampling 偶发 EOS；
+DS7B：在特殊提示、beam、sampling 下可生成 EOS；
+但三者都没有证明稳定严格 ModelClose。
+```
+
+因此当前图谱应新增三类 EOS：
+
+```text
+1. GreedyEOS：贪心 EOS；
+2. SamplingEOS：采样偶发 EOS；
+3. BeamEOS：束搜索 EOS。
+```
+
+它们和客户端停止仍然不同：
+
+```text
+ClientStop != GreedyEOS != SamplingEOS != BeamEOS
+```
+
+### 七、问题和硬伤
+
+第一，GLM4 的 EOS 正样本主要来自 sampling，随机性较强，且质量不稳定。
+
+第二，DS7B 的 EOS 正样本虽然多，但不少先进入推理/复述/问句轨道，然后才 EOS，不等于完成状态稳定。
+
+第三，qwen3 仍没有 EOS 正样本，因此 qwen3 的 done-state 成功图谱仍无法建立。
+
+第四，beam search 改变了解码目标，不等于模型自然 greedy 行为，不能和 greedy EOS 混用。
+
+第五，本轮发现 pad/eos 解析是重大实现风险。以后所有 EOS 研究必须显式记录：
+
+```text
+pad_token_id == eos_token_id ?
+generation_config.eos_token_id 是否为列表？
+输出解析是否保留 EOS？
+batch padding 是否引入假 EOS 或删掉真 EOS？
+```
+
+第六，当前仍然是小模型图谱，EOS 控制和 chat template 行为可能与大模型有明显偏差。
+
+### 八、理论更新
+
+Phase207 的公式：
+
+$$
+\mathrm{EOSRankHigh}(t)
+\not\Rightarrow
+\mathrm{ModelStopExecuted}(t)
+$$
+
+仍然成立。
+
+Phase208 进一步说明：
+
+$$
+\mathrm{ModelStopExecuted}
+=
+\mathrm{GreedyEOS}
+\lor
+\mathrm{BeamEOS}
+\lor
+\mathrm{SamplingEOS}
+$$
+
+但这只是停止执行，不是完整模型闭合。
+
+严格模型闭合仍是：
+
+$$
+\mathrm{ModelClose}(x,y)
+=
+\mathrm{AnswerCorrect}(x,y)
+\land
+\mathrm{BoundaryStable}(x,y)
+\land
+\mathrm{DoneStateStable}(x)
+\land
+\mathrm{ModelStopExecuted}(x)
+\land
+\mathrm{NoDrift}(x)
+$$
+
+Phase208 找到了一些 ModelStopExecuted 正样本，但还没有证明：
+
+```text
+AnswerCorrect
+BoundaryStable
+DoneStateStable
+NoDrift
+```
+
+同时成立。
+
+### 九、客户端方案更新
+
+工程方案不变，反而更明确：
+
+```text
+1. qwen3 不能依赖自然 EOS；
+2. GLM4 不能依赖 sampling 偶发 EOS；
+3. DS7B 虽能 EOS，但输出质量不稳定，仍需客户端 stop 与校验；
+4. 短答产品层仍应使用 stop sequence；
+5. EOS 只能作为额外停止条件，不能替代输出校验。
+```
+
+### 十、下一阶段任务
+
+当前任务仍属于同一阶段性目标：完成全局图谱拼图。Phase208 已找到可用但不完美的 EOS 正样本，下一步可以从“找不到正样本”转为“正样本质量分层和 done-state 对照”。
+
+建议进入：
+
+```text
+Phase209: EOS 正样本质量分层与 ModelClose 近邻图谱
+```
+
+核心任务：
+
+```text
+1. 将 EOS 正样本分为 clean_eos、late_eos、drift_eos、bad_answer_eos；
+2. 比较 qwen3 无 EOS、GLM4 sampling EOS、DS7B greedy/beam/sampling EOS；
+3. 对 EOS 前状态、句号后状态、续写失败状态做 residual 和 attention head 差分；
+4. 只对 clean 或 near-clean EOS 建立 done-state 候选方向；
+5. 明确区分 ModelStopExecuted 与 ModelClose；
+6. 输出 eos_quality_atlas_v1 和 modelclose_neighbor_atlas_v1。
+```
+
+通俗总结：这轮最大的收获不是“模型会停了”，而是发现之前可能把 EOS 当 pad 误删。修正以后，qwen3 仍然不会自然停，GLM4 偶尔会停但不稳，DS7B 确实能停但常常不是干净短答。也就是说，我们终于找到了 EOS 正样本，但它们还不等于真正的“答完了”。下一步要给这些 EOS 正样本分质量等级，再找接近 ModelClose 的内部状态。
+
+## Phase 209: 模式运行对比图谱与单点组件路线重估 [2026-07-06 18:49]
+
+### 一、任务来源和总判断
+
+本轮输入提出一个关键修正：
+
+```text
+语言的本质可能不是单个语义向量、单个概念神经元、单个停止符或单个通道，而是模式。
+语法规则是模式，逻辑推理是模式，知识网络也是模式网络。
+深度神经网络的核心工作方式，是对动态特征网络进行处理、组合、竞争和路由。
+```
+
+这个判断总体正确，而且比继续追 C249、句号、EOS rank、单个 attention head 更接近当前证据。
+
+Phase198 到 Phase208 的价值不是被推翻，而是被重新解释：
+
+```text
+单点组件不是语言机制的基本单位。
+单点组件是模式运行轨迹的底层证据。
+```
+
+前面负结果共同说明：
+
+```text
+答案选择通道不能闭合完整回答；
+句号不是停止；
+EOS rank 高不等于 EOS 被执行；
+客户端 stop 可以修复产品输出，但不是模型内部闭合；
+自然 EOS 正样本存在，但不等于 clean ModelClose。
+```
+
+因此，本轮将研究对象从“停止符 / 单点组件”上移到：
+
+```text
+对象-关系-值问答模式，在不同输出约束下如何运行、竞争和漂移。
+```
+
+### 二、模式的严格工作定义
+
+为了避免“模式”变成过大的词，本轮把模式定义为可测对象：
+
+$$
+\boxed{
+\mathrm{Pattern}
+=
+\left(
+\mathrm{Trigger},
+\mathrm{StateVariables},
+\mathrm{FeatureTrajectory},
+\mathrm{PriorityProxy},
+\mathrm{OutputConstraint},
+\mathrm{FailureModes}
+\right)
+}
+$$
+
+其中：
+
+```text
+Trigger = 触发条件，本轮为 relation + prompt pattern；
+StateVariables = 对象、关系、目标答案、语言方向；
+FeatureTrajectory = 贪心生成轨迹，以及每一步 target/stop/prose/echo/EOS 等排名代理；
+PriorityProxy = 多个模式竞争时，最终胜出的输出模式；
+OutputConstraint = 预期输出模式，例如短答、解释、复读、列表；
+FailureModes = 实际输出模式与预期不一致时的漂移类型。
+```
+
+统一机制公式暂时改写为：
+
+$$
+\boxed{
+h_{t+1}
+=
+\sum_{k \in \mathcal{P}}
+\alpha_k(x,t) T_k(h_t)
++
+\varepsilon_t
+}
+$$
+
+其中：
+
+```text
+\alpha_k(x,t) = 第 k 个模式在当前上下文和生成状态下的优先级；
+T_k(h_t) = 第 k 个模式对应的状态转移；
+\varepsilon_t = 当前未解释残差。
+```
+
+这比线性单点公式更能解释当前现象：同一个答案词可能已经被选中，但输出轨迹仍会漂移到解释、列表、复读或续写。
+
+### 三、测试脚本和数据
+
+新增脚本：
+
+```text
+tests/gpt5/phase209_pattern_running_contrast_atlas.py
+tests/gpt5/run_phase209_pattern_running_contrast_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase209_pattern_running_contrast_atlas/pattern_running_contrast_atlas/
+```
+
+核心结果文件：
+
+```text
+phase209_qwen3_summary.json
+phase209_glm4_summary.json
+phase209_deepseek7b_summary.json
+phase209_cross_model_summary.json
+phase209_cross_model_summary.md
+phase209_*_token_rows.jsonl
+phase209_*_trajectory_rows.jsonl
+```
+
+测试模式：
+
+```text
+answer_short          = 短答模式；
+answer_stop           = 短答 + 停止模式；
+answer_explain        = 解释模式；
+answer_repeat         = 复读模式；
+answer_list           = 列表模式；
+answer_echo_control   = 对象回声 + 回答模式；
+answer_target_seeded  = 目标答案种子 + 最终答案模式。
+```
+
+模型按顺序测试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+所有模型均使用本地 CUDA 加载，测试完一个释放显存后再加载下一个。
+
+### 四、客观结果
+
+跨模型总结果：
+
+```text
+总轨迹数: 833
+目标模式匹配: 140
+模式漂移: 693
+答案出现: 415
+自然 EOS 结束: 8
+```
+
+按模型：
+
+```text
+qwen3:
+  轨迹 420
+  模式匹配 79
+  模式漂移 341
+  答案出现 248
+  EOS 0
+
+GLM4:
+  轨迹 343
+  模式匹配 42
+  模式漂移 301
+  答案出现 145
+  EOS 0
+
+DS7B:
+  轨迹 70
+  模式匹配 19
+  模式漂移 51
+  答案出现 22
+  EOS 8
+```
+
+按模式的核心现象：
+
+```text
+answer_short:
+  三个模型均 0 命中；
+  经常漂移到 explain_answer、list_answer、repeat_answer 或 other_or_wrong。
+
+answer_stop:
+  三个模型均 0 命中；
+  说明“停止指令”没有形成稳定内部停止模式。
+
+answer_explain:
+  qwen3 27/60 命中；
+  GLM4 24/49 命中；
+  DS7B 10/10 命中；
+  解释模式比短答/停止模式更容易占优。
+
+answer_list:
+  qwen3 24/60 命中；
+  GLM4 4/49 命中；
+  DS7B 9/10 命中；
+  列表模式在 qwen3 和 DS7B 上较强，但 GLM4 输出格式混乱。
+
+answer_repeat:
+  qwen3 28/60 命中；
+  GLM4 10/49 命中；
+  DS7B 0/10 命中；
+  复读模式容易被列表模式吸收。
+
+answer_target_seeded:
+  qwen3 0/60 命中，但答案出现 57/60；
+  GLM4 4/49 命中，答案出现 42/49；
+  DS7B 0/10 命中，答案出现 10/10，且 EOS 8/10；
+  说明目标答案种子能强力提升答案出现，但不等于短答闭合。
+```
+
+### 五、关键进展
+
+第一，模式路线是可测试的，不只是理论说法。
+
+本轮已经把“模式”压成了可测对象：
+
+```text
+同一批对象-关系-值样本
+叠加不同输出约束
+观察最终胜出的输出模式和漂移模式
+```
+
+第二，结果支持“模式优先级竞争”。
+
+短答、停止、解释、列表、复读不是同一条轨迹上的简单参数变化，而更像不同模式之间的竞争。
+
+第三，前面停止机制负结果得到重新解释。
+
+短答和 stop 指令在本轮几乎完全失败，这说明：
+
+```text
+停止控制不是答案选择模式的自然尾部；
+停止控制也不是句号或 EOS 排名的简单结果；
+停止控制需要一个更高层的完成状态模式或外部客户端规则。
+```
+
+第四，答案出现和模式闭合被清楚拆开。
+
+例如 qwen3 的 answer_target_seeded：
+
+```text
+答案出现 57/60
+短答模式命中 0/60
+```
+
+这说明模型可以知道答案，但不能稳定执行目标输出模式。
+
+第五，解释模式和列表模式可能是小模型中的强默认语言模式。
+
+尤其 DS7B：
+
+```text
+answer_explain 10/10
+answer_list 9/10
+answer_short 0/10
+answer_stop 0/10
+```
+
+这说明 DS7B 更像被训练成“解释/展开/思考”优先，而不是短答优先。
+
+### 六、问题、硬伤和谨慎点
+
+第一，本轮分类器仍然是启发式分类器。
+
+它依赖 answer_mentions、comma_count、because_like、word_count 等规则，不能完全等价于真实语义模式。
+
+第二，短答判定较严格。
+
+如果模型先给出正确答案再继续展开，会被判为漂移。这是合理的，因为本轮研究的是模式闭合，不只是答案出现；但它会降低“短答模式命中率”。
+
+第三，DS7B 样本量偏小。
+
+DS7B 只有 70 条轨迹，不能和 qwen3 的 420 条、GLM4 的 343 条直接等权比较。DS7B 的方向有价值，但不能过度泛化。
+
+第四，当前样本仍主要来自对象-关系-值问答。
+
+这只是语言模式图谱的第一块，不覆盖否定、条件、比较、递推、语法嵌套等模式。
+
+第五，当前没有直接记录完整 hidden-state 轨迹。
+
+本轮 FeatureTrajectory 主要是输出轨迹和 token-rank 代理，还没有进入 layer/head/channel 级的动态轨迹分析。
+
+第六，小模型偏差仍然很大。
+
+当前三个模型的内部编码机制可能与更强模型存在 30% 到 50% 偏差，尤其 DS7B 的 reasoning trace 会强烈污染短答和停止模式。
+
+### 七、理论进展
+
+本轮理论不改名，只更新主体：
+
+```text
+智能理论当前核心主体：
+语言能力来自深度神经网络中可复用的动态模式网络。
+知识、语法、推理不是三个完全分离模块，而是不同类型的模式族。
+模型输出不是单个通道决定，而是多个模式在上下文中竞争后的轨迹结果。
+```
+
+最新机制公式：
+
+$$
+\boxed{
+P_k(x,t)
+=
+\left[
+\alpha_k(x,t),
+\phi_k(x,t),
+\Delta h_k(x,t),
+b_k(x,t),
+o_k(x,t)
+\right]
+}
+$$
+
+其中：
+
+```text
+P_k = 第 k 个模式；
+\alpha_k = 模式激活强度；
+\phi_k = 模式特征集合；
+\Delta h_k = 模式造成的状态变化；
+b_k = 边界/停止/切换信号；
+o_k = 输出倾向。
+```
+
+全局运行公式：
+
+$$
+\boxed{
+h_{t+1}
+=
+\sum_k
+\alpha_k(x,t) T_k(h_t)
++
+\varepsilon_t
+}
+$$
+
+输出竞争公式：
+
+$$
+\boxed{
+o_t
+=
+\operatorname{Readout}
+\left(
+\sum_k
+\alpha_k(x,t) T_k(h_t)
+\right)
+}
+$$
+
+闭合公式仍然保持严格：
+
+$$
+\boxed{
+\mathrm{ModelClose}(x,y)
+=
+\mathrm{AnswerCorrect}(x,y)
+\land
+\mathrm{PatternMatched}(x,y)
+\land
+\mathrm{BoundaryStable}(x,y)
+\land
+\mathrm{DoneStateStable}(x)
+\land
+\mathrm{ModelStopExecuted}(x)
+\land
+\mathrm{NoDrift}(x)
+}
+$$
+
+Phase209 说明：
+
+```text
+AnswerCorrect 或 AnswerPresent 远远不够。
+真正闭合必须要求 PatternMatched 和 NoDrift。
+```
+
+### 八、客户端改进方案
+
+客户端方案进一步明确：
+
+```text
+1. 短答产品不能依赖模型自然短答模式；
+2. stop sequence 仍然必要；
+3. EOS 只能作为辅助停止条件，不能作为唯一闭合标准；
+4. 对短答任务，应增加输出模式校验；
+5. 如果模型进入解释、列表、复读、格式循环，应客户端截断或重问；
+6. target-seeded prompt 可以提升答案出现率，但容易造成复读和二次展开，不能直接当闭合方案。
+```
+
+推荐工程规则：
+
+$$
+\boxed{
+\mathrm{ClientAccept}(y)
+=
+\mathrm{AnswerPresent}(y)
+\land
+\mathrm{FormatValid}(y)
+\land
+\mathrm{LengthValid}(y)
+\land
+\neg \mathrm{DriftPattern}(y)
+}
+$$
+
+其中 DriftPattern 至少包括：
+
+```text
+解释漂移；
+列表漂移；
+复读漂移；
+继续问答漂移；
+格式循环；
+reasoning trace 泄漏。
+```
+
+### 九、接下来的阶段任务
+
+当前任务和下一任务仍属于同一阶段性目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+但下一步不应继续 patch 单点参数，而应进入：
+
+```text
+Phase210: 最小稳定模式的内部轨迹定位
+```
+
+目标：
+
+```text
+1. 从 Phase209 中挑出最稳定的正模式：
+   qwen3 answer_explain / answer_repeat / answer_list；
+   GLM4 answer_explain；
+   DS7B answer_explain / answer_list。
+
+2. 为每个稳定模式建立最小对照：
+   explain vs short；
+   list vs short；
+   repeat vs list；
+   target_seeded vs short。
+
+3. 不再首先找 EOS，而是找模式切换点：
+   什么时候从 answer selection 进入 explain；
+   什么时候从 repeat 进入 list；
+   什么时候从 short 失败进入 continuation。
+
+4. 记录隐藏层轨迹：
+   residual norm；
+   target rank；
+   prose rank；
+   echo rank；
+   stop/EOS rank；
+   关键层差分。
+
+5. 目标输出：
+   minimal_pattern_transition_atlas_v1；
+   stable_pattern_positive_set_v1；
+   pattern_drift_negative_set_v1。
+```
+
+通俗总结：这轮证明“语言是模式网络”不是空话。模型经常已经知道答案，但并不会按短答或停止模式完成任务；它更容易被解释、列表、复读这些强模式带走。要破解编码机制，下一步不应继续死追某个停止符，而要选一个最稳定模式，观察它在网络内部从触发、竞争、占优到输出的完整轨迹。
+
+## Phase 210: 最小稳定模式的内部轨迹定位 [2026-07-06 19:23]
+
+### 一、任务判断
+
+本轮输入继续确认 Phase209 的路线：
+
+```text
+语言是多层动态模式网络；
+知识、语法、逻辑、标点、EOS、客户端停止都可以放入模式网络；
+但模式必须分层，不能把所有机制压成同一个平面。
+```
+
+这个判断正确。需要补充的是：
+
+```text
+模式网络不是放弃组件研究，而是改变研究顺序：
+先定义模式；
+再记录模式轨迹；
+再找模式切换点；
+最后把 attention head、MLP channel、EOS、句号等组件挂回模式图谱。
+```
+
+Phase209 已经证明输出模式漂移非常普遍，但它主要是行为层和 token-rank 代理。本轮 Phase210 的任务是继续同一阶段目标：
+
+```text
+从输出模式图谱进入内部 hidden-state 轨迹图谱。
+```
+
+### 二、算法原理
+
+本轮继续使用对象-关系-值问答模式族，测试五类模式：
+
+```text
+answer_short
+answer_explain
+answer_list
+answer_repeat
+answer_target_seeded
+```
+
+每条轨迹逐步生成，并在每一步记录：
+
+```text
+1. 当前输出 token；
+2. target rank；
+3. stop/prose/echo/EOS 等边界代理；
+4. 选定层的 last-token hidden state；
+5. 每层 hidden state 的 residual_norm、mean、std；
+6. 每个 pattern 相对 answer_short 的均值向量差分。
+```
+
+本轮模式轨迹代理为：
+
+$$
+\boxed{
+\Gamma(P,x,t,l)
+=
+\left[
+h_{l,t},
+m_{\mathrm{target},t},
+m_{\mathrm{stop},t},
+m_{\mathrm{prose},t},
+m_{\mathrm{echo},t},
+m_{\mathrm{EOS},t},
+o_t
+\right]
+}
+$$
+
+其中：
+
+```text
+P = 模式；
+x = 样本；
+t = 生成步；
+l = 层；
+h_l,t = 第 l 层 last-token hidden state；
+m = 各类 rank/margin 代理；
+o_t = 实际输出 token。
+```
+
+模式差分计算为：
+
+$$
+\boxed{
+\Delta h_{P,\mathrm{short}}(t,l)
+=
+\mathbb{E}[h_{P,t,l}]
+-
+\mathbb{E}[h_{\mathrm{short},t,l}]
+}
+$$
+
+并记录：
+
+$$
+\boxed{
+D_{P,\mathrm{short}}(t,l)
+=
+\left\|
+\Delta h_{P,\mathrm{short}}(t,l)
+\right\|_2
+}
+$$
+
+以及：
+
+$$
+\boxed{
+C_{P,\mathrm{short}}(t,l)
+=
+\cos
+\left(
+\mathbb{E}[h_{P,t,l}],
+\mathbb{E}[h_{\mathrm{short},t,l}]
+\right)
+}
+$$
+
+这些不是因果证明，只是内部状态分离度代理。
+
+### 三、脚本和结果位置
+
+新增脚本：
+
+```text
+tests/gpt5/phase210_minimal_pattern_transition_atlas.py
+tests/gpt5/run_phase210_minimal_pattern_transition_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase210_minimal_pattern_transition_atlas/minimal_pattern_transition_atlas/
+```
+
+核心结果：
+
+```text
+phase210_cross_model_summary.json
+phase210_cross_model_summary.md
+phase210_qwen3_summary.json
+phase210_glm4_summary.json
+phase210_deepseek7b_summary.json
+phase210_*_state_rows.jsonl
+phase210_*_contrast_rows.jsonl
+phase210_*_trajectory_rows.jsonl
+phase210_*_token_rows.jsonl
+```
+
+模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型测试完成后释放 GPU 显存，再加载下一个模型。
+
+### 四、客观结果
+
+跨模型总结果：
+
+```text
+总轨迹数: 440
+内部状态记录: 36848
+模式差分记录: 1008
+目标模式匹配: 119
+模式漂移: 321
+答案出现: 267
+自然 EOS: 6
+```
+
+模式匹配率：
+
+$$
+\boxed{
+R_{\mathrm{pattern}}
+=
+\frac{119}{440}
+\approx
+27.0\%
+}
+$$
+
+模式漂移率：
+
+$$
+\boxed{
+R_{\mathrm{drift}}
+=
+\frac{321}{440}
+\approx
+73.0\%
+}
+$$
+
+答案出现率：
+
+$$
+\boxed{
+R_{\mathrm{answer}}
+=
+\frac{267}{440}
+\approx
+60.7\%
+}
+$$
+
+自然 EOS 率：
+
+$$
+\boxed{
+R_{\mathrm{EOS}}
+=
+\frac{6}{440}
+\approx
+1.36\%
+}
+$$
+
+### 五、按模型结果
+
+qwen3：
+
+```text
+轨迹数: 200
+状态记录: 16800
+模式匹配: 62
+模式漂移: 138
+
+answer_short: 0/40
+answer_explain: 20/40
+answer_list: 14/40
+answer_repeat: 28/40
+answer_target_seeded: 0/40
+```
+
+GLM4：
+
+```text
+轨迹数: 200
+状态记录: 16800
+模式匹配: 45
+模式漂移: 155
+
+answer_short: 0/40
+answer_explain: 7/40
+answer_list: 1/40
+answer_repeat: 20/40
+answer_target_seeded: 17/40
+```
+
+DS7B：
+
+```text
+轨迹数: 40
+状态记录: 3248
+模式匹配: 12
+模式漂移: 28
+
+answer_short: 0/8
+answer_explain: 6/8
+answer_list: 6/8
+answer_repeat: 0/8
+answer_target_seeded: 0/8
+```
+
+关键事实：
+
+```text
+三模型 answer_short 仍然全部 0 命中。
+answer_repeat 在 qwen3 和 GLM4 中较强。
+answer_explain / answer_list 在 DS7B 中较强。
+GLM4 的 answer_target_seeded 出现 17/40 短答命中，是本轮新增的局部正结果。
+DS7B 的 answer_target_seeded 仍然答案出现高，但多为 repeat/echo，并且 6/8 EOS。
+```
+
+### 六、内部轨迹结果
+
+本轮最重要的内部结果是：
+
+```text
+相对 answer_short，其他模式在后层出现明显 hidden-state 均值向量差分。
+```
+
+最大差分集中层：
+
+```text
+qwen3:
+  layer 34 / 32 / 26 最明显；
+  answer_repeat、answer_list、answer_explain、answer_target_seeded 都和 short 分离。
+
+GLM4:
+  layer 38 / 35 / 29 最明显；
+  answer_list、answer_repeat、answer_target_seeded、answer_explain 都和 short 分离。
+
+DS7B:
+  layer 26 / 24 / 20 最明显；
+  answer_target_seeded、answer_explain、answer_list、answer_repeat 都和 short 分离。
+```
+
+跨模型 top contrast：
+
+```text
+DS7B answer_target_seeded vs short, layer 26:
+  mean_l2_diff = 708.77
+  cosine = 0.789
+
+DS7B answer_explain vs short, layer 26:
+  mean_l2_diff = 680.80
+  cosine = 0.805
+
+DS7B answer_list vs short, layer 26:
+  mean_l2_diff = 675.62
+  cosine = 0.806
+
+qwen3 answer_repeat vs short, layer 34:
+  mean_l2_diff = 260.20
+  cosine = 0.892
+
+qwen3 answer_list vs short, layer 34:
+  mean_l2_diff = 248.09
+  cosine = 0.896
+
+GLM4 answer_list vs short, layer 38:
+  mean_l2_diff = 143.04
+  cosine = 0.880
+
+GLM4 answer_repeat vs short, layer 38:
+  mean_l2_diff = 134.87
+  cosine = 0.900
+```
+
+解释：
+
+```text
+模式差异不只是输出文本分类差异；
+在 selected hidden layers 的 last-token state 中也能看到稳定分离代理。
+```
+
+但必须谨慎：
+
+```text
+这是均值向量差分，不是因果定位；
+不能直接说 layer 34 或 layer 38 “控制”模式；
+只能说这些层是当前观测下的模式分离高响应区。
+```
+
+### 七、和 Phase209 的关系
+
+Phase209 证明：
+
+```text
+模式路线可测；
+短答弱；
+解释、列表、复读是强竞争模式；
+答案出现不等于模式闭合。
+```
+
+Phase210 增加：
+
+```text
+模式差异可在 hidden-state 轨迹中观察到；
+差异主要出现在中后层到后层；
+answer_short 不是没有被提示，而是相对其他模式缺少稳定占优轨迹；
+target_seeded 能显著改变答案出现和 hidden-state 轨迹，但不保证短答闭合。
+```
+
+因此，当前拼图从：
+
+```text
+输出模式图谱
+```
+
+推进到：
+
+```text
+输出模式 + 内部状态差分图谱。
+```
+
+### 八、问题和硬伤
+
+第一，Phase210 仍然是相关性图谱。
+
+虽然记录了 hidden-state 差分，但没有做因果 patch、ablation 或 activation steering。
+
+第二，差分是均值差分。
+
+均值向量可能掩盖多子模式、多簇结构和样本内部差异。后续需要聚类或按输出成功/失败分组。
+
+第三，当前使用 last-token hidden state。
+
+这适合观察生成决策点，但不能覆盖 prompt 内部各 token 的模式触发过程，例如“because”“comma”“target seed”等 token 的局部作用。
+
+第四，DS7B 样本量仍偏小。
+
+DS7B 只有 40 条轨迹，虽然内部差分很大，但不能和 qwen3 / GLM4 等权比较。
+
+第五，模式分类器仍然是启发式。
+
+分类规则会影响 pattern_match / drift。尤其 short、other_or_wrong、echo_then_answer 的边界需要继续校正。
+
+第六，小模型偏差仍然存在。
+
+当前结果只能说明小模型模式机制图谱的一部分，不能直接外推到大模型或真实通用语言机制。
+
+### 九、理论进展
+
+当前理论主体不改名，只更新公式解释。
+
+语言编码机制当前可写为：
+
+$$
+\boxed{
+\mathrm{LanguageMechanism}
+=
+\mathrm{PatternFamily}
++
+\mathrm{PatternCompetition}
++
+\mathrm{StateTrajectory}
++
+\mathrm{OutputClosure}
+}
+$$
+
+模式运行公式保持：
+
+$$
+\boxed{
+h_{t+1}
+=
+\sum_k
+\alpha_k(x,t)T_k(h_t)
++
+\varepsilon_t
+}
+$$
+
+Phase210 增加内部轨迹观测项：
+
+$$
+\boxed{
+\Gamma(P,x)
+=
+\left\{
+h_{l,t},
+m_{r,t},
+o_t
+\right\}_{l,t,r}
+}
+$$
+
+其中：
+
+```text
+h_l,t = 层 l、生成步 t 的 hidden state；
+m_r,t = target、stop、prose、echo、EOS 等边界代理；
+o_t = 输出 token。
+```
+
+模式差分：
+
+$$
+\boxed{
+\Delta \Gamma(P_i,P_j)
+=
+\mathbb{E}[\Gamma(P_i)]
+-
+\mathbb{E}[\Gamma(P_j)]
+}
+$$
+
+当前最可靠的结论是：
+
+```text
+PatternMatched 必须成为闭合标准；
+NoDrift 必须成为闭合标准；
+hidden-state 分离是模式存在的候选证据；
+但只有因果干预才能把候选证据升级为机制证据。
+```
+
+### 十、客户端方案更新
+
+客户端层仍然不能依赖自然短答或自然 EOS。
+
+本轮进一步说明：
+
+```text
+1. short prompt 本身不足以触发短答闭合；
+2. target_seeded 可以改善答案出现，GLM4 上甚至改善短答命中，但容易引发 repeat/echo；
+3. explain/list/repeat 是强竞争模式，需要被客户端识别并截断；
+4. 产品层应使用输出模式校验，而不是只判断答案是否出现；
+5. 对短答任务，应组合 stop sequence、长度限制、格式校验、漂移模式过滤。
+```
+
+客户端接受公式保持：
+
+$$
+\boxed{
+\mathrm{ClientAccept}(y)
+=
+\mathrm{AnswerPresent}(y)
+\land
+\mathrm{FormatValid}(y)
+\land
+\mathrm{LengthValid}(y)
+\land
+\neg \mathrm{DriftPattern}(y)
+}
+$$
+
+### 十一、下一阶段任务
+
+当前任务和下一任务仍属于同一阶段性目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+Phase210 已完成第一版内部轨迹代理。下一步应进入：
+
+```text
+Phase211: 模式成功/失败分组与切换点定位
+```
+
+核心任务：
+
+```text
+1. 把同一模式分成 success 和 drift 两组；
+2. 比较 answer_repeat 成功 vs answer_repeat 漂移到 list；
+3. 比较 answer_explain 成功 vs explain 漂移到 repeat/list/other；
+4. 比较 target_seeded 短答成功 vs target_seeded repeat/echo；
+5. 在 layer-step 网格上找差分峰值；
+6. 只对差分峰值做小规模 causal patch / ablation；
+7. 输出 pattern_transition_switchpoint_atlas_v1。
+```
+
+通俗总结：Phase210 证明模式差异已经可以在模型内部状态轨迹中看见，尤其在中后层/后层最明显。但这还不是“找到了机制”，只是找到了可能的机制地形。下一步要把成功轨迹和失败轨迹分开，找“从短答转向解释/列表/复读”的具体切换点，再用小规模干预验证。
+
+## Phase 211: 模式成功/失败分组与切换点候选图谱 [2026-07-06 19:38]
+
+### 一、任务判断
+
+本轮输入对 Phase210 的判断基本正确：
+
+```text
+Phase210 证明模式差异不只是输出文本差异；
+在 hidden-state 轨迹中也能看到分离代理；
+但 Phase210 仍然是相关性图谱，不是因果闭合。
+```
+
+当前最应该继续的任务不是重新总结理论，也不是马上大规模 patch，而是：
+
+```text
+把同一模式的成功轨迹和失败轨迹分开；
+在 layer-step 网格中找模式漂移切换点候选；
+为下一轮小规模因果验证缩小搜索空间。
+```
+
+由于 Phase210 已经产生：
+
+```text
+440 条轨迹；
+36848 条 state rows；
+1008 条 pattern contrast rows。
+```
+
+本轮不需要重新加载 qwen3、GLM4、DS7B。直接离线分析 Phase210 结果更合理，避免重复消耗 GPU，并且符合“不要轻易进入 patch”的要求。
+
+### 二、脚本和结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase211_pattern_switchpoint_atlas.py
+tests/gpt5/run_phase211_pattern_switchpoint_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase211_pattern_switchpoint_atlas/pattern_switchpoint_atlas/
+```
+
+核心结果：
+
+```text
+phase211_cross_model_summary.json
+phase211_cross_model_summary.md
+phase211_cross_model_outcome_rows.jsonl
+phase211_cross_model_state_outcome_summary_rows.jsonl
+phase211_cross_model_switchpoint_rows.jsonl
+phase211_qwen3_summary.json
+phase211_glm4_summary.json
+phase211_deepseek7b_summary.json
+```
+
+### 三、算法原理
+
+Phase211 读取 Phase210 的：
+
+```text
+trajectory_rows；
+state_rows；
+token_rows 中已经写入 state rows 的 rank/margin 代理。
+```
+
+先给每条轨迹打 outcome label：
+
+```text
+success = pattern_match；
+drift:{failure_mode} = pattern_drift。
+```
+
+然后在每个：
+
+```text
+model / pattern_id / outcome_group / step / layer_idx
+```
+
+上统计：
+
+```text
+residual_norm_mean；
+residual_mean_mean；
+residual_std_mean；
+target_rank_mean；
+stop_margin_mean；
+prose_margin_mean；
+echo_margin_mean；
+eos_rank_mean；
+period_rank_mean。
+```
+
+再做 success-vs-drift 对比：
+
+$$
+\boxed{
+\Delta M
+=
+M_{\mathrm{drift}}
+-
+M_{\mathrm{success}}
+}
+$$
+
+切换点候选分数定义为简单代理：
+
+$$
+\boxed{
+S_{\mathrm{switch}}
+=
+\frac{|\Delta \mathrm{ResidualNorm}|}{\max(1,|\mathrm{ResidualNorm}_{success}|)}
++
+|\Delta \mathrm{ProseMargin}|
++
+|\Delta \mathrm{EchoMargin}|
++
+|\Delta \mathrm{StopMargin}|
++
+\frac{|\Delta \mathrm{TargetRank}|}{1000}
++
+\frac{|\Delta \mathrm{EOSRank}|}{1000}
+}
+$$
+
+解释：
+
+```text
+分数越高，表示成功轨迹和某类漂移轨迹在该层、该步的状态/边界代理差异越大。
+```
+
+注意：
+
+```text
+这是 switchpoint candidate score（切换点候选分数）；
+不是因果强度；
+不是机制闭合。
+```
+
+### 四、客观结果
+
+本轮输出：
+
+```text
+outcome rows: 50
+state summary rows: 4186
+switchpoint rows: 2268
+```
+
+最高分切换点候选：
+
+```text
+qwen3 answer_list -> drift:other_or_wrong
+  best step = 11
+  best layer = 32
+  score = 181.73
+  residual_norm_delta = -103.93
+  prose_margin_delta = -38.29
+  echo_margin_delta = -16.45
+
+GLM4 answer_list -> drift:short_answer
+  best step = 8
+  best layer = 29
+  score = 157.20
+  residual_norm_delta = 17.62
+  prose_margin_delta = 8.62
+  echo_margin_delta = 2.29
+
+GLM4 answer_list -> drift:echo_then_answer
+  best step = 8
+  best layer = 35
+  score = 153.64
+  residual_norm_delta = 50.34
+  prose_margin_delta = 5.53
+  echo_margin_delta = 11.63
+
+GLM4 answer_list -> drift:next_task_or_format
+  best step = 10
+  best layer = 35
+  score = 149.42
+  residual_norm_delta = -31.03
+  prose_margin_delta = -5.09
+  echo_margin_delta = -3.78
+
+GLM4 answer_list -> drift:repeat_answer
+  best step = 8
+  best layer = 29
+  score = 135.61
+  residual_norm_delta = 11.45
+  prose_margin_delta = 8.01
+  echo_margin_delta = 2.08
+
+DS7B answer_explain -> drift:other_or_wrong
+  best step = 7
+  best layer = 26
+  score = 133.46
+  residual_norm_delta = 132.97
+  prose_margin_delta = -3.72
+  echo_margin_delta = 11.00
+
+qwen3 answer_list -> drift:short_answer
+  best step = 9
+  best layer = 32
+  score = 126.87
+  residual_norm_delta = -74.96
+  prose_margin_delta = -38.27
+  echo_margin_delta = -30.79
+
+DS7B answer_list -> drift:other_or_wrong
+  best step = 7
+  best layer = 24
+  score = 111.87
+  residual_norm_delta = 99.68
+  prose_margin_delta = 0.65
+  echo_margin_delta = 10.21
+```
+
+### 五、主要发现
+
+第一，Phase211 和 Phase210 的层级结果基本一致。
+
+Phase210 发现模式分离高响应区：
+
+```text
+qwen3: layer 34 / 32 / 26；
+GLM4: layer 38 / 35 / 29；
+DS7B: layer 26 / 24 / 20。
+```
+
+Phase211 的高分切换点也主要集中在：
+
+```text
+qwen3 layer 32；
+GLM4 layer 29 / 35；
+DS7B layer 24 / 26。
+```
+
+这说明 Phase210 的后层/中后层分离不是孤立现象，成功/漂移分组后仍然复现。
+
+第二，answer_list 是当前最适合继续深挖的模式。
+
+高分候选里，大量来自：
+
+```text
+qwen3 answer_list；
+GLM4 answer_list；
+DS7B answer_list。
+```
+
+它有两个优点：
+
+```text
+有成功样本；
+有多种漂移方向；
+能形成 success-vs-drift 对照。
+```
+
+第三，GLM4 的 answer_list 很适合研究模式漂移。
+
+GLM4 的 answer_list 有多个 drift group：
+
+```text
+short_answer；
+echo_then_answer；
+next_task_or_format；
+repeat_answer；
+other_or_wrong。
+```
+
+这些漂移在 layer 29 / 35、step 8 / 10 附近出现较强候选差异。
+
+第四，qwen3 的 answer_list 漂移有强边界特征。
+
+例如：
+
+```text
+qwen3 answer_list -> other_or_wrong:
+prose_margin_delta = -38.29
+echo_margin_delta = -16.45
+
+qwen3 answer_list -> short_answer:
+prose_margin_delta = -38.27
+echo_margin_delta = -30.79
+```
+
+这说明 qwen3 的 list 成功和 drift 之间，可能不是单纯 residual norm 差异，而是 prose/echo/target 等边界代理共同变化。
+
+第五，DS7B 的高分候选样本量仍小，但层位非常一致。
+
+DS7B 的 answer_explain / answer_list 漂移候选出现在：
+
+```text
+layer 26 / 24；
+step 7。
+```
+
+这和 Phase210 的 DS7B 高差分层一致。但由于 DS7B 样本量小，仍只能作为候选证据。
+
+### 六、问题和硬伤
+
+第一，本轮没有重新跑模型，也没有做因果干预。
+
+这不是缺点，而是阶段选择：Phase211 是切换点候选图谱，不是闭合验证。
+
+第二，本轮只使用 Phase210 已保存的 scalar metrics。
+
+也就是说，Phase211 没有原始 hidden-state 向量，只能比较：
+
+```text
+residual_norm；
+residual_mean；
+residual_std；
+rank/margin。
+```
+
+不能计算 success-vs-drift 的真实向量方向。
+
+第三，switchpoint_score 是启发式。
+
+它用于排序候选点，不是严格数学定理。不同归一化方式可能改变排名。
+
+第四，成功/失败标签仍依赖 Phase210 的启发式模式分类器。
+
+如果分类器误判，switchpoint 候选也会受影响。
+
+第五，部分 drift group 样本数很少。
+
+例如 DS7B 的样本总量仍偏小，GLM4 某些 drift group 也可能样本不足。不能把单个高分点当成结论。
+
+第六，仍未覆盖 prompt token-level 触发过程。
+
+Phase211 仍然基于生成步 last-token state，没有观察 prompt 中模式触发词的局部状态。
+
+### 七、理论进展
+
+当前理论不改名，只增加“切换点”概念。
+
+模式运行公式保持：
+
+$$
+\boxed{
+h_{t+1}
+=
+\sum_k
+\alpha_k(x,t)T_k(h_t)
++
+\varepsilon_t
+}
+$$
+
+Phase211 增加：
+
+$$
+\boxed{
+\mathrm{SwitchPoint}(P_i \to P_j)
+=
+\arg\max_{l,t}
+D
+\left(
+\Gamma_{\mathrm{success}}(P_i,l,t),
+\Gamma_{\mathrm{drift}}(P_j,l,t)
+\right)
+}
+$$
+
+其中：
+
+```text
+SwitchPoint = 模式从目标轨迹分叉到漂移轨迹的候选层-步位置；
+D = 状态/边界代理差异；
+\Gamma_success = 成功轨迹；
+\Gamma_drift = 漂移轨迹。
+```
+
+当前严格表述应为：
+
+```text
+Phase211 找到的是 SwitchPointCandidate（切换点候选），不是 SwitchPointCause（切换点因果）。
+```
+
+闭合标准不变：
+
+$$
+\boxed{
+\mathrm{ModelClose}
+=
+\mathrm{AnswerCorrect}
+\land
+\mathrm{PatternMatched}
+\land
+\mathrm{BoundaryStable}
+\land
+\mathrm{DoneStateStable}
+\land
+\mathrm{ModelStopExecuted}
+\land
+\mathrm{NoDrift}
+}
+$$
+
+Phase211 的作用是服务于：
+
+```text
+PatternMatched；
+NoDrift；
+BoundaryStable。
+```
+
+### 八、当前阶段目标判断
+
+当前任务和下一任务仍属于同一阶段性目标：
+
+```text
+完成语言编码机制的全局图谱拼图。
+```
+
+Phase209 到 Phase211 的连续进展是：
+
+```text
+Phase209:
+  输出模式图谱，证明模式竞争和漂移。
+
+Phase210:
+  内部状态差分图谱，证明模式在 hidden-state 代理中可分。
+
+Phase211:
+  成功/失败切换点候选图谱，缩小因果验证范围。
+```
+
+### 九、下一阶段任务
+
+下一阶段应进入：
+
+```text
+Phase212: 小规模切换点因果验证
+```
+
+不建议大规模 patch。应选择 2 到 4 个最清楚候选：
+
+```text
+1. qwen3 answer_list success vs other_or_wrong
+   layer 32, step 11
+
+2. qwen3 answer_list success vs short_answer
+   layer 32, step 9
+
+3. GLM4 answer_list success vs repeat_answer / echo_then_answer
+   layer 29 / 35, step 8
+
+4. DS7B answer_explain success vs other_or_wrong
+   layer 26, step 7
+   但 DS7B 样本少，作为低权重验证。
+```
+
+因果验证方式：
+
+```text
+1. success mean state -> drift trajectory patch；
+2. drift mean state -> success trajectory patch；
+3. 只 patch 一个 layer-step；
+4. 观察输出模式是否改变；
+5. 记录 target/prose/echo/stop/EOS 边界变化；
+6. 不追求一次闭合，只判断候选点是否有方向性因果影响。
+```
+
+通俗总结：Phase211 没有证明“某个层控制某个模式”，但把搜索范围缩小了。现在最值得验证的是 list 模式的成功/漂移分叉，尤其 qwen3 的 layer 32 和 GLM4 的 layer 29/35。下一步只做少量精确干预，看看这些候选点是不是能真的推动模式从漂移回到目标轨迹。

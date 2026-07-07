@@ -1,0 +1,4732 @@
+{
+  "schema_version": "phase208_cross_model_summary_v1",
+  "phase": 208,
+  "source_phase": 207,
+  "round": "decode_config_eos_boundary_audit",
+  "status": "complete",
+  "timestamp": "2026-07-06 17:12:51",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "total_eos_positive_count": 1,
+  "model_summaries": [
+    {
+      "phase": 208,
+      "source_phase": 207,
+      "title": "Decode Config Audit and EOS Induction Boundary Search",
+      "model": "qwen3",
+      "prompt_protocols": [
+        "short_answer",
+        "stop_explicit",
+        "eos_instruction",
+        "final_answer",
+        "chat_eos"
+      ],
+      "sampling_temperatures": [
+        0.7,
+        1.0
+      ],
+      "sampling_seeds": [
+        11,
+        23,
+        37
+      ],
+      "status": "complete",
+      "timestamp": "2026-07-06 17:03:07",
+      "sample_count": 360,
+      "selected_relation_language_pairs": [
+        "color:en->en",
+        "color:en->zh",
+        "color:zh->en",
+        "color:zh->zh",
+        "function:en->en",
+        "function:zh->en",
+        "function:zh->zh"
+      ],
+      "selected_phase940_bridge_rows": [
+        {
+          "relation": "function",
+          "language_pair": "zh->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 76,
+          "relation_margin_delta_mean": 0.834703947368421,
+          "boundary_margin_delta_mean": 0.5370065789473685,
+          "period_margin_delta_mean": 0.5522203947368421,
+          "eos_margin_delta_mean": 0.5946751644736842,
+          "boundary_logit_delta_mean": -0.060032894736842105,
+          "control_best_boundary_margin_delta": -0.18009868421052633,
+          "boundary_bridge_gain_vs_best_control": 0.7171052631578948,
+          "joint_bridge_score": 0.5370065789473685,
+          "rank_improved": 32,
+          "new_relation_winner_target": 11
+        },
+        {
+          "relation": "color",
+          "language_pair": "en->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 54,
+          "relation_margin_delta_mean": 0.4097222222222222,
+          "boundary_margin_delta_mean": 0.65625,
+          "period_margin_delta_mean": 0.6226851851851852,
+          "eos_margin_delta_mean": 0.7415974934895834,
+          "boundary_logit_delta_mean": -0.08101851851851852,
+          "control_best_boundary_margin_delta": 0.03587962962962963,
+          "boundary_bridge_gain_vs_best_control": 0.6203703703703703,
+          "joint_bridge_score": 0.4097222222222222,
+          "rank_improved": 25,
+          "new_relation_winner_target": 3
+        },
+        {
+          "relation": "color",
+          "language_pair": "zh->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 108,
+          "relation_margin_delta_mean": 0.2957175925925926,
+          "boundary_margin_delta_mean": 0.4357638888888889,
+          "period_margin_delta_mean": 0.42476851851851855,
+          "eos_margin_delta_mean": 0.4835171169704861,
+          "boundary_logit_delta_mean": -0.019675925925925927,
+          "control_best_boundary_margin_delta": -0.02546296296296296,
+          "boundary_bridge_gain_vs_best_control": 0.46122685185185186,
+          "joint_bridge_score": 0.2957175925925926,
+          "rank_improved": 47,
+          "new_relation_winner_target": 5
+        },
+        {
+          "relation": "color",
+          "language_pair": "zh->zh",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 54,
+          "relation_margin_delta_mean": 0.3975694444444444,
+          "boundary_margin_delta_mean": 0.5005787037037037,
+          "period_margin_delta_mean": 0.46122685185185186,
+          "eos_margin_delta_mean": 0.5180121527777778,
+          "boundary_logit_delta_mean": -0.0763888888888889,
+          "control_best_boundary_margin_delta": 0.3263888888888889,
+          "boundary_bridge_gain_vs_best_control": 0.17418981481481483,
+          "joint_bridge_score": 0.17418981481481483,
+          "rank_improved": 53,
+          "new_relation_winner_target": 4
+        },
+        {
+          "relation": "color",
+          "language_pair": "en->zh",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 108,
+          "relation_margin_delta_mean": 0.5911458333333334,
+          "boundary_margin_delta_mean": 0.7051504629629629,
+          "period_margin_delta_mean": 0.8214699074074074,
+          "eos_margin_delta_mean": 0.8065643310546875,
+          "boundary_logit_delta_mean": -0.09259259259259259,
+          "control_best_boundary_margin_delta": 0.5717592592592593,
+          "boundary_bridge_gain_vs_best_control": 0.1333912037037036,
+          "joint_bridge_score": 0.1333912037037036,
+          "rank_improved": 108,
+          "new_relation_winner_target": 10
+        },
+        {
+          "relation": "function",
+          "language_pair": "en->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 38,
+          "relation_margin_delta_mean": 0.90625,
+          "boundary_margin_delta_mean": 0.6282894736842105,
+          "period_margin_delta_mean": 0.5279605263157895,
+          "eos_margin_delta_mean": 0.8104440789473685,
+          "boundary_logit_delta_mean": 0.06578947368421052,
+          "control_best_boundary_margin_delta": 0.569078947368421,
+          "boundary_bridge_gain_vs_best_control": 0.05921052631578949,
+          "joint_bridge_score": 0.05921052631578949,
+          "rank_improved": 17,
+          "new_relation_winner_target": 5
+        },
+        {
+          "relation": "function",
+          "language_pair": "zh->zh",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 38,
+          "relation_margin_delta_mean": 0.36800986842105265,
+          "boundary_margin_delta_mean": 0.16324013157894737,
+          "period_margin_delta_mean": 0.3260690789473684,
+          "eos_margin_delta_mean": 0.4196006373355263,
+          "boundary_logit_delta_mean": -0.125,
+          "control_best_boundary_margin_delta": 0.13322368421052633,
+          "boundary_bridge_gain_vs_best_control": 0.030016447368421045,
+          "joint_bridge_score": 0.030016447368421045,
+          "rank_improved": 24,
+          "new_relation_winner_target": 1
+        }
+      ],
+      "hidden_by_relation": {
+        "category": 9,
+        "color": 36,
+        "function": 27
+      },
+      "direction_specs_all": 228,
+      "candidate_pair_count": 7,
+      "config_audit": {
+        "tokenizer_eos_token_id": 151645,
+        "tokenizer_eos_token": "<|im_end|>",
+        "tokenizer_pad_token_id": 151643,
+        "tokenizer_pad_token": "<|endoftext|>",
+        "tokenizer_bos_token_id": null,
+        "tokenizer_bos_token": null,
+        "generation_config_eos_token_id": [
+          151645,
+          151643
+        ],
+        "generation_config_pad_token_id": 151643,
+        "generation_config_forced_eos_token_id": null,
+        "generation_config_max_new_tokens": null,
+        "model_config_eos_token_id": 151645,
+        "model_config_pad_token_id": null,
+        "manual_max_steps": 32,
+        "stopping_criteria": "default generate EOS stopping for generate modes; manual greedy stops when emitted token id is in eos group"
+      },
+      "prompt_count": 96,
+      "decode_rows": 864,
+      "manual_token_rows": 3072,
+      "eos_positive_count": 0,
+      "decode_summary_rows": [
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "<think>": 19
+          },
+          "top_generated_prefixes": {
+            "<think>\nOkay, the user is asking for exactly one": 13,
+            "<think>\nOkay, the user is asking for the color o": 6
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " The": 15,
+            " red": 4
+          },
+          "top_generated_prefixes": {
+            " The color of a horse is\nAnswer: brown. The colo": 4,
+            " The color of a dog is brown. Done. Brown. Done.": 4,
+            " The color of a wood is\nAnswer: brown. The color": 4,
+            " red. Done. red. red. red. red. red. red. red. r": 3,
+            " The color of a cherry is red. Done. red. Done. ": 2,
+            " red\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 12,
+            " red": 7
+          },
+          "top_generated_prefixes": {
+            " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+            " brown\nOkay, the question is about a dog and its": 4,
+            " brown\nOkay, the question is about the color of ": 4,
+            " red\nOkay, the question is about the color of an": 3,
+            " red\nOkay, the question is about the object \"che": 2,
+            " red\nOkay, the question is about a \"cardinal\" ob": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 20,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 8,
+            " black": 8,
+            " brown": 4
+          },
+          "top_generated_prefixes": {
+            " black.\nAnswer: black\n\nThe color of a horse is b": 4,
+            " black. The color of a cat is white. The color o": 4,
+            " brown. The color of a apple is red. The color o": 4,
+            " red.\nAnswer: red\n\nThe color of a cherry is red.": 3,
+            " red.\nAnswer: red\n\nThe color of a banana is yell": 2,
+            " red.\nAnswer: red\n\nThe color of a hummingbird is": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " black": 8,
+            " red": 7,
+            " brown": 4
+          },
+          "top_generated_prefixes": {
+            " black.\nThe answer is black. The color of a hors": 4,
+            " black.\nThe answer is black. The color of a dog ": 4,
+            " brown.\nThe color of a wood is brown. The color ": 4,
+            " red. The color of a banana is yellow. The color": 3,
+            " red.\nAnswer: red. The color of a cherry is red.": 2,
+            " red.\nAnswer: red. The color of a cardinal is re": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "<think>": 19
+          },
+          "top_generated_prefixes": {
+            "<think>\nOkay, the user is asking for exactly one": 13,
+            "<think>\nOkay, the user is asking for the color o": 6
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " The": 15,
+            " red": 4
+          },
+          "top_generated_prefixes": {
+            " The answer is: brown. The color of a horse is b": 4,
+            " The color of a dog is brown. brown. Done. brown": 4,
+            " The answer is:\n\nBrown. \n\nBrown. \n\nBrown. \n\nBrow": 4,
+            " red. Done. red. Done. red. Done. red. Done. red": 3,
+            " The answer is: red. The color of a cherry is re": 2,
+            " red\nred\n\nred. Done. The color of a cardinal is ": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 12,
+            " red": 7
+          },
+          "top_generated_prefixes": {
+            " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+            " brown\nOkay, the question is about a dog and its": 4,
+            " brown\nOkay, the question is about the color of ": 4,
+            " red\nOkay, the question is about the color of an": 3,
+            " red\nOkay, the question is about the object \"che": 2,
+            " red\nOkay, the question is about a \"cardinal\" an": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 20,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 8,
+            " black": 8,
+            " brown": 4
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 6,
+            " black. The color of a dog is brown. The color o": 4,
+            " black. The color of a cat is white. The color o": 4,
+            " brown. The color of a flower is pink. The color": 4,
+            " red. The color of a hummingbird is red. The col": 1,
+            " red. The color of a dress is blue. The color of": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 8,
+            " red": 7,
+            " black": 4
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 5,
+            " black.\nThe answer is black. The color of a hors": 4,
+            " brown.\nThe answer is brown. The color of a dog ": 4,
+            " brown. The color of a flower is red. The color ": 4,
+            " red. The color of a hummingbird is red. The col": 1,
+            " red. The color of a bird is blue. The color of ": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "chat_eos",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "<think>": 57
+          },
+          "top_generated_prefixes": {
+            "<think>\nOkay, the user is asking for exactly one": 38,
+            "<think>\nOkay, the user is asking for the color o": 19
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "chat_eos",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "<think>": 57
+          },
+          "top_generated_prefixes": {
+            "<think>\nOkay, the user is asking for exactly one": 37,
+            "<think>\nOkay, the user is asking for the color o": 20
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "eos_instruction",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " The": 34,
+            " red": 11,
+            " If": 4,
+            " You": 2,
+            " \n\n": 2,
+            " Please": 2,
+            " black": 1,
+            " brown": 1
+          },
+          "top_generated_prefixes": {
+            " The answer is:\nAnswer: brown. The answer is: br": 3,
+            " The color of a dog is brown. Done. Brown. Done.": 2,
+            " red. Done. red. \n\nWait, the user asked to answe": 1,
+            " red. \n\nEnd of response. \n\nWait, I think I need ": 1,
+            " red. Done. red. Done. red. Done. red. Done. red": 1,
+            " If the answer is not a color, you will be marke": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "eos_instruction",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " The": 21,
+            " red": 10,
+            " If": 7,
+            " You": 4,
+            " brown": 3,
+            " Please": 3,
+            " Black": 2,
+            " black": 1
+          },
+          "top_generated_prefixes": {
+            " red\nOkay, the user is asking for the color of a": 1,
+            " red. \n\nEnd of response. \n\nWait, I think I need ": 1,
+            " red. \n\nDone.  (The system may have a specific f": 1,
+            " If the answer is not a color, repeat the proces": 1,
+            " red\n\nThe color of an apple is red. (Note: This ": 1,
+            " red. Done. The color of a cherry is red. Done. ": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_answer",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 35,
+            " red": 21,
+            " black": 1
+          },
+          "top_generated_prefixes": {
+            " brown\nOkay, the question is about the color of ": 12,
+            " brown\nQuestion object: horse\nRelation: color\nAn": 9,
+            " brown\nOkay, the question is about a dog and its": 8,
+            " red\nOkay, the question is about the color of an": 4,
+            " brown\nQuestion object: cat\nRelation: color\nAnsw": 4,
+            " red\n\nQuestion object: sky\nRelation: color\nAnswe": 4
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_answer",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 35,
+            " red": 21,
+            " black": 1
+          },
+          "top_generated_prefixes": {
+            " brown\nOkay, the question is about the color of ": 11,
+            " brown\nQuestion object: horse\nRelation: color\nAn": 7,
+            " brown\nOkay, the question is about a dog and its": 6,
+            " brown\nQuestion object: cat\nRelation: color\nAnsw": 4,
+            " red\n\nQuestion object: sky\nRelation: color\nAnswe": 4,
+            " red\nOkay, the question is about the color of a ": 3
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "short_answer",
+          "temperature": 0.7,
+          "rows": 60,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 20,
+            " black": 12,
+            " brown": 10,
+            "...": 5,
+            " a": 3,
+            " usually": 3,
+            " determined": 3,
+            " typically": 1
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 3,
+            " black. The color of a cat is white. What is the": 2,
+            " brown. The color of a cat is black. The color o": 2,
+            " red. The answer is red. The color of a banana i": 2,
+            " brown.\nAnswer: brown\n\nThe color of a dog is bro": 2,
+            " black.\nAnswer: black\n\nThe color of a horse is b": 2
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "short_answer",
+          "temperature": 1.0,
+          "rows": 60,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 16,
+            " black": 9,
+            " brown": 7,
+            " typically": 5,
+            " a": 3,
+            " the": 3,
+            "...": 3,
+            " yellow": 2
+          },
+          "top_generated_prefixes": {
+            " black. The color of a cat is white. What is the": 2,
+            " brown.\n\nAnswer: brown\n\nOkay, the user wants me ": 2,
+            " typically red, but if it's a green apple, what ": 1,
+            " typically?\nAnswer: Red.\n\nThe color of a cherry ": 1,
+            " red. What is the color of a hummingbird? red\nAn": 1,
+            " yellow. The color of a flower is red. The color": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "stop_explicit",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 20,
+            " brown": 20,
+            " black": 10,
+            " green": 2,
+            " usually": 2,
+            " blue": 1,
+            " dark": 1,
+            " yellow": 1
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 6,
+            " black.\nThe answer is black. The color of a hors": 4,
+            " black.\nThe answer is black. The color of a dog ": 4,
+            " brown.\nThe answer is brown. The color of a dog ": 4,
+            " brown.\nThe answer is brown. The color of a hors": 3,
+            " brown. The color of a sky is blue. The color of": 2
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "stop_explicit",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 31.982456140350877,
+          "top_first_tokens": {
+            " red": 19,
+            " brown": 19,
+            " black": 9,
+            " green": 3,
+            " usually": 2,
+            " a": 1,
+            "...": 1,
+            " dark": 1
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 5,
+            " black.\nThe answer is black. The color of a hors": 4,
+            " black.\nThe answer is black. The color of a dog ": 4,
+            " red.\n\nAnswer: red. The color of a cherry is red": 2,
+            " brown.\n\nThe color of the horse is brown. So, th": 2,
+            " brown.\nThe answer is brown. The color of a dog ": 2
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "<think>": 19
+          },
+          "top_generated_prefixes": {
+            "<think>\nOkay, the user is asking for exactly one": 13,
+            "<think>\nOkay, the user is asking for the color o": 6
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " The": 15,
+            " red": 4
+          },
+          "top_generated_prefixes": {
+            " The answer is: brown. The color of a horse is b": 4,
+            " The color of a dog is brown. brown. Done. brown": 4,
+            " The color of a wood is\nAnswer:\nbrown. Answer: b": 4,
+            " red. Done. red. Done. red. Done. red. Done. red": 3,
+            " The color of a cherry is red. Done. red. Done. ": 2,
+            " red\nred\n\nred. End of response. End of response.": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 12,
+            " red": 7
+          },
+          "top_generated_prefixes": {
+            " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+            " brown\nOkay, the question is about a dog and its": 4,
+            " brown\nOkay, the question is about the color of ": 4,
+            " red\nOkay, the question is about the color of an": 3,
+            " red\nOkay, the question is about the object \"che": 2,
+            " red\nOkay, the question is about a \"cardinal\" ob": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 20,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 8,
+            " black": 8,
+            " brown": 4
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 6,
+            " black. The color of a dog is brown. The color o": 4,
+            " black. The color of a cat is white. The color o": 4,
+            " brown. The color of a flower is pink. The color": 4,
+            " red. The color of a hummingbird is red. The col": 1,
+            " red. The color of a dress is blue. The color of": 1
+          }
+        },
+        {
+          "model": "qwen3",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " brown": 8,
+            " red": 7,
+            " black": 4
+          },
+          "top_generated_prefixes": {
+            " red. The color of a banana is yellow. The color": 5,
+            " black.\nThe answer is black. The color of a hors": 4,
+            " brown.\nThe answer is brown. The color of a dog ": 4,
+            " brown. The color of a flower is red. The color ": 4,
+            " red. The color of a bluebird is blue. The color": 1,
+            " red. The color of a bird is blue. The color of ": 1
+          }
+        }
+      ],
+      "manual_generate_compare_summary": {
+        "rows": 96,
+        "first_token_matches": 96,
+        "manual_eos": 0,
+        "generate_eos": 0
+      },
+      "boundary": "Decode audit only. Sampling EOS, if any, is stochastic and must not be merged with greedy ModelStopExecuted."
+    },
+    {
+      "phase": 208,
+      "source_phase": 207,
+      "title": "Decode Config Audit and EOS Induction Boundary Search",
+      "model": "glm4",
+      "prompt_protocols": [
+        "short_answer",
+        "stop_explicit",
+        "eos_instruction",
+        "final_answer",
+        "chat_eos"
+      ],
+      "sampling_temperatures": [
+        0.7,
+        1.0
+      ],
+      "sampling_seeds": [
+        11,
+        23,
+        37
+      ],
+      "status": "complete",
+      "timestamp": "2026-07-06 17:09:20",
+      "sample_count": 360,
+      "selected_relation_language_pairs": [
+        "color:en->en",
+        "color:zh->en",
+        "color:zh->zh",
+        "function:en->en",
+        "function:zh->en"
+      ],
+      "selected_phase940_bridge_rows": [
+        {
+          "relation": "color",
+          "language_pair": "en->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 54,
+          "relation_margin_delta_mean": 4.008716724537037,
+          "boundary_margin_delta_mean": 12.123878761574074,
+          "period_margin_delta_mean": 13.44773582175926,
+          "eos_margin_delta_mean": 9.686885127314815,
+          "boundary_logit_delta_mean": -1.3622685185185186,
+          "control_best_boundary_margin_delta": 10.499168113425926,
+          "boundary_bridge_gain_vs_best_control": 1.6247106481481488,
+          "joint_bridge_score": 1.6247106481481488,
+          "rank_improved": 54,
+          "new_relation_winner_target": 25
+        },
+        {
+          "relation": "function",
+          "language_pair": "zh->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 76,
+          "relation_margin_delta_mean": 4.0327919407894735,
+          "boundary_margin_delta_mean": 10.861533717105264,
+          "period_margin_delta_mean": 8.02184416118421,
+          "eos_margin_delta_mean": 9.379396137438322,
+          "boundary_logit_delta_mean": -0.555921052631579,
+          "control_best_boundary_margin_delta": 10.573910361842104,
+          "boundary_bridge_gain_vs_best_control": 0.2876233552631593,
+          "joint_bridge_score": 0.2876233552631593,
+          "rank_improved": 76,
+          "new_relation_winner_target": 50
+        },
+        {
+          "relation": "color",
+          "language_pair": "zh->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 108,
+          "relation_margin_delta_mean": 4.361870659722222,
+          "boundary_margin_delta_mean": 12.258138020833334,
+          "period_margin_delta_mean": 13.78396267361111,
+          "eos_margin_delta_mean": 9.97175767686632,
+          "boundary_logit_delta_mean": -1.1799768518518519,
+          "control_best_boundary_margin_delta": 12.044885706018519,
+          "boundary_bridge_gain_vs_best_control": 0.21325231481481488,
+          "joint_bridge_score": 0.21325231481481488,
+          "rank_improved": 108,
+          "new_relation_winner_target": 56
+        },
+        {
+          "relation": "function",
+          "language_pair": "en->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 19,
+          "relation_margin_delta_mean": 3.7820723684210527,
+          "boundary_margin_delta_mean": 12.209292763157896,
+          "period_margin_delta_mean": 5.9106702302631575,
+          "eos_margin_delta_mean": 8.481650904605264,
+          "boundary_logit_delta_mean": -0.7631578947368421,
+          "control_best_boundary_margin_delta": 12.08922697368421,
+          "boundary_bridge_gain_vs_best_control": 0.12006578947368496,
+          "joint_bridge_score": 0.12006578947368496,
+          "rank_improved": 19,
+          "new_relation_winner_target": 12
+        },
+        {
+          "relation": "color",
+          "language_pair": "zh->zh",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 54,
+          "relation_margin_delta_mean": 0.5956307870370371,
+          "boundary_margin_delta_mean": 1.1805555555555556,
+          "period_margin_delta_mean": 0.42592592592592593,
+          "eos_margin_delta_mean": -0.17753092447916666,
+          "boundary_logit_delta_mean": -0.7835648148148148,
+          "control_best_boundary_margin_delta": 1.1571180555555556,
+          "boundary_bridge_gain_vs_best_control": 0.0234375,
+          "joint_bridge_score": 0.0234375,
+          "rank_improved": 30,
+          "new_relation_winner_target": 9
+        }
+      ],
+      "hidden_by_relation": {
+        "category": 10,
+        "color": 30,
+        "function": 30
+      },
+      "direction_specs_all": 192,
+      "candidate_pair_count": 5,
+      "config_audit": {
+        "tokenizer_eos_token_id": 151329,
+        "tokenizer_eos_token": "<|endoftext|>",
+        "tokenizer_pad_token_id": 151329,
+        "tokenizer_pad_token": "<|endoftext|>",
+        "tokenizer_bos_token_id": null,
+        "tokenizer_bos_token": null,
+        "generation_config_eos_token_id": [
+          151329,
+          151336,
+          151338
+        ],
+        "generation_config_pad_token_id": 151329,
+        "generation_config_forced_eos_token_id": null,
+        "generation_config_max_new_tokens": null,
+        "model_config_eos_token_id": [
+          151329,
+          151336,
+          151338
+        ],
+        "model_config_pad_token_id": 151329,
+        "manual_max_steps": 32,
+        "stopping_criteria": "default generate EOS stopping for generate modes; manual greedy stops when emitted token id is in eos group"
+      },
+      "prompt_count": 96,
+      "decode_rows": 864,
+      "manual_token_rows": 3072,
+      "eos_positive_count": 0,
+      "decode_summary_rows": [
+        {
+          "model": "glm4",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 19
+          },
+          "top_generated_prefixes": {
+            "\nRed<|user|>\nCertainly! If you have any more que": 8,
+            "\nBrown<|user|>\nCertainly! If you have any more q": 5,
+            "\nRed<|user|>\nThe color of a sky on a clear day i": 4,
+            "\nBay<|user|>\nCertainly! If you have any more que": 1,
+            "\npull<|user|>\nIt seems you've responded with the": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " Do": 19
+          },
+          "top_generated_prefixes": {
+            " Do not provide any additional information, such": 15,
+            " Do not provide any additional information or co": 4
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 12,
+            " brown": 6,
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            " red\nQuestion object: apple\nRelation: taste\nAnsw": 4,
+            " red\nQuestion object: cherry\nRelation: shape\nAns": 4,
+            " red\nQuestion object: cardinal\nRelation: color\nA": 2,
+            " red\nQuestion object: car\nRelation: color\nAnswer": 2,
+            " brown\nQuestion object: horse\nRelation: color\nAn": 2,
+            " brown\nQuestion object: dog\nRelation: color\nAnsw": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 20,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ______": 10,
+            " __": 4,
+            ":\n": 2,
+            " brown": 2,
+            " ride": 1,
+            " be": 1
+          },
+          "top_generated_prefixes": {
+            " __________.\nThe color of an apple is red. Howev": 4,
+            " ________.\nThe color of a cherry is red. Therefo": 4,
+            ":\nThe color of a cardinal is red. Cardinals are ": 2,
+            " ________.\nThe color of a car is blue.\nThe color": 2,
+            " ________.\nThe color of a horse is brown. Howeve": 2,
+            " ________.\nThe color of a dog is brown.\nThe colo": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ______": 18,
+            " ride": 1
+          },
+          "top_generated_prefixes": {
+            " ________.\nThe color of an apple is red. However": 4,
+            " ________.\nThe color of a cherry is red. However": 4,
+            " ________.\nThe color of a cardinal is red. Howev": 2,
+            " ________.\nThe color of a car is ________.\nThe c": 2,
+            " ________.\nThe color of a dog is brown.\nThe colo": 2,
+            " ________.\nThe color of a wood is brown.\nThe col": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 19
+          },
+          "top_generated_prefixes": {
+            "\nBrown<|user|>\nCertainly! If you have any more q": 6,
+            "\nRed<|user|>\nThe color of a sky on a clear day i": 4,
+            "\nRed<|user|>\nThe color of a cherry is indeed red": 4,
+            "\nRed<|user|>\nIt seems like you've provided an an": 2,
+            "\nRed<|user|>\nCertainly! If you have any more que": 2,
+            "\ncarry<|user|>\nIt seems you've provided a verb, ": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " Do": 19
+          },
+          "top_generated_prefixes": {
+            " Do not add any additional information or explan": 18,
+            " Do not add any additional information, such as ": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 12,
+            " brown": 6,
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            " red\nQuestion object: apple\nRelation: taste\nAnsw": 4,
+            " red\nQuestion object: cherry\nRelation: taste\nAns": 4,
+            " red\nQuestion object: cardinal\nRelation: size\nAn": 2,
+            " red\nQuestion object: car\nRelation: color\nAnswer": 2,
+            " brown\nQuestion object: horse\nRelation: color\nAn": 2,
+            " brown\nQuestion object: dog\nRelation: size\nAnswe": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 20,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ______": 10,
+            ":\n": 6,
+            " called": 2,
+            " ride": 1,
+            " be": 1
+          },
+          "top_generated_prefixes": {
+            " ________.\nThe color of an apple is red. However": 4,
+            ":\nThe color of a cherry is typically:\nThe color ": 4,
+            ":\nThe color of a cardinal is red. So, the answer": 2,
+            " ________.\nThe color of a car is red.\nThe color ": 2,
+            " ________.\nThe color of a horse is brown.\nHoweve": 2,
+            " ________.\nThe color of a dog is brown.\nThe colo": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            ":\n": 8,
+            " ______": 6,
+            " __": 4,
+            " ride": 1
+          },
+          "top_generated_prefixes": {
+            " __________.\nThe color of an apple is red. Howev": 4,
+            ":\nThe color of a cherry is:\nThe color of a cherr": 4,
+            ":\nThe color of a cardinal is red. This is the co": 2,
+            " ________.\nThe color of a car is red. (One color": 2,
+            " ________.\nThe color of a horse is brown. Howeve": 2,
+            " ________.\nThe color of a dog is brown. However,": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "chat_eos",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 57
+          },
+          "top_generated_prefixes": {
+            "\nRed<|user|>\nCertainly! If you have another ques": 3,
+            "\nRed<|user|>\nI apologize for the oversight. To p": 1,
+            "\nRed<|user|>\nTo determine if a number is prime o": 1,
+            "\nRed<|user|>\nThe color of a cardinal's feathers ": 1,
+            "\nred<|user|>\nTo determine the color of a car, yo": 1,
+            "\nRed<|user|>\nIf you are in a situation where you": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "chat_eos",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 57
+          },
+          "top_generated_prefixes": {
+            "\nRed<|user|>\nI was looking for information about": 1,
+            "\nRed<|user|>\nTo determine if a number is prime o": 1,
+            "\nRed<|user|>\n**Blue**<|user|>\nBlue<|user|>\nBlue<": 1,
+            "\nred<|user|>\nTo help you out, I'll provide the f": 1,
+            "\nRed<|user|>\nIf a child's bedroom is decorated i": 1,
+            "\nRed<|user|>\nSure, here's a color for you:\n\nEmer": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "eos_instruction",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " Do": 37,
+            " No": 14,
+            " If": 1,
+            " There": 1,
+            " Thank": 1,
+            " The": 1,
+            " You": 1,
+            " Don": 1
+          },
+          "top_generated_prefixes": {
+            " Do not add any additional text or explanations.": 3,
+            " Do not add any additional information or explan": 2,
+            " Do not add any additional sentences, even if th": 2,
+            " Do not provide any additional information or ex": 2,
+            " No explanation is required.\nThe color of an app": 1,
+            " Do not continue to explain or discuss.\nThe colo": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "eos_instruction",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " Do": 28,
+            " No": 12,
+            " If": 4,
+            " There": 3,
+            " You": 2,
+            " The": 2,
+            " Your": 1,
+            " Thank": 1
+          },
+          "top_generated_prefixes": {
+            " Do not add any additional sentences, even if th": 2,
+            " No explanation is required.\nThe color of an app": 1,
+            " Do not continue to talk after giving the answer": 1,
+            " Do not elaborate or provide additional informat": 1,
+            " No additional text or explanations are allowed.": 1,
+            " Do not start a new line. Here is a sample respo": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_answer",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 33,
+            " brown": 14,
+            " white": 2,
+            " eat": 2,
+            " black": 2,
+            " green": 2,
+            " blue": 1,
+            " \"": 1
+          },
+          "top_generated_prefixes": {
+            " red\nQuestion object: apple\nRelation: shape\nAnsw": 3,
+            " red\nQuestion object: cardinal\nRelation: size\nAn": 3,
+            " brown\nQuestion object: horse\nRelation: size\nAns": 3,
+            " brown\nQuestion object: dog\nRelation: color\nAnsw": 3,
+            " red\nQuestion object: cherry\nRelation: shape\nAns": 3,
+            " red\nQuestion object: cherry\nRelation: taste\nAns": 3
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_answer",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 29,
+            " brown": 12,
+            " \"": 3,
+            " eat": 2,
+            " black": 2,
+            " green": 2,
+            " RED": 1,
+            " bay": 1
+          },
+          "top_generated_prefixes": {
+            " red, green, yellow, orange, purple, pink, white": 1,
+            " red\nQuestion object: apple\nRelation: shape\nAnsw": 1,
+            " \"red\" or \"crimson\" or \"scarlet\"\nThe following q": 1,
+            " RED, GREEN, BLUE, YELLOW\nPlease note that the r": 1,
+            " red\nI've been trying to write a function that w": 1,
+            " red\nTo make sure you're doing it correctly, you": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "short_answer",
+          "temperature": 0.7,
+          "rows": 60,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            ":\n": 11,
+            " ______": 9,
+            " __": 8,
+            ":": 4,
+            " red": 3,
+            " __________________": 3,
+            " called": 3,
+            " brown": 2
+          },
+          "top_generated_prefixes": {
+            " ...\nThe color of an apple is ...\nI would go wit": 1,
+            " ________.\nThe color of a cherry is red. So, the": 1,
+            "...\nAnswer with one English color word only. The": 1,
+            " ________.\nThe color of the car is ________.\nThe": 1,
+            " ________.\nThe color of an apple is red.\nHowever": 1,
+            ":\nRed is the correct color word for the color of": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "short_answer",
+          "temperature": 1.0,
+          "rows": 60,
+          "ended_with_eos": 0,
+          "avg_steps": 31.483333333333334,
+          "top_first_tokens": {
+            " ______": 6,
+            ":\n": 6,
+            " __": 5,
+            ":": 4,
+            " __________________": 4,
+            "...\n": 3,
+            " called": 3,
+            " ...\n": 2
+          },
+          "top_generated_prefixes": {
+            " ...\n- green\n- red\n- yellow\n- white\nThere is als": 1,
+            " ________.\nThe color of a cherry is red. If you ": 1,
+            "...\n#colorword\nThe color of a cardinal is...\nThe": 1,
+            " ________.\nThe color of the car is ________.\nThe": 1,
+            " _______.\nSolution: The color of an apple is red": 1,
+            ":\nRed or Dark Red\nRed is the color of cherries. ": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "stop_explicit",
+          "temperature": 0.7,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            ":\n": 14,
+            " ______": 10,
+            " __": 9,
+            ":": 3,
+            " green": 2,
+            "?\n": 2,
+            " called": 2,
+            " (": 2
+          },
+          "top_generated_prefixes": {
+            " green.\nWhat color is an apple?\nGreen. An apple ": 1,
+            " ________.\nThe color of a cherry is red. Note th": 1,
+            " ______.\nThe color of a cardinal is red. However": 1,
+            "?\na. blue\nb. green\nc. red\nd. white\nThe car is wh": 1,
+            " _______. Green.\nGreen is the color of an apple.": 1,
+            " __________.\nThe color of a cherry is red. The p": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "stop_explicit",
+          "temperature": 1.0,
+          "rows": 57,
+          "ended_with_eos": 0,
+          "avg_steps": 31.70175438596491,
+          "top_first_tokens": {
+            ":\n": 13,
+            " __": 11,
+            " ______": 4,
+            ":": 3,
+            " [": 3,
+            " green": 2,
+            " called": 2,
+            " (": 2
+          },
+          "top_generated_prefixes": {
+            " green and red.\nAn apple is green and red in col": 1,
+            " ________.\nThe color of a cherry is red. Note th": 1,
+            " __________. Answer with exactly one English col": 1,
+            "?\na. Black\nb. Red\nc. Blue\nd. Green\ne. Silver\nf. ": 1,
+            " _______. Green.\nGreen is the color of an apple.": 1,
+            " __________.\nRed, as cherries are typically red.": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 19
+          },
+          "top_generated_prefixes": {
+            "\nBrown<|user|>\nCertainly! If you have any more q": 6,
+            "\nRed<|user|>\nThe color of a sky on a clear day i": 4,
+            "\nRed<|user|>\nThe color of a cherry is indeed red": 4,
+            "\nRed<|user|>\nIt seems like you've provided an an": 2,
+            "\nblue<|user|>\nThe color of a car is blue.\n\nThe c": 2,
+            "\ncarry<|user|>\nIt seems you've provided a verb, ": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " Do": 19
+          },
+          "top_generated_prefixes": {
+            " Do not add any additional information or explan": 18,
+            " Do not add any additional information, such as ": 1
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " red": 12,
+            " brown": 6,
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            " red\nQuestion object: apple\nRelation: taste\nAnsw": 4,
+            " red\nQuestion object: cherry\nRelation: taste\nAns": 4,
+            " red\nQuestion object: cardinal\nRelation: size\nAn": 2,
+            " red\nQuestion object: car\nRelation: color\nAnswer": 2,
+            " brown\nQuestion object: horse\nRelation: color\nAn": 2,
+            " brown\nQuestion object: dog\nRelation: size\nAnswe": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 20,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ______": 10,
+            ":\n": 6,
+            " called": 2,
+            " ride": 1,
+            " be": 1
+          },
+          "top_generated_prefixes": {
+            " ________.\nThe color of an apple is red. However": 4,
+            ":\nThe color of a cherry is typically:\nThe color ": 4,
+            ":\nThe color of a cardinal is red. So, the answer": 2,
+            " ________.\nThe color of a car is red.\nThe color ": 2,
+            " ________.\nThe color of a horse is brown.\nHoweve": 2,
+            " ________.\nThe color of a dog is brown.\nThe colo": 2
+          }
+        },
+        {
+          "model": "glm4",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 19,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            ":\n": 8,
+            " ______": 6,
+            " __": 4,
+            " ride": 1
+          },
+          "top_generated_prefixes": {
+            " __________.\nThe color of an apple is red. Howev": 4,
+            ":\nThe color of a cherry is:\nThe color of a cherr": 4,
+            ":\nThe color of a cardinal is red. This is the co": 2,
+            " ________.\nThe color of a car is red. However, s": 2,
+            " ________.\nThe color of a horse is brown. Howeve": 2,
+            " ________.\nThe color of a dog is brown. However,": 2
+          }
+        }
+      ],
+      "manual_generate_compare_summary": {
+        "rows": 96,
+        "first_token_matches": 96,
+        "manual_eos": 0,
+        "generate_eos": 0
+      },
+      "boundary": "Decode audit only. Sampling EOS, if any, is stochastic and must not be merged with greedy ModelStopExecuted."
+    },
+    {
+      "phase": 208,
+      "source_phase": 207,
+      "title": "Decode Config Audit and EOS Induction Boundary Search",
+      "model": "deepseek7b",
+      "prompt_protocols": [
+        "short_answer",
+        "stop_explicit",
+        "eos_instruction",
+        "final_answer",
+        "chat_eos"
+      ],
+      "sampling_temperatures": [
+        0.7,
+        1.0
+      ],
+      "sampling_seeds": [
+        11,
+        23,
+        37
+      ],
+      "status": "complete",
+      "timestamp": "2026-07-06 17:12:38",
+      "sample_count": 360,
+      "selected_relation_language_pairs": [
+        "function:en->en"
+      ],
+      "selected_phase940_bridge_rows": [
+        {
+          "relation": "function",
+          "language_pair": "en->en",
+          "alpha": 1.0,
+          "condition": "specific_direction",
+          "rows": 38,
+          "relation_margin_delta_mean": 0.18092105263157895,
+          "boundary_margin_delta_mean": 0.07236842105263158,
+          "period_margin_delta_mean": 0.11266447368421052,
+          "eos_margin_delta_mean": 0.12746710526315788,
+          "boundary_logit_delta_mean": -0.05756578947368421,
+          "control_best_boundary_margin_delta": -0.011513157894736841,
+          "boundary_bridge_gain_vs_best_control": 0.08388157894736842,
+          "joint_bridge_score": 0.07236842105263158,
+          "rank_improved": 21,
+          "new_relation_winner_target": 1
+        }
+      ],
+      "hidden_by_relation": {
+        "category": 14,
+        "color": 7,
+        "function": 14
+      },
+      "direction_specs_all": 228,
+      "candidate_pair_count": 1,
+      "config_audit": {
+        "tokenizer_eos_token_id": 151643,
+        "tokenizer_eos_token": "<｜end▁of▁sentence｜>",
+        "tokenizer_pad_token_id": 151643,
+        "tokenizer_pad_token": "<｜end▁of▁sentence｜>",
+        "tokenizer_bos_token_id": 151646,
+        "tokenizer_bos_token": "<｜begin▁of▁sentence｜>",
+        "generation_config_eos_token_id": 151643,
+        "generation_config_pad_token_id": null,
+        "generation_config_forced_eos_token_id": null,
+        "generation_config_max_new_tokens": null,
+        "model_config_eos_token_id": 151643,
+        "model_config_pad_token_id": null,
+        "manual_max_steps": 32,
+        "stopping_criteria": "default generate EOS stopping for generate modes; manual greedy stops when emitted token id is in eos group"
+      },
+      "prompt_count": 36,
+      "decode_rows": 324,
+      "manual_token_rows": 1133,
+      "eos_positive_count": 1,
+      "decode_summary_rows": [
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "answer_boundary",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " A": 1
+          },
+          "top_generated_prefixes": {
+            " A\n\n<think>\nOkay, so I've got this question here": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "Okay": 6
+          },
+          "top_generated_prefixes": {
+            "Okay, so I need to answer the question: \"A commo": 3,
+            "Okay, so I need to figure out a common use for a": 3
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "empty_completion",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " sucht": 1
+          },
+          "top_generated_prefixes": {
+            " sucht)\n<think>\n\n</think>\n\nIt seems like your me": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "end_now",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 12.0,
+          "top_first_tokens": {
+            " \n\n": 1
+          },
+          "top_generated_prefixes": {
+            " \n\n</think>\n\nHello! How can I assist you today?": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 23.833333333333332,
+          "top_first_tokens": {
+            "**\n\n": 5,
+            "**\n": 1
+          },
+          "top_generated_prefixes": {
+            "**\n\nAlright, so I need to figure out a common us": 2,
+            "**\n\n**Question:** A common use for a glass is to": 2,
+            "**\n</think>\n\nride\n\n**Answer:** ride": 1,
+            "**\n\n**Question:** A common use for a dog is to\n\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 26.333333333333332,
+          "top_first_tokens": {
+            " What": 3,
+            " ?\n\n": 2,
+            " The": 1
+          },
+          "top_generated_prefixes": {
+            " ?\n\nThe cup is a function because it has a singl": 2,
+            " What is the primary function of a glass object?": 2,
+            " What is the function of a horse?\n</think>\n\nWhat": 1,
+            " The function of a dog is to please its owner.\n<": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "final_marker",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " \\": 1
+          },
+          "top_generated_prefixes": {
+            " \\boxed{\\dfrac{1}{2}}\n\n**Step-by-Step Explanatio": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " \\": 2,
+            " hold": 2,
+            " carry": 1,
+            " fetch": 1
+          },
+          "top_generated_prefixes": {
+            " \\boxed{something}.\n\nA common use for a cup is t": 2,
+            " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+            " carry something on its back. So, the word \"back": 1,
+            " fetch objects. So, the verb should be \"fetch\".\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "single_word_done",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 1
+          },
+          "top_generated_prefixes": {
+            "\nOkay, so I need to figure out the answer to thi": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "space_completion",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "2": 1
+          },
+          "top_generated_prefixes": {
+            "2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_beam",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 31.833333333333332,
+          "top_first_tokens": {
+            " hold": 4,
+            " pull": 1,
+            " fetch": 1
+          },
+          "top_generated_prefixes": {
+            " hold water. What is another common use for a gl": 2,
+            " hold water. What is the common use for a spoon?": 1,
+            " hold water. What is a common use for a spoon?\n\n": 1,
+            " pull a cart. What is the subject of this senten": 1,
+            " fetch objects. So, what is the verb form?\n\nThe ": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "answer_boundary",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            " \n\\boxed{12}\n\n<think>\nTo determine the number of": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "Okay": 6
+          },
+          "top_generated_prefixes": {
+            "Okay, so I need to figure out a common use for a": 6
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "empty_completion",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " sucht": 1
+          },
+          "top_generated_prefixes": {
+            " sucht,\n<think>\n\n</think>\n\nIt seems like your me": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "end_now",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 12.0,
+          "top_first_tokens": {
+            " \n\n": 1
+          },
+          "top_generated_prefixes": {
+            " \n\n</think>\n\nHello! How can I assist you today?": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "**\n\n": 6
+          },
+          "top_generated_prefixes": {
+            "**\n\n---\n\n**Question:** A common use for a cup is": 2,
+            "**\n\n---\n\n**Question:** A common use for a glass ": 2,
+            "**\n\n**Question:** A common use for a horse is to": 1,
+            "**\n\n**Question:** A common use for a dog is to\n\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ?\n\n": 4,
+            " ": 2
+          },
+          "top_generated_prefixes": {
+            " ?\n\nThe cup is a function because it has a singl": 2,
+            " ?\n\nThe glass is used for drinking water. So, th": 1,
+            " ?\n\nThe question is asking for the function of a": 1,
+            " 6000\nBut wait, the question is about the horse'": 1,
+            " 6\n\nQuestion object: dog\nRelation: function\nAnsw": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "final_marker",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " \\": 1
+          },
+          "top_generated_prefixes": {
+            " \\boxed{12}\n\nWait, hold on. I think I made a mis": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " hold": 4,
+            " ride": 1,
+            " fetch": 1
+          },
+          "top_generated_prefixes": {
+            " hold something. So, the verb should be in the p": 2,
+            " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+            " ride. So, the answer is \\boxed{ride}.\n\n**Step-b": 1,
+            " fetch objects. So, the verb should be \"fetch\".\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "single_word_done",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 1
+          },
+          "top_generated_prefixes": {
+            "\nOkay, so I need to figure out what the answer i": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "space_completion",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            "                                ": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_greedy",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " hold": 4,
+            " carry": 1,
+            " fetch": 1
+          },
+          "top_generated_prefixes": {
+            " hold something. The verb should be in the prese": 2,
+            " hold water. What is the common use for a glass?": 2,
+            " carry a load. What is the subject of this sente": 1,
+            " fetch objects. So, the verb should be \"fetch\".\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "answer_boundary",
+          "temperature": 0.7,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 1,
+            " ": 1,
+            " A": 1
+          },
+          "top_generated_prefixes": {
+            "\n11\n<think>\nTo find the value of 11, I recognize": 1,
+            " \n\\boxed{1}\n\nWait, that can't be right. I think ": 1,
+            " A\n\n<think>\nOkay, so I've got this problem here ": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "answer_boundary",
+          "temperature": 1.0,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " D": 1,
+            " ": 1,
+            " A": 1
+          },
+          "top_generated_prefixes": {
+            " D\n\n<think>\nAlright, so I've got this math probl": 1,
+            " \n\\<think>\nAlright, so I need to figure out how ": 1,
+            " A\n\n<think>\nOkay, so I need to solve this proble": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "chat_eos",
+          "temperature": 0.7,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "Okay": 15,
+            "Alright": 3
+          },
+          "top_generated_prefixes": {
+            "Okay, so I need to figure out a common use for a": 7,
+            "Okay, so I need to answer the question: \"A commo": 2,
+            "Alright, I need to figure out a common use for a": 1,
+            "Okay, so I need to figure out the answer to the ": 1,
+            "Okay, so I have this question here: \"A common us": 1,
+            "Okay, so I need to figure out what the user is a": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "chat_eos",
+          "temperature": 1.0,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "Okay": 13,
+            "Alright": 5
+          },
+          "top_generated_prefixes": {
+            "Okay, so I have this question here: \"A common us": 2,
+            "Okay, I'm trying to figure out a common use for ": 1,
+            "Okay, so I need to figure out a common use for a": 1,
+            "Alright, I need to figure out a common use for a": 1,
+            "Okay, so I need to answer with a single English ": 1,
+            "Okay, so I need to figure out the answer to \"A c": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "empty_completion",
+          "temperature": 0.7,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " sucht": 3
+          },
+          "top_generated_prefixes": {
+            " sucht:\n\\\n2\n\\ \n1\n\\( \n2 \n\\)\n\\( \n1\n\\)\n\\( \n2 \n\\)\n\\(": 1,
+            " sucht,.\n  D\n  E\n  F\n  G\n  H\n  I\n  J\n  K\n  L\n  M": 1,
+            " sucht, -, \n<think>\n\n</think>\n\nIt seems like you": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "empty_completion",
+          "temperature": 1.0,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " sucht": 1,
+            " FIFO": 1,
+            " implode": 1
+          },
+          "top_generated_prefixes": {
+            " sucht:\n\n\n A\n B\n C\n D\n E\n F\n G\n H\n I\n J\n K\n L\n M": 1,
+            " FIFO,.\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl": 1,
+            " implode, a, the,<think>\n\n</think>\n\nSure! Please": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "end_now",
+          "temperature": 0.7,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 25.333333333333332,
+          "top_first_tokens": {
+            " \n\n": 2,
+            " Wait": 1
+          },
+          "top_generated_prefixes": {
+            " Wait, no, actually, please make sure to respond": 1,
+            " \n\n</think>\n\nThe situation in Israel-Palestine i": 1,
+            " \n\n</think>\n\nHello! How can I assist you today?": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "end_now",
+          "temperature": 1.0,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 25.333333333333332,
+          "top_first_tokens": {
+            " Wait": 1,
+            "**\n\n": 1,
+            " \n\n": 1
+          },
+          "top_generated_prefixes": {
+            " Wait, no—actually, please make sure to put the ": 1,
+            "**\n\n**Solution:**\n\nWe need to find all the integ": 1,
+            " \n\n</think>\n\nHello! How can I assist you today?": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "eos_instruction",
+          "temperature": 0.7,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 28.5,
+          "top_first_tokens": {
+            "**\n\n": 11,
+            " \n\n": 3,
+            " To": 1,
+            " Do": 1,
+            " Use": 1,
+            "**\n": 1
+          },
+          "top_generated_prefixes": {
+            "**\n\n---\n\n**Question:** A common use for a cup is": 1,
+            " To indicate the end, I'll put three dots.\n\nA. H": 1,
+            "**\n\n**Question:** A common use for a cup is to\n\n": 1,
+            "**\n\n**Question:** A common use for a glass is to": 1,
+            " \n\nThe options are: ride, carry, feed, or work.\n": 1,
+            " Do not add any additional text.\n\nThe question i": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "eos_instruction",
+          "temperature": 1.0,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 28.833333333333332,
+          "top_first_tokens": {
+            "**\n\n": 7,
+            " Use": 2,
+            " \n\n": 2,
+            " To": 1,
+            " Please": 1,
+            " Do": 1,
+            "  \n": 1,
+            " The": 1
+          },
+          "top_generated_prefixes": {
+            "**\n\n---\n\n**Question:** A common use for a cup is": 1,
+            " To help, I'll think through the primary functio": 1,
+            "**\n\n**<space>**\n</think>\n\nhold water.": 1,
+            " Use the following formats:\nIf the question is \"": 1,
+            " Please provide it using the exact same format a": 1,
+            " Do not include any additional text.\n\nWhat is th": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_answer",
+          "temperature": 0.7,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 30.0,
+          "top_first_tokens": {
+            " ?\n\n": 5,
+            " ": 4,
+            " The": 3,
+            " ?\n": 3,
+            " \\": 1,
+            " What": 1,
+            " what": 1
+          },
+          "top_generated_prefixes": {
+            " \\boxed{c}\n\nQuestion object: cup\nRelation: relat": 1,
+            " The glass is used to create a rainbow.\n</think>": 1,
+            " 2x + 5 = 9\n\nQuestion object: cup\nRelation: func": 1,
+            " ?\n\nWhat is the function of a glass object?\n\nI n": 1,
+            " The horse is a function.\nHmm, this doesn't make": 1,
+            " ?\nThe question is asking for the function of a ": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_answer",
+          "temperature": 1.0,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 30.22222222222222,
+          "top_first_tokens": {
+            " ?\n\n": 5,
+            " The": 3,
+            " ": 3,
+            " ?\n": 3,
+            " \\": 1,
+            " What": 1,
+            " ...\n": 1,
+            " \n": 1
+          },
+          "top_generated_prefixes": {
+            " \\boxed{c}\n\nQuestion object: cup\nRelation: relat": 1,
+            " The glass serves to contain liquid. \n\nAnother a": 1,
+            " 292\n\nQuestion object: cup\nRelation: material\nAn": 1,
+            " ?\n\nIs it the case that the function of glass is": 1,
+            " The horse is a __ function. ( )\nA) a\nB) an\nC) t": 1,
+            " ?\nThe question is: \"What is the function of a d": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_marker",
+          "temperature": 0.7,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " \\": 3
+          },
+          "top_generated_prefixes": {
+            " \\boxed{2}\n\nWait, hold on. Earlier, I thought th": 1,
+            " \\boxed{1}\n\nWait, I think I made a mistake there": 1,
+            " \\boxed{2}\n</think>\n\nTo solve the problem, we ne": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "final_marker",
+          "temperature": 1.0,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " \\": 3
+          },
+          "top_generated_prefixes": {
+            " \\boxed{2187}\n\nWait, no, I think I might have me": 1,
+            " \\boxed{45}\n</think>\n\nTo solve the problem, we n": 1,
+            " \\boxed{2}\n</think>\n\nTo solve the problem, we ne": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "short_answer",
+          "temperature": 0.7,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 31.61111111111111,
+          "top_first_tokens": {
+            " hold": 6,
+            " contain": 2,
+            " ride": 2,
+            " fetch": 2,
+            " \\": 2,
+            " serve": 1,
+            " store": 1,
+            " carry": 1
+          },
+          "top_generated_prefixes": {
+            " contain something. Which one is correct: \"conta": 1,
+            " hold water. What is the subject? (Please do not": 1,
+            " hold something. So, what is the correct verb to": 1,
+            " hold something. What is the most appropriate di": 1,
+            " ride. So, a horse can be ridden. Therefore, a h": 1,
+            " fetch objects. So, a \\boxed{fetch} the object.\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "short_answer",
+          "temperature": 1.0,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 31.22222222222222,
+          "top_first_tokens": {
+            " hold": 4,
+            " contain": 2,
+            " serve": 2,
+            " ride": 2,
+            " \\": 2,
+            " measure": 1,
+            " get": 1,
+            " store": 1
+          },
+          "top_generated_prefixes": {
+            " contain 95% of all liquids.\"\n\nIs this a correct": 1,
+            " serve water to people.\n\nIs it TRUE or FALSE?\n\nW": 1,
+            " measure out amounts of a liquid, such as water ": 1,
+            " hold something. What is the common use for a gl": 1,
+            " ride it. Therefore, a common use for a horse is": 1,
+            " get lost in the snow.\n\nThe sentence above can b": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "single_word_done",
+          "temperature": 0.7,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 2,
+            ".\n\n": 1
+          },
+          "top_generated_prefixes": {
+            "\nOkay, so I need to figure out the answer here. ": 1,
+            "\nAlright, so I need to figure out what the next ": 1,
+            ".\n\nSo, I think the answer is red. Maybe the ques": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "single_word_done",
+          "temperature": 1.0,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 2,
+            ".\n\n": 1
+          },
+          "top_generated_prefixes": {
+            "\nOkay, so I have to come up with a single word a": 1,
+            "\nAlright, let's try to figure this out. So, the ": 1,
+            ".\n\nSo, I think we should...\n\nWait, no, I don't w": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "space_completion",
+          "temperature": 0.7,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "4": 2,
+            "2": 1
+          },
+          "top_generated_prefixes": {
+            "4 4 4\n3 3 3 3 3 3 3\n2 2 2 2 2 2 ": 1,
+            "4 2 3 1 4 5 1 2 3 4 5 5 5 5 5 5 ": 1,
+            "2 2 1\n1 2 3 2 3 1 1 2 2 1 1 2 2 ": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "space_completion",
+          "temperature": 1.0,
+          "rows": 3,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "4": 2,
+            "5": 1
+          },
+          "top_generated_prefixes": {
+            "4 4 4;   \n    4 4 4 4];\n  $number = (string)$num": 1,
+            "4 2 3 1 4 5`, which represents a graph of `n=12`": 1,
+            "5 4 3 2 10\n\nWait, sorry, perhaps I'm overcomplic": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "stop_explicit",
+          "temperature": 0.7,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 31.555555555555557,
+          "top_first_tokens": {
+            " hold": 9,
+            " serve": 2,
+            " carry": 2,
+            " contain": 1,
+            " ride": 1,
+            " fetch": 1,
+            " pull": 1,
+            " {": 1
+          },
+          "top_generated_prefixes": {
+            " hold something, so the verb should be \"hold.\"\n\n": 1,
+            " hold water. The statement \"A glass of water is ": 1,
+            " serve coffee. A common use for a cup is to serv": 1,
+            " contain food. What is the common noun that is t": 1,
+            " ride, but some people prefer to use a car for t": 1,
+            " carry food. Which of the following is the corre": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "generate_sample",
+          "prompt_protocol": "stop_explicit",
+          "temperature": 1.0,
+          "rows": 18,
+          "ended_with_eos": 0,
+          "avg_steps": 31.38888888888889,
+          "top_first_tokens": {
+            " hold": 4,
+            " contain": 2,
+            " carry": 2,
+            " serve": 1,
+            " ride": 1,
+            " __": 1,
+            " make": 1,
+            " pour": 1
+          },
+          "top_generated_prefixes": {
+            " hold something, so I put a cup on the table. Ho": 1,
+            " hold drinks. The statement \"A glass of water is": 1,
+            " serve coffee. A common use for a glass is to dr": 1,
+            " contain food. What is the answer?\n\nThe answer i": 1,
+            " ride. A common use for a zebra is to observe. A": 1,
+            " carry food.\n\nSo, which option is correct?\n\nIs i": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "answer_boundary",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            " \n\\boxed{22}\n\n<think>\nTo determine the number of": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "chat_eos",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "Okay": 6
+          },
+          "top_generated_prefixes": {
+            "Okay, so I need to figure out a common use for a": 6
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "empty_completion",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " sucht": 1
+          },
+          "top_generated_prefixes": {
+            " sucht,\n\n\n\n\n<think>\n\n</think>\n\nHello! It seems l": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "end_now",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 1,
+          "avg_steps": 13.0,
+          "top_first_tokens": {
+            " \n\n": 1
+          },
+          "top_generated_prefixes": {
+            " \n\n</think>\n\nHello! How can I assist you today?<": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "eos_instruction",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "**\n\n": 6
+          },
+          "top_generated_prefixes": {
+            "**\n\n---\n\n**Question:** A common use for a cup is": 2,
+            "**\n\n---\n\n**Question:** A common use for a glass ": 2,
+            "**\n\n**Question:** A common use for a horse is to": 1,
+            "**\n\n**Question:** A common use for a dog is to\n\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "final_answer",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ?\n\n": 4,
+            " ": 2
+          },
+          "top_generated_prefixes": {
+            " ?\n\nThe cup is a function because it has a singl": 2,
+            " ?\n\nThe glass is used for drinking water. So, th": 2,
+            " 1000\n\nQuestion object: horse\nRelation: function": 1,
+            " 100\n\nQuestion object: dog\nRelation: function\nAn": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "final_marker",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " \\": 1
+          },
+          "top_generated_prefixes": {
+            " \\boxed{12}\n\nWait, hold on. I think I made a mis": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "short_answer",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " hold": 4,
+            " ride": 1,
+            " fetch": 1
+          },
+          "top_generated_prefixes": {
+            " hold something. So, the verb should be in the p": 2,
+            " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+            " ride. So, the answer is \\boxed{ride}.\n\n**Step-b": 1,
+            " fetch objects. So, the verb should be \"fetch\".\n": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "single_word_done",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            "\n": 1
+          },
+          "top_generated_prefixes": {
+            "\nOkay, so I need to figure out what the answer i": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "space_completion",
+          "temperature": null,
+          "rows": 1,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " ": 1
+          },
+          "top_generated_prefixes": {
+            "     , , , , , , , , , , , , , , , , , , , , , ,": 1
+          }
+        },
+        {
+          "model": "deepseek7b",
+          "decode_mode": "manual_greedy",
+          "prompt_protocol": "stop_explicit",
+          "temperature": null,
+          "rows": 6,
+          "ended_with_eos": 0,
+          "avg_steps": 32.0,
+          "top_first_tokens": {
+            " hold": 4,
+            " carry": 1,
+            " fetch": 1
+          },
+          "top_generated_prefixes": {
+            " hold something. The verb should be in the prese": 2,
+            " hold water. What is the common use for a glass?": 2,
+            " carry a load. What is the subject of this sente": 1,
+            " fetch objects. So, the verb should be \"fetch\".\n": 1
+          }
+        }
+      ],
+      "manual_generate_compare_summary": {
+        "rows": 36,
+        "first_token_matches": 36,
+        "manual_eos": 1,
+        "generate_eos": 0
+      },
+      "boundary": "Decode audit only. Sampling EOS, if any, is stochastic and must not be merged with greedy ModelStopExecuted."
+    }
+  ],
+  "decode_summary_rows": [
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 19
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 13,
+        "<think>\nOkay, the user is asking for the color o": 6
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 15,
+        " red": 4
+      },
+      "top_generated_prefixes": {
+        " The color of a horse is\nAnswer: brown. The colo": 4,
+        " The color of a dog is brown. Done. Brown. Done.": 4,
+        " The color of a wood is\nAnswer: brown. The color": 4,
+        " red. Done. red. red. red. red. red. red. red. r": 3,
+        " The color of a cherry is red. Done. red. Done. ": 2,
+        " red\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 12,
+        " red": 7
+      },
+      "top_generated_prefixes": {
+        " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+        " brown\nOkay, the question is about a dog and its": 4,
+        " brown\nOkay, the question is about the color of ": 4,
+        " red\nOkay, the question is about the color of an": 3,
+        " red\nOkay, the question is about the object \"che": 2,
+        " red\nOkay, the question is about a \"cardinal\" ob": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 8,
+        " black": 8,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " black.\nAnswer: black\n\nThe color of a horse is b": 4,
+        " black. The color of a cat is white. The color o": 4,
+        " brown. The color of a apple is red. The color o": 4,
+        " red.\nAnswer: red\n\nThe color of a cherry is red.": 3,
+        " red.\nAnswer: red\n\nThe color of a banana is yell": 2,
+        " red.\nAnswer: red\n\nThe color of a hummingbird is": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " black": 8,
+        " red": 7,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " black.\nThe answer is black. The color of a hors": 4,
+        " black.\nThe answer is black. The color of a dog ": 4,
+        " brown.\nThe color of a wood is brown. The color ": 4,
+        " red. The color of a banana is yellow. The color": 3,
+        " red.\nAnswer: red. The color of a cherry is red.": 2,
+        " red.\nAnswer: red. The color of a cardinal is re": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 19
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 13,
+        "<think>\nOkay, the user is asking for the color o": 6
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 15,
+        " red": 4
+      },
+      "top_generated_prefixes": {
+        " The answer is: brown. The color of a horse is b": 4,
+        " The color of a dog is brown. brown. Done. brown": 4,
+        " The answer is:\n\nBrown. \n\nBrown. \n\nBrown. \n\nBrow": 4,
+        " red. Done. red. Done. red. Done. red. Done. red": 3,
+        " The answer is: red. The color of a cherry is re": 2,
+        " red\nred\n\nred. Done. The color of a cardinal is ": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 12,
+        " red": 7
+      },
+      "top_generated_prefixes": {
+        " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+        " brown\nOkay, the question is about a dog and its": 4,
+        " brown\nOkay, the question is about the color of ": 4,
+        " red\nOkay, the question is about the color of an": 3,
+        " red\nOkay, the question is about the object \"che": 2,
+        " red\nOkay, the question is about a \"cardinal\" an": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 8,
+        " black": 8,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 6,
+        " black. The color of a dog is brown. The color o": 4,
+        " black. The color of a cat is white. The color o": 4,
+        " brown. The color of a flower is pink. The color": 4,
+        " red. The color of a hummingbird is red. The col": 1,
+        " red. The color of a dress is blue. The color of": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 8,
+        " red": 7,
+        " black": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 5,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " brown.\nThe answer is brown. The color of a dog ": 4,
+        " brown. The color of a flower is red. The color ": 4,
+        " red. The color of a hummingbird is red. The col": 1,
+        " red. The color of a bird is blue. The color of ": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 57
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 38,
+        "<think>\nOkay, the user is asking for the color o": 19
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 57
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 37,
+        "<think>\nOkay, the user is asking for the color o": 20
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 34,
+        " red": 11,
+        " If": 4,
+        " You": 2,
+        " \n\n": 2,
+        " Please": 2,
+        " black": 1,
+        " brown": 1
+      },
+      "top_generated_prefixes": {
+        " The answer is:\nAnswer: brown. The answer is: br": 3,
+        " The color of a dog is brown. Done. Brown. Done.": 2,
+        " red. Done. red. \n\nWait, the user asked to answe": 1,
+        " red. \n\nEnd of response. \n\nWait, I think I need ": 1,
+        " red. Done. red. Done. red. Done. red. Done. red": 1,
+        " If the answer is not a color, you will be marke": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 21,
+        " red": 10,
+        " If": 7,
+        " You": 4,
+        " brown": 3,
+        " Please": 3,
+        " Black": 2,
+        " black": 1
+      },
+      "top_generated_prefixes": {
+        " red\nOkay, the user is asking for the color of a": 1,
+        " red. \n\nEnd of response. \n\nWait, I think I need ": 1,
+        " red. \n\nDone.  (The system may have a specific f": 1,
+        " If the answer is not a color, repeat the proces": 1,
+        " red\n\nThe color of an apple is red. (Note: This ": 1,
+        " red. Done. The color of a cherry is red. Done. ": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 35,
+        " red": 21,
+        " black": 1
+      },
+      "top_generated_prefixes": {
+        " brown\nOkay, the question is about the color of ": 12,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 9,
+        " brown\nOkay, the question is about a dog and its": 8,
+        " red\nOkay, the question is about the color of an": 4,
+        " brown\nQuestion object: cat\nRelation: color\nAnsw": 4,
+        " red\n\nQuestion object: sky\nRelation: color\nAnswe": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 35,
+        " red": 21,
+        " black": 1
+      },
+      "top_generated_prefixes": {
+        " brown\nOkay, the question is about the color of ": 11,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 7,
+        " brown\nOkay, the question is about a dog and its": 6,
+        " brown\nQuestion object: cat\nRelation: color\nAnsw": 4,
+        " red\n\nQuestion object: sky\nRelation: color\nAnswe": 4,
+        " red\nOkay, the question is about the color of a ": 3
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 0.7,
+      "rows": 60,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 20,
+        " black": 12,
+        " brown": 10,
+        "...": 5,
+        " a": 3,
+        " usually": 3,
+        " determined": 3,
+        " typically": 1
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 3,
+        " black. The color of a cat is white. What is the": 2,
+        " brown. The color of a cat is black. The color o": 2,
+        " red. The answer is red. The color of a banana i": 2,
+        " brown.\nAnswer: brown\n\nThe color of a dog is bro": 2,
+        " black.\nAnswer: black\n\nThe color of a horse is b": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 1.0,
+      "rows": 60,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 16,
+        " black": 9,
+        " brown": 7,
+        " typically": 5,
+        " a": 3,
+        " the": 3,
+        "...": 3,
+        " yellow": 2
+      },
+      "top_generated_prefixes": {
+        " black. The color of a cat is white. What is the": 2,
+        " brown.\n\nAnswer: brown\n\nOkay, the user wants me ": 2,
+        " typically red, but if it's a green apple, what ": 1,
+        " typically?\nAnswer: Red.\n\nThe color of a cherry ": 1,
+        " red. What is the color of a hummingbird? red\nAn": 1,
+        " yellow. The color of a flower is red. The color": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 20,
+        " brown": 20,
+        " black": 10,
+        " green": 2,
+        " usually": 2,
+        " blue": 1,
+        " dark": 1,
+        " yellow": 1
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 6,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " black.\nThe answer is black. The color of a dog ": 4,
+        " brown.\nThe answer is brown. The color of a dog ": 4,
+        " brown.\nThe answer is brown. The color of a hors": 3,
+        " brown. The color of a sky is blue. The color of": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 31.982456140350877,
+      "top_first_tokens": {
+        " red": 19,
+        " brown": 19,
+        " black": 9,
+        " green": 3,
+        " usually": 2,
+        " a": 1,
+        "...": 1,
+        " dark": 1
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 5,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " black.\nThe answer is black. The color of a dog ": 4,
+        " red.\n\nAnswer: red. The color of a cherry is red": 2,
+        " brown.\n\nThe color of the horse is brown. So, th": 2,
+        " brown.\nThe answer is brown. The color of a dog ": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 19
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 13,
+        "<think>\nOkay, the user is asking for the color o": 6
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 15,
+        " red": 4
+      },
+      "top_generated_prefixes": {
+        " The answer is: brown. The color of a horse is b": 4,
+        " The color of a dog is brown. brown. Done. brown": 4,
+        " The color of a wood is\nAnswer:\nbrown. Answer: b": 4,
+        " red. Done. red. Done. red. Done. red. Done. red": 3,
+        " The color of a cherry is red. Done. red. Done. ": 2,
+        " red\nred\n\nred. End of response. End of response.": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 12,
+        " red": 7
+      },
+      "top_generated_prefixes": {
+        " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+        " brown\nOkay, the question is about a dog and its": 4,
+        " brown\nOkay, the question is about the color of ": 4,
+        " red\nOkay, the question is about the color of an": 3,
+        " red\nOkay, the question is about the object \"che": 2,
+        " red\nOkay, the question is about a \"cardinal\" ob": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 8,
+        " black": 8,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 6,
+        " black. The color of a dog is brown. The color o": 4,
+        " black. The color of a cat is white. The color o": 4,
+        " brown. The color of a flower is pink. The color": 4,
+        " red. The color of a hummingbird is red. The col": 1,
+        " red. The color of a dress is blue. The color of": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 8,
+        " red": 7,
+        " black": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 5,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " brown.\nThe answer is brown. The color of a dog ": 4,
+        " brown. The color of a flower is red. The color ": 4,
+        " red. The color of a bluebird is blue. The color": 1,
+        " red. The color of a bird is blue. The color of ": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 19
+      },
+      "top_generated_prefixes": {
+        "\nRed<|user|>\nCertainly! If you have any more que": 8,
+        "\nBrown<|user|>\nCertainly! If you have any more q": 5,
+        "\nRed<|user|>\nThe color of a sky on a clear day i": 4,
+        "\nBay<|user|>\nCertainly! If you have any more que": 1,
+        "\npull<|user|>\nIt seems you've responded with the": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " Do": 19
+      },
+      "top_generated_prefixes": {
+        " Do not provide any additional information, such": 15,
+        " Do not provide any additional information or co": 4
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 12,
+        " brown": 6,
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " red\nQuestion object: apple\nRelation: taste\nAnsw": 4,
+        " red\nQuestion object: cherry\nRelation: shape\nAns": 4,
+        " red\nQuestion object: cardinal\nRelation: color\nA": 2,
+        " red\nQuestion object: car\nRelation: color\nAnswer": 2,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 2,
+        " brown\nQuestion object: dog\nRelation: color\nAnsw": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ______": 10,
+        " __": 4,
+        ":\n": 2,
+        " brown": 2,
+        " ride": 1,
+        " be": 1
+      },
+      "top_generated_prefixes": {
+        " __________.\nThe color of an apple is red. Howev": 4,
+        " ________.\nThe color of a cherry is red. Therefo": 4,
+        ":\nThe color of a cardinal is red. Cardinals are ": 2,
+        " ________.\nThe color of a car is blue.\nThe color": 2,
+        " ________.\nThe color of a horse is brown. Howeve": 2,
+        " ________.\nThe color of a dog is brown.\nThe colo": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ______": 18,
+        " ride": 1
+      },
+      "top_generated_prefixes": {
+        " ________.\nThe color of an apple is red. However": 4,
+        " ________.\nThe color of a cherry is red. However": 4,
+        " ________.\nThe color of a cardinal is red. Howev": 2,
+        " ________.\nThe color of a car is ________.\nThe c": 2,
+        " ________.\nThe color of a dog is brown.\nThe colo": 2,
+        " ________.\nThe color of a wood is brown.\nThe col": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 19
+      },
+      "top_generated_prefixes": {
+        "\nBrown<|user|>\nCertainly! If you have any more q": 6,
+        "\nRed<|user|>\nThe color of a sky on a clear day i": 4,
+        "\nRed<|user|>\nThe color of a cherry is indeed red": 4,
+        "\nRed<|user|>\nIt seems like you've provided an an": 2,
+        "\nRed<|user|>\nCertainly! If you have any more que": 2,
+        "\ncarry<|user|>\nIt seems you've provided a verb, ": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " Do": 19
+      },
+      "top_generated_prefixes": {
+        " Do not add any additional information or explan": 18,
+        " Do not add any additional information, such as ": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 12,
+        " brown": 6,
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " red\nQuestion object: apple\nRelation: taste\nAnsw": 4,
+        " red\nQuestion object: cherry\nRelation: taste\nAns": 4,
+        " red\nQuestion object: cardinal\nRelation: size\nAn": 2,
+        " red\nQuestion object: car\nRelation: color\nAnswer": 2,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 2,
+        " brown\nQuestion object: dog\nRelation: size\nAnswe": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ______": 10,
+        ":\n": 6,
+        " called": 2,
+        " ride": 1,
+        " be": 1
+      },
+      "top_generated_prefixes": {
+        " ________.\nThe color of an apple is red. However": 4,
+        ":\nThe color of a cherry is typically:\nThe color ": 4,
+        ":\nThe color of a cardinal is red. So, the answer": 2,
+        " ________.\nThe color of a car is red.\nThe color ": 2,
+        " ________.\nThe color of a horse is brown.\nHoweve": 2,
+        " ________.\nThe color of a dog is brown.\nThe colo": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        ":\n": 8,
+        " ______": 6,
+        " __": 4,
+        " ride": 1
+      },
+      "top_generated_prefixes": {
+        " __________.\nThe color of an apple is red. Howev": 4,
+        ":\nThe color of a cherry is:\nThe color of a cherr": 4,
+        ":\nThe color of a cardinal is red. This is the co": 2,
+        " ________.\nThe color of a car is red. (One color": 2,
+        " ________.\nThe color of a horse is brown. Howeve": 2,
+        " ________.\nThe color of a dog is brown. However,": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 57
+      },
+      "top_generated_prefixes": {
+        "\nRed<|user|>\nCertainly! If you have another ques": 3,
+        "\nRed<|user|>\nI apologize for the oversight. To p": 1,
+        "\nRed<|user|>\nTo determine if a number is prime o": 1,
+        "\nRed<|user|>\nThe color of a cardinal's feathers ": 1,
+        "\nred<|user|>\nTo determine the color of a car, yo": 1,
+        "\nRed<|user|>\nIf you are in a situation where you": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 57
+      },
+      "top_generated_prefixes": {
+        "\nRed<|user|>\nI was looking for information about": 1,
+        "\nRed<|user|>\nTo determine if a number is prime o": 1,
+        "\nRed<|user|>\n**Blue**<|user|>\nBlue<|user|>\nBlue<": 1,
+        "\nred<|user|>\nTo help you out, I'll provide the f": 1,
+        "\nRed<|user|>\nIf a child's bedroom is decorated i": 1,
+        "\nRed<|user|>\nSure, here's a color for you:\n\nEmer": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " Do": 37,
+        " No": 14,
+        " If": 1,
+        " There": 1,
+        " Thank": 1,
+        " The": 1,
+        " You": 1,
+        " Don": 1
+      },
+      "top_generated_prefixes": {
+        " Do not add any additional text or explanations.": 3,
+        " Do not add any additional information or explan": 2,
+        " Do not add any additional sentences, even if th": 2,
+        " Do not provide any additional information or ex": 2,
+        " No explanation is required.\nThe color of an app": 1,
+        " Do not continue to explain or discuss.\nThe colo": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " Do": 28,
+        " No": 12,
+        " If": 4,
+        " There": 3,
+        " You": 2,
+        " The": 2,
+        " Your": 1,
+        " Thank": 1
+      },
+      "top_generated_prefixes": {
+        " Do not add any additional sentences, even if th": 2,
+        " No explanation is required.\nThe color of an app": 1,
+        " Do not continue to talk after giving the answer": 1,
+        " Do not elaborate or provide additional informat": 1,
+        " No additional text or explanations are allowed.": 1,
+        " Do not start a new line. Here is a sample respo": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 33,
+        " brown": 14,
+        " white": 2,
+        " eat": 2,
+        " black": 2,
+        " green": 2,
+        " blue": 1,
+        " \"": 1
+      },
+      "top_generated_prefixes": {
+        " red\nQuestion object: apple\nRelation: shape\nAnsw": 3,
+        " red\nQuestion object: cardinal\nRelation: size\nAn": 3,
+        " brown\nQuestion object: horse\nRelation: size\nAns": 3,
+        " brown\nQuestion object: dog\nRelation: color\nAnsw": 3,
+        " red\nQuestion object: cherry\nRelation: shape\nAns": 3,
+        " red\nQuestion object: cherry\nRelation: taste\nAns": 3
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 29,
+        " brown": 12,
+        " \"": 3,
+        " eat": 2,
+        " black": 2,
+        " green": 2,
+        " RED": 1,
+        " bay": 1
+      },
+      "top_generated_prefixes": {
+        " red, green, yellow, orange, purple, pink, white": 1,
+        " red\nQuestion object: apple\nRelation: shape\nAnsw": 1,
+        " \"red\" or \"crimson\" or \"scarlet\"\nThe following q": 1,
+        " RED, GREEN, BLUE, YELLOW\nPlease note that the r": 1,
+        " red\nI've been trying to write a function that w": 1,
+        " red\nTo make sure you're doing it correctly, you": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 0.7,
+      "rows": 60,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        ":\n": 11,
+        " ______": 9,
+        " __": 8,
+        ":": 4,
+        " red": 3,
+        " __________________": 3,
+        " called": 3,
+        " brown": 2
+      },
+      "top_generated_prefixes": {
+        " ...\nThe color of an apple is ...\nI would go wit": 1,
+        " ________.\nThe color of a cherry is red. So, the": 1,
+        "...\nAnswer with one English color word only. The": 1,
+        " ________.\nThe color of the car is ________.\nThe": 1,
+        " ________.\nThe color of an apple is red.\nHowever": 1,
+        ":\nRed is the correct color word for the color of": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 1.0,
+      "rows": 60,
+      "ended_with_eos": 0,
+      "avg_steps": 31.483333333333334,
+      "top_first_tokens": {
+        " ______": 6,
+        ":\n": 6,
+        " __": 5,
+        ":": 4,
+        " __________________": 4,
+        "...\n": 3,
+        " called": 3,
+        " ...\n": 2
+      },
+      "top_generated_prefixes": {
+        " ...\n- green\n- red\n- yellow\n- white\nThere is als": 1,
+        " ________.\nThe color of a cherry is red. If you ": 1,
+        "...\n#colorword\nThe color of a cardinal is...\nThe": 1,
+        " ________.\nThe color of the car is ________.\nThe": 1,
+        " _______.\nSolution: The color of an apple is red": 1,
+        ":\nRed or Dark Red\nRed is the color of cherries. ": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        ":\n": 14,
+        " ______": 10,
+        " __": 9,
+        ":": 3,
+        " green": 2,
+        "?\n": 2,
+        " called": 2,
+        " (": 2
+      },
+      "top_generated_prefixes": {
+        " green.\nWhat color is an apple?\nGreen. An apple ": 1,
+        " ________.\nThe color of a cherry is red. Note th": 1,
+        " ______.\nThe color of a cardinal is red. However": 1,
+        "?\na. blue\nb. green\nc. red\nd. white\nThe car is wh": 1,
+        " _______. Green.\nGreen is the color of an apple.": 1,
+        " __________.\nThe color of a cherry is red. The p": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 31.70175438596491,
+      "top_first_tokens": {
+        ":\n": 13,
+        " __": 11,
+        " ______": 4,
+        ":": 3,
+        " [": 3,
+        " green": 2,
+        " called": 2,
+        " (": 2
+      },
+      "top_generated_prefixes": {
+        " green and red.\nAn apple is green and red in col": 1,
+        " ________.\nThe color of a cherry is red. Note th": 1,
+        " __________. Answer with exactly one English col": 1,
+        "?\na. Black\nb. Red\nc. Blue\nd. Green\ne. Silver\nf. ": 1,
+        " _______. Green.\nGreen is the color of an apple.": 1,
+        " __________.\nRed, as cherries are typically red.": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 19
+      },
+      "top_generated_prefixes": {
+        "\nBrown<|user|>\nCertainly! If you have any more q": 6,
+        "\nRed<|user|>\nThe color of a sky on a clear day i": 4,
+        "\nRed<|user|>\nThe color of a cherry is indeed red": 4,
+        "\nRed<|user|>\nIt seems like you've provided an an": 2,
+        "\nblue<|user|>\nThe color of a car is blue.\n\nThe c": 2,
+        "\ncarry<|user|>\nIt seems you've provided a verb, ": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " Do": 19
+      },
+      "top_generated_prefixes": {
+        " Do not add any additional information or explan": 18,
+        " Do not add any additional information, such as ": 1
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 12,
+        " brown": 6,
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " red\nQuestion object: apple\nRelation: taste\nAnsw": 4,
+        " red\nQuestion object: cherry\nRelation: taste\nAns": 4,
+        " red\nQuestion object: cardinal\nRelation: size\nAn": 2,
+        " red\nQuestion object: car\nRelation: color\nAnswer": 2,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 2,
+        " brown\nQuestion object: dog\nRelation: size\nAnswe": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ______": 10,
+        ":\n": 6,
+        " called": 2,
+        " ride": 1,
+        " be": 1
+      },
+      "top_generated_prefixes": {
+        " ________.\nThe color of an apple is red. However": 4,
+        ":\nThe color of a cherry is typically:\nThe color ": 4,
+        ":\nThe color of a cardinal is red. So, the answer": 2,
+        " ________.\nThe color of a car is red.\nThe color ": 2,
+        " ________.\nThe color of a horse is brown.\nHoweve": 2,
+        " ________.\nThe color of a dog is brown.\nThe colo": 2
+      }
+    },
+    {
+      "model": "glm4",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        ":\n": 8,
+        " ______": 6,
+        " __": 4,
+        " ride": 1
+      },
+      "top_generated_prefixes": {
+        " __________.\nThe color of an apple is red. Howev": 4,
+        ":\nThe color of a cherry is:\nThe color of a cherr": 4,
+        ":\nThe color of a cardinal is red. This is the co": 2,
+        " ________.\nThe color of a car is red. However, s": 2,
+        " ________.\nThe color of a horse is brown. Howeve": 2,
+        " ________.\nThe color of a dog is brown. However,": 2
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "answer_boundary",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " A": 1
+      },
+      "top_generated_prefixes": {
+        " A\n\n<think>\nOkay, so I've got this question here": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 6
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to answer the question: \"A commo": 3,
+        "Okay, so I need to figure out a common use for a": 3
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "empty_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1
+      },
+      "top_generated_prefixes": {
+        " sucht)\n<think>\n\n</think>\n\nIt seems like your me": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "end_now",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 12.0,
+      "top_first_tokens": {
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 23.833333333333332,
+      "top_first_tokens": {
+        "**\n\n": 5,
+        "**\n": 1
+      },
+      "top_generated_prefixes": {
+        "**\n\nAlright, so I need to figure out a common us": 2,
+        "**\n\n**Question:** A common use for a glass is to": 2,
+        "**\n</think>\n\nride\n\n**Answer:** ride": 1,
+        "**\n\n**Question:** A common use for a dog is to\n\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 26.333333333333332,
+      "top_first_tokens": {
+        " What": 3,
+        " ?\n\n": 2,
+        " The": 1
+      },
+      "top_generated_prefixes": {
+        " ?\n\nThe cup is a function because it has a singl": 2,
+        " What is the primary function of a glass object?": 2,
+        " What is the function of a horse?\n</think>\n\nWhat": 1,
+        " The function of a dog is to please its owner.\n<": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_marker",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{\\dfrac{1}{2}}\n\n**Step-by-Step Explanatio": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 2,
+        " hold": 2,
+        " carry": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{something}.\n\nA common use for a cup is t": 2,
+        " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+        " carry something on its back. So, the word \"back": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "single_word_done",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out the answer to thi": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "space_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "2": 1
+      },
+      "top_generated_prefixes": {
+        "2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 31.833333333333332,
+      "top_first_tokens": {
+        " hold": 4,
+        " pull": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold water. What is another common use for a gl": 2,
+        " hold water. What is the common use for a spoon?": 1,
+        " hold water. What is a common use for a spoon?\n\n": 1,
+        " pull a cart. What is the subject of this senten": 1,
+        " fetch objects. So, what is the verb form?\n\nThe ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "answer_boundary",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " \n\\boxed{12}\n\n<think>\nTo determine the number of": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 6
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to figure out a common use for a": 6
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "empty_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1
+      },
+      "top_generated_prefixes": {
+        " sucht,\n<think>\n\n</think>\n\nIt seems like your me": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "end_now",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 12.0,
+      "top_first_tokens": {
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "**\n\n": 6
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 2,
+        "**\n\n---\n\n**Question:** A common use for a glass ": 2,
+        "**\n\n**Question:** A common use for a horse is to": 1,
+        "**\n\n**Question:** A common use for a dog is to\n\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ?\n\n": 4,
+        " ": 2
+      },
+      "top_generated_prefixes": {
+        " ?\n\nThe cup is a function because it has a singl": 2,
+        " ?\n\nThe glass is used for drinking water. So, th": 1,
+        " ?\n\nThe question is asking for the function of a": 1,
+        " 6000\nBut wait, the question is about the horse'": 1,
+        " 6\n\nQuestion object: dog\nRelation: function\nAnsw": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_marker",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{12}\n\nWait, hold on. I think I made a mis": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " ride": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. So, the verb should be in the p": 2,
+        " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+        " ride. So, the answer is \\boxed{ride}.\n\n**Step-b": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "single_word_done",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out what the answer i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "space_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        "                                ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " carry": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. The verb should be in the prese": 2,
+        " hold water. What is the common use for a glass?": 2,
+        " carry a load. What is the subject of this sente": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "answer_boundary",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1,
+        " ": 1,
+        " A": 1
+      },
+      "top_generated_prefixes": {
+        "\n11\n<think>\nTo find the value of 11, I recognize": 1,
+        " \n\\boxed{1}\n\nWait, that can't be right. I think ": 1,
+        " A\n\n<think>\nOkay, so I've got this problem here ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "answer_boundary",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " D": 1,
+        " ": 1,
+        " A": 1
+      },
+      "top_generated_prefixes": {
+        " D\n\n<think>\nAlright, so I've got this math probl": 1,
+        " \n\\<think>\nAlright, so I need to figure out how ": 1,
+        " A\n\n<think>\nOkay, so I need to solve this proble": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 15,
+        "Alright": 3
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to figure out a common use for a": 7,
+        "Okay, so I need to answer the question: \"A commo": 2,
+        "Alright, I need to figure out a common use for a": 1,
+        "Okay, so I need to figure out the answer to the ": 1,
+        "Okay, so I have this question here: \"A common us": 1,
+        "Okay, so I need to figure out what the user is a": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 13,
+        "Alright": 5
+      },
+      "top_generated_prefixes": {
+        "Okay, so I have this question here: \"A common us": 2,
+        "Okay, I'm trying to figure out a common use for ": 1,
+        "Okay, so I need to figure out a common use for a": 1,
+        "Alright, I need to figure out a common use for a": 1,
+        "Okay, so I need to answer with a single English ": 1,
+        "Okay, so I need to figure out the answer to \"A c": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "empty_completion",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 3
+      },
+      "top_generated_prefixes": {
+        " sucht:\n\\\n2\n\\ \n1\n\\( \n2 \n\\)\n\\( \n1\n\\)\n\\( \n2 \n\\)\n\\(": 1,
+        " sucht,.\n  D\n  E\n  F\n  G\n  H\n  I\n  J\n  K\n  L\n  M": 1,
+        " sucht, -, \n<think>\n\n</think>\n\nIt seems like you": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "empty_completion",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1,
+        " FIFO": 1,
+        " implode": 1
+      },
+      "top_generated_prefixes": {
+        " sucht:\n\n\n A\n B\n C\n D\n E\n F\n G\n H\n I\n J\n K\n L\n M": 1,
+        " FIFO,.\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl\nl": 1,
+        " implode, a, the,<think>\n\n</think>\n\nSure! Please": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "end_now",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 25.333333333333332,
+      "top_first_tokens": {
+        " \n\n": 2,
+        " Wait": 1
+      },
+      "top_generated_prefixes": {
+        " Wait, no, actually, please make sure to respond": 1,
+        " \n\n</think>\n\nThe situation in Israel-Palestine i": 1,
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "end_now",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 25.333333333333332,
+      "top_first_tokens": {
+        " Wait": 1,
+        "**\n\n": 1,
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " Wait, no—actually, please make sure to put the ": 1,
+        "**\n\n**Solution:**\n\nWe need to find all the integ": 1,
+        " \n\n</think>\n\nHello! How can I assist you today?": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 28.5,
+      "top_first_tokens": {
+        "**\n\n": 11,
+        " \n\n": 3,
+        " To": 1,
+        " Do": 1,
+        " Use": 1,
+        "**\n": 1
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 1,
+        " To indicate the end, I'll put three dots.\n\nA. H": 1,
+        "**\n\n**Question:** A common use for a cup is to\n\n": 1,
+        "**\n\n**Question:** A common use for a glass is to": 1,
+        " \n\nThe options are: ride, carry, feed, or work.\n": 1,
+        " Do not add any additional text.\n\nThe question i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 28.833333333333332,
+      "top_first_tokens": {
+        "**\n\n": 7,
+        " Use": 2,
+        " \n\n": 2,
+        " To": 1,
+        " Please": 1,
+        " Do": 1,
+        "  \n": 1,
+        " The": 1
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 1,
+        " To help, I'll think through the primary functio": 1,
+        "**\n\n**<space>**\n</think>\n\nhold water.": 1,
+        " Use the following formats:\nIf the question is \"": 1,
+        " Please provide it using the exact same format a": 1,
+        " Do not include any additional text.\n\nWhat is th": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 30.0,
+      "top_first_tokens": {
+        " ?\n\n": 5,
+        " ": 4,
+        " The": 3,
+        " ?\n": 3,
+        " \\": 1,
+        " What": 1,
+        " what": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{c}\n\nQuestion object: cup\nRelation: relat": 1,
+        " The glass is used to create a rainbow.\n</think>": 1,
+        " 2x + 5 = 9\n\nQuestion object: cup\nRelation: func": 1,
+        " ?\n\nWhat is the function of a glass object?\n\nI n": 1,
+        " The horse is a function.\nHmm, this doesn't make": 1,
+        " ?\nThe question is asking for the function of a ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 30.22222222222222,
+      "top_first_tokens": {
+        " ?\n\n": 5,
+        " The": 3,
+        " ": 3,
+        " ?\n": 3,
+        " \\": 1,
+        " What": 1,
+        " ...\n": 1,
+        " \n": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{c}\n\nQuestion object: cup\nRelation: relat": 1,
+        " The glass serves to contain liquid. \n\nAnother a": 1,
+        " 292\n\nQuestion object: cup\nRelation: material\nAn": 1,
+        " ?\n\nIs it the case that the function of glass is": 1,
+        " The horse is a __ function. ( )\nA) a\nB) an\nC) t": 1,
+        " ?\nThe question is: \"What is the function of a d": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_marker",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 3
+      },
+      "top_generated_prefixes": {
+        " \\boxed{2}\n\nWait, hold on. Earlier, I thought th": 1,
+        " \\boxed{1}\n\nWait, I think I made a mistake there": 1,
+        " \\boxed{2}\n</think>\n\nTo solve the problem, we ne": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_marker",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 3
+      },
+      "top_generated_prefixes": {
+        " \\boxed{2187}\n\nWait, no, I think I might have me": 1,
+        " \\boxed{45}\n</think>\n\nTo solve the problem, we n": 1,
+        " \\boxed{2}\n</think>\n\nTo solve the problem, we ne": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.61111111111111,
+      "top_first_tokens": {
+        " hold": 6,
+        " contain": 2,
+        " ride": 2,
+        " fetch": 2,
+        " \\": 2,
+        " serve": 1,
+        " store": 1,
+        " carry": 1
+      },
+      "top_generated_prefixes": {
+        " contain something. Which one is correct: \"conta": 1,
+        " hold water. What is the subject? (Please do not": 1,
+        " hold something. So, what is the correct verb to": 1,
+        " hold something. What is the most appropriate di": 1,
+        " ride. So, a horse can be ridden. Therefore, a h": 1,
+        " fetch objects. So, a \\boxed{fetch} the object.\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.22222222222222,
+      "top_first_tokens": {
+        " hold": 4,
+        " contain": 2,
+        " serve": 2,
+        " ride": 2,
+        " \\": 2,
+        " measure": 1,
+        " get": 1,
+        " store": 1
+      },
+      "top_generated_prefixes": {
+        " contain 95% of all liquids.\"\n\nIs this a correct": 1,
+        " serve water to people.\n\nIs it TRUE or FALSE?\n\nW": 1,
+        " measure out amounts of a liquid, such as water ": 1,
+        " hold something. What is the common use for a gl": 1,
+        " ride it. Therefore, a common use for a horse is": 1,
+        " get lost in the snow.\n\nThe sentence above can b": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "single_word_done",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 2,
+        ".\n\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out the answer here. ": 1,
+        "\nAlright, so I need to figure out what the next ": 1,
+        ".\n\nSo, I think the answer is red. Maybe the ques": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "single_word_done",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 2,
+        ".\n\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I have to come up with a single word a": 1,
+        "\nAlright, let's try to figure this out. So, the ": 1,
+        ".\n\nSo, I think we should...\n\nWait, no, I don't w": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "space_completion",
+      "temperature": 0.7,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "4": 2,
+        "2": 1
+      },
+      "top_generated_prefixes": {
+        "4 4 4\n3 3 3 3 3 3 3\n2 2 2 2 2 2 ": 1,
+        "4 2 3 1 4 5 1 2 3 4 5 5 5 5 5 5 ": 1,
+        "2 2 1\n1 2 3 2 3 1 1 2 2 1 1 2 2 ": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "space_completion",
+      "temperature": 1.0,
+      "rows": 3,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "4": 2,
+        "5": 1
+      },
+      "top_generated_prefixes": {
+        "4 4 4;   \n    4 4 4 4];\n  $number = (string)$num": 1,
+        "4 2 3 1 4 5`, which represents a graph of `n=12`": 1,
+        "5 4 3 2 10\n\nWait, sorry, perhaps I'm overcomplic": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 0.7,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.555555555555557,
+      "top_first_tokens": {
+        " hold": 9,
+        " serve": 2,
+        " carry": 2,
+        " contain": 1,
+        " ride": 1,
+        " fetch": 1,
+        " pull": 1,
+        " {": 1
+      },
+      "top_generated_prefixes": {
+        " hold something, so the verb should be \"hold.\"\n\n": 1,
+        " hold water. The statement \"A glass of water is ": 1,
+        " serve coffee. A common use for a cup is to serv": 1,
+        " contain food. What is the common noun that is t": 1,
+        " ride, but some people prefer to use a car for t": 1,
+        " carry food. Which of the following is the corre": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 1.0,
+      "rows": 18,
+      "ended_with_eos": 0,
+      "avg_steps": 31.38888888888889,
+      "top_first_tokens": {
+        " hold": 4,
+        " contain": 2,
+        " carry": 2,
+        " serve": 1,
+        " ride": 1,
+        " __": 1,
+        " make": 1,
+        " pour": 1
+      },
+      "top_generated_prefixes": {
+        " hold something, so I put a cup on the table. Ho": 1,
+        " hold drinks. The statement \"A glass of water is": 1,
+        " serve coffee. A common use for a glass is to dr": 1,
+        " contain food. What is the answer?\n\nThe answer i": 1,
+        " ride. A common use for a zebra is to observe. A": 1,
+        " carry food.\n\nSo, which option is correct?\n\nIs i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "answer_boundary",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        " \n\\boxed{22}\n\n<think>\nTo determine the number of": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "Okay": 6
+      },
+      "top_generated_prefixes": {
+        "Okay, so I need to figure out a common use for a": 6
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "empty_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " sucht": 1
+      },
+      "top_generated_prefixes": {
+        " sucht,\n\n\n\n\n<think>\n\n</think>\n\nHello! It seems l": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "end_now",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 1,
+      "avg_steps": 13.0,
+      "top_first_tokens": {
+        " \n\n": 1
+      },
+      "top_generated_prefixes": {
+        " \n\n</think>\n\nHello! How can I assist you today?<": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "**\n\n": 6
+      },
+      "top_generated_prefixes": {
+        "**\n\n---\n\n**Question:** A common use for a cup is": 2,
+        "**\n\n---\n\n**Question:** A common use for a glass ": 2,
+        "**\n\n**Question:** A common use for a horse is to": 1,
+        "**\n\n**Question:** A common use for a dog is to\n\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ?\n\n": 4,
+        " ": 2
+      },
+      "top_generated_prefixes": {
+        " ?\n\nThe cup is a function because it has a singl": 2,
+        " ?\n\nThe glass is used for drinking water. So, th": 2,
+        " 1000\n\nQuestion object: horse\nRelation: function": 1,
+        " 100\n\nQuestion object: dog\nRelation: function\nAn": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_marker",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " \\": 1
+      },
+      "top_generated_prefixes": {
+        " \\boxed{12}\n\nWait, hold on. I think I made a mis": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " ride": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. So, the verb should be in the p": 2,
+        " hold water. So, the answer is \\boxed{hold}.\n\n**": 2,
+        " ride. So, the answer is \\boxed{ride}.\n\n**Step-b": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "single_word_done",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "\n": 1
+      },
+      "top_generated_prefixes": {
+        "\nOkay, so I need to figure out what the answer i": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "space_completion",
+      "temperature": null,
+      "rows": 1,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " ": 1
+      },
+      "top_generated_prefixes": {
+        "     , , , , , , , , , , , , , , , , , , , , , ,": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 6,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " hold": 4,
+        " carry": 1,
+        " fetch": 1
+      },
+      "top_generated_prefixes": {
+        " hold something. The verb should be in the prese": 2,
+        " hold water. What is the common use for a glass?": 2,
+        " carry a load. What is the subject of this sente": 1,
+        " fetch objects. So, the verb should be \"fetch\".\n": 1
+      }
+    }
+  ]
+}

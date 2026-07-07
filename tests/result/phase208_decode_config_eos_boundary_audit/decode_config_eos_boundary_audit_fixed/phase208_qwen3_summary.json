@@ -1,0 +1,738 @@
+{
+  "phase": 208,
+  "source_phase": 207,
+  "title": "Decode Config Audit and EOS Induction Boundary Search",
+  "model": "qwen3",
+  "prompt_protocols": [
+    "short_answer",
+    "stop_explicit",
+    "eos_instruction",
+    "final_answer",
+    "chat_eos"
+  ],
+  "sampling_temperatures": [
+    0.7,
+    1.0
+  ],
+  "sampling_seeds": [
+    11,
+    23,
+    37
+  ],
+  "status": "complete",
+  "timestamp": "2026-07-06 17:17:53",
+  "sample_count": 360,
+  "selected_relation_language_pairs": [
+    "color:en->en",
+    "color:en->zh",
+    "color:zh->en",
+    "color:zh->zh",
+    "function:en->en",
+    "function:zh->en",
+    "function:zh->zh"
+  ],
+  "selected_phase940_bridge_rows": [
+    {
+      "relation": "function",
+      "language_pair": "zh->en",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 76,
+      "relation_margin_delta_mean": 0.834703947368421,
+      "boundary_margin_delta_mean": 0.5370065789473685,
+      "period_margin_delta_mean": 0.5522203947368421,
+      "eos_margin_delta_mean": 0.5946751644736842,
+      "boundary_logit_delta_mean": -0.060032894736842105,
+      "control_best_boundary_margin_delta": -0.18009868421052633,
+      "boundary_bridge_gain_vs_best_control": 0.7171052631578948,
+      "joint_bridge_score": 0.5370065789473685,
+      "rank_improved": 32,
+      "new_relation_winner_target": 11
+    },
+    {
+      "relation": "color",
+      "language_pair": "en->en",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 54,
+      "relation_margin_delta_mean": 0.4097222222222222,
+      "boundary_margin_delta_mean": 0.65625,
+      "period_margin_delta_mean": 0.6226851851851852,
+      "eos_margin_delta_mean": 0.7415974934895834,
+      "boundary_logit_delta_mean": -0.08101851851851852,
+      "control_best_boundary_margin_delta": 0.03587962962962963,
+      "boundary_bridge_gain_vs_best_control": 0.6203703703703703,
+      "joint_bridge_score": 0.4097222222222222,
+      "rank_improved": 25,
+      "new_relation_winner_target": 3
+    },
+    {
+      "relation": "color",
+      "language_pair": "zh->en",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 108,
+      "relation_margin_delta_mean": 0.2957175925925926,
+      "boundary_margin_delta_mean": 0.4357638888888889,
+      "period_margin_delta_mean": 0.42476851851851855,
+      "eos_margin_delta_mean": 0.4835171169704861,
+      "boundary_logit_delta_mean": -0.019675925925925927,
+      "control_best_boundary_margin_delta": -0.02546296296296296,
+      "boundary_bridge_gain_vs_best_control": 0.46122685185185186,
+      "joint_bridge_score": 0.2957175925925926,
+      "rank_improved": 47,
+      "new_relation_winner_target": 5
+    },
+    {
+      "relation": "color",
+      "language_pair": "zh->zh",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 54,
+      "relation_margin_delta_mean": 0.3975694444444444,
+      "boundary_margin_delta_mean": 0.5005787037037037,
+      "period_margin_delta_mean": 0.46122685185185186,
+      "eos_margin_delta_mean": 0.5180121527777778,
+      "boundary_logit_delta_mean": -0.0763888888888889,
+      "control_best_boundary_margin_delta": 0.3263888888888889,
+      "boundary_bridge_gain_vs_best_control": 0.17418981481481483,
+      "joint_bridge_score": 0.17418981481481483,
+      "rank_improved": 53,
+      "new_relation_winner_target": 4
+    },
+    {
+      "relation": "color",
+      "language_pair": "en->zh",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 108,
+      "relation_margin_delta_mean": 0.5911458333333334,
+      "boundary_margin_delta_mean": 0.7051504629629629,
+      "period_margin_delta_mean": 0.8214699074074074,
+      "eos_margin_delta_mean": 0.8065643310546875,
+      "boundary_logit_delta_mean": -0.09259259259259259,
+      "control_best_boundary_margin_delta": 0.5717592592592593,
+      "boundary_bridge_gain_vs_best_control": 0.1333912037037036,
+      "joint_bridge_score": 0.1333912037037036,
+      "rank_improved": 108,
+      "new_relation_winner_target": 10
+    },
+    {
+      "relation": "function",
+      "language_pair": "en->en",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 38,
+      "relation_margin_delta_mean": 0.90625,
+      "boundary_margin_delta_mean": 0.6282894736842105,
+      "period_margin_delta_mean": 0.5279605263157895,
+      "eos_margin_delta_mean": 0.8104440789473685,
+      "boundary_logit_delta_mean": 0.06578947368421052,
+      "control_best_boundary_margin_delta": 0.569078947368421,
+      "boundary_bridge_gain_vs_best_control": 0.05921052631578949,
+      "joint_bridge_score": 0.05921052631578949,
+      "rank_improved": 17,
+      "new_relation_winner_target": 5
+    },
+    {
+      "relation": "function",
+      "language_pair": "zh->zh",
+      "alpha": 1.0,
+      "condition": "specific_direction",
+      "rows": 38,
+      "relation_margin_delta_mean": 0.36800986842105265,
+      "boundary_margin_delta_mean": 0.16324013157894737,
+      "period_margin_delta_mean": 0.3260690789473684,
+      "eos_margin_delta_mean": 0.4196006373355263,
+      "boundary_logit_delta_mean": -0.125,
+      "control_best_boundary_margin_delta": 0.13322368421052633,
+      "boundary_bridge_gain_vs_best_control": 0.030016447368421045,
+      "joint_bridge_score": 0.030016447368421045,
+      "rank_improved": 24,
+      "new_relation_winner_target": 1
+    }
+  ],
+  "hidden_by_relation": {
+    "category": 9,
+    "color": 36,
+    "function": 27
+  },
+  "direction_specs_all": 228,
+  "candidate_pair_count": 7,
+  "config_audit": {
+    "tokenizer_eos_token_id": 151645,
+    "tokenizer_eos_token": "<|im_end|>",
+    "tokenizer_pad_token_id": 151643,
+    "tokenizer_pad_token": "<|endoftext|>",
+    "tokenizer_bos_token_id": null,
+    "tokenizer_bos_token": null,
+    "generation_config_eos_token_id": [
+      151645,
+      151643
+    ],
+    "generation_config_pad_token_id": 151643,
+    "generation_config_forced_eos_token_id": null,
+    "generation_config_max_new_tokens": null,
+    "model_config_eos_token_id": 151645,
+    "model_config_pad_token_id": null,
+    "manual_max_steps": 32,
+    "stopping_criteria": "default generate EOS stopping for generate modes; manual greedy stops when emitted token id is in eos group"
+  },
+  "prompt_count": 96,
+  "decode_rows": 864,
+  "manual_token_rows": 3072,
+  "eos_positive_count": 0,
+  "decode_summary_rows": [
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 19
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 13,
+        "<think>\nOkay, the user is asking for the color o": 6
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 15,
+        " red": 4
+      },
+      "top_generated_prefixes": {
+        " The color of a horse is\nAnswer: brown. The colo": 4,
+        " The color of a dog is brown. Done. Brown. Done.": 4,
+        " The color of a wood is\nAnswer: brown. The color": 4,
+        " red. Done. red. red. red. red. red. red. red. r": 3,
+        " The color of a cherry is red. Done. red. Done. ": 2,
+        " red\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred\n\nred": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 12,
+        " red": 7
+      },
+      "top_generated_prefixes": {
+        " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+        " brown\nOkay, the question is about a dog and its": 4,
+        " brown\nOkay, the question is about the color of ": 4,
+        " red\nOkay, the question is about the color of an": 3,
+        " red\nOkay, the question is about the object \"che": 2,
+        " red\nOkay, the question is about a \"cardinal\" ob": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 8,
+        " black": 8,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " black.\nAnswer: black\n\nThe color of a horse is b": 4,
+        " black. The color of a cat is white. The color o": 4,
+        " brown. The color of a apple is red. The color o": 4,
+        " red.\nAnswer: red\n\nThe color of a cherry is red.": 3,
+        " red.\nAnswer: red\n\nThe color of a banana is yell": 2,
+        " red.\nAnswer: red\n\nThe color of a hummingbird is": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_beam",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " black": 8,
+        " red": 7,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " black.\nThe answer is black. The color of a hors": 4,
+        " black.\nThe answer is black. The color of a dog ": 4,
+        " brown.\nThe color of a wood is brown. The color ": 4,
+        " red. The color of a banana is yellow. The color": 3,
+        " red.\nAnswer: red. The color of a cherry is red.": 2,
+        " red.\nAnswer: red. The color of a cardinal is re": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 19
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 13,
+        "<think>\nOkay, the user is asking for the color o": 6
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 15,
+        " red": 4
+      },
+      "top_generated_prefixes": {
+        " The answer is: brown. The color of a horse is b": 4,
+        " The color of a dog is brown. brown. Done. brown": 4,
+        " The answer is:\n\nBrown. \n\nBrown. \n\nBrown. \n\nBrow": 4,
+        " red. Done. red. Done. red. Done. red. Done. red": 3,
+        " The answer is: red. The color of a cherry is re": 2,
+        " red\nred\n\nred. Done. The color of a cardinal is ": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 12,
+        " red": 7
+      },
+      "top_generated_prefixes": {
+        " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+        " brown\nOkay, the question is about a dog and its": 4,
+        " brown\nOkay, the question is about the color of ": 4,
+        " red\nOkay, the question is about the color of an": 3,
+        " red\nOkay, the question is about the object \"che": 2,
+        " red\nOkay, the question is about a \"cardinal\" an": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 8,
+        " black": 8,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 6,
+        " black. The color of a dog is brown. The color o": 4,
+        " black. The color of a cat is white. The color o": 4,
+        " brown. The color of a flower is pink. The color": 4,
+        " red. The color of a hummingbird is red. The col": 1,
+        " red. The color of a dress is blue. The color of": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 8,
+        " red": 7,
+        " black": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 5,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " brown.\nThe answer is brown. The color of a dog ": 4,
+        " brown. The color of a flower is red. The color ": 4,
+        " red. The color of a hummingbird is red. The col": 1,
+        " red. The color of a bird is blue. The color of ": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 57
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 38,
+        "<think>\nOkay, the user is asking for the color o": 19
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "chat_eos",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 57
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 37,
+        "<think>\nOkay, the user is asking for the color o": 20
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 34,
+        " red": 11,
+        " If": 4,
+        " You": 2,
+        " \n\n": 2,
+        " Please": 2,
+        " black": 1,
+        " brown": 1
+      },
+      "top_generated_prefixes": {
+        " The answer is:\nAnswer: brown. The answer is: br": 3,
+        " The color of a dog is brown. Done. Brown. Done.": 2,
+        " red. Done. red. \n\nWait, the user asked to answe": 1,
+        " red. \n\nEnd of response. \n\nWait, I think I need ": 1,
+        " red. Done. red. Done. red. Done. red. Done. red": 1,
+        " If the answer is not a color, you will be marke": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "eos_instruction",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 21,
+        " red": 10,
+        " If": 7,
+        " You": 4,
+        " brown": 3,
+        " Please": 3,
+        " Black": 2,
+        " black": 1
+      },
+      "top_generated_prefixes": {
+        " red\nOkay, the user is asking for the color of a": 1,
+        " red. \n\nEnd of response. \n\nWait, I think I need ": 1,
+        " red. \n\nDone.  (The system may have a specific f": 1,
+        " If the answer is not a color, repeat the proces": 1,
+        " red\n\nThe color of an apple is red. (Note: This ": 1,
+        " red. Done. The color of a cherry is red. Done. ": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 35,
+        " red": 21,
+        " black": 1
+      },
+      "top_generated_prefixes": {
+        " brown\nOkay, the question is about the color of ": 12,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 9,
+        " brown\nOkay, the question is about a dog and its": 8,
+        " red\nOkay, the question is about the color of an": 4,
+        " brown\nQuestion object: cat\nRelation: color\nAnsw": 4,
+        " red\n\nQuestion object: sky\nRelation: color\nAnswe": 4
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "final_answer",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 35,
+        " red": 21,
+        " black": 1
+      },
+      "top_generated_prefixes": {
+        " brown\nOkay, the question is about the color of ": 11,
+        " brown\nQuestion object: horse\nRelation: color\nAn": 7,
+        " brown\nOkay, the question is about a dog and its": 6,
+        " brown\nQuestion object: cat\nRelation: color\nAnsw": 4,
+        " red\n\nQuestion object: sky\nRelation: color\nAnswe": 4,
+        " red\nOkay, the question is about the color of a ": 3
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 0.7,
+      "rows": 60,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 20,
+        " black": 12,
+        " brown": 10,
+        "...": 5,
+        " a": 3,
+        " usually": 3,
+        " determined": 3,
+        " typically": 1
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 3,
+        " black. The color of a cat is white. What is the": 2,
+        " brown. The color of a cat is black. The color o": 2,
+        " red. The answer is red. The color of a banana i": 2,
+        " brown.\nAnswer: brown\n\nThe color of a dog is bro": 2,
+        " black.\nAnswer: black\n\nThe color of a horse is b": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "short_answer",
+      "temperature": 1.0,
+      "rows": 60,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 16,
+        " black": 9,
+        " brown": 7,
+        " typically": 5,
+        " a": 3,
+        " the": 3,
+        "...": 3,
+        " yellow": 2
+      },
+      "top_generated_prefixes": {
+        " black. The color of a cat is white. What is the": 2,
+        " brown.\n\nAnswer: brown\n\nOkay, the user wants me ": 2,
+        " typically red, but if it's a green apple, what ": 1,
+        " typically?\nAnswer: Red.\n\nThe color of a cherry ": 1,
+        " red. What is the color of a hummingbird? red\nAn": 1,
+        " yellow. The color of a flower is red. The color": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 0.7,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 20,
+        " brown": 20,
+        " black": 10,
+        " green": 2,
+        " usually": 2,
+        " blue": 1,
+        " dark": 1,
+        " yellow": 1
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 6,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " black.\nThe answer is black. The color of a dog ": 4,
+        " brown.\nThe answer is brown. The color of a dog ": 4,
+        " brown.\nThe answer is brown. The color of a hors": 3,
+        " brown. The color of a sky is blue. The color of": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "generate_sample",
+      "prompt_protocol": "stop_explicit",
+      "temperature": 1.0,
+      "rows": 57,
+      "ended_with_eos": 0,
+      "avg_steps": 31.982456140350877,
+      "top_first_tokens": {
+        " red": 19,
+        " brown": 19,
+        " black": 9,
+        " green": 3,
+        " usually": 2,
+        " a": 1,
+        "...": 1,
+        " dark": 1
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 5,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " black.\nThe answer is black. The color of a dog ": 4,
+        " red.\n\nAnswer: red. The color of a cherry is red": 2,
+        " brown.\n\nThe color of the horse is brown. So, th": 2,
+        " brown.\nThe answer is brown. The color of a dog ": 2
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "chat_eos",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        "<think>": 19
+      },
+      "top_generated_prefixes": {
+        "<think>\nOkay, the user is asking for exactly one": 13,
+        "<think>\nOkay, the user is asking for the color o": 6
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "eos_instruction",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " The": 15,
+        " red": 4
+      },
+      "top_generated_prefixes": {
+        " The answer is: brown. The color of a horse is b": 4,
+        " The color of a dog is brown. brown. Done. brown": 4,
+        " The color of a wood is\nAnswer:\nbrown. Answer: b": 4,
+        " red. Done. red. Done. red. Done. red. Done. red": 3,
+        " The color of a cherry is red. Done. red. Done. ": 2,
+        " red\nred\n\nred. End of response. End of response.": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "final_answer",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 12,
+        " red": 7
+      },
+      "top_generated_prefixes": {
+        " brown\nQuestion object: horse\nRelation: color\nAn": 4,
+        " brown\nOkay, the question is about a dog and its": 4,
+        " brown\nOkay, the question is about the color of ": 4,
+        " red\nOkay, the question is about the color of an": 3,
+        " red\nOkay, the question is about the object \"che": 2,
+        " red\nOkay, the question is about a \"cardinal\" ob": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "short_answer",
+      "temperature": null,
+      "rows": 20,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " red": 8,
+        " black": 8,
+        " brown": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 6,
+        " black. The color of a dog is brown. The color o": 4,
+        " black. The color of a cat is white. The color o": 4,
+        " brown. The color of a flower is pink. The color": 4,
+        " red. The color of a hummingbird is red. The col": 1,
+        " red. The color of a dress is blue. The color of": 1
+      }
+    },
+    {
+      "model": "qwen3",
+      "decode_mode": "manual_greedy",
+      "prompt_protocol": "stop_explicit",
+      "temperature": null,
+      "rows": 19,
+      "ended_with_eos": 0,
+      "avg_steps": 32.0,
+      "top_first_tokens": {
+        " brown": 8,
+        " red": 7,
+        " black": 4
+      },
+      "top_generated_prefixes": {
+        " red. The color of a banana is yellow. The color": 5,
+        " black.\nThe answer is black. The color of a hors": 4,
+        " brown.\nThe answer is brown. The color of a dog ": 4,
+        " brown. The color of a flower is red. The color ": 4,
+        " red. The color of a bluebird is blue. The color": 1,
+        " red. The color of a bird is blue. The color of ": 1
+      }
+    }
+  ],
+  "manual_generate_compare_summary": {
+    "rows": 96,
+    "first_token_matches": 96,
+    "manual_eos": 0,
+    "generate_eos": 0
+  },
+  "boundary": "Decode audit only. Sampling EOS, if any, is stochastic and must not be merged with greedy ModelStopExecuted."
+}
