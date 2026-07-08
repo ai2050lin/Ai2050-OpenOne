@@ -1436,7 +1436,7 @@ export default function App() {
   const [fpModel, setFpModel] = useState('qwen3-4b');
   const [fpSentence, setFpSentence] = useState('s1');
   const [fpInputText, setFpInputText] = useState('The cat sat on the mat');
-  const [fpColorFile, setFpColorFile] = useState('/data/forward_pass_demo.json');
+  const fpColorFile = '/data/forward_pass_demo.json';
   const [fpPlaying, setFpPlaying] = useState(false);
   const [fpCurrentLayer, setFpCurrentLayer] = useState(null);  // null=未开始, 0~nLayers-1
   const [fpData, setFpData] = useState(null);  // forward pass数据
@@ -1557,7 +1557,7 @@ export default function App() {
 
   // ---- Forward Pass 动画 ----
   const startForwardPass = useCallback(() => {
-    // 加载forward pass数据 (根据颜色模式下拉框选择)
+    // 加载 forward pass 演示数据
     fetch(fpColorFile)
       .then(r => r.json())
       .then(data => {
@@ -2680,7 +2680,18 @@ export default function App() {
                     {fpMode === 'generate' ? '根据DNN运行记录的JSON数据，逐层播放前向传播' : '加载JSON数据文件，在3D空间中展示'}
                   </div>
 
-                  {/* ---- 生成模式: 输入框/模型选择/颜色模式 ---- */}
+                  {/* 速度控制 */}
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>
+                      <span>播放速度</span>
+                      <span style={{ color: '#4facfe' }}>{fpSpeed}ms/层</span>
+                    </div>
+                    <input type="range" min={200} max={2000} step={100} value={fpSpeed}
+                      onChange={(e) => setFpSpeed(Number(e.target.value))}
+                      style={{ width: '100%', accentColor: '#4facfe' }} />
+                  </div>
+
+                  {/* ---- 生成模式: 输入框/模型选择 ---- */}
                   {fpMode === 'generate' && (
                     <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(79,172,254,0.18)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#4facfe', fontSize: 13, fontWeight: 700 }}>
@@ -2733,41 +2744,6 @@ export default function App() {
                           </button>
                         ))}
                       </div>
-                    </div>
-
-                    {/* 颜色模式(选择生成模式的JSON文件) */}
-                    <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>颜色模式 (数据文件)</div>
-                      <select value={fpColorFile} onChange={(e) => setFpColorFile(e.target.value)}
-                        style={{
-                          width: '100%', padding: '8px 10px',
-                          background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)',
-                          borderRadius: 8, color: '#e7f4ff', cursor: 'pointer', fontSize: 12,
-                          outline: 'none', appearance: 'none',
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%237f95bb' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")`,
-                          backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
-                        }}>
-                        <optgroup label="🔥 激活值着色">
-                          <option value="/data/forward_pass_demo.json">Qwen3-4B 前向传播 (36L)</option>
-                        </optgroup>
-                        <optgroup label="🧩 分析数据">
-                          <option value="/data/language_analysis_puzzle.json">语言分析拼图</option>
-                        </optgroup>
-                      </select>
-                      <div style={{ fontSize: 9, color: '#7f95bb', marginTop: 3 }}>
-                        选择不同数据文件查看神经元着色效果
-                      </div>
-                    </div>
-
-                    {/* 速度控制 */}
-                    <div style={{ marginBottom: 10 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>
-                        <span>播放速度</span>
-                        <span style={{ color: '#4facfe' }}>{fpSpeed}ms/层</span>
-                      </div>
-                      <input type="range" min={200} max={2000} step={100} value={fpSpeed}
-                        onChange={(e) => setFpSpeed(Number(e.target.value))}
-                        style={{ width: '100%', accentColor: '#4facfe' }} />
                     </div>
 
                     {/* Forward Pass 进度 */}
@@ -4341,7 +4317,6 @@ export default function App() {
                 activeFileMeta={activeFileMeta}
                 atlasNodes={atlasNodes}
                 atlasEdges={atlasEdges}
-                researchCycle={researchCycle}
                 activeResearchPlugin={activeResearchPlugin}
               />
 
