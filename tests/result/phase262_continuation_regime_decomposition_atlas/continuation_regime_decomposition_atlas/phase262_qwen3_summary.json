@@ -1,0 +1,164 @@
+{
+  "phase": 262,
+  "source_phase": 261,
+  "title": "Continuation regime decomposition atlas",
+  "status": "complete",
+  "timestamp": "2026-07-08 04:02:05",
+  "schema_version": "1.0.0",
+  "model": "qwen3",
+  "base_case_count": 40,
+  "regime_count": 9,
+  "channel_rows": 21600,
+  "source_map_rows": 2160,
+  "matrix_rows": 2160,
+  "protocol_rows": 480,
+  "structured_rows": 480,
+  "observation_rows": 2160,
+  "metric_rows": 20,
+  "graph_edges": 19,
+  "token_coverage_rows": 14,
+  "missing_rows": 0,
+  "competition_winner_counts": {
+    "continue": 1859,
+    "stop": 301
+  },
+  "stop_win_rate": 0.139352,
+  "top_continue_channel_counts": {
+    "continue_the": 809,
+    "continue_because": 357,
+    "continue_list_item": 347,
+    "continue_format": 190,
+    "continue_comma": 44,
+    "continue_next_sentence": 42,
+    "continue_and": 34,
+    "continue_for": 17,
+    "continue_is": 16,
+    "continue_json_structure": 3
+  },
+  "mean_top_continue_vs_stop_margin_by_regime": {
+    "plain": 6.424609,
+    "period_boundary": 10.03099,
+    "newline_boundary": 8.590885,
+    "comma_stub": 6.069401,
+    "because_stub": 3.175781,
+    "answer_anchor": 8.158464,
+    "json_structure": 6.746615,
+    "list_item": 8.478385,
+    "next_sentence": -1.296875
+  },
+  "mean_stop_continue_margin_by_regime": {
+    "plain": -6.424609,
+    "period_boundary": -10.03099,
+    "newline_boundary": -8.590885,
+    "comma_stub": -6.069401,
+    "because_stub": -3.175781,
+    "answer_anchor": -8.158464,
+    "json_structure": -6.746615,
+    "list_item": -8.478385,
+    "next_sentence": 1.296875
+  },
+  "mean_channel_vs_stop_margin": {
+    "continue_the": 2.3523,
+    "continue_because": -0.142151,
+    "continue_and": -1.634161,
+    "continue_comma": -2.50323,
+    "continue_is": -1.156678,
+    "continue_for": -2.000791,
+    "continue_next_sentence": -2.041424,
+    "continue_format": -1.763276,
+    "continue_json_structure": -3.891525,
+    "continue_list_item": 2.588383
+  },
+  "top_suppression_candidates": [
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 34.5625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 30.5,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 28.875,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "plain",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 28.875,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 27.09375,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "plain",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 27.09375,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 26.3125,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 25.0625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "plain",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 25.0625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 25.0,
+      "source_hypothesis": "explanation_continuation"
+    }
+  ]
+}

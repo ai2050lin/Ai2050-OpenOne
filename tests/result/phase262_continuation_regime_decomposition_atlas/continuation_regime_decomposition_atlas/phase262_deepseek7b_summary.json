@@ -1,0 +1,164 @@
+{
+  "phase": 262,
+  "source_phase": 261,
+  "title": "Continuation regime decomposition atlas",
+  "status": "complete",
+  "timestamp": "2026-07-08 04:06:13",
+  "schema_version": "1.0.0",
+  "model": "deepseek7b",
+  "base_case_count": 40,
+  "regime_count": 9,
+  "channel_rows": 21600,
+  "source_map_rows": 2160,
+  "matrix_rows": 2160,
+  "protocol_rows": 480,
+  "structured_rows": 480,
+  "observation_rows": 2160,
+  "metric_rows": 20,
+  "graph_edges": 19,
+  "token_coverage_rows": 14,
+  "missing_rows": 0,
+  "competition_winner_counts": {
+    "continue": 1820,
+    "stop": 340
+  },
+  "stop_win_rate": 0.157407,
+  "top_continue_channel_counts": {
+    "continue_the": 729,
+    "continue_because": 415,
+    "continue_next_sentence": 181,
+    "continue_list_item": 139,
+    "continue_format": 126,
+    "continue_json_structure": 87,
+    "continue_is": 58,
+    "continue_comma": 43,
+    "continue_for": 27,
+    "continue_and": 15
+  },
+  "mean_top_continue_vs_stop_margin_by_regime": {
+    "plain": 3.384896,
+    "period_boundary": 5.976237,
+    "newline_boundary": 8.477865,
+    "comma_stub": 2.960872,
+    "because_stub": 1.897396,
+    "answer_anchor": 7.724023,
+    "json_structure": 6.022917,
+    "list_item": 8.68501,
+    "next_sentence": -0.410938
+  },
+  "mean_stop_continue_margin_by_regime": {
+    "plain": -3.384896,
+    "period_boundary": -5.976237,
+    "newline_boundary": -8.477865,
+    "comma_stub": -2.960872,
+    "because_stub": -1.897396,
+    "answer_anchor": -7.724023,
+    "json_structure": -6.022917,
+    "list_item": -8.68501,
+    "next_sentence": 0.410938
+  },
+  "mean_channel_vs_stop_margin": {
+    "continue_the": 2.692272,
+    "continue_because": 0.149991,
+    "continue_and": -1.609793,
+    "continue_comma": -1.549176,
+    "continue_is": -0.349362,
+    "continue_for": -1.147061,
+    "continue_next_sentence": -0.542206,
+    "continue_format": -0.301196,
+    "continue_json_structure": -3.105787,
+    "continue_list_item": 1.725316
+  },
+  "top_suppression_candidates": [
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_stop_after_answer_0001",
+      "condition": "template_incomplete_semantic_wrong",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 14.0625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_stop_after_answer_0001",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 14.0,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_stop_after_answer_0000",
+      "condition": "template_incomplete_semantic_wrong",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 13.78125,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_explain_answer_0001",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "answer_anchor",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 13.375,
+      "source_hypothesis": "answer_protocol_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 13.21875,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_one_word_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "answer_anchor",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 13.109375,
+      "source_hypothesis": "answer_protocol_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 12.96875,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_explain_answer_0001",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "answer_anchor",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 12.90625,
+      "source_hypothesis": "answer_protocol_continuation"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_json_answer_0001",
+      "condition": "template_complete_semantic_correct",
+      "regime_id": "newline_boundary",
+      "top_continue_channel": "continue_next_sentence",
+      "top_continue_vs_stop_margin": 12.875,
+      "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+    },
+    {
+      "model": "deepseek7b",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "template_incomplete_semantic_wrong",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 12.875,
+      "source_hypothesis": "explanation_continuation"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "phase": 263,
+  "source_phase": 262,
+  "title": "Continuation suppression candidate causal audit",
+  "status": "complete",
+  "timestamp": "2026-07-08 04:23:57",
+  "schema_version": "1.0.0",
+  "model": "deepseek7b",
+  "candidate_count": 32,
+  "suppression_rows": 768,
+  "channel_causal_effect_rows": 768,
+  "stop_plus_rows": 128,
+  "answer_preservation_rows": 768,
+  "rollout_probe_rows": 15,
+  "metric_rows": 9,
+  "graph_edges": 6,
+  "missing_rows": 0,
+  "policy_summary": {
+    "suppress_explanation": {
+      "rows": 128,
+      "mean_stop_margin_delta": 0.939392,
+      "mean_top_channel_logit_delta": -1.378418,
+      "winner_flip_rate": 0.0,
+      "target_preserved_rate": 1.0
+    },
+    "suppress_structured": {
+      "rows": 128,
+      "mean_stop_margin_delta": -0.963555,
+      "mean_top_channel_logit_delta": -0.839355,
+      "winner_flip_rate": 0.0,
+      "target_preserved_rate": 1.0
+    },
+    "suppress_natural": {
+      "rows": 128,
+      "mean_stop_margin_delta": 0.176172,
+      "mean_top_channel_logit_delta": -1.307617,
+      "winner_flip_rate": 0.0,
+      "target_preserved_rate": 1.0
+    },
+    "suppress_boundary_aftereffect": {
+      "rows": 128,
+      "mean_stop_margin_delta": 1.635742,
+      "mean_top_channel_logit_delta": -1.331055,
+      "winner_flip_rate": 0.0,
+      "target_preserved_rate": 0.921875
+    },
+    "suppress_top": {
+      "rows": 128,
+      "mean_stop_margin_delta": 2.280396,
+      "mean_top_channel_logit_delta": -3.248535,
+      "winner_flip_rate": 0.0,
+      "target_preserved_rate": 0.96875
+    },
+    "stop_plus_top": {
+      "rows": 128,
+      "mean_stop_margin_delta": 4.169067,
+      "mean_top_channel_logit_delta": -2.930176,
+      "winner_flip_rate": 0.0,
+      "target_preserved_rate": 0.8125
+    }
+  },
+  "rollout_summary": {
+    "no_patch": {
+      "rows": 5,
+      "mean_generated_tokens": 24.0,
+      "model_stop_rate": 0.0
+    },
+    "suppress_top": {
+      "rows": 5,
+      "mean_generated_tokens": 24.0,
+      "model_stop_rate": 0.0
+    },
+    "stop_plus_top": {
+      "rows": 5,
+      "mean_generated_tokens": 20.6,
+      "model_stop_rate": 0.4
+    }
+  }
+}

@@ -59243,3 +59243,4965 @@ Phase252 完成了三个关键拼图：
 4. 对 closure proxy 改善的样本做更长 rollout（32 token）；
 5. 暂时仍不做闭合理论总结，继续补全机制图谱。
 ```
+
+## Phase 253: 控制轴到读出轴的耦合映射验证 [2026-07-08 00:59]
+
+### 任务来源
+
+Phase252 的核心结论是：
+
+```text
+natural direction 更像 internal control axis（内部控制轴）；
+tokenbank direction 更像 output readout axis（输出读出轴）；
+二者几何子空间重叠很低，但都能影响输出。
+```
+
+因此 Phase253 不再继续寻找单一方向，而是验证：
+
+```text
+控制轴是否会在后层映射为读出轴；
+控制轴 / 读出轴联合抑制是否能改善 32 token rollout 的 closure proxy（闭合代理）。
+```
+
+### 脚本与结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase253_control_readout_coupling_validation.py
+tests/gpt5/run_phase253_control_readout_coupling_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase253_control_readout_coupling_validation/control_readout_coupling_validation/
+```
+
+核心输出：
+
+```text
+phase253_control_readout_projection_rows.jsonl
+phase253_layerwise_coupling_rows.jsonl
+phase253_suppression_projection_effect_rows.jsonl
+phase253_32token_rollout_rows.jsonl
+phase253_closure_validation_candidates.jsonl
+phase253_control_readout_coupling_report.md
+phase253_cross_model_summary.json
+```
+
+并已同步：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+前端构建通过，仍只有既有大 chunk（大代码块）警告。
+
+### 算法原理
+
+Phase253 做三类测试。
+
+第一类：多层 hidden projection（隐藏状态投影）。
+
+对高置信候选记录多个层的 hidden state：
+
+```text
+qwen3: L20, L26, L29, L31, L33
+GLM4: L20, L26, L28, L30, L32
+DS7B: L16, L22, L24, L26, L27
+```
+
+计算控制轴投影：
+
+$$
+\boxed{
+a_l^{\mathrm{control}}
+=
+\langle h_l, v_{\mathrm{control}} \rangle
+}
+$$
+
+计算读出轴投影：
+
+$$
+\boxed{
+a_l^{\mathrm{readout}}
+=
+\langle h_l, v_{\mathrm{readout}} \rangle
+}
+$$
+
+其中：
+
+```text
+v_control = natural_raw direction（自然原始控制方向）
+v_readout = tokenbank direction（词元库读出方向）
+```
+
+第二类：控制轴抑制后的读出变化。
+
+在不同层做：
+
+$$
+\boxed{
+h_l'
+=
+h_l
+-
+\lambda v_{\mathrm{control}}
+}
+$$
+
+观察：
+
+```text
+target margin delta（目标边界变化）
+closure proxy delta（闭合代理变化）
+readout projection delta（读出投影变化）
+```
+
+第三类：32 token rollout（32 词元生成展开）。
+
+对 high-confidence candidates（高置信候选）做四种条件：
+
+```text
+no_intervention（无干预）
+tokenbank_suppression（读出轴抑制）
+natural_raw_suppression（控制轴抑制）
+combined_suppression（控制轴 + 读出轴联合抑制）
+```
+
+闭合代理仍使用：
+
+$$
+\boxed{
+M_{\mathrm{closure}}
+=
+\max(z_{\mathrm{eos}}, z_{\mathrm{period}}, z_{\mathrm{newline}})
+-
+z_{\mathrm{continuation}}
+}
+$$
+
+并记录 continuation token rate（续写词元率）。
+
+### 客观结果
+
+三模型顺序完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+跨模型统计：
+
+```text
+candidate_count: 8
+control_readout_projection_rows: 240
+layerwise_coupling_rows: 48
+suppression_projection_effect_rows: 48
+rollout_32token_rows: 1015
+closure_validation_candidate_rows: 15
+observation_rows: 1303
+metric_rows: 22
+graph_edges: 88
+missing_rows: 0
+```
+
+DS7B 没有高置信候选，因此 candidate_count 为 0，不参与 rollout 判断。
+
+### 关键结果一：32 token closure proxy 明显改善
+
+跨模型 32 token rollout 的 closure proxy 均值：
+
+```text
+no_intervention: -3.431720
+tokenbank_suppression: -0.605981
+natural_raw_suppression: -1.594360
+combined_suppression: +0.374603
+```
+
+续写词元率：
+
+```text
+no_intervention: 0.199219
+tokenbank_suppression: 0.137652
+natural_raw_suppression: 0.156250
+combined_suppression: 0.132812
+```
+
+这说明：
+
+```text
+combined suppression（控制轴 + 读出轴联合抑制）
+在 32 token rollout 中对 closure proxy 最强，
+并且 continuation token rate 最低。
+```
+
+这支持 Phase252 的判断：
+
+```text
+控制轴和读出轴不是同一方向；
+但联合使用时能更好影响生成展开和闭合代理。
+```
+
+### 关键结果二：中后层控制轴抑制更有效
+
+跨模型 target margin delta：
+
+```text
+natural_raw_suppression_at_L20: -0.320312
+natural_raw_suppression_at_L26: +6.656250
+natural_raw_suppression_at_L28: +3.312500
+natural_raw_suppression_at_L29: +8.062500
+natural_raw_suppression_at_L30: +3.250000
+natural_raw_suppression_at_L31: +7.712500
+natural_raw_suppression_at_L32: +2.666667
+natural_raw_suppression_at_L33: +6.675000
+```
+
+跨模型 closure proxy delta：
+
+```text
+natural_raw_suppression_at_L20: +0.621094
+natural_raw_suppression_at_L26: +3.470947
+natural_raw_suppression_at_L28: -0.102214
+natural_raw_suppression_at_L29: +4.787500
+natural_raw_suppression_at_L30: +0.700521
+natural_raw_suppression_at_L31: +4.450000
+natural_raw_suppression_at_L32: +0.902995
+natural_raw_suppression_at_L33: +4.450000
+```
+
+模型分解：
+
+```text
+qwen3:
+  L26 target margin delta: +9.4625
+  L26 closure proxy delta: +6.0125
+  L29 target margin delta: +8.0625
+  L31 target margin delta: +7.7125
+  L33 target margin delta: +6.675
+
+GLM4:
+  L20 target margin delta: -0.979167
+  L20 closure proxy delta: -7.177083
+  L28 target margin delta: +3.3125
+  L30 closure proxy delta: +0.700521
+  L32 closure proxy delta: +0.902995
+```
+
+这说明：
+
+```text
+控制轴干预不是越早越好；
+中后层更像 control-to-readout coupling（控制到读出耦合）的有效区间。
+```
+
+### 关键结果三：筛出闭合验证候选
+
+Phase253 输出：
+
+```text
+closure_validation_candidate_rows: 15
+```
+
+强候选包括：
+
+```text
+qwen3 / reasoning_constraint_if_then_0001 / explain_instruction / tokenbank_suppression
+  final_closure_proxy_margin: +23.875
+
+qwen3 / state_drift_boundary_takeover_0001 / short_answer_instruction / combined_suppression
+  final_closure_proxy_margin: +10.46875
+  mean_closure_proxy_margin: +1.293945
+  continuation_token_rate: 0.09375
+
+qwen3 / output_protocol_table_answer_0002 / explain_instruction / combined_suppression
+  final_closure_proxy_margin: +5.046875
+  mean_closure_proxy_margin: +1.936768
+
+GLM4 / output_protocol_explain_answer_0000 / no_answer_anchor / combined_suppression
+  final_closure_proxy_margin: +6.296875
+  mean_closure_proxy_margin: +0.673340
+
+GLM4 / output_protocol_explain_answer_0000 / no_answer_anchor / natural_raw_suppression
+  final_closure_proxy_margin: +5.070312
+  mean_closure_proxy_margin: +1.600647
+  continuation_token_rate: 0.0625
+```
+
+这些候选适合下一阶段做更严格 closure validation（闭合验证）。
+
+### 正确性分析
+
+Phase253 的方向是正确的。
+
+它把 Phase252 的静态几何判断：
+
+```text
+control axis 与 readout axis 子空间低重叠
+```
+
+推进到动态验证：
+
+```text
+中后层 control suppression 会改变 readout margin 和 closure proxy；
+combined suppression 在 32 token rollout 中最好。
+```
+
+因此当前最谨慎结论是：
+
+```text
+语言机制可能存在 control-to-readout coupling path（控制到读出耦合路径）；
+这个路径主要在中后层显现；
+closure proxy 已经能被改善，但还不是 ModelClose。
+```
+
+### 主要硬伤
+
+1. `phase253_closure_validation_candidates.jsonl` 中 `closure_proxy_delta` 和 `target_margin_delta` 字段没有成功回填，因为 32 token rollout 条件名与单步 projection effect 条件名不同。核心 rollout closure proxy 数据完整，但候选表的两个 delta 字段需要下一阶段修复。
+
+2. 32 token rollout 仍是代理，不等于模型真实停止。
+
+3. DS7B 没有高置信候选，不能参与 Phase253 的 rollout 判断。
+
+4. qwen3 与 GLM4 的有效层不同，不能直接当作统一层级规律。
+
+5. combined suppression 使用简单方向相加，尚未校准最佳权重。
+
+6. 当前测试模型仍是小模型，内部机制可能存在 30% 到 50% 偏差。
+
+### 当前机制公式更新
+
+Phase252 的公式：
+
+$$
+\boxed{
+M_{\mathrm{target}}
+=
+R
+(
+h
++
+\alpha v_{\mathrm{control}}
++
+\gamma v_{\mathrm{readout}}
++
+\eta C_{\mathrm{control,readout}}
+)
+}
+$$
+
+Phase253 后可以加入层级映射：
+
+$$
+\boxed{
+h_{l+k}^{\mathrm{readout}}
+=
+T_{l \rightarrow l+k}
+(
+h_l
++
+\alpha v_{\mathrm{control}}
+)
+}
+$$
+
+以及闭合代理：
+
+$$
+\boxed{
+M_{\mathrm{closure}}^{(t)}
+=
+B
+(
+h_t,
+v_{\mathrm{control}},
+v_{\mathrm{readout}}
+)
+}
+$$
+
+其中：
+
+```text
+T 是层间控制到读出映射；
+B 是生成步上的闭合代理读出；
+二者都还不是完整机制公式。
+```
+
+### 图谱进度
+
+本阶段后图谱进度更新为：
+
+```text
+pattern_family_atlas: 0.81
+high_value_trace_selection: 0.66
+trace_signature_validation: 0.38
+focused_causal_validation: 0.25
+raw_vector_factor_decomposition: 0.25
+regime_field_direction_bank: 0.35
+natural_regime_direction_bank: 0.30
+regime_level_causal_validation: 0.25
+shared_subspace_analysis: 0.20
+coupled_regime_field_analysis: 0.22
+control_readout_coupling: 0.18
+residual_state_signature: 0.49
+readout_competition_trace: 0.71
+stepwise_rollout_trace: 0.34
+causal_closure: 0.14
+general_language_mechanism_confidence: 0.62
+```
+
+### 阶段结论
+
+Phase253 完成了三个新拼图：
+
+```text
+1. 控制轴干预在中后层更有效；
+2. 控制轴 + 读出轴联合抑制对 32 token closure proxy 最强；
+3. 已筛出 15 个 closure validation 候选。
+```
+
+当前结论仍然不是闭合：
+
+```text
+我们已经能影响 closure proxy；
+但还没有证明 ModelClose 真实执行。
+```
+
+下一阶段 Phase254 建议：
+
+```text
+闭合候选的真实停止验证与候选表修复。
+```
+
+具体任务：
+
+```text
+1. 修复 closure candidate 表中的 delta 字段回填；
+2. 对 15 个候选做 64 token rollout；
+3. 区分 EOS、句号、换行、语义结束和客户端停止；
+4. 判断 closure proxy 改善是否真的减少 over-generation；
+5. 选出少数进入 ModelClose 机制验证的候选。
+```
+
+## Phase 254: 闭合候选真实停止验证与候选表修复 [2026-07-08 01:16]
+
+### 任务来源
+
+Phase253 已经证明：
+
+```text
+control axis（控制轴）和 readout axis（读出轴）联合抑制，
+可以明显改善 32 token rollout 的 closure proxy（闭合代理）。
+```
+
+但 Phase253 仍不是闭合验证，因为：
+
+```text
+closure proxy 不等于真实停止；
+final closure proxy 为正，不代表模型产生 EOS；
+候选表中的 closure_proxy_delta / target_margin_delta 字段没有正确回填。
+```
+
+因此 Phase254 的目标是：
+
+```text
+修复候选表字段；
+对 closure candidates 做 64 token rollout；
+区分 EOS stop、句号边界、换行边界、语义完成、客户端截断、答案后继续；
+判断 closure proxy 是否真的转化为更真实的停止行为。
+```
+
+### 脚本与结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase254_closure_candidate_stop_validation.py
+tests/gpt5/run_phase254_closure_candidate_stop_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase254_closure_candidate_stop_validation/closure_candidate_stop_validation/
+```
+
+核心输出：
+
+```text
+phase254_closure_candidate_fixed_rows.jsonl
+phase254_64token_rollout_rows.jsonl
+phase254_stop_type_rows.jsonl
+phase254_weighted_combined_suppression_rows.jsonl
+phase254_modelclose_candidate_rows.jsonl
+phase254_closure_validation_report.md
+phase254_cross_model_summary.json
+```
+
+并已同步：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+前端构建通过，仍只有既有大 chunk（大代码块）警告。
+
+### 实验设计
+
+Phase254 使用 Phase253 的 closure validation candidates（闭合验证候选）。
+
+每个候选做 64 token rollout：
+
+```text
+no_intervention
+tokenbank_suppression
+natural_raw_suppression
+combined_suppression
+weighted_combined_suppression
+```
+
+权重网格：
+
+```text
+lambda_c ∈ {0.25, 0.5, 1.0}
+lambda_r ∈ {0.25, 0.5, 1.0}
+```
+
+联合抑制公式：
+
+$$
+\boxed{
+h'
+=
+h
+-
+\lambda_c v_{\mathrm{control}}
+-
+\lambda_r v_{\mathrm{readout}}
+}
+$$
+
+停止类型分类：
+
+```text
+eos_stop
+period_boundary_stop
+newline_boundary_stop
+semantic_done_no_continue
+continued_after_answer
+client_truncation
+other_stop
+```
+
+其中最关键的是区分：
+
+```text
+model stop（模型停止）
+vs
+client truncation（客户端截断）
+```
+
+### 客观结果
+
+三模型顺序完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+跨模型统计：
+
+```text
+candidate_count: 15
+fixed_candidate_rows: 15
+rollout_rows: 195
+stop_type_rows: 195
+weighted_combined_rows: 135
+modelclose_candidate_rows: 1
+observation_rows: 195
+metric_rows: 29
+graph_edges: 180
+missing_rows: 0
+```
+
+停止类型：
+
+```text
+client_truncation: 186
+eos_stop: 9
+```
+
+这说明：
+
+```text
+大多数 closure proxy 改善没有转化为真实停止；
+只有 GLM4 出现少量 EOS stop。
+```
+
+### 模型分解
+
+qwen3：
+
+```text
+candidate_count: 8
+rollout_rows: 104
+stop_type_counts:
+  client_truncation: 104
+modelclose_candidate_rows: 0
+```
+
+qwen3 是重要负结果：
+
+```text
+即使 closure proxy 提高，
+64 token 内仍全部客户端截断，
+没有真实 EOS stop。
+```
+
+GLM4：
+
+```text
+candidate_count: 7
+rollout_rows: 91
+stop_type_counts:
+  client_truncation: 82
+  eos_stop: 9
+modelclose_candidate_rows: 1（去重后唯一候选）
+```
+
+DS7B：
+
+```text
+candidate_count: 0
+```
+
+DS7B 没有 Phase253 高置信闭合候选，因此本阶段不能判断 DS7B 的闭合机制。
+
+### 权重校准结果
+
+跨模型 final closure proxy 均值最高的条件：
+
+```text
+weighted_combined_c0.25_r1.0: +3.376302
+weighted_combined_c1.0_r0.25: +3.012500
+tokenbank_suppression: +1.723437
+weighted_combined_c0.25_r0.5: +0.965104
+weighted_combined_c0.5_r1.0: +0.965104
+```
+
+过生成长度较低的条件：
+
+```text
+weighted_combined_c0.25_r1.0: 236.2
+natural_raw_suppression: 238.0
+tokenbank_suppression: 245.466667
+```
+
+最重要结果：
+
+```text
+weighted_combined_c0.25_r1.0
+同时提高 final closure proxy，
+并明显降低 over-generation length。
+```
+
+这说明简单 1:1 combined suppression（联合抑制）不是最优；控制轴和读出轴需要权重校准。
+
+### 唯一 ModelClose 候选
+
+去重后唯一候选：
+
+```text
+model: GLM4
+case_id: phase241_output_protocol_explain_answer_0000
+variant_id: no_answer_anchor
+condition: weighted_combined_c0.25_r1.0
+stop_type: eos_stop
+semantic_answer_seen: true
+client_truncation: false
+final_closure_proxy_margin: +7.15625
+over_generation_length: 47
+base_over_generation_length: 324
+```
+
+这是真正进入下一阶段 ModelClose validation（模型闭合验证）的候选。
+
+但必须谨慎：
+
+```text
+它目前只是候选；
+还没有证明内部 ModelClose 机制；
+也没有证明跨模型通用。
+```
+
+### 候选表修复
+
+Phase254 修复了：
+
+```text
+closure candidate 去重；
+condition name mapping；
+fixed candidate rows；
+stop type rows；
+weighted combined rows；
+modelclose candidate rows。
+```
+
+但仍有一个局限：
+
+```text
+候选表中的 closure_proxy_delta / target_margin_delta 只对同名 rollout condition 稳定；
+更复杂的 weighted condition 与 projection effect 的回连仍需要单独定义。
+```
+
+### 正确性分析
+
+Phase254 是一个正负混合结果。
+
+正结果：
+
+```text
+GLM4 中出现了 EOS stop；
+weighted_combined_c0.25_r1.0 是当前最强权重；
+closure proxy 可以筛出至少 1 个更接近 ModelClose 的候选。
+```
+
+负结果：
+
+```text
+qwen3 全部 client truncation；
+大多数候选即使 closure proxy 提高也没有真实停止；
+closure proxy 不能直接等同于 ModelClose。
+```
+
+因此当前结论必须写成：
+
+```text
+Phase254 完成了 closure proxy 到真实停止行为的第一轮校准；
+只得到 1 个唯一 ModelClose 候选；
+整体闭合仍未完成。
+```
+
+### 对语言机制的反思
+
+Phase254 进一步说明：
+
+```text
+提高停止/边界压力
+不等于
+执行停止。
+```
+
+也就是说语言生成至少分成三层：
+
+```text
+readout preference（读出偏好）
+rollout trajectory（生成轨迹）
+stop execution（停止执行）
+```
+
+前面 Phase253 改善的是：
+
+```text
+readout preference + rollout closure proxy
+```
+
+Phase254 检查的是：
+
+```text
+stop execution 是否真的发生
+```
+
+结果说明：
+
+```text
+二者之间仍有缺口。
+```
+
+这对破解语言编码机制非常重要：
+
+```text
+闭合不是一个 logit 方向；
+闭合是状态、读出、生成步和停止执行共同形成的过程。
+```
+
+### 当前机制公式更新
+
+Phase253 公式：
+
+$$
+\boxed{
+M_{\mathrm{closure}}^{(t)}
+=
+B
+(
+h_t,
+v_{\mathrm{control}},
+v_{\mathrm{readout}}
+)
+}
+$$
+
+Phase254 后需要区分：
+
+$$
+\boxed{
+\mathrm{ClosureProxy}
+\neq
+\mathrm{ModelClose}
+}
+$$
+
+更具体地：
+
+$$
+\boxed{
+\mathrm{ModelClose}
+=
+E
+(
+S_{\mathrm{done}},
+R_{\mathrm{stop}},
+G_{\mathrm{rollout}},
+C_{\mathrm{client}}
+)
+}
+$$
+
+其中：
+
+```text
+S_done = 语义完成状态；
+R_stop = 停止 / 边界读出；
+G_rollout = 生成展开轨迹；
+C_client = 客户端截断 / 外部停止规则。
+```
+
+当前只验证到：
+
+```text
+R_stop 和 G_rollout 的部分代理；
+尚未破解 S_done 到 ModelClose 的完整链条。
+```
+
+### 图谱进度
+
+本阶段后图谱进度更新为：
+
+```text
+pattern_family_atlas: 0.82
+high_value_trace_selection: 0.67
+trace_signature_validation: 0.38
+focused_causal_validation: 0.25
+regime_field_direction_bank: 0.35
+natural_regime_direction_bank: 0.30
+regime_level_causal_validation: 0.26
+shared_subspace_analysis: 0.20
+coupled_regime_field_analysis: 0.23
+control_readout_coupling: 0.20
+stop_type_validation: 0.18
+residual_state_signature: 0.49
+readout_competition_trace: 0.72
+stepwise_rollout_trace: 0.38
+causal_closure: 0.16
+general_language_mechanism_confidence: 0.63
+```
+
+### 阶段结论
+
+Phase254 完成了三个关键校准：
+
+```text
+1. closure proxy 可以改善，但多数不会变成真实停止；
+2. 权重校准比简单 combined suppression 更重要；
+3. 当前只筛出 1 个唯一 ModelClose candidate。
+```
+
+下一阶段 Phase255 建议：
+
+```text
+唯一 ModelClose 候选的内部停止机制追踪。
+```
+
+具体任务：
+
+```text
+1. 对 GLM4 / output_protocol_explain_answer_0000 / no_answer_anchor / weighted_combined_c0.25_r1.0 做重复验证；
+2. 记录 EOS step 前后的 hidden trajectory；
+3. 比较 no_intervention 与 weighted condition 的 stop-logit trajectory；
+4. 检查 semantic done 是否先于 EOS stop；
+5. 判断这是偶然采样 / 读出偏置，还是内部停止机制迹象。
+```
+
+## Phase 255: 唯一闭合候选的内部停止轨迹追踪 [2026-07-08 01:30]
+
+### 任务来源
+
+本阶段分析 Phase254 的复盘内容是否正确，并继续同一阶段任务。Phase254 的核心判断是正确的：
+
+```text
+closure proxy（闭合代理）改善
+≠
+ModelClose（模型真实闭合）
+```
+
+Phase254 的 186 个 client_truncation（客户端截断）和 9 个 eos_stop（结束符停止）说明，读出边界改善多数不能自动转化为停止执行。因此 Phase255 不再扩大普通候选，而是对 Phase254 产生的唯一 GLM4 ModelClose candidate（模型闭合候选）做内部轨迹追踪。
+
+测试脚本：
+
+```text
+tests/gpt5/phase255_modelclose_internal_stop_trace.py
+tests/gpt5/run_phase255_modelclose_internal_stop_trace.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase255_modelclose_internal_stop_trace/modelclose_internal_stop_trace/
+```
+
+前端固定格式图谱数据已同步，并通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仅保留既有大 chunk warning（大包警告）。
+
+### 测试原理
+
+Phase255 针对唯一候选：
+
+```text
+model: GLM4
+case_id: phase241_output_protocol_explain_answer_0000
+variant_id: no_answer_anchor
+source condition: weighted_combined_c0.25_r1.0
+```
+
+比较 5 个条件：
+
+```text
+no_intervention（无干预）
+tokenbank_suppression（词元库读出轴抑制）
+natural_raw_suppression（自然控制轴抑制）
+combined_suppression（控制轴+读出轴 1:1 抑制）
+weighted_combined_c0.25_r1.0（控制轴0.25+读出轴1.0加权抑制）
+```
+
+干预公式：
+
+$$
+\boxed{
+h'_t
+=
+h_t
+-
+\lambda_c v_{\mathrm{control}}
+-
+\lambda_r v_{\mathrm{readout}}
+}
+$$
+
+其中：
+
+```text
+v_control（控制轴）来自 natural_continuation_explain（自然续写/解释对比方向）；
+v_readout（读出轴）来自 continuation_regime（续写词元库方向）；
+lambda_c / lambda_r 是控制轴和读出轴权重。
+```
+
+本阶段同时记录三类数据：
+
+```text
+1. actual stop trace（真实停止轨迹）：是否 EOS、是否客户端截断、答案出现位置、过生成长度；
+2. generation step trace（生成步轨迹）：每一步 closure proxy、EOS logit、读出指标；
+3. prefix hidden projection（前缀隐藏投影）：每个生成前缀在多层 residual hidden state 上对 control/readout 方向的投影。
+```
+
+机制判定公式从 Phase254 继续收紧为：
+
+$$
+\boxed{
+\mathrm{ModelClose}
+=
+E(
+S_{\mathrm{done}},
+R_{\mathrm{stop}},
+G_{\mathrm{rollout}},
+C_{\mathrm{client}}
+)
+}
+$$
+
+Phase255 主要检查：
+
+$$
+\boxed{
+R_{\mathrm{stop}}
+\ \mathrm{and}\
+G_{\mathrm{rollout}}
+\rightarrow
+\mathrm{EOS\ execution}
+}
+$$
+
+是否存在可观察轨迹，而不是只看最终 margin（边界）。
+
+### 客观结果
+
+跨模型摘要：
+
+```text
+qwen3: 无 Phase254 ModelClose 候选，生成空结果，未加载模型；
+GLM4: 1 个候选，完成内部停止轨迹追踪；
+DS7B: 无 Phase254 ModelClose 候选，生成空结果，未加载模型。
+```
+
+GLM4 结果：
+
+```text
+stop_trace_rows: 5
+generation_step_rows: 245
+prefix_projection_rows: 1225
+stop_type_counts:
+  eos_stop: 3
+  client_truncation: 2
+missing_rows: 0
+```
+
+各条件结果：
+
+```text
+no_intervention:
+  stop_type = client_truncation
+  tokens = 96
+  answer_first_step = 7
+  eos_pos = None
+  final_closure_proxy_margin = +1.3125
+  over_generation_length = 507
+
+tokenbank_suppression:
+  stop_type = client_truncation
+  tokens = 96
+  answer_first_step = None
+  eos_pos = None
+  final_closure_proxy_margin = -1.0625
+  over_generation_length = 499
+
+natural_raw_suppression:
+  stop_type = eos_stop
+  tokens = 12
+  answer_first_step = 1
+  eos_pos = 12
+  final_closure_proxy_margin = +2.90625
+  over_generation_length = 56
+
+combined_suppression:
+  stop_type = eos_stop
+  tokens = 12
+  answer_first_step = 1
+  eos_pos = 12
+  final_closure_proxy_margin = +7.382812
+  over_generation_length = 56
+
+weighted_combined_c0.25_r1.0:
+  stop_type = eos_stop
+  tokens = 29
+  answer_first_step = 3
+  eos_pos = 29
+  final_closure_proxy_margin = +11.03125
+  over_generation_length = 131
+```
+
+最终层前缀投影均值：
+
+```text
+no_intervention:
+  readout_projection_mean = -4.449800
+  control_projection_mean = -11.366206
+  closure_proxy_mean = -1.157878
+
+tokenbank_suppression:
+  readout_projection_mean = -6.094681
+  control_projection_mean = -14.623580
+  closure_proxy_mean = -0.183431
+
+natural_raw_suppression:
+  readout_projection_mean = -3.546949
+  control_projection_mean = -9.140234
+  closure_proxy_mean = -0.814779
+
+combined_suppression:
+  readout_projection_mean = -3.546949
+  control_projection_mean = -9.140234
+  closure_proxy_mean = +1.399089
+
+weighted_combined_c0.25_r1.0:
+  readout_projection_mean = -5.060608
+  control_projection_mean = -10.590529
+  closure_proxy_mean = -0.123072
+```
+
+EOS 前关键轨迹：
+
+```text
+natural_raw_suppression:
+  step 11 输出句号，closure_proxy = +4.75，eos_logit = +6.25
+  step 12 输出 EOS，closure_proxy = +3.50，eos_logit = +7.5625
+
+combined_suppression:
+  step 11 输出句号，closure_proxy = +10.234375，eos_logit = +7.21875
+  step 12 输出 EOS，closure_proxy = +6.40625，eos_logit = +8.125
+
+weighted_combined_c0.25_r1.0:
+  step 28 输出句号，closure_proxy = +17.4375，eos_logit = +4.09375
+  step 29 输出 EOS，closure_proxy = +10.730469，eos_logit = +9.9375
+```
+
+### 正确性分析
+
+Phase254 复盘内容总体正确，而且 Phase255 进一步支持其中最关键的判断：
+
+```text
+真实停止执行不是单纯读出轴问题。
+```
+
+原因是：
+
+```text
+tokenbank_suppression 是纯 readout axis（读出轴）抑制；
+它没有触发 EOS；
+甚至没有稳定产生目标答案。
+```
+
+而：
+
+```text
+natural_raw_suppression 只使用 control axis（控制轴）；
+却直接触发 EOS stop；
+combined 和 weighted combined 也触发 EOS stop。
+```
+
+这说明当前唯一闭合候选中，停止执行更依赖 control axis（控制轴）参与，而不是只靠 readout preference（读出偏好）增强。
+
+Phase255 的正结果：
+
+```text
+1. 唯一 GLM4 ModelClose 候选可复现 EOS stop；
+2. EOS 不只出现在 Phase254 的 weighted condition，也出现在 natural_raw 和 combined；
+3. EOS 前通常先出现句号/语义完成，再出现 closure proxy 和 EOS logit 上升；
+4. 纯读出轴不能完成真实停止，反而保持 client truncation。
+```
+
+Phase255 的负结果：
+
+```text
+1. qwen3 和 DS7B 没有 Phase254 ModelClose 候选，本阶段无法跨模型验证；
+2. GLM4 只有 1 个样本，不能证明通用机制；
+3. natural_raw 和 combined 的输出更短，但语义格式不如 weighted condition 完整；
+4. weighted condition 虽然 EOS 最强，但过生成长度不一定最短；
+5. 当前仍未证明 S_done（语义完成状态）在内部作为独立状态被稳定编码。
+```
+
+### 关键进展
+
+此前 Phase253/254 的核心结构是：
+
+```text
+control axis（控制轴）
+readout axis（读出轴）
+closure proxy（闭合代理）
+actual stop（真实停止）
+```
+
+Phase255 后可以进一步拆成：
+
+```text
+readout axis: 改变边界压力，但不能单独执行停止；
+control axis: 更可能改变生成状态，使模型进入可停止轨迹；
+combined axis: 同时增强边界和轨迹；
+weighted combined: 可以形成更强 EOS logit，但格式和过生成仍需校准。
+```
+
+当前机制图谱应更新为：
+
+$$
+\boxed{
+S_{\mathrm{done}}
+\xrightarrow{\ v_{\mathrm{control}}\ }
+G_{\mathrm{rollout}}
+\xrightarrow{\ v_{\mathrm{readout}}\ }
+R_{\mathrm{stop}}
+\xrightarrow{}
+\mathrm{EOS}
+}
+$$
+
+但必须注意，这只是当前小模型 GLM4 的单样本机制迹象，不是已闭合公式。
+
+### 图谱进度
+
+本阶段后固定格式图谱数据已更新：
+
+```text
+pattern_family_atlas: 0.82
+high_value_trace_selection: 0.68
+trace_signature_validation: 0.40
+focused_causal_validation: 0.25
+regime_field_direction_bank: 0.35
+natural_regime_direction_bank: 0.30
+regime_level_causal_validation: 0.26
+shared_subspace_analysis: 0.20
+coupled_regime_field_analysis: 0.23
+control_readout_coupling: 0.21
+stop_type_validation: 0.20
+residual_state_signature: 0.50
+readout_competition_trace: 0.73
+stepwise_rollout_trace: 0.40
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.63
+```
+
+整体语言模式图谱进度评估：
+
+```text
+行为图谱: 约 82%
+读出竞争图谱: 约 73%
+残差状态签名: 约 50%
+停止类型验证: 约 20%
+因果闭合: 约 17%
+总体语言机制信心: 约 63%
+```
+
+### 问题、硬伤和瓶颈
+
+1. 单样本硬伤仍然存在。GLM4 的这个样本非常有价值，但不能证明跨样本、跨任务、跨模型机制。
+
+2. 小模型偏差必须保留。当前测试模型内部结构可能比大模型更粗糙，控制轴/读出轴分离程度、EOS 执行机制、短答协议都可能和真实大模型有 30% 到 50% 偏差。
+
+3. 语义完成状态仍未被直接定位。现在观察到 answer_step 和 EOS step 的关系，但还没有找到稳定的 hidden state done signature（完成状态签名）。
+
+4. 过生成长度指标需要更精细。当前 over_generation_length（过生成长度）按文本长度近似，适合粗筛，但对短答案和解释答案的评价不够精准。
+
+5. 读出轴不是停止轴。tokenbank_suppression 的失败说明，继续沿“只修读出边界”路线会进入边际收益递减。
+
+### 结论
+
+Phase255 是 Phase254 后的实质推进，但仍不是闭合成功。
+
+本阶段最重要的客观结论是：
+
+```text
+在唯一 GLM4 ModelClose 候选中，
+真实 EOS stop 更依赖 control axis（控制轴）参与，
+纯 readout axis（读出轴）不能触发停止执行。
+```
+
+因此当前研究路线应从：
+
+```text
+寻找更强 closure proxy
+```
+
+转为：
+
+```text
+寻找语义完成状态 S_done
+以及 S_done 如何通过 control axis 进入 rollout trajectory，
+再通过 readout axis 执行 EOS stop。
+```
+
+### 下一阶段任务
+
+Phase256 仍属于当前阶段，应继续自动推进。建议任务：
+
+```text
+Phase256: 语义完成状态 done signature 的反事实定位
+```
+
+核心方案：
+
+```text
+1. 以 Phase255 的 GLM4 EOS 候选为种子；
+2. 构造 answer-before-done、answer-after-done、explain-continue、short-answer-stop 四类前缀；
+3. 对 EOS 前后 3 到 5 个 token 做 residual hidden state 差分；
+4. 检查 done signature 是否早于 EOS logit 上升；
+5. 如果存在 done signature，再进行小规模因果注入/抑制；
+6. 输出固定 Pattern Atlas 格式，继续更新语言模式图谱。
+```
+
+阶段性目标不是立刻闭合，而是先确认：
+
+```text
+模型内部是否存在独立的 S_done（语义完成状态）；
+它是否是 ModelClose 的上游原因。
+```
+
+## Phase 256: 语义完成状态签名的反事实定位 [2026-07-08 01:35]
+
+### 任务来源
+
+Phase255 发现唯一 GLM4 ModelClose candidate（模型闭合候选）中，真实 EOS stop（结束符停止）并不是纯 readout axis（读出轴）触发，而更依赖 control axis（控制轴）参与。因此 Phase256 继续同一阶段任务：不急于闭合，而是检查是否存在更上游的语义完成状态：
+
+```text
+S_done（语义完成状态）
+```
+
+测试脚本：
+
+```text
+tests/gpt5/phase256_done_signature_counterfactual_localization.py
+tests/gpt5/run_phase256_done_signature_counterfactual_localization.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase256_done_signature_counterfactual_localization/done_signature_counterfactual_localization/
+```
+
+图谱数据已同步到前端固定格式，并通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仅有既有大 chunk warning（大包警告）。
+
+### 测试原理
+
+本阶段不重新采样，而是使用 Phase255 已生成的 step trace（生成步轨迹）重建前缀，减少变量。
+
+对每个 EOS 条件，取最终层 residual hidden state（残差隐藏状态）：
+
+```text
+h_answer = 答案首次出现前缀的 hidden state；
+h_eos = EOS 输出前缀的 hidden state。
+```
+
+构造候选 done direction（完成方向）：
+
+$$
+\boxed{
+v_{\mathrm{done}}
+=
+\operatorname{unit}
+\left(
+\frac{1}{N}
+\sum_i
+\left(
+h_{\mathrm{eos}}^{(i)}
+-
+h_{\mathrm{answer}}^{(i)}
+\right)
+\right)
+}
+$$
+
+然后对每个条件、每个生成前缀、多个层位计算：
+
+$$
+\boxed{
+p_{\mathrm{done}}(t,l)
+=
+\left\langle
+h_{t,l},
+v_{\mathrm{done}}
+\right\rangle
+}
+$$
+
+这个设计只做基础差分和投影，不引入复杂统计模型。目标是观察：
+
+```text
+answer step（答案步）到 EOS step（结束符步）
+是否存在稳定 done_projection（完成投影）增长。
+```
+
+### 客观结果
+
+跨模型情况：
+
+```text
+qwen3: 无 Phase255 stop seed，生成空结果；
+GLM4: 完成 1 个候选的 done signature 定位；
+DS7B: 无 Phase255 stop seed，生成空结果。
+```
+
+GLM4 结果：
+
+```text
+seed_stop_rows: 5
+done_vector_component_rows: 3
+done_signature_rows: 1225
+counterfactual_rows: 5
+missing_rows: 0
+interpretation_counts:
+  eos_aligned_done_growth: 3
+  no_eos_or_no_growth: 2
+```
+
+三条 EOS 条件的 done gain（完成投影增益）：
+
+```text
+natural_raw_suppression:
+  answer_done_projection = -37.017658
+  pre_eos_done_projection = +3.829839
+  eos_done_projection = +21.242704
+  done_gain_answer_to_eos = +58.260362
+
+combined_suppression:
+  answer_done_projection = -37.017658
+  pre_eos_done_projection = +3.829839
+  eos_done_projection = +21.242704
+  done_gain_answer_to_eos = +58.260362
+
+weighted_combined_c0.25_r1.0:
+  answer_done_projection = -50.142101
+  pre_eos_done_projection = +7.158975
+  eos_done_projection = +21.224991
+  done_gain_answer_to_eos = +71.367092
+```
+
+两个非 EOS 条件：
+
+```text
+no_intervention:
+  stop_type = client_truncation
+  answer_done_projection = -42.577522
+  late_done_projection = -4.214076
+  done_gain_answer_to_eos = None
+
+tokenbank_suppression:
+  stop_type = client_truncation
+  answer_done_projection = 0.0
+  late_done_projection = -5.510945
+  done_gain_answer_to_eos = None
+```
+
+关键步轨迹：
+
+```text
+natural_raw_suppression:
+  answer step 1: done_projection = -37.017658
+  pre-EOS step 11: done_projection = +3.829839
+  EOS step 12: done_projection = +21.242704
+
+combined_suppression:
+  answer step 1: done_projection = -37.017658
+  pre-EOS step 11: done_projection = +3.829839
+  EOS step 12: done_projection = +21.242704
+
+weighted_combined_c0.25_r1.0:
+  answer step 3: done_projection = -50.142101
+  pre-EOS step 28: done_projection = +7.158975
+  EOS step 29: done_projection = +21.224991
+```
+
+### 正确性分析
+
+Phase256 得到的是一个局部正结果：
+
+```text
+在 GLM4 唯一闭合候选中，
+EOS 条件都存在 answer step 到 EOS step 的 done_projection 大幅上升。
+```
+
+这说明 Phase255 的判断进一步得到支持：
+
+```text
+停止执行不是单纯的 EOS logit 或 readout preference；
+它可能有一个更上游的 residual state transition（残差状态转换）。
+```
+
+但这个结果不能过度解释。因为：
+
+```text
+1. done direction 是从同一个候选样本构造的，存在自解释风险；
+2. natural_raw 和 combined 的前缀轨迹高度相同，不能当成独立样本；
+3. no_intervention 后期也出现 late_done_projection 上升，但仍未 EOS；
+4. 因此 done_projection 可能是必要迹象，但不是充分条件。
+```
+
+更谨慎的结论是：
+
+```text
+Phase256 找到了一个局部 done signature candidate（完成状态签名候选），
+它与 EOS 执行同向，
+但还没有证明它是通用因果机制。
+```
+
+### 机制进展
+
+Phase253 到 Phase256 的机制链条可以暂时写成：
+
+$$
+\boxed{
+S_{\mathrm{answer}}
+\rightarrow
+S_{\mathrm{done}}
+\rightarrow
+G_{\mathrm{rollout}}
+\rightarrow
+R_{\mathrm{stop}}
+\rightarrow
+\mathrm{EOS}
+}
+$$
+
+其中当前证据强度：
+
+```text
+S_answer（答案出现）: 已可行为定位；
+S_done（语义完成）: 发现局部候选签名；
+G_rollout（生成轨迹）: 已有 step trace 证据；
+R_stop（停止读出）: closure proxy 和 EOS logit 可观测；
+EOS（结束符执行）: GLM4 单样本可复现。
+```
+
+但是尚未证明：
+
+```text
+S_done 是否可跨样本复用；
+S_done 是否可因果注入；
+S_done 是否早于并驱动 R_stop；
+S_done 是否在 qwen3 / DS7B 中存在同构结构。
+```
+
+### 图谱进度
+
+Phase256 后图谱进度：
+
+```text
+pattern_family_atlas: 0.82
+high_value_trace_selection: 0.68
+trace_signature_validation: 0.42
+focused_causal_validation: 0.25
+regime_field_direction_bank: 0.35
+natural_regime_direction_bank: 0.30
+regime_level_causal_validation: 0.26
+shared_subspace_analysis: 0.20
+coupled_regime_field_analysis: 0.23
+control_readout_coupling: 0.21
+stop_type_validation: 0.20
+semantic_done_signature: 0.12
+residual_state_signature: 0.51
+readout_competition_trace: 0.73
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.63
+```
+
+整体判断：
+
+```text
+语言模式图谱主体仍在推进；
+闭合验证仍处于早期；
+semantic_done_signature 是新开拼图，当前只有 0.12；
+causal_closure 仍只有 0.17，不能宣布闭合。
+```
+
+### 问题、硬伤和瓶颈
+
+1. 单样本构造 done direction 有循环解释风险。当前 v_done 来自 EOS 条件本身，因此只能算局部签名，不能算通用公式。
+
+2. 非 EOS 条件也出现 late_done_projection 上升，说明 done_projection 单独不足以触发停止。
+
+3. tokenbank_suppression 没有目标答案，导致 answer_done_projection 无法有效比较，这暴露出纯读出轴干预破坏语义轨迹的问题。
+
+4. qwen3 和 DS7B 没有同类 ModelClose seed，跨模型验证仍缺失。
+
+5. 当前小模型可能存在停止机制粗糙、EOS 训练偏置强、短答协议不稳定等问题，不能直接外推到大模型语言机制。
+
+### 阶段结论
+
+Phase256 是一个必要的局部机制定位阶段。它没有闭合语言机制，但把问题从：
+
+```text
+怎样提高 EOS / closure proxy
+```
+
+推进到：
+
+```text
+是否存在 EOS 上游的 S_done residual signature
+```
+
+本阶段最重要的发现是：
+
+```text
+GLM4 的三个 EOS 条件都出现 answer → EOS 的 done_projection 大幅增长；
+这支持“停止执行需要语义完成状态参与”的路线。
+```
+
+但必须保持谨慎：
+
+```text
+done signature 目前是局部候选，不是通用编码机制；
+下一步必须做跨样本反事实验证。
+```
+
+### 下一阶段任务
+
+Phase257 仍属于当前阶段，应继续推进：
+
+```text
+Phase257: done signature 的跨样本反事实复用测试
+```
+
+建议方案：
+
+```text
+1. 用 Phase256 的 v_done 作为固定方向，不重新拟合；
+2. 在 GLM4 的多个 output_protocol / short_answer / explain_answer 样本上投影；
+3. 检查 answer_done、pre_period_done、post_period_done、eos_done 的相对顺序；
+4. 对少量高匹配样本做 v_done 注入/抑制；
+5. 判断 v_done 是单样本局部方向，还是可复用的完成状态方向。
+```
+
+如果 Phase257 失败，也很有价值，因为它会说明：
+
+```text
+done state 不是单一方向，
+而可能是任务族、输出协议、语义类型共同决定的局部状态簇。
+```
+
+## Phase 257: done signature 的跨样本复用测试 [2026-07-08 01:40]
+
+### 任务来源
+
+Phase256 找到了局部 done signature candidate（完成状态签名候选），但它来自唯一 GLM4 ModelClose candidate（模型闭合候选），存在自解释风险。因此 Phase257 继续同一阶段任务：固定 Phase256 的 v_done（完成方向），不重新拟合，在更多 GLM4 输出协议样本上做跨样本复用测试。
+
+测试脚本：
+
+```text
+tests/gpt5/phase257_done_signature_cross_sample_reuse.py
+tests/gpt5/run_phase257_done_signature_cross_sample_reuse.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase257_done_signature_cross_sample_reuse/done_signature_cross_sample_reuse/
+```
+
+图谱数据已同步并通过前端构建：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仅保留既有大 chunk warning（大包警告）。
+
+### 测试原理
+
+Phase257 的关键约束是：
+
+```text
+v_done 固定；
+复用样本不重新拟合 done direction。
+```
+
+对 40 个 GLM4 output_protocol（输出协议）样本，构造 5 类前缀：
+
+```text
+prompt_only（只有提示词）
+answer_only（提示词 + 答案）
+answer_period（提示词 + 答案 + 句号）
+answer_explain_stub（提示词 + 答案 + because）
+answer_done_template（提示词 + Answer/Reason 完成模板）
+```
+
+计算最终层：
+
+$$
+\boxed{
+p_{\mathrm{done}}(x)
+=
+\left\langle
+h_{\mathrm{last}}(x),
+v_{\mathrm{done}}
+\right\rangle
+}
+$$
+
+并检查：
+
+$$
+\boxed{
+p_{\mathrm{done}}(\mathrm{answer\_period})
+>
+p_{\mathrm{done}}(\mathrm{answer\_only})
+}
+$$
+
+以及：
+
+$$
+\boxed{
+p_{\mathrm{done}}(\mathrm{answer\_done\_template})
+>
+p_{\mathrm{done}}(\mathrm{prompt\_only})
+}
+$$
+
+如果两者同时成立，标记为 reuse_match（复用匹配）。
+
+### 客观结果
+
+跨模型：
+
+```text
+qwen3: 无 done seed，生成空结果；
+GLM4: 完成 40 个样本复用测试；
+DS7B: 无 done seed，生成空结果。
+```
+
+GLM4 结果：
+
+```text
+seed_eos_rows: 3
+done_vector_component_rows: 3
+reuse_rows: 1000
+case_summary_rows: 40
+missing_rows: 0
+reuse_match_count: 18
+reuse_match_rate: 0.45
+```
+
+不同前缀的平均 done_projection：
+
+```text
+prompt_only: -17.489933
+answer_only: -7.151982
+answer_period: -5.547511
+answer_explain_stub: -10.986023
+answer_done_template: -2.426071
+```
+
+差分结果：
+
+```text
+mean_period_minus_answer: +1.604471
+mean_done_template_minus_prompt: +15.063862
+```
+
+按样本明细观察：
+
+```text
+output_protocol 总样本: 40
+reuse_match: 18
+reuse_match_rate: 45%
+```
+
+解释型 answer 样本上 done_template 增益较强：
+
+```text
+phase241_output_protocol_explain_answer_0000 one_word_strict:
+  done_template_minus_prompt = +45.466290
+
+phase241_output_protocol_explain_answer_0000 short_answer_instruction:
+  done_template_minus_prompt = +41.770173
+
+phase241_output_protocol_explain_answer_0000 full:
+  done_template_minus_prompt = +37.035934
+```
+
+JSON answer 相关样本上增益弱或为负：
+
+```text
+phase241_output_protocol_json_answer_0001 no_answer_anchor:
+  done_template_minus_prompt = -2.977939
+
+phase241_output_protocol_json_answer_0000 no_answer_anchor:
+  done_template_minus_prompt = -2.364160
+
+phase241_output_protocol_json_answer_0000 target_seeded:
+  done_template_minus_prompt = -1.713798
+```
+
+### 正确性分析
+
+Phase257 是一个弱正结果，同时也是重要校准。
+
+正结果：
+
+```text
+固定 v_done 在 40 个样本上不是完全失效；
+answer_done_template 相对 prompt_only 平均提升明显；
+answer_period 相对 answer_only 平均也有小幅提升；
+说明 Phase256 的 done direction 至少捕捉到一部分“答案完成/格式完成”的状态变化。
+```
+
+负结果：
+
+```text
+reuse_match_rate 只有 45%；
+JSON answer 样本上增益弱或负；
+说明 v_done 不是全局通用完成方向。
+```
+
+因此不能说：
+
+```text
+已经找到语言完成状态的统一方向。
+```
+
+更准确的说法是：
+
+```text
+找到一个与 explain_answer 输出协议强相关的 done-like direction（类完成方向）；
+它可以弱复用，但不是全局闭合机制。
+```
+
+### 机制进展
+
+Phase257 把 Phase256 的局部 done signature 从单样本扩展到小批量样本，得到一个更谨慎的结构：
+
+$$
+\boxed{
+S_{\mathrm{done}}
+\not\approx
+v_{\mathrm{done}}^{\mathrm{global}}
+}
+$$
+
+更可能的形式是：
+
+$$
+\boxed{
+S_{\mathrm{done}}
+\approx
+\mathcal{C}
+\left(
+v_{\mathrm{semantic}},
+v_{\mathrm{protocol}},
+v_{\mathrm{boundary}},
+v_{\mathrm{rollout}}
+\right)
+}
+$$
+
+其中：
+
+```text
+v_semantic（语义完成方向）
+v_protocol（输出协议方向）
+v_boundary（边界/句号方向）
+v_rollout（生成轨迹方向）
+```
+
+共同形成局部 done state cluster（完成状态簇）。
+
+这与前面图谱路线一致：
+
+```text
+语言不是单一向量机制；
+语言更像模式网络；
+完成状态也不是一个方向，而是模式族中的局部状态簇。
+```
+
+### 图谱进度
+
+Phase257 后图谱进度：
+
+```text
+pattern_family_atlas: 0.82
+high_value_trace_selection: 0.68
+trace_signature_validation: 0.43
+focused_causal_validation: 0.25
+regime_field_direction_bank: 0.35
+natural_regime_direction_bank: 0.30
+regime_level_causal_validation: 0.26
+shared_subspace_analysis: 0.20
+coupled_regime_field_analysis: 0.23
+control_readout_coupling: 0.21
+stop_type_validation: 0.20
+semantic_done_signature: 0.15
+residual_state_signature: 0.52
+readout_competition_trace: 0.73
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.63
+```
+
+### 问题、硬伤和瓶颈
+
+1. 复用率只有 45%，不能支持全局单向量 done mechanism（完成机制）。
+
+2. 样本主要来自 GLM4 output_protocol，仍不能跨模型泛化。
+
+3. 前缀模板是人工构造，虽然有利于控制变量，但不等同于模型自然生成轨迹。
+
+4. JSON answer 和 explain answer 差异明显，说明输出协议本身强烈影响 done signature。
+
+5. 当前只是投影复用，不是因果注入/抑制验证，因此 causal_closure（因果闭合）没有明显提高。
+
+### 阶段结论
+
+Phase257 完成了 Phase256 之后必须做的跨样本校准。结论是：
+
+```text
+Phase256 的 v_done 不是纯偶然方向，
+但也不是全局通用完成方向。
+```
+
+更可能的真实结构是：
+
+```text
+完成状态 = 语义完成 + 输出协议完成 + 边界符号 + 生成轨迹
+共同形成的局部状态簇。
+```
+
+因此当前研究应避免继续寻找一个单一 done vector（完成向量），而应进入：
+
+```text
+done state cluster（完成状态簇）
+```
+
+的图谱分析。
+
+### 下一阶段任务
+
+Phase258 可以继续同一大阶段，但已经从“单方向验证”转入“状态簇图谱”。建议任务：
+
+```text
+Phase258: done state cluster 的模式族分解
+```
+
+具体方案：
+
+```text
+1. 按 explain_answer / short_answer / json_answer / one_word_answer 分组；
+2. 每组单独构造局部 done direction；
+3. 比较组内复用率和组间迁移率；
+4. 判断 done state 是协议族分裂，还是共享核心 + 协议外壳；
+5. 只在复用率高的组内做小规模因果注入。
+```
+
+阶段性目标：
+
+```text
+从“寻找单一完成方向”
+转为
+绘制“完成状态簇图谱”。
+```
+
+## Phase 258: done state cluster 的模式族分解 [2026-07-08 02:24]
+
+### 任务来源
+
+本阶段分析 Phase255-257 的复盘内容是否正确，并继续当前同一阶段任务。附件判断总体正确：Phase255 证明 GLM4 单样本中真实 EOS stop（结束符停止）与 control axis（控制轴）参与有关；Phase256 找到局部 done-like direction（类完成方向）；Phase257 证明该方向可以弱复用，但不是全局 done vector（完成向量）。
+
+因此 Phase258 从：
+
+```text
+寻找单一完成方向
+```
+
+转入：
+
+```text
+done state cluster（完成状态簇）图谱分解
+```
+
+测试脚本：
+
+```text
+tests/gpt5/phase258_done_state_cluster_mode_decomposition.py
+tests/gpt5/run_phase258_done_state_cluster_mode_decomposition.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase258_done_state_cluster_mode_decomposition/done_state_cluster_mode_decomposition/
+```
+
+固定格式图谱数据已同步到前端，并通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仅保留既有大 chunk warning（大包警告）。
+
+### 测试原理
+
+Phase258 不再只使用 Phase256 的单一样本 v_done，而是在每个模型中按 output_protocol（输出协议）模式族分组：
+
+```text
+short_answer
+one_word
+explain_answer
+repeat_answer
+list_answer
+json_answer
+table_answer
+stop_after_answer
+```
+
+每个模型、每个模式族最多取 8 个样本，共：
+
+```text
+每模型 64 个样本；
+三模型 192 个样本。
+```
+
+对每个样本构造 5 类前缀：
+
+```text
+prompt_only（只有提示）
+answer_only（提示 + 答案）
+answer_period（提示 + 答案 + 句号）
+answer_explain_stub（提示 + 答案 + because）
+answer_done_template（提示 + Answer/Reason 完成模板）
+```
+
+每个模式族构造局部完成方向：
+
+$$
+\boxed{
+v_{\mathrm{done}}^{(m)}
+=
+\operatorname{unit}
+\left(
+\frac{1}{N_m}
+\sum_i
+\left(
+h_{\mathrm{done\_template}}^{(i,m)}
+-
+h_{\mathrm{prompt}}^{(i,m)}
+\right)
+\right)
+}
+$$
+
+然后计算所有源模式方向到所有目标模式样本的投影迁移：
+
+$$
+\boxed{
+p_{\mathrm{done}}^{(s \rightarrow t)}(x)
+=
+\left\langle
+h(x),
+v_{\mathrm{done}}^{(s)}
+\right\rangle
+}
+$$
+
+并用两个基础条件判断 reuse_match（复用匹配）：
+
+$$
+\boxed{
+p(\mathrm{answer\_period})
+>
+p(\mathrm{answer\_only})
+}
+$$
+
+$$
+\boxed{
+p(\mathrm{answer\_done\_template})
+>
+p(\mathrm{prompt\_only})
+}
+$$
+
+注意：这个测试仍然是投影图谱，不是因果闭合。
+
+### 客观结果
+
+三模型均完成：
+
+```text
+done_cluster_vectors: 24
+projection_rows: 7680
+transfer_rows: 1536
+observation_rows: 9216
+metric_rows: 282
+graph_edges: 192
+missing_rows: 0
+```
+
+跨模型复用率：
+
+```text
+qwen3:
+  within_mode_reuse_rate = 0.953125
+  cross_mode_reuse_rate = 0.984375
+
+GLM4:
+  within_mode_reuse_rate = 0.843750
+  cross_mode_reuse_rate = 0.944196
+
+DS7B:
+  within_mode_reuse_rate = 0.937500
+  cross_mode_reuse_rate = 0.937500
+
+overall:
+  within_mode_reuse_rate = 0.911458
+  cross_mode_reuse_rate = 0.955357
+```
+
+按模型总体复用率：
+
+```text
+qwen3: 0.980469
+GLM4: 0.931641
+DS7B: 0.937500
+```
+
+按源模式复用率：
+
+```text
+short_answer: 0.937500
+one_word: 0.963542
+explain_answer: 0.942708
+repeat_answer: 0.984375
+list_answer: 0.958333
+json_answer: 0.911458
+table_answer: 0.947917
+stop_after_answer: 0.953125
+```
+
+按目标模式复用率：
+
+```text
+explain_answer: 0.979167
+json_answer: 0.822917
+list_answer: 0.937500
+one_word: 0.947917
+repeat_answer: 0.984375
+short_answer: 0.968750
+stop_after_answer: 0.989583
+table_answer: 0.968750
+```
+
+方向相似度：
+
+```text
+qwen3 mode-direction cosine:
+  mean = 0.629099
+  min = 0.518082
+  max = 0.885819
+
+GLM4 mode-direction cosine:
+  mean = 0.509306
+  min = 0.302626
+  max = 0.741393
+
+DS7B mode-direction cosine:
+  mean = 0.793704
+  min = 0.656966
+  max = 0.926663
+```
+
+明显薄弱迁移：
+
+```text
+GLM4:
+  json_answer -> json_answer = 0.125
+  json_answer -> table_answer = 0.500
+  table_answer -> json_answer = 0.500
+  one_word -> json_answer = 0.625
+  list_answer -> json_answer = 0.625
+
+qwen3:
+  list_answer -> list_answer = 0.625
+  json_answer -> list_answer = 0.625
+  stop_after_answer -> list_answer = 0.625
+
+DS7B:
+  short_answer -> json_answer = 0.750
+  short_answer -> short_answer = 0.750
+  one_word -> json_answer = 0.750
+  explain_answer -> json_answer = 0.750
+```
+
+### 正确性分析
+
+Phase258 是一个重要校准阶段。表面上复用率很高，尤其 cross-mode（跨模式）复用率甚至高于 within-mode（组内复用率），但这不能解释为“找到了统一完成方向”。
+
+更谨慎的解释是：
+
+```text
+当前 done direction 很大一部分捕捉到的是 answer_done_template（完成模板）相对 prompt_only（纯提示）的格式/协议轴；
+该轴跨模式共享较强；
+因此 cross-mode 高不等于真实语义完成机制闭合。
+```
+
+这也是为什么 GLM4 最有价值：它的模式方向相似度均值最低：
+
+```text
+GLM4 cosine mean = 0.509306
+```
+
+说明 GLM4 中 output_protocol 的不同模式族确实有一定分裂，而 qwen3 和 DS7B 的方向更相似，可能反映小模型结构更粗，或者模板轴更强。
+
+JSON answer 是最关键异类：
+
+```text
+overall target json_answer reuse_rate = 0.822917
+GLM4 json_answer -> json_answer = 0.125
+```
+
+这说明 json_answer 的完成状态很可能不是普通“答案+句号+解释模板”方向，而是更接近结构化协议闭合：
+
+```text
+括号/引号/冒号/字段完整性/结构结束
+```
+
+因此 Phase258 没有证明全局 done cluster 已完成；它证明：
+
+```text
+完成状态簇至少包含强共享模板轴 + 协议族分裂轴。
+```
+
+### 机制进展
+
+Phase257 的公式是：
+
+$$
+\boxed{
+S_{\mathrm{done}}
+\not\approx
+v_{\mathrm{done}}^{\mathrm{global}}
+}
+$$
+
+Phase258 后更精确地改为：
+
+$$
+\boxed{
+S_{\mathrm{done}}^{(m)}
+=
+S_{\mathrm{template}}
++
+S_{\mathrm{protocol}}^{(m)}
++
+S_{\mathrm{boundary}}^{(m)}
++
+S_{\mathrm{semantic}}^{(m)}
+}
+$$
+
+其中：
+
+```text
+S_template（完成模板状态）是强共享轴；
+S_protocol（协议状态）决定 json/table/list 等结构化差异；
+S_boundary（边界状态）决定句号、换行、EOS 等边界行为；
+S_semantic（语义状态）决定答案是否真的完成。
+```
+
+当前测试主要验证了：
+
+```text
+S_template 强；
+S_protocol 存在，尤其 GLM4/json_answer 明显；
+S_semantic 仍未被充分分离。
+```
+
+### 图谱进度
+
+Phase258 后图谱进度：
+
+```text
+pattern_family_atlas: 0.83
+trace_signature_validation: 0.44
+semantic_done_signature: 0.20
+done_state_cluster_map: 0.16
+residual_state_signature: 0.53
+readout_competition_trace: 0.73
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.64
+```
+
+总体判断：
+
+```text
+语言模式图谱继续推进；
+完成状态簇图谱刚打开；
+闭合验证仍没有明显进展；
+当前更接近“全局图谱拼图”，而不是“机制闭合”。
+```
+
+### 问题、硬伤和瓶颈
+
+1. 测试指标可能被模板轴主导。answer_done_template 与 prompt_only 的差异很大，容易让跨模式复用率虚高。
+
+2. 复用率高不等于闭合。当前只是投影顺序满足条件，没有验证真实 EOS stop，也没有因果注入。
+
+3. 组内复用低于跨组复用是警告信号。它说明当前方向可能不是细粒度模式簇，而是一个更粗的完成模板轴。
+
+4. JSON answer 暴露结构化语言机制缺口。它可能需要独立的结构闭合方向，不能用普通答案完成方向解释。
+
+5. 小模型偏差仍然重要。qwen3 和 DS7B 的高相似度可能是结构粗糙，也可能是模板偏置更强，不能直接外推。
+
+### 阶段结论
+
+Phase258 的结论是：
+
+```text
+done state cluster 路线正确；
+但当前分解出的第一主轴更像完成模板轴，而不是纯语义完成轴。
+```
+
+换句话说：
+
+```text
+完成状态不是单一方向；
+也不是简单按模式族完全分裂；
+而是共享模板轴 + 协议族局部轴 + 语义完成轴共同构成。
+```
+
+这比 Phase257 更进一步，因为它解释了为什么固定 v_done 可以弱复用，也解释了为什么 JSON answer 不稳定。
+
+### 下一阶段任务
+
+Phase259 仍属于当前大阶段。建议下一步不要继续扩大同类模板投影，而要把模板轴和语义轴拆开：
+
+```text
+Phase259: template-done 与 semantic-done 的解耦测试
+```
+
+具体方案：
+
+```text
+1. 构造四类前缀：
+   A. 模板完整但语义错误；
+   B. 语义正确但模板未完成；
+   C. 模板完整且语义正确；
+   D. 模板未完成且语义错误；
+
+2. 分别测：
+   template_projection（模板投影）
+   semantic_projection（语义投影）
+   boundary_projection（边界投影）
+
+3. 检查 EOS / closure proxy 更依赖哪一类状态。
+```
+
+阶段目标：
+
+```text
+把 S_template 和 S_semantic 分开；
+否则 done state cluster 会被模板轴污染，无法靠近真实语言闭合机制。
+```
+
+## Phase 259: template-done 与 semantic-done 的解耦测试 [2026-07-08 02:59]
+
+### 任务来源
+
+本阶段分析 Phase258 复盘内容是否正确，并继续同一阶段任务。Phase258 的判断基本正确：done state cluster（完成状态簇）路线是必要推进，但高复用率主要说明模板/协议轴很强，不能证明已经找到纯 semantic-done（语义完成）机制。
+
+因此 Phase259 不再扩大同类模板投影，而是直接拆分：
+
+```text
+S_template（模板完成状态）
+S_semantic（语义完成状态）
+S_boundary（边界状态）
+```
+
+测试脚本：
+
+```text
+tests/gpt5/phase259_template_semantic_done_disentanglement.py
+tests/gpt5/run_phase259_template_semantic_done_disentanglement.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase259_template_semantic_done_disentanglement/template_semantic_done_disentanglement/
+```
+
+固定格式图谱数据已同步到前端，并通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仅有既有大 chunk warning（大包警告）。
+
+### 测试原理
+
+本阶段构造四象限前缀：
+
+```text
+template_complete_semantic_correct（模板完整 + 语义正确）
+template_complete_semantic_wrong（模板完整 + 语义错误）
+template_incomplete_semantic_correct（模板不完整 + 语义正确）
+template_incomplete_semantic_wrong（模板不完整 + 语义错误）
+```
+
+并额外加入边界前缀：
+
+```text
+boundary_complete_semantic_correct（边界完整 + 语义正确）
+boundary_complete_semantic_wrong（边界完整 + 语义错误）
+```
+
+在每个模型中构造三个方向：
+
+$$
+\boxed{
+v_{\mathrm{template}}
+=
+\operatorname{unit}
+\left(
+\frac{
+(h_{TC}-h_{IC})+(h_{TW}-h_{IW})
+}{2}
+\right)
+}
+$$
+
+$$
+\boxed{
+v_{\mathrm{semantic}}
+=
+\operatorname{unit}
+\left(
+\frac{
+(h_{TC}-h_{TW})+(h_{IC}-h_{IW})+(h_{BC}-h_{BW})
+}{3}
+\right)
+}
+$$
+
+$$
+\boxed{
+v_{\mathrm{boundary}}
+=
+\operatorname{unit}
+\left(
+\frac{
+(h_{BC}-h_{IC})+(h_{BW}-h_{IW})
+}{2}
+\right)
+}
+$$
+
+其中：
+
+```text
+TC = template complete + semantic correct；
+TW = template complete + semantic wrong；
+IC = incomplete template + semantic correct；
+IW = incomplete template + semantic wrong；
+BC = boundary complete + semantic correct；
+BW = boundary complete + semantic wrong。
+```
+
+然后检查：
+
+```text
+template_axis 是否只响应模板完整；
+semantic_axis 是否只响应语义正确；
+boundary_axis 是否响应句号/边界；
+closure proxy 是否跟这些轴同步变化。
+```
+
+### 客观结果
+
+三模型均完成：
+
+```text
+vector_rows: 9
+prefix_rows: 720
+case_summary_rows: 120
+observation_rows: 720
+metric_rows: 24
+graph_edges: 120
+missing_rows: 0
+```
+
+跨模型解耦率：
+
+```text
+qwen3: 1.0
+GLM4: 1.0
+DS7B: 1.0
+overall: 1.0
+```
+
+平均投影效应：
+
+```text
+template_axis_effect_correct: +120.060837
+template_axis_effect_wrong: +166.050752
+semantic_axis_effect_template: +13.505275
+semantic_axis_effect_incomplete: +96.979530
+```
+
+平均 closure proxy 效应：
+
+```text
+closure_template_effect_correct: -6.834180
+closure_semantic_effect_template: -0.049740
+closure_boundary_effect_correct: -5.406445
+```
+
+分模型：
+
+```text
+qwen3:
+  template_axis_effect_correct = +179.763319
+  semantic_axis_effect_template = +20.767336
+  closure_template_effect_correct = -8.278125
+  closure_semantic_effect_template = -0.376563
+
+GLM4:
+  template_axis_effect_correct = +31.547640
+  semantic_axis_effect_template = +2.800993
+  closure_template_effect_correct = -4.681250
+  closure_semantic_effect_template = -0.018750
+
+DS7B:
+  template_axis_effect_correct = +148.871551
+  semantic_axis_effect_template = +16.947497
+  closure_template_effect_correct = -7.543164
+  closure_semantic_effect_template = +0.246094
+```
+
+方向相似度：
+
+```text
+qwen3:
+  semantic_done vs template_done cosine = 0.306191
+  boundary_done vs template_done cosine = 0.878367
+  boundary_done vs semantic_done cosine = 0.378845
+
+GLM4:
+  semantic_done vs template_done cosine = 0.341111
+  boundary_done vs template_done cosine = 0.777494
+  boundary_done vs semantic_done cosine = 0.384409
+
+DS7B:
+  semantic_done vs template_done cosine = 0.326304
+  boundary_done vs template_done cosine = 0.874964
+  boundary_done vs semantic_done cosine = 0.172210
+```
+
+### 正确性分析
+
+Phase259 是一个强校准结果。
+
+正结果：
+
+```text
+template axis 和 semantic axis 可以在投影层面明显拆开；
+三模型 semantic/template cosine 约 0.31 到 0.34；
+boundary axis 与 template axis 高相似，约 0.78 到 0.88；
+说明边界更接近输出模板/协议结构，而不是纯语义。
+```
+
+负结果更关键：
+
+```text
+template 投影增强没有提高 closure proxy，反而平均下降；
+semantic 正确性几乎不提高 closure proxy；
+boundary 完整也平均降低 closure proxy。
+```
+
+这说明：
+
+```text
+投影上的完成状态
+≠
+停止读出压力
+≠
+真实 EOS 执行。
+```
+
+因此 Phase259 没有提高 causal_closure（因果闭合），但它把机制缺口定位得更清楚：
+
+```text
+S_template 和 S_semantic 可以分离；
+但它们没有自动接入 R_stop（停止读出）。
+```
+
+### 机制进展
+
+Phase258 的公式：
+
+$$
+\boxed{
+S_{\mathrm{done}}^{(m)}
+=
+S_{\mathrm{template}}
++
+S_{\mathrm{protocol}}^{(m)}
++
+S_{\mathrm{boundary}}^{(m)}
++
+S_{\mathrm{semantic}}^{(m)}
+}
+$$
+
+Phase259 后应进一步改为：
+
+$$
+\boxed{
+S_{\mathrm{done}}
+=
+\left(
+S_{\mathrm{template}},
+S_{\mathrm{semantic}},
+S_{\mathrm{boundary}}
+\right)
+}
+$$
+
+但：
+
+$$
+\boxed{
+S_{\mathrm{done}}
+\nRightarrow
+R_{\mathrm{stop}}
+}
+$$
+
+当前更完整的链条应写成：
+
+$$
+\boxed{
+S_{\mathrm{semantic}}
+\oplus
+S_{\mathrm{template}}
+\oplus
+S_{\mathrm{boundary}}
+\rightarrow
+G_{\mathrm{rollout}}
+\rightarrow
+R_{\mathrm{stop}}
+\rightarrow
+\mathrm{EOS}
+}
+$$
+
+其中：
+
+```text
+S_semantic / S_template / S_boundary 已能在投影上区分；
+G_rollout 到 R_stop 的连接仍未破解；
+R_stop 到 EOS 只在 GLM4 单候选中看到局部迹象。
+```
+
+### 图谱进度
+
+Phase259 后图谱进度：
+
+```text
+pattern_family_atlas: 0.83
+trace_signature_validation: 0.45
+semantic_done_signature: 0.23
+done_state_cluster_map: 0.20
+template_semantic_disentanglement: 0.18
+residual_state_signature: 0.54
+readout_competition_trace: 0.73
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.64
+```
+
+整体判断：
+
+```text
+图谱拼图继续推进；
+完成状态内部结构更清楚；
+但闭合链路仍未贯通。
+```
+
+### 问题、硬伤和瓶颈
+
+1. 四象限前缀是人工构造，不等于自然生成轨迹。它适合分离状态，但不能直接证明模型自然使用这些状态。
+
+2. wrong_answer（错误答案）是通用替代词，语义错误强度可能不完全一致。
+
+3. closure proxy 平均下降说明当前前缀可能改变了模型继续生成策略，而不是触发停止策略。
+
+4. boundary axis 与 template axis 高相似，说明句号/边界在小模型中可能被协议模板吞并。
+
+5. 仍没有因果注入。当前只是投影解耦，不是机制闭合。
+
+### 阶段结论
+
+Phase259 的结论是：
+
+```text
+template-done 与 semantic-done 可以在 hidden state 投影上分离；
+boundary-done 更接近 template-done；
+但三者都没有直接转化为 closure proxy 或 EOS stop。
+```
+
+这非常关键，因为它说明此前“完成状态簇”的主要瓶颈不在于无法分离状态，而在于：
+
+```text
+完成状态如何驱动 rollout trajectory 和 stop readout。
+```
+
+因此研究路线应从：
+
+```text
+继续找 done state
+```
+
+转向：
+
+```text
+寻找 S_done 到 R_stop 的桥接机制。
+```
+
+### 下一阶段任务
+
+Phase260 仍属于当前大阶段，建议任务：
+
+```text
+Phase260: S_done 到 R_stop 的桥接层定位
+```
+
+具体方案：
+
+```text
+1. 使用 Phase259 的 template/semantic/boundary 三个方向；
+2. 在多层 residual hidden state 上投影，而不是只看最终层；
+3. 检查哪些层出现：
+   semantic/template projection 上升；
+   closure proxy 随后上升；
+   EOS logit 随后上升；
+4. 重点看 GLM4，因为它在前面 Phase255 出现真实 EOS 候选；
+5. 只在桥接迹象强的层做小规模干预。
+```
+
+阶段目标：
+
+```text
+找到 S_done → R_stop 的中间层或桥接状态；
+否则完成状态图谱仍然无法闭合到真实停止。
+```
+
+## Phase 260: S_done 到 R_stop 的桥接层定位 [2026-07-08 03:29]
+
+### 任务来源
+
+本阶段分析 Phase259 复盘内容是否正确，并继续同一阶段任务。Phase259 的判断是正确的：它不是闭合阶段，而是把完成状态拆成：
+
+```text
+S_template（模板完成状态）
+S_semantic（语义完成状态）
+S_boundary（边界状态）
+```
+
+并证明三者在 hidden state（隐藏状态）投影上可以区分。但 Phase259 同时证明：
+
+```text
+完成状态投影
+≠
+closure proxy（闭合代理）
+≠
+EOS stop（结束符停止）
+```
+
+因此 Phase260 的任务是定位：
+
+```text
+S_done → R_stop
+```
+
+的桥接层或桥接迹象。
+
+测试脚本：
+
+```text
+tests/gpt5/phase260_sdone_rstop_bridge_layer_localization.py
+tests/gpt5/run_phase260_sdone_rstop_bridge_layer_localization.sh
+```
+
+测试结果：
+
+```text
+tests/result/phase260_sdone_rstop_bridge_layer_localization/sdone_rstop_bridge_layer_localization/
+```
+
+固定格式图谱数据已同步到前端，并通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仅有既有大 chunk warning（大包警告）。
+
+### 测试原理
+
+本阶段沿用 Phase259 的六类前缀：
+
+```text
+TC = template_complete_semantic_correct
+TW = template_complete_semantic_wrong
+IC = template_incomplete_semantic_correct
+IW = template_incomplete_semantic_wrong
+BC = boundary_complete_semantic_correct
+BW = boundary_complete_semantic_wrong
+```
+
+但不再只看 final layer（最终层），而是在多个 residual layer（残差层）上分别构造：
+
+```text
+template_done
+semantic_done
+boundary_done
+```
+
+方向。
+
+对每个层位 l：
+
+$$
+\boxed{
+v_{\mathrm{template}}^{(l)}
+=
+\operatorname{unit}
+\left(
+\frac{
+(h_{TC}^{(l)}-h_{IC}^{(l)})+
+(h_{TW}^{(l)}-h_{IW}^{(l)})
+}{2}
+\right)
+}
+$$
+
+$$
+\boxed{
+v_{\mathrm{semantic}}^{(l)}
+=
+\operatorname{unit}
+\left(
+\frac{
+(h_{TC}^{(l)}-h_{TW}^{(l)})+
+(h_{IC}^{(l)}-h_{IW}^{(l)})+
+(h_{BC}^{(l)}-h_{BW}^{(l)})
+}{3}
+\right)
+}
+$$
+
+$$
+\boxed{
+v_{\mathrm{boundary}}^{(l)}
+=
+\operatorname{unit}
+\left(
+\frac{
+(h_{BC}^{(l)}-h_{IC}^{(l)})+
+(h_{BW}^{(l)}-h_{IW}^{(l)})
+}{2}
+\right)
+}
+$$
+
+然后比较：
+
+```text
+projection_effect（投影变化）
+closure_proxy_effect（闭合代理变化）
+eos_logit_effect（结束符 logit 变化）
+```
+
+桥接候选定义：
+
+```text
+projection_effect > 0
+closure_proxy_effect > 0
+并且多数样本同向
+```
+
+另设 EOS bridge（结束符桥接）：
+
+```text
+projection_effect > 0
+eos_logit_effect > 0
+并且多数样本同向
+```
+
+注意：EOS bridge 不等于 closure bridge，因为 EOS logit 上升不一定赢得整体停止读出竞争。
+
+### 客观结果
+
+三模型均完成：
+
+```text
+vector_rows: 54
+case_layer_rows: 2160
+layer_summary_rows: 54
+observation_rows: 2160
+metric_rows: 54
+graph_edges: 54
+missing_rows: 0
+```
+
+跨模型总结果：
+
+```text
+bridge_candidate_count: 6
+eos_bridge_candidate_count: 42
+```
+
+按轴的 closure bridge rate（闭合桥接率）：
+
+```text
+template_done: 0.108333
+semantic_done: 0.491667
+boundary_done: 0.091667
+```
+
+按轴的 EOS bridge rate（结束符桥接率）：
+
+```text
+template_done: 0.700000
+semantic_done: 0.488889
+boundary_done: 0.691667
+```
+
+按轴的平均 closure proxy effect：
+
+```text
+template_done: -6.834180
+semantic_done: -0.049740
+boundary_done: -5.406445
+```
+
+按轴的平均 eos logit effect：
+
+```text
+template_done: +2.022526
+semantic_done: +0.021875
+boundary_done: +1.333532
+```
+
+分模型：
+
+```text
+qwen3:
+  bridge_candidate_count = 0
+  eos_bridge_candidate_count = 12
+  template_done eos effect = +3.660693
+  boundary_done eos effect = +2.516147
+  closure effects 全部为负
+
+GLM4:
+  bridge_candidate_count = 0
+  eos_bridge_candidate_count = 12
+  template_done eos effect = +0.972510
+  boundary_done eos effect = +0.101636
+  closure effects 全部为负或近零
+
+DS7B:
+  bridge_candidate_count = 6
+  eos_bridge_candidate_count = 18
+  semantic_done closure effect = +0.246094
+  semantic_done eos effect = +0.135547
+```
+
+关键候选：
+
+```text
+DS7B 的 semantic_done 在所有观察层都出现 weak closure bridge：
+L10, L16, L22, L24, L26, L27
+
+但 qwen3 和 GLM4 没有 closure bridge candidate。
+```
+
+### 正确性分析
+
+Phase260 是一个强负结果 + 弱正迹象阶段。
+
+强负结果：
+
+```text
+qwen3 和 GLM4 都没有 S_done → closure proxy 的桥接候选；
+template_done 和 boundary_done 虽然强烈提高 EOS logit，
+但 closure proxy 平均为负。
+```
+
+这说明：
+
+```text
+提高 EOS logit
+≠
+赢得停止读出竞争
+```
+
+也就是说，模型可能同时提高了 EOS，但 continuation、格式继续、解释继续等竞争项仍然更强，导致 closure proxy 不升反降。
+
+弱正迹象：
+
+```text
+DS7B 的 semantic_done 出现 6 个 closure bridge candidate。
+```
+
+但必须谨慎，因为：
+
+```text
+1. 只出现在 DS7B；
+2. 平均 closure effect 只有 +0.246094；
+3. 当前模型是小模型，内部结构可能粗糙；
+4. 每层候选重复性较强，可能来自同一组前缀差异，而不是真正层级传播。
+```
+
+因此不能说已经找到桥接机制，只能说：
+
+```text
+S_done → R_stop 的桥接在 DS7B 上有弱迹象；
+qwen3 和 GLM4 当前不支持该桥接。
+```
+
+### 机制进展
+
+Phase259 后的结构是：
+
+$$
+\boxed{
+S_{\mathrm{semantic}}
+\oplus
+S_{\mathrm{template}}
+\oplus
+S_{\mathrm{boundary}}
+\rightarrow
+G_{\mathrm{rollout}}
+\rightarrow
+R_{\mathrm{stop}}
+\rightarrow
+\mathrm{EOS}
+}
+$$
+
+Phase260 后必须再拆：
+
+$$
+\boxed{
+S_{\mathrm{template/boundary}}
+\rightarrow
+z_{\mathrm{EOS}}
+\not\Rightarrow
+R_{\mathrm{stop}}
+}
+$$
+
+以及：
+
+$$
+\boxed{
+S_{\mathrm{semantic}}
+\rightarrow
+R_{\mathrm{stop}}
+\quad
+\text{only weakly in DS7B}
+}
+$$
+
+其中：
+
+```text
+z_EOS = EOS logit；
+R_stop = 停止读出竞争整体，包括 EOS、句号、换行、续写 token 之间的相对竞争。
+```
+
+这说明真实停止不是单个 EOS logit，而是：
+
+$$
+\boxed{
+R_{\mathrm{stop}}
+=
+\max(z_{\mathrm{EOS}}, z_{\mathrm{period}}, z_{\mathrm{newline}})
+-
+z_{\mathrm{continuation}}
+}
+$$
+
+当前问题是：
+
+```text
+template/boundary 可以推高 z_EOS，
+但同时没有压低 continuation regime（续写机制），
+所以 closure proxy 不提高。
+```
+
+### 图谱进度
+
+Phase260 后图谱进度：
+
+```text
+pattern_family_atlas: 0.83
+trace_signature_validation: 0.46
+semantic_done_signature: 0.24
+done_state_cluster_map: 0.21
+template_semantic_disentanglement: 0.19
+sdone_rstop_bridge: 0.08
+residual_state_signature: 0.55
+readout_competition_trace: 0.73
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.64
+```
+
+整体判断：
+
+```text
+完成状态图谱更清楚；
+EOS logit 桥接有大量迹象；
+closure bridge 很弱；
+causal_closure 没有提升。
+```
+
+### 问题、硬伤和瓶颈
+
+1. 当前桥接层测试仍是前缀静态测试，不是自然 rollout 动态测试。
+
+2. closure effect 在同一前缀条件下与层无关，因此层位差异主要来自 projection 侧，不代表完整层级因果传播。
+
+3. EOS bridge 很强但 closure bridge 很弱，说明测试必须继续加入 continuation suppression（续写抑制）或竞争读出分析。
+
+4. DS7B 的弱正结果不能外推，可能是小模型粗糙结构或偶然模板响应。
+
+5. 没有做因果注入，因此仍不能证明 bridge layer 是机制原因。
+
+### 阶段结论
+
+Phase260 的关键结论是：
+
+```text
+S_done 到 EOS logit 的桥接比较容易出现；
+S_done 到整体 stop readout 的桥接很弱。
+```
+
+换句话说，当前真正缺口不是：
+
+```text
+模型是否知道“可以结束”
+```
+
+而是：
+
+```text
+模型如何让“结束”赢过“继续生成”。
+```
+
+这把下一步任务明确指向：
+
+```text
+stop-vs-continuation competition（停止-续写竞争）
+```
+
+### 下一阶段任务
+
+Phase261 仍属于当前大阶段。建议任务：
+
+```text
+Phase261: stop-vs-continuation competition 的桥接验证
+```
+
+具体方案：
+
+```text
+1. 继续使用 Phase259/260 的 template、semantic、boundary 方向；
+2. 同时构造 continuation_regime（续写机制）方向；
+3. 测试：
+   S_done 是否提高 EOS logit；
+   S_done 是否压低 continuation logit；
+   两者是否共同提高 closure proxy；
+4. 对 GLM4 的真实 EOS 候选重点验证；
+5. 如果存在组合方向，再做小规模 causal intervention。
+```
+
+阶段目标：
+
+```text
+从“完成状态是否存在”
+推进到
+“完成状态如何赢得停止-续写竞争”。
+```
+
+## Phase 261: 停止-续写竞争图谱的系统验证 [2026-07-08 03:48]
+
+### 任务来源和总判断
+
+本阶段综合了 Phase260 的强负结果和最新系统工程方案。两个判断基本正确：
+
+```text
+Phase260 证明的不是闭合失败本身，
+而是把闭合链条中的主要瓶颈定位到 stop-vs-continuation competition（停止-续写竞争）。
+```
+
+Phase260 已经说明：
+
+```text
+S_done（完成状态） -> EOS logit（结束符读出）相对容易出现；
+S_done（完成状态） -> 完整 R_stop（停止读出）很弱；
+因此真正困难的是让“停止”赢过“继续生成”。
+```
+
+最新系统工程方案也正确：当前不应继续用一个小测试追一个局部闭合，而应进入语言闭合机制的系统图谱阶段。本阶段因此不追求 closure validation（闭合验证），而是先构建 stop-vs-continuation competition（停止-续写竞争）的固定格式图谱数据。
+
+### 测试脚本和结果文件
+
+测试脚本：
+
+```text
+tests/gpt5/phase261_stop_continuation_competition_atlas.py
+tests/gpt5/run_phase261_stop_continuation_competition_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase261_stop_continuation_competition_atlas/stop_continuation_competition_atlas/
+```
+
+核心输出：
+
+```text
+phase261_cross_model_summary.json
+phase261_competition_rows.jsonl
+phase261_effect_rows.jsonl
+phase261_observations.jsonl
+phase261_metrics.jsonl
+phase261_graph_edges.jsonl
+phase261_vector_rows.jsonl
+phase261_stop_continuation_competition_atlas_report.md
+```
+
+本阶段已按固定 Pattern Atlas（模式图谱）格式生成数据，并同步到可视化客户端：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建结果通过，但 Vite（前端构建工具）仍提示部分 chunk（代码块）较大，这是前端性能问题，不影响本阶段数据正确性。
+
+### 测试原理
+
+本阶段把 Phase259/260 的完成状态条件转化为三类竞争读出：
+
+```text
+1. template（模板完成）
+2. semantic（语义正确）
+3. boundary（边界/终止提示）
+```
+
+并在每个模型中同时记录停止候选和续写候选的最大读出值。
+
+核心公式：
+
+$$
+R_{\text{stop}} =
+\max(
+z_{\text{EOS}},
+z_{\text{period}},
+z_{\text{newline}},
+z_{\text{end\_boundary}}
+)
+$$
+
+$$
+R_{\text{continue}} =
+\max(
+z_{\text{the}},
+z_{\text{because}},
+z_{\text{and}},
+z_{\text{comma}},
+z_{\text{is}},
+z_{\text{for}},
+z_{\text{next\_sentence}}
+)
+$$
+
+停止-续写竞争边界：
+
+$$
+M_{\text{close}} =
+R_{\text{stop}} - R_{\text{continue}}
+$$
+
+判断规则：
+
+```text
+M_close > 0：停止读出赢；
+M_close < 0：续写读出赢。
+```
+
+本阶段测试了 qwen3、GLM4、DS7B 三个模型，每个模型 40 个 case（案例），每个模型 240 条 competition rows（竞争记录），跨模型总计 720 条 competition rows（竞争记录）。
+
+### 客观结果
+
+跨模型总结果：
+
+```text
+vector_rows: 9
+competition_rows: 720
+effect_rows: 720
+observation_rows: 720
+metric_rows: 36
+graph_edges: 18
+missing_rows: 0
+competition_winner_counts:
+  continue: 504
+  stop: 216
+stop_win_rate: 0.300000
+```
+
+按模型看：
+
+```text
+qwen3:
+  continue: 182
+  stop: 58
+  stop_win_rate: 0.241667
+
+GLM4:
+  continue: 156
+  stop: 84
+  stop_win_rate: 0.350000
+
+DS7B:
+  continue: 166
+  stop: 74
+  stop_win_rate: 0.308333
+```
+
+跨模型不同条件下的平均停止边界：
+
+```text
+template_complete_semantic_correct: -6.179688
+template_complete_semantic_wrong:   -6.313021
+template_incomplete_semantic_correct: 1.860417
+template_incomplete_semantic_wrong:   2.039062
+boundary_complete_semantic_correct: -7.292318
+boundary_complete_semantic_wrong:   -7.016927
+```
+
+最重要的客观现象：
+
+```text
+template_complete 和 boundary_complete 条件下，M_close 多数为负；
+template_incomplete 条件下，M_close 反而多数为正。
+```
+
+换句话说，在这些小模型上，“看起来更完整”的模板和边界提示没有稳定增强停止竞争，反而经常触发更强续写竞争。
+
+跨模型 effect（效应）均值：
+
+```text
+template_effect_correct: -8.040104
+template_effect_wrong:   -8.352083
+semantic_effect_template: 0.133333
+semantic_effect_incomplete: -0.178646
+boundary_effect_correct: -9.152734
+boundary_effect_wrong:   -9.055990
+```
+
+读出拆分：
+
+```text
+mean_r_stop_delta_by_effect:
+  template_effect_correct: -9.134375
+  template_effect_wrong:   -7.592448
+  semantic_effect_template: -0.058594
+  semantic_effect_incomplete: 1.483333
+  boundary_effect_correct: -8.631380
+  boundary_effect_wrong:   -7.257812
+
+mean_r_continue_delta_by_effect:
+  template_effect_correct: -1.094271
+  template_effect_wrong:    0.759635
+  semantic_effect_template: -0.191927
+  semantic_effect_incomplete: 1.661979
+  boundary_effect_correct:  0.521354
+  boundary_effect_wrong:    1.798177
+```
+
+这说明 template（模板）和 boundary（边界）并不是单纯提高停止信号，而是会同时改变停止读出和续写读出；其中很多条件下，停止读出下降更明显，续写读出没有被充分压制。
+
+### 结果分析
+
+本阶段最重要结论不是“找到闭合方向”，而是确认 Phase260 的瓶颈判断：
+
+```text
+停止机制不是单一 EOS 激活问题，
+而是停止候选和续写候选之间的竞争问题。
+```
+
+三个模型共同显示：
+
+```text
+continue winner（续写获胜）明显多于 stop winner（停止获胜）。
+```
+
+这意味着：
+
+```text
+模型可能已经有“答案完成”的局部状态，
+但输出层仍然可以选择 because、the、逗号、下一句 等续写通道。
+```
+
+因此，后续不能只寻找 S_done（完成状态）或 EOS neuron（结束符神经元），而要分解：
+
+```text
+1. 哪些 continuation channel（续写通道）在赢；
+2. 它们来自模板、语义、边界、任务格式还是预训练惯性；
+3. stop readout（停止读出）是否需要增强；
+4. continuation readout（续写读出）是否需要抑制；
+5. 两者是否需要组合机制。
+```
+
+### 理论进展
+
+本阶段对“语言是动态模式网络”的图谱路线提供了一个重要校准：
+
+```text
+语言模式不是只激活目标模式；
+它还会激活相邻的延展模式、解释模式、补充模式、下一句模式。
+```
+
+从智能理论角度看，输出不是单一完成状态的投影，而是多个模式族在最后读出层竞争：
+
+$$
+O_t =
+\operatorname{Readout}
+\left(
+S_{\text{answer}},
+S_{\text{done}},
+S_{\text{continue}},
+S_{\text{format}},
+S_{\text{task}}
+\right)
+$$
+
+更适合当前证据的机制图是：
+
+$$
+P(y_{t+1})
+=
+\operatorname{softmax}
+\left(
+W_U h_t
+{}+ \Delta_{\text{stop}}
+{}+ \Delta_{\text{continue}}
+{}+ \Delta_{\text{format}}
+{}+ \Delta_{\text{task}}
+{}+ \epsilon
+\right)
+$$
+
+其中闭合不是：
+
+$$
+\Delta_{\text{stop}} > 0
+$$
+
+而是：
+
+$$
+\Delta_{\text{stop}}
+-
+\Delta_{\text{continue}}
+>
+\tau
+$$
+
+这解释了为什么 Phase260 中 EOS logit（结束符读出）可被提高，但 closure proxy（闭合代理）仍然很弱：因为续写通道没有被压下去。
+
+### 问题、硬伤和瓶颈
+
+1. 当前仍是静态前缀读出测试，不是自然 rollout（逐步生成）过程，不能证明真实生成时的动态闭合。
+
+2. stop token（停止词元）和 continuation token（续写词元）集合是近似定义，不同模型 tokenizer（分词器）可能造成偏差。
+
+3. template_complete（模板完成）和 boundary_complete（边界完成）在测试中可能引入了新的续写暗示，因此不能把它们等同于真实完成状态。
+
+4. 本阶段没有做因果注入，只能说明读出竞争结构，不能证明具体层或方向是因果机制。
+
+5. 当前模型都是小模型，内部编码结构可能粗糙，结论至少需要保留 30%-50% 的外推不确定性。
+
+6. stop_win_rate 只有 0.30，说明当前图谱仍处于机制定位阶段，不能声称闭合机制已经破解。
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.84
+trace_signature_validation: 0.46
+semantic_done_signature: 0.24
+done_state_cluster_map: 0.21
+template_semantic_disentanglement: 0.19
+sdone_rstop_bridge: 0.08
+stop_continuation_competition: 0.12
+residual_state_signature: 0.55
+readout_competition_trace: 0.75
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.64
+```
+
+总体判断：
+
+```text
+语言模式图谱主干继续变清楚；
+读出竞争图谱已有较高进展；
+停止-续写竞争刚开始系统化；
+真正闭合仍然较远。
+```
+
+### 阶段结论
+
+Phase261 完成了 Phase260 之后最重要的一步：把“为什么 EOS 增强不等于闭合”的问题转化为可测的竞争图谱。
+
+核心结论：
+
+```text
+当前瓶颈不是模型完全没有完成状态，
+而是完成状态没有稳定赢过续写状态。
+```
+
+更直接地说：
+
+```text
+破解停止机制 = 找到停止增强 + 续写抑制的组合机制。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前系统工程大阶段，但应作为 Phase262 单独推进：
+
+```text
+Phase262: continuation regime decomposition atlas
+```
+
+任务目标：
+
+```text
+分解 continuation winner（续写获胜者）的来源。
+```
+
+具体方案：
+
+```text
+1. 按 continue_the、continue_because、continue_next_sentence、continue_comma 等通道分组；
+2. 对不同任务模式、答案长度、标点、边界符号、解释诱导语进行矩阵测试；
+3. 先建立 continuation source map（续写来源图谱）；
+4. 再测试哪些状态能够压低 continuation channel（续写通道）；
+5. 只有在图谱稳定后，再进入小规模 causal intervention（因果干预）。
+```
+
+阶段性目标：
+
+```text
+从“停止为什么输”
+推进到
+“续写具体从哪里赢”。
+```
+
+## Phase 262: 续写机制分解图谱 [2026-07-08 04:06]
+
+### 任务来源和总判断
+
+本阶段分析了最新附件中对 Phase261 的判断。总体结论正确：
+
+```text
+Phase261 的价值不是闭合成功，
+而是把闭合瓶颈明确转化为 stop-vs-continuation competition（停止-续写竞争）。
+```
+
+附件中提出的下一步也正确：
+
+```text
+不要继续追单个 EOS 或单个 done direction（完成方向）；
+应该系统分解 continuation regime（续写机制/续写场景）。
+```
+
+因此 Phase262 继续处于同一个系统工程大阶段，目标不是 closure validation（闭合验证），而是回答：
+
+```text
+续写具体从哪里赢？
+```
+
+### 测试脚本和结果文件
+
+测试脚本：
+
+```text
+tests/gpt5/phase262_continuation_regime_decomposition_atlas.py
+tests/gpt5/run_phase262_continuation_regime_decomposition_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase262_continuation_regime_decomposition_atlas/continuation_regime_decomposition_atlas/
+```
+
+核心输出：
+
+```text
+phase262_cross_model_summary.json
+phase262_continuation_channel_rows.jsonl
+phase262_continuation_source_map_rows.jsonl
+phase262_stop_continue_matrix_rows.jsonl
+phase262_protocol_continuation_rows.jsonl
+phase262_structured_continuation_rows.jsonl
+phase262_token_coverage_rows.jsonl
+phase262_observations.jsonl
+phase262_metrics.jsonl
+phase262_graph_edges.jsonl
+phase262_continuation_decomposition_report.md
+```
+
+本阶段已按固定 Pattern Atlas（模式图谱）格式写入：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+并完成前端同步和构建：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仍有 Vite（前端构建工具）chunk（代码块）较大的性能提示，不影响图谱数据读取。
+
+### 测试设计
+
+本阶段复用 Phase259/260/261 的 40 个基础 case（案例），每个模型执行：
+
+```text
+40 base cases
+× 6 done conditions（完成条件）
+× 9 continuation regimes（续写场景）
+= 2160 matrix rows（矩阵记录）
+```
+
+三模型总计：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+按顺序加载和释放，避免 GPU 显存叠加。
+
+续写场景包括：
+
+```text
+plain
+period_boundary
+newline_boundary
+comma_stub
+because_stub
+answer_anchor
+json_structure
+list_item
+next_sentence
+```
+
+续写通道包括：
+
+```text
+continue_the
+continue_because
+continue_and
+continue_comma
+continue_is
+continue_for
+continue_next_sentence
+continue_format
+continue_json_structure
+continue_list_item
+```
+
+### 核心公式
+
+停止读出：
+
+$$
+R_{\mathrm{stop}}
+=
+\max_{t \in C_{\mathrm{stop}}} z_t
+$$
+
+第 k 个续写通道读出：
+
+$$
+R_{\mathrm{continue}}^{(k)}
+=
+\max_{t \in C_k} z_t
+$$
+
+总续写读出：
+
+$$
+R_{\mathrm{continue}}
+=
+\max_k R_{\mathrm{continue}}^{(k)}
+$$
+
+停止-续写边界：
+
+$$
+M_{\mathrm{close}}
+=
+R_{\mathrm{stop}}
+-
+R_{\mathrm{continue}}
+$$
+
+单通道压制需求：
+
+$$
+\Delta_k
+=
+R_{\mathrm{continue}}^{(k)}
+-
+R_{\mathrm{stop}}
+$$
+
+如果：
+
+$$
+\Delta_k > 0
+$$
+
+说明第 k 个续写通道压过停止通道，是后续 continuation suppression（续写抑制）的候选。
+
+### 客观结果
+
+跨模型总结果：
+
+```text
+matrix_rows: 6480
+channel_rows: 64800
+source_map_rows: 6480
+protocol_rows: 1440
+structured_rows: 1440
+observation_rows: 6480
+metric_rows: 60
+graph_edges: 57
+token_coverage_rows: 42
+missing_rows: 0
+```
+
+停止-续写胜负：
+
+```text
+continue: 5661
+stop: 819
+stop_win_rate: 0.126389
+```
+
+按模型：
+
+```text
+qwen3:
+  continue: 1859
+  stop: 301
+  stop_win_rate: 0.139352
+
+GLM4:
+  continue: 1982
+  stop: 178
+  stop_win_rate: 0.082407
+
+DS7B:
+  continue: 1820
+  stop: 340
+  stop_win_rate: 0.157407
+```
+
+注意：Phase262 的 stop_win_rate 低于 Phase261，不应解释为机制退步，而是因为本阶段主动加入了更多续写诱导场景、协议场景和结构化场景，因此更容易暴露续写通道。
+
+### 续写通道排名
+
+跨模型 continuation winner（续写获胜者）计数：
+
+```text
+continue_the: 2035
+continue_list_item: 961
+continue_because: 943
+continue_next_sentence: 614
+continue_format: 594
+continue_json_structure: 171
+continue_comma: 120
+continue_is: 78
+continue_for: 73
+continue_and: 72
+```
+
+最重要的前三类：
+
+```text
+1. continue_the：自然语言延展续写；
+2. continue_list_item：列表/结构化协议续写；
+3. continue_because：解释型续写。
+```
+
+这说明续写不是一个统一方向，而是至少包含：
+
+```text
+自然语言续写；
+解释续写；
+结构化协议续写；
+下一句续写；
+格式继续。
+```
+
+### 续写来源图谱
+
+source_hypothesis（来源假设）计数：
+
+```text
+structured_protocol_continuation: 1437
+explanation_continuation: 1378
+boundary_aftereffect_or_stop_failure: 1187
+answer_protocol_continuation: 705
+natural_language_continuation: 368
+next_sentence_continuation: 338
+template_induced_continuation: 248
+```
+
+最强来源不是单纯语义，而是：
+
+```text
+结构化协议；
+解释续写；
+边界后效应；
+回答协议。
+```
+
+这对前面 Phase261 的异常现象给出了解释：
+
+```text
+template_complete / boundary_complete 可能不是“停止信号”，
+而是会触发结构化协议、解释、下一句或格式继续。
+```
+
+### 场景结果
+
+不同 regime（场景）的平均续写优势：
+
+```text
+plain: 4.118728
+period_boundary: 6.523069
+newline_boundary: 7.785395
+comma_stub: 4.456923
+because_stub: 2.666667
+answer_anchor: 6.616504
+json_structure: 6.546723
+list_item: 7.565533
+next_sentence: -0.432617
+```
+
+关键现象：
+
+```text
+newline_boundary、list_item、answer_anchor、json_structure、period_boundary
+都会显著增强续写优势。
+```
+
+这说明：
+
+```text
+换行、列表、答案锚点、JSON 结构、句号边界
+在小模型里经常不是停止边界，
+而是协议继续或结构继续的触发源。
+```
+
+`next_sentence` 场景反而平均为负，这一点需要谨慎解释：它可能把下一句提示提前消耗掉，导致后续位置停止读出相对增强；也可能是 token bank（词元库）定义不完整导致的读出偏差。不能把它直接解释为“下一句提示有利于停止”。
+
+### 通道边界结果
+
+mean_channel_vs_stop_margin（通道相对停止均值）：
+
+```text
+continue_the: 1.822756
+continue_list_item: 1.685750
+continue_because: -0.376319
+continue_format: -0.409276
+continue_next_sentence: -0.604745
+continue_is: -1.458539
+continue_for: -1.805679
+continue_comma: -1.976703
+continue_and: -1.993179
+continue_json_structure: -3.147655
+```
+
+这里有一个重要差异：
+
+```text
+winner count（获胜次数）高
+不等于 average channel margin（平均通道边界）高。
+```
+
+`continue_because` 虽然平均边界不是最高，但在高价值 suppression candidates（抑制候选）中反复出现，说明它更像“少数场景极强”的解释续写触发源。
+
+### 高价值抑制候选
+
+最高候选主要集中在：
+
+```text
+qwen3
+comma_stub / period_boundary / plain
+continue_because
+explanation_continuation
+```
+
+最大观测值：
+
+```text
+top_continue_vs_stop_margin: 34.5625
+source_hypothesis: explanation_continuation
+```
+
+这说明下一阶段不应盲目抑制所有续写，而应优先测试：
+
+```text
+because / explanation continuation（解释续写）
+list_item / structured protocol continuation（结构化协议续写）
+the / natural language continuation（自然语言延展续写）
+next_sentence / boundary aftereffect（边界后效应）
+```
+
+### 理论进展
+
+Phase262 对语言动态模式网络理论的推进是：
+
+```text
+续写不是一个单通道变量，
+而是多个 continuation regime（续写机制）构成的场。
+```
+
+更合适的机制公式是：
+
+$$
+R_{\mathrm{continue}}
+=
+\max
+\left(
+R_{\mathrm{the}},
+R_{\mathrm{because}},
+R_{\mathrm{list}},
+R_{\mathrm{format}},
+R_{\mathrm{next}},
+R_{\mathrm{json}},
+\cdots
+\right)
+$$
+
+闭合条件因此从：
+
+$$
+R_{\mathrm{stop}} > R_{\mathrm{continue}}
+$$
+
+细化为：
+
+$$
+R_{\mathrm{stop}}
+>
+\max_k R_{\mathrm{continue}}^{(k)}
+$$
+
+也就是：
+
+```text
+停止必须赢过所有主要续写通道，
+而不是只赢过一个平均续写方向。
+```
+
+这解释了为什么前面多个“平均方向”“正交方向”“done direction（完成方向）”难以闭合：它们可能只压住了部分续写通道，没有压住结构化协议续写或解释续写。
+
+### 问题、硬伤和瓶颈
+
+1. 本阶段仍是静态前缀读出测试，不是自然 rollout（生成展开）测试，因此不能证明这些通道在真实生成中按同样顺序激活。
+
+2. continuation token bank（续写词元库）仍然是人工近似，虽然记录了 token coverage（词元覆盖），但不同 tokenizer（分词器）仍可能带来偏差。
+
+3. 场景构造有诱导性：comma_stub、because_stub、json_structure、list_item 本来就是续写触发源，因此本阶段适合做来源分解，不适合估计自然闭合概率。
+
+4. source_hypothesis（来源假设）是规则归因，不是因果归因。它只能作为下一阶段干预候选，不能直接当作机制结论。
+
+5. 小模型偏差仍然需要保留 30%-50%。小模型可能更容易受模板和结构化符号牵引，真实大模型的续写场可能更平滑或更可控。
+
+6. 本阶段没有做 continuation suppression（续写抑制）因果注入，因此 causal_closure（因果闭合）不应提高。
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.85
+trace_signature_validation: 0.46
+semantic_done_signature: 0.24
+done_state_cluster_map: 0.21
+template_semantic_disentanglement: 0.19
+sdone_rstop_bridge: 0.08
+stop_continuation_competition: 0.18
+continuation_regime_decomposition: 0.16
+residual_state_signature: 0.55
+readout_competition_trace: 0.76
+stepwise_rollout_trace: 0.41
+causal_closure: 0.17
+general_language_mechanism_confidence: 0.65
+```
+
+总体判断：
+
+```text
+语言模式图谱继续推进；
+续写机制图谱已经打开；
+停止-续写竞争从“是否续写赢”推进到“哪类续写赢”；
+闭合因果仍未突破。
+```
+
+### 阶段结论
+
+Phase262 完成了 Phase261 后最关键的分解任务：
+
+```text
+续写胜出不是一个整体黑箱，
+而是由自然语言延展、解释续写、结构化协议续写、边界后效应和格式继续共同组成。
+```
+
+当前最关键的客观结论：
+
+```text
+continue_the、continue_list_item、continue_because
+是最优先研究的三类续写通道。
+```
+
+从破解语言编码机制的角度看，这一步把“停止为什么输”进一步拆成：
+
+```text
+停止输给了哪一种语言模式。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前系统工程大阶段，应作为 Phase263 推进：
+
+```text
+Phase263: continuation suppression candidate causal audit
+```
+
+任务目标：
+
+```text
+验证能否压低高价值续写通道，
+以及压低续写通道是否真的改善 M_close。
+```
+
+建议优先测试三类候选：
+
+```text
+1. explanation continuation suppression:
+   目标通道 continue_because；
+
+2. structured protocol continuation suppression:
+   目标通道 continue_list_item / continue_format / continue_json_structure；
+
+3. natural language extension suppression:
+   目标通道 continue_the。
+```
+
+阶段成功标准：
+
+```text
+1. 至少找到 1 到 2 类可稳定压低的续写通道；
+2. M_close 有可重复改善；
+3. 不显著破坏 answer readout（答案读出）；
+4. 仍不宣布闭合，直到 rollout 和真实 ModelStopExecuted（模型停止执行）验证完成。
+```
+
+## Phase 263: 续写抑制候选因果审计 [2026-07-08 04:24]
+
+### 任务来源和总判断
+
+本阶段分析了最新附件对 Phase262 的复盘。附件判断基本正确：
+
+```text
+Phase262 的价值不是闭合成功，
+而是把 continuation（续写）拆成多个 continuation regime（续写机制）。
+```
+
+附件提出的下一步也正确：
+
+```text
+不能继续只做续写来源统计；
+必须测试能否压低高价值续写通道，
+以及压低后 M_close 是否改善。
+```
+
+因此 Phase263 进入 continuation suppression candidate causal audit（续写抑制候选因果审计）。但本阶段必须严格限定结论：
+
+```text
+这是 final-hidden/readout-level intervention（最终隐状态/读出层级干预），
+不是完整内部机制闭合，
+也不是自然生成闭合成功。
+```
+
+### 测试脚本和结果文件
+
+测试脚本：
+
+```text
+tests/gpt5/phase263_continuation_suppression_candidate_causal_audit.py
+tests/gpt5/run_phase263_continuation_suppression_candidate_causal_audit.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase263_continuation_suppression_candidate_causal_audit/continuation_suppression_candidate_causal_audit/
+```
+
+核心输出：
+
+```text
+phase263_cross_model_summary.json
+phase263_continuation_suppression_rows.jsonl
+phase263_channel_causal_effect_rows.jsonl
+phase263_stop_plus_suppression_rows.jsonl
+phase263_answer_preservation_rows.jsonl
+phase263_rollout_probe_rows.jsonl
+phase263_observations.jsonl
+phase263_metrics.jsonl
+phase263_graph_edges.jsonl
+phase263_continuation_suppression_report.md
+```
+
+本阶段已同步固定 Pattern Atlas（模式图谱）格式数据到前端，并完成构建：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仍有 Vite（前端构建工具）chunk（代码块）较大的性能提示，不影响本阶段数据。
+
+### 测试原理
+
+Phase263 从 Phase262 的高价值 suppression candidates（抑制候选）中，每个模型选择：
+
+```text
+explanation continuation（解释续写）
+structured protocol continuation（结构化协议续写）
+natural language extension（自然语言延展续写）
+boundary aftereffect（边界后效应）
+```
+
+每类 8 个候选，三模型各 32 个候选。
+
+干预策略：
+
+```text
+suppress_explanation
+suppress_structured
+suppress_natural
+suppress_boundary_aftereffect
+suppress_top
+stop_plus_top
+```
+
+干预强度：
+
+```text
+lambda: 2, 4, 8, 12
+alpha_stop: 4
+```
+
+核心思想是构造续写通道的 unembedding direction（输出嵌入方向），在最终隐状态上做读出层级干预。
+
+单通道抑制：
+
+$$
+h'
+=
+h
+-
+\lambda v_{\mathrm{continue}}^{(k)}
+$$
+
+停止增强 + top continuation 抑制：
+
+$$
+h'
+=
+h
++
+\alpha v_{\mathrm{stop}}
+-
+\lambda v_{\mathrm{continue}}^{(\mathrm{top})}
+$$
+
+观察：
+
+$$
+\Delta M_{\mathrm{close}}
+=
+M_{\mathrm{close}}(h')
+-
+M_{\mathrm{close}}(h)
+$$
+
+同时记录：
+
+```text
+top_channel_logit_delta（目标续写通道变化）
+target_logit_delta（答案读出变化）
+winner_flip_to_stop（是否翻转为停止胜出）
+rollout_stop_rate（小规模生成是否真实停止）
+```
+
+### 客观结果
+
+跨模型总量：
+
+```text
+suppression_rows: 2304
+channel_causal_effect_rows: 2304
+stop_plus_rows: 384
+answer_preservation_rows: 2304
+rollout_probe_rows: 45
+observation_rows: 2304
+metric_rows: 27
+graph_edges: 18
+missing_rows: 0
+```
+
+跨模型平均 M_close 改变量：
+
+```text
+suppress_explanation: 1.121358
+suppress_structured: -1.291441
+suppress_natural: -0.035718
+suppress_boundary_aftereffect: 1.704183
+suppress_top: 2.304891
+stop_plus_top: 4.339233
+```
+
+目标续写通道 logit 变化：
+
+```text
+suppress_explanation: -1.217122
+suppress_structured: -0.780436
+suppress_natural: -1.270020
+suppress_boundary_aftereffect: -1.342122
+suppress_top: -2.988770
+stop_plus_top: -2.733236
+```
+
+答案保持率：
+
+```text
+suppress_explanation: 1.000000
+suppress_structured: 1.000000
+suppress_natural: 1.000000
+suppress_boundary_aftereffect: 0.973958
+suppress_top: 0.989583
+stop_plus_top: 0.908854
+```
+
+winner flip rate（翻转为停止胜出率）：
+
+```text
+所有策略均为 0.000000
+```
+
+小规模 rollout（生成展开）：
+
+```text
+no_patch:
+  mean_generated_tokens: 24.000000
+  model_stop_rate: 0.000000
+
+suppress_top:
+  mean_generated_tokens: 24.000000
+  model_stop_rate: 0.000000
+
+stop_plus_top:
+  mean_generated_tokens: 21.866667
+  model_stop_rate: 0.200000
+```
+
+### 分模型结果
+
+qwen3：
+
+```text
+stop_plus_top mean_stop_margin_delta: 5.833496
+suppress_top mean_stop_margin_delta: 3.039307
+suppress_boundary_aftereffect: 2.394531
+suppress_explanation: 1.628418
+rollout_stop_rate(stop_plus_top): 0.000000
+target_preserved_rate(stop_plus_top): 0.914062
+```
+
+GLM4：
+
+```text
+stop_plus_top mean_stop_margin_delta: 3.015137
+suppress_top mean_stop_margin_delta: 1.594971
+suppress_boundary_aftereffect: 1.082275
+suppress_explanation: 0.796265
+rollout_stop_rate(stop_plus_top): 0.200000
+target_preserved_rate(stop_plus_top): 1.000000
+```
+
+DS7B：
+
+```text
+stop_plus_top mean_stop_margin_delta: 4.169067
+suppress_top mean_stop_margin_delta: 2.280396
+suppress_boundary_aftereffect: 1.635742
+suppress_explanation: 0.939392
+rollout_stop_rate(stop_plus_top): 0.400000
+target_preserved_rate(stop_plus_top): 0.812500
+```
+
+### 结果分析
+
+本阶段是弱正结果 + 强校准结果。
+
+弱正结果：
+
+```text
+1. 续写抑制确实能压低目标续写通道；
+2. suppress_top 和 stop_plus_top 能稳定改善 M_close；
+3. explanation suppression 和 boundary-aftereffect suppression 在三模型上平均为正；
+4. stop_plus_top 在 GLM4 和 DS7B 的小规模 rollout 中出现真实停止。
+```
+
+强校准结果：
+
+```text
+1. 所有策略 winner_flip_rate 都是 0；
+2. 单纯 suppress_top 不产生真实停止；
+3. stop_plus_top 只产生 0.20 的 rollout_stop_rate；
+4. qwen3 即使 M_close 改善最大，也没有 rollout stop；
+5. stop_plus_top 对答案读出有一定损伤风险。
+```
+
+这说明：
+
+```text
+读出层级抑制可以改善边界，
+但还不足以完成真实闭合。
+```
+
+### 关键洞察
+
+Phase263 证明了一个重要事实：
+
+```text
+续写通道不是不可压；
+但压低续写通道不等于停止胜出，
+更不等于模型真实停止。
+```
+
+这与 Phase254 以来的路线一致：
+
+```text
+readout improvement（读出改善）
+≠
+ModelClose（模型闭合）。
+```
+
+当前更准确的闭合链条应写成：
+
+$$
+S_{\mathrm{done}}
+\rightarrow
+R_{\mathrm{stop}}
+\uparrow
+\land
+R_{\mathrm{continue}}^{(k)}
+\downarrow
+\rightarrow
+M_{\mathrm{close}}
+\uparrow
+\rightarrow
+\mathrm{WinnerFlip}
+\rightarrow
+\mathrm{RolloutStop}
+\rightarrow
+\mathrm{NoDrift}
+$$
+
+Phase263 只完成到：
+
+```text
+R_continue^(k) 下降；
+M_close 上升；
+少量 rollout stop。
+```
+
+还没有完成：
+
+```text
+winner flip 稳定发生；
+自然生成稳定停止；
+无漂移。
+```
+
+### 问题、硬伤和瓶颈
+
+1. 本阶段是 final-hidden/readout-level intervention（最终隐状态/读出层级干预），不是模型内部自然机制定位。
+
+2. winner_flip_rate 为 0，说明当前候选虽然改善 M_close，但还没跨过停止胜出的阈值。
+
+3. stop_plus_top 有更强效果，但会带来答案读出损伤风险，尤其 DS7B 的 target_preserved_rate 只有 0.812500。
+
+4. suppress_structured 平均为负，说明结构化协议续写不是简单沿一个方向抑制就能改善；它可能需要协议完成检测，而不是粗暴压制。
+
+5. suppress_natural 基本无效，说明 continue_the 可能是背景语言流，不是一个容易单独压制的局部机制。
+
+6. rollout_probe 规模较小，只能作为迹象，不能作为闭合验证。
+
+7. 当前仍是小模型测试，需要保留 30%-50% 外推偏差。
+
+### 图谱进度
+
+```text
+pattern_family_atlas: 0.85
+trace_signature_validation: 0.46
+semantic_done_signature: 0.24
+done_state_cluster_map: 0.21
+template_semantic_disentanglement: 0.19
+sdone_rstop_bridge: 0.08
+stop_continuation_competition: 0.20
+continuation_regime_decomposition: 0.18
+continuation_suppression_causal_audit: 0.10
+residual_state_signature: 0.55
+readout_competition_trace: 0.77
+stepwise_rollout_trace: 0.42
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.65
+```
+
+总体判断：
+
+```text
+图谱继续推进；
+读出层级因果链有弱正结果；
+真实闭合仍未突破；
+下一步必须从读出层级推进到 rollout 稳定性和 winner flip 阈值。
+```
+
+### 阶段结论
+
+Phase263 的核心结论：
+
+```text
+续写抑制是有效方向，
+但单独续写抑制不够；
+必须结合停止增强、阈值跨越和生成展开稳定。
+```
+
+更具体地说：
+
+```text
+suppress_top 可以压低续写并改善 M_close；
+stop_plus_top 效果最强，并产生少量真实停止；
+但 winner_flip 仍未稳定发生。
+```
+
+因此，当前不能宣布闭合，但可以确认：
+
+```text
+停止增强 + top continuation suppression
+是下一阶段最值得追的组合机制。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前系统工程大阶段，应作为 Phase264 推进：
+
+```text
+Phase264: stop-plus-continuation suppression threshold sweep with rollout validation
+```
+
+任务目标：
+
+```text
+系统扫描 alpha_stop 和 lambda_suppression，
+找到能稳定跨过 winner flip 阈值的组合，
+并验证 32/64 token rollout 是否减少过生成。
+```
+
+建议方案：
+
+```text
+1. 只保留 Phase263 中有效的 suppress_top 和 stop_plus_top；
+2. 对 alpha_stop 与 lambda_suppression 做二维网格；
+3. 分别统计 M_close、winner_flip、target_preservation、rollout_stop_rate；
+4. 单独处理 structured protocol，因为 suppress_structured 平均为负；
+5. 不再盲目扩大通道，而是寻找阈值曲线。
+```
+
+阶段成功标准：
+
+```text
+1. winner_flip_rate 明显大于 0；
+2. rollout_stop_rate 明显高于 baseline；
+3. target_preserved_rate 不低于 0.90；
+4. 至少在两个模型上复现；
+5. 仍不宣布最终闭合，直到 NoDrift 和长程 rollout 验证完成。
+```
+
+## Phase 264: 语言模式族物理路径图谱第一版 [2026-07-08 04:55]
+
+### 任务来源和总判断
+
+本阶段综合两个附件。
+
+第一个附件对 Phase263 的判断正确：
+
+```text
+Phase263 比 Phase262 更接近因果层；
+它证明续写通道可以被压低，M_close 可以改善；
+但 winner flip、稳定 ModelStopExecuted、NoDrift 和完整闭合都没有完成。
+```
+
+第二个附件提出了更重要的方法论修正，也基本正确：
+
+```text
+当前不应继续把主目标放在闭合、单点 patch、单方向修复、单个 EOS 机制；
+应该转向语言模式族物理编码路径图谱。
+```
+
+因此，本阶段对上一阶段建议做了修正：
+
+```text
+Phase264 不继续做 stop_plus_top 阈值扫描；
+而是先把 Phase261-263 的数据整理为第一版 physical path atlas（物理路径图谱）。
+```
+
+阈值扫描不是放弃，而是降级为后续稳定路径候选的因果审计工具。
+
+### 脚本和结果文件
+
+脚本：
+
+```text
+tests/gpt5/phase264_language_pattern_physical_path_atlas.py
+tests/gpt5/run_phase264_language_pattern_physical_path_atlas.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase264_language_pattern_physical_path_atlas/language_pattern_physical_path_atlas/
+```
+
+核心输出：
+
+```text
+phase264_cross_model_summary.json
+phase264_mode_family_case_bank_v3.jsonl
+phase264_internal_path_trace_rows.jsonl
+phase264_state_factor_projection_rows.jsonl
+phase264_readout_competition_rows.jsonl
+phase264_rollout_trace_rows.jsonl
+phase264_path_cluster_rows.jsonl
+phase264_mechanism_candidate_rows.jsonl
+phase264_observations.jsonl
+phase264_metrics.jsonl
+phase264_graph_edges.jsonl
+phase264_language_pattern_physical_path_atlas_report.md
+```
+
+本阶段没有重新加载模型，没有新增 CUDA 测试，而是复用 Phase261、Phase262、Phase263 的固定格式结果，生成第一版路径图谱。数据已同步到可视化客户端，并完成构建：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仍有前端 chunk（代码块）较大的提示，不影响图谱数据。
+
+### 算法原理
+
+本阶段把已有测试结果从“指标表”改造成“路径表”。
+
+核心路径定义：
+
+$$
+\mathcal{M}(P_i)
+=
+(
+\mathcal{L}_i,
+\mathcal{C}_i,
+\mathcal{S}_i,
+\mathcal{R}_i,
+\mathcal{G}_i
+)
+$$
+
+其中：
+
+```text
+L_i = layer path（层路径），当前阶段暂用 final hidden/readout-level 近似；
+C_i = component path（组件路径），当前记录 final_hidden 和 lm_head_readout；
+S_i = state path（状态路径）；
+R_i = readout competition path（读出竞争路径）；
+G_i = rollout trajectory（生成轨迹路径）。
+```
+
+路径签名：
+
+$$
+\Sigma_i
+=
+[
+\mathrm{family},
+\mathrm{state\_path},
+\mathrm{component\_path},
+\mathrm{readout\_winner},
+\mathrm{rollout\_class},
+\mathrm{closure\_class}
+]
+$$
+
+状态因子坐标：
+
+$$
+s_{i}
+=
+[
+S_{\mathrm{template}},
+S_{\mathrm{semantic}},
+S_{\mathrm{boundary}},
+S_{\mathrm{protocol}},
+S_{\mathrm{structure}},
+S_{\mathrm{continue}},
+S_{\mathrm{stop}},
+S_{\mathrm{done}}
+]
+$$
+
+需要注意：这些状态因子只是观测坐标和标签，不是假设为真实正交方向。
+
+### 数据规模
+
+Phase264 汇总了 Phase261-263 的结果，生成：
+
+```text
+case_bank_rows: 6480
+path_signature_rows: 6480
+state_factor_rows: 6480
+readout_rows: 6480
+rollout_rows: 45
+path_cluster_rows: 191
+mechanism_candidate_rows: 928
+observation_rows: 6480
+metric_rows: 4
+graph_edges: 191
+```
+
+这一步的核心价值不是新增模型行为结果，而是把已有客观现象组织成可继续扩展的路径图谱。
+
+### 关键路径簇
+
+最强跨模型稳定簇：
+
+```text
+cluster:
+  output_protocol / explanation_continuation / continue_because / continuation_dominant
+
+path_count: 568
+model_counts:
+  qwen3: 232
+  GLM4: 119
+  DS7B: 217
+cross_model_coverage: 3
+mean_stop_continue_margin: -9.331784
+mean_top_continue_vs_stop_margin: 9.331784
+mean_best_stop_margin_delta: 0.292804
+rollout_stop_count: 0
+```
+
+解释：
+
+```text
+解释续写 because 是跨模型稳定的强失败路径，
+但 Phase263 的读出层级补丁对这个大簇平均修复很弱。
+```
+
+第二类稳定簇：
+
+```text
+output_protocol / structured_protocol_continuation / continue_list_item / continuation_dominant
+
+path_count: 448
+cross_model_coverage: 3
+mean_stop_continue_margin: -6.614816
+mean_best_stop_margin_delta: 0.000000
+```
+
+解释：
+
+```text
+结构化协议续写是稳定失败路径，
+但不能用简单续写抑制来修复。
+```
+
+第三类稳定簇：
+
+```text
+output_protocol / structured_protocol_continuation / continue_the / continuation_dominant
+
+path_count: 410
+cross_model_coverage: 3
+mean_stop_continue_margin: -7.204764
+```
+
+解释：
+
+```text
+结构化协议不仅会触发 list_item，也会触发自然语言延展。
+```
+
+另一个重要簇：
+
+```text
+output_protocol / next_sentence_continuation / continue_list_item / static_stop_winner
+
+path_count: 261
+cross_model_coverage: 3
+mean_stop_continue_margin: 1.229885
+```
+
+解释：
+
+```text
+某些 next_sentence 条件在静态读出上反而接近 stop winner，
+但还没有 rollout stop，因此不能解释为闭合。
+```
+
+### 机制候选
+
+共生成：
+
+```text
+mechanism_candidate_rows: 928
+```
+
+高优先级候选主要集中在：
+
+```text
+qwen3
+output_protocol
+explanation_continuation
+continue_because
+period_boundary / comma_stub / plain
+```
+
+最高候选示例：
+
+```text
+model: qwen3
+mode_id: explain_answer
+condition: template_incomplete_semantic_correct
+regime_id: period_boundary
+source_hypothesis: explanation_continuation
+top_continue_channel: continue_because
+best_stop_margin_delta: 13.125
+priority_score: 11.871875
+status: candidate_not_closure
+```
+
+另一个重要候选：
+
+```text
+model: DS7B
+mode_id: stop_after_answer
+regime_id: comma_stub
+source_hypothesis: explanation_continuation
+top_continue_channel: continue_because
+best_stop_margin_delta: 7.25
+rollout_stop_seen: true
+```
+
+这说明：
+
+```text
+解释续写路径既是强失败路径，
+也是当前最值得做局部因果审计的路径。
+```
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.86
+physical_path_atlas: 0.24
+state_factor_atlas: 0.34
+path_cluster_mining: 0.12
+trace_signature_validation: 0.47
+readout_competition_trace: 0.78
+stepwise_rollout_trace: 0.43
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.66
+```
+
+与附件给出的判断一致：
+
+```text
+全局模式图谱已经较清楚；
+但物理路径图谱仍很早；
+闭合不应作为当前主驱动。
+```
+
+### 理论进展
+
+本阶段的理论改进不是提出新名词，而是修正研究顺序。
+
+旧顺序：
+
+```text
+公式 -> patch -> 闭合
+```
+
+新顺序：
+
+```text
+大样本图谱
+-> 路径签名
+-> 路径聚类
+-> 稳定路径
+-> 少量因果审计
+-> 闭合候选
+```
+
+统一机制公式应暂时作为图谱组织工具，而不是最终机制：
+
+$$
+\mathrm{LanguageMechanism}
+=
+\sum_i
+\alpha_i(x,t)
+P_i(x,t)
+$$
+
+其中每个模式路径：
+
+$$
+P_i
+=
+[
+T_i,
+G_i,
+A_i,
+M_i,
+R_i,
+O_i,
+L_i,
+K_i
+]
+$$
+
+当前真正要破解的是：
+
+```text
+某个语言模式族如何在层、组件、状态、读出和生成轨迹中形成稳定路径。
+```
+
+### 问题和硬伤
+
+1. Phase264 是路径图谱聚合，不是新模型测试，因此不能提供新的内部激活证据。
+
+2. 当前 component_path（组件路径）仍粗，只记录到 final_hidden 和 lm_head_readout，还没有完整 attention、MLP、residual 层级追踪。
+
+3. state_factor 是标签化坐标，不是真实独立状态方向。
+
+4. path_cluster 是规则聚类，不是深层机制聚类，后续需要加入层位、组件、生成步数据。
+
+5. 结果目前主要覆盖 output_protocol 和 readout_competition，九大模式族尚未完整覆盖。
+
+6. rollout_rows 只有 45 条，生成轨迹图谱仍明显不足。
+
+7. 当前仍基于小模型，需要保留 30%-50% 外推偏差。
+
+### 阶段结论
+
+Phase264 完成了一个重要路线校准：
+
+```text
+从闭合/patch 主线，
+转向语言模式族物理编码路径图谱主线。
+```
+
+本阶段已经把 Phase261-263 的结果组织成：
+
+```text
+case bank；
+state factor；
+readout path；
+rollout trace；
+path cluster；
+mechanism candidate。
+```
+
+这说明研究方向已经从“某个指标能不能修好”推进到：
+
+```text
+哪些语言模式族在模型中形成稳定失败路径和候选路径。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于 Phase264-300 大阶段，应作为 Phase265 推进：
+
+```text
+Phase265: multi-family case bank and path schema expansion
+```
+
+任务目标：
+
+```text
+把当前主要集中在 output_protocol 的路径图谱扩展到九大语言模式族。
+```
+
+建议方案：
+
+```text
+1. 建立 mode_family_case_bank_v3；
+2. 覆盖 content_knowledge、reasoning_constraint、syntax_structure、language_action、cross_lingual、state_drift、closure 等模式族；
+3. 每个样本固定 target、protocol、boundary、done、continuation、scoring risk 标签；
+4. 不急于跑因果 patch；
+5. 先让路径图谱覆盖面变完整。
+```
+
+阶段成功标准：
+
+```text
+1. 九大模式族都有固定格式 case bank；
+2. 每个模式族至少有基础样本、对照样本、扰动样本、边界变体；
+3. 可视化客户端能读取并筛选模式族、路径簇、候选机制；
+4. 后续内部追踪脚本可以直接消费这些样本。
+```

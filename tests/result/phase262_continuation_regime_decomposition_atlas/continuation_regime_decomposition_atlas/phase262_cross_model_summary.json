@@ -1,0 +1,680 @@
+{
+  "phase": 262,
+  "source_phase": 261,
+  "title": "Continuation regime decomposition atlas",
+  "status": "complete",
+  "timestamp": "2026-07-08 04:06:13",
+  "schema_version": "1.0.0",
+  "round_name": "continuation_regime_decomposition_atlas",
+  "model_summaries": [
+    {
+      "phase": 262,
+      "source_phase": 261,
+      "title": "Continuation regime decomposition atlas",
+      "status": "complete",
+      "timestamp": "2026-07-08 04:02:05",
+      "schema_version": "1.0.0",
+      "model": "qwen3",
+      "base_case_count": 40,
+      "regime_count": 9,
+      "channel_rows": 21600,
+      "source_map_rows": 2160,
+      "matrix_rows": 2160,
+      "protocol_rows": 480,
+      "structured_rows": 480,
+      "observation_rows": 2160,
+      "metric_rows": 20,
+      "graph_edges": 19,
+      "token_coverage_rows": 14,
+      "missing_rows": 0,
+      "competition_winner_counts": {
+        "continue": 1859,
+        "stop": 301
+      },
+      "stop_win_rate": 0.139352,
+      "top_continue_channel_counts": {
+        "continue_the": 809,
+        "continue_because": 357,
+        "continue_list_item": 347,
+        "continue_format": 190,
+        "continue_comma": 44,
+        "continue_next_sentence": 42,
+        "continue_and": 34,
+        "continue_for": 17,
+        "continue_is": 16,
+        "continue_json_structure": 3
+      },
+      "mean_top_continue_vs_stop_margin_by_regime": {
+        "plain": 6.424609,
+        "period_boundary": 10.03099,
+        "newline_boundary": 8.590885,
+        "comma_stub": 6.069401,
+        "because_stub": 3.175781,
+        "answer_anchor": 8.158464,
+        "json_structure": 6.746615,
+        "list_item": 8.478385,
+        "next_sentence": -1.296875
+      },
+      "mean_stop_continue_margin_by_regime": {
+        "plain": -6.424609,
+        "period_boundary": -10.03099,
+        "newline_boundary": -8.590885,
+        "comma_stub": -6.069401,
+        "because_stub": -3.175781,
+        "answer_anchor": -8.158464,
+        "json_structure": -6.746615,
+        "list_item": -8.478385,
+        "next_sentence": 1.296875
+      },
+      "mean_channel_vs_stop_margin": {
+        "continue_the": 2.3523,
+        "continue_because": -0.142151,
+        "continue_and": -1.634161,
+        "continue_comma": -2.50323,
+        "continue_is": -1.156678,
+        "continue_for": -2.000791,
+        "continue_next_sentence": -2.041424,
+        "continue_format": -1.763276,
+        "continue_json_structure": -3.891525,
+        "continue_list_item": 2.588383
+      },
+      "top_suppression_candidates": [
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0001",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 34.5625,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 30.5,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "period_boundary",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 28.875,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0000",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "plain",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 28.875,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0001",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "period_boundary",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 27.09375,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0001",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "plain",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 27.09375,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_short_answer_0000",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "period_boundary",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 26.3125,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "period_boundary",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 25.0625,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "plain",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 25.0625,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "qwen3",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 25.0,
+          "source_hypothesis": "explanation_continuation"
+        }
+      ]
+    },
+    {
+      "phase": 262,
+      "source_phase": 261,
+      "title": "Continuation regime decomposition atlas",
+      "status": "complete",
+      "timestamp": "2026-07-08 04:04:20",
+      "schema_version": "1.0.0",
+      "model": "glm4",
+      "base_case_count": 40,
+      "regime_count": 9,
+      "channel_rows": 21600,
+      "source_map_rows": 2160,
+      "matrix_rows": 2160,
+      "protocol_rows": 480,
+      "structured_rows": 480,
+      "observation_rows": 2160,
+      "metric_rows": 20,
+      "graph_edges": 19,
+      "token_coverage_rows": 14,
+      "missing_rows": 0,
+      "competition_winner_counts": {
+        "continue": 1982,
+        "stop": 178
+      },
+      "stop_win_rate": 0.082407,
+      "top_continue_channel_counts": {
+        "continue_the": 497,
+        "continue_list_item": 475,
+        "continue_next_sentence": 391,
+        "continue_format": 278,
+        "continue_because": 171,
+        "continue_json_structure": 81,
+        "continue_comma": 33,
+        "continue_for": 29,
+        "continue_and": 23,
+        "continue_is": 4
+      },
+      "mean_top_continue_vs_stop_margin_by_regime": {
+        "plain": 2.54668,
+        "period_boundary": 3.561979,
+        "newline_boundary": 6.287435,
+        "comma_stub": 4.340495,
+        "because_stub": 2.926823,
+        "answer_anchor": 3.967025,
+        "json_structure": 6.870638,
+        "list_item": 5.533203,
+        "next_sentence": 0.409961
+      },
+      "mean_stop_continue_margin_by_regime": {
+        "plain": -2.54668,
+        "period_boundary": -3.561979,
+        "newline_boundary": -6.287435,
+        "comma_stub": -4.340495,
+        "because_stub": -2.926823,
+        "answer_anchor": -3.967025,
+        "json_structure": -6.870638,
+        "list_item": -5.533203,
+        "next_sentence": -0.409961
+      },
+      "mean_channel_vs_stop_margin": {
+        "continue_the": 0.423695,
+        "continue_because": -1.136797,
+        "continue_and": -2.735583,
+        "continue_comma": -1.877704,
+        "continue_is": -2.869576,
+        "continue_for": -2.269186,
+        "continue_next_sentence": 0.769396,
+        "continue_format": 0.836644,
+        "continue_json_structure": -2.445653,
+        "continue_list_item": 0.743551
+      },
+      "top_suppression_candidates": [
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 15.46875,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_wrong",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 13.375,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 13.1875,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_one_word_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 13.140625,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "boundary_complete_semantic_wrong",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 12.75,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 12.53125,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 12.53125,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "boundary_complete_semantic_wrong",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 12.5,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_stop_after_answer_0001",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 12.40625,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "glm4",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 12.375,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        }
+      ]
+    },
+    {
+      "phase": 262,
+      "source_phase": 261,
+      "title": "Continuation regime decomposition atlas",
+      "status": "complete",
+      "timestamp": "2026-07-08 04:06:13",
+      "schema_version": "1.0.0",
+      "model": "deepseek7b",
+      "base_case_count": 40,
+      "regime_count": 9,
+      "channel_rows": 21600,
+      "source_map_rows": 2160,
+      "matrix_rows": 2160,
+      "protocol_rows": 480,
+      "structured_rows": 480,
+      "observation_rows": 2160,
+      "metric_rows": 20,
+      "graph_edges": 19,
+      "token_coverage_rows": 14,
+      "missing_rows": 0,
+      "competition_winner_counts": {
+        "continue": 1820,
+        "stop": 340
+      },
+      "stop_win_rate": 0.157407,
+      "top_continue_channel_counts": {
+        "continue_the": 729,
+        "continue_because": 415,
+        "continue_next_sentence": 181,
+        "continue_list_item": 139,
+        "continue_format": 126,
+        "continue_json_structure": 87,
+        "continue_is": 58,
+        "continue_comma": 43,
+        "continue_for": 27,
+        "continue_and": 15
+      },
+      "mean_top_continue_vs_stop_margin_by_regime": {
+        "plain": 3.384896,
+        "period_boundary": 5.976237,
+        "newline_boundary": 8.477865,
+        "comma_stub": 2.960872,
+        "because_stub": 1.897396,
+        "answer_anchor": 7.724023,
+        "json_structure": 6.022917,
+        "list_item": 8.68501,
+        "next_sentence": -0.410938
+      },
+      "mean_stop_continue_margin_by_regime": {
+        "plain": -3.384896,
+        "period_boundary": -5.976237,
+        "newline_boundary": -8.477865,
+        "comma_stub": -2.960872,
+        "because_stub": -1.897396,
+        "answer_anchor": -7.724023,
+        "json_structure": -6.022917,
+        "list_item": -8.68501,
+        "next_sentence": 0.410938
+      },
+      "mean_channel_vs_stop_margin": {
+        "continue_the": 2.692272,
+        "continue_because": 0.149991,
+        "continue_and": -1.609793,
+        "continue_comma": -1.549176,
+        "continue_is": -0.349362,
+        "continue_for": -1.147061,
+        "continue_next_sentence": -0.542206,
+        "continue_format": -0.301196,
+        "continue_json_structure": -3.105787,
+        "continue_list_item": 1.725316
+      },
+      "top_suppression_candidates": [
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_stop_after_answer_0001",
+          "condition": "template_incomplete_semantic_wrong",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 14.0625,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_stop_after_answer_0001",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 14.0,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_stop_after_answer_0000",
+          "condition": "template_incomplete_semantic_wrong",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 13.78125,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_explain_answer_0001",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "answer_anchor",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 13.375,
+          "source_hypothesis": "answer_protocol_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 13.21875,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_one_word_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "answer_anchor",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 13.109375,
+          "source_hypothesis": "answer_protocol_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_explain_answer_0000",
+          "condition": "template_incomplete_semantic_correct",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 12.96875,
+          "source_hypothesis": "explanation_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_explain_answer_0001",
+          "condition": "boundary_complete_semantic_correct",
+          "regime_id": "answer_anchor",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 12.90625,
+          "source_hypothesis": "answer_protocol_continuation"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_json_answer_0001",
+          "condition": "template_complete_semantic_correct",
+          "regime_id": "newline_boundary",
+          "top_continue_channel": "continue_next_sentence",
+          "top_continue_vs_stop_margin": 12.875,
+          "source_hypothesis": "boundary_aftereffect_or_stop_failure"
+        },
+        {
+          "model": "deepseek7b",
+          "case_id": "phase241_output_protocol_short_answer_0001",
+          "condition": "template_incomplete_semantic_wrong",
+          "regime_id": "comma_stub",
+          "top_continue_channel": "continue_because",
+          "top_continue_vs_stop_margin": 12.875,
+          "source_hypothesis": "explanation_continuation"
+        }
+      ]
+    }
+  ],
+  "channel_rows": 64800,
+  "source_map_rows": 6480,
+  "matrix_rows": 6480,
+  "protocol_rows": 1440,
+  "structured_rows": 1440,
+  "observation_rows": 6480,
+  "metric_rows": 60,
+  "graph_edges": 57,
+  "token_coverage_rows": 42,
+  "missing_rows": 0,
+  "competition_winner_counts": {
+    "continue": 5661,
+    "stop": 819
+  },
+  "stop_win_rate": 0.126389,
+  "top_continue_channel_counts": {
+    "continue_the": 2035,
+    "continue_list_item": 961,
+    "continue_because": 943,
+    "continue_next_sentence": 614,
+    "continue_format": 594,
+    "continue_json_structure": 171,
+    "continue_comma": 120,
+    "continue_is": 78,
+    "continue_for": 73,
+    "continue_and": 72
+  },
+  "source_hypothesis_counts": {
+    "structured_protocol_continuation": 1437,
+    "explanation_continuation": 1378,
+    "boundary_aftereffect_or_stop_failure": 1187,
+    "answer_protocol_continuation": 705,
+    "natural_language_continuation": 368,
+    "next_sentence_continuation": 338,
+    "template_induced_continuation": 248
+  },
+  "mean_top_continue_vs_stop_margin_by_regime": {
+    "plain": 4.118728,
+    "period_boundary": 6.523069,
+    "newline_boundary": 7.785395,
+    "comma_stub": 4.456923,
+    "because_stub": 2.666667,
+    "answer_anchor": 6.616504,
+    "json_structure": 6.546723,
+    "list_item": 7.565533,
+    "next_sentence": -0.432617
+  },
+  "mean_stop_continue_margin_by_regime": {
+    "plain": -4.118728,
+    "period_boundary": -6.523069,
+    "newline_boundary": -7.785395,
+    "comma_stub": -4.456923,
+    "because_stub": -2.666667,
+    "answer_anchor": -6.616504,
+    "json_structure": -6.546723,
+    "list_item": -7.565533,
+    "next_sentence": 0.432617
+  },
+  "mean_channel_vs_stop_margin": {
+    "continue_the": 1.822756,
+    "continue_because": -0.376319,
+    "continue_and": -1.993179,
+    "continue_comma": -1.976703,
+    "continue_is": -1.458539,
+    "continue_for": -1.805679,
+    "continue_next_sentence": -0.604745,
+    "continue_format": -0.409276,
+    "continue_json_structure": -3.147655,
+    "continue_list_item": 1.68575
+  },
+  "top_suppression_candidates": [
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 34.5625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 30.5,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 28.875,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "plain",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 28.875,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 27.09375,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0001",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "plain",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 27.09375,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_short_answer_0000",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 26.3125,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "period_boundary",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 25.0625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "boundary_complete_semantic_correct",
+      "regime_id": "plain",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 25.0625,
+      "source_hypothesis": "explanation_continuation"
+    },
+    {
+      "model": "qwen3",
+      "case_id": "phase241_output_protocol_explain_answer_0000",
+      "condition": "template_incomplete_semantic_correct",
+      "regime_id": "comma_stub",
+      "top_continue_channel": "continue_because",
+      "top_continue_vs_stop_margin": 25.0,
+      "source_hypothesis": "explanation_continuation"
+    }
+  ],
+  "progress": {
+    "pattern_family_atlas": 0.85,
+    "trace_signature_validation": 0.46,
+    "semantic_done_signature": 0.24,
+    "done_state_cluster_map": 0.21,
+    "template_semantic_disentanglement": 0.19,
+    "sdone_rstop_bridge": 0.08,
+    "stop_continuation_competition": 0.18,
+    "continuation_regime_decomposition": 0.16,
+    "residual_state_signature": 0.55,
+    "readout_competition_trace": 0.76,
+    "stepwise_rollout_trace": 0.41,
+    "causal_closure": 0.17,
+    "general_language_mechanism_confidence": 0.65
+  }
+}
