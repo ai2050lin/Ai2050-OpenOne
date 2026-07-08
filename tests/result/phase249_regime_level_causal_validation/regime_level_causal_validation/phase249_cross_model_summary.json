@@ -1,0 +1,167 @@
+{
+  "phase": 249,
+  "source_phase": 248,
+  "title": "Cross-model regime-level causal validation",
+  "status": "complete",
+  "timestamp": "2026-07-07 23:14:11",
+  "schema_version": "1.0.0",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "model_summaries": {
+    "qwen3": {
+      "phase": 249,
+      "source_phase": 248,
+      "title": "Regime-level causal validation",
+      "status": "complete",
+      "timestamp": "2026-07-07 23:13:51",
+      "schema_version": "1.0.0",
+      "model": "qwen3",
+      "candidate_count": 10,
+      "missing_rows": 0,
+      "validation_rows": 50,
+      "regime_suppression_rows": 10,
+      "regime_injection_rows": 10,
+      "comparison_rows": 10,
+      "rollout_effect_rows": 50,
+      "mean_regime_suppression_margin_delta": 2.275,
+      "mean_regime_injection_margin_delta": -2.0125,
+      "regime_better_than_top_token_replay_count": 6,
+      "regime_better_than_phase246_top_token_count": 6,
+      "route_counts": {
+        "continuation_regime_test": 6,
+        "protocol_regime_test": 4
+      },
+      "failure_type_hints": {
+        "competitor_regime_failure": 6,
+        "target_pressure_failure": 4
+      },
+      "effect_labels": {
+        "readout_margin_gain": 22,
+        "readout_margin_harmed": 16,
+        "weak_or_no_readout_change": 12
+      }
+    },
+    "glm4": {
+      "phase": 249,
+      "source_phase": 248,
+      "title": "Regime-level causal validation",
+      "status": "complete",
+      "timestamp": "2026-07-07 23:14:02",
+      "schema_version": "1.0.0",
+      "model": "glm4",
+      "candidate_count": 4,
+      "missing_rows": 0,
+      "validation_rows": 20,
+      "regime_suppression_rows": 4,
+      "regime_injection_rows": 4,
+      "comparison_rows": 4,
+      "rollout_effect_rows": 20,
+      "mean_regime_suppression_margin_delta": -0.25,
+      "mean_regime_injection_margin_delta": -0.453125,
+      "regime_better_than_top_token_replay_count": 1,
+      "regime_better_than_phase246_top_token_count": 0,
+      "route_counts": {
+        "continuation_regime_test": 3,
+        "protocol_regime_test": 1
+      },
+      "failure_type_hints": {
+        "target_pressure_failure": 2,
+        "mixed_or_unresolved": 1,
+        "competitor_regime_failure": 1
+      },
+      "effect_labels": {
+        "weak_or_no_readout_change": 10,
+        "readout_margin_harmed": 5,
+        "readout_margin_gain": 5
+      }
+    },
+    "deepseek7b": {
+      "phase": 249,
+      "source_phase": 248,
+      "title": "Regime-level causal validation",
+      "status": "complete",
+      "timestamp": "2026-07-07 23:14:09",
+      "schema_version": "1.0.0",
+      "model": "deepseek7b",
+      "candidate_count": 1,
+      "missing_rows": 0,
+      "validation_rows": 5,
+      "regime_suppression_rows": 1,
+      "regime_injection_rows": 1,
+      "comparison_rows": 1,
+      "rollout_effect_rows": 5,
+      "mean_regime_suppression_margin_delta": 0.21875,
+      "mean_regime_injection_margin_delta": -0.125,
+      "regime_better_than_top_token_replay_count": 0,
+      "regime_better_than_phase246_top_token_count": 0,
+      "route_counts": {
+        "reason_regime_test": 1
+      },
+      "failure_type_hints": {
+        "target_pressure_failure": 1
+      },
+      "effect_labels": {
+        "weak_or_no_readout_change": 3,
+        "readout_margin_gain": 2
+      }
+    }
+  },
+  "candidate_count": 15,
+  "missing_rows": 0,
+  "validation_rows": 75,
+  "regime_suppression_rows": 15,
+  "regime_injection_rows": 15,
+  "target_vs_regime_comparison_rows": 15,
+  "rollout_effect_rows": 75,
+  "observation_rows": 75,
+  "metric_rows": 18,
+  "graph_edges": 75,
+  "mean_regime_suppression_margin_delta": 1.464583,
+  "mean_regime_injection_margin_delta": -1.470833,
+  "mean_top_token_replay_margin_delta": -2.23125,
+  "regime_better_than_top_token_replay_count": 7,
+  "regime_better_than_phase246_top_token_count": 6,
+  "route_counts": {
+    "continuation_regime_test": 9,
+    "protocol_regime_test": 5,
+    "reason_regime_test": 1
+  },
+  "tested_regime_counts": {
+    "continuation_regime": 9,
+    "protocol_short_regime": 5,
+    "because_reason_regime": 1
+  },
+  "failure_type_hints": {
+    "competitor_regime_failure": 7,
+    "target_pressure_failure": 7,
+    "mixed_or_unresolved": 1
+  },
+  "effect_labels": {
+    "readout_margin_gain": 29,
+    "weak_or_no_readout_change": 25,
+    "readout_margin_harmed": 21
+  },
+  "pattern_atlas_progress": {
+    "pattern_family_atlas": 0.77,
+    "candidate_clustering": 0.42,
+    "case_bank_calibration": 0.39,
+    "high_value_trace_selection": 0.62,
+    "first_internal_trace_batch": 0.38,
+    "trace_signature_validation": 0.36,
+    "focused_causal_validation": 0.23,
+    "raw_delta_vector_archive": 0.25,
+    "raw_vector_factor_decomposition": 0.22,
+    "regime_field_direction_bank": 0.24,
+    "regime_level_causal_validation": 0.18,
+    "gate_up_product_signature": 0.45,
+    "residual_state_signature": 0.43,
+    "readout_competition_trace": 0.67,
+    "stepwise_rollout_trace": 0.24,
+    "causal_closure": 0.12,
+    "general_language_mechanism_confidence": 0.58
+  },
+  "judgement": "first_regime_level_causal_signal_not_closure"
+}

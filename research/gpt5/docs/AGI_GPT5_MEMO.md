@@ -57625,3 +57625,1621 @@ Phase248 完成了第一版机制级方向库；
 发现 continuation/protocol 是下一步最优先测试方向；
 机制闭合仍未完成。
 ```
+
+## Phase 249: 机制级因果验证 [2026-07-07 23:14]
+
+### 任务来源
+
+本阶段接续 Phase248 的结论：
+
+```text
+top token intervention（最高词元干预）不够稳定；
+需要验证 regime-level intervention（机制级干预）是否更接近真实竞争机制。
+```
+
+因此 Phase249 不再只看 output embedding token bank（输出嵌入词元库）的投影相关性，而是在同一批 Phase248 候选上进行因果式读出干预。
+
+### 测试脚本与结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase249_regime_level_causal_validation.py
+tests/gpt5/run_phase249_regime_level_causal_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase249_regime_level_causal_validation/regime_level_causal_validation/
+```
+
+核心输出：
+
+```text
+phase249_regime_causal_validation_rows.jsonl
+phase249_regime_suppression_rows.jsonl
+phase249_regime_injection_rows.jsonl
+phase249_target_vs_regime_comparison_rows.jsonl
+phase249_rollout_effect_rows.jsonl
+phase249_regime_causal_validation_report.md
+phase249_cross_model_summary.json
+```
+
+并已同步写入 Pattern Atlas（模式图谱）固定格式：
+
+```text
+tests/result/pattern_family_atlas/v1/observations.jsonl
+tests/result/pattern_family_atlas/v1/metrics.jsonl
+tests/result/pattern_family_atlas/v1/graph_edges.jsonl
+tests/result/pattern_family_atlas/v1/progress.json
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+前端可视化数据已同步，`frontend` 构建通过。构建仍有既有大 chunk（大代码块）警告，不影响本阶段数据读取。
+
+### 测试原理
+
+Phase249 使用 Phase246 保存的 raw vector（原始向量）与 Phase248 的 regime direction（机制方向）：
+
+```text
+continuation_regime_test -> continuation_regime
+protocol_regime_test -> protocol_short_regime
+reason_regime_test -> because_reason_regime
+```
+
+在最终观测层对 hidden state（隐藏状态）做四类对照：
+
+```text
+no_intervention（无干预）
+regime_suppression（机制抑制）
+regime_injection（机制注入）
+target_injection_replay（目标注入复现）
+top_token_suppression_replay（最高竞争词元抑制复现）
+```
+
+核心公式：
+
+$$
+\boxed{
+h' =
+h - \lambda v_{\mathrm{regime}}
+}
+$$
+
+$$
+\boxed{
+h' =
+h + \lambda v_{\mathrm{regime}}
+}
+$$
+
+对照指标：
+
+$$
+\boxed{
+\Delta M =
+M(h') - M(h)
+}
+$$
+
+其中：
+
+```text
+M = target_logit - winning_regime_logit
+```
+
+即目标相对胜出机制的 readout margin（读出边界）。
+
+### 客观结果
+
+三模型顺序完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+跨模型统计：
+
+```text
+candidate_count: 15
+validation_rows: 75
+regime_suppression_rows: 15
+regime_injection_rows: 15
+target_vs_regime_comparison_rows: 15
+rollout_effect_rows: 75
+missing_rows: 0
+```
+
+总体均值：
+
+```text
+mean_regime_suppression_margin_delta: +1.464583
+mean_regime_injection_margin_delta: -1.470833
+mean_top_token_replay_margin_delta: -2.23125
+regime_better_than_top_token_replay_count: 7 / 15
+regime_better_than_phase246_top_token_count: 6 / 15
+```
+
+候选路线：
+
+```text
+continuation_regime_test: 9
+protocol_regime_test: 5
+reason_regime_test: 1
+```
+
+失败类型提示：
+
+```text
+competitor_regime_failure: 7
+target_pressure_failure: 7
+mixed_or_unresolved: 1
+```
+
+模型分解：
+
+```text
+qwen3:
+  candidate_count: 10
+  mean_regime_suppression_margin_delta: +2.275
+  mean_regime_injection_margin_delta: -2.0125
+  regime_better_than_top_token_replay_count: 6 / 10
+
+GLM4:
+  candidate_count: 4
+  mean_regime_suppression_margin_delta: -0.25
+  mean_regime_injection_margin_delta: -0.453125
+  regime_better_than_top_token_replay_count: 1 / 4
+
+DS7B:
+  candidate_count: 1
+  mean_regime_suppression_margin_delta: +0.21875
+  mean_regime_injection_margin_delta: -0.125
+  regime_better_than_top_token_replay_count: 0 / 1
+```
+
+最强正例集中在 qwen3 的 continuation_regime（续写机制）：
+
+```text
+phase241_output_protocol_table_answer_0002 / explain_instruction:
+  regime_suppression_margin_delta: +7.125
+
+phase241_state_drift_boundary_takeover_0001 / short_answer_instruction:
+  regime_suppression_margin_delta: +6.0625
+
+phase241_reasoning_constraint_if_then_0000 / no_answer_anchor:
+  regime_suppression_margin_delta: +4.0625
+
+phase241_output_protocol_json_answer_0000 / one_word_strict:
+  regime_suppression_margin_delta: +3.0625
+```
+
+最明显问题集中在 protocol_short_regime（短答协议机制）：
+
+```text
+qwen3 / protocol_short_regime 多个样本出现 margin 下降；
+GLM4 / protocol_short_regime 也不稳定；
+说明 protocol direction（协议方向）不能直接等同于“修复方向”。
+```
+
+### 正确性分析
+
+Phase248 的判断基本正确：
+
+```text
+语言输出确实更像 regime-level competition（机制级竞争），
+而不是单一 top-token competition（最高词元竞争）。
+```
+
+Phase249 给出了第一层因果迹象：
+
+```text
+在 qwen3 上，抑制 continuation_regime 经常改善目标 readout margin；
+机制级抑制比 top-token replay 更稳定；
+regime injection 与 suppression 呈相反方向，说明方向不是完全随机。
+```
+
+但跨模型不闭合：
+
+```text
+GLM4 不支持稳定正效应；
+DS7B 只有 1 个样本，不能统计；
+总体正均值主要由 qwen3 拉动。
+```
+
+因此 Phase249 的结论只能写成：
+
+```text
+弱正结果 + 强校准结果。
+```
+
+### 主要硬伤
+
+1. token-bank regime direction（词元库机制方向）仍是 proxy（代理），不是自然内部方向。
+
+2. regime_suppression 的正效应主要来自 qwen3，不能作为跨模型机制闭合。
+
+3. protocol_short_regime 不是单调修复方向，可能混合了：
+
+```text
+短答协议；
+边界锚点；
+目标词压力；
+停止控制；
+格式遵循。
+```
+
+4. rollout（生成展开）只测了早期 4 token，不能证明 closure（闭合）。
+
+5. 当前模型仍是小模型，内部编码机制可能存在 30% 到 50% 偏差。
+
+### 图谱进度
+
+本阶段后图谱进度更新为：
+
+```text
+pattern_family_atlas: 0.77
+regime_field_direction_bank: 0.24
+regime_level_causal_validation: 0.18
+readout_competition_trace: 0.67
+stepwise_rollout_trace: 0.24
+causal_closure: 0.12
+general_language_mechanism_confidence: 0.58
+```
+
+### 阶段结论
+
+Phase249 证明：
+
+```text
+continuation_regime 是真实竞争机制候选；
+机制级抑制在部分模型和样本上优于 top-token 抑制；
+但是 token-bank direction 还不能代表自然内部机制场。
+```
+
+下一步仍属于同一大阶段：机制方向图谱阶段。
+
+因此继续自动进入 Phase250：
+
+```text
+从静态 token-bank direction
+推进到 natural contrast direction（自然对照方向）。
+```
+
+## Phase 250: 自然机制方向提取 [2026-07-07 23:18]
+
+### 阶段目标
+
+Phase249 的最大硬伤是：
+
+```text
+regime direction 来自 output embedding token bank，
+不是自然运行轨迹中形成的内部方向。
+```
+
+Phase250 因此构造自然对照：
+
+```text
+one_word_strict vs explain_instruction
+full vs no_answer_anchor
+target_seeded vs full
+short_answer_instruction vs explain_instruction
+```
+
+从同一 case（案例）的不同 prompt variant（提示变体）中提取 hidden-state delta（隐藏状态差分），建立 natural regime direction bank（自然机制方向库）。
+
+### 测试脚本与结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase250_natural_regime_direction_extraction.py
+tests/gpt5/run_phase250_natural_regime_direction_extraction.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase250_natural_regime_direction_extraction/natural_regime_direction_extraction/
+```
+
+核心输出：
+
+```text
+phase250_natural_direction_sample_rows.jsonl
+phase250_natural_direction_rows.jsonl
+phase250_natural_projection_rows.jsonl
+phase250_natural_prediction_rows.jsonl
+phase250_natural_regime_direction_report.md
+phase250_cross_model_summary.json
+```
+
+自然方向张量保存于：
+
+```text
+tests/result/phase250_natural_regime_direction_extraction/natural_regime_direction_extraction/natural_vectors/
+```
+
+并已同步 Pattern Atlas（模式图谱）固定格式和前端可视化数据。
+
+### 测试设计
+
+每个模型从 Phase241 大规模图谱中抽取：
+
+```text
+9 个模式族；
+每个模式族 2 个 case；
+每个 case 5 类自然对照；
+每模型 90 个自然对照样本；
+三模型共 270 个自然对照样本。
+```
+
+五类自然对照：
+
+```text
+natural_protocol_short:
+  one_word_strict - explain_instruction
+
+natural_continuation_explain:
+  explain_instruction - one_word_strict
+
+natural_answer_boundary:
+  full - no_answer_anchor
+
+natural_target_seed:
+  target_seeded - full
+
+natural_concise_answer:
+  short_answer_instruction - explain_instruction
+```
+
+核心公式：
+
+$$
+\boxed{
+v_{\mathrm{natural}, r}
+=
+\mathrm{Normalize}
+\left(
+\frac{1}{N}
+\sum_{i=1}^{N}
+\left(
+h_i^{(+)} - h_i^{(-)}
+\right)
+\right)
+}
+$$
+
+再将 Phase246 的 raw delta vector（原始差分向量）投影到自然方向：
+
+$$
+\boxed{
+s_{i,r}
+=
+\cos
+\left(
+\Delta h_i,
+v_{\mathrm{natural}, r}
+\right)
+}
+$$
+
+观察：
+
+```text
+自然方向投影是否能解释 target_injection_gain；
+自然方向投影是否能解释 competitor_suppression_gain；
+自然方向是否比 token-bank direction 更接近真实轨迹。
+```
+
+### 客观结果
+
+跨模型统计：
+
+```text
+sample_rows: 270
+direction_rows: 150
+projection_rows: 225
+prediction_rows: 30
+observation_rows: 225
+metric_rows: 180
+graph_edges: 30
+missing_rows: 0
+```
+
+每类自然对照样本数：
+
+```text
+natural_protocol_short: 54
+natural_continuation_explain: 54
+natural_answer_boundary: 54
+natural_target_seed: 54
+natural_concise_answer: 54
+```
+
+模型分解：
+
+```text
+qwen3:
+  sample_rows: 90
+  direction_rows: 50
+  projection_rows: 150
+  prediction_rows: 15
+
+GLM4:
+  sample_rows: 90
+  direction_rows: 50
+  projection_rows: 60
+  prediction_rows: 15
+
+DS7B:
+  sample_rows: 90
+  direction_rows: 50
+  projection_rows: 15
+  prediction_rows: 0
+```
+
+DS7B 仍因 Phase246 raw vectors 太少，无法形成预测相关性。
+
+### 主要观测
+
+GLM4 的若干自然方向相关性较大，但只有 4 个 raw-vector 行：
+
+```text
+delta_down_out x natural_concise_answer:
+  corr_projection_competitor_suppression_gain: -0.786991
+
+delta_down_out x natural_target_seed:
+  corr_projection_competitor_suppression_gain: +0.782785
+
+delta_down_out x natural_answer_boundary:
+  corr_projection_competitor_suppression_gain: -0.694349
+
+delta_residual x natural_target_seed:
+  corr_projection_competitor_suppression_gain: +0.656338
+```
+
+qwen3 的自然方向相关性更弱，但样本行更多：
+
+```text
+delta_down_out x natural_target_seed:
+  rows: 10
+  corr_projection_competitor_suppression_gain: -0.292339
+
+delta_down_out x natural_answer_boundary:
+  rows: 10
+  corr_projection_competitor_suppression_gain: -0.287995
+
+delta_residual x natural_target_seed:
+  rows: 10
+  corr_projection_competitor_suppression_gain: -0.203867
+```
+
+这说明：
+
+```text
+自然方向库已经建立；
+但自然方向对 Phase246 少量 raw vectors 的解释力还不强；
+当前更像方向素材库，而不是可闭合公式。
+```
+
+### 正确性分析
+
+Phase250 的方向是正确的，因为它修复了 Phase248/249 的核心缺口：
+
+```text
+静态 output direction（输出方向）
+不能代表自然内部轨迹；
+必须从真实 prompt contrast（提示对照）提取方向。
+```
+
+但是 Phase250 不应被过度解释。
+
+原因：
+
+```text
+自然对照方向来自 prompt-level contrast（提示层对照）；
+它可能同时包含语义、格式、边界、目标词、停止控制等多个因素；
+还没有完成 orthogonalization（正交化）与因果干预。
+```
+
+因此 Phase250 的结论是：
+
+```text
+自然机制方向库已建立；
+方向库具备后续因果验证价值；
+尚未证明自然方向能闭合语言编码机制。
+```
+
+### 当前核心拼图更新
+
+新增拼图：
+
+```text
+NaturalRegimeDirectionBank（自然机制方向库）
+NaturalProtocolShort（自然短答协议方向）
+NaturalContinuationExplain（自然解释续写方向）
+NaturalAnswerBoundary（自然回答边界方向）
+NaturalTargetSeed（自然目标种子方向）
+NaturalConciseAnswer（自然简答方向）
+```
+
+当前机制图谱从：
+
+```text
+token-bank regime direction
+```
+
+推进到：
+
+```text
+token-bank direction
++ natural contrast direction
++ raw delta projection
++ intervention comparison
+```
+
+机制公式更新为：
+
+$$
+\boxed{
+\Delta h
+=
+\sum_r
+\beta_r
+v_{\mathrm{natural}, r}
++
+\sum_k
+\gamma_k
+v_{\mathrm{tokenbank}, k}
++
+\epsilon
+}
+$$
+
+其中：
+
+```text
+v_natural,r 是自然对照方向；
+v_tokenbank,k 是输出词元库方向；
+epsilon 是未解释混合残差。
+```
+
+### 图谱进度
+
+本阶段后图谱进度更新为：
+
+```text
+pattern_family_atlas: 0.78
+case_bank_calibration: 0.40
+high_value_trace_selection: 0.63
+raw_delta_vector_archive: 0.26
+raw_vector_factor_decomposition: 0.23
+regime_field_direction_bank: 0.30
+natural_regime_direction_bank: 0.20
+regime_level_causal_validation: 0.18
+residual_state_signature: 0.45
+readout_competition_trace: 0.68
+causal_closure: 0.12
+general_language_mechanism_confidence: 0.59
+```
+
+### 硬伤与瓶颈
+
+1. 当前自然方向样本虽覆盖 9 个模式族，但每族只有 2 个 case，仍是第一版方向库。
+
+2. 自然对照不是纯变量对照，例如：
+
+```text
+one_word_strict - explain_instruction
+```
+
+同时混合了短答协议、解释欲望、长度控制和结束倾向。
+
+3. GLM4 的相关性较大但 raw vector 行数只有 4，不能强化结论。
+
+4. DS7B 仍缺 raw vector 样本，不能参与相关性判断。
+
+5. Phase250 没有做自然方向 causal intervention（因果干预），所以仍不是闭合。
+
+### 阶段结论
+
+Phase249 和 Phase250 合起来说明：
+
+```text
+continuation/protocol 等机制场是当前最有价值的候选；
+token-bank direction 可以产生部分因果迹象；
+natural contrast direction 已经可以建立方向库；
+但两者都还没有达到闭合标准。
+```
+
+当前最谨慎结论：
+
+```text
+语言编码机制不是单词元竞争；
+更像多个机制场在 residual state（残差状态）中的混合竞争；
+其中 continuation field（续写场）是当前最强候选；
+protocol / boundary / closure 仍需拆分。
+```
+
+下一阶段建议进入 Phase251：
+
+```text
+对自然机制方向做正交化和因果干预。
+```
+
+具体任务：
+
+```text
+1. 对 natural_protocol_short、natural_continuation_explain、natural_answer_boundary、natural_target_seed 做正交化；
+2. 用正交后的自然方向重跑 regime suppression / injection；
+3. 比较 token-bank direction 与 natural direction 的因果稳定性；
+4. 筛出进入 rollout / closure trace 的少数高置信候选；
+5. 暂时不要总结闭合理论，优先继续完善图谱拼图。
+```
+
+## Phase 251: 正交化自然方向因果验证 [2026-07-07 23:56]
+
+### 任务来源
+
+本阶段接续 Phase249 和 Phase250。
+
+Phase249 证明：
+
+```text
+token-bank regime direction（词元库机制方向）有部分因果迹象；
+continuation_regime（续写机制）是当前最强候选；
+但机制方向仍是 output embedding proxy（输出嵌入代理方向）。
+```
+
+Phase250 证明：
+
+```text
+可以从自然 prompt contrast（提示对照）中提取 natural regime direction（自然机制方向）；
+但自然方向仍然是混合方向，没有完成拆分。
+```
+
+因此 Phase251 的目标是：
+
+```text
+对自然方向做正交化；
+比较 token-bank direction、natural raw direction、natural orthogonal direction；
+验证正交化是否能减少混合污染并提升因果稳定性。
+```
+
+### 测试脚本与结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase251_orthogonalized_natural_direction_causal_validation.py
+tests/gpt5/run_phase251_orthogonalized_natural_direction_causal_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase251_orthogonalized_natural_direction_causal_validation/orthogonalized_natural_direction_causal_validation/
+```
+
+核心输出：
+
+```text
+phase251_orthogonalized_natural_direction_rows.jsonl
+phase251_tokenbank_vs_natural_direction_rows.jsonl
+phase251_natural_direction_causal_rows.jsonl
+phase251_rollout_effect_rows.jsonl
+phase251_high_confidence_rollout_candidates.jsonl
+phase251_natural_direction_report.md
+phase251_cross_model_summary.json
+```
+
+并已同步：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+前端 `npm run build` 已通过，仍只有既有大 chunk（大代码块）警告。
+
+### 算法原理
+
+Phase251 使用 Phase250 的五类自然方向：
+
+```text
+natural_protocol_short
+natural_continuation_explain
+natural_answer_boundary
+natural_target_seed
+natural_concise_answer
+```
+
+按固定顺序做 Gram-Schmidt orthogonalization（格拉姆-施密特正交化）：
+
+$$
+\boxed{
+v_i^{\perp}
+=
+\mathrm{Normalize}
+\left(
+v_i
+-
+\sum_{j<i}
+\langle v_i, v_j^{\perp} \rangle
+v_j^{\perp}
+\right)
+}
+$$
+
+然后在同一批 Phase248/249 候选上比较三类方向：
+
+```text
+tokenbank（词元库方向）
+natural_raw（自然原始方向）
+natural_orth（正交化自然方向）
+```
+
+每类方向做两种干预：
+
+```text
+suppression（抑制）
+injection（注入）
+```
+
+核心干预公式：
+
+$$
+\boxed{
+h'
+=
+h
+-
+\lambda v
+}
+$$
+
+$$
+\boxed{
+h'
+=
+h
++
+\lambda v
+}
+$$
+
+读出边界仍使用：
+
+$$
+\boxed{
+\Delta M
+=
+M(h') - M(h)
+}
+$$
+
+其中：
+
+$$
+\boxed{
+M
+=
+z_{\mathrm{target}}
+-
+z_{\mathrm{winning\ regime}}
+}
+$$
+
+同时记录 early rollout（早期生成展开）8 token，用于筛选下一阶段 rollout / closure trace（生成展开 / 闭合追踪）候选。
+
+### 客观结果
+
+三模型顺序完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+跨模型统计：
+
+```text
+candidate_count: 15
+validation_rows: 90
+comparison_rows: 15
+rollout_effect_rows: 90
+orthogonalized_direction_rows: 15
+high_confidence_rollout_candidates: 9
+missing_rows: 0
+```
+
+总体均值：
+
+```text
+mean_tokenbank_suppression_delta: +1.464583
+mean_natural_raw_suppression_delta: +1.220833
+mean_natural_orth_suppression_delta: -1.8375
+
+natural_orth_better_than_tokenbank_count: 2 / 15
+natural_orth_better_than_raw_count: 0 / 15
+```
+
+最佳方向来源：
+
+```text
+natural_raw: 8
+tokenbank: 7
+natural_orth: 0
+```
+
+路线分布：
+
+```text
+continuation_regime_test: 9
+protocol_regime_test: 5
+reason_regime_test: 1
+```
+
+### 模型分解
+
+qwen3：
+
+```text
+candidate_count: 10
+mean_tokenbank_suppression_delta: +2.275
+mean_natural_raw_suppression_delta: +1.059375
+mean_natural_orth_suppression_delta: -2.578125
+natural_orth_better_than_tokenbank_count: 0 / 10
+best_suppression_sources:
+  tokenbank: 6
+  natural_raw: 4
+```
+
+GLM4：
+
+```text
+candidate_count: 4
+mean_tokenbank_suppression_delta: -0.25
+mean_natural_raw_suppression_delta: +1.734375
+mean_natural_orth_suppression_delta: -0.265625
+natural_orth_better_than_tokenbank_count: 2 / 4
+best_suppression_sources:
+  natural_raw: 3
+  tokenbank: 1
+```
+
+DS7B：
+
+```text
+candidate_count: 1
+mean_tokenbank_suppression_delta: +0.21875
+mean_natural_raw_suppression_delta: +0.78125
+mean_natural_orth_suppression_delta: -0.71875
+best_suppression_sources:
+  natural_raw: 1
+```
+
+### 高置信候选
+
+筛出 9 个 high-confidence rollout candidates（高置信生成展开候选）。
+
+最强样本：
+
+```text
+qwen3 / phase241_output_protocol_table_answer_0002 / explain_instruction
+best_source: natural_raw
+best_suppression_delta: +11.25
+rollout_word_delta_vs_original: -1
+```
+
+其他强样本：
+
+```text
+qwen3 / reasoning_constraint_if_then_0001 / explain_instruction
+best_source: natural_raw
+best_suppression_delta: +7.125
+
+qwen3 / state_drift_boundary_takeover_0001 / short_answer_instruction
+best_source: natural_raw
+best_suppression_delta: +6.625
+
+qwen3 / reasoning_constraint_if_then_0000 / no_answer_anchor
+best_source: natural_raw
+best_suppression_delta: +6.5
+
+GLM4 / output_protocol_explain_answer_0000 / no_answer_anchor
+best_source: natural_raw
+best_suppression_delta: +4.8125
+```
+
+### 正确性分析
+
+Phase251 最重要的结果不是正交化成功，而是正交化失败。
+
+客观现象是：
+
+```text
+natural_raw direction（自然原始方向）经常有效；
+tokenbank direction（词元库方向）仍然有效；
+natural_orth direction（正交化自然方向）整体明显变差。
+```
+
+这说明前一阶段的“做正交化可能减少污染”这个想法只对了一半：
+
+```text
+正交化确实减少混合；
+但它也可能剥掉真实机制运行所需的混合成分。
+```
+
+因此当前不能把语言机制理解成简单线性独立基底：
+
+```text
+protocol field（协议场）
+continuation field（续写场）
+boundary field（边界场）
+target field（目标场）
+```
+
+很可能不是彼此独立的正交方向，而是存在共享子空间、耦合方向或层级复用。
+
+### 关键负结果
+
+本阶段的核心负结果：
+
+```text
+简单 Gram-Schmidt 正交化不能提升机制方向因果稳定性。
+```
+
+更准确地说：
+
+```text
+natural_orth 不仅没有优于 natural_raw，
+而且在 15 个候选中没有一次优于 natural_raw。
+```
+
+这说明：
+
+```text
+当前机制方向不是“越独立越好”；
+真实机制可能依赖混合子空间；
+简单线性拆分会破坏有效脉络。
+```
+
+### 当前机制公式修正
+
+Phase250 的公式是：
+
+$$
+\boxed{
+\Delta h
+=
+\sum_r
+\beta_r
+v_{\mathrm{natural},r}
++
+\sum_k
+\gamma_k
+v_{\mathrm{tokenbank},k}
++
+\epsilon
+}
+$$
+
+Phase251 后需要补充一项：
+
+$$
+\boxed{
+v_{\mathrm{effective}}
+\neq
+\mathrm{Orthogonalize}
+\left(
+v_{\mathrm{protocol}},
+v_{\mathrm{continuation}},
+v_{\mathrm{boundary}},
+v_{\mathrm{target}}
+\right)
+}
+$$
+
+更合理的暂定形式是：
+
+$$
+\boxed{
+\Delta h
+=
+\sum_r
+\beta_r
+v_r
++
+\sum_{r,s}
+\eta_{rs}
+C(v_r, v_s)
++
+\epsilon
+}
+$$
+
+其中：
+
+```text
+C(v_r, v_s) 表示机制之间的耦合成分；
+eta_rs 表示耦合强度；
+epsilon 表示仍未解释的残差。
+```
+
+这不是最终理论，只是对当前负结果的最低限度解释。
+
+### 硬伤与瓶颈
+
+1. 当前正交化顺序固定，Gram-Schmidt 对顺序敏感。
+
+2. 每个自然方向来自 prompt-level contrast（提示层对照），仍然混合语义、格式、长度、边界、目标压力。
+
+3. qwen3 和 GLM4 的最佳方向来源不同：
+
+```text
+qwen3 更偏 tokenbank + natural_raw 混合；
+GLM4 更偏 natural_raw。
+```
+
+不能直接上升为跨模型统一机制。
+
+4. DS7B 只有 1 个候选，仍不能统计。
+
+5. rollout 只记录 8 token，仍不是 closure validation（闭合验证）。
+
+6. 当前小模型内部机制可能比大模型粗糙，有 30% 到 50% 偏差空间。
+
+### 图谱进度
+
+本阶段后图谱进度更新为：
+
+```text
+pattern_family_atlas: 0.79
+candidate_clustering: 0.43
+high_value_trace_selection: 0.64
+trace_signature_validation: 0.37
+focused_causal_validation: 0.24
+raw_vector_factor_decomposition: 0.24
+regime_field_direction_bank: 0.33
+natural_regime_direction_bank: 0.28
+regime_level_causal_validation: 0.23
+orthogonalized_direction_validation: 0.16
+residual_state_signature: 0.46
+readout_competition_trace: 0.69
+stepwise_rollout_trace: 0.26
+causal_closure: 0.12
+general_language_mechanism_confidence: 0.60
+```
+
+### 阶段结论
+
+Phase251 完成了一个重要校准：
+
+```text
+自然方向有效；
+词元库方向也有效；
+简单正交化方向无效。
+```
+
+因此当前路线应从：
+
+```text
+寻找独立机制方向
+```
+
+转向：
+
+```text
+分析机制方向的共享子空间、耦合成分和层级复用。
+```
+
+下一阶段 Phase252 建议：
+
+```text
+共享子空间与耦合机制分析。
+```
+
+具体任务：
+
+```text
+1. 对 tokenbank direction 与 natural_raw direction 做 pairwise cosine（成对余弦）和 residual overlap（残差重叠）分析；
+2. 不再直接正交化，而是寻找 shared effective subspace（共享有效子空间）；
+3. 对 9 个高置信候选做 rollout / closure trace；
+4. 检查 continuation/protocol/boundary 是否共享同一个底层展开场；
+5. 继续保持闭合后置，优先补齐机制图谱。
+```
+
+## Phase 252: 共享子空间与耦合机制场分析 [2026-07-08 00:24]
+
+### 任务来源
+
+Phase251 给出一个关键负结果：
+
+```text
+natural_raw direction（自然原始方向）有效；
+tokenbank direction（词元库方向）有效；
+natural_orth direction（正交化自然方向）无效。
+```
+
+这说明简单正交化没有拆出更好的机制方向，反而可能破坏了有效混合成分。因此 Phase252 不再继续做“独立方向”假设，而是转向：
+
+```text
+shared subspace（共享子空间）
+coupled regime field（耦合机制场）
+rollout / closure trace（生成展开 / 闭合追踪）
+```
+
+目标不是闭合，而是解释 Phase251 的负结果：
+
+```text
+为什么自然原始方向有效；
+为什么正交化方向失效；
+tokenbank direction 与 natural direction 是否处于不同子空间；
+高置信候选的 readout 改善是否会进入 rollout / closure。
+```
+
+### 脚本与结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase252_shared_subspace_coupled_regime_analysis.py
+tests/gpt5/run_phase252_shared_subspace_coupled_regime_analysis.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase252_shared_subspace_coupled_regime_analysis/shared_subspace_coupled_regime_analysis/
+```
+
+核心输出：
+
+```text
+phase252_direction_rows.jsonl
+phase252_direction_cosine_rows.jsonl
+phase252_subspace_overlap_rows.jsonl
+phase252_shared_effective_subspace_rows.jsonl
+phase252_shared_subspace_projection_rows.jsonl
+phase252_rollout_closure_trace_rows.jsonl
+phase252_coupled_regime_field_report.md
+phase252_cross_model_summary.json
+```
+
+并已同步：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+前端构建通过，仍只有既有大 chunk（大代码块）警告。
+
+### 算法原理
+
+Phase252 做四类分析。
+
+第一类：方向余弦矩阵。
+
+覆盖方向：
+
+```text
+tokenbank_core:
+  continuation_regime
+  protocol_short_regime
+  answer_boundary_regime
+  period_stop_regime
+  because_reason_regime
+
+natural_raw_core:
+  natural_protocol_short
+  natural_continuation_explain
+  natural_answer_boundary
+  natural_target_seed
+  natural_concise_answer
+
+natural_orth_core:
+  上述自然方向的正交化版本
+```
+
+方向余弦：
+
+$$
+\boxed{
+\mathrm{cos}(v_i, v_j)
+=
+\frac{
+\langle v_i, v_j \rangle
+}{
+\|v_i\|\|v_j\|
+}
+}
+$$
+
+第二类：子空间重叠。
+
+对每组方向构造正交基：
+
+$$
+\boxed{
+Q_S
+=
+\mathrm{QR}(V_S)
+}
+$$
+
+子空间重叠：
+
+$$
+\boxed{
+\mathrm{Overlap}(S_a,S_b)
+=
+\frac{
+\|Q_a^T Q_b\|_F^2
+}{
+\min(\dim S_a,\dim S_b)
+}
+}
+$$
+
+第三类：共享有效子空间。
+
+对方向集合做 SVD/PCA：
+
+$$
+\boxed{
+S_{\mathrm{shared}}
+=
+\mathrm{SVD}
+(
+[v_1, v_2, \ldots, v_n]
+)
+}
+$$
+
+观察前几维是否能解释 raw delta vector（原始差分向量）和 Phase251 的 best suppression delta（最佳抑制边界变化）。
+
+第四类：高置信候选 rollout / closure trace。
+
+对 Phase251 的 high-confidence rollout candidates（高置信生成展开候选）做：
+
+```text
+8 token rollout
+16 token rollout
+no_intervention vs best_suppression
+EOS / period / newline / continuation logit
+closure_proxy_margin
+```
+
+闭合代理：
+
+$$
+\boxed{
+M_{\mathrm{closure}}
+=
+\max(z_{\mathrm{eos}}, z_{\mathrm{period}}, z_{\mathrm{newline}})
+-
+z_{\mathrm{continuation}}
+}
+$$
+
+### 客观结果
+
+三模型顺序完成：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+跨模型统计：
+
+```text
+direction_rows: 45
+direction_cosine_rows: 315
+subspace_overlap_rows: 9
+shared_effective_subspace_rows: 15
+shared_subspace_projection_rows: 45
+rollout_closure_trace_rows: 384
+observation_rows: 708
+metric_rows: 32
+graph_edges: 54
+missing_rows: 0
+```
+
+rollout / closure trace 覆盖：
+
+```text
+qwen3: 5 个高置信候选
+GLM4: 3 个高置信候选
+DS7B: 0 个高置信候选
+```
+
+DS7B 没有 rollout trace，不是模型无效，而是 Phase251 没有筛出高置信候选。
+
+### 关键观测一：自然方向内部高度重叠
+
+最强方向余弦：
+
+```text
+natural_raw:natural_continuation_explain
+vs
+natural_raw:natural_protocol_short
+
+qwen3: -1.0
+GLM4: -1.0
+DS7B: -1.0
+```
+
+这说明：
+
+```text
+natural_protocol_short 与 natural_continuation_explain 基本是同一轴的相反方向。
+```
+
+这非常重要。它解释了 Phase251 的正交化失败：
+
+```text
+如果两个自然方向本来就是同一控制轴的两端，
+把它们强行正交化，就会破坏真实机制轴。
+```
+
+其他强重叠：
+
+```text
+qwen3:
+  natural_concise_answer vs natural_continuation_explain: -0.964491
+  natural_concise_answer vs natural_protocol_short: +0.964491
+
+GLM4:
+  natural_concise_answer vs natural_continuation_explain: -0.883079
+  natural_concise_answer vs natural_protocol_short: +0.883079
+
+DS7B:
+  natural_concise_answer vs natural_continuation_explain: -0.717246
+  natural_concise_answer vs natural_protocol_short: +0.717246
+```
+
+这说明：
+
+```text
+短答协议、解释续写、简答控制高度耦合；
+它们不是三个独立方向，更像一个长度/展开控制轴上的不同方向。
+```
+
+### 关键观测二：自然方向子空间与 tokenbank 子空间重叠很低
+
+子空间重叠：
+
+```text
+qwen3:
+  natural_raw_core vs tokenbank_core: 0.008414
+  natural_orth_core vs tokenbank_core: 0.009526
+  natural_orth_core vs natural_raw_core: 1.0
+
+GLM4:
+  natural_raw_core vs tokenbank_core: 0.008555
+  natural_orth_core vs tokenbank_core: 0.01032
+  natural_orth_core vs natural_raw_core: 1.0
+
+DS7B:
+  natural_raw_core vs tokenbank_core: 0.007336
+  natural_orth_core vs tokenbank_core: 0.007687
+  natural_orth_core vs natural_raw_core: 0.80008
+```
+
+这说明：
+
+```text
+tokenbank direction 和 natural direction 都有效，
+但它们可能不是同一个子空间。
+```
+
+更合理的解释是：
+
+```text
+tokenbank direction 更接近 output readout axis（输出读出轴）；
+natural direction 更接近 internal control axis（内部控制轴）；
+二者通过模型后层读出机制耦合，而不是几何上直接重合。
+```
+
+### 关键观测三：闭合代理有改善，但不能算闭合
+
+跨模型 closure_proxy_margin（闭合代理边界）均值：
+
+```text
+no_intervention: -3.221354
+natural_raw_suppression: -1.554199
+tokenbank_suppression: +0.572266
+```
+
+按模型分解：
+
+```text
+qwen3:
+  no_intervention: -3.491146
+  natural_raw_suppression: -2.449870
+  tokenbank_suppression: +0.572266
+
+GLM4:
+  no_intervention: -2.771701
+  natural_raw_suppression: -0.359972
+```
+
+说明：
+
+```text
+机制抑制不仅影响第一步 readout margin；
+也会影响早期 rollout 中 closure proxy；
+但 closure proxy 不是真实 ModelClose（模型闭合）。
+```
+
+尤其 qwen3 的 tokenbank_suppression 把 closure proxy 推到正值，说明它可能更直接压制 continuation pressure（续写压力）或抬高 boundary/stop pressure（边界/停止压力）。
+
+### 正确性分析
+
+Phase252 支持 Phase251 的核心解释：
+
+```text
+自然机制方向不是独立功能方向；
+它们内部高度耦合；
+正交化失败不是偶然，而是因为正交化破坏了真实共享轴。
+```
+
+同时 Phase252 也补充了一个新判断：
+
+```text
+tokenbank direction 与 natural direction 可能分别处于读出轴和控制轴；
+二者都是有效拼图，但不能简单相加或互相替代。
+```
+
+这使当前语言机制图谱从：
+
+```text
+单 token
+单方向
+单机制场
+```
+
+推进到：
+
+```text
+内部控制轴
++ 输出读出轴
++ 机制耦合轴
++ rollout 闭合代理
+```
+
+### 主要硬伤
+
+1. 当前子空间分析方向数量仍少，每模型 15 个全局方向。
+
+2. natural_protocol_short 与 natural_continuation_explain 是由互反 prompt contrast 构造出来的，因此余弦 -1.0 有一部分来自实验设计本身，不能过度解释为模型自然发现。
+
+3. 子空间 overlap 很低，可能受 output embedding space（输出嵌入空间）与 hidden contrast space（隐藏对照空间）尺度差异影响。
+
+4. rollout trace 只覆盖 qwen3 和 GLM4 的高置信候选，DS7B 没有高置信候选。
+
+5. closure proxy 只是 EOS/句号/换行相对 continuation 的代理，不等于真实停止执行。
+
+6. 当前仍是小模型结果，内部结构可能粗糙，有 30% 到 50% 偏差空间。
+
+### 当前机制公式更新
+
+Phase251 后的公式是：
+
+$$
+\boxed{
+\Delta h
+=
+\sum_r
+\beta_r
+v_r
++
+\sum_{r,s}
+\eta_{rs}
+C(v_r, v_s)
++
+\epsilon
+}
+$$
+
+Phase252 后需要区分两个空间：
+
+$$
+\boxed{
+\Delta h
+=
+\Delta h_{\mathrm{control}}
++
+\Delta h_{\mathrm{readout}}
++
+\Delta h_{\mathrm{coupling}}
++
+\epsilon
+}
+$$
+
+其中：
+
+```text
+control = natural contrast direction 对应的内部控制轴；
+readout = tokenbank direction 对应的输出读出轴；
+coupling = 控制轴影响读出轴的耦合机制；
+epsilon = 未解释残差。
+```
+
+更具体地：
+
+$$
+\boxed{
+M_{\mathrm{target}}
+=
+R
+(
+h
++
+\alpha v_{\mathrm{control}}
++
+\gamma v_{\mathrm{readout}}
++
+\eta C_{\mathrm{control,readout}}
+)
+}
+$$
+
+这里的 \(R\) 是 readout map（读出映射），不是简单的方向投影。
+
+### 图谱进度
+
+本阶段后图谱进度更新为：
+
+```text
+pattern_family_atlas: 0.80
+high_value_trace_selection: 0.65
+raw_vector_factor_decomposition: 0.25
+regime_field_direction_bank: 0.34
+natural_regime_direction_bank: 0.29
+regime_level_causal_validation: 0.24
+orthogonalized_direction_validation: 0.17
+shared_subspace_analysis: 0.18
+coupled_regime_field_analysis: 0.16
+residual_state_signature: 0.47
+readout_competition_trace: 0.70
+stepwise_rollout_trace: 0.30
+causal_closure: 0.13
+general_language_mechanism_confidence: 0.61
+```
+
+### 阶段结论
+
+Phase252 完成了三个关键拼图：
+
+```text
+1. 自然方向内部存在强耦合轴；
+2. tokenbank 与 natural direction 处于低重叠子空间；
+3. 高置信候选的机制抑制会改变 rollout closure proxy。
+```
+
+这说明当前最合理路线不是继续找单一闭合方向，而是：
+
+```text
+内部控制轴 -> 读出轴 -> rollout/closure 代理
+```
+
+下一阶段 Phase253 建议：
+
+```text
+控制轴到读出轴的耦合映射验证。
+```
+
+具体任务：
+
+```text
+1. 对 high-confidence candidates 记录多层 hidden trajectory（隐藏轨迹）；
+2. 分析 natural_raw suppression 后，tokenbank readout axis 的投影如何随层变化；
+3. 判断 control axis 是否在后层被映射到 readout axis；
+4. 对 closure proxy 改善的样本做更长 rollout（32 token）；
+5. 暂时仍不做闭合理论总结，继续补全机制图谱。
+```
