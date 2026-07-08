@@ -1,18 +1,8 @@
 export const RESEARCH_LAYER_DEFINITIONS = {
-  network: {
-    id: 'network',
-    label: '模型结构层',
-    detail: 'layer / head / channel / MLP / residual stream',
-  },
   atlas: {
     id: 'atlas',
     label: '机制图谱层',
     detail: 'atlas graph nodes / causal edges / evidence links',
-  },
-  theory: {
-    id: 'theory',
-    label: '理论连接层',
-    detail: '理论假设 / 历史证据 / 反证边界',
   },
   aiOrbit: {
     id: 'aiOrbit',
@@ -52,20 +42,18 @@ export const RESEARCH_PLUGINS = [
     target: '破解语言编码机制',
     focus: '围绕词元、语义角色、注意力头、MLP通道和生成变化，形成可验证机制图谱。',
     status: '主线',
-    defaultLayers: ['network', 'atlas'],
-    layers3D: ['network', 'atlas', 'causalPath', 'theory', 'boundary', 'aiOrbit'],
+    defaultLayers: ['atlas'],
+    layers3D: ['atlas', 'causalPath', 'boundary', 'aiOrbit'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
       { id: 'evidence', label: '证据详情', defaultOpen: false },
       { id: 'experiment', label: '实验矩阵', defaultOpen: false },
-      { id: 'theory', label: '理论记录', defaultOpen: false },
     ],
     actions: [
       { id: 'load_latest_atlas', label: '加载最新图谱' },
       { id: 'run_patch', label: '因果验证' },
-      { id: 'open_theory', label: '理论库' },
     ],
-    modes: ['configure', 'evidence', 'theory', 'ai_loop'],
+    modes: ['configure', 'evidence', 'ai_loop'],
   },
   {
     id: 'sae-features',
@@ -77,8 +65,8 @@ export const RESEARCH_PLUGINS = [
     target: '建立可解释特征坐标系',
     focus: '把神经元与通道重新投影到稀疏特征空间，追踪特征与语言任务的因果关系。',
     status: '扩展路线',
-    defaultLayers: ['network', 'atlas'],
-    layers3D: ['network', 'features', 'atlas', 'causalPath', 'boundary'],
+    defaultLayers: ['atlas'],
+    layers3D: ['features', 'atlas', 'causalPath', 'boundary'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
       { id: 'feature-map', label: '特征字典', defaultOpen: false },
@@ -101,8 +89,8 @@ export const RESEARCH_PLUGINS = [
     target: '追踪跨层计算回路',
     focus: '把候选机制压缩为可审计路径，强调上游因果源、关键边与闭合性验证。',
     status: '验证路线',
-    defaultLayers: ['network', 'atlas'],
-    layers3D: ['network', 'atlas', 'causalPath', 'theory', 'boundary'],
+    defaultLayers: ['atlas'],
+    layers3D: ['atlas', 'causalPath', 'boundary'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
       { id: 'path', label: '因果路径', defaultOpen: false },
@@ -113,7 +101,7 @@ export const RESEARCH_PLUGINS = [
       { id: 'run_path_patch', label: '路径验证' },
       { id: 'load_latest_atlas', label: '加载图谱' },
     ],
-    modes: ['configure', 'evidence', 'theory'],
+    modes: ['configure', 'evidence'],
   },
   {
     id: 'ai-research-loop',
@@ -125,8 +113,8 @@ export const RESEARCH_PLUGINS = [
     target: '自动形成假设、实验与图谱',
     focus: '让多个模型讨论，主模型综合，自动编写脚本并把结果回写到机制图谱。',
     status: '自动化',
-    defaultLayers: ['network', 'atlas', 'aiOrbit'],
-    layers3D: ['network', 'atlas', 'aiOrbit', 'causalPath', 'theory', 'boundary'],
+    defaultLayers: ['atlas', 'aiOrbit'],
+    layers3D: ['atlas', 'aiOrbit', 'causalPath', 'boundary'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
       { id: 'agent-log', label: '循环日志', defaultOpen: false },
@@ -140,30 +128,6 @@ export const RESEARCH_PLUGINS = [
     modes: ['configure', 'ai_loop', 'evidence'],
   },
   {
-    id: 'theory-audit',
-    name: '理论审计',
-    shortName: '理论审计',
-    routeType: 'theory_system',
-    workspaceTab: 'main',
-    defaultMode: 'theory',
-    target: '把理论变成可反证系统',
-    focus: '管理历史研究、最新理论、支持证据、反例、适用边界与下一步验证任务。',
-    status: '知识库',
-    defaultLayers: ['atlas', 'theory'],
-    layers3D: ['atlas', 'theory', 'boundary', 'causalPath'],
-    panels: [
-      { id: 'overview', label: '路线总览', defaultOpen: true },
-      { id: 'theory', label: '理论记录', defaultOpen: false },
-      { id: 'boundary', label: '失败边界', defaultOpen: false },
-      { id: 'evidence', label: '证据详情', defaultOpen: false },
-    ],
-    actions: [
-      { id: 'open_theory', label: '理论库' },
-      { id: 'open_roadmap', label: '路线图' },
-    ],
-    modes: ['theory', 'evidence', 'configure'],
-  },
-  {
     id: 'snn-dynamics',
     name: 'SNN 动力学研究',
     shortName: 'SNN',
@@ -173,8 +137,8 @@ export const RESEARCH_PLUGINS = [
     target: '观测脉冲神经动力学',
     focus: '分析放电、可塑性、时序传播与语言机制之间的动力学桥接关系。',
     status: '并行路线',
-    defaultLayers: ['network'],
-    layers3D: ['network', 'dynamics', 'theory', 'boundary'],
+    defaultLayers: ['dynamics'],
+    layers3D: ['dynamics', 'boundary'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
       { id: 'dynamics', label: '动力学状态', defaultOpen: false },
@@ -195,17 +159,16 @@ export const RESEARCH_PLUGINS = [
     target: '统一语言主干与快速写读分支',
     focus: '围绕语言训练、语义推演、在线写入、记忆回放与稳定性做综合研究。',
     status: '模型路线',
-    defaultLayers: ['network'],
-    layers3D: ['network', 'dynamics', 'theory', 'boundary'],
+    defaultLayers: ['dynamics'],
+    layers3D: ['dynamics', 'boundary'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
       { id: 'control', label: '控制参数', defaultOpen: false },
-      { id: 'theory', label: '理论记录', defaultOpen: false },
     ],
     actions: [
       { id: 'switch_icspb', label: '进入ICSPB' },
     ],
-    modes: ['configure', 'theory'],
+    modes: ['configure'],
   },
 ];
 
@@ -218,10 +181,6 @@ export function makeLayerVisibility(layerIds) {
     acc[layerId] = layerIds.includes(layerId);
     return acc;
   }, {});
-}
-
-export function getPluginLayerItems(plugin) {
-  return (plugin?.layers3D || []).map((layerId) => RESEARCH_LAYER_DEFINITIONS[layerId]).filter(Boolean);
 }
 
 export function getPluginWindowState(plugin) {

@@ -5,11 +5,11 @@
  * 可视化类型:
  *   v1.0: trajectory, point_cloud, heatmap_3d, flow, layer_stack
  *   v2.0: subspace_decomposition, force_line, grammar_role_matrix, causal_chain, dark_matter_flow
- *   v3.0: neural_network (DNN层结构), 多维度视角切换, 动画场景演示
+ *   v3.0: 多维度视角切换, 动画场景演示
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Stars, Text } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
 // 模块化导入
@@ -23,15 +23,13 @@ import ForceLineRenderer from './renderers/ForceLineRenderer';
 import GrammarRoleMatrixRenderer from './renderers/GrammarRoleMatrixRenderer';
 import CausalChainRenderer from './renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './renderers/DarkMatterFlowRenderer';
-import NeuralNetworkRenderer from './renderers/NeuralNetworkRenderer';
-import ComponentDetailRenderer from './renderers/ComponentDetailRenderer';
 import AtlasGraphRenderer from './renderers/AtlasGraphRenderer';
 import SceneHelpers from './components/SceneHelpers';
 import HoverTooltip from './components/HoverTooltip';
 import useVisData from './hooks/useVisData';
 import {
   CATEGORY_COLORS, deltaCosToColor, cosWuToColor, SUBSPACE_COLORS,
-  DIMENSION_VIEWS, ANIMATION_SCENARIOS, LAYER_FUNCTIONS, COMPONENT_TYPES,
+  DIMENSION_VIEWS, ANIMATION_SCENARIOS, LAYER_FUNCTIONS,
   layerToFuncColor, layerToFuncLabel,
 } from './utils/constants';
 
@@ -76,8 +74,6 @@ export default function NeuralVis3DApp() {
   const [viewMode, setViewMode] = useState('all');
   const [activeDimension, setActiveDimension] = useState(null); // 5大维度
   const [activeSubView, setActiveSubView] = useState(null);     // 维度内子视角
-  const [showDNNLayers, setShowDNNLayers] = useState(true);     // DNN层可视化
-  const [visibleComponents, setVisibleComponents] = useState(['attention', 'ffn', 'layer_norm']); // 显示的组件
 
   // ---- 动画状态 ----
   const [animProgress, setAnimProgress] = useState(1);
@@ -89,7 +85,6 @@ export default function NeuralVis3DApp() {
   // ---- 交互状态 ----
   const [hoveredInfo, setHoveredInfo] = useState(null);
   const [selectedLayers, setSelectedLayers] = useState(null);
-  const [highlightedLayer, setHighlightedLayer] = useState(null);
   const [leftPanelTab, setLeftPanelTab] = useState('dimension'); // dimension | renderer | animation
 
   useEffect(() => { loadDataManifest(); }, [loadDataManifest]);
@@ -348,47 +343,6 @@ export default function NeuralVis3DApp() {
         {/* ========== Tab 2: 渲染器选择 ========== */}
         {leftPanelTab === 'renderer' && (
           <div>
-            {/* DNN层可视化开关 */}
-            <div style={{ ...S.section, padding: '8px', background: '#0f172a', borderRadius: 6, border: '1px solid #1e293b' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 12, color: '#e2e8f0' }}>🧱 DNN层结构</span>
-                <button onClick={() => setShowDNNLayers(!showDNNLayers)}
-                  style={{
-                    padding: '2px 8px', borderRadius: 3, fontSize: 10,
-                    background: showDNNLayers ? '#1e40af' : '#1e293b',
-                    border: showDNNLayers ? '1px solid #3b82f6' : '1px solid #334155',
-                    color: showDNNLayers ? '#bfdbfe' : '#64748b',
-                    cursor: 'pointer',
-                  }}>
-                  {showDNNLayers ? 'ON' : 'OFF'}
-                </button>
-              </div>
-              {/* 组件可见性 */}
-              {showDNNLayers && (
-                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                  {Object.entries(COMPONENT_TYPES).map(([key, comp]) => {
-                    const isVisible = visibleComponents.includes(key);
-                    return (
-                      <button key={key} onClick={() => {
-                        setVisibleComponents(prev =>
-                          isVisible ? prev.filter(k => k !== key) : [...prev, key]
-                        );
-                      }}
-                        style={{
-                          padding: '2px 6px', borderRadius: 3, fontSize: 9,
-                          background: isVisible ? `${comp.color}22` : '#1e293b',
-                          border: isVisible ? `1px solid ${comp.color}` : '1px solid #334155',
-                          color: isVisible ? comp.color : '#475569',
-                          cursor: 'pointer',
-                        }}>
-                        {comp.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
             {/* 层功能图例 */}
             <div style={S.section}>
               <h3 style={S.sectionTitle}>层功能分区</h3>
@@ -571,13 +525,6 @@ export default function NeuralVis3DApp() {
             错误: {error}
           </div>
         )}
-        {!activeData && !showDNNLayers && (
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10, textAlign: 'center', color: '#64748b' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🧠</div>
-            <div style={{ fontSize: 16 }}>请加载可视化数据或开启DNN层结构</div>
-          </div>
-        )}
-
         {/* 顶部状态栏 */}
         {(activeDimension || activeScenario) && (
           <div style={{ position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', gap: 8 }}>
@@ -629,31 +576,6 @@ export default function NeuralVis3DApp() {
             <AtlasGraphRenderer
               graph={atlasGraph}
               onHoverNode={setHoveredInfo}
-            />
-          )}
-
-          {/* ===== DNN层结构渲染器 ===== */}
-          {showDNNLayers && (
-            <NeuralNetworkRenderer
-              nLayers={nLayers}
-              dModel={activeData?.model_info?.d_model}
-              activeLayerRange={activeScenario ? getCurrentPhase()?.layerRange : null}
-              highlightedLayer={highlightedLayer}
-              visibleComponents={visibleComponents}
-              animProgress={animProgress}
-              activeScenario={activeScenario}
-              onHoverLayer={setHighlightedLayer}
-            />
-          )}
-
-          {/* ===== 层组件详情3D模型 ===== */}
-          {showDNNLayers && (
-            <ComponentDetailRenderer
-              nLayers={nLayers}
-              activeLayerRange={activeScenario ? getCurrentPhase()?.layerRange : null}
-              highlightedLayer={highlightedLayer}
-              animProgress={animProgress}
-              activeScenario={activeScenario}
             />
           )}
 
