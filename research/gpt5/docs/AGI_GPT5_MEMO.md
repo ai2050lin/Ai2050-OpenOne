@@ -56637,3 +56637,991 @@ Phase245 没有推进闭合；
 但它把 Phase244 的内部追踪数据转成了可审计的签名、稳定性和因果候选。
 下一步可以更克制地进入小规模因果验证。
 ```
+
+## Phase 246: 稳定追踪签名的小规模因果验证 [2026-07-07 21:05]
+
+### 1. 任务判断
+
+本阶段分析的 Phase245 复盘内容总体正确。
+
+Phase245 已经把 Phase244 的内部 trace 转成：
+
+```text
+trace signature；
+component-readout correlation；
+validate / frozen audit；
+proxy factor decomposition；
+causal test candidates。
+```
+
+它的结论也正确：
+
+```text
+整体模型级 component delta 与 readout margin delta 基本不相关；
+局部强相关常常样本量太小；
+下一步应该做 focused causal validation；
+不能直接做 closure validation。
+```
+
+因此 Phase246 继续处于同一阶段性目标：
+
+```text
+语言模式图谱 → 内部追踪 → 签名审计 → 小规模因果迹象验证。
+```
+
+本阶段仍不追求闭合，只验证少数稳定签名是否有必要性或充分性迹象。
+
+### 2. 测试原理
+
+Phase246 从 Phase245 的 30 条 causal candidates 中选取全局前 15 条，按模型依次运行：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+每个候选执行：
+
+```text
+1. 找到 selected variant 和 full baseline；
+2. 捕获 source layer 的 product / down_out；
+3. 捕获 final observe layer 的 residual；
+4. 保存 raw delta vectors；
+5. 执行 no_intervention；
+6. 执行 down_out_delta_ablation；
+7. 执行 target_unembed_injection；
+8. 执行 top_competitor_suppression；
+9. 比较 target margin、winner regime、短 rollout。
+```
+
+关键差分向量：
+
+$$
+\Delta d
+=
+d_{\mathrm{variant}} - d_{\mathrm{full}}
+$$
+
+down_out 差分消融：
+
+$$
+h' = h - \lambda \Delta d
+$$
+
+target 注入：
+
+$$
+h' = h + \lambda v_{\mathrm{target}}
+$$
+
+competitor 抑制：
+
+$$
+h' = h - \lambda v_{\mathrm{competitor}}
+$$
+
+本阶段保存了 raw delta vectors，用于后续真正的方向分解。
+
+### 3. 新增脚本和输出
+
+新增脚本：
+
+```text
+tests/gpt5/phase246_focused_causal_validation.py
+tests/gpt5/run_phase246_focused_causal_validation.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase246_focused_causal_validation/focused_causal_validation/
+```
+
+主要输出：
+
+```text
+phase246_cross_model_summary.json
+phase246_causal_validation_rows.jsonl
+phase246_component_ablation_rows.jsonl
+phase246_target_injection_rows.jsonl
+phase246_competitor_suppression_rows.jsonl
+phase246_rollout_closure_perturbation_rows.jsonl
+phase246_raw_delta_vector_manifest.json
+phase246_causal_validation_report.md
+raw_vectors/
+```
+
+并继续写入 Pattern Atlas：
+
+```text
+observations.jsonl
+metrics.jsonl
+graph_edges.jsonl
+progress.json
+```
+
+### 4. 测试规模
+
+正式测试规模：
+
+```text
+candidate_count: 15
+validation_rows: 60
+component_ablation_rows: 15
+target_injection_rows: 15
+competitor_suppression_rows: 15
+rollout_closure_perturbation_rows: 60
+raw_delta_vectors: 15
+missing_rows: 0
+```
+
+分模型：
+
+```text
+qwen3: 10 candidates
+GLM4: 4 candidates
+DS7B: 1 candidate
+```
+
+这说明 Phase245 的前 15 个高分候选偏向 qwen3，DS7B 候选较少。这个分布来自候选评分，不应解释为模型能力差异。
+
+### 5. 客观结果
+
+总效果：
+
+```text
+necessity_signal_count: 3
+target_injection_gain_count: 14
+competitor_suppression_gain_count: 10
+```
+
+平均 margin 变化：
+
+```text
+mean_ablation_margin_delta: 1.768229
+mean_target_injection_margin_delta: 8.764063
+mean_competitor_suppression_margin_delta: -0.696354
+```
+
+effect label 分布：
+
+```text
+sufficiency_or_readout_gain_signal: 24
+weak_or_no_sufficiency_signal: 15
+ablation_improved_margin_opposite_signal: 8
+intervention_harmed_margin: 6
+weak_or_no_necessity_signal: 4
+necessity_signal_margin_dropped: 3
+```
+
+### 6. 关键发现
+
+第一，target_unembed_injection 是最稳定的正向干预：
+
+```text
+15 条中 14 条出现 sufficiency_or_readout_gain_signal；
+平均 readout margin 增益为 8.764063。
+```
+
+这说明当前候选中大量问题更像：
+
+```text
+target pressure 不足；
+或 target direction 没有足够进入最终读出。
+```
+
+第二，down_out_delta_ablation 只有 3 条出现 necessity_signal_margin_dropped。
+
+更重要的是，有 8 条出现：
+
+```text
+ablation_improved_margin_opposite_signal
+```
+
+也就是说，抑制原本的 down_out 差分反而改善了目标边界。这是一个关键负结果：
+
+```text
+高 component delta 经常不是必要目标写入；
+它可能包含 competitor / continuation / protocol 噪声写入。
+```
+
+第三，top_competitor_suppression 分化明显：
+
+```text
+10 条正向；
+5 条 harmed；
+平均值为 -0.696354。
+```
+
+说明“抑制 top token / top competitor”这个粗方法不稳定。它有时压住竞争，有时也破坏了目标相关结构。
+
+### 7. 进展分析
+
+Phase246 完成了 Phase245 要求的第一轮小规模因果迹象验证。
+
+本阶段新增拼图：
+
+```text
+1. raw delta vectors 已保存；
+2. down_out 差分消融开始给出必要性迹象；
+3. target unembed 注入给出较稳定充分性迹象；
+4. competitor suppression 被证明是混合且不稳定的粗干预；
+5. high component delta 中混入非目标写入的可能性大幅提高。
+```
+
+这比 Phase245 前进了一步，因为 Phase245 只是候选审计，Phase246 已经开始测试：
+
+```text
+某个内部差分被削弱或增强时，readout margin 是否改变。
+```
+
+但这仍然不是闭合。
+
+### 8. 问题和硬伤
+
+第一，Phase246 的干预仍然很粗。target_unembed_injection 使用的是输出嵌入方向，不等于真实 target factor direction。
+
+第二，top_competitor_suppression 使用 top token 方向，不能代表完整 competitor regime。一个 regime 可能由多个 token、多个方向、多个层共同构成。
+
+第三，down_out_delta_ablation 只消融 source layer 的 last-token down_out 差分，不能覆盖多层传播和后续重写。
+
+第四，候选分布不均衡：
+
+```text
+qwen3: 10
+GLM4: 4
+DS7B: 1
+```
+
+因此跨模型结论必须谨慎。
+
+第五，当前 rollout 仍然很短，不能说明 closure。
+
+第六，当前模型都是小模型或中小模型，需要保留 30% 到 50% 偏差空间。
+
+### 9. 图谱进度
+
+Phase246 后 Pattern Atlas 进度：
+
+```text
+pattern_family_atlas: 0.74
+candidate_clustering: 0.42
+case_bank_calibration: 0.39
+high_value_trace_selection: 0.60
+first_internal_trace_batch: 0.38
+trace_signature_validation: 0.35
+focused_causal_validation: 0.20
+raw_delta_vector_archive: 0.18
+gate_up_product_signature: 0.44
+residual_state_signature: 0.41
+readout_competition_trace: 0.63
+stepwise_rollout_trace: 0.23
+proxy_factor_decomposition: 0.18
+causal_closure: 0.12
+general_language_mechanism_confidence: 0.55
+```
+
+总体判断：
+
+```text
+已经进入小规模因果迹象阶段；
+target pressure 路线获得较强正信号；
+component delta 必要性只得到弱正 + 强校准；
+closure 仍然很早。
+```
+
+### 10. 智能理论视角
+
+Phase246 的关键洞察是：
+
+```text
+内部大差分不一定是“正确模式写入”；
+它可能是目标、竞争、续写、协议、格式等多种状态的混合。
+```
+
+当前更合理的链条是：
+
+$$
+\Delta \mathrm{Component}
+\rightarrow
+\Delta \mathrm{Residual}
+\rightarrow
+\Delta \mathrm{Readout}
+\rightarrow
+\Delta \mathrm{Rollout}
+\rightarrow
+\Delta \mathrm{Closure}
+$$
+
+但 Phase246 说明：
+
+```text
+第一段箭头不稳定；
+第二段 readout 更容易被 target direction 直接影响；
+competitor suppression 必须做 regime 级分解，不能只压 top token。
+```
+
+这对破解语言编码机制很关键：
+
+```text
+真正的机制不在“某个大向量变化”；
+而在“哪些变化沿 target / competitor / boundary / closure 方向传播并进入读出与展开”。
+```
+
+### 11. 下一阶段任务
+
+下一阶段仍属于同一大阶段，但应从粗因果干预转向真实方向分解：
+
+```text
+Phase247: raw-vector factor direction decomposition
+```
+
+任务：
+
+```text
+1. 使用 Phase246 保存的 raw delta vectors；
+2. 构造 target / competitor / boundary / protocol / closure 方向；
+3. 对 delta_down_out、delta_product、delta_residual 做投影；
+4. 检查 target projection 是否解释 target_injection_gain；
+5. 检查 competitor projection 是否解释 suppression harmed / gain 的分化；
+6. 只对方向分解稳定的候选进入下一轮因果验证。
+```
+
+Phase247 不应扩大闭合测试，而应先回答：
+
+```text
+大差分到底是什么方向？
+target pressure 和 competitor pressure 如何混在一起？
+```
+
+当前阶段结论：
+
+```text
+Phase246 获得了第一批因果迹象；
+target direction 充分性迹象较强；
+down_out 差分必要性较弱且混合；
+competitor suppression 需要 regime 级分解；
+机制闭合仍未完成。
+```
+
+## Phase 247: 原始向量因子方向分解 [2026-07-07 21:26]
+
+### 1. 任务判断
+
+本阶段分析的 Phase246 复盘内容总体正确。
+
+Phase246 的关键进展是：
+
+```text
+target_unembed_injection 有强正向读出迹象；
+down_out_delta_ablation 必要性较弱且经常反向；
+top_competitor_suppression 不稳定；
+raw delta vectors 已经保存。
+```
+
+因此 Phase247 不应继续扩大 patch，也不应进入 closure validation，而应先回答：
+
+```text
+大差分到底是什么方向？
+target pressure 和 competitor pressure 如何混在一起？
+为什么 target injection 有效，而 down_out ablation 必要性弱？
+为什么 competitor suppression 有时有效、有时有害？
+```
+
+本阶段没有重新加载模型，也没有新的 forward。它直接分析 Phase246 保存的 raw vectors。
+
+### 2. 测试原理
+
+输入：
+
+```text
+tests/result/phase246_focused_causal_validation/focused_causal_validation/phase246_raw_delta_vector_manifest.json
+tests/result/phase246_focused_causal_validation/focused_causal_validation/raw_vectors/
+tests/result/phase246_focused_causal_validation/focused_causal_validation/phase246_causal_validation_rows.jsonl
+```
+
+每个 raw vector 文件包含：
+
+```text
+delta_down_out
+delta_product
+delta_residual
+target_direction
+competitor_direction
+target_token_id
+top_token_id
+```
+
+Phase247 对三类差分向量做投影：
+
+```text
+delta_down_out
+delta_product
+delta_residual
+```
+
+投影到：
+
+```text
+target direction
+top competitor direction
+empirical regime direction
+```
+
+其中 empirical regime direction 来自 Phase246 中同一模型、同一 regime group 的 top competitor directions 平均。
+
+核心投影：
+
+$$
+a_j
+=
+\left\langle
+\Delta x,
+v_j
+\right\rangle
+$$
+
+正交化后投影：
+
+$$
+a^{\perp}_j
+=
+\left\langle
+\Delta x,
+v^{\perp}_j
+\right\rangle
+$$
+
+注意：Phase247 只对已经保存的 raw target / top competitor directions 做真实投影。protocol / boundary / closure 的真实原始方向仍未捕获，不能冒充已解决。
+
+### 3. 新增脚本和输出
+
+新增脚本：
+
+```text
+tests/gpt5/phase247_raw_vector_factor_decomposition.py
+```
+
+结果目录：
+
+```text
+tests/result/phase247_raw_vector_factor_decomposition/raw_vector_factor_decomposition/
+```
+
+主要输出：
+
+```text
+phase247_factor_decomposition_summary.json
+phase247_factor_direction_rows.jsonl
+phase247_regime_direction_rows.jsonl
+phase247_raw_delta_projection_rows.jsonl
+phase247_projection_prediction_rows.jsonl
+phase247_regime_test_candidate_rows.jsonl
+phase247_observations.jsonl
+phase247_metrics.jsonl
+phase247_graph_edges.jsonl
+phase247_factor_direction_report.md
+```
+
+并同步 Pattern Atlas 固定格式。
+
+### 4. 客观结果
+
+输出规模：
+
+```text
+raw_vector_rows: 15
+factor_direction_rows: 20
+regime_direction_rows: 5
+projection_rows: 135
+prediction_rows: 45
+next_test_candidate_rows: 15
+observation_rows: 135
+metric_rows: 46
+graph_edges: 32
+```
+
+方向覆盖：
+
+```text
+target directions: available
+top competitor directions: available but regime incomplete
+empirical continuation_regime directions: 3
+empirical boundary_regime directions: 2
+protocol / boundary / closure raw directions: missing
+direction_gap_count: 9
+```
+
+候选路线分布：
+
+```text
+competitor_regime_candidate: 8
+target_pressure_direction_candidate: 4
+mixed_or_weak_candidate: 3
+```
+
+这说明 Phase246 后真正优先级已经从：
+
+```text
+单 token competitor suppression
+```
+
+转向：
+
+```text
+regime-level competitor decomposition
+```
+
+### 5. 关键发现
+
+第一，Phase247 证明 Phase246 已保存的 raw vectors 可以进入真实方向投影流程。
+
+这意味着研究不再停留在：
+
+```text
+component delta norm
+```
+
+而开始进入：
+
+```text
+delta direction composition
+```
+
+第二，target projection 能筛出一批 target_pressure_direction_candidate，例如：
+
+```text
+qwen3 / output_protocol_json_answer_0000 / one_word_strict
+qwen3 / output_protocol_table_answer_0002 / explain_instruction
+qwen3 / state_drift_boundary_takeover_0001 / short_answer_instruction
+deepseek7b / reasoning_constraint_if_then_0001 / no_answer_anchor
+```
+
+第三，更多候选被归到 competitor_regime_candidate。这与 Phase246 中 top_competitor_suppression 分化明显相吻合：
+
+```text
+单 top token 不够；
+需要机制场方向。
+```
+
+第四，best_target_prediction_corr 和 best_competitor_suppression_prediction_corr 接近 1，但这些主要来自小样本分组，不应上升为机制规律。
+
+更稳妥的结论是：
+
+```text
+Phase247 已经能把候选分成 target pressure、competitor regime、mixed 三类；
+但分组相关性还需要更大样本验证。
+```
+
+### 6. 问题和硬伤
+
+第一，Phase247 没有新增模型 forward，只是 raw vector 二次分析。
+
+第二，empirical regime directions 只来自 15 个 Phase246 候选，样本太少。
+
+第三，protocol / boundary / closure 的 raw directions 缺失。这是当前最大缺口。
+
+第四，continuation_regime 和 boundary_regime 方向仍然由 top competitor directions 聚合而来，不是真正的多 token regime bank。
+
+第五，DS7B 只有 1 个候选，不能做可靠跨模型方向结论。
+
+### 7. 图谱进度
+
+Phase247 后 Pattern Atlas 进度：
+
+```text
+pattern_family_atlas: 0.75
+candidate_clustering: 0.42
+case_bank_calibration: 0.39
+high_value_trace_selection: 0.61
+first_internal_trace_batch: 0.38
+trace_signature_validation: 0.36
+focused_causal_validation: 0.22
+raw_delta_vector_archive: 0.24
+raw_vector_factor_decomposition: 0.20
+regime_field_direction_bank: 0.10
+gate_up_product_signature: 0.45
+residual_state_signature: 0.42
+readout_competition_trace: 0.64
+stepwise_rollout_trace: 0.23
+causal_closure: 0.12
+general_language_mechanism_confidence: 0.56
+```
+
+总体判断：
+
+```text
+已进入原始向量方向分解阶段；
+target / top competitor 方向可分析；
+regime field 方向仍弱；
+protocol / boundary / closure 方向仍缺失；
+closure 没有实质推进。
+```
+
+### 8. 智能理论视角
+
+Phase247 对智能理论的关键校准是：
+
+```text
+语言模式不是“大向量变化”；
+语言模式是多方向因子的混合写入和竞争读出。
+```
+
+更准确的内部差分公式是：
+
+$$
+\Delta x
+=
+a_t v_{\mathrm{target}}
++
+a_c v_{\mathrm{competitor}}
++
+a_p v_{\mathrm{protocol}}
++
+a_b v_{\mathrm{boundary}}
++
+a_k v_{\mathrm{closure}}
++
+\epsilon
+$$
+
+但 Phase247 只能实测其中一部分：
+
+```text
+v_target: 已有 raw direction
+v_competitor: 已有 top-token raw direction，但 regime 不完整
+v_protocol: 缺失
+v_boundary: 缺失
+v_closure: 缺失
+```
+
+因此当前理论进展不是“公式闭合”，而是明确了缺失项。
+
+### 9. 下一阶段任务
+
+下一阶段仍属于同一大阶段，不应进入闭合。
+
+建议 Phase248：
+
+```text
+regime-level direction bank construction
+机制级方向库构建
+```
+
+任务：
+
+```text
+1. 为 each model 构造 regime token bank；
+2. 至少覆盖 continuation、answer_boundary、newline_boundary、period_stop、because_reason、comma_repeat；
+3. 使用输出嵌入或自然 trace 方向构造 regime field direction；
+4. 重新投影 Phase246 raw deltas；
+5. 检查 regime projection 是否解释 suppression gain/harm；
+6. 选择少数候选进入 regime-level causal test。
+```
+
+Phase248 的成功标准不是闭合，而是：
+
+```text
+把 competitor 从 top token 升级为 regime field；
+减少 Phase246 中 competitor suppression 的不稳定性；
+明确哪些 regime 方向需要真正因果测试。
+```
+
+当前结论：
+
+```text
+Phase247 完成了第一版 raw-vector factor decomposition；
+证明大差分可被方向投影审计；
+发现下一步关键缺口是 regime-level direction bank；
+机制闭合仍未完成。
+```
+
+## Phase 248: 机制级方向库构建 [2026-07-07 22:59]
+
+### 1. 任务判断
+
+本阶段分析的 Phase247 复盘内容总体正确。
+
+Phase247 的核心进展是：
+
+```text
+研究对象从 component delta norm
+升级为 delta direction composition。
+```
+
+它证明 raw delta vectors 可以进入方向投影流程，但也暴露了核心缺口：
+
+```text
+target direction 已有；
+top competitor direction 已有但过粗；
+protocol / boundary / closure 真实方向仍缺失；
+competitor 需要从 top token 升级为 regime field。
+```
+
+因此 Phase248 继续属于同一阶段目标：
+
+```text
+语言模式图谱 → 原始向量方向分解 → 机制级方向库 → 机制级因果测试候选。
+```
+
+本阶段不做闭合验证，只构建第一版 regime-level direction bank，并重新投影 Phase246 raw deltas。
+
+### 2. 测试原理
+
+Phase248 顺序加载：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+但不做生成 forward，只使用 tokenizer 和 output embedding 构造 regime token-bank directions。
+
+覆盖的 regime：
+
+```text
+continuation_regime
+answer_boundary_regime
+newline_boundary_regime
+period_stop_regime
+because_reason_regime
+comma_repeat_regime
+protocol_short_regime
+```
+
+机制方向构造公式：
+
+$$
+v_{\mathrm{regime}}
+=
+\frac{1}{|R|}
+\sum_{t\in R}
+v_t
+$$
+
+其中：
+
+```text
+R: regime token bank
+v_t: token t 的 output embedding direction
+```
+
+然后对 Phase246 保存的 raw deltas 重新投影：
+
+```text
+delta_down_out
+delta_product
+delta_residual
+```
+
+投影公式：
+
+$$
+a_{\mathrm{regime}}
+=
+\left\langle
+\Delta x,
+v_{\mathrm{regime}}
+\right\rangle
+$$
+
+### 3. 新增脚本和输出
+
+新增脚本：
+
+```text
+tests/gpt5/phase248_regime_level_direction_bank.py
+tests/gpt5/run_phase248_regime_level_direction_bank.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase248_regime_level_direction_bank/regime_level_direction_bank/
+```
+
+主要输出：
+
+```text
+phase248_cross_model_summary.json
+phase248_regime_direction_rows.jsonl
+phase248_regime_projection_rows.jsonl
+phase248_projection_prediction_rows.jsonl
+phase248_regime_test_candidate_rows.jsonl
+phase248_observations.jsonl
+phase248_metrics.jsonl
+phase248_graph_edges.jsonl
+phase248_regime_direction_report.md
+```
+
+并同步 Pattern Atlas 固定格式。
+
+### 4. 客观结果
+
+总体输出：
+
+```text
+regime_bank_rows: 21
+raw_vector_rows: 15
+projection_rows: 315
+prediction_rows: 84
+regime_test_candidate_rows: 15
+observation_rows: 315
+metric_rows: 105
+graph_edges: 55
+```
+
+每个模型 7 个 regime bank，token 覆盖：
+
+```text
+continuation_regime: 10
+answer_boundary_regime: 7
+newline_boundary_regime: 3
+period_stop_regime: 5
+because_reason_regime: 6
+comma_repeat_regime: 4
+protocol_short_regime: 6
+```
+
+下一轮候选路线分布：
+
+```text
+continuation_regime_test: 9
+protocol_regime_test: 5
+reason_regime_test: 1
+```
+
+这说明当前最突出的 regime-level 问题仍然是：
+
+```text
+continuation / protocol 接管；
+而不是单个 top token 竞争。
+```
+
+### 5. 关键发现
+
+第一，Phase248 成功把 competitor 从 top token 推进到 token-bank regime direction。
+
+这比 Phase247 的 empirical regime direction 更稳，因为 Phase247 的 regime direction 只来自 15 个候选中的 top competitor，而 Phase248 使用显式 token bank。
+
+第二，continuation_regime_test 成为最大候选类：
+
+```text
+9 / 15
+```
+
+这与早期 Phase209 以来反复出现的 continuation takeover、over-generation、the_continuation、be_continuation 现象一致。
+
+第三，protocol_regime_test 有 5 条，说明输出协议不是表面格式问题，而可能是一个读出方向/边界方向问题。
+
+第四，reason_regime_test 只有 1 条，且来自 DS7B 单样本，不能强化解释。
+
+第五，部分 projection-prediction correlation 很高，但仍受样本数限制。尤其 GLM4 只有 4 个 raw vectors，不能把高相关当成机制定律。
+
+### 6. 问题和硬伤
+
+第一，Phase248 的 regime bank 仍然来自 output embedding token bank，不等于自然内部 regime field。
+
+第二，每个 regime token bank 仍然较小，尤其 newline、comma、period 等边界类还很粗。
+
+第三，当前没有多层、多步、多位置的 regime field，只是静态 output direction。
+
+第四，DS7B 只有 1 个 raw vector，因此 DS7B 的 prediction rows 为 0，不能做统计判断。
+
+第五，本阶段仍然没有 closure validation，没有 DoneStateStable，也没有 ModelStopExecuted。
+
+### 7. 图谱进度
+
+Phase248 后 Pattern Atlas 进度：
+
+```text
+pattern_family_atlas: 0.76
+candidate_clustering: 0.42
+case_bank_calibration: 0.39
+high_value_trace_selection: 0.62
+first_internal_trace_batch: 0.38
+trace_signature_validation: 0.36
+focused_causal_validation: 0.22
+raw_delta_vector_archive: 0.25
+raw_vector_factor_decomposition: 0.22
+regime_field_direction_bank: 0.22
+gate_up_product_signature: 0.45
+residual_state_signature: 0.42
+readout_competition_trace: 0.66
+stepwise_rollout_trace: 0.23
+causal_closure: 0.12
+general_language_mechanism_confidence: 0.57
+```
+
+总体判断：
+
+```text
+机制级方向库已经有第一版；
+continuation/protocol 是当前最强候选方向；
+target/competitor 方向分解继续推进；
+闭合仍没有实质推进。
+```
+
+### 8. 智能理论视角
+
+Phase248 进一步支持：
+
+```text
+语言机制不是单词级竞争，而是 regime field 级竞争。
+```
+
+更合理的读出竞争公式是：
+
+$$
+O(t)
+=
+\arg\max_r
+\left\langle
+h_t,
+v_{\mathrm{regime},r}
+\right\rangle
+$$
+
+其中：
+
+```text
+r: continuation / boundary / reason / protocol / closure 等机制；
+v_regime,r: 机制方向场。
+```
+
+这比单 token readout 更接近语言运行机制。
+
+### 9. 下一阶段任务
+
+下一阶段仍属于同一阶段目标，不应闭合。
+
+建议 Phase249：
+
+```text
+regime-level causal validation
+机制级因果验证
+```
+
+任务：
+
+```text
+1. 选取 Phase248 的 continuation_regime_test 和 protocol_regime_test 高分候选；
+2. 用 regime direction 替代 top token direction 做 suppression / injection；
+3. 比较 target margin、winner regime、rollout token 序列；
+4. 判断 regime-level 干预是否比 top-token suppression 更稳定；
+5. 只保留能稳定减少 continuation takeover 或 protocol drift 的候选。
+```
+
+成功标准：
+
+```text
+不是闭合；
+而是证明 regime-level intervention 比 top-token intervention 更稳定或更可解释。
+```
+
+当前结论：
+
+```text
+Phase248 完成了第一版机制级方向库；
+把竞争机制从 top token 推进到 regime token bank；
+发现 continuation/protocol 是下一步最优先测试方向；
+机制闭合仍未完成。
+```
