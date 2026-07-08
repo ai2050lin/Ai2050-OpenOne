@@ -53218,3 +53218,1953 @@ prompt trigger / anchor 消融图谱。
 4. 区分“语义等价但目标词不同”和“真实模式漂移”；
 5. 再选稳定漂移模式进入 prompt trigger 和内部脉络追踪。
 ```
+
+## Phase 237: 可视化客户端运行环境与模式图谱数据发布配置 [2026-07-07 05:32]
+
+### 1. 本阶段任务
+
+本阶段任务不是新的模型机制测试，而是安装和配置可视化客户端运行环境，使 Phase235/236 生成的 Pattern Atlas（模式图谱）可以被前端稳定读取。
+
+核心目标：
+
+```text
+1. 安装并验证前端依赖；
+2. 配置模式图谱数据的前端 public 访问路径；
+3. 启动并验证 Vite 可视化客户端；
+4. 启动并验证 FastAPI 后端；
+5. 补齐后端 GPT-2 本地缓存，使模型相关 API 不因缺权重而降级。
+```
+
+### 2. 前端环境
+
+前端目录：
+
+```text
+frontend/
+```
+
+执行：
+
+```text
+npm install
+npm run sync:pattern-atlas
+npm run build
+npm run dev -- --host 0.0.0.0
+```
+
+结果：
+
+```text
+npm install: 完成，依赖已是最新；
+npm run build: 通过；
+Vite dev server: 运行于 5173。
+```
+
+当前访问地址：
+
+```text
+http://127.0.0.1:5173/
+http://192.168.101.116:5173/
+```
+
+注意：当前 shell 环境存在 `http_proxy/https_proxy`，所以命令行测试本地服务时需要使用：
+
+```text
+curl --noproxy '*'
+```
+
+否则 `localhost` 可能被代理拦截并返回 502。
+
+### 3. 模式图谱数据发布
+
+新增同步脚本：
+
+```text
+frontend/scripts/sync_pattern_atlas.mjs
+```
+
+新增 npm 命令：
+
+```text
+npm run sync:pattern-atlas
+```
+
+源数据目录：
+
+```text
+tests/result/pattern_family_atlas/v1/
+```
+
+前端发布目录：
+
+```text
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+前端可访问入口：
+
+```text
+/vis_data/pattern_family_atlas/v1/manifest.json
+/vis_data/pattern_family_atlas/v1/progress.json
+/vis_data/pattern_family_atlas/v1/public_manifest.json
+```
+
+同步结果：
+
+```text
+14 个 pattern atlas 文件已同步到 frontend/public/vis_data/pattern_family_atlas/v1。
+```
+
+新增环境变量：
+
+```text
+VITE_PATTERN_ATLAS_BASE=/vis_data/pattern_family_atlas/v1
+VITE_PATTERN_ATLAS_MANIFEST=/vis_data/pattern_family_atlas/v1/manifest.json
+```
+
+### 4. 后端环境
+
+后端入口：
+
+```text
+python -m server.server
+```
+
+服务地址：
+
+```text
+http://127.0.0.1:5001/
+```
+
+已验证：
+
+```text
+http://127.0.0.1:5001/docs
+http://127.0.0.1:5001/agi/progress
+```
+
+第一次启动时发现：
+
+```text
+GPT-2 model.safetensors 本地缓存缺失；
+fallback 下载因 HF_ENDPOINT=hf-mirror.com 不可达失败。
+```
+
+修复方式：
+
+```text
+使用官方 HuggingFace endpoint 下载 gpt2 snapshot。
+```
+
+缓存路径：
+
+```text
+/home/rankrank/.cache/huggingface/hub/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e
+```
+
+重启后结果：
+
+```text
+Forced 12-layer GPT-2 loaded successfully on cuda；
+ManifoldSurgeon and GeometricInterceptor initialized；
+AGI Core Engine and RLMF Provider initialized；
+AGI Chat Engine initialization started。
+```
+
+### 5. 当前验证结果
+
+前端：
+
+```text
+HTTP 200:
+http://127.0.0.1:5173/
+```
+
+后端：
+
+```text
+HTTP 200:
+http://127.0.0.1:5001/docs
+http://127.0.0.1:5001/agi/progress
+```
+
+模式图谱数据：
+
+```text
+HTTP 200:
+http://127.0.0.1:5173/vis_data/pattern_family_atlas/v1/public_manifest.json
+http://127.0.0.1:5173/vis_data/pattern_family_atlas/v1/manifest.json
+http://127.0.0.1:5173/vis_data/pattern_family_atlas/v1/progress.json
+```
+
+### 6. 问题和风险
+
+第一，前端 `npm install` 报告：
+
+```text
+15 vulnerabilities
+```
+
+其中：
+
+```text
+1 low
+6 moderate
+8 high
+```
+
+本阶段没有自动执行 `npm audit fix`，因为自动修复可能升级依赖并破坏现有可视化客户端。
+
+第二，当前只是完成环境和数据发布配置。
+
+Pattern Atlas 独立页面还没有正式实现到 React UI 中，目前只是数据已经可以被前端通过 public URL 读取。
+
+第三，后端启动会加载 GPT-2 到 CUDA，会占用显存。
+
+如果后续要运行 qwen3、GLM4、DS7B 测试，应该先停止后端，避免 GPU 内存竞争。
+
+### 7. 阶段结论
+
+Phase237 完成了可视化客户端运行环境配置。
+
+当前链路已经打通：
+
+```text
+tests/result/pattern_family_atlas/v1
+-> frontend/public/vis_data/pattern_family_atlas/v1
+-> Vite client 5173
+-> FastAPI backend 5001
+```
+
+这为下一步实现真正的 Pattern Atlas 独立界面提供了运行基础。
+
+### 8. 下一阶段
+
+下一阶段应该实现：
+
+```text
+Pattern Atlas 独立可视化页面。
+```
+
+最低要求：
+
+```text
+1. 读取 VITE_PATTERN_ATLAS_MANIFEST；
+2. 展示 global_progress；
+3. 展示 9 个模式族卡片；
+4. 展示 72 个模式表格；
+5. 展示 graph_nodes / graph_edges 的机制链路；
+6. 展示 Phase236 行为基准统计；
+7. 每次运行 npm run sync:pattern-atlas 后自动看到最新结果。
+```
+
+## Phase 238: 行为评分校准、歧义样例标记与独立 Pattern Atlas 页面 [2026-07-07 06:45]
+
+### 1. 对附件判断的校准
+
+附件对 Phase236 和 Phase237 的判断基本正确。
+
+正确部分：
+
+```text
+1. Phase236 是行为层基准，不是内部机制闭合；
+2. Phase237 是工程基础设施，不是新的机制实验；
+3. 当前真正完成的是固定格式、跨模型行为观测、图谱回写、前端 public 数据发布；
+4. 下一步不能直接进入深层 hook，必须先修正行为评分和目标歧义。
+```
+
+需要补充的一点：
+
+```text
+评分校准不能简单扩大 aliases。
+如果 aliases 太宽，会把解释中的相关词误判成答案本身。
+```
+
+例如初版校准把 `citric` 纳入 lemon taste 的同义集合，会把 “sweet because citric acid” 误判为 sour/tart 等价答案。已在本阶段收紧。
+
+### 2. 本阶段任务
+
+本阶段目标：
+
+```text
+1. 增加 target_aliases / acceptable_answers / relation_schema；
+2. 重新计算 Phase236 行为得分；
+3. 标记 semantic_correct_but_target_mismatch；
+4. 标记 ambiguous target / relation；
+5. 导出 stable failure candidates；
+6. 实现独立 Pattern Atlas 页面；
+7. 根据固定格式回写语言模式图谱测试数据。
+```
+
+本阶段没有重新跑 qwen3、GLM4、DS7B，因为目标是校准 Phase236 已有输出，不是新增模型行为测试。
+
+### 3. 新增脚本和页面
+
+新增评分校准脚本：
+
+```text
+tests/gpt5/phase238_pattern_atlas_scoring_calibration.py
+```
+
+新增独立页面：
+
+```text
+frontend/public/pattern_atlas.html
+```
+
+更新客户端规范：
+
+```text
+frontend/PATTERN_ATLAS_CLIENT_SPEC.md
+```
+
+同步命令：
+
+```text
+cd frontend
+npm run sync:pattern-atlas
+```
+
+构建验证：
+
+```text
+npm run build: 通过
+```
+
+页面访问：
+
+```text
+http://127.0.0.1:5173/pattern_atlas.html
+```
+
+### 4. 输出目录
+
+独立结果目录：
+
+```text
+tests/result/phase238_pattern_atlas_scoring_calibration/pattern_atlas_scoring_calibration/
+```
+
+回写图谱目录：
+
+```text
+tests/result/pattern_family_atlas/v1/
+```
+
+前端发布目录：
+
+```text
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+### 5. 新增固定格式数据
+
+新增文件：
+
+```text
+case_aliases.jsonl
+semantic_equivalence_flags.jsonl
+stable_failure_candidates.jsonl
+```
+
+独立结果中还包含：
+
+```text
+phase238_calibrated_case_rows.jsonl
+phase238_calibrated_observations.jsonl
+phase238_calibrated_metrics.jsonl
+phase238_ambiguous_case_report.md
+phase238_scoring_calibration_summary.json
+```
+
+这些文件解决：
+
+```text
+target_aliases；
+acceptable_answers；
+relation_schema；
+semantic_equivalence_label；
+ambiguous_case；
+stable_failure_candidate。
+```
+
+### 6. 校准评分公式
+
+Phase238 使用：
+
+$$
+\boxed{
+S_{\mathrm{calibrated}}
+=
+0.35 I_{\mathrm{answer}}
++
+0.25 I_{\mathrm{protocol}}
++
+0.25 I_{\mathrm{semantic}}
++
+0.15 I_{\mathrm{closure}}
+}
+$$
+
+其中：
+
+```text
+I_answer = 是否命中 target_aliases / acceptable_answers；
+I_protocol = 是否符合输出协议；
+I_semantic = 是否语义等价；
+I_closure = 是否出现粗略闭合信号。
+```
+
+注意：
+
+```text
+这个公式只是行为层评分校准工具，不是语言机制公式。
+```
+
+### 7. 客观结果
+
+输入规模：
+
+```text
+case_rows: 132
+unique_cases: 44
+```
+
+输出规模：
+
+```text
+calibrated_observation_rows: 792
+metric_rows: 68
+case_aliases: 44
+semantic_equivalence_flags: 132
+stable_failure_candidates: 12
+```
+
+校准前后：
+
+```text
+mean_original_behavior_score: 0.6462
+mean_calibrated_behavior_score: 0.8133
+```
+
+校准后漂移类型：
+
+```text
+none: 69
+protocol_or_over_generation: 27
+semantic_or_target_failure: 17
+closure_or_rollout_failure: 11
+semantic_correct_but_target_mismatch: 8
+```
+
+歧义行：
+
+```text
+ambiguous_rows: 13
+semantic_mismatch_rows: 13
+```
+
+### 8. 稳定失败候选
+
+Phase238 导出 12 个 stable failure candidates。
+
+主要类型：
+
+```text
+stable_protocol_failure；
+stable_semantic_or_target_failure。
+```
+
+当前最值得进入 Phase239 的方向：
+
+```text
+short_answer 过生成；
+Answer boundary；
+one-word constraint；
+period / newline / Answer 触发边界；
+wheel part_of 关系歧义。
+```
+
+其中更适合机制追踪的是：
+
+```text
+stable_protocol_failure
+```
+
+因为它更可能对应输出协议、边界控制和读出机制，而不是语义标注歧义。
+
+### 9. 独立 Pattern Atlas 页面
+
+页面：
+
+```text
+frontend/public/pattern_atlas.html
+```
+
+访问：
+
+```text
+http://127.0.0.1:5173/pattern_atlas.html
+```
+
+已验证：
+
+```text
+HTTP 200；
+public_manifest.json 可访问；
+progress.json 可访问；
+stable_failure_candidates.jsonl 可访问。
+```
+
+页面显示：
+
+```text
+global_progress；
+9 个模式族；
+72 个模式；
+calibrated metrics；
+stable failure candidates；
+mechanism graph edges；
+case aliases；
+ambiguity risk。
+```
+
+### 10. 当前图谱进度
+
+Phase238 回写后：
+
+```text
+pattern_family_atlas: 0.48
+behavior level: 0.54
+general_language_mechanism_confidence: 0.46
+model_internal_closure: 0.46
+```
+
+当前完成内容：
+
+```text
+1. 固定数据契约；
+2. 行为层跨模型基准；
+3. 行为评分校准；
+4. 语义等价标记；
+5. 歧义样例报告；
+6. 稳定失败候选筛选；
+7. 前端 public 数据发布；
+8. 独立 Pattern Atlas 页面。
+```
+
+仍未完成：
+
+```text
+1. 模式族样本均衡；
+2. prompt trigger / anchor 系统消融；
+3. gate/up/product 跨模式族追踪；
+4. residual state 传播图谱；
+5. rollout 多 token 轨迹；
+6. closure 因果闭合。
+```
+
+### 11. 严格审视
+
+第一，校准后分数升高不等于模型能力变强。
+
+它说明：
+
+```text
+Phase236 的原始评分低估了语义等价答案。
+```
+
+第二，semantic_equivalence 仍然是启发式。
+
+同义集合过窄会误判正确答案，同义集合过宽会误判解释性相关词。当前只是第一版校准。
+
+第三，模式族仍然不均衡。
+
+当前 content_knowledge 行数仍然明显多于 reasoning、syntax、cross_lingual、language_action、closure。
+
+第四，小模型偏差仍然存在。
+
+即使评分校准后，也必须保留：
+
+```text
+30% 到 50% 小模型结构偏差空间。
+```
+
+### 12. 阶段判断
+
+Phase238 与 Phase236/237 属于同一个阶段性目标：
+
+```text
+把语言模式研究沉淀成可持续积累、可视化、可校准的 Pattern Atlas。
+```
+
+这一阶段的基础目标已经完成：
+
+```text
+固定格式
+-> 行为观测
+-> 评分校准
+-> 图谱回写
+-> 前端查看。
+```
+
+Phase239 已经进入新的机制测试阶段，应该单独执行。
+
+### 13. 下一阶段任务
+
+Phase239 建议执行：
+
+```text
+prompt trigger / anchor 消融。
+```
+
+但不应大范围铺样本，而应从 Phase238 的 stable failure candidates 中选择少量高价值样例。
+
+优先级：
+
+```text
+1. stable_protocol_failure；
+2. short_answer / one-word 过生成；
+3. Answer boundary；
+4. period / newline 触发；
+5. readout regime takeover。
+```
+
+Phase239 如果进行模型测试，应依次运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+并继续写入：
+
+```text
+observations.jsonl
+metrics.jsonl
+graph_edges.jsonl
+progress.json
+```
+
+## Phase 239: 稳定协议失败的 prompt trigger / anchor 消融图谱 [2026-07-07 07:23]
+
+### 1. 对附件判断的校准
+
+附件对 Phase238 的判断正确：
+
+```text
+Phase238 是行为观测校准，不是机制实验；
+Phase239 应该从 stable_protocol_failure 中选少量样例，
+进入 prompt trigger / anchor 消融。
+```
+
+本阶段执行了这个方案。
+
+需要特别记录一个关键校准：
+
+```text
+初版统计把 explain_instruction 按解释任务协议评分，
+会把“换任务成功”误判成“原始短答协议修复”。
+```
+
+因此脚本已修正为：
+
+```text
+所有 prompt 变体都按 original_protocol_match 评价，
+即是否修复原始 short-answer / one-word 协议。
+```
+
+### 2. 新增脚本
+
+新增测试脚本：
+
+```text
+tests/gpt5/phase239_stable_protocol_prompt_trigger_atlas.py
+```
+
+新增顺序运行脚本：
+
+```text
+tests/gpt5/run_phase239_stable_protocol_prompt_trigger_atlas.sh
+```
+
+三模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型完成后释放 CUDA 显存。
+
+脚本检查：
+
+```text
+python -m py_compile: 通过
+bash -n: 通过
+```
+
+### 3. 测试设计
+
+输入来自：
+
+```text
+tests/result/pattern_family_atlas/v1/stable_failure_candidates.jsonl
+```
+
+只选择：
+
+```text
+stable_protocol_failure
+```
+
+测试规模：
+
+```text
+8 个 stable_protocol_failure 样例；
+每个样例 11 个 prompt 变体；
+三模型共 264 条 variant rows。
+```
+
+prompt 变体：
+
+```text
+full
+no_answer_anchor
+strong_answer_anchor
+one_word_strict
+one_word_no_explain
+period_forced
+newline_removed
+colon_removed
+short_answer_instruction
+explain_instruction
+target_seeded
+```
+
+记录指标：
+
+```text
+target_rank；
+target_logit；
+target_margin_vs_winner；
+winner_regime；
+second_competitor；
+top_token；
+original_protocol_match；
+variant_protocol_match；
+over_generation；
+closure_signal；
+baseline_score_delta；
+baseline_margin_delta。
+```
+
+### 4. 输出文件
+
+结果目录：
+
+```text
+tests/result/phase239_stable_protocol_prompt_trigger_atlas/stable_protocol_prompt_trigger_atlas/
+```
+
+核心文件：
+
+```text
+phase239_cross_model_summary.json
+phase239_cross_model_prompt_trigger_rows.jsonl
+phase239_cross_model_observations.jsonl
+phase239_cross_model_metrics.jsonl
+phase239_cross_model_graph_edges.jsonl
+phase239_protocol_failure_report.md
+phase239_stable_failure_selection.json
+```
+
+同时回写：
+
+```text
+tests/result/pattern_family_atlas/v1/observations.jsonl
+tests/result/pattern_family_atlas/v1/metrics.jsonl
+tests/result/pattern_family_atlas/v1/graph_edges.jsonl
+tests/result/pattern_family_atlas/v1/progress.json
+tests/result/pattern_family_atlas/v1/summary.md
+```
+
+并已同步到前端：
+
+```text
+cd frontend
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过。
+
+### 5. 客观结果
+
+总量：
+
+```text
+variant_rows: 264
+observation_rows: 2376
+metric_rows: 33
+graph_edges: 33
+```
+
+修正版跨模型结果：
+
+```text
+mean_score: 0.6152
+protocol_match_rate: 0.0038
+```
+
+分模型：
+
+```text
+qwen3:
+mean_score = 0.6869
+protocol_match_rate = 0.0
+
+GLM4:
+mean_score = 0.7256
+protocol_match_rate = 0.0114
+
+DS7B:
+mean_score = 0.4330
+protocol_match_rate = 0.0
+```
+
+### 6. 关键现象
+
+第一，几乎没有 prompt 变体能恢复原始短答协议。
+
+```text
+protocol_match_rate = 0.0038
+```
+
+说明 stable_protocol_failure 不是简单 prompt wording 问题。
+
+第二，explain_instruction 不是短答修复。
+
+修正后：
+
+```text
+explain_instruction:
+original_protocol_match = 0.0
+variant_protocol_match = 0.9167
+over_generation_rate = 0.9583
+```
+
+这说明它只是把任务切换成解释输出，不是修复原始 one-word / short-answer 协议。
+
+第三，强指令和强 Answer 锚点没有修复。
+
+```text
+one_word_strict:
+protocol_match_rate = 0.0
+over_generation_rate = 0.9583
+
+strong_answer_anchor:
+protocol_match_rate = 0.0
+over_generation_rate = 0.7083
+```
+
+这说明短答失败不只是缺少显式指令。
+
+第四，主要竞争机制仍然是：
+
+```text
+the_continuation；
+newline_boundary；
+answer_boundary；
+be_continuation；
+period_stop；
+for_continuation。
+```
+
+### 7. 严格审视
+
+第一，这是 prompt trigger 层负结果，不是内部机制闭合。
+
+它只能说明：
+
+```text
+浅层 prompt / anchor 修改不足以修复稳定协议失败。
+```
+
+第二，测试样例仍来自小模型。
+
+需要保留：
+
+```text
+30% 到 50% 小模型结构偏差空间。
+```
+
+第三，当前没有进入 gate/up/product 或 residual write。
+
+所以不能断言具体内部通道或层已经定位。
+
+第四，稳定协议失败的样例主要来自 content_knowledge 的 short protocol 和 output_protocol short_answer，模式族仍不均衡。
+
+### 8. 理论进展
+
+本阶段补上的拼图是：
+
+$$
+\boxed{
+\mathrm{StableProtocolFailure}
+\not\approx
+\mathrm{PromptWordingFailure}
+}
+$$
+
+更准确地说：
+
+$$
+\boxed{
+\mathrm{ProtocolFailure}
+\rightarrow
+\mathrm{ReadoutRegimeTakeover}
+\lor
+\mathrm{ResidualStateBias}
+\lor
+\mathrm{RolloutPatternBias}
+\lor
+\mathrm{ClosureStateMissing}
+}
+$$
+
+这只是方向判断，还不是闭合证明。
+
+### 9. 当前图谱进度
+
+Phase239 回写后：
+
+```text
+pattern_family_atlas: 0.52
+prompt_trigger: 0.32
+behavior: 0.54
+readout_competition: 0.32
+model_internal_closure: 0.46
+general_language_mechanism_confidence: 0.47
+```
+
+已完成：
+
+```text
+固定数据契约；
+行为层测试；
+评分校准；
+稳定失败筛选；
+prompt trigger / anchor 消融；
+前端 Pattern Atlas 查看。
+```
+
+未完成：
+
+```text
+gate/up/product 协议失败追踪；
+residual write 机制；
+rollout 多 token 轨迹；
+closure 因果闭合。
+```
+
+### 10. 阶段结论
+
+Phase239 是一个重要负结果。
+
+它证明：
+
+```text
+stable_protocol_failure 不能靠简单 prompt / anchor 变体修复。
+```
+
+这把下一步研究从：
+
+```text
+继续调提示词
+```
+
+推进到：
+
+```text
+追踪协议状态是否被写入 residual stream，
+以及读出竞争机制为什么接管 rollout。
+```
+
+### 11. 下一阶段任务
+
+Phase240 应该进入：
+
+```text
+gate/up/product protocol trace
+```
+
+核心问题：
+
+```text
+1. one-word / short-answer 协议状态是否进入 MLP product；
+2. Answer boundary 是否有可定位的 residual write；
+3. the_continuation / newline_boundary 为什么压过目标闭合；
+4. 是否存在 stopping / boundary state 的早期写入失败；
+5. 哪些稳定协议失败值得进入更深 hook 因果验证。
+```
+
+Phase240 仍应继续使用少量 stable_protocol_failure 样例，避免大范围铺数据。
+
+## Phase 240: gate/up/product 协议状态追踪与读出竞争校准 [2026-07-07 14:57]
+
+### 1. 阶段目标
+
+本阶段承接 Phase239 的负结果。
+
+Phase239 已经证明：
+
+```text
+stable_protocol_failure 不是简单 prompt / anchor 变体可以修复的问题。
+```
+
+Phase240 的目标不是继续改提示词，而是进入内部状态链条：
+
+```text
+PromptProtocol
+→ Gate / Up / Product
+→ ResidualState
+→ ReadoutCompetition
+→ Rollout / Closure
+```
+
+核心问题：
+
+```text
+1. one-word / short-answer 协议是否进入 MLP product；
+2. 协议进入 product / residual 后，是否能改善目标读出竞争；
+3. 如果目标读出没有改善，稳定协议失败更像写入失败、读出竞争失败，还是 rollout / closure 失败。
+```
+
+### 2. 测试脚本与输出
+
+新增脚本：
+
+```text
+tests/gpt5/phase240_gate_product_protocol_trace.py
+tests/gpt5/run_phase240_gate_product_protocol_trace.sh
+```
+
+测试顺序：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+固定输出目录：
+
+```text
+tests/result/phase240_gate_product_protocol_trace/gate_product_protocol_trace/
+```
+
+核心输出文件：
+
+```text
+phase240_cross_model_summary.json
+phase240_cross_model_behavior_rows.jsonl
+phase240_cross_model_gate_product_protocol_rows.jsonl
+phase240_cross_model_residual_protocol_rows.jsonl
+phase240_cross_model_observations.jsonl
+phase240_cross_model_metrics.jsonl
+phase240_cross_model_graph_edges.jsonl
+phase240_protocol_trace_report.md
+```
+
+并回写 Pattern Atlas：
+
+```text
+tests/result/pattern_family_atlas/v1/observations.jsonl
+tests/result/pattern_family_atlas/v1/metrics.jsonl
+tests/result/pattern_family_atlas/v1/graph_edges.jsonl
+tests/result/pattern_family_atlas/v1/progress.json
+tests/result/pattern_family_atlas/v1/summary.md
+```
+
+前端同步和构建：
+
+```text
+cd frontend
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过；只有 Vite chunk size 警告，不影响本阶段结果。
+
+### 3. 测试原理
+
+从 Phase238 / Phase239 标记的 stable_protocol_failure 中选取 6 个高价值样例。
+
+对每个样例比较 6 种输入变体：
+
+```text
+full
+strong_answer_anchor
+one_word_strict
+short_answer_instruction
+explain_instruction
+target_seeded
+```
+
+内部追踪层：
+
+```text
+qwen3: layer 29，观察 29 / 31 / 33
+GLM4: layer 30，观察 28 / 30 / 32
+DS7B: layer 24，观察 24 / 26 / 27
+```
+
+采集组件：
+
+```text
+gate
+up
+product
+down_out
+recomputed_product
+residual_state
+readout_winner
+second_competitor
+target_margin_vs_winner
+rollout output
+```
+
+基础差分公式：
+
+$$
+\Delta z_{c,l,v}
+=
+z_{c,l,v}
+-
+z_{c,l,\mathrm{full}}
+$$
+
+其中：
+
+```text
+c: component，例如 gate / up / product / down_out / residual_state；
+l: layer；
+v: prompt variant。
+```
+
+相对差分：
+
+$$
+r_{c,l,v}
+=
+\frac{
+\|\Delta z_{c,l,v}\|
+}{
+\|z_{c,l,\mathrm{full}}\|+\epsilon
+}
+$$
+
+读出竞争变化：
+
+$$
+\Delta M_v
+=
+M_v - M_{\mathrm{full}}
+$$
+
+其中：
+
+$$
+M
+=
+\mathrm{logit}(\mathrm{target})
+-
+\mathrm{logit}(\mathrm{winning\ competitor})
+$$
+
+判断逻辑：
+
+```text
+如果 strict protocol prompt 的 product / down_out 差分很小：
+    倾向 protocol_state_weak_or_not_written；
+
+如果 product / down_out 差分明显，但 target margin 不改善，protocol_match 仍然为 0：
+    倾向 protocol_state_written_but_readout_competition_failed；
+
+如果 target margin 改善，但生成仍过长：
+    倾向 readout_or_rollout_closure_failed。
+```
+
+### 4. 主要结果
+
+跨模型总量：
+
+```text
+behavior_rows: 108
+gate_product_trace_rows: 540
+residual_trace_rows: 324
+observation_rows: 972
+metric_rows: 162
+graph_edges: 24
+mean_behavior_score: 0.6278
+protocol_match_rate: 0.0
+```
+
+三模型判断：
+
+```text
+qwen3:
+  decision: protocol_state_written_but_readout_competition_failed
+  strict_mean_product_down_relative_delta: 0.172966
+  strict_mean_margin_delta: -0.066
+  strict_protocol_match_rate: 0.0
+  strict_over_generation_rate: 1.0
+
+GLM4:
+  decision: protocol_state_written_but_readout_competition_failed
+  strict_mean_product_down_relative_delta: 0.604032
+  strict_mean_margin_delta: -1.0608
+  strict_protocol_match_rate: 0.0
+  strict_over_generation_rate: 1.0
+
+DS7B:
+  decision: protocol_state_written_but_readout_competition_failed
+  strict_mean_product_down_relative_delta: 0.682197
+  strict_mean_margin_delta: -2.6493
+  strict_protocol_match_rate: 0.0
+  strict_over_generation_rate: 0.6667
+```
+
+最重要的客观现象：
+
+```text
+1. 严格协议提示确实改变 gate/up/product/down_out/residual_state；
+2. 但 protocol_match_rate 仍然为 0；
+3. strict protocol prompt 没有稳定改善 target_margin_vs_winner；
+4. GLM4 和 DS7B 的 product/down_out 差分很大，但读出竞争反而更差；
+5. target_seeded 产生最大内部差分，但它不是自然短答闭合，只能作为“目标已进入状态”的上界参照。
+```
+
+因此 Phase240 支持的判断是：
+
+```text
+stable_protocol_failure 不是协议状态完全没有进入内部层；
+更像是协议状态进入了 gate/up/product/residual，
+但没有转化为目标读出优势和 rollout 闭合。
+```
+
+### 5. 与 Phase239 的关系
+
+Phase239 证明：
+
+```text
+继续加强 prompt wording / answer anchor 不能修复稳定协议失败。
+```
+
+Phase240 进一步说明：
+
+```text
+这不是因为提示词完全没有影响内部状态；
+提示词影响了内部状态，
+但这个影响没有赢得 readout competition，
+也没有形成 closure control。
+```
+
+这把问题从：
+
+```text
+协议提示是否足够强
+```
+
+推进到：
+
+```text
+协议状态如何被读出、如何压过 continuation competitor、如何触发停止闭合。
+```
+
+### 6. 当前核心拼图
+
+已经积累的核心拼图：
+
+```text
+1. 语言模式不是单一语义向量，而是模式网络；
+2. 输出协议是一类模式，不等同于答案语义；
+3. stable_protocol_failure 是稳定失败族，不是随机噪声；
+4. target_alias 校准能修复部分假失败，但不能修复协议失败；
+5. prompt trigger / anchor 变体不能解决稳定协议失败；
+6. gate/up/product/residual 会响应协议变体；
+7. 内部响应不等于读出成功；
+8. target_seeded 是目标状态上界参照，不代表自然闭合；
+9. readout competition 和 rollout / closure 是下一层关键障碍。
+```
+
+当前全局图谱链条更新为：
+
+```text
+TestCase
+→ ScoringCalibration
+→ PromptProtocol
+→ ProtocolState
+→ GateUpProduct
+→ ResidualWrite
+→ TargetPressure
+→ CompetitorPressureField
+→ ReadoutRegimeSelection
+→ RolloutControl
+→ ClosureTrace
+```
+
+### 7. 问题与硬伤
+
+本阶段仍不是闭合证明，主要硬伤如下：
+
+```text
+1. Phase240 是 trace，不是 causal patch；
+2. 只追踪最后输入位置的状态，尚未覆盖多 token rollout 轨迹；
+3. target_seeded 与自然短答协议不同，不能混作成功样本；
+4. 当前模型是小模型，内部编码机制可能比大模型粗糙 30% 到 50%；
+5. product / residual 的大差分不必然表示“正确协议方向”，可能包含格式、目标、边界、续写等混合因素；
+6. 还没有分离 target pressure 与 competitor pressure 的方向；
+7. 还没有确认 stopping / closure state 是否存在可定位写入。
+```
+
+严格结论只能写成：
+
+```text
+协议变体能够改变内部状态；
+但该内部变化没有稳定转化为目标读出优势和短答闭合。
+```
+
+不能写成：
+
+```text
+已经找到完整协议机制。
+```
+
+### 8. 图谱进度
+
+Phase240 回写后：
+
+```text
+pattern_family_atlas: 0.56
+behavior: 0.54
+prompt_trigger: 0.32
+gate_up_product: 0.30
+residual_state: 0.30
+readout_competition: 0.48
+rollout: 0.05
+closure: 0.10
+model_internal_closure: 0.46
+general_language_mechanism_confidence: 0.48
+```
+
+总体判断：
+
+```text
+语言模式图谱完成度约 56%；
+模型内部闭合完成度约 46%；
+对一般语言机制的信心约 48%。
+```
+
+### 9. 智能理论角度的关键洞察
+
+语言能力至少包含三层不同机制：
+
+```text
+1. 内容机制：知道答案是什么；
+2. 协议机制：知道答案应该以什么形式出现；
+3. 闭合机制：知道什么时候停止，不进入续写或解释。
+```
+
+Phase240 的关键洞察是：
+
+```text
+协议状态可以进入内部网络，但不一定成为最终输出制度。
+```
+
+这说明智能系统中的“规则”可能不是单点开关，而是分布式竞争过程：
+
+$$
+\mathrm{Output}
+=
+\arg\max
+\left(
+P_{\mathrm{target}}
+-
+P_{\mathrm{competitor}}
+-
+B_{\mathrm{closure\ failure}}
+\right)
+$$
+
+更接近当前结果的统一机制公式：
+
+$$
+\boxed{
+\mathrm{LanguageState}_{t+1}
+=
+F(
+\mathrm{ContentState}_t,
+\mathrm{ProtocolState}_t,
+\mathrm{BoundaryState}_t,
+\mathrm{CompetitorField}_t,
+\mathrm{ResidualWrite}_t,
+\mathrm{RolloutControl}_t
+)
+}
+$$
+
+其中 Phase240 主要补上：
+
+```text
+ProtocolState → GateUpProduct → ResidualWrite
+```
+
+但仍没有闭合：
+
+```text
+ResidualWrite → ReadoutCompetition → RolloutControl → ClosureTrace
+```
+
+### 10. 下一阶段任务
+
+Phase241 应进入：
+
+```text
+protocol rollout / closure trace
+```
+
+优先任务：
+
+```text
+1. 对 stable_protocol_failure 做多 token rollout 逐步追踪；
+2. 比较第 1 个输出 token 正确但后续过生成的样例；
+3. 分离 target pressure、continuation pressure、newline / period boundary pressure；
+4. 追踪停止符、句号、换行、because、the 等竞争 token 的逐步 logit 变化；
+5. 判断 closure failure 是第一步读出失败，还是后续 rollout 控制失败；
+6. 只在定位清楚后再进入 causal suppression / patch。
+```
+
+阶段性目标不变：
+
+```text
+第一优先级：完成全局图谱；
+第二优先级：机制闭合验证；
+第三优先级：理论总结。
+```
+
+## Phase 241: 大规模模式族行为与读出图谱基准 [2026-07-07 16:12]
+
+### 1. 阶段校正
+
+Phase240 之后原计划进入：
+
+```text
+protocol rollout / closure trace
+```
+
+但结合最新判断，本阶段更合理的优先级是：
+
+```text
+先做语言模式图谱的大数据量测试，
+再从大数据负面结果中筛选高价值内部追踪样本。
+```
+
+原因是前面多轮局部实验已经反复出现：
+
+```text
+小样本有效；
+扩量后失效；
+单模型有效；
+跨模型失效；
+局部 patch 有效；
+全局闭合失败。
+```
+
+因此 Phase241 不继续局部追闭合，而是建立第一版：
+
+```text
+Large-Scale Pattern Atlas Benchmark
+大规模模式族图谱基准
+```
+
+### 2. 新增脚本
+
+新增：
+
+```text
+tests/gpt5/phase241_large_scale_pattern_atlas_benchmark.py
+tests/gpt5/run_phase241_large_scale_pattern_atlas_benchmark.sh
+```
+
+运行顺序：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+本轮正式规模：
+
+```text
+9 个模式族
+72 个模式
+每个模式 4 个样本
+每个样本 6 个 prompt / protocol 变体
+3 个模型
+```
+
+总运行量：
+
+```text
+72 × 4 × 6 × 3 = 5184
+```
+
+脚本参数支持继续扩展：
+
+```text
+SAMPLES_PER_MODE=50
+SAMPLES_PER_MODE=100
+```
+
+但本轮先用 5184 条运行建立第一版全图谱分布，避免一次性把测试成本推得过高。
+
+### 3. 覆盖的九大模式族
+
+本轮覆盖：
+
+```text
+1. content_knowledge
+2. output_protocol
+3. reasoning_constraint
+4. syntax_structure
+5. language_action
+6. cross_lingual
+7. readout_competition
+8. state_drift
+9. closure
+```
+
+每个模式族 8 个模式，共 72 个模式。
+
+本阶段不做 hook，只做：
+
+```text
+behavior；
+next-token readout；
+rollout up to 24 tokens；
+winner / second competitor；
+calibrated scoring；
+negative result taxonomy。
+```
+
+### 4. 输出文件
+
+结果目录：
+
+```text
+tests/result/phase241_large_scale_pattern_atlas_benchmark/large_scale_pattern_atlas_benchmark/
+```
+
+核心输出：
+
+```text
+phase241_cross_model_summary.json
+phase241_large_scale_case_rows.jsonl
+phase241_large_scale_behavior_rows.jsonl
+phase241_large_scale_readout_rows.jsonl
+phase241_negative_result_rows.jsonl
+phase241_mode_trace_vectors.jsonl
+phase241_family_failure_matrix.json
+phase241_readout_regime_matrix.json
+phase241_cross_model_observations.jsonl
+phase241_cross_model_metrics.jsonl
+phase241_cross_model_graph_edges.jsonl
+phase241_large_scale_summary.md
+```
+
+同时回写：
+
+```text
+tests/result/pattern_family_atlas/v1/test_cases.jsonl
+tests/result/pattern_family_atlas/v1/observations.jsonl
+tests/result/pattern_family_atlas/v1/metrics.jsonl
+tests/result/pattern_family_atlas/v1/graph_edges.jsonl
+tests/result/pattern_family_atlas/v1/progress.json
+tests/result/pattern_family_atlas/v1/summary.md
+```
+
+前端同步和构建：
+
+```text
+cd frontend
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，只有 chunk size 警告。
+
+### 5. 测试原理
+
+每条样本记录：
+
+```text
+case_id
+family_id
+mode_id
+model
+prompt_variant
+target
+target_aliases
+output
+semantic_match
+protocol_match
+winner_regime
+second_competitor
+target_margin_vs_winner
+failure_type
+negative_result
+negative_category
+mechanism_hint
+should_enter_hook
+```
+
+基础行为分数：
+
+$$
+\boxed{
+S
+=
+0.40 A
++
+0.25 F
++
+0.25 P
++
+0.10 C
+}
+$$
+
+其中：
+
+```text
+A = semantic_match
+F = answer starts / reachable
+P = protocol_match
+C = closure_signal
+```
+
+读出边界：
+
+$$
+\boxed{
+M
+=
+\mathrm{logit}(\mathrm{target})
+-
+\mathrm{logit}(\mathrm{winning\ competitor})
+}
+$$
+
+模式脉络向量：
+
+$$
+\boxed{
+\tau(P_i)
+=
+[
+B_i,
+T_i,
+G_i,
+R_i,
+C_i,
+O_i,
+K_i
+]
+}
+$$
+
+本阶段实际填充：
+
+```text
+B_i = behavior signature
+T_i = prompt variant trigger signature
+C_i = readout competition signature
+O_i = rollout signature
+K_i = closure signature
+```
+
+其中：
+
+```text
+G_i 和 R_i 暂时为空，留给 Phase242 的内部追踪。
+```
+
+### 6. 负面结果分类
+
+本阶段正式把负面结果纳入图谱，而不是视为失败。
+
+分类包括：
+
+```text
+semantic_failure
+protocol_negative
+readout_negative
+rollout_negative
+closure_negative
+```
+
+负面结果公式：
+
+$$
+\boxed{
+N_i
+=
+f(
+\neg A_i,
+\neg P_i,
+M_i < 0,
+\mathrm{OverGenerate}_i,
+\neg C_i
+)
+}
+$$
+
+其中：
+
+```text
+A_i: 语义目标匹配
+P_i: 输出协议匹配
+M_i: 目标相对竞争机制边界
+C_i: 闭合信号
+```
+
+### 7. 客观结果
+
+跨模型汇总：
+
+```text
+case_count: 288
+behavior_rows: 5184
+readout_rows: 5184
+negative_rows: 4223
+mean_score: 0.5386
+semantic_match_rate: 0.7355
+protocol_match_rate: 0.1854
+negative_rate: 0.8146
+```
+
+负面结果分类：
+
+```text
+rollout_negative: 1863
+semantic_failure: 1371
+closure_negative: 398
+readout_negative: 363
+protocol_negative: 228
+```
+
+单模型负面率：
+
+```text
+qwen3: 0.8038
+GLM4: 0.7824
+DS7B: 0.8576
+```
+
+这证明：
+
+```text
+扩量后负面结果不是偶然；
+负面结果是当前图谱的主体材料。
+```
+
+### 8. 重要客观现象
+
+1. 大量负面来自 rollout_negative。
+
+```text
+模型经常能触达答案或部分触达答案，
+但输出展开、格式、停止和闭合不稳定。
+```
+
+2. semantic_failure 数量也很高。
+
+```text
+这说明第一版 case bank 中有一部分模式目标定义偏粗，
+尤其 location_fact、causal_fact、classify 等模式，
+需要继续做 target_alias 和 relation_schema 校准。
+```
+
+3. closure_negative 和 readout_negative 成为独立大类。
+
+```text
+这支持 Phase239 / Phase240 的方向：
+语言机制不只是答案内容，
+还包括协议、读出竞争、展开控制和停止闭合。
+```
+
+4. output_protocol / closure 中 one_word、short_answer、done_state_stable、boundary_stable 继续高失败。
+
+```text
+短答和闭合仍是核心困难。
+```
+
+5. 主要竞争机制仍集中在：
+
+```text
+the_continuation
+period_stop
+comma_repeat
+answer_boundary
+newline_boundary
+be_continuation
+```
+
+### 9. 当前硬伤
+
+本阶段是大规模行为/读出图谱，不是闭合证明。
+
+主要硬伤：
+
+```text
+1. 每模式 4 个样本仍不是最终大数据规模；
+2. 6 个 prompt 变体中 target_seeded 是上界参照，不是自然成功；
+3. location_fact / causal_fact / classify 的目标定义偏粗，会增加 semantic_failure；
+4. 当前 scoring 仍是规则评分，不是人工审阅或语义模型复核；
+5. readout regime 集合仍是人工定义，还未自动发现；
+6. 没有内部 hook，因此 G_i / R_i 还未填充；
+7. 小模型内部编码粗糙，仍需保留 30% 到 50% 偏差空间。
+```
+
+因此不能说：
+
+```text
+已经完成语言模式图谱。
+```
+
+只能说：
+
+```text
+已经建立第一版跨九大模式族的大规模行为/读出负面结果图谱。
+```
+
+### 10. 图谱进度
+
+Phase241 回写后：
+
+```text
+pattern_family_atlas: 0.62
+behavior: 0.68
+readout_competition: 0.56
+large_scale_negative_taxonomy: 0.35
+prompt_trigger: 0.32
+gate_up_product: 0.30
+residual_state: 0.30
+rollout: 0.05
+closure: 0.10
+model_internal_closure: 0.46
+general_language_mechanism_confidence: 0.50
+```
+
+当前总体判断：
+
+```text
+语言模式图谱约 62%；
+行为层覆盖明显提高；
+内部机制闭合仍约 46%；
+一般语言机制信心约 50%。
+```
+
+### 11. 理论进展
+
+Phase241 最重要的理论进展不是提出新名词，而是校正研究方法：
+
+```text
+负面结果不是实验失败；
+负面结果是语言机制图谱的一部分。
+```
+
+当前更合理的语言机制公式：
+
+$$
+\boxed{
+\mathrm{LanguageMechanism}
+=
+\sum_i
+\alpha_i(x,t)
+P_i(x,t)
+}
+$$
+
+其中：
+
+$$
+\boxed{
+P_i
+=
+\mathrm{TriggerTrace}_i
+\circ
+\mathrm{GateProductTrace}_i
+\circ
+\mathrm{ResidualWriteTrace}_i
+\circ
+\mathrm{ReadoutTrace}_i
+\circ
+\mathrm{CompetitorTrace}_i
+\circ
+\mathrm{RolloutTrace}_i
+\circ
+\mathrm{ClosureTrace}_i
+}
+$$
+
+Phase241 主要补上：
+
+```text
+BehaviorTrace；
+ReadoutTrace；
+CompetitorTrace；
+NegativeTaxonomy；
+ModeTraceVector 的外部部分。
+```
+
+但仍缺：
+
+```text
+GateProductTrace；
+ResidualWriteTrace；
+ClosureTrace 的内部闭合。
+```
+
+### 12. 下一阶段任务
+
+Phase242 应进入：
+
+```text
+High-Value Internal Trace Selection
+高价值内部脉络选择
+```
+
+不是直接全量 hook，而是从 Phase241 结果中筛：
+
+```text
+1. 跨模型稳定失败；
+2. 高 target pressure 但 winner 压制；
+3. protocol_negative 高发模式；
+4. closure_negative 高发模式；
+5. rollout_negative 高发但 semantic_match 高的模式；
+6. scoring 可能错误的 semantic_failure 高发模式；
+7. 理论冲突样本。
+```
+
+优先补两件事：
+
+```text
+1. 校准 case bank：修复目标定义粗糙的模式；
+2. 选出 100 到 300 条 hook 候选，进入 gate/up/product、residual、rollout trace。
+```
+
+阶段目标保持：
+
+```text
+先完成全局图谱；
+再做高价值内部追踪；
+最后做少数模式闭合验证。
+```

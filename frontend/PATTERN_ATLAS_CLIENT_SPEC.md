@@ -8,6 +8,18 @@ Current package:
 tests/result/pattern_family_atlas/v1/
 ```
 
+Current public client path:
+
+```text
+http://127.0.0.1:5173/pattern_atlas.html
+```
+
+Current public data package:
+
+```text
+/vis_data/pattern_family_atlas/v1/
+```
+
 ## Load Order
 
 1. Load `manifest.json`.
@@ -185,3 +197,29 @@ progress.json     -> atlas_graph_v1.metrics
 ## Current Limitation
 
 Phase235 defines the data contract and imports known evidence from earlier phases. It is not a new behavior benchmark. The next benchmark phase should fill `observations.jsonl` with cross-model case-level results.
+
+## Phase238 Additions
+
+Phase238 adds scoring calibration files:
+
+```text
+case_aliases.jsonl
+semantic_equivalence_flags.jsonl
+stable_failure_candidates.jsonl
+```
+
+The standalone client page reads these files directly from:
+
+```text
+/vis_data/pattern_family_atlas/v1/
+```
+
+The page displays:
+
+- global progress
+- family progress
+- mode table
+- calibrated metrics
+- stable failure candidates
+- mechanism edges
+- target aliases and relation ambiguity risk

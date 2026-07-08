@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pattern Atlas</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #101316;
+        color: #e8edf2;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(28, 45, 50, 0.72), rgba(16, 19, 22, 0.92) 34%),
+          #101316;
+      }
+
+      button,
+      select {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(1500px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 22px 0 40px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) auto;
+        gap: 16px;
+        align-items: end;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(232, 237, 242, 0.16);
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: clamp(28px, 4vw, 54px);
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        color: #aab6bd;
+        font-size: 14px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .select,
+      .btn {
+        min-height: 38px;
+        border: 1px solid rgba(232, 237, 242, 0.18);
+        background: rgba(255, 255, 255, 0.06);
+        color: #e8edf2;
+        border-radius: 6px;
+        padding: 0 12px;
+      }
+
+      .btn {
+        cursor: pointer;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 12px;
+        margin: 18px 0;
+      }
+
+      .metric {
+        min-height: 94px;
+        border: 1px solid rgba(232, 237, 242, 0.14);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 14px;
+      }
+
+      .metric-label {
+        color: #9aa7af;
+        font-size: 12px;
+      }
+
+      .metric-value {
+        margin-top: 10px;
+        font-size: 28px;
+        line-height: 1;
+        font-weight: 700;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+
+      .panel {
+        border: 1px solid rgba(232, 237, 242, 0.14);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.045);
+        overflow: hidden;
+      }
+
+      .panel-head {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(232, 237, 242, 0.12);
+      }
+
+      .panel-title {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .panel-body {
+        padding: 12px;
+      }
+
+      .family-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .family-card {
+        width: 100%;
+        min-height: 72px;
+        text-align: left;
+        border: 1px solid rgba(232, 237, 242, 0.12);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+        color: #e8edf2;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .family-card.active {
+        border-color: rgba(95, 183, 255, 0.72);
+        background: rgba(95, 183, 255, 0.12);
+      }
+
+      .family-name {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .bar {
+        height: 7px;
+        margin-top: 10px;
+        border-radius: 999px;
+        background: rgba(232, 237, 242, 0.12);
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #5fb7ff, #7ee787);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+        padding: 10px;
+        border-bottom: 1px solid rgba(232, 237, 242, 0.12);
+        overflow-x: auto;
+      }
+
+      .tab {
+        min-height: 34px;
+        border: 1px solid rgba(232, 237, 242, 0.14);
+        background: rgba(255, 255, 255, 0.04);
+        color: #dce5eb;
+        border-radius: 6px;
+        padding: 0 10px;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        background: rgba(126, 231, 135, 0.14);
+        border-color: rgba(126, 231, 135, 0.62);
+      }
+
+      .table-wrap {
+        max-height: 560px;
+        overflow: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid rgba(232, 237, 242, 0.09);
+        padding: 9px 10px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        background: #151a1e;
+        color: #9fb0ba;
+        z-index: 1;
+      }
+
+      .pill {
+        display: inline-flex;
+        min-height: 24px;
+        align-items: center;
+        border-radius: 999px;
+        border: 1px solid rgba(232, 237, 242, 0.14);
+        padding: 2px 8px;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .graph {
+        display: grid;
+        gap: 8px;
+      }
+
+      .edge {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        min-height: 56px;
+        border: 1px solid rgba(232, 237, 242, 0.12);
+        border-radius: 8px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .muted {
+        color: #9aa7af;
+      }
+
+      .error {
+        margin-top: 16px;
+        border: 1px solid rgba(255, 110, 110, 0.5);
+        border-radius: 8px;
+        padding: 12px;
+        color: #ffd7d7;
+        background: rgba(255, 80, 80, 0.12);
+      }
+
+      @media (max-width: 980px) {
+        .topbar,
+        .layout,
+        .split,
+        .summary-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .actions {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <h1>Pattern Atlas</h1>
+          <div class="subtitle" id="phaseLine">loading</div>
+        </div>
+        <div class="actions">
+          <select class="select" id="modelSelect" aria-label="model"></select>
+          <button class="btn" id="reloadBtn">Refresh</button>
+        </div>
+      </section>
+
+      <section class="summary-grid" id="summaryGrid"></section>
+
+      <section class="layout">
+        <aside class="panel">
+          <div class="panel-head">
+            <div class="panel-title">模式族</div>
+            <span class="pill" id="familyCount">0</span>
+          </div>
+          <div class="panel-body">
+            <div class="family-list" id="familyList"></div>
+          </div>
+        </aside>
+
+        <section class="panel">
+          <div class="tabs">
+            <button class="tab active" data-tab="modes">模式</button>
+            <button class="tab" data-tab="metrics">统计</button>
+            <button class="tab" data-tab="failures">失败候选</button>
+            <button class="tab" data-tab="graph">机制边</button>
+            <button class="tab" data-tab="aliases">别名</button>
+          </div>
+          <div class="panel-body" id="content"></div>
+        </section>
+      </section>
+
+      <div id="errorBox"></div>
+    </main>
+
+    <script type="module">
+      const BASE = '/vis_data/pattern_family_atlas/v1';
+      const state = {
+        tab: 'modes',
+        selectedFamily: '',
+        selectedModel: 'cross_model',
+        data: {},
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      async function loadJson(file) {
+        const res = await fetch(`${BASE}/${file}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`${file}: ${res.status}`);
+        return res.json();
+      }
+
+      async function loadText(file) {
+        const res = await fetch(`${BASE}/${file}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`${file}: ${res.status}`);
+        return res.text();
+      }
+
+      async function loadJsonl(file) {
+        const text = await loadText(file);
+        return text
+          .split(/\r?\n/)
+          .filter(Boolean)
+          .map((line) => JSON.parse(line));
+      }
+
+      function fmt(value) {
+        if (typeof value === 'number') return value.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+        return value ?? '';
+      }
+
+      function pct(value) {
+        const n = Number(value || 0);
+        return `${Math.round(n * 100)}%`;
+      }
+
+      function renderSummary() {
+        const { manifest, progress, metrics, observations, edges, failures } = state.data;
+        const calibrated = metrics.find((row) => row.metric_id === 'phase238:cross_model:family:content_knowledge:*:calibrated_behavior');
+        const items = [
+          ['phase', progress?.phase_id || manifest?.phase || ''],
+          ['atlas progress', pct(progress?.global_progress?.pattern_family_atlas)],
+          ['observations', observations.length],
+          ['metrics', metrics.length],
+          ['graph edges', edges.length],
+          ['stable failures', failures.length],
+          ['behavior level', pct(progress?.levels?.behavior)],
+          ['content calibrated', calibrated ? fmt(calibrated.metric_value) : ''],
+        ];
+        $('summaryGrid').innerHTML = items.map(([label, value]) => `
+          <div class="metric">
+            <div class="metric-label">${label}</div>
+            <div class="metric-value">${value}</div>
+          </div>
+        `).join('');
+        $('phaseLine').textContent = `${progress?.phase_id || manifest?.phase || ''} · next ${progress?.next_phase || ''}`;
+      }
+
+      function renderModelSelect() {
+        const models = ['cross_model', ...new Set(state.data.metrics.map((row) => row.model).filter(Boolean).filter((x) => x !== 'cross_model'))];
+        $('modelSelect').innerHTML = models.map((model) => `<option value="${model}">${model}</option>`).join('');
+        $('modelSelect').value = state.selectedModel;
+      }
+
+      function renderFamilies() {
+        const { families, progress } = state.data;
+        if (!state.selectedFamily && families.length) state.selectedFamily = families[0].family_id;
+        $('familyCount').textContent = String(families.length);
+        $('familyList').innerHTML = families.map((family) => {
+          const p = progress?.families?.[family.family_id] ?? family.progress ?? 0;
+          const active = family.family_id === state.selectedFamily ? 'active' : '';
+          return `
+            <button class="family-card ${active}" data-family="${family.family_id}">
+              <div class="family-name">
+                <span>${family.family_name || family.family_id}</span>
+                <span>${pct(p)}</span>
+              </div>
+              <div class="muted">${family.family_id}</div>
+              <div class="bar"><div class="bar-fill" style="width:${pct(p)}"></div></div>
+            </button>
+          `;
+        }).join('');
+        document.querySelectorAll('[data-family]').forEach((el) => {
+          el.addEventListener('click', () => {
+            state.selectedFamily = el.dataset.family;
+            render();
+          });
+        });
+      }
+
+      function rowsForModel(rows) {
+        if (state.selectedModel === 'cross_model') return rows;
+        return rows.filter((row) => row.model === state.selectedModel);
+      }
+
+      function renderModes() {
+        const rows = state.data.modes.filter((row) => row.family_id === state.selectedFamily);
+        return table(['mode', 'status', 'progress', 'evidence', 'expected path'], rows.map((row) => [
+          row.mode_id,
+          row.status,
+          pct(row.progress),
+          fmt(row.evidence_score),
+          row.expected_internal_path,
+        ]));
+      }
+
+      function renderMetrics() {
+        const rows = rowsForModel(state.data.metrics)
+          .filter((row) => row.family_id === state.selectedFamily)
+          .slice(-120)
+          .reverse();
+        return table(['model', 'scope', 'mode', 'metric', 'value', 'cases', 'drift'], rows.map((row) => [
+          row.model,
+          row.scope,
+          row.mode_id || '',
+          row.metric_name,
+          fmt(row.metric_value),
+          row.case_count || '',
+          JSON.stringify(row.calibrated_drift_types || row.drift_types || {}),
+        ]));
+      }
+
+      function renderFailures() {
+        const rows = state.data.failures.filter((row) => row.family_id === state.selectedFamily);
+        return table(['case', 'mode', 'type', 'models', 'mean score', 'next'], rows.map((row) => [
+          row.case_id,
+          row.mode_id,
+          row.failure_type,
+          (row.models || []).join(', '),
+          fmt(row.mean_calibrated_behavior_score),
+          row.next_phase_recommendation,
+        ]));
+      }
+
+      function renderGraph() {
+        const rows = rowsForModel(state.data.edges).filter((row) => row.family_id === state.selectedFamily).slice(-80).reverse();
+        if (!rows.length) return '<div class="muted">no edges</div>';
+        return `<div class="graph">${rows.map((row) => `
+          <div class="edge">
+            <div>
+              <div>${row.source} -> ${row.target}</div>
+              <div class="muted">${row.edge_type || row.evidence_type || ''}</div>
+            </div>
+            <span class="pill">${fmt(row.confidence ?? row.effect_size ?? '')}</span>
+          </div>
+        `).join('')}</div>`;
+      }
+
+      function renderAliases() {
+        const rows = state.data.aliases.filter((row) => row.family_id === state.selectedFamily);
+        return table(['case', 'mode', 'target', 'aliases', 'relation', 'risk'], rows.map((row) => [
+          row.case_id,
+          row.mode_id,
+          row.target,
+          (row.target_aliases || []).join(', '),
+          row.relation_schema,
+          row.ambiguity_risk,
+        ]));
+      }
+
+      function table(headers, rows) {
+        return `
+          <div class="table-wrap">
+            <table>
+              <thead><tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr></thead>
+              <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell ?? ''}</td>`).join('')}</tr>`).join('')}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      function renderContent() {
+        const renderers = {
+          modes: renderModes,
+          metrics: renderMetrics,
+          failures: renderFailures,
+          graph: renderGraph,
+          aliases: renderAliases,
+        };
+        $('content').innerHTML = (renderers[state.tab] || renderModes)();
+      }
+
+      function renderTabs() {
+        document.querySelectorAll('.tab').forEach((tab) => {
+          tab.classList.toggle('active', tab.dataset.tab === state.tab);
+          tab.onclick = () => {
+            state.tab = tab.dataset.tab;
+            render();
+          };
+        });
+      }
+
+      function render() {
+        renderSummary();
+        renderModelSelect();
+        renderFamilies();
+        renderTabs();
+        renderContent();
+      }
+
+      async function loadAll() {
+        $('errorBox').innerHTML = '';
+        const [
+          manifest,
+          progress,
+          families,
+          modes,
+          observations,
+          metrics,
+          nodes,
+          edges,
+          aliases,
+          flags,
+          failures,
+        ] = await Promise.all([
+          loadJson('manifest.json'),
+          loadJson('progress.json'),
+          loadJsonl('families.jsonl'),
+          loadJsonl('modes.jsonl'),
+          loadJsonl('observations.jsonl'),
+          loadJsonl('metrics.jsonl'),
+          loadJsonl('graph_nodes.jsonl'),
+          loadJsonl('graph_edges.jsonl'),
+          loadJsonl('case_aliases.jsonl'),
+          loadJsonl('semantic_equivalence_flags.jsonl'),
+          loadJsonl('stable_failure_candidates.jsonl'),
+        ]);
+        state.data = { manifest, progress, families, modes, observations, metrics, nodes, edges, aliases, flags, failures };
+        render();
+      }
+
+      $('reloadBtn').addEventListener('click', loadAll);
+      $('modelSelect').addEventListener('change', (event) => {
+        state.selectedModel = event.target.value;
+        render();
+      });
+
+      loadAll().catch((error) => {
+        $('errorBox').innerHTML = `<div class="error">${error.message}</div>`;
+      });
+    </script>
+  </body>
+</html>
