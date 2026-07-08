@@ -1,6 +1,6 @@
 import { Text } from '@react-three/drei';
 
-export function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNodes, atlasEdges, researchCycle, activeResearchPlugin }) {
+export function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNodes, atlasEdges, activeResearchPlugin }) {
   const phaseLabel = activeFileMeta?.phase ? `Phase ${activeFileMeta.phase}` : 'Current phase';
   const graphLabel = `${atlasNodes.length || 0} nodes / ${atlasEdges.length || 0} edges`;
   const routeLabel = activeResearchPlugin?.shortName || activeResearchPlugin?.name || '研究路线';
@@ -15,37 +15,6 @@ export function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNod
           插件化研究路线 · 共享3D主空间
         </Text>
       </group>
-
-      {layerVisibility.aiOrbit && (
-        <group position={[17, 8, 8]}>
-          <mesh>
-            <torusGeometry args={[3.1, 0.035, 12, 96]} />
-            <meshStandardMaterial color="#a78bfa" emissive="#7c3aed" emissiveIntensity={0.6} transparent opacity={0.75} />
-          </mesh>
-          {['讨论', '综合', '脚本', '运行', '图谱'].map((label, index) => {
-            const angle = (index / 5) * Math.PI * 2;
-            const x = Math.cos(angle) * 3.1;
-            const y = Math.sin(angle) * 1.45;
-            return (
-              <group key={label} position={[x, y, 0]}>
-                <mesh>
-                  <sphereGeometry args={[0.34, 16, 16]} />
-                  <meshStandardMaterial color={researchCycle.running ? '#c084fc' : '#7c3aed'} emissive="#a855f7" emissiveIntensity={0.5} />
-                </mesh>
-                <Text position={[0, 0.58, 0]} fontSize={0.22} color="#ede9fe" anchorX="center">
-                  {label}
-                </Text>
-              </group>
-            );
-          })}
-          <Text position={[0, 2.4, 0]} fontSize={0.48} color="#ede9fe" anchorX="center">
-            AI研究循环
-          </Text>
-          <Text position={[0, 1.85, 0]} fontSize={0.28} color="#c4b5fd" anchorX="center">
-            {researchCycle.running ? `第 ${researchCycle.round || 1} / ${researchCycle.total} 轮` : `${researchCycle.modeLabel} · 待启动`}
-          </Text>
-        </group>
-      )}
 
       {layerVisibility.boundary && (
         <group position={[0, 3.5, -17]}>
