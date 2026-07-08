@@ -86,3 +86,23 @@ test_cases: 36
 - negative_rate: 0.8146
 - negative_categories: {'rollout_negative': 1863, 'semantic_failure': 1371, 'closure_negative': 398, 'readout_negative': 363, 'protocol_negative': 228}
 - top_negative_modes: [{'created_at': '2026-07-08T01:11:36.814973+00:00', 'family_id': 'content_knowledge', 'mean_target_margin_vs_winner': -10.1013, 'metric_id': 'phase241:deepseek7b:content_knowledge:location_fact:large_scale_behavior', 'metric_name': 'large_scale_behavior_signature', 'metric_value': 0.1125, 'mode_id': 'location_fact', 'model': 'deepseek7b', 'negative_categories': {'rollout_negative': 4, 'semantic_failure': 20}, 'negative_rate': 1.0, 'over_generation_rate': 0.1667, 'phase_id': 'Phase241', 'protocol_match_rate': 0.0, 'rows': 24, 'schema_version': '1.0.0', 'scope': 'mode', 'semantic_match_rate': 0.1667, 'winner_regimes': {'comma_repeat': 12, 'period_stop': 8, 'the_continuation': 4}}, {'created_at': '2026-07-08T01:06:42.429963+00:00', 'family_id': 'content_knowledge', 'mean_target_margin_vs_winner': -9.5254, 'metric_id': 'phase241:qwen3:content_knowledge:causal_fact:large_scale_behavior', 'metric_name': 'large_scale_behavior_signature', 'metric_value': 0.1167, 'mode_id': 'causal_fact', 'model': 'qwen3', 'negative_categories': {'rollout_negative': 4, 'semantic_failure': 20}, 'negative_rate': 1.0, 'over_generation_rate': 0.1667, 'phase_id': 'Phase241', 'protocol_match_rate': 0.0, 'rows': 24, 'schema_version': '1.0.0', 'scope': 'mode', 'semantic_match_rate': 0.1667, 'winner_regimes': {'answer_boundary': 2, 'be_continuation': 1, 'comma_repeat': 7, 'newline_boundary': 4, 'period_stop': 8, 'the_continuation': 2}}, {'created_at': '2026-07-08T01:09:28.268621+00:00', 'family_id': 'content_knowledge', 'mean_target_margin_vs_winner': -8.7844, 'metric_id': 'phase241:glm4:content_knowledge:location_fact:large_scale_behavior', 'metric_name': 'large_scale_behavior_signature', 'metric_value': 0.1167, 'mode_id': 'location_fact', 'model': 'glm4', 'negative_categories': {'rollout_negative': 4, 'semantic_failure': 20}, 'negative_rate': 1.0, 'over_generation_rate': 0.1667, 'phase_id': 'Phase241', 'protocol_match_rate': 0.0, 'rows': 24, 'schema_version': '1.0.0', 'scope': 'mode', 'semantic_match_rate': 0.1667, 'winner_regimes': {'answer_boundary': 4, 'be_continuation': 4, 'newline_boundary': 1, 'period_stop': 4, 'the_continuation': 11}}, {'created_at': '2026-07-08T01:06:42.429963+00:00', 'family_id': 'content_knowledge', 'mean_target_margin_vs_winner': -14.4437, 'metric_id': 'phase241:qwen3:content_knowledge:location_fact:large_scale_behavior', 'metric_name': 'large_scale_behavior_signature', 'metric_value': 0.125, 'mode_id': 'location_fact', 'model': 'qwen3', 'negative_categories': {'rollout_negative': 4, 'semantic_failure': 20}, 'negative_rate': 1.0, 'over_generation_rate': 0.1667, 'phase_id': 'Phase241', 'protocol_match_rate': 0.0, 'rows': 24, 'schema_version': '1.0.0', 'scope': 'mode', 'semantic_match_rate': 0.1667, 'winner_regimes': {'answer_boundary': 2, 'be_continuation': 8, 'comma_repeat': 4, 'period_stop': 8, 'the_continuation': 2}}, {'created_at': '2026-07-08T01:11:36.814973+00:00', 'family_id': 'content_knowledge', 'mean_target_margin_vs_winner': -8.6527, 'metric_id': 'phase241:deepseek7b:content_knowledge:causal_fact:large_scale_behavior', 'metric_name': 'large_scale_behavior_signature', 'metric_value': 0.125, 'mode_id': 'causal_fact', 'model': 'deepseek7b', 'negative_categories': {'rollout_negative': 4, 'semantic_failure': 20}, 'negative_rate': 1.0, 'over_generation_rate': 0.1667, 'phase_id': 'Phase241', 'protocol_match_rate': 0.0, 'rows': 24, 'schema_version': '1.0.0', 'scope': 'mode', 'semantic_match_rate': 0.1667, 'winner_regimes': {'answer_boundary': 3, 'be_continuation': 1, 'comma_repeat': 9, 'period_stop': 7, 'the_continuation': 4}}]
+
+## Phase242 Negative Multilabel And Trace Selection Update
+
+- source_behavior_rows: 5184
+- multilabel_rows: 5184
+- high_value_candidates: 300
+- hook_ready_candidates: 300
+- case_bank_review_rows: 288
+- manual_review_cases: 95
+- multilabel_counts: {'semantic': 1371, 'protocol': 2852, 'readout': 4644, 'rollout': 3476, 'closure': 3345, 'scoring': 930}
+
+## Phase243 Candidate Clustering And Case Bank V2 Update
+
+- dedup_candidates: 300
+- cluster_count: 157
+- trace_selection_rows: 100
+- case_bank_v2_rows: 288
+- manual_review_cases: 95
+- trace_selection_by_test: {'readout_competitor_trace': 40, 'protocol_gate_product_residual_trace': 25, 'stepwise_rollout_trace': 20, 'rollout_closure_trace': 10, 'cross_model_structure_comparison': 5}
+- data_split_counts: {'explore': 168, 'validate': 70, 'frozen': 62}

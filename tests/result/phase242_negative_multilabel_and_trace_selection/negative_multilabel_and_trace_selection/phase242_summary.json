@@ -1,0 +1,1333 @@
+{
+  "phase": 242,
+  "source_phase": 241,
+  "title": "Negative multilabel and high-value internal trace selection",
+  "status": "complete",
+  "timestamp": "2026-07-07 17:10:49",
+  "schema_version": "1.0.0",
+  "phase241_round": "large_scale_pattern_atlas_benchmark",
+  "source_behavior_rows": 5184,
+  "source_negative_rows": 4223,
+  "multilabel_rows": 5184,
+  "case_bank_review_rows": 288,
+  "manual_review_cases": 95,
+  "high_value_candidates": 300,
+  "hook_ready_candidates": 300,
+  "observation_rows": 588,
+  "metric_rows": 72,
+  "graph_edges": 37,
+  "multilabel_counts": {
+    "semantic": 1371,
+    "protocol": 2852,
+    "readout": 4644,
+    "rollout": 3476,
+    "closure": 3345,
+    "scoring": 930
+  },
+  "candidate_reason_counts": {
+    "semantic_correct_rollout_failure": 286,
+    "cross_model_divergence": 14,
+    "semantic_correct_closure_failure": 209,
+    "cross_model_stable_failure": 286,
+    "semantic_correct_protocol_failure": 194,
+    "stable_readout_competitor": 216,
+    "high_target_pressure_protocol_failure": 38
+  },
+  "recommended_next_tests": {
+    "stepwise_rollout_trace": 29,
+    "rollout_closure_trace": 13,
+    "readout_competitor_trace": 216,
+    "protocol_gate_product_residual_trace": 36,
+    "cross_model_structure_comparison": 6
+  },
+  "top_hook_candidates": [
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_scope_binding_0001:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_scope_binding_0001",
+      "family_id": "reasoning_constraint",
+      "mode_id": "scope_binding",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "qwen3"
+      ],
+      "success_models": [
+        "glm4"
+      ],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 0.6667,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 1.0,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "semantic_correct_rollout_failure",
+        "cross_model_divergence"
+      ],
+      "candidate_score": 0.8667,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_cross_lingual_ZH_to_EN_0002:explain_instruction",
+      "case_id": "phase241_cross_lingual_ZH_to_EN_0002",
+      "family_id": "cross_lingual",
+      "mode_id": "ZH_to_EN",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "qwen3"
+      ],
+      "success_models": [
+        "glm4"
+      ],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 0.3333,
+      "closure_fail_rate": 0.6667,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 0.2083,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "semantic_correct_closure_failure",
+        "cross_model_divergence"
+      ],
+      "candidate_score": 0.8667,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "rollout_closure_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_content_knowledge_object_relation_value_0000:explain_instruction",
+      "case_id": "phase241_content_knowledge_object_relation_value_0000",
+      "family_id": "content_knowledge",
+      "mode_id": "object_relation_value",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.3333,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 1.8125,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_comparison_0001:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_comparison_0001",
+      "family_id": "reasoning_constraint",
+      "mode_id": "comparison",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.3333,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.2917,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_comparison_0002:no_answer_anchor",
+      "case_id": "phase241_reasoning_constraint_comparison_0002",
+      "family_id": "reasoning_constraint",
+      "mode_id": "comparison",
+      "variant_id": "no_answer_anchor",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.6667,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.8333,
+      "stable_winner_regime": "comma_repeat",
+      "winner_regimes": {
+        "comma_repeat": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "stable_readout_competitor",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "readout_competitor_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_scope_binding_0000:full",
+      "case_id": "phase241_reasoning_constraint_scope_binding_0000",
+      "family_id": "reasoning_constraint",
+      "mode_id": "scope_binding",
+      "variant_id": "full",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 4.4896,
+      "stable_winner_regime": "newline_boundary",
+      "winner_regimes": {
+        "newline_boundary": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_scope_binding_0001:full",
+      "case_id": "phase241_reasoning_constraint_scope_binding_0001",
+      "family_id": "reasoning_constraint",
+      "mode_id": "scope_binding",
+      "variant_id": "full",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 2.9167,
+      "stable_winner_regime": "newline_boundary",
+      "winner_regimes": {
+        "newline_boundary": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_scope_binding_0002:full",
+      "case_id": "phase241_reasoning_constraint_scope_binding_0002",
+      "family_id": "reasoning_constraint",
+      "mode_id": "scope_binding",
+      "variant_id": "full",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 4.0521,
+      "stable_winner_regime": "newline_boundary",
+      "winner_regimes": {
+        "newline_boundary": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_scope_binding_0002:short_answer_instruction",
+      "case_id": "phase241_reasoning_constraint_scope_binding_0002",
+      "family_id": "reasoning_constraint",
+      "mode_id": "scope_binding",
+      "variant_id": "short_answer_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.7917,
+      "stable_winner_regime": "comma_repeat",
+      "winner_regimes": {
+        "comma_repeat": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_scope_binding_0003:full",
+      "case_id": "phase241_reasoning_constraint_scope_binding_0003",
+      "family_id": "reasoning_constraint",
+      "mode_id": "scope_binding",
+      "variant_id": "full",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.1771,
+      "stable_winner_regime": "newline_boundary",
+      "winner_regimes": {
+        "newline_boundary": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_syntax_structure_answer_anchor_0000:short_answer_instruction",
+      "case_id": "phase241_syntax_structure_answer_anchor_0000",
+      "family_id": "syntax_structure",
+      "mode_id": "answer_anchor",
+      "variant_id": "short_answer_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 1.6667,
+      "stable_winner_regime": "comma_repeat",
+      "winner_regimes": {
+        "comma_repeat": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_syntax_structure_answer_anchor_0003:short_answer_instruction",
+      "case_id": "phase241_syntax_structure_answer_anchor_0003",
+      "family_id": "syntax_structure",
+      "mode_id": "answer_anchor",
+      "variant_id": "short_answer_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.8125,
+      "stable_winner_regime": "comma_repeat",
+      "winner_regimes": {
+        "comma_repeat": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_readout_competition_target_answer_0000:explain_instruction",
+      "case_id": "phase241_readout_competition_target_answer_0000",
+      "family_id": "readout_competition",
+      "mode_id": "target_answer",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.0,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 0.6667,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 0.4167,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "rollout_closure_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_readout_competition_the_continuation_0003:short_answer_instruction",
+      "case_id": "phase241_readout_competition_the_continuation_0003",
+      "family_id": "readout_competition",
+      "mode_id": "the_continuation",
+      "variant_id": "short_answer_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.6667,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 0.6667,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 3.2708,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_state_drift_over_generation_0003:explain_instruction",
+      "case_id": "phase241_state_drift_over_generation_0003",
+      "family_id": "state_drift",
+      "mode_id": "over_generation",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.3333,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_state_drift_continuation_takeover_0002:explain_instruction",
+      "case_id": "phase241_state_drift_continuation_takeover_0002",
+      "family_id": "state_drift",
+      "mode_id": "continuation_takeover",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.1667,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_closure_eos_pressure_0000:explain_instruction",
+      "case_id": "phase241_closure_eos_pressure_0000",
+      "family_id": "closure",
+      "mode_id": "eos_pressure",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 5.6146,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.85,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_if_then_0000:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_if_then_0000",
+      "family_id": "reasoning_constraint",
+      "mode_id": "if_then",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "qwen3"
+      ],
+      "success_models": [
+        "glm4"
+      ],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 0.6667,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 2.8438,
+      "stable_winner_regime": "answer_boundary",
+      "winner_regimes": {
+        "answer_boundary": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "semantic_correct_rollout_failure",
+        "cross_model_divergence"
+      ],
+      "candidate_score": 0.8167,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_content_knowledge_object_attribute_0003:explain_instruction",
+      "case_id": "phase241_content_knowledge_object_attribute_0003",
+      "family_id": "content_knowledge",
+      "mode_id": "object_attribute",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 0.6667,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.2917,
+      "stable_winner_regime": "answer_boundary",
+      "winner_regimes": {
+        "answer_boundary": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "rollout_closure_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_content_knowledge_category_membership_0001:explain_instruction",
+      "case_id": "phase241_content_knowledge_category_membership_0001",
+      "family_id": "content_knowledge",
+      "mode_id": "category_membership",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.6667,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.6667,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": -0.4792,
+      "stable_winner_regime": "answer_boundary",
+      "winner_regimes": {
+        "answer_boundary": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_content_knowledge_category_membership_0003:explain_instruction",
+      "case_id": "phase241_content_knowledge_category_membership_0003",
+      "family_id": "content_knowledge",
+      "mode_id": "category_membership",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 3.0625,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 2,
+        "answer_boundary": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_output_protocol_one_word_0000:explain_instruction",
+      "case_id": "phase241_output_protocol_one_word_0000",
+      "family_id": "output_protocol",
+      "mode_id": "one_word",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.3333,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 0.1875,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 2,
+        "answer_boundary": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_output_protocol_list_answer_0003:explain_instruction",
+      "case_id": "phase241_output_protocol_list_answer_0003",
+      "family_id": "output_protocol",
+      "mode_id": "list_answer",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.0,
+      "readout_fail_rate": 0.6667,
+      "rollout_fail_rate": 0.6667,
+      "closure_fail_rate": 0.6667,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 0.6458,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 3
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure",
+        "stable_readout_competitor"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "readout_competitor_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_output_protocol_table_answer_0002:full",
+      "case_id": "phase241_output_protocol_table_answer_0002",
+      "family_id": "output_protocol",
+      "mode_id": "table_answer",
+      "variant_id": "full",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 1.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 0.4583,
+      "stable_winner_regime": "comma_repeat",
+      "winner_regimes": {
+        "comma_repeat": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_closure_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "rollout_closure_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_output_protocol_stop_after_answer_0003:explain_instruction",
+      "case_id": "phase241_output_protocol_stop_after_answer_0003",
+      "family_id": "output_protocol",
+      "mode_id": "stop_after_answer",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 1.0,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.3333,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 3.7708,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 2,
+        "newline_boundary": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure",
+        "semantic_correct_protocol_failure",
+        "high_target_pressure_protocol_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "protocol_gate_product_residual_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_if_then_0001:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_if_then_0001",
+      "family_id": "reasoning_constraint",
+      "mode_id": "if_then",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 3.1146,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 2,
+        "answer_boundary": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_if_then_0002:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_if_then_0002",
+      "family_id": "reasoning_constraint",
+      "mode_id": "if_then",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.3333,
+      "readout_fail_rate": 0.3333,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 3.9271,
+      "stable_winner_regime": "the_continuation",
+      "winner_regimes": {
+        "the_continuation": 2,
+        "answer_boundary": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_negation_0000:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_negation_0000",
+      "family_id": "reasoning_constraint",
+      "mode_id": "negation",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.3333,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 4.9688,
+      "stable_winner_regime": "answer_boundary",
+      "winner_regimes": {
+        "answer_boundary": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_negation_0002:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_negation_0002",
+      "family_id": "reasoning_constraint",
+      "mode_id": "negation",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 4.3646,
+      "stable_winner_regime": "answer_boundary",
+      "winner_regimes": {
+        "answer_boundary": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    },
+    {
+      "schema_version": "1.0.0",
+      "phase_id": "Phase242",
+      "created_at": "2026-07-08T02:10:49.849889+00:00",
+      "candidate_id": "phase242:phase241_reasoning_constraint_negation_0003:explain_instruction",
+      "case_id": "phase241_reasoning_constraint_negation_0003",
+      "family_id": "reasoning_constraint",
+      "mode_id": "negation",
+      "variant_id": "explain_instruction",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "failed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "success_models": [],
+      "semantic_rate": 1.0,
+      "protocol_fail_rate": 0.0,
+      "readout_fail_rate": 0.0,
+      "rollout_fail_rate": 1.0,
+      "closure_fail_rate": 0.0,
+      "scoring_risk_rate": 0.0,
+      "mean_target_margin_vs_winner": 4.9583,
+      "stable_winner_regime": "answer_boundary",
+      "winner_regimes": {
+        "answer_boundary": 2,
+        "the_continuation": 1
+      },
+      "selection_reasons": [
+        "cross_model_stable_failure",
+        "semantic_correct_rollout_failure"
+      ],
+      "candidate_score": 0.8,
+      "should_enter_hook": true,
+      "should_enter_case_bank_review": false,
+      "recommended_next_test": "stepwise_rollout_trace"
+    }
+  ],
+  "top_case_bank_review_modes": {
+    "content_knowledge::function_answer": 4,
+    "content_knowledge::part_whole": 4,
+    "content_knowledge::material_answer": 4,
+    "content_knowledge::location_fact": 4,
+    "content_knowledge::causal_fact": 4,
+    "language_action::summarize": 4,
+    "language_action::translate": 4,
+    "language_action::classify": 4,
+    "language_action::rewrite": 4,
+    "language_action::compare": 4,
+    "cross_lingual::ZH_to_ZH": 4,
+    "cross_lingual::EN_to_FR": 4,
+    "cross_lingual::FR_to_EN": 4,
+    "cross_lingual::cross_lingual_reasoning": 4,
+    "cross_lingual::ZH_to_EN": 3,
+    "content_knowledge::object_relation_value": 2,
+    "content_knowledge::category_membership": 2,
+    "output_protocol::one_word": 2,
+    "cross_lingual::EN_to_ZH": 2,
+    "state_drift::format_drift": 2
+  },
+  "progress_estimate": {
+    "pattern_family_atlas": 0.66,
+    "large_scale_negative_taxonomy": 0.5,
+    "case_bank_calibration": 0.28,
+    "high_value_trace_selection": 0.34,
+    "model_internal_closure": 0.46,
+    "general_language_mechanism_confidence": 0.51
+  }
+}

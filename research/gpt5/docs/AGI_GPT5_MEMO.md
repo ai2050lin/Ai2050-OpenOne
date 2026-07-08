@@ -55168,3 +55168,1472 @@ High-Value Internal Trace Selection
 再做高价值内部追踪；
 最后做少数模式闭合验证。
 ```
+
+## Phase 242: 负面结果多标签化与高价值内部脉络选择 [2026-07-07 17:11]
+
+### 1. 阶段目标
+
+本阶段承接 Phase241。
+
+Phase241 已经完成：
+
+```text
+9 个模式族；
+72 个模式；
+288 个基础样例；
+5184 条跨模型行为 / 读出记录；
+4223 条单标签负面结果。
+```
+
+但 Phase241 的主要硬伤是：
+
+```text
+1. 负面结果还是单标签；
+2. semantic_failure 中混有 case bank / scoring 风险；
+3. 还没有从负面结果中筛出高价值内部追踪候选；
+4. 不能直接把所有负面结果送进 hook。
+```
+
+因此 Phase242 的目标是：
+
+```text
+把 Phase241 的第一版大图谱升级成可筛选、可校准、可进入内部追踪的数据基础。
+```
+
+本阶段不重新跑模型，不做 hook，不做 probe，不做 ablation。
+
+### 2. 新增脚本
+
+新增：
+
+```text
+tests/gpt5/phase242_negative_multilabel_and_trace_selection.py
+```
+
+输入：
+
+```text
+tests/result/phase241_large_scale_pattern_atlas_benchmark/large_scale_pattern_atlas_benchmark/
+```
+
+输出目录：
+
+```text
+tests/result/phase242_negative_multilabel_and_trace_selection/negative_multilabel_and_trace_selection/
+```
+
+核心输出：
+
+```text
+phase242_summary.json
+phase242_multilabel_negative_rows.jsonl
+phase242_high_value_hook_candidates.jsonl
+phase242_case_bank_calibration_rows.jsonl
+phase242_trace_selection_matrix.json
+phase242_internal_trace_plan.md
+phase242_observations.jsonl
+phase242_metrics.jsonl
+phase242_graph_edges.jsonl
+```
+
+并回写：
+
+```text
+tests/result/pattern_family_atlas/v1/observations.jsonl
+tests/result/pattern_family_atlas/v1/metrics.jsonl
+tests/result/pattern_family_atlas/v1/graph_edges.jsonl
+tests/result/pattern_family_atlas/v1/progress.json
+tests/result/pattern_family_atlas/v1/summary.md
+```
+
+前端同步和构建通过：
+
+```text
+cd frontend
+npm run sync:pattern-atlas
+npm run build
+```
+
+### 3. 算法原理
+
+Phase241 的单标签负面结果：
+
+```text
+semantic_failure
+protocol_negative
+readout_negative
+rollout_negative
+closure_negative
+```
+
+升级为多标签向量：
+
+$$
+\boxed{
+\mathbf{N}_i
+=
+[
+N_{\mathrm{semantic}},
+N_{\mathrm{protocol}},
+N_{\mathrm{readout}},
+N_{\mathrm{rollout}},
+N_{\mathrm{closure}},
+N_{\mathrm{scoring}}
+]
+}
+$$
+
+其中：
+
+```text
+N_semantic: semantic_match = false；
+N_protocol: semantic_match = true 且 protocol_match = false；
+N_readout: target_margin_vs_winner < -1 或 target_rank 较差；
+N_rollout: over_generation 或输出过长；
+N_closure: semantic_match = true 且 closure_signal = false；
+N_scoring: 目标定义、跨语言、动作类型、target_rank 与字符串匹配冲突等评分风险。
+```
+
+候选筛选公式：
+
+$$
+\boxed{
+\mathrm{CandidateScore}
+=
+0.25 S_{\mathrm{crossmodel}}
++
+0.20 S_{\mathrm{semantic}}
++
+0.15 S_{\mathrm{failure}}
++
+0.15 S_{\mathrm{winner}}
++
+0.15 S_{\mathrm{divergence}}
++
+0.10 S_{\mathrm{margin}}
+-
+0.20 S_{\mathrm{scoring}}
+}
+$$
+
+其中：
+
+```text
+S_crossmodel: 三模型稳定失败程度；
+S_semantic: 语义正确程度；
+S_failure: protocol/readout/rollout/closure 负面强度；
+S_winner: winner_regime 跨模型稳定程度；
+S_divergence: 跨模型成功/失败差异；
+S_margin: target margin 接近或大于 0 但仍失败；
+S_scoring: 样例/评分风险惩罚。
+```
+
+筛选原则：
+
+```text
+优先选择语义正确但协议、读出、展开或闭合失败的样本；
+不优先选择 target_seeded；
+不优先选择明显 scoring risk 且没有机制价值的 semantic_failure。
+```
+
+### 4. 客观结果
+
+输入：
+
+```text
+source_behavior_rows: 5184
+source_negative_rows: 4223
+```
+
+输出：
+
+```text
+multilabel_rows: 5184
+high_value_candidates: 300
+hook_ready_candidates: 300
+case_bank_review_rows: 288
+manual_review_cases: 95
+```
+
+多标签计数：
+
+```text
+semantic: 1371
+protocol: 2852
+readout: 4644
+rollout: 3476
+closure: 3345
+scoring: 930
+```
+
+这说明 Phase241 的单标签低估了失败的重叠程度。
+
+尤其重要的是：
+
+```text
+readout、rollout、closure 大量重叠；
+很多样本不是单一失败，而是“语义触达 + 协议失败 + 读出竞争 + 展开/闭合失败”的复合状态。
+```
+
+候选原因统计：
+
+```text
+semantic_correct_rollout_failure: 286
+cross_model_stable_failure: 286
+stable_readout_competitor: 216
+semantic_correct_closure_failure: 209
+semantic_correct_protocol_failure: 194
+high_target_pressure_protocol_failure: 38
+cross_model_divergence: 14
+```
+
+推荐下一步测试：
+
+```text
+readout_competitor_trace: 216
+protocol_gate_product_residual_trace: 36
+stepwise_rollout_trace: 29
+rollout_closure_trace: 13
+cross_model_structure_comparison: 6
+```
+
+样例库复核热点：
+
+```text
+content_knowledge::function_answer
+content_knowledge::part_whole
+content_knowledge::material_answer
+content_knowledge::location_fact
+content_knowledge::causal_fact
+language_action::summarize
+language_action::translate
+language_action::classify
+language_action::rewrite
+language_action::compare
+cross_lingual::ZH_to_ZH
+cross_lingual::EN_to_FR
+cross_lingual::FR_to_EN
+cross_lingual::cross_lingual_reasoning
+```
+
+### 5. 关键进展
+
+Phase242 的进展不是模型新结果，而是数据结构进展。
+
+核心进展：
+
+```text
+1. 负面结果从单标签升级为多标签；
+2. 证明大量失败是复合失败，而不是单点失败；
+3. 将 scoring / case bank 风险从机制失败中分离出来；
+4. 从 5184 条记录中筛出 300 条高价值内部追踪候选；
+5. 明确下一步内部测试优先级：readout competitor trace 最多，其次 protocol gate/product/residual trace；
+6. 产出 case bank 校准清单，避免把目标定义粗糙带进 hook。
+```
+
+### 6. 问题和硬伤
+
+本阶段仍有明显硬伤：
+
+```text
+1. 没有重新跑模型，完全依赖 Phase241 数据；
+2. 多标签规则仍是启发式，不是人工复核；
+3. 300 条 hook-ready candidates 中仍可能混有评分误差；
+4. readout 标签很宽，因为 target_margin_vs_winner < -1 会覆盖大量样本；
+5. case bank 校准只是标记 review，不是实际修正样本；
+6. 还没有做模式脉络聚类；
+7. 还没有做内部 G_i / R_i 填充。
+```
+
+因此不能说：
+
+```text
+已经找到内部机制候选的最终集合。
+```
+
+只能说：
+
+```text
+已经形成第一版内部追踪候选池和样例库校准任务池。
+```
+
+### 7. 当前图谱进度
+
+Phase242 回写后：
+
+```text
+pattern_family_atlas: 0.66
+behavior: 0.68
+readout_competition: 0.56
+large_scale_negative_taxonomy: 0.50
+case_bank_calibration: 0.28
+high_value_trace_selection: 0.34
+prompt_trigger: 0.32
+gate_up_product: 0.30
+residual_state: 0.30
+rollout: 0.05
+closure: 0.10
+model_internal_closure: 0.46
+general_language_mechanism_confidence: 0.51
+```
+
+阶段判断：
+
+```text
+全局图谱继续前进；
+闭合没有明显前进；
+内部机制仍未进入新一轮实测。
+```
+
+### 8. 智能理论角度的关键洞察
+
+Phase242 说明：
+
+```text
+语言失败不是单轴失败。
+```
+
+同一个输出可以同时满足：
+
+```text
+语义接近；
+协议失败；
+读出被压；
+展开漂移；
+闭合失败；
+评分存在风险。
+```
+
+因此语言模式不能用单个 success / failure 标签描述，而应表示为多维状态：
+
+$$
+\boxed{
+\mathrm{LanguageFailure}_i
+=
+(
+N_{\mathrm{semantic}},
+N_{\mathrm{protocol}},
+N_{\mathrm{readout}},
+N_{\mathrm{rollout}},
+N_{\mathrm{closure}},
+N_{\mathrm{scoring}}
+)
+}
+$$
+
+这也反过来说明，语言机制应表示为：
+
+$$
+\boxed{
+P_i
+=
+\mathrm{TriggerTrace}_i
+\circ
+\mathrm{ReadoutTrace}_i
+\circ
+\mathrm{CompetitorTrace}_i
+\circ
+\mathrm{RolloutTrace}_i
+\circ
+\mathrm{ClosureTrace}_i
+\circ
+\mathrm{InternalTrace}_i
+}
+$$
+
+当前 Phase242 主要补强：
+
+```text
+NegativeTaxonomy；
+CaseBankCalibration；
+HighValueInternalTraceSelection。
+```
+
+### 9. 下一阶段任务
+
+Phase243 应进入：
+
+```text
+mode trace clustering and candidate validation
+模式脉络聚类与候选验证
+```
+
+优先任务：
+
+```text
+1. 对 300 条候选做去重、分层、聚类；
+2. 建立 explore / validate / frozen 数据划分；
+3. 从 300 条中选 60 到 120 条第一批内部追踪样本；
+4. 重点覆盖 readout_competitor_trace、protocol_gate_product_residual_trace、stepwise_rollout_trace；
+5. 对 95 个 manual_review case 做样例库 v2 修正；
+6. 为后续每模式 50 样本的大规模二版测试准备冻结 case bank。
+```
+
+仍然不要直接闭合。
+
+## Phase 243: 候选聚类、数据划分与 case bank v2 [2026-07-07 17:30]
+
+### 1. 阶段目标
+
+本阶段承接 Phase242。
+
+Phase242 已经完成：
+
+```text
+5184 条记录多标签化；
+300 条高价值内部追踪候选；
+95 个 manual_review case；
+readout / protocol / rollout / closure 候选优先级。
+```
+
+但 Phase242 的候选池仍然不能直接进入 hook，因为：
+
+```text
+1. 300 条候选过多；
+2. 候选之间有重复机制；
+3. 还没有 explore / validate / frozen 数据划分；
+4. case bank 仍有评分风险；
+5. 内部追踪需要按测试类型平衡。
+```
+
+Phase243 的目标是：
+
+```text
+候选去重；
+候选聚类；
+数据划分；
+选出第一批内部追踪样本；
+生成 case bank v2 标记。
+```
+
+本阶段仍不重新跑模型，不做 hook，不做 probe，不做 ablation，不做闭合。
+
+### 2. 新增脚本
+
+新增：
+
+```text
+tests/gpt5/phase243_candidate_clustering_and_casebank_v2.py
+```
+
+输入：
+
+```text
+tests/result/phase242_negative_multilabel_and_trace_selection/negative_multilabel_and_trace_selection/
+```
+
+输出目录：
+
+```text
+tests/result/phase243_candidate_clustering_and_casebank_v2/candidate_clustering_and_casebank_v2/
+```
+
+核心输出：
+
+```text
+phase243_pattern_mining_summary.json
+phase243_candidate_dedup_rows.jsonl
+phase243_candidate_cluster_rows.jsonl
+phase243_trace_selection_rows.jsonl
+phase243_case_bank_v2_rows.jsonl
+phase243_data_split_rows.jsonl
+phase243_internal_trace_plan.md
+phase243_observations.jsonl
+phase243_metrics.jsonl
+phase243_graph_edges.jsonl
+```
+
+前端同步和构建通过：
+
+```text
+cd frontend
+npm run sync:pattern-atlas
+npm run build
+```
+
+### 3. 聚类算法
+
+候选聚类使用外部模式脉络特征：
+
+```text
+family_id；
+mode_id；
+recommended_next_test；
+stable_winner_regime；
+failure_group；
+margin_bucket。
+```
+
+聚类键：
+
+$$
+\boxed{
+C_i
+=
+(
+F_i,
+M_i,
+T_i,
+W_i,
+G_i,
+B_i
+)
+}
+$$
+
+其中：
+
+```text
+F_i = family_id；
+M_i = mode_id；
+T_i = recommended_next_test；
+W_i = stable_winner_regime；
+G_i = failure_group；
+B_i = margin_bucket。
+```
+
+数据划分：
+
+$$
+\boxed{
+D
+=
+D_{\mathrm{explore}}
+\cup
+D_{\mathrm{validate}}
+\cup
+D_{\mathrm{frozen}}
+}
+$$
+
+实际使用稳定 hash 划分，并根据 case bank 风险调整：
+
+```text
+explore: 用于发现规律；
+validate: 用于验证候选规律；
+frozen: 保留，不参与调参。
+```
+
+第一批内部追踪样本按附件建议比例选择：
+
+```text
+readout_competitor_trace: 40%
+protocol_gate_product_residual_trace: 25%
+stepwise_rollout_trace: 20%
+rollout_closure_trace: 10%
+cross_model_structure_comparison: 5%
+```
+
+### 4. 客观结果
+
+```text
+input_candidates: 300
+dedup_candidates: 300
+cluster_count: 157
+trace_selection_rows: 100
+case_bank_v2_rows: 288
+manual_review_cases: 95
+```
+
+数据划分：
+
+```text
+explore: 168
+validate: 70
+frozen: 62
+```
+
+第一批内部追踪样本：
+
+```text
+readout_competitor_trace: 40
+protocol_gate_product_residual_trace: 25
+stepwise_rollout_trace: 20
+rollout_closure_trace: 10
+cross_model_structure_comparison: 5
+```
+
+高频聚类现象：
+
+```text
+reasoning_constraint::if_then → be_continuation / period_stop 稳定读出竞争；
+reasoning_constraint::counterfactual → the_continuation 稳定读出竞争；
+state_drift::early_correct_late_drift → the_continuation 稳定读出竞争；
+readout_competition::because_reason → the_continuation 稳定读出竞争；
+content_knowledge::object_attribute → period_stop / comma_repeat 稳定竞争；
+output_protocol::explain_answer → the_continuation 稳定竞争。
+```
+
+### 5. 关键进展
+
+Phase243 的关键进展：
+
+```text
+1. 300 条候选被压缩成 157 个机制簇；
+2. 建立 explore / validate / frozen 划分；
+3. 选出 100 条第一批内部追踪样本；
+4. 内部追踪样本按 readout / protocol / rollout / closure / cross-model 比例平衡；
+5. 形成 case bank v2 标记；
+6. 为 Phase244 第一批内部 trace 提供明确输入。
+```
+
+这一步使后续 hook 不再是盲目抽样，而是来自大数据图谱、负面多标签和聚类筛选。
+
+### 6. 问题和硬伤
+
+本阶段仍有硬伤：
+
+```text
+1. dedup_candidates 仍为 300，说明候选按 case+variant 没有明显重复，机制层重复主要体现在 cluster；
+2. 聚类是规则聚类，不是自动 embedding 聚类；
+3. case bank v2 仍是标记层，还没有人工修正 target_aliases；
+4. 100 条 trace selection 仍可能有评分风险；
+5. 没有产生新的模型行为结果；
+6. 没有填充 G_i / R_i；
+7. 没有内部因果验证。
+```
+
+因此不能说：
+
+```text
+已经完成内部机制选择。
+```
+
+只能说：
+
+```text
+已经完成第一批内部追踪样本的结构化选择。
+```
+
+### 7. 图谱进度
+
+Phase243 回写后：
+
+```text
+pattern_family_atlas: 0.69
+behavior: 0.68
+readout_competition: 0.56
+large_scale_negative_taxonomy: 0.50
+case_bank_calibration: 0.36
+high_value_trace_selection: 0.48
+candidate_clustering: 0.40
+prompt_trigger: 0.32
+gate_up_product: 0.30
+residual_state: 0.30
+rollout: 0.05
+closure: 0.10
+model_internal_closure: 0.46
+general_language_mechanism_confidence: 0.52
+```
+
+总体判断：
+
+```text
+全局图谱继续推进；
+候选选择明显前进；
+内部机制闭合仍没有前进。
+```
+
+### 8. 理论进展
+
+Phase243 进一步确认：
+
+```text
+语言模式图谱不能只列样本；
+必须把样本组织成候选簇、验证集和冻结集。
+```
+
+当前研究循环更清楚：
+
+$$
+\boxed{
+D_{\mathrm{large}}
+\rightarrow
+\mathrm{NegativeMultilabel}
+\rightarrow
+\mathrm{CandidateCluster}
+\rightarrow
+D_{\mathrm{explore/validate/frozen}}
+\rightarrow
+\mathrm{InternalTraceBatch}
+\rightarrow
+\mathrm{CausalTest}
+}
+$$
+
+这意味着后续规律必须先经过：
+
+```text
+候选聚类；
+验证集复核；
+冻结集保留；
+内部 trace；
+因果测试。
+```
+
+不能直接从局部候选上升为理论。
+
+### 9. 下一阶段任务
+
+Phase244 应进入：
+
+```text
+first internal trace batch
+第一批内部追踪样本测试
+```
+
+但仍不要直接闭合。
+
+建议优先顺序：
+
+```text
+1. 先做 40 条 readout_competitor_trace；
+2. 再做 25 条 protocol_gate_product_residual_trace；
+3. 再做 20 条 stepwise_rollout_trace；
+4. 少量做 rollout_closure_trace 和 cross_model_structure_comparison；
+5. 每次仍按 qwen3 → GLM4 → DS7B 顺序运行；
+6. 输出必须继续写入 Pattern Atlas 固定格式。
+```
+
+Phase244 的目标不是证明闭合，而是填充：
+
+```text
+G_i: gate/product signature；
+R_i: residual signature；
+更细的 readout competitor trace；
+stepwise rollout trace。
+```
+
+## Phase 244: 第一批内部追踪样本测试 [2026-07-07 17:47]
+
+### 1. 任务判断
+
+本阶段分析的 Phase243 判断基本正确。
+
+Phase243 的价值不是直接发现新的语言理论，而是把 Phase241/242 的大数据负结果整理成可以进入内部追踪的高价值样本集。它把下一步任务从“继续扩行为数据”推进到：
+
+```text
+高价值候选样本
+→ 内部组件追踪
+→ 读出竞争追踪
+→ rollout 早期轨迹追踪
+→ 再进入因果验证
+```
+
+因此 Phase244 不应该追求闭合，而应该先完成第一批内部 trace 数据。
+
+### 2. 测试原理
+
+本阶段使用 Phase243 选出的 100 条 trace selection 样本，并回连 Phase241 的固定行为数据行。每个样本在每个模型上执行：
+
+```text
+1. 找到 selected variant 的 prompt_variant；
+2. 找到同 case_id 的 full baseline；
+3. 捕获指定层的 gate/up/product/down_out/recomputed_product；
+4. 捕获 observe layers 的 residual state；
+5. 计算 selected variant 相对 full baseline 的 delta；
+6. 重新读取 lm_head 的 readout competitor；
+7. 对 stepwise_rollout_trace / rollout_closure_trace / cross_model_structure_comparison 样本做 4 步 argmax rollout；
+8. 输出 Pattern Atlas 固定格式 observations / metrics / graph_edges。
+```
+
+核心度量为：
+
+$$
+\Delta_{\mathrm{rel}}(x, x_{\mathrm{full}})
+=
+\frac{\lVert x - x_{\mathrm{full}} \rVert_2}
+{\max(\lVert x_{\mathrm{full}} \rVert_2,\epsilon)}
+$$
+
+读出边界变化为：
+
+$$
+\Delta m
+=
+m_{\mathrm{variant}} - m_{\mathrm{full}}
+=
+\left(z_{\mathrm{target}} - z_{\mathrm{winner}}\right)_{\mathrm{variant}}
+-
+\left(z_{\mathrm{target}} - z_{\mathrm{winner}}\right)_{\mathrm{full}}
+$$
+
+本阶段仍然只证明 trace 相关性，不证明因果闭合。
+
+### 3. 脚本和结果文件
+
+新增脚本：
+
+```text
+tests/gpt5/phase244_first_internal_trace_batch.py
+tests/gpt5/run_phase244_first_internal_trace_batch.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase244_first_internal_trace_batch/first_internal_trace_batch/
+```
+
+主要输出：
+
+```text
+phase244_cross_model_summary.json
+phase244_cross_model_component_trace_rows.jsonl
+phase244_cross_model_residual_trace_rows.jsonl
+phase244_cross_model_readout_trace_rows.jsonl
+phase244_cross_model_stepwise_rollout_rows.jsonl
+phase244_cross_model_observations.jsonl
+phase244_cross_model_metrics.jsonl
+phase244_cross_model_graph_edges.jsonl
+phase244_first_internal_trace_report.md
+```
+
+同时同步到：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+### 4. 测试规模
+
+按要求依次运行：
+
+```text
+qwen3 → GLM4 → DS7B
+```
+
+完成情况：
+
+```text
+selected rows: 100
+completed cases per model: 100
+missing rows: 0
+models: qwen3, glm4, deepseek7b
+```
+
+跨模型总输出：
+
+```text
+component_trace_rows: 1500
+residual_trace_rows: 900
+readout_trace_rows: 300
+stepwise_rollout_rows: 420
+observation_rows: 3120
+metric_rows: 144
+graph_edges: 45
+```
+
+trace 任务分布：
+
+```text
+readout_competitor_trace: 120
+protocol_gate_product_residual_trace: 75
+stepwise_rollout_trace: 60
+rollout_closure_trace: 30
+cross_model_structure_comparison: 15
+```
+
+### 5. 客观结果
+
+总体均值：
+
+```text
+mean_component_relative_delta: 0.479805
+mean_residual_relative_delta: 0.338150
+mean_readout_margin_delta_vs_full: 7.433960
+stable_winner_match_rate: 0.5533
+```
+
+分模型结果：
+
+```text
+qwen3:
+  component delta: 0.419004
+  residual delta: 0.303248
+  readout margin delta: 12.172012
+  stable winner match rate: 0.6600
+
+GLM4:
+  component delta: 0.449837
+  residual delta: 0.338994
+  readout margin delta: 6.471758
+  stable winner match rate: 0.4800
+
+DS7B:
+  component delta: 0.570575
+  residual delta: 0.372209
+  readout margin delta: 3.658110
+  stable winner match rate: 0.5200
+```
+
+最强内部组件变化主要出现在 DS7B 的 stepwise_rollout_trace / rollout_closure_trace / cross_model_structure_comparison 样本中，product 与 recomputed_product 的相对变化最高接近 0.90。
+
+但 readout margin delta 最大的是 qwen3，而不是 DS7B。这说明：
+
+```text
+内部组件变化强
+≠
+读出边界改善强
+```
+
+这是一个重要校准结果。
+
+### 6. 进展分析
+
+本阶段完成的核心拼图：
+
+```text
+1. Phase243 的候选样本可以无缺失地回连 Phase241 行为数据；
+2. 可以在三模型上稳定生成固定格式内部 trace；
+3. gate/product、residual、readout、stepwise rollout 四类数据已经进入同一个图谱格式；
+4. 首次得到 100 个候选样本 × 3 模型的内部组件变化矩阵；
+5. 发现“组件变化强度”和“读出改善强度”存在明显模型差异。
+```
+
+这比 Phase240 的局部 protocol trace 更进一步，因为 Phase244 不再只测短答协议，而是覆盖 Phase243 挑出的多类高价值失败样本。
+
+### 7. 问题和硬伤
+
+第一，本阶段仍是 trace，不是 causal test。内部向量变化与输出变化同现，不等于证明该组件是必要原因。
+
+第二，当前 baseline 使用同 case 的 full variant。它适合观察 prompt variant 变化，但不能完全分离：
+
+```text
+语义内容变化；
+格式约束变化；
+目标词提示变化；
+长度和边界变化。
+```
+
+第三，stepwise rollout 只做 argmax 前 4 步。它能观察早期漂移，但还不能覆盖长程生成闭合。
+
+第四，小模型偏差仍然很大。qwen3、GLM4、DS7B 的内部机制可能比真实大型模型更粗糙，当前机制图谱可能有 30% 到 50% 的偏差，尤其不能把单模型强信号直接提升为通用语言机制。
+
+第五，stable_winner_match_rate 只有 0.5533，说明 Phase243 的 stable winner 聚类并不是强闭合变量，只能作为候选分组依据。
+
+### 8. 图谱进度
+
+当前 Pattern Atlas 进度评估：
+
+```text
+pattern_family_atlas: 0.72
+candidate_clustering: 0.40
+case_bank_calibration: 0.36
+high_value_trace_selection: 0.55
+first_internal_trace_batch: 0.30
+gate_up_product_signature: 0.38
+residual_state_signature: 0.37
+readout_competition_trace: 0.58
+stepwise_rollout_trace: 0.18
+causal_closure: 0.10
+general_language_mechanism_confidence: 0.53
+```
+
+总体判断：
+
+```text
+语言模式图谱已经进入内部追踪阶段；
+但机制闭合仍然很早；
+当前最强进展是数据管线和第一批 G/R/readout/rollout trace 拼图。
+```
+
+### 9. 智能理论视角
+
+Phase244 支持“语言是动态模式网络”的路线，但进一步校准了一个关键点：
+
+```text
+模式不是单一向量；
+模式更像多层、多组件、多读出边界共同决定的运行轨迹。
+```
+
+当前更合理的机制表达是：
+
+$$
+P_i(t)
+=
+\left[
+G_i(t),
+U_i(t),
+M_i(t),
+D_i(t),
+R_i(t),
+O_i(t)
+\right]
+$$
+
+其中：
+
+```text
+G_i: gate signature
+U_i: up projection signature
+M_i: product signature
+D_i: down output signature
+R_i: residual trajectory
+O_i: output/readout regime
+```
+
+模式是否成功，不应只看某个组件是否变化，而要看：
+
+$$
+\mathrm{Success}(P_i)
+=
+f\left(
+\Delta G_i,
+\Delta M_i,
+\Delta R_i,
+\Delta O_i,
+\mathrm{Rollout}_i
+\right)
+$$
+
+本阶段最重要的洞察是：
+
+```text
+内部变化可能负责“写入候选状态”；
+读出边界负责“选择输出 regime”；
+rollout 轨迹负责“是否维持正确模式”。
+```
+
+这三者不能再混成一个变量。
+
+### 10. 下一阶段任务
+
+Phase245 应继续处于同一阶段性目标：
+
+```text
+完成语言模式图谱的内部追踪拼图；
+暂不进入最终闭合。
+```
+
+建议任务：
+
+```text
+Phase245: internal trace validation and frozen split audit
+```
+
+具体步骤：
+
+```text
+1. 从 Phase244 中选出 component delta 高、readout margin 高、二者不一致的三类样本；
+2. 在 validate split 和 frozen split 上复测这些 trace signature；
+3. 检查 product/down_out/residual/readout 四类指标是否稳定；
+4. 对最稳定的少数候选再设计 causal patch/ablation；
+5. 不再盲目扩大局部 patch，先判断 trace signature 是否跨样本稳定。
+```
+
+当前阶段结论：
+
+```text
+Phase244 完成了第一批内部追踪数据；
+证明图谱管线可运行；
+发现内部组件变化与读出改善不等价；
+但距离机制闭合仍然较远。
+```
+
+## Phase 245: 内部追踪签名验证与冻结集审计 [2026-07-07 18:17]
+
+### 1. 任务判断
+
+本阶段分析的 Phase244 复盘内容总体正确。
+
+Phase244 已经完成：
+
+```text
+大数据负面结果图谱
+→ 候选聚类
+→ 第一批内部追踪
+```
+
+但附件中的关键提醒也正确：
+
+```text
+Phase244 是 trace；
+不是 causal test；
+不是 probe；
+不是 ablation；
+不是 closure validation。
+```
+
+因此 Phase245 继续属于同一阶段性目标：
+
+```text
+完成语言模式图谱的内部追踪拼图；
+暂不进入最终闭合。
+```
+
+本阶段没有重新加载模型，因为 Phase244 已经完成 100 个候选 × 3 模型的内部追踪。Phase245 先对已有 trace 数据做验证、审计和候选筛选，避免过早进入 patch。
+
+### 2. 测试原理
+
+输入数据：
+
+```text
+tests/result/phase244_first_internal_trace_batch/first_internal_trace_batch/
+```
+
+主要使用：
+
+```text
+phase244_cross_model_component_trace_rows.jsonl
+phase244_cross_model_residual_trace_rows.jsonl
+phase244_cross_model_readout_trace_rows.jsonl
+phase244_cross_model_stepwise_rollout_rows.jsonl
+```
+
+Phase245 将每个：
+
+```text
+model + case_id + variant_id
+```
+
+聚合成一个 trace signature：
+
+```text
+component_mean_delta
+product_down_mean_delta
+residual_mean_delta
+readout_margin_delta_vs_full
+winner_sequence
+rollout_drift_score
+closure_proxy_score
+```
+
+然后划分为五类：
+
+```text
+high_component_high_readout
+high_component_low_readout
+low_component_high_readout
+readout_boundary_weak_change
+mixed_signature
+```
+
+核心分析公式：
+
+$$
+\rho_{\mathrm{group}}
+=
+\mathrm{corr}
+\left(
+\Delta_{\mathrm{component}},
+\Delta_{\mathrm{readout}}
+\right)
+$$
+
+按以下维度分组：
+
+```text
+model
+model + recommended_next_test
+model + family_id
+model + family_id + recommended_next_test
+model + winning_regime
+model + signature_class
+```
+
+冻结集稳定性采用 validate / frozen 之间的均值差距近似：
+
+$$
+\mathrm{Stability}
+=
+\frac{1}
+{1 + \mathrm{mean}
+\left(
+|\Delta_{\mathrm{validate}}-\Delta_{\mathrm{frozen}}|
+\right)}
+$$
+
+注意：本阶段的 factor projection 是代理分解，不是真正的原始向量正交分解。由于 Phase244 没有保存原始向量，只能用 trace/readout/rollout 元数据估计：
+
+```text
+target_proxy
+protocol_proxy
+boundary_proxy
+competitor_proxy
+closure_proxy
+rollout_drift_proxy
+```
+
+### 3. 新增脚本和输出
+
+新增脚本：
+
+```text
+tests/gpt5/phase245_trace_signature_validation_and_frozen_audit.py
+```
+
+结果目录：
+
+```text
+tests/result/phase245_trace_signature_validation_and_frozen_audit/trace_signature_validation_and_frozen_audit/
+```
+
+主要输出：
+
+```text
+phase245_summary.json
+phase245_trace_signature_rows.jsonl
+phase245_component_readout_correlation_rows.jsonl
+phase245_validate_frozen_audit_rows.jsonl
+phase245_factor_projection_rows.jsonl
+phase245_causal_test_candidate_rows.jsonl
+phase245_observations.jsonl
+phase245_metrics.jsonl
+phase245_graph_edges.jsonl
+phase245_trace_signature_report.md
+```
+
+并同步到 Pattern Atlas 固定格式：
+
+```text
+tests/result/pattern_family_atlas/v1/
+frontend/public/vis_data/pattern_family_atlas/v1/
+```
+
+### 4. 客观结果
+
+本阶段输出规模：
+
+```text
+signature_rows: 300
+correlation_rows: 94
+validate_frozen_audit_rows: 79
+proxy_factor_projection_rows: 300
+causal_test_candidate_rows: 30
+observation_rows: 3000
+metric_rows: 178
+graph_edges: 40
+```
+
+signature class 分布：
+
+```text
+mixed_signature: 143
+high_component_low_readout: 71
+high_component_high_readout: 46
+low_component_high_readout: 36
+readout_boundary_weak_change: 4
+```
+
+数据划分分布：
+
+```text
+explore: 177
+frozen: 66
+validate: 57
+```
+
+模型级 component-readout 相关性：
+
+```text
+qwen3: 0.117579
+GLM4: -0.071452
+DS7B: -0.005691
+```
+
+这个结果非常关键：
+
+```text
+在模型级整体上，component delta 与 readout margin delta 基本不相关。
+```
+
+虽然局部分组中出现接近 1 或 -1 的相关性，但很多分组只有 3 到 4 条样本，不能当成稳定机制结论。
+
+### 5. 关键进展
+
+Phase245 进一步确认 Phase244 的核心校准：
+
+$$
+\Delta_{\mathrm{component}}
+\not\Rightarrow
+\Delta_{\mathrm{readout}}
+$$
+
+并把它从观察结论推进到分组统计结论：
+
+```text
+整体模型级相关性弱；
+局部分组可能强相关；
+但强相关分组常常样本量过小；
+因此必须先做 validate/frozen 稳定性审计。
+```
+
+本阶段筛出 30 条下一步 causal test 候选。最高分候选包括：
+
+```text
+glm4 / reasoning_constraint / if_then / no_answer_anchor / frozen
+qwen3 / output_protocol / table_answer / explain_instruction / explore
+glm4 / reasoning_constraint / if_then / no_answer_anchor / explore
+qwen3 / reasoning_constraint / if_then / explain_instruction / frozen
+qwen3 / state_drift / boundary_takeover / short_answer_instruction / validate
+```
+
+推荐的下一步因果测试主要是：
+
+```text
+component_ablation_and_readout_margin_test
+target_injection_vs_competitor_suppression
+```
+
+### 6. 稳定性审计
+
+较稳定的候选组包括：
+
+```text
+DS7B / high_component_high_readout
+DS7B / high_component_low_readout
+DS7B / the_continuation
+qwen3 / answer_boundary
+qwen3 / output_protocol
+GLM4 / because_reason
+```
+
+但需要谨慎：
+
+```text
+有些稳定性高的组 frozen 行数很少；
+有些强相关组 row_count 只有 3；
+这些只能作为下一步采样优先级，不能作为机制结论。
+```
+
+### 7. 问题和硬伤
+
+第一，Phase245 没有新模型 forward，只是对 Phase244 结果做审计。因此它不能替代真正复测，也不能证明因果。
+
+第二，factor projection 只是代理分解。真正的方向分解需要在 Phase246 或之后保存 raw delta vectors，并构造：
+
+```text
+target direction
+protocol direction
+boundary direction
+competitor direction
+closure direction
+```
+
+第三，局部分组相关性容易被小样本放大。Phase245 已经暴露这个问题，所以后续必须要求：
+
+```text
+高相关 + 足够样本 + validate/frozen 稳定
+```
+
+三者同时满足，才进入因果测试。
+
+第四，小模型偏差仍然存在。当前所有结论都是 qwen3 / GLM4 / DS7B 的小模型内部图谱，不能直接等价为大型模型或真实语言机制。
+
+### 8. 图谱进度
+
+Phase245 后 Pattern Atlas 进度：
+
+```text
+pattern_family_atlas: 0.73
+candidate_clustering: 0.42
+case_bank_calibration: 0.38
+high_value_trace_selection: 0.58
+first_internal_trace_batch: 0.36
+trace_signature_validation: 0.32
+gate_up_product_signature: 0.42
+residual_state_signature: 0.40
+readout_competition_trace: 0.61
+stepwise_rollout_trace: 0.21
+proxy_factor_decomposition: 0.16
+causal_closure: 0.10
+general_language_mechanism_confidence: 0.54
+```
+
+总体进度判断：
+
+```text
+图谱阶段继续推进；
+内部追踪签名开始可筛选；
+但 causal closure 仍然只有 0.10。
+```
+
+### 9. 智能理论视角
+
+Phase245 的关键洞察是：
+
+```text
+语言模式轨迹不能用单一“内部变化强度”解释；
+必须同时看组件变化、残差变化、读出边界、winner 序列、rollout 漂移和闭合代理。
+```
+
+当前更稳妥的模式轨迹公式是：
+
+$$
+P_i(t)
+=
+\left[
+G_i(t),
+U_i(t),
+M_i(t),
+D_i(t),
+R_i(t),
+O_i(t),
+L_i(t),
+K_i(t)
+\right]
+$$
+
+其中：
+
+```text
+G_i: gate signature
+U_i: up projection signature
+M_i: product signature
+D_i: down output signature
+R_i: residual trajectory
+O_i: readout regime
+L_i: rollout trajectory
+K_i: closure state
+```
+
+Phase245 进一步说明：
+
+```text
+如果只看 G/M/D 的范数差分，很容易误判；
+如果只看 O 的 readout margin，也会忽略内部写入；
+如果不看 L/K，无法判断输出是否真正闭合。
+```
+
+### 10. 下一阶段任务
+
+下一阶段仍属于同一大阶段：
+
+```text
+内部追踪图谱 → 稳定签名 → 小规模因果测试准备。
+```
+
+建议 Phase246 进入：
+
+```text
+focused causal validation for stable trace signatures
+稳定追踪签名的小规模因果验证
+```
+
+但只选 10 到 15 条候选，不要大规模 patch。
+
+优先样本：
+
+```text
+1. frozen / validate 中的高分 causal candidates；
+2. high_component_low_readout，用 component ablation 测是否只是噪声写入；
+3. low_component_high_readout，用 target injection vs competitor suppression 测读出是否主导；
+4. high_component_high_readout，用 component replacement 测是否能改变 readout margin。
+```
+
+Phase246 的成功标准应是：
+
+```text
+不是闭合语言机制；
+而是确认至少 2 到 3 类 signature 是否具有因果必要性或充分性迹象。
+```
+
+当前结论：
+
+```text
+Phase245 没有推进闭合；
+但它把 Phase244 的内部追踪数据转成了可审计的签名、稳定性和因果候选。
+下一步可以更克制地进入小规模因果验证。
+```

@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "phase_id": "Phase241",
-  "created_at": "2026-07-08T01:11:40.319332+00:00",
+  "phase_id": "Phase243",
+  "created_at": "2026-07-08T02:30:24.961677+00:00",
   "global_progress": {
-    "pattern_family_atlas": 0.62,
+    "pattern_family_atlas": 0.69,
     "model_internal_closure": 0.46,
-    "general_language_mechanism_confidence": 0.5
+    "general_language_mechanism_confidence": 0.52
   },
   "families": {
     "content_knowledge": 0.45,
@@ -27,7 +27,10 @@
     "competitor_source": 0.18,
     "rollout": 0.05,
     "closure": 0.1,
-    "large_scale_negative_taxonomy": 0.35
+    "large_scale_negative_taxonomy": 0.5,
+    "case_bank_calibration": 0.36,
+    "high_value_trace_selection": 0.48,
+    "candidate_clustering": 0.4
   },
   "modes": {
     "object_identity": 0.02,
@@ -100,23 +103,25 @@
     "no_drift": 0.02,
     "model_close": 0.08
   },
-  "next_phase": "Phase242_high_value_internal_trace_selection",
-  "latest_phase": {
-    "phase_id": "Phase241",
-    "title": "大规模模式族行为与读出图谱基准",
-    "case_count": 288,
-    "behavior_rows": 5184,
-    "negative_rows": 4223,
-    "mean_score": 0.5386,
-    "semantic_match_rate": 0.7355,
-    "protocol_match_rate": 0.1854,
-    "negative_rate": 0.8146,
-    "negative_categories": {
-      "rollout_negative": 1863,
-      "semantic_failure": 1371,
-      "closure_negative": 398,
-      "readout_negative": 363,
-      "protocol_negative": 228
-    }
-  }
+  "next_phase": "Phase244_first_internal_trace_batch",
+  "latest_phase": "Phase245",
+  "updated_at": "2026-07-08T03:17:27.509858+00:00",
+  "latest_round": "Trace signature validation and frozen audit",
+  "progress": {
+    "pattern_family_atlas": 0.73,
+    "candidate_clustering": 0.42,
+    "case_bank_calibration": 0.38,
+    "high_value_trace_selection": 0.58,
+    "first_internal_trace_batch": 0.36,
+    "trace_signature_validation": 0.32,
+    "gate_up_product_signature": 0.42,
+    "residual_state_signature": 0.4,
+    "readout_competition_trace": 0.61,
+    "stepwise_rollout_trace": 0.21,
+    "proxy_factor_decomposition": 0.16,
+    "causal_closure": 0.1,
+    "general_language_mechanism_confidence": 0.54
+  },
+  "current_priority": "run focused causal tests only after trace signatures are stable",
+  "small_model_bias_warning": "Phase245 is a no-new-forward audit over qwen3/glm4/deepseek7b traces; proxy factors are not raw vector orthogonalization."
 }
