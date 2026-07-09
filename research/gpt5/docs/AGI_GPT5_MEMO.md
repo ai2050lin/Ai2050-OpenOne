@@ -64205,3 +64205,2186 @@ Phase265: multi-family case bank and path schema expansion
 3. 可视化客户端能读取并筛选模式族、路径簇、候选机制；
 4. 后续内部追踪脚本可以直接消费这些样本。
 ```
+
+## Phase 265: 九大语言模式族样本库与路径 Schema 扩展 [2026-07-08 05:14]
+
+### 任务来源和总判断
+
+本阶段分析了 Phase264 复盘附件。附件判断正确：
+
+```text
+Phase264 是关键路线升级；
+它不是新增模型行为，也不是闭合证明；
+它的价值是把 Phase261-263 的结果重组成 language pattern physical path atlas（语言模式族物理路径图谱）。
+```
+
+附件指出的主要问题也正确：
+
+```text
+当前路径图谱主要集中在 output_protocol（输出协议）和 readout_competition（读出竞争）；
+九大语言模式族还没有完整覆盖；
+因此第一优先级应是补全语言族物理路径样本库。
+```
+
+所以 Phase265 不做模型 forward（前向计算），不做闭合，也不做 patch（补丁）。本阶段目标是：
+
+```text
+建立九大语言模式族统一 case bank（样本库）和 path schema（路径模式），
+让后续内部追踪脚本可以直接消费这些样本。
+```
+
+### 脚本和结果文件
+
+脚本：
+
+```text
+tests/gpt5/phase265_multi_family_case_bank_path_schema_expansion.py
+tests/gpt5/run_phase265_multi_family_case_bank_path_schema_expansion.sh
+```
+
+结果目录：
+
+```text
+tests/result/phase265_multi_family_case_bank_path_schema_expansion/multi_family_case_bank_path_schema_expansion/
+```
+
+核心输出：
+
+```text
+phase265_cross_model_summary.json
+phase265_mode_family_case_bank_v3.jsonl
+phase265_mode_variant_matrix_rows.jsonl
+phase265_case_quality_audit_rows.jsonl
+phase265_path_schema_rows.jsonl
+phase265_state_factor_design_rows.jsonl
+phase265_observations.jsonl
+phase265_metrics.jsonl
+phase265_graph_edges.jsonl
+phase265_multi_family_case_bank_report.md
+```
+
+同时同步到全局 Pattern Atlas（模式图谱）：
+
+```text
+tests/result/pattern_family_atlas/v1/test_cases.jsonl
+tests/result/pattern_family_atlas/v1/mode_family_case_bank_v3.jsonl
+tests/result/pattern_family_atlas/v1/mode_variant_matrix_rows.jsonl
+tests/result/pattern_family_atlas/v1/case_quality_audit_rows.jsonl
+tests/result/pattern_family_atlas/v1/path_schema_rows.jsonl
+tests/result/pattern_family_atlas/v1/state_factor_design_rows.jsonl
+```
+
+前端同步和构建已完成：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+构建通过，仍有前端 chunk（代码块）较大的性能提示，不影响数据读取。
+
+### 数据规模
+
+本阶段生成：
+
+```text
+case_rows: 1296
+matrix_rows: 1296
+quality_rows: 1296
+path_schema_rows: 216
+state_factor_rows: 1296
+observation_rows: 1296
+metric_rows: 11
+graph_edges: 216
+```
+
+九大模式族每族样本数：
+
+```text
+content_knowledge: 144
+output_protocol: 144
+reasoning_constraint: 144
+syntax_structure: 144
+language_action: 144
+cross_lingual: 144
+readout_competition: 144
+state_drift: 144
+closure: 144
+```
+
+变体覆盖：
+
+```text
+base: 216
+protocol: 216
+continuation: 216
+boundary: 216
+structure: 432
+```
+
+评分风险：
+
+```text
+low: 504
+medium: 792
+high: 0
+```
+
+全局 test_cases.jsonl 当前总量：
+
+```text
+1620
+```
+
+### 路径 Schema
+
+每条样本固定记录：
+
+```text
+target
+expected_pattern
+output_protocol
+boundary_type
+done_label
+continuation_trigger
+scoring_risk
+state factor labels
+path_schema_id
+```
+
+每个 path schema（路径模式）包含：
+
+```text
+trigger_trace
+component_trace_targets
+state_trace_targets
+readout_trace_targets
+rollout_trace_targets
+closure_trace_targets
+```
+
+组件追踪目标：
+
+```text
+embedding
+attention_out
+mlp_gate
+mlp_up
+mlp_product
+mlp_down
+residual_stream
+lm_head
+```
+
+状态追踪目标：
+
+```text
+S_content
+S_target
+S_protocol
+S_boundary
+S_done
+S_continue
+S_stop
+S_structure
+```
+
+读出竞争目标：
+
+```text
+target_vs_wrong
+stop_vs_continuation
+protocol_vs_drift
+structure_completion_vs_structure_continuation
+```
+
+生成轨迹目标：
+
+```text
+step_1
+step_4
+step_8
+step_16
+step_32
+answer_step
+drift_step
+eos_step
+```
+
+闭合追踪目标：
+
+```text
+AnswerCorrect
+PatternMatched
+BoundaryStable
+DoneStateStable
+ModelStopExecuted
+NoDrift
+```
+
+### 理论意义
+
+Phase265 的意义是把“语言族物理路径”从口头方案变成可执行数据结构。
+
+当前路径对象可以写成：
+
+$$
+\mathcal{M}(P_i)
+=
+(
+\mathcal{L}_i,
+\mathcal{C}_i,
+\mathcal{S}_i,
+\mathcal{R}_i,
+\mathcal{G}_i
+)
+$$
+
+Phase265 主要补齐的是：
+
+```text
+P_i 的族覆盖；
+S_i 的状态标签；
+R_i 的读出竞争任务；
+G_i 的 rollout 追踪入口；
+C_i 的组件追踪目标。
+```
+
+它还没有真正测出：
+
+```text
+L_i 的层路径；
+C_i 的组件激活；
+S_i 的真实内部状态；
+G_i 的真实生成轨迹。
+```
+
+但它让后续测试可以不再临时造样本，而是按统一 schema 执行。
+
+### 问题和硬伤
+
+1. 本阶段是 case-bank/schema expansion（样本库/路径模式扩展），不是模型测试，因此没有新增模型行为证据。
+
+2. 样本是设计样本，不是自动从真实失败分布中采样，可能存在人工模板偏差。
+
+3. 每个模式族 144 条样本只是第一版覆盖，距离每族 200-500 条高质量样本还有距离。
+
+4. state factor labels（状态因子标签）仍是设计标签，不是测量出来的内部变量。
+
+5. scoring risk（评分风险）目前只有 low/medium，没有经过真实模型输出校准。
+
+6. 结构化、跨语言、语法样本需要后续用真实输出做质量校验。
+
+7. 当前仍没有完成内部组件路径追踪。
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.87
+physical_path_atlas: 0.27
+multi_family_case_bank: 0.42
+state_factor_atlas: 0.36
+path_cluster_mining: 0.12
+trace_signature_validation: 0.47
+readout_competition_trace: 0.78
+stepwise_rollout_trace: 0.43
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.66
+```
+
+总体判断：
+
+```text
+语言族覆盖明显改善；
+物理路径图谱仍处于早期；
+第一优先级仍是补全语言族路径；
+闭合仍是第二优先级之后的终检目标。
+```
+
+### 阶段结论
+
+Phase265 完成了 Phase264 之后最需要补的一块：
+
+```text
+把物理路径图谱从 output_protocol 局部样本，
+扩展为九大语言模式族统一样本矩阵。
+```
+
+当前最重要进展：
+
+```text
+后续内部追踪不再需要临时构造样本；
+可以直接使用 mode_family_case_bank_v3 和 path_schema_rows。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于 Phase264-300 大阶段，应作为 Phase266 推进：
+
+```text
+Phase266: multi-family baseline behavior and readout scan
+```
+
+任务目标：
+
+```text
+对 Phase265 的九大模式族样本库进行三模型基线测试，
+记录行为结果、读出竞争、续写胜出、评分风险和初始 rollout 迹象。
+```
+
+建议方案：
+
+```text
+1. 使用 qwen3、GLM4、DS7B 顺序测试；
+2. 优先每族抽取均衡子集，避免一次性过大；
+3. 输出固定格式 behavior_rows、readout_rows、rollout_probe_rows、quality_calibration_rows；
+4. 校准 Phase265 的 scoring_risk；
+5. 找出每个模式族的主要失败路径。
+```
+
+阶段成功标准：
+
+```text
+1. 九大模式族都有三模型基线结果；
+2. 每个模式族能初步定位 top failure path；
+3. 可视化客户端能按 family/mode/variant 查看结果；
+4. 不追闭合，只为后续内部路径追踪选择高价值样本。
+```
+
+## Phase 266: 多语言族基线行为与读出竞争扫描 [2026-07-08 06:31]
+
+### 本阶段判断
+
+Phase266 继续了 Phase265 的正确方向，而且属于同一大阶段：
+
+```text
+Phase264-265: 建立语言族物理路径样本与路径 schema（路径格式）
+Phase266: 对这些样本做三模型行为层和读出层 baseline（基线）扫描
+```
+
+本阶段没有尝试闭合，也不应把结果解释为机制闭合。它完成的是更基础的一步：
+
+```text
+从“统一样本库已经存在”
+推进到
+“九大语言族在三模型上的行为表现、读出竞争、初始 rollout（生成展开）和风险校准已经有固定格式数据”。
+```
+
+附件中 Phase265 的判断基本正确：先完成语言族物理路径，再考虑闭合，是当前最稳妥的路线。继续单点 patch（补丁）或继续追局部闭合，会进入边际收益递减区；现在更需要把真实现象拼图铺开。
+
+### 测试脚本和结果位置
+
+脚本：
+
+```text
+tests/gpt5/phase266_multi_family_baseline_behavior_readout_scan.py
+tests/gpt5/run_phase266_multi_family_baseline_behavior_readout_scan.sh
+```
+
+结果：
+
+```text
+tests/result/phase266_multi_family_baseline_behavior_readout_scan/multi_family_baseline_behavior_readout_scan/
+```
+
+同步到可视化客户端：
+
+```text
+tests/result/pattern_family_atlas/v1/phase266_behavior_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase266_readout_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase266_rollout_probe_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase266_quality_calibration_rows.jsonl
+```
+
+前端同步和构建已经通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+客户端当前同步了 26 个 pattern atlas（模式图谱）文件。
+
+### 测试原理
+
+Phase266 使用 Phase265 的 `mode_family_case_bank_v3.jsonl`，从九大模式族中均衡抽样：
+
+```text
+每个 family（语言族）36 条；
+每个 model（模型）324 条；
+三个模型合计 972 条。
+```
+
+测试模型顺序：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每条样本记录四类数据：
+
+```text
+behavior_rows: 行为输出是否命中目标、是否符合输出模式；
+readout_rows: 下一词元读出竞争；
+rollout_probe_rows: 12 token（词元）短生成展开；
+quality_calibration_rows: 根据真实输出和读出结果校准 scoring_risk（评分风险）。
+```
+
+核心观测公式：
+
+$$
+R(x)
+=
+\arg\max_{c \in C_{stop} \cup C_{continue} \cup C_{target}}
+\text{logit}_c(x)
+$$
+
+其中：
+
+```text
+C_stop: 停止候选通道；
+C_continue: 继续候选通道；
+C_target: 目标答案候选通道。
+```
+
+停止-继续差值：
+
+$$
+\Delta_{stop,continue}(x)
+=
+\max_{c \in C_{stop}}\text{logit}_c(x)
+-
+\max_{c \in C_{continue}}\text{logit}_c(x)
+$$
+
+目标-胜出差值：
+
+$$
+\Delta_{target,winner}(x)
+=
+\max_{c \in C_{target}}\text{logit}_c(x)
+-
+\max_{c \in C_{all}}\text{logit}_c(x)
+$$
+
+风险校准规则是基础规则，不引入复杂统计：
+
+```text
+如果目标未命中，或 target_margin_vs_winner < -5，则 high；
+如果模式未匹配，或 stop_continue_margin < -6，或有 drift marker（漂移标记），则 medium；
+如果模型自然停止且模式匹配，则 low；
+否则保留 Phase265 设计风险。
+```
+
+### 客观结果
+
+总数据量：
+
+```text
+behavior_rows: 972
+readout_rows: 972
+rollout_rows: 972
+quality_rows: 972
+observation_rows: 972
+metric_rows: 63
+graph_edges: 86
+missing_rows: 0
+```
+
+最重要的客观结果：
+
+```text
+competition_winner_counts:
+continue = 972
+```
+
+也就是说，在本阶段的三模型、九语言族、972 条样本中，下一词元读出竞争全部由 continue（继续）通道胜出。这个结果不能证明“模型一定会继续输出”，但它强烈说明：
+
+```text
+语言族样本的首步物理入口不是 stop（停止）；
+更稳定的入口是 continuation regime（继续状态）；
+后续物理路径追踪应从继续通道分叉开始，而不是从终止符号开始。
+```
+
+Top continue channel（最高频继续通道）：
+
+```text
+continue_list_item: 334
+continue_the: 330
+continue_next_sentence: 172
+continue_json_structure: 70
+continue_format: 66
+```
+
+模型自然停止率：
+
+```text
+model_stop_rate: 0.041152
+```
+
+这说明短 rollout（生成展开）里自然停止很少。停止不是主导路径，继续态才是主导路径。
+
+各语言族 answer_correct_proxy_rate（答案命中代理率）：
+
+```text
+closure: 0.685185
+content_knowledge: 0.592593
+cross_lingual: 0.833333
+language_action: 0.944444
+output_protocol: 0.925926
+readout_competition: 0.722222
+reasoning_constraint: 0.944444
+state_drift: 0.925926
+syntax_structure: 0.851852
+```
+
+各语言族 pattern_matched_proxy_rate（模式匹配代理率）：
+
+```text
+closure: 0.407407
+content_knowledge: 0.166667
+cross_lingual: 0.5
+language_action: 0.5
+output_protocol: 0.518519
+readout_competition: 0.259259
+reasoning_constraint: 0.462963
+state_drift: 0.5
+syntax_structure: 0.222222
+```
+
+这个结果非常关键：答案命中率整体高于模式匹配率，说明模型经常“知道答案”，但没有稳定执行目标输出模式。语言能力的物理路径不能只看语义答案，还要拆开：
+
+```text
+答案内容路径；
+输出协议路径；
+格式结构路径；
+停止/继续路径。
+```
+
+各语言族 mean_stop_continue_margin（平均停止-继续差值）：
+
+```text
+closure: -5.988426
+content_knowledge: -7.708912
+cross_lingual: -7.296875
+language_action: -10.900752
+output_protocol: -8.175058
+readout_competition: -6.095197
+reasoning_constraint: -8.155382
+state_drift: -8.385127
+syntax_structure: -10.691551
+```
+
+所有语言族都是负值，说明 continue（继续）相对 stop（停止）有系统优势。其中：
+
+```text
+language_action: -10.900752
+syntax_structure: -10.691551
+```
+
+继续态优势最强。后续追踪语言动作和语法结构时，不应先从停止机制入手，而应先看继续态如何组织结构展开。
+
+风险校准：
+
+```text
+medium: 610
+high: 322
+low: 40
+```
+
+Phase265 的低/中风险设计在真实模型输出后被明显上调，说明样本库的评分难度低估了真实模式执行难度。这个校准是必要进展。
+
+### 分模型现象
+
+qwen3：
+
+```text
+behavior_rows: 324
+competition_winner: continue 324
+model_stop_rate: 0.0
+top_continue_channel:
+continue_the 136
+continue_list_item 134
+continue_format 38
+continue_json_structure 12
+continue_next_sentence 4
+```
+
+GLM4：
+
+```text
+behavior_rows: 324
+competition_winner: continue 324
+model_stop_rate: 0.030864
+top_continue_channel:
+continue_list_item 122
+continue_next_sentence 116
+continue_json_structure 58
+continue_format 26
+continue_the 2
+```
+
+DS7B：
+
+```text
+behavior_rows: 324
+competition_winner: continue 324
+model_stop_rate: 0.092593
+top_continue_channel:
+continue_the 192
+continue_list_item 78
+continue_next_sentence 52
+continue_format 2
+```
+
+跨模型共同点：
+
+```text
+continue winner（继续胜出）稳定；
+停止路径弱；
+列表、普通英文延续、下一句、JSON 结构、格式延续构成主要继续通道。
+```
+
+跨模型差异：
+
+```text
+qwen3 更偏 continue_the 和 continue_list_item；
+GLM4 更偏 continue_list_item、continue_next_sentence、continue_json_structure；
+DS7B 更偏 continue_the。
+```
+
+这说明“继续态主导”可能是跨模型稳定现象，但继续态内部的通道分叉有明显模型差异。由于当前模型都是小模型，内部编码机制可能比大模型粗糙，差异中可能有 30%-50% 是模型规模和训练数据带来的偏差，不能直接上升为通用语言机制。
+
+### 已完成的语言模式图谱内容
+
+到 Phase266，已经完成：
+
+```text
+1. 九大语言族统一 case bank（样本库）；
+2. 每族 144 条设计样本；
+3. 每族 36 条三模型基线扫描；
+4. 行为输出、读出竞争、短 rollout、风险校准四类固定格式数据；
+5. family -> top_continue_channel 的第一版 failure path（失败路径）边；
+6. 可视化客户端数据同步。
+```
+
+当前图谱进度：
+
+```text
+pattern_family_atlas: 0.88
+physical_path_atlas: 0.30
+multi_family_case_bank: 0.45
+multi_family_baseline_scan: 0.16
+state_factor_atlas: 0.37
+path_cluster_mining: 0.14
+trace_signature_validation: 0.48
+readout_competition_trace: 0.79
+stepwise_rollout_trace: 0.44
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.67
+```
+
+总体进度评估：
+
+```text
+语言模式图谱整体约 35%-40%；
+语言族物理路径约 30%；
+闭合约 18%。
+```
+
+这个比例说明当前第一优先级仍然不是闭合，而是补语言族物理路径。
+
+### 问题、硬伤和瓶颈
+
+1. answer_correct_proxy（答案正确代理）和 pattern_matched_proxy（模式匹配代理）仍是字符串规则，不是真正语义判分。
+
+2. 每族只跑 36 条，是均衡 baseline（基线）而不是全量 1296 条穷尽测试。
+
+3. rollout 只有 12 token（词元），只能观察初始展开，不能观察长程漂移和长程停止。
+
+4. readout（读出）只看下一词元竞争，还没有记录层路径、注意力头、MLP channel（多层感知机通道）和 residual stream（残差流）中的具体物理传播。
+
+5. continue（继续）通道全部胜出是强现象，但这可能部分来自 prompt（提示词）结构、模板格式和小模型输出习惯，不能直接视为语言机制闭合。
+
+6. syntax_structure（语法结构）答案命中高但模式匹配低，说明当前代理评分对语法样本可能过粗，需要更细的结构判分。
+
+7. content_knowledge（知识内容）模式匹配最低，可能是模板目标过短，也可能是知识输出天然倾向解释扩展，需要后续拆成事实召回、实体关系、定义解释、条件知识几个子族。
+
+8. 当前没有 causal intervention（因果干预），因此只能说“路径候选”，不能说“机制已证明”。
+
+### 智能理论角度的进展
+
+Phase266 支持一个更清楚的分解：
+
+$$
+Language(x)
+\neq
+Answer(x)
+$$
+
+更合理的机制图是：
+
+$$
+Language(x)
+=
+Content(x)
+\oplus
+Protocol(x)
+\oplus
+Structure(x)
+\oplus
+Continuation(x)
+\oplus
+Stop(x)
+$$
+
+其中本阶段最强证据落在：
+
+$$
+Continuation(x) > Stop(x)
+$$
+
+并且：
+
+$$
+AnswerHit(x) > PatternMatch(x)
+$$
+
+这意味着语言智能不是单纯“生成正确语义”，而是多个模式系统同时竞争：
+
+```text
+知识网络负责内容；
+推理能力负责约束和步骤；
+语法系统负责结构；
+输出协议负责格式；
+继续/停止系统负责生成边界；
+读出竞争把这些路径投影到下一词元。
+```
+
+破解语言编码机制的第一性原理应继续保持：
+
+```text
+不要先找一个闭合公式；
+先找全局物理路径图谱；
+当路径图谱足够完整后，公式应从图谱中自然浮现。
+```
+
+### 阶段结论
+
+Phase266 完成了 Phase265 之后必须做的三模型基线扫描。它证明的不是闭合，而是：
+
+```text
+九大语言族在首步读出层面都被 continuation regime（继续状态）主导；
+答案命中和模式执行明显分离；
+后续物理路径追踪应从 continue channel（继续通道）分叉开始。
+```
+
+当前最值得追踪的物理路径入口：
+
+```text
+continue_list_item
+continue_the
+continue_next_sentence
+continue_json_structure
+continue_format
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前大阶段，应作为 Phase267 推进：
+
+```text
+Phase267: multi-family continuation channel physical path tracing
+```
+
+目标：
+
+```text
+从 Phase266 的 top failure path 中选择高价值样本，
+追踪 continue channel 在不同语言族中的层路径、组件路径和状态变化。
+```
+
+建议任务：
+
+```text
+1. 每个语言族选择 3-5 条高风险样本；
+2. 对 qwen3、GLM4、DS7B 分别记录 layer-wise readout（逐层读出）；
+3. 记录 residual stream（残差流）、attention output（注意力输出）、MLP output（多层感知机输出）对 continue channel 的贡献；
+4. 对 continue_list_item、continue_the、continue_next_sentence、continue_json_structure、continue_format 分别建路径签名；
+5. 输出固定格式 physical_path_rows、component_contribution_rows、channel_trace_rows；
+6. 只在路径稳定后再考虑局部因果干预。
+```
+
+阶段成功标准：
+
+```text
+1. 每个语言族至少得到一个可视化的 continue physical path（继续物理路径）；
+2. 能区分“答案内容路径”和“输出模式路径”；
+3. 能判断 top_continue_channel 是在哪些层开始稳定胜出的；
+4. 不追闭合，只补语言族物理路径图谱。
+```
+
+## Phase 267: 多语言族继续通道逐层物理路径追踪 [2026-07-08 07:08]
+
+### 本阶段判断
+
+Phase267 继续 Phase264-300 的同一大阶段，方向正确：
+
+```text
+第一优先级：完成语言族物理路径；
+第二优先级：在物理路径稳定后再尝试闭合。
+```
+
+附件对 Phase266 的分析基本正确。Phase266 证明了九大语言族的首步读出入口几乎全部由 continuation regime（继续机制）主导，但它还没有追踪内部层路径。Phase267 补上的正是这一块：
+
+```text
+从 behavior/readout baseline（行为/读出基线）
+推进到
+layer-wise residual readout trace（逐层残差读出追踪）。
+```
+
+本阶段仍不是闭合验证，也不是因果干预。它是物理路径图谱的第一版逐层 tracing（追踪）。
+
+### 脚本和结果位置
+
+脚本：
+
+```text
+tests/gpt5/phase267_multifamily_continuation_physical_path_trace.py
+tests/gpt5/run_phase267_multifamily_continuation_physical_path_trace.sh
+```
+
+结果：
+
+```text
+tests/result/phase267_multifamily_continuation_physical_path_trace/multifamily_continuation_physical_path_trace/
+```
+
+同步到可视化客户端：
+
+```text
+tests/result/pattern_family_atlas/v1/phase267_physical_path_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase267_layerwise_readout_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase267_component_contribution_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase267_continue_channel_trace_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase267_family_path_signature_rows.jsonl
+```
+
+前端同步和构建已经通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+客户端当前同步了 31 个 pattern atlas（模式图谱）文件。
+
+### 测试原理
+
+Phase267 从 Phase266 的结果中，每个模型、每个语言族选择 3 条高价值样本：
+
+```text
+优先 high / medium risk（高/中风险）；
+优先答案命中但模式失败；
+优先 stop_continue_margin（停止-继续差值）很负；
+优先 Phase266 中出现 top continue channel（最高继续通道）的样本。
+```
+
+样本量：
+
+```text
+9 个语言族 × 3 条 × 3 个模型 = 81 条 physical path（物理路径）
+```
+
+对每条样本，记录所有 hidden_states（隐藏状态），把每一层的 residual state（残差状态）投影到 lm_head（输出头），计算 stop / continue / target 的读出竞争。
+
+逐层继续优势公式：
+
+$$
+M_{\mathrm{continue}}^{(l)}
+=
+R_{\mathrm{continue}}^{(l)}
+-
+R_{\mathrm{stop}}^{(l)}
+$$
+
+其中：
+
+```text
+R_continue^(l): 第 l 层继续通道最高 logit；
+R_stop^(l): 第 l 层停止通道最高 logit。
+```
+
+稳定层定义：
+
+$$
+L_{\mathrm{stable}}
+=
+\min l
+\quad
+\text{s.t.}
+\quad
+M_{\mathrm{continue}}^{(l)},
+M_{\mathrm{continue}}^{(l+1)},
+M_{\mathrm{continue}}^{(l+2)}
+> 0
+$$
+
+层级 residual delta（残差层增量）：
+
+$$
+\Delta M_{\mathrm{continue}}^{(l)}
+=
+M_{\mathrm{continue}}^{(l)}
+-
+M_{\mathrm{continue}}^{(l-1)}
+$$
+
+需要注意：本阶段的 component_contribution_rows（组件贡献行）是 layer-level residual delta（层级残差增量），还没有拆成 attention（注意力）和 MLP（多层感知机）的独立贡献。
+
+### 客观结果
+
+总输出：
+
+```text
+physical_path_rows: 81
+layerwise_readout_rows: 2889
+component_contribution_rows: 2808
+continue_channel_trace_rows: 81
+family_path_signature_rows: 81
+observation_rows: 81
+metric_rows: 31
+graph_edges: 32
+missing_rows: 0
+```
+
+九大语言族覆盖：
+
+```text
+closure: 9
+content_knowledge: 9
+cross_lingual: 9
+language_action: 9
+output_protocol: 9
+readout_competition: 9
+reasoning_constraint: 9
+state_drift: 9
+syntax_structure: 9
+```
+
+本阶段追踪到的 continue channel（继续通道）分布：
+
+```text
+continue_json_structure: 29
+continue_next_sentence: 21
+continue_format: 20
+continue_the: 8
+continue_list_item: 3
+```
+
+最终层竞争：
+
+```text
+continue: 78
+target: 3
+```
+
+这说明，在高风险样本子集中，continue（继续）仍然是最终层主导路径；但 GLM4 有 3 条样本 target（目标答案）强于 continue。这个结果不推翻 Phase266，因为 Phase266 的 competition_winner 主要是 stop / continue 竞争，本阶段额外把 target 纳入了最终竞争。
+
+关键层指标：
+
+```text
+mean_first_continue_win_layer: 0
+mean_stable_continue_from_layer: 0.296296
+mean_final_continue_stop_margin: 8.247106
+```
+
+逐层稳定分布：
+
+```text
+first_continue_win_layer:
+L0 = 81 / 81
+
+stable_continue_from_layer:
+L0 = 75 / 81
+L2 = 3 / 81
+L6 = 3 / 81
+```
+
+这个结果非常强，但必须谨慎解释：
+
+```text
+L0 读出可解码出 continue 优势，
+不等于 L0 已经因果地产生完整继续机制。
+```
+
+更稳妥的解释是：
+
+```text
+continuation bias（继续偏置）在输入嵌入/词元先验层面已经非常强，
+后续层更多是在重塑、放大或改写这个继续路径，
+而不是从零产生继续状态。
+```
+
+### 分模型结果
+
+qwen3：
+
+```text
+physical_path_rows: 27
+layerwise_readout_rows: 999
+component_contribution_rows: 972
+final_winner_counts: continue 27
+channel_counts:
+continue_format 16
+continue_json_structure 8
+continue_the 3
+mean_stable_continue_from_layer: 0.666667
+mean_final_continue_stop_margin: 10.412037
+```
+
+GLM4：
+
+```text
+physical_path_rows: 27
+layerwise_readout_rows: 1107
+component_contribution_rows: 1080
+final_winner_counts:
+continue 24
+target 3
+channel_counts:
+continue_json_structure 21
+continue_format 4
+continue_next_sentence 2
+mean_stable_continue_from_layer: 0.222222
+mean_final_continue_stop_margin: 4.688079
+```
+
+DS7B：
+
+```text
+physical_path_rows: 27
+layerwise_readout_rows: 783
+component_contribution_rows: 756
+final_winner_counts: continue 27
+channel_counts:
+continue_next_sentence 19
+continue_the 5
+continue_list_item 3
+mean_stable_continue_from_layer: 0
+mean_final_continue_stop_margin: 9.641204
+```
+
+跨模型共同点：
+
+```text
+continue 路径极早可读出；
+最终层多数仍由 continue 胜出；
+九大语言族都有可视化逐层路径；
+高风险样本中结构化继续通道占比更高。
+```
+
+跨模型差异：
+
+```text
+qwen3 高风险路径偏 continue_format / continue_json_structure；
+GLM4 高风险路径强烈偏 continue_json_structure；
+DS7B 高风险路径偏 continue_next_sentence。
+```
+
+这说明 continue regime（继续机制）是跨模型稳定现象，但具体通道分叉明显受模型架构、词表和训练分布影响。当前模型较小，必须继续保留 30%-50% 的偏差空间。
+
+### 各语言族物理路径观察
+
+按 family（语言族）汇总的最终 continue-stop margin（继续-停止差值）：
+
+```text
+closure: 7.388889
+content_knowledge: 8.34375
+cross_lingual: 7.958333
+language_action: 7.53125
+output_protocol: 8.034722
+readout_competition: 7.887153
+reasoning_constraint: 6.875
+state_drift: 8.416667
+syntax_structure: 11.788194
+```
+
+syntax_structure（语法结构）最高：
+
+```text
+syntax_structure final_continue_stop_margin = 11.788194
+```
+
+这支持 Phase266 的判断：语法结构不是静态规则外壳，而是强烈依赖继续展开的生成控制路径。
+
+reasoning_constraint（推理约束）最低：
+
+```text
+reasoning_constraint final_continue_stop_margin = 6.875
+```
+
+但它仍然是正值，说明推理约束也没有转向 stop-first（停止优先），只是继续优势相对弱一些。
+
+### 进展
+
+Phase267 完成了当前阶段最需要的一步：
+
+```text
+把 Phase266 的 continue winner（继续胜出）
+进一步拆成逐层 physical path（物理路径）。
+```
+
+已经完成的拼图：
+
+```text
+1. 九大语言族每族都有三模型逐层路径；
+2. continue 路径在 L0 就可读出；
+3. 75/81 样本从 L0 开始连续稳定；
+4. 结构化继续通道成为高风险路径主入口；
+5. residual layer delta（残差层增量）已经有第一版记录；
+6. 可视化客户端已经能读取 Phase267 路径数据。
+```
+
+### 问题和硬伤
+
+1. L0 可读出 continue 优势，可能包含词元频率、词表先验和 prompt 模板偏置，不能直接解释为完整内部机制。
+
+2. 本阶段没有拆分 attention output（注意力输出）和 MLP output（多层感知机输出），component_contribution_rows 只是残差层级差分。
+
+3. 每族每模型只有 3 条高风险样本，适合追路径，不适合估计总体分布。
+
+4. 样本是从 Phase266 高风险子集中选出的，因此 channel_counts 会偏向结构化失败路径，不能代表全量语言族分布。
+
+5. 逐层投影是 readout probing（读出探针），不是 causal intervention（因果干预）。它能说明“某层可读出什么”，不能直接说明“某层导致什么”。
+
+6. 当前使用小模型，继续路径很可能比大模型更粗糙，尤其是 EOS（结束符）和结构化输出控制可能偏弱。
+
+7. GLM4 的 target 胜出样本说明 target/content path（目标/内容路径）在部分情况下能压过 continue path（继续路径），后续必须拆分内容路径和继续路径的相互作用。
+
+### 理论更新
+
+Phase267 不需要改理论名词，但可以改进机制图：
+
+$$
+\mathcal{M}(P_i)
+=
+(
+\mathcal{L}_i,
+\mathcal{C}_i,
+\mathcal{S}_i,
+\mathcal{R}_i,
+\mathcal{G}_i
+)
+$$
+
+本阶段补强的是：
+
+```text
+L_i: 逐层路径开始有数据；
+R_i: 继续/停止/目标读出竞争更完整；
+S_i: continuation state（继续状态）在早层已可读出；
+C_i: 只有 residual delta（残差增量），还未拆组件；
+G_i: 本阶段没有扩展长程生成轨迹。
+```
+
+更具体的当前公式：
+
+$$
+LanguagePath_i
+=
+ContentPath_i
+\oplus
+ProtocolPath_i
+\oplus
+StructurePath_i
+\oplus
+ContinuationPath_i
+\oplus
+StopPath_i
+$$
+
+其中 Phase267 支持：
+
+$$
+ContinuationPath_i^{(L0)}
+>
+StopPath_i^{(L0)}
+$$
+
+但这应解释为“早层可读出优势”，不是完整因果生成机制。
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.89
+physical_path_atlas: 0.34
+multi_family_case_bank: 0.45
+multi_family_baseline_scan: 0.18
+state_factor_atlas: 0.38
+path_cluster_mining: 0.16
+trace_signature_validation: 0.50
+readout_competition_trace: 0.80
+stepwise_rollout_trace: 0.44
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.68
+```
+
+总体评估：
+
+```text
+语言模式图谱整体约 38%-42%；
+语言族物理路径约 34%；
+闭合约 18%。
+```
+
+第一优先级仍然是补全语言族物理路径，特别是 attention / MLP 组件级路径。
+
+### 阶段结论
+
+Phase267 的结论：
+
+```text
+继续机制不是只在最终输出层突然出现；
+在高风险语言族样本中，continue path 通常从极早层就可读出，并在多数样本中保持稳定。
+```
+
+最重要的新拼图：
+
+```text
+语言族物理路径的入口不是“后期闭合失败”，
+而是“早层 continuation bias + 后续层结构化重塑”。
+```
+
+这解释了为什么单点闭合 patch（补丁）反复失败：
+
+```text
+如果继续路径从早层就已占优，
+只在末端压 EOS 或修正完成向量，
+通常无法稳定改变整个生成动力学。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前大阶段，应作为 Phase268：
+
+```text
+Phase268: attention / MLP separated continuation path attribution
+```
+
+目标：
+
+```text
+把 Phase267 的 residual layer delta（残差层增量）
+拆成 attention output（注意力输出）和 MLP output（多层感知机输出）的贡献。
+```
+
+建议：
+
+```text
+1. 只选 Phase267 中最稳定的 18 条样本，避免显存和数据噪声；
+2. 每个模型每个主要 channel 至少 1-2 条；
+3. hook 每层 attention output 和 MLP output；
+4. 分别计算加入/移除组件输出后 continue_stop_margin 的变化；
+5. 输出 component_physical_path_rows、attention_contribution_rows、mlp_contribution_rows；
+6. 继续不做闭合，只定位组件级物理路径。
+```
+
+成功标准：
+
+```text
+1. 能判断 continue path 主要由 attention、MLP 还是 residual accumulation 推动；
+2. 能为九大语言族至少给出粗粒度组件路径；
+3. 能识别不同模型的组件分叉差异；
+4. 为后续少量因果干预选择组件目标。
+```
+
+## Phase 268: 注意力/MLP 分离的继续路径组件归因 [2026-07-08 16:30]
+
+### 本阶段判断
+
+Phase268 继续 Phase264-300 大阶段，仍属于“语言模式图谱物理路径”优先级，不属于闭合阶段。
+
+附件对 Phase267 的判断基本正确：
+
+```text
+Phase267 已经证明 continue path（继续路径）在高风险样本中极早可读出；
+但 residual delta（残差增量）还没有拆成 attention（注意力）和 MLP（多层感知机）贡献；
+因此 Phase268 应补组件级路径，而不是立刻做闭合。
+```
+
+本阶段完成的是：
+
+```text
+layer_input
+-> layer_input + attention_out
+-> layer_input + attention_out + MLP_out
+-> layer_out
+```
+
+的观测分解，计算每一步对 continue-stop margin（继续-停止差值）的影响。
+
+### 脚本和结果位置
+
+脚本：
+
+```text
+tests/gpt5/phase268_attention_mlp_continuation_path_attribution.py
+tests/gpt5/run_phase268_attention_mlp_continuation_path_attribution.sh
+```
+
+结果：
+
+```text
+tests/result/phase268_attention_mlp_continuation_path_attribution/attention_mlp_continuation_path_attribution/
+```
+
+同步到可视化客户端：
+
+```text
+tests/result/pattern_family_atlas/v1/phase268_component_physical_path_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase268_attention_contribution_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase268_mlp_contribution_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase268_residual_accumulation_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase268_component_summary_rows.jsonl
+```
+
+前端同步和构建已通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+客户端当前同步了 36 个 pattern atlas（模式图谱）文件。
+
+### 测试原理
+
+Phase268 从 Phase267 的稳定高价值样本中选择：
+
+```text
+每个模型 6 条；
+三个模型合计 18 条；
+覆盖 continue_json_structure、continue_format、continue_next_sentence、continue_the、continue_list_item；
+覆盖 syntax_structure、content_knowledge、output_protocol、state_drift、reasoning_constraint、readout_competition 等核心语言族。
+```
+
+每层捕获：
+
+```text
+h_l: layer_input（层输入残差）
+a_l: attention_out（注意力输出）
+m_l: MLP_out（多层感知机输出）
+o_l: layer_out（层输出）
+```
+
+逐层继续优势：
+
+$$
+M(h)
+=
+R_{\mathrm{continue}}(h)
+-
+R_{\mathrm{stop}}(h)
+$$
+
+注意力贡献：
+
+$$
+\Delta M_{\mathrm{attn}}^{(l)}
+=
+M(h_l + a_l)
+-
+M(h_l)
+$$
+
+MLP 贡献：
+
+$$
+\Delta M_{\mathrm{mlp}}^{(l)}
+=
+M(h_l + a_l + m_l)
+-
+M(h_l + a_l)
+$$
+
+残差 carry（残差携带/结构差）：
+
+$$
+\Delta M_{\mathrm{resid}}^{(l)}
+=
+M(o_l)
+-
+M(h_l + a_l + m_l)
+$$
+
+注意：这是 observational attribution（观测归因），不是 causal ablation（因果消融）。它说明自然前向中哪类组件更强地增加 continue-stop margin，但不能单独证明组件因果必要性。
+
+### 客观结果
+
+总输出：
+
+```text
+component_physical_path_rows: 624
+attention_contribution_rows: 624
+mlp_contribution_rows: 624
+residual_accumulation_rows: 624
+component_summary_rows: 18
+observation_rows: 18
+metric_rows: 18
+graph_edges: 18
+missing_rows: 0
+```
+
+语言族覆盖：
+
+```text
+syntax_structure: 3
+state_drift: 2
+language_action: 1
+reasoning_constraint: 2
+content_knowledge: 3
+output_protocol: 3
+readout_competition: 2
+closure: 1
+cross_lingual: 1
+```
+
+继续通道覆盖：
+
+```text
+continue_json_structure: 6
+continue_format: 4
+continue_next_sentence: 4
+continue_the: 3
+continue_list_item: 1
+```
+
+最终层结果：
+
+```text
+final_winner_counts:
+continue = 18
+```
+
+组件主导结果：
+
+```text
+dominant_positive_component_counts:
+mlp = 18
+```
+
+平均正向贡献：
+
+```text
+mean_sum_positive_attn_delta: 9.446689
+mean_sum_positive_mlp_delta: 26.821832
+mean_sum_positive_residual_delta: 0.207329
+mean_final_continue_stop_margin: 9.039062
+```
+
+这是一条强结果：
+
+```text
+在本阶段 18 条高价值继续路径样本中，
+MLP 对 continue-stop margin 的正向增强显著大于 attention；
+attention 也有明显正贡献；
+residual carry 贡献很小。
+```
+
+但必须限制解释：
+
+```text
+MLP 是最大自然正向写入/增强者；
+还不能说 MLP 是唯一因果必要组件。
+```
+
+### 分模型结果
+
+qwen3：
+
+```text
+selected_cases: 6
+dominant_positive_component: mlp 6/6
+mean_final_continue_stop_margin: 11.166667
+mean_sum_positive_attn_delta: 11.328186
+mean_sum_positive_mlp_delta: 30.655925
+mean_sum_positive_residual_delta: 0.291911
+strongest_attn_layers: L25(4), L15(1), L9(1)
+strongest_mlp_layers: L34(5), L35(1)
+```
+
+GLM4：
+
+```text
+selected_cases: 6
+dominant_positive_component: mlp 6/6
+mean_final_continue_stop_margin: 5.648438
+mean_sum_positive_attn_delta: 8.131673
+mean_sum_positive_mlp_delta: 25.885092
+mean_sum_positive_residual_delta: 0.151692
+strongest_attn_layers: L36(4), L22(1), L33(1)
+strongest_mlp_layers: L38(4), L22(1), L39(1)
+```
+
+DS7B：
+
+```text
+selected_cases: 6
+dominant_positive_component: mlp 6/6
+mean_final_continue_stop_margin: 10.302083
+mean_sum_positive_attn_delta: 8.880208
+mean_sum_positive_mlp_delta: 23.924479
+mean_sum_positive_residual_delta: 0.178385
+strongest_attn_layers: L9(3), L0(2), L12(1)
+strongest_mlp_layers: L27(4), L26(1), L25(1)
+```
+
+跨模型共同点：
+
+```text
+MLP 是 18/18 样本的最大正向增强组件；
+最终层 continue 仍为 18/18；
+attention 有稳定正贡献，但弱于 MLP；
+residual carry 很小。
+```
+
+跨模型差异：
+
+```text
+qwen3 的 strongest MLP 多在 L34/L35；
+GLM4 的 strongest MLP 多在 L38/L39；
+DS7B 的 strongest MLP 多在 L25-L27；
+attention 的强层分布更分散。
+```
+
+这说明继续路径的组件图谱出现一个新模式：
+
+```text
+attention 更像路由/上下文搬运；
+MLP 更像 continue advantage（继续优势）的主写入/放大器；
+residual stream 负责携带，但本阶段观测到的额外 carry 增量很小。
+```
+
+### 核心拼图进展
+
+Phase268 补上了 Phase267 最大缺口：
+
+```text
+从 residual layer delta（残差层增量）
+推进到
+attention / MLP separated attribution（注意力 / MLP 分离归因）。
+```
+
+当前新增拼图：
+
+```text
+1. 继续路径不是只有残差层级曲线；
+2. MLP 在高价值继续路径中是最强正向增强组件；
+3. attention 有稳定贡献，但多数低于 MLP；
+4. 继续路径的强 MLP 层多在模型后段；
+5. 结构化继续通道和语法/协议路径具有明显 MLP 写入特征；
+6. 三模型都显示同一方向，但层号和通道分叉模型特异。
+```
+
+这使当前语言模式物理路径图谱变成：
+
+```text
+早层 continuation bias（继续偏置）
+-> 中后层 attention 路由和上下文搬运
+-> 后段 MLP 写入/放大 continue advantage
+-> 最终读出层 continue / target / stop 竞争
+```
+
+### 问题和硬伤
+
+1. 本阶段仍是 observational attribution（观测归因），不是 causal intervention（因果干预）。
+
+2. 样本只有 18 条，适合定位组件路径，不适合估计全量分布。
+
+3. 样本来自 Phase267 高风险稳定样本，因此偏向继续路径强、结构化风险高的样本。
+
+4. `h_l + attention_out + MLP_out` 是近似分解。不同架构存在 RMSNorm、残差缩放、并行结构、post-norm / pre-norm 差异，可能带来测量偏差。
+
+5. MLP 正向贡献大，不等于 MLP 是唯一原因。attention 可能提供了 MLP 所需上下文，二者存在依赖关系。
+
+6. 当前没有对 MLP 做消融、替换、抑制或跨样本 patch，因此不能证明必要性。
+
+7. 小模型可能更依赖 MLP 进行格式和继续写入，大模型中 attention / MLP 分工可能更复杂，仍需保留 30%-50% 外推偏差。
+
+### 理论更新
+
+不改理论名词，但机制公式可以更具体：
+
+$$
+M_{\mathrm{continue}}^{(l)}
+=
+B_{\mathrm{embed}}
++
+\sum_{j=1}^{l}
+\left(
+\Delta M_{\mathrm{attn}}^{(j)}
++
+\Delta M_{\mathrm{mlp}}^{(j)}
++
+\Delta M_{\mathrm{resid}}^{(j)}
+\right)
+$$
+
+Phase268 的经验关系：
+
+$$
+\sum \Delta M_{\mathrm{mlp}}^{+}
+>
+\sum \Delta M_{\mathrm{attn}}^{+}
+>>
+\sum \Delta M_{\mathrm{resid}}^{+}
+$$
+
+对应当前结果：
+
+```text
+MLP positive sum: 26.821832
+Attention positive sum: 9.446689
+Residual positive sum: 0.207329
+```
+
+智能理论中的语言路径可以进一步写成：
+
+$$
+\mathrm{LanguagePath}
+=
+B_{\mathrm{embed}}
+\oplus
+\mathrm{AttentionRoute}
+\oplus
+\mathrm{MLPWrite}
+\oplus
+\mathrm{ReadoutCompetition}
+\oplus
+\mathrm{Rollout}
+$$
+
+其中 Phase268 强化的是：
+
+```text
+MLPWrite 是 continue path 的主要正向增强环节。
+```
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.90
+physical_path_atlas: 0.37
+multi_family_case_bank: 0.45
+multi_family_baseline_scan: 0.18
+state_factor_atlas: 0.39
+path_cluster_mining: 0.17
+trace_signature_validation: 0.52
+readout_competition_trace: 0.80
+component_path_atlas: 0.16
+stepwise_rollout_trace: 0.44
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.69
+```
+
+总体评估：
+
+```text
+语言模式图谱整体约 40%-43%；
+语言族物理路径约 37%；
+组件路径图谱约 16%；
+闭合约 18%。
+```
+
+第一优先级仍是补物理路径。闭合还不应前置。
+
+### 阶段结论
+
+Phase268 的阶段结论：
+
+```text
+在高价值继续路径样本中，
+MLP 是 continuation path（继续路径）最强的自然正向增强组件；
+attention 提供稳定但较弱的正向贡献；
+residual carry 的额外增量很小。
+```
+
+这说明语言模式图谱的关键瓶颈已经从：
+
+```text
+继续路径在哪里出现？
+```
+
+推进到：
+
+```text
+哪些 MLP 层在写入或放大继续路径？
+这些 MLP 层是否因果必要？
+它们写入的是通用继续偏置，还是具体结构/协议通道？
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前大阶段，应作为 Phase269：
+
+```text
+Phase269: MLP continuation writer necessity audit
+```
+
+目标：
+
+```text
+对 Phase268 定位出的 strongest MLP layers 做小规模因果必要性审计。
+```
+
+建议：
+
+```text
+1. 每个模型选 2 条样本；
+2. 优先 qwen3 L34/L35、GLM4 L38/L39、DS7B L25-L27；
+3. 对 strongest MLP output 做 suppression（抑制）、zero ablation（置零）或 mean replacement（均值替换）；
+4. 观察 continue_stop_margin、target_margin、生成前 8 token 是否变化；
+5. 输出 mlp_necessity_rows、causal_effect_rows、rollout_effect_rows；
+6. 只做小规模因果审计，不宣称闭合。
+```
+
+成功标准：
+
+```text
+1. 判断 strongest MLP 是否对 continue path 必要；
+2. 区分“MLP 写入继续通道”和“MLP 只是相关放大”；
+3. 找到后续大规模组件图谱的最小因果入口；
+4. 继续保持闭合后置。
+```
+
+## Phase 269: MLP 继续路径写入器必要性审计 [2026-07-08 17:05]
+
+### 本阶段判断
+
+Phase269 继续 Phase264-300 大阶段，仍属于“语言模式图谱物理路径”优先级。
+
+附件对 Phase268 的判断基本正确：
+
+```text
+Phase268 证明 MLP 在高价值 continuation path（继续路径）样本中是最强自然正向增强组件；
+但它仍是 observational attribution（观测归因）；
+必须通过小规模 causal necessity audit（因果必要性审计）检验 strongest MLP 是否真的必要。
+```
+
+本阶段完成的不是闭合，而是第一版小规模 MLP necessity audit（MLP 必要性审计）。
+
+### 脚本和结果位置
+
+脚本：
+
+```text
+tests/gpt5/phase269_mlp_continuation_writer_necessity_audit.py
+tests/gpt5/run_phase269_mlp_continuation_writer_necessity_audit.sh
+```
+
+结果：
+
+```text
+tests/result/phase269_mlp_continuation_writer_necessity_audit/mlp_continuation_writer_necessity_audit/
+```
+
+同步到可视化客户端：
+
+```text
+tests/result/pattern_family_atlas/v1/phase269_mlp_necessity_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase269_causal_effect_rows.jsonl
+tests/result/pattern_family_atlas/v1/phase269_rollout_effect_rows.jsonl
+```
+
+前端同步和构建已通过：
+
+```text
+npm run sync:pattern-atlas
+npm run build
+```
+
+客户端当前同步了 39 个 pattern atlas（模式图谱）文件。
+
+### 测试原理
+
+从 Phase268 的 strongest MLP layers（最强 MLP 层）中选样：
+
+```text
+qwen3: 2 条
+GLM4: 2 条
+DS7B: 2 条
+总计 6 条样本
+```
+
+选择的核心层：
+
+```text
+qwen3: L35 / L34
+GLM4: L38
+DS7B: L25 / L26
+```
+
+对每条样本做两个干预：
+
+```text
+mlp_zero_last_token: 把该层 MLP output 在最后 token 位置置零；
+mlp_half_last_token: 把该层 MLP output 在最后 token 位置缩放到 0.5。
+```
+
+核心指标：
+
+$$
+\Delta M_{\mathrm{continue}}
+=
+M_{\mathrm{patched}}
+-
+M_{\mathrm{base}}
+$$
+
+其中：
+
+$$
+M
+=
+R_{\mathrm{continue}}
+-
+R_{\mathrm{stop}}
+$$
+
+必要性支持规则：
+
+```text
+如果 delta_continue_stop_margin < -1.0，
+或 winner 从 continue 翻转为 stop/target，
+则记为 necessity_supported = True。
+```
+
+另外记录 8 token（8 词元）短 rollout（生成展开），检查输出是否改变。
+
+### 客观结果
+
+总输出：
+
+```text
+mlp_necessity_rows: 12
+causal_effect_rows: 12
+rollout_effect_rows: 12
+observation_rows: 12
+metric_rows: 6
+graph_edges: 12
+missing_rows: 0
+```
+
+干预分布：
+
+```text
+mlp_zero_last_token: 6
+mlp_half_last_token: 6
+```
+
+必要性结果：
+
+```text
+necessity_supported:
+True = 8
+False = 4
+```
+
+winner 翻转：
+
+```text
+winner_changed:
+True = 2
+False = 10
+```
+
+rollout 改变：
+
+```text
+rollout_changed:
+True = 4
+False = 8
+```
+
+平均效果：
+
+```text
+mean_delta_continue_stop_margin: -2.873698
+mean_delta_target_logit: -0.858337
+```
+
+总体结论：
+
+```text
+MLP 抑制总体削弱 continue-stop margin；
+但效果不是跨模型一致；
+qwen3 和 DS7B 支持 MLP 必要性；
+GLM4 在本轮两条样本上不支持，甚至出现 continue margin 上升。
+```
+
+### 分模型结果
+
+qwen3：
+
+```text
+selected_cases: 2
+necessity_supported: 4 / 4
+winner_changed: 1 / 4
+mean_delta_continue_stop_margin: -6.535156
+mean_delta_target_logit: -2.841064
+rollout_changed: 1 / 4
+```
+
+关键样本：
+
+```text
+syntax_structure L35:
+zero: 16.75 -> 10.765625, delta = -5.984375
+half: 16.75 -> 13.78125, delta = -2.96875
+
+reasoning_constraint L34:
+zero: 10.4375 -> -3.125, delta = -13.5625, continue -> stop
+half: 10.4375 -> 6.8125, delta = -3.625
+```
+
+qwen3 中 strongest MLP 对 continue path 具有强必要性迹象，尤其 reasoning_constraint（推理约束）出现 winner 翻转。
+
+GLM4：
+
+```text
+selected_cases: 2
+necessity_supported: 0 / 4
+winner_changed: 0 / 4
+mean_delta_continue_stop_margin: +1.5
+mean_delta_target_logit: +0.055115
+rollout_changed: 2 / 4
+```
+
+关键样本：
+
+```text
+output_protocol L38:
+zero: 4.5625 -> 6.5, delta = +1.9375
+half: 4.5625 -> 5.3125, delta = +0.75
+
+content_knowledge L38:
+zero: 5.0625 -> 7.4375, delta = +2.375
+half: 5.0625 -> 6.0, delta = +0.9375
+```
+
+这是一个重要负/校准结果。它说明：
+
+```text
+GLM4 的 Phase268 MLP 正向贡献大，
+但直接抑制该层 MLP 不一定削弱最终 continue margin；
+该层可能同时写入 continue 和 stop/target 相关成分，
+或者后续层存在补偿。
+```
+
+DS7B：
+
+```text
+selected_cases: 2
+necessity_supported: 4 / 4
+winner_changed: 1 / 4
+mean_delta_continue_stop_margin: -3.585938
+mean_delta_target_logit: +0.210938
+rollout_changed: 1 / 4
+```
+
+关键样本：
+
+```text
+content_knowledge L25:
+zero: 11.34375 -> 7.75, delta = -3.59375
+half: 11.34375 -> 10.21875, delta = -1.125
+
+reasoning_constraint L26:
+zero: 7.125 -> -0.25, delta = -7.375, continue -> stop
+half: 7.125 -> 4.875, delta = -2.25
+```
+
+DS7B 中 strongest MLP 也具有必要性迹象，尤其 reasoning_constraint 出现 winner 翻转。
+
+### 进展
+
+Phase269 完成了 Phase268 之后必须补的一块：
+
+```text
+从“MLP 是最大自然正向增强组件”
+推进到
+“MLP 在 qwen3 和 DS7B 中具有小规模因果必要性迹象，但 GLM4 不一致”。
+```
+
+这是比单纯正结果更有价值的校准：
+
+```text
+MLPWrite 是重要候选；
+但 MLPWrite 不是单一、跨模型、无条件必要机制；
+必须进入模型特异和路径特异的组件图谱。
+```
+
+当前核心拼图更新：
+
+```text
+1. qwen3/DS7B: 后段 MLP 抑制会显著削弱 continue path；
+2. qwen3/DS7B: reasoning_constraint 样本出现 continue -> stop 翻转；
+3. GLM4: strongest MLP 抑制不削弱 continue，反而增强；
+4. MLP 自然正向贡献和 MLP 因果必要性不能等同；
+5. 组件路径必须区分模型、语言族、通道和后续补偿。
+```
+
+### 问题和硬伤
+
+1. 样本只有 6 条，干预 12 次，仍是小规模 necessity pilot（必要性试点）。
+
+2. 只干预最后 token 的 MLP output，不能代表整个生成轨迹中的 MLP 作用。
+
+3. 干预方式是 scale/zero，可能改变分布自然性，尤其对 GLM4 的补偿效应解释仍不确定。
+
+4. 没有做 mean replacement（均值替换）、random same norm（同范数随机替换）或跨样本替换，无法排除范数/分布偏移问题。
+
+5. rollout 只有 8 token，不能判断长程结构和停止效果。
+
+6. GLM4 负结果说明当前线性组件公式仍不足以模拟真实运行机制。单层 MLP output 不是完整机制。
+
+7. 当前模型为小模型，组件分工可能粗糙，对大模型外推仍需保留 30%-50% 偏差。
+
+### 理论更新
+
+Phase269 不改理论名词，但要修正 Phase268 的过强解释。
+
+Phase268 支持：
+
+$$
+\sum \Delta M_{\mathrm{mlp}}^{+}
+>
+\sum \Delta M_{\mathrm{attn}}^{+}
+$$
+
+Phase269 进一步说明：
+
+$$
+\mathrm{ObservedWrite}_{\mathrm{MLP}}
+\nRightarrow
+\mathrm{CausalNecessary}_{\mathrm{MLP}}
+$$
+
+更准确公式：
+
+$$
+\mathrm{ContinuePath}
+=
+B_{\mathrm{embed}}
+\oplus
+\mathrm{AttentionRoute}
+\oplus
+\mathrm{MLPWrite}
+\oplus
+\mathrm{CompensationPath}
+\oplus
+\mathrm{ReadoutCompetition}
+$$
+
+其中 Phase269 新增的是：
+
+```text
+CompensationPath（补偿路径）必须进入公式；
+否则无法解释 GLM4 中 MLP 抑制后 continue margin 反而增强。
+```
+
+这也支持用户当前提醒：
+
+```text
+当前线性公式很可能无法模拟真实运行机制。
+```
+
+正确路线不是继续 patch 线性公式，而是继续扩展物理路径图谱。
+
+### 当前图谱进度
+
+```text
+pattern_family_atlas: 0.90
+physical_path_atlas: 0.39
+multi_family_case_bank: 0.45
+multi_family_baseline_scan: 0.18
+state_factor_atlas: 0.39
+path_cluster_mining: 0.18
+trace_signature_validation: 0.54
+readout_competition_trace: 0.80
+component_path_atlas: 0.20
+stepwise_rollout_trace: 0.45
+causal_closure: 0.18
+general_language_mechanism_confidence: 0.69
+```
+
+总体评估：
+
+```text
+语言模式图谱整体约 41%-44%；
+语言族物理路径约 39%；
+组件路径图谱约 20%；
+闭合约 18%。
+```
+
+闭合仍不能前置。当前最重要的是补：
+
+```text
+补偿路径；
+跨层 MLP 组合路径；
+attention -> MLP 的条件依赖路径；
+长程 rollout 路径。
+```
+
+### 阶段结论
+
+Phase269 的结论是“混合结果 + 关键校准”：
+
+```text
+qwen3 和 DS7B 支持 strongest MLP 对 continue path 的必要性；
+GLM4 不支持，反而出现抑制 MLP 后 continue margin 上升；
+因此 MLP 是重要候选写入器，但不是单层、跨模型、无条件必要机制。
+```
+
+这对当前路线非常重要：
+
+```text
+不能把 Phase268 的 MLP 主导观测结果直接升级为统一闭合公式；
+必须继续完成组件级物理路径图谱，特别是补偿路径和跨层组合路径。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于当前大阶段，应作为 Phase270：
+
+```text
+Phase270: MLP compensation and cross-layer writer set audit
+```
+
+目标：
+
+```text
+解释 GLM4 的反向结果，并测试 continue path 是否由单层 MLP 变成跨层 writer set（写入器集合）。
+```
+
+建议：
+
+```text
+1. 保留 Phase269 的 6 条样本；
+2. 对 strongest MLP 前后 2 层组成 window；
+3. 测试 single-layer zero、multi-layer window zero、attention+MLP combined zero；
+4. 增加 random same norm control（同范数随机控制）；
+5. 对 GLM4 重点观察是否存在后续层补偿；
+6. 输出 compensation_rows、writer_set_rows、control_rows、rollout_effect_rows；
+7. 仍然不做闭合，只做组件路径图谱。
+```
+
+成功标准：
+
+```text
+1. 判断 GLM4 反向结果是否来自补偿路径；
+2. 判断 continue path 是否由跨层 MLP writer set 支撑；
+3. 区分真实必要性和范数/分布扰动；
+4. 为更大规模组件图谱选择稳定干预方法。
+```
