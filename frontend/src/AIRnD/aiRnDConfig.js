@@ -182,6 +182,14 @@ export const RESEARCH_PHASES = [
 
 // API类型配置
 export const API_TYPES = [
+  { id: 'gpt', label: 'GPT', prefix: 'https://api.openai.com/v1' },
+  { id: 'claude', label: 'Claude', prefix: 'https://api.anthropic.com/v1' },
+  {
+    id: 'nownextai',
+    label: 'NowNextAI',
+    prefix: 'https://nownextai.com/v1/model',
+    defaultModel: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
+  },
   { id: 'openai', label: 'OpenAI 兼容', prefix: 'https://api.openai.com/v1' },
   { id: 'zhipu', label: '智谱 AI', prefix: 'https://open.bigmodel.cn/api/paas/v4' },
   { id: 'deepseek', label: 'DeepSeek', prefix: 'https://api.deepseek.com/v1' },

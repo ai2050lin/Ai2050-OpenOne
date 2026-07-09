@@ -16,21 +16,6 @@ export function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNod
         </Text>
       </group>
 
-      {layerVisibility.boundary && (
-        <group position={[0, 3.5, -17]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[8.5, 0.04, 12, 128]} />
-            <meshStandardMaterial color="#ef4444" emissive="#dc2626" emissiveIntensity={0.38} transparent opacity={0.55} />
-          </mesh>
-          <Text position={[0, 1.2, 0]} fontSize={0.42} color="#fecaca" anchorX="center">
-            失败边界层
-          </Text>
-          <Text position={[0, 0.65, 0]} fontSize={0.28} color="#fca5a5" anchorX="center">
-            weak / null / boundary evidence
-          </Text>
-        </group>
-      )}
-
       {layerVisibility.features && (
         <group position={[-14, 7, 12]}>
           <mesh>

@@ -81,6 +81,13 @@ async def lifespan(app: FastAPI):
     model_name = "gpt2-small"  
     
     print(f"Loading model {model_name} (Forced 12-Layer Mode)...")
+
+    if os.environ.get("AI2050_SKIP_MODEL_LOAD", "0") == "1":
+        print("[WARN] AI2050_SKIP_MODEL_LOAD=1; starting API server without local model.")
+        model = None
+        yield
+        print("Shutting down...")
+        return
     
     try:
         from safetensors.torch import load_file as load_safetensors
@@ -143,13 +150,17 @@ async def lifespan(app: FastAPI):
         print(f"[ERROR] Error during forced 12-layer load: {e}")
         import traceback
         traceback.print_exc()
-        try:
-            # Emergency Fallback
-            model = transformer_lens.HookedTransformer.from_pretrained("gpt2-small")
-            print("[OK] Successfully loaded gpt2-small as emergency fallback.")
-        except Exception as fallback_error:
-            print(f"[ERROR] Critical failure during fallback: {fallback_error}")
+        if os.environ.get("AI2050_SKIP_MODEL_LOAD", "0") == "1":
+            print("[WARN] AI2050_SKIP_MODEL_LOAD=1; starting API server without local model.")
             model = None
+        else:
+            try:
+                # Emergency Fallback
+                model = transformer_lens.HookedTransformer.from_pretrained("gpt2-small")
+                print("[OK] Successfully loaded gpt2-small as emergency fallback.")
+            except Exception as fallback_error:
+                print(f"[ERROR] Critical failure during fallback: {fallback_error}")
+                model = None
 
     if model:
         try:

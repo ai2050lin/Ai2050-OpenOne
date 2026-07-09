@@ -105,10 +105,15 @@ export const AIRnDOverlay = ({ onClose }) => {
   }, []);
 
   // Control actions
-  const startSession = useCallback(async () => {
+  const startSession = useCallback(async (objective = '') => {
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/api/ai-rnd/session/start`, { method: 'POST' });
+      const trimmedObjective = String(objective || '').trim();
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/start`, {
+        method: 'POST',
+        headers: trimmedObjective ? { 'Content-Type': 'application/json' } : undefined,
+        body: trimmedObjective ? JSON.stringify({ objective: trimmedObjective }) : undefined,
+      });
       if (res.ok) {
         setSessionStatus('running');
         connectEventStream();

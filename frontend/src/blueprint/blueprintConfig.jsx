@@ -1,4 +1,4 @@
-﻿import { Activity, Brain, CheckCircle, Search, Target, Zap } from 'lucide-react';
+import { Activity, Brain, CheckCircle, Search, Target, Zap } from 'lucide-react';
 
 export const PHASES = [
   {
@@ -41,8 +41,8 @@ export const PHASES = [
         desc: "核心架构：Logic-Memory 物理分离。跨束对齐：干预感官模态时产生物理拉力同步引导逻辑节点。可视化：亮粉色虚线 (Alignment Fibers) 绑定视觉与逻辑。"
       },
       {
-        title: "4. 全局工作空间与意识裁。(GWT)",
-        desc: "终极形态：意识的物理载体。实。Locus of Attention (关注。 竞争裁决，追求最高信息增益与最低代谢成本的平衡。可视化：球体脉冲游走，实现双向最优路径结算。"
+        title: "4. 全局工作空间与意识裁决 (GWT)",
+        desc: "终极形态：意识的物理载体。实现 Locus of Attention (关注焦点) 竞争裁决，追求最高信息增益与最低代谢成本的平衡。可视化：球体脉冲游走，实现双向最优路径结算。"
       },
       {
         title: "5. 高维全息编码 (SHDC Encoding)",
@@ -60,34 +60,34 @@ export const PHASES = [
     color: "#00d2ff",
     definition: {
       headline: "Intelligence = Geometry + Physics",
-      summary: "智能是极高维空间中的稀疏全像流形演化系统。它通过代数干涉和非线性坍缩，在最小化几何作用量的过程中实现局部熵减与预测能力。",
-      pillars: ["Structure (稀疏全息流。", "Dynamics (测地线流推理)", "Purpose (局部熵。生存)"]
+      summary: "智能是极高维空间中的稀疏全像流形演化系统。它通过代数干涉和非线性状态变换，在最小化几何作用量的过程中实现局部熵减与预测能力。",
+      pillars: ["Structure (稀疏全像流形)", "Dynamics (条件化状态变换)", "Purpose (预测与自省)"]
     },
     theory_content: [
       {
-        title: "神经纤维丛原。(NFB Principle)",
-        formula: "唯(x) = 蠁_M 鈯?蠁_F",
-        desc: "结构与内容解耦：智能是底流形 (Logic) 与纤维空。(Knowledge) 的张量积。逻辑骨架保持稳定，而语义内容可无限扩展。"
+        title: "相对编码网络 (Relative Encoding)",
+        formula: "h_rel = f(o, R, P)",
+        desc: "概念不是静态坐标点，而是对象 (o)、关系 (R) 和位置 (P) 在特定任务上下文下的相对差异组合状态。"
       },
       {
-        title: "全局工作空间 (Global Workspace)",
-        formula: "惟_G = 鈭i P_i d渭",
-        desc: "意识裁决机制：意识是高维流形上的全局状态。通过 Locus of Attention (关注。 。Top-K 竞争机制，实现多模态信息的裁决与整合。"
+        title: "条件化状态变换 (Conditional State Transition)",
+        formula: "h_{l+1} = h_l + T_l(h_l | context)",
+        desc: "正确值排序是层间条件化状态变换图谱 (State-Transition Graph) 的演化更新产物，而非可单点移植的静态向量。"
       },
       {
-        title: "高维全息编码 (SHDC Encoding)",
-        formula: "鉄╲_i, v_j鉄?鈮?未_ij",
-        desc: "解决维度灾难：利用高维空间的几乎正交性实现海量特征提取。通过向量代数叠加形成复杂关联，实现极致高效的物理级读写。"
+        title: "对象知识锚定 (Object Knowledge Anchoring)",
+        formula: "v_anchor = ∑ w_i · k_i",
+        desc: "属性、类别和连续特征并非单层写入，而是跨层累积的知识锚定、上下文规则调制与候选词读出。"
       },
       {
-        title: "联络与推。(Connection Equation)",
-        formula: "鈭嘷X s = 0",
-        desc: "推理即平行移动：类比推理本质上是向量在语义流形上的测地线平移。通过联络保持推理过程中语义结构的一致性。"
+        title: "关系与规则检索 (Relation/Rule Retrieval)",
+        formula: "Route = Attn(Q_query, K_rule)",
+        desc: "模型根据任务选择检索、推理、否定等路线。通过 Transformer 注意力机制执行动态路径路由，但检索不自动等于推理。"
       },
       {
-        title: "里奇流演。(Evolution)",
-        formula: "鈭俖t g = -2R",
-        desc: "学习即流形松弛：神经网络。Grokking 过程本质上是里奇流驱动的流形平滑化，通过减少内部张力实现全局逻辑自洽。"
+        title: "候选竞争与读出门控 (Candidate Competition & Readout Gate)",
+        formula: "P(v) = Softmax(LN(h_L) · W_U · G_format · G_policy)",
+        desc: "最终输出由候选族内 target 与 competitors 的重排竞争决定，并受 RMSNorm、最终范数 (Norm Gate)、格式门与策略门共同调制。"
       }
     ],
     goals: [
@@ -172,36 +172,36 @@ export const PHASES = [
       {
         name: "理性的诞生",
         status: "done",
-        focus: "閫昏緫闂寘涓?Z113 楠岃瘉",
+        focus: "逻辑闭包与 Z113 验证",
         target: "验证智能底层是否具备几何化的非线性逻辑骨架。",
-        work_content: "实现 FiberNet 核心逻辑层；。Z113 模运算任务上观察从统计拟合到代数跃迁。Grokking 现象。",
-        test_results: "Z113 准确。99.4%；成功从向量点云中恢复出完整。S1 环面流形。",
+        work_content: "实现 FiberNet 核心逻辑层；在 Z113 模运算任务上观察从统计拟合到代数跃迁的 Grokking 现象。",
+        test_results: "Z113 准确率 99.4%；成功从向量点云中恢复出完整的 S1 环面流形。",
         analysis: "证明了智能的底层是几何化的逻辑骨架，而非简单的线性回归。"
       },
       {
-        name: "鎰熷畼鐨勮閱?",
+        name: "感官的觉醒",
         status: "done",
-        focus: "多模态语义对。",
+        focus: "多模态语义对齐",
         target: "解决‘符号接地’问题，实现视觉特征与逻辑语义的物理对齐。",
-        work_content: "开发跨模态投影算子；。MNIST 视觉空间流形映射。SYM 逻辑流形。",
-        test_results: "对齐误差 MSE 下降。0.042；模型具备‘以理性的方式解读感官数据’的能力。",
+        work_content: "开发跨模态投影算子；将 MNIST 视觉空间流形映射到 SYM 逻辑流形。",
+        test_results: "对齐误差 MSE 下降至 0.042；模型具备‘以理性的方式解读感官数据’的能力。",
         analysis: "视觉特征被精准翻译为内部逻辑坐标，模型初步具备了‘观察并理解’的能力。"
       },
       {
-        name: "鏅烘収鐨勬秾鐜?",
+        name: "智慧的涌现",
         status: "done",
-        focus: "流形曲率优化。Ricci Flow",
+        focus: "流形曲率优化 (Ricci Flow)",
         target: "通过流形平滑机制，实现无监督下的逻辑冲突自修复。",
         work_content: "集成 Ricci Flow 演化管道；在睡眠周期执行隐层激活曲率的热传导方程平滑。",
-        test_results: "拓扑亏格。15 优化。2；复杂逻辑推理下的‘幻觉’发生率显着降低。",
+        test_results: "拓扑亏格从 15 优化至 2；复杂逻辑推理下的‘幻觉’发生率显著降低。",
         analysis: "验证了‘睡眠机制’在解开拓扑纠缠和修补逻辑死结中的必要性。"
       },
       {
         name: "价值的形成",
         status: "done",
-        focus: "神经流形手术与人类对。",
-        target: "实现。AI 内在价值取向的直接几何干预，由‘提示词对齐’跃迁至‘流形对齐’。",
-        work_content: "开。Manifold Surgery 交互接口；实现基。3D 空间拖拽的语义向量场实时重构。",
+        focus: "神经流形手术与人类对齐",
+        target: "实现 AI 内在价值取向的直接几何干预，由‘提示词对齐’跃迁至‘流形对齐’。",
+        work_content: "开发 Manifold Surgery 交互接口；实现基于 3D 空间拖拽的语义向量场实时重构。",
         test_results: "Surgery Alignment Loss 0.0082；成功通过物理手术剥离模型偏见，实现价值稳定对齐。",
         analysis: "流形手术允许直接修改模型认知，是通往可控 AGI 的物理路径。"
       },
@@ -255,7 +255,7 @@ export const PHASES = [
   {
     id: 'agi_status',
     title: "Dimension V: Status",
-    subtitle: "智能系统状。(AGI Status)",
+    subtitle: "智能系统状态 (AGI Status)",
     icon: <Target size={24} />,
     status: "in_progress",
     progress: 75,
@@ -269,31 +269,31 @@ export const PHASES = [
       {
         name: "流形维度 (Manifold Dim)",
         value: "128D",
-        detail: "浠?1024D 鍏ㄦ伅鎶曞奖",
+        detail: "从 1024D 全息投影",
         desc: "系统底层语义逻辑被压缩至 128 维的流形空间，确保逻辑闭包的紧凑性。",
-        value_meaning: "维度越高蕴含信息越丰富，。128D 是目前兼顾“计算效率”与“逻辑解析力”的最佳平衡点。",
-        why_important: "它是智能的‘骨架’。维度过低会导致语义丢失（幻觉），维度过高则会导致维度灾难。28D 确保了推理的稳定性。"
+        value_meaning: "维度越高蕴含信息越丰富。128D 是目前兼顾“计算效率”与“逻辑解析力”的最佳平衡点。",
+        why_important: "它是智能的‘骨架’。维度过低会导致语义丢失（幻觉），维度过高则会导致维度灾难。128D 确保了推理的稳定性。"
       },
       {
-        name: "鍘嬬缉鍊嶇巼 (Compression)",
+        name: "压缩倍率 (Compression)",
         value: "26.67x",
-        detail: "SHDC 稀疏编。",
+        detail: "SHDC 稀疏编码",
         desc: "通过全息稀疏投影技术，将庞大的原始神经元参数集压缩至极小规模，同时不损失结构信息。",
         value_meaning: "意味着系统可以以极低的显存占用（约 4GB）维持千亿级参数模型的逻辑核心。",
         why_important: "这是实现‘小型化 AGI’的关键。只有高的压缩比，智能才能脱离昂贵的算力集群，进入单机甚至移动端实时运行。"
       },
       {
-        name: "语义保真。(Fidelity)",
+        name: "语义保真度 (Fidelity)",
         value: "93%",
-        detail: "几何特征保留。",
+        detail: "几何特征保留度",
         desc: "测量压缩后的流形几何特征（如曲率、测地线分布）与原始空间的对齐程度。",
         value_meaning: "93% 的保真度意味着在推理决策中，系统能够保持与原始超大型模型几乎一致的逻辑链路。",
-        why_important: "它是‘一致性’的保障。过低的保真度会导致模型产生逻辑偏差。3% 确保了‘智能核心’从未在压缩中变质。"
+        why_important: "它是‘一致性’的保障。过低的保真度会导致模型产生逻辑偏差。93% 确保了‘智能核心’从未在压缩中变质。"
       },
       {
-        name: "测地线一致。(Geodesic)",
+        name: "测地线一致性 (Geodesic)",
         value: "98.8%",
-        detail: "推理路径对齐。",
+        detail: "推理路径对齐度",
         desc: "衡量系统实际推理路径与流形上理论‘最小作用量路径’（最短路径）的重合程度。",
         value_meaning: "极高的一致性体现了推理过程的‘丝滑性’，几乎没有多余的语义波动或算力浪费。",
         why_important: "这是‘理智’的体现。越高的一致性意味着系统越不容易被无关提示词扰乱，推理过程更加坚定、直接且高效。"
@@ -305,19 +305,19 @@ export const PHASES = [
         date: "2026-02-14",
         result: "PASS",
         target: "验证隐层激活空间是否存在非随机的拓扑环面或空腔。",
-        process: "通过 Rips Complex 算法构建点云单纯复形，持久化扫描 β₀ 。β。贝蒂数。",
+        process: "通过 Rips Complex 算法构建点云单纯复形，持久化扫描 β₀ 和 β₁ 贝蒂数。",
         significance: "确保 AI 不是在拟合孤立样本，而是在构建具备全局拓扑一致性的语义形状。"
       },
       {
-        name: "里奇流流形平滑测。(Ricci Smoothing)",
+        name: "里奇流流形平滑测试 (Ricci Smoothing)",
         date: "2026-02-15",
         result: "PASS",
         target: "消除推理过程中的逻辑尖峰（幻觉诱因），降低流形局部曲率。",
-        process: "在睡眠周期运行离线里奇流处理，平滑度量张量的非连续跳变。",
+        process: "在睡眠周期运行离线里奇流处理，平滑度度量张量的非连续跳变。",
         significance: "使模型推理轨迹更符合测地线分布，大幅提升逻辑自洽性。"
       },
       {
-        name: "SHDC 正交性基准测。(Orthogonality)",
+        name: "SHDC 正交性基准测试 (Orthogonality)",
         date: "2026-02-15",
         result: "PASS",
         target: "验证 128 维全息编码在稀疏投影下的几乎正交性。",
@@ -330,7 +330,7 @@ export const PHASES = [
         result: "PASS (+11.15%)",
         target: "优化推理路径，使激活流沿最小作用量路径滑行。",
         process: "引入 Geodesic Regularization 约束项，对比 baseline 与优化后的推理物理作用量。",
-        significance: "实现了‘不费力的推理’。丝滑度提升 11.15% 意味着计算冗余和能耗的显着降低。"
+        significance: "实现了‘不费力的推理’。丝滑度提升 11.15% 意味着计算冗余和能耗的显著降低。"
       },
       {
         name: "逻辑流形坍缩验证 (Logic Collapse)",

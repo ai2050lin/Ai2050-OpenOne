@@ -1434,6 +1434,8 @@ export default function App() {
     try { localStorage.setItem('fpMode', mode); } catch {}
   };
   const [fpModel, setFpModel] = useState('qwen3-4b');
+  const selectedFpModelConfig = MODEL_CONFIGS[fpModel] || MODEL_CONFIGS['qwen3-4b'];
+  const selectedFpLayerCount = selectedFpModelConfig?.layers || 36;
   const [fpSentence, setFpSentence] = useState('s1');
   const [fpInputText, setFpInputText] = useState('The cat sat on the mat');
   const fpColorFile = '/data/forward_pass_demo.json';
@@ -1442,7 +1444,6 @@ export default function App() {
   const [fpData, setFpData] = useState(null);  // forward pass数据
   const [fpSpeed, setFpSpeed] = useState(800);  // ms per layer
   const fpTimerRef = useRef(null);
-  const [useActivationColor, setUseActivationColor] = useState(true);
 
   // Layer 内部动画进度 (0~1 循环)
   const [layerAnimProgress, setLayerAnimProgress] = useState(0);
@@ -1473,7 +1474,7 @@ export default function App() {
     const nextPhase = fpSubPhase + 1;
     if (nextPhase >= FP_SUB_PHASES.length) {
       // 当前层所有子阶段完成，推进到下一层
-      const nLayers = fpData?.model_info?.n_layers || 36;
+      const nLayers = selectedFpLayerCount;
       if (fpCurrentLayer != null && fpCurrentLayer < nLayers - 1) {
         setFpCurrentLayer(prev => prev + 1);
         setFpSubPhase(0);
@@ -1484,7 +1485,7 @@ export default function App() {
     } else {
       setFpSubPhase(nextPhase);
     }
-  }, [fpSubPhase, fpCurrentLayer, fpData]);
+  }, [fpSubPhase, fpCurrentLayer, selectedFpLayerCount]);
 
   // 计算当前 forward-pass 子阶段的中心进度
   const getSubPhaseProgress = useCallback((phaseIdx) => {
@@ -1587,10 +1588,17 @@ export default function App() {
     fpTimerRef.current = null;
   }, []);
 
+  // Reset forward-pass state when switching model configs.
+  const handleFpModelChange = useCallback((modelKey) => {
+    setFpModel(modelKey);
+    resetForwardPass();
+    setLayerAnimProgress(0);
+  }, [resetForwardPass]);
+
   // Forward pass逐层推进定时器
   useEffect(() => {
     if (!fpPlaying || fpCurrentLayer == null) return;
-    const nLayers = fpData?.model_info?.n_layers || 36;
+    const nLayers = selectedFpLayerCount;
     fpTimerRef.current = setInterval(() => {
       setFpCurrentLayer(prev => {
         if (prev == null || prev >= nLayers - 1) {
@@ -1602,7 +1610,7 @@ export default function App() {
       });
     }, fpSpeed);
     return () => { if (fpTimerRef.current) clearInterval(fpTimerRef.current); };
-  }, [fpPlaying, fpCurrentLayer, fpData, fpSpeed]);
+  }, [fpPlaying, fpCurrentLayer, selectedFpLayerCount, fpSpeed]);
 
   const functionTypePanelMap = {
     main: { label: 'DNN', hasInfo: true, hasOperation: true },
@@ -1682,7 +1690,6 @@ export default function App() {
   const [showOperationHistory, setShowOperationHistory] = useState(false);
   const [showBlueprint, setShowBlueprint] = useState(false);
   const [blueprintInitialTab, setBlueprintInitialTab] = useState('roadmap');
-  const [showAIRnD, setShowAIRnD] = useState(false);
 
   useEffect(() => {
     if (!hasInfoPanelContent) {
@@ -2409,12 +2416,16 @@ export default function App() {
 
       <button
         onClick={() => {
-          setBlueprintInitialTab('roadmap');
-          setShowBlueprint(true);
+          if (showBlueprint && ['roadmap', 'language', 'analysis', 'progress', 'system'].includes(blueprintInitialTab)) {
+            setShowBlueprint(false);
+          } else {
+            setBlueprintInitialTab('roadmap');
+            setShowBlueprint(true);
+          }
         }}
         style={{
           position: 'absolute', top: 20, left: 66, zIndex: 101,
-          background: showBlueprint ? '#ffaa00' : 'rgba(20, 20, 25, 0.8)',
+          background: (showBlueprint && ['roadmap', 'language', 'analysis', 'progress', 'system'].includes(blueprintInitialTab)) ? '#ffaa00' : 'rgba(20, 20, 25, 0.8)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
           padding: '8px',
@@ -2431,12 +2442,16 @@ export default function App() {
 
       <button
         onClick={() => {
-          applyResearchMode('ai_loop');
-          setShowAIRnD(true);
+          if (showBlueprint && ['rnd_console', 'rnd_config'].includes(blueprintInitialTab)) {
+            setShowBlueprint(false);
+          } else {
+            setBlueprintInitialTab('rnd_console');
+            setShowBlueprint(true);
+          }
         }}
         style={{
           position: 'absolute', top: 20, left: 112, zIndex: 101,
-          background: showAIRnD ? '#7c3aed' : 'rgba(20, 20, 25, 0.8)',
+          background: (showBlueprint && ['rnd_console', 'rnd_config'].includes(blueprintInitialTab)) ? '#7c3aed' : 'rgba(20, 20, 25, 0.8)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
           padding: '8px',
@@ -2702,7 +2717,7 @@ export default function App() {
                     {/* 模型选择 */}
                     <div style={{ marginBottom: 8 }}>
                       <div style={{ fontSize: 11, color: '#7f95bb', marginBottom: 4 }}>模型</div>
-                      <select value={fpModel} onChange={(e) => setFpModel(e.target.value)}
+                      <select value={fpModel} onChange={(e) => handleFpModelChange(e.target.value)}
                         style={{
                           width: '100%', padding: '8px 10px',
                           background: 'rgba(79,172,254,0.08)', border: '1px solid rgba(79,172,254,0.25)',
@@ -2729,21 +2744,6 @@ export default function App() {
                           outline: 'none', fontFamily: 'inherit',
                         }}
                       />
-                      {/* 快捷语句 */}
-                      <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
-                        {['The cat sat on the mat', "She didn't like the movie", 'The students have been studying'].map((s, i) => (
-                          <button key={i} onClick={() => setFpInputText(s)}
-                            style={{
-                              padding: '3px 8px', borderRadius: 5, fontSize: 9,
-                              background: fpInputText === s ? 'rgba(79,172,254,0.2)' : 'rgba(255,255,255,0.04)',
-                              border: fpInputText === s ? '1px solid rgba(79,172,254,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                              color: fpInputText === s ? '#4facfe' : '#7f95bb', cursor: 'pointer',
-                            }}
-                          >
-                            {s.length > 20 ? s.slice(0, 18) + '...' : s}
-                          </button>
-                        ))}
-                      </div>
                     </div>
 
                     {/* Forward Pass 进度 */}
@@ -2751,11 +2751,11 @@ export default function App() {
                       <div style={{ marginTop: 10 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
                           <span style={{ color: '#4facfe', fontWeight: 700 }}>L{fpCurrentLayer}</span>
-                          <span style={{ color: '#7f95bb' }}>{((fpCurrentLayer + 1) / (fpData?.model_info?.n_layers || 36) * 100).toFixed(0)}%</span>
+                          <span style={{ color: '#7f95bb' }}>{((fpCurrentLayer + 1) / selectedFpLayerCount * 100).toFixed(0)}%</span>
                         </div>
                         <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{
-                            width: `${((fpCurrentLayer + 1) / (fpData?.model_info?.n_layers || 36)) * 100}%`,
+                            width: `${((fpCurrentLayer + 1) / selectedFpLayerCount) * 100}%`,
                             height: '100%', background: 'linear-gradient(90deg, #4facfe, #00f2fe)', borderRadius: 3,
                             transition: 'width 0.3s',
                           }} />
@@ -2780,50 +2780,6 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* 着色模式 */}
-                    <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 11, color: '#7f95bb' }}>着色:</span>
-                      <button onClick={() => setUseActivationColor(true)}
-                        style={{
-                          padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                          background: useActivationColor ? 'rgba(79,172,254,0.15)' : 'rgba(255,255,255,0.04)',
-                          border: useActivationColor ? '1px solid rgba(79,172,254,0.4)' : '1px solid rgba(255,255,255,0.1)',
-                          color: useActivationColor ? '#4facfe' : '#7f95bb', cursor: 'pointer',
-                        }}>
-                        🔥 激活值
-                      </button>
-                      <button onClick={() => setUseActivationColor(false)}
-                        style={{
-                          padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                          background: !useActivationColor ? 'rgba(168,85,247,0.15)' : 'rgba(255,255,255,0.04)',
-                          border: !useActivationColor ? '1px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.1)',
-                          color: !useActivationColor ? '#a855f7' : '#7f95bb', cursor: 'pointer',
-                        }}>
-                        🧬 子空间
-                      </button>
-                    </div>
-
-                    {/* 激活值颜色图例 */}
-                    {useActivationColor && (
-                      <div style={{ marginTop: 8, display: 'flex', gap: 8, fontSize: 9, color: '#7f95bb' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#ff4444', display: 'inline-block' }} />
-                          &gt;0.8
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#ffcc00', display: 'inline-block' }} />
-                          &gt;0.5
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#22c55e', display: 'inline-block' }} />
-                          &gt;0.3
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, background: '#3b82f6', display: 'inline-block' }} />
-                          &lt;0.3
-                        </div>
-                      </div>
-                    )}
                   </div>
                   )}
 
@@ -2836,7 +2792,7 @@ export default function App() {
                       <Brain size={14} color="#a855f7" />
                       模型
                     </div>
-                    <select value={fpModel} onChange={(e) => setFpModel(e.target.value)}
+                    <select value={fpModel} onChange={(e) => handleFpModelChange(e.target.value)}
                       style={{
                         width: '100%', padding: '8px 10px',
                         background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)',
@@ -4277,6 +4233,7 @@ export default function App() {
           {isAppleMainView && !isEncoding3DTab ? (
             <>
               <AppleNeuronSceneContent
+                key={`apple-neuron-${fpModel}`}
                 nodes={appleNeuronWorkspace.nodes}
                 links={appleNeuronWorkspace.links}
                 selected={appleNeuronWorkspace.selected}
@@ -4576,23 +4533,15 @@ export default function App() {
         </SimplePanel>
       )}
 
-      {/* Project Genesis Blueprint Overlay */}
+      {/* Project Genesis Blueprint Sidebar */}
       {showBlueprint && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 3000 }}>
-          <HLAIBlueprint
-            initialTab={blueprintInitialTab}
-            onClose={() => {
-              setShowBlueprint(false);
-              setBlueprintInitialTab('roadmap');
-            }}
-          />
-        </div>
-      )}
-
-      {/* AI R&D Overlay */}
-      {showAIRnD && (
-        <AIRnDOverlay
-          onClose={() => setShowAIRnD(false)}
+        <HLAIBlueprint
+          mode="sidebar"
+          initialTab={blueprintInitialTab}
+          onClose={() => {
+            setShowBlueprint(false);
+            setBlueprintInitialTab('roadmap');
+          }}
         />
       )}
 

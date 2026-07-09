@@ -1,11 +1,15 @@
-﻿import { Brain, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Brain, X, Activity, Target, Search, Play, Zap, CheckCircle } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { pollRuntimeWithFallback } from './utils/runtimeClient';
+import { beginBackendRequest, clearBackendUnavailable, isFetchNetworkError, markBackendUnavailable } from './utils/backendAvailability';
 import { ProjectRoadmapTab } from './blueprint/ProjectRoadmapTab';
 import { LanguageAnalysisTab } from './blueprint/LanguageAnalysisTab';
 import { DeepAnalysisTab } from './blueprint/DeepAnalysisTab';
 import { ResearchProgressTab } from './blueprint/ResearchProgressTab';
 import { SystemStatusTab } from './blueprint/SystemStatusTab';
+import { AIRnDConsoleTab } from './AIRnD/AIRnDConsoleTab';
+import { AIRnDConfigTab } from './AIRnD/AIRnDConfigTab';
+import { RESEARCH_PHASES } from './AIRnD/aiRnDConfig';
 import {
   PHASES,
   IMPROVEMENTS,
@@ -16,11 +20,196 @@ import {
 } from './blueprint/blueprintConfig';
 import { API_BASE, mapLegacyConsciousField, mapRuntimeConsciousField } from './blueprint/blueprintRuntimeUtils';
 
-const BLUEPRINT_TABS = new Set(['roadmap', 'language', 'analysis', 'progress', 'system']);
+const BLUEPRINT_TABS = new Set(['roadmap', 'language', 'analysis', 'progress', 'system', 'rnd_console', 'rnd_config']);
 
-export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
+const PHASE_ICONS = {
+  analyze: Search,
+  plan: Target,
+  generate: Zap,
+  execute: Play,
+  summarize: CheckCircle,
+};
+
+export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay' }) => {
   const [activeTab, setActiveTab] = useState(initialTab); // roadmap, progress, system
+  const [lastTheoryTab, setLastTheoryTab] = useState('roadmap');
   const [selectedRouteId, setSelectedRouteId] = useState('fiber_bundle');
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    if (['roadmap', 'language', 'analysis', 'progress', 'system'].includes(tabId)) {
+      setLastTheoryTab(tabId);
+    }
+  };
+
+  // AI Auto R&D states and lifecycle
+  const [sessionStatus, setSessionStatus] = useState('idle'); // idle | running | paused | stopped | waiting_step
+  const [sessionMode, setSessionMode] = useState('auto'); // auto | manual
+  const [currentPhase, setCurrentPhase] = useState(null);
+  const [round, setRound] = useState(0);
+  const [logs, setLogs] = useState([]);
+  const [findings, setFindings] = useState([]);
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [executionResult, setExecutionResult] = useState(null);
+  const [researchState, setResearchState] = useState(null);
+  const [rndError, setRndError] = useState(null);
+  const eventSourceRef = useRef(null);
+
+  const fetchSessionStatus = useCallback(async () => {
+    if (!beginBackendRequest()) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/status`);
+      if (res.ok) {
+        clearBackendUnavailable();
+        const data = await res.json();
+        setSessionStatus(data.status || 'idle');
+        setSessionMode(data.mode || 'auto');
+        setCurrentPhase(data.current_phase || null);
+        setRound(data.round || 0);
+        setResearchState(data.research_state || null);
+      }
+    } catch (e) {
+      if (isFetchNetworkError(e)) markBackendUnavailable();
+    }
+  }, []);
+
+  const handleEvent = useCallback((data) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = { ...data, timestamp, id: Date.now() + Math.random() };
+    setLogs(prev => [...prev.slice(-500), logEntry]);
+
+    if (data.type === 'phase_change') {
+      setCurrentPhase(data.phase);
+    } else if (data.type === 'round_change') {
+      setRound(data.round);
+    } else if (data.type === 'status_change') {
+      setSessionStatus(data.status);
+    } else if (data.type === 'mode_change') {
+      setSessionMode(data.mode);
+    } else if (data.type === 'finding') {
+      setFindings(prev => [...prev.slice(-200), data.finding]);
+    } else if (data.type === 'code_generated') {
+      setGeneratedCode(data.code || '');
+    } else if (data.type === 'execution_result') {
+      setExecutionResult(data.result);
+    } else if (data.type === 'error') {
+      setRndError(data.message);
+    }
+  }, []);
+
+  const connectEventStream = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+    const es = new EventSource(`${API_BASE}/api/ai-rnd/session/events`);
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        handleEvent(data);
+      } catch (e) {
+        console.warn('Failed to parse SSE event:', e);
+      }
+    };
+    es.onerror = () => {
+      es.close();
+      eventSourceRef.current = null;
+    };
+    eventSourceRef.current = es;
+  }, [handleEvent]);
+
+  // Fetch initial session status and auto-connect SSE if running
+  useEffect(() => {
+    fetchSessionStatus().then(() => {
+      if (!beginBackendRequest()) return;
+      fetch(`${API_BASE}/api/ai-rnd/session/status`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.status === 'running') {
+            connectEventStream();
+          }
+        })
+        .catch((e) => {
+          if (isFetchNetworkError(e)) markBackendUnavailable();
+        });
+    });
+    
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, [fetchSessionStatus, connectEventStream]);
+
+  const startSession = useCallback(async (objective = '') => {
+    try {
+      setRndError(null);
+      const trimmedObjective = String(objective || '').trim();
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/start`, {
+        method: 'POST',
+        headers: trimmedObjective ? { 'Content-Type': 'application/json' } : undefined,
+        body: trimmedObjective ? JSON.stringify({ objective: trimmedObjective }) : undefined,
+      });
+      if (res.ok) {
+        setSessionStatus('running');
+        connectEventStream();
+      } else {
+        const err = await res.json();
+        setRndError(err.detail || '启动失败');
+      }
+    } catch (e) {
+      setRndError(`连接后端失败: ${e.message}`);
+    }
+  }, [connectEventStream]);
+
+  const pauseSession = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE}/api/ai-rnd/session/pause`, { method: 'POST' });
+      setSessionStatus('paused');
+    } catch (e) { setRndError(e.message); }
+  }, []);
+
+  const resumeSession = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE}/api/ai-rnd/session/start`, { method: 'POST' });
+      setSessionStatus('running');
+    } catch (e) { setRndError(e.message); }
+  }, []);
+
+  const stopSession = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE}/api/ai-rnd/session/stop`, { method: 'POST' });
+      setSessionStatus('stopped');
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    } catch (e) { setRndError(e.message); }
+  }, []);
+
+  const toggleMode = useCallback(async () => {
+    const newMode = sessionMode === 'auto' ? 'manual' : 'auto';
+    try {
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/mode`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: newMode }),
+      });
+      if (res.ok) {
+        setSessionMode(newMode);
+      }
+    } catch (e) { setRndError(e.message); }
+  }, [sessionMode]);
+
+  const stepNext = useCallback(async () => {
+    try {
+      setRndError(null);
+      const res = await fetch(`${API_BASE}/api/ai-rnd/session/step`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json();
+        setRndError(err.detail || 'Step failed');
+      }
+    } catch (e) { setRndError(e.message); }
+  }, []);
   const [timelineRoutes, setTimelineRoutes] = useState([]);
   const [expandedFormulaIdx, setExpandedFormulaIdx] = useState(null);
   const [expandedParam, setExpandedParam] = useState(null);
@@ -35,22 +224,30 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
   const runtimeStepRef = useRef(0);
 
   useEffect(() => {
-    setActiveTab(BLUEPRINT_TABS.has(initialTab) ? initialTab : 'roadmap');
+    const targetTab = BLUEPRINT_TABS.has(initialTab) ? initialTab : 'roadmap';
+    setActiveTab(targetTab);
+    if (['roadmap', 'language', 'analysis', 'progress', 'system'].includes(targetTab)) {
+      setLastTheoryTab(targetTab);
+    }
   }, [initialTab]);
 
   // Real-time Consciousness Polling
   useEffect(() => {
     let mounted = true;
+    let retryAfter = 0;
 
     const fetchLegacyConsciousField = async () => {
+      if (!beginBackendRequest()) throw new Error('backend unavailable cooldown');
       const res = await fetch(`${API_BASE}/nfb_ra/unified_conscious_field`);
       if (!res.ok) throw new Error(`legacy conscious field failed: ${res.status}`);
+      clearBackendUnavailable();
       const data = await res.json();
       if (data?.status !== 'success') throw new Error('legacy conscious field unavailable');
       return mapLegacyConsciousField(data);
     };
 
     const pollConsciousField = async () => {
+      if (Date.now() < retryAfter) return;
       const stepId = runtimeStepRef.current++;
       try {
         const result = await pollRuntimeWithFallback({
@@ -66,11 +263,13 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
           eventLimit: 20,
         });
         if (!mounted) return;
+        retryAfter = 0;
         setConsciousField({ ...result.data, source: result.source });
-      } catch (err) {
+      } catch (error) {
         if (!mounted) return;
+        if (isFetchNetworkError(error)) markBackendUnavailable();
+        retryAfter = Date.now() + 10000;
         setConsciousField(null);
-        console.warn('Unified Conscious Field unreachable.', err);
       }
     };
 
@@ -86,14 +285,17 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
     let mounted = true;
 
     const fetchRuntimeStatusSummary = async () => {
+      if (!beginBackendRequest()) return;
       try {
         const res = await fetch(`${API_BASE}/api/system_status/runtime_summary`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        clearBackendUnavailable();
         const payload = await res.json();
         if (!mounted || payload?.status !== 'success') return;
         setRuntimeStatusSummary(payload);
-      } catch {
+      } catch (error) {
         if (!mounted) return;
+        if (isFetchNetworkError(error)) markBackendUnavailable();
         setRuntimeStatusSummary(null);
       }
     };
@@ -109,14 +311,17 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
   useEffect(() => {
     let mounted = true;
     const fetchTimelineRoutes = async () => {
+      if (!beginBackendRequest()) return;
       try {
         const res = await fetch(`${API_BASE}/api/v1/experiments/timeline?limit=120`);
         if (!res.ok) return;
+        clearBackendUnavailable();
         const payload = await res.json();
         if (!mounted || payload?.status !== 'success') return;
         const routes = Array.isArray(payload?.timeline?.routes) ? payload.timeline.routes : [];
         setTimelineRoutes(routes);
-      } catch {
+      } catch (error) {
+        if (isFetchNetworkError(error)) markBackendUnavailable();
         // Keep local defaults when runtime API is unavailable.
       }
     };
@@ -129,9 +334,11 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
   useEffect(() => {
     let mounted = true;
     const fetchMultimodalSummary = async () => {
+      if (!beginBackendRequest()) return;
       try {
         const res = await fetch(`${API_BASE}/nfb/multimodal/summary`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        clearBackendUnavailable();
         const payload = await res.json();
         if (!mounted) return;
         if (payload?.status !== 'success') throw new Error('invalid payload');
@@ -139,6 +346,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
         setMultimodalError(null);
       } catch (err) {
         if (!mounted) return;
+        if (isFetchNetworkError(err)) markBackendUnavailable();
         setMultimodalError(err?.message || 'multimodal summary unavailable');
       }
     };
@@ -286,20 +494,20 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
             name: '原型阶段',
             status: 'done',
             featurePoints: [
-              '完成 FiberNet 核心逻辑层与底流形建。',
-              '打。NFB 几何编码与基础推理链路',
-              '建立最小可用结构分析工具链（Logit Lens/TDA。',
+              '完成 FiberNet 核心逻辑层与底流形构建',
+              '打通 NFB 几何编码与基础推理链路',
+              '建立最小可用结构分析工具链（Logit Lens/TDA等）',
             ],
             tests: [
               {
-                name: 'Z113 閫昏緫闂寘楠岃瘉',
+                name: 'Z113 逻辑闭包验证',
                 params: 'layers=12, d=4, D=128, optimizer=adamw, lr=1e-3',
                 dataset: 'Z113 模运算合成数据集',
-                result: '准确。99.4%，可恢复稳定环面结构',
+                result: '准确率 99.4%，可恢复稳定环面结构',
                 summary: '证明原型具备几何逻辑骨架，不是纯统计拟合。',
               },
               {
-                name: '基础拓扑可解释性测。',
+                name: '基础拓扑可解释性测试',
                 params: 'topk_heads=8, tda_threshold=0.1',
                 dataset: '内部语义提示词基准集 v1',
                 result: '关键层拓扑特征可稳定复现',
@@ -416,14 +624,14 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
         subtitle: '实验路线',
         routeDescription: '该路线正在构建中，描述信息待补充。',
         engineeringProcessDescription: '计算流程说明待补充。',
-        theoryTitle: '寰呰ˉ鍏呯悊璁?',
+        theoryTitle: '待补充理论',
         theorySummary: '该路线尚未配置详细理论描述。',
         theoryBullets: [],
         theoryFormulas: [],
         engineeringItems: [],
         nfbtProcessSteps: [],
         nfbtOptimization: '',
-        milestoneTitle: '里程碑目标（。AGI 终点。',
+        milestoneTitle: '里程碑目标（AGI 终点）',
         milestoneGoals: [],
         milestoneMetrics: {},
         milestoneStages: [],
@@ -608,7 +816,16 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
     return [...baseStages, routeValidationStage];
   }, [selectedRoute, selectedRouteId, activeSystemProfile]);
   return (
-    <div style={{
+    <div style={mode === 'sidebar' ? {
+      position: 'absolute', top: '20px', right: '20px', bottom: '20px', width: '500px',
+      backgroundColor: 'rgba(10, 10, 18, 0.95)', backdropFilter: 'blur(20px)', zIndex: 102,
+      display: 'flex', flexDirection: 'column', color: '#fff',
+      fontFamily: '"SF Mono", "Roboto Mono", monospace', overflow: 'hidden',
+      borderRadius: '12px',
+      border: '1px solid rgba(0, 210, 255, 0.2)',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+      animation: 'slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+    } : {
       position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
       backgroundColor: 'rgba(5, 5, 10, 0.98)', backdropFilter: 'blur(30px)', zIndex: 2000,
       display: 'flex', flexDirection: 'column', color: '#fff',
@@ -621,34 +838,38 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
         @keyframes brainRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes brainRotateReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes synapsePulse { 0%, 100% { opacity: 0.3; scale: 0.8; } 50% { opacity: 1; scale: 1.2; } }
+        @keyframes slideInRight { from { transform: translateX(calc(100% + 20px)); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
       `}</style>
 
       {/* Top Header / Navigation */}
-      <div style={{
+      <div style={mode === 'sidebar' ? {
+        padding: '0 16px', height: '60px', display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)',
+        flexShrink: 0
+      } : {
         padding: '0 40px', height: '80px', display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)'
+        alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)',
+        flexShrink: 0
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '50px', height: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Brain size={28} color="#00d2ff" />
-            <span style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px' }}>理论分析</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: mode === 'sidebar' ? '12px' : '50px', height: '100%', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <Brain size={mode === 'sidebar' ? 20 : 28} color="#00d2ff" />
+            <span style={{ fontSize: mode === 'sidebar' ? '14px' : '18px', fontWeight: 'bold', letterSpacing: '1px' }}>理论分析</span>
           </div>
 
-          <nav style={{ display: 'flex', gap: '10px', height: '100%', overflowX: 'auto', scrollbarWidth: 'thin' }}>
+          <nav style={{ display: 'flex', gap: '4px', height: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {[
-              { id: 'roadmap', label: '项目大纲' },
-              { id: 'language', label: '语言分析' },
-              { id: 'analysis', label: '智能理论' },
-              { id: 'progress', label: '模型研发' },
-              { id: 'system', label: '系统状态' },
+              { id: 'rnd_console', label: '自动研发', onClick: () => handleTabChange('rnd_console'), isActive: ['rnd_console', 'rnd_config'].includes(activeTab) },
+              { id: 'theory_root', label: '理论分析', onClick: () => handleTabChange(lastTheoryTab), isActive: ['roadmap', 'language', 'analysis', 'progress', 'system'].includes(activeTab) },
             ].map(t => (
               <button
                 key={t.id}
-                onClick={() => setActiveTab(t.id)}
+                onClick={t.onClick}
                 style={{
-                  background: 'transparent', border: 'none', color: activeTab === t.id ? '#00d2ff' : '#666',
-                  fontSize: '15px', fontWeight: 'bold', cursor: 'pointer', padding: '0 25px',
-                  borderBottom: activeTab === t.id ? '3px solid #00d2ff' : '3px solid transparent',
+                  background: 'transparent', border: 'none', color: t.isActive ? '#00d2ff' : '#666',
+                  fontSize: mode === 'sidebar' ? '12px' : '15px', fontWeight: 'bold', cursor: 'pointer',
+                  padding: mode === 'sidebar' ? '0 10px' : '0 25px', flexShrink: 0,
+                  borderBottom: t.isActive ? '3px solid #00d2ff' : '3px solid transparent',
                   transition: 'all 0.3s', height: '100%'
                 }}
               >
@@ -658,21 +879,109 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
           </nav>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <button onClick={onClose} style={{
             background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff', cursor: 'pointer',
-            width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
+            width: mode === 'sidebar' ? '30px' : '40px', height: mode === 'sidebar' ? '30px' : '40px',
+            borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
           }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,100,100,0.2)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
-            <X size={22} />
+            <X size={mode === 'sidebar' ? 16 : 22} />
           </button>
         </div>
       </div>
+
+      {/* Secondary Sub-Navbar for Theory */}
+      {['roadmap', 'language', 'analysis', 'progress', 'system'].includes(activeTab) && (
+        <div style={{
+          display: 'flex', gap: '6px', padding: '10px 16px',
+          background: 'rgba(0,0,0,0.15)', borderBottom: '1px solid rgba(255,255,255,0.06)',
+          flexShrink: 0, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none'
+        }}>
+          {[
+            { id: 'roadmap', label: '项目大纲' },
+            { id: 'language', label: '语言分析' },
+            { id: 'analysis', label: '智能理论' },
+            { id: 'progress', label: '模型研发' },
+            { id: 'system', label: '系统状态' },
+          ].map(t => (
+            <button
+              key={t.id}
+              onClick={() => handleTabChange(t.id)}
+              style={{
+                background: activeTab === t.id ? 'rgba(0, 210, 255, 0.12)' : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${activeTab === t.id ? 'rgba(0, 210, 255, 0.25)' : 'rgba(255,255,255,0.05)'}`,
+                borderRadius: '6px',
+                color: activeTab === t.id ? '#00d2ff' : '#999',
+                fontSize: '11px', fontWeight: 'bold', cursor: 'pointer',
+                padding: '6px 12px', flexShrink: 0,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => {
+                if (activeTab !== t.id) {
+                  e.currentTarget.style.color = '#fff';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeTab !== t.id) {
+                  e.currentTarget.style.color = '#999';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                }
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Secondary Sub-Navbar for AI Auto R&D */}
+      {['rnd_console', 'rnd_config'].includes(activeTab) && (
+        <div style={{
+          display: 'flex', gap: '6px', padding: '10px 16px',
+          background: 'rgba(0,0,0,0.15)', borderBottom: '1px solid rgba(167,139,250,0.12)',
+          flexShrink: 0, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none'
+        }}>
+          {[
+            { id: 'rnd_console', label: '研发控制台' },
+            { id: 'rnd_config', label: '研发配置' },
+          ].map(t => (
+            <button
+              key={t.id}
+              onClick={() => handleTabChange(t.id)}
+              style={{
+                background: activeTab === t.id ? 'rgba(167, 139, 250, 0.14)' : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${activeTab === t.id ? 'rgba(167, 139, 250, 0.35)' : 'rgba(255,255,255,0.05)'}`,
+                borderRadius: '6px',
+                color: activeTab === t.id ? '#c4b5fd' : '#999',
+                fontSize: '11px', fontWeight: 'bold', cursor: 'pointer',
+                padding: '6px 12px', flexShrink: 0,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => {
+                if (activeTab !== t.id) {
+                  e.currentTarget.style.color = '#fff';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeTab !== t.id) {
+                  e.currentTarget.style.color = '#999';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                }
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
         {/* Sub-Sidebar for Research Progress */}
-        {activeTab === 'progress' && (
+        {activeTab === 'progress' && mode !== 'sidebar' && (
           <div style={{
             width: '280px', borderRight: '1px solid rgba(255,255,255,0.1)',
             padding: '30px 20px', background: 'rgba(0,0,0,0.2)', overflowY: 'auto',
@@ -734,7 +1043,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
 
         {/* Content Details */}
         <div style={{
-          flex: 1, padding: '50px 80px', overflowY: 'auto',
+          flex: 1, padding: mode === 'sidebar' ? '20px 24px' : '50px 80px', overflowY: 'auto',
           background: 'radial-gradient(circle at 50% 10%, rgba(0, 100, 200, 0.05) 0%, transparent 70%)'
         }}>
 
@@ -773,22 +1082,51 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
 
           {/* TAB: Research Progress (Route-Centric Command) */}
           {activeTab === 'progress' && selectedRoute && (
-            <ResearchProgressTab
-              selectedRoute={selectedRoute}
-              expandedFormulaIdx={expandedFormulaIdx}
-              setExpandedFormulaIdx={setExpandedFormulaIdx}
-              dnnAnalysisPlan={DNN_ANALYSIS_PLAN}
-              expandedEngPhase={expandedEngPhase}
-              setExpandedEngPhase={setExpandedEngPhase}
-              mergedMilestoneStages={mergedMilestoneStages}
-              multimodalView={multimodalView}
-              setMultimodalView={setMultimodalView}
-              multimodalError={multimodalError}
-              selectedMultimodalReport={selectedMultimodalReport}
-              selectedMultimodalData={selectedMultimodalData}
-              selectedMultimodalLatest={selectedMultimodalLatest}
-              multimodalMetricRows={multimodalMetricRows}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
+              {mode === 'sidebar' && (
+                <div style={{ marginBottom: '8px', flexShrink: 0 }}>
+                  <label style={{ fontSize: '11px', color: '#888', display: 'block', marginBottom: '6px', fontWeight: 'bold', letterSpacing: '1px' }}>选择研究路线 (Research Route)</label>
+                  <select
+                    value={selectedRouteId}
+                    onChange={(e) => setSelectedRouteId(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      background: 'rgba(0,0,0,0.6)',
+                      border: '1px solid rgba(0, 210, 255, 0.3)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '13px',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit'
+                    }}
+                  >
+                    {routeList.map((r) => (
+                      <option key={r.id} value={r.id} style={{ background: '#111' }}>
+                        {r.title} ({r.stats.routeProgress}%)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <ResearchProgressTab
+                selectedRoute={selectedRoute}
+                expandedFormulaIdx={expandedFormulaIdx}
+                setExpandedFormulaIdx={setExpandedFormulaIdx}
+                dnnAnalysisPlan={DNN_ANALYSIS_PLAN}
+                expandedEngPhase={expandedEngPhase}
+                setExpandedEngPhase={setExpandedEngPhase}
+                mergedMilestoneStages={mergedMilestoneStages}
+                multimodalView={multimodalView}
+                setMultimodalView={setMultimodalView}
+                multimodalError={multimodalError}
+                selectedMultimodalReport={selectedMultimodalReport}
+                selectedMultimodalData={selectedMultimodalData}
+                selectedMultimodalLatest={selectedMultimodalLatest}
+                multimodalMetricRows={multimodalMetricRows}
+              />
+            </div>
           )}
 
           {/* TAB: AGI System Status */}
@@ -806,6 +1144,90 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap' }) => {
               expandedParam={expandedParam}
               setExpandedParam={setExpandedParam}
             />
+          )}
+
+          {/* TAB: AI Auto R&D Console */}
+          {activeTab === 'rnd_console' && (
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
+              {/* Phase Progress Bar */}
+              {sessionStatus === 'running' && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 4, padding: '12px 16px',
+                  background: 'rgba(10, 10, 16, 0.4)', borderBottom: '1px solid rgba(167, 139, 250, 0.15)',
+                  borderRadius: '8px', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none',
+                  width: '100%', boxSizing: 'border-box'
+                }}>
+                  {RESEARCH_PHASES.map((phase, i) => {
+                    const isCurrent = currentPhase === phase.id;
+                    const Icon = PHASE_ICONS[phase.id] || Search;
+                    return (
+                      <div key={phase.id} style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                        <div style={{
+                          padding: '4px 8px', borderRadius: '16px', fontSize: '11px', fontWeight: 'bold',
+                          background: isCurrent ? `${phase.color}20` : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${isCurrent ? phase.color : 'rgba(255,255,255,0.08)'}`,
+                          color: isCurrent ? phase.color : '#888',
+                          transition: 'all 0.3s',
+                          boxShadow: isCurrent ? `0 0 12px ${phase.color}40` : 'none',
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                        }}>
+                          <Icon size={12} style={{ filter: isCurrent ? `drop-shadow(0 0 3px ${phase.color})` : 'none' }} />
+                          <span>{phase.label}</span>
+                        </div>
+                        {i < RESEARCH_PHASES.length - 1 && (
+                          <div style={{ 
+                            width: 12, height: 2, 
+                            background: isCurrent ? `linear-gradient(90deg, ${phase.color}, rgba(255,255,255,0.1))` : 'rgba(255,255,255,0.08)',
+                            transition: 'all 0.3s',
+                            flexShrink: 0
+                          }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div style={{ marginLeft: 'auto', fontSize: '11px', color: '#9ca3af', fontFamily: 'monospace', fontWeight: 'bold', flexShrink: 0, paddingLeft: 8 }}>
+                    R{round}
+                  </div>
+                </div>
+              )}
+
+              {/* R&D Error banner */}
+              {rndError && (
+                <div style={{
+                  padding: '8px 16px', background: 'rgba(255,50,50,0.1)', borderBottom: '1px solid rgba(255,50,50,0.3)',
+                  borderRadius: '6px', color: '#ff6666', fontSize: '13px',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <span>{rndError}</span>
+                  <button onClick={() => setRndError(null)} style={{ background: 'none', border: 'none', color: '#ff6666', cursor: 'pointer' }}>
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              <AIRnDConsoleTab
+                sessionStatus={sessionStatus}
+                sessionMode={sessionMode}
+                currentPhase={currentPhase}
+                round={round}
+                logs={logs}
+                generatedCode={generatedCode}
+                executionResult={executionResult}
+                findings={findings}
+                onStart={startSession}
+                onPause={pauseSession}
+                onResume={resumeSession}
+                onStop={stopSession}
+                onToggleMode={toggleMode}
+                onStep={stepNext}
+                onClear={() => setLogs([])}
+              />
+            </div>
+          )}
+
+          {/* TAB: AI Auto R&D Config */}
+          {activeTab === 'rnd_config' && (
+            <AIRnDConfigTab />
           )}
 
         </div>

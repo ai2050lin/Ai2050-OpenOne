@@ -1,0 +1,40 @@
+{
+  "master_model": {
+    "name": "global.anthropic.claude-opus-4-8",
+    "model_type": "master",
+    "api_type": "nownextai",
+    "api_base": "https://nownextai.com/v1/model",
+    "api_key": "eyJ1c2VyX2lkIjo3NzcsImV4cGlyZXMiOjE5MzkwMjg0NjAsImlzc3VlZF9hdCI6MTc4MzUwODQ2MCwiZXh0cmEiOm51bGx9.DWqrYAZ1Z2V4sARQToUu7422uloNtidgT9WvusIvvp4=",
+    "model_id": "global.anthropic.claude-opus-4-8",
+    "analysis_prompt": "你是一位深度神经网络逆向工程专家。请分析以下研究数据，找出关键模式、异常和突破点。\n\n当前研究轮次: {round}\n累积研究发现:\n{findings}\n\n最新测试结果:\n{test_results}\n\n请从以下角度分析:\n1. 数据中是否出现了新的模式或规律？\n2. 之前的假设是否被验证或推翻？\n3. 当前最大的瓶颈是什么？\n4. 有哪些异常值需要特别关注？\n\n请给出简洁、有洞察力的分析。",
+    "planning_prompt": "你是AI研究主管，负责制定下一步研究方案。\n\n当前研究轮次: {round}\n研究上下文:\n{research_context}\n\n各分析师的发现:\n{analyst_reports}\n\n已验证的结论:\n{verified_conclusions}\n\n当前瓶颈:\n{bottlenecks}\n\n请制定下一步研究方案，包括:\n1. 需要验证的核心假设\n2. 具体实验设计\n3. 预期结果和判据\n4. 优先级排序\n\n方案要具体、可执行，能直接转化为Python测试代码。",
+    "code_gen_prompt": "你是一位精通Transformer模型逆向工程的Python开发者。请根据研究方案生成测试代码。\n\n研究方案:\n{plan}\n\n可用的本地模型和工具:\n- 模型: Qwen3-4B (4B参数, bf16), GLM4-9B (8bit量化), DeepSeek-R1-7B (8bit量化)\n- 框架: PyTorch, TransformerLens, HuggingFace Transformers\n- GPU: RTX 5080 16GB VRAM\n\n已有工具函数 (tests/glm5/model_utils.py):\n- load_model_bf16(model_name) - 加载模型\n- get_layers(model) - 获取transformer层\n- get_W_U(model, model_name) - 获取unembedding矩阵\n- get_model_info(model, model_name) - 获取模型信息\n- release_model(model) - 释放模型\n- MODEL_CONFIGS - 模型路径配置\n\n代码要求:\n1. 输出文件保存到 results/glm5/ 目录\n2. 临时文件保存到 tests/glm5_temp/ 目录\n3. 使用 if __name__ == \"__main__\" 入口\n4. 包含计时和内存监控\n5. 测试完一个模型再测试下一个，避免GPU OOM\n6. 8bit量化加载大模型(GLM4/DS7B)\n\n请只输出Python代码，不要解释。",
+    "summary_prompt": "你是研究总结专家。请总结本轮研究的关键发现。\n\n研究轮次: {round}\n执行结果:\n{execution_results}\n\n关键数据:\n{key_data}\n\n请总结:\n1. 本轮最重要的发现（1-3条）\n2. 被验证的结论\n3. 被推翻的假设\n4. 新出现的疑问\n5. 对下一轮研究的建议\n\n用简洁的学术语言总结。"
+  },
+  "analyst_models": [
+    {
+      "name": "DeepSeek-Chat",
+      "model_type": "analyst",
+      "api_type": "deepseek",
+      "api_base": "https://api.deepseek.com/v1",
+      "api_key": "sk-361deec53eea41a9bbb4bc9187dedaa6",
+      "model_id": "deepseek-chat",
+      "analysis_prompt": "你是一位擅长数学分析的AI研究助手。请从数学结构的角度分析以下实验数据。\n\n当前研究轮次: {round}\n研究发现:\n{findings}\n\n测试结果:\n{test_results}\n\n请重点关注:\n1. 数据中是否隐含某种代数或几何结构？\n2. 不同模型的结果是否有共同的数学模式？\n3. 是否可以用更简洁的数学语言描述观察到的现象？\n4. 结果是否与已知理论（如流形假设、正交分解）一致？\n\n请给出数学直觉和初步形式化。",
+      "planning_prompt": "",
+      "code_gen_prompt": "",
+      "summary_prompt": ""
+    },
+    {
+      "name": "claude-opus-4-8",
+      "model_type": "analyst",
+      "api_type": "nownextai",
+      "api_base": "https://nownextai.com/v1/model",
+      "api_key": "eyJ1c2VyX2lkIjo3NzcsImV4cGlyZXMiOjE5MzkwMjg0NjAsImlzc3VlZF9hdCI6MTc4MzUwODQ2MCwiZXh0cmEiOm51bGx9.DWqrYAZ1Z2V4sARQToUu7422uloNtidgT9WvusIvvp4=",
+      "model_id": "global.anthropic.claude-opus-4-8",
+      "analysis_prompt": "你是一位擅长统计分析和模式识别的AI研究助手。请从实证角度分析以下实验数据。\n\n当前研究轮次: {round}\n研究发现:\n{findings}\n\n测试结果:\n{test_results}\n\n请重点关注:\n1. 数据中是否有统计显著的规律？\n2. 异常值是否暗示了某种被忽略的机制？\n3. 跨模型一致性是否足够强以支持通用结论？\n4. 样本量是否足够？是否需要更大规模的验证？\n\n请给出谨慎、有统计支撑的分析。",
+      "planning_prompt": "",
+      "code_gen_prompt": "",
+      "summary_prompt": ""
+    }
+  ]
+}
