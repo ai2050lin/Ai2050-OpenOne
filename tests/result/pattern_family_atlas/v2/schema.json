@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0.0",
+  "primary_table": "path_signature_rows.jsonl",
+  "tables": {
+    "path_signature_rows": "one row per model-case physical path signature",
+    "atlas_scores": "family x model score matrix",
+    "case_details": "detail json loaded on demand by client",
+    "phase274_gap_rows": "one row per v2 signature gap with objective missing dimensions and priority",
+    "phase274_selected_batch_rows": "first batch queue for physical path and low-side-effect causal fill",
+    "phase274_coverage_matrix_rows": "family x model gap pressure and progress table",
+    "phase275_component_summary_rows": "selected Phase274 queue component path fills",
+    "phase275_causal_fill_rows": "low-side-effect and diagnostic MLP causal audit rows",
+    "phase275_rollout_fill_rows": "short rollout comparison rows for side-effect checks",
+    "phase276_recalibrated_gap_rows": "Phase274 gaps with Phase275 fill resolution and remaining dimensions",
+    "phase276_next_batch_rows": "next queue after Phase275 physical-path fills",
+    "phase276_coverage_rows": "family-model remaining gap coverage after Phase275",
+    "phase277_component_summary_rows": "Phase276 next queue component path fills",
+    "phase277_causal_fill_rows": "Phase276 next queue low-side-effect and diagnostic causal rows",
+    "phase278_recalibrated_gap_rows": "Phase274 gaps recalibrated after Phase275 and Phase277 fills",
+    "phase278_next_batch_rows": "next queue after two physical-path fill batches"
+  },
+  "score_fields": [
+    "behavior",
+    "readout",
+    "layer_path",
+    "component_path",
+    "causal",
+    "rollout",
+    "closure",
+    "overall"
+  ],
+  "status_values": [
+    "not_enough_data",
+    "mapped_partial",
+    "path_candidate_not_closed",
+    "high_quality_candidate_not_closed",
+    "gap_queue_only"
+  ]
+}
