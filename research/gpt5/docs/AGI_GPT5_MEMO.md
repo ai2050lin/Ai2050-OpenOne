@@ -36779,3 +36779,864 @@ Phase278 是正确推进。它证明两轮补图谱都能被 v2 图谱系统稳�
 但物理路径覆盖仍不足，
 闭合仍然不是第一优先级。
 ```
+
+## Phase 279: 扩大样本后的第三批语言模式图谱物理路径测试 [2026-07-09 05:21]
+
+### 任务判断
+
+本阶段根据“语言编码机制 - 语言模式图谱”的路线要求，继续加大样本数量，不再停留在单点实验或少量候选样本。当前目标仍然是完成语言模式图谱的物理分布拼图，而不是直接追求闭合。
+
+Phase279 读取 Phase278 生成的下一批队列：
+
+```text
+phase278_next_batch_rows.jsonl
+```
+
+并排除只需要 candidate_closure_verification 的样本，继续执行第三批三模型物理路径补图谱。
+
+### 新增文件
+
+```text
+tests/gpt5/phase279_third_gap_batch_physical_path_fill.py
+tests/gpt5/run_phase279_third_gap_batch_physical_path_fill.sh
+tests/result/phase279_third_gap_batch_physical_path_fill/
+tests/result/pattern_family_atlas/v2/phase279_component_physical_path_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase279_component_summary_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase279_causal_fill_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase279_rollout_fill_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase279_missing_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase279_cross_model_summary.json
+tests/result/pattern_family_atlas/v2/phase279_report.md
+```
+
+### 测试原理
+
+测试仍使用当前稳定闭环：
+
+```text
+Gap Queue
+-> Physical Path Fill
+-> Causal Audit
+-> Gap Recalibration
+```
+
+每个样本补：
+
+```text
+layer_input
+after_attention
+after_mlp
+layer_output
+```
+
+并计算：
+
+```text
+delta_attention = margin(after_attention) - margin(layer_input)
+delta_mlp = margin(after_mlp) - margin(after_attention)
+delta_residual = margin(layer_output) - margin(after_mlp)
+```
+
+因果审计继续使用：
+
+```text
+MLP_half
+MLP_zero
+```
+
+其中 MLP_half 是低副作用候选，MLP_zero 只是诊断性强干预。
+
+### 客观结果
+
+第三批总结果：
+
+```text
+component_summary_rows = 48
+component_physical_path_rows = 1660
+causal_fill_rows = 96
+rollout_fill_rows = 96
+missing_rows = 0
+```
+
+模型分布：
+
+```text
+qwen3 = 17
+GLM4 = 15
+DS7B = 16
+```
+
+模式族分布：
+
+```text
+closure = 5
+state_drift = 6
+cross_lingual = 6
+output_protocol = 4
+reasoning_constraint = 6
+language_action = 6
+readout_competition = 6
+content_knowledge = 4
+syntax_structure = 5
+```
+
+主导组件：
+
+```text
+mlp = 46
+attention = 2
+```
+
+因果审计：
+
+```text
+causal_effect_supported True = 71
+causal_effect_supported False = 25
+
+side_effect_risk True = 55
+side_effect_risk False = 41
+
+low_side_effect_supported_rate = 0.645833
+low_side_effect_risk_rate = 0.500000
+```
+
+平均正向贡献：
+
+```text
+mean_sum_positive_attn_delta = 9.014667
+mean_sum_positive_mlp_delta = 25.441825
+mean_sum_positive_residual_delta = 0.204419
+```
+
+分模型：
+
+```text
+qwen3:
+  selected_gap_rows = 17
+  dominant_positive_component = mlp 17/17
+  causal_effect_supported = 32/34
+  low_side_effect_supported_rate = 0.882353
+  low_side_effect_risk_rate = 0.588235
+
+GLM4:
+  selected_gap_rows = 15
+  dominant_positive_component = mlp 13/15, attention 2/15
+  causal_effect_supported = 9/30
+  low_side_effect_supported_rate = 0.133333
+  low_side_effect_risk_rate = 0.466667
+
+DS7B:
+  selected_gap_rows = 16
+  dominant_positive_component = mlp 16/16
+  causal_effect_supported = 30/32
+  low_side_effect_supported_rate = 0.875000
+  low_side_effect_risk_rate = 0.437500
+```
+
+### 结果分析
+
+Phase279 进一步扩大样本后，MLP 主导现象仍然稳定：
+
+```text
+Phase275: mlp = 42/45
+Phase277: mlp = 45/49
+Phase279: mlp = 46/48
+```
+
+这说明 MLPWrite 是当前语言模式图谱中非常强的物理路径候选。
+
+但同时必须注意一个更重要的负面校准：
+
+```text
+low_side_effect_risk_rate = 0.500000
+```
+
+也就是说，第三批中低副作用候选干预虽然支持率不低，但副作用风险已经非常高。尤其 qwen3 和 DS7B 的支持率高，但 side_effect_risk 也同步升高，这说明简单 MLP_half 不能直接当作闭合证据。
+
+GLM4 仍然是特殊困难模型：
+
+```text
+low_side_effect_supported_rate = 0.133333
+```
+
+说明 GLM4 可能需要更细粒度的 channel / source-restricted 因果审计。
+
+### 问题和硬伤
+
+1. 本阶段仍不是闭合验证。
+
+2. MLP 主导稳定，但 MLP_half 副作用风险升高。
+
+3. 当前测试仍基于小模型，可能有 30%-50% 的内部结构偏差。
+
+4. 候选闭合复核样本仍未单独处理。
+
+5. need_closure_quality 没有减少，因为本阶段继续优先补物理路径。
+
+### 阶段结论
+
+Phase279 完成了第三批扩大样本测试。它强化了 MLPWrite 在语言模式图谱中的高频主导地位，但也进一步证明低副作用因果闭合仍不稳定。
+
+核心结论：
+
+```text
+物理路径拼图继续前进；
+闭合仍不能提前宣布；
+下一步必须合并三批结果重新回算缺口。
+```
+
+## Phase 280: 三批物理路径测试后的语言模式图谱缺口重算 [2026-07-09 05:21]
+
+### 任务判断
+
+Phase279 完成第三批补图谱后，需要把 Phase275、Phase277、Phase279 三批结果合并回灌，重新计算语言模式图谱的总缺口。这一步是判断“加大样本数量是否真实推进图谱”的关键。
+
+### 新增文件
+
+```text
+tests/gpt5/phase280_gap_recalibration_after_phase279.py
+tests/gpt5/run_phase280_gap_recalibration_after_phase279.sh
+tests/result/phase280_gap_recalibration_after_phase279/
+tests/result/pattern_family_atlas/v2/phase280_recalibrated_gap_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase280_next_batch_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase280_summary.json
+tests/result/pattern_family_atlas/v2/phase280_report.md
+```
+
+### 回算原理
+
+Phase280 合并：
+
+```text
+phase275_component_summary_rows
+phase277_component_summary_rows
+phase279_component_summary_rows
+phase275_causal_fill_rows
+phase277_causal_fill_rows
+phase279_causal_fill_rows
+```
+
+然后对原始 972 条 gap rows 回算：
+
+```text
+如果任一批次已补 component_summary：
+  need_component_path = false
+  need_layer_path = false
+
+如果任一批次已补 causal_fill_rows：
+  need_causal_audit = false
+
+如果存在低副作用因果支持且无副作用：
+  good_readout_low_causal = false
+```
+
+### 客观结果
+
+三批合计：
+
+```text
+total_component_summary_rows = 142
+total_causal_fill_rows = 284
+```
+
+回算状态：
+
+```text
+filled_by_phase275_277_279 = 98
+partially_filled_by_phase275_277_279 = 44
+still_open = 830
+```
+
+剩余缺口：
+
+```text
+need_component_path = 812
+need_causal_audit = 817
+need_layer_path = 749
+need_closure_quality = 587
+need_readout_competition = 376
+candidate_not_closed = 9
+good_behavior_low_path = 675
+good_readout_low_causal = 337
+```
+
+与 Phase274 初始缺口相比：
+
+```text
+component_path:
+  954 -> 812
+  减少 142
+
+causal_audit:
+  959 -> 817
+  减少 142
+
+layer_path:
+  891 -> 749
+  减少 142
+```
+
+这与三批真实补图谱样本数完全一致：
+
+```text
+Phase275 = 45
+Phase277 = 49
+Phase279 = 48
+Total = 142
+```
+
+说明回灌机制仍没有虚增。
+
+下一批队列：
+
+```text
+next_batch_rows = 54
+qwen3 = 18
+GLM4 = 18
+DS7B = 18
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1028 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite 大 chunk 警告，不影响图谱数据发布。
+
+### 当前图谱进度
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 57%-59%
+物理分布拼图进度: 56%-58%
+v2 图谱系统骨架: 53%-55%
+组件路径覆盖: 40%-42%
+因果审计覆盖: 29%-31%
+闭合进度: 20%-21%
+```
+
+### 关键结论
+
+三批扩大样本测试证明：
+
+```text
+语言模式图谱测试可以系统扩展；
+每一批真实补图谱都会等量减少 component_path / causal_audit / layer_path 缺口；
+MLPWrite 是高频主导物理路径；
+但低副作用因果稳定性不足，不能进入闭合阶段。
+```
+
+当前最大瓶颈已经更清楚：
+
+```text
+1. 剩余物理路径缺口仍大；
+2. closure_quality 完全没有推进；
+3. GLM4 需要专门的低副作用细粒度审计；
+4. candidate_not_closed 需要单独闭合质量复核。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于语言模式图谱测试大阶段，但应拆为两条：
+
+```text
+Phase281A:
+  继续执行 phase280_next_batch_rows，进一步加大物理路径样本。
+
+Phase281B:
+  对 9 条 candidate_not_closed 做 closure_quality verification。
+```
+
+为了避免只做无尽补表，建议 Phase281B 必须启动，因为 closure_quality 当前仍为：
+
+```text
+need_closure_quality = 587
+candidate_not_closed = 9
+```
+
+### 阶段结论
+
+Phase280 证明第三批样本扩展有效，语言模式图谱测试已经进入可扩展工程阶段。但距离“完成语言模式图谱”仍有明显距离，目前完成的是阶段性大样本补图谱测试，不是全图谱闭合。
+
+## Phase 281: 候选闭合点四条件复核 [2026-07-09 06:02]
+
+### 任务判断
+
+本轮附件对 Phase279/280 的判断基本正确：当前研究已经从单点机制追踪进入语言模式图谱的系统补图谱阶段。需要补充的是，继续扩大物理路径样本之前，必须先把 9 条 `candidate_not_closed` 复核掉，否则后续图谱会把高分候选误认为闭合。
+
+### 测试原理
+
+Phase281 对 Phase280 中全部 9 条候选闭合行做严格四条件复核。闭合不再只看行为正确，也不只看整体分数，而是要求：
+
+```text
+ClosureCandidate =
+  SemanticDone
+  ∧ StopWins
+  ∧ ContinueSuppressed
+  ∧ RolloutStable
+```
+
+其中：
+
+```text
+SemanticDone = answer_correct_proxy
+StopWins = r_stop > r_continue
+ContinueSuppressed = top_continue_vs_stop_margin <= -0.5
+RolloutStable =
+  pattern_matched_proxy
+  ∧ no_drift_marker
+  ∧ no_repeated_protocol_marker
+  ∧ (model_stop_executed ∨ generated_token_count < max_rollout_tokens)
+```
+
+这里的关键是把“语义完成”和“停止机制完成”拆开：语义正确不能自动推出模型内部已经停止。
+
+### 执行
+
+新增脚本：
+
+```text
+tests/gpt5/phase281_candidate_closure_quality_verification.py
+tests/gpt5/run_phase281_candidate_closure_quality_verification.sh
+```
+
+按顺序使用本地 CUDA 模型运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+输出固定图谱格式：
+
+```text
+tests/result/pattern_family_atlas/v2/phase281_closure_quality_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase281_cross_model_summary.json
+frontend/public/vis_data/pattern_family_atlas/v2/phase281_closure_quality_rows.jsonl
+```
+
+### 客观结果
+
+```text
+closure_quality_rows = 9
+missing_rows = 0
+four_condition_closed_count = 0
+weak_candidate_survived_count = 0
+semantic_done_rate = 0.666667
+stop_wins_rate = 0.0
+continue_suppressed_rate = 0.0
+rollout_stable_rate = 0.111111
+mean_stop_continue_margin = -7.838542
+```
+
+分模型：
+
+```text
+qwen3:
+  candidate_rows = 1
+  semantic_done = 1
+  stop_wins = 0
+  rollout_stable = 0
+
+GLM4:
+  candidate_rows = 5
+  semantic_done = 3
+  stop_wins = 0
+  rollout_stable = 0
+
+DS7B:
+  candidate_rows = 3
+  semantic_done = 2
+  stop_wins = 0
+  rollout_stable = 1
+```
+
+主要阻塞项：
+
+```text
+stop_not_winner = 9
+continue_not_suppressed = 9
+rollout_not_stable = 8
+semantic_not_done = 3
+```
+
+### 结果分析
+
+这是一个重要负结果。9 条候选里有 6 条语义完成，但没有任何一条通过停止胜出和继续压制。因此当前所谓 candidate 不是机制闭合，只是行为或路径分数较高。
+
+最关键的客观现象是：
+
+```text
+语义完成 ≠ 停止完成
+行为正确 ≠ 读出竞争完成
+候选高分 ≠ 四条件闭合
+```
+
+这与 Phase279/280 的路线判断一致：第一优先级仍应是语言模式图谱的物理分布拼图，闭合只能在更完整的物理路径基础上尝试。
+
+### 硬伤
+
+当前复核仍有三个限制：
+
+```text
+1. semantic evaluator 仍是代理指标，不能替代人工语义判断；
+2. rollout_stable 使用短生成，无法证明长程稳定；
+3. 当前模型是小模型，停止/继续竞争机制可能比大模型粗糙。
+```
+
+所以 Phase281 不能证明大模型也没有闭合，只能证明当前小模型图谱中的这 9 条候选不能算闭合。
+
+## Phase 282: Phase281 后图谱缺口重算 [2026-07-09 06:02]
+
+### 任务
+
+Phase282 不做新模型测试，只把 Phase281 的严格闭合复核结果回写到语言模式图谱缺口表。
+
+新增脚本：
+
+```text
+tests/gpt5/phase282_gap_recalibration_after_phase281.py
+tests/gpt5/run_phase282_gap_recalibration_after_phase281.sh
+```
+
+### 客观结果
+
+```text
+source_gap_rows = 972
+closure_quality_rows = 9
+four_condition_closed_count = 0
+weak_candidate_survived_count = 0
+```
+
+状态：
+
+```text
+filled_by_phase275_277_279_281 = 98
+partially_filled_by_phase275_277_279 = 44
+closure_quality_rechecked_phase281 = 9
+still_open = 821
+```
+
+剩余缺口：
+
+```text
+candidate_not_closed = 9
+need_closure_quality = 593
+need_readout_competition = 376
+good_behavior_low_path = 675
+good_readout_low_causal = 337
+need_causal_audit = 817
+need_component_path = 812
+need_layer_path = 749
+```
+
+### 分析
+
+Phase282 说明：严格闭合复核没有减少候选闭合缺口，反而把 `need_closure_quality` 从 587 校准到 593。这不是倒退，而是纠正了高分候选带来的虚假乐观。
+
+当前闭合链条可写为：
+
+```text
+BehaviorCorrect
+  ↛ StopWins
+  ↛ ContinueSuppressed
+  ↛ RolloutStable
+```
+
+即行为正确没有自然推出停止机制完成。
+
+### 阶段结论
+
+Phase282 完成的是图谱校准，不是闭合推进。它证明当前阶段不能把 closure_quality 当作普通分数补齐，而必须继续追踪读出竞争和停止/继续通道的物理来源。
+
+## Phase 283: 第四批大样本物理路径填充 [2026-07-09 06:02]
+
+### 任务
+
+根据用户要求“加大测试样本数量，完成语言模式图谱测试”，Phase283 在 Phase282 的基础上继续扩大样本。为了避免重复候选闭合行，本阶段排除纯 `candidate_closure_verification`，只选择仍需要组件路径、层路径或因果审计的开放缺口。
+
+新增脚本：
+
+```text
+tests/gpt5/phase283_fourth_gap_batch_physical_path_fill.py
+tests/gpt5/run_phase283_fourth_gap_batch_physical_path_fill.sh
+```
+
+测试规模：
+
+```text
+selected_gap_rows = 54
+qwen3 = 18
+GLM4 = 18
+DS7B = 18
+families = 9
+每个模型每个模式族 2 行
+missing_rows = 0
+```
+
+### 测试公式
+
+本阶段仍使用物理路径分解：
+
+```text
+ΔR_total(layer)
+  = ΔR_attention(layer)
+  + ΔR_mlp(layer)
+  + ΔR_residual(layer)
+```
+
+并记录主导组件：
+
+```text
+DominantComponent =
+  argmax_component Σ max(ΔR_component(layer), 0)
+```
+
+低副作用因果审计：
+
+```text
+LowSideEffectSupported =
+  causal_effect_supported
+  ∧ not side_effect_risk
+```
+
+### 客观结果
+
+总体：
+
+```text
+component_summary_rows = 54
+causal_fill_rows = 108
+missing_rows = 0
+dominant_positive_component_counts:
+  mlp = 52
+  attention = 2
+final_winner_counts:
+  continue = 54
+low_side_effect_supported_rate = 0.666667
+low_side_effect_risk_rate = 0.388889
+mean_sum_positive_attn_delta = 9.105415
+mean_sum_positive_mlp_delta = 25.700721
+mean_sum_positive_residual_delta = 0.222938
+```
+
+分模型：
+
+```text
+qwen3:
+  component_summary_rows = 18
+  dominant_positive_component = mlp 18
+  low_side_effect_supported_rate = 0.888889
+  low_side_effect_risk_rate = 0.333333
+
+GLM4:
+  component_summary_rows = 18
+  dominant_positive_component = mlp 17, attention 1
+  low_side_effect_supported_rate = 0.166667
+  low_side_effect_risk_rate = 0.611111
+
+DS7B:
+  component_summary_rows = 18
+  dominant_positive_component = mlp 17, attention 1
+  low_side_effect_supported_rate = 0.944444
+  low_side_effect_risk_rate = 0.222222
+```
+
+### 进展
+
+Phase283 是正结果，但不是闭合。它进一步强化了以下拼图：
+
+```text
+1. MLPWrite 是当前小模型语言模式图谱中最稳定的主导物理路径；
+2. attention 不是不存在，但在当前样本中更多像辅助或局部路径；
+3. continue winner 在 54/54 中保持，说明停止问题仍是系统性问题；
+4. GLM4 是低副作用因果审计的主要困难模型。
+```
+
+### 硬伤
+
+最大问题是 GLM4：
+
+```text
+GLM4 low_side_effect_supported_rate = 0.166667
+GLM4 low_side_effect_risk_rate = 0.611111
+```
+
+这说明“压制 MLP 继续写入”虽然可能改变读出，但副作用很高，不能当作稳定机制公式。
+
+因此当前线性补丁公式仍不能模拟真实运行机制。它更适合做物理路径探针，而不是闭合控制公式。
+
+## Phase 284: 第四批样本后图谱总校准 [2026-07-09 06:02]
+
+### 任务
+
+Phase284 合并 Phase275、Phase277、Phase279、Phase283 四轮物理路径填充和 Phase281 闭合复核，重算整个语言模式图谱缺口。
+
+新增脚本：
+
+```text
+tests/gpt5/phase284_gap_recalibration_after_phase283.py
+tests/gpt5/run_phase284_gap_recalibration_after_phase283.sh
+```
+
+### 客观结果
+
+```text
+source_gap_rows = 972
+total_component_summary_rows = 196
+total_causal_fill_rows = 392
+closure_quality_rows = 9
+```
+
+状态：
+
+```text
+filled_by_phase275_277_279_281_283 = 124
+partially_filled_by_phase275_277_279_281_283 = 81
+still_open = 767
+```
+
+剩余缺口：
+
+```text
+candidate_not_closed = 9
+need_readout_competition = 376
+good_behavior_low_path = 675
+good_readout_low_causal = 324
+need_causal_audit = 763
+need_component_path = 758
+need_layer_path = 695
+need_closure_quality = 587
+```
+
+累计主导组件：
+
+```text
+dominant_component_counts_all_fills:
+  mlp = 185
+  attention = 11
+
+mean_component_mlp_delta_all_fills = 24.756555
+```
+
+### 当前进度估计
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 60%
+物理分布拼图进度: 60%
+组件路径覆盖: 50%
+因果审计覆盖: 40%
+闭合进度: 20%
+```
+
+### 图谱核心拼图
+
+当前已经积累的核心拼图是：
+
+```text
+1. 语言模式族可以稳定拆成九个大族；
+2. 每个族都能映射到固定 case / mode / variant / path_signature；
+3. 大多数开放缺口的正向物理写入来自 MLP；
+4. attention 在少数样本中成为主导，说明路由/选择机制仍不能忽略；
+5. residual_delta 通常较小，更像累计载体而不是主要写入源；
+6. continue winner 在多批样本中持续占优；
+7. 高质量行为候选无法自然通过停止闭合；
+8. GLM4 的低副作用因果稳定性明显弱于 qwen3 和 DS7B；
+9. 当前线性干预适合定位物理路径，但不适合直接作为闭合公式。
+```
+
+### 智能理论角度
+
+当前更合理的第一性原理表述不是：
+
+```text
+找到一个线性方向 -> patch -> 闭合
+```
+
+而是：
+
+```text
+语言能力 = 多模式族在网络内部形成的动态物理路径图谱
+```
+
+更接近当前客观结果的统一公式是：
+
+```text
+PatternState(t)
+  = Route(t)
+  + Write_MLP(t)
+  + Select_Attention(t)
+  + ResidualCarry(t)
+  + ReadoutCompetition(t)
+```
+
+输出是否闭合取决于：
+
+```text
+ClosedOutput
+  = SemanticDone
+  ∧ ProtocolSatisfied
+  ∧ StopWins
+  ∧ ContinueSuppressed
+  ∧ RolloutStable
+```
+
+当前已经看到，前两个条件较容易出现，后三个条件才是瓶颈。
+
+### 接下来的阶段性任务
+
+下一阶段仍属于“完成语言模式图谱物理分布拼图”的同一大阶段，应继续系统推进，不应退回单点 patch：
+
+```text
+Phase285A:
+  继续执行 phase284_next_batch_rows，进一步扩大物理路径样本。
+
+Phase285B:
+  对 GLM4 高风险样本做 source-restricted 低副作用审计。
+
+Phase285C:
+  把 need_readout_competition = 376 单独拆成 stop/continue/channel 竞争来源表。
+
+Phase285D:
+  将 closure_quality 的四条件复核推广到非候选高行为样本，避免只复核高分候选。
+```
+
+阶段目标不是马上闭合，而是完成：
+
+```text
+语言模式族 -> 物理路径 -> 组件分布 -> 读出竞争 -> 因果审计
+```
+
+这一整条图谱链。只有这条链足够完整，闭合公式才有可能自然浮现。
+
+### 前端同步
+
+已同步到可视化客户端：
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1050 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite 大 chunk 警告，不影响图谱数据读取。
+
+### 阶段结论
+
+Phase281-284 完成了两件事：
+
+```text
+1. 严格否定了当前 9 条候选闭合点；
+2. 把语言模式图谱物理路径样本从 142 扩展到 196。
+```
+
+当前研究方向正确，但还没有完成语言模式图谱，更没有闭合。最可靠的结论是：语言模式图谱已经进入可扩展测试阶段，MLPWrite 是目前最稳定的物理路径拼图，停止/继续读出竞争仍是闭合瓶颈。

@@ -54,7 +54,43 @@
     "phase278_recalibrated_gap_rows": "phase278_recalibrated_gap_rows.jsonl",
     "phase278_next_batch_rows": "phase278_next_batch_rows.jsonl",
     "phase278_summary": "phase278_summary.json",
-    "phase278_report": "phase278_report.md"
+    "phase278_report": "phase278_report.md",
+    "phase279_component_physical_path_rows": "phase279_component_physical_path_rows.jsonl",
+    "phase279_attention_contribution_rows": "phase279_attention_contribution_rows.jsonl",
+    "phase279_mlp_contribution_rows": "phase279_mlp_contribution_rows.jsonl",
+    "phase279_residual_accumulation_rows": "phase279_residual_accumulation_rows.jsonl",
+    "phase279_component_summary_rows": "phase279_component_summary_rows.jsonl",
+    "phase279_causal_fill_rows": "phase279_causal_fill_rows.jsonl",
+    "phase279_rollout_fill_rows": "phase279_rollout_fill_rows.jsonl",
+    "phase279_missing_rows": "phase279_missing_rows.jsonl",
+    "phase279_cross_model_summary": "phase279_cross_model_summary.json",
+    "phase279_report": "phase279_report.md",
+    "phase280_recalibrated_gap_rows": "phase280_recalibrated_gap_rows.jsonl",
+    "phase280_next_batch_rows": "phase280_next_batch_rows.jsonl",
+    "phase280_summary": "phase280_summary.json",
+    "phase280_report": "phase280_report.md",
+    "phase281_closure_quality_rows": "phase281_closure_quality_rows.jsonl",
+    "phase281_missing_rows": "phase281_missing_rows.jsonl",
+    "phase281_cross_model_summary": "phase281_cross_model_summary.json",
+    "phase281_report": "phase281_report.md",
+    "phase282_recalibrated_gap_rows": "phase282_recalibrated_gap_rows.jsonl",
+    "phase282_next_batch_rows": "phase282_next_batch_rows.jsonl",
+    "phase282_summary": "phase282_summary.json",
+    "phase282_report": "phase282_report.md",
+    "phase283_component_physical_path_rows": "phase283_component_physical_path_rows.jsonl",
+    "phase283_attention_contribution_rows": "phase283_attention_contribution_rows.jsonl",
+    "phase283_mlp_contribution_rows": "phase283_mlp_contribution_rows.jsonl",
+    "phase283_residual_accumulation_rows": "phase283_residual_accumulation_rows.jsonl",
+    "phase283_component_summary_rows": "phase283_component_summary_rows.jsonl",
+    "phase283_causal_fill_rows": "phase283_causal_fill_rows.jsonl",
+    "phase283_rollout_fill_rows": "phase283_rollout_fill_rows.jsonl",
+    "phase283_missing_rows": "phase283_missing_rows.jsonl",
+    "phase283_cross_model_summary": "phase283_cross_model_summary.json",
+    "phase283_report": "phase283_report.md",
+    "phase284_recalibrated_gap_rows": "phase284_recalibrated_gap_rows.jsonl",
+    "phase284_next_batch_rows": "phase284_next_batch_rows.jsonl",
+    "phase284_summary": "phase284_summary.json",
+    "phase284_report": "phase284_report.md"
   },
   "latest_gap_phase": "Phase274",
   "phase274_gap_summary": {
@@ -368,7 +404,7 @@
     "priority_rule": "candidate statuses first, then high behavior/readout with missing component/causal, then family-model pressure balancing",
     "next_executable_phase": "Phase275 should run selected_batch_rows sequentially on qwen3, GLM4, and DS7B for component path and low-side-effect causal fill."
   },
-  "latest_fill_phase": "Phase277",
+  "latest_fill_phase": "Phase283",
   "phase275_summary": {
     "phase": 275,
     "schema_version": "2.2.0",
@@ -580,7 +616,7 @@
       "closure": 0.19
     }
   },
-  "latest_gap_recalibration_phase": "Phase278",
+  "latest_gap_recalibration_phase": "Phase284",
   "phase276_summary": {
     "schema_version": "2.3.0",
     "phase": "Phase276",
@@ -878,6 +914,691 @@
       "physical_distribution_puzzle": 0.53,
       "component_path_coverage": 0.37,
       "causal_audit_coverage": 0.26,
+      "closure": 0.2
+    }
+  },
+  "phase279_summary": {
+    "phase": 279,
+    "schema_version": "2.6.0",
+    "phase_id": "Phase279",
+    "title": "Phase278 third gap batch physical path fill",
+    "status": "complete",
+    "created_at": "2026-07-09T14:20:34.940551+00:00",
+    "round_name": "third_gap_batch_physical_path_fill",
+    "model_summaries": [
+      {
+        "phase": 279,
+        "schema_version": "2.6.0",
+        "phase_id": "Phase279",
+        "title": "Phase278 third gap batch physical path fill",
+        "status": "complete",
+        "created_at": "2026-07-09T14:19:52.607433+00:00",
+        "model": "qwen3",
+        "selected_gap_rows": 17,
+        "component_physical_path_rows": 612,
+        "component_summary_rows": 17,
+        "causal_fill_rows": 34,
+        "rollout_fill_rows": 34,
+        "missing_rows": 0,
+        "family_counts": {
+          "closure": 2,
+          "state_drift": 2,
+          "cross_lingual": 2,
+          "output_protocol": 2,
+          "reasoning_constraint": 2,
+          "language_action": 2,
+          "readout_competition": 2,
+          "content_knowledge": 2,
+          "syntax_structure": 1
+        },
+        "dominant_positive_component_counts": {
+          "mlp": 17
+        },
+        "final_winner_counts": {
+          "continue": 17
+        },
+        "strongest_mlp_layers": {
+          "34": 9,
+          "35": 8
+        },
+        "mean_sum_positive_attn_delta": 10.004223,
+        "mean_sum_positive_mlp_delta": 29.185561,
+        "mean_sum_positive_residual_delta": 0.215648,
+        "causal_effect_supported_counts": {
+          "True": 32,
+          "False": 2
+        },
+        "side_effect_risk_counts": {
+          "True": 23,
+          "False": 11
+        },
+        "low_side_effect_supported_rate": 0.882353,
+        "low_side_effect_risk_rate": 0.588235
+      },
+      {
+        "phase": 279,
+        "schema_version": "2.6.0",
+        "phase_id": "Phase279",
+        "title": "Phase278 third gap batch physical path fill",
+        "status": "complete",
+        "created_at": "2026-07-09T14:20:13.525796+00:00",
+        "model": "glm4",
+        "selected_gap_rows": 15,
+        "component_physical_path_rows": 600,
+        "component_summary_rows": 15,
+        "causal_fill_rows": 30,
+        "rollout_fill_rows": 30,
+        "missing_rows": 0,
+        "family_counts": {
+          "cross_lingual": 2,
+          "closure": 1,
+          "output_protocol": 1,
+          "state_drift": 2,
+          "reasoning_constraint": 2,
+          "language_action": 2,
+          "readout_competition": 2,
+          "content_knowledge": 1,
+          "syntax_structure": 2
+        },
+        "dominant_positive_component_counts": {
+          "mlp": 13,
+          "attention": 2
+        },
+        "final_winner_counts": {
+          "continue": 15
+        },
+        "strongest_mlp_layers": {
+          "38": 7,
+          "22": 3,
+          "39": 2,
+          "30": 2,
+          "7": 1
+        },
+        "mean_sum_positive_attn_delta": 11.612496,
+        "mean_sum_positive_mlp_delta": 19.195951,
+        "mean_sum_positive_residual_delta": 0.182446,
+        "causal_effect_supported_counts": {
+          "False": 21,
+          "True": 9
+        },
+        "side_effect_risk_counts": {
+          "False": 16,
+          "True": 14
+        },
+        "low_side_effect_supported_rate": 0.133333,
+        "low_side_effect_risk_rate": 0.466667
+      },
+      {
+        "phase": 279,
+        "schema_version": "2.6.0",
+        "phase_id": "Phase279",
+        "title": "Phase278 third gap batch physical path fill",
+        "status": "complete",
+        "created_at": "2026-07-09T14:20:31.758301+00:00",
+        "model": "deepseek7b",
+        "selected_gap_rows": 16,
+        "component_physical_path_rows": 448,
+        "component_summary_rows": 16,
+        "causal_fill_rows": 32,
+        "rollout_fill_rows": 32,
+        "missing_rows": 0,
+        "family_counts": {
+          "reasoning_constraint": 2,
+          "state_drift": 2,
+          "language_action": 2,
+          "output_protocol": 1,
+          "cross_lingual": 2,
+          "syntax_structure": 2,
+          "readout_competition": 2,
+          "closure": 2,
+          "content_knowledge": 1
+        },
+        "dominant_positive_component_counts": {
+          "mlp": 16
+        },
+        "final_winner_counts": {
+          "continue": 16
+        },
+        "strongest_mlp_layers": {
+          "26": 15,
+          "27": 1
+        },
+        "mean_sum_positive_attn_delta": 5.527801,
+        "mean_sum_positive_mlp_delta": 27.31961,
+        "mean_sum_positive_residual_delta": 0.213089,
+        "causal_effect_supported_counts": {
+          "True": 30,
+          "False": 2
+        },
+        "side_effect_risk_counts": {
+          "False": 14,
+          "True": 18
+        },
+        "low_side_effect_supported_rate": 0.875,
+        "low_side_effect_risk_rate": 0.4375
+      }
+    ],
+    "component_summary_rows": 48,
+    "causal_fill_rows": 96,
+    "missing_rows": 0,
+    "family_counts": {
+      "closure": 5,
+      "state_drift": 6,
+      "cross_lingual": 6,
+      "output_protocol": 4,
+      "reasoning_constraint": 6,
+      "language_action": 6,
+      "readout_competition": 6,
+      "content_knowledge": 4,
+      "syntax_structure": 5
+    },
+    "model_counts": {
+      "qwen3": 17,
+      "glm4": 15,
+      "deepseek7b": 16
+    },
+    "dominant_positive_component_counts": {
+      "mlp": 46,
+      "attention": 2
+    },
+    "final_winner_counts": {
+      "continue": 48
+    },
+    "causal_effect_supported_counts": {
+      "True": 71,
+      "False": 25
+    },
+    "side_effect_risk_counts": {
+      "True": 55,
+      "False": 41
+    },
+    "low_side_effect_supported_rate": 0.645833,
+    "low_side_effect_risk_rate": 0.5,
+    "mean_sum_positive_attn_delta": 9.014667,
+    "mean_sum_positive_mlp_delta": 25.441825,
+    "mean_sum_positive_residual_delta": 0.204419
+  },
+  "phase280_summary": {
+    "schema_version": "2.7.0",
+    "phase": "Phase280",
+    "created_at": "2026-07-09T14:20:55.196302+00:00",
+    "source_gap_rows": 972,
+    "total_component_summary_rows": 142,
+    "total_causal_fill_rows": 284,
+    "phase280_status_counts": {
+      "still_open": 830,
+      "filled_by_phase275_277_279": 98,
+      "partially_filled_by_phase275_277_279": 44
+    },
+    "remaining_gap_counts": {
+      "candidate_not_closed": 9,
+      "need_readout_competition": 376,
+      "good_behavior_low_path": 675,
+      "good_readout_low_causal": 337,
+      "need_causal_audit": 817,
+      "need_component_path": 812,
+      "need_layer_path": 749,
+      "need_closure_quality": 587
+    },
+    "next_batch_rows": 54,
+    "next_batch_by_model": {
+      "glm4": 18,
+      "qwen3": 18,
+      "deepseek7b": 18
+    },
+    "next_batch_by_family": {
+      "closure": 6,
+      "output_protocol": 6,
+      "cross_lingual": 6,
+      "state_drift": 6,
+      "reasoning_constraint": 6,
+      "language_action": 6,
+      "content_knowledge": 6,
+      "syntax_structure": 6,
+      "readout_competition": 6
+    },
+    "progress_estimate": {
+      "pattern_family_atlas": 0.57,
+      "physical_distribution_puzzle": 0.56,
+      "component_path_coverage": 0.4,
+      "causal_audit_coverage": 0.29,
+      "closure": 0.2
+    }
+  },
+  "latest_closure_quality_phase": "Phase281",
+  "phase281_summary": {
+    "phase": 281,
+    "schema_version": "2.8.0",
+    "phase_id": "Phase281",
+    "title": "candidate closure four-condition quality verification",
+    "status": "complete",
+    "created_at": "2026-07-09T14:56:56.820505+00:00",
+    "round_name": "candidate_closure_quality_verification",
+    "model_summaries": [
+      {
+        "phase": 281,
+        "schema_version": "2.8.0",
+        "phase_id": "Phase281",
+        "title": "candidate closure four-condition quality verification",
+        "status": "complete",
+        "created_at": "2026-07-09T14:56:39.900669+00:00",
+        "model": "qwen3",
+        "candidate_rows": 1,
+        "closure_quality_rows": 1,
+        "missing_rows": 0,
+        "family_counts": {
+          "syntax_structure": 1
+        },
+        "semantic_done_count": 1,
+        "stop_wins_count": 0,
+        "continue_suppressed_count": 0,
+        "rollout_stable_count": 0,
+        "four_condition_closed_count": 0,
+        "weak_candidate_survived_count": 0,
+        "blocker_counts": {
+          "stop_not_winner": 1,
+          "continue_not_suppressed": 1,
+          "rollout_not_stable": 1
+        },
+        "mean_stop_continue_margin": -16.75
+      },
+      {
+        "phase": 281,
+        "schema_version": "2.8.0",
+        "phase_id": "Phase281",
+        "title": "candidate closure four-condition quality verification",
+        "status": "complete",
+        "created_at": "2026-07-09T14:56:47.926532+00:00",
+        "model": "glm4",
+        "candidate_rows": 5,
+        "closure_quality_rows": 5,
+        "missing_rows": 0,
+        "family_counts": {
+          "closure": 1,
+          "output_protocol": 1,
+          "cross_lingual": 1,
+          "content_knowledge": 1,
+          "readout_competition": 1
+        },
+        "semantic_done_count": 3,
+        "stop_wins_count": 0,
+        "continue_suppressed_count": 0,
+        "rollout_stable_count": 0,
+        "four_condition_closed_count": 0,
+        "weak_candidate_survived_count": 0,
+        "blocker_counts": {
+          "stop_not_winner": 5,
+          "continue_not_suppressed": 5,
+          "rollout_not_stable": 5,
+          "semantic_not_done": 2
+        },
+        "mean_stop_continue_margin": -5.015625
+      },
+      {
+        "phase": 281,
+        "schema_version": "2.8.0",
+        "phase_id": "Phase281",
+        "title": "candidate closure four-condition quality verification",
+        "status": "complete",
+        "created_at": "2026-07-09T14:56:54.320359+00:00",
+        "model": "deepseek7b",
+        "candidate_rows": 3,
+        "closure_quality_rows": 3,
+        "missing_rows": 0,
+        "family_counts": {
+          "output_protocol": 1,
+          "content_knowledge": 1,
+          "reasoning_constraint": 1
+        },
+        "semantic_done_count": 2,
+        "stop_wins_count": 0,
+        "continue_suppressed_count": 0,
+        "rollout_stable_count": 1,
+        "four_condition_closed_count": 0,
+        "weak_candidate_survived_count": 0,
+        "blocker_counts": {
+          "stop_not_winner": 3,
+          "continue_not_suppressed": 3,
+          "semantic_not_done": 1,
+          "rollout_not_stable": 2
+        },
+        "mean_stop_continue_margin": -9.572917
+      }
+    ],
+    "closure_quality_rows": 9,
+    "missing_rows": 0,
+    "model_counts": {
+      "qwen3": 1,
+      "glm4": 5,
+      "deepseek7b": 3
+    },
+    "family_counts": {
+      "syntax_structure": 1,
+      "closure": 1,
+      "output_protocol": 2,
+      "cross_lingual": 1,
+      "content_knowledge": 2,
+      "readout_competition": 1,
+      "reasoning_constraint": 1
+    },
+    "semantic_done_rate": 0.666667,
+    "stop_wins_rate": 0.0,
+    "continue_suppressed_rate": 0.0,
+    "rollout_stable_rate": 0.111111,
+    "four_condition_closed_count": 0,
+    "weak_candidate_survived_count": 0,
+    "blocker_counts": {
+      "stop_not_winner": 9,
+      "continue_not_suppressed": 9,
+      "rollout_not_stable": 8,
+      "semantic_not_done": 3
+    },
+    "mean_stop_continue_margin": -7.838542
+  },
+  "phase282_summary": {
+    "schema_version": "2.9.0",
+    "phase": "Phase282",
+    "created_at": "2026-07-09T14:57:02.543200+00:00",
+    "source_gap_rows": 972,
+    "closure_quality_rows": 9,
+    "four_condition_closed_count": 0,
+    "weak_candidate_survived_count": 0,
+    "phase282_status_counts": {
+      "closure_quality_rechecked_phase281": 9,
+      "filled_by_phase275_277_279_281": 98,
+      "still_open": 821,
+      "partially_filled_by_phase275_277_279": 44
+    },
+    "remaining_gap_counts": {
+      "candidate_not_closed": 9,
+      "need_closure_quality": 593,
+      "need_readout_competition": 376,
+      "good_behavior_low_path": 675,
+      "good_readout_low_causal": 337,
+      "need_causal_audit": 817,
+      "need_component_path": 812,
+      "need_layer_path": 749
+    },
+    "next_batch_rows": 54,
+    "next_batch_by_model": {
+      "glm4": 18,
+      "qwen3": 18,
+      "deepseek7b": 18
+    },
+    "next_batch_by_family": {
+      "closure": 6,
+      "output_protocol": 6,
+      "cross_lingual": 6,
+      "state_drift": 6,
+      "reasoning_constraint": 6,
+      "language_action": 6,
+      "readout_competition": 6,
+      "content_knowledge": 6,
+      "syntax_structure": 6
+    },
+    "mean_candidate_stop_continue_margin": -7.838542,
+    "progress_estimate": {
+      "pattern_family_atlas": 0.58,
+      "physical_distribution_puzzle": 0.56,
+      "component_path_coverage": 0.4,
+      "causal_audit_coverage": 0.29,
+      "closure": 0.2
+    }
+  },
+  "phase283_summary": {
+    "phase": 283,
+    "schema_version": "2.10.0",
+    "phase_id": "Phase283",
+    "title": "Phase282 fourth gap batch physical path fill",
+    "status": "complete",
+    "created_at": "2026-07-09T15:00:34.500774+00:00",
+    "round_name": "fourth_gap_batch_physical_path_fill",
+    "model_summaries": [
+      {
+        "phase": 283,
+        "schema_version": "2.10.0",
+        "phase_id": "Phase283",
+        "title": "Phase282 fourth gap batch physical path fill",
+        "status": "complete",
+        "created_at": "2026-07-09T14:59:49.214810+00:00",
+        "model": "qwen3",
+        "selected_gap_rows": 18,
+        "component_physical_path_rows": 648,
+        "component_summary_rows": 18,
+        "causal_fill_rows": 36,
+        "rollout_fill_rows": 36,
+        "missing_rows": 0,
+        "family_counts": {
+          "closure": 2,
+          "cross_lingual": 2,
+          "output_protocol": 2,
+          "state_drift": 2,
+          "readout_competition": 2,
+          "reasoning_constraint": 2,
+          "language_action": 2,
+          "content_knowledge": 2,
+          "syntax_structure": 2
+        },
+        "dominant_positive_component_counts": {
+          "mlp": 18
+        },
+        "final_winner_counts": {
+          "continue": 18
+        },
+        "strongest_mlp_layers": {
+          "34": 13,
+          "35": 5
+        },
+        "mean_sum_positive_attn_delta": 11.102556,
+        "mean_sum_positive_mlp_delta": 29.623055,
+        "mean_sum_positive_residual_delta": 0.239936,
+        "causal_effect_supported_counts": {
+          "True": 34,
+          "False": 2
+        },
+        "side_effect_risk_counts": {
+          "False": 17,
+          "True": 19
+        },
+        "low_side_effect_supported_rate": 0.888889,
+        "low_side_effect_risk_rate": 0.333333
+      },
+      {
+        "phase": 283,
+        "schema_version": "2.10.0",
+        "phase_id": "Phase283",
+        "title": "Phase282 fourth gap batch physical path fill",
+        "status": "complete",
+        "created_at": "2026-07-09T15:00:13.066079+00:00",
+        "model": "glm4",
+        "selected_gap_rows": 18,
+        "component_physical_path_rows": 720,
+        "component_summary_rows": 18,
+        "causal_fill_rows": 36,
+        "rollout_fill_rows": 36,
+        "missing_rows": 0,
+        "family_counts": {
+          "closure": 2,
+          "cross_lingual": 2,
+          "output_protocol": 2,
+          "state_drift": 2,
+          "reasoning_constraint": 2,
+          "language_action": 2,
+          "readout_competition": 2,
+          "content_knowledge": 2,
+          "syntax_structure": 2
+        },
+        "dominant_positive_component_counts": {
+          "mlp": 17,
+          "attention": 1
+        },
+        "final_winner_counts": {
+          "continue": 18
+        },
+        "strongest_mlp_layers": {
+          "38": 8,
+          "22": 5,
+          "39": 2,
+          "30": 2,
+          "14": 1
+        },
+        "mean_sum_positive_attn_delta": 11.410858,
+        "mean_sum_positive_mlp_delta": 20.384003,
+        "mean_sum_positive_residual_delta": 0.22312,
+        "causal_effect_supported_counts": {
+          "True": 12,
+          "False": 24
+        },
+        "side_effect_risk_counts": {
+          "True": 24,
+          "False": 12
+        },
+        "low_side_effect_supported_rate": 0.166667,
+        "low_side_effect_risk_rate": 0.611111
+      },
+      {
+        "phase": 283,
+        "schema_version": "2.10.0",
+        "phase_id": "Phase283",
+        "title": "Phase282 fourth gap batch physical path fill",
+        "status": "complete",
+        "created_at": "2026-07-09T15:00:32.061843+00:00",
+        "model": "deepseek7b",
+        "selected_gap_rows": 18,
+        "component_physical_path_rows": 504,
+        "component_summary_rows": 18,
+        "causal_fill_rows": 36,
+        "rollout_fill_rows": 36,
+        "missing_rows": 0,
+        "family_counts": {
+          "reasoning_constraint": 2,
+          "language_action": 2,
+          "output_protocol": 2,
+          "state_drift": 2,
+          "readout_competition": 2,
+          "syntax_structure": 2,
+          "closure": 2,
+          "cross_lingual": 2,
+          "content_knowledge": 2
+        },
+        "dominant_positive_component_counts": {
+          "mlp": 17,
+          "attention": 1
+        },
+        "final_winner_counts": {
+          "continue": 18
+        },
+        "strongest_mlp_layers": {
+          "26": 13,
+          "27": 2,
+          "21": 2,
+          "0": 1
+        },
+        "mean_sum_positive_attn_delta": 4.802829,
+        "mean_sum_positive_mlp_delta": 27.095106,
+        "mean_sum_positive_residual_delta": 0.205756,
+        "causal_effect_supported_counts": {
+          "True": 34,
+          "False": 2
+        },
+        "side_effect_risk_counts": {
+          "False": 20,
+          "True": 16
+        },
+        "low_side_effect_supported_rate": 0.944444,
+        "low_side_effect_risk_rate": 0.222222
+      }
+    ],
+    "component_summary_rows": 54,
+    "causal_fill_rows": 108,
+    "missing_rows": 0,
+    "family_counts": {
+      "closure": 6,
+      "cross_lingual": 6,
+      "output_protocol": 6,
+      "state_drift": 6,
+      "readout_competition": 6,
+      "reasoning_constraint": 6,
+      "language_action": 6,
+      "content_knowledge": 6,
+      "syntax_structure": 6
+    },
+    "model_counts": {
+      "qwen3": 18,
+      "glm4": 18,
+      "deepseek7b": 18
+    },
+    "dominant_positive_component_counts": {
+      "mlp": 52,
+      "attention": 2
+    },
+    "final_winner_counts": {
+      "continue": 54
+    },
+    "causal_effect_supported_counts": {
+      "True": 80,
+      "False": 28
+    },
+    "side_effect_risk_counts": {
+      "False": 49,
+      "True": 59
+    },
+    "low_side_effect_supported_rate": 0.666667,
+    "low_side_effect_risk_rate": 0.388889,
+    "mean_sum_positive_attn_delta": 9.105415,
+    "mean_sum_positive_mlp_delta": 25.700721,
+    "mean_sum_positive_residual_delta": 0.222938
+  },
+  "phase284_summary": {
+    "schema_version": "2.11.0",
+    "phase": "Phase284",
+    "created_at": "2026-07-09T15:02:00.722337+00:00",
+    "source_gap_rows": 972,
+    "total_component_summary_rows": 196,
+    "total_causal_fill_rows": 392,
+    "closure_quality_rows": 9,
+    "phase284_status_counts": {
+      "partially_filled_by_phase275_277_279_281_283": 81,
+      "filled_by_phase275_277_279_281_283": 124,
+      "still_open": 767
+    },
+    "remaining_gap_counts": {
+      "candidate_not_closed": 9,
+      "need_readout_competition": 376,
+      "good_behavior_low_path": 675,
+      "good_readout_low_causal": 324,
+      "need_causal_audit": 763,
+      "need_component_path": 758,
+      "need_layer_path": 695,
+      "need_closure_quality": 587
+    },
+    "next_batch_rows": 54,
+    "next_batch_by_model": {
+      "glm4": 18,
+      "qwen3": 18,
+      "deepseek7b": 18
+    },
+    "next_batch_by_family": {
+      "closure": 6,
+      "output_protocol": 6,
+      "cross_lingual": 6,
+      "state_drift": 6,
+      "language_action": 6,
+      "reasoning_constraint": 6,
+      "readout_competition": 6,
+      "content_knowledge": 6,
+      "syntax_structure": 6
+    },
+    "dominant_component_counts_all_fills": {
+      "mlp": 185,
+      "attention": 11
+    },
+    "mean_component_mlp_delta_all_fills": 24.756555,
+    "progress_estimate": {
+      "pattern_family_atlas": 0.6,
+      "physical_distribution_puzzle": 0.6,
+      "component_path_coverage": 0.5,
+      "causal_audit_coverage": 0.4,
       "closure": 0.2
     }
   }

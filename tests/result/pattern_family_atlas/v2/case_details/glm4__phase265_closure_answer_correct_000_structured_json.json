@@ -525,5 +525,70 @@
         39
       ]
     }
-  ]
+  ],
+  "phase281_closure_quality": {
+    "schema_version": "2.8.0",
+    "phase_id": "Phase281",
+    "created_at": "2026-07-09T14:56:45.896058+00:00",
+    "closure_quality_id": "phase281:closure_quality:glm4:phase265_closure_answer_correct_000_structured_json",
+    "source_gap_id": "phase274:gap:glm4:phase265_closure_answer_correct_000_structured_json",
+    "model": "glm4",
+    "case_id": "phase265_closure_answer_correct_000_structured_json",
+    "family_id": "closure",
+    "mode_id": "answer_correct",
+    "variant_id": "structured_json",
+    "path_schema_id": "phase265:path_schema:closure:answer_correct:structured_json",
+    "target": "black",
+    "expected_pattern": "json",
+    "output_protocol": "json",
+    "continuation_trigger": "json_structure",
+    "semantic_done": true,
+    "protocol_matched": true,
+    "stop_wins": false,
+    "continue_suppressed": false,
+    "rollout_stable": false,
+    "four_condition_closed": false,
+    "weak_candidate_survived": false,
+    "closure_blockers": [
+      "stop_not_winner",
+      "continue_not_suppressed",
+      "rollout_not_stable"
+    ],
+    "r_stop": 9.4375,
+    "r_continue": 14.8125,
+    "stop_continue_margin": -5.375,
+    "top_continue_vs_stop_margin": 5.375,
+    "top_continue_channel": "continue_json_structure",
+    "competition_winner": "continue",
+    "target_logit": -0.55859375,
+    "target_rank": 37147,
+    "generated_text": "```json\n{\"answer\": \"black\"}\n``````json\n{\"answer\":",
+    "generated_token_count": 16,
+    "model_stop_executed": false,
+    "has_drift_marker": false,
+    "repeated_protocol_marker": true,
+    "answer_correct_proxy": true,
+    "pattern_matched_proxy": true,
+    "source_scores": {
+      "behavior": 1.0,
+      "causal": 0.5,
+      "closure": 0.875,
+      "component_path": 0.505242,
+      "layer_path": 0.8375,
+      "overall": 0.659777,
+      "readout": 0.16046,
+      "rollout": 0.740235
+    },
+    "source_remaining_flags": {
+      "candidate_not_closed": true,
+      "good_behavior_low_path": false,
+      "good_readout_low_causal": false,
+      "need_causal_audit": false,
+      "need_closure_quality": false,
+      "need_component_path": false,
+      "need_layer_path": false,
+      "need_readout_competition": true
+    }
+  },
+  "phase281_updated_at": "2026-07-09T14:56:45.896278+00:00"
 }
