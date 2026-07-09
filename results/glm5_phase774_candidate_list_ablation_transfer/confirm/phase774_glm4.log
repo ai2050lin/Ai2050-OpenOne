@@ -1,80 +1,0 @@
-[21:24:12] glm4/confirm: focus=clean_fiber_high cases=3 variants=with_candidate_list,without_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
-[21:24:13] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<00:44,  9.92it/s]Loading weights:   0%|          | 2/443 [00:00<00:51,  8.59it/s]Loading weights:   5%|▌         | 24/443 [00:00<00:04, 93.03it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 183.26it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 227.40it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 252.60it/s]Loading weights:  35%|███▍      | 154/443 [00:00<00:01, 256.86it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 286.86it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 294.69it/s]Loading weights:  58%|█████▊    | 257/443 [00:01<00:00, 298.08it/s]Loading weights:  65%|██████▍   | 287/443 [00:01<00:00, 287.00it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 298.25it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 305.53it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 293.93it/s]Loading weights:  97%|█████████▋| 431/443 [00:01<00:00, 325.56it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 264.63it/s]
-[21:24:15] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[21:25:11] glm4: candidate-list ablation 1/3 cases; rows=30
-[21:26:07] glm4: candidate-list ablation 2/3 cases; rows=60
-[21:27:02] glm4: candidate-list ablation 3/3 cases; rows=90
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "confirm",
-  "n_cases": 3,
-  "by_prompt_variant": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "same_layer_control_head",
-      "n": 21,
-      "case_n": 3,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 72.66666666666667,
-      "mean_base_margin": 4.619140625,
-      "mean_scan_score": 0.025541859070654024,
-      "mean_target_logit_drop": -0.002976190476190476,
-      "mean_margin_drop_target_vs_contrast": -0.003162202380952381,
-      "mean_attention_mass": 0.15043833142235166,
-      "mean_direct_target_boost": -0.0005685563711224296,
-      "mean_direct_route_suppression": 0.02538950035618438,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 21,
-      "case_n": 3,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 72.66666666666667,
-      "mean_base_margin": 4.619140625,
-      "mean_scan_score": 0.09798253160783103,
-      "mean_target_logit_drop": -0.010416666666666666,
-      "mean_margin_drop_target_vs_contrast": -0.002139136904761905,
-      "mean_attention_mass": 0.5819664228530157,
-      "mean_direct_target_boost": 0.012122857428732373,
-      "mean_direct_route_suppression": 0.06802332856958467,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 24,
-      "case_n": 3,
-      "base_top1_rate": 1.0,
-      "mean_base_target_rank": 1.0,
-      "mean_base_margin": 2.6979166666666665,
-      "mean_scan_score": 0.18908778584902597,
-      "mean_target_logit_drop": 0.010416666666666666,
-      "mean_margin_drop_target_vs_contrast": 0.0390625,
-      "mean_attention_mass": 0.5050582215189934,
-      "mean_direct_target_boost": 0.048230880949025355,
-      "mean_direct_route_suppression": 0.07295046687916813,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "same_layer_control_head",
-      "n": 24,
-      "case_n": 3,
-      "base_top1_rate": 1.0,
-      "mean_base_target_rank": 1.0,
-      "mean_base_margin": 2.6979166666666665,
-      "mean_scan_score": 0.026252930217532364,
-      "mean_target_logit_drop": 0.010416666666666666,
-      "mean_margin_drop_target_vs_contrast": 0.026041666666666668,
-      "mean_attention_mass": 0.13351662581165633,
-      "mean_direct_target_boost": -0.00015455925502768272,
-      "mean_direct_route_suppression": 0.02851600666660185,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

@@ -1,124 +1,0 @@
-[08:13:37] glm4/main: pairs=6 target=hidden_40 audits=2 combo_candidates=3
-[08:13:38] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   1%|          | 5/443 [00:00<00:09, 45.66it/s]Loading weights:   9%|▊         | 38/443 [00:00<00:02, 190.89it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 228.18it/s]Loading weights:  23%|██▎       | 100/443 [00:00<00:01, 245.56it/s]Loading weights:  31%|███       | 136/443 [00:00<00:01, 276.81it/s]Loading weights:  38%|███▊      | 167/443 [00:00<00:00, 278.16it/s]Loading weights:  45%|████▍     | 199/443 [00:00<00:00, 288.28it/s]Loading weights:  53%|█████▎    | 236/443 [00:00<00:00, 300.98it/s]Loading weights:  60%|██████    | 268/443 [00:00<00:00, 304.00it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 308.38it/s]Loading weights:  75%|███████▌  | 333/443 [00:01<00:00, 301.68it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 310.26it/s]Loading weights:  91%|█████████ | 401/443 [00:01<00:00, 280.16it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 290.74it/s]
-[08:13:40] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[08:13:45] glm4: competitor suppression audit 2/6 pairs; rows=8
-[08:13:49] glm4: competitor suppression audit 4/6 pairs; rows=12
-[08:13:54] glm4: competitor suppression audit 6/6 pairs; rows=24
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "main",
-  "condition_summary": [
-    {
-      "condition": "joint_add_topK",
-      "suppression_scale": 0.0,
-      "n": 12,
-      "donor_top1_rate": 0.5,
-      "mean_donor_rank": 3.5,
-      "mean_margin_donor_vs_top": -1.0885416666666667,
-      "mean_margin_donor_vs_recipient": 1.3880208333333333,
-      "mean_suppression_alpha_needed": 1.1728255158573222,
-      "top_token_class_counts": {
-        "donor_answer": 6,
-        "other_vocab": 2,
-        "echo_object_or_relation": 4
-      },
-      "top_token_counts": {
-        " fruit": 2,
-        " B": 2,
-        " yellow": 2,
-        " orange": 2,
-        " stone": 3,
-        " taste": 1
-      },
-      "suppressed_token_class_counts": {
-        "donor_answer": 6,
-        "other_vocab": 2,
-        "echo_object_or_relation": 4
-      }
-    },
-    {
-      "condition": "suppress_current_top",
-      "suppression_scale": 1.0,
-      "n": 6,
-      "donor_top1_rate": 0.0,
-      "mean_donor_rank": 2.0,
-      "mean_margin_donor_vs_top": -0.3020833333333333,
-      "mean_margin_donor_vs_recipient": 1.671875,
-      "mean_suppression_alpha_needed": 2.3456510317146444,
-      "top_token_class_counts": {
-        "other_vocab": 2,
-        "format_or_schema": 2,
-        "echo_object_or_relation": 2
-      },
-      "top_token_counts": {
-        " B": 2,
-        " Category": 2,
-        " stone": 1,
-        " taste": 1
-      },
-      "suppressed_token_class_counts": {
-        "other_vocab": 2,
-        "echo_object_or_relation": 4
-      }
-    },
-    {
-      "condition": "suppress_current_top",
-      "suppression_scale": 1.25,
-      "n": 6,
-      "donor_top1_rate": 0.6666666666666666,
-      "mean_donor_rank": 1.3333333333333333,
-      "mean_margin_donor_vs_top": -0.1875,
-      "mean_margin_donor_vs_recipient": 1.9479166666666667,
-      "mean_suppression_alpha_needed": 2.3456510317146444,
-      "top_token_class_counts": {
-        "donor_answer": 4,
-        "echo_object_or_relation": 2
-      },
-      "top_token_counts": {
-        " sweet": 2,
-        " object": 2,
-        " stone": 1,
-        " taste": 1
-      },
-      "suppressed_token_class_counts": {
-        "other_vocab": 2,
-        "echo_object_or_relation": 4
-      }
-    }
-  ],
-  "suppressed_class_summary": [
-    {
-      "suppressed_token_class": "donor_answer",
-      "n": 6,
-      "mean_margin_donor_vs_top": 0.0,
-      "mean_suppression_alpha_needed": 0.0,
-      "top_token_counts": {
-        " fruit": 2,
-        " yellow": 2,
-        " orange": 2
-      }
-    },
-    {
-      "suppressed_token_class": "echo_object_or_relation",
-      "n": 4,
-      "mean_margin_donor_vs_top": -3.046875,
-      "mean_suppression_alpha_needed": 3.288603504584768,
-      "top_token_counts": {
-        " stone": 3,
-        " taste": 1
-      }
-    },
-    {
-      "suppressed_token_class": "other_vocab",
-      "n": 2,
-      "mean_margin_donor_vs_top": -0.4375,
-      "mean_suppression_alpha_needed": 0.45974608597439814,
-      "top_token_counts": {
-        " B": 2
-      }
-    }
-  ]
-}

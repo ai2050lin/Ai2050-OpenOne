@@ -1,107 +1,0 @@
-[00:35:40] deepseek7b/confirm: pairs=10 target=hidden_28 audits=2
-[00:35:40] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/339 [00:00<00:05, 56.81it/s]Loading weights:  12%|█▏        | 41/339 [00:00<00:01, 216.94it/s]Loading weights:  19%|█▉        | 66/339 [00:00<00:01, 226.16it/s]Loading weights:  27%|██▋       | 93/339 [00:00<00:01, 236.07it/s]Loading weights:  40%|███▉      | 134/339 [00:00<00:00, 287.74it/s]Loading weights:  48%|████▊     | 163/339 [00:00<00:00, 278.10it/s]Loading weights:  58%|█████▊    | 197/339 [00:00<00:00, 288.20it/s]Loading weights:  67%|██████▋   | 226/339 [00:00<00:00, 280.83it/s]Loading weights:  75%|███████▌  | 255/339 [00:00<00:00, 266.29it/s]Loading weights:  83%|████████▎ | 282/339 [00:01<00:00, 266.59it/s]Loading weights:  93%|█████████▎| 316/339 [00:01<00:00, 282.52it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 267.82it/s]
-[00:35:42] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[00:35:55] deepseek7b: threshold audit 3/10 pairs; rows=6
-[00:36:08] deepseek7b: threshold audit 6/10 pairs; rows=12
-[00:36:21] deepseek7b: threshold audit 9/10 pairs; rows=18
-[00:36:25] deepseek7b: threshold audit 10/10 pairs; rows=20
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "confirm",
-  "target_site": "hidden_28",
-  "top_threshold_audits": [
-    {
-      "intervention_key": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017] conflict<-explicit",
-      "intervention_label": "source_plus_all_mlp|L22H24<-all_pre_answer|L27:mlp[2872:2932]+L22:mlp[957:1017]",
-      "direction": "conflict<-explicit",
-      "intervention_mode": "source_plus_all_mlp",
-      "source_component_id": "L22H24",
-      "source_group": "all_pre_answer",
-      "mlp_components": [
-        "L27:mlp[2872:2932]",
-        "L22:mlp[957:1017]"
-      ],
-      "n": 10,
-      "patched_candidate_best_counts": {
-        "recipient_answer": 6,
-        "object_echo": 2,
-        "format_the": 2
-      },
-      "patched_vocab_top_counts": {
-        " tool": 1,
-        " blue": 2,
-        " bitter": 2,
-        " carrot": 1,
-        " The": 2,
-        " stone": 1,
-        " sweet": 1
-      },
-      "mean_patched_margin_donor_vs_recipient": -7.609375,
-      "mean_patched_margin_donor_vs_candidate_best": -8.015625,
-      "mean_patched_margin_donor_vs_vocab_top": -8.015625,
-      "mean_alpha_star_vocab_top": 5.961867421753157,
-      "mean_alpha_star_candidate_best": 5.961867421753157,
-      "candidate_flip_found_rate": 1.0,
-      "vocab_flip_found_rate": 1.0,
-      "mean_first_alpha_donor_candidate_top": 11.653879293905174,
-      "mean_first_alpha_donor_vocab_top": 11.653879293905174,
-      "boosted_generation_tested": 10,
-      "boosted_generation_donor_hit_rate": 1.0,
-      "boosted_generation_class_counts": {
-        "answer_stop": 10
-      },
-      "mean_final_norm_output_norm": 191.51158142089844,
-      "mean_source_contribution_delta_norm": 8.041763019561767,
-      "mean_mlp_delta_norm_total": 69.33902635574341
-    },
-    {
-      "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
-      "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
-      "direction": "explicit<-conflict",
-      "intervention_mode": "source_plus_all_mlp",
-      "source_component_id": "L22H24",
-      "source_group": "target_record_line",
-      "mlp_components": [
-        "L27:mlp[2872:2932]",
-        "L22:mlp[957:1017]"
-      ],
-      "n": 10,
-      "patched_candidate_best_counts": {
-        "relation_echo": 1,
-        "recipient_answer": 9
-      },
-      "patched_vocab_top_counts": {
-        " category": 1,
-        " red": 1,
-        " sweet": 2,
-        " yellow": 1,
-        " vegetable": 1,
-        " orange": 1,
-        " object": 1,
-        " gray": 1,
-        " none": 1
-      },
-      "mean_patched_margin_donor_vs_recipient": -11.648046875,
-      "mean_patched_margin_donor_vs_candidate_best": -11.710546875,
-      "mean_patched_margin_donor_vs_vocab_top": -11.710546875,
-      "mean_alpha_star_vocab_top": 8.636828474791173,
-      "mean_alpha_star_candidate_best": 8.636828474791173,
-      "candidate_flip_found_rate": 1.0,
-      "vocab_flip_found_rate": 1.0,
-      "mean_first_alpha_donor_candidate_top": 17.398877098777383,
-      "mean_first_alpha_donor_vocab_top": 17.398877098777383,
-      "boosted_generation_tested": 10,
-      "boosted_generation_donor_hit_rate": 1.0,
-      "boosted_generation_class_counts": {
-        "answer_mentioned": 5,
-        "answer_stop": 5
-      },
-      "mean_final_norm_output_norm": 186.4530792236328,
-      "mean_source_contribution_delta_norm": 7.51079580783844,
-      "mean_mlp_delta_norm_total": 69.33902635574341
-    }
-  ]
-}

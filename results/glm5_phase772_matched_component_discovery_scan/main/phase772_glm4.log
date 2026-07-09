@@ -1,77 +1,0 @@
-[20:31:54] glm4/main: focus=all_matched cases=8 sources=['instruction', 'question', 'object_tokens', 'relation_tokens']
-[20:31:55] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:46,  9.44it/s]Loading weights:   7%|▋         | 31/443 [00:00<00:03, 121.44it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 177.21it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 219.91it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 249.09it/s]Loading weights:  35%|███▍      | 153/443 [00:00<00:01, 254.71it/s]Loading weights:  43%|████▎     | 190/443 [00:00<00:00, 267.33it/s]Loading weights:  53%|█████▎    | 235/443 [00:00<00:00, 311.68it/s]Loading weights:  60%|██████    | 267/443 [00:01<00:00, 292.79it/s]Loading weights:  67%|██████▋   | 298/443 [00:01<00:00, 287.98it/s]Loading weights:  75%|███████▌  | 334/443 [00:01<00:00, 298.37it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 306.55it/s]Loading weights:  90%|█████████ | 400/443 [00:01<00:00, 309.23it/s]Loading weights:  98%|█████████▊| 434/443 [00:01<00:00, 306.83it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 269.02it/s]
-[20:31:57] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[20:32:27] glm4: component discovery 2/8 cases; rows=6
-[20:32:57] glm4: component discovery 4/8 cases; rows=12
-[20:33:26] glm4: component discovery 6/8 cases; rows=18
-[20:33:55] glm4: component discovery 8/8 cases; rows=24
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "main",
-  "n_cases": 8,
-  "top_components": [
-    {
-      "component_key": "L34:attn_out:H10:instruction",
-      "n": 1,
-      "case_n": 1,
-      "mean_scan_score": 2.1401397286603845,
-      "mean_target_logit_drop": 0.5625,
-      "mean_margin_drop_target_vs_contrast": 0.6875,
-      "mean_attention_mass": 0.9759149551391602,
-      "mean_direct_target_boost": 1.3925749063491821,
-      "mean_direct_route_suppression": 0.05394870415329933,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "component_key": "L34:attn_out:H13:instruction",
-      "n": 1,
-      "case_n": 1,
-      "mean_scan_score": 1.2429834774074455,
-      "mean_target_logit_drop": 0.3125,
-      "mean_margin_drop_target_vs_contrast": 0.3125,
-      "mean_attention_mass": 0.8819694519042969,
-      "mean_direct_target_boost": 0.8376140594482422,
-      "mean_direct_route_suppression": 0.06562203634530306,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "component_key": "L35:attn_out:H28:instruction",
-      "n": 2,
-      "case_n": 2,
-      "mean_scan_score": 0.5543365793923537,
-      "mean_target_logit_drop": 0.15625,
-      "mean_margin_drop_target_vs_contrast": 0.1875,
-      "mean_attention_mass": 0.9283742904663086,
-      "mean_direct_target_boost": 0.37610578536987305,
-      "mean_direct_route_suppression": 0.0,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "component_key": "L38:attn_out:H26:instruction",
-      "n": 1,
-      "case_n": 1,
-      "mean_scan_score": 0.19021241888403892,
-      "mean_target_logit_drop": 0.125,
-      "mean_margin_drop_target_vs_contrast": 0.125,
-      "mean_attention_mass": 0.8804779052734375,
-      "mean_direct_target_boost": 0.031084932386875153,
-      "mean_direct_route_suppression": 0.0995611622929573,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "component_key": "L34:attn_out:H1:instruction",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.9332534039020539,
-      "mean_target_logit_drop": 0.0875,
-      "mean_margin_drop_target_vs_contrast": 0.075,
-      "mean_attention_mass": 0.6872275352478028,
-      "mean_direct_target_boost": 0.6009223878383636,
-      "mean_direct_route_suppression": 0.0,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

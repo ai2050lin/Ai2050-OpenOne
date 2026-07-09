@@ -1,67 +1,0 @@
-[20:51:30] qwen3/smoke: focus=clean_fiber_high cases=2 sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix']
-[20:51:30] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 250.88it/s]Loading weights:  20%|█▉        | 79/398 [00:00<00:00, 411.28it/s]Loading weights:  35%|███▌      | 140/398 [00:00<00:00, 497.51it/s]Loading weights:  53%|█████▎    | 212/398 [00:00<00:00, 553.22it/s]Loading weights:  69%|██████▉   | 275/398 [00:00<00:00, 577.93it/s]Loading weights:  86%|████████▌ | 342/398 [00:00<00:00, 606.75it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 560.66it/s]
-[20:51:31] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
-[20:51:37] qwen3: source disentanglement 1/2 cases; rows=4
-[20:51:41] qwen3: source disentanglement 2/2 cases; rows=8
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "smoke",
-  "n_cases": 2,
-  "by_source_family": [
-    {
-      "source_family": "candidate_protocol",
-      "candidate_kind": "source_group_top_component",
-      "n": 2,
-      "case_n": 2,
-      "mean_scan_score": 22.354168581465878,
-      "mean_target_logit_drop": 0.75,
-      "mean_margin_drop_target_vs_contrast": 0.96875,
-      "mean_attention_mass": 0.482364296913147,
-      "mean_direct_target_boost": 14.954689025878906,
-      "mean_direct_route_suppression": 0.9500977545976639,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "output_prefix",
-      "candidate_kind": "source_group_top_component",
-      "n": 2,
-      "case_n": 2,
-      "mean_scan_score": 1.169172665476799,
-      "mean_target_logit_drop": 0.125,
-      "mean_margin_drop_target_vs_contrast": -0.28125,
-      "mean_attention_mass": 0.45703125,
-      "mean_direct_target_boost": 0.2918321192264557,
-      "mean_direct_route_suppression": 0.6234259903430939,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_format",
-      "candidate_kind": "source_group_top_component",
-      "n": 2,
-      "case_n": 2,
-      "mean_scan_score": 0.18415233120322227,
-      "mean_target_logit_drop": 0.0625,
-      "mean_margin_drop_target_vs_contrast": -0.03125,
-      "mean_attention_mass": 0.06066322326660156,
-      "mean_direct_target_boost": 0.11466382443904877,
-      "mean_direct_route_suppression": 0.059338510036468506,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_instruction",
-      "candidate_kind": "source_group_top_component",
-      "n": 2,
-      "case_n": 2,
-      "mean_scan_score": 0.22762822788208725,
-      "mean_target_logit_drop": 0.0,
-      "mean_margin_drop_target_vs_contrast": 0.0625,
-      "mean_attention_mass": 0.6349794864654541,
-      "mean_direct_target_boost": 0.004509125137701631,
-      "mean_direct_route_suppression": 0.2989659830927849,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

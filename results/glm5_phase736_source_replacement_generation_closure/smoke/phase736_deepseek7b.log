@@ -1,115 +1,0 @@
-[22:49:45] deepseek7b/smoke: pairs=2 target_site=hidden_28 source_paths=2
-[22:49:46] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|▏         | 5/339 [00:00<00:07, 42.91it/s]Loading weights:  12%|█▏        | 41/339 [00:00<00:01, 210.47it/s]Loading weights:  19%|█▊        | 63/339 [00:00<00:01, 213.84it/s]Loading weights:  29%|██▉       | 100/339 [00:00<00:00, 253.00it/s]Loading weights:  40%|████      | 137/339 [00:00<00:00, 287.53it/s]Loading weights:  50%|████▉     | 168/339 [00:00<00:00, 293.95it/s]Loading weights:  58%|█████▊    | 198/339 [00:00<00:00, 273.41it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 287.39it/s]Loading weights:  77%|███████▋  | 261/339 [00:00<00:00, 276.81it/s]Loading weights:  86%|████████▌ | 290/339 [00:01<00:00, 251.63it/s]Loading weights:  97%|█████████▋| 328/339 [00:01<00:00, 282.96it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 266.61it/s]
-[22:49:47] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[22:49:49] deepseek7b: replacement closure 1/2 pairs; rows=4
-[22:49:50] deepseek7b: replacement closure 2/2 pairs; rows=8
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke",
-  "target_site": "hidden_28",
-  "top_replacement_paths": [
-    {
-      "component_id": "L22H24",
-      "layer": 22,
-      "head": 24,
-      "source_group": "all_pre_answer",
-      "direction": "conflict<-explicit",
-      "n": 2,
-      "mean_restore_projection": 19.91692543029785,
-      "mean_restore_fraction": 0.03501479980833529,
-      "mean_donor_logprob_delta": 0.07382726669311523,
-      "mean_recipient_logprob_delta": -0.00429806113243103,
-      "mean_donor_rank_delta": 4.0,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.9839550256729126,
-      "mean_recipient_attention_mass": 0.9904885292053223,
-      "mean_contribution_delta_norm": 10.729984760284424,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L22H24",
-      "layer": 22,
-      "head": 24,
-      "source_group": "records_all",
-      "direction": "explicit<-conflict",
-      "n": 2,
-      "mean_restore_projection": 17.38309621810913,
-      "mean_restore_fraction": 0.02756265742831841,
-      "mean_donor_logprob_delta": 0.41049766540527344,
-      "mean_recipient_logprob_delta": -0.025049231946468353,
-      "mean_donor_rank_delta": -1682.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 0.5,
-      "baseline_recipient_hit_rate": 0.5,
-      "changed_rate": 0.5,
-      "mean_donor_attention_mass": 0.8242940902709961,
-      "mean_recipient_attention_mass": 0.738799512386322,
-      "mean_contribution_delta_norm": 9.997029066085815,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L22H24",
-      "layer": 22,
-      "head": 24,
-      "source_group": "all_pre_answer",
-      "direction": "explicit<-conflict",
-      "n": 2,
-      "mean_restore_projection": 16.23861598968506,
-      "mean_restore_fraction": 0.025440538638971298,
-      "mean_donor_logprob_delta": 0.42749500274658203,
-      "mean_recipient_logprob_delta": 0.031010635197162628,
-      "mean_donor_rank_delta": -1678.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 0.5,
-      "baseline_recipient_hit_rate": 0.5,
-      "changed_rate": 0.5,
-      "mean_donor_attention_mass": 0.9904885292053223,
-      "mean_recipient_attention_mass": 0.9839550256729126,
-      "mean_contribution_delta_norm": 10.729984760284424,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L22H24",
-      "layer": 22,
-      "head": 24,
-      "source_group": "records_all",
-      "direction": "conflict<-explicit",
-      "n": 2,
-      "mean_restore_projection": 11.12438154220581,
-      "mean_restore_fraction": 0.020352954401480643,
-      "mean_donor_logprob_delta": -0.0025653839111328125,
-      "mean_recipient_logprob_delta": -0.002565532922744751,
-      "mean_donor_rank_delta": 5.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.738799512386322,
-      "mean_recipient_attention_mass": 0.8242940902709961,
-      "mean_contribution_delta_norm": 9.997029066085815,
-      "role_guess": "state_transfer_only"
-    }
-  ]
-}

@@ -1,39 +1,0 @@
-[20:29:52] deepseek7b/smoke: focus=all_matched cases=2 sources=['instruction', 'question']
-[20:29:52] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:27, 12.34it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 127.15it/s]Loading weights:  16%|█▌        | 53/339 [00:00<00:01, 160.85it/s]Loading weights:  29%|██▊       | 97/339 [00:00<00:00, 249.17it/s]Loading weights:  37%|███▋      | 126/339 [00:00<00:00, 253.65it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 263.30it/s]Loading weights:  57%|█████▋    | 193/339 [00:00<00:00, 275.09it/s]Loading weights:  65%|██████▌   | 222/339 [00:00<00:00, 263.35it/s]Loading weights:  73%|███████▎  | 249/339 [00:01<00:00, 263.77it/s]Loading weights:  83%|████████▎ | 281/339 [00:01<00:00, 263.04it/s]Loading weights:  91%|█████████ | 308/339 [00:01<00:00, 264.10it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 249.87it/s]
-[20:29:54] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[20:29:57] deepseek7b: component discovery 1/2 cases; rows=1
-[20:30:00] deepseek7b: component discovery 2/2 cases; rows=2
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke",
-  "n_cases": 2,
-  "top_components": [
-    {
-      "component_key": "L23:attn_out:H19:question",
-      "n": 1,
-      "case_n": 1,
-      "mean_scan_score": 1.7675106145441533,
-      "mean_target_logit_drop": -0.25,
-      "mean_margin_drop_target_vs_contrast": -0.0625,
-      "mean_attention_mass": 0.6884727478027344,
-      "mean_direct_target_boost": 0.7595720291137695,
-      "mean_direct_route_suppression": 1.1682960093021393,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "component_key": "L23:attn_out:H20:instruction",
-      "n": 1,
-      "case_n": 1,
-      "mean_scan_score": 1.3136407867074014,
-      "mean_target_logit_drop": -0.25,
-      "mean_margin_drop_target_vs_contrast": -0.125,
-      "mean_attention_mass": 0.814544677734375,
-      "mean_direct_target_boost": 0.4414002299308777,
-      "mean_direct_route_suppression": 1.143087387084961,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

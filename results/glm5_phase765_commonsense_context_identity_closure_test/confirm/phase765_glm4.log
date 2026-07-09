@@ -1,97 +1,0 @@
-[18:07:17] glm4/confirm: cases=108 sources=['instruction', 'question', 'object_tokens', 'relation_tokens', 'answer_prefix'] relations=['category', 'edible', 'grows_on_tree']
-[18:07:18] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:48,  9.13it/s]Loading weights:   7%|▋         | 31/443 [00:00<00:03, 111.95it/s]Loading weights:  15%|█▌        | 68/443 [00:00<00:01, 200.37it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 216.49it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 245.94it/s]Loading weights:  36%|███▌      | 158/443 [00:00<00:01, 262.27it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 284.51it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 292.32it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 297.85it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 302.22it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 299.50it/s]Loading weights:  81%|████████  | 359/443 [00:01<00:00, 313.83it/s]Loading weights:  88%|████████▊ | 391/443 [00:01<00:00, 311.22it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 309.50it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 270.59it/s]
-[18:07:20] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[18:07:34] glm4: commonsense fibers 18/108 cases; rows=198
-[18:07:48] glm4: commonsense fibers 36/108 cases; rows=396
-[18:08:02] glm4: commonsense fibers 54/108 cases; rows=594
-[18:08:15] glm4: commonsense fibers 72/108 cases; rows=792
-[18:08:29] glm4: commonsense fibers 90/108 cases; rows=990
-[18:08:43] glm4: commonsense fibers 108/108 cases; rows=1188
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "confirm",
-  "n_cases": 108,
-  "observation_summary": {
-    "overall": {
-      "n": 108,
-      "target_top1_rate": 0.5925925925925926,
-      "mean_target_rank": 1.6574074074074074,
-      "mean_contrast_rank": 5.046296296296297
-    },
-    "by_context": {
-      "commonsense_question": {
-        "n": 54,
-        "target_top1_rate": 0.46296296296296297,
-        "mean_target_rank": 1.8518518518518519,
-        "mean_contrast_rank": 5.481481481481482
-      },
-      "commonsense_statement": {
-        "n": 54,
-        "target_top1_rate": 0.7222222222222222,
-        "mean_target_rank": 1.462962962962963,
-        "mean_contrast_rank": 4.611111111111111
-      }
-    },
-    "by_relation": {
-      "category": {
-        "n": 36,
-        "target_top1_rate": 0.8055555555555556,
-        "mean_target_rank": 1.4444444444444444,
-        "mean_contrast_rank": 10.75
-      },
-      "edible": {
-        "n": 36,
-        "target_top1_rate": 0.5,
-        "mean_target_rank": 1.6666666666666667,
-        "mean_contrast_rank": 1.9722222222222223
-      },
-      "grows_on_tree": {
-        "n": 36,
-        "target_top1_rate": 0.4722222222222222,
-        "mean_target_rank": 1.8611111111111112,
-        "mean_contrast_rank": 2.4166666666666665
-      }
-    }
-  },
-  "context_pair_summaries": {
-    "commonsense_question": {
-      "n_objects": 18,
-      "n_features": 120,
-      "pair_summary": {
-        "same_domain_mean": 0.15449217529060325,
-        "different_domain_mean": -0.053240365272819994,
-        "separation": 0.20773254056342325,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.2222222222222222
-      }
-    },
-    "commonsense_statement": {
-      "n_objects": 18,
-      "n_features": 120,
-      "pair_summary": {
-        "same_domain_mean": 0.08661433918922078,
-        "different_domain_mean": -0.06957757314131804,
-        "separation": 0.1561919123305388,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.2777777777777778
-      }
-    }
-  },
-  "cross_context_stability": [
-    {
-      "context_a": "commonsense_question",
-      "context_b": "commonsense_statement",
-      "common_objects": 18,
-      "same_object_mean": -0.26123346909735196,
-      "same_domain_diff_object_mean": -0.38475914033203973,
-      "different_domain_mean": -0.42194288292622906,
-      "object_stability_gap": 0.12352567123468777,
-      "domain_stability_gap": 0.03718374259418933
-    }
-  ]
-}

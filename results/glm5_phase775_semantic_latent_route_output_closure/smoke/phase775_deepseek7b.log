@@ -1,101 +1,0 @@
-[21:38:06] deepseek7b/smoke: focus=clean_fiber_high cases=2 variants=without_candidate_list,constrained_free_prompt,with_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens']
-[21:38:07] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:29, 11.49it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 125.58it/s]Loading weights:  16%|█▌        | 53/339 [00:00<00:01, 155.64it/s]Loading weights:  28%|██▊       | 96/339 [00:00<00:00, 247.33it/s]Loading weights:  37%|███▋      | 125/339 [00:00<00:00, 246.75it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 262.53it/s]Loading weights:  58%|█████▊    | 196/339 [00:00<00:00, 285.11it/s]Loading weights:  67%|██████▋   | 226/339 [00:00<00:00, 273.89it/s]Loading weights:  75%|███████▌  | 255/339 [00:01<00:00, 264.73it/s]Loading weights:  83%|████████▎ | 282/339 [00:01<00:00, 265.96it/s]Loading weights:  92%|█████████▏| 313/339 [00:01<00:00, 262.47it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 248.16it/s]
-[21:38:09] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[21:38:30] deepseek7b: semantic latent audit 1/2 cases; rows=19
-[21:38:51] deepseek7b: semantic latent audit 2/2 cases; rows=38
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke",
-  "n_cases": 2,
-  "by_prompt_observation": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "n": 2,
-      "case_n": 2,
-      "base_top1_rate": 0.0,
-      "latent_pool_hit_rate": 0.5,
-      "pool_target_top1_rate": 0.5,
-      "mean_base_target_rank": 10435.0,
-      "mean_pool_target_rank": 1.5,
-      "mean_base_margin": 1.27197265625,
-      "mean_pool_margin_target_vs_best_other": 0.09033203125
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "n": 2,
-      "case_n": 2,
-      "base_top1_rate": 0.0,
-      "latent_pool_hit_rate": 0.5,
-      "pool_target_top1_rate": 0.5,
-      "mean_base_target_rank": 4.0,
-      "mean_pool_target_rank": 1.5,
-      "mean_base_margin": 1.1875,
-      "mean_pool_margin_target_vs_best_other": 1.1875
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "n": 2,
-      "case_n": 2,
-      "base_top1_rate": 0.0,
-      "latent_pool_hit_rate": 0.5,
-      "pool_target_top1_rate": 0.5,
-      "mean_base_target_rank": 3543.5,
-      "mean_pool_target_rank": 1.5,
-      "mean_base_margin": 0.9140625,
-      "mean_pool_margin_target_vs_best_other": -0.609375
-    }
-  ],
-  "by_prompt_effect": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 10,
-      "case_n": 2,
-      "mean_target_logit_drop": -0.41982421875,
-      "mean_margin_drop_target_vs_contrast": -0.1680908203125,
-      "mean_target_rank_delta": -6245.6,
-      "mean_pool_rank_delta": 0.0,
-      "mean_pool_margin_drop": -0.08466796875,
-      "mean_attention_mass": 0.4622447967529297,
-      "mean_direct_target_boost": 0.19520062133669852,
-      "mean_direct_route_suppression": 0.46176845729351046,
-      "top1_loss_rate": 0.0,
-      "pool_top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 12,
-      "case_n": 2,
-      "mean_target_logit_drop": -0.010416666666666666,
-      "mean_margin_drop_target_vs_contrast": -0.08854166666666667,
-      "mean_target_rank_delta": -0.08333333333333333,
-      "mean_pool_rank_delta": 0.0,
-      "mean_pool_margin_drop": -0.08854166666666667,
-      "mean_attention_mass": 0.3241892655690511,
-      "mean_direct_target_boost": 1.3570905222247045,
-      "mean_direct_route_suppression": 0.3804401362625261,
-      "top1_loss_rate": 0.0,
-      "pool_top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "candidate_kind": "source_group_top_component",
-      "n": 10,
-      "case_n": 2,
-      "mean_target_logit_drop": 0.009375,
-      "mean_margin_drop_target_vs_contrast": -0.06298828125,
-      "mean_target_rank_delta": -842.3,
-      "mean_pool_rank_delta": 0.0,
-      "mean_pool_margin_drop": -0.065625,
-      "mean_attention_mass": 0.43740692138671877,
-      "mean_direct_target_boost": 0.19607891216874124,
-      "mean_direct_route_suppression": 0.437315228395164,
-      "top1_loss_rate": 0.0,
-      "pool_top1_loss_rate": 0.0
-    }
-  ]
-}

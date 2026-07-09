@@ -1,91 +1,0 @@
-[22:17:43] deepseek7b/confirm: focus=clean_fiber_high cases=8 variants=without_candidate_list,constrained_free_prompt,with_candidate_list top_k=50
-[22:17:44] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[22:17:44] [load] deepseek7b: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[22:17:44] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:30, 11.15it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 114.84it/s]Loading weights:  19%|█▉        | 65/339 [00:00<00:01, 200.93it/s]Loading weights:  28%|██▊       | 94/339 [00:00<00:01, 222.18it/s]Loading weights:  37%|███▋      | 126/339 [00:00<00:00, 245.18it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 272.11it/s]Loading weights:  56%|█████▌    | 190/339 [00:00<00:00, 256.19it/s]Loading weights:  65%|██████▌   | 222/339 [00:00<00:00, 273.59it/s]Loading weights:  76%|███████▌  | 256/339 [00:01<00:00, 291.45it/s]Loading weights:  84%|████████▍ | 286/339 [00:01<00:00, 272.31it/s]Loading weights:  93%|█████████▎| 314/339 [00:01<00:00, 264.21it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 248.34it/s]
-[22:17:45] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
-[22:17:46] deepseek7b: readout bridge audit 2/8 cases; rows=306
-[22:17:46] deepseek7b: readout bridge audit 4/8 cases; rows=612
-[22:17:47] deepseek7b: readout bridge audit 6/8 cases; rows=918
-[22:17:47] deepseek7b: readout bridge audit 8/8 cases; rows=1224
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "confirm",
-  "attn": "sdpa",
-  "n_cases": 8,
-  "by_prompt_observation": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "n": 8,
-      "case_n": 8,
-      "base_top1_rate": 0.125,
-      "pool_top1_rate": 0.625,
-      "latent_pool_hit_rate": 0.5,
-      "mean_base_target_rank": 1186.375,
-      "mean_pool_target_rank": 1.5,
-      "mean_top1_gap_above_target": 5.390625
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "n": 8,
-      "case_n": 8,
-      "base_top1_rate": 0.375,
-      "pool_top1_rate": 0.75,
-      "latent_pool_hit_rate": 0.375,
-      "mean_base_target_rank": 2.875,
-      "mean_pool_target_rank": 1.25,
-      "mean_top1_gap_above_target": 1.5703125
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "n": 8,
-      "case_n": 8,
-      "base_top1_rate": 0.125,
-      "pool_top1_rate": 0.75,
-      "latent_pool_hit_rate": 0.625,
-      "mean_base_target_rank": 675.0,
-      "mean_pool_target_rank": 1.25,
-      "mean_top1_gap_above_target": 5.2249755859375
-    }
-  ],
-  "latent_top1_competitor_by_prompt": [
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "competitor_class": "case_variant_target_value",
-      "n": 4,
-      "case_n": 4,
-      "mean_gap_above_target": 5.015625,
-      "mean_base_target_rank": 8.75,
-      "mean_pool_target_rank": 1.0
-    },
-    {
-      "prompt_variant": "without_candidate_list",
-      "competitor_class": "case_variant_target_value",
-      "n": 4,
-      "case_n": 4,
-      "mean_gap_above_target": 5.0,
-      "mean_base_target_rank": 11.5,
-      "mean_pool_target_rank": 1.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "competitor_class": "case_variant_target_value",
-      "n": 3,
-      "case_n": 3,
-      "mean_gap_above_target": 2.625,
-      "mean_base_target_rank": 3.0,
-      "mean_pool_target_rank": 1.0
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "competitor_class": "lexical_capitalized",
-      "n": 1,
-      "case_n": 1,
-      "mean_gap_above_target": 4.53125,
-      "mean_base_target_rank": 176.0,
-      "mean_pool_target_rank": 1.0
-    }
-  ]
-}

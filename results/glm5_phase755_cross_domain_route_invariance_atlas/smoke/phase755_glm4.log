@@ -1,95 +1,0 @@
-[12:12:10] glm4/smoke: pairs=2 candidates=1 sources=['target_record_line', 'target_value_tokens']
-[12:12:11] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<01:42,  4.33it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:04, 100.72it/s]Loading weights:  13%|█▎        | 56/443 [00:00<00:02, 159.14it/s]Loading weights:  20%|██        | 90/443 [00:00<00:01, 215.74it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 245.94it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 264.48it/s]Loading weights:  43%|████▎     | 191/443 [00:00<00:00, 264.18it/s]Loading weights:  53%|█████▎    | 235/443 [00:01<00:00, 291.25it/s]Loading weights:  60%|█████▉    | 265/443 [00:01<00:00, 288.04it/s]Loading weights:  68%|██████▊   | 300/443 [00:01<00:00, 295.22it/s]Loading weights:  75%|███████▌  | 333/443 [00:01<00:00, 300.37it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 307.42it/s]Loading weights:  90%|█████████ | 399/443 [00:01<00:00, 303.56it/s]Loading weights:  98%|█████████▊| 434/443 [00:01<00:00, 306.22it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 263.12it/s]
-[12:12:13] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[12:12:14] glm4: cross-domain atlas 1/2 pairs; rows=3
-[12:12:15] glm4: cross-domain atlas 2/2 pairs; rows=6
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "smoke",
-  "route_js": 0.5312605009229713,
-  "top": [
-    {
-      "site": "L35:attn_out",
-      "head": 29,
-      "subunit_id": "L35:attn_out:H29",
-      "source_group": "target_value_tokens",
-      "n": 2,
-      "domains": [
-        "abstract",
-        "fruit"
-      ],
-      "relations": [
-        "category",
-        "shape"
-      ],
-      "mean_attention_mass_to_source": 0.004547119140625,
-      "mean_source_target_logit_contribution": -0.00039746581751387566,
-      "mean_source_total_route_suppression_contribution": 0.00046530317376891617,
-      "mean_target_logit_drop_after_source_removal": 0.0,
-      "support_rate_drop_gt_0_20": 0.0,
-      "mean_total_positive_route_release_after_source_removal": 0.09375,
-      "route_guard_rate_release_gt_0_20": 0.0,
-      "top1_loss_rate": 0.0,
-      "domain_breakdown": {
-        "abstract": {
-          "n": 1,
-          "support_rate": 0.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.0,
-          "mean_route_release": 0.125
-        },
-        "fruit": {
-          "n": 1,
-          "support_rate": 0.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.0,
-          "mean_route_release": 0.0625
-        }
-      },
-      "cross_domain_guess": "domain_specific_or_weak"
-    },
-    {
-      "site": "L35:attn_out",
-      "head": 29,
-      "subunit_id": "L35:attn_out:H29",
-      "source_group": "target_record_line",
-      "n": 2,
-      "domains": [
-        "abstract",
-        "fruit"
-      ],
-      "relations": [
-        "category",
-        "shape"
-      ],
-      "mean_attention_mass_to_source": 0.05612754821777344,
-      "mean_source_target_logit_contribution": 0.0001467015317757614,
-      "mean_source_total_route_suppression_contribution": 0.0005622926255455241,
-      "mean_target_logit_drop_after_source_removal": 0.0,
-      "support_rate_drop_gt_0_20": 0.0,
-      "mean_total_positive_route_release_after_source_removal": 0.0625,
-      "route_guard_rate_release_gt_0_20": 0.0,
-      "top1_loss_rate": 0.0,
-      "domain_breakdown": {
-        "abstract": {
-          "n": 1,
-          "support_rate": 0.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.0,
-          "mean_route_release": 0.125
-        },
-        "fruit": {
-          "n": 1,
-          "support_rate": 0.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.0,
-          "mean_route_release": 0.0
-        }
-      },
-      "cross_domain_guess": "domain_specific_or_weak"
-    }
-  ]
-}

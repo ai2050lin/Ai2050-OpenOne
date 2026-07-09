@@ -1,50 +1,0 @@
-[00:31:35] qwen3/smoke: pairs=1 target=hidden_36 audits=1
-[00:31:35] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   5%|▌         | 20/398 [00:00<00:02, 156.49it/s]Loading weights:  24%|██▍       | 97/398 [00:00<00:00, 477.15it/s]Loading weights:  40%|████      | 160/398 [00:00<00:00, 534.67it/s]Loading weights:  55%|█████▌    | 219/398 [00:00<00:00, 553.52it/s]Loading weights:  70%|██████▉   | 278/398 [00:00<00:00, 539.00it/s]Loading weights:  89%|████████▉ | 355/398 [00:00<00:00, 605.61it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 553.02it/s]
-[00:31:36] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
-[00:31:38] qwen3: threshold audit 1/1 pairs; rows=1
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "smoke",
-  "target_site": "hidden_36",
-  "top_threshold_audits": [
-    {
-      "intervention_key": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341] explicit<-conflict",
-      "intervention_label": "source_plus_all_mlp|L35H0<-self_last|L34:mlp[85:128]+L28:mlp[299:341]",
-      "direction": "explicit<-conflict",
-      "intervention_mode": "source_plus_all_mlp",
-      "source_component_id": "L35H0",
-      "source_group": "self_last",
-      "mlp_components": [
-        "L34:mlp[85:128]",
-        "L28:mlp[299:341]"
-      ],
-      "n": 1,
-      "patched_candidate_best_counts": {
-        "recipient_answer": 1
-      },
-      "patched_vocab_top_counts": {
-        " fruit": 1
-      },
-      "mean_patched_margin_donor_vs_recipient": -19.25,
-      "mean_patched_margin_donor_vs_candidate_best": -19.25,
-      "mean_patched_margin_donor_vs_vocab_top": -19.25,
-      "mean_alpha_star_vocab_top": 12.957913685488862,
-      "mean_alpha_star_candidate_best": 12.957913685488862,
-      "candidate_flip_found_rate": 1.0,
-      "vocab_flip_found_rate": 1.0,
-      "mean_first_alpha_donor_candidate_top": 25.915827370977723,
-      "mean_first_alpha_donor_vocab_top": 25.915827370977723,
-      "boosted_generation_tested": 1,
-      "boosted_generation_donor_hit_rate": 1.0,
-      "boosted_generation_class_counts": {
-        "answer_stop": 1
-      },
-      "mean_final_norm_output_norm": 180.4156036376953,
-      "mean_source_contribution_delta_norm": 17.459585189819336,
-      "mean_mlp_delta_norm_total": 16.35501527786255
-    }
-  ]
-}

@@ -1,80 +1,0 @@
-[21:27:05] deepseek7b/confirm: focus=clean_fiber_high cases=3 variants=with_candidate_list,without_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
-[21:27:05] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<00:58,  5.81it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 124.33it/s]Loading weights:  16%|█▌        | 53/339 [00:00<00:01, 160.84it/s]Loading weights:  26%|██▌       | 87/339 [00:00<00:01, 192.97it/s]Loading weights:  40%|████      | 137/339 [00:00<00:00, 277.37it/s]Loading weights:  50%|████▉     | 168/339 [00:00<00:00, 286.33it/s]Loading weights:  58%|█████▊    | 198/339 [00:00<00:00, 270.01it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 283.20it/s]Loading weights:  77%|███████▋  | 262/339 [00:01<00:00, 248.53it/s]Loading weights:  90%|████████▉ | 304/339 [00:01<00:00, 285.66it/s]Loading weights:  99%|█████████▊| 334/339 [00:01<00:00, 277.08it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 248.30it/s]
-[21:27:07] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[21:27:47] deepseek7b: candidate-list ablation 1/3 cases; rows=30
-[21:28:26] deepseek7b: candidate-list ablation 2/3 cases; rows=60
-[21:29:04] deepseek7b: candidate-list ablation 3/3 cases; rows=90
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "confirm",
-  "n_cases": 3,
-  "by_prompt_variant": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 21,
-      "case_n": 3,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 6958.666666666667,
-      "mean_base_margin": 3.9469401041666665,
-      "mean_scan_score": 4.171163563572225,
-      "mean_target_logit_drop": 0.0907563709077381,
-      "mean_margin_drop_target_vs_contrast": 0.2851155598958333,
-      "mean_attention_mass": 0.43601840024902705,
-      "mean_direct_target_boost": 0.9081913325048628,
-      "mean_direct_route_suppression": 4.179416082444645,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "same_layer_control_head",
-      "n": 21,
-      "case_n": 3,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 6958.666666666667,
-      "mean_base_margin": 3.9469401041666665,
-      "mean_scan_score": 0.28765199787225054,
-      "mean_target_logit_drop": 0.05747767857142857,
-      "mean_margin_drop_target_vs_contrast": 0.018275669642857144,
-      "mean_attention_mass": 0.13306683461580956,
-      "mean_direct_target_boost": 0.05782124225604656,
-      "mean_direct_route_suppression": 0.2974712877947273,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 24,
-      "case_n": 3,
-      "base_top1_rate": 0.3333333333333333,
-      "mean_base_target_rank": 3.0,
-      "mean_base_margin": 4.552083333333333,
-      "mean_scan_score": 5.493144906428643,
-      "mean_target_logit_drop": 0.109375,
-      "mean_margin_drop_target_vs_contrast": 0.049479166666666664,
-      "mean_attention_mass": 0.43200687567392987,
-      "mean_direct_target_boost": 3.282841614137093,
-      "mean_direct_route_suppression": 1.3137299127411097,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "same_layer_control_head",
-      "n": 24,
-      "case_n": 3,
-      "base_top1_rate": 0.3333333333333333,
-      "mean_base_target_rank": 3.0,
-      "mean_base_margin": 4.552083333333333,
-      "mean_scan_score": 0.2655808925188385,
-      "mean_target_logit_drop": 0.041666666666666664,
-      "mean_margin_drop_target_vs_contrast": 0.016927083333333332,
-      "mean_attention_mass": 0.1149351690740635,
-      "mean_direct_target_boost": -0.05124430085124251,
-      "mean_direct_route_suppression": 0.33958568980086196,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

@@ -1,48 +1,0 @@
-[00:31:47] deepseek7b/smoke: pairs=1 target=hidden_28 audits=1
-[00:31:48] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   2%|▏         | 6/339 [00:00<00:05, 57.01it/s]Loading weights:  11%|█         | 38/339 [00:00<00:01, 177.99it/s]Loading weights:  22%|██▏       | 76/339 [00:00<00:01, 246.08it/s]Loading weights:  31%|███       | 105/339 [00:00<00:00, 255.50it/s]Loading weights:  41%|████      | 138/339 [00:00<00:00, 274.04it/s]Loading weights:  51%|█████     | 173/339 [00:00<00:00, 279.09it/s]Loading weights:  61%|██████▏   | 208/339 [00:00<00:00, 279.93it/s]Loading weights:  70%|██████▉   | 236/339 [00:00<00:00, 268.92it/s]Loading weights:  79%|███████▉  | 269/339 [00:01<00:00, 284.44it/s]Loading weights:  88%|████████▊ | 298/339 [00:01<00:00, 279.09it/s]Loading weights:  96%|█████████▋| 327/339 [00:01<00:00, 273.42it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 268.35it/s]
-[00:31:49] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[00:31:51] deepseek7b: threshold audit 1/1 pairs; rows=1
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke",
-  "target_site": "hidden_28",
-  "top_threshold_audits": [
-    {
-      "intervention_key": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017] explicit<-conflict",
-      "intervention_label": "source_plus_all_mlp|L22H24<-target_record_line|L27:mlp[2872:2932]+L22:mlp[957:1017]",
-      "direction": "explicit<-conflict",
-      "intervention_mode": "source_plus_all_mlp",
-      "source_component_id": "L22H24",
-      "source_group": "target_record_line",
-      "mlp_components": [
-        "L27:mlp[2872:2932]",
-        "L22:mlp[957:1017]"
-      ],
-      "n": 1,
-      "patched_candidate_best_counts": {
-        "relation_echo": 1
-      },
-      "patched_vocab_top_counts": {
-        " category": 1
-      },
-      "mean_patched_margin_donor_vs_recipient": -14.421875,
-      "mean_patched_margin_donor_vs_candidate_best": -15.046875,
-      "mean_patched_margin_donor_vs_vocab_top": -15.046875,
-      "mean_alpha_star_vocab_top": 11.125134291071385,
-      "mean_alpha_star_candidate_best": 11.125134291071385,
-      "candidate_flip_found_rate": 0.0,
-      "vocab_flip_found_rate": 0.0,
-      "mean_first_alpha_donor_candidate_top": null,
-      "mean_first_alpha_donor_vocab_top": null,
-      "boosted_generation_tested": 0,
-      "boosted_generation_donor_hit_rate": null,
-      "boosted_generation_class_counts": {},
-      "mean_final_norm_output_norm": 190.50318908691406,
-      "mean_source_contribution_delta_norm": 6.340348243713379,
-      "mean_mlp_delta_norm_total": 32.102128982543945
-    }
-  ]
-}

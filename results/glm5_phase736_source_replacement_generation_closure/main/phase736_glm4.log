@@ -1,142 +1,0 @@
-[22:50:25] glm4/main: pairs=8 target_site=hidden_40 source_paths=4
-[22:50:26] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:24, 17.94it/s]Loading weights:   5%|▍         | 22/443 [00:00<00:03, 118.70it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:01, 225.27it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 255.69it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 269.76it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:00, 284.43it/s]Loading weights:  43%|████▎     | 191/443 [00:00<00:00, 287.54it/s]Loading weights:  51%|█████     | 224/443 [00:00<00:00, 290.03it/s]Loading weights:  58%|█████▊    | 258/443 [00:00<00:00, 299.76it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 307.19it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 300.40it/s]Loading weights:  80%|███████▉  | 353/443 [00:01<00:00, 295.82it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 307.06it/s]Loading weights:  95%|█████████▍| 420/443 [00:01<00:00, 307.09it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 287.03it/s]
-[22:50:28] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[22:50:35] glm4: replacement closure 2/8 pairs; rows=16
-[22:50:42] glm4: replacement closure 4/8 pairs; rows=32
-[22:50:49] glm4: replacement closure 6/8 pairs; rows=48
-[22:50:56] glm4: replacement closure 8/8 pairs; rows=64
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "main",
-  "target_site": "hidden_40",
-  "top_replacement_paths": [
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "all_pre_answer",
-      "direction": "explicit<-conflict",
-      "n": 8,
-      "mean_restore_projection": 0.9215423911809921,
-      "mean_restore_fraction": 0.005715407069779961,
-      "mean_donor_logprob_delta": 0.04122793674468994,
-      "mean_recipient_logprob_delta": -0.0017408402636647224,
-      "mean_donor_rank_delta": -4.875,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.9909453168511391,
-      "mean_recipient_attention_mass": 0.9922116696834564,
-      "mean_contribution_delta_norm": 3.692640006542206,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "instruction",
-      "direction": "explicit<-conflict",
-      "n": 8,
-      "mean_restore_projection": 0.8813010398298502,
-      "mean_restore_fraction": 0.0054664518946490465,
-      "mean_donor_logprob_delta": 0.0354386568069458,
-      "mean_recipient_logprob_delta": -0.00460024643689394,
-      "mean_donor_rank_delta": -3.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.8329372406005859,
-      "mean_recipient_attention_mass": 0.9652032256126404,
-      "mean_contribution_delta_norm": 3.5187419056892395,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "instruction",
-      "direction": "conflict<-explicit",
-      "n": 8,
-      "mean_restore_projection": 0.49180223047733307,
-      "mean_restore_fraction": 0.0030540843034637635,
-      "mean_donor_logprob_delta": 0.04103285074234009,
-      "mean_recipient_logprob_delta": 0.004900233820080757,
-      "mean_donor_rank_delta": -11.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.9652032256126404,
-      "mean_recipient_attention_mass": 0.8329372406005859,
-      "mean_contribution_delta_norm": 3.5187419056892395,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "all_pre_answer",
-      "direction": "conflict<-explicit",
-      "n": 8,
-      "mean_restore_projection": 0.449271772056818,
-      "mean_restore_fraction": 0.002674921557212472,
-      "mean_donor_logprob_delta": 0.04228711128234863,
-      "mean_recipient_logprob_delta": 0.0012718020007014275,
-      "mean_donor_rank_delta": -15.625,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.9922116696834564,
-      "mean_recipient_attention_mass": 0.9909453168511391,
-      "mean_contribution_delta_norm": 3.692640006542206,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "self_last",
-      "direction": "explicit<-conflict",
-      "n": 8,
-      "mean_restore_projection": 0.36249720491468906,
-      "mean_restore_fraction": 0.002105270124827826,
-      "mean_donor_logprob_delta": 0.015309691429138184,
-      "mean_recipient_logprob_delta": 0.0006613775622099638,
-      "mean_donor_rank_delta": -7.625,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.008380889892578125,
-      "mean_recipient_attention_mass": 0.007451057434082031,
-      "mean_contribution_delta_norm": 0.05239812278887257,
-      "role_guess": "content_transfer_candidate"
-    }
-  ]
-}

@@ -1,71 +1,0 @@
-[22:15:45] qwen3/smoke: focus=clean_fiber_high cases=2 variants=without_candidate_list,constrained_free_prompt,with_candidate_list top_k=20
-[22:15:46] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[22:15:46] [load] qwen3: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[22:15:46] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   8%|▊         | 31/398 [00:00<00:01, 301.64it/s]Loading weights:  23%|██▎       | 93/398 [00:00<00:00, 478.49it/s]Loading weights:  39%|███▉      | 155/398 [00:00<00:00, 508.28it/s]Loading weights:  56%|█████▋    | 224/398 [00:00<00:00, 567.51it/s]Loading weights:  71%|███████   | 281/398 [00:00<00:00, 538.35it/s]Loading weights:  90%|████████▉ | 357/398 [00:00<00:00, 601.61it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 566.49it/s]
-[22:15:47] [load] qwen3: loaded sdpa, device=cuda:0, gpu=8.05GB
-[22:15:47] qwen3: readout bridge audit 1/2 cases; rows=63
-[22:15:47] qwen3: readout bridge audit 2/2 cases; rows=126
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "smoke",
-  "attn": "sdpa",
-  "n_cases": 2,
-  "by_prompt_observation": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "n": 2,
-      "case_n": 2,
-      "base_top1_rate": 0.0,
-      "pool_top1_rate": 0.5,
-      "latent_pool_hit_rate": 0.5,
-      "mean_base_target_rank": 3146.0,
-      "mean_pool_target_rank": 4.0,
-      "mean_top1_gap_above_target": 9.375
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "n": 2,
-      "case_n": 2,
-      "base_top1_rate": 1.0,
-      "pool_top1_rate": 1.0,
-      "latent_pool_hit_rate": 0.0,
-      "mean_base_target_rank": 1.0,
-      "mean_pool_target_rank": 1.0,
-      "mean_top1_gap_above_target": 0.0
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "n": 2,
-      "case_n": 2,
-      "base_top1_rate": 0.0,
-      "pool_top1_rate": 0.5,
-      "latent_pool_hit_rate": 0.5,
-      "mean_base_target_rank": 1268.5,
-      "mean_pool_target_rank": 3.5,
-      "mean_top1_gap_above_target": 8.0625
-    }
-  ],
-  "latent_top1_competitor_by_prompt": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "competitor_class": "boolean_value",
-      "n": 1,
-      "case_n": 1,
-      "mean_gap_above_target": 7.875,
-      "mean_base_target_rank": 4.0,
-      "mean_pool_target_rank": 1.0
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "competitor_class": "boolean_value",
-      "n": 1,
-      "case_n": 1,
-      "mean_gap_above_target": 4.625,
-      "mean_base_target_rank": 3.0,
-      "mean_pool_target_rank": 1.0
-    }
-  ]
-}

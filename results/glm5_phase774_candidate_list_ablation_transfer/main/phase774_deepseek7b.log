@@ -1,50 +1,0 @@
-[21:18:49] deepseek7b/main: focus=clean_fiber_high cases=5 variants=with_candidate_list,without_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
-[21:18:50] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:28, 12.02it/s]Loading weights:   9%|▊         | 29/339 [00:00<00:02, 128.13it/s]Loading weights:  19%|█▉        | 64/339 [00:00<00:01, 207.33it/s]Loading weights:  27%|██▋       | 90/339 [00:00<00:01, 222.56it/s]Loading weights:  37%|███▋      | 124/339 [00:00<00:00, 242.97it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 273.87it/s]Loading weights:  56%|█████▌    | 190/339 [00:00<00:00, 276.88it/s]Loading weights:  65%|██████▍   | 220/339 [00:00<00:00, 277.42it/s]Loading weights:  73%|███████▎  | 249/339 [00:01<00:00, 262.69it/s]Loading weights:  83%|████████▎ | 280/339 [00:01<00:00, 258.02it/s]Loading weights:  91%|█████████ | 308/339 [00:01<00:00, 262.86it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 248.22it/s]
-[21:18:51] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[21:19:30] deepseek7b: candidate-list ablation 1/5 cases; rows=15
-[21:20:08] deepseek7b: candidate-list ablation 2/5 cases; rows=30
-[21:20:46] deepseek7b: candidate-list ablation 3/5 cases; rows=45
-[21:21:24] deepseek7b: candidate-list ablation 4/5 cases; rows=60
-[21:22:02] deepseek7b: candidate-list ablation 5/5 cases; rows=75
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "main",
-  "n_cases": 5,
-  "by_prompt_variant": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 35,
-      "case_n": 5,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 4177.0,
-      "mean_base_margin": 5.2431640625,
-      "mean_scan_score": 3.3923237951525618,
-      "mean_target_logit_drop": 0.03302525111607143,
-      "mean_margin_drop_target_vs_contrast": 0.22218540736607142,
-      "mean_attention_mass": 0.41366203938211715,
-      "mean_direct_target_boost": 1.0807634981615202,
-      "mean_direct_route_suppression": 2.6943075684564453,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 40,
-      "case_n": 5,
-      "base_top1_rate": 0.6,
-      "mean_base_target_rank": 2.2,
-      "mean_base_margin": 3.93125,
-      "mean_scan_score": 5.0940005858801305,
-      "mean_target_logit_drop": 0.1015625,
-      "mean_margin_drop_target_vs_contrast": 0.1046875,
-      "mean_attention_mass": 0.4051573991775513,
-      "mean_direct_target_boost": 3.1358616946265103,
-      "mean_direct_route_suppression": 1.0163337292149663,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

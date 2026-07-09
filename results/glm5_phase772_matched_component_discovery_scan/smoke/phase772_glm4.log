@@ -1,27 +1,0 @@
-[20:29:38] glm4/smoke: focus=all_matched cases=2 sources=['instruction', 'question']
-[20:29:39] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:49,  8.88it/s]Loading weights:   7%|▋         | 32/443 [00:00<00:03, 121.87it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 171.36it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 214.25it/s]Loading weights:  27%|██▋       | 120/443 [00:00<00:01, 222.08it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 272.14it/s]Loading weights:  43%|████▎     | 191/443 [00:00<00:00, 281.23it/s]Loading weights:  50%|████▉     | 221/443 [00:00<00:00, 277.04it/s]Loading weights:  57%|█████▋    | 253/443 [00:01<00:00, 288.22it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 313.35it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 313.20it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 309.61it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 313.16it/s]Loading weights:  96%|█████████▋| 427/443 [00:01<00:00, 326.99it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 269.66it/s]
-[20:29:41] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[20:29:46] glm4: component discovery 1/2 cases; rows=1
-[20:29:49] glm4: component discovery 2/2 cases; rows=2
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "smoke",
-  "n_cases": 2,
-  "top_components": [
-    {
-      "component_key": "L34:attn_out:H13:instruction",
-      "n": 2,
-      "case_n": 2,
-      "mean_scan_score": 1.430688228768607,
-      "mean_target_logit_drop": 0.375,
-      "mean_margin_drop_target_vs_contrast": 0.34375,
-      "mean_attention_mass": 0.8981490135192871,
-      "mean_direct_target_boost": 0.9655340909957886,
-      "mean_direct_route_suppression": 0.07175388745963573,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

@@ -1,37 +1,0 @@
-=== Phase304 normal logged run ===
-2026-05-29 18:35:00 CST
-run_id=20260529_183500_phase304normal_glm4
-model=glm4
-output_dir=results/gpt5_phase304_role_query_template_calibration
-conda_env=openone-cuda121
-probe_torch_dtype=bfloat16
-probe_attn_implementation=sdpa
-probe_device_map_auto_models=glm4,deepseek7b
-probe_max_gpu_memory=21GiB
-cuda_launch_blocking=0
-pytorch_no_cuda_memory_caching=0
-enable_gpu_monitor=0
-enable_snapshot_nvidia_smi=1
-args=--max-bases 32 --max-seq-len 96 --progress-every 4
-
-=== Start kernel log follower ===
-=== GPU/process monitor disabled ===
-=== Run Phase304 normal ===
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:04,  1.55s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:02<00:02,  1.43s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:04<00:01,  1.33s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:05<00:00,  1.20s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:05<00:00,  1.28s/it]
-[phase304] model=glm4 class=GlmForCausalLM bases=32 templates=16
-[phase304] base 4/32 rows=256 elapsed=21.3s
-[phase304] base 8/32 rows=512 elapsed=41.7s
-[phase304] base 12/32 rows=768 elapsed=62.3s
-[phase304] base 16/32 rows=1024 elapsed=82.7s
-[phase304] base 20/32 rows=1280 elapsed=103.0s
-[phase304] base 24/32 rows=1536 elapsed=123.5s
-[phase304] base 28/32 rows=1792 elapsed=144.2s
-[phase304] base 32/32 rows=2048 elapsed=164.5s
-[phase304] saved results/gpt5_phase304_role_query_template_calibration/glm4_phase304_role_query_template_calibration.json
-[phase304] done rows=2048 reliable=0 nonfinite=0
-phase304_exit_code=0
-=== Kernel log since start ===
-=== Result files ===
-results/gpt5_phase304_role_query_template_calibration/glm4_phase304_role_query_template_calibration.json
-results/gpt5_phase304_role_query_template_calibration/qwen3_phase304_role_query_template_calibration.json
-log_dir=results/gpt5_gpu_lock_logs/20260529_183500_phase304normal_glm4

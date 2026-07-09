@@ -1,97 +1,0 @@
-[18:04:47] deepseek7b/main: cases=108 sources=['instruction', 'question', 'object_tokens', 'relation_tokens'] relations=['category', 'edible', 'grows_on_tree']
-[18:04:48] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|▏         | 5/339 [00:00<00:06, 49.20it/s]Loading weights:  11%|█         | 38/339 [00:00<00:01, 189.40it/s]Loading weights:  22%|██▏       | 74/339 [00:00<00:01, 236.17it/s]Loading weights:  33%|███▎      | 112/339 [00:00<00:00, 266.29it/s]Loading weights:  42%|████▏     | 144/339 [00:00<00:00, 275.35it/s]Loading weights:  51%|█████▏    | 174/339 [00:00<00:00, 277.91it/s]Loading weights:  60%|█████▉    | 202/339 [00:00<00:00, 268.28it/s]Loading weights:  68%|██████▊   | 230/339 [00:00<00:00, 266.91it/s]Loading weights:  79%|███████▉  | 267/339 [00:01<00:00, 275.72it/s]Loading weights:  87%|████████▋ | 295/339 [00:01<00:00, 268.72it/s]Loading weights:  96%|█████████▌| 325/339 [00:01<00:00, 262.25it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 267.15it/s]
-[18:04:50] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[18:05:00] deepseek7b: commonsense fibers 18/108 cases; rows=162
-[18:05:08] deepseek7b: commonsense fibers 36/108 cases; rows=324
-[18:05:17] deepseek7b: commonsense fibers 54/108 cases; rows=486
-[18:05:27] deepseek7b: commonsense fibers 72/108 cases; rows=648
-[18:05:36] deepseek7b: commonsense fibers 90/108 cases; rows=810
-[18:05:45] deepseek7b: commonsense fibers 108/108 cases; rows=972
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "main",
-  "n_cases": 108,
-  "observation_summary": {
-    "overall": {
-      "n": 108,
-      "target_top1_rate": 0.18518518518518517,
-      "mean_target_rank": 5.833333333333333,
-      "mean_contrast_rank": 66.10185185185185
-    },
-    "by_context": {
-      "commonsense_question": {
-        "n": 54,
-        "target_top1_rate": 0.07407407407407407,
-        "mean_target_rank": 8.38888888888889,
-        "mean_contrast_rank": 121.81481481481481
-      },
-      "commonsense_statement": {
-        "n": 54,
-        "target_top1_rate": 0.2962962962962963,
-        "mean_target_rank": 3.2777777777777777,
-        "mean_contrast_rank": 10.38888888888889
-      }
-    },
-    "by_relation": {
-      "category": {
-        "n": 36,
-        "target_top1_rate": 0.3611111111111111,
-        "mean_target_rank": 5.0,
-        "mean_contrast_rank": 184.72222222222223
-      },
-      "edible": {
-        "n": 36,
-        "target_top1_rate": 0.1111111111111111,
-        "mean_target_rank": 7.027777777777778,
-        "mean_contrast_rank": 9.722222222222221
-      },
-      "grows_on_tree": {
-        "n": 36,
-        "target_top1_rate": 0.08333333333333333,
-        "mean_target_rank": 5.472222222222222,
-        "mean_contrast_rank": 3.861111111111111
-      }
-    }
-  },
-  "context_pair_summaries": {
-    "commonsense_question": {
-      "n_objects": 18,
-      "n_features": 96,
-      "pair_summary": {
-        "same_domain_mean": 0.27169409982357523,
-        "different_domain_mean": -0.09832425474651078,
-        "separation": 0.370018354570086,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.7777777777777778
-      }
-    },
-    "commonsense_statement": {
-      "n_objects": 18,
-      "n_features": 96,
-      "pair_summary": {
-        "same_domain_mean": 0.33229355114492604,
-        "different_domain_mean": -0.10407760194261824,
-        "separation": 0.43637115308754426,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.6666666666666666
-      }
-    }
-  },
-  "cross_context_stability": [
-    {
-      "context_a": "commonsense_question",
-      "context_b": "commonsense_statement",
-      "common_objects": 18,
-      "same_object_mean": -0.11944527777861756,
-      "same_domain_diff_object_mean": -0.188254762318927,
-      "different_domain_mean": -0.32219427209943974,
-      "object_stability_gap": 0.06880948454030943,
-      "domain_stability_gap": 0.13393950978051275
-    }
-  ]
-}

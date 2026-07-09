@@ -1,22 +1,0 @@
-[18:29:11] glm4/smoke: cases=12 top_k=30 relations=['category', 'edible', 'grows_on_tree'] include_candidate_list=True
-[18:29:12] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[18:29:12] [load] glm4: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[18:29:12] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<01:36,  4.58it/s]Loading weights:   6%|▌         | 26/443 [00:00<00:04, 100.60it/s]Loading weights:  12%|█▏        | 54/443 [00:00<00:02, 161.88it/s]Loading weights:  20%|██        | 90/443 [00:00<00:01, 228.15it/s]Loading weights:  28%|██▊       | 125/443 [00:00<00:01, 244.56it/s]Loading weights:  34%|███▍      | 152/443 [00:00<00:01, 245.21it/s]Loading weights:  43%|████▎     | 190/443 [00:00<00:00, 280.34it/s]Loading weights:  50%|████▉     | 220/443 [00:00<00:00, 279.62it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 304.77it/s]Loading weights:  65%|██████▌   | 290/443 [00:01<00:00, 302.92it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 302.66it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 309.54it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 309.15it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 313.42it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 267.96it/s]
-[18:29:14] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
-[18:29:15] glm4: top-k audit 4/12 cases
-[18:29:15] glm4: top-k audit 8/12 cases
-[18:29:15] glm4: top-k audit 12/12 cases
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "smoke",
-  "summary": {
-    "target_top1_rate": 0.5,
-    "target_in_topk_rate": 1.0,
-    "mean_target_rank": 1.6666666666666667,
-    "mean_target_allowed_rank": 1.3333333333333333,
-    "mean_target_margin_vs_best_other": 0.11458333333333333
-  }
-}

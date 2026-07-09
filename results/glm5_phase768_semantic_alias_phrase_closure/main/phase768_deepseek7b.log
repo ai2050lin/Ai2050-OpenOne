@@ -1,75 +1,0 @@
-[19:02:22] deepseek7b/main: cases=108 relations=['category', 'edible', 'grows_on_tree'] phase767_round=main max_new_tokens=6
-[19:02:22] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[19:02:22] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[19:02:22] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:35,  9.58it/s]Loading weights:   8%|▊         | 27/339 [00:00<00:02, 105.00it/s]Loading weights:  19%|█▉        | 65/339 [00:00<00:01, 186.90it/s]Loading weights:  29%|██▉       | 98/339 [00:00<00:01, 225.16it/s]Loading weights:  37%|███▋      | 126/339 [00:00<00:00, 238.28it/s]Loading weights:  47%|████▋     | 160/339 [00:00<00:00, 265.16it/s]Loading weights:  55%|█████▌    | 188/339 [00:00<00:00, 250.65it/s]Loading weights:  63%|██████▎   | 215/339 [00:00<00:00, 247.85it/s]Loading weights:  71%|███████   | 241/339 [00:01<00:00, 241.24it/s]Loading weights:  80%|███████▉  | 270/339 [00:01<00:00, 246.63it/s]Loading weights:  89%|████████▉ | 303/339 [00:01<00:00, 269.58it/s]Loading weights:  98%|█████████▊| 331/339 [00:01<00:00, 247.84it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 232.02it/s]
-[19:02:24] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
-The following generation flags are not valid and may be ignored: ['temperature', 'top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
-[19:02:32] deepseek7b: phrase closure 18/108 cases
-[19:02:39] deepseek7b: phrase closure 36/108 cases
-[19:02:47] deepseek7b: phrase closure 54/108 cases
-[19:02:54] deepseek7b: phrase closure 72/108 cases
-[19:03:01] deepseek7b: phrase closure 90/108 cases
-[19:03:09] deepseek7b: phrase closure 108/108 cases
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "main",
-  "by_subset": {
-    "all": {
-      "n": 108,
-      "semantic_top1_rate": 0.35185185185185186,
-      "exact_top1_rate": 0.17592592592592593,
-      "phrase_top1_rate": 0.37962962962962965,
-      "generation_match_rate": 0.35185185185185186,
-      "mean_phrase_rank": 1.6666666666666667,
-      "mean_phrase_margin": 0.033564797395633325
-    },
-    "exact_clean": {
-      "n": 19,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 1.0,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 4.476973657349222
-    },
-    "semantic_clean": {
-      "n": 38,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 0.5,
-      "phrase_top1_rate": 0.9736842105263158,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0263157894736843,
-      "mean_phrase_margin": 3.3503289245265093
-    },
-    "semantic_only": {
-      "n": 19,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 0.9473684210526315,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0526315789473684,
-      "mean_phrase_margin": 2.2236841917037964
-    },
-    "semantic_fail": {
-      "n": 70,
-      "semantic_top1_rate": 0.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 0.05714285714285714,
-      "generation_match_rate": 0.0,
-      "mean_phrase_rank": 2.0142857142857142,
-      "mean_phrase_margin": -1.7669643001896995
-    },
-    "rank_le2": {
-      "n": 55,
-      "semantic_top1_rate": 0.6909090909090909,
-      "exact_top1_rate": 0.34545454545454546,
-      "phrase_top1_rate": 0.7090909090909091,
-      "generation_match_rate": 0.6909090909090909,
-      "mean_phrase_rank": 1.290909090909091,
-      "mean_phrase_margin": 2.081818163869056
-    }
-  }
-}

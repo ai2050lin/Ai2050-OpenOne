@@ -1,128 +1,0 @@
-[07:17:19] glm4/smoke: pairs=1 target=hidden_40 audits=1 candidates=1
-[07:17:19] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<00:46,  9.54it/s]Loading weights:   0%|          | 2/443 [00:00<00:59,  7.41it/s]Loading weights:   9%|▊         | 38/443 [00:00<00:02, 141.15it/s]Loading weights:  16%|█▌        | 71/443 [00:00<00:01, 197.93it/s]Loading weights:  23%|██▎       | 101/443 [00:00<00:01, 221.02it/s]Loading weights:  31%|███       | 137/443 [00:00<00:01, 249.66it/s]Loading weights:  38%|███▊      | 168/443 [00:00<00:01, 264.28it/s]Loading weights:  46%|████▌     | 203/443 [00:00<00:00, 286.84it/s]Loading weights:  53%|█████▎    | 236/443 [00:01<00:00, 297.03it/s]Loading weights:  60%|██████    | 267/443 [00:01<00:00, 291.57it/s]Loading weights:  67%|██████▋   | 298/443 [00:01<00:00, 295.20it/s]Loading weights:  75%|███████▍  | 331/443 [00:01<00:00, 297.43it/s]Loading weights:  83%|████████▎ | 368/443 [00:01<00:00, 315.45it/s]Loading weights:  90%|█████████ | 400/443 [00:01<00:00, 311.48it/s]Loading weights:  98%|█████████▊| 432/443 [00:01<00:00, 309.14it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 266.43it/s]
-[07:17:22] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[07:17:23] glm4: causal validation 1/1 pairs; rows=6
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "smoke",
-  "target_site": "hidden_40",
-  "condition_summary": [
-    {
-      "candidate_component_id": "L38:mlp_out",
-      "condition": "donor_erase_to_recipient_component",
-      "n": 1,
-      "candidate_component": "mlp_out",
-      "candidate_layer": 38,
-      "mean_fraction_of_threshold": 2.0409212166735125,
-      "mean_effect_vs_joint_fraction": 1.9808104114810086,
-      "mean_effect_vs_donor_fraction": -0.8908553435169334,
-      "mean_target_rank": 1.0,
-      "target_top1_rate": 1.0,
-      "mean_margin_donor_vs_top": 0.0,
-      "top_token_counts": {
-        " fruit": 1
-      },
-      "phase740_mean_patched_fraction": 0.04181411292136393,
-      "phase740_mean_donor_fraction": 1.0458718891793892,
-      "role_guess": "donor_path_necessary_candidate"
-    },
-    {
-      "candidate_component_id": "L38:mlp_out",
-      "condition": "joint_add_donor_delta",
-      "n": 1,
-      "candidate_component": "mlp_out",
-      "candidate_layer": 38,
-      "mean_fraction_of_threshold": 1.1040758553688648,
-      "mean_effect_vs_joint_fraction": 1.0439648219357935,
-      "mean_effect_vs_donor_fraction": -1.8277007048215812,
-      "mean_target_rank": 1.0,
-      "target_top1_rate": 1.0,
-      "mean_margin_donor_vs_top": 0.0,
-      "top_token_counts": {
-        " fruit": 1
-      },
-      "phase740_mean_patched_fraction": 0.04181411292136393,
-      "phase740_mean_donor_fraction": 1.0458718891793892,
-      "role_guess": "causal_boost_candidate"
-    },
-    {
-      "candidate_component_id": "L38:mlp_out",
-      "condition": "joint_base",
-      "n": 1,
-      "candidate_component": "mlp_out",
-      "candidate_layer": 38,
-      "mean_fraction_of_threshold": 0.060111083360695206,
-      "mean_effect_vs_joint_fraction": 0.0,
-      "mean_effect_vs_donor_fraction": -2.8716655267573747,
-      "mean_target_rank": 7.0,
-      "target_top1_rate": 0.0,
-      "mean_margin_donor_vs_top": -5.875,
-      "top_token_counts": {
-        " tool": 1
-      },
-      "phase740_mean_patched_fraction": 0.04181411292136393,
-      "phase740_mean_donor_fraction": 1.0458718891793892,
-      "role_guess": "standalone_boost_candidate"
-    },
-    {
-      "candidate_component_id": "L38:mlp_out",
-      "condition": "joint_erase_to_recipient_component",
-      "n": 1,
-      "candidate_component": "mlp_out",
-      "candidate_layer": 38,
-      "mean_fraction_of_threshold": 0.00758350503400268,
-      "mean_effect_vs_joint_fraction": -0.05252757654356309,
-      "mean_effect_vs_donor_fraction": -2.9241932673488455,
-      "mean_target_rank": 8.0,
-      "target_top1_rate": 0.0,
-      "mean_margin_donor_vs_top": -6.25,
-      "top_token_counts": {
-        " tool": 1
-      },
-      "phase740_mean_patched_fraction": 0.04181411292136393,
-      "phase740_mean_donor_fraction": 1.0458718891793892,
-      "role_guess": "joint_path_necessary_candidate"
-    },
-    {
-      "candidate_component_id": "L38:mlp_out",
-      "condition": "joint_replace_with_donor_component",
-      "n": 1,
-      "candidate_component": "mlp_out",
-      "candidate_layer": 38,
-      "mean_fraction_of_threshold": 1.0579642994791745,
-      "mean_effect_vs_joint_fraction": 0.9978531519258197,
-      "mean_effect_vs_donor_fraction": -1.8738123748315552,
-      "mean_target_rank": 1.0,
-      "target_top1_rate": 1.0,
-      "mean_margin_donor_vs_top": 0.0,
-      "top_token_counts": {
-        " fruit": 1
-      },
-      "phase740_mean_patched_fraction": 0.04181411292136393,
-      "phase740_mean_donor_fraction": 1.0458718891793892,
-      "role_guess": "causal_boost_candidate"
-    },
-    {
-      "candidate_component_id": "L38:mlp_out",
-      "condition": "recipient_add_donor_delta",
-      "n": 1,
-      "candidate_component": "mlp_out",
-      "candidate_layer": 38,
-      "mean_fraction_of_threshold": 1.0488677716777601,
-      "mean_effect_vs_joint_fraction": 0.9887566241244055,
-      "mean_effect_vs_donor_fraction": -1.8829089026329693,
-      "mean_target_rank": 1.0,
-      "target_top1_rate": 1.0,
-      "mean_margin_donor_vs_top": 0.0,
-      "top_token_counts": {
-        " fruit": 1
-      },
-      "phase740_mean_patched_fraction": 0.04181411292136393,
-      "phase740_mean_donor_fraction": 1.0458718891793892,
-      "role_guess": "standalone_boost_candidate"
-    }
-  ]
-}

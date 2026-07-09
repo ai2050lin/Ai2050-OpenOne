@@ -1,95 +1,0 @@
-[12:12:17] deepseek7b/smoke: pairs=2 candidates=1 sources=['target_record_line', 'target_value_tokens']
-[12:12:17] [load] deepseek7b: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   3%|▎         | 11/339 [00:00<00:03, 103.62it/s]Loading weights:  15%|█▌        | 51/339 [00:00<00:01, 253.37it/s]Loading weights:  22%|██▏       | 76/339 [00:00<00:01, 251.32it/s]Loading weights:  33%|███▎      | 113/339 [00:00<00:00, 290.79it/s]Loading weights:  42%|████▏     | 144/339 [00:00<00:00, 288.19it/s]Loading weights:  51%|█████▏    | 174/339 [00:00<00:00, 286.66it/s]Loading weights:  60%|█████▉    | 203/339 [00:00<00:00, 282.73it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 267.40it/s]Loading weights:  78%|███████▊  | 266/339 [00:00<00:00, 282.68it/s]Loading weights:  87%|████████▋ | 295/339 [00:01<00:00, 270.86it/s]Loading weights:  95%|█████████▌| 323/339 [00:01<00:00, 260.91it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 276.19it/s]
-[12:12:19] [load] deepseek7b: loaded eager, device=cuda:0, gpu=15.23GB
-[12:12:20] deepseek7b: cross-domain atlas 1/2 pairs; rows=3
-[12:12:20] deepseek7b: cross-domain atlas 2/2 pairs; rows=6
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke",
-  "route_js": 0.18573905472618807,
-  "top": [
-    {
-      "site": "L22:attn_out",
-      "head": 24,
-      "subunit_id": "L22:attn_out:H24",
-      "source_group": "target_record_line",
-      "n": 2,
-      "domains": [
-        "abstract",
-        "fruit"
-      ],
-      "relations": [
-        "category",
-        "shape"
-      ],
-      "mean_attention_mass_to_source": 0.2840576171875,
-      "mean_source_target_logit_contribution": 0.030149070546030998,
-      "mean_source_total_route_suppression_contribution": 0.10092559270560741,
-      "mean_target_logit_drop_after_source_removal": 0.1875,
-      "support_rate_drop_gt_0_20": 0.5,
-      "mean_total_positive_route_release_after_source_removal": 0.0,
-      "route_guard_rate_release_gt_0_20": 0.0,
-      "top1_loss_rate": 0.0,
-      "domain_breakdown": {
-        "abstract": {
-          "n": 1,
-          "support_rate": 0.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.125,
-          "mean_route_release": 0.0
-        },
-        "fruit": {
-          "n": 1,
-          "support_rate": 1.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.25,
-          "mean_route_release": 0.0
-        }
-      },
-      "cross_domain_guess": "domain_specific_or_weak"
-    },
-    {
-      "site": "L22:attn_out",
-      "head": 24,
-      "subunit_id": "L22:attn_out:H24",
-      "source_group": "target_value_tokens",
-      "n": 2,
-      "domains": [
-        "abstract",
-        "fruit"
-      ],
-      "relations": [
-        "category",
-        "shape"
-      ],
-      "mean_attention_mass_to_source": 0.1640625,
-      "mean_source_target_logit_contribution": 0.03386874729767442,
-      "mean_source_total_route_suppression_contribution": 0.07574699819087982,
-      "mean_target_logit_drop_after_source_removal": 0.125,
-      "support_rate_drop_gt_0_20": 0.5,
-      "mean_total_positive_route_release_after_source_removal": 0.21875,
-      "route_guard_rate_release_gt_0_20": 0.5,
-      "top1_loss_rate": 0.0,
-      "domain_breakdown": {
-        "abstract": {
-          "n": 1,
-          "support_rate": 0.0,
-          "route_guard_rate": 1.0,
-          "mean_target_drop": -0.125,
-          "mean_route_release": 0.4375
-        },
-        "fruit": {
-          "n": 1,
-          "support_rate": 1.0,
-          "route_guard_rate": 0.0,
-          "mean_target_drop": 0.375,
-          "mean_route_release": 0.0
-        }
-      },
-      "cross_domain_guess": "domain_specific_or_weak"
-    }
-  ]
-}

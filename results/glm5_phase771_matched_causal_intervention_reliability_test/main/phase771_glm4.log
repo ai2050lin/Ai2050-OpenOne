@@ -1,44 +1,0 @@
-[19:55:03] glm4/main: matched cases=12 pairs=6 sources=['instruction', 'question', 'object_tokens', 'relation_tokens']
-[19:55:04] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.65it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:03, 106.42it/s]Loading weights:  13%|█▎        | 57/443 [00:00<00:02, 174.36it/s]Loading weights:  21%|██        | 92/443 [00:00<00:01, 232.27it/s]Loading weights:  28%|██▊       | 123/443 [00:00<00:01, 249.44it/s]Loading weights:  36%|███▌      | 158/443 [00:00<00:01, 262.49it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 281.37it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 286.41it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 296.62it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 300.05it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 297.43it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 307.21it/s]Loading weights:  88%|████████▊ | 389/443 [00:01<00:00, 307.90it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 309.81it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 269.63it/s]
-[19:55:06] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[19:55:09] glm4: matched causal cases 4/12 rows=16
-[19:55:10] glm4: matched causal cases 8/12 rows=32
-[19:55:12] glm4: matched causal cases 12/12 rows=48
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "main",
-  "n_cases": 12,
-  "by_matched_arm": [
-    {
-      "matched_arm": "clean",
-      "n": 24,
-      "mean_target_logit_drop": 0.020833333333333332,
-      "mean_margin_drop_target_vs_contrast": 0.018229166666666668,
-      "mean_contrast_logit_gain": -0.0026041666666666665,
-      "mean_attention_mass": 0.25077251593271893,
-      "mean_direct_target_boost": 3.6628255960143483e-06,
-      "mean_direct_route_suppression": 0.0041501929254081915,
-      "top1_loss_rate": 0.0,
-      "candidate_kind_counts": {
-        "phase755_top_candidate": 24
-      }
-    },
-    {
-      "matched_arm": "fail",
-      "n": 24,
-      "mean_target_logit_drop": 0.0078125,
-      "mean_margin_drop_target_vs_contrast": 0.0234375,
-      "mean_contrast_logit_gain": 0.015625,
-      "mean_attention_mass": 0.25311758120854694,
-      "mean_direct_target_boost": -0.001922871477991824,
-      "mean_direct_route_suppression": 0.001536936992716657,
-      "top1_loss_rate": 0.0,
-      "candidate_kind_counts": {
-        "phase755_top_candidate": 24
-      }
-    }
-  ]
-}

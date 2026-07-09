@@ -1,87 +1,0 @@
-[17:28:42] glm4/main: cases=162 sources=['context_all', 'target_context_line', 'target_value_tokens', 'object_tokens'] relations=['category', 'color', 'edible']
-[17:28:43] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:00<00:45,  9.71it/s]Loading weights:   0%|          | 2/443 [00:00<00:48,  9.08it/s]Loading weights:   5%|▍         | 22/443 [00:00<00:04, 89.79it/s]Loading weights:  13%|█▎        | 59/443 [00:00<00:01, 192.91it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 237.11it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 264.49it/s]Loading weights:  35%|███▌      | 157/443 [00:00<00:01, 277.51it/s]Loading weights:  42%|████▏     | 185/443 [00:00<00:00, 275.80it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 310.42it/s]Loading weights:  58%|█████▊    | 257/443 [00:01<00:00, 280.68it/s]Loading weights:  68%|██████▊   | 302/443 [00:01<00:00, 324.47it/s]Loading weights:  76%|███████▌  | 336/443 [00:01<00:00, 321.77it/s]Loading weights:  84%|████████▍ | 372/443 [00:01<00:00, 331.49it/s]Loading weights:  92%|█████████▏| 406/443 [00:01<00:00, 333.52it/s]Loading weights:  99%|█████████▉| 440/443 [00:01<00:00, 331.92it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 276.61it/s]
-[17:28:45] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[17:29:03] glm4: format fibers 27/162 cases; rows=243
-[17:29:19] glm4: format fibers 54/162 cases; rows=486
-[17:29:36] glm4: format fibers 81/162 cases; rows=729
-[17:29:52] glm4: format fibers 108/162 cases; rows=972
-[17:30:09] glm4: format fibers 135/162 cases; rows=1215
-[17:30:26] glm4: format fibers 162/162 cases; rows=1458
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "main",
-  "n_cases": 162,
-  "context_pair_summaries": {
-    "key_value": {
-      "n_objects": 18,
-      "n_features": 96,
-      "pair_summary": {
-        "same_domain_mean": 0.2825352544005539,
-        "different_domain_mean": -0.09334806070253492,
-        "separation": 0.3758833151030888,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.5
-      }
-    },
-    "sentence_lines": {
-      "n_objects": 18,
-      "n_features": 96,
-      "pair_summary": {
-        "same_domain_mean": 0.3703079505754046,
-        "different_domain_mean": -0.09913658401872999,
-        "separation": 0.4694445345941346,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.5555555555555556
-      }
-    },
-    "compact_sentence": {
-      "n_objects": 18,
-      "n_features": 96,
-      "pair_summary": {
-        "same_domain_mean": 0.34573263460236986,
-        "different_domain_mean": -0.1061257806113764,
-        "separation": 0.45185841521374626,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.5555555555555556
-      }
-    }
-  },
-  "cross_context_stability": [
-    {
-      "context_a": "compact_sentence",
-      "context_b": "key_value",
-      "common_objects": 18,
-      "same_object_mean": 0.2852502955065143,
-      "same_domain_diff_object_mean": 0.03871048785413295,
-      "different_domain_mean": -0.17990997036553924,
-      "object_stability_gap": 0.24653980765238137,
-      "domain_stability_gap": 0.2186204582196722
-    },
-    {
-      "context_a": "compact_sentence",
-      "context_b": "sentence_lines",
-      "common_objects": 18,
-      "same_object_mean": -0.08474826183425462,
-      "same_domain_diff_object_mean": -0.2036119042173376,
-      "different_domain_mean": -0.32934613088759246,
-      "object_stability_gap": 0.11886364238308299,
-      "domain_stability_gap": 0.12573422667025486
-    },
-    {
-      "context_a": "key_value",
-      "context_b": "sentence_lines",
-      "common_objects": 18,
-      "same_object_mean": 0.07203434587051945,
-      "same_domain_diff_object_mean": -0.11368036947486074,
-      "different_domain_mean": -0.32299488385711583,
-      "object_stability_gap": 0.1857147153453802,
-      "domain_stability_gap": 0.2093145143822551
-    }
-  ]
-}

@@ -1,47 +1,0 @@
-[21:09:19] qwen3/smoke: focus=clean_fiber_high cases=2 variants=with_candidate_list,without_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens']
-[21:09:19] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 27/398 [00:00<00:01, 253.61it/s]Loading weights:  23%|██▎       | 90/398 [00:00<00:00, 463.20it/s]Loading weights:  35%|███▍      | 138/398 [00:00<00:00, 453.75it/s]Loading weights:  54%|█████▍    | 216/398 [00:00<00:00, 570.96it/s]Loading weights:  70%|███████   | 279/398 [00:00<00:00, 588.88it/s]Loading weights:  86%|████████▌ | 341/398 [00:00<00:00, 598.44it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 557.84it/s]
-[21:09:20] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
-[21:09:34] qwen3: candidate-list ablation 1/2 cases; rows=11
-[21:09:48] qwen3: candidate-list ablation 2/2 cases; rows=22
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "smoke",
-  "n_cases": 2,
-  "by_prompt_variant": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 10,
-      "case_n": 2,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 2911.0,
-      "mean_base_margin": 1.546875,
-      "mean_scan_score": 0.29994630299508573,
-      "mean_target_logit_drop": 0.0375,
-      "mean_margin_drop_target_vs_contrast": 0.05,
-      "mean_attention_mass": 0.2330482244491577,
-      "mean_direct_target_boost": 0.16081715784966946,
-      "mean_direct_route_suppression": 0.09180706962943078,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 12,
-      "case_n": 2,
-      "base_top1_rate": 1.0,
-      "mean_base_target_rank": 1.0,
-      "mean_base_margin": 8.6875,
-      "mean_scan_score": 4.021211125232123,
-      "mean_target_logit_drop": 0.17708333333333334,
-      "mean_margin_drop_target_vs_contrast": 0.13020833333333334,
-      "mean_attention_mass": 0.2837393879890442,
-      "mean_direct_target_boost": 2.566444815020077,
-      "mean_direct_route_suppression": 0.35898313058229786,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

@@ -1,71 +1,0 @@
-[19:00:16] deepseek7b/smoke2: cases=12 relations=['category', 'edible', 'grows_on_tree'] phase767_round=main max_new_tokens=6
-[19:00:16] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[19:00:16] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[19:00:16] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   1%|          | 2/339 [00:00<00:35,  9.45it/s]Loading weights:  12%|█▏        | 41/339 [00:00<00:01, 156.95it/s]Loading weights:  22%|██▏       | 75/339 [00:00<00:01, 222.27it/s]Loading weights:  30%|███       | 103/339 [00:00<00:01, 226.80it/s]Loading weights:  40%|████      | 137/339 [00:00<00:00, 257.96it/s]Loading weights:  50%|████▉     | 168/339 [00:00<00:00, 265.17it/s]Loading weights:  58%|█████▊    | 197/339 [00:00<00:00, 257.07it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 271.54it/s]Loading weights:  77%|███████▋  | 260/339 [00:01<00:00, 272.26it/s]Loading weights:  85%|████████▍ | 288/339 [00:01<00:00, 256.56it/s]Loading weights:  94%|█████████▎| 317/339 [00:01<00:00, 264.83it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 248.29it/s]
-[19:00:18] [load] deepseek7b: loaded sdpa, device=cuda:0, gpu=15.23GB
-The following generation flags are not valid and may be ignored: ['temperature', 'top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
-[19:00:21] deepseek7b: phrase closure 6/12 cases
-[19:00:24] deepseek7b: phrase closure 12/12 cases
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke2",
-  "by_subset": {
-    "all": {
-      "n": 12,
-      "semantic_top1_rate": 0.3333333333333333,
-      "exact_top1_rate": 0.25,
-      "phrase_top1_rate": 0.3333333333333333,
-      "generation_match_rate": 0.3333333333333333,
-      "mean_phrase_rank": 1.75,
-      "mean_phrase_margin": -0.4114583556850751
-    },
-    "exact_clean": {
-      "n": 3,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 1.0,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 3.8124999403953552
-    },
-    "semantic_clean": {
-      "n": 4,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 0.75,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 3.0624999403953552
-    },
-    "semantic_only": {
-      "n": 1,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 0.8124999403953552
-    },
-    "semantic_fail": {
-      "n": 8,
-      "semantic_top1_rate": 0.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 0.0,
-      "generation_match_rate": 0.0,
-      "mean_phrase_rank": 2.125,
-      "mean_phrase_margin": -2.1484375037252903
-    },
-    "rank_le2": {
-      "n": 5,
-      "semantic_top1_rate": 0.8,
-      "exact_top1_rate": 0.6,
-      "phrase_top1_rate": 0.8,
-      "generation_match_rate": 0.8,
-      "mean_phrase_rank": 1.2,
-      "mean_phrase_margin": 2.412499952316284
-    }
-  }
-}

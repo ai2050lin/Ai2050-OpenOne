@@ -1,47 +1,0 @@
-[19:55:51] qwen3/confirm: matched cases=20 pairs=10 sources=['instruction', 'question', 'object_tokens', 'relation_tokens']
-[19:55:52] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 250.15it/s]Loading weights:  22%|██▏       | 86/398 [00:00<00:00, 430.93it/s]Loading weights:  37%|███▋      | 148/398 [00:00<00:00, 506.59it/s]Loading weights:  54%|█████▎    | 213/398 [00:00<00:00, 560.85it/s]Loading weights:  68%|██████▊   | 270/398 [00:00<00:00, 539.96it/s]Loading weights:  86%|████████▋ | 344/398 [00:00<00:00, 602.31it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 555.51it/s]
-[19:55:53] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
-[19:55:57] qwen3: matched causal cases 5/20 rows=40
-[19:56:00] qwen3: matched causal cases 10/20 rows=80
-[19:56:03] qwen3: matched causal cases 15/20 rows=120
-[19:56:05] qwen3: matched causal cases 20/20 rows=160
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "confirm",
-  "n_cases": 20,
-  "by_matched_arm": [
-    {
-      "matched_arm": "clean",
-      "n": 80,
-      "mean_target_logit_drop": -0.0234375,
-      "mean_margin_drop_target_vs_contrast": -0.021875,
-      "mean_contrast_logit_gain": 0.0015625,
-      "mean_attention_mass": 0.25659348368644713,
-      "mean_direct_target_boost": 0.24025061732099856,
-      "mean_direct_route_suppression": 0.06983463267970365,
-      "top1_loss_rate": 0.0,
-      "candidate_kind_counts": {
-        "phase755_top_candidate": 40,
-        "same_layer_control_head": 40
-      }
-    },
-    {
-      "matched_arm": "fail",
-      "n": 80,
-      "mean_target_logit_drop": -0.0296875,
-      "mean_margin_drop_target_vs_contrast": -0.0421875,
-      "mean_contrast_logit_gain": -0.0125,
-      "mean_attention_mass": 0.2548003077507019,
-      "mean_direct_target_boost": 0.16566477041997132,
-      "mean_direct_route_suppression": 0.0680316668265732,
-      "top1_loss_rate": 0.0,
-      "candidate_kind_counts": {
-        "phase755_top_candidate": 40,
-        "same_layer_control_head": 40
-      }
-    }
-  ]
-}

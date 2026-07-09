@@ -1,87 +1,0 @@
-[17:34:20] glm4/confirm: cases=162 sources=['context_all', 'target_context_line', 'target_value_tokens', 'object_tokens', 'relation_tokens', 'question'] relations=['category', 'color', 'edible']
-[17:34:21] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.68it/s]Loading weights:   5%|▍         | 22/443 [00:00<00:04, 86.46it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 188.29it/s]Loading weights:  21%|██        | 92/443 [00:00<00:01, 199.30it/s]Loading weights:  31%|███▏      | 139/443 [00:00<00:01, 251.09it/s]Loading weights:  42%|████▏     | 185/443 [00:00<00:00, 306.26it/s]Loading weights:  49%|████▉     | 218/443 [00:00<00:00, 308.72it/s]Loading weights:  57%|█████▋    | 251/443 [00:01<00:00, 288.65it/s]Loading weights:  64%|██████▍   | 283/443 [00:01<00:00, 296.60it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 320.95it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 321.14it/s]Loading weights:  88%|████████▊ | 392/443 [00:01<00:00, 328.37it/s]Loading weights:  97%|█████████▋| 429/443 [00:01<00:00, 338.94it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 278.57it/s]
-[17:34:23] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[17:34:48] glm4: format fibers 27/162 cases; rows=351
-[17:35:12] glm4: format fibers 54/162 cases; rows=702
-[17:35:36] glm4: format fibers 81/162 cases; rows=1053
-[17:36:00] glm4: format fibers 108/162 cases; rows=1404
-[17:36:24] glm4: format fibers 135/162 cases; rows=1755
-[17:36:49] glm4: format fibers 162/162 cases; rows=2106
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "confirm",
-  "n_cases": 162,
-  "context_pair_summaries": {
-    "key_value": {
-      "n_objects": 18,
-      "n_features": 144,
-      "pair_summary": {
-        "same_domain_mean": 0.24318678135511387,
-        "different_domain_mean": -0.0873828486187458,
-        "separation": 0.3305696299738597,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.5
-      }
-    },
-    "sentence_lines": {
-      "n_objects": 18,
-      "n_features": 144,
-      "pair_summary": {
-        "same_domain_mean": 0.35379406197242647,
-        "different_domain_mean": -0.09940353669493358,
-        "separation": 0.45319759866736004,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.5555555555555556
-      }
-    },
-    "compact_sentence": {
-      "n_objects": 18,
-      "n_features": 144,
-      "pair_summary": {
-        "same_domain_mean": 0.3204871699957615,
-        "different_domain_mean": -0.1041604911484614,
-        "separation": 0.4246476611442229,
-        "same_n": 18,
-        "different_n": 135,
-        "nn_domain_accuracy": 0.6666666666666666
-      }
-    }
-  },
-  "cross_context_stability": [
-    {
-      "context_a": "compact_sentence",
-      "context_b": "key_value",
-      "common_objects": 18,
-      "same_object_mean": 0.2399458222035381,
-      "same_domain_diff_object_mean": 0.0020170648668161625,
-      "different_domain_mean": -0.19359074320580835,
-      "object_stability_gap": 0.23792875733672195,
-      "domain_stability_gap": 0.1956078080726245
-    },
-    {
-      "context_a": "compact_sentence",
-      "context_b": "sentence_lines",
-      "common_objects": 18,
-      "same_object_mean": -0.06550994298225504,
-      "same_domain_diff_object_mean": -0.17634798963707032,
-      "different_domain_mean": -0.3014140907254215,
-      "object_stability_gap": 0.11083804665481528,
-      "domain_stability_gap": 0.1250661010883512
-    },
-    {
-      "context_a": "key_value",
-      "context_b": "sentence_lines",
-      "common_objects": 18,
-      "same_object_mean": 0.08135129868121721,
-      "same_domain_diff_object_mean": -0.11000193358149857,
-      "different_domain_mean": -0.299476696650323,
-      "object_stability_gap": 0.19135323226271578,
-      "domain_stability_gap": 0.18947476306882444
-    }
-  ]
-}

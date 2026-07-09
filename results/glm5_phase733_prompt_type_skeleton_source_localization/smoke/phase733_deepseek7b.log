@@ -1,117 +1,0 @@
-[20:29:19] [load] deepseek7b: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[20:29:19] [load] deepseek7b: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[20:29:19] [load] deepseek7b: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<00:56,  5.95it/s]Loading weights:   8%|▊         | 28/339 [00:00<00:02, 118.23it/s]Loading weights:  19%|█▊        | 63/339 [00:00<00:01, 187.01it/s]Loading weights:  29%|██▉       | 98/339 [00:00<00:01, 231.89it/s]Loading weights:  39%|███▊      | 131/339 [00:00<00:00, 242.56it/s]Loading weights:  48%|████▊     | 162/339 [00:00<00:00, 245.45it/s]Loading weights:  58%|█████▊    | 198/339 [00:00<00:00, 275.13it/s]Loading weights:  68%|██████▊   | 232/339 [00:00<00:00, 287.07it/s]Loading weights:  77%|███████▋  | 262/339 [00:01<00:00, 256.57it/s]Loading weights:  87%|████████▋ | 294/339 [00:01<00:00, 268.89it/s]Loading weights:  97%|█████████▋| 328/339 [00:01<00:00, 283.76it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 246.83it/s]
-[20:29:20] [load] deepseek7b: loaded attn=sdpa, device=cuda:0, gpu=15.23GB
-[20:29:20] deepseek7b/smoke: scan_cases=9, pairs=2
-[20:29:21] scan 1/9 cases; current_sites=112
-[20:29:21] scan 2/9 cases; current_sites=112
-[20:29:21] scan 3/9 cases; current_sites=112
-[20:29:21] scan 4/9 cases; current_sites=112
-[20:29:21] scan 5/9 cases; current_sites=112
-[20:29:21] scan 6/9 cases; current_sites=112
-[20:29:21] scan 7/9 cases; current_sites=112
-[20:29:21] scan 8/9 cases; current_sites=112
-[20:29:21] scan 9/9 cases; current_sites=112
-[20:29:21] deepseek7b/smoke: candidate_sites=['L22_layer_input', 'L27_layer_input', 'L21_attn_out', 'L27_attn_out']
-[20:29:23] transfer 1/2 pairs; rows=8
-[20:29:25] transfer 2/2 pairs; rows=16
-[model_utils] GPU memory released, allocated=15.24 GB
-{
-  "model": "deepseek7b",
-  "round": "smoke",
-  "attn": "sdpa",
-  "formation": {
-    "layer_input": {
-      "max_site": "L27_layer_input",
-      "max_layer": 27,
-      "max_effect_norm": 578.9385375976562,
-      "earliest_35pct_site": "L22_layer_input",
-      "earliest_35pct_layer": 22,
-      "earliest_35pct_effect_norm": 213.64569091796875
-    },
-    "attn_out": {
-      "max_site": "L27_attn_out",
-      "max_layer": 27,
-      "max_effect_norm": 159.99009704589844,
-      "earliest_35pct_site": "L21_attn_out",
-      "earliest_35pct_layer": 21,
-      "earliest_35pct_effect_norm": 56.81743240356445
-    },
-    "mlp_out": {
-      "max_site": "L27_mlp_out",
-      "max_layer": 27,
-      "max_effect_norm": 488.02825927734375,
-      "earliest_35pct_site": "L24_mlp_out",
-      "earliest_35pct_layer": 24,
-      "earliest_35pct_effect_norm": 171.888671875
-    },
-    "layer_out": {
-      "max_site": "hidden_28",
-      "max_layer": 27,
-      "max_effect_norm": 793.5023803710938,
-      "earliest_35pct_site": "hidden_24",
-      "earliest_35pct_layer": 23,
-      "earliest_35pct_effect_norm": 322.1124572753906
-    }
-  },
-  "top_transfer": [
-    [
-      "commonsense<-explicit|L22_layer_input",
-      {
-        "site_kind": "layer_input",
-        "layer": 22,
-        "n": 2,
-        "mean_patched_delta_vs_recipient": 0.4417245388031006,
-        "changed_rate": 1.0,
-        "recipient_hit_rate": 0.5,
-        "patched_hit_rate": 0.0,
-        "hit_gain": 0.0,
-        "hit_loss": 0.5
-      }
-    ],
-    [
-      "explicit<-commonsense|L22_layer_input",
-      {
-        "site_kind": "layer_input",
-        "layer": 22,
-        "n": 2,
-        "mean_patched_delta_vs_recipient": -4.152836948633194,
-        "changed_rate": 1.0,
-        "recipient_hit_rate": 0.5,
-        "patched_hit_rate": 0.0,
-        "hit_gain": 0.0,
-        "hit_loss": 0.5
-      }
-    ],
-    [
-      "commonsense<-explicit|L27_layer_input",
-      {
-        "site_kind": "layer_input",
-        "layer": 27,
-        "n": 2,
-        "mean_patched_delta_vs_recipient": 4.44265478849411,
-        "changed_rate": 1.0,
-        "recipient_hit_rate": 0.5,
-        "patched_hit_rate": 0.5,
-        "hit_gain": 0.5,
-        "hit_loss": 0.5
-      }
-    ],
-    [
-      "explicit<-commonsense|L27_layer_input",
-      {
-        "site_kind": "layer_input",
-        "layer": 27,
-        "n": 2,
-        "mean_patched_delta_vs_recipient": -4.761672884225845,
-        "changed_rate": 1.0,
-        "recipient_hit_rate": 0.5,
-        "patched_hit_rate": 0.5,
-        "hit_gain": 0.5,
-        "hit_loss": 0.5
-      }
-    ]
-  ]
-}

@@ -1,72 +1,0 @@
-[18:58:30] glm4/smoke: cases=12 relations=['category', 'edible', 'grows_on_tree'] phase767_round=main max_new_tokens=6
-[18:58:30] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[18:58:30] [load] glm4: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[18:58:31] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:46,  9.42it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:04, 103.29it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 177.27it/s]Loading weights:  21%|██        | 92/443 [00:00<00:01, 217.83it/s]Loading weights:  26%|██▋       | 117/443 [00:00<00:01, 223.24it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:01, 278.51it/s]Loading weights:  43%|████▎     | 192/443 [00:00<00:00, 284.28it/s]Loading weights:  50%|█████     | 222/443 [00:00<00:00, 287.73it/s]Loading weights:  58%|█████▊    | 258/443 [00:01<00:00, 302.10it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 295.96it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 302.90it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 302.82it/s]Loading weights:  88%|████████▊ | 388/443 [00:01<00:00, 300.58it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 305.85it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 267.93it/s]
-[18:58:32] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
-The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
-[18:58:35] glm4: phrase closure 4/12 cases
-[18:58:37] glm4: phrase closure 8/12 cases
-[18:58:39] glm4: phrase closure 12/12 cases
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "smoke",
-  "by_subset": {
-    "all": {
-      "n": 12,
-      "semantic_top1_rate": 0.6666666666666666,
-      "exact_top1_rate": 0.5,
-      "phrase_top1_rate": 0.6666666666666666,
-      "generation_match_rate": 0.16666666666666666,
-      "mean_phrase_rank": 1.3333333333333333,
-      "mean_phrase_margin": 1.0468750409781933
-    },
-    "exact_clean": {
-      "n": 6,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 1.0,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 0.0,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 2.6770834053556123
-    },
-    "semantic_clean": {
-      "n": 8,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 0.75,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 0.25,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 2.2968750689178705
-    },
-    "semantic_only": {
-      "n": 2,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 1.0,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0,
-      "mean_phrase_margin": 1.1562500596046448
-    },
-    "semantic_fail": {
-      "n": 4,
-      "semantic_top1_rate": 0.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 0.0,
-      "generation_match_rate": 0.0,
-      "mean_phrase_rank": 2.0,
-      "mean_phrase_margin": -1.4531250149011612
-    },
-    "rank_le2": {
-      "n": 11,
-      "semantic_top1_rate": 0.7272727272727273,
-      "exact_top1_rate": 0.5454545454545454,
-      "phrase_top1_rate": 0.7272727272727273,
-      "generation_match_rate": 0.18181818181818182,
-      "mean_phrase_rank": 1.2727272727272727,
-      "mean_phrase_margin": 1.44318187372251
-    }
-  }
-}

@@ -1,43 +1,0 @@
-`torch_dtype` is deprecated! Use `dtype` instead!
-[2026-06-12 00:11:16] Failed loading qwen3 with flash_attention_2: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   3%|▎         | 11/398 [00:00<00:03, 99.21it/s]Loading weights:  18%|█▊        | 71/398 [00:00<00:00, 380.70it/s]Loading weights:  32%|███▏      | 129/398 [00:00<00:00, 468.35it/s]Loading weights:  49%|████▊     | 194/398 [00:00<00:00, 530.47it/s]Loading weights:  64%|██████▍   | 256/398 [00:00<00:00, 547.12it/s]Loading weights:  78%|███████▊  | 312/398 [00:00<00:00, 546.27it/s]Loading weights:  95%|█████████▍| 378/398 [00:00<00:00, 579.52it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 530.34it/s]
-[2026-06-12 00:11:17] Loaded qwen3 with attn_impl=sdpa
-[2026-06-12 00:11:17] Phase93 model=qwen3 items=420 nodes=[(6, 'mlp'), (24, 'attn')] copy_modes=['tail', 'prefix', 'both'] donor_kinds=['diff_slot_diff_object', 'diff_slot_same_object', 'same_slot_diff_target', 'same_slot_same_target', 'self_restore']
-[2026-06-12 00:13:46] mode=tail node=L6:mlp item=70/420 rows=350 elapsed=149s
-[2026-06-12 00:16:14] mode=tail node=L6:mlp item=140/420 rows=700 elapsed=297s
-[2026-06-12 00:18:43] mode=tail node=L6:mlp item=210/420 rows=1050 elapsed=446s
-[2026-06-12 00:21:12] mode=tail node=L6:mlp item=280/420 rows=1400 elapsed=595s
-[2026-06-12 00:23:40] mode=tail node=L6:mlp item=350/420 rows=1750 elapsed=743s
-[2026-06-12 00:26:08] mode=tail node=L6:mlp item=420/420 rows=2100 elapsed=891s
-[2026-06-12 00:28:33] mode=tail node=L24:attn item=70/420 rows=2450 elapsed=1036s
-[2026-06-12 00:30:58] mode=tail node=L24:attn item=140/420 rows=2800 elapsed=1181s
-[2026-06-12 00:33:22] mode=tail node=L24:attn item=210/420 rows=3150 elapsed=1325s
-[2026-06-12 00:35:47] mode=tail node=L24:attn item=280/420 rows=3500 elapsed=1470s
-[2026-06-12 00:38:11] mode=tail node=L24:attn item=350/420 rows=3850 elapsed=1614s
-[2026-06-12 00:40:35] mode=tail node=L24:attn item=420/420 rows=4200 elapsed=1758s
-[2026-06-12 00:43:04] mode=prefix node=L6:mlp item=70/420 rows=4550 elapsed=1907s
-[2026-06-12 00:45:32] mode=prefix node=L6:mlp item=140/420 rows=4900 elapsed=2055s
-[2026-06-12 00:48:00] mode=prefix node=L6:mlp item=210/420 rows=5250 elapsed=2203s
-[2026-06-12 00:50:29] mode=prefix node=L6:mlp item=280/420 rows=5600 elapsed=2352s
-[2026-06-12 00:52:58] mode=prefix node=L6:mlp item=350/420 rows=5950 elapsed=2501s
-[2026-06-12 00:55:26] mode=prefix node=L6:mlp item=420/420 rows=6300 elapsed=2649s
-[2026-06-12 00:57:51] mode=prefix node=L24:attn item=70/420 rows=6650 elapsed=2794s
-[2026-06-12 01:00:15] mode=prefix node=L24:attn item=140/420 rows=7000 elapsed=2938s
-[2026-06-12 01:02:39] mode=prefix node=L24:attn item=210/420 rows=7350 elapsed=3082s
-[2026-06-12 01:05:04] mode=prefix node=L24:attn item=280/420 rows=7700 elapsed=3227s
-[2026-06-12 01:07:29] mode=prefix node=L24:attn item=350/420 rows=8050 elapsed=3371s
-[2026-06-12 01:09:53] mode=prefix node=L24:attn item=420/420 rows=8400 elapsed=3516s
-[2026-06-12 01:12:22] mode=both node=L6:mlp item=70/420 rows=8750 elapsed=3665s
-[2026-06-12 01:14:51] mode=both node=L6:mlp item=140/420 rows=9100 elapsed=3814s
-[2026-06-12 01:17:20] mode=both node=L6:mlp item=210/420 rows=9450 elapsed=3963s
-[2026-06-12 01:19:49] mode=both node=L6:mlp item=280/420 rows=9800 elapsed=4112s
-[2026-06-12 01:22:18] mode=both node=L6:mlp item=350/420 rows=10150 elapsed=4260s
-[2026-06-12 01:24:46] mode=both node=L6:mlp item=420/420 rows=10500 elapsed=4409s
-[2026-06-12 01:27:11] mode=both node=L24:attn item=70/420 rows=10850 elapsed=4554s
-[2026-06-12 01:29:35] mode=both node=L24:attn item=140/420 rows=11200 elapsed=4698s
-[2026-06-12 01:32:00] mode=both node=L24:attn item=210/420 rows=11550 elapsed=4843s
-[2026-06-12 01:34:25] mode=both node=L24:attn item=280/420 rows=11900 elapsed=4988s
-[2026-06-12 01:36:50] mode=both node=L24:attn item=350/420 rows=12250 elapsed=5133s
-[2026-06-12 01:39:15] mode=both node=L24:attn item=420/420 rows=12600 elapsed=5277s
-[2026-06-12 01:39:15] Wrote results/gpt5_phase93_transplant_alignment_audit_full_20260612_001114/qwen3_phase93_transplant_alignment_audit.json
-[2026-06-12 01:39:15] Hard exit after model requested.

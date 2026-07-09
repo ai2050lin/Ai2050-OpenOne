@@ -1,115 +1,0 @@
-[22:49:37] glm4/smoke: pairs=2 target_site=hidden_40 source_paths=2
-[22:49:37] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:24, 17.81it/s]Loading weights:   6%|▌         | 26/443 [00:00<00:03, 137.40it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:01, 214.77it/s]Loading weights:  21%|██        | 93/443 [00:00<00:01, 253.28it/s]Loading weights:  28%|██▊       | 125/443 [00:00<00:01, 270.13it/s]Loading weights:  36%|███▌      | 159/443 [00:00<00:00, 289.71it/s]Loading weights:  43%|████▎     | 191/443 [00:00<00:00, 292.06it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 298.14it/s]Loading weights:  58%|█████▊    | 258/443 [00:00<00:00, 302.49it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 304.51it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 306.45it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 311.05it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 313.38it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 313.06it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 289.34it/s]
-[22:49:39] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[22:49:41] glm4: replacement closure 1/2 pairs; rows=4
-[22:49:43] glm4: replacement closure 2/2 pairs; rows=8
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "smoke",
-  "target_site": "hidden_40",
-  "top_replacement_paths": [
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "all_pre_answer",
-      "direction": "explicit<-conflict",
-      "n": 2,
-      "mean_restore_projection": 1.28352689743042,
-      "mean_restore_fraction": 0.007926620717906244,
-      "mean_donor_logprob_delta": 0.057419776916503906,
-      "mean_recipient_logprob_delta": -0.0011734571307897568,
-      "mean_donor_rank_delta": -36.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.986937403678894,
-      "mean_recipient_attention_mass": 0.9898667633533478,
-      "mean_contribution_delta_norm": 3.6722750663757324,
-      "role_guess": "content_transfer_candidate"
-    },
-    {
-      "component_id": "L23H17",
-      "layer": 23,
-      "head": 17,
-      "source_group": "all_pre_answer",
-      "direction": "conflict<-explicit",
-      "n": 2,
-      "mean_restore_projection": 0.3593095541000366,
-      "mean_restore_fraction": 0.0023318628677248244,
-      "mean_donor_logprob_delta": -0.00806570053100586,
-      "mean_recipient_logprob_delta": -0.0002527087926864624,
-      "mean_donor_rank_delta": 2.0,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 0.9898667633533478,
-      "mean_recipient_attention_mass": 0.986937403678894,
-      "mean_contribution_delta_norm": 3.6722750663757324,
-      "role_guess": "state_transfer_only"
-    },
-    {
-      "component_id": "L39H21",
-      "layer": 39,
-      "head": 21,
-      "source_group": "self_last",
-      "direction": "explicit<-conflict",
-      "n": 2,
-      "mean_restore_projection": -0.16136284172534943,
-      "mean_restore_fraction": -0.0009159334643719849,
-      "mean_donor_logprob_delta": 0.02202749252319336,
-      "mean_recipient_logprob_delta": 0.0024968069046735764,
-      "mean_donor_rank_delta": -7.5,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 1.0,
-      "mean_recipient_attention_mass": 1.0,
-      "mean_contribution_delta_norm": 17.382274627685547,
-      "role_guess": "likelihood_transfer_only"
-    },
-    {
-      "component_id": "L39H21",
-      "layer": 39,
-      "head": 21,
-      "source_group": "self_last",
-      "direction": "conflict<-explicit",
-      "n": 2,
-      "mean_restore_projection": -1.8164920806884766,
-      "mean_restore_fraction": -0.011197439699156294,
-      "mean_donor_logprob_delta": -0.010340452194213867,
-      "mean_recipient_logprob_delta": -0.010339904576539993,
-      "mean_donor_rank_delta": 3.0,
-      "mean_recipient_rank_delta": 0.0,
-      "donor_hit_gain_rate": 0.0,
-      "recipient_hit_loss_rate": 0.0,
-      "patched_donor_hit_rate": 0.0,
-      "baseline_donor_hit_rate": 0.0,
-      "patched_recipient_hit_rate": 1.0,
-      "baseline_recipient_hit_rate": 1.0,
-      "changed_rate": 0.0,
-      "mean_donor_attention_mass": 1.0,
-      "mean_recipient_attention_mass": 1.0,
-      "mean_contribution_delta_norm": 17.382274627685547,
-      "role_guess": "weak_or_negative"
-    }
-  ]
-}

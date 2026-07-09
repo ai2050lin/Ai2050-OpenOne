@@ -1,71 +1,0 @@
-[18:59:49] qwen3/smoke2: cases=12 relations=['category', 'edible', 'grows_on_tree'] phase767_round=main max_new_tokens=6
-[18:59:49] [load] qwen3: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[18:59:49] [load] qwen3: attn=flash_attention_2 failed: ImportError: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[18:59:49] [load] qwen3: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 26/398 [00:00<00:01, 259.01it/s]Loading weights:  23%|██▎       | 91/398 [00:00<00:00, 476.26it/s]Loading weights:  38%|███▊      | 151/398 [00:00<00:00, 501.01it/s]Loading weights:  56%|█████▌    | 223/398 [00:00<00:00, 577.21it/s]Loading weights:  71%|███████   | 281/398 [00:00<00:00, 572.46it/s]Loading weights:  87%|████████▋ | 345/398 [00:00<00:00, 589.19it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 564.29it/s]
-[18:59:50] [load] qwen3: loaded sdpa, device=cuda:0, gpu=8.05GB
-The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
-[18:59:53] qwen3: phrase closure 6/12 cases
-[18:59:55] qwen3: phrase closure 12/12 cases
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "smoke2",
-  "by_subset": {
-    "all": {
-      "n": 12,
-      "semantic_top1_rate": 0.9166666666666666,
-      "exact_top1_rate": 0.9166666666666666,
-      "phrase_top1_rate": 0.8333333333333334,
-      "generation_match_rate": 0.9166666666666666,
-      "mean_phrase_rank": 1.1666666666666667,
-      "mean_phrase_margin": 3.9270834227791056
-    },
-    "exact_clean": {
-      "n": 11,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 1.0,
-      "phrase_top1_rate": 0.9090909090909091,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0909090909090908,
-      "mean_phrase_margin": 4.875000099609182
-    },
-    "semantic_clean": {
-      "n": 11,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 1.0,
-      "phrase_top1_rate": 0.9090909090909091,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0909090909090908,
-      "mean_phrase_margin": 4.875000099609182
-    },
-    "semantic_only": {
-      "n": 0,
-      "semantic_top1_rate": null,
-      "exact_top1_rate": null,
-      "phrase_top1_rate": null,
-      "generation_match_rate": null,
-      "mean_phrase_rank": null,
-      "mean_phrase_margin": null
-    },
-    "semantic_fail": {
-      "n": 1,
-      "semantic_top1_rate": 0.0,
-      "exact_top1_rate": 0.0,
-      "phrase_top1_rate": 0.0,
-      "generation_match_rate": 0.0,
-      "mean_phrase_rank": 2.0,
-      "mean_phrase_margin": -6.500000022351742
-    },
-    "rank_le2": {
-      "n": 11,
-      "semantic_top1_rate": 1.0,
-      "exact_top1_rate": 1.0,
-      "phrase_top1_rate": 0.9090909090909091,
-      "generation_match_rate": 1.0,
-      "mean_phrase_rank": 1.0909090909090908,
-      "mean_phrase_margin": 4.875000099609182
-    }
-  }
-}

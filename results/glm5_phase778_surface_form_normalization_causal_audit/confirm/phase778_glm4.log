@@ -1,97 +1,0 @@
-[22:34:51] glm4/confirm: selected surface cases=6 variants=without_candidate_list,constrained_free_prompt,lowercase_short_value,lowercase_no_punctuation,token_identity_contract,with_candidate_list
-[22:34:52] [load] glm4: bf16 device_map=auto attn=flash_attention_2 quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-[22:34:52] [load] glm4: flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following error: the package for FlashAttention2 doesn't seem to be installed.
-[22:34:52] [load] glm4: bf16 device_map=auto attn=sdpa quantization=off
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.74it/s]Loading weights:   6%|▌         | 25/443 [00:00<00:04, 98.07it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 184.79it/s]Loading weights:  21%|██        | 92/443 [00:00<00:01, 214.40it/s]Loading weights:  28%|██▊       | 122/443 [00:00<00:01, 234.43it/s]Loading weights:  35%|███▌      | 156/443 [00:00<00:01, 256.97it/s]Loading weights:  42%|████▏     | 186/443 [00:00<00:01, 245.26it/s]Loading weights:  53%|█████▎    | 235/443 [00:00<00:00, 308.61it/s]Loading weights:  61%|██████    | 269/443 [00:01<00:00, 306.17it/s]Loading weights:  68%|██████▊   | 301/443 [00:01<00:00, 309.49it/s]Loading weights:  76%|███████▌  | 335/443 [00:01<00:00, 313.46it/s]Loading weights:  83%|████████▎ | 367/443 [00:01<00:00, 307.84it/s]Loading weights:  91%|█████████ | 401/443 [00:01<00:00, 311.12it/s]Loading weights:  98%|█████████▊| 434/443 [00:01<00:00, 313.69it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 269.59it/s]
-[22:34:54] [load] glm4: loaded sdpa, device=cuda:0, gpu=18.80GB
-[22:34:55] glm4: surface-form audit 2/6 cases; rows=372
-[22:34:56] glm4: surface-form audit 4/6 cases; rows=744
-[22:34:56] glm4: surface-form audit 6/6 cases; rows=1116
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "confirm",
-  "attn": "sdpa",
-  "n_cases": 6,
-  "by_prompt_observation": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "n": 6,
-      "case_n": 6,
-      "strict_open_rate": 0.0,
-      "semantic_equiv_open_rate": 1.0,
-      "surface_gain_rate": 1.0,
-      "pool_top1_rate": 1.0,
-      "case_variant_top1_rate": 1.0,
-      "hard_readout_after_equiv_rate": 0.0,
-      "mean_base_target_rank": 3.5,
-      "mean_top1_gap_above_target": 1.2291666666666667
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "n": 6,
-      "case_n": 6,
-      "strict_open_rate": 1.0,
-      "semantic_equiv_open_rate": 1.0,
-      "surface_gain_rate": 0.0,
-      "pool_top1_rate": 1.0,
-      "case_variant_top1_rate": 0.0,
-      "hard_readout_after_equiv_rate": 0.0,
-      "mean_base_target_rank": 1.0,
-      "mean_top1_gap_above_target": 0.0
-    },
-    {
-      "prompt_variant": "token_identity_contract",
-      "n": 6,
-      "case_n": 6,
-      "strict_open_rate": 0.16666666666666666,
-      "semantic_equiv_open_rate": 0.6666666666666666,
-      "surface_gain_rate": 0.5,
-      "pool_top1_rate": 0.6666666666666666,
-      "case_variant_top1_rate": 0.5,
-      "hard_readout_after_equiv_rate": 0.3333333333333333,
-      "mean_base_target_rank": 3.6666666666666665,
-      "mean_top1_gap_above_target": 1.0520833333333333
-    },
-    {
-      "prompt_variant": "lowercase_short_value",
-      "n": 6,
-      "case_n": 6,
-      "strict_open_rate": 0.5,
-      "semantic_equiv_open_rate": 1.0,
-      "surface_gain_rate": 0.5,
-      "pool_top1_rate": 1.0,
-      "case_variant_top1_rate": 0.5,
-      "hard_readout_after_equiv_rate": 0.0,
-      "mean_base_target_rank": 2.1666666666666665,
-      "mean_top1_gap_above_target": 0.3541666666666667
-    },
-    {
-      "prompt_variant": "lowercase_no_punctuation",
-      "n": 6,
-      "case_n": 6,
-      "strict_open_rate": 0.6666666666666666,
-      "semantic_equiv_open_rate": 0.6666666666666666,
-      "surface_gain_rate": 0.0,
-      "pool_top1_rate": 1.0,
-      "case_variant_top1_rate": 0.0,
-      "hard_readout_after_equiv_rate": 0.3333333333333333,
-      "mean_base_target_rank": 1.6666666666666667,
-      "mean_top1_gap_above_target": 0.3541666666666667
-    },
-    {
-      "prompt_variant": "constrained_free_prompt",
-      "n": 6,
-      "case_n": 6,
-      "strict_open_rate": 0.0,
-      "semantic_equiv_open_rate": 1.0,
-      "surface_gain_rate": 1.0,
-      "pool_top1_rate": 0.6666666666666666,
-      "case_variant_top1_rate": 1.0,
-      "hard_readout_after_equiv_rate": 0.0,
-      "mean_base_target_rank": 4.833333333333333,
-      "mean_top1_gap_above_target": 1.6770833333333333
-    }
-  ]
-}

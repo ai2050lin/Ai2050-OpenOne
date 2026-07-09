@@ -1,17 +1,0 @@
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|¨€¨€¨„       | 1/4 [00:02<00:08,  2.75s/it]Loading checkpoint shards:  50%|¨€¨€¨€¨€¨€     | 2/4 [00:05<00:05,  2.67s/it]Loading checkpoint shards:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 3/4 [00:07<00:02,  2.57s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 4/4 [00:10<00:00,  2.65s/it]Loading checkpoint shards: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 4/4 [00:10<00:00,  2.65s/it]
-Some parameters are on the meta device because they were offloaded to the cpu.
-Traceback (most recent call last):
-  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase_ccxlv_local_geometry.py", line 586, in <module>
-    main()
-  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase_ccxlv_local_geometry.py", line 525, in main
-    results = run_ccxlv(model, tokenizer, model_key,
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase_ccxlv_local_geometry.py", line 349, in run_ccxlv
-    weight_results = analyze_weight_matrices(model, model_key)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\Ai2050\TransformerLens-Project\tests\glm5\phase_ccxlv_local_geometry.py", line 143, in analyze_weight_matrices
-    frobenius = torch.norm(w).item()
-                ^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\27876\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\_meta_registrations.py", line 7779, in meta_local_scalar_dense
-    raise RuntimeError("Tensor.item() cannot be called on meta tensors")
-RuntimeError: Tensor.item() cannot be called on meta tensors

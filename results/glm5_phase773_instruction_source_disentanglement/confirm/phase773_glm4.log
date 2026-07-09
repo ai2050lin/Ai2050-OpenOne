@@ -1,121 +1,0 @@
-[21:00:00] glm4/confirm: focus=clean_fiber_high cases=4 sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
-[21:00:00] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:45,  9.63it/s]Loading weights:   6%|▌         | 25/443 [00:00<00:04, 97.22it/s]Loading weights:  11%|█         | 48/443 [00:00<00:02, 139.51it/s]Loading weights:  20%|██        | 90/443 [00:00<00:01, 224.03it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 257.09it/s]Loading weights:  35%|███▌      | 156/443 [00:00<00:01, 268.01it/s]Loading weights:  43%|████▎     | 191/443 [00:00<00:00, 284.72it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 296.10it/s]Loading weights:  58%|█████▊    | 256/443 [00:01<00:00, 292.35it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 298.71it/s]Loading weights:  73%|███████▎  | 322/443 [00:01<00:00, 301.04it/s]Loading weights:  80%|███████▉  | 353/443 [00:01<00:00, 297.24it/s]Loading weights:  88%|████████▊ | 390/443 [00:01<00:00, 312.80it/s]Loading weights:  95%|█████████▌| 423/443 [00:01<00:00, 306.62it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 268.05it/s]
-[21:00:02] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[21:00:33] glm4: source disentanglement 1/4 cases; rows=16
-[21:01:02] glm4: source disentanglement 2/4 cases; rows=32
-[21:01:31] glm4: source disentanglement 3/4 cases; rows=48
-[21:02:01] glm4: source disentanglement 4/4 cases; rows=64
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "confirm",
-  "n_cases": 4,
-  "by_source_family": [
-    {
-      "source_family": "candidate_protocol",
-      "candidate_kind": "source_group_top_component",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 1.0099275586816172,
-      "mean_target_logit_drop": 0.125,
-      "mean_margin_drop_target_vs_contrast": 0.140625,
-      "mean_attention_mass": 0.4558136463165283,
-      "mean_direct_target_boost": 0.6642085015773773,
-      "mean_direct_route_suppression": 0.0228079566732049,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "query_frame",
-      "candidate_kind": "source_group_top_component",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.06572321663673696,
-      "mean_target_logit_drop": 0.03125,
-      "mean_margin_drop_target_vs_contrast": 0.03125,
-      "mean_attention_mass": 0.5395123064517975,
-      "mean_direct_target_boost": 0.00797552359290421,
-      "mean_direct_route_suppression": 0.01756256660883082,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "semantic_object",
-      "candidate_kind": "same_layer_control_head",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.00277425862623204,
-      "mean_target_logit_drop": 0.03125,
-      "mean_margin_drop_target_vs_contrast": 0.03125,
-      "mean_attention_mass": 0.01835346221923828,
-      "mean_direct_target_boost": -0.00015302287920349045,
-      "mean_direct_route_suppression": 0.002832076628692448,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_instruction",
-      "candidate_kind": "source_group_top_component",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.1585914555005729,
-      "mean_target_logit_drop": 0.015625,
-      "mean_margin_drop_target_vs_contrast": 0.015625,
-      "mean_attention_mass": 0.9011364579200745,
-      "mean_direct_target_boost": 0.018283957615494728,
-      "mean_direct_route_suppression": 0.10407066997140646,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "semantic_relation",
-      "candidate_kind": "source_group_top_component",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.04578165311831981,
-      "mean_target_logit_drop": 0.015625,
-      "mean_margin_drop_target_vs_contrast": 0.015625,
-      "mean_attention_mass": 0.3726654052734375,
-      "mean_direct_target_boost": 0.00541429512668401,
-      "mean_direct_route_suppression": 0.016323521733283997,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_format",
-      "candidate_kind": "same_layer_control_head",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.0027425329783000055,
-      "mean_target_logit_drop": 0.015625,
-      "mean_margin_drop_target_vs_contrast": 0.015625,
-      "mean_attention_mass": 0.04235902428627014,
-      "mean_direct_target_boost": -6.634817873418797e-05,
-      "mean_direct_route_suppression": 0.0005442791152745485,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "candidate_protocol",
-      "candidate_kind": "same_layer_control_head",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.004145488201781215,
-      "mean_target_logit_drop": 0.015625,
-      "mean_margin_drop_target_vs_contrast": -0.015625,
-      "mean_attention_mass": 0.0751650333404541,
-      "mean_direct_target_boost": 0.0002270565164508298,
-      "mean_direct_route_suppression": 6.701864913338795e-05,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_instruction",
-      "candidate_kind": "same_layer_control_head",
-      "n": 4,
-      "case_n": 4,
-      "mean_scan_score": 0.10794038769866651,
-      "mean_target_logit_drop": 0.0,
-      "mean_margin_drop_target_vs_contrast": 0.03125,
-      "mean_attention_mass": 0.4621991142630577,
-      "mean_direct_target_boost": 0.008584251161664724,
-      "mean_direct_route_suppression": 0.09605354187078774,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

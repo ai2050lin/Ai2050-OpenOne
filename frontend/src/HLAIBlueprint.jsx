@@ -7,6 +7,7 @@ import { LanguageAnalysisTab } from './blueprint/LanguageAnalysisTab';
 import { DeepAnalysisTab } from './blueprint/DeepAnalysisTab';
 import { ResearchProgressTab } from './blueprint/ResearchProgressTab';
 import { SystemStatusTab } from './blueprint/SystemStatusTab';
+import { AtlasControlDashboard } from './blueprint/AtlasControlDashboard';
 import { AIRnDConsoleTab } from './AIRnD/AIRnDConsoleTab';
 import { AIRnDConfigTab } from './AIRnD/AIRnDConfigTab';
 import { RESEARCH_PHASES } from './AIRnD/aiRnDConfig';
@@ -20,7 +21,9 @@ import {
 } from './blueprint/blueprintConfig';
 import { API_BASE, mapLegacyConsciousField, mapRuntimeConsciousField } from './blueprint/blueprintRuntimeUtils';
 
-const BLUEPRINT_TABS = new Set(['roadmap', 'language', 'analysis', 'progress', 'system', 'rnd_console', 'rnd_config']);
+const BLUEPRINT_TABS = new Set(['roadmap', 'atlas_control', 'language', 'analysis', 'progress', 'system', 'rnd_console', 'rnd_config']);
+const THEORY_TABS = new Set(['roadmap', 'atlas_control', 'language', 'analysis', 'progress', 'system']);
+const RND_TABS = new Set(['rnd_console', 'rnd_config']);
 
 const PHASE_ICONS = {
   analyze: Search,
@@ -30,14 +33,19 @@ const PHASE_ICONS = {
   summarize: CheckCircle,
 };
 
-export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay' }) => {
-  const [activeTab, setActiveTab] = useState(initialTab); // roadmap, progress, system
+export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay', scope = 'theory' }) => {
+  const normalizedInitialTab = scope === 'rnd'
+    ? (RND_TABS.has(initialTab) ? initialTab : 'rnd_console')
+    : (THEORY_TABS.has(initialTab) ? initialTab : 'roadmap');
+  const [activeTab, setActiveTab] = useState(normalizedInitialTab); // roadmap, progress, system
   const [lastTheoryTab, setLastTheoryTab] = useState('roadmap');
   const [selectedRouteId, setSelectedRouteId] = useState('fiber_bundle');
 
   const handleTabChange = (tabId) => {
+    if (scope === 'rnd' && !RND_TABS.has(tabId)) return;
+    if (scope === 'theory' && !THEORY_TABS.has(tabId)) return;
     setActiveTab(tabId);
-    if (['roadmap', 'language', 'analysis', 'progress', 'system'].includes(tabId)) {
+    if (THEORY_TABS.has(tabId)) {
       setLastTheoryTab(tabId);
     }
   };
@@ -226,7 +234,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   useEffect(() => {
     const targetTab = BLUEPRINT_TABS.has(initialTab) ? initialTab : 'roadmap';
     setActiveTab(targetTab);
-    if (['roadmap', 'language', 'analysis', 'progress', 'system'].includes(targetTab)) {
+    if (['roadmap', 'atlas_control', 'language', 'analysis', 'progress', 'system'].includes(targetTab)) {
       setLastTheoryTab(targetTab);
     }
   }, [initialTab]);
@@ -818,13 +826,14 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   return (
     <div style={mode === 'sidebar' ? {
       position: 'absolute', top: '20px', right: '20px', bottom: '20px', width: '500px',
-      backgroundColor: 'rgba(10, 10, 18, 0.95)', backdropFilter: 'blur(20px)', zIndex: 102,
+      backgroundColor: 'rgba(10, 10, 18, 0.98)', zIndex: 102,
       display: 'flex', flexDirection: 'column', color: '#fff',
+      transform: 'translateZ(0)',
+      willChange: 'auto',
       fontFamily: '"SF Mono", "Roboto Mono", monospace', overflow: 'hidden',
       borderRadius: '12px',
       border: '1px solid rgba(0, 210, 255, 0.2)',
-      boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-      animation: 'slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+      boxShadow: '0 16px 32px rgba(0,0,0,0.42)'
     } : {
       position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
       backgroundColor: 'rgba(5, 5, 10, 0.98)', backdropFilter: 'blur(30px)', zIndex: 2000,
@@ -838,7 +847,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         @keyframes brainRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes brainRotateReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes synapsePulse { 0%, 100% { opacity: 0.3; scale: 0.8; } 50% { opacity: 1; scale: 1.2; } }
-        @keyframes slideInRight { from { transform: translateX(calc(100% + 20px)); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
       `}</style>
 
       {/* Top Header / Navigation */}
@@ -854,29 +862,10 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         <div style={{ display: 'flex', alignItems: 'center', gap: mode === 'sidebar' ? '12px' : '50px', height: '100%', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             <Brain size={mode === 'sidebar' ? 20 : 28} color="#00d2ff" />
-            <span style={{ fontSize: mode === 'sidebar' ? '14px' : '18px', fontWeight: 'bold', letterSpacing: '1px' }}>理论分析</span>
+            <span style={{ fontSize: mode === 'sidebar' ? '14px' : '18px', fontWeight: 'bold', letterSpacing: '1px' }}>
+              {scope === 'rnd' ? '自动研发' : '理论分析'}
+            </span>
           </div>
-
-          <nav style={{ display: 'flex', gap: '4px', height: '100%', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {[
-              { id: 'rnd_console', label: '自动研发', onClick: () => handleTabChange('rnd_console'), isActive: ['rnd_console', 'rnd_config'].includes(activeTab) },
-              { id: 'theory_root', label: '理论分析', onClick: () => handleTabChange(lastTheoryTab), isActive: ['roadmap', 'language', 'analysis', 'progress', 'system'].includes(activeTab) },
-            ].map(t => (
-              <button
-                key={t.id}
-                onClick={t.onClick}
-                style={{
-                  background: 'transparent', border: 'none', color: t.isActive ? '#00d2ff' : '#666',
-                  fontSize: mode === 'sidebar' ? '12px' : '15px', fontWeight: 'bold', cursor: 'pointer',
-                  padding: mode === 'sidebar' ? '0 10px' : '0 25px', flexShrink: 0,
-                  borderBottom: t.isActive ? '3px solid #00d2ff' : '3px solid transparent',
-                  transition: 'all 0.3s', height: '100%'
-                }}
-              >
-                {t.label}
-              </button>
-            ))}
-          </nav>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -891,7 +880,29 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
       </div>
 
       {/* Secondary Sub-Navbar for Theory */}
-      {['roadmap', 'language', 'analysis', 'progress', 'system'].includes(activeTab) && (
+      {scope === 'theory' && THEORY_TABS.has(activeTab) && (
+        <div style={{
+          display: 'flex', gap: '6px', padding: '10px 16px 0',
+          background: 'rgba(0,0,0,0.15)',
+          flexShrink: 0, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none'
+        }}>
+          <button
+            onClick={() => handleTabChange('atlas_control')}
+            style={{
+              background: activeTab === 'atlas_control' ? 'rgba(0, 210, 255, 0.12)' : 'rgba(255,255,255,0.02)',
+              border: `1px solid ${activeTab === 'atlas_control' ? 'rgba(0, 210, 255, 0.25)' : 'rgba(255,255,255,0.05)'}`,
+              borderRadius: '6px',
+              color: activeTab === 'atlas_control' ? '#00d2ff' : '#999',
+              fontSize: '11px', fontWeight: 'bold', cursor: 'pointer',
+              padding: '6px 12px', flexShrink: 0,
+              transition: 'all 0.2s'
+            }}
+          >
+            图谱总控
+          </button>
+        </div>
+      )}
+      {scope === 'theory' && THEORY_TABS.has(activeTab) && (
         <div style={{
           display: 'flex', gap: '6px', padding: '10px 16px',
           background: 'rgba(0,0,0,0.15)', borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -936,7 +947,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
       )}
 
       {/* Secondary Sub-Navbar for AI Auto R&D */}
-      {['rnd_console', 'rnd_config'].includes(activeTab) && (
+      {scope === 'rnd' && RND_TABS.has(activeTab) && (
         <div style={{
           display: 'flex', gap: '6px', padding: '10px 16px',
           background: 'rgba(0,0,0,0.15)', borderBottom: '1px solid rgba(167,139,250,0.12)',
@@ -981,7 +992,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
         {/* Sub-Sidebar for Research Progress */}
-        {activeTab === 'progress' && mode !== 'sidebar' && (
+        {scope === 'theory' && activeTab === 'progress' && mode !== 'sidebar' && (
           <div style={{
             width: '280px', borderRight: '1px solid rgba(255,255,255,0.1)',
             padding: '30px 20px', background: 'rgba(0,0,0,0.2)', overflowY: 'auto',
@@ -1048,7 +1059,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         }}>
 
           {/* TAB: Project Roadmap */}
-          {activeTab === 'roadmap' && (
+          {scope === 'theory' && activeTab === 'roadmap' && (
             <ProjectRoadmapTab
               roadmapData={roadmapData}
               analysisPhase={analysisPhase}
@@ -1064,12 +1075,17 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
           )}
 
           {/* TAB: Language Analysis */}
-          {activeTab === 'language' && (
+          {scope === 'theory' && activeTab === 'language' && (
             <LanguageAnalysisTab />
           )}
 
+          {/* TAB: Pattern Family Atlas Control */}
+          {scope === 'theory' && activeTab === 'atlas_control' && (
+            <AtlasControlDashboard />
+          )}
+
           {/* TAB: Deep Analysis / Model Comparison */}
-          {activeTab === 'analysis' && (
+          {scope === 'theory' && activeTab === 'analysis' && (
             <DeepAnalysisTab
               evidenceDrivenPlan={EVIDENCE_DRIVEN_PLAN}
               improvements={IMPROVEMENTS}
@@ -1081,7 +1097,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
           )}
 
           {/* TAB: Research Progress (Route-Centric Command) */}
-          {activeTab === 'progress' && selectedRoute && (
+          {scope === 'theory' && activeTab === 'progress' && selectedRoute && (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
               {mode === 'sidebar' && (
                 <div style={{ marginBottom: '8px', flexShrink: 0 }}>
@@ -1130,7 +1146,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
           )}
 
           {/* TAB: AGI System Status */}
-          {activeTab === 'system' && (
+          {scope === 'theory' && activeTab === 'system' && (
             <SystemStatusTab
               consciousField={consciousField}
               systemRouteOptions={systemRouteOptions}
@@ -1147,7 +1163,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
           )}
 
           {/* TAB: AI Auto R&D Console */}
-          {activeTab === 'rnd_console' && (
+          {scope === 'rnd' && activeTab === 'rnd_console' && (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
               {/* Phase Progress Bar */}
               {sessionStatus === 'running' && (
@@ -1226,7 +1242,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
           )}
 
           {/* TAB: AI Auto R&D Config */}
-          {activeTab === 'rnd_config' && (
+          {scope === 'rnd' && activeTab === 'rnd_config' && (
             <AIRnDConfigTab />
           )}
 

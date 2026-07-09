@@ -1,33 +1,0 @@
-=== Phase306 normal logged run ===
-2026-06-02 10:29:27 CST
-run_id=20260602_102927_phase306normal_deepseek7b
-model=deepseek7b
-output_dir=results/gpt5_phase306_symbolic_role_query_after_gpu_fix_smoke
-conda_env=openone-cu130-py312
-probe_torch_dtype=bfloat16
-probe_attn_implementation=sdpa
-probe_device_map_auto_models=glm4,deepseek7b
-probe_max_gpu_memory=21GiB
-cuda_launch_blocking=0
-pytorch_no_cuda_memory_caching=0
-enable_gpu_monitor=0
-enable_snapshot_nvidia_smi=1
-args=--max-bases 2 --max-seq-len 128 --entity-styles ab,entity_ab,nonce --answer-styles letter,entity --progress-every 1
-
-=== Start kernel log follower ===
-=== GPU/process monitor disabled ===
-=== Run Phase306 normal ===
-Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
-Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:02<00:02,  2.37s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:04<00:00,  2.11s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:04<00:00,  2.15s/it]
-[phase306] model=deepseek7b class=Qwen2ForCausalLM bases=2 entity_styles=['ab', 'entity_ab', 'nonce'] answer_styles=['letter', 'entity'] templates=8
-[phase306] base 1/2 rows=384 elapsed=16.6s
-[phase306] base 2/2 rows=768 elapsed=32.8s
-[phase306] saved results/gpt5_phase306_symbolic_role_query_after_gpu_fix_smoke/deepseek7b_phase306_symbolic_role_query_calibration.json
-[phase306] done rows=768 reliable=0 nonfinite=0
-phase306_exit_code=0
-=== Kernel log since start ===
-=== Result files ===
-results/gpt5_phase306_symbolic_role_query_after_gpu_fix_smoke/deepseek7b_phase306_symbolic_role_query_calibration.json
-results/gpt5_phase306_symbolic_role_query_after_gpu_fix_smoke/glm4_phase306_symbolic_role_query_calibration.json
-results/gpt5_phase306_symbolic_role_query_after_gpu_fix_smoke/qwen3_phase306_symbolic_role_query_calibration.json
-log_dir=results/gpt5_gpu_lock_logs/20260602_102927_phase306normal_deepseek7b

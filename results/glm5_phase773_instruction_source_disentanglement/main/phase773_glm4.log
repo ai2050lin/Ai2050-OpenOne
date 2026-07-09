@@ -1,122 +1,0 @@
-[20:54:05] glm4/main: focus=clean_fiber_high cases=5 sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
-[20:54:05] [load] glm4: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 2/443 [00:00<00:48,  9.15it/s]Loading weights:   6%|▌         | 27/443 [00:00<00:04, 102.52it/s]Loading weights:  14%|█▎        | 60/443 [00:00<00:02, 174.33it/s]Loading weights:  21%|██        | 92/443 [00:00<00:01, 216.35it/s]Loading weights:  28%|██▊       | 126/443 [00:00<00:01, 248.34it/s]Loading weights:  36%|███▌      | 158/443 [00:00<00:01, 257.51it/s]Loading weights:  43%|████▎     | 189/443 [00:00<00:00, 269.09it/s]Loading weights:  51%|█████     | 225/443 [00:00<00:00, 291.07it/s]Loading weights:  58%|█████▊    | 255/443 [00:01<00:00, 285.88it/s]Loading weights:  66%|██████▌   | 291/443 [00:01<00:00, 302.61it/s]Loading weights:  73%|███████▎  | 324/443 [00:01<00:00, 301.72it/s]Loading weights:  81%|████████  | 357/443 [00:01<00:00, 304.42it/s]Loading weights:  88%|████████▊ | 388/443 [00:01<00:00, 301.69it/s]Loading weights:  95%|█████████▍| 420/443 [00:01<00:00, 300.21it/s]Loading weights: 100%|██████████| 443/443 [00:01<00:00, 266.21it/s]
-[20:54:07] [load] glm4: loaded eager, device=cuda:0, gpu=18.80GB
-[20:54:37] glm4: source disentanglement 1/5 cases; rows=8
-[20:55:06] glm4: source disentanglement 2/5 cases; rows=16
-[20:55:35] glm4: source disentanglement 3/5 cases; rows=24
-[20:56:04] glm4: source disentanglement 4/5 cases; rows=32
-[20:56:33] glm4: source disentanglement 5/5 cases; rows=40
-[model_utils] GPU memory released, allocated=18.81 GB
-{
-  "model": "glm4",
-  "round": "main",
-  "n_cases": 5,
-  "by_source_family": [
-    {
-      "source_family": "query_frame",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.06658624058608742,
-      "mean_target_logit_drop": 0.025,
-      "mean_margin_drop_target_vs_contrast": 0.03125,
-      "mean_attention_mass": 0.5718265295028686,
-      "mean_direct_target_boost": 0.01051571574062109,
-      "mean_direct_route_suppression": 0.018081661540782078,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "semantic_relation",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.05264337724695604,
-      "mean_target_logit_drop": 0.0125,
-      "mean_margin_drop_target_vs_contrast": 0.01875,
-      "mean_attention_mass": 0.38914794921875,
-      "mean_direct_target_boost": 0.01512404317036271,
-      "mean_direct_route_suppression": 0.013058817386627198,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_instruction",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.16659067734455069,
-      "mean_target_logit_drop": 0.0125,
-      "mean_margin_drop_target_vs_contrast": 0.0125,
-      "mean_attention_mass": 0.9126893043518066,
-      "mean_direct_target_boost": 0.007476256787776947,
-      "mean_direct_route_suppression": 0.14103475492447615,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "semantic_object",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.03954105958885824,
-      "mean_target_logit_drop": 0.0125,
-      "mean_margin_drop_target_vs_contrast": 0.0125,
-      "mean_attention_mass": 0.310791015625,
-      "mean_direct_target_boost": 0.00512205958366394,
-      "mean_direct_route_suppression": 0.022475925204344094,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "candidate_protocol",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.8628784322490295,
-      "mean_target_logit_drop": 0.0,
-      "mean_margin_drop_target_vs_contrast": 0.10625,
-      "mean_attention_mass": 0.5564089417457581,
-      "mean_direct_target_boost": 0.37562683820724485,
-      "mean_direct_route_suppression": 0.10894333347678184,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "protocol_format",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.03400422315501298,
-      "mean_target_logit_drop": 0.0,
-      "mean_margin_drop_target_vs_contrast": -0.00625,
-      "mean_attention_mass": 0.34957237243652345,
-      "mean_direct_target_boost": -0.0021853272803127764,
-      "mean_direct_route_suppression": 0.02580461334437132,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "output_prefix",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.09075069962069392,
-      "mean_target_logit_drop": -0.0125,
-      "mean_margin_drop_target_vs_contrast": 0.0125,
-      "mean_attention_mass": 0.682421875,
-      "mean_direct_target_boost": 0.029349663108587266,
-      "mean_direct_route_suppression": 0.0,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "source_family": "semantic_mixed",
-      "candidate_kind": "source_group_top_component",
-      "n": 5,
-      "case_n": 5,
-      "mean_scan_score": 0.07282354431226849,
-      "mean_target_logit_drop": -0.0125,
-      "mean_margin_drop_target_vs_contrast": 0.0,
-      "mean_attention_mass": 0.43527984619140625,
-      "mean_direct_target_boost": 0.019397856295108797,
-      "mean_direct_route_suppression": 0.03089879397302866,
-      "top1_loss_rate": 0.0
-    }
-  ]
-}

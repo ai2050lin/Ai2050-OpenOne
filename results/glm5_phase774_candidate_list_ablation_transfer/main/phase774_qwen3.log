@@ -1,50 +1,0 @@
-[21:11:05] qwen3/main: focus=clean_fiber_high cases=5 variants=with_candidate_list,without_candidate_list sources=['instruction_core', 'format_cue', 'candidate_list', 'answer_prefix', 'object_tokens', 'relation_tokens', 'semantic_pair', 'task_frame_without_semantic']
-[21:11:06] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   3%|▎         | 13/398 [00:00<00:03, 127.82it/s]Loading weights:  18%|█▊        | 73/398 [00:00<00:00, 394.16it/s]Loading weights:  36%|███▌      | 142/398 [00:00<00:00, 525.14it/s]Loading weights:  51%|█████     | 203/398 [00:00<00:00, 545.32it/s]Loading weights:  68%|██████▊   | 269/398 [00:00<00:00, 569.22it/s]Loading weights:  83%|████████▎ | 332/398 [00:00<00:00, 550.84it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 554.92it/s]
-[21:11:07] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
-[21:11:44] qwen3: candidate-list ablation 1/5 cases; rows=15
-[21:12:20] qwen3: candidate-list ablation 2/5 cases; rows=30
-[21:12:56] qwen3: candidate-list ablation 3/5 cases; rows=45
-[21:13:32] qwen3: candidate-list ablation 4/5 cases; rows=60
-[21:14:09] qwen3: candidate-list ablation 5/5 cases; rows=75
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "main",
-  "n_cases": 5,
-  "by_prompt_variant": [
-    {
-      "prompt_variant": "without_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 35,
-      "case_n": 5,
-      "base_top1_rate": 0.0,
-      "mean_base_target_rank": 1168.8,
-      "mean_base_margin": 3.18125,
-      "mean_scan_score": 0.6003629224130972,
-      "mean_target_logit_drop": 0.03125,
-      "mean_margin_drop_target_vs_contrast": 0.06339285714285714,
-      "mean_attention_mass": 0.2500060626438686,
-      "mean_direct_target_boost": 0.21886322221585683,
-      "mean_direct_route_suppression": 0.37948675963229367,
-      "top1_loss_rate": 0.0
-    },
-    {
-      "prompt_variant": "with_candidate_list",
-      "candidate_kind": "source_group_top_component",
-      "n": 40,
-      "case_n": 5,
-      "base_top1_rate": 1.0,
-      "mean_base_target_rank": 1.0,
-      "mean_base_margin": 6.75,
-      "mean_scan_score": 3.558282056436486,
-      "mean_target_logit_drop": 0.1375,
-      "mean_margin_drop_target_vs_contrast": 0.221875,
-      "mean_attention_mass": 0.2739827990531921,
-      "mean_direct_target_boost": 2.2686267361976205,
-      "mean_direct_route_suppression": 0.32542111215880143,
-      "top1_loss_rate": 0.025
-    }
-  ]
-}

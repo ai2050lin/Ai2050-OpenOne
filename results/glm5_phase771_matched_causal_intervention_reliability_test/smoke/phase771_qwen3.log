@@ -1,43 +1,0 @@
-[19:54:25] qwen3/smoke: matched cases=2 pairs=1 sources=['instruction', 'question']
-[19:54:25] [load] qwen3: bf16 device_map=auto attn=eager quantization=off
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   7%|▋         | 27/398 [00:00<00:01, 264.93it/s]Loading weights:  22%|██▏       | 89/398 [00:00<00:00, 442.94it/s]Loading weights:  39%|███▉      | 157/398 [00:00<00:00, 526.10it/s]Loading weights:  56%|█████▋    | 224/398 [00:00<00:00, 576.70it/s]Loading weights:  71%|███████   | 282/398 [00:00<00:00, 560.93it/s]Loading weights:  87%|████████▋ | 348/398 [00:00<00:00, 593.00it/s]Loading weights: 100%|██████████| 398/398 [00:00<00:00, 565.64it/s]
-[19:54:26] [load] qwen3: loaded eager, device=cuda:0, gpu=8.05GB
-[19:54:27] qwen3: matched causal cases 1/2 rows=2
-[19:54:27] qwen3: matched causal cases 2/2 rows=4
-[model_utils] GPU memory released, allocated=8.05 GB
-{
-  "model": "qwen3",
-  "round": "smoke",
-  "n_cases": 2,
-  "by_matched_arm": [
-    {
-      "matched_arm": "clean",
-      "n": 2,
-      "mean_target_logit_drop": -0.0625,
-      "mean_margin_drop_target_vs_contrast": -0.40625,
-      "mean_contrast_logit_gain": -0.34375,
-      "mean_attention_mass": 0.49738216400146484,
-      "mean_direct_target_boost": -0.01732492446899414,
-      "mean_direct_route_suppression": 0.25191841716878116,
-      "top1_loss_rate": 0.0,
-      "candidate_kind_counts": {
-        "phase755_top_candidate": 2
-      }
-    },
-    {
-      "matched_arm": "fail",
-      "n": 2,
-      "mean_target_logit_drop": -0.0625,
-      "mean_margin_drop_target_vs_contrast": -0.375,
-      "mean_contrast_logit_gain": -0.3125,
-      "mean_attention_mass": 0.49782657623291016,
-      "mean_direct_target_boost": 0.062292326241731644,
-      "mean_direct_route_suppression": 0.2548053301870823,
-      "top1_loss_rate": 0.0,
-      "candidate_kind_counts": {
-        "phase755_top_candidate": 2
-      }
-    }
-  ]
-}

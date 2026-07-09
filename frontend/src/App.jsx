@@ -1690,6 +1690,7 @@ export default function App() {
   const [showOperationHistory, setShowOperationHistory] = useState(false);
   const [showBlueprint, setShowBlueprint] = useState(false);
   const [blueprintInitialTab, setBlueprintInitialTab] = useState('roadmap');
+  const [showAIRnD, setShowAIRnD] = useState(false);
 
   useEffect(() => {
     if (!hasInfoPanelContent) {
@@ -2416,7 +2417,7 @@ export default function App() {
 
       <button
         onClick={() => {
-          if (showBlueprint && ['roadmap', 'language', 'analysis', 'progress', 'system'].includes(blueprintInitialTab)) {
+          if (showBlueprint) {
             setShowBlueprint(false);
           } else {
             setBlueprintInitialTab('roadmap');
@@ -2425,7 +2426,7 @@ export default function App() {
         }}
         style={{
           position: 'absolute', top: 20, left: 66, zIndex: 101,
-          background: (showBlueprint && ['roadmap', 'language', 'analysis', 'progress', 'system'].includes(blueprintInitialTab)) ? '#ffaa00' : 'rgba(20, 20, 25, 0.8)',
+          background: showBlueprint ? '#ffaa00' : 'rgba(20, 20, 25, 0.8)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
           padding: '8px',
@@ -2442,16 +2443,11 @@ export default function App() {
 
       <button
         onClick={() => {
-          if (showBlueprint && ['rnd_console', 'rnd_config'].includes(blueprintInitialTab)) {
-            setShowBlueprint(false);
-          } else {
-            setBlueprintInitialTab('rnd_console');
-            setShowBlueprint(true);
-          }
+          setShowAIRnD(prev => !prev);
         }}
         style={{
           position: 'absolute', top: 20, left: 112, zIndex: 101,
-          background: (showBlueprint && ['rnd_console', 'rnd_config'].includes(blueprintInitialTab)) ? '#7c3aed' : 'rgba(20, 20, 25, 0.8)',
+          background: showAIRnD ? '#7c3aed' : 'rgba(20, 20, 25, 0.8)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
           padding: '8px',
@@ -4533,14 +4529,26 @@ export default function App() {
         </SimplePanel>
       )}
 
-      {/* Project Genesis Blueprint Sidebar */}
+      {/* Project Genesis Blueprint */}
       {showBlueprint && (
         <HLAIBlueprint
-          mode="sidebar"
+          mode="overlay"
+          scope="theory"
           initialTab={blueprintInitialTab}
           onClose={() => {
             setShowBlueprint(false);
             setBlueprintInitialTab('roadmap');
+          }}
+        />
+      )}
+
+      {showAIRnD && (
+        <HLAIBlueprint
+          mode="sidebar"
+          scope="rnd"
+          initialTab="rnd_console"
+          onClose={() => {
+            setShowAIRnD(false);
           }}
         />
       )}
