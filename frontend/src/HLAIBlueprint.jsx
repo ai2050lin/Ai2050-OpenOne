@@ -7,7 +7,6 @@ import { LanguageAnalysisTab } from './blueprint/LanguageAnalysisTab';
 import { DeepAnalysisTab } from './blueprint/DeepAnalysisTab';
 import { ResearchProgressTab } from './blueprint/ResearchProgressTab';
 import { SystemStatusTab } from './blueprint/SystemStatusTab';
-import { AtlasControlDashboard } from './blueprint/AtlasControlDashboard';
 import { AIRnDConsoleTab } from './AIRnD/AIRnDConsoleTab';
 import { AIRnDConfigTab } from './AIRnD/AIRnDConfigTab';
 import { RESEARCH_PHASES } from './AIRnD/aiRnDConfig';
@@ -21,9 +20,13 @@ import {
 } from './blueprint/blueprintConfig';
 import { API_BASE, mapLegacyConsciousField, mapRuntimeConsciousField } from './blueprint/blueprintRuntimeUtils';
 
-const BLUEPRINT_TABS = new Set(['roadmap', 'atlas_control', 'language', 'analysis', 'progress', 'system', 'rnd_console', 'rnd_config']);
-const THEORY_TABS = new Set(['roadmap', 'atlas_control', 'language', 'analysis', 'progress', 'system']);
+const THEORY_TABS = new Set(['roadmap', 'language', 'analysis', 'progress']);
 const RND_TABS = new Set(['rnd_console', 'rnd_config']);
+
+const normalizeTheoryTab = (tabId) => {
+  if (tabId === 'system') return 'progress';
+  return THEORY_TABS.has(tabId) ? tabId : 'roadmap';
+};
 
 const PHASE_ICONS = {
   analyze: Search,
@@ -33,20 +36,21 @@ const PHASE_ICONS = {
   summarize: CheckCircle,
 };
 
-export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay', scope = 'theory' }) => {
+export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay', scope = 'theory', lang = 'zh' }) => {
   const normalizedInitialTab = scope === 'rnd'
     ? (RND_TABS.has(initialTab) ? initialTab : 'rnd_console')
-    : (THEORY_TABS.has(initialTab) ? initialTab : 'roadmap');
-  const [activeTab, setActiveTab] = useState(normalizedInitialTab); // roadmap, progress, system
+    : normalizeTheoryTab(initialTab);
+  const [activeTab, setActiveTab] = useState(normalizedInitialTab);
   const [lastTheoryTab, setLastTheoryTab] = useState('roadmap');
   const [selectedRouteId, setSelectedRouteId] = useState('fiber_bundle');
 
   const handleTabChange = (tabId) => {
     if (scope === 'rnd' && !RND_TABS.has(tabId)) return;
-    if (scope === 'theory' && !THEORY_TABS.has(tabId)) return;
-    setActiveTab(tabId);
-    if (THEORY_TABS.has(tabId)) {
-      setLastTheoryTab(tabId);
+    const nextTabId = scope === 'theory' ? normalizeTheoryTab(tabId) : tabId;
+    if (scope === 'theory' && !THEORY_TABS.has(nextTabId)) return;
+    setActiveTab(nextTabId);
+    if (THEORY_TABS.has(nextTabId)) {
+      setLastTheoryTab(nextTabId);
     }
   };
 
@@ -232,12 +236,14 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   const runtimeStepRef = useRef(0);
 
   useEffect(() => {
-    const targetTab = BLUEPRINT_TABS.has(initialTab) ? initialTab : 'roadmap';
+    const targetTab = scope === 'rnd'
+      ? (RND_TABS.has(initialTab) ? initialTab : 'rnd_console')
+      : normalizeTheoryTab(initialTab);
     setActiveTab(targetTab);
-    if (['roadmap', 'atlas_control', 'language', 'analysis', 'progress', 'system'].includes(targetTab)) {
+    if (THEORY_TABS.has(targetTab)) {
       setLastTheoryTab(targetTab);
     }
-  }, [initialTab]);
+  }, [initialTab, scope]);
 
   // Real-time Consciousness Polling
   useEffect(() => {
@@ -879,29 +885,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         </div>
       </div>
 
-      {/* Secondary Sub-Navbar for Theory */}
-      {scope === 'theory' && THEORY_TABS.has(activeTab) && (
-        <div style={{
-          display: 'flex', gap: '6px', padding: '10px 16px 0',
-          background: 'rgba(0,0,0,0.15)',
-          flexShrink: 0, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none'
-        }}>
-          <button
-            onClick={() => handleTabChange('atlas_control')}
-            style={{
-              background: activeTab === 'atlas_control' ? 'rgba(0, 210, 255, 0.12)' : 'rgba(255,255,255,0.02)',
-              border: `1px solid ${activeTab === 'atlas_control' ? 'rgba(0, 210, 255, 0.25)' : 'rgba(255,255,255,0.05)'}`,
-              borderRadius: '6px',
-              color: activeTab === 'atlas_control' ? '#00d2ff' : '#999',
-              fontSize: '11px', fontWeight: 'bold', cursor: 'pointer',
-              padding: '6px 12px', flexShrink: 0,
-              transition: 'all 0.2s'
-            }}
-          >
-            图谱总控
-          </button>
-        </div>
-      )}
       {scope === 'theory' && THEORY_TABS.has(activeTab) && (
         <div style={{
           display: 'flex', gap: '6px', padding: '10px 16px',
@@ -912,8 +895,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
             { id: 'roadmap', label: '项目大纲' },
             { id: 'language', label: '语言分析' },
             { id: 'analysis', label: '智能理论' },
-            { id: 'progress', label: '模型研发' },
-            { id: 'system', label: '系统状态' },
+            { id: 'progress', label: '模型与系统' },
           ].map(t => (
             <button
               key={t.id}
@@ -1076,12 +1058,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
 
           {/* TAB: Language Analysis */}
           {scope === 'theory' && activeTab === 'language' && (
-            <LanguageAnalysisTab />
-          )}
-
-          {/* TAB: Pattern Family Atlas Control */}
-          {scope === 'theory' && activeTab === 'atlas_control' && (
-            <AtlasControlDashboard />
+            <LanguageAnalysisTab lang={lang} />
           )}
 
           {/* TAB: Deep Analysis / Model Comparison */}
@@ -1096,7 +1073,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
             />
           )}
 
-          {/* TAB: Research Progress (Route-Centric Command) */}
+          {/* TAB: Model R&D + System Status */}
           {scope === 'theory' && activeTab === 'progress' && selectedRoute && (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
               {mode === 'sidebar' && (
@@ -1142,24 +1119,28 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
                 selectedMultimodalLatest={selectedMultimodalLatest}
                 multimodalMetricRows={multimodalMetricRows}
               />
+              <div
+                style={{
+                  marginTop: mode === 'sidebar' ? '18px' : '30px',
+                  paddingTop: mode === 'sidebar' ? '18px' : '30px',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+              >
+                <SystemStatusTab
+                  consciousField={consciousField}
+                  systemRouteOptions={systemRouteOptions}
+                  routeList={routeList}
+                  setSelectedRouteId={setSelectedRouteId}
+                  selectedRouteId={selectedRouteId}
+                  activeSystemProfile={activeSystemProfile}
+                  statusData={statusData}
+                  selectedRoute={selectedRoute}
+                  getRouteImpl={getRouteImpl}
+                  expandedParam={expandedParam}
+                  setExpandedParam={setExpandedParam}
+                />
+              </div>
             </div>
-          )}
-
-          {/* TAB: AGI System Status */}
-          {scope === 'theory' && activeTab === 'system' && (
-            <SystemStatusTab
-              consciousField={consciousField}
-              systemRouteOptions={systemRouteOptions}
-              routeList={routeList}
-              setSelectedRouteId={setSelectedRouteId}
-              selectedRouteId={selectedRouteId}
-              activeSystemProfile={activeSystemProfile}
-              statusData={statusData}
-              selectedRoute={selectedRoute}
-              getRouteImpl={getRouteImpl}
-              expandedParam={expandedParam}
-              setExpandedParam={setExpandedParam}
-            />
           )}
 
           {/* TAB: AI Auto R&D Console */}

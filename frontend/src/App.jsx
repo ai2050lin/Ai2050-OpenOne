@@ -4535,6 +4535,7 @@ export default function App() {
           mode="overlay"
           scope="theory"
           initialTab={blueprintInitialTab}
+          lang={lang}
           onClose={() => {
             setShowBlueprint(false);
             setBlueprintInitialTab('roadmap');
@@ -4547,6 +4548,7 @@ export default function App() {
           mode="sidebar"
           scope="rnd"
           initialTab="rnd_console"
+          lang={lang}
           onClose={() => {
             setShowAIRnD(false);
           }}
