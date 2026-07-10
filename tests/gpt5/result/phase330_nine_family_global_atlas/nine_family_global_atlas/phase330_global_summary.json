@@ -1,0 +1,76 @@
+{
+  "schema_version": "8.0.0",
+  "phase_id": "Phase330",
+  "created_at": "2026-07-10T12:00:29.619050+00:00",
+  "status": "complete_not_closed",
+  "counts": {
+    "families": 9,
+    "mechanisms": 72,
+    "independent_items_within_mechanism": 1728,
+    "prompt_cases": 5184,
+    "prompt_model_cases": 15552,
+    "behavior_rows": 15552,
+    "readout_rows": 15552,
+    "rollout_rows": 15552,
+    "top50_rows": 777600,
+    "component_event_rows": 4852224,
+    "path_signature_rows": 139968,
+    "component_candidate_rows": 487296,
+    "carrier_set_rows": 864,
+    "registered_causal_cases": 432,
+    "causal_condition_rows": 4320,
+    "heldout_prediction_rows": 3888
+  },
+  "behavior_by_model": [
+    {
+      "model": "deepseek7b",
+      "candidate_winner_is_target": 0.7837577,
+      "target_in_top50": 0.5991512,
+      "target_match": 0.501929,
+      "protocol_success": 0.9602623,
+      "behavior_success": 0.4818673
+    },
+    {
+      "model": "glm4",
+      "candidate_winner_is_target": 0.9010417,
+      "target_in_top50": 0.7935957,
+      "target_match": 0.175733,
+      "protocol_success": 0.9616127,
+      "behavior_success": 0.1734182
+    },
+    {
+      "model": "qwen3",
+      "candidate_winner_is_target": 0.910108,
+      "target_in_top50": 0.8661265,
+      "target_match": 0.7611883,
+      "protocol_success": 0.9641204,
+      "behavior_success": 0.7291667
+    }
+  ],
+  "cross_model": {
+    "joint_readout_specific_mechanisms": 5,
+    "natural_identity_positive_mechanisms": 14,
+    "behavior_necessity_mechanisms": 0,
+    "total_mechanisms": 72
+  },
+  "heldout_prediction": {
+    "exact_layer_match_rate": 0.6118827,
+    "within_10pct_depth_rate": 0.8315329,
+    "mean_normalized_layer_error": 0.1155577,
+    "scope": "peak_layer_conditioned_on_frozen_role"
+  },
+  "quality_corrections": [
+    "all rollout rows rerun cache-free after model-specific cache interface confound",
+    "adjacent 18/19 causal registration invalidated; balanced 18/23 registration fully rerun"
+  ],
+  "coverage": {
+    "family_behavior_readout_layer_path": "9/9",
+    "mechanism_component_candidates": "72/72 x 3 models",
+    "mechanism_registered_set_interventions": "72/72 x 3 models",
+    "single_neuron_cuda_interventions": 0,
+    "complete_natural_language_chains": 0
+  },
+  "single_unit_intervention_gate_open": false,
+  "language_encoding_mechanism_closed": false,
+  "intelligence_theory_closed": false
+}

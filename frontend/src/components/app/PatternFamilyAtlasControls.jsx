@@ -4,8 +4,9 @@ import './PatternFamilyAtlasControls.css';
 const FOCUS_OPTIONS = [
   { value: 'key', label: '关键候选' },
   { value: 'natural', label: '自然交叉' },
-  { value: 'group', label: '组级支持' },
-  { value: 'confirmed', label: '扩大确认' },
+  { value: 'registered', label: '注册集合' },
+  { value: 'cross_model', label: '跨模型' },
+  { value: 'competition', label: '竞争路径' },
 ];
 
 export function PatternFamilyAtlasControls({
@@ -135,7 +136,22 @@ export function PatternFamilyAtlasControls({
             <span>{metrics?.natural_overlap_count || 0} 个自然交叉</span>
             <span>{metrics?.group_supported_candidate_count || 0} 个组级支持候选</span>
             <span>{metrics?.expanded_confirmed_candidate_count || 0} 个扩大确认候选</span>
-            <span className="pattern-atlas-boundary">单神经元因果 0</span>
+            <span>{metrics?.natural_retrieval_path_count || 0} 条自然检索路径</span>
+            <span>{metrics?.full_natural_chain_pass_count || 0} 条严格自然闭合</span>
+            <span>{metrics?.upstream_residual_mediation_edge_count || 0} 条上游中介候选</span>
+            <span>{metrics?.full_vocabulary_mediation_path_count || 0} 条全词表路径</span>
+            <span>{metrics?.phase330_mechanism_count || 0} 个九族机制</span>
+            <span>{metrics?.phase330_component_member_count || 0} 个新组件成员</span>
+            <span>{metrics?.phase330_registered_causal_case_count || 0} 个注册留出案例</span>
+            <span>{metrics?.phase330_local_set_readout_specific_mechanism_count || 0} 个本模型集合读出支持</span>
+            <span>{metrics?.phase330_cross_model_set_readout_specific_mechanism_count || 0} 个跨模型读出支持</span>
+            <span>{Math.round((metrics?.phase330_heldout_peak_10pct_rate || 0) * 100)}% 留出峰层命中</span>
+            <span>{metrics?.tokenwise_beats_pooled_count || 0} 条逐词元正向胜出</span>
+            <span>{metrics?.blocker_decline_pass_count || 0} 条阻挡者下降</span>
+            <span>{metrics?.carrier_member_mediation_pass_count || 0} 条成员中介</span>
+            <span>{metrics?.top1_unlock_pass_count || 0} 条首选解锁</span>
+            <span>{metrics?.causal_path_edge_count || 0} 条因果路径边</span>
+            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · 行为闭合 {metrics?.phase330_cross_model_behavior_necessity_mechanism_count || 0}</span>
           </>
         ) : (
           <span>{atlas.family?.family_name || '当前模式族'} · 等待真实物理映射</span>

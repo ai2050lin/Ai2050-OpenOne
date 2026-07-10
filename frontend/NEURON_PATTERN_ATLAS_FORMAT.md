@@ -82,6 +82,14 @@ missing
 
 Phase326 extends the package with `attention_head` and `mlp_product_group` component-set members. These remain distinct from `unit_candidate` nodes. Its `single_unit_causal_count` is zero.
 
+Phase327 annotates the frozen Phase326 members with mechanism-level natural identity, position necessity, natural-state transplant, and complete-generation results. It adds `path.natural_retrieval_paths` to the content-knowledge partitions. These paths do not create new neuron nodes and remain `causal=false` because no upstream intervention was shown to alter the downstream frozen set.
+
+Phase328 adds `path.upstream_residual_mediation_edges` for registered pooled query-residual interventions. A single-model mediation pass is displayed as a candidate state, not a causal edge. `causal=true` requires cross-model mediation together with natural top-1 answer unlock; the Phase328 published count is zero.
+
+Phase329 adds `path.full_vocabulary_mediation_paths`. Each path records the residual observation layer, the correctly aligned next-block input layer, full-vocabulary blocker decline, tokenwise-versus-pooled comparison, carrier-member mediation, top-1 unlock, generation improvement, and the single-unit intervention gate. These paths are evidence overlays on existing physical members; they do not create neurons. Function and format tokens at answer onset are stored as surface-protocol competitors and are not labeled semantic blockers without a separate causal test.
+
+Phase330 maps all nine registered families for all three models. Each family/model partition contains eight mechanisms, full-layer attention/MLP/residual path anchors at source/query/last roles, and 32 frozen component-set members. The global package adds `phase330_paths.jsonl`, `phase330_carrier_sets.jsonl`, and `phase330_claim_registry.jsonl`. A node may carry `phase330_registered_set_support` or `phase330_cross_model_readout_specific`; neither field means visible-behavior closure or single-neuron causality. The client preserves the original DNN geometry and renders these members only as a physical evidence overlay.
+
 ## Node Types
 
 ```text
@@ -102,7 +110,7 @@ Future causal edges must include intervention, matched control, heldout replicat
 ## Build
 
 ```bash
-python tests/gpt5/phase326_publish_physical_path_atlas.py
+python tests/gpt5/phase330_publish_global_atlas.py
 ```
 
 The builder writes the canonical package to:

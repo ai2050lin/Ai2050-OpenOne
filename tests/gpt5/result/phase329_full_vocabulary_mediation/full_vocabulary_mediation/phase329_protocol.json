@@ -1,0 +1,49 @@
+{
+  "schema_version": "7.0.0",
+  "phase_id": "Phase329",
+  "primary_goal": "full_vocabulary_blocker_and_tokenwise_query_to_carrier_mediation_atlas",
+  "registered_prompt_count_per_model": 72,
+  "registered_independent_object_count_per_model": 36,
+  "top_k_competitor_count": 50,
+  "blocker_definition": "all vocabulary tokens with logit strictly above the target first token",
+  "blocker_taxonomy": [
+    "target",
+    "target_alias",
+    "registered_wrong_answer",
+    "punctuation_or_whitespace",
+    "continuation_function",
+    "protocol_or_format",
+    "subject_copy",
+    "semantic_content_other"
+  ],
+  "query_conditions": [
+    "recipient_baseline",
+    "recipient_tokenwise_correct",
+    "recipient_pooled_correct",
+    "recipient_tokenwise_same_target",
+    "recipient_tokenwise_wrong_target",
+    "recipient_tokenwise_unrelated",
+    "recipient_tokenwise_norm_matched_unrelated",
+    "recipient_tokenwise_shuffled",
+    "recipient_tokenwise_correct_wrong_layer",
+    "recipient_natural_carrier_correct",
+    "correct_baseline",
+    "correct_carrier_joint_zero"
+  ],
+  "generation_conditions": [
+    "correct_baseline",
+    "correct_carrier_joint_zero",
+    "recipient_baseline",
+    "recipient_tokenwise_correct",
+    "recipient_pooled_correct",
+    "recipient_natural_carrier_correct"
+  ],
+  "registered_thresholds": {
+    "positive_consistency_min": 0.65,
+    "max_mean_js_divergence": 0.05,
+    "cross_model_support_min": 2,
+    "mechanism_top1_unlock_model_min": 2
+  },
+  "single_unit_intervention_gate": "Do not run the Phase288 full single-neuron CUDA intervention unless a mechanism passes cross-model tokenwise, blocker, carrier-member, and generation criteria.",
+  "selection_updates_allowed": false
+}

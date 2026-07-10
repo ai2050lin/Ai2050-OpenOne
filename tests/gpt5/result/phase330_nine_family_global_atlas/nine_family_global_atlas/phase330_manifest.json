@@ -1,0 +1,223 @@
+{
+  "schema_version": "8.0.0",
+  "phase_id": "Phase330",
+  "created_at": "2026-07-10T10:35:20.651288+00:00",
+  "title": "Nine-family global physical atlas census",
+  "status": "case_bank_frozen",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "families": [
+    {
+      "family_id": "content_knowledge",
+      "family_name": "内容知识",
+      "mechanisms": [
+        "category",
+        "attribute",
+        "function",
+        "part",
+        "material",
+        "habitat",
+        "comparison_relation",
+        "negated_attribute"
+      ]
+    },
+    {
+      "family_id": "output_protocol",
+      "family_name": "输出协议",
+      "mechanisms": [
+        "answer_only",
+        "single_sentence",
+        "single_item_list",
+        "json",
+        "quote_closure",
+        "newline_closure",
+        "format_template",
+        "no_explanation"
+      ]
+    },
+    {
+      "family_id": "reasoning_constraint",
+      "family_name": "推理约束",
+      "mechanisms": [
+        "direct_entailment",
+        "direct_contradiction",
+        "two_hop_entailment",
+        "two_hop_blocked",
+        "transitive_order",
+        "reversed_order_control",
+        "conjunction_rule",
+        "missing_condition_control"
+      ]
+    },
+    {
+      "family_id": "syntax_structure",
+      "family_name": "语法结构",
+      "mechanisms": [
+        "subject_role",
+        "object_role",
+        "singular_agreement",
+        "plural_agreement",
+        "past_tense",
+        "pronoun_number",
+        "adjective_attachment",
+        "relative_clause_role"
+      ]
+    },
+    {
+      "family_id": "language_action",
+      "family_name": "语言动作",
+      "mechanisms": [
+        "answer",
+        "classify",
+        "extract",
+        "transform",
+        "translate",
+        "rewrite",
+        "summarize",
+        "refuse_or_comply"
+      ]
+    },
+    {
+      "family_id": "cross_lingual",
+      "family_name": "跨语言",
+      "mechanisms": [
+        "semantic_equivalence",
+        "translation",
+        "negation",
+        "question",
+        "role_binding",
+        "number_agreement",
+        "protocol_preservation",
+        "mixed_language_routing"
+      ]
+    },
+    {
+      "family_id": "readout_competition",
+      "family_name": "读出竞争",
+      "mechanisms": [
+        "target_vs_wrong",
+        "target_vs_continue",
+        "target_vs_echo",
+        "target_vs_protocol",
+        "target_vs_punctuation",
+        "answer_alias",
+        "multi_token_answer",
+        "full_vocabulary_blockers"
+      ]
+    },
+    {
+      "family_id": "state_drift",
+      "family_name": "状态漂移",
+      "mechanisms": [
+        "entity_drift",
+        "attribute_drift",
+        "role_drift",
+        "language_drift",
+        "format_drift",
+        "reasoning_drift",
+        "repetition_drift",
+        "long_context_drift"
+      ]
+    },
+    {
+      "family_id": "closure",
+      "family_name": "闭合",
+      "mechanisms": [
+        "semantic_completion",
+        "protocol_completion",
+        "stop_wins",
+        "continue_suppression",
+        "multi_token_completion",
+        "alias_completion",
+        "generation_stability",
+        "client_visible_closure"
+      ]
+    }
+  ],
+  "planned_counts": {
+    "families": 9,
+    "mechanisms": 72,
+    "items_per_mechanism": 24,
+    "templates_per_item": 3,
+    "prompt_cases": 5184,
+    "prompt_model_cases": 15552,
+    "behavior_rows": 15552,
+    "readout_rows": 15552,
+    "rollout_rows": 15552,
+    "top50_rows": 777600,
+    "component_event_rows": 4852224,
+    "registered_causal_cases": 432,
+    "registered_causal_condition_rows": 4320
+  },
+  "split_contract": {
+    "discovery_items": 12,
+    "calibration_items": 6,
+    "heldout_items": 6
+  },
+  "template_contract": {
+    "selection_styles": [
+      "template_a",
+      "template_b"
+    ],
+    "heldout_style": "template_c"
+  },
+  "analysis_freeze": "During model execution only completeness, missing rows, hashes, schema errors, and runtime failures may be inspected. Scientific claims are generated only after all three models complete.",
+  "case_bank_sha256": "a79c951826e599e6fc6ed0c9db45a9ff31350bbe63853806c30f08622f85fed9",
+  "validation": {
+    "schema_version": "8.0.0",
+    "phase_id": "Phase330",
+    "created_at": "2026-07-10T10:35:20.586565+00:00",
+    "family_count": 9,
+    "mechanism_count": 72,
+    "independent_item_count": 1728,
+    "prompt_case_count": 5184,
+    "prompt_model_plan_count": 15552,
+    "family_prompt_counts": {
+      "closure": 576,
+      "content_knowledge": 576,
+      "cross_lingual": 576,
+      "language_action": 576,
+      "output_protocol": 576,
+      "readout_competition": 576,
+      "reasoning_constraint": 576,
+      "state_drift": 576,
+      "syntax_structure": 576
+    },
+    "mechanism_prompt_count_values": [
+      72
+    ],
+    "template_counts": {
+      "template_a": 1728,
+      "template_b": 1728,
+      "template_c": 1728
+    },
+    "split_item_count_values": {
+      "discovery": [
+        12
+      ],
+      "calibration": [
+        6
+      ],
+      "heldout": [
+        6
+      ]
+    },
+    "duplicate_case_id_count": 0,
+    "source_query_order_error_count": 0,
+    "missing_mechanism_count": 0,
+    "unexpected_mechanism_count": 0,
+    "empty_target_count": 0,
+    "empty_distractor_count": 0,
+    "target_leak_count": 1347,
+    "selection_eligible_count": 2592,
+    "heldout_style_count": 1728,
+    "selection_updates_allowed": false,
+    "case_bank_sha256": "a79c951826e599e6fc6ed0c9db45a9ff31350bbe63853806c30f08622f85fed9",
+    "valid": true
+  },
+  "single_unit_intervention_gate_open": false,
+  "selection_updates_allowed": false
+}

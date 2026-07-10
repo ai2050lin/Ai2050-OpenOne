@@ -9,6 +9,7 @@ const COLORS = {
   natural: '#22d3ee',
   group: '#fb923c',
   confirmed: '#4ade80',
+  crossModel: '#e879f9',
   readout: '#fb7185',
   active: '#f8fafc',
 };
@@ -17,6 +18,9 @@ function filterNodes(nodes, focus) {
   if (focus === 'natural') return nodes.filter((node) => node.natural_observed);
   if (focus === 'group') return nodes.filter((node) => node.group_intervention_supported);
   if (focus === 'confirmed') return nodes.filter((node) => node.expanded_confirmation_pass);
+  if (focus === 'registered') return nodes.filter((node) => node.phase330_registered_set_support || node.group_intervention_supported);
+  if (focus === 'cross_model') return nodes.filter((node) => node.phase330_cross_model_readout_specific);
+  if (focus === 'competition') return nodes.filter((node) => node.phase329_tested || node.phase330_tested);
   return nodes;
 }
 
@@ -111,6 +115,7 @@ function nodePosition(node, snapshot, rankInLayer, overlay = false) {
 }
 
 function nodeColor(node) {
+  if (node.phase330_cross_model_readout_specific) return COLORS.crossModel;
   if (node.expanded_confirmation_pass) return COLORS.confirmed;
   if (node.group_intervention_supported) return COLORS.group;
   if (node.natural_observed) return COLORS.natural;
@@ -118,6 +123,7 @@ function nodeColor(node) {
 }
 
 function nodeCategory(node) {
+  if (node.phase330_cross_model_readout_specific) return 'crossModel';
   if (node.expanded_confirmation_pass) return 'confirmed';
   if (node.group_intervention_supported) return 'group';
   if (node.natural_observed) return 'natural';
@@ -150,6 +156,42 @@ function toHoverInfo(node) {
     natural_observed: node.natural_observed,
     group_intervention_supported: node.group_intervention_supported,
     expanded_confirmation_pass: node.expanded_confirmation_pass,
+    phase327_natural_gate_observational_pass: node.phase327_natural_gate_observational_pass,
+    phase327_position_necessity_pass: node.phase327_position_necessity_pass,
+    phase327_natural_state_transplant_pass: node.phase327_natural_state_transplant_pass,
+    phase327_complete_generation_pass: node.phase327_complete_generation_pass,
+    phase327_full_chain_pass: node.phase327_full_chain_pass,
+    phase327_status: node.phase327_status,
+    phase327_evidence_boundary: node.phase327_evidence_boundary,
+    phase328_selected_residual_layer: node.phase328_selected_residual_layer,
+    phase328_residual_position_role: node.phase328_residual_position_role,
+    phase328_upstream_mediation_pass: node.phase328_upstream_mediation_pass,
+    phase328_natural_generation_unlock_pass: node.phase328_natural_generation_unlock_pass,
+    phase328_causal_edge: node.phase328_causal_edge,
+    phase328_evidence_boundary: node.phase328_evidence_boundary,
+    phase329_tested: node.phase329_tested,
+    phase329_residual_observation_layer: node.phase329_residual_observation_layer,
+    phase329_intervention_input_layer: node.phase329_intervention_input_layer,
+    phase329_positive_residual_identity: node.phase329_positive_residual_identity,
+    phase329_tokenwise_beats_pooled: node.phase329_tokenwise_beats_pooled,
+    phase329_blocker_decline_pass: node.phase329_blocker_decline_pass,
+    phase329_carrier_member_mediation_pass: node.phase329_carrier_member_mediation_pass,
+    phase329_top1_unlock_pass: node.phase329_top1_unlock_pass,
+    phase329_generation_improvement_pass: node.phase329_generation_improvement_pass,
+    phase329_full_chain_candidate: node.phase329_full_chain_candidate,
+    phase329_single_unit_gate_open: node.phase329_single_unit_gate_open,
+    phase329_status: node.phase329_status,
+    phase329_evidence_boundary: node.phase329_evidence_boundary,
+    phase330_tested: node.phase330_tested,
+    phase330_registered_set_support: node.phase330_registered_set_support,
+    phase330_cross_model_readout_specific: node.phase330_cross_model_readout_specific,
+    phase330_cross_model_natural_identity: node.phase330_cross_model_natural_identity,
+    phase330_cross_model_behavior_necessity: node.phase330_cross_model_behavior_necessity,
+    phase330_joint_minus_random_margin: node.phase330_joint_minus_random_margin,
+    phase330_joint_minus_wrong_layer_margin: node.phase330_joint_minus_wrong_layer_margin,
+    phase330_natural_minus_wrong_donor_margin: node.phase330_natural_minus_wrong_donor_margin,
+    phase330_status: node.phase330_status,
+    phase330_evidence_boundary: node.phase330_evidence_boundary,
     source: node.source_artifacts?.[0],
     source_artifacts: node.source_artifacts,
     node_id: node.node_id,
@@ -294,7 +336,7 @@ export default function PatternFamilyNeuronAtlasRenderer({
     return nodePosition(node, snapshot, rank, overlay);
   });
   const positionById = new Map(selectedNodes.map((node, index) => [node.node_id, positions[index]]));
-  const instanceGroups = ['candidate', 'natural', 'group', 'confirmed'].map((category) => {
+  const instanceGroups = ['candidate', 'natural', 'group', 'confirmed', 'crossModel'].map((category) => {
     const items = selectedNodes.filter((node) => nodeCategory(node) === category);
     return {
       category,
@@ -454,6 +496,7 @@ export default function PatternFamilyNeuronAtlasRenderer({
           [COLORS.natural, '自然运行观测'],
           [COLORS.group, '组级留出支持'],
           [COLORS.confirmed, '扩大确认，非单元因果'],
+          [COLORS.crossModel, '跨模型集合读出，非行为闭合'],
         ].map(([color, label], index) => (
           <group key={label} position={[0, index * 0.48, 0]}>
             <mesh><sphereGeometry args={[0.1, 10, 10]} /><meshBasicMaterial color={color} /></mesh>

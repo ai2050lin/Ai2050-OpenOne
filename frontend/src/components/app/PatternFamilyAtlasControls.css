@@ -1,7 +1,7 @@
 .pattern-atlas-controls {
   position: absolute;
-  left: 390px;
-  right: 390px;
+  left: clamp(390px, 29vw, 420px);
+  right: clamp(390px, 29vw, 420px);
   bottom: 18px;
   z-index: 130;
   min-width: 520px;
@@ -50,6 +50,7 @@
 .pattern-atlas-controls__body {
   gap: 8px;
   padding: 8px 10px;
+  flex-wrap: wrap;
 }
 
 .pattern-atlas-field,
@@ -77,8 +78,8 @@
 
 .pattern-atlas-segment {
   display: grid;
-  grid-template-columns: repeat(4, minmax(58px, 1fr));
-  min-width: 252px;
+  grid-template-columns: repeat(5, minmax(54px, 1fr));
+  min-width: 278px;
   border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 5px;
   overflow: hidden;
@@ -100,7 +101,7 @@
 .pattern-atlas-segment button:disabled { cursor: not-allowed; opacity: 0.42; }
 
 .pattern-atlas-range {
-  flex: 1;
+  flex: 1 1 130px;
   min-width: 130px;
 }
 
@@ -135,12 +136,12 @@
 .pattern-atlas-controls__footer {
   min-height: 28px;
   gap: 12px;
-  padding: 0 10px;
+  padding: 6px 10px;
   color: #8298b8;
   border-top: 1px solid rgba(148, 163, 184, 0.12);
   font-size: 9px;
-  white-space: nowrap;
-  overflow-x: auto;
+  line-height: 1.4;
+  flex-wrap: wrap;
 }
 
 .pattern-atlas-controls__footer .pattern-atlas-boundary { color: #fda4af; }
@@ -162,7 +163,7 @@
   .pattern-atlas-field span, .pattern-atlas-range svg { display: none; }
   .pattern-atlas-field select { width: 138px; }
   .pattern-atlas-field--model select { width: 76px; }
-  .pattern-atlas-segment { min-width: 230px; }
+  .pattern-atlas-segment { min-width: 270px; }
 }
 
 @media (max-width: 900px) {
@@ -178,11 +179,13 @@
     bottom: 10px;
     min-width: 0;
   }
-  .pattern-atlas-controls__body { flex-wrap: wrap; }
   .pattern-atlas-field { flex: 1 1 130px; }
   .pattern-atlas-field select { width: 100%; }
   .pattern-atlas-field--model { flex: 0 1 92px; }
-  .pattern-atlas-segment { flex: 2 1 210px; }
+  .pattern-atlas-segment {
+    flex: 2 1 270px;
+    grid-template-columns: repeat(5, minmax(54px, 1fr));
+  }
   .pattern-atlas-range { flex: 1 1 180px; }
   .pattern-atlas-controls__footer { gap: 8px; }
 }
