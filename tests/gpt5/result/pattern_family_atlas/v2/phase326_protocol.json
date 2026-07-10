@@ -1,0 +1,49 @@
+{
+  "schema_version": "5.0.0",
+  "phase_id": "Phase326",
+  "created_at": "2026-07-10T05:50:14.520156+00:00",
+  "objective": "Map implicit knowledge retrieval and multi-token reasoning source groups to distributed physical carrier candidates.",
+  "frozen_denominator": {
+    "families": 2,
+    "mechanisms_per_family": 4,
+    "independent_items_per_mechanism": 12,
+    "templates_per_item": 3,
+    "prompt_cases_per_model": 288,
+    "registered_models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "registered_model_prompt_cases": 864
+  },
+  "independent_splits": {
+    "discovery": [
+      0,
+      3
+    ],
+    "calibration": [
+      4,
+      7
+    ],
+    "heldout": [
+      8,
+      11
+    ]
+  },
+  "registered_conditions": [
+    "baseline",
+    "single_attention_zero",
+    "attention_set_zero",
+    "single_mlp_zero",
+    "mlp_set_zero",
+    "joint_set_zero",
+    "matched_random_joint_zero",
+    "wrong_layer_joint_zero"
+  ],
+  "evidence_limits": [
+    "Candidate selection is observational until intervention.",
+    "MLP product groups are not single neurons.",
+    "Set ablation is a necessity test, not a natural sufficiency or natural-gate test.",
+    "L5 requires frozen heldout replication in at least two models with matched controls."
+  ]
+}

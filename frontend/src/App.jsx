@@ -4285,15 +4285,15 @@ export default function App() {
 
           <PerspectiveCamera
             makeDefault
-            position={isPatternFamilyAtlasView ? [10, 2, 34] : isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [12, 16, 36] : [20, 20, 20]}
-            fov={isPatternFamilyAtlasView ? 48 : isEncoding3DTab ? 46 : isAppleMainView ? 50 : 50}
+            position={isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [12, 16, 36] : [20, 20, 20]}
+            fov={isEncoding3DTab ? 46 : 50}
           />
           <OrbitControls
             makeDefault
-            target={isPatternFamilyAtlasView ? [0, 1, 0] : [0, 0, 0]}
+            target={[0, 0, 0]}
             enablePan
             enableZoom
-            minDistance={isPatternFamilyAtlasView ? 18 : isAppleMainView ? 10 : undefined}
+            minDistance={isAppleMainView ? 10 : undefined}
           />
 
           <ambientLight intensity={0.5} />
@@ -4317,9 +4317,52 @@ export default function App() {
 
           {isAppleMainView && !isEncoding3DTab ? (
             <>
-              {isPatternFamilyAtlasView ? (
+              <AppleNeuronSceneContent
+                key={`apple-neuron-${fpModel}`}
+                nodes={appleNeuronWorkspace.nodes}
+                links={appleNeuronWorkspace.links}
+                selected={appleNeuronWorkspace.selected}
+                onSelect={appleNeuronWorkspace.setSelected}
+                prediction={appleNeuronWorkspace.prediction}
+                mode={appleNeuronWorkspace.analysisMode}
+                theoryObjectMeta={appleNeuronWorkspace.currentTheoryObject}
+                dimensionLayerProfile={appleNeuronWorkspace.multidimLayerProfile}
+                activeDimension={appleNeuronWorkspace.multidimActiveDimension}
+                dimensionCausal={appleNeuronWorkspace.multidimCausalData}
+                nodeDisplayEmphasis={appleNeuronWorkspace.nodeDisplayEmphasis}
+                animationMode={appleNeuronWorkspace.animationMode}
+                scanMechanismData={appleNeuronWorkspace.scanMechanismData}
+                languageFocus={appleNeuronWorkspace.languageFocus}
+                showDNNLayers={false}
+                visibleComponents={[]}
+                forwardPassLayer={fpCurrentLayer}
+                forwardPassData={fpData?.layers ? Object.fromEntries(fpData.layers.map(l => [l.layer, l])) : null}
+                modelKey={fpModel}
+                layerAnimProgress={layerAnimProgress}
+                fpSpeed={fpSpeed}
+                lang={lang}
+              />
+              <RealUnitTraceRenderer
+                trace={realResearchTrace.trace}
+                stableUnits={realResearchTrace.stableUnits}
+                currentEvent={realResearchTrace.currentEvent}
+                currentLayer={fpCurrentLayer}
+                onHover={setHoveredInfo}
+              />
+              {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
+                <ReverseEngineeringOverlay
+                  viewMode={appleNeuronWorkspace.reverseEngineeringState?.viewMode}
+                  selectedLanguageDims={appleNeuronWorkspace.reverseEngineeringState?.selectedLanguageDims}
+                  selectedDNNFeature={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNFeature}
+                  selectedDNNCategory={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNCategory}
+                  nodes={appleNeuronWorkspace.nodes}
+                  links={appleNeuronWorkspace.links}
+                />
+              )}
+              {isPatternFamilyAtlasView && (
                 <PatternFamilyNeuronAtlasRenderer
                   atlas={patternFamilyNeuronAtlas}
+                  overlay
                   evidenceFocus={patternFamilyEvidenceFocus}
                   maxUnits={patternFamilyMaxUnits}
                   currentLayer={fpCurrentLayer}
@@ -4331,51 +4374,6 @@ export default function App() {
                     setInfoPanelTab('detail');
                   }}
                 />
-              ) : (
-                <>
-                  <AppleNeuronSceneContent
-                    key={`apple-neuron-${fpModel}`}
-                    nodes={appleNeuronWorkspace.nodes}
-                    links={appleNeuronWorkspace.links}
-                    selected={appleNeuronWorkspace.selected}
-                    onSelect={appleNeuronWorkspace.setSelected}
-                    prediction={appleNeuronWorkspace.prediction}
-                    mode={appleNeuronWorkspace.analysisMode}
-                    theoryObjectMeta={appleNeuronWorkspace.currentTheoryObject}
-                    dimensionLayerProfile={appleNeuronWorkspace.multidimLayerProfile}
-                    activeDimension={appleNeuronWorkspace.multidimActiveDimension}
-                    dimensionCausal={appleNeuronWorkspace.multidimCausalData}
-                    nodeDisplayEmphasis={appleNeuronWorkspace.nodeDisplayEmphasis}
-                    animationMode={appleNeuronWorkspace.animationMode}
-                    scanMechanismData={appleNeuronWorkspace.scanMechanismData}
-                    languageFocus={appleNeuronWorkspace.languageFocus}
-                    showDNNLayers={false}
-                    visibleComponents={[]}
-                    forwardPassLayer={fpCurrentLayer}
-                    forwardPassData={fpData?.layers ? Object.fromEntries(fpData.layers.map(l => [l.layer, l])) : null}
-                    modelKey={fpModel}
-                    layerAnimProgress={layerAnimProgress}
-                    fpSpeed={fpSpeed}
-                    lang={lang}
-                  />
-                  <RealUnitTraceRenderer
-                    trace={realResearchTrace.trace}
-                    stableUnits={realResearchTrace.stableUnits}
-                    currentEvent={realResearchTrace.currentEvent}
-                    currentLayer={fpCurrentLayer}
-                    onHover={setHoveredInfo}
-                  />
-                  {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
-                    <ReverseEngineeringOverlay
-                      viewMode={appleNeuronWorkspace.reverseEngineeringState?.viewMode}
-                      selectedLanguageDims={appleNeuronWorkspace.reverseEngineeringState?.selectedLanguageDims}
-                      selectedDNNFeature={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNFeature}
-                      selectedDNNCategory={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNCategory}
-                      nodes={appleNeuronWorkspace.nodes}
-                      links={appleNeuronWorkspace.links}
-                    />
-                  )}
-                </>
               )}
 
               <ResearchSpaceOverlay

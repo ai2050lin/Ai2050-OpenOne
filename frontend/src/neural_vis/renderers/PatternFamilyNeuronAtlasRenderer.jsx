@@ -8,6 +8,7 @@ const COLORS = {
   candidate: '#fbbf24',
   natural: '#22d3ee',
   group: '#fb923c',
+  confirmed: '#4ade80',
   readout: '#fb7185',
   active: '#f8fafc',
 };
@@ -15,7 +16,37 @@ const COLORS = {
 function filterNodes(nodes, focus) {
   if (focus === 'natural') return nodes.filter((node) => node.natural_observed);
   if (focus === 'group') return nodes.filter((node) => node.group_intervention_supported);
+  if (focus === 'confirmed') return nodes.filter((node) => node.expanded_confirmation_pass);
   return nodes;
+}
+
+function aggregateAnchors(anchors) {
+  const byLayer = new Map();
+  anchors.forEach((anchor) => {
+    const layer = Number(anchor.layer || 0);
+    const current = byLayer.get(layer) || {
+      ...anchor,
+      anchor_id: `display-layer-${layer}`,
+      candidate_count: 0,
+      natural_overlap_count: 0,
+      group_supported_count: 0,
+      expanded_confirmation_count: 0,
+      mechanism_ids: new Set(),
+    };
+    current.candidate_count += Number(anchor.candidate_count || 0);
+    current.natural_overlap_count += Number(anchor.natural_overlap_count || 0);
+    current.group_supported_count += Number(anchor.group_supported_count || 0);
+    current.expanded_confirmation_count += Number(anchor.expanded_confirmation_count || 0);
+    if (anchor.mechanism_id) current.mechanism_ids.add(anchor.mechanism_id);
+    byLayer.set(layer, current);
+  });
+  return Array.from(byLayer.values())
+    .sort((a, b) => Number(a.layer) - Number(b.layer))
+    .map((anchor) => ({
+      ...anchor,
+      mechanism_count: anchor.mechanism_ids.size,
+      mechanism_ids: Array.from(anchor.mechanism_ids),
+    }));
 }
 
 function selectBalancedNodes(nodes, focus, limit) {
@@ -54,34 +85,51 @@ function layerY(layer, layerCount) {
   return -9.6 + (Number(layer) / (layerCount - 1)) * 19.2;
 }
 
-function nodePosition(node, snapshot, rankInLayer) {
+function layerZ(layer, layerCount) {
+  return (Number(layer) - (layerCount - 1) / 2) * 0.92;
+}
+
+function nodePosition(node, snapshot, rankInLayer, overlay = false) {
   const index = Number(node.unit_index || 0);
-  const angle = ((index * 0.618033988749895) % 1) * Math.PI * 2;
+  const layerCount = Number(snapshot?.num_hidden_layers || 1);
+  const kindOffset = node.unit_kind === 'attention_head' ? 0.137 : node.unit_kind === 'mlp_product_group' ? 0.271 : 0;
+  const angle = ((index * 0.618033988749895 + Number(node.layer || 0) * 0.037 + kindOffset) % 1) * Math.PI * 2;
   const radius = 3 + (index % 3) * 0.5;
+  if (overlay) {
+    const overlayRadius = 3.15 + (index % 5) * 0.48 + (rankInLayer % 3) * 0.12;
+    return [
+      Math.cos(angle) * overlayRadius,
+      Math.sin(angle) * overlayRadius,
+      layerZ(node.layer, layerCount),
+    ];
+  }
   return [
     Math.cos(angle) * radius,
-    layerY(node.layer, Number(snapshot?.num_hidden_layers || 1)) + ((rankInLayer % 5) - 2) * 0.07,
+    layerY(node.layer, layerCount) + ((rankInLayer % 5) - 2) * 0.07,
     Math.sin(angle) * radius,
   ];
 }
 
 function nodeColor(node) {
+  if (node.expanded_confirmation_pass) return COLORS.confirmed;
   if (node.group_intervention_supported) return COLORS.group;
   if (node.natural_observed) return COLORS.natural;
   return COLORS.candidate;
 }
 
 function nodeCategory(node) {
+  if (node.expanded_confirmation_pass) return 'confirmed';
   if (node.group_intervention_supported) return 'group';
   if (node.natural_observed) return 'natural';
   return 'candidate';
 }
 
 function toHoverInfo(node) {
+  const isComponentSet = node.node_type === 'component_set_member';
   return {
     token: `L${node.layer} · ${node.unit_kind} #${node.unit_index}`,
     label: node.family_name,
-    type: '模式族物理单元候选',
+    type: isComponentSet ? '模式族物理组件集合成员' : '模式族物理单元候选',
     family_id: node.family_id,
     family_name: node.family_name,
     relation: node.relation,
@@ -101,10 +149,12 @@ function toHoverInfo(node) {
     causal_scope: node.causal_scope,
     natural_observed: node.natural_observed,
     group_intervention_supported: node.group_intervention_supported,
+    expanded_confirmation_pass: node.expanded_confirmation_pass,
     source: node.source_artifacts?.[0],
     source_artifacts: node.source_artifacts,
     node_id: node.node_id,
-    is_real_unit: true,
+    is_real_unit: !isComponentSet,
+    is_component_set_member: isComponentSet,
   };
 }
 
@@ -221,6 +271,7 @@ function EmptyFamilyScene({ family, model }) {
 
 export default function PatternFamilyNeuronAtlasRenderer({
   atlas,
+  overlay = false,
   evidenceFocus = 'key',
   maxUnits = 48,
   currentLayer = null,
@@ -240,10 +291,10 @@ export default function PatternFamilyNeuronAtlasRenderer({
     const layer = Number(node.layer || 0);
     const rank = rankByLayer.get(layer) || 0;
     rankByLayer.set(layer, rank + 1);
-    return nodePosition(node, snapshot, rank);
+    return nodePosition(node, snapshot, rank, overlay);
   });
   const positionById = new Map(selectedNodes.map((node, index) => [node.node_id, positions[index]]));
-  const instanceGroups = ['candidate', 'natural', 'group'].map((category) => {
+  const instanceGroups = ['candidate', 'natural', 'group', 'confirmed'].map((category) => {
     const items = selectedNodes.filter((node) => nodeCategory(node) === category);
     return {
       category,
@@ -254,14 +305,46 @@ export default function PatternFamilyNeuronAtlasRenderer({
   }).filter((group) => group.items.length > 0);
   const sourceY = -11.7;
   const readoutY = 11.7;
-  const anchors = partition?.path?.layer_anchors || [];
+  const anchors = aggregateAnchors(partition?.path?.layer_anchors || []);
   const spinePoints = [
     [0, sourceY, 0],
     ...anchors.map((anchor) => [0, layerY(anchor.layer, layerCount), 0]),
     [0, readoutY, 0],
   ];
 
-  if (!partition) return <EmptyFamilyScene family={atlas?.family} model={atlas?.model || ''} />;
+  if (!partition) return overlay ? null : <EmptyFamilyScene family={atlas?.family} model={atlas?.model || ''} />;
+
+  if (overlay) {
+    return (
+      <group name="pattern-family-physical-overlay">
+        {selectedNodes.map((node) => {
+          const target = positionById.get(node.node_id);
+          const anchor = [0, 0, layerZ(node.layer, layerCount)];
+          return (
+            <Line
+              key={`overlay-edge-${node.node_id}`}
+              points={[anchor, target]}
+              color={nodeColor(node)}
+              lineWidth={node.expanded_confirmation_pass ? 1.45 : node.group_intervention_supported ? 1.1 : 0.7}
+              transparent
+              opacity={node.expanded_confirmation_pass ? 0.62 : node.group_intervention_supported ? 0.42 : 0.22}
+            />
+          );
+        })}
+        {instanceGroups.map((group) => (
+          <UnitInstances
+            key={`overlay-${group.category}`}
+            items={group.items}
+            positions={group.positions}
+            colorValue={group.color}
+            selectedNodeId={selectedNodeId}
+            onHover={onHover}
+            onSelect={onSelect}
+          />
+        ))}
+      </group>
+    );
+  }
 
   const familyName = partition.family?.family_name || partition.family?.family_id;
   const readout = partition.path?.readout;
@@ -273,7 +356,7 @@ export default function PatternFamilyNeuronAtlasRenderer({
         {familyName}
       </Text>
       <Text position={[0, 13.2, 0]} fontSize={0.24} color="#7dd3fc" anchorX="center">
-        {`${partition.model} · 真实证据关键脉络 · ${selectedNodes.length}/${partition.metrics.unique_unit_count} 单元`}
+        {`${partition.model} · 真实证据关键脉络 · ${selectedNodes.length}/${partition.metrics.unique_unit_count} 物理候选`}
       </Text>
 
       <Line points={spinePoints} color={COLORS.path} lineWidth={2} transparent opacity={0.5} dashed dashSize={0.3} gapSize={0.18} />
@@ -307,6 +390,8 @@ export default function PatternFamilyNeuronAtlasRenderer({
           candidate_count: anchor.candidate_count,
           natural_overlap_count: anchor.natural_overlap_count,
           group_supported_count: anchor.group_supported_count,
+          expanded_confirmation_count: anchor.expanded_confirmation_count,
+          mechanism_ids: anchor.mechanism_ids,
           source: partition.source_artifacts?.[1],
         };
         return (
@@ -365,9 +450,10 @@ export default function PatternFamilyNeuronAtlasRenderer({
 
       <group position={[6.3, -10.8, 0]}>
         {[
-          [COLORS.candidate, 'L4 候选'],
-          [COLORS.natural, 'L2 自然交叉'],
-          [COLORS.group, '组级支持，非单元因果'],
+          [COLORS.candidate, '物理候选'],
+          [COLORS.natural, '自然运行观测'],
+          [COLORS.group, '组级留出支持'],
+          [COLORS.confirmed, '扩大确认，非单元因果'],
         ].map(([color, label], index) => (
           <group key={label} position={[0, index * 0.48, 0]}>
             <mesh><sphereGeometry args={[0.1, 10, 10]} /><meshBasicMaterial color={color} /></mesh>

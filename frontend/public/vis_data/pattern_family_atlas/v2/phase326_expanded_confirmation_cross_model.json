@@ -1,0 +1,639 @@
+{
+  "schema_version": "5.0.0",
+  "phase_id": "Phase326",
+  "created_at": "2026-07-10T06:00:56.340190+00:00",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "independent_object_model_cases": 192,
+  "prompt_model_cases": 384,
+  "intervention_row_count": 2304,
+  "frozen_selection": true,
+  "mechanism_results": [
+    {
+      "family_id": "content_knowledge",
+      "mechanism_id": "category_retrieval",
+      "expanded_only_pass_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "expanded_confirmation_pass_models": [
+        "glm4",
+        "deepseek7b"
+      ],
+      "cross_model_expanded_confirmation_replicated": true,
+      "single_unit_causal": false,
+      "l5_promoted": false
+    },
+    {
+      "family_id": "content_knowledge",
+      "mechanism_id": "color_retrieval",
+      "expanded_only_pass_models": [
+        "qwen3",
+        "glm4"
+      ],
+      "expanded_confirmation_pass_models": [
+        "qwen3",
+        "glm4"
+      ],
+      "cross_model_expanded_confirmation_replicated": true,
+      "single_unit_causal": false,
+      "l5_promoted": false
+    },
+    {
+      "family_id": "content_knowledge",
+      "mechanism_id": "habitat_retrieval",
+      "expanded_only_pass_models": [
+        "glm4",
+        "deepseek7b"
+      ],
+      "expanded_confirmation_pass_models": [
+        "glm4",
+        "deepseek7b"
+      ],
+      "cross_model_expanded_confirmation_replicated": true,
+      "single_unit_causal": false,
+      "l5_promoted": false
+    },
+    {
+      "family_id": "content_knowledge",
+      "mechanism_id": "material_retrieval",
+      "expanded_only_pass_models": [
+        "glm4"
+      ],
+      "expanded_confirmation_pass_models": [],
+      "cross_model_expanded_confirmation_replicated": false,
+      "single_unit_causal": false,
+      "l5_promoted": false
+    }
+  ],
+  "cross_model_replicated_mechanism_count": 3,
+  "single_unit_causal_count": 0,
+  "l5_promoted_count": 0,
+  "model_summaries": [
+    {
+      "schema_version": "5.0.0",
+      "phase_id": "Phase326",
+      "created_at": "2026-07-10T05:50:49.207063+00:00",
+      "model": "qwen3",
+      "independent_object_count": 64,
+      "prompt_case_count": 128,
+      "intervention_row_count": 768,
+      "knowledge_answer_leak_count": 0,
+      "mechanism_pass_count": 2,
+      "mechanism_audits": [
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:50:49.206276+00:00",
+          "model": "qwen3",
+          "family_id": "content_knowledge",
+          "mechanism_id": "category_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 32,
+          "baseline_eligible_independent_object_count": 16,
+          "baseline_accuracy": 1.0,
+          "joint_margin_drop": 0.412842,
+          "matched_random_margin_drop": 0.147217,
+          "wrong_layer_margin_drop": 0.063354,
+          "best_single_margin_drop": 0.278198,
+          "matched_control_specificity": 0.265625,
+          "distributed_gain_over_single": 0.134644,
+          "positive_effect_consistency": 0.90625,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.348633,
+              "matched_control_specificity": 0.212891,
+              "positive_effect_consistency": 0.875,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.477051,
+              "matched_control_specificity": 0.281006,
+              "positive_effect_consistency": 0.9375,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:50:49.206551+00:00",
+          "model": "qwen3",
+          "family_id": "content_knowledge",
+          "mechanism_id": "color_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 32,
+          "baseline_eligible_independent_object_count": 16,
+          "baseline_accuracy": 1.0,
+          "joint_margin_drop": 0.574951,
+          "matched_random_margin_drop": 0.055176,
+          "wrong_layer_margin_drop": -0.118896,
+          "best_single_margin_drop": 0.455322,
+          "matched_control_specificity": 0.519775,
+          "distributed_gain_over_single": 0.119629,
+          "positive_effect_consistency": 0.96875,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.478027,
+              "matched_control_specificity": 0.390137,
+              "positive_effect_consistency": 1.0,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.671875,
+              "matched_control_specificity": 0.649414,
+              "positive_effect_consistency": 0.9375,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:50:49.206820+00:00",
+          "model": "qwen3",
+          "family_id": "content_knowledge",
+          "mechanism_id": "habitat_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 29,
+          "baseline_eligible_independent_object_count": 16,
+          "baseline_accuracy": 0.90625,
+          "joint_margin_drop": 0.368669,
+          "matched_random_margin_drop": 0.093076,
+          "wrong_layer_margin_drop": -0.187769,
+          "best_single_margin_drop": 0.32826,
+          "matched_control_specificity": 0.275593,
+          "distributed_gain_over_single": 0.040409,
+          "positive_effect_consistency": 0.689655,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 13,
+              "joint_margin_drop": 0.230168,
+              "matched_control_specificity": 0.190504,
+              "positive_effect_consistency": 0.615385,
+              "template_pass": false
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.481201,
+              "matched_control_specificity": 0.344727,
+              "positive_effect_consistency": 0.75,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": false,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:50:49.207056+00:00",
+          "model": "qwen3",
+          "family_id": "content_knowledge",
+          "mechanism_id": "material_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 30,
+          "baseline_eligible_independent_object_count": 16,
+          "baseline_accuracy": 0.9375,
+          "joint_margin_drop": 0.32526,
+          "matched_random_margin_drop": 0.010286,
+          "wrong_layer_margin_drop": 0.108984,
+          "best_single_margin_drop": 0.248177,
+          "matched_control_specificity": 0.216276,
+          "distributed_gain_over_single": 0.077083,
+          "positive_effect_consistency": 0.733333,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 14,
+              "joint_margin_drop": 0.160714,
+              "matched_control_specificity": -0.068081,
+              "positive_effect_consistency": 0.642857,
+              "template_pass": false
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.469238,
+              "matched_control_specificity": 0.325927,
+              "positive_effect_consistency": 0.8125,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": false,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        }
+      ],
+      "single_unit_causal_count": 0,
+      "l5_promoted_count": 0
+    },
+    {
+      "schema_version": "5.0.0",
+      "phase_id": "Phase326",
+      "created_at": "2026-07-10T05:52:11.894430+00:00",
+      "model": "glm4",
+      "independent_object_count": 64,
+      "prompt_case_count": 128,
+      "intervention_row_count": 768,
+      "knowledge_answer_leak_count": 0,
+      "mechanism_pass_count": 4,
+      "mechanism_audits": [
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:52:11.893404+00:00",
+          "model": "glm4",
+          "family_id": "content_knowledge",
+          "mechanism_id": "category_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 30,
+          "baseline_eligible_independent_object_count": 16,
+          "baseline_accuracy": 0.9375,
+          "joint_margin_drop": 0.482918,
+          "matched_random_margin_drop": 0.134655,
+          "wrong_layer_margin_drop": -0.077171,
+          "best_single_margin_drop": 0.17861,
+          "matched_control_specificity": 0.348263,
+          "distributed_gain_over_single": 0.304308,
+          "positive_effect_consistency": 0.766667,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 14,
+              "joint_margin_drop": 0.53319,
+              "matched_control_specificity": 0.485174,
+              "positive_effect_consistency": 0.785714,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.438931,
+              "matched_control_specificity": 0.228466,
+              "positive_effect_consistency": 0.75,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:52:11.893751+00:00",
+          "model": "glm4",
+          "family_id": "content_knowledge",
+          "mechanism_id": "color_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 30,
+          "baseline_eligible_independent_object_count": 16,
+          "baseline_accuracy": 0.9375,
+          "joint_margin_drop": 0.863542,
+          "matched_random_margin_drop": -0.008529,
+          "wrong_layer_margin_drop": 0.029818,
+          "best_single_margin_drop": 0.386589,
+          "matched_control_specificity": 0.833724,
+          "distributed_gain_over_single": 0.476953,
+          "positive_effect_consistency": 0.866667,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 14,
+              "joint_margin_drop": 0.832729,
+              "matched_control_specificity": 0.732004,
+              "positive_effect_consistency": 0.857143,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 16,
+              "joint_margin_drop": 0.890503,
+              "matched_control_specificity": 0.912354,
+              "positive_effect_consistency": 0.875,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:52:11.894073+00:00",
+          "model": "glm4",
+          "family_id": "content_knowledge",
+          "mechanism_id": "habitat_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 25,
+          "baseline_eligible_independent_object_count": 14,
+          "baseline_accuracy": 0.78125,
+          "joint_margin_drop": 0.72167,
+          "matched_random_margin_drop": 0.053931,
+          "wrong_layer_margin_drop": -0.093948,
+          "best_single_margin_drop": 0.097432,
+          "matched_control_specificity": 0.667739,
+          "distributed_gain_over_single": 0.624238,
+          "positive_effect_consistency": 0.88,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 11,
+              "joint_margin_drop": 0.818809,
+              "matched_control_specificity": 0.802429,
+              "positive_effect_consistency": 0.818182,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 14,
+              "joint_margin_drop": 0.645346,
+              "matched_control_specificity": 0.561911,
+              "positive_effect_consistency": 0.928571,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:52:11.894422+00:00",
+          "model": "glm4",
+          "family_id": "content_knowledge",
+          "mechanism_id": "material_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 28,
+          "baseline_eligible_independent_object_count": 15,
+          "baseline_accuracy": 0.875,
+          "joint_margin_drop": 1.016776,
+          "matched_random_margin_drop": -0.067357,
+          "wrong_layer_margin_drop": -0.088919,
+          "best_single_margin_drop": 0.642203,
+          "matched_control_specificity": 1.084133,
+          "distributed_gain_over_single": 0.374573,
+          "positive_effect_consistency": 0.785714,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 13,
+              "joint_margin_drop": 1.089844,
+              "matched_control_specificity": 1.153546,
+              "positive_effect_consistency": 0.769231,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 15,
+              "joint_margin_drop": 0.953451,
+              "matched_control_specificity": 0.936328,
+              "positive_effect_consistency": 0.8,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        }
+      ],
+      "single_unit_causal_count": 0,
+      "l5_promoted_count": 0
+    },
+    {
+      "schema_version": "5.0.0",
+      "phase_id": "Phase326",
+      "created_at": "2026-07-10T05:53:04.335010+00:00",
+      "model": "deepseek7b",
+      "independent_object_count": 64,
+      "prompt_case_count": 128,
+      "intervention_row_count": 768,
+      "knowledge_answer_leak_count": 0,
+      "mechanism_pass_count": 2,
+      "mechanism_audits": [
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:53:04.334558+00:00",
+          "model": "deepseek7b",
+          "family_id": "content_knowledge",
+          "mechanism_id": "category_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 27,
+          "baseline_eligible_independent_object_count": 15,
+          "baseline_accuracy": 0.84375,
+          "joint_margin_drop": 0.385417,
+          "matched_random_margin_drop": -0.030093,
+          "wrong_layer_margin_drop": 0.079282,
+          "best_single_margin_drop": 0.056713,
+          "matched_control_specificity": 0.306135,
+          "distributed_gain_over_single": 0.328704,
+          "positive_effect_consistency": 0.740741,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 14,
+              "joint_margin_drop": 0.290179,
+              "matched_control_specificity": 0.296875,
+              "positive_effect_consistency": 0.714286,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 13,
+              "joint_margin_drop": 0.487981,
+              "matched_control_specificity": 0.316106,
+              "positive_effect_consistency": 0.769231,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:53:04.334715+00:00",
+          "model": "deepseek7b",
+          "family_id": "content_knowledge",
+          "mechanism_id": "color_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 17,
+          "baseline_eligible_independent_object_count": 11,
+          "baseline_accuracy": 0.53125,
+          "joint_margin_drop": -0.150735,
+          "matched_random_margin_drop": 0.110294,
+          "wrong_layer_margin_drop": 0.040441,
+          "best_single_margin_drop": 0.014706,
+          "matched_control_specificity": -0.261029,
+          "distributed_gain_over_single": -0.165441,
+          "positive_effect_consistency": 0.529412,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 10,
+              "joint_margin_drop": 0.11875,
+              "matched_control_specificity": -0.0125,
+              "positive_effect_consistency": 0.6,
+              "template_pass": false
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 7,
+              "joint_margin_drop": -0.535714,
+              "matched_control_specificity": -0.705357,
+              "positive_effect_consistency": 0.428571,
+              "template_pass": false
+            }
+          ],
+          "expanded_confirmation_pass": false,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:53:04.334864+00:00",
+          "model": "deepseek7b",
+          "family_id": "content_knowledge",
+          "mechanism_id": "habitat_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 22,
+          "baseline_eligible_independent_object_count": 14,
+          "baseline_accuracy": 0.6875,
+          "joint_margin_drop": 1.125,
+          "matched_random_margin_drop": 0.210227,
+          "wrong_layer_margin_drop": 0.289773,
+          "best_single_margin_drop": 0.660511,
+          "matched_control_specificity": 0.835227,
+          "distributed_gain_over_single": 0.464489,
+          "positive_effect_consistency": 0.772727,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 12,
+              "joint_margin_drop": 1.346354,
+              "matched_control_specificity": 0.903646,
+              "positive_effect_consistency": 0.75,
+              "template_pass": true
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 10,
+              "joint_margin_drop": 0.859375,
+              "matched_control_specificity": 0.646875,
+              "positive_effect_consistency": 0.8,
+              "template_pass": true
+            }
+          ],
+          "expanded_confirmation_pass": true,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        },
+        {
+          "schema_version": "5.0.0",
+          "phase_id": "Phase326",
+          "created_at": "2026-07-10T05:53:04.335004+00:00",
+          "model": "deepseek7b",
+          "family_id": "content_knowledge",
+          "mechanism_id": "material_retrieval",
+          "split": "expanded_confirmation",
+          "registered_prompt_count": 32,
+          "registered_independent_object_count": 16,
+          "baseline_eligible_prompt_count": 23,
+          "baseline_eligible_independent_object_count": 13,
+          "baseline_accuracy": 0.71875,
+          "joint_margin_drop": -0.512228,
+          "matched_random_margin_drop": 0.387228,
+          "wrong_layer_margin_drop": -0.021739,
+          "best_single_margin_drop": 0.0,
+          "matched_control_specificity": -0.899456,
+          "distributed_gain_over_single": -0.512228,
+          "positive_effect_consistency": 0.217391,
+          "template_audits": [
+            {
+              "template_id": "template_d",
+              "eligible_count": 13,
+              "joint_margin_drop": -0.396635,
+              "matched_control_specificity": -0.865385,
+              "positive_effect_consistency": 0.307692,
+              "template_pass": false
+            },
+            {
+              "template_id": "template_e",
+              "eligible_count": 10,
+              "joint_margin_drop": -0.6625,
+              "matched_control_specificity": -0.94375,
+              "positive_effect_consistency": 0.1,
+              "template_pass": false
+            }
+          ],
+          "expanded_confirmation_pass": false,
+          "selection_frozen": true,
+          "single_unit_causal": false,
+          "l5_promoted": false
+        }
+      ],
+      "single_unit_causal_count": 0,
+      "l5_promoted_count": 0
+    }
+  ]
+}

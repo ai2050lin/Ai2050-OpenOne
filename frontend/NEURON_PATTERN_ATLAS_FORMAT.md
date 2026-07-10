@@ -1,13 +1,13 @@
-# Pattern-Family Neuron Atlas v1
+# Pattern-Family Physical Path Atlas v1
 
 `pattern_family_neuron_atlas.v1` is the evidence-scoped bridge between model experiments and the 3D research client.
 
 ## Purpose
 
-The package shows only physical units and path stages that have source artifacts. It does not publish synthetic placeholder neurons for unmapped pattern families.
+The package shows only physical units, component-set members, and path stages that have source artifacts. It does not publish synthetic placeholder neurons for unmapped pattern families.
 
 ```text
-pattern family -> observed component path -> localized unit candidates -> readout
+pattern family -> observed component path -> unit candidates / component-set members -> readout
 ```
 
 An ordered trace is not a causal path. A channel-group intervention is not single-unit causality.
@@ -40,6 +40,17 @@ checksums.json
 
 The JSONL files are the append/analysis representation. Partition JSON files are the client read model.
 
+## Scene Integration
+
+The physical-path atlas is an overlay on the existing DNN scene. It must not replace or reshape the base model.
+
+```text
+base DNN layer plane: z = (layer - (layer_count - 1) / 2) * 0.92
+atlas candidate: projected onto the same z plane with a deterministic radial position
+```
+
+Turning the overlay off must leave the original camera, layer stack, model label, forward-pass animation, layer expansion, and base interactions unchanged. Atlas coordinates are display coordinates, not learned geometry.
+
 ## Unit Identity
 
 Every unit node requires:
@@ -69,7 +80,16 @@ negative
 missing
 ```
 
-The current Phase325 package contains L2 observations and L4 localized candidates. Its `single_unit_causal_count` is zero.
+Phase326 extends the package with `attention_head` and `mlp_product_group` component-set members. These remain distinct from `unit_candidate` nodes. Its `single_unit_causal_count` is zero.
+
+## Node Types
+
+```text
+unit_candidate: localized real-unit candidate from Phase286/287
+component_set_member: frozen attention-head or MLP-product-group member from Phase326
+```
+
+`expanded_confirmation_pass=true` means a frozen component set passed the larger new-object and new-template necessity audit for that model and mechanism. It does not make every member individually causal.
 
 ## Edge Semantics
 
@@ -82,7 +102,7 @@ Future causal edges must include intervention, matched control, heldout replicat
 ## Build
 
 ```bash
-python tests/gpt5/phase325_pattern_family_neuron_atlas.py
+python tests/gpt5/phase326_publish_physical_path_atlas.py
 ```
 
 The builder writes the canonical package to:
