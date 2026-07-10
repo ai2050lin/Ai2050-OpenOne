@@ -23,6 +23,17 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from server.research_orchestrator import (
+    ROLE_DEFINITIONS,
+    artifact_audit,
+    create_research_run,
+    execute_research_code,
+    list_research_runs,
+    load_evidence_context,
+    terminate_active_process,
+)
+from server.research_orchestrator.runtime import ResearchRun
+
 
 # ==================== 数据模型 ====================
 
@@ -75,12 +86,17 @@ class ResearchSession:
         self._stop_requested = False
         self._pause_requested = False
         self._step_event: asyncio.Event = asyncio.Event()
+        self.active_run_id: Optional[str] = None
 
         # 加载保存的配置
         self._load_config()
+        self._load_state()
 
     def _config_path(self) -> Path:
         return Path(__file__).parent.parent / "ai_rnd_config.json"
+
+    def _state_path(self) -> Path:
+        return Path(__file__).parent.parent / "tests" / "result" / "auto_rnd" / "session_state.json"
 
     def _load_config(self):
         path = self._config_path()
@@ -96,6 +112,39 @@ class ResearchSession:
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.config, f, indent=2, ensure_ascii=False)
+
+    def _load_state(self):
+        path = self._state_path()
+        if not path.exists():
+            return
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            self.round = int(payload.get("round", 0))
+            self.findings = list(payload.get("findings", []))
+            self.research_state = dict(payload.get("research_state", {}))
+            self.active_run_id = payload.get("active_run_id")
+            self.started_at = payload.get("started_at")
+        except Exception:
+            return
+
+    def persist_state(self):
+        path = self._state_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "schema_version": "ai_rnd_session.v2",
+            "status": self.status,
+            "mode": self.mode,
+            "current_phase": self.current_phase,
+            "round": self.round,
+            "started_at": self.started_at,
+            "active_run_id": self.active_run_id,
+            "findings": self.findings,
+            "research_state": self.research_state,
+            "saved_at": datetime.now().isoformat(),
+        }
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(path)
 
     def push_event(self, event_type: str, **kwargs):
         """推送事件到SSE队列"""
@@ -118,6 +167,9 @@ class ResearchSession:
             "started_at": self.started_at,
             "findings_count": len(self.findings),
             "research_state": self.research_state,
+            "active_run_id": self.active_run_id,
+            "evidence_context": load_evidence_context(),
+            "agent_roles": ROLE_DEFINITIONS,
         }
 
 
@@ -516,80 +568,22 @@ async def test_ai_model_config(model_config: ModelConfig) -> Dict[str, Any]:
         }
 
 
-def execute_code_sandbox(code: str, timeout: int = 120) -> Dict:
-    """在沙箱中执行AI生成的代码"""
-    # 写入临时文件
-    tmp_dir = Path(__file__).parent.parent / "tests" / "glm5_temp"
-    tmp_dir.mkdir(parents=True, exist_ok=True)
-
-    timestamp = int(time.time())
-    script_path = tmp_dir / f"ai_rnd_gen_{timestamp}.py"
-
-    # 安全检查: 禁止危险操作
-    dangerous_patterns = [
-        "os.system", "subprocess.Popen", "shutil.rmtree",
-        "__import__", "eval(", "exec(",
-    ]
-    for pattern in dangerous_patterns:
-        if pattern in code:
-            return {
-                "status": "error",
-                "error": f"Blocked dangerous pattern: {pattern}",
-                "output": "",
-            }
-
-    with open(script_path, "w", encoding="utf-8") as f:
-        f.write(code)
-
-    # 执行
-    python_exe = r"C:\Users\Admin\.workbuddy\binaries\python\versions\3.11.9\python.exe"
-    project_root = str(Path(__file__).parent.parent)
-
-    try:
-        result = subprocess.run(
-            [python_exe, str(script_path)],
-            capture_output=True, text=True,
-            timeout=timeout,
-            cwd=project_root,
-            env={
-                **os.environ,
-                "HF_HOME": r"D:\develop\model",
-                "HF_ENDPOINT": "https://hf-mirror.com",
-                "TORCH_FORCE_WEIGHTS_ONLY_LOAD": "0",
-            },
-        )
-        output = result.stdout[-5000:] if len(result.stdout) > 5000 else result.stdout
-        error = result.stderr[-3000:] if len(result.stderr) > 3000 else result.stderr
-
-        if result.returncode == 0:
-            return {
-                "status": "success",
-                "output": output,
-                "error": error if error else None,
-                "return_code": result.returncode,
-                "duration": "N/A",
-            }
-        else:
-            return {
-                "status": "error",
-                "output": output,
-                "error": error,
-                "return_code": result.returncode,
-                "duration": "N/A",
-            }
-    except subprocess.TimeoutExpired:
-        return {
-            "status": "error",
-            "output": "",
-            "error": f"Execution timed out after {timeout}s",
-            "duration": f"{timeout}s",
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "output": "",
-            "error": str(e),
-        }
+def execute_code_sandbox(
+    code: str,
+    timeout: int = 120,
+    run: Optional[ResearchRun] = None,
+    stop_requested=None,
+) -> Dict:
+    """Execute reviewed code in a persistent run with a single-GPU lock."""
+    active_run = run or create_research_run("manual code execution", int(time.time()))
+    result = execute_research_code(
+        code,
+        active_run,
+        timeout=timeout,
+        stop_requested=stop_requested,
+    )
+    result["artifact_audit"] = artifact_audit(active_run)
+    return result
 
 
 # ==================== 研究循环 ====================
@@ -642,6 +636,20 @@ async def run_research_loop(session: ResearchSession):
 
         session.round += 1
         session.push_event("round_change", round=session.round)
+        objective = str(session.research_state.get("research_objective") or "从证据缺口中选择可证伪的语言机制问题")
+        research_run = create_research_run(objective, session.round)
+        session.active_run_id = research_run.run_id
+        evidence_context = load_evidence_context()
+        session.research_state["active_experiment"] = json.loads(
+            research_run.experiment_path.read_text(encoding="utf-8")
+        )
+        session.research_state["evidence_context"] = evidence_context
+        session.persist_state()
+        session.push_event(
+            "research_run",
+            run_id=research_run.run_id,
+            experiment=session.research_state["active_experiment"],
+        )
 
         # ===== Phase 1: 分析 =====
         session.current_phase = "analyze"
@@ -655,17 +663,25 @@ async def run_research_loop(session: ResearchSession):
 
         test_results = session.research_state.get("last_test_output", "暂无测试结果")
 
-        for am in analyst_models:
+        review_roles = ("method_reviewer", "adversarial_reviewer")
+        for analyst_index, am in enumerate(analyst_models):
             if not am.api_key:
                 continue
+            role = review_roles[analyst_index % len(review_roles)]
             prompt = (am.analysis_prompt or "").replace("{round}", str(session.round))
             prompt = prompt.replace("{findings}", findings_summary)
             prompt = prompt.replace("{test_results}", test_results)
+            prompt += (
+                "\n\n本轮 ExperimentSpec:\n"
+                + json.dumps(session.research_state["active_experiment"], ensure_ascii=False, indent=2)
+                + "\n\n当前 Evidence Kernel 摘要:\n"
+                + json.dumps(evidence_context, ensure_ascii=False, indent=2)
+            )
 
-            session.push_event("analysis", content=f"📡 调用 {am.name} 分析中...")
-            result = await call_ai_model(am, prompt, system_msg="你是一位深度神经网络逆向工程研究助手")
-            analyst_reports.append({"model": am.name, "analysis": result})
-            session.push_event("analysis", content=f"✓ {am.name} 分析完成")
+            session.push_event("analysis", content=f"📡 {am.name} 以 {role} 角色审核中...")
+            result = await call_ai_model(am, prompt, system_msg=ROLE_DEFINITIONS[role])
+            analyst_reports.append({"model": am.name, "role": role, "analysis": result})
+            session.push_event("analysis", content=f"✓ {am.name} / {role} 审核完成")
 
         session.research_state["last_analyst_reports"] = analyst_reports
         if session._stop_requested:
@@ -687,13 +703,17 @@ async def run_research_loop(session: ResearchSession):
         bottlenecks = session.research_state.get("bottlenecks", "暂无")
 
         plan_prompt = (master_model.planning_prompt or "").replace("{round}", str(session.round))
-        plan_prompt = plan_prompt.replace("{research_context}", json.dumps(session.research_state, ensure_ascii=False)[:3000])
+        plan_prompt = plan_prompt.replace("{research_context}", json.dumps(session.research_state, ensure_ascii=False)[:8000])
         plan_prompt = plan_prompt.replace("{analyst_reports}", reports_text[:6000])
         plan_prompt = plan_prompt.replace("{verified_conclusions}", verified)
         plan_prompt = plan_prompt.replace("{bottlenecks}", bottlenecks)
 
         session.push_event("planning", content="📋 主模型规划中...")
-        plan = await call_ai_model(master_model, plan_prompt, system_msg="你是AI研究主管")
+        plan_prompt += (
+            "\n\n必须遵守 ExperimentSpec；Qwen3、GLM4、DeepSeek7B 必须串行；"
+            "先 smoke，再 full，再独立复核。所有产物写入环境变量 AI_RND_RUN_DIR。"
+        )
+        plan = await call_ai_model(master_model, plan_prompt, system_msg=ROLE_DEFINITIONS["principal_investigator"])
         session.push_event("planning", content=f"✓ 规划完成")
         session.research_state["last_plan"] = plan
 
@@ -709,7 +729,12 @@ async def run_research_loop(session: ResearchSession):
         session.current_phase = "generate"
         session.push_event("phase_change", phase="generate")
 
-        code_prompt = (master_model.code_gen_prompt or "").replace("{plan}", plan[:6000])
+        code_prompt = (master_model.code_gen_prompt or "").replace("{plan}", plan[:10000])
+        code_prompt += (
+            "\n\n运行目录来自 os.environ['AI_RND_RUN_DIR']。"
+            "必须输出 ExperimentSpec 要求的 JSON/JSONL/manifest 文件；不得启动子进程；"
+            "不得访问网络；三个本地模型只能按 AI_RND_MODEL_ORDER 串行加载和释放。"
+        )
         session.push_event("generation", content="⚡ 主模型生成代码中...")
         generated_code = await call_ai_model(master_model, code_prompt, system_msg="你只输出Python代码，不要任何解释或markdown标记")
 
@@ -729,11 +754,39 @@ async def run_research_loop(session: ResearchSession):
         session.push_event("execution", content="🚀 执行代码中...")
 
         loop = asyncio.get_event_loop()
-        exec_result = await loop.run_in_executor(None, execute_code_sandbox, generated_code)
+        exec_result = await loop.run_in_executor(
+            None,
+            lambda: execute_code_sandbox(
+                generated_code,
+                run=research_run,
+                stop_requested=lambda: session._stop_requested,
+            ),
+        )
 
         session.push_event("execution_result", result=exec_result)
         session.research_state["last_test_output"] = exec_result.get("output", "")[:5000]
         session.research_state["last_execution_status"] = exec_result.get("status", "unknown")
+        session.research_state["last_artifact_audit"] = exec_result.get("artifact_audit", {})
+
+        # Independent reviewers see the artifact inventory and raw execution output,
+        # not the master model's summary.
+        post_run_reviews = []
+        post_roles = ("data_auditor", "adversarial_reviewer")
+        for analyst_index, am in enumerate(analyst_models):
+            if not am.api_key:
+                continue
+            role = post_roles[analyst_index % len(post_roles)]
+            audit_prompt = (
+                f"研究目标: {objective}\n"
+                f"ExperimentSpec: {json.dumps(session.research_state['active_experiment'], ensure_ascii=False)}\n"
+                f"Artifact audit: {json.dumps(exec_result.get('artifact_audit', {}), ensure_ascii=False)}\n"
+                f"Raw execution: {json.dumps(exec_result, ensure_ascii=False)[:12000]}\n"
+                "请逐条检查证据，不得根据其他 AI 的共识提升结论。"
+            )
+            session.push_event("review", content=f"{am.name} / {role} 正在复核原始产物")
+            review = await call_ai_model(am, audit_prompt, system_msg=ROLE_DEFINITIONS[role])
+            post_run_reviews.append({"model": am.name, "role": role, "review": review})
+        session.research_state["last_post_run_reviews"] = post_run_reviews
 
         if session._stop_requested:
             break
@@ -750,9 +803,19 @@ async def run_research_loop(session: ResearchSession):
         summary_prompt = (master_model.summary_prompt or "").replace("{round}", str(session.round))
         summary_prompt = summary_prompt.replace("{execution_results}", json.dumps(exec_result, ensure_ascii=False)[:4000])
         summary_prompt = summary_prompt.replace("{key_data}", exec_result.get("output", "")[:3000])
+        summary_prompt += (
+            "\n\nArtifact audit:\n"
+            + json.dumps(exec_result.get("artifact_audit", {}), ensure_ascii=False, indent=2)
+            + "\n\nIndependent reviews:\n"
+            + json.dumps(post_run_reviews, ensure_ascii=False, indent=2)[:10000]
+            + "\n裁决只能是 accepted、rejected 或 inconclusive；产物不完整时必须是 inconclusive。"
+        )
 
         session.push_event("summary", content="📝 总结中...")
-        summary = await call_ai_model(master_model, summary_prompt, system_msg="你是研究总结专家")
+        summary = await call_ai_model(master_model, summary_prompt, system_msg=ROLE_DEFINITIONS["principal_investigator"])
+        decision = exec_result.get("artifact_audit", {}).get("decision", "inconclusive")
+        if decision == "pending_review":
+            decision = "inconclusive"
 
         finding = {
             "round": session.round,
@@ -761,6 +824,10 @@ async def run_research_loop(session: ResearchSession):
             "source": master_model.name,
             "timestamp": datetime.now().isoformat(),
             "tags": [session.mode],
+            "run_id": research_run.run_id,
+            "decision": decision,
+            "artifact_audit": exec_result.get("artifact_audit", {}),
+            "review_roles": [review.get("role") for review in post_run_reviews],
         }
         session.findings.append(finding)
         session.push_event("finding", finding=finding)
@@ -768,6 +835,8 @@ async def run_research_loop(session: ResearchSession):
 
         session.research_state["rounds_completed"] = session.round
         session.research_state["last_summary"] = summary[:2000]
+        session.research_state["last_decision"] = decision
+        session.persist_state()
 
         # Manual: wait at end of round
         await _wait_for_step(session, "summarize")
@@ -818,6 +887,7 @@ async def start_session(payload: Optional[StartSessionPayload] = None):
     if objective:
         session.research_state["research_objective"] = objective
         session.push_event("objective", message=f"研究目标: {objective}", objective=objective)
+        session.persist_state()
     if session._pause_requested:
         session._pause_requested = False
         return {"status": "resumed"}
@@ -847,6 +917,7 @@ async def set_mode(payload: ModePayload):
     if payload.mode not in ("auto", "manual"):
         raise HTTPException(400, "mode must be 'auto' or 'manual'")
     session.mode = payload.mode
+    session.persist_state()
     session.push_event("mode_change", mode=payload.mode)
     return {"status": "ok", "mode": payload.mode}
 
@@ -869,11 +940,13 @@ async def stop_session():
     session = get_session()
     session._stop_requested = True
     session._pause_requested = False
+    terminate_active_process()
     if session._loop_task:
         session._loop_task.cancel()
         session._loop_task = None
     session.status = "stopped"
     session.current_phase = None
+    session.persist_state()
     return {"status": "stopped"}
 
 
@@ -930,3 +1003,22 @@ async def get_history():
         "research_state": session.research_state,
         "started_at": session.started_at,
     }
+
+
+@router.get("/orchestrator/status")
+async def get_orchestrator_status():
+    session = get_session()
+    return {
+        "schema_version": "research_orchestrator_status.v1",
+        "active_run_id": session.active_run_id,
+        "model_order": ["qwen3", "glm4", "deepseek7b"],
+        "gpu_policy": "single_process_serial",
+        "roles": ROLE_DEFINITIONS,
+        "evidence_context": load_evidence_context(),
+        "recent_runs": list_research_runs(20),
+    }
+
+
+@router.get("/orchestrator/runs")
+async def get_orchestrator_runs(limit: int = 50):
+    return {"runs": list_research_runs(max(1, min(limit, 200)))}

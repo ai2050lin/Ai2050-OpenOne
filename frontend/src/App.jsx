@@ -52,8 +52,10 @@ import GrammarRoleMatrixRenderer from './neural_vis/renderers/GrammarRoleMatrixR
 import CausalChainRenderer from './neural_vis/renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './neural_vis/renderers/DarkMatterFlowRenderer';
 import AtlasGraphRenderer from './neural_vis/renderers/AtlasGraphRenderer';
+import RealUnitTraceRenderer from './neural_vis/renderers/RealUnitTraceRenderer';
 import SceneHelpers from './neural_vis/components/SceneHelpers';
 import useVisData from './neural_vis/hooks/useVisData';
+import { useResearchKernel } from './researchKernel/useResearchKernel';
 import {
   RESEARCH_PLUGINS,
   getPluginWindowState,
@@ -62,6 +64,23 @@ import {
 } from './plugins/researchPlugins';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
+
+const FP_SUB_PHASES = [
+  { id: 'input', label: 'Input', color: '#94a3b8' },
+  { id: 'ln1', label: 'LN₁', color: '#818cf8' },
+  { id: 'qkv', label: 'Q/K/V', color: '#60a5fa' },
+  { id: 'attn_score', label: 'Attn Score', color: '#38bdf8' },
+  { id: 'softmax', label: 'Softmax', color: '#22d3ee' },
+  { id: 'attn_out', label: 'Attn Out', color: '#2dd4bf' },
+  { id: 'residual1', label: '⊕ Res₁', color: '#a78bfa' },
+  { id: 'ln2', label: 'LN₂', color: '#818cf8' },
+  { id: 'ffn_up', label: 'W_up', color: '#f59e0b' },
+  { id: 'ffn_act', label: 'SiLU', color: '#fb923c' },
+  { id: 'ffn_down', label: 'W_down', color: '#f97316' },
+  { id: 'residual2', label: '⊕ Res₂', color: '#a78bfa' },
+];
+const FP_PHASE_DURATIONS = [0.08, 0.07, 0.12, 0.1, 0.08, 0.1, 0.07, 0.07, 0.1, 0.08, 0.08, 0.05];
+const FP_TOTAL_DUR = FP_PHASE_DURATIONS.reduce((sum, duration) => sum + duration, 0);
 
 function activationToColor(value) {
   if (value > 0.8) return '#ff4444';
@@ -1452,22 +1471,11 @@ export default function App() {
 
   // Layer 内部子阶段步进 (0~11, 对应 LayerExplodedView3D 的12个子阶段)
   const [fpSubPhase, setFpSubPhase] = useState(0);
-  const FP_SUB_PHASES = [
-    { id: 'input', label: 'Input', color: '#94a3b8' },
-    { id: 'ln1', label: 'LN₁', color: '#818cf8' },
-    { id: 'qkv', label: 'Q/K/V', color: '#60a5fa' },
-    { id: 'attn_score', label: 'Attn Score', color: '#38bdf8' },
-    { id: 'softmax', label: 'Softmax', color: '#22d3ee' },
-    { id: 'attn_out', label: 'Attn Out', color: '#2dd4bf' },
-    { id: 'residual1', label: '⊕ Res₁', color: '#a78bfa' },
-    { id: 'ln2', label: 'LN₂', color: '#818cf8' },
-    { id: 'ffn_up', label: 'W_up', color: '#f59e0b' },
-    { id: 'ffn_act', label: 'SiLU', color: '#fb923c' },
-    { id: 'ffn_down', label: 'W_down', color: '#f97316' },
-    { id: 'residual2', label: '⊕ Res₂', color: '#a78bfa' },
-  ];
-  const FP_PHASE_DURATIONS = [0.08, 0.07, 0.12, 0.1, 0.08, 0.1, 0.07, 0.07, 0.1, 0.08, 0.08, 0.05];
-  const FP_TOTAL_DUR = FP_PHASE_DURATIONS.reduce((s, d) => s + d, 0);
+  const realResearchTrace = useResearchKernel(
+    fpModel,
+    fpCurrentLayer,
+    FP_SUB_PHASES[fpSubPhase]?.id
+  );
 
   // 步进到下一个子阶段
   const stepNextSubPhase = useCallback(() => {
@@ -1497,6 +1505,14 @@ export default function App() {
     return (start + end) / 2; // 子阶段中心
   }, []);
 
+  const getSubPhaseBounds = useCallback((phaseIdx) => {
+    let cum = 0;
+    for (let i = 0; i < phaseIdx; i++) cum += FP_PHASE_DURATIONS[i];
+    const start = cum / FP_TOTAL_DUR;
+    const end = (cum + FP_PHASE_DURATIONS[phaseIdx]) / FP_TOTAL_DUR;
+    return [start, end];
+  }, []);
+
   useEffect(() => {
     if (fpCurrentLayer == null) {
       setLayerAnimProgress(0);
@@ -1509,10 +1525,13 @@ export default function App() {
       return;
     }
     layerAnimStartRef.current = performance.now();
+    const [phaseStart, phaseEnd] = getSubPhaseBounds(fpSubPhase);
+    const phaseDuration = Math.max(80, fpSpeed * FP_PHASE_DURATIONS[fpSubPhase] / FP_TOTAL_DUR);
     const animate = (now) => {
       if (!layerAnimStartRef.current) layerAnimStartRef.current = now;
       const elapsed = now - layerAnimStartRef.current;
-      const progress = (elapsed % fpSpeed) / fpSpeed;
+      const phaseProgress = Math.min(1, elapsed / phaseDuration);
+      const progress = phaseStart + (phaseEnd - phaseStart) * phaseProgress;
       setLayerAnimProgress(progress);
       layerAnimRef.current = requestAnimationFrame(animate);
     };
@@ -1520,7 +1539,7 @@ export default function App() {
     return () => {
       if (layerAnimRef.current) cancelAnimationFrame(layerAnimRef.current);
     };
-  }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getSubPhaseProgress]);
+  }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getSubPhaseBounds, getSubPhaseProgress]);
 
   // ---- 可视化数据系统 (neural-vis) ----
   const { dataFiles, activeData: visData, activeFileMeta, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect, setActiveFileMeta: setActiveFileMetaDirect } = useVisData();
@@ -1558,6 +1577,13 @@ export default function App() {
 
   // ---- Forward Pass 动画 ----
   const startForwardPass = useCallback(() => {
+    if (realResearchTrace.forwardData) {
+      setFpData(realResearchTrace.forwardData);
+      setFpCurrentLayer(0);
+      setFpSubPhase(0);
+      setFpPlaying(true);
+      return;
+    }
     // 加载 forward pass 演示数据
     fetch(fpColorFile)
       .then(r => r.json())
@@ -1571,11 +1597,11 @@ export default function App() {
         console.error('[ForwardPass] Failed to load data:', err);
         setErrorDirect('无法加载forward pass数据');
       });
-  }, [setErrorDirect, fpColorFile]);
+  }, [realResearchTrace.forwardData, setErrorDirect, fpColorFile]);
 
   const stopForwardPass = useCallback(() => {
     setFpPlaying(false);
-    if (fpTimerRef.current) clearInterval(fpTimerRef.current);
+    if (fpTimerRef.current) clearTimeout(fpTimerRef.current);
     fpTimerRef.current = null;
   }, []);
 
@@ -1584,7 +1610,7 @@ export default function App() {
     setFpCurrentLayer(null);
     setFpData(null);
     setFpSubPhase(0);
-    if (fpTimerRef.current) clearInterval(fpTimerRef.current);
+    if (fpTimerRef.current) clearTimeout(fpTimerRef.current);
     fpTimerRef.current = null;
   }, []);
 
@@ -1595,22 +1621,13 @@ export default function App() {
     setLayerAnimProgress(0);
   }, [resetForwardPass]);
 
-  // Forward pass逐层推进定时器
+  // Forward pass按真实组件逐步推进。
   useEffect(() => {
     if (!fpPlaying || fpCurrentLayer == null) return;
-    const nLayers = selectedFpLayerCount;
-    fpTimerRef.current = setInterval(() => {
-      setFpCurrentLayer(prev => {
-        if (prev == null || prev >= nLayers - 1) {
-          setFpPlaying(false);
-          return prev;
-        }
-        setFpSubPhase(0); // 新层重置子阶段
-        return prev + 1;
-      });
-    }, fpSpeed);
-    return () => { if (fpTimerRef.current) clearInterval(fpTimerRef.current); };
-  }, [fpPlaying, fpCurrentLayer, selectedFpLayerCount, fpSpeed]);
+    const phaseDuration = Math.max(80, fpSpeed * FP_PHASE_DURATIONS[fpSubPhase] / FP_TOTAL_DUR);
+    fpTimerRef.current = setTimeout(stepNextSubPhase, phaseDuration);
+    return () => { if (fpTimerRef.current) clearTimeout(fpTimerRef.current); };
+  }, [fpPlaying, fpCurrentLayer, fpSubPhase, fpSpeed, stepNextSubPhase]);
 
   const functionTypePanelMap = {
     main: { label: 'DNN', hasInfo: true, hasOperation: true },
@@ -2953,6 +2970,22 @@ export default function App() {
                       <span>{'当前: ' + (fpCurrentLayer == null ? '未开始' : FP_SUB_PHASES[fpSubPhase]?.label)}</span>
                       <span>{fpCurrentLayer == null ? '-' : String(fpSubPhase + 1) + '/' + FP_SUB_PHASES.length}</span>
                     </div>
+                    <div style={{ marginTop: 8, padding: '8px 9px', border: '1px solid rgba(34,211,238,0.16)', background: 'rgba(8,47,73,0.18)', borderRadius: 6 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, color: '#a5f3fc', fontSize: 10, fontWeight: 700 }}>
+                        <span>真实组件 Trace</span>
+                        <span>{realResearchTrace.ready ? 'L2 已加载' : '等待数据'}</span>
+                      </div>
+                      <div style={{ marginTop: 4, color: '#7f95bb', fontSize: 9, lineHeight: 1.45, overflowWrap: 'anywhere' }}>
+                        {realResearchTrace.currentEvent
+                          ? `L${realResearchTrace.currentEvent.layer} · ${realResearchTrace.currentEvent.event_type} · ${realResearchTrace.currentEvent.top_units?.length || 0} 个真实地址`
+                          : (fpCurrentLayer == null
+                            ? (realResearchTrace.trace?.run_id || '正在加载研究证据')
+                            : `${FP_SUB_PHASES[fpSubPhase]?.label} 暂无直接组件观测`)}
+                      </div>
+                      {realResearchTrace.error && (
+                        <div style={{ marginTop: 3, color: '#fb7185', fontSize: 9 }}>{realResearchTrace.error}</div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -4252,6 +4285,13 @@ export default function App() {
                 layerAnimProgress={layerAnimProgress}
                 fpSpeed={fpSpeed}
                 lang={lang}
+              />
+              <RealUnitTraceRenderer
+                trace={realResearchTrace.trace}
+                stableUnits={realResearchTrace.stableUnits}
+                currentEvent={realResearchTrace.currentEvent}
+                currentLayer={fpCurrentLayer}
+                onHover={setHoveredInfo}
               />
               {/* Reverse Engineering 3D Overlay */}
               {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (

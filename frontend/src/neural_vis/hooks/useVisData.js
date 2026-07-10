@@ -11,7 +11,14 @@ export default function useVisData() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const isSupportedSchema = (version) => ['1.0', '2.0', 'atlas_graph_v1'].includes(version);
+  const isSupportedSchema = (version) => [
+    '1.0',
+    '2.0',
+    '2.0.0',
+    'atlas_graph_v1',
+    'real_component_trace.v1',
+    'research_kernel_manifest.v1',
+  ].includes(version);
 
   const loadDataManifest = useCallback(async () => {
     try {

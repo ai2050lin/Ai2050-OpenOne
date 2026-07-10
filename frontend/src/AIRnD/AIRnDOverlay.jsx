@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Brain, Target, Activity, Search, Zap, CheckCircle, Play } from 'lucide-react';
+import { X, Brain, Target, Activity, Search, Zap, CheckCircle, Play, Database } from 'lucide-react';
 import { AIRnDConfigTab } from './AIRnDConfigTab';
 import { AIRnDConsoleTab } from './AIRnDConsoleTab';
+import { AIRnDOrchestratorTab } from './AIRnDOrchestratorTab';
 import { RESEARCH_PHASES } from './aiRnDConfig';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
 const TABS = [
   { id: 'console', label: '控制台', icon: Activity },
+  { id: 'orchestrator', label: '证据编排', icon: Database },
   { id: 'config', label: '配置', icon: Target },
 ];
 
@@ -396,6 +398,9 @@ export const AIRnDOverlay = ({ onClose }) => {
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', position: 'relative', zIndex: 1 }}>
         {activeTab === 'config' && (
           <AIRnDConfigTab />
+        )}
+        {activeTab === 'orchestrator' && (
+          <AIRnDOrchestratorTab />
         )}
         {activeTab === 'console' && (
           <AIRnDConsoleTab

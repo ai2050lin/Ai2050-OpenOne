@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-const ATLAS_BASE = '/vis_data/pattern_family_atlas/v1';
+const ATLAS_BASE = '/vis_data/pattern_family_atlas/v2';
 
 const pct = (value) => `${Math.round(Number(value || 0) * 100)}%`;
 const clamp01 = (value) => Math.max(0, Math.min(1, Number(value || 0)));
@@ -120,37 +120,37 @@ const progressRows = [
     id: 'pattern_family_atlas',
     label: '语言模式族谱',
     hint: '语言模式分类、样本组织和路径框架的完成度。',
-    fallback: 0.86,
+    fallback: 0,
   },
   {
     id: 'physical_path_atlas',
     label: '物理路径图谱',
     hint: '逐层路径、内部状态和读出轨迹的追踪完成度。',
-    fallback: 0.72,
+    fallback: 0,
   },
   {
     id: 'component_path_atlas',
     label: '组件路径图谱',
     hint: '注意力、MLP、残差等组件路径的定位进度。',
-    fallback: 0.64,
+    fallback: 0,
   },
   {
     id: 'readout_competition_trace',
     label: '读出竞争追踪',
     hint: '目标、继续、停止和错误输出之间的竞争解释进度。',
-    fallback: 0.68,
+    fallback: 0,
   },
   {
     id: 'stepwise_rollout_trace',
     label: '生成轨迹追踪',
     hint: '后续生成、状态漂移、协议延续和停止行为的记录进度。',
-    fallback: 0.58,
+    fallback: 0,
   },
   {
     id: 'causal_closure',
     label: '机制闭合',
     hint: '因果必要性、竞争胜出、低副作用和自然闭合的综合进度。',
-    fallback: 0.42,
+    fallback: 0,
   },
 ];
 
@@ -706,9 +706,23 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
   useEffect(() => {
     let mounted = true;
     Promise.all([
-      fetch(`${ATLAS_BASE}/progress.json`, { cache: 'no-store' }).then((res) => {
-        if (!res.ok) throw new Error(`progress.json ${res.status}`);
-        return res.json();
+      fetch(`${ATLAS_BASE}/phase284_summary.json`, { cache: 'no-store' }).then(async (res) => {
+        if (!res.ok) throw new Error(`phase284_summary.json ${res.status}`);
+        const summary = await res.json();
+        const estimate = summary.progress_estimate || {};
+        const total = Number(summary.source_gap_rows || 0);
+        const remaining = summary.remaining_gap_counts || {};
+        return {
+          pattern_family_atlas: estimate.pattern_family_atlas || 0,
+          physical_path_atlas: estimate.physical_distribution_puzzle || 0,
+          component_path_atlas: estimate.component_path_coverage || 0,
+          readout_competition_trace: total > 0 ? 1 - Number(remaining.need_readout_competition || total) / total : 0,
+          stepwise_rollout_trace: 0,
+          causal_closure: estimate.closure || 0,
+          latest_phase: summary.phase,
+          source_rows: total,
+          source: `${ATLAS_BASE}/phase284_summary.json`,
+        };
       }),
       fetch(`${ATLAS_BASE}/manifest.json`, { cache: 'no-store' }).then((res) => {
         if (!res.ok) throw new Error(`manifest.json ${res.status}`);
