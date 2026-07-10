@@ -1,0 +1,71 @@
+{
+  "schema_version": "3.5.0",
+  "phase": "Phase316",
+  "created_at": "2026-07-10T02:47:43.907772+00:00",
+  "status": "stage_complete_data_not_mechanism",
+  "title": "Core language physical atlas stage completion",
+  "phase_range": "Phase311-316",
+  "independent_controlled_model_cases": 360,
+  "independent_template_heldout_model_cases": 72,
+  "total_new_independent_model_cases": 432,
+  "layer_component_rows": 44928,
+  "path_event_rows": 3240,
+  "matched_similarity_rows": 3240,
+  "same_template_heldout_family_accuracy": 0.847222,
+  "same_template_heldout_mechanism_accuracy": 0.736111,
+  "same_template_target_conditioned_baseline": 0.239583,
+  "template_heldout_family_accuracy": 0.736111,
+  "template_heldout_mechanism_accuracy": 0.486111,
+  "template_heldout_mechanism_random_baseline": 0.125,
+  "template_heldout_accuracy_drop": {
+    "family": -0.111111,
+    "mechanism": -0.25
+  },
+  "mean_adjusted_reuse_score": 0.042899,
+  "adjusted_reuse_by_family": {
+    "content_knowledge": 0.011873,
+    "reasoning_constraint": 0.100799,
+    "syntax_structure": 0.016024
+  },
+  "heldout_causal_cases": 18,
+  "heldout_winner_changes": 0,
+  "strong_nonlinear_interaction_cases": 0,
+  "full_vocab_top1_changed_cases": 2,
+  "claim_rows": 6,
+  "scientific_progress": {
+    "controlled_core_independent_case_coverage": 1.0,
+    "controlled_core_three_position_event_coverage": 1.0,
+    "matched_control_analysis_coverage": 1.0,
+    "same_template_heldout_prediction_coverage": 1.0,
+    "template_heldout_prediction_coverage": 1.0,
+    "template_heldout_prediction_quality_above_random": 0.412698,
+    "heldout_causal_case_coverage": 0.05,
+    "heldout_causal_quality_proxy": 0.0,
+    "natural_gate_coverage": 0.0,
+    "strict_clean_closure": 0.0
+  },
+  "objective_conclusions": [
+    "Controlled knowledge, syntax, and reasoning tasks have complete three-position component observations for the frozen denominator.",
+    "Matched-control adjusted reuse is positive but small overall; reasoning is the strongest of the three controlled families.",
+    "Path prototypes predict heldout items above simple baselines, but accuracy drops under template paraphrasing.",
+    "Heldout attention/MLP half-scaling produced no target-vs-distractor winner flips and no strong interaction above the preset threshold.",
+    "Current evidence remains L4 observational/predictive; no natural gate or strict-clean closure was established."
+  ],
+  "hard_limits": [
+    "Reasoning prompts use balanced yes/no candidate vocabularies and can share answer-route structure.",
+    "Knowledge and syntax adjusted reuse are close to zero after matched controls, so a universal family backbone is not established.",
+    "Template paraphrases are rule-based and still preserve much of the task wording.",
+    "Causal audit coverage is only five percent of the controlled denominator.",
+    "All models are small and the tested prompts are English controlled tasks."
+  ],
+  "next_stage": {
+    "name": "natural source-to-boundary causal edge mapping",
+    "tasks": [
+      "Independently authored template and domain holdouts.",
+      "Source-token attention to MLP gate/up/product/down tracing.",
+      "State-matched replacement rather than only half scaling.",
+      "Full-vocabulary and natural rollout boundary validation.",
+      "Open-set family discovery and unknown-family rate measurement."
+    ]
+  }
+}

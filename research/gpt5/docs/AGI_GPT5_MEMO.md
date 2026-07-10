@@ -37640,3 +37640,6454 @@ Phase281-284 完成了两件事：
 ```
 
 当前研究方向正确，但还没有完成语言模式图谱，更没有闭合。最可靠的结论是：语言模式图谱已经进入可扩展测试阶段，MLPWrite 是目前最稳定的物理路径拼图，停止/继续读出竞争仍是闭合瓶颈。
+
+## Phase 285: 闭合质量扩展扫描 [2026-07-09 06:33]
+
+### 任务判断
+
+附件对 Phase281-284 的判断总体正确：当前路线成熟点在于把“高分候选”与“机制闭合”拆开，并把图谱测试扩展到工程化批处理。但附件指出的一个问题也成立：如果继续只补 `component_path` 和 `causal_audit`，`closure_quality` 会长期停滞。
+
+因此 Phase285 不再继续单纯扩大物理路径批次，而是启动闭合质量扩展扫描：
+
+```text
+输入:
+  high behavior score
+  need_closure_quality = true
+  非 candidate_not_closed 旧候选
+
+输出:
+  SemanticDone
+  StopWins
+  ContinueSuppressed
+  RolloutStable
+  closure_reclassification
+```
+
+### 测试脚本
+
+新增：
+
+```text
+tests/gpt5/phase285_closure_quality_expansion_scan.py
+tests/gpt5/run_phase285_closure_quality_expansion_scan.sh
+```
+
+测试按顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每模型 9 条，共 27 条，使用 32 token rollout。
+
+输出固定图谱格式：
+
+```text
+tests/result/pattern_family_atlas/v2/phase285_closure_quality_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase285_four_condition_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase285_rollout_stability_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase285_cross_model_summary.json
+```
+
+### 公式
+
+闭合质量继续使用硬条件：
+
+```text
+ClosedOutput =
+  SemanticDone
+  ∧ ProtocolMatched
+  ∧ StopWins
+  ∧ ContinueSuppressed
+  ∧ RolloutStable
+```
+
+其中：
+
+```text
+StopWins = r_stop > r_continue
+ContinueSuppressed = top_continue_vs_stop_margin <= -0.5
+```
+
+### 客观结果
+
+总体：
+
+```text
+closure_quality_rows = 27
+missing_rows = 0
+semantic_done_rate = 1.0
+stop_wins_rate = 0.0
+continue_suppressed_rate = 0.0
+rollout_stable_rate = 0.0
+four_condition_closed_count = 0
+```
+
+重分类：
+
+```text
+closure_rejected = 25
+semantic_protocol_ok_but_not_closed = 2
+```
+
+阻塞项：
+
+```text
+stop_not_winner = 27
+continue_not_suppressed = 27
+rollout_not_stable = 27
+```
+
+分模型：
+
+```text
+qwen3:
+  selected_rows = 9
+  semantic_done = 9
+  stop_wins = 0
+  four_condition_closed = 0
+
+GLM4:
+  selected_rows = 9
+  semantic_done = 9
+  stop_wins = 0
+  four_condition_closed = 0
+
+DS7B:
+  selected_rows = 9
+  semantic_done = 9
+  stop_wins = 0
+  four_condition_closed = 0
+```
+
+### 分析
+
+这是比 Phase281 更强的负结果。Phase281 只复核 9 条候选闭合点；Phase285 扩展到 27 条高行为、缺闭合质量样本。结果全部语义完成，但全部无法停止胜出和继续压制。
+
+这说明：
+
+```text
+语义完成不是瓶颈；
+停止/继续竞争才是瓶颈；
+rollout 稳定不能从短答正确自然推出。
+```
+
+换句话说，当前模型可以“答对”，但没有进入机制意义上的“完成态”。
+
+### 硬伤
+
+1. 语义完成仍然是代理指标，虽然本批样本目标命中非常干净，但不能替代人工语义评估。
+2. 32 token rollout 比此前更长，但仍不是长程稳定证明。
+3. 当前小模型可能有粗糙停止机制，不能直接外推到大模型。
+
+### 阶段结论
+
+Phase285 证明：`need_closure_quality` 不能只靠高行为样本自然补齐。闭合质量扩展扫描应该继续做，但它目前主要产生的是客观负结果，真正突破点仍在 `ReadoutCompetition`、`StopGate` 和 `ContinueSuppression`。
+
+## Phase 286: Phase285 后缺口回灌 [2026-07-09 06:33]
+
+### 任务
+
+Phase286 将 Phase281 的 9 条候选复核和 Phase285 的 27 条扩展闭合质量扫描合并回灌到 Pattern Family Atlas v2。
+
+新增：
+
+```text
+tests/gpt5/phase286_gap_recalibration_after_phase285.py
+tests/gpt5/run_phase286_gap_recalibration_after_phase285.sh
+```
+
+### 客观结果
+
+```text
+source_gap_rows = 972
+closure_quality_checked_rows = 36
+closure_rejected_rows = 36
+```
+
+状态：
+
+```text
+filled_by_phase275_277_279_281_283_285 = 134
+partially_filled_by_phase275_277_279_281_283_285 = 88
+still_open = 750
+```
+
+剩余缺口：
+
+```text
+candidate_not_closed = 9
+need_readout_competition = 376
+good_behavior_low_path = 675
+good_readout_low_causal = 324
+need_causal_audit = 763
+need_component_path = 758
+need_layer_path = 695
+need_closure_quality = 557
+```
+
+进度估计：
+
+```text
+语言模式图谱整体进度: 62%
+物理分布拼图进度: 60%
+组件路径覆盖: 50%
+因果审计覆盖: 40%
+闭合质量测量进度: 25%
+闭合进度: 20%
+```
+
+### 分析
+
+Phase286 的关键不是“闭合增加”，而是把 36 条样本从“未测闭合质量”转成“已测但闭合失败”。因此：
+
+```text
+need_closure_quality: 587 -> 557
+closure: 不增加
+closure_rejected: 36
+```
+
+这是必要校准。它让图谱区分：
+
+```text
+没有做闭合质量测试
+≠
+做了闭合质量测试但失败
+```
+
+### 阶段结论
+
+Phase286 后，闭合质量测量开始真正进入图谱循环。但所有已测样本均失败，说明下一阶段不能再期待“高行为样本自动闭合”，必须进入读出竞争、停止门和继续压制机制的物理来源分析。
+
+## Phase 287: GLM4 高副作用风险队列 [2026-07-09 06:33]
+
+### 任务
+
+附件指出 GLM4 需要单独机制分支，这个判断正确。GLM4 在 Phase283 中表现为：
+
+```text
+low_side_effect_supported_rate = 0.166667
+low_side_effect_risk_rate = 0.611111
+```
+
+Phase287 不加载模型，而是从已有因果审计结果中整理 GLM4 高副作用风险队列，为后续 source-restricted / channel-level 审计建立固定输入。
+
+新增：
+
+```text
+tests/gpt5/phase287_glm4_side_effect_risk_queue.py
+tests/gpt5/run_phase287_glm4_side_effect_risk_queue.sh
+```
+
+输出：
+
+```text
+tests/result/pattern_family_atlas/v2/phase287_glm4_side_effect_risk_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase287_glm4_next_audit_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase287_summary.json
+```
+
+### 客观结果
+
+```text
+source_glm4_causal_rows = 122
+glm4_side_effect_risk_rows = 74
+next_audit_rows = 36
+```
+
+风险分桶：
+
+```text
+generic_side_effect_risk = 30
+coupled_target_continue_risk = 22
+attention_mlp_joint_risk = 18
+readout_competition_risk = 4
+```
+
+推荐审计：
+
+```text
+random_same_norm_control = 74
+subspace_or_mean_replace_audit = 41
+source_restricted_low_side_effect_audit = 33
+attention_mlp_joint_audit = 20
+channel_level_stop_continue_audit = 8
+```
+
+平均变化：
+
+```text
+mean_delta_continue_stop_margin = -0.552365
+mean_delta_target_logit = -0.636824
+```
+
+### 分析
+
+GLM4 的问题不是简单“MLP 半缩放不够强”，而是：
+
+```text
+target path 和 continue path 强耦合；
+降低 continue 往往也伤害 target；
+attention 和 MLP 在部分样本中存在联合风险；
+读出竞争仍有开放缺口。
+```
+
+这解释了为什么普通 `mlp_half_last_token` 难以稳定解决 GLM4：它不是干净的继续通道开关，而是可能同时碰到答案、协议、结构和继续路径。
+
+### 智能理论洞察
+
+当前更合理的机制图不是：
+
+```text
+MLPWrite -> output
+```
+
+而是：
+
+```text
+MLPWrite
+  -> ReadoutCompetition(target, continue, stop, protocol)
+  -> SideEffectCoupling
+  -> RolloutTrajectory
+```
+
+GLM4 说明语言编码机制中存在“耦合路径”，即同一个物理写入区域可能同时承载目标答案和继续倾向。破解语言机制不能只找正向写入源，还必须找到如何分离耦合路径。
+
+### 前端同步
+
+已同步：
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1064 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite 大 chunk 警告，不影响图谱读取。
+
+### 下一阶段任务
+
+下一阶段仍属于“语言模式图谱物理分布拼图”同一大阶段，应继续自动推进：
+
+```text
+Phase288A:
+  对 phase287_glm4_next_audit_rows.jsonl 做 GLM4 source-restricted low-side-effect audit。
+
+Phase288B:
+  对 readout_competition_gap_open 样本做 stop / continue / target / protocol channel 分解。
+
+Phase288C:
+  继续小规模 phase286_next_batch_rows 物理路径补图谱，避免物理分布增长停滞。
+```
+
+阶段目标仍不是闭合，而是补齐：
+
+```text
+物理路径分布
+闭合质量测量
+GLM4 高风险耦合路径
+读出竞争来源
+```
+
+只有这些拼图足够完整，才有可能进入真正闭合。
+
+## Phase 288: 模式图谱特征挖掘 [2026-07-09 07:37]
+
+### 任务判断
+
+本轮附件的核心判断正确：Phase285-287 已经证明继续局部追闭合或继续只做 MLP 机制审计会进入边际收益递减区。当前应明显增加“大数据图谱特征分析”的权重，把主线从：
+
+```text
+机制优先
+```
+
+调整为：
+
+```text
+图谱特征优先，机制审计后置
+```
+
+因此 Phase288 不跑新模型，不做 patch，而是读取当前 Pattern Family Atlas v2 的全量数据，抽取语言族、模型、组件、通道、层轨迹、副作用、闭合瓶颈和缺口热力图。
+
+### 输入数据
+
+```text
+path_signature_rows = 972
+component_summary_rows = 196
+causal_rows = 392
+closure_quality_rows = 36
+gap_rows = 972
+```
+
+### 新增脚本
+
+```text
+tests/gpt5/phase288_pattern_atlas_feature_mining.py
+tests/gpt5/run_phase288_pattern_atlas_feature_mining.sh
+```
+
+### 输出表
+
+```text
+phase288_family_feature_matrix.jsonl
+phase288_model_feature_matrix.jsonl
+phase288_component_distribution_rows.jsonl
+phase288_continue_channel_distribution_rows.jsonl
+phase288_layer_curve_cluster_rows.jsonl
+phase288_side_effect_distribution_rows.jsonl
+phase288_closure_bottleneck_rows.jsonl
+phase288_gap_heatmap_rows.jsonl
+phase288_feature_mining_summary.json
+phase288_feature_mining_report.md
+```
+
+### 特征公式
+
+每个样本被视为图谱路径对象：
+
+```text
+v_i =
+[
+  family,
+  model,
+  component,
+  continue_channel,
+  layer_cluster,
+  side_effect,
+  closure_failure,
+  gap_state
+]
+```
+
+语言机制不再写成单个线性公式，而写成图谱对象集合：
+
+```text
+LanguageMechanism =
+  Atlas({M+(P_i)}_{i=1..N})
+```
+
+其中：
+
+```text
+M+(P_i) =
+(
+  LayerPath,
+  ComponentPath,
+  StatePath,
+  ReadoutCompetition,
+  BlockerBoundaryField,
+  AnswerAliasSpanField,
+  ProtocolField,
+  RolloutTrajectory,
+  StopClosureGate,
+  SideEffectAudit
+)
+```
+
+### 客观结果
+
+全局：
+
+```text
+global_mlp_dominance_rate = 0.943878
+global_attention_dominance_rate = 0.056122
+global_continue_win_rate = 1.0
+global_side_effect_risk_rate = 0.507653
+global_closure_closed_count = 0
+global_closure_rejected_count = 36
+```
+
+层轨迹粗聚类：
+
+```text
+late_mlp_strong_continue = 80
+middle_mlp_strong_continue = 67
+late_mlp_continue = 15
+middle_mlp_continue = 15
+early_attention_routed_continue = 6
+middle_attention_routed_continue = 5
+early_mlp_continue = 4
+early_mlp_strong_continue = 4
+```
+
+继续通道分布：
+
+```text
+continue_list_item = 347
+continue_the = 344
+continue_next_sentence = 176
+continue_json_structure = 74
+continue_format = 67
+```
+
+模型矩阵：
+
+```text
+qwen3:
+  mlp_dominance_rate = 1.0
+  side_effect_risk_rate = 0.507246
+  low_side_effect_supported_rate = 0.884058
+
+GLM4:
+  mlp_dominance_rate = 0.836066
+  attention_dominance_rate = 0.163934
+  side_effect_risk_rate = 0.606557
+  low_side_effect_supported_rate = 0.147541
+
+DS7B:
+  mlp_dominance_rate = 0.984848
+  side_effect_risk_rate = 0.416667
+  low_side_effect_supported_rate = 0.742424
+```
+
+### 关键发现
+
+1. 当前全图谱中 `continue` 胜出率是 1.0，这说明停止/继续竞争是全局性瓶颈，不是候选样本偶然问题。
+2. MLP 主导率 0.943878，说明 MLPWrite 是稳定共享主干，但不是闭合机制。
+3. GLM4 的 attention 主导率和副作用风险显著更高，是模型特异风险。
+4. 继续通道主要集中在 `continue_list_item`、`continue_the`、`continue_next_sentence`，说明“继续”不是单一方向，而是一组通道族。
+5. 闭合通过数仍为 0，说明图谱特征挖掘不能被误读为闭合推进。
+
+### 硬伤
+
+Phase288 是特征挖掘，不是因果验证。它只能说明分布结构：
+
+```text
+什么现象稳定出现；
+什么区域缺口最大；
+什么模型风险最高；
+什么通道最常胜出。
+```
+
+它不能证明这些特征就是真实机制原因。因此后续机制审计必须由这些特征驱动，而不是完全取消机制审计。
+
+## Phase 289: 特征复用-差分分析 [2026-07-09 07:37]
+
+### 任务
+
+Phase289 基于 Phase288 的特征矩阵，进一步做：
+
+```text
+共享主干估计；
+语言族差分；
+模型差分；
+特征驱动的机制审计候选选择。
+```
+
+新增脚本：
+
+```text
+tests/gpt5/phase289_feature_reuse_delta_analysis.py
+tests/gpt5/run_phase289_feature_reuse_delta_analysis.sh
+```
+
+### 复用-差分公式
+
+族均值：
+
+```text
+P_bar(f) =
+  mean_{x in family f} P(x)
+```
+
+共享主干：
+
+```text
+P_shared =
+  mean_f P_bar(f)
+```
+
+族差分：
+
+```text
+Delta_f =
+  P_bar(f) - P_shared
+```
+
+模型差分：
+
+```text
+Delta_model =
+  P_model - mean_model(P_model)
+```
+
+### 客观结果
+
+共享主干：
+
+```text
+shared_continue_win_rate = 1.0
+shared_mlp_dominance_rate = 0.946745
+shared_attention_dominance_rate = 0.053255
+shared_mean_positive_mlp_delta = 24.749139
+shared_mean_positive_attn_delta = 9.632531
+shared_side_effect_risk_rate = 0.513343
+shared_closure_rejected_rate = 0.888889
+shared_stop_not_winner_rate = 0.888889
+```
+
+族差分标签：
+
+```text
+high_side_effect_family = 2
+mlp_reuse_strong_family = 4
+attention_delta_family = 2
+high_behavior_family = 1
+```
+
+模型差分标签：
+
+```text
+low_side_effect_strong_model = 2
+glm4_high_risk_delta = 1
+```
+
+特征驱动审计候选：
+
+```text
+feature_driven_audit_candidates = 83
+```
+
+候选类型：
+
+```text
+side_effect_distribution = 44
+closure_bottleneck = 24
+gap_heatmap_hotspot = 15
+```
+
+推荐下一步：
+
+```text
+source_restricted_or_subspace_audit = 32
+readout_competition_channel_decomposition = 24
+queue_driven_physical_path_fill = 15
+closure_quality_probe = 12
+```
+
+### 关键结论
+
+Phase289 把下一步机制审计从“人工选择样本”改成“图谱特征驱动选择样本”。这很重要，因为当前研究的第一优先级是完成物理分布拼图，不是凭局部直觉追闭合。
+
+当前共享主干可以客观写成：
+
+```text
+SharedBackbone =
+  continue_wins_all
+  + MLP_dominant_write
+  + high_side_effect_risk
+  + closure_rejected
+```
+
+族差分说明：
+
+```text
+不同语言族不是完全不同机制；
+它们共享 continue + MLPWrite 主干；
+差异主要体现在副作用、attention 比例、行为分和缺口结构上。
+```
+
+模型差分说明：
+
+```text
+GLM4 是高风险差分模型；
+qwen3 和 DS7B 更像低副作用强模型；
+但三者都处于 continue 优先状态。
+```
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 65%
+物理分布拼图进度: 61%
+大数据特征挖掘进度: 38%
+复用-差分分析进度: 25%
+机制审计进度: 40%
+闭合进度: 20%
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1080 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite 大 chunk 警告，不影响图谱数据读取。
+
+### 下一阶段任务
+
+下一阶段仍属于同一阶段：语言模式图谱物理分布拼图。
+
+但执行顺序应调整为：
+
+```text
+Phase290:
+  使用 phase289_feature_driven_audit_candidates.jsonl 选择样本，
+  优先做 readout_competition_channel_decomposition。
+
+Phase291:
+  对 source_restricted_or_subspace_audit 候选做 GLM4 风险解耦。
+
+Phase292:
+  对 closure_quality_probe 候选做小规模闭合质量复核。
+```
+
+阶段目标不是马上闭合，而是：
+
+```text
+先画地图；
+再找共享主干；
+再找族差分；
+再由图谱选择机制审计样本；
+最后才进入闭合复核。
+```
+
+### 阶段结论
+
+Phase288-289 完成了当前路线的关键升级：从“补图谱数据”推进到“从图谱中抽取稳定结构”。当前最可靠的客观结果是：
+
+```text
+continue 全局胜出；
+MLPWrite 是共享主干；
+GLM4 是高风险模型差分；
+闭合仍为 0；
+下一步机制审计必须由图谱特征驱动。
+```
+
+## Phase 290: 读出竞争通道分解与下一轮审计队列 [2026-07-09 08:13]
+
+### 任务判断
+
+本轮附件对 Phase288-289 的判断基本正确。当前研究已经不适合继续只做局部 patch 或单点闭合，而应该把 Pattern Atlas（模式图谱）中的大数据分布转化为可审计的机制对象。
+
+Phase288-289 已经说明：
+
+```text
+continue 全局胜出；
+MLPWrite 是经验共享主干；
+GLM4 是高副作用风险差分模型；
+闭合候选仍然没有通过四条件复核；
+下一步应由图谱特征驱动机制审计。
+```
+
+但不同字段覆盖率不一致。972 条 path_signature_rows 是全图谱签名，而 component_summary_rows、causal_rows、closure_quality_rows 都是子集。因此本阶段不把统计结果解释成完整因果结论，而是先补一个固定格式的读出竞争通道分解层。
+
+### 算法原理
+
+本阶段没有重新运行 qwen3、GLM4、DS7B 模型，而是对现有 972 条 Pattern Atlas v2 样本做离线结构分析。每条样本被转换为：
+
+```text
+case -> readout competition -> continue channel family -> bottleneck -> audit priority
+```
+
+核心对象为：
+
+```text
+R_i = (model_i, family_i, case_i, w_i, c_i, m_i, b_i, g_i)
+```
+
+其中：
+
+```text
+w_i：读出胜出者；
+c_i：top continue channel；
+m_i：top_continue_vs_stop_margin；
+b_i：stop / continue / target / protocol bottleneck；
+g_i：缺口队列和 Phase289 特征优先级。
+```
+
+通道族映射：
+
+```text
+continue_the / continue_next_sentence -> natural_language_continue
+continue_list_item -> list_structure_continue
+continue_json_structure -> protocol_json_continue
+continue_format -> protocol_format_continue
+because / for / is -> explanation_relation_continue
+comma / and -> local_syntax_continue
+```
+
+读出瓶颈判定：
+
+```text
+competition_winner != stop -> stop_not_winner
+top_continue_vs_stop_margin >= -0.25 -> continue_not_suppressed
+target_rank > 100 -> target_readout_weak
+json / format / list 通道 -> protocol_or_structure_continue
+```
+
+### 生成的数据
+
+新增脚本：
+
+```text
+tests/gpt5/phase290_readout_competition_channel_decomposition.py
+tests/gpt5/run_phase290_readout_competition_channel_decomposition.sh
+```
+
+新增固定格式结果：
+
+```text
+tests/result/pattern_family_atlas/v2/phase290_readout_channel_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase290_channel_family_model_matrix.jsonl
+tests/result/pattern_family_atlas/v2/phase290_stop_continue_bottleneck_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase290_readout_competition_audit_queue.jsonl
+tests/result/pattern_family_atlas/v2/phase290_family_model_readout_summary.jsonl
+tests/result/pattern_family_atlas/v2/phase290_summary.json
+tests/result/pattern_family_atlas/v2/phase290_report.md
+```
+
+前端同步：
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1087 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响图谱数据读取。
+
+### 客观结果
+
+Phase290 统计结果：
+
+```text
+source_signature_rows = 972
+readout_channel_rows = 972
+channel_family_model_matrix_rows = 86
+stop_continue_bottleneck_rows = 340
+readout_competition_audit_queue_rows = 144
+family_model_readout_summary_rows = 27
+```
+
+全图谱读出结果：
+
+```text
+global_continue_winner_rate = 1.0
+global_stop_winner_rate = 0.0
+global_mean_top_continue_vs_stop_margin = 8.155253
+```
+
+这说明在当前 Pattern Atlas v2 的 972 条签名中，读出竞争没有任何一条自然进入 stop winner。这个结果比前面 36 条 closure_quality 的负结果更强，因为它覆盖了完整签名层。
+
+continue 通道族分布：
+
+```text
+natural_language_continue = 502
+list_structure_continue = 334
+protocol_json_continue = 70
+protocol_format_continue = 66
+```
+
+top continue channel：
+
+```text
+continue_list_item = 334
+continue_the = 330
+continue_next_sentence = 172
+continue_json_structure = 70
+continue_format = 66
+```
+
+读出瓶颈计数：
+
+```text
+continue_not_suppressed = 972
+stop_not_winner = 972
+protocol_or_structure_continue = 470
+gap_need_readout_competition = 376
+target_readout_weak = 186
+closure_continue_not_suppressed = 36
+closure_stop_not_winner = 36
+closure_rollout_not_stable = 35
+closure_semantic_not_done = 3
+```
+
+下一轮审计队列：
+
+```text
+total = 144
+qwen3 = 55
+GLM4 = 46
+DS7B = 43
+```
+
+审计类型：
+
+```text
+protocol_continue_suppression = 87
+readout_channel_decomposition = 42
+target_vs_continue_competition = 15
+```
+
+### 结果分析
+
+最重要的新结果不是“闭合成功”，而是读出瓶颈被分解成了三层结构：
+
+```text
+第一层：stop 几乎完全不胜出；
+第二层：continue 不是单一方向，而是多个通道族；
+第三层：协议 / 列表 / JSON / 格式通道在 470 条样本中形成结构性继续压力。
+```
+
+这解释了为什么前面很多 intervention 能提高目标答案，却无法稳定停止：
+
+```text
+目标答案路径和继续通道不是同一个问题；
+提高 target 并不等价于压制 continue；
+压制 continue 也不能只压一个方向，必须按通道族拆解。
+```
+
+### 问题和硬伤
+
+1. 本阶段仍然是离线图谱分析，不是新的因果干预。
+
+```text
+它证明了读出竞争分布；
+没有证明哪个内部组件可以低副作用压制某个通道族。
+```
+
+2. 当前通道族分类仍是工程分类。
+
+```text
+continue_the / continue_next_sentence / continue_list_item 等分类来自 readout detail 字段；
+它们很有用，但还不是真实神经元或真实子空间。
+```
+
+3. 小模型偏差必须继续保留。
+
+```text
+qwen3、GLM4、DS7B 是当前测试小模型；
+内部编码可能比强模型更粗糙；
+读出瓶颈可能被放大 30% 到 50%。
+```
+
+4. 线性公式仍不能闭合。
+
+当前结果继续支持一个判断：
+
+```text
+简单线性方向无法模拟真实语言停止机制。
+```
+
+因为停止不是单个 scalar gate，而更像：
+
+```text
+target completion
++ protocol completion
++ continue channel suppression
++ stop boundary elevation
++ rollout stability
+```
+
+的联合结构。
+
+### 理论进展
+
+当前统一公式应继续从线性闭合公式转为机制谱图公式：
+
+```text
+LanguageMechanism = Atlas({M+(P_i)}_{i=1}^N)
+```
+
+其中 Phase290 补上的是读出竞争层：
+
+```text
+R_i =
+(
+W_stop,
+W_continue_channel,
+M_continue-stop,
+TargetRank,
+ProtocolPressure,
+ClosureBlocker
+)
+```
+
+更准确的闭合条件暂时应写成：
+
+```text
+Closed(i) =
+SemanticDone(i)
+AND StopWins(i)
+AND ContinueSuppressed(i)
+AND RolloutStable(i)
+```
+
+Phase290 说明当前最大的缺口是：
+
+```text
+StopWins(i) = false
+ContinueSuppressed(i) = false
+```
+
+而不是：
+
+```text
+SemanticDone(i) = false
+```
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 66%
+物理分布拼图进度: 63%
+大数据特征挖掘进度: 42%
+读出竞争通道分解进度: 35%
+机制审计进度: 41%
+闭合进度: 20%
+```
+
+### 下一阶段任务
+
+下一阶段仍然属于同一阶段：语言模式图谱的物理分布拼图。
+
+Phase291 应按 Phase290 生成的 144 条队列继续做，但不要马上追求闭合。优先顺序：
+
+```text
+1. protocol_continue_suppression：
+   分别测试 list / json / format 通道是否有不同源头。
+
+2. target_vs_continue_competition：
+   区分 target 弱和 continue 强两类失败。
+
+3. readout_channel_decomposition：
+   对 qwen3 -> GLM4 -> DS7B 顺序运行局部模型测试，
+   每次只加载一个模型，避免 GPU 内存溢出。
+```
+
+### 阶段结论
+
+Phase290 完成了一个关键拼图：把“continue 全局胜出”拆解为可观测的通道族和审计队列。
+
+当前最可靠结论是：
+
+```text
+当前 Pattern Atlas v2 中 stop 自然胜出率为 0；
+continue 不是单一机制，而是自然语言、列表、JSON、格式四类主要通道；
+协议和结构继续压力是闭合失败的重要来源；
+下一步不能盲目 patch，应按通道族做源头定位和低副作用压制审计。
+```
+
+## Phase 291: 扩大样本类型与大批量测试队列 [2026-07-09 08:22]
+
+### 任务判断
+
+用户要求继续加大样本类型和数量，改进特征分析算法，完成语言模式族图谱。这个方向正确，而且是 Phase290 之后必须做的事情。
+
+但需要严格区分两类数据：
+
+```text
+已测图谱数据：来自模型实际行为、读出、路径、因果和闭合扫描；
+待测扩样数据：只是样本和测试计划，不能当成模型结果。
+```
+
+因此本阶段先完成样本类型扩展和跨模型大队列，不把未测样本混入 path_signature_rows。
+
+### 样本扩展原则
+
+原始 v2 case bank：
+
+```text
+existing_cases = 1296
+root_cases = 216
+families = 9
+old_variant_types = 6
+```
+
+原有变体：
+
+```text
+base
+answer_only
+explain_pressure
+boundary_period
+structured_json
+list_pressure
+```
+
+新增 12 类变体：
+
+```text
+stop_word_hard
+newline_stop
+double_newline_stop
+comma_continue_pressure
+because_suppression
+for_relation_pressure
+json_closed_brace
+json_no_markdown
+numbered_list_one
+markdown_bullet_one
+quote_close
+bilingual_answer_only
+```
+
+这些变体覆盖：
+
+```text
+stop_boundary
+natural_language_continue
+local_syntax_continue
+explanation_relation_continue
+protocol_json_continue
+list_structure_continue
+answer_boundary_continue
+```
+
+### 生成的数据
+
+新增脚本：
+
+```text
+tests/gpt5/phase291_expanded_sample_type_and_large_batch_queue.py
+tests/gpt5/run_phase291_expanded_sample_type_and_large_batch_queue.sh
+```
+
+新增固定格式数据：
+
+```text
+tests/result/pattern_family_atlas/v2/phase291_expanded_case_candidates.jsonl
+tests/result/pattern_family_atlas/v2/phase291_full_model_test_plan_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase291_selected_large_batch_queue.jsonl
+tests/result/pattern_family_atlas/v2/phase291_sample_type_coverage_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase291_summary.json
+tests/result/pattern_family_atlas/v2/phase291_report.md
+```
+
+### 客观结果
+
+```text
+source_existing_cases = 1296
+source_root_cases = 216
+new_variant_types = 12
+expanded_case_candidates = 2592
+full_model_test_plan_rows = 7776
+selected_large_batch_queue_rows = 972
+sample_type_coverage_rows = 108
+```
+
+第一批大队列保持三模型均衡：
+
+```text
+qwen3 = 324
+GLM4 = 324
+DS7B = 324
+```
+
+九大语言族均衡：
+
+```text
+每个 family = 108
+```
+
+通道焦点覆盖：
+
+```text
+protocol_json_continue = 162
+list_structure_continue = 162
+explanation_relation_continue = 162
+natural_language_continue = 162
+local_syntax_continue = 81
+stop_boundary = 162
+answer_boundary_continue = 81
+```
+
+### 阶段意义
+
+Phase291 的价值不是产生模型行为结果，而是把图谱测试从 6 类变体扩展到 18 类变体，并形成 7776 条跨模型完整测试计划。
+
+这解决了前面一个硬伤：
+
+```text
+旧样本类型太少，容易把局部通道误认为全局规律。
+```
+
+现在新增样本能更系统地区分：
+
+```text
+停止边界；
+自然语言继续；
+解释继续；
+列表继续；
+JSON 继续；
+格式继续；
+引号边界；
+跨语言协议。
+```
+
+### 当前限制
+
+Phase291 是 sample expansion and queue only，没有运行模型，所以：
+
+```text
+不能把 2592 条候选样本当成已测证据；
+不能更新 closure 结论；
+不能说明新增变体的真实模型行为。
+```
+
+这些样本必须进入 Phase293 之后才成为真实图谱数据。
+
+## Phase 292: 特征分析算法 v2 与覆盖率归一图谱完成度 [2026-07-09 08:22]
+
+### 算法改进
+
+Phase288 的特征分析以计数为主，Phase289 做复用-差分，Phase290 做读出通道分解。Phase292 在此基础上改进为 coverage-aware feature analysis（覆盖率感知特征分析）。
+
+每个 family-model cell 现在包含：
+
+```text
+behavior_score
+readout_score
+rollout_score
+component_coverage
+causal_coverage
+closure_quality_coverage
+measurement_coverage
+expanded_selection_rate
+channel_entropy
+structure_continue_rate
+bottleneck_pressure
+target_weak_rate
+side_effect_risk_rate
+gap_pressure_norm
+atlas_completion_v2
+```
+
+通道熵：
+
+```text
+H = - sum(p_c log(p_c)) / log(K)
+```
+
+含义：
+
+```text
+H 高：多个 continue 通道共同竞争；
+H 低：单一 continue 通道主导。
+```
+
+新版完成度不是简单平均，而是：
+
+```text
+AtlasCompletionV2 =
+behavior
++ readout
++ rollout
++ measurement_coverage
++ expanded_selection_rate
++ channel_entropy
++ clean_structure_score
++ target_strength_score
++ gap_clean_score
++ side_effect_clean_score
+- bottleneck_pressure
+```
+
+该公式仍是工程评分，不是最终机制公式。它的作用是排序图谱缺口，而不是证明智能理论闭合。
+
+### 生成的数据
+
+新增脚本：
+
+```text
+tests/gpt5/phase292_feature_analysis_algorithm_v2.py
+tests/gpt5/run_phase292_feature_analysis_algorithm_v2.sh
+```
+
+新增固定格式数据：
+
+```text
+tests/result/pattern_family_atlas/v2/phase292_feature_matrix_v2_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase292_channel_entropy_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase292_coverage_normalized_gap_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase292_feature_priority_queue_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase292_global_atlas_completion.json
+tests/result/pattern_family_atlas/v2/phase292_report.md
+```
+
+### 客观结果
+
+```text
+feature_matrix_rows = 27
+mean_atlas_completion_v2 = 0.410425
+min_atlas_completion_v2 = 0.331615
+max_atlas_completion_v2 = 0.476055
+mean_bottleneck_pressure = 1.0
+mean_channel_entropy = 0.69222
+mean_measurement_coverage = 0.410494
+```
+
+按语言族：
+
+```text
+closure = 0.415058
+content_knowledge = 0.387764
+cross_lingual = 0.449626
+language_action = 0.397709
+output_protocol = 0.419891
+readout_competition = 0.395063
+reasoning_constraint = 0.447451
+state_drift = 0.409878
+syntax_structure = 0.371386
+```
+
+按模型：
+
+```text
+DS7B = 0.417307
+GLM4 = 0.405683
+qwen3 = 0.408285
+```
+
+下一优先级：
+
+```text
+urgent_readout_bottleneck = 23
+large_gap_physical_path_fill = 2
+balanced_large_batch_measurement = 2
+```
+
+### 结果分析
+
+新版算法给出一个更严格的判断：
+
+```text
+图谱结构框架正在变完整；
+但真实机制测量覆盖率仍然低；
+读出瓶颈压力仍然满格；
+闭合进度不能提高。
+```
+
+mean_atlas_completion_v2 只有 0.410425，说明此前主观估计的“图谱进度 60%+”需要拆开看：
+
+```text
+样本框架和数据格式进度高；
+真实机制证据进度中等偏低；
+闭合证据仍然低。
+```
+
+这比单纯说“整体进度 70%”更准确。
+
+### 当前问题和硬伤
+
+1. 瓶颈压力仍为 1.0。
+
+```text
+说明 stop_not_winner / continue_not_suppressed 不是少数异常，而是当前图谱核心瓶颈。
+```
+
+2. measurement_coverage 只有 0.410494。
+
+```text
+说明 component、causal、closure 三类内部证据覆盖还不够。
+```
+
+3. 新增 2592 条样本尚未测量。
+
+```text
+它们提高了图谱设计覆盖率；
+但没有提高机制证据覆盖率。
+```
+
+4. 当前模型仍是小模型。
+
+```text
+qwen3、GLM4、DS7B 的内部机制可能比强模型粗糙；
+读出瓶颈和协议漂移可能被放大 30% 到 50%。
+```
+
+## Phase 293: 大队列跨模型执行脚本准备 [2026-07-09 08:22]
+
+### 目的
+
+为了避免下一步又临时写脚本，本轮补充了跨模型顺序执行脚本。它读取 Phase292 的优先队列，并按：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+顺序执行，避免 GPU 内存溢出。
+
+新增脚本：
+
+```text
+tests/gpt5/phase293_expanded_queue_behavior_readout_runner.py
+tests/gpt5/run_phase293_expanded_queue_behavior_readout_runner.sh
+```
+
+脚本已通过 py_compile 语法检查。
+
+默认完整运行：
+
+```text
+bash tests/gpt5/run_phase293_expanded_queue_behavior_readout_runner.sh 0
+```
+
+小规模烟测：
+
+```text
+bash tests/gpt5/run_phase293_expanded_queue_behavior_readout_runner.sh 5
+```
+
+### 本轮为什么没有直接跑 972 条模型测试
+
+原因是当前请求同时包含扩样、改算法和完成图谱结构。直接启动 972 条跨模型 CUDA 测试会长时间占用 GPU，而且如果样本队列或算法字段有问题，会浪费大量时间。
+
+本轮先完成：
+
+```text
+样本扩展；
+大队列生成；
+特征算法升级；
+可视化数据同步；
+跨模型执行脚本准备。
+```
+
+下一步才应运行 Phase293 完整大队列。
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1099 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响数据读取。
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 71%
+样本类型覆盖进度: 62%
+大数据特征挖掘进度: 50%
+物理分布拼图进度: 64%
+机制审计进度: 42%
+闭合进度: 20%
+```
+
+### 下一阶段任务
+
+下一阶段仍属于同一阶段：语言模式族图谱物理分布拼图。
+
+最优先任务：
+
+```text
+运行 Phase293 大队列：
+qwen3 -> GLM4 -> DS7B
+每个模型 324 条
+总计 972 条
+```
+
+执行后需要生成：
+
+```text
+expanded_behavior_rows
+expanded_readout_rows
+expanded_path_signature_rows
+expanded_gap_rows
+expanded_feature_matrix_v3
+```
+
+然后再回到：
+
+```text
+component path
+causal audit
+closure quality
+```
+
+不能直接追闭合。
+
+### 阶段结论
+
+本轮完成了“加大样本类型和数量 + 改进特征分析算法”的系统升级。
+
+最可靠结论：
+
+```text
+图谱样本设计已经从 6 类变体扩展到 18 类变体；
+新增 2592 条候选样本和 7776 条跨模型完整测试计划；
+第一批大测试队列为 972 条，三模型和九族均衡；
+新版特征算法显示 atlas_completion_v2 均值只有 0.410425；
+主要瓶颈仍然是读出竞争，不是语义完成；
+下一步必须运行 Phase293 大队列，才能把扩样从计划转为真实证据。
+```
+
+## Phase 293: 扩样大队列三模型真实测量 [2026-07-09 08:38]
+
+### 任务判断
+
+Phase291 和 Phase292 只是完成扩样计划和特征算法升级，还没有把新增样本转为真实模型证据。因此本阶段继续执行 Phase293 大队列，按项目要求依次使用：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每次只加载一个模型，完成后释放 GPU，避免显存溢出。
+
+### 执行情况
+
+执行脚本：
+
+```text
+tests/gpt5/phase293_expanded_queue_behavior_readout_runner.py
+tests/gpt5/run_phase293_expanded_queue_behavior_readout_runner.sh
+```
+
+先做 5 条烟测，发现一个脚本问题：底层模型加载器需要逗号字符串形式的 attn_implementations，原脚本传入 list，已修复。
+
+随后运行完整队列：
+
+```text
+qwen3 = 324
+GLM4 = 324
+DS7B = 324
+total = 972
+```
+
+FlashAttention2 不可用，自动回退到 sdpa。三模型均完成，无 GPU 内存溢出。
+
+### 客观结果
+
+qwen3：
+
+```text
+rows = 324
+answer_correct_proxy_rate = 0.962963
+pattern_matched_proxy_rate = 0.194444
+model_stop_executed_rate = 0.0
+continue_winner = 321
+stop_winner = 3
+mean_top_continue_vs_stop_margin = 9.308353
+```
+
+GLM4：
+
+```text
+rows = 324
+answer_correct_proxy_rate = 0.953704
+pattern_matched_proxy_rate = 0.367284
+model_stop_executed_rate = 0.067901
+continue_winner = 300
+stop_winner = 24
+mean_top_continue_vs_stop_margin = 4.147111
+```
+
+DS7B：
+
+```text
+rows = 324
+answer_correct_proxy_rate = 0.771605
+pattern_matched_proxy_rate = 0.296296
+model_stop_executed_rate = 0.518519
+continue_winner = 324
+stop_winner = 0
+mean_top_continue_vs_stop_margin = 8.31115
+```
+
+### 关键观察
+
+扩样后最重要的现象是：
+
+```text
+语义答案正确率很高；
+协议匹配率明显偏低；
+模型生成层停止和读出层 stop winner 不是一回事；
+continue 仍然是压倒性读出优势。
+```
+
+尤其 DS7B：
+
+```text
+model_stop_executed_rate = 0.518519
+continue_winner_rate = 1.0
+```
+
+这说明一个重要分离：
+
+```text
+生成最终停止可以发生；
+但最后一步读出竞争仍然可能是 continue 胜出。
+```
+
+这支持前面关于三层停止结构的判断：
+
+```text
+模型内部停止
+!= 任务层完成
+!= 客户端停止
+!= 读出层 stop winner
+```
+
+## Phase 294: 扩样测量结果写入图谱 [2026-07-09 08:38]
+
+### 任务目的
+
+Phase293 的结果原始保存在测试目录中，本阶段把 972 条真实测量转换为 Pattern Atlas v2 固定格式。
+
+新增脚本：
+
+```text
+tests/gpt5/phase294_expanded_measurement_atlas_update.py
+tests/gpt5/run_phase294_expanded_measurement_atlas_update.sh
+```
+
+新增图谱数据：
+
+```text
+phase294_expanded_behavior_rows.jsonl
+phase294_expanded_readout_rows.jsonl
+phase294_expanded_path_signature_rows.jsonl
+phase294_expanded_gap_rows.jsonl
+phase294_expanded_family_model_update_rows.jsonl
+phase294_cross_model_summary.json
+```
+
+### 汇总结果
+
+```text
+expanded_behavior_rows = 972
+expanded_readout_rows = 972
+expanded_path_signature_rows = 972
+expanded_gap_rows = 972
+family_model_update_rows = 27
+```
+
+全局：
+
+```text
+global_answer_correct_proxy_rate = 0.896091
+global_pattern_matched_proxy_rate = 0.286008
+global_model_stop_executed_rate = 0.195473
+global_continue_winner_rate = 0.972222
+global_stop_winner_rate = 0.027778
+global_mean_top_continue_vs_stop_margin = 7.255538
+```
+
+这说明扩样后继续压倒性胜出的结论仍成立，但不再是 100%。新增边界和协议样本让少量 stop winner 出现，尤其 GLM4。
+
+### 图谱缺口变化
+
+虽然行为和读出层已扩展，但每条扩样样本仍然缺少：
+
+```text
+layer_path
+component_path
+causal_audit
+closure_quality
+```
+
+因此 Phase294 把新增样本标记为：
+
+```text
+expanded_measured_partial
+```
+
+这很重要，因为它避免把 behavior/readout 层的测量误读成完整物理路径。
+
+## Phase 295: 加入实测扩样后的特征算法 v3 [2026-07-09 08:38]
+
+### 算法改进
+
+Phase292 的完成度使用的是扩样计划；Phase295 改为使用 Phase294 的实测 behavior/readout。
+
+新增脚本：
+
+```text
+tests/gpt5/phase295_feature_algorithm_v3_after_expansion.py
+tests/gpt5/run_phase295_feature_algorithm_v3_after_expansion.sh
+```
+
+新增数据：
+
+```text
+phase295_feature_matrix_v3_rows.jsonl
+phase295_summary.json
+phase295_report.md
+```
+
+v3 评分使用：
+
+```text
+expanded_answer_correct_proxy_rate
+expanded_pattern_matched_proxy_rate
+expanded_model_stop_executed_rate
+expanded_continue_winner_rate
+expanded_stop_winner_rate
+expanded_mean_top_continue_vs_stop_margin
+```
+
+并加入读出惩罚：
+
+```text
+readout_penalty =
+continue_winner_rate * 0.65
++ normalized_continue_stop_margin * 0.35
+```
+
+### 客观结果
+
+```text
+feature_v3_rows = 27
+mean_atlas_completion_v3 = 0.361124
+mean_completion_delta_v3_minus_v2 = -0.049301
+mean_expanded_answer_correct_proxy_rate = 0.896091
+mean_expanded_pattern_matched_proxy_rate = 0.286008
+mean_expanded_model_stop_executed_rate = 0.195473
+mean_expanded_continue_winner_rate = 0.972222
+```
+
+按模型：
+
+```text
+DS7B = 0.369678
+GLM4 = 0.37625
+qwen3 = 0.337444
+```
+
+按语言族：
+
+```text
+closure = 0.349814
+content_knowledge = 0.345609
+cross_lingual = 0.384346
+language_action = 0.351537
+output_protocol = 0.367011
+readout_competition = 0.362091
+reasoning_constraint = 0.386572
+state_drift = 0.366638
+syntax_structure = 0.336499
+```
+
+下一优先级：
+
+```text
+hard_readout_stop_failure = 12
+generation_stop_without_readout_stop = 4
+protocol_pattern_failure = 6
+measured_expansion_followup = 5
+```
+
+### 严格分析
+
+完成度从 v2 的 0.410425 降到 v3 的 0.361124，不是研究倒退，而是更严格的实测校准。
+
+原因：
+
+```text
+扩样后发现：
+答案正确率高；
+协议匹配率低；
+continue winner 仍然高达 0.972222；
+读出层停止非常少；
+新增样本没有 layer/component/causal 路径证据。
+```
+
+因此图谱更真实，但闭合更难。
+
+### 当前硬伤
+
+1. 扩样只完成 behavior/readout。
+
+```text
+还没有完成新增样本的层路径、组件路径、因果路径。
+```
+
+2. 读出停止和生成停止分离。
+
+```text
+DS7B 有较高 model_stop_executed_rate；
+但 readout competition 仍然 100% continue winner。
+```
+
+3. 协议匹配是新增大瓶颈。
+
+```text
+global_pattern_matched_proxy_rate = 0.286008
+```
+
+说明模型常常知道答案，但不能稳定遵守输出模式。
+
+4. 小模型偏差仍然存在。
+
+```text
+当前小模型可能放大协议漂移和停止失败；
+强模型可能更稳，但不应假设机制完全不同。
+```
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 75%
+样本类型覆盖进度: 68%
+大数据特征挖掘进度: 58%
+物理分布拼图进度: 67%
+机制审计进度: 44%
+闭合进度: 21%
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1109 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响图谱数据读取。
+
+### 下一阶段任务
+
+下一阶段仍属于同一大阶段：完成语言模式族图谱的物理分布拼图。
+
+优先级应为：
+
+```text
+Phase296:
+  从 Phase294 expanded_gap_rows 中选择高价值样本，
+  补 layer_path 和 component_path。
+
+Phase297:
+  对 hard_readout_stop_failure 和 protocol_pattern_failure 做组件路径审计。
+
+Phase298:
+  对 generation_stop_without_readout_stop 做停止机制分离分析。
+```
+
+不要直接追闭合。当前闭合瓶颈已经更清楚：
+
+```text
+语义完成不是主瓶颈；
+协议模式不稳；
+读出 stop winner 稀少；
+continue 通道仍强；
+生成停止与读出停止可分离。
+```
+
+### 阶段结论
+
+本轮真正完成了“加大样本类型和数量”的实测推进：
+
+```text
+新增 972 条真实跨模型测量；
+扩样样本不再只是计划；
+continue winner 从 1.0 降到 0.972222，但仍压倒性占优；
+GLM4 出现最多 stop winner；
+DS7B 出现生成停止与读出继续分离；
+新版完成度降到 0.361124，说明图谱更严格、更接近真实难度。
+```
+
+下一步要补的是新增样本的内部物理路径，而不是继续扩大行为样本或直接闭合。
+
+## Phase 296: 扩样样本组件物理路径补全 [2026-07-09 08:43]
+
+### 任务判断
+
+上一阶段已经完成 972 条扩样样本的 behavior/readout 实测，但这些样本仍然缺少内部物理路径。因此本阶段不继续盲目扩大行为样本，而是把新增样本推进到 layer / attention / MLP / residual 组件路径层。
+
+旧的 Phase275 组件路径脚本绑定 v1 case bank，不能直接处理 Phase291-294 的新增样本。因此新写 Phase296 适配版，直接读取 Phase292 优先队列中的 prompt，并对 Phase294 高缺口样本做内部组件路径追踪。
+
+### 新增脚本
+
+```text
+tests/gpt5/phase296_expanded_component_path_probe.py
+tests/gpt5/run_phase296_expanded_component_path_probe.sh
+```
+
+运行：
+
+```text
+bash tests/gpt5/run_phase296_expanded_component_path_probe.sh 9
+```
+
+即每个模型 9 条，三模型共 27 条。样本按九大语言族均衡选择。
+
+### 输出数据
+
+```text
+phase296_component_physical_path_rows.jsonl
+phase296_attention_contribution_rows.jsonl
+phase296_mlp_contribution_rows.jsonl
+phase296_residual_accumulation_rows.jsonl
+phase296_component_summary_rows.jsonl
+phase296_missing_rows.jsonl
+phase296_summary.json
+```
+
+### 客观结果
+
+```text
+component_physical_path_rows = 936
+attention_contribution_rows = 936
+mlp_contribution_rows = 936
+residual_accumulation_rows = 936
+component_summary_rows = 27
+missing_rows = 0
+```
+
+三模型：
+
+```text
+qwen3 = 9
+GLM4 = 9
+DS7B = 9
+```
+
+九大语言族：
+
+```text
+每个 family = 3
+```
+
+主导组件：
+
+```text
+MLP = 24
+attention = 3
+```
+
+最终读出：
+
+```text
+continue = 27
+stop = 0
+```
+
+平均正向贡献：
+
+```text
+mean_sum_positive_attn_delta = 13.229134
+mean_sum_positive_mlp_delta = 27.735397
+mean_sum_positive_residual_delta = 0.233892
+```
+
+模型细节：
+
+```text
+qwen3:
+  MLP = 7
+  attention = 2
+  final_continue = 9
+
+GLM4:
+  MLP = 8
+  attention = 1
+  final_continue = 9
+
+DS7B:
+  MLP = 9
+  final_continue = 9
+```
+
+### 关键进展
+
+这是扩样样本第一次进入内部组件路径层。结果与前面 Phase288-290 的主结论一致：
+
+```text
+新增样本中 MLP 仍然是 continue path 的主要写入主干；
+attention 也存在，但比例较小；
+最终读出仍全部是 continue；
+residual carry 的独立正向贡献很小。
+```
+
+这说明前面的 MLPWrite 共享主干不是只在旧样本中出现，新扩展样本也复现了这一结构。
+
+### 严格限制
+
+本阶段只有 27 条内部路径样本，覆盖率仍然很低：
+
+```text
+27 / 972 = 2.7778%
+```
+
+所以结论应表述为：
+
+```text
+扩样高优先级子集中，MLP 继续路径主干继续复现。
+```
+
+不能表述为：
+
+```text
+所有扩样样本都已经完成内部路径。
+```
+
+## Phase 297: 加入组件路径后的特征算法 v4 [2026-07-09 08:43]
+
+### 算法改进
+
+Phase295 的 v3 完成度只纳入扩样 behavior/readout。Phase297 把 Phase296 的 component path evidence（组件路径证据）加入图谱完成度。
+
+新增脚本：
+
+```text
+tests/gpt5/phase297_feature_algorithm_v4_with_component_paths.py
+tests/gpt5/run_phase297_feature_algorithm_v4_with_component_paths.sh
+```
+
+新增数据：
+
+```text
+phase297_feature_matrix_v4_rows.jsonl
+phase297_summary.json
+phase297_report.md
+```
+
+v4 增加字段：
+
+```text
+expanded_component_summary_rows
+expanded_component_coverage
+expanded_mlp_dominance_rate
+expanded_attention_dominance_rate
+expanded_component_continue_winner_rate
+expanded_mean_sum_positive_mlp_delta
+expanded_mean_sum_positive_attn_delta
+component_path_score
+atlas_completion_v4
+```
+
+### 客观结果
+
+```text
+feature_v4_rows = 27
+mean_atlas_completion_v4 = 0.361956
+mean_completion_delta_v4_minus_v3 = 0.000832
+mean_expanded_component_coverage = 0.027778
+mean_expanded_mlp_dominance_rate = 0.888889
+mean_expanded_component_continue_winner_rate = 1.0
+```
+
+下一优先级：
+
+```text
+mlp_continue_path_causal_audit = 24
+attention_route_followup = 3
+```
+
+按模型：
+
+```text
+DS7B = 0.371278
+GLM4 = 0.370302
+qwen3 = 0.344287
+```
+
+按语言族：
+
+```text
+closure = 0.35488
+content_knowledge = 0.335059
+cross_lingual = 0.382693
+language_action = 0.359632
+output_protocol = 0.373225
+readout_competition = 0.356862
+reasoning_constraint = 0.380825
+state_drift = 0.371747
+syntax_structure = 0.342677
+```
+
+### 结果分析
+
+v4 完成度只比 v3 增加 0.000832，原因不是组件路径无价值，而是覆盖率太低：
+
+```text
+expanded_component_coverage = 0.027778
+```
+
+但机制方向很明确：
+
+```text
+88.8889% 的扩样内部路径由 MLP 主导；
+100% 的扩样组件路径最终仍是 continue winner；
+因此下一步应进入 MLP continue path causal audit，而不是继续扩大行为样本。
+```
+
+### 当前硬伤
+
+1. 内部路径覆盖率太低。
+
+```text
+只覆盖 27 条扩样样本。
+```
+
+2. 没有新增 causal audit。
+
+```text
+Phase296 是组件路径观察，不是因果干预。
+```
+
+3. stop winner 仍没有被解释。
+
+```text
+当前组件路径主要解释 continue path；
+还没有找到 stop path 的自然来源。
+```
+
+4. 小模型偏差仍然存在。
+
+```text
+当前结果可能放大 MLP 主导和协议漂移；
+但跨三模型一致出现 MLP continue 主干，说明它不是单模型偶然。
+```
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式图谱整体进度: 76%
+样本类型覆盖进度: 68%
+大数据特征挖掘进度: 62%
+物理分布拼图进度: 70%
+机制审计进度: 47%
+闭合进度: 21%
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1120 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响图谱数据读取。
+
+### 下一阶段任务
+
+下一阶段仍属于语言模式族图谱的物理分布拼图。
+
+最优先：
+
+```text
+Phase298:
+  对 Phase296 中 24 条 MLP 主导样本做低副作用 causal audit。
+
+Phase299:
+  对 3 条 attention 主导样本做 attention route followup。
+
+Phase300:
+  汇总 behavior/readout/component/causal 四层图谱，形成 Pattern Atlas v3 候选。
+```
+
+### 阶段结论
+
+本轮完成了从“扩样行为/读出证据”到“扩样内部组件路径证据”的关键推进。
+
+最可靠结论：
+
+```text
+扩样样本中 MLP continue path 继续强复现；
+27 条内部路径样本全部最终 continue；
+MLP 主导占 24/27；
+下一步应做 MLP continue path 的因果审计；
+继续单纯扩大行为样本的边际收益已经降低。
+```
+
+## Phase 298: 扩样 MLP 续写路径低副作用因果审计 [2026-07-09 08:51]
+
+### 任务背景
+
+用户要求继续加大样本类型和数量，改进特征分析算法，完成语言模式族图谱。
+
+根据 Phase296/297 的客观结果，继续单纯扩大行为样本的边际收益已经下降；当前最关键缺口不是更多输出样本，而是对已经定位出的 24 条 MLP 主导 continuation path（续写路径）进行因果审计。
+
+因此本阶段没有盲目扩样，而是把样本数量加到关键瓶颈上：
+
+```text
+Phase296 MLP 主导样本: 24 条
+每条样本 patch 类型: 3 个
+总因果审计行: 72 行
+模型顺序: qwen3 -> GLM4 -> DS7B
+```
+
+### 测试脚本
+
+```text
+tests/gpt5/phase298_expanded_mlp_continue_causal_audit.py
+tests/gpt5/run_phase298_expanded_mlp_continue_causal_audit.sh
+```
+
+### 输出文件
+
+```text
+tests/result/phase298_expanded_mlp_continue_causal_audit/expanded_mlp_continue_causal_audit/
+tests/result/pattern_family_atlas/v2/phase298_mlp_causal_audit_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase298_causal_effect_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase298_rollout_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase298_cross_model_summary.json
+```
+
+### 算法原理
+
+对 Phase296 中 MLP 主导样本，读取其 strongest_mlp_layer（最强 MLP 层），在该层最后 token 的 MLP 输出上做缩放干预：
+
+```text
+mlp_zero_last_token: scale = 0.0
+mlp_quarter_last_token: scale = 0.25
+mlp_half_last_token: scale = 0.5
+```
+
+基础公式：
+
+$$
+h_l = h_{l-1} + Attn_l(h_{l-1}) + MLP_l(h_{l-1})
+$$
+
+干预公式：
+
+$$
+h_l^{patch} = h_{l-1} + Attn_l(h_{l-1}) + \alpha \cdot MLP_l(h_{l-1})
+$$
+
+其中：
+
+$$
+\alpha \in \{0, 0.25, 0.5\}
+$$
+
+读出差分：
+
+$$
+\Delta M_{continue-stop}
+= M_{continue-stop}^{patch} - M_{continue-stop}^{base}
+$$
+
+判定标准：
+
+```text
+如果 Delta continue-stop margin < -1.0:
+  说明 MLP 干预明显削弱 continuation readout，记为 weak causal support。
+
+如果 winner 发生翻转:
+  说明 MLP 干预改变读出胜者，记为 strong causal support。
+```
+
+### 客观结果
+
+全局结果：
+
+```text
+selected_mlp_dominant_cases: 24
+audit_rows: 72
+causal_effect_rows: 72
+rollout_rows: 72
+missing_rows: 0
+patch_counts:
+  mlp_zero_last_token: 24
+  mlp_quarter_last_token: 24
+  mlp_half_last_token: 24
+necessity_supported:
+  True: 48
+  False: 24
+winner_changed:
+  False: 72
+causal_support_level:
+  weak: 48
+  not_supported: 24
+rollout_changed:
+  True: 46
+  False: 26
+mean_delta_continue_stop_margin: -2.700304
+mean_delta_target_logit: -1.579861
+```
+
+分模型结果：
+
+```text
+qwen3:
+  MLP dominant cases: 7
+  audit_rows: 21
+  necessity_supported: 20/21
+  winner_changed: 0/21
+  rollout_changed: 15/21
+  mean_delta_continue_stop_margin: -5.222470
+
+GLM4:
+  MLP dominant cases: 8
+  audit_rows: 24
+  necessity_supported: 8/24
+  winner_changed: 0/24
+  rollout_changed: 20/24
+  mean_delta_continue_stop_margin: -0.682292
+
+DS7B:
+  MLP dominant cases: 9
+  audit_rows: 27
+  necessity_supported: 20/27
+  winner_changed: 0/27
+  rollout_changed: 11/27
+  mean_delta_continue_stop_margin: -2.532407
+```
+
+分语言模式族平均 Delta：
+
+```text
+closure: -3.774306
+content_knowledge: -2.520833
+cross_lingual: -4.435764
+language_action: -1.494792
+output_protocol: -1.809028
+readout_competition: -2.177083
+reasoning_constraint: -2.843750
+state_drift: -2.984375
+syntax_structure: -1.968750
+```
+
+### 结果分析
+
+本阶段最重要的正结果：
+
+```text
+MLP patch 可以系统性降低 continuation margin。
+```
+
+48/72 个干预行支持 MLP 对 continuation readout 有必要性，而且三模型均出现负向 Delta。
+
+但最重要的负结果同样清楚：
+
+```text
+没有任何一个 patch 导致 winner 翻转。
+```
+
+这说明当前 MLP 路径是 continuation pressure（续写压力）的重要组成部分，但不是完整控制开关。它更像底层连续写入通道，而不是最终停止/继续决策器。
+
+### 硬伤和瓶颈
+
+1. 仍不是闭合。
+
+```text
+winner_changed = 0/72
+```
+
+说明 MLP 缩放只能削弱 continuation margin，不能直接控制最终读出胜者。
+
+2. GLM4 的读出效应弱。
+
+GLM4 mean_delta_continue_stop_margin 只有 -0.682292，但 rollout_changed 达到 20/24，说明：
+
+```text
+读出 margin 变化和实际生成轨迹变化不是同一层证据。
+```
+
+3. stop source 仍未定位。
+
+当前因果审计主要围绕 MLP continuation path，仍没有找到自然 stop path 的物理来源。
+
+4. 当前 patch 仍是线性缩放。
+
+线性缩放可能不符合真实机制，所以不能用它反复 patch 追求闭合。
+
+### 阶段结论
+
+Phase298 正确推进了语言模式图谱的物理分布拼图：
+
+```text
+MLP continuation path:
+  已有跨模型、跨语言模式族、弱因果支持。
+
+完整停止/继续闭合:
+  未完成。
+```
+
+## Phase 299: 特征分析算法 v5 引入因果审计证据 [2026-07-09 08:51]
+
+### 任务背景
+
+Phase297 的特征算法 v4 已经加入组件路径证据，但缺少因果证据。
+
+Phase299 将 Phase298 的 MLP causal audit（因果审计）加入 cell-level（单元级）特征矩阵。
+
+### 测试脚本
+
+```text
+tests/gpt5/phase299_feature_algorithm_v5_with_causal_audit.py
+tests/gpt5/run_phase299_feature_algorithm_v5_with_causal_audit.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase299_feature_matrix_v5_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase299_summary.json
+tests/result/pattern_family_atlas/v2/phase299_feature_algorithm_v5_report.md
+```
+
+### 算法改进
+
+v5 不再只看行为和组件观察，而加入：
+
+```text
+causal_case_count
+causal_support_rate
+causal_strong_rate
+mean_delta_continue_stop_margin
+```
+
+特征合成公式：
+
+$$
+CausalScore =
+0.45 \cdot Coverage
++ 0.30 \cdot SupportRate
++ 0.15 \cdot StrongRate
++ 0.10 \cdot NormDelta
+$$
+
+其中：
+
+$$
+NormDelta = \min \left( \frac{|\Delta M_{continue-stop}|}{8}, 1 \right)
+$$
+
+图谱完成度更新：
+
+$$
+AtlasCompletion_{v5}
+= clamp(AtlasCompletion_{v4} + 0.07 \cdot CausalScore)
+$$
+
+### 客观结果
+
+```text
+input_cells: 27
+feature_cells: 27
+phase298_audit_rows: 72
+phase298_selected_mlp_dominant_cases: 24
+mean_atlas_completion_v5: 0.386058
+mean_completion_delta_v5_minus_v4: 0.024103
+mean_expanded_mlp_causal_support_rate: 0.592593
+mean_expanded_mlp_causal_strong_rate: 0.0
+mean_expanded_mlp_causal_score: 0.344326
+```
+
+下一优先级分布：
+
+```text
+weak_causal_path_expand: 18
+mlp_continue_path_causal_audit: 3
+side_effect_or_noncausal_path_recheck: 6
+```
+
+分模型完成度：
+
+```text
+deepseek7b: 0.400050
+GLM4: 0.386562
+qwen3: 0.371563
+```
+
+### 结果分析
+
+v5 的提升很小：
+
+```text
+mean delta: +0.024103
+```
+
+这是合理的，因为 Phase298 只提供 weak causal support，没有 strong causal support。
+
+这一点非常重要：
+
+```text
+当前算法没有把弱证据包装成强闭合。
+```
+
+### 当前进度
+
+```text
+language_pattern_family_atlas: 78%
+sample_type_coverage: 70%
+large_data_feature_mining: 66%
+physical_distribution_puzzle: 72%
+mechanism_causal_audit: 50%
+closure: 21%
+```
+
+### 阶段结论
+
+Phase299 改进了特征分析算法，但没有虚增闭合。
+
+最可靠结论：
+
+```text
+MLP continuation path 已经有弱因果证据；
+但强因果证据仍为 0；
+下一步不能继续只做线性 MLP patch。
+```
+
+## Phase 300: 语言模式族图谱 v3 候选合成 [2026-07-09 08:51]
+
+### 任务背景
+
+用户要求系统完成语言模式族图谱，不要每次只做小功能。
+
+因此 Phase300 将已有四层证据合成为 Pattern Atlas v3 candidate（模式图谱第三版候选）：
+
+```text
+行为层: Phase294
+读出竞争层: Phase294
+组件路径层: Phase296
+因果审计层: Phase298
+特征矩阵层: Phase299
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase300_pattern_atlas_v3_candidate_synthesis.py
+tests/gpt5/run_phase300_pattern_atlas_v3_candidate_synthesis.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase300_pattern_atlas_v3_cell_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase300_pattern_atlas_v3_node_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase300_pattern_atlas_v3_edge_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase300_pattern_atlas_v3_summary.json
+```
+
+### 合成公式
+
+单元证据完整度：
+
+$$
+EvidenceCompleteness =
+\frac{
+I_{behavior}+I_{readout}+I_{component}+I_{causal}
+}{4}
+$$
+
+物理路径置信度：
+
+$$
+PhysicalPathConfidence =
+0.30 \cdot EvidenceCompleteness
++ 0.25 \cdot MLPDominance
++ 0.15 \cdot AttentionDominance
++ 0.20 \cdot CausalSupport
++ 0.10 \cdot (1 - WinnerFlip)
+$$
+
+闭合缺口：
+
+$$
+ClosureGap =
+1 -
+\left(
+0.25 \cdot PatternScore
++ 0.20 \cdot StopRate
++ 0.25 \cdot WinnerFlip
++ 0.30 \cdot EvidenceCompleteness
+\right)
+$$
+
+### 客观结果
+
+```text
+cell_rows: 27
+node_rows: 12
+edge_rows: 27
+behavior_rows: 972
+readout_rows: 972
+component_rows: 27
+causal_rows: 72
+mean_atlas_completion_v5: 0.386058
+mean_physical_path_confidence: 0.749074
+mean_closure_gap: 0.597737
+```
+
+图谱状态：
+
+```text
+partial_physical_path: 27/27
+```
+
+下一优先级：
+
+```text
+search_stop_source_path: 15
+fill_component_or_causal_evidence: 3
+stronger_causal_intervention_design: 7
+protocol_pattern_failure_analysis: 2
+```
+
+### 结果分析
+
+本阶段完成了一个重要系统升级：
+
+```text
+语言模式族图谱已经从散乱阶段结果，进入 cell/node/edge 可视化图谱结构。
+```
+
+但它没有完成闭合：
+
+```text
+mean_closure_gap: 0.597737
+winner flip: 0
+stop source path: 未定位
+```
+
+所以当前最准确说法是：
+
+```text
+语言模式族图谱 v3 candidate 已形成；
+物理路径拼图已经有较强轮廓；
+机制闭合仍远未完成。
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1134 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响数据读取。
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式族图谱整体进度: 80%
+样本类型覆盖进度: 70%
+大数据特征挖掘进度: 68%
+物理分布拼图进度: 74%
+机制因果审计进度: 52%
+闭合进度: 21%
+```
+
+### 严格审视
+
+硬伤：
+
+1. 当前因果证据只有 weak support。
+
+```text
+winner_changed = 0/72
+```
+
+2. 当前图谱主要解释 continuation path。
+
+```text
+stop source path 仍没有自然物理来源。
+```
+
+3. 组件路径样本仍少。
+
+```text
+behavior/readout: 972 rows
+component: 27 rows
+causal: 72 rows
+```
+
+4. 当前 patch 是线性缩放，可能不符合真实非线性运行机制。
+
+5. 当前测试模型是小模型，内部结构粗糙可能导致 30%-50% 偏差。
+
+### 智能理论角度的关键洞察
+
+语言模式族图谱目前显示：
+
+```text
+语言不是单一语义向量；
+也不是单一停止符号；
+而是多个模式族在读出层竞争，
+并由 MLP/Attention/Residual 等物理路径共同塑造输出轨迹。
+```
+
+当前最重要的第一性原理不是闭合公式，而是：
+
+```text
+先找到模式族在网络中的物理分布；
+再找到模式族之间如何竞争、复用、漂移；
+最后才尝试闭合。
+```
+
+### 下一阶段大任务
+
+下一阶段仍属于同一大阶段：完成语言模式图谱的物理分布拼图。
+
+不要继续只做单点 patch，应进入系统化任务：
+
+```text
+Phase301-305:
+  stop source path 搜索。
+  目标：找到与停止、边界、答案完成、协议结束相关的自然物理路径。
+
+Phase306-310:
+  扩大 component path coverage。
+  目标：把 27 条组件路径扩展到至少 81 条，覆盖 9 个模式族 x 3 模型 x 多 variant。
+
+Phase311-315:
+  非线性因果干预设计。
+  目标：不要只缩放 MLP，而是测试层间组合、attention+MLP 联合路径、窗口位置路径。
+
+Phase316-320:
+  Pattern Atlas v4。
+  目标：把 behavior/readout/component/causal/stop-source 五层证据合成新版图谱。
+```
+
+### 阶段结论
+
+本轮完成了用户要求中的核心部分：
+
+```text
+加大了关键样本数量；
+完成了跨 qwen3、GLM4、DS7B 的顺序 CUDA 测试；
+改进了特征分析算法；
+生成了固定格式图谱数据；
+合成了语言模式族图谱 v3 candidate；
+前端数据已同步并构建通过。
+```
+
+但还不能说完成语言编码机制破解。
+
+当前最可靠结论：
+
+```text
+语言模式族图谱已经形成可视化候选；
+MLP continuation path 是稳定物理主干之一；
+stop path 和非线性闭合机制仍是最大瓶颈；
+下一阶段第一优先级是 stop source path，而不是继续线性 patch。
+```
+
+## Phase 301: 语义复用-差分图谱样本库 [2026-07-09 14:45]
+
+### 对附件判断的分析
+
+附件中关于 Phase290-300 的总体判断基本正确。
+
+正确部分：
+
+```text
+当前路线已经从机制优先，转向大数据图谱特征优先；
+Pattern Atlas v3 candidate 已形成，但不是闭合；
+MLP continuation path 只有弱因果支持，不能当作完整控制机制；
+stop source path、非线性机制和跨模型泛化仍是最大瓶颈；
+语义复用-差分机制应该成为独立重点方向。
+```
+
+需要修正的部分：
+
+```text
+语义复用-差分不能只靠理论特征表；
+必须做跨模型行为/读出实测；
+并且要防止“两个对象都答不好，所以表现相似”被误判为高复用。
+```
+
+因此本轮把附件建议落成一个新子图谱方向：
+
+```text
+Semantic Reuse-Delta Atlas（语义复用-差分图谱）
+```
+
+它仍属于当前大阶段：
+
+```text
+第一优先级：完成语言模式图谱的物理分布拼图；
+第二优先级：在高质量图谱基础上尝试闭合。
+```
+
+### 脚本
+
+```text
+tests/gpt5/phase301_semantic_reuse_delta_case_bank.py
+tests/gpt5/run_phase301_semantic_reuse_delta_case_bank.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase301_semantic_object_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase301_semantic_attribute_case_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase301_semantic_contrast_case_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase301_semantic_full_test_plan_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase301_semantic_reuse_delta_case_bank_summary.json
+```
+
+### 样本设计
+
+对象库：
+
+```text
+20 objects:
+  15 个水果；
+  2 个非水果食物/植物对象；
+  3 个非食物控制对象。
+```
+
+属性任务：
+
+```text
+category
+subclass
+color
+shape
+taste
+texture
+part
+use
+```
+
+对比任务：
+
+```text
+shared backbone:
+  orange-lemon, lemon-lime, apple-pear, strawberry-blueberry, banana-mango
+
+difference:
+  apple-banana, orange-lemon, banana-apple, fruit-chair
+```
+
+### 客观结果
+
+```text
+object_rows: 20
+attribute_case_rows: 160
+contrast_case_rows: 9
+full_test_plan_rows: 507
+models: qwen3, GLM4, DS7B
+```
+
+### 核心公式
+
+对象语义复用-差分公式：
+
+$$
+\mathrm{Sem}(x \mid c)
+=
+S_{\mathrm{shared}}(x)
++ \Delta_{\mathrm{id}}(x)
++ \Delta_{\mathrm{attr}}(x \mid c)
++ \Delta_{\mathrm{rel}}(x \mid c)
++ \Delta_{\mathrm{use}}(x \mid c)
+$$
+
+水果共享主干：
+
+$$
+S_{\mathrm{fruit}}
+=
+S_{\mathrm{entity}}
++ S_{\mathrm{plant}}
++ S_{\mathrm{food}}
++ S_{\mathrm{fruit-category}}
+$$
+
+水果差分：
+
+$$
+\Delta_{\mathrm{fruit}}(x)
+=
+\Delta_{\mathrm{color}}(x)
++ \Delta_{\mathrm{shape}}(x)
++ \Delta_{\mathrm{taste}}(x)
++ \Delta_{\mathrm{texture}}(x)
++ \Delta_{\mathrm{subclass}}(x)
++ \Delta_{\mathrm{use}}(x)
+$$
+
+### 阶段结论
+
+Phase301 完成了语义复用-差分子图谱的固定格式样本库。
+
+它不是模型测试，也不是理论闭合，而是为 Phase302/303 的实测和矩阵图谱提供对象、属性、对比三类基础数据。
+
+## Phase 302: 语义复用-差分跨模型行为/读出实测 [2026-07-09 14:45]
+
+### 脚本
+
+```text
+tests/gpt5/phase302_semantic_reuse_delta_behavior_readout_runner.py
+tests/gpt5/run_phase302_semantic_reuse_delta_behavior_readout.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase302_semantic_behavior_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase302_semantic_readout_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase302_semantic_rollout_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase302_cross_model_summary.json
+```
+
+### 测试设置
+
+```text
+qwen3: 169 rows
+GLM4: 169 rows
+DS7B: 169 rows
+total: 507 rows
+missing_rows: 0
+```
+
+三个模型按顺序在 CUDA 上运行，避免显存叠加。
+
+### 客观结果
+
+全局：
+
+```text
+behavior_rows: 507
+readout_rows: 507
+rollout_rows: 507
+missing_rows: 0
+answer_correct_proxy_rate: 0.325444
+pattern_matched_proxy_rate: 0.307692
+model_stop_executed_rate: 0.001972
+competition_winner:
+  continue: 418
+  stop: 89
+```
+
+分模型：
+
+```text
+qwen3:
+  answer_correct_proxy_rate: 0.325444
+  pattern_matched_proxy_rate: 0.301775
+  model_stop_executed_rate: 0.0
+  competition_winner:
+    continue: 169
+
+GLM4:
+  answer_correct_proxy_rate: 0.473373
+  pattern_matched_proxy_rate: 0.443787
+  model_stop_executed_rate: 0.0
+  competition_winner:
+    stop: 74
+    continue: 95
+
+DS7B:
+  answer_correct_proxy_rate: 0.177515
+  pattern_matched_proxy_rate: 0.177515
+  model_stop_executed_rate: 0.005917
+  competition_winner:
+    continue: 154
+    stop: 15
+```
+
+属性成功率：
+
+```text
+category: 0.766667
+color: 0.516667
+taste: 0.500000
+part: 0.333333
+subclass: 0.200000
+shared contrast: 0.200000
+texture: 0.183333
+use: 0.100000
+shape: 0.083333
+difference contrast: 0.083333
+```
+
+### 结果分析
+
+最可靠正结果：
+
+```text
+共享类别主干最强；
+颜色和味道属性相对稳定；
+用途、形状、对比差分明显更弱。
+```
+
+这支持附件中的核心判断：
+
+```text
+语义不是单一对象向量；
+而是共享主干 + 属性差分 + 上下文路由。
+```
+
+最重要的负结果：
+
+```text
+difference contrast 成功率只有 0.083333；
+use 成功率只有 0.100000；
+shape 成功率只有 0.083333。
+```
+
+这说明对象差分和关系/用途差分比类别主干更难稳定激活。
+
+另一个重要现象：
+
+```text
+GLM4 出现 74/169 stop winner；
+但 model_stop_executed_rate = 0。
+```
+
+这再次说明：
+
+```text
+读出停止 != 生成停止。
+```
+
+### 硬伤
+
+1. 别名表仍偏窄。
+
+例如 shape、use、texture 任务可能有多个合理答案，但当前评分只覆盖少量目标词。
+
+2. 小模型偏差明显。
+
+DS7B 在语义属性任务上 target rank 很差，可能是模型能力和提示格式共同造成。
+
+3. 当前仍是行为/读出层。
+
+没有定位语义属性在 attention、MLP、residual 中的物理路径。
+
+## Phase 303: 语义复用-差分矩阵图谱 [2026-07-09 14:45]
+
+### 脚本
+
+```text
+tests/gpt5/phase303_semantic_reuse_delta_atlas.py
+tests/gpt5/run_phase303_semantic_reuse_delta_atlas.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase303_semantic_object_summary_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase303_semantic_reuse_matrix_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase303_semantic_delta_matrix_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase303_semantic_attribute_path_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase303_semantic_family_cluster_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase303_semantic_reuse_delta_atlas_summary.json
+```
+
+### 结果
+
+```text
+object_summary_rows: 20
+reuse_matrix_rows: 190
+delta_matrix_rows: 190
+attribute_path_rows: 30
+cluster_rows: 10
+behavior_rows: 507
+readout_rows: 507
+mean_attribute_success_rate: 0.321667
+mean_measured_reuse_score: 0.697758
+mean_theoretical_reuse_score: 0.247345
+mean_delta_score: 0.549969
+high_reuse_pair_count: 25
+high_delta_pair_count: 32
+```
+
+自然出现的高复用对：
+
+```text
+lemon-lime
+orange-lemon
+orange-lime
+strawberry-blueberry
+banana-mango
+banana-pineapple
+apple-pear
+```
+
+自然出现的高差分对：
+
+```text
+fruit / non-fruit controls:
+  blueberry-stone
+  lemon-chair
+  lemon-knife
+  strawberry-stone
+  grape-chair
+  grape-knife
+  orange-stone
+```
+
+### 问题发现
+
+Phase303 暴露了一个算法硬伤：
+
+```text
+measured_reuse_score 太粗；
+如果两个对象都答不好，它们的答题表现也可能相似；
+这会造成假高复用。
+```
+
+例如：
+
+```text
+pear-watermelon
+banana-blueberry
+```
+
+这类 pair 不应该因为答题表现相似就被过度解释为共享语义主干。
+
+因此需要立刻进入 Phase304 修正算法。
+
+## Phase 304: 语义复用-差分算法 v2 修正 [2026-07-09 14:45]
+
+### 脚本
+
+```text
+tests/gpt5/phase304_semantic_reuse_delta_algorithm_v2.py
+tests/gpt5/run_phase304_semantic_reuse_delta_algorithm_v2.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase304_semantic_reuse_matrix_v2_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase304_semantic_reuse_false_high_audit_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase304_semantic_reuse_delta_algorithm_v2_summary.json
+```
+
+### 算法修正
+
+v1 的粗公式：
+
+$$
+Reuse_{v1}
+=
+0.55 \cdot Reuse_{theory}
++ 0.45 \cdot Reuse_{measured}
+$$
+
+问题是 measured reuse 会受低质量答题共同失败影响。
+
+v2 引入 evidence quality（证据质量）：
+
+$$
+Q(x,y)
+=
+\frac{
+Success(x)+Success(y)
+}{2}
+$$
+
+动态权重：
+
+$$
+w_{measured}
+=
+0.20 + 0.25 \cdot Q(x,y)
+$$
+
+$$
+w_{theory}
+=
+1 - w_{measured}
+$$
+
+类别/子类约束：
+
+$$
+Reuse_{v2}
+=
+w_{theory} \cdot Reuse_{theory}
++ w_{measured} \cdot Reuse_{measured}
++ B_{category}
++ B_{subclass}
+$$
+
+其中：
+
+$$
+B_{category} =
+\begin{cases}
+0.10, & same category \\
+-0.10, & different category
+\end{cases}
+$$
+
+$$
+B_{subclass} =
+\begin{cases}
+0.12, & same subclass \\
+0, & otherwise
+\end{cases}
+$$
+
+差分：
+
+$$
+Delta_{v2}
+=
+1 - Reuse_{v2}
+$$
+
+### 客观结果
+
+```text
+input_reuse_rows: 190
+corrected_reuse_rows: 190
+audit_rows: 5
+mean_reuse_v1: 0.450031
+mean_corrected_reuse_v2: 0.391870
+mean_corrected_delta_v2: 0.608130
+likely_shared_backbone_count: 41
+semantic_relation_counts:
+  category_shared_backbone: 87
+  subclass_shared_backbone: 14
+  contrast_control: 84
+  ambiguous_or_needs_more_evidence: 5
+```
+
+修正后的 top reuse 更合理：
+
+```text
+lemon-lime: 0.915689
+orange-lime: 0.840676
+mango-pineapple: 0.838937
+peach-cherry: 0.818398
+orange-lemon: 0.804938
+strawberry-blueberry: 0.799011
+banana-mango: 0.763360
+banana-pineapple: 0.757697
+apple-pear: 0.726202
+mango-kiwi: 0.723466
+```
+
+### 分析
+
+Phase304 说明：
+
+```text
+语义复用不能只用行为相似度；
+必须加入对象特征、类别/子类约束和证据质量。
+```
+
+这和当前大路线一致：
+
+```text
+不要轻易用高级统计包装结果；
+先把客观拼图和明显错误校准做好。
+```
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式族图谱整体进度: 81%
+语义复用-差分子图谱进度: 38%
+样本类型覆盖进度: 72%
+大数据特征挖掘进度: 71%
+物理分布拼图进度: 75%
+机制因果审计进度: 52%
+闭合进度: 21%
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1155 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响数据读取。
+
+### 严格结论
+
+本轮完成了一个新的语义子图谱雏形：
+
+```text
+水果 / 非水果对象库；
+属性任务库；
+对比任务库；
+三模型行为/读出实测；
+语义复用矩阵；
+语义差分矩阵；
+语义簇；
+复用算法 v2 修正。
+```
+
+最可靠结论：
+
+```text
+category 主干最稳定；
+color/taste 属性较稳定；
+shape/use/contrast difference 差分很弱；
+柑橘、浆果、热带、树果等子类主干能在修正算法后自然显现；
+语义复用-差分方向值得继续推进。
+```
+
+不能过度解释的地方：
+
+```text
+当前是 behavior/readout semantic atlas；
+还不是 internal semantic component path atlas；
+不能说已经破解水果语义在网络内部的物理路径。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于同一大阶段。
+
+建议任务：
+
+```text
+Phase305:
+  扩大语义别名表和属性答案集合，降低 shape/use/texture 的假阴性。
+
+Phase306:
+  对 high shared backbone pairs 做内部组件路径探针。
+  重点对象：lemon-lime, orange-lemon, apple-pear, banana-mango。
+
+Phase307:
+  对 high delta control pairs 做内部组件路径探针。
+  重点对象：fruit/non-fruit, citrus/tool, berry/mineral。
+
+Phase308:
+  把语义子图谱接回 Pattern Atlas v4。
+```
+
+### 阶段结论
+
+附件提出的“水果之间如何复用和差分”方向是正确的。
+
+但它应该按当前研究原则推进：
+
+```text
+先建语义图谱；
+再做实测校准；
+再做内部路径；
+最后才谈机制闭合。
+```
+
+本轮已经完成前两步，并完成了第一版算法校准。
+
+## Phase 305: 内部语义物理路径图谱定位 [2026-07-09 16:11]
+
+### 对附件判断的分析
+
+附件关于 Phase301-304 的判断总体正确：
+
+```text
+Phase301-304 已经把研究从输出路径、继续通道、停止瓶颈，
+推进到语义知识网络的复用-差分结构。
+```
+
+最关键的正确点是：
+
+```text
+当前已经不能只看对象行为相似、答案读出相似、复用矩阵和差分矩阵；
+必须进入内部语义物理路径定位。
+```
+
+但需要谨慎修正：
+
+```text
+附件提出 object token / query token / answer readout 三位置追踪是正确目标；
+本阶段先完成 answer readout position（答案读出位置）的层/组件语义路径定位；
+object token 和 query token 路径还没有完成。
+```
+
+因此本阶段是：
+
+```text
+internal semantic physical path probe v1
+内部语义物理路径探针第一版
+```
+
+不是完整语义编码闭合。
+
+### 脚本
+
+```text
+tests/gpt5/phase305_internal_semantic_physical_path_probe.py
+tests/gpt5/run_phase305_internal_semantic_physical_path_probe.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase305_semantic_component_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase305_semantic_component_summary_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase305_cross_model_summary.json
+```
+
+### 测试设置
+
+从 Phase304 的语义复用-差分图谱中选择 high shared backbone（高共享主干）和 contrast control（对比控制）相关样本。
+
+每个模型：
+
+```text
+12 semantic cases
+```
+
+三模型：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+总计：
+
+```text
+semantic_component_summary_rows: 36
+semantic_component_rows: 1248
+missing_rows: 0
+```
+
+### 算法原理
+
+对每条语义样本构造 target semantic group（目标语义组）和 distractor semantic group（干扰语义组）。
+
+例如：
+
+```text
+category:
+  target = fruit
+  distractor = vegetable / tool / furniture / mineral
+
+color:
+  target = yellow
+  distractor = red / green / orange / blue / purple
+
+taste:
+  target = sour
+  distractor = sweet / bitter / starchy
+```
+
+语义读出边界：
+
+$$
+M_{\mathrm{semantic}}
+=
+\max z(\mathrm{target\ group})
+-
+\max z(\mathrm{distractor\ group})
+$$
+
+每层分解：
+
+$$
+h_l
+=
+h_{l-1}
++ A_l
++ M_l
++ R_l
+$$
+
+其中：
+
+```text
+A_l: attention output
+M_l: MLP output
+R_l: residual carry / unmodeled carry
+```
+
+组件贡献：
+
+$$
+\Delta_{\mathrm{attn}}^{(l)}
+=
+M_{\mathrm{semantic}}(h_{l-1}+A_l)
+-
+M_{\mathrm{semantic}}(h_{l-1})
+$$
+
+$$
+\Delta_{\mathrm{mlp}}^{(l)}
+=
+M_{\mathrm{semantic}}(h_{l-1}+A_l+M_l)
+-
+M_{\mathrm{semantic}}(h_{l-1}+A_l)
+$$
+
+$$
+\Delta_{\mathrm{residual}}^{(l)}
+=
+M_{\mathrm{semantic}}(h_l)
+-
+M_{\mathrm{semantic}}(h_{l-1}+A_l+M_l)
+$$
+
+### 客观结果
+
+全局：
+
+```text
+semantic_component_rows: 1248
+semantic_component_summary_rows: 36
+missing_rows: 0
+final_semantic_winner:
+  target: 21
+  distractor: 15
+dominant_positive_semantic_component:
+  MLP: 23
+  attention: 13
+mean_final_semantic_margin: 1.243056
+mean_sum_positive_attn_semantic_delta: 22.174643
+mean_sum_positive_mlp_semantic_delta: 18.608308
+mean_sum_positive_residual_semantic_delta: 0.189424
+```
+
+分模型：
+
+```text
+qwen3:
+  target: 8
+  distractor: 4
+  dominant component:
+    attention: 10
+    MLP: 2
+  mean_final_semantic_margin: 1.583333
+  mean_attn_delta: 44.893168
+  mean_mlp_delta: 23.318015
+
+GLM4:
+  target: 9
+  distractor: 3
+  dominant component:
+    MLP: 10
+    attention: 2
+  mean_final_semantic_margin: 2.411458
+  mean_attn_delta: 17.396070
+  mean_mlp_delta: 21.280244
+
+DS7B:
+  target: 4
+  distractor: 8
+  dominant component:
+    MLP: 11
+    attention: 1
+  mean_final_semantic_margin: -0.265625
+  mean_attn_delta: 4.234691
+  mean_mlp_delta: 11.226664
+```
+
+### 结果分析
+
+最重要的进展：
+
+```text
+语义路径和 continuation path 不完全相同。
+```
+
+此前 continuation path 中 MLP 是更稳定的主干。但 Phase305 显示：
+
+```text
+qwen3 的语义路径更偏 attention；
+GLM4 / DS7B 的语义路径更偏 MLP；
+residual 正向贡献很小。
+```
+
+这说明：
+
+```text
+语义知识网络可能更依赖 attention route + MLP write 的组合；
+不能直接把 MLP continuation path 当作语义编码主干。
+```
+
+### 硬伤
+
+1. 只追踪 last position。
+
+```text
+object token position 未追踪；
+query token position 未追踪。
+```
+
+2. 没有因果审计。
+
+```text
+当前是 observational component attribution；
+不是 causal patch。
+```
+
+3. distractor set 仍手工构造。
+
+语义候选集合仍需要更完整的 alias / distractor 表。
+
+4. 样本量仍小。
+
+```text
+内部语义路径样本: 36
+行为/读出语义样本: 507
+```
+
+### 阶段结论
+
+Phase305 完成了内部语义物理路径第一版定位。
+
+当前可靠结论：
+
+```text
+语义路径已经出现可测的 attention/MLP 分解；
+类别、颜色、味道等语义边界可在层组件上追踪；
+但还没有完成对象 token / 查询 token / 答案读出三位置路径闭合。
+```
+
+## Phase 306: 语义物理路径子图谱更新 [2026-07-09 16:11]
+
+### 脚本
+
+```text
+tests/gpt5/phase306_semantic_physical_path_atlas_update.py
+tests/gpt5/run_phase306_semantic_physical_path_atlas_update.sh
+```
+
+### 输出文件
+
+```text
+tests/result/pattern_family_atlas/v2/phase306_semantic_physical_path_cell_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase306_semantic_attribute_atlas_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase306_semantic_physical_path_atlas_summary.json
+```
+
+### 合成目标
+
+把 Phase305 的 36 条内部路径样本合成：
+
+```text
+model-attribute path cell
+attribute-level semantic atlas
+```
+
+### 评分公式
+
+语义物理路径分数：
+
+$$
+Score_{\mathrm{semantic\ path}}
+=
+0.30 \cdot TargetWinnerRate
++ 0.25 \cdot NormAttnDelta
++ 0.25 \cdot NormMLPDelta
++ 0.20 \cdot BehaviorSuccess
+$$
+
+其中：
+
+$$
+NormAttnDelta = \min \left( \frac{\Delta_{\mathrm{attn}}^+}{25}, 1 \right)
+$$
+
+$$
+NormMLPDelta = \min \left( \frac{\Delta_{\mathrm{mlp}}^+}{25}, 1 \right)
+$$
+
+### 客观结果
+
+```text
+semantic_component_rows: 1248
+semantic_component_summary_rows: 36
+semantic_path_cell_rows: 21
+semantic_attribute_atlas_rows: 7
+mean_semantic_physical_path_score: 0.563390
+mean_final_target_winner_rate: 0.547619
+dominant_component:
+  MLP: 15
+  attention: 6
+```
+
+属性级下一步：
+
+```text
+expand_object_query_position_trace: 4
+contrast_delta_path_followup: 1
+expand_alias_and_distractor_calibration: 2
+```
+
+模型-属性局部结果：
+
+```text
+category:
+  qwen3 score 0.970000, dominant attention
+  GLM4 score 0.948372, dominant MLP
+  DS7B score 0.409645, dominant MLP
+
+color:
+  qwen3 score 0.837062, dominant MLP
+  GLM4 score 0.825491, dominant MLP
+  DS7B score 0.520230, dominant MLP
+
+taste:
+  qwen3 score 0.900000, dominant attention
+  GLM4 score 0.816100, dominant attention
+  DS7B score 0.270120, dominant MLP
+
+use:
+  qwen3 score 0.510000, final target winner 0.0
+  GLM4 score 0.309976, final target winner 0.0
+  DS7B score 0.128306, final target winner 0.0
+```
+
+### 结果分析
+
+最可靠的语义路径拼图：
+
+```text
+category / color / taste 是当前最强语义物理路径候选；
+use / shared / subclass 在部分模型上仍弱；
+difference 对比差分仍不稳定；
+DS7B 的语义 target winner 明显弱于 qwen3 和 GLM4。
+```
+
+一个关键洞察：
+
+```text
+语义共享主干和对象差分并不等价。
+```
+
+category 是共享主干，路径最稳定；
+color/taste 是属性差分，部分稳定；
+use/difference 是关系和对比差分，明显更弱。
+
+这和 Phase302 行为层结果一致，说明不是单纯读出噪声。
+
+### 当前进度
+
+只根据当前进展估计：
+
+```text
+语言模式族图谱整体进度: 82%
+语义复用-差分子图谱进度: 43%
+语义内部物理路径进度: 22%
+样本类型覆盖进度: 72%
+大数据特征挖掘进度: 72%
+物理分布拼图进度: 76%
+机制因果审计进度: 52%
+闭合进度: 21%
+```
+
+### 前端同步
+
+```text
+npm run sync:pattern-atlas:v2
+Synced 1163 pattern atlas v2 files
+
+npm run build
+build passed
+```
+
+仍有 Vite chunk size warning，不影响图谱数据读取。
+
+### 严格结论
+
+本轮完成了附件提出的下一步核心任务的一部分：
+
+```text
+从语义行为/读出图谱
+推进到内部语义组件路径图谱。
+```
+
+但还没有完成附件中的完整目标：
+
+```text
+object token path: 未完成
+query token path: 未完成
+answer readout path: 已完成第一版
+shared backbone subspace: 未完成
+attribute delta subspace: 未完成
+causal validation: 未完成
+```
+
+### 下一阶段任务
+
+下一阶段仍属于同一大阶段，应继续自动推进：
+
+```text
+Phase307:
+  object/query/last 三位置语义路径追踪。
+
+Phase308:
+  high shared backbone pairs 的对象 token 复用路径定位。
+  重点: lemon-lime, orange-lemon, apple-pear, banana-mango。
+
+Phase309:
+  high delta control pairs 的差分路径定位。
+  重点: fruit/non-fruit, citrus/tool, berry/mineral。
+
+Phase310:
+  语义子图谱接回 Pattern Atlas v4。
+```
+
+### 阶段结论
+
+附件方向正确，但必须谨慎推进。
+
+当前最可靠结论：
+
+```text
+语义物理路径已能在 attention/MLP 层组件中观察；
+category/color/taste 的路径最清楚；
+use/difference/shared/subclass 仍需要更强别名表和三位置追踪；
+语义编码机制还没有闭合，但物理分布拼图已经开始进入内部层级。
+```
+
+## Phase 307: 三位置语义路径追踪 [2026-07-09 16:28]
+
+### 任务判断
+
+附件中对 Phase305/306 的判断基本正确。Phase305/306 已经把语义复用-差分方向推进到内部物理路径层，但它主要观察 answer readout position（答案读出位置），还没有回答一个关键问题：
+
+```text
+语义关系是在 object token（对象词元）写入，
+在 query token（查询词元）重组，
+还是只在 last token（最后词元）读出？
+```
+
+因此继续做三位置追踪是合理的，不应直接进入闭合。当前线性闭合公式仍不足以模拟真实机制，第一优先级仍是完成语言模式图谱的物理分布拼图。
+
+### 测试脚本和数据
+
+新增脚本：
+
+```text
+tests/gpt5/phase307_three_position_semantic_path_trace.py
+tests/gpt5/run_phase307_three_position_semantic_path_trace.sh
+```
+
+测试模型按顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+输出文件：
+
+```text
+tests/result/pattern_family_atlas/v2/phase307_three_position_component_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase307_three_position_summary_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase307_cross_model_summary.json
+```
+
+### 测试原理
+
+本阶段保持 Phase305/306 的 target（目标对象）和 distractor（干扰对象）语义边界，但把位置拆成三类：
+
+```text
+object position: 对象词元位置
+query position: 查询词元位置
+last position: 答案读出前最后位置
+```
+
+核心观测量为组件投影边际：
+
+$$
+M_{c,p,l}^{attn}
+=
+\left\langle A_{c,p,l}, v_{target} - v_{distractor} \right\rangle
+$$
+
+$$
+M_{c,p,l}^{mlp}
+=
+\left\langle F_{c,p,l}, v_{target} - v_{distractor} \right\rangle
+$$
+
+$$
+M_{c,p,l}^{resid}
+=
+\left\langle R_{c,p,l}, v_{target} - v_{distractor} \right\rangle
+$$
+
+其中：
+
+```text
+c: case（测试样本）
+p: position（位置）
+l: layer（层）
+A: attention 输出
+F: MLP 输出
+R: residual hidden state（残差隐藏态）
+v_target - v_distractor: 目标-干扰读出差分方向
+```
+
+三位置路径可写成：
+
+$$
+\mathcal{P}_{semantic}(x)
+=
+\left[
+T_{object}(x),
+T_{query}(x),
+T_{last}(x)
+\right]
+$$
+
+其中每个位置的局部路径为：
+
+$$
+T_p(x)
+=
+\left\{
+M_{p,l}^{attn},
+M_{p,l}^{mlp},
+M_{p,l}^{resid}
+\right\}_{l=1}^{L}
+$$
+
+### 客观结果
+
+总量：
+
+```text
+three_position_component_rows: 3744
+three_position_summary_rows: 108
+missing_rows: 0
+position_counts:
+  object: 36
+  query: 36
+  last: 36
+attribute_counts:
+  category: 18
+  color: 18
+  difference: 18
+  shared: 18
+  subclass: 18
+  taste: 9
+  use: 9
+dominant_component_counts:
+  MLP: 90
+  attention: 18
+```
+
+三位置平均组件强度：
+
+```text
+position_mean_attn_delta:
+  last: 22.174643
+  object: 9.083975
+  query: 9.057919
+
+position_mean_mlp_delta:
+  query: 19.453018
+  object: 19.224558
+  last: 18.608308
+
+position_mean_residual_delta:
+  last: 0.189424
+  object: 0.189018
+  query: 0.168942
+```
+
+跨模型摘要：
+
+```text
+qwen3:
+  rows: 36
+  final_target_winner_count: 18
+  final_distractor_winner_count: 18
+  dominant_component_counts: MLP 24 / attention 12
+  mean_attn_delta: 21.796431
+  mean_mlp_delta: 22.802338
+
+GLM4:
+  rows: 36
+  final_target_winner_count: 20
+  final_distractor_winner_count: 16
+  dominant_component_counts: MLP 33 / attention 3
+  mean_attn_delta: 11.983748
+  mean_mlp_delta: 18.663619
+
+DS7B:
+  rows: 36
+  final_target_winner_count: 12
+  final_distractor_winner_count: 24
+  dominant_component_counts: MLP 33 / attention 3
+  mean_attn_delta: 6.536358
+  mean_mlp_delta: 15.819926
+```
+
+### 结果分析
+
+最稳定的客观现象：
+
+```text
+object/query 位置明显偏 MLP-dominant（MLP 主导）；
+last 位置 attention 强度明显上升；
+qwen3 的 last position attention 路径最突出；
+GLM4 和 DS7B 更偏 MLP 全路径；
+DS7B 的 final winner 明显偏 distractor，说明小模型语义边界更粗糙。
+```
+
+这说明语义路径不是简单的单点读出，而更像：
+
+```text
+对象/查询阶段: MLP 写入或重组语义特征；
+最后读出阶段: attention 可能参与答案路由或关系选择；
+最终输出: residual/logit readout 汇合。
+```
+
+但这仍然不是闭合，只是把语义模式图谱从 answer readout position 扩展到 object/query/last 三位置物理分布。
+
+### 问题和硬伤
+
+1. object/query 位置通过 tokenizer subsequence（词元子序列）定位，复杂分词情况下可能有误差。
+2. 当前只做观测追踪，没有做三位置 causal patch（因果补丁）。
+3. 样本仍集中于 Phase301 的语义对象库，数量比行为图谱小。
+4. target-distractor 差分方向仍是线性投影，可能无法模拟真实非线性运行机制。
+5. 小模型内部编码可能粗糙，尤其 DS7B 的 distractor 偏置不能直接外推到大模型语言机制。
+
+### 阶段结论
+
+Phase307 正确推进了语义物理路径图谱：
+
+```text
+语义关系不是只在最后词元出现；
+object/query/last 三位置都有可测组件差异；
+object/query 更像语义写入或局部重组；
+last 更像答案路由或读出聚合；
+MLP 是主干，attention 在最后位置可能承担路由角色。
+```
+
+## Phase 308: 三位置语义图谱合成 [2026-07-09 16:28]
+
+### 任务判断
+
+Phase307 产生的是逐层、逐组件、逐位置的原始观测数据。为了让语言模式图谱客户端和后续研究使用，需要把结果合成为固定格式的 atlas cell（图谱单元）和 route row（路径行）。因此 Phase308 属于同一阶段的必要自动延续。
+
+### 新增脚本和输出
+
+新增脚本：
+
+```text
+tests/gpt5/phase308_three_position_semantic_atlas_update.py
+tests/gpt5/run_phase308_three_position_semantic_atlas_update.sh
+```
+
+输出文件：
+
+```text
+tests/result/pattern_family_atlas/v2/phase308_three_position_semantic_position_cell_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase308_three_position_semantic_attribute_cell_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase308_three_position_semantic_route_rows.jsonl
+tests/result/pattern_family_atlas/v2/phase308_three_position_semantic_atlas_summary.json
+```
+
+并同步到可视化客户端：
+
+```text
+frontend/public/vis_data/pattern_family_atlas/v2/
+```
+
+客户端构建结果：
+
+```text
+npm run sync:pattern-atlas:v2: success
+npm run build: success
+```
+
+### 合成公式
+
+位置路径得分：
+
+$$
+S_{model,position}
+=
+\alpha \cdot W_{target}
++ \beta \cdot D_{component}
++ \gamma \cdot R_{confidence}
++ \delta \cdot C_{coverage}
+$$
+
+其中：
+
+```text
+W_target: target winner rate（目标胜出率）
+D_component: dominant component strength（主导组件强度）
+R_confidence: readout confidence（读出置信）
+C_coverage: coverage completeness（覆盖完整度）
+```
+
+模型路径类型：
+
+$$
+Route(model)
+=
+\arg\max_{component}
+\left[
+S_{object},
+S_{query},
+S_{last}
+\right]
+$$
+
+本阶段只作为图谱合成指标，不作为闭合公式。
+
+### 客观结果
+
+总体结果：
+
+```text
+three_position_component_rows: 3744
+three_position_summary_rows: 108
+position_cell_rows: 9
+attribute_position_cell_rows: 21
+route_rows: 3
+dominant_component_counts:
+  MLP: 8
+  attention: 1
+mean_position_path_score: 0.599125
+route_type_counts:
+  mlp->mlp->mlp: 2
+  mlp->mlp->attention: 1
+```
+
+模型级位置图谱：
+
+```text
+qwen3:
+  object: MLP, score 0.635106
+  query: MLP, score 0.593230
+  last: attention, score 0.874949
+  route_type: mlp->mlp->attention
+
+GLM4:
+  object: MLP, score 0.547169
+  query: MLP, score 0.559889
+  last: MLP, score 0.785116
+  route_type: mlp->mlp->mlp
+
+DS7B:
+  object: MLP, score 0.550492
+  query: MLP, score 0.463139
+  last: MLP, score 0.383038
+  route_type: mlp->mlp->mlp
+```
+
+属性级现象：
+
+```text
+category:
+  last attention target_rate: 0.833333
+  object MLP target_rate: 1.000000
+  query MLP target_rate: 0.333333
+
+color:
+  last attention target_rate: 1.000000
+  object MLP target_rate: 0.833333
+  query MLP target_rate: 0.666667
+
+difference:
+  last attention target_rate: 0.500000
+  object MLP target_rate: 0.666667
+  query MLP target_rate: 0.000000
+```
+
+### 图谱进展
+
+更新后的进度估计：
+
+```text
+language_pattern_family_atlas: 0.83
+semantic_reuse_delta_subatlas: 0.46
+semantic_internal_physical_path: 0.30
+sample_type_coverage: 0.72
+feature_mining_coverage: 0.73
+physical_distribution_coverage: 0.77
+causal_audit_coverage: 0.52
+closure_validation: 0.21
+```
+
+这说明当前真正完成的是：
+
+```text
+语言模式图谱的物理分布拼图继续推进；
+语义子图谱从行为/读出进入三位置内部路径；
+闭合验证仍然较低，不应提前宣称完成机制公式。
+```
+
+### 理论进展
+
+当前更合理的语言模式族物理路径表述为：
+
+$$
+\mathcal{G}_{language}
+=
+\left(
+\mathcal{P}_{syntax},
+\mathcal{P}_{semantic},
+\mathcal{P}_{reasoning},
+\mathcal{P}_{stop},
+\mathcal{E}_{reuse},
+\mathcal{E}_{delta}
+\right)
+$$
+
+其中语义路径暂时应写成分布式路径，而不是单线性公式：
+
+$$
+\mathcal{P}_{semantic}
+=
+\left[
+\mathcal{W}_{object}^{MLP},
+\mathcal{W}_{query}^{MLP},
+\mathcal{R}_{last}^{Attention/MLP},
+\mathcal{O}_{logit}
+\right]
+$$
+
+解释：
+
+```text
+object MLP: 对象语义写入
+query MLP: 查询条件重组
+last attention/MLP: 答案路由或最终语义聚合
+logit output: 输出读出
+```
+
+这比“语义向量”或“单一方向”更接近真实现象，但仍然只是物理分布图谱，不是完整运行机制。
+
+### 严格审视
+
+当前结果的可信部分：
+
+```text
+三位置差异稳定存在；
+MLP 是 object/query 的主干；
+last position 的 attention 作用在 qwen3 中明显；
+不同小模型的路径形态不同，说明机制有模型结构依赖。
+```
+
+当前不能得出的结论：
+
+```text
+不能说 MLP 就是语义本体；
+不能说 attention 就是语义路由的唯一机制；
+不能说三位置路径已经闭合；
+不能用当前线性投影公式代替真实运行机制。
+```
+
+### 下一阶段任务
+
+下一步仍属于同一阶段，应继续自动推进，但目标应从“三位置定位”转向“语义复用-差分对子路径”：
+
+```text
+Phase309:
+  high shared backbone pairs 的 object/query/last 三位置复用路径定位。
+  重点对象:
+    lemon-lime
+    orange-lemon
+    apple-pear
+    banana-mango
+
+Phase310:
+  high delta control pairs 的 object/query/last 差分路径定位。
+  重点对象:
+    fruit/non-fruit
+    citrus/tool
+    berry/mineral
+
+Phase311:
+  把 shared backbone path 和 delta path 合并为语义子图谱 v3。
+```
+
+### 阶段结论
+
+Phase308 完成了 Phase307 的图谱化合成。当前语言模式图谱不再只是行为层图谱，也不只是最后读出层图谱，而开始形成：
+
+```text
+行为结果
+-> 读出竞争
+-> 内部组件
+-> token position 物理路径
+-> 语义复用/差分子图谱
+```
+
+总体判断：
+
+```text
+方向正确；
+结果不是闭合；
+物理分布拼图继续推进；
+下一步应继续做 shared backbone 和 delta control 的三位置路径，而不是回到单点 patch。
+```
+
+## Phase 309: 共享主干与差分对象对的三位置路径图谱 [2026-07-09 16:54]
+
+### 任务判断
+
+附件对 Phase307/308 的判断基本正确。Phase307/308 已经证明语义路径不是只在 last token（最后词元）读出，而是存在 object/query/last 三位置结构。但它仍有一个关键缺口：
+
+```text
+单对象三位置路径已经完成；
+对象对之间的 shared backbone（共享主干）和 delta control（差分控制）是否真的在内部路径上可区分，还没有完成。
+```
+
+因此本阶段继续推进到对象对路径矩阵，而不是追闭合。这个选择符合当前总路线：
+
+```text
+第一优先级: 完成各种语言模式族的物理分布拼图；
+第二优先级: 在高质量物理路径基础上尝试闭合。
+```
+
+### 新增脚本
+
+新增测试脚本：
+
+```text
+tests/gpt5/phase309_pair_three_position_reuse_delta_path_atlas.py
+tests/gpt5/run_phase309_pair_three_position_reuse_delta_path_atlas.sh
+```
+
+结果保存到新规则目录：
+
+```text
+tests/gpt5/result/phase309_pair_three_position_reuse_delta_path_atlas/
+tests/gpt5/result/pattern_family_atlas/v2/
+```
+
+同时为了兼容当前可视化客户端，也同步了一份到：
+
+```text
+tests/result/pattern_family_atlas/v2/
+frontend/public/vis_data/pattern_family_atlas/v2/
+```
+
+前端同步与构建：
+
+```text
+npm run sync:pattern-atlas:v2: success
+npm run build: success
+```
+
+构建只有 chunk size warning（包体积警告），不影响图谱数据读取。
+
+### 测试设计
+
+测试对象对分两类。
+
+高复用对象对：
+
+```text
+lemon-lime
+orange-lemon
+apple-pear
+banana-mango
+strawberry-blueberry
+```
+
+高差分对象对：
+
+```text
+apple-banana
+fruit-chair
+lemon-knife
+blueberry-stone
+orange-stone
+```
+
+属性类型：
+
+```text
+category
+subclass
+color
+taste
+use
+```
+
+测试规模：
+
+```text
+models: qwen3, GLM4, DS7B
+cases_per_model: 100
+total_object_attribute_traces: 300
+three_position_summary_rows: 900
+component_rows: 31200
+pair_path_rows: 150
+pair_matrix_rows: 1350
+missing_rows: 0
+```
+
+模型按顺序执行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+没有并行加载多个模型，避免 GPU 内存溢出。
+
+### 算法原理
+
+本阶段把 Phase307 的单对象路径：
+
+$$
+\mathcal{P}_{semantic}(x)
+=
+\left[
+T_{object}(x),
+T_{query}(x),
+T_{last}(x)
+\right]
+$$
+
+升级为对象对路径比较：
+
+$$
+\mathcal{P}_{pair}(x,y)
+=
+\left[
+Sim(T_{object}(x),T_{object}(y)),
+Sim(T_{query}(x),T_{query}(y)),
+Sim(T_{last}(x),T_{last}(y))
+\right]
+$$
+
+其中每个位置继续拆成 attention/MLP/residual 三类组件：
+
+$$
+T_p(x)
+=
+\left\{
+M_{p,l}^{attn},
+M_{p,l}^{mlp},
+M_{p,l}^{resid}
+\right\}_{l=1}^{L}
+$$
+
+路径复用指标：
+
+$$
+Reuse_{path}(x,y,p,c)
+=
+\frac{
+\cos(T_{p,c}(x),T_{p,c}(y)) + 1
+}{2}
+$$
+
+路径差分指标：
+
+$$
+Delta_{path}(x,y,p,c)
+=
+1 - Reuse_{path}(x,y,p,c)
+$$
+
+这里使用的是逐层组件 margin profile（边际轨迹）的相似度，不是最终机制公式。它的意义是基础物理分布探针：
+
+```text
+如果高复用对象对的路径相似度显著高于高差分对象对，
+说明 shared backbone / delta control 不只是行为标签，
+而是在内部三位置路径上也有可观察差异。
+```
+
+### Token Span 改进
+
+本阶段补充了 Phase307/308 的一个硬伤：token 位置定位信息不足。
+
+新增字段：
+
+```text
+token_start
+token_end
+token_match_confidence
+match_surface
+multi_token_pooling_method
+```
+
+正式批次结果：
+
+```text
+token_match_confidence_mean: 0.8
+```
+
+这说明大部分 object/query/last 定位可用，但仍不是完美，需要后续继续改进多词元 span pooling。
+
+### 客观结果
+
+总体结果：
+
+```text
+component_rows: 31200
+summary_rows: 900
+pair_path_rows: 150
+pair_matrix_rows: 1350
+component_similarity_rows: 1350
+missing_rows: 0
+```
+
+核心复用/差分结果：
+
+```text
+shared_backbone mean reuse: 0.702623
+delta_control mean reuse: 0.563324
+
+shared_backbone mean delta: 0.297377
+delta_control mean delta: 0.436676
+```
+
+分模型结果：
+
+```text
+qwen3:
+  shared_backbone reuse: 0.901764
+  delta_control reuse: 0.755106
+
+GLM4:
+  shared_backbone reuse: 0.838703
+  delta_control reuse: 0.680402
+
+DS7B:
+  shared_backbone reuse: 0.830350
+  delta_control reuse: 0.690642
+```
+
+三个模型都出现同向结果：
+
+```text
+shared_backbone path reuse > delta_control path reuse
+```
+
+这是本阶段最重要的正结果。
+
+### 位置结构
+
+按位置统计：
+
+```text
+overall:
+  object reuse: 0.551451
+  query reuse: 0.666259
+  last reuse: 0.681211
+
+shared_backbone:
+  object reuse: 0.609287
+  query reuse: 0.739696
+  last reuse: 0.758886
+
+delta_control:
+  object reuse: 0.493614
+  query reuse: 0.592822
+  last reuse: 0.603535
+```
+
+这说明：
+
+```text
+shared/delta 的可区分性不是只在 object 入口；
+query 和 last 位置反而更清楚；
+对象对语义复用更可能在查询路由和最终读出聚合阶段表现出来。
+```
+
+### 属性结构
+
+按属性统计：
+
+```text
+shared_backbone:
+  category reuse: 0.751802
+  subclass reuse: 0.768946
+  color reuse: 0.590974
+  taste reuse: 0.745104
+  use reuse: 0.656290
+
+delta_control:
+  category reuse: 0.622357
+  subclass reuse: 0.558913
+  color reuse: 0.587033
+  taste reuse: 0.497986
+  use reuse: 0.550330
+```
+
+最清楚的区分在：
+
+```text
+subclass: shared 0.768946 vs delta 0.558913
+taste: shared 0.745104 vs delta 0.497986
+category: shared 0.751802 vs delta 0.622357
+```
+
+color 区分较弱：
+
+```text
+shared color reuse: 0.590974
+delta color reuse: 0.587033
+```
+
+这提示颜色可能更像表层属性或对象具体属性，不一定稳定承载共享主干。
+
+### 组件结构
+
+按组件统计：
+
+```text
+attention reuse: 0.707727
+MLP reuse: 0.688073
+residual reuse: 0.503120
+```
+
+本阶段与 Phase307/308 相比出现一个重要校准：
+
+```text
+单对象路径中 object/query 偏 MLP；
+对象对复用矩阵中 attention 与 MLP 都强，attention 略高；
+residual 明显更弱。
+```
+
+这说明对象对复用不是简单的“MLP 写入强度相同”，而可能还包含 attention 对查询路由、对象-属性绑定、上下文聚合的复用。
+
+### 路径类型
+
+高频 route type：
+
+```text
+attention->attention->attention: 33
+attention->mlp->attention: 22
+attention->attention->mlp: 12
+mlp->mlp->attention: 10
+mlp->attention->attention: 9
+mlp->attention->mlp: 8
+residual->mlp->mlp: 8
+```
+
+这进一步说明：
+
+```text
+对象对路径复用的主导组件与单对象目标读出路径不同；
+复用/差分图谱不能直接套用 Phase307 的单对象 MLP 主干结论；
+attention 在 shared/delta pair path 中更重要。
+```
+
+### 图谱进展
+
+更新后的进度估计：
+
+```text
+language_pattern_family_atlas: 0.84
+semantic_reuse_delta_subatlas: 0.52
+semantic_internal_physical_path: 0.36
+pair_path_distribution_coverage: 0.34
+sample_type_coverage: 0.74
+feature_mining_coverage: 0.76
+physical_distribution_coverage: 0.79
+causal_audit_coverage: 0.52
+closure_validation: 0.21
+```
+
+解释：
+
+```text
+语义复用-差分子图谱从 0.46 提升到 0.52；
+语义内部物理路径从 0.30 提升到 0.36；
+闭合没有明显提升，因为本阶段仍是观测路径图谱，不是因果闭合。
+```
+
+### 正确结论
+
+本阶段可以谨慎得出的结论：
+
+```text
+shared_backbone 对象对在三模型中均表现出更高路径复用；
+delta_control 对象对表现出更高路径差分；
+query/last 位置比 object 位置更能体现对象对复用结构；
+subclass/category/taste 比 color/use 更能区分共享主干；
+attention 与 MLP 都参与对象对路径复用，attention 在本阶段略强；
+DS7B 虽然语义边界粗糙，但仍保留 shared > delta 的方向。
+```
+
+不能得出的结论：
+
+```text
+不能说 shared backbone 已经闭合；
+不能说 attention 就是共享主干本体；
+不能说当前 cosine profile 就是真实机制；
+不能把小模型路径直接外推为大模型或大脑机制。
+```
+
+### 问题和硬伤
+
+1. 当前相似度比较的是逐层 margin profile，不是隐藏态完整几何结构。
+2. target-distractor 仍是线性读出探针，真实机制可能是非线性、多子空间、门控竞争结构。
+3. token_match_confidence_mean 为 0.8，仍有 20% 左右定位不够理想。
+4. 本阶段对象库仍偏水果/非水果控制，知识网络覆盖不足。
+5. 本阶段主要用单对象属性 prompt 做 pair path 比较，还没有系统测试 contrast prompt 本身。
+6. 没有做 causal patch，因此只能说“路径复用可观察”，不能说“路径复用因果必要”。
+
+### 智能理论洞察
+
+本阶段补上了一个重要拼图：
+
+```text
+知识网络不是对象静态向量集合，
+而是对象之间在 object/query/last 三位置和 attention/MLP 组件上的复用-差分路径网络。
+```
+
+更接近当前观测的表达是：
+
+$$
+KnowledgeNetwork
+=
+ObjectEntry
++ QueryRoute
++ SharedBackbonePath
++ DeltaPath
++ ReadoutCompetition
+$$
+
+其中：
+
+```text
+ObjectEntry: 对象入口；
+QueryRoute: 查询路由；
+SharedBackbonePath: 共享主干路径；
+DeltaPath: 差分路径；
+ReadoutCompetition: 读出竞争。
+```
+
+这说明语言的语义系统可能不是“概念向量表”，而是：
+
+```text
+对象-属性-关系在不同位置和组件中的动态路径复用网络。
+```
+
+### 下一阶段任务
+
+下一步仍属于同一大阶段，应该继续自动推进，但不应马上闭合。
+
+Phase310 建议：
+
+```text
+Phase310: contrast prompt shared/difference path atlas
+```
+
+核心目标：
+
+```text
+把 Phase309 的单对象属性 path comparison，
+推进到 contrast prompt 本身：
+
+An lemon and a lime are both ___.
+Compared with a knife, a lemon is more associated with ___.
+```
+
+需要回答：
+
+```text
+shared prompt 是否显式激活 shared backbone path？
+difference prompt 是否显式激活 delta path？
+query position 是否是 shared/difference 路由分叉点？
+last position 是否是答案聚合点？
+```
+
+Phase311 建议：
+
+```text
+把 single-object pair path、contrast prompt path、Phase303/304 reuse-delta matrix 合并为 Semantic Reuse-Delta Atlas v3。
+```
+
+### 阶段结论
+
+Phase309 是一个重要正结果，但不是闭合。
+
+最重要的客观发现是：
+
+```text
+三个模型中，shared_backbone 对象对的三位置路径复用均高于 delta_control 对象对。
+```
+
+这说明当前“语言是模式网络 / 语义是复用-差分路径网络”的路线继续得到支持，但仍必须谨慎：
+
+```text
+当前完成的是物理分布拼图；
+不是因果证明；
+不是最终机制公式；
+更不是 AGI 理论闭合。
+```
+
+## Phase 310: 当前研究总审计与语言物理图谱完成路线 [2026-07-09 17:04]
+
+### 一、任务范围
+
+本阶段对以下三类材料进行交叉审计：
+
+```text
+1. GPT 路线 Phase195-309；
+2. GLM 路线最新的语义坐标、边界齿轮和通道因果结果；
+3. IntelligentTheory.md 中的语言编码机制、语言模式图谱和智能理论框架。
+```
+
+目标不是再提出一个新理论名词，也不是运行一轮局部模型测试，而是回答：
+
+```text
+当前真正完成了哪些拼图？
+哪些只是工程覆盖或观测相关？
+哪些已经有因果证据？
+距离语言模式族物理分布图谱、语言编码机制和智能理论分别还有多远？
+下一阶段怎样系统推进，而不是继续逐个小补丁？
+```
+
+本阶段没有重新运行 qwen3、GLM4、DS7B。原因是当前任务是证据审计、理论校准和阶段设计，没有新的实验假设需要立即加载模型。后续模型测试仍必须按 qwen3 -> GLM4 -> DS7B 顺序单模型执行。
+
+### 二、总判断
+
+当前研究方向总体正确，最重要的路线升级已经完成：
+
+```text
+概念神经元/单一语义方向
+-> 动态语言模式
+-> 状态写入和读出竞争
+-> 层与组件路径
+-> 因果审计
+-> 语言模式族物理路径图谱
+-> 语义复用-差分路径图谱
+```
+
+当前最可靠的总判断是：
+
+```text
+语言编码不是静态概念向量表；
+也不是一个神经元对应一个语义或语法规则；
+更接近上下文条件下的相对状态、路径路由、组件更新、候选竞争和生成门共同构成的动态路径网络。
+```
+
+但是，当前还不能说已经破解语言编码机制，更不能说智能理论已经完成。现阶段已经形成了较成熟的研究基础设施和一批重要物理分布拼图，但完整因果链、自然门控、跨模型统一性和可预测性仍明显不足。
+
+### 三、已经完成的核心成果
+
+#### 1. 研究对象完成了正确升级
+
+早期研究主要寻找：
+
+```text
+语义向量；
+概念神经元；
+停止方向；
+某一层或某一通道的最大贡献。
+```
+
+大量正负结果已经证明，这些对象不足以描述真实运行机制。当前研究对象已经升级为完整路径：
+
+$$
+PatternPath(x,m)
+=
+[
+Trigger,
+State,
+Route,
+ComponentUpdate,
+ReadoutCompetition,
+ProtocolGate,
+Rollout,
+Closure
+]
+$$
+
+这个升级是目前最重要的方法论成果。它避免把“可读出”误认为“因果节点”，也避免把“首词元获胜”误认为“自然生成闭合”。
+
+#### 2. 九大语言模式族和统一样本框架已经建立
+
+当前工作分类包括：
+
+```text
+content_knowledge（内容知识）
+output_protocol（输出协议）
+reasoning_constraint（推理约束）
+syntax_structure（语法结构）
+language_action（语言动作）
+cross_lingual（跨语言）
+readout_competition（读出竞争）
+state_drift（状态漂移）
+closure（闭合）
+```
+
+Phase265 建立了 1296 条统一设计样本，每个模式族 144 条；Phase266、Phase293/294 等阶段完成了九族三模型的行为和读出扫描。Phase273 以后又建立了固定 schema（数据模式）、case detail（样本详情）、cell/node/edge（单元/节点/边）和前端数据同步系统。
+
+因此可以确认：
+
+```text
+语言模式族图谱已经不再只是研究设想；
+它已经具备样本库、执行脚本、结果格式、缺口队列和可视化数据结构。
+```
+
+#### 3. 行为结果和读出竞争已经形成较大规模基线
+
+九族扩样批次的客观规模：
+
+```text
+behavior rows: 972
+readout rows: 972
+family-model cells: 27
+global answer-correct proxy: 0.896091
+global pattern-matched proxy: 0.286008
+global continue winner rate: 0.972222
+global stop winner rate: 0.027778
+```
+
+这组结果说明一个稳定事实：
+
+```text
+模型经常已经知道答案，但输出模式、协议完成和停止执行仍然失败。
+```
+
+因此下列区分已经得到充分支持：
+
+```text
+答案正确 != 输出模式正确；
+语义完成 != 停止获胜；
+句号出现 != EOS 动作；
+首词元闭合 != 自然生成闭合；
+模型内部停止 != 客户端停止。
+```
+
+#### 4. 继续路径已经出现稳定的组件轮廓
+
+Phase288 汇总了 196 条组件摘要和 392 条历史因果记录，观察到：
+
+```text
+global MLP dominance rate: 0.943878
+global attention dominance rate: 0.056122
+global closure closed count: 0
+```
+
+Phase296 的均衡九族代表样本进一步得到：
+
+```text
+27 个 family-model 组件样本；
+24 个 MLP 主导；
+3 个 attention 主导；
+27 个最终仍由 continue 获胜。
+```
+
+可以谨慎确认：
+
+```text
+MLP 是当前小模型 continue path（继续路径）的稳定写入主干之一；
+attention 更可能参与检索、路由、格式和边界聚合；
+但不同层存在补偿路径，单层最大贡献不等于最小因果机制。
+```
+
+#### 5. 因果审计已经否定了“单点闭合”的简单解释
+
+Phase298 对 24 个 MLP 主导样本进行了 72 次干预：
+
+```text
+weak necessity support: 48 / 72
+not supported: 24 / 72
+winner changed: 0 / 72
+strong causal support rate: 0
+```
+
+这不是“实验失败”，而是一个重要负结果：
+
+```text
+压低 MLP continue margin 可以改变轨迹；
+但不足以让 stop winner 翻转；
+说明完整机制包含补偿、竞争者替代、协议场和自然生成门。
+```
+
+GLM 路线补充了更细的局部证据：
+
+```text
+GLM4 L39 存在 EOS-vs-a 的有符号边界齿轮候选；
+标点阻塞更像公共齿轮骨架 + case residual（样本残差）；
+qwen3 的部分 color/function MLP 通道组通过了激活加权和随机组控制；
+GLM4 存在明显通用边界敏感性；
+DS7B 有坐标集中，但不稳定转化为正向边界因果效应。
+```
+
+这些结果支持“局部齿轮存在”，但还没有找到自然门控，也没有完成 strict-clean rollout（严格干净自然生成）。
+
+#### 6. 语义知识网络已经从行为图谱进入内部路径图谱
+
+Phase301-304 建立了 20 个对象、8 类属性和对比关系的语义样本库，并完成 507 条三模型行为/读出测试。属性成功率显示：
+
+```text
+category: 0.766667
+color: 0.516667
+taste: 0.500000
+part: 0.333333
+shared: 0.200000
+subclass: 0.200000
+use: 0.100000
+difference: 0.083333
+shape: 0.083333
+```
+
+这说明类别、颜色、味道比功能、差异和形状更容易被当前小模型与当前模板稳定读出。
+
+Phase305-308 又把语义路径扩展到 object/query/last（对象/查询/最后读出）三位置：
+
+```text
+object/query 多数为 MLP 主导；
+last 位置 attention 贡献明显增加；
+qwen3 路径为 MLP -> MLP -> attention；
+GLM4、DS7B 为 MLP -> MLP -> MLP。
+```
+
+Phase309 的规模为：
+
+```text
+10 个对象对；
+5 类属性；
+3 个模型；
+150 个独立 pair-attribute-model 路径单元；
+900 条三位置摘要；
+31200 条逐层组件记录；
+missing rows: 0。
+```
+
+核心结果：
+
+```text
+shared-backbone reuse: 0.702623
+delta-control reuse: 0.563324
+
+qwen3: 0.901764 > 0.755106
+GLM4: 0.838703 > 0.680402
+DS7B: 0.830350 > 0.690642
+```
+
+三个模型都出现：
+
+```text
+共享主干对象对的路径复用 > 差分控制对象对的路径复用。
+```
+
+这支持“知识网络包含复用路径和差分路径”的研究方向。query/last 的区分比 object 更清楚，attention 与 MLP 都参与对象对路径复用。
+
+#### 7. 数据系统和可视化基础已经形成
+
+当前已经具备：
+
+```text
+统一 JSON/JSONL 输出；
+模型、语言族、模式、变体、路径、证据和缺口字段；
+case detail 按需读取；
+固定前端同步流程；
+图谱 summary、cell、node、edge 和 route 数据；
+自动构建和前端查看入口。
+```
+
+这是后续大规模研究能够积累而不是反复推翻的必要条件。
+
+### 四、当前最合理的语言编码机制框架
+
+当前理论中最可信的主体不应再改名。可以保持为：
+
+```text
+语言是动态模式网络；
+编码的基本单位是条件化物理路径，而不是孤立向量或神经元。
+```
+
+模型的精确前向过程仍是：
+
+$$
+H_{l+1}=T_l(H_l)
+$$
+
+$$
+P(y_{t+1}\mid x,y_{\le t})
+=
+softmax\left(W_U N(h_{L,t})\right)
+$$
+
+但要解释语言机制，需要在这个前向过程中识别因果子图。当前最合适的机制分解为：
+
+$$
+\mathcal{G}_{language}
+=
+(V_{state},V_{route},V_{component},V_{boundary},V_{gate},E)
+$$
+
+其中：
+
+```text
+V_state: 对象、角色、关系、构式、操作符、作用域和完成状态；
+V_route: 检索、绑定、语法、推理、格式、继续、停止等路线；
+V_component: attention、MLP、residual、norm、W_U 等组件事件；
+V_boundary: target、wrong、echo、prose、format、continue、stop 的竞争边界；
+V_gate: 协议门、自然触发门、生成门和停止门；
+E: 自然运行或受控干预下可验证的路径边。
+```
+
+当前语言输出机制可以暂时写成组织公式：
+
+$$
+LanguageOutput
+=
+Readout\Big(
+GenerationGate\big(
+BoundaryCompetition\big(
+ComponentUpdate\big(
+Route(StateEncode(x))
+\big)\big)\big)\Big)
+$$
+
+必须强调：这只是待验证的机制图组织公式，不是已经闭合的数学定律。
+
+当前语义知识网络的局部拼图可以写成：
+
+$$
+\mathcal{P}_{semantic}(o,r)
+=
+[
+ObjectEntry,
+QueryRoute,
+SharedPath,
+DeltaPath,
+ReadoutCompetition
+]
+$$
+
+Phase309 支持 SharedPath 和 DeltaPath 在内部轨迹上可区分，但尚未证明它们是因果必要子空间。
+
+### 五、智能理论当前进展
+
+当前智能理论中较可信的第一性原理候选是：
+
+```text
+智能不是存储孤立知识点；
+智能是在持续输入中构造相对状态网络，
+根据目标选择条件化路径，
+让候选知识或行动竞争，
+再根据结果和反馈更新内部路径。
+```
+
+可以用以下状态更新框架组织：
+
+$$
+S_{t+1}
+=
+F(S_t,x_t,g_t,feedback_t;\mathcal{G}_t)
+$$
+
+$$
+a_t
+=
+Select(Candidates(S_{t+1}),g_t)
+$$
+
+$$
+\mathcal{G}_{t+1}
+=
+Update(\mathcal{G}_t,S_t,a_t,feedback_t)
+$$
+
+其中：
+
+```text
+S: 相对状态网络；
+G: 可复用机制图谱；
+g: 当前目标；
+a: 输出词元、回答或行动；
+Update: 不破坏已有知识的局部可塑性更新。
+```
+
+当前 DNN 已经显示出前两式的部分能力：相对状态、路径路由、候选竞争和复杂读出。但第三式仍主要依赖离线训练，尚未证明可控实时学习、低副作用更新和稳定系统思维。因此这仍是智能理论框架，不是完成的智能数学理论。
+
+### 六、当前问题和硬伤
+
+#### 1. 图谱覆盖率和机制完成度被混用
+
+历史记录中的：
+
+```text
+language_pattern_family_atlas: 0.84
+physical_distribution_coverage: 0.79
+causal_audit_coverage: 0.52
+closure_validation: 0.21
+```
+
+属于项目管理估计，不是科学测量。Phase300 同时给出：
+
+```text
+mean atlas evidence completion: 0.386058
+mean physical path confidence: 0.749074
+mean closure gap: 0.597737
+```
+
+两组数字口径不同。前者偏向“有没有建立框架和数据”，后者才更接近“单元证据是否完整”。因此不能用 84% 或 79% 表示“语言机制已经完成约八成”。
+
+#### 2. 逐层记录数不能当作独立样本数
+
+Phase309 的 31200 条 component rows（组件记录）来自 150 个独立 pair-attribute-model 单元。逐层、逐组件、逐位置记录增加了分辨率，但没有等比例增加独立证据。
+
+后续所有报告必须同时列出：
+
+```text
+independent_case_count；
+pair_count；
+prompt_template_count；
+object_count；
+layer_component_row_count。
+```
+
+#### 3. 九族覆盖仍不等于九族物理机制已完成
+
+行为/读出已有 972 条，但 Phase296 的均衡完整组件样本只有：
+
+```text
+9 families x 3 models x 1 representative case = 27 cases。
+```
+
+当前深入图谱主要集中在：
+
+```text
+输出协议/继续-停止；
+水果对象的类别、颜色、味道；
+少量语义方向和边界齿轮。
+```
+
+语法、推理、多跳绑定、跨语言、语言动作仍没有达到同等内部路径深度。
+
+#### 4. 语义样本域过窄
+
+Phase309 主要是水果及少量工具、家具、矿物控制。当前 shared > delta 可能同时包含：
+
+```text
+类别相似；
+词频相似；
+词元长度相似；
+模板相似；
+目标/干扰词表相似；
+全模型共有的层形状。
+```
+
+因此需要动物、材料、地点、动作、情绪、抽象概念、关系和规则等更多领域，并加入词频、词元数和模板匹配控制。
+
+#### 5. 当前复用算法仍可能把公共层形状当成共享机制
+
+Phase309 使用逐层 margin profile（边际轨迹）的余弦相似度。它保留路径形状，但可能忽略：
+
+```text
+绝对幅度；
+正负号；
+局部峰值是否来自同一层事件；
+同模板和同候选词表带来的全局基线。
+```
+
+高差分控制组仍有 0.563324 的平均复用，说明必须先扣除匹配随机对象对和模板基线，再解释共享主干。
+
+#### 6. 功能标签仍主要是解释，不是因果事实
+
+当前把 object MLP 解释为“对象写入”、query MLP 解释为“查询重组”、last attention 解释为“答案路由”。这些解释与现象一致，但尚未通过源位置到目标位置的因果传递验证。
+
+正确标记应是：
+
+```text
+observed component event（观测组件事件）；
+functional hypothesis（功能假设）；
+causal edge candidate（因果边候选）。
+```
+
+不能直接标记为已确认 writer/router/gate（写入器/路由器/门）。
+
+#### 7. 因果干预仍主要是人工线性补丁
+
+zero、half scaling、direction add/remove 可以定位候选，但常常产生分布外状态。Phase298 的 0/72 winner flip 和 GLM4 的强随机敏感性都说明：
+
+```text
+干预有效 != 找到自然机制；
+投影很强 != 因果节点；
+候选组优于随机 != 找到最小齿轮；
+首词边界获胜 != 自然输出闭合。
+```
+
+#### 8. 没有完成自然触发门
+
+目前最大的机制缺口是：
+
+```text
+谁在自然输入下启动 reader/router/writer？
+哪些上游状态决定通道的符号和强度？
+为什么同一组件在不同模型或模板上出现相反效应？
+```
+
+没有 natural gate（自然门控），图谱仍是组件地图，不是运行机制图。
+
+#### 9. 缺少留出预测
+
+当前图谱主要解释已经观察过的数据。还没有系统证明：给定未见样本，图谱能提前预测：
+
+```text
+主导层；
+主导组件；
+路径类型；
+主要竞争者；
+失败模式；
+干预效果；
+自然闭合结果。
+```
+
+没有前向预测能力，图谱仍可能只是精细的实验日志。
+
+#### 10. 跨模型结果不能简单平均
+
+qwen3、GLM4、DS7B 在层数、维度、词元化、训练方式和协议行为上不同。已有结果显示：
+
+```text
+qwen3 的语义路径 attention 更突出；
+GLM4 的边界场对通用扰动敏感；
+DS7B 的语义读出较粗，但保留部分 shared > delta 结构。
+```
+
+跨模型一致只应建立在功能事件和归一化路径上，不能按绝对层号或通道号直接对齐。
+
+#### 11. 小模型外推是根本限制
+
+当前小模型的编码可能比大模型粗糙，甚至存在 30%-50% 的结构偏差。三小模型一致只能说明现象不是单一模型偶然，不能证明大模型、人脑或一般智能必然使用相同机制。
+
+#### 12. 数据和文档版本存在复现风险
+
+当前结果同时存在于：
+
+```text
+tests/result/...
+tests/gpt5/result/...
+frontend/public/vis_data/...
+```
+
+`progress.json` 仍停留在 Phase308，而 Phase309 已经完成。GPT 和 GLM 两条路线使用不同 Phase 编号空间，`IntelligentTheory.md` 又吸收了其他历史阶段。若不增加 branch_id（研究分支编号）、source_phase（来源阶段）、model_hash（模型哈希）、tokenizer_hash（词元器哈希）和 git commit（代码提交），后续很容易把不同版本结果混合为同一证据链。
+
+### 七、进度重新评估
+
+在没有冻结全图谱分母前，不应给出单一精确百分比。当前更合理的是分层区间：
+
+| 层级 | 当前完成度 | 判断依据 |
+|---|---:|---|
+| 图谱工程与数据基础设施 | 85%-90% | schema、样本库、结果格式、缺口队列、前端同步已形成 |
+| 九族行为/读出基线 | 65%-75% | 三模型已有 972 条均衡结果，但真实任务域和开放集不足 |
+| 层/组件观测分布 | 30%-40% | 历史组件记录较多，但九族均衡深测只有少量代表样本 |
+| 语义复用-差分子图谱 | 35%-45% | 已有三位置和对象对结果，但领域窄、无对比提示因果链 |
+| 因果必要性图谱 | 15%-25% | 有局部弱正结果，强因果、低副作用和最小性不足 |
+| 自然门控与因果充分性 | 5%-10% | 自然触发源尚未定位，跨样本迁移不稳定 |
+| 严格自然闭合 | 5%-10% | 首词边界候选存在，但严格干净和自然 EOS 动作未闭合 |
+| 语言编码机制整体 | 20%-30% | 机制框架清楚，完整可预测因果图尚未完成 |
+| 可验证智能理论 | 15%-25% | 有统一框架，但实时学习、跨模态、可塑性和系统级预测未验证 |
+
+如果只评价“语言模式族物理分布拼图”，当前更谨慎的整体估计是：
+
+```text
+约 40%-50%，而不是 79%。
+```
+
+79% 更接近工程字段覆盖和候选图谱轮廓；40%-50% 更接近独立样本、族覆盖、组件深度、因果等级和留出验证综合后的科学完成度。
+
+### 八、如何改进图谱和特征分析算法
+
+#### 1. 冻结科学分母
+
+图谱基本单元应固定为：
+
+$$
+Cell
+=
+(family,task,model,language,template,variant,position,component,evidence)
+$$
+
+每个 Cell 必须记录：
+
+```text
+planned independent cases；
+valid independent cases；
+missing cases；
+heldout cases；
+negative controls；
+evidence level；
+source files；
+reproduction status。
+```
+
+以后只允许用有效独立单元数计算覆盖率，逐层行数只表示测量分辨率。
+
+#### 2. 使用简单但严格的匹配差分
+
+对复用路径，不应只看原始余弦值。至少增加：
+
+$$
+ReuseAdjusted
+=
+Reuse(shared\ pair)
+-
+Reuse(matched\ random\ pair)
+$$
+
+匹配随机对必须控制：
+
+```text
+词元数；
+词频档；
+模板；
+候选集合；
+答案长度；
+对象类别距离。
+```
+
+路径特征同时保留：
+
+```text
+符号；
+绝对幅度；
+首次出现层；
+峰值层；
+持续层数；
+反转层；
+object -> query -> last 的转移顺序。
+```
+
+#### 3. 把路径角色拆成可验证边
+
+不要直接写：
+
+```text
+object MLP = writer。
+```
+
+应测试：
+
+```text
+object state 改变
+-> query state 是否按预测改变
+-> last boundary 是否按预测改变
+-> rollout 是否按预测改变。
+```
+
+每条边依次获得：
+
+```text
+L2 readout；
+L3 layer path；
+L4 component attribution；
+L5 low-side-effect necessity；
+L6 controlled sufficiency；
+L7 rollout stability；
+L8 clean closure。
+```
+
+#### 4. 用四条件检查最基本的非线性耦合
+
+对候选组件 A、B，固定四种条件：
+
+```text
+baseline；
+A only；
+B only；
+A + B。
+```
+
+基本交互量：
+
+$$
+Interaction(A,B)
+=
+\Delta_{A+B}
+-
+\Delta_A
+-
+\Delta_B
+$$
+
+若不接近 0，就不能继续用单组件贡献相加解释机制。这个测试只需要基础差分，不依赖复杂数学模型。
+
+#### 5. 把自然触发源加入图谱
+
+每个 writer/gear（写入器/齿轮）候选必须追踪：
+
+```text
+上游来源词元；
+上游 attention head；
+进入 MLP 前的 residual state；
+gate/up/product/down 的自然激活；
+下游 boundary 和 rollout。
+```
+
+目标是从“人工拨齿轮”推进到：
+
+```text
+什么输入条件自然拨动齿轮，
+齿轮如何改变下游状态，
+为什么在错误样本上没有被正确启动。
+```
+
+#### 6. 引入留出预测和反例优先
+
+每轮样本固定拆为：
+
+```text
+60% 路径发现；
+20% 参数和阈值校准；
+20% 完全留出验证。
+```
+
+先冻结预测，再打开留出结果。必须记录预测失败样本，并优先研究反例，不允许只报告均值正结果。
+
+### 九、下一阶段大任务
+
+下一阶段应定义为一个连续大阶段：
+
+```text
+Phase311-330: 语言模式族物理机制图谱完成阶段
+```
+
+该阶段不是追求一次性“最终闭合”，而是完成从观测图谱到可预测因果图谱的关键升级。
+
+#### Batch A: 图谱口径冻结和证据清洗
+
+```text
+1. 合并 tests/result 与 tests/gpt5/result 的正式来源；
+2. 给所有记录增加 branch_id、run_id、model_hash、tokenizer_hash、git_commit；
+3. 更新 progress.json 到 Phase310；
+4. 区分 independent cases 和 layer/component rows；
+5. 建立 claim registry（机制主张登记）和正/负/反例文件索引；
+6. 重新计算证据封顶后的真实完成度。
+```
+
+#### Batch B: 三个语言核心能力的均衡物理分布扩展
+
+知识网络：
+
+```text
+从水果扩展到动物、材料、工具、地点、动作、情绪、抽象概念和社会关系；
+测试 category、attribute、function、part、relation、comparison、negation；
+补 Phase309 的 contrast prompt（对比提示）shared/difference 路径。
+```
+
+语法系统：
+
+```text
+主谓一致；
+词性和角色；
+语序；
+依存距离；
+嵌套从句；
+否定与作用域；
+时态和指代；
+跨语言同构语法。
+```
+
+推理能力：
+
+```text
+单规则检索；
+对象-关系绑定；
+两跳组合；
+变量替换；
+否定条件；
+反事实；
+顺序约束；
+错误中间状态和错误关系控制。
+```
+
+每个 family-model 至少需要 100 个独立高质量样本后，才允许形成稳定机制主张；内部全链路深测可先对每格 20-30 个均衡样本执行，再根据缺口扩展。
+
+#### Batch C: 全链路物理路径追踪
+
+每条高价值样本统一追踪：
+
+```text
+source token
+-> object/relation/query positions
+-> attention route
+-> MLP gate/up/product/down
+-> residual/norm
+-> full-vocabulary boundary
+-> phrase likelihood
+-> natural rollout
+-> stop/protocol gate。
+```
+
+输出固定的 event rows（事件行）和 edge rows（边行），不再只输出单个总分。
+
+#### Batch D: 低副作用因果链和非线性审计
+
+对稳定候选执行：
+
+```text
+自然状态匹配替换；
+half/mean replacement；
+same-norm random；
+permutation；
+negative family control；
+source-to-target patch；
+attention + MLP 联合干预；
+四条件非线性交互；
+对象、模板、语言和模型留出。
+```
+
+目标不是找到“有用补丁”，而是确认：
+
+```text
+触发源必要；
+中间边必要；
+目标组件具有受控充分性；
+全词表边界按预测移动；
+自然生成按预测改变；
+副作用在预设阈值内。
+```
+
+#### Batch E: 前向预测、闭合和智能理论验证
+
+图谱必须对未见样本预测：
+
+```text
+主导层和组件；
+shared/delta 路径；
+主要竞争者；
+错误路径；
+干预方向；
+自然闭合结果。
+```
+
+闭合仍坚持硬判据：
+
+$$
+Closure
+=
+SemanticDone
+\land StopWins
+\land ContinueSuppressed
+\land RolloutStable
+$$
+
+只有图谱在留出样本上能稳定预测这些结果，才可以把机制主张提升为语言编码理论的一部分。
+
+智能理论验证则至少还要增加：
+
+```text
+在线学习新关系；
+低副作用局部编辑；
+跨任务复用；
+多步状态传递；
+错误路径自诊断；
+新知识更新后的系统一致性。
+```
+
+### 十、阶段成功标准
+
+下一大阶段完成的最低标准：
+
+```text
+1. 九族三模型的独立样本分母冻结；
+2. 知识、语法、推理三条核心能力都有三位置/多位置组件图谱；
+3. 每个高价值机制主张都有正证据、负证据和反例；
+4. 至少形成若干条 L5 以上的完整低副作用因果边；
+5. 至少一个机制链在对象、模板和语言留出上复现；
+6. 图谱对未见样本的路径和失败类型有明确高于简单基线的预测能力；
+7. 闭合继续独立计分，不因图谱覆盖增加而虚增；
+8. 所有数据可由固定脚本、固定模型版本和固定提交重新生成。
+```
+
+### 十一、最终结论
+
+当前研究已经完成的不是“语言编码机制破解”，而是破解所需的核心实验框架和第一批高价值拼图：
+
+```text
+语言模式族分类；
+行为和读出竞争基线；
+继续/停止/协议场分离；
+attention/MLP/residual 路径拆解；
+补偿与副作用认识；
+语义 object/query/last 三位置路径；
+shared backbone 与 delta control 的跨模型路径差异；
+局部语义坐标和边界齿轮候选；
+固定格式图谱和可视化基础。
+```
+
+当前最关键的缺口是：
+
+```text
+自然触发门；
+源到目标的完整因果链；
+语法和推理的同等深度物理图谱；
+跨领域、跨模板和跨模型留出；
+完整短语与自然生成闭合；
+图谱对未知样本的前向预测。
+```
+
+所以接下来的第一优先级仍然正确：
+
+```text
+完成各种语言模式族的物理分布拼图图谱。
+```
+
+但“完成”的标准必须从“有很多记录”升级为：
+
+```text
+分母明确、路径完整、证据分级、反例保留、因果可复现、留出可预测。
+```
+
+第二优先级才是在这些稳定因果路径上尝试闭合。智能理论也不应继续靠增加抽象公式推进，而应等待知识网络、语法、推理、协议闭合和可塑性更新这几条机制链共同提供约束，让统一结构从拼图中自然浮现。
+
+## Phase 311: 知识、语法、推理三核心族的冻结分母物理路径测试 [2026-07-09 17:48]
+
+### 任务目标
+
+Phase310 指出当前九族图谱存在一个核心硬伤：行为/读出样本较多，但知识、语法、推理三条核心能力缺少同一口径、同一深度的内部路径数据。本阶段不再随机选择局部案例，而是冻结一个明确分母：
+
+```text
+3 个核心模式族；
+每族 8 种机制；
+每种机制 5 个独立词汇或规则变体；
+3 个模型；
+
+3 x 8 x 5 x 3 = 360 个独立模型样本。
+```
+
+样本拆分：
+
+```text
+discovery: 72 个基础样本 / 216 个模型样本；
+calibration: 24 个基础样本 / 72 个模型样本；
+heldout: 24 个基础样本 / 72 个模型样本。
+```
+
+三模型按顺序运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+没有同时加载多个模型，没有发生显存溢出。
+
+### 脚本和固定格式数据
+
+```text
+tests/gpt5/phase311_core_language_physical_atlas.py
+tests/gpt5/run_phase311_314_core_language_physical_mechanism_atlas.sh
+```
+
+核心输出：
+
+```text
+tests/gpt5/result/pattern_family_atlas/v2/phase311_core_language_case_bank.jsonl
+tests/gpt5/result/pattern_family_atlas/v2/phase311_core_language_model_plan_rows.jsonl
+tests/gpt5/result/pattern_family_atlas/v2/phase311_core_language_case_result_rows.jsonl
+tests/gpt5/result/pattern_family_atlas/v2/phase311_core_language_component_rows.jsonl
+tests/gpt5/result/pattern_family_atlas/v2/phase311_core_language_position_summary_rows.jsonl
+tests/gpt5/result/pattern_family_atlas/v2/phase311_core_language_physical_atlas_summary.json
+```
+
+每条记录新增或固定：
+
+```text
+branch_id；
+run_id；
+git_commit；
+model_hash；
+tokenizer_hash；
+independent_case；
+split；
+source/query/last token span；
+token_match_confidence。
+```
+
+这一步修复了 Phase310 指出的部分复现风险，也明确区分 independent case（独立样本）和 layer/component row（逐层组件记录）。
+
+### 三个核心族
+
+知识网络：
+
+```text
+category binding；
+color binding；
+function binding；
+part binding；
+habitat binding；
+material binding；
+comparison binding；
+negated attribute。
+```
+
+语法系统：
+
+```text
+subject role；
+object role；
+singular agreement；
+plural agreement；
+past tense；
+pronoun number；
+adjective attachment；
+relative-clause role。
+```
+
+推理能力：
+
+```text
+direct entailment；
+direct contradiction；
+two-hop entailment；
+two-hop blocked control；
+transitive order；
+reversed-order control；
+conjunction rule；
+missing-conjunct control。
+```
+
+### 测试原理
+
+每个样本追踪三个位置：
+
+$$
+\mathcal{P}(x)
+=
+[T_{source}(x),T_{query}(x),T_{last}(x)]
+$$
+
+每个位置记录 attention、MLP、residual 的逐层候选边际变化：
+
+$$
+\Delta A_l=M(h_l+A_l)-M(h_l)
+$$
+
+$$
+\Delta F_l=M(h_l+A_l+F_l)-M(h_l+A_l)
+$$
+
+$$
+\Delta R_l=M(h_{l+1})-M(h_l+A_l+F_l)
+$$
+
+其中：
+
+$$
+M(h)=z_{target}(h)-z_{distractor}(h)
+$$
+
+这仍是目标-干扰读出探针，不是最终机制公式。
+
+### 客观结果
+
+```text
+planned independent model cases: 360
+valid independent model cases: 360
+missing independent cases: 0
+layer/component rows: 37440
+position summary rows: 1080
+token match confidence mean: 1.0
+```
+
+模型级目标相对干扰项胜率：
+
+```text
+qwen3: 0.966667
+GLM4: 0.991667
+DS7B: 0.958333
+overall: 0.972222
+```
+
+模式族级胜率：
+
+```text
+content_knowledge: 1.000000
+reasoning_constraint: 0.983333
+syntax_structure: 0.933333
+```
+
+需要严格解释：这只是受控 target-vs-distractor 候选边界，不是全词表自然回答率，也不是自然停止或闭合率。
+
+### 初步结果分析
+
+1. 三核心族都可以在 source/query/last 三位置形成可测组件轨迹。
+2. 语法的目标边界最弱，错误主要集中于 adjective attachment、relative-clause role、object role 和部分 agreement。
+3. 两跳 blocked control 在 qwen3、DS7B 各出现失败，说明“缺少推理链”控制比正向 entailment 更困难。
+4. 高目标胜率说明测试候选集合可用，但不能据此声称已经找到三族各自的独立物理主干。
+
+## Phase 312: 匹配基线、路径事件和留出预测算法 [2026-07-09 17:48]
+
+### 脚本
+
+```text
+tests/gpt5/phase312_matched_path_feature_analysis.py
+```
+
+### 算法改进
+
+本阶段不再只使用原始余弦相似度，而同时记录：
+
+```text
+符号；
+绝对幅度；
+首次显著层；
+峰值层；
+归一化峰值深度；
+持续层数；
+正负贡献；
+符号翻转次数。
+```
+
+路径事件：
+
+$$
+Event(x,p,c)
+=
+[onset,peak,depth,persistence,positive,negative,flips]
+$$
+
+匹配复用分数：
+
+$$
+ReuseAdjusted
+=
+Reuse(within\ mechanism)
+-
+Reuse(matched\ control)
+$$
+
+推理样本的控制进一步收紧为：
+
+```text
+相同模型；
+相同模式族；
+相同 item index；
+相同 yes/no 目标标签；
+不同推理机制。
+```
+
+这一步避免把 yes/no 答案路线误判为推理机制复用。
+
+留出预测使用 discovery + calibration 生成简单路径原型：
+
+$$
+\hat m(x)
+=
+\arg\max_m
+cos(P(x),Prototype_m)
+$$
+
+预测阈值和原型在打开 heldout 前冻结。
+
+### 客观结果
+
+```text
+path event rows: 3240
+matched similarity rows: 3240
+aggregate rows: 81
+heldout prediction rows: 72
+```
+
+匹配控制前后：
+
+```text
+mean within-mechanism reuse: 0.637247
+mean matched-control reuse: 0.594349
+mean adjusted reuse: 0.042899
+```
+
+按模式族：
+
+```text
+content_knowledge adjusted reuse: 0.011873
+reasoning_constraint adjusted reuse: 0.100799
+syntax_structure adjusted reuse: 0.016024
+```
+
+这个结果大幅收紧了原始复用结论：
+
+```text
+三族都有很高的公共路径相似度；
+但扣除匹配控制后，知识和语法的族内机制净复用非常弱；
+推理净复用较强，但仍可能包含 yes/no、规则格式和显式 Question 路线。
+```
+
+最强净复用出现在推理 source 位置：
+
+```text
+source attention: 0.260146
+source MLP: 0.258210
+source residual: 0.236718
+```
+
+这提示受控推理任务的共享结构更早出现在规则/事实入口，但当前只能称为观测路径结构。
+
+### 同模板词汇/规则留出预测
+
+```text
+family accuracy: 0.847222
+mechanism accuracy: 0.736111
+family random baseline: 0.333333
+mechanism unconditioned baseline: 0.125000
+mechanism target-conditioned baseline: 0.239583
+```
+
+结果高于简单基线，说明路径轨迹包含可预测信息。但同模板留出仍不能排除固定提示结构泄漏。
+
+### 组件事件的整体形状
+
+当前三族都呈现：
+
+```text
+attention 峰值总体早于 MLP；
+MLP 的持续率高于 attention；
+last 位置 MLP 峰值总体晚于 source/query；
+attention 和 MLP 都存在大量正负交替，不是单向累积；
+residual 未建模增量绝对值很小。
+```
+
+例如平均归一化峰值深度：
+
+```text
+content knowledge:
+  source attention 0.1648 -> source MLP 0.3004
+  query attention 0.3756 -> query MLP 0.4139
+  last attention 0.5515 -> last MLP 0.7151
+
+reasoning:
+  source attention 0.0614 -> source MLP 0.2645
+  query attention 0.1213 -> query MLP 0.3357
+  last attention 0.1682 -> last MLP 0.6692
+
+syntax:
+  source attention 0.1398 -> source MLP 0.3413
+  query attention 0.1750 -> query MLP 0.2702
+  last attention 0.3131 -> last MLP 0.4812
+```
+
+最谨慎的解释是：
+
+```text
+attention 更早改变候选边界；
+MLP 在更长层区间持续改写；
+最后位置的 MLP 更像后期候选整合之一；
+但不能仅凭时间顺序把 attention 命名为 reader、MLP 命名为 writer。
+```
+
+## Phase 313: 留出样本 attention-MLP 联合干预审计 [2026-07-09 17:48]
+
+### 脚本
+
+```text
+tests/gpt5/phase313_heldout_component_interaction_audit.py
+```
+
+### 选择和审计隔离
+
+候选层、位置和机制只使用 discovery + calibration 数据选择；干预只在 heldout 词汇/规则样本执行。
+
+每模型每核心族选择 2 个机制：
+
+```text
+3 models x 3 families x 2 mechanisms = 18 heldout causal cases。
+```
+
+每个样本执行：
+
+```text
+baseline；
+attention half；
+MLP half；
+attention + MLP half；
+attention same-norm feature permutation；
+MLP same-norm feature permutation。
+```
+
+总计：
+
+```text
+108 intervention rows；
+18 interaction rows；
+18 rollout comparison rows；
+missing rows: 0。
+```
+
+基本交互量：
+
+$$
+Interaction(A,F)
+=
+\Delta_{A+F}
+-
+\Delta_A
+-
+\Delta_F
+$$
+
+预设强交互条件：
+
+$$
+|Interaction|>1
+$$
+
+### 客观结果
+
+```text
+target-vs-distractor winner changes: 0 / 18
+strong nonlinear interactions: 0 / 18
+full-vocabulary top1 changes: 2 / 18
+rollout text changes: 4 / 18
+mean absolute interaction: 0.217882
+```
+
+分模型：
+
+```text
+qwen3:
+  winner changes 0
+  strong interactions 0
+  top1 changes 2
+  rollout changes 2
+
+GLM4:
+  winner changes 0
+  strong interactions 0
+  top1 changes 0
+  rollout changes 0
+
+DS7B:
+  winner changes 0
+  strong interactions 0
+  top1 changes 0
+  rollout changes 2
+```
+
+这是一个明确负结果：
+
+```text
+观测路径峰值没有在 heldout 上转化为强因果边；
+attention/MLP 半缩放的联合效应很小；
+当前简单组件强度选择算法不足以定位最小因果单元。
+```
+
+qwen3 两例 full-vocabulary top1 变化也不能升级为强正结果：一个只是 capitalization（大小写）变化，另一个把 adjective attachment 从正确名词路线推到 color 路线，属于副作用迹象。
+
+因此本阶段证据等级全部保持为：
+
+```text
+L4 intervention effect；
+没有 L5 因果必要性边。
+```
+
+## Phase 314: 核心语言物理机制图谱合成 [2026-07-09 17:48]
+
+### 脚本和输出
+
+```text
+tests/gpt5/phase314_core_mechanism_atlas_synthesis.py
+
+phase314_core_mechanism_atlas_summary.json
+phase314_mechanism_claim_rows.jsonl
+phase314_graph_nodes.jsonl
+phase314_graph_edges.jsonl
+phase314_evidence_progress.json
+```
+
+合成结果：
+
+```text
+graph nodes: 106
+graph edges: 99
+mechanism claims: 5
+```
+
+本阶段第一次把覆盖率改成冻结分母下的精确指标：
+
+```text
+controlled denominator coverage: 1.0
+three-position observational coverage: 1.0
+matched baseline coverage: 1.0
+same-template heldout prediction coverage: 1.0
+heldout causal case coverage: 0.05
+heldout causal quality proxy: 0.0
+natural gate coverage: 0.0
+strict clean closure: 0.0
+```
+
+这组指标不能解释为整个语言图谱已经完成，而是：
+
+```text
+本轮冻结的受控三核心族观测分母已完成；
+因果分母只覆盖 5%；
+因果质量、自然门控和严格闭合仍为 0。
+```
+
+## Phase 315: 模板改写后的完全留出路径验证 [2026-07-09 17:48]
+
+### 任务原因
+
+Phase312 的 heldout 只替换了词汇或规则对象，模板保持相同。为了检查路径预测是否主要来自模板，本阶段在原型冻结后改写提示：
+
+```text
+Fact -> Statement；
+Complete -> Fill the blank；
+Answer -> Response；
+Question -> Decide whether；
+语法指令改写为另一套表达。
+```
+
+每个机制使用此前完全未参与原型训练的 item index=4：
+
+```text
+24 mechanisms x 3 models = 72 template-and-item heldout cases。
+```
+
+### 脚本和结果
+
+```text
+tests/gpt5/phase315_template_heldout_path_validation.py
+tests/gpt5/run_phase315_template_heldout_path_validation.sh
+```
+
+```text
+valid independent cases: 72 / 72
+component rows: 7488
+position summary rows: 216
+missing rows: 0
+target-vs-distractor winner rate: 0.944444
+token match confidence mean: 1.0
+```
+
+冻结原型预测：
+
+```text
+family accuracy: 0.736111
+mechanism accuracy: 0.486111
+family random baseline: 0.333333
+mechanism random baseline: 0.125000
+```
+
+与同模板留出相比：
+
+```text
+family accuracy: 0.847222 -> 0.736111, delta -0.111111
+mechanism accuracy: 0.736111 -> 0.486111, delta -0.250000
+```
+
+分模型：
+
+```text
+qwen3: family 0.791667, mechanism 0.458333
+GLM4: family 0.708333, mechanism 0.458333
+DS7B: family 0.708333, mechanism 0.541667
+```
+
+分族最重要现象：
+
+```text
+reasoning 的模板留出仍相对较强；
+knowledge 族级识别较稳定，但具体关系机制混淆较多；
+syntax 对模板改写最敏感：
+  qwen3 family 0.625
+  GLM4 family 0.375
+  DS7B family 0.500。
+```
+
+严格结论：
+
+```text
+路径原型中存在可跨模板保留的信息；
+但原同模板结果包含显著模板成分；
+当前机制级路径签名远未达到模板不变表示。
+```
+
+规则改写仍由程序生成，不是独立人工模板，也不是 open-set（开放集）任务，因此只能算第一版模板压力测试。
+
+## Phase 316: 核心物理图谱连续阶段收束 [2026-07-09 17:48]
+
+### 阶段输出
+
+```text
+tests/gpt5/phase316_core_atlas_stage_completion.py
+
+tests/gpt5/result/pattern_family_atlas/v2/phase316_core_atlas_stage_summary.json
+tests/gpt5/result/pattern_family_atlas/v2/phase316_mechanism_claim_rows.jsonl
+tests/gpt5/result/pattern_family_atlas/v2/phase316_evidence_progress.json
+tests/gpt5/result/pattern_family_atlas/v2/phase316_report.md
+```
+
+本连续阶段新增：
+
+```text
+controlled independent model cases: 360
+template-and-item heldout model cases: 72
+total new independent model cases: 432
+layer/component rows: 44928
+path event rows: 3240
+matched similarity rows: 3240
+heldout causal cases: 18
+```
+
+数据已经同步到：
+
+```text
+frontend/public/vis_data/pattern_family_atlas/v2/
+frontend/dist/vis_data/pattern_family_atlas/v2/
+```
+
+前端结果：
+
+```text
+Synced 1216 pattern atlas v2 files
+npm run build: passed
+```
+
+只有既有 chunk size warning，不影响图谱数据读取。
+
+### 本阶段最重要的正结果
+
+1. 第一次对知识、语法、推理建立同一冻结分母、同一三位置、同一组件粒度的三模型路径图谱。
+2. 第一次严格区分 432 个独立模型样本和 44928 条逐层记录。
+3. 路径原型在词汇/规则留出和模板改写留出上都高于简单基线，说明内部路径包含部分可迁移结构。
+4. attention 峰值总体早于 MLP、MLP 持续更久、last MLP 更晚的时间轮廓在三族中均可观察。
+5. progress.json 已改为工程进度和科学进度双口径，不再用旧管理百分比代表机制完成度。
+
+### 本阶段最重要的负结果
+
+1. 扣除匹配控制后，总净复用只有 0.042899。
+2. 知识净复用 0.011873、语法净复用 0.016024，不能支持强“族级共享物理主干”结论。
+3. 推理净复用 0.100799 较强，但仍可能部分来自 yes/no 候选路线、规则格式和问题位置。
+4. 模板改写使机制预测下降 25 个百分点，证明模板不是噪声，而是路径组成的一部分。
+5. 18 个 heldout 联合干预中没有 winner flip，也没有强非线性交互。
+6. 当前没有自然门控，没有全词表边界闭合，没有严格自然生成闭合。
+
+### 理论进展
+
+本阶段支持对“语言是模式网络”作一次收紧：
+
+旧的过强表达：
+
+```text
+每个模式族存在一个稳定共享主干，再叠加差分路径。
+```
+
+当前更符合证据的表达：
+
+```text
+语言任务在 source/query/last 和 attention/MLP 上形成可预测的条件化路径；
+其中既有共享的候选/格式/位置结构，也有机制特异更新；
+共享程度依赖模式族、提示模板、目标词表和模型；
+不能预设每个模式族都有一个模板不变、线性可移植的共享主干。
+```
+
+因此当前机制组织公式应继续写成条件化图，而不是固定路径：
+
+$$
+\mathcal{P}(x)
+=
+\mathcal{P}
+(family,mechanism,template,target,position,model)
+$$
+
+更严格地说：
+
+$$
+SharedPath
+\neq
+RawSimilarity
+$$
+
+而应至少满足：
+
+$$
+SharedPathCandidate
+=
+WithinMechanismSimilarity
+-MatchedControl
+-TemplateEffect
+-TargetEffect
+$$
+
+并通过留出预测和因果边验证。
+
+### 智能理论角度的关键洞察
+
+1. 语言路径具有可预测结构，但不是简单模板不变代码。
+2. 模板、候选词表和任务指令不是外部噪声，而是条件化路由的一部分。
+3. 推理 source 位置出现最强净复用，支持“规则入口组织后续候选路线”的假设，但没有证明这是推理本体。
+4. 知识和语法在当前 profile 相似度下净复用很弱，说明复用可能发生在更细通道、绑定关系或非线性门上，而不是完整逐层 margin 轮廓。
+5. 可预测不等于因果；本阶段预测结果为正、干预结果为负，恰好证明“描述图谱”和“运行机制图谱”必须分开计分。
+
+### 严格进度更新
+
+本轮冻结局部范围：
+
+```text
+controlled core case coverage: 100%
+controlled three-position event coverage: 100%
+matched-control analysis coverage: 100%
+same-template heldout prediction coverage: 100%
+template-heldout prediction coverage: 100%
+heldout causal case coverage: 5%
+heldout causal quality proxy: 0%
+natural gate coverage: 0%
+strict clean closure: 0%
+```
+
+全局研究估计只做小幅更新：
+
+```text
+语言模式族物理分布拼图: 约 45%-55%
+语言编码机制: 约 20%-30%
+严格自然闭合: 约 5%-10%
+可验证智能理论: 约 15%-25%
+```
+
+物理分布拼图提高的原因是三核心族获得了均衡数据、匹配控制和两种留出验证；机制和闭合没有显著提高，因为因果审计是负结果。
+
+### 当前硬伤
+
+1. 受控任务全部为英文，小模型结果不能直接外推。
+2. 每种机制只有一个模板改写留出样本，尚不足以形成强模板不变结论。
+3. 推理使用 yes/no 词表，尽管匹配控制已同标签化，仍可能保留共享答案路线。
+4. knowledge/syntax 的净复用接近 0，现有完整 profile 算法可能太粗，也可能说明族级共享主干假设过强。
+5. Phase313 使用 half scaling 和 feature permutation，仍不是自然状态匹配干预。
+6. 候选层经常落在 L0，可能反映表面模板/词汇入口，而非高级机制节点。
+7. 没有追踪 source token attention 到 MLP gate/up/product/down 的自然传递。
+8. 没有开放集 unknown family 测试。
+9. 没有完整短语似然、全词表阻塞者和 strict-clean rollout 联合审计。
+
+### 下一阶段
+
+Phase311-316 已完成一个独立阶段目标：
+
+```text
+把知识、语法、推理从零散代表样本，推进到冻结分母的观测图谱、匹配控制、留出预测和小规模干预审计。
+```
+
+下一阶段与当前阶段不再是同一个任务层级，应转向：
+
+```text
+Phase317-325:
+Natural Source-to-Boundary Causal Edge Mapping
+自然来源到输出边界的因果边图谱。
+```
+
+核心任务：
+
+```text
+1. 独立编写新模板、新领域和开放集样本；
+2. 追踪 source token -> attention head -> MLP gate/up/product/down；
+3. 使用自然状态匹配替换，不再只做 half scaling；
+4. 验证 source/query/last 的方向传递，而不是只看局部峰值；
+5. 同时测 target/distractor、全词表 blocker、完整短语和自然 rollout；
+6. 只有跨对象、跨模板、跨语言留出成立，才升级为 L5/L6 因果边。
+```
+
+### 阶段结论
+
+Phase311-316 完成了用户要求的本阶段系统任务，没有在单个局部测试后停止。
+
+最可靠的新结论是：
+
+```text
+知识、语法、推理的内部路径具有部分可预测结构；
+但匹配控制和模板留出会显著削弱表面高复用；
+当前简单 attention/MLP 路径峰值不能稳定转化为 heldout 因果边；
+语言模式族物理图谱已经更严格、更完整，语言编码机制仍未闭合。
+```

@@ -1,0 +1,154 @@
+{
+  "schema_version": "2.36.0",
+  "phase": "Phase309",
+  "created_at": "2026-07-10T01:49:15.757167+00:00",
+  "status": "complete",
+  "round_name": "phase309_smoke",
+  "model_summaries": [
+    {
+      "schema_version": "2.36.0",
+      "phase": "Phase309",
+      "created_at": "2026-07-10T01:48:50.489134+00:00",
+      "model": "qwen3",
+      "selected_cases": 8,
+      "component_rows": 864,
+      "summary_rows": 24,
+      "pair_path_rows": 4,
+      "pair_matrix_rows": 36,
+      "missing_rows": 0,
+      "pair_group_counts": {
+        "delta_control": 2,
+        "shared_backbone": 2
+      },
+      "attribute_counts": {
+        "category": 2,
+        "color": 2
+      },
+      "route_type_counts": {
+        "mlp->attention->attention": 1,
+        "attention->attention->mlp": 1,
+        "attention->attention->attention": 2
+      },
+      "mean_reuse_by_pair_group": {
+        "delta_control": 0.883182,
+        "shared_backbone": 0.891436
+      },
+      "mean_delta_by_pair_group": {
+        "delta_control": 0.116817,
+        "shared_backbone": 0.108564
+      }
+    },
+    {
+      "schema_version": "2.36.0",
+      "phase": "Phase309",
+      "created_at": "2026-07-10T01:49:03.245495+00:00",
+      "model": "glm4",
+      "selected_cases": 8,
+      "component_rows": 960,
+      "summary_rows": 24,
+      "pair_path_rows": 4,
+      "pair_matrix_rows": 36,
+      "missing_rows": 0,
+      "pair_group_counts": {
+        "delta_control": 2,
+        "shared_backbone": 2
+      },
+      "attribute_counts": {
+        "category": 2,
+        "color": 2
+      },
+      "route_type_counts": {
+        "attention->attention->attention": 4
+      },
+      "mean_reuse_by_pair_group": {
+        "delta_control": 0.800739,
+        "shared_backbone": 0.792471
+      },
+      "mean_delta_by_pair_group": {
+        "delta_control": 0.199261,
+        "shared_backbone": 0.207529
+      }
+    },
+    {
+      "schema_version": "2.36.0",
+      "phase": "Phase309",
+      "created_at": "2026-07-10T01:49:12.901419+00:00",
+      "model": "deepseek7b",
+      "selected_cases": 8,
+      "component_rows": 672,
+      "summary_rows": 24,
+      "pair_path_rows": 4,
+      "pair_matrix_rows": 36,
+      "missing_rows": 0,
+      "pair_group_counts": {
+        "delta_control": 2,
+        "shared_backbone": 2
+      },
+      "attribute_counts": {
+        "category": 2,
+        "color": 2
+      },
+      "route_type_counts": {
+        "mlp->mlp->mlp": 1,
+        "residual->residual->mlp": 1,
+        "attention->mlp->mlp": 1,
+        "residual->mlp->mlp": 1
+      },
+      "mean_reuse_by_pair_group": {
+        "delta_control": 0.748462,
+        "shared_backbone": 0.79941
+      },
+      "mean_delta_by_pair_group": {
+        "delta_control": 0.251538,
+        "shared_backbone": 0.20059
+      }
+    }
+  ],
+  "component_rows": 2496,
+  "summary_rows": 72,
+  "pair_path_rows": 12,
+  "pair_matrix_rows": 108,
+  "component_similarity_rows": 108,
+  "missing_rows": 0,
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "pair_group_counts": {
+    "delta_control": 6,
+    "shared_backbone": 6
+  },
+  "attribute_counts": {
+    "category": 6,
+    "color": 6
+  },
+  "route_type_counts": {
+    "mlp->attention->attention": 1,
+    "attention->attention->mlp": 1,
+    "attention->attention->attention": 6,
+    "mlp->mlp->mlp": 1,
+    "residual->residual->mlp": 1,
+    "attention->mlp->mlp": 1,
+    "residual->mlp->mlp": 1
+  },
+  "mean_reuse_by_pair_group": {
+    "delta_control": 0.66825,
+    "shared_backbone": 0.674022
+  },
+  "mean_delta_by_pair_group": {
+    "delta_control": 0.33175,
+    "shared_backbone": 0.325978
+  },
+  "mean_reuse_by_position": {
+    "last": 0.708759,
+    "object": 0.610155,
+    "query": 0.694494
+  },
+  "mean_delta_by_position": {
+    "last": 0.291241,
+    "object": 0.389845,
+    "query": 0.305506
+  },
+  "token_match_confidence_mean": 0.875
+}
