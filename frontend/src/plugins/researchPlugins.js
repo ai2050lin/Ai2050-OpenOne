@@ -40,7 +40,7 @@ export const RESEARCH_PLUGINS = [
     workspaceTab: 'main',
     defaultMode: 'evidence',
     target: '破解语言编码机制',
-    focus: '围绕词元、语义角色、注意力头、MLP通道和生成变化，形成可验证机制图谱。',
+    focus: '按语言模式族追踪来源状态、关键层、真实神经元候选、残差写入和读出结果，形成可验证物理脉络。',
     status: '主线',
     defaultLayers: ['atlas'],
     layers3D: ['atlas', 'causalPath', 'boundary', 'aiOrbit'],

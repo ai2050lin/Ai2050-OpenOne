@@ -18,6 +18,8 @@ export default function useVisData() {
     'atlas_graph_v1',
     'real_component_trace.v1',
     'research_kernel_manifest.v1',
+    'pattern_family_neuron_atlas.v1',
+    'neuron_atlas_partition.v1',
   ].includes(version);
 
   const loadDataManifest = useCallback(async () => {

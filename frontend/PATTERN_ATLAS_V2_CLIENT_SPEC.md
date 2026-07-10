@@ -36,6 +36,7 @@ case_details/{model}__{case_id}.json
 9. Batch Planner: first executable queue from `phase274_selected_batch_rows.jsonl`.
 10. Fill Results: Phase275 component and causal fill rows.
 11. Causal Fill Audit: low-side-effect support and side-effect risk from `phase275_causal_fill_rows.jsonl`.
+12. Neuron Path Atlas: selected pattern family -> observed component sequence -> localized physical units -> readout.
 
 ## Client Rules
 
@@ -46,3 +47,8 @@ case_details/{model}__{case_id}.json
 - Phase274 gap files are prioritization data, not new model evidence.
 - `candidate_closure_verification` means the row already has some path evidence but still needs strict closure recheck.
 - Phase275 fill files are physical-path evidence for selected queue rows, still not closure proof.
+- The neuron path view must start from `pattern_family_neuron_atlas/v1/manifest.json` and load only the selected family/model partition.
+- Unmapped families must display `not_mapped_to_real_units`; the client must not create placeholder neurons or inferred edges.
+- `observed_component_sequence` is a temporal/component trace, not a causal neuron-to-neuron path.
+- `channel_group_not_single_unit` must never be presented as single-unit causality.
+- The 3D default is an evidence-bearing key path. Full architecture inventory and unrelated activation background stay hidden.

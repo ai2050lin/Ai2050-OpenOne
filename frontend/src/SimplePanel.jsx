@@ -11,9 +11,11 @@ export function SimplePanel({
   dragHandleProps, // For draggable handle props
   actions, // Optional header actions
   hideTitle = false, // When true, only show actions in header bar (no logo/title text)
+  className = '',
 }) {
   return (
     <div 
+      className={className}
       style={{
         background: 'rgba(20, 20, 25, 0.8)', 
         padding: '16px', 

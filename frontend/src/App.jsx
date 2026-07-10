@@ -18,6 +18,7 @@ import { useAppleNeuronWorkspace } from './blueprint/appleNeuronWorkspaceBridge'
 import { MODEL_CONFIGS } from './blueprint/appleNeuron/constants';
 import { GlobalConfigPanel } from './components/app/GlobalConfigPanel';
 import { AttentionHeatmap, MLPActivationChart, Visualization } from './components/app/LegacyVisualization';
+import { PatternFamilyAtlasControls } from './components/app/PatternFamilyAtlasControls';
 import { ResearchSpaceOverlay } from './components/app/ResearchSpaceOverlay';
 import ICSPBPanel from './components/FiberNetPanel';
 
@@ -52,9 +53,11 @@ import GrammarRoleMatrixRenderer from './neural_vis/renderers/GrammarRoleMatrixR
 import CausalChainRenderer from './neural_vis/renderers/CausalChainRenderer';
 import DarkMatterFlowRenderer from './neural_vis/renderers/DarkMatterFlowRenderer';
 import AtlasGraphRenderer from './neural_vis/renderers/AtlasGraphRenderer';
+import PatternFamilyNeuronAtlasRenderer from './neural_vis/renderers/PatternFamilyNeuronAtlasRenderer';
 import RealUnitTraceRenderer from './neural_vis/renderers/RealUnitTraceRenderer';
 import SceneHelpers from './neural_vis/components/SceneHelpers';
 import useVisData from './neural_vis/hooks/useVisData';
+import { usePatternFamilyNeuronAtlas } from './researchKernel/usePatternFamilyNeuronAtlas';
 import { useResearchKernel } from './researchKernel/useResearchKernel';
 import {
   RESEARCH_PLUGINS,
@@ -1438,6 +1441,11 @@ export default function App() {
     total: 10,
   });
   const [activeResearchPluginId, setActiveResearchPluginId] = useState('language-mechanism');
+  const [patternFamilyAtlasEnabled, setPatternFamilyAtlasEnabled] = useState(true);
+  const [patternFamilyId, setPatternFamilyId] = useState('content_knowledge');
+  const [patternFamilyEvidenceFocus, setPatternFamilyEvidenceFocus] = useState('key');
+  const [patternFamilyMaxUnits, setPatternFamilyMaxUnits] = useState(48);
+  const [patternFamilySelectedNodeId, setPatternFamilySelectedNodeId] = useState('');
   const [pluginWindowVisibility, setPluginWindowVisibility] = useState(() => (
     getPluginWindowState(getResearchPluginById('language-mechanism'))
   ));
@@ -1476,6 +1484,11 @@ export default function App() {
     fpCurrentLayer,
     FP_SUB_PHASES[fpSubPhase]?.id
   );
+  const patternFamilyNeuronAtlas = usePatternFamilyNeuronAtlas(patternFamilyId, fpModel);
+
+  useEffect(() => {
+    setPatternFamilySelectedNodeId('');
+  }, [fpModel, patternFamilyId]);
 
   // 步进到下一个子阶段
   const stepNextSubPhase = useCallback(() => {
@@ -2272,6 +2285,11 @@ export default function App() {
   })();
 
   const activeResearchPlugin = getResearchPluginById(activeResearchPluginId);
+  const isPatternFamilyAtlasView = Boolean(
+    isAppleMainView
+    && activeResearchPluginId === 'language-mechanism'
+    && patternFamilyAtlasEnabled
+  );
   const activePluginPanels = activeResearchPlugin?.panels || [];
   const currentResearchTarget = activeResearchPlugin?.target || '语言编码机制';
   const selectedAtlasLabel = activeFileMeta?.label || activeFileMeta?.filename || (isAtlasGraph ? '已加载机制图谱' : '未加载机制图谱');
@@ -2285,6 +2303,9 @@ export default function App() {
     setSystemType(plugin.workspaceTab === 'snn' ? 'snn' : plugin.workspaceTab === 'icspb' ? 'icspb' : 'dnn');
     if ((plugin.defaultLayers || []).includes('atlas')) {
       setFpMode('demo');
+    }
+    if (plugin.id === 'language-mechanism') {
+      setPatternFamilyAtlasEnabled(true);
     }
   };
   const applyResearchMode = (mode) => {
@@ -2411,7 +2432,10 @@ export default function App() {
     : `操作面板 · ${activeFunctionPanel.label}`;
 
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#050505', color: 'white' }}>
+    <div
+      className={isPatternFamilyAtlasView ? 'pattern-family-atlas-active' : ''}
+      style={{ width: '100vw', height: '100vh', background: '#050505', color: 'white' }}
+    >
 
       {/* Global Settings Button */}
       <button
@@ -2500,6 +2524,7 @@ export default function App() {
       {/* ==================== 左上: 控制面板 (v3.0 三Tab设计) ==================== */}
       {panelVisibility.inputPanel && (
         <SimplePanel
+          className="workspace-panel workspace-panel--input"
           title="控制面板"
           hideTitle
           style={{
@@ -3000,6 +3025,7 @@ export default function App() {
       {/* Model Info Panel (Top-Right) */}
       {panelVisibility.infoPanel && (
         <SimplePanel
+          className="workspace-panel workspace-panel--info"
           title={infoPanelTitle}
           style={{
             position: 'absolute', top: 20, right: 20, zIndex: 100,
@@ -3209,6 +3235,8 @@ export default function App() {
                               {info.label && !info.token && <div>名称: <strong>{info.label}</strong></div>}
                               {info.source && <div><span style={{ color: '#7f95bb' }}>from:</span> {info.source}</div>}
                               {info.type && <div>类型: <span style={{ color: '#4ecdc4' }}>{info.type}</span></div>}
+                              {info.family_name && <div>模式族: <span style={{ color: '#67e8f9' }}>{info.family_name}</span></div>}
+                              {info.model && <div>模型: <span style={{ color: '#dbeafe' }}>{info.model}</span></div>}
                               {info.layer !== undefined && (
                                 <div>层: <span style={{ color: layerToFuncColor(info.layer) }}>L{info.layer}</span>{' '}
                                   <span style={{ fontSize: 10, color: '#7f95bb' }}>({layerToFuncLabel(info.layer)})</span>
@@ -3228,6 +3256,18 @@ export default function App() {
                               {info.activation !== undefined && (
                                 <div>激活: <span style={{ color: '#4ecdc4' }}>{info.activation?.toFixed(4)}</span></div>
                               )}
+                              {info.component && <div>组件: <span style={{ color: '#fbbf24' }}>{info.component}</span></div>}
+                              {info.unit_kind && <div>单元类型: <span style={{ color: '#fbbf24' }}>{info.unit_kind}</span></div>}
+                              {info.unit_index !== undefined && <div>单元索引: <span style={{ color: '#fff' }}>{info.unit_index}</span></div>}
+                              {info.evidence_level && <div>证据等级: <span style={{ color: '#67e8f9' }}>{info.evidence_level}</span></div>}
+                              {info.evidence_status && <div>证据状态: <span style={{ color: '#a5b4fc' }}>{info.evidence_status}</span></div>}
+                              {info.causal_scope && <div>因果范围: <span style={{ color: '#fda4af' }}>{info.causal_scope}</span></div>}
+                              {info.case_count !== undefined && <div>样本覆盖: <span style={{ color: '#fff' }}>{info.case_count}</span></div>}
+                              {info.target_labels?.length > 0 && <div>目标标签: <span style={{ color: '#fff' }}>{info.target_labels.join(', ')}</span></div>}
+                              {info.natural_observed !== undefined && <div>自然交叉: <span style={{ color: info.natural_observed ? '#22d3ee' : '#64748b' }}>{info.natural_observed ? '是' : '否'}</span></div>}
+                              {info.group_intervention_supported !== undefined && <div>组级干预支持: <span style={{ color: info.group_intervention_supported ? '#fb923c' : '#64748b' }}>{info.group_intervention_supported ? '是，非单元因果' : '否'}</span></div>}
+                              {info.global_closed !== undefined && <div>当前自然样本读出: <span style={{ color: info.global_closed ? '#4ade80' : '#fb7185' }}>{info.global_closed ? '命中' : '未闭合'}</span></div>}
+                              {info.evidence_boundary && <div style={{ marginTop: 5, paddingTop: 5, borderTop: '1px solid rgba(148,163,184,0.16)', color: '#fda4af' }}>证据边界: {info.evidence_boundary}</div>}
                               {info.category && <div>类别: <span style={{ color: CATEGORY_COLORS[info.category] || '#ffe66d' }}>{info.category}</span></div>}
                               {info.subspace && (
                                 <div>子空间: <span style={{ color: SUBSPACE_COLORS[info.subspace] || '#888' }}>{info.subspace === 'w_u' ? 'W_U' : info.subspace === 'w_u_perp' ? 'W_U⊥' : info.subspace}</span></div>
@@ -3932,6 +3972,7 @@ export default function App() {
       {/* ==================== 右下: 操作面板 ==================== */}
       {panelVisibility.layersPanel && (
         <SimplePanel
+          className="workspace-panel workspace-panel--operation"
           title={operationPanelTitle}
           style={{
             position: 'absolute', bottom: 20, right: 20, zIndex: 10,
@@ -4223,21 +4264,36 @@ export default function App() {
           错误: {visError}
         </div>
       )}
+      {isAppleMainView && activeResearchPluginId === 'language-mechanism' && (
+        <PatternFamilyAtlasControls
+          enabled={patternFamilyAtlasEnabled}
+          onEnabledChange={setPatternFamilyAtlasEnabled}
+          atlas={patternFamilyNeuronAtlas}
+          familyId={patternFamilyId}
+          onFamilyChange={setPatternFamilyId}
+          modelKey={fpModel}
+          onModelChange={handleFpModelChange}
+          evidenceFocus={patternFamilyEvidenceFocus}
+          onEvidenceFocusChange={setPatternFamilyEvidenceFocus}
+          maxUnits={patternFamilyMaxUnits}
+          onMaxUnitsChange={setPatternFamilyMaxUnits}
+        />
+      )}
         <Canvas shadows>
           {isAppleMainView && <color attach="background" args={['#090b15']} />}
           {isAppleMainView && <fog attach="fog" args={['#090b15', 18, fpCurrentLayer != null ? 200 : 80]} />}
 
           <PerspectiveCamera
             makeDefault
-            position={isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [12, 16, 36] : [20, 20, 20]}
-            fov={isEncoding3DTab ? 46 : isAppleMainView ? 50 : 50}
+            position={isPatternFamilyAtlasView ? [10, 2, 34] : isEncoding3DTab ? [0, 8, 34] : isAppleMainView ? [12, 16, 36] : [20, 20, 20]}
+            fov={isPatternFamilyAtlasView ? 48 : isEncoding3DTab ? 46 : isAppleMainView ? 50 : 50}
           />
           <OrbitControls
             makeDefault
-            target={[0, 0, 0]}
+            target={isPatternFamilyAtlasView ? [0, 1, 0] : [0, 0, 0]}
             enablePan
             enableZoom
-            minDistance={isAppleMainView ? 10 : undefined}
+            minDistance={isPatternFamilyAtlasView ? 18 : isAppleMainView ? 10 : undefined}
           />
 
           <ambientLight intensity={0.5} />
@@ -4261,48 +4317,65 @@ export default function App() {
 
           {isAppleMainView && !isEncoding3DTab ? (
             <>
-              <AppleNeuronSceneContent
-                key={`apple-neuron-${fpModel}`}
-                nodes={appleNeuronWorkspace.nodes}
-                links={appleNeuronWorkspace.links}
-                selected={appleNeuronWorkspace.selected}
-                onSelect={appleNeuronWorkspace.setSelected}
-                prediction={appleNeuronWorkspace.prediction}
-                mode={appleNeuronWorkspace.analysisMode}
-                theoryObjectMeta={appleNeuronWorkspace.currentTheoryObject}
-                dimensionLayerProfile={appleNeuronWorkspace.multidimLayerProfile}
-                activeDimension={appleNeuronWorkspace.multidimActiveDimension}
-                dimensionCausal={appleNeuronWorkspace.multidimCausalData}
-                nodeDisplayEmphasis={appleNeuronWorkspace.nodeDisplayEmphasis}
-                animationMode={appleNeuronWorkspace.animationMode}
-                scanMechanismData={appleNeuronWorkspace.scanMechanismData}
-                languageFocus={appleNeuronWorkspace.languageFocus}
-                showDNNLayers={false}
-                visibleComponents={[]}
-                forwardPassLayer={fpCurrentLayer}
-                forwardPassData={fpData?.layers ? Object.fromEntries(fpData.layers.map(l => [l.layer, l])) : null}
-                modelKey={fpModel}
-                layerAnimProgress={layerAnimProgress}
-                fpSpeed={fpSpeed}
-                lang={lang}
-              />
-              <RealUnitTraceRenderer
-                trace={realResearchTrace.trace}
-                stableUnits={realResearchTrace.stableUnits}
-                currentEvent={realResearchTrace.currentEvent}
-                currentLayer={fpCurrentLayer}
-                onHover={setHoveredInfo}
-              />
-              {/* Reverse Engineering 3D Overlay */}
-              {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
-                <ReverseEngineeringOverlay
-                  viewMode={appleNeuronWorkspace.reverseEngineeringState?.viewMode}
-                  selectedLanguageDims={appleNeuronWorkspace.reverseEngineeringState?.selectedLanguageDims}
-                  selectedDNNFeature={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNFeature}
-                  selectedDNNCategory={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNCategory}
-                  nodes={appleNeuronWorkspace.nodes}
-                  links={appleNeuronWorkspace.links}
+              {isPatternFamilyAtlasView ? (
+                <PatternFamilyNeuronAtlasRenderer
+                  atlas={patternFamilyNeuronAtlas}
+                  evidenceFocus={patternFamilyEvidenceFocus}
+                  maxUnits={patternFamilyMaxUnits}
+                  currentLayer={fpCurrentLayer}
+                  selectedNodeId={patternFamilySelectedNodeId}
+                  onHover={setHoveredInfo}
+                  onSelect={(info) => {
+                    setPatternFamilySelectedNodeId(info?.node_id || '');
+                    setDisplayInfo(info);
+                    setInfoPanelTab('detail');
+                  }}
                 />
+              ) : (
+                <>
+                  <AppleNeuronSceneContent
+                    key={`apple-neuron-${fpModel}`}
+                    nodes={appleNeuronWorkspace.nodes}
+                    links={appleNeuronWorkspace.links}
+                    selected={appleNeuronWorkspace.selected}
+                    onSelect={appleNeuronWorkspace.setSelected}
+                    prediction={appleNeuronWorkspace.prediction}
+                    mode={appleNeuronWorkspace.analysisMode}
+                    theoryObjectMeta={appleNeuronWorkspace.currentTheoryObject}
+                    dimensionLayerProfile={appleNeuronWorkspace.multidimLayerProfile}
+                    activeDimension={appleNeuronWorkspace.multidimActiveDimension}
+                    dimensionCausal={appleNeuronWorkspace.multidimCausalData}
+                    nodeDisplayEmphasis={appleNeuronWorkspace.nodeDisplayEmphasis}
+                    animationMode={appleNeuronWorkspace.animationMode}
+                    scanMechanismData={appleNeuronWorkspace.scanMechanismData}
+                    languageFocus={appleNeuronWorkspace.languageFocus}
+                    showDNNLayers={false}
+                    visibleComponents={[]}
+                    forwardPassLayer={fpCurrentLayer}
+                    forwardPassData={fpData?.layers ? Object.fromEntries(fpData.layers.map(l => [l.layer, l])) : null}
+                    modelKey={fpModel}
+                    layerAnimProgress={layerAnimProgress}
+                    fpSpeed={fpSpeed}
+                    lang={lang}
+                  />
+                  <RealUnitTraceRenderer
+                    trace={realResearchTrace.trace}
+                    stableUnits={realResearchTrace.stableUnits}
+                    currentEvent={realResearchTrace.currentEvent}
+                    currentLayer={fpCurrentLayer}
+                    onHover={setHoveredInfo}
+                  />
+                  {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
+                    <ReverseEngineeringOverlay
+                      viewMode={appleNeuronWorkspace.reverseEngineeringState?.viewMode}
+                      selectedLanguageDims={appleNeuronWorkspace.reverseEngineeringState?.selectedLanguageDims}
+                      selectedDNNFeature={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNFeature}
+                      selectedDNNCategory={appleNeuronWorkspace.reverseEngineeringState?.selectedDNNCategory}
+                      nodes={appleNeuronWorkspace.nodes}
+                      links={appleNeuronWorkspace.links}
+                    />
+                  )}
+                </>
               )}
 
               <ResearchSpaceOverlay
@@ -4313,7 +4386,7 @@ export default function App() {
                 activeResearchPlugin={activeResearchPlugin}
               />
 
-              {visData && (
+              {visData && !isPatternFamilyAtlasView && (
                 <>
                   {/* 场景辅助 (地面网格 + 层号标尺) */}
                   <SceneHelpers nLayers={nLayers} />

@@ -1,0 +1,96 @@
+{
+  "schema_version": "pattern_family_neuron_atlas.v1",
+  "phase": 325,
+  "generated_at": "2026-07-10T04:41:41.086991+00:00",
+  "title": "Evidence-scoped pattern-family neuron path atlas",
+  "families_path": "families.json",
+  "index_path": "neuron_index.json",
+  "partitions": [
+    {
+      "family_id": "content_knowledge",
+      "model": "qwen3",
+      "path": "partitions/content_knowledge/qwen3.json",
+      "mapping_status": "component_path_with_unit_candidates_not_single_unit_causal",
+      "source_row_count": 550,
+      "unique_unit_count": 288,
+      "natural_overlap_count": 23,
+      "group_supported_candidate_count": 32,
+      "candidate_layer_count": 5,
+      "trace_event_count": 110,
+      "group_intervention_row_count": 848,
+      "single_unit_causal_count": 0
+    },
+    {
+      "family_id": "content_knowledge",
+      "model": "glm4",
+      "path": "partitions/content_knowledge/glm4.json",
+      "mapping_status": "component_path_with_unit_candidates_not_single_unit_causal",
+      "source_row_count": 550,
+      "unique_unit_count": 297,
+      "natural_overlap_count": 21,
+      "group_supported_candidate_count": 44,
+      "candidate_layer_count": 4,
+      "trace_event_count": 122,
+      "group_intervention_row_count": 732,
+      "single_unit_causal_count": 0
+    },
+    {
+      "family_id": "content_knowledge",
+      "model": "deepseek7b",
+      "path": "partitions/content_knowledge/deepseek7b.json",
+      "mapping_status": "component_path_with_unit_candidates_not_single_unit_causal",
+      "source_row_count": 550,
+      "unique_unit_count": 248,
+      "natural_overlap_count": 19,
+      "group_supported_candidate_count": 27,
+      "candidate_layer_count": 3,
+      "trace_event_count": 86,
+      "group_intervention_row_count": 432,
+      "single_unit_causal_count": 0
+    }
+  ],
+  "files": {
+    "nodes": "neuron_nodes.jsonl",
+    "edges": "neuron_edges.jsonl",
+    "events": "neuron_events.jsonl",
+    "interventions": "neuron_interventions.jsonl",
+    "runs": "neuron_runs.jsonl"
+  },
+  "metrics": {
+    "family_count": 9,
+    "mapped_family_count": 1,
+    "model_count": 3,
+    "unique_unit_count": 833,
+    "edge_count": 848,
+    "natural_event_count": 318,
+    "group_intervention_row_count": 2012,
+    "single_unit_causal_count": 0
+  },
+  "evidence_boundary": {
+    "mapped_scope": "content_knowledge/color",
+    "unmapped_families": [
+      "output_protocol",
+      "reasoning_constraint",
+      "syntax_structure",
+      "language_action",
+      "cross_lingual",
+      "readout_competition",
+      "state_drift",
+      "closure"
+    ],
+    "statement": "Only evidence-bearing units are published. No placeholder units are synthesized for unmapped families.",
+    "single_unit_causal_closure": false
+  },
+  "source_artifacts": [
+    "tests/result/pattern_family_atlas/v2/families.jsonl",
+    "tests/result/research_kernel/manifest.json",
+    "tests/result/research_kernel/runs/phase286_color_real_units_*/",
+    "tests/result/research_kernel/runs/phase287_*_red_component_trace/"
+  ],
+  "validation": {
+    "status": "passed",
+    "families": 9,
+    "nodes": 833,
+    "edges": 848
+  }
+}

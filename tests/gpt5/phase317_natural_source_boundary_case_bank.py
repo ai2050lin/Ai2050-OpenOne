@@ -38,6 +38,11 @@ def digest(value: Any) -> str:
     return hashlib.sha256(raw).hexdigest()[:20]
 
 
+def scientific_digest(rows: list[dict[str, Any]]) -> str:
+    canonical = [{key: value for key, value in row.items() if key != "created_at"} for row in rows]
+    return digest(canonical)
+
+
 def aliases(value: str) -> list[str]:
     values = [value, value.lower(), value.capitalize()]
     if value.lower() == "yes":
@@ -449,8 +454,8 @@ def prepare() -> dict[str, Any]:
         "split_counts": dict(Counter(str(r["split"]) for r in cases)),
         "pair_split_counts": dict(Counter(str(r["split"]) for r in pairs)),
         "models": MODELS,
-        "case_bank_hash": digest(cases),
-        "pair_bank_hash": digest(pairs),
+        "case_bank_hash": scientific_digest(cases),
+        "pair_bank_hash": scientific_digest(pairs),
         "controls": ["same_target_natural_state", "unrelated_mechanism_natural_state", "wrong_position", "feature_permutation"],
         "heldout_policy": "template_c_open and heldout objects/rules are not used for layer or component selection",
     }

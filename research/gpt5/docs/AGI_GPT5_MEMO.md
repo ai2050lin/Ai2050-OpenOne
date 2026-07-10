@@ -44091,3 +44091,1483 @@ Phase311-316 完成了用户要求的本阶段系统任务，没有在单个局�
 当前简单 attention/MLP 路径峰值不能稳定转化为 heldout 因果边；
 语言模式族物理图谱已经更严格、更完整，语言编码机制仍未闭合。
 ```
+
+## Phase 317: Phase309-316 转述审计与自然因果分母冻结 [2026-07-09 18:30]
+
+### 附件判断审计
+
+附件的主方向基本正确：
+
+```text
+Phase309 是对象对内部路径的观测正结果；
+Phase310-316 对原始复用、模板效应、独立样本数和因果证据作了必要降温；
+当前已经形成语言模式族物理图谱基础设施，但没有破解完整语言编码机制。
+```
+
+但附件存在一个需要修正的统计口径问题。
+
+Phase309 原始汇总同时包含两类复用均值：
+
+```text
+逐组件相似度记录总体均值：
+  shared_backbone（共享主干） = 0.702623
+  delta_control（差分控制） = 0.563324
+
+对象对主路径记录的模型级均值：
+  qwen3: 0.901764 vs 0.755106
+  GLM4: 0.838703 vs 0.680402
+  DS7B: 0.830350 vs 0.690642
+```
+
+这两组数值都来自原始文件，但不是同一个统计单位：前者来自 1350 条位置-组件相似度记录，后者来自 150 条对象对主路径记录。附件把它们并列时没有标明分母，容易被误读成简单平均不一致。
+
+因此 Phase309 的严格结论只能是：
+
+```text
+在两种观测汇总口径下，共享主干对象对均高于差分控制对象对；
+但这个结果仍受对象类别、提示模板、候选词表和属性构造影响；
+它是观测路径正结果，不是因果边或共享机制闭合。
+```
+
+### 冻结科学分母
+
+脚本：
+
+```text
+tests/gpt5/phase317_natural_source_boundary_case_bank.py
+```
+
+本阶段建立全新独立分母：
+
+```text
+3 个核心模式族；
+每族 4 个机制；
+每机制 12 个基础案例；
+发现、校准、留出各 4 个案例；
+每机制 3 套模板；
+144 个基础案例；
+144 个供体-受体反事实配对；
+432 个模型配对。
+```
+
+分族：
+
+```text
+知识族 48；
+语法族 48；
+推理族 48。
+```
+
+分割：
+
+```text
+发现 48；
+校准 48；
+开放模板留出 48。
+```
+
+加入四类控制：
+
+```text
+同功能标签自然状态控制；
+无关机制自然状态控制；
+错误位置替换；
+同范数特征置换。
+```
+
+时间戳已经从科学分母哈希中排除：
+
+```text
+case_bank_hash = fdabbf60a606c54d5b10
+pair_bank_hash = 93b7b526cca4d01411c9
+```
+
+这一步保证重复生成文件不会因为 created_at（创建时间）字段改变科学分母指纹。
+
+## Phase 318: 自然来源状态替换和来源到查询/边界传播 [2026-07-09 18:30]
+
+### 脚本和运行
+
+```text
+tests/gpt5/phase318_natural_source_state_transfer.py
+tests/gpt5/run_phase317_319_natural_source_boundary_atlas.sh
+```
+
+按以下顺序完成 CUDA（英伟达并行计算平台）测试：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型结束后释放显存，再加载下一个模型。正式运行没有缺失案例和显存溢出。
+
+### 干预原理
+
+对供体样本和受体样本，先提取自然运行时来源位置的逐层状态。然后在受体指定层和来源位置执行完整自然状态替换：
+
+$$
+h'_{l,s}(x_r)=h_{l,s}(x_d)
+$$
+
+其中：
+
+```text
+x_d 为供体；
+x_r 为受体；
+l 为来源候选层；
+s 为来源词元位置。
+```
+
+供体相对受体的边界：
+
+$$
+B(x)=L_{donor}(x)-L_{recipient}(x)
+$$
+
+来源替换效应：
+
+$$
+\Delta_{source}=B(do(h_{l,s}=h^d_{l,s}))-B(baseline)
+$$
+
+控制校正效应：
+
+$$
+\Delta_{corrected}
+=
+\Delta_{source}
+-
+\max(\Delta_{unrelated},\Delta_{wrong\ position})
+$$
+
+发现集只用于扫描 6 个归一化深度候选层；校准集不参与选层，只检验冻结层和控制项；留出集在 Phase319 才打开。
+
+来源变化在查询或最后位置朝供体方向传播的投影比例：
+
+$$
+\rho_{p,k}
+=
+\frac{
+(h'_{k,p}-h^r_{k,p})^\top(h^d_{k,p}-h^r_{k,p})
+}{
+\|h^d_{k,p}-h^r_{k,p}\|^2
+}
+$$
+
+### 客观结果
+
+```text
+discovery scan rows（发现扫描记录）: 1728
+calibration control rows（校准控制记录）: 864
+source/query/last propagation rows（传播记录）: 37096
+source layer selections（来源层选择）: 36
+missing pairs（缺失配对）: 0
+```
+
+三模型校准结果：
+
+```text
+qwen3:
+  source replace = 8.072286
+  unrelated replace = 3.011598
+  source - unrelated = 5.060688
+  donor win rate = 0.604167
+
+GLM4:
+  source replace = 3.444587
+  unrelated replace = 0.923412
+  source - unrelated = 2.521175
+  donor win rate = 0.395833
+
+DS7B:
+  source replace = 4.911377
+  unrelated replace = 1.979026
+  source - unrelated = 2.932351
+  donor win rate = 0.562500
+```
+
+总体：
+
+```text
+source transfer mean = 5.476083
+unrelated transfer mean = 1.971345
+control-corrected transfer = 3.504738
+donor win rate = 0.520833
+full-vocabulary top1 change rate = 0.291667
+```
+
+查询和最后位置出现正供体方向投影的比例：
+
+```text
+qwen3: query 0.660636, last 0.819226
+GLM4: query 0.701480, last 0.827714
+DS7B: query 0.686070, last 0.805760
+```
+
+### 结果边界
+
+这是比 half scaling（半缩放）更自然的状态干预，但仍然只是整条高维残差状态替换。它可能同时携带：
+
+```text
+词元身份；
+显式答案值；
+模板位置；
+局部语法；
+多个注意力头和多层感知机通道的混合信息。
+```
+
+因此本阶段只能升级为 L4 自然状态干预效应，不能称为最小因果边。
+
+## Phase 319: 开放模板留出的注意力头-多层感知机通道中介审计 [2026-07-09 18:30]
+
+### 脚本
+
+```text
+tests/gpt5/phase319_heldout_component_mediation.py
+```
+
+### 选择隔离
+
+只使用发现集测量来源替换自然引发的组件响应，并为每个模型-模式族-机制冻结：
+
+```text
+1 个来源层；
+1 个注意力头输入候选；
+1 个多层感知机乘积通道组候选；
+候选作用位置为 query（查询）或 last（最后位置）。
+```
+
+开放模板留出样本完全不参与来源层、注意力头或通道选择。
+
+### 中介恢复原理
+
+在来源状态替换保持有效时，把被选注意力头或多层感知机乘积通道恢复到受体自然基线值：
+
+$$
+M_A
+=
+\Delta_{source}
+-
+\Delta_{source+A\ restore}
+$$
+
+$$
+M_F
+=
+\Delta_{source}
+-
+\Delta_{source+F\ restore}
+$$
+
+$$
+M_{AF}
+=
+\Delta_{source}
+-
+\Delta_{source+A,F\ restore}
+$$
+
+若某个头或通道真实中介来源效应，恢复后应稳定削弱供体边界移动，而不是只产生无方向扰动。
+
+同时测量：
+
+```text
+供体-受体首词元边界；
+全词表首选词元；
+完整目标短语对数似然；
+8 词元自然生成展开；
+无关机制、错误位置和特征置换控制。
+```
+
+### 数据量
+
+```text
+discovery component rows（发现组件记录）: 58624
+component selections（组件选择）: 72
+open-template heldout cases（开放模板留出案例）: 144
+heldout condition rows（留出条件记录）: 1152
+natural component event rows（自然组件事件）: 288
+phrase/rollout cases（短语/生成案例）: 144
+missing cases（缺失案例）: 0
+```
+
+### 总体结果
+
+```text
+heldout source transfer mean = 7.674791
+heldout control-corrected transfer = 3.216129
+heldout donor win rate = 0.590278
+phrase transfer shift mean = 6.453154
+rollout change rate = 0.715278
+patched rollout starts with donor = 0.166667
+joint mediation loss mean = 0.018746
+```
+
+这组结果必须拆开解释：
+
+```text
+整来源状态替换在开放模板上仍然有效；
+短语边界也明显朝供体移动；
+但自然生成只有 16.67% 直接以供体答案开始；
+单注意力头加单多层感知机通道平均只解释 0.018746；
+局部边界变化没有变成稳定完整生成机制。
+```
+
+### 分族结果
+
+```text
+知识族:
+  source transfer = 18.654491
+  control-corrected = 8.526307
+  joint mediation = -0.015669
+
+语法族:
+  source transfer = 4.071312
+  control-corrected = 1.178225
+  joint mediation = 0.059169
+
+推理族:
+  source transfer = 0.298571
+  control-corrected = -0.056145
+  joint mediation = 0.012739
+```
+
+这是本阶段最重要的分化：
+
+```text
+知识族测试的 source（来源）就是事实中显式出现的答案值词元；
+它证明的是显式记录值的搬运路径，不是参数记忆中的潜在知识检索；
+语法来源词元有中等条件效应；
+推理不能由单个“关键词元”状态替换恢复，说明推理来源很可能是多语句、多词元绑定结构。
+```
+
+### 初筛候选
+
+DS7B 出现 2 个个体筛选候选：
+
+```text
+category_binding（类别绑定）；
+material_binding（材料绑定）。
+```
+
+但两者主要来自最后位置注意力头恢复，多层感知机通道恢复分别很弱或为负；同时无关机制和错误位置控制也很大。因此它们没有直接升级为 L5，而是进入 Phase320 注册复核。
+
+## Phase 320: 全新对象和第四模板的注册式因果边复核 [2026-07-09 18:30]
+
+### 脚本和注册分母
+
+```text
+tests/gpt5/phase320_registered_edge_replication.py
+```
+
+在查看复核结果之前冻结：
+
+```text
+2 个候选知识机制；
+8 个全新对象；
+第四套独立提示模板；
+8 个新供体-受体配对；
+24 个模型复核配对；
+每配对 7 个条件。
+```
+
+qwen3 首次运行发生一次底层段错误；在确认显存回落至 561 MiB 后单独完整重跑，8/8 案例成功。GLM4 和 DS7B 首次均完成。最终三模型数据完整，缺失为 0。
+
+### 更严格的个体通过标准
+
+个体必须同时满足：
+
+$$
+\Delta_{source}>0.5
+$$
+
+$$
+\Delta_{corrected}>0.5
+$$
+
+$$
+DonorWins=1
+$$
+
+$$
+M_A>\max(0.5,0.2|\Delta_{source}|)
+$$
+
+$$
+M_F>\max(0.5,0.1|\Delta_{source}|)
+$$
+
+$$
+M_{AF}>\max(M_A,M_F)
+$$
+
+即使个体通过，机制仍需在平行对象和至少两个模型中复现才可升级。
+
+### 客观结果
+
+```text
+registered model cases（注册模型案例）: 24
+condition rows（条件记录）: 168
+missing cases（缺失案例）: 0
+source transfer mean = 21.009809
+control-corrected transfer mean = 10.187535
+donor win rate = 1.000000
+attention mediation loss mean = 0.748984
+MLP product mediation loss mean = -0.388312
+joint mediation loss mean = 0.409402
+registered pass count = 0
+registered pass rate = 0.0
+promoted L5 edge count = 0
+```
+
+分模型：
+
+```text
+qwen3:
+  source transfer 25.339998
+  corrected 12.767922
+  attention mediation 0.484290
+  MLP mediation -1.258609
+  pass 0/8
+
+GLM4:
+  source transfer 23.219342
+  corrected 12.126297
+  attention mediation 0.274372
+  MLP mediation 0.020497
+  pass 0/8
+
+DS7B:
+  source transfer 14.470087
+  corrected 5.668385
+  attention mediation 1.488292
+  MLP mediation 0.073177
+  pass 0/8
+```
+
+严格结论：
+
+```text
+全新对象和模板重复证明整来源值状态替换很强；
+但没有证明一个注意力头和一个多层感知机通道构成稳定完整中介链；
+Phase319 的 2 个筛选候选被注册复核否定升级；
+当前仍为 L4 干预效应，没有 L5 因果边。
+```
+
+## Phase 321: 自然来源因果候选图谱合成 [2026-07-09 18:30]
+
+### 脚本和图谱
+
+```text
+tests/gpt5/phase321_natural_causal_edge_atlas_synthesis.py
+```
+
+生成：
+
+```text
+graph nodes（图谱节点）: 131
+graph edges（图谱边）: 252
+evidence claims（证据声明）: 5
+```
+
+固定格式文件包括：
+
+```text
+phase321_natural_causal_edge_atlas_summary.json
+phase321_natural_causal_edge_progress.json
+phase321_natural_causal_edge_claim_rows.jsonl
+phase321_natural_causal_edge_graph_nodes.jsonl
+phase321_natural_causal_edge_graph_edges.jsonl
+phase321_family_aggregate_rows.jsonl
+phase321_model_family_aggregate_rows.jsonl
+phase321_mechanism_aggregate_rows.jsonl
+phase321_calibration_condition_aggregate_rows.jsonl
+phase321_rollout_family_aggregate_rows.jsonl
+```
+
+### 图谱边的证据分级
+
+```text
+模式族 -> 机制：L1 注册关系；
+机制 -> 来源层：L3 发现候选；
+来源层 -> 输出边界：L4 自然状态干预效应；
+来源层 -> 查询/最后位置：L3 观测传播；
+来源层 -> 注意力头/乘积通道：L3 自然响应；
+单头/单通道 -> 输出边界：L4 负因果审计；
+L5 已复现因果边：0。
+```
+
+### 机制公式的改进
+
+旧的线性写法隐含：
+
+$$
+\Delta B
+\approx
+\Delta A+
+\Delta F
+$$
+
+本阶段数据不支持这种单头、单通道相加解释。更符合当前证据的组织形式是条件化多节点图：
+
+$$
+\Delta B
+=
+\mathcal{F}
+(S,
+\mathcal{H},
+\mathcal{C},
+R,
+Q,
+T,
+M)
+$$
+
+其中：
+
+```text
+S：来源状态组；
+H：注意力头集合；
+C：多层感知机通道集合；
+R：残差携带状态；
+Q：查询和角色绑定条件；
+T：模板、目标和候选集合；
+M：具体模型。
+```
+
+这仍然是待验证的组织公式，不是闭合定律。
+
+当前最可靠的机制分解应写成：
+
+$$
+SourceGroup
+\rightarrow
+DistributedCarrierSet
+\rightarrow
+ConditionalBoundary
+\rightarrow
+Phrase
+\rightarrow
+Rollout
+$$
+
+而不是：
+
+$$
+SingleToken
+\rightarrow
+SingleHead
+\rightarrow
+SingleMLPChannel
+\rightarrow
+Answer
+$$
+
+## Phase 322: 自然来源到边界阶段收束 [2026-07-09 18:30]
+
+### 脚本和客户端
+
+```text
+tests/gpt5/phase322_natural_source_boundary_stage_completion.py
+```
+
+阶段数据已同步到：
+
+```text
+tests/gpt5/result/pattern_family_atlas/v2/
+tests/result/pattern_family_atlas/v2/
+frontend/public/vis_data/pattern_family_atlas/v2/
+frontend/dist/vis_data/pattern_family_atlas/v2/
+```
+
+客户端同步和构建：
+
+```text
+Synced 1255 pattern atlas v2 files
+npm run build: passed
+```
+
+仅有既有打包体积警告，不影响数据读取。
+
+### 阶段客观总量
+
+```text
+基础独立案例: 144
+基础反事实配对: 144
+模型配对: 432
+开放模板留出模型配对: 144
+注册复核模型配对: 24
+发现扫描记录: 1728
+校准控制记录: 864
+来源到查询/最后传播记录: 37096
+发现组件记录: 58624
+留出条件记录: 1152
+短语/生成案例: 144
+缺失案例: 0
+```
+
+### 阶段最重要正结果
+
+1. 自然供体完整来源状态在开放模板和全新对象上都能稳定改变显式值边界。
+2. 来源变化在查询和最后位置出现可测的供体方向传播。
+3. 语法族部分机制存在弱到中等来源条件效应。
+4. 测试第一次同时覆盖首词元边界、完整短语、自然生成、错误位置、无关机制和注册复核。
+5. 描述图谱与因果图谱继续分开计分，没有用工程覆盖率替代机制完成度。
+
+### 阶段最重要负结果
+
+1. 推理族校正来源效应为 -0.056145，不支持单关键词元承载通用推理路径。
+2. 知识族强效应主要来自显式答案值词元搬运，不代表参数记忆检索。
+3. 单注意力头和单多层感知机通道联合中介均值只有 0.018746。
+4. 自然生成直接以供体答案开始的比例只有 0.166667。
+5. 2 个个体筛选候选在 24 个注册复核案例中通过 0 个。
+6. 没有 L5 因果边，没有自然门控，没有严格闭合。
+
+### 当前硬伤
+
+1. 知识族来源位置直接出现答案值，存在强复制/搬运捷径。
+2. 推理来源应是规则、事实和变量绑定的多词元组，本阶段单词元来源定义过粗。
+3. 候选组件按自然响应范数选择，响应大不等于中介作用强。
+4. 每个机制只选择一个注意力头和一个固定宽度通道组，无法覆盖分布式冗余集合。
+5. 多层感知机只在 product（乘积）位置做通道恢复，gate/up/down（门控/上投影/下投影）尚未形成完整因果分解。
+6. 所有任务仍为英语受控提示，没有跨语言复现。
+7. 小模型可能合并或粗化真实语言机制，三模型一致仍不能外推大型模型和人脑。
+8. 整残差状态替换副作用仍较大，必须加入状态完整性和内容保持审计。
+
+### 理论进展
+
+本阶段没有改名，而是进一步收紧“语言是动态模式网络”理论：
+
+```text
+语言模式不是固定线性方向；
+也不是一个模式对应一个注意力头或一个多层感知机通道；
+显式值搬运、语法约束和推理绑定使用不同粒度的来源结构；
+同一个表面任务可能由多节点、冗余、条件门控的载体集合实现；
+完整语言机制必须同时解释来源形成、跨层传播、边界竞争、短语概率和自然生成。
+```
+
+当前工作理论公式：
+
+$$
+\mathcal{P}_{language}(x)
+=
+\mathcal{G}
+(SourceGroup,
+BindingState,
+CarrierSet,
+Boundary,
+Gate,
+Template,
+Model)
+$$
+
+其中任何一条边只有在以下条件成立后才可升级：
+
+$$
+L5Edge
+=
+InterventionEffect
+\land
+MatchedControl
+\land
+HeldoutPrediction
+\land
+ParallelObjectReplication
+\land
+CrossModelReplication
+\land
+LowSideEffect
+$$
+
+当前满足上述全部条件的边数为 0。
+
+### 严格进度
+
+局部冻结范围：
+
+```text
+自然来源状态干预覆盖: 100%
+来源到查询/最后传播覆盖: 100%
+开放模板组件中介审计覆盖: 100%
+已选择候选的注册复核覆盖: 100%
+已升级 L5 边质量: 0%
+潜在参数记忆检索路径覆盖: 0%
+分布式多节点中介覆盖: 0%
+自然门控覆盖: 0%
+严格闭合: 0%
+```
+
+全局谨慎估计：
+
+```text
+语言模式族物理分布图谱: 约 48%-56%
+语言编码机制: 约 22%-30%
+严格自然闭合: 约 5%-10%
+可验证智能理论: 约 17%-25%
+```
+
+物理图谱小幅提升，是因为新增了自然状态替换、传播、开放模板和注册复核；机制进度只做极小调整，因为没有 L5 边。
+
+### 是否继续自动进入下一步
+
+Phase317-322 已完成一个完整独立阶段：
+
+```text
+从观测路径峰值推进到自然来源状态干预、传播、组件中介和注册复核，
+并严格确认没有可升级的单头-单通道 L5 因果边。
+```
+
+下一阶段不再是同一任务层级，应设为：
+
+```text
+Phase323-330:
+分布式多节点载体集合与潜在参数记忆检索图谱。
+```
+
+优先任务：
+
+```text
+1. 用模型参数记忆问题替换显式答案值记录，消除复制捷径；
+2. 用多词元规则子句、事实链和变量绑定组定义推理来源；
+3. 按因果消融选择稀疏注意力头集合和多层感知机通道集合，而不是按响应范数选单点；
+4. 分别追踪 gate/up/product/down；
+5. 加入跨语言、跨领域、完整短语、自然生成和副作用复核；
+6. 只有注册复现后才升级 L5，仍不以闭合为第一优先级。
+```
+
+### 通俗总结
+
+这轮实验说明，把一个句子里“真正提供信息的词”的完整内部状态换成另一个样本的状态，模型的答案确实会跟着移动。这证明来源信息存在可追踪的物理传递。
+
+但这种传递不是一根简单电线。恢复一个最活跃的注意力头和一个最活跃的多层感知机通道，几乎不能稳定撤销效果；推理问题甚至不能靠替换一个关键词来转移。更符合现象的图景是：语言依赖多个位置、多个头、多个通道和边界条件共同形成的动态网络。
+
+所以本阶段完成的是一块重要拼图，并且排除了“单词元 -> 单头 -> 单通道 -> 答案”的简单机制。它没有破解完整语言编码，也没有完成智能理论或闭合。
+
+## Phase 323: Phase288 全量单神经元 CUDA 干预未运行根因审计 [2026-07-09 18:39]
+
+### 审计对象
+
+用户指出：
+
+```text
+Phase288 全量单神经元 CUDA 干预尚未运行，
+因此当前不能宣称全图谱已实现真实神经元级机制闭合。
+```
+
+这个判断正确。本阶段只审计代码、候选依赖、执行记录和结果目录，没有运行新的模型测试。
+
+### 直接证据
+
+仓库中存在第二套 Phase288：
+
+```text
+tests/gpt5/phase288_color_single_unit_heldout.py
+tests/gpt5/run_phase288_color_single_unit_heldout.py
+tests/gpt5/test_phase288_color_single_unit_heldout.py
+```
+
+但正式结果目录在审计前不存在：
+
+```text
+tests/result/phase288_color_single_unit_heldout/
+```
+
+也不存在以下完成证据：
+
+```text
+intervention_rows.jsonl；
+clean_control_rows.jsonl；
+summary.json；
+manifest.json。
+```
+
+因此只能确认脚本和候选数据已经准备，不能确认 CUDA 干预已经执行。
+
+### 根因一：Phase288 编号冲突
+
+现有备忘录中的原 Phase288 是：
+
+```text
+模式图谱特征挖掘；
+明确规定不跑新模型，不做干预，只读取全量图谱数据。
+```
+
+提交 `ec64f322` 又新增了另一套同名 Phase288：
+
+```text
+颜色单神经元留出干预。
+```
+
+新脚本提交时间位于 Phase317-322 正式执行前几分钟，但没有接入当时的阶段计划、统一运行器、备忘录阶段索引或图谱缺口队列。上一轮执行沿备忘录中的 Phase309-316 -> Phase317-322 主线推进，错误地把低编号 Phase288 视为已经完成的历史阶段，没有发现同编号新分支。
+
+这是阶段编号和调度审计缺失，不是科学结论。
+
+### 根因二：候选分母并不完整
+
+Phase288 声明颜色集合为 12 类：
+
+```text
+red, blue, green, yellow, orange, purple,
+brown, black, white, gray, silver, pink。
+```
+
+但 Phase286 的三个模型候选文件都只有 11 类，每类 50 条候选，缺少：
+
+```text
+pink（粉色）。
+```
+
+因此设计文件的理论分母是：
+
+$$
+12\times20\times6=1440\ cases/model
+$$
+
+当前实际可运行分母是：
+
+$$
+11\times20\times6=1320\ cases/model
+$$
+
+三模型合计：
+
+$$
+1320\times3=3960\ independent\ model\ cases
+$$
+
+如果不先补齐 pink 候选，就不能称为设计定义下的全量运行。
+
+### 根因三：测试没有接入默认仓库导入路径
+
+直接从仓库根目录运行：
+
+```text
+python -m unittest tests.gpt5.test_phase288_color_single_unit_heldout
+```
+
+会因为：
+
+```text
+ModuleNotFoundError: hf_probe_env
+```
+
+而失败。加入：
+
+```text
+PYTHONPATH=tests/gpt5
+```
+
+后三项设计测试可以通过。
+
+这说明算法单元本身可导入，但尚未形成不依赖临时环境变量的持续集成入口。
+
+### 根因四：“全量单神经元”名称过强
+
+当前脚本不是遍历模型中全部多层感知机神经元。它实际执行的是：
+
+```text
+每个颜色从 Phase286 候选中选择 1 个最高分神经元；
+在 20 个对象、6 个模板上重复测试该候选；
+执行 zero、half 和 matched-control 三类干预。
+```
+
+因此更准确的名称是：
+
+```text
+颜色候选单神经元的大样本留出必要性测试。
+```
+
+不是：
+
+```text
+全模型所有神经元穷举干预；
+全语言模式族神经元图谱；
+真实神经元级机制闭合。
+```
+
+### 候选证据本身仍为 L4
+
+Phase286 三模型候选来源：
+
+```text
+qwen3: 550 个已发布 MLP product（多层感知机乘积）神经元地址；
+GLM4: 550；
+DS7B: 550。
+```
+
+但 Phase286 报告明确写明：
+
+```text
+候选来自 channel-group（通道组）干预和真实激活归一化；
+仍是 L4 组件归因证据；
+没有任何记录被标记为单神经元必要性。
+```
+
+Phase288 正是用来补这个缺口，而不是已经完成这个缺口。
+
+### 是否受 GPU 资源阻塞
+
+不是主要阻塞。
+
+当前环境：
+
+```text
+GPU: NVIDIA GeForce RTX 4090 D
+总显存: 24564 MiB
+审计时占用约 654 MiB
+```
+
+运行器已经设计为：
+
+```text
+qwen3 -> GLM4 -> DS7B 顺序执行；
+每个模型结束后释放；
+GLM4 限制 11GiB；
+DS7B 限制 12GiB；
+必要时使用 device_map=auto（自动设备映射）。
+```
+
+因此没有运行的核心原因是分支未调度和分母/测试入口未完全就绪，而不是当前硬件无法运行。
+
+### 即使运行成功，也不能宣称什么
+
+脚本自身的科学边界正确写明：
+
+```text
+通过只代表某个预注册颜色候选神经元，
+对下一词元颜色边界具有留出必要性候选证据；
+不代表充分性；
+不代表自然生成稳定；
+不代表低副作用闭合；
+不代表其他语言模式族；
+不代表全图谱神经元机制闭合。
+```
+
+所以当前图谱不能宣称真实神经元级机制闭合；Phase288 将来跑完后仍然不能单独支持这个宣称。
+
+### 正确补全顺序
+
+在正式运行前应先完成：
+
+```text
+1. 为第二套 Phase288 分配唯一阶段号或分支标识，消除编号冲突；
+2. 补齐 pink 候选，或明确把冻结分母修改为 11 类颜色；
+3. 修复 hf_probe_env 的默认导入路径；
+4. 先依次运行三模型 smoke（冒烟测试）；
+5. 冻结候选、分母和验收阈值；
+6. 再按 qwen3 -> GLM4 -> DS7B 完成正式 CUDA 干预；
+7. 输出固定 JSON/JSONL、缺失记录、结果清单和哈希；
+8. 将结果接入 Pattern Atlas（模式图谱）并进行注册式复现。
+```
+
+### 审计结论
+
+```text
+Phase288 单神经元正式 CUDA 结果确实缺失；
+缺失原因主要是同编号新分支未接入执行链；
+其次是 pink 候选缺失和默认测试入口不完整；
+GPU 不是主要阻塞；
+当前脚本测试的是颜色候选单神经元，不是全部神经元；
+即使正式运行，也只能补充颜色局部必要性证据，不能完成全图谱机制闭合。
+```
+
+## Phase 324: 三维图谱是否下钻到神经元级的客户端架构审计 [2026-07-09 19:28]
+
+### 任务边界
+
+本阶段不运行新模型实验，也不声称发现新编码机制。目标是审计当前三维可视化是否应显示神经元级对象，以及在不夸大证据、不牺牲性能的前提下，给出可实施的客户端和数据链改造方案。
+
+### 总判断
+
+```text
+三维图谱需要支持神经元级下钻；
+但不应该默认同时显示全部神经元；
+更不能把“神经元被画出来”解释为“神经元机制已经被证明”。
+```
+
+神经元级显示对本项目是必要能力，因为研究目标不是只观察行为相关性，而是把语言模式族继续定位到：
+
+```text
+模型 -> 层 -> 组件 -> 头/通道组 -> 单元 -> 上下文位置 -> 输出影响
+```
+
+如果客户端只能停留在模式族、层或组件级，它可以展示研究目录，却不能承载最终的物理分布拼图。但是，模型内单元数量巨大，且单元通常具有多义性和上下文依赖性，所以正确方案是多尺度按需下钻，而不是一次加载和渲染全模型所有单元与所有连线。
+
+### 当前客户端已经具备的基础
+
+当前 `RealUnitTraceRenderer`（真实单元追踪渲染器）已经能够显示四类真实地址对象：
+
+```text
+mlp_product_neuron（多层感知器乘积神经元）；
+attention_head_channel（注意力头通道）；
+residual_dimension（残差维度）；
+unembedding_token（反嵌入词元）。
+```
+
+它按层放置单元，能够读取候选分数、证据等级、因果范围和来源文件，并将 Phase286 的稳定候选与 Phase287 的真实事件结合。这说明客户端不是从零开始，已经具有有限的真实单元级覆盖层。
+
+但当前覆盖仍有明显限制：
+
+```text
+每层主要展示最多 64 个稳定候选和当前激活单元；
+没有形成完整的神经元库存索引；
+没有接入 Phase288 单神经元正式干预结果；
+没有单元点击、路径追踪、基线/干预/对照联动；
+不能把候选单元组织成可验证的因果路径。
+```
+
+当前 `AtlasGraphRenderer`（图谱图渲染器）支持模型、阶段、层、头、通道、簇、干预、概念、任务和失败等节点，但没有明确的神经元、来源词元、门控、乘积神经元、读出和证据声明节点类型。它使用逐节点网格和逐边线段，适合小图，不适合数万到数百万单元。
+
+当前 `DNNAnalysis3DVisualization`（深度神经网络三维分析可视化）中的激活、坐标和连线强度使用随机数生成，并且每层最多生成 50 个演示神经元和相邻层全连接线。这只能作为界面演示，不能进入科研证据视图，也不能作为真实模型结构或机制的代理。
+
+### 必须澄清的“神经元”定义
+
+Transformer（变换器）中的“神经元”不能与生物神经元混为一谈。客户端必须把不同物理对象分开：
+
+```text
+MLP gate/up（多层感知器门控/上投影）坐标；
+MLP product（多层感知器乘积）坐标；
+MLP down（多层感知器下投影）贡献；
+attention head（注意力头）；
+attention head channel（注意力头通道）；
+residual dimension（残差维度）；
+unembedding readout（反嵌入读出）；
+token-position event（词元位置事件）。
+```
+
+这些对象的索引、数值含义和可干预位置不同，不能统一叫作一个模糊的 `neuron`（神经元）后直接比较。
+
+### 正确的多尺度三维结构
+
+建议把三维图谱固定为六级下钻：
+
+```text
+L0 语言模式族/任务；
+L1 模型与阶段；
+L2 层与组件；
+L3 注意力头、通道组、候选簇；
+L4 单神经元/单通道/单残差维度；
+L5 词元位置、生成时间和因果路径事件。
+```
+
+远距离视图只显示族、层、组件和密度；接近某层时再展开候选簇；用户选择簇或证据节点后才加载单元；选择单元后才绘制其自然激活和干预路径。这样既保留全局形状，也避免把屏幕变成无意义的点云。
+
+### 三种必须分离的视图
+
+```text
+结构视图：显示模型中实际存在的对象和索引，不代表机制证据；
+自然运行视图：显示特定提示词、词元位置和时间步中的真实激活；
+因果证据视图：只显示具有干预、对照、留出和复现记录的节点与边。
+```
+
+可增加比较视图，用于基线与干预、来源与查询、成功与失败、模型与模型之间同步对照。结构、激活和因果不能混用同一颜色含义。
+
+### 神经元级固定数据身份
+
+每个可定位对象至少需要以下不可歧义的身份：
+
+```text
+model_id；
+model_hash；
+tokenizer_hash；
+layer_index；
+component；
+unit_kind；
+unit_index；
+head_index（如适用）；
+token_position；
+case_id；
+run_id。
+```
+
+只保存“第 123 个神经元”是不够的，因为模型版本、组件位置、词元位置或挂钩位置一旦变化，该地址就失去可复现性。
+
+### 建议增加的数据格式
+
+在现有 `atlas_graph_v1`（图谱图第一版）之外，增加 `neuron_atlas_v1`（神经元图谱第一版），并按模型、层、组件和证据等级分区：
+
+```text
+neuron_nodes.jsonl：物理对象、索引、所属族和证据状态；
+neuron_edges.jsonl：对象之间被观测或被干预支持的关系；
+neuron_events.jsonl：提示词、位置、时间步下的自然激活事件；
+neuron_interventions.jsonl：消融、替换、放大及匹配对照；
+neuron_runs.jsonl：模型哈希、数据集切分、随机种子和运行环境；
+neuron_index.json：分区、范围、数量、哈希和缺失记录。
+```
+
+节点核心字段建议为：
+
+```text
+node_id, node_type, model_id, model_hash, layer_index,
+component, unit_kind, unit_index, head_index, position_role,
+activation, candidate_score, evidence_level, causal_scope,
+family_id, mechanism_id, case_id, split, source_artifact
+```
+
+因果边核心字段建议为：
+
+```text
+edge_id, source_id, target_id, relation,
+baseline_value, intervention_value, raw_delta,
+matched_control_delta, corrected_effect, effect_sign,
+side_effect, replication_count, evidence_level, source_artifact
+```
+
+必须同时记录负结果和缺失结果，不能只把成功干预画进图谱。
+
+### 证据视觉语义
+
+节点大小只能表达激活量或效应量，不能单独表达证据可靠性。证据可靠性应使用稳定的边框、透明度和标记：
+
+```text
+结构已知；
+自然激活已观测；
+相关候选；
+L4 局部干预支持；
+L5 留出复现支持；
+负结果；
+缺失/运行失败。
+```
+
+点击任一单元必须能看到：自然激活、基线、干预值、匹配对照、超对照效应、短语滚动结果、副作用、样本数、数据切分、来源文件和模型哈希。当前 Phase286 候选必须标记为组件候选，Phase288 未正式运行前不能标记为单神经元必要机制。
+
+### 渲染层改造
+
+单元数量较大时，不能为每个单元创建独立 React（反应式界面框架）组件。建议：
+
+```text
+数百个选中单元：实例化球体；
+数千至数万个单元：InstancedMesh（实例化网格）；
+更大库存：点精灵或密度体；
+边：只绘制当前选择、当前路径和聚合边；
+拾取：颜色编号缓冲或分区拾取；
+数据：TypedArray（类型化数组）与 Web Worker（网页工作线程）解析；
+加载：按模型/层/组件/证据等级懒加载；
+坐标：由层、组件和单元索引确定，禁止随机坐标。
+```
+
+任何“显示全部连接”的方案都会接近平方级边数，既无法渲染，也没有解释价值。远景只应显示聚合流量或证据密度，选择路径后再展开真实边。
+
+### 客户端具体改动顺序
+
+```text
+1. 保留并扩展 RealUnitTraceRenderer，加入单元选择、精确地址搜索、证据筛选和路径高亮；
+2. 将 AtlasGraphRenderer 分成机制图和神经元下钻图，增加明确的单元节点与因果边类型；
+3. 扩展 useVisData，支持 neuron_atlas_v1 和 single_unit_intervention.v1；
+4. 扩展 useResearchKernel，读取 Phase288 及以后按层分区的单元干预记录；
+5. 将随机 DNNAnalysis3DVisualization 移出科研证据入口，或永久标记为 simulation_only（仅模拟）；
+6. 更新 PATTERN_ATLAS_CLIENT_SPEC，冻结神经元身份、事件、干预和证据格式；
+7. 接入统一的模型/族/机制/层/组件/证据过滤器和生成时间轴；
+8. 在详情面板中显示原始证据和负结果，不只显示可视化摘要。
+```
+
+### 与 Phase288 的关系
+
+客户端可以先完成神经元级数据契约和多尺度渲染，但不能预填不存在的因果结果。当前 Phase288 正式 CUDA 干预没有运行，因此：
+
+```text
+可以显示模型结构中的全部单元库存；
+可以显示 Phase286 的候选单元；
+可以显示 Phase287 的自然事件；
+不能把这些单元标成已验证的单神经元必要机制；
+只有正式干预、匹配对照、留出复现和副作用检查通过后，才能升级证据状态。
+```
+
+### 进度判断
+
+仅针对客户端神经元级能力，当前可粗略判断为：
+
+```text
+真实单元覆盖层与基础数据读取：约 35%-45%；
+完整单元库存与多尺度渲染：约 15%-25%；
+单元级因果图谱：约 5%-15%；
+跨模型、跨族、跨样本的神经元机制闭合：尚未完成。
+```
+
+百分比只描述工程和证据覆盖，不代表语言编码机制已经破解。
+
+### 阶段结论
+
+```text
+神经元级显示是必要终点能力，但不是默认全量视图；
+正确形式是“全局聚合 + 证据候选 + 按需单元 + 事件时间轴 + 因果路径”；
+当前已有真实单元追踪基础，但主图谱、数据格式和干预证据尚未闭合；
+第一优先级应是冻结 neuron_atlas_v1 数据契约并接入真实结果；
+第二优先级是实现实例化、多尺度和按需加载；
+第三优先级才是依据 Phase288 及后续复现结果升级单元和边的证据等级。
+```
+
+## Phase 325: 语言模式族神经元关键脉络图谱与客户端一致化 [2026-07-09 19:59]
+
+### 阶段目标
+
+Phase324 确认三维图谱需要支持神经元级下钻，但本阶段进一步收紧目标：
+
+```text
+不是大范围记录和显示无关神经元状态；
+而是以语言模式族为入口，只显示具有研究证据的关键物理单元、组件事件和读出脉络；
+实验结果、证据边界和客户端显示必须使用同一份固定数据。
+```
+
+本阶段不运行新模型，不产生新机制证据。使用 Phase286、Phase287 和模式族图谱已有结果，建立可重复生成的数据桥和聚焦三维客户端。
+
+### 数据构造原则
+
+每个物理单元使用以下复合身份，不允许仅用单元编号跨模型比较：
+
+```text
+U = (family, model, model_revision, layer, component, unit_kind, unit_index)
+```
+
+Phase286 中同一物理地址可能对应多个样本记录。本阶段按复合身份聚合，保留：
+
+```text
+最大与平均候选分数；
+样本数、目标标签和模板/对象覆盖；
+读出贡献；
+是否在 Phase287 单样本自然轨迹中再次出现；
+是否属于通道组干预支持集合；
+原始来源文件和证据边界。
+```
+
+显示优先级只用于决定客户端首先显示哪些已有候选，不用于升级证据：
+
+```text
+DisplayPriority(u)
+= MaxCandidateScore(u)
++ 0.12 * NaturalOverlap(u)
++ 0.08 * GroupSupport(u)
++ 0.004 * min(CaseCount(u), 20)
+```
+
+这只是基础排序规则。它没有被解释为语言机制公式，也没有被用于统计显著性判断。
+
+### 边的严格语义
+
+本阶段只生成两类边：
+
+```text
+observed_component_sequence：同一次真实前向轨迹中的组件事件顺序；
+contains_localized_candidate：关键层锚点包含某个真实地址候选。
+```
+
+两类边全部固定为：
+
+```text
+causal = false
+```
+
+通道组干预记录统一标记：
+
+```text
+causal_scope = channel_group_not_single_unit
+single_unit_causal = false
+```
+
+因此三维连线表示“观察到的组件顺序和候选归属”，不是神经元到神经元的因果连接。
+
+### 固定数据包
+
+新增生成器：
+
+```text
+tests/gpt5/phase325_pattern_family_neuron_atlas.py
+```
+
+规范结果目录：
+
+```text
+tests/gpt5/result/pattern_family_neuron_atlas/v1/
+```
+
+客户端公开镜像：
+
+```text
+frontend/public/vis_data/pattern_family_neuron_atlas/v1/
+```
+
+固定入口和文件：
+
+```text
+manifest.json
+families.json
+neuron_index.json
+neuron_nodes.jsonl
+neuron_edges.jsonl
+neuron_events.jsonl
+neuron_interventions.jsonl
+neuron_runs.jsonl
+checksums.json
+partitions/{family_id}/{model}.json
+```
+
+客户端只初始读取清单和模式族索引，再按当前模式族和模型读取一个分区。原始大文件不进入初始加载链。
+
+### 客观数据结果
+
+当前九个模式族中，只有：
+
+```text
+content_knowledge（内容知识模式族）/ color（颜色关系）
+```
+
+具备三模型真实单元候选映射。其余八个模式族明确标记：
+
+```text
+not_mapped_to_real_units
+```
+
+没有生成占位神经元或推测路径。
+
+全包结果：
+
+```text
+模式族总数：9；
+已映射模式族：1；
+模型数：3；
+唯一物理候选单元：833；
+非因果图谱边：848；
+自然组件事件：318；
+通道组干预记录：2012；
+单神经元因果记录：0。
+```
+
+分模型结果：
+
+```text
+qwen3：5 个关键层，288 个唯一候选，23 个自然交叉，32 个组级支持候选；
+GLM4：4 个关键层，297 个唯一候选，21 个自然交叉，44 个组级支持候选；
+DS7B：3 个关键层，248 个唯一候选，19 个自然交叉，27 个组级支持候选。
+```
+
+### 客户端改造
+
+新增：
+
+```text
+usePatternFamilyNeuronAtlas：按模式族和模型懒加载证据分区；
+PatternFamilyNeuronAtlasRenderer：实例化渲染关键物理单元和路径锚点；
+PatternFamilyAtlasControls：模式族、模型、证据交叉和显示数量控制；
+NEURON_PATTERN_ATLAS_FORMAT.md：冻结数据身份和证据语义。
+```
+
+语言机制研究路线现在默认进入模式族关键脉络视图。该视图开启时：
+
+```text
+隐藏苹果/果实等旧演示节点；
+隐藏旧 RealUnitTrace 和手动图谱叠层；
+只显示所选模式族、所选模型和所选证据筛选下的关键单元；
+未映射模式族只显示明确空状态；
+点击层锚点或真实单元进入证据详情；
+可随时返回旧工作台。
+```
+
+三类单元颜色固定为：
+
+```text
+黄色：L4 真实地址候选；
+青色：同时在自然轨迹中再次观测；
+橙色：属于组级干预支持集合，但不是单神经元因果。
+```
+
+单元点击详情显示模型版本、层、组件、单元类型、单元索引、激活、候选分数、样本覆盖、目标标签、自然交叉、组级范围、来源文件和证据边界。
+
+### 渲染与交互实现
+
+只对当前筛选后的最多 12 到 96 个关键单元生成显示对象。候选按关键层分层抽样，避免末层候选数量压倒其他层。
+
+单元位置使用单元索引的确定性黄金角映射：
+
+```text
+theta(u) = 2 * pi * frac(0.618033988749895 * unit_index)
+```
+
+层位置由真实层号归一到固定纵轴。该坐标只是稳定布局，不代表模型内部真实欧氏距离。
+
+视觉节点使用三批实例化网格，分别对应候选、自然交叉和组级支持。为屏幕上最多 96 个已筛选节点增加透明拾取壳，解决不同 WebGL 环境中实例拾取不稳定的问题；未显示单元不创建拾取对象。
+
+### 验证结果
+
+数据验证：
+
+```text
+python tests/gpt5/phase325_pattern_family_neuron_atlas.py --validate-only
+结果：9 families / 833 nodes / 848 edges；
+节点 ID 无重复；
+所有分区模式族一致；
+所有当前边 causal=false；
+single_unit_causal_count=0。
+```
+
+自动测试：
+
+```text
+python tests/gpt5/test_phase325_pattern_family_neuron_atlas.py
+结果：2 tests passed。
+```
+
+客户端验证：
+
+```text
+新增/修改文件定向 ESLint：通过；
+npm run build：通过；
+桌面 1440x1000：画布非空、路径和三类颜色正常；
+窄屏 390x844：旧固定面板自动收起、无横向溢出、控制和画布可见；
+九族选择：未映射族不生成神经元；
+qwen3 -> GLM4 -> DS7B 切换：分区计数与数据一致；
+关键候选/自然交叉/组级支持筛选：正常；
+层锚点点击：正常；
+真实实例单元点击与证据详情：正常。
+```
+
+生产构建仍有既有主包超过 500KB 警告，构建成功。本阶段新增模式族分区采用选择后加载，不进入初始 JavaScript 主包。
+
+### 进展判断
+
+客户端能力与研究覆盖必须分开：
+
+```text
+模式族关键脉络数据契约：已建立；
+三模型切换、筛选、下钻和证据详情：已建立第一版；
+真实物理单元候选映射：1/9 模式族，约 11.1%；
+具有自然轨迹交叉的候选：三模型共 63 个唯一候选；
+单神经元因果闭合：0；
+全语言模式族物理脉络图谱：未完成。
+```
+
+Phase324 对客户端神经元级能力的粗略进度可以上调，但只能解释为工程能力提高。语言模式族真实物理覆盖仍然很低。
+
+### 硬伤与边界
+
+```text
+1. 目前只有颜色关系进入真实单元图谱，不能代表整个内容知识模式族；
+2. Phase286 单元是组件归因候选，通道组干预不能分配到单个神经元；
+3. Phase287 自然交叉主要是一个 red cube 单样本，不能证明跨模板稳定；
+4. 组件事件顺序不是因果传播路径；
+5. 三个小模型内部结构可能比更大模型粗糙，不能直接外推普遍语言编码；
+6. 当前布局表示索引和层次，不表示真实几何距离；
+7. Phase288 正式单神经元 CUDA 干预仍未完成。
+```
+
+### 下一阶段任务
+
+下一阶段仍属于“语言模式族物理分布拼图”同一大阶段。最合理的 Phase326 不是继续美化客户端，而是按当前固定契约扩展真实证据：
+
+```text
+第一批：output_protocol（输出协议）和 readout_competition（竞争读出）；
+第二批：syntax_structure（语法结构）；
+每族先完成自然组件轨迹和真实单元候选映射；
+再进行通道组、匹配随机组和留出样本干预；
+最后才选择少量高复现候选进入单神经元必要性测试。
+```
+
+每次新研究只需生成对应分区并更新 `manifest.json`，客户端即可在同一三维空间中查看，不再新增孤立可视化页面。
+
+### 阶段结论
+
+```text
+Phase325 完成了“研究结果 -> 固定图谱数据 -> 聚焦三维脉络 -> 原始证据详情”的一致链；
+客户端现在围绕语言模式族显示关键神经元脉络，不再默认展示无关神经元状态；
+但客观研究覆盖仍只有 1/9 模式族，且单神经元因果计数为 0；
+因此这是图谱基础设施和已有证据可视化完成，不是语言编码机制破解或机制闭合。
+```
