@@ -1,0 +1,34 @@
+{
+  "schema_version": "experiment_spec.v1",
+  "run_id": "phase288_qwen3_color_single_unit_smoke",
+  "created_at": "2026-07-10T03:23:36+00:00",
+  "model": "qwen3",
+  "mode": "smoke",
+  "prediction_frozen_before_measurement": true,
+  "candidate_source": "tests/result/research_kernel/runs/phase286_color_real_units_qwen3/unit_evidence.jsonl",
+  "requested_colors": [
+    "red",
+    "blue"
+  ],
+  "tested_colors": [
+    "red",
+    "blue"
+  ],
+  "missing_preregistered_colors": [],
+  "case_design": {
+    "objects": 2,
+    "templates": 1,
+    "cases": 4
+  },
+  "interventions": [
+    "single_unit_zero",
+    "single_unit_half",
+    "matched_activation_same_layer_zero"
+  ],
+  "acceptance_counts": {
+    "negative": "at least 80%",
+    "beyond_matched_control": "at least 70%",
+    "monotonic": "at least 70%"
+  },
+  "scientific_boundary": "Tests necessity of one preregistered MLP product unit for local color-candidate margin only."
+}

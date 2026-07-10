@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import sys
 import time
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -12,6 +13,10 @@ from typing import Any
 
 import torch
 import torch.nn.functional as F
+
+GPT5_DIR = Path(__file__).resolve().parent
+if str(GPT5_DIR) not in sys.path:
+    sys.path.insert(0, str(GPT5_DIR))
 
 from hf_probe_env import get_layers, load_probe_model, release_loaded, vram_gb
 
