@@ -224,7 +224,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   }, []);
   const [timelineRoutes, setTimelineRoutes] = useState([]);
   const [expandedFormulaIdx, setExpandedFormulaIdx] = useState(null);
-  const [expandedParam, setExpandedParam] = useState(null);
   const [expandedEngPhase, setExpandedEngPhase] = useState(null);
   const [expandedImprovementPhase, setExpandedImprovementPhase] = useState(IMPROVEMENTS[0]?.id || null);
   const [expandedImprovementTest, setExpandedImprovementTest] = useState(null);
@@ -686,13 +685,9 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   useEffect(() => {
     setExpandedFormulaIdx(null);
     setExpandedEngPhase(null);
-    setExpandedParam(null);
   }, [selectedRouteId]);
 
   const selectedRoute = routeList.find((item) => item.id === selectedRouteId) || routeList[0];
-  const systemRouteOptions = routeList.filter((item) =>
-    ['fiber_bundle'].includes(item.id)
-  );
   const selectedMultimodalData = multimodalSummary?.views?.[multimodalView] || null;
   const selectedMultimodalReport = selectedMultimodalData?.report || null;
   const selectedMultimodalBest = selectedMultimodalReport?.summary?.best || null;
@@ -1128,16 +1123,11 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
               >
                 <SystemStatusTab
                   consciousField={consciousField}
-                  systemRouteOptions={systemRouteOptions}
-                  routeList={routeList}
-                  setSelectedRouteId={setSelectedRouteId}
                   selectedRouteId={selectedRouteId}
                   activeSystemProfile={activeSystemProfile}
                   statusData={statusData}
                   selectedRoute={selectedRoute}
                   getRouteImpl={getRouteImpl}
-                  expandedParam={expandedParam}
-                  setExpandedParam={setExpandedParam}
                 />
               </div>
             </div>

@@ -37640,3 +37640,533 @@ Phase281-284 完成了两件事：
 ```
 
 当前研究方向正确，但还没有完成语言模式图谱，更没有闭合。最可靠的结论是：语言模式图谱已经进入可扩展测试阶段，MLPWrite 是目前最稳定的物理路径拼图，停止/继续读出竞争仍是闭合瓶颈。
+
+## Phase 285: 理论、真实神经网络 3D 与多 AI 自动研发的一体化架构审计 [2026-07-09 20:47]
+
+### 任务范围
+
+本阶段不运行新模型测试，任务是对当前项目进行系统架构审计，回答三个问题：
+
+```text
+1. 理论分析、实验结果和语言模式图谱是否共享同一条证据链；
+2. 主 3D 空间显示的是否是模型真实结构、真实单元和真实计算过程；
+3. 自动研发是否能安全、可复现地完成“提出假设 -> 测试 -> 审核 -> 回写理论与图谱”。
+```
+
+审计对象：
+
+```text
+research/IntelligentTheory.md
+research/MainAnalysis/20260709_03_Pattern_Family_Atlas_v2_系统方案.md
+research/gpt5/docs/AGI_GPT5_MEMO.md
+frontend/src/App.jsx
+frontend/src/HLAIBlueprint.jsx
+frontend/src/blueprint/AtlasControlDashboard.jsx
+frontend/src/blueprint/appleNeuron/*
+frontend/src/neural_vis/*
+frontend/src/AIRnD/*
+server/ai_rnd_service.py
+server/runtime/*
+tests/codex/agi_research_result_schema.py
+frontend/public/vis_data/pattern_family_atlas/v2/*
+```
+
+### 总体判断
+
+项目已经具备三个相对完整的雏形：
+
+```text
+理论与研究进展界面；
+主 3D 神经网络空间和逐层动画；
+多 AI 自动研发控制台与后端循环。
+```
+
+但当前三者不是同一套系统。最核心的问题是：
+
+```text
+实验结果没有通过统一证据协议进入理论；
+理论主张没有自动生成下一批实验缺口；
+3D 空间同时混合真实节点、硬编码示例节点和伪随机节点；
+自动研发只读取截断后的 stdout 和文本总结，没有读取完整实验产物；
+自动研发完成后不会强制执行 schema 校验、因果审计、图谱回写和 claim 审核。
+```
+
+因此当前项目更接近“三个可运行原型”，还不是一个端到端逆向工程平台。
+
+### 关键客观发现
+
+#### 1. 理论和图谱
+
+当前语言模式图谱已经定义了较好的主对象：
+
+```text
+PatternPath(x,m)
+  = prompt/context
+  -> state
+  -> route
+  -> component path
+  -> readout competition
+  -> rollout/protocol gate
+  -> closure gate
+  -> evidence level
+  -> claim registry
+```
+
+证据等级 L0-L8、闭合四条件、跨模型冲突、非线性耦合和 heldout 预测都是值得保留的研究框架。
+
+但客户端进度仍有硬伤：
+
+```text
+1. v2 的 progress.json 实际不存在，AtlasControlDashboard 却把它作为 Promise.all 的必需文件；
+2. useVisData 只接受 2.0，不接受 v2 数据实际使用的 2.0.0；
+3. v1 曾把 pattern_family_atlas 写到 0.92，v2 又重置到 0.60，两个数字不是同一分母；
+4. 当前进度主要由脚本手工写入，不是由有效行数/目标行数自动计算；
+5. 图谱 graph_nodes 主要是 family/case 节点，没有真实 layer/component/unit 地址。
+```
+
+进度必须改成可重新计算的基本比例：
+
+$$
+Coverage_d
+=
+\frac{N_{valid,d}}{N_{required,d}}
+$$
+
+其中每个维度单独显示，不用一个总百分比掩盖因果与闭合缺口：
+
+```text
+sample coverage
+layer path coverage
+component path coverage
+causal coverage
+rollout coverage
+prediction coverage
+clean closure count
+```
+
+#### 2. 主 3D 空间
+
+当前主 3D 空间具有可复用的 Three.js / React Three Fiber 场景、层动画、组件爆炸视图和节点详情交互，但科研真实性不足。
+
+发现的明确问题：
+
+```text
+1. 默认 LAYER_COUNT = 28；Qwen3 实际 36 层，GLM4 实际 40 层，导入函数会把高层索引压到 L27；
+2. Qwen3 实际为 32 heads / d_ff 9728 / vocab 151936，前端写成 20 / 6912 / 152064；
+3. DeepSeek-R1-Distill-Qwen-7B 实际是 Qwen2ForCausalLM 的 dense decoder，前端写成 MoE，vocab 也写错；
+4. 多个 build*Nodes 函数在没有真实 layer/neuron 时用 pseudoRandom 生成单元位置；
+5. APPLE_CORE_NEURONS 和水果节点是 seed/example 常量，当前界面没有把它们与已验证真实节点严格区分；
+6. forward pass 播放固定读取 forward_pass_demo.json，模型下拉框不会触发对应模型的真实 Trace；
+7. demo 文件里的 Qwen3 头数本身也是 20，与本地模型 config.json 的 32 不一致；
+8. /api/runtime/neuron_flow 返回的是 residual stream dimension，不是 MLP neuron；跨层连线按 top-k rank 连接，也不代表同一个物理单元连续传输；
+9. Pattern Family Atlas v2 当前没有真实单神经元字段，不能投影为真实神经元图谱。
+```
+
+必须定义真实物理单元地址：
+
+$$
+UnitAddress
+=
+(ModelRevision,Layer,Component,UnitKind,UnitIndex,TokenPosition)
+$$
+
+其中 UnitKind 必须区分：
+
+```text
+residual_dimension
+attention_head
+attention_head_channel
+mlp_gate_neuron
+mlp_up_neuron
+mlp_product_neuron
+unembedding_token
+```
+
+只有地址完整、范围通过模型 config 校验、并且带 source artifact 的记录，才能在主 3D 空间显示为真实单元。缺少这些字段时，只能显示在理论图或统计图，不能冒充神经元。
+
+3D 坐标只是显示映射，不代表模型天然存在三维几何：
+
+$$
+z = s_z\left(l-\frac{L-1}{2}\right)
+$$
+
+$$
+\theta = 2\pi\frac{u}{U},\qquad
+r=r_{component},\qquad
+(x,y)=(r\cos\theta,r\sin\theta)
+$$
+
+这里的真实含义是地址准确、可重复定位；圆柱/环形坐标只是客户端布局。
+
+#### 3. 自动研发
+
+当前 AIRnD 已经有主模型、多个分析模型、SSE 日志、自动/手动模式和五阶段循环：
+
+```text
+analyze -> plan -> generate -> execute -> summarize
+```
+
+但它还不能承担严谨科研自动化：
+
+```text
+1. ResearchSession 是内存单例，服务重启后研究状态和 findings 丢失；
+2. 生成代码只经过字符串黑名单，execute_code_sandbox 并不是真正沙箱；
+3. 代码直接在主工作区执行，没有独立 run directory、资源限制和产物白名单；
+4. 自动脚本写入 tests/glm5_temp 和 results/glm5，与当前强制目录 tests/gpt5_temp、tests/gpt5、tests/result 不一致；
+5. 没有 GPU 单任务锁和 qwen3 -> GLM4 -> DS7B 的强制顺序调度；
+6. stop/cancel 不能保证终止 executor 内已经启动的子进程；
+7. 分析师读取的是最多 5000 字符 stdout，不读取 JSONL、manifest、原始样本和反例；
+8. 没有 hypothesis registry、experiment spec、accept/reject 判据和 negative control；
+9. 没有 schema validator、artifact checksum、模型 config 快照和随机种子登记；
+10. 没有独立方法审计、反例审计、数据审计和最终裁决；
+11. 总结文本不会自动更新 claim registry、gap queue、图谱和 memo；
+12. API Key 由普通 JSON 配置持久化，缺少安全的 secret 管理边界。
+```
+
+### 统一系统架构
+
+建议把项目改造成一个共享证据内核上的三个工作空间：
+
+```text
+                           Evidence Kernel
+                  /              |              \
+        Theory Workspace    DNN 3D Workspace    Auto R&D Workspace
+```
+
+Evidence Kernel 是唯一事实源，负责：
+
+```text
+model registry
+case bank
+hypothesis registry
+experiment plan/run
+real trace events
+unit evidence
+causal interventions
+claim registry
+atlas nodes/edges
+artifact provenance
+gap queue
+```
+
+推荐后端模块：
+
+```text
+server/research_kernel/
+  contracts.py
+  model_registry.py
+  artifact_store.py
+  evidence_store.py
+  claim_store.py
+  atlas_builder.py
+  trace_service.py
+  validators.py
+
+server/research_orchestrator/
+  scheduler.py
+  gpu_lock.py
+  agent_roles.py
+  experiment_runner.py
+  adjudicator.py
+  publisher.py
+```
+
+推荐前端模块：
+
+```text
+frontend/src/features/theory/
+frontend/src/features/model3d/
+frontend/src/features/autoResearch/
+frontend/src/features/evidence/
+frontend/src/shared/researchData/
+```
+
+当前 App.jsx 约 4558 行、HLAIBlueprint.jsx 约 1230 行、server.py 约 2387 行。它们应逐步变成路由和组合层，业务状态放入对应 feature/store，不继续向大文件追加。
+
+### 统一数据协议
+
+建议冻结 `agi_research_bundle.v2`。每次实验形成一个不可变 run 目录：
+
+```text
+tests/result/<run_id>/
+  experiment.json
+  model_snapshot.json
+  cases.jsonl
+  trace_events.jsonl
+  unit_evidence.jsonl
+  intervention_rows.jsonl
+  rollout_rows.jsonl
+  claims_delta.jsonl
+  manifest.json
+  report.md
+```
+
+真实单元证据最小字段：
+
+```json
+{
+  "schema_version": "real_unit_evidence.v1",
+  "run_id": "phase285_color_qwen3_seed01",
+  "model": "qwen3",
+  "model_revision": "config_and_weight_hash",
+  "case_id": "color_red_apple_template03",
+  "token_position": -1,
+  "layer": 18,
+  "component": "mlp",
+  "unit_kind": "mlp_product_neuron",
+  "unit_index": 6212,
+  "activation": 1.42,
+  "contrast_delta": 0.61,
+  "causal_margin_delta": -0.37,
+  "control_margin_delta": -0.03,
+  "side_effect": 0.08,
+  "evidence_level": "L5",
+  "source_artifact": "intervention_rows.jsonl#row=184"
+}
+```
+
+Trace 事件必须与计算动画一一对应：
+
+```text
+embedding
+norm1
+q_proj / k_proj / v_proj
+attention_score
+softmax
+head_output / o_proj
+residual1
+norm2
+gate_proj / up_proj / activation_product
+down_proj
+residual2
+final_norm
+W_U / next_token
+```
+
+每个事件记录：
+
+```text
+layer
+component
+token_position
+top real units
+activation/sign
+target/stop/continue margin
+source artifact
+timestamp/step
+```
+
+### 三个工作空间的修改方案
+
+#### A. 理论分析
+
+保留五个核心视图：
+
+```text
+1. 总览：研究目标、当前大阶段、各证据维度真实覆盖率、最大阻塞；
+2. 语言模式图谱：family x model、物理路径、读出竞争、closure gate；
+3. 机制主张：claim、适用范围、L0-L8、正证据、反证据、反例、下一测试；
+4. 实验证据：按 Phase/run/case/model 查看原始 JSONL 和脚本来源；
+5. 历史路线：阶段推进、被否定路线、仍然开放的问题。
+```
+
+界面中的所有进度、公式和结论必须来自 Evidence Kernel。静态说明可以保留，但必须明确标记为 theory/hypothesis，不能与 measured result 混在一起。
+
+#### B. 主 3D 空间
+
+主界面建议固定为：
+
+```text
+左侧：模型、run、case、token、显示层级和证据筛选；
+中央：真实模型结构与真实单元稀疏叠加；
+底部：计算 Trace 时间轴和逐事件播放；
+右侧：当前单元/组件的地址、数值、因果结果、来源文件和 claim；
+```
+
+显示层级：
+
+```text
+Model -> Layer -> Component -> Head/Neuron/Channel -> Token Readout
+```
+
+由于三个模型有几十万 MLP 单元，不能一次渲染全部球体。客户端只渲染：
+
+```text
+当前层全组件框架；
+当前 token 的 top activation；
+当前 case 的 contrast candidates；
+通过 causal audit 的真实单元；
+用户搜索到的精确 unit address。
+```
+
+大规模单元使用 InstancedMesh；详情按需加载；动画只消费 trace_events，不在前端生成机制数据。
+
+证据样式必须硬编码区分：
+
+```text
+real_trace
+correlational_candidate
+causal_necessary
+causal_sufficient
+clean_closed
+demo/example
+```
+
+默认关闭 demo/example；只有用户主动开启演示层时才能显示。
+
+#### C. 自动研发
+
+把五阶段文本循环升级为十二阶段证据循环：
+
+```text
+1. 从 gap queue 选择大任务；
+2. 建立 hypothesis 和可证伪预测；
+3. 生成 ExperimentSpec；
+4. 方法审计 AI 检查样本、对照和判据；
+5. 编程 AI 在独立 run 目录生成脚本；
+6. 静态安全检查和 schema 检查；
+7. smoke test；
+8. GPU scheduler 按 qwen3 -> GLM4 -> DS7B 串行执行；
+9. 数据审计 AI 读取完整 artifacts；
+10. 反例 AI 主动寻找失败样本和替代解释；
+11. 主 AI 裁决 accept/reject/inconclusive；
+12. 发布到 claim registry、atlas、3D trace index 和 memo。
+```
+
+AI 角色建议：
+
+```text
+Principal Investigator：确定问题与最终裁决；
+Method Reviewer：检查设计是否可证伪；
+Code Agent：实现与修复脚本；
+Data Auditor：只看原始产物，独立复算基本指标；
+Adversarial Reviewer：找反例、副作用和跨模型冲突；
+Theory Synthesizer：只有通过审核后才更新理论；
+```
+
+角色不依赖不同品牌模型。关键是独立上下文、不同职责和最终证据裁决，而不是简单让多个 AI 重复写意见。
+
+### 第一条端到端样板任务
+
+优先完成“颜色属性真实编码纵向闭环”，但不再只记录 Top-K。
+
+建议测试规模：
+
+```text
+12 种颜色 x 20 个对象 x 6 种模板 = 1440 个基本 case / model；
+加入颜色交换、对象交换、错误颜色、协议变化和同义词控制；
+三模型严格串行执行；
+smoke 后执行 full，重要结果再用新模板/新对象复核一轮。
+```
+
+基本候选分数只使用可解释的基础量：
+
+$$
+CandidateScore(l,u)
+=
+w_1 D_{contrast}
++w_2 S_{template}
++w_3 E_{causal}
++w_4 C_{clean}
+-w_5 E_{side}
+$$
+
+其中：
+
+```text
+D_contrast：目标颜色与负对照的激活差；
+S_template：不同模板下方向和排序是否稳定；
+E_causal：移除/缩放该单元后目标 margin 是否按预测下降；
+C_clean：非目标任务是否基本保持；
+E_side：无关输出和 rollout 的副作用。
+```
+
+候选只能说明“值得干预”，不能直接说明“颜色由该神经元编码”。最终要验证的是单元集合和跨组件路径：
+
+```text
+input/context
+-> attention route
+-> MLP gate/up/product writers
+-> residual transport
+-> W_U color candidates
+-> rollout
+```
+
+该样板完成标准：
+
+```text
+同一个 run 可在理论页查看 claim；
+可在证据页打开原始行和脚本；
+可在主 3D 中定位真实 unit address；
+播放时与真实 trace_events 同步；
+自动研发能显示每个审核角色的依据；
+失败结果也进入反证据和 gap queue。
+```
+
+### 分阶段实施顺序
+
+```text
+Milestone 0 - Integrity Freeze
+  修正模型 config、删除默认伪神经元、补数据真实性标签、修复 v2 入口。
+
+Milestone 1 - Evidence Kernel
+  冻结 bundle v2、run store、claim store、gap queue、validator 和 provenance。
+
+Milestone 2 - Real Trace Engine
+  三模型 hook adapter、完整组件事件、GPU 串行调度、离线 trace 文件。
+
+Milestone 3 - 3D Digital Twin
+  真实地址映射、InstancedMesh、时间轴、单元详情、来源回链。
+
+Milestone 4 - Research Orchestrator
+  多角色审核、独立 run workspace、进程控制、artifact 驱动裁决。
+
+Milestone 5 - Color Vertical Closure
+  用颜色属性完成三系统端到端样板，再扩展到九大语言模式族。
+```
+
+每个里程碑必须有验收条件，不能按“新增多少界面”验收，而要按“一个真实 run 能否无手工复制地贯穿三个系统”验收。
+
+### 硬伤与风险
+
+```text
+1. 真实单神经元并不等于完整语言机制，机制可能是分布式单元集合和组件时序；
+2. 三维布局是可视化坐标，不是神经网络内部真实空间结构；
+3. 强干预可能产生分布外副作用，必须保留 half/mean/random-same-norm/negative-control；
+4. 不同模型架构不能强行对齐 unit_index，只能对齐功能角色和相对层位置；
+5. 当前 Pattern Family Atlas 的 972 条骨架不能替代每格大样本；
+6. 自动 AI 可能形成互相引用的文本共识，必须让审核者直接读取原始 artifact；
+7. 理论更新必须允许 inconclusive 和 rejected，不能只积累正结果。
+```
+
+### 智能理论角度的关键洞察
+
+项目真正要破解的对象不是“哪些神经元亮”，而是：
+
+$$
+Mechanism(x,t)
+=
+State(x,t)
+\rightarrow Route(x,t)
+\rightarrow Write(x,t)
+\rightarrow Competition(x,t)
+\rightarrow Action(x,t+1)
+$$
+
+真实单元定位是把这个抽象链条锚定到模型物理参数的必要条件，但不是终点。只有当图谱能够对未见样本预测：
+
+```text
+哪一层；
+哪个组件；
+哪些真实单元集合；
+读出竞争如何变化；
+干预后会出现什么行为；
+```
+
+并且真实实验与预测一致，图谱才从“历史整理”进入“机制理论”。
+
+### 阶段结论
+
+当前项目有较强研究资产和真实 CUDA 测试基础，方向具有可行性；最大问题不是缺少更多小测试，而是缺少统一的科研事实源和严格的数据真实性边界。
+
+下一阶段最应该做的不是继续添加独立界面，也不是把现有 Pattern Atlas 近似映射到神经元，而是先完成 `Milestone 0 + Milestone 1`，然后以颜色属性完成第一条真实端到端纵向闭环。只有这样，理论分析、主 3D 和自动研发才会成为同一个逆向工程系统。
