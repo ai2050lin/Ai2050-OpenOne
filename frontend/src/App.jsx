@@ -2650,6 +2650,25 @@ export default function App() {
                     </div>
                   </div>
 
+                  {activeResearchPluginId === 'language-mechanism' && (
+                    <PatternFamilyAtlasControls
+                      enabled={patternFamilyAtlasEnabled}
+                      onEnabledChange={setPatternFamilyAtlasEnabled}
+                      atlas={patternFamilyNeuronAtlas}
+                      familyId={patternFamilyId}
+                      onFamilyChange={setPatternFamilyId}
+                      modelKey={fpModel}
+                      onModelChange={handleFpModelChange}
+                      evidenceFocus={patternFamilyEvidenceFocus}
+                      onEvidenceFocusChange={setPatternFamilyEvidenceFocus}
+                      maxUnits={patternFamilyMaxUnits}
+                      onMaxUnitsChange={setPatternFamilyMaxUnits}
+                      variant="panel"
+                      showModel={false}
+                      showDetails={false}
+                    />
+                  )}
+
                   {showSimpleAiCycle && (
                   <div style={cockpitCardStyle}>
                     <div style={cockpitTitleStyle}>
@@ -4263,21 +4282,6 @@ export default function App() {
         <div style={{ position: 'absolute', top: 90, left: 400, zIndex: 10, background: 'rgba(127,29,29,0.9)', padding: '8px 16px', borderRadius: 8, fontSize: 13, color: '#ff6b6b', backdropFilter: 'blur(8px)' }}>
           错误: {visError}
         </div>
-      )}
-      {isAppleMainView && activeResearchPluginId === 'language-mechanism' && (
-        <PatternFamilyAtlasControls
-          enabled={patternFamilyAtlasEnabled}
-          onEnabledChange={setPatternFamilyAtlasEnabled}
-          atlas={patternFamilyNeuronAtlas}
-          familyId={patternFamilyId}
-          onFamilyChange={setPatternFamilyId}
-          modelKey={fpModel}
-          onModelChange={handleFpModelChange}
-          evidenceFocus={patternFamilyEvidenceFocus}
-          onEvidenceFocusChange={setPatternFamilyEvidenceFocus}
-          maxUnits={patternFamilyMaxUnits}
-          onMaxUnitsChange={setPatternFamilyMaxUnits}
-        />
       )}
         <Canvas shadows>
           {isAppleMainView && <color attach="background" args={['#090b15']} />}

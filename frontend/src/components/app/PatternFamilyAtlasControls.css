@@ -14,6 +14,38 @@
   overflow: hidden;
 }
 
+.pattern-atlas-controls--panel {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 12px;
+  box-shadow: none;
+  background: rgba(8, 13, 24, 0.72);
+}
+
+.pattern-atlas-controls--panel .pattern-atlas-controls__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.pattern-atlas-controls--panel .pattern-atlas-field,
+.pattern-atlas-controls--panel .pattern-atlas-range {
+  width: 100%;
+}
+
+.pattern-atlas-controls--panel .pattern-atlas-field select {
+  width: 100%;
+  min-width: 0;
+}
+
+.pattern-atlas-controls--panel .pattern-atlas-icon-button--visible {
+  display: none;
+}
+
 .pattern-atlas-controls__header,
 .pattern-atlas-controls__body,
 .pattern-atlas-controls__footer {
@@ -76,30 +108,6 @@
 
 .pattern-atlas-field--model select { width: 82px; }
 
-.pattern-atlas-segment {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(54px, 1fr));
-  min-width: 278px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.pattern-atlas-segment button {
-  min-height: 28px;
-  padding: 0 7px;
-  color: #8298b8;
-  background: #101828;
-  border: 0;
-  border-right: 1px solid rgba(148, 163, 184, 0.16);
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.pattern-atlas-segment button:last-child { border-right: 0; }
-.pattern-atlas-segment button.is-active { color: #ecfeff; background: #155e75; }
-.pattern-atlas-segment button:disabled { cursor: not-allowed; opacity: 0.42; }
-
 .pattern-atlas-range {
   flex: 1 1 130px;
   min-width: 130px;
@@ -122,6 +130,14 @@
   border: 1px solid transparent;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.pattern-atlas-restore--panel {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  margin: 0 0 12px;
 }
 
 .pattern-atlas-icon-button:hover,
@@ -163,29 +179,42 @@
   .pattern-atlas-field span, .pattern-atlas-range svg { display: none; }
   .pattern-atlas-field select { width: 138px; }
   .pattern-atlas-field--model select { width: 76px; }
-  .pattern-atlas-segment { min-width: 270px; }
+
+  .pattern-atlas-controls--panel {
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pattern-atlas-controls--panel .pattern-atlas-field span,
+  .pattern-atlas-controls--panel .pattern-atlas-range svg {
+    display: inline-flex;
+  }
+
+  .pattern-atlas-controls--panel .pattern-atlas-field select {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 900px) {
-  .pattern-family-atlas-active .workspace-panel--input,
-  .pattern-family-atlas-active .workspace-panel--info,
-  .pattern-family-atlas-active .workspace-panel--operation {
-    display: none !important;
-  }
-
-  .pattern-atlas-controls {
+  .pattern-atlas-controls--floating {
     left: 10px;
     right: 10px;
     bottom: 10px;
     min-width: 0;
   }
+  .pattern-atlas-controls--panel {
+    left: auto;
+    right: auto;
+    bottom: auto;
+    min-width: 0;
+  }
   .pattern-atlas-field { flex: 1 1 130px; }
   .pattern-atlas-field select { width: 100%; }
   .pattern-atlas-field--model { flex: 0 1 92px; }
-  .pattern-atlas-segment {
-    flex: 2 1 270px;
-    grid-template-columns: repeat(5, minmax(54px, 1fr));
-  }
   .pattern-atlas-range { flex: 1 1 180px; }
   .pattern-atlas-controls__footer { gap: 8px; }
 }
