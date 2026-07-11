@@ -1,0 +1,244 @@
+{
+  "schema_version": "14.0.0",
+  "phase_id": "Phase338",
+  "created_at": "2026-07-11T06:48:47.219293+00:00",
+  "purpose": "Staged coarse-block causal screen after Phase337 protocol qualification.",
+  "claim_scope": "Explicit material relation binding only; no parametric knowledge claim.",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "interface": "answer_aligned_chat",
+  "templates": [
+    "template_a",
+    "template_b",
+    "template_c"
+  ],
+  "item_count": 24,
+  "registered_case_count": 216,
+  "splits": {
+    "discovery_items": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "calibration_items": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "heldout_items": [
+      18,
+      19,
+      20,
+      21
+    ],
+    "private_heldout_items": [
+      22,
+      23
+    ]
+  },
+  "blocks": [
+    {
+      "block_id": "attention_output__early__source",
+      "component": "attention_output",
+      "depth_bin": "early",
+      "position_role": "source"
+    },
+    {
+      "block_id": "attention_output__early__query",
+      "component": "attention_output",
+      "depth_bin": "early",
+      "position_role": "query"
+    },
+    {
+      "block_id": "attention_output__early__answer_start",
+      "component": "attention_output",
+      "depth_bin": "early",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "attention_output__middle__source",
+      "component": "attention_output",
+      "depth_bin": "middle",
+      "position_role": "source"
+    },
+    {
+      "block_id": "attention_output__middle__query",
+      "component": "attention_output",
+      "depth_bin": "middle",
+      "position_role": "query"
+    },
+    {
+      "block_id": "attention_output__middle__answer_start",
+      "component": "attention_output",
+      "depth_bin": "middle",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "attention_output__late__source",
+      "component": "attention_output",
+      "depth_bin": "late",
+      "position_role": "source"
+    },
+    {
+      "block_id": "attention_output__late__query",
+      "component": "attention_output",
+      "depth_bin": "late",
+      "position_role": "query"
+    },
+    {
+      "block_id": "attention_output__late__answer_start",
+      "component": "attention_output",
+      "depth_bin": "late",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "mlp_output__early__source",
+      "component": "mlp_output",
+      "depth_bin": "early",
+      "position_role": "source"
+    },
+    {
+      "block_id": "mlp_output__early__query",
+      "component": "mlp_output",
+      "depth_bin": "early",
+      "position_role": "query"
+    },
+    {
+      "block_id": "mlp_output__early__answer_start",
+      "component": "mlp_output",
+      "depth_bin": "early",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "mlp_output__middle__source",
+      "component": "mlp_output",
+      "depth_bin": "middle",
+      "position_role": "source"
+    },
+    {
+      "block_id": "mlp_output__middle__query",
+      "component": "mlp_output",
+      "depth_bin": "middle",
+      "position_role": "query"
+    },
+    {
+      "block_id": "mlp_output__middle__answer_start",
+      "component": "mlp_output",
+      "depth_bin": "middle",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "mlp_output__late__source",
+      "component": "mlp_output",
+      "depth_bin": "late",
+      "position_role": "source"
+    },
+    {
+      "block_id": "mlp_output__late__query",
+      "component": "mlp_output",
+      "depth_bin": "late",
+      "position_role": "query"
+    },
+    {
+      "block_id": "mlp_output__late__answer_start",
+      "component": "mlp_output",
+      "depth_bin": "late",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "residual_increment__early__source",
+      "component": "residual_increment",
+      "depth_bin": "early",
+      "position_role": "source"
+    },
+    {
+      "block_id": "residual_increment__early__query",
+      "component": "residual_increment",
+      "depth_bin": "early",
+      "position_role": "query"
+    },
+    {
+      "block_id": "residual_increment__early__answer_start",
+      "component": "residual_increment",
+      "depth_bin": "early",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "residual_increment__middle__source",
+      "component": "residual_increment",
+      "depth_bin": "middle",
+      "position_role": "source"
+    },
+    {
+      "block_id": "residual_increment__middle__query",
+      "component": "residual_increment",
+      "depth_bin": "middle",
+      "position_role": "query"
+    },
+    {
+      "block_id": "residual_increment__middle__answer_start",
+      "component": "residual_increment",
+      "depth_bin": "middle",
+      "position_role": "answer_start"
+    },
+    {
+      "block_id": "residual_increment__late__source",
+      "component": "residual_increment",
+      "depth_bin": "late",
+      "position_role": "source"
+    },
+    {
+      "block_id": "residual_increment__late__query",
+      "component": "residual_increment",
+      "depth_bin": "late",
+      "position_role": "query"
+    },
+    {
+      "block_id": "residual_increment__late__answer_start",
+      "component": "residual_increment",
+      "depth_bin": "late",
+      "position_role": "answer_start"
+    }
+  ],
+  "stages": {
+    "discovery": "All 27 blocks; phrase margin; zero only.",
+    "calibration": "Discovery top 3 per model; zero, half, permutation.",
+    "heldout": "One frozen block per model; baseline, zero, half, permutation, wrong depth, wrong position; phrase and rollout."
+  },
+  "thresholds": {
+    "discovery_mean_phrase_loss_min": 0.1,
+    "discovery_positive_case_rate_min": 0.6666667,
+    "calibration_mean_phrase_loss_min": 0.1,
+    "calibration_positive_case_rate_min": 0.6666667,
+    "calibration_permutation_phrase_loss_min": 0.1,
+    "heldout_phrase_loss_min": 0.2,
+    "heldout_positive_case_rate_min": 0.6666667,
+    "heldout_control_superiority_min": 0.05,
+    "heldout_behavior_loss_rate_min": 0.25,
+    "heldout_control_behavior_loss_rate_max": 0.1,
+    "cross_model_pass_min": 2
+  },
+  "claim_boundaries": [
+    "A coarse block spans all layers in one depth third at one token role.",
+    "Attribute binding is a real mechanism and is not treated as a null control.",
+    "Same-block permutation tests content-structure sensitivity, not a null location control.",
+    "No SAE or transcoder feature is merged into physical-neuron coordinates.",
+    "No single-neuron claim is allowed.",
+    "Private heldout rows never participate in candidate or threshold selection."
+  ]
+}

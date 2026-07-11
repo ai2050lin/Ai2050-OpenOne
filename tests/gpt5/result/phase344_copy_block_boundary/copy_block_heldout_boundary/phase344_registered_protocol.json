@@ -1,0 +1,62 @@
+{
+  "schema_version": "20.0.0",
+  "phase_id": "Phase344",
+  "created_at": "2026-07-11T09:24:08.862381+00:00",
+  "purpose": "Test the Phase338 frozen blocks across qualified copy and noncopy heldouts.",
+  "registered_case_count": 585,
+  "selected_tasks": [
+    "random_label_copy",
+    "digit_copy",
+    "arbitrary_symbol_relay",
+    "cross_sentence_pointer",
+    "multi_token_phrase_copy",
+    "delayed_copy",
+    "key_value_read",
+    "object_name_relay",
+    "field_extraction",
+    "material_relation_binding",
+    "singular_agreement",
+    "direct_entailment",
+    "token_transformation"
+  ],
+  "splits": [
+    "heldout",
+    "private_heldout"
+  ],
+  "execution_mode": "b1_left_cache0",
+  "phrase_conditions": [
+    "baseline",
+    "correct_zero",
+    "correct_half",
+    "correct_permutation",
+    "wrong_depth_zero",
+    "wrong_position_zero"
+  ],
+  "rollout_conditions": [
+    "baseline",
+    "correct_zero",
+    "wrong_depth_zero",
+    "wrong_position_zero"
+  ],
+  "thresholds": {
+    "baseline_capability_rate_min": 0.8,
+    "required_phrase_valid_rate_min": 1.0,
+    "correct_behavior_loss_rate_min": 0.5,
+    "wrong_control_behavior_loss_rate_max": 0.1,
+    "phrase_control_superiority_min": 0.05,
+    "glm4_explicit_copy_task_pass_min": 4,
+    "glm4_noncopy_task_pass_max": 0
+  },
+  "lexical_generalization_required_tasks": [
+    "random_label_copy",
+    "digit_copy",
+    "arbitrary_symbol_relay",
+    "multi_token_phrase_copy"
+  ],
+  "claim_boundaries": [
+    "Phase338 blocks remain frozen and cannot be reselected.",
+    "All phrase scoring and behavior generation use batch size one.",
+    "Copy-neighbor effects do not count as noncopy side effects.",
+    "No natural-state replacement, layer shrink, or neuron scan is allowed in Phase344."
+  ]
+}

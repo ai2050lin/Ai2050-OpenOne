@@ -1,0 +1,56 @@
+{
+  "schema_version": "24.0.0",
+  "phase_id": "Phase348",
+  "created_at": "2026-07-11T10:32:52.244379+00:00",
+  "purpose": "Test two adjusted natural-trace block candidates against spatial and matched-task controls.",
+  "registered_case_count": 1296,
+  "target_tasks": [
+    "contiguous_multi_token_answer",
+    "no_morphology_control"
+  ],
+  "matched_control_tasks": [
+    "explicit_copy_control",
+    "simple_no_source_answer",
+    "sentence_past_tense",
+    "direct_fact_control"
+  ],
+  "candidate_control_map": {
+    "contiguous_multi_token_answer": [
+      "explicit_copy_control",
+      "simple_no_source_answer"
+    ],
+    "no_morphology_control": [
+      "sentence_past_tense",
+      "direct_fact_control"
+    ]
+  },
+  "screen_splits": [
+    "discovery",
+    "calibration"
+  ],
+  "sealed_splits": [
+    "heldout",
+    "private_heldout"
+  ],
+  "conditions": [
+    "baseline",
+    "correct_zero",
+    "correct_half",
+    "wrong_depth_zero",
+    "wrong_position_zero"
+  ],
+  "official_execution_mode": "b1_left_cache0",
+  "thresholds": {
+    "split_baseline_target_win_rate_min": 0.8,
+    "split_zero_mean_phrase_margin_loss_min": 0.1,
+    "split_zero_positive_rate_min": 0.65,
+    "split_spatial_control_superiority_min": 0.05,
+    "split_matched_task_superiority_min": 0.05,
+    "split_half_mean_phrase_margin_loss_min": 0.0
+  },
+  "stop_rules": [
+    "Do not reveal causal heldout outcomes unless discovery and calibration both pass.",
+    "Do not enter MCUE unless a target beats spatial and matched-task controls.",
+    "This screen cannot establish neuron-level causality or sufficiency."
+  ]
+}

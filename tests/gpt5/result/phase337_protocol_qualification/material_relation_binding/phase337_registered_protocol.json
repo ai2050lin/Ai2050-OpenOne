@@ -1,0 +1,36 @@
+{
+  "schema_version": "13.0.0",
+  "phase_id": "Phase337",
+  "created_at": "2026-07-11T05:35:06.786741+00:00",
+  "purpose": "Separate answer arrival, semantic correctness, phrase validity, and baseline capability.",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "interfaces": [
+    "raw_completion",
+    "native_chat",
+    "answer_aligned_chat"
+  ],
+  "template": "template_a",
+  "objects_per_model_interface": 12,
+  "registered_case_count": 108,
+  "max_new_tokens": 128,
+  "cell_capable_case_min": 9,
+  "cell_answer_reached_min": 9,
+  "stage_gate_common_interface_model_min": 2,
+  "baseline_capability_definition": "answer_reached AND answer_head_semantic_correct AND target_phrase_valid",
+  "diagnostic_only": [
+    "initial_target_rank",
+    "protocol_followed",
+    "token_budget_exhausted",
+    "semantic_correct_outside_answer"
+  ],
+  "claim_boundaries": [
+    "No internal activation or intervention is measured.",
+    "No parametric-memory origin claim is allowed.",
+    "No mechanism or neuron node is published.",
+    "A passing cell only qualifies a denominator for later causal tests."
+  ]
+}

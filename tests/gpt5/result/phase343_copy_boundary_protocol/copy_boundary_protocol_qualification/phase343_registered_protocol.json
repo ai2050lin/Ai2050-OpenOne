@@ -1,0 +1,92 @@
+{
+  "schema_version": "19.0.0",
+  "phase_id": "Phase343",
+  "created_at": "2026-07-11T09:04:44.013690+00:00",
+  "purpose": "Qualify explicit-copy, copy-neighbor, and noncopy tasks on the Phase342 official path.",
+  "registered_case_count": 2592,
+  "items_per_task": 18,
+  "templates": [
+    "format_a",
+    "format_b",
+    "format_c"
+  ],
+  "tasks": [
+    {
+      "task_id": "random_label_copy",
+      "task_class": "explicit_copy"
+    },
+    {
+      "task_id": "digit_copy",
+      "task_class": "explicit_copy"
+    },
+    {
+      "task_id": "arbitrary_symbol_relay",
+      "task_class": "explicit_copy"
+    },
+    {
+      "task_id": "cross_sentence_pointer",
+      "task_class": "explicit_copy"
+    },
+    {
+      "task_id": "multi_token_phrase_copy",
+      "task_class": "explicit_copy"
+    },
+    {
+      "task_id": "delayed_copy",
+      "task_class": "explicit_copy"
+    },
+    {
+      "task_id": "key_value_read",
+      "task_class": "copy_neighbor"
+    },
+    {
+      "task_id": "object_name_relay",
+      "task_class": "copy_neighbor"
+    },
+    {
+      "task_id": "field_extraction",
+      "task_class": "copy_neighbor"
+    },
+    {
+      "task_id": "material_relation_binding",
+      "task_class": "noncopy_control"
+    },
+    {
+      "task_id": "attribute_relation_binding",
+      "task_class": "noncopy_control"
+    },
+    {
+      "task_id": "semantic_classification",
+      "task_class": "noncopy_control"
+    },
+    {
+      "task_id": "singular_agreement",
+      "task_class": "noncopy_control"
+    },
+    {
+      "task_id": "direct_entailment",
+      "task_class": "noncopy_control"
+    },
+    {
+      "task_id": "token_transformation",
+      "task_class": "noncopy_control"
+    },
+    {
+      "task_id": "non_source_answer",
+      "task_class": "noncopy_control"
+    }
+  ],
+  "official_execution_mode": "b1_left_cache0",
+  "thresholds": {
+    "split_baseline_accuracy_min": 0.8,
+    "split_phrase_valid_rate_min": 1.0,
+    "glm4_explicit_copy_qualified_min": 3,
+    "glm4_copy_neighbor_qualified_min": 1,
+    "glm4_noncopy_control_qualified_min": 4
+  },
+  "claim_boundaries": [
+    "Phase343 is baseline qualification only and uses single-case left-padded execution.",
+    "Task qualification is not copy-mechanism evidence.",
+    "No task may be dropped using causal outcomes because no causal intervention is run."
+  ]
+}

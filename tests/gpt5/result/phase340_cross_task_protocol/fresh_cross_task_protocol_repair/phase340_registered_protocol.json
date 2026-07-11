@@ -1,0 +1,68 @@
+{
+  "schema_version": "16.0.0",
+  "phase_id": "Phase340",
+  "created_at": "2026-07-11T07:49:33.594807+00:00",
+  "purpose": "Independently qualify a repaired two-template cross-task baseline denominator.",
+  "registered_case_count": 972,
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "tasks": [
+    {
+      "task_id": "material_relation_binding",
+      "task_class": "relation_binding"
+    },
+    {
+      "task_id": "attribute_relation_binding",
+      "task_class": "relation_binding"
+    },
+    {
+      "task_id": "part_relation_binding",
+      "task_class": "relation_binding"
+    },
+    {
+      "task_id": "location_relation_binding",
+      "task_class": "relation_binding"
+    },
+    {
+      "task_id": "identity_copy",
+      "task_class": "source_operation"
+    },
+    {
+      "task_id": "source_span_extraction",
+      "task_class": "source_operation"
+    },
+    {
+      "task_id": "singular_agreement",
+      "task_class": "cross_family"
+    },
+    {
+      "task_id": "direct_entailment",
+      "task_class": "cross_family"
+    },
+    {
+      "task_id": "answer_only_protocol",
+      "task_class": "cross_family"
+    }
+  ],
+  "templates": [
+    "template_b",
+    "template_c"
+  ],
+  "items_per_task": 18,
+  "thresholds": {
+    "split_baseline_accuracy_min": 0.8,
+    "split_phrase_score_valid_rate_min": 1.0,
+    "glm4_relation_neighbor_qualified_min": 1,
+    "glm4_source_control_qualified_min": 1,
+    "glm4_cross_control_qualified_min": 1
+  },
+  "entry_gate": "GLM4 material plus at least one other relation, one source control, and one cross-family control must qualify on all four splits.",
+  "claim_boundaries": [
+    "Phase340 is baseline protocol qualification only.",
+    "No activation intervention is executed or inferred.",
+    "Fresh items prevent Phase339 heldout outcomes from serving as the new causal denominator."
+  ]
+}

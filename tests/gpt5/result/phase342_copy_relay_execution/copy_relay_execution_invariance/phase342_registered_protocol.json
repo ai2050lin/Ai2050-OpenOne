@@ -1,0 +1,96 @@
+{
+  "schema_version": "18.0.0",
+  "phase_id": "Phase342",
+  "created_at": "2026-07-11T08:52:11.909840+00:00",
+  "purpose": "Qualify natural execution paths before copy-relay causal testing.",
+  "registered_case_count": 216,
+  "case_count_per_model": 72,
+  "task_count": 9,
+  "selected_item_indices": [
+    0,
+    5,
+    13,
+    16
+  ],
+  "reference_mode": "b1_left_cache0",
+  "execution_modes": [
+    {
+      "mode_id": "b1_left_cache0",
+      "batch_size": 1,
+      "padding_side": "left",
+      "use_cache": false
+    },
+    {
+      "mode_id": "b2_left_cache0",
+      "batch_size": 2,
+      "padding_side": "left",
+      "use_cache": false
+    },
+    {
+      "mode_id": "b4_left_cache0",
+      "batch_size": 4,
+      "padding_side": "left",
+      "use_cache": false
+    },
+    {
+      "mode_id": "b6_left_cache0",
+      "batch_size": 6,
+      "padding_side": "left",
+      "use_cache": false
+    },
+    {
+      "mode_id": "b1_left_cache1",
+      "batch_size": 1,
+      "padding_side": "left",
+      "use_cache": true
+    },
+    {
+      "mode_id": "b2_left_cache1",
+      "batch_size": 2,
+      "padding_side": "left",
+      "use_cache": true
+    },
+    {
+      "mode_id": "b4_left_cache1",
+      "batch_size": 4,
+      "padding_side": "left",
+      "use_cache": true
+    },
+    {
+      "mode_id": "b6_left_cache1",
+      "batch_size": 6,
+      "padding_side": "left",
+      "use_cache": true
+    },
+    {
+      "mode_id": "b2_right_cache0",
+      "batch_size": 2,
+      "padding_side": "right",
+      "use_cache": false
+    },
+    {
+      "mode_id": "b4_right_cache0",
+      "batch_size": 4,
+      "padding_side": "right",
+      "use_cache": false
+    },
+    {
+      "mode_id": "b6_right_cache0",
+      "batch_size": 6,
+      "padding_side": "right",
+      "use_cache": false
+    }
+  ],
+  "thresholds": {
+    "text_invariance_rate_min": 0.99,
+    "correctness_invariance_rate_min": 1.0,
+    "top_token_invariance_rate_min": 1.0,
+    "source_hidden_cosine_min": 0.999,
+    "target_first_logit_abs_delta_max": 0.05
+  },
+  "claim_boundaries": [
+    "Natural forward and generation only; no activation intervention is allowed.",
+    "Batch, cache, and padding modes are execution variables, not language mechanisms.",
+    "A failed mode cannot be used for later causal behavior evidence."
+  ]
+}

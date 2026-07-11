@@ -1,0 +1,75 @@
+{
+  "schema_version": "21.0.0",
+  "phase_id": "Phase345",
+  "created_at": "2026-07-11T09:59:35.117735+00:00",
+  "purpose": "Qualify orthogonal knowledge, reasoning, grammar, and protocol tasks before physical tracing.",
+  "registered_case_count": 2592,
+  "items_per_task": 24,
+  "templates": [
+    "format_a",
+    "format_b",
+    "format_c"
+  ],
+  "tasks": [
+    {
+      "task_id": "context_relation_binding",
+      "task_class": "knowledge_network"
+    },
+    {
+      "task_id": "parameter_knowledge_retrieval",
+      "task_class": "knowledge_network"
+    },
+    {
+      "task_id": "explicit_copy_control",
+      "task_class": "knowledge_network"
+    },
+    {
+      "task_id": "missing_condition_check",
+      "task_class": "reasoning"
+    },
+    {
+      "task_id": "two_hop_entailment",
+      "task_class": "reasoning"
+    },
+    {
+      "task_id": "direct_fact_control",
+      "task_class": "reasoning"
+    },
+    {
+      "task_id": "sentence_number_agreement",
+      "task_class": "grammar"
+    },
+    {
+      "task_id": "sentence_past_tense",
+      "task_class": "grammar"
+    },
+    {
+      "task_id": "no_morphology_control",
+      "task_class": "grammar"
+    },
+    {
+      "task_id": "answer_only_protocol",
+      "task_class": "protocol_control"
+    },
+    {
+      "task_id": "multi_token_natural_answer",
+      "task_class": "protocol_control"
+    },
+    {
+      "task_id": "no_source_answer",
+      "task_class": "protocol_control"
+    }
+  ],
+  "official_execution_mode": "b1_left_cache0",
+  "thresholds": {
+    "split_baseline_accuracy_min": 0.8,
+    "split_phrase_valid_rate_min": 1.0,
+    "physical_trace_family_qualified_min": 2,
+    "physical_trace_protocol_qualified_min": 2
+  },
+  "claim_boundaries": [
+    "Phase345 is baseline qualification only; MCUE and causal interventions are not run.",
+    "All behavior and phrase scoring use the Phase342 single-case official path.",
+    "Task-family coverage is a graph denominator, not a mechanism closure claim."
+  ]
+}
