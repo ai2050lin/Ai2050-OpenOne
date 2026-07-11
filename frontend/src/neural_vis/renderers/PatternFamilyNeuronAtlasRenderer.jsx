@@ -9,6 +9,13 @@ const COLORS = {
   natural: '#22d3ee',
   group: '#fb923c',
   confirmed: '#4ade80',
+  refined: '#a3e635',
+  sharedSkeleton: '#2dd4bf',
+  interfaceBranch: '#f59e0b',
+  dynamicPositive: '#4ade80',
+  dynamicControl: '#fb7185',
+  necessityPrimary: '#facc15',
+  necessityComparator: '#38bdf8',
   crossModel: '#e879f9',
   readout: '#fb7185',
   active: '#f8fafc',
@@ -20,6 +27,10 @@ function filterNodes(nodes, focus) {
   if (focus === 'confirmed') return nodes.filter((node) => node.expanded_confirmation_pass);
   if (focus === 'registered') return nodes.filter((node) => node.phase330_registered_set_support || node.group_intervention_supported);
   if (focus === 'cross_model') return nodes.filter((node) => node.phase330_cross_model_readout_specific);
+  if (focus === 'refined') return nodes.filter((node) => node.phase331_tested);
+  if (focus === 'interface_path') return nodes.filter((node) => node.phase332_tested);
+  if (focus === 'dynamic_path') return nodes.filter((node) => node.phase333_tested);
+  if (focus === 'natural_necessity') return nodes.filter((node) => node.phase334_tested);
   if (focus === 'competition') return nodes.filter((node) => node.phase329_tested || node.phase330_tested);
   return nodes;
 }
@@ -115,6 +126,12 @@ function nodePosition(node, snapshot, rankInLayer, overlay = false) {
 }
 
 function nodeColor(node) {
+  if (node.phase334_tested) return node.cohort === 'primary' ? COLORS.necessityPrimary : COLORS.necessityComparator;
+  if (node.phase333_tested) return node.cohort === 'positive' ? COLORS.dynamicPositive : COLORS.dynamicControl;
+  if (node.phase332_path_role === 'shared_skeleton') return COLORS.sharedSkeleton;
+  if (node.phase332_path_role === 'interface_branch') return COLORS.interfaceBranch;
+  if (node.phase331_full_gate_pass) return COLORS.confirmed;
+  if (node.phase331_tested) return COLORS.refined;
   if (node.phase330_cross_model_readout_specific) return COLORS.crossModel;
   if (node.expanded_confirmation_pass) return COLORS.confirmed;
   if (node.group_intervention_supported) return COLORS.group;
@@ -123,6 +140,12 @@ function nodeColor(node) {
 }
 
 function nodeCategory(node) {
+  if (node.phase334_tested) return node.cohort === 'primary' ? 'necessityPrimary' : 'necessityComparator';
+  if (node.phase333_tested) return node.cohort === 'positive' ? 'dynamicPositive' : 'dynamicControl';
+  if (node.phase332_path_role === 'shared_skeleton') return 'sharedSkeleton';
+  if (node.phase332_path_role === 'interface_branch') return 'interfaceBranch';
+  if (node.phase331_full_gate_pass) return 'confirmed';
+  if (node.phase331_tested) return 'refined';
   if (node.phase330_cross_model_readout_specific) return 'crossModel';
   if (node.expanded_confirmation_pass) return 'confirmed';
   if (node.group_intervention_supported) return 'group';
@@ -132,10 +155,13 @@ function nodeCategory(node) {
 
 function toHoverInfo(node) {
   const isComponentSet = node.node_type === 'component_set_member';
+  const isInterfacePath = node.node_type === 'interface_path_member';
+  const isDynamicEvent = node.node_type === 'dynamic_path_event';
+  const isNaturalNecessity = node.node_type === 'natural_necessity_component_candidate';
   return {
     token: `L${node.layer} · ${node.unit_kind} #${node.unit_index}`,
     label: node.family_name,
-    type: isComponentSet ? '模式族物理组件集合成员' : '模式族物理单元候选',
+    type: isNaturalNecessity ? '接收者自然路径组件必要性候选' : isDynamicEvent ? '冻结功能时间动态事件锚点' : isInterfacePath ? '保留集稳定接口路径成员' : isComponentSet ? '模式族物理组件集合成员' : '模式族物理单元候选',
     family_id: node.family_id,
     family_name: node.family_name,
     relation: node.relation,
@@ -192,11 +218,64 @@ function toHoverInfo(node) {
     phase330_natural_minus_wrong_donor_margin: node.phase330_natural_minus_wrong_donor_margin,
     phase330_status: node.phase330_status,
     phase330_evidence_boundary: node.phase330_evidence_boundary,
+    phase331_tested: node.phase331_tested,
+    phase331_interfaces: node.phase331_interfaces,
+    phase331_expanded_heldout_items: node.phase331_expanded_heldout_items,
+    phase331_raw_readout_specific: node.phase331_raw_readout_specific,
+    phase331_chat_readout_specific: node.phase331_chat_readout_specific,
+    phase331_raw_joint_margin_delta: node.phase331_raw_joint_margin_delta,
+    phase331_chat_joint_margin_delta: node.phase331_chat_joint_margin_delta,
+    phase331_raw_phrase_logprob_delta: node.phase331_raw_phrase_logprob_delta,
+    phase331_chat_phrase_logprob_delta: node.phase331_chat_phrase_logprob_delta,
+    phase331_raw_behavior_changed_rate: node.phase331_raw_behavior_changed_rate,
+    phase331_chat_behavior_changed_rate: node.phase331_chat_behavior_changed_rate,
+    phase331_raw_compensation_ratio: node.phase331_raw_compensation_ratio,
+    phase331_chat_compensation_ratio: node.phase331_chat_compensation_ratio,
+    phase331_member_localized: node.phase331_member_localized,
+    phase331_full_generation_changed: node.phase331_full_generation_changed,
+    phase331_full_gate_pass: node.phase331_full_gate_pass,
+    phase331_status: node.phase331_status,
+    phase331_evidence_boundary: node.phase331_evidence_boundary,
+    phase332_tested: node.phase332_tested,
+    phase332_path_role: node.phase332_path_role,
+    phase332_interface: node.phase332_interface,
+    phase332_position_role: node.phase332_position_role,
+    phase332_discovery_item_sign_consistency: node.phase332_discovery_item_sign_consistency,
+    phase332_heldout_item_sign_consistency: node.phase332_heldout_item_sign_consistency,
+    phase332_heldout_stable: node.phase332_heldout_stable,
+    phase332_exchange_causally_effective: node.phase332_exchange_causally_effective,
+    phase333_tested: node.phase333_tested,
+    phase333_event_role: node.phase333_event_role,
+    phase333_interface: node.phase333_interface,
+    phase333_block_windows: node.phase333_block_windows,
+    phase333_dynamic_sequence_stable: node.phase333_dynamic_sequence_stable,
+    phase333_heldout_peak_depth: node.phase333_heldout_peak_depth,
+    phase333_correct_block_specific: node.phase333_correct_block_specific,
+    phase333_phrase_delta: node.phase333_phrase_delta,
+    phase333_rank_improvement: node.phase333_rank_improvement,
+    phase333_behavior_gain_rate: node.phase333_behavior_gain_rate,
+    phase334_tested: node.phase334_tested,
+    phase334_interface: node.phase334_interface,
+    phase334_depth_bin: node.phase334_depth_bin,
+    phase334_position_role: node.phase334_position_role,
+    phase334_component: node.phase334_component,
+    phase334_baseline_eligible_case_count: node.phase334_baseline_eligible_case_count,
+    phase334_common_valid_case_count: node.phase334_common_valid_case_count,
+    phase334_phrase_logprob_loss: node.phase334_phrase_logprob_loss,
+    phase334_target_rank_loss: node.phase334_target_rank_loss,
+    phase334_behavior_loss_rate: node.phase334_behavior_loss_rate,
+    phase334_control_phrase_loss: node.phase334_control_phrase_loss,
+    phase334_natural_necessity_specific: node.phase334_natural_necessity_specific,
+    phase334_propagation_candidate_rate: node.phase334_propagation_candidate_rate,
+    phase334_local_gate_pass: node.phase334_local_gate_pass,
     source: node.source_artifacts?.[0],
     source_artifacts: node.source_artifacts,
     node_id: node.node_id,
     is_real_unit: !isComponentSet,
     is_component_set_member: isComponentSet,
+    is_interface_path_member: isInterfacePath,
+    is_dynamic_path_event: isDynamicEvent,
+    is_natural_necessity_candidate: isNaturalNecessity,
   };
 }
 
@@ -336,7 +415,7 @@ export default function PatternFamilyNeuronAtlasRenderer({
     return nodePosition(node, snapshot, rank, overlay);
   });
   const positionById = new Map(selectedNodes.map((node, index) => [node.node_id, positions[index]]));
-  const instanceGroups = ['candidate', 'natural', 'group', 'confirmed', 'crossModel'].map((category) => {
+  const instanceGroups = ['candidate', 'natural', 'group', 'confirmed', 'crossModel', 'refined', 'sharedSkeleton', 'interfaceBranch', 'dynamicPositive', 'dynamicControl', 'necessityPrimary', 'necessityComparator'].map((category) => {
     const items = selectedNodes.filter((node) => nodeCategory(node) === category);
     return {
       category,
@@ -345,6 +424,71 @@ export default function PatternFamilyNeuronAtlasRenderer({
       color: COLORS[category],
     };
   }).filter((group) => group.items.length > 0);
+  const interfacePathLines = [];
+  const interfacePathGroups = new Map();
+  selectedNodes.forEach((node) => {
+    if (!node.phase332_tested) return;
+    const key = [node.mechanism_id, node.phase332_path_role, node.phase332_interface, node.phase332_position_role].join(':');
+    if (!interfacePathGroups.has(key)) interfacePathGroups.set(key, []);
+    interfacePathGroups.get(key).push({ node, position: positionById.get(node.node_id) });
+  });
+  interfacePathGroups.forEach((members, key) => {
+    const byLayer = new Map();
+    members.forEach(({ node, position }) => {
+      const layer = Number(node.layer || 0);
+      if (!byLayer.has(layer)) byLayer.set(layer, []);
+      byLayer.get(layer).push(position);
+    });
+    const points = Array.from(byLayer.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([, values]) => values[0].map((_, axis) => values.reduce((sum, value) => sum + value[axis], 0) / values.length));
+    if (points.length > 1) {
+      interfacePathLines.push({
+        key,
+        points,
+        role: members[0].node.phase332_path_role,
+      });
+    }
+  });
+  const dynamicPathLines = [];
+  const dynamicGroups = new Map();
+  selectedNodes.forEach((node) => {
+    if (!node.phase333_tested) return;
+    if (!dynamicGroups.has(node.mechanism_id)) dynamicGroups.set(node.mechanism_id, []);
+    dynamicGroups.get(node.mechanism_id).push({ node, position: positionById.get(node.node_id) });
+  });
+  const interfaceOrder = { raw_completion: 0, native_chat: 1, answer_aligned_chat: 2 };
+  dynamicGroups.forEach((members, key) => {
+    const ordered = members.slice().sort((a, b) => (
+      (interfaceOrder[a.node.phase333_interface] ?? 9) - (interfaceOrder[b.node.phase333_interface] ?? 9)
+    ));
+    if (ordered.length > 1) {
+      dynamicPathLines.push({
+        key,
+        points: ordered.map((entry) => entry.position),
+        cohort: ordered[0].node.cohort,
+      });
+    }
+  });
+  const necessityLines = [];
+  const necessityGroups = new Map();
+  selectedNodes.forEach((node) => {
+    if (!node.phase334_tested) return;
+    if (!necessityGroups.has(node.mechanism_id)) necessityGroups.set(node.mechanism_id, []);
+    necessityGroups.get(node.mechanism_id).push({ node, position: positionById.get(node.node_id) });
+  });
+  necessityGroups.forEach((members, key) => {
+    const ordered = members.slice().sort((a, b) => (
+      (interfaceOrder[a.node.phase334_interface] ?? 9) - (interfaceOrder[b.node.phase334_interface] ?? 9)
+    ));
+    if (ordered.length > 1) {
+      necessityLines.push({
+        key,
+        points: ordered.map((entry) => entry.position),
+        cohort: ordered[0].node.cohort,
+      });
+    }
+  });
   const sourceY = -11.7;
   const readoutY = 11.7;
   const anchors = aggregateAnchors(partition?.path?.layer_anchors || []);
@@ -359,6 +503,36 @@ export default function PatternFamilyNeuronAtlasRenderer({
   if (overlay) {
     return (
       <group name="pattern-family-physical-overlay">
+        {necessityLines.map((path) => (
+          <Line
+            key={`overlay-necessity-${path.key}`}
+            points={path.points}
+            color={path.cohort === 'primary' ? COLORS.necessityPrimary : COLORS.necessityComparator}
+            lineWidth={2.3}
+            transparent
+            opacity={0.88}
+          />
+        ))}
+        {dynamicPathLines.map((path) => (
+          <Line
+            key={`overlay-dynamic-${path.key}`}
+            points={path.points}
+            color={path.cohort === 'positive' ? COLORS.dynamicPositive : COLORS.dynamicControl}
+            lineWidth={2.1}
+            transparent
+            opacity={0.82}
+          />
+        ))}
+        {interfacePathLines.map((path) => (
+          <Line
+            key={`overlay-path-${path.key}`}
+            points={path.points}
+            color={path.role === 'shared_skeleton' ? COLORS.sharedSkeleton : COLORS.interfaceBranch}
+            lineWidth={1.7}
+            transparent
+            opacity={0.72}
+          />
+        ))}
         {selectedNodes.map((node) => {
           const target = positionById.get(node.node_id);
           const anchor = [0, 0, layerZ(node.layer, layerCount)];
@@ -402,6 +576,39 @@ export default function PatternFamilyNeuronAtlasRenderer({
       </Text>
 
       <Line points={spinePoints} color={COLORS.path} lineWidth={2} transparent opacity={0.5} dashed dashSize={0.3} gapSize={0.18} />
+
+      {necessityLines.map((path) => (
+        <Line
+          key={`necessity-path-${path.key}`}
+          points={path.points}
+          color={path.cohort === 'primary' ? COLORS.necessityPrimary : COLORS.necessityComparator}
+          lineWidth={2.4}
+          transparent
+          opacity={0.9}
+        />
+      ))}
+
+      {dynamicPathLines.map((path) => (
+        <Line
+          key={`dynamic-path-${path.key}`}
+          points={path.points}
+          color={path.cohort === 'positive' ? COLORS.dynamicPositive : COLORS.dynamicControl}
+          lineWidth={2.2}
+          transparent
+          opacity={0.86}
+        />
+      ))}
+
+      {interfacePathLines.map((path) => (
+        <Line
+          key={`interface-path-${path.key}`}
+          points={path.points}
+          color={path.role === 'shared_skeleton' ? COLORS.sharedSkeleton : COLORS.interfaceBranch}
+          lineWidth={2}
+          transparent
+          opacity={0.78}
+        />
+      ))}
 
       <Anchor
         position={[0, sourceY, 0]}
@@ -497,6 +704,13 @@ export default function PatternFamilyNeuronAtlasRenderer({
           [COLORS.group, '组级留出支持'],
           [COLORS.confirmed, '扩大确认，非单元因果'],
           [COLORS.crossModel, '跨模型集合读出，非行为闭合'],
+          [COLORS.refined, 'Phase331 扩展审计，非单元因果'],
+          [COLORS.sharedSkeleton, 'Phase332 保留集共享骨架'],
+          [COLORS.interfaceBranch, 'Phase332 保留集接口分支'],
+          [COLORS.dynamicPositive, 'Phase333 缺失条件动态锚点'],
+          [COLORS.dynamicControl, 'Phase333 两跳阻断对照锚点'],
+          [COLORS.necessityPrimary, 'Phase334 主机制自然必要性候选'],
+          [COLORS.necessityComparator, 'Phase334 配对机制自然必要性候选'],
         ].map(([color, label], index) => (
           <group key={label} position={[0, index * 0.48, 0]}>
             <mesh><sphereGeometry args={[0.1, 10, 10]} /><meshBasicMaterial color={color} /></mesh>

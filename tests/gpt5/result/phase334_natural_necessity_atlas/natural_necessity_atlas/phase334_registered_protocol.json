@@ -1,0 +1,136 @@
+{
+  "schema_version": "12.0.0",
+  "phase_id": "Phase334",
+  "created_at": "2026-07-10T18:45:18.139514+00:00",
+  "purpose": "Map natural receiver-path necessity across knowledge, reasoning, and syntax.",
+  "families": [
+    "content_knowledge",
+    "reasoning_constraint",
+    "syntax_structure"
+  ],
+  "mechanism_pairs": [
+    [
+      "content_knowledge",
+      "material",
+      "primary",
+      "attribute"
+    ],
+    [
+      "content_knowledge",
+      "attribute",
+      "matched_comparator",
+      "material"
+    ],
+    [
+      "reasoning_constraint",
+      "missing_condition_control",
+      "primary",
+      "two_hop_blocked"
+    ],
+    [
+      "reasoning_constraint",
+      "two_hop_blocked",
+      "matched_comparator",
+      "missing_condition_control"
+    ],
+    [
+      "syntax_structure",
+      "past_tense",
+      "primary",
+      "plural_agreement"
+    ],
+    [
+      "syntax_structure",
+      "plural_agreement",
+      "matched_comparator",
+      "past_tense"
+    ]
+  ],
+  "new_item_count_per_mechanism": 12,
+  "discovery_items": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "calibration_items": [
+    6,
+    7,
+    8
+  ],
+  "heldout_items": [
+    9,
+    10,
+    11
+  ],
+  "templates": [
+    "template_a",
+    "template_b",
+    "template_c"
+  ],
+  "interfaces": [
+    "raw_completion",
+    "native_chat",
+    "answer_aligned_chat"
+  ],
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "registered_case_count": 1944,
+  "max_new_tokens": 24,
+  "candidate_components": [
+    "attention_output",
+    "mlp_output",
+    "residual_increment"
+  ],
+  "position_roles": [
+    "source",
+    "query",
+    "answer_start"
+  ],
+  "depth_bins": [
+    "early",
+    "middle",
+    "late"
+  ],
+  "baseline_eligibility": {
+    "behavior_success_required": true,
+    "target_rank_max": 50,
+    "finite_phrase_logprob_required": true,
+    "model_cell_eligible_cases_min": 6
+  },
+  "calibration_selection": "Within each model/mechanism/interface, select one of three discovery-frozen depth candidates on calibration-only natural deletion loss.",
+  "heldout_conditions": [
+    "baseline",
+    "correct_selected_delete",
+    "correct_attention_delete",
+    "correct_mlp_delete",
+    "correct_residual_delete",
+    "correct_joint_delete",
+    "wrong_time_delete",
+    "wrong_object_increment",
+    "matched_mechanism_increment",
+    "moment_matched_permutation",
+    "wrong_layer_delete"
+  ],
+  "thresholds": {
+    "common_valid_case_count_min": 6,
+    "phrase_logprob_loss_min": 0.1,
+    "target_rank_loss_min": 1.0,
+    "behavior_loss_rate_min": 0.1,
+    "control_superiority_min": 0.05,
+    "protocol_side_effect_max": 0.1,
+    "propagation_case_rate_min": 0.6666667
+  },
+  "claim_boundaries": [
+    "The knowledge pair tests explicit relation binding, not parametric-memory origin.",
+    "Matched comparators are real mechanisms, not expected-null negative controls.",
+    "Natural contrast magnitude selects candidates without a target-output direction.",
+    "No training-formation claim is allowed without same-run checkpoints.",
+    "No single-unit claim is allowed in Phase334."
+  ]
+}

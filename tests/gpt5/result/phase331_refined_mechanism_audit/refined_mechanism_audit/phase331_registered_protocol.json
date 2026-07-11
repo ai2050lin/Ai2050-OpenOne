@@ -1,0 +1,137 @@
+{
+  "schema_version": "9.0.0",
+  "phase_id": "Phase331",
+  "created_at": "2026-07-10T14:00:37.860944+00:00",
+  "purpose": "Refine only the five frozen Phase330 cross-model set-readout candidates.",
+  "positive_mechanisms": [
+    "content_knowledge/negated_attribute",
+    "language_action/summarize",
+    "language_action/transform",
+    "reasoning_constraint/missing_condition_control",
+    "syntax_structure/singular_agreement"
+  ],
+  "matched_negative_controls": [
+    "content_knowledge/attribute",
+    "language_action/rewrite",
+    "language_action/extract",
+    "reasoning_constraint/two_hop_blocked",
+    "syntax_structure/plural_agreement"
+  ],
+  "heldout_item_indices": [
+    19,
+    20,
+    21,
+    22
+  ],
+  "templates": [
+    "template_a",
+    "template_b",
+    "template_c"
+  ],
+  "interfaces": [
+    "raw_completion",
+    "chat_template"
+  ],
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "positive_interface_case_count": 360,
+  "control_interface_case_count": 360,
+  "interface_case_count": 720,
+  "positive_conditions": [
+    "baseline",
+    "joint_set_zero",
+    "attention_set_zero",
+    "mlp_set_zero",
+    "single_member_0_zero",
+    "single_member_1_zero",
+    "single_member_2_zero",
+    "single_member_3_zero",
+    "set_without_member_0_zero",
+    "set_without_member_1_zero",
+    "set_without_member_2_zero",
+    "set_without_member_3_zero",
+    "matched_random_joint_zero",
+    "wrong_layer_joint_zero",
+    "paired_control_joint_zero",
+    "correct_donor_transplant",
+    "wrong_donor_transplant",
+    "same_target_donor_transplant",
+    "matched_random_donor_transplant",
+    "wrong_layer_donor_transplant",
+    "correct_donor_restoration"
+  ],
+  "control_conditions": [
+    "baseline",
+    "joint_set_zero",
+    "matched_random_joint_zero",
+    "wrong_layer_joint_zero",
+    "paired_positive_joint_zero"
+  ],
+  "generation_conditions": [
+    "baseline",
+    "joint_set_zero",
+    "matched_random_joint_zero",
+    "wrong_layer_joint_zero",
+    "paired_control_joint_zero",
+    "paired_positive_joint_zero",
+    "correct_donor_transplant",
+    "wrong_donor_transplant",
+    "same_target_donor_transplant",
+    "matched_random_donor_transplant",
+    "wrong_layer_donor_transplant",
+    "correct_donor_restoration"
+  ],
+  "trace_conditions": [
+    "baseline",
+    "joint_set_zero",
+    "attention_set_zero",
+    "mlp_set_zero",
+    "single_member_0_zero",
+    "single_member_1_zero",
+    "single_member_2_zero",
+    "single_member_3_zero",
+    "set_without_member_0_zero",
+    "set_without_member_1_zero",
+    "set_without_member_2_zero",
+    "set_without_member_3_zero",
+    "matched_random_joint_zero",
+    "wrong_layer_joint_zero",
+    "paired_control_joint_zero",
+    "correct_donor_transplant",
+    "wrong_donor_transplant",
+    "same_target_donor_transplant",
+    "matched_random_donor_transplant",
+    "wrong_layer_donor_transplant",
+    "correct_donor_restoration"
+  ],
+  "trace_template": "template_c",
+  "trace_scope": "all registered intervention conditions on template_c for every item and interface",
+  "thresholds": {
+    "item_direction_consistency_min": 0.75,
+    "joint_margin_delta_max": -0.05,
+    "member_margin_delta_max": -0.05,
+    "generation_behavior_change_min": 0.1,
+    "paired_control_behavior_change_max": 0.1,
+    "paired_control_protocol_loss_max": 0.1,
+    "nonselected_compensation_ratio_max": 1.25,
+    "late_residual_recovery_fraction_max": 0.25
+  },
+  "success_gate": [
+    "readout_specific",
+    "expanded_heldout",
+    "cross_interface",
+    "cross_model",
+    "member_localized",
+    "compensation_accounted",
+    "full_generation_changed",
+    "low_side_effect"
+  ],
+  "denominator_frozen": true,
+  "selection_updates_allowed": false,
+  "phase330_denominator_updates_allowed": false,
+  "single_unit_intervention_gate_open": false,
+  "theory_update_gate_open": false
+}

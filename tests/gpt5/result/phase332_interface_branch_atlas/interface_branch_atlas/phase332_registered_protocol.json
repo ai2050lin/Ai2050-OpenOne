@@ -1,0 +1,86 @@
+{
+  "schema_version": "10.0.0",
+  "phase_id": "Phase332",
+  "created_at": "2026-07-10T15:23:34.284496+00:00",
+  "purpose": "Map interface-conditioned natural paths and test answer-phase-aligned path exchange.",
+  "positive_mechanisms": [
+    "language_action/summarize",
+    "reasoning_constraint/missing_condition_control"
+  ],
+  "matched_negative_controls": [
+    "language_action/rewrite",
+    "reasoning_constraint/two_hop_blocked"
+  ],
+  "new_item_count_per_mechanism": 8,
+  "discovery_items": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "heldout_items": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "templates": [
+    "template_a",
+    "template_b",
+    "template_c"
+  ],
+  "interfaces": [
+    "raw_completion",
+    "native_chat",
+    "chat_no_think",
+    "answer_aligned_chat"
+  ],
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "registered_interface_case_count": 1152,
+  "unique_prompt_case_count": 1056,
+  "glm4_native_no_think_equivalent_case_count": 96,
+  "component_selection": {
+    "split": "discovery_only",
+    "item_sign_consistency_min": 0.75,
+    "top_fraction_per_component_role": 0.1,
+    "max_members_per_component_role": 12,
+    "shared_skeleton": "exact physical unit intersection across unique interfaces within one model",
+    "interface_branch": "stable top units in one interface absent from all other interface top sets"
+  },
+  "exchange_directions": [
+    "raw_to_answer_aligned",
+    "answer_aligned_to_raw"
+  ],
+  "exchange_conditions": [
+    "baseline",
+    "shared_skeleton_correct",
+    "interface_branch_correct",
+    "shared_plus_branch_correct",
+    "shared_plus_branch_wrong_item",
+    "matched_random_units_correct"
+  ],
+  "max_new_tokens": 64,
+  "thresholds": {
+    "heldout_item_direction_consistency_min": 0.75,
+    "phrase_logprob_improvement_min": 0.1,
+    "behavior_gain_min": 0.1,
+    "behavior_side_effect_max": 0.1,
+    "protocol_side_effect_max": 0.1
+  },
+  "success_gate": [
+    "shared_skeleton_stable",
+    "interface_branch_specific",
+    "path_exchange_effective",
+    "full_string_improved",
+    "free_generation_improved",
+    "low_side_effect",
+    "cross_model"
+  ],
+  "selection_updates_allowed": false,
+  "single_unit_intervention_gate_open": false,
+  "theory_update_gate_open": false
+}

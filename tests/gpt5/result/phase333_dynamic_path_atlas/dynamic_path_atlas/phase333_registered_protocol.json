@@ -1,0 +1,98 @@
+{
+  "schema_version": "11.0.0",
+  "phase_id": "Phase333",
+  "created_at": "2026-07-10T17:16:47.089413+00:00",
+  "purpose": "Test dynamic event order, contiguous residual-state blocks, and lagged compensation.",
+  "positive_mechanism": "reasoning_constraint/missing_condition_control",
+  "matched_negative_control": "reasoning_constraint/two_hop_blocked",
+  "new_item_count_per_mechanism": 12,
+  "discovery_items": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "calibration_items": [
+    6,
+    7,
+    8
+  ],
+  "heldout_items": [
+    9,
+    10,
+    11
+  ],
+  "templates": [
+    "template_a",
+    "template_b",
+    "template_c"
+  ],
+  "interfaces": [
+    "raw_completion",
+    "native_chat",
+    "answer_aligned_chat"
+  ],
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "registered_case_count": 648,
+  "max_new_tokens": 64,
+  "dynamic_components": [
+    "residual_input",
+    "normalized_input",
+    "attention_output",
+    "mlp_output"
+  ],
+  "functional_events": [
+    "answer_start",
+    "target_pressure_formation",
+    "competitor_overtake",
+    "target_first_appearance",
+    "error_first_appearance",
+    "stop",
+    "final_readout"
+  ],
+  "block_lengths": [
+    1,
+    2,
+    4
+  ],
+  "block_patch_target": "contiguous transformer-layer residual outputs at one frozen functional time",
+  "block_conditions": [
+    "baseline",
+    "correct_block_1",
+    "correct_block_2",
+    "correct_block_4",
+    "wrong_object_block_4",
+    "wrong_interface_block_4",
+    "wrong_time_block_4",
+    "moment_matched_permutation_block_4",
+    "matched_control_block_4"
+  ],
+  "thresholds": {
+    "object_event_presence_min": 0.6666667,
+    "relative_depth_tolerance": 0.15,
+    "phrase_logprob_improvement_min": 0.1,
+    "target_rank_improvement_min": 1.0,
+    "behavior_gain_min": 0.1,
+    "control_superiority_min": 0.05,
+    "side_effect_max": 0.1,
+    "compensation_explained_rate_min": 0.6666667
+  },
+  "success_gate": [
+    "dynamic_sequence_stable",
+    "state_block_effective",
+    "competition_consistent",
+    "compensation_explained",
+    "free_generation_improved",
+    "matched_controls_clean",
+    "cross_model"
+  ],
+  "selection_updates_allowed": false,
+  "theory_update_gate_open": false,
+  "single_unit_intervention_gate_open": false
+}

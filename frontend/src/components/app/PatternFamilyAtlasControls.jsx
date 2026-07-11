@@ -6,6 +6,10 @@ const FOCUS_OPTIONS = [
   { value: 'natural', label: '自然交叉' },
   { value: 'registered', label: '注册集合' },
   { value: 'cross_model', label: '跨模型' },
+  { value: 'refined', label: '扩展审计' },
+  { value: 'interface_path', label: '接口脉络' },
+  { value: 'dynamic_path', label: '动态时序' },
+  { value: 'natural_necessity', label: '自然必要性' },
   { value: 'competition', label: '竞争路径' },
 ];
 
@@ -145,13 +149,31 @@ export function PatternFamilyAtlasControls({
             <span>{metrics?.phase330_registered_causal_case_count || 0} 个注册留出案例</span>
             <span>{metrics?.phase330_local_set_readout_specific_mechanism_count || 0} 个本模型集合读出支持</span>
             <span>{metrics?.phase330_cross_model_set_readout_specific_mechanism_count || 0} 个跨模型读出支持</span>
+            <span>{metrics?.phase331_refined_mechanism_count || 0} 个扩展审计机制</span>
+            <span>{metrics?.phase331_full_gate_pass_count || 0} 个完整门槛通过</span>
+            <span>{metrics?.phase331_behavior_mechanism_closed_count || 0} 个行为机制闭合</span>
+            <span>{metrics?.phase332_interface_path_member_count || 0} 个接口路径成员</span>
+            <span>{metrics?.phase332_stable_shared_member_count || 0} 个稳定共享成员</span>
+            <span>{metrics?.phase332_specific_interface_branch_member_count || 0} 个接口分支成员</span>
+            <span>{metrics?.phase332_full_gate_pass_count || 0} 个接口路径完整门</span>
+            <span>{metrics?.phase333_dynamic_event_count || 0} 个动态事件锚点</span>
+            <span>{metrics?.phase333_stable_sequence_count || 0} 个稳定时序接口</span>
+            <span>{metrics?.phase333_specific_block_cell_count || 0} 个特异状态块单元</span>
+            <span>{metrics?.phase333_compensation_candidate_count || 0} 条补偿候选</span>
+            <span>{metrics?.phase333_full_gate_pass_count || 0} 个动态路径完整门</span>
+            <span>{metrics?.phase334_candidate_node_count || 0} 个自然必要性候选</span>
+            <span>{metrics?.phase334_baseline_eligible_cell_count || 0} 个基线合格单元</span>
+            <span>{metrics?.phase334_natural_necessity_candidate_count || 0} 个局部必要性单元</span>
+            <span>{metrics?.phase334_propagation_candidate_count || 0} 条下游传播候选</span>
+            <span>{metrics?.phase334_local_gate_pass_count || 0} 个局部完整门</span>
+            <span>{metrics?.phase334_cross_model_gate_count || 0} 个跨模型必要性门</span>
             <span>{Math.round((metrics?.phase330_heldout_peak_10pct_rate || 0) * 100)}% 留出峰层命中</span>
             <span>{metrics?.tokenwise_beats_pooled_count || 0} 条逐词元正向胜出</span>
             <span>{metrics?.blocker_decline_pass_count || 0} 条阻挡者下降</span>
             <span>{metrics?.carrier_member_mediation_pass_count || 0} 条成员中介</span>
             <span>{metrics?.top1_unlock_pass_count || 0} 条首选解锁</span>
             <span>{metrics?.causal_path_edge_count || 0} 条因果路径边</span>
-            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · 行为闭合 {metrics?.phase330_cross_model_behavior_necessity_mechanism_count || 0}</span>
+            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · Phase334 跨模型必要性 {metrics?.phase334_cross_model_gate_count || 0}</span>
           </>
         ) : (
           <span>{atlas.family?.family_name || '当前模式族'} · 等待真实物理映射</span>
