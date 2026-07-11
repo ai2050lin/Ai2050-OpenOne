@@ -21,12 +21,15 @@ export function PatternFamilyAtlasControls({
   onEvidenceFocusChange,
   maxUnits,
   onMaxUnitsChange,
+  variant = 'floating',
+  showModel = true,
+  showDetails = true,
 }) {
   if (!enabled) {
     return (
       <button
         type="button"
-        className="pattern-atlas-restore"
+        className={`pattern-atlas-restore pattern-atlas-restore--${variant}`}
         onClick={() => onEnabledChange(true)}
         title="打开模式族物理叠层"
         aria-label="打开模式族物理叠层"
@@ -41,7 +44,7 @@ export function PatternFamilyAtlasControls({
   const mappingTone = atlas.mapped ? 'mapped' : 'unmapped';
 
   return (
-    <section className="pattern-atlas-controls" aria-label="模式族物理叠层控制">
+    <section className={`pattern-atlas-controls pattern-atlas-controls--${variant}`} aria-label="模式族物理叠层控制">
       <header className="pattern-atlas-controls__header">
         <div className="pattern-atlas-controls__title">
           <Network size={16} />
@@ -74,28 +77,30 @@ export function PatternFamilyAtlasControls({
           </select>
         </label>
 
-        <label className="pattern-atlas-field pattern-atlas-field--model">
-          <span>模型</span>
-          <select value={modelKey} onChange={(event) => onModelChange(event.target.value)} aria-label="模型">
-            <option value="qwen3-4b">Qwen3</option>
-            <option value="glm4-9b">GLM4</option>
-            <option value="ds7b">DS7B</option>
+        {showModel && (
+          <label className="pattern-atlas-field pattern-atlas-field--model">
+            <span>模型</span>
+            <select value={modelKey} onChange={(event) => onModelChange(event.target.value)} aria-label="模型">
+              <option value="qwen3-4b">Qwen3</option>
+              <option value="glm4-9b">GLM4</option>
+              <option value="ds7b">DS7B</option>
+            </select>
+          </label>
+        )}
+
+        <label className="pattern-atlas-field pattern-atlas-field--evidence">
+          <span>证据范围</span>
+          <select
+            value={evidenceFocus}
+            onChange={(event) => onEvidenceFocusChange(event.target.value)}
+            disabled={!atlas.mapped}
+            aria-label="证据范围"
+          >
+            {FOCUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
           </select>
         </label>
-
-        <div className="pattern-atlas-segment" aria-label="证据筛选">
-          {FOCUS_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className={evidenceFocus === option.value ? 'is-active' : ''}
-              onClick={() => onEvidenceFocusChange(option.value)}
-              disabled={!atlas.mapped}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
 
         <label className="pattern-atlas-range">
           <SlidersHorizontal size={14} />
@@ -122,7 +127,7 @@ export function PatternFamilyAtlasControls({
         </button>
       </div>
 
-      <footer className="pattern-atlas-controls__footer">
+      {showDetails && <footer className="pattern-atlas-controls__footer">
         {atlas.loading ? (
           <span>正在读取证据分区</span>
         ) : atlas.error ? (
@@ -156,7 +161,7 @@ export function PatternFamilyAtlasControls({
         ) : (
           <span>{atlas.family?.family_name || '当前模式族'} · 等待真实物理映射</span>
         )}
-      </footer>
+      </footer>}
     </section>
   );
 }
