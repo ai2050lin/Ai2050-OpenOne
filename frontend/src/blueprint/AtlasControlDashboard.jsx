@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { EvidenceKernelDashboard } from './EvidenceKernelDashboard';
 
 const ATLAS_BASE = '/vis_data/pattern_family_atlas/v2';
 
@@ -992,6 +993,8 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
             ))}
           </div>
         </div>
+
+        <EvidenceKernelDashboard />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {latestSections.map((section) => (

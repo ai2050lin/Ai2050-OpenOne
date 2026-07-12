@@ -22,6 +22,7 @@ import { API_BASE, mapLegacyConsciousField, mapRuntimeConsciousField } from './b
 
 const THEORY_TABS = new Set(['roadmap', 'language', 'analysis', 'progress']);
 const RND_TABS = new Set(['rnd_console', 'rnd_config']);
+const SHOW_LEGACY_RESEARCH_ROUTES = false;
 
 const normalizeTheoryTab = (tabId) => {
   if (tabId === 'system') return 'progress';
@@ -41,7 +42,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
     ? (RND_TABS.has(initialTab) ? initialTab : 'rnd_console')
     : normalizeTheoryTab(initialTab);
   const [activeTab, setActiveTab] = useState(normalizedInitialTab);
-  const [lastTheoryTab, setLastTheoryTab] = useState('roadmap');
+  const [, setLastTheoryTab] = useState('roadmap');
   const [selectedRouteId, setSelectedRouteId] = useState('fiber_bundle');
 
   const handleTabChange = (tabId) => {
@@ -63,7 +64,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   const [findings, setFindings] = useState([]);
   const [generatedCode, setGeneratedCode] = useState('');
   const [executionResult, setExecutionResult] = useState(null);
-  const [researchState, setResearchState] = useState(null);
+  const [, setResearchState] = useState(null);
   const [rndError, setRndError] = useState(null);
   const eventSourceRef = useRef(null);
 
@@ -408,7 +409,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
   const roadmapData = PHASES.find(p => p.id === 'roadmap');
   const theoryPhase = PHASES.find(p => p.id === 'theory');
   const analysisPhase = PHASES.find(p => p.id === 'analysis');
-  const engineeringPhase = PHASES.find(p => p.id === 'engineering');
   const milestonePhase = PHASES.find(p => p.id === 'agi_goal');
 
   const routeBlueprints = useMemo(
@@ -620,7 +620,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
       },
 
     }),
-    [engineeringPhase?.sub_phases, milestonePhase?.goals, milestonePhase?.metrics, theoryPhase?.definition?.headline, theoryPhase?.definition?.summary, theoryPhase?.theory_content]
+    [milestonePhase?.goals, milestonePhase?.metrics, theoryPhase?.definition?.headline, theoryPhase?.definition?.summary, theoryPhase?.theory_content]
   );
 
   const routeList = useMemo(() => {
@@ -795,7 +795,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         })),
       },
     }),
-    [consciousField, selectedRouteId, statusData?.passed_tests]
+    [consciousField, statusData?.passed_tests]
   );
 
   const activeSystemProfile = systemProfiles[selectedRouteId] || systemProfiles.fiber_bundle;
@@ -969,7 +969,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
         {/* Sub-Sidebar for Research Progress */}
-        {scope === 'theory' && activeTab === 'progress' && mode !== 'sidebar' && (
+        {SHOW_LEGACY_RESEARCH_ROUTES && scope === 'theory' && activeTab === 'progress' && mode !== 'sidebar' && (
           <div style={{
             width: '280px', borderRight: '1px solid rgba(255,255,255,0.1)',
             padding: '30px 20px', background: 'rgba(0,0,0,0.2)', overflowY: 'auto',
@@ -1071,7 +1071,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
           {/* TAB: Model R&D + System Status */}
           {scope === 'theory' && activeTab === 'progress' && selectedRoute && (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px' }}>
-              {mode === 'sidebar' && (
+              {SHOW_LEGACY_RESEARCH_ROUTES && mode === 'sidebar' && (
                 <div style={{ marginBottom: '8px', flexShrink: 0 }}>
                   <label style={{ fontSize: '11px', color: '#888', display: 'block', marginBottom: '6px', fontWeight: 'bold', letterSpacing: '1px' }}>选择研究路线 (Research Route)</label>
                   <select

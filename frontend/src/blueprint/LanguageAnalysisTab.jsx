@@ -1,6 +1,5 @@
 import { BookOpen, Brain, Database, Layers, Sparkles, Target } from 'lucide-react';
 import { AtlasControlDashboard } from './AtlasControlDashboard';
-import { EvidenceKernelDashboard } from './EvidenceKernelDashboard';
 
 const frameworkColumns = [
   {
@@ -196,8 +195,6 @@ export const LanguageAnalysisTab = ({ lang = 'zh' }) => {
             : '深入分析语言的数学结构特性与编码机制，逆向工程深度神经网络'}
         </p>
       </div>
-
-      <EvidenceKernelDashboard />
 
       <div style={{
         background: 'rgba(0, 50, 100, 0.2)',
