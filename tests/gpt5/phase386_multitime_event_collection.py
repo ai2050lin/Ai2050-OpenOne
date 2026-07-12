@@ -102,6 +102,15 @@ def weight_reference_id(model: str, layer_index: int, component: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def public_group_id(case: dict[str, Any], group_field: str) -> str:
+    value = case.get(group_field)
+    if not isinstance(value, str) or not value:
+        raise RuntimeError(
+            f"Missing public group field {group_field} for {case.get('blind_case_id')}"
+        )
+    return value
+
+
 def case_file(split: str) -> Path:
     name = (
         "phase386_instrument_audit_cases.jsonl"
@@ -842,14 +851,19 @@ def run_model(
     model: str,
     split: str,
     output_root: Path = DEFAULT_OUT,
+    *,
+    schema_version: str = "60.5.0",
+    phase_id: str = "Phase386-IncrementalEventCollection",
+    group_field: str = "phase386_public_parallel_group_id",
+    collection_label: str = "Phase386",
 ) -> dict[str, Any]:
     split_authorized(split)
     rows = read_jsonl(case_file(split))
     cases = [row for row in rows if row["private_execution_model"] == model]
     if not cases:
-        raise RuntimeError(f"No Phase386 cases for {model}/{split}")
+        raise RuntimeError(f"No {collection_label} cases for {model}/{split}")
     if any(row.get("semantic_labels_available_to_collection", True) for row in cases):
-        raise RuntimeError("Phase386 collection received semantic labels")
+        raise RuntimeError(f"{collection_label} collection received semantic labels")
     loaded = None
     handles: list[Any] = []
     value_handles: list[Any] = []
@@ -869,7 +883,7 @@ def run_model(
         runtime_dtype = next(loaded.model.parameters()).dtype
         if runtime_dtype != FROZEN_DTYPE_BY_MODEL[model]:
             raise RuntimeError(
-                f"Phase386 runtime dtype mismatch for {model}: "
+                f"{collection_label} runtime dtype mismatch for {model}: "
                 f"{runtime_dtype} != {FROZEN_DTYPE_BY_MODEL[model]}"
             )
         layers = get_layers(loaded.model)
@@ -953,13 +967,11 @@ def run_model(
                 / case["blind_case_id"]
             )
             meta_payload = {
-                "schema_version": "60.5.0",
-                "phase_id": "Phase386-IncrementalEventCollection",
+                "schema_version": schema_version,
+                "phase_id": phase_id,
                 "blind_case_id": case["blind_case_id"],
                 "anonymous_model_id": case["anonymous_model_id"],
-                "public_parallel_group_id": case[
-                    "phase386_public_parallel_group_id"
-                ],
+                "public_parallel_group_id": public_group_id(case, group_field),
                 "anonymous_condition_slot": case["anonymous_condition_slot"],
                 "semantic_coordinates": list(COORDINATES),
                 "model_call_count": model_call_count,
@@ -987,13 +999,11 @@ def run_model(
                         f"Coordinate order mismatch for {case['blind_case_id']}"
                     )
                 payload = {
-                    "schema_version": "60.5.0",
-                    "phase_id": "Phase386-IncrementalEventCollection",
+                    "schema_version": schema_version,
+                    "phase_id": phase_id,
                     "blind_case_id": case["blind_case_id"],
                     "anonymous_model_id": case["anonymous_model_id"],
-                    "public_parallel_group_id": case[
-                        "phase386_public_parallel_group_id"
-                    ],
+                    "public_parallel_group_id": public_group_id(case, group_field),
                     "anonymous_condition_slot": case["anonymous_condition_slot"],
                     "layer_index": layer_index,
                     "coordinate_names": flat_coordinates,
@@ -1076,9 +1086,7 @@ def run_model(
             case_rows.append(
                 {
                     "blind_case_id": case["blind_case_id"],
-                    "public_parallel_group_id": case[
-                        "phase386_public_parallel_group_id"
-                    ],
+                    "public_parallel_group_id": public_group_id(case, group_field),
                     "anonymous_model_id": case["anonymous_model_id"],
                     "anonymous_condition_slot": case["anonymous_condition_slot"],
                     "mechanism_id_private": case["mechanism_id"],
@@ -1110,8 +1118,8 @@ def run_model(
 
         model_root = output_root / split / "models" / model
         manifest = {
-            "schema_version": "60.5.0",
-            "phase_id": "Phase386-IncrementalEventCollection",
+            "schema_version": schema_version,
+            "phase_id": phase_id,
             "created_at": now(),
             "model": model,
             "split": split,

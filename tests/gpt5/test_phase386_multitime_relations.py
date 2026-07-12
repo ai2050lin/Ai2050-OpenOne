@@ -141,7 +141,8 @@ class Phase386MultitimeRelationTests(unittest.TestCase):
             self.assertEqual((ATLAS / name).read_bytes(), (CLIENT / name).read_bytes(), name)
         manifest = read_json(ATLAS / "manifest.json")
         progress = read_json(ATLAS / "progress.json")
-        self.assertEqual(manifest["last_phase"], "Phase389-StageMerge")
+        latest_phase = int(manifest["last_phase"].split("Phase", 1)[1].split("-", 1)[0])
+        self.assertGreaterEqual(latest_phase, 389)
         self.assertEqual(manifest["phase386"]["physical_predictive_relation_count"], 10)
         self.assertEqual(manifest["phase386"]["language_path_count"], 0)
         self.assertEqual(
@@ -155,7 +156,7 @@ class Phase386MultitimeRelationTests(unittest.TestCase):
         self.assertFalse(progress["single_global_progress_percentage_valid"])
         for root in (NEURON, NEURON_CLIENT):
             neuron = read_json(root / "manifest.json")
-            self.assertEqual(neuron["phase"], 389)
+            self.assertGreaterEqual(neuron["phase"], 389)
             self.assertEqual(
                 neuron["phase386_audit"]["new_neuron_path_nodes_promoted"], 0
             )

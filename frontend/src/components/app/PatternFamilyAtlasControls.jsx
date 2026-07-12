@@ -44,6 +44,8 @@ export function PatternFamilyAtlasControls({
   }
 
   const metrics = atlas.partition?.metrics;
+  const latestMetrics = atlas.manifest?.metrics || {};
+  const hasPhase393 = Number(latestMetrics.phase393_attribute_direction_count || 0) > 0;
   const mappingStatus = atlas.mapped ? '物理候选已叠加' : '真实单元尚未映射';
   const mappingTone = atlas.mapped ? 'mapped' : 'unmapped';
 
@@ -131,6 +133,17 @@ export function PatternFamilyAtlasControls({
         </button>
       </div>
 
+      {hasPhase393 && (
+        <div className="pattern-atlas-controls__latest" aria-label="Phase393 最新研究边界">
+          <strong>P393</strong>
+          <span>属性搬运 {latestMetrics.phase393_attribute_answer_switch_count || 0}/{latestMetrics.phase393_attribute_direction_count || 0}</span>
+          <span>错误深度 {latestMetrics.phase393_wrong_depth_attribute_switch_count || 0}/{latestMetrics.phase393_attribute_direction_count || 0}</span>
+          <span>深度特异 {latestMetrics.phase393_depth_specificity_pass_model_count || 0}/3</span>
+          <span>完整路径 0</span>
+          <span>神经元路径 0</span>
+        </div>
+      )}
+
       {showDetails && <footer className="pattern-atlas-controls__footer">
         {atlas.loading ? (
           <span>正在读取证据分区</span>
@@ -172,13 +185,18 @@ export function PatternFamilyAtlasControls({
             <span>{metrics?.phase334_propagation_candidate_count || 0} 条下游传播候选</span>
             <span>{metrics?.phase334_local_gate_pass_count || 0} 个局部完整门</span>
             <span>{metrics?.phase334_cross_model_gate_count || 0} 个跨模型必要性门</span>
+            <span>{latestMetrics.phase391_physical_local_parent_layout_count || 0} 个物理局部父节点布局</span>
+            <span>{latestMetrics.phase393_attribute_answer_switch_count || 0}/{latestMetrics.phase393_attribute_direction_count || 0} 属性内容切换</span>
+            <span>{latestMetrics.phase393_wrong_depth_attribute_switch_count || 0}/{latestMetrics.phase393_attribute_direction_count || 0} 错误深度切换</span>
+            <span>{latestMetrics.phase393_attribute_transport_pass_model_count || 0}/3 属性搬运模型</span>
+            <span>{latestMetrics.phase393_depth_specificity_pass_model_count || 0}/3 深度特异模型</span>
             <span>{Math.round((metrics?.phase330_heldout_peak_10pct_rate || 0) * 100)}% 留出峰层命中</span>
             <span>{metrics?.tokenwise_beats_pooled_count || 0} 条逐词元正向胜出</span>
             <span>{metrics?.blocker_decline_pass_count || 0} 条阻挡者下降</span>
             <span>{metrics?.carrier_member_mediation_pass_count || 0} 条成员中介</span>
             <span>{metrics?.top1_unlock_pass_count || 0} 条首选解锁</span>
             <span>{metrics?.causal_path_edge_count || 0} 条因果路径边</span>
-            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · Phase334 跨模型必要性 {metrics?.phase334_cross_model_gate_count || 0}</span>
+            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · 完整语言路径 0 · 深度特异路径 {latestMetrics.phase393_depth_specificity_pass_model_count || 0}/3</span>
           </>
         ) : (
           <span>{atlas.family?.family_name || '当前模式族'} · 等待真实物理映射</span>

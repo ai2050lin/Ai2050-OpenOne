@@ -1,0 +1,465 @@
+{
+  "schema_version": "66.0.0",
+  "phase_id": "Phase392-Protocol",
+  "created_at": "2026-07-12T16:08:43.621470+00:00",
+  "objective": "graph_consistent_parent_boundary_joint_role_replay",
+  "denominator": {
+    "candidate_group_count": 40,
+    "conditions_per_group": 2,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "candidate_case_count": 240,
+    "instrument_groups_required": 2,
+    "causal_groups_required": 24
+  },
+  "case_contract": {
+    "same_record_owner_batch_query_within_pair": true,
+    "status_and_rejected_values_swapped": true,
+    "semantic_role_token_counts_match_within_pair_all_models": true,
+    "status_slot_token_counts_match_within_pair_all_models": true,
+    "target_first_token_candidates_distinct_all_models": true,
+    "single_sample_model_native_interface": true
+  },
+  "frozen_model_layers": {
+    "qwen3": 20,
+    "glm4": 22,
+    "deepseek7b": 15
+  },
+  "frozen_interventions": [
+    "no_intervention",
+    "identity_semantic_joint",
+    "donor_semantic_joint",
+    "donor_attributes_only",
+    "donor_fixed_best_role",
+    "donor_frozen_structure_roles",
+    "donor_same_count_random_parent_positions",
+    "donor_semantic_joint_wrong_depth"
+  ],
+  "frozen_outcomes": [
+    "query_layer_output_shift_toward_donor",
+    "donor_vs_recipient_target_logit_margin_shift",
+    "joint_generation_switch_to_donor_target",
+    "full_vocabulary_top_change"
+  ],
+  "frozen_gates": {
+    "identity_max_abs_error": 0.01,
+    "median_joint_normalized_margin_mediation": 0.1,
+    "median_joint_advantage_over_fixed_role": 0.05,
+    "median_joint_advantage_over_attributes_only": 0.05,
+    "median_joint_advantage_over_random_positions": 0.05,
+    "median_joint_advantage_over_wrong_depth": 0.05,
+    "minimum_positive_direction_rate": 0.75,
+    "minimum_strict_answer_switch_rate_for_function_path": 0.5,
+    "all_three_models_required_for_shared_causal_path": true
+  },
+  "selection_rule": "first two behavior-and-position qualified groups are engineering instruments; next 24 are causal test; no replacement after intervention starts",
+  "authorization": {
+    "intervention_before_behavior_freeze": false,
+    "single_neuron_scan": false
+  },
+  "groups": [
+    {
+      "parallel_group_id": "p392g_9176d0a04306b0b311df6301",
+      "group_priority": 0,
+      "source_seed": 0,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_8e381bd85fb21ccccc4db782",
+      "group_priority": 1,
+      "source_seed": 1,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_7c504d0e96d4bd59ddf27365",
+      "group_priority": 2,
+      "source_seed": 3,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_9ee464a32631f51fddadeed1",
+      "group_priority": 3,
+      "source_seed": 5,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_0bac1d961b0aa57e9ef90469",
+      "group_priority": 4,
+      "source_seed": 7,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_d96a482bfbe92a210cf801b2",
+      "group_priority": 5,
+      "source_seed": 9,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_39d5b2f4c0e605523bd646ac",
+      "group_priority": 6,
+      "source_seed": 11,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_403663b693910c8050ab1c75",
+      "group_priority": 7,
+      "source_seed": 16,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_c0de9074abf9aafa91270324",
+      "group_priority": 8,
+      "source_seed": 17,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_0aa904f75c33060ddf8aa3d1",
+      "group_priority": 9,
+      "source_seed": 18,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_889f6731eedeb74c1143612c",
+      "group_priority": 10,
+      "source_seed": 20,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_2253bfd361cf22afcf32d41e",
+      "group_priority": 11,
+      "source_seed": 24,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_81c8d148b04faa11750fedda",
+      "group_priority": 12,
+      "source_seed": 25,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_99a366617190a779ad7a7ed7",
+      "group_priority": 13,
+      "source_seed": 26,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_70c579a48d33276903a68080",
+      "group_priority": 14,
+      "source_seed": 28,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_241741a80ba0fa38f9011b6d",
+      "group_priority": 15,
+      "source_seed": 35,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_7889db9784d6c75df07c75e1",
+      "group_priority": 16,
+      "source_seed": 39,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_d2c37387d836de3edf2b7b23",
+      "group_priority": 17,
+      "source_seed": 42,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_ad580b5e1d096690e5189fa0",
+      "group_priority": 18,
+      "source_seed": 45,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_9b6e627617c0b716f0827869",
+      "group_priority": 19,
+      "source_seed": 46,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_722da5b02d9bb1bc8d759e34",
+      "group_priority": 20,
+      "source_seed": 47,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_64e9a63b85820dcda7563f04",
+      "group_priority": 21,
+      "source_seed": 48,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_86a52d390056e892e45ad9ee",
+      "group_priority": 22,
+      "source_seed": 50,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_73fb3ecd0444b7db45bf22ce",
+      "group_priority": 23,
+      "source_seed": 52,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_fa6cddce7e084579817c4b8b",
+      "group_priority": 24,
+      "source_seed": 55,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_6707975a74705e8edae1140f",
+      "group_priority": 25,
+      "source_seed": 57,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_1a72a7db588a01b8b79b1fd3",
+      "group_priority": 26,
+      "source_seed": 58,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_4f27abf4e6b25f335fe062ae",
+      "group_priority": 27,
+      "source_seed": 59,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_0c1195e7471fee23792f344b",
+      "group_priority": 28,
+      "source_seed": 60,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_ff0fbedf0d9cfeae3e513732",
+      "group_priority": 29,
+      "source_seed": 66,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_cc1353b9954f797c475eb792",
+      "group_priority": 30,
+      "source_seed": 68,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_1644dde1eaf5a38fa4918927",
+      "group_priority": 31,
+      "source_seed": 72,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_0914c21687e94604613ef86d",
+      "group_priority": 32,
+      "source_seed": 74,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_24b277a7741f819debadac5a",
+      "group_priority": 33,
+      "source_seed": 76,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_e84c9ffd83a9b5b6ea582394",
+      "group_priority": 34,
+      "source_seed": 80,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_4581c227d76e340e61789ee9",
+      "group_priority": 35,
+      "source_seed": 81,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_df7a0ec300e6d2788e44091c",
+      "group_priority": 36,
+      "source_seed": 82,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_151717042772a4bea5bf29ec",
+      "group_priority": 37,
+      "source_seed": 85,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_fe4856187f0aaef2f45574f6",
+      "group_priority": 38,
+      "source_seed": 95,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    },
+    {
+      "parallel_group_id": "p392g_68df00991248cc1e3ff9d8ef",
+      "group_priority": 39,
+      "source_seed": 96,
+      "conditions": [
+        "mapping_x",
+        "mapping_y"
+      ],
+      "token_aligned_all_models": true
+    }
+  ]
+}

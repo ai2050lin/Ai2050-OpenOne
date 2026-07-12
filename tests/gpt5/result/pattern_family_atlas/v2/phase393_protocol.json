@@ -1,0 +1,59 @@
+{
+  "schema_version": "67.0.0",
+  "phase_id": "Phase393-AttributeHoldoutProtocol",
+  "created_at": "2026-07-12T16:22:54.351372+00:00",
+  "hypothesis_source": "Phase392 joint patch explained by attributes-only mediation",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "unused_qualified_group_count_before_selection": 13,
+    "frozen_group_count": 12,
+    "case_count": 72,
+    "direction_count": 72
+  },
+  "independence": {
+    "group_overlap_with_phase392_intervention": 0,
+    "groups_selected_before_phase393_intervention": true,
+    "failed_groups_replaceable_after_intervention": false
+  },
+  "scenarios": [
+    "no_intervention",
+    "identity_attributes",
+    "donor_attributes_candidate_depth",
+    "donor_structure_candidate_depth",
+    "donor_random_candidate_depth",
+    "donor_attributes_wrong_depth"
+  ],
+  "frozen_gates": {
+    "median_attribute_normalized_margin_mediation": 0.1,
+    "median_attribute_advantage_over_structure": 0.05,
+    "median_attribute_advantage_over_random": 0.05,
+    "minimum_positive_attribute_direction_rate": 0.75,
+    "minimum_attribute_answer_switch_rate": 0.75,
+    "minimum_candidate_depth_advantage_for_depth_specificity": 0.05,
+    "all_three_models_required_for_shared_attribute_transport": true
+  },
+  "claim_boundary": {
+    "attribute_transport_is_multi_source_joint_path": false,
+    "attribute_transport_is_field_extraction_algorithm_closure": false,
+    "depth_nonspecific_transport_is_specialized_layer_path": false,
+    "single_neuron_scan_authorized": false
+  },
+  "selected_groups": [
+    "p392g_4f27abf4e6b25f335fe062ae",
+    "p392g_0c1195e7471fee23792f344b",
+    "p392g_ff0fbedf0d9cfeae3e513732",
+    "p392g_cc1353b9954f797c475eb792",
+    "p392g_1644dde1eaf5a38fa4918927",
+    "p392g_0914c21687e94604613ef86d",
+    "p392g_24b277a7741f819debadac5a",
+    "p392g_e84c9ffd83a9b5b6ea582394",
+    "p392g_4581c227d76e340e61789ee9",
+    "p392g_df7a0ec300e6d2788e44091c",
+    "p392g_151717042772a4bea5bf29ec",
+    "p392g_fe4856187f0aaef2f45574f6"
+  ]
+}

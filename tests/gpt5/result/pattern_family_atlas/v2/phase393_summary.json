@@ -1,0 +1,101 @@
+{
+  "schema_version": "67.2.0",
+  "phase_id": "Phase393-AttributeHoldoutAnalysis",
+  "created_at": "2026-07-12T16:27:51.929909+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "independent_group_count": 12,
+    "direction_count": 72,
+    "scenario_count": 432,
+    "generation_count": 288,
+    "phase392_group_overlap": 0
+  },
+  "models": [
+    {
+      "schema_version": "67.2.0",
+      "phase_id": "Phase393-AttributeHoldoutAnalysis",
+      "model": "qwen3",
+      "direction_count": 24,
+      "median_attribute_normalized_margin_mediation": 0.17509108369596166,
+      "median_structure_mediation": 0.0023662805170723738,
+      "median_random_mediation": 0.0,
+      "median_wrong_depth_attribute_mediation": 0.080288168921766,
+      "median_attribute_advantage_over_structure": 0.17631911038477388,
+      "median_attribute_advantage_over_random": 0.17509108369596166,
+      "median_candidate_depth_advantage": 0.012254037986854698,
+      "positive_attribute_direction_rate": 0.9583333333333334,
+      "attribute_answer_switch_rate": 0.9583333333333334,
+      "structure_answer_switch_rate": 0.0,
+      "random_answer_switch_rate": 0.0,
+      "wrong_depth_attribute_switch_rate": 1.0,
+      "attribute_content_transport_gate_pass": true,
+      "candidate_depth_specificity_gate_pass": false
+    },
+    {
+      "schema_version": "67.2.0",
+      "phase_id": "Phase393-AttributeHoldoutAnalysis",
+      "model": "glm4",
+      "direction_count": 24,
+      "median_attribute_normalized_margin_mediation": 0.1546255695577286,
+      "median_structure_mediation": 0.002988092100788634,
+      "median_random_mediation": 0.0,
+      "median_wrong_depth_attribute_mediation": 0.15630416484618084,
+      "median_attribute_advantage_over_structure": 0.1572452491690779,
+      "median_attribute_advantage_over_random": 0.1546255695577286,
+      "median_candidate_depth_advantage": -0.011572983842231002,
+      "positive_attribute_direction_rate": 0.9583333333333334,
+      "attribute_answer_switch_rate": 1.0,
+      "structure_answer_switch_rate": 0.0,
+      "random_answer_switch_rate": 0.0,
+      "wrong_depth_attribute_switch_rate": 1.0,
+      "attribute_content_transport_gate_pass": true,
+      "candidate_depth_specificity_gate_pass": false
+    },
+    {
+      "schema_version": "67.2.0",
+      "phase_id": "Phase393-AttributeHoldoutAnalysis",
+      "model": "deepseek7b",
+      "direction_count": 24,
+      "median_attribute_normalized_margin_mediation": 0.230733878225505,
+      "median_structure_mediation": -0.001287381928986525,
+      "median_random_mediation": 0.0,
+      "median_wrong_depth_attribute_mediation": 0.13657171922685657,
+      "median_attribute_advantage_over_structure": 0.22349174312081488,
+      "median_attribute_advantage_over_random": 0.230733878225505,
+      "median_candidate_depth_advantage": 0.022296276472896233,
+      "positive_attribute_direction_rate": 0.9166666666666666,
+      "attribute_answer_switch_rate": 1.0,
+      "structure_answer_switch_rate": 0.0,
+      "random_answer_switch_rate": 0.0,
+      "wrong_depth_attribute_switch_rate": 1.0,
+      "attribute_content_transport_gate_pass": true,
+      "candidate_depth_specificity_gate_pass": false
+    }
+  ],
+  "results": {
+    "models_passing_attribute_transport": 3,
+    "models_passing_depth_specificity": 0,
+    "crossmodel_attribute_content_transport_established": true,
+    "crossmodel_candidate_depth_specificity_established": false,
+    "multi_source_joint_path_established": false,
+    "complete_field_extraction_path_established": false,
+    "single_neuron_causal_path_count": 0,
+    "language_encoding_closed": false
+  },
+  "authorization": {
+    "promote_attribute_content_transport_edge": true,
+    "promote_depth_specific_specialized_path": false,
+    "promote_multi_source_joint_path": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "attribute_transport_is_field_extraction_algorithm": false,
+    "attribute_transport_is_multi_source_cooperation": false,
+    "depth_nonspecific_transport_is_specialized_layer": false,
+    "language_encoding_closed": false
+  }
+}

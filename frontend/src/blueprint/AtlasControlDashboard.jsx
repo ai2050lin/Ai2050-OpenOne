@@ -814,6 +814,31 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
     });
   }, [progress]);
 
+  const jointFormationRows = useMemo(() => {
+    const stage = progress?.joint_formation_stage || {};
+    const definitions = [
+      ['behavior_cases', '冻结行为样本'],
+      ['behavior_eligible_mechanisms', '行为分母合格机制'],
+      ['global_terminal_alignment_candidates', '全局终端方向候选'],
+      ['physical_local_parent_layouts', '物理留出局部父节点布局'],
+      ['joint_answer_switches', '联合父边界答案切换'],
+      ['models_passing_joint_specificity', '联合路径特异性合格模型'],
+      ['attribute_answer_switches', '独立属性内容答案切换'],
+      ['structure_answer_switches', '结构位置答案切换'],
+      ['random_answer_switches', '随机位置答案切换'],
+      ['wrong_depth_attribute_switches', '错误深度属性答案切换'],
+      ['models_passing_attribute_transport', '属性内容搬运合格模型'],
+      ['models_passing_depth_specificity', '深度特异性合格模型'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
     const latest = progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2';
@@ -854,19 +879,31 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         items: relationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
       };
     }
+    if (overallLatest && progress?.joint_formation_stage) {
+      overallLatest.summary = '局部父节点布局已跨模型复现，属性内容可受控搬运；联合形成与深度特异路径仍未建立。';
+      overallLatest.value = '71/72 transport / 0/72 paths';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：结构布局与内容搬运已分离`,
+        text: 'Phase390 否定了跨层方向必须保持到终端的线性假设。Phase391 在三模型发现、校准和物理留出中复制出一个图合法的局部父节点布局。Phase392 的联合干预虽产生 139/144 次答案切换，却没有通过属性单独干预和错误深度对照。Phase393 在完全独立组上确认属性位置可搬运内容，但错误深度同样全部切换，因此它不是特定中层的自然语言路径。',
+        value: 'Local structure replicated / content transport causal / depth route absent',
+        valueHint: '客户端只提升“受控属性内容搬运”因果边，不提升多来源联合路径、深度特异路径、完整语言路径或神经元路径。当前内部测试只覆盖通过严格行为分母的 field_extraction，不能外推到九族。',
+        items: jointFormationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
     const engineering = sections.find((item) => item.id === 'engineering_latest');
     if (engineering) {
       engineering.detail = {
         ...engineering.detail,
         items: overallValid
           ? progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`)
-          : (relationRows.length ? relationRows : exactEventRows)
+          : (jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
             .map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
         valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${latest}。单一全局完成百分比：${overallValid ? '有效' : '无效'}。`,
       };
     }
     return sections;
-  }, [clientIndex, exactEventRows, manifest, overallValid, progress, progressMap, relationRows]);
+  }, [clientIndex, exactEventRows, jointFormationRows, manifest, overallValid, progress, progressMap, relationRows]);
 
   const planDetail = useMemo(() => {
     return planCards.find((item) => item.id === activePlan)?.detail || null;

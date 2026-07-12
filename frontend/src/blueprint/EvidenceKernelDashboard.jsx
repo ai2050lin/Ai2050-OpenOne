@@ -82,6 +82,7 @@ function ProgressBar({ ratio }) {
 
 function AtlasDetail({ atlas }) {
   const metrics = atlas?.metrics || {};
+  const phase393 = atlas?.phase393_audit || {};
   const rows = [
     ['模式族物理映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['模型 × 模式族分区', formatNumber(metrics.model_family_partition_count)],
@@ -92,6 +93,9 @@ function AtlasDetail({ atlas }) {
     ['跨模型集合读出候选', formatNumber(metrics.phase330_cross_model_set_readout_specific_mechanism_count)],
     ['Phase 334 局部传播通过', formatNumber(metrics.phase334_local_propagation_pass_count)],
     ['Phase 334 自然必要性候选', formatNumber(metrics.phase334_natural_necessity_candidate_count)],
+    ['Phase 391 局部父节点布局', formatNumber(metrics.phase391_physical_local_parent_layout_count)],
+    ['Phase 393 属性内容切换', `${metrics.phase393_attribute_answer_switch_count || 0}/${metrics.phase393_attribute_direction_count || 0}`],
+    ['Phase 393 深度特异模型', `${metrics.phase393_depth_specificity_pass_model_count || 0}/3`],
     ['跨模型行为必要性', formatNumber(metrics.phase330_cross_model_behavior_necessity_mechanism_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
@@ -100,7 +104,9 @@ function AtlasDetail({ atlas }) {
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <div style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>
-        当前图谱已经完成九个模式族和三个模型的统一物理覆盖，并继续推进到 Phase {atlas?.phase || '-'} 的自然必要性审计。严格边界仍然是：局部传播已经出现，但跨模型行为必要性、单神经元因果和完整自然闭合均未通过。
+        {phase393.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。局部父节点布局已跨模型物理复现，受控属性内容搬运也已通过三模型独立留出；但错误深度同样有效，所以不能把它标成自然深度路径。完整语言路径与神经元因果仍为零。`
+          : `当前图谱已经完成九个模式族和三个模型的统一物理覆盖，并继续推进到 Phase ${atlas?.phase || '-'} 的自然必要性审计。严格边界仍然是：局部传播已经出现，但跨模型行为必要性、单神经元因果和完整自然闭合均未通过。`}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 8 }}>
         {rows.map(([label, value]) => (
@@ -110,7 +116,9 @@ function AtlasDetail({ atlas }) {
           </div>
         ))}
       </div>
-      <div style={{ color: '#fbbf24', fontSize: 11, lineHeight: 1.65 }}>{atlas?.evidence_boundary}</div>
+      <div style={{ color: '#fbbf24', fontSize: 11, lineHeight: 1.65 }}>
+        {atlas?.evidence_boundary?.statement || atlas?.evidence_boundary || ''}
+      </div>
       <SourceLink path={ATLAS_MANIFEST} label="最新物理图谱 manifest" />
     </div>
   );
@@ -238,6 +246,9 @@ export function EvidenceKernelDashboard() {
     if (!atlas && !manifest) return { label: '证据源不可用', detail: '无法读取统一证据内核，请检查发布数据。', color: '#fb7185' };
     if (metrics.full_natural_chain_pass_count > 0 && metrics.single_unit_causal_count > 0) {
       return { label: '存在严格闭合机制', detail: '至少一条路径同时通过单元因果和完整自然链。', color: '#34d399' };
+    }
+    if ((metrics.phase393_attribute_transport_pass_model_count || 0) === 3) {
+      return { label: '属性内容可搬运，深度路径未定位', detail: '三模型独立留出确认受控属性内容搬运；错误深度同样有效，尚无完整路径或神经元级闭合。', color: '#f59e0b' };
     }
     if (metrics.phase334_local_propagation_pass_count > 0) {
       return { label: '局部传播已出现，机制未闭合', detail: '图谱覆盖完整，已有局部传播证据；自然必要性、单神经元因果和完整生成链仍未通过。', color: '#f59e0b' };

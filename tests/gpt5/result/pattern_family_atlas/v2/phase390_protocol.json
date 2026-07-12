@@ -1,0 +1,145 @@
+{
+  "schema_version": "64.0.0",
+  "phase_id": "Phase390-Protocol",
+  "created_at": "2026-07-12T15:42:52.630782+00:00",
+  "objective": "map_graph_legal_multi_source_multi_head_cross_layer_joint_formation",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "families": [
+      "content_knowledge",
+      "state_drift",
+      "language_action",
+      "readout_competition",
+      "syntax_structure",
+      "reasoning_constraint"
+    ],
+    "mechanisms": [
+      "relation_binding",
+      "entity_recency",
+      "field_extraction",
+      "target_vs_wrong",
+      "number_agreement",
+      "missing_condition_control"
+    ],
+    "candidate_groups_per_mechanism": 24,
+    "conditions_per_group": 4,
+    "candidate_parallel_group_count": 144,
+    "candidate_case_count": 1728,
+    "frozen_split_groups_per_qualified_mechanism": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    },
+    "failed_group_replacement_allowed": false
+  },
+  "runtime_contract": {
+    "generation_path": "model_native_answer_aligned_single_sample",
+    "internal_path": "initial_prompt_then_actual_incremental_kv_cache",
+    "execution_batch_size": 1,
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "dtype_by_model": {
+      "qwen3": "float16",
+      "glm4": "float16",
+      "deepseek7b": "bfloat16"
+    }
+  },
+  "directed_parent_graph": [
+    "source_layer_input_to_source_key_value",
+    "query_layer_input_and_source_keys_to_attention_probabilities",
+    "source_values_and_probabilities_to_head_write",
+    "all_head_writes_to_attention_output",
+    "layer_input_and_attention_output_to_post_attention_state",
+    "post_attention_state_to_mlp_write",
+    "post_attention_state_and_mlp_write_to_layer_output",
+    "layer_output_to_next_layer_input"
+  ],
+  "forbidden_edges": [
+    "source_same_layer_attention_output_to_query_same_layer_head_state",
+    "independently_patched_key_value_states_without_parent_recomputation",
+    "independent_multi_layer_patches_that_overwrite_natural_propagation"
+  ],
+  "source_roles": [
+    "entities",
+    "attributes_items",
+    "relations",
+    "query_keywords",
+    "query_window",
+    "other_causal_prefix"
+  ],
+  "role_contract": {
+    "all_prompt_positions_partitioned_once": true,
+    "strongest_source_selection_used": false,
+    "all_heads_retained": true,
+    "top_k_used": false
+  },
+  "natural_window_contract": {
+    "window_lengths": [
+      1,
+      2,
+      4
+    ],
+    "cross_layer_write": "sum_of_exact_residual_writes_in_one_residual_coordinate_system",
+    "multi_layer_intervention": "patch_once_at_earliest_parent_boundary_then_recompute_naturally"
+  },
+  "frozen_analysis": {
+    "learned_black_box_predictor_used": false,
+    "sae_or_learned_basis_used": false,
+    "joint_attention_write": "sum_over_all_registered_source_roles_and_all_heads",
+    "single_source_baseline": "best_pre_registered_role_without_posthoc_role_merging",
+    "single_head_baseline": "best_head_within_model_without_crossmodel_head_id_matching",
+    "cross_layer_baseline": "best_single_layer_against_pre_registered_two_and_four_layer_windows",
+    "terminal_target": "operation_minus_control_target_encoded_layer_output",
+    "lexical_replication": [
+      "A_minus_B",
+      "C_minus_D"
+    ],
+    "controls": [
+      "wrong_parallel_group",
+      "wrong_semantic_time",
+      "wrong_depth",
+      "source_role_permutation",
+      "head_permutation",
+      "same_energy_random_natural_parent_set"
+    ]
+  },
+  "quality_gates": {
+    "component_parent_child_max_relative_error": 0.01,
+    "source_role_partition_max_relative_error": 0.01,
+    "minimum_discovery_support_groups": 8,
+    "minimum_calibration_support_groups": 4,
+    "minimum_physical_support_groups": 4,
+    "minimum_joint_advantage_over_best_single": 0.05,
+    "minimum_correct_minus_wrong_control_advantage": 0.05,
+    "all_three_models_required_for_crossmodel_claim": true
+  },
+  "causal_replay_contract": {
+    "authorized_before_physical_gate": false,
+    "patch_boundary": "earliest_source_layer_input_parent_boundary",
+    "patch_all_matching_source_positions_together": true,
+    "natural_recomputation_after_patch": true,
+    "controls": [
+      "identity",
+      "best_single_source_role",
+      "wrong_source_role_set",
+      "wrong_depth",
+      "wrong_semantic_time",
+      "same_count_random_parent_positions"
+    ]
+  },
+  "claim_boundary": {
+    "predictive_joint_graph_is_causal_path": false,
+    "attention_additivity_is_multi_source_synergy": false,
+    "fixed_head_identity_required_across_models": false,
+    "single_neuron_scan_authorized": false,
+    "language_encoding_closed": false
+  },
+  "prior_prompt_overlap_count": 0
+}
