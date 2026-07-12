@@ -49,7 +49,7 @@ JSONL_SOURCES = {
 }
 
 FAMILY_BY_MECHANISM = {
-    "entity_recency": "content_knowledge",
+    "entity_recency": "state_drift",
     "relation_binding": "reasoning_constraint",
     "number_agreement": "syntax_structure",
     "target_vs_wrong": "readout_competition",
