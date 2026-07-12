@@ -1,0 +1,128 @@
+{
+  "schema_version": "46.0.0",
+  "phase_id": "Phase369",
+  "created_at": "2026-07-12T03:38:52.459059+00:00",
+  "objective": "test_whether_raw_vector_relations_and_topology_add_cross_model_future_information_beyond_phase367_descriptors",
+  "evidence_denominators": {
+    "registered_language_family_count": 9,
+    "registered_representative_mechanism_count": 18,
+    "phase369_admitted_mechanism_count": 4,
+    "strict_closure_cell_count": 72,
+    "strictly_closed_cell_count": 0,
+    "single_global_progress_percentage_valid": false
+  },
+  "dataset_contract": {
+    "model_count": 3,
+    "mechanism_count": 4,
+    "fresh_group_count_per_model_mechanism": 12,
+    "condition_count_per_group": 4,
+    "case_count": 576,
+    "fresh_discovery_groups_per_model_mechanism": 6,
+    "fresh_calibration_groups_per_model_mechanism": 3,
+    "physical_holdout_groups_per_model_mechanism": 3,
+    "minimum_cross_model_qualified_discovery_groups_per_mechanism": 4,
+    "minimum_cross_model_qualified_calibration_groups_per_mechanism": 2,
+    "qualification_requires_all_four_conditions_and_all_three_models": true,
+    "phase368_calibration_reused_for_mapping_or_thresholds": false,
+    "old_physical_confirmation_opened": false
+  },
+  "blind_event_contract": {
+    "allowed": [
+      "event_type",
+      "source_role_alias",
+      "receiver_role_alias",
+      "relative_depth",
+      "generation_time",
+      "raw_vector_reference",
+      "parent_event_reference",
+      "branch_count",
+      "merge_count",
+      "conservation_ratio",
+      "label_free_full_vocab_state_reference"
+    ],
+    "forbidden": [
+      "family_id",
+      "mechanism_id",
+      "condition_semantics",
+      "correct_answer",
+      "target_token_id",
+      "target_rank",
+      "target_margin",
+      "distractor_rank"
+    ]
+  },
+  "raw_relation_signature": {
+    "event_vectors_retained_by_hash_reference": true,
+    "normalized_gram": "K_ij=dot(e_i,e_j)/(norm(e_i)*norm(e_j))",
+    "norm_share": "r_i=norm(e_i)/sum_j(norm(e_j))",
+    "unrestricted_learned_cross_model_rotation_allowed": false,
+    "coordinate_invariant_relations_are_primary": true
+  },
+  "topology_gate_vector": {
+    "weighted_scalar_distance_used": false,
+    "components": [
+      "event_type",
+      "partial_order",
+      "source_receiver_role",
+      "branch_merge",
+      "relative_depth_drift",
+      "generation_delay",
+      "conservation",
+      "future_prediction"
+    ],
+    "all_components_must_pass_their_frozen_gate": true,
+    "calibration_may_retune_component_gate": false
+  },
+  "head_neuron_contract": {
+    "attention_heads_merged_before_discovery": false,
+    "mlp_single_neuron_writes_offline_recoverable": true,
+    "task_score_top_k_allowed": false,
+    "fixed_hash_shard_counts": [
+      8,
+      32,
+      128
+    ],
+    "fixed_hash_seed_count": 3,
+    "multiple_hash_seeds_count_as_independent_replication": false,
+    "single_units_enter_only_after_conserved_shard_localization": true
+  },
+  "cross_model_evidence_levels": {
+    "level_1": "single_model_calibrated_topology",
+    "level_2": "glm4_plus_qwen3_or_deepseek7b_calibrated_topology",
+    "level_2_architecture_family_only": "qwen3_plus_deepseek7b_not_heterogeneous_replication",
+    "level_3": "all_three_models_calibrated_topology",
+    "physical_holdout_entry_minimum": "level_2_with_glm4",
+    "unified_theory_entry_minimum": "level_3"
+  },
+  "controls": [
+    "phase367_ten_descriptor_baseline",
+    "matched_size_random_flow",
+    "time_order_shuffle",
+    "source_receiver_role_permutation",
+    "equal_energy_wrong_flow",
+    "public_architecture_backbone",
+    "same_model_different_independent_group"
+  ],
+  "stage_order": [
+    "fresh_case_contract",
+    "discovery_and_calibration_behavior_qualification",
+    "fresh_discovery_raw_collection",
+    "candidate_and_gate_freeze",
+    "fresh_calibration_once",
+    "physical_holdout_only_if_authorized"
+  ],
+  "stop_rules": [
+    "if_raw_relations_do_not_beat_phase367_descriptor_baseline_stop_before_calibration",
+    "if_calibration_fails_do_not_reuse_calibration_to_redesign_mapping",
+    "if_only_qwen3_and_deepseek7b_match_do_not_call_it_heterogeneous_cross_model",
+    "if_no_glm4_cross_model_candidate_keep_physical_holdout_sealed",
+    "never_open_old_or_new_physical_holdout_to_repair_discovery"
+  ],
+  "authorization": {
+    "fresh_case_bank_creation": true,
+    "discovery_and_calibration_behavior_qualification": true,
+    "fresh_discovery_raw_collection_before_behavior_gate": false,
+    "physical_holdout_execution": false,
+    "causal_intervention": false
+  }
+}

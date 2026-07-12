@@ -1,0 +1,181 @@
+{
+  "schema_version": "50.0.0",
+  "phase_id": "Phase377-CalibrationProtocol",
+  "created_at": "2026-07-12T07:27:20.792234+00:00",
+  "objective": "independently_replicate_phase376_late_residual_content_transfer",
+  "scope": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "execution_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "mechanisms": [
+      "relation_binding",
+      "entity_recency"
+    ],
+    "qualified_group_counts": {
+      "entity_recency": 5,
+      "relation_binding": 6
+    },
+    "case_count": 132,
+    "case_count_per_model": 44,
+    "relative_depth": "late",
+    "templates": [
+      "residual_current",
+      "residual_source_query_current"
+    ],
+    "physical_opened": false,
+    "new_prompt_generation": false
+  },
+  "transfer_pairs": {
+    "primary_treatment": [
+      "A_to_C",
+      "C_to_A"
+    ],
+    "matched_direct_route_control": [
+      "B_to_D",
+      "D_to_B"
+    ],
+    "primary_group_gate_requires_both_treatment_directions": true
+  },
+  "batched_conditions": {
+    "correct": "decision_event_correct_depth_correct_roles",
+    "wrong_depth": "decision_event_cyclic_depth_correct_roles",
+    "wrong_role": "decision_event_correct_depth_cyclic_donor_roles",
+    "wrong_time": "answer_entry_event_correct_depth_correct_roles"
+  },
+  "primary_readout": {
+    "margin": "donor_target_token_logit_minus_recipient_target_token_logit",
+    "transfer_gain": "patched_margin_minus_recipient_baseline_margin",
+    "winner_transfer": "donor_target_token_becomes_argmax",
+    "full_generation_behavior_claimed": false,
+    "trained_probe_used": false
+  },
+  "frozen_numeric_gates": {
+    "minimum_correct_transfer_gain": 0.1,
+    "minimum_gain_over_wrong_depth": 0.05,
+    "minimum_gain_over_wrong_role": 0.05,
+    "minimum_gain_over_wrong_time_when_distinct": 0.05,
+    "minimum_independent_groups_per_model_mechanism_template": 4,
+    "both_treatment_directions_required": true
+  },
+  "decision_step_distributions": {
+    "qwen3": {
+      "0": 22,
+      "1": 11,
+      "15": 11
+    },
+    "glm4": {
+      "0": 30,
+      "1": 13,
+      "13": 1
+    },
+    "deepseek7b": {
+      "0": 4,
+      "16": 6,
+      "17": 7,
+      "1": 3,
+      "15": 24
+    }
+  },
+  "candidate_contract": [
+    {
+      "mechanism_id": "entity_recency",
+      "relative_depth": "late",
+      "template": "residual_current",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_transfer_pass": true,
+      "level3_transfer_pass": true,
+      "winner_flip_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_winner_flip_pass": true,
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "entity_recency",
+      "relative_depth": "late",
+      "template": "residual_source_query_current",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_transfer_pass": true,
+      "level3_transfer_pass": true,
+      "winner_flip_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_winner_flip_pass": true,
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "relative_depth": "late",
+      "template": "residual_current",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_transfer_pass": true,
+      "level3_transfer_pass": true,
+      "winner_flip_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_winner_flip_pass": true,
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "relative_depth": "late",
+      "template": "residual_source_query_current",
+      "models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_transfer_pass": true,
+      "level3_transfer_pass": true,
+      "winner_flip_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_winner_flip_pass": true,
+      "language_mechanism_claimed": false
+    }
+  ],
+  "input_hashes": {
+    "discovery_protocol": "d7db4f3dffcdab160d4908419e79514b9c9142c5191a59b66e4ac6a63470e774",
+    "discovery_summary": "13ee2f3b0a347e6db3f908e68735e8276d5625457c33e9e68c77140da58f4526",
+    "execution_cases": "8d28e7b4be222fcc72a0d2f09656d78b1de266e5f24a7d44a98e68dc63cc84d1",
+    "behavior_qwen3": "9dd2dc7d780eafa489e10332e410d14db7843458d6c7d1ec7efa6f683ab7d243",
+    "behavior_glm4": "511429959b59463a908952afd72882eb49022c4a0a2bd37d4d95814e0e7a7f6d",
+    "behavior_deepseek7b": "dd0d7a1f51300d68154c7781a139d75cde19eb9fcee0648f7de7d603365141d6"
+  },
+  "claim_boundary": {
+    "calibration_replication_is_physical_holdout": false,
+    "late_residual_carrier_is_upstream_encoding_rule": false,
+    "winner_transfer_is_full_generation_sufficiency": false,
+    "language_mechanism_claimed": false
+  },
+  "authorization": {
+    "run_calibration_interventions": true,
+    "open_physical_before_calibration_merge": false,
+    "single_neuron_scan": false
+  }
+}

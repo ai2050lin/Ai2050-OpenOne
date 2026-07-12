@@ -1,0 +1,63 @@
+{
+  "schema_version": "47.8.0",
+  "phase_id": "Phase371C",
+  "created_at": "2026-07-12T04:57:17.823914+00:00",
+  "objective": "freeze_case_code_and_data_contract_before_behavior_model_execution",
+  "valid": true,
+  "errors": [],
+  "denominator": {
+    "case_count": 1056,
+    "parallel_group_count": 88,
+    "model_group_count": 264,
+    "mechanism_split_group_counts": {
+      "entity_recency:fresh_discovery": 12,
+      "entity_recency:sealed_calibration": 6,
+      "entity_recency:sealed_physical": 4,
+      "number_agreement:fresh_discovery": 12,
+      "number_agreement:sealed_calibration": 6,
+      "number_agreement:sealed_physical": 4,
+      "relation_binding:fresh_discovery": 12,
+      "relation_binding:sealed_calibration": 6,
+      "relation_binding:sealed_physical": 4,
+      "target_competition:fresh_discovery": 12,
+      "target_competition:sealed_calibration": 6,
+      "target_competition:sealed_physical": 4
+    }
+  },
+  "quality": {
+    "blind_label_leak_count": 0,
+    "physical_nonphysical_overlap_count": 0,
+    "physical_execution_file_separated": true,
+    "prior_prompt_overlap_count": 0,
+    "all_four_conditions_present": true,
+    "all_three_models_parallel": true
+  },
+  "frozen_hashes": {
+    "scripts": {
+      "tests/gpt5/phase371c_case_bank.py": "f35f9e18b0eef34f1214acf34059edf3a933b017caee018760015a7337f72cf4",
+      "tests/gpt5/phase371c_case_contract_audit.py": "e4c37ca610be1719fab62e3086792b1fe7efc4f677e9b9ef5317a5eed80da3f9",
+      "tests/gpt5/phase371c_independent_cycle_protocol.py": "477779892fa2a69fd2443f5fbe33867d519a6191a08ca860bd5f5ccaf68ed57d",
+      "tests/gpt5/phase371b_anchor_qk_collection.py": "ac51dcb366d3903ee68dc42dbe5e9d493b20adef44f79859a2bdec11499c4d9a"
+    },
+    "data": {
+      "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_case_bank/private/phase371c_execution_cases.jsonl": "69bfe0c403a46866018123cc931cdf7cad990f926ef613bcb28f1aa5225d4262",
+      "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_case_bank/private/phase371c_nonphysical_execution_cases.jsonl": "8d28e7b4be222fcc72a0d2f09656d78b1de266e5f24a7d44a98e68dc63cc84d1",
+      "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_case_bank/sealed/private/phase371c_physical_execution_cases.jsonl": "f192cbb883d641e728062db1e743793b071deea2c4fb027dba9dc5dd1467ff24",
+      "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_case_bank/phase371c_blind_case_registry.jsonl": "4b64aa9c84164c1a01f6d8cb7bd1705dc8525d30427071f3842e033a29ac9207",
+      "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_case_bank/private/phase371c_label_key.jsonl": "3a48b9b557f108182ee413503e9c2cf79afbddf4c57dfda70c24ad9685ca88fc",
+      "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_independent_cycle_protocol.json": "7d1513d540ae69da0df00cb4ac4cafa89d61ff62a17dc2c2da8a5b7f1715b7ea"
+    }
+  },
+  "authorization": {
+    "behavior_model_execution_nonphysical_only": true,
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "internal_collection": false,
+    "calibration_internal_open": false,
+    "physical_execution": false
+  },
+  "next_decision": "run_nonphysical_behavior_qualification_sequentially"
+}

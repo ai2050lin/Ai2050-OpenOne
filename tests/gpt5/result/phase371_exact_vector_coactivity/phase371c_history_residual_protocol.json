@@ -1,0 +1,48 @@
+{
+  "schema_version": "47.21.0",
+  "phase_id": "Phase371C-History",
+  "created_at": "2026-07-12T05:28:06.470428+00:00",
+  "objective": "test_whether_t1_route_difference_is_a_history_sufficient_direction_for_t2_adjacent_output_difference",
+  "authorization_basis": {
+    "provisional_model_candidate_count": 210,
+    "full_candidate_count_before_history": 0,
+    "mapping_hash": "9ee978c0d387fa3e5a4346d6ab0b4f01474924f02f3d12b33ffeebed195a8d9f"
+  },
+  "time_contract": {
+    "past": 0,
+    "current": 1,
+    "future": 2,
+    "t0_candidates_history_eligible": false,
+    "t1_candidates_history_eligible": true,
+    "t2_candidates_history_eligible": false
+  },
+  "basic_geometry": {
+    "current_error": "norm(y_future-proj_span(x_current)(y_future))/norm(y_future)",
+    "past_error": "norm(y_future-proj_span(x_past)(y_future))/norm(y_future)",
+    "history_error": "norm(y_future-proj_span(x_current,x_past)(y_future))/norm(y_future)",
+    "history_gain": "current_error-history_error",
+    "fitted_regression_or_coordinate_rotation": false
+  },
+  "lexical_pair_gate": {
+    "current_error_must_be_strictly_less_than_past_error": true,
+    "history_gain_max": 0.01,
+    "A_B_and_C_D_both_required": true,
+    "zero_future_difference_passes": false
+  },
+  "replication_gate": {
+    "minimum_independent_groups_per_model_mechanism_route": 8,
+    "heterogeneous_level2_requires_glm4": true,
+    "same_canonical_depth_role_route_required": true
+  },
+  "claim_boundary": {
+    "history_projection_is_a_linear_local_diagnostic_not_state_sufficiency_proof": true,
+    "causal_same_graph_intervention_replay_completed": false,
+    "history_pass_can_open_calibration": false,
+    "language_path_claim": false
+  },
+  "authorization": {
+    "implement_and_hash_exact_history_evaluator": true,
+    "open_calibration": false,
+    "open_physical": false
+  }
+}

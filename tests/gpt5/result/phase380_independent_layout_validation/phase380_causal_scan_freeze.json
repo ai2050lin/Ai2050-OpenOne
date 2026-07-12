@@ -1,0 +1,219 @@
+{
+  "schema_version": "53.8.0",
+  "phase_id": "Phase380-CausalScanFreeze",
+  "created_at": "2026-07-12T08:45:37.385497+00:00",
+  "stable_objects": [
+    {
+      "mechanism_id": "entity_recency",
+      "contrast_axis": "content_change_same_operation",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "entity_recency",
+      "contrast_axis": "joint_content_operation_change",
+      "individually_stable_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": false,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "contrast_axis": "content_change_same_operation",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "contrast_axis": "joint_content_operation_change",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "target_vs_wrong",
+      "contrast_axis": "joint_content_operation_change",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    }
+  ],
+  "selected_parallel_groups": {
+    "entity_recency": [
+      "parallel380_044085c7ab0fdb28f4",
+      "parallel380_04b031fccc59ba6682",
+      "parallel380_1743810a426214cef2",
+      "parallel380_3eeccfbf626a4b4df1",
+      "parallel380_5e3b6aa93c5a1c729f",
+      "parallel380_72cb080ad09fbcd677",
+      "parallel380_9a7a91902291f58fee",
+      "parallel380_a4651aa1b051cf9cf8"
+    ],
+    "relation_binding": [
+      "parallel380_059c07ec49a895bb64",
+      "parallel380_0c1461c797d5db5ab6",
+      "parallel380_192f9881e01e27c659",
+      "parallel380_27d60b3294c7be764d",
+      "parallel380_30183e45d33d4d763a",
+      "parallel380_48a5d4205b4237f9ab",
+      "parallel380_4aa34c9b3842df19cf",
+      "parallel380_4b6d5e7082d2d23d64"
+    ],
+    "target_vs_wrong": [
+      "parallel380_16978b671a94b6991c",
+      "parallel380_1fae783c9a0261910c",
+      "parallel380_2f7143f5ecf219168f",
+      "parallel380_4dcb9e1bbe79f4acbe",
+      "parallel380_5222aace94c7b22caf",
+      "parallel380_5dd85eab784389a8c4",
+      "parallel380_6e1243cdb2b420900e",
+      "parallel380_8ec3dd370c886c7dec"
+    ]
+  },
+  "transfer_pairs_by_axis": {
+    "content_change_same_operation": [
+      "A_to_C",
+      "C_to_A",
+      "B_to_D",
+      "D_to_B"
+    ],
+    "joint_content_operation_change": [
+      "A_to_D",
+      "D_to_A",
+      "B_to_C",
+      "C_to_B"
+    ]
+  },
+  "scan_grid": {
+    "relative_depths": [
+      "early",
+      "middle_early",
+      "middle",
+      "middle_late",
+      "late"
+    ],
+    "relative_depth_fractions": [
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      0.9
+    ],
+    "component_boundaries": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "layer_output"
+    ],
+    "position_roles": [
+      "source",
+      "query",
+      "current"
+    ],
+    "conditions": [
+      "natural_swap",
+      "equal_energy_permutation"
+    ],
+    "top_k_selection": false
+  },
+  "frozen_gates": {
+    "minimum_natural_transfer_gain": 0.1,
+    "minimum_gain_over_equal_energy": 0.05,
+    "minimum_terminal_transfer_share": 0.02,
+    "minimum_share_over_equal_energy": 0.01,
+    "minimum_gain_over_cyclic_wrong_depth": 0.05,
+    "minimum_gain_over_cyclic_wrong_role": 0.05,
+    "minimum_groups_all_four_directions": 6
+  },
+  "denominator": {
+    "model_count": 3,
+    "stable_object_count": 5,
+    "selected_group_object_count": 40,
+    "selected_unique_group_count": 24,
+    "condition_rows_per_model": 19200,
+    "condition_rows_total": 57600
+  },
+  "claim_boundary": {
+    "same_normalized_cell_across_models_is_same_neuron": false,
+    "single_passing_cell_is_a_complete_language_path": false,
+    "late_current_layer_output_is_upstream_rule": false,
+    "physical_holdout_opened": false,
+    "single_neuron_scan": false
+  },
+  "execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ]
+}

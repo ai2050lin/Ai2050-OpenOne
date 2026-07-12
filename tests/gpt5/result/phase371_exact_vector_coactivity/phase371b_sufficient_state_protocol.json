@@ -1,0 +1,46 @@
+{
+  "schema_version": "47.4.0",
+  "phase_id": "Phase371B-R",
+  "created_at": "2026-07-12T04:50:01.318567+00:00",
+  "objective": "remove_only_deterministic_materialized_derivatives_and_validate_exact_on_demand_replay",
+  "trigger": {
+    "three_model_numeric_gate_pass": true,
+    "materialized_derivative_storage_gate_pass": false,
+    "sufficient_state_storage_projection_pass": true
+  },
+  "retained_state": [
+    "all_component_vectors",
+    "actual_rotary_query_key_value_states",
+    "all_receiver_all_source_attention_probabilities",
+    "mlp_channel_product",
+    "deterministic_head_and_channel_partitions",
+    "weight_reference_ids",
+    "quality_and_claim_boundaries"
+  ],
+  "removed_materializations": [
+    "attention_head_writes_all_receivers",
+    "attention_head_partition_writes_all_receivers",
+    "mlp_partition_writes_all_receivers"
+  ],
+  "lossless_replay_gates": {
+    "query_key_probability_relative_error_max": 0.01,
+    "attention_output_relative_error_max": 0.01,
+    "attention_tree_conservation_relative_error_max": 1e-05,
+    "mlp_output_relative_error_max": 0.01,
+    "mlp_tree_conservation_relative_error_max": 1e-05,
+    "removed_materialization_reconstruction_relative_error_max": 0.01,
+    "block_output_relative_error_max": 0.01,
+    "all_27_rows_must_pass": true
+  },
+  "storage_gate": {
+    "full_discovery_budget_bytes": 68719476736,
+    "minimum_free_reserve_bytes": 214748364800,
+    "projection_uses_actual_compacted_file_sizes": true
+  },
+  "claim_boundary": {
+    "engineering_format_repair_only": true,
+    "new_model_execution": false,
+    "language_path_claim": false,
+    "calibration_or_physical_holdout": false
+  }
+}

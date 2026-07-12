@@ -1,0 +1,193 @@
+{
+  "schema_version": "42.2.0",
+  "phase_id": "Phase365-A",
+  "created_at": "2026-07-12T02:04:19.772496+00:00",
+  "model": "deepseek7b",
+  "denominator": {
+    "fixed_prompt_count": 1,
+    "repeat_count": 2,
+    "selected_layer_count": 3,
+    "token_count": 10
+  },
+  "execution": {
+    "use_cache": false,
+    "output_attentions": false,
+    "causal_intervention": false,
+    "input_batch_size": 1,
+    "model_execution_order_contract": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ]
+  },
+  "results": {
+    "all_layer_replay_gates_pass": true,
+    "repeat_exact_equal": true,
+    "max_direct_relative_error": 0.0006166790844872594,
+    "max_neuron_write_relative_error": 0.0021988339722156525,
+    "max_repeat_relative_error": 0.0
+  },
+  "repeat_rows": [
+    {
+      "repeat_index": 0,
+      "final_logits_sha256": "8d51da0e9f50b190cf6fcff85b0ee30131b448f334c5583629c42d0ccf7ef480",
+      "final_logits_repeat_difference": null,
+      "layer_rows": [
+        {
+          "layer_role": "early",
+          "layer_index": 0,
+          "adapter_kind": "separate_gate_up_silu",
+          "intermediate_size": 18944,
+          "direct_relative_error": 0.0006166790844872594,
+          "neuron_write_relative_error": 0.0019449986284598708,
+          "replay_gate_pass": true,
+          "tensor_hashes": {
+            "early.mlp_input": "5487941b3c7b13c994460823fc0fbf9fab8bd17bdd01e549ee6c7bf5dbe901b0",
+            "early.mlp_product": "57afb3d20eddad32b8656b55d2bc77ca4297a9ea523e584ee1dae7e4c8ff49b0",
+            "early.mlp_output": "2fcabe46167dc4b569d7be16da3f25d1ffd506d7818eff994591bde813c1c238"
+          },
+          "repeat_differences": {}
+        },
+        {
+          "layer_role": "middle",
+          "layer_index": 14,
+          "adapter_kind": "separate_gate_up_silu",
+          "intermediate_size": 18944,
+          "direct_relative_error": 0.0002219122980022803,
+          "neuron_write_relative_error": 0.0021988339722156525,
+          "replay_gate_pass": true,
+          "tensor_hashes": {
+            "middle.mlp_input": "bd7e54c2dfe36ca886687b586a2ca1bf733326cdcf8d9bffcc67668d0e57296e",
+            "middle.mlp_product": "cf1aee5aa1bdacc199cf767ade0748d0fdf77d793987f83b33420e1f42b93954",
+            "middle.mlp_output": "e43a6c0bf53adb7d75e3dbd43b238676b5dc3beab0a8a226595aa39484dc8741"
+          },
+          "repeat_differences": {}
+        },
+        {
+          "layer_role": "late",
+          "layer_index": 27,
+          "adapter_kind": "separate_gate_up_silu",
+          "intermediate_size": 18944,
+          "direct_relative_error": 0.00027932858210988343,
+          "neuron_write_relative_error": 0.001732165226712823,
+          "replay_gate_pass": true,
+          "tensor_hashes": {
+            "late.mlp_input": "114dd8d7fafdf3277e37c2b6ff887925680643872ef08be87c347d5750b26765",
+            "late.mlp_product": "3bed25b4160d63ac4e188e5b88a011636437b3ac5fba46d3b4cf7d6664d3e588",
+            "late.mlp_output": "63607be77dc1e036857d8f24d283cbefd1e0ff2f6b53063af738e41dbb940ab9"
+          },
+          "repeat_differences": {}
+        }
+      ]
+    },
+    {
+      "repeat_index": 1,
+      "final_logits_sha256": "8d51da0e9f50b190cf6fcff85b0ee30131b448f334c5583629c42d0ccf7ef480",
+      "final_logits_repeat_difference": {
+        "max_absolute": 0.0,
+        "relative": 0.0,
+        "exact_equal": true
+      },
+      "layer_rows": [
+        {
+          "layer_role": "early",
+          "layer_index": 0,
+          "adapter_kind": "separate_gate_up_silu",
+          "intermediate_size": 18944,
+          "direct_relative_error": 0.0006166790844872594,
+          "neuron_write_relative_error": 0.0019449986284598708,
+          "replay_gate_pass": true,
+          "tensor_hashes": {
+            "early.mlp_input": "5487941b3c7b13c994460823fc0fbf9fab8bd17bdd01e549ee6c7bf5dbe901b0",
+            "early.mlp_product": "57afb3d20eddad32b8656b55d2bc77ca4297a9ea523e584ee1dae7e4c8ff49b0",
+            "early.mlp_output": "2fcabe46167dc4b569d7be16da3f25d1ffd506d7818eff994591bde813c1c238"
+          },
+          "repeat_differences": {
+            "early.mlp_input": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            },
+            "early.mlp_product": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            },
+            "early.mlp_output": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            }
+          }
+        },
+        {
+          "layer_role": "middle",
+          "layer_index": 14,
+          "adapter_kind": "separate_gate_up_silu",
+          "intermediate_size": 18944,
+          "direct_relative_error": 0.0002219122980022803,
+          "neuron_write_relative_error": 0.0021988339722156525,
+          "replay_gate_pass": true,
+          "tensor_hashes": {
+            "middle.mlp_input": "bd7e54c2dfe36ca886687b586a2ca1bf733326cdcf8d9bffcc67668d0e57296e",
+            "middle.mlp_product": "cf1aee5aa1bdacc199cf767ade0748d0fdf77d793987f83b33420e1f42b93954",
+            "middle.mlp_output": "e43a6c0bf53adb7d75e3dbd43b238676b5dc3beab0a8a226595aa39484dc8741"
+          },
+          "repeat_differences": {
+            "middle.mlp_input": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            },
+            "middle.mlp_product": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            },
+            "middle.mlp_output": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            }
+          }
+        },
+        {
+          "layer_role": "late",
+          "layer_index": 27,
+          "adapter_kind": "separate_gate_up_silu",
+          "intermediate_size": 18944,
+          "direct_relative_error": 0.00027932858210988343,
+          "neuron_write_relative_error": 0.001732165226712823,
+          "replay_gate_pass": true,
+          "tensor_hashes": {
+            "late.mlp_input": "114dd8d7fafdf3277e37c2b6ff887925680643872ef08be87c347d5750b26765",
+            "late.mlp_product": "3bed25b4160d63ac4e188e5b88a011636437b3ac5fba46d3b4cf7d6664d3e588",
+            "late.mlp_output": "63607be77dc1e036857d8f24d283cbefd1e0ff2f6b53063af738e41dbb940ab9"
+          },
+          "repeat_differences": {
+            "late.mlp_input": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            },
+            "late.mlp_product": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            },
+            "late.mlp_output": {
+              "max_absolute": 0.0,
+              "relative": 0.0,
+              "exact_equal": true
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "vram_gb_before_release": {
+    "allocated": 15.285757952,
+    "reserved": 15.416164352
+  },
+  "valid": true
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": "50.1.0",
+  "phase_id": "Phase377-CalibrationIntervention",
+  "created_at": "2026-07-12T07:29:26.362552+00:00",
+  "model": "qwen3",
+  "execution": {
+    "device": "cuda:0",
+    "model_execution": true,
+    "calibration_opened": true,
+    "physical_opened": false
+  },
+  "denominator": {
+    "case_count": 44,
+    "parallel_group_count": 11,
+    "template_depth_transfer_count": 88,
+    "patched_forward_condition_count": 352,
+    "group_gate_count": 22
+  },
+  "quality": {
+    "baseline_replay_count": 44,
+    "baseline_replay_match_count": 44,
+    "baseline_replay_match_rate": 1.0,
+    "all_patch_hooks_reached": true
+  },
+  "results": {
+    "model_candidate_count": 4,
+    "replicated_winner_flip_candidate_count": 4,
+    "model_candidates": [
+      {
+        "model": "qwen3",
+        "mechanism_id": "entity_recency",
+        "relative_depth": "late",
+        "template": "residual_current",
+        "group_pass_count": 5,
+        "winner_flip_group_count": 5,
+        "minimum_group_count": 4,
+        "calibration_gate_pass": true,
+        "replicated_winner_flip_pass": true
+      },
+      {
+        "model": "qwen3",
+        "mechanism_id": "entity_recency",
+        "relative_depth": "late",
+        "template": "residual_source_query_current",
+        "group_pass_count": 5,
+        "winner_flip_group_count": 5,
+        "minimum_group_count": 4,
+        "calibration_gate_pass": true,
+        "replicated_winner_flip_pass": true
+      },
+      {
+        "model": "qwen3",
+        "mechanism_id": "relation_binding",
+        "relative_depth": "late",
+        "template": "residual_current",
+        "group_pass_count": 6,
+        "winner_flip_group_count": 5,
+        "minimum_group_count": 4,
+        "calibration_gate_pass": true,
+        "replicated_winner_flip_pass": true
+      },
+      {
+        "model": "qwen3",
+        "mechanism_id": "relation_binding",
+        "relative_depth": "late",
+        "template": "residual_source_query_current",
+        "group_pass_count": 6,
+        "winner_flip_group_count": 5,
+        "minimum_group_count": 4,
+        "calibration_gate_pass": true,
+        "replicated_winner_flip_pass": true
+      }
+    ]
+  },
+  "claim_boundary": {
+    "physical_holdout_tested": false,
+    "upstream_encoding_rule_claimed": false,
+    "full_generation_tested": false,
+    "language_mechanism_claimed": false
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": "38.0.0",
+  "phase_id": "Phase361",
+  "created_at": "2026-07-11T17:18:41.134341+00:00",
+  "denominator": {
+    "model_count": 3,
+    "admitted_mechanism_count": 4,
+    "cases_per_model_mechanism": 8,
+    "case_count": 96,
+    "blind_discovery_case_count": 72,
+    "blind_calibration_case_count": 24,
+    "condition_counts": {
+      "A": 24,
+      "B": 24,
+      "C": 24,
+      "D": 24
+    },
+    "r1_shard_counts": {
+      "0": 6,
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6,
+      "6": 6,
+      "7": 6,
+      "8": 6,
+      "9": 6,
+      "10": 6,
+      "11": 6,
+      "12": 6,
+      "13": 6,
+      "14": 6,
+      "15": 6
+    },
+    "ledger_row_count": 3328,
+    "sealed_byte_count": 1289962528,
+    "model_layer_counts": {
+      "qwen3": 36,
+      "glm4": 40,
+      "deepseek7b": 28
+    }
+  },
+  "quality": {
+    "all_model_completions_valid": true,
+    "all_component_gates_pass": true,
+    "blind_ledger_label_leak_row_count": 0,
+    "max_errors": {
+      "attention": 0.003623889,
+      "mlp": 0.005293302,
+      "block": 0.0,
+      "input_norm": 0.002559967,
+      "post_attention_norm": 0.002582695,
+      "probability": 0.003417969
+    },
+    "role_exact_counts": {
+      "source": 3328,
+      "query": 3328,
+      "answer_start": 3328,
+      "current_generation": 3328
+    },
+    "r1_shard_counts": {
+      "0": 6,
+      "1": 6,
+      "2": 6,
+      "3": 6,
+      "4": 6,
+      "5": 6,
+      "6": 6,
+      "7": 6,
+      "8": 6,
+      "9": 6,
+      "10": 6,
+      "11": 6,
+      "12": 6,
+      "13": 6,
+      "14": 6,
+      "15": 6
+    }
+  },
+  "recorded_views": {
+    "r0_role_state_count": 9,
+    "role_count": 4,
+    "all_attention_head_scalar_ledgers": true,
+    "attention_source_probability_rows": true,
+    "all_mlp_shard_scalar_ledgers": true,
+    "one_balanced_raw_mlp_shard_per_case": true,
+    "full_vocabulary_logits_per_case": true,
+    "generation_time_count": 1
+  },
+  "claim_boundary": {
+    "r0_r1_recording_complete_for_admitted_sample": true,
+    "all_eighteen_mechanisms_recorded": false,
+    "multi_step_generation_recorded": false,
+    "public_backbone_separated": false,
+    "blind_operation_specific_motif_discovered": false,
+    "future_prediction_tested": false,
+    "physical_heldout_revealed": false,
+    "causal_intervention_executed": false
+  },
+  "next_decision": "build_blind_public_backbone_and_test_next_layer_prediction"
+}

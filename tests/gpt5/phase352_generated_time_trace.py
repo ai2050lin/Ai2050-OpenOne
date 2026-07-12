@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""Collect teacher-forced signed trajectories across target-generation time."""
+
+from __future__ import annotations
+
+import argparse
+import gc
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Iterable
+
+import torch
+
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tests/gpt5"))
+
+from hf_probe_env import load_probe_model, release_loaded  # noqa: E402
+from phase334_natural_contrast_survey import role_positions  # noqa: E402
+from phase338_block_causal_screen import continuation_ids, get_layers, prompt_ids  # noqa: E402
+from phase347_three_core_natural_trace import depth_lookup, install_capture_hooks  # noqa: E402
+from phase351_signed_paired_trace import unit_direction  # noqa: E402
+from phase351_signed_paired_trace_case_bank import OUT as SOURCE_OUT, ROUND_DEFAULT as SOURCE_ROUND  # noqa: E402
+
+
+PHASE = "Phase352"
+SCHEMA_VERSION = "28.0.0"
+ROUND_DEFAULT = "generated_time_signed_trace"
+OUT = ROOT / "tests/gpt5/result/phase352_generated_time_trace"
+MODELS = ("qwen3", "glm4", "deepseek7b")
+ROLES = ("source", "query", "answer_start", "current_generation")
+MAX_TARGET_STEPS = 4
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def write_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+
+
+def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n")
+
+
+def phase_for(step: int, length: int) -> str:
+    if length == 1:
+        return "first_final"
+    if step == 0:
+        return "first"
+    if step == length - 1 or step == MAX_TARGET_STEPS - 1:
+        return "final"
+    return "middle"
+
+
+@torch.inference_mode()
+def run_model(model: str, round_name: str = ROUND_DEFAULT) -> dict[str, Any]:
+    source_root = SOURCE_OUT / SOURCE_ROUND
+    cases = [row for row in read_jsonl(source_root / "phase351_registered_cases.jsonl") if row["model"] == model]
+    loaded = None
+    handles: list[Any] = []
+    rows = []
+    target_step_count = 0
+    try:
+        loaded = load_probe_model(model)
+        depth_by_layer = depth_lookup(len(get_layers(loaded.model)))
+        output_weight = loaded.model.get_output_embeddings().weight.detach()
+        state: dict[str, Any] = {"captures": [], "positions": None}
+        handles = install_capture_hooks(loaded, state)
+        eos = int(loaded.tokenizer.eos_token_id)
+        for index, case in enumerate(cases, 1):
+            prompt = prompt_ids(loaded, case)
+            role_map = role_positions(loaded, case, prompt)
+            target_ids = continuation_ids(loaded, case, case["target"])
+            distractor_ids = [continuation_ids(loaded, case, value) for value in case["distractors"]]
+            step_limit = min(len(target_ids), MAX_TARGET_STEPS)
+            target_step_count += step_limit
+            for step in range(step_limit):
+                sequence = prompt + target_ids[:step]
+                fixed_positions = [role_map[role][0] for role in ROLES[:3]]
+                positions = fixed_positions + [len(sequence) - 1]
+                state["positions"] = torch.tensor(positions, dtype=torch.long, device=loaded.input_device)
+                state["captures"] = []
+                state["pre_inputs"] = {}
+                target_direction = unit_direction(output_weight, target_ids[step])
+                competitor_tokens = [values[step] if step < len(values) else eos for values in distractor_ids]
+                competitor_directions = torch.stack([unit_direction(output_weight, token_id) for token_id in competitor_tokens])
+                input_ids = torch.tensor([sequence], dtype=torch.long, device=loaded.input_device)
+                output = loaded.model(input_ids=input_ids, attention_mask=torch.ones_like(input_ids), use_cache=False, return_dict=True)
+                generation_phase = phase_for(step, len(target_ids))
+                for layer_index, component, captured in state["captures"]:
+                    vectors = captured.float()
+                    norms = vectors.norm(dim=-1).clamp_min(1e-8)
+                    target_cosine = torch.mv(vectors, target_direction.to(vectors.device)) / norms
+                    competitors = torch.mm(vectors, competitor_directions.to(vectors.device).T) / norms[:, None]
+                    best_competitor = competitors.max(dim=-1).values
+                    margins = target_cosine - best_competitor
+                    for role_index, role in enumerate(ROLES):
+                        values = (norms[role_index], target_cosine[role_index], best_competitor[role_index], margins[role_index])
+                        finite = all(torch.isfinite(value).item() for value in values)
+                        rows.append({
+                            "schema_version": SCHEMA_VERSION, "phase_id": PHASE, "created_at": now(),
+                            "model": model, "case_id": case["case_id"],
+                            "contrast_group_id": case["contrast_group_id"], "family_id": case["family_id"],
+                            "item_index": case["item_index"], "split": case["split"],
+                            "template_id": case["template_id"], "contrast_condition": case["contrast_condition"],
+                            "lexical_set": case["lexical_set"], "operation_demanded": case["operation_demanded"],
+                            "target_step": step, "target_step_count": len(target_ids),
+                            "generation_phase": generation_phase, "teacher_forced": True,
+                            "component": component, "layer_index": layer_index,
+                            "depth_bin": depth_by_layer[layer_index], "position_role": role,
+                            "component_l2_norm": round(float(values[0].item()), 7) if finite else None,
+                            "signed_target_cosine": round(float(values[1].item()), 7) if finite else None,
+                            "signed_best_competitor_cosine": round(float(values[2].item()), 7) if finite else None,
+                            "signed_competition_margin": round(float(values[3].item()), 7) if finite else None,
+                            "finite": finite, "natural_trace_only": True,
+                            "physical_heldout": False, "causal_sealed": False,
+                            "single_unit_causal": False,
+                        })
+                del output, input_ids
+            if index % 48 == 0 or index == len(cases):
+                print(f"[{model}] {index}/{len(cases)} cases, {target_step_count} target steps", flush=True)
+        model_root = OUT / round_name / "models" / model
+        write_jsonl(model_root / "phase352_generated_time_rows.jsonl", rows)
+        complete = {
+            "schema_version": SCHEMA_VERSION, "phase_id": PHASE, "created_at": now(),
+            "model": model, "registered_case_count": len(cases), "target_step_count": target_step_count,
+            "trace_row_count": len(rows), "nonfinite_trace_row_count": sum(not row["finite"] for row in rows),
+            "physical_heldout_trace_count": sum(row["physical_heldout"] for row in rows),
+            "causal_sealed_trace_count": sum(row["causal_sealed"] for row in rows),
+            "valid": len(cases) == 192 and target_step_count >= 192 and bool(rows),
+        }
+        write_json(model_root / "complete.json", complete)
+        return complete
+    finally:
+        for handle in handles:
+            handle.remove()
+        release_loaded(loaded)
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", choices=MODELS, required=True)
+    parser.add_argument("--round", default=ROUND_DEFAULT)
+    args = parser.parse_args()
+    print(json.dumps(run_model(args.model, args.round), ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

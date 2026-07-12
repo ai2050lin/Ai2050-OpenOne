@@ -1,0 +1,4915 @@
+{
+  "schema_version": "47.15.0",
+  "phase_id": "Phase371C-Path",
+  "model": "deepseek7b",
+  "blind_case_id": "p371c_a2e64292dac60c98a260204",
+  "anonymous_model_id": "am371c_ca398376464",
+  "anonymous_parallel_group_id": "parallel371c_af40717b802fd645f4",
+  "anonymous_group_id": "group371c_d97af1ddf7c5b87765",
+  "anonymous_condition_slot": "slot371c_b6c08bd07a",
+  "generation_time_count": 3,
+  "layer_pairs": [
+    {
+      "name": "early",
+      "source_layer": 0,
+      "receiver_layer": 1
+    },
+    {
+      "name": "middle",
+      "source_layer": 14,
+      "receiver_layer": 15
+    },
+    {
+      "name": "late",
+      "source_layer": 26,
+      "receiver_layer": 27
+    }
+  ],
+  "nodes": [
+    {
+      "id": "t0:l0:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        73
+      ],
+      "source_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l0:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "1c751f5169de0b93e53d69f9c545fe2fc4b888ba7fc1b6764b4c98b551f446e8",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l0:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "c53e645fa8a2b8dfa6e9e77564f4939bd5fa34b9e90d024d782f58b058415faf",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l0:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        73
+      ],
+      "source_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l1:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "3a8894d83b21b76e86ab6d44b6442f4f7c2ee55bc97dd8bff1a0795294d003d3",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l1:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "2e2c59da41c878972597365a91fbf1f8f74f05f2d1770530c4c2bc8ef2d4536b",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l1:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l14:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l14:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        73
+      ],
+      "source_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l14:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "b21e0863036a8379878f56000340b2fe3398cf30f86e12eae095f272f22570ad",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l14:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l14:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l14:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "e680e92ca3646b860f6170a3fcd7032b759898c44aec2ed63250c4ff757371bf",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l14:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l14:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_014.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l15:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l15:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        73
+      ],
+      "source_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l15:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "8417b3b4f065a8efbd7d10232bda21193f58fd1745e7444e707e885ca8b9904c",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l15:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l15:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l15:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "174b10a17f947fd9aa399508100efad64aef908fa01afc21d1be4b7831a5b33c",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l15:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l15:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_015.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l26:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l26:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        73
+      ],
+      "source_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l26:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "3e71b37dc49dea43b4c05c8e6c3a0b6544cc35a8129367deb8dd1083a6e68253",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l26:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l26:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l26:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "834c379d85192db06abc652ed1a6d713283e99761dcd2b4143defe2d475c2a23",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l26:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l26:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_026.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l27:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l27:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        73
+      ],
+      "source_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l27:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "a8d190f59ad26073c76b5633be703055d3e887966f7d9c690aa6711c4f46b92f",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l27:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l27:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l27:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        73
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "1546974901fcf03bb79b5bc128b98926336c51e6724293727efd7a7e81ca333a",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l27:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l27:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        73
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/layer_027.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:vocab",
+      "event_type": "label_free_vocab_state",
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_0/time_meta.pt",
+        "tensor_pointer": "full_vocabulary_logits",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        74
+      ],
+      "source_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l0:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "1c751f5169de0b93e53d69f9c545fe2fc4b888ba7fc1b6764b4c98b551f446e8",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l0:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "c53e645fa8a2b8dfa6e9e77564f4939bd5fa34b9e90d024d782f58b058415faf",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l0:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        74
+      ],
+      "source_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l1:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "3a8894d83b21b76e86ab6d44b6442f4f7c2ee55bc97dd8bff1a0795294d003d3",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l1:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "2e2c59da41c878972597365a91fbf1f8f74f05f2d1770530c4c2bc8ef2d4536b",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l1:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l14:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l14:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        74
+      ],
+      "source_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l14:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "b21e0863036a8379878f56000340b2fe3398cf30f86e12eae095f272f22570ad",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l14:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l14:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l14:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "e680e92ca3646b860f6170a3fcd7032b759898c44aec2ed63250c4ff757371bf",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l14:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l14:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_014.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l15:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l15:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        74
+      ],
+      "source_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l15:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "8417b3b4f065a8efbd7d10232bda21193f58fd1745e7444e707e885ca8b9904c",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l15:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l15:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l15:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "174b10a17f947fd9aa399508100efad64aef908fa01afc21d1be4b7831a5b33c",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l15:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l15:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_015.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l26:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l26:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        74
+      ],
+      "source_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l26:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "3e71b37dc49dea43b4c05c8e6c3a0b6544cc35a8129367deb8dd1083a6e68253",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l26:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l26:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l26:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "834c379d85192db06abc652ed1a6d713283e99761dcd2b4143defe2d475c2a23",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l26:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l26:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_026.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l27:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l27:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        74
+      ],
+      "source_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l27:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "a8d190f59ad26073c76b5633be703055d3e887966f7d9c690aa6711c4f46b92f",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l27:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l27:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l27:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        74
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "1546974901fcf03bb79b5bc128b98926336c51e6724293727efd7a7e81ca333a",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l27:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l27:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        74
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/layer_027.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:vocab",
+      "event_type": "label_free_vocab_state",
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_1/time_meta.pt",
+        "tensor_pointer": "full_vocabulary_logits",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        75
+      ],
+      "source_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l0:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "1c751f5169de0b93e53d69f9c545fe2fc4b888ba7fc1b6764b4c98b551f446e8",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l0:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "c53e645fa8a2b8dfa6e9e77564f4939bd5fa34b9e90d024d782f58b058415faf",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l0:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        75
+      ],
+      "source_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l1:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "3a8894d83b21b76e86ab6d44b6442f4f7c2ee55bc97dd8bff1a0795294d003d3",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l1:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "2e2c59da41c878972597365a91fbf1f8f74f05f2d1770530c4c2bc8ef2d4536b",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l1:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l14:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l14:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        75
+      ],
+      "source_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l14:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "b21e0863036a8379878f56000340b2fe3398cf30f86e12eae095f272f22570ad",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l14:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l14:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l14:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "e680e92ca3646b860f6170a3fcd7032b759898c44aec2ed63250c4ff757371bf",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l14:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l14:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_014.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l15:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l15:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        75
+      ],
+      "source_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l15:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "8417b3b4f065a8efbd7d10232bda21193f58fd1745e7444e707e885ca8b9904c",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l15:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l15:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l15:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "174b10a17f947fd9aa399508100efad64aef908fa01afc21d1be4b7831a5b33c",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l15:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l15:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_015.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l26:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l26:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        75
+      ],
+      "source_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l26:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "3e71b37dc49dea43b4c05c8e6c3a0b6544cc35a8129367deb8dd1083a6e68253",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l26:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l26:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l26:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "834c379d85192db06abc652ed1a6d713283e99761dcd2b4143defe2d475c2a23",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l26:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l26:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_026.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l27:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l27:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        75
+      ],
+      "source_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l27:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "head_domain": [
+        0,
+        28
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "a8d190f59ad26073c76b5633be703055d3e887966f7d9c690aa6711c4f46b92f",
+      "partitions": [
+        [
+          0,
+          3
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          24,
+          28
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l27:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l27:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l27:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        75
+      ],
+      "neuron_domain": [
+        0,
+        18944
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "1546974901fcf03bb79b5bc128b98926336c51e6724293727efd7a7e81ca333a",
+      "partitions": [
+        [
+          0,
+          2368
+        ],
+        [
+          2368,
+          4736
+        ],
+        [
+          4736,
+          7104
+        ],
+        [
+          7104,
+          9472
+        ],
+        [
+          9472,
+          11840
+        ],
+        [
+          11840,
+          14208
+        ],
+        [
+          14208,
+          16576
+        ],
+        [
+          16576,
+          18944
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l27:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l27:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        75
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/layer_027.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:vocab",
+      "event_type": "label_free_vocab_state",
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/deepseek7b/p371c_a2e64292dac60c98a260204/time_2/time_meta.pt",
+        "tensor_pointer": "full_vocabulary_logits",
+        "slice": "all"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "t0:l0:input",
+      "target": "t0:l0:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l0:qk",
+      "target": "t0:l0:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l0:attn_heads",
+      "target": "t0:l0:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l0:input",
+      "target": "t0:l0:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l0:attn_merge",
+      "target": "t0:l0:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l0:attn_residual",
+      "target": "t0:l0:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l0:mlp_neurons",
+      "target": "t0:l0:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l0:attn_residual",
+      "target": "t0:l0:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l0:mlp_merge",
+      "target": "t0:l0:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l1:input",
+      "target": "t0:l1:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l1:qk",
+      "target": "t0:l1:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l1:attn_heads",
+      "target": "t0:l1:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l1:input",
+      "target": "t0:l1:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l1:attn_merge",
+      "target": "t0:l1:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l1:attn_residual",
+      "target": "t0:l1:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l1:mlp_neurons",
+      "target": "t0:l1:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l1:attn_residual",
+      "target": "t0:l1:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l1:mlp_merge",
+      "target": "t0:l1:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l14:input",
+      "target": "t0:l14:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l14:qk",
+      "target": "t0:l14:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l14:attn_heads",
+      "target": "t0:l14:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l14:input",
+      "target": "t0:l14:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l14:attn_merge",
+      "target": "t0:l14:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l14:attn_residual",
+      "target": "t0:l14:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l14:mlp_neurons",
+      "target": "t0:l14:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l14:attn_residual",
+      "target": "t0:l14:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l14:mlp_merge",
+      "target": "t0:l14:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l15:input",
+      "target": "t0:l15:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l15:qk",
+      "target": "t0:l15:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l15:attn_heads",
+      "target": "t0:l15:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l15:input",
+      "target": "t0:l15:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l15:attn_merge",
+      "target": "t0:l15:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l15:attn_residual",
+      "target": "t0:l15:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l15:mlp_neurons",
+      "target": "t0:l15:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l15:attn_residual",
+      "target": "t0:l15:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l15:mlp_merge",
+      "target": "t0:l15:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l26:input",
+      "target": "t0:l26:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l26:qk",
+      "target": "t0:l26:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l26:attn_heads",
+      "target": "t0:l26:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l26:input",
+      "target": "t0:l26:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l26:attn_merge",
+      "target": "t0:l26:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l26:attn_residual",
+      "target": "t0:l26:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l26:mlp_neurons",
+      "target": "t0:l26:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l26:attn_residual",
+      "target": "t0:l26:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l26:mlp_merge",
+      "target": "t0:l26:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l27:input",
+      "target": "t0:l27:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l27:qk",
+      "target": "t0:l27:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l27:attn_heads",
+      "target": "t0:l27:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l27:input",
+      "target": "t0:l27:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l27:attn_merge",
+      "target": "t0:l27:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l27:attn_residual",
+      "target": "t0:l27:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l27:mlp_neurons",
+      "target": "t0:l27:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l27:attn_residual",
+      "target": "t0:l27:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l27:mlp_merge",
+      "target": "t0:l27:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l0:output",
+      "target": "t0:l1:input",
+      "type": "verified_layer_continuity",
+      "pair": "early",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t0:l14:output",
+      "target": "t0:l15:input",
+      "type": "verified_layer_continuity",
+      "pair": "middle",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t0:l26:output",
+      "target": "t0:l27:input",
+      "type": "verified_layer_continuity",
+      "pair": "late",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t0:l27:output",
+      "target": "t0:vocab",
+      "type": "final_norm_and_unembedding"
+    },
+    {
+      "source": "t0:vocab",
+      "target": "t1:l0:input",
+      "type": "greedy_generation_feedback"
+    },
+    {
+      "source": "t1:l0:input",
+      "target": "t1:l0:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l0:qk",
+      "target": "t1:l0:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l0:attn_heads",
+      "target": "t1:l0:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l0:input",
+      "target": "t1:l0:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l0:attn_merge",
+      "target": "t1:l0:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l0:attn_residual",
+      "target": "t1:l0:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l0:mlp_neurons",
+      "target": "t1:l0:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l0:attn_residual",
+      "target": "t1:l0:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l0:mlp_merge",
+      "target": "t1:l0:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l1:input",
+      "target": "t1:l1:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l1:qk",
+      "target": "t1:l1:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l1:attn_heads",
+      "target": "t1:l1:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l1:input",
+      "target": "t1:l1:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l1:attn_merge",
+      "target": "t1:l1:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l1:attn_residual",
+      "target": "t1:l1:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l1:mlp_neurons",
+      "target": "t1:l1:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l1:attn_residual",
+      "target": "t1:l1:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l1:mlp_merge",
+      "target": "t1:l1:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l14:input",
+      "target": "t1:l14:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l14:qk",
+      "target": "t1:l14:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l14:attn_heads",
+      "target": "t1:l14:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l14:input",
+      "target": "t1:l14:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l14:attn_merge",
+      "target": "t1:l14:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l14:attn_residual",
+      "target": "t1:l14:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l14:mlp_neurons",
+      "target": "t1:l14:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l14:attn_residual",
+      "target": "t1:l14:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l14:mlp_merge",
+      "target": "t1:l14:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l15:input",
+      "target": "t1:l15:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l15:qk",
+      "target": "t1:l15:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l15:attn_heads",
+      "target": "t1:l15:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l15:input",
+      "target": "t1:l15:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l15:attn_merge",
+      "target": "t1:l15:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l15:attn_residual",
+      "target": "t1:l15:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l15:mlp_neurons",
+      "target": "t1:l15:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l15:attn_residual",
+      "target": "t1:l15:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l15:mlp_merge",
+      "target": "t1:l15:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l26:input",
+      "target": "t1:l26:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l26:qk",
+      "target": "t1:l26:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l26:attn_heads",
+      "target": "t1:l26:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l26:input",
+      "target": "t1:l26:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l26:attn_merge",
+      "target": "t1:l26:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l26:attn_residual",
+      "target": "t1:l26:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l26:mlp_neurons",
+      "target": "t1:l26:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l26:attn_residual",
+      "target": "t1:l26:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l26:mlp_merge",
+      "target": "t1:l26:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l27:input",
+      "target": "t1:l27:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l27:qk",
+      "target": "t1:l27:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l27:attn_heads",
+      "target": "t1:l27:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l27:input",
+      "target": "t1:l27:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l27:attn_merge",
+      "target": "t1:l27:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l27:attn_residual",
+      "target": "t1:l27:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l27:mlp_neurons",
+      "target": "t1:l27:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l27:attn_residual",
+      "target": "t1:l27:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l27:mlp_merge",
+      "target": "t1:l27:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l0:output",
+      "target": "t1:l1:input",
+      "type": "verified_layer_continuity",
+      "pair": "early",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t1:l14:output",
+      "target": "t1:l15:input",
+      "type": "verified_layer_continuity",
+      "pair": "middle",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t1:l26:output",
+      "target": "t1:l27:input",
+      "type": "verified_layer_continuity",
+      "pair": "late",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t1:l27:output",
+      "target": "t1:vocab",
+      "type": "final_norm_and_unembedding"
+    },
+    {
+      "source": "t1:vocab",
+      "target": "t2:l0:input",
+      "type": "greedy_generation_feedback"
+    },
+    {
+      "source": "t2:l0:input",
+      "target": "t2:l0:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l0:qk",
+      "target": "t2:l0:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l0:attn_heads",
+      "target": "t2:l0:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l0:input",
+      "target": "t2:l0:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l0:attn_merge",
+      "target": "t2:l0:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l0:attn_residual",
+      "target": "t2:l0:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l0:mlp_neurons",
+      "target": "t2:l0:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l0:attn_residual",
+      "target": "t2:l0:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l0:mlp_merge",
+      "target": "t2:l0:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l1:input",
+      "target": "t2:l1:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l1:qk",
+      "target": "t2:l1:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l1:attn_heads",
+      "target": "t2:l1:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l1:input",
+      "target": "t2:l1:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l1:attn_merge",
+      "target": "t2:l1:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l1:attn_residual",
+      "target": "t2:l1:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l1:mlp_neurons",
+      "target": "t2:l1:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l1:attn_residual",
+      "target": "t2:l1:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l1:mlp_merge",
+      "target": "t2:l1:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l14:input",
+      "target": "t2:l14:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l14:qk",
+      "target": "t2:l14:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l14:attn_heads",
+      "target": "t2:l14:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l14:input",
+      "target": "t2:l14:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l14:attn_merge",
+      "target": "t2:l14:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l14:attn_residual",
+      "target": "t2:l14:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l14:mlp_neurons",
+      "target": "t2:l14:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l14:attn_residual",
+      "target": "t2:l14:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l14:mlp_merge",
+      "target": "t2:l14:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l15:input",
+      "target": "t2:l15:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l15:qk",
+      "target": "t2:l15:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l15:attn_heads",
+      "target": "t2:l15:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l15:input",
+      "target": "t2:l15:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l15:attn_merge",
+      "target": "t2:l15:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l15:attn_residual",
+      "target": "t2:l15:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l15:mlp_neurons",
+      "target": "t2:l15:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l15:attn_residual",
+      "target": "t2:l15:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l15:mlp_merge",
+      "target": "t2:l15:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l26:input",
+      "target": "t2:l26:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l26:qk",
+      "target": "t2:l26:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l26:attn_heads",
+      "target": "t2:l26:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l26:input",
+      "target": "t2:l26:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l26:attn_merge",
+      "target": "t2:l26:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l26:attn_residual",
+      "target": "t2:l26:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l26:mlp_neurons",
+      "target": "t2:l26:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l26:attn_residual",
+      "target": "t2:l26:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l26:mlp_merge",
+      "target": "t2:l26:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l27:input",
+      "target": "t2:l27:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l27:qk",
+      "target": "t2:l27:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l27:attn_heads",
+      "target": "t2:l27:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l27:input",
+      "target": "t2:l27:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l27:attn_merge",
+      "target": "t2:l27:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l27:attn_residual",
+      "target": "t2:l27:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l27:mlp_neurons",
+      "target": "t2:l27:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l27:attn_residual",
+      "target": "t2:l27:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l27:mlp_merge",
+      "target": "t2:l27:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l0:output",
+      "target": "t2:l1:input",
+      "type": "verified_layer_continuity",
+      "pair": "early",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t2:l14:output",
+      "target": "t2:l15:input",
+      "type": "verified_layer_continuity",
+      "pair": "middle",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t2:l26:output",
+      "target": "t2:l27:input",
+      "type": "verified_layer_continuity",
+      "pair": "late",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t2:l27:output",
+      "target": "t2:vocab",
+      "type": "final_norm_and_unembedding"
+    }
+  ],
+  "implicit_exact_event_counts": {
+    "query_key_score_events": 2760240,
+    "attention_head_write_events": 37296,
+    "mlp_single_neuron_write_events": 25233408,
+    "residual_merge_events": 2664
+  },
+  "claim_boundary": {
+    "label_free_extraction": true,
+    "semantic_labels_available": false,
+    "candidate_selected": false,
+    "language_path_claimed": false,
+    "global_all_layer_path": false
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": "47.3.0",
+  "phase_id": "Phase371B",
+  "created_at": "2026-07-12T04:47:55.276472+00:00",
+  "objective": "audit_three_model_exact_qk_tree_engineering_and_frozen_storage_projection",
+  "denominator": {
+    "model_count": 3,
+    "engineering_case_count": 3,
+    "generation_time_count_per_case": 3,
+    "anchor_count_per_time": 3,
+    "audit_row_count": 27,
+    "projected_discovery_case_count": 336
+  },
+  "results": {
+    "three_model_numeric_gate_pass": true,
+    "file_hash_and_shape_contract_pass": true,
+    "materialized_derivative_storage_gate_pass": false,
+    "sufficient_state_storage_projection_pass": true,
+    "phase371b_full_gate_pass": false,
+    "phase371c_authorized": false,
+    "language_mechanism_claimed": false
+  },
+  "storage": {
+    "engineering_measured_bytes": 809648661,
+    "tensor_breakdown": {
+      "component_vectors": 94574592,
+      "attention_sufficient_state": 29650128,
+      "attention_materialized_derivatives": 520814592,
+      "mlp_sufficient_state": 56337408,
+      "mlp_materialized_derivatives": 108085248
+    },
+    "projected_materialized_full_discovery_bytes": 90680650032,
+    "projected_sufficient_state_full_discovery_bytes": 20243867952,
+    "frozen_budget_bytes": 68719476736,
+    "free_disk_bytes_at_audit": 1302022230016,
+    "minimum_free_reserve_bytes": 214748364800
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "engineering_case_count": 1,
+      "phase369_discovery_case_count": 112,
+      "row_count": 9,
+      "measured_byte_count": 223534599,
+      "tensor_breakdown": {
+        "component_vectors": 25159680,
+        "attention_sufficient_state": 12130944,
+        "attention_materialized_derivatives": 143769600,
+        "mlp_sufficient_state": 13658112,
+        "mlp_materialized_derivatives": 28753920
+      },
+      "serialization_overhead_bytes": 62343,
+      "projected_materialized_byte_count": 25035875088,
+      "projected_sufficient_state_byte_count": 5713240848,
+      "all_numeric_gates_pass": true,
+      "contract_error_count": 0
+    },
+    {
+      "model": "glm4",
+      "engineering_case_count": 1,
+      "phase369_discovery_case_count": 112,
+      "row_count": 9,
+      "measured_byte_count": 300872967,
+      "tensor_breakdown": {
+        "component_vectors": 35094528,
+        "attention_sufficient_state": 8304000,
+        "attention_materialized_derivatives": 200540160,
+        "mlp_sufficient_state": 16763904,
+        "mlp_materialized_derivatives": 40108032
+      },
+      "serialization_overhead_bytes": 62343,
+      "projected_materialized_byte_count": 33697772304,
+      "projected_sufficient_state_byte_count": 6745174800,
+      "all_numeric_gates_pass": true,
+      "contract_error_count": 0
+    },
+    {
+      "model": "deepseek7b",
+      "engineering_case_count": 1,
+      "phase369_discovery_case_count": 112,
+      "row_count": 9,
+      "measured_byte_count": 285241095,
+      "tensor_breakdown": {
+        "component_vectors": 34320384,
+        "attention_sufficient_state": 9215184,
+        "attention_materialized_derivatives": 176504832,
+        "mlp_sufficient_state": 25915392,
+        "mlp_materialized_derivatives": 39223296
+      },
+      "serialization_overhead_bytes": 62007,
+      "projected_materialized_byte_count": 31947002640,
+      "projected_sufficient_state_byte_count": 7785452304,
+      "all_numeric_gates_pass": true,
+      "contract_error_count": 0
+    }
+  ],
+  "contract_errors": [],
+  "interpretation": {
+    "actual_qk_capture_feasible": true,
+    "materializing_all_head_and_partition_writes_is_redundant": true,
+    "sufficient_state_can_reconstruct_removed_derivatives_exactly": true,
+    "storage_failure_is_a_representation_failure_not_a_language_mechanism_result": true
+  },
+  "authorization": {
+    "freeze_lossless_sufficient_state_compaction_contract": true,
+    "rerun_models_for_compaction": false,
+    "rewrite_private_engineering_copies_from_existing_files": true,
+    "new_case_collection": false,
+    "calibration_or_physical_holdout": false
+  },
+  "next_decision": "validate_lossless_on_demand_replay_from_compacted_existing_engineering_files"
+}

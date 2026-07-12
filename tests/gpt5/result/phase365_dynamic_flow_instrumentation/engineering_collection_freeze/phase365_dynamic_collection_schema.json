@@ -1,0 +1,80 @@
+{
+  "schema_version": "42.4.0",
+  "phase_id": "Phase365-B",
+  "created_at": "2026-07-12T02:08:17.088202+00:00",
+  "scope": {
+    "case_count": 96,
+    "model_count": 3,
+    "admitted_mechanism_count": 4,
+    "group_count_per_model_mechanism": 2,
+    "condition_count_per_group": 4,
+    "generation_time_count": 3,
+    "role_names": [
+      "source",
+      "query",
+      "answer_start",
+      "current_generation"
+    ],
+    "scope_is_all_token_positions": false,
+    "scope_name": "four_role_dynamic_flow_engineering_pilot"
+  },
+  "saved_per_layer_time": {
+    "role_component_vectors": [
+      "layer_input",
+      "input_normalized_state",
+      "attention_output",
+      "post_attention_state",
+      "post_attention_normalized_state",
+      "mlp_output",
+      "layer_output"
+    ],
+    "attention": [
+      "value_states_before_output_projection_all_sources",
+      "attention_probabilities_all_heads_role_receivers_all_sources",
+      "output_projection_weight_reference"
+    ],
+    "mlp": [
+      "gate_pre_at_roles",
+      "up_at_roles",
+      "down_projection_input_product_at_roles",
+      "down_projection_weight_reference",
+      "channel_ids"
+    ],
+    "vocab": [
+      "full_vocabulary_logits_at_current_generation"
+    ],
+    "quality": [
+      "native_dtype_add_order",
+      "attention_source_conservation",
+      "mlp_neuron_conservation",
+      "block_conservation",
+      "repeat_hash"
+    ]
+  },
+  "derived_not_saved": {
+    "attention_source_residual_writes": "replay_from_values_probabilities_and_output_weight",
+    "mlp_single_neuron_residual_writes": "replay_from_product_and_down_weight_columns",
+    "condition_contrasts": "only_after_typed_event_alignment_and_path_freeze",
+    "public_backbone_residual": "optional_view_raw_events_must_remain"
+  },
+  "blindness": {
+    "collection_reads_family_or_mechanism": false,
+    "collection_reads_condition_semantics": false,
+    "collection_reads_target_or_distractors": false,
+    "private_execution_registry_contains_labels": true,
+    "blind_output_strips_private_labels": true
+  },
+  "threshold_policy": {
+    "fixed_execution_repeat_noise_floor": 0.0,
+    "template_and_condition_floor_still_missing": true,
+    "mad_only_path_threshold_allowed": false,
+    "multiscale_threshold_persistence_counts_as_replication": false
+  },
+  "execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "causal_intervention": false,
+  "physical_confirmation_opened": false
+}

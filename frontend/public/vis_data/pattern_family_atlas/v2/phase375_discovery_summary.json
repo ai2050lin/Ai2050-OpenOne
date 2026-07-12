@@ -1,0 +1,83 @@
+{
+  "schema_version": "48.4.0",
+  "phase_id": "Phase375-Discovery-Merge",
+  "created_at": "2026-07-12T07:08:37.368514+00:00",
+  "objective": "merge_model_specific_finite_subgraph_gates_without_coordinate_alignment",
+  "execution": {
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "model_execution": false,
+    "calibration_opened": false,
+    "physical_opened": false
+  },
+  "denominator": {
+    "model_count": 3,
+    "total_group_candidate_count": 792,
+    "total_lexical_evaluation_count": 1584,
+    "model_candidate_count": 0,
+    "canonical_candidate_count": 0
+  },
+  "results": {
+    "heterogeneous_level2_count": 0,
+    "level3_count": 0,
+    "causal_replay_authorized": false,
+    "language_path_candidate_count": 0,
+    "language_mechanism_claimed": false
+  },
+  "model_summaries": [
+    {
+      "model": "qwen3",
+      "model_candidate_count": 0,
+      "failed_gate_counts": {
+        "absolute_error": 528,
+        "best_single": 358,
+        "history": 120,
+        "past": 362,
+        "vocab_context": 240,
+        "wrong_depth": 285,
+        "wrong_group": 374,
+        "wrong_role": 390
+      }
+    },
+    {
+      "model": "glm4",
+      "model_candidate_count": 0,
+      "failed_gate_counts": {
+        "absolute_error": 528,
+        "best_single": 386,
+        "history": 109,
+        "past": 404,
+        "vocab_context": 144,
+        "wrong_depth": 300,
+        "wrong_group": 401,
+        "wrong_role": 403
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "model_candidate_count": 0,
+      "failed_gate_counts": {
+        "absolute_error": 528,
+        "best_single": 445,
+        "history": 67,
+        "past": 457,
+        "vocab_context": 348,
+        "wrong_depth": 380,
+        "wrong_group": 468,
+        "wrong_role": 475
+      }
+    }
+  ],
+  "cross_model_rows": [],
+  "authorization": {
+    "run_discovery_same_graph_causal_replay": false,
+    "open_calibration": false,
+    "open_physical": false,
+    "single_neuron_scan": false
+  },
+  "next_decision": "stop_and_reject_current_finite_state_templates",
+  "protocol_hash": "ea019e3a1b993aae16fbf3c9d744e4fcd6dc68bb27933140e1cdbe07843503a9"
+}

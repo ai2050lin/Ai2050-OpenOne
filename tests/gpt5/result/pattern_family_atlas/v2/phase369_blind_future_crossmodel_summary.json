@@ -1,0 +1,246 @@
+{
+  "schema_version": "46.2.0",
+  "phase_id": "Phase369",
+  "created_at": "2026-07-12T04:15:48.578390+00:00",
+  "objective": "test_whether_coordinate_invariant_raw_relations_add_blind_future_and_cross_model_information_beyond_the_old_ten_descriptors",
+  "denominator": {
+    "model_count": 3,
+    "case_count": 336,
+    "case_count_per_model": 112,
+    "independent_group_count_per_model": 28,
+    "cross_model_pair_count": 3,
+    "depth_resample_points": 32
+  },
+  "future_prediction": [
+    {
+      "model": "qwen3",
+      "case_count": 112,
+      "independent_group_count": 28,
+      "mean_future_flow_errors": {
+        "raw_relation": 0.02360991,
+        "low_ten_descriptor": 0.02377236,
+        "random_flow": 0.05694381,
+        "time_shuffle": 0.0552934,
+        "role_permutation": 0.05533827,
+        "equal_energy_wrong_flow": 0.02353663,
+        "public_backbone": 0.0403651
+      },
+      "mean_vocab_errors": {
+        "raw_relation": 0.03212354,
+        "low_ten_descriptor": 0.04249146,
+        "random_flow": 0.05757746,
+        "time_shuffle": 0.04109811,
+        "role_permutation": 0.03197905,
+        "equal_energy_wrong_flow": 0.04364148,
+        "public_backbone": 0.02980671
+      },
+      "raw_case_win_fraction_over_low": 0.17857143,
+      "component_gates": {
+        "raw_mean_future_flow_error_strictly_below_low_ten_descriptor": true,
+        "raw_case_win_fraction_over_low_strictly_above_half": false,
+        "raw_mean_vocab_error_not_above_low": true,
+        "raw_mean_future_flow_error_below_random": true,
+        "raw_mean_future_flow_error_below_time_shuffle": true,
+        "raw_mean_future_flow_error_below_role_permutation": true,
+        "raw_mean_future_flow_error_below_equal_energy_wrong_flow": false,
+        "raw_mean_future_flow_error_below_public_backbone": true
+      },
+      "all_future_prediction_components_pass": false
+    },
+    {
+      "model": "glm4",
+      "case_count": 112,
+      "independent_group_count": 28,
+      "mean_future_flow_errors": {
+        "raw_relation": 0.02972003,
+        "low_ten_descriptor": 0.03074608,
+        "random_flow": 0.06427462,
+        "time_shuffle": 0.06454887,
+        "role_permutation": 0.05965235,
+        "equal_energy_wrong_flow": 0.0312036,
+        "public_backbone": 0.04788062
+      },
+      "mean_vocab_errors": {
+        "raw_relation": 0.01370847,
+        "low_ten_descriptor": 0.01401253,
+        "random_flow": 0.02776837,
+        "time_shuffle": 0.02814582,
+        "role_permutation": 0.01952537,
+        "equal_energy_wrong_flow": 0.01540065,
+        "public_backbone": 0.02012868
+      },
+      "raw_case_win_fraction_over_low": 0.09821428,
+      "component_gates": {
+        "raw_mean_future_flow_error_strictly_below_low_ten_descriptor": true,
+        "raw_case_win_fraction_over_low_strictly_above_half": false,
+        "raw_mean_vocab_error_not_above_low": true,
+        "raw_mean_future_flow_error_below_random": true,
+        "raw_mean_future_flow_error_below_time_shuffle": true,
+        "raw_mean_future_flow_error_below_role_permutation": true,
+        "raw_mean_future_flow_error_below_equal_energy_wrong_flow": true,
+        "raw_mean_future_flow_error_below_public_backbone": true
+      },
+      "all_future_prediction_components_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 112,
+      "independent_group_count": 28,
+      "mean_future_flow_errors": {
+        "raw_relation": 0.03413307,
+        "low_ten_descriptor": 0.03405182,
+        "random_flow": 0.08831753,
+        "time_shuffle": 0.07129283,
+        "role_permutation": 0.06359345,
+        "equal_energy_wrong_flow": 0.03602289,
+        "public_backbone": 0.05869458
+      },
+      "mean_vocab_errors": {
+        "raw_relation": 0.05281632,
+        "low_ten_descriptor": 0.05109575,
+        "random_flow": 0.07256799,
+        "time_shuffle": 0.05058111,
+        "role_permutation": 0.0648787,
+        "equal_energy_wrong_flow": 0.05372891,
+        "public_backbone": 0.05505704
+      },
+      "raw_case_win_fraction_over_low": 0.09821428,
+      "component_gates": {
+        "raw_mean_future_flow_error_strictly_below_low_ten_descriptor": false,
+        "raw_case_win_fraction_over_low_strictly_above_half": false,
+        "raw_mean_vocab_error_not_above_low": false,
+        "raw_mean_future_flow_error_below_random": true,
+        "raw_mean_future_flow_error_below_time_shuffle": true,
+        "raw_mean_future_flow_error_below_role_permutation": true,
+        "raw_mean_future_flow_error_below_equal_energy_wrong_flow": true,
+        "raw_mean_future_flow_error_below_public_backbone": true
+      },
+      "all_future_prediction_components_pass": false
+    }
+  ],
+  "cross_model": [
+    {
+      "left_model": "qwen3",
+      "right_model": "glm4",
+      "architecture_relation": "heterogeneous",
+      "case_count_each": 112,
+      "raw_residual": {
+        "matched_mean_distance": 0.05957701,
+        "wrong_mean_distance": 0.06224748,
+        "matched_separation_ratio": 0.95709914,
+        "top1_retrieval_rate": 0.01785714,
+        "top5_retrieval_rate": 0.11607143,
+        "mean_rank": 40.99106979
+      },
+      "low_residual": {
+        "matched_mean_distance": 0.06455051,
+        "wrong_mean_distance": 0.06850545,
+        "matched_separation_ratio": 0.94226825,
+        "top1_retrieval_rate": 0.04464286,
+        "top5_retrieval_rate": 0.16964285,
+        "mean_rank": 44.11606979
+      },
+      "random_top5_rate": 0.04464286,
+      "component_gates": {
+        "raw_residual_matched_separation_ratio_below_one": true,
+        "raw_residual_matched_separation_ratio_below_low_residual_ratio": false,
+        "raw_residual_top5_retrieval_rate_above_low_residual": false,
+        "raw_residual_top5_retrieval_rate_above_random_rate": true
+      },
+      "all_cross_model_components_pass": false,
+      "unrestricted_coordinate_rotation_fitted": false
+    },
+    {
+      "left_model": "glm4",
+      "right_model": "deepseek7b",
+      "architecture_relation": "heterogeneous",
+      "case_count_each": 112,
+      "raw_residual": {
+        "matched_mean_distance": 0.07398898,
+        "wrong_mean_distance": 0.07691661,
+        "matched_separation_ratio": 0.96193761,
+        "top1_retrieval_rate": 0.03571429,
+        "top5_retrieval_rate": 0.15178572,
+        "mean_rank": 37.9196434
+      },
+      "low_residual": {
+        "matched_mean_distance": 0.07220001,
+        "wrong_mean_distance": 0.07409719,
+        "matched_separation_ratio": 0.97439599,
+        "top1_retrieval_rate": 0.01785714,
+        "top5_retrieval_rate": 0.07142857,
+        "mean_rank": 43.6875
+      },
+      "random_top5_rate": 0.04464286,
+      "component_gates": {
+        "raw_residual_matched_separation_ratio_below_one": true,
+        "raw_residual_matched_separation_ratio_below_low_residual_ratio": true,
+        "raw_residual_top5_retrieval_rate_above_low_residual": true,
+        "raw_residual_top5_retrieval_rate_above_random_rate": true
+      },
+      "all_cross_model_components_pass": true,
+      "unrestricted_coordinate_rotation_fitted": false
+    },
+    {
+      "left_model": "qwen3",
+      "right_model": "deepseek7b",
+      "architecture_relation": "shared_qwen_architecture_family",
+      "case_count_each": 112,
+      "raw_residual": {
+        "matched_mean_distance": 0.07269011,
+        "wrong_mean_distance": 0.0745793,
+        "matched_separation_ratio": 0.9746688,
+        "top1_retrieval_rate": 0.01785714,
+        "top5_retrieval_rate": 0.08035714,
+        "mean_rank": 42.4732132
+      },
+      "low_residual": {
+        "matched_mean_distance": 0.06560118,
+        "wrong_mean_distance": 0.06708797,
+        "matched_separation_ratio": 0.97783828,
+        "top1_retrieval_rate": 0.01785714,
+        "top5_retrieval_rate": 0.11607143,
+        "mean_rank": 44.6696434
+      },
+      "random_top5_rate": 0.04464286,
+      "component_gates": {
+        "raw_residual_matched_separation_ratio_below_one": true,
+        "raw_residual_matched_separation_ratio_below_low_residual_ratio": true,
+        "raw_residual_top5_retrieval_rate_above_low_residual": false,
+        "raw_residual_top5_retrieval_rate_above_random_rate": true
+      },
+      "all_cross_model_components_pass": false,
+      "unrestricted_coordinate_rotation_fitted": false
+    }
+  ],
+  "evidence": {
+    "level_1_model_count": 0,
+    "level_1_models": [],
+    "level_2_heterogeneous_pair_count": 0,
+    "level_2_heterogeneous_pairs": [],
+    "qwen_deepseek_architecture_family_only_pass": false,
+    "level_3_all_three_models": false
+  },
+  "controls": {
+    "low_ten_descriptor": true,
+    "random_flow": true,
+    "time_shuffle": true,
+    "role_permutation": true,
+    "equal_energy_wrong_flow": true,
+    "public_backbone": true
+  },
+  "claim_boundary": {
+    "semantic_labels_used": false,
+    "target_rank_or_margin_used": false,
+    "head_or_neuron_topology_tested": false,
+    "calibration_executed": false,
+    "physical_holdout_opened": false,
+    "language_mechanism_discovered": false
+  },
+  "authorization": {
+    "head_and_neuron_topology_refinement": false,
+    "fresh_calibration_raw_collection": false,
+    "physical_holdout": false
+  },
+  "next_decision": "stop_phase369_before_head_neuron_calibration_and_physical_holdout"
+}

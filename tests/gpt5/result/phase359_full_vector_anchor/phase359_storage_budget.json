@@ -1,0 +1,103 @@
+{
+  "schema_version": "35.0.0",
+  "phase_id": "Phase359",
+  "created_at": "2026-07-11T16:09:19.872262+00:00",
+  "purpose": "storage_budget_freeze_before_blind_full_vector_discovery",
+  "models": [
+    {
+      "model": "qwen3",
+      "architecture": {
+        "layer_count": 36,
+        "hidden_size": 2560,
+        "intermediate_size": 9728,
+        "attention_head_count": 32
+      },
+      "assumptions": {
+        "model_case_count": 144,
+        "trace_passes_per_case": 8,
+        "planning_sequence_length": 256,
+        "native_dtype_bytes": 2,
+        "projected_contribution_dtype_bytes": 4
+      },
+      "naive_full_trace": {
+        "bytes_per_pass": 5284823040,
+        "bytes_all_cases": 6088116142080
+      },
+      "recommended_multiresolution": {
+        "r0_role_state_and_scalar_bytes": 7675969536,
+        "r1_balanced_single_shard_bytes": 201719808,
+        "r2_one_full_anchor_bytes": 5284823040,
+        "total_planned_bytes": 13162512384
+      }
+    },
+    {
+      "model": "glm4",
+      "architecture": {
+        "layer_count": 40,
+        "hidden_size": 4096,
+        "intermediate_size": 13696,
+        "attention_head_count": 32
+      },
+      "assumptions": {
+        "model_case_count": 144,
+        "trace_passes_per_case": 8,
+        "planning_sequence_length": 256,
+        "native_dtype_bytes": 2,
+        "projected_contribution_dtype_bytes": 4
+      },
+      "naive_full_trace": {
+        "bytes_per_pass": 9256304640,
+        "bytes_all_cases": 10663262945280
+      },
+      "recommended_multiresolution": {
+        "r0_role_state_and_scalar_bytes": 13624934400,
+        "r1_balanced_single_shard_bytes": 315555840,
+        "r2_one_full_anchor_bytes": 9256304640,
+        "total_planned_bytes": 23196794880
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "architecture": {
+        "layer_count": 28,
+        "hidden_size": 3584,
+        "intermediate_size": 18944,
+        "attention_head_count": 28
+      },
+      "assumptions": {
+        "model_case_count": 144,
+        "trace_passes_per_case": 8,
+        "planning_sequence_length": 256,
+        "native_dtype_bytes": 2,
+        "projected_contribution_dtype_bytes": 4
+      },
+      "naive_full_trace": {
+        "bytes_per_pass": 5358223360,
+        "bytes_all_cases": 6172673310720
+      },
+      "recommended_multiresolution": {
+        "r0_role_state_and_scalar_bytes": 8346304512,
+        "r1_balanced_single_shard_bytes": 305528832,
+        "r2_one_full_anchor_bytes": 5358223360,
+        "total_planned_bytes": 14010056704
+      }
+    }
+  ],
+  "global": {
+    "naive_full_trace_bytes": 22924052398080,
+    "recommended_multiresolution_bytes": 50369363968,
+    "disk_free_bytes_at_freeze": 1379268964352,
+    "minimum_free_space_reserve_bytes": 214748364800,
+    "naive_full_trace_fits_with_reserve": false,
+    "recommended_multiresolution_fits_with_reserve": true
+  },
+  "frozen_policy": {
+    "r0": "all cases; four pre-registered position roles; component states plus scalar head/shard ledgers",
+    "r1": "balanced hash assignment; one raw MLP shard per case; no label-conditioned selection",
+    "r2": "one sealed full-vector anchor per model until replay audit passes",
+    "r3": "held-out and causal traces remain unopened",
+    "frontend_raw_tensor_export": false,
+    "semantic_label_used_for_selection": false
+  },
+  "decision": "allow_one_full_vector_anchor_per_model"
+}

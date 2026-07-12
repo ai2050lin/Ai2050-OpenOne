@@ -1,0 +1,48 @@
+{
+  "schema_version": "42.1.0",
+  "phase_id": "Phase365",
+  "created_at": "2026-07-12T02:01:42.874347+00:00",
+  "denominator": {
+    "model_adapter_count": 3,
+    "real_checkpoint_reference_model_count": 3,
+    "dynamic_bundle_schema_count": 1,
+    "new_model_execution_count": 0
+  },
+  "results": {
+    "synthetic_adapter_gate_model_count": 3,
+    "real_checkpoint_down_reference_gate_model_count": 3,
+    "blind_bundle_schema_gate_pass": true,
+    "blind_bundle_schema_errors": [],
+    "target_specific_competition_blocked_during_discovery": true,
+    "typed_alignment_required_before_contrast": true,
+    "raw_event_retention_required": true,
+    "repeat_noise_floor_available": false
+  },
+  "authorization": {
+    "full_96_case_engineering_run_authorized": false,
+    "six_run_repeat_noise_format_gate_authorized": true,
+    "repeat_noise_format_gate": {
+      "model_order": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "fixed_case_count_per_model": 1,
+      "repeat_count_per_model": 2,
+      "total_forward_run_count": 6,
+      "selected_layer_roles": [
+        "early",
+        "middle",
+        "late"
+      ],
+      "causal_intervention": false
+    }
+  },
+  "claim_boundary": {
+    "synthetic_adapter_test_is_real_model_execution": false,
+    "real_checkpoint_weights_loaded": false,
+    "language_mechanism_tested": false,
+    "physical_confirmation_opened": false
+  },
+  "next_decision": "run_six_repeat_noise_format_forwards_sequentially_qwen3_glm4_deepseek7b"
+}

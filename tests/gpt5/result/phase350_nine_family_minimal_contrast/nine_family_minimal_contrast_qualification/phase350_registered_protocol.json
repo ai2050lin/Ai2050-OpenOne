@@ -1,0 +1,49 @@
+{
+  "schema_version": "26.0.0",
+  "phase_id": "Phase350",
+  "created_at": "2026-07-11T12:03:13.093230+00:00",
+  "purpose": "Qualify one manually controlled paired contrast per family before signed physical tracing.",
+  "registered_case_count": 2592,
+  "families": [
+    "content_knowledge",
+    "output_protocol",
+    "reasoning_constraint",
+    "syntax_structure",
+    "language_action",
+    "cross_lingual",
+    "readout_competition",
+    "state_drift",
+    "closure"
+  ],
+  "conditions": [
+    "A_operation_lex_x",
+    "B_control_lex_x",
+    "C_operation_lex_y",
+    "D_control_lex_y"
+  ],
+  "items_per_family": 12,
+  "templates": [
+    "format_a",
+    "format_b"
+  ],
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "split_contract": {
+    "physical_discovery": 6,
+    "physical_calibration": 2,
+    "physical_heldout": 2,
+    "causal_sealed": 2
+  },
+  "thresholds": {
+    "split_semantic_accuracy_min": 0.8,
+    "split_phrase_valid_rate_min": 1.0
+  },
+  "claim_boundaries": [
+    "The control may use an explicit shortcut or relaxed protocol; it is not a pure operation-off state.",
+    "Qualification tests behavior contracts only and cannot identify physical mechanisms.",
+    "Causal-sealed cases may be behavior-qualified but their internal traces remain sealed."
+  ]
+}

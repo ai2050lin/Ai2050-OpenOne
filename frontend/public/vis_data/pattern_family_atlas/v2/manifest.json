@@ -1,2527 +1,6 @@
 {
-  "program_id": "pattern_family_atlas_v2",
-  "schema_version": "2.0.0",
-  "phase": "Phase273",
-  "created_at": "2026-07-09T03:24:48.754550+00:00",
-  "source": "tests/result/pattern_family_atlas/v1",
-  "models": [
-    "qwen3",
-    "glm4",
-    "deepseek7b"
-  ],
-  "families": 9,
-  "path_signatures": 972,
-  "atlas_scores": 36,
-  "detail_files": 972,
-  "files": {
-    "schema": "schema.json",
-    "client_index": "client_index.json",
-    "families": "families.jsonl",
-    "modes": "modes.jsonl",
-    "cases": "cases.jsonl",
-    "path_signature_rows": "path_signature_rows.jsonl",
-    "atlas_scores": "atlas_scores.jsonl",
-    "graph_nodes": "graph_nodes.jsonl",
-    "graph_edges": "graph_edges.jsonl",
-    "summary": "summary.md",
-    "phase274_gap_rows": "phase274_gap_rows.jsonl",
-    "phase274_selected_batch_rows": "phase274_selected_batch_rows.jsonl",
-    "phase274_coverage_matrix_rows": "phase274_coverage_matrix_rows.jsonl",
-    "phase274_gap_summary": "phase274_gap_summary.json",
-    "phase274_gap_report": "phase274_gap_report.md",
-    "phase275_component_physical_path_rows": "phase275_component_physical_path_rows.jsonl",
-    "phase275_component_summary_rows": "phase275_component_summary_rows.jsonl",
-    "phase275_causal_fill_rows": "phase275_causal_fill_rows.jsonl",
-    "phase275_rollout_fill_rows": "phase275_rollout_fill_rows.jsonl",
-    "phase275_missing_rows": "phase275_missing_rows.jsonl",
-    "phase275_cross_model_summary": "phase275_cross_model_summary.json",
-    "phase275_report": "phase275_report.md",
-    "phase276_recalibrated_gap_rows": "phase276_recalibrated_gap_rows.jsonl",
-    "phase276_next_batch_rows": "phase276_next_batch_rows.jsonl",
-    "phase276_coverage_rows": "phase276_coverage_rows.jsonl",
-    "phase276_summary": "phase276_summary.json",
-    "phase276_report": "phase276_report.md",
-    "phase277_component_physical_path_rows": "phase277_component_physical_path_rows.jsonl",
-    "phase277_attention_contribution_rows": "phase277_attention_contribution_rows.jsonl",
-    "phase277_mlp_contribution_rows": "phase277_mlp_contribution_rows.jsonl",
-    "phase277_residual_accumulation_rows": "phase277_residual_accumulation_rows.jsonl",
-    "phase277_component_summary_rows": "phase277_component_summary_rows.jsonl",
-    "phase277_causal_fill_rows": "phase277_causal_fill_rows.jsonl",
-    "phase277_rollout_fill_rows": "phase277_rollout_fill_rows.jsonl",
-    "phase277_missing_rows": "phase277_missing_rows.jsonl",
-    "phase277_cross_model_summary": "phase277_cross_model_summary.json",
-    "phase277_report": "phase277_report.md",
-    "phase278_recalibrated_gap_rows": "phase278_recalibrated_gap_rows.jsonl",
-    "phase278_next_batch_rows": "phase278_next_batch_rows.jsonl",
-    "phase278_summary": "phase278_summary.json",
-    "phase278_report": "phase278_report.md",
-    "phase279_component_physical_path_rows": "phase279_component_physical_path_rows.jsonl",
-    "phase279_attention_contribution_rows": "phase279_attention_contribution_rows.jsonl",
-    "phase279_mlp_contribution_rows": "phase279_mlp_contribution_rows.jsonl",
-    "phase279_residual_accumulation_rows": "phase279_residual_accumulation_rows.jsonl",
-    "phase279_component_summary_rows": "phase279_component_summary_rows.jsonl",
-    "phase279_causal_fill_rows": "phase279_causal_fill_rows.jsonl",
-    "phase279_rollout_fill_rows": "phase279_rollout_fill_rows.jsonl",
-    "phase279_missing_rows": "phase279_missing_rows.jsonl",
-    "phase279_cross_model_summary": "phase279_cross_model_summary.json",
-    "phase279_report": "phase279_report.md",
-    "phase280_recalibrated_gap_rows": "phase280_recalibrated_gap_rows.jsonl",
-    "phase280_next_batch_rows": "phase280_next_batch_rows.jsonl",
-    "phase280_summary": "phase280_summary.json",
-    "phase280_report": "phase280_report.md",
-    "phase281_closure_quality_rows": "phase281_closure_quality_rows.jsonl",
-    "phase281_missing_rows": "phase281_missing_rows.jsonl",
-    "phase281_cross_model_summary": "phase281_cross_model_summary.json",
-    "phase281_report": "phase281_report.md",
-    "phase282_recalibrated_gap_rows": "phase282_recalibrated_gap_rows.jsonl",
-    "phase282_next_batch_rows": "phase282_next_batch_rows.jsonl",
-    "phase282_summary": "phase282_summary.json",
-    "phase282_report": "phase282_report.md",
-    "phase283_component_physical_path_rows": "phase283_component_physical_path_rows.jsonl",
-    "phase283_attention_contribution_rows": "phase283_attention_contribution_rows.jsonl",
-    "phase283_mlp_contribution_rows": "phase283_mlp_contribution_rows.jsonl",
-    "phase283_residual_accumulation_rows": "phase283_residual_accumulation_rows.jsonl",
-    "phase283_component_summary_rows": "phase283_component_summary_rows.jsonl",
-    "phase283_causal_fill_rows": "phase283_causal_fill_rows.jsonl",
-    "phase283_rollout_fill_rows": "phase283_rollout_fill_rows.jsonl",
-    "phase283_missing_rows": "phase283_missing_rows.jsonl",
-    "phase283_cross_model_summary": "phase283_cross_model_summary.json",
-    "phase283_report": "phase283_report.md",
-    "phase284_recalibrated_gap_rows": "phase284_recalibrated_gap_rows.jsonl",
-    "phase284_next_batch_rows": "phase284_next_batch_rows.jsonl",
-    "phase284_summary": "phase284_summary.json",
-    "phase284_report": "phase284_report.md",
-    "phase285_closure_quality_rows": "phase285_closure_quality_rows.jsonl",
-    "phase285_four_condition_rows": "phase285_four_condition_rows.jsonl",
-    "phase285_rollout_stability_rows": "phase285_rollout_stability_rows.jsonl",
-    "phase285_missing_rows": "phase285_missing_rows.jsonl",
-    "phase285_cross_model_summary": "phase285_cross_model_summary.json",
-    "phase285_report": "phase285_report.md",
-    "phase286_recalibrated_gap_rows": "phase286_recalibrated_gap_rows.jsonl",
-    "phase286_next_batch_rows": "phase286_next_batch_rows.jsonl",
-    "phase286_summary": "phase286_summary.json",
-    "phase286_report": "phase286_report.md",
-    "phase287_glm4_side_effect_risk_rows": "phase287_glm4_side_effect_risk_rows.jsonl",
-    "phase287_glm4_next_audit_rows": "phase287_glm4_next_audit_rows.jsonl",
-    "phase287_summary": "phase287_summary.json",
-    "phase287_report": "phase287_report.md",
-    "phase288_family_feature_matrix": "phase288_family_feature_matrix.jsonl",
-    "phase288_model_feature_matrix": "phase288_model_feature_matrix.jsonl",
-    "phase288_component_distribution_rows": "phase288_component_distribution_rows.jsonl",
-    "phase288_continue_channel_distribution_rows": "phase288_continue_channel_distribution_rows.jsonl",
-    "phase288_layer_curve_cluster_rows": "phase288_layer_curve_cluster_rows.jsonl",
-    "phase288_side_effect_distribution_rows": "phase288_side_effect_distribution_rows.jsonl",
-    "phase288_closure_bottleneck_rows": "phase288_closure_bottleneck_rows.jsonl",
-    "phase288_gap_heatmap_rows": "phase288_gap_heatmap_rows.jsonl",
-    "phase288_feature_mining_summary": "phase288_feature_mining_summary.json",
-    "phase288_feature_mining_report": "phase288_feature_mining_report.md",
-    "phase289_shared_backbone": "phase289_shared_backbone.jsonl",
-    "phase289_family_delta_rows": "phase289_family_delta_rows.jsonl",
-    "phase289_model_delta_rows": "phase289_model_delta_rows.jsonl",
-    "phase289_feature_driven_audit_candidates": "phase289_feature_driven_audit_candidates.jsonl",
-    "phase289_summary": "phase289_summary.json",
-    "phase289_report": "phase289_report.md",
-    "phase290_readout_channel_rows": "phase290_readout_channel_rows.jsonl",
-    "phase290_channel_family_model_matrix": "phase290_channel_family_model_matrix.jsonl",
-    "phase290_stop_continue_bottleneck_rows": "phase290_stop_continue_bottleneck_rows.jsonl",
-    "phase290_readout_competition_audit_queue": "phase290_readout_competition_audit_queue.jsonl",
-    "phase290_family_model_readout_summary": "phase290_family_model_readout_summary.jsonl",
-    "phase290_summary": "phase290_summary.json",
-    "phase290_report": "phase290_report.md",
-    "phase291_expanded_case_candidates": "phase291_expanded_case_candidates.jsonl",
-    "phase291_full_model_test_plan_rows": "phase291_full_model_test_plan_rows.jsonl",
-    "phase291_selected_large_batch_queue": "phase291_selected_large_batch_queue.jsonl",
-    "phase291_sample_type_coverage_rows": "phase291_sample_type_coverage_rows.jsonl",
-    "phase291_summary": "phase291_summary.json",
-    "phase291_report": "phase291_report.md",
-    "phase292_feature_matrix_v2_rows": "phase292_feature_matrix_v2_rows.jsonl",
-    "phase292_channel_entropy_rows": "phase292_channel_entropy_rows.jsonl",
-    "phase292_coverage_normalized_gap_rows": "phase292_coverage_normalized_gap_rows.jsonl",
-    "phase292_feature_priority_queue_rows": "phase292_feature_priority_queue_rows.jsonl",
-    "phase292_global_atlas_completion": "phase292_global_atlas_completion.json",
-    "phase292_report": "phase292_report.md",
-    "phase294_expanded_behavior_rows": "phase294_expanded_behavior_rows.jsonl",
-    "phase294_expanded_readout_rows": "phase294_expanded_readout_rows.jsonl",
-    "phase294_expanded_path_signature_rows": "phase294_expanded_path_signature_rows.jsonl",
-    "phase294_expanded_gap_rows": "phase294_expanded_gap_rows.jsonl",
-    "phase294_expanded_family_model_update_rows": "phase294_expanded_family_model_update_rows.jsonl",
-    "phase294_cross_model_summary": "phase294_cross_model_summary.json",
-    "phase294_report": "phase294_report.md",
-    "phase295_feature_matrix_v3_rows": "phase295_feature_matrix_v3_rows.jsonl",
-    "phase295_summary": "phase295_summary.json",
-    "phase295_report": "phase295_report.md",
-    "phase296_component_physical_path_rows": "phase296_component_physical_path_rows.jsonl",
-    "phase296_attention_contribution_rows": "phase296_attention_contribution_rows.jsonl",
-    "phase296_mlp_contribution_rows": "phase296_mlp_contribution_rows.jsonl",
-    "phase296_residual_accumulation_rows": "phase296_residual_accumulation_rows.jsonl",
-    "phase296_component_summary_rows": "phase296_component_summary_rows.jsonl",
-    "phase296_missing_rows": "phase296_missing_rows.jsonl",
-    "phase296_summary": "phase296_summary.json",
-    "phase296_report": "phase296_report.md",
-    "phase297_feature_matrix_v4_rows": "phase297_feature_matrix_v4_rows.jsonl",
-    "phase297_summary": "phase297_summary.json",
-    "phase297_report": "phase297_report.md"
-  },
-  "latest_gap_phase": "Phase274",
-  "phase274_gap_summary": {
-    "schema_version": "2.1.0",
-    "phase": "Phase274",
-    "generated_at": "2026-07-09T04:11:21.456555+00:00",
-    "model_test_status": "not_run_gap_queue_only",
-    "source_path_signatures": 972,
-    "gap_rows": 972,
-    "selected_batch_rows": 54,
-    "status_counts": {
-      "mapped_partial": 963,
-      "path_candidate_not_closed": 7,
-      "high_quality_candidate_not_closed": 2
-    },
-    "gap_flag_counts": {
-      "need_readout_competition": 376,
-      "candidate_not_closed": 9,
-      "need_component_path": 954,
-      "need_causal_audit": 959,
-      "need_layer_path": 891,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 376,
-      "need_closure_quality": 587
-    },
-    "batch_kind_counts": {
-      "candidate_closure_path_fill": 9,
-      "high_signal_missing_mechanism": 753,
-      "causal_audit_gap": 5,
-      "coverage_balance": 4,
-      "component_and_causal_gap": 201
-    },
-    "selected_by_model": {
-      "glm4": 18,
-      "deepseek7b": 18,
-      "qwen3": 18
-    },
-    "selected_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6,
-      "readout_competition": 6,
-      "reasoning_constraint": 6,
-      "state_drift": 6,
-      "language_action": 6
-    },
-    "top_pressure_cells": [
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:cross_lingual:deepseek7b",
-        "family_id": "cross_lingual",
-        "model": "deepseek7b",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.37037,
-          "readout": 0.304148,
-          "layer_path": 0.074132,
-          "component_path": 0.0,
-          "causal": 0.0,
-          "rollout": 0.555556,
-          "closure": 0.055556,
-          "overall": 0.194251
-        },
-        "status_counts": {
-          "mapped_partial": 36
-        },
-        "gap_counts": {
-          "need_component_path": 36,
-          "need_causal_audit": 36,
-          "need_layer_path": 33,
-          "good_behavior_low_path": 6,
-          "good_readout_low_causal": 10,
-          "need_closure_quality": 34,
-          "need_readout_competition": 8
-        },
-        "physical_distribution_progress": 0.126093,
-        "closure_readiness": 0.018519,
-        "priority_pressure": 0.994444
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:syntax_structure:glm4",
-        "family_id": "syntax_structure",
-        "model": "glm4",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.648148,
-          "readout": 0.200145,
-          "layer_path": 0.070679,
-          "component_path": 0.015198,
-          "causal": 0.0,
-          "rollout": 1.0,
-          "closure": 0.055556,
-          "overall": 0.284247
-        },
-        "status_counts": {
-          "mapped_partial": 36
-        },
-        "gap_counts": {
-          "need_component_path": 35,
-          "need_causal_audit": 36,
-          "need_layer_path": 33,
-          "need_readout_competition": 18,
-          "good_behavior_low_path": 31,
-          "need_closure_quality": 34
-        },
-        "physical_distribution_progress": 0.095341,
-        "closure_readiness": 0.023585,
-        "priority_pressure": 0.987605
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:content_knowledge:deepseek7b",
-        "family_id": "content_knowledge",
-        "model": "deepseek7b",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.333333,
-          "readout": 0.140963,
-          "layer_path": 0.074334,
-          "component_path": 0.015558,
-          "causal": 0.016204,
-          "rollout": 0.772217,
-          "closure": 0.010417,
-          "overall": 0.194718
-        },
-        "status_counts": {
-          "mapped_partial": 35,
-          "path_candidate_not_closed": 1
-        },
-        "gap_counts": {
-          "need_readout_competition": 32,
-          "candidate_not_closed": 1,
-          "need_component_path": 35,
-          "need_causal_audit": 35,
-          "need_closure_quality": 35,
-          "need_layer_path": 33,
-          "good_behavior_low_path": 2
-        },
-        "physical_distribution_progress": 0.076952,
-        "closure_readiness": 0.01406,
-        "priority_pressure": 0.984665
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:closure:deepseek7b",
-        "family_id": "closure",
-        "model": "deepseek7b",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.444444,
-          "readout": 0.219628,
-          "layer_path": 0.072434,
-          "component_path": 0.0,
-          "causal": 0.0,
-          "rollout": 0.722222,
-          "closure": 0.222222,
-          "overall": 0.240136
-        },
-        "status_counts": {
-          "mapped_partial": 36
-        },
-        "gap_counts": {
-          "need_component_path": 36,
-          "need_causal_audit": 36,
-          "need_layer_path": 33,
-          "need_readout_competition": 24,
-          "good_behavior_low_path": 12,
-          "need_closure_quality": 28,
-          "good_readout_low_causal": 2
-        },
-        "physical_distribution_progress": 0.097354,
-        "closure_readiness": 0.074074,
-        "priority_pressure": 0.977778
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:language_action:deepseek7b",
-        "family_id": "language_action",
-        "model": "deepseek7b",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.537037,
-          "readout": 0.297251,
-          "layer_path": 0.073476,
-          "component_path": 0.0,
-          "causal": 0.0,
-          "rollout": 0.555556,
-          "closure": 0.222222,
-          "overall": 0.240792
-        },
-        "status_counts": {
-          "mapped_partial": 36
-        },
-        "gap_counts": {
-          "need_component_path": 36,
-          "need_causal_audit": 36,
-          "need_layer_path": 33,
-          "good_behavior_low_path": 18,
-          "good_readout_low_causal": 16,
-          "need_closure_quality": 28,
-          "need_readout_competition": 20
-        },
-        "physical_distribution_progress": 0.123576,
-        "closure_readiness": 0.074074,
-        "priority_pressure": 0.977778
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:readout_competition:qwen3",
-        "family_id": "readout_competition",
-        "model": "qwen3",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.555556,
-          "readout": 0.364603,
-          "layer_path": 0.072974,
-          "component_path": 0.0,
-          "causal": 0.0,
-          "rollout": 0.722222,
-          "closure": 0.222222,
-          "overall": 0.276797
-        },
-        "status_counts": {
-          "mapped_partial": 36
-        },
-        "gap_counts": {
-          "need_component_path": 36,
-          "need_causal_audit": 36,
-          "need_layer_path": 33,
-          "good_behavior_low_path": 20,
-          "good_readout_low_causal": 14,
-          "need_closure_quality": 28,
-          "need_readout_competition": 6
-        },
-        "physical_distribution_progress": 0.145859,
-        "closure_readiness": 0.074074,
-        "priority_pressure": 0.977778
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:content_knowledge:glm4",
-        "family_id": "content_knowledge",
-        "model": "glm4",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.537037,
-          "readout": 0.311266,
-          "layer_path": 0.058391,
-          "component_path": 0.014103,
-          "causal": 0.016204,
-          "rollout": 0.881944,
-          "closure": 0.173611,
-          "overall": 0.284651
-        },
-        "status_counts": {
-          "mapped_partial": 35,
-          "path_candidate_not_closed": 1
-        },
-        "gap_counts": {
-          "need_component_path": 35,
-          "need_causal_audit": 35,
-          "need_layer_path": 33,
-          "good_behavior_low_path": 20,
-          "good_readout_low_causal": 6,
-          "need_closure_quality": 30,
-          "need_readout_competition": 6,
-          "candidate_not_closed": 1
-        },
-        "physical_distribution_progress": 0.12792,
-        "closure_readiness": 0.067973,
-        "priority_pressure": 0.969001
-      },
-      {
-        "schema_version": "2.1.0",
-        "coverage_id": "phase274:coverage:readout_competition:glm4",
-        "family_id": "readout_competition",
-        "model": "glm4",
-        "case_count": 36,
-        "scores": {
-          "behavior": 0.62963,
-          "readout": 0.456125,
-          "layer_path": 0.070211,
-          "component_path": 0.015942,
-          "causal": 0.006944,
-          "rollout": 0.888862,
-          "closure": 0.229167,
-          "overall": 0.328126
-        },
-        "status_counts": {
-          "mapped_partial": 35,
-          "path_candidate_not_closed": 1
-        },
-        "gap_counts": {
-          "need_component_path": 35,
-          "need_causal_audit": 35,
-          "need_layer_path": 33,
-          "good_behavior_low_path": 24,
-          "good_readout_low_causal": 20,
-          "need_closure_quality": 28,
-          "candidate_not_closed": 1,
-          "need_readout_competition": 6
-        },
-        "physical_distribution_progress": 0.180759,
-        "closure_readiness": 0.084018,
-        "priority_pressure": 0.966785
-      }
-    ],
-    "priority_rule": "candidate statuses first, then high behavior/readout with missing component/causal, then family-model pressure balancing",
-    "next_executable_phase": "Phase275 should run selected_batch_rows sequentially on qwen3, GLM4, and DS7B for component path and low-side-effect causal fill."
-  },
-  "latest_fill_phase": "Phase283",
-  "phase275_summary": {
-    "phase": 275,
-    "schema_version": "2.2.0",
-    "phase_id": "Phase275",
-    "title": "Selected Phase274 gap batch physical path fill",
-    "status": "complete",
-    "created_at": "2026-07-09T04:48:38.344651+00:00",
-    "round_name": "selected_gap_batch_physical_path_fill_full",
-    "model_summaries": [
-      {
-        "phase": 275,
-        "schema_version": "2.2.0",
-        "phase_id": "Phase275",
-        "title": "Selected Phase274 gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T04:47:29.957887+00:00",
-        "model": "qwen3",
-        "selected_gap_rows": 17,
-        "component_physical_path_rows": 612,
-        "component_summary_rows": 17,
-        "causal_fill_rows": 34,
-        "rollout_fill_rows": 34,
-        "missing_rows": 0,
-        "family_counts": {
-          "closure": 2,
-          "cross_lingual": 2,
-          "state_drift": 2,
-          "reasoning_constraint": 2,
-          "output_protocol": 2,
-          "language_action": 2,
-          "readout_competition": 2,
-          "content_knowledge": 2,
-          "syntax_structure": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 17
-        },
-        "final_winner_counts": {
-          "continue": 17
-        },
-        "strongest_mlp_layers": {
-          "35": 11,
-          "34": 4,
-          "16": 2
-        },
-        "mean_sum_positive_attn_delta": 12.535522,
-        "mean_sum_positive_mlp_delta": 26.882138,
-        "mean_sum_positive_residual_delta": 0.23979,
-        "causal_effect_supported_counts": {
-          "True": 30,
-          "False": 4
-        },
-        "side_effect_risk_counts": {
-          "False": 22,
-          "True": 12
-        },
-        "low_side_effect_supported_rate": 0.882353,
-        "low_side_effect_risk_rate": 0.117647
-      },
-      {
-        "phase": 275,
-        "schema_version": "2.2.0",
-        "phase_id": "Phase275",
-        "title": "Selected Phase274 gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T04:47:49.917541+00:00",
-        "model": "glm4",
-        "selected_gap_rows": 13,
-        "component_physical_path_rows": 520,
-        "component_summary_rows": 13,
-        "causal_fill_rows": 26,
-        "rollout_fill_rows": 26,
-        "missing_rows": 0,
-        "family_counts": {
-          "cross_lingual": 1,
-          "closure": 1,
-          "content_knowledge": 1,
-          "reasoning_constraint": 2,
-          "output_protocol": 1,
-          "language_action": 2,
-          "readout_competition": 1,
-          "state_drift": 2,
-          "syntax_structure": 2
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 10,
-          "attention": 3
-        },
-        "final_winner_counts": {
-          "continue": 13
-        },
-        "strongest_mlp_layers": {
-          "22": 4,
-          "38": 3,
-          "5": 2,
-          "39": 2,
-          "8": 1,
-          "14": 1
-        },
-        "mean_sum_positive_attn_delta": 10.951472,
-        "mean_sum_positive_mlp_delta": 20.335975,
-        "mean_sum_positive_residual_delta": 0.21552,
-        "causal_effect_supported_counts": {
-          "False": 18,
-          "True": 8
-        },
-        "side_effect_risk_counts": {
-          "True": 20,
-          "False": 6
-        },
-        "low_side_effect_supported_rate": 0.307692,
-        "low_side_effect_risk_rate": 0.615385
-      },
-      {
-        "phase": 275,
-        "schema_version": "2.2.0",
-        "phase_id": "Phase275",
-        "title": "Selected Phase274 gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T04:48:07.803679+00:00",
-        "model": "deepseek7b",
-        "selected_gap_rows": 15,
-        "component_physical_path_rows": 420,
-        "component_summary_rows": 15,
-        "causal_fill_rows": 30,
-        "rollout_fill_rows": 30,
-        "missing_rows": 0,
-        "family_counts": {
-          "cross_lingual": 2,
-          "reasoning_constraint": 1,
-          "state_drift": 2,
-          "language_action": 2,
-          "output_protocol": 1,
-          "closure": 2,
-          "syntax_structure": 2,
-          "readout_competition": 2,
-          "content_knowledge": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 15
-        },
-        "final_winner_counts": {
-          "continue": 15
-        },
-        "strongest_mlp_layers": {
-          "26": 12,
-          "0": 2,
-          "25": 1
-        },
-        "mean_sum_positive_attn_delta": 6.947924,
-        "mean_sum_positive_mlp_delta": 25.370963,
-        "mean_sum_positive_residual_delta": 0.249919,
-        "causal_effect_supported_counts": {
-          "True": 21,
-          "False": 9
-        },
-        "side_effect_risk_counts": {
-          "False": 22,
-          "True": 8
-        },
-        "low_side_effect_supported_rate": 0.6,
-        "low_side_effect_risk_rate": 0.133333
-      }
-    ],
-    "component_summary_rows": 45,
-    "causal_fill_rows": 90,
-    "missing_rows": 0,
-    "family_counts": {
-      "closure": 5,
-      "cross_lingual": 5,
-      "state_drift": 6,
-      "reasoning_constraint": 5,
-      "output_protocol": 4,
-      "language_action": 6,
-      "readout_competition": 5,
-      "content_knowledge": 4,
-      "syntax_structure": 5
-    },
-    "model_counts": {
-      "qwen3": 17,
-      "glm4": 13,
-      "deepseek7b": 15
-    },
-    "dominant_positive_component_counts": {
-      "mlp": 42,
-      "attention": 3
-    },
-    "final_winner_counts": {
-      "continue": 45
-    },
-    "causal_effect_supported_counts": {
-      "True": 59,
-      "False": 31
-    },
-    "side_effect_risk_counts": {
-      "False": 50,
-      "True": 40
-    },
-    "low_side_effect_supported_rate": 0.622222,
-    "low_side_effect_risk_rate": 0.266667,
-    "mean_sum_positive_attn_delta": 10.215375,
-    "mean_sum_positive_mlp_delta": 24.487299,
-    "mean_sum_positive_residual_delta": 0.236155,
-    "progress_estimate": {
-      "pattern_family_atlas": 0.52,
-      "physical_distribution_puzzle": 0.48,
-      "component_path_coverage": 0.32,
-      "causal_audit_coverage": 0.21,
-      "closure": 0.19
-    }
-  },
-  "latest_gap_recalibration_phase": "Phase286",
-  "phase276_summary": {
-    "schema_version": "2.3.0",
-    "phase": "Phase276",
-    "created_at": "2026-07-09T04:51:02.318291+00:00",
-    "source_gap_rows": 972,
-    "phase275_component_summary_rows": 45,
-    "phase275_causal_fill_rows": 90,
-    "phase276_status_counts": {
-      "still_open": 927,
-      "filled_by_phase275": 33,
-      "partially_filled_by_phase275": 12
-    },
-    "remaining_gap_counts": {
-      "candidate_not_closed": 9,
-      "need_readout_competition": 376,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 356,
-      "need_causal_audit": 914,
-      "need_component_path": 909,
-      "need_layer_path": 846,
-      "need_closure_quality": 587
-    },
-    "next_batch_rows": 54,
-    "next_batch_by_model": {
-      "glm4": 18,
-      "qwen3": 18,
-      "deepseek7b": 18
-    },
-    "next_batch_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "content_knowledge": 6,
-      "state_drift": 6,
-      "language_action": 6,
-      "reasoning_constraint": 6,
-      "readout_competition": 6,
-      "syntax_structure": 6
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.53,
-      "physical_distribution_puzzle": 0.5,
-      "component_path_coverage": 0.34,
-      "causal_audit_coverage": 0.23,
-      "closure": 0.19
-    }
-  },
-  "phase277_summary": {
-    "phase": 277,
-    "schema_version": "2.4.0",
-    "phase_id": "Phase277",
-    "title": "Phase276 next gap batch physical path fill",
-    "status": "complete",
-    "created_at": "2026-07-09T05:00:35.593944+00:00",
-    "round_name": "next_gap_batch_physical_path_fill",
-    "model_summaries": [
-      {
-        "phase": 277,
-        "schema_version": "2.4.0",
-        "phase_id": "Phase277",
-        "title": "Phase276 next gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T04:59:52.144896+00:00",
-        "model": "qwen3",
-        "selected_gap_rows": 17,
-        "component_physical_path_rows": 612,
-        "component_summary_rows": 17,
-        "causal_fill_rows": 34,
-        "rollout_fill_rows": 34,
-        "missing_rows": 0,
-        "family_counts": {
-          "closure": 2,
-          "state_drift": 2,
-          "cross_lingual": 2,
-          "reasoning_constraint": 2,
-          "output_protocol": 2,
-          "language_action": 2,
-          "readout_competition": 2,
-          "content_knowledge": 2,
-          "syntax_structure": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 17
-        },
-        "final_winner_counts": {
-          "continue": 17
-        },
-        "strongest_mlp_layers": {
-          "34": 8,
-          "35": 7,
-          "16": 2
-        },
-        "mean_sum_positive_attn_delta": 12.530223,
-        "mean_sum_positive_mlp_delta": 26.233959,
-        "mean_sum_positive_residual_delta": 0.263514,
-        "causal_effect_supported_counts": {
-          "True": 30,
-          "False": 4
-        },
-        "side_effect_risk_counts": {
-          "True": 16,
-          "False": 18
-        },
-        "low_side_effect_supported_rate": 0.882353,
-        "low_side_effect_risk_rate": 0.352941
-      },
-      {
-        "phase": 277,
-        "schema_version": "2.4.0",
-        "phase_id": "Phase277",
-        "title": "Phase276 next gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T05:00:13.406731+00:00",
-        "model": "glm4",
-        "selected_gap_rows": 15,
-        "component_physical_path_rows": 600,
-        "component_summary_rows": 15,
-        "causal_fill_rows": 30,
-        "rollout_fill_rows": 30,
-        "missing_rows": 0,
-        "family_counts": {
-          "cross_lingual": 2,
-          "closure": 1,
-          "content_knowledge": 1,
-          "output_protocol": 1,
-          "language_action": 2,
-          "readout_competition": 2,
-          "state_drift": 2,
-          "reasoning_constraint": 2,
-          "syntax_structure": 2
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 11,
-          "attention": 4
-        },
-        "final_winner_counts": {
-          "continue": 15
-        },
-        "strongest_mlp_layers": {
-          "38": 5,
-          "22": 4,
-          "5": 2,
-          "8": 1,
-          "7": 1,
-          "14": 1,
-          "30": 1
-        },
-        "mean_sum_positive_attn_delta": 11.895443,
-        "mean_sum_positive_mlp_delta": 18.31045,
-        "mean_sum_positive_residual_delta": 0.184309,
-        "causal_effect_supported_counts": {
-          "False": 28,
-          "True": 2
-        },
-        "side_effect_risk_counts": {
-          "True": 16,
-          "False": 14
-        },
-        "low_side_effect_supported_rate": 0.0,
-        "low_side_effect_risk_rate": 0.466667
-      },
-      {
-        "phase": 277,
-        "schema_version": "2.4.0",
-        "phase_id": "Phase277",
-        "title": "Phase276 next gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T05:00:32.423752+00:00",
-        "model": "deepseek7b",
-        "selected_gap_rows": 17,
-        "component_physical_path_rows": 476,
-        "component_summary_rows": 17,
-        "causal_fill_rows": 34,
-        "rollout_fill_rows": 34,
-        "missing_rows": 0,
-        "family_counts": {
-          "reasoning_constraint": 2,
-          "state_drift": 2,
-          "language_action": 2,
-          "output_protocol": 2,
-          "cross_lingual": 2,
-          "closure": 2,
-          "syntax_structure": 2,
-          "readout_competition": 2,
-          "content_knowledge": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 17
-        },
-        "final_winner_counts": {
-          "continue": 17
-        },
-        "strongest_mlp_layers": {
-          "26": 13,
-          "0": 2,
-          "25": 1,
-          "27": 1
-        },
-        "mean_sum_positive_attn_delta": 6.904548,
-        "mean_sum_positive_mlp_delta": 24.745634,
-        "mean_sum_positive_residual_delta": 0.281781,
-        "causal_effect_supported_counts": {
-          "False": 11,
-          "True": 23
-        },
-        "side_effect_risk_counts": {
-          "False": 21,
-          "True": 13
-        },
-        "low_side_effect_supported_rate": 0.529412,
-        "low_side_effect_risk_rate": 0.294118
-      }
-    ],
-    "component_summary_rows": 49,
-    "causal_fill_rows": 98,
-    "missing_rows": 0,
-    "family_counts": {
-      "closure": 5,
-      "state_drift": 6,
-      "cross_lingual": 6,
-      "reasoning_constraint": 6,
-      "output_protocol": 5,
-      "language_action": 6,
-      "readout_competition": 6,
-      "content_knowledge": 4,
-      "syntax_structure": 5
-    },
-    "model_counts": {
-      "qwen3": 17,
-      "glm4": 15,
-      "deepseek7b": 17
-    },
-    "dominant_positive_component_counts": {
-      "mlp": 45,
-      "attention": 4
-    },
-    "final_winner_counts": {
-      "continue": 49
-    },
-    "causal_effect_supported_counts": {
-      "True": 55,
-      "False": 43
-    },
-    "side_effect_risk_counts": {
-      "True": 45,
-      "False": 53
-    },
-    "low_side_effect_supported_rate": 0.489796,
-    "low_side_effect_risk_rate": 0.367347,
-    "mean_sum_positive_attn_delta": 10.384138,
-    "mean_sum_positive_mlp_delta": 23.292037,
-    "mean_sum_positive_residual_delta": 0.245605
-  },
-  "phase278_summary": {
-    "schema_version": "2.5.0",
-    "phase": "Phase278",
-    "created_at": "2026-07-09T05:01:47.480449+00:00",
-    "source_gap_rows": 972,
-    "total_component_summary_rows": 94,
-    "total_causal_fill_rows": 188,
-    "phase278_status_counts": {
-      "still_open": 878,
-      "filled_by_phase275_277": 67,
-      "partially_filled_by_phase275_277": 27
-    },
-    "remaining_gap_counts": {
-      "candidate_not_closed": 9,
-      "need_readout_competition": 376,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 345,
-      "need_causal_audit": 865,
-      "need_component_path": 860,
-      "need_layer_path": 797,
-      "need_closure_quality": 587
-    },
-    "next_batch_rows": 54,
-    "next_batch_by_model": {
-      "glm4": 18,
-      "qwen3": 18,
-      "deepseek7b": 18
-    },
-    "next_batch_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "state_drift": 6,
-      "reasoning_constraint": 6,
-      "language_action": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6,
-      "readout_competition": 6
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.55,
-      "physical_distribution_puzzle": 0.53,
-      "component_path_coverage": 0.37,
-      "causal_audit_coverage": 0.26,
-      "closure": 0.2
-    }
-  },
-  "phase279_summary": {
-    "phase": 279,
-    "schema_version": "2.6.0",
-    "phase_id": "Phase279",
-    "title": "Phase278 third gap batch physical path fill",
-    "status": "complete",
-    "created_at": "2026-07-09T14:20:34.940551+00:00",
-    "round_name": "third_gap_batch_physical_path_fill",
-    "model_summaries": [
-      {
-        "phase": 279,
-        "schema_version": "2.6.0",
-        "phase_id": "Phase279",
-        "title": "Phase278 third gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T14:19:52.607433+00:00",
-        "model": "qwen3",
-        "selected_gap_rows": 17,
-        "component_physical_path_rows": 612,
-        "component_summary_rows": 17,
-        "causal_fill_rows": 34,
-        "rollout_fill_rows": 34,
-        "missing_rows": 0,
-        "family_counts": {
-          "closure": 2,
-          "state_drift": 2,
-          "cross_lingual": 2,
-          "output_protocol": 2,
-          "reasoning_constraint": 2,
-          "language_action": 2,
-          "readout_competition": 2,
-          "content_knowledge": 2,
-          "syntax_structure": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 17
-        },
-        "final_winner_counts": {
-          "continue": 17
-        },
-        "strongest_mlp_layers": {
-          "34": 9,
-          "35": 8
-        },
-        "mean_sum_positive_attn_delta": 10.004223,
-        "mean_sum_positive_mlp_delta": 29.185561,
-        "mean_sum_positive_residual_delta": 0.215648,
-        "causal_effect_supported_counts": {
-          "True": 32,
-          "False": 2
-        },
-        "side_effect_risk_counts": {
-          "True": 23,
-          "False": 11
-        },
-        "low_side_effect_supported_rate": 0.882353,
-        "low_side_effect_risk_rate": 0.588235
-      },
-      {
-        "phase": 279,
-        "schema_version": "2.6.0",
-        "phase_id": "Phase279",
-        "title": "Phase278 third gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T14:20:13.525796+00:00",
-        "model": "glm4",
-        "selected_gap_rows": 15,
-        "component_physical_path_rows": 600,
-        "component_summary_rows": 15,
-        "causal_fill_rows": 30,
-        "rollout_fill_rows": 30,
-        "missing_rows": 0,
-        "family_counts": {
-          "cross_lingual": 2,
-          "closure": 1,
-          "output_protocol": 1,
-          "state_drift": 2,
-          "reasoning_constraint": 2,
-          "language_action": 2,
-          "readout_competition": 2,
-          "content_knowledge": 1,
-          "syntax_structure": 2
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 13,
-          "attention": 2
-        },
-        "final_winner_counts": {
-          "continue": 15
-        },
-        "strongest_mlp_layers": {
-          "38": 7,
-          "22": 3,
-          "39": 2,
-          "30": 2,
-          "7": 1
-        },
-        "mean_sum_positive_attn_delta": 11.612496,
-        "mean_sum_positive_mlp_delta": 19.195951,
-        "mean_sum_positive_residual_delta": 0.182446,
-        "causal_effect_supported_counts": {
-          "False": 21,
-          "True": 9
-        },
-        "side_effect_risk_counts": {
-          "False": 16,
-          "True": 14
-        },
-        "low_side_effect_supported_rate": 0.133333,
-        "low_side_effect_risk_rate": 0.466667
-      },
-      {
-        "phase": 279,
-        "schema_version": "2.6.0",
-        "phase_id": "Phase279",
-        "title": "Phase278 third gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T14:20:31.758301+00:00",
-        "model": "deepseek7b",
-        "selected_gap_rows": 16,
-        "component_physical_path_rows": 448,
-        "component_summary_rows": 16,
-        "causal_fill_rows": 32,
-        "rollout_fill_rows": 32,
-        "missing_rows": 0,
-        "family_counts": {
-          "reasoning_constraint": 2,
-          "state_drift": 2,
-          "language_action": 2,
-          "output_protocol": 1,
-          "cross_lingual": 2,
-          "syntax_structure": 2,
-          "readout_competition": 2,
-          "closure": 2,
-          "content_knowledge": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 16
-        },
-        "final_winner_counts": {
-          "continue": 16
-        },
-        "strongest_mlp_layers": {
-          "26": 15,
-          "27": 1
-        },
-        "mean_sum_positive_attn_delta": 5.527801,
-        "mean_sum_positive_mlp_delta": 27.31961,
-        "mean_sum_positive_residual_delta": 0.213089,
-        "causal_effect_supported_counts": {
-          "True": 30,
-          "False": 2
-        },
-        "side_effect_risk_counts": {
-          "False": 14,
-          "True": 18
-        },
-        "low_side_effect_supported_rate": 0.875,
-        "low_side_effect_risk_rate": 0.4375
-      }
-    ],
-    "component_summary_rows": 48,
-    "causal_fill_rows": 96,
-    "missing_rows": 0,
-    "family_counts": {
-      "closure": 5,
-      "state_drift": 6,
-      "cross_lingual": 6,
-      "output_protocol": 4,
-      "reasoning_constraint": 6,
-      "language_action": 6,
-      "readout_competition": 6,
-      "content_knowledge": 4,
-      "syntax_structure": 5
-    },
-    "model_counts": {
-      "qwen3": 17,
-      "glm4": 15,
-      "deepseek7b": 16
-    },
-    "dominant_positive_component_counts": {
-      "mlp": 46,
-      "attention": 2
-    },
-    "final_winner_counts": {
-      "continue": 48
-    },
-    "causal_effect_supported_counts": {
-      "True": 71,
-      "False": 25
-    },
-    "side_effect_risk_counts": {
-      "True": 55,
-      "False": 41
-    },
-    "low_side_effect_supported_rate": 0.645833,
-    "low_side_effect_risk_rate": 0.5,
-    "mean_sum_positive_attn_delta": 9.014667,
-    "mean_sum_positive_mlp_delta": 25.441825,
-    "mean_sum_positive_residual_delta": 0.204419
-  },
-  "phase280_summary": {
-    "schema_version": "2.7.0",
-    "phase": "Phase280",
-    "created_at": "2026-07-09T14:20:55.196302+00:00",
-    "source_gap_rows": 972,
-    "total_component_summary_rows": 142,
-    "total_causal_fill_rows": 284,
-    "phase280_status_counts": {
-      "still_open": 830,
-      "filled_by_phase275_277_279": 98,
-      "partially_filled_by_phase275_277_279": 44
-    },
-    "remaining_gap_counts": {
-      "candidate_not_closed": 9,
-      "need_readout_competition": 376,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 337,
-      "need_causal_audit": 817,
-      "need_component_path": 812,
-      "need_layer_path": 749,
-      "need_closure_quality": 587
-    },
-    "next_batch_rows": 54,
-    "next_batch_by_model": {
-      "glm4": 18,
-      "qwen3": 18,
-      "deepseek7b": 18
-    },
-    "next_batch_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "state_drift": 6,
-      "reasoning_constraint": 6,
-      "language_action": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6,
-      "readout_competition": 6
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.57,
-      "physical_distribution_puzzle": 0.56,
-      "component_path_coverage": 0.4,
-      "causal_audit_coverage": 0.29,
-      "closure": 0.2
-    }
-  },
-  "latest_closure_quality_phase": "Phase285",
-  "phase281_summary": {
-    "phase": 281,
-    "schema_version": "2.8.0",
-    "phase_id": "Phase281",
-    "title": "candidate closure four-condition quality verification",
-    "status": "complete",
-    "created_at": "2026-07-09T14:56:56.820505+00:00",
-    "round_name": "candidate_closure_quality_verification",
-    "model_summaries": [
-      {
-        "phase": 281,
-        "schema_version": "2.8.0",
-        "phase_id": "Phase281",
-        "title": "candidate closure four-condition quality verification",
-        "status": "complete",
-        "created_at": "2026-07-09T14:56:39.900669+00:00",
-        "model": "qwen3",
-        "candidate_rows": 1,
-        "closure_quality_rows": 1,
-        "missing_rows": 0,
-        "family_counts": {
-          "syntax_structure": 1
-        },
-        "semantic_done_count": 1,
-        "stop_wins_count": 0,
-        "continue_suppressed_count": 0,
-        "rollout_stable_count": 0,
-        "four_condition_closed_count": 0,
-        "weak_candidate_survived_count": 0,
-        "blocker_counts": {
-          "stop_not_winner": 1,
-          "continue_not_suppressed": 1,
-          "rollout_not_stable": 1
-        },
-        "mean_stop_continue_margin": -16.75
-      },
-      {
-        "phase": 281,
-        "schema_version": "2.8.0",
-        "phase_id": "Phase281",
-        "title": "candidate closure four-condition quality verification",
-        "status": "complete",
-        "created_at": "2026-07-09T14:56:47.926532+00:00",
-        "model": "glm4",
-        "candidate_rows": 5,
-        "closure_quality_rows": 5,
-        "missing_rows": 0,
-        "family_counts": {
-          "closure": 1,
-          "output_protocol": 1,
-          "cross_lingual": 1,
-          "content_knowledge": 1,
-          "readout_competition": 1
-        },
-        "semantic_done_count": 3,
-        "stop_wins_count": 0,
-        "continue_suppressed_count": 0,
-        "rollout_stable_count": 0,
-        "four_condition_closed_count": 0,
-        "weak_candidate_survived_count": 0,
-        "blocker_counts": {
-          "stop_not_winner": 5,
-          "continue_not_suppressed": 5,
-          "rollout_not_stable": 5,
-          "semantic_not_done": 2
-        },
-        "mean_stop_continue_margin": -5.015625
-      },
-      {
-        "phase": 281,
-        "schema_version": "2.8.0",
-        "phase_id": "Phase281",
-        "title": "candidate closure four-condition quality verification",
-        "status": "complete",
-        "created_at": "2026-07-09T14:56:54.320359+00:00",
-        "model": "deepseek7b",
-        "candidate_rows": 3,
-        "closure_quality_rows": 3,
-        "missing_rows": 0,
-        "family_counts": {
-          "output_protocol": 1,
-          "content_knowledge": 1,
-          "reasoning_constraint": 1
-        },
-        "semantic_done_count": 2,
-        "stop_wins_count": 0,
-        "continue_suppressed_count": 0,
-        "rollout_stable_count": 1,
-        "four_condition_closed_count": 0,
-        "weak_candidate_survived_count": 0,
-        "blocker_counts": {
-          "stop_not_winner": 3,
-          "continue_not_suppressed": 3,
-          "semantic_not_done": 1,
-          "rollout_not_stable": 2
-        },
-        "mean_stop_continue_margin": -9.572917
-      }
-    ],
-    "closure_quality_rows": 9,
-    "missing_rows": 0,
-    "model_counts": {
-      "qwen3": 1,
-      "glm4": 5,
-      "deepseek7b": 3
-    },
-    "family_counts": {
-      "syntax_structure": 1,
-      "closure": 1,
-      "output_protocol": 2,
-      "cross_lingual": 1,
-      "content_knowledge": 2,
-      "readout_competition": 1,
-      "reasoning_constraint": 1
-    },
-    "semantic_done_rate": 0.666667,
-    "stop_wins_rate": 0.0,
-    "continue_suppressed_rate": 0.0,
-    "rollout_stable_rate": 0.111111,
-    "four_condition_closed_count": 0,
-    "weak_candidate_survived_count": 0,
-    "blocker_counts": {
-      "stop_not_winner": 9,
-      "continue_not_suppressed": 9,
-      "rollout_not_stable": 8,
-      "semantic_not_done": 3
-    },
-    "mean_stop_continue_margin": -7.838542
-  },
-  "phase282_summary": {
-    "schema_version": "2.9.0",
-    "phase": "Phase282",
-    "created_at": "2026-07-09T14:57:02.543200+00:00",
-    "source_gap_rows": 972,
-    "closure_quality_rows": 9,
-    "four_condition_closed_count": 0,
-    "weak_candidate_survived_count": 0,
-    "phase282_status_counts": {
-      "closure_quality_rechecked_phase281": 9,
-      "filled_by_phase275_277_279_281": 98,
-      "still_open": 821,
-      "partially_filled_by_phase275_277_279": 44
-    },
-    "remaining_gap_counts": {
-      "candidate_not_closed": 9,
-      "need_closure_quality": 593,
-      "need_readout_competition": 376,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 337,
-      "need_causal_audit": 817,
-      "need_component_path": 812,
-      "need_layer_path": 749
-    },
-    "next_batch_rows": 54,
-    "next_batch_by_model": {
-      "glm4": 18,
-      "qwen3": 18,
-      "deepseek7b": 18
-    },
-    "next_batch_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "state_drift": 6,
-      "reasoning_constraint": 6,
-      "language_action": 6,
-      "readout_competition": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6
-    },
-    "mean_candidate_stop_continue_margin": -7.838542,
-    "progress_estimate": {
-      "pattern_family_atlas": 0.58,
-      "physical_distribution_puzzle": 0.56,
-      "component_path_coverage": 0.4,
-      "causal_audit_coverage": 0.29,
-      "closure": 0.2
-    }
-  },
-  "phase283_summary": {
-    "phase": 283,
-    "schema_version": "2.10.0",
-    "phase_id": "Phase283",
-    "title": "Phase282 fourth gap batch physical path fill",
-    "status": "complete",
-    "created_at": "2026-07-09T15:00:34.500774+00:00",
-    "round_name": "fourth_gap_batch_physical_path_fill",
-    "model_summaries": [
-      {
-        "phase": 283,
-        "schema_version": "2.10.0",
-        "phase_id": "Phase283",
-        "title": "Phase282 fourth gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T14:59:49.214810+00:00",
-        "model": "qwen3",
-        "selected_gap_rows": 18,
-        "component_physical_path_rows": 648,
-        "component_summary_rows": 18,
-        "causal_fill_rows": 36,
-        "rollout_fill_rows": 36,
-        "missing_rows": 0,
-        "family_counts": {
-          "closure": 2,
-          "cross_lingual": 2,
-          "output_protocol": 2,
-          "state_drift": 2,
-          "readout_competition": 2,
-          "reasoning_constraint": 2,
-          "language_action": 2,
-          "content_knowledge": 2,
-          "syntax_structure": 2
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 18
-        },
-        "final_winner_counts": {
-          "continue": 18
-        },
-        "strongest_mlp_layers": {
-          "34": 13,
-          "35": 5
-        },
-        "mean_sum_positive_attn_delta": 11.102556,
-        "mean_sum_positive_mlp_delta": 29.623055,
-        "mean_sum_positive_residual_delta": 0.239936,
-        "causal_effect_supported_counts": {
-          "True": 34,
-          "False": 2
-        },
-        "side_effect_risk_counts": {
-          "False": 17,
-          "True": 19
-        },
-        "low_side_effect_supported_rate": 0.888889,
-        "low_side_effect_risk_rate": 0.333333
-      },
-      {
-        "phase": 283,
-        "schema_version": "2.10.0",
-        "phase_id": "Phase283",
-        "title": "Phase282 fourth gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T15:00:13.066079+00:00",
-        "model": "glm4",
-        "selected_gap_rows": 18,
-        "component_physical_path_rows": 720,
-        "component_summary_rows": 18,
-        "causal_fill_rows": 36,
-        "rollout_fill_rows": 36,
-        "missing_rows": 0,
-        "family_counts": {
-          "closure": 2,
-          "cross_lingual": 2,
-          "output_protocol": 2,
-          "state_drift": 2,
-          "reasoning_constraint": 2,
-          "language_action": 2,
-          "readout_competition": 2,
-          "content_knowledge": 2,
-          "syntax_structure": 2
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 17,
-          "attention": 1
-        },
-        "final_winner_counts": {
-          "continue": 18
-        },
-        "strongest_mlp_layers": {
-          "38": 8,
-          "22": 5,
-          "39": 2,
-          "30": 2,
-          "14": 1
-        },
-        "mean_sum_positive_attn_delta": 11.410858,
-        "mean_sum_positive_mlp_delta": 20.384003,
-        "mean_sum_positive_residual_delta": 0.22312,
-        "causal_effect_supported_counts": {
-          "True": 12,
-          "False": 24
-        },
-        "side_effect_risk_counts": {
-          "True": 24,
-          "False": 12
-        },
-        "low_side_effect_supported_rate": 0.166667,
-        "low_side_effect_risk_rate": 0.611111
-      },
-      {
-        "phase": 283,
-        "schema_version": "2.10.0",
-        "phase_id": "Phase283",
-        "title": "Phase282 fourth gap batch physical path fill",
-        "status": "complete",
-        "created_at": "2026-07-09T15:00:32.061843+00:00",
-        "model": "deepseek7b",
-        "selected_gap_rows": 18,
-        "component_physical_path_rows": 504,
-        "component_summary_rows": 18,
-        "causal_fill_rows": 36,
-        "rollout_fill_rows": 36,
-        "missing_rows": 0,
-        "family_counts": {
-          "reasoning_constraint": 2,
-          "language_action": 2,
-          "output_protocol": 2,
-          "state_drift": 2,
-          "readout_competition": 2,
-          "syntax_structure": 2,
-          "closure": 2,
-          "cross_lingual": 2,
-          "content_knowledge": 2
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 17,
-          "attention": 1
-        },
-        "final_winner_counts": {
-          "continue": 18
-        },
-        "strongest_mlp_layers": {
-          "26": 13,
-          "27": 2,
-          "21": 2,
-          "0": 1
-        },
-        "mean_sum_positive_attn_delta": 4.802829,
-        "mean_sum_positive_mlp_delta": 27.095106,
-        "mean_sum_positive_residual_delta": 0.205756,
-        "causal_effect_supported_counts": {
-          "True": 34,
-          "False": 2
-        },
-        "side_effect_risk_counts": {
-          "False": 20,
-          "True": 16
-        },
-        "low_side_effect_supported_rate": 0.944444,
-        "low_side_effect_risk_rate": 0.222222
-      }
-    ],
-    "component_summary_rows": 54,
-    "causal_fill_rows": 108,
-    "missing_rows": 0,
-    "family_counts": {
-      "closure": 6,
-      "cross_lingual": 6,
-      "output_protocol": 6,
-      "state_drift": 6,
-      "readout_competition": 6,
-      "reasoning_constraint": 6,
-      "language_action": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6
-    },
-    "model_counts": {
-      "qwen3": 18,
-      "glm4": 18,
-      "deepseek7b": 18
-    },
-    "dominant_positive_component_counts": {
-      "mlp": 52,
-      "attention": 2
-    },
-    "final_winner_counts": {
-      "continue": 54
-    },
-    "causal_effect_supported_counts": {
-      "True": 80,
-      "False": 28
-    },
-    "side_effect_risk_counts": {
-      "False": 49,
-      "True": 59
-    },
-    "low_side_effect_supported_rate": 0.666667,
-    "low_side_effect_risk_rate": 0.388889,
-    "mean_sum_positive_attn_delta": 9.105415,
-    "mean_sum_positive_mlp_delta": 25.700721,
-    "mean_sum_positive_residual_delta": 0.222938
-  },
-  "phase284_summary": {
-    "schema_version": "2.11.0",
-    "phase": "Phase284",
-    "created_at": "2026-07-09T15:02:00.722337+00:00",
-    "source_gap_rows": 972,
-    "total_component_summary_rows": 196,
-    "total_causal_fill_rows": 392,
-    "closure_quality_rows": 9,
-    "phase284_status_counts": {
-      "partially_filled_by_phase275_277_279_281_283": 81,
-      "filled_by_phase275_277_279_281_283": 124,
-      "still_open": 767
-    },
-    "remaining_gap_counts": {
-      "candidate_not_closed": 9,
-      "need_readout_competition": 376,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 324,
-      "need_causal_audit": 763,
-      "need_component_path": 758,
-      "need_layer_path": 695,
-      "need_closure_quality": 587
-    },
-    "next_batch_rows": 54,
-    "next_batch_by_model": {
-      "glm4": 18,
-      "qwen3": 18,
-      "deepseek7b": 18
-    },
-    "next_batch_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "state_drift": 6,
-      "language_action": 6,
-      "reasoning_constraint": 6,
-      "readout_competition": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6
-    },
-    "dominant_component_counts_all_fills": {
-      "mlp": 185,
-      "attention": 11
-    },
-    "mean_component_mlp_delta_all_fills": 24.756555,
-    "progress_estimate": {
-      "pattern_family_atlas": 0.6,
-      "physical_distribution_puzzle": 0.6,
-      "component_path_coverage": 0.5,
-      "causal_audit_coverage": 0.4,
-      "closure": 0.2
-    }
-  },
-  "phase285_summary": {
-    "phase": 285,
-    "schema_version": "2.12.0",
-    "phase_id": "Phase285",
-    "title": "closure quality expansion scan",
-    "status": "complete",
-    "created_at": "2026-07-09T15:29:58.206777+00:00",
-    "round_name": "closure_quality_expansion_scan",
-    "model_summaries": [
-      {
-        "phase": 285,
-        "schema_version": "2.12.0",
-        "phase_id": "Phase285",
-        "title": "closure quality expansion scan",
-        "status": "complete",
-        "created_at": "2026-07-09T15:29:30.995187+00:00",
-        "model": "qwen3",
-        "selected_rows": 9,
-        "closure_quality_rows": 9,
-        "missing_rows": 0,
-        "family_counts": {
-          "content_knowledge": 2,
-          "readout_competition": 2,
-          "closure": 2,
-          "state_drift": 2,
-          "output_protocol": 1
-        },
-        "reclassification_counts": {
-          "closure_rejected": 9
-        },
-        "semantic_done_count": 9,
-        "stop_wins_count": 0,
-        "continue_suppressed_count": 0,
-        "rollout_stable_count": 0,
-        "four_condition_closed_count": 0,
-        "blocker_counts": {
-          "stop_not_winner": 9,
-          "continue_not_suppressed": 9,
-          "rollout_not_stable": 9
-        },
-        "mean_stop_continue_margin": -4.6875
-      },
-      {
-        "phase": 285,
-        "schema_version": "2.12.0",
-        "phase_id": "Phase285",
-        "title": "closure quality expansion scan",
-        "status": "complete",
-        "created_at": "2026-07-09T15:29:44.367790+00:00",
-        "model": "glm4",
-        "selected_rows": 9,
-        "closure_quality_rows": 9,
-        "missing_rows": 0,
-        "family_counts": {
-          "state_drift": 2,
-          "readout_competition": 2,
-          "cross_lingual": 2,
-          "closure": 2,
-          "reasoning_constraint": 1
-        },
-        "reclassification_counts": {
-          "closure_rejected": 9
-        },
-        "semantic_done_count": 9,
-        "stop_wins_count": 0,
-        "continue_suppressed_count": 0,
-        "rollout_stable_count": 0,
-        "four_condition_closed_count": 0,
-        "blocker_counts": {
-          "stop_not_winner": 9,
-          "continue_not_suppressed": 9,
-          "rollout_not_stable": 9
-        },
-        "mean_stop_continue_margin": -3.034722
-      },
-      {
-        "phase": 285,
-        "schema_version": "2.12.0",
-        "phase_id": "Phase285",
-        "title": "closure quality expansion scan",
-        "status": "complete",
-        "created_at": "2026-07-09T15:29:55.715715+00:00",
-        "model": "deepseek7b",
-        "selected_rows": 9,
-        "closure_quality_rows": 9,
-        "missing_rows": 0,
-        "family_counts": {
-          "cross_lingual": 2,
-          "output_protocol": 2,
-          "state_drift": 2,
-          "reasoning_constraint": 2,
-          "closure": 1
-        },
-        "reclassification_counts": {
-          "semantic_protocol_ok_but_not_closed": 2,
-          "closure_rejected": 7
-        },
-        "semantic_done_count": 9,
-        "stop_wins_count": 0,
-        "continue_suppressed_count": 0,
-        "rollout_stable_count": 0,
-        "four_condition_closed_count": 0,
-        "blocker_counts": {
-          "stop_not_winner": 9,
-          "continue_not_suppressed": 9,
-          "rollout_not_stable": 9
-        },
-        "mean_stop_continue_margin": -8.5
-      }
-    ],
-    "closure_quality_rows": 27,
-    "missing_rows": 0,
-    "model_counts": {
-      "qwen3": 9,
-      "glm4": 9,
-      "deepseek7b": 9
-    },
-    "family_counts": {
-      "content_knowledge": 2,
-      "readout_competition": 4,
-      "closure": 5,
-      "state_drift": 6,
-      "output_protocol": 3,
-      "cross_lingual": 4,
-      "reasoning_constraint": 3
-    },
-    "reclassification_counts": {
-      "closure_rejected": 25,
-      "semantic_protocol_ok_but_not_closed": 2
-    },
-    "semantic_done_rate": 1.0,
-    "stop_wins_rate": 0.0,
-    "continue_suppressed_rate": 0.0,
-    "rollout_stable_rate": 0.0,
-    "four_condition_closed_count": 0,
-    "blocker_counts": {
-      "stop_not_winner": 27,
-      "continue_not_suppressed": 27,
-      "rollout_not_stable": 27
-    },
-    "mean_stop_continue_margin": -5.407407
-  },
-  "phase286_summary": {
-    "schema_version": "2.13.0",
-    "phase": "Phase286",
-    "created_at": "2026-07-09T15:31:31.716316+00:00",
-    "source_gap_rows": 972,
-    "total_component_summary_rows": 196,
-    "total_causal_fill_rows": 392,
-    "closure_quality_checked_rows": 36,
-    "closure_rejected_rows": 36,
-    "phase286_status_counts": {
-      "partially_filled_by_phase275_277_279_281_283_285": 88,
-      "filled_by_phase275_277_279_281_283_285": 134,
-      "still_open": 750
-    },
-    "remaining_gap_counts": {
-      "candidate_not_closed": 9,
-      "need_readout_competition": 376,
-      "good_behavior_low_path": 675,
-      "good_readout_low_causal": 324,
-      "need_causal_audit": 763,
-      "need_component_path": 758,
-      "need_layer_path": 695,
-      "need_closure_quality": 557
-    },
-    "next_batch_rows": 54,
-    "next_batch_by_model": {
-      "glm4": 18,
-      "qwen3": 18,
-      "deepseek7b": 18
-    },
-    "next_batch_by_family": {
-      "closure": 6,
-      "output_protocol": 6,
-      "cross_lingual": 6,
-      "state_drift": 6,
-      "language_action": 6,
-      "reasoning_constraint": 6,
-      "readout_competition": 6,
-      "content_knowledge": 6,
-      "syntax_structure": 6
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.62,
-      "physical_distribution_puzzle": 0.6,
-      "component_path_coverage": 0.5,
-      "causal_audit_coverage": 0.4,
-      "closure_quality_measurement": 0.25,
-      "closure": 0.2
-    },
-    "mean_component_mlp_delta_all_fills": 24.756555
-  },
-  "latest_glm4_risk_phase": "Phase287",
-  "phase287_summary": {
-    "schema_version": "2.14.0",
-    "phase": "Phase287",
-    "created_at": "2026-07-09T15:32:43.758017+00:00",
-    "source_glm4_causal_rows": 122,
-    "glm4_side_effect_risk_rows": 74,
-    "next_audit_rows": 36,
-    "risk_bucket_counts": {
-      "attention_mlp_joint_risk": 18,
-      "coupled_target_continue_risk": 22,
-      "generic_side_effect_risk": 30,
-      "readout_competition_risk": 4
-    },
-    "family_counts": {
-      "closure": 10,
-      "readout_competition": 9,
-      "state_drift": 8,
-      "language_action": 12,
-      "output_protocol": 10,
-      "syntax_structure": 8,
-      "content_knowledge": 5,
-      "cross_lingual": 10,
-      "reasoning_constraint": 2
-    },
-    "recommended_audit_counts": {
-      "attention_mlp_joint_audit": 20,
-      "random_same_norm_control": 74,
-      "subspace_or_mean_replace_audit": 41,
-      "source_restricted_low_side_effect_audit": 33,
-      "channel_level_stop_continue_audit": 8
-    },
-    "patch_type_counts": {
-      "mlp_zero_last_token": 41,
-      "mlp_half_last_token": 33
-    },
-    "mean_delta_continue_stop_margin": -0.552365,
-    "mean_delta_target_logit": -0.636824
-  },
-  "latest_feature_mining_phase": "Phase288",
-  "phase288_summary": {
-    "schema_version": "2.15.0",
-    "phase": "Phase288",
-    "created_at": "2026-07-09T16:35:06.599497+00:00",
-    "signature_rows": 972,
-    "component_summary_rows": 196,
-    "causal_rows": 392,
-    "closure_quality_rows": 36,
-    "gap_rows": 972,
-    "family_feature_rows": 9,
-    "model_feature_rows": 3,
-    "component_distribution_rows": 31,
-    "continue_channel_distribution_rows": 86,
-    "layer_curve_cluster_rows": 196,
-    "side_effect_distribution_rows": 54,
-    "closure_bottleneck_rows": 60,
-    "gap_heatmap_rows": 27,
-    "global_mlp_dominance_rate": 0.943878,
-    "global_attention_dominance_rate": 0.056122,
-    "global_continue_win_rate": 1.0,
-    "global_side_effect_risk_rate": 0.507653,
-    "global_closure_closed_count": 0,
-    "global_closure_rejected_count": 36,
-    "top_layer_cluster_counts": {
-      "late_mlp_strong_continue": 80,
-      "middle_mlp_strong_continue": 67,
-      "late_mlp_continue": 15,
-      "middle_mlp_continue": 15,
-      "early_attention_routed_continue": 6,
-      "middle_attention_routed_continue": 5,
-      "early_mlp_continue": 4,
-      "early_mlp_strong_continue": 4
-    },
-    "top_continue_channel_counts": {
-      "continue_list_item": 347,
-      "continue_the": 344,
-      "continue_next_sentence": 176,
-      "continue_json_structure": 74,
-      "continue_format": 67
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.64,
-      "physical_distribution_puzzle": 0.61,
-      "feature_mining": 0.3,
-      "mechanism_audit": 0.4,
-      "closure": 0.2
-    }
-  },
-  "latest_feature_delta_phase": "Phase289",
-  "phase289_summary": {
-    "schema_version": "2.16.0",
-    "phase": "Phase289",
-    "created_at": "2026-07-09T16:36:44.056688+00:00",
-    "family_delta_rows": 9,
-    "model_delta_rows": 3,
-    "feature_driven_audit_candidates": 83,
-    "candidate_type_counts": {
-      "gap_heatmap_hotspot": 15,
-      "closure_bottleneck": 24,
-      "side_effect_distribution": 44
-    },
-    "recommended_next_counts": {
-      "queue_driven_physical_path_fill": 15,
-      "readout_competition_channel_decomposition": 24,
-      "source_restricted_or_subspace_audit": 32,
-      "closure_quality_probe": 12
-    },
-    "family_delta_label_counts": {
-      "high_side_effect_family": 2,
-      "mlp_reuse_strong_family": 4,
-      "attention_delta_family": 2,
-      "high_behavior_family": 1
-    },
-    "model_delta_label_counts": {
-      "low_side_effect_strong_model": 2,
-      "glm4_high_risk_delta": 1
-    },
-    "shared_backbone": {
-      "schema_version": "2.16.0",
-      "phase_id": "Phase289",
-      "created_at": "2026-07-09T16:36:44.056448+00:00",
-      "shared_backbone_id": "phase289:shared_backbone:global",
-      "shared_answer_correct_proxy_rate": 0.707819,
-      "shared_mean_behavior_score": 0.687929,
-      "shared_mean_readout_score": 0.331028,
-      "shared_mean_rollout_score": 0.840488,
-      "shared_continue_win_rate": 1.0,
-      "shared_mlp_dominance_rate": 0.946745,
-      "shared_attention_dominance_rate": 0.053255,
-      "shared_mean_positive_mlp_delta": 24.749139,
-      "shared_mean_positive_attn_delta": 9.632531,
-      "shared_causal_effect_supported_rate": 0.679535,
-      "shared_side_effect_risk_rate": 0.513343,
-      "shared_closure_rejected_rate": 0.888889,
-      "shared_stop_not_winner_rate": 0.888889
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.65,
-      "feature_mining": 0.38,
-      "reuse_delta_analysis": 0.25,
-      "mechanism_audit": 0.4,
-      "closure": 0.2
-    }
-  },
-  "latest_readout_decomposition_phase": "Phase290",
-  "phase290_summary": {
-    "schema_version": "2.17.0",
-    "phase": "Phase290",
-    "created_at": "2026-07-09T17:13:17.201116+00:00",
-    "model_test_status": "not_run_offline_atlas_readout_decomposition",
-    "source_signature_rows": 972,
-    "readout_channel_rows": 972,
-    "channel_family_model_matrix_rows": 86,
-    "stop_continue_bottleneck_rows": 340,
-    "readout_competition_audit_queue_rows": 144,
-    "family_model_readout_summary_rows": 27,
-    "global_continue_winner_rate": 1.0,
-    "global_stop_winner_rate": 0.0,
-    "global_mean_top_continue_vs_stop_margin": 8.155253,
-    "top_continue_channel_counts": {
-      "continue_list_item": 334,
-      "continue_the": 330,
-      "continue_next_sentence": 172,
-      "continue_json_structure": 70,
-      "continue_format": 66
-    },
-    "continue_channel_family_counts": {
-      "natural_language_continue": 502,
-      "list_structure_continue": 334,
-      "protocol_json_continue": 70,
-      "protocol_format_continue": 66
-    },
-    "readout_bottleneck_counts": {
-      "continue_not_suppressed": 972,
-      "stop_not_winner": 972,
-      "protocol_or_structure_continue": 470,
-      "gap_need_readout_competition": 376,
-      "target_readout_weak": 186,
-      "closure_continue_not_suppressed": 36,
-      "closure_stop_not_winner": 36,
-      "closure_rollout_not_stable": 35,
-      "closure_semantic_not_done": 3
-    },
-    "audit_queue_by_model": {
-      "qwen3": 55,
-      "deepseek7b": 43,
-      "glm4": 46
-    },
-    "audit_queue_by_recommended_next": {
-      "protocol_continue_suppression": 87,
-      "readout_channel_decomposition": 42,
-      "target_vs_continue_competition": 15
-    },
-    "coverage_policy": "All rates include coverage_count, coverage_rate, and confidence_flag where aggregation is not full-table.",
-    "progress_estimate": {
-      "pattern_family_atlas": 0.66,
-      "physical_distribution_puzzle": 0.63,
-      "feature_mining": 0.42,
-      "readout_competition_decomposition": 0.35,
-      "mechanism_audit": 0.41,
-      "closure": 0.2
-    }
-  },
-  "latest_sample_expansion_phase": "Phase291",
-  "phase291_summary": {
-    "schema_version": "2.18.0",
-    "phase": "Phase291",
-    "created_at": "2026-07-09T17:19:52.420816+00:00",
-    "model_test_status": "not_run_sample_expansion_and_queue_only",
-    "source_existing_cases": 1296,
-    "source_root_cases": 216,
-    "new_variant_types": 12,
-    "expanded_case_candidates": 2592,
-    "full_model_test_plan_rows": 7776,
-    "selected_large_batch_queue_rows": 972,
-    "sample_type_coverage_rows": 108,
-    "candidate_family_counts": {
-      "content_knowledge": 288,
-      "output_protocol": 288,
-      "reasoning_constraint": 288,
-      "syntax_structure": 288,
-      "language_action": 288,
-      "cross_lingual": 288,
-      "readout_competition": 288,
-      "state_drift": 288,
-      "closure": 288
-    },
-    "candidate_channel_focus_counts": {
-      "stop_boundary": 432,
-      "natural_language_continue": 432,
-      "local_syntax_continue": 216,
-      "explanation_relation_continue": 432,
-      "protocol_json_continue": 432,
-      "list_structure_continue": 432,
-      "answer_boundary_continue": 216
-    },
-    "selected_by_model": {
-      "qwen3": 324,
-      "deepseek7b": 324,
-      "glm4": 324
-    },
-    "selected_by_family": {
-      "syntax_structure": 108,
-      "language_action": 108,
-      "state_drift": 108,
-      "reasoning_constraint": 108,
-      "output_protocol": 108,
-      "cross_lingual": 108,
-      "content_knowledge": 108,
-      "readout_competition": 108,
-      "closure": 108
-    },
-    "selected_by_channel_focus": {
-      "protocol_json_continue": 162,
-      "list_structure_continue": 162,
-      "explanation_relation_continue": 162,
-      "natural_language_continue": 162,
-      "local_syntax_continue": 81,
-      "stop_boundary": 162,
-      "answer_boundary_continue": 81
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.7,
-      "sample_type_coverage": 0.62,
-      "physical_distribution_puzzle": 0.63,
-      "feature_mining": 0.42,
-      "mechanism_audit": 0.41,
-      "closure": 0.2
-    }
-  },
-  "latest_feature_algorithm_phase": "Phase297",
-  "phase292_summary": {
-    "schema_version": "2.19.0",
-    "phase": "Phase292",
-    "created_at": "2026-07-09T17:21:36.506907+00:00",
-    "feature_matrix_rows": 27,
-    "mean_atlas_completion_v2": 0.410425,
-    "min_atlas_completion_v2": 0.331615,
-    "max_atlas_completion_v2": 0.476055,
-    "mean_bottleneck_pressure": 1.0,
-    "mean_channel_entropy": 0.69222,
-    "mean_measurement_coverage": 0.410494,
-    "family_completion": {
-      "closure": 0.415058,
-      "content_knowledge": 0.387764,
-      "cross_lingual": 0.449626,
-      "language_action": 0.397709,
-      "output_protocol": 0.419891,
-      "readout_competition": 0.395063,
-      "reasoning_constraint": 0.447451,
-      "state_drift": 0.409878,
-      "syntax_structure": 0.371386
-    },
-    "model_completion": {
-      "deepseek7b": 0.417307,
-      "glm4": 0.405683,
-      "qwen3": 0.408285
-    },
-    "next_priority_counts": {
-      "urgent_readout_bottleneck": 23,
-      "large_gap_physical_path_fill": 2,
-      "balanced_large_batch_measurement": 2
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.71,
-      "sample_type_coverage": 0.62,
-      "feature_mining": 0.5,
-      "physical_distribution_puzzle": 0.64,
-      "mechanism_audit": 0.42,
-      "closure": 0.2
-    }
-  },
-  "latest_expanded_measurement_phase": "Phase294",
-  "phase294_summary": {
-    "schema_version": "2.21.0",
-    "phase": "Phase294",
-    "created_at": "2026-07-09T17:37:05.751877+00:00",
-    "source_phase": "Phase293",
-    "expanded_behavior_rows": 972,
-    "expanded_readout_rows": 972,
-    "expanded_path_signature_rows": 972,
-    "expanded_gap_rows": 972,
-    "family_model_update_rows": 27,
-    "global_answer_correct_proxy_rate": 0.896091,
-    "global_pattern_matched_proxy_rate": 0.286008,
-    "global_model_stop_executed_rate": 0.195473,
-    "global_continue_winner_rate": 0.972222,
-    "global_stop_winner_rate": 0.027778,
-    "global_mean_top_continue_vs_stop_margin": 7.255538,
-    "model_summary": {
-      "qwen3": {
-        "rows": 324,
-        "answer_correct_proxy_rate": 0.962963,
-        "pattern_matched_proxy_rate": 0.194444,
-        "model_stop_executed_rate": 0.0,
-        "continue_winner_rate": 0.990741,
-        "stop_winner_rate": 0.009259,
-        "mean_top_continue_vs_stop_margin": 9.308353,
-        "top_continue_channel_counts": {
-          "continue_format": 71,
-          "continue_json_structure": 23,
-          "continue_the": 62,
-          "continue_next_sentence": 43,
-          "continue_list_item": 125
-        }
-      },
-      "glm4": {
-        "rows": 324,
-        "answer_correct_proxy_rate": 0.953704,
-        "pattern_matched_proxy_rate": 0.367284,
-        "model_stop_executed_rate": 0.067901,
-        "continue_winner_rate": 0.925926,
-        "stop_winner_rate": 0.074074,
-        "mean_top_continue_vs_stop_margin": 4.147111,
-        "top_continue_channel_counts": {
-          "continue_json_structure": 77,
-          "continue_list_item": 101,
-          "continue_next_sentence": 81,
-          "continue_the": 16,
-          "continue_format": 49
-        }
-      },
-      "deepseek7b": {
-        "rows": 324,
-        "answer_correct_proxy_rate": 0.771605,
-        "pattern_matched_proxy_rate": 0.296296,
-        "model_stop_executed_rate": 0.518519,
-        "continue_winner_rate": 1.0,
-        "stop_winner_rate": 0.0,
-        "mean_top_continue_vs_stop_margin": 8.31115,
-        "top_continue_channel_counts": {
-          "continue_next_sentence": 133,
-          "continue_the": 113,
-          "continue_format": 24,
-          "continue_list_item": 54
-        }
-      }
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.74,
-      "sample_type_coverage": 0.68,
-      "feature_mining": 0.54,
-      "physical_distribution_puzzle": 0.66,
-      "mechanism_audit": 0.44,
-      "closure": 0.21
-    }
-  },
-  "phase295_summary": {
-    "schema_version": "2.22.0",
-    "phase": "Phase295",
-    "created_at": "2026-07-09T17:38:03.792017+00:00",
-    "feature_v3_rows": 27,
-    "mean_atlas_completion_v3": 0.361124,
-    "mean_completion_delta_v3_minus_v2": -0.049301,
-    "mean_expanded_answer_correct_proxy_rate": 0.896091,
-    "mean_expanded_pattern_matched_proxy_rate": 0.286008,
-    "mean_expanded_model_stop_executed_rate": 0.195473,
-    "mean_expanded_continue_winner_rate": 0.972222,
-    "next_priority_counts": {
-      "hard_readout_stop_failure": 12,
-      "generation_stop_without_readout_stop": 4,
-      "protocol_pattern_failure": 6,
-      "measured_expansion_followup": 5
-    },
-    "model_completion_v3": {
-      "deepseek7b": 0.369678,
-      "glm4": 0.37625,
-      "qwen3": 0.337444
-    },
-    "family_completion_v3": {
-      "closure": 0.349814,
-      "content_knowledge": 0.345609,
-      "cross_lingual": 0.384346,
-      "language_action": 0.351537,
-      "output_protocol": 0.367011,
-      "readout_competition": 0.362091,
-      "reasoning_constraint": 0.386572,
-      "state_drift": 0.366638,
-      "syntax_structure": 0.336499
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.75,
-      "sample_type_coverage": 0.68,
-      "feature_mining": 0.58,
-      "physical_distribution_puzzle": 0.67,
-      "mechanism_audit": 0.44,
-      "closure": 0.21
-    }
-  },
-  "latest_expanded_component_phase": "Phase296",
-  "phase296_summary": {
-    "schema_version": "2.23.0",
-    "phase": "Phase296",
-    "created_at": "2026-07-09T17:42:20.998259+00:00",
-    "model_summaries": [
-      {
-        "schema_version": "2.23.0",
-        "phase": "Phase296",
-        "created_at": "2026-07-09T17:42:11.166399+00:00",
-        "model": "qwen3",
-        "selected_rows": 9,
-        "component_summary_rows": 9,
-        "missing_rows": 0,
-        "family_counts": {
-          "language_action": 1,
-          "state_drift": 1,
-          "reasoning_constraint": 1,
-          "output_protocol": 1,
-          "closure": 1,
-          "syntax_structure": 1,
-          "cross_lingual": 1,
-          "content_knowledge": 1,
-          "readout_competition": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 7,
-          "attention": 2
-        },
-        "final_winner_counts": {
-          "continue": 9
-        },
-        "mean_sum_positive_attn_delta": 20.712985,
-        "mean_sum_positive_mlp_delta": 32.379557,
-        "mean_sum_positive_residual_delta": 0.253743
-      },
-      {
-        "schema_version": "2.23.0",
-        "phase": "Phase296",
-        "created_at": "2026-07-09T17:42:16.777522+00:00",
-        "model": "glm4",
-        "selected_rows": 9,
-        "component_summary_rows": 9,
-        "missing_rows": 0,
-        "family_counts": {
-          "language_action": 1,
-          "syntax_structure": 1,
-          "closure": 1,
-          "output_protocol": 1,
-          "content_knowledge": 1,
-          "state_drift": 1,
-          "reasoning_constraint": 1,
-          "cross_lingual": 1,
-          "readout_competition": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 8,
-          "attention": 1
-        },
-        "final_winner_counts": {
-          "continue": 9
-        },
-        "mean_sum_positive_attn_delta": 13.244652,
-        "mean_sum_positive_mlp_delta": 23.473742,
-        "mean_sum_positive_residual_delta": 0.219526
-      },
-      {
-        "schema_version": "2.23.0",
-        "phase": "Phase296",
-        "created_at": "2026-07-09T17:42:20.984689+00:00",
-        "model": "deepseek7b",
-        "selected_rows": 9,
-        "component_summary_rows": 9,
-        "missing_rows": 0,
-        "family_counts": {
-          "syntax_structure": 1,
-          "reasoning_constraint": 1,
-          "closure": 1,
-          "readout_competition": 1,
-          "output_protocol": 1,
-          "state_drift": 1,
-          "content_knowledge": 1,
-          "language_action": 1,
-          "cross_lingual": 1
-        },
-        "dominant_positive_component_counts": {
-          "mlp": 9
-        },
-        "final_winner_counts": {
-          "continue": 9
-        },
-        "mean_sum_positive_attn_delta": 5.729763,
-        "mean_sum_positive_mlp_delta": 27.352892,
-        "mean_sum_positive_residual_delta": 0.228407
-      }
-    ],
-    "component_physical_path_rows": 936,
-    "attention_contribution_rows": 936,
-    "mlp_contribution_rows": 936,
-    "residual_accumulation_rows": 936,
-    "component_summary_rows": 27,
-    "missing_rows": 0,
-    "family_counts": {
-      "language_action": 3,
-      "state_drift": 3,
-      "reasoning_constraint": 3,
-      "output_protocol": 3,
-      "closure": 3,
-      "syntax_structure": 3,
-      "cross_lingual": 3,
-      "content_knowledge": 3,
-      "readout_competition": 3
-    },
-    "model_counts": {
-      "qwen3": 9,
-      "glm4": 9,
-      "deepseek7b": 9
-    },
-    "dominant_positive_component_counts": {
-      "mlp": 24,
-      "attention": 3
-    },
-    "final_winner_counts": {
-      "continue": 27
-    },
-    "mean_sum_positive_attn_delta": 13.229134,
-    "mean_sum_positive_mlp_delta": 27.735397,
-    "mean_sum_positive_residual_delta": 0.233892,
-    "progress_estimate": {
-      "pattern_family_atlas": 0.76,
-      "sample_type_coverage": 0.68,
-      "feature_mining": 0.59,
-      "physical_distribution_puzzle": 0.69,
-      "mechanism_audit": 0.46,
-      "closure": 0.21
-    }
-  },
-  "phase297_summary": {
-    "schema_version": "2.24.0",
-    "phase": "Phase297",
-    "created_at": "2026-07-09T17:43:21.051963+00:00",
-    "feature_v4_rows": 27,
-    "mean_atlas_completion_v4": 0.361956,
-    "mean_completion_delta_v4_minus_v3": 0.000832,
-    "mean_expanded_component_coverage": 0.027778,
-    "mean_expanded_mlp_dominance_rate": 0.888889,
-    "mean_expanded_component_continue_winner_rate": 1.0,
-    "next_priority_counts": {
-      "mlp_continue_path_causal_audit": 24,
-      "attention_route_followup": 3
-    },
-    "model_completion_v4": {
-      "deepseek7b": 0.371278,
-      "glm4": 0.370302,
-      "qwen3": 0.344287
-    },
-    "family_completion_v4": {
-      "closure": 0.35488,
-      "content_knowledge": 0.335059,
-      "cross_lingual": 0.382693,
-      "language_action": 0.359632,
-      "output_protocol": 0.373225,
-      "readout_competition": 0.356862,
-      "reasoning_constraint": 0.380825,
-      "state_drift": 0.371747,
-      "syntax_structure": 0.342677
-    },
-    "progress_estimate": {
-      "pattern_family_atlas": 0.76,
-      "sample_type_coverage": 0.68,
-      "feature_mining": 0.62,
-      "physical_distribution_puzzle": 0.7,
-      "mechanism_audit": 0.47,
-      "closure": 0.21
-    }
-  },
-  "generated_files": [
-    "phase300_pattern_atlas_v3_cell_rows.jsonl",
-    "phase300_pattern_atlas_v3_node_rows.jsonl",
-    "phase300_pattern_atlas_v3_edge_rows.jsonl",
-    "phase300_pattern_atlas_v3_summary.json",
-    "phase303_semantic_object_summary_rows.jsonl",
-    "phase303_semantic_reuse_matrix_rows.jsonl",
-    "phase303_semantic_delta_matrix_rows.jsonl",
-    "phase303_semantic_attribute_path_rows.jsonl",
-    "phase303_semantic_family_cluster_rows.jsonl",
-    "phase303_semantic_reuse_delta_atlas_summary.json",
-    "phase304_semantic_reuse_matrix_v2_rows.jsonl",
-    "phase304_semantic_reuse_false_high_audit_rows.jsonl",
-    "phase304_semantic_reuse_delta_algorithm_v2_summary.json",
-    "phase306_semantic_physical_path_cell_rows.jsonl",
-    "phase306_semantic_attribute_atlas_rows.jsonl",
-    "phase306_semantic_physical_path_atlas_summary.json",
-    "phase308_three_position_semantic_position_cell_rows.jsonl",
-    "phase308_three_position_semantic_attribute_cell_rows.jsonl",
-    "phase308_three_position_semantic_route_rows.jsonl",
-    "phase308_three_position_semantic_atlas_summary.json"
-  ],
-  "last_phase": "Phase308",
-  "updated_at": "2026-07-10T06:00:56.379142+00:00",
-  "phase300_summary": {
-    "cell_rows": 27,
-    "mean_physical_path_confidence": 0.749074,
-    "mean_closure_gap": 0.597737
-  },
-  "phase303_summary": {
-    "reuse_matrix_rows": 190,
-    "delta_matrix_rows": 190,
-    "mean_measured_reuse_score": 0.697758
-  },
-  "phase304_summary": {
-    "corrected_reuse_rows": 190,
-    "false_high_reuse_count": 0,
-    "likely_shared_backbone_count": 41
-  },
-  "phase306_summary": {
-    "semantic_path_cell_rows": 21,
-    "mean_semantic_physical_path_score": 0.56339,
-    "mean_final_target_winner_rate": 0.547619
-  },
-  "phase308_summary": {
-    "position_cell_rows": 9,
-    "mean_position_path_score": 0.599125,
-    "route_type_counts": {
-      "mlp->mlp->mlp": 2,
-      "mlp->mlp->attention": 1
-    }
-  },
+  "schema_version": "pattern_family_atlas.v2",
+  "updated_at": "2026-07-12T09:08:42.759265+00:00",
   "phase326": {
     "status": "available",
     "families": [
@@ -2552,5 +31,358 @@
         "phase326_token_span_validation.json"
       ]
     }
+  },
+  "phase354_355": {
+    "status": "strict_negative_with_near_candidates",
+    "qualified_contracts": 3,
+    "raw_trace_rows": 1192896,
+    "fixed_nodes": 2592,
+    "graph_edges": 756,
+    "strict_dynamic_candidates": 0,
+    "replicated_direction_near_candidates": 67,
+    "physical_heldout_revealed": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase354_semantic_time_nodes.jsonl",
+      "phase354_semantic_time_edges.jsonl",
+      "phase354_cross_model_convergence.jsonl",
+      "phase355_near_candidates.jsonl",
+      "phase355_failure_summary.json"
+    ]
+  },
+  "phase356": {
+    "status": "coarse_blind_cartography_feasibility_only",
+    "source_raw_trace_rows": 1192896,
+    "blind_skeleton_rows": 70704,
+    "blind_calibration_stable_motifs": 68,
+    "cross_model_repeated_motifs": 47,
+    "full_trace_schema_complete": false,
+    "physical_heldout_revealed": false,
+    "causal_motif_count": 0,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase356_blind_motif_nodes.jsonl",
+      "phase356_blind_motif_edges.jsonl",
+      "phase356_blind_cartography_summary.json"
+    ]
+  },
+  "phase357": {
+    "status": "block_reconstruction_valid",
+    "anchor_cases": 36,
+    "reconstruction_rows": 1248,
+    "passing_models": 3,
+    "cross_model_reconstruction_valid": true,
+    "full_trace_schema_complete": false,
+    "physical_heldout_revealed": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase357_model_reconstruction_summary.jsonl",
+      "phase357_reconstruction_summary.json"
+    ]
+  },
+  "phase358": {
+    "status": "format_and_expanded_component_ledger_pass",
+    "format_cases": 6,
+    "layer_rows": 208,
+    "attention_head_rows": 6432,
+    "mlp_shard_rows": 3328,
+    "format_gate_pass": true,
+    "full_phase358_complete": false,
+    "physical_heldout_revealed": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase358_model_component_summary.jsonl",
+      "phase358_component_conservation_summary.json",
+      "phase358_expanded_ledger_summary.json"
+    ],
+    "expanded_cases": 12,
+    "expanded_layer_rows": 416,
+    "expanded_ledger_gate_pass": true,
+    "full_vector_anchors_persisted": true,
+    "blind_motif_discovery_complete": false
+  },
+  "phase359": {
+    "status": "sealed_full_vector_anchor_replay_pass",
+    "model_count": 3,
+    "anchor_count": 3,
+    "layer_file_count": 104,
+    "sealed_tensor_byte_count": 3550406712,
+    "all_models_replay_pass": true,
+    "raw_tensors_frontend_exported": false,
+    "physical_heldout_revealed": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase359_full_vector_anchor_summary.json"
+    ]
+  },
+  "phase360": {
+    "status": "nine_family_denominator_frozen_not_ready_for_full_discovery",
+    "family_count": 9,
+    "mechanism_count": 18,
+    "contract_gate_pass_count": 11,
+    "three_model_behavior_measured_count": 11,
+    "blind_discovery_admitted_count": 3,
+    "full_behavior_gate_pass_count": 2,
+    "phase358_expanded_case_count": 12,
+    "phase359_full_vector_anchor_count": 3,
+    "phase359_replayed_layer_count": 104,
+    "single_global_progress_percentage_valid": false,
+    "physical_heldout_revealed": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase360_denominator_summary.json"
+    ]
+  },
+  "phase361": {
+    "status": "r0_r1_complete_predictive_candidates_not_mechanisms",
+    "repaired_contract_count": 7,
+    "repaired_behavior_case_count": 2016,
+    "blind_discovery_admitted_count": 4,
+    "r0_r1_case_count": 96,
+    "r0_r1_ledger_row_count": 3328,
+    "r0_r1_sealed_byte_count": 1289962528,
+    "frozen_predictive_candidate_count": 93,
+    "universal_backbone_candidate_count": 77,
+    "selective_association_candidate_count": 16,
+    "operation_specific_mechanism_count": 0,
+    "physical_heldout_revealed": false,
+    "single_unit_causal_count": 0,
+    "raw_tensors_frontend_exported": false,
+    "files": [
+      "phase361_contract_repair_summary.json",
+      "phase361_frozen_mechanism_matrix.jsonl",
+      "phase361_r0_r1_summary.json",
+      "phase361_blind_prediction_summary.json",
+      "phase361_posthoc_predictive_summary.json"
+    ]
+  },
+  "phase362": {
+    "status": "independent_next_layer_survivors_temporal_formula_missing",
+    "case_count": 384,
+    "independent_calibration_case_count": 288,
+    "physical_confirmation_case_count": 96,
+    "generation_ledger_row_count": 29952,
+    "anchor_count": 9,
+    "next_layer_survivor_count": 7,
+    "temporal_predictive_survivor_count": 0,
+    "operation_specific_mechanism_count": 0,
+    "physical_confirmation_opened": false,
+    "raw_tensors_frontend_exported": false,
+    "files": [
+      "phase362_global_summary.json",
+      "phase362_anchor_replay_summary.json",
+      "phase362_frozen_candidate_summary.json",
+      "phase362_posthoc_survivor_summary.json"
+    ]
+  },
+  "phase363": {
+    "status": "temporal_candidate_route_closed_confirmation_remains_sealed",
+    "discovery_prompt_count": 288,
+    "sealed_confirmation_prompt_count": 96,
+    "tested_formula_count": 20,
+    "frozen_formula_count": 0,
+    "temporal_state_candidate_count": 0,
+    "competition_state_candidate_count": 0,
+    "physical_confirmation_opened": false,
+    "causal_intervention_executed": false,
+    "raw_tensors_frontend_exported": false,
+    "single_global_progress_percentage_valid": false,
+    "files": [
+      "phase363_global_summary.json",
+      "phase363_hypothesis_summary.json",
+      "phase363_all_formula_rows.jsonl"
+    ]
+  },
+  "phase364": {
+    "status": "p0_lossy_skeleton_p2_p3_instrumentation_incomplete",
+    "discovery_case_count": 288,
+    "anchor_count": 9,
+    "p0_structurally_noninjective": true,
+    "strict_formula_survivor_count": 0,
+    "mlp_single_neuron_self_contained_model_count": 0,
+    "dynamic_flow_bundle_schema_model_count": 0,
+    "new_model_execution_authorized": false,
+    "physical_confirmation_opened": false,
+    "raw_tensors_frontend_exported": false,
+    "files": [
+      "phase364_projection_audit_summary.json",
+      "phase365_instrumentation_protocol.json"
+    ]
+  },
+  "last_phase": "Phase380-GlobalLayoutStageMerge",
+  "phase365": {
+    "status": "three_model_dynamic_instrumentation_and_free_rollout_collection_complete",
+    "model_count": 3,
+    "case_count": 288,
+    "layer_file_count": 29952,
+    "valid_model_count": 3,
+    "physical_confirmation_opened": false,
+    "raw_tensors_frontend_exported": false,
+    "files": [
+      "phase365_repeat_noise_summary.json",
+      "phase365_collection_freeze_summary.json",
+      "phase366_full_collection_summary.json"
+    ]
+  },
+  "phase366": {
+    "status": "full_288_role_dynamic_bundles_and_blind_descriptors_complete",
+    "bundle_count": 288,
+    "event_count": 1069152,
+    "edge_count": 1068864,
+    "derived_file_count": 29952,
+    "descriptor_count": 519168,
+    "all_token_position_scope_complete": false,
+    "physical_confirmation_opened": false,
+    "raw_tensors_frontend_exported": false,
+    "files": [
+      "phase366_dynamic_bundle_summary.json",
+      "phase366_bundle_split_summary.json",
+      "phase366_derived_artifact_integrity_summary.json",
+      "phase366_descriptor_summary.json",
+      "phase366_threshold_custodian_summary.json"
+    ]
+  },
+  "phase367": {
+    "status": "blind_discovery_motifs_frozen_not_language_paths",
+    "discovery_case_count": 192,
+    "enumerated_window_count": 2196480,
+    "frozen_candidate_count": 49,
+    "cross_model_signature_count": 0,
+    "semantic_labels_used": false,
+    "files": [
+      "phase367_blind_motif_discovery_summary.json"
+    ]
+  },
+  "phase368": {
+    "status": "four_model_specific_calibrated_motifs_zero_cross_model_language_paths",
+    "calibration_case_count": 96,
+    "calibrated_local_motif_count": 4,
+    "cross_model_signature_count": 0,
+    "language_path_discovered": false,
+    "physical_confirmation_opened": false,
+    "raw_tensors_frontend_exported": false,
+    "files": [
+      "phase368_blind_motif_calibration_summary.json",
+      "phase368_dynamic_path_stage_summary.json"
+    ]
+  },
+  "phase369": {
+    "status": "raw_relation_strict_negative_calibration_and_physical_holdout_sealed",
+    "behavior_qualified_discovery_cases": 336,
+    "behavior_qualified_calibration_cases": 180,
+    "raw_collection_cases": 336,
+    "raw_relation_route_rows": 605696,
+    "level_1_model_count": 0,
+    "level_2_heterogeneous_pair_count": 0,
+    "language_path_discovered": false,
+    "files": [
+      "phase369_behavior_qualification_summary.json",
+      "phase369_raw_collection_summary.json",
+      "phase369_dynamic_bundle_summary.json",
+      "phase369_raw_relation_summary.json",
+      "phase369_blind_future_crossmodel_summary.json",
+      "phase369_evidence_nodes.jsonl",
+      "phase369_evidence_edges.jsonl",
+      "phase369_raw_topology_stage_summary.json"
+    ]
+  },
+  "phase370": {
+    "status": "fixed_hash_head_neuron_energy_topology_diagnostic_negative",
+    "head_route_count": 605696,
+    "mlp_role_count": 128128,
+    "new_independent_cycle_authorized": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase370_head_neuron_topology_summary.json",
+      "phase370_head_neuron_diagnostic_summary.json"
+    ]
+  },
+  "phase371": {
+    "status": "exact_measurement_complete_history_crossmodel_gate_negative",
+    "behavior_case_count": 864,
+    "internal_discovery_case_count": 264,
+    "combined_exact_ledger_bytes": 34343263536,
+    "lazy_explicit_node_count": 38808,
+    "blind_route_row_count": 299376,
+    "history_level2_count": 0,
+    "history_level3_count": 0,
+    "language_path_discovered": false,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase371a_exact_tree_feasibility_summary.json",
+      "phase371b_engineering_summary.json",
+      "phase371b_sufficient_state_summary.json",
+      "phase371c_case_bank_summary.json",
+      "phase371c_behavior_analysis_summary.json",
+      "phase371c_internal_collection_audit.json",
+      "phase371c_adjacent_extension_audit.json",
+      "phase371c_lazy_exact_path_summary.json",
+      "phase371c_blind_vector_contrast_summary.json",
+      "phase371c_blind_contrast_audit.json",
+      "phase371c_discovery_mapping_summary.json",
+      "phase371c_exact_history_residual_summary.json",
+      "phase371_exact_vector_stage_summary.json",
+      "phase371_measured_layer_pairs.jsonl",
+      "phase371_evidence_nodes.jsonl",
+      "phase371_evidence_edges.jsonl"
+    ]
+  },
+  "phase378": {
+    "status": "terminal_residual_carrier_physically_confirmed_upstream_unknown",
+    "decision_aligned_discovery_cases": 264,
+    "calibration_cases": 132,
+    "physical_cases": 96,
+    "minimal_terminal_carrier_count": 2,
+    "upstream_encoding_rule_count": 0,
+    "language_path_count": 0,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase375_protocol.json",
+      "phase375_blind_inventory_summary.json",
+      "phase375_discovery_summary.json",
+      "phase375_negative_result_diagnostic.json",
+      "phase376_decision_time_alignment_summary.json",
+      "phase376_intervention_summary.json",
+      "phase377_calibration_summary.json",
+      "phase378_physical_protocol.json",
+      "phase378_physical_behavior_analysis_summary.json",
+      "phase378_physical_summary.json",
+      "phase378_terminal_carrier_minimality_summary.json",
+      "phase378_decision_aligned_stage_summary.json",
+      "phase378_evidence_nodes.jsonl",
+      "phase378_evidence_edges.jsonl"
+    ]
+  },
+  "phase380": {
+    "status": "independent_residual_replication_terminal_interface_only",
+    "representative_mechanism_count": 4,
+    "qualified_trace_case_count": 780,
+    "exact_event_vector_count": 324480,
+    "causal_condition_row_count": 57600,
+    "replicated_residual_object_count": 5,
+    "terminal_interface_mechanism_count": 3,
+    "heterogeneous_upstream_cell_count": 0,
+    "language_path_count": 0,
+    "single_unit_causal_count": 0,
+    "files": [
+      "phase379_global_layout_protocol.json",
+      "phase379_case_bank_summary.json",
+      "phase379_phase330_decision_audit.json",
+      "phase379_discovery_mapping_summary.json",
+      "phase379_calibration_summary.json",
+      "phase379_backbone_confound_audit.json",
+      "phase380_independent_protocol.json",
+      "phase380_case_bank_summary.json",
+      "phase380_behavior_analysis_final_summary.json",
+      "phase380_residual_validation_summary.json",
+      "phase380_causal_scan_freeze.json",
+      "phase380_causal_layout_summary.json",
+      "phase380_global_layout_stage_summary.json",
+      "phase380_stable_layout_objects.jsonl",
+      "phase380_crossmodel_causal_cells.jsonl",
+      "phase380_shared_terminal_interfaces.jsonl",
+      "phase380_evidence_nodes.jsonl",
+      "phase380_evidence_edges.jsonl"
+    ]
   }
 }

@@ -1,0 +1,146 @@
+{
+  "schema_version": "51.0.0",
+  "phase_id": "Phase378-PhysicalProtocol",
+  "created_at": "2026-07-12T07:32:06.657166+00:00",
+  "objective": "narrow_physical_confirmation_of_decision_aligned_late_residual_content_transfer",
+  "scope": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "execution_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "mechanisms": [
+      "relation_binding",
+      "entity_recency"
+    ],
+    "registered_physical_groups_per_mechanism": 4,
+    "registered_case_count": 96,
+    "templates": [
+      "residual_current",
+      "residual_source_query_current"
+    ],
+    "relative_depth": "late",
+    "other_mechanisms_opened": false,
+    "single_neuron_scan": false
+  },
+  "behavior_gate": {
+    "max_new_tokens": 24,
+    "equal_prompt_length_bucketed": true,
+    "target_present_and_no_distractor": true,
+    "all_three_models_all_four_conditions_required": true,
+    "minimum_common_groups_per_mechanism": 3,
+    "failed_groups_replaced": false
+  },
+  "intervention_gate": {
+    "decision_alignment": "observed_target_completion_token",
+    "transfer_pairs": [
+      "A_to_C",
+      "C_to_A"
+    ],
+    "controls": [
+      "wrong_depth",
+      "wrong_role",
+      "wrong_time"
+    ],
+    "minimum_correct_transfer_gain": 0.1,
+    "minimum_control_margin": 0.05,
+    "minimum_common_groups_per_model_mechanism_template": 3,
+    "both_treatment_directions_required": true
+  },
+  "candidate_contract": [
+    {
+      "mechanism_id": "entity_recency",
+      "relative_depth": "late",
+      "template": "residual_current",
+      "calibration_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "winner_flip_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_calibration_pass": true,
+      "level3_calibration_pass": false,
+      "physical_confirmation_completed": false,
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "entity_recency",
+      "relative_depth": "late",
+      "template": "residual_source_query_current",
+      "calibration_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "winner_flip_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_calibration_pass": true,
+      "level3_calibration_pass": false,
+      "physical_confirmation_completed": false,
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "relative_depth": "late",
+      "template": "residual_current",
+      "calibration_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "winner_flip_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_calibration_pass": true,
+      "level3_calibration_pass": true,
+      "physical_confirmation_completed": false,
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "relative_depth": "late",
+      "template": "residual_source_query_current",
+      "calibration_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "winner_flip_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_calibration_pass": true,
+      "level3_calibration_pass": true,
+      "physical_confirmation_completed": false,
+      "language_mechanism_claimed": false
+    }
+  ],
+  "claim_boundary": {
+    "physical_transfer_confirms_terminal_content_carrier_only": true,
+    "upstream_encoding_rule_claimed": false,
+    "natural_necessity_claimed": false,
+    "full_generation_sufficiency_claimed": false,
+    "language_mechanism_claimed": false
+  },
+  "input_hashes": {
+    "calibration_summary": "bee6b1fc6806ce3698843b1bd829f30cfc7c4971eac0caa733cb886aeb2787a7",
+    "sealed_physical_cases": "f192cbb883d641e728062db1e743793b071deea2c4fb027dba9dc5dd1467ff24"
+  },
+  "authorization": {
+    "open_two_mechanism_physical_behavior_cases": true,
+    "run_physical_intervention_before_behavior_gate": false,
+    "open_other_mechanisms": false,
+    "single_neuron_scan": false
+  }
+}

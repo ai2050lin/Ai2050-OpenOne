@@ -1,0 +1,16 @@
+{
+  "phase": 379,
+  "task": "Remove oversized result blobs from local push history",
+  "github_limit_mb": 100,
+  "recommended_limit_mb": 50,
+  "backup_branch": "backup/pre-large-file-cleanup-20260712-010350",
+  "strategy": [
+    "Stash uncommitted working tree",
+    "Reset local unpublished commits to origin/main as working tree changes",
+    "Add exact oversized result paths to .gitignore",
+    "Restage only non-ignored files",
+    "Verify staged files are below 50MB before recommit"
+  ],
+  "model_tests_run": false,
+  "local_large_files_deleted": false
+}

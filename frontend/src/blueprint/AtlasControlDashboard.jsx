@@ -707,22 +707,16 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
   useEffect(() => {
     let mounted = true;
     Promise.all([
-      fetch(`${ATLAS_BASE}/phase284_summary.json`, { cache: 'no-store' }).then(async (res) => {
-        if (!res.ok) throw new Error(`phase284_summary.json ${res.status}`);
+      fetch(`${ATLAS_BASE}/progress.json`, { cache: 'no-store' }).then(async (res) => {
+        if (!res.ok) throw new Error(`progress.json ${res.status}`);
         const summary = await res.json();
-        const estimate = summary.progress_estimate || {};
-        const total = Number(summary.source_gap_rows || 0);
-        const remaining = summary.remaining_gap_counts || {};
+        const coverage = summary.client_stage_coverage || {};
         return {
-          pattern_family_atlas: estimate.pattern_family_atlas || 0,
-          physical_path_atlas: estimate.physical_distribution_puzzle || 0,
-          component_path_atlas: estimate.component_path_coverage || 0,
-          readout_competition_trace: total > 0 ? 1 - Number(remaining.need_readout_competition || total) / total : 0,
-          stepwise_rollout_trace: 0,
-          causal_closure: estimate.closure || 0,
-          latest_phase: summary.phase,
-          source_rows: total,
-          source: `${ATLAS_BASE}/phase284_summary.json`,
+          ...coverage,
+          last_phase: summary.last_phase,
+          latest_phase: summary.last_phase,
+          single_global_progress_percentage_valid: summary.single_global_progress_percentage_valid,
+          source: `${ATLAS_BASE}/progress.json`,
         };
       }),
       fetch(`${ATLAS_BASE}/manifest.json`, { cache: 'no-store' }).then((res) => {
@@ -764,6 +758,7 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
     const closure = progressMap.causal_closure || 0;
     return (pattern * 0.18) + (physical * 0.18) + (component * 0.16) + (readout * 0.14) + (rollout * 0.14) + (closure * 0.2);
   }, [progressMap]);
+  const overallValid = progress?.single_global_progress_percentage_valid !== false;
 
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
@@ -879,9 +874,9 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
               综合推进度 OVERALL
             </div>
             <div style={{ color: '#fff', fontSize: 32, fontWeight: 900, fontFamily: 'monospace', marginBottom: 6 }}>
-              {pct(overall)}
+              {overallValid ? pct(overall) : 'N/A'}
             </div>
-            <ProgressBar value={overall} color="#67e8f9" />
+            {overallValid && <ProgressBar value={overall} color="#67e8f9" />}
           </div>
         </div>
         {error && (
@@ -960,11 +955,13 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
           }}>
             <div style={{ color: '#94a3b8', fontSize: 10, fontWeight: 'bold', letterSpacing: 1, marginBottom: 4 }}>OVERALL PROGRESS</div>
             <div style={{ color: '#67e8f9', fontSize: 38, lineHeight: 1, fontWeight: 900, fontFamily: 'monospace' }}>
-              {pct(overall)}
+              {overallValid ? pct(overall) : 'N/A'}
             </div>
-            <div style={{ marginTop: 10 }}>
-              <ProgressBar value={overall} color="#67e8f9" />
-            </div>
+            {overallValid && (
+              <div style={{ marginTop: 10 }}>
+                <ProgressBar value={overall} color="#67e8f9" />
+              </div>
+            )}
           </div>
 
           {/* Right Progress bars in 3 columns */}

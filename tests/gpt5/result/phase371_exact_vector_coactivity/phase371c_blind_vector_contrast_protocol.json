@@ -1,0 +1,92 @@
+{
+  "schema_version": "47.16.0",
+  "phase_id": "Phase371C-Contrast",
+  "created_at": "2026-07-12T05:16:38.022574+00:00",
+  "objective": "compare_all_anonymous_condition_pairs_on_exact_path_vectors_before_semantic_unblinding",
+  "authorization_basis": {
+    "lazy_path_object_valid": true,
+    "candidate_language_path_count_before_contrast": 0,
+    "path_summary_hash": "837e834552e337aded03f50756f1ba72a49a112bb7b80032d62767ebce461908"
+  },
+  "frozen_denominator": {
+    "model_count": 3,
+    "parallel_group_count": 22,
+    "model_group_count": 66,
+    "anonymous_conditions_per_model_group": 4,
+    "unordered_condition_pairs_per_model_group": 6,
+    "pair_rows_before_route_expansion": 396,
+    "generation_time_count": 3,
+    "local_layer_pair_count": 3,
+    "roles": [
+      "source_end",
+      "query_end",
+      "answer_start",
+      "current_generation"
+    ]
+  },
+  "blind_extraction": {
+    "all_six_unordered_pairs_retained": true,
+    "all_three_perfect_matchings_retained": true,
+    "condition_semantics_available": false,
+    "family_or_mechanism_labels_available": false,
+    "target_rank_or_margin_available": false,
+    "top_k_route_selection": false,
+    "weighted_scalar_score": false
+  },
+  "exact_route_families": [
+    "layer_input_difference",
+    "attention_head_partition_difference",
+    "attention_merge_difference",
+    "post_attention_difference",
+    "mlp_neuron_partition_difference",
+    "mlp_merge_difference",
+    "layer_output_difference",
+    "label_free_vocab_distribution_difference"
+  ],
+  "navigation_indices_not_terminal_states": [
+    "exact_difference_norm",
+    "signed_cosine_to_parent_difference",
+    "child_parent_inner_product_share",
+    "child_cancellation_with_siblings",
+    "adjacent_output_direction_persistence"
+  ],
+  "same_graph_gates": {
+    "component_difference_sum_reconstructs_layer_output_difference": true,
+    "head_children_reconstruct_attention_difference": true,
+    "neuron_children_reconstruct_mlp_difference": true,
+    "source_layer_output_equals_receiver_layer_input": true,
+    "next_layer_output_relation_beats_wrong_depth_control": true,
+    "next_generation_relation_beats_time_shuffle_control": true,
+    "history_residual_gate_required": true,
+    "all_gates_must_pass_separately": true
+  },
+  "controls": [
+    "all_unordered_condition_pairs",
+    "wrong_depth_receiver",
+    "wrong_token_role",
+    "generation_time_shuffle",
+    "head_partition_permutation",
+    "mlp_partition_permutation"
+  ],
+  "candidate_freeze": {
+    "no_candidate_is_selected_by_a_single_navigation_index": true,
+    "candidate_requires_exact_vector_and_same_graph_gate_vector": true,
+    "candidate_code_and_rows_hashed_before_condition_unblinding": true,
+    "calibration_remains_sealed_during_discovery": true,
+    "failed_routes_remain_in_negative_atlas": true
+  },
+  "cross_model": {
+    "absolute_layer_head_neuron_ids_compared": false,
+    "unrestricted_coordinate_rotation_fitted": false,
+    "functional_partial_order_and_response_required": true,
+    "glm4_required_for_heterogeneous_level2": true
+  },
+  "authorization": {
+    "implement_and_hash_blind_contrast_extractor": true,
+    "execute_contrast_before_extractor_hash_freeze": false,
+    "open_semantic_condition_key": false,
+    "open_calibration": false,
+    "open_physical": false
+  },
+  "next_decision": "implement_streaming_exact_contrast_extractor_then_audit_cost_before_execution"
+}

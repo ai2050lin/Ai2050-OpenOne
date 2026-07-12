@@ -1,0 +1,67 @@
+{
+  "schema_version": "53.10.0",
+  "phase_id": "Phase380-CausalLayoutAnalysis",
+  "created_at": "2026-07-12T09:03:09.636269+00:00",
+  "objective": "test_whether_independently_stable_residual_profiles_contain_control_specific_causal_layout_cells",
+  "denominator": {
+    "condition_row_count": 57600,
+    "direction_gate_row_count": 28800,
+    "model_cell_count": 900,
+    "crossmodel_passing_cell_count": 14
+  },
+  "descriptive": {
+    "natural_transfer_gain_minimum": -12.681640625,
+    "natural_transfer_gain_median": 0.0234375,
+    "natural_transfer_gain_mean": 4.021616353127691,
+    "natural_transfer_gain_maximum": 103.740234375
+  },
+  "results": {
+    "direction_gate_pass_count": 2477,
+    "model_cell_pass_count": 34,
+    "heterogeneous_level2_cell_count": 10,
+    "level3_cell_count": 10,
+    "heterogeneous_terminal_interface_cell_count": 10,
+    "heterogeneous_upstream_cell_count": 0,
+    "shared_cross_mechanism_territory_count": 0,
+    "shared_cross_mechanism_territories": [],
+    "shared_terminal_interface_territory_count": 2,
+    "shared_terminal_interface_territories": [
+      {
+        "depth_name": "late",
+        "component_type": "layer_input",
+        "position_role": "current",
+        "mechanisms": [
+          "entity_recency",
+          "relation_binding",
+          "target_vs_wrong"
+        ],
+        "cross_mechanism_terminal_interface": true,
+        "upstream_language_rule_established": false,
+        "same_neurons_established": false
+      },
+      {
+        "depth_name": "late",
+        "component_type": "layer_output",
+        "position_role": "current",
+        "mechanisms": [
+          "entity_recency",
+          "relation_binding",
+          "target_vs_wrong"
+        ],
+        "cross_mechanism_terminal_interface": true,
+        "upstream_language_rule_established": false,
+        "same_neurons_established": false
+      }
+    ],
+    "complete_upstream_language_path_count": 0,
+    "single_neuron_causal_count": 0,
+    "language_encoding_mechanism_closed": false
+  },
+  "claim_boundary": {
+    "crossmodel_cell_is_a_complete_path": false,
+    "shared_normalized_cell_is_same_physical_neurons": false,
+    "terminal_endpoint_is_upstream_encoding_rule": false,
+    "late_layer_input_is_upstream_encoding_rule": false,
+    "physical_holdout_opened": false
+  }
+}

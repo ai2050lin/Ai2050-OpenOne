@@ -30,9 +30,22 @@ class Phase348AdjustedBlockScreenTests(unittest.TestCase):
         self.assertTrue(summary["denominator"]["all_model_completions_valid"])
         self.assertEqual(summary["denominator"]["screen_condition_row_count"], 4590)
         self.assertEqual(summary["denominator"]["actual_model_batch_size"], 1)
-        self.assertFalse(summary["results"]["heldout_causal_outcome_revealed"])
         self.assertFalse(summary["results"]["mcue_entry_gate_open"])
         self.assertEqual(summary["results"]["single_unit_causal_count"], 0)
+
+    def test_selective_heldout_boundary(self) -> None:
+        path = RESULT / "phase348_heldout_summary.json"
+        if not path.exists():
+            self.skipTest("Phase348 heldout has not been selectively revealed")
+        heldout = json.loads(path.read_text())
+        self.assertTrue(heldout["complete"]["valid"])
+        self.assertEqual(heldout["complete"]["case_count"], 63)
+        self.assertEqual(heldout["complete"]["phrase_row_count"], 315)
+        self.assertEqual(heldout["complete"]["rollout_row_count"], 252)
+        summary = json.loads((RESULT / "phase348_global_summary.json").read_text())
+        self.assertTrue(summary["results"]["heldout_causal_outcome_revealed"])
+        self.assertFalse(summary["claim_boundary"]["cross_model_mechanism_supported"])
+        self.assertFalse(summary["claim_boundary"]["single_neuron_supported"])
 
 
 if __name__ == "__main__":

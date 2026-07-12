@@ -1,0 +1,76 @@
+{
+  "schema_version": "43.1.0",
+  "phase_id": "Phase366-A",
+  "created_at": "2026-07-12T02:47:21.788606+00:00",
+  "objective": "freeze_group_independent_label_blind_discovery_and_calibration_splits",
+  "denominator": {
+    "model_count": 3,
+    "bundle_count": 288,
+    "independent_group_count": 72,
+    "condition_count_per_group": 4,
+    "blind_discovery_group_count": 48,
+    "blind_calibration_group_count": 24,
+    "blind_discovery_case_count": 192,
+    "blind_calibration_case_count": 96,
+    "physical_confirmation_case_count": 96
+  },
+  "results": {
+    "valid_bundle_count": 288,
+    "group_case_count_histogram": {
+      "4": 72
+    },
+    "group_condition_slot_count_histogram": {
+      "4": 72
+    },
+    "all_groups_have_four_cases": true,
+    "all_groups_have_four_condition_slots": true,
+    "physical_confirmation_overlap_count": 0,
+    "semantic_or_target_fields_added_to_bundle": false,
+    "condition_semantics_revealed": false
+  },
+  "model_split_case_counts": [
+    {
+      "model": "qwen3",
+      "split": "blind_discovery",
+      "case_count": 64
+    },
+    {
+      "model": "qwen3",
+      "split": "blind_calibration",
+      "case_count": 32
+    },
+    {
+      "model": "glm4",
+      "split": "blind_discovery",
+      "case_count": 64
+    },
+    {
+      "model": "glm4",
+      "split": "blind_calibration",
+      "case_count": 32
+    },
+    {
+      "model": "deepseek7b",
+      "split": "blind_discovery",
+      "case_count": 64
+    },
+    {
+      "model": "deepseek7b",
+      "split": "blind_calibration",
+      "case_count": 32
+    }
+  ],
+  "authorization": {
+    "label_blind_descriptor_extraction_authorized": true,
+    "semantic_label_reveal_authorized": false,
+    "physical_confirmation_authorized": false,
+    "causal_intervention_authorized": false
+  },
+  "claim_boundary": {
+    "bundle_split_frozen": true,
+    "motif_scoring_executed": false,
+    "language_path_discovered": false
+  },
+  "private_bundle_hash_manifest": "private/phase366_bundle_hash_manifest.json",
+  "next_decision": "extract_label_blind_directed_event_descriptors_then_freeze_noise_thresholds"
+}

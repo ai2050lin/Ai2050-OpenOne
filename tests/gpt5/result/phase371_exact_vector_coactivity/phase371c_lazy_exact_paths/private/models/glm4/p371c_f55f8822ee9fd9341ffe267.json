@@ -1,0 +1,4915 @@
+{
+  "schema_version": "47.15.0",
+  "phase_id": "Phase371C-Path",
+  "model": "glm4",
+  "blind_case_id": "p371c_f55f8822ee9fd9341ffe267",
+  "anonymous_model_id": "am371c_0f4087fff92",
+  "anonymous_parallel_group_id": "parallel371c_2afe937ff4662a04fd",
+  "anonymous_group_id": "group371c_b012d539c98462bb9b",
+  "anonymous_condition_slot": "slot371c_f9d6e7aa99",
+  "generation_time_count": 3,
+  "layer_pairs": [
+    {
+      "name": "early",
+      "source_layer": 0,
+      "receiver_layer": 1
+    },
+    {
+      "name": "middle",
+      "source_layer": 20,
+      "receiver_layer": 21
+    },
+    {
+      "name": "late",
+      "source_layer": 38,
+      "receiver_layer": 39
+    }
+  ],
+  "nodes": [
+    {
+      "id": "t0:l0:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        65
+      ],
+      "source_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l0:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "dd6b413411a969e9222a82a881328c6f162ad8b63e7ea76127d17f44b9413f51",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l0:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "aa00aa2c0e7f82e34cb6f4f84fbfe37ce4f0690f4e280596fe6eac90e3139bf0",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l0:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l0:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        65
+      ],
+      "source_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l1:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "c904e16329cd313cf588d6440b22f35a657f125f9e78f3b9cb46b61d1058d8c7",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l1:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "526a3fb335271770001328eb7dbf35bc567bb70a02a3f2c396a9c590b7f86c42",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l1:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l1:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l20:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l20:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        65
+      ],
+      "source_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l20:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "d050423ca4666c3de6bc94a3475f429f20598bdedc38235bdbf8fd2980c7323f",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l20:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l20:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l20:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "93e885b6da35df1ab3d19734d4af0c163f73eab4f108bd02cc4cc85c40e34d45",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l20:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l20:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_020.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l21:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l21:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        65
+      ],
+      "source_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l21:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "4e4285be05518c7c0bacc113f2916817a416daecd096a13a2cdde3a2eb04725f",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l21:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l21:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l21:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "111e77b6f5254aea6d25e41123b5872d43d14c1b510ed22fc26b916cc989e0f9",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l21:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l21:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_021.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l38:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l38:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        65
+      ],
+      "source_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l38:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "179cf043ba369a2ca5ae8778e073546b7dc6cb0c692a672ab9a082701cdf5335",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l38:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l38:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l38:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "a5556e50359ad89d25c750cd65aac9c2314e5e152a2ab251c7ea870e06142184",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l38:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l38:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_038.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l39:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l39:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        65
+      ],
+      "source_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t0:l39:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "655a5592eb92809feecb6c25fc0ae13172a897950af8dbf348511eb60661efc8",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t0:l39:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l39:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l39:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        65
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "7a95bd4ce46ed3f183f882cfb233bce486927596f16bc1aee242b763aca14ec9",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t0:l39:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:l39:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        65
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/layer_039.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t0:vocab",
+      "event_type": "label_free_vocab_state",
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_0/time_meta.pt",
+        "tensor_pointer": "full_vocabulary_logits",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        66
+      ],
+      "source_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l0:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "dd6b413411a969e9222a82a881328c6f162ad8b63e7ea76127d17f44b9413f51",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l0:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "aa00aa2c0e7f82e34cb6f4f84fbfe37ce4f0690f4e280596fe6eac90e3139bf0",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l0:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l0:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        66
+      ],
+      "source_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l1:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "c904e16329cd313cf588d6440b22f35a657f125f9e78f3b9cb46b61d1058d8c7",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l1:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "526a3fb335271770001328eb7dbf35bc567bb70a02a3f2c396a9c590b7f86c42",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l1:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l1:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l20:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l20:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        66
+      ],
+      "source_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l20:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "d050423ca4666c3de6bc94a3475f429f20598bdedc38235bdbf8fd2980c7323f",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l20:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l20:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l20:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "93e885b6da35df1ab3d19734d4af0c163f73eab4f108bd02cc4cc85c40e34d45",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l20:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l20:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_020.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l21:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l21:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        66
+      ],
+      "source_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l21:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "4e4285be05518c7c0bacc113f2916817a416daecd096a13a2cdde3a2eb04725f",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l21:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l21:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l21:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "111e77b6f5254aea6d25e41123b5872d43d14c1b510ed22fc26b916cc989e0f9",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l21:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l21:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_021.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l38:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l38:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        66
+      ],
+      "source_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l38:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "179cf043ba369a2ca5ae8778e073546b7dc6cb0c692a672ab9a082701cdf5335",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l38:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l38:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l38:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "a5556e50359ad89d25c750cd65aac9c2314e5e152a2ab251c7ea870e06142184",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l38:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l38:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_038.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l39:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l39:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        66
+      ],
+      "source_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t1:l39:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "655a5592eb92809feecb6c25fc0ae13172a897950af8dbf348511eb60661efc8",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t1:l39:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l39:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l39:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        66
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "7a95bd4ce46ed3f183f882cfb233bce486927596f16bc1aee242b763aca14ec9",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t1:l39:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:l39:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        66
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/layer_039.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t1:vocab",
+      "event_type": "label_free_vocab_state",
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_1/time_meta.pt",
+        "tensor_pointer": "full_vocabulary_logits",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        67
+      ],
+      "source_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l0:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "dd6b413411a969e9222a82a881328c6f162ad8b63e7ea76127d17f44b9413f51",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l0:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "aa00aa2c0e7f82e34cb6f4f84fbfe37ce4f0690f4e280596fe6eac90e3139bf0",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l0:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l0:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_000.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        67
+      ],
+      "source_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l1:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "c904e16329cd313cf588d6440b22f35a657f125f9e78f3b9cb46b61d1058d8c7",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l1:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "526a3fb335271770001328eb7dbf35bc567bb70a02a3f2c396a9c590b7f86c42",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l1:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l1:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_001.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l20:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l20:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        67
+      ],
+      "source_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l20:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "d050423ca4666c3de6bc94a3475f429f20598bdedc38235bdbf8fd2980c7323f",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l20:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l20:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l20:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "93e885b6da35df1ab3d19734d4af0c163f73eab4f108bd02cc4cc85c40e34d45",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l20:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l20:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_020.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l21:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l21:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        67
+      ],
+      "source_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l21:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "4e4285be05518c7c0bacc113f2916817a416daecd096a13a2cdde3a2eb04725f",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l21:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l21:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l21:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "111e77b6f5254aea6d25e41123b5872d43d14c1b510ed22fc26b916cc989e0f9",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l21:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l21:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_021.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l38:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l38:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        67
+      ],
+      "source_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l38:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "179cf043ba369a2ca5ae8778e073546b7dc6cb0c692a672ab9a082701cdf5335",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l38:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l38:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l38:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "a5556e50359ad89d25c750cd65aac9c2314e5e152a2ab251c7ea870e06142184",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l38:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l38:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "adjacent",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_038.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l39:input",
+      "event_type": "layer_input",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "component_vectors/layer_input_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l39:qk",
+      "event_type": "query_key_score",
+      "receiver_domain": [
+        0,
+        67
+      ],
+      "source_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "exact_query_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "attention/query_states_all_positions",
+        "slice": "all"
+      },
+      "exact_key_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "attention/key_states_all_positions",
+        "slice": "all"
+      },
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "derivation": "softmax(query@repeat_kv(key)^T*scaling+causal_mask)"
+    },
+    {
+      "id": "t2:l39:attn_heads",
+      "event_type": "attention_head_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "head_domain": [
+        0,
+        32
+      ],
+      "probability_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "attention/probabilities_all_receivers_all_sources",
+        "slice": "all"
+      },
+      "value_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "attention/value_states_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "655a5592eb92809feecb6c25fc0ae13172a897950af8dbf348511eb60661efc8",
+      "partitions": [
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          24,
+          28
+        ],
+        [
+          28,
+          32
+        ]
+      ],
+      "derivation": "per_head_probability_weighted_value_times_o_projection_head_block"
+    },
+    {
+      "id": "t2:l39:attn_merge",
+      "event_type": "attention_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "component_vectors/attention_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l39:attn_residual",
+      "event_type": "residual_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "component_vectors/post_attention_state_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l39:mlp_neurons",
+      "event_type": "mlp_single_neuron_write",
+      "position_domain": [
+        0,
+        67
+      ],
+      "neuron_domain": [
+        0,
+        13696
+      ],
+      "product_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "mlp/down_projection_input_product_all_positions",
+        "slice": "all"
+      },
+      "weight_reference_id": "7a95bd4ce46ed3f183f882cfb233bce486927596f16bc1aee242b763aca14ec9",
+      "partitions": [
+        [
+          0,
+          1712
+        ],
+        [
+          1712,
+          3424
+        ],
+        [
+          3424,
+          5136
+        ],
+        [
+          5136,
+          6848
+        ],
+        [
+          6848,
+          8560
+        ],
+        [
+          8560,
+          10272
+        ],
+        [
+          10272,
+          11984
+        ],
+        [
+          11984,
+          13696
+        ]
+      ],
+      "derivation": "product[position,neuron]*down_projection_weight[:,neuron]"
+    },
+    {
+      "id": "t2:l39:mlp_merge",
+      "event_type": "mlp_merge",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "component_vectors/mlp_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:l39:output",
+      "event_type": "layer_output",
+      "position_domain": [
+        0,
+        67
+      ],
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/layer_039.pt",
+        "tensor_pointer": "component_vectors/layer_output_all_positions",
+        "slice": "all"
+      }
+    },
+    {
+      "id": "t2:vocab",
+      "event_type": "label_free_vocab_state",
+      "exact_vector_ref": {
+        "ledger": "base",
+        "relative_path": "private/models/glm4/p371c_f55f8822ee9fd9341ffe267/time_2/time_meta.pt",
+        "tensor_pointer": "full_vocabulary_logits",
+        "slice": "all"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "t0:l0:input",
+      "target": "t0:l0:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l0:qk",
+      "target": "t0:l0:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l0:attn_heads",
+      "target": "t0:l0:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l0:input",
+      "target": "t0:l0:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l0:attn_merge",
+      "target": "t0:l0:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l0:attn_residual",
+      "target": "t0:l0:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l0:mlp_neurons",
+      "target": "t0:l0:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l0:attn_residual",
+      "target": "t0:l0:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l0:mlp_merge",
+      "target": "t0:l0:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l1:input",
+      "target": "t0:l1:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l1:qk",
+      "target": "t0:l1:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l1:attn_heads",
+      "target": "t0:l1:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l1:input",
+      "target": "t0:l1:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l1:attn_merge",
+      "target": "t0:l1:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l1:attn_residual",
+      "target": "t0:l1:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l1:mlp_neurons",
+      "target": "t0:l1:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l1:attn_residual",
+      "target": "t0:l1:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l1:mlp_merge",
+      "target": "t0:l1:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l20:input",
+      "target": "t0:l20:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l20:qk",
+      "target": "t0:l20:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l20:attn_heads",
+      "target": "t0:l20:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l20:input",
+      "target": "t0:l20:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l20:attn_merge",
+      "target": "t0:l20:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l20:attn_residual",
+      "target": "t0:l20:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l20:mlp_neurons",
+      "target": "t0:l20:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l20:attn_residual",
+      "target": "t0:l20:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l20:mlp_merge",
+      "target": "t0:l20:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l21:input",
+      "target": "t0:l21:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l21:qk",
+      "target": "t0:l21:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l21:attn_heads",
+      "target": "t0:l21:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l21:input",
+      "target": "t0:l21:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l21:attn_merge",
+      "target": "t0:l21:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l21:attn_residual",
+      "target": "t0:l21:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l21:mlp_neurons",
+      "target": "t0:l21:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l21:attn_residual",
+      "target": "t0:l21:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l21:mlp_merge",
+      "target": "t0:l21:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l38:input",
+      "target": "t0:l38:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l38:qk",
+      "target": "t0:l38:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l38:attn_heads",
+      "target": "t0:l38:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l38:input",
+      "target": "t0:l38:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l38:attn_merge",
+      "target": "t0:l38:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l38:attn_residual",
+      "target": "t0:l38:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l38:mlp_neurons",
+      "target": "t0:l38:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l38:attn_residual",
+      "target": "t0:l38:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l38:mlp_merge",
+      "target": "t0:l38:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l39:input",
+      "target": "t0:l39:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t0:l39:qk",
+      "target": "t0:l39:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t0:l39:attn_heads",
+      "target": "t0:l39:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t0:l39:input",
+      "target": "t0:l39:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l39:attn_merge",
+      "target": "t0:l39:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l39:attn_residual",
+      "target": "t0:l39:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t0:l39:mlp_neurons",
+      "target": "t0:l39:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t0:l39:attn_residual",
+      "target": "t0:l39:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t0:l39:mlp_merge",
+      "target": "t0:l39:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t0:l0:output",
+      "target": "t0:l1:input",
+      "type": "verified_layer_continuity",
+      "pair": "early",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t0:l20:output",
+      "target": "t0:l21:input",
+      "type": "verified_layer_continuity",
+      "pair": "middle",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t0:l38:output",
+      "target": "t0:l39:input",
+      "type": "verified_layer_continuity",
+      "pair": "late",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t0:l39:output",
+      "target": "t0:vocab",
+      "type": "final_norm_and_unembedding"
+    },
+    {
+      "source": "t0:vocab",
+      "target": "t1:l0:input",
+      "type": "greedy_generation_feedback"
+    },
+    {
+      "source": "t1:l0:input",
+      "target": "t1:l0:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l0:qk",
+      "target": "t1:l0:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l0:attn_heads",
+      "target": "t1:l0:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l0:input",
+      "target": "t1:l0:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l0:attn_merge",
+      "target": "t1:l0:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l0:attn_residual",
+      "target": "t1:l0:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l0:mlp_neurons",
+      "target": "t1:l0:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l0:attn_residual",
+      "target": "t1:l0:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l0:mlp_merge",
+      "target": "t1:l0:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l1:input",
+      "target": "t1:l1:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l1:qk",
+      "target": "t1:l1:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l1:attn_heads",
+      "target": "t1:l1:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l1:input",
+      "target": "t1:l1:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l1:attn_merge",
+      "target": "t1:l1:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l1:attn_residual",
+      "target": "t1:l1:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l1:mlp_neurons",
+      "target": "t1:l1:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l1:attn_residual",
+      "target": "t1:l1:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l1:mlp_merge",
+      "target": "t1:l1:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l20:input",
+      "target": "t1:l20:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l20:qk",
+      "target": "t1:l20:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l20:attn_heads",
+      "target": "t1:l20:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l20:input",
+      "target": "t1:l20:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l20:attn_merge",
+      "target": "t1:l20:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l20:attn_residual",
+      "target": "t1:l20:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l20:mlp_neurons",
+      "target": "t1:l20:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l20:attn_residual",
+      "target": "t1:l20:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l20:mlp_merge",
+      "target": "t1:l20:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l21:input",
+      "target": "t1:l21:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l21:qk",
+      "target": "t1:l21:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l21:attn_heads",
+      "target": "t1:l21:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l21:input",
+      "target": "t1:l21:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l21:attn_merge",
+      "target": "t1:l21:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l21:attn_residual",
+      "target": "t1:l21:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l21:mlp_neurons",
+      "target": "t1:l21:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l21:attn_residual",
+      "target": "t1:l21:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l21:mlp_merge",
+      "target": "t1:l21:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l38:input",
+      "target": "t1:l38:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l38:qk",
+      "target": "t1:l38:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l38:attn_heads",
+      "target": "t1:l38:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l38:input",
+      "target": "t1:l38:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l38:attn_merge",
+      "target": "t1:l38:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l38:attn_residual",
+      "target": "t1:l38:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l38:mlp_neurons",
+      "target": "t1:l38:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l38:attn_residual",
+      "target": "t1:l38:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l38:mlp_merge",
+      "target": "t1:l38:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l39:input",
+      "target": "t1:l39:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t1:l39:qk",
+      "target": "t1:l39:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t1:l39:attn_heads",
+      "target": "t1:l39:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t1:l39:input",
+      "target": "t1:l39:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l39:attn_merge",
+      "target": "t1:l39:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l39:attn_residual",
+      "target": "t1:l39:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t1:l39:mlp_neurons",
+      "target": "t1:l39:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t1:l39:attn_residual",
+      "target": "t1:l39:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t1:l39:mlp_merge",
+      "target": "t1:l39:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t1:l0:output",
+      "target": "t1:l1:input",
+      "type": "verified_layer_continuity",
+      "pair": "early",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t1:l20:output",
+      "target": "t1:l21:input",
+      "type": "verified_layer_continuity",
+      "pair": "middle",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t1:l38:output",
+      "target": "t1:l39:input",
+      "type": "verified_layer_continuity",
+      "pair": "late",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t1:l39:output",
+      "target": "t1:vocab",
+      "type": "final_norm_and_unembedding"
+    },
+    {
+      "source": "t1:vocab",
+      "target": "t2:l0:input",
+      "type": "greedy_generation_feedback"
+    },
+    {
+      "source": "t2:l0:input",
+      "target": "t2:l0:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l0:qk",
+      "target": "t2:l0:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l0:attn_heads",
+      "target": "t2:l0:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l0:input",
+      "target": "t2:l0:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l0:attn_merge",
+      "target": "t2:l0:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l0:attn_residual",
+      "target": "t2:l0:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l0:mlp_neurons",
+      "target": "t2:l0:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l0:attn_residual",
+      "target": "t2:l0:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l0:mlp_merge",
+      "target": "t2:l0:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l1:input",
+      "target": "t2:l1:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l1:qk",
+      "target": "t2:l1:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l1:attn_heads",
+      "target": "t2:l1:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l1:input",
+      "target": "t2:l1:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l1:attn_merge",
+      "target": "t2:l1:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l1:attn_residual",
+      "target": "t2:l1:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l1:mlp_neurons",
+      "target": "t2:l1:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l1:attn_residual",
+      "target": "t2:l1:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l1:mlp_merge",
+      "target": "t2:l1:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l20:input",
+      "target": "t2:l20:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l20:qk",
+      "target": "t2:l20:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l20:attn_heads",
+      "target": "t2:l20:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l20:input",
+      "target": "t2:l20:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l20:attn_merge",
+      "target": "t2:l20:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l20:attn_residual",
+      "target": "t2:l20:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l20:mlp_neurons",
+      "target": "t2:l20:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l20:attn_residual",
+      "target": "t2:l20:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l20:mlp_merge",
+      "target": "t2:l20:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l21:input",
+      "target": "t2:l21:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l21:qk",
+      "target": "t2:l21:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l21:attn_heads",
+      "target": "t2:l21:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l21:input",
+      "target": "t2:l21:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l21:attn_merge",
+      "target": "t2:l21:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l21:attn_residual",
+      "target": "t2:l21:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l21:mlp_neurons",
+      "target": "t2:l21:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l21:attn_residual",
+      "target": "t2:l21:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l21:mlp_merge",
+      "target": "t2:l21:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l38:input",
+      "target": "t2:l38:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l38:qk",
+      "target": "t2:l38:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l38:attn_heads",
+      "target": "t2:l38:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l38:input",
+      "target": "t2:l38:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l38:attn_merge",
+      "target": "t2:l38:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l38:attn_residual",
+      "target": "t2:l38:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l38:mlp_neurons",
+      "target": "t2:l38:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l38:attn_residual",
+      "target": "t2:l38:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l38:mlp_merge",
+      "target": "t2:l38:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l39:input",
+      "target": "t2:l39:qk",
+      "type": "normalization_and_projection"
+    },
+    {
+      "source": "t2:l39:qk",
+      "target": "t2:l39:attn_heads",
+      "type": "source_routing"
+    },
+    {
+      "source": "t2:l39:attn_heads",
+      "target": "t2:l39:attn_merge",
+      "type": "exact_head_sum"
+    },
+    {
+      "source": "t2:l39:input",
+      "target": "t2:l39:attn_residual",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l39:attn_merge",
+      "target": "t2:l39:attn_residual",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l39:attn_residual",
+      "target": "t2:l39:mlp_neurons",
+      "type": "normalization_and_gate"
+    },
+    {
+      "source": "t2:l39:mlp_neurons",
+      "target": "t2:l39:mlp_merge",
+      "type": "exact_neuron_sum"
+    },
+    {
+      "source": "t2:l39:attn_residual",
+      "target": "t2:l39:output",
+      "type": "residual_parent"
+    },
+    {
+      "source": "t2:l39:mlp_merge",
+      "target": "t2:l39:output",
+      "type": "residual_child"
+    },
+    {
+      "source": "t2:l0:output",
+      "target": "t2:l1:input",
+      "type": "verified_layer_continuity",
+      "pair": "early",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t2:l20:output",
+      "target": "t2:l21:input",
+      "type": "verified_layer_continuity",
+      "pair": "middle",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t2:l38:output",
+      "target": "t2:l39:input",
+      "type": "verified_layer_continuity",
+      "pair": "late",
+      "relative_error": 0.0
+    },
+    {
+      "source": "t2:l39:output",
+      "target": "t2:vocab",
+      "type": "final_norm_and_unembedding"
+    }
+  ],
+  "implicit_exact_event_counts": {
+    "query_key_score_events": 2509440,
+    "attention_head_write_events": 38016,
+    "mlp_single_neuron_write_events": 16270848,
+    "residual_merge_events": 2376
+  },
+  "claim_boundary": {
+    "label_free_extraction": true,
+    "semantic_labels_available": false,
+    "candidate_selected": false,
+    "language_path_claimed": false,
+    "global_all_layer_path": false
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "schema_version": "51.4.0",
+  "phase_id": "Phase378-PhysicalMerge",
+  "created_at": "2026-07-12T07:37:38.365013+00:00",
+  "denominator": {
+    "model_count": 3,
+    "physical_case_count": 96,
+    "template_depth_transfer_count": 192,
+    "patched_forward_condition_count": 768,
+    "canonical_candidate_count": 4
+  },
+  "quality": {
+    "behavior_strict_correct_count": 96,
+    "baseline_replay_match_counts": {
+      "qwen3": 32,
+      "glm4": 32,
+      "deepseek7b": 31
+    },
+    "all_patch_hooks_reached": true,
+    "failed_groups_replaced": false
+  },
+  "results": {
+    "physically_confirmed_terminal_carrier_count": 4,
+    "level3_terminal_carrier_count": 2,
+    "upstream_encoding_rule_count": 0,
+    "natural_necessity_count": 0,
+    "full_generation_sufficiency_count": 0,
+    "language_path_candidate_count": 0,
+    "language_mechanism_claimed": false
+  },
+  "model_results": [
+    {
+      "model": "qwen3",
+      "model_candidate_count": 4,
+      "physical_winner_flip_candidate_count": 4
+    },
+    {
+      "model": "glm4",
+      "model_candidate_count": 4,
+      "physical_winner_flip_candidate_count": 4
+    },
+    {
+      "model": "deepseek7b",
+      "model_candidate_count": 4,
+      "physical_winner_flip_candidate_count": 2
+    }
+  ],
+  "cross_model_rows": [
+    {
+      "mechanism_id": "entity_recency",
+      "relative_depth": "late",
+      "template": "residual_current",
+      "physical_transfer_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "physical_winner_flip_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_physical_pass": true,
+      "level3_physical_pass": false,
+      "evidence_class": "physically_confirmed_terminal_content_carrier",
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "entity_recency",
+      "relative_depth": "late",
+      "template": "residual_source_query_current",
+      "physical_transfer_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "physical_winner_flip_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_physical_pass": true,
+      "level3_physical_pass": false,
+      "evidence_class": "physically_confirmed_terminal_content_carrier",
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "relative_depth": "late",
+      "template": "residual_current",
+      "physical_transfer_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "physical_winner_flip_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_physical_pass": true,
+      "level3_physical_pass": true,
+      "evidence_class": "physically_confirmed_terminal_content_carrier",
+      "language_mechanism_claimed": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "relative_depth": "late",
+      "template": "residual_source_query_current",
+      "physical_transfer_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "physical_winner_flip_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_level2_physical_pass": true,
+      "level3_physical_pass": true,
+      "evidence_class": "physically_confirmed_terminal_content_carrier",
+      "language_mechanism_claimed": false
+    }
+  ],
+  "claim_boundary": {
+    "physical_transfer_confirms_terminal_content_carrier_only": true,
+    "upstream_encoding_rule_claimed": false,
+    "natural_necessity_claimed": false,
+    "full_generation_sufficiency_claimed": false,
+    "language_mechanism_claimed": false
+  },
+  "next_stage": {
+    "priority": "trace_where_terminal_content_residual_is_formed_before_late_readout",
+    "continue_terminal_residual_swaps": false,
+    "open_other_language_families": false,
+    "single_neuron_scan": false
+  }
+}

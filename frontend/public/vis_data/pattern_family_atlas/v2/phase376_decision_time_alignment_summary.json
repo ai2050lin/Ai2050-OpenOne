@@ -1,0 +1,117 @@
+{
+  "schema_version": "49.0.0",
+  "phase_id": "Phase376-DecisionAlignmentAudit",
+  "created_at": "2026-07-12T07:13:46.171744+00:00",
+  "objective": "test_whether_fixed_generation_offsets_are_crossmodel_semantic_events",
+  "denominator": {
+    "model_count": 3,
+    "case_count": 264,
+    "case_count_per_model": 88,
+    "crossmodel_semantic_condition_count": 88
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "case_count": 88,
+      "decision_step_distribution": {
+        "0": 43,
+        "1": 20,
+        "15": 23,
+        "17": 2
+      },
+      "mechanism_distributions": {
+        "entity_recency": {
+          "0": 24,
+          "1": 20
+        },
+        "relation_binding": {
+          "15": 23,
+          "0": 19,
+          "17": 2
+        }
+      },
+      "within_fixed_t0_t2_count": 63,
+      "within_fixed_t0_t2_rate": 0.7159090909090909,
+      "missing_target_step_count": 0
+    },
+    {
+      "model": "glm4",
+      "case_count": 88,
+      "decision_step_distribution": {
+        "0": 61,
+        "1": 20,
+        "13": 7
+      },
+      "mechanism_distributions": {
+        "entity_recency": {
+          "0": 24,
+          "1": 20
+        },
+        "relation_binding": {
+          "0": 37,
+          "13": 7
+        }
+      },
+      "within_fixed_t0_t2_count": 81,
+      "within_fixed_t0_t2_rate": 0.9204545454545454,
+      "missing_target_step_count": 0
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 88,
+      "decision_step_distribution": {
+        "0": 10,
+        "1": 6,
+        "15": 42,
+        "16": 13,
+        "17": 15,
+        "18": 1,
+        "19": 1
+      },
+      "mechanism_distributions": {
+        "entity_recency": {
+          "0": 10,
+          "17": 13,
+          "16": 13,
+          "1": 6,
+          "19": 1,
+          "18": 1
+        },
+        "relation_binding": {
+          "15": 42,
+          "17": 2
+        }
+      },
+      "within_fixed_t0_t2_count": 16,
+      "within_fixed_t0_t2_rate": 0.18181818181818182,
+      "missing_target_step_count": 0
+    }
+  ],
+  "crossmodel": {
+    "exact_same_decision_step_count": 16,
+    "all_models_within_fixed_t0_t2_count": 16,
+    "semantic_condition_count": 88
+  },
+  "results": {
+    "fixed_t0_t2_is_crossmodel_semantic_alignment": false,
+    "phase374_375_fixed_time_results_are_early_prefix_diagnostics": true,
+    "phase374_375_fixed_time_results_are_answer_decision_mechanisms": false,
+    "decision_aligned_recollection_required": true
+  },
+  "claim_boundary": {
+    "invalidates_existing_exact_tensor_measurements": false,
+    "invalidates_fixed_offset_semantic_comparison": true,
+    "proves_decision_aligned_subgraph_causality": false
+  },
+  "next_stage": {
+    "events": [
+      "answer_entry",
+      "pre_target_decision",
+      "target_decision"
+    ],
+    "primary_readout": "direct_activation_swap_and_target_token_margin",
+    "predictive_prefilter_required": false,
+    "calibration_opened": false,
+    "physical_opened": false
+  }
+}

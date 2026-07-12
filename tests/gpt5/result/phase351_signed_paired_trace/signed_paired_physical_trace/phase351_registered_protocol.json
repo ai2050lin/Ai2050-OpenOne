@@ -1,0 +1,44 @@
+{
+  "schema_version": "27.0.0",
+  "phase_id": "Phase351",
+  "created_at": "2026-07-11T12:17:45.696014+00:00",
+  "purpose": "Measure signed target-versus-competitor paired trajectories without revealing physical heldout cases.",
+  "registered_case_count": 576,
+  "families": [
+    "closure",
+    "language_action",
+    "state_drift"
+  ],
+  "splits": [
+    "physical_discovery",
+    "physical_calibration"
+  ],
+  "components": [
+    "attention_output",
+    "mlp_output",
+    "residual_increment"
+  ],
+  "depth_bins": [
+    "early",
+    "middle",
+    "late"
+  ],
+  "position_roles": [
+    "source",
+    "query",
+    "answer_start"
+  ],
+  "metrics": [
+    "component_l2_norm",
+    "signed_target_cosine",
+    "signed_best_competitor_cosine",
+    "signed_competition_margin"
+  ],
+  "official_execution_mode": "b1_left_cache0",
+  "claim_boundaries": [
+    "Only physical discovery and calibration traces are visible.",
+    "Signed unembedding alignment remains a descriptive readout, not a causal contribution.",
+    "The explicit shortcut control is not a pure operation-off state.",
+    "No generated-time trajectory, heldout trace, or intervention is included."
+  ]
+}

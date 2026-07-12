@@ -1,0 +1,77 @@
+{
+  "schema_version": "47.15.0",
+  "phase_id": "Phase371C-Path",
+  "created_at": "2026-07-12T05:14:56.824753+00:00",
+  "objective": "build_complete_lazy_references_for_all_measured_qk_head_neuron_residual_and_generation_events",
+  "valid": true,
+  "denominator": {
+    "model_count": 3,
+    "case_count": 264,
+    "explicit_node_count": 38808,
+    "explicit_edge_count": 46464,
+    "implicit_exact_event_counts": {
+      "query_key_score_events": 913988976,
+      "attention_head_write_events": 11455344,
+      "mlp_single_neuron_write_events": 5248129536,
+      "residual_merge_events": 747432
+    }
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "case_count": 88,
+      "explicit_node_count": 12936,
+      "explicit_edge_count": 15488,
+      "implicit_exact_event_counts": {
+        "query_key_score_events": 365474688,
+        "attention_head_write_events": 4281984,
+        "mlp_single_neuron_write_events": 1301723136,
+        "residual_merge_events": 267624
+      }
+    },
+    {
+      "model": "glm4",
+      "case_count": 88,
+      "explicit_node_count": 12936,
+      "explicit_edge_count": 15488,
+      "implicit_exact_event_counts": {
+        "query_key_score_events": 265082496,
+        "attention_head_write_events": 3648384,
+        "mlp_single_neuron_write_events": 1561508352,
+        "residual_merge_events": 228024
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 88,
+      "explicit_node_count": 12936,
+      "explicit_edge_count": 15488,
+      "implicit_exact_event_counts": {
+        "query_key_score_events": 283431792,
+        "attention_head_write_events": 3524976,
+        "mlp_single_neuron_write_events": 2384898048,
+        "residual_merge_events": 251784
+      }
+    }
+  ],
+  "quality": {
+    "semantic_forbidden_field_count": 0,
+    "top_k_used": false,
+    "scalar_or_hash_terminal_state_used": false,
+    "exact_vector_materialization_duplicated": false,
+    "verified_local_continuity_edges_per_case": 9
+  },
+  "results": {
+    "lazy_exact_path_object_complete_for_measured_layers": true,
+    "global_all_layer_path_complete": false,
+    "candidate_language_path_count": 0,
+    "language_mechanism_claimed": false
+  },
+  "authorization": {
+    "freeze_label_free_pairwise_vector_contrast_algorithm": true,
+    "use_semantic_labels_during_candidate_extraction": false,
+    "open_calibration": false,
+    "open_physical": false
+  },
+  "next_decision": "freeze_blind_all_pair_vector_contrast_and_same_graph_replay_before_condition_unblinding"
+}

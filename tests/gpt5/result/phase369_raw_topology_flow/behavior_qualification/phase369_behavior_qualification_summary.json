@@ -1,0 +1,91 @@
+{
+  "schema_version": "46.0.0",
+  "phase_id": "Phase369",
+  "created_at": "2026-07-12T03:41:53.467261+00:00",
+  "objective": "freeze_cross_model_natural_behavior_denominator_before_raw_internal_collection",
+  "input": {
+    "model_count": 3,
+    "nonphysical_case_count": 432,
+    "physical_holdout_case_count_loaded": 0,
+    "parallel_group_count": 36
+  },
+  "qualification": {
+    "model_group_count": 108,
+    "qualified_model_group_count": 79,
+    "qualified_parallel_group_count": 25,
+    "qualified_case_count": 300,
+    "fresh_discovery_blind_case_count": 204,
+    "fresh_calibration_blind_case_count": 96,
+    "requires_all_four_conditions_and_all_three_models": true,
+    "gates": [
+      {
+        "split": "fresh_discovery",
+        "mechanism_id": "relation_binding",
+        "qualified_parallel_group_count": 5,
+        "minimum_required": 4,
+        "passed": true
+      },
+      {
+        "split": "fresh_discovery",
+        "mechanism_id": "target_vs_wrong",
+        "qualified_parallel_group_count": 6,
+        "minimum_required": 4,
+        "passed": true
+      },
+      {
+        "split": "fresh_discovery",
+        "mechanism_id": "entity_recency",
+        "qualified_parallel_group_count": 6,
+        "minimum_required": 4,
+        "passed": true
+      },
+      {
+        "split": "fresh_discovery",
+        "mechanism_id": "number_agreement",
+        "qualified_parallel_group_count": 0,
+        "minimum_required": 4,
+        "passed": false
+      },
+      {
+        "split": "fresh_calibration",
+        "mechanism_id": "relation_binding",
+        "qualified_parallel_group_count": 3,
+        "minimum_required": 2,
+        "passed": true
+      },
+      {
+        "split": "fresh_calibration",
+        "mechanism_id": "target_vs_wrong",
+        "qualified_parallel_group_count": 2,
+        "minimum_required": 2,
+        "passed": true
+      },
+      {
+        "split": "fresh_calibration",
+        "mechanism_id": "entity_recency",
+        "qualified_parallel_group_count": 3,
+        "minimum_required": 2,
+        "passed": true
+      },
+      {
+        "split": "fresh_calibration",
+        "mechanism_id": "number_agreement",
+        "qualified_parallel_group_count": 0,
+        "minimum_required": 2,
+        "passed": false
+      }
+    ],
+    "all_gates_passed": false
+  },
+  "seals": {
+    "semantic_labels_in_public_qualified_case_files": false,
+    "physical_holdout_opened": false,
+    "phase368_calibration_reused": false
+  },
+  "authorization": {
+    "fresh_discovery_raw_collection": false,
+    "fresh_calibration_raw_collection": false,
+    "physical_holdout_execution": false
+  },
+  "next_decision": "stop_and_generate_an_independent_replacement_case_bank_without_opening_physical_holdout"
+}

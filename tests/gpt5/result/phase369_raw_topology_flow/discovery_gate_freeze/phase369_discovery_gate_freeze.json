@@ -1,0 +1,34 @@
+{
+  "schema_version": "46.2.0",
+  "phase_id": "Phase369",
+  "created_at": "2026-07-12T04:15:40.311446+00:00",
+  "frozen_before_discovery_evaluation": true,
+  "unit_of_replication": "independent_anonymous_group_not_route_layer_or_condition",
+  "future_prediction_gates_per_model": {
+    "raw_mean_future_flow_error_strictly_below_low_ten_descriptor": true,
+    "raw_case_win_fraction_over_low_strictly_above": 0.5,
+    "raw_mean_vocab_error_not_above_low": true,
+    "raw_mean_future_flow_error_below_random": true,
+    "raw_mean_future_flow_error_below_time_shuffle": true,
+    "raw_mean_future_flow_error_below_role_permutation": true,
+    "raw_mean_future_flow_error_below_equal_energy_wrong_flow": true,
+    "raw_mean_future_flow_error_below_public_backbone": true
+  },
+  "cross_model_gates_per_pair": {
+    "raw_residual_matched_separation_ratio_below_one": true,
+    "raw_residual_matched_separation_ratio_below_low_residual_ratio": true,
+    "raw_residual_top5_retrieval_rate_above_low_residual": true,
+    "raw_residual_top5_retrieval_rate_above_random_rate": true
+  },
+  "evidence_levels": {
+    "level_1": "one_model_passes_all_future_prediction_components",
+    "level_2": "glm4_qwen3_or_glm4_deepseek7b_pair_passes_all_cross_model_components_and_both_models_are_level_1",
+    "architecture_family_only": "qwen3_deepseek7b_pair_without_glm4",
+    "level_3": "all_three_pairs_pass_and_all_three_models_are_level_1"
+  },
+  "calibration_entry_gate": "at_least_one_level_2_pair",
+  "weighted_scalar_score_used": false,
+  "calibration_may_retune_gate": false,
+  "semantic_labels_or_target_rank_used": false,
+  "physical_holdout_opened": false
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": "49.2.0",
+  "phase_id": "Phase376-Intervention",
+  "created_at": "2026-07-12T07:24:42.580890+00:00",
+  "model": "deepseek7b",
+  "execution": {
+    "device": "cuda:0",
+    "model_execution": true,
+    "discovery_only": true,
+    "calibration_opened": false,
+    "physical_opened": false
+  },
+  "denominator": {
+    "case_count": 88,
+    "parallel_group_count": 22,
+    "transfer_count": 88,
+    "template_depth_transfer_count": 792,
+    "patched_forward_condition_count": 3168,
+    "group_gate_count": 198
+  },
+  "quality": {
+    "baseline_replay_count": 88,
+    "baseline_replay_match_count": 88,
+    "baseline_replay_match_rate": 1.0,
+    "all_patch_hooks_reached": true
+  },
+  "results": {
+    "model_candidate_count": 6,
+    "replicated_winner_flip_candidate_count": 2,
+    "model_candidates": [
+      {
+        "model": "deepseek7b",
+        "mechanism_id": "entity_recency",
+        "relative_depth": "late",
+        "template": "attention_mlp_current",
+        "group_pass_count": 9,
+        "winner_flip_group_count": 0,
+        "minimum_group_count": 8,
+        "model_gate_pass": true,
+        "replicated_winner_flip_pass": false
+      },
+      {
+        "model": "deepseek7b",
+        "mechanism_id": "entity_recency",
+        "relative_depth": "late",
+        "template": "residual_current",
+        "group_pass_count": 10,
+        "winner_flip_group_count": 6,
+        "minimum_group_count": 8,
+        "model_gate_pass": true,
+        "replicated_winner_flip_pass": false
+      },
+      {
+        "model": "deepseek7b",
+        "mechanism_id": "entity_recency",
+        "relative_depth": "late",
+        "template": "residual_source_query_current",
+        "group_pass_count": 10,
+        "winner_flip_group_count": 6,
+        "minimum_group_count": 8,
+        "model_gate_pass": true,
+        "replicated_winner_flip_pass": false
+      },
+      {
+        "model": "deepseek7b",
+        "mechanism_id": "relation_binding",
+        "relative_depth": "late",
+        "template": "attention_mlp_current",
+        "group_pass_count": 9,
+        "winner_flip_group_count": 0,
+        "minimum_group_count": 8,
+        "model_gate_pass": true,
+        "replicated_winner_flip_pass": false
+      },
+      {
+        "model": "deepseek7b",
+        "mechanism_id": "relation_binding",
+        "relative_depth": "late",
+        "template": "residual_current",
+        "group_pass_count": 11,
+        "winner_flip_group_count": 11,
+        "minimum_group_count": 8,
+        "model_gate_pass": true,
+        "replicated_winner_flip_pass": true
+      },
+      {
+        "model": "deepseek7b",
+        "mechanism_id": "relation_binding",
+        "relative_depth": "late",
+        "template": "residual_source_query_current",
+        "group_pass_count": 11,
+        "winner_flip_group_count": 11,
+        "minimum_group_count": 8,
+        "model_gate_pass": true,
+        "replicated_winner_flip_pass": true
+      }
+    ]
+  },
+  "claim_boundary": {
+    "full_generation_tested": false,
+    "natural_necessity_tested": false,
+    "single_neuron_causality_tested": false,
+    "language_mechanism_claimed": false
+  }
+}

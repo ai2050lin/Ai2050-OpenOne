@@ -1,0 +1,160 @@
+{
+  "schema_version": "49.1.0",
+  "phase_id": "Phase376-InterventionProtocol",
+  "created_at": "2026-07-12T07:16:51.611692+00:00",
+  "objective": "test_direct_content_transfer_at_semantically_aligned_answer_decisions_without_a_predictive_prefilter",
+  "rationale": {
+    "phase375_all_absolute_future_projection_gates_failed": true,
+    "phase371_fixed_offsets_crossmodel_semantically_aligned": false,
+    "same_coordinate_projection_is_primary_causal_readout": false,
+    "direct_natural_boundary_intervention_required": true
+  },
+  "frozen_scope": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "execution_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "mechanisms": [
+      "relation_binding",
+      "entity_recency"
+    ],
+    "discovery_parallel_groups_per_model": 22,
+    "conditions_per_group": 4,
+    "case_count": 264,
+    "relative_depths": [
+      "early",
+      "middle",
+      "late"
+    ],
+    "calibration_opened": false,
+    "physical_opened": false,
+    "new_cases_added": false
+  },
+  "semantic_alignment": {
+    "decision_event": "context_immediately_before_the_token_completing_target_alias",
+    "answer_entry_event": "formatted_prompt_before_any_generated_token",
+    "decision_context_tokens": "prompt_plus_natural_generated_prefix_before_decision",
+    "target_token": "observed_natural_token_at_decision_step",
+    "fixed_token_offset_used": false
+  },
+  "transfer_pairs": {
+    "primary_treatment": [
+      "A_to_C",
+      "C_to_A"
+    ],
+    "matched_direct_route_control": [
+      "B_to_D",
+      "D_to_B"
+    ],
+    "primary_group_gate_requires_both_treatment_directions": true
+  },
+  "natural_templates": {
+    "residual_current": {
+      "component": "residual_output",
+      "roles": [
+        "current"
+      ]
+    },
+    "residual_source_query_current": {
+      "component": "residual_output",
+      "roles": [
+        "source",
+        "query",
+        "current"
+      ]
+    },
+    "attention_mlp_current": {
+      "component": "attention_mlp_output",
+      "roles": [
+        "current"
+      ]
+    }
+  },
+  "batched_conditions": {
+    "correct": "decision_event_correct_depth_correct_roles",
+    "wrong_depth": "decision_event_cyclic_depth_correct_roles",
+    "wrong_role": "decision_event_correct_depth_cyclic_donor_roles",
+    "wrong_time": "answer_entry_event_correct_depth_correct_roles"
+  },
+  "primary_readout": {
+    "margin": "donor_target_token_logit_minus_recipient_target_token_logit",
+    "transfer_gain": "patched_margin_minus_recipient_baseline_margin",
+    "winner_transfer": "donor_target_token_becomes_argmax",
+    "full_generation_behavior_claimed": false,
+    "trained_probe_used": false
+  },
+  "frozen_numeric_gates": {
+    "minimum_correct_transfer_gain": 0.1,
+    "minimum_gain_over_wrong_depth": 0.05,
+    "minimum_gain_over_wrong_role": 0.05,
+    "minimum_gain_over_wrong_time_when_distinct": 0.05,
+    "minimum_independent_groups_per_model_mechanism_template": 8,
+    "both_treatment_directions_required": true
+  },
+  "cross_model_gate": {
+    "canonical_identity": [
+      "mechanism",
+      "relative_depth",
+      "template"
+    ],
+    "heterogeneous_level2_requires_glm4": true,
+    "level3_requires_all_models": true,
+    "same_absolute_layer_required": false
+  },
+  "evidence_boundary": {
+    "positive_transfer_without_winner_flip": "causal_content_carrier_candidate",
+    "winner_flip": "single_token_local_sufficiency_candidate",
+    "full_language_mechanism": false,
+    "natural_necessity_tested": false,
+    "single_neuron_causality_tested": false
+  },
+  "stop_rules": {
+    "no_model_candidate": "close_current_natural_templates",
+    "single_model_only": "record_model_specific_intervention_effect",
+    "level2_without_winner_flip": "do_not_open_calibration",
+    "level2_with_replicated_winner_flip": "authorize_separate_calibration_protocol"
+  },
+  "input_hashes": {
+    "decision_alignment": {
+      "path": "tests/gpt5/result/phase376_decision_aligned_subgraphs/phase376_decision_time_alignment_summary.json",
+      "sha256": "4f3905e8b023daa990d3a2209ef5c3825dead20ea6794e353afc19138a00dcf2"
+    },
+    "phase375_negative_diagnostic": {
+      "path": "tests/gpt5/result/phase375_finite_exact_subgraphs/phase375_discovery/phase375_negative_result_diagnostic.json",
+      "sha256": "54075ece1537d15298ab98f51892432f56d748e71a53f87652f1f4a89a3f14bd"
+    },
+    "collector_cases": {
+      "path": "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_behavior_analysis/private/phase371c_discovery_collector_cases.jsonl",
+      "sha256": "2e75bccd09fbabacd460c0dee3f50a4eff7cfd6c6d8e37e842442c3f21590fc1"
+    },
+    "behavior_qwen3": {
+      "path": "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_behavior_qualification/private/models/qwen3/phase371c_behavior_rows.jsonl",
+      "sha256": "9dd2dc7d780eafa489e10332e410d14db7843458d6c7d1ec7efa6f683ab7d243"
+    },
+    "behavior_glm4": {
+      "path": "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_behavior_qualification/private/models/glm4/phase371c_behavior_rows.jsonl",
+      "sha256": "511429959b59463a908952afd72882eb49022c4a0a2bd37d4d95814e0e7a7f6d"
+    },
+    "behavior_deepseek7b": {
+      "path": "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_behavior_qualification/private/models/deepseek7b/phase371c_behavior_rows.jsonl",
+      "sha256": "dd0d7a1f51300d68154c7781a139d75cde19eb9fcee0648f7de7d603365141d6"
+    },
+    "condition_key": {
+      "path": "tests/gpt5/result/phase371_exact_vector_coactivity/phase371c_discovery_mapping/private/phase371c_discovery_condition_key.jsonl",
+      "sha256": "09eabd49ed56d8be8e0d83f65fb20b6bf59b35f500c5f7d01518bc04b01d9745"
+    }
+  },
+  "authorization": {
+    "run_all_preregistered_discovery_interventions": true,
+    "predictive_candidate_required": false,
+    "open_calibration": false,
+    "open_physical": false,
+    "single_neuron_scan": false
+  }
+}

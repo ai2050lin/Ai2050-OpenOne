@@ -1,0 +1,64 @@
+{
+  "schema_version": "47.13.0",
+  "phase_id": "Phase371C-Adj",
+  "created_at": "2026-07-12T05:08:59.370480+00:00",
+  "objective": "add_only_the_three_missing_neighbor_layers_needed_for_local_next_layer_replay",
+  "trigger": {
+    "base_ledger_valid": true,
+    "three_anchor_local_block_replay_available": true,
+    "adjacent_next_layer_state_available": false,
+    "semantic_candidate_search_started": false,
+    "calibration_opened": false
+  },
+  "layer_pairs": {
+    "early": [
+      0,
+      1
+    ],
+    "middle": [
+      "floor_half",
+      "floor_half_plus_one"
+    ],
+    "late": [
+      "last_minus_one",
+      "last"
+    ],
+    "new_layers_collected_per_model": 3
+  },
+  "denominator": {
+    "case_count": 264,
+    "case_count_per_model": 88,
+    "generation_time_count": 3,
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "collector_case_hash": "2e75bccd09fbabacd460c0dee3f50a4eff7cfd6c6d8e37e842442c3f21590fc1",
+    "collector_code_hash": "aa1e2511e7b490e183c5f2944f50c2683f518636a2e9f0fbbbf9a57f9f3e0649",
+    "exact_tree_helper_hash": "8ca9138bbe9634f9bf60e00eef2708edfecdb02bb246517252d829b7042893e6"
+  },
+  "storage": {
+    "current_base_bytes": 17412761184,
+    "estimated_extension_bytes": 17412761184,
+    "estimated_combined_bytes": 34825522368,
+    "budget_bytes": 68719476736,
+    "free_disk_bytes": 1284406845440,
+    "minimum_reserve_bytes": 214748364800
+  },
+  "gates": {
+    "greedy_generation_tokens_must_match_base_ledger": true,
+    "all_existing_numeric_gates_unchanged": true,
+    "lossless_sufficient_state_only": true,
+    "all_files_hash_and_shape_audited_before_path_extraction": true
+  },
+  "claim_boundary": {
+    "measurement_contract_repair_only": true,
+    "language_path_claim": false,
+    "calibration_or_physical_open": false
+  },
+  "authorization": {
+    "run_adjacent_collection": true,
+    "run_path_extraction_before_extension_audit": false
+  }
+}

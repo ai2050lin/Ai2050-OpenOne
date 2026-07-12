@@ -1,0 +1,68 @@
+{
+  "schema_version": "42.0.0",
+  "phase_id": "Phase365",
+  "created_at": "2026-07-12T02:16:20.491573+00:00",
+  "event_types": [
+    "attention_source_write",
+    "attention_merge",
+    "mlp_neuron_write",
+    "mlp_merge",
+    "residual_state",
+    "residual_merge",
+    "generation_transition",
+    "vocab_state"
+  ],
+  "edge_types": [
+    "route",
+    "write",
+    "merge",
+    "residual",
+    "time",
+    "vocab_transition"
+  ],
+  "blind_discovery": {
+    "forbidden_keys": [
+      "condition_label",
+      "condition_semantics",
+      "correct_answer",
+      "distractor",
+      "distractors",
+      "family_id",
+      "family_name",
+      "historical_candidate",
+      "mechanism_id",
+      "mechanism_name",
+      "model",
+      "model_name",
+      "semantic_label",
+      "target",
+      "target_margin",
+      "target_rank",
+      "targets"
+    ],
+    "anonymous_condition_slot_retained": true,
+    "condition_semantics_private_until_path_freeze": true,
+    "target_specific_competition_in_event": false,
+    "label_free_vocab_state_reference_allowed": true
+  },
+  "condition_contrast": {
+    "direct_graph_subtraction_allowed": false,
+    "typed_event_alignment_required": true,
+    "unmatched_events_retained": true
+  },
+  "public_backbone": {
+    "raw_events_must_be_retained": true,
+    "residual_view_may_be_derived": true,
+    "residual_view_may_replace_raw": false
+  },
+  "thresholds": {
+    "mad_only_threshold_authorized": false,
+    "repeat_noise_floor_required": true,
+    "multiscale_persistence_is_independent_replication": false
+  },
+  "weight_reference": {
+    "checkpoint_index_hash_required": true,
+    "private_parameter_path_required": true,
+    "public_exports_strip_model_and_parameter_paths": true
+  }
+}

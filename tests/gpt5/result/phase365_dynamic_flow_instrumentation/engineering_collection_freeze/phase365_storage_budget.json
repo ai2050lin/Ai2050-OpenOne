@@ -1,0 +1,79 @@
+{
+  "models": [
+    {
+      "model": "qwen3",
+      "architecture": {
+        "layer_count": 36,
+        "hidden_size": 2560,
+        "intermediate_size": 9728,
+        "attention_head_count": 32,
+        "key_value_head_count": 8,
+        "head_dim": 128,
+        "vocab_size": 151936
+      },
+      "case_count": 32,
+      "per_layer_time_case_bytes": {
+        "seven_role_component_vectors": 143360,
+        "all_source_value_states": 524288,
+        "all_head_role_source_probabilities": 65536,
+        "mlp_gate_up_product_at_roles": 233472
+      },
+      "planned_role_focused_bytes": 3908972543,
+      "naive_explicit_neuron_write_bytes": 688536944640,
+      "explicit_neuron_write_bytes_saved": 688536944640
+    },
+    {
+      "model": "glm4",
+      "architecture": {
+        "layer_count": 40,
+        "hidden_size": 4096,
+        "intermediate_size": 13696,
+        "attention_head_count": 32,
+        "key_value_head_count": 2,
+        "head_dim": 128,
+        "vocab_size": 151552
+      },
+      "case_count": 32,
+      "per_layer_time_case_bytes": {
+        "seven_role_component_vectors": 229376,
+        "all_source_value_states": 131072,
+        "all_head_role_source_probabilities": 65536,
+        "mlp_gate_up_product_at_roles": 328704
+      },
+      "planned_role_focused_bytes": 3399627571,
+      "naive_explicit_neuron_write_bytes": 1723355627520,
+      "explicit_neuron_write_bytes_saved": 1723355627520
+    },
+    {
+      "model": "deepseek7b",
+      "architecture": {
+        "layer_count": 28,
+        "hidden_size": 3584,
+        "intermediate_size": 18944,
+        "attention_head_count": 28,
+        "key_value_head_count": 4,
+        "head_dim": 128,
+        "vocab_size": 152064
+      },
+      "case_count": 32,
+      "per_layer_time_case_bytes": {
+        "seven_role_component_vectors": 200704,
+        "all_source_value_states": 262144,
+        "all_head_role_source_probabilities": 57344,
+        "mlp_gate_up_product_at_roles": 454656
+      },
+      "planned_role_focused_bytes": 3080601600,
+      "naive_explicit_neuron_write_bytes": 1460020445184,
+      "explicit_neuron_write_bytes_saved": 1460020445184
+    }
+  ],
+  "global": {
+    "planning_sequence_length": 256,
+    "planned_role_focused_bytes": 10389201714,
+    "naive_explicit_neuron_write_bytes": 3871913017344,
+    "compression_ratio_vs_explicit_neuron_writes": 372.68628754472945,
+    "disk_free_bytes": 1356584452096,
+    "minimum_free_reserve_bytes": 214748364800,
+    "fits_with_reserve": true
+  }
+}

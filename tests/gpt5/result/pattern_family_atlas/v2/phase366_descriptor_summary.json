@@ -1,0 +1,121 @@
+{
+  "schema_version": "43.2.0",
+  "phase_id": "Phase366-B",
+  "created_at": "2026-07-12T02:49:27.153329+00:00",
+  "objective": "extract_direction_sensitive_typed_flow_descriptors_before_any_semantic_label_reveal",
+  "denominator": {
+    "model_count": 3,
+    "bundle_count": 288,
+    "directed_path_descriptor_count": 519168,
+    "feature_count_per_descriptor": 10,
+    "blind_discovery_case_count": 192,
+    "blind_calibration_case_count": 96
+  },
+  "results": {
+    "all_source_routes_retained": true,
+    "raw_vector_references_retained": true,
+    "top_k_selection_used": false,
+    "condition_average_used": false,
+    "direct_graph_subtraction_used": false,
+    "semantic_or_target_label_used": false,
+    "path_candidate_count": 0
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "bundle_count": 96,
+      "descriptor_count": 179712,
+      "split_case_counts": {
+        "blind_calibration": 32,
+        "blind_discovery": 64
+      },
+      "source_role_counts": {
+        "answer_start": 27648,
+        "answer_start+current_generation": 10368,
+        "current_generation": 27648,
+        "other_sources": 38016,
+        "query": 38016,
+        "source": 38016
+      },
+      "receiver_role_counts": {
+        "answer_start": 34560,
+        "answer_start+current_generation": 13824,
+        "current_generation": 34560,
+        "query": 48384,
+        "source": 48384
+      },
+      "relative_path": "private/qwen3_directed_flow_descriptors.jsonl",
+      "byte_count": 283988795,
+      "sha256": "35a00143f718aa2e1398d045e483b679b1febbc9fb2b6f8164baf4610a3e69f2"
+    },
+    {
+      "model": "glm4",
+      "bundle_count": 96,
+      "descriptor_count": 199680,
+      "split_case_counts": {
+        "blind_calibration": 32,
+        "blind_discovery": 64
+      },
+      "source_role_counts": {
+        "answer_start": 30720,
+        "answer_start+current_generation": 11520,
+        "current_generation": 30720,
+        "other_sources": 42240,
+        "query": 42240,
+        "source": 42240
+      },
+      "receiver_role_counts": {
+        "answer_start": 38400,
+        "answer_start+current_generation": 15360,
+        "current_generation": 38400,
+        "query": 53760,
+        "source": 53760
+      },
+      "relative_path": "private/glm4_directed_flow_descriptors.jsonl",
+      "byte_count": 315596284,
+      "sha256": "200e28065aeec00ba4d57f4fbeb20b815a803c2216d552e09000fab5854a609c"
+    },
+    {
+      "model": "deepseek7b",
+      "bundle_count": 96,
+      "descriptor_count": 139776,
+      "split_case_counts": {
+        "blind_calibration": 32,
+        "blind_discovery": 64
+      },
+      "source_role_counts": {
+        "answer_start": 21504,
+        "answer_start+current_generation": 8064,
+        "current_generation": 21504,
+        "other_sources": 29568,
+        "query": 29568,
+        "source": 29568
+      },
+      "receiver_role_counts": {
+        "answer_start": 26880,
+        "answer_start+current_generation": 10752,
+        "current_generation": 26880,
+        "query": 37632,
+        "source": 37632
+      },
+      "relative_path": "private/deepseek7b_directed_flow_descriptors.jsonl",
+      "byte_count": 221459646,
+      "sha256": "591f7d656d5935e85dbeaab870bf6f8229a2508aa92ce794dd153aba173a9b3c"
+    }
+  ],
+  "descriptor_schema": "phase366_descriptor_schema.json",
+  "combined_descriptor_digest": "589973aefd5298e9adf7abbbef9a05207e18bd2ab6bf7e1740985c643416911b",
+  "authorization": {
+    "private_threshold_custodian_authorized": true,
+    "blind_motif_scoring_authorized": false,
+    "semantic_label_reveal_authorized": false,
+    "physical_confirmation_authorized": false
+  },
+  "claim_boundary": {
+    "descriptor_extraction_complete": true,
+    "descriptors_are_language_paths": false,
+    "future_prediction_test_executed": false,
+    "calibration_replication_executed": false
+  },
+  "next_decision": "freeze_reconstruction_repeat_and_same_condition_template_floors_before_scoring"
+}

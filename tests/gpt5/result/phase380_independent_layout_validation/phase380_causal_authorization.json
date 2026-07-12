@@ -1,0 +1,132 @@
+{
+  "schema_version": "53.7.0",
+  "phase_id": "Phase380-CausalAuthorization",
+  "created_at": "2026-07-12T08:41:34.677187+00:00",
+  "authorization": {
+    "run_registered_natural_boundary_causal_scan": true,
+    "open_prior_physical_holdout": false,
+    "run_single_neuron_scan": false
+  },
+  "stable_objects": [
+    {
+      "mechanism_id": "entity_recency",
+      "contrast_axis": "content_change_same_operation",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "entity_recency",
+      "contrast_axis": "joint_content_operation_change",
+      "individually_stable_models": [
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": false,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "contrast_axis": "content_change_same_operation",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "relation_binding",
+      "contrast_axis": "joint_content_operation_change",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    },
+    {
+      "mechanism_id": "target_vs_wrong",
+      "contrast_axis": "joint_content_operation_change",
+      "individually_stable_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "heterogeneous_passing_pairs": [
+        [
+          "qwen3",
+          "glm4"
+        ],
+        [
+          "glm4",
+          "deepseek7b"
+        ]
+      ],
+      "heterogeneous_level2_residual_pass": true,
+      "level3_individual_replication": true,
+      "causal_reuse_established": false
+    }
+  ],
+  "scan_contract": {
+    "fixed_depth_bins": 5,
+    "component_boundaries": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "layer_output"
+    ],
+    "position_roles": [
+      "source",
+      "query",
+      "current"
+    ],
+    "top_k_selection": false
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "schema_version": "43.0.0",
+  "phase_id": "Phase366",
+  "created_at": "2026-07-12T02:22:23.438379+00:00",
+  "objective": "discover_recurrent_typed_flow_motifs_without_semantic_or_target_labels",
+  "denominator": {
+    "model_count": 3,
+    "admitted_mechanism_count_private": 4,
+    "independent_group_count": 72,
+    "case_count": 288,
+    "condition_count_per_group": 4,
+    "generation_time_count": 3,
+    "blind_discovery_group_count": 48,
+    "blind_calibration_group_count": 24,
+    "physical_confirmation_case_count": 96
+  },
+  "event_descriptor": {
+    "allowed": [
+      "event_type",
+      "edge_type",
+      "relative_layer",
+      "generation_time",
+      "source_role_alias",
+      "receiver_role_alias",
+      "raw_vector_reference",
+      "vector_norm",
+      "signed_alignment_to_local_write",
+      "local_layer_order",
+      "branch_and_merge_degree"
+    ],
+    "forbidden": [
+      "real_model_name",
+      "family",
+      "mechanism",
+      "condition_semantics",
+      "correct_answer",
+      "target_token",
+      "target_margin",
+      "target_rank",
+      "historical_candidate_score"
+    ],
+    "raw_vectors_remain_authoritative": true
+  },
+  "condition_handling": {
+    "average_four_conditions_before_discovery": false,
+    "anonymous_condition_slots_retained": true,
+    "condition_semantics_revealed_during_discovery": false,
+    "direct_graph_subtraction": false,
+    "typed_event_alignment_before_any_contrast": true,
+    "unmatched_events_retained": true
+  },
+  "common_backbone": {
+    "raw_graph_deleted_after_residualization": false,
+    "raw_and_residual_views_both_retained": true,
+    "backbone_may_use_semantic_labels": false,
+    "common_motif_classified_only_after_recurrence": true
+  },
+  "motif_enumeration": {
+    "top_k_component_selection": false,
+    "fixed_mad_only_threshold": false,
+    "path_lengths": [
+      2,
+      3,
+      4,
+      6,
+      8
+    ],
+    "path_length_persistence_counts_as_independent_replication": false,
+    "typed_contiguous_edges_required": true,
+    "time_order_must_be_preserved": true,
+    "shuffled_time_control_required": true,
+    "matched_size_random_bundle_control_required": true
+  },
+  "threshold_custodian": {
+    "fixed_execution_repeat_floor": 0.0,
+    "reconstruction_floor_source": "phase365_engineering_collection_max_errors",
+    "same_condition_template_floor_required": true,
+    "condition_effect_may_be_counted_as_noise": false,
+    "threshold_values_frozen_before_motif_scoring": true
+  },
+  "prediction_gate": {
+    "targets_during_blind_stage": [
+      "next_typed_events",
+      "next_layer_local_write"
+    ],
+    "target_specific_competition_added_only_after_motif_freeze": true,
+    "strong_baselines": [
+      "model_relative_layer_role_common_transition",
+      "time_order_shuffle",
+      "matched_size_random_bundle",
+      "current_bundle_persistence"
+    ],
+    "independent_group_is_analysis_unit": true
+  },
+  "cross_model_equivalence": {
+    "same_layer_number_required": false,
+    "same_head_or_channel_id_required": false,
+    "compare": [
+      "typed_event_order",
+      "source_receiver_roles",
+      "relative_depth",
+      "branch_merge_structure",
+      "future_transition_signature"
+    ]
+  },
+  "gates": {
+    "engineering_96_cases_can_produce_language_claim": false,
+    "all_288_cases_must_be_collected_before_scientific_scoring": true,
+    "blind_motif_must_replicate_in_calibration_groups": true,
+    "labels_revealed_only_after_motif_and_threshold_freeze": true,
+    "physical_confirmation_opened": false,
+    "causal_intervention": false
+  },
+  "stop_rules": [
+    "if_only_common_architecture_motifs_recur_record_backbone_only",
+    "if_motifs_do_not_predict_future_events_do_not_reveal_function_labels",
+    "if_calibration_fails_do_not_change_thresholds_or_path_lengths",
+    "if_model_specific_only_do_not_enter_cross_model_theory",
+    "never_open_physical_confirmation_to_repair_motif_discovery"
+  ],
+  "authorization": {
+    "collect_remaining_192_dynamic_bundles": true,
+    "scientific_motif_scoring_now": false,
+    "condition_or_target_label_reveal_now": false,
+    "physical_confirmation_now": false
+  },
+  "next_decision": "collect_remaining_192_cases_with_frozen_phase365_schema_before_blind_scoring"
+}
