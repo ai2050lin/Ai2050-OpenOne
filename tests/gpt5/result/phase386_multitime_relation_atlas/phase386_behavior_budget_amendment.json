@@ -1,0 +1,56 @@
+{
+  "schema_version": "60.1.1",
+  "phase_id": "Phase386-BehaviorBudgetAudit",
+  "created_at": "2026-07-12T12:24:31.986565+00:00",
+  "pilot_max_new_tokens": 8,
+  "model_rows": [
+    {
+      "model": "qwen3",
+      "case_count": 960,
+      "failure_count": 42,
+      "capped_failure_count": 0,
+      "capped_failure_fraction": 0.0,
+      "capped_failures_by_mechanism": {}
+    },
+    {
+      "model": "glm4",
+      "case_count": 960,
+      "failure_count": 64,
+      "capped_failure_count": 64,
+      "capped_failure_fraction": 1.0,
+      "capped_failures_by_mechanism": {
+        "entity_recency": 10,
+        "number_agreement": 7,
+        "target_vs_wrong": 2,
+        "missing_condition_control": 44,
+        "field_extraction": 1
+      }
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 960,
+      "failure_count": 470,
+      "capped_failure_count": 382,
+      "capped_failure_fraction": 0.8127659574468085,
+      "capped_failures_by_mechanism": {
+        "relation_binding": 109,
+        "entity_recency": 48,
+        "number_agreement": 51,
+        "target_vs_wrong": 81,
+        "missing_condition_control": 3,
+        "field_extraction": 90
+      }
+    }
+  ],
+  "output_budget_failure": true,
+  "pilot_cohort_retired": true,
+  "failed_cases_selectively_replaced": false,
+  "all_models_must_rerun": true,
+  "replacement_max_new_tokens": 24,
+  "internal_collection_started": false,
+  "physical_holdout_opened": false,
+  "claim_boundary": {
+    "pilot_failure_is_model_language_failure": false,
+    "replacement_budget_may_be_retuned_again": false
+  }
+}

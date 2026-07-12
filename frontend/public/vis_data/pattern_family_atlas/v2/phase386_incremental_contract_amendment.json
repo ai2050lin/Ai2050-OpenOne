@@ -1,0 +1,42 @@
+{
+  "schema_version": "60.4.2",
+  "phase_id": "Phase386-IncrementalContractAmendment",
+  "created_at": "2026-07-12T13:06:17.801027+00:00",
+  "trigger": {
+    "teacher_forced_discovery_case_count": 288,
+    "qwen3_required_transition_pass_count": 96,
+    "glm4_required_transition_pass_count": 96,
+    "deepseek7b_required_transition_pass_count": 94,
+    "deepseek7b_target_encoded_mismatch_count": 2,
+    "component_conservation_failure_count": 0,
+    "relation_analysis_started": false,
+    "calibration_opened": false,
+    "physical_holdout_opened": false
+  },
+  "probe": {
+    "case_count": 2,
+    "all_actual_incremental_transitions_match": true,
+    "max_actual_vs_full_logit_abs_difference": 1.1171875
+  },
+  "retired_contract": {
+    "three_full_sequence_teacher_forced_replays": true,
+    "status": "engineering_pilot_only",
+    "raw_files_preserved": true,
+    "may_support_language_path_claim": false
+  },
+  "replacement_contract": {
+    "generation_path": "actual_incremental_kv_cache",
+    "model_call_count_formula": "3 + target_decision_step: prompt + every pre-target prefix token + target token + post-decision token",
+    "semantic_coordinate_count": 5,
+    "semantic_coordinates_are_independent_times": false,
+    "all_three_models_must_be_rerun": true,
+    "instrument_audit_must_be_rerun": true,
+    "no_failed_case_replacement": true
+  },
+  "authorization": {
+    "incremental_instrument_collection": true,
+    "incremental_discovery_before_instrument_audit": false,
+    "calibration_collection": false,
+    "physical_holdout_collection": false
+  }
+}

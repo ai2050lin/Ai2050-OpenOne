@@ -1,0 +1,162 @@
+{
+  "schema_version": "60.2.0",
+  "phase_id": "Phase386-BehaviorFreeze",
+  "created_at": "2026-07-12T12:52:24.614122+00:00",
+  "denominator": {
+    "candidate_case_count": 2880,
+    "candidate_parallel_group_count": 240,
+    "multitime_qualified_parallel_group_count": 126,
+    "eligible_mechanism_count": 3,
+    "selected_parallel_group_count": 48,
+    "selected_case_count": 576,
+    "instrument_audit_parallel_group_count": 3,
+    "instrument_audit_case_count": 36,
+    "split_group_counts_per_mechanism": {
+      "discovery": 8,
+      "calibration": 4,
+      "physical_holdout": 4
+    }
+  },
+  "gates": [
+    {
+      "mechanism_id": "relation_binding",
+      "qualified_parallel_group_count": 40,
+      "minimum_required": 16,
+      "eligible": true,
+      "exclusion_reason": null
+    },
+    {
+      "mechanism_id": "entity_recency",
+      "qualified_parallel_group_count": 30,
+      "minimum_required": 16,
+      "eligible": true,
+      "exclusion_reason": null
+    },
+    {
+      "mechanism_id": "number_agreement",
+      "qualified_parallel_group_count": 2,
+      "minimum_required": 16,
+      "eligible": false,
+      "exclusion_reason": "fewer_than_16_three_model_four_condition_groups"
+    },
+    {
+      "mechanism_id": "target_vs_wrong",
+      "qualified_parallel_group_count": 15,
+      "minimum_required": 16,
+      "eligible": false,
+      "exclusion_reason": "fewer_than_16_three_model_four_condition_groups"
+    },
+    {
+      "mechanism_id": "missing_condition_control",
+      "qualified_parallel_group_count": 4,
+      "minimum_required": 16,
+      "eligible": false,
+      "exclusion_reason": "fewer_than_16_three_model_four_condition_groups"
+    },
+    {
+      "mechanism_id": "field_extraction",
+      "qualified_parallel_group_count": 35,
+      "minimum_required": 16,
+      "eligible": true,
+      "exclusion_reason": null
+    }
+  ],
+  "eligible_mechanisms": [
+    "relation_binding",
+    "entity_recency",
+    "field_extraction"
+  ],
+  "selected_groups_private": {
+    "relation_binding": {
+      "discovery": [
+        "parallel386_0a2956145d1d510ed79c",
+        "parallel386_425f04aceb51cec1b205",
+        "parallel386_38d1ddbacbdec443ed28",
+        "parallel386_2e2a980c3117f600af96",
+        "parallel386_d46a1deeaa31631fa2e4",
+        "parallel386_8d5c5423c33dd3433ebd",
+        "parallel386_799319bac454fb8774d7",
+        "parallel386_460e9de79a001c34a8b1"
+      ],
+      "calibration": [
+        "parallel386_7b078bc676f3602d9103",
+        "parallel386_31719ca77795378863ca",
+        "parallel386_273cd250ed8a663306a7",
+        "parallel386_0905f0f9ff010edcbdca"
+      ],
+      "physical_holdout": [
+        "parallel386_c54ed5f8b9e597a57b43",
+        "parallel386_292a1cfdcdfcbb91a968",
+        "parallel386_78a887cbec23d01405b0",
+        "parallel386_c16987d8c33b05f1f5b6"
+      ]
+    },
+    "entity_recency": {
+      "discovery": [
+        "parallel386_e6f9b7160e28bac60456",
+        "parallel386_aef857718f312ca86fec",
+        "parallel386_e2fb2d8a4e558c7927d4",
+        "parallel386_a437d5e5d14f4d2ec790",
+        "parallel386_6c410b9a2087edc2be48",
+        "parallel386_6da82c064c3ffc9c1e36",
+        "parallel386_2be4995c269fee1e07f2",
+        "parallel386_12a10c56f31ec23a4b2b"
+      ],
+      "calibration": [
+        "parallel386_b77c0bb7d74e1db893dd",
+        "parallel386_8200e6b3d3e8c9cab61e",
+        "parallel386_5eea4bb05e23dd47a0ed",
+        "parallel386_d9de20c9f3abd14799d8"
+      ],
+      "physical_holdout": [
+        "parallel386_9316327d363e295feb81",
+        "parallel386_4d6ad169acdaeb962edf",
+        "parallel386_2d5de0ac66d194b9989f",
+        "parallel386_9b256b268528f4d57ce9"
+      ]
+    },
+    "field_extraction": {
+      "discovery": [
+        "parallel386_a0fc06adbbb41f39e183",
+        "parallel386_fe48d5bda13f0866f245",
+        "parallel386_0c9a5c8175fc440c4f2b",
+        "parallel386_693be61e59959120767c",
+        "parallel386_dc726ecdad2866beb8e4",
+        "parallel386_ec18c243bbf19cde303f",
+        "parallel386_23865858a7aa8be1ac2b",
+        "parallel386_66d2fe0c38fb82843799"
+      ],
+      "calibration": [
+        "parallel386_b04290d37362e124288a",
+        "parallel386_638b589e2b96a629cb99",
+        "parallel386_4b22a657d54306033755",
+        "parallel386_e4cb7aa4c3a10462c6fe"
+      ],
+      "physical_holdout": [
+        "parallel386_982b60c8ad698525ca12",
+        "parallel386_6b19580a25fc3498135c",
+        "parallel386_6f71e502248c53ff6c4f",
+        "parallel386_31eaeabd5a5e8807b7ab"
+      ]
+    }
+  },
+  "behavior_budget": {
+    "retired_pilot_max_new_tokens": 8,
+    "frozen_max_new_tokens": 24,
+    "all_models_rerun": true,
+    "failed_cases_selectively_replaced": false
+  },
+  "internal_collection_started_before_freeze": false,
+  "physical_holdout_opened": false,
+  "authorization": {
+    "run_instrument_audit": true,
+    "run_discovery_before_instrument_audit": false,
+    "run_calibration_before_relation_freeze": false,
+    "open_physical_holdout": false,
+    "run_causal_intervention": false
+  },
+  "claim_boundary": {
+    "excluded_mechanism_may_be_replaced": false,
+    "behavior_qualified_mechanism_is_internal_path": false
+  }
+}

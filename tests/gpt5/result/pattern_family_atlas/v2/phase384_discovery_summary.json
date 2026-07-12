@@ -1,0 +1,77 @@
+{
+  "schema_version": "58.1.0",
+  "phase_id": "Phase384-ExactSubunitMassDiscovery",
+  "created_at": "2026-07-12T11:00:02.183382+00:00",
+  "denominator": {
+    "model_count": 3,
+    "mechanism_count": 4,
+    "parallel_group_count": 12,
+    "case_count": 144,
+    "mass_row_count": 89856,
+    "exact_attention_head_event_count": 2315520,
+    "exact_mlp_channel_event_count": 205701120
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "group_count": 12,
+      "case_count": 48,
+      "layer_count": 36,
+      "mass_row_count": 31104,
+      "exact_attention_head_event_count": 829440,
+      "exact_mlp_channel_event_count": 50429952,
+      "maximum_attention_parent_projection_error": 0.0001905299723148346,
+      "maximum_mlp_parent_projection_error": 0.0037293732166290283,
+      "parquet_relative_path": "private/discovery/phase384_qwen3_subunit_mass.parquet",
+      "parquet_byte_count": 746999
+    },
+    {
+      "model": "glm4",
+      "group_count": 12,
+      "case_count": 48,
+      "layer_count": 40,
+      "mass_row_count": 34560,
+      "exact_attention_head_event_count": 921600,
+      "exact_mlp_channel_event_count": 78888960,
+      "maximum_attention_parent_projection_error": 0.0003722732362803072,
+      "maximum_mlp_parent_projection_error": 0.0006404593586921692,
+      "parquet_relative_path": "private/discovery/phase384_glm4_subunit_mass.parquet",
+      "parquet_byte_count": 860554
+    },
+    {
+      "model": "deepseek7b",
+      "group_count": 12,
+      "case_count": 48,
+      "layer_count": 28,
+      "mass_row_count": 24192,
+      "exact_attention_head_event_count": 564480,
+      "exact_mlp_channel_event_count": 76382208,
+      "maximum_attention_parent_projection_error": 0.0015886928886175156,
+      "maximum_mlp_parent_projection_error": 0.007335923612117767,
+      "parquet_relative_path": "private/discovery/phase384_deepseek7b_subunit_mass.parquet",
+      "parquet_byte_count": 675781
+    }
+  ],
+  "results": {
+    "parent_projection_conservation_pass": true,
+    "heterogeneous_level2_pattern_count": 11,
+    "level3_pattern_count": 6,
+    "coherent_pattern_count": 0,
+    "opposing_pattern_count": 11,
+    "upstream_level2_pattern_count": 2,
+    "upstream_coherent_pattern_count": 0,
+    "upstream_opposing_pattern_count": 2,
+    "top_k_used": false,
+    "language_path_discovered": false
+  },
+  "claim_boundary": {
+    "projection_mass_pattern_is_causal_path": false,
+    "same_functional_cell_is_same_unit_identity": false,
+    "all_exact_subunits_included": true
+  },
+  "authorization": {
+    "calibration_subunit_mass_extraction": true,
+    "physical_holdout": false,
+    "causal_intervention": false
+  }
+}

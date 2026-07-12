@@ -1,0 +1,38 @@
+{
+  "schema_version": "57.0.2",
+  "phase_id": "Phase383-SinglePathQualificationAnalysis",
+  "created_at": "2026-07-12T10:41:36.607792+00:00",
+  "denominator": {
+    "candidate_case_count": 780,
+    "candidate_parallel_group_count": 65,
+    "single_path_qualified_case_count_by_model": {
+      "qwen3": 260,
+      "glm4": 260,
+      "deepseek7b": 239
+    },
+    "single_path_qualified_groups_by_mechanism": {
+      "relation_binding": 13,
+      "entity_recency": 18,
+      "number_agreement": 7,
+      "target_vs_wrong": 11
+    }
+  },
+  "frozen_runtime": {
+    "execution_batch_size": 1,
+    "output_attentions": true,
+    "runtime_dtype_by_model": {
+      "qwen3": "float16",
+      "glm4": "float16",
+      "deepseek7b": "bfloat16"
+    }
+  },
+  "results": {
+    "phase380_batch_qualified_groups_reused_without_check": false,
+    "balanced_group_cap": 7,
+    "all_four_mechanisms_retain_balanced_denominator": true
+  },
+  "claim_boundary": {
+    "single_path_qualification_is_language_mechanism": false,
+    "batch_path_and_single_path_are_interchangeable": false
+  }
+}

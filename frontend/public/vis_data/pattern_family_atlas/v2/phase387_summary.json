@@ -1,0 +1,51 @@
+{
+  "schema_version": "61.0.0",
+  "phase_id": "Phase387-ComputationalOrderAudit",
+  "created_at": "2026-07-12T13:47:08.539421+00:00",
+  "denominator": {
+    "phase386_physical_survivor_count": 10,
+    "candidate_id_checksum": "bfb31e6a690d263a50c338cc1a0cbe68842bcf51af9c8c18b8a391eb26572281",
+    "terminal_trajectory_count": 9,
+    "pre_answer_trajectory_count": 1
+  },
+  "results": {
+    "semantic_temporal_precedence_count": 10,
+    "direct_computational_edge_admissible_count": 0,
+    "indirect_causal_reachability_proven_count": 0,
+    "predictive_trajectory_count": 10,
+    "counts_by_vector_family": {
+      "attention_head_state": 5,
+      "attention_output": 3,
+      "layer_input": 1,
+      "layer_output": 1
+    },
+    "upstream_direct_physical_edge_count": 0,
+    "causal_language_path_count": 0,
+    "single_neuron_causal_path_count": 0
+  },
+  "decision": "Retain all ten Phase386 survivors as physical-holdout predictive trajectories, but register none as a direct computational edge.",
+  "authorization": {
+    "display_predictive_trajectories": true,
+    "display_direct_physical_edge": false,
+    "reuse_phase386_physical_holdout": false,
+    "run_single_neuron_scan": false,
+    "freeze_fresh_causally_admissible_intervention_protocol": true
+  },
+  "next_stage": {
+    "phase": 388,
+    "objective": "test source layer-input-derived K/V to receiver attention-state transport on a fresh relation-binding denominator",
+    "required_controls": [
+      "wrong_source_position",
+      "wrong_layer",
+      "K_only",
+      "V_only",
+      "matched_terminal_relation",
+      "no_intervention"
+    ],
+    "required_outcomes": [
+      "receiver_state_mediation",
+      "downstream_target_logit_change",
+      "behavior_change_when_the_natural_outputs_differ"
+    ]
+  }
+}

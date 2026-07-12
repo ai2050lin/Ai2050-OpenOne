@@ -1,0 +1,159 @@
+{
+  "schema_version": "60.4.0",
+  "phase_id": "Phase386-InstrumentAudit",
+  "created_at": "2026-07-12T12:54:47.923979+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "eligible_mechanisms": [
+      "relation_binding",
+      "entity_recency",
+      "field_extraction"
+    ],
+    "parallel_group_count": 3,
+    "case_count": 36,
+    "forward_execution_count": 108,
+    "semantic_coordinate_observation_count": 180,
+    "layer_file_count": 1248,
+    "total_byte_count": 1271693556
+  },
+  "semantic_coordinates": [
+    "source_encoded",
+    "query_integrated",
+    "pre_decision",
+    "target_encoded",
+    "post_decision_next_token"
+  ],
+  "results": {
+    "all_three_model_instruments_valid": true,
+    "all_required_generation_transitions_replayed": true,
+    "attention_head_source_events_exactly_replayable": true,
+    "mlp_channel_events_exactly_replayable": true,
+    "residual_component_conservation_pass": true,
+    "top_k_used": false,
+    "pairwise_gram_materialized": false,
+    "five_independent_clock_times_claimed": false,
+    "language_path_discovered": false
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "case_count": 12,
+      "parallel_group_count": 3,
+      "layer_count": 36,
+      "forward_execution_count": 36,
+      "semantic_coordinate_observation_count": 60,
+      "layer_file_count": 432,
+      "meta_file_count": 12,
+      "total_byte_count": 456732636,
+      "gate_maxima": {
+        "attention_source": 0.0004910093108479161,
+        "probability": 0.0003668665885925293,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.0011086859588093055,
+        "mlp_neuron": 0.0009952226361261206,
+        "block": 0.0
+      },
+      "checksum_failure_count": 0,
+      "shape_failure_count": 0,
+      "payload_gate_failure_count": 0,
+      "mechanism_case_counts_private": {
+        "entity_recency": 4,
+        "field_extraction": 4,
+        "relation_binding": 4
+      },
+      "condition_case_counts_private": {
+        "A_operation_lex_x": 3,
+        "B_control_lex_x": 3,
+        "C_operation_lex_y": 3,
+        "D_control_lex_y": 3
+      },
+      "failures": [],
+      "valid": true
+    },
+    {
+      "model": "glm4",
+      "case_count": 12,
+      "parallel_group_count": 3,
+      "layer_count": 40,
+      "forward_execution_count": 36,
+      "semantic_coordinate_observation_count": 60,
+      "layer_file_count": 480,
+      "meta_file_count": 12,
+      "total_byte_count": 422230908,
+      "gate_maxima": {
+        "attention_source": 0.0005667155126011694,
+        "probability": 0.000392913818359375,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.0007951375458784908,
+        "mlp_neuron": 0.0006143121449657684,
+        "block": 0.0
+      },
+      "checksum_failure_count": 0,
+      "shape_failure_count": 0,
+      "payload_gate_failure_count": 0,
+      "mechanism_case_counts_private": {
+        "entity_recency": 4,
+        "field_extraction": 4,
+        "relation_binding": 4
+      },
+      "condition_case_counts_private": {
+        "A_operation_lex_x": 3,
+        "B_control_lex_x": 3,
+        "C_operation_lex_y": 3,
+        "D_control_lex_y": 3
+      },
+      "failures": [],
+      "valid": true
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 12,
+      "parallel_group_count": 3,
+      "layer_count": 28,
+      "forward_execution_count": 36,
+      "semantic_coordinate_observation_count": 60,
+      "layer_file_count": 336,
+      "meta_file_count": 12,
+      "total_byte_count": 392730012,
+      "gate_maxima": {
+        "attention_source": 0.0037741820187631643,
+        "probability": 0.00341796875,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.005838294142531301,
+        "mlp_neuron": 0.005324751522299439,
+        "block": 0.0
+      },
+      "checksum_failure_count": 0,
+      "shape_failure_count": 0,
+      "payload_gate_failure_count": 0,
+      "mechanism_case_counts_private": {
+        "entity_recency": 4,
+        "field_extraction": 4,
+        "relation_binding": 4
+      },
+      "condition_case_counts_private": {
+        "A_operation_lex_x": 3,
+        "B_control_lex_x": 3,
+        "C_operation_lex_y": 3,
+        "D_control_lex_y": 3
+      },
+      "failures": [],
+      "valid": true
+    }
+  ],
+  "authorization": {
+    "discovery_collection": true,
+    "calibration_collection": false,
+    "physical_holdout_collection": false,
+    "causal_intervention": false
+  },
+  "claim_boundary": {
+    "instrument_validity_is_language_path": false,
+    "event_replayability_is_causal_specificity": false,
+    "semantic_coordinates_are_independent_times": false
+  }
+}

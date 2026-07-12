@@ -1,0 +1,153 @@
+{
+  "schema_version": "62.5.0",
+  "phase_id": "Phase388-CausalAnalysis",
+  "created_at": "2026-07-12T14:10:56.527039+00:00",
+  "denominator": {
+    "causal_test_group_count": 16,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "direction_count": 96,
+    "scenario_count": 672,
+    "main_patched_generation_count": 96,
+    "candidate_group_replacement_count": 0,
+    "phase386_holdout_reuse_count": 0
+  },
+  "results": {
+    "models_passing_query_state_gate": 0,
+    "models_passing_target_margin_gate": 0,
+    "models_passing_behavior_gate": 0,
+    "models_passing_all_three_outcomes": 0,
+    "strict_donor_target_switch_count": 0,
+    "patch_failure_count": 0,
+    "causal_source_kv_transport_path_established": false,
+    "single_neuron_path_established": false,
+    "language_encoding_closed": false
+  },
+  "gate_registration_boundary": {
+    "qualitative_outcomes_frozen_before_collection": true,
+    "numeric_rate_thresholds_written_before_full_collection": false,
+    "positive_causal_registration_allowed": false,
+    "reason": "The full result may reject this coarse intervention, but no positive causal path may be registered from post-collection numeric gates."
+  },
+  "model_results": [
+    {
+      "schema_version": "62.5.0",
+      "phase_id": "Phase388-CausalAnalysis",
+      "model": "qwen3",
+      "direction_count": 32,
+      "query_state": {
+        "main_median_projection": 0.015174872879388297,
+        "main_positive_rate": 0.90625,
+        "wrong_source_median_projection": 0.004289511937672614,
+        "wrong_layer_median_projection": 0.0012797674714475236,
+        "main_exceeds_both_controls_rate": 0.40625,
+        "key_only_median_projection": 0.0011379018523039889,
+        "value_only_median_projection": 0.011054116361628497,
+        "gate_pass": false
+      },
+      "target_margin": {
+        "main_median_shift": 0.015625,
+        "main_positive_rate": 0.59375,
+        "wrong_source_median_shift": -0.001953125,
+        "wrong_layer_median_shift": -0.00390625,
+        "main_exceeds_both_controls_rate": 0.34375,
+        "key_only_median_shift": 0.00390625,
+        "value_only_median_shift": 0.0,
+        "gate_pass": false
+      },
+      "generation": {
+        "donor_target_present_count": 0,
+        "recipient_target_present_count": 32,
+        "strict_donor_target_switch_count": 0,
+        "strict_donor_target_switch_rate": 0.0,
+        "gate_pass": false
+      },
+      "all_three_outcomes_pass": false
+    },
+    {
+      "schema_version": "62.5.0",
+      "phase_id": "Phase388-CausalAnalysis",
+      "model": "glm4",
+      "direction_count": 32,
+      "query_state": {
+        "main_median_projection": 0.00029527197168756765,
+        "main_positive_rate": 0.625,
+        "wrong_source_median_projection": 0.0003699465285320146,
+        "wrong_layer_median_projection": 0.002512070491447416,
+        "main_exceeds_both_controls_rate": 0.28125,
+        "key_only_median_projection": 0.00022776763845704578,
+        "value_only_median_projection": 4.379472890705789e-06,
+        "gate_pass": false
+      },
+      "target_margin": {
+        "main_median_shift": 0.0,
+        "main_positive_rate": 0.46875,
+        "wrong_source_median_shift": -0.005859375,
+        "wrong_layer_median_shift": 0.021484375,
+        "main_exceeds_both_controls_rate": 0.25,
+        "key_only_median_shift": 0.0,
+        "value_only_median_shift": 0.0,
+        "gate_pass": false
+      },
+      "generation": {
+        "donor_target_present_count": 0,
+        "recipient_target_present_count": 32,
+        "strict_donor_target_switch_count": 0,
+        "strict_donor_target_switch_rate": 0.0,
+        "gate_pass": false
+      },
+      "all_three_outcomes_pass": false
+    },
+    {
+      "schema_version": "62.5.0",
+      "phase_id": "Phase388-CausalAnalysis",
+      "model": "deepseek7b",
+      "direction_count": 32,
+      "query_state": {
+        "main_median_projection": 0.038051017849014,
+        "main_positive_rate": 1.0,
+        "wrong_source_median_projection": 0.025460972539442336,
+        "wrong_layer_median_projection": 0.013240146133892974,
+        "main_exceeds_both_controls_rate": 0.5,
+        "key_only_median_projection": 0.007631222230028165,
+        "value_only_median_projection": 0.026820253207517943,
+        "gate_pass": false
+      },
+      "target_margin": {
+        "main_median_shift": 0.015625,
+        "main_positive_rate": 0.5,
+        "wrong_source_median_shift": -0.0625,
+        "wrong_layer_median_shift": 0.0,
+        "main_exceeds_both_controls_rate": 0.34375,
+        "key_only_median_shift": 0.0,
+        "value_only_median_shift": 0.0625,
+        "gate_pass": false
+      },
+      "generation": {
+        "donor_target_present_count": 0,
+        "recipient_target_present_count": 32,
+        "strict_donor_target_switch_count": 0,
+        "strict_donor_target_switch_rate": 0.0,
+        "gate_pass": false
+      },
+      "all_three_outcomes_pass": false
+    }
+  ],
+  "decision": "Close the coarse single-position full-K/V transfer as a cross-model causal language path. Preserve component-wise perturbation measurements as negative/diagnostic evidence.",
+  "authorization": {
+    "register_direct_causal_edge": false,
+    "register_single_neuron_path": false,
+    "reuse_current_causal_denominator": false,
+    "analyze_head_and_source_resolved_receiver_contributions": true,
+    "run_unbounded_neuron_scan": false
+  },
+  "next_stage": {
+    "phase": 389,
+    "objective": "decompose the measured receiver effect by query head and source role before any new intervention",
+    "model_run_required_initially": false,
+    "reason": "The current aggregate query state can hide head-wise opposition; the saved exact Phase386 attention events should first determine whether a stable receiver head/source route exists."
+  }
+}

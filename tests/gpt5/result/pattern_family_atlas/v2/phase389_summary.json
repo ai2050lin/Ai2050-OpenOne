@@ -1,0 +1,80 @@
+{
+  "schema_version": "63.0.0",
+  "phase_id": "Phase389-HeadSourceDecomposition",
+  "created_at": "2026-07-12T14:16:48.137335+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "discovery_groups_per_model": 8,
+    "calibration_groups_per_model": 4,
+    "all_heads_evaluated": 92,
+    "discovery_head_group_rows": 736,
+    "calibration_head_group_rows": 368,
+    "source_role_partition_count": 4,
+    "source_role_window_width": 8,
+    "physical_holdout_reused": false,
+    "new_model_run_count": 0
+  },
+  "results": {
+    "discovery_head_candidate_count": 59,
+    "replicated_head_relation_count": 56,
+    "replicated_head_counts_by_model": {
+      "qwen3": 21,
+      "glm4": 21,
+      "deepseek7b": 14
+    },
+    "replicated_role_route_count": 92,
+    "replicated_role_counts_by_model": {
+      "qwen3": 31,
+      "glm4": 34,
+      "deepseek7b": 27
+    },
+    "replicated_roles_by_model": {
+      "qwen3": [
+        "other_prior_context",
+        "query_local_context",
+        "source_anchor"
+      ],
+      "glm4": [
+        "other_prior_context",
+        "query_local_context",
+        "source_anchor"
+      ],
+      "deepseek7b": [
+        "other_prior_context",
+        "query_local_context",
+        "source_anchor"
+      ]
+    },
+    "common_replicated_source_roles": [
+      "other_prior_context",
+      "query_local_context",
+      "source_anchor"
+    ],
+    "replicated_source_anchor_specificity_count": 2,
+    "replicated_source_anchor_specificity_by_model": {
+      "qwen3": 0,
+      "glm4": 2,
+      "deepseek7b": 0
+    },
+    "max_role_conservation_abs_error": 2.86102294921875e-06,
+    "causal_head_source_route_established": false,
+    "single_neuron_path_established": false
+  },
+  "claim_boundary": {
+    "discovery_and_calibration_were_previously_viewed_at_aggregate_level": true,
+    "head_source_analysis_is_fully_independent_holdout": false,
+    "source_anchor_specificity_rule_added_after_broad_head_result": true,
+    "replicated_head_relation_is_causal_transport": false,
+    "small_model_head_numbers_are_crossmodel_equivalent": false
+  },
+  "authorization": {
+    "register_descriptive_head_source_candidates": true,
+    "run_new_head_specific_intervention": false,
+    "run_single_neuron_scan": false,
+    "reuse_phase386_physical_holdout": false
+  }
+}

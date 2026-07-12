@@ -125,7 +125,7 @@ class Phase381382AlgorithmAuditTests(unittest.TestCase):
             self.assertEqual((ATLAS / name).read_bytes(), (CLIENT / name).read_bytes(), name)
         manifest = read_json(ATLAS / "manifest.json")
         progress = read_json(ATLAS / "progress.json")
-        self.assertEqual(manifest["last_phase"], "Phase382-StageMerge")
+        self.assertEqual(manifest["last_phase"], "Phase385-StageMerge")
         self.assertEqual(manifest["phase381"]["model_cell_pass_count"], 0)
         self.assertEqual(manifest["phase382"]["parameter_free_gate_pass_count"], 0)
         self.assertFalse(progress["single_global_progress_percentage_valid"])
@@ -135,12 +135,16 @@ class Phase381382AlgorithmAuditTests(unittest.TestCase):
         )
         for root in (NEURON, NEURON_CLIENT):
             neuron_manifest = read_json(root / "manifest.json")
-            self.assertEqual(neuron_manifest["phase"], 382)
+            self.assertEqual(neuron_manifest["phase"], 385)
             self.assertEqual(
                 neuron_manifest["phase381_audit"]["new_neuron_path_nodes_promoted"], 0
             )
             self.assertEqual(
                 neuron_manifest["phase382_audit"]["new_neuron_path_nodes_promoted"], 0
+            )
+            self.assertEqual(
+                neuron_manifest["phase383_385_audit"]["new_neuron_path_nodes_promoted"],
+                0,
             )
             self.assertFalse(
                 neuron_manifest["evidence_boundary"]["upstream_language_path_available"]

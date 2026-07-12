@@ -1,0 +1,510 @@
+{
+  "schema_version": "62.0.0",
+  "phase_id": "Phase388-Protocol",
+  "created_at": "2026-07-12T13:57:38.879483+00:00",
+  "objective": "test_causally_admissible_source_layer_input_derived_kv_to_query_attention_transport_on_fresh_relation_binding_cases",
+  "denominator": {
+    "candidate_group_count": 24,
+    "conditions_per_group": 2,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "candidate_case_count": 144,
+    "instrument_groups_required": 2,
+    "causal_test_groups_required": 16
+  },
+  "case_design": {
+    "same_entity_and_item_sets_across_pair": true,
+    "only_item_to_entity_binding_is_swapped": true,
+    "source_patch_token_identity_is_held_constant": true,
+    "source_state_occurs_after_bound_item_in_causal_text_order": true,
+    "prompt_overlap_with_phase386": false,
+    "model_native_answer_aligned_interface": true
+  },
+  "runtime_contract": {
+    "execution_batch_size": 1,
+    "reason": "preserve the previously audited single-sample position path; batched left padding is not qualified for GLM4",
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ]
+  },
+  "frozen_interventions": [
+    "no_intervention",
+    "identity_source_kv",
+    "donor_source_k_only",
+    "donor_source_v_only",
+    "donor_source_kv",
+    "donor_wrong_source_kv",
+    "donor_source_kv_at_terminal_control_depth"
+  ],
+  "frozen_outcomes": [
+    "query_attention_state_projection_toward_donor",
+    "donor_vs_recipient_first_token_logit_margin_shift",
+    "patched_generation_switch_to_donor_target"
+  ],
+  "selection_rule": "Select the first two preordered groups with exact one-item behavior in both conditions and all models for instrumentation; select the next sixteen for the causal test. Do not replace groups after intervention starts.",
+  "physical_holdout_reuse": false,
+  "single_neuron_scan_authorized": false,
+  "groups": [
+    {
+      "parallel_group_id": "p388g_0e1914b086e8db5124a5",
+      "group_priority": 0,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_8a4b283ed50400717b51",
+          "target": "amber",
+          "distractor": "cobalt"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_8b3ab751d9c29ebaf5e0",
+          "target": "cobalt",
+          "distractor": "amber"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_54e9ce76018b0cd60c9b",
+      "group_priority": 1,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_d31ef650b064cae65b47",
+          "target": "copper",
+          "distractor": "silver"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_9c73eeec33a7e2afe654",
+          "target": "silver",
+          "distractor": "copper"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_1ea129f060052c052061",
+      "group_priority": 2,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_c0a1590707028049adef",
+          "target": "lemon",
+          "distractor": "peach"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_22e2558ad9e536dfc3a8",
+          "target": "peach",
+          "distractor": "lemon"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_80b54a20e186a6c0da4d",
+      "group_priority": 3,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_01080f928ca60d70ed4a",
+          "target": "violin",
+          "distractor": "flute"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_b320a2c349bf6e02900f",
+          "target": "flute",
+          "distractor": "violin"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_39e1791b802d6c628749",
+      "group_priority": 4,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_289400973d9ae5f5d73a",
+          "target": "cedar",
+          "distractor": "maple"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_76681e729fdde105c850",
+          "target": "maple",
+          "distractor": "cedar"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_8a0cd443cb3bdc1d0e35",
+      "group_priority": 5,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_6d6dee01aa076b779c4a",
+          "target": "ruby",
+          "distractor": "jade"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_9e87772a033ebfb070ab",
+          "target": "jade",
+          "distractor": "ruby"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_dc87adcc14501c1900f4",
+      "group_priority": 6,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_f56f4f3c530ef918a904",
+          "target": "falcon",
+          "distractor": "heron"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_72f982eb87392765b888",
+          "target": "heron",
+          "distractor": "falcon"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_65d7ab0336da35850fa6",
+      "group_priority": 7,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_873dc9d1957641e98d86",
+          "target": "velvet",
+          "distractor": "linen"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_5a6d3947efe29347cacd",
+          "target": "linen",
+          "distractor": "velvet"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_b1a073d59fee30f49e4e",
+      "group_priority": 8,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_1a51bfebe91e78bcf74e",
+          "target": "comet",
+          "distractor": "planet"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_046abcac2c0e355e405d",
+          "target": "planet",
+          "distractor": "comet"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_0f9be8c72986218a5fca",
+      "group_priority": 9,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_2de6bf2d99c8e29856c2",
+          "target": "coral",
+          "distractor": "pearl"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_b91c45aefb816d9e3ff0",
+          "target": "pearl",
+          "distractor": "coral"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_1dfb215ba3ced8c9b71d",
+      "group_priority": 10,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_fb4c9bed81d71e28f139",
+          "target": "basil",
+          "distractor": "thyme"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_24cce9e7db228aa52d9b",
+          "target": "thyme",
+          "distractor": "basil"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_5ca99bea7201ced68082",
+      "group_priority": 11,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_3b9a127b089ca648ca4d",
+          "target": "marble",
+          "distractor": "granite"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_fd48cd31c9cdbe3f891f",
+          "target": "granite",
+          "distractor": "marble"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_04544fef8a1995ee710d",
+      "group_priority": 12,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_986e291956b4154e0a00",
+          "target": "saffron",
+          "distractor": "pepper"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_be1bcddafddd5845ceb3",
+          "target": "pepper",
+          "distractor": "saffron"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_12f2efb2a573b209e82e",
+      "group_priority": 13,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_4f3846bf045acca89d1f",
+          "target": "willow",
+          "distractor": "birch"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_ff8d91390b96fe9a835c",
+          "target": "birch",
+          "distractor": "willow"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_5fadb703b8beb6716bcc",
+      "group_priority": 14,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_8028969621fd82b0facc",
+          "target": "piano",
+          "distractor": "cello"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_db56c100cf25c8f20d18",
+          "target": "cello",
+          "distractor": "piano"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_a16a15816de5d1ab3bd3",
+      "group_priority": 15,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_d5c181ec3488854d7412",
+          "target": "orange",
+          "distractor": "plum"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_5cb2fe8961cc792d2157",
+          "target": "plum",
+          "distractor": "orange"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_128951afc82a2236aebe",
+      "group_priority": 16,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_66a78e2e6bea144d0ffb",
+          "target": "bronze",
+          "distractor": "nickel"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_8b160971f65ef431ef59",
+          "target": "nickel",
+          "distractor": "bronze"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_da851eead93f479f517e",
+      "group_priority": 17,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_d6fec587a782ebbce480",
+          "target": "tulip",
+          "distractor": "orchid"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_2b0ecf45b29dacd782c9",
+          "target": "orchid",
+          "distractor": "tulip"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_b7847c101905d1d36ea1",
+      "group_priority": 18,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_ddd07cd673c182262bcf",
+          "target": "salmon",
+          "distractor": "trout"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_70bfa32df02698160272",
+          "target": "trout",
+          "distractor": "salmon"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_f4069fdad6cda8ccf679",
+      "group_priority": 19,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_ab1d4c4ddba996f622ff",
+          "target": "cotton",
+          "distractor": "silk"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_8e6d0601abe92e438e44",
+          "target": "silk",
+          "distractor": "cotton"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_727d67ac083aa502715a",
+      "group_priority": 20,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_d98e28a7bb8bcfe3b987",
+          "target": "saturn",
+          "distractor": "venus"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_59aa222534af4fc82980",
+          "target": "venus",
+          "distractor": "saturn"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_0464953e15fe04651be6",
+      "group_priority": 21,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_519cc1433337b654d453",
+          "target": "mint",
+          "distractor": "ginger"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_f72399caa24eb35bf293",
+          "target": "ginger",
+          "distractor": "mint"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_dcd7b77442e7fb4da89a",
+      "group_priority": 22,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_d0f9d9d00d9b9eb85e3a",
+          "target": "quartz",
+          "distractor": "onyx"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_3914f3ab775d092e5f13",
+          "target": "onyx",
+          "distractor": "quartz"
+        }
+      ]
+    },
+    {
+      "parallel_group_id": "p388g_ad1a83aa2d839aebd435",
+      "group_priority": 23,
+      "condition_count": 2,
+      "conditions": [
+        {
+          "condition": "mapping_a",
+          "condition_id": "p388c_f821ac943afbcbd5cfac",
+          "target": "raven",
+          "distractor": "swan"
+        },
+        {
+          "condition": "mapping_b",
+          "condition_id": "p388c_ef44036893341a58d629",
+          "target": "swan",
+          "distractor": "raven"
+        }
+      ]
+    }
+  ]
+}

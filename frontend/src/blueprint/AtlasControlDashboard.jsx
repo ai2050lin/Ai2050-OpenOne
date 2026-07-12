@@ -712,6 +712,7 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         const summary = await res.json();
         const coverage = summary.client_stage_coverage || {};
         return {
+          ...summary,
           ...coverage,
           last_phase: summary.last_phase,
           latest_phase: summary.last_phase,
@@ -760,18 +761,112 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
   }, [progressMap]);
   const overallValid = progress?.single_global_progress_percentage_valid !== false;
 
+  const exactEventRows = useMemo(() => {
+    const stage = progress?.exact_event_stage || {};
+    const definitions = [
+      ['audited_families', '精确事件覆盖模式族'],
+      ['audited_registered_mechanisms', '精确事件覆盖注册机制'],
+      ['single_path_qualified_models', '单样本路径合格模型'],
+      ['instrument_conservation_models', '事件守恒合格模型'],
+      ['signed_event_calibration_candidates', '有符号事件复制候选'],
+      ['upstream_signed_event_candidates', '上游有符号事件候选'],
+      ['function_specific_upstream_patterns', '功能特异上游模式'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const relationRows = useMemo(() => {
+    const causalStage = progress?.causal_order_kv_stage;
+    const stage = causalStage || progress?.multitime_relation_stage || {};
+    const definitions = causalStage ? [
+      ['physical_predictive_trajectories', '物理预测轨迹'],
+      ['direct_computational_edges', '直接计算边'],
+      ['causal_intervention_directions', '因果干预方向'],
+      ['strict_answer_switches', '严格答案切换'],
+      ['models_passing_query_gate', '查询状态门合格模型'],
+      ['models_passing_margin_gate', '目标差值门合格模型'],
+      ['models_passing_behavior_gate', '行为门合格模型'],
+      ['crossmodel_source_specific_head_routes', '跨模型来源特异头路径'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ] : [
+      ['behavior_eligible_mechanisms', '行为分母合格机制'],
+      ['incremental_discovery_cases', '增量发现样本'],
+      ['incremental_event_ledger_models', '增量事件账本模型'],
+      ['physical_holdout_cases', '物理留出样本'],
+      ['calibrated_predictive_relations', '校准预测关系'],
+      ['physical_predictive_relations', '物理预测关系'],
+      ['upstream_descriptive_predictive_relations', '上游描述预测关系'],
+      ['physical_mlp_channel_relations', '物理 MLP 通道关系'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
+    const latest = progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2';
+    const overallLatest = sections.find((item) => item.id === 'overall_latest');
+    if (overallLatest && progress?.exact_event_stage) {
+      overallLatest.summary = '精确组件事件已可守恒回放，但功能特异的上游语言路径仍未出现。';
+      overallLatest.value = '0/72 complete paths';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：精确事件图谱的严格边界`,
+        text: '当前已建立单样本运行合同、精确注意力来源事件和 MLP 通道事件账本。复制结果仍集中在晚段终端接口；两个上游相消质量模式均未通过匹配特异性对照，因此不能提升为语言路径。',
+        value: 'Exact events available / upstream path absent',
+        valueHint: '九族是工程注册分母，不等于九族物理机制已完成。物理留出仍密封，CUDA 因果干预尚未授权。',
+        items: exactEventRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.multitime_relation_stage) {
+      overallLatest.summary = '真实增量生成路径中出现跨模型、跨词汇、物理留出可预测的关系，但证据仍以终端注意力关系为主。';
+      overallLatest.value = '10 physical relations / 0 causal paths';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：增量多坐标关系图谱`,
+        text: '五个语义坐标已按真实 KV-cache 生成路径采集。10 条关系通过一次性物理留出和错组、错时刻、错深度对照；其中 9 条属于目标词到后续词的终端延续，只有 1 条是晚深度的来源到查询注意力关系。当前没有 MLP 神经元通道关系，也没有因果必要性或完整语言路径。',
+        value: 'Predictive descriptive relations / causal path absent',
+        valueHint: '物理预测强于静态相关，但不能替代干预。物理留出已使用一次，不能重新挑选候选或阈值。',
+        items: relationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.causal_order_kv_stage) {
+      overallLatest.summary = '预测轨迹已完成计算方向与 K/V 干预审计，未升级为因果路径。';
+      overallLatest.value = '0 edges / 0 switches';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：计算方向与来源 K/V 因果审计`,
+        text: 'Phase386 的 10 条关系保留为预测轨迹，但同层计算依赖审计判定 0 条是按原节点定义的直接边。全新的 96 条双向来源 K/V 干预没有一次切换到 donor 答案；头和来源分解虽复制出广泛活动，却没有三模型共同的来源锚点特异头路径。当前不新增神经元节点。',
+        value: 'Predictive trajectories retained / causal route rejected',
+        valueHint: '单位置粗 K/V 路线已经关闭。下一阶段需要新的多位置、多头、跨层联合状态合同，不能继续调层号或扩大单神经元扫描。',
+        items: relationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
     const engineering = sections.find((item) => item.id === 'engineering_latest');
     if (engineering) {
       engineering.detail = {
         ...engineering.detail,
-        items: progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`),
-        valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2'}。`,
+        items: overallValid
+          ? progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`)
+          : (relationRows.length ? relationRows : exactEventRows)
+            .map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+        valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${latest}。单一全局完成百分比：${overallValid ? '有效' : '无效'}。`,
       };
     }
     return sections;
-  }, [clientIndex, manifest, progress, progressMap]);
+  }, [clientIndex, exactEventRows, manifest, overallValid, progress, progressMap, relationRows]);
 
   const planDetail = useMemo(() => {
     return planCards.find((item) => item.id === activePlan)?.detail || null;
@@ -925,7 +1020,7 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         <SectionHeader
           eyebrow="02"
           title="最新成果"
-          subtitle="说明当前整体推进状态：理论已经从单点解释进入机制图谱阶段，工程上正在把路径、组件、竞争和闭合统一起来。"
+          subtitle="按当前合格科学分母显示精确事件覆盖、复制结果与未通过门槛；工程注册不等于物理路径完成。"
         />
 
         {/* Spacious Dashboard Control Center Board */}
@@ -966,7 +1061,7 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
 
           {/* Right Progress bars in 3 columns */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, gridColumn: 'span 2' }}>
-            {progressRows.map((row) => (
+            {(overallValid ? progressRows : (relationRows.length ? relationRows : exactEventRows)).map((row) => (
               <div
                 key={row.id}
                 className="progress-row-hover"
@@ -983,9 +1078,11 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
                   <span style={{ color: '#cbd5e1', fontSize: 12, fontWeight: 700 }}>{row.label}</span>
-                  <span style={{ color: '#34d399', fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' }}>{pct(progressMap[row.id])}</span>
+                  <span style={{ color: '#34d399', fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' }}>
+                    {overallValid ? pct(progressMap[row.id]) : `${row.numerator}/${row.denominator}`}
+                  </span>
                 </div>
-                <ProgressBar value={progressMap[row.id]} color="#a7f3d0" />
+                {overallValid && <ProgressBar value={progressMap[row.id]} color="#a7f3d0" />}
               </div>
             ))}
           </div>

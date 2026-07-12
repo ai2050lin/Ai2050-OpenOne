@@ -108,7 +108,7 @@ class Phase379380GlobalLayoutTests(unittest.TestCase):
             )
         manifest = read_json(ATLAS / "manifest.json")
         progress = read_json(ATLAS / "progress.json")
-        self.assertEqual(manifest["last_phase"], "Phase382-StageMerge")
+        self.assertEqual(manifest["last_phase"], "Phase385-StageMerge")
         self.assertEqual(progress["global_layout_stage"]["upstream_causal_mechanisms"]["numerator"], 0)
         self.assertFalse(progress["single_global_progress_percentage_valid"])
 
@@ -122,10 +122,13 @@ class Phase379380GlobalLayoutTests(unittest.TestCase):
         self.assertFalse(stage["authorization"]["claim_global_layout_complete"])
         for root in (NEURON_ATLAS, NEURON_CLIENT):
             manifest = read_json(root / "manifest.json")
-            self.assertEqual(manifest["phase"], 382)
+            self.assertEqual(manifest["phase"], 385)
             self.assertEqual(manifest["phase380_audit"]["new_neuron_path_nodes_promoted"], 0)
             self.assertEqual(manifest["phase380_audit"]["upstream_crossmodel_cell_count"], 0)
             self.assertEqual(manifest["phase382_audit"]["new_neuron_path_nodes_promoted"], 0)
+            self.assertEqual(
+                manifest["phase383_385_audit"]["new_neuron_path_nodes_promoted"], 0
+            )
             self.assertFalse(manifest["evidence_boundary"]["upstream_language_path_available"])
             self.assertFalse(manifest["evidence_boundary"]["single_unit_causal_closure"])
         self.assertEqual(

@@ -1,0 +1,125 @@
+{
+  "schema_version": "60.6.0",
+  "phase_id": "Phase386-DiscoveryCollectionAudit",
+  "created_at": "2026-07-12T13:13:47.190080+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "mechanisms": [
+      "relation_binding",
+      "entity_recency",
+      "field_extraction"
+    ],
+    "parallel_group_count": 24,
+    "case_count": 288,
+    "model_call_count": 1850,
+    "semantic_coordinate_observation_count": 1440,
+    "layer_file_count": 9984,
+    "total_byte_count": 11552355796
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "case_count": 96,
+      "parallel_group_count": 24,
+      "layer_count": 36,
+      "model_call_count": 365,
+      "layer_file_count": 3456,
+      "meta_file_count": 96,
+      "total_byte_count": 4143712191,
+      "gate_maxima": {
+        "attention_source": 0.0004982388945204555,
+        "probability": 0.0004057884216308594,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.0010564386234683534,
+        "mlp_neuron": 0.0,
+        "block": 0.0
+      },
+      "mechanism_case_counts_private": {
+        "entity_recency": 32,
+        "field_extraction": 32,
+        "relation_binding": 32
+      },
+      "checksum_failure_count": 0,
+      "shape_failure_count": 0,
+      "payload_gate_failure_count": 0,
+      "failures": [],
+      "valid": true
+    },
+    {
+      "model": "glm4",
+      "case_count": 96,
+      "parallel_group_count": 24,
+      "layer_count": 40,
+      "model_call_count": 366,
+      "layer_file_count": 3840,
+      "meta_file_count": 96,
+      "total_byte_count": 3538707210,
+      "gate_maxima": {
+        "attention_source": 0.000489055636557955,
+        "probability": 0.0004061460494995117,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.0006909137137890017,
+        "mlp_neuron": 0.0,
+        "block": 0.0
+      },
+      "mechanism_case_counts_private": {
+        "entity_recency": 32,
+        "field_extraction": 32,
+        "relation_binding": 32
+      },
+      "checksum_failure_count": 0,
+      "shape_failure_count": 0,
+      "payload_gate_failure_count": 0,
+      "failures": [],
+      "valid": true
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 96,
+      "parallel_group_count": 24,
+      "layer_count": 28,
+      "model_call_count": 1119,
+      "layer_file_count": 2688,
+      "meta_file_count": 96,
+      "total_byte_count": 3869936395,
+      "gate_maxima": {
+        "attention_source": 0.003995993162211679,
+        "probability": 0.003711700439453125,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.007021246123273708,
+        "mlp_neuron": 0.0,
+        "block": 0.0
+      },
+      "mechanism_case_counts_private": {
+        "entity_recency": 32,
+        "field_extraction": 32,
+        "relation_binding": 32
+      },
+      "checksum_failure_count": 0,
+      "shape_failure_count": 0,
+      "payload_gate_failure_count": 0,
+      "failures": [],
+      "valid": true
+    }
+  ],
+  "results": {
+    "all_discovery_artifacts_valid": true,
+    "all_required_generation_transitions_replayed": true,
+    "all_component_ledgers_conserved": true,
+    "all_five_coordinates_present": true,
+    "top_k_used": false,
+    "pairwise_gram_materialized": false,
+    "physical_holdout_opened": false,
+    "language_path_discovered": false
+  },
+  "authorization": {
+    "discovery_relation_extraction": true,
+    "calibration_collection": false,
+    "physical_holdout_collection": false,
+    "causal_intervention": false
+  }
+}

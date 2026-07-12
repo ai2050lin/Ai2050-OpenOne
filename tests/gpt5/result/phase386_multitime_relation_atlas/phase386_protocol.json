@@ -1,0 +1,102 @@
+{
+  "schema_version": "60.0.0",
+  "phase_id": "Phase386-Protocol",
+  "created_at": "2026-07-12T12:11:42.671242+00:00",
+  "objective": "build_a_fresh_multitime_exact_event_relation_graph",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "families": [
+      "content_knowledge",
+      "state_drift",
+      "syntax_structure",
+      "readout_competition",
+      "reasoning_constraint",
+      "language_action"
+    ],
+    "mechanisms": [
+      "relation_binding",
+      "entity_recency",
+      "number_agreement",
+      "target_vs_wrong",
+      "missing_condition_control",
+      "field_extraction"
+    ],
+    "candidate_groups_per_mechanism": 40,
+    "conditions_per_group": 4,
+    "candidate_parallel_group_count": 240,
+    "candidate_case_count": 2880,
+    "frozen_split_groups_per_qualified_mechanism": {
+      "discovery": 8,
+      "calibration": 4,
+      "physical_holdout": 4
+    }
+  },
+  "runtime_contract": {
+    "execution_batch_size": 1,
+    "output_attentions": true,
+    "dtype_by_model": {
+      "qwen3": "float16",
+      "glm4": "float16",
+      "deepseek7b": "bfloat16"
+    },
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ]
+  },
+  "semantic_coordinates": {
+    "source_encoded": "source token position in the predecision causal forward",
+    "query_integrated": "query token position in the predecision causal forward",
+    "pre_decision": "last position before the first target token",
+    "target_encoded": "first target token after it is appended",
+    "post_decision_next_token": "next generated token after the first target token",
+    "forward_pass_count_per_case": 3,
+    "independent_clock_times_claimed": false
+  },
+  "exact_event_contract": {
+    "top_k_used": false,
+    "parent_child_conservation_max_relative_error": 0.01,
+    "full_pairwise_channel_gram_materialized": false,
+    "vector_cancellation": "1-norm(sum(delta_child))/(sum(norm(delta_child))+epsilon)",
+    "terminal_projection_cancellation_retained": true,
+    "composite_relation_score_used": false
+  },
+  "relation_families": [
+    "physical_parent_child",
+    "adjacent_layer_continuity",
+    "semantic_coordinate_persistence",
+    "appearance_disappearance",
+    "sign_reversal",
+    "descriptive_compensation",
+    "multi_event_convergence"
+  ],
+  "separate_gates": [
+    "single_sample_behavior",
+    "component_conservation",
+    "wrong_time",
+    "wrong_depth",
+    "wrong_receiver",
+    "time_order_shuffle",
+    "independent_calibration",
+    "next_coordinate_prediction"
+  ],
+  "authorization": {
+    "run_behavior_qualification": true,
+    "run_internal_collection_before_behavior_freeze": false,
+    "open_physical_holdout": false,
+    "run_causal_intervention": false,
+    "run_single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "phase384_proves_raw_neuron_activity_cancels": false,
+    "phase384_proves_contrastive_terminal_projection_cancels": true,
+    "semantic_coordinates_are_five_independent_times": false,
+    "relation_similarity_is_causality": false,
+    "language_encoding_mechanism_closed": false
+  }
+}
