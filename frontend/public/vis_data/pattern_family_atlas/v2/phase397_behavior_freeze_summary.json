@@ -1,0 +1,215 @@
+{
+  "schema_version": "71.2.0",
+  "phase_id": "Phase397-BehaviorFreeze",
+  "created_at": "2026-07-13T01:25:46.118141+00:00",
+  "denominator": {
+    "candidate_case_count": 4320,
+    "candidate_parallel_group_count": 144,
+    "qualified_parallel_group_count": 79,
+    "eligible_surface_count": 3,
+    "selected_parallel_group_count": 48,
+    "selected_case_count": 1440,
+    "instrument_group_count": 3,
+    "instrument_case_count": 90,
+    "minimum_qualified_groups_per_surface": 16,
+    "split_group_counts_per_surface": {
+      "discovery": 8,
+      "calibration": 4,
+      "physical_holdout": 4
+    }
+  },
+  "model_results": {
+    "qwen3": {
+      "strict_correct_count": 1431,
+      "case_count": 1440
+    },
+    "glm4": {
+      "strict_correct_count": 1416,
+      "case_count": 1440
+    },
+    "deepseek7b": {
+      "strict_correct_count": 1312,
+      "case_count": 1440
+    }
+  },
+  "surface_gates": [
+    {
+      "task_surface": "field_extraction",
+      "candidate_group_count": 24,
+      "qualified_group_count": 13,
+      "eligible": false,
+      "selected_group_count": 0,
+      "reserve_qualified_group_count": 0,
+      "exclusion_reason": "fewer_than_16_three_model_ten_condition_groups_qualified"
+    },
+    {
+      "task_surface": "possession_relation",
+      "candidate_group_count": 24,
+      "qualified_group_count": 18,
+      "eligible": true,
+      "selected_group_count": 16,
+      "reserve_qualified_group_count": 2,
+      "exclusion_reason": null
+    },
+    {
+      "task_surface": "spatial_relation",
+      "candidate_group_count": 24,
+      "qualified_group_count": 0,
+      "eligible": false,
+      "selected_group_count": 0,
+      "reserve_qualified_group_count": 0,
+      "exclusion_reason": "fewer_than_16_three_model_ten_condition_groups_qualified"
+    },
+    {
+      "task_surface": "role_filling",
+      "candidate_group_count": 24,
+      "qualified_group_count": 24,
+      "eligible": true,
+      "selected_group_count": 16,
+      "reserve_qualified_group_count": 8,
+      "exclusion_reason": null
+    },
+    {
+      "task_surface": "coreference_resolution",
+      "candidate_group_count": 24,
+      "qualified_group_count": 24,
+      "eligible": true,
+      "selected_group_count": 16,
+      "reserve_qualified_group_count": 8,
+      "exclusion_reason": null
+    },
+    {
+      "task_surface": "event_state_update",
+      "candidate_group_count": 24,
+      "qualified_group_count": 0,
+      "eligible": false,
+      "selected_group_count": 0,
+      "reserve_qualified_group_count": 0,
+      "exclusion_reason": "fewer_than_16_three_model_ten_condition_groups_qualified"
+    }
+  ],
+  "eligible_surfaces": [
+    "possession_relation",
+    "role_filling",
+    "coreference_resolution"
+  ],
+  "selected_groups_private": {
+    "possession_relation": {
+      "discovery": [
+        "p397g_419d37fc94021a2220338735",
+        "p397g_6cbb3429c79207cf1a2ed8eb",
+        "p397g_2587b1a27fc72327dc2bd91f",
+        "p397g_bbd388c3a2b14b333815a221",
+        "p397g_b3a3e16b9bc8ae9160dce22f",
+        "p397g_302e2ff248285f2f1c3138f6",
+        "p397g_6525e8b99df7681159069c0f",
+        "p397g_071bb43093f40d531de52f5c"
+      ],
+      "calibration": [
+        "p397g_985ed84b59c1e28da9224aab",
+        "p397g_28945a5d6644b46a25a06ef7",
+        "p397g_bae17b33650ec483bc8089b3",
+        "p397g_0c2d556eaf3d5275b6960654"
+      ],
+      "physical_holdout": [
+        "p397g_304e2bb1a6713e3523bc3db2",
+        "p397g_28b7ab4ae641dc36e835e398",
+        "p397g_1478061eaf7bcc3221c6da8e",
+        "p397g_4b0f414ef87c0be6cee493b3"
+      ]
+    },
+    "role_filling": {
+      "discovery": [
+        "p397g_3222310e010ef4c4d9d40133",
+        "p397g_29d487635c28e15cd117e30c",
+        "p397g_bbd8fe0f3c821ec2f8d62ee3",
+        "p397g_e6f22fb030206658dd070d4f",
+        "p397g_290cc341ee763a2335ce63b0",
+        "p397g_863244da8c6bc1c23c8d9b9d",
+        "p397g_3bebfb616a09ed4838c10404",
+        "p397g_33fc3c8921c8782c2ca95d8a"
+      ],
+      "calibration": [
+        "p397g_8ed24668a970931ba586e554",
+        "p397g_5b001bbc9ce83532c303d4e8",
+        "p397g_715e05476a123b617972fa1f",
+        "p397g_ae58eaaebd2ae67923e08989"
+      ],
+      "physical_holdout": [
+        "p397g_a0f7ebbdb21d162b764ebceb",
+        "p397g_35bd3d422c1a940ddc5daea9",
+        "p397g_005c600f8d15c75985d91595",
+        "p397g_b0120101aa987db966f6018f"
+      ]
+    },
+    "coreference_resolution": {
+      "discovery": [
+        "p397g_bb31acb54e547bb5d565edca",
+        "p397g_b5d19b712846e89db1fe2341",
+        "p397g_417329571c8b23a899f880df",
+        "p397g_4c06dd2508f53330a37638d9",
+        "p397g_fec6515071aead2b4c65a39f",
+        "p397g_4a371ed8be25474b8b57c1e4",
+        "p397g_584f6b5beaa7a971c1c257ab",
+        "p397g_edb22057b6023070189d2855"
+      ],
+      "calibration": [
+        "p397g_eef4429d7893e7b72c538a74",
+        "p397g_1d49c4e49d021875eca004e6",
+        "p397g_7802d02e8add8344eac67e82",
+        "p397g_8f5735bca0b90d1a539519ad"
+      ],
+      "physical_holdout": [
+        "p397g_2168bde872839cdf26cc8faa",
+        "p397g_078a9c550c310145d412af09",
+        "p397g_39aa2a1d9bfffdfac9168dfb",
+        "p397g_eed6eadf94a2e06bddd98ac3"
+      ]
+    }
+  },
+  "reserve_groups_private": {
+    "possession_relation": [
+      "p397g_b86ed98592db378bc40be335",
+      "p397g_f3ff9c46ad9eee5102a14c6f"
+    ],
+    "role_filling": [
+      "p397g_350f1cc267e93b4f3453603b",
+      "p397g_2d4991cfc780287c92ac1785",
+      "p397g_61b6d1ed4217bd6bd3a1ac22",
+      "p397g_bb8290d671672270df98274b",
+      "p397g_0d46ec8efba4c0c489141ce2",
+      "p397g_dbe7ee107c178e8f30f0d330",
+      "p397g_67cbe918f6ff40c923f72232",
+      "p397g_c9bd336e0d9cab1b91c9c2a2"
+    ],
+    "coreference_resolution": [
+      "p397g_78004cd374bb2c6d18cd4625",
+      "p397g_6aa8f7e2a9bfbacabc80634e",
+      "p397g_93d5ee37f53332aa211f2a60",
+      "p397g_ca56f8ea4b52047189dc52b2",
+      "p397g_4180837e5affaa09b985a898",
+      "p397g_45ef6d59709d62747761f468",
+      "p397g_81d5b98dbe443024f8e1d392",
+      "p397g_e96ae533a0fbd11c2ef88c85"
+    ]
+  },
+  "selection_contract": {
+    "minimum_16_groups_required": true,
+    "failed_groups_replaced": false,
+    "reserve_groups_used_as_backfill": false,
+    "excluded_surfaces_backfilled": false,
+    "hash_order_split_before_internal_collection": true
+  },
+  "authorization": {
+    "run_instrument_audit": true,
+    "run_discovery_collection": false,
+    "run_calibration": false,
+    "open_physical_holdout": false,
+    "run_single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "behavior_qualified_surface_is_binding_mechanism": false,
+    "excluded_surface_has_no_binding": false,
+    "language_encoding_closed": false
+  }
+}

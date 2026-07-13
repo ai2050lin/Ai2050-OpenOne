@@ -1,0 +1,74 @@
+{
+  "schema_version": "68.0.0",
+  "phase_id": "Phase394-Protocol",
+  "created_at": "2026-07-12T17:10:29.810253+00:00",
+  "objective": "separate_content_identity_from_formal_binding_pointer_and_query_route",
+  "audit_of_proposal": {
+    "all_input_tokens_can_be_identical_while_binding_changes": false,
+    "content_tokens_and_positions_can_be_identical": true,
+    "binding_change_requires_separate_pointer_tokens": true,
+    "formal_pointer_success_is_natural_language_binding": false,
+    "three_formal_surfaces_are_three_independent_language_mechanisms": false
+  },
+  "denominator": {
+    "task_surfaces": [
+      "field_extraction",
+      "relation_qa",
+      "entity_recency"
+    ],
+    "groups_per_surface": 24,
+    "conditions_per_group": 4,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "candidate_case_count": 864,
+    "split_group_counts_per_eligible_surface": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    }
+  },
+  "identity_contract": {
+    "entity_content_tokens_fixed_within_pair": true,
+    "attribute_content_tokens_fixed_within_pair": true,
+    "query_tokens_fixed_within_pair": true,
+    "content_token_positions_fixed_within_pair": true,
+    "only_binding_pointer_token_ids_change_within_pair": true,
+    "prompt_token_count_fixed_within_pair": true,
+    "target_first_tokens_distinct": true,
+    "single_sample_model_native_interface": true
+  },
+  "split_rule": "a task surface enters internal collection only if all 24 groups pass all four conditions on all three models with target and post-target events; then hash-order 12/6/6 without replacement",
+  "internal_objects": [
+    "entity_content",
+    "attribute_content",
+    "binding_pointer",
+    "query_integrated_state",
+    "terminal_carrier",
+    "readout_competition"
+  ],
+  "causal_controls": [
+    "identity_binding_pointer",
+    "donor_binding_pointer",
+    "donor_attribute_content",
+    "donor_structure_positions",
+    "same_count_random_positions",
+    "wrong_entity_pointer",
+    "wrong_depth_binding_pointer",
+    "wrong_semantic_time"
+  ],
+  "authorization": {
+    "run_behavior_qualification": true,
+    "run_internal_before_behavior_freeze": false,
+    "run_natural_language_transfer_before_formal_physical_gate": false,
+    "run_single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "formal_pointer_binding_is_natural_language_binding": false,
+    "binding_transport_is_natural_necessity": false,
+    "binding_transport_is_complete_language_path": false,
+    "language_encoding_closed": false
+  }
+}

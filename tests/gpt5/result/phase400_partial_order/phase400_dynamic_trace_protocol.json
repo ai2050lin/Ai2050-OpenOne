@@ -1,0 +1,84 @@
+{
+  "schema_version": "74.4.0",
+  "phase_id": "Phase400-DynamicTraceProtocol",
+  "created_at": "2026-07-13T06:21:52.149799+00:00",
+  "objective": "capture_interval_direction_readout_and_raw_anchor_data_for_partial_order_graphs",
+  "denominator": {
+    "eligible_surfaces": [
+      "possession_relation",
+      "role_filling"
+    ],
+    "selected_case_count": 1536,
+    "instrument_case_count": 96,
+    "split_case_counts": {
+      "discovery": 768,
+      "calibration": 384,
+      "physical_holdout": 384
+    }
+  },
+  "raw_anchor_group_ids_private": {
+    "possession_relation": "p400g_951002de4bdd3b6b54937faf",
+    "role_filling": "p400g_a279b585f3e209d5eb7a9a7f"
+  },
+  "capture_contract": {
+    "state_roles": [
+      "source_entity_a",
+      "source_entity_b",
+      "source_value_a",
+      "source_value_b",
+      "clause_end_0",
+      "clause_end_1",
+      "query_entity",
+      "query_end",
+      "answer_anchor"
+    ],
+    "attention_receivers": [
+      "query_end",
+      "answer_anchor"
+    ],
+    "attention_source_roles": [
+      "source_entity_a",
+      "source_entity_b",
+      "source_value_a",
+      "source_value_b",
+      "source_structure",
+      "query_entity",
+      "query_context",
+      "other_prior_context",
+      "receiver_self"
+    ],
+    "parent_components": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "layer_output"
+    ],
+    "all_layers": true,
+    "roq_effect_trajectories": true,
+    "roq_cross_layer_direction_cosines": true,
+    "query_and_terminal_target_competitor_logit_lens": true,
+    "raw_signed_roq_anchor_private": true,
+    "head_channel_neuron_identity": false
+  },
+  "quality_gates": {
+    "block_relative_error_max": 0.01,
+    "attention_role_replay_relative_error_max": 0.01,
+    "attention_probability_sum_absolute_error_max": 0.01,
+    "exact_first_answer_replay_required": true,
+    "exact_target_completion_replay_required": true,
+    "exact_post_target_replay_required": true
+  },
+  "authorization": {
+    "instrument_trace": true,
+    "discovery_trace": false,
+    "calibration_trace": false,
+    "physical_holdout_trace": false,
+    "joint_causal_intervention": false,
+    "head_channel_neuron_scan": false
+  },
+  "claim_boundary": {
+    "logit_lens_prediction_is_model_generation": false,
+    "role_partition_is_a_causal_graph": false,
+    "raw_anchor_is_a_neuron_map": false
+  }
+}

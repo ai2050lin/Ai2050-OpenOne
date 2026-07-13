@@ -1,0 +1,202 @@
+{
+  "schema_version": "72.7.0",
+  "phase_id": "Phase398-DiscoveryAnalysis",
+  "created_at": "2026-07-13T03:18:46.136126+00:00",
+  "objective": {
+    "coordinate": "query_end",
+    "component": "layer_output",
+    "effect": "RQ",
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "eligible_surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution"
+    ],
+    "groups_per_model_surface": 8,
+    "depths": "all_layers_with_no_depth_exclusion"
+  },
+  "frozen_gates": {
+    "minimum_median_min_axis_normalized_rq_norm": 0.005,
+    "minimum_support_groups_at_0_005": 6,
+    "minimum_median_rq_to_max_nuisance_interaction_ratio": 1.25,
+    "nuisance_interactions": [
+      "RO",
+      "OQ",
+      "ROQ"
+    ],
+    "minimum_shared_operation_cross_axis_cosine": 0.1
+  },
+  "denominator": {
+    "behavior_case_count": 3456,
+    "frozen_trace_case_count": 2304,
+    "instrument_case_count": 144,
+    "discovery_case_count": 1152,
+    "discovery_parallel_group_count": 72,
+    "model_surface_cell_count": 9,
+    "groups_per_model_surface": 8,
+    "physical_profile_row_count": 2496
+  },
+  "results": {
+    "qualified_model_surface_cell_count": 0,
+    "shared_operation_candidate_cell_count": 0,
+    "content_conditioned_candidate_cell_count": 0,
+    "not_qualified_cell_count": 9,
+    "all_discovery_replays_exact": true,
+    "all_component_conservation_pass": true
+  },
+  "cells": [
+    {
+      "model": "qwen3",
+      "task_surface": "possession_relation",
+      "selected_layer": 35,
+      "selected_relative_depth": 1.0,
+      "median_min_axis_normalized_rq_norm": 0.015443197,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.195292966,
+      "median_rq_cross_axis_cosine": -0.110169,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "qwen3",
+      "task_surface": "role_filling",
+      "selected_layer": 19,
+      "selected_relative_depth": 0.542857143,
+      "median_min_axis_normalized_rq_norm": 0.022800735,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.244547409,
+      "median_rq_cross_axis_cosine": 0.051241641,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "qwen3",
+      "task_surface": "coreference_resolution",
+      "selected_layer": 35,
+      "selected_relative_depth": 1.0,
+      "median_min_axis_normalized_rq_norm": 0.017923846,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.235424207,
+      "median_rq_cross_axis_cosine": 0.007996004,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "glm4",
+      "task_surface": "possession_relation",
+      "selected_layer": 20,
+      "selected_relative_depth": 0.512820513,
+      "median_min_axis_normalized_rq_norm": 0.049259926,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.290903007,
+      "median_rq_cross_axis_cosine": -0.193790182,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "glm4",
+      "task_surface": "role_filling",
+      "selected_layer": 20,
+      "selected_relative_depth": 0.512820513,
+      "median_min_axis_normalized_rq_norm": 0.044275347,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.270252097,
+      "median_rq_cross_axis_cosine": -0.039022813,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "glm4",
+      "task_surface": "coreference_resolution",
+      "selected_layer": 20,
+      "selected_relative_depth": 0.512820513,
+      "median_min_axis_normalized_rq_norm": 0.074359776,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.348094235,
+      "median_rq_cross_axis_cosine": -0.105316494,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "possession_relation",
+      "selected_layer": 17,
+      "selected_relative_depth": 0.62962963,
+      "median_min_axis_normalized_rq_norm": 0.02014988,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.15693968,
+      "median_rq_cross_axis_cosine": 0.156348846,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": true,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "role_filling",
+      "selected_layer": 27,
+      "selected_relative_depth": 1.0,
+      "median_min_axis_normalized_rq_norm": 0.019291674,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.280101116,
+      "median_rq_cross_axis_cosine": -0.026481211,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "coreference_resolution",
+      "selected_layer": 27,
+      "selected_relative_depth": 1.0,
+      "median_min_axis_normalized_rq_norm": 0.016975225,
+      "rq_support_group_count": 8,
+      "median_rq_to_max_nuisance_interaction_ratio": 0.259967343,
+      "median_rq_cross_axis_cosine": -0.247484855,
+      "magnitude_gate_pass": true,
+      "specificity_gate_pass": false,
+      "direction_gate_pass": false,
+      "classification": "not_qualified",
+      "candidate_layer_count": 0
+    }
+  ],
+  "interpretation_boundary": {
+    "factorial_rq_interaction_is_observational": true,
+    "factorial_rq_interaction_proves_binding_algorithm": false,
+    "cross_axis_direction_failure_proves_no_joint_process": false,
+    "target_completion_margin_encodes_answer_identity": false,
+    "complete_language_path_established": false,
+    "single_neuron_mechanism_established": false
+  },
+  "authorization": {
+    "run_calibration_trace": false,
+    "open_physical_holdout": false,
+    "run_causal_intervention": false,
+    "single_neuron_scan": false
+  }
+}

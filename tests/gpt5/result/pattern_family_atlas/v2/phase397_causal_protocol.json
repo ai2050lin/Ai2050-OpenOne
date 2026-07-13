@@ -1,0 +1,72 @@
+{
+  "schema_version": "71.9.0",
+  "phase_id": "Phase397-CausalProtocol",
+  "created_at": "2026-07-13T01:38:43.515498+00:00",
+  "objective": "test_relation_context_sufficiency_against_content_order_syntax_query_entity_random_depth_and_full_source_controls",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "task_surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution"
+    ],
+    "groups_per_surface_model": 8,
+    "conditions_per_group": 10,
+    "directions_per_group": 2,
+    "direction_count": 144,
+    "scenario_count_per_direction": 11,
+    "generation_scenario_count_per_direction": 1
+  },
+  "directions": {
+    "axis_x": "A_recipient_from_B_relation_donor",
+    "axis_y": "F_recipient_from_G_relation_donor"
+  },
+  "scenario_contract": {
+    "common_evaluation_margin": "relation_donor_target_logit_minus_recipient_target_logit",
+    "relation": "same literal values and same value positions; context donor differs only in preceding entity slots",
+    "content": "different literal values at the same value positions",
+    "order": "same literal binding with whole-clause order changed; mapped by literal identity",
+    "syntax": "same literal binding under paraphrase; mapped by literal identity",
+    "query_source": "identical source with later query changed; source value states must be invariant",
+    "entity": "source entity states mapped by entity identity",
+    "random": "same number of non-source causal prefix positions",
+    "wrong_depth": "same relation donor at externally frozen shallow layer",
+    "full_source": "entire relation donor source prefix"
+  },
+  "scenarios": [
+    "no_intervention",
+    "identity_relation_candidate",
+    "donor_relation_candidate",
+    "donor_content_candidate",
+    "donor_order_candidate",
+    "donor_syntax_candidate",
+    "donor_query_source_candidate",
+    "donor_entities_candidate",
+    "donor_random_candidate",
+    "donor_relation_wrong_depth",
+    "donor_full_source_candidate"
+  ],
+  "frozen_gates_inherited_and_extended_from_phase395": {
+    "minimum_median_relation_normalized_margin_mediation": 0.1,
+    "minimum_relation_advantage_over_each_local_control": 0.05,
+    "minimum_positive_relation_direction_rate": 0.75,
+    "minimum_relation_answer_switch_rate": 0.5,
+    "minimum_candidate_advantage_over_wrong_depth": 0.05,
+    "all_three_models_and_three_surfaces_required": true
+  },
+  "authorization": {
+    "run_discovery_causal_three_models_sequentially": true,
+    "run_calibration_causal": false,
+    "open_physical_causal_holdout": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "causal_discovery_pass_is_calibrated_rule": false,
+    "aggregate_value_patch_is_single_neuron": false,
+    "sufficiency_is_natural_necessity": false
+  }
+}

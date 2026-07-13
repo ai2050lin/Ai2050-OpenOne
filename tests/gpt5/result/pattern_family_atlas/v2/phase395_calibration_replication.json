@@ -1,0 +1,205 @@
+{
+  "schema_version": "69.6.0",
+  "phase_id": "Phase395-BindingReplicationAnalysis",
+  "created_at": "2026-07-12T17:39:03.603877+00:00",
+  "split": "calibration",
+  "frozen_candidate_anchor_index": 4,
+  "frozen_wrong_anchor_index": 1,
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "task_surfaces": [
+      "field_extraction",
+      "entity_recency"
+    ],
+    "groups_per_surface_model": 6,
+    "case_count": 144,
+    "cell_count": 6
+  },
+  "frozen_thresholds": {
+    "minimum_median_layer_output_relative_contrast": 0.02,
+    "minimum_median_attention_output_relative_contrast": 0.005,
+    "support_fraction_inherited_from_discovery": 0.6666666666666666,
+    "minimum_group_support": 4
+  },
+  "candidate_cells": [
+    {
+      "model": "qwen3",
+      "task_surface": "field_extraction",
+      "layer_index": 20,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.0819143176839384,
+      "median_min_attention_output_relative_contrast": 0.277529870008735,
+      "median_min_mlp_output_relative_contrast": 0.20179783352675712,
+      "median_min_layer_output_relative_contrast": 0.09795318344076766,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "qwen3",
+      "task_surface": "entity_recency",
+      "layer_index": 20,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.06906836847361777,
+      "median_min_attention_output_relative_contrast": 0.18595938195549194,
+      "median_min_mlp_output_relative_contrast": 0.1351061806486607,
+      "median_min_layer_output_relative_contrast": 0.07096089382547371,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "glm4",
+      "task_surface": "field_extraction",
+      "layer_index": 22,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.1439959650484053,
+      "median_min_attention_output_relative_contrast": 0.23799973896115478,
+      "median_min_mlp_output_relative_contrast": 0.17396147882451768,
+      "median_min_layer_output_relative_contrast": 0.1421126168989696,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "glm4",
+      "task_surface": "entity_recency",
+      "layer_index": 22,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.15183039997884007,
+      "median_min_attention_output_relative_contrast": 0.21432908197413186,
+      "median_min_mlp_output_relative_contrast": 0.19434866035205778,
+      "median_min_layer_output_relative_contrast": 0.15628967070229616,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "field_extraction",
+      "layer_index": 15,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.08905935293305642,
+      "median_min_attention_output_relative_contrast": 0.16361949988036287,
+      "median_min_mlp_output_relative_contrast": 0.12312793309255238,
+      "median_min_layer_output_relative_contrast": 0.07749832322109217,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "entity_recency",
+      "layer_index": 15,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.08474340407479902,
+      "median_min_attention_output_relative_contrast": 0.18267797411869907,
+      "median_min_mlp_output_relative_contrast": 0.127182909612711,
+      "median_min_layer_output_relative_contrast": 0.07806697914945282,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    }
+  ],
+  "wrong_depth_cells": [
+    {
+      "model": "qwen3",
+      "task_surface": "field_extraction",
+      "layer_index": 5,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.014748928616037014,
+      "median_min_attention_output_relative_contrast": 0.04830974439376101,
+      "median_min_mlp_output_relative_contrast": 0.03291867401782192,
+      "median_min_layer_output_relative_contrast": 0.014544773688273767,
+      "support_count": 0,
+      "support_required": 4,
+      "cell_gate_pass": false
+    },
+    {
+      "model": "qwen3",
+      "task_surface": "entity_recency",
+      "layer_index": 5,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.015401762627591572,
+      "median_min_attention_output_relative_contrast": 0.04921751833936193,
+      "median_min_mlp_output_relative_contrast": 0.03300050992639805,
+      "median_min_layer_output_relative_contrast": 0.015312705220174673,
+      "support_count": 0,
+      "support_required": 4,
+      "cell_gate_pass": false
+    },
+    {
+      "model": "glm4",
+      "task_surface": "field_extraction",
+      "layer_index": 6,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.026571870097772433,
+      "median_min_attention_output_relative_contrast": 0.07102683830551507,
+      "median_min_mlp_output_relative_contrast": 0.05131609722395021,
+      "median_min_layer_output_relative_contrast": 0.030748691431977695,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "glm4",
+      "task_surface": "entity_recency",
+      "layer_index": 6,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.03259709480821363,
+      "median_min_attention_output_relative_contrast": 0.13904559514302595,
+      "median_min_mlp_output_relative_contrast": 0.08600008602988532,
+      "median_min_layer_output_relative_contrast": 0.04892571162123458,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "field_extraction",
+      "layer_index": 4,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.031306015302638594,
+      "median_min_attention_output_relative_contrast": 0.050215653630813775,
+      "median_min_mlp_output_relative_contrast": 0.04504401173145958,
+      "median_min_layer_output_relative_contrast": 0.029146648879012922,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "entity_recency",
+      "layer_index": 4,
+      "group_count": 6,
+      "median_min_layer_input_relative_contrast": 0.028558544837372232,
+      "median_min_attention_output_relative_contrast": 0.055160822218326605,
+      "median_min_mlp_output_relative_contrast": 0.04176842300179988,
+      "median_min_layer_output_relative_contrast": 0.028879644170680153,
+      "support_count": 6,
+      "support_required": 4,
+      "cell_gate_pass": true
+    }
+  ],
+  "results": {
+    "crossmodel_crosssurface_replication_gate_pass": true,
+    "candidate_cell_pass_count": 6,
+    "wrong_depth_cell_pass_count": 4,
+    "causal_binding_state_count": 0,
+    "natural_necessity_count": 0
+  },
+  "authorization": {
+    "causal_intervention": true,
+    "physical_holdout_collection": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "replicated_contrast_is_binding_rule": false,
+    "wrong_depth_pass_invalidates_candidate": false,
+    "observational_replication_is_causal": false
+  }
+}

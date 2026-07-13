@@ -1,0 +1,50 @@
+{
+  "schema_version": "72.3.0",
+  "phase_id": "Phase398-QueryTraceProtocol",
+  "created_at": "2026-07-13T03:10:10.711185+00:00",
+  "objective": "map_full_depth_relation_order_query_factorial_effects_at_causally_legal_query_and_answer_coordinates",
+  "denominator": {
+    "eligible_surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution"
+    ],
+    "selected_case_count": 2304,
+    "instrument_case_count": 144,
+    "discovery_case_count": 1152,
+    "calibration_case_count": 576,
+    "physical_holdout_case_count": 576
+  },
+  "capture_contract": {
+    "coordinates": [
+      "query_end",
+      "answer_anchor"
+    ],
+    "components": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "layer_output"
+    ],
+    "depths": "all_layers",
+    "target_completion_logits": true,
+    "common_value_a_minus_value_b_margin": false,
+    "full_vectors_persisted": false,
+    "group_level_factorial_effects_persisted": true,
+    "top_k_reduction": false,
+    "single_neuron_claim": false
+  },
+  "authorization": {
+    "instrument_trace": true,
+    "discovery_trace": false,
+    "calibration_trace": false,
+    "physical_holdout_trace": false,
+    "causal_intervention": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "factorial_interaction_is_causal_binding": false,
+    "target_completion_step_is_first_value_divergence": false,
+    "full_depth_query_trace_is_complete_language_path": false
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": "70.0.0",
+  "phase_id": "Phase396-FieldPhysicalProtocol",
+  "created_at": "2026-07-12T17:52:31.964545+00:00",
+  "hypothesis_source": "Phase395 calibration field_extraction passed on all three models while crosssurface gate failed",
+  "source_holdout_file_sha256": "f4d287683dc9333a276c4e8a3aea26e725b8e3388429e9855346aa8096a3e32f",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "task_surface": "field_extraction",
+    "groups_per_model": 6,
+    "conditions_per_group": 4,
+    "case_count": 72,
+    "directions_per_model": 24,
+    "total_direction_count": 72
+  },
+  "scenarios": [
+    "no_intervention",
+    "identity_same_literal_candidate",
+    "donor_same_literal_candidate",
+    "donor_same_position_candidate",
+    "donor_source_entities_candidate",
+    "donor_same_count_random_candidate",
+    "donor_query_candidate",
+    "donor_full_source_candidate",
+    "donor_same_literal_wrong_depth"
+  ],
+  "frozen_gates_inherited_without_change": {
+    "minimum_median_same_literal_normalized_margin_mediation": 0.1,
+    "minimum_same_literal_advantage_over_entity": 0.05,
+    "minimum_same_literal_advantage_over_random": 0.05,
+    "minimum_positive_same_literal_direction_rate": 0.75,
+    "minimum_same_literal_answer_switch_rate": 0.5,
+    "minimum_candidate_advantage_over_wrong_depth_for_depth_specificity": 0.05,
+    "all_three_models_and_both_surfaces_required_for_shared_state": true
+  },
+  "phase396_field_gate": {
+    "all_three_models_required": true,
+    "numeric_thresholds_inherited_from_phase395": true
+  },
+  "independence": {
+    "group_overlap_with_phase395_calibration": 0,
+    "field_physical_groups_opened_after_protocol_freeze": true,
+    "entity_recency_rows_loaded_for_file_filtering": true,
+    "entity_recency_physical_internal_evaluation_run": false,
+    "failed_physical_groups_replaceable": false
+  },
+  "authorization": {
+    "run_three_models_sequentially": true,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "field_specific_replication_is_crosssurface_rule": false,
+    "context_transport_is_abstract_binding_algorithm": false,
+    "physical_replication_is_natural_necessity": false
+  }
+}

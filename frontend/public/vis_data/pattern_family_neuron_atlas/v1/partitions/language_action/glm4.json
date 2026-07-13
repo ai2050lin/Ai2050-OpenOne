@@ -1,6 +1,6 @@
 {
   "schema_version": "neuron_atlas_partition.v1",
-  "generated_at": "2026-07-12T11:22:39.401683+00:00",
+  "generated_at": "2026-07-13T03:41:45.912016+00:00",
   "family": {
     "core_questions": [
       "模型如何选择回答、解释、总结、翻译、分类、续写等语言动作。"
@@ -67,8 +67,8 @@
       332
     ]
   },
-  "mapping_status": "phase332_interface_path_mapped_not_causally_closed",
-  "evidence_boundary": "Phase332 displays only discovery members that remained stable or interface-specific on disjoint heldout objects. Cross-model path exchange passed 0/2 positive mechanisms; displayed components are not causal single neurons.",
+  "mapping_status": "phase398_order_conditioned_ROQ_replicated_single_position_sufficiency_rejected",
+  "evidence_boundary": "Phase398 adds one aggregate query-end ROQ anchor. It replicated observationally over three splits but failed single-position causal sufficiency and is not a neuron.",
   "path": {
     "source": {
       "token_position": "source/query/last",
@@ -5012,6 +5012,83 @@
         "tests/gpt5/result/phase332_interface_branch_atlas/interface_branch_atlas/phase332_member_validation.jsonl"
       ],
       "published_at": "2026-07-12T11:22:39.401683+00:00"
+    },
+    {
+      "schema_version": "aggregate_state_anchor.v1",
+      "node_id": "language_action:glm4:L22:phase397:role_filling:relation_signature",
+      "node_type": "aggregate_token_state_anchor",
+      "family_id": "language_action",
+      "family_name": "语言行为模式族",
+      "relation": "role_filling",
+      "model": "glm4",
+      "layer": 22,
+      "component": "residual_stream_layer_input",
+      "unit_kind": "token_state_aggregate",
+      "unit_index": 3,
+      "token_position": "literal_value_positions",
+      "candidate_score": 0.11858032869647796,
+      "case_count": 120,
+      "natural_observed": true,
+      "group_intervention_supported": false,
+      "expanded_confirmation_pass": true,
+      "causal_scope": "observational_relation_context_signature_not_portable_carrier",
+      "evidence_level": "L3-three-split-observational",
+      "evidence_status": "replicated_signature_causal_sufficiency_rejected",
+      "evidence_boundary": "Aggregate value-token relation signature. Three independent splits replicated, but isolated transport passed 0/9 cells and switched 0/144 answers; this is not a neuron or a binding rule.",
+      "display_priority": 12.118580328696478,
+      "phase397_tested": true,
+      "phase397_cohort": "relation_signature_observational",
+      "phase397_physical_observational_pass": true,
+      "phase397_relation_candidate_delta": 0.11858032869647796,
+      "phase397_relation_wrong_depth_delta": 0.10260131493319836,
+      "phase397_causal_gate_pass": false,
+      "phase397_relation_mediation": -0.002636925303350774,
+      "phase397_relation_answer_switch_rate": 0.0,
+      "is_real_unit": false,
+      "single_neuron_claim": false,
+      "generated_at": "2026-07-13T01:51:50.380919+00:00",
+      "source_artifacts": [
+        "phase397_factor_physical_analysis.json",
+        "phase397_causal_analysis.json"
+      ]
+    },
+    {
+      "schema_version": "aggregate_state_anchor.v1",
+      "node_id": "language_action:glm4:L11:phase398:role_filling:order_conditioned_joint_interaction",
+      "node_type": "aggregate_interaction_trajectory_anchor",
+      "family_id": "language_action",
+      "family_name": "语言行为模式族",
+      "relation": "role_filling",
+      "model": "glm4",
+      "layer": 11,
+      "component": "residual_stream_layer_output",
+      "unit_kind": "query_end_factorial_interaction_aggregate",
+      "unit_index": 4,
+      "token_position": "query_end",
+      "candidate_score": 0.167724094,
+      "case_count": 64,
+      "natural_observed": true,
+      "group_intervention_supported": false,
+      "expanded_confirmation_pass": true,
+      "causal_scope": "three_split_order_conditioned_ROQ_observation_single_position_sufficiency_rejected",
+      "evidence_level": "L3-three-split-observational-with-L4-negative-causal-test",
+      "evidence_status": "replicated_order_conditioned_trajectory_causal_sufficiency_rejected",
+      "evidence_boundary": "A query-end aggregate ROQ trajectory replicated across lexical axes, discovery, calibration, and physical holdout. Query-end single-position transport passed 0/9 causal cells; this is not a neuron or complete binding path.",
+      "display_priority": 14.167724094,
+      "phase398_tested": true,
+      "phase398_physical_observational_pass": true,
+      "phase398_roq_norm": 0.167724094,
+      "phase398_roq_cross_axis_cosine": 0.984929592,
+      "phase398_roq_to_rq_ratio": 8.3751215,
+      "phase398_causal_gate_pass": false,
+      "phase398_same_order_answer_switch_rate": 0.0,
+      "is_real_unit": false,
+      "single_neuron_claim": false,
+      "generated_at": "2026-07-13T03:41:45.912016+00:00",
+      "source_artifacts": [
+        "phase398_order_conditioned_physical_validation.json",
+        "phase398_order_conditioned_causal_analysis.json"
+      ]
     }
   ],
   "membership_edges": [
@@ -5462,12 +5539,22 @@
     "phase332_specific_interface_branch_member_count": 52,
     "phase332_path_exchange_effective_count": 0,
     "phase332_full_gate_pass_count": 0,
-    "phase332_single_unit_causal_count": 0
+    "phase332_single_unit_causal_count": 0,
+    "phase397_relation_signature_anchor_count": 1,
+    "phase397_observational_physical_pass_count": 1,
+    "phase397_causal_relation_carrier_count": 0,
+    "phase397_single_neuron_causal_count": 0,
+    "phase398_order_conditioned_anchor_count": 1,
+    "phase398_observational_physical_pass_count": 1,
+    "phase398_single_position_causal_count": 0,
+    "phase398_single_neuron_causal_count": 0
   },
   "source_artifacts": [
     "tests/gpt5/result/phase330_nine_family_global_atlas/nine_family_global_atlas/phase330_global_summary.json",
     "tests/gpt5/result/phase330_nine_family_global_atlas/nine_family_global_atlas/path_registry.jsonl",
     "tests/gpt5/result/phase330_nine_family_global_atlas/nine_family_global_atlas/carrier_sets.jsonl",
-    "tests/gpt5/result/phase330_nine_family_global_atlas/nine_family_global_atlas/cross_model_mechanism_summary.jsonl"
+    "tests/gpt5/result/phase330_nine_family_global_atlas/nine_family_global_atlas/cross_model_mechanism_summary.jsonl",
+    "phase397_factor_physical_analysis.json",
+    "phase397_causal_analysis.json"
   ]
 }

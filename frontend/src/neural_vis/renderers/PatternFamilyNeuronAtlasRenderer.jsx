@@ -16,12 +16,18 @@ const COLORS = {
   dynamicControl: '#fb7185',
   necessityPrimary: '#facc15',
   necessityComparator: '#38bdf8',
+  bindingContext: '#2dd4bf',
+  contentControl: '#f59e0b',
+  relationSignature: '#38bdf8',
+  jointInteraction: '#f472b6',
+  dynamicBinding: '#60a5fa',
   crossModel: '#e879f9',
   readout: '#fb7185',
   active: '#f8fafc',
 };
 
 function filterNodes(nodes, focus) {
+  if (focus === 'binding_context') return nodes.filter((node) => node.phase396_tested || node.phase397_tested || node.phase398_tested || node.phase399_tested);
   if (focus === 'natural') return nodes.filter((node) => node.natural_observed);
   if (focus === 'group') return nodes.filter((node) => node.group_intervention_supported);
   if (focus === 'confirmed') return nodes.filter((node) => node.expanded_confirmation_pass);
@@ -126,6 +132,10 @@ function nodePosition(node, snapshot, rankInLayer, overlay = false) {
 }
 
 function nodeColor(node) {
+  if (node.phase399_tested) return COLORS.dynamicBinding;
+  if (node.phase398_tested) return COLORS.jointInteraction;
+  if (node.phase397_tested) return COLORS.relationSignature;
+  if (node.phase396_tested) return node.phase396_cohort === 'context_carrier' ? COLORS.bindingContext : COLORS.contentControl;
   if (node.phase334_tested) return node.cohort === 'primary' ? COLORS.necessityPrimary : COLORS.necessityComparator;
   if (node.phase333_tested) return node.cohort === 'positive' ? COLORS.dynamicPositive : COLORS.dynamicControl;
   if (node.phase332_path_role === 'shared_skeleton') return COLORS.sharedSkeleton;
@@ -140,6 +150,10 @@ function nodeColor(node) {
 }
 
 function nodeCategory(node) {
+  if (node.phase399_tested) return 'dynamicBinding';
+  if (node.phase398_tested) return 'jointInteraction';
+  if (node.phase397_tested) return 'relationSignature';
+  if (node.phase396_tested) return node.phase396_cohort === 'context_carrier' ? 'bindingContext' : 'contentControl';
   if (node.phase334_tested) return node.cohort === 'primary' ? 'necessityPrimary' : 'necessityComparator';
   if (node.phase333_tested) return node.cohort === 'positive' ? 'dynamicPositive' : 'dynamicControl';
   if (node.phase332_path_role === 'shared_skeleton') return 'sharedSkeleton';
@@ -158,10 +172,13 @@ function toHoverInfo(node) {
   const isInterfacePath = node.node_type === 'interface_path_member';
   const isDynamicEvent = node.node_type === 'dynamic_path_event';
   const isNaturalNecessity = node.node_type === 'natural_necessity_component_candidate';
+  const isAggregateState = node.node_type === 'aggregate_token_state_anchor'
+    || node.node_type === 'aggregate_interaction_trajectory_anchor'
+    || node.node_type === 'aggregate_dynamic_route_event';
   return {
     token: `L${node.layer} · ${node.unit_kind} #${node.unit_index}`,
     label: node.family_name,
-    type: isNaturalNecessity ? '接收者自然路径组件必要性候选' : isDynamicEvent ? '冻结功能时间动态事件锚点' : isInterfacePath ? '保留集稳定接口路径成员' : isComponentSet ? '模式族物理组件集合成员' : '模式族物理单元候选',
+    type: isAggregateState ? '聚合词元状态锚点（不是神经元）' : isNaturalNecessity ? '接收者自然路径组件必要性候选' : isDynamicEvent ? '冻结功能时间动态事件锚点' : isInterfacePath ? '保留集稳定接口路径成员' : isComponentSet ? '模式族物理组件集合成员' : '模式族物理单元候选',
     family_id: node.family_id,
     family_name: node.family_name,
     relation: node.relation,
@@ -268,10 +285,43 @@ function toHoverInfo(node) {
     phase334_natural_necessity_specific: node.phase334_natural_necessity_specific,
     phase334_propagation_candidate_rate: node.phase334_propagation_candidate_rate,
     phase334_local_gate_pass: node.phase334_local_gate_pass,
+    phase396_tested: node.phase396_tested,
+    phase396_cohort: node.phase396_cohort,
+    phase396_physical_replication_pass: node.phase396_physical_replication_pass,
+    phase396_normalized_margin_mediation: node.phase396_normalized_margin_mediation,
+    phase396_positive_direction_rate: node.phase396_positive_direction_rate,
+    phase396_answer_switch_rate: node.phase396_answer_switch_rate,
+    phase397_tested: node.phase397_tested,
+    phase397_cohort: node.phase397_cohort,
+    phase397_physical_observational_pass: node.phase397_physical_observational_pass,
+    phase397_relation_candidate_delta: node.phase397_relation_candidate_delta,
+    phase397_relation_wrong_depth_delta: node.phase397_relation_wrong_depth_delta,
+    phase397_causal_gate_pass: node.phase397_causal_gate_pass,
+    phase397_relation_mediation: node.phase397_relation_mediation,
+    phase397_relation_answer_switch_rate: node.phase397_relation_answer_switch_rate,
+    phase397_followup_scope_limit: node.phase397_followup_scope_limit,
+    phase398_tested: node.phase398_tested,
+    phase398_physical_observational_pass: node.phase398_physical_observational_pass,
+    phase398_roq_norm: node.phase398_roq_norm,
+    phase398_roq_cross_axis_cosine: node.phase398_roq_cross_axis_cosine,
+    phase398_roq_to_rq_ratio: node.phase398_roq_to_rq_ratio,
+    phase398_causal_gate_pass: node.phase398_causal_gate_pass,
+    phase398_same_order_answer_switch_rate: node.phase398_same_order_answer_switch_rate,
+    phase399_tested: node.phase399_tested,
+    phase399_event_class: node.phase399_event_class,
+    phase399_event_id: node.phase399_event_id,
+    phase399_physical_observational_pass: node.phase399_physical_observational_pass,
+    phase399_roq_norm: node.phase399_roq_norm,
+    phase399_roq_cross_axis_cosine: node.phase399_roq_cross_axis_cosine,
+    phase399_roq_to_competitor_ratio: node.phase399_roq_to_competitor_ratio,
+    phase399_ordered_chain_pass: node.phase399_ordered_chain_pass,
+    phase399_crossmodel_chain_pass: node.phase399_crossmodel_chain_pass,
+    phase399_causal_gate_open: node.phase399_causal_gate_open,
     source: node.source_artifacts?.[0],
     source_artifacts: node.source_artifacts,
     node_id: node.node_id,
-    is_real_unit: !isComponentSet,
+    is_real_unit: !isComponentSet && !isAggregateState,
+    is_aggregate_state_anchor: isAggregateState,
     is_component_set_member: isComponentSet,
     is_interface_path_member: isInterfacePath,
     is_dynamic_path_event: isDynamicEvent,
@@ -415,7 +465,7 @@ export default function PatternFamilyNeuronAtlasRenderer({
     return nodePosition(node, snapshot, rank, overlay);
   });
   const positionById = new Map(selectedNodes.map((node, index) => [node.node_id, positions[index]]));
-  const instanceGroups = ['candidate', 'natural', 'group', 'confirmed', 'crossModel', 'refined', 'sharedSkeleton', 'interfaceBranch', 'dynamicPositive', 'dynamicControl', 'necessityPrimary', 'necessityComparator'].map((category) => {
+  const instanceGroups = ['relationSignature', 'bindingContext', 'contentControl', 'candidate', 'natural', 'group', 'confirmed', 'crossModel', 'refined', 'sharedSkeleton', 'interfaceBranch', 'dynamicPositive', 'dynamicControl', 'necessityPrimary', 'necessityComparator'].map((category) => {
     const items = selectedNodes.filter((node) => nodeCategory(node) === category);
     return {
       category,
@@ -711,6 +761,11 @@ export default function PatternFamilyNeuronAtlasRenderer({
           [COLORS.dynamicControl, 'Phase333 两跳阻断对照锚点'],
           [COLORS.necessityPrimary, 'Phase334 主机制自然必要性候选'],
           [COLORS.necessityComparator, 'Phase334 配对机制自然必要性候选'],
+          [COLORS.bindingContext, 'Phase396 同字面值上下文载体（聚合状态）'],
+          [COLORS.contentControl, 'Phase396 同位置内容搬运对照（聚合状态）'],
+          [COLORS.relationSignature, 'Phase397 关系签名（观测复现，因果未通过）'],
+          [COLORS.jointInteraction, 'Phase398 顺序条件化联合轨迹（非神经元）'],
+          [COLORS.dynamicBinding, 'Phase399 模型特异动态事件链（聚合观测）'],
         ].map(([color, label], index) => (
           <group key={label} position={[0, index * 0.48, 0]}>
             <mesh><sphereGeometry args={[0.1, 10, 10]} /><meshBasicMaterial color={color} /></mesh>

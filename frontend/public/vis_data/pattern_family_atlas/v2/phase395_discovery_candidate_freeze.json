@@ -1,0 +1,238 @@
+{
+  "schema_version": "69.5.0",
+  "phase_id": "Phase395-BindingDiscoveryAnalysis",
+  "created_at": "2026-07-12T17:36:25.412247+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "task_surfaces": [
+      "field_extraction",
+      "entity_recency"
+    ],
+    "groups_per_surface_model": 12,
+    "relative_anchor_count": 8,
+    "cell_count": 48
+  },
+  "frozen_thresholds": {
+    "minimum_median_layer_output_relative_contrast": 0.02,
+    "minimum_median_attention_output_relative_contrast": 0.005,
+    "minimum_group_support": 8
+  },
+  "anchor_rows": [
+    {
+      "anchor_index": 0,
+      "anchor_fraction": 0.0,
+      "median_crosscell_attention_contrast": 0.0038966090827051753,
+      "median_crosscell_layer_output_contrast": 0.004470732623089716,
+      "passing_cell_count": 0,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 1,
+      "anchor_fraction": 0.14285714285714285,
+      "median_crosscell_attention_contrast": 0.053450512634216935,
+      "median_crosscell_layer_output_contrast": 0.028140237368548565,
+      "passing_cell_count": 4,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 2,
+      "anchor_fraction": 0.2857142857142857,
+      "median_crosscell_attention_contrast": 0.13632298887584263,
+      "median_crosscell_layer_output_contrast": 0.04597471925643532,
+      "passing_cell_count": 6,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 3,
+      "anchor_fraction": 0.42857142857142855,
+      "median_crosscell_attention_contrast": 0.20664230210939255,
+      "median_crosscell_layer_output_contrast": 0.07874858844361567,
+      "passing_cell_count": 6,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 4,
+      "anchor_fraction": 0.5714285714285714,
+      "median_crosscell_attention_contrast": 0.23854962556638704,
+      "median_crosscell_layer_output_contrast": 0.1000308127435887,
+      "passing_cell_count": 6,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 5,
+      "anchor_fraction": 0.7142857142857143,
+      "median_crosscell_attention_contrast": 0.11773365155389735,
+      "median_crosscell_layer_output_contrast": 0.09303052990542098,
+      "passing_cell_count": 6,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 6,
+      "anchor_fraction": 0.8571428571428571,
+      "median_crosscell_attention_contrast": 0.130726891267623,
+      "median_crosscell_layer_output_contrast": 0.09283650209372714,
+      "passing_cell_count": 6,
+      "cell_denominator": 6
+    },
+    {
+      "anchor_index": 7,
+      "anchor_fraction": 1.0,
+      "median_crosscell_attention_contrast": 0.09106346345635263,
+      "median_crosscell_layer_output_contrast": 0.09298380969856018,
+      "passing_cell_count": 6,
+      "cell_denominator": 6
+    }
+  ],
+  "frozen_candidate": {
+    "anchor_index": 4,
+    "anchor_fraction": 0.5714285714285714,
+    "wrong_anchor_index": 1,
+    "wrong_anchor_fraction": 0.14285714285714285,
+    "model_layers": {
+      "qwen3": {
+        "candidate_layer": 20,
+        "wrong_depth_layer": 5
+      },
+      "glm4": {
+        "candidate_layer": 22,
+        "wrong_depth_layer": 6
+      },
+      "deepseek7b": {
+        "candidate_layer": 15,
+        "wrong_depth_layer": 4
+      }
+    },
+    "cells": [
+      {
+        "schema_version": "69.5.0",
+        "phase_id": "Phase395-BindingDiscoveryAnalysis",
+        "model": "qwen3",
+        "task_surface": "field_extraction",
+        "anchor_index": 4,
+        "anchor_fraction": 0.5714285714285714,
+        "layer_index": 20,
+        "group_count": 12,
+        "median_min_layer_input_relative_contrast": 0.08950791630277419,
+        "median_min_attention_output_relative_contrast": 0.29597702043887086,
+        "median_min_mlp_output_relative_contrast": 0.2050164028368615,
+        "median_min_layer_output_relative_contrast": 0.10551026764378596,
+        "median_attention_increment_over_input": 0.01445950065319311,
+        "support_count": 12,
+        "support_required": 8,
+        "cell_gate_pass": true
+      },
+      {
+        "schema_version": "69.5.0",
+        "phase_id": "Phase395-BindingDiscoveryAnalysis",
+        "model": "qwen3",
+        "task_surface": "entity_recency",
+        "anchor_index": 4,
+        "anchor_fraction": 0.5714285714285714,
+        "layer_index": 20,
+        "group_count": 12,
+        "median_min_layer_input_relative_contrast": 0.086202805372353,
+        "median_min_attention_output_relative_contrast": 0.264164137244889,
+        "median_min_mlp_output_relative_contrast": 0.17357871612478276,
+        "median_min_layer_output_relative_contrast": 0.09455135784339144,
+        "median_attention_increment_over_input": 0.006573562998004476,
+        "support_count": 12,
+        "support_required": 8,
+        "cell_gate_pass": true
+      },
+      {
+        "schema_version": "69.5.0",
+        "phase_id": "Phase395-BindingDiscoveryAnalysis",
+        "model": "glm4",
+        "task_surface": "field_extraction",
+        "anchor_index": 4,
+        "anchor_fraction": 0.5714285714285714,
+        "layer_index": 22,
+        "group_count": 12,
+        "median_min_layer_input_relative_contrast": 0.14127155295823676,
+        "median_min_attention_output_relative_contrast": 0.2173175835607457,
+        "median_min_mlp_output_relative_contrast": 0.17500025851538645,
+        "median_min_layer_output_relative_contrast": 0.14125874395888588,
+        "median_attention_increment_over_input": -0.0007626071301994469,
+        "support_count": 12,
+        "support_required": 8,
+        "cell_gate_pass": true
+      },
+      {
+        "schema_version": "69.5.0",
+        "phase_id": "Phase395-BindingDiscoveryAnalysis",
+        "model": "glm4",
+        "task_surface": "entity_recency",
+        "anchor_index": 4,
+        "anchor_fraction": 0.5714285714285714,
+        "layer_index": 22,
+        "group_count": 12,
+        "median_min_layer_input_relative_contrast": 0.1755694124663003,
+        "median_min_attention_output_relative_contrast": 0.25978166757202836,
+        "median_min_mlp_output_relative_contrast": 0.23583556435178488,
+        "median_min_layer_output_relative_contrast": 0.18201670163783512,
+        "median_attention_increment_over_input": 0.005815423940226314,
+        "support_count": 12,
+        "support_required": 8,
+        "cell_gate_pass": true
+      },
+      {
+        "schema_version": "69.5.0",
+        "phase_id": "Phase395-BindingDiscoveryAnalysis",
+        "model": "deepseek7b",
+        "task_surface": "field_extraction",
+        "anchor_index": 4,
+        "anchor_fraction": 0.5714285714285714,
+        "layer_index": 15,
+        "group_count": 12,
+        "median_min_layer_input_relative_contrast": 0.09676712724887088,
+        "median_min_attention_output_relative_contrast": 0.16114780662242895,
+        "median_min_mlp_output_relative_contrast": 0.12740936951145737,
+        "median_min_layer_output_relative_contrast": 0.08219130225939128,
+        "median_attention_increment_over_input": -0.013063174502626874,
+        "support_count": 12,
+        "support_required": 8,
+        "cell_gate_pass": true
+      },
+      {
+        "schema_version": "69.5.0",
+        "phase_id": "Phase395-BindingDiscoveryAnalysis",
+        "model": "deepseek7b",
+        "task_surface": "entity_recency",
+        "anchor_index": 4,
+        "anchor_fraction": 0.5714285714285714,
+        "layer_index": 15,
+        "group_count": 12,
+        "median_min_layer_input_relative_contrast": 0.0791316116673812,
+        "median_min_attention_output_relative_contrast": 0.15879700966915244,
+        "median_min_mlp_output_relative_contrast": 0.11652643756038969,
+        "median_min_layer_output_relative_contrast": 0.07186060422742344,
+        "median_attention_increment_over_input": -0.007271102420337391,
+        "support_count": 12,
+        "support_required": 8,
+        "cell_gate_pass": true
+      }
+    ],
+    "crossmodel_crosssurface_discovery_gate_pass": true,
+    "causal_binding_claim": false
+  },
+  "results": {
+    "crossmodel_crosssurface_query_binding_contrast_candidate_count": 1,
+    "causal_binding_state_count": 0,
+    "natural_necessity_count": 0
+  },
+  "authorization": {
+    "calibration_collection": true,
+    "physical_holdout_collection": false,
+    "causal_intervention": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "query_contrast_is_binding_rule": false,
+    "same_token_multiset_removes_order_information": false,
+    "observational_depth_is_causal_depth": false
+  }
+}

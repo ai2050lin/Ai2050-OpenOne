@@ -1,0 +1,109 @@
+{
+  "schema_version": "73.6.0",
+  "phase_id": "Phase399-DynamicCandidateProtocol",
+  "created_at": "2026-07-13T04:22:47.491381+00:00",
+  "objective": "select_a_computation_ordered_aggregate_event_chain_before_calibration_is_opened",
+  "event_classes": {
+    "source_state": {
+      "prefixes": [
+        "state:source_entity_a:layer_output",
+        "state:source_entity_b:layer_output",
+        "state:source_value_a:layer_output",
+        "state:source_value_b:layer_output",
+        "state:clause_end_0:layer_output",
+        "state:clause_end_1:layer_output"
+      ],
+      "required_for_chain": false
+    },
+    "source_to_query_route": {
+      "prefixes": [
+        "route:source_entity_a->query_end:attention_write",
+        "route:source_entity_b->query_end:attention_write",
+        "route:source_value_a->query_end:attention_write",
+        "route:source_value_b->query_end:attention_write",
+        "route:source_structure->query_end:attention_write"
+      ],
+      "required_for_chain": true
+    },
+    "query_integration": {
+      "prefixes": [
+        "state:query_end:attention_output",
+        "state:query_end:mlp_output",
+        "state:query_end:layer_output"
+      ],
+      "required_for_chain": true
+    },
+    "terminal_integration": {
+      "prefixes": [
+        "route:source_entity_a->first_answer:attention_write",
+        "route:source_entity_b->first_answer:attention_write",
+        "route:source_value_a->first_answer:attention_write",
+        "route:source_value_b->first_answer:attention_write",
+        "route:source_structure->first_answer:attention_write",
+        "route:query_entity->first_answer:attention_write",
+        "route:query_context->first_answer:attention_write",
+        "state:first_answer:attention_output",
+        "state:first_answer:mlp_output",
+        "state:first_answer:layer_output"
+      ],
+      "required_for_chain": true
+    },
+    "completion_continuation": {
+      "prefixes": [
+        "state:target_completion:layer_output",
+        "state:post_target:layer_output"
+      ],
+      "required_for_chain": false
+    }
+  },
+  "per_group_layer_gate": {
+    "roq_min_axis_normalized_norm_min": 0.01,
+    "roq_cross_axis_cosine_min": 0.75,
+    "roq_to_competing_interaction_min": 1.25
+  },
+  "discovery_cell_gate": {
+    "group_pass_rate_min": 0.8,
+    "median_roq_min_axis_normalized_norm_min": 0.015,
+    "median_roq_cross_axis_cosine_min": 0.85,
+    "median_roq_to_competing_interaction_min": 1.5
+  },
+  "calibration_and_physical_gate": {
+    "group_pass_rate_min": 0.8,
+    "median_roq_min_axis_normalized_norm_min": 0.012,
+    "median_roq_cross_axis_cosine_min": 0.8,
+    "median_roq_to_competing_interaction_min": 1.25
+  },
+  "chain_gate": {
+    "required_classes": [
+      "source_to_query_route",
+      "query_integration",
+      "terminal_integration"
+    ],
+    "ordered_peak_layers": "source_to_query_route <= query_integration <= terminal_integration",
+    "crossmodel_surface_gate": "all_three_models_pass_the_same_required_role_classes"
+  },
+  "search_denominator": {
+    "effects_used": [
+      "RO",
+      "RQ",
+      "OQ",
+      "ROQ"
+    ],
+    "all_layers_searched": true,
+    "all_predeclared_event_ids_searched": true,
+    "head_ids_searched": false,
+    "channel_ids_searched": false,
+    "neuron_ids_searched": false
+  },
+  "authorization": {
+    "run_discovery_analysis_after_instrument_gate": true,
+    "open_calibration_before_candidate_freeze": false,
+    "open_physical_before_calibration": false,
+    "run_causal_before_physical": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "discovery_chain_is_causal": false,
+    "ordered_observational_events_are_a_binding_algorithm": false
+  }
+}

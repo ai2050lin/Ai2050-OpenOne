@@ -1,0 +1,50 @@
+{
+  "schema_version": "72.10.0",
+  "phase_id": "Phase398-OrderConditionedCausalProtocol",
+  "created_at": "2026-07-13T03:25:13.819387+00:00",
+  "objective": "test_whether_the_frozen_order_conditioned_query_end_state_is_causally_sufficient_and_order_specific_at_the_next_layer_parent_boundary",
+  "denominator": {
+    "instrument_group_count": 9,
+    "causal_test_group_count": 27,
+    "conditions_per_group": 16,
+    "directions_per_group": 16,
+    "scenario_count_per_direction": 6,
+    "instrument_generation_count": 864,
+    "causal_test_generation_count": 2592
+  },
+  "direction_contract": "for_each_axis_relation_order_and_both_query_directions_copy_the_opposite_query_state_within_the_same_order;_wrong_order_donor_keeps_the_donor_target_fixed",
+  "patch_contract": {
+    "candidate_state": "candidate_layer_output_equivalently_next_layer_input",
+    "recipient_position": "query_end_only",
+    "same_order_donor": "same_axis_relation_order_opposite_query",
+    "wrong_order_donor": "same_axis_relation_opposite_order_opposite_query_with_same_target",
+    "wrong_depth": "same_order_donor_at_frozen_shallower_parent_layer",
+    "answer_anchor_control": "same_order_donor_answer_anchor_to_recipient_answer_anchor_at_candidate_parent"
+  },
+  "scenarios": [
+    "no_intervention",
+    "identity_candidate_parent",
+    "same_order_joint_donor_candidate",
+    "wrong_order_joint_donor_candidate",
+    "same_order_joint_donor_wrong_depth",
+    "same_order_donor_answer_anchor_control"
+  ],
+  "frozen_gates": {
+    "baseline_recipient_correct_rate": 1.0,
+    "identity_recipient_correct_rate": 1.0,
+    "minimum_same_order_donor_answer_switch_rate": 0.5,
+    "minimum_same_order_advantage_over_wrong_order_switch_rate": 0.1,
+    "minimum_same_order_advantage_over_wrong_depth_switch_rate": 0.1,
+    "all_nine_model_surface_cells_required": true
+  },
+  "claim_boundary": {
+    "state_swap_sufficiency_is_natural_necessity": false,
+    "query_end_state_is_single_neuron": false,
+    "failure_proves_no_order_conditioned_computation": false
+  },
+  "authorization": {
+    "run_instrument": true,
+    "run_causal_test": false,
+    "single_neuron_scan": false
+  }
+}

@@ -112,8 +112,10 @@ class Phase390To393JointFormationTests(unittest.TestCase):
             progress = read_json(root / "progress.json")
             stage = read_json(root / "phase393_joint_formation_stage_summary.json")
             stages.append(stage)
-            self.assertEqual(manifest["last_phase"], "Phase393-StageMerge")
-            self.assertEqual(progress["last_phase"], "Phase393-StageMerge")
+            self.assertEqual(manifest["last_phase"], "Phase399-MultiPositionDynamicBindingStage")
+            self.assertEqual(progress["last_phase"], "Phase399-MultiPositionDynamicBindingStage")
+            self.assertIn("phase397", manifest)
+            self.assertIn("phase399", manifest)
             for key, value in expected_results.items():
                 self.assertEqual(stage["results"][key], value)
             self.assertFalse(stage["authorization"]["show_depth_specialized_path"])
@@ -130,7 +132,7 @@ class Phase390To393JointFormationTests(unittest.TestCase):
     def test_neuron_atlas_stays_at_zero_promoted_paths(self) -> None:
         for root in (NEURON_ATLAS, NEURON_CLIENT):
             manifest = read_json(root / "manifest.json")
-            self.assertEqual(manifest["phase"], 393)
+            self.assertGreaterEqual(manifest["phase"], 393)
             audit = manifest["phase393_audit"]
             self.assertEqual(audit["new_neuron_path_nodes_promoted"], 0)
             self.assertEqual(audit["single_unit_causal_count"], 0)
@@ -138,7 +140,11 @@ class Phase390To393JointFormationTests(unittest.TestCase):
             self.assertFalse(manifest["evidence_boundary"]["candidate_depth_specificity_available"])
             checksums = read_json(root / "checksums.json")
             entries = {row["path"]: row["sha256"] for row in checksums["files"]}
-            latest = "phase393_joint_formation_stage_summary.json"
+            phase393 = "phase393_joint_formation_stage_summary.json"
+            phase396 = "phase396_binding_separation_stage_summary.json"
+            latest = "phase397_factor_separated_binding_stage_summary.json"
+            self.assertEqual(entries[phase393], sha256(root / phase393))
+            self.assertEqual(entries[phase396], sha256(root / phase396))
             self.assertEqual(entries[latest], sha256(root / latest))
 
 

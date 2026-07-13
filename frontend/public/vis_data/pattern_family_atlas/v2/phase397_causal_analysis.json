@@ -1,0 +1,728 @@
+{
+  "schema_version": "71.11.0",
+  "phase_id": "Phase397-CausalAnalysis",
+  "created_at": "2026-07-13T01:42:33.653177+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "task_surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution"
+    ],
+    "groups_per_cell": 8,
+    "directions_per_cell": 16,
+    "direction_count": 144,
+    "scenario_count": 1584,
+    "generation_count": 144
+  },
+  "frozen_gates": {
+    "minimum_median_relation_normalized_margin_mediation": 0.1,
+    "minimum_relation_advantage_over_each_local_control": 0.05,
+    "minimum_positive_relation_direction_rate": 0.75,
+    "minimum_relation_answer_switch_rate": 0.5,
+    "minimum_candidate_advantage_over_wrong_depth": 0.05,
+    "all_three_models_and_three_surfaces_required": true
+  },
+  "cells": [
+    {
+      "model": "qwen3",
+      "task_surface": "possession_relation",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0017242518843137958,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.2840264957574212,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.16821007787914474,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": 0.01735150214872677,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0038394698118228397,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": -7.997054294914924e-05,
+          "positive_direction_count": 7,
+          "positive_direction_rate": 0.4375
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0044542365543889535,
+          "positive_direction_count": 11,
+          "positive_direction_rate": 0.6875
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.28230224387310743,
+        "donor_order_candidate": -0.16648582599483094,
+        "donor_syntax_candidate": -0.015627250264412973,
+        "donor_query_source_candidate": 0.0017242518843137958,
+        "donor_entities_candidate": -0.002115217927509044,
+        "donor_random_candidate": 0.0017242518843137958
+      },
+      "minimum_relation_advantage_over_local_controls": -0.28230224387310743,
+      "candidate_advantage_over_wrong_depth": 0.001804222427262945,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "qwen3",
+      "task_surface": "role_filling",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.022104738981340386,
+          "positive_direction_count": 14,
+          "positive_direction_rate": 0.875
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.47382976042946834,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.8820045294037031,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": 0.07280862145609074,
+          "positive_direction_count": 14,
+          "positive_direction_rate": 0.875
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.012995619790034413,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": -0.0005799986870524027,
+          "positive_direction_count": 6,
+          "positive_direction_rate": 0.375
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.01672538970421116,
+          "positive_direction_count": 12,
+          "positive_direction_rate": 0.75
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.45172502144812793,
+        "donor_order_candidate": -0.8598997904223628,
+        "donor_syntax_candidate": -0.050703882474750356,
+        "donor_query_source_candidate": 0.022104738981340386,
+        "donor_entities_candidate": 0.009109119191305973,
+        "donor_random_candidate": 0.022104738981340386
+      },
+      "minimum_relation_advantage_over_local_controls": -0.8598997904223628,
+      "candidate_advantage_over_wrong_depth": 0.02268473766839279,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "qwen3",
+      "task_surface": "coreference_resolution",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.007918807560012422,
+          "positive_direction_count": 9,
+          "positive_direction_rate": 0.5625
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.2938901471596185,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.16502100426550162,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": -0.00436548362473624,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0010352531513710345,
+          "positive_direction_count": 10,
+          "positive_direction_rate": 0.625
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": 0.0007893709499547494,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.016337773226347125,
+          "positive_direction_count": 12,
+          "positive_direction_rate": 0.75
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.2859713395996061,
+        "donor_order_candidate": -0.1571021967054892,
+        "donor_syntax_candidate": 0.012284291184748662,
+        "donor_query_source_candidate": 0.007918807560012422,
+        "donor_entities_candidate": 0.006883554408641387,
+        "donor_random_candidate": 0.007918807560012422
+      },
+      "minimum_relation_advantage_over_local_controls": -0.2859713395996061,
+      "candidate_advantage_over_wrong_depth": 0.007129436610057672,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "glm4",
+      "task_surface": "possession_relation",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.005287645575817009,
+          "positive_direction_count": 13,
+          "positive_direction_rate": 0.8125
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.3442253496638703,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.09424513111251162,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": -0.011426713640861178,
+          "positive_direction_count": 7,
+          "positive_direction_rate": 0.4375
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": -0.0017302101159140985,
+          "positive_direction_count": 1,
+          "positive_direction_rate": 0.0625
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": 0.00023271320447077227,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.006936103615609077,
+          "positive_direction_count": 11,
+          "positive_direction_rate": 0.6875
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.3389377040880533,
+        "donor_order_candidate": -0.08895748553669461,
+        "donor_syntax_candidate": 0.016714359216678187,
+        "donor_query_source_candidate": 0.005287645575817009,
+        "donor_entities_candidate": 0.007017855691731108,
+        "donor_random_candidate": 0.005287645575817009
+      },
+      "minimum_relation_advantage_over_local_controls": -0.3389377040880533,
+      "candidate_advantage_over_wrong_depth": 0.005054932371346237,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "glm4",
+      "task_surface": "role_filling",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": -0.002636925303350774,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.6024547639931882,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.7542298646872637,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": 0.11561748708417877,
+          "positive_direction_count": 13,
+          "positive_direction_rate": 0.8125
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.025353037986915496,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": -0.001275465381138127,
+          "positive_direction_count": 7,
+          "positive_direction_rate": 0.4375
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": -0.02195232598127643,
+          "positive_direction_count": 7,
+          "positive_direction_rate": 0.4375
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.605091689296539,
+        "donor_order_candidate": -0.7568667899906145,
+        "donor_syntax_candidate": -0.11825441238752954,
+        "donor_query_source_candidate": -0.002636925303350774,
+        "donor_entities_candidate": -0.02798996329026627,
+        "donor_random_candidate": -0.002636925303350774
+      },
+      "minimum_relation_advantage_over_local_controls": -0.7568667899906145,
+      "candidate_advantage_over_wrong_depth": -0.0013614599222126467,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "glm4",
+      "task_surface": "coreference_resolution",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": -0.0017071607984327068,
+          "positive_direction_count": 3,
+          "positive_direction_rate": 0.1875
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.31258104860582836,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.05824951193027292,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": 0.012235786887844652,
+          "positive_direction_count": 11,
+          "positive_direction_rate": 0.6875
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0012812569807191558,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": 0.0023271027766867984,
+          "positive_direction_count": 14,
+          "positive_direction_rate": 0.875
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": -0.00382742630957417,
+          "positive_direction_count": 3,
+          "positive_direction_rate": 0.1875
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.31428820940426105,
+        "donor_order_candidate": -0.059956672728705626,
+        "donor_syntax_candidate": -0.013942947686277359,
+        "donor_query_source_candidate": -0.0017071607984327068,
+        "donor_entities_candidate": -0.0029884177791518625,
+        "donor_random_candidate": -0.0017071607984327068
+      },
+      "minimum_relation_advantage_over_local_controls": -0.31428820940426105,
+      "candidate_advantage_over_wrong_depth": -0.004034263575119506,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "possession_relation",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0019701902927030143,
+          "positive_direction_count": 9,
+          "positive_direction_rate": 0.5625
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.3255588234543873,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.14069375213832416,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": 0.01851405875117485,
+          "positive_direction_count": 11,
+          "positive_direction_rate": 0.6875
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.10531941654353169,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": -0.0033638643584517555,
+          "positive_direction_count": 6,
+          "positive_direction_rate": 0.375
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.21076519253880704,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.3235886331616843,
+        "donor_order_candidate": -0.13872356184562115,
+        "donor_syntax_candidate": -0.016543868458471837,
+        "donor_query_source_candidate": 0.0019701902927030143,
+        "donor_entities_candidate": -0.10334922625082868,
+        "donor_random_candidate": 0.0019701902927030143
+      },
+      "minimum_relation_advantage_over_local_controls": -0.3235886331616843,
+      "candidate_advantage_over_wrong_depth": 0.00533405465115477,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "role_filling",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": -0.0005325204399409146,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.5264887072620186,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.2913851333014189,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": 0.04886476626103315,
+          "positive_direction_count": 12,
+          "positive_direction_rate": 0.75
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.25547340085812176,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": 0.0017660588708508025,
+          "positive_direction_count": 9,
+          "positive_direction_rate": 0.5625
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.5395698203235666,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.5270212277019595,
+        "donor_order_candidate": -0.2919176537413598,
+        "donor_syntax_candidate": -0.04939728670097406,
+        "donor_query_source_candidate": -0.0005325204399409146,
+        "donor_entities_candidate": -0.25600592129806266,
+        "donor_random_candidate": -0.0005325204399409146
+      },
+      "minimum_relation_advantage_over_local_controls": -0.5270212277019595,
+      "candidate_advantage_over_wrong_depth": -0.0022985793107917173,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "task_surface": "coreference_resolution",
+      "direction_count": 16,
+      "scenario_summaries": {
+        "no_intervention": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "identity_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0008848818449234742,
+          "positive_direction_count": 8,
+          "positive_direction_rate": 0.5
+        },
+        "donor_content_candidate": {
+          "median_normalized_relation_margin_mediation": 0.34664285162061526,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_order_candidate": {
+          "median_normalized_relation_margin_mediation": 0.08159545084541525,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_syntax_candidate": {
+          "median_normalized_relation_margin_mediation": -0.017795822270822784,
+          "positive_direction_count": 4,
+          "positive_direction_rate": 0.25
+        },
+        "donor_query_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_entities_candidate": {
+          "median_normalized_relation_margin_mediation": 0.10012579899991483,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        },
+        "donor_random_candidate": {
+          "median_normalized_relation_margin_mediation": 0.0,
+          "positive_direction_count": 0,
+          "positive_direction_rate": 0.0
+        },
+        "donor_relation_wrong_depth": {
+          "median_normalized_relation_margin_mediation": 0.004949135915237832,
+          "positive_direction_count": 11,
+          "positive_direction_rate": 0.6875
+        },
+        "donor_full_source_candidate": {
+          "median_normalized_relation_margin_mediation": 0.07571743722245575,
+          "positive_direction_count": 16,
+          "positive_direction_rate": 1.0
+        }
+      },
+      "relation_advantage_over_controls": {
+        "donor_content_candidate": -0.3457579697756918,
+        "donor_order_candidate": -0.08071056900049178,
+        "donor_syntax_candidate": 0.01868070411574626,
+        "donor_query_source_candidate": 0.0008848818449234742,
+        "donor_entities_candidate": -0.09924091715499136,
+        "donor_random_candidate": 0.0008848818449234742
+      },
+      "minimum_relation_advantage_over_local_controls": -0.3457579697756918,
+      "candidate_advantage_over_wrong_depth": -0.004064254070314358,
+      "relation_answer_switch_count": 0,
+      "relation_answer_switch_rate": 0.0,
+      "causal_relation_context_specificity_gate_pass": false
+    }
+  ],
+  "results": {
+    "passing_model_surface_cell_count": 0,
+    "crossmodel_crosssurface_causal_relation_context_gate_pass": false,
+    "maximum_identity_effect": 0.0,
+    "maximum_query_source_control_effect": 0.0,
+    "maximum_patch_locality_error": 0.0,
+    "calibrated_causal_relation_binding_count": 0,
+    "natural_necessity_count": 0,
+    "single_neuron_mechanism_count": 0
+  },
+  "authorization": {
+    "calibration_causal_intervention": false,
+    "physical_causal_holdout": false,
+    "record_crosssurface_causal_rule": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "discovery_causal_pass_is_calibrated_rule": false,
+    "failed_shared_gate_erases_local_positive_cells": false,
+    "aggregate_sufficiency_is_natural_necessity": false
+  }
+}

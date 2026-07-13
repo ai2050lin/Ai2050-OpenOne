@@ -1,0 +1,81 @@
+{
+  "schema_version": "74.8.0",
+  "phase_id": "Phase400-PartialOrder-calibration-Validation",
+  "created_at": "2026-07-13T06:50:51.141283+00:00",
+  "stage": "calibration",
+  "status": "not_analyzed_invalid_collection",
+  "quality_audit": {
+    "schema_version": "74.8.0",
+    "phase_id": "Phase400-CalibrationCollectionQualityAudit",
+    "created_at": "2026-07-13T06:50:51.141283+00:00",
+    "status": "calibration_collection_invalid_frozen_replay_gate_failed",
+    "denominator": {
+      "model_count": 3,
+      "shard_count": 12,
+      "case_count": 384,
+      "group_model_cell_count": 24,
+      "quality_group_model_cell_count": 23,
+      "first_answer_replay_match_count": 383,
+      "target_completion_replay_match_count": 384,
+      "post_target_replay_match_count": 384
+    },
+    "max_errors": {
+      "block_relative_error": 0.004977617,
+      "attention_replay_relative_error": 0.004737128,
+      "probability_sum_absolute_error": 0.003417969
+    },
+    "failed_group_model_cells": [
+      {
+        "model": "deepseek7b",
+        "surface": "possession_relation",
+        "public_parallel_group_id": "p400pg_dd20a66a5c725dfafc68d608",
+        "first_answer_replay_match_count": 15,
+        "target_completion_replay_match_count": 16,
+        "post_target_replay_match_count": 16
+      }
+    ],
+    "diagnosis": {
+      "numeric_conservation_gate_failed": false,
+      "exact_first_answer_replay_gate_failed": true,
+      "exact_semantic_target_completion_gate_failed": false,
+      "exact_post_target_replay_gate_failed": false,
+      "parent_capture_hooks_changed_current_single_case_top1": false,
+      "current_single_case_plain_vs_hooked_invariance": true,
+      "batch_size_1_vs_8_first_token_invariance": false,
+      "cached_behavior_reproduced_at_original_batch_size": true,
+      "full_behavior_to_trace_execution_invariance_established": false,
+      "format_token_instability_observed": true
+    },
+    "authorization": {
+      "analyze_calibration_event_graph": false,
+      "open_physical_holdout": false,
+      "run_joint_causal_intervention": false,
+      "head_channel_or_neuron_scan": false
+    },
+    "non_override_audit": {
+      "failed_group_removed": false,
+      "replacement_group_added": false,
+      "quality_threshold_relaxed": false,
+      "semantic_equivalence_used_to_override_exact_replay": false,
+      "failed_attempt_hidden_by_rerun": false
+    },
+    "claim_boundary": {
+      "phase400_discovery_graph_is_calibration_confirmed": false,
+      "calibration_failure_disproves_dynamic_events": false,
+      "calibration_failure_is_zero_causal_effect": false
+    }
+  },
+  "cells": [],
+  "crossmodel_surfaces": [],
+  "results": {
+    "validated_model_surface_cell_count": 0,
+    "crossmodel_isomorphism_surface_count": 0,
+    "prediction_pass_cell_count": 0
+  },
+  "authorization": {
+    "analyze_calibration_event_graph": false,
+    "open_physical_holdout": false,
+    "run_joint_causal_intervention": false,
+    "head_channel_or_neuron_scan": false
+  }
+}

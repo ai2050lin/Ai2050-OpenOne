@@ -1,0 +1,80 @@
+{
+  "schema_version": "73.3.0",
+  "phase_id": "Phase399-DynamicTraceProtocol",
+  "created_at": "2026-07-13T04:22:39.434550+00:00",
+  "objective": "trace_multi_position_parent_events_and_role_partitioned_attention_writes",
+  "denominator": {
+    "eligible_surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution"
+    ],
+    "selected_case_count": 2880,
+    "instrument_case_count": 144,
+    "discovery_case_count": 1440,
+    "calibration_case_count": 720,
+    "physical_holdout_case_count": 720
+  },
+  "capture_contract": {
+    "state_roles": [
+      "source_entity_a",
+      "source_entity_b",
+      "source_value_a",
+      "source_value_b",
+      "clause_end_0",
+      "clause_end_1",
+      "query_entity",
+      "query_end",
+      "answer_anchor"
+    ],
+    "attention_receivers": [
+      "query_end",
+      "answer_anchor"
+    ],
+    "attention_source_roles": [
+      "source_entity_a",
+      "source_entity_b",
+      "source_value_a",
+      "source_value_b",
+      "source_structure",
+      "query_entity",
+      "query_context",
+      "other_prior_context",
+      "receiver_self"
+    ],
+    "parent_components": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "layer_output"
+    ],
+    "role_attention_write_vectors": true,
+    "role_attention_probability_mass": true,
+    "attention_bias_is_separate_event": true,
+    "depths": "all_layers",
+    "raw_vectors_persisted": false,
+    "group_factorial_event_metrics_persisted": true,
+    "head_identity_persisted": false,
+    "mlp_channel_identity_persisted": false
+  },
+  "quality_gates": {
+    "block_relative_error_max": 0.01,
+    "attention_role_replay_relative_error_max": 0.01,
+    "attention_probability_sum_absolute_error_max": 0.01,
+    "exact_first_answer_replay_required": true,
+    "exact_target_completion_replay_required": true
+  },
+  "authorization": {
+    "instrument_trace": true,
+    "discovery_trace": false,
+    "calibration_trace": false,
+    "physical_holdout_trace": false,
+    "joint_causal_intervention": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "role_attention_write_is_a_causal_binding_edge": false,
+    "factorial_event_chain_is_a_dynamic_binding_algorithm": false,
+    "trace_is_a_complete_language_path": false
+  }
+}

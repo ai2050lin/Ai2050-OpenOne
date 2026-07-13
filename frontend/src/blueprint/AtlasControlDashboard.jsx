@@ -584,7 +584,7 @@ function DetailLayer({ detail, onClose }) {
       </div>
 
       {(detail.value || detail.valueHint) && (
-        <div style={{
+        <div className="atlas-detail-value-grid" style={{
           marginTop: 14,
           display: 'grid',
           gridTemplateColumns: detail.value ? 'minmax(180px, 0.22fr) minmax(0, 1fr)' : '1fr',
@@ -839,6 +839,122 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
     });
   }, [progress]);
 
+  const bindingSeparationRows = useMemo(() => {
+    const stage = progress?.binding_separation_stage || {};
+    const definitions = [
+      ['formal_pointer_qualified_groups', '形式指针合格组'],
+      ['natural_behavior_qualified_groups', '自然同词元集合合格组'],
+      ['eligible_natural_surfaces', '行为合格任务面'],
+      ['local_context_transport_cells', '局部上下文搬运单元'],
+      ['crosssurface_shared_states', '跨任务共享静态状态'],
+      ['field_physical_model_cells', '字段抽取物理复现模型'],
+      ['field_same_literal_answer_switches', '同字面值上下文答案切换'],
+      ['same_position_content_switches', '同位置内容答案切换'],
+      ['abstract_binding_algorithms', '抽象绑定算法'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const factorSeparatedBindingRows = useMemo(() => {
+    const stage = progress?.factor_separated_binding_stage || {};
+    const definitions = [
+      ['behavior_cases', '冻结行为案例'],
+      ['qualified_parallel_groups', '三模型十条件完整合格组'],
+      ['eligible_surfaces', '行为合格任务面'],
+      ['discovery_observational_cells', '发现集关系签名单元'],
+      ['calibration_observational_cells', '校准集关系签名单元'],
+      ['physical_observational_cells', '物理留出关系签名单元'],
+      ['causal_relation_context_cells', '因果关系载体单元'],
+      ['relation_answer_switches', '纯关系上下文答案切换'],
+      ['abstract_binding_algorithms', '抽象绑定算法'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const orderConditionedBindingRows = useMemo(() => {
+    const stage = progress?.order_conditioned_joint_binding_stage || {};
+    const definitions = [
+      ['behavior_cases', '联合析因行为案例'],
+      ['qualified_parallel_groups', '三模型十六条件完整合格组'],
+      ['frozen_trace_cases', '冻结全深度追踪案例'],
+      ['order_invariant_RQ_cells', '顺序不变 RQ 候选单元'],
+      ['ROQ_discovery_cells', 'ROQ 发现单元'],
+      ['ROQ_calibration_cells', 'ROQ 校准单元'],
+      ['ROQ_physical_cells', 'ROQ 物理留出单元'],
+      ['single_query_position_causal_cells', '单查询位置因果单元'],
+      ['same_order_answer_switches', '同顺序联合状态答案切换'],
+      ['abstract_binding_algorithms', '抽象绑定算法'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const multiPositionDynamicBindingRows = useMemo(() => {
+    const stage = progress?.multi_position_dynamic_binding_stage || {};
+    const definitions = [
+      ['behavior_candidate_cases', '四任务候选行为案例'],
+      ['qualified_parallel_groups', '三模型十六条件完整合格组'],
+      ['eligible_surfaces', '行为合格任务面'],
+      ['selected_trace_cases', '冻结动态追踪案例'],
+      ['quality_trace_group_model_cells', '守恒合格组模型单元'],
+      ['required_event_discovery_cells', '必需事件发现单元'],
+      ['required_event_calibration_cells', '必需事件校准单元'],
+      ['required_event_physical_cells', '必需事件物理留出单元'],
+      ['ordered_chain_discovery_cells', '有序链发现单元'],
+      ['ordered_chain_calibration_cells', '有序链校准单元'],
+      ['ordered_chain_physical_cells', '有序链物理留出单元'],
+      ['crossmodel_ordered_chain_surfaces', '跨模型有序链任务面'],
+      ['joint_causal_intervention_authorized', '联合因果干预授权'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const dynamicPartialOrderRows = useMemo(() => {
+    const stage = progress?.dynamic_partial_order_stage || {};
+    const definitions = [
+      ['behavior_candidate_cases', '冻结行为候选案例'],
+      ['eligible_surfaces', '行为合格任务面'],
+      ['discovery_quality_group_model_cells', '发现集守恒合格组模型单元'],
+      ['discovery_partial_order_graph_cells', '发现集部分序图合格单元'],
+      ['discovery_crossmodel_isomorphism_surfaces', '发现集跨模型同构任务面'],
+      ['discovery_prediction_cells', '发现集预测门合格单元'],
+      ['calibration_quality_group_model_cells', '校准集守恒合格组模型单元'],
+      ['validated_crossmodel_partial_order_surfaces', '校准后跨模型部分序任务面'],
+      ['physical_holdout_cases_consumed', '已使用物理留出案例'],
+      ['joint_causal_intervention_authorized', '联合因果干预授权'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
     const latest = progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2';
@@ -891,19 +1007,79 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         items: jointFormationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
       };
     }
+    if (overallLatest && progress?.binding_separation_stage) {
+      overallLatest.summary = '字段抽取的同字面值上下文载体已在三模型物理留出复现；跨任务共享绑定规则仍未建立。';
+      overallLatest.value = '46/72 context switches / 0 binding rules';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：内容、上下文与绑定规则分离`,
+        text: 'Phase394 的形式指针接口没有形成三模型共同分母。Phase395 改用同一词元集合、仅交换关系排列的自然样本，在约 57% 相对深度发现并校准了上下文差分；同字面值状态搬运仅有 4/6 模型任务单元通过，跨任务共享门失败。Phase396 在未见字段抽取组上取得三模型物理复现，但同位置内容搬运仍更强。',
+        value: 'Field-specific contextual carrier replicated / abstract binding absent',
+        valueHint: '3D 只新增聚合词元状态锚点，不新增注意力头或 MLP 神经元。供体充分性不等于自然必要性，字段抽取结果不能外推到九族。',
+        items: bindingSeparationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.factor_separated_binding_stage) {
+      overallLatest.summary = '关系相关签名已跨三任务、三模型和三分割复现，但隔离关系上下文不是可移植因果载体。';
+      overallLatest.value = '27/27 observed cells / 0/9 causal cells';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：关系签名与关系载体分离`,
+        text: 'Phase397 冻结六类自然任务、十个独立控制和 4,320 个三模型行为案例。拥有关系、角色填槽和指代解析通过严格行为门；同位置值状态的关系差异在发现、校准、物理留出三份数据中均为 9/9，但 144 个隔离关系上下文搬运方向没有一次切换答案，9 个因果单元全部失败。内容身份和整句顺序状态的作用明显更大。',
+        value: 'Stable relation signature / portable causal carrier rejected',
+        valueHint: '3D 蓝色锚点只表示聚合关系签名，不是神经元。Phase396 字段结果保留为旧对比下的局部充分性，但不能外推为纯关系载体；因果校准、物理因果和单神经元扫描均关闭。',
+        items: factorSeparatedBindingRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.order_conditioned_joint_binding_stage) {
+      overallLatest.summary = '顺序条件化 ROQ 联合轨迹完成三分割复制；单查询位置状态不是充分因果载体。';
+      overallLatest.value = '27/27 observed cells / 0/9 causal cells';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：联合轨迹与单位置载体分离`,
+        text: 'Phase398 冻结三个任务面、三模型、16 条件完整析因和 3,456 个行为案例。顺序不变 RQ 候选为 0/9；中层查询末端 ROQ 轨迹在发现、校准、物理留出均为 9/9，且跨两套词汇方向复现。随后 432 个父边界方向只产生 10 次同顺序答案切换，单位置因果单元为 0/9。',
+        value: 'Order-conditioned trajectory replicated / single-position carrier rejected',
+        valueHint: '3D 粉色锚点表示聚合顺序条件化轨迹，不是神经元或完整绑定规则。下一阶段需要多位置、注意力来源边和 MLP 写入的动态联合路径合同。',
+        items: orderConditionedBindingRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.multi_position_dynamic_binding_stage) {
+      overallLatest.summary = '三类聚合动态事件完成三分割复制；冻结有序链仅在 DS7B 角色填槽成立，跨模型与因果门关闭。';
+      overallLatest.value = '3/27 ordered cells / 0/3 crossmodel surfaces';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：多位置动态事件与模型特异链`,
+        text: 'Phase399 在四个新任务面上运行 5,376 个三模型行为案例，字段抽取因只有 1/28 个完整组而在追踪前排除。其余三个任务面的 2,880 个冻结案例覆盖来源角色、查询末端、首答案、目标完成和答案后时刻。三类必需事件在发现、校准、物理留出均为 9/9；但“来源路由峰值不晚于查询整合、再不晚于终端”的整链只在 DS7B 角色填槽以第 10、10、20 层三次复现。',
+        value: 'Aggregate events replicated / one model-specific ordered chain / causal gate closed',
+        valueHint: '3D 仅显示三枚 DS7B 聚合事件锚点，均不是头、通道或神经元。跨模型任务为 0/3，因此没有运行联合损伤、分层恢复或细粒度扫描；完整语言路径仍为 0/72。',
+        items: multiPositionDynamicBindingRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.dynamic_partial_order_stage) {
+      overallLatest.summary = '区间部分序候选在发现集出现，但未通过答案预测门；校准集又因批形状重放失败失去资格。';
+      overallLatest.value = '5/6 discovery graphs / 0/6 prediction cells';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：区间部分序候选与严格门控结果`,
+        text: 'Phase400 在全新 4,608 个三模型行为案例上，以事件区间、相对起点、持续时间和部分序边替代单峰层号。发现集有 5/6 个模型任务单元形成冻结图，拥有关系在三模型间出现一个仅限发现集的同构候选；但 6/6 单元均未通过答案预测和对照门。校准收集的 384 个案例中有 1 个 DS7B 案例因 batch=8 与 batch=1 的首格式词元不同而违反冻结重放合同，因此校准分析、物理留出、因果干预和神经元扫描全部关闭。',
+        value: 'Discovery-only partial order / prediction negative / calibration invalid',
+        valueHint: '3D 不新增神经元、头或通道节点。发现图只用于显示聚合候选及失败边界，不能标记为已验证路径；物理留出仍为 0/384，完整语言路径仍为 0/72。',
+        items: dynamicPartialOrderRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
     const engineering = sections.find((item) => item.id === 'engineering_latest');
     if (engineering) {
       engineering.detail = {
         ...engineering.detail,
         items: overallValid
           ? progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`)
-          : (jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
+          : (dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
             .map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
         valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${latest}。单一全局完成百分比：${overallValid ? '有效' : '无效'}。`,
       };
     }
     return sections;
-  }, [clientIndex, exactEventRows, jointFormationRows, manifest, overallValid, progress, progressMap, relationRows]);
+  }, [bindingSeparationRows, clientIndex, dynamicPartialOrderRows, exactEventRows, factorSeparatedBindingRows, jointFormationRows, manifest, multiPositionDynamicBindingRows, orderConditionedBindingRows, overallValid, progress, progressMap, relationRows]);
 
   const planDetail = useMemo(() => {
     return planCards.find((item) => item.id === activePlan)?.detail || null;
@@ -968,6 +1144,27 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
           background: rgba(255, 255, 255, 0.04) !important;
           border-color: rgba(255, 255, 255, 0.08) !important;
           padding-left: 10px !important;
+        }
+        @media (max-width: 640px) {
+          .atlas-latest-card {
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 8px !important;
+            align-items: start !important;
+          }
+          .atlas-latest-card > span {
+            justify-self: start !important;
+          }
+          .atlas-latest-actions {
+            justify-content: flex-start !important;
+            flex-wrap: wrap !important;
+          }
+          .atlas-latest-value {
+            white-space: normal !important;
+            overflow-wrap: anywhere;
+          }
+          .atlas-detail-value-grid {
+            grid-template-columns: minmax(0, 1fr) !important;
+          }
         }
       `}</style>
 
@@ -1098,7 +1295,7 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
 
           {/* Right Progress bars in 3 columns */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, gridColumn: 'span 2' }}>
-            {(overallValid ? progressRows : (relationRows.length ? relationRows : exactEventRows)).map((row) => (
+            {(overallValid ? progressRows : (dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)).map((row) => (
               <div
                 key={row.id}
                 className="progress-row-hover"
@@ -1131,6 +1328,7 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
           {latestSections.map((section) => (
             <ClickableCard
               key={section.id}
+              className="atlas-latest-card"
               active={activeLatest === section.id}
               onClick={() => setActiveLatest(activeLatest === section.id ? null : section.id)}
               activeColor="#34d399"
@@ -1158,8 +1356,8 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
               </span>
               <div style={{ color: '#f8fafc', fontSize: 15, fontWeight: 700 }}>{section.title}</div>
               <div style={{ color: '#cbd5e1', fontSize: 12.5, lineHeight: 1.55 }}>{section.summary}</div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 14 }}>
-                <div style={{ color: '#bae6fd', fontSize: 11, fontWeight: 800, fontFamily: 'monospace', whiteSpace: 'nowrap' }}>{section.value}</div>
+              <div className="atlas-latest-actions" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 14 }}>
+                <div className="atlas-latest-value" style={{ color: '#bae6fd', fontSize: 11, fontWeight: 800, fontFamily: 'monospace', whiteSpace: 'nowrap' }}>{section.value}</div>
                 <span style={{ color: '#34d399', fontSize: 11, opacity: activeLatest === section.id ? 1 : 0.6, transition: 'opacity 0.2s', whiteSpace: 'nowrap' }}>
                   {activeLatest === section.id ? '收起 ▲' : '详情 ▼'}
                 </span>

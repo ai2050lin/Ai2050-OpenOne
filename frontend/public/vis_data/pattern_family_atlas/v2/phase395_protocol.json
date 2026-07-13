@@ -1,0 +1,59 @@
+{
+  "schema_version": "69.0.0",
+  "phase_id": "Phase395-Protocol",
+  "created_at": "2026-07-12T17:28:27.850188+00:00",
+  "objective": "separate_literal_content_identity_from_natural_contextual_binding_state",
+  "phase394_amendment": {
+    "formal_pointer_interface_is_prerequisite_for_natural_binding": false,
+    "reason": "formal pointer following is an artificial interface ability and failed crossmodel qualification",
+    "phase394_data_reused": false
+  },
+  "denominator": {
+    "task_surfaces": [
+      "field_extraction",
+      "relation_qa",
+      "entity_recency"
+    ],
+    "groups_per_surface": 24,
+    "conditions_per_group": 4,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "candidate_case_count": 864,
+    "split_group_counts_per_eligible_surface": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    }
+  },
+  "natural_identity_contract": {
+    "same_input_token_multiset_within_pair": true,
+    "same_entities_and_query_within_pair": true,
+    "same_literal_value_set_within_pair": true,
+    "literal_values_swap_relation_positions": true,
+    "same_literal_mapping_is_available_for_causal_control": true,
+    "direct_position_mapping_is_content_swap_control": true,
+    "single_sample_model_native_interface": true
+  },
+  "planned_causal_contrasts": {
+    "same_literal_state_mapping": "same word donor state to same word recipient position; tests contextual binding beyond token identity",
+    "same_position_state_mapping": "donor position to same recipient position; swaps literal content and reproduces content transport",
+    "entity_state_mapping": "fixed entity token states as structure control",
+    "random_state_mapping": "same number of causal prefix positions",
+    "wrong_depth_mapping": "frozen alternate relative depth"
+  },
+  "split_rule": "all 24 groups and all four conditions must pass on all three models; then hash-order 12/6/6 without replacement",
+  "authorization": {
+    "run_behavior_qualification": true,
+    "run_internal_before_behavior_freeze": false,
+    "run_single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "same_token_multiset_behavior_is_binding_mechanism": false,
+    "same_literal_patch_effect_is_abstract_binding_rule": false,
+    "three_surface_replication_is_nine_family_layout": false,
+    "language_encoding_closed": false
+  }
+}

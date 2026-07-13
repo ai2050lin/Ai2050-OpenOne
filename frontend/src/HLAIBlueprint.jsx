@@ -848,6 +848,11 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         @keyframes brainRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes brainRotateReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes synapsePulse { 0%, 100% { opacity: 0.3; scale: 0.8; } 50% { opacity: 1; scale: 1.2; } }
+        @media (max-width: 640px) {
+          .blueprint-content-details {
+            padding: 20px 12px !important;
+          }
+        }
       `}</style>
 
       {/* Top Header / Navigation */}
@@ -1030,7 +1035,7 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
         )}
 
         {/* Content Details */}
-        <div style={{
+        <div className="blueprint-content-details" style={{
           flex: 1, padding: mode === 'sidebar' ? '20px 24px' : '50px 80px', overflowY: 'auto',
           background: 'radial-gradient(circle at 50% 10%, rgba(0, 100, 200, 0.05) 0%, transparent 70%)'
         }}>
@@ -1222,8 +1227,6 @@ export const HLAIBlueprint = ({ onClose, initialTab = 'roadmap', mode = 'overlay
     </div>
   );
 };
-
-
 
 
 

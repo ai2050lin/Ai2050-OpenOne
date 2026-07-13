@@ -1,0 +1,110 @@
+{
+  "schema_version": "69.4.0",
+  "phase_id": "Phase395-InstrumentAudit",
+  "created_at": "2026-07-12T17:28:59.561367+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "eligible_surfaces": [
+      "field_extraction",
+      "entity_recency"
+    ],
+    "parallel_group_count": 2,
+    "case_count": 24,
+    "model_call_count": 84,
+    "layer_file_count": 832,
+    "total_byte_count": 858102236
+  },
+  "results": {
+    "all_three_model_instruments_valid": true,
+    "exact_component_conservation_pass": true,
+    "exact_source_role_partition_pass": true,
+    "all_heads_and_sources_retained": true,
+    "language_path_discovered": false
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "case_count": 8,
+      "parallel_group_count": 2,
+      "layer_count": 36,
+      "model_call_count": 28,
+      "layer_file_count": 288,
+      "meta_file_count": 8,
+      "total_byte_count": 311640020,
+      "gate_maxima": {
+        "attention_source": 0.0004718778397470302,
+        "probability": 0.0003695487976074219,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.0008239454649915949,
+        "mlp_neuron": 0.0007679925961810153,
+        "block": 0.0
+      },
+      "checksum_failure_count": 0,
+      "payload_failure_count": 0,
+      "role_mapping_failure_count": 0,
+      "failures": [],
+      "valid": true
+    },
+    {
+      "model": "glm4",
+      "case_count": 8,
+      "parallel_group_count": 2,
+      "layer_count": 40,
+      "model_call_count": 28,
+      "layer_file_count": 320,
+      "meta_file_count": 8,
+      "total_byte_count": 285654900,
+      "gate_maxima": {
+        "attention_source": 0.0004452962839292865,
+        "probability": 0.00041556358337402344,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.0005707396192447066,
+        "mlp_neuron": 0.0004199369874348928,
+        "block": 0.0
+      },
+      "checksum_failure_count": 0,
+      "payload_failure_count": 0,
+      "role_mapping_failure_count": 0,
+      "failures": [],
+      "valid": true
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 8,
+      "parallel_group_count": 2,
+      "layer_count": 28,
+      "model_call_count": 28,
+      "layer_file_count": 224,
+      "meta_file_count": 8,
+      "total_byte_count": 260807316,
+      "gate_maxima": {
+        "attention_source": 0.003176925415513189,
+        "probability": 0.0030059814453125,
+        "mlp_product": 0.0,
+        "mlp_direct": 0.005037987109627037,
+        "mlp_neuron": 0.004416474686634478,
+        "block": 0.0
+      },
+      "checksum_failure_count": 0,
+      "payload_failure_count": 0,
+      "role_mapping_failure_count": 0,
+      "failures": [],
+      "valid": true
+    }
+  ],
+  "authorization": {
+    "discovery_collection": true,
+    "calibration_collection": false,
+    "physical_holdout_collection": false,
+    "causal_intervention": false,
+    "single_neuron_scan": false
+  },
+  "claim_boundary": {
+    "instrument_validity_is_binding_state": false,
+    "role_partition_is_binding_specificity": false
+  }
+}

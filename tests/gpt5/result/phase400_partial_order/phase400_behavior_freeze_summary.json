@@ -1,0 +1,212 @@
+{
+  "schema_version": "74.3.0",
+  "phase_id": "Phase400-BehaviorFreeze",
+  "created_at": "2026-07-13T06:19:26.955034+00:00",
+  "denominator": {
+    "candidate_case_count": 4608,
+    "candidate_parallel_group_count": 96,
+    "qualified_parallel_group_count": 74,
+    "eligible_surface_count": 2,
+    "selected_parallel_group_count": 32,
+    "selected_case_count": 1536,
+    "instrument_group_count": 2,
+    "instrument_case_count": 96,
+    "candidate_split_group_counts_per_surface": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    },
+    "selected_split_group_counts_per_surface": {
+      "discovery": 8,
+      "calibration": 4,
+      "physical_holdout": 4
+    }
+  },
+  "model_results": {
+    "qwen3": {
+      "strict_correct_count": 1536,
+      "case_count": 1536
+    },
+    "glm4": {
+      "strict_correct_count": 1534,
+      "case_count": 1536
+    },
+    "deepseek7b": {
+      "strict_correct_count": 1513,
+      "case_count": 1536
+    }
+  },
+  "surface_gates": [
+    {
+      "task_surface": "possession_relation",
+      "candidate_group_count": 24,
+      "qualified_group_count": 19,
+      "qualified_group_counts_by_split": {
+        "discovery": 8,
+        "calibration": 6,
+        "physical_holdout": 5
+      },
+      "required_group_counts_by_split": {
+        "discovery": 8,
+        "calibration": 4,
+        "physical_holdout": 4
+      },
+      "eligible": true,
+      "selected_group_count": 16,
+      "exclusion_reason": null
+    },
+    {
+      "task_surface": "role_filling",
+      "candidate_group_count": 24,
+      "qualified_group_count": 22,
+      "qualified_group_counts_by_split": {
+        "discovery": 11,
+        "calibration": 5,
+        "physical_holdout": 6
+      },
+      "required_group_counts_by_split": {
+        "discovery": 8,
+        "calibration": 4,
+        "physical_holdout": 4
+      },
+      "eligible": true,
+      "selected_group_count": 16,
+      "exclusion_reason": null
+    },
+    {
+      "task_surface": "coreference_resolution",
+      "candidate_group_count": 24,
+      "qualified_group_count": 16,
+      "qualified_group_counts_by_split": {
+        "discovery": 7,
+        "calibration": 5,
+        "physical_holdout": 4
+      },
+      "required_group_counts_by_split": {
+        "discovery": 8,
+        "calibration": 4,
+        "physical_holdout": 4
+      },
+      "eligible": false,
+      "selected_group_count": 0,
+      "exclusion_reason": "one_or_more_preassigned_splits_below_8_4_4_complete_group_gate"
+    },
+    {
+      "task_surface": "field_extraction",
+      "candidate_group_count": 24,
+      "qualified_group_count": 17,
+      "qualified_group_counts_by_split": {
+        "discovery": 9,
+        "calibration": 5,
+        "physical_holdout": 3
+      },
+      "required_group_counts_by_split": {
+        "discovery": 8,
+        "calibration": 4,
+        "physical_holdout": 4
+      },
+      "eligible": false,
+      "selected_group_count": 0,
+      "exclusion_reason": "one_or_more_preassigned_splits_below_8_4_4_complete_group_gate"
+    }
+  ],
+  "eligible_surfaces": [
+    "possession_relation",
+    "role_filling"
+  ],
+  "selected_groups_private": {
+    "possession_relation": {
+      "discovery": [
+        "p400g_951002de4bdd3b6b54937faf",
+        "p400g_2579afe8714154ff31104814",
+        "p400g_3a5e57894672419c5993728f",
+        "p400g_fb0b35ef9d0acd4ee5ac04db",
+        "p400g_4c8012f76f608f4c2f3a3dea",
+        "p400g_d3aa46ea9eb517527f5c3a59",
+        "p400g_ac6a58ae195763a142fc0c72",
+        "p400g_c39f8b3a2f801ab3541fd56c"
+      ],
+      "calibration": [
+        "p400g_4bc0656c21b7f3095ea0f6f4",
+        "p400g_7207b9a1c61511b56048ec3c",
+        "p400g_b06a3b43c795181e0f54d0b8",
+        "p400g_38330e7e4275fe6acc256cf5"
+      ],
+      "physical_holdout": [
+        "p400g_8d61f35330fd5a24860ef91d",
+        "p400g_d041671b50c06221eb34d9bf",
+        "p400g_2ea10d0e5d8cfb4f9fc9ce1d",
+        "p400g_6f61cb96bebb039d28295d8e"
+      ]
+    },
+    "role_filling": {
+      "discovery": [
+        "p400g_a279b585f3e209d5eb7a9a7f",
+        "p400g_e9c221bbfb2be2b7313fb002",
+        "p400g_5f0f8fed9d54694350e17528",
+        "p400g_5ecda9278dac16cd5385fefb",
+        "p400g_7f9be83ac47c7b36ff775eac",
+        "p400g_65aa77095b421394bd68b0b2",
+        "p400g_9b0ee87dc0c0930ff7e6aa21",
+        "p400g_16aefa8d2973081f716ce465"
+      ],
+      "calibration": [
+        "p400g_b517ffd78f759f7e241c04e5",
+        "p400g_b3a64fb899c17b4b9d14f366",
+        "p400g_49aec79bfec6d24f76a88d40",
+        "p400g_34cd780cce53caaf0eb59f67"
+      ],
+      "physical_holdout": [
+        "p400g_8c3b2e27499b35490a5425a9",
+        "p400g_e96cace5a0014fca73d9aee3",
+        "p400g_755d96b14d013920cd10cd0a",
+        "p400g_a200bfa3bb2f17e09e72cbf6"
+      ]
+    }
+  },
+  "reserve_groups_private": {
+    "possession_relation": {
+      "discovery": [],
+      "calibration": [
+        "p400g_e5ff7d6948cc65e23987177f",
+        "p400g_bb0432b883b32b83c9395257"
+      ],
+      "physical_holdout": [
+        "p400g_a9f5cb10401a976ddd62b4e7"
+      ]
+    },
+    "role_filling": {
+      "discovery": [
+        "p400g_1470c3ffea4e1486ac865e8a",
+        "p400g_0f33021bddb05ba584bc46a6",
+        "p400g_5f67b99600a64bb4b9a78bd7"
+      ],
+      "calibration": [
+        "p400g_a58ee49e84c75ef7963b967e"
+      ],
+      "physical_holdout": [
+        "p400g_b683fd234880ba867af2564b",
+        "p400g_2228b4b26a32312ecd16324d"
+      ]
+    }
+  },
+  "selection_contract": {
+    "split_identity_frozen_before_behavior": true,
+    "priority_frozen_before_behavior": true,
+    "selection_does_not_cross_splits": true,
+    "all_failed_groups_retained_in_behavior_ledger": true,
+    "reserve_used_as_backfill": false
+  },
+  "authorization": {
+    "run_instrument_trace": true,
+    "run_discovery_trace": false,
+    "run_calibration": false,
+    "open_physical_holdout": false,
+    "run_joint_causal_intervention": false,
+    "head_channel_or_neuron_scan": false
+  },
+  "claim_boundary": {
+    "behavior_factorial_is_a_partial_order_graph": false,
+    "excluded_surface_has_no_dynamic_process": false
+  }
+}

@@ -10,6 +10,7 @@ const FOCUS_OPTIONS = [
   { value: 'interface_path', label: '接口脉络' },
   { value: 'dynamic_path', label: '动态时序' },
   { value: 'natural_necessity', label: '自然必要性' },
+  { value: 'binding_context', label: '绑定上下文' },
   { value: 'competition', label: '竞争路径' },
 ];
 
@@ -46,6 +47,10 @@ export function PatternFamilyAtlasControls({
   const metrics = atlas.partition?.metrics;
   const latestMetrics = atlas.manifest?.metrics || {};
   const hasPhase393 = Number(latestMetrics.phase393_attribute_direction_count || 0) > 0;
+  const hasPhase396 = Number(latestMetrics.phase396_physical_direction_count || 0) > 0;
+  const hasPhase397 = Number(latestMetrics.phase397_causal_direction_count || 0) > 0;
+  const hasPhase398 = Number(latestMetrics.phase398_causal_direction_count || 0) > 0;
+  const hasPhase399 = Number(latestMetrics.phase399_selected_trace_case_count || 0) > 0;
   const mappingStatus = atlas.mapped ? '物理候选已叠加' : '真实单元尚未映射';
   const mappingTone = atlas.mapped ? 'mapped' : 'unmapped';
 
@@ -133,7 +138,45 @@ export function PatternFamilyAtlasControls({
         </button>
       </div>
 
-      {hasPhase393 && (
+      {hasPhase399 ? (
+        <div className="pattern-atlas-controls__latest" aria-label="Phase399 最新研究边界">
+          <strong>P399</strong>
+          <span>完整组 {latestMetrics.phase399_qualified_parallel_group_count || 0}/112</span>
+          <span>任务面 {latestMetrics.phase399_eligible_surface_count || 0}/{latestMetrics.phase399_registered_surface_count || 0}</span>
+          <span>三分割必需事件 27/27</span>
+          <span>三分割有序链 3/27</span>
+          <span>跨模型链 {latestMetrics.phase399_crossmodel_chain_surface_count || 0}/3</span>
+          <span>因果未授权</span>
+        </div>
+      ) : hasPhase398 ? (
+        <div className="pattern-atlas-controls__latest" aria-label="Phase398 最新研究边界">
+          <strong>P398</strong>
+          <span>完整组 {latestMetrics.phase398_qualified_group_count || 0}/72</span>
+          <span>ROQ 三分割 27/27</span>
+          <span>因果单元 {latestMetrics.phase398_causal_pass_cell_count || 0}/9</span>
+          <span>同序切换 {latestMetrics.phase398_same_order_answer_switch_count || 0}/{latestMetrics.phase398_causal_direction_count || 0}</span>
+          <span>神经元路径 0</span>
+        </div>
+      ) : hasPhase397 ? (
+        <div className="pattern-atlas-controls__latest" aria-label="Phase397 最新研究边界">
+          <strong>P397</strong>
+          <span>行为合格 {latestMetrics.phase397_behavior_qualified_group_count || 0}/144</span>
+          <span>任务面 {latestMetrics.phase397_eligible_surface_count || 0}/{latestMetrics.phase397_registered_surface_count || 0}</span>
+          <span>三分割观测 27/27</span>
+          <span>因果单元 {latestMetrics.phase397_causal_relation_pass_cell_count || 0}/9</span>
+          <span>关系切换 {latestMetrics.phase397_relation_answer_switch_count || 0}/{latestMetrics.phase397_causal_direction_count || 0}</span>
+          <span>神经元路径 0</span>
+        </div>
+      ) : hasPhase396 ? (
+        <div className="pattern-atlas-controls__latest" aria-label="Phase396 最新研究边界">
+          <strong>P396</strong>
+          <span>上下文搬运 {latestMetrics.phase396_same_literal_answer_switch_count || 0}/{latestMetrics.phase396_physical_direction_count || 0}</span>
+          <span>内容对照 {latestMetrics.phase396_same_position_content_switch_count || 0}/{latestMetrics.phase396_physical_direction_count || 0}</span>
+          <span>物理复现 {latestMetrics.phase396_field_context_transport_pass_model_count || 0}/3</span>
+          <span>跨任务共享 0/1</span>
+          <span>神经元路径 0</span>
+        </div>
+      ) : hasPhase393 && (
         <div className="pattern-atlas-controls__latest" aria-label="Phase393 最新研究边界">
           <strong>P393</strong>
           <span>属性搬运 {latestMetrics.phase393_attribute_answer_switch_count || 0}/{latestMetrics.phase393_attribute_direction_count || 0}</span>
@@ -190,13 +233,32 @@ export function PatternFamilyAtlasControls({
             <span>{latestMetrics.phase393_wrong_depth_attribute_switch_count || 0}/{latestMetrics.phase393_attribute_direction_count || 0} 错误深度切换</span>
             <span>{latestMetrics.phase393_attribute_transport_pass_model_count || 0}/3 属性搬运模型</span>
             <span>{latestMetrics.phase393_depth_specificity_pass_model_count || 0}/3 深度特异模型</span>
+            <span>{latestMetrics.phase396_same_literal_answer_switch_count || 0}/{latestMetrics.phase396_physical_direction_count || 0} 字段上下文切换</span>
+            <span>{latestMetrics.phase396_same_position_content_switch_count || 0}/{latestMetrics.phase396_physical_direction_count || 0} 同位置内容切换</span>
+            <span>{latestMetrics.phase396_field_context_transport_pass_model_count || 0}/3 字段物理复现模型</span>
+            <span>{latestMetrics.phase395_local_context_transport_cell_count || 0}/{latestMetrics.phase395_context_transport_cell_denominator || 0} 局部上下文单元</span>
+            <span>{latestMetrics.phase397_behavior_qualified_group_count || 0}/144 多任务完整合格组</span>
+            <span>{latestMetrics.phase397_eligible_surface_count || 0}/{latestMetrics.phase397_registered_surface_count || 0} 行为合格任务面</span>
+            <span>{latestMetrics.phase397_physical_observational_pass_cell_count || 0}/9 物理关系签名单元</span>
+            <span>{latestMetrics.phase397_causal_relation_pass_cell_count || 0}/9 因果关系载体单元</span>
+            <span>{latestMetrics.phase397_relation_answer_switch_count || 0}/{latestMetrics.phase397_causal_direction_count || 0} 纯关系上下文切换</span>
+            <span>{latestMetrics.phase398_qualified_group_count || 0}/72 联合析因完整合格组</span>
+            <span>{latestMetrics.phase398_ROQ_physical_pass_cell_count || 0}/9 顺序条件化物理单元</span>
+            <span>{latestMetrics.phase398_causal_pass_cell_count || 0}/9 单查询位置因果单元</span>
+            <span>{latestMetrics.phase398_same_order_answer_switch_count || 0}/{latestMetrics.phase398_causal_direction_count || 0} 同顺序联合状态切换</span>
+            <span>{latestMetrics.phase399_qualified_parallel_group_count || 0}/112 多位置动态完整组</span>
+            <span>{latestMetrics.phase399_eligible_surface_count || 0}/{latestMetrics.phase399_registered_surface_count || 0} 多位置动态合格任务面</span>
+            <span>{latestMetrics.phase399_required_event_physical_cell_count || 0}/9 必需动态事件物理单元</span>
+            <span>{latestMetrics.phase399_ordered_chain_physical_cell_count || 0}/9 有序动态链物理单元</span>
+            <span>{latestMetrics.phase399_crossmodel_chain_surface_count || 0}/3 跨模型动态链</span>
+            <span>{latestMetrics.phase399_joint_causal_intervention_count || 0} 次联合因果干预</span>
             <span>{Math.round((metrics?.phase330_heldout_peak_10pct_rate || 0) * 100)}% 留出峰层命中</span>
             <span>{metrics?.tokenwise_beats_pooled_count || 0} 条逐词元正向胜出</span>
             <span>{metrics?.blocker_decline_pass_count || 0} 条阻挡者下降</span>
             <span>{metrics?.carrier_member_mediation_pass_count || 0} 条成员中介</span>
             <span>{metrics?.top1_unlock_pass_count || 0} 条首选解锁</span>
             <span>{metrics?.causal_path_edge_count || 0} 条因果路径边</span>
-            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · 完整语言路径 0 · 深度特异路径 {latestMetrics.phase393_depth_specificity_pass_model_count || 0}/3</span>
+            <span className="pattern-atlas-boundary">单神经元门 {metrics?.single_unit_intervention_gate_open_count || 0} · 完整语言路径 0 · 跨任务绑定规则 0/1</span>
           </>
         ) : (
           <span>{atlas.family?.family_name || '当前模式族'} · 等待真实物理映射</span>

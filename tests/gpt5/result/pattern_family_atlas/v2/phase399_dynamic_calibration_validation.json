@@ -1,0 +1,851 @@
+{
+  "schema_version": "73.8.0",
+  "phase_id": "Phase399-Dynamic-calibration-Validation",
+  "created_at": "2026-07-13T04:54:48.749371+00:00",
+  "stage": "calibration",
+  "denominator": {
+    "case_count": 720,
+    "group_model_cell_count": 45,
+    "quality_group_model_cell_count": 45,
+    "candidate_model_surface_cell_count": 9
+  },
+  "cells": [
+    {
+      "model": "qwen3",
+      "surface": "possession_relation",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 18,
+          "relative_depth": 0.5142857142857142,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.2008981,
+            "median_roq_cross_axis_cosine": 0.975445867,
+            "median_roq_to_competing_interaction": 2.327938566,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 14,
+          "relative_depth": 0.4,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.236378338,
+            "median_roq_cross_axis_cosine": 0.990917921,
+            "median_roq_to_competing_interaction": 3.583837234,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 21,
+          "relative_depth": 0.6,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.593246189,
+            "median_roq_cross_axis_cosine": 0.99247694,
+            "median_roq_to_competing_interaction": 6.439119929,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 22,
+          "relative_depth": 0.6285714285714286,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.108189046,
+            "median_roq_cross_axis_cosine": 0.986572146,
+            "median_roq_to_competing_interaction": 4.501414573,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "qwen3",
+      "surface": "role_filling",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 29,
+          "relative_depth": 0.8285714285714286,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.27523186,
+            "median_roq_cross_axis_cosine": 0.97835809,
+            "median_roq_to_competing_interaction": 2.942942215,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 14,
+          "relative_depth": 0.4,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.295797861,
+            "median_roq_cross_axis_cosine": 0.980294228,
+            "median_roq_to_competing_interaction": 3.991077265,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 21,
+          "relative_depth": 0.6,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.540354822,
+            "median_roq_cross_axis_cosine": 0.984256804,
+            "median_roq_to_competing_interaction": 3.774952696,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 22,
+          "relative_depth": 0.6285714285714286,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.104300484,
+            "median_roq_cross_axis_cosine": 0.976974607,
+            "median_roq_to_competing_interaction": 3.021567687,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "qwen3",
+      "surface": "coreference_resolution",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 16,
+          "relative_depth": 0.45714285714285713,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.345419238,
+            "median_roq_cross_axis_cosine": 0.969341516,
+            "median_roq_to_competing_interaction": 3.457719516,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 14,
+          "relative_depth": 0.4,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.244906159,
+            "median_roq_cross_axis_cosine": 0.984728754,
+            "median_roq_to_competing_interaction": 3.322870228,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 19,
+          "relative_depth": 0.5428571428571428,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.520858956,
+            "median_roq_cross_axis_cosine": 0.964997232,
+            "median_roq_to_competing_interaction": 4.735237241,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 22,
+          "relative_depth": 0.6285714285714286,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.093210172,
+            "median_roq_cross_axis_cosine": 0.967321515,
+            "median_roq_to_competing_interaction": 3.501890505,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "glm4",
+      "surface": "possession_relation",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 14,
+          "relative_depth": 0.358974358974359,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.490202723,
+            "median_roq_cross_axis_cosine": 0.959323049,
+            "median_roq_to_competing_interaction": 5.123541823,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 11,
+          "relative_depth": 0.28205128205128205,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.446703128,
+            "median_roq_cross_axis_cosine": 0.98802042,
+            "median_roq_to_competing_interaction": 4.437130823,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 20,
+          "relative_depth": 0.5128205128205128,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.63614329,
+            "median_roq_cross_axis_cosine": 0.986759007,
+            "median_roq_to_competing_interaction": 4.139359274,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 22,
+          "relative_depth": 0.5641025641025641,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.118306594,
+            "median_roq_cross_axis_cosine": 0.971420407,
+            "median_roq_to_competing_interaction": 3.72671515,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "glm4",
+      "surface": "role_filling",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 14,
+          "relative_depth": 0.358974358974359,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.46867782,
+            "median_roq_cross_axis_cosine": 0.976057649,
+            "median_roq_to_competing_interaction": 3.286238934,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 11,
+          "relative_depth": 0.28205128205128205,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.421883069,
+            "median_roq_cross_axis_cosine": 0.981975973,
+            "median_roq_to_competing_interaction": 3.501933757,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 20,
+          "relative_depth": 0.5128205128205128,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.564902026,
+            "median_roq_cross_axis_cosine": 0.985120893,
+            "median_roq_to_competing_interaction": 4.515344147,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 22,
+          "relative_depth": 0.5641025641025641,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.108331507,
+            "median_roq_cross_axis_cosine": 0.975506544,
+            "median_roq_to_competing_interaction": 3.400909682,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "glm4",
+      "surface": "coreference_resolution",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 19,
+          "relative_depth": 0.48717948717948717,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.685859032,
+            "median_roq_cross_axis_cosine": 0.917557836,
+            "median_roq_to_competing_interaction": 3.333821563,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 11,
+          "relative_depth": 0.28205128205128205,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.365916454,
+            "median_roq_cross_axis_cosine": 0.989402533,
+            "median_roq_to_competing_interaction": 3.160458199,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 20,
+          "relative_depth": 0.5128205128205128,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.689374921,
+            "median_roq_cross_axis_cosine": 0.965776205,
+            "median_roq_to_competing_interaction": 3.112349196,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 22,
+          "relative_depth": 0.5641025641025641,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.132096032,
+            "median_roq_cross_axis_cosine": 0.932935834,
+            "median_roq_to_competing_interaction": 2.181158637,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "surface": "possession_relation",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 17,
+          "relative_depth": 0.6296296296296297,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.451429836,
+            "median_roq_cross_axis_cosine": 0.928685784,
+            "median_roq_to_competing_interaction": 2.887721145,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 15,
+          "relative_depth": 0.5555555555555556,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.30843355,
+            "median_roq_cross_axis_cosine": 0.971365213,
+            "median_roq_to_competing_interaction": 3.624040643,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 18,
+          "relative_depth": 0.6666666666666666,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.669557591,
+            "median_roq_cross_axis_cosine": 0.989425778,
+            "median_roq_to_competing_interaction": 5.572310109,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 21,
+          "relative_depth": 0.7777777777777778,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.18482073,
+            "median_roq_cross_axis_cosine": 0.960697353,
+            "median_roq_to_competing_interaction": 4.82445196,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "surface": "role_filling",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 10,
+          "relative_depth": 0.37037037037037035,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.290068626,
+            "median_roq_cross_axis_cosine": 0.983058691,
+            "median_roq_to_competing_interaction": 3.00205962,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 10,
+          "relative_depth": 0.37037037037037035,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.217637721,
+            "median_roq_cross_axis_cosine": 0.984087825,
+            "median_roq_to_competing_interaction": 2.986539985,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 20,
+          "relative_depth": 0.7407407407407407,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.502543872,
+            "median_roq_cross_axis_cosine": 0.984244049,
+            "median_roq_to_competing_interaction": 3.746435787,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 21,
+          "relative_depth": 0.7777777777777778,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 4,
+            "group_pass_rate": 0.8,
+            "median_roq_min_axis_normalized_norm": 0.167407499,
+            "median_roq_cross_axis_cosine": 0.950108349,
+            "median_roq_to_competing_interaction": 3.428168832,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        }
+      },
+      "discovery_chain_pass": true,
+      "ordered_peak_layer_gate_pass": true,
+      "dynamic_chain_validation_pass": true
+    },
+    {
+      "model": "deepseek7b",
+      "surface": "coreference_resolution",
+      "event_classes": {
+        "source_state": {
+          "event_id": "state:clause_end_0:layer_output",
+          "layer_index": 0,
+          "relative_depth": 0.0,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 0,
+            "group_pass_rate": 0.0,
+            "median_roq_min_axis_normalized_norm": 0.0,
+            "median_roq_cross_axis_cosine": 0.0,
+            "median_roq_to_competing_interaction": 0.0,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        },
+        "source_to_query_route": {
+          "event_id": "route:source_structure->query_end:attention_write",
+          "layer_index": 17,
+          "relative_depth": 0.6296296296296297,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.469907903,
+            "median_roq_cross_axis_cosine": 0.926414371,
+            "median_roq_to_competing_interaction": 2.775527833,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "query_integration": {
+          "event_id": "state:query_end:attention_output",
+          "layer_index": 15,
+          "relative_depth": 0.5555555555555556,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.303442442,
+            "median_roq_cross_axis_cosine": 0.968343735,
+            "median_roq_to_competing_interaction": 2.431179089,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "terminal_integration": {
+          "event_id": "route:query_entity->first_answer:attention_write",
+          "layer_index": 18,
+          "relative_depth": 0.6666666666666666,
+          "required_for_chain": true,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 5,
+            "group_pass_rate": 1.0,
+            "median_roq_min_axis_normalized_norm": 0.678602166,
+            "median_roq_cross_axis_cosine": 0.981656134,
+            "median_roq_to_competing_interaction": 4.713081528,
+            "gate_pass": true
+          },
+          "validation_pass": true
+        },
+        "completion_continuation": {
+          "event_id": "state:target_completion:layer_output",
+          "layer_index": 21,
+          "relative_depth": 0.7777777777777778,
+          "required_for_chain": false,
+          "metrics": {
+            "group_count": 5,
+            "group_pass_count": 3,
+            "group_pass_rate": 0.6,
+            "median_roq_min_axis_normalized_norm": 0.179394929,
+            "median_roq_cross_axis_cosine": 0.774016023,
+            "median_roq_to_competing_interaction": 3.520640916,
+            "gate_pass": false
+          },
+          "validation_pass": false
+        }
+      },
+      "discovery_chain_pass": false,
+      "ordered_peak_layer_gate_pass": false,
+      "dynamic_chain_validation_pass": false
+    }
+  ],
+  "crossmodel_surfaces": [
+    {
+      "surface": "coreference_resolution",
+      "model_cell_count": 3,
+      "passing_model_cell_count": 0,
+      "crossmodel_validation_pass": false
+    },
+    {
+      "surface": "possession_relation",
+      "model_cell_count": 3,
+      "passing_model_cell_count": 0,
+      "crossmodel_validation_pass": false
+    },
+    {
+      "surface": "role_filling",
+      "model_cell_count": 3,
+      "passing_model_cell_count": 1,
+      "crossmodel_validation_pass": false
+    }
+  ],
+  "results": {
+    "dynamic_chain_validation_cell_count": 1,
+    "candidate_model_surface_cell_count": 9,
+    "crossmodel_surface_count": 0,
+    "all_collection_quality_gates_pass": true
+  },
+  "authorization": {
+    "open_physical_holdout": true,
+    "run_joint_causal_intervention": false,
+    "head_channel_or_neuron_scan": false
+  },
+  "claim_boundary": {
+    "validated_chain_is_causal": false,
+    "crossmodel_role_chain_uses_identical_neurons": false,
+    "failed_cell_has_no_dynamic_process": false
+  }
+}

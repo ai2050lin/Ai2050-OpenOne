@@ -83,6 +83,11 @@ function ProgressBar({ ratio }) {
 function AtlasDetail({ atlas }) {
   const metrics = atlas?.metrics || {};
   const phase393 = atlas?.phase393_audit || {};
+  const phase396 = atlas?.phase396_audit || {};
+  const phase397 = atlas?.phase397_audit || {};
+  const phase398 = atlas?.phase398_audit || {};
+  const phase399 = atlas?.phase399_audit || {};
+  const phase400 = atlas?.phase400_audit || {};
   const rows = [
     ['模式族物理映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['模型 × 模式族分区', formatNumber(metrics.model_family_partition_count)],
@@ -96,6 +101,31 @@ function AtlasDetail({ atlas }) {
     ['Phase 391 局部父节点布局', formatNumber(metrics.phase391_physical_local_parent_layout_count)],
     ['Phase 393 属性内容切换', `${metrics.phase393_attribute_answer_switch_count || 0}/${metrics.phase393_attribute_direction_count || 0}`],
     ['Phase 393 深度特异模型', `${metrics.phase393_depth_specificity_pass_model_count || 0}/3`],
+    ['Phase 396 字段上下文切换', `${metrics.phase396_same_literal_answer_switch_count || 0}/${metrics.phase396_physical_direction_count || 0}`],
+    ['Phase 396 同位置内容切换', `${metrics.phase396_same_position_content_switch_count || 0}/${metrics.phase396_physical_direction_count || 0}`],
+    ['Phase 396 字段物理复现模型', `${metrics.phase396_field_context_transport_pass_model_count || 0}/3`],
+    ['Phase 395 跨任务共享状态', `${metrics.phase395_crosssurface_shared_state_count || 0}/1`],
+    ['Phase 397 多任务完整合格组', `${metrics.phase397_behavior_qualified_group_count || 0}/144`],
+    ['Phase 397 行为合格任务面', `${metrics.phase397_eligible_surface_count || 0}/${metrics.phase397_registered_surface_count || 0}`],
+    ['Phase 397 三分割关系签名', `${(metrics.phase397_discovery_observational_pass_cell_count || 0) + (metrics.phase397_calibration_observational_pass_cell_count || 0) + (metrics.phase397_physical_observational_pass_cell_count || 0)}/27`],
+    ['Phase 397 因果关系载体', `${metrics.phase397_causal_relation_pass_cell_count || 0}/9`],
+    ['Phase 397 关系答案切换', `${metrics.phase397_relation_answer_switch_count || 0}/${metrics.phase397_causal_direction_count || 0}`],
+    ['Phase 398 联合析因完整组', `${metrics.phase398_qualified_group_count || 0}/72`],
+    ['Phase 398 ROQ 物理复现', `${metrics.phase398_ROQ_physical_pass_cell_count || 0}/9`],
+    ['Phase 398 单位置因果单元', `${metrics.phase398_causal_pass_cell_count || 0}/9`],
+    ['Phase 398 同顺序答案切换', `${metrics.phase398_same_order_answer_switch_count || 0}/${metrics.phase398_causal_direction_count || 0}`],
+    ['Phase 399 多位置动态完整组', `${metrics.phase399_qualified_parallel_group_count || 0}/112`],
+    ['Phase 399 行为合格任务面', `${metrics.phase399_eligible_surface_count || 0}/${metrics.phase399_registered_surface_count || 0}`],
+    ['Phase 399 物理必需事件单元', `${metrics.phase399_required_event_physical_cell_count || 0}/9`],
+    ['Phase 399 物理有序链单元', `${metrics.phase399_ordered_chain_physical_cell_count || 0}/9`],
+    ['Phase 399 跨模型动态链', `${metrics.phase399_crossmodel_chain_surface_count || 0}/3`],
+    ['Phase 399 联合因果干预', formatNumber(metrics.phase399_joint_causal_intervention_count)],
+    ['Phase 400 发现集部分序图', `${metrics.phase400_discovery_partial_order_graph_cell_count || 0}/6`],
+    ['Phase 400 跨模型发现候选', `${metrics.phase400_discovery_crossmodel_isomorphism_surface_count || 0}/2`],
+    ['Phase 400 预测门合格单元', `${metrics.phase400_discovery_prediction_pass_cell_count || 0}/6`],
+    ['Phase 400 校准守恒单元', `${metrics.phase400_calibration_quality_group_model_cell_count || 0}/${metrics.phase400_calibration_group_model_cell_count || 0}`],
+    ['Phase 400 已使用物理留出', `${metrics.phase400_physical_holdout_case_count || 0}/384`],
+    ['Phase 400 新增神经元节点', formatNumber(metrics.phase400_new_neuron_node_count)],
     ['跨模型行为必要性', formatNumber(metrics.phase330_cross_model_behavior_necessity_mechanism_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
@@ -104,7 +134,17 @@ function AtlasDetail({ atlas }) {
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <div style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>
-        {phase393.status
+        {phase400.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。区间部分序发现图通过 5/6 个模型任务单元，拥有关系出现 1/2 个发现集跨模型候选；但答案预测门为 0/6，校准守恒合同仅通过 23/24 个组模型单元。物理留出保持 0/384，3D 不新增神经元、头或通道节点。`
+          : phase399.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。来源到查询、查询整合和终端三类聚合事件在 9/9 个模型任务单元及三份独立数据中复现；但冻结峰值顺序只在 DS7B 角色填槽中三次通过，跨模型任务为 0/3。3D 蓝色事件是模型特异聚合观测，不是注意力头、神经元或因果绑定路径。`
+          : phase398.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。查询末端的 ROQ 联合轨迹在三任务、三模型和三份独立数据中均为 9/9，并跨词汇方向复现；但单查询位置搬运通过 0/9 个因果单元，只产生 10/432 次答案切换。3D 粉色节点是顺序条件化聚合轨迹，不是神经元、可移植状态或完整绑定算法。`
+          : phase397.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。同位置值状态中的关系签名在三任务、三模型和三份独立数据上复现，但隔离搬运通过 0/9 个因果单元、产生 0/144 次答案切换。3D 蓝色节点是聚合观测签名，不是注意力头、MLP 神经元或可移植绑定规则。`
+          : phase396.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。字段抽取中的同字面值上下文状态已在三模型独立物理组复现，但跨任务共享门失败；3D 新增的是聚合词元状态锚点，不是注意力头或 MLP 神经元。抽象绑定算法、自然必要性、完整语言路径与单神经元因果仍为零。`
+          : phase393.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。局部父节点布局已跨模型物理复现，受控属性内容搬运也已通过三模型独立留出；但错误深度同样有效，所以不能把它标成自然深度路径。完整语言路径与神经元因果仍为零。`
           : `当前图谱已经完成九个模式族和三个模型的统一物理覆盖，并继续推进到 Phase ${atlas?.phase || '-'} 的自然必要性审计。严格边界仍然是：局部传播已经出现，但跨模型行为必要性、单神经元因果和完整自然闭合均未通过。`}
       </div>
@@ -247,6 +287,9 @@ export function EvidenceKernelDashboard() {
     if (metrics.full_natural_chain_pass_count > 0 && metrics.single_unit_causal_count > 0) {
       return { label: '存在严格闭合机制', detail: '至少一条路径同时通过单元因果和完整自然链。', color: '#34d399' };
     }
+    if ((metrics.phase400_behavior_candidate_case_count || 0) > 0) {
+      return { label: '部分序候选未通过验证门', detail: '发现集出现聚合区间图，但预测为 0/6，校准合同为 23/24；物理留出、因果干预与神经元扫描均未开放。', color: '#f59e0b' };
+    }
     if ((metrics.phase393_attribute_transport_pass_model_count || 0) === 3) {
       return { label: '属性内容可搬运，深度路径未定位', detail: '三模型独立留出确认受控属性内容搬运；错误深度同样有效，尚无完整路径或神经元级闭合。', color: '#f59e0b' };
     }
@@ -268,7 +311,8 @@ export function EvidenceKernelDashboard() {
     ['模式族映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['注册机制', formatNumber(metrics.registered_mechanism_count)],
     ['物理组件事件', formatNumber(metrics.component_event_count)],
-    ['局部传播通过', formatNumber(metrics.phase334_local_propagation_pass_count)],
+    ['Phase400 发现图', `${metrics.phase400_discovery_partial_order_graph_cell_count || 0}/6`],
+    ['Phase400 预测门', `${metrics.phase400_discovery_prediction_pass_cell_count || 0}/6`],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
   ];
