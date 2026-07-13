@@ -90,6 +90,11 @@ function AtlasDetail({ atlas }) {
   const phase400 = atlas?.phase400_audit || {};
   const phase401 = atlas?.phase401_audit || {};
   const phase402 = atlas?.phase402_audit || {};
+  const phase405 = atlas?.phase405_audit || {};
+  const phase406 = atlas?.phase406_audit || {};
+  const phase407 = atlas?.phase407_audit || {};
+  const phase408 = atlas?.phase408_audit || {};
+  const phase409 = atlas?.phase409_audit || {};
   const rows = [
     ['模式族物理映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['模型 × 模式族分区', formatNumber(metrics.model_family_partition_count)],
@@ -144,6 +149,43 @@ function AtlasDetail({ atlas }) {
     ['Phase 402 跨模型多父任务面', `${metrics.phase402_crossmodel_joint_parent_surface_count || 0}/2`],
     ['Phase 402 已使用物理留出', `${metrics.phase402_physical_holdout_case_count || 0}/288`],
     ['Phase 402 新增神经元节点', formatNumber(metrics.phase402_new_neuron_node_count)],
+    ['Phase 403 状态操作正确案例', `${metrics.phase403_predictive_state_correct_count || 0}/${metrics.phase403_predictive_state_case_count || 0}`],
+    ['Phase 403 跨模型状态族', `${metrics.phase403_crossmodel_state_family_count || 0}/3`],
+    ['Phase 404 有限候选正确案例', `${metrics.phase404_finite_candidate_correct_count || 0}/${metrics.phase404_direct_state_case_count || 0}`],
+    ['Phase 404 全词表目标首词', `${metrics.phase404_global_top_target_count || 0}/${metrics.phase404_direct_state_case_count || 0}`],
+    ['Phase 405 自然未来目标首词', `${metrics.phase405_natural_top_target_count || 0}/${metrics.phase405_natural_future_case_count || 0}`],
+    ['Phase 405 严格模型族单元', `${metrics.phase405_model_family_natural_group_pass_count || 0}/9`],
+    ['Phase 405 跨模型状态族', `${metrics.phase405_crossmodel_state_family_count || 0}/3`],
+    ['Phase 405 新增神经元节点', formatNumber(metrics.phase405_new_neuron_node_count)],
+    ['Phase 406 正式发现案例', formatNumber(metrics.phase406_formal_discovery_case_count)],
+    ['Phase 406 H12 语义正确', `${metrics.phase406_H12_sequence_semantic_correct_count || 0}/${metrics.phase406_formal_discovery_case_count || 0}`],
+    ['Phase 406 正式组通过', `${metrics.phase406_formal_group_pass_count || 0}/72`],
+    ['Phase 406 跨模型状态族', `${metrics.phase406_crossmodel_state_family_count || 0}/3`],
+    ['Phase 406 新增神经元节点', formatNumber(metrics.phase406_new_neuron_node_count)],
+    ['Phase 407 正式发现案例', formatNumber(metrics.phase407_formal_discovery_case_count)],
+    ['Phase 407 语义正确', `${metrics.phase407_semantic_correct_count || 0}/${metrics.phase407_formal_discovery_case_count || 0}`],
+    ['Phase 407 完整响应', `${metrics.phase407_complete_response_count || 0}/${metrics.phase407_formal_discovery_case_count || 0}`],
+    ['Phase 407 四门完整组', `${metrics.phase407_fully_semantic_gated_group_count || 0}/${metrics.phase407_formal_group_count || 0}`],
+    ['Phase 407 非有限路径', formatNumber(metrics.phase407_nonfinite_generation_path_count)],
+    ['Phase 407 跨模型状态族', `${metrics.phase407_crossmodel_state_family_count || 0}/3`],
+    ['Phase 407 新增神经元节点', formatNumber(metrics.phase407_new_neuron_node_count)],
+    ['Phase 408 正式发现案例', formatNumber(metrics.phase408_formal_discovery_case_count)],
+    ['Phase 408 注册响应', `${metrics.phase408_registered_response_observed_count || 0}/${metrics.phase408_formal_discovery_case_count || 0}`],
+    ['Phase 408 允许响应', `${metrics.phase408_allowed_response_observed_count || 0}/${metrics.phase408_formal_discovery_case_count || 0}`],
+    ['Phase 408 条件可分组', `${metrics.phase408_condition_separation_pass_group_count || 0}/108`],
+    ['Phase 408 表面词汇稳定组', `${metrics.phase408_surface_lexical_stability_pass_group_count || 0}/108`],
+    ['Phase 408 功能分区组', `${metrics.phase408_functional_group_pass_count || 0}/108`],
+    ['Phase 408 发现跨模型族', `${metrics.phase408_discovery_crossmodel_partition_family_count || 0}/3`],
+    ['Phase 408 校准跨模型族', `${metrics.phase408_calibration_crossmodel_partition_family_count || 0}/3`],
+    ['Phase 408 行为留出跨模型族', `${metrics.phase408_behavioral_crossmodel_partition_family_count || 0}/3`],
+    ['Phase 408 新增神经元节点', formatNumber(metrics.phase408_new_neuron_node_count)],
+    ['Phase 409 协议注册案例', formatNumber(metrics.phase409_registered_abstract_case_count)],
+    ['Phase 409 未来提示哈希', formatNumber(metrics.phase409_future_model_prompt_hash_count)],
+    ['Phase 409 双规则一致', `${metrics.phase409_dual_rule_agreement_count || 0}/${metrics.phase409_rule_engine_scenario_count || 0}`],
+    ['Phase 409 外部规则复核', `${metrics.phase409_external_rule_review_count || 0}/1`],
+    ['Phase 409 采集器等价', `${metrics.phase409_collector_equivalence_count || 0}/1`],
+    ['Phase 409 模型案例', formatNumber(metrics.phase409_model_case_count)],
+    ['Phase 409 新增神经元节点', formatNumber(metrics.phase409_new_neuron_node_count)],
     ['跨模型行为必要性', formatNumber(metrics.phase330_cross_model_behavior_necessity_mechanism_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
@@ -152,7 +194,17 @@ function AtlasDetail({ atlas }) {
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <div style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>
-        {phase402.status
+        {phase409.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase409 已冻结 ${formatNumber(metrics.phase409_registered_abstract_case_count)} 个动态响应与历史条件抽象案例、${formatNumber(metrics.phase409_future_model_prompt_hash_count)} 个未来三模型提示哈希；双机器规则引擎一致 ${metrics.phase409_dual_rule_agreement_count || 0}/${metrics.phase409_rule_engine_scenario_count || 0}。外部规则复核和增量采集器逐词元等价仍为 0/1，模型案例为 0，因此这里只显示协议节点，不显示新的物理路径或神经元。`
+          : phase408.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase408 在 ${formatNumber(metrics.phase408_formal_discovery_case_count)} 个正式案例中，把状态可分性、标签对齐、数值有效性、生成事件和右删失分别记录；${metrics.phase408_functional_group_pass_count || 0}/108 个组形成冻结功能分区，发现、校准、行为留出的跨模型候选分别为 ${metrics.phase408_discovery_crossmodel_partition_family_count || 0}/3、${metrics.phase408_calibration_crossmodel_partition_family_count || 0}/3、${metrics.phase408_behavioral_crossmodel_partition_family_count || 0}/3。历史仍固定为空，因此不授权物理路径或神经元节点。`
+          : phase407.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase407 在 5,760 个正式发现案例中分开记录语义完成、句界和模型停止：3,935 例达到注册语义，3,933 例形成完整响应；只有 10/108 个组同时通过表面、接口、历史和序列门，九个模型×语言族单元均未达门，跨模型状态族为 0/3。129 条 GLM4 非有限路径单列为运行时警告，所有物理和神经元门保持关闭。`
+          : phase406.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。条件化 H12 短序列在 5,760 个正式发现案例中恢复 3,512 例语义答案，但 72 个正式组仅通过 5 个，且未达到任何模型族门；跨模型条件状态族为 0/3。宽松词汇上界与 H48 诊断均未改变停止决定，所有下游物理和神经元门保持关闭。`
+          : phase405.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase403-405 依次分离了更新执行、有限候选读出和自然未来首词；最终九个模型×语言族单元的严格自然组通过数均为零，跨模型预测状态族为 0/3。校准、行为留出和物理留出均未使用，3D 不新增层、头、通道或神经元节点。`
+          : phase402.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。四类互斥注意力 K/V 父分区账本通过 3,328/3,328；13,728 个联合组层子集中只有 8 个早层局部单元通过全部门，模型级和跨模型候选均为零。校准与物理留出未使用，3D 不新增神经元、头或通道节点。`
           : phase401.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。同执行形状组件账本通过 96/96；独立批敏感性审计有 7/192 个案例发生字段变化。真实关系替换虽然产生局部响应，但严格与敏感性审计均为 0/208 个合格层、0/6 个特异直接物理边。校准和物理留出均未使用，3D 不新增神经元、头或通道节点。`
@@ -309,6 +361,29 @@ export function EvidenceKernelDashboard() {
     if (metrics.full_natural_chain_pass_count > 0 && metrics.single_unit_causal_count > 0) {
       return { label: '存在严格闭合机制', detail: '至少一条路径同时通过单元因果和完整自然链。', color: '#34d399' };
     }
+    if ((metrics.phase409_registered_abstract_case_count || 0) > 0) {
+      return {
+        label: '动态历史协议已冻结，模型执行尚未授权',
+        detail: `Phase409 注册 ${metrics.phase409_registered_abstract_case_count || 0} 个抽象案例和 ${metrics.phase409_future_model_prompt_hash_count || 0} 个未来提示哈希；机器双规则一致 ${metrics.phase409_dual_rule_agreement_count || 0}/${metrics.phase409_rule_engine_scenario_count || 0}，但外部规则复核和采集器逐词元等价均未完成。模型、物理、因果和神经元案例均为零。`,
+        color: '#f59e0b',
+      };
+    }
+    if ((metrics.phase408_formal_discovery_case_count || 0) > 0) {
+      return {
+        label: '排他响应分区已审计，内部机制尚未授权',
+        detail: `Phase408 完成 ${metrics.phase408_formal_discovery_case_count || 0} 个发现案例；功能分区组为 ${metrics.phase408_functional_group_pass_count || 0}/108，行为留出跨模型族为 ${metrics.phase408_behavioral_crossmodel_partition_family_count || 0}/3。响应分区仍是观测对象，历史、物理、因果和神经元门未越级开放。`,
+        color: '#f59e0b',
+      };
+    }
+    if ((metrics.phase407_formal_discovery_case_count || 0) > 0) {
+      return { label: '事件账本完整，跨模型状态未成立', detail: 'Phase407 的注册语义为 3,935/5,760，四门完整组为 10/108，但九个模型族单元均未达门、跨模型为 0/3；校准、物理、因果和神经元门保持关闭。', color: '#f59e0b' };
+    }
+    if ((metrics.phase406_formal_discovery_case_count || 0) > 0) {
+      return { label: '短序列恢复存在，跨模型状态未成立', detail: 'Phase406 的 H12 序列语义正确为 3,512/5,760，但正式组仅 5/72、跨模型为 0/3；校准、物理、因果和神经元门保持关闭。', color: '#f59e0b' };
+    }
+    if ((metrics.phase405_natural_future_case_count || 0) > 0) {
+      return { label: '响应丰富但预测状态尚未成立', detail: 'Phase403-405 已完成三种功能状态协议；九个严格模型族单元均未通过，跨模型状态、物理路径和神经元门保持关闭。', color: '#f59e0b' };
+    }
     if ((metrics.phase402_behavior_candidate_case_count || 0) > 0) {
       return { label: '多父局部迹象未形成模型级机制', detail: '分区账本为 3,328/3,328；严格局部联合单元为 8/13,728，但模型级与跨模型候选均为零，所有下游门保持关闭。', color: '#f59e0b' };
     }
@@ -343,6 +418,23 @@ export function EvidenceKernelDashboard() {
     ['Phase401 局部边层', `${metrics.phase401_strict_local_edge_passing_layer_count || 0}/${metrics.phase401_model_surface_layer_count || 0}`],
     ['Phase402 多父分区账本', `${metrics.phase402_instrument_pass_row_count || 0}/${metrics.phase402_instrument_row_count || 0}`],
     ['Phase402 严格局部联合单元', `${metrics.phase402_strict_local_joint_cell_count || 0}/${metrics.phase402_joint_group_layer_subset_count || 0}`],
+    ['Phase404 候选/自然首词', `${metrics.phase404_finite_candidate_correct_count || 0}/${metrics.phase404_global_top_target_count || 0}`],
+    ['Phase405 自然目标首词', `${metrics.phase405_natural_top_target_count || 0}/${metrics.phase405_natural_future_case_count || 0}`],
+    ['Phase405 跨模型状态族', `${metrics.phase405_crossmodel_state_family_count || 0}/3`],
+    ['Phase406 H12 语义正确', `${metrics.phase406_H12_sequence_semantic_correct_count || 0}/${metrics.phase406_formal_discovery_case_count || 0}`],
+    ['Phase406 正式组通过', `${metrics.phase406_formal_group_pass_count || 0}/72`],
+    ['Phase406 跨模型状态族', `${metrics.phase406_crossmodel_state_family_count || 0}/3`],
+    ['Phase407 注册语义正确', `${metrics.phase407_semantic_correct_count || 0}/${metrics.phase407_formal_discovery_case_count || 0}`],
+    ['Phase407 四门完整组', `${metrics.phase407_fully_semantic_gated_group_count || 0}/${metrics.phase407_formal_group_count || 0}`],
+    ['Phase407 跨模型状态族', `${metrics.phase407_crossmodel_state_family_count || 0}/3`],
+    ['Phase408 注册响应', `${metrics.phase408_registered_response_observed_count || 0}/${metrics.phase408_formal_discovery_case_count || 0}`],
+    ['Phase408 功能分区组', `${metrics.phase408_functional_group_pass_count || 0}/108`],
+    ['Phase408 发现跨模型族', `${metrics.phase408_discovery_crossmodel_partition_family_count || 0}/3`],
+    ['Phase408 行为留出跨模型族', `${metrics.phase408_behavioral_crossmodel_partition_family_count || 0}/3`],
+    ['Phase409 协议注册案例', formatNumber(metrics.phase409_registered_abstract_case_count)],
+    ['Phase409 双规则一致', `${metrics.phase409_dual_rule_agreement_count || 0}/${metrics.phase409_rule_engine_scenario_count || 0}`],
+    ['Phase409 外部规则复核', `${metrics.phase409_external_rule_review_count || 0}/1`],
+    ['Phase409 模型案例', formatNumber(metrics.phase409_model_case_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
   ];

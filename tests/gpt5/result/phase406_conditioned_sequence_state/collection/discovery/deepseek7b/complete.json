@@ -1,0 +1,56 @@
+{
+  "schema_version": "80.1.0",
+  "phase_id": "Phase406-ConditionedSequenceCollection",
+  "created_at": "2026-07-13T13:11:00.795588+00:00",
+  "model": "deepseek7b",
+  "runtime_dtype": "bfloat16",
+  "split": "discovery",
+  "authorized_families": [
+    "knowledge_binding",
+    "rule_reasoning",
+    "grammar_constraint"
+  ],
+  "case_count": 1920,
+  "batch_count": 241,
+  "max_batch_size": 8,
+  "batching": "same_prompt_token_length_only_no_padding",
+  "max_new_tokens": 12,
+  "top_k_ledger_size": 8,
+  "first_step_candidate_correct_count": 1149,
+  "first_step_global_top_is_target_count": 360,
+  "eos_observed_count": 0,
+  "nonfinite_first_step_candidate_case_count": 0,
+  "nonfinite_first_step_global_case_count": 0,
+  "nonfinite_any_generated_step_case_count": 0,
+  "generation_processor_masked_case_count": 0,
+  "families": [
+    {
+      "family_id": "knowledge_binding",
+      "case_count": 768,
+      "first_step_candidate_correct_count": 611,
+      "first_step_global_top_is_target_count": 268,
+      "eos_observed_count": 0
+    },
+    {
+      "family_id": "rule_reasoning",
+      "case_count": 384,
+      "first_step_candidate_correct_count": 256,
+      "first_step_global_top_is_target_count": 71,
+      "eos_observed_count": 0
+    },
+    {
+      "family_id": "grammar_constraint",
+      "case_count": 768,
+      "first_step_candidate_correct_count": 282,
+      "first_step_global_top_is_target_count": 21,
+      "eos_observed_count": 0
+    }
+  ],
+  "valid": true,
+  "claim_boundary": {
+    "generated_sequence_is_semantic_state": false,
+    "top_k_ledger_is_full_vocab_distribution": false,
+    "deterministic_greedy_is_complete_response_kernel": false,
+    "raw_model_logits_separated_from_generation_processor_scores": true
+  }
+}

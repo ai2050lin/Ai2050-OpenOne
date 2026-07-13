@@ -1,0 +1,104 @@
+{
+  "schema_version": "83.0.0",
+  "phase_id": "Phase409-DynamicResponseHistoryProtocol",
+  "created_at": "2026-07-13T18:00:15.795258+00:00",
+  "objective": "dynamic_registered_response_process_and_history_condition_protocol",
+  "models_in_future_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_contract": {
+    "device": "cuda",
+    "dtype_by_model": {
+      "qwen3": "float16",
+      "glm4": "float16",
+      "deepseek7b": "bfloat16"
+    },
+    "generation": "stepwise_deterministic_greedy_not_global_sequence_map",
+    "max_new_tokens": 48,
+    "model_execution_in_this_stage": false
+  },
+  "denominator": {
+    "families": [
+      "knowledge_binding",
+      "rule_reasoning",
+      "grammar_constraint"
+    ],
+    "groups_per_family": 32,
+    "split_group_counts": {
+      "qualification": 2,
+      "discovery": 12,
+      "calibration": 6,
+      "behavioral_holdout": 6,
+      "physical_holdout": 6
+    },
+    "states_per_family": {
+      "knowledge_binding": 6,
+      "rule_reasoning": 3,
+      "grammar_constraint": 4
+    },
+    "structural_surfaces": 4,
+    "lexical_replicas": 2,
+    "history_modes": [
+      "h0_current_only",
+      "h1_prior_equivalent_state",
+      "h2_prior_irrelevant_content",
+      "h3_prior_conflicting_state",
+      "h4_prior_conflict_then_current_explicit_override"
+    ],
+    "abstract_case_count_all_registered_splits": 65280,
+    "future_model_rendered_case_count_all_models": 195840,
+    "discovery_abstract_case_count": 24480,
+    "future_discovery_case_count_all_models": 73440,
+    "gate_eligible_abstract_case_count": 52224,
+    "conflict_diagnostic_abstract_case_count": 13056,
+    "sealed_qualification_case_count_per_future_model": 55
+  },
+  "interface_gate_contract": {
+    "knowledge_single_entity_individual_query_is_injective": false,
+    "knowledge_single_entity_three_role_joint_signature_is_injective": true,
+    "rule_truth_vector_is_high_pressure_independent_interface": true,
+    "grammar_sentence_completion_requires_be_form_adjective_and_boundary": true
+  },
+  "event_process_fields": [
+    "final_semantic_class",
+    "first_registered_event",
+    "first_allowed_event",
+    "allowed_exit_event",
+    "boundary_event",
+    "stop_event",
+    "event_transition_sequence"
+  ],
+  "hierarchical_gates": [
+    "machine_protocol_and_external_rule_review",
+    "future_execution_qualification",
+    "interface_internal_joint_signature",
+    "surface_and_lexical_replication",
+    "interface_pair_transform",
+    "history_h0_h1_h2_h4_replication",
+    "crossmodel_calibration_and_behavioral_holdout",
+    "separate_physical_protocol_registration"
+  ],
+  "authorization": {
+    "protocol_and_dual_solver_development": true,
+    "model_qualification": false,
+    "formal_discovery": false,
+    "calibration": false,
+    "behavioral_holdout": false,
+    "physical_mapping": false,
+    "causal_intervention": false,
+    "neuron_scan": false
+  },
+  "remaining_blockers": [
+    "independent_human_rule_review_not_completed",
+    "incremental_collector_old_new_token_equivalence_not_completed",
+    "no_model_execution_qualification_under_schema_83"
+  ],
+  "claim_boundary": {
+    "event_automaton_is_model_internal_state_machine": false,
+    "machine_dual_solver_agreement_is_independent_human_review": false,
+    "behavioral_interface_transform_is_internal_operator": false,
+    "single_global_progress_percentage_valid": false
+  }
+}

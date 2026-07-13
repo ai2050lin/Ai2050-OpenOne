@@ -1,0 +1,183 @@
+{
+  "schema_version": "80.5.0",
+  "phase_id": "Phase406-ConditionedSequenceProtocol",
+  "created_at": "2026-07-13T13:05:13.915067+00:00",
+  "objective": "test_exact_conditioned_short_sequence_response_tables_before_physical_mapping",
+  "formal_amendment": {
+    "amendment_id": "semantic_answer_contract_001",
+    "reason": "reasoning_identity_names_were_not_mapped_to_A_B_and_demonstrative_natural_completion_was_not_unique",
+    "thresholds_changed": false,
+    "denominator_changed": false,
+    "all_models_restarted_from_qwen3": true,
+    "pre_amendment_results_quarantined": "tests/gpt5/result/phase406_conditioned_sequence_pre_semantic_contract_fix_001"
+  },
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_contract": {
+    "device": "cuda",
+    "runtime_dtype_by_model": {
+      "qwen3": "float16",
+      "glm4": "float16",
+      "deepseek7b": "bfloat16"
+    },
+    "attention_implementation": "eager",
+    "generation": "deterministic_greedy",
+    "max_new_tokens": 12,
+    "top_k_ledger_size": 8,
+    "batching": "same_prompt_token_length_only_no_padding",
+    "max_batch_size_by_model": {
+      "qwen3": 12,
+      "glm4": 4,
+      "deepseek7b": 8
+    },
+    "full_vocab_tensor_materialized_in_memory": true,
+    "full_vocab_tensor_persisted": false,
+    "raw_model_logits_separated_from_generation_processor_scores": true,
+    "persistent_ledger": "generated_sequence_plus_each_step_top_k_plus_first_step_semantic_panel",
+    "replay_reason": "sealed_prompt_token_ids_model_dtype_and_generation_contract_allow_exact_recomputation_without_multi_gigabyte_duplicate_logits"
+  },
+  "denominator": {
+    "families": [
+      "knowledge_binding",
+      "rule_reasoning",
+      "grammar_constraint"
+    ],
+    "groups_per_family": 20,
+    "split_group_counts": {
+      "discovery": 8,
+      "calibration": 4,
+      "behavioral_holdout": 4,
+      "physical_holdout": 4
+    },
+    "states_per_family": {
+      "knowledge_binding": 4,
+      "rule_reasoning": 2,
+      "grammar_constraint": 4
+    },
+    "surface_replicas_per_state": 4,
+    "queries_per_state": 3,
+    "interfaces_per_query": 2,
+    "conditions_per_state": 6,
+    "case_count_all_models_all_splits": 14400,
+    "discovery_case_count_per_model": 1920,
+    "discovery_case_count_all_models": 5760
+  },
+  "condition_definition": {
+    "components": [
+      "semantic_query",
+      "surface_syntax",
+      "interface",
+      "output_protocol",
+      "generation_history"
+    ],
+    "interfaces": [
+      "answer_first",
+      "natural_completion"
+    ],
+    "generation_history_values": [
+      "empty"
+    ],
+    "history_generalization_tested": false,
+    "reasoning_identity_aliases_registered": true,
+    "proximal_demonstrative_contract_registered": true
+  },
+  "integer_gates": {
+    "state_condition_surface_semantic_pass_min": "3_of_4",
+    "group_semantic_correct_min": {
+      "knowledge_binding": "84_of_96",
+      "rule_reasoning": "42_of_48",
+      "grammar_constraint": "84_of_96"
+    },
+    "leave_one_interface_source_consensus_min": "3_of_4",
+    "leave_one_interface_target_match_min": "3_of_4",
+    "all_state_query_interface_folds_required": true,
+    "discovery_groups_min_per_model_family": "6_of_8",
+    "calibration_groups_min_per_model_family": "3_of_4",
+    "behavioral_holdout_groups_min_per_model_family": "3_of_4",
+    "crossmodel_requires_all_three_models": true
+  },
+  "semantic_transition_graph": {
+    "knowledge_binding": [
+      {
+        "source": "red_blue",
+        "operation": "swap",
+        "target": "blue_red"
+      },
+      {
+        "source": "blue_red",
+        "operation": "swap",
+        "target": "red_blue"
+      },
+      {
+        "source": "red_blue",
+        "operation": "copy_a_to_b",
+        "target": "red_red"
+      },
+      {
+        "source": "blue_red",
+        "operation": "copy_a_to_b",
+        "target": "blue_blue"
+      }
+    ],
+    "rule_reasoning": [
+      {
+        "source": "holder_a",
+        "operation": "swap_holder",
+        "target": "holder_b"
+      },
+      {
+        "source": "holder_b",
+        "operation": "swap_holder",
+        "target": "holder_a"
+      },
+      {
+        "source": "holder_b",
+        "operation": "set_a_holder",
+        "target": "holder_a"
+      }
+    ],
+    "grammar_constraint": [
+      {
+        "source": "singular_present",
+        "operation": "toggle_number",
+        "target": "plural_present"
+      },
+      {
+        "source": "plural_present",
+        "operation": "toggle_number",
+        "target": "singular_present"
+      },
+      {
+        "source": "singular_present",
+        "operation": "set_past",
+        "target": "singular_past"
+      },
+      {
+        "source": "plural_present",
+        "operation": "set_past",
+        "target": "plural_past"
+      }
+    ]
+  },
+  "semantic_transition_graph_is_observed_internal_operator": false,
+  "authorization": {
+    "run_discovery": true,
+    "run_calibration_only_for_discovery_crossmodel_families": true,
+    "run_behavioral_holdout_only_for_calibration_crossmodel_families": true,
+    "run_direct_operator_only_after_behavioral_holdout": true,
+    "run_physical_mapping_only_after_direct_operator_and_crossmodel_gate": true,
+    "run_causal_intervention": false,
+    "run_neuron_scan": false
+  },
+  "claim_boundary": {
+    "six_conditions_are_all_legal_futures": false,
+    "generation_history_generalized": false,
+    "semantic_parser_is_internal_state": false,
+    "finite_condition_transfer_is_causal_state": false,
+    "truth_transition_table_is_model_operator": false,
+    "top_k_persistence_is_full_distribution_persistence": false
+  }
+}

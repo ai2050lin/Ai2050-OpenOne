@@ -1009,6 +1009,118 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
     });
   }, [progress]);
 
+  const predictiveStateRows = useMemo(() => {
+    const stage = progress?.predictive_state_stage || {};
+    const definitions = [
+      ['phase403_semantic_correct_cases', 'Phase403 状态操作正确案例'],
+      ['phase403_crossmodel_candidate_families', 'Phase403 跨模型状态族'],
+      ['phase404_finite_candidate_correct_cases', 'Phase404 有限候选正确案例'],
+      ['phase404_natural_top_target_cases', 'Phase404 全词表目标首词'],
+      ['phase404_crossmodel_candidate_families', 'Phase404 跨模型状态族'],
+      ['phase405_finite_candidate_correct_cases', 'Phase405 有限候选正确案例'],
+      ['phase405_natural_top_target_cases', 'Phase405 自然目标首词'],
+      ['phase405_model_family_natural_group_pass_cells', 'Phase405 严格模型族单元'],
+      ['phase405_crossmodel_candidate_families', 'Phase405 跨模型状态族'],
+      ['physical_holdout_cases_consumed', '已使用物理留出'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const conditionedSequenceRows = useMemo(() => {
+    const stage = progress?.conditioned_sequence_stage || {};
+    const definitions = [
+      ['formal_discovery_cases', 'Phase406 正式发现案例'],
+      ['first_step_candidate_correct_cases', '首步候选集正确案例'],
+      ['first_step_global_top_target_cases', '首步全词表目标案例'],
+      ['H12_short_sequence_semantic_correct_cases', 'H12 短序列语义正确案例'],
+      ['formal_group_passes', '正式组通过数'],
+      ['crossmodel_candidate_families', '跨模型条件状态族'],
+      ['calibration_cases_consumed', '已使用校准案例'],
+      ['behavioral_holdout_cases_consumed', '已使用行为留出'],
+      ['physical_holdout_cases_consumed', '已使用物理留出'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const eventHorizonRows = useMemo(() => {
+    const stage = progress?.event_horizon_condition_response_stage || {};
+    const definitions = [
+      ['formal_discovery_cases', 'Phase407 正式发现案例'],
+      ['semantic_correct_cases', '注册语义正确案例'],
+      ['complete_response_cases', '完整响应案例'],
+      ['fully_semantic_gated_groups', '表面/接口/历史/序列四门完整组'],
+      ['crossmodel_candidate_families', '跨模型条件状态族'],
+      ['calibration_cases_consumed', '已使用校准案例'],
+      ['behavioral_holdout_cases_consumed', '已使用行为留出'],
+      ['physical_holdout_cases_consumed', '已使用物理留出'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const partitionInterfaceRows = useMemo(() => {
+    const stage = progress?.partition_interface_stage || {};
+    const definitions = [
+      ['formal_discovery_cases', 'Phase408 正式发现案例'],
+      ['registered_response_cases', '注册响应案例'],
+      ['allowed_response_cases', '允许响应案例'],
+      ['condition_separation_groups', '全部条件可分组'],
+      ['surface_lexical_stability_groups', '表面与词汇稳定组'],
+      ['functional_partition_groups', '功能响应分区组'],
+      ['discovery_crossmodel_candidate_families', '发现跨模型分区族'],
+      ['calibration_crossmodel_candidate_families', '校准跨模型分区族'],
+      ['behavioral_crossmodel_candidate_families', '行为留出跨模型分区族'],
+      ['calibration_cases_consumed', '已使用校准案例'],
+      ['behavioral_holdout_cases_consumed', '已使用行为留出'],
+      ['physical_holdout_cases_consumed', '已使用物理留出'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const dynamicResponseProtocolRows = useMemo(() => {
+    const stage = progress?.dynamic_response_protocol_stage || {};
+    const definitions = [
+      ['registered_abstract_cases', 'Phase409 协议注册案例'],
+      ['future_model_prompt_hashes', '未来三模型提示哈希'],
+      ['dual_rule_engine_scenarios', '双机器规则一致场景'],
+      ['query_contracts', '冻结查询合同'],
+      ['independent_human_rule_review', '独立外部规则复核'],
+      ['incremental_collector_token_equivalence', '增量采集器逐词元等价'],
+      ['model_qualification_cases_consumed', '已使用模型资格案例'],
+      ['physical_holdout_cases_consumed', '已使用物理留出'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
     const latest = progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2';
@@ -1145,19 +1257,93 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         items: multiParentRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
       };
     }
+    if (overallLatest && progress?.predictive_state_stage) {
+      overallLatest.summary = '三种预测状态协议已完成三模型发现集；行为响应丰富，但没有稳定跨模型状态族，物理与神经元门保持关闭。';
+      overallLatest.value = '0/3 state families / 0 physical paths';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：预测状态新范式与自然未来分支审计`,
+        text: 'Phase403 将有限状态与更新操作放入统一未来面板，发现更新执行会混淆状态表示。Phase404 改为直接终态，在 2,880 例中有 2,597 例有限候选正确，但只有 1,529 例全词表首词为目标。Phase405 删除选择指令并使用自然未完成分支，有限候选正确 2,076/2,880、自然目标首词 1,266/2,880；九个模型×语言族单元的严格组通过数全部为零。',
+        value: 'Response ledgers available / predictive equivalence rejected',
+        valueHint: '语义真值边只表示测试世界规则，不是模型内部算子。校准、行为留出和物理留出均未消耗；3D 不新增层、头、通道或神经元路径。',
+        items: predictiveStateRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.conditioned_sequence_stage) {
+      overallLatest.summary = '条件化短序列修复了大量首步误判，但正式组门和跨模型门仍未通过。';
+      overallLatest.value = '3,512/5,760 sequences / 0/3 cross-model';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：条件化短序列响应表与接口迁移审计`,
+        text: 'Phase406 在三类语言族、三模型、四个表面、六种未来条件上完成 5,760 个正式发现案例。首步候选集正确 4,490 例、首步全词表目标正确 1,722 例，而 H12 短序列语义正确达到 3,512 例，其中 1,791 例属于首步全词表错误但短序列恢复。72 个正式组仅 Qwen3 知识绑定通过 5 个，未达到预注册的 6/8 模型族门；其余模型族全部为零，跨模型候选为 0/3。',
+        value: 'Sequence recovery observed / conditioned state rejected',
+        valueHint: '宽松词汇上界和 H48 诊断都没有改变停止决定。校准、行为留出、物理留出、直接算子、因果干预和神经元扫描全部保持关闭；3D 不新增物理路径或神经元节点。',
+        items: conditionedSequenceRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.event_horizon_condition_response_stage) {
+      overallLatest.summary = '语义、句界和停止事件已经分离；观测响应分区存在，但九个模型族单元均未形成稳定状态。';
+      overallLatest.value = '3,935/5,760 semantic / 0/3 cross-model';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：事件地平线条件响应核与接口迁移审计`,
+        text: 'Phase407 使用全新语义组，在三类语言族、三模型、四个表面、两种族特异接口和两种历史携带方式上完成 5,760 个 batch=1 正式发现案例。注册语义正确 3,935 例、完整响应 3,933 例；1,728 个条件响应单元中有 894 个恒等映射、43 个完整非恒等置换、302 个状态塌缩和 489 个缺失。只有 10/108 个正式组同时通过表面、接口、历史和序列门，九个模型×语言族单元均未达到 9/12 门，跨模型候选为 0/3。',
+        value: 'Event ledger available / conditioned state rejected',
+        valueHint: 'GLM4 有 129 条 FP16 非有限感叹号退化路径，全部到达 H48，已作为运行时警告而非语言机制解释。校准、行为留出和物理留出均未消费；3D 不新增物理路径、头、通道或神经元。',
+        items: eventHorizonRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.partition_interface_stage) {
+      const stage = progress.partition_interface_stage;
+      const discoveryCases = stage.formal_discovery_cases?.denominator || 0;
+      const functionalGroups = stage.functional_partition_groups?.numerator || 0;
+      const discoveryFamilies = stage.discovery_crossmodel_candidate_families?.numerator || 0;
+      const calibrationFamilies = stage.calibration_crossmodel_candidate_families?.numerator || 0;
+      const behavioralFamilies = stage.behavioral_crossmodel_candidate_families?.numerator || 0;
+      overallLatest.summary = '排他响应合同已经冻结并完成三模型审计；行为响应分区仍未被晋升为内部状态或物理路径。';
+      overallLatest.value = `${functionalGroups}/108 partitions / ${behavioralFamilies}/3 behavioral`;
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：排他响应分区与接口协变审计`,
+        text: `Phase408 使用三类语言族、三个模型、三种族特异接口、四个结构表面和两个独立词汇复本，完成 ${discoveryCases} 个 batch=1 正式发现案例。语义类别、运行时数值、响应事件和停止右删失分别记账；功能分区通过 ${functionalGroups}/108 个组，发现、校准和行为留出的严格跨模型候选依次为 ${discoveryFamilies}/3、${calibrationFamilies}/3、${behavioralFamilies}/3。`,
+        value: 'Exclusive response ledger / observational partitions only',
+        valueHint: '接口坐标图是测试协议定义，不是已发现的模型内部算子；闭环映射复用同一批状态行，不作为独立因果证据。历史固定为空，因此物理留出、因果干预和神经元扫描不开放，3D 保留原有网络形状且不新增具体神经元。',
+        items: partitionInterfaceRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.dynamic_response_protocol_stage) {
+      const stage = progress.dynamic_response_protocol_stage;
+      const abstractCases = stage.registered_abstract_cases?.numerator || 0;
+      const promptHashes = stage.future_model_prompt_hashes?.numerator || 0;
+      const ruleAgreement = stage.dual_rule_engine_scenarios?.numerator || 0;
+      const ruleDenominator = stage.dual_rule_engine_scenarios?.denominator || 0;
+      const externalReview = stage.independent_human_rule_review?.numerator || 0;
+      const collectorEquivalence = stage.incremental_collector_token_equivalence?.numerator || 0;
+      const modelCases = stage.model_qualification_cases_consumed?.numerator || 0;
+      overallLatest.summary = '动态响应与历史条件协议已经冻结；当前展示的是可审计协议准备度，不是模型行为或内部物理机制。';
+      overallLatest.value = `${ruleAgreement}/${ruleDenominator} machine rules / ${modelCases} model cases`;
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：动态响应过程与历史条件协议`,
+        text: `Phase409 注册 ${abstractCases} 个抽象案例和 ${promptHashes} 个未来三模型提示哈希，覆盖五种历史条件、完整句格式以及知识族三次单实体查询的联合签名。闭式规则与有限世界穷举在 ${ruleAgreement}/${ruleDenominator} 个场景上一致。`,
+        value: 'Protocol frozen / model execution closed',
+        valueHint: `机器双求解不等于独立规则复核；外部复核为 ${externalReview}/1，增量采集器逐词元等价为 ${collectorEquivalence}/1，模型案例为 ${modelCases}。3D 保留原网络形状，不新增物理路径、头、通道或神经元。`,
+        items: dynamicResponseProtocolRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
     const engineering = sections.find((item) => item.id === 'engineering_latest');
     if (engineering) {
       engineering.detail = {
         ...engineering.detail,
         items: overallValid
           ? progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`)
-          : (multiParentRows.length ? multiParentRows : localEdgeRows.length ? localEdgeRows : dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
+          : (dynamicResponseProtocolRows.length ? dynamicResponseProtocolRows : partitionInterfaceRows.length ? partitionInterfaceRows : eventHorizonRows.length ? eventHorizonRows : conditionedSequenceRows.length ? conditionedSequenceRows : predictiveStateRows.length ? predictiveStateRows : multiParentRows.length ? multiParentRows : localEdgeRows.length ? localEdgeRows : dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
             .map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
         valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${latest}。单一全局完成百分比：${overallValid ? '有效' : '无效'}。`,
       };
     }
     return sections;
-  }, [bindingSeparationRows, clientIndex, dynamicPartialOrderRows, exactEventRows, factorSeparatedBindingRows, jointFormationRows, localEdgeRows, manifest, multiParentRows, multiPositionDynamicBindingRows, orderConditionedBindingRows, overallValid, progress, progressMap, relationRows]);
+  }, [bindingSeparationRows, clientIndex, conditionedSequenceRows, dynamicPartialOrderRows, dynamicResponseProtocolRows, eventHorizonRows, exactEventRows, factorSeparatedBindingRows, jointFormationRows, localEdgeRows, manifest, multiParentRows, multiPositionDynamicBindingRows, orderConditionedBindingRows, overallValid, partitionInterfaceRows, predictiveStateRows, progress, progressMap, relationRows]);
 
   const planDetail = useMemo(() => {
     return planCards.find((item) => item.id === activePlan)?.detail || null;
