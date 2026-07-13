@@ -2645,29 +2645,38 @@ export default function App() {
                           <option key={plugin.id} value={plugin.id}>
                             {plugin.name}
                           </option>
-                        ))}
+                          ))}
                       </select>
                     </div>
-                  </div>
 
-                  {activeResearchPluginId === 'language-mechanism' && (
-                    <PatternFamilyAtlasControls
-                      enabled={patternFamilyAtlasEnabled}
-                      onEnabledChange={setPatternFamilyAtlasEnabled}
-                      atlas={patternFamilyNeuronAtlas}
-                      familyId={patternFamilyId}
-                      onFamilyChange={setPatternFamilyId}
-                      modelKey={fpModel}
-                      onModelChange={handleFpModelChange}
-                      evidenceFocus={patternFamilyEvidenceFocus}
-                      onEvidenceFocusChange={setPatternFamilyEvidenceFocus}
-                      maxUnits={patternFamilyMaxUnits}
-                      onMaxUnitsChange={setPatternFamilyMaxUnits}
-                      variant="panel"
-                      showModel={false}
-                      showDetails={false}
-                    />
-                  )}
+                    {activeResearchPluginId === 'language-mechanism' && (
+                      <>
+                        <div
+                          style={{
+                            height: 1,
+                            margin: '14px 0',
+                            background: 'linear-gradient(90deg, transparent, rgba(125,211,252,0.34), transparent)',
+                          }}
+                        />
+                        <PatternFamilyAtlasControls
+                          enabled={patternFamilyAtlasEnabled}
+                          onEnabledChange={setPatternFamilyAtlasEnabled}
+                          atlas={patternFamilyNeuronAtlas}
+                          familyId={patternFamilyId}
+                          onFamilyChange={setPatternFamilyId}
+                          modelKey={fpModel}
+                          onModelChange={handleFpModelChange}
+                          evidenceFocus={patternFamilyEvidenceFocus}
+                          onEvidenceFocusChange={setPatternFamilyEvidenceFocus}
+                          maxUnits={patternFamilyMaxUnits}
+                          onMaxUnitsChange={setPatternFamilyMaxUnits}
+                          variant="panel"
+                          showModel={false}
+                          showDetails={false}
+                        />
+                      </>
+                    )}
+                  </div>
 
                   {showSimpleAiCycle && (
                   <div style={cockpitCardStyle}>
