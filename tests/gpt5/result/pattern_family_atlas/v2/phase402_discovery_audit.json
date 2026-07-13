@@ -1,0 +1,60 @@
+{
+  "schema_version": "76.8.0",
+  "phase_id": "Phase402-DiscoveryAudit",
+  "created_at": "2026-07-13T10:18:12.260517+00:00",
+  "denominator": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "surfaces": [
+      "role_filling",
+      "conditional_presence"
+    ],
+    "groups_per_surface_per_model": 6,
+    "collection_case_count": 576,
+    "pair_metric_count": 2875392,
+    "group_layer_subset_metric_count": 179712,
+    "joint_group_layer_subset_count": 13728
+  },
+  "gate_flow": {
+    "true_base_gate_pass_count": 5909,
+    "joint_above_best_singleton_count": 641,
+    "all_controls_pass_count_independent_of_other_gates": 18,
+    "strict_group_layer_candidate_count": 8,
+    "model_candidate_count": 0,
+    "crossmodel_candidate_count": 0,
+    "partial_two_model_candidate_count": 0
+  },
+  "control_failure_counts_over_joint_group_layer_subsets": {
+    "same_target_wrong_order": 13025,
+    "wrong_receiver_role": 9421,
+    "wrong_semantic_time": 11652,
+    "source_content_role_permutation": 8736,
+    "same_content_wrong_structure": 8047,
+    "deterministic_random_natural_donor": 12972,
+    "wrong_depth_quarter_shift": 6133,
+    "same_absolute_mass_sign_permuted": 6133
+  },
+  "protocol_precision_audit": {
+    "stored_group_rate_threshold": 0.666666667,
+    "groups_per_surface": 6,
+    "effective_required_count": 5,
+    "note": "decimal_0.666666667_requires_5_of_6_not_4_of_6_and_is_honored_without_posthoc_relaxation"
+  },
+  "crossmodel_candidates": [],
+  "partial_two_model_candidates": [],
+  "authorization": {
+    "freeze_and_run_calibration": false,
+    "run_physical_holdout": false,
+    "run_propagation_terminal": false,
+    "run_neuron_scan": false
+  },
+  "stopping_decision": "close_current_four_partition_direct_child_hypothesis",
+  "claim_boundary": {
+    "strict_group_layer_candidate_is_a_language_path": false,
+    "model_candidate_is_crossmodel_replication": false,
+    "negative_result_excludes_finer_parent_decompositions": false
+  }
+}

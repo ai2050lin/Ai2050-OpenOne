@@ -88,6 +88,8 @@ function AtlasDetail({ atlas }) {
   const phase398 = atlas?.phase398_audit || {};
   const phase399 = atlas?.phase399_audit || {};
   const phase400 = atlas?.phase400_audit || {};
+  const phase401 = atlas?.phase401_audit || {};
+  const phase402 = atlas?.phase402_audit || {};
   const rows = [
     ['模式族物理映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['模型 × 模式族分区', formatNumber(metrics.model_family_partition_count)],
@@ -126,6 +128,22 @@ function AtlasDetail({ atlas }) {
     ['Phase 400 校准守恒单元', `${metrics.phase400_calibration_quality_group_model_cell_count || 0}/${metrics.phase400_calibration_group_model_cell_count || 0}`],
     ['Phase 400 已使用物理留出', `${metrics.phase400_physical_holdout_case_count || 0}/384`],
     ['Phase 400 新增神经元节点', formatNumber(metrics.phase400_new_neuron_node_count)],
+    ['Phase 401 语义正确案例', `${metrics.phase401_behavior_semantic_correct_case_count || 0}/${metrics.phase401_behavior_candidate_case_count || 0}`],
+    ['Phase 401 批形状敏感案例', `${metrics.phase401_batch_sensitive_pilot_case_count || 0}/${metrics.phase401_batch_pilot_case_count || 0}`],
+    ['Phase 401 同形状账本', `${metrics.phase401_instrument_quality_pass_case_count || 0}/${metrics.phase401_instrument_case_count || 0}`],
+    ['Phase 401 严格局部边层', `${metrics.phase401_strict_local_edge_passing_layer_count || 0}/${metrics.phase401_model_surface_layer_count || 0}`],
+    ['Phase 401 特异直接物理边', `${metrics.phase401_direct_local_physical_model_surface_count || 0}/${metrics.phase401_model_surface_count || 0}`],
+    ['Phase 401 跨模型局部边', `${metrics.phase401_crossmodel_local_edge_surface_count || 0}/2`],
+    ['Phase 401 已使用物理留出', `${metrics.phase401_physical_holdout_case_count || 0}/384`],
+    ['Phase 401 新增神经元节点', formatNumber(metrics.phase401_new_neuron_node_count)],
+    ['Phase 402 语义正确案例', `${metrics.phase402_behavior_semantic_correct_case_count || 0}/${metrics.phase402_behavior_candidate_case_count || 0}`],
+    ['Phase 402 行为合格任务面', `${metrics.phase402_eligible_surface_count || 0}/${metrics.phase402_registered_surface_count || 0}`],
+    ['Phase 402 多父分区账本', `${metrics.phase402_instrument_pass_row_count || 0}/${metrics.phase402_instrument_row_count || 0}`],
+    ['Phase 402 严格局部联合单元', `${metrics.phase402_strict_local_joint_cell_count || 0}/${metrics.phase402_joint_group_layer_subset_count || 0}`],
+    ['Phase 402 模型级多父候选', `${metrics.phase402_model_level_joint_parent_candidate_count || 0}/12`],
+    ['Phase 402 跨模型多父任务面', `${metrics.phase402_crossmodel_joint_parent_surface_count || 0}/2`],
+    ['Phase 402 已使用物理留出', `${metrics.phase402_physical_holdout_case_count || 0}/288`],
+    ['Phase 402 新增神经元节点', formatNumber(metrics.phase402_new_neuron_node_count)],
     ['跨模型行为必要性', formatNumber(metrics.phase330_cross_model_behavior_necessity_mechanism_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
@@ -134,7 +152,11 @@ function AtlasDetail({ atlas }) {
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <div style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>
-        {phase400.status
+        {phase402.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。四类互斥注意力 K/V 父分区账本通过 3,328/3,328；13,728 个联合组层子集中只有 8 个早层局部单元通过全部门，模型级和跨模型候选均为零。校准与物理留出未使用，3D 不新增神经元、头或通道节点。`
+          : phase401.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。同执行形状组件账本通过 96/96；独立批敏感性审计有 7/192 个案例发生字段变化。真实关系替换虽然产生局部响应，但严格与敏感性审计均为 0/208 个合格层、0/6 个特异直接物理边。校准和物理留出均未使用，3D 不新增神经元、头或通道节点。`
+          : phase400.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。区间部分序发现图通过 5/6 个模型任务单元，拥有关系出现 1/2 个发现集跨模型候选；但答案预测门为 0/6，校准守恒合同仅通过 23/24 个组模型单元。物理留出保持 0/384，3D 不新增神经元、头或通道节点。`
           : phase399.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。来源到查询、查询整合和终端三类聚合事件在 9/9 个模型任务单元及三份独立数据中复现；但冻结峰值顺序只在 DS7B 角色填槽中三次通过，跨模型任务为 0/3。3D 蓝色事件是模型特异聚合观测，不是注意力头、神经元或因果绑定路径。`
@@ -287,6 +309,12 @@ export function EvidenceKernelDashboard() {
     if (metrics.full_natural_chain_pass_count > 0 && metrics.single_unit_causal_count > 0) {
       return { label: '存在严格闭合机制', detail: '至少一条路径同时通过单元因果和完整自然链。', color: '#34d399' };
     }
+    if ((metrics.phase402_behavior_candidate_case_count || 0) > 0) {
+      return { label: '多父局部迹象未形成模型级机制', detail: '分区账本为 3,328/3,328；严格局部联合单元为 8/13,728，但模型级与跨模型候选均为零，所有下游门保持关闭。', color: '#f59e0b' };
+    }
+    if ((metrics.phase401_behavior_candidate_case_count || 0) > 0) {
+      return { label: '局部响应未形成特异功能边', detail: '执行与语义合同已修复，账本为 96/96；局部边为 0/208 层，校准、物理留出、因果与神经元门均关闭。', color: '#f59e0b' };
+    }
     if ((metrics.phase400_behavior_candidate_case_count || 0) > 0) {
       return { label: '部分序候选未通过验证门', detail: '发现集出现聚合区间图，但预测为 0/6，校准合同为 23/24；物理留出、因果干预与神经元扫描均未开放。', color: '#f59e0b' };
     }
@@ -311,8 +339,10 @@ export function EvidenceKernelDashboard() {
     ['模式族映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['注册机制', formatNumber(metrics.registered_mechanism_count)],
     ['物理组件事件', formatNumber(metrics.component_event_count)],
-    ['Phase400 发现图', `${metrics.phase400_discovery_partial_order_graph_cell_count || 0}/6`],
-    ['Phase400 预测门', `${metrics.phase400_discovery_prediction_pass_cell_count || 0}/6`],
+    ['Phase401 同形状账本', `${metrics.phase401_instrument_quality_pass_case_count || 0}/${metrics.phase401_instrument_case_count || 0}`],
+    ['Phase401 局部边层', `${metrics.phase401_strict_local_edge_passing_layer_count || 0}/${metrics.phase401_model_surface_layer_count || 0}`],
+    ['Phase402 多父分区账本', `${metrics.phase402_instrument_pass_row_count || 0}/${metrics.phase402_instrument_row_count || 0}`],
+    ['Phase402 严格局部联合单元', `${metrics.phase402_strict_local_joint_cell_count || 0}/${metrics.phase402_joint_group_layer_subset_count || 0}`],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
   ];

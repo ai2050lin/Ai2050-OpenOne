@@ -1,0 +1,93 @@
+{
+  "schema_version": "75.7.0",
+  "phase_id": "Phase401-InstrumentAudit",
+  "created_at": "2026-07-13T08:22:48.840744+00:00",
+  "models": {
+    "qwen3": {
+      "schema_version": "75.6.0",
+      "phase_id": "Phase401-InstrumentLedger",
+      "created_at": "2026-07-13T08:21:38.439607+00:00",
+      "model": "qwen3",
+      "case_count": 32,
+      "layer_count": 36,
+      "max_relative_errors": {
+        "attention_probability": 0.0,
+        "attention_output": 0.0004291908,
+        "mlp_output": 0.0004460823,
+        "block_output": 0.0003673683,
+        "next_layer_continuity": 0.0
+      },
+      "ledger_pass_case_count": 32,
+      "exact_replay_pass_case_count": 32,
+      "quality_pass_case_count": 32,
+      "valid": true,
+      "claim_boundary": {
+        "ledger_conservation_is_language_mechanism": false,
+        "exact_replay_is_batch_invariance": false
+      }
+    },
+    "glm4": {
+      "schema_version": "75.6.0",
+      "phase_id": "Phase401-InstrumentLedger",
+      "created_at": "2026-07-13T08:22:10.266348+00:00",
+      "model": "glm4",
+      "case_count": 32,
+      "layer_count": 40,
+      "max_relative_errors": {
+        "attention_probability": 0.0,
+        "attention_output": 0.0004170381,
+        "mlp_output": 0.0003371739,
+        "block_output": 0.0003839728,
+        "next_layer_continuity": 0.0
+      },
+      "ledger_pass_case_count": 32,
+      "exact_replay_pass_case_count": 32,
+      "quality_pass_case_count": 32,
+      "valid": true,
+      "claim_boundary": {
+        "ledger_conservation_is_language_mechanism": false,
+        "exact_replay_is_batch_invariance": false
+      }
+    },
+    "deepseek7b": {
+      "schema_version": "75.6.0",
+      "phase_id": "Phase401-InstrumentLedger",
+      "created_at": "2026-07-13T08:22:31.336413+00:00",
+      "model": "deepseek7b",
+      "case_count": 32,
+      "layer_count": 28,
+      "max_relative_errors": {
+        "attention_probability": 0.0,
+        "attention_output": 0.0029669282,
+        "mlp_output": 0.0025108405,
+        "block_output": 0.0025305445,
+        "next_layer_continuity": 0.0
+      },
+      "ledger_pass_case_count": 32,
+      "exact_replay_pass_case_count": 32,
+      "quality_pass_case_count": 32,
+      "valid": true,
+      "claim_boundary": {
+        "ledger_conservation_is_language_mechanism": false,
+        "exact_replay_is_batch_invariance": false
+      }
+    }
+  },
+  "joint_gate": {
+    "all_three_models_complete": true,
+    "all_cases_all_layers_ledger_pass": true,
+    "all_same_shape_generated_replays_pass": true,
+    "pass": true
+  },
+  "authorization": {
+    "run_discovery_local_edges": true,
+    "run_calibration": false,
+    "open_physical_holdout": false,
+    "head_channel_or_neuron_scan": false
+  },
+  "stopping_decision": null,
+  "claim_boundary": {
+    "instrument_pass_is_a_language_edge": false,
+    "instrument_failure_disproves_internal_language_processing": false
+  }
+}

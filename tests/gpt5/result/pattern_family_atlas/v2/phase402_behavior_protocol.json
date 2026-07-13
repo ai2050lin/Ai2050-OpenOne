@@ -1,0 +1,45 @@
+{
+  "schema_version": "76.1.0",
+  "phase_id": "Phase402-BehaviorProtocol",
+  "created_at": "2026-07-13T09:35:33.390481+00:00",
+  "frozen_multiparent_protocol_sha256": "c2c11ca39a1438d2c6d50e13d02f9cc5b87be71e5567c4a09f7faf6d2c044be7",
+  "denominator": {
+    "surfaces": [
+      "entity_attribute_binding",
+      "role_filling",
+      "coreference_resolution",
+      "two_step_composition",
+      "conditional_presence",
+      "number_agreement"
+    ],
+    "candidate_groups_per_surface": 24,
+    "conditions_per_group": 16,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "candidate_group_count": 144,
+    "candidate_case_count": 6912,
+    "split_group_counts_per_surface": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    }
+  },
+  "lexical_contract": {
+    "entity_pool_size": 25,
+    "object_pool_size": 18,
+    "role_pool_size": 39,
+    "factorial_token_contract_checked_in_each_model": true,
+    "fresh_prompt_hash_against_phase400_and_phase401": true
+  },
+  "authorization": {
+    "run_formal_behavior_batch1": true,
+    "run_internal_before_behavior_freeze": false
+  },
+  "claim_boundary": {
+    "six_surfaces_are_six_closed_language_mechanisms": false,
+    "behavior_success_is_internal_mechanism_evidence": false
+  }
+}

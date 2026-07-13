@@ -1,0 +1,248 @@
+{
+  "schema_version": "75.0.1",
+  "phase_id": "Phase401-LocalEdgeProtocol",
+  "created_at": "2026-07-13T08:03:57.676260+00:00",
+  "objective": "separate_semantic_format_and_stop_spans_under_one_execution_shape_then_test_real_compute_graph_parent_child_responses",
+  "prior_information_boundary": {
+    "phase400_results_used_for_protocol_design_only": true,
+    "phase400_cases_reused": false,
+    "phase400_discovery_or_calibration_reopened": false,
+    "all_phase401_thresholds_frozen_before_phase401_behavior": true
+  },
+  "protocol_amendment_001": {
+    "trigger": "independent_batch_pilot_exposed_that_repeated_target_text_was_incorrectly_counted_as_semantic_failure",
+    "scientific_reason": "target_repetition_belongs_to_format_suffix_or_continuation_and_must_not_be_confounded_with_semantic_content_correctness",
+    "changed_field": "output_span_contract.semantic_match",
+    "old_rule": "target_present_once_and_no_distractor",
+    "new_rule": "target_present_at_least_once_and_no_distractor",
+    "unchanged": [
+      "all_samples",
+      "all_split_assignments",
+      "all_numeric_gates",
+      "all_edge_classes",
+      "all_controls"
+    ],
+    "pre_amendment_outputs_are_instrument_only": true,
+    "all_formal_models_reexecuted_after_amendment": true
+  },
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_contract": {
+    "batch_size": 1,
+    "padding": "none_for_single_unpadded_prompt",
+    "attention_implementation": "eager",
+    "use_cache": true,
+    "do_sample": false,
+    "max_new_tokens": 12,
+    "runtime_dtype_by_model": {
+      "qwen3": "float16",
+      "glm4": "float16",
+      "deepseek7b": "bfloat16"
+    },
+    "behavior_and_trace_execution_shape_identical": true,
+    "execution_shape_is_measurement_machine_state_not_semantic_state": true,
+    "formal_denominator_may_not_use_batch_sensitivity_rows": true
+  },
+  "batch_sensitivity_audit": {
+    "independent_pilot_groups_per_surface": 1,
+    "conditions_per_group": 16,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "batch_sizes": [
+      1,
+      8
+    ],
+    "pilot_case_count_per_batch_shape": 192,
+    "formal_denominator_overlap": false,
+    "comparison_fields": [
+      "generated_token_ids",
+      "semantic_correct",
+      "semantic_span",
+      "format_prefix",
+      "format_suffix",
+      "stop_step"
+    ]
+  },
+  "behavior_denominator": {
+    "surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution",
+      "field_extraction"
+    ],
+    "candidate_groups_per_surface": 24,
+    "conditions_per_group": 16,
+    "candidate_case_count": 4608,
+    "candidate_split_group_counts": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    },
+    "selected_split_group_counts": {
+      "discovery": 8,
+      "calibration": 4,
+      "physical_holdout": 4
+    },
+    "surface_gate": "at_least_8_discovery_4_calibration_4_physical_groups_with_all_16_conditions_semantically_correct_and_span_resolved_in_all_models",
+    "failed_groups_retained_and_never_backfilled": true
+  },
+  "output_span_contract": {
+    "decomposition": [
+      "format_prefix",
+      "semantic_answer",
+      "format_suffix",
+      "stop"
+    ],
+    "semantic_match": "unicode_nfkc_casefolded_whole_word_target_present_at_least_once_and_no_whole_word_distractor_before_stop",
+    "semantic_start": "latest_token_start_of_the_shortest_completion_prefix_whose_decoded_segment_contains_the_target_alias",
+    "semantic_completion": "first_generated_token_step_whose_decoded_prefix_contains_target_alias",
+    "stop": "first_eos_token_or_generation_limit_if_eos_absent",
+    "format_exactness_is_recorded_but_not_a_semantic_behavior_gate": true,
+    "target_repetition_is_recorded_as_format_or_continuation_not_semantic_failure": true,
+    "same_shape_trace_requires_exact_generated_token_replay": true
+  },
+  "instrument_ledger_gates": {
+    "attention_probability_replay_relative_error_max": 0.01,
+    "attention_output_replay_relative_error_max": 0.01,
+    "block_output_replay_relative_error_max": 0.01,
+    "mlp_output_replay_relative_error_max": 0.01,
+    "layer_output_to_next_input_relative_error_max": 1e-06,
+    "all_cases_and_layers_required": true
+  },
+  "edge_classes": {
+    "source_kv_to_query_attention": {
+      "parent": "source_role_key_and_value_states",
+      "child": "query_attention_output",
+      "operation": "replace_role_aligned_source_KV_from_matched_donor_and_recompute_attention_with_recipient_query_mask_and_other_source_states",
+      "language_candidate": true
+    },
+    "query_attention_to_post_attention": {
+      "parent": "query_attention_output",
+      "child": "query_post_attention_residual",
+      "operation": "recipient_layer_input_plus_donor_attention_output",
+      "language_candidate": false,
+      "reason": "architectural_addition_ledger_edge"
+    },
+    "post_attention_to_mlp": {
+      "parent": "query_post_attention_residual",
+      "child": "query_mlp_output",
+      "operation": "recipient_layer_norm_and_mlp_recomputed_on_donor_parent",
+      "language_candidate": true
+    },
+    "mlp_to_layer_output": {
+      "parent": "query_mlp_output",
+      "child": "query_layer_output",
+      "operation": "recipient_post_attention_plus_donor_mlp_output",
+      "language_candidate": false,
+      "reason": "architectural_addition_ledger_edge"
+    },
+    "layer_output_to_next_input": {
+      "parent": "query_layer_output",
+      "child": "next_layer_query_input",
+      "operation": "identity_continuity_check",
+      "language_candidate": false,
+      "reason": "architectural_identity_ledger_edge"
+    }
+  },
+  "intervention_pair_contract": {
+    "true_pair": "same_axis_order_query_with_relation_level_toggled",
+    "directions": "both_R0_to_R1_and_R1_to_R0",
+    "role_alignment": "semantic_role_positions_not_absolute_token_indices",
+    "recipient_other_parents_held_natural": true,
+    "natural_donor_child_is_prediction_target": true,
+    "minimum_informative_baseline_relative_norm": 0.01
+  },
+  "edge_response_fields": {
+    "positive_mass": "sum(max(delta_i,0))",
+    "negative_mass": "sum(max(-delta_i,0))",
+    "net_mass": "sum(delta_i)",
+    "absolute_mass": "positive_mass_plus_negative_mass",
+    "direction_cosine": "cosine(counterfactual_minus_recipient,donor_minus_recipient)",
+    "state_recovery": "1_minus_norm(counterfactual_minus_donor)_over_norm(recipient_minus_donor)"
+  },
+  "discovery_local_edge_gate": {
+    "informative_pair_rate_min": 0.75,
+    "pair_direction_cosine_min": 0.6,
+    "pair_state_recovery_min": 0.2,
+    "pair_pass_rate_min": 0.75,
+    "median_state_recovery_min": 0.25,
+    "qualified_discovery_group_rate_min": 0.75,
+    "layer_selected_on_discovery_only": true,
+    "separate_gate_fields_not_weighted_sum": true
+  },
+  "validation_local_edge_gate": {
+    "informative_pair_rate_min": 0.75,
+    "pair_direction_cosine_min": 0.55,
+    "pair_state_recovery_min": 0.15,
+    "pair_pass_rate_min": 0.75,
+    "median_state_recovery_min": 0.2,
+    "qualified_group_rate_min": 0.75,
+    "discovery_layer_and_role_map_frozen": true,
+    "thresholds_reselected": false
+  },
+  "counterfactual_controls": {
+    "required_separately": [
+      "wrong_source_order_matched_same_target",
+      "wrong_receiver_role",
+      "wrong_semantic_time",
+      "wrong_depth_quarter_model_shift",
+      "source_role_permutation",
+      "same_content_wrong_structure",
+      "deterministic_random_natural_donor",
+      "same_absolute_mass_sign_permuted"
+    ],
+    "true_minus_each_control_median_recovery_min": 0.1,
+    "true_minus_each_control_pair_pass_rate_min": 0.2,
+    "control_failure_cannot_be_averaged_away": true
+  },
+  "semantic_prediction_gate": {
+    "target": "donor_target_minus_recipient_target_logit_lens_competition",
+    "pair_positive_shift_rate_min": 0.65,
+    "median_normalized_competition_recovery_min": 0.1,
+    "improvement_over_each_control_min": 0.1,
+    "direct_child_only_without_semantic_prediction": "register_local_physical_edge_not_language_path"
+  },
+  "crossmodel_functional_equivalence": {
+    "all_three_models_required": true,
+    "glm4_required": true,
+    "same_source_receiver_roles_required": true,
+    "same_component_edge_class_required": true,
+    "same_semantic_time_required": true,
+    "same_sign_class_required": true,
+    "same_control_outcome_required": true,
+    "relative_depth_zone_agreement_required": true,
+    "relative_depth_shift_allowed": true,
+    "absolute_layer_head_or_neuron_identity_required": false,
+    "posthoc_rotation_or_mapping_allowed": false
+  },
+  "stage_gate": "execution_and_semantic_and_ledger_and_local_edge_and_prediction_and_calibration_must_all_pass_before_physical_holdout",
+  "authorization": {
+    "run_behavior_after_protocol_freeze": true,
+    "run_instrument_after_behavior_surface_gate": true,
+    "run_discovery_after_instrument_ledger_gate": true,
+    "run_calibration_after_discovery_local_and_prediction_gates": true,
+    "open_physical_after_calibration_joint_gate": true,
+    "head_channel_or_neuron_scan": false
+  },
+  "stopping_rules": {
+    "same_shape_trace_unstable": "repair_instrument_and_stop_mechanism_analysis",
+    "ledger_fails": "stop_before_local_edge_analysis",
+    "direct_child_passes_terminal_prediction_fails": "register_local_physical_edge_only",
+    "any_required_control_matches_true_edge": "register_common_numeric_response_not_functional_edge",
+    "single_model_only": "register_model_specific_edge_only",
+    "no_calibration_surface": "keep_physical_and_causal_stages_closed"
+  },
+  "claim_boundary": {
+    "execution_shape_is_a_language_latent_variable": false,
+    "architecture_ledger_edge_is_a_language_mechanism": false,
+    "local_parent_response_is_a_complete_language_path": false,
+    "observational_recovery_is_natural_necessity": false,
+    "phase401_success_is_language_encoding_closure": false
+  }
+}

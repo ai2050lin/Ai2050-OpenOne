@@ -1,0 +1,43 @@
+{
+  "schema_version": "75.1.0",
+  "phase_id": "Phase401-BehaviorProtocol",
+  "created_at": "2026-07-13T07:57:39.069728+00:00",
+  "frozen_local_edge_protocol_sha256": "80bd400aab5531302dc16580ddec5cb5e9cc406034d07dfc0a86e5703ddaff07",
+  "denominator": {
+    "task_surfaces": [
+      "possession_relation",
+      "role_filling",
+      "coreference_resolution",
+      "field_extraction"
+    ],
+    "candidate_groups_per_surface": 24,
+    "conditions_per_group": 16,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "candidate_case_count": 4608,
+    "candidate_split_group_counts": {
+      "discovery": 12,
+      "calibration": 6,
+      "physical_holdout": 6
+    }
+  },
+  "batch_sensitivity_pilot": {
+    "group_count": 4,
+    "case_count_per_execution_shape": 192,
+    "formal_denominator_overlap": false
+  },
+  "authorization": {
+    "run_batch_sensitivity_pilot": true,
+    "run_formal_behavior": true,
+    "run_internal_before_behavior_freeze": false,
+    "run_head_channel_or_neuron_scan": false
+  },
+  "claim_boundary": {
+    "fresh_behavior_is_a_local_edge": false,
+    "batch_invariance_is_assumed": false,
+    "language_encoding_closed": false
+  }
+}

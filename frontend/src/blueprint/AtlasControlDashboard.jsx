@@ -955,6 +955,60 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
     });
   }, [progress]);
 
+  const localEdgeRows = useMemo(() => {
+    const stage = progress?.local_edge_stage || {};
+    const definitions = [
+      ['behavior_candidate_cases', '冻结行为候选案例'],
+      ['semantic_correct_cases', '语义答案正确案例'],
+      ['complete_three_model_groups', '三模型完整行为组'],
+      ['eligible_surfaces', '行为合格任务面'],
+      ['batch_shape_all_field_matches', '批形状全字段一致案例'],
+      ['instrument_quality_cases', '同形状账本合格案例'],
+      ['discovery_model_cases', '局部边发现案例'],
+      ['strict_local_edge_layers', '严格局部边合格层'],
+      ['direct_local_physical_model_surface_cells', '特异直接物理边单元'],
+      ['crossmodel_local_edge_surfaces', '跨模型局部边任务面'],
+      ['calibration_cases_consumed', '已使用校准案例'],
+      ['physical_holdout_cases_consumed', '已使用物理留出案例'],
+      ['joint_causal_intervention_authorized', '联合因果干预授权'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const multiParentRows = useMemo(() => {
+    const stage = progress?.multiparent_direct_child_stage || {};
+    const definitions = [
+      ['behavior_candidate_cases', '冻结行为候选案例'],
+      ['semantic_correct_cases', '语义答案正确案例'],
+      ['complete_three_model_groups', '三模型完整行为组'],
+      ['eligible_surfaces', '行为合格任务面'],
+      ['instrument_rows', '多父分区账本合格行'],
+      ['discovery_model_cases', '多父发现案例'],
+      ['true_base_joint_cells', '真实响应合格联合单元'],
+      ['above_best_singleton_cells', '超过最佳单父联合单元'],
+      ['all_control_specific_cells', '独立排除全部控制单元'],
+      ['strict_local_joint_cells', '严格局部联合单元'],
+      ['model_level_joint_parent_candidates', '模型级多父候选'],
+      ['crossmodel_joint_parent_surfaces', '跨模型多父任务面'],
+      ['calibration_cases_consumed', '已使用校准案例'],
+      ['physical_holdout_cases_consumed', '已使用物理留出案例'],
+      ['joint_causal_intervention_authorized', '联合因果干预授权'],
+      ['complete_language_paths', '完整语言路径'],
+      ['single_neuron_causal_paths', '单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
     const latest = progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2';
@@ -1067,19 +1121,43 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         items: dynamicPartialOrderRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
       };
     }
+    if (overallLatest && progress?.local_edge_stage) {
+      overallLatest.summary = '同执行形状账本已经通过；真实关系替换产生局部响应，但未超过全部反事实控制。';
+      overallLatest.value = '96/96 ledger / 0/208 local-edge layers';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：执行同构、语义跨度与局部边审计`,
+        text: 'Phase401 在全新 4,608 个三模型行为案例上统一使用 batch=1，并把格式前缀、语义答案、格式后缀和停止分开记录。独立批敏感性样本有 7/192 个案例发生至少一个字段变化；同形状内部账本为 96/96。三模型共采集 239,616 条真实关系替换与八类控制响应。真实替换能在部分早层恢复注意力状态，但三模型两个任务的 208 个模型任务层都没有同时通过组门、语义门和八类控制，直接特异物理边为 0/6。',
+        value: 'Exact ledger / observable response / functional edge rejected',
+        valueHint: '同目标控制与原语义差值门存在预注册矛盾；严格审计和不具放行权的 N/A 敏感性审计均为 0 层。校准与物理留出均未使用，3D 不新增头、通道或神经元节点。',
+        items: localEdgeRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.multiparent_direct_child_stage) {
+      overallLatest.summary = '四类真实 K/V 父分区已完成全子集审计；出现 8 个局部联合单元，但没有模型级或跨模型候选。';
+      overallLatest.value = '8/13,728 local cells / 0 model candidates';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：多父条件状态与直接子状态审计`,
+        text: 'Phase402 冻结六个任务面、6,912 个三模型行为案例，其中 5,585 例语义正确，只有角色填槽和条件存在满足三分割行为门。四类互斥且守恒的真实注意力 K/V 父分区通过 3,328/3,328 条重放账本。发现集保留 2,875,392 条私有配对指标，并把 13,728 个联合组层子集依次与真实响应门、最佳包含单父和每项适用控制比较。最终只有 8 个早层 source_structure + query_local 局部单元同时通过，Qwen3 为 0、GLM4 为 1、DS7B 为 7；模型级、双模型和跨模型候选均为 0。',
+        value: 'Exact parent ledger / local hint only / model candidate rejected',
+        valueHint: '冻结小数阈值 0.666666667 在 6 组分母上实际要求 5/6，本轮按原合同执行且不事后放宽。校准和物理留出均未使用，终端生成、自然必要性、因果闭合及神经元扫描全部关闭；3D 只显示聚合局部迹象，不新增具体头、通道或神经元。',
+        items: multiParentRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
     const engineering = sections.find((item) => item.id === 'engineering_latest');
     if (engineering) {
       engineering.detail = {
         ...engineering.detail,
         items: overallValid
           ? progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`)
-          : (dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
+          : (multiParentRows.length ? multiParentRows : localEdgeRows.length ? localEdgeRows : dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
             .map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
         valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${latest}。单一全局完成百分比：${overallValid ? '有效' : '无效'}。`,
       };
     }
     return sections;
-  }, [bindingSeparationRows, clientIndex, dynamicPartialOrderRows, exactEventRows, factorSeparatedBindingRows, jointFormationRows, manifest, multiPositionDynamicBindingRows, orderConditionedBindingRows, overallValid, progress, progressMap, relationRows]);
+  }, [bindingSeparationRows, clientIndex, dynamicPartialOrderRows, exactEventRows, factorSeparatedBindingRows, jointFormationRows, localEdgeRows, manifest, multiParentRows, multiPositionDynamicBindingRows, orderConditionedBindingRows, overallValid, progress, progressMap, relationRows]);
 
   const planDetail = useMemo(() => {
     return planCards.find((item) => item.id === activePlan)?.detail || null;

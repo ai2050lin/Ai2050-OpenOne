@@ -1,0 +1,525 @@
+{
+  "schema_version": "75.10.0",
+  "phase_id": "Phase401-LocalEdgeDiscoveryAudit",
+  "created_at": "2026-07-13T08:43:43.750096+00:00",
+  "objective": "test_direct_source_KV_to_query_attention_edges_with_eight_controls",
+  "source_completeness": {
+    "qwen3": {
+      "collection_valid": true,
+      "group_count": 16,
+      "case_count": 256,
+      "layer_count": 36,
+      "aggregate_row_count": 5184,
+      "expected_aggregate_row_count": 5184
+    },
+    "glm4": {
+      "collection_valid": true,
+      "group_count": 16,
+      "case_count": 256,
+      "layer_count": 40,
+      "aggregate_row_count": 5760,
+      "expected_aggregate_row_count": 5760
+    },
+    "deepseek7b": {
+      "collection_valid": true,
+      "group_count": 16,
+      "case_count": 256,
+      "layer_count": 28,
+      "aggregate_row_count": 4032,
+      "expected_aggregate_row_count": 4032
+    }
+  },
+  "all_source_denominators_complete": true,
+  "frozen_gate_source": "/home/rankrank/Documents/OpenOne/Ai2050-OpenOne/tests/gpt5/result/phase401_local_edge_graph/phase401_local_edge_execution_freeze.json",
+  "protocol_contradiction": {
+    "present": true,
+    "control": "wrong_source_order_matched_same_target",
+    "reason": "control_requires_same_target_but_frozen_semantic_gate_requires_recipient_and_donor_target_ids_to_differ",
+    "primary_treatment": "undefined_semantic_comparison_fails_strict_all_fields_gate",
+    "sensitivity_treatment": "semantic_comparison_marked_not_applicable_for_this_control_only",
+    "sensitivity_has_authorization_power": false
+  },
+  "model_surface_summary": {
+    "qwen3": {
+      "possession_relation": {
+        "layer_count": 36,
+        "strict_passing_layer_count": 0,
+        "sensitivity_passing_layer_count": 0,
+        "strict_candidate": null,
+        "sensitivity_candidate_non_authorizing": null,
+        "diagnostic_best_layer_non_authorizing": {
+          "layer_index": 7,
+          "layer_count": 36,
+          "relative_depth_zone": "early",
+          "qualified_true_group_rate": 0.0,
+          "sensitivity_controls_passed": 5,
+          "control_count": 8,
+          "failed_gates": [
+            "qualified_group_rate",
+            "control_attention_recovery",
+            "control_pair_pass_rate",
+            "control_semantic_defined",
+            "control_semantic_recovery"
+          ]
+        },
+        "true_group_component_maxima_non_authorizing": {
+          "attention_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 1
+          },
+          "attention_pair_pass": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 2
+          },
+          "attention_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.25,
+            "earliest_layer_at_maximum": 2
+          },
+          "semantic_informative": {
+            "maximum_pass_count": 2,
+            "maximum_pass_rate": 0.25,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 19
+          },
+          "semantic_positive_shift": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.65,
+            "earliest_layer_at_maximum": 0
+          },
+          "semantic_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.1,
+            "earliest_layer_at_maximum": 0
+          }
+        },
+        "strict_failure_layer_counts": {
+          "control_attention_recovery": 36,
+          "control_pair_pass_rate": 36,
+          "control_semantic_defined": 36,
+          "control_semantic_recovery": 36,
+          "qualified_group_rate": 36
+        },
+        "undefined_semantic_layer_counts_by_control": {
+          "deterministic_random_natural_donor": 0,
+          "same_absolute_mass_sign_permuted": 0,
+          "same_content_wrong_structure": 0,
+          "source_role_permutation": 0,
+          "wrong_depth_quarter_model_shift": 0,
+          "wrong_receiver_role": 0,
+          "wrong_semantic_time": 0,
+          "wrong_source_order_matched_same_target": 36
+        }
+      },
+      "role_filling": {
+        "layer_count": 36,
+        "strict_passing_layer_count": 0,
+        "sensitivity_passing_layer_count": 0,
+        "strict_candidate": null,
+        "sensitivity_candidate_non_authorizing": null,
+        "diagnostic_best_layer_non_authorizing": {
+          "layer_index": 2,
+          "layer_count": 36,
+          "relative_depth_zone": "early",
+          "qualified_true_group_rate": 0.0,
+          "sensitivity_controls_passed": 5,
+          "control_count": 8,
+          "failed_gates": [
+            "qualified_group_rate",
+            "control_attention_recovery",
+            "control_pair_pass_rate",
+            "control_semantic_defined",
+            "control_semantic_recovery"
+          ]
+        },
+        "true_group_component_maxima_non_authorizing": {
+          "attention_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 1
+          },
+          "attention_pair_pass": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 2
+          },
+          "attention_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.25,
+            "earliest_layer_at_maximum": 2
+          },
+          "semantic_informative": {
+            "maximum_pass_count": 1,
+            "maximum_pass_rate": 0.125,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 12
+          },
+          "semantic_positive_shift": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.65,
+            "earliest_layer_at_maximum": 0
+          },
+          "semantic_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.1,
+            "earliest_layer_at_maximum": 0
+          }
+        },
+        "strict_failure_layer_counts": {
+          "control_attention_recovery": 36,
+          "control_pair_pass_rate": 36,
+          "control_semantic_defined": 36,
+          "control_semantic_recovery": 36,
+          "qualified_group_rate": 36
+        },
+        "undefined_semantic_layer_counts_by_control": {
+          "deterministic_random_natural_donor": 0,
+          "same_absolute_mass_sign_permuted": 0,
+          "same_content_wrong_structure": 0,
+          "source_role_permutation": 0,
+          "wrong_depth_quarter_model_shift": 0,
+          "wrong_receiver_role": 0,
+          "wrong_semantic_time": 0,
+          "wrong_source_order_matched_same_target": 36
+        }
+      }
+    },
+    "glm4": {
+      "possession_relation": {
+        "layer_count": 40,
+        "strict_passing_layer_count": 0,
+        "sensitivity_passing_layer_count": 0,
+        "strict_candidate": null,
+        "sensitivity_candidate_non_authorizing": null,
+        "diagnostic_best_layer_non_authorizing": {
+          "layer_index": 5,
+          "layer_count": 40,
+          "relative_depth_zone": "early",
+          "qualified_true_group_rate": 0.0,
+          "sensitivity_controls_passed": 4,
+          "control_count": 8,
+          "failed_gates": [
+            "qualified_group_rate",
+            "control_attention_recovery",
+            "control_pair_pass_rate",
+            "control_semantic_defined",
+            "control_semantic_recovery"
+          ]
+        },
+        "true_group_component_maxima_non_authorizing": {
+          "attention_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 1
+          },
+          "attention_pair_pass": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 1
+          },
+          "attention_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.25,
+            "earliest_layer_at_maximum": 1
+          },
+          "semantic_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 32
+          },
+          "semantic_positive_shift": {
+            "maximum_pass_count": 7,
+            "maximum_pass_rate": 0.875,
+            "threshold": 0.65,
+            "earliest_layer_at_maximum": 1
+          },
+          "semantic_median_recovery": {
+            "maximum_pass_count": 6,
+            "maximum_pass_rate": 0.75,
+            "threshold": 0.1,
+            "earliest_layer_at_maximum": 0
+          }
+        },
+        "strict_failure_layer_counts": {
+          "control_attention_recovery": 40,
+          "control_pair_pass_rate": 40,
+          "control_semantic_defined": 40,
+          "control_semantic_recovery": 40,
+          "qualified_group_rate": 40
+        },
+        "undefined_semantic_layer_counts_by_control": {
+          "deterministic_random_natural_donor": 0,
+          "same_absolute_mass_sign_permuted": 0,
+          "same_content_wrong_structure": 0,
+          "source_role_permutation": 0,
+          "wrong_depth_quarter_model_shift": 0,
+          "wrong_receiver_role": 0,
+          "wrong_semantic_time": 0,
+          "wrong_source_order_matched_same_target": 40
+        }
+      },
+      "role_filling": {
+        "layer_count": 40,
+        "strict_passing_layer_count": 0,
+        "sensitivity_passing_layer_count": 0,
+        "strict_candidate": null,
+        "sensitivity_candidate_non_authorizing": null,
+        "diagnostic_best_layer_non_authorizing": {
+          "layer_index": 3,
+          "layer_count": 40,
+          "relative_depth_zone": "early",
+          "qualified_true_group_rate": 0.0,
+          "sensitivity_controls_passed": 4,
+          "control_count": 8,
+          "failed_gates": [
+            "qualified_group_rate",
+            "control_attention_recovery",
+            "control_pair_pass_rate",
+            "control_semantic_defined",
+            "control_semantic_recovery"
+          ]
+        },
+        "true_group_component_maxima_non_authorizing": {
+          "attention_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 1
+          },
+          "attention_pair_pass": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 1
+          },
+          "attention_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.25,
+            "earliest_layer_at_maximum": 1
+          },
+          "semantic_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 31
+          },
+          "semantic_positive_shift": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.65,
+            "earliest_layer_at_maximum": 0
+          },
+          "semantic_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.1,
+            "earliest_layer_at_maximum": 0
+          }
+        },
+        "strict_failure_layer_counts": {
+          "control_attention_recovery": 40,
+          "control_pair_pass_rate": 40,
+          "control_semantic_defined": 40,
+          "control_semantic_recovery": 40,
+          "qualified_group_rate": 40
+        },
+        "undefined_semantic_layer_counts_by_control": {
+          "deterministic_random_natural_donor": 0,
+          "same_absolute_mass_sign_permuted": 0,
+          "same_content_wrong_structure": 0,
+          "source_role_permutation": 0,
+          "wrong_depth_quarter_model_shift": 0,
+          "wrong_receiver_role": 0,
+          "wrong_semantic_time": 0,
+          "wrong_source_order_matched_same_target": 40
+        }
+      }
+    },
+    "deepseek7b": {
+      "possession_relation": {
+        "layer_count": 28,
+        "strict_passing_layer_count": 0,
+        "sensitivity_passing_layer_count": 0,
+        "strict_candidate": null,
+        "sensitivity_candidate_non_authorizing": null,
+        "diagnostic_best_layer_non_authorizing": {
+          "layer_index": 5,
+          "layer_count": 28,
+          "relative_depth_zone": "early",
+          "qualified_true_group_rate": 0.0,
+          "sensitivity_controls_passed": 4,
+          "control_count": 8,
+          "failed_gates": [
+            "qualified_group_rate",
+            "control_attention_recovery",
+            "control_pair_pass_rate",
+            "control_semantic_recovery"
+          ]
+        },
+        "true_group_component_maxima_non_authorizing": {
+          "attention_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 0
+          },
+          "attention_pair_pass": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 5
+          },
+          "attention_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.25,
+            "earliest_layer_at_maximum": 5
+          },
+          "semantic_informative": {
+            "maximum_pass_count": 1,
+            "maximum_pass_rate": 0.125,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 5
+          },
+          "semantic_positive_shift": {
+            "maximum_pass_count": 6,
+            "maximum_pass_rate": 0.75,
+            "threshold": 0.65,
+            "earliest_layer_at_maximum": 27
+          },
+          "semantic_median_recovery": {
+            "maximum_pass_count": 7,
+            "maximum_pass_rate": 0.875,
+            "threshold": 0.1,
+            "earliest_layer_at_maximum": 0
+          }
+        },
+        "strict_failure_layer_counts": {
+          "control_attention_recovery": 28,
+          "control_pair_pass_rate": 28,
+          "control_semantic_defined": 11,
+          "control_semantic_recovery": 28,
+          "qualified_group_rate": 28
+        },
+        "undefined_semantic_layer_counts_by_control": {
+          "deterministic_random_natural_donor": 0,
+          "same_absolute_mass_sign_permuted": 0,
+          "same_content_wrong_structure": 0,
+          "source_role_permutation": 0,
+          "wrong_depth_quarter_model_shift": 0,
+          "wrong_receiver_role": 0,
+          "wrong_semantic_time": 0,
+          "wrong_source_order_matched_same_target": 11
+        }
+      },
+      "role_filling": {
+        "layer_count": 28,
+        "strict_passing_layer_count": 0,
+        "sensitivity_passing_layer_count": 0,
+        "strict_candidate": null,
+        "sensitivity_candidate_non_authorizing": null,
+        "diagnostic_best_layer_non_authorizing": {
+          "layer_index": 1,
+          "layer_count": 28,
+          "relative_depth_zone": "early",
+          "qualified_true_group_rate": 0.0,
+          "sensitivity_controls_passed": 4,
+          "control_count": 8,
+          "failed_gates": [
+            "qualified_group_rate",
+            "control_attention_recovery",
+            "control_pair_pass_rate",
+            "control_semantic_defined",
+            "control_semantic_recovery"
+          ]
+        },
+        "true_group_component_maxima_non_authorizing": {
+          "attention_informative": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 0
+          },
+          "attention_pair_pass": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 5
+          },
+          "attention_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.25,
+            "earliest_layer_at_maximum": 5
+          },
+          "semantic_informative": {
+            "maximum_pass_count": 1,
+            "maximum_pass_rate": 0.125,
+            "threshold": 0.75,
+            "earliest_layer_at_maximum": 0
+          },
+          "semantic_positive_shift": {
+            "maximum_pass_count": 7,
+            "maximum_pass_rate": 0.875,
+            "threshold": 0.65,
+            "earliest_layer_at_maximum": 5
+          },
+          "semantic_median_recovery": {
+            "maximum_pass_count": 8,
+            "maximum_pass_rate": 1.0,
+            "threshold": 0.1,
+            "earliest_layer_at_maximum": 0
+          }
+        },
+        "strict_failure_layer_counts": {
+          "control_attention_recovery": 28,
+          "control_pair_pass_rate": 28,
+          "control_semantic_defined": 28,
+          "control_semantic_recovery": 28,
+          "qualified_group_rate": 28
+        },
+        "undefined_semantic_layer_counts_by_control": {
+          "deterministic_random_natural_donor": 0,
+          "same_absolute_mass_sign_permuted": 0,
+          "same_content_wrong_structure": 0,
+          "source_role_permutation": 0,
+          "wrong_depth_quarter_model_shift": 0,
+          "wrong_receiver_role": 0,
+          "wrong_semantic_time": 0,
+          "wrong_source_order_matched_same_target": 28
+        }
+      }
+    }
+  },
+  "strict_crossmodel_candidates": [],
+  "sensitivity_crossmodel_candidates_non_authorizing": [],
+  "authorization": {
+    "run_calibration": false,
+    "run_physical_holdout": false,
+    "run_head_channel_neuron_scan": false,
+    "reason": "strict_crossmodel_candidate_required_before_calibration;_physical_holdout_requires_independent_calibration_pass"
+  },
+  "claim_boundary": {
+    "direct_local_response_is_language_mechanism": false,
+    "logit_lens_competition_is_generated_behavior": false,
+    "sensitivity_candidate_is_confirmed_candidate": false,
+    "architecture_edge_and_language_specific_edge_are_separate": true
+  }
+}
