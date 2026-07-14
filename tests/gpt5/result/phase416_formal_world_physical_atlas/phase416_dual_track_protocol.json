@@ -1,0 +1,109 @@
+{
+  "schema_version": "89.0.0",
+  "phase_id": "Phase416-FormalWorldPhysicalAtlas",
+  "created_at": "2026-07-14T03:20:24.737021+00:00",
+  "objective": "qualify_real_collectors_then_map_observer_independent_formal_world_physical_distributions",
+  "source_case_bank": "tests/gpt5/result/phase347_three_core_natural_trace/three_core_natural_physical_trace/phase347_registered_cases.jsonl",
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "case_count": 165,
+  "case_count_per_model": 55,
+  "mechanism_quotas_per_model": {
+    "context_relation_binding": 6,
+    "parameter_knowledge_retrieval": 6,
+    "explicit_copy_control": 5,
+    "two_hop_entailment": 6,
+    "direct_fact_control": 5,
+    "sentence_past_tense": 6,
+    "no_morphology_control": 5,
+    "answer_only_protocol": 6,
+    "contiguous_multi_token_answer": 5,
+    "simple_no_source_answer": 5
+  },
+  "track_contract": {
+    "formal_world": {
+      "semantics": "executable_frozen_target_and_distractor_contract",
+      "external_human_review_required_for_raw_collection": false,
+      "observer_required_for_raw_collection": false,
+      "collector_equivalence_required": true,
+      "functional_label_requires_qualified_observer": true,
+      "claim_scope": "formal_world_only"
+    },
+    "natural_language_externalization": {
+      "external_human_review_required": true,
+      "completed_reviewer_count": 0,
+      "authorized": false
+    }
+  },
+  "collector_gates": {
+    "direct_vs_hook_terminal_logit_max_abs": 0.02,
+    "direct_vs_hook_terminal_js": 1e-06,
+    "layer_output_max_abs": 0.02,
+    "component_ledger_relative_error": 0.01,
+    "chunked_cache_terminal_logit_max_abs": 0.125,
+    "chunked_cache_terminal_js": 1e-06,
+    "chunked_cache_top1_exact_required": true,
+    "chunked_cache_relative_error": 0.01,
+    "checkpoint_replay_terminal_logit_max_abs": 0.02,
+    "checkpoint_replay_terminal_js": 1e-06,
+    "greedy_generation_token_exact_required": true,
+    "greedy_generation_score_max_abs": 0.03,
+    "required_case_pass_count": 165
+  },
+  "public_calibration": {
+    "excluded_from_evaluation_denominator": true,
+    "excluded_cell": {
+      "mechanism_id": "answer_only_protocol",
+      "item_index": 0,
+      "template_id": "format_a"
+    },
+    "observed_chunked_cache_terminal_logit_max_abs": 0.07421875,
+    "observed_chunked_cache_relative_error": 0.005421875510364771,
+    "observed_terminal_token_exact": true,
+    "frozen_fp16_logit_tolerance_after_calibration": 0.125,
+    "evaluation_cases_are_disjoint_from_calibration_cell": true
+  },
+  "behavior_gate": {
+    "minimum_family_case_count": 5,
+    "minimum_target_event_match_rate": 0.75,
+    "scope": "model_by_formal_family",
+    "failure_effect": "withhold_functional_family_label_but_keep_instrument_rows"
+  },
+  "physical_contract": {
+    "all_layers": true,
+    "all_prompt_positions_reduced": true,
+    "position_roles": [
+      "source",
+      "query",
+      "answer_start"
+    ],
+    "core_components": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "residual_increment",
+      "layer_output"
+    ],
+    "subcomponents": [
+      "q_projection",
+      "k_projection",
+      "v_projection",
+      "mlp_gate",
+      "mlp_up",
+      "mlp_product"
+    ],
+    "lossless_anchor_vectors_per_model": 4,
+    "observer_index": null,
+    "causal": false
+  },
+  "stop_rules": [
+    "collector_case_failure_blocks_all_new_physical_collection_for_that_model",
+    "behavior_family_failure_withholds_family_functional_interpretation",
+    "high_event_panel_outside_mass_blocks_panel_summary",
+    "no_observer_label_before_frozen_holdout_qualification",
+    "no_causal_or_neuron_stage_from_descriptive_physical_results"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": "94.0.0",
+  "phase_id": "Phase421-BalancedBoundaryDenominator",
+  "created_at": "2026-07-14T07:16:47.086798+00:00",
+  "objective": "balance_history_relation_boundary_before_incremental_typed_path_prediction",
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "group_count": 96,
+  "condition_count": 31104,
+  "split_count": {
+    "discovery": 52,
+    "calibration": 20,
+    "behavior_holdout": 16,
+    "physical_holdout": 8
+  },
+  "family_count": {
+    "knowledge_network": 24,
+    "reasoning": 24,
+    "grammar": 24,
+    "protocol_control": 24
+  },
+  "registered_prompt_operations": {
+    "current_support_multiplicity": [
+      1,
+      2,
+      3
+    ],
+    "history_reliability_numeric_cue": [
+      1,
+      2,
+      3
+    ],
+    "history_relation": [
+      "compatible",
+      "conflict",
+      "irrelevant"
+    ],
+    "operations_are_not_assumed_latent_scalar_ground_truth": true
+  },
+  "behavior_contract": {
+    "primary": "continuous_first_step_target_minus_opposite_logit_margin",
+    "secondary_generation_panel_per_model": 576,
+    "generation_horizon_initial": 12,
+    "generation_horizon_extended": 24,
+    "balance_near_zero_absolute_margin": 0.25,
+    "balance_each_sign_min_rate": 0.2,
+    "balance_largest_sign_max_rate": 0.7
+  },
+  "physical_contract": {
+    "pre_registered_group_count": 28,
+    "conditions_per_model": 1344,
+    "support_levels": [
+      1,
+      3
+    ],
+    "reliability_levels": [
+      1,
+      3
+    ],
+    "physical_holdout_requires_incremental_prediction": true,
+    "physical_holdout_is_sealed": true,
+    "causal_intervention_authorized": false
+  },
+  "geometry_contract": {
+    "parallel_gain": "dot(delta_mlp,delta_attn)/(norm(delta_attn)^2+eps)",
+    "orthogonal_rewrite": "norm(delta_mlp-g_parallel*delta_attn)/(norm(delta_attn)+eps)",
+    "total_write_ratio": "norm(delta_mlp)/(norm(delta_attn)+eps)",
+    "repeat_noise_floor_required": true,
+    "minimum_numeric_floor": 1e-06
+  },
+  "prediction_contract": {
+    "baseline_and_path_fit_on_discovery_only": true,
+    "calibration_and_behavior_holdout_reported_separately": true,
+    "minimum_relative_squared_error_reduction": 0.05,
+    "both_holdouts_must_pass": true
+  },
+  "claim_boundary": "balanced_behavior_and_development_physical_prediction_no_causal_or_neuron_claim"
+}

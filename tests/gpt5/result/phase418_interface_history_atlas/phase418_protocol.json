@@ -1,0 +1,98 @@
+{
+  "schema_version": "92.0.0",
+  "phase_id": "Phase418-InterfaceHistoryRegisteredDenominator",
+  "created_at": "2026-07-14T04:37:38.720878+00:00",
+  "objective": "map_paired_interface_history_physical_differences_without_claiming_token_level_orthogonality",
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "families": [
+    "grammar",
+    "knowledge_network",
+    "protocol_control",
+    "reasoning"
+  ],
+  "semantic_cases_per_family": 10,
+  "semantic_cases_per_model": 40,
+  "conditions_per_semantic_case": 10,
+  "condition_count_per_model": 400,
+  "condition_count": 1200,
+  "interfaces": [
+    "chat",
+    "completion"
+  ],
+  "histories": [
+    "none",
+    "compatible",
+    "irrelevant",
+    "conflict",
+    "override"
+  ],
+  "factor_notes": {
+    "none": "current task only",
+    "compatible": "prior same-task answer agrees with the registered target",
+    "irrelevant": "prior unrelated exchange provides a length/content control",
+    "conflict": "prior same-task answer is a registered distractor",
+    "override": "conflicting prior plus an explicit current-turn override; composite, not a pure history level"
+  },
+  "prompt_contract": {
+    "current_task_text_unchanged_for_pure_history_levels": true,
+    "override_current_task_has_registered_override_prefix": true,
+    "shared_terminal_literal": "Final answer:",
+    "chat_uses_model_local_chat_template": true,
+    "completion_uses_frozen_plain_narrative_serialization": true,
+    "completion_avoids_chat_like_pseudo_role_markers": true,
+    "record_full_prompt_hash_and_token_count": true,
+    "require_exact_prompt_length_across_conditions": false,
+    "require_shared_terminal_suffix_token_ids_within_model": true
+  },
+  "execution_contract": {
+    "native_model_generate": true,
+    "passive_hooks_already_qualified_by_phase417": true,
+    "max_new_tokens": 4,
+    "collect_prompt_prefill_current_prediction_position": true,
+    "ignore_cached_vectors_for_factor_map": true,
+    "core_components": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "residual_increment",
+      "layer_output"
+    ]
+  },
+  "registered_contrasts": {
+    "history": "interface/history minus same-interface/none",
+    "interface": "completion/history minus chat/history",
+    "interaction": "(completion/history-completion/none)-(chat/history-chat/none)"
+  },
+  "analysis_contract": {
+    "absolute_scale_audit": true,
+    "relative_write_rate": true,
+    "layer_local_median_mad_standardization": true,
+    "exact_vector_delta_direction_consistency": true,
+    "token_length_delta_strata": [
+      0,
+      2,
+      8
+    ],
+    "discovery_and_calibration_kept_separate": true,
+    "cross_model_hidden_spaces_not_directly_aligned": true,
+    "no_functional_name_from_high_norm_or_high_z_alone": true
+  },
+  "behavior_gate": {
+    "minimum_cases_per_model_family_interface_history": 10,
+    "minimum_target_event_match_rate_for_functional_cell": 0.7,
+    "failure_effect": "retain_physical_rows_but_withhold_functional_cell_interpretation"
+  },
+  "stop_rules": [
+    "terminal_suffix_token_alignment_failure_blocks_model_execution",
+    "nonfinite_or_component_ledger_failure_blocks_model_atlas",
+    "length_or_position_dominance_blocks_interface_history_mechanism_claim",
+    "late_depth_absolute_norm_dominance_is_scale_bias_not_mechanism",
+    "descriptive_direction_consistency_does_not_authorize_causal_or_neuron_claims",
+    "override_condition_is_never_interpreted_as_a_pure_history_main_effect"
+  ],
+  "claim_boundary": "paired_formal_world_interface_history_behavior_and_reduced_physical_difference_atlas_only"
+}

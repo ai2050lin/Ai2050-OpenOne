@@ -1,0 +1,76 @@
+{
+  "schema_version": "93.0.0",
+  "phase_id": "Phase420-TypedNaturalPathDenominator",
+  "created_at": "2026-07-14T05:40:36.293084+00:00",
+  "objective": "trace_typed_history_and_current_source_writes_after_full_current_by_history_identity_cross",
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "interfaces": [
+    "chat",
+    "completion"
+  ],
+  "current_identities": [
+    "a",
+    "b"
+  ],
+  "history_identities": [
+    "a",
+    "b"
+  ],
+  "group_count": 33,
+  "condition_count": 792,
+  "group_split_count": {
+    "discovery": 15,
+    "calibration": 6,
+    "behavior_holdout": 6,
+    "physical_holdout": 6
+  },
+  "family_split_count": {
+    "behavior_holdout:grammar": 1,
+    "behavior_holdout:knowledge_network": 2,
+    "behavior_holdout:protocol_control": 2,
+    "behavior_holdout:reasoning": 1,
+    "calibration:grammar": 1,
+    "calibration:knowledge_network": 2,
+    "calibration:protocol_control": 2,
+    "calibration:reasoning": 1,
+    "discovery:grammar": 3,
+    "discovery:knowledge_network": 5,
+    "discovery:protocol_control": 4,
+    "discovery:reasoning": 3,
+    "physical_holdout:grammar": 1,
+    "physical_holdout:knowledge_network": 2,
+    "physical_holdout:protocol_control": 2,
+    "physical_holdout:reasoning": 1
+  },
+  "denominator_correction": {
+    "phase419_cases_are_not_intrinsically_two_current_state_groups": true,
+    "phase420_rebuilds_pairs_from_full_phase345_phase346_qualified_case_banks": true,
+    "current_a_and_b_are_independently_valid_same_mechanism_tasks": true,
+    "history_pair_full_prompt_token_count_is_exact_within_each_current_identity": true,
+    "current_a_b_prompt_lengths_are_registered_nuisance_not_assumed_equal": true,
+    "reasoning_b_states_are_registered_same_mechanism_counterfactual_queries": true
+  },
+  "registered_contrasts": {
+    "compatibility_effect": "0.5*((X_a_b-X_a_a)+(X_b_a-X_b_b))",
+    "history_identity_main_effect": "0.5*((X_a_b-X_a_a)+(X_b_b-X_b_a))",
+    "current_identity_main_effect": "0.5*((X_b_a-X_a_a)+(X_b_b-X_a_b))"
+  },
+  "execution_contract": {
+    "behavior_max_new_tokens": 12,
+    "behavior_horizon_separate_from_prefill_physical_horizon": true,
+    "development_physical_splits": [
+      "discovery",
+      "calibration",
+      "behavior_holdout"
+    ],
+    "physical_holdout_requires_all_prediction_gates": true,
+    "output_attentions_required": true,
+    "actual_qkv_capture_required": true,
+    "attention_and_mlp_reconstruction_error_max": 0.01
+  },
+  "claim_boundary": "typed_natural_path_observation_and_holdout_prediction_only_no_causal_or_neuron_claim"
+}

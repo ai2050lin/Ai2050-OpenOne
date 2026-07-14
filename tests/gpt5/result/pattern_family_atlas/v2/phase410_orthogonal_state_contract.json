@@ -1,0 +1,164 @@
+{
+  "schema_version": "84.0.0",
+  "phase_id": "Phase410-OrthogonalStateContractAudit",
+  "created_at": "2026-07-13T19:04:53.524494+00:00",
+  "valid": true,
+  "orthogonal_axes": [
+    "semantic_class",
+    "format_class",
+    "boundary_reached",
+    "model_stopped",
+    "numeric_validity",
+    "response_role"
+  ],
+  "mutually_exclusive_global_automaton_removed": true,
+  "coincident_events_supported": true,
+  "synthetic_process": {
+    "axis_transitions": [
+      {
+        "step": 1,
+        "axis": "format_class",
+        "from": "empty",
+        "to": "partial"
+      },
+      {
+        "step": 1,
+        "axis": "numeric_validity",
+        "from": "unknown",
+        "to": "finite"
+      },
+      {
+        "step": 2,
+        "axis": "semantic_class",
+        "from": "no_registered_response",
+        "to": "allowed_response"
+      },
+      {
+        "step": 2,
+        "axis": "format_class",
+        "from": "partial",
+        "to": "complete"
+      },
+      {
+        "step": 2,
+        "axis": "response_role",
+        "from": "none",
+        "to": "current"
+      },
+      {
+        "step": 3,
+        "axis": "boundary_reached",
+        "from": false,
+        "to": true
+      },
+      {
+        "step": 4,
+        "axis": "semantic_class",
+        "from": "allowed_response",
+        "to": "no_registered_response"
+      },
+      {
+        "step": 4,
+        "axis": "format_class",
+        "from": "complete",
+        "to": "malformed"
+      },
+      {
+        "step": 4,
+        "axis": "response_role",
+        "from": "current",
+        "to": "none"
+      },
+      {
+        "step": 5,
+        "axis": "model_stopped",
+        "from": false,
+        "to": true
+      }
+    ],
+    "step_states": [
+      {
+        "step": 1,
+        "text": " is",
+        "state": {
+          "semantic_class": "no_registered_response",
+          "format_class": "partial",
+          "boundary_reached": false,
+          "model_stopped": false,
+          "numeric_validity": "finite",
+          "response_role": "none",
+          "raw_response_class": null,
+          "matched_raw_classes": []
+        }
+      },
+      {
+        "step": 2,
+        "text": " is quiet",
+        "state": {
+          "semantic_class": "allowed_response",
+          "format_class": "complete",
+          "boundary_reached": false,
+          "model_stopped": false,
+          "numeric_validity": "finite",
+          "response_role": "current",
+          "raw_response_class": "sentence_is",
+          "matched_raw_classes": [
+            "sentence_is"
+          ]
+        }
+      },
+      {
+        "step": 3,
+        "text": " is quiet.",
+        "state": {
+          "semantic_class": "allowed_response",
+          "format_class": "complete",
+          "boundary_reached": true,
+          "model_stopped": false,
+          "numeric_validity": "finite",
+          "response_role": "current",
+          "raw_response_class": "sentence_is",
+          "matched_raw_classes": [
+            "sentence_is"
+          ]
+        }
+      },
+      {
+        "step": 4,
+        "text": " is quiet. extra",
+        "state": {
+          "semantic_class": "no_registered_response",
+          "format_class": "malformed",
+          "boundary_reached": true,
+          "model_stopped": false,
+          "numeric_validity": "finite",
+          "response_role": "none",
+          "raw_response_class": null,
+          "matched_raw_classes": []
+        }
+      }
+    ],
+    "first_semantic_event_by_class": {
+      "no_registered_response": 1,
+      "allowed_response": 2
+    },
+    "stop_event": 5,
+    "right_censored_at_horizon": false,
+    "coincident_transition_steps": [
+      1,
+      2,
+      4
+    ],
+    "final_state": {
+      "semantic_class": "no_registered_response",
+      "format_class": "malformed",
+      "boundary_reached": true,
+      "model_stopped": true,
+      "numeric_validity": "finite",
+      "response_role": "none",
+      "raw_response_class": null,
+      "matched_raw_classes": []
+    }
+  },
+  "claim_boundary": "external_response_measurement_not_model_internal_state"
+}

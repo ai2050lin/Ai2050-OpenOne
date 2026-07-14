@@ -95,6 +95,11 @@ function AtlasDetail({ atlas }) {
   const phase407 = atlas?.phase407_audit || {};
   const phase408 = atlas?.phase408_audit || {};
   const phase409 = atlas?.phase409_audit || {};
+  const phase410 = atlas?.phase410_audit || {};
+  const phase411 = atlas?.phase411_audit || {};
+  const phase412 = atlas?.phase412_audit || {};
+  const phase413 = atlas?.phase413_audit || {};
+  const phase414 = atlas?.phase414_audit || {};
   const rows = [
     ['模式族物理映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`],
     ['模型 × 模式族分区', formatNumber(metrics.model_family_partition_count)],
@@ -186,6 +191,61 @@ function AtlasDetail({ atlas }) {
     ['Phase 409 采集器等价', `${metrics.phase409_collector_equivalence_count || 0}/1`],
     ['Phase 409 模型案例', formatNumber(metrics.phase409_model_case_count)],
     ['Phase 409 新增神经元节点', formatNumber(metrics.phase409_new_neuron_node_count)],
+    ['Phase 410 正交状态轴', `${metrics.phase410_orthogonal_axis_count || 0}/6`],
+    ['Phase 410 h3 顺序审计', `${(metrics.phase410_h3_order_variant_count || 0) - (metrics.phase410_h3_order_symmetry_failure_count || 0)}/${metrics.phase410_h3_order_variant_count || 0}`],
+    ['Phase 410 语法有限全集', `${(metrics.phase410_grammar_finite_case_count || 0) - (metrics.phase410_grammar_failure_count || 0)}/${metrics.phase410_grammar_finite_case_count || 0}`],
+    ['Phase 410 外部审阅者', `${metrics.phase410_completed_external_reviewer_count || 0}/${metrics.phase410_required_external_reviewer_count || 0}`],
+    ['Phase 410 密封采集器等价', `${metrics.phase410_sealed_model_collector_case_count || 0}/165`],
+    ['Phase 410 模型案例', formatNumber(metrics.phase410_model_case_count)],
+    ['Phase 410 新增神经元节点', formatNumber(metrics.phase410_new_neuron_node_count)],
+    ['Phase 411 有限语义合同', `${(metrics.phase411_finite_semantic_case_count || 0) - (metrics.phase411_finite_semantic_failure_count || 0)}/${metrics.phase411_finite_semantic_case_count || 0}`],
+    ['Phase 411 有限语义新增解析', formatNumber(metrics.phase411_semantic_only_resolved_case_count)],
+    ['Phase 411 注册状态操作', `${metrics.phase411_registered_operation_count || 0}/46`],
+    ['Phase 411 操作组合闭包', `${(metrics.phase411_operation_composition_case_count || 0) - (metrics.phase411_operation_composition_failure_count || 0)}/${metrics.phase411_operation_composition_case_count || 0}`],
+    ['Phase 411 历史规则协变', `${(metrics.phase411_history_covariance_case_count || 0) - (metrics.phase411_history_covariance_failure_count || 0)}/${metrics.phase411_history_covariance_case_count || 0}`],
+    ['Phase 411 粗分区不稳定操作单元', formatNumber(metrics.phase411_coarse_unstable_operation_cell_count)],
+    ['Phase 411 外部审阅者', `${metrics.phase411_completed_external_reviewer_count || 0}/${metrics.phase411_required_external_reviewer_count || 0}`],
+    ['Phase 411 双人接受条目', `${metrics.phase411_review_accepted_item_count || 0}/65`],
+    ['Phase 411 密封采集器等价', `${metrics.phase411_sealed_model_collector_case_count || 0}/165`],
+    ['Phase 411 模型案例', formatNumber(metrics.phase411_model_case_count)],
+    ['Phase 411 新增神经元节点', formatNumber(metrics.phase411_new_neuron_node_count)],
+    ['Phase 412 类型化观察者协变', `${(metrics.phase412_observer_operation_cell_count || 0) - (metrics.phase412_typed_observer_unstable_cell_count || 0)}/${metrics.phase412_observer_operation_cell_count || 0}`],
+    ['Phase 412 固定角色失败已解释', `${metrics.phase412_role_transport_explained_cell_count || 0}/${metrics.phase412_fixed_observer_unstable_cell_count || 0}`],
+    ['Phase 412 观察者作用组合', `${(metrics.phase412_observer_action_composition_case_count || 0) - (metrics.phase412_observer_action_composition_failure_count || 0)}/${metrics.phase412_observer_action_composition_case_count || 0}`],
+    ['Phase 412 有限分区穷举', `${metrics.phase412_finite_partition_count || 0}/${metrics.phase412_finite_partition_count || 0}`],
+    ['Phase 412 全局非平凡商', `${metrics.phase412_global_qualifying_nontrivial_partition_count || 0}/${metrics.phase412_nontrivial_partition_count || 0}`],
+    ['Phase 412 外部角色索引分区束', formatNumber(metrics.phase412_role_indexed_partition_bundle_count)],
+    ['Phase 412 已注册不可逆操作', `${metrics.phase412_registered_irreversible_operation_count || 0}/7`],
+    ['Phase 412 已注册跨族桥', `${metrics.phase412_registered_cross_family_bridge_count || 0}/4`],
+    ['Phase 412 外部审阅者', `${metrics.phase412_completed_external_reviewer_count || 0}/${metrics.phase412_required_external_reviewer_count || 0}`],
+    ['Phase 412 密封采集器等价', `${metrics.phase412_sealed_model_collector_case_count || 0}/165`],
+    ['Phase 412 模型案例', formatNumber(metrics.phase412_model_case_count)],
+    ['Phase 412 新增神经元节点', formatNumber(metrics.phase412_new_neuron_node_count)],
+    ['Phase 413 材料主张审计', `${metrics.phase413_source_claim_count || 0}/${metrics.phase413_source_claim_count || 0}`],
+    ['Phase 413 终端相同有限轨迹', `${metrics.phase413_same_terminal_path_count || 0}/${metrics.phase413_synthetic_path_count || 0}`],
+    ['Phase 413 中间不同轨迹对', `${metrics.phase413_internal_distinct_path_pair_count || 0}/${metrics.phase413_synthetic_path_pair_count || 0}`],
+    ['Phase 413 一步相同但未来不同', `${metrics.phase413_future_different_pair_count || 0}/${metrics.phase413_future_state_pair_count || 0}`],
+    ['Phase 413 通道置换原生输出不变', `${metrics.phase413_native_output_invariant_channel_case_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}`],
+    ['Phase 413 固定通道读数反例', `${metrics.phase413_fixed_coordinate_probe_failure_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}`],
+    ['Phase 413 候选面板合同', `${metrics.phase413_candidate_panel_case_count || 0}/${metrics.phase413_candidate_panel_case_count || 0}`],
+    ['Phase 413 合格层内局部概率读出', `${metrics.phase413_qualified_direct_layer_local_readout_count || 0}/${metrics.phase413_direct_layer_local_readout_count || 0}`],
+    ['Phase 413 外部审阅者', `${metrics.phase413_completed_external_reviewer_count || 0}/${metrics.phase413_required_external_reviewer_count || 0}`],
+    ['Phase 413 密封采集器等价', `${metrics.phase413_sealed_model_collector_case_count || 0}/165`],
+    ['Phase 413 模型案例', formatNumber(metrics.phase413_model_case_count)],
+    ['Phase 413 新增神经元节点', formatNumber(metrics.phase413_new_neuron_node_count)],
+    ['Phase 414 混合证据目录分类', `${metrics.phase414_catalog_item_count || 0}/${metrics.phase414_catalog_item_count || 0}`],
+    ['Phase 414 目录严格机制闭合', `${metrics.phase414_catalog_mechanism_closed_count || 0}/${metrics.phase414_catalog_item_count || 0}`],
+    ['Phase 414 完整状态续跑恒等', `${metrics.phase414_natural_replay_exact_count || 0}/${metrics.phase414_natural_replay_cell_count || 0}`],
+    ['Phase 414 层间终端核变化', `${metrics.phase414_layerwise_terminal_kernel_variation_count || 0}/${metrics.phase414_natural_replay_case_count || 0}`],
+    ['Phase 414 不完整状态反例', `${metrics.phase414_incomplete_state_counterexample_count || 0}/${metrics.phase414_natural_replay_cell_count || 0}`],
+    ['Phase 414 观察者索引轨迹', `${metrics.phase414_varying_observer_trajectory_count || 0}/${metrics.phase414_observer_trajectory_count || 0}`],
+    ['Phase 414 可变长度语义事件', `${metrics.phase414_candidate_event_count || 0}/${metrics.phase414_candidate_event_count || 0}`],
+    ['Phase 414 跨 tokenizer 语义对齐', `${metrics.phase414_cross_tokenizer_semantic_alignment_count || 0}/${metrics.phase414_cross_tokenizer_semantic_event_count || 0}`],
+    ['Phase 414 合格观察者', `${metrics.phase414_qualified_observer_count || 0}/${metrics.phase414_observer_method_count || 0}`],
+    ['Phase 414 外部审阅者', `${metrics.phase414_completed_external_reviewer_count || 0}/${metrics.phase414_required_external_reviewer_count || 0}`],
+    ['Phase 414 密封采集器等价', `${metrics.phase414_sealed_model_collector_case_count || 0}/165`],
+    ['Phase 414 模型案例', formatNumber(metrics.phase414_model_case_count)],
+    ['Phase 414 新增神经元节点', formatNumber(metrics.phase414_new_neuron_node_count)],
     ['跨模型行为必要性', formatNumber(metrics.phase330_cross_model_behavior_necessity_mechanism_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
@@ -194,7 +254,17 @@ function AtlasDetail({ atlas }) {
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <div style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>
-        {phase409.status
+        {phase414.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase414 将完整自然状态续跑校准为仪器恒等门：${metrics.phase414_natural_replay_exact_count || 0}/${metrics.phase414_natural_replay_cell_count || 0} 个有限续跑单元复现同一终端核，层间终端核变化为 ${metrics.phase414_layerwise_terminal_kernel_variation_count || 0}/${metrics.phase414_natural_replay_case_count || 0}；删去角色、历史或缓存后出现 ${metrics.phase414_incomplete_state_counterexample_count || 0}/${metrics.phase414_natural_replay_cell_count || 0} 个反例。观察者索引轨迹变化 ${metrics.phase414_varying_observer_trajectory_count || 0}/${metrics.phase414_observer_trajectory_count || 0} 只是合成可读性审计，合格观察者仍为 ${metrics.phase414_qualified_observer_count || 0}/${metrics.phase414_observer_method_count || 0}。96 项目录是混合证据账本，不是完成百分比分母；模型、物理、因果和神经元证据均未增加。`
+          : phase413.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase413 明确区分终端原生预测核和中间诊断读出：${metrics.phase413_same_terminal_path_count || 0}/${metrics.phase413_synthetic_path_count || 0} 条有限轨迹共享同一终端分布，但 ${metrics.phase413_internal_distinct_path_pair_count || 0}/${metrics.phase413_synthetic_path_pair_count || 0} 条轨迹对拥有不同中间过程；${metrics.phase413_future_different_pair_count || 0}/${metrics.phase413_future_state_pair_count || 0} 个状态对在一步分布相同而未来不同。通道置换保持原生输出 ${metrics.phase413_native_output_invariant_channel_case_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}，同时给出固定通道读数反例 ${metrics.phase413_fixed_coordinate_probe_failure_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}。合格层内局部概率读出仍为 ${metrics.phase413_qualified_direct_layer_local_readout_count || 0}/${metrics.phase413_direct_layer_local_readout_count || 0}，模型、物理和神经元证据均未增加。`
+          : phase412.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase412 复现了 ${metrics.phase412_fixed_observer_unstable_cell_count || 0} 个固定查询角色失败，并确认其中 ${metrics.phase412_role_transport_explained_cell_count || 0} 个都来自实体重命名时未同步运输查询角色。状态、查询角色和响应类联合变换后，类型化协变通过 ${(metrics.phase412_observer_operation_cell_count || 0) - (metrics.phase412_typed_observer_unstable_cell_count || 0)}/${metrics.phase412_observer_operation_cell_count || 0}；${metrics.phase412_finite_partition_count || 0} 个有限分区已穷举，全局合格非平凡商为 ${metrics.phase412_global_qualifying_nontrivial_partition_count || 0}/${metrics.phase412_nontrivial_partition_count || 0}。知识族的 ${metrics.phase412_role_indexed_partition_bundle_count || 0} 个外部角色索引分区束不是模型状态证据。外部审阅者和密封采集器仍分别为 ${metrics.phase412_completed_external_reviewer_count || 0}/${metrics.phase412_required_external_reviewer_count || 0}、${metrics.phase412_sealed_model_collector_case_count || 0}/165，所以不显示新的模型行为、物理路径或神经元。`
+          : phase411.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase411 在 ${formatNumber(metrics.phase411_finite_semantic_case_count)} 个冻结模板案例上完成严格精确通道与有限注册语义通道审计，并验证 ${metrics.phase411_registered_operation_count || 0} 个外部状态操作、${metrics.phase411_operation_composition_case_count || 0} 个组合和 ${metrics.phase411_history_covariance_case_count || 0} 个历史协变案例。固定查询角色下有 ${metrics.phase411_coarse_unstable_operation_cell_count || 0} 个粗分区操作单元不保持；该结果仍需区分状态变换和查询角色运输。外部审阅者仍为 ${metrics.phase411_completed_external_reviewer_count || 0}/${metrics.phase411_required_external_reviewer_count || 0}，密封采集器为 ${metrics.phase411_sealed_model_collector_case_count || 0}/165，所以不显示新的模型行为、物理路径或神经元。`
+          : phase410.status
+          ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase410 已把动态响应拆成 ${metrics.phase410_orthogonal_axis_count || 0} 个正交轴，并完成 ${(metrics.phase410_h3_order_variant_count || 0) - (metrics.phase410_h3_order_symmetry_failure_count || 0)}/${metrics.phase410_h3_order_variant_count || 0} 个 h3 顺序变体和 ${(metrics.phase410_grammar_finite_case_count || 0) - (metrics.phase410_grammar_failure_count || 0)}/${metrics.phase410_grammar_finite_case_count || 0} 个语法有限全集案例的机器审计。外部审阅者为 ${metrics.phase410_completed_external_reviewer_count || 0}/${metrics.phase410_required_external_reviewer_count || 0}，密封真实模型采集器等价为 ${metrics.phase410_sealed_model_collector_case_count || 0}/165，因此不显示新的行为、物理路径或神经元。`
+          : phase409.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase409 已冻结 ${formatNumber(metrics.phase409_registered_abstract_case_count)} 个动态响应与历史条件抽象案例、${formatNumber(metrics.phase409_future_model_prompt_hash_count)} 个未来三模型提示哈希；双机器规则引擎一致 ${metrics.phase409_dual_rule_agreement_count || 0}/${metrics.phase409_rule_engine_scenario_count || 0}。外部规则复核和增量采集器逐词元等价仍为 0/1，模型案例为 0，因此这里只显示协议节点，不显示新的物理路径或神经元。`
           : phase408.status
           ? `当前图谱已推进到 Phase ${atlas?.phase || '-'}。Phase408 在 ${formatNumber(metrics.phase408_formal_discovery_case_count)} 个正式案例中，把状态可分性、标签对齐、数值有效性、生成事件和右删失分别记录；${metrics.phase408_functional_group_pass_count || 0}/108 个组形成冻结功能分区，发现、校准、行为留出的跨模型候选分别为 ${metrics.phase408_discovery_crossmodel_partition_family_count || 0}/3、${metrics.phase408_calibration_crossmodel_partition_family_count || 0}/3、${metrics.phase408_behavioral_crossmodel_partition_family_count || 0}/3。历史仍固定为空，因此不授权物理路径或神经元节点。`
@@ -361,6 +431,41 @@ export function EvidenceKernelDashboard() {
     if (metrics.full_natural_chain_pass_count > 0 && metrics.single_unit_causal_count > 0) {
       return { label: '存在严格闭合机制', detail: '至少一条路径同时通过单元因果和完整自然链。', color: '#34d399' };
     }
+    if ((metrics.phase414_catalog_item_count || 0) > 0) {
+      return {
+        label: '完整状态续跑已校准为恒等门，观察者仍未合格',
+        detail: `Phase414 的完整自然状态续跑恒等为 ${metrics.phase414_natural_replay_exact_count || 0}/${metrics.phase414_natural_replay_cell_count || 0}，层间终端核变化 ${metrics.phase414_layerwise_terminal_kernel_variation_count || 0}/${metrics.phase414_natural_replay_case_count || 0}；这不是候选逐层收缩曲线。不完整状态反例为 ${metrics.phase414_incomplete_state_counterexample_count || 0}/${metrics.phase414_natural_replay_cell_count || 0}，合格观察者为 ${metrics.phase414_qualified_observer_count || 0}/${metrics.phase414_observer_method_count || 0}。外部审阅与真实采集器门仍关闭。`,
+        color: '#f59e0b',
+      };
+    }
+    if ((metrics.phase413_source_claim_count || 0) > 0) {
+      return {
+        label: '终端预测核边界已冻结，中间局部概率读出仍为空',
+        detail: `Phase413 构造 ${metrics.phase413_same_terminal_path_count || 0}/${metrics.phase413_synthetic_path_count || 0} 条终端相同轨迹和 ${metrics.phase413_internal_distinct_path_pair_count || 0}/${metrics.phase413_synthetic_path_pair_count || 0} 条中间不同轨迹对；通道置换原生输出不变 ${metrics.phase413_native_output_invariant_channel_case_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}，固定通道读数反例 ${metrics.phase413_fixed_coordinate_probe_failure_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}。合格层内局部概率读出为 ${metrics.phase413_qualified_direct_layer_local_readout_count || 0}/${metrics.phase413_direct_layer_local_readout_count || 0}，外部审阅与真实采集器门仍关闭。`,
+        color: '#f59e0b',
+      };
+    }
+    if ((metrics.phase412_finite_partition_count || 0) > 0) {
+      return {
+        label: '类型化协变通过，全局非平凡状态商仍为空',
+        detail: `Phase412 将 Phase411 的 ${metrics.phase412_fixed_observer_unstable_cell_count || 0} 个固定角色失败全部校准为查询角色运输问题；类型化协变为 ${(metrics.phase412_observer_operation_cell_count || 0) - (metrics.phase412_typed_observer_unstable_cell_count || 0)}/${metrics.phase412_observer_operation_cell_count || 0}。有限分区穷举 ${metrics.phase412_finite_partition_count || 0}/${metrics.phase412_finite_partition_count || 0}，全局合格非平凡商 ${metrics.phase412_global_qualifying_nontrivial_partition_count || 0}/${metrics.phase412_nontrivial_partition_count || 0}。外部审阅和真实采集器门仍关闭。`,
+        color: '#f59e0b',
+      };
+    }
+    if ((metrics.phase411_finite_semantic_case_count || 0) > 0) {
+      return {
+        label: '有限协议闭包通过，模型语义与物理执行仍关闭',
+        detail: `Phase411 的有限语义合同通过 ${(metrics.phase411_finite_semantic_case_count || 0) - (metrics.phase411_finite_semantic_failure_count || 0)}/${metrics.phase411_finite_semantic_case_count || 0}，操作组合通过 ${(metrics.phase411_operation_composition_case_count || 0) - (metrics.phase411_operation_composition_failure_count || 0)}/${metrics.phase411_operation_composition_case_count || 0}。固定查询角色下有 ${metrics.phase411_coarse_unstable_operation_cell_count || 0} 个粗分区不稳定单元；该结果不能在未审计查询角色运输时直接升级为功能状态否定。外部审阅者 ${metrics.phase411_completed_external_reviewer_count || 0}/${metrics.phase411_required_external_reviewer_count || 0}、密封采集器 ${metrics.phase411_sealed_model_collector_case_count || 0}/165，模型和物理案例均为零。`,
+        color: '#f59e0b',
+      };
+    }
+    if ((metrics.phase410_orthogonal_axis_count || 0) > 0) {
+      return {
+        label: '正交动态预检通过，科学执行门仍关闭',
+        detail: `Phase410 的六轴状态合同、h3 顺序镜像和语法有限全集机器审计已通过；外部审阅者为 ${metrics.phase410_completed_external_reviewer_count || 0}/${metrics.phase410_required_external_reviewer_count || 0}，密封模型采集器等价为 ${metrics.phase410_sealed_model_collector_case_count || 0}/165。模型、物理、因果和神经元案例均为零。`,
+        color: '#f59e0b',
+      };
+    }
     if ((metrics.phase409_registered_abstract_case_count || 0) > 0) {
       return {
         label: '动态历史协议已冻结，模型执行尚未授权',
@@ -435,6 +540,48 @@ export function EvidenceKernelDashboard() {
     ['Phase409 双规则一致', `${metrics.phase409_dual_rule_agreement_count || 0}/${metrics.phase409_rule_engine_scenario_count || 0}`],
     ['Phase409 外部规则复核', `${metrics.phase409_external_rule_review_count || 0}/1`],
     ['Phase409 模型案例', formatNumber(metrics.phase409_model_case_count)],
+    ['Phase410 h3 顺序审计', `${(metrics.phase410_h3_order_variant_count || 0) - (metrics.phase410_h3_order_symmetry_failure_count || 0)}/${metrics.phase410_h3_order_variant_count || 0}`],
+    ['Phase410 语法有限全集', `${(metrics.phase410_grammar_finite_case_count || 0) - (metrics.phase410_grammar_failure_count || 0)}/${metrics.phase410_grammar_finite_case_count || 0}`],
+    ['Phase410 外部审阅者', `${metrics.phase410_completed_external_reviewer_count || 0}/${metrics.phase410_required_external_reviewer_count || 0}`],
+    ['Phase410 密封采集器等价', `${metrics.phase410_sealed_model_collector_case_count || 0}/165`],
+    ['Phase410 模型案例', formatNumber(metrics.phase410_model_case_count)],
+    ['Phase411 有限语义合同', `${(metrics.phase411_finite_semantic_case_count || 0) - (metrics.phase411_finite_semantic_failure_count || 0)}/${metrics.phase411_finite_semantic_case_count || 0}`],
+    ['Phase411 注册状态操作', `${metrics.phase411_registered_operation_count || 0}/46`],
+    ['Phase411 操作组合闭包', `${(metrics.phase411_operation_composition_case_count || 0) - (metrics.phase411_operation_composition_failure_count || 0)}/${metrics.phase411_operation_composition_case_count || 0}`],
+    ['Phase411 历史规则协变', `${(metrics.phase411_history_covariance_case_count || 0) - (metrics.phase411_history_covariance_failure_count || 0)}/${metrics.phase411_history_covariance_case_count || 0}`],
+    ['Phase411 粗分区不稳定单元', formatNumber(metrics.phase411_coarse_unstable_operation_cell_count)],
+    ['Phase411 外部审阅者', `${metrics.phase411_completed_external_reviewer_count || 0}/${metrics.phase411_required_external_reviewer_count || 0}`],
+    ['Phase411 密封采集器等价', `${metrics.phase411_sealed_model_collector_case_count || 0}/165`],
+    ['Phase411 模型案例', formatNumber(metrics.phase411_model_case_count)],
+    ['Phase412 类型化观察者协变', `${(metrics.phase412_observer_operation_cell_count || 0) - (metrics.phase412_typed_observer_unstable_cell_count || 0)}/${metrics.phase412_observer_operation_cell_count || 0}`],
+    ['Phase412 固定角色失败已解释', `${metrics.phase412_role_transport_explained_cell_count || 0}/${metrics.phase412_fixed_observer_unstable_cell_count || 0}`],
+    ['Phase412 有限分区穷举', `${metrics.phase412_finite_partition_count || 0}/${metrics.phase412_finite_partition_count || 0}`],
+    ['Phase412 全局非平凡商', `${metrics.phase412_global_qualifying_nontrivial_partition_count || 0}/${metrics.phase412_nontrivial_partition_count || 0}`],
+    ['Phase412 外部角色索引分区束', formatNumber(metrics.phase412_role_indexed_partition_bundle_count)],
+    ['Phase412 不可逆操作', `${metrics.phase412_registered_irreversible_operation_count || 0}/7`],
+    ['Phase412 跨族桥', `${metrics.phase412_registered_cross_family_bridge_count || 0}/4`],
+    ['Phase412 外部审阅者', `${metrics.phase412_completed_external_reviewer_count || 0}/${metrics.phase412_required_external_reviewer_count || 0}`],
+    ['Phase412 密封采集器等价', `${metrics.phase412_sealed_model_collector_case_count || 0}/165`],
+    ['Phase412 模型案例', formatNumber(metrics.phase412_model_case_count)],
+    ['Phase413 终端相同有限轨迹', `${metrics.phase413_same_terminal_path_count || 0}/${metrics.phase413_synthetic_path_count || 0}`],
+    ['Phase413 中间不同轨迹对', `${metrics.phase413_internal_distinct_path_pair_count || 0}/${metrics.phase413_synthetic_path_pair_count || 0}`],
+    ['Phase413 一步相同但未来不同', `${metrics.phase413_future_different_pair_count || 0}/${metrics.phase413_future_state_pair_count || 0}`],
+    ['Phase413 固定通道读数反例', `${metrics.phase413_fixed_coordinate_probe_failure_count || 0}/${metrics.phase413_channel_permutation_case_count || 0}`],
+    ['Phase413 合格层内局部概率读出', `${metrics.phase413_qualified_direct_layer_local_readout_count || 0}/${metrics.phase413_direct_layer_local_readout_count || 0}`],
+    ['Phase413 外部审阅者', `${metrics.phase413_completed_external_reviewer_count || 0}/${metrics.phase413_required_external_reviewer_count || 0}`],
+    ['Phase413 密封采集器等价', `${metrics.phase413_sealed_model_collector_case_count || 0}/165`],
+    ['Phase413 模型案例', formatNumber(metrics.phase413_model_case_count)],
+    ['Phase414 混合证据目录', `${metrics.phase414_catalog_item_count || 0}/${metrics.phase414_catalog_item_count || 0}`],
+    ['Phase414 目录严格机制闭合', `${metrics.phase414_catalog_mechanism_closed_count || 0}/${metrics.phase414_catalog_item_count || 0}`],
+    ['Phase414 完整状态续跑恒等', `${metrics.phase414_natural_replay_exact_count || 0}/${metrics.phase414_natural_replay_cell_count || 0}`],
+    ['Phase414 层间终端核变化', `${metrics.phase414_layerwise_terminal_kernel_variation_count || 0}/${metrics.phase414_natural_replay_case_count || 0}`],
+    ['Phase414 不完整状态反例', `${metrics.phase414_incomplete_state_counterexample_count || 0}/${metrics.phase414_natural_replay_cell_count || 0}`],
+    ['Phase414 观察者索引轨迹', `${metrics.phase414_varying_observer_trajectory_count || 0}/${metrics.phase414_observer_trajectory_count || 0}`],
+    ['Phase414 跨 tokenizer 语义事件', `${metrics.phase414_cross_tokenizer_semantic_alignment_count || 0}/${metrics.phase414_cross_tokenizer_semantic_event_count || 0}`],
+    ['Phase414 合格观察者', `${metrics.phase414_qualified_observer_count || 0}/${metrics.phase414_observer_method_count || 0}`],
+    ['Phase414 外部审阅者', `${metrics.phase414_completed_external_reviewer_count || 0}/${metrics.phase414_required_external_reviewer_count || 0}`],
+    ['Phase414 密封采集器等价', `${metrics.phase414_sealed_model_collector_case_count || 0}/165`],
+    ['Phase414 模型案例', formatNumber(metrics.phase414_model_case_count)],
     ['单神经元因果', formatNumber(metrics.single_unit_causal_count)],
     ['完整自然链', formatNumber(metrics.full_natural_chain_pass_count)],
   ];

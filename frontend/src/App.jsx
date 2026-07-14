@@ -10,7 +10,7 @@ import {
   Scale,
   Settings, Share2, Sparkles, Target, TrendingUp, X
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AppleNeuronSceneContent } from './blueprint/appleNeuronSceneBridge';
 import { AppleNeuronGeneratedConceptSetsPanel, AppleNeuronMultidimSettingsPanel } from './blueprint/appleNeuronInfoPanelsBridge';
@@ -1555,8 +1555,44 @@ export default function App() {
   }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getSubPhaseBounds, getSubPhaseProgress]);
 
   // ---- 可视化数据系统 (neural-vis) ----
-  const { dataFiles, activeData: visData, activeFileMeta, loading: visLoading, error: visError, loadDataManifest, loadDataFile, loadLocalFile, setActiveData: setActiveDataDirect, setError: setErrorDirect, setActiveFileMeta: setActiveFileMetaDirect } = useVisData();
+  const {
+    dataSources,
+    activeSource,
+    dataFiles,
+    activeData: visData,
+    activeFileMeta,
+    loading: visLoading,
+    sourceLoading: visSourceLoading,
+    error: visError,
+    registryWarning: visRegistryWarning,
+    loadDataManifest,
+    selectDataSource,
+    refreshDataSource,
+    loadDataFile,
+    loadLocalFile,
+    setActiveData: setActiveDataDirect,
+    setError: setErrorDirect,
+    setActiveFileMeta: setActiveFileMetaDirect,
+  } = useVisData();
   const visFileInputRef = useRef();
+  const [visDataSearch, setVisDataSearch] = useState('');
+  const filteredVisDataFiles = useMemo(() => {
+    const query = visDataSearch.trim().toLocaleLowerCase();
+    if (!query) return dataFiles;
+    return dataFiles.filter((file) => [
+      file.label,
+      file.filename,
+      file.model,
+      file.family_id,
+      file.phase,
+      file.run_id,
+    ].some((value) => String(value ?? '').toLocaleLowerCase().includes(query)));
+  }, [dataFiles, visDataSearch]);
+  const activeVisManifestFile = useMemo(
+    () => dataFiles.find((file) => file.id === activeFileMeta?.id || file.path === activeFileMeta?.path),
+    [activeFileMeta?.id, activeFileMeta?.path, dataFiles]
+  );
+  const visDataSelectValue = activeVisManifestFile?.id || (visData ? '__active__' : '');
   // 可视化数据分类
   const schemaVersion = visData?.schema_version || '1.0';
   const isAtlasGraph = schemaVersion === 'atlas_graph_v1';
@@ -2289,6 +2325,7 @@ export default function App() {
     isAppleMainView
     && activeResearchPluginId === 'language-mechanism'
     && patternFamilyAtlasEnabled
+    && !visData
   );
   const activePluginPanels = activeResearchPlugin?.panels || [];
   const currentResearchTarget = activeResearchPlugin?.target || '语言编码机制';
@@ -2875,10 +2912,78 @@ export default function App() {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
                     <Layers size={14} color="#4facfe" />
-                    数据源
+                    测试路线数据源
                   </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 34px', gap: 6, marginBottom: 7 }}>
+                    <select
+                      aria-label="主工作台测试路线数据源"
+                      value={activeSource?.id || ''}
+                      disabled={visSourceLoading || dataSources.length === 0}
+                      onChange={(event) => {
+                        setVisDataSearch('');
+                        selectDataSource(event.target.value);
+                      }}
+                      style={{
+                        minWidth: 0, padding: '8px 10px',
+                        background: 'rgba(79,172,254,0.08)',
+                        border: '1px solid rgba(79,172,254,0.25)',
+                        borderRadius: 8, color: '#e7f4ff', cursor: 'pointer', fontSize: 11,
+                        outline: 'none', appearance: 'none',
+                      }}
+                    >
+                      {dataSources.map((source) => (
+                        <option key={source.id} value={source.id}>
+                          {source.route_label} · {source.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      title="刷新当前路线清单"
+                      aria-label="刷新当前路线清单"
+                      disabled={!activeSource || visSourceLoading}
+                      onClick={refreshDataSource}
+                      style={{
+                        width: 34, height: 34, display: 'grid', placeItems: 'center',
+                        background: 'rgba(79,172,254,0.08)',
+                        border: '1px solid rgba(79,172,254,0.25)', borderRadius: 8,
+                        color: '#7dd3fc', cursor: visSourceLoading ? 'wait' : 'pointer',
+                      }}
+                    >
+                      <RefreshCw size={14} />
+                    </button>
+                  </div>
+                  {activeSource && (
+                    <div style={{ marginBottom: 7, padding: '7px 9px', background: 'rgba(15,23,42,0.55)', borderLeft: `2px solid ${activeSource.color || '#4facfe'}` }}>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', color: '#cfe8ff', fontSize: 10, fontWeight: 700 }}>
+                        <Database size={12} color={activeSource.color || '#4facfe'} />
+                        <span>{activeSource.route_label}</span>
+                        <span style={{ marginLeft: 'auto', color: '#7f95bb', fontWeight: 500 }}>{dataFiles.length} 组</span>
+                      </div>
+                      <div style={{ color: '#6f83a8', fontSize: 9, lineHeight: 1.45, marginTop: 3 }}>{activeSource.description}</div>
+                      <div style={{ color: '#526482', fontSize: 8, marginTop: 3 }}>模型：{activeSource.models?.join(' / ') || '未声明'}</div>
+                    </div>
+                  )}
+                  {visRegistryWarning && (
+                    <div style={{ marginBottom: 7, color: '#fbbf24', fontSize: 9, lineHeight: 1.4 }}>{visRegistryWarning}</div>
+                  )}
+                  {dataFiles.length > 8 && (
+                    <input
+                      type="search"
+                      aria-label="筛选主工作台测试数据"
+                      value={visDataSearch}
+                      onChange={(event) => setVisDataSearch(event.target.value)}
+                      placeholder="筛选模式族、模型或阶段"
+                      style={{
+                        width: '100%', padding: '7px 9px', marginBottom: 7,
+                        background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(79,172,254,0.18)',
+                        borderRadius: 7, color: '#dbeafe', fontSize: 10, outline: 'none',
+                      }}
+                    />
+                  )}
                   <select
-                    value={visData ? '__active__' : ''}
+                    aria-label="主工作台测试数据集"
+                    value={visDataSelectValue}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === '' || val === '__active__') return;
@@ -2909,14 +3014,15 @@ export default function App() {
                     }}
                   >
                     <option value="">-- 选择数据文件 --</option>
+                    {visData && !activeVisManifestFile && <option value="__active__">当前已加载数据</option>}
                     <optgroup label="预设数据">
                       <option value="__preset__/data/language_analysis_puzzle.json">🧩 语言分析拼图</option>
                       <option value="__preset__/data/forward_pass_demo.json">🧠 前向传播演示</option>
                     </optgroup>
-                    {dataFiles.length > 0 && (
-                      <optgroup label="Manifest 文件">
-                        {dataFiles.map((f, i) => (
-                          <option key={f.filename || i} value={f.filename}>{f.label || f.filename}</option>
+                    {filteredVisDataFiles.length > 0 && (
+                      <optgroup label={`${activeSource?.route_label || '路线'} · ${filteredVisDataFiles.length} 组`}>
+                        {filteredVisDataFiles.map((file) => (
+                          <option key={file.id || file.path} value={file.id}>{file.label || file.filename}</option>
                         ))}
                       </optgroup>
                     )}
@@ -2928,13 +3034,15 @@ export default function App() {
                     <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(79,172,254,0.06)', borderRadius: 8, border: '1px solid rgba(79,172,254,0.15)' }}>
                       <div style={{ fontSize: 11, color: '#4facfe', fontWeight: 600, marginBottom: 2 }}>✓ 已加载</div>
                       <div style={{ fontSize: 10, color: '#7f95bb' }}>
+                        {visData.source_context?.route_label || activeFileMeta?.route_label || '本地数据'} · {' '}
                         {visData.schema_version ? `Schema ${isAtlasGraph ? visData.schema_version : `v${visData.schema_version}`}` : '自定义格式'}
+                        {visData.source_schema_version && visData.source_schema_version !== visData.schema_version ? ` · 原始 ${visData.source_schema_version}` : ''}
                         {visData.tokens?.length ? ` · ${visData.tokens.length} tokens` : ''}
                         {visData.layers?.length ? ` · ${visData.layers.length} layers` : ''}
                       </div>
                     </div>
                   )}
-                  {visLoading && <div style={{ fontSize: 11, color: '#4facfe', marginTop: 8 }}>⏳ 加载中...</div>}
+                  {(visLoading || visSourceLoading) && <div style={{ fontSize: 11, color: '#4facfe', marginTop: 8 }}>正在加载...</div>}
                   {visError && <div style={{ fontSize: 11, color: '#ff6b6b', marginTop: 8 }}>⚠ {visError}</div>}
                 </div>
                   )} {/* end fpMode === 'demo' */}
@@ -4282,9 +4390,9 @@ export default function App() {
       )}
 
       {/* ===== neural-vis 加载/错误/空状态覆盖层 ===== */}
-      {isAppleMainView && visLoading && (
+      {isAppleMainView && (visLoading || visSourceLoading) && (
         <div style={{ position: 'absolute', top: 90, left: 400, zIndex: 10, background: 'rgba(20,20,25,0.9)', padding: '8px 16px', borderRadius: 8, fontSize: 13, color: '#4facfe', backdropFilter: 'blur(8px)' }}>
-          加载中...
+          {visSourceLoading ? '正在加载路线清单...' : '正在加载测试数据...'}
         </div>
       )}
       {isAppleMainView && visError && (

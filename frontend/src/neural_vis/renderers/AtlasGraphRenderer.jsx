@@ -35,6 +35,11 @@ const EDGE_COLORS = {
   upstream_of: '#38bdf8',
   washed_by: '#64748b',
   candidate_of: '#f97316',
+  contains_localized_candidate: '#475569',
+  contains_distributed_component_candidate: '#64748b',
+  contains_phase330_frozen_component_candidate: '#a78bfa',
+  measured_after: '#38bdf8',
+  observed_continuity: '#f59e0b',
 };
 
 function clamp(value, min, max) {
@@ -47,6 +52,8 @@ function asNumber(value, fallback = 0) {
 }
 
 function nodeSize(node) {
+  const explicitSize = Number(node.size);
+  if (Number.isFinite(explicitSize)) return clamp(explicitSize, 0.08, 0.95);
   const strength = Math.max(
     Math.abs(asNumber(node.score, 0)),
     Math.abs(asNumber(node.mean_logprob_delta, 0)),
@@ -123,10 +130,12 @@ export default function AtlasGraphRenderer({ graph, onHoverNode }) {
 
   if (!nodes.length) return null;
 
+  const graphTitle = graph?.title || 'Mechanism Atlas Graph';
+
   return (
     <group position={[0, -8, 0]}>
-      <Text position={[0, 66, -10]} fontSize={1.1} color="#e2e8f0" anchorX="center">
-        Mechanism Atlas Graph
+      <Text position={[0, 66, -10]} fontSize={1.1} color="#e2e8f0" anchorX="center" maxWidth={34} textAlign="center">
+        {graphTitle}
       </Text>
 
       {modelLanes.map((lane) => (
@@ -193,7 +202,7 @@ export default function AtlasGraphRenderer({ graph, onHoverNode }) {
                 metalness={0.25}
               />
             </mesh>
-            {(node.type === 'model' || node.type === 'head' || node.type === 'cluster' || node.type === 'failure') && (
+            {(node.show_label ?? (node.type === 'model' || node.type === 'head' || node.type === 'cluster' || node.type === 'failure')) && (
               <Text position={[0, size + 0.35, 0]} fontSize={0.35} color={color} anchorX="center">
                 {label}
               </Text>

@@ -1,0 +1,143 @@
+{
+  "schema_version": "atlas_graph_v1",
+  "phase_id": "Phase420-AttentionMLPRewriteAtlas",
+  "title": "Phase420 glm4 注意力—MLP 重写图",
+  "model": "glm4",
+  "graph": {
+    "nodes": [
+      {
+        "id": "phase420:glm4:rewrite:early",
+        "label": "early · opposing_cancellation",
+        "type": "mlp_rewrite_event",
+        "model": "glm4",
+        "schema_version": "93.0.0",
+        "phase_id": "Phase420-RewriteGeometrySummary",
+        "created_at": "2026-07-14T05:56:47.321355+00:00",
+        "split": "behavior_holdout",
+        "depth_bin": "early",
+        "cell_count": 156,
+        "stable_four_cell_count": 156,
+        "stable_four_cell_rate": 1.0,
+        "dominant_rewrite_class": "opposing_cancellation",
+        "dominant_rewrite_class_count": 132,
+        "rewrite_class_counts": {
+          "same_direction_amplification": 12,
+          "opposing_cancellation": 132,
+          "orthogonal_rewrite": 12
+        },
+        "median_cancellation_compatibility_effect": 7.419965e-05,
+        "median_novelty_compatibility_effect": -1.81665e-05,
+        "descriptive_geometry_only": true,
+        "causal": false,
+        "score": 1.0,
+        "size": 1.0,
+        "color": "#14b8a6",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "show_label": true,
+        "physical": true,
+        "predictive": false
+      },
+      {
+        "id": "phase420:glm4:rewrite:middle",
+        "label": "middle · opposing_cancellation",
+        "type": "mlp_rewrite_event",
+        "model": "glm4",
+        "schema_version": "93.0.0",
+        "phase_id": "Phase420-RewriteGeometrySummary",
+        "created_at": "2026-07-14T05:56:47.321499+00:00",
+        "split": "behavior_holdout",
+        "depth_bin": "middle",
+        "cell_count": 156,
+        "stable_four_cell_count": 148,
+        "stable_four_cell_rate": 0.9487179487179487,
+        "dominant_rewrite_class": "opposing_cancellation",
+        "dominant_rewrite_class_count": 140,
+        "rewrite_class_counts": {
+          "opposing_cancellation": 140,
+          "orthogonal_rewrite": 8,
+          "mixed_across_cells": 8
+        },
+        "median_cancellation_compatibility_effect": 0.00012839945,
+        "median_novelty_compatibility_effect": 0.0001348781,
+        "descriptive_geometry_only": true,
+        "causal": false,
+        "score": 0.9487179487179487,
+        "size": 0.9692307692307692,
+        "color": "#f59e0b",
+        "position": [
+          0.0,
+          9.0,
+          0.0
+        ],
+        "show_label": true,
+        "physical": true,
+        "predictive": false
+      },
+      {
+        "id": "phase420:glm4:rewrite:late",
+        "label": "late · mixed_across_cells",
+        "type": "mlp_rewrite_event",
+        "model": "glm4",
+        "schema_version": "93.0.0",
+        "phase_id": "Phase420-RewriteGeometrySummary",
+        "created_at": "2026-07-14T05:56:47.321434+00:00",
+        "split": "behavior_holdout",
+        "depth_bin": "late",
+        "cell_count": 168,
+        "stable_four_cell_count": 117,
+        "stable_four_cell_rate": 0.6964285714285714,
+        "dominant_rewrite_class": "mixed_across_cells",
+        "dominant_rewrite_class_count": 51,
+        "rewrite_class_counts": {
+          "orthogonal_rewrite": 47,
+          "mixed_across_cells": 51,
+          "opposing_cancellation": 22,
+          "same_direction_amplification": 48
+        },
+        "median_cancellation_compatibility_effect": 0.00044809715,
+        "median_novelty_compatibility_effect": 0.00045428994999999997,
+        "descriptive_geometry_only": true,
+        "causal": false,
+        "score": 0.6964285714285714,
+        "size": 0.8178571428571428,
+        "color": "#ef4444",
+        "position": [
+          0.0,
+          18.0,
+          0.0
+        ],
+        "show_label": true,
+        "physical": true,
+        "predictive": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "phase420:glm4:rewrite:early->phase420:glm4:rewrite:middle",
+        "source": "phase420:glm4:rewrite:early",
+        "target": "phase420:glm4:rewrite:middle",
+        "relation": "same_block_depth_order_not_causal",
+        "causal": false
+      },
+      {
+        "id": "phase420:glm4:rewrite:middle->phase420:glm4:rewrite:late",
+        "source": "phase420:glm4:rewrite:middle",
+        "target": "phase420:glm4:rewrite:late",
+        "relation": "same_block_depth_order_not_causal",
+        "causal": false
+      }
+    ]
+  },
+  "metrics": {
+    "node_count": 3,
+    "edge_count": 2
+  },
+  "evidence_boundary": [
+    "Rewrite classes summarize the angle and cancellation geometry of same-layer residual writes.",
+    "Stable block geometry is not proof that the MLP causally rewrites history information."
+  ]
+}

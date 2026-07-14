@@ -1,0 +1,44 @@
+{
+  "schema_version": "87.0.0",
+  "phase_id": "Phase413-CandidatePanelContract",
+  "created_at": "2026-07-14T01:45:15.521207+00:00",
+  "valid": true,
+  "panel_id": "phase413_synthetic_equal_horizon_panel",
+  "panel_hash": "312d3742c09094b2118d06c3fb0504fd",
+  "candidate_count": 4,
+  "horizon_tokens": 2,
+  "axis_count": 5,
+  "axes": [
+    "semantic_valid",
+    "grammar_valid",
+    "logic_valid",
+    "format_valid",
+    "stop_valid"
+  ],
+  "events_pairwise_disjoint": true,
+  "all_candidates_equal_horizon": true,
+  "eos_absorbing": true,
+  "axes_are_independent_labels_not_exclusive_buckets": true,
+  "model_token_ids_registered": false,
+  "real_model_panel_exhaustive": false,
+  "required_real_model_fields": [
+    "tokenizer_hash",
+    "token_ids",
+    "surface",
+    "split",
+    "raw_sequence_probability",
+    "raw_panel_mass",
+    "outside_panel_mass",
+    "conditional_panel_probability",
+    "right_censored"
+  ],
+  "metric_rules": {
+    "raw_panel_mass": "sum_of_pairwise_disjoint_equal_horizon_sequence_probabilities",
+    "outside_panel_mass": "one_minus_raw_panel_mass_only_after_disjointness_audit",
+    "conditional_panel_probability": "raw_sequence_probability_divided_by_raw_panel_mass",
+    "effective_candidate_count": "exp_entropy_of_declared_distribution_with_distribution_scope_recorded",
+    "valid_mass": "sum_raw_probability_by_each_validity_axis_and_fully_valid_intersection",
+    "js_divergence": "only_same_frozen_panel_same_coordinate_system_and_same_qualified_readout"
+  },
+  "claim_boundary": "synthetic_contract_only_not_a_registered_model_token_panel_or_language_ontology"
+}

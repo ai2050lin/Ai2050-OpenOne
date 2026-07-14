@@ -1,0 +1,217 @@
+{
+  "schema_version": "89.0.0",
+  "phase_id": "Phase416-InstrumentDomainQualification",
+  "created_at": "2026-07-14T03:24:35.383958+00:00",
+  "valid": true,
+  "assessment": {
+    "phase414_measurement_ontology_correct": true,
+    "external_review_should_block_formal_prefill_collection": false,
+    "observer_qualification_should_block_unlabeled_prefill_collection": false,
+    "single_collector_gate_across_prefill_cache_and_generation_valid": false,
+    "prefill_and_incremental_execution_must_be_separate_instrument_domains": true
+  },
+  "denominators": {
+    "model_count": 3,
+    "case_count_per_model": 55,
+    "collector_case_count": 165,
+    "prefill_gate_count": 6,
+    "cache_gate_count": 5,
+    "generation_gate_count": 3
+  },
+  "results": {
+    "prefill_collector_pass_count": 165,
+    "incremental_cache_pass_count": 45,
+    "greedy_generation_pass_count": 61,
+    "prefill_qualified_model_count": 3,
+    "incremental_cache_qualified_model_count": 0,
+    "greedy_generation_qualified_model_count": 0,
+    "qualified_formal_behavior_cell_count": 11,
+    "formal_behavior_cell_count": 12
+  },
+  "models": [
+    {
+      "model": "qwen3",
+      "case_count": 55,
+      "prefill_collector_pass_count": 55,
+      "prefill_collector_qualification_pass": true,
+      "incremental_cache_pass_count": 33,
+      "incremental_cache_qualification_pass": false,
+      "greedy_generation_pass_count": 54,
+      "greedy_generation_qualification_pass": false,
+      "target_behavior_pass_count": 51,
+      "exact_answer_pass_count": 45,
+      "qualified_formal_family_count": 4,
+      "prefill_physical_collection_authorized": true,
+      "generation_time_physical_collection_authorized": false
+    },
+    {
+      "model": "glm4",
+      "case_count": 55,
+      "prefill_collector_pass_count": 55,
+      "prefill_collector_qualification_pass": true,
+      "incremental_cache_pass_count": 12,
+      "incremental_cache_qualification_pass": false,
+      "greedy_generation_pass_count": 7,
+      "greedy_generation_qualification_pass": false,
+      "target_behavior_pass_count": 53,
+      "exact_answer_pass_count": 16,
+      "qualified_formal_family_count": 4,
+      "prefill_physical_collection_authorized": true,
+      "generation_time_physical_collection_authorized": false
+    },
+    {
+      "model": "deepseek7b",
+      "case_count": 55,
+      "prefill_collector_pass_count": 55,
+      "prefill_collector_qualification_pass": true,
+      "incremental_cache_pass_count": 0,
+      "incremental_cache_qualification_pass": false,
+      "greedy_generation_pass_count": 0,
+      "greedy_generation_qualification_pass": false,
+      "target_behavior_pass_count": 40,
+      "exact_answer_pass_count": 24,
+      "qualified_formal_family_count": 3,
+      "prefill_physical_collection_authorized": true,
+      "generation_time_physical_collection_authorized": false
+    }
+  ],
+  "behavior_cells": [
+    {
+      "model": "qwen3",
+      "family_id": "grammar",
+      "case_count": 11,
+      "collector_pass_count": 4,
+      "target_event_match_rate": 1.0,
+      "exact_answer_rate": 0.45454545454545453,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "qwen3",
+      "family_id": "knowledge_network",
+      "case_count": 17,
+      "collector_pass_count": 9,
+      "target_event_match_rate": 0.8823529411764706,
+      "exact_answer_rate": 0.8823529411764706,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "qwen3",
+      "family_id": "protocol_control",
+      "case_count": 16,
+      "collector_pass_count": 9,
+      "target_event_match_rate": 0.875,
+      "exact_answer_rate": 0.875,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "qwen3",
+      "family_id": "reasoning",
+      "case_count": 11,
+      "collector_pass_count": 10,
+      "target_event_match_rate": 1.0,
+      "exact_answer_rate": 1.0,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "glm4",
+      "family_id": "grammar",
+      "case_count": 11,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.9090909090909091,
+      "exact_answer_rate": 0.0,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "glm4",
+      "family_id": "knowledge_network",
+      "case_count": 17,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 1.0,
+      "exact_answer_rate": 0.29411764705882354,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "glm4",
+      "family_id": "protocol_control",
+      "case_count": 16,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 1.0,
+      "exact_answer_rate": 0.6875,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "glm4",
+      "family_id": "reasoning",
+      "case_count": 11,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.9090909090909091,
+      "exact_answer_rate": 0.0,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "grammar",
+      "case_count": 11,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 1.0,
+      "exact_answer_rate": 0.45454545454545453,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "knowledge_network",
+      "case_count": 17,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.29411764705882354,
+      "exact_answer_rate": 0.29411764705882354,
+      "formal_behavior_qualified": false,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "protocol_control",
+      "case_count": 16,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.875,
+      "exact_answer_rate": 0.8125,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "reasoning",
+      "case_count": 11,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.9090909090909091,
+      "exact_answer_rate": 0.09090909090909091,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    }
+  ],
+  "authorization": {
+    "collect_observer_free_prefill_physical_atlas": true,
+    "collect_generation_time_physical_atlas": false,
+    "attach_functional_labels_only_to_behavior_qualified_formal_cells": true,
+    "claim_natural_language_external_validity": false,
+    "train_or_publish_qualified_observer": false,
+    "run_causal_intervention": false,
+    "run_neuron_scan": false
+  },
+  "hard_limits": [
+    "prefill qualification does not qualify KV-cached incremental execution",
+    "formal target behavior does not establish natural-language external validity",
+    "raw physical nodes receive no semantic-probability or causal labels",
+    "DS7B knowledge behavior failed the frozen 0.75 target-event gate",
+    "no generation-time stop or sentence-boundary topology may be inferred"
+  ],
+  "claim_boundary": "prefill_instrument_domain_only_not_generation_time_or_causal_mechanism"
+}

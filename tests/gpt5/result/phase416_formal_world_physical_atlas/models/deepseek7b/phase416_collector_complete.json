@@ -1,0 +1,77 @@
+{
+  "schema_version": "89.0.0",
+  "phase_id": "Phase416-RealCollectorQualification",
+  "created_at": "2026-07-14T03:22:28.352937+00:00",
+  "model": "deepseek7b",
+  "case_count": 55,
+  "required_case_count": 55,
+  "collector_case_pass_count": 0,
+  "collector_case_failure_count": 55,
+  "collector_qualification_pass": false,
+  "target_behavior_pass_count": 40,
+  "exact_answer_pass_count": 24,
+  "behavior_cells": [
+    {
+      "model": "deepseek7b",
+      "family_id": "grammar",
+      "case_count": 11,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 1.0,
+      "exact_answer_rate": 0.45454545454545453,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "knowledge_network",
+      "case_count": 17,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.29411764705882354,
+      "exact_answer_rate": 0.29411764705882354,
+      "formal_behavior_qualified": false,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "protocol_control",
+      "case_count": 16,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.875,
+      "exact_answer_rate": 0.8125,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    },
+    {
+      "model": "deepseek7b",
+      "family_id": "reasoning",
+      "case_count": 11,
+      "collector_pass_count": 0,
+      "target_event_match_rate": 0.9090909090909091,
+      "exact_answer_rate": 0.09090909090909091,
+      "formal_behavior_qualified": true,
+      "natural_language_external_validity": false
+    }
+  ],
+  "qualified_formal_family_count": 3,
+  "max_observed_errors": {
+    "direct_hook_terminal_logit_max_abs": 0.0,
+    "direct_hook_terminal_js": 0.0,
+    "layer_output_max_abs": 0.0,
+    "component_ledger_relative_error": 0.0,
+    "chunked_cache_terminal_logit_max_abs": 4.5625,
+    "chunked_cache_terminal_js": 0.17978203296661377,
+    "chunked_cache_relative_error": 0.40467530488967896,
+    "checkpoint_replay_terminal_logit_max_abs": 0.0,
+    "checkpoint_replay_terminal_js": 0.0,
+    "greedy_generation_score_max_abs": 0.0625
+  },
+  "vram_gb": [
+    15.278073856,
+    15.409872896
+  ],
+  "raw_physical_collection_authorized": false,
+  "functional_labels_authorized_only_for_qualified_formal_families": true,
+  "causal_intervention_authorized": false,
+  "neuron_scan_authorized": false,
+  "claim_boundary": "real_instrument_and_formal_behavior_qualification_not_language_mechanism_closure"
+}

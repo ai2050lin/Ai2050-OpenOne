@@ -167,20 +167,30 @@ class Phase402MultiParentGraphTest(unittest.TestCase):
         self.assertTrue(all(not row["causal_path"] for row in edges))
         for root in (NEURON, NEURON_CLIENT):
             manifest = read_json(root / "manifest.json")
-            self.assertEqual(manifest["phase"], 402)
+            self.assertGreaterEqual(manifest["phase"], 402)
             self.assertEqual(
                 manifest["phase402_audit"]["new_neuron_path_nodes_promoted"], 0
             )
-            self.assertFalse(
-                manifest["evidence_boundary"][
-                    "crossmodel_joint_parent_candidate_available"
-                ]
+            self.assertEqual(
+                manifest["phase402_audit"][
+                    "model_level_joint_parent_candidate_count"
+                ],
+                0,
+            )
+            self.assertEqual(
+                manifest["phase402_audit"][
+                    "crossmodel_joint_parent_surface_count"
+                ],
+                0,
             )
             self.assertFalse(manifest["evidence_boundary"]["single_unit_causal_closure"])
 
     def test_progress_and_client_use_phase402_as_latest(self):
         progress = read_json(ATLAS / "progress.json")
-        self.assertEqual(progress["last_phase"], "Phase402-MultiParentDirectChildStage")
+        latest_phase_number = int(
+            progress["last_phase"].split("-", maxsplit=1)[0].removeprefix("Phase")
+        )
+        self.assertGreaterEqual(latest_phase_number, 402)
         self.assertFalse(progress["single_global_progress_percentage_valid"])
         self.assertEqual(
             progress["multiparent_direct_child_stage"]["strict_local_joint_cells"],

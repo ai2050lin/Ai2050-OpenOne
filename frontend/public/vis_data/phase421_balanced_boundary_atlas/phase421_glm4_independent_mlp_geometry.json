@@ -1,0 +1,154 @@
+{
+  "schema_version": "atlas_graph_v1",
+  "phase_id": "Phase421-BalancedBoundaryAtlas",
+  "title": "Phase421 glm4 独立 MLP 几何",
+  "model": "glm4",
+  "graph": {
+    "nodes": [
+      {
+        "id": "phase421:glm4:geometry:early",
+        "label": "early · g∥ -0.20 · g⊥ 1.19",
+        "type": "independent_mlp_geometry",
+        "schema_version": "94.0.0",
+        "phase_id": "Phase421-IndependentGeometrySummary",
+        "created_at": "2026-07-14T07:59:44.115788+00:00",
+        "model": "glm4",
+        "split": "behavior_holdout",
+        "depth_bin": "early",
+        "history_relation": "conflict",
+        "row_count": 1664,
+        "parallel_gain": -0.2047129223,
+        "orthogonal_rewrite_ratio": 1.1894202025,
+        "total_mlp_attention_ratio": 1.211710358,
+        "delta_attention_norm": 0.0773819313,
+        "delta_mlp_norm": 0.090676792,
+        "delta_combined_norm": 0.1051817574,
+        "old_novelty_and_cancellation_metrics_removed_as_algebraically_redundant": true,
+        "descriptive_only": true,
+        "causal": false,
+        "score": 0.2047129223,
+        "size": 0.65,
+        "color": "#38bdf8",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "show_label": true,
+        "physical": true,
+        "predictive": false
+      },
+      {
+        "id": "phase421:glm4:geometry:middle",
+        "label": "middle · g∥ -0.13 · g⊥ 1.24",
+        "type": "independent_mlp_geometry",
+        "schema_version": "94.0.0",
+        "phase_id": "Phase421-IndependentGeometrySummary",
+        "created_at": "2026-07-14T07:59:44.120460+00:00",
+        "model": "glm4",
+        "split": "behavior_holdout",
+        "depth_bin": "middle",
+        "history_relation": "conflict",
+        "row_count": 1664,
+        "parallel_gain": -0.1294579559,
+        "orthogonal_rewrite_ratio": 1.2407544285,
+        "total_mlp_attention_ratio": 1.2452410698,
+        "delta_attention_norm": 0.5534665287,
+        "delta_mlp_norm": 0.7460354865,
+        "delta_combined_norm": 0.9155783654,
+        "old_novelty_and_cancellation_metrics_removed_as_algebraically_redundant": true,
+        "descriptive_only": true,
+        "causal": false,
+        "score": 0.1294579559,
+        "size": 0.65,
+        "color": "#f59e0b",
+        "position": [
+          0.0,
+          9.0,
+          0.0
+        ],
+        "show_label": true,
+        "physical": true,
+        "predictive": false
+      },
+      {
+        "id": "phase421:glm4:geometry:late",
+        "label": "late · g∥ 0.01 · g⊥ 1.47",
+        "type": "independent_mlp_geometry",
+        "schema_version": "94.0.0",
+        "phase_id": "Phase421-IndependentGeometrySummary",
+        "created_at": "2026-07-14T07:59:44.118307+00:00",
+        "model": "glm4",
+        "split": "behavior_holdout",
+        "depth_bin": "late",
+        "history_relation": "conflict",
+        "row_count": 1792,
+        "parallel_gain": 0.0103948503,
+        "orthogonal_rewrite_ratio": 1.4722806294,
+        "total_mlp_attention_ratio": 1.4726587639,
+        "delta_attention_norm": 2.1373442412,
+        "delta_mlp_norm": 3.4238722324,
+        "delta_combined_norm": 4.7271540165,
+        "old_novelty_and_cancellation_metrics_removed_as_algebraically_redundant": true,
+        "descriptive_only": true,
+        "causal": false,
+        "score": 0.0103948503,
+        "size": 0.65,
+        "color": "#ef4444",
+        "position": [
+          0.0,
+          18.0,
+          0.0
+        ],
+        "show_label": true,
+        "physical": true,
+        "predictive": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "phase421:glm4:geometry:early->phase421:glm4:geometry:middle",
+        "source": "phase421:glm4:geometry:early",
+        "target": "phase421:glm4:geometry:middle",
+        "relation": "depth_order_not_causal",
+        "causal": false
+      },
+      {
+        "id": "phase421:glm4:geometry:middle->phase421:glm4:geometry:late",
+        "source": "phase421:glm4:geometry:middle",
+        "target": "phase421:glm4:geometry:late",
+        "relation": "depth_order_not_causal",
+        "causal": false
+      }
+    ]
+  },
+  "metrics": {
+    "node_count": 3,
+    "edge_count": 2,
+    "repeat_noise": {
+      "parallel_gain": {
+        "repeat_row_count": 480,
+        "median_absolute_repeat_difference": 0.0,
+        "max_absolute_repeat_difference": 0.0,
+        "effective_floor": 1e-06
+      },
+      "orthogonal_rewrite_ratio": {
+        "repeat_row_count": 480,
+        "median_absolute_repeat_difference": 0.0,
+        "max_absolute_repeat_difference": 0.0,
+        "effective_floor": 1e-06
+      },
+      "total_mlp_attention_ratio": {
+        "repeat_row_count": 480,
+        "median_absolute_repeat_difference": 0.0,
+        "max_absolute_repeat_difference": 0.0,
+        "effective_floor": 1e-06
+      }
+    }
+  },
+  "evidence_boundary": [
+    "Parallel gain, orthogonal rewrite and total ratio are algebraically independent summaries.",
+    "Repeat noise is reported separately; reconstruction error is not treated as the metric noise floor.",
+    "Geometry remains descriptive unless it passes frozen incremental prediction."
+  ]
+}

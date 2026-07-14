@@ -295,8 +295,16 @@ class Phase409DynamicResponseProtocolTest(unittest.TestCase):
             manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
             progress = json.loads((root / "progress.json").read_text(encoding="utf-8"))
             self.assertEqual(mirror, source)
-            self.assertEqual(
-                manifest["last_phase"], "Phase409-DynamicResponseProtocolStage"
+            self.assertIn(
+                manifest["last_phase"],
+                {
+                    "Phase409-DynamicResponseProtocolStage",
+                    "Phase410-OrthogonalDynamicPreflightStage",
+                    "Phase411-FiniteSemanticOperationPreflightStage",
+                    "Phase412-TypedObserverQuotientPreflightStage",
+                    "Phase413-PredictionKernelMeasurementPreflightStage",
+                    "Phase414-ObserverIndexedEventPreflightStage",
+                },
             )
             self.assertEqual(manifest["phase409"]["model_case_count"], 0)
             self.assertFalse(progress["single_global_progress_percentage_valid"])
@@ -311,7 +319,7 @@ class Phase409DynamicResponseProtocolTest(unittest.TestCase):
         )
         for root in neuron_roots:
             manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
-            self.assertEqual(manifest["phase"], 409)
+            self.assertGreaterEqual(manifest["phase"], 409)
             self.assertEqual(
                 manifest["phase409_audit"]["new_neuron_path_nodes_promoted"], 0
             )

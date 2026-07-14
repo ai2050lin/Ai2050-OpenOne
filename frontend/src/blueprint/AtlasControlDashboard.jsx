@@ -1121,6 +1121,125 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
     });
   }, [progress]);
 
+  const orthogonalDynamicPreflightRows = useMemo(() => {
+    const stage = progress?.orthogonal_dynamic_preflight_stage || {};
+    const definitions = [
+      ['orthogonal_state_axes', 'Phase410 正交状态轴'],
+      ['h3_order_variants_machine_audited', 'h3 顺序反转机器审计'],
+      ['finite_grammar_cases_machine_audited', '语法有限全集机器审计'],
+      ['independent_external_reviewers', '独立外部规则审阅者'],
+      ['sealed_model_collector_equivalence', '密封模型采集器等价'],
+      ['model_cases_consumed', '已使用模型案例'],
+      ['physical_cases_consumed', '已使用物理案例'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const finiteSemanticOperationRows = useMemo(() => {
+    const stage = progress?.finite_semantic_operation_preflight_stage || {};
+    const definitions = [
+      ['finite_semantic_cases_machine_audited', 'Phase411 有限语义合同机器审计'],
+      ['semantic_only_registered_resolutions', '仅有限语义通道解析案例'],
+      ['registered_operations_with_inverse', '具有双侧逆的注册操作'],
+      ['operation_compositions_machine_audited', '操作组合闭包机器审计'],
+      ['history_covariance_cases_machine_audited', '历史规则协变机器审计'],
+      ['independent_external_reviewers', '独立外部规则审阅者'],
+      ['accepted_external_review_items', '双人一致且符合注册表的条目'],
+      ['sealed_model_collector_equivalence', '密封模型采集器等价'],
+      ['model_cases_consumed', '已使用模型案例'],
+      ['physical_cases_consumed', '已使用物理案例'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const typedObserverQuotientRows = useMemo(() => {
+    const stage = progress?.typed_observer_quotient_preflight_stage || {};
+    const definitions = [
+      ['typed_observer_covariance_cells', 'Phase412 类型化观察者协变'],
+      ['fixed_failures_explained_by_role_transport', '固定角色失败的角色运输解释'],
+      ['observer_action_compositions', '观察者作用组合审计'],
+      ['finite_partitions_exhausted', '有限状态分区穷举'],
+      ['global_nontrivial_qualifying_partitions', '全局合格非平凡商'],
+      ['external_role_indexed_partition_bundles', '外部角色索引分区束'],
+      ['registered_irreversible_operations', '已注册不可逆操作'],
+      ['registered_cross_family_bridges', '已注册跨族桥'],
+      ['independent_external_reviewers', '独立外部规则审阅者'],
+      ['sealed_model_collector_equivalence', '密封模型采集器等价'],
+      ['model_cases_consumed', '已使用模型案例'],
+      ['physical_cases_consumed', '已使用物理案例'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const predictionKernelMeasurementRows = useMemo(() => {
+    const stage = progress?.prediction_kernel_measurement_preflight_stage || {};
+    const definitions = [
+      ['source_claims_audited', 'Phase413 材料主张审计'],
+      ['terminal_identical_synthetic_paths', '终端相同的有限轨迹'],
+      ['endpoint_identical_internal_distinct_pairs', '端点相同但中间不同的轨迹对'],
+      ['one_step_equal_future_different_pairs', '一步相同但未来不同的状态对'],
+      ['native_output_channel_permutation_invariance', '通道置换下原生输出不变'],
+      ['fixed_coordinate_probe_counterexamples', '固定通道读数反例'],
+      ['candidate_panel_contract_cases', '定长多轴候选面板合同'],
+      ['qualified_direct_layer_local_probability_readouts', '合格的层内局部概率读出'],
+      ['independent_external_reviewers', '独立外部规则审阅者'],
+      ['sealed_model_collector_equivalence', '密封模型采集器等价'],
+      ['model_cases_consumed', '已使用模型案例'],
+      ['physical_cases_consumed', '已使用物理案例'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
+  const observerIndexedEventRows = useMemo(() => {
+    const stage = progress?.observer_indexed_event_preflight_stage || {};
+    const definitions = [
+      ['supplied_claims_audited', 'Phase414 材料主张审计'],
+      ['mixed_catalog_items_classified', '混合证据目录分类'],
+      ['natural_complete_state_replay_identity', '完整自然状态续跑恒等'],
+      ['layerwise_terminal_kernel_variation', '层间终端核变化'],
+      ['incomplete_state_counterexamples', '不完整状态续跑反例'],
+      ['observer_indexed_cells', '观察者索引读数单元'],
+      ['variable_length_event_panel', '可变长度事件面板合同'],
+      ['invalid_prefix_panel_rejected', '前缀冲突面板拒绝'],
+      ['cross_tokenizer_semantic_alignment', '跨 tokenizer 语义事件对齐'],
+      ['qualified_observers', '合格中间观察者'],
+      ['independent_external_reviewers', '独立外部规则审阅者'],
+      ['sealed_model_collector_equivalence', '密封模型采集器等价'],
+      ['model_cases_consumed', '已使用模型案例'],
+      ['new_physical_paths', '新增物理路径'],
+      ['new_single_neuron_causal_paths', '新增单神经元因果路径'],
+    ];
+    return definitions.flatMap(([id, label]) => {
+      const value = stage[id];
+      if (!value || !Number.isFinite(value.numerator) || !Number.isFinite(value.denominator)) return [];
+      return [{ id, label, numerator: value.numerator, denominator: value.denominator }];
+    });
+  }, [progress]);
+
   const latestSections = useMemo(() => {
     const sections = latestCards.map((item) => ({ ...item }));
     const latest = progress?.last_phase || progress?.latest_phase || manifest?.phase || 'Atlas v2';
@@ -1331,19 +1450,127 @@ export function AtlasControlDashboard({ lang = 'zh' }) {
         items: dynamicResponseProtocolRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
       };
     }
+    if (overallLatest && progress?.orthogonal_dynamic_preflight_stage) {
+      const stage = progress.orthogonal_dynamic_preflight_stage;
+      const axes = stage.orthogonal_state_axes?.numerator || 0;
+      const h3 = stage.h3_order_variants_machine_audited || {};
+      const grammar = stage.finite_grammar_cases_machine_audited || {};
+      const reviewers = stage.independent_external_reviewers || {};
+      const collector = stage.sealed_model_collector_equivalence || {};
+      const modelCases = stage.model_cases_consumed?.numerator || 0;
+      overallLatest.summary = '动态响应已改为六轴正交账本；机器预检通过，但外部复核和真实模型采集器门仍关闭。';
+      overallLatest.value = `${h3.numerator || 0}/${h3.denominator || 0} h3 / ${modelCases} model cases`;
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：正交动态状态与执行资格预检`,
+        text: `Phase410 将语义、格式、句界、停止、数值和响应角色拆成 ${axes} 个可并存状态轴；完成 ${h3.numerator || 0}/${h3.denominator || 0} 个 h3 顺序变体与 ${grammar.numerator || 0}/${grammar.denominator || 0} 个冻结语法响应案例的机器审计。`,
+        value: 'Machine preflight passed / scientific execution closed',
+        valueHint: `独立外部审阅者为 ${reviewers.numerator || 0}/${reviewers.denominator || 0}，密封真实模型采集器等价为 ${collector.numerator || 0}/${collector.denominator || 0}。当前模型、物理、因果和神经元案例均为零；3D 保留原网络形状。`,
+        items: orthogonalDynamicPreflightRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.finite_semantic_operation_preflight_stage) {
+      const stage = progress.finite_semantic_operation_preflight_stage;
+      const semantic = stage.finite_semantic_cases_machine_audited || {};
+      const semanticOnly = stage.semantic_only_registered_resolutions || {};
+      const operations = stage.registered_operations_with_inverse || {};
+      const compositions = stage.operation_compositions_machine_audited || {};
+      const covariance = stage.history_covariance_cases_machine_audited || {};
+      const reviewers = stage.independent_external_reviewers || {};
+      const accepted = stage.accepted_external_review_items || {};
+      const collector = stage.sealed_model_collector_equivalence || {};
+      overallLatest.summary = '有限语义与操作合同已冻结；固定观察者粗分区出现失败，执行门关闭。';
+      overallLatest.value = '1.21M finite / 0 model';
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：有限语义、操作闭包与独立复核门`,
+        text: `Phase411 保留严格整段精确通道，并在 ${semantic.numerator || 0}/${semantic.denominator || 0} 个冻结模板案例上增加有限注册语义通道，其中 ${semanticOnly.numerator || 0} 例只能由该有限通道解析。三族 ${operations.numerator || 0}/${operations.denominator || 0} 个外部状态操作均有双侧逆；操作组合 ${compositions.numerator || 0}/${compositions.denominator || 0}、历史规则协变 ${covariance.numerator || 0}/${covariance.denominator || 0} 均通过机器审计。`,
+        value: 'Finite protocol closed / model semantics and physics untested',
+        valueHint: `这些操作属于测试世界，不是模型内部算子。独立审阅者为 ${reviewers.numerator || 0}/${reviewers.denominator || 0}，双人接受条目为 ${accepted.numerator || 0}/${accepted.denominator || 0}，密封真实模型采集器等价为 ${collector.numerator || 0}/${collector.denominator || 0}；3D 保留原网络形状，不新增物理路径或神经元。`,
+        items: finiteSemanticOperationRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.typed_observer_quotient_preflight_stage) {
+      const stage = progress.typed_observer_quotient_preflight_stage;
+      const covariance = stage.typed_observer_covariance_cells || {};
+      const explained = stage.fixed_failures_explained_by_role_transport || {};
+      const compositions = stage.observer_action_compositions || {};
+      const partitions = stage.finite_partitions_exhausted || {};
+      const globalQuotients = stage.global_nontrivial_qualifying_partitions || {};
+      const bundles = stage.external_role_indexed_partition_bundles || {};
+      const irreversible = stage.registered_irreversible_operations || {};
+      const bridges = stage.registered_cross_family_bridges || {};
+      const reviewers = stage.independent_external_reviewers || {};
+      const collector = stage.sealed_model_collector_equivalence || {};
+      overallLatest.summary = '固定查询角色的失败已校准为角色运输问题；全局非平凡状态商仍未建立。';
+      overallLatest.value = `${partitions.numerator || 0} partitions / 0 model`;
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：类型化观察者协变与非平凡状态商穷举`,
+        text: `Phase412 复现 Phase411 的 ${explained.denominator || 0} 个固定查询角色失败，并确认其中 ${explained.numerator || 0} 个都由实体重命名时未同步运输查询角色造成。状态、查询角色和响应类联合变换后，协变单元通过 ${covariance.numerator || 0}/${covariance.denominator || 0}，观察者作用组合通过 ${compositions.numerator || 0}/${compositions.denominator || 0}。有限世界的 ${partitions.numerator || 0}/${partitions.denominator || 0} 个分区已穷举。`,
+        value: `Global nontrivial quotient ${globalQuotients.numerator || 0}/${globalQuotients.denominator || 0}`,
+        valueHint: `知识族有 ${bundles.numerator || 0} 个外部角色索引分区束，但它不是模型状态。不可逆操作 ${irreversible.numerator || 0}/${irreversible.denominator || 0}、跨族桥 ${bridges.numerator || 0}/${bridges.denominator || 0}、外部审阅者 ${reviewers.numerator || 0}/${reviewers.denominator || 0}、密封采集器 ${collector.numerator || 0}/${collector.denominator || 0}；3D 形状不变，不新增物理路径或神经元。`,
+        items: typedObserverQuotientRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.prediction_kernel_measurement_preflight_stage) {
+      const stage = progress.prediction_kernel_measurement_preflight_stage;
+      const claims = stage.source_claims_audited || {};
+      const paths = stage.terminal_identical_synthetic_paths || {};
+      const pairs = stage.endpoint_identical_internal_distinct_pairs || {};
+      const future = stage.one_step_equal_future_different_pairs || {};
+      const nativeOutput = stage.native_output_channel_permutation_invariance || {};
+      const fixedProbe = stage.fixed_coordinate_probe_counterexamples || {};
+      const localReadouts = stage.qualified_direct_layer_local_probability_readouts || {};
+      const reviewers = stage.independent_external_reviewers || {};
+      const collector = stage.sealed_model_collector_equivalence || {};
+      overallLatest.summary = '终端预测核可以精确定义，但中间候选轨迹尚无合格的层内局部概率读出。';
+      overallLatest.value = `${paths.numerator || 0} terminal paths / ${localReadouts.numerator || 0} local readout`;
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：终端预测核与中间候选轨迹测量资格`,
+        text: `Phase413 审计 ${claims.numerator || 0}/${claims.denominator || 0} 条材料主张。构造的 ${paths.numerator || 0}/${paths.denominator || 0} 条轨迹拥有相同起点和终端分布，但 ${pairs.numerator || 0}/${pairs.denominator || 0} 条轨迹对的中间过程不同；另有 ${future.numerator || 0}/${future.denominator || 0} 个有限状态对在当前一步分布相同而两步未来不同。`,
+        value: `Qualified direct layer-local probability readout ${localReadouts.numerator || 0}/${localReadouts.denominator || 0}`,
+        valueHint: `MLP 通道置换保持原生输出 ${nativeOutput.numerator || 0}/${nativeOutput.denominator || 0}，却产生固定通道读数反例 ${fixedProbe.numerator || 0}/${fixedProbe.denominator || 0}。这些都是协议和有限反例，不是模型物理路径。外部审阅者 ${reviewers.numerator || 0}/${reviewers.denominator || 0}、密封采集器 ${collector.numerator || 0}/${collector.denominator || 0}；3D 形状不变。`,
+        items: predictionKernelMeasurementRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
+    if (overallLatest && progress?.observer_indexed_event_preflight_stage) {
+      const stage = progress.observer_indexed_event_preflight_stage;
+      const catalog = stage.mixed_catalog_items_classified || {};
+      const replay = stage.natural_complete_state_replay_identity || {};
+      const variation = stage.layerwise_terminal_kernel_variation || {};
+      const incomplete = stage.incomplete_state_counterexamples || {};
+      const observerCells = stage.observer_indexed_cells || {};
+      const events = stage.variable_length_event_panel || {};
+      const semanticAlignment = stage.cross_tokenizer_semantic_alignment || {};
+      const qualified = stage.qualified_observers || {};
+      const reviewers = stage.independent_external_reviewers || {};
+      const collector = stage.sealed_model_collector_equivalence || {};
+      overallLatest.summary = '完整自然状态续跑是终端恒等检查，不是层间候选收缩曲线；观察者索引与事件合同已冻结。';
+      overallLatest.value = `${replay.numerator || 0}/${replay.denominator || 0} identity / ${qualified.numerator || 0} observer`;
+      overallLatest.detail = {
+        ...overallLatest.detail,
+        title: `${latest}：自然状态续跑恒等、观察者索引与事件合同`,
+        text: `Phase414 在 ${replay.numerator || 0}/${replay.denominator || 0} 个有限完整状态续跑单元中复现同一终端核，${variation.numerator || 0}/${variation.denominator || 0} 个案例出现层间终端核变化；删去角色、历史或缓存后则有 ${incomplete.numerator || 0}/${incomplete.denominator || 0} 个反例。完整状态续跑因此只用于验证采集器和 checkpoint 一致性。观察者索引读数记录 ${observerCells.numerator || 0}/${observerCells.denominator || 0}，不能称为模型原生中间概率。`,
+        value: `Qualified observer ${qualified.numerator || 0}/${qualified.denominator || 0}`,
+        valueHint: `${catalog.numerator || 0}/${catalog.denominator || 0} 项目录已按证据类型分类，但不是完成百分比分母。可变长度事件合同 ${events.numerator || 0}/${events.denominator || 0}，跨 tokenizer 语义事件对齐 ${semanticAlignment.numerator || 0}/${semanticAlignment.denominator || 0}。外部审阅者 ${reviewers.numerator || 0}/${reviewers.denominator || 0}、密封采集器 ${collector.numerator || 0}/${collector.denominator || 0}；3D 保留原网络形状，不新增物理路径或神经元。`,
+        items: observerIndexedEventRows.map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
+      };
+    }
     const engineering = sections.find((item) => item.id === 'engineering_latest');
     if (engineering) {
       engineering.detail = {
         ...engineering.detail,
         items: overallValid
           ? progressRows.map((row) => `${row.label}：${pct(progressMap[row.id])}。${row.hint}`)
-          : (dynamicResponseProtocolRows.length ? dynamicResponseProtocolRows : partitionInterfaceRows.length ? partitionInterfaceRows : eventHorizonRows.length ? eventHorizonRows : conditionedSequenceRows.length ? conditionedSequenceRows : predictiveStateRows.length ? predictiveStateRows : multiParentRows.length ? multiParentRows : localEdgeRows.length ? localEdgeRows : dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
+          : (observerIndexedEventRows.length ? observerIndexedEventRows : predictionKernelMeasurementRows.length ? predictionKernelMeasurementRows : typedObserverQuotientRows.length ? typedObserverQuotientRows : finiteSemanticOperationRows.length ? finiteSemanticOperationRows : orthogonalDynamicPreflightRows.length ? orthogonalDynamicPreflightRows : dynamicResponseProtocolRows.length ? dynamicResponseProtocolRows : partitionInterfaceRows.length ? partitionInterfaceRows : eventHorizonRows.length ? eventHorizonRows : conditionedSequenceRows.length ? conditionedSequenceRows : predictiveStateRows.length ? predictiveStateRows : multiParentRows.length ? multiParentRows : localEdgeRows.length ? localEdgeRows : dynamicPartialOrderRows.length ? dynamicPartialOrderRows : multiPositionDynamicBindingRows.length ? multiPositionDynamicBindingRows : orderConditionedBindingRows.length ? orderConditionedBindingRows : factorSeparatedBindingRows.length ? factorSeparatedBindingRows : bindingSeparationRows.length ? bindingSeparationRows : jointFormationRows.length ? jointFormationRows : relationRows.length ? relationRows : exactEventRows)
             .map((row) => `${row.label}：${row.numerator}/${row.denominator}。`),
         valueHint: `客户端视图数量：${clientIndex?.views?.length || 0}。最新阶段：${latest}。单一全局完成百分比：${overallValid ? '有效' : '无效'}。`,
       };
     }
     return sections;
-  }, [bindingSeparationRows, clientIndex, conditionedSequenceRows, dynamicPartialOrderRows, dynamicResponseProtocolRows, eventHorizonRows, exactEventRows, factorSeparatedBindingRows, jointFormationRows, localEdgeRows, manifest, multiParentRows, multiPositionDynamicBindingRows, orderConditionedBindingRows, overallValid, partitionInterfaceRows, predictiveStateRows, progress, progressMap, relationRows]);
+  }, [bindingSeparationRows, clientIndex, conditionedSequenceRows, dynamicPartialOrderRows, dynamicResponseProtocolRows, eventHorizonRows, exactEventRows, factorSeparatedBindingRows, finiteSemanticOperationRows, jointFormationRows, localEdgeRows, manifest, multiParentRows, multiPositionDynamicBindingRows, observerIndexedEventRows, orderConditionedBindingRows, orthogonalDynamicPreflightRows, overallValid, partitionInterfaceRows, predictionKernelMeasurementRows, predictiveStateRows, progress, progressMap, relationRows, typedObserverQuotientRows]);
 
   const planDetail = useMemo(() => {
     return planCards.find((item) => item.id === activePlan)?.detail || null;

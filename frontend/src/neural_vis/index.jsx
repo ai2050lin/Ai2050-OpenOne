@@ -7,9 +7,10 @@
  *   v2.0: subspace_decomposition, force_line, grammar_role_matrix, causal_chain, dark_matter_flow
  *   v3.0: 多维度视角切换, 动画场景演示
  */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Stars } from '@react-three/drei';
+import { Database, FolderOpen, RefreshCw, Search } from 'lucide-react';
 import * as THREE from 'three';
 
 // 模块化导入
@@ -67,8 +68,24 @@ const S = {
 
 // ==================== 主组件 ====================
 export default function NeuralVis3DApp() {
-  const { dataFiles, activeData, loading, error, loadDataManifest, loadDataFile, loadLocalFile } = useVisData();
+  const {
+    dataSources,
+    activeSource,
+    dataFiles,
+    activeData,
+    activeFileMeta,
+    loading,
+    sourceLoading,
+    error,
+    registryWarning,
+    loadDataManifest,
+    selectDataSource,
+    refreshDataSource,
+    loadDataFile,
+    loadLocalFile,
+  } = useVisData();
   const fileInputRef = useRef();
+  const [dataSearch, setDataSearch] = useState('');
 
   // ---- 视图状态 ----
   const [viewMode, setViewMode] = useState('all');
@@ -84,10 +101,28 @@ export default function NeuralVis3DApp() {
 
   // ---- 交互状态 ----
   const [hoveredInfo, setHoveredInfo] = useState(null);
-  const [selectedLayers, setSelectedLayers] = useState(null);
+  const selectedLayers = null;
   const [leftPanelTab, setLeftPanelTab] = useState('dimension'); // dimension | renderer | animation
 
   useEffect(() => { loadDataManifest(); }, [loadDataManifest]);
+
+  const filteredDataFiles = useMemo(() => {
+    const query = dataSearch.trim().toLocaleLowerCase();
+    if (!query) return dataFiles;
+    return dataFiles.filter((file) => [
+      file.label,
+      file.filename,
+      file.model,
+      file.family_id,
+      file.phase,
+      file.run_id,
+    ].some((value) => String(value ?? '').toLocaleLowerCase().includes(query)));
+  }, [dataFiles, dataSearch]);
+
+  const routeCount = useMemo(
+    () => new Set(dataSources.map((source) => source.route_id)).size,
+    [dataSources]
+  );
 
   const visualizations = activeData?.visualizations || [];
   const schemaVersion = activeData?.schema_version || '1.0';
@@ -230,22 +265,128 @@ export default function NeuralVis3DApp() {
 
         {/* ---- 数据源 ---- */}
         <div style={S.section}>
-          <h3 style={S.sectionTitle}>数据源</h3>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 7 }}>
+            <h3 style={{ ...S.sectionTitle, margin: 0, flex: 1 }}>测试路线数据源</h3>
+            <span style={{ fontSize: 9, color: '#64748b' }}>{routeCount} 条路线 · {dataSources.length} 类数据</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px', gap: 5, marginBottom: 6 }}>
+            <select
+              aria-label="测试路线数据源"
+              value={activeSource?.id || ''}
+              disabled={sourceLoading || dataSources.length === 0}
+              onChange={(event) => {
+                setDataSearch('');
+                selectDataSource(event.target.value);
+              }}
+              style={{
+                minWidth: 0,
+                height: 30,
+                padding: '0 7px',
+                background: '#111c30',
+                border: '1px solid #334155',
+                borderRadius: 4,
+                color: '#dbeafe',
+                fontSize: 10,
+              }}
+            >
+              {dataSources.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {source.route_label} · {source.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              title="刷新当前数据源"
+              aria-label="刷新当前数据源"
+              disabled={!activeSource || sourceLoading}
+              onClick={refreshDataSource}
+              style={{
+                width: 30,
+                height: 30,
+                display: 'grid',
+                placeItems: 'center',
+                background: '#1e293b',
+                border: '1px solid #334155',
+                borderRadius: 4,
+                color: '#93c5fd',
+                cursor: sourceLoading ? 'wait' : 'pointer',
+              }}
+            >
+              <RefreshCw size={14} className={sourceLoading ? 'vis-source-spin' : undefined} />
+            </button>
+          </div>
+          {activeSource && (
+            <div style={{ padding: '6px 7px', marginBottom: 6, borderLeft: `2px solid ${activeSource.color || '#60a5fa'}`, background: '#111827' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#cbd5e1', fontSize: 10, fontWeight: 700 }}>
+                <Database size={12} color={activeSource.color || '#60a5fa'} />
+                <span>{activeSource.route_label}</span>
+                <span style={{ marginLeft: 'auto', color: '#94a3b8', fontWeight: 500 }}>{dataFiles.length} 组</span>
+              </div>
+              <div style={{ color: '#64748b', fontSize: 9, lineHeight: 1.45, marginTop: 3 }}>{activeSource.description}</div>
+              <div style={{ color: '#475569', fontSize: 8, lineHeight: 1.4, marginTop: 3 }}>
+                模型：{activeSource.models?.join(' / ') || '未声明'}
+              </div>
+            </div>
+          )}
+          {registryWarning && (
+            <div style={{ color: '#fbbf24', fontSize: 9, lineHeight: 1.4, marginBottom: 6 }}>{registryWarning}</div>
+          )}
           <button onClick={() => fileInputRef.current?.click()}
-            style={{ width: '100%', padding: '6px', background: '#1e293b', border: '1px solid #334155', borderRadius: 6, color: '#e2e8f0', cursor: 'pointer', marginBottom: 6, fontSize: 11 }}>
-            📂 加载JSON文件
+            style={{ width: '100%', height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#1e293b', border: '1px solid #334155', borderRadius: 4, color: '#e2e8f0', cursor: 'pointer', marginBottom: 6, fontSize: 10 }}>
+            <FolderOpen size={14} /> 加载本地 JSON 文件
           </button>
           <input ref={fileInputRef} type="file" accept=".json" style={{ display: 'none' }}
             onChange={(e) => e.target.files[0] && loadLocalFile(e.target.files[0])} />
           {dataFiles.length > 0 && (
-            <div style={{ maxHeight: 80, overflowY: 'auto' }}>
-              {dataFiles.slice(0, 5).map((f, i) => (
-                <button key={i} onClick={() => loadDataFile(f.filename)}
-                  style={{ display: 'block', width: '100%', padding: '4px 6px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: 3, color: '#94a3b8', cursor: 'pointer', textAlign: 'left', fontSize: 10, marginBottom: 2 }}>
-                  {f.label || f.filename}
-                </button>
-              ))}
-            </div>
+            <>
+              <label style={{ position: 'relative', display: 'block', marginBottom: 5 }}>
+                <Search size={12} style={{ position: 'absolute', left: 7, top: 8, color: '#64748b' }} />
+                <input
+                  type="search"
+                  aria-label="筛选测试数据"
+                  value={dataSearch}
+                  onChange={(event) => setDataSearch(event.target.value)}
+                  placeholder="筛选模式族、模型或阶段"
+                  style={{
+                    width: '100%',
+                    height: 28,
+                    padding: '0 7px 0 25px',
+                    background: '#0b1220',
+                    border: '1px solid #1e293b',
+                    borderRadius: 4,
+                    color: '#cbd5e1',
+                    fontSize: 9,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </label>
+              <div style={{ maxHeight: 174, overflowY: 'auto', paddingRight: 2 }} data-testid="route-dataset-list">
+                {filteredDataFiles.map((file) => {
+                  const isActive = activeFileMeta?.id === file.id || activeFileMeta?.path === file.path;
+                  return (
+                    <button key={file.id || file.path} onClick={() => loadDataFile(file)}
+                      style={{
+                        display: 'block', width: '100%', minHeight: 32, padding: '5px 6px',
+                        background: isActive ? '#172554' : '#0f172a',
+                        border: isActive ? '1px solid #3b82f6' : '1px solid #1e293b',
+                        borderRadius: 3, color: isActive ? '#dbeafe' : '#94a3b8',
+                        cursor: 'pointer', textAlign: 'left', fontSize: 9, marginBottom: 3,
+                      }}>
+                      <span style={{ display: 'block', overflowWrap: 'anywhere' }}>{file.label || file.filename}</span>
+                      {(file.model || file.phase || file.node_count) && (
+                        <span style={{ display: 'block', color: '#475569', fontSize: 8, marginTop: 2 }}>
+                          {[file.model, file.phase ? `Phase ${file.phase}` : null, file.node_count ? `${file.node_count} 节点` : null].filter(Boolean).join(' · ')}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+                {filteredDataFiles.length === 0 && (
+                  <div style={{ padding: 8, color: '#64748b', fontSize: 9, textAlign: 'center' }}>没有匹配的数据集</div>
+                )}
+              </div>
+            </>
           )}
         </div>
 
@@ -475,7 +616,12 @@ export default function NeuralVis3DApp() {
           <div style={{ ...S.section, padding: 8, background: '#0f172a', borderRadius: 6, border: '1px solid #1e293b' }}>
             <h3 style={{ ...S.sectionTitle, marginBottom: 6 }}>数据摘要</h3>
             <div style={{ fontSize: 10, lineHeight: 1.6 }}>
+              <div>路线: <span style={{ color: '#c4b5fd' }}>{activeData.source_context?.route_label || activeFileMeta?.route_label || '本地文件'}</span></div>
+              <div>数据源: <span style={{ color: '#93c5fd' }}>{activeData.source_context?.source_label || activeFileMeta?.source_label || '-'}</span></div>
               <div>Schema: <span style={{ color: '#60a5fa' }}>{isAtlasGraph ? schemaVersion : `v${schemaVersion}`}</span></div>
+              {activeData.source_schema_version && activeData.source_schema_version !== schemaVersion && (
+                <div>原始模式: <span style={{ color: '#94a3b8' }}>{activeData.source_schema_version}</span></div>
+              )}
               <div>Model: <span style={{ color: '#4ecdc4' }}>{activeData.model || activeData.model_info?.model || 'mixed'}</span></div>
               {isAtlasGraph ? (
                 <>
@@ -515,9 +661,9 @@ export default function NeuralVis3DApp() {
 
       {/* ==================== 中央3D画布 ==================== */}
       <div style={{ flex: 1, position: 'relative' }}>
-        {loading && (
+        {(loading || sourceLoading) && (
           <div style={{ position: 'absolute', top: 20, left: 20, zIndex: 10, background: '#1e293b', padding: '8px 16px', borderRadius: 6, fontSize: 13 }}>
-            加载中...
+            {sourceLoading ? '正在加载路线清单...' : '正在加载测试数据...'}
           </div>
         )}
         {error && (
@@ -719,7 +865,7 @@ export default function NeuralVis3DApp() {
               <div style={{ marginTop: 16 }}>
                 <h3 style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8 }}>类型统计</h3>
                 <div style={{ fontSize: 11, lineHeight: 1.8 }}>
-                  {Object.entries(byType).filter(([_, arr]) => arr.length > 0).map(([type, arr]) => (
+                  {Object.entries(byType).filter((entry) => entry[1].length > 0).map(([type, arr]) => (
                     <div key={type}><span style={{ color: '#60a5fa' }}>{type}</span>: {arr.length}</div>
                   ))}
                 </div>
