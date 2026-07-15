@@ -65137,31 +65137,3 @@ Phase429 不能继续自动读取密封集：预注册预测门失败，且预�
 物理层摘要：`tests/gpt5/result/phase429_typed_route/phase429_physical_layer_summaries.jsonl`。
 
 复现入口：`tests/gpt5/run_phase429_typed_route.sh`。
-
-## Phase 430: Phase429 超 100MB 物理原始表跳过提交与远端同步 [2026-07-14 20:29]
-
-### 一、任务
-
-本阶段是 Git 工程清理，不是新的模型实验。当前本地提交包含 Phase429 的 Qwen3 物理原始表，单文件约 212.85MB，超过 GitHub 100MB 硬限制，直接推送会被拒绝。
-
-### 二、处理原则
-
-保留本地原始数据，不删除实验结果；只将超限文件加入 `.gitignore`，并重组尚未推送的提交。处理前已创建备份分支，保留原始未推送提交状态。
-
-被跳过文件：
-
-```text
-tests/gpt5/result/phase429_typed_route/physical/open/qwen3/phase429_physical_rows.jsonl
-```
-
-### 三、验证方式
-
-本阶段未运行 CUDA 模型测试。验证标准为：重新提交后检查 `origin/main..HEAD` 中是否仍存在超过 100MB 的 blob；检查为空后再推送。
-
-### 四、问题与限制
-
-该处理只解决 GitHub 单文件上限，不改变 Phase429 的科学结论。原始大表仍在本地，可用于复核；远端只保存脚本、协议、摘要、审计结果和较小分片。后续需要将原始大表迁移到压缩归档、分片索引、Git LFS 或外部对象存储。
-
-### 五、下一步
-
-优先保持全局语言模式图谱的物理分布分析可复现：提交可执行脚本、冻结协议、摘要和索引；原始大表不再直接进入 Git 历史，避免版本库膨胀和推送失败。
