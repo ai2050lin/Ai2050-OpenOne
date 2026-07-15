@@ -1,0 +1,201 @@
+{
+  "schema_version": "phase435_natural_relation.v1",
+  "trace_schema_version": "phase435_natural_relation_trace.v1",
+  "phase_id": "Phase435-NaturalRelationProtocol",
+  "created_at": "2026-07-15T15:14:11.743704+00:00",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "contracts": [
+    "field_extract",
+    "natural_qa",
+    "relation_rewrite"
+  ],
+  "generic_physical_control": "generic_pairing_control",
+  "interfaces": [
+    "direct_value",
+    "answer_field",
+    "result_field",
+    "natural_sentence"
+  ],
+  "interface_simplicity_order": [
+    "direct_value",
+    "answer_field",
+    "result_field",
+    "natural_sentence"
+  ],
+  "relation_families": [
+    "person_city",
+    "object_color",
+    "animal_habitat",
+    "country_capital"
+  ],
+  "record_orders": [
+    "ab",
+    "ba"
+  ],
+  "mappings": [
+    "direct",
+    "swapped"
+  ],
+  "query_roles": [
+    "a",
+    "b"
+  ],
+  "behavior_splits": [
+    "behavior_discovery",
+    "behavior_holdout"
+  ],
+  "physical_split": "physical_calibration",
+  "sealed_split": "sealed_physical_holdout",
+  "denominator_audit": {
+    "valid": true,
+    "language_scope": "controlled natural-language contextual relations; not a natural-corpus sample",
+    "groups_by_split": {
+      "interface_calibration": 288,
+      "behavior_discovery": 96,
+      "behavior_holdout": 192,
+      "physical_calibration": 192,
+      "sealed_physical_holdout": 96
+    },
+    "calibration_groups_per_contract": {
+      "field_extract": 96,
+      "natural_qa": 96,
+      "relation_rewrite": 96
+    },
+    "conditions_by_split_per_model": {
+      "interface_calibration": 1152,
+      "behavior_discovery": 2304,
+      "behavior_holdout": 4608
+    },
+    "open_behavior_conditions_per_model": 8064,
+    "three_model_open_behavior_conditions": 24192,
+    "maximum_open_physical_conditions_per_model": 6144,
+    "maximum_sealed_conditions_per_model": 3072,
+    "vocabulary_disjoint_across_splits": true,
+    "formal_balance": {
+      "behavior_discovery": {
+        "relation_family": {
+          "person_city": 24,
+          "object_color": 24,
+          "animal_habitat": 24,
+          "country_capital": 24
+        },
+        "physical_fold": {
+          "None": 96
+        }
+      },
+      "behavior_holdout": {
+        "relation_family": {
+          "person_city": 48,
+          "object_color": 48,
+          "animal_habitat": 48,
+          "country_capital": 48
+        },
+        "physical_fold": {
+          "None": 192
+        }
+      },
+      "physical_calibration": {
+        "relation_family": {
+          "person_city": 48,
+          "object_color": 48,
+          "animal_habitat": 48,
+          "country_capital": 48
+        },
+        "physical_fold": {
+          "discovery": 96,
+          "holdout": 96
+        }
+      },
+      "sealed_physical_holdout": {
+        "relation_family": {
+          "person_city": 24,
+          "object_color": 24,
+          "animal_habitat": 24,
+          "country_capital": 24
+        },
+        "physical_fold": {
+          "sealed": 96
+        }
+      }
+    }
+  },
+  "rows_sha256": {
+    "interface_calibration": "5358f982fc7ec0e95fcf7255d6eefdbe5a56ffb11ce4e3e73dde39af651ed380",
+    "behavior_discovery": "3fb37bfc506cc8a603c00d935631ce152fad095cc647f8b347bc7b371f0be50b",
+    "behavior_holdout": "03b063e26d899de861171a43314590da1cddd0a777fb6a097ac89bfccdfb419e",
+    "physical_calibration": "6967dba48f1eae4a1b0a5394332234c01a7dde3477898f4c3c84f404656424d1"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase435_natural_relation.v1",
+    "phase_id": "Phase435-NaturalRelationProtocol",
+    "created_at": "2026-07-15T15:14:11.743242+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_group_count": 96,
+    "maximum_sealed_condition_count_per_model": 3072,
+    "sealed_group_rows_sha256": "3c28e606a19b65b8bca7a050dd666c3bad620c8564c391ece2f4ffe31dfd1894",
+    "read_requires_open_gate": true,
+    "open_analysis_must_not_import_sealed_rows": true
+  },
+  "interface_calibration_gate": {
+    "per_contract_wilson_lcb": 0.75,
+    "per_position_wilson_lcb": 0.75,
+    "maximum_position_gap": 0.1,
+    "other_wilson_ucb": 0.1,
+    "selection": "first qualified interface in frozen simplicity order; otherwise deterministic best interface remains behavior-ineligible"
+  },
+  "natural_behavior_gate": {
+    "discovery_and_holdout_per_position_wilson_lcb": 0.8,
+    "maximum_position_gap": 0.05,
+    "holdout_other_wilson_ucb": 0.05,
+    "teacher_event_per_position_wilson_lcb": 0.8,
+    "interface_parse_per_position_wilson_lcb": 0.8,
+    "stop_is_separate_from_content_gate": true
+  },
+  "physical_contract": {
+    "runs_only_for_behavior_eligible_model_contracts": true,
+    "open_window_freeze_groups": 96,
+    "open_holdout_groups": 96,
+    "generic_pairing_control_included": true,
+    "full_layer_component_ledger": true,
+    "source_to_query_attention_write": true,
+    "single_head_channel_neuron_scan": false
+  },
+  "numeric_gates": {
+    "component_reconstruction_relative_error_max": 0.001,
+    "attention_replay_relative_error_max": 0.001,
+    "label_blind_geometry_effect_min": 0.05,
+    "geometry_positive_relation_families_min": 3,
+    "geometry_candidate_over_generic_min": 0.02,
+    "transport_balanced_accuracy_min": 0.7,
+    "transport_per_source_wilson_lcb_min": 0.65,
+    "transport_maximum_position_gap": 0.1,
+    "transport_candidate_over_generic_accuracy_min": 0.1
+  },
+  "gate_order": [
+    "G0_interface_calibration",
+    "G1_natural_content_and_order_balance",
+    "G2_component_identity_and_position_registration",
+    "G3_label_blind_order_geometry",
+    "G4_semantic_source_transport",
+    "G5_frozen_holdout_prediction",
+    "G6_generic_pairing_specificity",
+    "G7_sealed_physical_replication"
+  ],
+  "causal_and_single_neuron_forbidden_in_phase435": true,
+  "source_transport_is_not_inferred_from_state_geometry": true,
+  "implementation_hashes": {
+    "phase435_natural_relation_protocol.py": "bf858e79aa893308b83cac9721cc80b567d2fb2b8c87beb9024114e14a193a8d",
+    "phase435_natural_relation_collect.py": "a2fe7f06514fe64283f3b449e79653ee1d35734f91eb40e922d4825bf62dda38",
+    "phase435_natural_relation_analysis.py": "eb8e9c9bb399912337e2f9fd8ee6a8a5b4049aa85b0e99b78b98f8f3d84a7900",
+    "test_phase435_natural_relation.py": "55f584cb824b186644a6a7e93e75fd18082a8d099f56ef0a77f4612409fbfd67"
+  }
+}

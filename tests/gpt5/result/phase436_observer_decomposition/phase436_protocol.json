@@ -1,0 +1,169 @@
+{
+  "schema_version": "phase436_observer_decomposition.v1",
+  "phase_id": "Phase436-ObserverDecompositionProtocol",
+  "created_at": "2026-07-15T15:14:11.752963+00:00",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "contracts": [
+    "field_extract",
+    "natural_qa",
+    "relation_rewrite"
+  ],
+  "interfaces": [
+    "direct_value",
+    "answer_field",
+    "result_field",
+    "natural_sentence"
+  ],
+  "interface_selection_unit": "model_x_contract",
+  "observer_axes": [
+    "semantic_content",
+    "exact_format",
+    "stop"
+  ],
+  "semantic_content_excludes_exact_format_and_stop": true,
+  "denominator_audit": {
+    "valid": true,
+    "calibration_group_count": 576,
+    "calibration_groups_per_contract": {
+      "field_extract": 192,
+      "natural_qa": 192,
+      "relation_rewrite": 192
+    },
+    "calibration_conditions_per_model": 2304,
+    "three_model_calibration_conditions": 6912,
+    "fresh_calibration_vocabulary_disjoint_from_phase435": true,
+    "reused_phase435_behavior_and_physical_denominators_remain_frozen": true,
+    "phase435_behavior_discovery_and_holdout_were_not_used_for_observer_selection": true,
+    "factor_balance": {
+      "field_extract": {
+        "relation_family": {
+          "person_city": 48,
+          "object_color": 48,
+          "animal_habitat": 48,
+          "country_capital": 48
+        },
+        "record_order": {
+          "ab": 96,
+          "ba": 96
+        },
+        "mapping": {
+          "direct": 96,
+          "swapped": 96
+        },
+        "query_role": {
+          "a": 96,
+          "b": 96
+        }
+      },
+      "natural_qa": {
+        "relation_family": {
+          "person_city": 48,
+          "object_color": 48,
+          "animal_habitat": 48,
+          "country_capital": 48
+        },
+        "record_order": {
+          "ab": 96,
+          "ba": 96
+        },
+        "mapping": {
+          "direct": 96,
+          "swapped": 96
+        },
+        "query_role": {
+          "a": 96,
+          "b": 96
+        }
+      },
+      "relation_rewrite": {
+        "relation_family": {
+          "person_city": 48,
+          "object_color": 48,
+          "animal_habitat": 48,
+          "country_capital": 48
+        },
+        "record_order": {
+          "ab": 96,
+          "ba": 96
+        },
+        "mapping": {
+          "direct": 96,
+          "swapped": 96
+        },
+        "query_role": {
+          "a": 96,
+          "b": 96
+        }
+      }
+    }
+  },
+  "calibration_rows_sha256": "1b9acda6c6ffd1375a3affe9c052f1e7a7b63b9fb5e82b016c76846eda4aaf99",
+  "phase435_reused_rows_sha256": {
+    "behavior_discovery": "5fe3d21b78865b835a9c3e1ccc012f5fbdebde59e51eea5a370578342a9b5c60",
+    "behavior_holdout": "9667b77ae47804ee5f74aa81a2b5a2a69e1012b7b1a04cd71f93df75f194bb07",
+    "physical_calibration": "b79ab1c34ee19e02577c283b75e664434888babd537b98b67d795f6547c73f3f"
+  },
+  "phase435_sealed_commitment": {
+    "schema_version": "phase435_natural_relation.v1",
+    "phase_id": "Phase435-NaturalRelationProtocol",
+    "created_at": "2026-07-15T15:14:11.743242+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_group_count": 96,
+    "maximum_sealed_condition_count_per_model": 3072,
+    "sealed_group_rows_sha256": "3c28e606a19b65b8bca7a050dd666c3bad620c8564c391ece2f4ffe31dfd1894",
+    "read_requires_open_gate": true,
+    "open_analysis_must_not_import_sealed_rows": true
+  },
+  "interface_semantic_gate": {
+    "per_position_wilson_lcb": 0.8,
+    "maximum_position_gap": 0.05,
+    "other_wilson_ucb": 0.1,
+    "teacher_per_position_wilson_lcb": 0.8,
+    "format_and_stop_are_reported_but_not_gating": true
+  },
+  "behavior_gate": {
+    "discovery_and_holdout_per_position_wilson_lcb": 0.8,
+    "maximum_position_gap": 0.05,
+    "holdout_other_wilson_ucb": 0.05,
+    "teacher_per_position_wilson_lcb": 0.8,
+    "format_and_stop_are_reported_but_not_gating": true
+  },
+  "physical_numeric_gates": {
+    "component_reconstruction_relative_error_max": 0.001,
+    "attention_replay_relative_error_max": 0.001,
+    "label_blind_geometry_effect_min": 0.05,
+    "geometry_positive_relation_families_min": 3,
+    "geometry_candidate_over_generic_min": 0.02,
+    "transport_balanced_accuracy_min": 0.7,
+    "transport_per_source_wilson_lcb_min": 0.65,
+    "transport_maximum_position_gap": 0.1,
+    "transport_candidate_over_generic_accuracy_min": 0.1
+  },
+  "gate_order": [
+    "G0_semantic_observer_by_model_contract",
+    "G1_natural_content_and_order_balance",
+    "G2_component_identity_and_position_registration",
+    "G3_label_blind_order_geometry",
+    "G4_semantic_source_transport",
+    "G5_frozen_holdout_prediction",
+    "G6_generic_pairing_specificity",
+    "G7_sealed_physical_replication"
+  ],
+  "source_transport_is_not_inferred_from_geometry": true,
+  "causal_and_single_neuron_forbidden": true,
+  "implementation_hashes": {
+    "phase436_observer_decomposition_protocol.py": "976d109691d4422d4c32a38bd8e827c5d492912db3c57bc338d8cfdc784f007b",
+    "phase436_observer_decomposition_collect.py": "08bcb98b118bc02966cfcb30b84178ba95932d98fcfd7a1c4bc5384c23f43f3d",
+    "phase436_observer_decomposition_analysis.py": "e46b0117a0755576711b53802cbe193a8f212412f526fc6e5919d25ddcb132fb",
+    "test_phase436_observer_decomposition.py": "f832016e72c3cde50b6e377490b1faebcb0a8ff22d5092bce6f9704ece9118aa"
+  }
+}

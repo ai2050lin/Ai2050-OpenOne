@@ -1,0 +1,22 @@
+{
+  "schema_version": "phase437_quarantine.v1",
+  "phase": 437,
+  "status": "quarantined_before_formal_inference",
+  "cuda_row_count": 3456,
+  "models": ["qwen3", "glm4", "deepseek7b"],
+  "defects": [
+    "observer label_order and relation_family were not pairwise balanced",
+    "observer boundary and mapping were not pairwise balanced",
+    "split identity was appended as a multiword target suffix"
+  ],
+  "allowed_use": "tool_diagnostic_only",
+  "forbidden_use": [
+    "single_factor_effect inference",
+    "behavior qualification",
+    "physical qualification",
+    "mechanism or closure claims"
+  ],
+  "authoritative_v0_prompts": "observer/<model>/behavior/phase435_materialized_conditions.jsonl",
+  "thresholds_changed_in_formal_rerun": false,
+  "interfaces_changed_in_formal_rerun": false
+}

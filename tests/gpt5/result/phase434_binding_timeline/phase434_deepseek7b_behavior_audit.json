@@ -1,0 +1,6223 @@
+{
+  "schema_version": "phase434_binding_timeline.v1",
+  "phase_id": "Phase434-BindingTimelineAnalysis",
+  "created_at": "2026-07-15T13:35:04.842087+00:00",
+  "model": "deepseek7b",
+  "condition_count": 14784,
+  "token_contract": {
+    "valid": 14784,
+    "total": 14784,
+    "fraction": 1.0,
+    "common_prefix_length_range": [
+      11,
+      11
+    ],
+    "pass": true
+  },
+  "splits": {
+    "behavior_discovery": {
+      "candidate": {
+        "group_count": 96,
+        "required_condition_scope": "late_timings",
+        "group_contract": {
+          "successes": 0,
+          "total": 96,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.038475588
+        },
+        "condition_complete_event": {
+          "successes": 0,
+          "total": 3840,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.00099938
+        },
+        "natural_common_prefix": {
+          "successes": 0,
+          "total": 3840,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.00099938
+        },
+        "actual_choice_counts": {
+          "source_1": 2682,
+          "source_2": 1018,
+          "other": 140
+        }
+      },
+      "control": {
+        "group_count": 96,
+        "required_condition_scope": "all_timings",
+        "group_contract": {
+          "successes": 0,
+          "total": 96,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.038475588
+        },
+        "condition_complete_event": {
+          "successes": 0,
+          "total": 960,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.003985571
+        },
+        "natural_common_prefix": {
+          "successes": 0,
+          "total": 960,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.003985571
+        },
+        "actual_choice_counts": {
+          "source_1": 291,
+          "other": 434,
+          "source_2": 235
+        }
+      },
+      "behavior_qualification_pass": false
+    },
+    "behavior_holdout": {
+      "candidate": {
+        "group_count": 192,
+        "required_condition_scope": "late_timings",
+        "group_contract": {
+          "successes": 0,
+          "total": 192,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.019615146
+        },
+        "condition_complete_event": {
+          "successes": 0,
+          "total": 7680,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.00049994
+        },
+        "natural_common_prefix": {
+          "successes": 0,
+          "total": 7680,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.00049994
+        },
+        "actual_choice_counts": {
+          "other": 249,
+          "source_1": 5479,
+          "source_2": 1952
+        }
+      },
+      "control": {
+        "group_count": 192,
+        "required_condition_scope": "all_timings",
+        "group_contract": {
+          "successes": 0,
+          "total": 192,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.019615146
+        },
+        "condition_complete_event": {
+          "successes": 0,
+          "total": 1920,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.001996765
+        },
+        "natural_common_prefix": {
+          "successes": 0,
+          "total": 1920,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.001996765
+        },
+        "actual_choice_counts": {
+          "source_1": 600,
+          "other": 790,
+          "source_2": 530
+        }
+      },
+      "behavior_qualification_pass": false
+    }
+  },
+  "cells": {
+    "behavior_discovery": {
+      "candidate": [
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 19,
+            "total": 96,
+            "estimate": 0.197916667,
+            "lcb": 0.130527332,
+            "ucb": 0.288551669
+          },
+          "choice_counts": {
+            "source_1": 46,
+            "source_2": 50
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 94,
+            "total": 96,
+            "estimate": 0.979166667,
+            "lcb": 0.927192865,
+            "ucb": 0.99426803
+          },
+          "choice_counts": {
+            "source_2": 91,
+            "source_1": 4,
+            "other": 1
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 13,
+            "total": 96,
+            "estimate": 0.135416667,
+            "lcb": 0.080877064,
+            "ucb": 0.218011385
+          },
+          "choice_counts": {
+            "source_1": 96
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 87,
+            "total": 96,
+            "estimate": 0.90625,
+            "lcb": 0.831346693,
+            "ucb": 0.949891892
+          },
+          "choice_counts": {
+            "source_1": 92,
+            "other": 4
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 72,
+            "total": 96,
+            "estimate": 0.75,
+            "lcb": 0.65490189,
+            "ucb": 0.825860316
+          },
+          "choice_counts": {
+            "source_1": 85,
+            "source_2": 11
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 31,
+            "total": 96,
+            "estimate": 0.322916667,
+            "lcb": 0.237758414,
+            "ucb": 0.42170169
+          },
+          "choice_counts": {
+            "source_1": 85,
+            "source_2": 11
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 39,
+            "total": 96,
+            "estimate": 0.40625,
+            "lcb": 0.313453022,
+            "ucb": 0.506261151
+          },
+          "choice_counts": {
+            "source_1": 73,
+            "source_2": 23
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 49,
+            "total": 96,
+            "estimate": 0.510416667,
+            "lcb": 0.411960371,
+            "ucb": 0.608071388
+          },
+          "choice_counts": {
+            "source_1": 84,
+            "source_2": 12
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 30,
+            "total": 96,
+            "estimate": 0.3125,
+            "lcb": 0.228509546,
+            "ucb": 0.410918799
+          },
+          "choice_counts": {
+            "source_1": 61,
+            "source_2": 35
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 75,
+            "total": 96,
+            "estimate": 0.78125,
+            "lcb": 0.688620933,
+            "ucb": 0.852236549
+          },
+          "choice_counts": {
+            "source_2": 91,
+            "source_1": 5
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 13,
+            "total": 96,
+            "estimate": 0.135416667,
+            "lcb": 0.080877064,
+            "ucb": 0.218011385
+          },
+          "choice_counts": {
+            "source_1": 94,
+            "source_2": 2
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 80,
+            "total": 96,
+            "estimate": 0.833333333,
+            "lcb": 0.746290098,
+            "ucb": 0.894726176
+          },
+          "choice_counts": {
+            "source_1": 96
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 72,
+            "total": 96,
+            "estimate": 0.75,
+            "lcb": 0.65490189,
+            "ucb": 0.825860316
+          },
+          "choice_counts": {
+            "source_1": 86,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 27,
+            "total": 96,
+            "estimate": 0.28125,
+            "lcb": 0.201074108,
+            "ucb": 0.378258961
+          },
+          "choice_counts": {
+            "source_1": 93,
+            "source_2": 3
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 37,
+            "total": 96,
+            "estimate": 0.385416667,
+            "lcb": 0.294257686,
+            "ucb": 0.48539297
+          },
+          "choice_counts": {
+            "source_1": 68,
+            "source_2": 28
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 53,
+            "total": 96,
+            "estimate": 0.552083333,
+            "lcb": 0.452516386,
+            "ucb": 0.647642407
+          },
+          "choice_counts": {
+            "source_1": 66,
+            "source_2": 30
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 19,
+            "total": 96,
+            "estimate": 0.197916667,
+            "lcb": 0.130527332,
+            "ucb": 0.288551669
+          },
+          "choice_counts": {
+            "source_1": 22,
+            "source_2": 73,
+            "other": 1
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 94,
+            "total": 96,
+            "estimate": 0.979166667,
+            "lcb": 0.927192865,
+            "ucb": 0.99426803
+          },
+          "choice_counts": {
+            "source_2": 95,
+            "other": 1
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 17,
+            "total": 96,
+            "estimate": 0.177083333,
+            "lcb": 0.113605079,
+            "ucb": 0.265410405
+          },
+          "choice_counts": {
+            "source_1": 92,
+            "other": 4
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 90,
+            "total": 96,
+            "estimate": 0.9375,
+            "lcb": 0.870290535,
+            "ucb": 0.971043326
+          },
+          "choice_counts": {
+            "source_1": 96
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 70,
+            "total": 96,
+            "estimate": 0.729166667,
+            "lcb": 0.632736527,
+            "ucb": 0.807962162
+          },
+          "choice_counts": {
+            "source_1": 88,
+            "source_2": 8
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 26,
+            "total": 96,
+            "estimate": 0.270833333,
+            "lcb": 0.192037838,
+            "ucb": 0.367263473
+          },
+          "choice_counts": {
+            "source_1": 87,
+            "source_2": 9
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 21,
+            "total": 96,
+            "estimate": 0.21875,
+            "lcb": 0.147763451,
+            "ucb": 0.311379067
+          },
+          "choice_counts": {
+            "source_1": 73,
+            "source_2": 23
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 59,
+            "total": 96,
+            "estimate": 0.614583333,
+            "lcb": 0.51460703,
+            "ucb": 0.705742314
+          },
+          "choice_counts": {
+            "source_1": 79,
+            "source_2": 17
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 8,
+            "total": 96,
+            "estimate": 0.083333333,
+            "lcb": 0.042830624,
+            "ucb": 0.155899032
+          },
+          "choice_counts": {
+            "source_1": 52,
+            "source_2": 44
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 93,
+            "total": 96,
+            "estimate": 0.96875,
+            "lcb": 0.912113207,
+            "ucb": 0.98931593
+          },
+          "choice_counts": {
+            "source_1": 14,
+            "source_2": 82
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 4,
+            "total": 96,
+            "estimate": 0.041666667,
+            "lcb": 0.016320708,
+            "ucb": 0.102281915
+          },
+          "choice_counts": {
+            "source_1": 92,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 90,
+            "total": 96,
+            "estimate": 0.9375,
+            "lcb": 0.870290535,
+            "ucb": 0.971043326
+          },
+          "choice_counts": {
+            "source_1": 96
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 82,
+            "total": 96,
+            "estimate": 0.854166667,
+            "lcb": 0.76998185,
+            "ucb": 0.911097942
+          },
+          "choice_counts": {
+            "source_1": 73,
+            "source_2": 23
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 18,
+            "total": 96,
+            "estimate": 0.1875,
+            "lcb": 0.1220247,
+            "ucb": 0.277022543
+          },
+          "choice_counts": {
+            "source_1": 80,
+            "source_2": 16
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 65,
+            "total": 96,
+            "estimate": 0.677083333,
+            "lcb": 0.57829831,
+            "ucb": 0.762241586
+          },
+          "choice_counts": {
+            "source_1": 83,
+            "source_2": 13
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 33,
+            "total": 96,
+            "estimate": 0.34375,
+            "lcb": 0.256403932,
+            "ucb": 0.443119689
+          },
+          "choice_counts": {
+            "source_1": 85,
+            "source_2": 11
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 61,
+            "total": 96,
+            "estimate": 0.635416667,
+            "lcb": 0.535652262,
+            "ucb": 0.724760599
+          },
+          "choice_counts": {
+            "source_1": 61,
+            "source_2": 16,
+            "other": 19
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 96,
+            "total": 96,
+            "estimate": 1.0,
+            "lcb": 0.961524412,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 70,
+            "other": 26
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 24,
+            "total": 96,
+            "estimate": 0.25,
+            "lcb": 0.174139684,
+            "ucb": 0.34509811
+          },
+          "choice_counts": {
+            "source_2": 38,
+            "source_1": 49,
+            "other": 9
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 96,
+            "total": 96,
+            "estimate": 1.0,
+            "lcb": 0.961524412,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 70,
+            "other": 26
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 66,
+            "total": 96,
+            "estimate": 0.6875,
+            "lcb": 0.589081201,
+            "ucb": 0.771490454
+          },
+          "choice_counts": {
+            "source_1": 61,
+            "source_2": 30,
+            "other": 5
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 30,
+            "total": 96,
+            "estimate": 0.3125,
+            "lcb": 0.228509546,
+            "ucb": 0.410918799
+          },
+          "choice_counts": {
+            "source_2": 20,
+            "source_1": 63,
+            "other": 13
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 40,
+            "total": 96,
+            "estimate": 0.416666667,
+            "lcb": 0.323115611,
+            "ucb": 0.516630321
+          },
+          "choice_counts": {
+            "source_2": 16,
+            "source_1": 70,
+            "other": 10
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 96,
+          "complete_event": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 96,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.038475588
+          },
+          "teacher_correct": {
+            "successes": 78,
+            "total": 96,
+            "estimate": 0.8125,
+            "lcb": 0.722977457,
+            "ucb": 0.8779753
+          },
+          "choice_counts": {
+            "source_1": 62,
+            "source_2": 13,
+            "other": 21
+          }
+        }
+      ],
+      "control": [
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 20,
+            "total": 32,
+            "estimate": 0.625,
+            "lcb": 0.452544074,
+            "ucb": 0.770661127
+          },
+          "choice_counts": {
+            "source_1": 6,
+            "other": 22,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 26,
+            "total": 32,
+            "estimate": 0.8125,
+            "lcb": 0.646908448,
+            "ucb": 0.911104553
+          },
+          "choice_counts": {
+            "source_1": 7,
+            "other": 21,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 8,
+            "total": 16,
+            "estimate": 0.5,
+            "lcb": 0.279995636,
+            "ucb": 0.720004364
+          },
+          "choice_counts": {
+            "source_2": 2,
+            "other": 12,
+            "source_1": 2
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 10,
+            "total": 16,
+            "estimate": 0.625,
+            "lcb": 0.386410405,
+            "ucb": 0.815187674
+          },
+          "choice_counts": {
+            "source_2": 3,
+            "other": 11,
+            "source_1": 2
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 32,
+            "estimate": 1.0,
+            "lcb": 0.892820802,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 8,
+            "other": 15,
+            "source_1": 9
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 32,
+            "estimate": 1.0,
+            "lcb": 0.892820802,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 8,
+            "other": 15,
+            "source_1": 9
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 16,
+            "total": 16,
+            "estimate": 1.0,
+            "lcb": 0.806392319,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 5,
+            "other": 7,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 16,
+            "total": 16,
+            "estimate": 1.0,
+            "lcb": 0.806392319,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 5,
+            "other": 7,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 26,
+            "total": 32,
+            "estimate": 0.8125,
+            "lcb": 0.646908448,
+            "ucb": 0.911104553
+          },
+          "choice_counts": {
+            "other": 22,
+            "source_2": 6,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 29,
+            "total": 32,
+            "estimate": 0.90625,
+            "lcb": 0.757818453,
+            "ucb": 0.967598449
+          },
+          "choice_counts": {
+            "other": 26,
+            "source_2": 2,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 12,
+            "total": 16,
+            "estimate": 0.75,
+            "lcb": 0.505016835,
+            "ucb": 0.898179325
+          },
+          "choice_counts": {
+            "source_2": 4,
+            "source_1": 5,
+            "other": 7
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 13,
+            "total": 16,
+            "estimate": 0.8125,
+            "lcb": 0.56991119,
+            "ucb": 0.934084009
+          },
+          "choice_counts": {
+            "source_2": 4,
+            "source_1": 5,
+            "other": 7
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 31,
+            "total": 32,
+            "estimate": 0.96875,
+            "lcb": 0.842557362,
+            "ucb": 0.99446214
+          },
+          "choice_counts": {
+            "source_2": 8,
+            "other": 12,
+            "source_1": 12
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 31,
+            "total": 32,
+            "estimate": 0.96875,
+            "lcb": 0.842557362,
+            "ucb": 0.99446214
+          },
+          "choice_counts": {
+            "source_2": 8,
+            "other": 12,
+            "source_1": 12
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 15,
+            "total": 16,
+            "estimate": 0.9375,
+            "lcb": 0.716712624,
+            "ucb": 0.988880655
+          },
+          "choice_counts": {
+            "source_1": 6,
+            "other": 6,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 15,
+            "total": 16,
+            "estimate": 0.9375,
+            "lcb": 0.716712624,
+            "ucb": 0.988880655
+          },
+          "choice_counts": {
+            "source_1": 6,
+            "other": 6,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 25,
+            "total": 32,
+            "estimate": 0.78125,
+            "lcb": 0.612450064,
+            "ucb": 0.889761637
+          },
+          "choice_counts": {
+            "other": 21,
+            "source_2": 6,
+            "source_1": 5
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 25,
+            "total": 32,
+            "estimate": 0.78125,
+            "lcb": 0.612450064,
+            "ucb": 0.889761637
+          },
+          "choice_counts": {
+            "other": 22,
+            "source_2": 5,
+            "source_1": 5
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 10,
+            "total": 16,
+            "estimate": 0.625,
+            "lcb": 0.386410405,
+            "ucb": 0.815187674
+          },
+          "choice_counts": {
+            "source_2": 4,
+            "other": 8,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 8,
+            "total": 16,
+            "estimate": 0.5,
+            "lcb": 0.279995636,
+            "ucb": 0.720004364
+          },
+          "choice_counts": {
+            "source_2": 4,
+            "other": 8,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 31,
+            "total": 32,
+            "estimate": 0.96875,
+            "lcb": 0.842557362,
+            "ucb": 0.99446214
+          },
+          "choice_counts": {
+            "other": 10,
+            "source_1": 11,
+            "source_2": 11
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 31,
+            "total": 32,
+            "estimate": 0.96875,
+            "lcb": 0.842557362,
+            "ucb": 0.99446214
+          },
+          "choice_counts": {
+            "other": 11,
+            "source_1": 11,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 15,
+            "total": 16,
+            "estimate": 0.9375,
+            "lcb": 0.716712624,
+            "ucb": 0.988880655
+          },
+          "choice_counts": {
+            "other": 8,
+            "source_2": 4,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 15,
+            "total": 16,
+            "estimate": 0.9375,
+            "lcb": 0.716712624,
+            "ucb": 0.988880655
+          },
+          "choice_counts": {
+            "other": 5,
+            "source_2": 5,
+            "source_1": 6
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 27,
+            "total": 32,
+            "estimate": 0.84375,
+            "lcb": 0.682458504,
+            "ucb": 0.931355797
+          },
+          "choice_counts": {
+            "source_1": 15,
+            "source_2": 12,
+            "other": 5
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 15,
+            "total": 32,
+            "estimate": 0.46875,
+            "lcb": 0.308693871,
+            "ucb": 0.635504829
+          },
+          "choice_counts": {
+            "source_1": 15,
+            "source_2": 13,
+            "other": 4
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 11,
+            "total": 16,
+            "estimate": 0.6875,
+            "lcb": 0.444043558,
+            "ucb": 0.858353561
+          },
+          "choice_counts": {
+            "source_2": 6,
+            "source_1": 8,
+            "other": 2
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 7,
+            "total": 16,
+            "estimate": 0.4375,
+            "lcb": 0.230986524,
+            "ucb": 0.668214436
+          },
+          "choice_counts": {
+            "source_2": 6,
+            "source_1": 8,
+            "other": 2
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 32,
+            "estimate": 1.0,
+            "lcb": 0.892820802,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 15,
+            "source_1": 15,
+            "other": 2
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 32,
+            "estimate": 1.0,
+            "lcb": 0.892820802,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 14,
+            "source_1": 15,
+            "other": 3
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 16,
+            "total": 16,
+            "estimate": 1.0,
+            "lcb": 0.806392319,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 8,
+            "source_2": 8
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 16,
+            "total": 16,
+            "estimate": 1.0,
+            "lcb": 0.806392319,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 8,
+            "source_2": 8
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 28,
+            "total": 32,
+            "estimate": 0.875,
+            "lcb": 0.719316945,
+            "ucb": 0.950298656
+          },
+          "choice_counts": {
+            "source_1": 9,
+            "other": 19,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 20,
+            "total": 32,
+            "estimate": 0.625,
+            "lcb": 0.452544074,
+            "ucb": 0.770661127
+          },
+          "choice_counts": {
+            "source_1": 9,
+            "other": 19,
+            "source_2": 4
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 13,
+            "total": 16,
+            "estimate": 0.8125,
+            "lcb": 0.56991119,
+            "ucb": 0.934084009
+          },
+          "choice_counts": {
+            "source_2": 2,
+            "other": 10,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 9,
+            "total": 16,
+            "estimate": 0.5625,
+            "lcb": 0.331785564,
+            "ucb": 0.769013476
+          },
+          "choice_counts": {
+            "source_2": 2,
+            "other": 10,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 29,
+            "total": 32,
+            "estimate": 0.90625,
+            "lcb": 0.757818453,
+            "ucb": 0.967598449
+          },
+          "choice_counts": {
+            "other": 19,
+            "source_1": 8,
+            "source_2": 5
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 32,
+          "complete_event": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 32,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.107179198
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 32,
+            "estimate": 1.0,
+            "lcb": 0.892820802,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "other": 19,
+            "source_1": 8,
+            "source_2": 5
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 13,
+            "total": 16,
+            "estimate": 0.8125,
+            "lcb": 0.56991119,
+            "ucb": 0.934084009
+          },
+          "choice_counts": {
+            "other": 10,
+            "source_2": 2,
+            "source_1": 4
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 16,
+          "complete_event": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 16,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.193607681
+          },
+          "teacher_correct": {
+            "successes": 16,
+            "total": 16,
+            "estimate": 1.0,
+            "lcb": 0.806392319,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "other": 9,
+            "source_2": 3,
+            "source_1": 4
+          }
+        }
+      ]
+    },
+    "behavior_holdout": {
+      "candidate": [
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 56,
+            "total": 192,
+            "estimate": 0.291666667,
+            "lcb": 0.231963391,
+            "ucb": 0.35954292
+          },
+          "choice_counts": {
+            "other": 1,
+            "source_1": 76,
+            "source_2": 115
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 170,
+            "total": 192,
+            "estimate": 0.885416667,
+            "lcb": 0.832610795,
+            "ucb": 0.92310253
+          },
+          "choice_counts": {
+            "source_2": 180,
+            "source_1": 12
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 29,
+            "total": 192,
+            "estimate": 0.151041667,
+            "lcb": 0.107269693,
+            "ucb": 0.208503378
+          },
+          "choice_counts": {
+            "source_1": 191,
+            "source_2": 1
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 170,
+            "total": 192,
+            "estimate": 0.885416667,
+            "lcb": 0.832610795,
+            "ucb": 0.92310253
+          },
+          "choice_counts": {
+            "source_1": 192
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 146,
+            "total": 192,
+            "estimate": 0.760416667,
+            "lcb": 0.695311538,
+            "ucb": 0.815305573
+          },
+          "choice_counts": {
+            "source_1": 170,
+            "source_2": 22
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 68,
+            "total": 192,
+            "estimate": 0.354166667,
+            "lcb": 0.289983888,
+            "ucb": 0.424070529
+          },
+          "choice_counts": {
+            "source_1": 169,
+            "source_2": 23
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 72,
+            "total": 192,
+            "estimate": 0.375,
+            "lcb": 0.309604184,
+            "ucb": 0.445299602
+          },
+          "choice_counts": {
+            "source_2": 33,
+            "source_1": 159
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 125,
+            "total": 192,
+            "estimate": 0.651041667,
+            "lcb": 0.581257766,
+            "ucb": 0.714900159
+          },
+          "choice_counts": {
+            "source_1": 182,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 78,
+            "total": 192,
+            "estimate": 0.40625,
+            "lcb": 0.339279259,
+            "ucb": 0.476898581
+          },
+          "choice_counts": {
+            "source_1": 123,
+            "source_2": 69
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 142,
+            "total": 192,
+            "estimate": 0.739583333,
+            "lcb": 0.673240066,
+            "ucb": 0.796527676
+          },
+          "choice_counts": {
+            "source_2": 180,
+            "source_1": 12
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 192,
+            "estimate": 0.166666667,
+            "lcb": 0.120602042,
+            "ucb": 0.225808055
+          },
+          "choice_counts": {
+            "source_1": 189,
+            "source_2": 3
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 163,
+            "total": 192,
+            "estimate": 0.848958333,
+            "lcb": 0.791496622,
+            "ucb": 0.892730307
+          },
+          "choice_counts": {
+            "source_1": 192
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 140,
+            "total": 192,
+            "estimate": 0.729166667,
+            "lcb": 0.662270751,
+            "ucb": 0.787072307
+          },
+          "choice_counts": {
+            "source_1": 180,
+            "source_2": 12
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 61,
+            "total": 192,
+            "estimate": 0.317708333,
+            "lcb": 0.255978914,
+            "ucb": 0.386589108
+          },
+          "choice_counts": {
+            "source_1": 184,
+            "source_2": 8
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 73,
+            "total": 192,
+            "estimate": 0.380208333,
+            "lcb": 0.314529912,
+            "ucb": 0.450586217
+          },
+          "choice_counts": {
+            "source_2": 60,
+            "source_1": 132
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 115,
+            "total": 192,
+            "estimate": 0.598958333,
+            "lcb": 0.528347985,
+            "ucb": 0.665686517
+          },
+          "choice_counts": {
+            "source_2": 71,
+            "source_1": 121
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 43,
+            "total": 192,
+            "estimate": 0.223958333,
+            "lcb": 0.170734634,
+            "ucb": 0.288011228
+          },
+          "choice_counts": {
+            "source_2": 154,
+            "source_1": 36,
+            "other": 2
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 179,
+            "total": 192,
+            "estimate": 0.932291667,
+            "lcb": 0.887617091,
+            "ucb": 0.960007314
+          },
+          "choice_counts": {
+            "source_2": 192
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 39,
+            "total": 192,
+            "estimate": 0.203125,
+            "lcb": 0.152300913,
+            "ucb": 0.26559558
+          },
+          "choice_counts": {
+            "source_1": 192
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 170,
+            "total": 192,
+            "estimate": 0.885416667,
+            "lcb": 0.832610795,
+            "ucb": 0.92310253
+          },
+          "choice_counts": {
+            "source_1": 192
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 139,
+            "total": 192,
+            "estimate": 0.723958333,
+            "lcb": 0.656801982,
+            "ucb": 0.782328733
+          },
+          "choice_counts": {
+            "source_1": 186,
+            "source_2": 6
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 57,
+            "total": 192,
+            "estimate": 0.296875,
+            "lcb": 0.236747354,
+            "ucb": 0.364971299
+          },
+          "choice_counts": {
+            "source_1": 185,
+            "source_2": 7
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 40,
+            "total": 192,
+            "estimate": 0.208333333,
+            "lcb": 0.156889151,
+            "ucb": 0.271219685
+          },
+          "choice_counts": {
+            "source_2": 43,
+            "source_1": 149
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 125,
+            "total": 192,
+            "estimate": 0.651041667,
+            "lcb": 0.581257766,
+            "ucb": 0.714900159
+          },
+          "choice_counts": {
+            "source_1": 168,
+            "source_2": 24
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 61,
+            "total": 192,
+            "estimate": 0.317708333,
+            "lcb": 0.255978914,
+            "ucb": 0.386589108
+          },
+          "choice_counts": {
+            "source_1": 96,
+            "source_2": 96
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 163,
+            "total": 192,
+            "estimate": 0.848958333,
+            "lcb": 0.791496622,
+            "ucb": 0.892730307
+          },
+          "choice_counts": {
+            "source_2": 165,
+            "source_1": 27
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 31,
+            "total": 192,
+            "estimate": 0.161458333,
+            "lcb": 0.116139447,
+            "ucb": 0.220058308
+          },
+          "choice_counts": {
+            "source_1": 187,
+            "source_2": 5
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 171,
+            "total": 192,
+            "estimate": 0.890625,
+            "lcb": 0.838584218,
+            "ucb": 0.927341449
+          },
+          "choice_counts": {
+            "source_1": 190,
+            "source_2": 2
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 143,
+            "total": 192,
+            "estimate": 0.744791667,
+            "lcb": 0.678741006,
+            "ucb": 0.801239079
+          },
+          "choice_counts": {
+            "source_1": 154,
+            "source_2": 38
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 192,
+            "estimate": 0.25,
+            "lcb": 0.194060652,
+            "ucb": 0.315746921
+          },
+          "choice_counts": {
+            "source_1": 158,
+            "source_2": 34
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 56,
+            "total": 192,
+            "estimate": 0.291666667,
+            "lcb": 0.231963391,
+            "ucb": 0.35954292
+          },
+          "choice_counts": {
+            "source_1": 182,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 142,
+            "total": 192,
+            "estimate": 0.739583333,
+            "lcb": 0.673240066,
+            "ucb": 0.796527676
+          },
+          "choice_counts": {
+            "source_1": 187,
+            "source_2": 5
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 133,
+            "total": 192,
+            "estimate": 0.692708333,
+            "lcb": 0.624200926,
+            "ucb": 0.753655737
+          },
+          "choice_counts": {
+            "other": 36,
+            "source_1": 127,
+            "source_2": 29
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 192,
+            "total": 192,
+            "estimate": 1.0,
+            "lcb": 0.980384854,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "other": 55,
+            "source_2": 137
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 192,
+            "estimate": 0.229166667,
+            "lcb": 0.1753756,
+            "ucb": 0.293582604
+          },
+          "choice_counts": {
+            "other": 16,
+            "source_1": 83,
+            "source_2": 93
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 192,
+            "total": 192,
+            "estimate": 1.0,
+            "lcb": 0.980384854,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "other": 51,
+            "source_1": 141
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 130,
+            "total": 192,
+            "estimate": 0.677083333,
+            "lcb": 0.608029713,
+            "ucb": 0.739189923
+          },
+          "choice_counts": {
+            "other": 12,
+            "source_2": 61,
+            "source_1": 119
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 74,
+            "total": 192,
+            "estimate": 0.385416667,
+            "lcb": 0.319463765,
+            "ucb": 0.455864706
+          },
+          "choice_counts": {
+            "source_2": 35,
+            "source_1": 137,
+            "other": 20
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 64,
+            "total": 192,
+            "estimate": 0.333333333,
+            "lcb": 0.270499507,
+            "ucb": 0.402705542
+          },
+          "choice_counts": {
+            "other": 18,
+            "source_1": 149,
+            "source_2": 25
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 192,
+          "complete_event": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 192,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.019615146
+          },
+          "teacher_correct": {
+            "successes": 167,
+            "total": 192,
+            "estimate": 0.869791667,
+            "lcb": 0.814850523,
+            "ucb": 0.910225775
+          },
+          "choice_counts": {
+            "other": 38,
+            "source_1": 150,
+            "source_2": 4
+          }
+        }
+      ],
+      "control": [
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 43,
+            "total": 48,
+            "estimate": 0.895833333,
+            "lcb": 0.778325783,
+            "ucb": 0.954678281
+          },
+          "choice_counts": {
+            "source_1": 7,
+            "other": 31,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 45,
+            "total": 48,
+            "estimate": 0.9375,
+            "lcb": 0.831645619,
+            "ucb": 0.978516767
+          },
+          "choice_counts": {
+            "source_1": 7,
+            "other": 31,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "source_2": 10,
+            "other": 31,
+            "source_1": 7
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 47,
+            "total": 48,
+            "estimate": 0.979166667,
+            "lcb": 0.89100782,
+            "ucb": 0.996312889
+          },
+          "choice_counts": {
+            "source_2": 9,
+            "other": 31,
+            "source_1": 8
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 12,
+            "other": 20,
+            "source_1": 16
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 12,
+            "other": 18,
+            "source_1": 18
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "other": 17,
+            "source_2": 12,
+            "source_1": 19
+          }
+        },
+        {
+          "timing": "after_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "other": 17,
+            "source_2": 12,
+            "source_1": 19
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 46,
+            "total": 48,
+            "estimate": 0.958333333,
+            "lcb": 0.860243441,
+            "ucb": 0.988498107
+          },
+          "choice_counts": {
+            "source_1": 12,
+            "source_2": 14,
+            "other": 22
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "source_1": 13,
+            "source_2": 13,
+            "other": 22
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 13,
+            "source_1": 13,
+            "other": 22
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 46,
+            "total": 48,
+            "estimate": 0.958333333,
+            "lcb": 0.860243441,
+            "ucb": 0.988498107
+          },
+          "choice_counts": {
+            "source_2": 13,
+            "source_1": 14,
+            "other": 21
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 46,
+            "total": 48,
+            "estimate": 0.958333333,
+            "lcb": 0.860243441,
+            "ucb": 0.988498107
+          },
+          "choice_counts": {
+            "source_2": 12,
+            "other": 20,
+            "source_1": 16
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 45,
+            "total": 48,
+            "estimate": 0.9375,
+            "lcb": 0.831645619,
+            "ucb": 0.978516767
+          },
+          "choice_counts": {
+            "source_2": 12,
+            "other": 17,
+            "source_1": 19
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "source_1": 16,
+            "other": 20,
+            "source_2": 12
+          }
+        },
+        {
+          "timing": "after_role_a",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 42,
+            "total": 48,
+            "estimate": 0.875,
+            "lcb": 0.752995417,
+            "ucb": 0.941429486
+          },
+          "choice_counts": {
+            "source_1": 17,
+            "other": 19,
+            "source_2": 12
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 39,
+            "total": 48,
+            "estimate": 0.8125,
+            "lcb": 0.680601329,
+            "ucb": 0.89808609
+          },
+          "choice_counts": {
+            "source_1": 9,
+            "other": 24,
+            "source_2": 15
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 38,
+            "total": 48,
+            "estimate": 0.791666667,
+            "lcb": 0.657410987,
+            "ucb": 0.88269727
+          },
+          "choice_counts": {
+            "source_1": 10,
+            "other": 28,
+            "source_2": 10
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 41,
+            "total": 48,
+            "estimate": 0.854166667,
+            "lcb": 0.728328235,
+            "ucb": 0.927517507
+          },
+          "choice_counts": {
+            "source_2": 15,
+            "other": 24,
+            "source_1": 9
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 41,
+            "total": 48,
+            "estimate": 0.854166667,
+            "lcb": 0.728328235,
+            "ucb": 0.927517507
+          },
+          "choice_counts": {
+            "source_2": 15,
+            "other": 23,
+            "source_1": 10
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "source_2": 17,
+            "other": 17,
+            "source_1": 14
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 42,
+            "total": 48,
+            "estimate": 0.875,
+            "lcb": 0.752995417,
+            "ucb": 0.941429486
+          },
+          "choice_counts": {
+            "source_2": 17,
+            "other": 17,
+            "source_1": 14
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 46,
+            "total": 48,
+            "estimate": 0.958333333,
+            "lcb": 0.860243441,
+            "ucb": 0.988498107
+          },
+          "choice_counts": {
+            "other": 14,
+            "source_2": 17,
+            "source_1": 17
+          }
+        },
+        {
+          "timing": "after_role_b",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 43,
+            "total": 48,
+            "estimate": 0.895833333,
+            "lcb": 0.778325783,
+            "ucb": 0.954678281
+          },
+          "choice_counts": {
+            "other": 18,
+            "source_2": 16,
+            "source_1": 14
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 43,
+            "total": 48,
+            "estimate": 0.895833333,
+            "lcb": 0.778325783,
+            "ucb": 0.954678281
+          },
+          "choice_counts": {
+            "source_1": 23,
+            "source_2": 18,
+            "other": 7
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 29,
+            "total": 48,
+            "estimate": 0.604166667,
+            "lcb": 0.463104085,
+            "ucb": 0.729791721
+          },
+          "choice_counts": {
+            "source_1": 23,
+            "source_2": 18,
+            "other": 7
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "source_2": 19,
+            "source_1": 21,
+            "other": 8
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 32,
+            "total": 48,
+            "estimate": 0.666666667,
+            "lcb": 0.525401097,
+            "ucb": 0.783232193
+          },
+          "choice_counts": {
+            "source_2": 19,
+            "source_1": 21,
+            "other": 8
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 47,
+            "total": 48,
+            "estimate": 0.979166667,
+            "lcb": 0.89100782,
+            "ucb": 0.996312889
+          },
+          "choice_counts": {
+            "source_2": 22,
+            "source_1": 24,
+            "other": 2
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 22,
+            "source_1": 24,
+            "other": 2
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "source_1": 24,
+            "source_2": 18,
+            "other": 6
+          }
+        },
+        {
+          "timing": "before_records",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 24,
+            "source_2": 20,
+            "other": 4
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 11,
+            "other": 31,
+            "source_2": 6
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_1": 11,
+            "other": 32,
+            "source_2": 5
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 7,
+            "other": 29,
+            "source_1": 12
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ab",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 48,
+            "total": 48,
+            "estimate": 1.0,
+            "lcb": 0.92589987,
+            "ucb": 1.0
+          },
+          "choice_counts": {
+            "source_2": 7,
+            "other": 29,
+            "source_1": 12
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 42,
+            "total": 48,
+            "estimate": 0.875,
+            "lcb": 0.752995417,
+            "ucb": 0.941429486
+          },
+          "choice_counts": {
+            "source_2": 11,
+            "other": 23,
+            "source_1": 14
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "direct",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 45,
+            "total": 48,
+            "estimate": 0.9375,
+            "lcb": 0.831645619,
+            "ucb": 0.978516767
+          },
+          "choice_counts": {
+            "source_2": 10,
+            "other": 27,
+            "source_1": 11
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "a",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 43,
+            "total": 48,
+            "estimate": 0.895833333,
+            "lcb": 0.778325783,
+            "ucb": 0.954678281
+          },
+          "choice_counts": {
+            "other": 25,
+            "source_2": 10,
+            "source_1": 13
+          }
+        },
+        {
+          "timing": "near_query",
+          "record_order": "ba",
+          "mapping": "swapped",
+          "role": "b",
+          "condition_count": 48,
+          "complete_event": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "branch_correct": {
+            "successes": 0,
+            "total": 48,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.07410013
+          },
+          "teacher_correct": {
+            "successes": 44,
+            "total": 48,
+            "estimate": 0.916666667,
+            "lcb": 0.804466982,
+            "ucb": 0.967116243
+          },
+          "choice_counts": {
+            "other": 26,
+            "source_2": 8,
+            "source_1": 14
+          }
+        }
+      ]
+    }
+  },
+  "timing_reproducibility": {
+    "direction_tested_count": 0,
+    "direction_agreement": {
+      "successes": 0,
+      "total": 0,
+      "estimate": 0.0,
+      "lcb": 0.0,
+      "ucb": 1.0
+    },
+    "details": [
+      {
+        "timing": "before_records",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ab",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ab",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ba",
+        "mapping": "direct",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "a",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "before_records",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_a",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_role_b",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "after_records",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      },
+      {
+        "timing": "near_query",
+        "record_order": "ba",
+        "mapping": "swapped",
+        "role": "b",
+        "discovery_late_minus_timing": 0.0,
+        "holdout_late_minus_timing": 0.0
+      }
+    ]
+  },
+  "holdout_failure_audit": {
+    "failure_count": 7680,
+    "by_timing": {
+      "after_records": 1536,
+      "after_role_a": 1536,
+      "after_role_b": 1536,
+      "before_records": 1536,
+      "near_query": 1536
+    },
+    "by_record_order": {
+      "ab": 3840,
+      "ba": 3840
+    },
+    "by_mapping": {
+      "direct": 3840,
+      "swapped": 3840
+    },
+    "by_role": {
+      "a": 3840,
+      "b": 3840
+    },
+    "by_role_alias": {
+      "0": 1920,
+      "1": 1920,
+      "2": 1920,
+      "3": 1920
+    },
+    "by_cue_alias": {
+      "0": 1920,
+      "1": 1920,
+      "2": 1920,
+      "3": 1920
+    },
+    "three_factor": {
+      "after_records::direct::a": 384,
+      "after_records::direct::b": 384,
+      "after_records::swapped::a": 384,
+      "after_records::swapped::b": 384,
+      "after_role_a::direct::a": 384,
+      "after_role_a::direct::b": 384,
+      "after_role_a::swapped::a": 384,
+      "after_role_a::swapped::b": 384,
+      "after_role_b::direct::a": 384,
+      "after_role_b::direct::b": 384,
+      "after_role_b::swapped::a": 384,
+      "after_role_b::swapped::b": 384,
+      "before_records::direct::a": 384,
+      "before_records::direct::b": 384,
+      "before_records::swapped::a": 384,
+      "before_records::swapped::b": 384,
+      "near_query::direct::a": 384,
+      "near_query::direct::b": 384,
+      "near_query::swapped::a": 384,
+      "near_query::swapped::b": 384
+    }
+  },
+  "record_position_audit": {
+    "behavior_discovery": {
+      "posthoc_descriptive_only": true,
+      "gate_thresholds_unchanged": true,
+      "first_record_selected": {
+        "successes": 1193,
+        "total": 3840,
+        "estimate": 0.310677083,
+        "lcb": 0.296235503,
+        "ucb": 0.325497074
+      },
+      "target_is_first_record": {
+        "complete_event": {
+          "successes": 0,
+          "total": 1920,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.001996765
+        },
+        "registered_source_choice_correct": {
+          "successes": 721,
+          "total": 1920,
+          "estimate": 0.375520833,
+          "lcb": 0.354128849,
+          "ucb": 0.397409929
+        }
+      },
+      "target_is_second_record": {
+        "complete_event": {
+          "successes": 0,
+          "total": 1920,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.001996765
+        },
+        "registered_source_choice_correct": {
+          "successes": 1375,
+          "total": 1920,
+          "estimate": 0.716145833,
+          "lcb": 0.695562552,
+          "ucb": 0.73586593
+        }
+      },
+      "failed_conditions_select_first_record": {
+        "successes": 1193,
+        "total": 3840,
+        "estimate": 0.310677083,
+        "lcb": 0.296235503,
+        "ucb": 0.325497074
+      },
+      "by_timing": {
+        "before_records": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 157,
+              "total": 384,
+              "estimate": 0.408854167,
+              "lcb": 0.360821171,
+              "ucb": 0.458692709
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 264,
+              "total": 384,
+              "estimate": 0.6875,
+              "lcb": 0.639475617,
+              "ucb": 0.731810115
+            }
+          }
+        },
+        "after_role_a": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 132,
+              "total": 384,
+              "estimate": 0.34375,
+              "lcb": 0.298003221,
+              "ucb": 0.392592002
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 301,
+              "total": 384,
+              "estimate": 0.783854167,
+              "lcb": 0.739981393,
+              "ucb": 0.822103952
+            }
+          }
+        },
+        "after_role_b": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 110,
+              "total": 384,
+              "estimate": 0.286458333,
+              "lcb": 0.243529017,
+              "ucb": 0.333617788
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 302,
+              "total": 384,
+              "estimate": 0.786458333,
+              "lcb": 0.742737504,
+              "ucb": 0.824504587
+            }
+          }
+        },
+        "after_records": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 141,
+              "total": 384,
+              "estimate": 0.3671875,
+              "lcb": 0.320511323,
+              "ucb": 0.416494617
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 291,
+              "total": 384,
+              "estimate": 0.7578125,
+              "lcb": 0.712546416,
+              "ucb": 0.797971465
+            }
+          }
+        },
+        "near_query": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 181,
+              "total": 384,
+              "estimate": 0.471354167,
+              "lcb": 0.421957603,
+              "ucb": 0.521318187
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 384,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.009904714
+            },
+            "registered_source_choice_correct": {
+              "successes": 217,
+              "total": 384,
+              "estimate": 0.565104167,
+              "lcb": 0.515117534,
+              "ucb": 0.613801123
+            }
+          }
+        }
+      }
+    },
+    "behavior_holdout": {
+      "posthoc_descriptive_only": true,
+      "gate_thresholds_unchanged": true,
+      "first_record_selected": {
+        "successes": 2438,
+        "total": 7680,
+        "estimate": 0.317447917,
+        "lcb": 0.307130883,
+        "ucb": 0.32794748
+      },
+      "target_is_first_record": {
+        "complete_event": {
+          "successes": 0,
+          "total": 3840,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.00099938
+        },
+        "registered_source_choice_correct": {
+          "successes": 1475,
+          "total": 3840,
+          "estimate": 0.384114583,
+          "lcb": 0.368853878,
+          "ucb": 0.399606916
+        }
+      },
+      "target_is_second_record": {
+        "complete_event": {
+          "successes": 0,
+          "total": 3840,
+          "estimate": 0.0,
+          "lcb": 0.0,
+          "ucb": 0.00099938
+        },
+        "registered_source_choice_correct": {
+          "successes": 2741,
+          "total": 3840,
+          "estimate": 0.713802083,
+          "lcb": 0.699298288,
+          "ucb": 0.72787854
+        }
+      },
+      "failed_conditions_select_first_record": {
+        "successes": 2438,
+        "total": 7680,
+        "estimate": 0.317447917,
+        "lcb": 0.307130883,
+        "ucb": 0.32794748
+      },
+      "by_timing": {
+        "before_records": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 322,
+              "total": 768,
+              "estimate": 0.419270833,
+              "lcb": 0.384859169,
+              "ucb": 0.454486077
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 519,
+              "total": 768,
+              "estimate": 0.67578125,
+              "lcb": 0.641872586,
+              "ucb": 0.707940186
+            }
+          }
+        },
+        "after_role_a": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 255,
+              "total": 768,
+              "estimate": 0.33203125,
+              "lcb": 0.29963274,
+              "ucb": 0.366101722
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 612,
+              "total": 768,
+              "estimate": 0.796875,
+              "lcb": 0.766975854,
+              "ucb": 0.82381905
+            }
+          }
+        },
+        "after_role_b": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 211,
+              "total": 768,
+              "estimate": 0.274739583,
+              "lcb": 0.244349379,
+              "ucb": 0.307372032
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 613,
+              "total": 768,
+              "estimate": 0.798177083,
+              "lcb": 0.768339039,
+              "ucb": 0.82504707
+            }
+          }
+        },
+        "after_records": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 282,
+              "total": 768,
+              "estimate": 0.3671875,
+              "lcb": 0.333835305,
+              "ucb": 0.401861712
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 575,
+              "total": 768,
+              "estimate": 0.748697917,
+              "lcb": 0.716834139,
+              "ucb": 0.778086153
+            }
+          }
+        },
+        "near_query": {
+          "first": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 405,
+              "total": 768,
+              "estimate": 0.52734375,
+              "lcb": 0.491986238,
+              "ucb": 0.562429082
+            }
+          },
+          "second": {
+            "complete_event": {
+              "successes": 0,
+              "total": 768,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.004977005
+            },
+            "registered_source_choice_correct": {
+              "successes": 422,
+              "total": 768,
+              "estimate": 0.549479167,
+              "lcb": 0.514131238,
+              "ucb": 0.584334579
+            }
+          }
+        }
+      }
+    }
+  },
+  "stress": {
+    "condition_count": 384,
+    "nonblocking": true,
+    "choice_counts": {
+      "other": 19,
+      "source_1": 253,
+      "source_2": 112
+    },
+    "by_mode": {
+      "conflict_slots": {
+        "other": 15,
+        "source_1": 113,
+        "source_2": 64
+      },
+      "neutral_only": {
+        "source_1": 140,
+        "source_2": 48,
+        "other": 4
+      }
+    }
+  },
+  "behavior_eligible": false,
+  "physical": false,
+  "predictive": false,
+  "causal": false
+}

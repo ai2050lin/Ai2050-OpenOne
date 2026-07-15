@@ -1,0 +1,187 @@
+{
+  "schema_version": "position_time_trace.v1",
+  "phase_id": "Phase431-PositionTimeAnalysis",
+  "title": "Phase431 最小位置-时间自然计算图谱",
+  "model": "qwen3",
+  "evidence_scope": "blind-frozen architecture events with independent open holdout evaluation; non-causal and non-neuronal",
+  "graph": {
+    "meta": {
+      "layer_axis": "x",
+      "position_role_axis": "y",
+      "generation_step_axis": "z",
+      "gates": {
+        "G0": true,
+        "G1": false,
+        "G2": true,
+        "G3": true,
+        "G4": false,
+        "G5": false
+      },
+      "sealed_unlock": false,
+      "failed_gates": [
+        "G1",
+        "G4",
+        "G5"
+      ],
+      "terminal_choice_accuracy": 1.0,
+      "upstream_balanced_accuracy": 0.5,
+      "candidate_predicted_role_flip": 0.0,
+      "control_predicted_role_flip": 0.0,
+      "event_order_contract": "registered prompt role order followed by natural generation step; observed order is not a causal edge"
+    },
+    "nodes": [
+      {
+        "id": "phase431:qwen3:L1:question_end",
+        "label": "L1 / question_end",
+        "type": "position_time_blind_event",
+        "model": "qwen3",
+        "layer": 1,
+        "relative_depth": 0.028571429,
+        "position_role": "question_end",
+        "generation_step": 0,
+        "blind_event_score": 1.324242252,
+        "score": 1.324242252,
+        "size": 0.7,
+        "color": "#0ea5e9",
+        "position": [
+          1.0,
+          8.0,
+          0.0
+        ],
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "pipeline_sealed": false,
+        "evidence_level": "blind_physical_observation",
+        "show_label": true
+      },
+      {
+        "id": "phase431:qwen3:L1:instruction_end",
+        "label": "L1 / instruction_end",
+        "type": "position_time_blind_event",
+        "model": "qwen3",
+        "layer": 1,
+        "relative_depth": 0.028571429,
+        "position_role": "instruction_end",
+        "generation_step": 0,
+        "blind_event_score": 1.33287174,
+        "score": 1.33287174,
+        "size": 0.7,
+        "color": "#f59e0b",
+        "position": [
+          1.0,
+          10.0,
+          0.0
+        ],
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "pipeline_sealed": false,
+        "evidence_level": "blind_physical_observation",
+        "show_label": true
+      },
+      {
+        "id": "phase431:qwen3:L1:g1",
+        "label": "L1 / g1",
+        "type": "position_time_blind_event",
+        "model": "qwen3",
+        "layer": 1,
+        "relative_depth": 0.028571429,
+        "position_role": "g1",
+        "generation_step": 1,
+        "blind_event_score": 2.005279778,
+        "score": 2.005279778,
+        "size": 0.7,
+        "color": "#14b8a6",
+        "position": [
+          1.0,
+          16.0,
+          3.0
+        ],
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "pipeline_sealed": false,
+        "evidence_level": "blind_physical_observation",
+        "show_label": true
+      },
+      {
+        "id": "phase431:qwen3:L1:g2",
+        "label": "L1 / g2",
+        "type": "position_time_blind_event",
+        "model": "qwen3",
+        "layer": 1,
+        "relative_depth": 0.028571429,
+        "position_role": "g2",
+        "generation_step": 2,
+        "blind_event_score": 1.531280922,
+        "score": 1.531280922,
+        "size": 0.7,
+        "color": "#8b5cf6",
+        "position": [
+          1.0,
+          18.0,
+          6.0
+        ],
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "pipeline_sealed": false,
+        "evidence_level": "blind_physical_observation",
+        "show_label": true
+      }
+    ],
+    "edges": [
+      {
+        "id": "phase431:qwen3:L1:question_end->phase431:qwen3:L1:instruction_end",
+        "source": "phase431:qwen3:L1:question_end",
+        "target": "phase431:qwen3:L1:instruction_end",
+        "type": "observed_position_time_order",
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "evidence_level": "observed_order_not_causal",
+        "color": "#64748b",
+        "weight": 0.7
+      },
+      {
+        "id": "phase431:qwen3:L1:instruction_end->phase431:qwen3:L1:g1",
+        "source": "phase431:qwen3:L1:instruction_end",
+        "target": "phase431:qwen3:L1:g1",
+        "type": "observed_position_time_order",
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "evidence_level": "observed_order_not_causal",
+        "color": "#64748b",
+        "weight": 0.7
+      },
+      {
+        "id": "phase431:qwen3:L1:g1->phase431:qwen3:L1:g2",
+        "source": "phase431:qwen3:L1:g1",
+        "target": "phase431:qwen3:L1:g2",
+        "type": "observed_position_time_order",
+        "physical": true,
+        "observer": true,
+        "predictive": false,
+        "causal": false,
+        "single_neuron": false,
+        "evidence_level": "observed_order_not_causal",
+        "color": "#64748b",
+        "weight": 0.7
+      }
+    ]
+  }
+}

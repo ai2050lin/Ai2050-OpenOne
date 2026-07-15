@@ -1,0 +1,4259 @@
+{
+  "analysis": {
+    "schema_version": "phase433_final_summary.v1",
+    "phase_id": "Phase433-SharedPrefixAnalysis",
+    "created_at": "2026-07-15T10:49:02.043205+00:00",
+    "status": "open_gate_failed_sealed_unread",
+    "denominator": {
+      "valid": true,
+      "groups_per_block_split": 128,
+      "open_group_count": 768,
+      "sealed_group_count": 256,
+      "stress_group_count": 256,
+      "conditions_per_open_split_per_model": 1536,
+      "main_open_conditions_per_model": 4608,
+      "stress_open_conditions_per_model": 1024,
+      "total_open_conditions_per_model": 5632,
+      "sealed_conditions_qwen": 1536,
+      "three_model_open_conditions": 16896,
+      "vocabulary_disjoint_across_splits": true,
+      "counts": {
+        "language_action_shared_prefix_candidate::behavior_holdout": 128,
+        "language_action_shared_prefix_candidate::conflict_stress": 128,
+        "language_action_shared_prefix_candidate::observer_calibration": 128,
+        "language_action_shared_prefix_candidate::physical_calibration": 128,
+        "language_action_shared_prefix_candidate::sealed_physical_holdout": 128,
+        "language_action_shared_prefix_control::behavior_holdout": 128,
+        "language_action_shared_prefix_control::conflict_stress": 128,
+        "language_action_shared_prefix_control::observer_calibration": 128,
+        "language_action_shared_prefix_control::physical_calibration": 128,
+        "language_action_shared_prefix_control::sealed_physical_holdout": 128
+      }
+    },
+    "window_freeze": {
+      "schema_version": "phase433_shared_prefix.v1",
+      "phase_id": "Phase433-SharedPrefixAnalysis",
+      "created_at": "2026-07-15T10:35:07.968388+00:00",
+      "calibration_split": "observer_calibration",
+      "selected_layer": 26,
+      "selected_position_role": "prompt_terminal",
+      "selected_balanced_accuracy": 0.569866072,
+      "candidate_windows": [
+        {
+          "split": "observer_calibration",
+          "layer": 24,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 320,
+            "source_2": 448
+          },
+          "prediction_counts": {
+            "source_1": 768
+          },
+          "choice": {
+            "accuracy": 0.416666667,
+            "balanced_accuracy": 0.5,
+            "per_class": {
+              "source_1": {
+                "successes": 320,
+                "total": 320,
+                "estimate": 1.0,
+                "lcb": 0.988137841,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 448,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.008501785
+              }
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 0,
+            "total": 384,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.009904714
+          },
+          "predicted_role_invariance": {
+            "successes": 384,
+            "total": 384,
+            "estimate": 1.0,
+            "lcb": 0.990095286,
+            "ucb": 1.0
+          },
+          "natural_common_prefix": {
+            "successes": 768,
+            "total": 768,
+            "estimate": 1.0,
+            "lcb": 0.995022995,
+            "ucb": 1.0
+          },
+          "natural_complete_event": {
+            "successes": 704,
+            "total": 768,
+            "estimate": 0.916666667,
+            "lcb": 0.894984541,
+            "ucb": 0.934201289
+          }
+        },
+        {
+          "split": "observer_calibration",
+          "layer": 25,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 320,
+            "source_2": 448
+          },
+          "prediction_counts": {
+            "source_1": 646,
+            "source_2": 122
+          },
+          "choice": {
+            "accuracy": 0.424479167,
+            "balanced_accuracy": 0.480803571,
+            "per_class": {
+              "source_1": {
+                "successes": 262,
+                "total": 320,
+                "estimate": 0.81875,
+                "lcb": 0.772842671,
+                "ucb": 0.857095203
+              },
+              "source_2": {
+                "successes": 64,
+                "total": 448,
+                "estimate": 0.142857143,
+                "lcb": 0.113485867,
+                "ucb": 0.178301122
+              }
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 122,
+            "total": 384,
+            "estimate": 0.317708333,
+            "lcb": 0.273142527,
+            "ucb": 0.365885234
+          },
+          "predicted_role_invariance": {
+            "successes": 262,
+            "total": 384,
+            "estimate": 0.682291667,
+            "lcb": 0.634114766,
+            "ucb": 0.726857473
+          },
+          "natural_common_prefix": {
+            "successes": 768,
+            "total": 768,
+            "estimate": 1.0,
+            "lcb": 0.995022995,
+            "ucb": 1.0
+          },
+          "natural_complete_event": {
+            "successes": 704,
+            "total": 768,
+            "estimate": 0.916666667,
+            "lcb": 0.894984541,
+            "ucb": 0.934201289
+          }
+        },
+        {
+          "split": "observer_calibration",
+          "layer": 26,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 320,
+            "source_2": 448
+          },
+          "prediction_counts": {
+            "source_1": 703,
+            "source_2": 65
+          },
+          "choice": {
+            "accuracy": 0.498697917,
+            "balanced_accuracy": 0.569866072,
+            "per_class": {
+              "source_1": {
+                "successes": 319,
+                "total": 320,
+                "estimate": 0.996875,
+                "lcb": 0.982513832,
+                "ucb": 0.999448148
+              },
+              "source_2": {
+                "successes": 64,
+                "total": 448,
+                "estimate": 0.142857143,
+                "lcb": 0.113485867,
+                "ucb": 0.178301122
+              }
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 65,
+            "total": 384,
+            "estimate": 0.169270833,
+            "lcb": 0.135083109,
+            "ucb": 0.210010113
+          },
+          "predicted_role_invariance": {
+            "successes": 319,
+            "total": 384,
+            "estimate": 0.830729167,
+            "lcb": 0.789989887,
+            "ucb": 0.864916891
+          },
+          "natural_common_prefix": {
+            "successes": 768,
+            "total": 768,
+            "estimate": 1.0,
+            "lcb": 0.995022995,
+            "ucb": 1.0
+          },
+          "natural_complete_event": {
+            "successes": 704,
+            "total": 768,
+            "estimate": 0.916666667,
+            "lcb": 0.894984541,
+            "ucb": 0.934201289
+          }
+        },
+        {
+          "split": "observer_calibration",
+          "layer": 27,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 320,
+            "source_2": 448
+          },
+          "prediction_counts": {
+            "source_1": 625,
+            "source_2": 143
+          },
+          "choice": {
+            "accuracy": 0.514322917,
+            "balanced_accuracy": 0.568526786,
+            "per_class": {
+              "source_1": {
+                "successes": 286,
+                "total": 320,
+                "estimate": 0.89375,
+                "lcb": 0.855193328,
+                "ucb": 0.922965222
+              },
+              "source_2": {
+                "successes": 109,
+                "total": 448,
+                "estimate": 0.243303571,
+                "lcb": 0.205862719,
+                "ucb": 0.285109179
+              }
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 143,
+            "total": 384,
+            "estimate": 0.372395833,
+            "lcb": 0.325529692,
+            "ucb": 0.421789741
+          },
+          "predicted_role_invariance": {
+            "successes": 241,
+            "total": 384,
+            "estimate": 0.627604167,
+            "lcb": 0.578210259,
+            "ucb": 0.674470308
+          },
+          "natural_common_prefix": {
+            "successes": 768,
+            "total": 768,
+            "estimate": 1.0,
+            "lcb": 0.995022995,
+            "ucb": 1.0
+          },
+          "natural_complete_event": {
+            "successes": 704,
+            "total": 768,
+            "estimate": 0.916666667,
+            "lcb": 0.894984541,
+            "ucb": 0.934201289
+          }
+        },
+        {
+          "split": "observer_calibration",
+          "layer": 28,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 320,
+            "source_2": 448
+          },
+          "prediction_counts": {
+            "source_1": 768
+          },
+          "choice": {
+            "accuracy": 0.416666667,
+            "balanced_accuracy": 0.5,
+            "per_class": {
+              "source_1": {
+                "successes": 320,
+                "total": 320,
+                "estimate": 1.0,
+                "lcb": 0.988137841,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 448,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.008501785
+              }
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 0,
+            "total": 384,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.009904714
+          },
+          "predicted_role_invariance": {
+            "successes": 384,
+            "total": 384,
+            "estimate": 1.0,
+            "lcb": 0.990095286,
+            "ucb": 1.0
+          },
+          "natural_common_prefix": {
+            "successes": 768,
+            "total": 768,
+            "estimate": 1.0,
+            "lcb": 0.995022995,
+            "ucb": 1.0
+          },
+          "natural_complete_event": {
+            "successes": 704,
+            "total": 768,
+            "estimate": 0.916666667,
+            "lcb": 0.894984541,
+            "ucb": 0.934201289
+          }
+        },
+        {
+          "split": "observer_calibration",
+          "layer": 29,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 320,
+            "source_2": 448
+          },
+          "prediction_counts": {
+            "source_1": 768
+          },
+          "choice": {
+            "accuracy": 0.416666667,
+            "balanced_accuracy": 0.5,
+            "per_class": {
+              "source_1": {
+                "successes": 320,
+                "total": 320,
+                "estimate": 1.0,
+                "lcb": 0.988137841,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 448,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.008501785
+              }
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 0,
+            "total": 384,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.009904714
+          },
+          "predicted_role_invariance": {
+            "successes": 384,
+            "total": 384,
+            "estimate": 1.0,
+            "lcb": 0.990095286,
+            "ucb": 1.0
+          },
+          "natural_common_prefix": {
+            "successes": 768,
+            "total": 768,
+            "estimate": 1.0,
+            "lcb": 0.995022995,
+            "ucb": 1.0
+          },
+          "natural_complete_event": {
+            "successes": 704,
+            "total": 768,
+            "estimate": 0.916666667,
+            "lcb": 0.894984541,
+            "ucb": 0.934201289
+          }
+        }
+      ],
+      "selection_count": 1,
+      "labels_used": true,
+      "observer_only": true,
+      "holdout_reselection_forbidden": true,
+      "sealed_reselection_forbidden": true
+    },
+    "open": {
+      "schema_version": "phase433_shared_prefix.v1",
+      "phase_id": "Phase433-SharedPrefixAnalysis",
+      "created_at": "2026-07-15T10:48:10.089586+00:00",
+      "stage": "open",
+      "denominator": {
+        "valid": true,
+        "groups_per_block_split": 128,
+        "open_group_count": 768,
+        "sealed_group_count": 256,
+        "stress_group_count": 256,
+        "conditions_per_open_split_per_model": 1536,
+        "main_open_conditions_per_model": 4608,
+        "stress_open_conditions_per_model": 1024,
+        "total_open_conditions_per_model": 5632,
+        "sealed_conditions_qwen": 1536,
+        "three_model_open_conditions": 16896,
+        "vocabulary_disjoint_across_splits": true,
+        "counts": {
+          "language_action_shared_prefix_candidate::behavior_holdout": 128,
+          "language_action_shared_prefix_candidate::conflict_stress": 128,
+          "language_action_shared_prefix_candidate::observer_calibration": 128,
+          "language_action_shared_prefix_candidate::physical_calibration": 128,
+          "language_action_shared_prefix_candidate::sealed_physical_holdout": 128,
+          "language_action_shared_prefix_control::behavior_holdout": 128,
+          "language_action_shared_prefix_control::conflict_stress": 128,
+          "language_action_shared_prefix_control::observer_calibration": 128,
+          "language_action_shared_prefix_control::physical_calibration": 128,
+          "language_action_shared_prefix_control::sealed_physical_holdout": 128
+        }
+      },
+      "behavior": {
+        "qwen3": {
+          "model": "qwen3",
+          "stage": "open",
+          "condition_count": 5632,
+          "token_contract": {
+            "valid": 5632,
+            "total": 5632,
+            "fraction": 1.0,
+            "common_prefix_length_range": [
+              9,
+              9
+            ],
+            "pass": true
+          },
+          "splits": {
+            "observer_calibration": {
+              "split": "observer_calibration",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 64,
+                  "total": 128,
+                  "estimate": 0.5,
+                  "lcb": 0.414652246,
+                  "ucb": 0.585347754
+                },
+                "role_response_contract": {
+                  "successes": 320,
+                  "total": 384,
+                  "estimate": 0.833333333,
+                  "lcb": 0.792795286,
+                  "ucb": 0.867268238
+                },
+                "condition_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_branch_correct": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "teacher_sequence_correct": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 128,
+                  "total": 128,
+                  "estimate": 1.0,
+                  "lcb": 0.970863044,
+                  "ucb": 1.0
+                },
+                "role_response_contract": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "condition_complete_event": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_branch_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "source_1": 384,
+                  "source_2": 384
+                }
+              },
+              "behavior_gate_pass": false
+            },
+            "physical_calibration": {
+              "split": "physical_calibration",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 64,
+                  "total": 128,
+                  "estimate": 0.5,
+                  "lcb": 0.414652246,
+                  "ucb": 0.585347754
+                },
+                "role_response_contract": {
+                  "successes": 320,
+                  "total": 384,
+                  "estimate": 0.833333333,
+                  "lcb": 0.792795286,
+                  "ucb": 0.867268238
+                },
+                "condition_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_branch_correct": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "teacher_sequence_correct": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 128,
+                  "total": 128,
+                  "estimate": 1.0,
+                  "lcb": 0.970863044,
+                  "ucb": 1.0
+                },
+                "role_response_contract": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "condition_complete_event": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_branch_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "source_1": 384,
+                  "source_2": 384
+                }
+              },
+              "behavior_gate_pass": false
+            },
+            "behavior_holdout": {
+              "split": "behavior_holdout",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 64,
+                  "total": 128,
+                  "estimate": 0.5,
+                  "lcb": 0.414652246,
+                  "ucb": 0.585347754
+                },
+                "role_response_contract": {
+                  "successes": 320,
+                  "total": 384,
+                  "estimate": 0.833333333,
+                  "lcb": 0.792795286,
+                  "ucb": 0.867268238
+                },
+                "condition_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_branch_correct": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "teacher_sequence_correct": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                },
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 128,
+                  "total": 128,
+                  "estimate": 1.0,
+                  "lcb": 0.970863044,
+                  "ucb": 1.0
+                },
+                "role_response_contract": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "condition_complete_event": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_branch_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "source_1": 384,
+                  "source_2": 384
+                }
+              },
+              "behavior_gate_pass": false
+            }
+          },
+          "stress": {
+            "condition_count": 1024,
+            "nonblocking": true,
+            "by_block_route_role_choice": {
+              "language_action_shared_prefix_candidate::conflict::a": {
+                "source_2": 128
+              },
+              "language_action_shared_prefix_candidate::conflict::b": {
+                "source_1": 64,
+                "source_2": 64
+              },
+              "language_action_shared_prefix_candidate::none::a": {
+                "source_1": 64,
+                "source_2": 64
+              },
+              "language_action_shared_prefix_candidate::none::b": {
+                "source_1": 64,
+                "source_2": 64
+              },
+              "language_action_shared_prefix_control::conflict::a": {
+                "source_1": 64,
+                "source_2": 64
+              },
+              "language_action_shared_prefix_control::conflict::b": {
+                "source_1": 64,
+                "source_2": 64
+              },
+              "language_action_shared_prefix_control::none::a": {
+                "source_1": 64,
+                "source_2": 64
+              },
+              "language_action_shared_prefix_control::none::b": {
+                "source_1": 64,
+                "source_2": 64
+              }
+            },
+            "complete_event": {
+              "successes": 704,
+              "total": 1024,
+              "estimate": 0.6875,
+              "lcb": 0.658454061,
+              "ucb": 0.715144412
+            }
+          },
+          "behavior_holdout_pass": false
+        },
+        "glm4": {
+          "model": "glm4",
+          "stage": "open",
+          "condition_count": 5632,
+          "token_contract": {
+            "valid": 5632,
+            "total": 5632,
+            "fraction": 1.0,
+            "common_prefix_length_range": [
+              6,
+              7
+            ],
+            "pass": true
+          },
+          "splits": {
+            "observer_calibration": {
+              "split": "observer_calibration",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 122,
+                  "total": 384,
+                  "estimate": 0.317708333,
+                  "lcb": 0.273142527,
+                  "ucb": 0.365885234
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 645,
+                  "total": 768,
+                  "estimate": 0.83984375,
+                  "lcb": 0.812223617,
+                  "ucb": 0.864081075
+                },
+                "actual_choice_counts": {
+                  "other": 411,
+                  "source_1": 231,
+                  "source_2": 126
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 9,
+                  "total": 384,
+                  "estimate": 0.0234375,
+                  "lcb": 0.012378572,
+                  "ucb": 0.043936858
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "other": 711,
+                  "source_1": 41,
+                  "source_2": 16
+                }
+              },
+              "behavior_gate_pass": false
+            },
+            "physical_calibration": {
+              "split": "physical_calibration",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 140,
+                  "total": 384,
+                  "estimate": 0.364583333,
+                  "lcb": 0.31800437,
+                  "ucb": 0.413844823
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 662,
+                  "total": 768,
+                  "estimate": 0.861979167,
+                  "lcb": 0.835777485,
+                  "ucb": 0.884577704
+                },
+                "actual_choice_counts": {
+                  "other": 400,
+                  "source_1": 224,
+                  "source_2": 144
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 8,
+                  "total": 384,
+                  "estimate": 0.020833333,
+                  "lcb": 0.010593553,
+                  "ucb": 0.040565132
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "other": 723,
+                  "source_1": 29,
+                  "source_2": 16
+                }
+              },
+              "behavior_gate_pass": false
+            },
+            "behavior_holdout": {
+              "split": "behavior_holdout",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 146,
+                  "total": 384,
+                  "estimate": 0.380208333,
+                  "lcb": 0.333068308,
+                  "ucb": 0.429721363
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 665,
+                  "total": 768,
+                  "estimate": 0.865885417,
+                  "lcb": 0.839954549,
+                  "ucb": 0.888174257
+                },
+                "actual_choice_counts": {
+                  "source_1": 244,
+                  "other": 378,
+                  "source_2": 146
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 8,
+                  "total": 384,
+                  "estimate": 0.020833333,
+                  "lcb": 0.010593553,
+                  "ucb": 0.040565132
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "other": 721,
+                  "source_1": 31,
+                  "source_2": 16
+                }
+              },
+              "behavior_gate_pass": false
+            }
+          },
+          "stress": {
+            "condition_count": 1024,
+            "nonblocking": true,
+            "by_block_route_role_choice": {
+              "language_action_shared_prefix_candidate::conflict::a": {
+                "source_2": 24,
+                "source_1": 56,
+                "other": 48
+              },
+              "language_action_shared_prefix_candidate::conflict::b": {
+                "other": 12,
+                "source_2": 82,
+                "source_1": 34
+              },
+              "language_action_shared_prefix_candidate::none::a": {
+                "other": 118,
+                "source_2": 9,
+                "source_1": 1
+              },
+              "language_action_shared_prefix_candidate::none::b": {
+                "other": 118,
+                "source_2": 9,
+                "source_1": 1
+              },
+              "language_action_shared_prefix_control::conflict::a": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::conflict::b": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::none::a": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::none::b": {
+                "other": 128
+              }
+            },
+            "complete_event": {
+              "successes": 0,
+              "total": 1024,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.003737404
+            }
+          },
+          "behavior_holdout_pass": false
+        },
+        "deepseek7b": {
+          "model": "deepseek7b",
+          "stage": "open",
+          "condition_count": 5632,
+          "token_contract": {
+            "valid": 5632,
+            "total": 5632,
+            "fraction": 1.0,
+            "common_prefix_length_range": [
+              9,
+              9
+            ],
+            "pass": true
+          },
+          "splits": {
+            "observer_calibration": {
+              "split": "observer_calibration",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 568,
+                  "total": 768,
+                  "estimate": 0.739583333,
+                  "lcb": 0.707407186,
+                  "ucb": 0.769374666
+                },
+                "actual_choice_counts": {
+                  "other": 768
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "other": 768
+                }
+              },
+              "behavior_gate_pass": false
+            },
+            "physical_calibration": {
+              "split": "physical_calibration",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 569,
+                  "total": 768,
+                  "estimate": 0.740885417,
+                  "lcb": 0.708752826,
+                  "ucb": 0.770620232
+                },
+                "actual_choice_counts": {
+                  "other": 768
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "actual_choice_counts": {
+                  "other": 768
+                }
+              },
+              "behavior_gate_pass": false
+            },
+            "behavior_holdout": {
+              "split": "behavior_holdout",
+              "condition_count": 1536,
+              "candidate": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 565,
+                  "total": 768,
+                  "estimate": 0.735677083,
+                  "lcb": 0.703372367,
+                  "ucb": 0.765635868
+                },
+                "actual_choice_counts": {
+                  "other": 768
+                }
+              },
+              "control": {
+                "group_all_complete_events": {
+                  "successes": 0,
+                  "total": 128,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.029136956
+                },
+                "role_response_contract": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "condition_complete_event": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_common_prefix": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "natural_branch_correct": {
+                  "successes": 0,
+                  "total": 768,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.004977005
+                },
+                "teacher_sequence_correct": {
+                  "successes": 766,
+                  "total": 768,
+                  "estimate": 0.997395833,
+                  "lcb": 0.990555031,
+                  "ucb": 0.999285553
+                },
+                "actual_choice_counts": {
+                  "other": 768
+                }
+              },
+              "behavior_gate_pass": false
+            }
+          },
+          "stress": {
+            "condition_count": 1024,
+            "nonblocking": true,
+            "by_block_route_role_choice": {
+              "language_action_shared_prefix_candidate::conflict::a": {
+                "other": 128
+              },
+              "language_action_shared_prefix_candidate::conflict::b": {
+                "other": 128
+              },
+              "language_action_shared_prefix_candidate::none::a": {
+                "other": 128
+              },
+              "language_action_shared_prefix_candidate::none::b": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::conflict::a": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::conflict::b": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::none::a": {
+                "other": 128
+              },
+              "language_action_shared_prefix_control::none::b": {
+                "other": 128
+              }
+            },
+            "complete_event": {
+              "successes": 0,
+              "total": 1024,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.003737404
+            }
+          },
+          "behavior_holdout_pass": false
+        }
+      },
+      "physical": {
+        "qwen3": {
+          "model": "qwen3",
+          "stage": "open",
+          "trace_row_count": 165888,
+          "layer_count": 36,
+          "registered_layer": 26,
+          "registered_relative_depth": 0.742857143,
+          "window_freeze": {
+            "schema_version": "phase433_shared_prefix.v1",
+            "phase_id": "Phase433-SharedPrefixAnalysis",
+            "created_at": "2026-07-15T10:35:07.968388+00:00",
+            "calibration_split": "observer_calibration",
+            "selected_layer": 26,
+            "selected_position_role": "prompt_terminal",
+            "selected_balanced_accuracy": 0.569866072,
+            "candidate_windows": [
+              {
+                "split": "observer_calibration",
+                "layer": 24,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 25,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 646,
+                  "source_2": 122
+                },
+                "choice": {
+                  "accuracy": 0.424479167,
+                  "balanced_accuracy": 0.480803571,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 262,
+                      "total": 320,
+                      "estimate": 0.81875,
+                      "lcb": 0.772842671,
+                      "ucb": 0.857095203
+                    },
+                    "source_2": {
+                      "successes": 64,
+                      "total": 448,
+                      "estimate": 0.142857143,
+                      "lcb": 0.113485867,
+                      "ucb": 0.178301122
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 122,
+                  "total": 384,
+                  "estimate": 0.317708333,
+                  "lcb": 0.273142527,
+                  "ucb": 0.365885234
+                },
+                "predicted_role_invariance": {
+                  "successes": 262,
+                  "total": 384,
+                  "estimate": 0.682291667,
+                  "lcb": 0.634114766,
+                  "ucb": 0.726857473
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 26,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 703,
+                  "source_2": 65
+                },
+                "choice": {
+                  "accuracy": 0.498697917,
+                  "balanced_accuracy": 0.569866072,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 319,
+                      "total": 320,
+                      "estimate": 0.996875,
+                      "lcb": 0.982513832,
+                      "ucb": 0.999448148
+                    },
+                    "source_2": {
+                      "successes": 64,
+                      "total": 448,
+                      "estimate": 0.142857143,
+                      "lcb": 0.113485867,
+                      "ucb": 0.178301122
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 65,
+                  "total": 384,
+                  "estimate": 0.169270833,
+                  "lcb": 0.135083109,
+                  "ucb": 0.210010113
+                },
+                "predicted_role_invariance": {
+                  "successes": 319,
+                  "total": 384,
+                  "estimate": 0.830729167,
+                  "lcb": 0.789989887,
+                  "ucb": 0.864916891
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 27,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 625,
+                  "source_2": 143
+                },
+                "choice": {
+                  "accuracy": 0.514322917,
+                  "balanced_accuracy": 0.568526786,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 286,
+                      "total": 320,
+                      "estimate": 0.89375,
+                      "lcb": 0.855193328,
+                      "ucb": 0.922965222
+                    },
+                    "source_2": {
+                      "successes": 109,
+                      "total": 448,
+                      "estimate": 0.243303571,
+                      "lcb": 0.205862719,
+                      "ucb": 0.285109179
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 143,
+                  "total": 384,
+                  "estimate": 0.372395833,
+                  "lcb": 0.325529692,
+                  "ucb": 0.421789741
+                },
+                "predicted_role_invariance": {
+                  "successes": 241,
+                  "total": 384,
+                  "estimate": 0.627604167,
+                  "lcb": 0.578210259,
+                  "ucb": 0.674470308
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 28,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 29,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              }
+            ],
+            "selection_count": 1,
+            "labels_used": true,
+            "observer_only": true,
+            "holdout_reselection_forbidden": true,
+            "sealed_reselection_forbidden": true
+          },
+          "coordinate_identity": {
+            "terminal_native_top1_equal": 4608,
+            "branch_native_top1_equal": 4608,
+            "identity_total": 4608,
+            "hook_hidden_state_max_abs_error": 0.0,
+            "pass": true
+          },
+          "candidate_prompt_terminal": {
+            "split": "behavior_holdout",
+            "layer": 26,
+            "position_role": "prompt_terminal",
+            "candidate": true,
+            "condition_count": 768,
+            "actual_choice_counts": {
+              "source_1": 320,
+              "source_2": 448
+            },
+            "prediction_counts": {
+              "source_1": 694,
+              "source_2": 74
+            },
+            "choice": {
+              "accuracy": 0.486979167,
+              "balanced_accuracy": 0.555803572,
+              "per_class": {
+                "source_1": {
+                  "successes": 310,
+                  "total": 320,
+                  "estimate": 0.96875,
+                  "lcb": 0.943440531,
+                  "ucb": 0.982938695
+                },
+                "source_2": {
+                  "successes": 64,
+                  "total": 448,
+                  "estimate": 0.142857143,
+                  "lcb": 0.113485867,
+                  "ucb": 0.178301122
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 74,
+              "total": 384,
+              "estimate": 0.192708333,
+              "lcb": 0.15637992,
+              "ucb": 0.235124019
+            },
+            "predicted_role_invariance": {
+              "successes": 310,
+              "total": 384,
+              "estimate": 0.807291667,
+              "lcb": 0.764875981,
+              "ucb": 0.84362008
+            },
+            "natural_common_prefix": {
+              "successes": 768,
+              "total": 768,
+              "estimate": 1.0,
+              "lcb": 0.995022995,
+              "ucb": 1.0
+            },
+            "natural_complete_event": {
+              "successes": 704,
+              "total": 768,
+              "estimate": 0.916666667,
+              "lcb": 0.894984541,
+              "ucb": 0.934201289
+            }
+          },
+          "control_prompt_terminal": {
+            "split": "behavior_holdout",
+            "layer": 26,
+            "position_role": "prompt_terminal",
+            "candidate": false,
+            "condition_count": 768,
+            "actual_choice_counts": {
+              "source_1": 384,
+              "source_2": 384
+            },
+            "prediction_counts": {
+              "source_1": 551,
+              "source_2": 217
+            },
+            "choice": {
+              "accuracy": 0.615885417,
+              "balanced_accuracy": 0.615885417,
+              "per_class": {
+                "source_1": {
+                  "successes": 320,
+                  "total": 384,
+                  "estimate": 0.833333333,
+                  "lcb": 0.792795286,
+                  "ucb": 0.867268238
+                },
+                "source_2": {
+                  "successes": 153,
+                  "total": 384,
+                  "estimate": 0.3984375,
+                  "lcb": 0.35070923,
+                  "ucb": 0.448177665
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 215,
+              "total": 384,
+              "estimate": 0.559895833,
+              "lcb": 0.509896133,
+              "ucb": 0.608709032
+            },
+            "predicted_role_invariance": {
+              "successes": 169,
+              "total": 384,
+              "estimate": 0.440104167,
+              "lcb": 0.391290968,
+              "ucb": 0.490103867
+            },
+            "natural_common_prefix": {
+              "successes": 768,
+              "total": 768,
+              "estimate": 1.0,
+              "lcb": 0.995022995,
+              "ucb": 1.0
+            },
+            "natural_complete_event": {
+              "successes": 768,
+              "total": 768,
+              "estimate": 1.0,
+              "lcb": 0.995022995,
+              "ucb": 1.0
+            }
+          },
+          "candidate_teacher_branch_boundary": {
+            "split": "behavior_holdout",
+            "layer": 26,
+            "position_role": "teacher_branch_boundary",
+            "candidate": true,
+            "condition_count": 768,
+            "actual_choice_counts": {
+              "source_1": 320,
+              "source_2": 448
+            },
+            "prediction_counts": {
+              "source_1": 767,
+              "source_2": 1
+            },
+            "choice": {
+              "accuracy": 0.41796875,
+              "balanced_accuracy": 0.501116072,
+              "per_class": {
+                "source_1": {
+                  "successes": 320,
+                  "total": 320,
+                  "estimate": 1.0,
+                  "lcb": 0.988137841,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 1,
+                  "total": 448,
+                  "estimate": 0.002232143,
+                  "lcb": 0.000394137,
+                  "ucb": 0.012533979
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 1,
+              "total": 384,
+              "estimate": 0.002604167,
+              "lcb": 0.000459847,
+              "ucb": 0.014601613
+            },
+            "predicted_role_invariance": {
+              "successes": 383,
+              "total": 384,
+              "estimate": 0.997395833,
+              "lcb": 0.985398387,
+              "ucb": 0.999540153
+            },
+            "natural_common_prefix": {
+              "successes": 768,
+              "total": 768,
+              "estimate": 1.0,
+              "lcb": 0.995022995,
+              "ucb": 1.0
+            },
+            "natural_complete_event": {
+              "successes": 704,
+              "total": 768,
+              "estimate": 0.916666667,
+              "lcb": 0.894984541,
+              "ucb": 0.934201289
+            }
+          },
+          "fixed_window_event_observer_pass": false,
+          "candidate_specificity_pass": false,
+          "prompt_terminal_is_pre_generation": true,
+          "teacher_branch_boundary_is_teacher_forced": true,
+          "language_interpretation_allowed": true
+        },
+        "glm4": {
+          "model": "glm4",
+          "stage": "open",
+          "trace_row_count": 184320,
+          "layer_count": 40,
+          "registered_layer": 29,
+          "registered_relative_depth": 0.743589744,
+          "window_freeze": {
+            "schema_version": "phase433_shared_prefix.v1",
+            "phase_id": "Phase433-SharedPrefixAnalysis",
+            "created_at": "2026-07-15T10:35:07.968388+00:00",
+            "calibration_split": "observer_calibration",
+            "selected_layer": 26,
+            "selected_position_role": "prompt_terminal",
+            "selected_balanced_accuracy": 0.569866072,
+            "candidate_windows": [
+              {
+                "split": "observer_calibration",
+                "layer": 24,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 25,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 646,
+                  "source_2": 122
+                },
+                "choice": {
+                  "accuracy": 0.424479167,
+                  "balanced_accuracy": 0.480803571,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 262,
+                      "total": 320,
+                      "estimate": 0.81875,
+                      "lcb": 0.772842671,
+                      "ucb": 0.857095203
+                    },
+                    "source_2": {
+                      "successes": 64,
+                      "total": 448,
+                      "estimate": 0.142857143,
+                      "lcb": 0.113485867,
+                      "ucb": 0.178301122
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 122,
+                  "total": 384,
+                  "estimate": 0.317708333,
+                  "lcb": 0.273142527,
+                  "ucb": 0.365885234
+                },
+                "predicted_role_invariance": {
+                  "successes": 262,
+                  "total": 384,
+                  "estimate": 0.682291667,
+                  "lcb": 0.634114766,
+                  "ucb": 0.726857473
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 26,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 703,
+                  "source_2": 65
+                },
+                "choice": {
+                  "accuracy": 0.498697917,
+                  "balanced_accuracy": 0.569866072,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 319,
+                      "total": 320,
+                      "estimate": 0.996875,
+                      "lcb": 0.982513832,
+                      "ucb": 0.999448148
+                    },
+                    "source_2": {
+                      "successes": 64,
+                      "total": 448,
+                      "estimate": 0.142857143,
+                      "lcb": 0.113485867,
+                      "ucb": 0.178301122
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 65,
+                  "total": 384,
+                  "estimate": 0.169270833,
+                  "lcb": 0.135083109,
+                  "ucb": 0.210010113
+                },
+                "predicted_role_invariance": {
+                  "successes": 319,
+                  "total": 384,
+                  "estimate": 0.830729167,
+                  "lcb": 0.789989887,
+                  "ucb": 0.864916891
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 27,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 625,
+                  "source_2": 143
+                },
+                "choice": {
+                  "accuracy": 0.514322917,
+                  "balanced_accuracy": 0.568526786,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 286,
+                      "total": 320,
+                      "estimate": 0.89375,
+                      "lcb": 0.855193328,
+                      "ucb": 0.922965222
+                    },
+                    "source_2": {
+                      "successes": 109,
+                      "total": 448,
+                      "estimate": 0.243303571,
+                      "lcb": 0.205862719,
+                      "ucb": 0.285109179
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 143,
+                  "total": 384,
+                  "estimate": 0.372395833,
+                  "lcb": 0.325529692,
+                  "ucb": 0.421789741
+                },
+                "predicted_role_invariance": {
+                  "successes": 241,
+                  "total": 384,
+                  "estimate": 0.627604167,
+                  "lcb": 0.578210259,
+                  "ucb": 0.674470308
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 28,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 29,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              }
+            ],
+            "selection_count": 1,
+            "labels_used": true,
+            "observer_only": true,
+            "holdout_reselection_forbidden": true,
+            "sealed_reselection_forbidden": true
+          },
+          "coordinate_identity": {
+            "terminal_native_top1_equal": 4608,
+            "branch_native_top1_equal": 4608,
+            "identity_total": 4608,
+            "hook_hidden_state_max_abs_error": 0.0,
+            "pass": true
+          },
+          "candidate_prompt_terminal": {
+            "split": "behavior_holdout",
+            "layer": 29,
+            "position_role": "prompt_terminal",
+            "candidate": true,
+            "condition_count": 390,
+            "actual_choice_counts": {
+              "source_1": 244,
+              "source_2": 146
+            },
+            "prediction_counts": {
+              "source_1": 390
+            },
+            "choice": {
+              "accuracy": 0.625641026,
+              "balanced_accuracy": 0.5,
+              "per_class": {
+                "source_1": {
+                  "successes": 244,
+                  "total": 244,
+                  "estimate": 1.0,
+                  "lcb": 0.984500338,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 0,
+                  "total": 146,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.025636822
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 0,
+              "total": 146,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.025636822
+            },
+            "predicted_role_invariance": {
+              "successes": 146,
+              "total": 146,
+              "estimate": 1.0,
+              "lcb": 0.974363178,
+              "ucb": 1.0
+            },
+            "natural_common_prefix": {
+              "successes": 0,
+              "total": 390,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.00975382
+            },
+            "natural_complete_event": {
+              "successes": 0,
+              "total": 390,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.00975382
+            }
+          },
+          "control_prompt_terminal": {
+            "split": "behavior_holdout",
+            "layer": 29,
+            "position_role": "prompt_terminal",
+            "candidate": false,
+            "condition_count": 47,
+            "actual_choice_counts": {
+              "source_1": 31,
+              "source_2": 16
+            },
+            "prediction_counts": {
+              "source_1": 47
+            },
+            "choice": {
+              "accuracy": 0.659574468,
+              "balanced_accuracy": 0.5,
+              "per_class": {
+                "source_1": {
+                  "successes": 31,
+                  "total": 31,
+                  "estimate": 1.0,
+                  "lcb": 0.889744605,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 0,
+                  "total": 16,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.193607681
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 0,
+              "total": 8,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.324407565
+            },
+            "predicted_role_invariance": {
+              "successes": 8,
+              "total": 8,
+              "estimate": 1.0,
+              "lcb": 0.675592435,
+              "ucb": 1.0
+            },
+            "natural_common_prefix": {
+              "successes": 0,
+              "total": 47,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.075557604
+            },
+            "natural_complete_event": {
+              "successes": 0,
+              "total": 47,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.075557604
+            }
+          },
+          "candidate_teacher_branch_boundary": {
+            "split": "behavior_holdout",
+            "layer": 29,
+            "position_role": "teacher_branch_boundary",
+            "candidate": true,
+            "condition_count": 390,
+            "actual_choice_counts": {
+              "source_1": 244,
+              "source_2": 146
+            },
+            "prediction_counts": {
+              "source_1": 244,
+              "source_2": 146
+            },
+            "choice": {
+              "accuracy": 1.0,
+              "balanced_accuracy": 1.0,
+              "per_class": {
+                "source_1": {
+                  "successes": 244,
+                  "total": 244,
+                  "estimate": 1.0,
+                  "lcb": 0.984500338,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 146,
+                  "total": 146,
+                  "estimate": 1.0,
+                  "lcb": 0.974363178,
+                  "ucb": 1.0
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 146,
+              "total": 146,
+              "estimate": 1.0,
+              "lcb": 0.974363178,
+              "ucb": 1.0
+            },
+            "predicted_role_invariance": {
+              "successes": 0,
+              "total": 146,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.025636822
+            },
+            "natural_common_prefix": {
+              "successes": 0,
+              "total": 390,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.00975382
+            },
+            "natural_complete_event": {
+              "successes": 0,
+              "total": 390,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.00975382
+            }
+          },
+          "fixed_window_event_observer_pass": false,
+          "candidate_specificity_pass": false,
+          "prompt_terminal_is_pre_generation": true,
+          "teacher_branch_boundary_is_teacher_forced": true,
+          "language_interpretation_allowed": false
+        },
+        "deepseek7b": {
+          "model": "deepseek7b",
+          "stage": "open",
+          "trace_row_count": 129024,
+          "layer_count": 28,
+          "registered_layer": 20,
+          "registered_relative_depth": 0.740740741,
+          "window_freeze": {
+            "schema_version": "phase433_shared_prefix.v1",
+            "phase_id": "Phase433-SharedPrefixAnalysis",
+            "created_at": "2026-07-15T10:35:07.968388+00:00",
+            "calibration_split": "observer_calibration",
+            "selected_layer": 26,
+            "selected_position_role": "prompt_terminal",
+            "selected_balanced_accuracy": 0.569866072,
+            "candidate_windows": [
+              {
+                "split": "observer_calibration",
+                "layer": 24,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 25,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 646,
+                  "source_2": 122
+                },
+                "choice": {
+                  "accuracy": 0.424479167,
+                  "balanced_accuracy": 0.480803571,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 262,
+                      "total": 320,
+                      "estimate": 0.81875,
+                      "lcb": 0.772842671,
+                      "ucb": 0.857095203
+                    },
+                    "source_2": {
+                      "successes": 64,
+                      "total": 448,
+                      "estimate": 0.142857143,
+                      "lcb": 0.113485867,
+                      "ucb": 0.178301122
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 122,
+                  "total": 384,
+                  "estimate": 0.317708333,
+                  "lcb": 0.273142527,
+                  "ucb": 0.365885234
+                },
+                "predicted_role_invariance": {
+                  "successes": 262,
+                  "total": 384,
+                  "estimate": 0.682291667,
+                  "lcb": 0.634114766,
+                  "ucb": 0.726857473
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 26,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 703,
+                  "source_2": 65
+                },
+                "choice": {
+                  "accuracy": 0.498697917,
+                  "balanced_accuracy": 0.569866072,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 319,
+                      "total": 320,
+                      "estimate": 0.996875,
+                      "lcb": 0.982513832,
+                      "ucb": 0.999448148
+                    },
+                    "source_2": {
+                      "successes": 64,
+                      "total": 448,
+                      "estimate": 0.142857143,
+                      "lcb": 0.113485867,
+                      "ucb": 0.178301122
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 65,
+                  "total": 384,
+                  "estimate": 0.169270833,
+                  "lcb": 0.135083109,
+                  "ucb": 0.210010113
+                },
+                "predicted_role_invariance": {
+                  "successes": 319,
+                  "total": 384,
+                  "estimate": 0.830729167,
+                  "lcb": 0.789989887,
+                  "ucb": 0.864916891
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 27,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 625,
+                  "source_2": 143
+                },
+                "choice": {
+                  "accuracy": 0.514322917,
+                  "balanced_accuracy": 0.568526786,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 286,
+                      "total": 320,
+                      "estimate": 0.89375,
+                      "lcb": 0.855193328,
+                      "ucb": 0.922965222
+                    },
+                    "source_2": {
+                      "successes": 109,
+                      "total": 448,
+                      "estimate": 0.243303571,
+                      "lcb": 0.205862719,
+                      "ucb": 0.285109179
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 143,
+                  "total": 384,
+                  "estimate": 0.372395833,
+                  "lcb": 0.325529692,
+                  "ucb": 0.421789741
+                },
+                "predicted_role_invariance": {
+                  "successes": 241,
+                  "total": 384,
+                  "estimate": 0.627604167,
+                  "lcb": 0.578210259,
+                  "ucb": 0.674470308
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 28,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              },
+              {
+                "split": "observer_calibration",
+                "layer": 29,
+                "position_role": "prompt_terminal",
+                "candidate": true,
+                "condition_count": 768,
+                "actual_choice_counts": {
+                  "source_1": 320,
+                  "source_2": 448
+                },
+                "prediction_counts": {
+                  "source_1": 768
+                },
+                "choice": {
+                  "accuracy": 0.416666667,
+                  "balanced_accuracy": 0.5,
+                  "per_class": {
+                    "source_1": {
+                      "successes": 320,
+                      "total": 320,
+                      "estimate": 1.0,
+                      "lcb": 0.988137841,
+                      "ucb": 1.0
+                    },
+                    "source_2": {
+                      "successes": 0,
+                      "total": 448,
+                      "estimate": 0.0,
+                      "lcb": 0.0,
+                      "ucb": 0.008501785
+                    }
+                  }
+                },
+                "predicted_role_flip": {
+                  "successes": 0,
+                  "total": 384,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 0.009904714
+                },
+                "predicted_role_invariance": {
+                  "successes": 384,
+                  "total": 384,
+                  "estimate": 1.0,
+                  "lcb": 0.990095286,
+                  "ucb": 1.0
+                },
+                "natural_common_prefix": {
+                  "successes": 768,
+                  "total": 768,
+                  "estimate": 1.0,
+                  "lcb": 0.995022995,
+                  "ucb": 1.0
+                },
+                "natural_complete_event": {
+                  "successes": 704,
+                  "total": 768,
+                  "estimate": 0.916666667,
+                  "lcb": 0.894984541,
+                  "ucb": 0.934201289
+                }
+              }
+            ],
+            "selection_count": 1,
+            "labels_used": true,
+            "observer_only": true,
+            "holdout_reselection_forbidden": true,
+            "sealed_reselection_forbidden": true
+          },
+          "coordinate_identity": {
+            "terminal_native_top1_equal": 4608,
+            "branch_native_top1_equal": 4608,
+            "identity_total": 4608,
+            "hook_hidden_state_max_abs_error": 0.0,
+            "pass": true
+          },
+          "candidate_prompt_terminal": {
+            "split": "behavior_holdout",
+            "layer": 20,
+            "position_role": "prompt_terminal",
+            "candidate": true,
+            "condition_count": 0,
+            "actual_choice_counts": {},
+            "prediction_counts": {},
+            "choice": {
+              "accuracy": 0.0,
+              "balanced_accuracy": 0.0,
+              "per_class": {
+                "source_1": {
+                  "successes": 0,
+                  "total": 0,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 0,
+                  "total": 0,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 1.0
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "predicted_role_invariance": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "natural_common_prefix": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "natural_complete_event": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            }
+          },
+          "control_prompt_terminal": {
+            "split": "behavior_holdout",
+            "layer": 20,
+            "position_role": "prompt_terminal",
+            "candidate": false,
+            "condition_count": 0,
+            "actual_choice_counts": {},
+            "prediction_counts": {},
+            "choice": {
+              "accuracy": 0.0,
+              "balanced_accuracy": 0.0,
+              "per_class": {
+                "source_1": {
+                  "successes": 0,
+                  "total": 0,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 0,
+                  "total": 0,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 1.0
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "predicted_role_invariance": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "natural_common_prefix": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "natural_complete_event": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            }
+          },
+          "candidate_teacher_branch_boundary": {
+            "split": "behavior_holdout",
+            "layer": 20,
+            "position_role": "teacher_branch_boundary",
+            "candidate": true,
+            "condition_count": 0,
+            "actual_choice_counts": {},
+            "prediction_counts": {},
+            "choice": {
+              "accuracy": 0.0,
+              "balanced_accuracy": 0.0,
+              "per_class": {
+                "source_1": {
+                  "successes": 0,
+                  "total": 0,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 1.0
+                },
+                "source_2": {
+                  "successes": 0,
+                  "total": 0,
+                  "estimate": 0.0,
+                  "lcb": 0.0,
+                  "ucb": 1.0
+                }
+              }
+            },
+            "predicted_role_flip": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "predicted_role_invariance": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "natural_common_prefix": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "natural_complete_event": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            }
+          },
+          "fixed_window_event_observer_pass": false,
+          "candidate_specificity_pass": false,
+          "prompt_terminal_is_pre_generation": true,
+          "teacher_branch_boundary_is_teacher_forced": true,
+          "language_interpretation_allowed": false
+        }
+      },
+      "component": {
+        "condition_count": 512,
+        "trace_row_count": 3072,
+        "attention_replay_relative_error_median": 0.00039702,
+        "conservation_pass": true,
+        "cells": [
+          {
+            "layer": 24,
+            "receiver": "prompt_terminal",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000287855,
+            "source_1_branch_write_median": -0.009125768,
+            "source_2_branch_write_median": -0.195896812,
+            "instruction_branch_write_median": 0.221646234,
+            "assistant_template_branch_write_median": 0.557671815,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 24,
+            "receiver": "teacher_branch_boundary",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.0003832,
+            "source_1_branch_write_median": 1.255353362,
+            "source_2_branch_write_median": -0.624029451,
+            "instruction_branch_write_median": -0.002457608,
+            "assistant_template_branch_write_median": 0.037070649,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 25,
+            "receiver": "prompt_terminal",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000342576,
+            "source_1_branch_write_median": -0.06463192,
+            "source_2_branch_write_median": 0.020358756,
+            "instruction_branch_write_median": 0.014632104,
+            "assistant_template_branch_write_median": 0.322002023,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 25,
+            "receiver": "teacher_branch_boundary",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000395248,
+            "source_1_branch_write_median": -0.416372195,
+            "source_2_branch_write_median": 0.129807513,
+            "instruction_branch_write_median": 0.003065864,
+            "assistant_template_branch_write_median": 0.074620191,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 26,
+            "receiver": "prompt_terminal",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000388374,
+            "source_1_branch_write_median": 0.121066988,
+            "source_2_branch_write_median": 0.002429512,
+            "instruction_branch_write_median": 0.286157161,
+            "assistant_template_branch_write_median": 0.034341763,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 26,
+            "receiver": "teacher_branch_boundary",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000392196,
+            "source_1_branch_write_median": 0.588654191,
+            "source_2_branch_write_median": -0.074389411,
+            "instruction_branch_write_median": 0.043555755,
+            "assistant_template_branch_write_median": -0.084973827,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 27,
+            "receiver": "prompt_terminal",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000405618,
+            "source_1_branch_write_median": 0.032308917,
+            "source_2_branch_write_median": 0.031371547,
+            "instruction_branch_write_median": -0.030481467,
+            "assistant_template_branch_write_median": -0.058026153,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 27,
+            "receiver": "teacher_branch_boundary",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000402767,
+            "source_1_branch_write_median": 0.149011292,
+            "source_2_branch_write_median": 0.021645177,
+            "instruction_branch_write_median": -0.004107098,
+            "assistant_template_branch_write_median": -0.148983121,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 28,
+            "receiver": "prompt_terminal",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000410147,
+            "source_1_branch_write_median": 0.250837833,
+            "source_2_branch_write_median": 0.33242926,
+            "instruction_branch_write_median": 0.048438173,
+            "assistant_template_branch_write_median": 0.247605346,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 28,
+            "receiver": "teacher_branch_boundary",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000394877,
+            "source_1_branch_write_median": 0.505379737,
+            "source_2_branch_write_median": -0.210511984,
+            "instruction_branch_write_median": -0.005062508,
+            "assistant_template_branch_write_median": 0.020967302,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 29,
+            "receiver": "prompt_terminal",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.000416536,
+            "source_1_branch_write_median": 0.631287604,
+            "source_2_branch_write_median": -0.458173946,
+            "instruction_branch_write_median": 0.051954608,
+            "assistant_template_branch_write_median": 0.107571226,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          },
+          {
+            "layer": 29,
+            "receiver": "teacher_branch_boundary",
+            "condition_count": 512,
+            "attention_replay_error_median": 0.00040714,
+            "source_1_branch_write_median": 3.710466146,
+            "source_2_branch_write_median": -2.936667562,
+            "instruction_branch_write_median": 0.016484839,
+            "assistant_template_branch_write_median": -0.050917503,
+            "observed_legal_attention_partition": true,
+            "causal": false
+          }
+        ],
+        "interpretation": "observed source-partition writes, not causal contribution"
+      },
+      "failure_audit": {
+        "schema_version": "phase433_failure_audit.v1",
+        "phase_id": "Phase433-SharedPrefixAnalysis",
+        "created_at": "2026-07-15T10:48:09.877808+00:00",
+        "formal_open_gates": {
+          "P0_main_behavior": false,
+          "P1_coordinate_and_token_identity": true,
+          "P2_fixed_window_holdout_event_prediction": false,
+          "P3_candidate_specificity": false,
+          "P4_component_conservation": true
+        },
+        "model_event_ledger": {
+          "qwen3": {
+            "observer_calibration": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "source_1": 704,
+                "source_2": 832
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1472,
+                "natural_common_prefix_exact": 1536,
+                "natural_reaches_branch_boundary": 1536,
+                "natural_branch_correct": 1472,
+                "natural_complete_event_correct": 1472,
+                "natural_interface_valid": 1536,
+                "natural_stop": 1536
+              }
+            },
+            "physical_calibration": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "source_1": 704,
+                "source_2": 832
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1472,
+                "natural_common_prefix_exact": 1536,
+                "natural_reaches_branch_boundary": 1536,
+                "natural_branch_correct": 1472,
+                "natural_complete_event_correct": 1472,
+                "natural_interface_valid": 1536,
+                "natural_stop": 1536
+              }
+            },
+            "behavior_holdout": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "source_1": 704,
+                "source_2": 832
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1472,
+                "natural_common_prefix_exact": 1536,
+                "natural_reaches_branch_boundary": 1536,
+                "natural_branch_correct": 1472,
+                "natural_complete_event_correct": 1472,
+                "natural_interface_valid": 1536,
+                "natural_stop": 1536
+              }
+            },
+            "conflict_stress": {
+              "condition_count": 1024,
+              "actual_choice_counts": {
+                "source_2": 576,
+                "source_1": 448
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 704,
+                "natural_common_prefix_exact": 1024,
+                "natural_reaches_branch_boundary": 1024,
+                "natural_branch_correct": 704,
+                "natural_complete_event_correct": 704,
+                "natural_interface_valid": 1024,
+                "natural_stop": 1024
+              }
+            }
+          },
+          "glm4": {
+            "observer_calibration": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "other": 1122,
+                "source_1": 272,
+                "source_2": 142
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1413,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 0
+              }
+            },
+            "physical_calibration": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "other": 1123,
+                "source_1": 253,
+                "source_2": 160
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1430,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 0
+              }
+            },
+            "behavior_holdout": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "source_1": 275,
+                "other": 1099,
+                "source_2": 162
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1433,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 0
+              }
+            },
+            "conflict_stress": {
+              "condition_count": 1024,
+              "actual_choice_counts": {
+                "source_2": 124,
+                "other": 808,
+                "source_1": 92
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 692,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 0
+              }
+            }
+          },
+          "deepseek7b": {
+            "observer_calibration": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "other": 1536
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1336,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 755
+              }
+            },
+            "physical_calibration": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "other": 1536
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1337,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 737
+              }
+            },
+            "behavior_holdout": {
+              "condition_count": 1536,
+              "actual_choice_counts": {
+                "other": 1536
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 1331,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 764
+              }
+            },
+            "conflict_stress": {
+              "condition_count": 1024,
+              "actual_choice_counts": {
+                "other": 1024
+              },
+              "event_counts": {
+                "teacher_sequence_correct": 706,
+                "natural_common_prefix_exact": 0,
+                "natural_reaches_branch_boundary": 0,
+                "natural_branch_correct": 0,
+                "natural_complete_event_correct": 0,
+                "natural_interface_valid": 0,
+                "natural_stop": 183
+              }
+            }
+          }
+        },
+        "qwen_systematic_candidate_failures": {
+          "observer_calibration": {
+            "failure_count": 64,
+            "cells": {
+              "swapped::b::source_only::source_2::source_1": 64
+            }
+          },
+          "physical_calibration": {
+            "failure_count": 64,
+            "cells": {
+              "swapped::b::source_only::source_2::source_1": 64
+            }
+          },
+          "behavior_holdout": {
+            "failure_count": 64,
+            "cells": {
+              "swapped::b::source_only::source_2::source_1": 64
+            }
+          }
+        },
+        "qwen_route_window_audit": {
+          "source_only": {
+            "registered_l26": {
+              "split": "behavior_holdout",
+              "layer": 26,
+              "position_role": "prompt_terminal",
+              "candidate": true,
+              "condition_count": 256,
+              "actual_choice_counts": {
+                "source_1": 64,
+                "source_2": 192
+              },
+              "prediction_counts": {
+                "source_1": 256
+              },
+              "choice": {
+                "accuracy": 0.25,
+                "balanced_accuracy": 0.5,
+                "per_class": {
+                  "source_1": {
+                    "successes": 64,
+                    "total": 64,
+                    "estimate": 1.0,
+                    "lcb": 0.94337594,
+                    "ucb": 1.0
+                  },
+                  "source_2": {
+                    "successes": 0,
+                    "total": 192,
+                    "estimate": 0.0,
+                    "lcb": 0.0,
+                    "ucb": 0.019615146
+                  }
+                }
+              },
+              "predicted_role_flip": {
+                "successes": 0,
+                "total": 128,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.029136956
+              },
+              "predicted_role_invariance": {
+                "successes": 128,
+                "total": 128,
+                "estimate": 1.0,
+                "lcb": 0.970863044,
+                "ucb": 1.0
+              },
+              "natural_common_prefix": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              },
+              "natural_complete_event": {
+                "successes": 192,
+                "total": 256,
+                "estimate": 0.75,
+                "lcb": 0.693524937,
+                "ucb": 0.799083134
+              }
+            },
+            "posthoc_best_descriptive_only": {
+              "split": "behavior_holdout",
+              "layer": 35,
+              "position_role": "prompt_terminal",
+              "candidate": true,
+              "condition_count": 256,
+              "actual_choice_counts": {
+                "source_1": 64,
+                "source_2": 192
+              },
+              "prediction_counts": {
+                "source_1": 162,
+                "source_2": 94
+              },
+              "choice": {
+                "accuracy": 0.6171875,
+                "balanced_accuracy": 0.744791667,
+                "per_class": {
+                  "source_1": {
+                    "successes": 64,
+                    "total": 64,
+                    "estimate": 1.0,
+                    "lcb": 0.94337594,
+                    "ucb": 1.0
+                  },
+                  "source_2": {
+                    "successes": 94,
+                    "total": 192,
+                    "estimate": 0.489583333,
+                    "lcb": 0.419775517,
+                    "ucb": 0.559799799
+                  }
+                }
+              },
+              "predicted_role_flip": {
+                "successes": 36,
+                "total": 128,
+                "estimate": 0.28125,
+                "lcb": 0.210613227,
+                "ucb": 0.364634191
+              },
+              "predicted_role_invariance": {
+                "successes": 92,
+                "total": 128,
+                "estimate": 0.71875,
+                "lcb": 0.635365809,
+                "ucb": 0.789386773
+              },
+              "natural_common_prefix": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              },
+              "natural_complete_event": {
+                "successes": 192,
+                "total": 256,
+                "estimate": 0.75,
+                "lcb": 0.693524937,
+                "ucb": 0.799083134
+              }
+            }
+          },
+          "query_only": {
+            "registered_l26": {
+              "split": "behavior_holdout",
+              "layer": 26,
+              "position_role": "prompt_terminal",
+              "candidate": true,
+              "condition_count": 256,
+              "actual_choice_counts": {
+                "source_1": 128,
+                "source_2": 128
+              },
+              "prediction_counts": {
+                "source_1": 256
+              },
+              "choice": {
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "per_class": {
+                  "source_1": {
+                    "successes": 128,
+                    "total": 128,
+                    "estimate": 1.0,
+                    "lcb": 0.970863044,
+                    "ucb": 1.0
+                  },
+                  "source_2": {
+                    "successes": 0,
+                    "total": 128,
+                    "estimate": 0.0,
+                    "lcb": 0.0,
+                    "ucb": 0.029136956
+                  }
+                }
+              },
+              "predicted_role_flip": {
+                "successes": 0,
+                "total": 128,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.029136956
+              },
+              "predicted_role_invariance": {
+                "successes": 128,
+                "total": 128,
+                "estimate": 1.0,
+                "lcb": 0.970863044,
+                "ucb": 1.0
+              },
+              "natural_common_prefix": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              },
+              "natural_complete_event": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              }
+            },
+            "posthoc_best_descriptive_only": {
+              "split": "behavior_holdout",
+              "layer": 27,
+              "position_role": "prompt_terminal",
+              "candidate": true,
+              "condition_count": 256,
+              "actual_choice_counts": {
+                "source_1": 128,
+                "source_2": 128
+              },
+              "prediction_counts": {
+                "source_1": 195,
+                "source_2": 61
+              },
+              "choice": {
+                "accuracy": 0.73828125,
+                "balanced_accuracy": 0.73828125,
+                "per_class": {
+                  "source_1": {
+                    "successes": 128,
+                    "total": 128,
+                    "estimate": 1.0,
+                    "lcb": 0.970863044,
+                    "ucb": 1.0
+                  },
+                  "source_2": {
+                    "successes": 61,
+                    "total": 128,
+                    "estimate": 0.4765625,
+                    "lcb": 0.391988726,
+                    "ucb": 0.562502069
+                  }
+                }
+              },
+              "predicted_role_flip": {
+                "successes": 61,
+                "total": 128,
+                "estimate": 0.4765625,
+                "lcb": 0.391988726,
+                "ucb": 0.562502069
+              },
+              "predicted_role_invariance": {
+                "successes": 67,
+                "total": 128,
+                "estimate": 0.5234375,
+                "lcb": 0.437497931,
+                "ucb": 0.608011274
+              },
+              "natural_common_prefix": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              },
+              "natural_complete_event": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              }
+            }
+          },
+          "consistent": {
+            "registered_l26": {
+              "split": "behavior_holdout",
+              "layer": 26,
+              "position_role": "prompt_terminal",
+              "candidate": true,
+              "condition_count": 256,
+              "actual_choice_counts": {
+                "source_1": 128,
+                "source_2": 128
+              },
+              "prediction_counts": {
+                "source_1": 182,
+                "source_2": 74
+              },
+              "choice": {
+                "accuracy": 0.7109375,
+                "balanced_accuracy": 0.7109375,
+                "per_class": {
+                  "source_1": {
+                    "successes": 118,
+                    "total": 128,
+                    "estimate": 0.921875,
+                    "lcb": 0.862153068,
+                    "ucb": 0.957012625
+                  },
+                  "source_2": {
+                    "successes": 64,
+                    "total": 128,
+                    "estimate": 0.5,
+                    "lcb": 0.414652246,
+                    "ucb": 0.585347754
+                  }
+                }
+              },
+              "predicted_role_flip": {
+                "successes": 74,
+                "total": 128,
+                "estimate": 0.578125,
+                "lcb": 0.491518474,
+                "ucb": 0.660178877
+              },
+              "predicted_role_invariance": {
+                "successes": 54,
+                "total": 128,
+                "estimate": 0.421875,
+                "lcb": 0.339821123,
+                "ucb": 0.508481526
+              },
+              "natural_common_prefix": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              },
+              "natural_complete_event": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              }
+            },
+            "posthoc_best_descriptive_only": {
+              "split": "behavior_holdout",
+              "layer": 26,
+              "position_role": "prompt_terminal",
+              "candidate": true,
+              "condition_count": 256,
+              "actual_choice_counts": {
+                "source_1": 128,
+                "source_2": 128
+              },
+              "prediction_counts": {
+                "source_1": 182,
+                "source_2": 74
+              },
+              "choice": {
+                "accuracy": 0.7109375,
+                "balanced_accuracy": 0.7109375,
+                "per_class": {
+                  "source_1": {
+                    "successes": 118,
+                    "total": 128,
+                    "estimate": 0.921875,
+                    "lcb": 0.862153068,
+                    "ucb": 0.957012625
+                  },
+                  "source_2": {
+                    "successes": 64,
+                    "total": 128,
+                    "estimate": 0.5,
+                    "lcb": 0.414652246,
+                    "ucb": 0.585347754
+                  }
+                }
+              },
+              "predicted_role_flip": {
+                "successes": 74,
+                "total": 128,
+                "estimate": 0.578125,
+                "lcb": 0.491518474,
+                "ucb": 0.660178877
+              },
+              "predicted_role_invariance": {
+                "successes": 54,
+                "total": 128,
+                "estimate": 0.421875,
+                "lcb": 0.339821123,
+                "ucb": 0.508481526
+              },
+              "natural_common_prefix": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              },
+              "natural_complete_event": {
+                "successes": 256,
+                "total": 256,
+                "estimate": 1.0,
+                "lcb": 0.985216144,
+                "ucb": 1.0
+              }
+            }
+          }
+        },
+        "qwen_position_shape_posthoc": {
+          "source_1_end": {
+            "posthoc_best_layer": 29,
+            "posthoc_best_balanced_accuracy": 0.695982143,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "source_2_end": {
+            "posthoc_best_layer": 11,
+            "posthoc_best_balanced_accuracy": 0.587946429,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "question_end": {
+            "posthoc_best_layer": 0,
+            "posthoc_best_balanced_accuracy": 0.5,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "instruction_start": {
+            "posthoc_best_layer": 0,
+            "posthoc_best_balanced_accuracy": 0.5,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "instruction_mid": {
+            "posthoc_best_layer": 0,
+            "posthoc_best_balanced_accuracy": 0.5,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "instruction_end": {
+            "posthoc_best_layer": 30,
+            "posthoc_best_balanced_accuracy": 0.5625,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "assistant_boundary": {
+            "posthoc_best_layer": 27,
+            "posthoc_best_balanced_accuracy": 0.5609375,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "prompt_terminal": {
+            "posthoc_best_layer": 27,
+            "posthoc_best_balanced_accuracy": 0.5609375,
+            "time_status": "natural_prompt_pre_generation"
+          },
+          "teacher_branch_boundary": {
+            "posthoc_best_layer": 34,
+            "posthoc_best_balanced_accuracy": 1.0,
+            "time_status": "teacher_forced_pre_divergence"
+          }
+        },
+        "instrument_incidents": [
+          {
+            "model": "glm4",
+            "incident": "float16 teacher-score NaN before first checkpoint",
+            "repair": "rerun with preregistered bfloat16",
+            "scientific_result": false
+          },
+          {
+            "model": "glm4",
+            "incident": "process segmentation fault after checkpointed behavior rows",
+            "repair": "resume from condition-id checkpoints in a fresh process",
+            "scientific_result": false
+          },
+          {
+            "scope": "analysis",
+            "incident": "stress_only metadata omitted by inherited behavior serializer",
+            "repair": "recover deterministically from frozen conflict_stress split",
+            "scientific_result": false
+          }
+        ],
+        "sealed_rows_read": false,
+        "causal_tested": false,
+        "single_neuron_tested": false,
+        "conclusion": "The Phase432 first-token terminal observer does not transfer to the shared-prefix complete event. Qwen3 behavior has one deterministic pre-source forward-binding failure cell, but no prompt-terminal route window qualifies for sealed replication."
+      },
+      "revision_audit": {
+        "schema_version": "phase433_revision_audit.v1",
+        "phase_id": "Phase433-SharedPrefixAnalysis",
+        "created_at": "2026-07-15T10:48:10.089453+00:00",
+        "frozen_execution_hashes": {
+          "phase433_shared_prefix_protocol.py": "713bf0b734b4c1a0fd144443e8297481363d6a77d9f6f8e20782c092c687b47e",
+          "phase433_shared_prefix_collect.py": "ae1d90f315dfb4d0d7cbfb6bb360ab0da700d86f4bd9efc9dce8a2cdeee306af",
+          "phase433_shared_prefix_analysis.py": "2fe38fed413c85f04c82e43ae7846dab76edc217879d4d540143e51aa3f572aa",
+          "test_phase433_shared_prefix.py": "3803558b3e4be59ee761beedb65cd2472a8263a0e0f164319b808fcff9758805"
+        },
+        "current_hashes": {
+          "phase433_shared_prefix_protocol.py": "713bf0b734b4c1a0fd144443e8297481363d6a77d9f6f8e20782c092c687b47e",
+          "phase433_shared_prefix_collect.py": "acaacb4dda125ea6537a70ed18286adba765d7f68b19bd438e651e07fd0cc2da",
+          "phase433_shared_prefix_analysis.py": "ddb108c75edbfaf5c7604dd2377974d7b79beba3d238e04339582311ef082bc4",
+          "test_phase433_shared_prefix.py": "3803558b3e4be59ee761beedb65cd2472a8263a0e0f164319b808fcff9758805"
+        },
+        "revisions_after_model_collection": [
+          {
+            "file": "phase433_shared_prefix_collect.py",
+            "scope": "explicitly serialize stress_only and accept the frozen conflict_stress split as deterministic fallback",
+            "model_forward_reexecuted": false,
+            "stored_behavior_or_physical_value_changed": false
+          },
+          {
+            "file": "phase433_shared_prefix_analysis.py",
+            "scope": "recover stress-only metadata and add stratified failure/route/shape audits",
+            "model_forward_reexecuted": false,
+            "gate_or_threshold_changed": false
+          }
+        ],
+        "frozen_rows_and_commitment_unchanged": true,
+        "sealed_rows_read": false
+      },
+      "gates": {
+        "P0_main_behavior": false,
+        "P1_coordinate_and_token_identity": true,
+        "P2_fixed_window_holdout_event_prediction": false,
+        "P3_candidate_specificity": false,
+        "P4_component_conservation": true
+      },
+      "failed_gates": [
+        "P0_main_behavior",
+        "P2_fixed_window_holdout_event_prediction",
+        "P3_candidate_specificity"
+      ],
+      "sealed_unlock": false,
+      "sealed_rows_read": false,
+      "stress_gate_blocking": false,
+      "cross_model_language_mechanism": false,
+      "causal": false,
+      "single_neuron": false
+    },
+    "sealed": null,
+    "evidence": {
+      "physical": true,
+      "observer": true,
+      "predictive": false,
+      "causal": false,
+      "single_neuron": false,
+      "mechanism_closure": false,
+      "cross_model_language_mechanism": false,
+      "complete_multi_token_event": false
+    },
+    "closure": {
+      "strict_mechanisms": "0/72",
+      "overall_scientific_progress_percent": 21,
+      "cautious_interval_percent": [
+        18,
+        24
+      ]
+    }
+  },
+  "visual": {
+    "manifest": {
+      "schema_version": "phase433_shared_prefix_manifest.v1",
+      "generated_at": "2026-07-15T10:49:02.055799+00:00",
+      "default_item_id": "phase433_qwen3_shared_prefix_event",
+      "items": [
+        {
+          "id": "phase433_qwen3_shared_prefix_event",
+          "label": "Phase433 Qwen3 同首词元多词元事件",
+          "filename": "phase433_qwen3_shared_prefix_event.json",
+          "model": "qwen3",
+          "phase": 433,
+          "evidence_scope": "shared-prefix complete-event observer; open gates failed or sealed unread; non-causal"
+        }
+      ]
+    },
+    "node_count": 99,
+    "edge_count": 90
+  }
+}

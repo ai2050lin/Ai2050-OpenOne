@@ -1,0 +1,769 @@
+{
+  "schema_version": "phase437_position_factor.v1",
+  "phase_id": "Phase437-PositionFactorProtocol",
+  "created_at": "2026-07-15T16:01:07.914628+00:00",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "contracts": [
+    "field_extract",
+    "natural_qa",
+    "relation_rewrite"
+  ],
+  "frozen_interfaces_from_phase436": {
+    "qwen3": {
+      "field_extract": "direct_value",
+      "natural_qa": "answer_field",
+      "relation_rewrite": "natural_sentence"
+    },
+    "glm4": {
+      "field_extract": "natural_sentence",
+      "natural_qa": "natural_sentence",
+      "relation_rewrite": "answer_field"
+    },
+    "deepseek7b": {
+      "field_extract": "answer_field",
+      "natural_qa": "answer_field",
+      "relation_rewrite": "result_field"
+    }
+  },
+  "phase436_threshold_audit": {
+    "interface_other_ucb": 0.1,
+    "behavior_other_ucb": 0.05,
+    "historical_summary_consistent_with_code": true,
+    "phase437_unified_other_ucb": 0.05,
+    "phase436_results_not_rewritten": true
+  },
+  "distance_design": {
+    "structural_limit": "an earlier record cannot be closer than a later record to a future query without moving or duplicating content",
+    "primary_natural_conditions": [
+      "first_natural_near",
+      "second_natural_near",
+      "first_natural_far",
+      "second_natural_far"
+    ],
+    "conditional_second_record_match": [
+      "second_matched_near",
+      "second_matched_far"
+    ],
+    "actual_model_token_distances_are_mandatory": true,
+    "matched_distance_overlap_required": true
+  },
+  "factor_design": {
+    "outer_full_factorial": {
+      "boundary": [
+        "period",
+        "semicolon",
+        "newline",
+        "field_delimiter"
+      ],
+      "connector": [
+        "parallel",
+        "separate",
+        "none"
+      ],
+      "record_length": [
+        "short",
+        "long"
+      ],
+      "label_order": [
+        "entity_first",
+        "relation_first"
+      ]
+    },
+    "within_group_variants": [
+      "first_natural_near",
+      "second_natural_near",
+      "first_natural_far",
+      "second_natural_far",
+      "second_matched_near",
+      "second_matched_far"
+    ],
+    "query_and_mapping_fixed_within_semantic_group": true,
+    "direct_matched_contrasts_only": true,
+    "regression_is_not_used_as_a_mechanism_model": true
+  },
+  "denominator_audit": {
+    "valid": true,
+    "groups_by_split": {
+      "observer_calibration": 1152,
+      "behavior_discovery": 576,
+      "behavior_holdout": 1152,
+      "physical_calibration": 1152,
+      "sealed_physical_holdout": 1152
+    },
+    "groups_per_contract": {
+      "observer_calibration": 384,
+      "behavior_discovery": 192,
+      "behavior_holdout": 384,
+      "physical_calibration": 384,
+      "sealed_physical_holdout": 384
+    },
+    "observer_conditions_per_model": 1152,
+    "maximum_behavior_conditions_per_model": {
+      "behavior_discovery": 3456,
+      "behavior_holdout": 6912
+    },
+    "maximum_three_model_behavior_conditions": 31104,
+    "split_vocabulary_disjoint": true,
+    "vocabulary_disjoint_from_phase435_436": true,
+    "factor_balance": {
+      "observer_calibration": {
+        "field_extract": {
+          "relation_family": {
+            "person_city": 96,
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          },
+          "observer_variant": {
+            "first_natural_near": 96,
+            "second_natural_near": 96,
+            "first_natural_far": 96,
+            "second_natural_far": 96
+          }
+        },
+        "natural_qa": {
+          "relation_family": {
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          },
+          "observer_variant": {
+            "first_natural_near": 96,
+            "second_natural_near": 96,
+            "first_natural_far": 96,
+            "second_natural_far": 96
+          }
+        },
+        "relation_rewrite": {
+          "relation_family": {
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96,
+            "object_color": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          },
+          "observer_variant": {
+            "first_natural_near": 96,
+            "second_natural_near": 96,
+            "first_natural_far": 96,
+            "second_natural_far": 96
+          }
+        }
+      },
+      "behavior_discovery": {
+        "field_extract": {
+          "relation_family": {
+            "person_city": 48,
+            "object_color": 48,
+            "animal_habitat": 48,
+            "country_capital": 48
+          },
+          "boundary": {
+            "period": 48,
+            "semicolon": 48,
+            "newline": 48,
+            "field_delimiter": 48
+          },
+          "connector": {
+            "parallel": 64,
+            "separate": 64,
+            "none": 64
+          },
+          "record_length": {
+            "short": 96,
+            "long": 96
+          },
+          "label_order": {
+            "entity_first": 96,
+            "relation_first": 96
+          },
+          "query_role": {
+            "a": 96,
+            "b": 96
+          },
+          "mapping": {
+            "direct": 96,
+            "swapped": 96
+          }
+        },
+        "natural_qa": {
+          "relation_family": {
+            "object_color": 48,
+            "animal_habitat": 48,
+            "country_capital": 48,
+            "person_city": 48
+          },
+          "boundary": {
+            "period": 48,
+            "semicolon": 48,
+            "newline": 48,
+            "field_delimiter": 48
+          },
+          "connector": {
+            "parallel": 64,
+            "separate": 64,
+            "none": 64
+          },
+          "record_length": {
+            "short": 96,
+            "long": 96
+          },
+          "label_order": {
+            "entity_first": 96,
+            "relation_first": 96
+          },
+          "query_role": {
+            "a": 96,
+            "b": 96
+          },
+          "mapping": {
+            "direct": 96,
+            "swapped": 96
+          }
+        },
+        "relation_rewrite": {
+          "relation_family": {
+            "animal_habitat": 48,
+            "country_capital": 48,
+            "person_city": 48,
+            "object_color": 48
+          },
+          "boundary": {
+            "period": 48,
+            "semicolon": 48,
+            "newline": 48,
+            "field_delimiter": 48
+          },
+          "connector": {
+            "parallel": 64,
+            "separate": 64,
+            "none": 64
+          },
+          "record_length": {
+            "short": 96,
+            "long": 96
+          },
+          "label_order": {
+            "entity_first": 96,
+            "relation_first": 96
+          },
+          "query_role": {
+            "a": 96,
+            "b": 96
+          },
+          "mapping": {
+            "direct": 96,
+            "swapped": 96
+          }
+        }
+      },
+      "behavior_holdout": {
+        "field_extract": {
+          "relation_family": {
+            "person_city": 96,
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        },
+        "natural_qa": {
+          "relation_family": {
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        },
+        "relation_rewrite": {
+          "relation_family": {
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96,
+            "object_color": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        }
+      },
+      "physical_calibration": {
+        "field_extract": {
+          "relation_family": {
+            "person_city": 96,
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        },
+        "natural_qa": {
+          "relation_family": {
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        },
+        "relation_rewrite": {
+          "relation_family": {
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96,
+            "object_color": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        }
+      },
+      "sealed_physical_holdout": {
+        "field_extract": {
+          "relation_family": {
+            "person_city": 96,
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        },
+        "natural_qa": {
+          "relation_family": {
+            "object_color": 96,
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        },
+        "relation_rewrite": {
+          "relation_family": {
+            "animal_habitat": 96,
+            "country_capital": 96,
+            "person_city": 96,
+            "object_color": 96
+          },
+          "boundary": {
+            "period": 96,
+            "semicolon": 96,
+            "newline": 96,
+            "field_delimiter": 96
+          },
+          "connector": {
+            "parallel": 128,
+            "separate": 128,
+            "none": 128
+          },
+          "record_length": {
+            "short": 192,
+            "long": 192
+          },
+          "label_order": {
+            "entity_first": 192,
+            "relation_first": 192
+          },
+          "query_role": {
+            "a": 192,
+            "b": 192
+          },
+          "mapping": {
+            "direct": 192,
+            "swapped": 192
+          }
+        }
+      }
+    },
+    "geometry_pair_audit": {
+      "physical_calibration": {
+        "pair_count": 576,
+        "all_pairs_have_two_groups": true,
+        "different_relation_matched_factor_pairs": true
+      },
+      "sealed_physical_holdout": {
+        "pair_count": 576,
+        "all_pairs_have_two_groups": true,
+        "different_relation_matched_factor_pairs": true
+      }
+    }
+  },
+  "group_hashes": {
+    "observer_calibration": "9ab12657fc85586eef550cedc4c43cf102a280b5ef65807e50b2f3cbc3d1e046",
+    "behavior_discovery": "7941697a30e9ce902c2f65094a9cfc96c161eea3aaae3c25835a667b75639900",
+    "behavior_holdout": "37cce2744721c14ab0ee0a39e1b4db5870ebdacdcf4f5f5662ac7cddd2314fe0",
+    "physical_calibration": "ee5758b19c7ef511253a750ab9c57bf16d95c55ed7ada9ecc68d7b2e0a5a1990",
+    "sealed_physical_holdout": "ea1e60253a6cbf9ccfaf57f598ebdc258c3fe6a22c8e2feca392fd8170bde709"
+  },
+  "observer_gate": {
+    "per_position_wilson_lcb": 0.8,
+    "maximum_natural_position_gap": 0.05,
+    "other_wilson_ucb": 0.05,
+    "teacher_per_position_wilson_lcb": 0.8,
+    "format_and_stop_reported_separately": true
+  },
+  "behavior_gate": {
+    "discovery_and_holdout_per_position_wilson_lcb": 0.8,
+    "maximum_natural_position_gap": 0.05,
+    "maximum_matched_position_gap": 0.05,
+    "maximum_post_gap_effect": 0.05,
+    "maximum_outer_factor_range": 0.05,
+    "maximum_matched_token_distance_median_error": 4.0,
+    "maximum_matched_token_distance_p95_error": 8.0,
+    "other_wilson_ucb": 0.05,
+    "teacher_per_position_wilson_lcb": 0.8,
+    "both_splits_required": true
+  },
+  "physical_stage": {
+    "variants": [
+      "first_natural_near",
+      "second_natural_near",
+      "second_matched_near"
+    ],
+    "paired_control_types": [
+      "no_relation",
+      "wrong_relation",
+      "wrong_query_entity",
+      "wrong_query_relation",
+      "wrong_value_mapping",
+      "order_swap_control",
+      "distance_swap_control",
+      "boundary_swap_control"
+    ],
+    "label_blind_geometry": true,
+    "semantic_transport_must_exceed_physical_position_transport": true,
+    "prediction_must_exceed_position_distance_boundary_contract_baselines": true,
+    "causal_and_single_neuron_forbidden": true
+  },
+  "physical_numeric_gates": {
+    "component_reconstruction_relative_error_max": 0.001,
+    "attention_replay_relative_error_max": 0.001,
+    "label_blind_geometry_effect_min": 0.05,
+    "geometry_positive_relation_families_min": 3,
+    "geometry_candidate_over_control_min": 0.02,
+    "transport_balanced_accuracy_min": 0.7,
+    "transport_per_source_wilson_lcb_min": 0.65,
+    "transport_maximum_position_gap": 0.1,
+    "transport_over_best_surface_baseline_min": 0.05,
+    "transport_candidate_over_control_accuracy_min": 0.1
+  },
+  "gate_order": [
+    "G0_observer_schema_and_semantic_gate",
+    "G1_factorized_behavior_discovery_and_holdout",
+    "G2_actual_token_distance_registration",
+    "G3_label_blind_relation_geometry",
+    "G4_semantic_source_transport",
+    "G5_frozen_holdout_prediction",
+    "G6_control_specificity",
+    "G7_sealed_physical_replication"
+  ],
+  "sealed_commitment": {
+    "schema_version": "phase437_position_factor.v1",
+    "phase_id": "Phase437-PositionFactorProtocol",
+    "created_at": "2026-07-15T16:01:07.913621+00:00",
+    "sealed_group_count": 1152,
+    "sealed_rows_sha256": "ac8ab9f42e0e0775aa5ad04293d4e0d4498537ffe1361aaf2a1ce70046626b2a",
+    "read_requires_all_open_physical_gates": true,
+    "causal_and_single_neuron_forbidden": true
+  },
+  "implementation_hashes": {
+    "phase437_position_factor_protocol.py": "b0d3b9bacc1454ee60eef27af1e2b0db7d0d40e2381f38fd419f258d79e128a7",
+    "phase437_position_factor_collect.py": "00d972e3479e8b94f5badaff5dbbb42285fea286223d67c000301e9244285ec1",
+    "phase437_position_factor_analysis.py": "f4b492e5c59361c98335fe9d530f0ec2a1bdf112aaa9f2892c513624c07df351",
+    "test_phase437_position_factor.py": "644f1957f9679babd388d83e27741dcb42eb628455857a79cf524989383608eb"
+  }
+}

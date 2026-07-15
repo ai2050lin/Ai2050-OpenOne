@@ -1,0 +1,214 @@
+{
+  "schema_version": "phase431_position_time.v1",
+  "trace_schema_version": "position_time_trace.v1",
+  "phase_id": "Phase431-PositionTimeProtocol",
+  "created_at": "2026-07-15T08:39:39.511219+00:00",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "language_model": "qwen3",
+  "language_candidate": {
+    "block_id": "language_action_dual_route_candidate",
+    "contract_variant": "no_examples",
+    "matched_control_block_id": "language_action_stable_result_control",
+    "model_specific": true,
+    "cross_model": false
+  },
+  "instrument_only_models": [
+    "glm4",
+    "deepseek7b"
+  ],
+  "interface": "direct_item",
+  "open_splits": [
+    "coordinate_calibration",
+    "blind_discovery",
+    "behavior_holdout"
+  ],
+  "sealed_split": "sealed_physical_holdout",
+  "roles": [
+    "a",
+    "b"
+  ],
+  "routes": [
+    "none",
+    "source_only",
+    "query_only",
+    "consistent",
+    "conflict"
+  ],
+  "scorable_routes": [
+    "source_only",
+    "query_only",
+    "consistent"
+  ],
+  "denominator_audit": {
+    "valid": true,
+    "open_group_count": 576,
+    "sealed_group_count": 192,
+    "open_condition_count": 5760,
+    "sealed_condition_count": 1920,
+    "groups_per_block_split": 96,
+    "counts": {
+      "language_action_dual_route_candidate::behavior_holdout": 96,
+      "language_action_dual_route_candidate::blind_discovery": 96,
+      "language_action_dual_route_candidate::coordinate_calibration": 96,
+      "language_action_dual_route_candidate::sealed_physical_holdout": 96,
+      "language_action_stable_result_control::behavior_holdout": 96,
+      "language_action_stable_result_control::blind_discovery": 96,
+      "language_action_stable_result_control::coordinate_calibration": 96,
+      "language_action_stable_result_control::sealed_physical_holdout": 96
+    }
+  },
+  "open_group_rows_sha256": "3375584b724206dfa9e92bf452d0f0cb6ce70cc7321a0a1914a483cbdf39b657",
+  "sealed_commitment": {
+    "schema_version": "phase431_position_time.v1",
+    "phase_id": "Phase431-PositionTimeProtocol",
+    "created_at": "2026-07-15T08:39:39.510353+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_group_count": 192,
+    "sealed_condition_count": 1920,
+    "sealed_group_rows_sha256": "2a263ab52a8174ee828b5e5ee8c0b4fd97de2de913e08ab1cc8b94f8008319ce",
+    "open_pipeline_must_not_import_sealed_file": true,
+    "read_requires_open_gates": [
+      "G0",
+      "G1",
+      "G2",
+      "G3",
+      "G4",
+      "G5"
+    ]
+  },
+  "prediction_target": {
+    "coverage_axis": "registered_source versus other",
+    "choice_axis": "source_1 versus source_2 conditional on registered source",
+    "other_is_never_deleted": true,
+    "source_1_source_2_balanced_on_scorable_candidate_conditions": true,
+    "behavior_qualification_is_not_prediction_target": true
+  },
+  "baseline_contract": {
+    "primary": "balanced 50/50 source-choice prior on eligible conditions",
+    "nuisance_only": [
+      "prompt_length",
+      "source_token_length",
+      "absolute_positions"
+    ],
+    "forbidden_oracle_fields": [
+      "role",
+      "active_selector_identity",
+      "role_mapping_variant",
+      "normative_target",
+      "actual_choice"
+    ],
+    "reason": "selector-bearing metadata deterministically contains the answer and would recreate a perfect, non-improvable baseline"
+  },
+  "upstream_predictor_contract": {
+    "window_selection_reads_behavior_labels": false,
+    "per_window_prediction": "sign of source_1 minus source_2 residual logit margin",
+    "aggregate": "majority vote across all blind-frozen windows",
+    "tie_break": "prediction from the latest-layer frozen window",
+    "holdout_window_reselection": false
+  },
+  "position_contract": {
+    "prompt_roles": [
+      "source_1_end",
+      "source_2_end",
+      "before_selector_end",
+      "after_selector_end",
+      "question_end",
+      "instruction_end",
+      "assistant_boundary",
+      "prompt_terminal"
+    ],
+    "generation_steps": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "generation_step_zero": "prompt terminal state predicting first natural token",
+    "overlapping_roles_share_one_physical_token": true
+  },
+  "record_contract": {
+    "all_layers_compact_ledger": true,
+    "receivers": [
+      "question_end",
+      "instruction_end",
+      "prompt_terminal",
+      "g1",
+      "g2",
+      "g3",
+      "g4"
+    ],
+    "disjoint_source_partition": [
+      "source_1",
+      "source_2",
+      "before_selector",
+      "after_selector",
+      "question",
+      "instruction",
+      "other_positions"
+    ],
+    "registered_sources_require_other_remainder": true,
+    "random_projection": {
+      "seeds": [
+        43101,
+        43102,
+        43103
+      ],
+      "dimensions_per_seed": 8,
+      "position": "prompt_terminal",
+      "observer_only": true
+    },
+    "full_vector_windows_max": 4,
+    "head_channel_neuron_scan": false,
+    "intervention": false
+  },
+  "open_gates": {
+    "G0": "fresh Qwen3 candidate behavior and matched-control specificity",
+    "G1": "native terminal, cache/no-cache and batch/single identity",
+    "G2": "residual and full attention-source partition reconstruction",
+    "G3": "registered-source coverage and conditional source-choice terminal identity",
+    "G4": "blind-frozen upstream event predicts heldout source choice above balanced prior",
+    "G5": "candidate role-selective event exceeds matched control and swaps"
+  },
+  "numeric_gates": {
+    "identity_top1_exact": true,
+    "behavior_group_all_lcb_min": 0.7,
+    "reconstruction_relative_error_median_max": 0.01,
+    "registered_source_coverage_lcb_min": 0.9,
+    "terminal_choice_accuracy_lcb_min": 0.9,
+    "upstream_balanced_accuracy_lcb_min": 0.55,
+    "candidate_role_flip_lcb_min": 0.6,
+    "control_role_flip_ucb_max": 0.4
+  },
+  "evidence_contract": {
+    "physical": true,
+    "observer": true,
+    "predictive_only_after_independent_holdout": true,
+    "causal": false,
+    "single_neuron": false,
+    "strict_double_blind": false
+  },
+  "stop_rules": [
+    "behavior failure closes candidate before large physical collection",
+    "language-model identity failure blocks its physical collection",
+    "instrument-only model identity failure blocks the strict three-model gate and sealed unlock but does not rewrite Qwen3 observations",
+    "ledger failure blocks prediction interpretation",
+    "holdout failure cannot change layers positions features or thresholds",
+    "open gate failure keeps sealed file unread",
+    "no head channel neuron or causal test in Phase431"
+  ],
+  "implementation_sha256": {
+    "phase431_position_time_protocol.py": "c51204578842a9871d1fa71f7b52084497c4b8e94a620c9665bcb2229a580e0e",
+    "phase431_position_time_collect.py": "11475a2494fa16759d671bea9cac256c7e5c51d816fbbbba9f7db40344110482",
+    "phase431_position_time_analysis.py": "d6618b7c407d7c22f3fd6db04b557b061b0025e807a6dc32241d18fa83ab75a8"
+  }
+}

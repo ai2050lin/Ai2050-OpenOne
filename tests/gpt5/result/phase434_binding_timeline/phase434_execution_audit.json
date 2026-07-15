@@ -1,0 +1,46 @@
+{
+  "schema_version": "phase434_execution_audit.v1",
+  "phase_id": "Phase434-BindingTimelineAnalysis",
+  "created_at_local": "2026-07-15 04:42 HDT",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "behavior_batch_history": {
+    "qwen3": [8],
+    "glm4": [2, 4, 6],
+    "deepseek7b": [4, 8]
+  },
+  "final_behavior_batch_size": {
+    "qwen3": 8,
+    "glm4": 6,
+    "deepseek7b": 8
+  },
+  "scientific_contract_changed_during_execution": false,
+  "resume_contract": "checkpoint rows are keyed by condition_id; completed rows are not recomputed; final merge deduplicates by condition_id",
+  "final_row_audit": {
+    "qwen3": {
+      "row_count": 14784,
+      "unique_condition_id_count": 14784,
+      "all_numeric_scalars_finite": true
+    },
+    "glm4": {
+      "row_count": 14784,
+      "unique_condition_id_count": 14784,
+      "all_numeric_scalars_finite": true
+    },
+    "deepseek7b": {
+      "row_count": 14784,
+      "unique_condition_id_count": 14784,
+      "all_numeric_scalars_finite": true
+    }
+  },
+  "gpu_residency": "models were loaded and released sequentially; no model overlap was observed",
+  "interpretation": "batch-size changes are execution-instrument events, not model results"
+}

@@ -1,0 +1,158 @@
+{
+  "schema_version": "phase433_shared_prefix.v1",
+  "trace_schema_version": "phase433_shared_prefix_trace.v1",
+  "phase_id": "Phase433-SharedPrefixProtocol",
+  "created_at": "2026-07-15T09:54:27.267565+00:00",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "language_interpretation_model": "qwen3",
+  "open_splits": [
+    "observer_calibration",
+    "physical_calibration",
+    "behavior_holdout"
+  ],
+  "sealed_split": "sealed_physical_holdout",
+  "stress_split": "conflict_stress",
+  "main_routes": [
+    "source_only",
+    "query_only",
+    "consistent"
+  ],
+  "stress_routes": [
+    "none",
+    "conflict"
+  ],
+  "denominator_audit": {
+    "valid": true,
+    "groups_per_block_split": 128,
+    "open_group_count": 768,
+    "sealed_group_count": 256,
+    "stress_group_count": 256,
+    "conditions_per_open_split_per_model": 1536,
+    "main_open_conditions_per_model": 4608,
+    "stress_open_conditions_per_model": 1024,
+    "total_open_conditions_per_model": 5632,
+    "sealed_conditions_qwen": 1536,
+    "three_model_open_conditions": 16896,
+    "vocabulary_disjoint_across_splits": true,
+    "counts": {
+      "language_action_shared_prefix_candidate::behavior_holdout": 128,
+      "language_action_shared_prefix_candidate::conflict_stress": 128,
+      "language_action_shared_prefix_candidate::observer_calibration": 128,
+      "language_action_shared_prefix_candidate::physical_calibration": 128,
+      "language_action_shared_prefix_candidate::sealed_physical_holdout": 128,
+      "language_action_shared_prefix_control::behavior_holdout": 128,
+      "language_action_shared_prefix_control::conflict_stress": 128,
+      "language_action_shared_prefix_control::observer_calibration": 128,
+      "language_action_shared_prefix_control::physical_calibration": 128,
+      "language_action_shared_prefix_control::sealed_physical_holdout": 128
+    }
+  },
+  "open_rows_sha256": "2e759352b001c5086b7f8458ed046cf70a0bdb8c3f781535e4de3d9d551ba28b",
+  "stress_rows_sha256": "e02ca14a6a7a1e0d2e72cea8e1f2c634ebffa41606e02adfa44975c3c55984c5",
+  "sealed_commitment": {
+    "schema_version": "phase433_shared_prefix.v1",
+    "phase_id": "Phase433-SharedPrefixProtocol",
+    "created_at": "2026-07-15T09:54:27.266227+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_group_count": 256,
+    "sealed_condition_count": 1536,
+    "sealed_group_rows_sha256": "19350097fa1dda169d65f3660ba628593d3affba81c7c48546a736199158f5fd",
+    "read_requires_open_gate": true,
+    "open_analysis_must_not_import_sealed_rows": true
+  },
+  "event_contract": {
+    "minimum_common_prefix_tokens_each_model": 2,
+    "same_first_token_required": true,
+    "same_surface_length_required": true,
+    "first_divergence_token_observer_is_observer_only": true,
+    "complete_sequence_behavior_is_primary": true,
+    "prompt_terminal_is_pre_generation": true,
+    "teacher_branch_boundary_is_not_prompt_prechoice": true,
+    "natural_branch_boundary_requires_exact_generated_common_prefix": true
+  },
+  "window_contract": {
+    "calibration_split": "observer_calibration",
+    "candidate_layers_qwen": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "position_role": "prompt_terminal",
+    "maximum_selected_windows": 3,
+    "selection": "highest balanced accuracy; deterministic lower-layer tie break",
+    "holdout_reselection_forbidden": true,
+    "sealed_reselection_forbidden": true
+  },
+  "physical_contract": {
+    "positions": [
+      "source_1_end",
+      "source_2_end",
+      "question_end",
+      "instruction_start",
+      "instruction_mid",
+      "instruction_end",
+      "assistant_boundary",
+      "prompt_terminal",
+      "teacher_branch_boundary"
+    ],
+    "component_layers_qwen": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29
+    ],
+    "component_split": "physical_calibration",
+    "component_routes": [
+      "consistent"
+    ],
+    "component_receivers": [
+      "prompt_terminal",
+      "teacher_branch_boundary"
+    ],
+    "no_head_channel_neuron_scan": true
+  },
+  "numeric_gates": {
+    "behavior_group_all_lcb_min": 0.95,
+    "behavior_role_contract_lcb_min": 0.95,
+    "token_contract_valid_fraction_min": 1.0,
+    "registered_source_coverage_lcb_min": 0.95,
+    "observer_per_class_lcb_min": 0.9,
+    "candidate_role_flip_lcb_min": 0.95,
+    "control_role_invariance_lcb_min": 0.95,
+    "control_role_flip_ucb_max": 0.05,
+    "natural_common_prefix_lcb_min": 0.95,
+    "hidden_state_hook_max_abs_error": 0.001,
+    "attention_replay_median_max": 0.002
+  },
+  "gate_order": [
+    "P0_main_behavior",
+    "P1_coordinate_and_token_identity",
+    "P2_fixed_window_holdout_event_prediction",
+    "P3_candidate_specificity",
+    "P4_component_conservation",
+    "P5_sealed_replication",
+    "P6_optional_aggregate_causal"
+  ],
+  "stress_does_not_block_main_observer": true,
+  "causal_unlock_requires_sealed_pass": true,
+  "implementation_hashes": {
+    "phase433_shared_prefix_protocol.py": "713bf0b734b4c1a0fd144443e8297481363d6a77d9f6f8e20782c092c687b47e",
+    "phase433_shared_prefix_collect.py": "ae1d90f315dfb4d0d7cbfb6bb360ab0da700d86f4bd9efc9dce8a2cdeee306af",
+    "phase433_shared_prefix_analysis.py": "2fe38fed413c85f04c82e43ae7846dab76edc217879d4d540143e51aa3f572aa",
+    "test_phase433_shared_prefix.py": "3803558b3e4be59ee761beedb65cd2472a8263a0e0f164319b808fcff9758805"
+  }
+}

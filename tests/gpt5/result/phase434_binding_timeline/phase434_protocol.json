@@ -1,0 +1,302 @@
+{
+  "schema_version": "phase434_binding_timeline.v1",
+  "trace_schema_version": "phase434_binding_timeline_trace.v1",
+  "phase_id": "Phase434-BindingTimelineProtocol",
+  "created_at": "2026-07-15T13:48:02.029439+00:00",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "language_interpretation_model": "qwen3",
+  "timings": [
+    "before_records",
+    "after_role_a",
+    "after_role_b",
+    "after_records",
+    "near_query"
+  ],
+  "record_orders": [
+    "ab",
+    "ba"
+  ],
+  "mappings": [
+    "direct",
+    "swapped"
+  ],
+  "behavior_splits": [
+    "behavior_discovery",
+    "behavior_holdout"
+  ],
+  "physical_split": "physical_calibration",
+  "sealed_split": "sealed_physical_holdout",
+  "stress_split": "conflict_stress",
+  "denominator_audit": {
+    "valid": true,
+    "design": "candidate paired full order-mapping crossing; lexical aliases balanced between independent groups",
+    "groups_by_split": {
+      "behavior_discovery": 192,
+      "behavior_holdout": 384,
+      "physical_calibration": 384,
+      "sealed_physical_holdout": 384,
+      "conflict_stress": 96
+    },
+    "independent_groups_per_block": {
+      "behavior_discovery": 96,
+      "behavior_holdout": 192,
+      "physical_calibration": 192,
+      "sealed_physical_holdout": 192,
+      "conflict_stress": 96
+    },
+    "conditions_by_split_per_model": {
+      "behavior_discovery": 4800,
+      "behavior_holdout": 9600,
+      "physical_calibration": 9600,
+      "sealed_physical_holdout": 9600,
+      "conflict_stress": 384
+    },
+    "behavior_open_conditions_per_model": 14784,
+    "three_model_behavior_open_conditions": 44352,
+    "physical_open_conditions_per_eligible_model": 9600,
+    "sealed_conditions_qwen_if_unlocked": 9600,
+    "surface_length_matched": true,
+    "vocabulary_disjoint_across_splits": true,
+    "factor_balance": {
+      "behavior_discovery": {
+        "role_alias": {
+          "0": 24,
+          "1": 24,
+          "2": 24,
+          "3": 24
+        },
+        "cue_alias": {
+          "0": 24,
+          "1": 24,
+          "2": 24,
+          "3": 24
+        },
+        "baseline_order": {
+          "ab": 48,
+          "ba": 48
+        },
+        "baseline_mapping": {
+          "direct": 64,
+          "swapped": 32
+        },
+        "control_target": {
+          "source_1": 48,
+          "source_2": 48
+        }
+      },
+      "behavior_holdout": {
+        "role_alias": {
+          "0": 48,
+          "1": 48,
+          "2": 48,
+          "3": 48
+        },
+        "cue_alias": {
+          "0": 48,
+          "1": 48,
+          "2": 48,
+          "3": 48
+        },
+        "baseline_order": {
+          "ab": 96,
+          "ba": 96
+        },
+        "baseline_mapping": {
+          "direct": 96,
+          "swapped": 96
+        },
+        "control_target": {
+          "source_1": 96,
+          "source_2": 96
+        }
+      },
+      "physical_calibration": {
+        "role_alias": {
+          "0": 48,
+          "1": 48,
+          "2": 48,
+          "3": 48
+        },
+        "cue_alias": {
+          "0": 48,
+          "1": 48,
+          "2": 48,
+          "3": 48
+        },
+        "baseline_order": {
+          "ab": 96,
+          "ba": 96
+        },
+        "baseline_mapping": {
+          "direct": 96,
+          "swapped": 96
+        },
+        "control_target": {
+          "source_1": 96,
+          "source_2": 96
+        }
+      },
+      "sealed_physical_holdout": {
+        "role_alias": {
+          "0": 48,
+          "1": 48,
+          "2": 48,
+          "3": 48
+        },
+        "cue_alias": {
+          "0": 48,
+          "1": 48,
+          "2": 48,
+          "3": 48
+        },
+        "baseline_order": {
+          "ab": 96,
+          "ba": 96
+        },
+        "baseline_mapping": {
+          "direct": 96,
+          "swapped": 96
+        },
+        "control_target": {
+          "source_1": 96,
+          "source_2": 96
+        }
+      },
+      "conflict_stress": {
+        "role_alias": {
+          "0": 24,
+          "1": 24,
+          "2": 24,
+          "3": 24
+        },
+        "cue_alias": {
+          "0": 24,
+          "1": 24,
+          "2": 24,
+          "3": 24
+        },
+        "baseline_order": {
+          "ab": 48,
+          "ba": 48
+        },
+        "baseline_mapping": {
+          "direct": 64,
+          "swapped": 32
+        },
+        "control_target": {}
+      }
+    },
+    "counts": {
+      "language_action_binding_timeline_candidate::behavior_discovery": 96,
+      "language_action_binding_timeline_candidate::behavior_holdout": 192,
+      "language_action_binding_timeline_candidate::conflict_stress": 96,
+      "language_action_binding_timeline_candidate::physical_calibration": 192,
+      "language_action_binding_timeline_candidate::sealed_physical_holdout": 192,
+      "language_action_binding_timeline_control::behavior_discovery": 96,
+      "language_action_binding_timeline_control::behavior_holdout": 192,
+      "language_action_binding_timeline_control::physical_calibration": 192,
+      "language_action_binding_timeline_control::sealed_physical_holdout": 192
+    }
+  },
+  "rows_sha256": {
+    "behavior_discovery": "4eeadf39a258c880636cce25b26495f865018a4ec156d454652fab37fcd0a34c",
+    "behavior_holdout": "b9db99ff79349ec9c9db193e40e0e67e23de95617bf1647e3e32472adad5b4d5",
+    "physical_calibration": "263059563eeff009e3998332552e1a821845df665339652112ffc571543ebaab",
+    "conflict_stress": "e19771ca3e63f1c7a0f94c6d41e5c6e9c2c928938e0ee859a0ccfbd9b3cf1a6e"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase434_binding_timeline.v1",
+    "phase_id": "Phase434-BindingTimelineProtocol",
+    "created_at": "2026-07-15T13:48:02.027676+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_group_count": 384,
+    "sealed_condition_count": 9600,
+    "sealed_group_rows_sha256": "80bb1d3a25b6c2d6ff71e26f949f666f369a9a871af03b0144fd0ef377d8b7ce",
+    "read_requires_open_gate": true,
+    "open_analysis_must_not_import_sealed_rows": true
+  },
+  "event_contract": {
+    "minimum_common_prefix_tokens_each_model": 2,
+    "minimum_post_divergence_tokens_each_event": 2,
+    "minimum_post_divergence_mismatches": 2,
+    "same_first_token_required": true,
+    "same_surface_length_required": true,
+    "complete_sequence_behavior_is_primary": true,
+    "all_five_selector_slots_always_present": true,
+    "exactly_one_active_selector_slot": true
+  },
+  "behavior_contract": {
+    "behavior_before_physical": true,
+    "discovery_groups_per_block": 96,
+    "holdout_groups_per_block": 192,
+    "late_timings": [
+      "after_records",
+      "near_query"
+    ],
+    "stress_nonblocking": true,
+    "model_specific_graph_allowed": true,
+    "cross_model_claim_requires_models": 2
+  },
+  "physical_contract": {
+    "behavior_qualified_models_only": true,
+    "positions": [
+      "selector_slot_end",
+      "role_a_result_end",
+      "role_b_result_end",
+      "after_records_end",
+      "question_end",
+      "instruction_end",
+      "assistant_boundary",
+      "prompt_terminal",
+      "teacher_branch_boundary"
+    ],
+    "state_sketch_dimensions": 16,
+    "state_sketch_seed": 4340715,
+    "state_sketch_is_output_label_blind": true,
+    "equivariance_metric": "same-source paired sketch distance versus different-source paired sketch distance",
+    "physical_internal_discovery_groups": 96,
+    "physical_internal_holdout_groups": 96,
+    "unknown_hidden_permutation_is_not_assumed": true,
+    "no_head_channel_neuron_scan": true
+  },
+  "numeric_gates": {
+    "token_contract_valid_fraction_min": 1.0,
+    "late_behavior_group_lcb_min": 0.95,
+    "control_all_timing_group_lcb_min": 0.95,
+    "physical_group_coverage_fraction_min": 1.0,
+    "physical_finite_fraction_min": 1.0,
+    "binding_geometry_effect_min": 0.05,
+    "binding_geometry_holdout_direction_agreement_min": 0.8,
+    "candidate_control_specificity_min": 0.05,
+    "hook_hidden_state_max_abs_error": 0.001
+  },
+  "gate_order": [
+    "G0_natural_behavior_qualification",
+    "G1_token_position_cache_component_identity",
+    "G2_label_blind_binding_geometry",
+    "G3_binding_time_replication",
+    "G4_source_specific_transport",
+    "G5_complete_event_holdout_prediction",
+    "G6_matched_control_specificity",
+    "G7_sealed_replication",
+    "G8_optional_aggregate_causal"
+  ],
+  "source_transport_is_not_inferred_from_state_geometry": true,
+  "sealed_unlock_requires_G0_through_G6": true,
+  "causal_unlock_requires_sealed_pass": true,
+  "implementation_hashes": {
+    "phase434_binding_timeline_protocol.py": "276b13dd49bd0588887d467ebcc81960ea411ac31d8c3cb020c66c4e2f847792",
+    "phase434_binding_timeline_collect.py": "666a99a3a7ef5a919338ea6ab6136cf3f3fd947818dbe476f3181802b4ac495c",
+    "phase434_binding_timeline_analysis.py": "869c1cfa417f8afd8d8a59eec6d42437c63aad29f6c4ea71b844250ccb5e9d3e",
+    "test_phase434_binding_timeline.py": "cc7dacf263fe857bf43edf96b2194d2dd1ccd1677485e585d5d1831820034411"
+  }
+}

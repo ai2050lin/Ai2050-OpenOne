@@ -1,0 +1,859 @@
+{
+  "schema_version": "phase432_final_summary.v1",
+  "phase_id": "Phase432-PrechoiceTerminalAnalysis",
+  "created_at": "2026-07-15T08:39:27.119126+00:00",
+  "status": "open_or_sealed_failed",
+  "denominator": {
+    "valid": true,
+    "groups_per_block_split": 128,
+    "open_group_count": 256,
+    "sealed_group_count": 256,
+    "conditions_per_model_open": 2560,
+    "conditions_per_model_sealed": 2560,
+    "three_model_open_condition_count": 7680,
+    "counts": {
+      "language_action_dual_route_candidate::independent_confirmation": 128,
+      "language_action_dual_route_candidate::sealed_replication": 128,
+      "language_action_stable_result_control::independent_confirmation": 128,
+      "language_action_stable_result_control::sealed_replication": 128
+    }
+  },
+  "primary_window": {
+    "model": "qwen3",
+    "layer": 26,
+    "position_role": "prompt_terminal",
+    "relative_depth": 0.7428571428571429,
+    "selected_from": "Phase431 posthoc descriptive failure map",
+    "labels_used_before_phase432_freeze": true
+  },
+  "open": {
+    "schema_version": "phase432_prechoice_terminal.v1",
+    "phase_id": "Phase432-PrechoiceTerminalAnalysis",
+    "created_at": "2026-07-15T08:23:57.878088+00:00",
+    "stage": "open",
+    "behavior": {
+      "qwen3": {
+        "model": "qwen3",
+        "stage": "open",
+        "row_count": 2560,
+        "candidate": {
+          "group_all_events": {
+            "successes": 128,
+            "total": 128,
+            "estimate": 1.0,
+            "lcb": 0.970863044,
+            "ucb": 1.0
+          },
+          "role_response_contract": {
+            "successes": 384,
+            "total": 384,
+            "estimate": 1.0,
+            "lcb": 0.990095286,
+            "ucb": 1.0
+          },
+          "actual_choice_counts": {
+            "source_2": 640,
+            "source_1": 640
+          }
+        },
+        "control": {
+          "group_all_events": {
+            "successes": 116,
+            "total": 128,
+            "estimate": 0.90625,
+            "lcb": 0.843270027,
+            "ucb": 0.945556196
+          },
+          "role_response_contract": {
+            "successes": 384,
+            "total": 384,
+            "estimate": 1.0,
+            "lcb": 0.990095286,
+            "ucb": 1.0
+          },
+          "actual_choice_counts": {
+            "source_1": 629,
+            "source_2": 651
+          }
+        },
+        "behavior_gate_pass": false
+      },
+      "glm4": {
+        "model": "glm4",
+        "stage": "open",
+        "row_count": 2560,
+        "candidate": {
+          "group_all_events": {
+            "successes": 0,
+            "total": 128,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.029136956
+          },
+          "role_response_contract": {
+            "successes": 256,
+            "total": 384,
+            "estimate": 0.666666667,
+            "lcb": 0.618071523,
+            "ucb": 0.711960238
+          },
+          "actual_choice_counts": {
+            "source_2": 312,
+            "source_1": 556,
+            "other": 412
+          }
+        },
+        "control": {
+          "group_all_events": {
+            "successes": 0,
+            "total": 128,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.029136956
+          },
+          "role_response_contract": {
+            "successes": 373,
+            "total": 384,
+            "estimate": 0.971354167,
+            "lcb": 0.949440329,
+            "ucb": 0.983930747
+          },
+          "actual_choice_counts": {
+            "source_1": 640,
+            "source_2": 609,
+            "other": 31
+          }
+        },
+        "behavior_gate_pass": false
+      },
+      "deepseek7b": {
+        "model": "deepseek7b",
+        "stage": "open",
+        "row_count": 2560,
+        "candidate": {
+          "group_all_events": {
+            "successes": 0,
+            "total": 128,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.029136956
+          },
+          "role_response_contract": {
+            "successes": 0,
+            "total": 384,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.009904714
+          },
+          "actual_choice_counts": {
+            "other": 1194,
+            "source_2": 60,
+            "source_1": 26
+          }
+        },
+        "control": {
+          "group_all_events": {
+            "successes": 0,
+            "total": 128,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.029136956
+          },
+          "role_response_contract": {
+            "successes": 0,
+            "total": 384,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.009904714
+          },
+          "actual_choice_counts": {
+            "other": 1280
+          }
+        },
+        "behavior_gate_pass": false
+      }
+    },
+    "physical": {
+      "qwen3": {
+        "model": "qwen3",
+        "stage": "open",
+        "trace_row_count": 73728,
+        "layer_count": 36,
+        "registered_layer": 26,
+        "registered_relative_depth": 0.742857143,
+        "coordinate_identity": {
+          "terminal_native_top1_equal": 2048,
+          "terminal_native_top1_total": 2048,
+          "hook_hidden_state_max_abs_error": 0.0,
+          "pass": true
+        },
+        "registered_source_coverage": {
+          "successes": 768,
+          "total": 768,
+          "estimate": 1.0,
+          "lcb": 0.995022995,
+          "ucb": 1.0
+        },
+        "candidate": {
+          "layer": 26,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 384,
+            "source_2": 384
+          },
+          "prediction_counts": {
+            "source_1": 394,
+            "source_2": 374
+          },
+          "choice": {
+            "overall": {
+              "successes": 758,
+              "total": 768,
+              "estimate": 0.986979167,
+              "lcb": 0.97619872,
+              "ucb": 0.992912218
+            },
+            "per_class": {
+              "source_1": {
+                "successes": 384,
+                "total": 384,
+                "estimate": 1.0,
+                "lcb": 0.990095286,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 374,
+                "total": 384,
+                "estimate": 0.973958333,
+                "lcb": 0.952733461,
+                "ucb": 0.985794362
+              }
+            },
+            "balanced_accuracy": 0.986979167,
+            "confusion": {
+              "source_1->source_1": 384,
+              "source_2->source_2": 374,
+              "source_2->source_1": 10
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 374,
+            "total": 384,
+            "estimate": 0.973958333,
+            "lcb": 0.952733461,
+            "ucb": 0.985794362
+          },
+          "predicted_role_invariance": {
+            "successes": 10,
+            "total": 384,
+            "estimate": 0.026041667,
+            "lcb": 0.014205638,
+            "ucb": 0.047266539
+          }
+        },
+        "control": {
+          "layer": 26,
+          "position_role": "prompt_terminal",
+          "candidate": false,
+          "condition_count": 768,
+          "actual_choice_counts": {
+            "source_1": 384,
+            "source_2": 384
+          },
+          "prediction_counts": {
+            "source_1": 391,
+            "source_2": 377
+          },
+          "choice": {
+            "overall": {
+              "successes": 761,
+              "total": 768,
+              "estimate": 0.990885417,
+              "lcb": 0.981306537,
+              "ucb": 0.995578018
+            },
+            "per_class": {
+              "source_1": {
+                "successes": 384,
+                "total": 384,
+                "estimate": 1.0,
+                "lcb": 0.990095286,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 377,
+                "total": 384,
+                "estimate": 0.981770833,
+                "lcb": 0.962855714,
+                "ucb": 0.991142348
+              }
+            },
+            "balanced_accuracy": 0.990885417,
+            "confusion": {
+              "source_1->source_1": 384,
+              "source_2->source_2": 377,
+              "source_2->source_1": 7
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 7,
+            "total": 384,
+            "estimate": 0.018229167,
+            "lcb": 0.008857652,
+            "ucb": 0.037144286
+          },
+          "predicted_role_invariance": {
+            "successes": 377,
+            "total": 384,
+            "estimate": 0.981770833,
+            "lcb": 0.962855714,
+            "ucb": 0.991142348
+          }
+        },
+        "primary_observer_pass": true,
+        "language_interpretation_allowed": true
+      },
+      "glm4": {
+        "model": "glm4",
+        "stage": "open",
+        "trace_row_count": 81920,
+        "layer_count": 40,
+        "registered_layer": 29,
+        "registered_relative_depth": 0.743589744,
+        "coordinate_identity": {
+          "terminal_native_top1_equal": 2048,
+          "terminal_native_top1_total": 2048,
+          "hook_hidden_state_max_abs_error": 0.0,
+          "pass": true
+        },
+        "registered_source_coverage": {
+          "successes": 546,
+          "total": 768,
+          "estimate": 0.7109375,
+          "lcb": 0.677889172,
+          "ucb": 0.741886154
+        },
+        "candidate": {
+          "layer": 29,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 546,
+          "actual_choice_counts": {
+            "source_1": 267,
+            "source_2": 279
+          },
+          "prediction_counts": {
+            "source_1": 546
+          },
+          "choice": {
+            "overall": {
+              "successes": 267,
+              "total": 546,
+              "estimate": 0.489010989,
+              "lcb": 0.447305191,
+              "ucb": 0.530870336
+            },
+            "per_class": {
+              "source_1": {
+                "successes": 267,
+                "total": 267,
+                "estimate": 1.0,
+                "lcb": 0.985816578,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 279,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.013581668
+              }
+            },
+            "balanced_accuracy": 0.5,
+            "confusion": {
+              "source_1->source_1": 267,
+              "source_2->source_1": 279
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 0,
+            "total": 256,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 0.014783856
+          },
+          "predicted_role_invariance": {
+            "successes": 256,
+            "total": 256,
+            "estimate": 1.0,
+            "lcb": 0.985216144,
+            "ucb": 1.0
+          }
+        },
+        "control": {
+          "layer": 29,
+          "position_role": "prompt_terminal",
+          "candidate": false,
+          "condition_count": 756,
+          "actual_choice_counts": {
+            "source_1": 384,
+            "source_2": 372
+          },
+          "prediction_counts": {
+            "source_1": 750,
+            "source_2": 6
+          },
+          "choice": {
+            "overall": {
+              "successes": 378,
+              "total": 756,
+              "estimate": 0.5,
+              "lcb": 0.464448609,
+              "ucb": 0.535551391
+            },
+            "per_class": {
+              "source_1": {
+                "successes": 378,
+                "total": 384,
+                "estimate": 0.984375,
+                "lcb": 0.96633505,
+                "ucb": 0.992819758
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 372,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.010220955
+              }
+            },
+            "balanced_accuracy": 0.4921875,
+            "confusion": {
+              "source_1->source_1": 378,
+              "source_2->source_1": 372,
+              "source_1->source_2": 6
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 6,
+            "total": 373,
+            "estimate": 0.016085791,
+            "lcb": 0.007392577,
+            "ucb": 0.034644886
+          },
+          "predicted_role_invariance": {
+            "successes": 367,
+            "total": 373,
+            "estimate": 0.983914209,
+            "lcb": 0.965355114,
+            "ucb": 0.992607423
+          }
+        },
+        "primary_observer_pass": false,
+        "language_interpretation_allowed": false
+      },
+      "deepseek7b": {
+        "model": "deepseek7b",
+        "stage": "open",
+        "trace_row_count": 57344,
+        "layer_count": 28,
+        "registered_layer": 20,
+        "registered_relative_depth": 0.740740741,
+        "coordinate_identity": {
+          "terminal_native_top1_equal": 2048,
+          "terminal_native_top1_total": 2048,
+          "hook_hidden_state_max_abs_error": 0.0,
+          "pass": true
+        },
+        "registered_source_coverage": {
+          "successes": 34,
+          "total": 768,
+          "estimate": 0.044270833,
+          "lcb": 0.031851377,
+          "ucb": 0.061226623
+        },
+        "candidate": {
+          "layer": 20,
+          "position_role": "prompt_terminal",
+          "candidate": true,
+          "condition_count": 34,
+          "actual_choice_counts": {
+            "source_2": 34
+          },
+          "prediction_counts": {
+            "source_1": 34
+          },
+          "choice": {
+            "overall": {
+              "successes": 0,
+              "total": 34,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 0.101514554
+            },
+            "per_class": {
+              "source_1": {
+                "successes": 0,
+                "total": 0,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 34,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 0.101514554
+              }
+            },
+            "balanced_accuracy": 0.0,
+            "confusion": {
+              "source_2->source_1": 34
+            }
+          },
+          "predicted_role_flip": {
+            "successes": 0,
+            "total": 0,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 1.0
+          },
+          "predicted_role_invariance": {
+            "successes": 0,
+            "total": 0,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 1.0
+          }
+        },
+        "control": {
+          "layer": 20,
+          "position_role": "prompt_terminal",
+          "candidate": false,
+          "condition_count": 0,
+          "actual_choice_counts": {},
+          "prediction_counts": {},
+          "choice": {
+            "overall": {
+              "successes": 0,
+              "total": 0,
+              "estimate": 0.0,
+              "lcb": 0.0,
+              "ucb": 1.0
+            },
+            "per_class": {
+              "source_1": {
+                "successes": 0,
+                "total": 0,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 1.0
+              },
+              "source_2": {
+                "successes": 0,
+                "total": 0,
+                "estimate": 0.0,
+                "lcb": 0.0,
+                "ucb": 1.0
+              }
+            },
+            "balanced_accuracy": 0.0,
+            "confusion": {}
+          },
+          "predicted_role_flip": {
+            "successes": 0,
+            "total": 0,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 1.0
+          },
+          "predicted_role_invariance": {
+            "successes": 0,
+            "total": 0,
+            "estimate": 0.0,
+            "lcb": 0.0,
+            "ucb": 1.0
+          }
+        },
+        "primary_observer_pass": false,
+        "language_interpretation_allowed": false
+      }
+    },
+    "gates": {
+      "H0_qwen_behavior": false,
+      "H1_qwen_coordinate_identity": true,
+      "H2_fixed_prechoice_window": true,
+      "H3_temporal_legality": true
+    },
+    "failed_gates": [
+      "H0_qwen_behavior"
+    ],
+    "sealed_unlock": false,
+    "sealed_rows_read": false,
+    "cross_model_language_mechanism": false,
+    "causal": false,
+    "single_neuron": false
+  },
+  "sealed": null,
+  "failure_audit": {
+    "schema_version": "phase432_failure_audit.v1",
+    "phase_id": "Phase432-PrechoiceTerminalAnalysis",
+    "created_at": "2026-07-15T08:26:20.687163+00:00",
+    "failed_gates": [
+      "H0_qwen_behavior"
+    ],
+    "qwen_control_failed_group_count": 12,
+    "qwen_control_failed_condition_count": 12,
+    "qwen_control_failure_axis_counts": {
+      "teacher_sequence_correct": 12,
+      "natural_target_first": 11,
+      "natural_opposite_first": 11
+    },
+    "qwen_control_failed_conditions": [
+      {
+        "condition_id": "phase432__independent_confirmation__pair_001__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_001__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_004__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_004__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_005__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_005__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_008__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_008__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_009__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_009__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_012__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_012__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_013__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_013__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_016__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_016__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_017__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_017__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_040__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_040__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_1",
+        "failed_axes": [
+          "teacher_sequence_correct"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_060__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_060__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      },
+      {
+        "condition_id": "phase432__independent_confirmation__pair_120__language_action_stable_result_control__rb__route_conflict__qwen3",
+        "semantic_group_id": "phase432__independent_confirmation__pair_120__language_action_stable_result_control",
+        "role": "b",
+        "route_mode": "conflict",
+        "actual_choice": "source_2",
+        "failed_axes": [
+          "teacher_sequence_correct",
+          "natural_target_first",
+          "natural_opposite_first"
+        ]
+      }
+    ],
+    "all_qwen_control_failures_are_role_b_conflict": true,
+    "shape_milestones": {
+      "qwen3": [
+        {
+          "position_role": "question_end",
+          "best_layer": 11,
+          "best_balanced_accuracy": 0.56640625,
+          "best_role_flip": 0.138020833,
+          "first_layer_at_or_above_0_90": null
+        },
+        {
+          "position_role": "instruction_end",
+          "best_layer": 29,
+          "best_balanced_accuracy": 0.557291667,
+          "best_role_flip": 0.166666667,
+          "first_layer_at_or_above_0_90": null
+        },
+        {
+          "position_role": "prompt_terminal",
+          "best_layer": 27,
+          "best_balanced_accuracy": 1.0,
+          "best_role_flip": 1.0,
+          "first_layer_at_or_above_0_90": 26
+        }
+      ],
+      "glm4": [
+        {
+          "position_role": "question_end",
+          "best_layer": 32,
+          "best_balanced_accuracy": 0.752084088,
+          "best_role_flip": 0.55859375,
+          "first_layer_at_or_above_0_90": null
+        },
+        {
+          "position_role": "instruction_end",
+          "best_layer": 37,
+          "best_balanced_accuracy": 0.808163184,
+          "best_role_flip": 0.58203125,
+          "first_layer_at_or_above_0_90": null
+        },
+        {
+          "position_role": "prompt_terminal",
+          "best_layer": 35,
+          "best_balanced_accuracy": 0.758507511,
+          "best_role_flip": 0.49609375,
+          "first_layer_at_or_above_0_90": null
+        }
+      ],
+      "deepseek7b": [
+        {
+          "position_role": "question_end",
+          "best_layer": 2,
+          "best_balanced_accuracy": 0.5,
+          "best_role_flip": 0.0,
+          "first_layer_at_or_above_0_90": null
+        },
+        {
+          "position_role": "instruction_end",
+          "best_layer": 0,
+          "best_balanced_accuracy": 0.5,
+          "best_role_flip": 0.0,
+          "first_layer_at_or_above_0_90": null
+        },
+        {
+          "position_role": "prompt_terminal",
+          "best_layer": 1,
+          "best_balanced_accuracy": 0.5,
+          "best_role_flip": 0.0,
+          "first_layer_at_or_above_0_90": null
+        }
+      ]
+    },
+    "audit_boundary": {
+      "labels_used": true,
+      "descriptive_only": true,
+      "phase432_gate_reopened": false,
+      "sealed_rows_read": false,
+      "primary_physical_routes_exclude_conflict": true,
+      "frozen_behavior_gate_includes_control_conflict": true,
+      "fixed_observer_is_output_basis_not_transport_mechanism": true,
+      "source_items_differ_at_first_token": true
+    }
+  },
+  "evidence": {
+    "physical": true,
+    "observer": true,
+    "predictive": false,
+    "causal": false,
+    "single_neuron": false,
+    "mechanism_closure": false,
+    "cross_model_language_mechanism": false
+  },
+  "closure": {
+    "strict_mechanisms": "0/72",
+    "overall_scientific_progress_percent": 21,
+    "cautious_interval_percent": [
+      18,
+      24
+    ]
+  }
+}

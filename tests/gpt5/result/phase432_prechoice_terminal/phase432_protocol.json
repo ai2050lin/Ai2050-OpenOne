@@ -1,0 +1,116 @@
+{
+  "schema_version": "phase432_prechoice_terminal.v1",
+  "trace_schema_version": "phase432_prechoice_terminal_trace.v1",
+  "phase_id": "Phase432-PrechoiceTerminalProtocol",
+  "created_at": "2026-07-15T08:39:39.529915+00:00",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtypes": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "language_model": "qwen3",
+  "open_split": "independent_confirmation",
+  "sealed_split": "sealed_replication",
+  "denominator_audit": {
+    "valid": true,
+    "groups_per_block_split": 128,
+    "open_group_count": 256,
+    "sealed_group_count": 256,
+    "conditions_per_model_open": 2560,
+    "conditions_per_model_sealed": 2560,
+    "three_model_open_condition_count": 7680,
+    "counts": {
+      "language_action_dual_route_candidate::independent_confirmation": 128,
+      "language_action_dual_route_candidate::sealed_replication": 128,
+      "language_action_stable_result_control::independent_confirmation": 128,
+      "language_action_stable_result_control::sealed_replication": 128
+    }
+  },
+  "open_group_rows_sha256": "c68e961af261edd77ec6a4a2426ce3b29f7e3f4f3bedd52bc111e1cfd8f75799",
+  "sealed_commitment": {
+    "schema_version": "phase432_prechoice_terminal.v1",
+    "phase_id": "Phase432-PrechoiceTerminalProtocol",
+    "created_at": "2026-07-15T08:39:39.528530+00:00",
+    "sealed_split": "sealed_replication",
+    "sealed_group_rows_sha256": "56c8d712b4454cc411fc6faf28257a8278465275a441cf7cc096d90fe584d917",
+    "sealed_group_count": 256,
+    "sealed_condition_count": 2560,
+    "read_requires_open_confirmation_pass": true
+  },
+  "primary_window": {
+    "model": "qwen3",
+    "layer": 26,
+    "position_role": "prompt_terminal",
+    "relative_depth": 0.7428571428571429,
+    "selected_from": "Phase431 posthoc descriptive failure map",
+    "labels_used_before_phase432_freeze": true
+  },
+  "observer_contract": {
+    "prediction": "sign(final_norm(residual_post) dot (unembed(source_1)-unembed(source_2)))",
+    "target": "first registered source selected by natural generation",
+    "positions_before_first_answer_only": true,
+    "generation_positions_forbidden": true,
+    "behavior_labels_used_for_phase432_window_selection": false,
+    "window_reselection": false,
+    "qwen_primary_only": true,
+    "glm4_deepseek7b_scope": "same-protocol diagnostic, not a language mechanism claim"
+  },
+  "shape_map_contract": {
+    "positions": [
+      "question_end",
+      "instruction_end",
+      "prompt_terminal"
+    ],
+    "layers": "all model layers",
+    "labels_used": true,
+    "evidence": "descriptive observer",
+    "can_select_new_primary_window": false
+  },
+  "numeric_gates": {
+    "behavior_group_all_lcb_min": 0.9,
+    "registered_source_coverage_lcb_min": 0.95,
+    "primary_choice_per_class_lcb_min": 0.95,
+    "candidate_role_flip_lcb_min": 0.95,
+    "control_role_invariance_lcb_min": 0.95,
+    "control_role_flip_ucb_max": 0.05,
+    "terminal_native_top1_identity_required": true,
+    "hidden_state_hook_max_abs_error": 0.0001
+  },
+  "open_gate": [
+    "Qwen3 behavior qualification",
+    "native terminal and hidden-state coordinate identity",
+    "fixed L26 prompt-terminal choice prediction",
+    "candidate role flip with matched-control invariance"
+  ],
+  "sealed_policy": {
+    "only_qwen3": true,
+    "no_read_before_open_gate": true,
+    "same_fixed_window_and_thresholds": true,
+    "failure_cannot_reselect": true
+  },
+  "evidence_contract": {
+    "physical": true,
+    "observer": true,
+    "predictive_after_open_and_sealed": true,
+    "causal": false,
+    "single_neuron": false,
+    "mechanism_closure": false
+  },
+  "stop_rules": [
+    "open failure keeps sealed data unread",
+    "instrument model behavior failure limits only that model's interpretation",
+    "no window search or threshold change after open results",
+    "no causal, head, channel, or neuron intervention in Phase432"
+  ],
+  "implementation_sha256": {
+    "phase432_prechoice_terminal_protocol.py": "6de252e0aea2a56ba44a54f0a4e79ad3a1981a8c407e12c4fd9d309aa7f40ef3",
+    "phase432_prechoice_terminal_collect.py": "423912a3825456e9f380e07bae69a86aea384ac046fb7d9d2ffbc464ff6da85e",
+    "phase432_prechoice_terminal_analysis.py": "5685a4c67e507dab048b84be78a45634f40550cd318856abbffbf43da5517d9c",
+    "test_phase432_prechoice_terminal.py": "1d6e75b4c5b60b1df9f7e844924ac7da31996f4425ef8c5d454f4aebc3da9748"
+  }
+}
