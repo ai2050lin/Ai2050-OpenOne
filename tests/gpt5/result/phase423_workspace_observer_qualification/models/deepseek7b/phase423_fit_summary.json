@@ -1,0 +1,139 @@
+{
+  "schema_version": "phase423_workspace_observer_fit.v1",
+  "phase": 423,
+  "model": "deepseek7b",
+  "model_adapter": "HFLensModel(Qwen2ForCausalLM, n_layers=28, d_model=3584)",
+  "dtype": "torch.bfloat16",
+  "official_implementation_commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "source_layers": [
+    0,
+    3,
+    6,
+    10,
+    13,
+    16,
+    20,
+    23,
+    26
+  ],
+  "relative_source_depths": [
+    0.0,
+    0.1111111111,
+    0.2222222222,
+    0.3703703704,
+    0.4814814815,
+    0.5925925926,
+    0.7407407407,
+    0.8518518519,
+    0.962962963
+  ],
+  "target_layer": 27,
+  "d_model": 3584,
+  "n_prompts_fit_a": 50,
+  "n_prompts_fit_b": 50,
+  "n_prompts_merged": 100,
+  "dim_batch": 8,
+  "split_seconds": {
+    "fit_a": 1477.809993438,
+    "fit_b": 1479.783278274
+  },
+  "wall_seconds": 2961.748429733,
+  "vram_allocated_gb_at_end": 15.293362176,
+  "vram_reserved_gb_at_end": 18.18230784,
+  "matrix_stability": [
+    {
+      "layer": 0,
+      "matrix_cosine": 0.850704968,
+      "relative_difference": 0.5504134893,
+      "a_frobenius_norm": 91.0411758423,
+      "b_frobenius_norm": 87.1153411865,
+      "finite": true
+    },
+    {
+      "layer": 3,
+      "matrix_cosine": 0.9009967446,
+      "relative_difference": 0.4486599267,
+      "a_frobenius_norm": 71.7054290771,
+      "b_frobenius_norm": 72.0867614746,
+      "finite": true
+    },
+    {
+      "layer": 6,
+      "matrix_cosine": 0.9375975132,
+      "relative_difference": 0.3580956161,
+      "a_frobenius_norm": 67.6858444214,
+      "b_frobenius_norm": 68.6233901978,
+      "finite": true
+    },
+    {
+      "layer": 10,
+      "matrix_cosine": 0.9653981924,
+      "relative_difference": 0.2689590752,
+      "a_frobenius_norm": 73.6983947754,
+      "b_frobenius_norm": 74.4754104614,
+      "finite": true
+    },
+    {
+      "layer": 13,
+      "matrix_cosine": 0.9808425903,
+      "relative_difference": 0.2031760365,
+      "a_frobenius_norm": 77.9362945557,
+      "b_frobenius_norm": 78.1180725098,
+      "finite": true
+    },
+    {
+      "layer": 16,
+      "matrix_cosine": 0.9872781038,
+      "relative_difference": 0.167209059,
+      "a_frobenius_norm": 86.5874023438,
+      "b_frobenius_norm": 86.6022720337,
+      "finite": true
+    },
+    {
+      "layer": 20,
+      "matrix_cosine": 0.9950628877,
+      "relative_difference": 0.1140052378,
+      "a_frobenius_norm": 83.042678833,
+      "b_frobenius_norm": 83.1404800415,
+      "finite": true
+    },
+    {
+      "layer": 23,
+      "matrix_cosine": 0.9993136525,
+      "relative_difference": 0.0757158771,
+      "a_frobenius_norm": 77.5039520264,
+      "b_frobenius_norm": 77.9518585205,
+      "finite": true
+    },
+    {
+      "layer": 26,
+      "matrix_cosine": 1.0,
+      "relative_difference": 0.0441223346,
+      "a_frobenius_norm": 71.2329101562,
+      "b_frobenius_norm": 71.3008041382,
+      "finite": true
+    }
+  ],
+  "matrix_cosine_median": 0.9808425903,
+  "matrix_cosine_min": 0.850704968,
+  "relative_difference_median": 0.2031760365,
+  "matrix_finite": true,
+  "fit_reproducibility_gate_pass": true,
+  "lens_files": {
+    "fit_a": "tests/gpt5/result/phase423_workspace_observer_qualification/models/deepseek7b/phase423_jacobian_lens_fit_a.pt",
+    "fit_b": "tests/gpt5/result/phase423_workspace_observer_qualification/models/deepseek7b/phase423_jacobian_lens_fit_b.pt",
+    "merged": "tests/gpt5/result/phase423_workspace_observer_qualification/models/deepseek7b/phase423_jacobian_lens_merged.pt"
+  },
+  "lens_file_sizes": {
+    "fit_a": 231214669,
+    "fit_b": 231214669,
+    "merged": 231214682
+  },
+  "lens_sha256": {
+    "fit_a": "6824f50a706a31f0e6e92ec8b9e80858884c70db2aeb7018424b82eac11ea9e7",
+    "fit_b": "84ac04633bcd05644ea40a60e610ca3bed35dda2ab214917a86e5a2cb0c38db8",
+    "merged": "b37d2cc307fb442266dfe25f1bac35f215cbf16789d839c705319a01e0790f27"
+  },
+  "semantic_interpretation_allowed": false,
+  "completed_at": "2026-07-14T12:00:49.389998+00:00"
+}

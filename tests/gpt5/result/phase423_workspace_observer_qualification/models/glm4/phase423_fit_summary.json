@@ -1,0 +1,139 @@
+{
+  "schema_version": "phase423_workspace_observer_fit.v1",
+  "phase": 423,
+  "model": "glm4",
+  "model_adapter": "HFLensModel(GlmForCausalLM, n_layers=40, d_model=4096)",
+  "dtype": "torch.bfloat16",
+  "official_implementation_commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "source_layers": [
+    0,
+    5,
+    10,
+    14,
+    19,
+    24,
+    28,
+    33,
+    38
+  ],
+  "relative_source_depths": [
+    0.0,
+    0.1282051282,
+    0.2564102564,
+    0.358974359,
+    0.4871794872,
+    0.6153846154,
+    0.7179487179,
+    0.8461538462,
+    0.9743589744
+  ],
+  "target_layer": 39,
+  "d_model": 4096,
+  "n_prompts_fit_a": 50,
+  "n_prompts_fit_b": 50,
+  "n_prompts_merged": 100,
+  "dim_batch": 4,
+  "split_seconds": {
+    "fit_a": 2521.713160978,
+    "fit_b": 2526.5366057559
+  },
+  "wall_seconds": 5056.6151293881,
+  "vram_allocated_gb_at_end": 18.858886144,
+  "vram_reserved_gb_at_end": 20.56257536,
+  "matrix_stability": [
+    {
+      "layer": 0,
+      "matrix_cosine": 0.7713859081,
+      "relative_difference": 0.6808977127,
+      "a_frobenius_norm": 1118.1370849609,
+      "b_frobenius_norm": 1153.4978027344,
+      "finite": true
+    },
+    {
+      "layer": 5,
+      "matrix_cosine": 0.9129620194,
+      "relative_difference": 0.4229659736,
+      "a_frobenius_norm": 479.326385498,
+      "b_frobenius_norm": 484.2442932129,
+      "finite": true
+    },
+    {
+      "layer": 10,
+      "matrix_cosine": 0.9587279558,
+      "relative_difference": 0.2976312041,
+      "a_frobenius_norm": 381.8935546875,
+      "b_frobenius_norm": 373.693572998,
+      "finite": true
+    },
+    {
+      "layer": 14,
+      "matrix_cosine": 0.9814708233,
+      "relative_difference": 0.2065578103,
+      "a_frobenius_norm": 380.3531494141,
+      "b_frobenius_norm": 375.8067932129,
+      "finite": true
+    },
+    {
+      "layer": 19,
+      "matrix_cosine": 0.9852173328,
+      "relative_difference": 0.1833426058,
+      "a_frobenius_norm": 244.5231933594,
+      "b_frobenius_norm": 243.70262146,
+      "finite": true
+    },
+    {
+      "layer": 24,
+      "matrix_cosine": 0.9929130077,
+      "relative_difference": 0.1356010139,
+      "a_frobenius_norm": 167.878036499,
+      "b_frobenius_norm": 167.3373260498,
+      "finite": true
+    },
+    {
+      "layer": 28,
+      "matrix_cosine": 0.997502327,
+      "relative_difference": 0.0995524228,
+      "a_frobenius_norm": 144.1370697021,
+      "b_frobenius_norm": 144.1851196289,
+      "finite": true
+    },
+    {
+      "layer": 33,
+      "matrix_cosine": 0.999902308,
+      "relative_difference": 0.0669057071,
+      "a_frobenius_norm": 128.9282531738,
+      "b_frobenius_norm": 129.1587219238,
+      "finite": true
+    },
+    {
+      "layer": 38,
+      "matrix_cosine": 1.0,
+      "relative_difference": 0.0269031413,
+      "a_frobenius_norm": 69.5465011597,
+      "b_frobenius_norm": 69.5314254761,
+      "finite": true
+    }
+  ],
+  "matrix_cosine_median": 0.9852173328,
+  "matrix_cosine_min": 0.7713859081,
+  "relative_difference_median": 0.1833426058,
+  "matrix_finite": true,
+  "fit_reproducibility_gate_pass": true,
+  "lens_files": {
+    "fit_a": "tests/gpt5/result/phase423_workspace_observer_qualification/models/glm4/phase423_jacobian_lens_fit_a.pt",
+    "fit_b": "tests/gpt5/result/phase423_workspace_observer_qualification/models/glm4/phase423_jacobian_lens_fit_b.pt",
+    "merged": "tests/gpt5/result/phase423_workspace_observer_qualification/models/glm4/phase423_jacobian_lens_merged.pt"
+  },
+  "lens_file_sizes": {
+    "fit_a": 301993549,
+    "fit_b": 301993549,
+    "merged": 301993562
+  },
+  "lens_sha256": {
+    "fit_a": "2b1d51d5f25df957d8572b48e428d2d7e393ce1c9eda11489d25fddab5c6d1d0",
+    "fit_b": "dd4cb6136627c25ecf0f9ffcc083ef2fb50ae971a723db96ddcda014a6bcbbfd",
+    "merged": "b180ff6a806a37a72b713ecff4d40ed688eaf034b2f396f50e545549f2ccc52a"
+  },
+  "semantic_interpretation_allowed": false,
+  "completed_at": "2026-07-14T11:08:04.213779+00:00"
+}

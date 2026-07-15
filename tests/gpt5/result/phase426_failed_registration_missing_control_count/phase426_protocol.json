@@ -1,0 +1,201 @@
+{
+  "schema_version": "phase426_exact_position_role.v1",
+  "phase_id": "Phase426-ExactPositionRoleProtocol",
+  "created_at": "2026-07-14T16:29:30.591294+00:00",
+  "objective": "Test whether a reusable role component exceeds matched controls and is carried from an exactly position-matched causal source into full events.",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "blocks": [
+    {
+      "block_id": "language_action_translate_role_swap",
+      "family_id": "language_action",
+      "mechanism_id": "translate",
+      "candidate": true,
+      "matched_control_block_id": "language_action_stable_mapping_control"
+    },
+    {
+      "block_id": "language_action_stable_mapping_control",
+      "family_id": "language_action",
+      "mechanism_id": "translate_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "language_action_translate_role_swap"
+    },
+    {
+      "block_id": "syntax_relative_clause_role_swap",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role",
+      "candidate": true,
+      "matched_control_block_id": "syntax_relative_clause_surface_control"
+    },
+    {
+      "block_id": "syntax_relative_clause_surface_control",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "syntax_relative_clause_role_swap"
+    }
+  ],
+  "interfaces": [
+    "direct",
+    "result_field"
+  ],
+  "histories": [
+    "bare",
+    "worked_example"
+  ],
+  "roles": [
+    "a",
+    "b"
+  ],
+  "timings": [
+    "early_role",
+    "late_role"
+  ],
+  "execution_dtype_by_model": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "split_contract": {
+    "groups_per_block_per_split": 32,
+    "lexical_replicas_per_group": 2,
+    "conditions_per_pair_per_model": 16,
+    "conditions_per_group_per_model": 32,
+    "formal_independent_group_count": 512,
+    "instrument_independent_group_count": 8,
+    "split_unit": "lexical_replica_group"
+  },
+  "exact_position_contract": {
+    "active_tag_early": "active tag before source; neutral tag after source",
+    "active_tag_late": "neutral tag before source; active tag after source",
+    "source_positions_equal": true,
+    "query_positions_equal": true,
+    "executed_lengths_equal": true,
+    "causal_interpretation": "the late active tag cannot causally alter the earlier source state; both timings can alter the later query state",
+    "same_position_does_not_imply_same_state": true
+  },
+  "registered_thresholds": {
+    "component_ledger_relative_error_max": 0.01,
+    "role_covariance_min": 0.2,
+    "conditional_covariance_min": 0.2,
+    "replica_signal_ratio_min": 1.0,
+    "exact_position_specificity_min": 0.0,
+    "candidate_minus_control_min": 0.0,
+    "positive_group_fraction_min": 0.6666666666666666,
+    "source_to_write_identity_alignment_min": 0.2,
+    "teacher_sequence_correct_fraction_min": 0.75,
+    "natural_target_fraction_min": 0.75,
+    "prediction_r2_min": 0.0,
+    "prediction_delta_r2_min": 0.05,
+    "prediction_mae_gain_min": 0.0,
+    "cross_model_replication_min": 2,
+    "natural_generation_max_new_tokens": 8
+  },
+  "geometry_contract": {
+    "radial_distance": "abs(norm(x)-norm(y))/(0.5*(norm(x)+norm(y))+eps)",
+    "angular_distance": "1-cosine(x,y)",
+    "normalized_delta_range": "[0,2] up to epsilon rounding",
+    "role_component_and_role_dominance_are_separate": true,
+    "role_dominance_is_descriptive_only": true,
+    "identity_map_is_primary": true,
+    "learned_three_dimensional_map_pre_registered": false
+  },
+  "prediction_contract": {
+    "fit_split": "discovery",
+    "gate_splits": [
+      "calibration",
+      "behavior_holdout"
+    ],
+    "baseline_features": [
+      "executed_token_count_mean",
+      "target_sequence_token_count_mean"
+    ],
+    "physical_features": [
+      "formation_exact_specificity",
+      "transport_exact_specificity",
+      "competition_specificity"
+    ],
+    "physical_feature_count_max": 3,
+    "ridge_alpha": 1.0,
+    "teacher_and_natural_accounts_are_separate": true,
+    "sealed_split_used_for_selection": false
+  },
+  "evidence_contract": {
+    "instrument_groups_update_thresholds": false,
+    "matched_negative_controls_required": true,
+    "candidate_must_exceed_control": true,
+    "attention_source_write_is_legal_compute_quantity": true,
+    "legal_compute_quantity_is_not_causal_edge": true,
+    "strict_human_double_blind": false,
+    "sealed_read_allowed_before_open_gate": false,
+    "causal_claim_allowed_before_sealed_pass": false,
+    "full_neuron_scan_allowed": false,
+    "single_aggregate_block_test_only_after_sealed_pass": true
+  },
+  "stop_rules": [
+    "candidate_control_role_covariance_not_positive_closes_function_specific_role",
+    "exact_position_transport_failure_closes_role_transport_candidate",
+    "formation_to_transport_identity_failure_prevents_complete_path",
+    "either_teacher_or_natural_event_prediction_failure_keeps_sealed_closed",
+    "one_model_only_is_model_specific",
+    "no_threshold_layer_feature_or_sample_rescue_on_this_denominator"
+  ],
+  "implementation_commitments": {
+    "phase426_exact_position_protocol.py": "e5e212168cd549c007234e7c91352de63f8dc283316b9bd0b4039a205972549f",
+    "phase426_exact_position_collect.py": "d0140e0312cf6bcc8529310ee6b641bb0c1cf0d9fb777277334a9cdfa7755787",
+    "phase426_exact_position_analysis.py": "a188f05f3213a56a50832d881c6fc86dcdb46de703294873fa417498561a5dde"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase426_exact_position_role.v1",
+    "phase_id": "Phase426-ExactPositionRoleProtocol",
+    "created_at": "2026-07-14T16:29:30.485177+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_condition_count": 12288,
+    "sealed_condition_rows_sha256": "53d4640327da61b729561f3874863b23adfc1aa4bd1d9e02b868ebfb0f8ce416",
+    "sealed_prompt_hashes_sha256": "031d405927d5b97cac27eb346ee5732fcbab528a1859d3a29ef15c385c2676d9",
+    "strict_human_double_blind": false,
+    "pipeline_sealed_until_gate_freeze": true
+  },
+  "validation": {
+    "valid": true,
+    "block_count": 4,
+    "formal_pair_count": 1024,
+    "formal_replica_group_count": 512,
+    "formal_condition_count": 49152,
+    "open_condition_count": 36864,
+    "sealed_condition_count": 12288,
+    "instrument_pair_count": 16,
+    "instrument_replica_group_count": 8,
+    "instrument_condition_count": 768,
+    "conditions_per_pair_per_model": 16,
+    "conditions_per_group_per_model": 32,
+    "position_counterfactual_mismatch_count": 0,
+    "replica_group_split_leak_count": 0,
+    "formal_condition_counts_by_model": {
+      "deepseek7b": 16384,
+      "glm4": 16384,
+      "qwen3": 16384
+    },
+    "formal_group_counts_by_block_split": {
+      "language_action_stable_mapping_control::behavior_holdout": 32,
+      "language_action_stable_mapping_control::calibration": 32,
+      "language_action_stable_mapping_control::discovery": 32,
+      "language_action_stable_mapping_control::sealed_physical_holdout": 32,
+      "language_action_translate_role_swap::behavior_holdout": 32,
+      "language_action_translate_role_swap::calibration": 32,
+      "language_action_translate_role_swap::discovery": 32,
+      "language_action_translate_role_swap::sealed_physical_holdout": 32,
+      "syntax_relative_clause_role_swap::behavior_holdout": 32,
+      "syntax_relative_clause_role_swap::calibration": 32,
+      "syntax_relative_clause_role_swap::discovery": 32,
+      "syntax_relative_clause_role_swap::sealed_physical_holdout": 32,
+      "syntax_relative_clause_surface_control::behavior_holdout": 32,
+      "syntax_relative_clause_surface_control::calibration": 32,
+      "syntax_relative_clause_surface_control::discovery": 32,
+      "syntax_relative_clause_surface_control::sealed_physical_holdout": 32
+    }
+  }
+}

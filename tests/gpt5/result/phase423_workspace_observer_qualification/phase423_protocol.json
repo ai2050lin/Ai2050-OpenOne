@@ -1,0 +1,65 @@
+{
+  "schema_version": "phase423_workspace_observer_protocol.v1",
+  "phase": 423,
+  "frozen_at": "2026-07-14T09:14:34.709420+00:00",
+  "scientific_role": "observer_qualification",
+  "compute_edge_claim_allowed": false,
+  "causal_claim_allowed": false,
+  "workspace_claim_allowed": false,
+  "paper_url": "https://transformer-circuits.pub/2026/workspace/index.html",
+  "official_repository": "https://github.com/anthropics/jacobian-lens",
+  "official_commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "fit_contract": {
+    "corpus": "Salesforce/wikitext:wikitext-103-raw-v1:train",
+    "candidate_records": 500,
+    "prompt_count": 100,
+    "split_counts": {
+      "fit_a": 50,
+      "fit_b": 50
+    },
+    "max_seq_len": 64,
+    "skip_first": 8,
+    "source_layer_count": 9,
+    "source_layer_rule": "nine_even_relative_depths_below_final_target",
+    "dtype": "bfloat16",
+    "dim_batch_by_model": {
+      "qwen3": 8,
+      "glm4": 4,
+      "deepseek7b": 8
+    },
+    "checkpoint_every": 10
+  },
+  "evaluation_contract": {
+    "datasets": [
+      "lens-eval-association",
+      "lens-eval-multihop",
+      "lens-eval-multilingual",
+      "lens-eval-typo"
+    ],
+    "items_per_dataset": 48,
+    "total_items": 192,
+    "split_rule": "sha256_sort_then_even_calibration_odd_holdout",
+    "candidate_rule": "single_token_raw_space_lower_title_variants",
+    "metric_rule": "minimum_full_vocabulary_rank_across_frozen_layers"
+  },
+  "frozen_gates": {
+    "matrix_finite": true,
+    "half_matrix_cosine_median_min": 0.8,
+    "half_matrix_cosine_layer_min": 0.4,
+    "half_relative_difference_median_max": 0.9,
+    "eligible_intermediate_fraction_min": 0.8,
+    "improved_fraction_each_split_min": 0.55,
+    "mrr_ratio_each_split_min": 1.1,
+    "pass_at_10_absolute_gain_each_split_min": 0.02,
+    "passing_evaluation_datasets_each_split_min": 2,
+    "cross_model_qualified_models_min": 2
+  },
+  "authorization_rule": "Only observer-qualified models may enter a later workspace-function audit. No Phase423 output authorizes workspace, compute-edge, causal, channel, or neuron claims.",
+  "fit_prompt_sha256": "1231b0e3ab38eeb8f902da7c04867da196438ca34187a2fe870a8ff8194d637a",
+  "evaluation_sha256": "3f21cd35c1599bc1b46a2aba42fad94c0eef2ec31698692a42566b873deec07f"
+}

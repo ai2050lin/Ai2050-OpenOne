@@ -1,0 +1,1271 @@
+{
+  "schema_version": "phase426_exact_position_role.v1",
+  "phase_id": "Phase426-GateFreeze",
+  "created_at": "2026-07-14T18:31:58.419211+00:00",
+  "open_audit_count": 6,
+  "cross_model_audit_count": 2,
+  "sealed_unlock": false,
+  "sealed_unlock_blocks": [],
+  "selected_depths_by_model_block": {
+    "qwen3::language_action_translate_role_swap": {
+      "formation": "late",
+      "transport": "late",
+      "competition": "late"
+    },
+    "qwen3::syntax_relative_clause_role_swap": {
+      "formation": "late",
+      "transport": "early",
+      "competition": "late"
+    },
+    "glm4::language_action_translate_role_swap": {
+      "formation": "late",
+      "transport": "early",
+      "competition": "late"
+    },
+    "glm4::syntax_relative_clause_role_swap": {
+      "formation": "early",
+      "transport": "early",
+      "competition": "early"
+    },
+    "deepseek7b::language_action_translate_role_swap": {
+      "formation": "late",
+      "transport": "late",
+      "competition": "early"
+    },
+    "deepseek7b::syntax_relative_clause_role_swap": {
+      "formation": "late",
+      "transport": "middle",
+      "competition": "middle"
+    }
+  },
+  "prediction_models_by_model_block": {
+    "qwen3::language_action_translate_role_swap": {
+      "effective_independent_fit_count": 32,
+      "targets": {
+        "early_role_teacher_sequence_margin_mean": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              66.078125,
+              2.6484375
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285
+            ],
+            "coefficient": [
+              -0.03982948915979287,
+              -0.09464084275304772
+            ],
+            "intercept": 0.546454483490625,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              66.078125,
+              2.6484375,
+              0.06261212190000001,
+              0.0003012583218749995,
+              0.00160481083125
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285,
+              0.003621952027397133,
+              0.02379701625717343,
+              0.0040903104610639195
+            ],
+            "coefficient": [
+              0.009673575154662531,
+              -0.060967767758171386,
+              0.09120722145553607,
+              0.05729341252443461,
+              -0.10525398724654696
+            ],
+            "intercept": 0.546454483490625,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": 0.2837163049,
+                "mae": 0.1369210688,
+                "truth_mean": 0.5305954697,
+                "prediction_mean": 0.5607126092
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.0908963468,
+                "mae": 0.1496706181,
+                "truth_mean": 0.5305954697,
+                "prediction_mean": 0.55155525
+              },
+              "delta_r2": -0.3746126517,
+              "mae_gain": -0.0127495493,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.1960530017,
+                "mae": 0.118857325,
+                "truth_mean": 0.5148950904,
+                "prediction_mean": 0.5173249639
+              },
+              "physical": {
+                "count": 32,
+                "r2": -2.5054154719,
+                "mae": 0.2001616991,
+                "truth_mean": 0.5148950904,
+                "prediction_mean": 0.5274706661
+              },
+              "delta_r2": -2.3093624702,
+              "mae_gain": -0.0813043741,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        },
+        "early_role_natural_target_fraction": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              66.078125,
+              2.6484375
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285
+            ],
+            "coefficient": [
+              0.011367415833848852,
+              -0.012447620901793653
+            ],
+            "intercept": 0.201171875,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              66.078125,
+              2.6484375,
+              0.06261212190000001,
+              0.0003012583218749995,
+              0.00160481083125
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285,
+              0.003621952027397133,
+              0.02379701625717343,
+              0.0040903104610639195
+            ],
+            "coefficient": [
+              0.03001683825696588,
+              0.002821526826145906,
+              0.03312268998636153,
+              -0.015177597167877805,
+              -0.016558328417351924
+            ],
+            "intercept": 0.201171875,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -1.1398684283,
+                "mae": 0.0530802514,
+                "truth_mean": 0.154296875,
+                "prediction_mean": 0.2011646201
+              },
+              "physical": {
+                "count": 32,
+                "r2": -1.5329113442,
+                "mae": 0.0534260241,
+                "truth_mean": 0.154296875,
+                "prediction_mean": 0.1839056331
+              },
+              "delta_r2": -0.3930429159,
+              "mae_gain": -0.0003457727,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.5253022697,
+                "mae": 0.0480111904,
+                "truth_mean": 0.1640625,
+                "prediction_mean": 0.1997365958
+              },
+              "physical": {
+                "count": 32,
+                "r2": -1.0983248583,
+                "mae": 0.0534895865,
+                "truth_mean": 0.1640625,
+                "prediction_mean": 0.1945559839
+              },
+              "delta_r2": -0.5730225886,
+              "mae_gain": -0.0054783961,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        }
+      },
+      "gate_pass": false
+    },
+    "qwen3::syntax_relative_clause_role_swap": {
+      "effective_independent_fit_count": 32,
+      "targets": {
+        "early_role_teacher_sequence_margin_mean": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              88.25,
+              3.5625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494
+            ],
+            "coefficient": [
+              -0.00971545384193917,
+              -0.009715453841939167
+            ],
+            "intercept": 0.769792758390625,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              88.25,
+              3.5625,
+              0.06612279273124999,
+              0.05150744765937498,
+              0.00474067844375
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494,
+              0.012329379992109094,
+              0.003882253560294973,
+              0.001615851083758069
+            ],
+            "coefficient": [
+              -0.005180777296782954,
+              -0.00518077729678295,
+              0.020846960321670917,
+              0.010034086779207876,
+              0.011120708772670771
+            ],
+            "intercept": 0.769792758390625,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.5024527172,
+                "mae": 0.0885740514,
+                "truth_mean": 0.7096929125,
+                "prediction_mean": 0.7728314766
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.625152307,
+                "mae": 0.0906907496,
+                "truth_mean": 0.7096929125,
+                "prediction_mean": 0.7770006739
+              },
+              "delta_r2": -0.1226995898,
+              "mae_gain": -0.0021166982,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.2154277983,
+                "mae": 0.073418689,
+                "truth_mean": 0.7262433866,
+                "prediction_mean": 0.7687798523
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.1622942111,
+                "mae": 0.0724228676,
+                "truth_mean": 0.7262433866,
+                "prediction_mean": 0.756578276
+              },
+              "delta_r2": 0.0531335872,
+              "mae_gain": 0.0009958214,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        },
+        "early_role_natural_target_fraction": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              88.25,
+              3.5625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494
+            ],
+            "coefficient": [
+              -0.010626215331754773,
+              -0.010626215331754769
+            ],
+            "intercept": 0.134765625,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              88.25,
+              3.5625,
+              0.06612279273124999,
+              0.05150744765937498,
+              0.00474067844375
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494,
+              0.012329379992109094,
+              0.003882253560294973,
+              0.001615851083758069
+            ],
+            "coefficient": [
+              -0.001403580188745948,
+              -0.001403580188745945,
+              0.025223506787051046,
+              0.03202547651499132,
+              -0.013117072395765848
+            ],
+            "intercept": 0.134765625,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.4209230392,
+                "mae": 0.060678172,
+                "truth_mean": 0.09765625,
+                "prediction_mean": 0.1380892036
+              },
+              "physical": {
+                "count": 32,
+                "r2": -1.2700026411,
+                "mae": 0.0705059255,
+                "truth_mean": 0.09765625,
+                "prediction_mean": 0.1511715486
+              },
+              "delta_r2": -0.8490796019,
+              "mae_gain": -0.0098277535,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.1407830001,
+                "mae": 0.0669786332,
+                "truth_mean": 0.111328125,
+                "prediction_mean": 0.1336577655
+              },
+              "physical": {
+                "count": 32,
+                "r2": 0.0091879465,
+                "mae": 0.0597072661,
+                "truth_mean": 0.111328125,
+                "prediction_mean": 0.1364877932
+              },
+              "delta_r2": 0.1499709466,
+              "mae_gain": 0.0072713671,
+              "gate_pass": true
+            }
+          },
+          "gate_pass": false
+        }
+      },
+      "gate_pass": false
+    },
+    "glm4::language_action_translate_role_swap": {
+      "effective_independent_fit_count": 32,
+      "targets": {
+        "early_role_teacher_sequence_margin_mean": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              68.078125,
+              2.6484375
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285
+            ],
+            "coefficient": [
+              0.00036715091685579333,
+              0.01363983207635658
+            ],
+            "intercept": -0.10099349028125001,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              68.078125,
+              2.6484375,
+              0.10622541670937502,
+              0.055468315721875015,
+              -0.007997051828124999
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285,
+              0.010906422835668216,
+              0.015325642230101919,
+              0.005104201216617588
+            ],
+            "coefficient": [
+              -0.006475304567797691,
+              0.010885901820216783,
+              -0.0197442581534558,
+              0.014146217143148149,
+              0.007128294735426216
+            ],
+            "intercept": -0.10099349028125001,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.0472066305,
+                "mae": 0.0977961517,
+                "truth_mean": -0.1440158527,
+                "prediction_mean": -0.1035928626
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.1814222576,
+                "mae": 0.1000250096,
+                "truth_mean": -0.1440158527,
+                "prediction_mean": -0.092307496
+              },
+              "delta_r2": -0.1342156271,
+              "mae_gain": -0.0022288579,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.8026930678,
+                "mae": 0.1160091363,
+                "truth_mean": -0.1924781963,
+                "prediction_mean": -0.0981473417
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.9386057226,
+                "mae": 0.1222385348,
+                "truth_mean": -0.1924781963,
+                "prediction_mean": -0.0986019253
+              },
+              "delta_r2": -0.1359126548,
+              "mae_gain": -0.0062293985,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        },
+        "early_role_natural_target_fraction": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              68.078125,
+              2.6484375
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285
+            ],
+            "coefficient": [
+              -0.0044909255715900286,
+              0.0212322481348638
+            ],
+            "intercept": 0.041015625,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              68.078125,
+              2.6484375,
+              0.10622541670937502,
+              0.055468315721875015,
+              -0.007997051828124999
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285,
+              0.010906422835668216,
+              0.015325642230101919,
+              0.005104201216617588
+            ],
+            "coefficient": [
+              -0.002500797171651734,
+              0.02101637799565083,
+              0.0012720386213194669,
+              0.00675203297715681,
+              0.00607542940799433
+            ],
+            "intercept": 0.041015625,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.3580914791,
+                "mae": 0.0494420977,
+                "truth_mean": 0.048828125,
+                "prediction_mean": 0.0379606467
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.4128840405,
+                "mae": 0.0493344137,
+                "truth_mean": 0.048828125,
+                "prediction_mean": 0.0326907831
+              },
+              "delta_r2": -0.0547925614,
+              "mae_gain": 0.000107684,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -1.1980607099,
+                "mae": 0.0378466509,
+                "truth_mean": 0.017578125,
+                "prediction_mean": 0.0449243059
+              },
+              "physical": {
+                "count": 32,
+                "r2": -1.1953642777,
+                "mae": 0.0367417339,
+                "truth_mean": 0.017578125,
+                "prediction_mean": 0.0420403169
+              },
+              "delta_r2": 0.0026964322,
+              "mae_gain": 0.001104917,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        }
+      },
+      "gate_pass": false
+    },
+    "glm4::syntax_relative_clause_role_swap": {
+      "effective_independent_fit_count": 32,
+      "targets": {
+        "early_role_teacher_sequence_margin_mean": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              90.25,
+              3.5625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494
+            ],
+            "coefficient": [
+              -0.004412565395637445,
+              -0.004412565395637443
+            ],
+            "intercept": -0.058278857946875,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              90.25,
+              3.5625,
+              0.0498341473125,
+              0.053358162337500015,
+              -0.0145643997625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494,
+              0.0029249919819498787,
+              0.013804289624079787,
+              0.0008376586848191924
+            ],
+            "coefficient": [
+              -0.0029896019689970572,
+              -0.0029896019689970538,
+              0.018314459399848992,
+              -0.01779846789851451,
+              -0.00032788615511652515
+            ],
+            "intercept": -0.058278857946875,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.0240910972,
+                "mae": 0.0661735554,
+                "truth_mean": -0.0401649662,
+                "prediction_mean": -0.0568987327
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.1045425114,
+                "mae": 0.0680239055,
+                "truth_mean": -0.0401649662,
+                "prediction_mean": -0.0601132101
+              },
+              "delta_r2": -0.0804514142,
+              "mae_gain": -0.0018503501,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": 0.0031360966,
+                "mae": 0.0659073666,
+                "truth_mean": -0.0653860075,
+                "prediction_mean": -0.0587388997
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.0128021025,
+                "mae": 0.065496444,
+                "truth_mean": -0.0653860075,
+                "prediction_mean": -0.0702496284
+              },
+              "delta_r2": -0.0159381991,
+              "mae_gain": 0.0004109226,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        },
+        "early_role_natural_target_fraction": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              90.25,
+              3.5625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494
+            ],
+            "coefficient": [
+              -0.010826709960655797,
+              -0.010826709960655797
+            ],
+            "intercept": 0.38671875,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              90.25,
+              3.5625,
+              0.0498341473125,
+              0.053358162337500015,
+              -0.0145643997625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494,
+              0.0029249919819498787,
+              0.013804289624079787,
+              0.0008376586848191924
+            ],
+            "coefficient": [
+              -0.010650770935513558,
+              -0.010650770935513556,
+              -0.001285274195194875,
+              -0.0014144225186470624,
+              0.007284342425663022
+            ],
+            "intercept": 0.38671875,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": 0.0691349434,
+                "mae": 0.0622336499,
+                "truth_mean": 0.373046875,
+                "prediction_mean": 0.3901050376
+              },
+              "physical": {
+                "count": 32,
+                "r2": 0.0101032811,
+                "mae": 0.0648971613,
+                "truth_mean": 0.373046875,
+                "prediction_mean": 0.3918256607
+              },
+              "delta_r2": -0.0590316623,
+              "mae_gain": -0.0026635114,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.0974585956,
+                "mae": 0.0516817125,
+                "truth_mean": 0.361328125,
+                "prediction_mean": 0.3855899875
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.1829159839,
+                "mae": 0.0536446085,
+                "truth_mean": 0.361328125,
+                "prediction_mean": 0.3873266427
+              },
+              "delta_r2": -0.0854573883,
+              "mae_gain": -0.001962896,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        }
+      },
+      "gate_pass": false
+    },
+    "deepseek7b::language_action_translate_role_swap": {
+      "effective_independent_fit_count": 32,
+      "targets": {
+        "early_role_teacher_sequence_margin_mean": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              66.078125,
+              2.6484375
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285
+            ],
+            "coefficient": [
+              0.009820286126706795,
+              0.023460516486825754
+            ],
+            "intercept": 0.080950894165625,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              66.078125,
+              2.6484375,
+              0.10751962530312498,
+              0.077429678740625,
+              -0.009692643440624997
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285,
+              0.005676540939801996,
+              0.021013956721415806,
+              0.0010207447058050187
+            ],
+            "coefficient": [
+              0.01130938487225981,
+              0.013892032502514055,
+              0.00956566761241561,
+              0.010559215937367682,
+              -0.00022205869573545324
+            ],
+            "intercept": 0.080950894165625,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": 0.1770041949,
+                "mae": 0.057132901,
+                "truth_mean": 0.0525304213,
+                "prediction_mean": 0.0774224612
+              },
+              "physical": {
+                "count": 32,
+                "r2": 0.0871878213,
+                "mae": 0.0588928124,
+                "truth_mean": 0.0525304213,
+                "prediction_mean": 0.0846637952
+              },
+              "delta_r2": -0.0898163736,
+              "mae_gain": -0.0017599114,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": 0.1548607789,
+                "mae": 0.0637573693,
+                "truth_mean": 0.0950510992,
+                "prediction_mean": 0.0881641566
+              },
+              "physical": {
+                "count": 32,
+                "r2": 0.2018306175,
+                "mae": 0.0618880815,
+                "truth_mean": 0.0950510992,
+                "prediction_mean": 0.080699111
+              },
+              "delta_r2": 0.0469698386,
+              "mae_gain": 0.0018692878,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        },
+        "early_role_natural_target_fraction": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              66.078125,
+              2.6484375
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285
+            ],
+            "coefficient": [
+              -0.02721954247016294,
+              -0.01299401858196225
+            ],
+            "intercept": 0.083984375,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              66.078125,
+              2.6484375,
+              0.10751962530312498,
+              0.077429678740625,
+              -0.009692643440624997
+            ],
+            "scale": [
+              1.5161081704070458,
+              0.37944951389315285,
+              0.005676540939801996,
+              0.021013956721415806,
+              0.0010207447058050187
+            ],
+            "coefficient": [
+              -0.0305081558876376,
+              -0.006647030510060765,
+              -0.02784630840297363,
+              0.0039416708774980685,
+              0.0015441046917630311
+            ],
+            "intercept": 0.083984375,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": 0.0130934215,
+                "mae": 0.0541248135,
+                "truth_mean": 0.08984375,
+                "prediction_mean": 0.0884078152
+              },
+              "physical": {
+                "count": 32,
+                "r2": 0.1462545442,
+                "mae": 0.0450242263,
+                "truth_mean": 0.08984375,
+                "prediction_mean": 0.0740756685
+              },
+              "delta_r2": 0.1331611227,
+              "mae_gain": 0.0091005872,
+              "gate_pass": true
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.4792860755,
+                "mae": 0.0397561002,
+                "truth_mean": 0.095703125,
+                "prediction_mean": 0.0768466213
+              },
+              "physical": {
+                "count": 32,
+                "r2": 0.0633978655,
+                "mae": 0.0315595819,
+                "truth_mean": 0.095703125,
+                "prediction_mean": 0.0876025428
+              },
+              "delta_r2": 0.542683941,
+              "mae_gain": 0.0081965183,
+              "gate_pass": true
+            }
+          },
+          "gate_pass": true
+        }
+      },
+      "gate_pass": false
+    },
+    "deepseek7b::syntax_relative_clause_role_swap": {
+      "effective_independent_fit_count": 32,
+      "targets": {
+        "early_role_teacher_sequence_margin_mean": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              88.25,
+              3.5625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494
+            ],
+            "coefficient": [
+              0.01670678057419004,
+              0.01670678057419004
+            ],
+            "intercept": 0.26015800905937503,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_teacher_sequence_margin_mean",
+            "mean": [
+              88.25,
+              3.5625,
+              0.07787297978437498,
+              0.09461653018437496,
+              -0.007168300031250001
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494,
+              0.004034129778471942,
+              0.007853351256936546,
+              0.0006847302429665386
+            ],
+            "coefficient": [
+              0.015601871192733492,
+              0.015601871192733485,
+              0.0016155228570348223,
+              0.01992414615065494,
+              -0.007913658436173369
+            ],
+            "intercept": 0.26015800905937503,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.013074001,
+                "mae": 0.047078476,
+                "truth_mean": 0.2442273293,
+                "prediction_mean": 0.2549326022
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.2424951643,
+                "mae": 0.0525921312,
+                "truth_mean": 0.2442273293,
+                "prediction_mean": 0.2587785909
+              },
+              "delta_r2": -0.2294211633,
+              "mae_gain": -0.0055136552,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.0387226525,
+                "mae": 0.0503306771,
+                "truth_mean": 0.2526451639,
+                "prediction_mean": 0.2618998113
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.1874055749,
+                "mae": 0.0545181906,
+                "truth_mean": 0.2526451639,
+                "prediction_mean": 0.2540189979
+              },
+              "delta_r2": -0.1486829224,
+              "mae_gain": -0.0041875135,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        },
+        "early_role_natural_target_fraction": {
+          "baseline_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              88.25,
+              3.5625
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494
+            ],
+            "coefficient": [
+              0.005613849609228937,
+              0.005613849609228935
+            ],
+            "intercept": 0.1328125,
+            "ridge_alpha": 1.0
+          },
+          "physical_model": {
+            "features": [
+              "executed_token_count_mean",
+              "target_sequence_token_count_mean",
+              "selected_formation",
+              "selected_transport",
+              "selected_competition"
+            ],
+            "target": "early_role_natural_target_fraction",
+            "mean": [
+              88.25,
+              3.5625,
+              0.07787297978437498,
+              0.09461653018437496,
+              -0.007168300031250001
+            ],
+            "scale": [
+              1.1989578808281798,
+              0.29973947020704494,
+              0.004034129778471942,
+              0.007853351256936546,
+              0.0006847302429665386
+            ],
+            "coefficient": [
+              0.005574289739691938,
+              0.005574289739691935,
+              0.0015103985235247301,
+              0.0076990077382096955,
+              -0.009444013828301498
+            ],
+            "intercept": 0.1328125,
+            "ridge_alpha": 1.0
+          },
+          "split_results": {
+            "calibration": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.0933232514,
+                "mae": 0.0192879259,
+                "truth_mean": 0.13671875,
+                "prediction_mean": 0.1310566472
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.1805195575,
+                "mae": 0.02032331,
+                "truth_mean": 0.13671875,
+                "prediction_mean": 0.1315363967
+              },
+              "delta_r2": -0.0871963061,
+              "mae_gain": -0.0010353841,
+              "gate_pass": false
+            },
+            "behavior_holdout": {
+              "baseline": {
+                "count": 32,
+                "r2": -0.2436989353,
+                "mae": 0.0194326139,
+                "truth_mean": 0.12109375,
+                "prediction_mean": 0.1333977843
+              },
+              "physical": {
+                "count": 32,
+                "r2": -0.5593411804,
+                "mae": 0.020838375,
+                "truth_mean": 0.12109375,
+                "prediction_mean": 0.1301465876
+              },
+              "delta_r2": -0.3156422451,
+              "mae_gain": -0.0014057611,
+              "gate_pass": false
+            }
+          },
+          "gate_pass": false
+        }
+      },
+      "gate_pass": false
+    }
+  },
+  "transport_map": "identity_only",
+  "thresholds": {
+    "component_ledger_relative_error_max": 0.01,
+    "role_covariance_min": 0.2,
+    "conditional_covariance_min": 0.2,
+    "replica_signal_ratio_min": 1.0,
+    "exact_position_specificity_min": 0.0,
+    "candidate_minus_control_min": 0.0,
+    "positive_group_fraction_min": 0.6666666666666666,
+    "source_to_write_identity_alignment_min": 0.2,
+    "teacher_sequence_correct_fraction_min": 0.75,
+    "natural_target_fraction_min": 0.75,
+    "prediction_r2_min": 0.0,
+    "prediction_delta_r2_min": 0.05,
+    "prediction_mae_gain_min": 0.0,
+    "cross_model_replication_min": 2,
+    "natural_generation_max_new_tokens": 8
+  },
+  "prohibited_after_freeze": [
+    "depth_change",
+    "feature_change",
+    "threshold_change",
+    "map_change",
+    "predictor_refit",
+    "sample_append"
+  ],
+  "causal_unlock": false,
+  "head_channel_neuron_scan_allowed": false
+}

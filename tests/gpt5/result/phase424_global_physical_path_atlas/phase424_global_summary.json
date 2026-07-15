@@ -1,0 +1,80 @@
+{
+  "schema_version": "phase424_global_physical_path.v1",
+  "phase_id": "Phase424-GlobalPhysicalPathAnalysis",
+  "created_at": "2026-07-14T13:59:10.987217+00:00",
+  "protocol_valid": true,
+  "models": {
+    "qwen3": {
+      "layer_count": 36,
+      "condition_count": 1728,
+      "pair_count": 864,
+      "branch_correct_pair_count": 813,
+      "physical_path_candidate_count": 2,
+      "observer_independent_formation_transport_candidate_count": 6,
+      "behavior_qualified_formation_transport_candidate_count": 4,
+      "predictive_path_candidate_count": 2,
+      "prediction_family_gate_count": 5,
+      "max_component_ledger_relative_error": 0.000629058,
+      "elapsed_seconds": 137.294087984
+    },
+    "glm4": {
+      "layer_count": 40,
+      "condition_count": 1728,
+      "pair_count": 864,
+      "branch_correct_pair_count": 821,
+      "physical_path_candidate_count": 3,
+      "observer_independent_formation_transport_candidate_count": 67,
+      "behavior_qualified_formation_transport_candidate_count": 60,
+      "predictive_path_candidate_count": 3,
+      "prediction_family_gate_count": 4,
+      "max_component_ledger_relative_error": 0.0078155583,
+      "elapsed_seconds": 173.914619443
+    },
+    "deepseek7b": {
+      "layer_count": 28,
+      "condition_count": 1728,
+      "pair_count": 864,
+      "branch_correct_pair_count": 554,
+      "physical_path_candidate_count": 1,
+      "observer_independent_formation_transport_candidate_count": 30,
+      "behavior_qualified_formation_transport_candidate_count": 1,
+      "predictive_path_candidate_count": 1,
+      "prediction_family_gate_count": 4,
+      "max_component_ledger_relative_error": 0.0058481657,
+      "elapsed_seconds": 124.786639575
+    }
+  },
+  "pair_summary_count": 2592,
+  "pair_layer_row_count": 89856,
+  "prediction_audit_count": 27,
+  "mechanism_map_count": 216,
+  "cross_model_map_count": 72,
+  "family_summary_count": 27,
+  "cross_model_predictive_topology_candidate_count": 0,
+  "cross_model_formation_transport_candidate_count": 10,
+  "cross_model_behavior_qualified_formation_transport_candidate_count": 2,
+  "strict_double_blind_mechanism_count": 0,
+  "causally_closed_mechanism_count": 0,
+  "strict_mechanism_closure": "0/72",
+  "overall_scientific_progress_percent": 21,
+  "progress_interval_percent": [
+    18,
+    24
+  ],
+  "conclusion": "部分模型内路径通过冻结预测门，但没有形成至少两个模型共享的有类型事件拓扑；它们仍是模型内候选，不是共同语言算法。",
+  "observer_jacobian_overlay": {
+    "source_phase": 423,
+    "qualified_models": [
+      "glm4"
+    ],
+    "used_as_compute_edge": false,
+    "used_as_cross_model_coordinate": false
+  },
+  "hard_limits": [
+    "Phase330 semantic items were previously exposed; legacy holdout is not double blind.",
+    "Target-versus-opposite readout directions are observers, not native compute edges.",
+    "Frozen ridge prediction is an audit and cannot establish mediation or causality.",
+    "No head, channel, or neuron intervention was executed.",
+    "Small-model topology may differ materially from larger language models."
+  ]
+}

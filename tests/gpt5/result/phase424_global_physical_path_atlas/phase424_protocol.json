@@ -1,0 +1,125 @@
+{
+  "schema_version": "phase424_global_physical_path.v1",
+  "phase": 424,
+  "phase_id": "Phase424-GlobalPhysicalPathProtocol",
+  "frozen_at": "2026-07-14T13:26:19.524408+00:00",
+  "title": "Nine-family formation-transport-competition physical path census",
+  "models_in_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "execution_dtype_by_model": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "source_case_bank": "tests/gpt5/result/phase330_nine_family_global_atlas/nine_family_global_atlas/phase330_case_bank.jsonl",
+  "source_case_bank_sha256": "82c296f76d3905f2d10d29deedc91c909d7a5391900acf28e2c98d4145f1f475",
+  "denominator": {
+    "families": 9,
+    "mechanisms": 72,
+    "items_per_mechanism": 24,
+    "pairs_per_mechanism": 12,
+    "total_pairs": 864,
+    "conditions_per_model": 1728,
+    "total_model_conditions": 5184,
+    "template": "template_a",
+    "split_pair_counts_per_mechanism": {
+      "discovery": 6,
+      "calibration": 2,
+      "behavior_holdout": 2,
+      "legacy_physical_holdout": 2
+    }
+  },
+  "evidence_contract": {
+    "compute_edges": [
+      "source residual -> value state",
+      "value state x actual attention probability -> output projection write",
+      "attention write + MLP write -> layer output"
+    ],
+    "observer_overlays": [
+      "target-versus-opposite unembedding direction",
+      "physical-to-behavior frozen ridge audit"
+    ],
+    "causal_claim_allowed": false,
+    "single_neuron_claim_allowed": false,
+    "workspace_claim_allowed": false
+  },
+  "frozen_features": {
+    "formation": "paired source-state contrast minus paired instruction-control contrast",
+    "transport": "paired legal source-write contrast minus paired instruction-control-write contrast",
+    "competition": "signed source write and query residual alignment to the frozen target-versus-opposite readout direction",
+    "depth_bins": [
+      "early",
+      "middle",
+      "late"
+    ],
+    "prediction_baseline": [
+      "executed_token_count_mean",
+      "source_token_count_mean",
+      "query_token_count_mean",
+      "control_token_count_mean",
+      "target_word_count_mean",
+      "target_leak_fraction"
+    ],
+    "prediction_physical": [
+      "formation_specificity_median",
+      "transport_contrast_specificity_median",
+      "source_mass_specificity_median",
+      "source_target_specificity_median",
+      "query_target_alignment_median",
+      "cancellation_index_median"
+    ]
+  },
+  "frozen_gates": {
+    "component_ledger_relative_error_max": 0.01,
+    "replication_positive_fraction_min": 0.75,
+    "replication_median_min": 0.0,
+    "behavior_pair_correct_fraction_min_each_split": 0.75,
+    "prediction_delta_r2_min_each_split": 0.05,
+    "prediction_mae_gain_min_each_split": 0.0,
+    "cross_model_topology_models_min": 2,
+    "strict_double_blind_required_for_closure": true,
+    "causal_intervention_required_for_closure": true
+  },
+  "split_status": {
+    "discovery": "development",
+    "calibration": "development_holdout",
+    "behavior_holdout": "behavior_holdout",
+    "legacy_physical_holdout": "previously_exposed_replication_only",
+    "strict_double_blind_holdout": "missing"
+  },
+  "phase_success_boundary": "This phase may complete an observer-independent physical census and identify replicated path candidates. It cannot close any mechanism because the source bank is previously exposed and no intervention is run.",
+  "selection_updates_allowed": false,
+  "validation": {
+    "family_count": 9,
+    "mechanism_count": 72,
+    "pair_count": 864,
+    "condition_count": 5184,
+    "conditions_per_model": {
+      "qwen3": 1728,
+      "glm4": 1728,
+      "deepseek7b": 1728
+    },
+    "pairs_per_split": {
+      "discovery": 432,
+      "calibration": 144,
+      "behavior_holdout": 144,
+      "legacy_physical_holdout": 144
+    },
+    "pair_count_values_by_mechanism_split": [
+      2,
+      6
+    ],
+    "missing_mechanism_count": 0,
+    "duplicate_pair_id_count": 0,
+    "duplicate_condition_id_count": 0,
+    "empty_position_condition_count": 0,
+    "legacy_physical_holdout_pair_count": 144,
+    "new_double_blind_pair_count": 0,
+    "valid": true
+  },
+  "pair_rows_sha256": "ca5bf895ae20676afde421699c4dfdb3b650aacaa3506579d935fc784e2b7bf1",
+  "condition_rows_sha256": "e45cc715af12622c1145cd189ca991bc98b1d9017fd39b8a0f176cf0bbd263fe"
+}

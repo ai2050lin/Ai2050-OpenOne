@@ -1,0 +1,915 @@
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-GateFreeze",
+  "created_at": "2026-07-14T15:35:53.323806+00:00",
+  "open_audit_count": 12,
+  "cross_model_audit_count": 4,
+  "sealed_unlock": false,
+  "sealed_unlock_blocks": [],
+  "selected_depths_by_model_block": {
+    "qwen3::language_action_translate_role_swap": {
+      "formation": "late",
+      "transport": "late",
+      "competition": "middle"
+    },
+    "qwen3::language_action_stable_mapping_control": {
+      "formation": "late",
+      "transport": "early",
+      "competition": "early"
+    },
+    "qwen3::syntax_relative_clause_role_swap": {
+      "formation": "middle",
+      "transport": "late",
+      "competition": "middle"
+    },
+    "qwen3::syntax_relative_clause_surface_control": {
+      "formation": "middle",
+      "transport": "late",
+      "competition": "late"
+    },
+    "glm4::language_action_translate_role_swap": {
+      "formation": "middle",
+      "transport": "early",
+      "competition": "late"
+    },
+    "glm4::language_action_stable_mapping_control": {
+      "formation": "middle",
+      "transport": "early",
+      "competition": "middle"
+    },
+    "glm4::syntax_relative_clause_role_swap": {
+      "formation": "middle",
+      "transport": "late",
+      "competition": "early"
+    },
+    "glm4::syntax_relative_clause_surface_control": {
+      "formation": "middle",
+      "transport": "middle",
+      "competition": "late"
+    },
+    "deepseek7b::language_action_translate_role_swap": {
+      "formation": "late",
+      "transport": "early",
+      "competition": "early"
+    },
+    "deepseek7b::language_action_stable_mapping_control": {
+      "formation": "late",
+      "transport": "early",
+      "competition": "late"
+    },
+    "deepseek7b::syntax_relative_clause_role_swap": {
+      "formation": "late",
+      "transport": "early",
+      "competition": "middle"
+    },
+    "deepseek7b::syntax_relative_clause_surface_control": {
+      "formation": "middle",
+      "transport": "middle",
+      "competition": "late"
+    }
+  },
+  "prediction_models_by_model_block": {
+    "qwen3::language_action_translate_role_swap": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          97.91666666666667,
+          2.0416666666666665,
+          12.5
+        ],
+        "scale": [
+          0.9537935951882996,
+          0.13819269959814168,
+          1.0
+        ],
+        "coefficient": [
+          0.011741252611413332,
+          -0.04646573506727471,
+          0.0
+        ],
+        "intercept": 1.5332031249916664,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          97.91666666666667,
+          2.0416666666666665,
+          12.5,
+          -0.2221367553,
+          -0.5989823836916667,
+          0.0004121336250000001
+        ],
+        "scale": [
+          0.9537935951882996,
+          0.13819269959814168,
+          1.0,
+          0.06492709164708704,
+          0.15370147668520323,
+          0.00032426857680902443
+        ],
+        "coefficient": [
+          0.0820729135890163,
+          0.026205480914246473,
+          0.0,
+          0.10435706533911793,
+          0.07875740613930725,
+          0.07936722287751272
+        ],
+        "intercept": 1.5332031249916664,
+        "ridge_alpha": 1.0
+      }
+    },
+    "qwen3::language_action_stable_mapping_control": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          102.375,
+          2.0416666666666665,
+          12.5
+        ],
+        "scale": [
+          0.8926785535678563,
+          0.13819269959814168,
+          1.0
+        ],
+        "coefficient": [
+          0.1400161356664253,
+          -0.10000554406971454,
+          0.0
+        ],
+        "intercept": -2.2775065104,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          102.375,
+          2.0416666666666665,
+          12.5,
+          -0.15925561400000002,
+          -0.5727998113166667,
+          0.005352545283333333
+        ],
+        "scale": [
+          0.8926785535678563,
+          0.13819269959814168,
+          1.0,
+          0.02185131681415842,
+          0.04323078564446461,
+          0.0018412998163463991
+        ],
+        "coefficient": [
+          0.021611949057862307,
+          0.027312015281180654,
+          0.0,
+          0.09683397884491006,
+          -0.1818634084802166,
+          0.039150258190656755
+        ],
+        "intercept": -2.2775065104,
+        "ridge_alpha": 1.0
+      }
+    },
+    "qwen3::syntax_relative_clause_role_swap": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          56.25,
+          2.75,
+          8.5
+        ],
+        "scale": [
+          1.25,
+          0.25,
+          1.0
+        ],
+        "coefficient": [
+          -0.020312500000000008,
+          -0.020312499999999994,
+          0.0
+        ],
+        "intercept": 3.33544921875,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          56.25,
+          2.75,
+          8.5,
+          -0.11681374004166667,
+          0.025618831883333328,
+          0.001134163916666667
+        ],
+        "scale": [
+          1.25,
+          0.25,
+          1.0,
+          0.05566496180021207,
+          0.024222649553209442,
+          0.00035693247305525644
+        ],
+        "coefficient": [
+          -0.07066511800399612,
+          -0.07066511800399608,
+          0.0,
+          0.04663887546015202,
+          -0.01942980800210542,
+          0.09415548167551538
+        ],
+        "intercept": 3.33544921875,
+        "ridge_alpha": 1.0
+      }
+    },
+    "qwen3::syntax_relative_clause_surface_control": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          56.291666666666664,
+          2.4583333333333335,
+          8.5
+        ],
+        "scale": [
+          1.6002386974726266,
+          0.32004773949452536,
+          1.0
+        ],
+        "coefficient": [
+          0.10663031215457261,
+          0.10663031215457319,
+          0.0
+        ],
+        "intercept": 5.175089518233333,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          56.291666666666664,
+          2.4583333333333335,
+          8.5,
+          -0.06324319383333334,
+          -0.24469426274999997,
+          0.04514090044999999
+        ],
+        "scale": [
+          1.6002386974726266,
+          0.32004773949452536,
+          1.0,
+          0.01755054006553508,
+          0.04242432646886458,
+          0.002124305967605933
+        ],
+        "coefficient": [
+          0.01934484238478108,
+          0.019344842384780733,
+          0.0,
+          0.16680943469342907,
+          -0.03349536820571813,
+          -0.06734792027256835
+        ],
+        "intercept": 5.175089518233333,
+        "ridge_alpha": 1.0
+      }
+    },
+    "glm4::language_action_translate_role_swap": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          99.875,
+          2.0416666666666665,
+          12.5
+        ],
+        "scale": [
+          0.960143218483576,
+          0.13819269959814168,
+          1.0
+        ],
+        "coefficient": [
+          0.044424562561532946,
+          -0.00886489262630003,
+          0.0
+        ],
+        "intercept": 0.39807128906666667,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          99.875,
+          2.0416666666666665,
+          12.5,
+          -0.258731357175,
+          -0.6633608977416666,
+          -3.815835833333333e-05
+        ],
+        "scale": [
+          0.960143218483576,
+          0.13819269959814168,
+          1.0,
+          0.0547279242773134,
+          0.044949692393414814,
+          0.00019770335600834086
+        ],
+        "coefficient": [
+          0.049266220273465146,
+          -0.0019017395972304515,
+          0.0,
+          -0.02765857084950702,
+          0.04262551558126271,
+          -0.01780833229281256
+        ],
+        "intercept": 0.39807128906666667,
+        "ridge_alpha": 1.0
+      }
+    },
+    "glm4::language_action_stable_mapping_control": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          104.33333333333333,
+          2.0416666666666665,
+          12.5
+        ],
+        "scale": [
+          0.9204467514322715,
+          0.13819269959814168,
+          1.0
+        ],
+        "coefficient": [
+          0.10124562067293569,
+          -0.1710011130496819,
+          0.0
+        ],
+        "intercept": 1.3874918619749999,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          104.33333333333333,
+          2.0416666666666665,
+          12.5,
+          -0.152167861275,
+          -0.6614988980250001,
+          0.004700923825000001
+        ],
+        "scale": [
+          0.9204467514322715,
+          0.13819269959814168,
+          1.0,
+          0.028548812699579224,
+          0.040605144654665075,
+          0.0013382563987597883
+        ],
+        "coefficient": [
+          0.17424857969284638,
+          -0.21300338655744275,
+          0.0,
+          0.006687850652898335,
+          0.021663500823844235,
+          0.11730147109199998
+        ],
+        "intercept": 1.3874918619749999,
+        "ridge_alpha": 1.0
+      }
+    },
+    "glm4::syntax_relative_clause_role_swap": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          58.041666666666664,
+          2.7083333333333335,
+          8.5
+        ],
+        "scale": [
+          1.2325166214790866,
+          0.24650332429581734,
+          1.0
+        ],
+        "coefficient": [
+          -0.0251367363152911,
+          -0.025136736315291237,
+          0.0
+        ],
+        "intercept": 3.3176269531166667,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          58.041666666666664,
+          2.7083333333333335,
+          8.5,
+          -0.16467603669166664,
+          -0.12583553885833335,
+          3.875195000000001e-05
+        ],
+        "scale": [
+          1.2325166214790866,
+          0.24650332429581734,
+          1.0,
+          0.09391793543827888,
+          0.059949059730610856,
+          5.403594562556638e-05
+        ],
+        "coefficient": [
+          -0.05781576988811757,
+          -0.057815769888117714,
+          0.0,
+          0.052181052762838014,
+          0.04122852904005525,
+          -0.040681034451118904
+        ],
+        "intercept": 3.3176269531166667,
+        "ridge_alpha": 1.0
+      }
+    },
+    "glm4::syntax_relative_clause_surface_control": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          58.291666666666664,
+          2.4583333333333335,
+          8.5
+        ],
+        "scale": [
+          1.6002386974726266,
+          0.32004773949452536,
+          1.0
+        ],
+        "coefficient": [
+          -0.2248708306933624,
+          -0.22487083069336186,
+          0.0
+        ],
+        "intercept": 1.3995768229166667,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          58.291666666666664,
+          2.4583333333333335,
+          8.5,
+          -0.07983438686666666,
+          -0.14153426391666668,
+          0.01768300321666667
+        ],
+        "scale": [
+          1.6002386974726266,
+          0.32004773949452536,
+          1.0,
+          0.02969214401951671,
+          0.03436303483585967,
+          0.0021744138534571657
+        ],
+        "coefficient": [
+          -0.016211430059196584,
+          -0.016211430059194294,
+          0.0,
+          -0.17749464296032236,
+          -0.054078758234333286,
+          0.4033564727471787
+        ],
+        "intercept": 1.3995768229166667,
+        "ridge_alpha": 1.0
+      }
+    },
+    "deepseek7b::language_action_translate_role_swap": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          97.91666666666667,
+          2.0416666666666665,
+          12.5
+        ],
+        "scale": [
+          0.9537935951882996,
+          0.13819269959814168,
+          1.0
+        ],
+        "coefficient": [
+          -0.004280530067797111,
+          0.04377750340657711,
+          0.0
+        ],
+        "intercept": 0.19746907550833334,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          97.91666666666667,
+          2.0416666666666665,
+          12.5,
+          -0.17926725575,
+          -0.6356553072916667,
+          -0.00015970234166666665
+        ],
+        "scale": [
+          0.9537935951882996,
+          0.13819269959814168,
+          1.0,
+          0.04144079559039621,
+          0.07501943225515596,
+          0.0001135099775829307
+        ],
+        "coefficient": [
+          -0.03369801176898839,
+          -0.012370320075002049,
+          0.0,
+          -0.03223093676534106,
+          -0.0343950752063038,
+          0.04524207042303352
+        ],
+        "intercept": 0.19746907550833334,
+        "ridge_alpha": 1.0
+      }
+    },
+    "deepseek7b::language_action_stable_mapping_control": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          102.375,
+          2.0416666666666665,
+          12.5
+        ],
+        "scale": [
+          0.8926785535678563,
+          0.13819269959814168,
+          1.0
+        ],
+        "coefficient": [
+          -0.22556316038813393,
+          0.007757199213187288,
+          0.0
+        ],
+        "intercept": -0.5657552083333334,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          102.375,
+          2.0416666666666665,
+          12.5,
+          -0.17308364163333334,
+          -0.60349420385,
+          0.005415160483333334
+        ],
+        "scale": [
+          0.8926785535678563,
+          0.13819269959814168,
+          1.0,
+          0.025410392638955278,
+          0.021787744561333065,
+          0.001886452623414026
+        ],
+        "coefficient": [
+          -0.2783808584135696,
+          -0.027925878553318198,
+          0.0,
+          -0.04571285227952184,
+          0.02222242777488254,
+          -0.1183868771193846
+        ],
+        "intercept": -0.5657552083333334,
+        "ridge_alpha": 1.0
+      }
+    },
+    "deepseek7b::syntax_relative_clause_role_swap": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          56.25,
+          2.75,
+          8.5
+        ],
+        "scale": [
+          1.25,
+          0.25,
+          1.0
+        ],
+        "coefficient": [
+          0.040703125000000014,
+          0.040703124999999986,
+          0.0
+        ],
+        "intercept": 0.9549153645833334,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          56.25,
+          2.75,
+          8.5,
+          -0.13006963390833334,
+          -0.4390771287333333,
+          0.0008546151916666666
+        ],
+        "scale": [
+          1.25,
+          0.25,
+          1.0,
+          0.06035498380536749,
+          0.13721578772118975,
+          0.000761605906999303
+        ],
+        "coefficient": [
+          -0.018096696238842486,
+          -0.018096696238842462,
+          0.0,
+          0.09440382599681957,
+          0.043813137732603195,
+          0.018272607727854
+        ],
+        "intercept": 0.9549153645833334,
+        "ridge_alpha": 1.0
+      }
+    },
+    "deepseek7b::syntax_relative_clause_surface_control": {
+      "baseline_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean"
+        ],
+        "mean": [
+          56.291666666666664,
+          2.4583333333333335,
+          8.5
+        ],
+        "scale": [
+          1.6002386974726266,
+          0.32004773949452536,
+          1.0
+        ],
+        "coefficient": [
+          -0.08375825640055352,
+          -0.08375825640055344,
+          0.0
+        ],
+        "intercept": 0.80810546875,
+        "ridge_alpha": 1.0
+      },
+      "physical_model": {
+        "features": [
+          "executed_token_count_mean",
+          "source_token_count_mean",
+          "query_token_count_mean",
+          "selected_formation",
+          "selected_transport",
+          "selected_competition"
+        ],
+        "mean": [
+          56.291666666666664,
+          2.4583333333333335,
+          8.5,
+          -0.014938294525000001,
+          -0.0276882394,
+          0.0030980688916666665
+        ],
+        "scale": [
+          1.6002386974726266,
+          0.32004773949452536,
+          1.0,
+          0.015700224347398862,
+          0.03324290978836019,
+          0.001539903393194558
+        ],
+        "coefficient": [
+          -0.009161397729635966,
+          -0.009161397729635309,
+          0.0,
+          -0.04921437850688938,
+          0.17790422392703814,
+          0.16748416086524315
+        ],
+        "intercept": 0.80810546875,
+        "ridge_alpha": 1.0
+      }
+    }
+  },
+  "cross_model_open_audits": {
+    "language_action_translate_role_swap": {
+      "schema_version": "phase425_role_exchange.v2",
+      "phase_id": "Phase425-CrossModelOpenAudit",
+      "created_at": "2026-07-14T15:35:53.323792+00:00",
+      "block_id": "language_action_translate_role_swap",
+      "family_id": "language_action",
+      "mechanism_id": "translate",
+      "candidate": true,
+      "matched_control_block_id": "language_action_stable_mapping_control",
+      "open_path_models": [],
+      "best_topology": null,
+      "best_topology_models": [],
+      "cross_model_open_gate_pass": false,
+      "sealed_tested": false,
+      "sealed_gate_pass": false,
+      "causal": false,
+      "matched_control_cross_model_gate_pass": false,
+      "specificity_gate_pass": false
+    },
+    "language_action_stable_mapping_control": {
+      "schema_version": "phase425_role_exchange.v2",
+      "phase_id": "Phase425-CrossModelOpenAudit",
+      "created_at": "2026-07-14T15:35:53.323797+00:00",
+      "block_id": "language_action_stable_mapping_control",
+      "family_id": "language_action",
+      "mechanism_id": "translate_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "language_action_translate_role_swap",
+      "open_path_models": [],
+      "best_topology": null,
+      "best_topology_models": [],
+      "cross_model_open_gate_pass": false,
+      "sealed_tested": false,
+      "sealed_gate_pass": false,
+      "causal": false,
+      "matched_control_cross_model_gate_pass": false,
+      "specificity_gate_pass": false
+    },
+    "syntax_relative_clause_role_swap": {
+      "schema_version": "phase425_role_exchange.v2",
+      "phase_id": "Phase425-CrossModelOpenAudit",
+      "created_at": "2026-07-14T15:35:53.323800+00:00",
+      "block_id": "syntax_relative_clause_role_swap",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role",
+      "candidate": true,
+      "matched_control_block_id": "syntax_relative_clause_surface_control",
+      "open_path_models": [],
+      "best_topology": null,
+      "best_topology_models": [],
+      "cross_model_open_gate_pass": false,
+      "sealed_tested": false,
+      "sealed_gate_pass": false,
+      "causal": false,
+      "matched_control_cross_model_gate_pass": false,
+      "specificity_gate_pass": false
+    },
+    "syntax_relative_clause_surface_control": {
+      "schema_version": "phase425_role_exchange.v2",
+      "phase_id": "Phase425-CrossModelOpenAudit",
+      "created_at": "2026-07-14T15:35:53.323802+00:00",
+      "block_id": "syntax_relative_clause_surface_control",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "syntax_relative_clause_role_swap",
+      "open_path_models": [],
+      "best_topology": null,
+      "best_topology_models": [],
+      "cross_model_open_gate_pass": false,
+      "sealed_tested": false,
+      "sealed_gate_pass": false,
+      "causal": false,
+      "matched_control_cross_model_gate_pass": false,
+      "specificity_gate_pass": false
+    }
+  },
+  "thresholds": {
+    "behavior_correct_fraction_min": 0.75,
+    "signal_positive_fraction_min": 0.6666666666666666,
+    "signal_median_min": 0.0,
+    "role_delta_coherence_min": 0.2,
+    "prediction_r2_min": 0.0,
+    "prediction_delta_r2_min": 0.05,
+    "prediction_mae_gain_min": 0.0,
+    "cross_model_replication_min": 2,
+    "component_ledger_relative_error_max": 0.01
+  },
+  "prohibited_after_freeze": [
+    "depth_change",
+    "feature_change",
+    "threshold_change",
+    "topology_change",
+    "predictor_refit"
+  ],
+  "causal_unlock": false,
+  "head_channel_neuron_scan_allowed": false
+}

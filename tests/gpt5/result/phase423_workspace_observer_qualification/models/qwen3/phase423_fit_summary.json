@@ -1,0 +1,140 @@
+{
+  "schema_version": "phase423_workspace_observer_fit.v1",
+  "phase": 423,
+  "model": "qwen3",
+  "model_adapter": "HFLensModel(Qwen3ForCausalLM, n_layers=36, d_model=2560)",
+  "dtype": "torch.bfloat16",
+  "official_implementation_commit": "581d398613e5602a5af361e1c34d3a92ea82ba8e",
+  "source_layers": [
+    0,
+    4,
+    8,
+    13,
+    17,
+    21,
+    26,
+    30,
+    34
+  ],
+  "relative_source_depths": [
+    0.0,
+    0.1142857143,
+    0.2285714286,
+    0.3714285714,
+    0.4857142857,
+    0.6,
+    0.7428571429,
+    0.8571428571,
+    0.9714285714
+  ],
+  "target_layer": 35,
+  "d_model": 2560,
+  "n_prompts_fit_a": 50,
+  "n_prompts_fit_b": 50,
+  "n_prompts_merged": 100,
+  "dim_batch": 8,
+  "split_seconds": {
+    "fit_a": 804.5415492291,
+    "fit_b": 806.597142293
+  },
+  "wall_seconds": 1614.023085474,
+  "vram_allocated_gb_at_end": 8.118749184,
+  "vram_reserved_gb_at_end": 10.775166976,
+  "matrix_stability": [
+    {
+      "layer": 0,
+      "matrix_cosine": 0.7728385925,
+      "relative_difference": 0.6793895364,
+      "a_frobenius_norm": 129.3030700684,
+      "b_frobenius_norm": 119.319770813,
+      "finite": true
+    },
+    {
+      "layer": 4,
+      "matrix_cosine": 0.812754631,
+      "relative_difference": 0.6162031293,
+      "a_frobenius_norm": 74.0203552246,
+      "b_frobenius_norm": 69.9479751587,
+      "finite": true
+    },
+    {
+      "layer": 8,
+      "matrix_cosine": 0.8883320093,
+      "relative_difference": 0.4800254703,
+      "a_frobenius_norm": 63.9569129944,
+      "b_frobenius_norm": 59.5818061829,
+      "finite": true
+    },
+    {
+      "layer": 13,
+      "matrix_cosine": 0.9518598318,
+      "relative_difference": 0.3230727613,
+      "a_frobenius_norm": 89.5108413696,
+      "b_frobenius_norm": 83.0343170166,
+      "finite": true
+    },
+    {
+      "layer": 17,
+      "matrix_cosine": 0.974843204,
+      "relative_difference": 0.2397424877,
+      "a_frobenius_norm": 105.5241546631,
+      "b_frobenius_norm": 98.7035064697,
+      "finite": true
+    },
+    {
+      "layer": 21,
+      "matrix_cosine": 0.9861939549,
+      "relative_difference": 0.1774334311,
+      "a_frobenius_norm": 95.7685623169,
+      "b_frobenius_norm": 91.5884475708,
+      "finite": true
+    },
+    {
+      "layer": 26,
+      "matrix_cosine": 0.9947835803,
+      "relative_difference": 0.1099000201,
+      "a_frobenius_norm": 76.2667922974,
+      "b_frobenius_norm": 76.6552581787,
+      "finite": true
+    },
+    {
+      "layer": 30,
+      "matrix_cosine": 0.9983274937,
+      "relative_difference": 0.0729018971,
+      "a_frobenius_norm": 68.4903793335,
+      "b_frobenius_norm": 69.1913909912,
+      "finite": true
+    },
+    {
+      "layer": 34,
+      "matrix_cosine": 1.0,
+      "relative_difference": 0.0222106688,
+      "a_frobenius_norm": 55.8364372253,
+      "b_frobenius_norm": 55.9853515625,
+      "finite": true
+    }
+  ],
+  "matrix_cosine_median": 0.974843204,
+  "matrix_cosine_min": 0.7728385925,
+  "relative_difference_median": 0.2397424877,
+  "matrix_finite": true,
+  "fit_reproducibility_gate_pass": true,
+  "lens_files": {
+    "fit_a": "tests/gpt5/result/phase423_workspace_observer_qualification/models/qwen3/phase423_jacobian_lens_fit_a.pt",
+    "fit_b": "tests/gpt5/result/phase423_workspace_observer_qualification/models/qwen3/phase423_jacobian_lens_fit_b.pt",
+    "merged": "tests/gpt5/result/phase423_workspace_observer_qualification/models/qwen3/phase423_jacobian_lens_merged.pt"
+  },
+  "lens_file_sizes": {
+    "fit_a": 117968461,
+    "fit_b": 117968461,
+    "merged": 117968474
+  },
+  "lens_sha256": {
+    "fit_a": "f8602009a4b8e9b1c4ce55c81d7f8811f35dc09804cc0d9323ef3136b2d054a0",
+    "fit_b": "3d59c29b533bedc31362c0a621e3391a5ad6b6aae2dfcc0734ea0a4075a1a8ca",
+    "merged": "873fb4d66ade0c6cd9605ef7b75b5a7fcfc45b930cb798108532bcd716c77373"
+  },
+  "semantic_interpretation_allowed": false,
+  "completed_at": "2026-07-14T09:41:51.921279+00:00",
+  "summary_recomputed_at": "2026-07-14T09:42:25.709018+00:00"
+}

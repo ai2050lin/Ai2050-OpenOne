@@ -1,0 +1,737 @@
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-RoleExchangeProtocol",
+  "created_at": "2026-07-14T15:14:39.740444+00:00",
+  "objective": "Distinguish matched-literal functional-role formation from lexical, position, interface and history separation before any sealed or causal promotion.",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "blocks": [
+    {
+      "block_id": "language_action_translate_role_swap",
+      "family_id": "language_action",
+      "mechanism_id": "translate",
+      "candidate": true,
+      "matched_control_block_id": "language_action_stable_mapping_control"
+    },
+    {
+      "block_id": "language_action_stable_mapping_control",
+      "family_id": "language_action",
+      "mechanism_id": "translate_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "language_action_translate_role_swap"
+    },
+    {
+      "block_id": "syntax_relative_clause_role_swap",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role",
+      "candidate": true,
+      "matched_control_block_id": "syntax_relative_clause_surface_control"
+    },
+    {
+      "block_id": "syntax_relative_clause_surface_control",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "syntax_relative_clause_role_swap"
+    }
+  ],
+  "interfaces": [
+    "direct",
+    "result_field"
+  ],
+  "histories": [
+    "bare",
+    "worked_example"
+  ],
+  "roles": [
+    "a",
+    "b"
+  ],
+  "execution_dtype_by_model": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "registered_thresholds": {
+    "behavior_correct_fraction_min": 0.75,
+    "signal_positive_fraction_min": 0.6666666666666666,
+    "signal_median_min": 0.0,
+    "role_delta_coherence_min": 0.2,
+    "prediction_r2_min": 0.0,
+    "prediction_delta_r2_min": 0.05,
+    "prediction_mae_gain_min": 0.0,
+    "cross_model_replication_min": 2,
+    "component_ledger_relative_error_max": 0.01
+  },
+  "split_contract": {
+    "discovery_pairs_per_block": 24,
+    "calibration_pairs_per_block": 24,
+    "behavior_holdout_pairs_per_block": 24,
+    "sealed_physical_holdout_pairs_per_block": 24,
+    "conditions_per_pair_per_model": 8,
+    "replica_pairs_per_group": 2,
+    "split_unit": "lexical_replica_group"
+  },
+  "prediction_contract": {
+    "baseline_features": [
+      "executed_token_count_mean",
+      "source_token_count_mean",
+      "query_token_count_mean"
+    ],
+    "physical_features": [
+      "formation_specificity",
+      "transport_specificity",
+      "competition_specificity"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_split": "discovery",
+    "gate_splits": [
+      "calibration",
+      "behavior_holdout"
+    ],
+    "sealed_split_used_for_selection": false
+  },
+  "role_signal_contract": {
+    "functional_specificity": "role contrast minus the larger matched-position or interface-history contrast",
+    "role_dominance": "role contrast minus lexical-main-effect contrast",
+    "strict_path_specificity": "minimum of functional specificity and role dominance",
+    "cross_lexical_covariance": "cosine agreement of role-difference vectors across two lexical replicas",
+    "interpretation": "functional specificity is evidence for a reusable role component; positive role dominance is the stronger Phase425 sealed-unlock requirement"
+  },
+  "evidence_contract": {
+    "attention_source_write_is_legal_compute_quantity": true,
+    "event_order_graph_edges_are_compute_edges": false,
+    "competition_is_observer": true,
+    "strict_human_double_blind": false,
+    "pipeline_sealed": true,
+    "causal_claim_allowed_before_sealed_pass": false,
+    "head_channel_neuron_scan_allowed": false
+  },
+  "pair_rows_sha256": "487399f50a2fc901667148c004c979e7f29f64c33e60d11d16a05efcb293c39b",
+  "open_condition_rows_sha256": "11981ca44e1823865383aa71ebb78423f8d50997ee1c696a1d7d7bc0b78154bc",
+  "implementation_commitments": {
+    "phase425_role_exchange_protocol.py": "f86c2cc6bfcd721e1cd6c9ec85b269b755888ce2c53dc612b3dc9c329dd85b6b",
+    "phase425_role_exchange_collect.py": "50c8253ddfbeae8bbbea8178fe73a3fb62088313107a8b79f6753944186ff603",
+    "phase425_role_exchange_analysis.py": "8646c90b4e0fc99411262ed1072a6e63db856d05aa0176141a0e46a396e536e7"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase425_role_exchange.v2",
+    "phase_id": "Phase425-RoleExchangeProtocol",
+    "created_at": "2026-07-14T15:14:39.722632+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_condition_count": 2304,
+    "sealed_condition_rows_sha256": "4485572ac79ccd982214dabbea9a6c281fa6edf7d234fb231e48d31863d5ad1c",
+    "sealed_prompt_hashes_sha256": "8d6fbe0c06c0ca67b468b3c72de0d104bddef59586e5a79158bf0ce6389a5113",
+    "human_double_blind": false,
+    "pipeline_sealed_until_gate_freeze": true
+  },
+  "validation": {
+    "valid": true,
+    "block_count": 4,
+    "pair_count": 384,
+    "condition_count": 9216,
+    "open_condition_count": 6912,
+    "sealed_condition_count": 2304,
+    "pair_counts_by_block": {
+      "language_action_stable_mapping_control": 96,
+      "language_action_translate_role_swap": 96,
+      "syntax_relative_clause_role_swap": 96,
+      "syntax_relative_clause_surface_control": 96
+    },
+    "pair_counts_by_split": {
+      "behavior_holdout": 96,
+      "calibration": 96,
+      "discovery": 96,
+      "sealed_physical_holdout": 96
+    },
+    "condition_counts_by_model": {
+      "deepseek7b": 3072,
+      "glm4": 3072,
+      "qwen3": 3072
+    },
+    "condition_counts_by_block": {
+      "language_action_stable_mapping_control": 2304,
+      "language_action_translate_role_swap": 2304,
+      "syntax_relative_clause_role_swap": 2304,
+      "syntax_relative_clause_surface_control": 2304
+    },
+    "condition_counts_by_split": {
+      "behavior_holdout": 2304,
+      "calibration": 2304,
+      "discovery": 2304,
+      "sealed_physical_holdout": 2304
+    },
+    "replica_group_count": 192,
+    "replica_group_split_leak_count": 0
+  }
+}
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-RoleExchangeCollection",
+  "created_at": "2026-07-14T15:18:40.424312+00:00",
+  "model": "qwen3",
+  "stage": "open",
+  "authorized_blocks": [
+    "language_action_stable_mapping_control",
+    "language_action_translate_role_swap",
+    "syntax_relative_clause_role_swap",
+    "syntax_relative_clause_surface_control"
+  ],
+  "layer_count": 36,
+  "execution_dtype": "float16",
+  "protocol_schema_version": "phase425_role_exchange.v2",
+  "collector_sha256": "50c8253ddfbeae8bbbea8178fe73a3fb62088313107a8b79f6753944186ff603",
+  "condition_count": 2304,
+  "pair_count": 288,
+  "replica_group_count": 144,
+  "condition_layer_row_count": 82944,
+  "pair_layer_row_count": 10368,
+  "group_layer_row_count": 5184,
+  "expected_condition_layer_row_count": 82944,
+  "expected_pair_layer_row_count": 10368,
+  "expected_group_layer_row_count": 5184,
+  "condition_correct_count": 1477,
+  "numerical_retry_condition_count": 0,
+  "max_component_ledger_relative_error": 0.000672068,
+  "component_ledger_gate_pass": true,
+  "all_rows_complete": true,
+  "condition_rows_sha256": "cc2d97d8a9e2f078bd9415af7b538a3e527c0e10a9cc3cb5b2c638a74d4f79c6",
+  "pair_layer_rows_sha256": "d8fdda6409f2f7661b970bc313f83d354619db0d88b6de2438adafb83d57d20c",
+  "group_layer_rows_sha256": "fe62043221bf2a121d5a829763e3504d5a0b2944bc04ac252abbd8e9175b3085",
+  "pair_summary_rows_sha256": "a013b33f060eaee3661121430dc7c93940d61195df14e31c2704f21433b95891",
+  "group_summary_rows_sha256": "79cfb015b289e30e94374720a185f50e13b8534355e12d633542d62e764001fe",
+  "elapsed_seconds": 211.807610403,
+  "vram_gb": [
+    8.110229504,
+    9.263120384
+  ],
+  "pipeline_sealed_stage": false,
+  "strict_human_double_blind": false,
+  "physical": true,
+  "observer_overlay": true,
+  "predictive": false,
+  "causal": false
+}
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-RoleExchangeCollection",
+  "created_at": "2026-07-14T15:23:44.454659+00:00",
+  "model": "glm4",
+  "stage": "open",
+  "authorized_blocks": [
+    "language_action_stable_mapping_control",
+    "language_action_translate_role_swap",
+    "syntax_relative_clause_role_swap",
+    "syntax_relative_clause_surface_control"
+  ],
+  "layer_count": 40,
+  "execution_dtype": "bfloat16",
+  "protocol_schema_version": "phase425_role_exchange.v2",
+  "collector_sha256": "50c8253ddfbeae8bbbea8178fe73a3fb62088313107a8b79f6753944186ff603",
+  "condition_count": 2304,
+  "pair_count": 288,
+  "replica_group_count": 144,
+  "condition_layer_row_count": 92160,
+  "pair_layer_row_count": 11520,
+  "group_layer_row_count": 5760,
+  "expected_condition_layer_row_count": 92160,
+  "expected_pair_layer_row_count": 11520,
+  "expected_group_layer_row_count": 5760,
+  "condition_correct_count": 1643,
+  "numerical_retry_condition_count": 0,
+  "max_component_ledger_relative_error": 0.0077181741,
+  "component_ledger_gate_pass": true,
+  "all_rows_complete": true,
+  "condition_rows_sha256": "f3ad178c37cd741dab53e0d84cb0e889614039c5f08ef68ba6becf4e42182ce6",
+  "pair_layer_rows_sha256": "8287f354f0d0c496672efd40217d896df2cbbdad9f95005a22738e475d0174e6",
+  "group_layer_rows_sha256": "80db4f268646c0f4cf08c7a8a44c87509d10572325cdbedbe47c897d592cb00f",
+  "pair_summary_rows_sha256": "f5ea9e20c3ce365aaa430cf205fdb3e97e795fbd371631938d0b3bcf02eb4b74",
+  "group_summary_rows_sha256": "6fa9cfd3984a9f7e6a0d75e8e3141d4170e6dd48b3d43a83b7b1591b20658ff5",
+  "elapsed_seconds": 288.443714406,
+  "vram_gb": [
+    18.850366464,
+    20.336082944
+  ],
+  "pipeline_sealed_stage": false,
+  "strict_human_double_blind": false,
+  "physical": true,
+  "observer_overlay": true,
+  "predictive": false,
+  "causal": false
+}
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-RoleExchangeCollection",
+  "created_at": "2026-07-14T15:27:10.030123+00:00",
+  "model": "deepseek7b",
+  "stage": "open",
+  "authorized_blocks": [
+    "language_action_stable_mapping_control",
+    "language_action_translate_role_swap",
+    "syntax_relative_clause_role_swap",
+    "syntax_relative_clause_surface_control"
+  ],
+  "layer_count": 28,
+  "execution_dtype": "bfloat16",
+  "protocol_schema_version": "phase425_role_exchange.v2",
+  "collector_sha256": "50c8253ddfbeae8bbbea8178fe73a3fb62088313107a8b79f6753944186ff603",
+  "condition_count": 2304,
+  "pair_count": 288,
+  "replica_group_count": 144,
+  "condition_layer_row_count": 64512,
+  "pair_layer_row_count": 8064,
+  "group_layer_row_count": 4032,
+  "expected_condition_layer_row_count": 64512,
+  "expected_pair_layer_row_count": 8064,
+  "expected_group_layer_row_count": 4032,
+  "condition_correct_count": 1042,
+  "numerical_retry_condition_count": 0,
+  "max_component_ledger_relative_error": 0.005361689,
+  "component_ledger_gate_pass": true,
+  "all_rows_complete": true,
+  "condition_rows_sha256": "a82ec451c6e20c670543925a5185806a21fd8d37238f220cbd70fc7ae08895a0",
+  "pair_layer_rows_sha256": "04f75548f4e163ecce4f53d5e12d41828476eb94f48ec2779036a9abbfaa14bb",
+  "group_layer_rows_sha256": "828edf1eebc8fec760ab3f0c8bfe19bea00ceca523ee9e20011678fa8540120d",
+  "pair_summary_rows_sha256": "3bd0a5e1c38a7c503f4efe4f6e265a02521eaea98939882f1cb250ad1abb6b14",
+  "group_summary_rows_sha256": "717aebb5b1e68ae7ac21644d64288d38e2a74c400b4d1c54cc572da9379edcd6",
+  "elapsed_seconds": 195.3596295459,
+  "vram_gb": [
+    15.284842496,
+    16.548626432
+  ],
+  "pipeline_sealed_stage": false,
+  "strict_human_double_blind": false,
+  "physical": true,
+  "observer_overlay": true,
+  "predictive": false,
+  "causal": false
+}
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-RoleExchangeAnalysis",
+  "created_at": "2026-07-14T15:35:53.324737+00:00",
+  "stage": "preseal",
+  "protocol_valid": true,
+  "registered_condition_count": 9216,
+  "executed_open_condition_count": 6912,
+  "executed_sealed_condition_count": 0,
+  "open_path_gate_count_by_model": {
+    "qwen3": 0,
+    "glm4": 0,
+    "deepseek7b": 0
+  },
+  "cross_model_open_candidate_count": 0,
+  "functional_role_observation_count_by_model": {
+    "qwen3": 0,
+    "glm4": 0,
+    "deepseek7b": 0
+  },
+  "cross_model_specific_candidate_count": 0,
+  "sealed_unlock": false,
+  "sealed_unlock_blocks": [],
+  "sealed_tested": false,
+  "causal_tested": false,
+  "causal_gate_pass": false,
+  "strict_human_double_blind": false,
+  "strict_mechanism_closure": "0/72",
+  "overall_scientific_progress_percent": 21,
+  "progress_interval_percent": [
+    18,
+    24
+  ],
+  "conclusion": "No candidate passed the frozen cross-model, negative-control and prediction gates; sealed and causal stages remain closed."
+}
+{
+  "schema_version": "phase425_role_exchange_posthoc.v1",
+  "phase_id": "Phase425-PosthocFailureDecomposition",
+  "created_at": "2026-07-14T15:35:54.179293+00:00",
+  "posthoc": true,
+  "changes_frozen_gate": false,
+  "sealed_data_read": false,
+  "causal_claim": false,
+  "model_count": 3,
+  "block_count": 4,
+  "model_block_count": 12,
+  "failed_gate_counts_over_12_model_blocks": {
+    "behavior": 9,
+    "competition": 5,
+    "formation": 12,
+    "partial_order": 9,
+    "prediction": 12,
+    "transport": 12
+  },
+  "condition_geometry": {
+    "qwen3": {
+      "condition_count": 2304,
+      "source_to_query_token_gap_median": 25.25,
+      "control_to_query_token_gap_median": 16.5,
+      "control_is_closer_fraction": 1.0,
+      "true_same_position_control": false
+    },
+    "glm4": {
+      "condition_count": 2304,
+      "source_to_query_token_gap_median": 25.25,
+      "control_to_query_token_gap_median": 16.5,
+      "control_is_closer_fraction": 1.0,
+      "true_same_position_control": false
+    },
+    "deepseek7b": {
+      "condition_count": 2304,
+      "source_to_query_token_gap_median": 25.25,
+      "control_to_query_token_gap_median": 16.5,
+      "control_is_closer_fraction": 1.0,
+      "true_same_position_control": false
+    }
+  },
+  "hard_limits": [
+    "The registered control token is later and closer to the query than the focus token; it is not a true same-position control.",
+    "Each block has only 12 independent lexical-replica groups per split despite many repeated conditions.",
+    "The endpoint margin compares one branch token rather than a complete generated semantic event.",
+    "All conclusions concern synthetic lookup and relative-clause tasks in three small models."
+  ],
+  "strict_conclusion": "Phase425 closes the current strict role-dominant formation-transport-prediction path. It does not establish absence of functional role states or transport because the position control is structurally unmatched and the effective predictive sample is small."
+}
+{
+  "schema_version": "phase415_multi_route_vis_source_contract.v1",
+  "phase_id": "Phase415-MultiRouteVisualizationDataSources",
+  "generated_at": "2026-07-14T15:35:54.474Z",
+  "valid": true,
+  "registry_path": "frontend/public/vis_data/source_registry.json",
+  "route_count": 2,
+  "route_ids": [
+    "gpt5",
+    "glm5"
+  ],
+  "source_count": 13,
+  "dataset_count": 148,
+  "canonical_node_count": 11902,
+  "canonical_edge_count": 18932,
+  "source_results": [
+    {
+      "source_id": "gpt5_pattern_family_neuron_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "pattern_family_neuron_atlas.v1",
+      "payload_schemas": [
+        "neuron_atlas_partition.v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 27,
+      "canonical_node_count": 2763,
+      "canonical_edge_count": 1985,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_real_component_trace",
+      "route_id": "gpt5",
+      "manifest_schema": "real_component_trace_manifest.v1",
+      "payload_schemas": [
+        "real_component_trace.v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 1318,
+      "canonical_edge_count": 1274,
+      "explicitly_noncausal_adapted_edge_count": 1274,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_mechanism_trace",
+      "route_id": "gpt5",
+      "manifest_schema": "mechanism_trace_manifest_v1",
+      "payload_schemas": [
+        "mechanism_trace_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 1391,
+      "canonical_edge_count": 1352,
+      "explicitly_noncausal_adapted_edge_count": 1352,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase416_formal_prefill_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase416_prefill_physical_atlas_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 540,
+      "canonical_edge_count": 360,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase417_native_generation_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase417_native_generation_atlas_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 360,
+      "canonical_edge_count": 420,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "glm5_causal_fiber_atlas",
+      "route_id": "glm5",
+      "manifest_schema": "vis_data_manifest_v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "cross_model"
+      ],
+      "dataset_count": 67,
+      "canonical_node_count": 2239,
+      "canonical_edge_count": 3149,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase418_interface_history_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase418_interface_history_atlas_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 1800,
+      "canonical_edge_count": 9300,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase419_token_matched_history_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase419_token_matched_history_atlas_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 540,
+      "canonical_edge_count": 540,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase420_typed_path_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase420_typed_path_atlas_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 12,
+      "canonical_node_count": 66,
+      "canonical_edge_count": 42,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase421_balanced_boundary_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase421_balanced_boundary_atlas_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 12,
+      "canonical_node_count": 126,
+      "canonical_edge_count": 6,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase423_workspace_observer_qualification",
+      "route_id": "gpt5",
+      "manifest_schema": "phase423_workspace_observer_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 6,
+      "canonical_node_count": 75,
+      "canonical_edge_count": 48,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase424_global_physical_path_atlas",
+      "route_id": "gpt5",
+      "manifest_schema": "phase424_global_physical_path_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 648,
+      "canonical_edge_count": 432,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    },
+    {
+      "source_id": "gpt5_phase425_role_exchange_validation",
+      "route_id": "gpt5",
+      "manifest_schema": "phase425_role_exchange_manifest.v1",
+      "payload_schemas": [
+        "atlas_graph_v1"
+      ],
+      "declared_models": [
+        "qwen3",
+        "glm4",
+        "deepseek7b"
+      ],
+      "observed_models": [
+        "deepseek7b",
+        "glm4",
+        "qwen3"
+      ],
+      "dataset_count": 3,
+      "canonical_node_count": 36,
+      "canonical_edge_count": 24,
+      "explicitly_noncausal_adapted_edge_count": 0,
+      "all_dataset_paths_resolved": true,
+      "all_payloads_renderable": true
+    }
+  ],
+  "client_contract": {
+    "route_selector_present": true,
+    "dataset_search_present": true,
+    "full_manifest_list_available": true,
+    "local_json_import_preserved": true,
+    "legacy_glm5_fallback_preserved": true,
+    "main_workspace_route_selector_present": true
+  },
+  "evidence_boundary": [
+    "This phase validates data provenance, loading, adaptation, and rendering contracts only.",
+    "Observed trace order and factor continuity are explicitly non-causal.",
+    "No model execution, physical-path promotion, neuron causality, or mechanism closure is added."
+  ]
+}

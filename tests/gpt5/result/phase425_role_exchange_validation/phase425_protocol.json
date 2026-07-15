@@ -1,0 +1,170 @@
+{
+  "schema_version": "phase425_role_exchange.v2",
+  "phase_id": "Phase425-RoleExchangeProtocol",
+  "created_at": "2026-07-14T15:14:39.740444+00:00",
+  "objective": "Distinguish matched-literal functional-role formation from lexical, position, interface and history separation before any sealed or causal promotion.",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "blocks": [
+    {
+      "block_id": "language_action_translate_role_swap",
+      "family_id": "language_action",
+      "mechanism_id": "translate",
+      "candidate": true,
+      "matched_control_block_id": "language_action_stable_mapping_control"
+    },
+    {
+      "block_id": "language_action_stable_mapping_control",
+      "family_id": "language_action",
+      "mechanism_id": "translate_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "language_action_translate_role_swap"
+    },
+    {
+      "block_id": "syntax_relative_clause_role_swap",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role",
+      "candidate": true,
+      "matched_control_block_id": "syntax_relative_clause_surface_control"
+    },
+    {
+      "block_id": "syntax_relative_clause_surface_control",
+      "family_id": "syntax_structure",
+      "mechanism_id": "relative_clause_role_neutral_control",
+      "candidate": false,
+      "matched_control_block_id": "syntax_relative_clause_role_swap"
+    }
+  ],
+  "interfaces": [
+    "direct",
+    "result_field"
+  ],
+  "histories": [
+    "bare",
+    "worked_example"
+  ],
+  "roles": [
+    "a",
+    "b"
+  ],
+  "execution_dtype_by_model": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "registered_thresholds": {
+    "behavior_correct_fraction_min": 0.75,
+    "signal_positive_fraction_min": 0.6666666666666666,
+    "signal_median_min": 0.0,
+    "role_delta_coherence_min": 0.2,
+    "prediction_r2_min": 0.0,
+    "prediction_delta_r2_min": 0.05,
+    "prediction_mae_gain_min": 0.0,
+    "cross_model_replication_min": 2,
+    "component_ledger_relative_error_max": 0.01
+  },
+  "split_contract": {
+    "discovery_pairs_per_block": 24,
+    "calibration_pairs_per_block": 24,
+    "behavior_holdout_pairs_per_block": 24,
+    "sealed_physical_holdout_pairs_per_block": 24,
+    "conditions_per_pair_per_model": 8,
+    "replica_pairs_per_group": 2,
+    "split_unit": "lexical_replica_group"
+  },
+  "prediction_contract": {
+    "baseline_features": [
+      "executed_token_count_mean",
+      "source_token_count_mean",
+      "query_token_count_mean"
+    ],
+    "physical_features": [
+      "formation_specificity",
+      "transport_specificity",
+      "competition_specificity"
+    ],
+    "ridge_alpha": 1.0,
+    "fit_split": "discovery",
+    "gate_splits": [
+      "calibration",
+      "behavior_holdout"
+    ],
+    "sealed_split_used_for_selection": false
+  },
+  "role_signal_contract": {
+    "functional_specificity": "role contrast minus the larger matched-position or interface-history contrast",
+    "role_dominance": "role contrast minus lexical-main-effect contrast",
+    "strict_path_specificity": "minimum of functional specificity and role dominance",
+    "cross_lexical_covariance": "cosine agreement of role-difference vectors across two lexical replicas",
+    "interpretation": "functional specificity is evidence for a reusable role component; positive role dominance is the stronger Phase425 sealed-unlock requirement"
+  },
+  "evidence_contract": {
+    "attention_source_write_is_legal_compute_quantity": true,
+    "event_order_graph_edges_are_compute_edges": false,
+    "competition_is_observer": true,
+    "strict_human_double_blind": false,
+    "pipeline_sealed": true,
+    "causal_claim_allowed_before_sealed_pass": false,
+    "head_channel_neuron_scan_allowed": false
+  },
+  "pair_rows_sha256": "487399f50a2fc901667148c004c979e7f29f64c33e60d11d16a05efcb293c39b",
+  "open_condition_rows_sha256": "11981ca44e1823865383aa71ebb78423f8d50997ee1c696a1d7d7bc0b78154bc",
+  "implementation_commitments": {
+    "phase425_role_exchange_protocol.py": "f86c2cc6bfcd721e1cd6c9ec85b269b755888ce2c53dc612b3dc9c329dd85b6b",
+    "phase425_role_exchange_collect.py": "50c8253ddfbeae8bbbea8178fe73a3fb62088313107a8b79f6753944186ff603",
+    "phase425_role_exchange_analysis.py": "8646c90b4e0fc99411262ed1072a6e63db856d05aa0176141a0e46a396e536e7"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase425_role_exchange.v2",
+    "phase_id": "Phase425-RoleExchangeProtocol",
+    "created_at": "2026-07-14T15:14:39.722632+00:00",
+    "sealed_split": "sealed_physical_holdout",
+    "sealed_condition_count": 2304,
+    "sealed_condition_rows_sha256": "4485572ac79ccd982214dabbea9a6c281fa6edf7d234fb231e48d31863d5ad1c",
+    "sealed_prompt_hashes_sha256": "8d6fbe0c06c0ca67b468b3c72de0d104bddef59586e5a79158bf0ce6389a5113",
+    "human_double_blind": false,
+    "pipeline_sealed_until_gate_freeze": true
+  },
+  "validation": {
+    "valid": true,
+    "block_count": 4,
+    "pair_count": 384,
+    "condition_count": 9216,
+    "open_condition_count": 6912,
+    "sealed_condition_count": 2304,
+    "pair_counts_by_block": {
+      "language_action_stable_mapping_control": 96,
+      "language_action_translate_role_swap": 96,
+      "syntax_relative_clause_role_swap": 96,
+      "syntax_relative_clause_surface_control": 96
+    },
+    "pair_counts_by_split": {
+      "behavior_holdout": 96,
+      "calibration": 96,
+      "discovery": 96,
+      "sealed_physical_holdout": 96
+    },
+    "condition_counts_by_model": {
+      "deepseek7b": 3072,
+      "glm4": 3072,
+      "qwen3": 3072
+    },
+    "condition_counts_by_block": {
+      "language_action_stable_mapping_control": 2304,
+      "language_action_translate_role_swap": 2304,
+      "syntax_relative_clause_role_swap": 2304,
+      "syntax_relative_clause_surface_control": 2304
+    },
+    "condition_counts_by_split": {
+      "behavior_holdout": 2304,
+      "calibration": 2304,
+      "discovery": 2304,
+      "sealed_physical_holdout": 2304
+    },
+    "replica_group_count": 192,
+    "replica_group_split_leak_count": 0
+  }
+}

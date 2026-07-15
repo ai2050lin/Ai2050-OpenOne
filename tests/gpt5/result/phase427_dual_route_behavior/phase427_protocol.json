@@ -1,0 +1,265 @@
+{
+  "schema_version": "phase427_dual_route_behavior.v1",
+  "phase_id": "Phase427-DualRouteBehaviorProtocol",
+  "created_at": "2026-07-15T00:57:49.608955+00:00",
+  "objective": "Qualify complete behavior before physical hooks and separate source prebinding from query-side gating on an independent denominator.",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "blocks": [
+    {
+      "block_id": "language_action_dual_route_candidate",
+      "family_id": "language_action",
+      "mechanism_id": "dual_route_lookup",
+      "candidate": true,
+      "matched_control_block_id": "language_action_stable_result_control"
+    },
+    {
+      "block_id": "language_action_stable_result_control",
+      "family_id": "language_action",
+      "mechanism_id": "stable_result_control",
+      "candidate": false,
+      "matched_control_block_id": "language_action_dual_route_candidate"
+    },
+    {
+      "block_id": "syntax_agent_patient_dual_route_candidate",
+      "family_id": "syntax_structure",
+      "mechanism_id": "agent_patient_dual_route",
+      "candidate": true,
+      "matched_control_block_id": "syntax_marked_anchor_control"
+    },
+    {
+      "block_id": "syntax_marked_anchor_control",
+      "family_id": "syntax_structure",
+      "mechanism_id": "marked_anchor_control",
+      "candidate": false,
+      "matched_control_block_id": "syntax_agent_patient_dual_route_candidate"
+    }
+  ],
+  "splits": [
+    "behavior_discovery",
+    "behavior_calibration",
+    "behavior_holdout",
+    "sealed_behavior_holdout"
+  ],
+  "interfaces": [
+    "direct",
+    "result_field"
+  ],
+  "histories": [
+    "bare",
+    "balanced_examples"
+  ],
+  "roles": [
+    "a",
+    "b"
+  ],
+  "route_modes": [
+    "none",
+    "source_only",
+    "query_only",
+    "consistent",
+    "conflict"
+  ],
+  "scorable_candidate_routes": [
+    "source_only",
+    "query_only",
+    "consistent"
+  ],
+  "execution_dtype_by_model": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "split_contract": {
+    "groups_per_block_per_split": 64,
+    "conditions_per_group_per_model": 10,
+    "formal_independent_group_count": 1024,
+    "open_condition_count": 23040,
+    "sealed_condition_count": 7680,
+    "instrument_condition_count": 240,
+    "interface_history_balanced_between_groups": true,
+    "split_unit": "semantic_group"
+  },
+  "route_contract": {
+    "none": "neutral before source and neutral before query; descriptive only for candidates",
+    "source_only": "active role before source and neutral after source",
+    "query_only": "neutral before source and active role after source",
+    "consistent": "same active role in both slots",
+    "conflict": "opposite active roles in the two slots; descriptive route preference only",
+    "conflict_has_normative_candidate_target": false,
+    "same_source_query_and_slot_positions_across_routes": true
+  },
+  "behavior_contract": {
+    "chat_interface": "concise chat; Qwen thinking disabled; DeepSeek empty thinking prefill",
+    "teacher_target": "full exact response versus full opposite response",
+    "natural_generation_tokens": {
+      "direct": 24,
+      "result_field": 32
+    },
+    "teacher_and_natural_accounts_separate": true,
+    "right_censoring_explicit": true,
+    "gate_splits": [
+      "behavior_calibration",
+      "behavior_holdout"
+    ],
+    "block_qualification": "candidate and matched control both pass for the consistent route and at least one single route on both gate splits",
+    "independent_unit": "semantic_group; two role conditions are paired measurements"
+  },
+  "registered_thresholds": {
+    "teacher_sequence_correct_fraction_min": 0.8,
+    "teacher_sequence_margin_median_min": 0.0,
+    "natural_target_first_fraction_min": 0.7,
+    "natural_opposite_first_fraction_max": 0.1,
+    "natural_revision_fraction_max": 0.05,
+    "natural_boundary_fraction_min": 0.7,
+    "natural_stop_fraction_min": 0.7,
+    "natural_censoring_fraction_max": 0.25,
+    "cross_model_replication_min": 2,
+    "groups_per_block_split": 64
+  },
+  "future_physical_contract": {
+    "physical_hooks_before_behavior_qualification": false,
+    "independent_physical_denominator_required": true,
+    "exact_finite_difference_attention_decomposition_primary": true,
+    "full_hidden_rank_r_map_prohibited": true,
+    "learned_map_only_in_preregistered_low_dimensional_basis": true,
+    "maximum_summary_rank": 3,
+    "sealed_physical_and_causal_stages_not_registered_yet": true
+  },
+  "evidence_contract": {
+    "instrument_updates_thresholds": false,
+    "candidate_conflict_and_none_are_descriptive": true,
+    "pipeline_sealed": true,
+    "strict_human_double_blind": false,
+    "causal_claim": false,
+    "head_channel_neuron_scan_allowed": false
+  },
+  "stop_rules": [
+    "open_behavior_failure_keeps_sealed_behavior_closed",
+    "sealed_behavior_failure_prevents_physical_registration",
+    "one_model_only_is_model_specific",
+    "conflict_preference_never_counts_as_behavior_correct",
+    "no_threshold_prompt_sample_or_window_rescue_on_this_denominator",
+    "no_physical_hook_until_behavior_gate_passes"
+  ],
+  "implementation_commitments": {
+    "phase427_dual_route_protocol.py": "3f8fe06c71164639c5a5e456ca7251f6675bea5412f73ff7eb5d7e1422a046ca",
+    "phase427_behavior_collect.py": "00c2f1971d9ec39248a456fcc5302a57c70ecda789c336afc78fba3a8ac2ea4f",
+    "phase427_behavior_analysis.py": "4e84ed455e8e4ba66cf47670604b8517ff20b6a07ead1a2adea55127fc03bbc1"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase427_dual_route_behavior.v1",
+    "phase_id": "Phase427-DualRouteBehaviorProtocol",
+    "created_at": "2026-07-15T00:57:49.530755+00:00",
+    "sealed_split": "sealed_behavior_holdout",
+    "sealed_condition_count": 7680,
+    "sealed_condition_rows_sha256": "0c21eabc4546acef4df4d84ca49ee52e29bcbc4ec18310ba32c9bc56d5b7d271",
+    "sealed_prompt_hashes_sha256": "a86442fb98f7f4698d61036b388334da0bd3c59de545e23d98dfd52aef9e2118",
+    "pipeline_sealed_until_open_behavior_gate": true,
+    "strict_human_double_blind": false
+  },
+  "validation": {
+    "valid": true,
+    "formal_group_count": 1024,
+    "instrument_group_count": 8,
+    "formal_condition_count": 30720,
+    "open_condition_count": 23040,
+    "sealed_condition_count": 7680,
+    "instrument_condition_count": 240,
+    "conditions_per_group_per_model": 10,
+    "route_position_mismatch_count": 0,
+    "group_split_leak_count": 0,
+    "formal_condition_counts_by_model": {
+      "deepseek7b": 10240,
+      "glm4": 10240,
+      "qwen3": 10240
+    },
+    "formal_group_counts_by_block_split": {
+      "language_action_dual_route_candidate::behavior_calibration": 64,
+      "language_action_dual_route_candidate::behavior_discovery": 64,
+      "language_action_dual_route_candidate::behavior_holdout": 64,
+      "language_action_dual_route_candidate::sealed_behavior_holdout": 64,
+      "language_action_stable_result_control::behavior_calibration": 64,
+      "language_action_stable_result_control::behavior_discovery": 64,
+      "language_action_stable_result_control::behavior_holdout": 64,
+      "language_action_stable_result_control::sealed_behavior_holdout": 64,
+      "syntax_agent_patient_dual_route_candidate::behavior_calibration": 64,
+      "syntax_agent_patient_dual_route_candidate::behavior_discovery": 64,
+      "syntax_agent_patient_dual_route_candidate::behavior_holdout": 64,
+      "syntax_agent_patient_dual_route_candidate::sealed_behavior_holdout": 64,
+      "syntax_marked_anchor_control::behavior_calibration": 64,
+      "syntax_marked_anchor_control::behavior_discovery": 64,
+      "syntax_marked_anchor_control::behavior_holdout": 64,
+      "syntax_marked_anchor_control::sealed_behavior_holdout": 64
+    },
+    "interface_history_group_counts": {
+      "language_action_dual_route_candidate::behavior_calibration::direct::balanced_examples": 16,
+      "language_action_dual_route_candidate::behavior_calibration::direct::bare": 16,
+      "language_action_dual_route_candidate::behavior_calibration::result_field::balanced_examples": 16,
+      "language_action_dual_route_candidate::behavior_calibration::result_field::bare": 16,
+      "language_action_dual_route_candidate::behavior_discovery::direct::balanced_examples": 16,
+      "language_action_dual_route_candidate::behavior_discovery::direct::bare": 16,
+      "language_action_dual_route_candidate::behavior_discovery::result_field::balanced_examples": 16,
+      "language_action_dual_route_candidate::behavior_discovery::result_field::bare": 16,
+      "language_action_dual_route_candidate::behavior_holdout::direct::balanced_examples": 16,
+      "language_action_dual_route_candidate::behavior_holdout::direct::bare": 16,
+      "language_action_dual_route_candidate::behavior_holdout::result_field::balanced_examples": 16,
+      "language_action_dual_route_candidate::behavior_holdout::result_field::bare": 16,
+      "language_action_dual_route_candidate::sealed_behavior_holdout::direct::balanced_examples": 16,
+      "language_action_dual_route_candidate::sealed_behavior_holdout::direct::bare": 16,
+      "language_action_dual_route_candidate::sealed_behavior_holdout::result_field::balanced_examples": 16,
+      "language_action_dual_route_candidate::sealed_behavior_holdout::result_field::bare": 16,
+      "language_action_stable_result_control::behavior_calibration::direct::balanced_examples": 16,
+      "language_action_stable_result_control::behavior_calibration::direct::bare": 16,
+      "language_action_stable_result_control::behavior_calibration::result_field::balanced_examples": 16,
+      "language_action_stable_result_control::behavior_calibration::result_field::bare": 16,
+      "language_action_stable_result_control::behavior_discovery::direct::balanced_examples": 16,
+      "language_action_stable_result_control::behavior_discovery::direct::bare": 16,
+      "language_action_stable_result_control::behavior_discovery::result_field::balanced_examples": 16,
+      "language_action_stable_result_control::behavior_discovery::result_field::bare": 16,
+      "language_action_stable_result_control::behavior_holdout::direct::balanced_examples": 16,
+      "language_action_stable_result_control::behavior_holdout::direct::bare": 16,
+      "language_action_stable_result_control::behavior_holdout::result_field::balanced_examples": 16,
+      "language_action_stable_result_control::behavior_holdout::result_field::bare": 16,
+      "language_action_stable_result_control::sealed_behavior_holdout::direct::balanced_examples": 16,
+      "language_action_stable_result_control::sealed_behavior_holdout::direct::bare": 16,
+      "language_action_stable_result_control::sealed_behavior_holdout::result_field::balanced_examples": 16,
+      "language_action_stable_result_control::sealed_behavior_holdout::result_field::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_calibration::direct::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_calibration::direct::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_calibration::result_field::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_calibration::result_field::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_discovery::direct::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_discovery::direct::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_discovery::result_field::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_discovery::result_field::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_holdout::direct::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_holdout::direct::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_holdout::result_field::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::behavior_holdout::result_field::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::sealed_behavior_holdout::direct::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::sealed_behavior_holdout::direct::bare": 16,
+      "syntax_agent_patient_dual_route_candidate::sealed_behavior_holdout::result_field::balanced_examples": 16,
+      "syntax_agent_patient_dual_route_candidate::sealed_behavior_holdout::result_field::bare": 16,
+      "syntax_marked_anchor_control::behavior_calibration::direct::balanced_examples": 16,
+      "syntax_marked_anchor_control::behavior_calibration::direct::bare": 16,
+      "syntax_marked_anchor_control::behavior_calibration::result_field::balanced_examples": 16,
+      "syntax_marked_anchor_control::behavior_calibration::result_field::bare": 16,
+      "syntax_marked_anchor_control::behavior_discovery::direct::balanced_examples": 16,
+      "syntax_marked_anchor_control::behavior_discovery::direct::bare": 16,
+      "syntax_marked_anchor_control::behavior_discovery::result_field::balanced_examples": 16,
+      "syntax_marked_anchor_control::behavior_discovery::result_field::bare": 16,
+      "syntax_marked_anchor_control::behavior_holdout::direct::balanced_examples": 16,
+      "syntax_marked_anchor_control::behavior_holdout::direct::bare": 16,
+      "syntax_marked_anchor_control::behavior_holdout::result_field::balanced_examples": 16,
+      "syntax_marked_anchor_control::behavior_holdout::result_field::bare": 16,
+      "syntax_marked_anchor_control::sealed_behavior_holdout::direct::balanced_examples": 16,
+      "syntax_marked_anchor_control::sealed_behavior_holdout::direct::bare": 16,
+      "syntax_marked_anchor_control::sealed_behavior_holdout::result_field::balanced_examples": 16,
+      "syntax_marked_anchor_control::sealed_behavior_holdout::result_field::bare": 16
+    }
+  }
+}
