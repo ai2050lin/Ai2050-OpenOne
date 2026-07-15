@@ -25,6 +25,8 @@ then
   PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase427_behavior_collect.py --model glm4 --stage sealed
   PROBE_TORCH_DTYPE=bfloat16 python tests/gpt5/phase427_behavior_collect.py --model deepseek7b --stage sealed
   python tests/gpt5/phase427_behavior_analysis.py --stage sealed
+else
+  python tests/gpt5/phase427_behavior_posthoc_audit.py
 fi
 
 python -m unittest tests/gpt5/test_phase427_dual_route_behavior.py

@@ -1,0 +1,203 @@
+{
+  "schema_version": "phase429_typed_route.v1",
+  "phase_id": "Phase429-TypedRouteAnalysis",
+  "created_at": "2026-07-15T03:31:52.963654+00:00",
+  "models": {
+    "qwen3": {
+      "selected_interface": "direct_item",
+      "selection_score": [
+        0.9615244121,
+        0.9615244121,
+        -0.0384755879,
+        0
+      ],
+      "selection_split": "interface_calibration",
+      "qualification_split": "interface_holdout",
+      "calibration_gates": {
+        "observer_semantic_lookup": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        },
+        "observer_syntax_readout": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        }
+      },
+      "holdout_gates": {
+        "observer_semantic_lookup": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        },
+        "observer_syntax_readout": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        }
+      },
+      "behavior_authorized": true,
+      "selection_reused_behavior_data": false
+    },
+    "glm4": {
+      "selected_interface": "forced_choice",
+      "selection_score": [
+        0.9615244121,
+        0.9615244121,
+        -0.0384755879,
+        -3
+      ],
+      "selection_split": "interface_calibration",
+      "qualification_split": "interface_holdout",
+      "calibration_gates": {
+        "observer_semantic_lookup": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        },
+        "observer_syntax_readout": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        }
+      },
+      "holdout_gates": {
+        "observer_semantic_lookup": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        },
+        "observer_syntax_readout": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        }
+      },
+      "behavior_authorized": true,
+      "selection_reused_behavior_data": false
+    },
+    "deepseek7b": {
+      "selected_interface": "result_field",
+      "selection_score": [
+        0.7345895948,
+        0.9121132068,
+        -0.2654104052,
+        -2
+      ],
+      "selection_split": "interface_calibration",
+      "qualification_split": "interface_holdout",
+      "calibration_gates": {
+        "observer_semantic_lookup": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        },
+        "observer_syntax_readout": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": false,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": false
+        }
+      },
+      "holdout_gates": {
+        "observer_semantic_lookup": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": true,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": true
+        },
+        "observer_syntax_readout": {
+          "checks": {
+            "group_count": true,
+            "teacher_all_lcb": true,
+            "target_first_lcb": true,
+            "opposite_first_ucb": false,
+            "event_coverage_lcb": true,
+            "teacher_margin": true
+          },
+          "gate_pass": false
+        }
+      },
+      "behavior_authorized": false,
+      "selection_reused_behavior_data": false
+    }
+  },
+  "authorized_models": [
+    "qwen3",
+    "glm4"
+  ],
+  "thresholds_updated": false,
+  "behavior_data_read": false,
+  "sealed_rows_read": false,
+  "physical_hooks_installed": false,
+  "implementation_sha256": {
+    "phase429_typed_route_protocol.py": "0fc4a7b5c8e46e7c6cbd9b09cc5392be0b356d03967e9bfbaf43838d102cd3d0",
+    "phase429_typed_route_collect.py": "6ab4d28a345c90c3472b28771673d3d93f6ea29602045b5427a5efd7d440ce73",
+    "phase429_typed_route_analysis.py": "e0b7ff22cbc14e38212bf5214b11defd0d9b0c69921debaf5f0cf1093740571b"
+  }
+}

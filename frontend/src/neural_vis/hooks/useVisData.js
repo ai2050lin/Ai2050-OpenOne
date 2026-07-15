@@ -40,6 +40,15 @@ const SUPPORTED_SCHEMAS = new Set([
   'neuron_atlas_partition.v1',
 ]);
 
+function isSupportedPayload(data, source = null) {
+  const version = data?.schema_version || '1.0';
+  if (SUPPORTED_SCHEMAS.has(version)) return true;
+  return source?.payload_adapter === 'atlas_graph'
+    && data?.graph
+    && Array.isArray(data.graph.nodes)
+    && (Array.isArray(data.graph.edges) || Array.isArray(data.graph.links));
+}
+
 async function fetchJson(path) {
   const response = await fetch(path, { cache: 'no-store' });
   if (!response.ok) throw new Error(`${path} 加载失败 (${response.status})`);
@@ -150,7 +159,7 @@ export default function useVisData() {
     try {
       const data = await fetchJson(fileMeta.path);
       const version = data.schema_version || '1.0';
-      if (!SUPPORTED_SCHEMAS.has(version)) throw new Error(`Unsupported schema: ${version}`);
+      if (!isSupportedPayload(data, activeSource)) throw new Error(`Unsupported schema: ${version}`);
       const normalized = normalizeVisualizationPayload(data, fileMeta, activeSource);
       setActiveData(normalized);
       setActiveFileMeta({
@@ -171,7 +180,7 @@ export default function useVisData() {
       try {
         const data = JSON.parse(event.target.result);
         const version = data.schema_version || '1.0';
-        if (!SUPPORTED_SCHEMAS.has(version)) throw new Error(`Unsupported schema: ${version}`);
+        if (!isSupportedPayload(data)) throw new Error(`Unsupported schema: ${version}`);
         const fileMeta = { id: file.name, filename: file.name, label: file.name, source: 'local' };
         setActiveData(normalizeVisualizationPayload(data, fileMeta, null));
         setActiveFileMeta({ ...fileMeta, route_label: '本地文件', source_label: '本地文件' });

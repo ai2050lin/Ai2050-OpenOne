@@ -127,6 +127,31 @@ function canonicalGraph(data, fileMeta, source, graph, extras = {}) {
   };
 }
 
+function adaptRegisteredAtlasGraph(data, fileMeta, source) {
+  const graph = data?.graph || {};
+  const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+  const edges = Array.isArray(graph.edges)
+    ? graph.edges
+    : Array.isArray(graph.links)
+      ? graph.links
+      : [];
+  const maxLayer = Math.max(0, ...nodes.map((node) => asNumber(node.layer, 0)));
+  return canonicalGraph(data, fileMeta, source, {
+    ...graph,
+    nodes,
+    edges,
+  }, {
+    title: data.title || fileMeta?.label || '3D 数据图谱',
+    model: data.model || fileMeta?.model || null,
+    phase: data.phase ?? fileMeta?.phase ?? null,
+    model_info: {
+      model: data.model || fileMeta?.model || null,
+      phase: data.phase ?? fileMeta?.phase ?? null,
+      n_layers: maxLayer + 1,
+    },
+  });
+}
+
 function neuronNodeType(node) {
   if (String(node.node_type || '').includes('anchor')) return 'cluster';
   if (node.unit_kind === 'attention_head') return 'head';
@@ -374,5 +399,8 @@ export function normalizeVisualizationPayload(data, fileMeta = {}, source = null
   if (schema === 'neuron_atlas_partition.v1') return adaptNeuronAtlas(data, fileMeta, source);
   if (schema === 'real_component_trace.v1') return adaptRealComponentTrace(data, fileMeta, source);
   if (schema === 'mechanism_trace_v1') return adaptMechanismTrace(data, fileMeta, source);
+  if (source?.payload_adapter === 'atlas_graph' && data?.graph) {
+    return adaptRegisteredAtlasGraph(data, fileMeta, source);
+  }
   throw new Error(`Unsupported schema: ${schema}`);
 }

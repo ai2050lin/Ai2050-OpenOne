@@ -1,0 +1,245 @@
+{
+  "schema_version": "phase429_typed_route.v1",
+  "phase_id": "Phase429-TypedRouteProtocol",
+  "created_at": "2026-07-15T03:22:04.779538+00:00",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "observer_blocks": [
+    {
+      "block_id": "observer_semantic_lookup",
+      "family_id": "knowledge_semantics",
+      "mechanism_id": "observer_interface_qualification"
+    },
+    {
+      "block_id": "observer_syntax_readout",
+      "family_id": "syntax_structure",
+      "mechanism_id": "observer_interface_qualification"
+    }
+  ],
+  "behavior_blocks": [
+    {
+      "block_id": "language_action_dual_route_candidate",
+      "family_id": "language_action",
+      "mechanism_id": "dual_route_lookup",
+      "candidate": true,
+      "matched_control_block_id": "language_action_stable_result_control"
+    },
+    {
+      "block_id": "language_action_stable_result_control",
+      "family_id": "language_action",
+      "mechanism_id": "stable_result_control",
+      "candidate": false,
+      "matched_control_block_id": "language_action_dual_route_candidate"
+    },
+    {
+      "block_id": "syntax_agent_patient_dual_route_candidate",
+      "family_id": "syntax_structure",
+      "mechanism_id": "agent_patient_dual_route",
+      "candidate": true,
+      "matched_control_block_id": "syntax_marked_anchor_control"
+    },
+    {
+      "block_id": "syntax_marked_anchor_control",
+      "family_id": "syntax_structure",
+      "mechanism_id": "marked_anchor_control",
+      "candidate": false,
+      "matched_control_block_id": "syntax_agent_patient_dual_route_candidate"
+    }
+  ],
+  "interfaces": [
+    "direct_item",
+    "short_code",
+    "result_field",
+    "forced_choice"
+  ],
+  "interface_simplicity_order": [
+    "direct_item",
+    "short_code",
+    "result_field",
+    "forced_choice"
+  ],
+  "observer_splits": [
+    "interface_calibration",
+    "interface_holdout"
+  ],
+  "behavior_splits": [
+    "behavior_calibration",
+    "behavior_holdout",
+    "sealed_physical_holdout"
+  ],
+  "contract_variants": [
+    "no_examples",
+    "fully_crossed_examples"
+  ],
+  "roles": [
+    "a",
+    "b"
+  ],
+  "route_modes": [
+    "none",
+    "source_only",
+    "query_only",
+    "consistent",
+    "conflict"
+  ],
+  "scorable_routes": [
+    "source_only",
+    "query_only",
+    "consistent"
+  ],
+  "execution_dtype_by_model": {
+    "qwen3": "float16",
+    "glm4": "bfloat16",
+    "deepseek7b": "bfloat16"
+  },
+  "selection_contract": {
+    "selection_split": "interface_calibration",
+    "qualification_split": "interface_holdout",
+    "selection_primary": "minimum block target-first Wilson lower bound",
+    "selection_secondary": "minimum block teacher-correct Wilson lower bound",
+    "selection_tertiary": "maximum block opposite-first Wilson upper bound",
+    "tie_break": "shortest least-structured interface by frozen order",
+    "behavior_holdout_reselection": false,
+    "unqualified_model_behavior_collection": false
+  },
+  "typed_thresholds": {
+    "confidence_level": 0.95,
+    "confidence_method": "Wilson score on independent semantic-group all/any events",
+    "observer": {
+      "groups_per_block_split": 96,
+      "teacher_all_lcb_min": 0.75,
+      "target_first_lcb_min": 0.65,
+      "opposite_first_ucb_max": 0.15,
+      "event_coverage_lcb_min": 0.8,
+      "teacher_margin_median_min": 0.0
+    },
+    "content": {
+      "groups_per_block_split": 96,
+      "teacher_all_lcb_min": 0.7,
+      "target_first_all_lcb_min": 0.6,
+      "opposite_first_any_ucb_max": 0.2,
+      "event_coverage_all_lcb_min": 0.7,
+      "teacher_margin_median_min": 0.0
+    },
+    "interface": {
+      "valid_all_lcb_min": 0.7
+    },
+    "revision": {
+      "revision_any_ucb_max": 0.1
+    },
+    "boundary": {
+      "boundary_all_lcb_min": 0.7
+    },
+    "termination": {
+      "stop_all_lcb_min": 0.7,
+      "censor_any_ucb_max": 0.25
+    },
+    "specificity_effect_min": 0.15,
+    "cross_model_replication_min": 2
+  },
+  "physical_contract": {
+    "content_gate_can_authorize_without_termination_gate": true,
+    "candidate_and_matched_control_required": true,
+    "calibration_and_holdout_required": true,
+    "architecture_components_only": [
+      "residual_state",
+      "query_projection",
+      "key_projection",
+      "value_projection",
+      "attention_write",
+      "mlp_write",
+      "output_projection"
+    ],
+    "head_channel_neuron_scan_allowed": false,
+    "full_hidden_rank_fit_allowed": false,
+    "sealed_read_requires_physical_reconstruction_and_prediction": true
+  },
+  "evidence_contract": {
+    "observer_and_behavior_denominators_independent": true,
+    "no_examples_and_fully_crossed_are_independent_denominators": true,
+    "candidate_none_and_conflict_descriptive": true,
+    "content_interface_revision_boundary_termination_separate": true,
+    "strict_human_double_blind": false,
+    "causal_claim": false
+  },
+  "stop_rules": [
+    "no qualified interface closes that model before route collection",
+    "no threshold prompt window interface or sample rescue after freeze",
+    "candidate content failure prevents physical collection",
+    "matched-control content failure prevents specificity claim",
+    "one-model-only is model-specific",
+    "termination failure does not erase qualified content evidence",
+    "sealed groups remain unread until open physical prediction passes",
+    "no head channel or neuron scan in Phase429"
+  ],
+  "implementation_commitments": {
+    "phase429_typed_route_protocol.py": "0fc4a7b5c8e46e7c6cbd9b09cc5392be0b356d03967e9bfbaf43838d102cd3d0",
+    "phase429_typed_route_collect.py": "6ab4d28a345c90c3472b28771673d3d93f6ea29602045b5427a5efd7d440ce73",
+    "phase429_typed_route_analysis.py": "e0b7ff22cbc14e38212bf5214b11defd0d9b0c69921debaf5f0cf1093740571b"
+  },
+  "sealed_commitment": {
+    "schema_version": "phase429_typed_route.v1",
+    "phase_id": "Phase429-TypedRouteProtocol",
+    "created_at": "2026-07-15T03:22:04.776254+00:00",
+    "sealed_group_count": 768,
+    "sealed_group_rows_sha256": "c31c04e6058485386739c64a69d43959a8a203b74e70e0997426852930401fa4",
+    "pipeline_sealed_until_open_physical_prediction_gate": true,
+    "strict_human_double_blind": false
+  },
+  "validation": {
+    "valid": true,
+    "observer_formal_group_count": 384,
+    "observer_instrument_group_count": 4,
+    "behavior_formal_group_count": 2304,
+    "behavior_open_group_count": 1536,
+    "behavior_sealed_group_count": 768,
+    "behavior_instrument_group_count": 16,
+    "groups_per_block_split_contract": 96,
+    "observer_group_counts": {
+      "observer_semantic_lookup::interface_calibration": 96,
+      "observer_semantic_lookup::interface_holdout": 96,
+      "observer_syntax_readout::interface_calibration": 96,
+      "observer_syntax_readout::interface_holdout": 96
+    },
+    "behavior_group_counts": {
+      "language_action_dual_route_candidate::fully_crossed_examples::behavior_calibration": 96,
+      "language_action_dual_route_candidate::fully_crossed_examples::behavior_holdout": 96,
+      "language_action_dual_route_candidate::fully_crossed_examples::sealed_physical_holdout": 96,
+      "language_action_dual_route_candidate::no_examples::behavior_calibration": 96,
+      "language_action_dual_route_candidate::no_examples::behavior_holdout": 96,
+      "language_action_dual_route_candidate::no_examples::sealed_physical_holdout": 96,
+      "language_action_stable_result_control::fully_crossed_examples::behavior_calibration": 96,
+      "language_action_stable_result_control::fully_crossed_examples::behavior_holdout": 96,
+      "language_action_stable_result_control::fully_crossed_examples::sealed_physical_holdout": 96,
+      "language_action_stable_result_control::no_examples::behavior_calibration": 96,
+      "language_action_stable_result_control::no_examples::behavior_holdout": 96,
+      "language_action_stable_result_control::no_examples::sealed_physical_holdout": 96,
+      "syntax_agent_patient_dual_route_candidate::fully_crossed_examples::behavior_calibration": 96,
+      "syntax_agent_patient_dual_route_candidate::fully_crossed_examples::behavior_holdout": 96,
+      "syntax_agent_patient_dual_route_candidate::fully_crossed_examples::sealed_physical_holdout": 96,
+      "syntax_agent_patient_dual_route_candidate::no_examples::behavior_calibration": 96,
+      "syntax_agent_patient_dual_route_candidate::no_examples::behavior_holdout": 96,
+      "syntax_agent_patient_dual_route_candidate::no_examples::sealed_physical_holdout": 96,
+      "syntax_marked_anchor_control::fully_crossed_examples::behavior_calibration": 96,
+      "syntax_marked_anchor_control::fully_crossed_examples::behavior_holdout": 96,
+      "syntax_marked_anchor_control::fully_crossed_examples::sealed_physical_holdout": 96,
+      "syntax_marked_anchor_control::no_examples::behavior_calibration": 96,
+      "syntax_marked_anchor_control::no_examples::behavior_holdout": 96,
+      "syntax_marked_anchor_control::no_examples::sealed_physical_holdout": 96
+    },
+    "fully_crossed_cell_count_per_group": 4,
+    "role_route_cells": [
+      "a:query",
+      "a:source",
+      "b:query",
+      "b:source"
+    ],
+    "observer_formal_condition_count": 4608,
+    "observer_instrument_condition_count": 48,
+    "behavior_open_selected_condition_count_per_model": 15360,
+    "behavior_sealed_selected_condition_count_per_model": 7680
+  }
+}

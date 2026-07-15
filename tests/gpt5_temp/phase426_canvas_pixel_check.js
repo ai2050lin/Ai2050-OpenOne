@@ -5,10 +5,13 @@ const path = require('path');
 const { chromium } = require('playwright-core');
 
 const ROOT = path.resolve(__dirname, '../..');
-const OUT = path.join(ROOT, 'tests/gpt5/result/phase426_exact_position_role_validation/screenshots');
-const RESULT = path.join(OUT, 'phase426_canvas_pixel_check.json');
-const URL = 'http://127.0.0.1:5175/';
-const SOURCE_ID = 'gpt5_phase426_exact_position_role_validation';
+const PHASE_SLUG = process.env.PHASE_VIS_SLUG || 'phase426_exact_position_role_validation';
+const CHECK_ID = process.env.PHASE_CHECK_ID || 'Phase426-CanvasPixelCheck';
+const OUT = path.join(ROOT, 'tests/gpt5/result', PHASE_SLUG, 'screenshots');
+const RESULT = path.join(OUT, `${PHASE_SLUG}_canvas_pixel_check.json`);
+const URL = process.env.PHASE_VIS_URL || 'http://127.0.0.1:5175/';
+const SOURCE_ID = process.env.PHASE_SOURCE_ID || 'gpt5_phase426_exact_position_role_validation';
+const EXPECTED_DATASET_COUNT = Number(process.env.PHASE_EXPECTED_DATASET_COUNT || 3);
 
 async function imagePairStats(page, before, after) {
   return page.evaluate(async ([beforeBase64, afterBase64]) => {
@@ -84,13 +87,13 @@ async function inspect(browser, viewportName, viewport) {
   const source = page.getByLabel('主工作台测试路线数据源');
   const dataset = page.getByLabel('主工作台测试数据集');
   await source.selectOption(SOURCE_ID);
-  await page.waitForFunction((sourceId) => {
+  await page.waitForFunction(({ sourceId, expectedCount }) => {
     const sourceElement = document.querySelector('[aria-label="主工作台测试路线数据源"]');
     const datasetElement = document.querySelector('[aria-label="主工作台测试数据集"]');
     const count = [...(datasetElement?.options || [])]
       .filter((option) => option.value && !option.value.startsWith('__')).length;
-    return sourceElement?.value === sourceId && count === 3;
-  }, SOURCE_ID, { timeout: 12000 });
+    return sourceElement?.value === sourceId && count === expectedCount;
+  }, { sourceId: SOURCE_ID, expectedCount: EXPECTED_DATASET_COUNT }, { timeout: 12000 });
   const datasetIds = await dataset.locator('option').evaluateAll((options) => options
     .map((option) => option.value)
     .filter((value) => value && !value.startsWith('__')));
@@ -105,6 +108,9 @@ async function inspect(browser, viewportName, viewport) {
     await canvas.dispatchEvent('wheel', { deltaY: 360, bubbles: true, cancelable: true });
     await page.waitForTimeout(650);
     const after = await canvas.screenshot();
+    const safeDatasetId = datasetId.replace(/[^a-zA-Z0-9_.-]+/g, '_');
+    fs.writeFileSync(path.join(OUT, `${viewportName}_${safeDatasetId}_before.png`), before);
+    fs.writeFileSync(path.join(OUT, `${viewportName}_${safeDatasetId}_after.png`), after);
     const stats = await imagePairStats(page, before, after);
     datasetChecks.push({
       dataset_id: datasetId,
@@ -145,11 +151,11 @@ async function main() {
     const optionalBackend = (message) => message.includes('ERR_CONNECTION_REFUSED')
       || message.includes('Failed to load resource');
     const result = {
-      phase_id: 'Phase426-CanvasPixelCheck',
+      phase_id: CHECK_ID,
       url: URL,
       checks,
       pass: checks.every((check) => (
-        check.dataset_checks.length === 3
+        check.dataset_checks.length === EXPECTED_DATASET_COUNT
         && check.dataset_checks.every((dataset) => dataset.nonblank && dataset.interaction_changed)
         && !check.horizontal_overflow
         && check.canvas_count > 0
