@@ -1,0 +1,76 @@
+[2026-07-15 04:34:46] Phase 947: GLM4 Color → MLP Channel Gear Bridge
+[2026-07-15 04:34:46] Total stimuli: 288
+[2026-07-15 04:34:49] Loading glm4...
+[2026-07-15 04:34:51]   attn=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following 
+[2026-07-15 04:35:04]   attn=sdpa OK
+[2026-07-15 04:35:04]   GPU=12.7GB
+[2026-07-15 04:35:04] n_layers=40, d_model=4096, inter=13696, mid=20
+[2026-07-15 04:35:04] Sample layers: [12, 14, 16, 18, 20, 22, 24, 26, 28]
+[2026-07-15 04:35:04] 
+=== STEP 1: Semantic Residual Direction Extraction ===
+[2026-07-15 04:35:04] Capturing 288 unique sentences...
+[2026-07-15 04:36:03]   60/288 (1.0/s) ETA=223s
+[2026-07-15 04:36:56]   120/288 (1.1/s) ETA=157s
+[2026-07-15 04:37:49]   180/288 (1.1/s) ETA=99s
+[2026-07-15 04:38:43]   240/288 (1.1/s) ETA=44s
+[2026-07-15 04:39:26] Capture done in 262s
+[2026-07-15 04:39:26] Extracted: ok=288, miss=0
+[2026-07-15 04:39:26]   L12: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L14: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L16: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L18: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L20: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L22: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L24: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L26: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L28: color PCA top1=nan%, top2=nan%
+[2026-07-15 04:39:26]   L12: color-func centroid cos=0.9697, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L14: color-func centroid cos=0.9736, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L16: color-func centroid cos=0.9787, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L18: color-func centroid cos=0.9832, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L20: color-func centroid cos=0.9849, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L22: color-func centroid cos=0.9870, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L24: color-func centroid cos=0.9858, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L26: color-func centroid cos=0.9805, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26]   L28: color-func centroid cos=0.9761, color intra norm=0.00, func intra norm=0.00
+[2026-07-15 04:39:26] 
+=== STEP 2: MLP Channel Activation Patterns ===
+[2026-07-15 04:39:31]   L20: consensus gate channels across color pairs: [] (0 channels)
+[2026-07-15 04:39:31] 
+=== STEP 3: Causal Intervention === 
+[2026-07-15 04:39:31] Color token IDs: {'red': 1151, 'blue': 12197, 'green': 13242, 'yellow': 27774, 'white': 5782, 'black': 11448, 'large': 16749, 'small': 9001, 'heavy': 88110, 'light': 4145, 'fast': 9346, 'slow': 35037}
+[2026-07-15 04:39:31] 
+=== STEP 4: MLP Channel Steering Experiment ===
+[2026-07-15 04:39:31] Target channels for intervention: [7873, 8099, 6056, 11913, 11210]
+[2026-07-15 04:39:31] Baseline 'red' top logits: [',', ' and', '\n', '.', '.\n']
+[2026-07-15 04:39:31] Baseline 'blue' top logits: [' and', ',', '\n', '.', ' in']
+[2026-07-15 04:39:31] Color logit comparison:
+[2026-07-15 04:39:31]   black: red=2.16, blue=2.58
+[2026-07-15 04:39:31]   blue: red=2.62, blue=3.94
+[2026-07-15 04:39:31]   fast: red=-0.07, blue=-0.32
+[2026-07-15 04:39:31]   green: red=3.30, blue=4.31
+[2026-07-15 04:39:31]   heavy: red=-1.28, blue=-0.57
+[2026-07-15 04:39:31]   large: red=-0.45, blue=-0.97
+[2026-07-15 04:39:31]   light: red=1.17, blue=0.76
+[2026-07-15 04:39:31]   red: red=3.66, blue=1.66
+[2026-07-15 04:39:31]   slow: red=-0.64, blue=-3.70
+[2026-07-15 04:39:31]   small: red=1.18, blue=-0.81
+[2026-07-15 04:39:31]   white: red=3.09, blue=2.73
+[2026-07-15 04:39:31]   yellow: red=3.23, blue=3.70
+[2026-07-15 04:39:31] 
+=== STEP 5: Activation Gap Analysis ===
+[2026-07-15 04:40:32] Phase 947: GLM4 Color → MLP Channel Gear Bridge
+[2026-07-15 04:40:32] Total stimuli: 288
+[2026-07-15 04:40:37] Loading glm4...
+[2026-07-15 04:40:39]   attn=flash_attention_2 failed: FlashAttention2 has been toggled on, but it cannot be used due to the following 
+[2026-07-15 04:40:52]   attn=sdpa OK
+[2026-07-15 04:40:52]   GPU=12.7GB
+[2026-07-15 04:40:52] n_layers=40, d_model=4096, inter=13696, mid=20
+[2026-07-15 04:40:52] Sample layers: [12, 14, 16, 18, 20, 22, 24, 26, 28]
+[2026-07-15 04:40:52] 
+=== STEP 1: Semantic Residual Direction Extraction ===
+[2026-07-15 04:40:52] Capturing 288 unique sentences...
+[2026-07-15 04:42:11]   60/288 (0.8/s) ETA=300s
+[2026-07-15 04:43:05]   120/288 (0.9/s) ETA=185s
+[2026-07-15 04:43:58]   180/288 (1.0/s) ETA=111s
+[2026-07-15 04:44:51]   240/288 (1.0/s) ETA=48s

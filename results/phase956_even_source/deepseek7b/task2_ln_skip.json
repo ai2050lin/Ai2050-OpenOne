@@ -1,0 +1,75 @@
+{
+  "task": "task2_layernorm_skip",
+  "model": "deepseek7b",
+  "n_prompts": 6,
+  "conditions": [
+    "normal",
+    "skip_ln"
+  ],
+  "cond_stats": {
+    "normal": {
+      ".": {
+        "mean_abs_odd": 1.65625,
+        "mean_abs_even": 2.1354166666666665,
+        "odd_even_ratio": 0.775609756097561,
+        "even_signed": 1.8385416666666667
+      },
+      " ": {
+        "mean_abs_odd": 1.90234375,
+        "mean_abs_even": 1.8841145833333333,
+        "odd_even_ratio": 1.009675190048376,
+        "even_signed": -1.19921875
+      },
+      "is": {
+        "mean_abs_odd": 1.4069010416666667,
+        "mean_abs_even": 4.585286458333333,
+        "odd_even_ratio": 0.306829476075536,
+        "even_signed": 4.585286458333333
+      },
+      " a": {
+        "mean_abs_odd": 1.69140625,
+        "mean_abs_even": 2.0143229166666665,
+        "odd_even_ratio": 0.8396897220426632,
+        "even_signed": -0.30078125
+      },
+      "<EOS>": {
+        "mean_abs_odd": 1.9693603515625,
+        "mean_abs_even": 1.4276936848958333,
+        "odd_even_ratio": 1.3793997776954428,
+        "even_signed": -1.2349853515625
+      }
+    },
+    "skip_ln": {
+      ".": {
+        "mean_abs_odd": 31.802408854166668,
+        "mean_abs_even": 78.6455078125,
+        "odd_even_ratio": 0.40437667374451053,
+        "even_signed": 53.218424479166664
+      },
+      " ": {
+        "mean_abs_odd": 44.407552083333336,
+        "mean_abs_even": 108.93619791666667,
+        "odd_even_ratio": 0.4076473470948926,
+        "even_signed": 51.509114583333336
+      },
+      "is": {
+        "mean_abs_odd": 17.5419921875,
+        "mean_abs_even": 48.314778645833336,
+        "odd_even_ratio": 0.3630771511153931,
+        "even_signed": 41.616861979166664
+      },
+      " a": {
+        "mean_abs_odd": 25.911458333333332,
+        "mean_abs_even": 61.328125,
+        "odd_even_ratio": 0.4225053078556263,
+        "even_signed": 25.963541666666668
+      },
+      "<EOS>": {
+        "mean_abs_odd": 24.7578125,
+        "mean_abs_even": 50.73828125,
+        "odd_even_ratio": 0.487951343444453,
+        "even_signed": 17.6796875
+      }
+    }
+  }
+}

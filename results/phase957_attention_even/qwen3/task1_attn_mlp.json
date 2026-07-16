@@ -1,0 +1,193 @@
+{
+  "task": "task1_attn_vs_mlp",
+  "model": "qwen3",
+  "beta": 4.0,
+  "n_prompts": 6,
+  "n_random": 4,
+  "skip_layers": [
+    33,
+    34,
+    35
+  ],
+  "conditions": [
+    "normal",
+    "skip_attn",
+    "skip_mlp"
+  ],
+  "cond_stats": {
+    "normal": {
+      ".": {
+        "mean_abs_odd": 1.5325520833333333,
+        "mean_abs_even": 2.9908854166666665,
+        "odd_even_ratio": 0.5124074880278624,
+        "even_signed": 2.9908854166666665,
+        "curvature": 5.981770833333333
+      },
+      " ": {
+        "mean_abs_odd": 1.1236979166666667,
+        "mean_abs_even": 1.5950520833333333,
+        "odd_even_ratio": 0.7044897959183675,
+        "even_signed": -1.3372395833333333,
+        "curvature": -2.6744791666666665
+      },
+      "is": {
+        "mean_abs_odd": 1.2701822916666667,
+        "mean_abs_even": 7.049479166666667,
+        "odd_even_ratio": 0.1801810121906169,
+        "even_signed": 7.049479166666667,
+        "curvature": 14.098958333333334
+      },
+      " a": {
+        "mean_abs_odd": 1.2975260416666667,
+        "mean_abs_even": 3.6360677083333335,
+        "odd_even_ratio": 0.3568487018800358,
+        "even_signed": -3.6360677083333335,
+        "curvature": -7.272135416666667
+      },
+      "Solution": {
+        "mean_abs_odd": 1.3309326171875,
+        "mean_abs_even": 4.2100830078125,
+        "odd_even_ratio": 0.31612978050972773,
+        "even_signed": 4.2100830078125,
+        "curvature": 8.420166015625
+      },
+      "Step": {
+        "mean_abs_odd": 1.5489705403645833,
+        "mean_abs_even": 3.40936279296875,
+        "odd_even_ratio": 0.45432845796260823,
+        "even_signed": 3.40936279296875,
+        "curvature": 6.8187255859375
+      },
+      "1": {
+        "mean_abs_odd": 0.6432291666666666,
+        "mean_abs_even": 4.674479166666667,
+        "odd_even_ratio": 0.13760445682451253,
+        "even_signed": 4.674479166666667,
+        "curvature": 9.348958333333334
+      },
+      "<EOS>": {
+        "mean_abs_odd": 1.4840138753255208,
+        "mean_abs_even": 1.7764027913411458,
+        "odd_even_ratio": 0.8354039312250361,
+        "even_signed": 1.3769073486328125,
+        "curvature": 2.753814697265625
+      }
+    },
+    "skip_attn": {
+      ".": {
+        "mean_abs_odd": 2.4189453125,
+        "mean_abs_even": 2.4820963541666665,
+        "odd_even_ratio": 0.9745573770491804,
+        "even_signed": 2.1982421875,
+        "curvature": 4.396484375
+      },
+      " ": {
+        "mean_abs_odd": 2.4558919270833335,
+        "mean_abs_even": 2.3972981770833335,
+        "odd_even_ratio": 1.024441577839636,
+        "even_signed": -1.3986002604166667,
+        "curvature": -2.7972005208333335
+      },
+      "is": {
+        "mean_abs_odd": 2.1494140625,
+        "mean_abs_even": 4.658528645833333,
+        "odd_even_ratio": 0.46139333379917546,
+        "even_signed": 4.657877604166667,
+        "curvature": 9.315755208333334
+      },
+      " a": {
+        "mean_abs_odd": 2.589599609375,
+        "mean_abs_even": 4.071370442708333,
+        "odd_even_ratio": 0.6360510903675869,
+        "even_signed": -3.8890787760416665,
+        "curvature": -7.778157552083333
+      },
+      "Solution": {
+        "mean_abs_odd": 1.8828125,
+        "mean_abs_even": 3.7985026041666665,
+        "odd_even_ratio": 0.49567229411260605,
+        "even_signed": 3.7574869791666665,
+        "curvature": 7.514973958333333
+      },
+      "Step": {
+        "mean_abs_odd": 2.2960917154947915,
+        "mean_abs_even": 3.4861348470052085,
+        "odd_even_ratio": 0.658635370191508,
+        "even_signed": 3.2761739095052085,
+        "curvature": 6.552347819010417
+      },
+      "1": {
+        "mean_abs_odd": 1.6575520833333333,
+        "mean_abs_even": 3.9075520833333335,
+        "odd_even_ratio": 0.4241919360213262,
+        "even_signed": 3.9075520833333335,
+        "curvature": 7.815104166666667
+      },
+      "<EOS>": {
+        "mean_abs_odd": 1.69580078125,
+        "mean_abs_even": 1.7658284505208333,
+        "odd_even_ratio": 0.9603428808442981,
+        "even_signed": 1.3829752604166667,
+        "curvature": 2.7659505208333335
+      }
+    },
+    "skip_mlp": {
+      ".": {
+        "mean_abs_odd": 0.845703125,
+        "mean_abs_even": 1.740234375,
+        "odd_even_ratio": 0.48597081930415265,
+        "even_signed": 1.7337239583333333,
+        "curvature": 3.4674479166666665
+      },
+      " ": {
+        "mean_abs_odd": 0.6927083333333334,
+        "mean_abs_even": 1.3151041666666667,
+        "odd_even_ratio": 0.5267326732673268,
+        "even_signed": -1.2161458333333333,
+        "curvature": -2.4322916666666665
+      },
+      "is": {
+        "mean_abs_odd": 1.1386769612630208,
+        "mean_abs_even": 5.5703481038411455,
+        "odd_even_ratio": 0.2044175588376287,
+        "even_signed": 5.5703481038411455,
+        "curvature": 11.140696207682291
+      },
+      " a": {
+        "mean_abs_odd": 0.8125,
+        "mean_abs_even": 4.24609375,
+        "odd_even_ratio": 0.19135234590616376,
+        "even_signed": -4.24609375,
+        "curvature": -8.4921875
+      },
+      "Solution": {
+        "mean_abs_odd": 0.7369791666666666,
+        "mean_abs_even": 3.0462239583333335,
+        "odd_even_ratio": 0.24193203675999142,
+        "even_signed": 3.0462239583333335,
+        "curvature": 6.092447916666667
+      },
+      "Step": {
+        "mean_abs_odd": 1.015118916829427,
+        "mean_abs_even": 2.9708480834960938,
+        "odd_even_ratio": 0.3416933105629673,
+        "even_signed": 2.9708480834960938,
+        "curvature": 5.9416961669921875
+      },
+      "1": {
+        "mean_abs_odd": 0.68359375,
+        "mean_abs_even": 4.171223958333333,
+        "odd_even_ratio": 0.16388325269236773,
+        "even_signed": 4.171223958333333,
+        "curvature": 8.342447916666666
+      },
+      "<EOS>": {
+        "mean_abs_odd": 0.8177083333333334,
+        "mean_abs_even": 1.1796875,
+        "odd_even_ratio": 0.6931567328918322,
+        "even_signed": -1.1263020833333333,
+        "curvature": -2.2526041666666665
+      }
+    }
+  }
+}

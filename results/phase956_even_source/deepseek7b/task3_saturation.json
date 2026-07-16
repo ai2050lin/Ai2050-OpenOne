@@ -1,0 +1,160 @@
+{
+  "task": "task3_mlp_saturation",
+  "model": "deepseek7b",
+  "layer": 27,
+  "beta": 4.0,
+  "summary": {
+    "baseline": {
+      "mean_saturation_ratio": 0.012893264358108107,
+      "mean_activation_norm": 230.8994903564453,
+      "mean_abs_activation": 0.26285718753933907,
+      "n": 4
+    },
+    "+u": {
+      "mean_saturation_ratio": 0.013751055743243243,
+      "mean_activation_norm": 252.16310119628906,
+      "mean_abs_activation": 0.28859520703554153,
+      "n": 4
+    },
+    "-u": {
+      "mean_saturation_ratio": 0.014160156250000002,
+      "mean_activation_norm": 211.99309921264648,
+      "mean_abs_activation": 0.3220931366086006,
+      "n": 4
+    }
+  },
+  "raw_results": [
+    {
+      "prompt": "The apple is",
+      "condition": "baseline",
+      "saturation_count": 273,
+      "near_zero_count": 15523,
+      "mean_abs_activation": 0.2907617390155792,
+      "max_abs_activation": 37.25,
+      "activation_norm": 258.92767333984375,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.01441089527027027
+    },
+    {
+      "prompt": "The apple is",
+      "condition": "+u",
+      "saturation_count": 259,
+      "near_zero_count": 15186,
+      "mean_abs_activation": 0.28208285570144653,
+      "max_abs_activation": 38.5,
+      "activation_norm": 251.2686767578125,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.013671875
+    },
+    {
+      "prompt": "The apple is",
+      "condition": "-u",
+      "saturation_count": 278,
+      "near_zero_count": 10534,
+      "mean_abs_activation": 0.3547629415988922,
+      "max_abs_activation": 26.5,
+      "activation_norm": 210.5521240234375,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.01467483108108108
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "baseline",
+      "saturation_count": 225,
+      "near_zero_count": 15012,
+      "mean_abs_activation": 0.23936936259269714,
+      "max_abs_activation": 32.5,
+      "activation_norm": 205.55747985839844,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.011877111486486486
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "+u",
+      "saturation_count": 266,
+      "near_zero_count": 15427,
+      "mean_abs_activation": 0.2680226266384125,
+      "max_abs_activation": 39.5,
+      "activation_norm": 237.2317352294922,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.014041385135135136
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "-u",
+      "saturation_count": 338,
+      "near_zero_count": 12863,
+      "mean_abs_activation": 0.3559926450252533,
+      "max_abs_activation": 38.75,
+      "activation_norm": 251.76551818847656,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.01784206081081081
+    },
+    {
+      "prompt": "The grass is",
+      "condition": "baseline",
+      "saturation_count": 262,
+      "near_zero_count": 14885,
+      "mean_abs_activation": 0.28357139229774475,
+      "max_abs_activation": 35.5,
+      "activation_norm": 246.3507080078125,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.013830236486486486
+    },
+    {
+      "prompt": "The grass is",
+      "condition": "+u",
+      "saturation_count": 260,
+      "near_zero_count": 13559,
+      "mean_abs_activation": 0.3223785161972046,
+      "max_abs_activation": 38.75,
+      "activation_norm": 270.54534912109375,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.013724662162162162
+    },
+    {
+      "prompt": "The grass is",
+      "condition": "-u",
+      "saturation_count": 288,
+      "near_zero_count": 11579,
+      "mean_abs_activation": 0.3621627688407898,
+      "max_abs_activation": 34.5,
+      "activation_norm": 243.572265625,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.015202702702702704
+    },
+    {
+      "prompt": "The sun is",
+      "condition": "baseline",
+      "saturation_count": 217,
+      "near_zero_count": 15374,
+      "mean_abs_activation": 0.23772625625133514,
+      "max_abs_activation": 31.125,
+      "activation_norm": 212.76210021972656,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.01145481418918919
+    },
+    {
+      "prompt": "The sun is",
+      "condition": "+u",
+      "saturation_count": 257,
+      "near_zero_count": 15025,
+      "mean_abs_activation": 0.28189682960510254,
+      "max_abs_activation": 39.0,
+      "activation_norm": 249.6066436767578,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.013566300675675675
+    },
+    {
+      "prompt": "The sun is",
+      "condition": "-u",
+      "saturation_count": 169,
+      "near_zero_count": 12164,
+      "mean_abs_activation": 0.21545419096946716,
+      "max_abs_activation": 24.5,
+      "activation_norm": 142.08248901367188,
+      "n_intermediate": 18944,
+      "saturation_ratio": 0.008921030405405405
+    }
+  ]
+}

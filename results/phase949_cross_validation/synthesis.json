@@ -1,0 +1,265 @@
+{
+  "phase": 949,
+  "model_results": {
+    "qwen3": {
+      "cross_ref": {
+        "model": "qwen3",
+        "top_protocol_mlp_layers": [
+          [
+            "L35_mlp",
+            5.160481770833333
+          ],
+          [
+            "L0_mlp",
+            1.2572916666666667
+          ],
+          [
+            "L28_mlp",
+            0.8541666666666666
+          ],
+          [
+            "L20_mlp",
+            0.8104166666666667
+          ],
+          [
+            "L16_mlp",
+            0.7302083333333333
+          ]
+        ],
+        "top_channel_layers": [],
+        "overlapping_layers": [],
+        "protocol_only_layers": [
+          0,
+          16,
+          35,
+          20,
+          28
+        ],
+        "channel_only_layers": []
+      }
+    },
+    "glm4": {
+      "cross_ref": {
+        "model": "glm4",
+        "top_protocol_mlp_layers": [
+          [
+            "L39_mlp",
+            1.1022447374131945
+          ],
+          [
+            "L5_mlp",
+            0.723611111111111
+          ],
+          [
+            "L20_mlp",
+            0.4681898328993056
+          ],
+          [
+            "L10_mlp",
+            0.2821017795138889
+          ],
+          [
+            "L25_mlp",
+            0.28159722222222217
+          ]
+        ],
+        "top_channel_layers": [
+          [
+            25,
+            4.377345085144043
+          ],
+          [
+            29,
+            3.6256065368652344
+          ],
+          [
+            27,
+            3.6098246574401855
+          ],
+          [
+            23,
+            3.239156723022461
+          ],
+          [
+            21,
+            2.2613205909729004
+          ]
+        ],
+        "overlapping_layers": [
+          25
+        ],
+        "protocol_only_layers": [
+          10,
+          20,
+          5,
+          39
+        ],
+        "channel_only_layers": [
+          29,
+          27,
+          21,
+          23
+        ],
+        "spearman_r_protocol_vs_channel": -0.7272727272727273,
+        "spearman_p": 0.02639093810205512
+      }
+    },
+    "deepseek7b": {
+      "cross_ref": {
+        "model": "deepseek7b",
+        "top_protocol_mlp_layers": [
+          [
+            "L27_mlp",
+            2.800759548611111
+          ],
+          [
+            "L15_mlp",
+            1.3535183376736113
+          ],
+          [
+            "L25_mlp",
+            0.7431382921006944
+          ],
+          [
+            "L10_mlp",
+            0.30381808810763894
+          ],
+          [
+            "L20_mlp",
+            0.2910400390625
+          ]
+        ],
+        "top_channel_layers": [],
+        "overlapping_layers": [],
+        "protocol_only_layers": [
+          20,
+          25,
+          10,
+          27,
+          15
+        ],
+        "channel_only_layers": []
+      }
+    }
+  },
+  "synthesis": {
+    "route_summary": {
+      "qwen3": {
+        "route_b_operator": {},
+        "route_a_channel": {
+          "top_layers": []
+        },
+        "route_c_protocol": {
+          "attn_mlp_ratio": 0.44136385285630236,
+          "top_mlp_layers": [
+            [
+              "L35_mlp",
+              5.160481770833333
+            ],
+            [
+              "L0_mlp",
+              1.2572916666666667
+            ],
+            [
+              "L28_mlp",
+              0.8541666666666666
+            ]
+          ],
+          "n_candidates": 343
+        }
+      },
+      "glm4": {
+        "route_b_operator": {},
+        "route_a_channel": {
+          "top_layers": [
+            [
+              25,
+              4.377345085144043
+            ],
+            [
+              29,
+              3.6256065368652344
+            ],
+            [
+              27,
+              3.6098246574401855
+            ]
+          ]
+        },
+        "route_c_protocol": {
+          "attn_mlp_ratio": 0.5413527557132393,
+          "top_mlp_layers": [
+            [
+              "L39_mlp",
+              1.1022447374131945
+            ],
+            [
+              "L5_mlp",
+              0.723611111111111
+            ],
+            [
+              "L20_mlp",
+              0.4681898328993056
+            ]
+          ],
+          "n_candidates": 0
+        }
+      },
+      "deepseek7b": {
+        "route_b_operator": {},
+        "route_a_channel": {
+          "top_layers": []
+        },
+        "route_c_protocol": {
+          "attn_mlp_ratio": 0.7913688962027686,
+          "top_mlp_layers": [
+            [
+              "L27_mlp",
+              2.800759548611111
+            ],
+            [
+              "L15_mlp",
+              1.3535183376736113
+            ],
+            [
+              "L25_mlp",
+              0.7431382921006944
+            ]
+          ],
+          "n_candidates": 0
+        }
+      }
+    },
+    "unified_hypothesis": {
+      "main": "MLP是统一的编码枢纽，但语义场和协议场使用MLP的不同层和不同通道。",
+      "architecture": "前中层MLP → 语义编码（概念、算子、属性）→ 中层输出 → 最后一层MLP → 协议决策（格式、停止、结构）→ 最终logit",
+      "channel_sharing": "可能存在跨层的通道复用：深层MLP通道同时参与语义和协议编码",
+      "key_unknown": "语义→协议的转换是否在最后一层MLP中完成？还是语义和协议在hidden state中是正交子空间？",
+      "testable_prediction": "如果归零语义热点层（如L18）的MLP，protocol token logit不应显著变化；如果归零最后一层MLP，protocol token logit应崩溃但语义方向应保留。"
+    },
+    "evidence_for_unification": [
+      {
+        "id": "E1_mlp_centrality",
+        "description": "MLP在所有三条路线中都是关键组件：算子编码依赖MLP输出，语义通道在MLP中实现，protocol token由MLP主导（Attn/MLP<1 in all models）",
+        "strength": "strong"
+      },
+      {
+        "id": "E2_final_layer_convergence",
+        "description": "Protocol token在最后一层MLP最强；语义编码在中层MLP最强；暗示MLP各层分工：前中层做语义编码，最后一层做输出协议决策",
+        "strength": "moderate"
+      }
+    ],
+    "evidence_against_unification": [
+      {
+        "id": "A1_different_dominance_patterns",
+        "description": "语义编码（Phase 947）在不同模型用不同MLP通道，但protocol编码（Phase 948）的Attn/MLP比例在跨模型间更一致。这可能意味着它们不是同一个底层电路。",
+        "strength": "moderate"
+      },
+      {
+        "id": "A2_different_layer_profiles",
+        "description": "Protocol token主要受最后一层MLP影响，而语义通道在中间层分布（如qwen3 L18-22 color通道，GLM4 L25）。层分布的系统性差异暗示不同的电路。",
+        "strength": "strong"
+      }
+    ]
+  }
+}

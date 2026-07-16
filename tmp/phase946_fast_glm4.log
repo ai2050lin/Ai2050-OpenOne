@@ -1,0 +1,157 @@
+[2026-07-15 04:21:42] Phase 946 Fast: glm4
+[2026-07-15 04:21:42] Total stimuli: 222, by type: {'negation': 80, 'quantification': 40, 'modal': 30, 'double_neg': 48, 'combo': 24}
+[2026-07-15 04:21:46] Loading glm4 (bf16 fast)...
+[2026-07-15 04:22:01]   attn=sdpa OK
+[2026-07-15 04:22:01] n_layers=40, d_model=4096, mid=20, sample=[15, 17, 19, 20, 21, 23, 25]
+[2026-07-15 04:22:01] Capturing 208 unique sentences...
+[2026-07-15 04:22:49]   40/208 (0.8/s) ETA=203s
+[2026-07-15 04:23:24]   80/208 (1.0/s) ETA=134s
+[2026-07-15 04:24:00]   120/208 (1.0/s) ETA=87s
+[2026-07-15 04:24:35]   160/208 (1.0/s) ETA=46s
+[2026-07-15 04:25:10]   200/208 (1.1/s) ETA=8s
+[2026-07-15 04:25:17] Capture done in 196s
+[2026-07-15 04:25:17] Extracting...
+[2026-07-15 04:25:17] Extracted: ok=222, miss=0
+[2026-07-15 04:25:17] 
+=== ANALYSIS 1: Negation LOO ===
+[2026-07-15 04:25:17]   L15: NEG LOO_cos = 0.8144 ± 0.0568
+[2026-07-15 04:25:17]   L17: NEG LOO_cos = 0.8078 ± 0.0578
+[2026-07-15 04:25:17]   L19: NEG LOO_cos = 0.8213 ± 0.0551
+[2026-07-15 04:25:17]   L20: NEG LOO_cos = 0.8314 ± 0.0529
+[2026-07-15 04:25:17]   L21: NEG LOO_cos = 0.8413 ± 0.0523
+[2026-07-15 04:25:17]   L23: NEG LOO_cos = 0.8755 ± 0.0381
+[2026-07-15 04:25:17]   L25: NEG LOO_cos = 0.8815 ± 0.0341
+[2026-07-15 04:25:17]   L15: NEG PCA top1=19.25%, dim50=4
+[2026-07-15 04:25:17]   L17: NEG PCA top1=20.54%, dim50=4
+[2026-07-15 04:25:17]   L19: NEG PCA top1=21.00%, dim50=4
+[2026-07-15 04:25:17]   L20: NEG PCA top1=21.92%, dim50=4
+[2026-07-15 04:25:17]   L21: NEG PCA top1=22.26%, dim50=4
+[2026-07-15 04:25:17]   L23: NEG PCA top1=22.57%, dim50=4
+[2026-07-15 04:25:17]   L25: NEG PCA top1=23.62%, dim50=4
+[2026-07-15 04:25:17] 
+=== ANALYSIS 2: Double Negation Closure ===
+[2026-07-15 04:25:17]   L15: ¬¬P cos=0.3277, pos_rate=100%
+[2026-07-15 04:25:17]   L17: ¬¬P cos=0.3142, pos_rate=100%
+[2026-07-15 04:25:17]   L19: ¬¬P cos=0.4345, pos_rate=100%
+[2026-07-15 04:25:17]   L20: ¬¬P cos=0.3935, pos_rate=100%
+[2026-07-15 04:25:17]   L21: ¬¬P cos=0.4058, pos_rate=100%
+[2026-07-15 04:25:17]   L23: ¬¬P cos=0.4508, pos_rate=100%
+[2026-07-15 04:25:17]   L25: ¬¬P cos=0.5363, pos_rate=100%
+[2026-07-15 04:25:17] 
+=== ANALYSIS 3: Cross-Operator Affinity ===
+[2026-07-15 04:25:17]   L15 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.438', 'M(can→should)'), ('+0.390', 'M(can→must)'), ('+0.068', 'NEG(not)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.622', 'M(may→must)'), ('+0.600', 'M(can→should)'), ('+0.500', 'M(might→must)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.600', 'M(can→must)'), ('+0.438', 'M(can→may)'), ('+0.200', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.819', 'M(might→must)'), ('+0.622', 'M(can→must)'), ('+0.491', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.819', 'M(may→must)'), ('+0.514', 'M(should→must)'), ('+0.500', 'M(can→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.514', 'M(might→must)'), ('+0.491', 'M(may→must)'), ('+0.485', 'M(can→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.177', 'Q(some→no)'), ('+0.155', 'Q(all→no)'), ('+0.069', 'M(can→should)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.545', 'Q(some→no)'), ('+0.155', 'NEG(not)'), ('+0.036', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.473', 'Q(some→every)'), ('+0.437', 'Q(some→no)'), ('+0.325', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.473', 'Q(some→all)'), ('+0.377', 'Q(some→few)'), ('+0.336', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.377', 'Q(some→every)'), ('+0.356', 'Q(some→no)'), ('+0.325', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.545', 'Q(all→no)'), ('+0.437', 'Q(some→all)'), ('+0.356', 'Q(some→few)')]
+[2026-07-15 04:25:17]   L17 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.432', 'M(can→should)'), ('+0.391', 'M(can→must)'), ('+0.093', 'NEG(not)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.611', 'M(may→must)'), ('+0.571', 'M(can→should)'), ('+0.504', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.571', 'M(can→must)'), ('+0.432', 'M(can→may)'), ('+0.170', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.837', 'M(might→must)'), ('+0.611', 'M(can→must)'), ('+0.497', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.837', 'M(may→must)'), ('+0.512', 'M(should→must)'), ('+0.494', 'M(can→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.512', 'M(might→must)'), ('+0.504', 'M(can→must)'), ('+0.497', 'M(may→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.194', 'Q(some→no)'), ('+0.174', 'Q(all→no)'), ('+0.093', 'M(can→may)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.581', 'Q(some→no)'), ('+0.174', 'NEG(not)'), ('+0.048', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.473', 'Q(some→every)'), ('+0.416', 'Q(some→no)'), ('+0.294', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.473', 'Q(some→all)'), ('+0.371', 'Q(some→few)'), ('+0.328', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.371', 'Q(some→every)'), ('+0.326', 'Q(some→no)'), ('+0.294', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.581', 'Q(all→no)'), ('+0.416', 'Q(some→all)'), ('+0.328', 'Q(some→every)')]
+[2026-07-15 04:25:17]   L19 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.466', 'M(can→should)'), ('+0.418', 'M(can→must)'), ('+0.089', 'NEG(not)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.629', 'M(may→must)'), ('+0.625', 'M(can→should)'), ('+0.488', 'M(might→must)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.625', 'M(can→must)'), ('+0.466', 'M(can→may)'), ('+0.218', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.822', 'M(might→must)'), ('+0.629', 'M(can→must)'), ('+0.497', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.822', 'M(may→must)'), ('+0.504', 'M(should→must)'), ('+0.488', 'M(can→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.504', 'M(might→must)'), ('+0.497', 'M(may→must)'), ('+0.476', 'M(can→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.161', 'Q(some→no)'), ('+0.139', 'Q(all→no)'), ('+0.089', 'M(can→may)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.588', 'Q(some→no)'), ('+0.139', 'NEG(not)'), ('+0.073', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.459', 'Q(some→every)'), ('+0.445', 'Q(some→no)'), ('+0.331', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.459', 'Q(some→all)'), ('+0.389', 'Q(some→few)'), ('+0.343', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.389', 'Q(some→every)'), ('+0.375', 'Q(some→no)'), ('+0.331', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.588', 'Q(all→no)'), ('+0.445', 'Q(some→all)'), ('+0.375', 'Q(some→few)')]
+[2026-07-15 04:25:17]   L20 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.496', 'M(can→should)'), ('+0.454', 'M(can→must)'), ('+0.074', 'NEG(not)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.651', 'M(can→should)'), ('+0.610', 'M(may→must)'), ('+0.491', 'M(might→must)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.651', 'M(can→must)'), ('+0.496', 'M(can→may)'), ('+0.218', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.829', 'M(might→must)'), ('+0.610', 'M(can→must)'), ('+0.493', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.829', 'M(may→must)'), ('+0.503', 'M(should→must)'), ('+0.491', 'M(can→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.503', 'M(might→must)'), ('+0.493', 'M(may→must)'), ('+0.467', 'M(can→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.151', 'Q(some→no)'), ('+0.131', 'Q(all→no)'), ('+0.074', 'M(can→may)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.584', 'Q(some→no)'), ('+0.131', 'NEG(not)'), ('+0.096', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.494', 'Q(some→every)'), ('+0.482', 'Q(some→no)'), ('+0.379', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.494', 'Q(some→all)'), ('+0.435', 'Q(some→few)'), ('+0.371', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.435', 'Q(some→every)'), ('+0.434', 'Q(some→no)'), ('+0.379', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.584', 'Q(all→no)'), ('+0.482', 'Q(some→all)'), ('+0.434', 'Q(some→few)')]
+[2026-07-15 04:25:17]   L21 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.472', 'M(can→should)'), ('+0.467', 'M(can→must)'), ('+0.045', 'NEG(not)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.655', 'M(can→should)'), ('+0.611', 'M(may→must)'), ('+0.487', 'M(might→must)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.655', 'M(can→must)'), ('+0.472', 'M(can→may)'), ('+0.252', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.817', 'M(might→must)'), ('+0.611', 'M(can→must)'), ('+0.455', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.817', 'M(may→must)'), ('+0.487', 'M(can→must)'), ('+0.474', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.474', 'M(might→must)'), ('+0.460', 'M(can→must)'), ('+0.455', 'M(may→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.160', 'Q(some→no)'), ('+0.131', 'Q(all→no)'), ('+0.053', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.562', 'Q(some→no)'), ('+0.131', 'NEG(not)'), ('+0.112', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.500', 'Q(some→no)'), ('+0.478', 'Q(some→every)'), ('+0.378', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.478', 'Q(some→all)'), ('+0.429', 'Q(some→few)'), ('+0.381', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.455', 'Q(some→no)'), ('+0.429', 'Q(some→every)'), ('+0.378', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.562', 'Q(all→no)'), ('+0.500', 'Q(some→all)'), ('+0.455', 'Q(some→few)')]
+[2026-07-15 04:25:17]   L23 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.428', 'M(can→must)'), ('+0.418', 'M(can→should)'), ('+0.051', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.650', 'M(can→should)'), ('+0.576', 'M(may→must)'), ('+0.505', 'M(might→must)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.650', 'M(can→must)'), ('+0.418', 'M(can→may)'), ('+0.248', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.826', 'M(might→must)'), ('+0.576', 'M(can→must)'), ('+0.429', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.826', 'M(may→must)'), ('+0.505', 'M(can→must)'), ('+0.467', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.493', 'M(can→must)'), ('+0.467', 'M(might→must)'), ('+0.429', 'M(may→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.144', 'Q(some→no)'), ('+0.115', 'Q(all→no)'), ('+0.061', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.608', 'Q(some→no)'), ('+0.125', 'Q(some→few)'), ('+0.115', 'NEG(not)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.503', 'Q(some→no)'), ('+0.474', 'Q(some→every)'), ('+0.371', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.474', 'Q(some→few)'), ('+0.474', 'Q(some→all)'), ('+0.389', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.474', 'Q(some→every)'), ('+0.435', 'Q(some→no)'), ('+0.371', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.608', 'Q(all→no)'), ('+0.503', 'Q(some→all)'), ('+0.435', 'Q(some→few)')]
+[2026-07-15 04:25:17]   L25 ops (12):
+[2026-07-15 04:25:17]     M(can→may)            : top3=[('+0.321', 'M(can→should)'), ('+0.318', 'M(can→must)'), ('+0.047', 'NEG(not)')]
+[2026-07-15 04:25:17]     M(can→must)           : top3=[('+0.637', 'M(may→must)'), ('+0.590', 'M(might→must)'), ('+0.565', 'M(can→should)')]
+[2026-07-15 04:25:17]     M(can→should)         : top3=[('+0.565', 'M(can→must)'), ('+0.321', 'M(can→may)'), ('+0.245', 'M(may→must)')]
+[2026-07-15 04:25:17]     M(may→must)           : top3=[('+0.856', 'M(might→must)'), ('+0.637', 'M(can→must)'), ('+0.438', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(might→must)         : top3=[('+0.856', 'M(may→must)'), ('+0.590', 'M(can→must)'), ('+0.473', 'M(should→must)')]
+[2026-07-15 04:25:17]     M(should→must)        : top3=[('+0.498', 'M(can→must)'), ('+0.473', 'M(might→must)'), ('+0.438', 'M(may→must)')]
+[2026-07-15 04:25:17]     NEG(not)              : top3=[('+0.082', 'Q(some→no)'), ('+0.067', 'Q(all→no)'), ('+0.047', 'M(can→may)')]
+[2026-07-15 04:25:17]     Q(all→no)             : top3=[('+0.591', 'Q(some→no)'), ('+0.094', 'Q(some→few)'), ('+0.067', 'NEG(not)')]
+[2026-07-15 04:25:17]     Q(some→all)           : top3=[('+0.528', 'Q(some→no)'), ('+0.474', 'Q(some→every)'), ('+0.390', 'Q(some→few)')]
+[2026-07-15 04:25:17]     Q(some→every)         : top3=[('+0.474', 'Q(some→all)'), ('+0.413', 'Q(some→few)'), ('+0.377', 'Q(some→no)')]
+[2026-07-15 04:25:17]     Q(some→few)           : top3=[('+0.425', 'Q(some→no)'), ('+0.413', 'Q(some→every)'), ('+0.390', 'Q(some→all)')]
+[2026-07-15 04:25:17]     Q(some→no)            : top3=[('+0.591', 'Q(all→no)'), ('+0.528', 'Q(some→all)'), ('+0.425', 'Q(some→few)')]
+[2026-07-15 04:25:17] 
+=== ANALYSIS 4: Operator Composition ===
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1833
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2714
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1504
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2257
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1638
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2330
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1571
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2538
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1526
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2574
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1403
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2582
+[2026-07-15 04:25:17]     not_all: cos(O_not)=+0.1750
+[2026-07-15 04:25:17]     not_must: cos(O_not)=+0.2021
+[2026-07-15 04:25:17] 
+Saved to results\phase946_operator_algebra\glm4_operator_algebra.json
+[2026-07-15 04:25:17] 
+==================================================
+[2026-07-15 04:25:17] SUMMARY L20:
+[2026-07-15 04:25:17]   NEG LOO: 0.8314
+[2026-07-15 04:25:17]   NEG PCA: top1=21.92%, dim50=4
+[2026-07-15 04:25:17]   ¬¬P cos: 0.3935
+[2026-07-15 04:25:17] Done!

@@ -1,0 +1,221 @@
+{
+  "task": "task2_rollout",
+  "model": "qwen3",
+  "max_new_tokens": 30,
+  "n_prompts": 5,
+  "channels": [
+    935,
+    36,
+    284,
+    153,
+    188
+  ],
+  "summary": {
+    "normal": {
+      "mean_period_count": 3.2,
+      "mean_space_count": 23.4,
+      "mean_word_count": 24.2,
+      "mean_n_tokens": 30.0,
+      "eos_termination_rate": 0.0,
+      "n_prompts": 5
+    },
+    "ablate_K5": {
+      "mean_period_count": 3.2,
+      "mean_space_count": 23.4,
+      "mean_word_count": 24.2,
+      "mean_n_tokens": 30.0,
+      "eos_termination_rate": 0.0,
+      "n_prompts": 5
+    },
+    "boost_K5": {
+      "mean_period_count": 3.2,
+      "mean_space_count": 23.0,
+      "mean_word_count": 23.8,
+      "mean_n_tokens": 30.0,
+      "eos_termination_rate": 0.0,
+      "n_prompts": 5
+    }
+  },
+  "raw_results": [
+    {
+      "prompt": "The capital of France is",
+      "condition": "normal",
+      "generated_text": " Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madrid. The capital of Portugal is Lisbon.",
+      "period_count": 5,
+      "space_count": 25,
+      "newline_count": 0,
+      "word_count": 25,
+      "output_length": 138,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "ablate_K5",
+      "generated_text": " Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madrid. The capital of Portugal is Lisbon.",
+      "period_count": 5,
+      "space_count": 25,
+      "newline_count": 0,
+      "word_count": 25,
+      "output_length": 138,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "boost_K5",
+      "generated_text": " Paris. The capital of Paris is...? The capital of Paris is not a city, as Paris is a city in France. So, the question",
+      "period_count": 5,
+      "space_count": 24,
+      "newline_count": 0,
+      "word_count": 24,
+      "output_length": 118,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "List three colors:\n1.",
+      "condition": "normal",
+      "generated_text": " Red\n2. Blue\n3. Green\n\nOkay, I need to list three colors. Let me think. The first one that comes to mind",
+      "period_count": 4,
+      "space_count": 19,
+      "newline_count": 4,
+      "word_count": 22,
+      "output_length": 104,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "List three colors:\n1.",
+      "condition": "ablate_K5",
+      "generated_text": " Red\n2. Blue\n3. Green\n\nOkay, I need to list three colors. Let me think. The first one that comes to mind",
+      "period_count": 4,
+      "space_count": 19,
+      "newline_count": 4,
+      "word_count": 22,
+      "output_length": 104,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "List three colors:\n1.",
+      "condition": "boost_K5",
+      "generated_text": " Red\n2. Blue\n3. Green\n\nOkay, I need to list three colors. Let me think. The first one that comes to mind",
+      "period_count": 4,
+      "space_count": 19,
+      "newline_count": 4,
+      "word_count": 22,
+      "output_length": 104,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "What is water?",
+      "condition": "normal",
+      "generated_text": " What is the role of water in the human body? What are the symptoms of dehydration? What are the causes of dehydration? What are the ways to",
+      "period_count": 0,
+      "space_count": 27,
+      "newline_count": 0,
+      "word_count": 27,
+      "output_length": 140,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "What is water?",
+      "condition": "ablate_K5",
+      "generated_text": " What is the role of water in the human body? What are the symptoms of dehydration? What are the causes of dehydration? How can we prevent dehydration",
+      "period_count": 0,
+      "space_count": 27,
+      "newline_count": 0,
+      "word_count": 27,
+      "output_length": 150,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "What is water?",
+      "condition": "boost_K5",
+      "generated_text": " What is the role of water in the human body? What are the symptoms of dehydration? What are the causes of dehydration? What are the ways to",
+      "period_count": 0,
+      "space_count": 27,
+      "newline_count": 0,
+      "word_count": 27,
+      "output_length": 140,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "Category: apple is a",
+      "condition": "normal",
+      "generated_text": " fruit\nThe apple is a fruit, but it's also a symbol of knowledge, beauty, and temptation. In the story of Adam and Eve,",
+      "period_count": 1,
+      "space_count": 22,
+      "newline_count": 1,
+      "word_count": 23,
+      "output_length": 119,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "Category: apple is a",
+      "condition": "ablate_K5",
+      "generated_text": " fruit\nThe apple is a fruit, but it's also a symbol of knowledge, beauty, and temptation. In the story of Adam and Eve,",
+      "period_count": 1,
+      "space_count": 22,
+      "newline_count": 1,
+      "word_count": 23,
+      "output_length": 119,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "Category: apple is a",
+      "condition": "boost_K5",
+      "generated_text": " fruit\n\nThe term \"apple is a fruit\" is a common statement, but it's not always accurate. In botany, an apple is classified",
+      "period_count": 1,
+      "space_count": 21,
+      "newline_count": 2,
+      "word_count": 22,
+      "output_length": 122,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "The sky is blue.",
+      "condition": "normal",
+      "generated_text": " The sun is shining. The grass is green. The trees are tall. The flowers are red. The birds are singing. The wind is blowing.",
+      "period_count": 6,
+      "space_count": 24,
+      "newline_count": 0,
+      "word_count": 24,
+      "output_length": 125,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "The sky is blue.",
+      "condition": "ablate_K5",
+      "generated_text": " The sun is shining. The grass is green. The trees are tall. The flowers are red. The birds are singing. The wind is blowing.",
+      "period_count": 6,
+      "space_count": 24,
+      "newline_count": 0,
+      "word_count": 24,
+      "output_length": 125,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    },
+    {
+      "prompt": "The sky is blue.",
+      "condition": "boost_K5",
+      "generated_text": " The sun is shining. The grass is green. The trees are tall. The flowers are red. The birds are singing. The wind is blowing.",
+      "period_count": 6,
+      "space_count": 24,
+      "newline_count": 0,
+      "word_count": 24,
+      "output_length": 125,
+      "has_eos": false,
+      "n_tokens_generated": 30
+    }
+  ]
+}

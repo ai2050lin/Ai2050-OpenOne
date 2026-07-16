@@ -1,0 +1,180 @@
+{
+  "task": "task1_head_rollout",
+  "model": "glm4",
+  "max_tokens": 30,
+  "n_prompts": 5,
+  "summary": {
+    "normal": {
+      "mean_periods": 2.0,
+      "mean_words": 23.6,
+      "mean_tokens": 30.0,
+      "eos_rate": 0.0,
+      "n": 5
+    },
+    "ablate_heads": {
+      "mean_periods": 1.8,
+      "mean_words": 19.2,
+      "mean_tokens": 30.0,
+      "eos_rate": 0.0,
+      "n": 5
+    },
+    "ablate_channels": {
+      "mean_periods": 2.0,
+      "mean_words": 23.6,
+      "mean_tokens": 30.0,
+      "eos_rate": 0.0,
+      "n": 5
+    }
+  },
+  "margin_summary": {
+    "normal": {
+      "mean_margin": 1.90625,
+      "n": 4
+    },
+    "ablate_heads": {
+      "mean_margin": 1.71875,
+      "n": 4
+    },
+    "ablate_channels": {
+      "mean_margin": 1.765625,
+      "n": 4
+    }
+  },
+  "raw_results": [
+    {
+      "prompt": "The capital of France is",
+      "condition": "normal",
+      "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+      "period_count": 2,
+      "word_count": 24,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "ablate_heads",
+      "generated": " Paris.\n根据问题，我们需要判断这个陈述是否正确。根据我的知识，法国的首都是巴黎。因此，这个陈述是正确的。最终答案是",
+      "period_count": 1,
+      "word_count": 2,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "ablate_channels",
+      "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+      "period_count": 2,
+      "word_count": 24,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "What is water?",
+      "condition": "normal",
+      "generated": "\nWater is a unique substance with several defining characteristics:\n\n1. **Molecular Structure**: Water is composed of two hydrogen atoms and one oxygen atom,",
+      "period_count": 1,
+      "word_count": 23,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "What is water?",
+      "condition": "ablate_heads",
+      "generated": "\nWater is a unique substance with several defining characteristics:\n\n1. **Molecular Structure**: Water is composed of two hydrogen atoms and one oxygen atom,",
+      "period_count": 1,
+      "word_count": 23,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "What is water?",
+      "condition": "ablate_channels",
+      "generated": "\nWater is a unique substance with several defining characteristics:\n\n1. **Molecular Structure**: Water is composed of two hydrogen atoms and one oxygen atom,",
+      "period_count": 1,
+      "word_count": 23,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "The sky is blue.",
+      "condition": "normal",
+      "generated": " The sky is blue. The sky is blue. The sky is blue. The sky is blue. The sky is blue. The sky is blue.",
+      "period_count": 6,
+      "word_count": 24,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "The sky is blue.",
+      "condition": "ablate_heads",
+      "generated": " The sky is blue. The sky is blue. The sky is blue. The sky is blue. The sky is blue. The sky is blue.",
+      "period_count": 6,
+      "word_count": 24,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "The sky is blue.",
+      "condition": "ablate_channels",
+      "generated": " The sky is blue. The sky is blue.\n\nThe sky is blue. The sky is blue. The sky is blue.\n\nThe sky is blue.",
+      "period_count": 6,
+      "word_count": 24,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "Explain gravity:",
+      "condition": "normal",
+      "generated": "\nGravity is a fundamental force of nature that attracts objects with mass towards each other. Here's a more detailed explanation:\n\n### Fundamental Aspects of Gravity",
+      "period_count": 1,
+      "word_count": 25,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "Explain gravity:",
+      "condition": "ablate_heads",
+      "generated": "\nGravity is a fundamental force of nature that attracts objects with mass towards each other. Here's a more detailed explanation:\n\n### Fundamental Aspects of Gravity",
+      "period_count": 1,
+      "word_count": 25,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "Explain gravity:",
+      "condition": "ablate_channels",
+      "generated": "\nGravity is a fundamental force of nature that attracts objects with mass towards each other. Here's a more detailed explanation:\n\n### Fundamental Aspects of Gravity",
+      "period_count": 1,
+      "word_count": 25,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "How many continents?",
+      "condition": "normal",
+      "generated": "\nThe seven continents are:\n\n* Africa\n* Antarctica\n* Asia\n* Europe\n* North America\n* South America\n\nSome people might argue",
+      "period_count": 0,
+      "word_count": 22,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "How many continents?",
+      "condition": "ablate_heads",
+      "generated": "\nThe seven continents are:\n\n* Africa\n* Antarctica\n* Asia\n* Europe\n* North America\n* South America\n\nSome people might argue",
+      "period_count": 0,
+      "word_count": 22,
+      "n_tokens": 30,
+      "has_eos": false
+    },
+    {
+      "prompt": "How many continents?",
+      "condition": "ablate_channels",
+      "generated": "\nThe seven continents are:\n\n* Africa\n* Antarctica\n* Asia\n* Europe\n* North America\n* South America\n\nSome people might argue",
+      "period_count": 0,
+      "word_count": 22,
+      "n_tokens": 30,
+      "has_eos": false
+    }
+  ]
+}
