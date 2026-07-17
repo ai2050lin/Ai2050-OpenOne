@@ -1,0 +1,51 @@
+{
+  "behavior_gates": {
+    "counterfactual_lcb_95_min": 0.85,
+    "orbit_group_lcb_95_min": 0.8,
+    "other_max_failures_per_split": 3,
+    "other_ucb_95_max": 0.05,
+    "semantic_gain_min": 0.25,
+    "semantic_lcb_95_min": 0.85,
+    "semantic_min_successes_per_split": 173,
+    "shortcut_accuracy_max": 0.55
+  },
+  "created_at": "2026-07-16T08:59:41.229642+00:00",
+  "forbidden_before_static_pass": [
+    "model_behavior_run",
+    "physical_trace_collection",
+    "causal_intervention",
+    "head_channel_neuron_scan"
+  ],
+  "method_frame": "条件物理状态图谱",
+  "output_labels": {
+    "A": "true",
+    "B": "false"
+  },
+  "pairs_per_split_per_task": 96,
+  "samples_per_split_per_task": 192,
+  "schema_version": "phase446_antishortcut_static_contract.v1",
+  "splits": [
+    "interface_calibration",
+    "behavior_discovery",
+    "counterfactual_orbit_holdout",
+    "physical_window_freeze",
+    "physical_prediction_holdout",
+    "sealed_physical_holdout"
+  ],
+  "status": "anti_shortcut_static_contract_frozen_no_model_run",
+  "stop_scope": "model_task_unit",
+  "surface_transforms": [
+    "lexical_rewrite",
+    "order_rewrite",
+    "distance_rewrite",
+    "boundary_rewrite",
+    "syntax_rewrite",
+    "query_rewrite"
+  ],
+  "tasks": {
+    "knowledge_network": "relation_truth_judgment",
+    "single_step_reasoning": "conditional_implication_truth",
+    "syntax_system": "agent_role_truth"
+  },
+  "theory_name": "语言是动态模式网络"
+}

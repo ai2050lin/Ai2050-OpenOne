@@ -1,0 +1,71 @@
+{
+  "authorization": {
+    "causal_or_neuron_claim_authorized": false,
+    "internal_mechanism_claim_authorized": false,
+    "next_step": "phase478_candidate_margin_paired_analysis"
+  },
+  "behavior_counts": {
+    "('mu_ab', False, 'semantic', 'false')": 15,
+    "('mu_ab', False, 'wrong', 'true')": 1,
+    "('mu_ab', True, 'semantic', 'true')": 15,
+    "('mu_ab', True, 'wrong', 'false')": 1,
+    "('mu_ba', False, 'semantic', 'false')": 12,
+    "('mu_ba', False, 'wrong', 'true')": 4,
+    "('mu_ba', True, 'semantic', 'true')": 15,
+    "('mu_ba', True, 'wrong', 'false')": 1
+  },
+  "created_at": "2026-07-17T01:14:52.139150+00:00",
+  "model": "glm4",
+  "prompt_count": 64,
+  "readout_definition": {
+    "margin_ab": "M_AB = S_A - S_B",
+    "margin_correct": "M_correct = s_truth * s_mu * M_AB",
+    "margin_true": "M_true = s_mu * M_AB",
+    "score": "S_v^(ell,r) = [W_U N_f(mean(H_r^(ell)))]_v"
+  },
+  "role_counts_at_layer0": {
+    "claim_span": 64,
+    "evidence_span": 64,
+    "label_instruction": 64,
+    "terminal_token": 64
+  },
+  "role_token_count_distribution": {
+    "claim_span": {
+      "23": 4,
+      "24": 6,
+      "25": 12,
+      "26": 14,
+      "27": 18,
+      "28": 6,
+      "29": 4
+    },
+    "evidence_span": {
+      "101": 4,
+      "102": 4,
+      "105": 8,
+      "108": 4,
+      "109": 8,
+      "110": 4,
+      "111": 8,
+      "112": 16,
+      "113": 4,
+      "115": 4
+    },
+    "label_instruction": {
+      "16": 64
+    },
+    "terminal_token": {
+      "1": 64
+    }
+  },
+  "roles": [
+    "evidence_span",
+    "claim_span",
+    "label_instruction",
+    "terminal_token"
+  ],
+  "schema_version": "phase477_candidate_margin_readout.v1",
+  "status": "candidate_margin_readout_complete",
+  "trace_row_count": 10496,
+  "transform": "order_evidence_first"
+}

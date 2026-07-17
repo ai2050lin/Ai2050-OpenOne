@@ -67046,31 +67046,3961 @@ research/MainAnalysis/20260715_10_Phase437记录位置因素分解与自然关�
 
 九个观察器全部未过门，所以现在还不能画关系状态在神经元中的运行脉络。正确结论是这套合同不够稳定，应停止继续打补丁，下一阶段从三个模型本来自然稳定完成的知识、推理和语法任务重新建立入口。
 
-## Phase 438: Phase431 超 100MB 压缩表跳过提交与远端同步 [2026-07-15 07:58]
+## Phase 438: 自然稳定任务入口与全局语言模式图谱方案 [2026-07-15 08:08]
 
 ### 一、任务
 
-本阶段是 Git 工程清理，不是新的模型实验。当前工作区包含 Phase431 的两个压缩结果文件，虽然已经压缩为 `.gz`，但单文件仍超过 GitHub 100MB 硬限制，若直接提交会导致远端拒绝。
+本阶段对外部分析文本进行严格审计，并与 Phase437 的正式结果对齐。结论是：该文本的核心判断总体正确，Phase437 关闭的是当前受控自然关系路线，不是证明模型内部不存在关系表示。
 
-### 二、处理原则
-
-保留本地原始压缩表，不删除实验结果；只将超限文件加入 `.gitignore`，远端提交脚本、协议、摘要、图谱数据和较小结果。这样保持复现入口和分析结论可追踪，同时避免 Git 历史继续膨胀。
-
-被跳过文件：
+Phase437 的正式状态仍为：
 
 ```text
-tests/gpt5/result/phase431_position_time/open/qwen3/physical/phase431_compact_rows.jsonl.gz
-tests/gpt5/result/phase431_position_time/phase431_blind_ledger.jsonl.gz
+strict_observer_failed_behavior_unread
 ```
 
-### 三、验证方式
+九个模型-合同观察器均未通过，行为发现集、行为留出集、开放物理、密封物理、因果和单神经元均未授权。因此所有物理命题仍是未评价。
 
-本阶段未运行 CUDA 模型测试。验证标准为：暂存后检查暂存文件和 `origin/main..HEAD` 中是否存在超过 100MB 的 blob；检查为空后再推送。
+### 二、算法原理
 
-### 四、问题与限制
+Phase437 的正式分母为：
 
-压缩并不保证 GitHub 可接受，超过 100MB 的压缩文件仍会被拒绝。后续大规模物理轨迹表应默认采用外部归档或更细分片，Git 内只保留索引、摘要、校验和与生成脚本。
+$$
+4\times3\times2\times2\times4\times2=384
+$$
+
+每模型每合同 384 组，三合同三模型共：
+
+$$
+384\times3\times3=3456
+$$
+
+语义、格式、停止继续分账：
+
+$$
+I_{\mathrm{sem}}
+=
+\mathbf 1[
+\log P(y^+|x)>\log P(y^-|x)
+\land
+\text{自然生成首先表达目标}
+\land
+\neg\text{先错后改}
+]
+$$
+
+$$
+I_{\mathrm{fmt}}
+=
+\mathbf 1[\text{输出满足注册模板}]
+$$
+
+$$
+I_{\mathrm{stop}}
+=
+\mathbf 1[\text{模型在注册答案边界停止}]
+$$
+
+因素幅度：
+
+$$
+R_f
+=
+\max_a P(I_{\mathrm{sem}}=1|f=a)
+-
+\min_a P(I_{\mathrm{sem}}=1|f=a)
+$$
+
+只能作为观察筛查，不能作为机制重要性排序，更不能作为因果结论。
+
+### 三、结果分析
+
+Qwen3 三个合同的聚合位置差都低于 0.05，但内容下界和其他输出门没有同时通过：
+
+```text
+字段抽取：位置差 0.0260，其他上界 0.1064，失败
+自然问答：位置差 0.0260，其他上界 0.0697，失败
+关系改写：位置差 0.0469，其他上界 0.1590，失败
+```
+
+GLM4 的三个合同仍有明显位置差，DS7B 对标签顺序高度敏感。当前最稳妥的行为层表达是：
+
+$$
+Y_m
+=
+F_m(c,I,r,p,d,o,b,k,s)
+$$
+
+其中 $c$ 是合同，$I$ 是接口，$r$ 是关系族，$p$ 是位置，$d$ 是距离，$o$ 是标签顺序，$b$ 是边界，$k$ 是连接结构，$s$ 是记录长度。该式不是内部语言机制公式。
+
+### 四、硬伤与限制
+
+两两平衡不等于完全因素正交，三阶交互、语义组难度、词汇分布和接口解析仍可能主导结果。条件距离匹配不是纯距离操作，会同时改变总长度、查询位置、边界、注意力衰减和中性词状态。伪专名降低先验污染，也可能带来分词和复制异常。
+
+当前三个合同只覆盖受控关系读取，不能代表参数知识、开放事实、多步推理、自然语法生成和对话历史整合。当前测试模型为小模型，内部编码机制和真实强语言编码可能存在 30% 到 50% 偏差，负结果只能关闭当前路线，不能外推为真实语言机制不存在。
+
+### 五、理论进展
+
+理论主体名称保持为“条件物理状态图谱理论”，不因每轮负结果改名。本阶段收紧理论对象：从线性方向和单点查询，转向位置-时间-接口-表面变换轨道上的功能状态图谱。
+
+架构递推仍为：
+
+$$
+H^{(\ell+1)}
+=
+H^{(\ell)}
++
+A_\ell(H^{(\ell)},C)
++
+M_\ell(H^{(\ell)},C)
+$$
+
+条件物理状态写为：
+
+$$
+\mathcal S_{m,t,\ell,p}
+=
+\Gamma_m(
+x,z,q,c,I,h,\pi,t,\ell,p,\mathcal C
+)
+$$
+
+表面变换轨道为：
+
+$$
+[x]_{\mathfrak G}
+=
+\{g\cdot x:g\in\mathfrak G\}
+$$
+
+候选语义质量应由轨道内和轨道间距离约束：
+
+$$
+Q_{\mathrm{semantic}}
+=
+1-
+\frac{
+D_{\mathrm{within}}
+}{
+D_{\mathrm{between}}+\varepsilon
+}
+$$
+
+来源位置要求等变性，而非强行不变性：
+
+$$
+\phi(gx)\approx\rho(g)\phi(x)
+$$
+
+全局图谱保持为：
+
+$$
+\mathcal G_m
+=
+(
+V_m,
+E_m^{\mathrm{architecture}},
+E_m^{\mathrm{observed}},
+E_m^{\mathrm{predictive}},
+E_m^{\mathrm{causal}},
+\tau_m,
+\rho_m,
+\omega_m
+)
+$$
+
+### 六、核心拼图
+
+当前拼图包括：词元身份、位置和距离、接口分账、内容-格式-停止分账、来源写入、注意力-MLP 补偿、历史来源与当前来源重组、生成时间分叉、行为资格门、关系绑定空白、跨模型差异和小模型偏差。
+
+全局物理轨迹图谱的稳定形状仍是：早层登记词元、位置、边界和标签；中层进行来源整合、路由、抵消和补偿；晚层组织查询、候选竞争、格式和停止；生成时间完成语义、修正、边界和终止。尚未证明抽象关系状态能跨表面变换保持稳定。
+
+### 七、闭合与进度
+
+严格机制闭合仍为：
+
+$$
+0/72=0\%
+$$
+
+全项目科学进度维持：
+
+$$
+21\%\quad(\text{合理区间 }18\%-24\%)
+$$
+
+该估计只表示协议成熟度、负结果筛选、图谱边界、局部物理拼图和工程复现能力，不表示语言机制已经破解 21%。
+
+### 八、下一阶段
+
+Phase438 的正确自动动作是冻结“自然稳定任务入口与全局语言模式图谱”方案，而不是继续补丁式修复 Phase437 合同。
+
+下一步应一次性覆盖知识网络、单步推理和语法系统，先发现每个模型自然稳定完成的任务类型，再冻结同语义表面变换轨道：
+
+$$
+\mathfrak G
+=
+\{
+\text{顺序交换},
+\text{距离改变},
+\text{边界改写},
+\text{连接词改写},
+\text{长度变化},
+\text{标签顺序改变}
+\}
+$$
+
+并记录：
+
+$$
+\Delta_gY=Y(g\cdot x)-Y(x)
+$$
+
+第一优先级是完成全局语言模式图谱的物理分布拼图，第二优先级才是闭合验证。当前不自动启动 CUDA 大样本，不读取物理或密封集。
+
+详细报告：`research/MainAnalysis/20260715_11_Phase438自然稳定任务入口与全局语言模式图谱方案.md`。
+
+## Phase 439: 三能力自然稳定入口与语义轨道预注册方案 [2026-07-15 15:58]
+
+### 一、任务
+
+本阶段审计新的 Phase438 分析文本，并对上一阶段的理论命名进行纠偏。Phase438 的战略方向正确：停止修补失败的受控自然关系合同，转向从模型自然稳定完成的知识、推理和语法任务中重建研究入口。但 Phase438 不应被视为新模型实验阶段。
+
+严格状态不变：
+
+$$
+\boxed{
+\text{九个模型-合同观察器全部未通过}
+}
+$$
+
+行为发现、行为留出、开放物理、密封物理、因果和神经元仍未授权。
+
+### 二、理论主体纠偏
+
+理论主体名称必须继续保持：
+
+$$
+\boxed{
+\text{语言是动态模式网络}
+}
+$$
+
+“条件物理状态图谱”不是新理论名，而是：
+
+$$
+\boxed{
+\text{条件物理状态图谱}
+=
+\text{语言是动态模式网络的测量、数据与证据框架}
+}
+$$
+
+三层结构为：理论主体、数学对象、实验方法。数学对象包括：
+
+$$
+\boxed{
+\mathfrak I
+=
+(
+\mathcal Z,
+\delta,
+\mathcal B,
+\mathcal T,
+\mathcal G,
+\mathcal E,
+\mathcal K,
+\Xi,
+\mathfrak G
+)
+}
+$$
+
+这些仍是候选对象，不是已完成的语言定律。
+
+### 三、算法与公式
+
+架构递推是物理账本：
+
+$$
+H^{(\ell+1)}
+=
+H^{(\ell)}
++
+A_\ell(H^{(\ell)},C)
++
+M_\ell(H^{(\ell)},C)
+$$
+
+完整条件物理状态为：
+
+$$
+\mathcal S_{m,t,\ell,p}
+=
+\Gamma_m(x,z,q,c,I,h,\pi,t,\ell,p,\mathcal C)
+$$
+
+任务激活动态图为：
+
+$$
+\mathcal G_m^{\mathrm{active}}(x,c,I,h)
+=
+\operatorname{Subgraph}[\mathcal G_m;x,c,I,h]
+$$
+
+表面变换轨道为：
+
+$$
+[x]_{\mathfrak G}
+=
+\{g\cdot x:g\in\mathfrak G\}
+$$
+
+且必须满足：
+
+$$
+\operatorname{Sem}(g\cdot x)=\operatorname{Sem}(x)
+$$
+
+Phase438 的语义质量公式需要收紧为有界轨道质量：
+
+$$
+Q_{\mathrm{orbit}}
+=
+\frac{
+D_{\mathrm{between}}-D_{\mathrm{within}}
+}{
+D_{\mathrm{between}}+D_{\mathrm{within}}+\varepsilon
+}
+$$
+
+来源位置要求图等变：
+
+$$
+E_{\mathrm{equiv}}
+=
+\frac{
+\|A(gx)-P_gA(x)P_g^{\mathsf T}\|_F
+}{
+\|A(x)\|_F+\varepsilon
+}
+$$
+
+### 四、全局物理图谱总结
+
+当前全局图谱宏观轮廓为：早层是输入分离与表面组织区；中层是整合、路由和补偿区；晚层是来源运输与终端准备区；生成时间更像增量承诺区。
+
+缺失的核心图谱仍是：抽象知识关系状态、推理中间状态转移、语法角色等变结构、跨表面轨道稳定物理状态、跨模型有类型功能拓扑。
+
+当前可靠复用更多来自注意力-MLP-残差骨架、来源/查询/终端位置角色、合法来源写入形式、事件类型和生成时间递推结构。尚未证明固定概念向量、固定关系向量、固定语法角色向量、固定全局工作空间坐标或跨模型统一隐藏坐标。
+
+### 五、闭合与进度
+
+闭合门升级为十三级：任务自然资格、观察器资格、表面轨道稳健性、行为留出、物理仪器资格、盲物理事件、语义轨道几何、类型化来源运输、未见行为预测、候选特异性、密封物理复现、聚合因果闭合、跨任务/跨模型/跨规模复现。
+
+当前严格机制闭合仍为：
+
+$$
+\boxed{
+0/72=0\%
+}
+$$
+
+全项目科学成熟度维持：
+
+$$
+\boxed{
+21\%\quad(\text{合理区间 }18\%-24\%)
+}
+$$
+
+本阶段没有新增模型数据，不能提高百分比。
+
+### 六、Phase439 方案
+
+Phase439 名称冻结为：
+
+```text
+三能力自然稳定入口、语义变换轨道资格与最小物理图谱
+```
+
+任务库一次性覆盖知识网络、单步推理和语法系统。知识任务包括上下文单属性读取、参数知识单事实读取、类别-属性继承、参数知识与上下文一致、参数知识与上下文冲突。推理任务包括集合包含、大小比较、条件蕴含、关系传递和一步排除。语法任务包括主谓数一致、代词数一致、主动-被动角色转换、关系从句角色、句界和闭合选择。
+
+冻结五个分割：接口校准、任务发现、表面轨道留出、物理窗口冻结、密封物理留出。实体、关系、规则和模板不得跨分割重复。
+
+任务发现集只允许每个模型-能力选择一个任务：
+
+$$
+\tau^*_{m,a}
+=
+\arg\max_{\tau\in\mathcal T_a}
+Q_{\mathrm{behavior}}(m,\tau)
+$$
+
+若全部任务未过最低门，不选择任何任务，禁止新增任务补救。
+
+行为资格要求：
+
+$$
+\operatorname{LCB}_{95\%}(p_{\mathrm{semantic}})\ge0.85
+$$
+
+$$
+\operatorname{UCB}_{95\%}(p_{\mathrm{other}})\le0.05
+$$
+
+轨道稳健性要求：
+
+$$
+\max_g p_g-\min_g p_g\le0.05
+$$
+
+密封授权要求：
+
+$$
+G_{\mathrm{behavior}}
+\land
+G_{\mathrm{orbit}}
+\land
+G_{\mathrm{equivariance}}
+\land
+G_{\mathrm{transport}}
+\land
+G_{\mathrm{prediction}}
+\land
+G_{\mathrm{specificity}}
+$$
+
+全部通过。Phase439 不执行因果干预，不扫描头、通道和神经元。
+
+### 七、下一步
+
+本阶段正确自动动作是理论纠偏、方案冻结和记录。当前不自动运行 CUDA 大样本，因为任务库、分割、接口选择和停止规则必须先稳定冻结；否则会从提示补丁循环滑入任务选择偏差循环。
+
+如果继续自动执行，下一步应先生成 Phase439 的机器可读协议和最小任务库，而不是直接采集三模型 CUDA 结果。
+
+详细报告：`research/MainAnalysis/20260715_12_Phase439三能力自然稳定入口与语义轨道预注册方案.md`。
+
+## Phase 440: Phase439 机器可读协议冻结与合同检查 [2026-07-15 15:58]
+
+### 一、任务
+
+根据 Phase439 的自动下一步判断，本阶段只冻结机器可读协议和最小任务库，不运行 CUDA 模型测试，不进入物理、密封、因果、头、通道或神经元扫描。
+
+### 二、结果
+
+新增协议脚本：
+
+```text
+tests/gpt5/phase439_natural_stable_entry_protocol.py
+```
+
+新增合同检查：
+
+```text
+tests/gpt5/test_phase439_natural_stable_entry_protocol.py
+```
+
+生成协议冻结文件：
+
+```text
+tests/gpt5/result/phase439_natural_stable_entry/phase439_protocol_freeze.json
+```
+
+协议包含三能力任务库：知识网络、单步推理、语法系统；冻结五个分割：接口校准、任务发现、表面轨道留出、物理窗口冻结、密封物理留出；保持理论主体为“语言是动态模式网络”，条件物理状态图谱仅作为测量框架。
+
+### 三、验证
+
+协议脚本运行成功。环境未安装 `pytest`，因此直接调用同一合同检查函数完成验证，结果通过：
+
+```text
+phase439 protocol contract ok
+```
+
+### 四、下一步
+
+下一步若继续自动执行，应在该协议基础上生成具体任务样本和分割清单；在样本、接口和停止规则全部冻结前，仍不应运行三模型 CUDA 大样本。
+
+## Phase 441: 协议v2与任务样本分割清单冻结 [2026-07-15 18:25]
+
+### 一、任务
+
+本阶段分析 Phase439-440 的纠偏意见，并把正确部分落实为运行前冻结产物。结论是：Phase439-440 没有新增机制证据，但指出了正确方向，即从模型自然稳定完成的知识、推理、语法任务建立入口，先冻结样本、语义轨道、分割、接口、答案别名和停止规则，再决定是否授权 CUDA（统一计算设备架构）行为测试和最小物理采集。
+
+### 二、完成内容
+
+协议已升级为：
+
+```text
+phase439_natural_stable_entry_protocol.v2
+```
+
+新增脚本：
+
+```text
+tests/gpt5/phase441_task_split_manifest.py
+```
+
+生成清单：
+
+```text
+tests/gpt5/result/phase439_natural_stable_entry/phase441_task_split_manifest.json
+```
+
+本阶段冻结六个分割：
+
+```text
+interface_calibration
+task_discovery
+surface_orbit_holdout
+physical_window_freeze
+physical_prediction_holdout
+sealed_physical_holdout
+```
+
+三种能力、每种五个候选任务、每任务 384 个基础语义组，总计 5760 个样本族清单项。清单散列为：
+
+```text
+856ba6a04d7b000a1d26c31538c645a1c929a5a2b8a1864660984b9a765264d9
+```
+
+### 三、算法原理
+
+任务选择采用固定顺序：
+
+```text
+通过硬行为门
+最大化最弱表面条件表现
+最小化表面轨道表现差
+优先选择最简单接口
+按任务编号确定性打破平局
+```
+
+这样做的目的不是提高表面分数，而是阻止在失败后临时换任务、换接口、换阈值或扩大窗口。
+
+### 四、核心公式
+
+行为语义门：
+
+$$
+\operatorname{LCB}_{95\%}(p_{\mathrm{semantic}})\ge0.85
+$$
+
+非目标输出门：
+
+$$
+\operatorname{UCB}_{95\%}(p_{\mathrm{other}})\le0.05
+$$
+
+轨道最大差：
+
+$$
+\max_g p_g-\min_g p_g\le0.05
+$$
+
+新增组级轨道一致性：
+
+$$
+C_{\mathrm{orbit}}
+=
+\frac{1}{N}
+\sum_i
+\prod_g
+\mathbf{1}
+\left[
+Y(gx_i)=Y_i^\*
+\right]
+$$
+
+冻结门槛：
+
+$$
+\operatorname{LCB}_{95\%}(C_{\mathrm{orbit}})\ge0.80
+$$
+
+轨道几何：
+
+$$
+Q_{\mathrm{orbit}}
+=
+\frac{
+D_{\mathrm{between}}-D_{\mathrm{within}}
+}{
+D_{\mathrm{between}}+D_{\mathrm{within}}+\varepsilon
+}
+$$
+
+图等变：
+
+$$
+E_{\mathrm{equiv}}
+=
+\frac{
+\left\|A(gx)-P_gA(x)P_g^\top\right\|_F
+}{
+\left\|A(x)\right\|_F+\varepsilon
+}
+$$
+
+其中 \(P_g\) 必须来自预注册节点映射，不能根据结果事后拟合。
+
+### 五、结果验证
+
+本地完成：
+
+```text
+python tests/gpt5/phase439_natural_stable_entry_protocol.py
+python tests/gpt5/phase441_task_split_manifest.py
+python -m py_compile tests/gpt5/phase439_natural_stable_entry_protocol.py tests/gpt5/phase441_task_split_manifest.py tests/gpt5/test_phase439_natural_stable_entry_protocol.py
+```
+
+并直接调用合同检查函数，结果通过：
+
+```text
+phase439/441 contract checks passed
+```
+
+### 六、理论进展与限制
+
+理论主体保持：
+
+$$
+\boxed{
+\text{语言是动态模式网络}
+}
+$$
+
+条件物理状态图谱仍只是测量框架，不是理论名称：
+
+$$
+\boxed{
+\text{条件物理状态图谱}=\text{测量、分账、留出和闭合验证框架}
+}
+$$
+
+本阶段新增的是研究纪律和入口可审计性，不是语言机制证据。严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍维持：
+
+$$
+\boxed{21\%}
+$$
+
+主要硬伤是：清单仍是样本族合同，不是真实自然语言样本；语义保持证明尚未逐样本完成；小模型外部效度仍可能有 30%-50% 偏差；轨道几何、来源运输、物理预测和密封复现仍没有真实物理结果。
+
+### 七、下一步
+
+应该自动推进到 Phase442：真实任务样本生成、语义轨道证明与静态合同检查。
+
+不应该直接自动运行三模型 CUDA 大样本。只有真实样本文本、答案别名、节点角色映射、词汇互斥、模板互斥、答案平衡、位置长度平衡、简单基线检查和冻结散列全部通过后，才允许进入行为资格测试。
+
+详细报告：`research/MainAnalysis/20260715_13_Phase441协议v2与任务样本分割清单冻结.md`。
+
+## Phase 442: 真实样本生成与零号门静态审计 [2026-07-15 21:05]
+
+### 一、任务
+
+本阶段分析 Phase441 的审计意见，并修复一个关键协议硬伤：当每分割只有 64 个语义组且使用双侧 Wilson 95% 区间时，“其他输出上界不超过 0.05”的门数学上不可通过。
+
+### 二、关键修复
+
+Phase442/v3 将每分割样本量从 64 提高到 80，保留双侧 Wilson 95% 区间，不覆盖 Phase441 旧产物。
+
+当 \(n=64\) 且 \(k=0\) 时：
+
+$$
+U_{95}(0,64)
+=
+\frac{1.96^2}{64+1.96^2}
+\approx0.0566
+$$
+
+该值大于 0.05，所以 Phase441 的其他输出门不可满足。
+
+当 \(n=80\) 且 \(k=0\) 时：
+
+$$
+U_{95}(0,80)
+\approx0.04582
+$$
+
+因此 Phase442/v3 的其他输出门数学上可通过，但要求：
+
+$$
+\boxed{0/80}
+$$
+
+次其他输出。
+
+### 三、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase442_static_sample_contract.py
+tests/gpt5/phase442_tokenization_contract.py
+tests/gpt5/test_phase442_static_sample_contract.py
+```
+
+生成产物：
+
+```text
+tests/gpt5/result/phase442_static_sample_contract/phase442_protocol_v3_freeze.json
+tests/gpt5/result/phase442_static_sample_contract/phase442_samples.jsonl
+tests/gpt5/result/phase442_static_sample_contract/phase442_semantic_certificates.jsonl
+tests/gpt5/result/phase442_static_sample_contract/phase442_static_audit_report.json
+tests/gpt5/result/phase442_static_sample_contract/phase442_tokenization_report.json
+tests/gpt5/result/phase442_static_sample_contract/phase442_artifact_manifest.json
+```
+
+本阶段生成：
+
+```text
+7200
+```
+
+个基础文本样本，以及：
+
+```text
+43200
+```
+
+个表面变体。
+
+联合散列：
+
+```text
+6d8e6a98d2b508e4c8fdaa28bc9375fce48b93bf78d41c7ec4ef74e66cc51c9d
+```
+
+### 四、算法原理
+
+本阶段引入零号门：
+
+$$
+G_{-1}
+=
+G_{\mathrm{protocol\ feasible}}
+\land
+G_{\mathrm{sample\ valid}}
+\land
+G_{\mathrm{semantic\ certified}}
+\land
+G_{\mathrm{split\ disjoint}}
+\land
+G_{\mathrm{tokenization}}
+\land
+G_{\mathrm{baseline}}
+\land
+G_{\mathrm{budget}}
+$$
+
+零号门不是机制闭合层，而是模型实验开始前的合法性门。
+
+### 五、统计门
+
+语义门：
+
+$$
+\operatorname{LCB}_{95\%}(p_{\mathrm{semantic}})\ge0.85
+$$
+
+在 \(n=80\) 时至少需要：
+
+$$
+\boxed{75/80}
+$$
+
+其他输出门：
+
+$$
+\operatorname{UCB}_{95\%}(p_{\mathrm{other}})\le0.05
+$$
+
+在 \(n=80\) 时最多允许：
+
+$$
+\boxed{0/80}
+$$
+
+组级轨道一致性门：
+
+$$
+\operatorname{LCB}_{95\%}(C_{\mathrm{orbit}})\ge0.80
+$$
+
+在 \(n=80\) 时至少需要：
+
+$$
+\boxed{72/80}
+$$
+
+### 六、分词合同
+
+本阶段只加载 tokenizer（分词器），不加载模型权重，不使用 CUDA（统一计算设备架构）。
+
+结果：
+
+```text
+Qwen3: pass, max_prompt_tokens=74
+GLM4: pass, max_prompt_tokens=70
+DS7B: pass, max_prompt_tokens=74
+```
+
+别名编码为空次数为 0，超过 1024 token 的提示数为 0。
+
+### 七、验证
+
+本地验证通过：
+
+```text
+phase442 static and tokenization contract checks passed
+```
+
+### 八、理论进展与限制
+
+理论主体保持：
+
+$$
+\boxed{
+\text{语言是动态模式网络}
+}
+$$
+
+本阶段的进展是实验入口合法性提高，不是语言机制证据。严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍维持：
+
+$$
+\boxed{21\%}
+$$
+
+主要限制是：样本仍是合成文本；语义证书来自生成器结构约束，还需要抽样人工审查或独立语义验证器；尚无行为结果、物理轨迹、来源运输、密封复现和因果中介。
+
+### 九、下一步
+
+可以自动进入 Phase443：三模型行为资格测试。
+
+Phase443 只允许按：
+
+```text
+Qwen3 → GLM4 → DS7B
+```
+
+顺序运行，每次只加载一个模型。若行为门、轨道门或基线门失败，必须停止，不得修改任务、接口、阈值、样本或分割。
+
+详细报告：`research/MainAnalysis/20260715_14_Phase442真实样本生成与零号门静态审计.md`。
+
+## Phase 443: 三模型行为资格测试与GLM4语法轨道失败 [2026-07-15 21:35]
+
+### 一、任务
+
+本阶段在 Phase442 零号门通过后，进入三模型行为资格测试。按冻结顺序执行：
+
+```text
+Qwen3 → GLM4 → DS7B
+```
+
+本阶段只运行短贪心生成行为测试，不采集物理轨迹，不做因果实验，不扫描头、通道或神经元。
+
+### 二、执行结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase443_behavior_qualification.py
+tests/gpt5/phase443_summarize_behavior.py
+```
+
+生成结果：
+
+```text
+tests/gpt5/result/phase443_behavior_qualification/phase443_qwen3_generations.jsonl
+tests/gpt5/result/phase443_behavior_qualification/phase443_qwen3_summary.json
+tests/gpt5/result/phase443_behavior_qualification/phase443_glm4_generations.jsonl
+tests/gpt5/result/phase443_behavior_qualification/phase443_glm4_summary.json
+tests/gpt5/result/phase443_behavior_qualification/phase443_behavior_aggregate_summary.json
+```
+
+Qwen3（通义千问3）通过三能力行为资格。GLM4（智谱GLM4）通过知识和推理，但语法系统表面轨道失败。因此 DS7B（深度求索7B）按停止规则未运行。
+
+### 三、行为门
+
+语义门：
+
+$$
+\operatorname{LCB}_{95\%}(p_{\mathrm{semantic}})\ge0.85
+$$
+
+在 \(n=80\) 时要求至少：
+
+$$
+\boxed{75/80}
+$$
+
+语义正确。
+
+其他输出门：
+
+$$
+\operatorname{UCB}_{95\%}(p_{\mathrm{other}})\le0.05
+$$
+
+在 \(n=80\) 时要求：
+
+$$
+\boxed{0/80}
+$$
+
+次其他输出。
+
+组级轨道一致性：
+
+$$
+C_{\mathrm{orbit}}
+=
+\frac{1}{N}
+\sum_i
+\prod_g
+\mathbf 1
+\left[
+Y(gx_i)=Y_i^\*
+\right]
+$$
+
+要求至少：
+
+$$
+\boxed{72/80}
+$$
+
+组全轨道通过。
+
+### 四、Qwen3结果
+
+Qwen3 选中任务：
+
+```text
+知识网络：category_attribute_inheritance
+单步推理：conditional_implication_one_step
+语法系统：active_passive_role_conversion
+```
+
+表面轨道留出结果：
+
+```text
+知识网络：80/80，表面最大差 0.0，pass
+单步推理：80/80，表面最大差 0.0，pass
+语法系统：80/80，表面最大差 0.0，pass
+```
+
+### 五、GLM4结果
+
+GLM4 选中同样三个任务：
+
+```text
+知识网络：category_attribute_inheritance
+单步推理：conditional_implication_one_step
+语法系统：active_passive_role_conversion
+```
+
+结果：
+
+```text
+知识网络：80/80，表面最大差 0.0，pass
+单步推理：80/80，表面最大差 0.0，pass
+语法系统：41/80，表面最大差 0.325，fail
+```
+
+语法失败集中在：
+
+```text
+order_rewrite：52/80 semantic，28/80 other
+query_rewrite：67/80 semantic，13/80 other
+```
+
+典型失败是精确角色 token 被截短，例如应输出：
+
+```text
+sy_acti_soh_002_ent_axx
+```
+
+但生成接近：
+
+```text
+sy_acti_soh_002_ent_a
+```
+
+### 六、理论进展
+
+理论主体保持：
+
+$$
+\boxed{
+\text{语言是动态模式网络}
+}
+$$
+
+本阶段只增加行为资格证据，不增加机制闭合证据。当前可以谨慎记录：
+
+$$
+\boxed{
+\text{Qwen3在当前合成三能力入口上通过行为轨道门}
+}
+$$
+
+以及：
+
+$$
+\boxed{
+\text{GLM4知识和推理入口通过，但语法角色表面轨道失败}
+}
+$$
+
+这说明知识读取和单步规则应用在当前合成文本中较稳定，但语法角色等变对模型和表面形式更敏感。
+
+### 七、限制
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍维持：
+
+$$
+\boxed{21\%}
+$$
+
+原因是本阶段没有物理轨迹、盲物理事件、轨道几何、来源运输、未见行为预测、密封复现或因果中介。
+
+主要硬伤是：样本仍是合成文本；Qwen3 的 100% 行为通过可能包含模板便利性；GLM4 失败混合了语法角色不稳、精确 token 复制不稳和接口格式不稳；DS7B 未运行，三模型复现未完成。
+
+### 八、下一步
+
+不应该继续自动运行 DS7B，不应该进入物理采集，也不应该修改样本、接口、阈值或任务补救。
+
+应该自动推进的下一步是分析型 Phase444：GLM4语法轨道失败审计与行为入口边界分析。Phase444 只能读取 Phase443 已生成结果，分析失败分布、token 截断、表面变换影响和观察器严格性；不得重新生成样本，不得放宽阈值，不得运行物理轨迹。
+
+详细报告：`research/MainAnalysis/20260715_15_Phase443三模型行为资格测试与GLM4语法轨道失败.md`。
+
+## Phase 444: 行为入口边界审计与物理授权撤回 [2026-07-15 23:10]
+
+### 一、任务
+
+本阶段只读取 Phase442-443 已生成结果，不运行新模型，不使用 CUDA（统一计算设备架构），不修改样本、接口、阈值或任务，不进入物理采集。
+
+目标是审计三个问题：
+
+1. GLM4（智谱GLM4）语法失败主要是角色选择失败，还是标识符序列化和格式失败；
+2. Qwen3（通义千问3）三个 100% 行为入口是否存在简单字符串捷径；
+3. DS7B（深度求索7B）未运行是否有冻结协议依据。
+
+### 二、完成内容
+
+新增只读分析脚本：
+
+```text
+tests/gpt5/phase444_behavior_boundary_analysis.py
+```
+
+生成结果：
+
+```text
+tests/gpt5/result/phase444_behavior_boundary_analysis/phase444_behavior_boundary_analysis.json
+```
+
+### 三、GLM4语法失败分解
+
+GLM4 在主动—被动角色转换的表面轨道中，共 480 个表面变体。
+
+分类结果：
+
+```text
+exact_or_accepted_target: 424
+target_prefix_truncation: 36
+unrelated_or_format_output: 20
+```
+
+严格失败共：
+
+$$
+\boxed{56}
+$$
+
+其中目标前缀截断为：
+
+$$
+\boxed{36/56}
+$$
+
+失败主要集中在：
+
+```text
+order_rewrite
+query_rewrite
+```
+
+### 四、角色选择与序列化分账
+
+本阶段计算：
+
+$$
+M_{\mathrm{role}}
+=
+d_N(\widehat y,y^-)-d_N(\widehat y,y^+)
+$$
+
+以及：
+
+$$
+R_{\mathrm{prefix}}
+=
+\frac{\operatorname{LCP}(\widehat y,y^+)}{|y^+|}
+$$
+
+结果：
+
+```text
+严格失败数：56
+高目标前缀比例失败：40
+正角色裕量失败：9
+```
+
+因此 GLM4 的正式结论应写为：
+
+$$
+\boxed{
+\text{完整语法行为轨道失败}
+}
+$$
+
+而不能写成：
+
+$$
+\boxed{
+\text{已证明语法角色理解失败}
+}
+$$
+
+更可能的解释是：角色相关输出被长合成标识符序列化、格式和停止问题破坏。
+
+### 五、Qwen3入口真实性审计
+
+Phase443 中 Qwen3 三任务均 80/80 通过，但 Phase444 实际检查简单基线后发现：
+
+类别—属性继承：
+
+```text
+first_color_in_prompt: 80/80 = 1.0
+last_color_in_prompt: 80/80 = 1.0
+```
+
+单步条件蕴含：
+
+```text
+first_color_in_prompt: 80/80 = 1.0
+last_color_in_prompt: 80/80 = 1.0
+```
+
+主动—被动角色转换：
+
+```text
+first_entity_token: 80/80 = 1.0
+last_entity_token: 80/80 = 1.0
+```
+
+这说明当前 Qwen3 的三个 100% 行为入口都可以被简单字符串或模板基线解释。
+
+### 六、DS7B停止规则审计
+
+读取 Phase442/v3 冻结协议后，没有发现明确的全局跨模型停止规则。
+
+因此 DS7B 状态应登记为：
+
+$$
+\boxed{
+\text{未知}
+}
+$$
+
+而不是失败。
+
+Phase443 因 GLM4 语法失败停止 DS7B 是保守执行，但不足以形成 DS7B 行为资格结论。
+
+### 七、物理授权决定
+
+Phase443 后曾有五个候选：
+
+```text
+Qwen3 类别—属性继承
+Qwen3 单步条件蕴含
+Qwen3 主动—被动转换
+GLM4 类别—属性继承
+GLM4 单步条件蕴含
+```
+
+Phase444 审计后，因 Qwen3 选中任务均存在 100% 简单基线，当前决定为：
+
+$$
+\boxed{
+\text{暂不授权任何模型—任务进入最小物理采集}
+}
+$$
+
+这是物理授权撤回，不是否定行为进展。
+
+### 八、理论更新
+
+理论主体保持：
+
+$$
+\boxed{
+\text{语言是动态模式网络}
+}
+$$
+
+本阶段重要更新是必须把序列化事件单独列入事件空间：
+
+$$
+\mathcal E
+=
+\mathcal E_{\mathrm{semantic}}
+\times
+\mathcal E_{\mathrm{serialization}}
+\times
+\mathcal E_{\mathrm{format}}
+\times
+\mathcal E_{\mathrm{revision}}
+\times
+\mathcal E_{\mathrm{boundary}}
+\times
+\mathcal E_{\mathrm{termination}}
+$$
+
+其中：
+
+$$
+\boxed{
+\text{语义角色选择}
+\neq
+\text{完整答案序列化}
+}
+$$
+
+### 九、限制
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍维持：
+
+$$
+\boxed{21\%}
+$$
+
+主要硬伤是：当前合成样本答案直接出现在提示中；知识和推理任务可被颜色提取基线完美解决；主动—被动任务可被实体位置基线完美解决；GLM4 失败主要混合序列化与格式问题；DS7B 行为资格仍未知；仍无内部物理轨迹。
+
+### 十、下一步
+
+不应该自动进入物理采集，不应该运行因果实验，不应该扫描头或神经元。
+
+应该自动推进到 Phase445：抗字符串捷径的三能力样本重构协议。
+
+Phase445 必须作为新协议版本，不能覆盖 Phase442-444 正式结果。目标是让答案不再被颜色、位置或模板基线直接读取，同时把语义选择与答案序列化分账。
+
+详细报告：`research/MainAnalysis/20260715_16_Phase444行为入口边界审计与物理授权撤回.md`。
+
+## Phase 445: 历史总审计与抗捷径路线判断 [2026-07-15 23:15]
+
+### 一、任务
+
+读取 `research/gpt5/docs/AGI_GPT5_MEMO.md` 的历史记录，对整体研究成果、路线问题和破解语言编码机制的下一步方案做总审计。本阶段不运行模型，不采集物理轨迹，不修改既有实验结论。
+
+### 二、总体成果
+
+项目已经完成的主要成果不是语言机制闭合，而是建立了较完整的实验基础设施：
+
+1. 三模型本地 CUDA（统一计算设备架构）测试体系已经形成；
+2. 残差、注意力、MLP（多层感知机）、来源写入、终端读出等组件账本逐步成熟；
+3. 位置—层—生成时间的全局物理图谱框架已经建立；
+4. 多轮协议审计排除了大量位置、模板、接口、历史、批处理、缓存和标签泄漏混杂；
+5. 十三级机制闭合门、零号门和表面轨道行为门已经形成；
+6. 理论名称稳定为“语言是动态模式网络”，条件物理状态图谱仅作为测量框架；
+7. Phase442-444 首次把三能力入口推进到真实合成样本、行为资格和基线审计层面。
+
+### 三、当前最可靠的结论
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍维持：
+
+$$
+\boxed{21\%}
+$$
+
+当前最可靠的正结论是：
+
+$$
+\boxed{
+\text{模型内部存在丰富的条件化动态物理轨迹和来源—查询—终端事件结构}
+}
+$$
+
+当前最可靠的负结论是：
+
+$$
+\boxed{
+\text{尚未发现可跨表面、跨任务、跨模型、跨留出稳定闭合的语言编码机制}
+}
+$$
+
+### 四、研究路线的主要问题
+
+历史记录显示，研究路线反复遇到五类硬伤：
+
+1. 将行为正确、物理相关或局部因果影响过早解释为机制；
+2. 多次被位置、模板、答案泄漏、接口格式、历史条件和序列化问题污染；
+3. 线性方向、单神经元、固定头、固定通道路线反复进入边际收益递减区；
+4. 合成任务容易被字符串、颜色、位置、最近项、首项等简单基线解决；
+5. 小模型结果的外部有效性有限，不能直接外推到真实语言编码。
+
+### 五、破解语言编码机制的关键转向
+
+下一步不能继续补丁式改进旧线性公式，也不能直接进入大规模物理采集。正确优先级应是：
+
+$$
+\boxed{
+\text{先构造抗捷径的真实三能力行为入口，再做最小物理图谱}
+}
+$$
+
+具体来说，应将事件空间显式拆成：
+
+$$
+\mathcal E
+=
+\mathcal E_{\mathrm{semantic}}
+\times
+\mathcal E_{\mathrm{serialization}}
+\times
+\mathcal E_{\mathrm{format}}
+\times
+\mathcal E_{\mathrm{boundary}}
+\times
+\mathcal E_{\mathrm{termination}}
+$$
+
+并将语言状态目标从“答案 token 正确”改成：
+
+$$
+\boxed{
+\text{知识实体—关系状态、推理规则转移、语法角色等变状态}
+}
+$$
+
+### 六、下一步方案
+
+下一阶段应执行 Phase445 的实质工作：抗字符串捷径的三能力样本重构协议。
+
+要求：
+
+1. 答案不能直接出现在提示中；
+2. 知识和推理任务不能被颜色、首项、最近项、答案长度或模板编号解决；
+3. 语法任务必须分离角色选择与答案序列化；
+4. 使用短自然别名或选择式语义标签，避免长合成标识符复制污染；
+5. 每个任务保存多标签：内容类型、操作类型、输出类型；
+6. 在运行模型前报告每个简单基线的实际准确率；
+7. DS7B 行为资格是否补齐必须由新协议明确停止作用域；
+8. 只有超过所有简单基线并通过表面轨道门的模型—任务，才允许进入最小物理图谱。
+
+### 七、最终判断
+
+项目已经完成了大量必要拼图，但目前仍处在“仪器和协议成熟、机制未闭合”的阶段。要破解语言编码机制，第一优先级不是继续找更强的局部方向或神经元，而是构造真正抗捷径的知识、推理、语法行为入口，并在这些入口上建立盲化、留出、可预测、可复现的最小位置—时间物理图谱。
+
+## Phase 446: 抗字符串捷径三能力入口与行为负结果 [2026-07-16 00:10]
+
+### 一、任务
+
+根据 Phase444-445 的审计结论，本阶段执行实质性的抗字符串捷径三能力入口协议。Phase445 已用于历史总审计，因此本阶段使用 Phase446 编号。
+
+本阶段目标：审计旧样本首/末基线同时 100% 的异常，生成抗捷径三能力样本，构造反事实语义对，运行三模型独立行为测试，并判断是否存在最小物理授权候选。
+
+本阶段不采集物理轨迹，不运行因果干预，不扫描头、通道或神经元。
+
+### 二、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase446_antishortcut_static_contract.py
+tests/gpt5/phase446_antishortcut_behavior.py
+tests/gpt5/phase446_summarize_antishortcut.py
+```
+
+生成结果：
+
+```text
+tests/gpt5/result/phase446_antishortcut_static_contract/
+tests/gpt5/result/phase446_antishortcut_behavior/
+```
+
+### 三、静态零号门
+
+固定三个主任务：
+
+```text
+knowledge_network/relation_truth_judgment
+single_step_reasoning/conditional_implication_truth
+syntax_system/agent_role_truth
+```
+
+每个任务不再从多个候选中择优。输出统一为 A/B 真假标签，避免复制颜色、属性词或长合成实体。
+
+静态规模：
+
+```text
+6 个分割
+每任务每分割 96 个反事实对
+总计 3456 个基础样本
+20736 个表面变体
+```
+
+静态门结果：
+
+```text
+答案标签泄漏：0
+候选非退化：3456/3456
+反事实对完整：1728/1728
+表面语义证书：20736/20736
+三模型 A/B 单词元：通过
+简单基线：全部 0.5，无超过 0.55
+```
+
+因此：
+
+$$
+\boxed{
+G_{-1}=1
+}
+$$
+
+### 四、行为门
+
+语义行为门：
+
+$$
+\operatorname{LCB}_{95\%}(A_{\mathrm{model}})\ge0.85
+$$
+
+简单基线门：
+
+$$
+A_{\mathrm{shortcut}}\le0.55
+$$
+
+语义增益门：
+
+$$
+H_{\mathrm{semantic}}
+=
+A_{\mathrm{model}}-A_{\mathrm{shortcut}}
+\ge0.25
+$$
+
+反事实一致性门：
+
+$$
+\operatorname{LCB}_{95\%}(C_{\mathrm{cf}})\ge0.85
+$$
+
+表面轨道门：
+
+$$
+\operatorname{LCB}_{95\%}(C_{\mathrm{orbit}})\ge0.80
+$$
+
+全部通过才允许最小物理图谱。
+
+### 五、Qwen3结果
+
+```text
+knowledge: 87/192, LCB=0.384, gain=-0.047, cf=3/96, orbit=0/192
+reasoning: 168/192, LCB=0.821, gain=0.375, cf=72/96, orbit=0/192
+syntax: 96/192, LCB=0.430, gain=0.000, cf=0/96, orbit=0/192
+```
+
+Qwen3 没有物理候选。推理任务有一定语义增益，但 Wilson 下界、反事实一致性和表面轨道均未过门。
+
+### 六、GLM4结果
+
+```text
+knowledge: 188/192, LCB=0.948, gain=0.479, cf=92/96, orbit=53/192
+reasoning: 152/192, LCB=0.729, gain=0.292, cf=56/96, orbit=96/192
+syntax: 80/192, LCB=0.349, gain=-0.083, cf=2/96, orbit=53/192
+```
+
+GLM4 的知识任务最接近合格：行为、基线增益和反事实一致性都通过，但表面轨道一致性失败，因此仍不能进入物理采集。
+
+### 七、DS7B结果
+
+```text
+knowledge: 84/192, LCB=0.369, gain=-0.062, cf=0/96, orbit=0/192
+reasoning: 96/192, LCB=0.430, gain=0.000, cf=0/96, orbit=0/192
+syntax: 96/192, LCB=0.430, gain=0.000, cf=0/96, orbit=0/192
+```
+
+DS7B 没有物理候选。本阶段补齐了 Phase443 缺失的 DS7B 行为状态。
+
+### 八、结论
+
+聚合结论为：
+
+$$
+\boxed{
+\text{无任何模型—任务获得最小物理授权}
+}
+$$
+
+这说明抗捷径门开始发挥作用。旧任务中的伪稳定入口被消除后，模型必须真正处理反事实语义翻转和表面轨道稳定。
+
+### 九、理论进展与限制
+
+理论主体保持：
+
+$$
+\boxed{
+\text{语言是动态模式网络}
+}
+$$
+
+本阶段新增约束：
+
+$$
+\boxed{
+\text{行为入口必须同时满足高正确率、低捷径、反事实翻转和表面轨道稳定}
+}
+$$
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍维持：
+
+$$
+\boxed{21\%}
+$$
+
+主要限制：抗捷径样本仍是合成文本；三模型均未通过完整行为门；表面轨道门成为主要瓶颈；语法任务接近机会水平；尚无内部物理轨迹。
+
+### 十、下一步
+
+不应该自动进入物理采集，不应该运行因果实验或神经元扫描。
+
+应该自动推进到 Phase447：抗捷径任务失败分解与接口修复协议。
+
+Phase447 应只分析 Phase446 行为输出，重点判断 GLM4 知识任务为何行为和反事实通过但表面轨道失败，Qwen3 推理任务为何接近门槛但轨道为零，以及失败来自模型语义能力、A/B 接口、提示形式、表面变换过强还是观察器解析。
+
+详细报告：`research/MainAnalysis/20260716_01_Phase446抗字符串捷径三能力入口与行为负结果.md`。
+
+## Phase 447: 失败分解与条件功能图谱授权审计 [2026-07-16 01:10]
+
+### 一、任务
+
+根据用户提供的 Phase446 后续分析，本阶段执行只读失败分解，判断是否应该把 GLM4 知识任务从条件功能候选推进到物理图谱观察。
+
+本阶段没有加载模型，没有使用 CUDA，没有生成新模型输出，没有采集内部激活、注意力、神经元或物理轨迹。
+
+实现脚本：
+
+```text
+tests/gpt5/phase447_failure_decomposition.py
+```
+
+输出结果：
+
+```text
+tests/gpt5/result/phase447_failure_decomposition/phase447_failure_decomposition.json
+```
+
+### 二、审计结论
+
+用户提供内容总体正确：Phase446 的停止决定正确，严格机制门不能放松，GLM4 知识任务是当前最强的狭窄候选，S0 到 S5 的分层授权体系是合理方向。
+
+但 Phase447 给出一个收紧结论：
+
+$$
+\boxed{
+\text{GLM4 知识任务是 S2 条件功能候选，但不授权物理图谱观察}
+}
+$$
+
+原因是表面轨道失败不是单点局部失败，而是分散在 boundary、order、query 三类变换上。
+
+### 三、核心结果
+
+聚合结果：
+
+```text
+observation_atlas_candidates = []
+strict_physical_candidates = []
+next_authorized = interface_redesign_protocol
+```
+
+GLM4 知识任务失败分解：
+
+```text
+boundary_rewrite: 96/192 failed, semantic_rate = 0.500
+order_rewrite:    96/192 failed, semantic_rate = 0.500
+query_rewrite:    96/192 failed, semantic_rate = 0.500
+distance_rewrite: 28/192 failed, semantic_rate = 0.854
+lexical_rewrite:  27/192 failed, semantic_rate = 0.859
+syntax_rewrite:    0/192 failed, semantic_rate = 1.000
+```
+
+最大失败簇占比：
+
+$$
+\boxed{
+\text{top failure share}=0.28<0.50
+}
+$$
+
+因此失败不够局部，不能解释为单一解析器或单一接口问题。
+
+### 四、理论进展
+
+本阶段把“功能候选”和“机制候选”进一步分离：
+
+$$
+\boxed{
+\text{行为信号}\neq\text{稳定功能窗口}\neq\text{物理机制}
+}
+$$
+
+当前理论主体保持：
+
+$$
+\boxed{
+\text{语言能力}=\text{动态模式网络在多表面轨道下的稳定语义不变量}
+}
+$$
+
+如果一个任务只能在原始表达或少数改写下正确，而在边界、顺序、查询形式改变时崩溃，那么它最多说明模型存在条件化语义敏感，不说明模型掌握了稳定语言编码机制。
+
+### 五、问题与硬伤
+
+第一，当前测试模型仍是小模型，内部编码机制与真实语言编码可能有 30% 到 50% 偏差。
+
+第二，Phase446 的表面变换可能混合了语义保持、提示接口和解析器压力，必须继续拆分。
+
+第三，现在线性机制公式无法解释跨表面轨道崩溃。继续补参数或补阈值很可能进入边际收益递减区。
+
+第四，GLM4 的知识任务有价值，但还不是稳定语言关系机制。
+
+### 六、下一步
+
+不应该自动进入物理轨迹图谱、神经元扫描或因果干预。
+
+应该自动推进到 Phase448：
+
+$$
+\boxed{
+\text{Phase448：边界、顺序、查询三类表面变换的接口重设计与语义保持审计}
+}
+$$
+
+Phase448 应重点检查 A/B 位置偏差、实体边界解析、关系方向、问题焦点、输出解析器误判，以及表面变换是否真实保持语义。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍为：
+
+$$
+\boxed{21\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_02_Phase447失败分解与条件功能图谱授权审计.md`。
+
+## Phase 448: 接口变换审计与协议重设计方案 [2026-07-16 01:13]
+
+### 一、任务
+
+根据 Phase447 的结论，本阶段自动推进到接口与表面变换审计。目标不是运行模型，而是检查 Phase446 中 boundary、order、query 三类失败变换是否混入了接口风险。
+
+本阶段没有加载模型，没有使用 CUDA，没有生成新模型输出，没有采集内部激活、注意力、神经元或物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase448_interface_transform_audit.py
+```
+
+输出：
+
+```text
+tests/gpt5/result/phase448_interface_transform_audit/phase448_interface_transform_audit.json
+```
+
+### 二、核心结果
+
+Phase448 显示，GLM4 知识任务的三类严重失败变换与三类接口风险重合：
+
+```text
+boundary_rewrite: semantic_rate = 0.500, 多个事实边界被压缩为分号链
+order_rewrite:    semantic_rate = 0.500, 查询被放在证据之前
+query_rewrite:    semantic_rate = 0.500, 删除 Queried statement 标记但最终指令仍引用 queried statement
+```
+
+表现最好的控制变换为：
+
+```text
+syntax_rewrite: semantic_rate = 1.000
+```
+
+这说明 GLM4 知识任务不是完全没有关系真值信号，而是对任务接口高度敏感。
+
+### 三、理论进展
+
+Phase448 把接口变量从语言机制变量中单独拆出：
+
+$$
+\boxed{
+\text{语言机制候选}=
+\text{语义不变量}
+\cap
+\text{接口不变量}
+\cap
+\text{表面轨道不变量}
+}
+$$
+
+接口不变量为：
+
+$$
+\boxed{
+\text{接口不变量}=
+\text{事实边界清晰}
+\cap
+\text{查询指代清晰}
+\cap
+\text{证据与问题的角色不混淆}
+}
+$$
+
+这一步很关键：如果接口没有冻结，物理轨迹会混入无效变量，导致后续神经元或激活图谱不可解释。
+
+### 四、问题与硬伤
+
+第一，本阶段只是静态审计，不能证明 v2 协议一定能通过行为门。
+
+第二，syntax_rewrite 的稳定可能来自更强提示框架，不一定代表真实语言关系机制。
+
+第三，小模型结果仍可能与真实语言编码机制有 30% 到 50% 偏差。
+
+第四，如果 v2 协议复测后仍失败，就必须承认当前 GLM4 知识任务只是表面条件窗口，不是稳定语言关系入口。
 
 ### 五、下一步
 
-继续优先完成全局语言模式图谱的物理分布拼图，但原始大表不直接进入 Git；闭合验证前应先建立稳定任务入口和可复查的轻量证据链。
+不允许进入物理轨迹、神经元扫描或因果干预。
+
+应该进入 Phase449：
+
+$$
+\boxed{
+\text{Phase449：冻结 Phase448 v2 接口协议，并生成小规模行为复测样本}
+}
+$$
+
+Phase449 应删除或替换原始三类高风险变换：order_rewrite 不再把查询放在证据前，boundary_rewrite 不再压缩事实边界，query_rewrite 必须同步改写最终指令。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍为：
+
+$$
+\boxed{21\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_03_Phase448接口变换审计与协议重设计方案.md`。
+
+## Phase 449: v2 接口协议冻结与 GLM4 知识复测入口 [2026-07-16 01:15]
+
+### 一、任务
+
+根据 Phase448 的结论，本阶段自动推进到 v2 接口协议冻结。目标是生成一个干净的小规模 GLM4 知识任务复测入口。
+
+本阶段没有运行模型，没有使用 CUDA，没有生成模型输出，没有采集内部激活、神经元、注意力或物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase449_v2_interface_protocol.py
+```
+
+输出：
+
+```text
+tests/gpt5/result/phase449_v2_interface_protocol/phase449_v2_protocol.json
+tests/gpt5/result/phase449_v2_interface_protocol/phase449_v2_glm4_knowledge_retest_samples.jsonl
+tests/gpt5/result/phase449_v2_interface_protocol/phase449_v2_static_audit.json
+tests/gpt5/result/phase449_v2_interface_protocol/phase449_v2_manifest.json
+```
+
+### 二、核心结果
+
+Phase449 生成 32 对、64 个 GLM4 知识任务小规模复测样本：
+
+```text
+pair_count = 32
+sample_count = 64
+label_counts = A:32, B:32
+role_counts = base:32, counterfactual:32
+failure_count = 0
+pass = true
+```
+
+授权范围：
+
+```text
+model_rerun_authorized = true
+physical_trace_authorized = false
+scope = glm4_knowledge_network_small_behavior_retest_only
+```
+
+### 三、协议变化
+
+Phase449 删除或替换 Phase448 标出的三类高风险变换：
+
+```text
+boundary_rewrite
+order_rewrite
+query_rewrite
+```
+
+新增 v2 变换：
+
+```text
+v2_lexical_frame
+v2_boundary_bullets
+v2_local_order_control
+v2_query_claim_sync
+v2_strong_statement_control
+```
+
+核心改变是：不把查询放在证据之前，不把事实边界压缩成分号链，删除 Queried statement 后同步改写最终指令。
+
+### 四、理论进展
+
+Phase449 把下一轮复测入口定义为：
+
+$$
+\boxed{
+\text{复测入口}=
+\text{语义保持}
+\cap
+\text{接口保持}
+\cap
+\text{A/B 与反事实平衡}
+}
+$$
+
+这一步不是降低标准，而是把接口错误从语言机制变量中剥离。
+
+### 五、下一步
+
+可以进入 Phase450，但 Phase450 已涉及模型推理，应该作为单独阶段执行。
+
+Phase450 应只运行 GLM4 的 Phase449 小规模知识任务复测，不运行其他模型，不采集物理轨迹。
+
+若小规模复测仍失败，GLM4 知识任务应降级为表面条件窗口；若通过，则扩大样本量后再判断是否允许有限观察图谱。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度仍为：
+
+$$
+\boxed{21\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_04_Phase449v2接口协议冻结与GLM4知识复测入口.md`。
+
+## Phase 450: 失败集合交并重审计 [2026-07-16 02:07]
+
+### 一、任务
+
+根据用户提供的 Phase447-449 审计意见，本阶段补充 Phase447 缺失的失败集合交并分析。目标是判断 boundary、order、query 三类失败是否真的是三批分散失败，还是同一批样本在多个高风险接口变换下同时失败。
+
+脚本：
+
+```text
+tests/gpt5/phase450_failure_set_overlap.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase450_failure_set_overlap/phase450_failure_set_overlap.json
+```
+
+### 二、结果
+
+Phase450 发现：
+
+```text
+failure_union_size = 139
+old_repeated_count_top_failure_share = 0.280
+union_based_localization_cover = 0.691
+Jaccard(boundary, order) = 1.0
+Jaccard(boundary, query) = 1.0
+Jaccard(order, query)    = 1.0
+```
+
+这说明 Phase447 的“失败分散”判断需要收紧。更准确说法是：
+
+$$
+\boxed{
+\text{同一批样本在 boundary、order、query 三类高风险接口变换下同时失败}
+}
+$$
+
+核心轨道与压力轨道差异：
+
+```text
+core_consistency_rate = 148/192 = 0.771
+stress_consistency_rate = 96/192 = 0.500
+all_consistency_rate = 53/192 = 0.276
+```
+
+Phase447 拒绝物理授权仍然正确，但不能把旧失败直接解释为稳定语言功能不存在。
+
+## Phase 451: GLM4 v2 小规模行为 pilot [2026-07-16 02:10]
+
+### 一、任务
+
+运行 GLM4 的 Phase449 v2 小规模复测。只运行 GLM4，不运行其他模型，不采集物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase451_glm4_v2_pilot_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase451_glm4_v2_pilot_behavior/phase451_glm4_v2_pilot_summary.json
+```
+
+### 二、结果
+
+修复生成切片后，小规模 pilot 结果为：
+
+```text
+overall = 308/320 = 0.963
+other = 0/320
+orbit = 55/64 = 0.859
+```
+
+分变换：
+
+```text
+v2_boundary_bullets = 64/64
+v2_lexical_frame = 59/64
+v2_local_order_control = 63/64
+v2_query_claim_sync = 59/64
+v2_strong_statement_control = 63/64
+```
+
+结论：v2 接口显著改善，但 64 样本不能作为严格资格测试。
+
+## Phase 452: v2 大样本独立留出协议冻结 [2026-07-16 02:11]
+
+### 一、任务
+
+冻结 GLM4 知识任务的大样本独立留出协议，来源为 Phase446 中未被行为运行的 physical_window_freeze split。
+
+脚本：
+
+```text
+tests/gpt5/phase452_v2_large_holdout_protocol.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase452_v2_large_holdout_protocol/phase452_v2_large_holdout_static_audit.json
+```
+
+### 二、结果
+
+```text
+pair_count = 96
+sample_count = 192
+variant_count = 960
+label_counts = A:96, B:96
+role_counts = base:96, counterfactual:96
+failure_count = 0
+```
+
+静态审计通过，授权 GLM4 大样本行为复测，不授权物理采集。
+
+## Phase 453: GLM4 v2 大样本独立留出行为复测 [2026-07-16 02:13]
+
+### 一、任务
+
+运行 GLM4 的 v2 大样本独立留出复测。只运行 GLM4，不运行其他模型，不采集物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase453_glm4_v2_large_holdout_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase453_glm4_v2_large_holdout_behavior/phase453_glm4_v2_large_holdout_summary.json
+```
+
+### 二、结果
+
+总体：
+
+```text
+overall = 944/960 = 0.983
+semantic_lcb_95 = 0.973
+other = 0/960
+orbit = 176/192 = 0.917
+orbit_lcb_95 = 0.869
+```
+
+分变换：
+
+```text
+v2_boundary_bullets = 192/192
+v2_lexical_frame = 190/192
+v2_local_order_control = 191/192
+v2_query_claim_sync = 192/192
+v2_strong_statement_control = 179/192
+```
+
+强模板压力项的反事实一致性不足：
+
+```text
+v2_strong_statement_control = 83/96
+consistent_lcb_95 = 0.782
+```
+
+因此包含强模板时，整体严格行为门仍不通过。
+
+## Phase 454: 核心轨道行为窗口读出 [2026-07-16 02:14]
+
+### 一、任务
+
+将 v2_strong_statement_control 从核心轨道中拆出，作为强模板压力轨道单独评估。
+
+脚本：
+
+```text
+tests/gpt5/phase454_core_track_readout.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase454_core_track_readout/phase454_core_track_readout.json
+```
+
+### 二、核心结果
+
+核心轨道包括：
+
+```text
+v2_boundary_bullets
+v2_lexical_frame
+v2_local_order_control
+v2_query_claim_sync
+```
+
+核心轨道结果：
+
+```text
+semantic = 765/768 = 0.996
+semantic_lcb_95 = 0.989
+other = 0
+counterfactual = 381/384 = 0.992
+counterfactual_lcb_95 = 0.977
+orbit = 189/192 = 0.984
+orbit_lcb_95 = 0.955
+```
+
+结论：
+
+$$
+\boxed{
+\text{GLM4 知识任务升级为 S3-core 核心轨道行为稳定候选}
+}
+$$
+
+但仍不能升级为 S4 物理功能稳定窗口。
+
+强模板压力轨道仍失败：
+
+```text
+v2_strong_statement_control semantic = 179/192
+counterfactual = 83/96
+counterfactual_lcb_95 = 0.782
+```
+
+### 三、理论进展
+
+当前候选门应写成：
+
+$$
+\boxed{
+G_{\mathrm{candidate}}
+=
+G_{\mathrm{interface\ valid}}
+\land
+G_{\mathrm{semantic\ sensitive}}
+\land
+G_{\mathrm{core\ surface\ robust}}
+}
+$$
+
+接口压力能力单独记为：
+
+$$
+\boxed{
+G_{\mathrm{stress}}
+=
+G_{\mathrm{query\ reorder}}
+\land
+G_{\mathrm{boundary\ compression}}
+\land
+G_{\mathrm{template\ shift}}
+}
+$$
+
+### 四、下一步
+
+不应该直接进入物理采集。
+
+应该进入 Phase455：独立核心轨道复验与静态基线审计。需要使用新的独立样本生成器，不复用 Phase446 名称和模板，同时重新运行简单基线、位置基线、模板编号基线和输出偏置基线。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度更新为：
+
+$$
+\boxed{23\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_05_Phase450-454失败集合重审计与GLM4核心轨道行为窗口.md`。
+
+## Phase 455: 独立核心轨道协议与静态基线审计 [2026-07-16 03:28]
+
+### 一、任务
+
+根据用户提供的 Phase450-454 审计意见，本阶段不复用 Phase446 生成器，而是构造全新词表、全新模板和预注册 core/stress 轨道，用于检验 Phase454 的 S3-core 候选是否能跨生成器复现。
+
+脚本：
+
+```text
+tests/gpt5/phase455_independent_core_protocol.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase455_independent_core_protocol/phase455_independent_core_static_audit.json
+```
+
+### 二、结果
+
+静态审计通过：
+
+```text
+status = static_pass_no_model_run
+label_counts = A:96, B:96
+role_counts = base:96, counterfactual:96
+target_side = left:96, right:96
+query_signal_side = left:96, right:96
+failing_baselines = []
+```
+
+授权 GLM4 独立行为复验，不授权物理采集。
+
+## Phase 456: GLM4 独立核心轨道行为复验 [2026-07-16 03:31]
+
+### 一、任务
+
+运行 GLM4 的 Phase455 独立核心轨道复验。只运行 GLM4，不运行其他模型，不采集物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase456_glm4_independent_core_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase456_glm4_independent_core_behavior/phase456_glm4_independent_core_summary.json
+```
+
+### 二、结果
+
+总体：
+
+```text
+overall = 976/1152 = 0.847
+semantic_lcb_95 = 0.825
+other = 0
+```
+
+核心轨道：
+
+```text
+core = 669/768 = 0.871
+core_lcb_95 = 0.846
+core_counterfactual = 285/384 = 0.742
+core_counterfactual_lcb_95 = 0.696
+core_orbit = 153/192 = 0.797
+core_orbit_lcb_95 = 0.734
+```
+
+结论：
+
+$$
+\boxed{
+\text{Phase456 未确认 S3-core 行为窗口}
+}
+$$
+
+## Phase 457: 独立复验失败结构审计 [2026-07-16 03:32]
+
+### 一、任务
+
+分析 Phase456 的失败结构，判断失败是否来自标签、角色、左右侧、ledger 模板或输出偏置。
+
+脚本：
+
+```text
+tests/gpt5/phase457_independent_failure_audit.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase457_independent_failure_audit/phase457_independent_failure_audit.json
+```
+
+### 二、结果
+
+核心轨道输出分布：
+
+```text
+A:285, B:483
+```
+
+按标签：
+
+```text
+label B = 384/384 correct
+label A = 285/384 correct
+```
+
+按角色：
+
+```text
+counterfactual = 384/384 correct
+base = 285/384 correct
+```
+
+按目标侧：
+
+```text
+target right = 373/384 = 0.971
+target left = 296/384 = 0.771
+```
+
+失败主因是独立生成器触发了 left/base/A 条件下的 B 输出倾向。
+
+### 三、理论结论
+
+Phase454 的结论必须收紧：
+
+$$
+\boxed{
+\text{GLM4 知识任务是高价值 S3-core 候选，但未通过独立确认}
+}
+$$
+
+S3-core 门应更新为：
+
+$$
+\boxed{
+G_{\mathrm{S3-core}}
+=
+G_{\mathrm{interface\ valid}}
+\land
+G_{\mathrm{core\ robust}}
+\land
+G_{\mathrm{counterfactual}}
+\land
+G_{\mathrm{generator\ independent}}
+}
+$$
+
+Phase454 满足前三项，但 Phase456 没有满足生成器独立复现。
+
+### 四、下一步
+
+不应该进入物理采集。
+
+应该进入 Phase458：独立生成器 v2，去除 left/right 侧偏置，改为三实体或轮换目标位置，并重新做静态基线审计。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{23\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_06_Phase455-457独立复验负结果与S3core候选收紧.md`。
+
+## Phase 458: 独立生成器 v2 静态协议 [2026-07-16 03:35]
+
+### 一、任务
+
+根据 Phase457 发现的 left/base/A 偏置，本阶段重新设计独立生成器 v2：去除 left/right 二分结构，改为四位置轮换，并在模型运行前重新做静态基线审计。
+
+脚本：
+
+```text
+tests/gpt5/phase458_independent_v2_protocol.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase458_independent_v2_protocol/phase458_independent_v2_static_audit.json
+```
+
+### 二、结果
+
+静态审计通过：
+
+```text
+status = static_pass_no_model_run
+label_counts = A:96, B:96
+role_counts = base:96, counterfactual:96
+target_positions = 0:48, 1:48, 2:48, 3:48
+query_marker_positions = 0:48, 1:48, 2:48, 3:48
+failing_baselines = []
+```
+
+GLM4 行为复验被授权，物理采集仍不授权。
+
+## Phase 459: GLM4 独立 v2 行为复验 [2026-07-16 03:37]
+
+### 一、任务
+
+运行 GLM4 的 Phase458 独立 v2 行为复验。只运行 GLM4，不运行其他模型，不采集物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase459_glm4_independent_v2_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase459_glm4_independent_v2_behavior/phase459_glm4_independent_v2_generations.jsonl
+```
+
+Phase459 初始 summary 复用了旧 transform 名称，导致 core 轨道被错误读为 0；因此 Phase460 做只读重算，没有重跑模型。
+
+## Phase 460: 独立 v2 正确轨道读出 [2026-07-16 03:38]
+
+### 一、任务
+
+使用 Phase458 的正确 core/stress transform 名称重算 Phase459 结果。
+
+脚本：
+
+```text
+tests/gpt5/phase460_independent_v2_readout.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase460_independent_v2_readout/phase460_independent_v2_readout.json
+```
+
+### 二、结果
+
+总体：
+
+```text
+overall = 988/1152 = 0.858
+semantic_lcb_95 = 0.836
+other = 0
+```
+
+核心轨道：
+
+```text
+core = 684/768 = 0.891
+core_lcb_95 = 0.867
+core_counterfactual = 306/384 = 0.797
+core_counterfactual_lcb_95 = 0.754
+core_orbit = 152/192 = 0.792
+core_orbit_lcb_95 = 0.729
+```
+
+分 core 变换：
+
+```text
+core_table_frame = 180/192
+core_claim_reference_sync = 171/192
+core_evidence_then_claim = 172/192
+core_record_lines = 161/192
+```
+
+结论：
+
+$$
+\boxed{
+\text{GLM4 独立 v2 仍未确认 S3-core 行为窗口}
+}
+$$
+
+### 三、理论结论
+
+当前最严格结论是：
+
+$$
+\boxed{
+\text{Phase452-454 是高价值候选，但跨生成器复验失败}
+}
+$$
+
+因此当前不能进入物理采集。
+
+下一步 Phase461 应做 Phase452 成功生成器与 Phase458 失败生成器的文本结构差分，定位失败来自关系推理不足、长距离负担、四实体干扰，还是模板不熟悉。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{23\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_07_Phase458-460独立生成器v2复验与S3core未确认.md`。
+
+## Phase 461: 生成器结构与联合混杂审计 [2026-07-16 04:21]
+
+### 一、任务
+
+根据用户提供的 Phase455-460 审计意见，本阶段检查 Phase452、Phase455、Phase458 三个生成器的联合计数和结构差异，重点判断边际平衡是否掩盖了标签、角色、目标位置和查询位置的联合混杂。
+
+脚本：
+
+```text
+tests/gpt5/phase461_generator_structure_audit.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase461_generator_structure_audit/phase461_generator_structure_audit.json
+```
+
+### 二、结果
+
+三个生成器都存在固定绑定：
+
+```text
+A/base = 96
+B/counterfactual = 96
+```
+
+也就是说：
+
+$$
+\boxed{
+\text{base}=A,\qquad \text{counterfactual}=B
+}
+$$
+
+反事实一致性因此混合了语义翻转、标签方向和角色身份。
+
+结构差异也很大：
+
+```text
+Phase452: 2 entities, 4 facts, avg 48.6 tokens
+Phase458: 4 entities, 8 facts, avg 100.3 tokens
+```
+
+因此 Phase458 失败不能只解释为生成器风格失败，也可能包含任务难度差异。
+
+## Phase 462: 桥接协议静态冻结 [2026-07-16 04:23]
+
+### 一、任务
+
+构造桥接协议：保持 Phase452 的两实体、四事实难度，但打破 base/A 与 counterfactual/B 绑定。
+
+脚本：
+
+```text
+tests/gpt5/phase462_bridge_protocol.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase462_bridge_protocol/phase462_bridge_static_audit.json
+```
+
+### 二、结果
+
+静态审计通过：
+
+```text
+A/base = 48
+A/counterfactual = 48
+B/base = 48
+B/counterfactual = 48
+```
+
+四阶联合也平衡：
+
+```text
+N(Y, role, target_position, query_position) = 24 per cell
+```
+
+授权 GLM4 桥接行为复验，不授权物理采集。
+
+## Phase 463: GLM4 桥接行为复验 [2026-07-16 04:25]
+
+### 一、任务
+
+运行 GLM4 的桥接行为复验。只运行 GLM4，不运行其他模型，不采集物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase463_glm4_bridge_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase463_glm4_bridge_behavior/phase463_glm4_bridge_summary.json
+```
+
+### 二、结果
+
+总体：
+
+```text
+overall = 956/1152 = 0.830
+semantic_lcb_95 = 0.807
+other = 0
+```
+
+核心轨道：
+
+```text
+core = 652/768 = 0.849
+core_lcb_95 = 0.822
+core_counterfactual = 273/384 = 0.711
+core_counterfactual_lcb_95 = 0.664
+core_orbit = 120/192 = 0.625
+core_orbit_lcb_95 = 0.555
+```
+
+桥接协议未恢复 S3-core 稳定。
+
+## Phase 464: 桥接失败结构审计 [2026-07-16 04:25]
+
+### 一、任务
+
+分析 Phase463 桥接复验失败结构。
+
+脚本：
+
+```text
+tests/gpt5/phase464_bridge_failure_audit.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase464_bridge_failure_audit/phase464_bridge_failure_audit.json
+```
+
+### 二、结果
+
+核心输出出现 A 倾向：
+
+```text
+core output_distribution = A:478, B:290
+```
+
+按 label/role：
+
+```text
+A/base = 188/192
+A/counterfactual = 185/192
+B/base = 139/192
+B/counterfactual = 140/192
+```
+
+按模板：
+
+```text
+bridge_lexical_frame = 188/192
+bridge_claim_sync = 169/192
+bridge_evidence_claim = 159/192
+bridge_numbered_facts = 136/192
+```
+
+结论：
+
+$$
+\boxed{
+\text{打破 base/A 绑定仍未恢复稳定，失败转移为模板触发路径问题}
+}
+$$
+
+### 三、理论结论
+
+当前模型行为应写为：
+
+$$
+\boxed{
+Y_m=F_m(z,c,I,\pi,h,\gamma,\tau)
+}
+$$
+
+其中：
+
+```text
+gamma = 生成器家族
+tau = 模板轨道或序列化方式
+```
+
+GLM4 当前只表现出生成器条件化、模板条件化的核心行为窗口，不能称为生成器独立 S3-core 窗口。
+
+### 四、下一步
+
+不应该进入物理采集。
+
+Phase465 应做模板因素桥接实验：从表现最好的 bridge_lexical_frame 出发，每次只改变一个因素，包括编号、Evidence frame、Claim sync、semicolon compact、claim-first。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{23\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_08_Phase461-464生成器结构审计与桥接复验失败.md`。
+
+## Phase 465: 模板因子桥接协议冻结 [2026-07-16 04:47]
+
+### 一、任务
+
+根据用户提供的 Phase461-464 审计意见，本阶段不再继续做自由模板补丁，而是把模板差异拆成单因素变化。目标是检查 Phase464 中所谓“模板触发路径”到底来自编号、Evidence（证据）标签、claim（断言）同步、分号压缩，还是查询前置。
+
+脚本：
+
+```text
+tests/gpt5/phase465_template_factor_protocol.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase465_template_factor_protocol/phase465_template_factor_static_audit.json
+```
+
+### 二、静态冻结
+
+协议保持两实体、四事实难度：
+
+```text
+samples = 192
+variants = 1152
+transforms = 6
+```
+
+标签、角色和位置平衡：
+
+```text
+A/base = 48
+A/counterfactual = 48
+B/base = 48
+B/counterfactual = 48
+```
+
+补充 Phase462 口径歧义：
+
+$$
+\boxed{
+S_{\mathrm{full}}=\frac{8}{16}=0.5
+}
+$$
+
+$$
+\boxed{
+S_{\mathrm{legal}}=\frac{8}{8}=1.0
+}
+$$
+
+完整笛卡尔支持不可能为 1，因为真值由 query position（查询位置）是否等于 target position（目标位置）定义；合法语义空间已全覆盖。
+
+非 oracle（非预言机）基线全部为 0.5，静态审计通过。授权 GLM4 行为复验，不授权物理采集。
+
+## Phase 466: GLM4 模板因子行为复验 [2026-07-16 04:47]
+
+### 一、任务
+
+运行 GLM4 模板因子复验，只做行为诊断，不采集内部激活。
+
+脚本：
+
+```text
+tests/gpt5/phase466_glm4_template_factor_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase466_glm4_template_factor_behavior/phase466_glm4_template_factor_summary.json
+```
+
+### 二、结果
+
+总体：
+
+```text
+overall = 1016/1152 = 0.8819
+semantic_lcb_95 = 0.8620
+other = 0
+counterfactual_pair = 440/576 = 0.7639
+counterfactual_lcb_95 = 0.7275
+orbit = 99/192 = 0.5156
+orbit_lcb_95 = 0.4453
+```
+
+没有恢复稳定模板窗口：
+
+$$
+\boxed{
+G_{\mathrm{template}}=0
+}
+$$
+
+按模板：
+
+```text
+factor_semicolon_only      = 188/192 = 0.9792
+factor_plain_anchor        = 187/192 = 0.9740
+factor_claim_sync_only     = 186/192 = 0.9688
+factor_evidence_label_only = 174/192 = 0.9063
+factor_numbered_only       = 169/192 = 0.8802
+factor_claim_first_only    = 112/192 = 0.5833
+```
+
+模板范围：
+
+$$
+\boxed{
+R_{\tau}=0.3959
+}
+$$
+
+## Phase 467: 模板因子失败结构审计 [2026-07-16 04:47]
+
+### 一、任务
+
+分析 Phase466 的失败结构，重点查看模板、标签、角色和位置交互。
+
+脚本：
+
+```text
+tests/gpt5/phase467_template_factor_failure_audit.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase467_template_factor_failure_audit/phase467_template_factor_failure_audit.json
+```
+
+### 二、结果
+
+最强失败来自查询前置：
+
+```text
+factor_claim_first_only / A = 96/96 = 1.0000
+factor_claim_first_only / B = 16/96 = 0.1667
+output A = 176/192
+```
+
+最稳定模板为分号压缩：
+
+```text
+factor_semicolon_only / A = 92/96 = 0.9583
+factor_semicolon_only / B = 96/96 = 1.0000
+```
+
+因此主要破坏因子不是分号或压缩，而是：
+
+$$
+\boxed{
+\rho=\text{查询在证据之前出现}
+}
+$$
+
+### 三、理论结论
+
+当前模型行为公式更新为：
+
+$$
+\boxed{
+Y_m=F_m(z,c,I,\pi,h,\gamma,\tau,\mu,\rho)
+}
+$$
+
+其中：
+
+```text
+gamma = 生成器家族
+tau = 模板轨道或序列化方式
+mu = A/B 标签含义映射
+rho = 证据-查询呈现顺序
+```
+
+模板本身应拆成：
+
+$$
+\boxed{
+\tau=(\tau_{\mathrm{record}},\tau_{\mathrm{number}},\tau_{\mathrm{evidence}},\tau_{\mathrm{claim}},\rho)
+}
+$$
+
+Phase465-467 的核心进展不是证明知识编码机制，而是把“模板敏感”压缩成一个更具体的候选轴：证据与查询的编译顺序。
+
+### 四、下一步
+
+正式语义物理图谱仍不授权。
+
+可以做小型诊断物理预检，只比较冻结的成功模板与失败模板：
+
+```text
+success = factor_semicolon_only / factor_plain_anchor
+failure = factor_claim_first_only
+```
+
+目标是检查同一语义任务在不同呈现顺序下是否形成不同任务程序编译轨迹，而不是命名神经元、头或因果边。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度小幅提高到：
+
+$$
+\boxed{24\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_09_Phase465-467模板因子桥接诊断与任务程序编译窗口.md`。
+
+## Phase 468: 模板顺序小型物理预检 [2026-07-16 04:51]
+
+### 一、任务
+
+根据 Phase465-467，自动继续一个极小、冻结、诊断性质的物理预检。目标不是建立正式语义物理图谱，而是检查成功模板和 claim-first 失败模板是否在内部标量摘要上存在可观察差异。
+
+脚本：
+
+```text
+tests/gpt5/phase468_template_order_physical_precheck.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase468_template_order_physical_precheck/phase468_template_order_physical_precheck_summary.json
+tests/gpt5/result/phase468_template_order_physical_precheck/phase468_template_order_physical_scalar_rows.jsonl
+```
+
+### 二、采集范围
+
+只比较三个冻结模板：
+
+```text
+factor_plain_anchor
+factor_semicolon_only
+factor_claim_first_only
+```
+
+采集规模：
+
+```text
+pair_index = 0..15
+prompts = 96
+layers = 41
+trace_rows = 3936
+```
+
+只保存最后 token（词元）每层标量：
+
+```text
+last_token_l2
+last_token_abs_mean
+last_token_mean
+```
+
+不保存原始向量，不保存注意力头，不保存神经元通道，不授权因果边。
+
+行为计数保留了核心现象：
+
+```text
+factor_claim_first_only / B / semantic = 5
+factor_claim_first_only / B / wrong = 11
+factor_plain_anchor / B / semantic = 16
+factor_semicolon_only / B / semantic = 16
+```
+
+## Phase 469: 模板顺序标量差异分析 [2026-07-16 04:51]
+
+### 一、任务
+
+分析 Phase468 标量物理预检，比较：
+
+$$
+\boxed{
+\text{claim-first 的 B wrong}
+-
+\text{成功模板的 B semantic}
+}
+$$
+
+脚本：
+
+```text
+tests/gpt5/phase469_template_order_scalar_analysis.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase469_template_order_scalar_analysis/phase469_template_order_scalar_analysis.json
+```
+
+### 二、结果
+
+最大 L2 差异集中在晚层：
+
+```text
+layer 39: delta_l2 = -12.1103
+layer 40: delta_l2 =  12.0435
+layer 38: delta_l2 = -8.4928
+layer 37: delta_l2 = -5.7854
+layer 36: delta_l2 = -4.2961
+```
+
+最大 abs-mean 差异也集中在晚层：
+
+```text
+layer 40: delta_abs =  0.07935
+layer 37: delta_abs = -0.05343
+layer 36: delta_abs = -0.05186
+```
+
+允许的结论：
+
+$$
+\boxed{
+\text{成功模板与 claim-first 的 B 失败在晚层标量摘要上存在可观察差异}
+}
+$$
+
+不允许的结论：
+
+$$
+\boxed{
+\text{已经定位知识编码机制、真值状态、因果头或神经元功能}
+}
+$$
+
+### 三、理论更新
+
+图谱坐标更新为：
+
+$$
+\boxed{
+X_m^{(\ell,t)}=\Phi_m(x;\gamma,\tau,\mu,\rho,\ell,t)
+}
+$$
+
+输出读出：
+
+$$
+\boxed{
+Y_m=R_m\left(X_m^{(L,T)};\mu,\rho\right)
+}
+$$
+
+Phase468-469 只授权一个很弱的观察边：
+
+$$
+\boxed{
+\rho \rightarrow X_m^{(\ell,T)}
+\quad
+\text{晚层标量摘要可观察}
+}
+$$
+
+正式语义物理图谱仍不授权。
+
+### 四、下一步
+
+如果继续，Phase470 应做位置分辨、向量无关诊断，只在同一 96 个冻结 prompt 上记录 evidence tokens（证据词元）、claim tokens（断言词元）和 terminal token（终端词元）的标量摘要，用来区分证据读取失败、断言绑定失败和晚期 A/B 标签竞争失败。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{24\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_10_Phase468-469模板顺序物理预检与晚层标量差异.md`。
+
+## Phase 470: 位置分辨标量物理预检 [2026-07-16 06:14]
+
+### 一、任务
+
+根据用户提供的 Phase465-469 审计，Phase468-469 的终端标量比较还不足以判断分歧发生位置。本阶段改为记录 evidence_span（证据跨度）、claim_span（断言跨度）和 terminal_token（终端词元）三类角色位置的标量摘要。
+
+脚本：
+
+```text
+tests/gpt5/phase470_position_resolved_scalar_precheck.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase470_position_resolved_scalar_precheck/phase470_position_resolved_scalar_summary.json
+tests/gpt5/result/phase470_position_resolved_scalar_precheck/phase470_position_resolved_scalar_rows.jsonl
+```
+
+### 二、采集范围
+
+```text
+model = GLM4
+pair_index = 0..15
+prompts = 96
+roles = evidence_span, claim_span, terminal_token
+layers = 41
+trace_rows = 11808
+```
+
+只保存：
+
+```text
+mean_token_l2
+mean_vector_l2
+mean_abs_mean
+mean_signed_mean
+```
+
+不保存原始向量，不保存注意力头，不保存神经元通道，不授权因果边。
+
+角色跨度定位全部成功：
+
+```text
+claim_span = 96
+evidence_span = 96
+terminal_token = 96
+```
+
+## Phase 471: 位置分辨严格配对分析 [2026-07-16 06:14]
+
+### 一、任务
+
+对同一 `sample_id` 进行严格配对：
+
+$$
+\boxed{
+\Delta_{\rho,i,\ell,r}
+=
+X_{i,\ell,r}^{\mathrm{claim-first}}
+-
+X_{i,\ell,r}^{\mathrm{evidence-first}}
+}
+$$
+
+主分析不按模型最终正确或错误筛选。
+
+脚本：
+
+```text
+tests/gpt5/phase471_position_resolved_paired_analysis.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase471_position_resolved_paired_analysis/phase471_position_resolved_paired_analysis.json
+```
+
+### 二、结果
+
+配对差异数量：
+
+```text
+paired_delta_count = 7872
+```
+
+主分析中，`mean_vector_l2` 的平均配对差异：
+
+```text
+claim_span / early     =  9.3567
+claim_span / mid_front = 21.4065
+claim_span / mid_back  = 16.6098
+claim_span / late      = 17.8140
+claim_span / final     = 33.6483
+
+evidence_span / early     = -1.8748
+evidence_span / mid_front = -3.6673
+evidence_span / mid_back  = -1.9859
+evidence_span / late      = -3.4650
+evidence_span / final     = -4.0816
+
+terminal_token / early     =  0.0025
+terminal_token / mid_front =  0.0104
+terminal_token / mid_back  =  1.0108
+terminal_token / late      =  2.2423
+terminal_token / final     = 15.2915
+```
+
+结论：
+
+$$
+\boxed{
+\text{claim_span 在早层和中前层已经明显分叉}
+}
+$$
+
+而：
+
+$$
+\boxed{
+\text{terminal_token 主要在晚层和最终层显现差异}
+}
+$$
+
+因此 Phase469 的“晚层终端差异”应修正为：
+
+$$
+\boxed{
+\text{断言位置早期分叉，终端位置晚期显现}
+}
+$$
+
+### 三、证据边界
+
+当前只授权：
+
+$$
+\boxed{
+(\rho,\tau,r)
+\rightsquigarrow
+s_m^{(\ell,r)}
+}
+$$
+
+其中：
+
+```text
+rho = 证据-查询顺序
+tau = 模板条件
+r = 角色位置
+s = 标量摘要
+```
+
+不授权：
+
+```text
+关系真值状态
+注意力头功能
+神经元功能
+因果组件
+正式语义机制图谱
+```
+
+### 四、下一步
+
+完整 Phase470 方案仍缺：
+
+```text
+label_mapping_reversal
+attention/MLP component ledger
+A/B candidate margin readout
+independent physical prediction holdout
+```
+
+下一步 Phase472 应做标签映射反转协议，区分关系状态和 A/B 标签状态。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{24\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_11_Phase470-471位置分辨配对标量图谱与查询前置分叉审计.md`。
+
+## Phase 472: 标签映射反转协议冻结 [2026-07-16 07:23]
+
+### 一、任务
+
+根据用户提供的 Phase470-471 审计，继续补充标签映射反转门。目标是区分固定 A/B 标签偏置和“真标签默认”策略。
+
+脚本：
+
+```text
+tests/gpt5/phase472_label_mapping_reversal_protocol.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase472_label_mapping_reversal_protocol/phase472_label_mapping_reversal_static_audit.json
+```
+
+### 二、静态冻结
+
+两种顺序：
+
+```text
+order_evidence_first
+order_claim_first
+```
+
+两种标签映射：
+
+```text
+mu_ab: true -> A, false -> B
+mu_ba: true -> B, false -> A
+```
+
+静态审计通过：
+
+```text
+samples = 384
+variants = 768
+labels A/B = 192/192
+truth true/false = 192/192
+mu_ab/mu_ba = 192/192
+每个 transform × mapping × answer = 96
+非语义简单基线 = 0.5
+```
+
+授权 GLM4 行为复验，不授权物理采集。
+
+## Phase 473: GLM4 标签映射行为复验 [2026-07-16 07:23]
+
+### 一、任务
+
+运行 GLM4 标签映射反转行为测试，只做行为复验，不采集物理轨迹。
+
+脚本：
+
+```text
+tests/gpt5/phase473_glm4_label_mapping_behavior.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase473_glm4_label_mapping_behavior/phase473_glm4_label_mapping_summary.json
+```
+
+### 二、结果
+
+总体：
+
+```text
+overall = 574/768 = 0.7474
+other = 0
+mapping_flip_consistency = 272/384 = 0.7083
+```
+
+按顺序：
+
+```text
+order_evidence_first = 354/384 = 0.9219
+order_claim_first    = 220/384 = 0.5729
+```
+
+按映射和顺序：
+
+```text
+evidence_first / mu_ab = 184/192 = 0.9583
+evidence_first / mu_ba = 170/192 = 0.8854
+claim_first / mu_ab    = 115/192 = 0.5990
+claim_first / mu_ba    = 105/192 = 0.5469
+```
+
+证据先条件仍较强，但反向标签映射下降；查询先条件仍失败。
+
+## Phase 474: 标签映射失败结构审计 [2026-07-16 07:23]
+
+### 一、任务
+
+分析 Phase473 的失败结构，判断查询前置是固定 A/B 偏置，还是跟随标签映射的真标签默认策略。
+
+脚本：
+
+```text
+tests/gpt5/phase474_label_mapping_failure_audit.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase474_label_mapping_failure_audit/phase474_label_mapping_failure_audit.json
+```
+
+### 二、结果
+
+查询前置条件：
+
+```text
+order_claim_first / truth=True  = 192/192 semantic, true-label output rate = 1.000
+order_claim_first / truth=False =  28/192 semantic, true-label output rate = 0.854
+```
+
+分映射：
+
+```text
+claim_first / mu_ab / false = 19/96 correct, output A = 77/96
+claim_first / mu_ba / false =  9/96 correct, output B = 87/96
+```
+
+因此，Phase467 的“固定 A 塌缩”应进一步修正为：
+
+$$
+\boxed{
+\text{查询前置触发真标签默认或断言肯定策略}
+}
+$$
+
+而不是固定 A/B 标签策略。
+
+### 三、理论结论
+
+当前更合理的失败模型是：
+
+$$
+\boxed{
+\mathcal R_m \approx \text{default true}
+}
+$$
+
+再由当前标签映射输出真标签：
+
+$$
+\boxed{
+\mathcal D_{m,\mu}(\text{default true})
+=
+\text{true-label under }\mu
+}
+$$
+
+允许结论：
+
+$$
+\boxed{
+\text{查询前置条件下，GLM4 对假断言无法稳定用后续证据覆盖默认真判断}
+}
+$$
+
+不允许结论：
+
+```text
+关系真值状态
+查询轨迹
+证据整合组件
+因果机制
+```
+
+### 四、下一步
+
+Phase475 应只在 `order_evidence_first` 条件下，对 `mu_ab` 与 `mu_ba` 做小型位置分辨标量预检，检查标签映射改变主要影响终端和标签定义位置，还是也强烈改变 evidence/claim 位置。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{24\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_12_Phase472-474标签映射反转与查询前置真标签默认审计.md`。
+
+## Phase 475: 标签映射位置分辨标量预检 [2026-07-16 13:21]
+
+### 一、任务
+
+根据用户提供的 Phase472-474 审计，修正 Phase474 的理论表述：不能写成内部关系状态 \(\mathcal R_m\approx\text{default true}\)，只能写成行为还原判断：
+
+$$
+\boxed{
+\widehat r_m^{\mathrm{beh}}
+=
+\mu^{-1}(\widehat y_m)
+}
+$$
+
+查询前置条件下：
+
+$$
+\boxed{
+P(\widehat r_m^{\mathrm{beh}}=\text{真})
+=
+\frac{356}{384}
+=
+0.927
+}
+$$
+
+本阶段只在 evidence-first（证据先）条件下比较 `mu_ab` 和 `mu_ba`，检查标签映射反转主要影响哪些角色位置。
+
+脚本：
+
+```text
+tests/gpt5/phase475_mapping_position_scalar_precheck.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase475_mapping_position_scalar_precheck/phase475_mapping_position_scalar_summary.json
+tests/gpt5/result/phase475_mapping_position_scalar_precheck/phase475_mapping_position_scalar_rows.jsonl
+```
+
+### 二、采集范围
+
+```text
+model = GLM4
+transform = order_evidence_first
+prompts = 64
+roles = evidence_span, claim_span, label_instruction, terminal_token
+layers = 41
+trace_rows = 10496
+```
+
+只保存标量摘要，不保存原始向量、注意力头、神经元通道，不授权因果边。
+
+## Phase 476: 标签映射位置配对分析 [2026-07-16 13:21]
+
+### 一、任务
+
+对同一逻辑样本做严格标签映射配对：
+
+$$
+\boxed{
+\Delta_{\mu,i}^{(\ell,r)}
+=
+X_i^{(\ell,r,\mu_{BA})}
+-
+X_i^{(\ell,r,\mu_{AB})}
+}
+$$
+
+脚本：
+
+```text
+tests/gpt5/phase476_mapping_position_paired_analysis.py
+```
+
+结果：
+
+```text
+tests/gpt5/result/phase476_mapping_position_paired_analysis/phase476_mapping_position_paired_analysis.json
+```
+
+### 二、结果
+
+配对差异数量：
+
+```text
+paired_delta_count = 5248
+```
+
+`mean_vector_l2` 配对差异：
+
+```text
+claim_span / all layer families    = 0.0000
+evidence_span / all layer families = 0.0000
+
+label_instruction / late  = -3.2687
+label_instruction / final = -1.8648
+
+terminal_token / late  =  3.0944
+terminal_token / final = -7.0717
+```
+
+核心结论：
+
+$$
+\boxed{
+\text{标签映射反转不改变前置 evidence/claim 角色的标量状态}
+}
+$$
+
+这是因果掩码下合理的，因为标签说明在 evidence/claim 之后，不能回写早期位置。
+
+差异主要出现在：
+
+$$
+\boxed{
+\text{label\_instruction 与 terminal\_token}
+}
+$$
+
+允许结论：
+
+$$
+\boxed{
+\text{标签映射变化主要作用在标签定义和终端输出相关位置的标量摘要}
+}
+$$
+
+不允许结论：
+
+```text
+关系状态不变
+标签状态等变
+A/B 候选裕量反转
+内部真值状态存在
+```
+
+### 三、下一步
+
+Phase477 应增加 A/B candidate-margin（候选裕量）读出，检查原始 A/B 裕量是否随标签映射反转，以及映射归一化 truth-margin 是否更稳定。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0\%}
+$$
+
+总体管理性成熟度保持：
+
+$$
+\boxed{24\%}
+$$
+
+详细报告：`research/MainAnalysis/20260716_13_Phase475-476标签映射位置分辨标量预检.md`。
+
+## Phase 477-478: 候选裕量读出与标签映射等变预检 [2026-07-16 16:15]
+
+### 一、阶段目标
+
+根据 Phase475-476 的审计结论，本阶段不再把前置 evidence/claim 的零差异解释为关系状态证据，而是升级到 A/B candidate-margin（A/B 候选裕量）读出，检查标签映射变化是否在可见位置形成可读出的候选方向。
+
+读出公式：
+
+$$
+S_v^{(\ell,r)}
+=
+\left[
+W_U\mathcal N_f
+\left(
+\operatorname{mean}(H_r^{(\ell)})
+\right)
+\right]_v
+$$
+
+$$
+M_{AB}=S_A-S_B
+$$
+
+$$
+M_{\mathrm{true}}=s_\mu M_{AB}
+$$
+
+$$
+M_{\mathrm{correct}}=t_i s_\mu M_{AB}
+$$
+
+其中 logit lens（词元读出镜）只是外部观察器，不授权内部机制、组件或因果结论。
+
+### 二、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase477_candidate_margin_readout.py
+tests/gpt5/phase478_candidate_margin_paired_analysis.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase477_candidate_margin_readout/phase477_candidate_margin_rows.jsonl
+tests/gpt5/result/phase477_candidate_margin_readout/phase477_candidate_margin_summary.json
+tests/gpt5/result/phase478_candidate_margin_paired_analysis/phase478_candidate_margin_paired_analysis.json
+```
+
+测试规模：
+
+```text
+32 个独立逻辑实例
+64 个提示
+4 个角色位置
+41 层
+10496 行候选裕量读出
+```
+
+### 三、关键结果
+
+最终层：
+
+```text
+claim_span:
+  mu_ab M_AB =  2.8327
+  mu_ba M_AB =  2.8327
+  raw flip aligned rate = 0.0000
+
+evidence_span:
+  mu_ab M_AB =  2.0177
+  mu_ba M_AB =  2.0177
+  raw flip aligned rate = 0.0000
+
+label_instruction:
+  mu_ab M_AB =  1.5762
+  mu_ba M_AB = -1.9219
+  raw flip aligned rate = 1.0000
+
+terminal_token:
+  mu_ab M_AB = -0.0430
+  mu_ba M_AB = -1.1328
+  raw flip aligned rate = 0.5625
+```
+
+按真值拆分的 terminal_token 最终层：
+
+```text
+truth=true:
+  mu_ab M_correct = 0.9531
+  mu_ba M_correct = 1.9609
+  raw flip aligned rate = 0.8125
+
+truth=false:
+  mu_ab M_correct = 1.0391
+  mu_ba M_correct = -0.3047
+  raw flip aligned rate = 0.3125
+```
+
+### 四、结论边界
+
+允许结论：
+
+$$
+\boxed{
+\text{标签说明位置存在可读出的 A/B 映射候选方向}
+}
+$$
+
+同时，终端位置的翻转不稳定，尤其假断言条件下正确答案裕量下降，说明关系真值、标签映射和输出候选之间仍未稳定合成。
+
+不允许结论：
+
+```text
+已经发现内部关系状态
+已经发现标签状态等变机制
+已经完成组件因果账本
+已经闭合语言编码机制
+```
+
+### 五、理论进展
+
+本阶段把全局图谱从标量规模推进到候选竞争读出：
+
+$$
+\boxed{
+\text{标量范数差异}
+\rightarrow
+\text{A/B 候选裕量}
+\rightarrow
+\text{真标签裕量与正确答案裕量分账}
+}
+$$
+
+最新图谱：
+
+$$
+\boxed{
+\text{前置证据/断言}
+\xrightarrow{\text{标签不可见}}
+\text{标签说明}
+\xrightarrow{\text{A/B 映射可读出}}
+\text{终端词元}
+\xrightarrow{\text{关系-标签合成不稳定}}
+\text{输出}
+}
+$$
+
+### 六、问题和硬伤
+
+1. logit lens（词元读出镜）不是内部机制变量。
+2. 独立逻辑实例只有 32 个，仍是预检规模。
+3. 未做 attention/MLP（注意力/多层感知机）组件账本。
+4. evidence-first（证据先）不能解释 claim-first（断言先）的默认真策略。
+5. 小模型外部有效性仍有 30%-50% 偏差风险。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度保持：
+
+$$
+\boxed{24\%}
+$$
+
+### 七、下一步
+
+应该自动进入 Phase479：标签前真值差分与关系候选状态预检。
+
+核心任务：
+
+1. 在 label_instruction（标签说明）之前比较 true/false（真/假）断言的物理差分。
+2. 检查该差分是否跨 mu_ab/mu_ba（两种标签映射）稳定。
+3. 分离 truth-margin（真值裕量）与 correct-margin（正确答案裕量）。
+4. 预设组件账本，只记录 attention/MLP（注意力/多层感知机）前后残差增量，不做强归因。
+
+详细报告：`research/MainAnalysis/20260716_14_Phase477-478候选裕量读出与标签映射等变预检.md`。
+
+## Phase 479: 标签前真值差分与关系候选状态预检 [2026-07-16 16:17]
+
+### 一、阶段目标
+
+根据 Phase477-478 的结果，本阶段自动继续检查：
+
+$$
+\boxed{
+\text{标签说明之前是否已经形成稳定的真/假关系候选状态？}
+}
+$$
+
+本阶段只复用 Phase477 的候选裕量读出，不重新加载模型，不新增 CUDA（统一计算架构）测试。
+
+### 二、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase479_prelabel_truth_contrast_analysis.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase479_prelabel_truth_contrast_analysis/phase479_prelabel_truth_contrast_analysis.json
+```
+
+分析范围：
+
+```text
+prelabel roles = evidence_span, claim_span
+truth_contrast_count = 2624
+mapping_stability_count = 1312
+```
+
+### 三、关键结果
+
+最终层：
+
+```text
+claim_span:
+  mean_truth_delta_margin_ab      = -0.1459
+  mean_abs_truth_delta_margin_ab  =  0.4369
+
+evidence_span:
+  mean_truth_delta_margin_ab      =  0.0002
+  mean_abs_truth_delta_margin_ab  =  0.0095
+```
+
+晚层：
+
+```text
+claim_span:
+  mean_truth_delta_margin_ab      = -0.0470
+  mean_abs_truth_delta_margin_ab  =  0.2687
+
+evidence_span:
+  mean_truth_delta_margin_ab      =  0.0054
+  mean_abs_truth_delta_margin_ab  =  0.0074
+```
+
+跨映射稳定性：
+
+```text
+claim_span raw margin mapping_stability_delta = 0.0000
+evidence_span raw margin mapping_stability_delta = 0.0000
+```
+
+### 四、结论
+
+允许结论：
+
+$$
+\boxed{
+\text{claim\_span 存在弱真/假读出痕迹}
+}
+$$
+
+$$
+\boxed{
+\text{evidence\_span 未显示可读出的稳定真/假关系状态}
+}
+$$
+
+不允许结论：
+
+```text
+标签前已经形成稳定关系状态
+证据位置已经完成关系判断
+当前模型已经实现先关系判断、后标签解码
+```
+
+### 五、理论进展
+
+当前图谱收紧为：
+
+$$
+\boxed{
+\text{证据位置：关系候选弱或不可读}
+}
+$$
+
+$$
+\boxed{
+\text{断言位置：弱真/假读出痕迹}
+}
+$$
+
+$$
+\boxed{
+\text{标签说明位置：A/B 映射候选方向可读出}
+}
+$$
+
+$$
+\boxed{
+\text{终端位置：关系-标签合成不稳定}
+}
+$$
+
+当前小模型更像具备局部标签绑定能力，而不是稳定抽象关系状态。
+
+### 六、闭合评估与下一步
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度保持：
+
+$$
+\boxed{24\%}
+$$
+
+不建议继续自动扩大同类 logit lens（词元读出镜）分析，因为边际收益会下降。下一步应先冻结 Phase480：标签说明与终端位置的残差组件账本预检。
+
+详细报告：`research/MainAnalysis/20260716_15_Phase479标签前真值差分与关系候选状态预检.md`。

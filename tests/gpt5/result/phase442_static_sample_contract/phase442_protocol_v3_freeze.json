@@ -1,0 +1,85 @@
+{
+  "behavior_gates": {
+    "orbit_group_consistency_lcb_95_min": 0.8,
+    "orbit_min_successes_per_split": 72,
+    "other_max_failures_per_split": 0,
+    "other_ucb_95_max": 0.05,
+    "semantic_lcb_95_min": 0.85,
+    "semantic_min_successes_per_split": 75
+  },
+  "confidence_interval": {
+    "kind": "wilson",
+    "sidedness": "two_sided",
+    "z": 1.96
+  },
+  "created_at": "2026-07-16T06:08:31.787254+00:00",
+  "groups_per_split": 80,
+  "groups_per_task": 480,
+  "interfaces": [
+    "restricted_choice",
+    "single_field",
+    "direct_short_answer",
+    "natural_short_sentence"
+  ],
+  "method_frame": "条件物理状态图谱",
+  "previous_phase441_artifacts_preserved": true,
+  "schema_version": "phase442_static_sample_contract.v3",
+  "splits": [
+    "interface_calibration",
+    "task_discovery",
+    "surface_orbit_holdout",
+    "physical_window_freeze",
+    "physical_prediction_holdout",
+    "sealed_physical_holdout"
+  ],
+  "status": "static_samples_and_feasibility_frozen_no_cuda_run",
+  "surface_transforms": [
+    "lexical_rewrite",
+    "order_rewrite",
+    "distance_rewrite",
+    "boundary_rewrite",
+    "syntax_rewrite",
+    "query_rewrite"
+  ],
+  "task_library": {
+    "knowledge_network": [
+      "context_single_attribute_read",
+      "parametric_single_fact_read",
+      "category_attribute_inheritance",
+      "parametric_context_consistent",
+      "parametric_context_conflict"
+    ],
+    "single_step_reasoning": [
+      "set_inclusion_one_step",
+      "size_comparison_one_step",
+      "conditional_implication_one_step",
+      "relation_transitive_one_step",
+      "one_step_exclusion"
+    ],
+    "syntax_system": [
+      "subject_verb_number_agreement",
+      "pronoun_number_agreement",
+      "active_passive_role_conversion",
+      "relative_clause_role",
+      "sentence_boundary_closure_choice"
+    ]
+  },
+  "theory_name": "语言是动态模式网络",
+  "tokenization_contract": {
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "must_pass_before_behavior_cuda": true,
+    "status": "pre_registered_pending_local_tokenizer_execution"
+  },
+  "zero_gate": [
+    "G_protocol_feasible",
+    "G_sample_valid",
+    "G_semantic_certified",
+    "G_split_disjoint",
+    "G_static_baseline",
+    "G_budget"
+  ]
+}

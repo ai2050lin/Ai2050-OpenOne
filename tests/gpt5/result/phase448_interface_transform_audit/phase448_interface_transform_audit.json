@@ -1,0 +1,265 @@
+{
+  "authorization": {
+    "model_rerun_authorized": false,
+    "next_step": "freeze_phase448_v2_interface_protocol_before_any_model_rerun",
+    "physical_trace_authorized": false
+  },
+  "created_at": "2026-07-16T10:13:05.639886+00:00",
+  "glm4_knowledge_redesign_matrix": [
+    {
+      "diagnosis": "High risk: semicolon compression removes clean fact boundaries and may collapse membership and trait statements.",
+      "glm4_knowledge_semantic_rate": 0.5,
+      "interface_risk": true,
+      "priority": "critical",
+      "recommended_replacement": "Preserve one sentence per fact; test boundary separately with harmless whitespace or bullet separators.",
+      "transform": "boundary_rewrite"
+    },
+    {
+      "diagnosis": "Moderate control: mostly preserves evidence-query order and marker clarity.",
+      "glm4_knowledge_semantic_rate": 0.8541666666666666,
+      "interface_risk": false,
+      "priority": "low",
+      "recommended_replacement": "Keep as a control transform unless later behavior data contradicts it.",
+      "transform": "distance_rewrite"
+    },
+    {
+      "diagnosis": "Moderate control: mostly preserves evidence-query order and marker clarity.",
+      "glm4_knowledge_semantic_rate": 0.859375,
+      "interface_risk": false,
+      "priority": "low",
+      "recommended_replacement": "Keep as a control transform unless later behavior data contradicts it.",
+      "transform": "lexical_rewrite"
+    },
+    {
+      "diagnosis": "High risk: query-before-evidence changes reading order and may induce premature answer formation.",
+      "glm4_knowledge_semantic_rate": 0.5,
+      "interface_risk": true,
+      "priority": "critical",
+      "recommended_replacement": "Keep evidence before the query; vary only local wording, not evidence-query order.",
+      "transform": "order_rewrite"
+    },
+    {
+      "diagnosis": "High risk: query marker is removed while the final instruction still refers to the queried statement.",
+      "glm4_knowledge_semantic_rate": 0.5,
+      "interface_risk": true,
+      "priority": "critical",
+      "recommended_replacement": "If the query marker is changed, also rewrite the final instruction to point to 'the claim' or 'the statement above'.",
+      "transform": "query_rewrite"
+    },
+    {
+      "diagnosis": "Best control: stronger facts/statement frame improves surface stability without changing logic.",
+      "glm4_knowledge_semantic_rate": 1.0,
+      "interface_risk": false,
+      "priority": "low",
+      "recommended_replacement": "Keep as a control transform unless later behavior data contradicts it.",
+      "transform": "syntax_rewrite"
+    }
+  ],
+  "schema_version": "phase448_interface_transform_audit.v1",
+  "source_phase": [
+    "phase446_static_contract",
+    "phase447_failure_decomposition"
+  ],
+  "status": "static_protocol_audit_no_model_run_no_cuda_no_physical_trace",
+  "summary": {
+    "best_control_transform": "syntax_rewrite",
+    "critical_transforms": [
+      "boundary_rewrite",
+      "order_rewrite",
+      "query_rewrite"
+    ],
+    "main_conclusion": "The three failing GLM4 knowledge transforms overlap with interface-level risk: query-before-evidence order, semicolon boundary compression, and query marker/instruction mismatch."
+  },
+  "surface_transform_audit": {
+    "boundary_rewrite": {
+      "avg_semicolon_count": 1.6666666666666667,
+      "avg_sentence_mark_count": 3.0,
+      "design_intent": "compress fact sentence boundaries with semicolons",
+      "examples": [
+        {
+          "risk_reasons": "multiple fact boundaries are compressed into one semicolon chain",
+          "sample_id": "395d6caf02f94cb0",
+          "text": "All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1; mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1; All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2; toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Queried statement: mira_kn_ifc_000_u has trait luminous_kn_ifc_000_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "multiple fact boundaries are compressed into one semicolon chain",
+          "sample_id": "eafc7a3ca7a2e43d",
+          "text": "All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1; mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1; All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2; toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Queried statement: mira_kn_ifc_000_u has trait silent_kn_ifc_000_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "multiple fact boundaries are compressed into one semicolon chain",
+          "sample_id": "71da63963ff88f65",
+          "text": "All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1; naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1; All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2; vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Queried statement: vexa_kn_ifc_001_v has trait curved_kn_ifc_001_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "multiple fact boundaries are compressed into one semicolon chain",
+          "sample_id": "f26810da45b9fa4d",
+          "text": "All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1; naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1; All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2; vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Queried statement: vexa_kn_ifc_001_v has trait brittle_kn_ifc_001_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "multiple fact boundaries are compressed into one semicolon chain",
+          "sample_id": "a1b50b06c1890fcd",
+          "text": "All members of vorn_kn_ifc_002_k1 have trait hollow_kn_ifc_002_p1; lina_kn_ifc_002_u is a member of vorn_kn_ifc_002_k1; All members of marn_kn_ifc_002_k2 have trait dense_kn_ifc_002_p2; rilo_kn_ifc_002_v is a member of marn_kn_ifc_002_k2. Queried statement: lina_kn_ifc_002_u has trait hollow_kn_ifc_002_p1. Reply with A if the queried statement is true, and B if it is false."
+        }
+      ],
+      "instruction_marker_mismatch_rate": 0.0,
+      "interface_risk": true,
+      "n": 3456,
+      "query_before_evidence_rate": 0.0
+    },
+    "distance_rewrite": {
+      "avg_semicolon_count": 0.0,
+      "avg_sentence_mark_count": 5.666666666666667,
+      "design_intent": "insert neutral text between facts and query",
+      "examples": [],
+      "instruction_marker_mismatch_rate": 0.0,
+      "interface_risk": false,
+      "n": 3456,
+      "query_before_evidence_rate": 0.0
+    },
+    "lexical_rewrite": {
+      "avg_semicolon_count": 0.0,
+      "avg_sentence_mark_count": 4.666666666666667,
+      "design_intent": "rename frame words while preserving fact-query order",
+      "examples": [
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "395d6caf02f94cb0",
+          "text": "Given these records: All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Check this claim: mira_kn_ifc_000_u has trait luminous_kn_ifc_000_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "eafc7a3ca7a2e43d",
+          "text": "Given these records: All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Check this claim: mira_kn_ifc_000_u has trait silent_kn_ifc_000_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "71da63963ff88f65",
+          "text": "Given these records: All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Check this claim: vexa_kn_ifc_001_v has trait curved_kn_ifc_001_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "f26810da45b9fa4d",
+          "text": "Given these records: All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Check this claim: vexa_kn_ifc_001_v has trait brittle_kn_ifc_001_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "a1b50b06c1890fcd",
+          "text": "Given these records: All members of vorn_kn_ifc_002_k1 have trait hollow_kn_ifc_002_p1. lina_kn_ifc_002_u is a member of vorn_kn_ifc_002_k1. All members of marn_kn_ifc_002_k2 have trait dense_kn_ifc_002_p2. rilo_kn_ifc_002_v is a member of marn_kn_ifc_002_k2. Check this claim: lina_kn_ifc_002_u has trait hollow_kn_ifc_002_p1. Reply with A if the queried statement is true, and B if it is false."
+        }
+      ],
+      "instruction_marker_mismatch_rate": 1.0,
+      "interface_risk": false,
+      "n": 3456,
+      "query_before_evidence_rate": 0.0
+    },
+    "order_rewrite": {
+      "avg_semicolon_count": 0.0,
+      "avg_sentence_mark_count": 4.666666666666667,
+      "design_intent": "place query before evidence",
+      "examples": [
+        {
+          "risk_reasons": "query appears before evidence",
+          "sample_id": "395d6caf02f94cb0",
+          "text": "Queried statement: mira_kn_ifc_000_u has trait luminous_kn_ifc_000_p1. Evidence: All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "query appears before evidence",
+          "sample_id": "eafc7a3ca7a2e43d",
+          "text": "Queried statement: mira_kn_ifc_000_u has trait silent_kn_ifc_000_p2. Evidence: All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "query appears before evidence",
+          "sample_id": "71da63963ff88f65",
+          "text": "Queried statement: vexa_kn_ifc_001_v has trait curved_kn_ifc_001_p2. Evidence: All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "query appears before evidence",
+          "sample_id": "f26810da45b9fa4d",
+          "text": "Queried statement: vexa_kn_ifc_001_v has trait brittle_kn_ifc_001_p1. Evidence: All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "query appears before evidence",
+          "sample_id": "a1b50b06c1890fcd",
+          "text": "Queried statement: lina_kn_ifc_002_u has trait hollow_kn_ifc_002_p1. Evidence: All members of vorn_kn_ifc_002_k1 have trait hollow_kn_ifc_002_p1. lina_kn_ifc_002_u is a member of vorn_kn_ifc_002_k1. All members of marn_kn_ifc_002_k2 have trait dense_kn_ifc_002_p2. rilo_kn_ifc_002_v is a member of marn_kn_ifc_002_k2. Reply with A if the queried statement is true, and B if it is false."
+        }
+      ],
+      "instruction_marker_mismatch_rate": 0.0,
+      "interface_risk": true,
+      "n": 3456,
+      "query_before_evidence_rate": 1.0
+    },
+    "query_rewrite": {
+      "avg_semicolon_count": 0.0,
+      "avg_sentence_mark_count": 4.666666666666667,
+      "design_intent": "replace the queried-statement marker with a natural question frame",
+      "examples": [
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "395d6caf02f94cb0",
+          "text": "All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Decide whether this is true: mira_kn_ifc_000_u has trait luminous_kn_ifc_000_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "eafc7a3ca7a2e43d",
+          "text": "All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. Decide whether this is true: mira_kn_ifc_000_u has trait silent_kn_ifc_000_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "71da63963ff88f65",
+          "text": "All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Decide whether this is true: vexa_kn_ifc_001_v has trait curved_kn_ifc_001_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "f26810da45b9fa4d",
+          "text": "All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. Decide whether this is true: vexa_kn_ifc_001_v has trait brittle_kn_ifc_001_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "a1b50b06c1890fcd",
+          "text": "All members of vorn_kn_ifc_002_k1 have trait hollow_kn_ifc_002_p1. lina_kn_ifc_002_u is a member of vorn_kn_ifc_002_k1. All members of marn_kn_ifc_002_k2 have trait dense_kn_ifc_002_p2. rilo_kn_ifc_002_v is a member of marn_kn_ifc_002_k2. Decide whether this is true: lina_kn_ifc_002_u has trait hollow_kn_ifc_002_p1. Reply with A if the queried statement is true, and B if it is false."
+        }
+      ],
+      "instruction_marker_mismatch_rate": 1.0,
+      "interface_risk": true,
+      "n": 3456,
+      "query_before_evidence_rate": 0.0
+    },
+    "syntax_rewrite": {
+      "avg_semicolon_count": 0.0,
+      "avg_sentence_mark_count": 5.666666666666667,
+      "design_intent": "explicitly name facts and statement with a stronger instruction frame",
+      "examples": [
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "395d6caf02f94cb0",
+          "text": "Use only the following facts to judge the statement. All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. The statement to judge is: mira_kn_ifc_000_u has trait luminous_kn_ifc_000_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "eafc7a3ca7a2e43d",
+          "text": "Use only the following facts to judge the statement. All members of dax_kn_ifc_000_k1 have trait luminous_kn_ifc_000_p1. mira_kn_ifc_000_u is a member of dax_kn_ifc_000_k1. All members of kel_kn_ifc_000_k2 have trait silent_kn_ifc_000_p2. toma_kn_ifc_000_v is a member of kel_kn_ifc_000_k2. The statement to judge is: mira_kn_ifc_000_u has trait silent_kn_ifc_000_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "71da63963ff88f65",
+          "text": "Use only the following facts to judge the statement. All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. The statement to judge is: vexa_kn_ifc_001_v has trait curved_kn_ifc_001_p2. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "f26810da45b9fa4d",
+          "text": "Use only the following facts to judge the statement. All members of nup_kn_ifc_001_k1 have trait brittle_kn_ifc_001_p1. naro_kn_ifc_001_u is a member of nup_kn_ifc_001_k1. All members of siv_kn_ifc_001_k2 have trait curved_kn_ifc_001_p2. vexa_kn_ifc_001_v is a member of siv_kn_ifc_001_k2. The statement to judge is: vexa_kn_ifc_001_v has trait brittle_kn_ifc_001_p1. Reply with A if the queried statement is true, and B if it is false."
+        },
+        {
+          "risk_reasons": "final instruction names queried statement after the marker was removed",
+          "sample_id": "a1b50b06c1890fcd",
+          "text": "Use only the following facts to judge the statement. All members of vorn_kn_ifc_002_k1 have trait hollow_kn_ifc_002_p1. lina_kn_ifc_002_u is a member of vorn_kn_ifc_002_k1. All members of marn_kn_ifc_002_k2 have trait dense_kn_ifc_002_p2. rilo_kn_ifc_002_v is a member of marn_kn_ifc_002_k2. The statement to judge is: lina_kn_ifc_002_u has trait hollow_kn_ifc_002_p1. Reply with A if the queried statement is true, and B if it is false."
+        }
+      ],
+      "instruction_marker_mismatch_rate": 1.0,
+      "interface_risk": false,
+      "n": 3456,
+      "query_before_evidence_rate": 0.0
+    }
+  }
+}
