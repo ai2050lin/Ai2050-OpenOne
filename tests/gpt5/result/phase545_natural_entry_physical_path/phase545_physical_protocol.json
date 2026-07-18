@@ -1,0 +1,65 @@
+{
+  "claim_boundaries": {
+    "explicit_source_copy_is_pretrained_knowledge": false,
+    "observer_event_is_causal": false,
+    "observer_event_is_compute_edge": false,
+    "sealed_split_read": false,
+    "single_neuron_scan_allowed": false,
+    "world_pair_delta_is_abstract_semantics": false
+  },
+  "created_at": "2026-07-18T05:35:25.863290+00:00",
+  "discovery_split": "discovery",
+  "frozen_event_selection": {
+    "event_axes": [
+      "stage",
+      "component",
+      "role",
+      "layer"
+    ],
+    "score": "median normalized world-pair delta multiplied by positive direction-support fraction",
+    "selection_split": "discovery",
+    "selection_updates_after_prediction": false
+  },
+  "gate_skipped_models": [
+    "deepseek7b"
+  ],
+  "independent_prediction_split": "independent_confirmation",
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "pair_limit_per_split_model_mechanism": 24,
+  "phase_id": "Phase545",
+  "prediction_gates": {
+    "component_ledger_relative_error_max": 0.01,
+    "peak_layer_relative_error_max": 0.1,
+    "same_event_median_direction_alignment_min": 0.0,
+    "same_event_positive_direction_fraction_min": 0.75
+  },
+  "registered_pairs_path": "tests/gpt5/result/phase545_natural_entry_physical_path/phase545_registered_physical_pairs.jsonl",
+  "registered_pairs_sha256": "9459c80761a829737dedae88ce45a76fed93055c2d1e234fe41776a67032c7ac",
+  "schema_version": "phase545_natural_entry_physical_protocol.v1",
+  "source_behavior_cases_sha256": "69928f66eb35454ab4bade5320e40c0c407779b683cb20cb0a68fda6614dad84",
+  "source_behavior_matrix_sha256": "20aaf7e738fa83321f7094aeded920f93d8b747b1df90b4ec559b071c2ba5f17",
+  "static_audit": {
+    "behavior_eligible_cell_count": 9,
+    "created_at": "2026-07-18T05:35:25.863182+00:00",
+    "deepseek_gate_skip": true,
+    "pair_count_per_model_mechanism": [
+      48
+    ],
+    "phase_id": "Phase545",
+    "physical_pair_count": 432,
+    "physical_pair_count_by_model": {
+      "glm4": 240,
+      "qwen3": 192
+    },
+    "schema_version": "phase545_natural_entry_physical_static_audit.v1",
+    "sealed_pair_count": 0,
+    "status": "static_pass_no_hidden_state_read",
+    "target_identity_error_count": 0,
+    "valid": true
+  },
+  "title": "Same-contract full-layer multi-position natural-entry physical paths"
+}

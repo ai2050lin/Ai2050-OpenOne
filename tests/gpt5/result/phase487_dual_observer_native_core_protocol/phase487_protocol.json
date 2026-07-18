@@ -1,0 +1,86 @@
+{
+  "channels": {
+    "label_candidate": "compare first-step generation logits for ' A' and ' B' at the mapped-label boundary",
+    "output_event": "greedy free generation parsed by the frozen target-blind event parser",
+    "semantic_candidate": "compare next-token logits for ' true' and ' false' at a fixed positive-polarity verdict boundary"
+  },
+  "created_at": "2026-07-17T08:38:11.312395+00:00",
+  "forbidden": [
+    "read sealed_physical",
+    "modify parser after seeing new generations",
+    "pool stress tracks into native-core denominator",
+    "treat free-generation format as relation-semantic failure",
+    "head channel or neuron scan",
+    "causal intervention"
+  ],
+  "gates": {
+    "event_map_requires_parser_conformance_and_more_than_one_event_class": true,
+    "event_unrecoverable_ucb95_max": 0.05,
+    "label_identity_lcb95_min": 0.95,
+    "label_plain_lcb95_min": 0.95,
+    "relation_geometry_requires_semantic_gates": true,
+    "semantic_identity_lcb95_min": 0.95,
+    "semantic_identity_plain_intersection_lcb95_min": 0.9,
+    "semantic_plain_lcb95_min": 0.95,
+    "strict_event_reported_separately": true
+  },
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "sample_design": {
+    "fact_orders": [
+      "canonical",
+      "swapped"
+    ],
+    "families": [
+      "marker_inheritance",
+      "signal_assignment"
+    ],
+    "label_mappings": [
+      "mu_ab",
+      "mu_ba"
+    ],
+    "mapping_positions": [
+      "before",
+      "after"
+    ],
+    "pairs_per_family_split": 64,
+    "target_slots": [
+      0,
+      1
+    ],
+    "truth_values": [
+      true,
+      false
+    ]
+  },
+  "schema_version": "phase487_dual_observer_native_core_protocol.v1",
+  "split_isolation": {
+    "behavior_script_may_read": [
+      "behavior_qualification"
+    ],
+    "geometry_script_may_read_after_gate": [
+      "geometry_window"
+    ],
+    "prediction_script_may_read_after_window_freeze": [
+      "physical_prediction"
+    ],
+    "sealed_read_authorized": false,
+    "separate_files": true
+  },
+  "status": "frozen_before_new_model_run",
+  "tracks": {
+    "formal_stress": [
+      "formal_light_stress"
+    ],
+    "native_core_candidates": [
+      "identity",
+      "native_plain_candidate"
+    ],
+    "topology_stress": [
+      "order_stress_claim_first"
+    ]
+  }
+}

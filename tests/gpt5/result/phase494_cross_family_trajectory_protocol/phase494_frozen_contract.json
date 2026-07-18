@@ -1,0 +1,111 @@
+{
+  "behavior_gate": {
+    "overall_unseen_intersection_lcb95_min": 0.85,
+    "per_family_identity_lcb95_min": 0.8,
+    "per_family_native_intersection_lcb95_min": 0.8,
+    "per_family_native_plain_lcb95_min": 0.8,
+    "per_family_paired_world_lcb95_min": 0.75
+  },
+  "created_at": "2026-07-17T10:07:15.865333+00:00",
+  "evidence_boundaries": {
+    "attention_head_channel_neuron_scan": false,
+    "causal_intervention": false,
+    "role_state_sequence_is_compute_transport": false,
+    "sealed_split_read": false
+  },
+  "fit_families": [
+    "marker_inheritance",
+    "signal_assignment"
+  ],
+  "nonlinear_controls": [
+    "fixed_tanh_random_features",
+    "local_rbf_class_kernel"
+  ],
+  "physical_gate": {
+    "overall_unseen_prediction_lcb95_min": 0.85,
+    "per_unseen_family_prediction_lcb95_min": 0.8,
+    "per_unseen_family_q_strictly_positive": true,
+    "stable_layer_count": 2
+  },
+  "position_roles": [
+    "rules_end",
+    "target_evidence_end",
+    "distractor_evidence_end",
+    "claim_entity_end",
+    "claim_relation_end",
+    "claim_end",
+    "final_instruction_end",
+    "prompt_end"
+  ],
+  "primary_windows": {
+    "deepseek7b": {
+      "normalized_depth": 0.85,
+      "position_role": "prompt_end",
+      "source": "predeclared architecture-normalized fallback"
+    },
+    "glm4": {
+      "layer_with_embedding": 33,
+      "position_role": "prompt_end",
+      "source": "Phase491-492 frozen window"
+    },
+    "qwen3": {
+      "layer_with_embedding": 31,
+      "position_role": "prompt_end",
+      "source": "Phase491-492 frozen window"
+    }
+  },
+  "projection": {
+    "changed_after_prediction_forbidden": true,
+    "dimension": 64,
+    "seeds": {
+      "deepseek7b": 494041,
+      "glm4": 490037,
+      "qwen3": 490031
+    }
+  },
+  "schema_version": "phase494_cross_family_contract.v1",
+  "scientific_question": "Does a train-family relation observer predict four unseen relation structures, and where does that readability first appear?",
+  "source_path": "tests/gpt5/phase494_cross_family_trajectory_protocol.py",
+  "source_sha256": "1f8619115fd3e36f5a085bf64b3c817f4439633fb25909c74aec7c9f2dc32840",
+  "split_files": {
+    "behavior_qualification": {
+      "path": "tests/gpt5/result/phase494_cross_family_trajectory_protocol/phase494_behavior_qualification_samples.jsonl",
+      "rows": 864,
+      "sealed": false,
+      "sha256": "e69f1bfc81a08185094dba9d9dbdbbfc0c4887b6f1a0cc8794ea96ccf54eeb8c",
+      "surface_variants": 1728
+    },
+    "family_prediction": {
+      "path": "tests/gpt5/result/phase494_cross_family_trajectory_protocol/phase494_family_prediction_samples.jsonl",
+      "rows": 576,
+      "sealed": false,
+      "sha256": "c612f88a4cf8a9791ef648020967c2511465328586d32074b2376918201afe95",
+      "surface_variants": 1152
+    },
+    "formation_fit": {
+      "path": "tests/gpt5/result/phase494_cross_family_trajectory_protocol/phase494_formation_fit_samples.jsonl",
+      "rows": 288,
+      "sealed": false,
+      "sha256": "604428be89df98c5869fd8433170bf87689a0aa17ab78fc71933590da02f9e13",
+      "surface_variants": 576
+    },
+    "sealed_cross_family": {
+      "path": "tests/gpt5/result/phase494_cross_family_trajectory_protocol/phase494_sealed_cross_family_samples.jsonl",
+      "rows": 864,
+      "sealed": true,
+      "sha256": "2e1f98c03c20566b3046b17fd8102f06fa2f760815d5a68c30a49e4307947d4b",
+      "surface_variants": 1728
+    }
+  },
+  "status": "frozen_before_model_run",
+  "tracks": [
+    "identity",
+    "native_plain_candidate"
+  ],
+  "unseen_families": [
+    "symmetric_pair",
+    "directed_mentor",
+    "transitive_precedence",
+    "direct_nontransitive"
+  ]
+}

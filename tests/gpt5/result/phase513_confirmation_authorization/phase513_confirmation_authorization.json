@@ -1,0 +1,136 @@
+{
+  "authorization": {
+    "binding_physical_candidate": false,
+    "joint_confirmation": false,
+    "physical": false,
+    "relation_physical_candidate": true
+  },
+  "binding_models": [],
+  "causal_intervention": false,
+  "created_at": "2026-07-17T14:02:31.624902+00:00",
+  "head_channel_neuron_scan": false,
+  "joint_models": [],
+  "model_summaries": {
+    "deepseek7b": {
+      "contract_summaries": {},
+      "created_at": "2026-07-17T14:02:25.821878+00:00",
+      "cuda_used": false,
+      "model": "deepseek7b",
+      "model_weights_loaded": false,
+      "passed_contracts": [],
+      "reanalyzed_from_existing_logits": true,
+      "row_count": 0,
+      "runtime_seconds": 4.969770088791847e-07,
+      "schema_version": "phase512_dual_contract_behavior.v1",
+      "sealed_split_read": false,
+      "split": "confirmation",
+      "stage": "confirmation",
+      "status": "no_authorized_contracts"
+    },
+    "glm4": {
+      "contract_summaries": {
+        "R": {
+          "by_relation_verb": {
+            "coaches": {
+              "count": 188,
+              "lcb95": 0.947665460133743,
+              "n": 192,
+              "rate": 0.9791666666666666,
+              "ucb95": 0.991869347588416
+            },
+            "guides": {
+              "count": 192,
+              "lcb95": 0.9803841471883398,
+              "n": 192,
+              "rate": 1.0,
+              "ucb95": 0.9999999999999999
+            }
+          },
+          "by_surface": {
+            "identity": {
+              "count": 191,
+              "lcb95": 0.971091779786119,
+              "n": 192,
+              "rate": 0.9947916666666666,
+              "ucb95": 0.9990800325356756
+            },
+            "native_plain_candidate": {
+              "count": 189,
+              "lcb95": 0.9550749394965397,
+              "n": 192,
+              "rate": 0.984375,
+              "ucb95": 0.9946722030921646
+            }
+          },
+          "free_event": {
+            "count": 0,
+            "lcb95": 0.0,
+            "n": 384,
+            "rate": 0.0,
+            "ucb95": 0.009905074649031977
+          },
+          "gate_pass": true,
+          "mean_candidate_probability_mass": 0.0017166116169088734,
+          "mean_non_candidate_probability_mass": 0.9982833876274526,
+          "paired_world": {
+            "count": 93,
+            "lcb95": 0.9121117385108631,
+            "n": 96,
+            "rate": 0.96875,
+            "ucb95": 0.989316123222122
+          },
+          "surface_intersection": {
+            "count": 189,
+            "lcb95": 0.9550749394965397,
+            "n": 192,
+            "rate": 0.984375,
+            "ucb95": 0.9946722030921646
+          }
+        }
+      },
+      "created_at": "2026-07-17T14:02:19.128247+00:00",
+      "cuda_used": true,
+      "model": "glm4",
+      "model_weights_loaded": true,
+      "passed_contracts": [
+        "R"
+      ],
+      "reanalyzed_from_existing_logits": true,
+      "row_count": 384,
+      "runtime_seconds": 5.139736458659172e-07,
+      "schema_version": "phase512_dual_contract_behavior.v1",
+      "sealed_split_read": false,
+      "split": "confirmation",
+      "stage": "confirmation",
+      "status": "complete"
+    },
+    "qwen3": {
+      "contract_summaries": {},
+      "created_at": "2026-07-17T14:02:14.401367+00:00",
+      "cuda_used": false,
+      "model": "qwen3",
+      "model_weights_loaded": false,
+      "passed_contracts": [],
+      "reanalyzed_from_existing_logits": true,
+      "row_count": 0,
+      "runtime_seconds": 4.139728844165802e-07,
+      "schema_version": "phase512_dual_contract_behavior.v1",
+      "sealed_split_read": false,
+      "split": "confirmation",
+      "stage": "confirmation",
+      "status": "no_authorized_contracts"
+    }
+  },
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "relation_models": [
+    "glm4"
+  ],
+  "schema_version": "phase513_confirmation_authorization.v1",
+  "sealed_split_read": false,
+  "stage": "confirmation",
+  "status": "authorization_frozen"
+}

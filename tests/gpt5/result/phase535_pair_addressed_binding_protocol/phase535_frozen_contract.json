@@ -1,0 +1,140 @@
+{
+  "behavior_gate": {
+    "all_open_splits_required": true,
+    "overall_lcb95_min": 0.9,
+    "pair_flip_exact_lcb95_min": 0.82,
+    "surface_lcb95_min": 0.88,
+    "unrecoverable_ucb95_max": 0.05,
+    "world_exact_lcb95_min": 0.78
+  },
+  "created_at": "2026-07-18T02:39:20.366122+00:00",
+  "evidence_boundaries": {
+    "causal": false,
+    "observer_is_model_mechanism": false,
+    "pair_address_is_relation_label": false,
+    "scaffold_observer_is_natural_state": false,
+    "sealed_read": false
+  },
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "physical_design": {
+    "discovery_gate": {
+      "candidate_lcb95_min": 0.72,
+      "embedding_gain_min": 0.12,
+      "overall_lcb95_min": 0.82,
+      "pair_flip_exact_lcb95_min": 0.72,
+      "position_gain_min": 0.2,
+      "surface_lcb95_min": 0.76
+    },
+    "group_folds": 4,
+    "minimum_contiguous_layers": 4,
+    "pipeline_permutation_count": 1024,
+    "pipeline_permutation_seed": 535901,
+    "position_roles": [
+      "pair_slot_0_end",
+      "pair_slot_1_end",
+      "pair_slot_2_end",
+      "pair_slot_3_end",
+      "facts_end",
+      "world_end"
+    ],
+    "prediction_gate": {
+      "candidate_lcb95_min": 0.76,
+      "overall_lcb95_min": 0.84,
+      "pair_flip_exact_lcb95_min": 0.76,
+      "surface_lcb95_min": 0.8
+    },
+    "projection_consensus_required": 2,
+    "projection_dimension": 48,
+    "projection_seeds": [
+      518031,
+      518037,
+      518041
+    ]
+  },
+  "schema_version": "phase535_pair_addressed_binding_protocol.v1",
+  "source_path": "tests/gpt5/phase535_pair_addressed_binding_protocol.py",
+  "source_sha256": "580e8b55a4b094a2308186fc7bcea01dac62c16097e3d48d726ad4cb0029df0a",
+  "split_files": {
+    "discovery": {
+      "path": "tests/gpt5/result/phase535_pair_addressed_binding_protocol/phase535_discovery.jsonl",
+      "row_count": 768,
+      "sealed": false,
+      "sha256": "c8e3f1837a63c103e3bd67855ac4706d6c04c0440f3ae42f9dbf02cfe6a4199d"
+    },
+    "entity_prediction": {
+      "path": "tests/gpt5/result/phase535_pair_addressed_binding_protocol/phase535_entity_prediction.jsonl",
+      "row_count": 1536,
+      "sealed": false,
+      "sha256": "9fbf984c8db81863fcae0bc1030600a6ccb83f086800d3bcac9c3789eb4ae0f4"
+    },
+    "relation_prediction": {
+      "path": "tests/gpt5/result/phase535_pair_addressed_binding_protocol/phase535_relation_prediction.jsonl",
+      "row_count": 1536,
+      "sealed": false,
+      "sha256": "dc676cf9112994cf056b5353a5068ac30c410800afb148c3e5fbfabd62654b2f"
+    },
+    "sealed": {
+      "path": "tests/gpt5/result/phase535_pair_addressed_binding_protocol/phase535_sealed.jsonl",
+      "row_count": 1536,
+      "sealed": true,
+      "sha256": "ba1605d3e370f7b932da783f04edf631d263ac12a1f411297e5b73f6030479bd"
+    }
+  },
+  "status": "frozen_before_model_execution",
+  "stop_rules": [
+    "Models run in Qwen3, GLM4, DS7B order and release CUDA memory between runs.",
+    "Physical collection is forbidden unless all three open behavior splits pass for that model.",
+    "Prediction splits remain unread until a durable discovery platform ledger exists.",
+    "Pipeline permutations run only after an independently predictive platform exists.",
+    "The pair ledger is an observer scaffold, not a spontaneous natural world state.",
+    "No component, head, channel, neuron, causal, compute-edge, or sealed claim."
+  ],
+  "world_design": {
+    "all_nodes_keep_source_or_target_role": true,
+    "candidate_pairs": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "every_candidate_pair_flips_edge_status": true,
+    "pair_address_slot_fixed_across_world_flip": true,
+    "pair_ledger_asserts_relation": false,
+    "world_0_edges": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "world_1_edges": [
+      [
+        0,
+        3
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  }
+}

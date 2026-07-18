@@ -1,0 +1,61 @@
+{
+  "allowed_claim": "Qwen3 and GLM4 have late prompt-end observational candidates after removing the obvious embedding artifact.",
+  "created_at": "2026-07-17T08:54:13.891015+00:00",
+  "forbidden_claim": "The candidates are not yet independent physical predictions or causal relation mechanisms.",
+  "lexical_artifacts": [
+    {
+      "classification": "lexical_token_identity_artifact",
+      "layer_with_embedding": 0,
+      "model": "qwen3",
+      "position_role": "claim_end",
+      "q_native": 0.999999985930158,
+      "reason": "identity/plain have the same claim token while entailed/counterfactual use different attribute tokens; no network computation has occurred at embedding layer",
+      "relation_direction_coherence": 2.365830420458792e-09
+    },
+    {
+      "classification": "lexical_token_identity_artifact",
+      "layer_with_embedding": 0,
+      "model": "glm4",
+      "position_role": "claim_end",
+      "q_native": 0.9999999923673205,
+      "reason": "identity/plain have the same claim token while entailed/counterfactual use different attribute tokens; no network computation has occurred at embedding layer",
+      "relation_direction_coherence": 1.471123933782792e-08
+    }
+  ],
+  "position_eligibility": {
+    "claim_end": "diagnostic only because counterfactual pairs change the claim attribute token",
+    "evidence_end": "ineligible because the queried claim has not yet been observed",
+    "prompt_end": "eligible candidate because evidence, claim, question, and output boundary are all present"
+  },
+  "schema_version": "phase491_geometry_contamination_audit.v1",
+  "sealed_split_read": false,
+  "selected_deconfounded_windows": [
+    {
+      "geometry_window_direction_coherence": 0.9778479933738708,
+      "geometry_window_family_q": {
+        "marker_inheritance": 0.4085645093308675,
+        "signal_assignment": 0.46829807172541177
+      },
+      "geometry_window_q_native": 0.437197025487166,
+      "layer_with_embedding": 31,
+      "model": "qwen3",
+      "normalized_depth": 0.8611111111111112,
+      "position_role": "prompt_end",
+      "selection_rule": "prompt_end only; normalized depth >= 0.5; q>0 in both families; coherence>=0.5; maximize minimum family q, then overall q, coherence, lower layer"
+    },
+    {
+      "geometry_window_direction_coherence": 0.9521737098693848,
+      "geometry_window_family_q": {
+        "marker_inheritance": 0.32986319893614435,
+        "signal_assignment": 0.28952602290661505
+      },
+      "geometry_window_q_native": 0.3102537205289868,
+      "layer_with_embedding": 33,
+      "model": "glm4",
+      "normalized_depth": 0.825,
+      "position_role": "prompt_end",
+      "selection_rule": "prompt_end only; normalized depth >= 0.5; q>0 in both families; coherence>=0.5; maximize minimum family q, then overall q, coherence, lower layer"
+    }
+  ],
+  "status": "contamination_audit_complete"
+}

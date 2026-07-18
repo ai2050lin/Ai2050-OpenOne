@@ -1,0 +1,96 @@
+{
+  "behavior_gates": {
+    "all_splits_required": [
+      "discovery",
+      "independent_confirmation"
+    ],
+    "all_surfaces_required": [
+      "direct_natural",
+      "reordered_natural"
+    ],
+    "all_vocab_sets_required": [
+      "vocab_a",
+      "vocab_b"
+    ],
+    "selection_updates_allowed": false,
+    "semantic_unit_exact_lcb95_min": 0.9,
+    "surface_pair_exact_lcb95_min": 0.8,
+    "surface_row_lcb95_min": 0.9,
+    "unrecoverable_unit_ucb95_max": 0.05,
+    "vocabulary_unit_lcb95_min": 0.9
+  },
+  "created_at": "2026-07-18T05:13:00.833002+00:00",
+  "evidence_policy": {
+    "behavior_qualification_is_cross_model_mechanism": false,
+    "behavior_qualification_is_physical_mechanism": false,
+    "confirmation_split_is_open_but_frozen_before_model_run": true,
+    "historical_phase424_trace_can_close_new_contract": false,
+    "physical_collection_requires_behavior_gate": true,
+    "sealed_split_read": false,
+    "semantic_unit_is_independent_denominator": true,
+    "single_neuron_scan_requires_compute_and_causal_gate": true,
+    "surface_rewrites_increase_independent_n": false
+  },
+  "frozen_denominator": {
+    "families": 9,
+    "registered_mechanisms": 72
+  },
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase_id": "Phase544",
+  "registered_cases_path": "tests/gpt5/result/phase544_nine_family_natural_behavior/phase544_registered_cases.jsonl",
+  "registered_cases_sha256": "69928f66eb35454ab4bade5320e40c0c407779b683cb20cb0a68fda6614dad84",
+  "schema_version": "phase544_nine_family_natural_behavior.v1",
+  "screening_denominator": {
+    "families": 9,
+    "independent_world_pairs_per_mechanism_split": 73,
+    "prompts_per_model": 10512,
+    "representative_mechanisms": 18,
+    "representatives": {
+      "closure": [
+        "semantic_completion",
+        "multi_token_completion"
+      ],
+      "content_knowledge": [
+        "category",
+        "negated_attribute"
+      ],
+      "cross_lingual": [
+        "translation",
+        "role_binding"
+      ],
+      "language_action": [
+        "extract",
+        "transform"
+      ],
+      "output_protocol": [
+        "answer_only",
+        "json"
+      ],
+      "readout_competition": [
+        "target_vs_wrong",
+        "multi_token_answer"
+      ],
+      "reasoning_constraint": [
+        "direct_entailment",
+        "two_hop_entailment"
+      ],
+      "state_drift": [
+        "entity_drift",
+        "role_drift"
+      ],
+      "syntax_structure": [
+        "subject_role",
+        "singular_agreement"
+      ]
+    },
+    "surfaces_per_world_condition": 2,
+    "world_conditions_per_pair": 2
+  },
+  "static_audit_path": "tests/gpt5/result/phase544_nine_family_natural_behavior/phase544_static_audit.json",
+  "static_audit_sha256": "ffc4399e823b71f6d8fb75e31a82bbc844ee6d2d49199e7d086c365ce5f35afa",
+  "title": "Nine-family natural behavior qualification and physical-entry reselection"
+}

@@ -1,0 +1,116 @@
+{
+  "allowed_claim": "A passing result is an independent observational relation-state prediction at one frozen late prompt window.",
+  "authorization": {
+    "causal_intervention_authorized": false,
+    "head_channel_neuron_scan_authorized": false,
+    "sealed_read_authorized": false
+  },
+  "created_at": "2026-07-17T08:57:10.462271+00:00",
+  "cuda_used": true,
+  "forbidden_claim": "A passing result is not causal localization, mediation, neuron closure, or universal cross-model coding.",
+  "frozen_window": {
+    "geometry_window_direction_coherence": 0.9521737098693848,
+    "geometry_window_family_q": {
+      "marker_inheritance": 0.32986319893614435,
+      "signal_assignment": 0.28952602290661505
+    },
+    "geometry_window_q_native": 0.3102537205289868,
+    "layer_with_embedding": 33,
+    "model": "glm4",
+    "normalized_depth": 0.825,
+    "position_role": "prompt_end",
+    "selection_rule": "prompt_end only; normalized depth >= 0.5; q>0 in both families; coherence>=0.5; maximize minimum family q, then overall q, coherence, lower layer"
+  },
+  "gate_pass": true,
+  "independent_geometry": {
+    "by_family": {
+      "marker_inheritance": {
+        "d_native_surface": 0.2838035821914673,
+        "d_relation_counterfactual": 0.5211910009384155,
+        "q_native": 0.29489318409452553
+      },
+      "signal_assignment": {
+        "d_native_surface": 0.27984243631362915,
+        "d_relation_counterfactual": 0.4051828682422638,
+        "q_native": 0.18297197091160605
+      }
+    },
+    "d_native_surface": 0.28182297945022583,
+    "d_relation_counterfactual": 0.46318691968917847,
+    "pair_counts": {
+      "relation": 256,
+      "surface": 256
+    },
+    "q_native": 0.24343829258385916,
+    "relation_direction_coherence": 0.9424878358840942
+  },
+  "independent_truth_prediction": {
+    "by_family": {
+      "marker_inheritance": {
+        "count": 256,
+        "lcb95": 0.9852156082782743,
+        "n": 256,
+        "rate": 1.0,
+        "ucb95": 1.0
+      },
+      "signal_assignment": {
+        "count": 254,
+        "lcb95": 0.9719666598432031,
+        "n": 256,
+        "rate": 0.9921875,
+        "ucb95": 0.9978549545557232
+      }
+    },
+    "by_track": {
+      "identity": {
+        "count": 254,
+        "lcb95": 0.9719666598432031,
+        "n": 256,
+        "rate": 0.9921875,
+        "ucb95": 0.9978549545557232
+      },
+      "native_plain_candidate": {
+        "count": 256,
+        "lcb95": 0.9852156082782743,
+        "n": 256,
+        "rate": 1.0,
+        "ucb95": 1.0
+      }
+    },
+    "direction_norm_after_normalization": 1.0,
+    "fit_rows": 512,
+    "fit_split": "geometry_window",
+    "overall": {
+      "count": 510,
+      "lcb95": 0.9858703008860721,
+      "n": 512,
+      "rate": 0.99609375,
+      "ucb95": 0.9989281333619606
+    },
+    "score_summary": {
+      "max": 0.3564152717590332,
+      "mean_false": -0.20679312944412231,
+      "mean_true": 0.22943957149982452,
+      "min": -0.27886685729026794
+    },
+    "test_rows": 512,
+    "test_split": "physical_prediction"
+  },
+  "input": "tests/gpt5/result/phase487_dual_observer_native_core_protocol/phase487_physical_prediction_samples.jsonl",
+  "input_sha256": "444950f3a8277efdfc4ee60d9bb76513b5a6a47e8ca046c71f6db52db51b4b37",
+  "model": "glm4",
+  "model_weights_loaded": true,
+  "raw_hidden_states_saved": false,
+  "run_info": {
+    "d_model": 4096,
+    "layer_with_embedding": 33,
+    "n_transformer_layers": 40,
+    "position_role": "prompt_end",
+    "projection_dim": 64,
+    "projection_seed": 490037
+  },
+  "runtime_seconds": 14.582847844925709,
+  "schema_version": "phase492_independent_relation_prediction.v1",
+  "sealed_split_read": false,
+  "status": "independent_prediction_pass"
+}

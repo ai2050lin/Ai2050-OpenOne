@@ -1,0 +1,79 @@
+{
+  "condition_gate": {
+    "calibration_and_confirmation_required": true,
+    "four_way_lcb95_min": 0.6,
+    "overall_lcb95_min": 0.78,
+    "surface_lcb95_min": 0.7,
+    "truth_lcb95_min": 0.68,
+    "unrecoverable_ucb95_max": 0.08
+  },
+  "created_at": "2026-07-18T01:56:42.197013+00:00",
+  "evidence_boundaries": {
+    "best_condition_is_pre_registered_mechanism": false,
+    "causal_intervention": false,
+    "factorial_behavior_is_world_geometry": false,
+    "sealed_read": false
+  },
+  "factors": {
+    "foil_type": [
+      "reverse",
+      "disconnected"
+    ],
+    "graph_shape": [
+      "two_edge",
+      "four_cycle"
+    ],
+    "query_voice": [
+      "active",
+      "passive"
+    ],
+    "register_mode": [
+      "absent",
+      "present"
+    ],
+    "surface": [
+      "identity",
+      "natural_paraphrase"
+    ],
+    "truth_value": [
+      true,
+      false
+    ]
+  },
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "schema_version": "phase528_relation_contract_factorial_protocol.v1",
+  "selection_rule": "A condition is physically eligible for a later fresh split only when it passes unchanged in calibration and independent entity/relation confirmation.",
+  "source_path": "tests/gpt5/phase528_relation_contract_factorial_protocol.py",
+  "source_sha256": "250dfa35f86a087976e2da5244af0bc2aac91d014b4e23633e060b1df267c8c7",
+  "split_files": {
+    "calibration": {
+      "path": "tests/gpt5/result/phase528_relation_contract_factorial_protocol/phase528_calibration.jsonl",
+      "row_count": 1024,
+      "sealed": false,
+      "sha256": "fe0415dacf9fd598d21145fdf0c462c79d4e1a6bd166a1c0a08fe481949c2219"
+    },
+    "confirmation": {
+      "path": "tests/gpt5/result/phase528_relation_contract_factorial_protocol/phase528_confirmation.jsonl",
+      "row_count": 2048,
+      "sealed": false,
+      "sha256": "133afc2ed3b34d8584c1d899ae184e906377a9c621d1bdfb0f0c5049ee9b1c67"
+    },
+    "sealed": {
+      "path": "tests/gpt5/result/phase528_relation_contract_factorial_protocol/phase528_sealed.jsonl",
+      "row_count": 2048,
+      "sealed": true,
+      "sha256": "0f37886814a3bd4b8e1d63a39053842757e8a17da5e6fffc6a104afbbf3e6c37"
+    }
+  },
+  "status": "frozen_before_model_execution",
+  "stop_rules": [
+    "No thresholds or factor definitions change after any model output.",
+    "No physical analysis uses calibration or confirmation rows from this diagnostic.",
+    "No best-cell selection is called a mechanism discovery.",
+    "No sealed split is read in Phase528-529."
+  ]
+}

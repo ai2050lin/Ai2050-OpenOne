@@ -71004,3 +71004,3920 @@ $$
 不建议继续自动扩大同类 logit lens（词元读出镜）分析，因为边际收益会下降。下一步应先冻结 Phase480：标签说明与终端位置的残差组件账本预检。
 
 详细报告：`research/MainAnalysis/20260716_15_Phase479标签前真值差分与关系候选状态预检.md`。
+
+## Phase 480-481: 组件裕量账本与动态模式网络理论收紧 [2026-07-16 17:12]
+
+### 一、理论判断
+
+本阶段综合两份输入：一份关于深度神经网络运行原理的理论草案，一份关于 Phase477-479 的审计。
+
+理论草案方向总体正确：神经网络可以被理解为语法、逻辑、风格、知识和任务模式在上下文中竞争、组合、路由的动态系统。但需要收紧为“条件化模式算子网络”，不能把模式理解为固定向量、固定神经元或固定优先级。
+
+核心数学对象：
+
+$$
+\boxed{
+\mathfrak M
+=
+\left(
+\mathcal Z,
+\mathcal P,
+\mathcal H,
+\Pi,
+\mathcal R,
+\mathcal C,
+\delta,
+\mathcal Q,
+\mathcal E,
+\mathcal K,
+\Xi,
+\Theta,
+\mathfrak G
+\right)
+}
+$$
+
+模式定义：
+
+$$
+\boxed{
+\mathcal P_\alpha
+=
+\left(
+\mathcal D_\alpha,
+\mathcal O_\alpha,
+\tau_\alpha,
+\chi_\alpha
+\right)
+}
+$$
+
+优先级不是固定权重，而是：
+
+$$
+\boxed{
+u_\alpha
+=
+\Psi_\alpha(z,c,h,\pi,t)
+}
+$$
+
+离散算子场：
+
+$$
+\boxed{
+X_{\ell+1,p,t}
+=
+X_{\ell,p,t}
++
+\mathbb F_{\ell,p,t}(X,c)
+}
+$$
+
+这些公式可以作为智能理论主体继续保留，但当前实验还没有证明功能—物理实现映射 \(\Xi\) 的闭合。
+
+### 二、Phase477-479 审计修正
+
+Phase477-479 的方向正确：从隐藏状态范数推进到 A/B 候选裕量，并尝试寻找标签前真/假差分。
+
+但必须保持三条边界：
+
+```text
+logit lens（词元读出镜）是外部观察器，不是内部机制变量。
+标签说明位置 A/B 裕量稳定翻转，首先是阳性控制。
+标签前 A/B 方向没有真/假任务语义，不能证明关系状态。
+```
+
+当前最稳妥链条：
+
+$$
+\boxed{
+\text{证据位置：没有针对未来断言的稳定真值读出}
+}
+$$
+
+$$
+\boxed{
+\text{断言位置：弱、样本特异的真/假差异}
+}
+$$
+
+$$
+\boxed{
+\text{标签说明位置：A/B 映射方向可读出}
+}
+$$
+
+$$
+\boxed{
+\text{终端位置：关系—标签合成不稳定}
+}
+$$
+
+### 三、完成 Phase480-481
+
+新增脚本：
+
+```text
+tests/gpt5/phase480_component_margin_ledger.py
+tests/gpt5/phase481_component_margin_ledger_analysis.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase480_component_margin_ledger/phase480_component_margin_ledger_rows.jsonl
+tests/gpt5/result/phase480_component_margin_ledger/phase480_component_margin_ledger_summary.json
+tests/gpt5/result/phase481_component_margin_ledger_analysis/phase481_component_margin_ledger_analysis.json
+```
+
+规模：
+
+```text
+state_row_count = 15360
+component_delta_row_count = 15360
+paired_mapping_delta_count = 7680
+```
+
+组件读出定义：
+
+$$
+\boxed{
+\Delta M_{\mathrm{attn}}^{(\ell,r)}
+=
+M(H_{\mathrm{attn\_post}})
+-
+M(H_{\mathrm{layer\_pre}})
+}
+$$
+
+$$
+\boxed{
+\Delta M_{\mathrm{MLP}}^{(\ell,r)}
+=
+M(H_{\mathrm{mlp\_post}})
+-
+M(H_{\mathrm{attn\_post}})
+}
+$$
+
+这些是组件读出账本，不是 causal effect（因果效应）。
+
+### 四、关键结果
+
+终端位置晚层：
+
+```text
+terminal_token / late / attention:
+  mean_delta_margin_correct = -0.1662
+  positive_rate = 0.3504
+
+terminal_token / late / MLP:
+  mean_delta_margin_correct = -0.2543
+  positive_rate = 0.3415
+
+terminal_token / late / whole layer:
+  mean_delta_margin_correct = -0.4204
+  positive_rate = 0.3393
+```
+
+终端位置中后层：
+
+```text
+terminal_token / mid_back / attention:
+  mean_delta_margin_correct = 0.2396
+  positive_rate = 0.5586
+
+terminal_token / mid_back / MLP:
+  mean_delta_margin_correct = 0.0586
+  positive_rate = 0.4883
+```
+
+标签说明位置晚层：
+
+```text
+label_instruction / late / attention:
+  mean_delta_margin_true = -0.0441
+  positive_rate = 0.4531
+
+label_instruction / late / MLP:
+  mean_delta_margin_true = 0.0209
+  positive_rate = 0.5045
+```
+
+解释：终端晚层的 attention/MLP（注意力/多层感知机）读出平均没有稳定提升正确答案裕量，反而削弱正确答案裕量。这支持“关系—标签合成不稳定”，但不支持粗组件机制闭合。
+
+### 五、理论进展
+
+当前图谱应进一步收紧为：
+
+$$
+\boxed{
+\text{局部标签绑定能力}
+>
+\text{稳定抽象关系状态}
+}
+$$
+
+$$
+\boxed{
+\text{条件化模式竞争与组合存在迹象}
+\neq
+\text{已证明内部模式算子闭合}
+}
+$$
+
+Phase480-481 的价值是首次建立了粗组件裕量账本，但结果没有找到稳定组件窗口。
+
+### 六、闭合评估
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度维持：
+
+$$
+\boxed{24\%}
+$$
+
+### 七、是否继续自动下一步
+
+不建议继续自动运行下一阶段模型测试。原因是 Phase480-481 没有发现稳定组件窗口；继续做更细头/神经元扫描容易进入 patch（补丁式）边际收益递减区。
+
+下一步应先冻结 Phase482：标签无关关系几何协议，重点使用固定随机投影、同真值/异真值距离、表面变体控制和独立留出。
+
+详细报告：`research/MainAnalysis/20260716_16_Phase480-481组件裕量账本与动态模式网络理论收紧.md`。
+
+## Phase 482: 标签无关关系几何协议冻结与静态审计 [2026-07-16 17:50]
+
+### 一、审计判断
+
+Phase480-481 的方向正确，停止决定正确。组件账本说明候选裕量轨迹具有非单调、条件化和符号变化特征，但没有发现稳定粗组件窗口。
+
+允许结论：
+
+$$
+\boxed{
+\text{正确答案裕量不是逐层单调增加的势函数}
+}
+$$
+
+不允许结论：
+
+```text
+已经定位关系—标签合成组件
+晚层组件真实制造错误
+可以进入注意力头/通道/神经元扫描
+```
+
+因此下一步必须从 A/B 线性输出坐标转向标签无关关系几何。
+
+### 二、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase482_relation_geometry_protocol.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase482_relation_geometry_protocol/phase482_relation_geometry_protocol.json
+tests/gpt5/result/phase482_relation_geometry_protocol/phase482_relation_geometry_samples.jsonl
+tests/gpt5/result/phase482_relation_geometry_protocol/phase482_relation_geometry_static_audit.json
+tests/gpt5/result/phase482_relation_geometry_protocol/phase482_relation_geometry_manifest.json
+```
+
+静态审计状态：
+
+```text
+static_pass_no_model_run
+```
+
+总样本记录：
+
+```text
+2304
+```
+
+### 三、冻结分割
+
+开放分割：
+
+```text
+geometry_window_freeze
+physical_prediction_holdout
+```
+
+密封分割：
+
+```text
+sealed_physical_holdout
+```
+
+Phase482 只允许读取开放分割，不允许读取密封分割。
+
+每个分割包含：
+
+```text
+96 个独立真/假反事实对
+2 个真值角色
+2 种标签映射
+2 个子协议
+2 个表面模板
+```
+
+### 四、两个子协议
+
+```text
+label_post_relation_geometry:
+  标签说明在证据和断言之后。
+  目标是在标签信息不可见时寻找真/假关系几何。
+
+label_pre_mapping_visible_control:
+  标签说明在证据和断言之前。
+  目标是在映射可见时检验关系几何是否仍跨映射保持。
+```
+
+这两条轨道必须分别报告，不能混为同一个结论。
+
+### 五、固定随机投影
+
+冻结 Rademacher（拉德马赫）随机投影：
+
+```text
+seed = 48220260716
+k = 256
+R_ij in {-1/sqrt(k), +1/sqrt(k)}
+```
+
+公式：
+
+$$
+\boxed{
+\widetilde H
+=
+R\widehat H
+}
+$$
+
+层内标准化：
+
+$$
+\boxed{
+\widehat H_{\ell,r}
+=
+\frac{
+H_{\ell,r}-\mu_{\ell,r}
+}{
+\sigma_{\ell,r}+\varepsilon
+}
+}
+$$
+
+### 六、几何质量标准
+
+标签后置关系几何：
+
+$$
+\boxed{
+Q_R
+=
+\frac{
+D_{\mathrm{cf}}-D_{\mathrm{surface}}
+}{
+D_{\mathrm{cf}}+D_{\mathrm{surface}}+\varepsilon
+}
+}
+$$
+
+标签前置映射可见控制：
+
+$$
+\boxed{
+D_\mu
+<
+D_{\mathrm{cf}}
+}
+$$
+
+否则不能登记为标签无关关系几何。
+
+### 七、静态审计结果
+
+```text
+balance pass = True
+equality pass = True
+failure_count = 0
+baseline pass = True
+```
+
+简单基线全部为 0.5：
+
+```text
+constant_A
+constant_B
+mu_ab
+role_base
+subprotocol_label_post
+template_records
+text_length_even
+truth_oracle
+```
+
+说明协议没有明显标签、映射、模板、子协议或长度捷径。
+
+### 八、闭合评估与下一步
+
+本阶段是协议进展，不是物理发现。
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度维持：
+
+$$
+\boxed{24\%}
+$$
+
+不继续自动运行模型几何采集。原因是下一步会生成较大物理数据，必须先实现在线距离汇总，并严格只读取开放分割。
+
+建议下一步：
+
+```text
+Phase483: 标签无关关系几何开放分割采集与在线距离分析
+```
+
+详细报告：`research/MainAnalysis/20260716_17_Phase482标签无关关系几何协议冻结与静态审计.md`。
+
+## Phase 483: 开放关系几何采集与表面基线关闭 [2026-07-16 18:17]
+
+### 一、运行前修复
+
+Phase482 审计指出样本计数口径存在矛盾。修复后明确：
+
+```text
+sample_records:
+  expected = 2304
+  actual   = 2304
+
+variant_records:
+  expected = 4608
+  actual   = 4608
+```
+
+原 `truth_oracle` 拆分为：
+
+```text
+truth_only_without_mapping = 0.5
+truth_plus_mapping_oracle  = 1.0
+```
+
+修复后：
+
+```text
+static_pass_no_model_run
+count_contract pass = True
+truth_plus_mapping_oracle = 1.0
+```
+
+### 二、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase483_open_relation_geometry.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase483_open_relation_geometry/phase483_open_relation_geometry_run_protocol.json
+tests/gpt5/result/phase483_open_relation_geometry/phase483_open_relation_geometry_norm_stats.npz
+tests/gpt5/result/phase483_open_relation_geometry/phase483_open_relation_geometry_distance_rows.jsonl.gz
+tests/gpt5/result/phase483_open_relation_geometry/phase483_open_relation_geometry_summary.json
+```
+
+未保存原始高维隐藏状态。距离账本已压缩，避免大文件问题。
+
+### 三、数据边界
+
+本阶段只读取开放分割：
+
+```text
+geometry_window_freeze
+physical_prediction_holdout
+```
+
+未读取：
+
+```text
+sealed_physical_holdout
+```
+
+运行记录：
+
+```text
+sealed_split_read = False
+norm_variant_records = 1536
+open_variant_records = 3072
+projected_vector_count = 503808
+distance_row_count = 1511424
+```
+
+### 四、核心结果
+
+两个开放分割都没有出现正的几何窗口：
+
+```text
+geometry_window_freeze:
+  max_q = 0.0
+  positive windows = 0/80
+
+physical_prediction_holdout:
+  max_q = 0.0
+  positive windows = 0/80
+```
+
+标签后置关系几何中，最好窗口仍为负：
+
+```text
+geometry_window_freeze / claim_end / mid_front:
+  D_cf      = 47.4529
+  D_surface = 102.7201
+  Q_R       = -0.3680
+
+physical_prediction_holdout / claim_end / mid_back:
+  D_cf      = 49.1059
+  D_surface = 104.3156
+  Q_R       = -0.3599
+```
+
+### 五、结论边界
+
+允许结论：
+
+$$
+\boxed{
+\text{当前 Phase482/483 协议没有发现 }D_{\mathrm{cf}}>D_{\mathrm{surface}}
+}
+$$
+
+$$
+\boxed{
+\text{当前表面顺序变体主导投影几何距离}
+}
+$$
+
+不允许结论：
+
+```text
+模型没有关系几何
+语言没有标签无关关系状态
+可以读取密封集
+可以进入头/通道/神经元扫描
+```
+
+当前关闭的是：
+
+$$
+\boxed{
+\text{“证据/断言顺序交换作为表面基线”的关系几何候选}
+}
+$$
+
+不是所有关系几何路线。
+
+### 六、理论进展
+
+Phase483 第一次真正执行固定随机投影关系几何。但结果显示：`records_claim` 与 `claim_records` 不是轻量表面扰动，而是改变因果顺序、角色可见性和位置拓扑的 order-stress（顺序压力测试）。
+
+因此，主 `D_surface` 需要修复为轻量表面控制。
+
+### 七、闭合评估与下一步
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度维持：
+
+$$
+\boxed{24\%}
+$$
+
+不继续自动运行模型，不读取密封集。
+
+建议下一步：
+
+```text
+Phase484: 轻量表面控制与标签无关关系几何协议修复
+```
+
+详细报告：`research/MainAnalysis/20260716_18_Phase483开放关系几何采集与表面基线关闭.md`。
+
+## Phase 484-485: 核心表面协议冻结与行为门失败 [2026-07-16 19:18]
+
+### 一、审计判断
+
+Phase483 的执行正确，停止决定正确。它关闭的是：
+
+$$
+\boxed{
+\text{把证据—断言顺序交换当作轻量表面变化的旧关系几何协议}
+}
+$$
+
+没有关闭标签无关关系几何总体路线。顺序交换属于 order-stress（顺序压力），不是 core surface（核心表面）变化。
+
+### 二、Phase484 静态协议
+
+新增脚本：
+
+```text
+tests/gpt5/phase484_core_surface_protocol.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase484_core_surface_protocol/phase484_core_surface_protocol.json
+tests/gpt5/result/phase484_core_surface_protocol/phase484_core_surface_samples.jsonl
+tests/gpt5/result/phase484_core_surface_protocol/phase484_core_surface_static_audit.json
+tests/gpt5/result/phase484_core_surface_protocol/phase484_core_surface_manifest.json
+```
+
+冻结轨道：
+
+```text
+identity
+core_surface_plain
+core_surface_light
+order_stress_claim_first
+```
+
+计数：
+
+```text
+sample_records = 2304
+variant_records = 9216
+open_variant_records = 6144
+sealed_variant_records = 3072
+```
+
+静态审计：
+
+```text
+static_pass_no_model_run
+topology pass = True
+balance pass = True
+truth_plus_mapping_oracle = 1.0
+```
+
+### 三、Phase485 行为门
+
+新增脚本：
+
+```text
+tests/gpt5/phase485_core_surface_behavior_gate.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase485_core_surface_behavior_gate/phase485_core_surface_behavior_generations.jsonl
+tests/gpt5/result/phase485_core_surface_behavior_gate/phase485_core_surface_behavior_summary.json
+```
+
+只读取开放分割，未读取密封分割：
+
+```text
+sealed_split_read = False
+open_variant_records = 6144
+```
+
+### 四、关键结果
+
+核心行为门失败：
+
+```text
+n = 4608
+correct = 2677
+accuracy = 0.5809
+accuracy_lcb95 = 0.5666
+other = 1840
+other_rate = 0.3993
+other_ucb95 = 0.4135
+pass = False
+```
+
+预注册标准为：
+
+$$
+\boxed{
+\operatorname{LCB}_{95\%}(C_{\mathrm{core}})\ge0.90
+}
+$$
+
+$$
+\boxed{
+\operatorname{UCB}_{95\%}(P_{\mathrm{other}})\le0.05
+}
+$$
+
+实际远未达到。
+
+### 五、结论边界
+
+允许结论：
+
+$$
+\boxed{
+\text{当前 Phase484 文本接口没有通过核心表面行为资格门}
+}
+$$
+
+不允许结论：
+
+```text
+模型没有关系几何
+轻量核心表面路线失败
+可以读取密封集
+可以继续物理几何采集
+```
+
+当前关闭的是当前文本接口，不是关系几何路线。
+
+### 六、理论进展
+
+本阶段说明：核心表面变换不能只由人工语义等价定义，必须先通过行为资格门。
+
+最新链条：
+
+$$
+\boxed{
+\text{文本接口}
+\rightarrow
+\text{行为稳定}
+\rightarrow
+\text{核心表面几何}
+\rightarrow
+\text{关系候选}
+}
+$$
+
+当前第一道行为门失败。
+
+### 七、闭合评估与下一步
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度维持：
+
+$$
+\boxed{24\%}
+$$
+
+不继续自动运行物理几何，不读取密封集。
+
+建议下一步：
+
+```text
+Phase486: GLM4 稳定接口核心表面协议重写
+```
+
+详细报告：`research/MainAnalysis/20260716_19_Phase484-485核心表面协议冻结与行为门失败.md`。
+
+## Phase 486: 只读输出事件审计与语义恢复门 [2026-07-16 21:44]
+
+### 一、审计判断
+
+Phase484-485 的停止决定正确，但失败主要来自 other（其他输出）事件，而不是明确 A/B 标签选错。
+
+核心轨道严格评分：
+
+```text
+n = 4608
+strict semantic = 2677
+strict wrong = 91
+strict other = 1840
+strict accuracy = 0.5809
+```
+
+明确 A/B 选错只有：
+
+$$
+\boxed{
+91/4608=1.97\%
+}
+$$
+
+因此当前最准确结论是：
+
+$$
+\boxed{
+\text{当前接口没有稳定完成严格单标签输出事件}
+}
+$$
+
+而不是“GLM4 没有关系判断能力”。
+
+### 二、完成内容
+
+新增脚本：
+
+```text
+tests/gpt5/phase486_readonly_other_event_audit.py
+```
+
+新增结果：
+
+```text
+tests/gpt5/result/phase486_readonly_other_event_audit/phase486_readonly_other_event_rows.jsonl
+tests/gpt5/result/phase486_readonly_other_event_audit/phase486_readonly_other_event_summary.json
+```
+
+本阶段没有修改提示，没有加载模型，没有读取密封集。
+
+### 三、other 类型分解
+
+全开放 6144 条：
+
+```text
+semantic = 2897
+wrong    = 422
+other    = 2825
+```
+
+other 类型：
+
+```text
+truth_word                   = 1683
+content_continuation         = 466
+explanation_prefix_truncated = 400
+single_label_with_wrapper    = 163
+yes_no_word                  = 107
+truth_word_ambiguous         = 5
+unrelated_or_content         = 1
+```
+
+other 主体是 true/false（真/假）、yes/no（是/否）或解释开头，不是无关输出。
+
+### 四、语义恢复结果
+
+核心轨道：
+
+```text
+n = 4608
+strict_accuracy = 0.5809
+semantic_after_recovery = 4196
+semantic_after_recovery_rate = 0.9106
+unrecoverable_or_ambiguous = 321
+unrecoverable_or_ambiguous_rate = 0.0697
+```
+
+语义恢复后：
+
+$$
+\boxed{
+\operatorname{LCB}_{95\%}\approx0.9020
+}
+$$
+
+三轨道：
+
+```text
+identity:
+  semantic_after_recovery_rate = 0.9753
+
+core_surface_plain:
+  semantic_after_recovery_rate = 0.9753
+
+core_surface_light:
+  semantic_after_recovery_rate = 0.7813
+
+order_stress_claim_first:
+  semantic_after_recovery_rate = 0.3073
+```
+
+### 五、理论进展
+
+Phase486 将失败拆成：
+
+$$
+\boxed{
+\text{关系语义选择}
+\neq
+\text{标签绑定}
+\neq
+\text{严格输出事件}
+}
+$$
+
+当前证据显示 identity/plain 轨道语义较稳定，但严格 A/B 输出事件不稳定；light 变换改变任务接口编译；order-stress 仍是强压力失败。
+
+因此智能理论需要显式加入：
+
+$$
+\boxed{
+\mathcal I:
+\text{任务—接口编译算子}
+}
+$$
+
+### 六、闭合评估与下一步
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度维持：
+
+$$
+\boxed{24\%}
+$$
+
+不继续自动运行模型或物理几何。下一步应冻结双评分器，并重建接口一致核心轨道。
+
+建议：
+
+```text
+Phase487: 双评分器核心表面行为门与接口一致协议
+```
+
+详细报告：`research/MainAnalysis/20260716_20_Phase486只读输出事件审计与语义恢复门.md`。
+
+## Phase 493: 双观察器复验与晚层关系状态独立预测 [2026-07-17 00:05]
+
+### 一、Phase486 审计结论
+
+Phase486 的三通道拆分方向正确：
+
+$$
+\boxed{
+\text{关系语义}
+\ne
+\text{标签绑定}
+\ne
+\text{严格输出事件}
+}
+$$
+
+但历史数值不能直接保留。只读复查发现：
+
+```text
+Phase484 identity 与 core_surface_plain 提示逐字节相同
+Phase485 strict 只取归一化输出首字符，不是精确单标签事件
+Phase486 解析器为后验构造，旧剩余项混合语义错误与不可恢复
+```
+
+冻结目标盲规则重算核心 4608 条：
+
+```text
+semantic correct       = 4067 / 4608 = 0.8826
+semantic wrong         =   92 / 4608 = 0.0200
+semantic unrecoverable =  449 / 4608 = 0.0974
+strict exact event     =    6 / 4608 = 0.0013
+```
+
+因此旧版：
+
+$$
+\boxed{4196/4608=91.06\%}
+$$
+
+不是冻结、目标盲的语义估计。
+
+### 二、Phase487 冻结协议
+
+新增脚本：
+
+```text
+tests/gpt5/phase487_dual_observer_native_core_protocol.py
+```
+
+冻结四个物理分离文件：
+
+```text
+behavior_qualification
+geometry_window
+physical_prediction
+sealed_physical
+```
+
+每个分割包含 512 个语义样本、2048 个接口变体，平衡两个关系族、真值、A/B 映射、目标槽位、事实顺序和映射位置。
+
+轨道在运行前冻结为：
+
+```text
+identity
+native_plain_candidate
+formal_light_stress
+order_stress_claim_first
+```
+
+其中 `identity` 与 `native_plain_candidate` 是真正不同的提示。
+
+解析器工程一致性用例为 28/28，但没有独立人工盲审，所以只用于事件账本，不单独授权输出事件物理图谱。
+
+### 三、Phase488-489 三模型行为结果
+
+新增脚本：
+
+```text
+tests/gpt5/phase488_multimodel_three_channel_behavior.py
+tests/gpt5/phase489_three_channel_behavior_analysis.py
+```
+
+按 CUDA 顺序逐个运行：
+
+```text
+qwen3 -> GLM4 -> DS7B
+```
+
+每个模型 2048 条，共 6144 条。
+
+原生两轨关系语义交集：
+
+```text
+qwen3:     256 / 256 = 1.0000   pass
+glm4:      253 / 256 = 0.9883   pass
+deepseek7b:128 / 256 = 0.5000   fail
+```
+
+标签绑定两轨交集：
+
+```text
+qwen3:      299 / 512 = 0.5840   fail
+glm4:       327 / 512 = 0.6387   fail
+deepseek7b: 205 / 512 = 0.4004   fail
+```
+
+严格完整事件：
+
+```text
+qwen3 identity/plain:      0 / 512, 0 / 512
+glm4 identity/plain:      29 / 512, 0 / 512
+deepseek7b identity/plain: 0 / 512, 0 / 512
+```
+
+所以只授权 Qwen3、GLM4 的关系语义物理观察；DS7B 不进入物理分母。输出事件图谱、密封集、因果与神经元扫描均关闭。
+
+### 四、Phase490-491 开放物理观察与污染审计
+
+新增脚本：
+
+```text
+tests/gpt5/phase490_open_native_relation_geometry.py
+tests/gpt5/phase491_geometry_contamination_audit.py
+```
+
+对合格模型采集所有层的证据终端、断言终端和提示终端固定 64 维投影，不保存原始隐藏状态。
+
+首轮两个模型的断言位置嵌入层均出现 $Q\approx1$。审计确认这是反事实样本更换属性词元造成的词元身份伪迹，不是关系计算，因此删除。
+
+冻结去混杂窗口：
+
+```text
+qwen3: prompt_end L31, normalized_depth=0.8611, Q=0.4372, coherence=0.9778
+glm4:  prompt_end L33, normalized_depth=0.8250, Q=0.3103, coherence=0.9522
+```
+
+只允许读取独立开放物理预测分割；密封分割仍关闭。
+
+### 五、Phase492 独立物理预测
+
+新增脚本：
+
+```text
+tests/gpt5/phase492_independent_relation_prediction.py
+```
+
+在几何窗口分割拟合：
+
+$$
+\boxed{
+d_m
+=
+\operatorname{normalize}
+\left(
+\mathbb E[z_m\mid t=1]
+-
+\mathbb E[z_m\mid t=0]
+\right)
+}
+$$
+
+在未用于选择窗口和方向的开放物理预测分割评价：
+
+```text
+qwen3:
+  independent Q            = 0.4303
+  direction coherence      = 0.9790
+  truth prediction         = 512 / 512 = 1.0000
+  prediction LCB95         = 0.9926
+
+glm4:
+  independent Q            = 0.2434
+  direction coherence      = 0.9425
+  truth prediction         = 510 / 512 = 0.9961
+  prediction LCB95         = 0.9859
+```
+
+两个关系族的独立 $Q$ 均为正；Qwen3 两族均为 256/256，GLM4 为 256/256 与 254/256。
+
+允许结论：
+
+$$
+\boxed{
+\text{Qwen3 与 GLM4 在冻结晚层提示终端窗口存在独立开放可预测的关系真值方向}
+}
+$$
+
+禁止结论：
+
+```text
+该方向是上游关系计算机制
+该方向是因果必要或充分载体
+三个模型共享一个通用方向
+标签、序列化、组件、注意力头、通道或神经元已闭合
+```
+
+### 六、Phase493 固定审计与可视化数据
+
+新增脚本：
+
+```text
+tests/gpt5/phase493_relation_state_stage_audit.py
+```
+
+固定结果：
+
+```text
+tests/gpt5/result/phase493_relation_state_stage_audit/phase493_relation_state_stage_audit.json
+```
+
+新增可视化数据源：
+
+```text
+frontend/public/vis_data/phase492_relation_state_atlas/manifest.json
+frontend/public/vis_data/phase492_relation_state_atlas/phase492_qwen3_relation_state.json
+frontend/public/vis_data/phase492_relation_state_atlas/phase492_glm4_relation_state.json
+frontend/public/vis_data/phase492_relation_state_atlas/phase492_deepseek7b_relation_state.json
+```
+
+图谱只显示：
+
+```text
+行为资格门 --测量授权--> 晚层提示终端状态 --观察预测--> 独立开放预测
+```
+
+这些边明确登记为非计算边、非因果边。标签绑定和严格输出作为失败节点显示。DS7B 显示行为失败和物理未授权，不绘制虚假路线。
+
+### 七、公式与理论边界
+
+本轮只增加观察量：
+
+$$
+\boxed{
+r_m^{\mathrm{terminal}}(x)
+=
+\langle d_m,P_m h_{m,\ell_m^*,\mathrm{prompt\ end}}(x)\rangle
+}
+$$
+
+完整机制仍需恢复：
+
+$$
+\boxed{
+E
+\xrightarrow{\mathcal F}
+R
+\xrightarrow{\mathcal T}
+R_{\mathrm{terminal}}
+\xrightarrow{\mathcal B_\mu}
+L
+\xrightarrow{\mathcal S}
+Y
+}
+$$
+
+当前只证明 $R_{\mathrm{terminal}}$ 在两个模型的当前开放任务上可读；没有恢复形成、运输、标签绑定或序列化算子。
+
+理论名称保持“语言是动态模式网络”，不因这一终端观察结果新增已确认模式算子。
+
+### 八、问题和硬伤
+
+1. 当前窗口在晚层提示终端，可能只是答案读出。
+2. 只有两个简单合成关系族，没有未见关系族留出。
+3. 两模型使用各自层、投影和方向，不是统一神经坐标。
+4. 没有密封复现与任何因果干预。
+5. 标签绑定和完整输出事件全部失败。
+6. 解析器没有独立人工盲审资格。
+7. 64 维线性观察器可能遗漏动态、非线性、相消与条件路由。
+8. DS7B 不复现，跨小模型普遍性不成立。
+9. 小模型向完整语言机制外推仍保留 30%-50% 风险，但不据此放宽门槛。
+
+### 九、闭合和进度
+
+严格机制闭合：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+由于新增一个经过独立开放物理预测的终端关系状态拼图，总体科学成熟度谨慎更新为：
+
+$$
+\boxed{25\%}
+$$
+
+合理区间：
+
+$$
+\boxed{24\%-26\%}
+$$
+
+### 十、下一阶段决策
+
+Phase487-493 当前阶段已完成。下一步改变科学对象，从终端观察转向上游形成和跨关系族外推，不属于同一阶段的自动追加；不得自动读取密封集或直接扫描神经元。
+
+建议冻结：
+
+```text
+Phase494: 上游形成边界与跨关系族外推门
+```
+
+阶段任务：
+
+1. 新增至少四个未见关系族及长度、顺序、否定控制；
+2. 两族拟合、其余关系族评价；
+3. 在来源、断言、提示终端定位最早稳定形成边界；
+4. 区分首次形成、运输、消失、重建和终端读出；
+5. 只有跨关系族预测通过后，才运行带随机控制的路径级必要性与充分性；
+6. 只有路径因果通过后，才授权组件、注意力头、通道和神经元细化。
+
+详细报告：`research/MainAnalysis/20260717_02_Phase486审计与晚层关系状态独立预测.md`。
+
+## Phase 494: 固定断言跨关系族行为门与旧晚层关系状态撤销 [2026-07-17 01:22]
+
+### 一、本阶段目标与材料审计
+
+本阶段审核了三份“语言是动态模式网络”材料，并执行 Phase487-493 留下的下一阶段任务。
+
+材料中可以保留的部分是：
+
+1. 神经网络的语言行为更可能依赖上下文条件下的分布式轨迹，而不是一组永久对应固定概念的神经元；
+2. 研究对象应区分触发条件、状态变化、路径选择和输出倾向；
+3. 功能行为资格必须先于物理定位，物理可读性又必须先于因果和神经元细化；
+4. 线性方向只能作为观察器，不能自动等同于真实运行机制；
+5. “先临摹、后归纳、再因果”的总体顺序仍然合理。
+
+目前不能写成已建立数学体系的部分是：
+
+```text
+SparseGate（稀疏门）已经存在；
+高阶模式竞争已经被观测；
+非交换模式算子或李括号已经成立；
+纤维丛、范畴、抽象层级和元模式已经对应真实内部对象；
+训练损失由路由、组合、抽象等辅助损失构成；
+知识、推理、语法已经被分解为独立功能因子。
+```
+
+这些内容当前只能作为实验生成框架。新增符号和高级数学名称不能替代对象识别、独立预测与因果证据。
+
+### 二、Phase494 冻结协议
+
+新增脚本：
+
+```text
+tests/gpt5/phase494_cross_family_trajectory_protocol.py
+tests/gpt5/phase495_cross_family_behavior_gate.py
+tests/gpt5/phase496_behavior_authorization.py
+tests/gpt5/phase497_498_cross_family_trajectory.py
+tests/gpt5/phase499_cross_family_stage_audit.py
+```
+
+六个关系族在模型运行前冻结：
+
+```text
+拟合族：
+marker_inheritance
+signal_assignment
+
+未见族：
+symmetric_pair
+directed_mentor
+transitive_precedence
+direct_nontransitive
+```
+
+每个关系族包含 72 个成对世界，正交平衡：
+
+```text
+3 档长度 × 3 种事实顺序 × 2 种断言极性 × 4 次独立词汇重复
+```
+
+真假成对世界首次满足：
+
+$$
+\boxed{
+\begin{aligned}
+C_i^{+}&=C_i^{-},\\
+\operatorname{Rules}_i^{+}&=\operatorname{Rules}_i^{-},\\
+\#F_i^{+}&=\#F_i^{-},\\
+\operatorname{BagTokens}(F_i^{+})&=\operatorname{BagTokens}(F_i^{-})
+\end{aligned}
+}
+$$
+
+其中断言 $C_i$ 完全相同，事实数量和词汇多重集相同，只交换决定真假的证据连接。这直接拆除了 Phase487-492 中“真假样本更换断言属性词元”的混杂。
+
+静态数据量：
+
+```text
+behavior_qualification: 864 个世界，1728 条原生表面
+formation_fit:           288 个世界， 576 条原生表面
+family_prediction:       576 个世界，1152 条原生表面
+sealed_cross_family:     864 个世界，1728 条原生表面
+```
+
+密封分割只生成并登记哈希，没有被任何下游脚本读取。
+
+### 三、行为资格公式
+
+对每个模型 $m$ 和关系族 $r$，冻结行为门为：
+
+$$
+\boxed{
+G^{\mathrm{beh}}_{m,r}
+=
+[L^{I}_{m,r}\ge0.80]
+\land[L^{P}_{m,r}\ge0.80]
+\land[L^{I\cap P}_{m,r}\ge0.80]
+\land[L^{\mathrm{pair}}_{m,r}\ge0.75]
+}
+$$
+
+其中 $I$ 为 identity（原表面），$P$ 为 native plain（自然简化表面），$L$ 为 95% Wilson 下界，$L^{\mathrm{pair}}$ 要求同一断言的真假两个世界在两条表面上全部正确。
+
+按 CUDA 顺序逐个运行：
+
+```text
+Qwen3 -> GLM4 -> DS7B
+```
+
+每个模型运行 1728 条，共 5184 条，没有同时驻留多个模型。
+
+### 四、三模型客观结果
+
+原生两轨交集和真假成对世界结果：
+
+| 模型 | 关系族 | 原生交集 | 成对世界全正确 | 行为门 |
+|---|---|---:|---:|---|
+| Qwen3 | marker_inheritance | 72/144 | 0/72 | fail |
+| Qwen3 | signal_assignment | 53/144 | 2/72 | fail |
+| Qwen3 | symmetric_pair | 140/144 | 68/72 | pass |
+| Qwen3 | directed_mentor | 140/144 | 68/72 | pass |
+| Qwen3 | transitive_precedence | 81/144 | 9/72 | fail |
+| Qwen3 | direct_nontransitive | 97/144 | 25/72 | fail |
+| GLM4 | marker_inheritance | 89/144 | 21/72 | fail |
+| GLM4 | signal_assignment | 95/144 | 29/72 | fail |
+| GLM4 | symmetric_pair | 114/144 | 42/72 | fail |
+| GLM4 | directed_mentor | 126/144 | 58/72 | fail |
+| GLM4 | transitive_precedence | 61/144 | 25/72 | fail |
+| GLM4 | direct_nontransitive | 67/144 | 9/72 | fail |
+| DS7B | marker_inheritance | 72/144 | 0/72 | fail |
+| DS7B | signal_assignment | 72/144 | 0/72 | fail |
+| DS7B | symmetric_pair | 72/144 | 0/72 | fail |
+| DS7B | directed_mentor | 67/144 | 0/72 | fail |
+| DS7B | transitive_precedence | 71/144 | 0/72 | fail |
+| DS7B | direct_nontransitive | 72/144 | 0/72 | fail |
+
+总体两轨交集：
+
+```text
+Qwen3: 583/864 = 0.6748；成对世界 172/432 = 0.3981
+GLM4:  552/864 = 0.6389；成对世界 184/432 = 0.4259
+DS7B:  426/864 = 0.4931；成对世界   0/432 = 0.0000
+```
+
+四个未见族交集：
+
+```text
+Qwen3: 458/576 = 0.7951，LCB95=0.7603
+GLM4:  368/576 = 0.6389，LCB95=0.5989
+DS7B:  282/576 = 0.4896，LCB95=0.4490
+```
+
+肯定与否定断言交集：
+
+```text
+Qwen3: positive 318/432；negative 265/432
+GLM4:  positive 372/432；negative 180/432
+DS7B:  positive 210/432；negative 216/432
+```
+
+否定是 GLM4 的明显瓶颈，但不是唯一问题。Qwen3 在旧拟合族的肯定条件也没有稳定区分固定断言的两个证据世界；DS7B 的成对世界全部失败，表现接近不随证据连接变化的固定输出。
+
+### 五、停止规则与未运行内容
+
+三个模型的两个拟合族总门全部失败。因此 Phase496 物理授权列表为空：
+
+$$
+\boxed{
+\mathcal M_{\mathrm{physical}}=\varnothing
+}
+$$
+
+所以本阶段按预注册停止规则没有运行：
+
+```text
+隐藏状态 formation_fit（形成拟合）；
+未见族 family_prediction（族外预测）；
+非线性观察器；
+来源运输；
+路径干预；
+注意力头、通道或神经元扫描；
+密封集。
+```
+
+`phase497_498_cross_family_trajectory.py` 已实现并通过语法检查，但没有获得模型运行资格。没有模型轨迹数据不是工程缺失，而是本轮有效负结果。
+
+### 六、对 Phase492 的反向校准
+
+Phase487 的旧真假样本保持事实不变，但把断言中的属性词元从正确属性替换成错误属性。Phase492 的冻结方向因此可能读取：
+
+```text
+断言词元身份；
+断言与事实的表面重合；
+晚层候选答案状态；
+或三者混合。
+```
+
+新协议固定断言并只交换证据连接以后，旧拟合族在三个模型上均未通过行为门。因此应撤销：
+
+$$
+\boxed{
+\text{Phase492 晚层方向}=\text{抽象关系真值状态}
+}
+$$
+
+允许保留的更窄结论是：
+
+$$
+\boxed{
+\text{Phase492 找到了旧同族合同下可独立预测的晚层方向，}
+\quad
+\text{但其关系状态解释已被固定断言审计否定。}
+}
+$$
+
+Phase492 原始数值没有删除；可视化图谱已标为历史结果，并由 Phase499 降级。预测边、行为门和晚层状态节点均不再显示为有效关系状态证据。
+
+### 七、理论更新
+
+理论名称继续保持“语言是动态模式网络”，不新增名词。本轮没有证明动态模式网络的核心算子；它只完成了一次更强的可证伪检查。
+
+候选统一式仍可写成实验框架：
+
+$$
+\boxed{
+x_{t+1}
+=
+\mathcal F_{\Theta}
+\left(
+x_t,
+c_t,
+\{M_i\},
+\{R_{ij}\}
+\right)
+}
+$$
+
+但当前实证对象只有模型输入输出映射和少量历史物理账本，尚未识别 $M_i$、$R_{ij}$、门函数或高阶组合律。因此不能把该式称为已完成的智能理论。
+
+当前最重要的新拼图是：
+
+$$
+\boxed{
+\text{可读晚层方向对观察合同和词面混杂高度敏感；}
+\quad
+\text{同族独立预测不保证关系抽象。}
+}
+$$
+
+这支持“语言状态是条件性的”这一弱命题，但不支持“已经找到了动态模式”的强命题。
+
+### 八、问题、硬伤与小模型边界
+
+1. 六个任务仍是合成封闭世界，不覆盖自然知识网络、长链推理和真实语法。
+2. 直接 `true/false` 候选是一个输出观察合同；行为失败可能同时包含理解失败和接口映射失败。
+3. 新固定断言协议比旧协议更严格，但证据交换也增加了绑定要求，不能简单与 Phase488 的准确率横向比较。
+4. Qwen3 只在对称关系和有向直接角色上通过，尚不能作为两个模型共享规律。
+5. GLM4 的否定控制明显下降，说明断言极性不能被当作中性表面变化。
+6. DS7B 接近固定输出，不能进入任何物理分母。
+7. 没有行为资格就没有新的物理形成、运输或全局轨迹结果。
+8. 小模型可能与完整语言编码存在 30%-50% 偏差，但该风险只能限制外推，不能用来放宽本模型内的证据门。
+9. `SparseGate`、模式竞争、非交换性、抽象层级和元模式仍没有直接观测对象。
+
+### 九、闭合与进度
+
+严格机制闭合保持：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+Phase492 的一个终端关系状态拼图被降级，同时 Phase494 增加了更可靠的固定断言协议和大样本负结果，因此总体成熟度不增加：
+
+$$
+\boxed{25\%}
+$$
+
+合理区间：
+
+$$
+\boxed{24\%-26\%}
+$$
+
+### 十、图谱与固定结果
+
+固定结果：
+
+```text
+tests/gpt5/result/phase494_cross_family_trajectory_protocol/
+tests/gpt5/result/phase495_cross_family_behavior_gate/
+tests/gpt5/result/phase496_behavior_authorization/
+tests/gpt5/result/phase499_cross_family_stage_audit/phase499_cross_family_stage_audit.json
+```
+
+可视化数据源：
+
+```text
+frontend/public/vis_data/phase499_cross_family_relation_trajectory/
+```
+
+该图谱只显示六族行为门和物理未授权节点。所有层序边都明确为非计算、非因果边；本轮没有绘制虚假的神经元路径。
+
+详细报告：`research/MainAnalysis/20260717_03_Phase487-499跨关系族状态轨迹审计.md`。
+
+### 十一、下一阶段决策
+
+Phase494 的阶段目标已经完成，结论是跨关系族物理研究未获行为资格。下一阶段不应自动进入因果、路径或神经元阶段。
+
+最可行的新阶段应是：
+
+```text
+Phase495：固定断言关系行为的可识别性校准
+```
+
+在新的预注册分母中分别检验：
+
+1. 模型是否能在不交换断言词元的情况下区分两个证据世界；
+2. 肯定、显式否定和反向查询是否是三个不同功能合同；
+3. 直接事实、单步规则、传递闭包和非传递排除应分层，而不是聚合成一个门；
+4. 用自然名字、结构化标识符和旧 Phase487 标识符三套词汇做完全交叉，确认失败是否来自标识符解析；
+5. 先冻结行为成功的最小合同，再以新的独立词汇和模板复现；
+6. 只有至少两个模型在固定断言成对世界上通过，才重新授权上游物理轨迹。
+
+该任务改变了行为合同和科学分母，属于新的阶段，不在本轮结果后自动改协议运行。否则会形成“看到失败后修改任务直到通过”的循环。
+
+## Phase 500: 固定断言原生关系合同、观察器分叉与物理门停止 [2026-07-17 03:24]
+
+### 一、阶段目标与材料复核
+
+本阶段复核了 Phase494-499 的反向校准，并完整执行了新的分层原生关系合同。材料中最重要的判断正确：
+
+$$
+\boxed{
+\text{同分布独立预测}
+\neq
+\text{构念有效性}
+\neq
+\text{机制有效性}
+}
+$$
+
+固定断言、固定规则、固定事实数量和固定事实词元多重集，确实拆除了 Phase492 中最严重的断言词元身份混杂。Phase492 的旧开放预测数值继续保留，但“抽象关系真值状态”解释维持撤销状态。没有行为资格时停止隐藏状态采集、路径干预和神经元扫描是正确的。
+
+材料需要收紧三点：
+
+1. 96 项账本混合了协议字段、单格数值和科学拼图，不能把每一项都计为独立机制进展。
+2. 固定词袋不能排除局部精确匹配；对称关系和非传递排除的确定性精确匹配基线在当前样本上均为 100%。
+3. 世界差异、词汇差异和观察器差异的物理比较，只能在行为合格且合同可比的单元内进行，不能先算几何再事后挑选合同。
+
+### 二、冻结协议与算法原理
+
+Phase500 在模型运行前冻结五类关系功能：
+
+1. 直接对称关系；
+2. 直接有向关系；
+3. 单步规则；
+4. 传递闭包；
+5. 非传递排除。
+
+每类分别交叉肯定断言、显式否定和反向查询三种极性。词汇系统包括自然名称、结构化标识符和历史人工标识符；观察器包括 true/false（真/假）、A/B 与 0/1；每个样本有原表面和自然简化表面。
+
+本轮没有直接运行完整笛卡尔积，而是使用预注册分层漏斗：
+
+```text
+阶段A：功能 × 极性行为校准
+  ↓ 仅通过单元
+阶段B：词汇 × 三观察器校准
+  ↓ 仅完整合同
+阶段C：独立数据确认
+  ↓ 至少两个模型确认同一合同
+阶段D：开放条件物理图谱
+```
+
+阶段 A 的门为：
+
+$$
+\boxed{
+G_A(m,f,p)
+=
+\mathbf 1
+\left[
+L_I\ge0.85
+\land L_P\ge0.85
+\land L_{I\cap P}\ge0.85
+\land L_{pair}\ge0.80
+\right]
+}
+$$
+
+阶段 B 的完整观察合同为：
+
+$$
+\boxed{
+G_B(m,f,p,v)
+=
+\left(\bigwedge_{o\in\{TF,AB,01\}}G_o\right)
+\land
+\mathbf 1[L_{consistent\land correct}\ge0.85]
+}
+$$
+
+物理授权为：
+
+$$
+\boxed{
+A_{physical}(c)
+=
+\mathbf 1
+\left[
+\sum_m G_C(m,c)\ge2
+\right]
+}
+$$
+
+所有比例门均使用 95% Wilson（威尔逊）下界，而不是只看点估计。失败单元不池化，不读取密封集，不在结果后修改阈值。
+
+### 三、静态合同与数据分母
+
+静态审计确认所有分割都满足：
+
+$$
+\boxed{C_i^+=C_i^-}
+$$
+
+$$
+\boxed{
+\operatorname{BagTokens}(F_i^+)
+=
+\operatorname{BagTokens}(F_i^-)
+}
+$$
+
+冻结数据为：
+
+| 分割 | 语义行 | 表面/观察变体 | 是否密封 |
+|---|---:|---:|---|
+| 功能—极性校准 | 720 | 1,440 | 否 |
+| 词汇—观察器校准 | 2,160 | 12,960 | 否 |
+| 独立确认 | 4,320 | 25,920 | 否 |
+| 开放条件物理 | 2,160 | 12,960 | 否 |
+| 最终合同 | 2,160 | 12,960 | 是 |
+
+确定性精确匹配基线在阶段 A 为：
+
+| 功能 | 正确率 |
+|---|---:|
+| 直接对称 | 144/144 = 100% |
+| 非传递排除 | 144/144 = 100% |
+| 直接有向 | 72/144 = 50% |
+| 单步规则 | 72/144 = 50% |
+| 传递闭包 | 72/144 = 50% |
+
+所以直接对称行为通过不能单独证明深层关系计算；直接有向、单步规则和传递闭包的高表现才超出该精确匹配基线。
+
+### 四、三模型 CUDA 执行顺序与质量事件
+
+阶段 A 严格按以下顺序加载本地模型并使用 CUDA：
+
+```text
+Qwen3 -> GLM4 -> DS7B
+```
+
+每个模型完成后退出并释放显存，再加载下一个模型。三个模型各评估 1,440 个表面变体，共 4,320 个模型行为行。
+
+阶段 B 同样按 Qwen3、GLM4、DS7B 顺序执行。Qwen3 获得 2 个阶段 A 单元，评估 1,728 行；GLM4 获得 4 个单元，评估 3,456 行；DS7B 授权集为空，不加载权重。阶段 B 合计 5,184 个模型行为行。
+
+首次检查 0/1 观察器时发现候选字符串前导空格会在 Qwen3 分词器中产生多词元。该尝试在任何模型推理和结果写入前中止。随后把尾随空格移入提示，将候选固定为单字符 `0` 和 `1`，并在三个本地分词器上确认 true、false、A、B、0、1 都是单词元。阶段 A 输入哈希保持不变；有效阶段 B 从修复后的冻结协议重新运行，因此没有把失败试跑混入分母。
+
+### 五、阶段 A：功能与极性结果
+
+#### Qwen3
+
+通过 2/15：
+
+```text
+direct_directed | positive
+direct_symmetric | positive
+```
+
+两项均达到表面交集 48/48、成对世界 24/24。传递闭包肯定项达到 47/48、成对世界 23/24，但未通过冻结下界，不能登记为通过。
+
+#### GLM4
+
+通过 4/15：
+
+```text
+direct_directed | positive
+direct_symmetric | positive
+direct_symmetric | reverse_query
+transitive_closure | positive
+```
+
+四项均达到表面交集 48/48、成对世界 24/24。有向显式否定达到 46/48、成对世界 22/24，有向反向查询达到 47/48、成对世界 23/24，但严格门均失败。
+
+#### DS7B
+
+通过 0/15。多数单元表现为不随成对世界正确翻转，不能进入词汇—观察器校准。
+
+跨至少两个模型共享的阶段 A 单元只有：
+
+```text
+direct_directed | positive
+direct_symmetric | positive
+```
+
+这建立了两个局部自然真假行为入口，但直接对称项仍受 100% 精确匹配基线限制。
+
+### 六、阶段 B：词汇与观察器分叉
+
+没有任何模型、功能、极性、词汇组合通过三观察器完整合同：
+
+$$
+\boxed{|\mathcal C_B^{pass}|=0}
+$$
+
+Qwen3 的自然名称结果：
+
+| 单元 | true/false 表面交集 | 0/1 表面交集 | A/B 表面交集 | 三观察器一致且正确 |
+|---|---:|---:|---:|---:|
+| 直接有向肯定 | 48/48 | 28/48 | 32/48 | 60/96 |
+| 直接对称肯定 | 48/48 | 34/48 | 28/48 | 58/96 |
+
+结构化和历史标识符也没有形成完整合同。
+
+GLM4 最接近通过的是直接有向肯定、自然名称：
+
+| 观察器 | 表面交集 | 成对世界 |
+|---|---:|---:|
+| true/false | 48/48 | 24/24 |
+| 0/1 | 48/48 | 24/24 |
+| A/B | 46/48 | 22/24 |
+
+三观察器一致且正确为：
+
+$$
+\boxed{94/96,quad LCB95=0.9272}
+$$
+
+尽管总一致率很高，A/B 自身的冻结行为门没有通过，所以完整合同必须判定失败。GLM4 的直接对称肯定、自然名称在 true/false 和 0/1 上均为 48/48，但 A/B 为 41/48；直接对称反向查询和传递闭包肯定也在映射观察器处明显下降。
+
+客观上，本轮证明的是：
+
+$$
+\boxed{
+\text{自然真假关系行为}
+\not\Rightarrow
+\text{任意输出标签合同稳定}
+}
+$$
+
+它不能被解释为“内部关系状态不存在”。失败可能来自语义求值、标签说明解析、任意符号绑定、输出偏置或这些因素的组合。
+
+### 七、阶段 C、阶段 D 与停止结果
+
+阶段 B 完整合同为空，因此三个模型的独立确认均只写入空授权审计：
+
+```text
+row_count = 0
+model_weights_loaded = false
+cuda_used = false
+sealed_split_read = false
+```
+
+Phase507 物理门结果：
+
+```text
+authorized_models = []
+shared_confirmed_contracts = []
+physical_rows_collected = 0
+```
+
+因此本阶段没有：
+
+* 隐藏状态轨迹；
+* 最早形成层；
+* 来源运输；
+* 合法计算边；
+* 因果干预；
+* 注意力头、通道或神经元扫描；
+* 密封集读取。
+
+该停止是预注册门的正确执行，不是测试中断或算力失败。
+
+### 八、理论更新与统一机制边界
+
+理论名称继续保持“语言是动态模式网络”，但仍然只是候选实验框架。本轮新增的可靠对象是观察合同：
+
+$$
+\boxed{
+\widehat r
+=
+\mathcal O_{m,\omega}(X)
+}
+$$
+
+$$
+\boxed{
+\omega
+=
+(\text{任务族},\text{反事实构造},\text{词汇},\text{极性},
+\text{标签映射},\text{评分器},\text{分割})
+}
+$$
+
+当前完整候选链仍为：
+
+$$
+\boxed{
+W,C
+\xrightarrow{\mathcal C_I}
+\kappa
+\xrightarrow{\mathcal F_\Theta}
+X
+\xrightarrow{\mathcal R\ ?}
+r
+\xrightarrow{\mathcal B_\mu\ ?}
+l
+\xrightarrow{\mathcal S\ ?}
+y
+}
+$$
+
+本轮对各对象的证据状态为：
+
+| 对象 | 状态 |
+|---|---|
+| 任务—接口条件化 | 行为层有强迹象，未闭合 |
+| 动态物理递推 | 架构事实已知，功能模式未知 |
+| 关系求值 | 只在部分自然真假合同有行为入口 |
+| 任意标签绑定 | 明显不稳定 |
+| 输出事件 | 未闭合 |
+| 观察器 | 已显式进入协议与图谱 |
+| 模式算子、模式竞争、非交换组合 | 未观测 |
+
+因此不能把观察器失败直接写成物理状态失败，也不能把观察器成功写成内部机制成立。
+
+### 九、全局图谱与物理分布
+
+新增可视化数据源为：
+
+```text
+frontend/public/vis_data/phase508_native_relation_contract_atlas/
+```
+
+每个模型图只显示：
+
+```text
+阶段A功能—极性行为资格
+  -> 三种输出观察器
+  -> 三观察器构念门
+  -> 独立确认阻断
+  -> 物理图谱阻断
+```
+
+所有边都标记为测量授权边或构念要求边：
+
+$$
+E^{measurement}
+\neq
+E^{compute}
+\neq
+E^{causal}
+$$
+
+本轮没有新的隐藏状态，因此全局物理分布仍保持 Phase499 后的严格状态：早层词汇、位置和模板结构已知较强；早中层任务编译、角色和极性只是候选；中层关系绑定与推理轨迹未知；晚层只保留合同相关答案信息可能压缩的弱结论；标签绑定与输出事件继续分叉。没有绘制虚假的神经元路径。
+
+### 十、问题、硬伤与小模型外推
+
+1. 数据仍是合成封闭世界，不能替代自然知识网络、真实语法或长链推理。
+2. 直接对称和非传递任务可被确定性字符串匹配完全解决，不能用于单独证明关系机制。
+3. 三个观察器使用同一类短标签，但标签先验、说明解析和词元概率并不完全等价；所谓“观察器不变性”本身是较强构念要求。
+4. 阶段 B 没有通过合同，不能知道语义求值和标签编译分别贡献多少失败。
+5. Qwen3 与 GLM4 的共享结果只覆盖肯定直接关系，尚未覆盖否定、规则和非传递结构。
+6. DS7B 没有最小行为入口，不能进入本轮物理分母。
+7. 当前小模型内部编码与完整语言机制可能有 30%-50% 偏差；该风险限制跨模型和大脑类比外推，但不能改变当前模型上的失败事实。
+8. 本轮没有物理数据，不能提高全局语言模式族物理分布图谱的完成度。
+
+### 十一、闭合与总体进度
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度保持：
+
+$$
+\boxed{25\%}
+$$
+
+合理区间：
+
+$$
+\boxed{24\%-26\%}
+$$
+
+本阶段提高的是协议、观察合同和构念边界的可靠性，没有新增语言模式族的隐藏状态、计算路径或因果闭合，所以不提高总体点估计。
+
+### 十二、阶段文件与验证
+
+新增脚本：
+
+```text
+tests/gpt5/phase500_native_relation_contract_protocol.py
+tests/gpt5/phase501_503_505_staged_behavior.py
+tests/gpt5/phase502_504_506_staged_authorization.py
+tests/gpt5/phase507_conditional_physical_gate.py
+tests/gpt5/phase508_native_contract_stage_audit.py
+tests/gpt5/test_phase508_native_contract_stage_audit.py
+```
+
+核心结果：
+
+```text
+tests/gpt5/result/phase500_native_relation_contract_protocol/
+tests/gpt5/result/phase501_function_polarity_calibration/
+tests/gpt5/result/phase502_staged_behavior_authorization/
+tests/gpt5/result/phase503_vocab_observer_calibration/
+tests/gpt5/result/phase504_staged_behavior_authorization/
+tests/gpt5/result/phase505_independent_confirmation/
+tests/gpt5/result/phase506_staged_behavior_authorization/
+tests/gpt5/result/phase507_conditional_physical_gate/
+tests/gpt5/result/phase508_native_contract_stage_audit/
+```
+
+系统报告：
+
+```text
+research/MainAnalysis/20260717_04_Phase500-508固定断言原生关系合同审计.md
+```
+
+Phase508 的四项自动合同测试全部通过，确认分母、模型通过数、停止门、图谱非物理边界和多路线数据源注册一致。
+
+### 十三、下一阶段决策
+
+Phase500 的阶段目标已完整结束：已经确认部分自然真假关系行为入口，同时严格否定了当前三观察器完整合同的资格。由于完整合同分母为空，不能自动进入条件物理图谱、路径干预或神经元级阶段。
+
+下一阶段最可行的单一大任务是：
+
+```text
+Phase509：语义关系求值与输出标签编译双合同分解
+```
+
+应先分别冻结两个合同：
+
+1. 语义关系求值：只使用已经表现稳定的自然真假接口，在全新实体、事实顺序和自然表面上复现直接有向关系。
+2. 标签编译：不要求关系推理，使用独立平衡语义状态测量 true/false、A/B、0/1 的任意符号绑定和输出偏置。
+3. 两个合同分别通过以后，才研究二者在隐藏状态中何处汇合。
+4. 若语义合同通过、标签合同失败，登记接口编译瓶颈；若语义合同也失败，关闭该模型原生关系入口。
+5. 不得使用本轮结果事后放宽 A/B 门或删除失败观察器。
+
+该方案改变了科学构念和选择门，属于新的独立阶段。本轮不自动运行 Phase509，避免把当前负结果改造成结果驱动的补丁循环。
+
+### 十四、通俗说明
+
+两个模型已经能在最简单的自然语言真假问题里，看懂“谁和谁存在什么直接关系”。但把完全相同的问题改成输出 A/B 或 0/1 后，它们并不总能稳定地把内部判断翻译成新标签。现在无法确定失败发生在“没有看懂关系”，还是“看懂了但没有按新标签回答”。
+
+所以本阶段没有继续打开模型内部找神经元。先把“理解关系”和“把答案映射成标签”拆开验证，才能保证以后看到的内部轨迹真正对应语言关系，而不是输出格式偏好。
+
+## Phase 509: 关系求值、标签编译分解与模型专属关系轨迹审计 [2026-07-17 05:21]
+
+### 一、阶段目标与附件判断复核
+
+本阶段承接 Phase500（阶段500）的观察器分叉，系统执行 Phase509-517（阶段509-517）。目标不是放宽旧三观察器合同，而是把三个不同科学对象分账：
+
+$$
+\boxed{
+R=\text{关系语义求值},\qquad
+B=\text{任意标签编译},\qquad
+J=\text{关系与标签的组合合同}
+}
+$$
+
+附件提出的主方向正确：三观察器共同通过适合作为组合构念门，不应作为模型专属自然真假关系观察图谱的唯一资格门；模型专属图谱与跨模型共享规律也必须分账。
+
+附件中四处表述需要收紧，本轮已经修复：
+
+1. 行为上的 `R/B` 分叉只能证明两个任务合同可分，不能证明内部已经存在两个先后串联模块。
+2. 直接告诉模型“语义结果为真/假”会产生词面复制捷径；本轮 `B` 的状态线索不包含候选符号，同时交叉释义表面和映射翻转。
+3. $A_R A_B$ 不是组合准确率的数学上界，只能作为近似独立串联时的描述性零假设。
+4. 三观察器门是 `J` 的资格条件，不是模型专属 `R` 观察轨迹的必要条件；跨模型共享主张仍要求至少两个模型通过。
+
+### 二、冻结协议与执行顺序
+
+Phase509（阶段509）一次性生成并冻结六个互不重叠分割：校准、独立确认、组合确认、物理拟合、物理预测和密封。三个合同的门为：
+
+$$
+\boxed{
+G_R
+=
+G_{\mathrm{fixed\ claim}}
+\land G_{\mathrm{four\mbox{-}way\ world}}
+\land G_{\mathrm{two\ surfaces}}
+\land G_{\mathrm{independent\ confirmation}}
+}
+$$
+
+$$
+\boxed{
+G_B
+=
+G_{\mathrm{candidate}}
+\land G_{\mathrm{mapping\ reversal}}
+\land G_{\mathrm{two\ surfaces}}
+}
+$$
+
+$$
+\boxed{
+G_J
+=
+G_R\land G_B\land G_{\mathrm{composition}}
+}
+$$
+
+关系合同继续保持相同断言、相同事实词元多重集，只改变决定真假的关系连接。每个来源世界对包含真假世界乘两个表面组成的四联组，禁止用逐行池化掩盖世界对失败。
+
+标签合同独立于关系推理，交叉：
+
+```text
+平衡二值状态
+× A/B 与 0/1 两套候选
+× 正向与反向映射
+× 两种不含候选符号的状态释义表面
+× 候选裕量与自然自由输出事件分账
+```
+
+模型严格按本地 CUDA（统一计算设备架构）顺序运行：
+
+```text
+Qwen3（通义千问3） -> GLM4（智谱GLM4） -> DS7B（深度求索7B）
+```
+
+每个模型完成后释放显存，再加载下一个模型。没有并发装载三个模型。
+
+### 三、行为层客观结果
+
+Phase510（阶段510）每个模型校准704行，共2112行：
+
+| 模型 | R两表面交集 | R四联世界 | R门 | B门 |
+|---|---:|---:|---|---|
+| Qwen3（通义千问3） | 87/96 | 39/48 | 失败 | 失败 |
+| GLM4（智谱GLM4） | 96/96 | 48/48 | 通过 | 失败 |
+| DS7B（深度求索7B） | 21/96 | 0/48 | 失败 | 失败 |
+
+`B` 在三个模型上均失败。Qwen3（通义千问3）的自然候选自由事件为310/512，GLM4（智谱GLM4）为182/512，DS7B（深度求索7B）为272/512；映射翻转、双表面交集和候选外概率质量暴露出不同接口瓶颈，不能把这些失败统一解释为“没有关系状态”。
+
+Phase511（阶段511）只授权 GLM4（智谱GLM4）的 `R` 进入独立确认。Phase512（阶段512）在全新实体、关系词和表面上运行384行：
+
+$$
+\boxed{
+\text{两表面交集}=189/192,qquad
+\text{四联世界}=93/96
+}
+$$
+
+因此 GLM4（智谱GLM4）的模型专属 `R` 行为入口得到独立确认。Qwen3（通义千问3）和 DS7B（深度求索7B）遵守空授权，没有加载模型。
+
+由于没有模型通过 `B`，Phase514（阶段514）的 `J` 授权集为空，三个模型均未加载；Phase515（阶段515）只允许 GLM4（智谱GLM4）的模型专属 `R` 进入观察性物理阶段。跨模型共享 `R/B/J` 均为假。
+
+### 四、物理观察算法
+
+Phase516（阶段516）不是神经元扫描，而是固定六类位置角色、全部深度层和固定64维随机投影：
+
+```text
+目标证据末端
+干扰证据末端
+断言实体末端
+断言关系末端
+断言整体末端
+提示终端
+```
+
+在物理拟合分割中，用偶数世界对训练每个层—角色的中心差观察器，用奇数世界对选择唯一主窗口；观察器账本、拟合投影和哈希写盘以后，才读取开放物理预测分割：
+
+$$
+\boxed{
+u_{l,p}
+=
+\frac{\bar z_{l,p}^{+}-\bar z_{l,p}^{-}}
+{\left\|\bar z_{l,p}^{+}-\bar z_{l,p}^{-}\right\|}
+}
+$$
+
+$$
+\boxed{
+\widehat r
+=
+\mathbf 1
+\left[
+z\cdot u_{l,p}>b_{l,p}
+\right]
+}
+$$
+
+该线性方向只是冻结的测量观察器，不是模型真实运行机制公式，也不代表组件运输或因果路径。
+
+物理拟合共192行，开放预测共384行。拟合集按冻结并列规则选择的主窗口为：
+
+```text
+带嵌入计数的第10层
+断言实体末端
+```
+
+开放预测结果：
+
+| 指标 | 结果 | 95%下界 |
+|---|---:|---:|
+| 原表面 | 173/192 | 0.8506 |
+| 自然释义表面 | 177/192 | 0.8751 |
+| 全部行 | 350/384 | 0.8788 |
+| 四联世界 | 71/96 | 0.6438 |
+
+冻结门要求四联世界95%下界至少0.75。实际0.6438，因此：
+
+$$
+\boxed{
+G_{R,\mathrm{physical\ prediction}}(\mathrm{GLM4})=0
+}
+$$
+
+91.15%的逐行准确率不能覆盖四联世界失败，不能登记为稳定关系物理路径。
+
+### 五、全层物理分布拼图
+
+离线复算所有246个层—角色窗口后，发现65个非主窗口达到同一数值门：
+
+| 位置角色 | 数值达门窗口数 | 层范围（含嵌入） |
+|---|---:|---:|
+| 断言实体末端 | 15 | 9-24 |
+| 断言关系末端 | 15 | 17-31 |
+| 断言整体末端 | 13 | 13-25 |
+| 提示终端 | 22 | 19-40 |
+| 目标证据末端 | 0 | 无 |
+| 干扰证据末端 | 0 | 无 |
+
+部分中晚层开放预测达到384/384，但这些窗口没有经过冻结的唯一窗口选择，所以只能登记为：
+
+$$
+\boxed{
+\text{GLM4查询/输出侧中晚层广泛关系候选分布}
+}
+$$
+
+不能事后替换失败的第10层主窗口并改判成功。该现象同时暴露出当前选择算法的硬伤：拟合选择集存在多个满分平台时，“选择最早单点”的规则不稳定。下一协议应事先定义平台区或连续窗口族，而不是在看到预测结果后换层。
+
+主窗口固定投影中的世界变化距离与表面变化距离比为2.242。它说明该投影对世界反事实比表面改写更敏感，但仍只是描述性距离，不能叫来源运输或计算边。
+
+### 六、随机对照质量审计
+
+Phase516（阶段516）原四个世界对翻转对照的逐行准确率范围为0.107-0.924。原因是24个观察器训练世界对没有被强制分成相等的正向和反向翻转；残余真实关系方向会随机主导正向或反向。因此原对照不具有诊断性，既不能支持也不能否定主观察器。
+
+Phase517（阶段517）只使用已经保存的投影，补做32个严格12/12平衡翻转质量对照：
+
+```text
+逐行准确率均值：0.516
+逐行准确率范围：0.224-0.802
+四联世界均值：0.144
+四联世界范围：0.000-0.542
+```
+
+该补充发生在主结果读取后，只登记为质量审计，不进入预注册成功门，也不用于提高证据等级。
+
+### 七、核心问题与硬伤
+
+1. GLM4（智谱GLM4）的 `R` 候选真/假裕量高度可分，但自然自由输出事件为0。当前是候选间相对偏好，不是完整自然输出事件。
+2. 主窗口从24个选择世界对和246个层—角色窗口中产生；开放预测门用于抵御窗口选择乐观偏差，而主窗口确实没有通过。
+3. 65个描述候选形成中晚层平台，但没有预注册窗口族门，不能用于结果后改判。
+4. 64维固定投影既会丢失信息，也可能保留模板、位置或查询角色方向。
+5. 目标证据与干扰证据位置没有数值达门窗口，当前没有恢复“事实来源如何运输到查询”的物理脉络。
+6. 三个模型的 `B` 都失败，`J` 完全未运行；不能说内部已经形成 `R -> B` 串联模块。
+7. 只有 GLM4（智谱GLM4）通过关系行为门，不能建立跨模型关系编码规律。
+8. 没有组件级、注意力头、通道、神经元、必要性、充分性或因果中介证据。
+9. 密封集未读取，不能宣称密封复现。
+10. 数据仍是合成直接有向关系，不能外推到知识网络、多步推理、否定或真实语法。
+11. 小模型与更大模型或人脑可能存在30%-50%的编码差异；该风险限制外推，但不改变本轮三个模型上的通过与失败事实。
+
+### 八、理论进展与统一公式
+
+理论名称继续保持“语言是动态模式网络”，但仍是候选实验框架。最基础物理递推保持：
+
+$$
+\boxed{
+X_{s+1}
+=
+\mathcal F_\Theta(X_s,c_s,\kappa_s)
+}
+$$
+
+功能分解更新为：
+
+$$
+\boxed{
+(W,C)
+\xrightarrow{\mathcal R_f}
+r
+\xrightarrow{\mathcal B_\mu}
+l
+\xrightarrow{\mathcal S}
+y
+}
+$$
+
+这里的 $\mathcal R_f$、$\mathcal B_\mu$ 和 $\mathcal S$ 只是分开的待验证功能合同，不是已识别的内部模块。当前证据状态：
+
+| 对象 | 状态 |
+|---|---|
+| 任务—接口条件化 | 行为迹象强，未恢复物理算子 |
+| 直接关系求值 | GLM4单模型行为确认；中晚层观察候选；主物理门失败 |
+| 任意标签编译 | 三模型行为门均失败 |
+| 关系—标签组合 | 未授权、未运行 |
+| 自然输出事件 | 未闭合 |
+| 模式算子、竞争与非交换组合 | 未识别 |
+| 功能—物理映射 | 未识别 |
+
+全局图谱继续严格分边：
+
+$$
+\boxed{
+E^{\mathrm{measurement}}
+\neq E^{\mathrm{observation}}
+\neq E^{\mathrm{prediction}}
+\neq E^{\mathrm{compute}}
+\neq E^{\mathrm{causal}}
+}
+$$
+
+本轮新增图谱只包含行为资格边和模型专属观察轨迹。所有层间连线均标记为观察顺序，不能解释为真实计算边。
+
+### 九、闭合与总体进度
+
+严格机制闭合仍为：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+总体科学成熟度保持：
+
+$$
+\boxed{25\%}
+$$
+
+合理区间：
+
+$$
+\boxed{24\%-26\%}
+$$
+
+本轮增加了真实隐藏状态数据和一个失败但有价值的中晚层分布拼图；由于预注册主预测门失败、没有共享模型、没有计算边和因果边，不提高总体点估计。
+
+### 十、阶段产物
+
+协议与执行脚本：
+
+```text
+tests/gpt5/phase509_dual_contract_protocol.py
+tests/gpt5/phase510_512_514_dual_contract_behavior.py
+tests/gpt5/phase511_513_515_dual_contract_authorization.py
+tests/gpt5/phase516_relation_physical_protocol.py
+tests/gpt5/phase516_glm4_relation_physical.py
+tests/gpt5/phase517_dual_contract_stage_audit.py
+tests/gpt5/test_phase517_dual_contract_stage_audit.py
+```
+
+核心结果：
+
+```text
+tests/gpt5/result/phase509_dual_contract_protocol/
+tests/gpt5/result/phase510_relation_binding_calibration/
+tests/gpt5/result/phase511_calibration_authorization/
+tests/gpt5/result/phase512_relation_binding_confirmation/
+tests/gpt5/result/phase513_confirmation_authorization/
+tests/gpt5/result/phase514_joint_confirmation/
+tests/gpt5/result/phase515_physical_authorization/
+tests/gpt5/result/phase516_relation_physical_protocol/
+tests/gpt5/result/phase516_glm4_relation_physical/
+tests/gpt5/result/phase517_dual_contract_stage_audit/
+```
+
+系统报告与可视化数据：
+
+```text
+research/MainAnalysis/20260717_05_Phase509-517关系求值与标签编译双合同审计.md
+frontend/public/vis_data/phase517_relation_binding_decomposition_atlas/
+```
+
+### 十一、阶段决定与下一大任务
+
+Phase509（阶段509）的完整目标已经执行完毕，而且同阶段允许的模型专属物理后续也已自动完成。当前门状态为：
+
+```text
+R：GLM4单模型通过，跨模型共享失败
+B：三个模型全部失败
+J：授权集为空
+GLM4 R物理主预测：失败
+密封：未授权
+因果与神经元：未授权
+```
+
+因此同阶段没有合法的自动下一步。继续做因果干预、神经元扫描或读取密封集会违反冻结门。
+
+下一阶段应作为一个新的大任务冻结，不得用本轮结果后调阈值：
+
+1. 建立不依赖候选词元裕量的自然关系输出合同，并扩大四联世界样本后复验。
+2. 对 `B` 建立映射理解、候选选择、候选外质量和自由输出四轴错误账本，仍禁止显式真假词面捷径。
+3. 预先把物理选择对象从单一最早窗口改为连续平台区或窗口族，并设置独立平台复现门。
+4. 只有新行为门通过，才重新开放物理拟合与预测；仍先做模型专属图谱，再判断是否存在跨模型共享结构。
+5. 在平台区稳定复现以前，不进入组件、注意力头、通道或神经元级因果搜索。
+
+### 十二、通俗说明
+
+这轮已经把“看懂关系”和“把答案翻译成A/B或0/1”真正分开测试。结果很清楚：只有 GLM4（智谱GLM4）稳定通过了关系判断，三个模型都没有稳定通过任意标签翻译。
+
+打开 GLM4（智谱GLM4）以后，中晚层的查询和输出位置确实出现了一大片能区分真假世界的候选区域，而且一些位置在新数据上完全正确；但预先规定的那个最早位置没有稳定通过四联世界门。科学上不能看见后面的高分以后换位置宣布成功。
+
+所以当前最客观的拼图是：GLM4（智谱GLM4）在查询侧中晚层存在广泛的关系相关信息，但我们还不知道它从事实位置怎样形成、怎样运输，也没有证明它是行为所必需的机制。下一步要先修好自然输出合同和平台区选择规则，再继续打开更细的内部结构。
+
+## Phase 518: 自然关系事件、标签编译四轴账本与世界—查询平台协议冻结 [2026-07-17 07:26]
+
+### 一、附件判断与协议修正
+
+对 Phase509-517（阶段509-517）审计附件的总方向判断为正确：关系求值、标签编译和组合输出必须分合同；主物理门失败后不能用后验高分窗口改判；下一步应从单点窗口升级为连续平台。
+
+执行前完成六项修正：
+
+1. 简单的距离相关不能证明世界状态，必须使用世界拓扑、查询模式和未来真值正交的数据设计。
+2. 三个随机投影属于不同坐标系，只比较预测和区间，不比较方向夹角。
+3. 平台只允许连接同一位置角色内的相邻层，不跨角色连线。
+4. 规范句是冻结语义输出接口，不宣称为自发自然语言。
+5. 使用目标盲确定性解析器和对抗样例，不虚构人工盲审。
+6. 物理阶段只有在行为独立确认后才开放；密封集、因果干预和神经元扫描继续关闭。
+
+### 二、冻结数据
+
+```text
+关系校准：96个来源对，192个语义样本，384行表面变体
+关系确认：192个来源对，384个语义样本，768行表面变体
+平台发现：96个来源对，384行表面变体
+平台预测：192个来源对，768行表面变体
+标签校准：256个语义样本，512行表面变体
+标签确认：512个语义样本，1024行表面变体
+密封关系与标签分割：生成并冻结，未读取
+```
+
+世界拓扑 `A/B`、查询模式 `A/B` 和未来真值形成完整正交表；每个关系来源对包含真假世界与两个表面，事实词元多重集匹配。标签合同包含映射理解、候选选择、候选外概率质量和严格自由输出四个轴。
+
+### 三、物理门
+
+六个位置角色为目标证据末端、干扰证据末端、断言实体末端、断言关系末端、断言末端和提示末端。固定三组48维投影，种子为 `518031/518037/518041`；四个来源组折中至少三折过门；平台必须在同一角色中连续至少四层。
+
+协议产物：
+
+```text
+tests/gpt5/phase518_world_query_platform_protocol.py
+tests/gpt5/result/phase518_world_query_platform_protocol/
+```
+
+## Phase 519: 三模型自然关系与标签编译行为校准 [2026-07-17 07:26]
+
+### 一、执行顺序与规模
+
+使用 CUDA 依次运行 Qwen3（通义千问3）、GLM4（智谱GLM4）和 DS7B（深度求索7B），每次释放模型后再加载下一个模型。每模型运行384行关系和512行标签，共896行；另有64个去重映射理解探针。
+
+### 二、冻结严格合同结果
+
+关系候选真／假观察器：
+
+| 模型 | 原表面 | 改写表面 | 四联组 |
+|---|---:|---:|---:|
+| Qwen3 | 192/192 | 192/192 | 96/96 |
+| GLM4 | 192/192 | 192/192 | 96/96 |
+| DS7B | 96/192 | 104/192 | 0/96 |
+
+严格规范句整段解析：Qwen3（通义千问3）0/384，GLM4（智谱GLM4）8/384，DS7B（深度求索7B）0/384，三者均失败。
+
+标签合同也全部失败：三模型映射理解严格整句均为0/64，严格单标签自由输出近乎为零；候选反转、候选外质量和两个标签系统不能同时过门。组合合同不得运行。
+
+### 三、重要原文现象
+
+生成原文显示 Qwen3（通义千问3）和 GLM4（智谱GLM4）常先输出正确的 `The statement is supported.` 或 `The statement is contradicted.`，随后继续解释。冻结解析器把整段不完全相等判为失败。该现象提示“语义事件”和“序列化服从”可能是两个对象，但不能事后修改 Phase519（阶段519）门。
+
+产物：
+
+```text
+tests/gpt5/phase519_521_natural_relation_binding_behavior.py
+tests/gpt5/result/phase519_natural_relation_binding_calibration/
+```
+
+## Phase 520: 首事件双账本诊断与确认授权 [2026-07-17 07:26]
+
+### 一、方法边界
+
+新增目标盲“首个完整规范句”解析，只登记为后验发现账本；冻结整段合同结果保持失败。首事件账本只有在未读取确认集再次通过后，才可用于物理授权。标签授权仍只使用原冻结严格门，不使用后验宽松解析。
+
+### 二、校准诊断
+
+| 模型 | 首事件原表面 | 首事件改写表面 | 首事件四联组 | 授权 |
+|---|---:|---:|---:|---|
+| Qwen3 | 192/192 | 192/192 | 96/96 | 关系确认 |
+| GLM4 | 192/192 | 192/192 | 96/96 | 关系确认 |
+| DS7B | 104/192 | 112/192 | 0/96 | 不授权 |
+
+Qwen3（通义千问3）和 GLM4（智谱GLM4）获关系确认授权；三个模型均未获标签确认授权。DS7B（深度求索7B）不因候选或首句局部正确而越门。
+
+产物：
+
+```text
+tests/gpt5/phase520_522_semantic_event_authorization.py
+tests/gpt5/result/phase520_behavior_authorization/
+```
+
+## Phase 521: 未见关系分割独立确认 [2026-07-17 07:26]
+
+### 一、执行
+
+只对授权的 Qwen3（通义千问3）和 GLM4（智谱GLM4）分别运行768行关系确认；DS7B（深度求索7B）写入 `no_authorized_contracts`，没有加载权重。标签数据未运行，密封数据未读取。
+
+### 二、独立确认结果
+
+| 模型 | 原表面 | 改写表面 | 两表面交集 | 四联组 | 首事件不可恢复 |
+|---|---:|---:|---:|---:|---:|
+| Qwen3 | 384/384 | 384/384 | 384/384 | 192/192 | 0/768 |
+| GLM4 | 384/384 | 384/384 | 384/384 | 192/192 | 0/768 |
+
+冻结严格整段合同仍失败；独立确认的是首个完整语义事件，不是完整自由输出序列。这个区分不能省略。
+
+产物：
+
+```text
+tests/gpt5/result/phase521_natural_relation_binding_confirmation/
+```
+
+## Phase 522: 物理阶段资格冻结 [2026-07-17 07:26]
+
+独立确认审计授权 Qwen3（通义千问3）和 GLM4（智谱GLM4）进入关系物理平台阶段；DS7B（深度求索7B）和全部标签合同继续关闭。
+
+授权只表示“允许测量内部状态”，不表示已存在平台、计算边或因果机制。
+
+```text
+tests/gpt5/result/phase522_semantic_event_confirmation/phase522_physical_authorization.json
+```
+
+## Phase 523: 世界拓扑与查询求值持续平台发现和开放预测 [2026-07-17 07:26]
+
+### 一、算法
+
+对每个模型、投影、层和角色提取压缩状态：
+
+$$
+z_{m,p,l,r}=P_p h_{m,l,r},\qquad p\in\{1,2,3\}.
+$$
+
+每折只用基本中心差构造观察方向：
+
+$$
+d_{p,l,r}=\mu^+_{p,l,r}-\mu^-_{p,l,r},
+$$
+
+$$
+\hat y=mathbf 1\!\left[
+\left\langle z-\frac{\mu^++\mu^-}{2},d\right\rangle>0
+\right].
+$$
+
+候选平台定义为：
+
+$$
+\Pi=(r,[l_a,l_b]),\qquad l_b-l_a+1\ge4,
+$$
+
+并要求三投影全部通过、四折中至少三折通过。先在384行发现数据上写入冻结观察器和平台账本，再读取768行预测数据。
+
+### 二、行为资格
+
+- Qwen3（通义千问3）：发现384/384；预测752/768。预测原表面384/384、改写表面368/384，四联组176/192；发现和预测均过门。
+- GLM4（智谱GLM4）：发现368/384，四联组88/96，四联下界0.844，略低于0.85门；预测768/768。发现行为门失败。
+
+### 三、世界拓扑强负结果
+
+两个模型在六个角色的全部层中，世界拓扑平台数量均为0。当前不能说证据区已经恢复世界状态，也不能把查询侧真假平台倒写成来源世界图谱。
+
+### 四、查询求值平台
+
+Qwen3（通义千问3）冻结出四个平台。开放预测中：
+
+```text
+断言实体末端 L18-L22：768/768，三投影全部过门
+断言末端 L19-L24：768/768，三投影全部过门
+断言末端 L30-L33：聚合768/768，但一组投影未过门
+提示末端 L24-L31：720/768，四联组144/192，失败
+```
+
+GLM4（智谱GLM4）出现四个预测强平台，但由于发现行为门失败，只登记为支持性形状：
+
+```text
+断言实体末端 L11-L17
+断言实体末端 L19-L24
+断言关系末端 L19-L28
+提示末端 L23-L40
+```
+
+这些平台仍是观察和预测对象；层间连续性不是计算边。
+
+产物：
+
+```text
+tests/gpt5/phase523_world_query_platform_physical.py
+tests/gpt5/result/phase523_world_query_platform_physical/
+```
+
+## Phase 524: 128次全流程分组置换与证据分级 [2026-07-17 07:26]
+
+### 一、零假设流水线
+
+每个置换在完整四联来源对内翻转标签，并重新执行观察器拟合、四折平台发现、连续平台选择和独立预测：
+
+$$
+T_0=\max_{\Pi\in\mathcal P_0}M(\Pi),
+\qquad
+T_b=\max_{\Pi\in\mathcal P_b}M(\Pi),
+\quad b=1,\ldots,128.
+$$
+
+因此 Qwen3（通义千问3）的次级平台不会因为主排序平台失败而得到事后豁免；所有冻结候选都进入同一个最大平台零假设。
+
+### 二、结果
+
+- Qwen3（通义千问3）查询求值：自然标签产生4个平台，最佳家族门裕量0.0901；128个零假设流水线都没有形成合格平台；置换值为 `1/129=0.007752`。断言实体 L18-L22 与断言末端 L19-L24 保留为家族控制后的观察平台。
+- Qwen3（通义千问3）世界拓扑：自然平台0，置换值1.0，强负结果。
+- GLM4（智谱GLM4）查询求值：形状和置换控制均强，但发现行为门失败，因此最终不升级为严格确认平台。
+- DS7B（深度求索7B）：未授权，没有物理数组和置换机制主张。
+
+### 三、证据边界
+
+Qwen3（通义千问3）新增的是“家族控制后的查询求值观察平台”，不是：
+
+```text
+世界知识结构
+来源运输路径
+层间真实计算边
+行为必要或充分机制
+注意力头、通道或神经元机制
+跨模型共享机制
+密封闭合
+```
+
+产物：
+
+```text
+tests/gpt5/phase524_platform_permutation_audit.py
+tests/gpt5/result/phase524_platform_permutation_audit/
+```
+
+## Phase 525: 图谱发布、理论收紧与阶段结论 [2026-07-17 07:26]
+
+### 一、固定格式图谱与客户端
+
+新增多模型数据源：
+
+```text
+frontend/public/vis_data/phase524_world_query_platform_atlas/
+frontend/public/vis_data/pattern_family_atlas/v2/phase524_world_query_platform_summary.json
+```
+
+每个平台按位置角色和层展开；相邻层边统一标为 `observational_platform_continuity`。全部节点和边显式写入：
+
+```text
+causal=false
+compute_edge=false
+single_neuron=false
+pipeline_sealed=false
+```
+
+世界平台缺失、标签编译失败和严格序列化失败也保留为图谱节点，避免客户端只呈现正结果。数据源已加入 `frontend/public/vis_data/source_registry.json`，本地开发服务器能够返回三模型清单与Qwen3逐层平台负载。
+
+### 二、理论更新
+
+理论主体继续使用“语言是动态模式网络”，不更名。物理递推保持：
+
+$$
+S_{t+1}=F_\theta(S_t,x_t,C_t,I_t).
+$$
+
+本轮增加语义事件与序列化分层：
+
+$$
+E_{\mathrm{sem}}=D_{\mathrm{sem}}(S,C),
+\qquad
+Y_{\mathrm{seq}}=D_{\mathrm{seq}}(E_{\mathrm{sem}},I,H).
+$$
+
+当前证据支持：语义首事件可以稳定，而严格整段序列化仍失败；查询条件化求值在Qwen3（通义千问3）中形成中后层连续观察平台。当前证据不支持：统一世界状态方向、来源运输算子、因果机制或跨模型统一坐标。
+
+### 三、主要硬伤
+
+1. 首事件解析是 Phase519（阶段519）失败后的探索性诊断，只因未见确认集再次通过而获得可信度，不能倒写成预注册发现。
+2. 数据仍是合成封闭世界中的直接有向关系，不覆盖真实知识网络、多步推理和通用语法。
+3. 世界 `A/B` 标签可能依赖实体角色之间的几何，而非统一线性方向；均值差观察器可能发生结构相消。
+4. Qwen3（通义千问3）平台没有组件消融、状态交换、路径运输、必要性或充分性证据。
+5. GLM4（智谱GLM4）没有同时通过发现与预测行为门，不能提供严格跨模型复制。
+6. 48维投影可能丢失结构；三投影一致只降低风险。
+7. 标签编译与严格输出接口仍失败，完整功能链未闭合。
+8. 密封集未读取，严格机制闭合仍为0/72。
+9. 小模型编码与更大模型或真实语言结构可能有30%-50%偏差，当前形状不能直接外推到人脑。
+
+### 四、核心拼图更新
+
+1. 首个语义事件与完整序列化合同被客观分开。
+2. Qwen3（通义千问3）和 GLM4（智谱GLM4）获得关系首事件独立确认。
+3. DS7B（深度求索7B）未复制关系首事件。
+4. 三模型标签编译继续失败。
+5. 六角色、三投影、四折连续平台协议完成。
+6. 两个授权模型的世界拓扑平台均为0。
+7. Qwen3（通义千问3）断言实体与断言末端平台跨768行、两个表面、八个匹配子组和三投影复现。
+8. 128次完整零假设流水线没有形成平台。
+9. GLM4（智谱GLM4）出现相似查询侧布局，但被行为门降级。
+10. 当前正结果定位于查询求值结果站，不是上游世界结构和运输铁路。
+
+### 五、闭合与进度
+
+严格机制闭合：
+
+$$
+\boxed{0/72=0\%}
+$$
+
+全局物理图谱：
+
+$$
+\boxed{31\%}
+$$
+
+总体科学成熟度：
+
+$$
+\boxed{26\%}
+$$
+
+相比 Phase517（阶段517）只增加1个百分点。原因是新增了一个关系族中的家族控制观察平台，但世界状态、计算边、因果边、标签编译和密封闭合没有增加。
+
+### 六、验证
+
+```text
+python -m unittest tests.gpt5.test_phase518_525_world_query_platform
+5项测试全部通过
+
+python -m unittest tests.gpt5.test_phase415_multi_route_vis_source_contract tests.gpt5.test_phase518_525_world_query_platform
+多路线客户端合同与本阶段合计9项测试全部通过
+
+npm run build
+生产构建通过
+
+npm run lint
+被全仓库既有480个错误和153个警告阻断；本轮未修改这些组件
+```
+
+阶段报告与审计：
+
+```text
+tests/gpt5/phase525_publish_world_query_platform_atlas.py
+tests/gpt5/test_phase518_525_world_query_platform.py
+tests/gpt5/result/phase525_world_query_stage_audit/phase525_world_query_stage_audit.json
+research/MainAnalysis/20260717_06_Phase518-524自然关系事件与世界查询平台系统审计.md
+```
+
+### 七、下一大阶段
+
+下一阶段冻结为：
+
+```text
+Phase526：角色规范化世界状态几何与查询平台来源验证
+```
+
+优先目标不是继续给线性方向加补丁，而是检验世界关系是否存在于实体角色间的成对几何中：使用来源端无查询前缀、角色规范化端点对、匹配世界交换、关系词和实体独立留出；先恢复世界拓扑，再测试其是否沿合法计算方向到达已确认查询平台。世界来源状态未恢复以前，不进入组件、头、通道或神经元扫描。
+
+### 八、通俗说明
+
+Qwen3（通义千问3）已经稳定算出“小世界里的这句话对不对”，而且在句子读完附近连续多层都能看到这个判断；128套随机标签完整重跑也没有制造出类似平台。这是一个真实的观察拼图。
+
+但证据区怎样先组织出世界结构、这个结构怎样到达判断位置、哪些组件真正执行运输，仍然没有答案。当前找到的是可靠的结果站台，不是完整铁路网，更不是语言编码机制闭合。
+
+## Phase 525: 世界与查询图谱客户端实景验收补充 [2026-07-17 07:38]
+
+本补充不增加模型机制证据，只验证 Phase525（阶段525）发布的数据账本与可视化客户端保持一致。
+
+### 一、验收方法
+
+客户端从注册源 `gpt5_phase524_world_query_platform_atlas` 加载三条模型数据。桌面视口为1440×900，逐一加载 Qwen3（通义千问3）、GLM4（智谱清言4）和 DS7B（深度求索7B）；移动视口为390×844，加载 Qwen3（通义千问3）代表数据。每次截取三维画布，解码真实像素，检查亮度方差、量化颜色数量、交互前后哈希、横向溢出、控制台错误和失败资源请求。
+
+### 二、客观结果
+
+1. 三模型数据集数量为3，均能被客户端选择和加载。
+2. 桌面三画布亮度标准差分别为22.84、22.60和22.53，量化颜色数量分别为750、762和711，均非空白画布。
+3. 移动画布亮度标准差为30.97，量化颜色数量为647，画布非空。
+4. 四次检查的交互前后画布哈希均改变。
+5. 桌面与移动视口的文档宽度分别严格等于1440和390，没有横向溢出。
+6. 控制台错误为0，失败资源请求为0。
+7. 人工截图复核确认桌面保留原有深度网络层叠形状，移动面板按纵向排列，研究数据源名称和模型数据可见。
+
+### 三、证据边界
+
+客户端验收只说明数据可读、画布可见、交互有效。它不提高观察平台的科学证据等级，也不改变以下字段：
+
+```text
+causal=false
+compute_edge=false
+single_neuron=false
+pipeline_sealed=false
+```
+
+因此严格机制闭合仍为0/72，全局物理图谱仍为31%，总体科学成熟度仍为26%。Phase526（阶段526）的世界来源几何验证仍是下一大阶段，本轮不因可视化成功提前进入神经元扫描。
+
+### 四、产物与验证
+
+```text
+tests/gpt5_temp/phase525_world_query_client_visual_check.cjs
+tests/gpt5/result/phase525_world_query_stage_audit/screenshots/phase525_world_query_client_visual_check.json
+tests/gpt5/result/phase525_world_query_stage_audit/screenshots/phase525_desktop_1440x900_workspace.png
+tests/gpt5/result/phase525_world_query_stage_audit/screenshots/phase525_mobile_390x844_workspace.png
+```
+
+通俗地说：新拼图已经真实出现在三维客户端里，而且电脑与手机都能正常查看；但“能画出来”不等于“已经破解”，图中仍明确区分观察结果、负结果和未完成的因果路径。
+
+## Phase 526: 角色规范化世界几何协议冻结 [2026-07-17 16:40]
+
+### 一、附件审计与协议修正
+
+Phase518-525（阶段518-525）只否定了“单位置、全局均值差、48维线性观察器足以恢复世界拓扑”，没有否定世界关系以实体间几何存在。附件提出改用角色规范化端点对、世界区与查询区分离、实体和关系词独立留出的方向正确。
+
+冻结前修正四个问题：
+
+1. 不能在人工拼接的成对特征上拟合交换算子后，把特征重排成功解释成模型内部等变；改为未见组上真实边分数必须高于反向边。
+2. 不能要求追加观察后完整世界前缀的分词逐词元完全相同；只冻结实体寄存器锚点的稳定词元映射。
+3. 可训练双线性桥存在记忆关系词和实体身份的风险；发现阶段只允许低容量、组外验证的观察器。
+4. 实体寄存器属于观察脚手架，不能写成模型自然生成的世界状态。
+
+### 二、冻结数据
+
+构造匹配事实词元袋、相同入度和出度的四节点有向环，并把查询从世界前缀完全移除：
+
+```text
+world_fit：384行
+world_entity_prediction：768行
+world_relation_prediction：768行
+bridge_open_prediction：768行
+sealed：768行，未读取
+```
+
+每个来源组包含真实边、反向边、断开边和匹配控制；实体寄存器四个槽位严格平衡。实体池与关系词池按发现、实体留出、关系留出、桥接开放集和密封集分离。静态审计的行数、四联组、词元袋、环方向、查询隔离和槽位平衡全部通过。
+
+### 三、成对特征
+
+固定投影后的实体状态为：
+
+$$
+z_{e,l,p}=P_p h_{e,l}.
+$$
+
+角色规范化有序对特征冻结为：
+
+$$
+\phi_{l,p}(a,b)=
+\left[z_{b,l,p}-z_{a,l,p}\;;\;z_{a,l,p}\odot z_{b,l,p}\right].
+$$
+
+发现门必须同时要求方向、断开对特异性、完整世界类别、位置基线和嵌入基线控制通过；发现平台不存在时，预测集和置换均不得读取。
+
+产物：
+
+```text
+tests/gpt5/phase526_role_normalized_world_geometry_protocol.py
+tests/gpt5/result/phase526_role_normalized_world_geometry_protocol/
+```
+
+## Phase 527: 三模型四边世界行为资格 [2026-07-17 16:53]
+
+按 Qwen3（通义千问3）、GLM4（智谱清言4）、DS7B（深度求索7B）顺序在CUDA（英伟达并行计算平台）上运行，每个模型完成后释放显存。
+
+### 一、客观结果
+
+```text
+Qwen3：
+  发现 196/384，四联组 8/96
+  实体留出 400/768，四联组 0/192
+  关系留出 480/768，四联组 0/192
+  桥接开放集 440/768，四联组 8/192
+
+GLM4：
+  发现 160/384，四联组 0/96
+  实体留出 360/768，四联组 8/192
+  关系留出 352/768，四联组 0/192
+  桥接开放集 344/768，四联组 0/192
+
+DS7B：
+  发现 152/384，四联组 0/96
+  实体留出 264/768，四联组 0/192
+  关系留出 320/768，四联组 0/192
+  桥接开放集 264/768，四联组 0/192
+```
+
+三模型均未通过四分割行为门，物理授权为空。输出分布显示明显模型偏置：Qwen3（通义千问3）偏向否定，GLM4（智谱清言4）偏向肯定，DS7B（深度求索7B）几乎不产生否定事件。这个结果不能直接解释为三模型都没有关系能力，因为任务负载和接口结构尚未拆分。
+
+### 二、协议修复记录
+
+最初实现额外加入了“完整前缀分词必须完全相同”的非冻结门，错误污染Qwen3（通义千问3）资格。模型原始输出没有丢失；删除该无效门后，按实体寄存器锚点重算并覆盖错误摘要。这个修复不改变三模型最终均不授权的结论。
+
+产物：
+
+```text
+tests/gpt5/phase527_world_geometry_behavior_qualification.py
+tests/gpt5/result/phase527_world_geometry_behavior_qualification/
+```
+
+## Phase 528: 关系合同五因素全因子协议 [2026-07-17 16:56]
+
+为避免围绕单一失败接口继续加补丁，冻结五因素全交叉设计：
+
+```text
+图形规模：two_edge / four_cycle
+伪边类型：reverse / disconnected
+查询语态：active / passive
+实体寄存器：absent / present
+表面形式：identity / natural_paraphrase
+```
+
+校准集16种条件共1024行，独立确认集2048行，密封集2048行。实体池和关系词池跨三个分割完全分离；每个条件内真假、表面和四联组均平衡。静态审计全部通过，密封集未读取。
+
+产物：
+
+```text
+tests/gpt5/phase528_relation_contract_factorial_protocol.py
+tests/gpt5/result/phase528_relation_contract_factorial_protocol/
+```
+
+## Phase 529: 三模型全因子行为定位 [2026-07-17 17:07]
+
+三模型依次运行校准集，先冻结通过条件账本，再读取独立确认集。只有 GLM4（智谱清言4）存在校准与确认交集：
+
+```text
+two_edge__disconnected__active__register_absent
+two_edge__disconnected__active__register_present
+two_edge__disconnected__passive__register_absent
+two_edge__reverse__active__register_absent
+two_edge__reverse__active__register_present
+```
+
+Qwen3（通义千问3）和DS7B（深度求索7B）确认条件均为0，三模型共享条件为0。
+
+### 一、最强客观因素
+
+GLM4（智谱清言4）的图形规模差异最大：
+
+```text
+校准：two_edge 0.9453，four_cycle 0.6562
+确认：two_edge 0.9854，four_cycle 0.6816
+```
+
+查询主动语态强于被动语态；但寄存器有无差异很小，反向伪边和断开伪边也远小于图形规模差异。当前最可信解释是：此前行为失败主要来自同时关系边数量和执行形状，而不是“没有寄存器”或“反向边特别困难”。
+
+### 二、证据边界
+
+这只是行为合同分解，不是物理机制。GLM4（智谱清言4）获得下一轮新鲜数据资格，不能直接复用全因子样本做物理发现。
+
+产物：
+
+```text
+tests/gpt5/phase529_relation_contract_factorial_behavior.py
+tests/gpt5/result/phase529_relation_contract_factorial_behavior/
+```
+
+## Phase 530: GLM4新鲜世界几何协议 [2026-07-17 17:10]
+
+从五个独立确认条件中，按预设优先级选择：
+
+```text
+two_edge__reverse__active__register_present
+```
+
+选择理由不是该条件准确率最高，而是实体寄存器提供几何观察位置，反向伪边提供方向控制，主动语态行为更稳定。重新生成从未用于 Phase529（阶段529）的数据：发现384行、实体留出768行、关系词留出768行、密封768行。发现与实体留出使用 `guides/advises`，关系留出使用 `mentors/trains`，密封使用 `briefs/coaches`。静态审计全部通过。
+
+产物：
+
+```text
+tests/gpt5/phase530_glm4_fresh_world_geometry_protocol.py
+tests/gpt5/result/phase530_glm4_fresh_world_geometry_protocol/
+```
+
+## Phase 531: GLM4新鲜行为独立确认 [2026-07-17 17:15]
+
+按照三模型顺序调用资格入口；Qwen3（通义千问3）和DS7B（深度求索7B）未获授权，因此不加载权重；只运行GLM4（智谱清言4）。
+
+```text
+发现：384/384，四联组 96/96
+实体留出：752/768，四联组 176/192
+关系留出：768/768，四联组 192/192
+```
+
+三个分割均通过行为门，GLM4（智谱清言4）获得新鲜物理观察授权。严格整段序列化仍弱：发现0/384、实体留出48/768、关系留出0/768；因此授权仅针对首个语义事件，不包括完整输出接口。
+
+产物：
+
+```text
+tests/gpt5/phase531_glm4_fresh_world_geometry_behavior.py
+tests/gpt5/result/phase531_glm4_fresh_world_geometry_behavior/
+```
+
+## Phase 532: 角色规范化世界几何物理发现 [2026-07-17 17:19]
+
+只对GLM4（智谱清言4）运行CUDA（英伟达并行计算平台）隐藏状态收集，只读取384行发现集。三个固定旧投影均为48维；实体按身份恢复规范顺序；四折按来源组隔离。
+
+发现阶段出现大量真实边对反向边方向准确率1.0的中层单元，位置基线和词嵌入基线均为0.5。但所有候选的断开实体对特异性只有0.5，完整世界类别恢复为0，因此：
+
+```text
+platform_count=0
+status=stopped_no_discovery_platform
+entity_prediction_split_read=false
+relation_prediction_split_read=false
+sealed_split_read=false
+```
+
+因为发现平台为0，1024次全流程置换未运行。这是预注册停止规则的正确执行，不是遗漏测试。
+
+产物：
+
+```text
+tests/gpt5/phase532_glm4_role_normalized_world_geometry.py
+tests/gpt5/result/phase532_glm4_role_normalized_world_geometry/
+```
+
+## Phase 533: 节点角色极性与实体对绑定反证 [2026-07-17 17:22]
+
+不重新运行模型，只对 Phase532（阶段532）的组外分数做离线分解。三个投影最佳位置为L14、L19、L16：
+
+```text
+真实边对反向边方向准确率：1.0000 / 1.0000 / 1.0000
+来源/目标节点角色准确率：0.9603 / 0.9642 / 0.9961
+```
+
+关键控制是枚举不存在真实边的节点角色组合：
+
+```text
+source -> target 假阳性：0.9961 / 0.9896 / 1.0000
+平均：0.9952256944
+target -> source 假阳性：接近0
+source -> source：0.5
+target -> target：0.5
+```
+
+因此方向分数更接近角色加和：
+
+$$
+s(a,b)\approx r_{\mathrm{source}}(a)+r_{\mathrm{target}}(b),
+$$
+
+而没有恢复实体对特异项：
+
+$$
+s(a,b)\not\approx
+r_{\mathrm{source}}(a)+r_{\mathrm{target}}(b)+B(a,b\mid W).
+$$
+
+### 核心结论
+
+$$
+\boxed{\text{来源/目标角色极性可见}\ne\text{具体实体对关系绑定可见}}
+$$
+
+当前观察器把几乎任意来源节点和任意目标节点拼成一条假边。Phase532（阶段532）的100%方向准确率不能升级为关系绑定，更不能升级为知识网络、计算边或因果机制。
+
+产物：
+
+```text
+tests/gpt5/phase533_world_geometry_role_binding_audit.py
+tests/gpt5/result/phase533_world_geometry_role_binding_audit/
+```
+
+## Phase 534: 图谱发布、理论收紧与阶段验收 [2026-07-17 17:33]
+
+### 一、固定格式图谱
+
+新增多模型数据源：
+
+```text
+frontend/public/vis_data/phase533_world_geometry_role_binding_atlas/
+frontend/public/vis_data/pattern_family_atlas/v2/phase533_world_geometry_role_binding_summary.json
+```
+
+Qwen3（通义千问3）和DS7B（深度求索7B）只显示行为未授权链；GLM4（智谱清言4）同时显示全因子确认、新鲜行为门、节点角色极性、方向观察、断开实体对假阳性、实体对绑定缺失和预测停止。所有节点和边均显式保持：
+
+```text
+causal=false
+compute_edge=false
+single_neuron=false
+pipeline_sealed=false
+```
+
+节点角色极性标为脚手架条件的物理观察签名，不标为自然世界状态或预测平台。
+
+### 二、理论收紧
+
+理论主体继续使用“语言是动态模式网络”，不修改名词。全局递推保持：
+
+$$
+S_{l+1,t}=F_{\theta,l}(S_{l,t},X_{\le t},C_t,I_t).
+$$
+
+关系候选至少需要三个部分：
+
+$$
+R_l(a,b\mid W)=G_l\!\left(U_l(a),V_l(b),B_l(a,b\mid W)\right).
+$$
+
+本轮只观察到 $U_l$ 与 $V_l$ 的来源/目标角色极性；实体对绑定 $B_l$ 的存在、位置、运输、复用差分和因果功能均未确认。这个负结果说明“角色可分”与“知识边可分”必须长期分账。
+
+### 三、全局拼图更新
+
+1. 四边环行为失败被分解为关系负载/图形形状问题。
+2. GLM4（智谱清言4）在两边合同上跨实体和关系词独立通过。
+3. 实体寄存器中存在跨三个投影复现的节点角色极性。
+4. 角色极性不能保留具体配对身份。
+5. 断开来源—目标对99.52%的假阳性构成实体对绑定的强反证。
+6. 自然世界状态、世界关系平台和查询来源桥仍缺失。
+7. 三模型没有共享行为条件或共享物理机制。
+8. 组件、头、通道和神经元扫描继续禁止。
+9. 预测、置换和密封集均因发现门失败未读取。
+10. 当前结果仍可能受小模型粗糙结构影响，与大型模型或真实语言编码可能有30%-50%偏差。
+
+### 四、闭合与进度
+
+$$
+\boxed{\text{严格机制闭合}=0/72=0\%}
+$$
+
+$$
+\boxed{\text{全局物理图谱}=31\%},
+\qquad
+\boxed{\text{总体科学成熟度}=26\%}.
+$$
+
+进度保持不变。新增正信号来自人工观察脚手架，并已证明不能区分具体关系边；自然世界状态、预测、计算运输、因果边和密封闭合均没有增加。
+
+### 五、验证
+
+```text
+Phase526-534脚本 py_compile：通过
+python -m unittest tests.gpt5.test_phase526_534_world_geometry：7项通过
+多路线合同、Phase518-525与本阶段联合回归：16项通过
+多路线数据合同：30个数据源、183个数据集、12859个节点、19585条边全部可解析
+npm run build：生产构建通过；仅保留既有大分块警告
+```
+
+三维客户端实景验收：
+
+```text
+桌面1440×900：三模型均非空，亮度标准差22.56-22.86，交互后哈希全部改变
+移动390×844：画布非空，亮度标准差31.06，交互后哈希改变
+桌面和移动横向溢出：0
+控制台错误：0
+失败资源请求：0
+```
+
+产物：
+
+```text
+tests/gpt5/phase534_publish_world_geometry_role_binding_atlas.py
+tests/gpt5/test_phase526_534_world_geometry.py
+tests/gpt5/result/phase534_world_geometry_stage_audit/
+research/MainAnalysis/20260717_07_Phase526-533角色规范化世界几何与关系合同全因子审计.md
+```
+
+### 六、下一大阶段
+
+下一阶段冻结为：
+
+```text
+Phase535：成对地址保持的世界关系绑定图谱
+```
+
+在同一世界后附加完全平衡的中性候选实体对地址账本，使真实边、反向边和断开来源—目标对各有独立位置，并同时保留无账本的自然世界端点对照。发现门必须同时满足：真实边高于反向边、真实边高于断开同角色对、实体和关系词留出、位置基线和嵌入基线失败、自然端点出现一致趋势。恢复实体对特异绑定以前，不运行1024次置换，不进入组件、头、通道或神经元定位。
+
+### 七、通俗说明
+
+这一轮一度看起来像找到了关系方向，因为模型能以100%准确率区分箭头朝向。更严格的控制却发现，任意“像起点”的实体和任意“像终点”的实体拼在一起，几乎都会被观察器错判成有边。现在确认的是“起点和终点角色”，不是“哪两个实体真的相连”。这张反证拼图防止研究把角色标签误画成知识网络；下一阶段要保留每一对实体的地址，专门寻找真正的配对身份。
+
+## Phase 535: 成对地址保持的世界关系协议 [2026-07-17 17:39]
+
+### 一、算法目标
+
+Phase533（阶段533）的核心反证是：实体寄存器能区分来源和目标角色，却不能保留“哪一个来源与哪一个目标相连”。因此 Phase535（阶段535）不再改旧观察器参数，而是改变观测对象。
+
+两个世界保持所有节点的来源/目标角色不变，只交换具体配对：
+
+$$
+W_0=\{0\to1,\;2\to3\},
+\qquad
+W_1=\{0\to3,\;2\to1\}.
+$$
+
+候选实体对固定为：
+
+$$
+\mathcal P=\{(0,1),(0,3),(2,1),(2,3)\}.
+$$
+
+同一候选对在两个世界中占据完全相同的地址槽位，但真假标签恰好翻转：
+
+$$
+y(p,W_0)=1-y(p,W_1).
+$$
+
+这样，来源/目标角色、地址槽位和实体身份都不能单独预测关系边，算法必须追随世界中的具体配对变化。
+
+### 二、冻结样本
+
+```text
+discovery：768行，48个来源组，384个同对翻转组
+entity_prediction：1536行，96个来源组，768个同对翻转组
+relation_prediction：1536行，96个来源组，768个同对翻转组
+sealed：1536行，未读取
+```
+
+每个来源组包含两个世界、两个表面、四个候选对，共16行。事实词元袋跨世界相同，候选地址账本跨世界逐字相同，每个槽位的真假样本严格平衡。实体池跨分割完全分离；发现与实体留出共享关系词，关系留出和密封使用独立关系词。
+
+### 三、静态审计修复
+
+首次静态审计因“真实断言字符串不得出现在世界前缀”失败。这个条件不合法，因为真命题本来就是一条事实。模型尚未运行，因此删除错误条件，改为检查查询区严格追加在冻结世界前缀之后。修复后行数、16联组、世界四候选组、同对标签翻转、槽位固定、事实词元袋、地址账本、查询区分离和槽位标签平衡全部通过。
+
+### 四、证据边界
+
+候选对地址账本明确写为中性索引，不提供关系标签；但它仍是人工观察脚手架，不能等同于模型自发自然状态。本阶段没有实现 Phase534（阶段534）设想的“无地址账本自然端点”物理对照，这是后续外推的明确硬伤。
+
+产物：
+
+```text
+tests/gpt5/phase535_pair_addressed_binding_protocol.py
+tests/gpt5/result/phase535_pair_addressed_binding_protocol/
+```
+
+## Phase 536: 三模型成对地址行为资格 [2026-07-17 17:52]
+
+三个模型在同一冻结合同上依次运行，每模型3840行，累计11520行；Qwen3（通义千问3）、GLM4（智谱清言4）、DS7B（深度求索7B）完成后分别释放显存。密封集未读取。
+
+### 一、Qwen3（通义千问3）
+
+```text
+发现：660/768 = 85.94%
+  世界四候选全对：112/192 = 58.33%
+  同对跨世界翻转全对：276/384 = 71.88%
+  来源组16项全对：4/48 = 8.33%
+实体留出：1384/1536 = 90.10%
+  同对翻转：616/768 = 80.21%
+关系词留出：1464/1536 = 95.31%
+  同对翻转：696/768 = 90.63%
+```
+
+只有关系词留出单独通过行为门；发现和实体留出未通过，因此整体物理授权为否。不能从事后最强分割反向选择平台。
+
+### 二、GLM4（智谱清言4）
+
+```text
+发现：536/768 = 69.79%
+  世界四候选全对：40/192 = 20.83%
+  同对跨世界翻转全对：152/384 = 39.58%
+  来源组16项全对：0/48
+实体留出：1160/1536 = 75.52%
+  同对翻转：392/768 = 51.04%
+关系词留出：1112/1536 = 72.40%
+  同对翻转：344/768 = 44.79%
+```
+
+GLM4（智谱清言4）在发现和实体留出的真命题为100%，假命题仅39.58%和51.04%；主要问题是强肯定偏置，不是地址槽位不平衡。
+
+### 三、DS7B（深度求索7B）
+
+```text
+发现：340/768 = 44.27%
+  世界四候选全对：0/192
+  同对跨世界翻转全对：16/384 = 4.17%
+实体留出：680/1536 = 44.27%
+  同对翻转：8/768 = 1.04%
+关系词留出：736/1536 = 47.92%
+  同对翻转：0/768
+```
+
+DS7B（深度求索7B）在关系词留出中没有正确反驳任何假命题；三个分割约25%-28%输出无法解析，行为门明确失败。
+
+### 四、授权结论
+
+```text
+physical_authorized_models=[]
+hidden_state_collection_run=false
+sealed_split_read=false
+```
+
+三模型均未获物理授权。按照冻结规则，不得因 Qwen3（通义千问3）关系词留出表现强而读取隐藏状态。
+
+产物：
+
+```text
+tests/gpt5/phase536_pair_addressed_binding_behavior.py
+tests/gpt5/result/phase536_pair_addressed_binding_behavior/
+```
+
+## Phase 537: 同对翻转与输出极性误差张量 [2026-07-17 17:53]
+
+本阶段不重新运行模型，也不拟合新观察器，只对三模型原始输出做分层账本。
+
+### 一、同对事件值是否真的翻转
+
+```text
+Qwen3发现：276/384 = 71.88%
+GLM4发现：152/384 = 39.58%
+DS7B发现：20/384 = 5.21%
+```
+
+Qwen3（通义千问3）的事件值翻转与两世界都正确均为276；GLM4（智谱清言4）152个两世界全对，其余主要为只把真命题答对；DS7B（深度求索7B）只有极少事件值随世界变化。
+
+### 二、地址槽位与表面
+
+Qwen3（通义千问3）发现集四个候选槽位准确率为83.33%-89.58%；GLM4（智谱清言4）为64.58%-72.92%；DS7B（深度求索7B）为41.67%-47.92%。槽位差异明显小于真假极性与表面差异，没有发现某一地址槽位制造主要捷径。
+
+Qwen3（通义千问3）的同形表面准确率77.08%，自然释义94.79%；GLM4（智谱清言4）为76.04%与63.54%；DS7B（深度求索7B）为53.13%与35.42%。表面接口仍显著影响行为。
+
+### 三、解释边界
+
+行为资格要求：
+
+$$
+\hat y(p,W_0)\ne\hat y(p,W_1),
+\qquad
+\hat y(p,W_i)=y(p,W_i).
+$$
+
+当前失败说明自由生成接口没有稳定追随世界配对变化，但不能区分以下两种情况：
+
+$$
+\text{内部没有形成配对判别}
+\quad\text{或}\quad
+\text{内部已判别但标签编译/生成接口失败}.
+$$
+
+因此不能从行为负结果推导内部关系状态不存在。
+
+产物：
+
+```text
+tests/gpt5/phase537_pair_addressed_behavior_diagnostics.py
+tests/gpt5/result/phase537_pair_addressed_behavior_diagnostics/
+```
+
+## Phase 538: 行为停止图谱发布与阶段结论 [2026-07-17 17:58]
+
+### 一、固定格式图谱
+
+新增数据源：
+
+```text
+frontend/public/vis_data/phase537_pair_addressed_behavior_atlas/
+frontend/public/vis_data/pattern_family_atlas/v2/phase537_pair_addressed_behavior_summary.json
+```
+
+每个模型图谱显示：平衡地址协议、发现整体、世界全对、同对翻转、真假输出偏置、实体留出、关系词留出、物理停止和实体对物理绑定未测。全部节点均为：
+
+```text
+physical=false
+predictive=false
+causal=false
+compute_edge=false
+single_neuron=false
+pipeline_sealed=false
+```
+
+“实体对物理绑定未测”与“实体对绑定为负”明确区分；由于行为未授权，不能把未运行的隐藏状态实验画成物理负结果。
+
+### 二、理论更新
+
+理论主体“语言是动态模式网络”不改名。本轮进一步拆分内部判别与输出接口：
+
+$$
+Z_{\mathrm{pair}}=E(S,W,p),
+\qquad
+Y_{\mathrm{label}}=D(Z_{\mathrm{pair}},I,H).
+$$
+
+自由生成失败可能来自 $E$ 或 $D$，当前实验无法区分。地址账本提高了可证伪性，但没有新增物理分布拼图。
+
+### 三、闭合与进度
+
+$$
+\boxed{\text{严格机制闭合}=0/72=0\%}
+$$
+
+$$
+\boxed{\text{全局物理图谱}=31\%},
+\qquad
+\boxed{\text{总体科学成熟度}=26\%}.
+$$
+
+本轮进度不提高。原因是没有模型获隐藏状态收集资格，预测、1024次置换、计算运输、因果干预和密封闭合均未运行。
+
+### 四、验证
+
+```text
+Phase535-538脚本 py_compile：通过
+python -m unittest tests.gpt5.test_phase535_538_pair_addressed_binding：6项通过
+前序与本轮联合回归：22项通过
+多路线数据合同：31个数据源、186个数据集、12886个节点、19612条边全部可解析
+npm run build：生产构建通过，仅既有大分块警告
+```
+
+三维客户端验收：桌面三个模型和移动代表数据均非空、交互后哈希变化、横向溢出0、控制台错误0、失败资源0。桌面亮度标准差22.52-22.87，移动31.13。
+
+产物：
+
+```text
+tests/gpt5/phase538_publish_pair_addressed_binding_atlas.py
+tests/gpt5/test_phase535_538_pair_addressed_binding.py
+tests/gpt5/result/phase538_pair_addressed_binding_stage_audit/
+research/MainAnalysis/20260717_08_Phase535-537成对地址关系绑定行为审计.md
+```
+
+### 五、下一阶段
+
+下一阶段冻结为：
+
+```text
+Phase539：答案边界双候选对数几率观察器与新鲜确认
+```
+
+先在开放校准集比较两个完整答案序列的条件对数几率，检验自由生成极性偏置是否掩盖潜在真假判别。该分析属于探索性接口校准；如果出现正结果，必须重新生成未见实体和未见关系词确认集，并在确认通过后才能收集隐藏状态。不得直接把开放集对数几率优势写成物理状态或机制。
+
+### 六、通俗说明
+
+这一轮给每一对实体安排了固定座位，并让它在两个世界中从“有边”切换成“无边”。Qwen3（通义千问3）确实会在不少样本上跟着切换，但还不够稳定；GLM4（智谱清言4）和DS7B（深度求索7B）更常陷入“总回答支持”。因此我们没有继续往神经元里找。下一步先绕开文字输出偏置，直接测量模型在答案边界上更倾向“支持”还是“反驳”，再用全新数据复核。
+
+## Phase 539: 答案边界双候选对数几率探索 [2026-07-17 18:14]
+
+### 一、算法与冻结边界
+
+Phase536（阶段536）的自由生成失败不能区分“内部没有判别”与“判别已形成但输出标签编译失败”。因此本阶段在同一 `Verdict`（判决）边界上，直接比较两个完整答案序列的平均条件对数概率：
+
+$$
+s(x)=\frac{1}{|A_+|}\log P(A_+\mid x)-\frac{1}{|A_-|}\log P(A_-\mid x),
+$$
+
+其中 $A_+$ 为完整支持句，$A_-$ 为完整反驳句。发现集按来源组进行四折组外判定；只在发现集冻结方向与阈值，随后读取实体留出和关系词留出。资格门仍同时要求整体、两个表面、世界四候选全对和同一候选跨世界翻转全对。该分数是答案接口观察器，不是隐藏状态、物理路径或机制公式。
+
+三模型依次使用 CUDA（统一计算设备架构）运行，每模型完成后释放显存，密封集未读取。
+
+### 二、客观结果
+
+```text
+Qwen3（通义千问3）
+  发现：740/768 = 96.35%；世界全对168/192 = 87.50%；同对翻转356/384 = 92.71%
+  实体留出：1472/1536 = 95.83%；世界全对328/384 = 85.42%；同对翻转704/768 = 91.67%
+  关系留出：1496/1536 = 97.40%；世界全对344/384 = 89.58%；同对翻转728/768 = 94.79%
+  三开放分割探索门：通过
+
+GLM4（智谱清言4）
+  发现：672/768 = 87.50%；世界全对112/192 = 58.33%；来源组全对8/48 = 16.67%
+  实体留出：1376/1536 = 89.58%；世界全对248/384 = 64.58%
+  关系留出：1344/1536 = 87.50%；世界全对208/384 = 54.17%
+  三开放分割探索门：失败
+
+DS7B（深度求索7B）
+  发现：641/768 = 83.46%；世界全对93/192 = 48.44%
+  实体留出：1184/1536 = 77.08%；世界全对120/384 = 31.25%
+  关系留出：1080/1536 = 70.31%；世界全对128/384 = 33.33%
+  三开放分割探索门：失败
+```
+
+Qwen3（通义千问3）只获得“必须生成全新确认集”的资格。`physical_authorized_models=[]`，没有模型获得物理采集资格。开放集高分仍可能是答案措辞、关系词和阈值共同形成的接口规律。
+
+产物：
+
+```text
+tests/gpt5/phase539_pair_answer_logodds_observer.py
+tests/gpt5/result/phase539_pair_answer_logodds_observer/
+```
+
+## Phase 540: 独立新词汇与新关系确认协议 [2026-07-17 18:18]
+
+### 一、冻结数据
+
+在 Qwen3（通义千问3）确认运行前，生成两个完全开放确认分割和一个密封分割：
+
+```text
+fresh_vocabulary_confirmation：2048行，128个来源组
+fresh_relation_confirmation：2048行，128个来源组
+sealed：2048行，128个来源组，未读取
+```
+
+新实体池、新关系词池、三个新分割之间以及 Phase535（阶段535）的全部历史词汇均不相交。每个来源组仍包含两个世界、两个表面、四个候选对；事实词元袋、候选地址账本、槽位标签、真假数量和同对跨世界翻转全部平衡。
+
+确认协议硬冻结：
+
+1. 不允许在 Phase540（阶段540）数据上重新拟合方向、阈值、答案序列或门槛。
+2. 只有 Phase539（阶段539）通过全部开放门的模型可以加载权重。
+3. 两个开放确认分割必须同时通过，才能授权观察性隐藏状态采集。
+4. 通过也不等于因果、计算边、组件或神经元机制。
+
+静态审计全部通过；模型尚未运行时合同和数据哈希已经封存。
+
+产物：
+
+```text
+tests/gpt5/phase540_pair_answer_logodds_fresh_protocol.py
+tests/gpt5/result/phase540_pair_answer_logodds_fresh_protocol/
+```
+
+## Phase 541: 固定答案观察器的独立反证 [2026-07-17 18:22]
+
+### 一、Qwen3（通义千问3）确认结果
+
+Qwen3（通义千问3）读取4,096条开放确认记录，完全复用 Phase539（阶段539）的候选序列、方向和阈值：
+
+```text
+新词汇确认
+  行级：1779/2048 = 86.87%
+  世界四候选全对：265/512 = 51.76%
+  同对跨世界翻转全对：755/1024 = 73.73%
+  同形表面：89.55%；自然释义：84.18%
+  假命题：100%；真命题：73.73%
+  冻结门：失败
+
+新关系确认
+  行级：1929/2048 = 94.19%
+  世界四候选全对：393/512 = 76.76%
+  同对跨世界翻转全对：905/1024 = 88.38%
+  同形表面：96.88%；自然释义：91.50%
+  假命题：100%；真命题：88.38%
+  冻结门：失败
+```
+
+GLM4（智谱清言4）和DS7B（深度求索7B）因 Phase539（阶段539）未获资格，只写入“未加载模型权重”的停止记录。最终：
+
+```text
+fresh_confirmed_models=[]
+physical_collection_authorized_models=[]
+hidden_state_collection_run=false
+sealed_split_read=false
+```
+
+### 二、结论与硬伤
+
+$$
+\boxed{\text{开放集双答案分数高}\not\Rightarrow\text{独立词汇上的配对状态}}
+$$
+
+新词汇集恢复出明显的“假命题全对、真命题下降”极性，说明固定答案序列分数仍混入标签先验、词汇和接口编译。它不能作为可移植的实体对物理状态。这个强负结果关闭了“只绕开自由生成就能恢复稳定绑定”的具体路线，但不能证明模型内部不存在关系判别。
+
+小模型可能对长合同、陌生关系词和否定接口存在粗糙性，测试结果与大型模型或真实语言编码可能有30%-50%偏差；这只能限制外推，不能把失败门槛事后放宽。
+
+产物：
+
+```text
+tests/gpt5/phase541_pair_answer_logodds_fresh_confirmation.py
+tests/gpt5/result/phase541_pair_answer_logodds_fresh_confirmation/
+```
+
+## Phase 542: 图谱发布、Phase518-525复审与阶段验收 [2026-07-17 18:31]
+
+### 一、对附件判断的复审
+
+Phase518-525（阶段518-525）的原判断总体正确：Qwen3（通义千问3）在固定断言合同中存在经过开放预测、多投影一致和128次全流水线置换控制的查询求值观察平台。它在原合同内仍成立，但后续证据进一步限制其外推：
+
+1. Phase533（阶段533）显示角色方向观察器对断开来源—目标对的假阳性约99.52%。
+2. Phase536-537（阶段536-537）的成对地址自由生成未稳定追随具体配对变化。
+3. Phase539（阶段539）的 Qwen3（通义千问3）答案分数探索正结果被 Phase541（阶段541）全新样本推翻。
+
+因此：
+
+$$
+\boxed{\text{固定断言查询求值可见}\ne\text{世界知识状态或实体对绑定可见}}.
+$$
+
+原平台不能升级为事实运输路径、实际计算通路、因果充分性或神经元机制。
+
+### 二、理论与核心拼图
+
+理论主体继续使用“语言是动态模式网络”，不更换名词。全局状态递推保持：
+
+$$
+S_{l+1,t}=F_{\theta,l}(S_{l,t},X_{\le t},C_t,I_t).
+$$
+
+关系候选至少需要：
+
+$$
+R_l(a,b\mid W)=G_l\left(U_l(a),V_l(b),B_l(a,b\mid W)\right).
+$$
+
+当前可靠拼图包括：来源/目标角色极性 $U_l,V_l$、固定合同中的查询求值平台、输出接口的条件偏置、角色方向不能保留具体配对身份、固定答案分数不能跨新词汇稳定迁移。具体配对项 $B_l$ 的位置、形成、运输、复用差分和因果功能仍未确认。
+
+### 三、固定格式图谱与客户端
+
+新增多模型数据源：
+
+```text
+frontend/public/vis_data/phase541_pair_answer_logodds_atlas/
+frontend/public/vis_data/pattern_family_atlas/v2/phase541_pair_answer_logodds_summary.json
+```
+
+图谱同时显示 Phase539（阶段539）的探索高分、Phase540（阶段540）的新样本协议、Phase541（阶段541）的确认失败和物理停止，避免只发布正结果。所有节点和边均保持：
+
+```text
+physical=false
+predictive=false
+causal=false
+compute_edge=false
+single_neuron=false
+pipeline_sealed=false
+```
+
+### 四、闭合与总体进度
+
+$$
+\boxed{\text{严格机制闭合}=0/72=0\%},
+\qquad
+\boxed{\text{全局物理图谱}=31\%},
+\qquad
+\boxed{\text{总体科学成熟度}=26\%}.
+$$
+
+进度不提高。本阶段增加的是测量路线反证和证据纪律，不是新的物理分布、预测平台、计算边、因果干预或密封闭合。
+
+### 五、工程验证
+
+```text
+Phase539-542脚本 py_compile：通过
+Phase518-542联合回归：28项通过
+多路线数据合同：32个数据源、189个数据集、12914个节点、19641条边全部可解析
+npm run build：生产构建通过，仅保留既有2.23 MB大分块警告
+```
+
+三维客户端实景验收：桌面1440×900中三个模型全部非空，亮度标准差22.47-22.87；移动390×844亮度标准差31.07。所有画布交互后哈希变化；横向溢出0，控制台错误0，失败请求0。
+
+产物：
+
+```text
+tests/gpt5/phase542_publish_pair_answer_logodds_atlas.py
+tests/gpt5/test_phase539_542_pair_answer_logodds.py
+tests/gpt5/result/phase542_pair_answer_logodds_stage_audit/
+research/MainAnalysis/20260717_09_Phase539-541答案边界对数几率与独立新样本反证.md
+```
+
+### 六、下一大阶段
+
+当前阶段目标已经完成，固定双答案接口路线因独立确认失败而关闭。下一阶段不应继续替换答案近义句或为旧接口增加参数，而应冻结：
+
+```text
+Phase543：九族自然行为资格矩阵与物理入口重选
+```
+
+在九族72机制总分母上，一次性完成“模型 × 家族 × 自然接口”的行为资格矩阵；只对跨表面、跨词汇和独立确认均稳定的单元采集全层、多位置物理轨迹。阶段内依次完成资格、轨迹临摹、复用差分事件图和入口排序，不用单个关系任务继续打补丁。
+
+优先路线：
+
+```text
+九族自然行为资格矩阵
+-> 稳定单元全层/多位置轨迹
+-> 复用与差分事件图
+-> 独立物理预测
+-> 合法计算边干预
+-> 神经元级局部化
+-> 密封闭合
+```
+
+### 七、通俗说明
+
+Qwen3（通义千问3）在旧题上很会比较“支持”和“反驳”两个答案，但换成完全新的名字和关系词后，整组世界判断明显下降。这说明旧信号更像一个不稳定的答题接口，而不是模型内部对“谁和谁真正相连”的可靠记录。最重要的结果不是继续往神经元里钻，而是用新样本及时证明入口不可靠并停下来。下一步要把九类语言能力放在同一张资格表里，先选真正稳定的入口，再画内部物理轨迹。
+
+## Phase 543: 历史密封污染审计与开放分割允许列表修复 [2026-07-17 18:40]
+
+### 一、发现的问题
+
+Phase542（阶段542）完成人工代码复核时发现：Phase540（阶段540）初版为了验证新词汇与历史词汇不重叠，遍历了 Phase535（阶段535）合同中的全部分割，其中包括 `sealed`（密封）文件。该文件被完整解析，实际计算只提取 `entity_names`（实体名）与 `relation_active`（活动关系词），没有读取模型输出或隐藏状态，也没有用于拟合方向、阈值、答案序列或门槛。
+
+但密封标准取决于“是否读取”，而不是“读取后是否利用答案”。因此必须保守登记：
+
+$$
+\boxed{\text{Phase535历史密封已污染}}.
+$$
+
+这个访问不可撤销，Phase535（阶段535）密封集以后不能用于任何密封确认或闭合声明。Phase538（阶段538）至 Phase542（阶段542）中关于“Phase535密封未读”的历史口径由本阶段正式纠正。
+
+### 二、影响边界
+
+1. Phase541（阶段541）的4,096条开放确认结果不变；旧密封数据没有参与模型评分或阈值拟合。
+2. Phase540（阶段540）本轮新生成的密封集没有被 Phase541（阶段541）读取，仍保持未读。
+3. 全局任何密封读取标志必须保守设为真；当前流水线密封闭合仍为假。
+4. 严格机制闭合本来就是0/72，因此污染不会把已闭合机制降级，但会关闭 Phase535 旧密封的未来使用资格。
+
+### 三、修复
+
+Phase540（阶段540）协议改为显式开放允许列表：
+
+```text
+discovery
+entity_prediction
+relation_prediction
+```
+
+不再遍历合同中的 `sealed`（密封）项。重新生成 Phase540（阶段540）合同、静态审计和哈希后，Phase543（阶段543）审计确认：
+
+```text
+historical_phase535_sealed_read=true
+current_phase540_sealed_read=false
+global_any_sealed_split_read=true
+pipeline_sealed=false
+correction_pass=true
+```
+
+图谱新增“Phase535旧密封被静态去重审计读取”节点；桌面三模型和移动代表数据重新验收通过。数据合同最终为32个数据源、189个数据集、12917个节点、19644条边，全部可解析。
+
+产物：
+
+```text
+tests/gpt5/phase543_seal_contamination_audit.py
+tests/gpt5/result/phase543_seal_contamination_audit/
+```
+
+### 四、下一阶段编号纠正
+
+Phase543（阶段543）已用于密封污染修复，因此“九族自然行为资格矩阵与物理入口重选”顺延为 Phase544（阶段544）。研究优先级不变：先以九族统一资格矩阵选择稳定自然入口，再采集全层、多位置轨迹；不能使用已污染的 Phase535 旧密封完成任何闭合。
+
+### 五、通俗说明
+
+我们在最后检查中发现，程序为了确认“新名字没有和旧名字重复”，曾打开过一份本应封存的旧题。虽然没有看模型对旧题的答案，也没有用它调参数，但“封存”资格依然已经失效。现在程序只允许读取明确列出的开放数据，新一轮密封题仍没有打开；旧密封污染也已在报告和三维图谱中公开标记，而不是被悄悄忽略。
+
+### 六、最终报告路径更正
+
+Phase542（阶段542）记录的阶段报告在加入密封污染审计后更名为：
+
+```text
+research/MainAnalysis/20260717_09_Phase539-543答案边界对数几率独立反证与密封污染审计.md
+```
+
+## Phase 544: 九族自然行为资格矩阵与旧分母审计 [2026-07-17 21:10]
+
+### 一、旧分母纠正
+
+Phase526-543（阶段526-543）关于“停止修补单一关系接口、转向九族统一资格矩阵”的主判断正确，但 Phase330（阶段330）的九族72机制只能作为冻结分类分母，不能直接当作72个独立自然合同。静态审计确认：
+
+```text
+Phase330旧提示：5,184条
+目标直接出现在提示中：1,347条（25.98%）
+旧独立留出：每机制仅6个题项
+跨名称完全相同的语义合同组：2组
+最大重复合同组：30个机制名称
+零不可恢复事件的95%上界不超过0.05所需独立样本：73
+Phase535旧密封：历史读取，永久失效
+```
+
+因此没有直接复用旧72合同，而是冻结九族各2个结构不同的代表机制，共18个入口筛选机制。每机制在发现集和独立确认集各73个独立反事实世界对，每对包含2个相反世界和2种自然表面。表面改写是重复测量，不增加独立分母。
+
+### 二、算法与执行
+
+行为资格门为：
+
+$$
+G^{\mathrm{beh}}_{m,f,k}=
+G_{\mathrm{unit}}\land G_{\mathrm{pair}}\land
+G_{\mathrm{surface}}\land G_{\mathrm{vocab}}\land
+G_{\mathrm{confirmation}}\land G_{\mathrm{recoverable}}.
+$$
+
+所有输出均为自然答案，不使用A/B、0/1等任意标签。三模型按 Qwen3（通义千问3）、GLM4（智谱清言4）、DS7B（深度求索7B）顺序在 CUDA（并行计算平台）上完成31,536条冻结提示，每模型10,512条；模型之间释放显存后再加载下一模型。
+
+```text
+Qwen3行为合格：4/18
+GLM4行为合格：5/18
+DS7B行为合格：0/18
+两个模型共享行为入口：4个
+```
+
+共享入口为类别、否定属性、自然抽取和 JSON（结构化文本）输出；GLM4另有实体漂移入口。推理、语法、跨语言、读出竞争和闭合代表机制全部失败。当前小模型最稳定的是显式来源读取、字段抽取和格式接口，不能外推为预训练知识网络、推理规则或语法系统。
+
+产物：
+
+```text
+tests/gpt5/phase544_nine_family_natural_protocol.py
+tests/gpt5/phase544_nine_family_natural_behavior.py
+tests/gpt5/phase544_nine_family_natural_analysis.py
+tests/gpt5/result/phase544_nine_family_natural_behavior/
+```
+
+## Phase 545: 全层多位置轨迹与终端身份事件校准 [2026-07-17 21:10]
+
+### 一、物理临摹
+
+只有 Phase544（阶段544）行为合格的9个“模型×机制”单元获得物理采集资格。Qwen3采集192个世界对，GLM4采集240个世界对；DS7B因行为门0/18按协议跳过权重加载。共得到49,536条“世界对×层×阶段”行，覆盖：
+
+```text
+阶段：提示结束、首词元后、第三词元后
+组件：层输入、注意力输出、多层感知机输出、层输出
+角色：来源、查询、当前位置
+```
+
+只保存世界对的归一化差分、答案方向对齐、余弦和组件守恒；完整隐藏向量在内存比较后立即丢弃，没有扫描注意力头、通道或神经元。
+
+$$
+\Delta_{l,c,r,t}=
+\frac{\|S^A_{l,c,r,t}-S^B_{l,c,r,t}\|}
+{(\|S^A_{l,c,r,t}\|+\|S^B_{l,c,r,t}\|)/2}.
+$$
+
+### 二、关键负校准
+
+初始全局事件预测7/9通过，但逐项审计发现7个通过事件全部是：
+
+1. 答案词元已经生成后的当前位置；或
+2. 第0层来源输入。
+
+这些事件可以由“答案已经出现”或“提示字面本来不同”解释，不能登记为上游物理路径：
+
+$$
+G_{\mathrm{physical\ prediction}}=1
+\land G_{\mathrm{terminal\ identity}}=1
+\Rightarrow G_{\mathrm{upstream\ route}}=0.
+$$
+
+校准后，上游路径资格为0/9，跨模型共享事件拓扑为0，计算边、因果边和严格闭合均为0。该负结果避免把终端答案回声误写成答案形成机制。
+
+产物：
+
+```text
+tests/gpt5/phase545_natural_entry_physical_protocol.py
+tests/gpt5/phase545_natural_entry_physical_collect.py
+tests/gpt5/phase545_natural_entry_physical_analysis.py
+tests/gpt5/result/phase545_natural_entry_physical_path/
+```
+
+## Phase 546: 生成前上游物理观察器独立确认 [2026-07-17 21:10]
+
+### 一、冻结修复
+
+在读取新隐藏状态前冻结统一规则：只允许提示结束阶段，并排除第0层输入；组件、角色和层只根据 Phase545（阶段545）发现集0-23号世界对选择。新确认使用从未做过物理采集的独立确认集24-72号世界对，每个模型机制单元49对，共441个新物理世界对，和 Phase545 物理样本重叠为0。
+
+该规则是在看到 Phase545 终端混杂后制定，因此登记为“独立修复确认”，不冒充严格预注册。
+
+### 二、客观结果
+
+```text
+Qwen3：196个新世界对，7,056条层级行，37.82秒
+GLM4：245个新世界对，9,800条层级行，58.03秒
+DS7B：行为门失败，跳过CUDA加载
+上游独立预测通过：7/9
+跨模型共享上游拓扑：2
+组件账本最大相对误差：0
+新密封读取：0
+```
+
+类别与否定属性在两模型中都落到“提示结束×注意力输出×当前位置×晚层”：Qwen3约L29/36，GLM4约L35/40，相对深度差约0.069。自然抽取两模型均通过但角色不同；实体漂移仅GLM4通过；JSON输出两模型均失败。
+
+这说明格式行为稳定不保证稳定上游物理轴。类别与否定属性是新的跨模型物理观察拼图，但两个世界提示本来含不同实体和答案，仍可能只是内容身份运输：
+
+$$
+G_{\mathrm{upstream\ observer}}=1
+\not\Rightarrow G_{\mathrm{compute\ edge}}=1
+\not\Rightarrow G_{\mathrm{causal}}=1.
+$$
+
+没有执行干预、头/通道/神经元扫描或密封确认。严格机制闭合保持0/72。
+
+产物：
+
+```text
+tests/gpt5/phase546_upstream_physical_prediction_protocol.py
+tests/gpt5/phase546_upstream_physical_collect.py
+tests/gpt5/phase546_upstream_physical_prediction_analysis.py
+tests/gpt5/result/phase546_upstream_physical_prediction/
+```
+
+## Phase 547: 九族上游物理图谱发布与阶段完成审计 [2026-07-17 21:10]
+
+### 一、阶段完成状态
+
+Phase544（阶段544）预定阶段目标已经满足：三模型九族资格矩阵完成；模型专属稳定入口不少于4个；共享行为入口不少于2个；合格单元完成全层、多位置和生成时间轨迹；形成终端身份与上游事件分账；至少2个机制通过跨模型上游独立预测；新密封保持未读；头、通道和神经元扫描保持关闭。
+
+客户端新增数据源：
+
+```text
+gpt5_phase546_nine_family_natural_atlas
+```
+
+三份模型图谱同时显示18个代表机制的行为通过/停止、Phase545终端身份事件、Phase546上游预测通过/失败以及“计算边仍为0”的停止节点。所有观察边明确保持 `causal=false`、`compute_edge=false`、`single_neuron=false`。
+
+### 二、理论与进度
+
+理论主体继续使用“语言是动态模式网络”，不改名：
+
+$$
+S_{l+1,t}=F_{\theta,l}(S_{l,t},X_{\le t},C_t,I_t).
+$$
+
+全局机制图谱为：
+
+$$
+\mathcal G=(V_{\mathrm{state}}\cup V_{\mathrm{event}}\cup V_{\mathrm{interface}},
+E_{\mathrm{observed}}\cup E_{\mathrm{predicted}}\cup
+E_{\mathrm{compute}}\cup E_{\mathrm{causal}}).
+$$
+
+本阶段只增加了独立复现的上游观察节点和预测边，计算边与因果边仍为空。由于7个模型机制上游观察器在49对新样本上复现，且2个拓扑跨模型共享并已发布，全局物理图谱由31%谨慎上调到32%，总体科学成熟度由26%上调到27%；严格闭合仍为0/72=0%。18个代表机制不等于72机制全量完成。
+
+### 三、工程验证
+
+```text
+新增脚本py_compile：通过
+Phase508-547联合回归：52项通过
+前端生产构建：通过，仅既有大分块警告
+多路线合同：33数据源、192数据集、12,998节点、19,728边全部可解析
+桌面1440×900：三模型画布非空且交互像素变化
+移动390×844：代表画布非空且交互像素变化
+横向溢出：0
+控制台错误：0
+失败请求：0
+```
+
+完整报告：
+
+```text
+research/MainAnalysis/20260717_10_Phase544-547九族自然行为资格与上游物理图谱.md
+```
+
+### 四、下一阶段边界
+
+下一阶段应为 Phase548（阶段548）“跨模型共享上游平台的粗粒度计算边资格”。它与本阶段属于不同证据门，必须先单独冻结 Qwen3 L28-30 和 GLM4 L34-36 的晚层注意力窗口，再在新样本上执行必要性、充分性、中介恢复、错层、错角色和同范数随机控制。计算边未通过前，禁止进入注意力头、通道和单神经元定位。
+
+通俗地说：统一考试后，真正稳定的主要还是“从题目里读字段”。逐层拍照时，我们先删掉了“答案已经写出来”的假线索；删掉以后，两个模型在晚层注意力处仍能稳定看到类别和否定属性差异。这是可靠的新地图标记，但还没有证明那里负责计算答案。下一阶段要做的是轻推这个粗窗口，看答案是否按预期改变，而不是立刻钻进单个神经元。
+
+### 五、多角色组件守恒补充审计 [2026-07-17 21:25]
+
+最终一致性检查发现，初版组件守恒只在当前位置做数值核对，而通过事件还包含来源或查询角色。实现随后改为对来源片段、查询片段和当前位置的全部定位词元逐层验证，并使用向量化计算避免逐词元同步开销。Qwen3（通义千问3）和GLM4（智谱清言4）的 Phase545（阶段545）与 Phase546（阶段546）物理采集全部按最终实现重跑。
+
+```text
+Phase545多角色账本最大相对误差：0
+Phase546多角色账本最大相对误差：0
+Phase545结果：名义预测7/9，终端身份7/7，上游资格0/9
+Phase546结果：上游预测7/9，跨模型共享拓扑2
+```
+
+因此额外硬伤审计没有改变事件选择、门结果、进度或理论边界，只提高了组件账本的实测覆盖。新的 Qwen3（通义千问3）与GLM4（智谱清言4）结果哈希、机器摘要、阶段报告和客户端图谱已经同步重发。
+
+最终 Phase546（阶段546）重跑时间为 Qwen3（通义千问3）40.90秒、GLM4（智谱清言4）55.75秒；本阶段前文初次运行的37.82秒与58.03秒只保留为历史执行记录，不再对应最终结果文件哈希。

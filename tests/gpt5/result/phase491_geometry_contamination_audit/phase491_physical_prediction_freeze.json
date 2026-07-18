@@ -1,0 +1,58 @@
+{
+  "authorization": {
+    "causal_intervention": false,
+    "head_channel_neuron_scan": false,
+    "output_event_map": false,
+    "physical_prediction_split_read": true,
+    "sealed_split_read": false
+  },
+  "created_at": "2026-07-17T08:54:13.891092+00:00",
+  "independent_gate": {
+    "direction_coherence_min": 0.5,
+    "q_native_positive_in_each_family": true,
+    "q_native_positive_overall": true,
+    "truth_prediction_lcb95_above": 0.5,
+    "truth_prediction_required_for_each_family": true,
+    "truth_prediction_required_for_each_native_track": true
+  },
+  "models_in_required_order": [
+    "qwen3",
+    "glm4"
+  ],
+  "projection": {
+    "dimension": 64,
+    "fit_direction_on_geometry_window_only": true,
+    "fit_intercept_on_geometry_window_only": true,
+    "reuse_phase490_model_seed": true
+  },
+  "schema_version": "phase491_physical_prediction_freeze.v1",
+  "status": "frozen_before_physical_prediction_split_read",
+  "windows": {
+    "glm4": {
+      "geometry_window_direction_coherence": 0.9521737098693848,
+      "geometry_window_family_q": {
+        "marker_inheritance": 0.32986319893614435,
+        "signal_assignment": 0.28952602290661505
+      },
+      "geometry_window_q_native": 0.3102537205289868,
+      "layer_with_embedding": 33,
+      "model": "glm4",
+      "normalized_depth": 0.825,
+      "position_role": "prompt_end",
+      "selection_rule": "prompt_end only; normalized depth >= 0.5; q>0 in both families; coherence>=0.5; maximize minimum family q, then overall q, coherence, lower layer"
+    },
+    "qwen3": {
+      "geometry_window_direction_coherence": 0.9778479933738708,
+      "geometry_window_family_q": {
+        "marker_inheritance": 0.4085645093308675,
+        "signal_assignment": 0.46829807172541177
+      },
+      "geometry_window_q_native": 0.437197025487166,
+      "layer_with_embedding": 31,
+      "model": "qwen3",
+      "normalized_depth": 0.8611111111111112,
+      "position_role": "prompt_end",
+      "selection_rule": "prompt_end only; normalized depth >= 0.5; q>0 in both families; coherence>=0.5; maximize minimum family q, then overall q, coherence, lower layer"
+    }
+  }
+}

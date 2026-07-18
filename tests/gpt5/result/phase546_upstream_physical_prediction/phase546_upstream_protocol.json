@@ -1,0 +1,84 @@
+{
+  "claim_boundaries": {
+    "sealed_split_read": false,
+    "single_neuron_scan_allowed": false,
+    "upstream_observer_is_causal": false,
+    "upstream_observer_is_compute_edge": false,
+    "world_pair_delta_is_abstract_semantics": false
+  },
+  "created_at": "2026-07-18T06:22:04.377937+00:00",
+  "fresh_confirmation": {
+    "independent_pairs_per_model_mechanism": 49,
+    "no_phase545_physical_overlap": true,
+    "physical_pair_indices": [
+      24,
+      72
+    ],
+    "source_behavior_split": "independent_confirmation"
+  },
+  "frozen_events_path": "tests/gpt5/result/phase546_upstream_physical_prediction/phase546_frozen_upstream_events.jsonl",
+  "frozen_events_sha256": "fc894fe60861625770b84d49f5b3e34efed09152052cae2384451f78efaba5ec",
+  "frozen_search_rule": {
+    "allowed_stage": "prompt_end",
+    "axes_frozen_before_confirmation": [
+      "component",
+      "role",
+      "layer"
+    ],
+    "excluded_event": "layer_input at layer zero",
+    "score": "median normalized world-pair delta multiplied by positive direction-support fraction",
+    "selection_source": "Phase545 discovery rows only"
+  },
+  "gate_skipped_models": [
+    "deepseek7b"
+  ],
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase_id": "Phase546",
+  "prediction_gates": {
+    "component_ledger_relative_error_max": 0.01,
+    "peak_layer_relative_error_max": 0.1,
+    "same_event_median_direction_alignment_min": 0.0,
+    "same_event_positive_direction_fraction_min": 0.75
+  },
+  "registered_pairs_path": "tests/gpt5/result/phase546_upstream_physical_prediction/phase546_registered_confirmation_pairs.jsonl",
+  "registered_pairs_sha256": "e0945a0edc3e1589471f98ed328a75e5e64332119685e6f9e5283818cb855eb3",
+  "repair_context": "Phase545 terminal-identity audit was observed before this rule was frozen; therefore this is an independently confirmed repair, not a strict preregistration.",
+  "schema_version": "phase546_upstream_physical_prediction_protocol.v1",
+  "source_behavior_cases_sha256": "69928f66eb35454ab4bade5320e40c0c407779b683cb20cb0a68fda6614dad84",
+  "source_behavior_matrix_sha256": "20aaf7e738fa83321f7094aeded920f93d8b747b1df90b4ec559b071c2ba5f17",
+  "source_phase545_protocol_sha256": "3a521075ce3576013858a54fdaed8a249fe378b747e4fdbc18755a551e563e47",
+  "static_audit": {
+    "behavior_eligible_cell_count": 9,
+    "confirmation_pair_index_range": [
+      24,
+      72
+    ],
+    "created_at": "2026-07-18T06:22:04.377782+00:00",
+    "fresh_physical_holdout": true,
+    "frozen_upstream_event_count": 9,
+    "generated_stage_event_count": 0,
+    "layer_zero_input_event_count": 0,
+    "pair_count_per_model_mechanism": [
+      49
+    ],
+    "phase545_physical_pair_overlap_count": 0,
+    "phase_id": "Phase546",
+    "registered_confirmation_pair_count": 441,
+    "registered_pair_count_by_model": {
+      "glm4": 245,
+      "qwen3": 196
+    },
+    "repair_rule_frozen_before_fresh_physical_collection": true,
+    "schema_version": "phase546_upstream_static_audit.v1",
+    "sealed_pair_count": 0,
+    "status": "static_pass_no_fresh_hidden_state_read",
+    "strict_preregistration": false,
+    "target_identity_error_count": 0,
+    "valid": true
+  },
+  "title": "Fresh prediction of prompt-end upstream physical observers"
+}

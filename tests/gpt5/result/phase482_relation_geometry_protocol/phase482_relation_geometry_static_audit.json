@@ -1,0 +1,127 @@
+{
+  "balance": {
+    "answer_by_mapping_truth": {
+      "('mu_ab', False, 'B')": 576,
+      "('mu_ab', True, 'A')": 576,
+      "('mu_ba', False, 'A')": 576,
+      "('mu_ba', True, 'B')": 576
+    },
+    "mapping_by_split": {
+      "('geometry_window_freeze', 'mu_ab')": 384,
+      "('geometry_window_freeze', 'mu_ba')": 384,
+      "('physical_prediction_holdout', 'mu_ab')": 384,
+      "('physical_prediction_holdout', 'mu_ba')": 384,
+      "('sealed_physical_holdout', 'mu_ab')": 384,
+      "('sealed_physical_holdout', 'mu_ba')": 384
+    },
+    "open_split": {
+      "geometry_window_freeze": 768,
+      "physical_prediction_holdout": 768
+    },
+    "pass": true,
+    "split": {
+      "geometry_window_freeze": 768,
+      "physical_prediction_holdout": 768,
+      "sealed_physical_holdout": 768
+    },
+    "subprotocol_by_split": {
+      "('geometry_window_freeze', 'label_post_relation_geometry')": 384,
+      "('geometry_window_freeze', 'label_pre_mapping_visible_control')": 384,
+      "('physical_prediction_holdout', 'label_post_relation_geometry')": 384,
+      "('physical_prediction_holdout', 'label_pre_mapping_visible_control')": 384,
+      "('sealed_physical_holdout', 'label_post_relation_geometry')": 384,
+      "('sealed_physical_holdout', 'label_pre_mapping_visible_control')": 384
+    },
+    "truth_by_split": {
+      "('geometry_window_freeze', False)": 384,
+      "('geometry_window_freeze', True)": 384,
+      "('physical_prediction_holdout', False)": 384,
+      "('physical_prediction_holdout', True)": 384,
+      "('sealed_physical_holdout', False)": 384,
+      "('sealed_physical_holdout', True)": 384
+    },
+    "variant_template_by_subprotocol": {
+      "('geometry_window_freeze', 'label_post_relation_geometry', 'claim_records')": 384,
+      "('geometry_window_freeze', 'label_post_relation_geometry', 'records_claim')": 384,
+      "('geometry_window_freeze', 'label_pre_mapping_visible_control', 'claim_records')": 384,
+      "('geometry_window_freeze', 'label_pre_mapping_visible_control', 'records_claim')": 384,
+      "('physical_prediction_holdout', 'label_post_relation_geometry', 'claim_records')": 384,
+      "('physical_prediction_holdout', 'label_post_relation_geometry', 'records_claim')": 384,
+      "('physical_prediction_holdout', 'label_pre_mapping_visible_control', 'claim_records')": 384,
+      "('physical_prediction_holdout', 'label_pre_mapping_visible_control', 'records_claim')": 384,
+      "('sealed_physical_holdout', 'label_post_relation_geometry', 'claim_records')": 384,
+      "('sealed_physical_holdout', 'label_post_relation_geometry', 'records_claim')": 384,
+      "('sealed_physical_holdout', 'label_pre_mapping_visible_control', 'claim_records')": 384,
+      "('sealed_physical_holdout', 'label_pre_mapping_visible_control', 'records_claim')": 384
+    }
+  },
+  "count_contract": {
+    "actual_sample_records": 2304,
+    "actual_variant_records": 4608,
+    "expected_sample_records": 2304,
+    "expected_variant_records": 4608,
+    "pass": true
+  },
+  "created_at": "2026-07-17T03:08:18.952447+00:00",
+  "equality": {
+    "failure_count": 0,
+    "failures": [],
+    "pass": true
+  },
+  "schema_version": "phase482_relation_geometry_static_audit.v1",
+  "static_baselines": {
+    "failing_baselines": [],
+    "oracle_baselines_not_counted": [
+      "truth_plus_mapping_oracle"
+    ],
+    "pass": true,
+    "reports": {
+      "constant_A": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "constant_B": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "mu_ab": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "role_base": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "subprotocol_label_post": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "template_records": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "text_length_even": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "truth_only_without_mapping": {
+        "accuracy": 0.5,
+        "correct": 2304,
+        "n": 4608
+      },
+      "truth_plus_mapping_oracle": {
+        "accuracy": 1.0,
+        "correct": 4608,
+        "n": 4608
+      }
+    }
+  },
+  "status": "static_pass_no_model_run"
+}

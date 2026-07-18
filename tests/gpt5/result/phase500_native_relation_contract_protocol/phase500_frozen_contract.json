@@ -1,0 +1,111 @@
+{
+  "behavior_gate": {
+    "identity_lcb95_min": 0.85,
+    "native_plain_lcb95_min": 0.85,
+    "observer_consistency_lcb95_min": 0.85,
+    "paired_world_lcb95_min": 0.8,
+    "surface_intersection_lcb95_min": 0.85
+  },
+  "created_at": "2026-07-17T12:11:14.539521+00:00",
+  "evidence_boundaries": {
+    "causal_intervention": false,
+    "head_channel_neuron_scan": false,
+    "role_sequence_is_compute_transport": false,
+    "sealed_read": false
+  },
+  "function_classes": [
+    "direct_symmetric",
+    "direct_directed",
+    "single_step_rule",
+    "transitive_closure",
+    "nontransitive_exclusion"
+  ],
+  "observers": [
+    "true_false",
+    "mapped_ab",
+    "mapped_01"
+  ],
+  "polarities": [
+    "positive",
+    "explicit_negative",
+    "reverse_query"
+  ],
+  "position_roles": [
+    "target_evidence_end",
+    "distractor_evidence_end",
+    "claim_entity_end",
+    "claim_relation_end",
+    "claim_end",
+    "prompt_end"
+  ],
+  "projection": {
+    "dimension": 64,
+    "seeds": {
+      "deepseek7b": 500041,
+      "glm4": 500037,
+      "qwen3": 500031
+    }
+  },
+  "schema_version": "phase500_native_relation_contract.v1",
+  "selection_rules": {
+    "no_failed_cell_pooling": true,
+    "shared_physical": "at least two models independently confirm the identical function x polarity x vocab contract",
+    "stage_a_to_b": "model-specific function_class x polarity cell must pass the frozen true_false natural_names gate",
+    "stage_b_to_c": "all three observers and their semantic consistency must pass for a model x function x polarity x vocab cell"
+  },
+  "source_path": "tests/gpt5/phase500_native_relation_contract_protocol.py",
+  "source_sha256": "863ecb8d50d994910b930aa3400b54aa8c26645be986cce32e25579a90ffa4f4",
+  "split_files": {
+    "function_polarity_calibration": {
+      "path": "tests/gpt5/result/phase500_native_relation_contract_protocol/phase500_function_polarity_calibration.jsonl",
+      "rows": 720,
+      "sealed": false,
+      "sha256": "d06c129ee6058a4ea5c625a63c28c6f1994e64ea36b85748e6c472303a5cfe6c",
+      "variants": 1440
+    },
+    "independent_confirmation": {
+      "path": "tests/gpt5/result/phase500_native_relation_contract_protocol/phase500_independent_confirmation.jsonl",
+      "rows": 4320,
+      "sealed": false,
+      "sha256": "8b08a3e45452f9e0ea6290bb2a350c1c4c5e34a1b5ba7951fa544dac73b55dd5",
+      "variants": 25920
+    },
+    "open_conditional_physical": {
+      "path": "tests/gpt5/result/phase500_native_relation_contract_protocol/phase500_open_conditional_physical.jsonl",
+      "rows": 2160,
+      "sealed": false,
+      "sha256": "4b0ada4b9543d806f6fe95a02b3aee828651754821e7667c5e8800c89ce43f6f",
+      "variants": 12960
+    },
+    "sealed_native_contract": {
+      "path": "tests/gpt5/result/phase500_native_relation_contract_protocol/phase500_sealed_native_contract.jsonl",
+      "rows": 2160,
+      "sealed": true,
+      "sha256": "f104c7649923f41d3e31239302bb9a51fb3a421f2a4159e77b137e4fd9f846f9",
+      "variants": 12960
+    },
+    "vocab_observer_calibration": {
+      "path": "tests/gpt5/result/phase500_native_relation_contract_protocol/phase500_vocab_observer_calibration.jsonl",
+      "rows": 2160,
+      "sealed": false,
+      "sha256": "ac7e0b9fa69511345cebe757b1bab2b7c994b666132f7ff54c8312265fc41a0e",
+      "variants": 12960
+    }
+  },
+  "stage_order": [
+    "function_polarity_calibration",
+    "vocab_observer_calibration",
+    "independent_confirmation",
+    "open_conditional_physical"
+  ],
+  "status": "frozen_before_model_run",
+  "surfaces": [
+    "identity",
+    "native_plain_candidate"
+  ],
+  "vocab_systems": [
+    "natural_names",
+    "structured_ids",
+    "historical_ids"
+  ]
+}

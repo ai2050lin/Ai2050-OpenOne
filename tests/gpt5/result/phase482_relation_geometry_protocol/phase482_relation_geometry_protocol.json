@@ -1,0 +1,102 @@
+{
+  "component_window_gate": "E[delta_M] > 0, P(delta_M > 0) >= 0.70, clustered CI excludes zero, true/false and both mappings pass, holdout replicates",
+  "count_contract": {
+    "expected_sample_records": 2304,
+    "expected_variant_records": 4608,
+    "label_mappings": 2,
+    "open_sample_records": 1536,
+    "open_variant_records": 3072,
+    "pairs_per_split": 96,
+    "record_naming": {
+      "sample_record": "one logical sample with embedded surface_variants",
+      "variant_record": "one concrete prompt/template row after expanding surface_variants"
+    },
+    "sealed_sample_records": 768,
+    "sealed_variant_records": 1536,
+    "split_count": 3,
+    "subprotocols": 2,
+    "templates": 2,
+    "truth_roles_per_pair": 2
+  },
+  "created_at": "2026-07-17T03:08:18.909842+00:00",
+  "distances": [
+    "cosine_distance",
+    "euclidean_distance"
+  ],
+  "forbidden": [
+    "head_scan",
+    "channel_scan",
+    "neuron_scan",
+    "sealed_split_read",
+    "post_result_projection_change"
+  ],
+  "label_mappings": [
+    "mu_ab",
+    "mu_ba"
+  ],
+  "layer_families": {
+    "early": [
+      0,
+      8
+    ],
+    "final": [
+      40,
+      40
+    ],
+    "late": [
+      33,
+      39
+    ],
+    "mid_back": [
+      21,
+      32
+    ],
+    "mid_front": [
+      9,
+      20
+    ]
+  },
+  "mapping_visible_gate": "D_mu < D_cf",
+  "primary_quality": "Q_R = (D_cf - D_surface) / (D_cf + D_surface + eps)",
+  "projection": {
+    "dimension_k": 256,
+    "entry_values": [
+      "-1/sqrt(k)",
+      "+1/sqrt(k)"
+    ],
+    "frozen_before_model_run": true,
+    "seed": 48220260716,
+    "type": "rademacher"
+  },
+  "roles": [
+    "evidence_block_end",
+    "claim_end",
+    "label_instruction_end",
+    "terminal_token"
+  ],
+  "schema_version": "phase482_relation_geometry_protocol.v1",
+  "splits": {
+    "open": [
+      "geometry_window_freeze",
+      "physical_prediction_holdout"
+    ],
+    "pairs_per_split": 96,
+    "phase482_may_read": [
+      "geometry_window_freeze",
+      "physical_prediction_holdout"
+    ],
+    "phase482_must_not_read": [
+      "sealed_physical_holdout"
+    ],
+    "sealed": "sealed_physical_holdout"
+  },
+  "status": "static_protocol_frozen_no_model_run_no_cuda",
+  "subprotocols": [
+    "label_post_relation_geometry",
+    "label_pre_mapping_visible_control"
+  ],
+  "templates": [
+    "records_claim",
+    "claim_records"
+  ]
+}

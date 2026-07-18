@@ -1,0 +1,109 @@
+{
+  "balance": {
+    "answer_by_mapping_truth": {
+      "('mu_ab', False, 'B')": 576,
+      "('mu_ab', True, 'A')": 576,
+      "('mu_ba', False, 'A')": 576,
+      "('mu_ba', True, 'B')": 576
+    },
+    "mapping_by_split": {
+      "('geometry_window_freeze', 'mu_ab')": 384,
+      "('geometry_window_freeze', 'mu_ba')": 384,
+      "('physical_prediction_holdout', 'mu_ab')": 384,
+      "('physical_prediction_holdout', 'mu_ba')": 384,
+      "('sealed_physical_holdout', 'mu_ab')": 384,
+      "('sealed_physical_holdout', 'mu_ba')": 384
+    },
+    "pass": true,
+    "split": {
+      "geometry_window_freeze": 768,
+      "physical_prediction_holdout": 768,
+      "sealed_physical_holdout": 768
+    },
+    "subprotocol_by_split": {
+      "('geometry_window_freeze', 'label_post_relation_geometry')": 384,
+      "('geometry_window_freeze', 'label_pre_mapping_visible_control')": 384,
+      "('physical_prediction_holdout', 'label_post_relation_geometry')": 384,
+      "('physical_prediction_holdout', 'label_pre_mapping_visible_control')": 384,
+      "('sealed_physical_holdout', 'label_post_relation_geometry')": 384,
+      "('sealed_physical_holdout', 'label_pre_mapping_visible_control')": 384
+    },
+    "track": {
+      "core_surface_light": 2304,
+      "core_surface_plain": 2304,
+      "identity": 2304,
+      "order_stress_claim_first": 2304
+    },
+    "truth_by_split": {
+      "('geometry_window_freeze', False)": 384,
+      "('geometry_window_freeze', True)": 384,
+      "('physical_prediction_holdout', False)": 384,
+      "('physical_prediction_holdout', True)": 384,
+      "('sealed_physical_holdout', False)": 384,
+      "('sealed_physical_holdout', True)": 384
+    },
+    "variant_class": {
+      "core_surface": 4608,
+      "identity": 2304,
+      "order_stress": 2304
+    }
+  },
+  "count_contract": {
+    "actual_sample_records": 2304,
+    "actual_variant_records": 9216,
+    "expected_sample_records": 2304,
+    "expected_variant_records": 9216,
+    "open_variant_records": 6144,
+    "pass": true,
+    "sealed_variant_records": 3072
+  },
+  "created_at": "2026-07-17T04:15:09.089278+00:00",
+  "schema_version": "phase484_core_surface_static_audit.v1",
+  "static_baselines": {
+    "failing_baselines": [],
+    "pass": true,
+    "reports": {
+      "constant_A": {
+        "accuracy": 0.5,
+        "correct": 4608,
+        "n": 9216
+      },
+      "constant_B": {
+        "accuracy": 0.5,
+        "correct": 4608,
+        "n": 9216
+      },
+      "mu_ab": {
+        "accuracy": 0.5,
+        "correct": 4608,
+        "n": 9216
+      },
+      "truth_only_without_mapping": {
+        "accuracy": 0.5,
+        "correct": 4608,
+        "n": 9216
+      },
+      "truth_plus_mapping_oracle": {
+        "accuracy": 1.0,
+        "correct": 9216,
+        "n": 9216
+      },
+      "variant_core": {
+        "accuracy": 0.5,
+        "correct": 4608,
+        "n": 9216
+      },
+      "variant_stress": {
+        "accuracy": 0.5,
+        "correct": 4608,
+        "n": 9216
+      }
+    }
+  },
+  "status": "static_pass_no_model_run",
+  "topology": {
+    "failure_count": 0,
+    "failures": [],
+    "pass": true
+  }
+}

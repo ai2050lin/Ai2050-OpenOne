@@ -1,0 +1,48 @@
+{
+  "created_at": "2026-07-17T04:15:09.089262+00:00",
+  "distance_definitions": {
+    "d_cf": "true vs false counterfactual with same track",
+    "d_core": "core_surface_plain vs core_surface_light with topology preserved",
+    "d_identity": "identity vs identity repeated forward/noise track",
+    "d_stress": "core_surface_plain vs order_stress_claim_first"
+  },
+  "forbidden": [
+    "sealed_split_read",
+    "head_scan",
+    "channel_scan",
+    "neuron_scan",
+    "post_result_surface_change"
+  ],
+  "pairs_per_split": 96,
+  "quality_definitions": {
+    "q_core": "(D_cf - D_core)/(D_cf + D_core + eps)",
+    "q_stress": "(D_cf - D_stress)/(D_cf + D_stress + eps)",
+    "t_topology": "(D_stress - D_core)/(D_stress + D_core + eps)"
+  },
+  "schema_version": "phase484_core_surface_protocol.v1",
+  "splits": {
+    "open": [
+      "geometry_window_freeze",
+      "physical_prediction_holdout"
+    ],
+    "phase484_may_read": [
+      "geometry_window_freeze",
+      "physical_prediction_holdout"
+    ],
+    "phase484_must_not_read": [
+      "sealed_physical_holdout"
+    ],
+    "sealed": "sealed_physical_holdout"
+  },
+  "status": "static_protocol_frozen_no_model_run_no_cuda",
+  "subprotocols": [
+    "label_post_relation_geometry",
+    "label_pre_mapping_visible_control"
+  ],
+  "variant_tracks": [
+    "identity",
+    "core_surface_plain",
+    "core_surface_light",
+    "order_stress_claim_first"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "behavior_gate": {
+    "all_open_splits_required": true,
+    "overall_lcb95_min": 0.9,
+    "pair_flip_exact_lcb95_min": 0.82,
+    "surface_lcb95_min": 0.88,
+    "unrecoverable_ucb95_max": 0.05,
+    "world_exact_lcb95_min": 0.78
+  },
+  "confirmation_rules": [
+    "No threshold, direction, continuation, or gate may be fitted on Phase540 data.",
+    "Only Phase539-qualified models may load weights.",
+    "Both open confirmation splits must pass; the sealed split remains unread.",
+    "A pass authorizes observational physical collection, not a mechanism or causal claim."
+  ],
+  "created_at": "2026-07-18T03:36:48.120303+00:00",
+  "evidence_boundaries": {
+    "causal": false,
+    "current_phase540_sealed_read": false,
+    "fresh_relations": true,
+    "fresh_vocabulary": true,
+    "historical_phase535_sealed_read": true,
+    "physical_state_collected": false
+  },
+  "fresh_confirmation_candidate_models": [
+    "qwen3"
+  ],
+  "frozen_observer_ledgers": {
+    "qwen3": {
+      "path": "tests/gpt5/result/phase539_pair_answer_logodds_observer/phase539_qwen3_frozen_discovery_ledger.json",
+      "sha256": "bf88cfd0567a4704ef11e368f9fe02837acd884358b427958cdc22946bad69c3"
+    }
+  },
+  "historical_phase535_sealed_compromised_by_initial_phase540_audit": true,
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase535_contract_path": "tests/gpt5/result/phase535_pair_addressed_binding_protocol/phase535_frozen_contract.json",
+  "phase535_contract_sha256": "9fd3faef2c6fc63db660152c4754572794350d1e36d7273b24a4a7b5756f3a97",
+  "phase535_prior_splits_read": [
+    "discovery",
+    "entity_prediction",
+    "relation_prediction"
+  ],
+  "phase535_sealed_split_read_by_current_protocol": false,
+  "phase539_authorization_path": "tests/gpt5/result/phase539_pair_answer_logodds_observer/phase539_fresh_confirmation_authorization.json",
+  "phase539_authorization_sha256": "085e7af7fb0cdcdf441fa3b1a0313f789ae5a87fbe4c78028c9d5962d9ed2a6d",
+  "schema_version": "phase540_pair_answer_logodds_fresh_protocol.v2",
+  "source_path": "tests/gpt5/phase540_pair_answer_logodds_fresh_protocol.py",
+  "source_sha256": "dd777f16d0a47f7c23ab420ad1b14ad6d6458ed43eb19b32a965ea4c5ea145f1",
+  "split_files": {
+    "fresh_relation_confirmation": {
+      "path": "tests/gpt5/result/phase540_pair_answer_logodds_fresh_protocol/phase540_fresh_relation_confirmation.jsonl",
+      "row_count": 2048,
+      "sealed": false,
+      "sha256": "7a79bdb0ab948a37c96253f6be945e002e866880345fd94b56212c1b93654685",
+      "source_group_count": 128
+    },
+    "fresh_vocabulary_confirmation": {
+      "path": "tests/gpt5/result/phase540_pair_answer_logodds_fresh_protocol/phase540_fresh_vocabulary_confirmation.jsonl",
+      "row_count": 2048,
+      "sealed": false,
+      "sha256": "6645e7418181857d813e9dd429473b890702174eff822eefe857ec01d2367073",
+      "source_group_count": 128
+    },
+    "sealed": {
+      "path": "tests/gpt5/result/phase540_pair_answer_logodds_fresh_protocol/phase540_sealed.jsonl",
+      "row_count": 2048,
+      "sealed": true,
+      "sha256": "04c764c640915749b1c66c2661257be009f70cf4f985482cc3a5ac9eb827624c",
+      "source_group_count": 128
+    }
+  },
+  "status": "frozen_before_fresh_model_execution"
+}

@@ -1,0 +1,147 @@
+{
+  "behavior_gate": {
+    "all_open_splits_required": true,
+    "four_way_lcb95_min": 0.82,
+    "overall_lcb95_min": 0.9,
+    "surface_lcb95_min": 0.88,
+    "unrecoverable_ucb95_max": 0.05
+  },
+  "created_at": "2026-07-18T01:40:00.164347+00:00",
+  "evidence_boundaries": {
+    "causal_intervention": false,
+    "entity_register_is_natural_unprompted_state": false,
+    "head_channel_neuron_scan": false,
+    "pair_observer_is_model_mechanism": false,
+    "prediction_is_compute_edge": false,
+    "sealed_read": false,
+    "temporal_order_is_transport": false
+  },
+  "models_in_required_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "natural_event_sentences": {
+    "false": "The statement is contradicted.",
+    "true": "The statement is supported."
+  },
+  "physical_design": {
+    "direction_test": "true directed edge score must exceed its reverse edge score",
+    "discovery_gate": {
+      "balanced_edge_lcb95_min": 0.82,
+      "directional_lcb95_min": 0.7,
+      "embedding_gain_min": 0.1,
+      "exact_graph_lcb95_min": 0.45,
+      "outgoing_top1_lcb95_min": 0.7,
+      "position_baseline_gain_min": 0.15
+    },
+    "group_folds": 4,
+    "minimum_contiguous_depth_bins": 2,
+    "minimum_fold_passes": 3,
+    "observer_scaffold": "query-free neutral entity register after complete world evidence",
+    "pair_feature": [
+      "target_minus_source",
+      "source_hadamard_target"
+    ],
+    "pair_feature_is_mechanism": false,
+    "phase524_platform_targets": [
+      {
+        "layers": [
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "legacy_role": "claim_entity_end",
+        "role": "claim_target_end"
+      },
+      {
+        "layers": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "legacy_role": "claim_end",
+        "role": "claim_end"
+      }
+    ],
+    "pipeline_permutation_count": 1024,
+    "pipeline_permutation_seed": 526901,
+    "prediction_gate": {
+      "balanced_edge_lcb95_min": 0.85,
+      "both_surfaces_required": true,
+      "directional_lcb95_min": 0.75,
+      "exact_graph_lcb95_min": 0.5,
+      "outgoing_top1_lcb95_min": 0.75
+    },
+    "projection_consensus_required": 2,
+    "projection_dimension": 48,
+    "projection_seeds": [
+      518031,
+      518037,
+      518041
+    ],
+    "relative_depth_bins": 8,
+    "swap_operator_fit_forbidden": true,
+    "world_matrix_test": "recover each source node's unique outgoing target; exact graph requires all four"
+  },
+  "schema_version": "phase526_role_normalized_world_geometry_protocol.v1",
+  "source_path": "tests/gpt5/phase526_role_normalized_world_geometry_protocol.py",
+  "source_sha256": "ea9f3ece82a366929ff8b535b4790bf2939b113185bfd915fb4ab5fed984d2e1",
+  "split_files": {
+    "bridge_open_prediction": {
+      "path": "tests/gpt5/result/phase526_role_normalized_world_geometry_protocol/phase526_bridge_open_prediction.jsonl",
+      "row_count": 768,
+      "sealed": false,
+      "sha256": "0bcd46df7938fbcd51e7c3d8bc1da0b6cbf7aa8425ebc524c8dade7b7068dcf7"
+    },
+    "sealed": {
+      "path": "tests/gpt5/result/phase526_role_normalized_world_geometry_protocol/phase526_sealed.jsonl",
+      "row_count": 768,
+      "sealed": true,
+      "sha256": "77745a279972d9144f45841ed7a0667b9eaa3d1c9c83e770c286de6d01359492"
+    },
+    "world_entity_prediction": {
+      "path": "tests/gpt5/result/phase526_role_normalized_world_geometry_protocol/phase526_world_entity_prediction.jsonl",
+      "row_count": 768,
+      "sealed": false,
+      "sha256": "805461eb906a4ed7b38811451a415ac4514e3fe03cf6f481deba47fa851e9a7c"
+    },
+    "world_fit": {
+      "path": "tests/gpt5/result/phase526_role_normalized_world_geometry_protocol/phase526_world_fit.jsonl",
+      "row_count": 384,
+      "sealed": false,
+      "sha256": "200862e0a0146488c5232f238f3363dff98caf235673d418afa15b52fe4a43e3"
+    },
+    "world_relation_prediction": {
+      "path": "tests/gpt5/result/phase526_role_normalized_world_geometry_protocol/phase526_world_relation_prediction.jsonl",
+      "row_count": 768,
+      "sealed": false,
+      "sha256": "c6794a3508daf13349adf11217ae5d44687aa274d34859035eab4affb0d19e81"
+    }
+  },
+  "stage_order": [
+    "behavior_qualification",
+    "world_fit_and_freeze",
+    "entity_holdout",
+    "relation_word_holdout",
+    "world_query_bridge_open_prediction",
+    "full_pipeline_permutation"
+  ],
+  "status": "frozen_before_model_execution",
+  "stop_rules": [
+    "No physical run for a model failing any open-split behavior gate.",
+    "No bridge claim if world geometry fails entity or relation-word holdout.",
+    "No transport claim from temporal order or predictive agreement alone.",
+    "No attention-head, channel, neuron, patching, or sealed-split run in this stage.",
+    "No result-contingent edits to features, bins, projections, thresholds, or permutations."
+  ],
+  "surfaces": [
+    "identity",
+    "natural_paraphrase"
+  ]
+}
