@@ -1,0 +1,85 @@
+{
+  "behavior_gate": {
+    "all_eight_cells_correct_lcb95_min": 0.9,
+    "both_independent_splits_required": true,
+    "unrecoverable_anchor_ucb95_max": 0.05
+  },
+  "created_at": "2026-07-18T08:14:51.453662+00:00",
+  "evidence_boundaries": {
+    "head_channel_neuron_search": false,
+    "new_sealed_split_read": false,
+    "observer_is_compute_edge": false,
+    "phase552_data_used_for_surface_selection": false,
+    "surface_scaffolds_selected_only_from_phase551_calibration": true
+  },
+  "factorial_cells": [
+    "route0_surface0_answer_a",
+    "route0_surface0_answer_b",
+    "route0_surface1_answer_a",
+    "route0_surface1_answer_b",
+    "route1_surface0_answer_a",
+    "route1_surface0_answer_b",
+    "route1_surface1_answer_a",
+    "route1_surface1_answer_b"
+  ],
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "observer_gate": {
+    "full_layer_components_and_roles": true,
+    "intervention_authorized": false,
+    "route_effect_compared_with_surface_and_answer_effects": true
+  },
+  "phase_id": "Phase552",
+  "registered_cases_path": "tests/gpt5/result/phase552_surface_route_answer/phase552_registered_cases.jsonl",
+  "registered_cases_sha256": "9b073eab6b7967ed98b6c2958562216b2ae5fe6fcc54c0212c858b8fc0e1e5ae",
+  "schema_version": "phase552_surface_route_answer_factorial.v1",
+  "splits": [
+    "discovery",
+    "independent_confirmation"
+  ],
+  "static_audit_path": "tests/gpt5/result/phase552_surface_route_answer/phase552_static_audit.json",
+  "static_audit_sha256": "eb842c7c287774bff89f391c90d71093baba5efdee0701026fe3a28fe6b47aea",
+  "surface_contracts": [
+    {
+      "family_id": "content_knowledge",
+      "mechanism_id": "category",
+      "model": "qwen3",
+      "phase551_validation_behavior_pass": true,
+      "surface0_scaffold_id": "prose",
+      "surface1_scaffold_id": "table",
+      "surface_selection_used_phase552_data": false
+    },
+    {
+      "family_id": "logical_reasoning",
+      "mechanism_id": "negated_attribute",
+      "model": "qwen3",
+      "phase551_validation_behavior_pass": true,
+      "surface0_scaffold_id": "compact",
+      "surface1_scaffold_id": "prose",
+      "surface_selection_used_phase552_data": false
+    },
+    {
+      "family_id": "content_knowledge",
+      "mechanism_id": "category",
+      "model": "glm4",
+      "phase551_validation_behavior_pass": true,
+      "surface0_scaffold_id": "prose",
+      "surface1_scaffold_id": "table",
+      "surface_selection_used_phase552_data": false
+    },
+    {
+      "family_id": "logical_reasoning",
+      "mechanism_id": "negated_attribute",
+      "model": "glm4",
+      "phase551_validation_behavior_pass": true,
+      "surface0_scaffold_id": "compact",
+      "surface1_scaffold_id": "prose",
+      "surface_selection_used_phase552_data": false
+    }
+  ],
+  "title": "Independent semantic route, surface form, and answer identity factorial",
+  "worlds_per_split": 73
+}

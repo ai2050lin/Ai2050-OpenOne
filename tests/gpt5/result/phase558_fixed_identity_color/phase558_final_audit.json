@@ -1,0 +1,92 @@
+{
+  "authorized_models": [],
+  "checks": {
+    "all_behavior_runs_cuda_bf16": true,
+    "atlas_contains_no_physical_or_causal_claim": true,
+    "atlas_registered": true,
+    "closure_still_zero_of_72": true,
+    "counterfactual_pairs_valid": true,
+    "cross_split_objects_disjoint": true,
+    "glm_failures_are_registered_distractors": true,
+    "no_internal_artifact_after_gate_failure": true,
+    "no_model_authorized_for_internal_collection": true,
+    "open_denominator_27648": true,
+    "qwen_failure_count_9": true,
+    "qwen_failures_are_field_name_only": true,
+    "registered_denominator_33792": true,
+    "sealed_denominator_6144": true,
+    "sealed_never_read": true,
+    "static_protocol_valid": true,
+    "three_model_behavior_complete": true
+  },
+  "created_at": "2026-07-19T01:53:54.183754+00:00",
+  "mechanism_denominator": 72,
+  "model_behavior": {
+    "deepseek7b": {
+      "confirmation_min_cell_lcb": 0.38101888493214947,
+      "confirmation_world_all32_rate": 0.03125,
+      "discovery_min_cell_lcb": 0.28055388546896454,
+      "discovery_world_all32_rate": 0.015625,
+      "failure_count": 2240,
+      "failure_event_counts": {
+        "registered_distractor": 445,
+        "unrecoverable": 1795
+      },
+      "semantic_accuracy": 0.7569444444444444,
+      "strict_sequence_accuracy": 0.7546657986111112
+    },
+    "glm4": {
+      "confirmation_min_cell_lcb": 0.8298024712135222,
+      "confirmation_world_all32_rate": 0.765625,
+      "discovery_min_cell_lcb": 0.8101690141672233,
+      "discovery_world_all32_rate": 0.765625,
+      "failure_count": 125,
+      "failure_event_counts": {
+        "registered_distractor": 125
+      },
+      "semantic_accuracy": 0.9864366319444444,
+      "strict_sequence_accuracy": 0.0
+    },
+    "qwen3": {
+      "confirmation_min_cell_lcb": 0.9166570109970937,
+      "confirmation_world_all32_rate": 0.984375,
+      "discovery_min_cell_lcb": 0.8930250611770575,
+      "discovery_world_all32_rate": 0.9375,
+      "failure_count": 9,
+      "failure_event_counts": {
+        "unrecoverable": 9
+      },
+      "semantic_accuracy": 0.9990234375,
+      "strict_sequence_accuracy": 0.9990234375
+    }
+  },
+  "negative_results_and_hard_limits": [
+    "No model passed every frozen discovery and confirmation confidence gate.",
+    "Qwen3 missed the discovery minimum-cell LCB by 0.00697 due two table-surface failures in one cell.",
+    "GLM4 often emitted the nontarget color before the target and failed world closure.",
+    "DS7B had broad unrecoverable and registered-distractor failures.",
+    "No hidden-state, component, head, channel, parameter, neuron, or sealed claim is authorized."
+  ],
+  "next_phase": "Phase559: independently preregister a larger exact-contract behavior replication to resolve Qwen3 cell-level uncertainty without changing thresholds or inspecting hidden states.",
+  "open_behavior_generation_count": 27648,
+  "phase_id": "Phase558",
+  "positive_results": [
+    "The fixed-identity counterfactual contract removed the Phase557 object-identity confound.",
+    "Qwen3 achieved 99.90% open semantic accuracy and strong world closure across all splits.",
+    "All three models completed the same large frozen denominator with no sealed reads."
+  ],
+  "progress_estimates": {
+    "estimate_type": "evidence-weighted project management estimate, not a measured statistic",
+    "global_physical_atlas_coverage_percent": 33.0,
+    "overall_scientific_maturity_percent": 30.0,
+    "strict_mechanism_closure_percent": 0.0
+  },
+  "registered_case_count": 33792,
+  "schema_version": "phase558_final_audit.v1",
+  "sealed_case_count_unread": 6144,
+  "sealed_split_read": false,
+  "strict_closed_mechanisms": 0,
+  "theory_update": "Phase558 adds no physical mechanism. It shows that fixed-identity color binding is behaviorally near-stable on Qwen3 but not yet qualified under the frozen confidence gate.",
+  "unexpected_internal_artifacts": [],
+  "valid": true
+}

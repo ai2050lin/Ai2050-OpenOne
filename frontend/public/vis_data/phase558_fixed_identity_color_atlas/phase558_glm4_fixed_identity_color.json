@@ -1,0 +1,123 @@
+{
+  "evidence_scope": "fixed-identity behavior only; no physical collection or causal edge",
+  "generated_at": "2026-07-19T01:53:43.194966+00:00",
+  "graph": {
+    "edges": [
+      {
+        "causal": false,
+        "compute_edge": false,
+        "evidence_level": "behavior",
+        "id": "phase558:glm4:gate_stop",
+        "label": "冻结行为门失败",
+        "predictive": false,
+        "score": 1.0,
+        "source": "phase558:glm4:fixed_identity_contract",
+        "target": "phase558:glm4:failure_boundary",
+        "type": "authorization_stop"
+      },
+      {
+        "causal": false,
+        "compute_edge": false,
+        "evidence_level": "protocol",
+        "id": "phase558:glm4:stop_next",
+        "label": "新阶段独立复制",
+        "predictive": false,
+        "score": 1.0,
+        "source": "phase558:glm4:failure_boundary",
+        "target": "phase558:glm4:next_boundary",
+        "type": "preregistered_next_step"
+      }
+    ],
+    "meta": {
+      "internal_collection_authorized": false,
+      "mechanism_denominator": 72,
+      "model": "glm4",
+      "open_case_count": 9216,
+      "sealed_case_count_unread": 2048,
+      "strict_closed_mechanisms": 0
+    },
+    "nodes": [
+      {
+        "behavior_gate_pass": false,
+        "causal": false,
+        "color": "#f59e0b",
+        "compute_edge": false,
+        "confirmation_min_cell_lcb": 0.8298024712135222,
+        "confirmation_world_all32_rate": 0.765625,
+        "discovery_min_cell_lcb": 0.8101690141672233,
+        "discovery_world_all32_rate": 0.765625,
+        "family_id": "semantic_knowledge",
+        "id": "phase558:glm4:fixed_identity_contract",
+        "label": "GLM4（智谱GLM4） / 固定对象颜色配对32格合同",
+        "mechanism_id": "fixed_identity_color_binding",
+        "model": "glm4",
+        "observer": true,
+        "physical": false,
+        "pipeline_sealed": false,
+        "position": [
+          -36.0,
+          0.0,
+          0.0
+        ],
+        "score": 0.765625,
+        "show_label": true,
+        "single_neuron": false,
+        "type": "behavior_contract"
+      },
+      {
+        "causal": false,
+        "color": "#ef4444",
+        "compute_edge": false,
+        "failure_count": 125,
+        "failure_event_counts": {
+          "registered_distractor": 125
+        },
+        "failure_rate": 0.013563368055555556,
+        "family_id": "semantic_knowledge",
+        "id": "phase558:glm4:failure_boundary",
+        "label": "GLM4（智谱GLM4） / 行为门停止，内部采集未授权",
+        "mechanism_id": "fixed_identity_color_binding",
+        "model": "glm4",
+        "observer": true,
+        "physical": false,
+        "pipeline_sealed": false,
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "score": 0.0,
+        "show_label": true,
+        "single_neuron": false,
+        "stop_reason": "frozen_behavior_gate_failed",
+        "type": "physical_collection_stop"
+      },
+      {
+        "causal": false,
+        "color": "#64748b",
+        "compute_edge": false,
+        "family_id": "semantic_knowledge",
+        "id": "phase558:glm4:next_boundary",
+        "label": "GLM4（智谱GLM4） / 仅允许独立大样本行为复制",
+        "mechanism_id": "fixed_identity_color_binding",
+        "model": "glm4",
+        "next_action": "independent_large_denominator_replication_without_gate_change",
+        "observer": true,
+        "physical": false,
+        "pipeline_sealed": false,
+        "position": [
+          36.0,
+          0.0,
+          0.0
+        ],
+        "score": 0.0,
+        "show_label": true,
+        "single_neuron": false,
+        "type": "next_test_boundary"
+      }
+    ]
+  },
+  "model": "glm4",
+  "phase_id": "Phase558",
+  "schema_version": "phase558_fixed_identity_color_atlas.v1"
+}

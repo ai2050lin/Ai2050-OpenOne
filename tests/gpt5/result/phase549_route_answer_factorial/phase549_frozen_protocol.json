@@ -1,0 +1,83 @@
+{
+  "behavior_gate": {
+    "all_four_cells_correct_lcb95_min": 0.9,
+    "discovery_and_independent_confirmation_required": true,
+    "unrecoverable_anchor_ucb95_max": 0.05
+  },
+  "created_at": "2026-07-18T07:20:34.035160+00:00",
+  "evidence_boundaries": {
+    "factorial_observation_is_compute_edge": false,
+    "head_channel_neuron_search": false,
+    "new_sealed_split_read": false,
+    "phase548_shared_compute_route_closed": true
+  },
+  "factorial_cells": [
+    "route0_answer_a",
+    "route1_answer_a",
+    "route0_answer_b",
+    "route1_answer_b"
+  ],
+  "frozen_windows": {
+    "deepseek7b": {
+      "target_layers": [],
+      "wrong_layers": []
+    },
+    "glm4": {
+      "target_layers": [
+        34,
+        35,
+        36
+      ],
+      "wrong_layers": [
+        15,
+        16,
+        17
+      ]
+    },
+    "qwen3": {
+      "target_layers": [
+        28,
+        29,
+        30
+      ],
+      "wrong_layers": [
+        12,
+        13,
+        14
+      ]
+    }
+  },
+  "independent_worlds_per_mechanism_split": 73,
+  "mechanisms": [
+    "category",
+    "negated_attribute"
+  ],
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "observer_interpretation": {
+    "answer_dominance_fraction_min": 0.7,
+    "compute_intervention_authorized": false,
+    "one_sided_sign_flip_permutation_p_max": 0.01,
+    "permutation_count": 1024,
+    "route_dominance_fraction_min": 0.7
+  },
+  "phase_id": "Phase549",
+  "primary_comparison": {
+    "answer_identity_effect": "same route, different answer",
+    "no_layer_or_threshold_selection": true,
+    "route_effect": "same answer, different route"
+  },
+  "registered_cases_path": "tests/gpt5/result/phase549_route_answer_factorial/phase549_registered_cases.jsonl",
+  "registered_cases_sha256": "128fd3a40d23724a346fcd73ce614ffb38eed1059b09b4ffda2a7194a3173f8f",
+  "schema_version": "phase549_route_answer_factorial.v1",
+  "splits": [
+    "discovery",
+    "independent_confirmation"
+  ],
+  "static_audit_path": "tests/gpt5/result/phase549_route_answer_factorial/phase549_static_audit.json",
+  "static_audit_sha256": "5f06f01c6311771888cc0781d0877a9941f04d453e919edbd6ef08ce7cf6dd4b",
+  "title": "Route-by-answer factorial decomposition of late-attention geometry"
+}

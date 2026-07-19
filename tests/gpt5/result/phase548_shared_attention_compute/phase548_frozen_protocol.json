@@ -1,0 +1,122 @@
+{
+  "behavior_gate": {
+    "all_splits_required": true,
+    "all_variants_required": true,
+    "independent_anchor_all_variants_correct_lcb95_min": 0.9,
+    "unrecoverable_anchor_ucb95_max": 0.05
+  },
+  "created_at": "2026-07-18T07:09:19.355141+00:00",
+  "evidence_boundaries": {
+    "content_identity_control_required": true,
+    "deepseek_physical_window_registered": false,
+    "head_channel_neuron_search": false,
+    "new_sealed_split_read": false,
+    "phase546_observer_is_compute_edge": false,
+    "small_model_error_percent_empirically_measured": false,
+    "whole_attention_output_is_attention_head_mechanism": false
+  },
+  "frozen_windows": {
+    "deepseek7b": {
+      "target_layers": [],
+      "wrong_layers": []
+    },
+    "glm4": {
+      "target_layers": [
+        34,
+        35,
+        36
+      ],
+      "wrong_layers": [
+        15,
+        16,
+        17
+      ]
+    },
+    "qwen3": {
+      "target_layers": [
+        28,
+        29,
+        30
+      ],
+      "wrong_layers": [
+        12,
+        13,
+        14
+      ]
+    }
+  },
+  "independent_worlds_per_mechanism_split": 73,
+  "intervention_gate": {
+    "alphas": [
+      0.5,
+      1.0
+    ],
+    "authorized_only_after_behavior_and_observer_gates": true,
+    "candidate_margin_is_secondary": true,
+    "natural_semantic_event_is_primary": true,
+    "required_controls": [
+      "wrong_layer",
+      "wrong_role",
+      "norm_matched_random",
+      "orthogonal",
+      "identity",
+      "answer_token",
+      "template",
+      "reverse_sign"
+    ],
+    "single_neuron_scan_allowed": false,
+    "target_component": "attention_output",
+    "target_role": "current_prompt_end"
+  },
+  "matched_variants": [
+    "base_plus",
+    "functional_minus",
+    "identity_control",
+    "answer_token_control",
+    "template_control"
+  ],
+  "mechanisms": [
+    "category",
+    "negated_attribute"
+  ],
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "observer_deconfounding_gate": {
+    "discovery_and_independent_confirmation_both_required": true,
+    "frozen_platform_aggregation": "three-layer concatenated Euclidean geometry",
+    "functional_delta_median_must_exceed": [
+      "identity_delta",
+      "answer_token_delta",
+      "template_delta"
+    ],
+    "one_sided_sign_flip_permutation_p_max": 0.01,
+    "paired_dominance_fraction_min": 0.7,
+    "permutation_count": 1024,
+    "selection_updates_allowed": false
+  },
+  "phase_id": "Phase548",
+  "registered_cases_path": "tests/gpt5/result/phase548_shared_attention_compute/phase548_registered_cases.jsonl",
+  "registered_cases_sha256": "75a4dbefa23d9cfdde5fe2d6b16b9f8297175b2004faf7d635e440df9bd1df1c",
+  "schema_version": "phase548_shared_attention_compute.v1",
+  "source_phase546_frozen_events": "tests/gpt5/result/phase546_upstream_physical_prediction/phase546_frozen_upstream_events.jsonl",
+  "splits": [
+    "discovery",
+    "independent_confirmation"
+  ],
+  "static_audit_path": "tests/gpt5/result/phase548_shared_attention_compute/phase548_static_audit.json",
+  "static_audit_sha256": "3a475ab95ea0f48efe9e46a9d7bccd153fc897f9388e8239da9b287bc9186bce",
+  "stopping_rules": {
+    "behavior_failure": "no physical collection for that model-mechanism cell",
+    "both_mechanisms_fail": "close the current shared late-attention compute route",
+    "control_explains_observer": "close shared functional-platform interpretation",
+    "control_matches_intervention": "record distributed perturbation, not compute edge",
+    "margin_only_effect": "not a compute edge",
+    "observer_reconfirmation_failure": "no intervention for that cell",
+    "one_model_only": "model-specific candidate only",
+    "post_result_threshold_or_window_change_allowed": false
+  },
+  "title": "Matched-control qualification of the shared late-attention observer platform"
+}

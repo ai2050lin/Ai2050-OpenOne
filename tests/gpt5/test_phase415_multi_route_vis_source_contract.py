@@ -81,6 +81,9 @@ class Phase415MultiRouteVisSourceContractTest(unittest.TestCase):
         self.assertIn("selectDataSource", hook)
         self.assertIn('aria-label="主工作台测试路线数据源"', main_client)
         self.assertIn('aria-label="主工作台测试数据集"', main_client)
+        self.assertIn('aria-label="主工作台模型架构"', main_client)
+        self.assertIn("VIS_DATASET_MODEL_KEYS", main_client)
+        self.assertIn("activeVisManifestFile?.model || visData?.model", main_client)
 
 
 if __name__ == "__main__":

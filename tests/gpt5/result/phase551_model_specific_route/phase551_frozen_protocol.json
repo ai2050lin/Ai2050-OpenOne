@@ -1,0 +1,70 @@
+{
+  "calibration_audit_path": "tests/gpt5/result/phase551_model_specific_route/phase551_calibration_static_audit.json",
+  "calibration_audit_sha256": "fbbfdfb913334beb8cf69b3811bd45d3dcaad5830c4ce9ec68936e73392c4bea",
+  "calibration_cases_path": "tests/gpt5/result/phase551_model_specific_route/phase551_calibration_cases.jsonl",
+  "calibration_cases_sha256": "eed2363aec85b5ac5efab5a601fc13e67da5952ee7c32bf9a753a852ebe0d212",
+  "calibration_selection_gate": {
+    "all_four_correct_anchor_min": 22,
+    "each_cell_correct_min": 23,
+    "selection_tie_break": "all_anchor_count,min_cell_count,mean_prompt_length,scaffold_order",
+    "unrecoverable_anchor_max": 1
+  },
+  "calibration_worlds_per_scaffold_mechanism_model": 24,
+  "created_at": "2026-07-18T07:53:59.015293+00:00",
+  "evidence_boundaries": {
+    "calibration_is_mechanism_evidence": false,
+    "full_layer_observer_is_compute_edge": false,
+    "new_sealed_split_read": false,
+    "validation_behavior_is_physical_evidence": false
+  },
+  "factorial_cells": [
+    "route0_answer_a",
+    "route1_answer_a",
+    "route0_answer_b",
+    "route1_answer_b"
+  ],
+  "mechanisms": [
+    "category",
+    "negated_attribute",
+    "transitive_order",
+    "subject_verb_agreement"
+  ],
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "observer_gate": {
+    "components": [
+      "layer_input",
+      "attention_output",
+      "mlp_output",
+      "layer_output"
+    ],
+    "full_layer": true,
+    "head_channel_neuron_search": false,
+    "intervention_authorized": false,
+    "prompt_end_only": true,
+    "roles": [
+      "source",
+      "query",
+      "current"
+    ]
+  },
+  "phase_id": "Phase551",
+  "scaffolds": [
+    "prose",
+    "explicit_candidates",
+    "table",
+    "compact",
+    "guarded"
+  ],
+  "schema_version": "phase551_model_specific_route_contract.v1",
+  "title": "Model-specific same-answer route contracts before full-layer observation",
+  "validation_behavior_gate": {
+    "all_four_cells_correct_lcb95_min": 0.9,
+    "both_independent_splits_required": true,
+    "unrecoverable_anchor_ucb95_max": 0.05
+  },
+  "validation_worlds_per_split": 73
+}

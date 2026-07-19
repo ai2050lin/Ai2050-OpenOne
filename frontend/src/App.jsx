@@ -68,6 +68,12 @@ import {
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
+const VIS_DATASET_MODEL_KEYS = {
+  qwen3: 'qwen3-4b',
+  glm4: 'glm4-9b',
+  deepseek7b: 'ds7b',
+};
+
 const FP_SUB_PHASES = [
   { id: 'input', label: 'Input', color: '#94a3b8' },
   { id: 'ln1', label: 'LN₁', color: '#818cf8' },
@@ -1670,6 +1676,14 @@ export default function App() {
     setLayerAnimProgress(0);
   }, [resetForwardPass]);
 
+  // Keep the architecture shell aligned with the model declared by atlas data.
+  useEffect(() => {
+    if (fpMode !== 'demo') return;
+    const declaredModel = activeVisManifestFile?.model || visData?.model;
+    const modelKey = VIS_DATASET_MODEL_KEYS[declaredModel];
+    if (modelKey && modelKey !== fpModel) handleFpModelChange(modelKey);
+  }, [activeVisManifestFile?.model, fpMode, fpModel, handleFpModelChange, visData?.model]);
+
   // Forward pass按真实组件逐步推进。
   useEffect(() => {
     if (!fpPlaying || fpCurrentLayer == null) return;
@@ -2895,7 +2909,10 @@ export default function App() {
                       <Brain size={14} color="#a855f7" />
                       模型
                     </div>
-                    <select value={fpModel} onChange={(e) => handleFpModelChange(e.target.value)}
+                    <select
+                      aria-label="主工作台模型架构"
+                      value={fpModel}
+                      onChange={(e) => handleFpModelChange(e.target.value)}
                       style={{
                         width: '100%', padding: '8px 10px',
                         background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.25)',
