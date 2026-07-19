@@ -1,0 +1,575 @@
+{
+  "task": "task6_large_rollout",
+  "model": "deepseek7b",
+  "primary_head": "L26_H19",
+  "n_prompts": 15,
+  "max_tokens": 40,
+  "summary": {
+    "normal": {
+      "eos_rate": 0.06666666666666667,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.06666666666666667,
+      "mean_tokens": 39.333333333333336
+    },
+    "ablate_lock": {
+      "eos_rate": 0.06666666666666667,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.06666666666666667,
+      "mean_tokens": 39.333333333333336
+    },
+    "reverse_lock_2.0": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    },
+    "rev2.0+boost_eos": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    }
+  },
+  "raw_results": [
+    {
+      "prompt": "The capital of France is",
+      "condition": "normal",
+      "generated": " Paris.\n\nYes, Paris is the capital of France.\n\n</think>\n\nThe capital of France is Paris.\n\nYes, Paris is the capital of France.<｜end▁of▁sentence｜>",
+      "has_eos": true,
+      "n_tokens": 30,
+      "strict_clean": false,
+      "lang_switched": true
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "ablate_lock",
+      "generated": " Paris.\n\nYes, Paris is the capital of France.\n\n</think>\n\nThe capital of France is Paris.\n\nYes, Paris is the capital of France.<｜end▁of▁sentence｜>",
+      "has_eos": true,
+      "n_tokens": 30,
+      "strict_clean": false,
+      "lang_switched": true
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "reverse_lock_2.0",
+      "generated": " \\boxed{Paris}.\n\nOkay, so I need to figure out the capital of France. Hmm, I remember learning about France in history class. I think Paris is the capital, but I'm",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " \\boxed{Paris}.\n\nOkay, so I need to figure out the capital of France. Hmm, I remember learning about France in history class. I think Paris is the capital, but I'm",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "normal",
+      "generated": " Jupiter. Jupiter is about 11 times the mass of Earth. If Earth's mass is 5.97 × 10^24 kg, what is the mass of Jupiter in",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "ablate_lock",
+      "generated": " \\boxed{Jupiter}.\n\n**Step-by-Step Explanation:**\n\n1. **Understanding the Question:**  \n   The question is asking for the name of the largest planet in our solar system.\n\n",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "reverse_lock_2.0",
+      "generated": " \\boxed{Jupiter}.\n\n**Step-by-Step Explanation:**\n\n1. **Understanding the Question:**\n   - The question is asking for the name of the largest planet in our solar system",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " \\boxed{Jupiter}.\n\n**Step-by-Step Explanation:**\n\n1. **Understanding the Question:**  \n   The question is asking for the name of the largest planet in our solar system.\n\n",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "normal",
+      "generated": " 60°C at a certain atmospheric pressure. What is the boiling point of water at this pressure?\n\nWait, that seems a bit confusing. Let me read it again.\n\n\"Water boils at ",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "ablate_lock",
+      "generated": " 61°C on the Kelvin scale. Wait, no, that's not right. Water boils at 100°C on the Celsius scale, which is 373.15",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "reverse_lock_2.0",
+      "generated": " 60°C at a certain atmospheric pressure. What is the boiling point of water at this pressure?\n\nWait, that seems a bit confusing. Let me read it again.\n\n\"Water boils at ",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "rev2.0+boost_eos",
+      "generated": " 60°C at a certain atmospheric pressure. What is the boiling point of water at this pressure?\n\nWait, that seems a bit confusing. Let me read it again.\n\n\"Water boils at ",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "normal",
+      "generated": " \\(1.8 \\times 10^{11}\\) meters per second. How many seconds would it take for light to travel \\(1.2 \\times 10^{10",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "ablate_lock",
+      "generated": " \\( c = 299,792,458 \\) meters per second. Let \\( \\mathcal{M} \\) be a set of all possible Minkowski",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "reverse_lock_2.0",
+      "generated": " \\( c = 299,792,458 \\) meters per second. The speed of light in a vacuum is a constant. The speed of light in a medium is",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " \\( c = 299,792,458 \\) meters per second. The speed of light in a vacuum is a constant. The speed of light in a medium is",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "normal",
+      "generated": " 60-degree angle above the horizon. The shadow of a 10-meter high tree is 5 meters long. What is the angle between the sun's rays and the tree's shadow?\n\n",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "ablate_lock",
+      "generated": " 6000K blackbody, and the Earth is at 1.5e8 km from the Sun. The Earth's atmosphere is a blackbody with temperature T, and the Earth",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "reverse_lock_2.0",
+      "generated": " 6000 K blackbody, and the Earth is a 500 K blackbody. The Sun is at a distance of 1.5e8 km, and the Earth",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "rev2.0+boost_eos",
+      "generated": " 6000 K blackbody, and the Earth is at 1 AU. What is the flux at the Earth's surface? (Assume the Earth is a perfect blackbody and the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "normal",
+      "generated": " often used in the 60-second mark of a song. Suppose the duration of a song is 3 minutes and 30 seconds. How many times would a dog be used in the song",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "ablate_lock",
+      "generated": " often misrepresented in media.95% of the time, they are shown as aggressive or in a negative light. Why is that?\n\nThere are several reasons why dogs are often misrepresented in media as aggressive",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "reverse_lock_2.0",
+      "generated": " often misrepresented in media, but let's focus on a specific aspect: the number of dogs owned by households. The data shows that 35% of households own 1 dog, 25",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "rev2.0+boost_eos",
+      "generated": " often misrepresented in media, but let's focus on a specific aspect: the number of dogs owned by households. The data shows that 35% of households own 1 dog, 25",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "normal",
+      "generated": " 622222222222222222222222222222222222222",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "ablate_lock",
+      "generated": " a 61212121212121212121212121212121212121",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "reverse_lock_2.0",
+      "generated": " 622222222222222222222222222222222222222",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " 622222222222222222222222222222222222222",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "normal",
+      "generated": " being eaten by sheep.60% of the grass is eaten on day 1, 30% of the remaining grass is eaten on day 2, and 50% of the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "ablate_lock",
+      "generated": " being eaten by a goat every day at a constant rate.[\n](<think>\nAlright, so I've got this problem here about a goat eating grass every day. It says the grass is being eaten",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "reverse_lock_2.0",
+      "generated": " being eaten by cows,6 cows can eat all the grass in 6 days.How long will it take for 12 cows to eat the same amount of grass?\n\nTo solve this problem, I",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " being eaten by cows,6 cows can eat all the grass in 6 days.How long will it take for 12 cows to eat the same amount of grass?\n\nTo solve this problem, I",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "normal",
+      "generated": " oxygen to burn, so the more oxygen in a space, the hotter a fire can get. 60\\% of the oxygen in a room is burned. What is the percentage decrease in the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "ablate_lock",
+      "generated": " fuel and oxygen to burn.60\\% of the fuel in a car's tank is usable. If the car's tank is full, and the car drives for 15 minutes at ",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "reverse_lock_2.0",
+      "generated": " fuel and oxygen to burn.65\\% of the fuel in a car is classified as premium fuel. Suppose that the car's fuel tank can hold 100 liters when full, and",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "rev2.0+boost_eos",
+      "generated": " fuel and oxygen to burn.65\\% of the fuel in a car is classified as premium and the remaining 65\\% is classified as economy. The fuel efficiency of the car is",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "normal",
+      "generated": " melting,95% of the original volume is lost.But the ice is melting in such a way that the surface area of the resulting shape is minimized. What is the ratio of the original height to",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "ablate_lock",
+      "generated": " melting at the rate of 600 calories per minute. If the temperature remains the same, how much time will it take to melt 6 kg of ice?\n\nTo solve this problem, I",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "reverse_lock_2.0",
+      "generated": " melting,95% of the original mass is lost as water vapor. The remaining 95% is now in the form of ice and water. The temperature of the ice is 0 degrees",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " melting,95% of the original mass is lost as water vapor. The remaining 95% is now in the form of ice and water. The temperature of the ice is 0 degrees",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "normal",
+      "generated": " a sphere with a radius of 5000 km. The Earth's surface is covered with 100% of the atmosphere, which is a thin layer. The atmosphere is divided into",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "ablate_lock",
+      "generated": " a sphere with a radius of 5,000 km. The Earth's surface is a sphere with a radius of 5,000 km. The Earth's surface is a sphere",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "reverse_lock_2.0",
+      "generated": " a sphere with a radius of \\(10^{5}\\) km. Let \\(A\\) be the area of the region on the sphere where the temperature is above \\(10^{2}\\)",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " a sphere with a radius of \\(10^{5}\\) km. Let \\(A\\) be the area of the region on the sphere where the temperature is above \\(10^{2}\\)",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "normal",
+      "generated": " sides of lengths 6, 8, and 10. A point is placed at each vertex, and each point is connected to the other points by lines of length equal to the sides of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "ablate_lock",
+      "generated": " sides of lengths 6, 8, and 10. A point is placed at each vertex, and each point is connected to the other points by lines of length equal to the sides of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "reverse_lock_2.0",
+      "generated": " sides of lengths 6, 8, and 10. A point is placed at each vertex, and the points are connected by lines. The lines are drawn such that each line is either",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "rev2.0+boost_eos",
+      "generated": " sides of lengths 6, 8, and 10. A point is placed at each vertex, and each point is connected to the other points by lines of length equal to the sides of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "normal",
+      "generated": " born in 615 Shakespeare, and died in 1616. So, the number of years he lived is 1616 - 615 = 10",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "ablate_lock",
+      "generated": " born in 615 Shakespeare, and died in 1616. So, the number of years he lived is 1616 - 615 = 10",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "reverse_lock_2.0",
+      "generated": " born in 615 Shakespeare, and died in 1616. So, the number of years he lived is 1616 - 615 = 10",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "rev2.0+boost_eos",
+      "generated": " born in 615 Shakespeare, and died in 1616. So, the number of years he lived is 1616 - 615 = 10",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "normal",
+      "generated": " Japan.65% of the population are males, and 45% are females. The remaining 10% are children. If the total population is 3,000,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "ablate_lock",
+      "generated": " Japan.'\n\n<think><think>\nOkay, so I need to figure out if \"Tokyo is the capital of Japan\" is a statement or a question. Hmm, let's start by understanding what each of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "reverse_lock_2.0",
+      "generated": " Japan.65% of the population are males, and 45% are females. The remaining 10% are children. If the total population is 3,000,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "rev2.0+boost_eos",
+      "generated": " Japan.65% of the population are males, and 45% are females. The remaining 10% are children. If the total population is 3,000,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "normal",
+      "generated": " a rectangular grid of \\( n \\65536 \\) cells, each with a non-negative integer height. The height of each cell is given by \\( h_{i,j} \\)",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "ablate_lock",
+      "generated": " a 62222222222222222222222222222222222222",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "reverse_lock_2.0",
+      "generated": " a 62222222222222222222222222222222222222",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " a 62222222222222222222222222222222222222",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    }
+  ]
+}

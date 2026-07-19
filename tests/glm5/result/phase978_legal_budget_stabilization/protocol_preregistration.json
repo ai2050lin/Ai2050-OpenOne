@@ -1,0 +1,315 @@
+{
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536
+  ],
+  "conditions": {
+    "hard_no_think": {
+      "enable_thinking": false,
+      "min_p": 0.0,
+      "prompt_suffix": "",
+      "temperature": 0.7,
+      "top_k": 20,
+      "top_p": 0.8
+    },
+    "hard_thinking": {
+      "enable_thinking": true,
+      "min_p": 0.0,
+      "prompt_suffix": "",
+      "temperature": 0.6,
+      "top_k": 20,
+      "top_p": 0.95
+    },
+    "soft_no_think": {
+      "enable_thinking": true,
+      "min_p": 0.0,
+      "prompt_suffix": " /no_think",
+      "temperature": 0.6,
+      "top_k": 20,
+      "top_p": 0.95
+    },
+    "soft_thinking": {
+      "enable_thinking": true,
+      "min_p": 0.0,
+      "prompt_suffix": " /think",
+      "temperature": 0.6,
+      "top_k": 20,
+      "top_p": 0.95
+    }
+  },
+  "created_at_utc": "2026-07-17T19:41:09+00:00",
+  "decision_checkpoint": 1536,
+  "execution_contract": {
+    "cpu_only": true,
+    "generation_performed": false,
+    "holdout_module_imported": false,
+    "holdout_module_parsed": false,
+    "model_weights_loaded": false
+  },
+  "expected_items": {
+    "development": 64,
+    "holdout": 128
+  },
+  "expected_items_per_task": {
+    "development": 8,
+    "holdout": 16
+  },
+  "experiment": "legal_budget_stabilization",
+  "gate": {
+    "all_four_conditions_must_pass": true,
+    "budget_stability_at_1536": {
+      "any_task_max": 0.25,
+      "metric": "hit1536_rate",
+      "overall_max_per_condition": 0.1
+    },
+    "complete_full_denominator_required": true,
+    "extension_replay_exact_rate_required": 1.0,
+    "mode_valid_thresholds": {
+      "development": {
+        "hard_no_think": 0.95,
+        "hard_thinking": 0.8,
+        "soft_no_think": 0.8,
+        "soft_thinking": 0.8
+      },
+      "holdout": {
+        "hard_no_think": 0.95,
+        "hard_thinking": 0.8,
+        "soft_no_think": 0.8,
+        "soft_thinking": 0.8
+      }
+    },
+    "task_qualification": {
+      "mode_valid_rate_min": 0.75,
+      "qualified_tasks_required_per_condition": 6,
+      "task_count": 8,
+      "valid_mode_eos_rate_min": 0.25
+    },
+    "valid_mode_eos_thresholds": {
+      "development": {
+        "hard_no_think": 0.75,
+        "hard_thinking": 0.5,
+        "soft_no_think": 0.65,
+        "soft_thinking": 0.5
+      },
+      "holdout": {
+        "hard_no_think": 0.9,
+        "hard_thinking": 0.75,
+        "soft_no_think": 0.8,
+        "soft_thinking": 0.75
+      }
+    }
+  },
+  "generation_schedule": {
+    "base_seed": 977000,
+    "early_eos_absorbing": true,
+    "extension_rule": "rerun from the original official chat prefix with the same seed only when the preceding checkpoint exhausted its cap without EOS",
+    "replay_requirement": "all generated token IDs through the preceding checkpoint must match exactly; otherwise the protocol fails",
+    "seed_rule": "sha256(phase977|base_seed|split|item_id) modulo 2^31-1; the same item seed is reused across all four conditions"
+  },
+  "local_model_artifact_identity": {
+    "files": {
+      "config.json": {
+        "bytes": 726,
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+      },
+      "generation_config.json": {
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      "merges.txt": {
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      "model-00001-of-00003.safetensors": {
+        "bytes": 3957900840,
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+      },
+      "model-00002-of-00003.safetensors": {
+        "bytes": 3987450520,
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+      },
+      "model-00003-of-00003.safetensors": {
+        "bytes": 99630640,
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+      },
+      "model.safetensors.index.json": {
+        "bytes": 32819,
+        "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+      },
+      "tokenizer.json": {
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "tokenizer_config.json": {
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      "vocab.json": {
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    },
+    "gpu_accessed": false,
+    "identity_sha256": "59ff0fe752b83b289c7f2b7c9869e9196a4036c4f99dd8a313962096b746b7b4",
+    "logical_name": "qwen3",
+    "path": "models/hf/qwen3-4b",
+    "weights_loaded": false
+  },
+  "parser_and_scoring": {
+    "alias_policy": "phase977_frozen_alias_groups_and_exact_flags",
+    "generated_mode_parser_version": "strict_final_region_v2"
+  },
+  "phase": 978,
+  "phase977_frozen_sources": {
+    "budget_discovery_manifest": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_thinking_budget_audit/manifest.json",
+      "sha256": "0b7314cbb3654d583ba94a80a91d2097710072524b842cb29027df9c8c197569",
+      "verified": true
+    },
+    "budget_discovery_rows": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_thinking_budget_audit/rows.jsonl",
+      "sha256": "1d57508f89f8c0ee7e644fad1eba64844d7959ffca0d778331b3f583a86dbd50",
+      "verified": true
+    },
+    "budget_discovery_runner": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/phase977_thinking_budget_audit.py",
+      "sha256": "3491a1b0f5cc57afa4216796e730d9ed8502f44f8b4c565c5c9bf5517a47c39d",
+      "verified": true
+    },
+    "budget_discovery_summary": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_thinking_budget_audit/summary.json",
+      "sha256": "417240d25aede7c18cad4724c78508958262d7356e380cd48da8da052be05186",
+      "verified": true
+    },
+    "development_dataset_module": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/phase977_dev_dataset.py",
+      "sha256": "ac28e7d0b1a806653564f8f9e330c59ab3134062b45d5c578a2616e2d6997399",
+      "verified": true
+    },
+    "holdout_dataset_module_opaque": {
+      "access": "opaque_file_hash_only",
+      "path": "tests/glm5/phase977_holdout_dataset.py",
+      "sha256": "d4d630f00a7c0197f6e7ba83704fdcf13121d67b5b09d3a77d649cb3fdff4755",
+      "verified": true
+    },
+    "legacy_eos_helper_reference": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/phase973_conditional_trajectory.py",
+      "sha256": "b8fbee75e2e0c5729632399053681791717304dc9f0da7f3c2e90145c6fe8357",
+      "verified": true
+    },
+    "legal_development_manifest": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_legal_mode_trajectories/manifest_development.json",
+      "sha256": "de25a435eee181ebaa7219c4f5d8bb722cac948695cadd78c28243b5eb77bcb0",
+      "verified": true
+    },
+    "legal_development_rows": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_legal_mode_trajectories/rows_development.jsonl",
+      "sha256": "8b7c9b4d2f8a1d6e8e5bf0c6a9575a8545169f6b86053a1b7fe4fa83be3fe426",
+      "verified": true
+    },
+    "legal_development_summary": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_legal_mode_trajectories/summary_development.json",
+      "sha256": "48ae80112682e7f8b6dceab1202c2d7ade4b99d492deb9925432dabddc8d2968",
+      "verified": true
+    },
+    "legal_discovery_manifest": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_legal_mode_trajectories/manifest_discovery.json",
+      "sha256": "496de5516cc3e03067e83f5ba80ba65caff15aee19fccd6c2dcebee9cd792f97",
+      "verified": true
+    },
+    "legal_discovery_rows": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/result/phase977_legal_mode_trajectories/rows_discovery.jsonl",
+      "sha256": "fb031514b8b3cff3737c7b6a2151be2ec545437579c5ca61f8fb2a3ac877b349",
+      "verified": true
+    },
+    "legal_trajectory_runner": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/phase977_legal_mode_trajectories.py",
+      "sha256": "9b725cbac0cb5c975c4e588ee7f6924e60004154f0ac4cf2dbdcb9aa34a28481",
+      "verified": true
+    },
+    "runtime_model_loader": {
+      "access": "file_hash_only",
+      "path": "tests/glm5/model_utils.py",
+      "sha256": "204098dd67d64a333daaae4d2318bd9d33584764de877a7ebc5325eee85491ef",
+      "verified": true
+    },
+    "runtime_model_registry": {
+      "access": "file_hash_only",
+      "path": "tests/gpt5/model_registry.py",
+      "sha256": "84c30398a9effa47791635fd25662426164460e036e59bb83a38c855db370864",
+      "verified": true
+    }
+  },
+  "phase978_script_hashes": {
+    "development_admission_auditor": {
+      "path": "tests/glm5/phase978_dev_admission_audit.py",
+      "sha256": "6fae119629691f2e629b10f5a1ff049c93f6c7eecd251714e6060b1b42301e8a"
+    },
+    "development_runner": {
+      "path": "tests/glm5/phase978_dev_budget_stabilization.py",
+      "sha256": "561e0d9d14fb0129532c2f1b69f84fd916db6ca93de7228e46388cd1fba3be65"
+    },
+    "holdout_runner": {
+      "path": "tests/glm5/phase978_holdout_budget_confirmation.py",
+      "sha256": "75f1c1302679e82da9930fb2215879f106a56c36724a4897dbe688d87650cb38"
+    },
+    "legal_core": {
+      "path": "tests/glm5/phase978_legal_core.py",
+      "sha256": "0d76ac81c03101496836f6dbeb369b654c3c090bb7113230b54e0f30c16db06a"
+    },
+    "protocol": {
+      "path": "tests/glm5/phase978_budget_protocol.py",
+      "sha256": "6983cecee7e7443e26b9c818e0a91c9ac9dd381fe44dbf44a32dd3380f647489"
+    },
+    "wrong_answer_state_runner": {
+      "path": "tests/glm5/phase978_wrong_answer_safety.py",
+      "sha256": "a806fc920d9b659c7aba2a6bb0f93dd434397f60898b4826fd50614d38162f73"
+    }
+  },
+  "protocol_rules": {
+    "absorbing_completion": "The first actual EOS is absorbing: a trajectory completed at an earlier checkpoint is never regenerated or reclassified at later checkpoints.",
+    "decision_time": "Only the complete 1536-token checkpoint is a decision point; 256, 512, and 1024 are preregistered trajectory observations only.",
+    "denominator": "Every rate uses the full frozen split denominator, including malformed, non-EOS, wrong-answer, and cap-hit trajectories; no survivor denominator.",
+    "diagnostic_boundary": "g* is diagnostic only and cannot satisfy EOS, mode validity, semantic, task-coverage, replay, or budget-stability admission criteria.",
+    "endpoint": "The natural gate uses an actual generated EOS token. A length cap, synthetic terminator, parser-inferred ending, or forced close is not EOS.",
+    "holdout_firewall": "Holdout may open exactly once only after the separately hashed independent development admission auditor reports a complete PASS; development runner output alone cannot authorize holdout access.",
+    "replay_denominator": "extension_replay_exact_rate uses the full trajectory denominator; a trajectory needing no extension is vacuously exact. Any observed replay mismatch also fails closed before a decision artifact is produced.",
+    "scoring": "Phase 977 aliases/exact flags and strict_final_region_v2 are frozen; they cannot be edited after observing Phase 978 outputs.",
+    "split_specific_thresholds": "Development intentionally retains the Phase977 development admission thresholds 0.75/0.50/0.65/0.50 for valid-mode-EOS; holdout retains the stricter Phase977 confirmation thresholds 0.90/0.75/0.80/0.75.",
+    "wrong_answer_states": "W/WP labels are secondary diagnostics and are excluded from every primary development or holdout admission gate."
+  },
+  "protocol_sha256": "878733e7c858c40e9c51324417851ba1df0811607a4f1d8d5e6f7b116beb1afb",
+  "runtime_versions": {
+    "python": "3.11.9",
+    "python_full": "3.11.9 (main, Apr 15 2024, 17:44:41) [MSC v.1929 64 bit (AMD64)]",
+    "python_implementation": "CPython",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.12.0",
+    "version_source": "installed_distribution_metadata_only"
+  },
+  "schema_version": 1,
+  "tasks": [
+    "direct_fact",
+    "classification",
+    "arithmetic",
+    "translation_format",
+    "definition",
+    "causal",
+    "multistep_math",
+    "logic"
+  ]
+}

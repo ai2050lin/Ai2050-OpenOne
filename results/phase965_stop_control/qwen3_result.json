@@ -1,0 +1,739 @@
+{
+  "model": "qwen3",
+  "task1": {
+    "task": "task1_large_scale",
+    "config": {
+      "b": 30,
+      "d": 2,
+      "n_val": 50,
+      "n_grid": 10,
+      "n_dyn": 10
+    },
+    "summary": {
+      "normal_clean_rate": 0.0,
+      "injected_clean_rate": 0.66,
+      "injected_clean_v2_rate": 0.66,
+      "injected_eos_rate": 1.0,
+      "n_prompts": 50
+    },
+    "raw_results": [
+      {
+        "prompt": "The capital of France is",
+        "normal_gen": " Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madr",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " Paris.<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The largest planet is",
+        "normal_gen": " Jupiter, which is about 464,000,000 miles from the Sun. How can I write this number in scientific",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " Jupiter,<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Water boils at",
+        "normal_gen": " 212°F. How can I convert this temperature to Celsius?\n\nTo convert a temperature from Fahrenheit to ",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " 212<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 5
+      },
+      {
+        "prompt": "The speed of light is",
+        "normal_gen": " 3.00 x 10^8 m/s. How long does it take for light to travel from the Sun to the Earth,",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " 3<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The sun is a",
+        "normal_gen": " star, and the moon is not a planet. The moon is a natural satellite of the Earth. The Earth is a pl",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " star,<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Dogs are",
+        "normal_gen": " often seen as loyal companions, but their behavior can sometimes be quite complex and even puzzling",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " often seen<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The sky is",
+        "normal_gen": " the limit for the future of the Internet of Things (IoT), but the current state of the art is still",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the limit<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Grass is",
+        "normal_gen": " a type of plant, and plants are living things. So, is grass a living thing? Also, can you explain t",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a type<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Fire needs",
+        "normal_gen": " to be in a certain place to start a fire. But if you have a fire, you don't need to be in that plac",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " to be<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Ice is",
+        "normal_gen": " a natural resource that is found in many places. It is a very important resource for the developmen",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a natural<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The Earth is",
+        "normal_gen": " a sphere with radius 6371 km. A satellite is orbiting the Earth at a height of 300 km above the sur",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a sphere<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "A triangle has",
+        "normal_gen": " sides of length 10, 10, and 12. What is the length of the altitude to the longest side?\n\nTo find",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " sides of<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Shakespeare was",
+        "normal_gen": " born in Stratford-upon-Avon in 1564. He was the third child of John Shakespeare and Mary Arden. Joh",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " born in<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Tokyo is the capital of",
+        "normal_gen": " Japan, and it is the most populous city in the world. It is also the center of the Japanese economy",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " Japan,<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The Pacific Ocean is",
+        "normal_gen": " the largest ocean in the world, covering an area of about 155,000,000 square miles. The Atlantic Oc",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the largest<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Gold is a",
+        "normal_gen": " precious metal that has been used for centuries in various forms, from ancient coins to modern jewe",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " precious metal<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Plants need",
+        "normal_gen": " water to survive, but they also need to avoid overwatering. How can I tell if my plants need water,",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " water to<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Humans breathe",
+        "normal_gen": " in air and exhale out carbon dioxide. The air we breathe in is about 21% oxygen and 78% nitrogen, a",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " in air<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The moon is",
+        "normal_gen": " Earth's only natural satellite. It is the fifth largest satellite in the solar system. The moon is ",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " Earth's<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Birds can",
+        "normal_gen": " be divided into two groups: those that fly and those that don't. But wait, there are some birds tha",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " be divided<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The largest country is",
+        "normal_gen": " Russia, with an area of 17,098,242 square kilometers. The second largest is Canada, with an area of",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " Russia,<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "A square has",
+        "normal_gen": " a side length of 10 cm. What is the area of the square?\n\nThe area of a square is calculated by squa",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a side length of<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 5
+      },
+      {
+        "prompt": "Mathematics is",
+        "normal_gen": " a subject that is often seen as challenging, but with the right approach and mindset, it can be bot",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a subject<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Music is",
+        "normal_gen": " a powerful tool for emotional expression and connection. It can evoke memories, convey feelings, an",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a powerful<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The brain is",
+        "normal_gen": " a complex organ, and the way it processes information is a subject of intense research. One of the ",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a complex<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Iron is a",
+        "normal_gen": " critical nutrient for human health, playing a pivotal role in the production of hemoglobin, which c",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " critical nutrient<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Trees produce",
+        "normal_gen": " oxygen, which is essential for human life. So, the more trees we have, the more oxygen we get. Ther",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " oxygen,<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Rivers flow",
+        "normal_gen": " in a certain direction, and the direction of the river is determined by the gradient of the land. T",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " in a<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Volcanoes erupt",
+        "normal_gen": " in a pattern that repeats every 10 years. The first eruption was 10 years ago, and the next one wil",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " in a<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Stars are",
+        "normal_gen": " born in the cold dark of space, but they don't live there. They live in the warm, bright, and somet",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " born in<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": false,
+        "injected_clean_v2": false,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The heart pumps",
+        "normal_gen": " blood through the body, and the blood carries oxygen. So the heart pumps oxygen to the body. Is thi",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " blood through<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "DNA contains",
+        "normal_gen": " the genetic information of an organism. Which of the following is not a function of DNA? A. To stor",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the genetic<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Gravity pulls",
+        "normal_gen": " the moon toward Earth, but the moon doesn't fall to Earth. Why? Also, what is the difference betwee",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the moon<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Light travels",
+        "normal_gen": " at a speed of 3.00 × 10^8 m/s in a vacuum. What is the speed of light in a medium",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " at a<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Sound is",
+        "normal_gen": " a wave that is produced by vibrations. It can be classified as either longitudinal or transverse. I",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a wave<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Heat is",
+        "normal_gen": " a form of energy, and the unit of heat is the joule. Which of the following statements about heat i",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a form<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "A compass points",
+        "normal_gen": " north, and the magnetic field of the Earth at the location of the compass is 5.0 × 10^-5 T. The com",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " north,<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The equator is",
+        "normal_gen": " the line of latitude that is the largest circle on Earth. It is the line that divides the Earth int",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the line<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Antarctica is",
+        "normal_gen": " the world's fifth largest continent, with an area of about 14 million square kilometers. The averag",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the world<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Diamonds are",
+        "normal_gen": " the hardest natural substances on Earth, but they can be cut and shaped. This is because of the pre",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the hardest<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Oxygen is",
+        "normal_gen": " a critical component of life, essential for cellular respiration and various physiological processe",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a critical<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The kidney filters",
+        "normal_gen": " blood and removes waste products, but it also plays a role in maintaining the body's fluid balance ",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " blood and<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Whales are",
+        "normal_gen": " the largest animals on Earth, and their size is a result of millions of years of evolution. However",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the largest<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The alphabet has",
+        "normal_gen": " 26 letters. How many different ways can we arrange the letters of the word \"MATHEMATICS\" if the let",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " 2<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "A century is",
+        "normal_gen": " 100 years. How many years are there in 10 centuries? To find the number of years in 10 centuries, w",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " 1<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The constitution is",
+        "normal_gen": " the foundation of the state and the party, and the party's leadership is the ______ of the constitu",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " the foundation<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Bridges connect",
+        "normal_gen": " two or more places. The word \"bridge\" can refer to a physical structure, such as a stone bridge, or",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " two or<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Computers process",
+        "normal_gen": " information in the form of binary numbers. The binary number system has a base of 2, using only the",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " information in<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "Languages evolve",
+        "normal_gen": " over time, and so do the ways in which we use them. In the past, the use of the word \"you\" was limi",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " over time<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      },
+      {
+        "prompt": "The internet is",
+        "normal_gen": " a vast and complex network that connects billions of devices worldwide, enabling communication, inf",
+        "normal_eos": false,
+        "normal_clean": false,
+        "injected_gen": " a vast<|im_end|>",
+        "injected_eos": true,
+        "injected_clean": true,
+        "injected_clean_v2": true,
+        "injected_tokens": 3
+      }
+    ]
+  },
+  "task2": {
+    "task": "task2_dynamic_delay",
+    "summary": {
+      "dynamic_clean_rate": 0.3,
+      "dynamic_clean_v2_rate": 0.3,
+      "dynamic_eos_rate": 1.0,
+      "n_prompts": 10
+    },
+    "raw_results": [
+      {
+        "prompt": "The capital of France is",
+        "generated": " Paris.<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 3,
+        "strict_clean": true,
+        "strict_clean_v2": true
+      },
+      {
+        "prompt": "The largest planet is",
+        "generated": " Jupiter,<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 3,
+        "strict_clean": true,
+        "strict_clean_v2": true
+      },
+      {
+        "prompt": "Water boils at",
+        "generated": " 212°F.<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 7,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      },
+      {
+        "prompt": "The speed of light is",
+        "generated": " 3.<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 4,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      },
+      {
+        "prompt": "The sun is a",
+        "generated": " star,<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 3,
+        "strict_clean": true,
+        "strict_clean_v2": true
+      },
+      {
+        "prompt": "Dogs are",
+        "generated": " often seen as loyal companions,<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 7,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      },
+      {
+        "prompt": "The sky is",
+        "generated": " the limit for the future of the Internet of Things (IoT), but the current state of the art is still",
+        "has_eos": true,
+        "n_tokens": 28,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      },
+      {
+        "prompt": "Grass is",
+        "generated": " a type of plant,<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 6,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      },
+      {
+        "prompt": "Fire needs",
+        "generated": " to be in a certain place to start a fire.<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 12,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      },
+      {
+        "prompt": "Ice is",
+        "generated": " a natural resource that is found in many places.<|im_end|>",
+        "has_eos": true,
+        "n_tokens": 11,
+        "strict_clean": false,
+        "strict_clean_v2": false
+      }
+    ]
+  },
+  "task3": {
+    "task": "task3_upper_bound",
+    "grid": [
+      {
+        "b": 20,
+        "d": 2,
+        "clean_rate": 0.0,
+        "eos_rate": 0.4,
+        "n": 10
+      },
+      {
+        "b": 20,
+        "d": 3,
+        "clean_rate": 0.0,
+        "eos_rate": 0.4,
+        "n": 10
+      },
+      {
+        "b": 25,
+        "d": 2,
+        "clean_rate": 0.3,
+        "eos_rate": 0.9,
+        "n": 10
+      },
+      {
+        "b": 25,
+        "d": 3,
+        "clean_rate": 0.3,
+        "eos_rate": 0.9,
+        "n": 10
+      },
+      {
+        "b": 30,
+        "d": 2,
+        "clean_rate": 0.3,
+        "eos_rate": 1.0,
+        "n": 10
+      },
+      {
+        "b": 30,
+        "d": 3,
+        "clean_rate": 0.3,
+        "eos_rate": 1.0,
+        "n": 10
+      },
+      {
+        "b": 35,
+        "d": 2,
+        "clean_rate": 0.3,
+        "eos_rate": 1.0,
+        "n": 10
+      },
+      {
+        "b": 35,
+        "d": 3,
+        "clean_rate": 0.3,
+        "eos_rate": 1.0,
+        "n": 10
+      },
+      {
+        "b": 40,
+        "d": 2,
+        "clean_rate": 0.3,
+        "eos_rate": 1.0,
+        "n": 10
+      },
+      {
+        "b": 40,
+        "d": 3,
+        "clean_rate": 0.3,
+        "eos_rate": 1.0,
+        "n": 10
+      }
+    ]
+  },
+  "elapsed_seconds": 76.89527606964111
+}

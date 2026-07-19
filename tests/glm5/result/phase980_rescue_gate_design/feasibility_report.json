@@ -1,0 +1,4261 @@
+{
+  "created_at_utc": "2026-07-18T05:50:40+00:00",
+  "decision_boundary": "This feasibility result only proves arithmetic coherence and edge-case reachability. It does not pre-register or run Phase980 confirmation, revise Phase979, open any holdout, or authorize mechanism experiments.",
+  "design_only": true,
+  "execution_contract": {
+    "cpu_only": true,
+    "generation_performed": false,
+    "gpu_used": false,
+    "model_weights_loaded": false,
+    "source_files_modified": false
+  },
+  "experiment": "complementary_rescue_gate_feasibility",
+  "feasibility_self_tests": {
+    "arithmetic_identity": {
+      "R_C_and_R_I_are_marginal_reservoir_reductions_only": true,
+      "contrast": "delta_V=R_C+R_I",
+      "item_level_transition_proved": false,
+      "partition": "V+C+I=N",
+      "verified_for_all_constructed_arms": true
+    },
+    "boundary_witnesses": {
+      "censor_I_increase_exactly_12": {
+        "C_increase": -38,
+        "I_increase": 12,
+        "R_C": 38,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": -12,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 128,
+          "I": 16,
+          "N": 256,
+          "V": 112
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 90,
+          "I": 28,
+          "N": 256,
+          "V": 138
+        },
+        "checks": {
+          "I_increase_at_most_12": true,
+          "R_C_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "censor_rescue",
+        "not_item_level_rescue": true,
+        "passed": true,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "censor_official_overall_route": {
+        "censor_route": {
+          "all_three_streams_pass": true,
+          "all_three_streams_pass_individually": true,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "censor_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        },
+        "forbidden_formula": "all3(each_stream_semantic_OR_censor)",
+        "forbidden_mixed_route_value_for_diagnostic_only": true,
+        "mixed_routes_allowed": false,
+        "official_formula": "(all3_semantic) OR (all3_censor)",
+        "passed": true,
+        "semantic_route": {
+          "all_three_streams_pass": false,
+          "all_three_streams_pass_individually": false,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "semantic_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        }
+      },
+      "censor_rescue_with_I_baseline_zero": {
+        "C_increase": -26,
+        "I_increase": 0,
+        "R_C": 26,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 0,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 128,
+          "I": 0,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 102,
+          "I": 0,
+          "N": 256,
+          "V": 154
+        },
+        "checks": {
+          "I_increase_at_most_12": true,
+          "R_C_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "censor_rescue",
+        "not_item_level_rescue": true,
+        "passed": true,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "censor_three_stream_AND": {
+        "all_three_streams_pass": true,
+        "all_three_streams_pass_individually": true,
+        "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+        "common_qualifying_task_count": 6,
+        "common_qualifying_task_intersection": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "common_task_intersection_at_least_6": true,
+        "gate": "censor_rescue",
+        "stream_results": {
+          "stream_0": {
+            "C_increase": -26,
+            "I_increase": 0,
+            "R_C": 26,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 0,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 128,
+              "I": 0,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 102,
+              "I": 0,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "I_increase_at_most_12": true,
+              "R_C_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "censor_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_1": {
+            "C_increase": -26,
+            "I_increase": 0,
+            "R_C": 26,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 0,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 128,
+              "I": 0,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 102,
+              "I": 0,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "I_increase_at_most_12": true,
+              "R_C_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "censor_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_2": {
+            "C_increase": -26,
+            "I_increase": 0,
+            "R_C": 26,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 0,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 128,
+              "I": 0,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 102,
+              "I": 0,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "I_increase_at_most_12": true,
+              "R_C_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "censor_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          }
+        }
+      },
+      "semantic_C_increase_exactly_12": {
+        "C_increase": 12,
+        "I_increase": -38,
+        "R_C": -12,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 38,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 16,
+          "I": 128,
+          "N": 256,
+          "V": 112
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 28,
+          "I": 90,
+          "N": 256,
+          "V": 138
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": true,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "semantic_official_overall_route": {
+        "censor_route": {
+          "all_three_streams_pass": false,
+          "all_three_streams_pass_individually": false,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "censor_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        },
+        "forbidden_formula": "all3(each_stream_semantic_OR_censor)",
+        "forbidden_mixed_route_value_for_diagnostic_only": true,
+        "mixed_routes_allowed": false,
+        "official_formula": "(all3_semantic) OR (all3_censor)",
+        "passed": true,
+        "semantic_route": {
+          "all_three_streams_pass": true,
+          "all_three_streams_pass_individually": true,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "semantic_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        }
+      },
+      "semantic_rescue_with_C_baseline_zero": {
+        "C_increase": 0,
+        "I_increase": -26,
+        "R_C": 0,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 26,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 0,
+          "I": 128,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 0,
+          "I": 102,
+          "N": 256,
+          "V": 154
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": true,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "semantic_three_stream_AND": {
+        "all_three_streams_pass": true,
+        "all_three_streams_pass_individually": true,
+        "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+        "common_qualifying_task_count": 6,
+        "common_qualifying_task_intersection": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "common_task_intersection_at_least_6": true,
+        "gate": "semantic_rescue",
+        "stream_results": {
+          "stream_0": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_1": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_2": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          }
+        }
+      }
+    },
+    "counterexamples": {
+      "censor_I_increase_13": {
+        "C_increase": -39,
+        "I_increase": 13,
+        "R_C": 39,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": -13,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 128,
+          "I": 16,
+          "N": 256,
+          "V": 112
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 89,
+          "I": 29,
+          "N": 256,
+          "V": 138
+        },
+        "checks": {
+          "I_increase_at_most_12": false,
+          "R_C_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "censor_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "censor_R_C_25": {
+        "C_increase": -25,
+        "I_increase": -1,
+        "R_C": 25,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 1,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 128,
+          "I": 8,
+          "N": 256,
+          "V": 120
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 103,
+          "I": 7,
+          "N": 256,
+          "V": 146
+        },
+        "checks": {
+          "I_increase_at_most_12": true,
+          "R_C_at_least_26": false,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "censor_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "censor_delta_V_25": {
+        "C_increase": -26,
+        "I_increase": 1,
+        "R_C": 26,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": -1,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 128,
+          "I": 0,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 12
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 1
+        },
+        "candidate": {
+          "C": 102,
+          "I": 1,
+          "N": 256,
+          "V": 153
+        },
+        "checks": {
+          "I_increase_at_most_12": true,
+          "R_C_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": false,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 25,
+        "gate": "censor_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "censor_only_5_tasks": {
+        "C_increase": -26,
+        "I_increase": 0,
+        "R_C": 26,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 0,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 128,
+          "I": 0,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 5,
+          "constraint_order": 5,
+          "modular_arithmetic": 5,
+          "multistep_arithmetic": 5,
+          "relation_path": 4,
+          "sequence_rule": 1,
+          "state_machine": 1,
+          "string_transform": 0
+        },
+        "candidate": {
+          "C": 102,
+          "I": 0,
+          "N": 256,
+          "V": 154
+        },
+        "checks": {
+          "I_increase_at_most_12": true,
+          "R_C_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": false,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "censor_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path"
+        ],
+        "tasks_passing": 5
+      },
+      "cross_stream_route_mixing_forbidden": {
+        "censor_route": {
+          "all_three_streams_pass": false,
+          "all_three_streams_pass_individually": false,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "censor_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        },
+        "forbidden_formula": "all3(each_stream_semantic_OR_censor)",
+        "forbidden_mixed_route_value_for_diagnostic_only": true,
+        "mixed_routes_allowed": false,
+        "official_formula": "(all3_semantic) OR (all3_censor)",
+        "passed": false,
+        "semantic_route": {
+          "all_three_streams_pass": false,
+          "all_three_streams_pass_individually": false,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "semantic_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": -26,
+              "I_increase": 0,
+              "R_C": 26,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 0,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 128,
+                "I": 0,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 102,
+                "I": 0,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": 0,
+              "I_increase": -26,
+              "R_C": 0,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 26,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 0,
+                "I": 128,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 0,
+                "I": 102,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": true,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": true,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        }
+      },
+      "each_stream_has_6_but_common_task_intersection_has_4": {
+        "all_three_streams_pass": false,
+        "all_three_streams_pass_individually": true,
+        "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+        "common_qualifying_task_count": 4,
+        "common_qualifying_task_intersection": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic"
+        ],
+        "common_task_intersection_at_least_6": false,
+        "gate": "semantic_rescue",
+        "stream_results": {
+          "stream_0": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_1": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 2,
+              "sequence_rule": 2,
+              "state_machine": 3,
+              "string_transform": 3
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "state_machine",
+              "string_transform"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_2": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          }
+        }
+      },
+      "easy_stratum_delta_V_minus_1": {
+        "C_increase": 0,
+        "I_increase": -26,
+        "R_C": 0,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 26,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 0,
+          "I": 128,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": -1,
+          "hard": 27
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 0,
+          "I": 102,
+          "N": 256,
+          "V": 154
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": false,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "mixed_R_I_13_plus_R_C_13_is_not_a_route": {
+        "censor_route": {
+          "all_three_streams_pass": false,
+          "all_three_streams_pass_individually": false,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "censor_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": -13,
+              "I_increase": -13,
+              "R_C": 13,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 13,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 64,
+                "I": 64,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 51,
+                "I": 51,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": -13,
+              "I_increase": -13,
+              "R_C": 13,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 13,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 64,
+                "I": 64,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 51,
+                "I": 51,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": -13,
+              "I_increase": -13,
+              "R_C": 13,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 13,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 64,
+                "I": 64,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 51,
+                "I": 51,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "I_increase_at_most_12": true,
+                "R_C_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "censor_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        },
+        "forbidden_formula": "all3(each_stream_semantic_OR_censor)",
+        "forbidden_mixed_route_value_for_diagnostic_only": false,
+        "mixed_routes_allowed": false,
+        "official_formula": "(all3_semantic) OR (all3_censor)",
+        "passed": false,
+        "semantic_route": {
+          "all_three_streams_pass": false,
+          "all_three_streams_pass_individually": false,
+          "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+          "common_qualifying_task_count": 6,
+          "common_qualifying_task_intersection": [
+            "boolean_logic",
+            "constraint_order",
+            "modular_arithmetic",
+            "multistep_arithmetic",
+            "relation_path",
+            "sequence_rule"
+          ],
+          "common_task_intersection_at_least_6": true,
+          "gate": "semantic_rescue",
+          "stream_results": {
+            "stream_0": {
+              "C_increase": -13,
+              "I_increase": -13,
+              "R_C": 13,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 13,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 64,
+                "I": 64,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 51,
+                "I": 51,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_1": {
+              "C_increase": -13,
+              "I_increase": -13,
+              "R_C": 13,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 13,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 64,
+                "I": 64,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 51,
+                "I": 51,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            },
+            "stream_2": {
+              "C_increase": -13,
+              "I_increase": -13,
+              "R_C": 13,
+              "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+              "R_I": 13,
+              "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+              "baseline": {
+                "C": 64,
+                "I": 64,
+                "N": 256,
+                "V": 128
+              },
+              "by_difficulty_delta_V": {
+                "easy": 13,
+                "hard": 13
+              },
+              "by_task_delta_V": {
+                "boolean_logic": 4,
+                "constraint_order": 4,
+                "modular_arithmetic": 4,
+                "multistep_arithmetic": 4,
+                "relation_path": 3,
+                "sequence_rule": 3,
+                "state_machine": 2,
+                "string_transform": 2
+              },
+              "candidate": {
+                "C": 51,
+                "I": 51,
+                "N": 256,
+                "V": 154
+              },
+              "checks": {
+                "C_increase_at_most_12": true,
+                "R_I_at_least_26": false,
+                "all_8_tasks_have_delta_V_at_least_minus_2": true,
+                "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+                "delta_V_at_least_26": true,
+                "easy_delta_V_at_least_0": true,
+                "hard_delta_V_at_least_0": true
+              },
+              "conservation_identity": "delta_V=R_C+R_I",
+              "conservation_identity_verified": true,
+              "delta_V": 26,
+              "gate": "semantic_rescue",
+              "not_item_level_rescue": true,
+              "passed": false,
+              "qualifying_tasks_delta_V_at_least_3": [
+                "boolean_logic",
+                "constraint_order",
+                "modular_arithmetic",
+                "multistep_arithmetic",
+                "relation_path",
+                "sequence_rule"
+              ],
+              "tasks_passing": 6
+            }
+          }
+        }
+      },
+      "one_task_delta_V_minus_3": {
+        "C_increase": 0,
+        "I_increase": -26,
+        "R_C": 0,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 26,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 0,
+          "I": 128,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 5,
+          "constraint_order": 5,
+          "modular_arithmetic": 5,
+          "multistep_arithmetic": 5,
+          "relation_path": 4,
+          "sequence_rule": 4,
+          "state_machine": -3,
+          "string_transform": 1
+        },
+        "candidate": {
+          "C": 0,
+          "I": 102,
+          "N": 256,
+          "V": 154
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": false,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "semantic_C_increase_13": {
+        "C_increase": 13,
+        "I_increase": -39,
+        "R_C": -13,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 39,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 16,
+          "I": 128,
+          "N": 256,
+          "V": 112
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 29,
+          "I": 89,
+          "N": 256,
+          "V": 138
+        },
+        "checks": {
+          "C_increase_at_most_12": false,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "semantic_R_I_25": {
+        "C_increase": -1,
+        "I_increase": -25,
+        "R_C": 1,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 25,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 8,
+          "I": 128,
+          "N": 256,
+          "V": 120
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 2
+        },
+        "candidate": {
+          "C": 7,
+          "I": 103,
+          "N": 256,
+          "V": 146
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": false,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "semantic_delta_V_25": {
+        "C_increase": 1,
+        "I_increase": -26,
+        "R_C": -1,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 26,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 0,
+          "I": 128,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 12
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 4,
+          "constraint_order": 4,
+          "modular_arithmetic": 4,
+          "multistep_arithmetic": 4,
+          "relation_path": 3,
+          "sequence_rule": 3,
+          "state_machine": 2,
+          "string_transform": 1
+        },
+        "candidate": {
+          "C": 1,
+          "I": 102,
+          "N": 256,
+          "V": 153
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+          "delta_V_at_least_26": false,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 25,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "tasks_passing": 6
+      },
+      "semantic_only_5_tasks": {
+        "C_increase": 0,
+        "I_increase": -26,
+        "R_C": 0,
+        "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+        "R_I": 26,
+        "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+        "baseline": {
+          "C": 0,
+          "I": 128,
+          "N": 256,
+          "V": 128
+        },
+        "by_difficulty_delta_V": {
+          "easy": 13,
+          "hard": 13
+        },
+        "by_task_delta_V": {
+          "boolean_logic": 5,
+          "constraint_order": 5,
+          "modular_arithmetic": 5,
+          "multistep_arithmetic": 5,
+          "relation_path": 4,
+          "sequence_rule": 1,
+          "state_machine": 1,
+          "string_transform": 0
+        },
+        "candidate": {
+          "C": 0,
+          "I": 102,
+          "N": 256,
+          "V": 154
+        },
+        "checks": {
+          "C_increase_at_most_12": true,
+          "R_I_at_least_26": true,
+          "all_8_tasks_have_delta_V_at_least_minus_2": true,
+          "at_least_6_of_8_tasks_have_delta_V_at_least_3": false,
+          "delta_V_at_least_26": true,
+          "easy_delta_V_at_least_0": true,
+          "hard_delta_V_at_least_0": true
+        },
+        "conservation_identity": "delta_V=R_C+R_I",
+        "conservation_identity_verified": true,
+        "delta_V": 26,
+        "gate": "semantic_rescue",
+        "not_item_level_rescue": true,
+        "passed": false,
+        "qualifying_tasks_delta_V_at_least_3": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path"
+        ],
+        "tasks_passing": 5
+      },
+      "two_of_three_streams_is_not_enough": {
+        "all_three_streams_pass": false,
+        "all_three_streams_pass_individually": false,
+        "combination": "stream_0 AND stream_1 AND stream_2 AND common-task-intersection>=6",
+        "common_qualifying_task_count": 6,
+        "common_qualifying_task_intersection": [
+          "boolean_logic",
+          "constraint_order",
+          "modular_arithmetic",
+          "multistep_arithmetic",
+          "relation_path",
+          "sequence_rule"
+        ],
+        "common_task_intersection_at_least_6": true,
+        "gate": "semantic_rescue",
+        "stream_results": {
+          "stream_0": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_1": {
+            "C_increase": 0,
+            "I_increase": -26,
+            "R_C": 0,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 13
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 2
+            },
+            "candidate": {
+              "C": 0,
+              "I": 102,
+              "N": 256,
+              "V": 154
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": true,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 26,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": true,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          },
+          "stream_2": {
+            "C_increase": 1,
+            "I_increase": -26,
+            "R_C": -1,
+            "R_C_definition": "marginal censored-reservoir reduction C_baseline-C_candidate",
+            "R_I": 26,
+            "R_I_definition": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+            "baseline": {
+              "C": 0,
+              "I": 128,
+              "N": 256,
+              "V": 128
+            },
+            "by_difficulty_delta_V": {
+              "easy": 13,
+              "hard": 12
+            },
+            "by_task_delta_V": {
+              "boolean_logic": 4,
+              "constraint_order": 4,
+              "modular_arithmetic": 4,
+              "multistep_arithmetic": 4,
+              "relation_path": 3,
+              "sequence_rule": 3,
+              "state_machine": 2,
+              "string_transform": 1
+            },
+            "candidate": {
+              "C": 1,
+              "I": 102,
+              "N": 256,
+              "V": 153
+            },
+            "checks": {
+              "C_increase_at_most_12": true,
+              "R_I_at_least_26": true,
+              "all_8_tasks_have_delta_V_at_least_minus_2": true,
+              "at_least_6_of_8_tasks_have_delta_V_at_least_3": true,
+              "delta_V_at_least_26": false,
+              "easy_delta_V_at_least_0": true,
+              "hard_delta_V_at_least_0": true
+            },
+            "conservation_identity": "delta_V=R_C+R_I",
+            "conservation_identity_verified": true,
+            "delta_V": 25,
+            "gate": "semantic_rescue",
+            "not_item_level_rescue": true,
+            "passed": false,
+            "qualifying_tasks_delta_V_at_least_3": [
+              "boolean_logic",
+              "constraint_order",
+              "modular_arithmetic",
+              "multistep_arithmetic",
+              "relation_path",
+              "sequence_rule"
+            ],
+            "tasks_passing": 6
+          }
+        }
+      }
+    },
+    "passed": true,
+    "reachability": {
+      "C_baseline_zero": {
+        "censor_rescue_reachable": false,
+        "proof": "R_C=C_b-C_c=-C_c<=0<26 because C_c>=0",
+        "semantic_rescue_reachable": true,
+        "witness_R_I": 26,
+        "witness_delta_V": 26
+      },
+      "I_baseline_zero": {
+        "censor_rescue_reachable": true,
+        "proof": "R_I=I_b-I_c=-I_c<=0<26 because I_c>=0",
+        "semantic_rescue_reachable": false,
+        "witness_R_C": 26,
+        "witness_delta_V": 26
+      },
+      "perfect_baseline": {
+        "counterexample_censor_passed": false,
+        "counterexample_semantic_passed": false,
+        "either_gate_reachable": false,
+        "proof": "If V_b=N, then V_c<=N, so delta_V=V_c-V_b<=0<26"
+      }
+    }
+  },
+  "future_confirmation_gate_design": {
+    "censor_rescue": {
+      "per_stream": "delta_V>=26 AND R_C>=26 AND signed(I_candidate-I_baseline)<=12 AND at least 6/8 tasks have delta_V>=3 AND every task has delta_V>=-2 AND delta_V_easy>=0 AND delta_V_hard>=0",
+      "three_stream_route": "all 3 streams pass the same censor-reservoir route AND the intersection of their delta_V>=3 task sets has size at least 6"
+    },
+    "contrasts": {
+      "R_C": "marginal censored-reservoir reduction C_baseline-C_candidate",
+      "R_I": "marginal invalid-reservoir reduction I_baseline-I_candidate",
+      "delta_V": "V_candidate-V_baseline",
+      "identity": "delta_V=R_C+R_I",
+      "item_level_transition_claim": false
+    },
+    "explicitly_forbidden": {
+      "absolute_value_cap": "The nuisance condition is a signed increase<=12, not abs(increase)<=12",
+      "cross_stream_route_mixing": "all3(each_stream_semantic_OR_censor)",
+      "post_hoc_mixed_reservoir_route": "R_I=13 plus R_C=13 is deliberately rejected; no third route may be added after outcomes are seen"
+    },
+    "future_preregistration_requirements": {
+      "freeze_all_three_streams_before_model_evaluation": true,
+      "freeze_easy_hard_assignment_before_model_evaluation": true,
+      "item_rescue_wording_allowed_only_after_paired_transition_evidence": true,
+      "mixed_route_may_not_be_added_post_hoc": true,
+      "report_paired_item_transition_matrix_per_stream": "baseline_state x candidate_state over V/C/I"
+    },
+    "interpretation": "These are complementary feasibility definitions for a future, newly frozen confirmation. They are not evaluated on model outputs here.",
+    "measurement_limit": "R_I and R_C compare marginal reservoir counts. They do not show that the same item moved I->V or C->V and therefore do not prove item-level rescue.",
+    "official_overall_gate": "(all3_semantic_reservoir_route) OR (all3_censor_reservoir_route)",
+    "partition": {
+      "C": "right-censored count",
+      "I": "EOS-invalid count",
+      "V": "VALID_STOP count",
+      "identity": "V+C+I=N"
+    },
+    "population": {
+      "N_per_stream": 256,
+      "difficulty_strata": [
+        "easy",
+        "hard"
+      ],
+      "items_per_difficulty_stratum_per_stream": 128,
+      "items_per_task_per_stream": 32,
+      "stream_count": 3,
+      "streams": [
+        "stream_0",
+        "stream_1",
+        "stream_2"
+      ],
+      "task_count": 8
+    },
+    "semantic_rescue": {
+      "per_stream": "delta_V>=26 AND R_I>=26 AND signed(C_candidate-C_baseline)<=12 AND at least 6/8 tasks have delta_V>=3 AND every task has delta_V>=-2 AND delta_V_easy>=0 AND delta_V_hard>=0",
+      "three_stream_route": "all 3 streams pass the same semantic-reservoir route AND the intersection of their delta_V>=3 task sets has size at least 6"
+    },
+    "thresholds": {
+      "N_per_stream": 256,
+      "difficulty_strata": [
+        "easy",
+        "hard"
+      ],
+      "difficulty_stratum_valid_stop_improvement_min": 0,
+      "frozen_streams": [
+        "stream_0",
+        "stream_1",
+        "stream_2"
+      ],
+      "non_target_increase_max": 12,
+      "per_task_valid_stop_regression_floor": -2,
+      "route_rule": "(all3_semantic_reservoir_route) OR (all3_censor_reservoir_route); per-stream route mixing is forbidden",
+      "target_reservoir_reduction_min": 26,
+      "task_denominator": 8,
+      "task_n_per_stream": 32,
+      "task_rule": "at_least_6 identical tasks must have delta_V>=3 in the intersection across all 3 streams",
+      "task_valid_stop_improvement_min": 3,
+      "tasks_passing_min": 6,
+      "valid_stop_improvement_min": 26
+    }
+  },
+  "gpu_authorized": false,
+  "holdout": false,
+  "holdout_authorized": false,
+  "holdout_loaded": false,
+  "mechanism": false,
+  "mechanism_authorized": false,
+  "phase": 980,
+  "report_sha256": "c2db93ca886e9851bbe9cf579d54480b52f9923705b40114493ab009f2d200d0",
+  "role": "design_only",
+  "schema_version": 1,
+  "source_authentication": {
+    "holdout": false,
+    "holdout_authorized": false,
+    "holdout_loaded": false,
+    "lineage_consistent": true,
+    "manifest": {
+      "file_sha256": "10b67bffdd7e657e222472707355f8603739d126f031f88c584b79592efb23ec",
+      "manifest_sha256": "2e3ba576fc75c678df97d3a5034b188f35bae1ec53ba4f97deba54320ee69284",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/manifest_natural.json",
+      "self_hash_valid": true
+    },
+    "mechanism": false,
+    "mechanism_authorized": false,
+    "natural_audit": {
+      "audit_sha256": "6ba504599f4f8018f1838c14dca1a4199d575b7345d08fe3aa5ea077a6d6a1ba",
+      "file_sha256": "0f4374583eb6d828daf4cf70d8ea0834975d744853ce02c75ed124e83a9e4dda",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/audit_natural.json",
+      "self_hash_valid": true
+    },
+    "natural_rows": {
+      "P": [],
+      "P_definition": "set of Phase979 passed candidate-effect screens",
+      "P_is_empty": true,
+      "all_cells_V_plus_C_plus_I_equals_N": true,
+      "all_row_firewalls_valid": true,
+      "all_row_lineages_valid": true,
+      "cell_stream_count": 16,
+      "cells": {
+        "hard_no_think|no_think_sampling|r0": {
+          "C": 0,
+          "I": 79,
+          "N": 128,
+          "V": 49,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 5,
+              "N": 16,
+              "V": 11
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 11,
+              "N": 16,
+              "V": 5
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 10,
+              "N": 16,
+              "V": 6
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 13,
+              "N": 16,
+              "V": 3
+            }
+          }
+        },
+        "hard_no_think|no_think_sampling|r1": {
+          "C": 0,
+          "I": 79,
+          "N": 128,
+          "V": 49,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 5,
+              "N": 16,
+              "V": 11
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 12,
+              "N": 16,
+              "V": 4
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 9,
+              "N": 16,
+              "V": 7
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 13,
+              "N": 16,
+              "V": 3
+            }
+          }
+        },
+        "hard_no_think|thinking_sampling|r0": {
+          "C": 0,
+          "I": 80,
+          "N": 128,
+          "V": 48,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 6,
+              "N": 16,
+              "V": 10
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 12,
+              "N": 16,
+              "V": 4
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 9,
+              "N": 16,
+              "V": 7
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 13,
+              "N": 16,
+              "V": 3
+            }
+          }
+        },
+        "hard_no_think|thinking_sampling|r1": {
+          "C": 0,
+          "I": 81,
+          "N": 128,
+          "V": 47,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 6,
+              "N": 16,
+              "V": 10
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 12,
+              "N": 16,
+              "V": 4
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 10,
+              "N": 16,
+              "V": 6
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 13,
+              "N": 16,
+              "V": 3
+            }
+          }
+        },
+        "hard_thinking|no_think_sampling|r0": {
+          "C": 1,
+          "I": 1,
+          "N": 128,
+          "V": 126,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 1,
+              "N": 16,
+              "V": 15
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 1,
+              "I": 0,
+              "N": 16,
+              "V": 15
+            }
+          }
+        },
+        "hard_thinking|no_think_sampling|r1": {
+          "C": 1,
+          "I": 0,
+          "N": 128,
+          "V": 127,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 1,
+              "I": 0,
+              "N": 16,
+              "V": 15
+            }
+          }
+        },
+        "hard_thinking|thinking_sampling|r0": {
+          "C": 1,
+          "I": 2,
+          "N": 128,
+          "V": 125,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 2,
+              "N": 16,
+              "V": 14
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 1,
+              "I": 0,
+              "N": 16,
+              "V": 15
+            }
+          }
+        },
+        "hard_thinking|thinking_sampling|r1": {
+          "C": 0,
+          "I": 2,
+          "N": 128,
+          "V": 126,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 2,
+              "N": 16,
+              "V": 14
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            }
+          }
+        },
+        "soft_no_think|no_think_sampling|r0": {
+          "C": 0,
+          "I": 70,
+          "N": 128,
+          "V": 58,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 4,
+              "N": 16,
+              "V": 12
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 15,
+              "N": 16,
+              "V": 1
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 11,
+              "N": 16,
+              "V": 5
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            }
+          }
+        },
+        "soft_no_think|no_think_sampling|r1": {
+          "C": 0,
+          "I": 73,
+          "N": 128,
+          "V": 55,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 4,
+              "N": 16,
+              "V": 12
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 10,
+              "N": 16,
+              "V": 6
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 10,
+              "N": 16,
+              "V": 6
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 9,
+              "N": 16,
+              "V": 7
+            }
+          }
+        },
+        "soft_no_think|thinking_sampling|r0": {
+          "C": 0,
+          "I": 72,
+          "N": 128,
+          "V": 56,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 4,
+              "N": 16,
+              "V": 12
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 15,
+              "N": 16,
+              "V": 1
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 11,
+              "N": 16,
+              "V": 5
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 11,
+              "N": 16,
+              "V": 5
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 7,
+              "N": 16,
+              "V": 9
+            }
+          }
+        },
+        "soft_no_think|thinking_sampling|r1": {
+          "C": 0,
+          "I": 70,
+          "N": 128,
+          "V": 58,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 4,
+              "N": 16,
+              "V": 12
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 16,
+              "N": 16,
+              "V": 0
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 15,
+              "N": 16,
+              "V": 1
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 8,
+              "N": 16,
+              "V": 8
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 10,
+              "N": 16,
+              "V": 6
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 10,
+              "N": 16,
+              "V": 6
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 7,
+              "N": 16,
+              "V": 9
+            }
+          }
+        },
+        "soft_thinking|no_think_sampling|r0": {
+          "C": 1,
+          "I": 0,
+          "N": 128,
+          "V": 127,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 1,
+              "I": 0,
+              "N": 16,
+              "V": 15
+            }
+          }
+        },
+        "soft_thinking|no_think_sampling|r1": {
+          "C": 0,
+          "I": 0,
+          "N": 128,
+          "V": 128,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            }
+          }
+        },
+        "soft_thinking|thinking_sampling|r0": {
+          "C": 2,
+          "I": 0,
+          "N": 128,
+          "V": 126,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 2,
+              "I": 0,
+              "N": 16,
+              "V": 14
+            }
+          }
+        },
+        "soft_thinking|thinking_sampling|r1": {
+          "C": 1,
+          "I": 1,
+          "N": 128,
+          "V": 126,
+          "V_plus_C_plus_I_equals_N": true,
+          "by_task": {
+            "boolean_logic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "constraint_order": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "modular_arithmetic": {
+              "C": 0,
+              "I": 1,
+              "N": 16,
+              "V": 15
+            },
+            "multistep_arithmetic": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "relation_path": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "sequence_rule": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "state_machine": {
+              "C": 0,
+              "I": 0,
+              "N": 16,
+              "V": 16
+            },
+            "string_transform": {
+              "C": 1,
+              "I": 0,
+              "N": 16,
+              "V": 15
+            }
+          }
+        }
+      },
+      "decision_checkpoint": 2048,
+      "file_hash_matches_natural_audit": true,
+      "file_sha256": "e56c06a6deec84d220784d2feba4d98050ff061a0cdbdcc7b989d218aeacad5a",
+      "partition_definition": {
+        "C": [
+          "CENSORED_AFTER_ANSWER_OBSERVED",
+          "CENSORED_AFTER_FINAL_START_NO_ANSWER",
+          "CENSORED_BEFORE_VALID_CLOSE"
+        ],
+        "I": [
+          "EOS_INVALID_MODE",
+          "EOS_INVALID_SEMANTIC"
+        ],
+        "V": [
+          "VALID_STOP"
+        ]
+      },
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/rows_natural.jsonl",
+      "row_self_hashes_verified": 2048,
+      "source_N_per_cell_stream": 128,
+      "unique_rows_verified": 2048
+    },
+    "natural_status": {
+      "complete": true,
+      "file_sha256": "ce4d8ab2cad0aab5b491f562144f1e48b045f9dcbb512f346f46c3aab27195a1",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/generator_status_natural.json",
+      "self_hash_valid": true,
+      "status_sha256": "2cec6816e710e592a8caa312cd4e30ab0c1700379137d4c71128ea91e62a85f7"
+    },
+    "protocol": {
+      "all_phase979_script_seals_valid": true,
+      "file_sha256": "48defe2ee9dc5f2a3589e5aa6381eb6c81b0c2db4c696adb73b2f4c6572251c7",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/protocol_preregistration.json",
+      "protocol_sha256": "160ea0d06fb651960dd5b2c00de9cda02e713725c09226147f9593068f83f5e1",
+      "self_hash_valid": true
+    }
+  },
+  "source_decision": {
+    "P": [],
+    "P_is_empty": true,
+    "phase979_confirmation_candidate_exists": false,
+    "phase979_decision_unchanged": true
+  },
+  "source_phase": 979
+}

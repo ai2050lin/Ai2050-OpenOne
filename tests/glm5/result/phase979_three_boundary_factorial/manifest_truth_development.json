@@ -1,0 +1,262 @@
+{
+  "actual_case_count": 512,
+  "batch_size": 8,
+  "boundary_core_path": "tests/glm5/phase979_boundary_core.py",
+  "boundary_core_sha256": "d6983462326dbd3f9afa707efca80d1dd6a26a8b1ea23a5fb1a44534ebf20f8d",
+  "control_policy": "hard_no_think",
+  "created_at_utc": "2026-07-18T03:25:36+00:00",
+  "dataset_identity": {
+    "all_pairs_sha256": "2f8be33fc1efa2b81f62cc6c6d8c5e3d779658e3af3dc0084928a1fdb2f704bd",
+    "candidate_labels": [
+      "A",
+      "B"
+    ],
+    "dataset_marker": "phase979_truth_punctuation_cross_v1",
+    "development_pairs_sha256": "ffab66f6a747ea2b88fd0d4036c43dfd2e5de43e6b8af8bfb342b27059536a31",
+    "expected_teacher_forced_rows": 1024,
+    "id_prefix": "p979_tp_cross",
+    "identity_sha256": "e8549f58d2ce11834b31f0a6f1c426046ebbb963e1d7f57a6ee9ff64226ef13b",
+    "identity_version": "phase979_truth_punctuation_cross_identity_v1",
+    "n_pairs": 128,
+    "n_prompts": 256,
+    "prompt_marker": "[TP979-TRUTH-CROSS]",
+    "prompts_sha256": "1ed552618e6a89b411ff546d0df9eaaa70e46037bd4aad1d02e2b2daf22e6bc7",
+    "replication_pairs_sha256": "f733524d5e12993dafb47a1042eb184f041c71b56e3c409c40728f589826dbd7",
+    "schema_version": 1,
+    "splits": [
+      "development",
+      "replication"
+    ],
+    "tasks": [
+      "direct_fact",
+      "classification",
+      "arithmetic",
+      "translation_format",
+      "definition",
+      "causal",
+      "multistep_math",
+      "logic"
+    ]
+  },
+  "dataset_module_path": "tests/glm5/phase979_truth_punctuation_dataset.py",
+  "dataset_module_sha256": "f0670c894778ecae600709748914ed0902e18675f440bc8cb78f15ceb1644e44",
+  "dataset_split_sha256": "ffab66f6a747ea2b88fd0d4036c43dfd2e5de43e6b8af8bfb342b27059536a31",
+  "device": "cuda:0",
+  "device_type": "cuda",
+  "eos_definition": "max_over_all_sealed_eos_ids",
+  "eos_rank_definition": "one_plus_count_all_vocab_logits_strictly_greater",
+  "eos_token_ids": [
+    151645,
+    151643
+  ],
+  "expected_rows": 512,
+  "experiment": "truth_punctuation_teacher_forcing",
+  "explicit_attention_mask": true,
+  "explicit_position_ids": true,
+  "gap_definition": "max_non_eos_logit_minus_max_eos_logit",
+  "holdout_loaded": false,
+  "left_padding": true,
+  "manifest_sha256": "99080b161d4d112572118cda6291eac19e5a6c80571892b58c837cb17b5bd873",
+  "mechanism_authorized": false,
+  "model_artifact_identity": {
+    "files": {
+      "config.json": {
+        "bytes": 726,
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+      },
+      "configuration.json": {
+        "bytes": 73,
+        "sha256": "f888421726665e8a84b738eed42a64875aed79de8be7daade851ac8bf4c0cef9"
+      },
+      "generation_config.json": {
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      "merges.txt": {
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      "model-00001-of-00003.safetensors": {
+        "bytes": 3957900840,
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+      },
+      "model-00002-of-00003.safetensors": {
+        "bytes": 3987450520,
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+      },
+      "model-00003-of-00003.safetensors": {
+        "bytes": 99630640,
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+      },
+      "model.safetensors.index.json": {
+        "bytes": 32819,
+        "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+      },
+      "tokenizer.json": {
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "tokenizer_config.json": {
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      "vocab.json": {
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    },
+    "identity_sha256": "5cf8bde58b192119d060554c739ee4555025d7f433f77f3299ddb2f846d61df5",
+    "model_dir": "D:\\develop\\model\\Qwen\\Qwen3-4B"
+  },
+  "model_class": "Qwen3ForCausalLM",
+  "model_dtype": "torch.bfloat16",
+  "model_mode": "eval_inference_mode",
+  "model_name": "qwen3",
+  "model_vocab_size": 151936,
+  "n_pairs": 64,
+  "pad_token_id": 151643,
+  "pairs_audit": {
+    "candidate_order_counts": {
+      "arithmetic": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "causal": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "classification": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "definition": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "direct_fact": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "logic": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "multistep_math": {
+        "A_first": 4,
+        "B_first": 4
+      },
+      "translation_format": {
+        "A_first": 4,
+        "B_first": 4
+      }
+    },
+    "controlled_change_issues": [],
+    "cross_set_overlap": [],
+    "dataset_marker": "phase979_truth_punctuation_cross_v1",
+    "duplicate_ids": [],
+    "duplicate_prompt_ids": [],
+    "duplicate_prompts": [],
+    "encoding_issues": [],
+    "errors": [],
+    "expected_teacher_forced_rows": 512,
+    "n_pairs": 64,
+    "n_prompts": 128,
+    "ok": true,
+    "passed": true,
+    "schema_issues": [],
+    "schema_version": 1,
+    "split_counts": {
+      "development": 64
+    },
+    "split_task_counts": {
+      "development": {
+        "arithmetic": 8,
+        "causal": 8,
+        "classification": 8,
+        "definition": 8,
+        "direct_fact": 8,
+        "logic": 8,
+        "multistep_math": 8,
+        "translation_format": 8
+      }
+    },
+    "task_counts": {
+      "arithmetic": 8,
+      "causal": 8,
+      "classification": 8,
+      "definition": 8,
+      "direct_fact": 8,
+      "logic": 8,
+      "multistep_math": 8,
+      "translation_format": 8
+    },
+    "tokenizer_audit_required": true,
+    "tokenizer_contract": "For every official-prefix context, A and B must each be one token; A./B. must preserve the bare token prefix and append the same one ASCII-period token. This module does not certify tokenizer behavior.",
+    "truth_issues": [],
+    "unknown_ids": []
+  },
+  "pairs_audit_sha256": "da6ebf0662d599a1fc7a961e878a37f4482bf45d52b87db58edbb52b60cd8a7a",
+  "phase": 979,
+  "phase978_holdout_loaded": false,
+  "phase978_no_go": {
+    "admission_file_sha256": "1d357451813cb66e22980e59699c4d0da8e99ac727ab9d32380ae51ceb7d9f6e",
+    "admission_sha256": "490e0a650795f0cdddb44591b6e11f7baec749c9005da27e93f8354b63dbfd92",
+    "development_gate_passed": false,
+    "holdout_authorized": false,
+    "holdout_loaded": false,
+    "open_receipt_exists": false
+  },
+  "protocol_file_sha256": "48defe2ee9dc5f2a3589e5aa6381eb6c81b0c2db4c696adb73b2f4c6572251c7",
+  "protocol_sha256": "160ea0d06fb651960dd5b2c00de9cda02e713725c09226147f9593068f83f5e1",
+  "replication_authorized": false,
+  "replication_execution_contract": "preregistered conditional block; no replication model forward or output before authenticated truth development admission",
+  "rng_policy": "not_applicable_no_sampling",
+  "runner_path": "tests/glm5/phase979_truth_punctuation.py",
+  "runner_sha256": "f3bfaedddf3f0fb7215210d4e0e3736216368cfa135e6a6d34122a0a4e4576d6",
+  "runtime_versions": {
+    "python": "3.11.9",
+    "python_full": "3.11.9 (main, Apr 15 2024, 17:44:41) [MSC v.1929 64 bit (AMD64)]",
+    "python_implementation": "CPython",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.12.0",
+    "version_source": "installed_distribution_metadata_only"
+  },
+  "sampling": false,
+  "sampling_performed": false,
+  "schema_version": 1,
+  "selected_eos_definition": "argmax_eos_logit",
+  "special_token_ids": {
+    "A": 32,
+    "B": 33,
+    "period": 13,
+    "think_close": 151668,
+    "think_open": 151667
+  },
+  "split": "development",
+  "teacher_forced": true,
+  "teacher_forcing": true,
+  "tf32_enabled": false,
+  "token_audit": {
+    "answer_states_preserve_official_prefix": true,
+    "bare_labels_are_one_token": true,
+    "case_token_identity_sha256": "6ed1b778f5d182c1afa157494d0eae5cdea97ffcbbab6d3eb95d4b5aed4dd5f1",
+    "enable_thinking": false,
+    "label_token_ids": {
+      "A": 32,
+      "B": 33
+    },
+    "n_official_prefixes": 128,
+    "n_teacher_forced_states": 512,
+    "official_control": "hard_no_think",
+    "period_is_same_pure_one_token_suffix_everywhere": true,
+    "period_token_id": 13,
+    "prefix_probes_sha256": "816609066ee6b81a8a17b77b0e2d6d59b99cb44b366e6c4f160f309db6185f97",
+    "think_close_id": 151668,
+    "think_open_id": 151667
+  },
+  "tokenizer_class": "Qwen2Tokenizer",
+  "tokenizer_length": 151669,
+  "tokenizer_padding_side": "left",
+  "truth_admission_file_sha256": null,
+  "truth_admission_sha256": null
+}

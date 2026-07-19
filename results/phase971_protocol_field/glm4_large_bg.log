@@ -1,0 +1,27 @@
+[20:27:51] Phase 971 GLM4 large-scale joint test (40 prompts)
+[20:27:51]   Top MLP channels (safe): [(39, 7968), (39, 10417), (39, 9701), (39, 5032), (36, 251), (39, 12274), (39, 5155), (39, 13207)]
+[model_utils] Loading glm4... (8bit=False)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=18.84GB
+[20:28:18]   GlmForCausalLM, 40L
+[20:28:34]   10/40 clean_so_far=9/10 (15s)
+[20:28:54]   20/40 clean_so_far=16/20 (36s)
+[20:29:19]   30/40 clean_so_far=20/30 (61s)
+[20:29:40]   40/40 clean_so_far=27/40 (81s)
+[20:29:40] 
+RESULT: clean=27/40=0.675  eos=0.950  expected=0.775  mean_b=14.7
+[20:29:40] Failures:
+[20:29:40]   'Grass is': b=16 ' growing at a rate of 1 cm per hour.<|endofte' exp=False
+[20:29:40]   'Shakespeare was': b=14 ' a playwright and poet who lived in the late ' exp=True
+[20:29:40]   'Gold is a': b=14 ' precious metal that has been used for centur' exp=True
+[20:29:40]   'Birds can': b=15 ' be a real pain in the garden.<|endoftext|>' exp=False
+[20:29:40]   'Mathematics is': b=16 ' a language of patterns.<|endoftext|>' exp=False
+[20:29:40]   'Music is': b=16 ' a universal language that transcends cultura' exp=False
+[20:29:40]   'The brain is': b=14 ' a complex organ that is responsible for a wi' exp=True
+[20:29:40]   'Rivers flow': b=15 ' from high ground to lower ground in the same' exp=False
+[20:29:40]   'Volcanoes erupt': b=14 ' for a variety of reasons, including<|endofte' exp=False
+[20:29:40]   'Heat is': b=15 ' a form of energy that can be transferred fro' exp=True
+[20:29:40]   'Diamonds are': b=15 ' a girl's best friend,<|endoftext|>' exp=False
+[20:29:40] 
+Done (81s)
+[model_utils] GPU memory released, allocated=18.85 GB
+[20:29:40] DONE

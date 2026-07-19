@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "phase": 978,
+  "experiment": "qwen3_official_budget_stabilization_development",
+  "split": "development",
+  "model": "qwen3",
+  "model_class": "Qwen3ForCausalLM",
+  "model_name_or_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\qwen3-4b",
+  "tokenizer_class": "Qwen2Tokenizer",
+  "protocol_sha256": "878733e7c858c40e9c51324417851ba1df0811607a4f1d8d5e6f7b116beb1afb",
+  "runner_sha256": "561e0d9d14fb0129532c2f1b69f84fd916db6ca93de7228e46388cd1fba3be65",
+  "source_artifact_sha256": {
+    "phase977_dev_dataset.py": "ac28e7d0b1a806653564f8f9e330c59ab3134062b45d5c578a2616e2d6997399",
+    "phase977_holdout_dataset.py": "d4d630f00a7c0197f6e7ba83704fdcf13121d67b5b09d3a77d649cb3fdff4755",
+    "phase977_legal_mode_trajectories.py": "9b725cbac0cb5c975c4e588ee7f6924e60004154f0ac4cf2dbdcb9aa34a28481",
+    "manifest_development.json": "de25a435eee181ebaa7219c4f5d8bb722cac948695cadd78c28243b5eb77bcb0",
+    "rows_development.jsonl": "8b7c9b4d2f8a1d6e8e5bf0c6a9575a8545169f6b86053a1b7fe4fa83be3fe426",
+    "summary_development.json": "48ae80112682e7f8b6dceab1202c2d7ade4b99d492deb9925432dabddc8d2968"
+  },
+  "source_manifest_sha256": "378a28959759177883ef72f6ad8f4c903c21f1762f2258f57b478e5545102544",
+  "source_dataset_sha256": "ff2703b07868f1b440b21e067385c9a3cdd56810c04b02670f607f151368e72d",
+  "source_stage_rows": 408,
+  "selected_hit512_trajectories": 112,
+  "selected_hit512_by_condition": {
+    "hard_no_think": 3,
+    "hard_thinking": 55,
+    "soft_no_think": 2,
+    "soft_thinking": 52
+  },
+  "conditions": {
+    "hard_no_think": {
+      "enable_thinking": false,
+      "prompt_suffix": "",
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0
+    },
+    "hard_thinking": {
+      "enable_thinking": true,
+      "prompt_suffix": "",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "min_p": 0.0
+    },
+    "soft_no_think": {
+      "enable_thinking": true,
+      "prompt_suffix": " /no_think",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "min_p": 0.0
+    },
+    "soft_thinking": {
+      "enable_thinking": true,
+      "prompt_suffix": " /think",
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "min_p": 0.0
+    }
+  },
+  "condition_order": [
+    "hard_no_think",
+    "hard_thinking",
+    "soft_no_think",
+    "soft_thinking"
+  ],
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536
+  ],
+  "new_stages": {
+    "1024": "extended1024",
+    "1536": "extended1536"
+  },
+  "decision_checkpoint": 1536,
+  "extension_rule": "only source hit512 trajectories rerun to 1024; only hit1024 trajectories rerun to 1536; always original official prefix and same seed",
+  "replay_rule": "all prior checkpoint generated token IDs must match exactly",
+  "natural_endpoint_rule": "actual sampled terminal EOS; top1/logit rank is not the gate",
+  "base_seed": 977000,
+  "seed_rule": "sha256(phase977|base_seed|split|item_id), identical across the four conditions",
+  "eos_token_ids": [
+    151645,
+    151643
+  ],
+  "special_token_ids": {
+    "think_open": 151667,
+    "think_close": 151668
+  },
+  "generated_mode_parser_version": "strict_final_region_v2",
+  "data_audit": {
+    "external": {
+      "ok": true,
+      "passed": true,
+      "n_items": 64,
+      "task_counts": {
+        "arithmetic": 8,
+        "causal": 8,
+        "classification": 8,
+        "definition": 8,
+        "direct_fact": 8,
+        "logic": 8,
+        "multistep_math": 8,
+        "translation_format": 8
+      },
+      "duplicate_ids": [],
+      "duplicate_prompts": [],
+      "cross_set_overlap": [],
+      "schema_issues": [],
+      "encoding_issues": [],
+      "errors": []
+    },
+    "local": {
+      "n": 64,
+      "n_tasks": 8,
+      "duplicate_ids": [],
+      "preexisting_soft_switches": [],
+      "empty_prompts": [],
+      "exact_n": 5
+    },
+    "cross_set_overlap_contract": "authenticated from the frozen Phase977 development manifest; Phase978 does not re-import the historical discovery builder"
+  },
+  "source_tokenizer_audit": {
+    "eos_ids": [
+      151645,
+      151643
+    ],
+    "think_open_id": 151667,
+    "think_close_id": 151668,
+    "all_source_rows_strict_v2_recomputed": true,
+    "all_source_terminations_exact": true,
+    "all_source_256_replays_exact": true
+  },
+  "holdout_module_imported": false,
+  "decision_owned_by": "phase978_dev_admission_audit.py",
+  "manifest_sha256": "059b8219ef21dba23da3f89821941cf07870e4737f07ce6cb139612edcbcf1ad",
+  "created_at_utc": "2026-07-17T19:43:57+00:00"
+}

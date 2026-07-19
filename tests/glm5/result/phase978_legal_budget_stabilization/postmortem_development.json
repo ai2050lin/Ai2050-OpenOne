@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "phase": 978,
+  "experiment": "development_budget_failure_postmortem",
+  "split": "development_design_data_only",
+  "role": "read_only_exploratory_postmortem_cannot_change_gate",
+  "postmortem_script_sha256": "760ae955e8a3dc1b5d562c4e4bd779ac0a6e11e3b12345ede8a71d24ccb68e67",
+  "protocol_sha256": "878733e7c858c40e9c51324417851ba1df0811607a4f1d8d5e6f7b116beb1afb",
+  "admission_sha256": "490e0a650795f0cdddb44591b6e11f7baec749c9005da27e93f8354b63dbfd92",
+  "development_manifest_sha256": "059b8219ef21dba23da3f89821941cf07870e4737f07ce6cb139612edcbcf1ad",
+  "development_rows_sha256": "0247a281bfdbcc0e7e7d5502e25dddb61ebe3cec159901e4f15c76fddc20ec93",
+  "source_rows_sha256": "8b7c9b4d2f8a1d6e8e5bf0c6a9575a8545169f6b86053a1b7fe4fa83be3fe426",
+  "input_authentication": {
+    "all_source_rows_recomputed": true,
+    "all_source_256_replays_exact": true,
+    "all_extension_rows_recomputed": true,
+    "all_extension_replays_exact": true,
+    "holdout_module_imported": false,
+    "model_weights_loaded": false
+  },
+  "frozen_decision": {
+    "passed": false,
+    "failed_conditions": [
+      "hard_thinking"
+    ],
+    "holdout_authorized": false,
+    "holdout_loaded": false,
+    "mechanism_authorized": false,
+    "decision_unchanged": true
+  },
+  "by_condition": {
+    "hard_no_think": {
+      "n": 64,
+      "endpoint_intervals": {
+        "<=256": 50,
+        "257-512": 11,
+        "513-1024": 3,
+        "1025-1536": 0,
+        ">1536_censored": 0
+      },
+      "staged_recovery": {
+        "selected_after_hit512_n": 3,
+        "actual_eos_513_1024_n": 3,
+        "recovery_among_hit512_rate": 1.0,
+        "selected_after_hit1024_n": 0,
+        "actual_eos_1025_1536_n": 0,
+        "recovery_among_hit1024_rate": null,
+        "still_censored_at_1536_n": 0
+      },
+      "completed_actual_eos_taxonomy": {
+        "n": 64,
+        "valid_mode_eos_n": 58,
+        "mode_valid_but_semantic_mismatch_n": 6,
+        "mode_invalid_n": 0,
+        "mutually_exclusive_and_exhaustive": true
+      },
+      "censoring": {
+        "n": 0,
+        "by_task": {},
+        "cap_snapshots": [],
+        "interpretation_boundary": "These rows have no sampled EOS by 1536. Mode/semantic fields describe only the truncated cap snapshot and are not endpoint failures. Right censoring applies to endpoint time only."
+      }
+    },
+    "hard_thinking": {
+      "n": 64,
+      "endpoint_intervals": {
+        "<=256": 2,
+        "257-512": 7,
+        "513-1024": 31,
+        "1025-1536": 11,
+        ">1536_censored": 13
+      },
+      "staged_recovery": {
+        "selected_after_hit512_n": 55,
+        "actual_eos_513_1024_n": 31,
+        "recovery_among_hit512_rate": 0.5636363636363636,
+        "selected_after_hit1024_n": 24,
+        "actual_eos_1025_1536_n": 11,
+        "recovery_among_hit1024_rate": 0.4583333333333333,
+        "still_censored_at_1536_n": 13
+      },
+      "completed_actual_eos_taxonomy": {
+        "n": 51,
+        "valid_mode_eos_n": 44,
+        "mode_valid_but_semantic_mismatch_n": 7,
+        "mode_invalid_n": 0,
+        "mutually_exclusive_and_exhaustive": true
+      },
+      "censoring": {
+        "n": 13,
+        "by_task": {
+          "arithmetic": 5,
+          "causal": 2,
+          "classification": 1,
+          "logic": 1,
+          "multistep_math": 3,
+          "translation_format": 1
+        },
+        "cap_snapshots": [
+          {
+            "id": "p977_dev_arithmetic_01",
+            "task": "arithmetic",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": true,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_arithmetic_04",
+            "task": "arithmetic",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": true,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_arithmetic_05",
+            "task": "arithmetic",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": true,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_arithmetic_06",
+            "task": "arithmetic",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          },
+          {
+            "id": "p977_dev_arithmetic_07",
+            "task": "arithmetic",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_causal_01",
+            "task": "causal",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_causal_03",
+            "task": "causal",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          },
+          {
+            "id": "p977_dev_classification_03",
+            "task": "classification",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": true,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_logic_01",
+            "task": "logic",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_multistep_math_05",
+            "task": "multistep_math",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          },
+          {
+            "id": "p977_dev_multistep_math_06",
+            "task": "multistep_math",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          },
+          {
+            "id": "p977_dev_multistep_math_08",
+            "task": "multistep_math",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          },
+          {
+            "id": "p977_dev_translation_format_06",
+            "task": "translation_format",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          }
+        ],
+        "interpretation_boundary": "These rows have no sampled EOS by 1536. Mode/semantic fields describe only the truncated cap snapshot and are not endpoint failures. Right censoring applies to endpoint time only."
+      }
+    },
+    "soft_no_think": {
+      "n": 64,
+      "endpoint_intervals": {
+        "<=256": 50,
+        "257-512": 12,
+        "513-1024": 2,
+        "1025-1536": 0,
+        ">1536_censored": 0
+      },
+      "staged_recovery": {
+        "selected_after_hit512_n": 2,
+        "actual_eos_513_1024_n": 2,
+        "recovery_among_hit512_rate": 1.0,
+        "selected_after_hit1024_n": 0,
+        "actual_eos_1025_1536_n": 0,
+        "recovery_among_hit1024_rate": null,
+        "still_censored_at_1536_n": 0
+      },
+      "completed_actual_eos_taxonomy": {
+        "n": 64,
+        "valid_mode_eos_n": 59,
+        "mode_valid_but_semantic_mismatch_n": 5,
+        "mode_invalid_n": 0,
+        "mutually_exclusive_and_exhaustive": true
+      },
+      "censoring": {
+        "n": 0,
+        "by_task": {},
+        "cap_snapshots": [],
+        "interpretation_boundary": "These rows have no sampled EOS by 1536. Mode/semantic fields describe only the truncated cap snapshot and are not endpoint failures. Right censoring applies to endpoint time only."
+      }
+    },
+    "soft_thinking": {
+      "n": 64,
+      "endpoint_intervals": {
+        "<=256": 2,
+        "257-512": 10,
+        "513-1024": 31,
+        "1025-1536": 15,
+        ">1536_censored": 6
+      },
+      "staged_recovery": {
+        "selected_after_hit512_n": 52,
+        "actual_eos_513_1024_n": 31,
+        "recovery_among_hit512_rate": 0.5961538461538461,
+        "selected_after_hit1024_n": 21,
+        "actual_eos_1025_1536_n": 15,
+        "recovery_among_hit1024_rate": 0.7142857142857143,
+        "still_censored_at_1536_n": 6
+      },
+      "completed_actual_eos_taxonomy": {
+        "n": 58,
+        "valid_mode_eos_n": 52,
+        "mode_valid_but_semantic_mismatch_n": 6,
+        "mode_invalid_n": 0,
+        "mutually_exclusive_and_exhaustive": true
+      },
+      "censoring": {
+        "n": 6,
+        "by_task": {
+          "arithmetic": 2,
+          "causal": 1,
+          "classification": 1,
+          "multistep_math": 1,
+          "translation_format": 1
+        },
+        "cap_snapshots": [
+          {
+            "id": "p977_dev_arithmetic_04",
+            "task": "arithmetic",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": true,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_arithmetic_06",
+            "task": "arithmetic",
+            "mode_valid_at_cap": false,
+            "final_region_valid_at_cap": false,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "invalid_repeated_reversed_or_unclosed_tags"
+          },
+          {
+            "id": "p977_dev_causal_01",
+            "task": "causal",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_classification_03",
+            "task": "classification",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": true,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_multistep_math_08",
+            "task": "multistep_math",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          },
+          {
+            "id": "p977_dev_translation_format_06",
+            "task": "translation_format",
+            "mode_valid_at_cap": true,
+            "final_region_valid_at_cap": true,
+            "semantic_match_at_cap": false,
+            "think_structure_status_at_cap": "unique_ordered_pair"
+          }
+        ],
+        "interpretation_boundary": "These rows have no sampled EOS by 1536. Mode/semantic fields describe only the truncated cap snapshot and are not endpoint failures. Right censoring applies to endpoint time only."
+      }
+    }
+  },
+  "paired_thinking_descriptive": {
+    "both_censored_n": 6,
+    "hard_only_censored_n": 7,
+    "soft_only_censored_n": 0,
+    "neither_censored_n": 51,
+    "both_completed_actual_eos_n": 51,
+    "endpoint_order_among_both_completed": {
+      "hard_earlier": 18,
+      "soft_earlier": 33,
+      "equal": 0
+    },
+    "interpretation_boundary": "This is a paired descriptive count only. The official hard/soft conditions use different complete decoding configurations, so it does not isolate a soft-switch causal effect."
+  },
+  "primary_matcher_self_consistency": {
+    "canonical_answer_matcher_false_n": 8,
+    "canonical_answer_matcher_false_ids": [
+      "p977_dev_causal_01",
+      "p977_dev_causal_03",
+      "p977_dev_causal_05",
+      "p977_dev_causal_07",
+      "p977_dev_causal_08",
+      "p977_dev_definition_03",
+      "p977_dev_definition_05",
+      "p977_dev_definition_07"
+    ],
+    "interpretation": "External frozen labels remain authoritative. These misses expose an evaluator hard limit and cannot be repaired post hoc for the Phase978 gate."
+  },
+  "wrong_answer_teacher_forced_auxiliary": {
+    "manifest_sha256": "6616c2b9a4664385e3927b21408f4e8464457b0aa026f3bb7f76a113a0245991",
+    "manifest_file_sha256": "31a520afa3daab8eca9429e49855409b3dc6b3806dbad416227d7bf979ca10fc",
+    "rows_file_sha256": "a082126540da785a3fa93b4e286c0ed55c1211bd98a75344f54fe35fd7d303b3",
+    "summary_file_sha256": "c7cfd236fef5d0b7c96a4c889e01aed96afd8c14a1bc61de00d414ff3a5cac29",
+    "authenticated_rows": 256,
+    "by_state": {
+      "C": {
+        "n": 64,
+        "eos_top1_n": 18,
+        "gap_negative_n": 18,
+        "mean_gap": 15.635658264160156,
+        "mean_max_eos_probability": 0.2686182191828389,
+        "mean_eos_rank": 1697.21875
+      },
+      "P": {
+        "n": 64,
+        "eos_top1_n": 25,
+        "gap_negative_n": 25,
+        "mean_gap": 2.30517578125,
+        "mean_max_eos_probability": 0.3736720044083848,
+        "mean_eos_rank": 94.390625
+      },
+      "W": {
+        "n": 64,
+        "eos_top1_n": 3,
+        "gap_negative_n": 3,
+        "mean_gap": 14.14031982421875,
+        "mean_max_eos_probability": 0.041352417119568004,
+        "mean_eos_rank": 4857.375
+      },
+      "WP": {
+        "n": 64,
+        "eos_top1_n": 23,
+        "gap_negative_n": 23,
+        "mean_gap": 2.31884765625,
+        "mean_max_eos_probability": 0.30294999346728735,
+        "mean_eos_rank": 57.921875
+      }
+    },
+    "paired": {
+      "n_complete_pairs": 64,
+      "WP_gap_greater_than_P_n": 36,
+      "mean_WP_minus_P_gap": 0.013671875,
+      "P_eos_top1_and_WP_not_n": 11,
+      "WP_eos_top1_and_P_not_n": 9,
+      "W_gap_greater_than_C_n": 30,
+      "mean_W_minus_C_gap": -1.4953384399414062,
+      "C_eos_top1_and_W_not_n": 15,
+      "W_eos_top1_and_C_not_n": 0,
+      "punctuation_pairs_n": 128,
+      "punctuation_preserves_base_token_prefix_n": 126,
+      "pure_single_token_period_suffix_n": 126,
+      "punctuation_retokenized_pair_n": 2,
+      "punctuation_retokenized_pairs": [
+        "p977_dev_logic_02:W->WP",
+        "p977_dev_logic_04:C->P"
+      ],
+      "punctuation_interpretation_boundary": "retokenized pairs are retained but are not pure one-token period suffix interventions",
+      "interpretation": "positive wrong-minus-correct gap means EOS is less competitive after the externally wrong answer; this remains an auxiliary teacher-forced association, not mechanism evidence"
+    },
+    "canonical_answer_matcher_false_n": 8,
+    "canonical_answer_matcher_false_ids": [
+      "p977_dev_definition_03",
+      "p977_dev_definition_05",
+      "p977_dev_definition_07",
+      "p977_dev_causal_01",
+      "p977_dev_causal_03",
+      "p977_dev_causal_05",
+      "p977_dev_causal_07",
+      "p977_dev_causal_08"
+    ],
+    "contract": {
+      "role": "auxiliary_teacher_forced_dev_only",
+      "tests": "formal completion and punctuation versus external answer correctness",
+      "natural_trajectory_evidence": false,
+      "official_four_mode_comparison": false,
+      "internal_mechanism_evidence": false,
+      "affects_main_legal_trajectory_gate": false,
+      "authorizes_holdout": false,
+      "imports_holdout": false
+    },
+    "interpretation_boundary": "These counts compare formal answer completion/punctuation with external gold correctness under teacher forcing. They are not natural trajectories, mode evidence, or internal mechanism evidence."
+  },
+  "conclusion_boundaries": [
+    "Actual sampled EOS, not EOS top-1 or logit gap, defines the natural endpoint gate.",
+    "Right censoring concerns endpoint time only; a truncated cap snapshot is not a semantic or mode endpoint failure.",
+    "Budget is an external protocol and observation variable, not a located internal causal node.",
+    "The official hard/soft configurations differ in decoding details; their contrast is not an isolated thinking-control intervention.",
+    "Development data are now design data. No post-hoc higher cap may revise the frozen Phase978 decision."
+  ],
+  "next_stage_constraint": "A later phase must use a new preregistration and new non-holdout design data to study the >1536 tail and evaluator separation. The sealed 128-item holdout remains closed until a fresh independent confirmatory gate passes.",
+  "holdout_loaded": false,
+  "model_weights_loaded": false,
+  "postmortem_sha256": "ce20d4ec17e2a182f2b168bb27e6a65b2d955999d223e44dc57660ef0cc27fa0",
+  "generated_at_utc": "2026-07-17T21:06:26+00:00"
+}

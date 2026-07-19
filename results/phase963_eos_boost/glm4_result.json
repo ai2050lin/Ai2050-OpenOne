@@ -1,0 +1,323 @@
+{
+  "model": "glm4",
+  "task1": {
+    "task": "task1_boost_eos_head",
+    "eos_head": "L38_H6",
+    "scales": [
+      1.0,
+      3.0,
+      5.0
+    ],
+    "summary": {
+      "scale_1.0": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.0,
+        "mean_tokens": 30.0
+      },
+      "scale_3.0": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.0,
+        "mean_tokens": 30.0
+      },
+      "scale_5.0": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.0,
+        "mean_tokens": 30.0
+      }
+    },
+    "raw_results": [
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 1.0,
+        "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 3.0,
+        "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 5.0,
+        "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 1.0,
+        "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6371 km, then the radius",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 3.0,
+        "generated": " Jupiter, which has a diameter of about 139,820 kilometers. To calculate the surface area of Jupiter, we can use the formula for the",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 5.0,
+        "generated": " Jupiter, which has a diameter of about 139,820 kilometers. To calculate the surface area of Jupiter, we can use the formula for the",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      }
+    ]
+  },
+  "task2": {
+    "summary": {
+      "normal": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.0,
+        "mean_tokens": 30.0
+      },
+      "boost_eos_3x": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.0,
+        "mean_tokens": 30.0
+      },
+      "ablate_lock": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.5,
+        "mean_tokens": 30.0
+      },
+      "boost_eos+ablate_lock": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.5,
+        "mean_tokens": 30.0
+      },
+      "boost_eos5x+ablate_lock": {
+        "eos_rate": 0.0,
+        "strict_clean_rate": 0.0,
+        "lang_switch_rate": 0.0,
+        "mean_tokens": 30.0
+      }
+    },
+    "raw_results": [
+      {
+        "prompt": "The capital of France is",
+        "condition": "normal",
+        "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The capital of France is",
+        "condition": "boost_eos_3x",
+        "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The capital of France is",
+        "condition": "ablate_lock",
+        "generated": " Paris.\n根据问题，我们需要判断这个陈述是否正确。根据我的知识，法国的首都是巴黎。因此，这个陈述是正确的。最终答案是",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": true
+      },
+      {
+        "prompt": "The capital of France is",
+        "condition": "boost_eos+ablate_lock",
+        "generated": " Paris.\n根据问题，我们需要判断这个陈述是否正确。根据我的知识，法国的首都是巴黎。因此，这个陈述是正确的。最终答案是",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": true
+      },
+      {
+        "prompt": "The capital of France is",
+        "condition": "boost_eos5x+ablate_lock",
+        "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "condition": "normal",
+        "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6371 km, then the radius",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "condition": "boost_eos_3x",
+        "generated": " Jupiter, which has a diameter of about 139,820 kilometers. To calculate the surface area of Jupiter, we can use the formula for the",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "condition": "ablate_lock",
+        "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6.371e+06 meters",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "condition": "boost_eos+ablate_lock",
+        "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6.371e+06 meters",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      },
+      {
+        "prompt": "The largest planet is",
+        "condition": "boost_eos5x+ablate_lock",
+        "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6.371e+06 meters",
+        "has_eos": false,
+        "n_tokens": 30,
+        "strict_clean": false,
+        "lang_switched": false
+      }
+    ]
+  },
+  "task5": {
+    "data": [
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 1.0,
+        "base_eos_logit": -3.59375,
+        "patched_eos_logit": -3.59375,
+        "delta_eos": 0.0,
+        "base_margin": 1.6875,
+        "patched_margin": 1.6875,
+        "base_argmax": 12089,
+        "patched_argmax": 12089,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 3.0,
+        "base_eos_logit": -3.59375,
+        "patched_eos_logit": -3.609375,
+        "delta_eos": -0.015625,
+        "base_margin": 1.6875,
+        "patched_margin": 1.6875,
+        "base_argmax": 12089,
+        "patched_argmax": 12089,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 5.0,
+        "base_eos_logit": -3.59375,
+        "patched_eos_logit": -3.609375,
+        "delta_eos": -0.015625,
+        "base_margin": 1.6875,
+        "patched_margin": 1.625,
+        "base_argmax": 12089,
+        "patched_argmax": 12089,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The capital of France is",
+        "boost_scale": 10.0,
+        "base_eos_logit": -3.59375,
+        "patched_eos_logit": -3.59375,
+        "delta_eos": 0.0,
+        "base_margin": 1.6875,
+        "patched_margin": 1.5,
+        "base_argmax": 12089,
+        "patched_argmax": 12089,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 1.0,
+        "base_eos_logit": -2.328125,
+        "patched_eos_logit": -2.328125,
+        "delta_eos": 0.0,
+        "base_margin": 1.625,
+        "patched_margin": 1.625,
+        "base_argmax": 49371,
+        "patched_argmax": 49371,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 3.0,
+        "base_eos_logit": -2.328125,
+        "patched_eos_logit": -2.328125,
+        "delta_eos": 0.0,
+        "base_margin": 1.625,
+        "patched_margin": 1.625,
+        "base_argmax": 49371,
+        "patched_argmax": 49371,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 5.0,
+        "base_eos_logit": -2.328125,
+        "patched_eos_logit": -2.421875,
+        "delta_eos": -0.09375,
+        "base_margin": 1.625,
+        "patched_margin": 1.625,
+        "base_argmax": 49371,
+        "patched_argmax": 49371,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      },
+      {
+        "prompt": "The largest planet is",
+        "boost_scale": 10.0,
+        "base_eos_logit": -2.328125,
+        "patched_eos_logit": -2.484375,
+        "delta_eos": -0.15625,
+        "base_margin": 1.625,
+        "patched_margin": 1.8125,
+        "base_argmax": 49371,
+        "patched_argmax": 49371,
+        "argmax_changed": 0,
+        "eos_is_argmax": 0
+      }
+    ]
+  },
+  "elapsed_seconds": 94.29262828826904
+}

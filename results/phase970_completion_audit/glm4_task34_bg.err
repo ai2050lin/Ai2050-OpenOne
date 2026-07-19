@@ -1,0 +1,12 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 443/443 [00:00<00:00, 7621.53it/s]
+[transformers] The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5_temp\phase970_glm4_task34.py", line 36, in <module>
+    r4 = task4_natural_component_search(model, tokenizer, device, info, layers, eos_id,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase970_completion_audit.py", line 558, in task4_natural_component_search
+    log(f"      {name:10s} ({len(eval(name+'_safe'))} heads): mean_gap_reduction={mean_red:.3f}")
+                                 ^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1, in <module>
+NameError: name 'new_safe' is not defined

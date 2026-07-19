@@ -1,0 +1,32 @@
+[18:46:20] Phase 970 Task4 (rerun): glm4
+[model_utils] Loading glm4... (8bit=False)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=18.84GB
+[18:46:39]   GlmForCausalLM, 40L, 32H
+[18:46:39]   Task 4: Natural component search (6 layers × all heads, 5 prompts)...
+[18:46:39]     Searching layers 34-39 (6L × 32H)
+[18:47:11]     1/5 prompts (32s)
+[18:47:41]     2/5 prompts (62s)
+[18:48:12]     3/5 prompts (93s)
+[18:48:44]     4/5 prompts (125s)
+[18:49:14]     5/5 prompts (155s)
+[18:49:14]     Found 28 safe head candidates (Δgap<-0.05, |Δtop1|<0.3)
+[18:49:14]       L39_H21: Δgap=-0.3648  Δtop1=-0.0750  ΔEOS=0.2898
+[18:49:14]       L38_H5: Δgap=-0.3516  Δtop1=-0.0250  ΔEOS=0.3266
+[18:49:14]       L34_H26: Δgap=-0.1609  Δtop1=-0.0375  ΔEOS=0.1234
+[18:49:14]       L39_H23: Δgap=-0.1469  Δtop1=-0.0500  ΔEOS=0.0969
+[18:49:14]       L38_H0: Δgap=-0.1328  Δtop1=0.0125  ΔEOS=0.1453
+[18:49:14]       L39_H24: Δgap=-0.1187  Δtop1=-0.0500  ΔEOS=0.0688
+[18:49:14]       L34_H17: Δgap=-0.0758  Δtop1=-0.0500  ΔEOS=0.0258
+[18:49:14]       L37_H5: Δgap=-0.0734  Δtop1=-0.0375  ΔEOS=0.0359
+[18:49:14]       L38_H3: Δgap=-0.0734  Δtop1=-0.0250  ΔEOS=0.0484
+[18:49:14]       L39_H11: Δgap=-0.0734  Δtop1=-0.0750  ΔEOS=-0.0016
+[18:49:14]       L35_H1: Δgap=-0.0719  Δtop1=0.0000  ΔEOS=0.0719
+[18:49:14]       L39_H0: Δgap=-0.0711  Δtop1=-0.0500  ΔEOS=0.0211
+[18:49:15]       L39_H28: Δgap=-0.0711  Δtop1=-0.0875  ΔEOS=-0.0164
+[18:49:15]       L39_H14: Δgap=-0.0703  Δtop1=-0.0500  ΔEOS=0.0203
+[18:49:15]       L37_H26: Δgap=-0.0664  Δtop1=-0.0375  ΔEOS=0.0289
+[18:49:15]     Testing gap reduction: existing=4 vs new=8 vs combined=9
+[18:49:20]       existing   (4 heads): mean_gap_reduction=0.548
+[18:49:20]       new        (8 heads): mean_gap_reduction=1.006
+[18:49:20]       combined   (9 heads): mean_gap_reduction=1.027
+[18:49:20]     Testing combined_safe + adaptive b (8 prompts)...

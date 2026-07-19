@@ -1,0 +1,23 @@
+[18:51:06] Phase 970 Task4 combined test: glm4
+[model_utils] Loading glm4... (8bit=False)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=18.84GB
+[18:51:24]   existing=4 new=8 combined=9
+[18:51:24]   combined_safe=[(38, 5), (39, 23), (38, 0), (35, 1), (39, 21), (34, 26), (39, 24), (34, 17), (37, 5)]
+[18:51:30]   existing   (4 heads): mean_gap_reduction=0.548
+[18:51:30]   new        (8 heads): mean_gap_reduction=1.006
+[18:51:30]   combined   (9 heads): mean_gap_reduction=1.027
+[18:51:30]   Testing combined_safe + adaptive b (8 prompts)...
+[18:51:37]     'The capital of France is': b=15 eos=False clean=False ' Paris.
+根据问题，我们需要判断这个陈述是否正确。首先，我们需要知道法国的'
+[18:51:38]     'The largest planet is': b=14 eos=True clean=True ' Jupiter, which is<|endoftext|>'
+[18:51:39]     'Water boils at': b=16 eos=True clean=True ' 100 degrees Celsius.<|endoftext|>'
+[18:51:42]     'The speed of light is': b=15 eos=True clean=True ' 299,792 kilometers per second.<|endofte'
+[18:51:43]     'The sun is a': b=12 eos=True clean=True ' star, and the<|endoftext|>'
+[18:51:45]     'Dogs are': b=14 eos=True clean=True ' not only pets, but also<|endoftext|>'
+[18:51:47]     'The sky is': b=15 eos=True clean=True ' clear and the sun is shining.<|endoftex'
+[18:51:49]     'Grass is': b=16 eos=True clean=False ' growing at a rate of 1 cm per hour.<|en'
+[18:51:49]   Combined safe + adaptive b: clean=6/8
+[18:51:49] 
+Task4 combined test done (25s)
+[model_utils] GPU memory released, allocated=18.85 GB
+[18:51:49] DONE

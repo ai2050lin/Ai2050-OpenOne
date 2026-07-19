@@ -1,0 +1,363 @@
+{
+  "batch_size": 8,
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536,
+    2048
+  ],
+  "controls": {
+    "hard_no_think": {
+      "enable_thinking": false,
+      "prompt_suffix": "",
+      "requires_generated_close": false,
+      "requires_nonempty_thinking": false
+    },
+    "hard_thinking": {
+      "enable_thinking": true,
+      "prompt_suffix": "",
+      "requires_generated_close": true,
+      "requires_nonempty_thinking": true
+    },
+    "soft_no_think": {
+      "enable_thinking": true,
+      "prompt_suffix": " /no_think",
+      "requires_generated_close": true,
+      "requires_nonempty_thinking": false
+    },
+    "soft_thinking": {
+      "enable_thinking": true,
+      "prompt_suffix": " /think",
+      "requires_generated_close": true,
+      "requires_nonempty_thinking": true
+    }
+  },
+  "created_at_utc": "2026-07-18T03:23:40+00:00",
+  "dataset_audits": {
+    "natural_audit_sha256": "c12fab0989b3209c617980c7e756f5ef8918077a7b65a77d3ce02a2a74df7678",
+    "truth_combined_audit_sha256": "f9e5ff11418536877432a10d9d09d0e033ccf26d1848869ba7ed5ee2b9dc5fef"
+  },
+  "decision_boundary": "Phase979 is an external design diagnostic. No result revises the Phase978 NO-GO, opens the Phase977 holdout, or directly authorizes layer/span/cross-time mechanism experiments.",
+  "decision_checkpoint": 2048,
+  "decoding_policies": {
+    "no_think_sampling": {
+      "min_p": 0.0,
+      "temperature": 0.7,
+      "top_k": 20,
+      "top_p": 0.8
+    },
+    "thinking_sampling": {
+      "min_p": 0.0,
+      "temperature": 0.6,
+      "top_k": 20,
+      "top_p": 0.95
+    }
+  },
+  "execution_contract": {
+    "cpu_only_protocol_freeze": true,
+    "generation_performed": false,
+    "model_weights_loaded": false,
+    "old_holdout_module_imported": false,
+    "old_holdout_module_parsed": false,
+    "truth_forward_pass_performed": false
+  },
+  "expected_natural_rows": 2048,
+  "expected_truth_rows": {
+    "development": 512,
+    "replication": 512
+  },
+  "experiment": "three_boundary_factorial_and_truth_punctuation",
+  "holdout_loaded": false,
+  "local_model_artifact_identity": {
+    "files": {
+      "config.json": {
+        "bytes": 726,
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+      },
+      "generation_config.json": {
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      "merges.txt": {
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      "model-00001-of-00003.safetensors": {
+        "bytes": 3957900840,
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+      },
+      "model-00002-of-00003.safetensors": {
+        "bytes": 3987450520,
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+      },
+      "model-00003-of-00003.safetensors": {
+        "bytes": 99630640,
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+      },
+      "model.safetensors.index.json": {
+        "bytes": 32819,
+        "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+      },
+      "tokenizer.json": {
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "tokenizer_config.json": {
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      "vocab.json": {
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    },
+    "gpu_accessed": false,
+    "identity_sha256": "59ff0fe752b83b289c7f2b7c9869e9196a4036c4f99dd8a313962096b746b7b4",
+    "logical_name": "qwen3",
+    "path": "models/hf/qwen3-4b",
+    "weights_loaded": false
+  },
+  "max_new_tokens": 2048,
+  "mechanism_authorized": false,
+  "model_name": "qwen3",
+  "natural_contract": {
+    "cap_categories_are_right_censored_snapshots_not_terminal_failures": true,
+    "checkpoint_snapshots_are_prefixes_not_reruns": true,
+    "holdout_loaded": false,
+    "max_new_tokens": 2048,
+    "mechanism_authorized": false,
+    "new_diagnostic_cap_not_phase978_revision": true,
+    "per_row_independent_generator": true,
+    "screen_thresholds": {
+      "censored_net_reduction_min": 13,
+      "denominator_per_cell_stream": 128,
+      "eos_invalid_increase_max": 6,
+      "interpretation": "A passing contrast is only a candidate for a fresh independent confirmation; it cannot open the old holdout or authorize a mechanism scan.",
+      "must_pass_both_frozen_streams": true,
+      "tasks_with_valid_stop_improvement_min": 6,
+      "valid_stop_net_improvement_min": 13
+    },
+    "single_rollout_per_row": true,
+    "terminal_states": [
+      "CENSORED_BEFORE_VALID_CLOSE",
+      "CENSORED_AFTER_FINAL_START_NO_ANSWER",
+      "CENSORED_AFTER_ANSWER_OBSERVED",
+      "EOS_INVALID_MODE",
+      "EOS_INVALID_SEMANTIC",
+      "VALID_STOP"
+    ],
+    "two_streams_are_seed_dependence_screen_not_variance_estimate": true
+  },
+  "natural_dataset_identity": {
+    "dataset": "phase979_diagnostic128",
+    "identity_sha256": "2da762df071a8a096feb017bd9fbf640454e056860bec2ac1c226fc55243330a",
+    "items_sha256": "e884f922d77482baded1da55562df81685808dc0718049e26413ebacf56ece10",
+    "label_counts": {
+      "A": 64,
+      "B": 64
+    },
+    "n_items": 128,
+    "path": "tests/glm5/phase979_diagnostic_dataset.py",
+    "schema_version": 1,
+    "sha256": "74875eb5e00253f952969904a0164a06920e995c82735b30b1c307535b853605",
+    "task_counts": {
+      "boolean_logic": 16,
+      "constraint_order": 16,
+      "modular_arithmetic": 16,
+      "multistep_arithmetic": 16,
+      "relation_path": 16,
+      "sequence_rule": 16,
+      "state_machine": 16,
+      "string_transform": 16
+    }
+  },
+  "official_cells": [
+    [
+      "hard_no_think",
+      "no_think_sampling"
+    ],
+    [
+      "hard_thinking",
+      "thinking_sampling"
+    ],
+    [
+      "soft_no_think",
+      "thinking_sampling"
+    ],
+    [
+      "soft_thinking",
+      "thinking_sampling"
+    ]
+  ],
+  "phase": 979,
+  "phase978_commitments": {
+    "development_admission": {
+      "admission_sha256": "490e0a650795f0cdddb44591b6e11f7baec749c9005da27e93f8354b63dbfd92",
+      "path": "tests/glm5/result/phase978_legal_budget_stabilization/admission_development.json",
+      "sha256": "1d357451813cb66e22980e59699c4d0da8e99ac727ab9d32380ae51ceb7d9f6e"
+    },
+    "development_gate_passed": false,
+    "development_postmortem": {
+      "path": "tests/glm5/result/phase978_legal_budget_stabilization/postmortem_development.json",
+      "postmortem_sha256": "ce20d4ec17e2a182f2b168bb27e6a65b2d955999d223e44dc57660ef0cc27fa0",
+      "sha256": "22df28d9eaeb4470ef09b345ce998da3ed6394c1475f7b051b4bc643b505304a"
+    },
+    "holdout_authorized": false,
+    "holdout_loaded": false,
+    "mechanism_authorized": false,
+    "open_receipt_exists": false,
+    "protocol": {
+      "path": "tests/glm5/result/phase978_legal_budget_stabilization/protocol_preregistration.json",
+      "protocol_sha256": "878733e7c858c40e9c51324417851ba1df0811607a4f1d8d5e6f7b116beb1afb",
+      "sha256": "b327c308484d4483db9ba882e249daa8898e7fd62274c174ded3dfae5770eadd"
+    }
+  },
+  "phase979_script_hashes": {
+    "boundary_core": {
+      "path": "tests/glm5/phase979_boundary_core.py",
+      "sha256": "d6983462326dbd3f9afa707efca80d1dd6a26a8b1ea23a5fb1a44534ebf20f8d"
+    },
+    "natural_auditor": {
+      "path": "tests/glm5/phase979_natural_audit.py",
+      "sha256": "3ec10ec742904e9029c0237bb1426dda05320f3eceedfc9934f30425959a9d8a"
+    },
+    "natural_dataset": {
+      "path": "tests/glm5/phase979_diagnostic_dataset.py",
+      "sha256": "74875eb5e00253f952969904a0164a06920e995c82735b30b1c307535b853605"
+    },
+    "natural_runner": {
+      "path": "tests/glm5/phase979_natural_runner.py",
+      "sha256": "ab197006ad524bf3b44ecfed8e8345ce63ad97f16fb41d265baa9ac948ef50e4"
+    },
+    "protocol": {
+      "path": "tests/glm5/phase979_protocol.py",
+      "sha256": "89879aac0d031c8dccc23d53c4882fde41c53fb79db32b089e6b922dfe00206e"
+    },
+    "truth_auditor": {
+      "path": "tests/glm5/phase979_truth_audit.py",
+      "sha256": "c5a68a76631c7247b35c1663e6df4612ae91b7b8c9384e52888db5a53bcf3fe7"
+    },
+    "truth_dataset": {
+      "path": "tests/glm5/phase979_truth_punctuation_dataset.py",
+      "sha256": "f0670c894778ecae600709748914ed0902e18675f440bc8cb78f15ceb1644e44"
+    },
+    "truth_runner": {
+      "path": "tests/glm5/phase979_truth_punctuation.py",
+      "sha256": "f3bfaedddf3f0fb7215210d4e0e3736216368cfa135e6a6d34122a0a4e4576d6"
+    }
+  },
+  "protocol_sha256": "160ea0d06fb651960dd5b2c00de9cda02e713725c09226147f9593068f83f5e1",
+  "replicates": [
+    0,
+    1
+  ],
+  "runtime_versions": {
+    "python": "3.11.9",
+    "python_full": "3.11.9 (main, Apr 15 2024, 17:44:41) [MSC v.1929 64 bit (AMD64)]",
+    "python_implementation": "CPython",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.12.0",
+    "version_source": "installed_distribution_metadata_only"
+  },
+  "schema_version": 1,
+  "tokenizer_audit": {
+    "chat_template_sha256": "41d5929bf73796beb66809ac700b2cf3ff81694f933e5c14d52b7fd6963c947d",
+    "eos_token_id": 151645,
+    "natural_prefix_contexts": 512,
+    "natural_prefixes_sha256": "9cf4e8815a06d47c3fff9dc475e7e2af42b20b3755ac454990c59ba8a8dcf22f",
+    "pad_token_id": 151643,
+    "special_token_ids": {
+      "A": 32,
+      "B": 33,
+      "period": 13,
+      "think_close": 151668,
+      "think_open": 151667
+    },
+    "tokenizer_class": "Qwen2Tokenizer",
+    "tokenizer_length": 151669,
+    "truth_all_periods_are_same_pure_one_token_suffix": true,
+    "truth_bare_period_context_pairs": 512,
+    "truth_prefixes_sha256": "965ebee652944705a1433acc29b364e52b64f7aa67389d401919d7cee3dbc51d"
+  },
+  "truth_contract": {
+    "D_formula": "D_r=.5*((G(qA,B,r)-G(qA,A,r))+(G(qB,A,r)-G(qB,B,r)))",
+    "Q_correct_formula": "Q_C=.5*((G(qA,A,period)-G(qA,A,bare))+(G(qB,B,period)-G(qB,B,bare)))",
+    "Q_wrong_formula": "Q_W=.5*((G(qA,B,period)-G(qA,B,bare))+(G(qB,A,period)-G(qB,A,bare)))",
+    "control_policy": "hard_no_think",
+    "development_precedes_replication": true,
+    "eos_top1_is_secondary_only": true,
+    "gap_formula": "g*=max_{j not in EOS} z_j - max_{e in EOS} z_e",
+    "holdout_loaded": false,
+    "interaction_identity": "I=D_period-D_bare=Q_W-Q_C",
+    "mechanism_authorized": false,
+    "natural_rollout_claim_authorized": false,
+    "negative_Q_meaning": "period has lower EOS gap / stronger EOS",
+    "positive_D_meaning": "correct answer has lower EOS gap / stronger EOS",
+    "random_seed": null,
+    "replication_is_not_analyst_blind_holdout": true,
+    "replication_model_evaluation_requires_development_admission": true,
+    "replication_source_precommitted_and_preaudited": true,
+    "sampling": false,
+    "teacher_forced": true,
+    "thresholds": {
+      "development_and_replication_each": {
+        "punctuation_effect_QC_and_QW": {
+          "mean_max_logits": -2.0,
+          "negative_pairs_min": 48,
+          "pair_denominator": 64,
+          "tasks_with_negative_mean_min": 6
+        },
+        "truth_effect_D0_and_D1": {
+          "any_task_mean_failure_at_or_below": -2.0,
+          "mean_min_logits": 2.0,
+          "pair_denominator": 64,
+          "positive_pairs_min": 48,
+          "tasks_meeting_positive_6_of_8_min": 6
+        }
+      },
+      "replication_combined_confirmation": {
+        "pair_denominator": 128,
+        "tasks_meeting_positive_12_of_16_min": 6,
+        "truth_effect_D0_and_D1_positive_pairs_min": 96
+      }
+    }
+  },
+  "truth_dataset_identity": {
+    "all_pairs_sha256": "2f8be33fc1efa2b81f62cc6c6d8c5e3d779658e3af3dc0084928a1fdb2f704bd",
+    "candidate_labels": [
+      "A",
+      "B"
+    ],
+    "dataset_marker": "phase979_truth_punctuation_cross_v1",
+    "development_pairs_sha256": "ffab66f6a747ea2b88fd0d4036c43dfd2e5de43e6b8af8bfb342b27059536a31",
+    "expected_teacher_forced_rows": 1024,
+    "id_prefix": "p979_tp_cross",
+    "identity_sha256": "e8549f58d2ce11834b31f0a6f1c426046ebbb963e1d7f57a6ee9ff64226ef13b",
+    "identity_version": "phase979_truth_punctuation_cross_identity_v1",
+    "n_pairs": 128,
+    "n_prompts": 256,
+    "prompt_marker": "[TP979-TRUTH-CROSS]",
+    "prompts_sha256": "1ed552618e6a89b411ff546d0df9eaaa70e46037bd4aad1d02e2b2daf22e6bc7",
+    "replication_pairs_sha256": "f733524d5e12993dafb47a1042eb184f041c71b56e3c409c40728f589826dbd7",
+    "schema_version": 1,
+    "splits": [
+      "development",
+      "replication"
+    ],
+    "tasks": [
+      "direct_fact",
+      "classification",
+      "arithmetic",
+      "translation_format",
+      "definition",
+      "causal",
+      "multistep_math",
+      "logic"
+    ]
+  },
+  "truth_dataset_module": {
+    "path": "tests/glm5/phase979_truth_punctuation_dataset.py",
+    "sha256": "f0670c894778ecae600709748914ed0902e18675f440bc8cb78f15ceb1644e44"
+  }
+}

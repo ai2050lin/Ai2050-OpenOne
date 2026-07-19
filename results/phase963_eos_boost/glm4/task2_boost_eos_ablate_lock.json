@@ -1,0 +1,104 @@
+{
+  "task": "task2_boost_eos_ablate_lock",
+  "model": "glm4",
+  "summary": {
+    "normal": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    },
+    "boost_eos_3x": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    },
+    "ablate_lock": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.5,
+      "mean_tokens": 40.0
+    },
+    "boost_eos+ablate_lock": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.5,
+      "mean_tokens": 40.0
+    }
+  },
+  "raw_results": [
+    {
+      "prompt": "The capital of France is",
+      "condition": "normal",
+      "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel Tower, the Louvre Museum, the Notre-D",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "boost_eos_3x",
+      "generated": " Paris. Paris is known for its rich history, stunning architecture, and vibrant culture. Some of the most famous landmarks in Paris include the Eiffel Tower, the Louvre Museum, the Notre-D",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "ablate_lock",
+      "generated": " Paris.\n根据问题，我们需要判断这个陈述是否正确。根据我的知识，法国的首都是巴黎。因此，这个陈述是正确的。最终答案是：Yes. The statement is correct. The capital",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": true
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "boost_eos+ablate_lock",
+      "generated": " Paris.\n根据问题，我们需要判断这个陈述是否正确。根据我的知识，法国的首都是巴黎。因此，这个陈述是正确的。最终答案是：Yes. The statement is correct. The capital",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": true
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "normal",
+      "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6371 km, then the radius of Jupiter is approximately 71442 km.\n\n",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "boost_eos_3x",
+      "generated": " Jupiter, which has a diameter of about 139,820 kilometers. To calculate the surface area of Jupiter, we can use the formula for the surface area of a sphere:\n\n\\[ A = ",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "ablate_lock",
+      "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6.371e+06 meters, we can calculate the radius of Jupiter as follows",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "boost_eos+ablate_lock",
+      "generated": " Jupiter, which is about 11.2 times the radius of Earth. If the radius of Earth is 6.371e+06 meters, we can calculate the radius of Jupiter as follows",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    }
+  ]
+}

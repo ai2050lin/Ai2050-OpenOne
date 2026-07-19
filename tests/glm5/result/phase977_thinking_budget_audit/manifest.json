@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "phase": 977,
+  "experiment": "qwen3_thinking_hit512_to1024_budget_audit",
+  "evidence_class": "exploratory_conditional_budget_audit_only",
+  "model": "qwen3",
+  "model_class": "Qwen3ForCausalLM",
+  "model_name_or_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\qwen3-4b",
+  "tokenizer_class": "Qwen2Tokenizer",
+  "source_split": "discovery",
+  "source_manifest_sha256": "b526c223863e59647be9d0c727aa9a5cb8c3211fc131465bfb8b7bed5a4854de",
+  "source_artifact_file_sha256": {
+    "manifest_discovery.json": "496de5516cc3e03067e83f5ba80ba65caff15aee19fccd6c2dcebee9cd792f97",
+    "rows_discovery.jsonl": "fb031514b8b3cff3737c7b6a2151be2ec545437579c5ca61f8fb2a3ac877b349",
+    "summary_discovery.json": "9875e58e7b6b9f8459f99a3489429e8eb1d6678e012683a290277f062b17c328",
+    "reaudit_discovery.json": "be19d93178c6c2e23fde546fe0dd4c1bec1b2a8d535dead2b65e86b92ccda3d9"
+  },
+  "source_generator_legal_script_sha256": "bf2780ac094d3af4c447e30543ef3eeae567b0048527bcc993a180fe5a76decb",
+  "current_strict_evaluator_script_sha256": "9b725cbac0cb5c975c4e588ee7f6924e60004154f0ac4cf2dbdcb9aa34a28481",
+  "strict_reaudit_target_script_sha256": "9b725cbac0cb5c975c4e588ee7f6924e60004154f0ac4cf2dbdcb9aa34a28481",
+  "script_sha256": "3491a1b0f5cc57afa4216796e730d9ed8502f44f8b4c565c5c9bf5517a47c39d",
+  "source_gate_status": "NO-GO",
+  "source_strict_v2_gate_passed": false,
+  "source_budget": 512,
+  "audit_budget": 1024,
+  "selection_rule": "frozen discovery extended512 rows where condition is hard_thinking or soft_thinking and hit512 is true",
+  "selected_conditions": [
+    "hard_thinking",
+    "soft_thinking"
+  ],
+  "selected_trajectories": 36,
+  "selected_unique_items": 25,
+  "selected_condition_counts": {
+    "soft_thinking": 18,
+    "hard_thinking": 18
+  },
+  "selected_keys": [
+    "ext_causal_sentence_01/soft_thinking",
+    "ext_causal_sentence_02/soft_thinking",
+    "ext_causal_sentence_08/soft_thinking",
+    "ext_causal_sentence_09/soft_thinking",
+    "ext_classification_00/hard_thinking",
+    "ext_classification_01/hard_thinking",
+    "ext_classification_01/soft_thinking",
+    "ext_classification_02/hard_thinking",
+    "ext_classification_02/soft_thinking",
+    "ext_classification_03/hard_thinking",
+    "ext_classification_04/hard_thinking",
+    "ext_classification_04/soft_thinking",
+    "ext_classification_05/hard_thinking",
+    "ext_classification_05/soft_thinking",
+    "ext_classification_06/hard_thinking",
+    "ext_classification_06/soft_thinking",
+    "ext_classification_07/hard_thinking",
+    "ext_classification_07/soft_thinking",
+    "ext_classification_08/hard_thinking",
+    "ext_classification_08/soft_thinking",
+    "ext_classification_09/hard_thinking",
+    "ext_definition_04/hard_thinking",
+    "ext_definition_05/hard_thinking",
+    "ext_definition_07/soft_thinking",
+    "ext_format_transform_03/hard_thinking",
+    "ext_format_transform_05/hard_thinking",
+    "ext_format_transform_05/soft_thinking",
+    "ext_format_transform_08/soft_thinking",
+    "ext_new_fact_01/soft_thinking",
+    "ext_new_fact_02/hard_thinking",
+    "ext_new_fact_05/hard_thinking",
+    "ext_new_fact_05/soft_thinking",
+    "ext_new_fact_06/hard_thinking",
+    "ext_new_fact_06/soft_thinking",
+    "ext_new_fact_09/hard_thinking",
+    "ext_new_fact_09/soft_thinking"
+  ],
+  "base_seed": 977000,
+  "seed_rule": "reuse exact frozen discovery item seed",
+  "generation_strategy": "rerun original official prefix from seed to max_new_tokens=1024; accept only if generated[:512] exactly equals frozen extended512",
+  "sampling": {
+    "hard_thinking": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "min_p": 0.0
+    },
+    "soft_thinking": {
+      "temperature": 0.6,
+      "top_p": 0.95,
+      "top_k": 20,
+      "min_p": 0.0
+    }
+  },
+  "generated_mode_parser_version": "strict_final_region_v2",
+  "eos_token_ids": [
+    151645,
+    151643
+  ],
+  "special_token_ids": {
+    "think_open": 151667,
+    "think_close": 151668
+  },
+  "runtime_identity": {
+    "torch_version": "2.11.0+cu128",
+    "transformers_version": "5.12.0",
+    "cuda_runtime_version": "12.8",
+    "cudnn_version": 91900,
+    "cuda_device_name": "NVIDIA GeForce RTX 5080",
+    "cuda_device_capability": [
+      12,
+      0
+    ],
+    "model_dtype": "torch.bfloat16",
+    "attention_implementation": "eager",
+    "model_config_sha256": "3b2c5deb7803a8dca3af418afe9ccb44d704f7c350377367cfba2135a85f7fc2",
+    "tokenizer_vocab_sha256": "f488fa45d324a8bc64c84f0e27b47223872d550f2a6900564f77dfa67ca5ff4d",
+    "tokenizer_length": 151669,
+    "deterministic_algorithms_enabled": false,
+    "cudnn_deterministic": false,
+    "cudnn_benchmark": false,
+    "local_model_artifacts": {
+      "model_dir": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "files": {
+        "config.json": {
+          "bytes": 726,
+          "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+        },
+        "generation_config.json": {
+          "bytes": 239,
+          "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+        },
+        "model.safetensors.index.json": {
+          "bytes": 32819,
+          "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+        },
+        "tokenizer_config.json": {
+          "bytes": 9732,
+          "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+        },
+        "tokenizer.json": {
+          "bytes": 11422654,
+          "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+        },
+        "merges.txt": {
+          "bytes": 1671853,
+          "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+        },
+        "vocab.json": {
+          "bytes": 2776833,
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+        },
+        "model-00001-of-00003.safetensors": {
+          "bytes": 3957900840,
+          "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+        },
+        "model-00002-of-00003.safetensors": {
+          "bytes": 3987450520,
+          "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+        },
+        "model-00003-of-00003.safetensors": {
+          "bytes": 99630640,
+          "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+        }
+      }
+    }
+  },
+  "endpoint": "P(outcome by 1024 | frozen discovery hit512)",
+  "original_discovery_gate_unchanged": true,
+  "mechanism_authorized": false,
+  "holdout_loaded": false,
+  "manifest_sha256": "d60941aa1591b4b3f92ab00ed043e2887338cbf2a8cc4f22ccea99757d8d5f20",
+  "created_at_utc": "2026-07-17T15:23:06+00:00"
+}

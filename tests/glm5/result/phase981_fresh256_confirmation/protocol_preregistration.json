@@ -1,0 +1,556 @@
+{
+  "arms": {
+    "A": {
+      "control_policy": "soft_no_think",
+      "decoding_policy": "thinking_sampling",
+      "role": "baseline"
+    },
+    "B": {
+      "control_policy": "soft_thinking",
+      "decoding_policy": "thinking_sampling",
+      "role": "candidate"
+    }
+  },
+  "batch_size": 8,
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536,
+    2048
+  ],
+  "common_random_number_contract": {
+    "arm_excluded_from_seed": true,
+    "coupling_is_precommitted_but_not_a_mechanism_claim": true,
+    "distinct_seed_namespace_per_stream": true,
+    "observations_are_not_256_independent_samples": true,
+    "observations_per_stream": 256,
+    "related_easy_hard_construction_pairs": 128,
+    "same_256_items_reused_in_all_three_streams": true,
+    "same_item_stream_A_and_B_share_seed": true,
+    "seed_audit": {
+      "all_three_streams_distinct_per_item": true,
+      "pair_seed_count": 768,
+      "seed_registry_sha256": "d88c9579b1ced97a1b1705981597cd2d4575a3778d7f554f6a9df19a1cdc9d15",
+      "unique_pair_seed_count": 768
+    },
+    "seed_formula": "sha256('phase981|fresh256|dataset_identity|item=<id>|stream=<r>')[:8] mod (2**31-1)",
+    "streams_are_not_independent_datasets": true,
+    "streams_are_not_used_for_variance_estimation": true,
+    "three_stream_gate_is_a_preregistered_count_AND_not_an_independence_inference": true
+  },
+  "created_at_utc": "2026-07-18T07:51:58+00:00",
+  "dataset_artifact_seals": {
+    "audit": {
+      "audit_sha256": "be8b8d9276b5de2198199c610a9f6dbc5a8a61b1cbbbf45b9fd0b2b989a6564c",
+      "file_sha256": "ddcbaf9d389510864846c50c05f31c3cbf22e98405222cf177cb5e3a7a60580e",
+      "path": "tests/glm5/result/phase981_fresh256_confirmation/audit.json"
+    },
+    "dataset": {
+      "dataset_sha256": "82551f64a6e5b1c4b53931aea856b8ac29986285fe38870bb262eca0a49d5d62",
+      "file_sha256": "e146cbb6173cd7bfe8d8d4f148844d18a602ccd24598a90640650991cb66f49b",
+      "path": "tests/glm5/result/phase981_fresh256_confirmation/dataset.json"
+    },
+    "identity_sha256": "e5a12cedb7e4ab0e56896975afd58285c3401b1edf138c2d081e431fab8fa6fd",
+    "normalized_prompt_overlap_n": 0,
+    "structural_payload_overlap_n": 0
+  },
+  "dataset_audit_sha256": "47aa4dd6b94b79dc830816c420c68f778a9f8682154e4b12ba1e2bfe3649eb17",
+  "dataset_contract": {
+    "difficulty_counts": {
+      "easy": 128,
+      "hard": 128
+    },
+    "difficulty_hidden_from_visible_prompt": true,
+    "fresh_source_precommitted_not_analyst_blind_holdout": true,
+    "items_per_task": 32,
+    "n_items": 256,
+    "old_holdout_imported": false,
+    "old_holdout_parsed": false,
+    "per_task_difficulty_count": 16,
+    "per_task_difficulty_label_count": 8,
+    "phase979_id_overlap_n": 0,
+    "phase979_normalized_prompt_overlap_n": 0,
+    "phase979_structural_payload_overlap_n": 0,
+    "phase979_task_spec_overlap_n": 0,
+    "tasks": [
+      "multistep_arithmetic",
+      "modular_arithmetic",
+      "boolean_logic",
+      "relation_path",
+      "state_machine",
+      "sequence_rule",
+      "string_transform",
+      "constraint_order"
+    ]
+  },
+  "dataset_identity": {
+    "dataset": "phase981_fresh256",
+    "difficulty_counts": {
+      "easy": 128,
+      "hard": 128
+    },
+    "freshness_against_phase979": {
+      "id_overlap_n": 0,
+      "normalized_prompt_overlap_n": 0,
+      "structural_payload_overlap_n": 0,
+      "task_spec_overlap_n": 0
+    },
+    "identity_sha256": "e5a12cedb7e4ab0e56896975afd58285c3401b1edf138c2d081e431fab8fa6fd",
+    "items_sha256": "16ab8afbc06eff78d766e9a169ac45554878961fc247219483d09418c47d4eba",
+    "n_items": 256,
+    "normalized_prompt_hashes_sha256": "1ef689d209f0ccdd363859d992b73c4892a321ec0bbd0603deec8d0f90777601",
+    "phase": 981,
+    "schema_version": 1,
+    "structural_payload_hashes_sha256": "d960b5c1989c4e9754a629cfcec70f2690cc02e27474b53e961cbea6cd2bf357",
+    "task_counts": {
+      "boolean_logic": 32,
+      "constraint_order": 32,
+      "modular_arithmetic": 32,
+      "multistep_arithmetic": 32,
+      "relation_path": 32,
+      "sequence_rule": 32,
+      "state_machine": 32,
+      "string_transform": 32
+    },
+    "task_registry": [
+      "multistep_arithmetic",
+      "modular_arithmetic",
+      "boolean_logic",
+      "relation_path",
+      "state_machine",
+      "sequence_rule",
+      "string_transform",
+      "constraint_order"
+    ]
+  },
+  "decision_checkpoint": 2048,
+  "dependency_seals": {
+    "model_registry": {
+      "path": "tests/gpt5/model_registry.py",
+      "sha256": "84c30398a9effa47791635fd25662426164460e036e59bb83a38c855db370864"
+    },
+    "model_utils": {
+      "path": "tests/glm5/model_utils.py",
+      "sha256": "204098dd67d64a333daaae4d2318bd9d33584764de877a7ebc5325eee85491ef"
+    },
+    "phase979_boundary_core": {
+      "path": "tests/glm5/phase979_boundary_core.py",
+      "sha256": "d6983462326dbd3f9afa707efca80d1dd6a26a8b1ea23a5fb1a44534ebf20f8d"
+    },
+    "phase979_diagnostic_dataset": {
+      "path": "tests/glm5/phase979_diagnostic_dataset.py",
+      "sha256": "74875eb5e00253f952969904a0164a06920e995c82735b30b1c307535b853605"
+    },
+    "phase980_rescue_gate_feasibility": {
+      "path": "tests/glm5/phase980_rescue_gate_feasibility.py",
+      "sha256": "9214ca5711e8870f6aafc3f94837160b51afca62f4315fd5b0daf8ae15475616"
+    }
+  },
+  "direction": "B_minus_A",
+  "execution_contract": {
+    "cpu_only_protocol_freeze": true,
+    "generation_performed": false,
+    "generation_requires_independent_admission": true,
+    "gpu_authorized": false,
+    "model_weights_loaded": false
+  },
+  "expected_rows": 1536,
+  "experiment": "fresh256_soft_configuration_semantic_confirmation",
+  "holdout": false,
+  "holdout_authorized": false,
+  "holdout_loaded": false,
+  "integrity_contract": {
+    "model_artifact_file_registry_exact_and_nonempty": true,
+    "negative_tamper_tests": {
+      "admission_holdout_loaded_true_rejected": true,
+      "changed_dependency_hash_rejected": true,
+      "changed_eos_identity_rejected": true,
+      "empty_model_file_registry_rejected": true,
+      "empty_phase979_script_hashes_rejected": true,
+      "empty_phase981_script_seals_rejected": true,
+      "expanded_intervention_scope_rejected": true,
+      "protocol_gpu_authorized_true_rejected": true,
+      "protocol_holdout_loaded_true_rejected": true
+    },
+    "phase979_script_hashes_persisted_and_exact": true,
+    "runtime_dependency_seals_exact": true,
+    "script_seals_exact": true
+  },
+  "interpretation_boundary": "A PASS confirms only the external soft-configuration bundle B over A on fresh items for the sealed Qwen3 model under the frozen common-random-number coupling. It does not isolate thinking, decoding, layers, spans, or an internal mechanism, and it cannot be generalized directly to GLM or DeepSeek models.",
+  "local_model_artifact_identity": {
+    "files": {
+      "config.json": {
+        "bytes": 726,
+        "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+      },
+      "generation_config.json": {
+        "bytes": 239,
+        "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+      },
+      "merges.txt": {
+        "bytes": 1671853,
+        "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+      },
+      "model-00001-of-00003.safetensors": {
+        "bytes": 3957900840,
+        "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+      },
+      "model-00002-of-00003.safetensors": {
+        "bytes": 3987450520,
+        "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+      },
+      "model-00003-of-00003.safetensors": {
+        "bytes": 99630640,
+        "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+      },
+      "model.safetensors.index.json": {
+        "bytes": 32819,
+        "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+      },
+      "tokenizer.json": {
+        "bytes": 11422654,
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "tokenizer_config.json": {
+        "bytes": 9732,
+        "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+      },
+      "vocab.json": {
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    },
+    "gpu_accessed": false,
+    "identity_sha256": "59ff0fe752b83b289c7f2b7c9869e9196a4036c4f99dd8a313962096b746b7b4",
+    "logical_name": "qwen3",
+    "path": "models/hf/qwen3-4b",
+    "weights_loaded": false
+  },
+  "max_new_tokens": 2048,
+  "mechanism": false,
+  "mechanism_authorized": false,
+  "model_name": "qwen3",
+  "model_scope_contract": {
+    "configuration_bundle_not_component_isolation": true,
+    "direct_generalization_to_DeepSeek7B_forbidden": true,
+    "direct_generalization_to_GLM4_forbidden": true,
+    "qwen3_only": true
+  },
+  "phase": 981,
+  "phase979_source": {
+    "P": [],
+    "P_is_empty": true,
+    "holdout": false,
+    "mechanism": false,
+    "natural_audit": {
+      "audit_sha256": "6ba504599f4f8018f1838c14dca1a4199d575b7345d08fe3aa5ea077a6d6a1ba",
+      "file_sha256": "0f4374583eb6d828daf4cf70d8ea0834975d744853ce02c75ed124e83a9e4dda",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/audit_natural.json"
+    },
+    "natural_rows": {
+      "file_sha256": "e56c06a6deec84d220784d2feba4d98050ff061a0cdbdcc7b989d218aeacad5a",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/rows_natural.jsonl"
+    },
+    "natural_status": {
+      "file_sha256": "ce4d8ab2cad0aab5b491f562144f1e48b045f9dcbb512f346f46c3aab27195a1",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/generator_status_natural.json",
+      "status_sha256": "2cec6816e710e592a8caa312cd4e30ab0c1700379137d4c71128ea91e62a85f7"
+    },
+    "phase979_script_hashes": {
+      "boundary_core": {
+        "path": "tests/glm5/phase979_boundary_core.py",
+        "sha256": "d6983462326dbd3f9afa707efca80d1dd6a26a8b1ea23a5fb1a44534ebf20f8d"
+      },
+      "natural_auditor": {
+        "path": "tests/glm5/phase979_natural_audit.py",
+        "sha256": "3ec10ec742904e9029c0237bb1426dda05320f3eceedfc9934f30425959a9d8a"
+      },
+      "natural_dataset": {
+        "path": "tests/glm5/phase979_diagnostic_dataset.py",
+        "sha256": "74875eb5e00253f952969904a0164a06920e995c82735b30b1c307535b853605"
+      },
+      "natural_runner": {
+        "path": "tests/glm5/phase979_natural_runner.py",
+        "sha256": "ab197006ad524bf3b44ecfed8e8345ce63ad97f16fb41d265baa9ac948ef50e4"
+      },
+      "protocol": {
+        "path": "tests/glm5/phase979_protocol.py",
+        "sha256": "89879aac0d031c8dccc23d53c4882fde41c53fb79db32b089e6b922dfe00206e"
+      },
+      "truth_auditor": {
+        "path": "tests/glm5/phase979_truth_audit.py",
+        "sha256": "c5a68a76631c7247b35c1663e6df4612ae91b7b8c9384e52888db5a53bcf3fe7"
+      },
+      "truth_dataset": {
+        "path": "tests/glm5/phase979_truth_punctuation_dataset.py",
+        "sha256": "f0670c894778ecae600709748914ed0902e18675f440bc8cb78f15ceb1644e44"
+      },
+      "truth_runner": {
+        "path": "tests/glm5/phase979_truth_punctuation.py",
+        "sha256": "f3bfaedddf3f0fb7215210d4e0e3736216368cfa135e6a6d34122a0a4e4576d6"
+      }
+    },
+    "phase979_script_hashes_sha256": "6fbdc41e894b9c2027f95b77cc3dd53c5e9c4442d0c027511af2a72347774600",
+    "protocol": {
+      "file_sha256": "48defe2ee9dc5f2a3589e5aa6381eb6c81b0c2db4c696adb73b2f4c6572251c7",
+      "path": "tests/glm5/result/phase979_three_boundary_factorial/protocol_preregistration.json",
+      "protocol_sha256": "160ea0d06fb651960dd5b2c00de9cda02e713725c09226147f9593068f83f5e1"
+    }
+  },
+  "phase980_design_source": {
+    "authenticated_design_only": true,
+    "current_script_reproduces_report": true,
+    "gpu_authorized": false,
+    "holdout": false,
+    "mechanism": false,
+    "phase981_narrowing": "Phase981 preselects only the semantic reservoir route before generation; the Phase980 censor route is secondary descriptive and cannot admit Phase981.",
+    "report": {
+      "file_sha256": "23ab764f22f009967ce35aae30394bc5df0e384eb13db03de1742280796d2929",
+      "path": "tests/glm5/result/phase980_rescue_gate_design/feasibility_report.json",
+      "report_sha256": "c2db93ca886e9851bbe9cf579d54480b52f9923705b40114493ab009f2d200d0"
+    },
+    "script": {
+      "file_sha256": "9214ca5711e8870f6aafc3f94837160b51afca62f4315fd5b0daf8ae15475616",
+      "path": "tests/glm5/phase980_rescue_gate_feasibility.py"
+    }
+  },
+  "primary_decision": {
+    "censor_route_can_admit": false,
+    "decision_checkpoint": 2048,
+    "direction": "B_minus_A",
+    "formula": "stream_0 AND stream_1 AND stream_2 semantic gate",
+    "mixed_route_can_admit": false,
+    "route": "semantic_only"
+  },
+  "protocol_sha256": "be459ea62a21537e029d54059a6bf5aca09a53ab04667532001dc5a05aeec4b2",
+  "role": "fresh_precommitted_confirmation_protocol",
+  "runtime_versions": {
+    "python": "3.11.9",
+    "python_full": "3.11.9 (main, Apr 15 2024, 17:44:41) [MSC v.1929 64 bit (AMD64)]",
+    "python_implementation": "CPython",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.12.0",
+    "version_source": "installed_distribution_metadata_only"
+  },
+  "sampling": {
+    "min_p": 0.0,
+    "temperature": 0.6,
+    "top_k": 20,
+    "top_p": 0.95
+  },
+  "schema_version": 1,
+  "script_seals": {
+    "admission": {
+      "path": "tests/glm5/phase981_confirmation_admission.py",
+      "sha256": "67976cb170fc2bffbdc04b1b9ec955ab7e3f70c002504e1e6f96f070e3ad3932"
+    },
+    "audit": {
+      "path": "tests/glm5/phase981_confirmation_audit.py",
+      "sha256": "9cb74e9338daeeb68070e7b4c016af6d39366648f49429db3c824a914ba69122"
+    },
+    "core": {
+      "path": "tests/glm5/phase981_confirmation_core.py",
+      "sha256": "0b48d0a87f86379282f4fb4ce12cbc5ebad1d0b384fadee1dbcd3ab6f7381123"
+    },
+    "dataset": {
+      "path": "tests/glm5/phase981_fresh_dataset.py",
+      "sha256": "e1c1c2127616fd328fe44d3b8dea27752df69618659e302820403b8102f4307f"
+    },
+    "protocol": {
+      "path": "tests/glm5/phase981_confirmation_protocol.py",
+      "sha256": "4a371e55a0870e31ef5391f37a64c4bd76b819b86bce156777ce0534f19db459"
+    },
+    "runner": {
+      "path": "tests/glm5/phase981_confirmation_runner.py",
+      "sha256": "cc6938f743725258e900185c84d0d9df80ccb420e8ae1178ecad3ffe2c03d72e"
+    },
+    "semantic_gate": {
+      "path": "tests/glm5/phase981_semantic_gate.py",
+      "sha256": "ec0c95745846dc2711a858df5a6a27ad93143bd68ac014a681e2cfde4df126be"
+    }
+  },
+  "semantic_gate": {
+    "contract": {
+      "N_per_stream": 256,
+      "arms": {
+        "baseline_A": "soft_no_think+thinking_sampling",
+        "candidate_B": "soft_thinking+thinking_sampling",
+        "contrast": "B-A"
+      },
+      "censor_route_role": "secondary_descriptive_only",
+      "channels": [
+        "V",
+        "C",
+        "I_mode",
+        "I_sem"
+      ],
+      "coverage": {
+        "common_tasks_delta_V_min": 3,
+        "common_tasks_required": 6,
+        "easy_delta_V_floor": 0,
+        "every_task_delta_V_floor": -2,
+        "hard_delta_V_floor": 0
+      },
+      "cpu_only": true,
+      "denominators": {
+        "per_difficulty": 128,
+        "per_stream": 256,
+        "per_task": 32,
+        "per_task_difficulty": 16
+      },
+      "direct_item_transition_subgate": {
+        "claim_only_not_primary_decision": true,
+        "gross_I_sem_to_V_min": 26,
+        "gross_new_C_or_I_mode_max": 12,
+        "net_I_sem_to_V_minus_V_to_I_sem_min": 26
+      },
+      "direction": "B_minus_A",
+      "experiment": "fresh256_soft_semantic_gate",
+      "partition": "V+C+I_mode+I_sem=N",
+      "phase": 981,
+      "primary_route": "semantic_only",
+      "primary_semantic": {
+        "R_I_sem_min": 26,
+        "censor_route_can_pass_primary": false,
+        "delta_C_max": 12,
+        "delta_C_plus_delta_I_mode_max": 12,
+        "delta_I_mode_max": 12,
+        "delta_V_min": 26,
+        "same_route_required_in_all_streams": true
+      },
+      "schema_version": 1,
+      "secondary_censor_descriptive": {
+        "R_C_min": 26,
+        "can_change_primary": false,
+        "delta_I_mode_max": 12,
+        "delta_I_sem_max": 12,
+        "delta_I_sem_plus_delta_I_mode_max": 12,
+        "delta_V_min": 26
+      },
+      "states": [
+        "V",
+        "C",
+        "I_mode",
+        "I_sem"
+      ],
+      "streams": [
+        "stream_0",
+        "stream_1",
+        "stream_2"
+      ]
+    },
+    "contract_sha256": "a6d929330ae2cb54a361f204fe7d16e528b536347531f449f81c4b48f48a3d58",
+    "self_test": {
+      "cpu_only": true,
+      "design_judgment": {
+        "censor": "secondary descriptive only; cannot change primary",
+        "direct_subgate": "strict paired I_sem->V evidence; required only for direct-item wording",
+        "primary": "marginal semantic-reservoir confirmation only"
+      },
+      "experiment": "fresh256_soft_semantic_gate",
+      "fail_closed_messages": {
+        "missing_row": "candidate requires exactly 256 rows, got 255",
+        "missing_stream": "exactly three frozen streams are required: ('stream_0', 'stream_1', 'stream_2')"
+      },
+      "gate_contract_sha256": "a6d929330ae2cb54a361f204fe7d16e528b536347531f449f81c4b48f48a3d58",
+      "generation_performed": false,
+      "gpu_used": false,
+      "model_weights_loaded": false,
+      "passed": true,
+      "phase": 981,
+      "schema_version": 1,
+      "tests": {
+        "I_mode_does_not_count_as_I_sem": true,
+        "R_I_sem_13_plus_R_C_13_fails": true,
+        "censor_secondary_cannot_set_primary": true,
+        "combined_non_target_13_fails": true,
+        "common_task_intersection_required": true,
+        "cross_stream_route_mixing_fails": true,
+        "delta_25_fails": true,
+        "delta_I_mode_12_passes_13_fails": true,
+        "difficulty_minus_1_fails": true,
+        "exact_26_primary_and_direct_pass": true,
+        "gross_direct_25_rejects_direct_claim": true,
+        "gross_non_target_13_rejects_direct_claim": true,
+        "marginal_pass_does_not_imply_direct_pass": true,
+        "missing_row_fails_closed": true,
+        "missing_stream_fails_closed": true,
+        "non_target_12_passes_13_fails": true,
+        "task_minus_3_fails": true
+      }
+    }
+  },
+  "streams": [
+    0,
+    1,
+    2
+  ],
+  "tokenizer_audit": {
+    "A_id": 32,
+    "B_id": 33,
+    "chat_template_sha256": "41d5929bf73796beb66809ac700b2cf3ff81694f933e5c14d52b7fd6963c947d",
+    "eos_token_id": 151645,
+    "pad_token_id": 151643,
+    "prefix_count": 512,
+    "prefixes_sha256": "a979911cec7172cd0258b9a5d5db193ffd13a8423db0791683b8bb3de5fbea7f",
+    "think_close_id": 151668,
+    "think_open_id": 151667,
+    "token_identity": {
+      "effective_eos_token_ids": [
+        151643,
+        151645
+      ],
+      "generation_config_eos_token_ids": [
+        151643,
+        151645
+      ],
+      "identity_source": "independently parsed tokenizer, config.json, and generation_config.json",
+      "model_config_eos_token_ids": [
+        151645
+      ],
+      "tokenizer_eos_token_id": 151645
+    },
+    "tokenizer_class": "Qwen2Tokenizer",
+    "tokenizer_length": 151669
+  },
+  "trajectory_contract": {
+    "cap_categories_are_right_censored_not_failures": true,
+    "checkpoint_snapshots_are_prefixes_not_reruns": true,
+    "first_eos_absorbing": true,
+    "per_row_private_cuda_generator": true,
+    "single_rollout_per_row": true,
+    "six_terminal_states": [
+      "CENSORED_BEFORE_VALID_CLOSE",
+      "CENSORED_AFTER_FINAL_START_NO_ANSWER",
+      "CENSORED_AFTER_ANSWER_OBSERVED",
+      "EOS_INVALID_MODE",
+      "EOS_INVALID_SEMANTIC",
+      "VALID_STOP"
+    ]
+  },
+  "transition_matrices": {
+    "all_margins_must_recover_arm_counts": true,
+    "mandatory_per_stream_4x4": [
+      "V",
+      "C",
+      "I_mode",
+      "I_sem"
+    ],
+    "paired_matrix_is_not_internal_mechanism_evidence": true,
+    "rows_are_A_states_columns_are_B_states": true,
+    "secondary_per_stream_3x3": [
+      "V",
+      "C",
+      "I"
+    ],
+    "secondary_per_stream_6x6": [
+      "CENSORED_BEFORE_VALID_CLOSE",
+      "CENSORED_AFTER_FINAL_START_NO_ANSWER",
+      "CENSORED_AFTER_ANSWER_OBSERVED",
+      "EOS_INVALID_MODE",
+      "EOS_INVALID_SEMANTIC",
+      "VALID_STOP"
+    ]
+  }
+}

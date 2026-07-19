@@ -1,0 +1,579 @@
+{
+  "audited_at_utc": "2026-07-18T03:36:39+00:00",
+  "dataset_split_sha256": "ffab66f6a747ea2b88fd0d4036c43dfd2e5de43e6b8af8bfb342b27059536a31",
+  "decision": "NO_GO_REPLICATION_REMAINS_CLOSED",
+  "erratum_report_sha256": "0b76ab620efb2e278713765d8571edad2ece384849dd9e95a3707bb9940a9fd0",
+  "erratum_script_file_sha256": "7c57c498b5cab640b48536f9dc5133fb99495be31b1ce36665cb404f067e110e",
+  "exact_tie_n": 1,
+  "exact_ties": [
+    {
+      "eos_logit": 27.5,
+      "eos_rank": 1,
+      "eos_top1": false,
+      "gap": 0.0,
+      "key": [
+        "p979_tp_cross_logic_02",
+        "qB",
+        "A",
+        "bare"
+      ],
+      "max_non_eos_id": 271,
+      "max_non_eos_logit": 27.5,
+      "row_sha256": "0c5a7036fc797992cd7f7796fd1316fa76f2510c6ea93a093ae9666bf61cf7e8",
+      "selected_eos_id": 151645,
+      "top1_id": 271
+    }
+  ],
+  "experiment": "truth_punctuation_teacher_forcing",
+  "formal_development_admission_written": false,
+  "formal_phase979_audit_status": "FAILED_TO_CERTIFY_DUE_FROZEN_TIE_BUG",
+  "frozen_auditor_file_sha256": "c5a68a76631c7247b35c1663e6df4612ae91b7b8c9384e52888db5a53bcf3fe7",
+  "frozen_auditor_rejections": [
+    {
+      "error": "('p979_tp_cross_logic_02', 'qB', 'A', 'bare') ambiguous EOS/non-EOS tie",
+      "key": [
+        "p979_tp_cross_logic_02",
+        "qB",
+        "A",
+        "bare"
+      ]
+    }
+  ],
+  "holdout_loaded": false,
+  "integrity_under_protocol_tie_semantics": {
+    "all_answer_prefixes_recomputed": true,
+    "all_answer_suffixes_recomputed": true,
+    "all_bare_labels_single_token": true,
+    "all_design_fields_reconstructed": true,
+    "all_official_prefixes_recomputed": true,
+    "all_periods_same_pure_one_token_suffix": true,
+    "all_primitive_metric_algebra_valid": true,
+    "all_rows_self_hashed": true,
+    "answer_token_ids": {
+      "A": 32,
+      "B": 33
+    },
+    "eos_ids": [
+      151645,
+      151643
+    ],
+    "expected_factorial_keys_exact": true,
+    "model_vocab_size": 151936,
+    "passed": true,
+    "period_token_id": 13,
+    "rows_file_sha256": "2be2399d314519757ba95b6c32c89259670d170ec0ab50bbf43eb673b2715186",
+    "rows_n": 512
+  },
+  "interpretation_limit": "This post-hoc report corrects tie semantics only. It is not a frozen admission, cannot authorize replication, and cannot support natural-rollout or internal-mechanism claims.",
+  "manifest_file_sha256": "219562c8800c3a3b9e29a7604d1240144271581c25101e5259177df9d7ca08be",
+  "manifest_sha256": "99080b161d4d112572118cda6291eac19e5a6c80571892b58c837cb17b5bd873",
+  "mechanism_authorized": false,
+  "natural_rollout_claim_authorized": false,
+  "one_ulp_gate_and_sign_counts_unchanged": true,
+  "one_ulp_sensitivity": {
+    "delta_+0.125": {
+      "effect_means": {
+        "D_bare": -0.0643310546875,
+        "D_period": 10.33953857421875,
+        "Q_correct": -8.409423828125,
+        "Q_wrong": 1.99444580078125,
+        "interaction": 10.40386962890625
+      },
+      "gate_signature": {
+        "both_effect_gates_passed": false,
+        "counts": {
+          "D_bare": {
+            "negative_n": 38,
+            "positive_n": 26,
+            "zero_n": 0
+          },
+          "D_period": {
+            "negative_n": 10,
+            "positive_n": 53,
+            "zero_n": 1
+          },
+          "Q_correct": {
+            "negative_n": 43,
+            "positive_n": 21,
+            "zero_n": 0
+          },
+          "Q_wrong": {
+            "negative_n": 21,
+            "positive_n": 43,
+            "zero_n": 0
+          }
+        },
+        "punctuation_gate_passed": false,
+        "truth_gate_passed": false
+      },
+      "hypothetical_gap": 0.125
+    },
+    "delta_-0.125": {
+      "effect_means": {
+        "D_bare": -0.0662841796875,
+        "D_period": 10.33953857421875,
+        "Q_correct": -8.409423828125,
+        "Q_wrong": 1.99639892578125,
+        "interaction": 10.40582275390625
+      },
+      "gate_signature": {
+        "both_effect_gates_passed": false,
+        "counts": {
+          "D_bare": {
+            "negative_n": 38,
+            "positive_n": 26,
+            "zero_n": 0
+          },
+          "D_period": {
+            "negative_n": 10,
+            "positive_n": 53,
+            "zero_n": 1
+          },
+          "Q_correct": {
+            "negative_n": 43,
+            "positive_n": 21,
+            "zero_n": 0
+          },
+          "Q_wrong": {
+            "negative_n": 21,
+            "positive_n": 43,
+            "zero_n": 0
+          }
+        },
+        "punctuation_gate_passed": false,
+        "truth_gate_passed": false
+      },
+      "hypothetical_gap": -0.125
+    }
+  },
+  "phase": 979,
+  "phase977_holdout_authorized": false,
+  "post_hoc_metric_diagnostic": {
+    "both_effect_gates_passed": false,
+    "effect_summaries": {
+      "D_bare": {
+        "by_task": {
+          "arithmetic": {
+            "mean": 0.1015625,
+            "n": 8,
+            "negative_n": 3,
+            "positive_n": 5,
+            "zero_n": 0
+          },
+          "causal": {
+            "mean": 6.078125,
+            "n": 8,
+            "negative_n": 2,
+            "positive_n": 6,
+            "zero_n": 0
+          },
+          "classification": {
+            "mean": -3.0927734375,
+            "n": 8,
+            "negative_n": 6,
+            "positive_n": 2,
+            "zero_n": 0
+          },
+          "definition": {
+            "mean": -3.6005859375,
+            "n": 8,
+            "negative_n": 7,
+            "positive_n": 1,
+            "zero_n": 0
+          },
+          "direct_fact": {
+            "mean": 2.91015625,
+            "n": 8,
+            "negative_n": 4,
+            "positive_n": 4,
+            "zero_n": 0
+          },
+          "logic": {
+            "mean": 2.998046875,
+            "n": 8,
+            "negative_n": 4,
+            "positive_n": 4,
+            "zero_n": 0
+          },
+          "multistep_math": {
+            "mean": 0.2783203125,
+            "n": 8,
+            "negative_n": 4,
+            "positive_n": 4,
+            "zero_n": 0
+          },
+          "translation_format": {
+            "mean": -6.1953125,
+            "n": 8,
+            "negative_n": 8,
+            "positive_n": 0,
+            "zero_n": 0
+          }
+        },
+        "field": "D_bare",
+        "mean": -0.0653076171875,
+        "n": 64,
+        "negative_n": 38,
+        "positive_n": 26,
+        "zero_n": 0
+      },
+      "D_period": {
+        "by_task": {
+          "arithmetic": {
+            "mean": -0.0078125,
+            "n": 8,
+            "negative_n": 3,
+            "positive_n": 5,
+            "zero_n": 0
+          },
+          "causal": {
+            "mean": 15.73291015625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "classification": {
+            "mean": 18.3134765625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "definition": {
+            "mean": 19.001953125,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "direct_fact": {
+            "mean": 13.44921875,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "logic": {
+            "mean": 4.505859375,
+            "n": 8,
+            "negative_n": 2,
+            "positive_n": 6,
+            "zero_n": 0
+          },
+          "multistep_math": {
+            "mean": -0.486328125,
+            "n": 8,
+            "negative_n": 5,
+            "positive_n": 2,
+            "zero_n": 1
+          },
+          "translation_format": {
+            "mean": 12.20703125,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          }
+        },
+        "field": "D_period",
+        "mean": 10.33953857421875,
+        "n": 64,
+        "negative_n": 10,
+        "positive_n": 53,
+        "zero_n": 1
+      },
+      "Q_correct": {
+        "by_task": {
+          "arithmetic": {
+            "mean": 3.0390625,
+            "n": 8,
+            "negative_n": 1,
+            "positive_n": 7,
+            "zero_n": 0
+          },
+          "causal": {
+            "mean": -3.7109375,
+            "n": 8,
+            "negative_n": 6,
+            "positive_n": 2,
+            "zero_n": 0
+          },
+          "classification": {
+            "mean": -19.5078125,
+            "n": 8,
+            "negative_n": 8,
+            "positive_n": 0,
+            "zero_n": 0
+          },
+          "definition": {
+            "mean": -24.421875,
+            "n": 8,
+            "negative_n": 8,
+            "positive_n": 0,
+            "zero_n": 0
+          },
+          "direct_fact": {
+            "mean": -22.265625,
+            "n": 8,
+            "negative_n": 8,
+            "positive_n": 0,
+            "zero_n": 0
+          },
+          "logic": {
+            "mean": 2.234375,
+            "n": 8,
+            "negative_n": 4,
+            "positive_n": 4,
+            "zero_n": 0
+          },
+          "multistep_math": {
+            "mean": 14.396484375,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "translation_format": {
+            "mean": -17.0390625,
+            "n": 8,
+            "negative_n": 8,
+            "positive_n": 0,
+            "zero_n": 0
+          }
+        },
+        "field": "Q_correct",
+        "mean": -8.409423828125,
+        "n": 64,
+        "negative_n": 43,
+        "positive_n": 21,
+        "zero_n": 0
+      },
+      "Q_wrong": {
+        "by_task": {
+          "arithmetic": {
+            "mean": 2.9296875,
+            "n": 8,
+            "negative_n": 2,
+            "positive_n": 6,
+            "zero_n": 0
+          },
+          "causal": {
+            "mean": 5.94384765625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "classification": {
+            "mean": 1.8984375,
+            "n": 8,
+            "negative_n": 1,
+            "positive_n": 7,
+            "zero_n": 0
+          },
+          "definition": {
+            "mean": -1.8193359375,
+            "n": 8,
+            "negative_n": 6,
+            "positive_n": 2,
+            "zero_n": 0
+          },
+          "direct_fact": {
+            "mean": -11.7265625,
+            "n": 8,
+            "negative_n": 8,
+            "positive_n": 0,
+            "zero_n": 0
+          },
+          "logic": {
+            "mean": 3.7421875,
+            "n": 8,
+            "negative_n": 2,
+            "positive_n": 6,
+            "zero_n": 0
+          },
+          "multistep_math": {
+            "mean": 13.6318359375,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "translation_format": {
+            "mean": 1.36328125,
+            "n": 8,
+            "negative_n": 2,
+            "positive_n": 6,
+            "zero_n": 0
+          }
+        },
+        "field": "Q_wrong",
+        "mean": 1.99542236328125,
+        "n": 64,
+        "negative_n": 21,
+        "positive_n": 43,
+        "zero_n": 0
+      },
+      "interaction": {
+        "by_task": {
+          "arithmetic": {
+            "mean": -0.109375,
+            "n": 8,
+            "negative_n": 6,
+            "positive_n": 2,
+            "zero_n": 0
+          },
+          "causal": {
+            "mean": 9.65478515625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "classification": {
+            "mean": 21.40625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "definition": {
+            "mean": 22.6025390625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "direct_fact": {
+            "mean": 10.5390625,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          },
+          "logic": {
+            "mean": 1.5078125,
+            "n": 8,
+            "negative_n": 2,
+            "positive_n": 6,
+            "zero_n": 0
+          },
+          "multistep_math": {
+            "mean": -0.7646484375,
+            "n": 8,
+            "negative_n": 5,
+            "positive_n": 3,
+            "zero_n": 0
+          },
+          "translation_format": {
+            "mean": 18.40234375,
+            "n": 8,
+            "negative_n": 0,
+            "positive_n": 8,
+            "zero_n": 0
+          }
+        },
+        "field": "interaction",
+        "mean": 10.40484619140625,
+        "n": 64,
+        "negative_n": 13,
+        "positive_n": 51,
+        "zero_n": 0
+      }
+    },
+    "pair_metrics_sha256": "29cc239d22fff42eb8bd622aa49af986adae86cd76871ba0a02297dd6f9dbefe",
+    "punctuation_gate_passed": false,
+    "punctuation_gates": {
+      "Q_correct": {
+        "checks": {
+          "mean_at_or_below_minus_2": true,
+          "negative_pairs_at_least_48_of_64": false,
+          "tasks_with_negative_mean_at_least_6": false
+        },
+        "effect": "Q_correct",
+        "passed": false,
+        "tasks_with_negative_mean_n": 5,
+        "thresholds": {
+          "mean_max": -2.0,
+          "negative_pairs_min": 48,
+          "tasks_with_negative_mean_min": 6
+        }
+      },
+      "Q_wrong": {
+        "checks": {
+          "mean_at_or_below_minus_2": false,
+          "negative_pairs_at_least_48_of_64": false,
+          "tasks_with_negative_mean_at_least_6": false
+        },
+        "effect": "Q_wrong",
+        "passed": false,
+        "tasks_with_negative_mean_n": 2,
+        "thresholds": {
+          "mean_max": -2.0,
+          "negative_pairs_min": 48,
+          "tasks_with_negative_mean_min": 6
+        }
+      }
+    },
+    "truth_gate_passed": false,
+    "truth_gates": {
+      "D_bare": {
+        "checks": {
+          "mean_at_least_2": false,
+          "no_task_mean_at_or_below_minus_2": false,
+          "positive_pairs_at_least_48_of_64": false,
+          "tasks_with_positive_at_least_6_of_8_at_least_6": false
+        },
+        "effect": "D_bare",
+        "passed": false,
+        "task_mean_floor_violations": [
+          "classification",
+          "definition",
+          "translation_format"
+        ],
+        "tasks_meeting_positive_threshold_n": 1,
+        "thresholds": {
+          "mean_min": 2.0,
+          "positive_pairs_min": 48,
+          "positive_per_task_min": 6,
+          "task_mean_must_be_above": -2.0,
+          "tasks_min": 6
+        }
+      },
+      "D_period": {
+        "checks": {
+          "mean_at_least_2": true,
+          "no_task_mean_at_or_below_minus_2": true,
+          "positive_pairs_at_least_48_of_64": true,
+          "tasks_with_positive_at_least_6_of_8_at_least_6": true
+        },
+        "effect": "D_period",
+        "passed": true,
+        "task_mean_floor_violations": [],
+        "tasks_meeting_positive_threshold_n": 6,
+        "thresholds": {
+          "mean_min": 2.0,
+          "positive_pairs_min": 48,
+          "positive_per_task_min": 6,
+          "task_mean_must_be_above": -2.0,
+          "tasks_min": 6
+        }
+      }
+    }
+  },
+  "protocol_file_sha256": "48defe2ee9dc5f2a3589e5aa6381eb6c81b0c2db4c696adb73b2f4c6572251c7",
+  "protocol_sha256": "160ea0d06fb651960dd5b2c00de9cda02e713725c09226147f9593068f83f5e1",
+  "replication_authorized": false,
+  "replication_model_evaluated": false,
+  "role": "post_hoc_tie_semantics_erratum_non_admission",
+  "rows_file_sha256": "2be2399d314519757ba95b6c32c89259670d170ec0ab50bbf43eb673b2715186",
+  "schema_version": 1,
+  "split": "development",
+  "tie_semantics": {
+    "bf16_ulp_at_observed_logit": 0.125,
+    "eos_rank_uses_strictly_greater_count": true,
+    "gap_zero_is_a_finite_primary_metric_value": true,
+    "scalar_argmax_tie_break_is_secondary": true
+  }
+}

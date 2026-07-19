@@ -1,0 +1,575 @@
+{
+  "task": "task6_large_rollout",
+  "model": "qwen3",
+  "primary_head": "L35_H0",
+  "n_prompts": 15,
+  "max_tokens": 40,
+  "summary": {
+    "normal": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    },
+    "ablate_lock": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    },
+    "reverse_lock_2.0": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    },
+    "rev2.0+boost_eos": {
+      "eos_rate": 0.0,
+      "strict_clean_rate": 0.0,
+      "lang_switch_rate": 0.0,
+      "mean_tokens": 40.0
+    }
+  },
+  "raw_results": [
+    {
+      "prompt": "The capital of France is",
+      "condition": "normal",
+      "generated": " Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madrid. The capital of Portugal is Lisbon. The capital of Greece is Athens. The capital of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "ablate_lock",
+      "generated": " in which country? The capital of France is Paris, which is in France. So the answer is France. \n\nBut wait, maybe the question is a trick? Like, is there a country whose",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "reverse_lock_2.0",
+      "generated": " in which country? The capital of France is Paris, which is in France. So the answer is France. Wait, but the question is a bit tricky. Let me think again. The question is",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The capital of France is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " in which country? The capital of France is in France. However, if you're asking which country has its capital in France, the answer is France itself. But if you meant to ask which country",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "normal",
+      "generated": " Jupiter, which is about 464,000,000 miles from the Sun. How can I write this number in scientific notation?\n\nTo convert 464,0",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "ablate_lock",
+      "generated": " Jupiter, which is about 464,000,000 miles in diameter. How can I write this number in scientific notation?\n\nTo convert 464,00",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "reverse_lock_2.0",
+      "generated": " Jupiter, which is about 464,000,000 miles in diameter. How can I write this number in scientific notation?\n\nTo convert 464,00",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The largest planet is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " Jupiter, which is about 464,000,000 miles in diameter. The second largest is Saturn, which is about 74,900 miles in diameter",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "normal",
+      "generated": " 212°F. How can I convert this temperature to Celsius?\n\nTo convert a temperature from Fahrenheit to Celsius, you can use the formula:  \n$$ C = \\frac{5}{9",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "ablate_lock",
+      "generated": " 212°F. How can I convert this temperature to Celsius using the formula $ C = \\frac{5}{9}(F - 32) $? Also, what is the correct",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "reverse_lock_2.0",
+      "generated": " 212°F. When a certain liquid is heated, its temperature increases by 1.5°C per minute. How many minutes does it take to boil the liquid if it starts at ",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Water boils at",
+      "condition": "rev2.0+boost_eos",
+      "generated": " 212°F. When a certain type of thermometer is calibrated, it is placed in boiling water and the temperature is recorded as 210°F. When it is placed in ice water",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "normal",
+      "generated": " 3.00 x 10^8 m/s. How long does it take for light to travel from the Sun to the Earth, a distance of 1.5 x 1",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "ablate_lock",
+      "generated": " 3.00 x 10^8 m/s. How long does it take for light to travel from the Sun to the Earth, a distance of 1.5 x 1",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "reverse_lock_2.0",
+      "generated": " 3.00 x 10^8 m/s. How long does it take for light to travel 1.00 x 10^10 meters? Also, what",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The speed of light is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " 3.00 x 10^8 m/s. How long does it take for light to travel 1.00 x 10^10 meters? - Brainly",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "normal",
+      "generated": " star, and the moon is not a planet. The moon is a natural satellite of the Earth. The Earth is a planet. The Earth is a planet in the solar system. The sun is a",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "ablate_lock",
+      "generated": " star, and the moon is a planet. The sun is a star, and the moon is a planet. The sun is a star, and the moon is a planet. The sun is a star",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "reverse_lock_2.0",
+      "generated": " star, and the moon is a planet. The sun is a star, and the moon is a planet. The sun is a star, and the moon is a planet. The sun is a star",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sun is a",
+      "condition": "rev2.0+boost_eos",
+      "generated": " star, and the moon is a planet. The sun is a star, and the moon is a planet. The sun is a star, and the moon is a planet. The sun is a star",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "normal",
+      "generated": " often seen as loyal companions, but their behavior can sometimes be quite complex and even puzzling. One of the most common and intriguing questions that dog owners ask is, \"Why does my dog stare at",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "ablate_lock",
+      "generated": " often seen as loyal companions, but their behavior can sometimes be quite perplexing. One common question that arises is why dogs might stare at their owners for extended periods. This behavior can b",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "reverse_lock_2.0",
+      "generated": " often seen as loyal companions, but their behavior can sometimes be quite perplexing to their human owners. One such behavior that has sparked curiosity and concern among many dog owners is when a do",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Dogs are",
+      "condition": "rev2.0+boost_eos",
+      "generated": " often seen as loyal companions, but their behavior can sometimes be quite perplexing to their human owners. One such behavior that has sparked curiosity and concern among many dog owners is when a do",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "normal",
+      "generated": " the limit for the future of the Internet of Things (IoT), but the current state of the art is still in its infancy. The IoT is a network of physical devices, vehicles, home appliances",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "ablate_lock",
+      "generated": " the limit for the future of the Internet of Things (IoT), but the current state of the art is still limited by the constraints of the physical world. The IoT is a network of interconnected devices",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "reverse_lock_2.0",
+      "generated": " the limit for the future of the Internet of Things (IoT), but the current state of the art is still limited by the constraints of the underlying network technologies. One of the most significant chal",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The sky is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " the limit for the future of the Internet of Things (IoT) in healthcare, but there are a number of challenges that must be overcome before the full potential of IoT in healthcare can be realized.",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "normal",
+      "generated": " a type of plant, and plants are living things. So, is grass a living thing? Also, can you explain the difference between a living thing and a non-living thing? What are the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "ablate_lock",
+      "generated": " a type of plant that is commonly found in many different environments. It is a crucial part of the ecosystem, providing food for many animals and helping to prevent soil erosion. However, there are s",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "reverse_lock_2.0",
+      "generated": " a type of plant that is commonly found in many different environments, from lawns to meadows to forests. It is a crucial part of the ecosystem as it provides food for many animals and helps to",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Grass is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " a type of plant that is commonly found in many different environments, from lawns to meadows to forests. It is a crucial part of the ecosystem as it provides food for many animals and helps to",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "normal",
+      "generated": " to be in a certain place to start a fire. But if you have a fire, you don't need to be in that place anymore. So, if you have a fire, you can be",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "ablate_lock",
+      "generated": " to be controlled in the process of using it, otherwise it may cause a fire accident. Which of the following is NOT a correct way to use fire? A. When using fire, the fire permit",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "reverse_lock_2.0",
+      "generated": " to be controlled in the workplace to prevent fires from happening. Which of the following is NOT a correct way to control fire in the workplace? ( )\nA. Do not use open flames in places with",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Fire needs",
+      "condition": "rev2.0+boost_eos",
+      "generated": " to be controlled in a certain way to be safe. Which of the following is NOT a way to control fire? A. Remove fuel B. Isolate oxygen C. Cool it down D. Add",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "normal",
+      "generated": " a natural resource that is found in many places. It is a very important resource for the development of the economy. It is also a very important resource for the development of the economy. It is als",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "ablate_lock",
+      "generated": " a natural resource that is found in many places on Earth. It is a solid form of water, and it is a very important part of the Earth's ecosystem. Ice is also a very important resource",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "reverse_lock_2.0",
+      "generated": " a natural resource that is found in many places on Earth. It is a solid form of water and is a key part of the Earth's climate system. Ice is found in the form of glaciers,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Ice is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " a natural resource that is found in many places on Earth. It is a solid form of water. It is a very important resource for human beings. It is used in many ways. For example,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "normal",
+      "generated": " a sphere with radius 6371 km. A satellite is orbiting the Earth at a height of 300 km above the surface. What is the distance from the satellite to the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "ablate_lock",
+      "generated": " a sphere with a radius of 6,371 km. A satellite is orbiting the Earth at a height of 35,786 km above the Earth's surface. What",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "reverse_lock_2.0",
+      "generated": " a sphere with a radius of 6,371 km. A satellite is orbiting the Earth at a height of 35,786 km above the surface. What is the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Earth is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " a sphere with a radius of 6,371 km. A satellite is orbiting the Earth at a height of 35,786 km above the surface. What is the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "normal",
+      "generated": " sides of length 10, 10, and 12. What is the length of the altitude to the longest side?\n\nTo find the length of the altitude to the longest side of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "ablate_lock",
+      "generated": " sides of length 10, 10, and 12. What is the length of the altitude to the longest side?\n\nTo find the length of the altitude to the longest side of",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "reverse_lock_2.0",
+      "generated": " sides of length 10, 10, and 12. What is the length of the altitude to the 12-unit side?\n\nTo find the length of the altitude to the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "A triangle has",
+      "condition": "rev2.0+boost_eos",
+      "generated": " sides of length 10, 10, and 12. What is the length of the altitude to the 12-unit side?\n\nTo find the length of the altitude to the",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "normal",
+      "generated": " born in Stratford-upon-Avon in 1564. He was the third child of John Shakespeare and Mary Arden. John was a glover, a man who makes gloves,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "ablate_lock",
+      "generated": " born in Stratford-upon-Avon in 1564. He was the third child of John Shakespeare and Mary Arden. John Shakespeare was a glover, a man who makes gloves",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "reverse_lock_2.0",
+      "generated": " born in Stratford-upon-Avon in 1564. He was the third child of John Shakespeare and Mary Arden. John Shakespeare was a glover and a butcher, and he",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Shakespeare was",
+      "condition": "rev2.0+boost_eos",
+      "generated": " born in Stratford-upon-Avon in 1564. He was the third child of John Shakespeare and Mary Arden. John Shakespeare was a glover, a man who makes gloves",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "normal",
+      "generated": " Japan, and it is the most populous city in the world. It is also the center of the Japanese economy. The city is located in the Kanto region, and it is the largest city in",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "ablate_lock",
+      "generated": " Japan, and it is one of the most important cities in the world. It is a city of more than 10 million people. It is a city of skyscrapers, and it is",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "reverse_lock_2.0",
+      "generated": " Japan, and it is one of the most populous cities in the world. It is also one of the most expensive cities in the world for living costs. Tokyo is known for its modern architecture, advanced",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "Tokyo is the capital of",
+      "condition": "rev2.0+boost_eos",
+      "generated": " Japan, and it is one of the most populous cities in the world. It is also one of the most expensive cities in the world. Tokyo is a city that is known for its modern architecture,",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "normal",
+      "generated": " the largest ocean in the world, covering an area of about 155,000,000 square miles. The Atlantic Ocean is the second largest, with an area of about",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "ablate_lock",
+      "generated": " the largest ocean in the world, covering an area of 63 million square miles. The Atlantic Ocean is the second largest, with an area of 41 million square miles. The Indian Ocean",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "reverse_lock_2.0",
+      "generated": " the largest ocean in the world, covering an area of 63 million square miles. The Atlantic Ocean is the second largest, with an area of 41 million square miles. The Indian Ocean",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    },
+    {
+      "prompt": "The Pacific Ocean is",
+      "condition": "rev2.0+boost_eos",
+      "generated": " the largest ocean in the world, covering an area of 63 million square miles. The Atlantic Ocean is the second largest, with an area of 41 million square miles. The Indian Ocean",
+      "has_eos": false,
+      "n_tokens": 40,
+      "strict_clean": false,
+      "lang_switched": false
+    }
+  ]
+}
