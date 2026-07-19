@@ -1,0 +1,108 @@
+{
+  "evidence_scope": "Phase564 independent three-model behavior authorization and rejected aggregate source-color post-softmax value edges; Phase565 typed/full-sequence residual-state sufficiency; no compute-edge, natural-necessity, parameter, or neuron closure",
+  "generated_at": "2026-07-19T07:28:35.423557+00:00",
+  "graph": {
+    "edges": [
+      {
+        "causal": false,
+        "compute_edge": false,
+        "evidence_level": "behavior",
+        "id": "phase562:deepseek7b:behavior_stop",
+        "label": "冻结行为门失败",
+        "predictive": false,
+        "score": 1.0,
+        "source": "phase562:deepseek7b:behavior_contract",
+        "target": "phase562:deepseek7b:internal_stop",
+        "type": "authorization_stop"
+      }
+    ],
+    "meta": {
+      "internal_collection_authorized": false,
+      "mechanism_denominator": 72,
+      "model": "deepseek7b",
+      "phase564_independent_behavior_accuracy": 0.8424072265625,
+      "phase564_internal_authorized": false,
+      "phase564_source_edge_compute_count": 0,
+      "phase565_residual_operator_count": 0,
+      "strict_closed_mechanisms": 0
+    },
+    "nodes": [
+      {
+        "behavior_gate_pass": false,
+        "causal": false,
+        "color": "#f59e0b",
+        "compute_edge": false,
+        "failure_count": 1619,
+        "family_id": "semantic_knowledge",
+        "id": "phase562:deepseek7b:behavior_contract",
+        "label": "DS7B（深度求索7B） / 固定身份颜色绑定合同",
+        "mechanism_id": "fixed_identity_color_binding",
+        "model": "deepseek7b",
+        "observer": true,
+        "physical": false,
+        "pipeline_sealed": false,
+        "position": [
+          -48.0,
+          0.0,
+          0.0
+        ],
+        "score": 0.8023681640625,
+        "semantic_accuracy": 0.8023681640625,
+        "show_label": true,
+        "single_neuron": false,
+        "type": "behavior_contract"
+      },
+      {
+        "causal": false,
+        "color": "#ef4444",
+        "compute_edge": false,
+        "family_id": "semantic_knowledge",
+        "id": "phase562:deepseek7b:internal_stop",
+        "label": "DS7B（深度求索7B） / 内部采集未授权",
+        "mechanism_id": "fixed_identity_color_binding",
+        "model": "deepseek7b",
+        "observer": true,
+        "physical": false,
+        "pipeline_sealed": false,
+        "position": [
+          -24.0,
+          0.0,
+          0.0
+        ],
+        "score": 0.0,
+        "show_label": true,
+        "single_neuron": false,
+        "stop_reason": "frozen_behavior_gate_failed",
+        "type": "physical_collection_stop"
+      },
+      {
+        "authorized_for_internal_collection": false,
+        "causal": false,
+        "color": "#d97706",
+        "component": "behavior_contract",
+        "compute_edge": false,
+        "family_id": "semantic_knowledge",
+        "id": "phase564:deepseek7b:independent_behavior",
+        "label": "独立行为门 停止 / 0.8424",
+        "layer": -1,
+        "mechanism_id": "fixed_identity_color_binding",
+        "model": "deepseek7b",
+        "observer": true,
+        "physical": false,
+        "pipeline_sealed": false,
+        "position": [
+          -32.0,
+          -10.0,
+          0.0
+        ],
+        "score": 0.8424072265625,
+        "show_label": true,
+        "single_neuron": false,
+        "type": "behavior_stop"
+      }
+    ]
+  },
+  "model": "deepseek7b",
+  "phase_id": "Phase565",
+  "schema_version": "phase565_fixed_identity_color_residual_atlas.v1"
+}

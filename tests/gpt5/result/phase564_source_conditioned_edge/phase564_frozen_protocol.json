@@ -1,0 +1,143 @@
+{
+  "behavior_case_count_per_model": 8192,
+  "behavior_gate": {
+    "discovery_and_confirmation_both_required": true,
+    "minimum_cell_wilson_95_lcb": 0.9,
+    "unrecoverable_wilson_95_ucb_max": 0.05,
+    "world_all_32_rate_min_per_behavior_split": 0.8
+  },
+  "behavior_splits": [
+    "behavior_discovery",
+    "behavior_confirmation"
+  ],
+  "cells": [
+    "binding0_query0_surface0_order0",
+    "binding0_query0_surface0_order1",
+    "binding0_query0_surface1_order0",
+    "binding0_query0_surface1_order1",
+    "binding0_query0_surface2_order0",
+    "binding0_query0_surface2_order1",
+    "binding0_query0_surface3_order0",
+    "binding0_query0_surface3_order1",
+    "binding0_query1_surface0_order0",
+    "binding0_query1_surface0_order1",
+    "binding0_query1_surface1_order0",
+    "binding0_query1_surface1_order1",
+    "binding0_query1_surface2_order0",
+    "binding0_query1_surface2_order1",
+    "binding0_query1_surface3_order0",
+    "binding0_query1_surface3_order1",
+    "binding1_query0_surface0_order0",
+    "binding1_query0_surface0_order1",
+    "binding1_query0_surface1_order0",
+    "binding1_query0_surface1_order1",
+    "binding1_query0_surface2_order0",
+    "binding1_query0_surface2_order1",
+    "binding1_query0_surface3_order0",
+    "binding1_query0_surface3_order1",
+    "binding1_query1_surface0_order0",
+    "binding1_query1_surface0_order1",
+    "binding1_query1_surface1_order0",
+    "binding1_query1_surface1_order1",
+    "binding1_query1_surface2_order0",
+    "binding1_query1_surface2_order1",
+    "binding1_query1_surface3_order0",
+    "binding1_query1_surface3_order1"
+  ],
+  "created_at": "2026-07-19T06:31:31.837821+00:00",
+  "edge_design": {
+    "candidate_layers": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "candidate_selection_uses_edge_discovery_only": true,
+    "confirmation_and_unseen_are_not_used_for_selection": true,
+    "confirmation_conditions": [
+      "same_case_restore",
+      "source_edge_remove",
+      "paired_donor_edge_replace",
+      "nontarget_source_edge_replace",
+      "wrong_target_donor_replace",
+      "wrong_depth_donor_replace",
+      "channel_roll_donor_replace"
+    ],
+    "discovery_conditions": [
+      "same_case_restore",
+      "source_edge_remove",
+      "paired_donor_edge_replace",
+      "nontarget_source_edge_replace"
+    ],
+    "maximum_frozen_confirmation_candidates": 4,
+    "source_role": "source_color_end",
+    "target_roles": [
+      "query_object_end",
+      "answer_boundary"
+    ],
+    "wrong_relation_control_available": false,
+    "wrong_relation_reason": "the frozen denominator contains only the color relation"
+  },
+  "edge_gate": {
+    "discovery_confirmation_and_unseen_required": true,
+    "donor_effect_must_exceed_each_wrong_control": true,
+    "donor_mean_effect_min": 1.0,
+    "donor_win_rate_min": 0.8,
+    "minimum_factorial_cell_donor_win_rate": 0.6,
+    "removal_mean_damage_min": 0.5,
+    "same_restore_max_abs_effect": 0.05
+  },
+  "edge_splits": [
+    "edge_discovery",
+    "edge_confirmation",
+    "edge_unseen"
+  ],
+  "evidence_policy": {
+    "aggregate_heads_before_any_head_scan": true,
+    "behavior_authorization_before_internal_collection": true,
+    "compute_edge_requires_necessity_restore_sufficiency_specificity_and_holdout": true,
+    "head_channel_parameter_neuron_scan_executed": false,
+    "key_effect_not_identified_by_this_intervention": true,
+    "sealed_split_read": false,
+    "source_edge_is_post_softmax_value_contribution": true
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "open_case_count": 41472,
+  "open_cases_sha256": "90269dbed5ecd515184d5afff689f88e2692d51f810b1d2e48022d656744ab5e",
+  "open_splits": [
+    "behavior_discovery",
+    "behavior_confirmation",
+    "edge_discovery",
+    "edge_confirmation",
+    "edge_unseen"
+  ],
+  "parent_contract": "Phase559 exact fixed-identity 32-cell behavior contract",
+  "phase_id": "Phase564",
+  "registered_case_count": 50688,
+  "schema_version": "phase564_frozen_protocol.v1",
+  "sealed_case_count": 9216,
+  "sealed_commitment_sha256": "e583b59c56fce5cc3440529844ac3f81834af2d0b54abdbeed87179c471f70c2",
+  "split_world_counts": {
+    "behavior_confirmation": 128,
+    "behavior_discovery": 128,
+    "edge_confirmation": 64,
+    "edge_discovery": 48,
+    "edge_unseen": 64,
+    "sealed": 96
+  },
+  "splits": [
+    "behavior_discovery",
+    "behavior_confirmation",
+    "edge_discovery",
+    "edge_confirmation",
+    "edge_unseen",
+    "sealed"
+  ]
+}

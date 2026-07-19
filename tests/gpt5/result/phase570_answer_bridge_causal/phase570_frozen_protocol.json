@@ -1,0 +1,85 @@
+{
+  "causal_screen_scope": "late answer-boundary attention contribution, not upstream relation encoding",
+  "cells_per_phenotype": 4,
+  "conditions": [
+    "baseline",
+    "target_projection_remove",
+    "random_matched_remove",
+    "wrong_layer_projection_remove"
+  ],
+  "created_at": "2026-07-19T12:29:57.149386+00:00",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase569_behavior_summary_sha256": "194f2880139e39b86c5a04688c473c070ae92590e8fc706140aed97b7c766385",
+  "phase569_trace_analysis_sha256": "04daa0132d63e29f6ca8fb3b5b9d7998070b37c24d76defb59d60770a0102dcd",
+  "phase_id": "Phase570",
+  "registered_case_count": 2304,
+  "registered_case_count_per_model": 768,
+  "schema_version": "phase570_frozen_protocol.v1",
+  "sealed_split_read": false,
+  "selected_cells_by_model": {
+    "deepseek7b": {
+      "stable_correct": [
+        "binding0_query1_relationbody_surface1_order0",
+        "binding1_query1_relationbody_surface1_order0",
+        "binding0_query1_relationbody_surface1_order1",
+        "binding2_query1_relationbody_surface1_order0"
+      ],
+      "stable_relation_confusion": [
+        "binding1_query2_relationtag_surface1_order0",
+        "binding0_query2_relationbody_surface1_order1",
+        "binding2_query2_relationbody_surface1_order1",
+        "binding1_query0_relationbody_surface2_order0"
+      ]
+    },
+    "glm4": {
+      "stable_correct": [
+        "binding0_query1_relationtag_surface1_order0",
+        "binding0_query1_relationtag_surface1_order1",
+        "binding2_query0_relationtag_surface1_order0",
+        "binding0_query2_relationtag_surface1_order1"
+      ],
+      "stable_relation_confusion": [
+        "binding0_query0_relationtag_surface1_order1",
+        "binding0_query2_relationbody_surface0_order1",
+        "binding0_query1_relationbody_surface2_order1",
+        "binding1_query2_relationbody_surface0_order1"
+      ]
+    },
+    "qwen3": {
+      "stable_correct": [
+        "binding0_query0_relationbody_surface0_order1",
+        "binding0_query0_relationbody_surface1_order1",
+        "binding0_query1_relationtag_surface0_order1",
+        "binding0_query2_relationtag_surface0_order1"
+      ],
+      "stable_relation_confusion": [
+        "binding1_query0_relationbody_surface2_order0",
+        "binding0_query0_relationbody_surface2_order0",
+        "binding1_query0_relationtag_surface2_order1",
+        "binding2_query0_relationbody_surface2_order0"
+      ]
+    }
+  },
+  "selected_layers_by_model": {
+    "deepseek7b": {
+      "layer_count": 28,
+      "target_layer": 23,
+      "wrong_layer_control": 7
+    },
+    "glm4": {
+      "layer_count": 40,
+      "target_layer": 34,
+      "wrong_layer_control": 10
+    },
+    "qwen3": {
+      "layer_count": 36,
+      "target_layer": 29,
+      "wrong_layer_control": 9
+    }
+  },
+  "world_count": 96
+}
