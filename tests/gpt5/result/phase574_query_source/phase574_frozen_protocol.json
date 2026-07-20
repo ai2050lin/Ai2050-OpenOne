@@ -1,0 +1,79 @@
+{
+  "axes": [
+    "relation",
+    "object",
+    "order"
+  ],
+  "behavior_gate": {
+    "both_noop_repeats_exact_and_semantic_stability_required": true,
+    "minimum_all_axis_qualified_worlds_each_structure_split": 128,
+    "minimum_all_axis_qualified_worlds_heldout": 128,
+    "minimum_relation_qualified_worlds_each_structure_split": 192
+  },
+  "candidate_worlds_per_split": 1024,
+  "causal_policy": {
+    "delete_then_restore_in_separate_forward_required": true,
+    "full_short_generation_required": true,
+    "query_condition_to_layer24_routing_mediation_required": true,
+    "strict_relation_object_order_controls_required": true,
+    "world_level_pipeline_permutations": 1024
+  },
+  "causal_splits": [
+    "causal_discovery",
+    "causal_confirmation"
+  ],
+  "control_screen_cap_per_split_model": 384,
+  "created_at": "2026-07-20T05:03:18.021412+00:00",
+  "depth_bands": [
+    [
+      5,
+      8
+    ],
+    [
+      9,
+      12
+    ],
+    [
+      13,
+      18
+    ],
+    [
+      19,
+      24
+    ]
+  ],
+  "final_worlds_per_split_model": 128,
+  "fixed_batch_size": 8,
+  "head_channel_parameter_neuron_scan_allowed": false,
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "noop_repeats": 2,
+  "open_case_count": 20480,
+  "phase573_decision_sha256": "6cb8c1111305bcb117eb2ff22243d061a705828b47d5c11c8e14d93c5f01e59f",
+  "phase_id": "Phase574",
+  "schema_version": "phase574_query_source_protocol.v1",
+  "sealed_case_count": 4096,
+  "sealed_commitment_sha256": "fce423097ec2b19d8994ea07d0dcf3161f46682c0613d4fd1cd8e112471885fa",
+  "sealed_split_read_for_analysis": false,
+  "structure_splits": [
+    "structure_discovery",
+    "structure_confirmation",
+    "heldout_recombination"
+  ],
+  "trace_policy": {
+    "causal_prefix_max_relative_delta": 1e-05,
+    "confirmation_and_heldout_frozen_metrics_only": true,
+    "open_discovery_full_vectors_allowed": true,
+    "output_embedding_direction_for_upstream_discovery": false,
+    "right_padding_and_explicit_position_ids_required": true
+  },
+  "variants": [
+    "base",
+    "relation_swap",
+    "object_swap",
+    "order_swap"
+  ]
+}

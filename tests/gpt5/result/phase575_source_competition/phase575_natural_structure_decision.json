@@ -1,0 +1,88 @@
+{
+  "analysis_sha256": "2015d53e7856ceda1bb6caa35c6a5f132b6740debcd22de29e1fb2695a85fbd9",
+  "causal_candidate_not_yet_a_mechanism": true,
+  "causal_intervention_executed": false,
+  "causal_protocol_authorized": true,
+  "causal_splits_read": false,
+  "created_at": "2026-07-20T09:42:04.290508+00:00",
+  "earliest_replicated_coordinate_by_channel_and_receiver": {
+    "message_norm__answer_boundary": {
+      "channel": "message_norm",
+      "direction_rate_floor": 0.9140625,
+      "effect_mean_floor": 2.479843575027189,
+      "gate_score": 0.7046875,
+      "layer": 23,
+      "order_rate_floor": 0.7421875,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.7046875,
+      "strict_flip_rate_floor": 0.2109375
+    },
+    "score__answer_boundary": {
+      "channel": "score",
+      "direction_rate_floor": 1.0,
+      "effect_mean_floor": 0.8382383326534182,
+      "gate_score": 0.8109375,
+      "layer": 24,
+      "order_rate_floor": 0.875,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.8109375,
+      "strict_flip_rate_floor": 0.28125
+    },
+    "weight__answer_boundary": {
+      "channel": "weight",
+      "direction_rate_floor": 0.9765625,
+      "effect_mean_floor": 0.018657365923445468,
+      "gate_score": 0.775,
+      "layer": 23,
+      "order_rate_floor": 0.796875,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.775,
+      "strict_flip_rate_floor": 0.296875
+    }
+  },
+  "model": "qwen3",
+  "natural_structure_found": true,
+  "phase_id": "Phase575",
+  "replicated_routing_bands": {
+    "message_norm": {
+      "answer_boundary": [
+        {
+          "end": 27,
+          "start": 23
+        },
+        {
+          "end": 34,
+          "start": 29
+        }
+      ],
+      "query_terminal": []
+    },
+    "score": {
+      "answer_boundary": [
+        {
+          "end": 24,
+          "start": 24
+        }
+      ],
+      "query_terminal": []
+    },
+    "weight": {
+      "answer_boundary": [
+        {
+          "end": 34,
+          "start": 23
+        }
+      ],
+      "query_terminal": []
+    }
+  },
+  "replicated_routing_coordinate_count": 24,
+  "schema_version": "phase575_natural_structure_decision.v1",
+  "sealed_split_read": false,
+  "selection_rule": "freeze only coordinates that independently pass semantic selection, order preservation, relation-direction, and duplicate-floor gates in all three open structure splits",
+  "status": "complete",
+  "theory_formula_frozen_before_discovery": false
+}

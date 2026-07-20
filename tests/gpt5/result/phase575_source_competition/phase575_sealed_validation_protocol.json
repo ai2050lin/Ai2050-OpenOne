@@ -1,0 +1,86 @@
+{
+  "behavior_qualification": {
+    "batch_size": 8,
+    "candidate_world_count": 1024,
+    "control_screen_cap": 384,
+    "max_new_tokens": 4,
+    "minimum_relation_qualified": 192,
+    "relation_screen_world_count": 1024,
+    "selected_five_variant_world_count": 128,
+    "two_exact_and_semantic_noop_repeats_required": true
+  },
+  "causal_execution": {
+    "direct_weight_restore_required": true,
+    "recipient_keys_and_values_preserved": true,
+    "same_position_reexpression_of_pre_rotary_query_required": true,
+    "world_batch_size": 8
+  },
+  "causal_gates": {
+    "pipeline_resample_count": 1024,
+    "relation_logit_effect_mean_minimum": 0.02,
+    "relation_logit_effect_positive_rate_minimum": 0.6,
+    "relation_route_effect_mean_minimum": 0.02,
+    "relation_route_effect_positive_rate_minimum": 0.8,
+    "relation_vs_object_effect_gap_minimum": 0.01,
+    "relation_vs_order_effect_gap_minimum": 0.01,
+    "restore_candidate_logit_maximum_absolute_delta": 0.0001,
+    "restore_route_maximum_absolute_delta": 1e-05,
+    "smoothed_tail_fraction_maximum": 0.01
+  },
+  "committed_sealed_cases_sha256": "769a1a3093d9770b43f280a335470fe9b6e70b052877145a407cfa065018f555",
+  "conditions": [
+    "natural_baseline",
+    "score_relation_replace",
+    "score_object_replace",
+    "score_order_replace",
+    "score_relation_weight_restore"
+  ],
+  "created_at": "2026-07-20T10:24:06.198483+00:00",
+  "failure_policy": {
+    "close_candidate_without_patch": true,
+    "do_not_reopen_seal": true
+  },
+  "full_generation": {
+    "do_sample": false,
+    "execution_repeats": [
+      "noop1",
+      "noop2"
+    ],
+    "max_new_tokens": 4,
+    "use_cache": false,
+    "world_count": 128
+  },
+  "full_generation_decision_sha256": "9fa833b61d0df01030a705cdd15a7f608e5f5528b548bc3f48dfda97c2dc6823",
+  "full_generation_summary_sha256": "4a6177f70ef4a58f0ed11c0f1efd0aa053f832b85fc9997a2091b859eaec52a4",
+  "generation_gates": {
+    "natural_base_target_rate_minimum": 0.95,
+    "pipeline_resample_count": 1024,
+    "relation_donor_target_rate_gain_minimum": 0.3,
+    "relation_donor_target_rate_minimum": 0.4,
+    "relation_vs_object_target_rate_gap_minimum": 0.2,
+    "relation_vs_order_target_rate_gap_minimum": 0.2,
+    "repeat_exact_text_mismatch_maximum_each_condition": 0,
+    "repeat_semantic_event_mismatch_maximum_each_condition": 0,
+    "restore_exact_text_mismatch_maximum": 0,
+    "restore_semantic_event_mismatch_maximum": 0,
+    "smoothed_tail_fraction_maximum": 0.01
+  },
+  "head_channel_parameter_neuron_scan_allowed": false,
+  "model": "qwen3",
+  "one_shot": true,
+  "output_embedding_direction_used": false,
+  "phase_id": "Phase575",
+  "schema_version": "phase575_sealed_validation_protocol.v1",
+  "sealed_commitment_sha256": "7045c399bffd382f355da306a14d1f83d1152069b3dd16e8339bb93c39853ff9",
+  "sealed_split_read": false,
+  "selected_coordinate": {
+    "branch": "score",
+    "layer": 24,
+    "receiver": "answer_boundary",
+    "source_groups": [
+      "anchor_base_selected",
+      "anchor_base_other_relation"
+    ]
+  },
+  "split": "sealed"
+}

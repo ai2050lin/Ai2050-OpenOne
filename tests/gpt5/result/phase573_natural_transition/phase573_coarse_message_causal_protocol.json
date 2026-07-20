@@ -1,0 +1,64 @@
+{
+  "behavior_batch_size": 8,
+  "behavior_gate": {
+    "base_relation_object_order_must_all_be_correct": true,
+    "both_noop_repeats_must_be_exactly_and_semantically_stable": true,
+    "control_screen_cap_each_split": 384,
+    "final_worlds_each_split": 128,
+    "minimum_relation_qualified_worlds_each_split": 192
+  },
+  "candidate_layer": 24,
+  "candidate_receiver": "answer_boundary",
+  "candidate_source": "semantic selected fact object+relation+value token union",
+  "causal_batch_worlds": 8,
+  "causal_gate": {
+    "discovery_and_confirmation_must_pass_independently": true,
+    "minimum_donor_candidate_win_rate": 0.1,
+    "minimum_mean_donor_switch_effect": 0.0,
+    "minimum_mean_gap_vs_control": 0.05,
+    "minimum_positive_effect_rate": 0.65,
+    "required_controls": [
+      "nonselected_edge_remove",
+      "channel_roll_donor_replace",
+      "wrong_depth_donor_replace",
+      "wrong_position_donor_replace"
+    ],
+    "required_primary_conditions": [
+      "selected_edge_remove",
+      "paired_relation_selected_replace"
+    ]
+  },
+  "causal_splits": [
+    "causal_discovery",
+    "causal_confirmation"
+  ],
+  "causal_splits_read_at_freeze": false,
+  "conditions": [
+    "same_case_restore",
+    "selected_edge_remove",
+    "nonselected_edge_remove",
+    "paired_relation_selected_replace",
+    "channel_roll_donor_replace",
+    "wrong_depth_donor_replace",
+    "wrong_position_donor_replace"
+  ],
+  "created_at": "2026-07-19T17:35:30.863550+00:00",
+  "frozen_protocol_sha256": "caf59830c97260a1874f3cb9856ab126b4b33107df53d9ee538985d000074ad8",
+  "head_channel_parameter_neuron_scan_executed": false,
+  "key_effect_identified": false,
+  "model": "qwen3",
+  "observer_padding": "right",
+  "open_cases_sha256": "dfca9887eb7fd06025613f26b19f8c0b5b04a346fcdd0675ffbd793aa5745c24",
+  "permutation_interpretation": "fixed deterministic sign-flip audit of paired case effects; descriptive support only, not a substitute for confirmation",
+  "permutations": 1024,
+  "phase_id": "Phase573",
+  "position_ids": "cumulative attention mask",
+  "post_softmax_value_contribution_intervention": true,
+  "reconstruction_relative_error_max": 0.02,
+  "schema_version": "phase573_coarse_message_causal_protocol.v1",
+  "sealed_split_read": false,
+  "trace_decision_sha256": "247ecd31523170a27dadb19c0601fd8cae44ad3730bddd03a0ac2db90a7ae879",
+  "trace_summary_sha256": "13c5f18d7f2de079c52ad72304573c3196d98c22de3cad095821b164618a9c05",
+  "wrong_depth_control_layer": 12,
+  "wrong_position_control": "query_terminal"
+}

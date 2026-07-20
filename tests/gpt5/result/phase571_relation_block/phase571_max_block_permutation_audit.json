@@ -1,0 +1,72 @@
+{
+  "closure_claimed": false,
+  "created_at": "2026-07-19T15:28:20.278215+00:00",
+  "intervention_outcomes_used": false,
+  "method": "Exact-pair phenotype-label sign flips. Discovery uses the maximum score across every frozen role and contiguous depth interval; confirmation tests the discovery-selected block on the independent pool.",
+  "model_reports": [
+    {
+      "candidate_count": 182,
+      "model": "qwen3",
+      "null_any_discovery_threshold_pass_rate": 0.4462890625,
+      "null_max_discovery_score_mean": 1.0308972922248083,
+      "null_max_discovery_score_q95": 1.796875,
+      "observed_max_discovery_score": 8.28125,
+      "observed_selected_confirmation_score": 2.5,
+      "observed_selected_discovery_score": 3.4375,
+      "permutation_gate_pass": true,
+      "permutation_rounds": 1024,
+      "selected_block": {
+        "end_band": 5,
+        "semantic_role": "answer_boundary",
+        "start_band": 5
+      },
+      "selected_block_confirmation_p": 0.000975609756097561,
+      "selected_block_familywise_discovery_p": 0.000975609756097561
+    },
+    {
+      "candidate_count": 182,
+      "model": "glm4",
+      "null_any_discovery_threshold_pass_rate": 0.330078125,
+      "null_max_discovery_score_mean": 0.9011276303866674,
+      "observed_max_discovery_score": 0.9375,
+      "permutation_gate_pass": false,
+      "permutation_rounds": 1024,
+      "reason": "No discovery-and-confirmation block was selected before permutation.",
+      "selected_block": null,
+      "selected_block_confirmation_p": null,
+      "selected_block_familywise_discovery_p": null
+    },
+    {
+      "candidate_count": 182,
+      "model": "deepseek7b",
+      "null_any_discovery_threshold_pass_rate": 0.5400390625,
+      "null_max_discovery_score_mean": 1.0419038761315447,
+      "null_max_discovery_score_q95": 1.484375,
+      "observed_max_discovery_score": 4.21875,
+      "observed_selected_confirmation_score": 2.65625,
+      "observed_selected_discovery_score": 1.5625,
+      "permutation_gate_pass": true,
+      "permutation_rounds": 1024,
+      "selected_block": {
+        "end_band": 6,
+        "semantic_role": "answer_boundary",
+        "start_band": 6
+      },
+      "selected_block_confirmation_p": 0.000975609756097561,
+      "selected_block_familywise_discovery_p": 0.03804878048780488
+    }
+  ],
+  "passed_model_count": 2,
+  "passed_models": [
+    "qwen3",
+    "deepseek7b"
+  ],
+  "permutation_gate_required_for_confirmed_observer_block": true,
+  "phase_id": "Phase571",
+  "rounds": 1024,
+  "schema_version": "phase571_max_block_permutation_audit.v1",
+  "score": "min(abs(relative_mean_gap)/frozen_relative_threshold, abs(positive_rate_gap)/frozen_positive_rate_threshold)",
+  "sealed_split_read": false,
+  "seed": 5711024,
+  "status": "complete"
+}

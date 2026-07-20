@@ -1,0 +1,137 @@
+{
+  "branch_definitions": {
+    "query": {
+      "object": "q_object_replace",
+      "order": "q_order_replace",
+      "relation": "q_relation_replace",
+      "restore_or_mediator": "q_relation_score_restore"
+    },
+    "score": {
+      "object": "score_object_replace",
+      "order": "score_order_replace",
+      "relation": "score_relation_replace",
+      "restore_or_mediator": "score_relation_weight_restore"
+    },
+    "weight": {
+      "object": "weight_object_replace",
+      "order": "weight_order_replace",
+      "relation": "weight_relation_replace",
+      "restore_or_mediator": "weight_relation_restore"
+    }
+  },
+  "causal_behavior": {
+    "batch_size": 8,
+    "control_screen_cap_each_split": 384,
+    "max_new_tokens": 4,
+    "minimum_relation_qualified_each_split": 192,
+    "relation_screen_worlds_each_split": 1024,
+    "selected_five_variant_worlds_each_split": 128,
+    "splits": [
+      "causal_discovery",
+      "causal_confirmation"
+    ],
+    "two_exact_and_semantic_noop_repeats_required": true
+  },
+  "causal_splits_read": false,
+  "confirmation_rule": {
+    "heldout_structure_was_already_required_before_freeze": true,
+    "only_the_selected_discovery_branch_is_run": true,
+    "same_direction_and_thresholds_required": true,
+    "sealed_can_open_only_after_discovery_and_confirmation_behavior_pass": true
+  },
+  "created_at": "2026-07-20T09:48:30.657145+00:00",
+  "discovery_conditions": [
+    "natural_baseline",
+    "q_relation_replace",
+    "q_object_replace",
+    "q_order_replace",
+    "q_relation_wrong_depth_rescaled",
+    "q_relation_delta_roll",
+    "q_relation_score_restore",
+    "wrong_receiver_q_relation_replace",
+    "score_relation_replace",
+    "score_object_replace",
+    "score_order_replace",
+    "score_equalize",
+    "score_equalize_restore",
+    "score_relation_weight_restore",
+    "weight_relation_replace",
+    "weight_object_replace",
+    "weight_order_replace",
+    "weight_relation_restore",
+    "value_group_swap_positive_control"
+  ],
+  "discovery_gate": {
+    "behavior_relation_logit_effect_mean_minimum": 0.02,
+    "behavior_relation_logit_effect_positive_rate_minimum": 0.6,
+    "maximum_branch_smoothed_tail_fraction": 0.01,
+    "mediation_remaining_fraction_maximum": 0.2,
+    "pipeline_resample_count": 1024,
+    "relation_route_effect_mean_minimum": 0.02,
+    "relation_route_effect_positive_rate_minimum": 0.8,
+    "relation_vs_object_effect_gap_minimum": 0.01,
+    "relation_vs_order_effect_gap_minimum": 0.01,
+    "restore_candidate_logit_maximum_absolute_delta": 0.0001,
+    "restore_route_maximum_absolute_delta": 1e-05
+  },
+  "execution": {
+    "full_short_generation_after_open_confirmation": true,
+    "full_short_generation_max_new_tokens": 4,
+    "post_rotary_q_replace_preserves_receiver_k_and_v": true,
+    "restore_uses_direct_natural_tensor_overwrite": true,
+    "right_padding_and_explicit_position_ids_required": true,
+    "score_and_weight_replace_keep_recipient_values": true,
+    "score_equalize_uses_two_fixed_source_groups": true,
+    "world_batch_size": 8
+  },
+  "head_channel_parameter_neuron_scan_allowed": false,
+  "model": "qwen3",
+  "natural_analysis_sha256": "2015d53e7856ceda1bb6caa35c6a5f132b6740debcd22de29e1fb2695a85fbd9",
+  "natural_decision_sha256": "47c8e39ab36fa05afad2f56081da6b8c68f36c4d1430629f572be9d9177fc638",
+  "open_cases_sha256": "7f4ab47566d433431fcda571c008e66d45d45eb5f2d3e02293860a8d7a749c6e",
+  "output_embedding_direction_used": false,
+  "phase575_protocol_sha256": "bedc2cea287fe59f178843d903eba53cf98376e92433449fa2178e4402c4830d",
+  "phase_id": "Phase575",
+  "positive_and_necessity_controls": [
+    "value_group_swap_positive_control",
+    "score_equalize",
+    "score_equalize_restore"
+  ],
+  "schema_version": "phase575_routing_causal_protocol.v1",
+  "sealed_split_read": false,
+  "selected_coordinate": {
+    "layer": 24,
+    "reason": "the only layer where raw score, normalized weight, and value-message events all independently replicated at the answer boundary",
+    "receiver": "answer_boundary",
+    "score_natural_gate": {
+      "channel": "score",
+      "direction_rate_floor": 1.0,
+      "effect_mean_floor": 0.8382383326534182,
+      "gate_score": 0.8109375,
+      "layer": 24,
+      "order_rate_floor": 0.875,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.8109375,
+      "strict_flip_rate_floor": 0.28125
+    },
+    "source_groups": [
+      "anchor_base_selected",
+      "anchor_base_other_relation"
+    ],
+    "weight_natural_gate": {
+      "channel": "weight",
+      "direction_rate_floor": 0.9921875,
+      "effect_mean_floor": 0.059673708425634686,
+      "gate_score": 0.9625,
+      "layer": 24,
+      "order_rate_floor": 0.9765625,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.9625,
+      "strict_flip_rate_floor": 0.515625
+    }
+  },
+  "selection_was_frozen_after_natural_replication": true,
+  "wrong_depth_control_layer": 23
+}

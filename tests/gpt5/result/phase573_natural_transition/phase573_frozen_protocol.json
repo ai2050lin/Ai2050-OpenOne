@@ -1,0 +1,71 @@
+{
+  "axes": [
+    "relation",
+    "object",
+    "order"
+  ],
+  "behavior_gate": {
+    "both_noop_repeats_must_have_expected_semantic_target": true,
+    "minimum_all_axis_qualified_worlds_each_structure_split": 128,
+    "minimum_all_axis_qualified_worlds_heldout": 128,
+    "minimum_relation_qualified_worlds_each_structure_split": 192,
+    "order_swap_output_must_equal_base_target": true
+  },
+  "candidate_worlds_per_split": 1024,
+  "causal_mask_constraint": "Facts precede the query, so a changed query cannot alter earlier fact-token states. Fact reading must be measured as source routing/messages into query terminal or answer-boundary receiver positions.",
+  "causal_splits": [
+    "causal_discovery",
+    "causal_confirmation"
+  ],
+  "control_screen_cap_per_split_model": 384,
+  "control_variants": [
+    "object_swap",
+    "order_swap"
+  ],
+  "created_at": "2026-07-19T16:53:00.818228+00:00",
+  "final_worlds_per_axis_split_model": 128,
+  "fixed_batch_size": 8,
+  "head_channel_parameter_neuron_scan_allowed": false,
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "noop_repeats": 2,
+  "open_case_count": 20480,
+  "phase572_decision_sha256": "19a6d7050e62c3749d2ce1b0ad62e7c7596e5b21b6aae79274abc25ed21c86c2",
+  "phase_id": "Phase573",
+  "relation_screen_variants": [
+    "base",
+    "relation_swap"
+  ],
+  "schema_version": "phase573_natural_transition_frozen_protocol.v1",
+  "sealed_case_count": 4096,
+  "sealed_commitment_sha256": "4e99f02af662768aa5c8ce9dedc7621bde2d2ec3d994e0b603168660cff0ed40",
+  "sealed_split_read_for_analysis": false,
+  "stage_order": [
+    "relation_behavior_screen",
+    "object_and_order_controls_on_relation_qualified_worlds",
+    "heldout_recombination_behavior",
+    "coordinate_free_natural_trace",
+    "coarse_message_edge_only_if_trace_confirms"
+  ],
+  "structure_splits": [
+    "structure_discovery",
+    "structure_confirmation",
+    "heldout_recombination"
+  ],
+  "trace_gate": {
+    "discovery_confirmation_same_event_order_required": true,
+    "fact_reading_must_be_measured_at_later_receiver_positions": true,
+    "heldout_recombination_required": true,
+    "minimum_worlds_per_axis_split": 128,
+    "upstream_primary_axis_must_not_use_output_embedding_direction": true
+  },
+  "variants": [
+    "base",
+    "relation_swap",
+    "object_swap",
+    "order_swap"
+  ]
+}

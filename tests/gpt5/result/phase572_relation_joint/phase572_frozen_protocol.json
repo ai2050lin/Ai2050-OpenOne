@@ -1,0 +1,69 @@
+{
+  "candidate_case_count": 1024,
+  "candidate_worlds_per_cell": 128,
+  "classification_rule": {
+    "controls_equal_or_exceed_joint": "general_state_replacement",
+    "joint_gate_pass": "candidate_distributed_relation_state",
+    "no_joint_repair": "late_joint_role_route_closed",
+    "only_answer_containing_sets_repair": "late_answer_content_transport"
+  },
+  "conditions": [
+    "baseline",
+    "self_qfa_entry_restore",
+    "matched_answer_entry",
+    "matched_query_entry",
+    "matched_fact_entry",
+    "matched_query_answer_entry",
+    "matched_fact_answer_entry",
+    "matched_query_fact_entry",
+    "matched_query_fact_answer_entry",
+    "wrong_target_query_fact_answer_entry",
+    "random_query_fact_answer_entry"
+  ],
+  "created_at": "2026-07-19T15:31:45.223486+00:00",
+  "entry_layer": 23,
+  "exit_layer": 26,
+  "final_pair_count": 128,
+  "fixed_batch_size": 8,
+  "fresh_worlds_required": true,
+  "head_channel_parameter_neuron_scan_allowed": false,
+  "joint_gate": {
+    "minimum_joint_confusion_repair": 0.1,
+    "minimum_joint_correct_preservation": 0.9,
+    "minimum_joint_gain_over_best_single_role": 0.05,
+    "minimum_joint_gain_over_best_two_role_subset": 0.05,
+    "minimum_joint_specificity_over_each_control": 0.1,
+    "minimum_leave_one_out_contribution": 0.05,
+    "minimum_self_restore_semantic_match": 0.95,
+    "minimum_two_roles_with_positive_leave_one_out_contribution": 2
+  },
+  "minimum_candidate_pairs": 160,
+  "mixed_cell_count": 8,
+  "mixed_cells": [
+    "binding0_query0_relationtag_surface1_order1",
+    "binding0_query1_relationbody_surface2_order0",
+    "binding1_query2_relationtag_surface0_order0",
+    "binding1_query2_relationtag_surface1_order0",
+    "binding0_query2_relationbody_surface1_order1",
+    "binding0_query1_relationtag_surface2_order1",
+    "binding1_query0_relationtag_surface1_order1",
+    "binding2_query0_relationtag_surface1_order1"
+  ],
+  "model": "qwen3",
+  "model_scope_reason": "Qwen3 alone passed the Phase571 permutation and coarse causal gates; GLM4 had no confirmed block and DS7B failed confusion repair specificity.",
+  "noop_repeats": 2,
+  "phase571_causal_sha256": "2df68c8bce8c546bbfd4b9db4cf9221f5741d5035d19e0a34d243ef5cb4efbe9",
+  "phase571_donor_sha256": "1d29cd6e1423191de477f83c93f7c9eec2a6844b1ce0ef58c2053d63463396bc",
+  "phase571_permutation_sha256": "46edb23265be305e3cf38f78c18fa1f89a4fb68c594300f02d9765f4e76a5808",
+  "phase571_protocol_sha256": "e1b0944e5cf1b7e4eb2387fb5bd6340ea49150bf0944dc01d6ee203da0707e4a",
+  "phase_id": "Phase572",
+  "roles": [
+    "query_relation",
+    "target_fact_value",
+    "answer_boundary"
+  ],
+  "schema_version": "phase572_relation_joint_frozen_protocol.v1",
+  "sealed_split_defined": false,
+  "source_split": "path_discovery",
+  "source_world_base": 90000
+}

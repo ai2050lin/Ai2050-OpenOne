@@ -1,0 +1,50 @@
+{
+  "causal_candidate_not_yet_a_mechanism": true,
+  "causal_confirmation_executed": false,
+  "confirmation_internal_state_authorized": true,
+  "created_at": "2026-07-20T10:08:25.140216+00:00",
+  "full_short_generation_executed": false,
+  "model": "qwen3",
+  "open_discovery_behavior_gate_pass": true,
+  "open_discovery_physical_routing_gate_pass": true,
+  "phase_id": "Phase575",
+  "schema_version": "phase575_routing_causal_discovery_decision.v1",
+  "sealed_split_authorized": false,
+  "sealed_split_read": false,
+  "selected_causal_branch": "score",
+  "selected_natural_coordinate": {
+    "layer": 24,
+    "reason": "the only layer where raw score, normalized weight, and value-message events all independently replicated at the answer boundary",
+    "receiver": "answer_boundary",
+    "score_natural_gate": {
+      "channel": "score",
+      "direction_rate_floor": 1.0,
+      "effect_mean_floor": 0.8382383326534182,
+      "gate_score": 0.8109375,
+      "layer": 24,
+      "order_rate_floor": 0.875,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.8109375,
+      "strict_flip_rate_floor": 0.28125
+    },
+    "source_groups": [
+      "anchor_base_selected",
+      "anchor_base_other_relation"
+    ],
+    "weight_natural_gate": {
+      "channel": "weight",
+      "direction_rate_floor": 0.9921875,
+      "effect_mean_floor": 0.059673708425634686,
+      "gate_score": 0.9625,
+      "layer": 24,
+      "order_rate_floor": 0.9765625,
+      "receiver": "answer_boundary",
+      "replicated_routing_event": true,
+      "semantic_rate_floor": 0.9625,
+      "strict_flip_rate_floor": 0.515625
+    }
+  },
+  "status": "complete",
+  "summary_sha256": "7547d86e6f7b9eaed00cf9fae78cd2345deadf6ab130b89cc33538c08719c7b7"
+}

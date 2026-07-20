@@ -1,0 +1,219 @@
+{
+  "candidate_rows": [
+    {
+      "band_end": 8,
+      "band_start": 5,
+      "candidate_id": "query_relation_value_message__L5_L8",
+      "component": "query_relation_value_message",
+      "patch_layers": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "band_end": 12,
+      "band_start": 9,
+      "candidate_id": "query_relation_value_message__L9_L12",
+      "component": "query_relation_value_message",
+      "patch_layers": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "band_end": 18,
+      "band_start": 13,
+      "candidate_id": "query_relation_value_message__L13_L18",
+      "component": "query_relation_value_message",
+      "patch_layers": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "band_end": 24,
+      "band_start": 19,
+      "candidate_id": "query_relation_value_message__L19_L24",
+      "component": "query_relation_value_message",
+      "patch_layers": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "band_end": 8,
+      "band_start": 5,
+      "candidate_id": "query_terminal_attention_output__L5_L8",
+      "component": "query_terminal_attention_output",
+      "patch_layers": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "band_end": 12,
+      "band_start": 9,
+      "candidate_id": "query_terminal_attention_output__L9_L12",
+      "component": "query_terminal_attention_output",
+      "patch_layers": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "band_end": 18,
+      "band_start": 13,
+      "candidate_id": "query_terminal_attention_output__L13_L18",
+      "component": "query_terminal_attention_output",
+      "patch_layers": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "band_end": 24,
+      "band_start": 19,
+      "candidate_id": "query_terminal_attention_output__L19_L24",
+      "component": "query_terminal_attention_output",
+      "patch_layers": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    }
+  ],
+  "causal_behavior": {
+    "all_axis_worlds_selected_each_split": 128,
+    "batch_size": 8,
+    "candidate_worlds_each_split": 1024,
+    "control_screen_cap_each_split": 384,
+    "noop_repeats": 2,
+    "relation_minimum_each_split": 192,
+    "selection_uses_internal_state": false
+  },
+  "causal_confirmation_evaluates_selected_candidate_only": true,
+  "causal_discovery_evaluates_all_candidates": true,
+  "causal_splits": [
+    "causal_discovery",
+    "causal_confirmation"
+  ],
+  "causal_world_batch_size": 4,
+  "conditions": [
+    "natural_baseline",
+    "recipient_remove",
+    "recipient_remove_restore",
+    "relation_donor_replace",
+    "object_donor_replace",
+    "order_donor_replace",
+    "wrong_depth_relation_replace",
+    "wrong_position_relation_replace",
+    "channel_roll_relation_replace"
+  ],
+  "created_at": "2026-07-20T07:05:06.931003+00:00",
+  "delete_then_restore_uses_two_separate_ordered_hooks": true,
+  "donor_variant_by_condition": {
+    "channel_roll_relation_replace": "relation_swap",
+    "object_donor_replace": "object_swap",
+    "order_donor_replace": "order_swap",
+    "relation_donor_replace": "relation_swap",
+    "wrong_depth_relation_replace": "relation_swap",
+    "wrong_position_relation_replace": "relation_swap"
+  },
+  "downstream_layer": 24,
+  "explicit_position_ids_for_right_padded_runs": true,
+  "full_generation_gate": {
+    "conditions": [
+      "natural_baseline",
+      "recipient_remove",
+      "recipient_remove_restore",
+      "relation_donor_replace",
+      "object_donor_replace",
+      "order_donor_replace"
+    ],
+    "relation_donor_target_win_rate_gain_minimum": 0.1,
+    "restore_exact_semantic_mismatch_maximum": 0,
+    "wrong_object_and_order_must_not_match_relation_gain": true
+  },
+  "generation_max_new_tokens": 4,
+  "generation_world_batch_size": 4,
+  "head_channel_parameter_neuron_scan_allowed": false,
+  "left_padded_full_generation": true,
+  "model": "qwen3",
+  "normal_receiver": "query_terminal",
+  "open_cases_sha256": "19c7b6e941790c307d21cced9f0e420ae339393bd01ce81920316ab52aa3a7d5",
+  "output_embedding_direction_used": false,
+  "phase_id": "Phase574",
+  "recipient_variant": "base",
+  "right_padded_causal_logits_and_routing": true,
+  "schema_version": "phase574_query_source_causal_protocol.v1",
+  "sealed_split_read": false,
+  "selection_rule": {
+    "confirmation_reuses_exact_selected_candidate": true,
+    "discovery_evaluates_all_eight_candidates": true,
+    "eligible_candidate_requires_relation_effect_mean_minimum": 0.01,
+    "eligible_candidate_requires_relation_effect_positive_rate": 0.6,
+    "eligible_candidate_requires_relation_vs_each_control_gap_minimum": 0.01,
+    "eligible_candidate_requires_remove_recipient_margin_damage_mean": 0.01,
+    "eligible_candidate_requires_restore_max_candidate_logit_delta": 0.0001,
+    "heldout_reuses_exact_selected_candidate": true,
+    "maximum_smoothed_tail_fraction": 0.01,
+    "pipeline_permutation_count": 1024,
+    "pipeline_permutation_maximum_over_all_candidates": true,
+    "primary_score": "relation_donor_route_switch_effect",
+    "tie_break": "lexicographic_candidate_id"
+  },
+  "strict_object_control": {
+    "recipient_and_object_donor_have_different_object": true,
+    "recipient_and_object_donor_have_same_relation": true,
+    "recipient_only_base_variant": true
+  },
+  "trace_decision_sha256": "b834e55bd4c7619126e51890e5303fe8b51849ff2e2388f67fe01107763fb9a9",
+  "trace_protocol_sha256": "7afb5123e262527ff151dfed345acd4b5fce8c28fc29ee8bb971755718151b19",
+  "trace_rows_sha256": "dfaaad65da2d07e749da83aff56322e1ea069b3d3a1d255ebe3ef7d4c45e50cb",
+  "wrong_depth_layer_mapping": {
+    "10": 20,
+    "11": 21,
+    "12": 22,
+    "13": 23,
+    "14": 24,
+    "15": 5,
+    "16": 6,
+    "17": 7,
+    "18": 8,
+    "19": 9,
+    "20": 10,
+    "21": 11,
+    "22": 12,
+    "23": 13,
+    "24": 14,
+    "5": 15,
+    "6": 16,
+    "7": 17,
+    "8": 18,
+    "9": 19
+  },
+  "wrong_position_receiver": "answer_boundary"
+}

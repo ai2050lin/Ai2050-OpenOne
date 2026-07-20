@@ -69,7 +69,9 @@ def role_positions(
         ),
         "target_fact_value": token_indices_for_span(
             offsets,
-            *span_in_parent(prompt, target_fact, fragments["target_fact_value"]),
+            *span_in_parent(
+                prompt, target_fact, fragments["target_fact_value"], last_child=True
+            ),
         ),
         "other_fact_object": token_indices_for_span(
             offsets,
@@ -81,7 +83,9 @@ def role_positions(
         ),
         "other_fact_value": token_indices_for_span(
             offsets,
-            *span_in_parent(prompt, other_fact, fragments["other_fact_value"]),
+            *span_in_parent(
+                prompt, other_fact, fragments["other_fact_value"], last_child=True
+            ),
         ),
         "query_relation": token_indices_for_span(
             offsets,
