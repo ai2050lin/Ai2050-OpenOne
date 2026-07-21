@@ -1,0 +1,72 @@
+{
+  "behavior_gate": {
+    "all_three_open_splits_must_pass_per_relation": true,
+    "minimum_qualified_objects_by_relation_category_each_split": {
+      "culinary_produce_group": {
+        "fruit": 10,
+        "vegetable": 5
+      },
+      "functional_artifact_group": {
+        "tool": 5,
+        "vehicle": 5
+      }
+    },
+    "minimum_repeat_exact_rate_each_split_relation": 0.99,
+    "minimum_semantic_accuracy_each_split_relation": 0.9,
+    "minimum_stable_case_rate_each_split_relation": 0.9,
+    "minimum_stable_surfaces_per_object": 6,
+    "model_relation_specific_qualification": true
+  },
+  "created_at": "2026-07-20T14:37:32.667761+00:00",
+  "evidence_policy": {
+    "behavior_before_internal_state": true,
+    "behavior_does_not_localize_parametric_storage": true,
+    "parent_domain_supplied_but_answer_candidates_absent": true,
+    "phase580_results_not_relabelled": true,
+    "sealed_split_read": false,
+    "strict_mechanism_closure_claimed": false
+  },
+  "fixed_batch_size": 32,
+  "max_new_tokens": 24,
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "noop_repeats": [
+    "noop1",
+    "noop2"
+  ],
+  "open_case_count": 720,
+  "open_cases_path": "tests/gpt5/result/phase581_typed_category/phase581_open_cases.jsonl.gz",
+  "open_cases_sha256": "5625a374902df6645c990a058f7b8928f2900ba11161e6c37bd16119ff7a1b14",
+  "open_splits": [
+    "behavior_discovery",
+    "behavior_confirmation",
+    "heldout_objects"
+  ],
+  "phase_id": "Phase581",
+  "relation_categories": {
+    "culinary_produce_group": [
+      "fruit",
+      "vegetable"
+    ],
+    "functional_artifact_group": [
+      "tool",
+      "vehicle"
+    ]
+  },
+  "relations": [
+    "culinary_produce_group",
+    "functional_artifact_group"
+  ],
+  "schema_version": "phase581_typed_category_protocol.v1",
+  "sealed_case_count": 240,
+  "sealed_commitment_path": "tests/gpt5/result/phase581_typed_category/phase581_sealed_commitment.json",
+  "sealed_commitment_sha256": "796dc62f346577ca57b7f1d4f0de5b633d9cf79f2b83a5764d7678c8cddb9c9a",
+  "sealed_split": "sealed",
+  "static_audit_path": "tests/gpt5/result/phase581_typed_category/phase581_static_audit.json",
+  "static_audit_sha256": "287ed22945c9d0c7751b3c09d742ce1f9c11624fe5e49c3e5741ad8d2b2d64cc",
+  "surfaces_per_split": 8,
+  "title": "Typed-parent-domain category behavior without answer candidates"
+}

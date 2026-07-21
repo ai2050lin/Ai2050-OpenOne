@@ -1,0 +1,88 @@
+{
+  "causal_intervention_authorized": false,
+  "common_interface_passed_all_three_judges": false,
+  "created_at": "2026-07-21T01:55:54.100970+00:00",
+  "evidence_classification": {
+    "internal_structure_result": false,
+    "judge_interface_calibration": true,
+    "mechanism_result": false,
+    "natural_behavior_result": false
+  },
+  "internal_trace_authorized_model_relations": {},
+  "phase_id": "Phase586",
+  "protocol_v1_results": {
+    "deepseek7b": {
+      "judge_model": "deepseek7b",
+      "judge_quality_gate_passes": false,
+      "judgment_counts": {
+        "NO": 2,
+        "UNPARSEABLE": 5754,
+        "YES": 4
+      },
+      "parse_rate": 0.0010416666666666667,
+      "repeat_exact_rate": 0.0010416666666666667,
+      "rows_sha256": "f43f04c02f283646b48437ad550708b721319d80c132cdfeac693a7323139de1",
+      "sealed_split_read": false
+    },
+    "glm4": {
+      "judge_model": "glm4",
+      "judge_quality_gate_passes": true,
+      "judgment_counts": {
+        "NO": 1602,
+        "YES": 4158
+      },
+      "parse_rate": 1.0,
+      "repeat_exact_rate": 1.0,
+      "rows_sha256": "634dbbb4937a8eee91b8fef6d39feef69ee7db5ede0039018f95bd996897b539",
+      "sealed_split_read": false
+    },
+    "qwen3": {
+      "judge_model": "qwen3",
+      "judge_quality_gate_passes": true,
+      "judgment_counts": {
+        "NO": 1902,
+        "YES": 3858
+      },
+      "parse_rate": 1.0,
+      "repeat_exact_rate": 1.0,
+      "rows_sha256": "80173db4215b5f1c21377812253dcbbf434732a9f09fb1d703d06f3fa0fc109f",
+      "sealed_split_read": false
+    }
+  },
+  "protocol_v2_deepseek7b_status": "not_run_after_glm4_failed_the_common_interface_quality_gate",
+  "protocol_v2_partial_results": {
+    "glm4": {
+      "judge_model": "glm4",
+      "judge_quality_gate_passes": false,
+      "judgment_counts": {
+        "NO": 472,
+        "UNPARSEABLE": 5052,
+        "YES": 236
+      },
+      "parse_rate": 0.12291666666666666,
+      "repeat_exact_rate": 0.12291666666666666,
+      "rows_sha256": "4e1a70f38515851ea52afe9a576074e1be717e8e5613275bdf4a6c5f26dcafe0",
+      "sealed_split_read": false
+    },
+    "qwen3": {
+      "judge_model": "qwen3",
+      "judge_quality_gate_passes": true,
+      "judgment_counts": {
+        "AMBIGUOUS": 28,
+        "NO": 1804,
+        "YES": 3928
+      },
+      "parse_rate": 1.0,
+      "repeat_exact_rate": 1.0,
+      "rows_sha256": "c8be06b794c5649d462ebc9f34ef80f778ef48753775c0c2cd216f4b77e959a2",
+      "sealed_split_read": false
+    }
+  },
+  "schema_version": "phase586_cross_semantic_interface_decision.v1",
+  "sealed_behavior_authorized_model_relations": {},
+  "sealed_split_read": false,
+  "sealed_validation_authorized": false,
+  "semantic_consensus_formed": false,
+  "status": "stopped_common_judge_interface_not_portable",
+  "stop_reason": "No single frozen label-generation interface met the parse and repeat gate for all three judge models; model-specific prompt patching was prohibited."
+}

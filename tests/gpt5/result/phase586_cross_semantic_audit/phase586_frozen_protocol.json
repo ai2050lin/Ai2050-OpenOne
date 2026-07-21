@@ -1,0 +1,79 @@
+{
+  "consensus_gate": {
+    "all_judges_must_be_parseable_and_repeat_stable": true,
+    "maximum_no_votes": 0,
+    "minimum_judge_parse_rate": 0.99,
+    "minimum_judge_repeat_exact_rate": 0.99,
+    "minimum_yes_votes": 2,
+    "source_behavior_gate_reused_without_threshold_change": true
+  },
+  "created_at": "2026-07-21T01:47:52.966220+00:00",
+  "evidence_policy": {
+    "cannot_directly_authorize_internal_trace": true,
+    "may_authorize_precommitted_sealed_behavior_confirmation": true,
+    "not_causal_evidence": true,
+    "not_independent_behavior_confirmation": true,
+    "not_internal_structure_evidence": true,
+    "retrospective_open_output_observer_calibration": true,
+    "sealed_split_read": false,
+    "strict_mechanism_closure_claimed": false
+  },
+  "fixed_batch_size": 32,
+  "interface_calibration_history": {
+    "scientific_cases_thresholds_and_consensus_rule_changed": false,
+    "v1_artifact_directory": "tests/gpt5/result/phase586_cross_semantic_audit/v1_interface_calibration",
+    "v1_deepseek7b_parse_rate": 0.0010416666666666667,
+    "v1_failure": "deepseek7b emitted reasoning prefixes before the four-token limit",
+    "v1_status": "superseded_before_consensus_decision",
+    "v2_change": "all three judges rerun with an identical label-first instruction and eight-token limit"
+  },
+  "judge_input_blinding": {
+    "candidate_response_visible": true,
+    "internal_state_hidden": true,
+    "previous_alias_score_hidden": true,
+    "raw_question_visible": true,
+    "reference_fact_visible": true,
+    "source_model_hidden": true,
+    "split_hidden": true
+  },
+  "judge_labels": [
+    "YES",
+    "NO",
+    "AMBIGUOUS"
+  ],
+  "judge_models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "judge_repeats": [
+    "judge1",
+    "judge2"
+  ],
+  "max_new_tokens": 8,
+  "phase_id": "Phase586",
+  "schema_version": "phase586_cross_semantic_audit_protocol.v2",
+  "source_artifacts": {
+    "deepseek7b": {
+      "rows_path": "tests/gpt5/result/phase585_object_swap/phase585_deepseek7b_object_swap_behavior_rows.jsonl.gz",
+      "rows_sha256": "92552f95387ffef26baa4d6dadbae707869952c6c84096338067d47b78c6d536",
+      "summary_path": "tests/gpt5/result/phase585_object_swap/phase585_deepseek7b_object_swap_behavior_summary.json",
+      "summary_sha256": "2f5a14dcc56a269b11e61bdacf20c74efeb4e6180eb472534de6d397dfe0ba96"
+    },
+    "glm4": {
+      "rows_path": "tests/gpt5/result/phase585_object_swap/phase585_glm4_object_swap_behavior_rows.jsonl.gz",
+      "rows_sha256": "db9f1f98d861a5c7b14e82331d75b7686920f13087eccf61a2c77b47c88323eb",
+      "summary_path": "tests/gpt5/result/phase585_object_swap/phase585_glm4_object_swap_behavior_summary.json",
+      "summary_sha256": "5498eb11ac4ef8668de8651f92d24f8365d8de846992d1c1bea2250c871a192e"
+    },
+    "qwen3": {
+      "rows_path": "tests/gpt5/result/phase585_object_swap/phase585_qwen3_object_swap_behavior_rows.jsonl.gz",
+      "rows_sha256": "2f7b7df51f516a60b49ff7cd87c2253cc27cc54650d4cad279dcf9a975c14f01",
+      "summary_path": "tests/gpt5/result/phase585_object_swap/phase585_qwen3_object_swap_behavior_summary.json",
+      "summary_sha256": "0827c62553ac4fa8063243ecaa410e13a2fd301568340bb3011da46fbf2764f7"
+    }
+  },
+  "source_phase": "Phase585",
+  "source_protocol_sha256": "e6ae7a7593cfa2f50166796ad9f712847c4236a9c6d329b55c53b5df105872c2",
+  "title": "Blinded cross-model audit of label-free natural responses"
+}

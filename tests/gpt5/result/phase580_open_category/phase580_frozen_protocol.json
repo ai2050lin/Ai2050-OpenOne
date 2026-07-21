@@ -1,0 +1,54 @@
+{
+  "behavior_gate": {
+    "all_three_open_splits_must_pass": true,
+    "minimum_qualified_objects_by_category_each_split": {
+      "fruit": 10,
+      "tool": 5,
+      "vegetable": 5,
+      "vehicle": 5
+    },
+    "minimum_repeat_exact_rate_each_split": 0.99,
+    "minimum_semantic_accuracy_each_split": 0.9,
+    "minimum_stable_case_rate_each_split": 0.9,
+    "minimum_stable_surfaces_per_object": 6,
+    "model_specific_qualification": true
+  },
+  "created_at": "2026-07-20T14:28:24.241645+00:00",
+  "evidence_policy": {
+    "answer_candidates_supplied": false,
+    "behavior_before_internal_state": true,
+    "behavior_does_not_localize_parametric_storage": true,
+    "context_fact_supplied": false,
+    "sealed_split_read": false,
+    "strict_mechanism_closure_claimed": false
+  },
+  "fixed_batch_size": 32,
+  "max_new_tokens": 8,
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "noop_repeats": [
+    "noop1",
+    "noop2"
+  ],
+  "open_case_count": 720,
+  "open_cases_path": "tests/gpt5/result/phase580_open_category/phase580_open_cases.jsonl.gz",
+  "open_cases_sha256": "e3590f4440e23f53c9a2ff28adcef1e69ecf2efacdab59325adb433a880ce46f",
+  "open_splits": [
+    "behavior_discovery",
+    "behavior_confirmation",
+    "heldout_objects"
+  ],
+  "phase_id": "Phase580",
+  "schema_version": "phase580_open_category_protocol.v1",
+  "sealed_case_count": 240,
+  "sealed_commitment_path": "tests/gpt5/result/phase580_open_category/phase580_sealed_commitment.json",
+  "sealed_commitment_sha256": "33b9a43a4d8a0a532fc30b63aecb264c0b90388edd87961d709d836ef0bd974e",
+  "sealed_split": "sealed",
+  "static_audit_path": "tests/gpt5/result/phase580_open_category/phase580_static_audit.json",
+  "static_audit_sha256": "45870925d05f249dc3bea5fc104e8c333ee55eca84252385700cfe2d78ad353d",
+  "surfaces_per_split": 8,
+  "title": "No-candidate immediate-category behavior denominator"
+}

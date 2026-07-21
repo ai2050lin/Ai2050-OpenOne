@@ -1,0 +1,76 @@
+{
+  "behavior_gate": {
+    "all_three_open_splits_must_pass": true,
+    "maximum_repeat_score_delta": 1e-06,
+    "minimum_qualified_objects_by_split_group": {
+      "behavior_confirmation": {
+        "fruit": 8,
+        "near_food_plant": 4,
+        "tool": 4,
+        "vehicle": 4
+      },
+      "behavior_discovery": {
+        "fruit": 8,
+        "near_food_plant": 4,
+        "tool": 4,
+        "vehicle": 4
+      },
+      "heldout_objects": {
+        "fruit": 3,
+        "near_food_plant": 1,
+        "tool": 1,
+        "vehicle": 1
+      }
+    },
+    "minimum_stable_surfaces_per_object": 6,
+    "minimum_target_win_rate_each_semantic_group": 0.8,
+    "minimum_target_win_rate_each_split_relation": 0.85
+  },
+  "created_at": "2026-07-21T02:03:10.120856+00:00",
+  "evidence_policy": {
+    "external_observer_not_causal_evidence": true,
+    "external_observer_not_internal_structure": true,
+    "external_observer_not_natural_generation": true,
+    "may_authorize_open_full_hidden_response_capture": true,
+    "sealed_split_read": false,
+    "strict_mechanism_closure_claimed": false
+  },
+  "fixed_batch_size": 16,
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "noop_repeats": [
+    "score1",
+    "score2"
+  ],
+  "open_case_count": 960,
+  "open_cases_path": "tests/gpt5/result/phase587_counterbalanced_continuation/phase587_open_cases.jsonl.gz",
+  "open_cases_sha256": "61aca44c156acc34818bd8f28bf74e06d20a375caa13e2299e0df250ca54bf19",
+  "open_splits": [
+    "behavior_discovery",
+    "behavior_confirmation",
+    "heldout_objects"
+  ],
+  "phase_id": "Phase587",
+  "relations": [
+    "ordinary_origin",
+    "primary_function"
+  ],
+  "schema_version": "phase587_counterbalanced_protocol.v1",
+  "score_definition": {
+    "candidate_continuations_inserted_into_model_input": false,
+    "continuations_serve_as_targets_and_foils_in_different_object_groups": true,
+    "margin": "target continuation score minus maximum foil continuation score",
+    "same_continuation_bank_reused_across_all_objects_in_a_relation": true,
+    "score": "mean conditional token log-probability of each external full continuation"
+  },
+  "sealed_case_count": 160,
+  "sealed_commitment_path": "tests/gpt5/result/phase587_counterbalanced_continuation/phase587_sealed_commitment.json",
+  "sealed_commitment_sha256": "53d677202178bf6abbf5f136194eb59550adf5e2fe0f8955319bb67fee070292",
+  "sealed_split": "sealed",
+  "static_audit_path": "tests/gpt5/result/phase587_counterbalanced_continuation/phase587_static_audit.json",
+  "static_audit_sha256": "411fc64a9c22d5067d9f8db96ee77be1e6a3959eb72299c1ee7f185a962c2bb0",
+  "title": "Counterbalanced natural continuation behavior observer"
+}

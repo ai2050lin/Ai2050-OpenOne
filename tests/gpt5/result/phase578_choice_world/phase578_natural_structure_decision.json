@@ -1,0 +1,70 @@
+{
+  "analysis_sha256": "44a3eb8055350edd30e70cb86369e004c66b147cd490483acb187d73e3472c61",
+  "causal_holdout_internal_state_read": false,
+  "causal_protocol_authorized": true,
+  "causal_protocol_authorized_models": [
+    "qwen3",
+    "glm4"
+  ],
+  "created_at": "2026-07-20T12:41:16.208620+00:00",
+  "model_decisions": {
+    "glm4": {
+      "candidate_not_yet_a_mechanism": true,
+      "causal_candidate_coordinates": [
+        {
+          "joint_gate_score": 0.875,
+          "joint_margin_floor": 0.02652858876778434,
+          "layer": 32,
+          "model": "glm4",
+          "normalized_depth": 0.8205128205128205,
+          "relation": "category"
+        },
+        {
+          "joint_gate_score": 0.8958333333333334,
+          "joint_margin_floor": 0.02897853501296292,
+          "layer": 33,
+          "model": "glm4",
+          "normalized_depth": 0.8461538461538461,
+          "relation": "outer_color"
+        }
+      ],
+      "causal_protocol_authorized": true,
+      "model": "glm4",
+      "natural_physical_structure_found": true,
+      "observer_event_is_not_causal_evidence": true,
+      "score_weight_joint_structure_found": true
+    },
+    "qwen3": {
+      "candidate_not_yet_a_mechanism": true,
+      "causal_candidate_coordinates": [
+        {
+          "joint_gate_score": 0.9615384615384616,
+          "joint_margin_floor": 0.05415709344491076,
+          "layer": 29,
+          "model": "qwen3",
+          "normalized_depth": 0.8285714285714286,
+          "relation": "category"
+        },
+        {
+          "joint_gate_score": 0.8043478260869565,
+          "joint_margin_floor": 0.07431432367909861,
+          "layer": 24,
+          "model": "qwen3",
+          "normalized_depth": 0.6857142857142857,
+          "relation": "outer_color"
+        }
+      ],
+      "causal_protocol_authorized": true,
+      "model": "qwen3",
+      "natural_physical_structure_found": true,
+      "observer_event_is_not_causal_evidence": true,
+      "score_weight_joint_structure_found": true
+    }
+  },
+  "phase_id": "Phase578",
+  "schema_version": "phase578_natural_structure_decision.v1",
+  "sealed_split_read": false,
+  "selection_rule": "for each model and relation, freeze the strongest layer where raw attention score and normalized attention weight both favor the behaviorally correct option across both option orders and both open splits",
+  "status": "complete",
+  "theory_formula_frozen_before_discovery": false
+}

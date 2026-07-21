@@ -1,0 +1,75 @@
+{
+  "behavior_gate": {
+    "all_three_open_splits_must_pass": true,
+    "minimum_qualified_objects_by_split_group": {
+      "behavior_confirmation": {
+        "fruit": 8,
+        "near_food_plant": 4,
+        "tool": 4,
+        "vehicle": 4
+      },
+      "behavior_discovery": {
+        "fruit": 8,
+        "near_food_plant": 4,
+        "tool": 4,
+        "vehicle": 4
+      },
+      "heldout_objects": {
+        "fruit": 3,
+        "near_food_plant": 1,
+        "tool": 1,
+        "vehicle": 1
+      }
+    },
+    "minimum_repeat_exact_rate_each_split_relation": 0.99,
+    "minimum_semantic_accuracy_each_split_relation": 0.85,
+    "minimum_stable_case_rate_each_split_relation": 0.8,
+    "minimum_stable_surfaces_per_object": 6,
+    "relation_specific_qualification": true
+  },
+  "created_at": "2026-07-21T01:27:50.188417+00:00",
+  "evidence_policy": {
+    "answer_candidates_supplied": false,
+    "automatic_alias_gate_only": true,
+    "behavior_before_internal_state": true,
+    "behavior_does_not_localize_parametric_storage": true,
+    "category_label_used_as_internal_coordinate": false,
+    "context_fact_supplied": false,
+    "sealed_split_read": false,
+    "strict_mechanism_closure_claimed": false,
+    "unrecoverable_outputs_are_not_posthoc_relabelled": true
+  },
+  "fixed_batch_size": 32,
+  "max_new_tokens": 14,
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "noop_repeats": [
+    "noop1",
+    "noop2"
+  ],
+  "open_case_count": 960,
+  "open_cases_path": "tests/gpt5/result/phase585_object_swap/phase585_open_cases.jsonl.gz",
+  "open_cases_sha256": "b8fa9379ab381b2df2cf847b1e7a926a033aabefc96bdab88cec03bdb709b011",
+  "open_splits": [
+    "behavior_discovery",
+    "behavior_confirmation",
+    "heldout_objects"
+  ],
+  "phase_id": "Phase585",
+  "relations": [
+    "ordinary_origin",
+    "primary_function"
+  ],
+  "schema_version": "phase585_object_swap_protocol.v1",
+  "sealed_case_count": 160,
+  "sealed_commitment_path": "tests/gpt5/result/phase585_object_swap/phase585_sealed_commitment.json",
+  "sealed_commitment_sha256": "3760f1a062d69189ade1e27efa8d4f8c7341a24d2e6522dff2304d5ecb3343fb",
+  "sealed_split": "sealed",
+  "static_audit_path": "tests/gpt5/result/phase585_object_swap/phase585_static_audit.json",
+  "static_audit_sha256": "c78c37e3231def978b3cfee53f4e9c681cb14662f9c4e15bac3bede40f8d8cba",
+  "surfaces_per_split": 8,
+  "title": "Label-free natural object response denominator"
+}

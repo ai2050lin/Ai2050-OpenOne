@@ -1,0 +1,96 @@
+{
+  "calibration_rule": {
+    "axis": "first category boundary logit minus second category boundary logit",
+    "fitted_parameters_per_model_relation": [
+      "orientation",
+      "threshold"
+    ],
+    "orientation": "larger discovery class mean is assigned to its observed class",
+    "prediction": "class selected by oriented side of the frozen threshold",
+    "threshold": "midpoint of the two discovery class means"
+  },
+  "calibration_split": "behavior_discovery",
+  "created_at": "2026-07-20T15:07:59.598870+00:00",
+  "diagnostic_gate": {
+    "both_evaluation_splits_must_pass": true,
+    "maximum_repeat_logit_delta": 1e-06,
+    "minimum_accuracy_each_category_each_evaluation_split": 0.9,
+    "minimum_overall_accuracy_each_evaluation_split": 0.9,
+    "minimum_qualified_objects_by_relation_category_each_split": {
+      "culinary_produce_group": {
+        "fruit": 10,
+        "vegetable": 5
+      },
+      "functional_artifact_group": {
+        "tool": 5,
+        "vehicle": 5
+      }
+    },
+    "minimum_stable_surfaces_per_object": 6
+  },
+  "evaluation_splits": [
+    "behavior_confirmation",
+    "heldout_objects"
+  ],
+  "evidence_policy": {
+    "causal_intervention_authorized": false,
+    "not_causal_evidence": true,
+    "not_independent_confirmatory_evidence": true,
+    "not_internal_localization": true,
+    "not_natural_generation": true,
+    "prompt_trace_authorized": false,
+    "registered_after_open_data_exploration": true,
+    "retrospective_open_data_diagnostic": true,
+    "sealed_split_read": false,
+    "strict_mechanism_closure_claimed": false
+  },
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase_id": "Phase584",
+  "relation_categories_in_fixed_axis_order": {
+    "culinary_produce_group": [
+      "fruit",
+      "vegetable"
+    ],
+    "functional_artifact_group": [
+      "tool",
+      "vehicle"
+    ]
+  },
+  "relations": [
+    "culinary_produce_group",
+    "functional_artifact_group"
+  ],
+  "repeats": [
+    "forward1",
+    "forward2"
+  ],
+  "schema_version": "phase584_boundary_calibration_contract.v1",
+  "source_artifacts": {
+    "deepseek7b": {
+      "rows_path": "tests/gpt5/result/phase583_prompt_boundary/phase583_deepseek7b_prompt_boundary_rows.jsonl.gz",
+      "rows_sha256": "5443797ff7854973231d3c38c4201827a88ceed4927b135fecca1f2c2dddbed3",
+      "summary_path": "tests/gpt5/result/phase583_prompt_boundary/phase583_deepseek7b_prompt_boundary_summary.json",
+      "summary_sha256": "87e7158776cd9b21018487189f6e18b6a73c08e177e0442296ea9132fabf5c8f"
+    },
+    "glm4": {
+      "rows_path": "tests/gpt5/result/phase583_prompt_boundary/phase583_glm4_prompt_boundary_rows.jsonl.gz",
+      "rows_sha256": "7425d8d850330bf3410b6361a643887b835dc9886cb854d6e3ac7cbcedcbca65",
+      "summary_path": "tests/gpt5/result/phase583_prompt_boundary/phase583_glm4_prompt_boundary_summary.json",
+      "summary_sha256": "6ee230fd56db875c773d4b5f6b3fa9c81da9bc5e91696ce55d139af1183b1df0"
+    },
+    "qwen3": {
+      "rows_path": "tests/gpt5/result/phase583_prompt_boundary/phase583_qwen3_prompt_boundary_rows.jsonl.gz",
+      "rows_sha256": "863082c2f85af92677a9a043419db08f550b2b641a5d69cbff067357f69b7b3a",
+      "summary_path": "tests/gpt5/result/phase583_prompt_boundary/phase583_qwen3_prompt_boundary_summary.json",
+      "summary_sha256": "28ffe2325ae3b3de0cd473eaeebe04d39d141ae7b222db5980ca4730717bce9f"
+    }
+  },
+  "source_decision_sha256": "b3c2872ee630bc7fe3568231d336f7acfb0b05a4f0e4bed7040f3a0edeb69389",
+  "source_phase": "Phase583",
+  "source_protocol_sha256": "c8483b9b59422fe40f34ad60fb866c520c355735c2d258220089085ed2447636",
+  "title": "Retrospective binary boundary calibration of prompt-boundary category logits"
+}

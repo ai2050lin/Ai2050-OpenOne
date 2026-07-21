@@ -1,0 +1,92 @@
+{
+  "created_at": "2026-07-21T06:18:56.831317+00:00",
+  "diagnostic_continuations": {
+    "negative": " No. People do not commonly eat it as food.",
+    "positive": " Yes. People commonly eat it as food."
+  },
+  "evidence_policy": {
+    "automatic_parser_is_not_human_gold": true,
+    "independent_human_gold_standard_available": false,
+    "may_authorize_exploratory_open_hidden_capture": true,
+    "may_not_authorize_mechanism_or_causal_claim": true,
+    "natural_generation_observer_only": true,
+    "observer_frozen_before_model_execution": true,
+    "sealed_split_read": false,
+    "teacher_forced_token_ledger_is_auxiliary_only": true
+  },
+  "fixed_batch_size": 16,
+  "frozen_semantic_parser": {
+    "conditional_patterns": [
+      "\\bonly (?:after|if|when)\\b",
+      "\\b(?:some|certain) (?:parts|varieties)\\b",
+      "\\brequires? (?:cooking|processing|preparation)\\b",
+      "\\bin small (?:amounts|quantities)\\b",
+      "\\bdepending on\\b"
+    ],
+    "negative_patterns": [
+      "\\bnot (?:commonly|normally|typically|generally|usually|ordinarily) (?:eaten|consumed)\\b",
+      "\\b(?:is|are) not (?:edible|food)\\b",
+      "\\bnot edible\\b",
+      "\\binedible\\b",
+      "\\b(?:cannot|can't|can not) be eaten\\b",
+      "\\bshould not be (?:eaten|consumed)\\b",
+      "\\bunsafe to (?:eat|consume)\\b",
+      "\\b(?:toxic|poisonous)\\b",
+      "\\bnot (?:used|consumed|prepared|regarded|considered) as (?:a )?food\\b",
+      "\\bpeople (?:do not|don't) (?:commonly |normally |typically |generally |usually |ordinarily )?(?:eat|consume)\\b",
+      "\\bnot (?:intended|meant|suitable|fit) for (?:human )?consumption\\b",
+      "\\bnot something (?:people|humans) (?:eat|consume)\\b",
+      "\\bnever (?:eaten|consumed)\\b",
+      "\\bnon[- ]food\\b"
+    ],
+    "positive_patterns": [
+      "\\b(?:commonly|normally|typically|generally|usually|often|widely|ordinarily) (?:eaten|consumed)\\b",
+      "\\b(?:is|are) edible\\b",
+      "\\bsafe to eat\\b",
+      "\\bcan be eaten\\b",
+      "\\bpeople (?:commonly |normally |typically |generally |usually |often |ordinarily )?(?:eat|consume)\\b",
+      "\\b(?:used|prepared|consumed|regarded|considered) as (?:a )?food\\b",
+      "\\b(?<!not )(?<!not generally )(?<!not normally )(?:fit|suitable) for human consumption\\b",
+      "\\bpart of (?:a|the) (?:human )?diet\\b",
+      "\\bfood (?:item|source|product)\\b",
+      "\\bhuman food\\b"
+    ]
+  },
+  "gate": {
+    "all_three_open_splits_must_pass": true,
+    "minimum_coverage": 0.9,
+    "minimum_each_group_accuracy": 0.85,
+    "minimum_qualified_objects_each_group_by_split": {
+      "observer_confirmation": 5,
+      "observer_discovery": 10,
+      "observer_heldout": 2
+    },
+    "minimum_repeat_polarity_rate": 0.99,
+    "minimum_semantic_accuracy": 0.9,
+    "minimum_stable_surfaces_per_object": 10
+  },
+  "max_new_tokens": 24,
+  "models_in_required_execution_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "narrow_proposition": "whether people ordinarily eat the object as food",
+  "noop_repeats": [
+    "natural1",
+    "natural2"
+  ],
+  "open_cases_path": "tests/gpt5/result/phase590_natural_semantic_event/phase590_open_cases.jsonl.gz",
+  "open_cases_sha256": "1849c7980aab83311d7e58bafb89b1922244852ea5d1e9e80b28a26acced747a",
+  "open_splits": [
+    "observer_discovery",
+    "observer_confirmation",
+    "observer_heldout"
+  ],
+  "phase_id": "Phase590",
+  "schema_version": "phase590_natural_semantic_event_protocol.v1",
+  "sealed_commitment_sha256": "2631f00a61a3e2b7f804d3837438a86cb902a441d083659bdf4dae5ff6f997e4",
+  "sealed_split": "sealed",
+  "static_audit_sha256": "733ffb885ba570217fe6e28746f9703f64a9915a7c4d086575c27ee735d61c8f",
+  "title": "Prospective natural food-status semantic-event observer"
+}
