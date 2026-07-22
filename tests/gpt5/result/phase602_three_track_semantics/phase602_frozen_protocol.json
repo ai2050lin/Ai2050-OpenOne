@@ -1,0 +1,107 @@
+{
+  "answer_token_ledger_by_model": {
+    "deepseek7b": {
+      "A": [
+        32
+      ],
+      "B": [
+        33
+      ]
+    },
+    "glm4": {
+      "A": [
+        32
+      ],
+      "B": [
+        33
+      ]
+    },
+    "qwen3": {
+      "A": [
+        32
+      ],
+      "B": [
+        33
+      ]
+    }
+  },
+  "cases_sha256": "b4ec0d9437b5685b473e20de6615630932e1e2312d0785d6cb5c3d590132e8e7",
+  "constraints": {
+    "behavior_unread_before_freeze": true,
+    "candidate_order_counterbalanced": true,
+    "causal_intervention_authorized": false,
+    "concept_split_isolation": true,
+    "exact_lexical_match_only": true,
+    "full_five_family_completion_claim_authorized": false,
+    "internal_observation_authorized_only_per_qualified_track": true,
+    "phase601_cluster_reuse_forbidden": true,
+    "same_concepts_across_tracks": true,
+    "technical_daily_truth_agreement_required": true
+  },
+  "created_at": "2026-07-22T13:00:00+00:00",
+  "entity_roles": [
+    "raw_fruit",
+    "seed_vegetable",
+    "meat",
+    "dairy",
+    "seafood"
+  ],
+  "fixed_batch_size": 32,
+  "foodon_sha256": "1e11fc50283c6498697a7aca9606c9d914f1cda71cc5510e006d949c32df7db0",
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "phase_id": "Phase602",
+  "registered_case_count": 1440,
+  "registered_concept_count": 120,
+  "schema_version": "phase602_three_track_semantics.v1",
+  "source_manifest_sha256": "6cc658ad74647a97fb603f7104eb9c3fb0fbfad6fc2cbfb95fe39aea962fe53c",
+  "splits": [
+    "discovery",
+    "independent_confirmation",
+    "heldout"
+  ],
+  "static_audit_sha256": "fcd12c1baaf71e0b6118b669b47c43af090973e633a01fc9dd63e2a95a384c0d",
+  "surface_count_per_concept_track": 4,
+  "track_gates": {
+    "daily": {
+      "answer_order_gap_max": 0.08,
+      "concept_unanimous_rate_min": 0.6,
+      "direct_candidate_output_rate_min": 0.8,
+      "direct_exact_accuracy_min": 0.7,
+      "membership_accuracy_min": 0.8,
+      "overall_accuracy_min": 0.85,
+      "split_accuracy_min": 0.8,
+      "surface_accuracy_min": 0.8
+    },
+    "explicit_evidence": {
+      "answer_order_gap_max": 0.05,
+      "concept_unanimous_rate_min": 0.85,
+      "direct_candidate_output_rate_min": 0.9,
+      "direct_exact_accuracy_min": 0.85,
+      "membership_accuracy_min": 0.92,
+      "overall_accuracy_min": 0.95,
+      "split_accuracy_min": 0.92,
+      "surface_accuracy_min": 0.92
+    },
+    "technical": {
+      "answer_order_gap_max": 0.08,
+      "concept_unanimous_rate_min": 0.6,
+      "direct_candidate_output_rate_min": 0.8,
+      "direct_exact_accuracy_min": 0.7,
+      "membership_accuracy_min": 0.8,
+      "overall_accuracy_min": 0.85,
+      "split_accuracy_min": 0.8,
+      "surface_accuracy_min": 0.8
+    }
+  },
+  "tracks": [
+    "technical",
+    "daily",
+    "explicit_evidence"
+  ],
+  "wordnet_archive_sha256": "640db279c949a88f61f851dd54ebbb22d003f8b90b85267042ef85a3781d3a52",
+  "wordnet_archive_size": 11537239
+}

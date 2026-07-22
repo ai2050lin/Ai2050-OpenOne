@@ -1,0 +1,92 @@
+{
+  "adjudication_rule": {
+    "adjudicator_must_be_distinct": true,
+    "allowed_factuality_outputs": [
+      "supported",
+      "contradicted",
+      "conditional",
+      "uncertain"
+    ],
+    "allowed_semantic_outputs": [
+      "positive",
+      "negative",
+      "conditional",
+      "unresolved"
+    ],
+    "factuality_uncertain_is_a_resolved_workflow_label_not_a_fact_claim": true,
+    "generated_only_after_three_valid_locked_first_pass_submissions": true,
+    "prior_labels_and_repeat_outcomes_hidden": true,
+    "semantic_unresolved_is_a_resolved_workflow_label_but_not_an_anchor": true
+  },
+  "batch_count_per_reviewer": 6,
+  "condition_types": [
+    "none",
+    "part_specific",
+    "processing_required",
+    "dose_or_quantity_limited",
+    "variety_specific",
+    "culture_or_use_context",
+    "ripeness_or_life_stage",
+    "other_explicit_condition"
+  ],
+  "created_at": "2026-07-22T09:32:29.450871+00:00",
+  "event_anchor_rule": {
+    "adjudication_cannot_create_anchor": true,
+    "coverage_threshold": 2,
+    "name": "contiguous_majority_character_coverage",
+    "pair_selection_after_results_forbidden": true,
+    "requires_nonempty": true,
+    "requires_single_contiguous_interval": true
+  },
+  "evidence_policy": {
+    "model_or_agent_annotation_cannot_substitute": true,
+    "no_model_or_internal_execution_before_semantic_gold_complete": true,
+    "phase590_sealed_set_remains_unread": true,
+    "private_answer_key_remains_unread": true,
+    "private_submission_map_must_not_be_shared_with_reviewers": true,
+    "same_workspace_cannot_prove_human_independence": true
+  },
+  "factual_reference_policy": {
+    "fixed_object_level_authoritative_registry_present": false,
+    "impact": "semantic review may proceed, but factuality cannot be promoted to an authoritative fact registry without a separately audited source collection",
+    "per_item_evidence_required": true,
+    "source_tiers_frozen": [
+      "tier1_public_health_toxicology_food_safety_government",
+      "tier2_botany_agriculture_medicine_food_science",
+      "tier3_professional_academic_encyclopedia",
+      "tier4_stable_ordinary_knowledge",
+      "tier5_unconfirmed"
+    ]
+  },
+  "main_gold_item_count": 288,
+  "main_items_per_batch": 48,
+  "packet_digests": {
+    "reviewer_a": "2513d010e45bf1dbc5f3d739f588c344cb1b7cff6f36d704910c71155eed16a3",
+    "reviewer_b": "3e7a5afb69a95a2e70e898eb9a262ba3af5dbec5ebd351828f22dd216f55fbe6",
+    "reviewer_c": "65e1ecb4199a00663490f5dc3867e842aa7f602d5448e0c1487071de8002e3b8"
+  },
+  "packet_item_count_per_reviewer": 300,
+  "phase_id": "Phase593",
+  "private_submission_map_sha256": "e8a32f7a9bab40f8a0ee79404eb29798b9c9dfb264536e92d76a58463b9b6c4d",
+  "repeat_control_item_count_per_reviewer": 12,
+  "repeat_control_rule": {
+    "any_mismatching_main_item_requires_independent_adjudication": true,
+    "descriptive_count_per_reviewer": 12,
+    "mismatch_does_not_change_main_denominator": true,
+    "no_post_result_agreement_threshold": true
+  },
+  "repeat_controls_change_gold_denominator": false,
+  "repeat_items_per_batch": 2,
+  "schema_version": "phase593_human_semantic_review_integrity_protocol.v1",
+  "source_queue_path": "tests/gpt5/result/phase590_natural_semantic_event/phase590_blind_review_queue.jsonl.gz",
+  "source_queue_sha256": "bdddbac9f21e7e797b195cf8b9bf3af05c9417b0aafc272c34b0bc402766157f",
+  "static_audit_sha256": "6e25799382699aec11741647e008c33b4e00317209515fc3ab70db8efee6843b",
+  "submission_lock_rule": {
+    "aggregation_requires_all_three_valid_locks": true,
+    "first_structurally_valid_file_is_sha256_locked": true,
+    "later_digest_change_invalidates_submission": true,
+    "lock_is_never_overwritten": true
+  },
+  "supersedes_review_packets_from": "Phase592",
+  "title": "Pre-review submission locking, repeat controls, and majority-covered anchors"
+}

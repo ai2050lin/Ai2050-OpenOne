@@ -1,0 +1,62 @@
+{
+  "batch_count_per_reviewer": 6,
+  "completed_response_paths": {
+    "reviewer_a": "tests/gpt5/result/phase592_semantic_gold_revision/external_review/reviewer_a_completed_v2.jsonl",
+    "reviewer_b": "tests/gpt5/result/phase592_semantic_gold_revision/external_review/reviewer_b_completed_v2.jsonl",
+    "reviewer_c": "tests/gpt5/result/phase592_semantic_gold_revision/external_review/reviewer_c_completed_v2.jsonl"
+  },
+  "created_at": "2026-07-22T09:32:29.407525+00:00",
+  "event_anchor_gate": {
+    "failure_does_not_destroy_semantic_gold": true,
+    "minimum_balanced_anchor_subset_not_yet_frozen": true,
+    "requires_nonunresolved_direct_semantic_consensus": true,
+    "requires_overlap_of_two_supporting_half_open_unicode_spans": true,
+    "requires_two_complete_response_votes": true,
+    "requires_two_no_later_semantic_change_votes": true,
+    "separate_from_semantic_gold": true
+  },
+  "evidence_policy": {
+    "adjudicator_cannot_see_prior_labels_or_hidden_metadata": true,
+    "adjudicator_must_be_distinct_from_three_reviewers": true,
+    "model_or_agent_annotation_cannot_substitute": true,
+    "no_model_or_internal_execution_before_semantic_gold_complete": true,
+    "phase590_sealed_set_remains_unread": true,
+    "private_answer_key_must_remain_unread_until_semantic_gold_complete": true
+  },
+  "gold_gate": {
+    "directly_resolved_plus_independently_adjudicated_must_equal": 288,
+    "first_pass_zero_disagreement_not_required": true,
+    "three_distinct_reviewers_complete_all_items": true,
+    "workflow_unresolved_item_count_must_equal": 0
+  },
+  "items_per_batch": 48,
+  "items_per_reviewer": 288,
+  "packet_digests": {
+    "reviewer_a": "7d2f216510b55a7bba7a12ba0671de932e3992db11616dcdf6ea10df6252f9cf",
+    "reviewer_b": "1944b5905509c0dcee9baacd05ff11e2ce3a478e08caef0a5808250cc62841d0",
+    "reviewer_c": "8b245ce40ec79706a033fd92c31ce527801d09a4d3b5cb3f8cd60b6ee38d213f"
+  },
+  "phase_id": "Phase592",
+  "required_distinct_reviewer_count": 3,
+  "reviewer_slots": [
+    "reviewer_a",
+    "reviewer_b",
+    "reviewer_c"
+  ],
+  "revision_reason": "Separate semantic resolution from event-anchor qualification and allow preserved, independent adjudication after all first-pass reviews.",
+  "schema_version": "phase592_semantic_gold_revision_protocol.v1",
+  "semantic_consensus_rule": {
+    "conditional_positive_or_negative_conflict": "independent_adjudication",
+    "positive_negative_conflict": "independent_adjudication",
+    "raw_reviews_must_never_be_overwritten": true,
+    "two_same_nonunresolved_plus_unresolved": "directly_resolved",
+    "unanimous": "directly_resolved",
+    "unresolved_majority_with_decisive_minority": "independent_adjudication"
+  },
+  "source_item_count": 288,
+  "source_queue_path": "tests/gpt5/result/phase590_natural_semantic_event/phase590_blind_review_queue.jsonl.gz",
+  "source_queue_sha256": "bdddbac9f21e7e797b195cf8b9bf3af05c9417b0aafc272c34b0bc402766157f",
+  "static_audit_sha256": "955756f784d7085e50c38fc1743c3cb0391b2776298a49ae0d4123d1988806db",
+  "supersedes_review_packets_from": "Phase591",
+  "title": "Pre-review semantic-gold and event-anchor gate revision"
+}

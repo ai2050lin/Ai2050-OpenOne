@@ -1,0 +1,160 @@
+{
+  "case_count": 1440,
+  "causal_intervention_authorized": false,
+  "common_qualified_tracks": [],
+  "concept_count": 120,
+  "created_at": "2026-07-22T12:56:52.474199+00:00",
+  "cross_model_internal_observation_authorized_tracks": [],
+  "entity_role_case_count": {
+    "dairy": 252,
+    "meat": 300,
+    "raw_fruit": 720,
+    "seafood": 48,
+    "seed_vegetable": 120
+  },
+  "evidence_boundary": "Matched public-source behavior calibration only. Track differences are descriptive diagnostics, not additive mechanism components. No internal state or intervention was collected.",
+  "full_five_family_completion_claim_authorized": false,
+  "matched_track_differences": {
+    "deepseek7b": {
+      "explicit_evidence_minus_daily": {
+        "accuracy_difference": 0.18333333333333332,
+        "matched_pair_count": 480,
+        "mean_margin_difference": 1.5658854166666667,
+        "prediction_disagreement_rate": 0.21875
+      },
+      "explicit_evidence_minus_technical": {
+        "accuracy_difference": 0.15833333333333333,
+        "matched_pair_count": 480,
+        "mean_margin_difference": 1.1302083333333333,
+        "prediction_disagreement_rate": 0.18541666666666667
+      },
+      "technical_minus_daily": {
+        "accuracy_difference": 0.025,
+        "matched_pair_count": 480,
+        "mean_margin_difference": 0.4356770833333333,
+        "prediction_disagreement_rate": 0.05416666666666667
+      }
+    },
+    "glm4": {
+      "explicit_evidence_minus_daily": {
+        "accuracy_difference": -0.008333333333333333,
+        "matched_pair_count": 480,
+        "mean_margin_difference": -0.14283854166666668,
+        "prediction_disagreement_rate": 0.05625
+      },
+      "explicit_evidence_minus_technical": {
+        "accuracy_difference": 0.01875,
+        "matched_pair_count": 480,
+        "mean_margin_difference": 0.9432291666666667,
+        "prediction_disagreement_rate": 0.06875
+      },
+      "technical_minus_daily": {
+        "accuracy_difference": -0.027083333333333334,
+        "matched_pair_count": 480,
+        "mean_margin_difference": -1.0860677083333334,
+        "prediction_disagreement_rate": 0.0625
+      }
+    },
+    "qwen3": {
+      "explicit_evidence_minus_daily": {
+        "accuracy_difference": 0.027083333333333334,
+        "matched_pair_count": 480,
+        "mean_margin_difference": 0.78984375,
+        "prediction_disagreement_rate": 0.027083333333333334
+      },
+      "explicit_evidence_minus_technical": {
+        "accuracy_difference": 0.027083333333333334,
+        "matched_pair_count": 480,
+        "mean_margin_difference": 4.843229166666666,
+        "prediction_disagreement_rate": 0.035416666666666666
+      },
+      "technical_minus_daily": {
+        "accuracy_difference": 0.0,
+        "matched_pair_count": 480,
+        "mean_margin_difference": -4.053385416666667,
+        "prediction_disagreement_rate": 0.0375
+      }
+    }
+  },
+  "mechanism_claim_authorized": false,
+  "model_specific_internal_observation_authorized": [
+    "qwen3/technical",
+    "qwen3/daily",
+    "qwen3/explicit_evidence",
+    "glm4/daily"
+  ],
+  "model_track_qualification": {
+    "deepseek7b": {
+      "daily": false,
+      "explicit_evidence": false,
+      "technical": false
+    },
+    "glm4": {
+      "daily": true,
+      "explicit_evidence": false,
+      "technical": false
+    },
+    "qwen3": {
+      "daily": true,
+      "explicit_evidence": true,
+      "technical": true
+    }
+  },
+  "phase_id": "Phase602",
+  "qualified_model_tracks": [
+    "qwen3/technical",
+    "qwen3/daily",
+    "qwen3/explicit_evidence",
+    "glm4/daily"
+  ],
+  "schema_version": "phase602_cross_model_analysis.v1",
+  "status": "complete",
+  "theory_or_formula_update_authorized": false,
+  "track_metrics": {
+    "daily": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.6916666666666667,
+        "glm4": 0.9708333333333333,
+        "qwen3": 0.9645833333333333
+      },
+      "all_models_correct_rate": 0.65625,
+      "case_count": 480,
+      "heldout_accuracy_by_model": {
+        "deepseek7b": 0.7083333333333334,
+        "glm4": 0.9833333333333333,
+        "qwen3": 0.9833333333333333
+      },
+      "unanimous_prediction_rate": 0.6645833333333333
+    },
+    "explicit_evidence": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.875,
+        "glm4": 0.9625,
+        "qwen3": 0.9916666666666667
+      },
+      "all_models_correct_rate": 0.83125,
+      "case_count": 480,
+      "heldout_accuracy_by_model": {
+        "deepseek7b": 0.8916666666666667,
+        "glm4": 0.975,
+        "qwen3": 0.9916666666666667
+      },
+      "unanimous_prediction_rate": 0.8354166666666667
+    },
+    "technical": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.7166666666666667,
+        "glm4": 0.94375,
+        "qwen3": 0.9645833333333333
+      },
+      "all_models_correct_rate": 0.675,
+      "case_count": 480,
+      "heldout_accuracy_by_model": {
+        "deepseek7b": 0.7333333333333333,
+        "glm4": 0.95,
+        "qwen3": 0.9833333333333333
+      },
+      "unanimous_prediction_rate": 0.6791666666666667
+    }
+  }
+}

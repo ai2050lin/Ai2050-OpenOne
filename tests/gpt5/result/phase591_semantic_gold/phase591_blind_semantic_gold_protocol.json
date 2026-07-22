@@ -1,0 +1,61 @@
+{
+  "completed_response_paths": {
+    "reviewer_a": "tests/gpt5/result/phase591_semantic_gold/external_review/reviewer_a_completed.jsonl",
+    "reviewer_b": "tests/gpt5/result/phase591_semantic_gold/external_review/reviewer_b_completed.jsonl",
+    "reviewer_c": "tests/gpt5/result/phase591_semantic_gold/external_review/reviewer_c_completed.jsonl"
+  },
+  "consensus_rule": {
+    "conditional_positive_or_negative_conflict": "adjudicate",
+    "decisive_boundary_requires_exact_majority": true,
+    "factuality_requires_simple_majority": true,
+    "positive_negative_conflict": "adjudicate",
+    "two_same_plus_unresolved": "accept_nonopposed_majority",
+    "unanimous_label": "accept",
+    "unresolved_majority_with_decisive_minority": "adjudicate"
+  },
+  "created_at": "2026-07-22T09:32:29.371682+00:00",
+  "evidence_policy": {
+    "model_or_agent_self_annotation_cannot_substitute": true,
+    "no_automatic_observer_development_before_gold_gate": true,
+    "no_internal_trace_or_causal_intervention_before_gold_gate": true,
+    "no_model_execution_before_gold_gate": true,
+    "phase590_sealed_set_must_remain_unread": true,
+    "private_answer_key_must_remain_unread_until_consensus_complete": true,
+    "three_distinct_external_people_required": true
+  },
+  "factuality_bases": [
+    "ordinary_knowledge",
+    "external_reference",
+    "uncertain"
+  ],
+  "factuality_labels": [
+    "supported",
+    "contradicted",
+    "conditional",
+    "uncertain"
+  ],
+  "packet_digests": {
+    "reviewer_a": "5942a01450cd18890f224234d2ae753b4f1e81ef163d188f540beb85fc865955",
+    "reviewer_b": "abad760ce9115fb3ad71ebc050f479ab19deb4931d510070ffcb385a4d6558e2",
+    "reviewer_c": "864c43b974a24014c4e27775cbcd37b927d7f9353680ac1a745146147536a8ed"
+  },
+  "phase_id": "Phase591",
+  "polarity_labels": [
+    "positive",
+    "negative",
+    "conditional",
+    "unresolved"
+  ],
+  "required_distinct_reviewer_count": 3,
+  "reviewer_slots": [
+    "reviewer_a",
+    "reviewer_b",
+    "reviewer_c"
+  ],
+  "schema_version": "phase591_blind_semantic_gold_protocol.v1",
+  "source_item_count": 288,
+  "source_queue_path": "tests/gpt5/result/phase590_natural_semantic_event/phase590_blind_review_queue.jsonl.gz",
+  "source_queue_sha256": "bdddbac9f21e7e797b195cf8b9bf3af05c9417b0aafc272c34b0bc402766157f",
+  "static_audit_sha256": "09e5236be6877035bae72a93ccd5b67e2287bbddf4a8d3228cd4c4fafe62839f",
+  "title": "Independent natural semantic gold review gate"
+}

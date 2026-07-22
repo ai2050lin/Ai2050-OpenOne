@@ -1,0 +1,814 @@
+{
+  "all_models_correct_rate": 0.7515625,
+  "all_models_wrong_case_count": 31,
+  "all_models_wrong_concept_count": 25,
+  "all_models_wrong_counts": {
+    "by_family": {
+      "animal_food": 5,
+      "fruit": 2,
+      "nut": 15,
+      "root_vegetable": 5,
+      "seed_vegetable": 4
+    },
+    "by_surface": {
+      "surface_0": 4,
+      "surface_1": 7,
+      "surface_2": 11,
+      "surface_3": 9
+    },
+    "by_target_letter": {
+      "A": 15,
+      "B": 16
+    },
+    "by_true_false_family": {
+      "animal_food->fruit": 1,
+      "animal_food->root_vegetable": 3,
+      "animal_food->seed_vegetable": 1,
+      "fruit->seed_vegetable": 2,
+      "nut->fruit": 11,
+      "nut->root_vegetable": 1,
+      "nut->seed_vegetable": 3,
+      "root_vegetable->fruit": 2,
+      "root_vegetable->seed_vegetable": 3,
+      "seed_vegetable->fruit": 1,
+      "seed_vegetable->nut": 1,
+      "seed_vegetable->root_vegetable": 2
+    }
+  },
+  "all_models_wrong_rate": 0.016145833333333335,
+  "case_count": 1920,
+  "causal_intervention_authorized": false,
+  "created_at": "2026-07-22T11:12:55.608424+00:00",
+  "cross_model_internal_observer_followup_authorized": false,
+  "evidence_boundary": "Public-ontology forced-choice behavior only; no hidden-state, neuron, parameter, or causal mechanism evidence was collected.",
+  "failure_counts_by_model": {
+    "deepseek7b": 224,
+    "glm4": 240,
+    "qwen3": 215
+  },
+  "family_cross_model_metrics": {
+    "animal_food": {
+      "all_models_correct_rate": 0.7682291666666666,
+      "case_count": 384,
+      "unanimous_prediction_rate": 0.7838541666666666
+    },
+    "fruit": {
+      "all_models_correct_rate": 0.8541666666666666,
+      "case_count": 384,
+      "unanimous_prediction_rate": 0.8697916666666666
+    },
+    "nut": {
+      "all_models_correct_rate": 0.5338541666666666,
+      "case_count": 384,
+      "unanimous_prediction_rate": 0.5833333333333334
+    },
+    "root_vegetable": {
+      "all_models_correct_rate": 0.8098958333333334,
+      "case_count": 384,
+      "unanimous_prediction_rate": 0.8255208333333334
+    },
+    "seed_vegetable": {
+      "all_models_correct_rate": 0.7916666666666666,
+      "case_count": 384,
+      "unanimous_prediction_rate": 0.8020833333333334
+    }
+  },
+  "forced_choice_prediction_counts_by_model": {
+    "deepseek7b": {
+      "A": 1077,
+      "B": 843
+    },
+    "glm4": {
+      "A": 997,
+      "B": 923
+    },
+    "qwen3": {
+      "A": 878,
+      "B": 1042
+    }
+  },
+  "hardest_concepts": [
+    {
+      "concept_id": "FOODON_00003449",
+      "concept_label": "coconut",
+      "correct_model_surface_count": 2,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03301690",
+      "concept_label": "poil de carotte cheese",
+      "correct_model_surface_count": 2,
+      "distance_to_family_root": 4,
+      "false_family": "root_vegetable",
+      "family": "animal_food",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03309920",
+      "concept_label": "copra meal",
+      "correct_model_surface_count": 2,
+      "distance_to_family_root": 3,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_03309930",
+      "concept_label": "polkudu",
+      "correct_model_surface_count": 2,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03316687",
+      "concept_label": "grape seed oil (edible)",
+      "correct_model_surface_count": 3,
+      "distance_to_family_root": 3,
+      "false_family": "seed_vegetable",
+      "family": "fruit",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_00001748",
+      "concept_label": "coconut beverage",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_00003856",
+      "concept_label": "coconut meat",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 2,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_00003864",
+      "concept_label": "coconut flake",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 3,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_00004391",
+      "concept_label": "winged bean tuber",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 3,
+      "false_family": "root_vegetable",
+      "family": "seed_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_00005348",
+      "concept_label": "butternut",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 3,
+      "false_family": "root_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03301353",
+      "concept_label": "peanut pod",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 2,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03309846",
+      "concept_label": "coconut oil press cake",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 2,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03309867",
+      "concept_label": "peanut shell",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03310047",
+      "concept_label": "coconut meal",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03311835",
+      "concept_label": "virginia peanut (roasted)",
+      "correct_model_surface_count": 4,
+      "distance_to_family_root": 4,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_00002765",
+      "concept_label": "bean pod",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "seed_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_00003653",
+      "concept_label": "chayote",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 3,
+      "false_family": "root_vegetable",
+      "family": "fruit",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_00003748",
+      "concept_label": "shallot",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 3,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_00004820",
+      "concept_label": "Cometa white onion cultivar",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 4,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_03301149",
+      "concept_label": "acorn (raw)",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 1,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03302736",
+      "concept_label": "peanut hay",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03304894",
+      "concept_label": "coconut milk drink",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03305165",
+      "concept_label": "breadnut seed",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 1,
+      "false_family": "nut",
+      "family": "fruit",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03309334",
+      "concept_label": "blue warehou (raw)",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 3,
+      "false_family": "seed_vegetable",
+      "family": "animal_food",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03412355",
+      "concept_label": "cipollini plant",
+      "correct_model_surface_count": 5,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_00001177",
+      "concept_label": "insect food product",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "animal_food",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_00001808",
+      "concept_label": "devils tongue food product",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 1,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_00002243",
+      "concept_label": "nata de coco",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 3,
+      "false_family": "root_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_00003571",
+      "concept_label": "water caltrop",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_00003631",
+      "concept_label": "swiss chard leaf",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 4,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_00003705",
+      "concept_label": "moreton bay chestnut black bean",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "nut",
+      "family": "seed_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03302029",
+      "concept_label": "harvard beet",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03306271",
+      "concept_label": "coconut piece (raw)",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 3,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03306590",
+      "concept_label": "peanut (canned)",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    },
+    {
+      "concept_id": "FOODON_03306863",
+      "concept_label": "peanut butter with yeast",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 4,
+      "false_family": "seed_vegetable",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03307023",
+      "concept_label": "poi",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "fruit",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_03308799",
+      "concept_label": "okra shrimp gumbo mix",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "animal_food",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_03309107",
+      "concept_label": "sucker (raw)",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 3,
+      "false_family": "fruit",
+      "family": "animal_food",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "independent_confirmation"
+    },
+    {
+      "concept_id": "FOODON_03310233",
+      "concept_label": "jojoba meal",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "fruit",
+      "family": "nut",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "heldout"
+    },
+    {
+      "concept_id": "FOODON_03316446",
+      "concept_label": "onion granules",
+      "correct_model_surface_count": 6,
+      "distance_to_family_root": 2,
+      "false_family": "seed_vegetable",
+      "family": "root_vegetable",
+      "lexical_cue": false,
+      "model_surface_denominator": 12,
+      "split": "discovery"
+    }
+  ],
+  "mechanism_claim_authorized": false,
+  "model_metrics": {
+    "deepseek7b": {
+      "concept_unanimous_rate": 0.70625,
+      "direct_candidate_output_rate": 0.7692708333333333,
+      "direct_exact_accuracy": 0.7010416666666667,
+      "forced_choice_accuracy": 0.8833333333333333,
+      "gate_checks": {
+        "all_families": true,
+        "all_split_families": true,
+        "all_splits": true,
+        "all_surfaces": true,
+        "answer_order": false,
+        "concept_unanimous": true,
+        "direct_candidate_output": false,
+        "direct_exact": true,
+        "nonlexical": true
+      },
+      "heldout_forced_choice_accuracy": 0.8833333333333333,
+      "nonlexical_forced_choice_accuracy": 0.8703051643192489
+    },
+    "glm4": {
+      "concept_unanimous_rate": 0.7229166666666667,
+      "direct_candidate_output_rate": 1.0,
+      "direct_exact_accuracy": 0.8421875,
+      "forced_choice_accuracy": 0.875,
+      "gate_checks": {
+        "all_families": false,
+        "all_split_families": false,
+        "all_splits": true,
+        "all_surfaces": true,
+        "answer_order": true,
+        "concept_unanimous": true,
+        "direct_candidate_output": true,
+        "direct_exact": true,
+        "nonlexical": true
+      },
+      "heldout_forced_choice_accuracy": 0.8895833333333333,
+      "nonlexical_forced_choice_accuracy": 0.8744131455399061
+    },
+    "qwen3": {
+      "concept_unanimous_rate": 0.7583333333333333,
+      "direct_candidate_output_rate": 1.0,
+      "direct_exact_accuracy": 0.8901041666666667,
+      "forced_choice_accuracy": 0.8880208333333334,
+      "gate_checks": {
+        "all_families": false,
+        "all_split_families": false,
+        "all_splits": true,
+        "all_surfaces": true,
+        "answer_order": false,
+        "concept_unanimous": true,
+        "direct_candidate_output": true,
+        "direct_exact": true,
+        "nonlexical": true
+      },
+      "heldout_forced_choice_accuracy": 0.8833333333333333,
+      "nonlexical_forced_choice_accuracy": 0.8832159624413145
+    }
+  },
+  "model_qualification": {
+    "deepseek7b": false,
+    "glm4": false,
+    "qwen3": false
+  },
+  "model_specific_internal_observer_followup_authorized": [],
+  "ontology_semantic_calibration_required": true,
+  "pairwise_prediction_agreement": {
+    "glm4/deepseek7b": 0.840625,
+    "qwen3/deepseek7b": 0.8317708333333333,
+    "qwen3/glm4": 0.8734375
+  },
+  "phase_id": "Phase601",
+  "posthoc_case_removal_authorized": false,
+  "protocol_sha256": "8da233d2d190f2b2919c30f3f4a6697cbc1dd32d975395214fa92c5f4588ec4e",
+  "qualified_models": [],
+  "schema_version": "phase601_cross_model_analysis.v1",
+  "source_sha256": "1e11fc50283c6498697a7aca9606c9d914f1cda71cc5510e006d949c32df7db0",
+  "status": "complete",
+  "true_false_pair_metrics": {
+    "animal_food->fruit": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.75,
+        "glm4": 0.8804347826086957,
+        "qwen3": 0.9456521739130435
+      },
+      "all_models_correct_rate": 0.6956521739130435,
+      "case_count": 92,
+      "mean_model_accuracy": 0.8586956521739131
+    },
+    "animal_food->nut": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.9318181818181818,
+        "glm4": 0.9431818181818182,
+        "qwen3": 0.9772727272727273
+      },
+      "all_models_correct_rate": 0.875,
+      "case_count": 88,
+      "mean_model_accuracy": 0.9507575757575758
+    },
+    "animal_food->root_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.7840909090909091,
+        "glm4": 0.875,
+        "qwen3": 0.9318181818181818
+      },
+      "all_models_correct_rate": 0.7272727272727273,
+      "case_count": 88,
+      "mean_model_accuracy": 0.8636363636363636
+    },
+    "animal_food->seed_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.853448275862069,
+        "glm4": 0.9310344827586207,
+        "qwen3": 0.9224137931034483
+      },
+      "all_models_correct_rate": 0.7758620689655172,
+      "case_count": 116,
+      "mean_model_accuracy": 0.9022988505747126
+    },
+    "fruit->animal_food": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.9821428571428571,
+        "glm4": 0.9553571428571429,
+        "qwen3": 0.9910714285714286
+      },
+      "all_models_correct_rate": 0.9375,
+      "case_count": 112,
+      "mean_model_accuracy": 0.9761904761904762
+    },
+    "fruit->nut": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.9375,
+        "glm4": 0.875,
+        "qwen3": 0.9875
+      },
+      "all_models_correct_rate": 0.85,
+      "case_count": 80,
+      "mean_model_accuracy": 0.9333333333333333
+    },
+    "fruit->root_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.8611111111111112,
+        "glm4": 0.8888888888888888,
+        "qwen3": 0.9444444444444444
+      },
+      "all_models_correct_rate": 0.7361111111111112,
+      "case_count": 72,
+      "mean_model_accuracy": 0.8981481481481481
+    },
+    "fruit->seed_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.9333333333333333,
+        "glm4": 0.9583333333333334,
+        "qwen3": 0.9083333333333333
+      },
+      "all_models_correct_rate": 0.85,
+      "case_count": 120,
+      "mean_model_accuracy": 0.9333333333333333
+    },
+    "nut->animal_food": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.99,
+        "glm4": 0.93,
+        "qwen3": 0.95
+      },
+      "all_models_correct_rate": 0.88,
+      "case_count": 100,
+      "mean_model_accuracy": 0.9566666666666667
+    },
+    "nut->fruit": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.7976190476190477,
+        "glm4": 0.6547619047619048,
+        "qwen3": 0.4523809523809524
+      },
+      "all_models_correct_rate": 0.40476190476190477,
+      "case_count": 84,
+      "mean_model_accuracy": 0.6349206349206349
+    },
+    "nut->root_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.90625,
+        "glm4": 0.7708333333333334,
+        "qwen3": 0.7083333333333334
+      },
+      "all_models_correct_rate": 0.5416666666666666,
+      "case_count": 96,
+      "mean_model_accuracy": 0.7951388888888888
+    },
+    "nut->seed_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.875,
+        "glm4": 0.4230769230769231,
+        "qwen3": 0.5480769230769231
+      },
+      "all_models_correct_rate": 0.2980769230769231,
+      "case_count": 104,
+      "mean_model_accuracy": 0.6153846153846154
+    },
+    "root_vegetable->animal_food": {
+      "accuracy_by_model": {
+        "deepseek7b": 1.0,
+        "glm4": 1.0,
+        "qwen3": 1.0
+      },
+      "all_models_correct_rate": 1.0,
+      "case_count": 88,
+      "mean_model_accuracy": 1.0
+    },
+    "root_vegetable->fruit": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.8913043478260869,
+        "glm4": 0.9347826086956522,
+        "qwen3": 0.9130434782608695
+      },
+      "all_models_correct_rate": 0.8260869565217391,
+      "case_count": 92,
+      "mean_model_accuracy": 0.9130434782608695
+    },
+    "root_vegetable->nut": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.9910714285714286,
+        "glm4": 0.9821428571428571,
+        "qwen3": 0.9821428571428571
+      },
+      "all_models_correct_rate": 0.9553571428571429,
+      "case_count": 112,
+      "mean_model_accuracy": 0.9851190476190477
+    },
+    "root_vegetable->seed_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.7391304347826086,
+        "glm4": 0.6521739130434783,
+        "qwen3": 0.75
+      },
+      "all_models_correct_rate": 0.43478260869565216,
+      "case_count": 92,
+      "mean_model_accuracy": 0.7137681159420289
+    },
+    "seed_vegetable->animal_food": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.9404761904761905,
+        "glm4": 1.0,
+        "qwen3": 1.0
+      },
+      "all_models_correct_rate": 0.9404761904761905,
+      "case_count": 84,
+      "mean_model_accuracy": 0.9801587301587301
+    },
+    "seed_vegetable->fruit": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.8125,
+        "glm4": 0.9,
+        "qwen3": 0.925
+      },
+      "all_models_correct_rate": 0.7125,
+      "case_count": 80,
+      "mean_model_accuracy": 0.8791666666666667
+    },
+    "seed_vegetable->nut": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.8928571428571429,
+        "glm4": 0.9523809523809523,
+        "qwen3": 0.9761904761904762
+      },
+      "all_models_correct_rate": 0.8571428571428571,
+      "case_count": 84,
+      "mean_model_accuracy": 0.9404761904761905
+    },
+    "seed_vegetable->root_vegetable": {
+      "accuracy_by_model": {
+        "deepseek7b": 0.7794117647058824,
+        "glm4": 0.9485294117647058,
+        "qwen3": 0.9338235294117647
+      },
+      "all_models_correct_rate": 0.7058823529411765,
+      "case_count": 136,
+      "mean_model_accuracy": 0.8872549019607843
+    }
+  },
+  "unanimous_prediction_rate": 0.7729166666666667
+}
