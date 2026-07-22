@@ -1,0 +1,94 @@
+{
+  "candidate_set": {
+    "natural_generation_is_primary": true,
+    "natural_generation_max_new_tokens": 24,
+    "semantic_values_in_fixed_order": [
+      "red",
+      "blue",
+      "green",
+      "black"
+    ],
+    "teacher_forced_continuations": {
+      "black": " black",
+      "blue": " blue",
+      "green": " green",
+      "red": " red"
+    },
+    "teacher_forced_logits_are_diagnostic_only": true
+  },
+  "candidate_set_sha256": "5459fa2264be20a6bb6800026b07c0aa12c14cb0a7f42ee0291169f643f85ab5",
+  "created_at_utc": "2026-07-22T01:40:34.882363+00:00",
+  "equivalence_rule": {
+    "eos_and_budget_are_secondary": true,
+    "marker_regex": "(?<![A-Za-z])(red|blue|green|black)(?![A-Za-z])",
+    "multiple_distinct_markers": "first marker scores semantics; ambiguity is separately reported",
+    "no_marker": "unparsed",
+    "normalization": "Unicode text is casefolded; ASCII word-boundary marker matches only",
+    "primary_prediction": "first complete marker match in generated text before EOS",
+    "strict_format_is_secondary": true,
+    "strict_reference_sentence": "The retrieved marker is {value}."
+  },
+  "equivalence_rule_sha256": "1a7f32c6484bdfc9f031d6745a8b3ba0f7059f5a4ad113a0bdef966cd3d6835a",
+  "experiment": "delayed_two_hop_gpu_admission_package",
+  "first_access_log_genesis_sha256": "583ff4336a50a1f24ab54ab576c97076fa044338b0846ad7a02fff2c92fe57eb",
+  "first_human_access_claimed": false,
+  "first_model_evaluation_access_status": "not_accessed",
+  "freeze_timestamp": "2026-07-22T01:40:34.882363+00:00",
+  "future_access_marker_contract": {
+    "all_three_raw_holdout_outputs_must_seal_before_any_scoring_or_review": true,
+    "broker_and_Python_guard_are_not_OS_WORM_or_blindness": true,
+    "create_before_open": true,
+    "create_exclusive_no_overwrite": true,
+    "hash_chain_fields": [
+      "previous_head",
+      "run_id",
+      "model",
+      "action",
+      "timestamp",
+      "input_manifest_sha256",
+      "output_receipt_sha256",
+      "new_head"
+    ],
+    "per_model_markers": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "runner_must_not_contain_direct_holdout_path": true
+  },
+  "holdout_commitment_sha256": "38918847b44eed45336341a2511f5451eeb97abcd20fe2fd45e5a1a160011dcd",
+  "holdout_semantics": "preregistered_immutable_not_blind",
+  "phase": 991,
+  "role": "holdout_first_model_evaluation_access_commitment",
+  "schema_version": 1,
+  "sealed_prompt_manifest": {
+    "bytes": 2983616,
+    "path": "runtime_prompts/private/sealed_holdout.jsonl",
+    "sha256": "297ba2e58697ccad1b43ed0f915828e5edbba07d7c71251667cc8e737462e1e5"
+  },
+  "search_candidate_set": {
+    "component": "residual_state",
+    "discovery_common_worlds_max": 16,
+    "frozen_candidate_blocks_max": 4,
+    "internal_search_not_authorized_by_phase991": true,
+    "no_preselected_head_neuron_direction_or_formula": true,
+    "position_groups": [
+      "fact_source",
+      "distractor",
+      "query",
+      "fixed_answer_or_current_generation"
+    ],
+    "relative_layer_blocks": 6
+  },
+  "search_candidate_set_sha256": "9f90386d15d843a406bfa1ca1af2328dee4799a863841d7533a9bf8952a6387e",
+  "thresholds": {
+    "all_three_primary_models_must_pass_before_extension_model_access": true,
+    "behavior_above_shortcut_is_not_mechanism_evidence": true,
+    "counterfactual_pair_sensitivity_min_percent": 85,
+    "each_preregistered_variant_min_percent": 85,
+    "overall_each_major_condition_min_percent": 90,
+    "public_splits_must_pass_before_sealed_access": true,
+    "shortcut_baseline_must_be_reported": true
+  },
+  "thresholds_sha256": "cc96da46cd90eb354756233a2114919340f6339bc0757401f400fc6e67dbf538"
+}

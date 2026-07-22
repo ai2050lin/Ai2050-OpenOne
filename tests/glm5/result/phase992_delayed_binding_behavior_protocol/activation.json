@@ -1,0 +1,452 @@
+{
+  "activation_sha256": "f14b48e26c5574a4fa1f0878d43399b23df5198e5efa39e8ea35b5c33d12711d",
+  "artifact_layout": {
+    "activation_is_unique_and_not_copied_to_execution_root": true,
+    "cleanup_receipt": "receipts/cleanup_{scope}_{model}.json",
+    "execution_root": "tests/glm5/result/phase992_delayed_binding_behavior_execution",
+    "forbidden_unsealed_plaintext_raw": true,
+    "holdout_abort_receipt": "holdout_access/abort_{model_index}_{model}.json",
+    "holdout_events": "holdout_access/events/{ordinal}_{model}_{action}.json",
+    "holdout_final_chain_receipt": "holdout_access/final_chain_receipt.json",
+    "holdout_grant_failure_receipt": "holdout_access/grant_failure_{model_index}_{model}.json",
+    "holdout_grant_receipt": "holdout_access/grant_{model_index}_{model}.json",
+    "holdout_raw": "raw/holdout/{model}.jsonl.gz",
+    "holdout_receipt": "receipts/holdout_{model}.json",
+    "holdout_score": "scores/holdout_score.json",
+    "holdout_seal_receipt": "holdout_access/seal_{model_index}_{model}.json",
+    "holdout_temporary_copy": "temporary_holdout/{run_id}_{model}.jsonl",
+    "lease": "execution.lease.json",
+    "primary_raw": "raw/primary/{model}.jsonl.gz",
+    "primary_receipt": "receipts/primary_{model}.json",
+    "protocol_root": "tests/glm5/result/phase992_delayed_binding_behavior_protocol",
+    "public_admission": "public_behavior_admission.json",
+    "public_score": "scores/public_score.json"
+  },
+  "attentions_authorized": false,
+  "audit": {
+    "audit_sha256": "71165589b481cd0db7bcbe222f93a770a2d9541e7456779dd5e15968da2f7fbc",
+    "path": "independent_source_audit.json"
+  },
+  "behavior_only_authorized": true,
+  "causal_intervention_authorized": false,
+  "cleanup_and_resource_contract": {
+    "child_process_must_exit_after_each_model_scope": true,
+    "cleanup_failure": "global_stop_no_next_model",
+    "cleanup_receipt_requires": [
+      "model_released",
+      "child_exit_zero",
+      "cuda_allocated_zero",
+      "cuda_reserved_zero",
+      "baseline_recovered",
+      "cleanup_pass"
+    ],
+    "cpu_or_disk_offload_forbidden": true,
+    "disk_minimum_failure": "global_stop_no_next_model",
+    "gpu_baseline_before_each_model": true,
+    "minimum_free_disk_gib_before_each_model": 80,
+    "nvidia_smi_post_cleanup_recovery_required": true,
+    "planned_result_quota_gib": [
+      40,
+      60
+    ],
+    "post_cleanup_used_mib_max_over_preload_baseline": 512,
+    "strict_release_sequence": [
+      "engine_release",
+      "synchronize",
+      "clear_cublas_workspaces",
+      "garbage_collect",
+      "empty_cache",
+      "ipc_collect",
+      "empty_cache",
+      "synchronize"
+    ],
+    "torch_cuda_allocated_and_reserved_bytes_before_exit": 0
+  },
+  "created_at_utc": "2026-07-22T03:01:18+00:00",
+  "engineering_contract": {
+    "engineering_failure": "global_stop_before_full_execution",
+    "engineering_is_not_scientific_accuracy_evidence": true,
+    "engineering_records": [
+      {
+        "ordinal": 0,
+        "prompt_sha256": "00a7c0bcc65c26c5c30b3133d3fdef1eea605d9391fbd277e7b4f30feda4a0fd",
+        "record_id": "p990_i_ddc9edc6a788dcd91b979c59024e2bfb",
+        "semantic_world_id": "p990_w_8eb78460fe9e36da82ef6366e134bc6a",
+        "variant_id": "original__standard__order_a__near"
+      },
+      {
+        "ordinal": 1,
+        "prompt_sha256": "396e9b53cc0af879052484920bd00ee228265fd3a44da9604aeeafb5c2c808f1",
+        "record_id": "p990_i_96cea2a5eb4bfeb2e404628ca56c86a3",
+        "semantic_world_id": "p990_w_2a516505361cf7fe22882ee4c1dce740",
+        "variant_id": "original__paraphrase__order_a__far"
+      },
+      {
+        "ordinal": 2,
+        "prompt_sha256": "8533ff08913bc8ea7402c1cd56aeae6e3f9d6e6dab88763070a624426c2ffb13",
+        "record_id": "p990_i_ff013888c5762b1c45c58c5dbd74a339",
+        "semantic_world_id": "p990_w_fff081cab8937372d65215d56c383b58",
+        "variant_id": "value_swap__standard__order_b__near"
+      },
+      {
+        "ordinal": 3,
+        "prompt_sha256": "d8af22731322a5f9e01cd34f849b969b03a91f2f5f3c2289a81fdf3f3c6e4768",
+        "record_id": "p990_i_615043874b3c56ae6153a7b73ddfaaf7",
+        "semantic_world_id": "p990_w_dccf71e7b67158cb17f6cd7322042315",
+        "variant_id": "value_swap__paraphrase__order_b__far"
+      },
+      {
+        "ordinal": 4,
+        "prompt_sha256": "0d15637a0270431bcbf5d9c36dff02e36c1db6e1ed49d4a566749167b07e2637",
+        "record_id": "p990_i_f256edc3db975417a80446957f96f49d",
+        "semantic_world_id": "p990_w_6c42215409022fd0afe496fc4d92b4ca",
+        "variant_id": "binding_swap__paraphrase__order_a__near"
+      },
+      {
+        "ordinal": 5,
+        "prompt_sha256": "b07b7e6a216dd22a18ddbaf38f8c312eed16425dc0287c89e991054798e36737",
+        "record_id": "p990_i_9c94f738c1b930da556063635ff3bf8d",
+        "semantic_world_id": "p990_w_97b30624935381aee8567abc4272dd8f",
+        "variant_id": "relation_swap__standard__order_a__far"
+      },
+      {
+        "ordinal": 6,
+        "prompt_sha256": "a5d1ad32fe825f36fe8b78fd061a1a484943a375b3f11215791a8255216f5f65",
+        "record_id": "p990_i_95745cde39d15b2cdcb322c82c5437bf",
+        "semantic_world_id": "p990_w_d59ad11b79fe5ea8ade00dc2ee612968",
+        "variant_id": "relation_swap__paraphrase__order_b__near"
+      },
+      {
+        "ordinal": 7,
+        "prompt_sha256": "2ac0a73105417a2137019909b1f01e76c49638dd0afe3f3028d81da6e884aac8",
+        "record_id": "p990_i_78b12ca01a7b7019f284e16ce6e178d1",
+        "semantic_world_id": "p990_w_2c343f5f2f8c6466cd0d7bb976282deb",
+        "variant_id": "relation_swap__paraphrase__order_b__far"
+      }
+    ],
+    "engineering_records_sha256": "0509da9141fb4db22878eaae65bdb12fd8c11e61819e19b925e1a3c7c748f5df",
+    "must_precede_full_public_execution": true,
+    "record_count_per_model": 8,
+    "required_checks": [
+      "exact_input_replay",
+      "natural_generation_schema",
+      "four_teacher_forced_logits",
+      "single_token_candidate_identity",
+      "effective_EOS_and_pad_identity",
+      "loaded_INT8_BF16_SDPA_cuda_only_identity",
+      "raw_receipt_self_hash",
+      "child_exit_and_cleanup_pass"
+    ],
+    "same_records_all_models": true,
+    "selection": "first eight discovery worlds; frozen variant offsets 0,5,10,15,20,25,30,31",
+    "source_split": "discovery"
+  },
+  "execution_root": "tests/glm5/result/phase992_delayed_binding_behavior_execution",
+  "expanded_confirmation_authorized": false,
+  "experiment": "delayed_two_hop_gpu_behavior",
+  "formal_python": {
+    "path": "C:\\Users\\Admin\\.workbuddy\\binaries\\python\\versions\\3.11.9\\python.exe",
+    "sha256": "0f11fb7422fa347b7609ba0964ceccef3c8fa9f15230c37b9ec27668e68e8a8a"
+  },
+  "freeze": {
+    "freeze_sha256": "5e160cde4404a62300e9d1058e76f30508d7302401d1aff0d5ec98ebd2767c56",
+    "path": "freeze_commit.json"
+  },
+  "generation_contract": {
+    "add_special_tokens": false,
+    "attention_implementation": "sdpa",
+    "automatic_fallback": false,
+    "batch_size": 8,
+    "chat_template": false,
+    "cpu_or_disk_offload": false,
+    "decode_scope": "generated continuation through first EOS exclusive",
+    "device_map": "cuda_only_no_cpu_or_disk_entries",
+    "do_sample": false,
+    "effective_eos": "sorted union of tokenizer, config, and generation-config EOS IDs",
+    "first_eos_absorbing": true,
+    "input_mode": "raw_text_no_chat_template_add_special_tokens_false",
+    "load_in_8bit": true,
+    "max_new_tokens": 24,
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "nonquantized_dtype": "torch.bfloat16",
+    "num_beams": 1,
+    "num_return_sequences": 1,
+    "one_model_resident_at_a_time": true,
+    "output_attentions": false,
+    "output_hidden_states": false,
+    "output_scores": false,
+    "pad_is_not_eos_unless_identical_id": true,
+    "padding_side": "left",
+    "phase983_engine_use": "adapter load/release, EOS/pad/quantization/device identity only; native-chat rendering and stochastic sample_batch are forbidden",
+    "prompt_source": "exact Phase991 runtime prompt row; prompt_sha256 must match",
+    "quantization": "bitsandbytes_int8",
+    "return_dict_in_generate": true,
+    "scientific_object": "local frozen INT8 checkpoints under the frozen runtime",
+    "truncation": false,
+    "use_cache": true
+  },
+  "generation_contract_sha256": "06eee0e99554baf3c9791f3e2f85a8656de89c80f3000bab39be850bb1fe9531",
+  "gpu_behavior_execution_authorized": true,
+  "hidden_states_authorized": false,
+  "holdout_contract": {
+    "broker_is_access_mediator_not_OS_sandbox": true,
+    "expanded_confirmation": "not authorized by this activation; a later sealed release requires all three complete primary gates PASS",
+    "failure_after_grant": "revoke any temporary copy, append abort_and_revoke, seal an inconclusive failure receipt, and prohibit later model access",
+    "first_access_marker_create_before_open": true,
+    "hash_chained_broker_log": true,
+    "holdout_records_per_model": 2048,
+    "holdout_semantics": "preregistered_immutable_not_blind",
+    "phase_1": "seal all three public-scope raw outputs and cleanup receipts; then and only then scorer may open public truth",
+    "phase_2": "after public PASS, broker releases sealed_holdout in model order; seal all three holdout raw outputs and cleanup receipts before holdout truth/scoring",
+    "phase_2_release_condition": "all_three_models_public_gate_PASS",
+    "public_scope_records_per_model": 8192,
+    "public_scope_splits": [
+      "discovery",
+      "confirmation",
+      "adversarial"
+    ],
+    "runner_may_not_read_scoring_truth": true,
+    "scoring_release_condition": {
+      "holdout": "sealed_public_score_all_three_PASS_and_all_three_holdout_raw_plus_cleanup_sealed",
+      "public": "all_three_primary_raw_plus_cleanup_sealed"
+    }
+  },
+  "internal_trace_authorized": false,
+  "mechanism_formula_authorized": false,
+  "model_artifact_contract": {
+    "all_model_files_independently_rehashed_by_phase991_audit": true,
+    "models_in_required_order": [
+      {
+        "file_count": 16,
+        "files_manifest_sha256": "cd65a2322408df3712b47dda0cf81848d8cf8a7089bb2469fc3bcb698a83939b",
+        "logical_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\qwen3-4b",
+        "model": "qwen3",
+        "resolved_root": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+        "weight_bytes": 8044982000,
+        "weight_shard_count": 3
+      },
+      {
+        "file_count": 16,
+        "files_manifest_sha256": "88e320d54c03a83ce089dba6768a1454490602803308c0cf8a87c09ba33a7990",
+        "logical_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\glm4-9b-chat-hf",
+        "model": "glm4",
+        "resolved_root": "D:\\develop\\model\\ZhipuAI\\glm-4-9b-chat-hf",
+        "weight_bytes": 18799953696,
+        "weight_shard_count": 4
+      },
+      {
+        "file_count": 14,
+        "files_manifest_sha256": "06ee39cec979e7d29b7505a4a0545f093c1b0e253eba3b034c24fcceb4bd309c",
+        "logical_path": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\deepseek-r1-distill-qwen-7b",
+        "model": "deepseek7b",
+        "resolved_root": "D:\\develop\\model\\deepseek-ai\\DeepSeek-R1-Distill-Qwen-7B",
+        "weight_bytes": 15231271850,
+        "weight_shard_count": 2
+      }
+    ],
+    "phase991_model_manifest": {
+      "bytes": 18243,
+      "model_manifest_sha256": "7021a4492a54702e3aebde3ab9ef4503a9287006c83b62954a9ac9cbe87e4ca5",
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/model_artifact_manifests.json",
+      "sha256": "92cbd72fe7286061bc1e1655bc62a2c943d584d9006bbcf634f5a65f3d07dfa5"
+    },
+    "phase992_protocol_does_not_rehash_42_GB_or_load_weights": true
+  },
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "parser_contract": {
+    "eos_and_budget_are_secondary": true,
+    "marker_regex": "(?<![A-Za-z])(red|blue|green|black)(?![A-Za-z])",
+    "multiple_distinct_markers": "first marker scores semantics; ambiguity is separately reported",
+    "no_marker": "unparsed",
+    "normalization": "Unicode text is casefolded; ASCII word-boundary marker matches only",
+    "primary_prediction": "first complete marker match in generated text before EOS",
+    "strict_format_is_secondary": true,
+    "strict_reference_sentence": "The retrieved marker is {value}."
+  },
+  "parser_contract_sha256": "1a7f32c6484bdfc9f031d6745a8b3ba0f7059f5a4ad113a0bdef966cd3d6835a",
+  "phase": 992,
+  "phase983_engine": {
+    "bytes": 54444,
+    "path": "tests/glm5/phase983_cross_model_engine.py",
+    "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+  },
+  "phase991_anchors": {
+    "admission": {
+      "bytes": 22450,
+      "gpu_admission_sha256": "db2e6fbb4b02d33cf1020f1e0abd474b3452e7f43a9bfef51605ac4d9a9b8c15",
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/gpu_admission_preregistration.json",
+      "sha256": "4e64673b85fadbcb8f75292959717b36ba768e543bd1a2b61c1bb531eaba8aad"
+    },
+    "freeze": {
+      "bytes": 1325,
+      "freeze_commit_sha256": "a334ad8d6aaa773a30a014c223176dfa07b6008c25e649f1e7c141c559f6d4c5",
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/freeze_commit.json",
+      "sha256": "33a6e3b667b77e21a49093ce0ee8476cc1682e91a72daac318f2a7c6e3a45b2a"
+    },
+    "holdout_commitment": {
+      "bytes": 3638,
+      "holdout_commitment_sha256": "38918847b44eed45336341a2511f5451eeb97abcd20fe2fd45e5a1a160011dcd",
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/holdout_access_commitment.json",
+      "sha256": "91393e63e0a8b4f7d4cacf5443a53de7bf4f31773cb763f43d57dcb5b8fde8a1"
+    },
+    "independent_audit": {
+      "bytes": 9196,
+      "independent_audit_sha256": "26d9a10396e332100f52069e2523335d2fc4e6224286f6814f53619c24129bab",
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/independent_execution_audit.json",
+      "sha256": "8ba3981262eaacf0741e9d73af82d5a72be5e2e75d027201a445294fd3011036"
+    },
+    "model_manifests": {
+      "bytes": 18243,
+      "model_manifest_sha256": "7021a4492a54702e3aebde3ab9ef4503a9287006c83b62954a9ac9cbe87e4ca5",
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/model_artifact_manifests.json",
+      "sha256": "92cbd72fe7286061bc1e1655bc62a2c943d584d9006bbcf634f5a65f3d07dfa5"
+    },
+    "stage_commit": {
+      "bytes": 4420,
+      "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/stage_commit.json",
+      "sha256": "5e4aabedcaed79d84dff7548cb1bf308e6536179a7a14dbc02b4e1d77384e20c",
+      "stage_commit_sha256": "555ebe6e781b4cb22a58b2a47a9cd9083a5d385167abb34cc7dd0d55882d7c3a"
+    }
+  },
+  "protocol": {
+    "path": "protocol_preregistration.json",
+    "protocol_sha256": "e8c672c2ea1efcd7c27733e7ff914808cd89787b64b1ca944d255794de9c63ea"
+  },
+  "qualified_phase991_freeze": {
+    "bytes": 1325,
+    "freeze_commit_sha256": "a334ad8d6aaa773a30a014c223176dfa07b6008c25e649f1e7c141c559f6d4c5",
+    "path": "tests/glm5/result/phase991_delayed_binding_gpu_admission/freeze_commit.json",
+    "sha256": "33a6e3b667b77e21a49093ce0ee8476cc1682e91a72daac318f2a7c6e3a45b2a"
+  },
+  "resource_preflight": {
+    "cuda_used": false,
+    "disk_free_bytes_at_activation_freeze": 159262625792,
+    "disk_free_gib_at_activation_freeze": 148.32487869262695,
+    "disk_total_bytes": 785322602496,
+    "minimum_free_disk_gib": 80,
+    "nvidia_smi_or_torch_GPU_query_performed_by_protocol": false,
+    "runner_must_recheck_before_each_model": true
+  },
+  "role": "fail_closed_external_behavior_execution_activation",
+  "runner_fail_closed_unless_all_identity_and_authority_checks_pass": true,
+  "schema_version": "phase992_gpu_behavior_activation.v1",
+  "scoring_authorized": false,
+  "scoring_execution_contract": {
+    "32_variants_per_world_are_paired_not_independent": true,
+    "exact_full_denominators_required": true,
+    "independent_unit": "semantic_world_id",
+    "natural_generation_is_primary": true,
+    "no_threshold_tuning_after_any_model_output": true,
+    "parser_may_not_use_prompt_or_truth": true,
+    "parser_search_text": "generated continuation before first effective EOS",
+    "teacher_forced_is_diagnostic_only": true
+  },
+  "scoring_execution_contract_sha256": "c42298e7add1ed8afd671eb62b52d3a0b4d735f021566c522e5493f0841330a2",
+  "scoring_release_condition": {
+    "holdout": "sealed_public_score_all_three_PASS_and_all_three_holdout_raw_plus_cleanup_sealed",
+    "public": "all_three_primary_raw_plus_cleanup_sealed"
+  },
+  "serial_and_lease_contract": {
+    "exclusive_lease_required": true,
+    "lease_created_atomically_no_overwrite": true,
+    "lease_identity_fields": [
+      "schema_version",
+      "activation_sha256",
+      "run_id",
+      "pid",
+      "process_start_token",
+      "scope",
+      "model",
+      "created_at_utc",
+      "lease_sha256"
+    ],
+    "manual_recovery_requires_separate_frozen_recovery_receipt": true,
+    "model_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "no_next_model_before_cleanup_receipt": true,
+    "no_unfrozen_resume": true,
+    "one_model_resident_at_a_time": true,
+    "one_model_subprocess_at_a_time": true,
+    "oom_or_interruption": "inconclusive_and_fail_closed",
+    "order_is_mandatory_within_each_scope": true,
+    "pid_reuse_resistant_start_token_required": true,
+    "source_or_activation_or_artifact_drift": "global_stop_no_next_model",
+    "stale_lease_not_auto_deleted": true,
+    "unknown_liveness_is_not_dead": true
+  },
+  "source_seals": {
+    "audit": {
+      "bytes": 59245,
+      "path": "tests/glm5/phase992_delayed_binding_audit.py",
+      "sha256": "d3ebdda0631c105a6ec8e25c8aecb05f23a77472825e817007d9fa953a8f303a"
+    },
+    "broker": {
+      "bytes": 29564,
+      "path": "tests/glm5/phase992_holdout_broker.py",
+      "sha256": "c7e1b35723f22463cbd2a111e6caaa7cce300cbaadd1fcd63e8a9087106beafb"
+    },
+    "protocol": {
+      "bytes": 48821,
+      "path": "tests/glm5/phase992_delayed_binding_protocol.py",
+      "sha256": "a10e603ce522acd24e2d37d2329de822b509e93b0e0913988d5c45384c85cc23"
+    },
+    "runner": {
+      "bytes": 56483,
+      "path": "tests/glm5/phase992_delayed_binding_runner.py",
+      "sha256": "b6070d53a5c20cdf9a3d22dd7841386768a91d59d50e85119c82784fc658e002"
+    },
+    "scorer": {
+      "bytes": 65870,
+      "path": "tests/glm5/phase992_delayed_binding_scorer.py",
+      "sha256": "8459824a9e0bfe2b068d6ad2eb01f1165218726929f855ed2c67bc1787942975"
+    }
+  },
+  "teacher_forced_contract": {
+    "all_candidates_single_token_each_frozen_tokenizer": true,
+    "boundary_identity": "full_ids == context_ids + candidate_ids",
+    "candidate_continuations": {
+      "black": " black",
+      "blue": " blue",
+      "green": " green",
+      "red": " red"
+    },
+    "candidate_count": 4,
+    "candidate_values_in_order": [
+      "red",
+      "blue",
+      "green",
+      "black"
+    ],
+    "context": "prompt + '\\n' + 'The retrieved marker is'",
+    "joiner": "\n",
+    "margin": "gold candidate logit - max(three foil candidate logits)",
+    "no_hidden_states_attentions_or_hooks": true,
+    "prefix": "The retrieved marker is",
+    "role": "diagnostic_only_not_replacement_for_natural_generation",
+    "same_raw_prompt_as_generation": true,
+    "score_position": "logits at final context token for first continuation token",
+    "stored_values": "four candidate logits plus gold-minus-max-foil margin"
+  },
+  "teacher_forced_contract_sha256": "efb7974ee627dd2bc2111ba4227fdc001f314a3891be10d72911acc8279d0516",
+  "threshold_contract": {
+    "all_three_primary_models_must_pass_before_extension_model_access": true,
+    "behavior_above_shortcut_is_not_mechanism_evidence": true,
+    "counterfactual_pair_sensitivity_min_percent": 85,
+    "each_preregistered_variant_min_percent": 85,
+    "overall_each_major_condition_min_percent": 90,
+    "public_splits_must_pass_before_sealed_access": true,
+    "shortcut_baseline_must_be_reported": true
+  },
+  "threshold_contract_sha256": "cc96da46cd90eb354756233a2114919340f6339bc0757401f400fc6e67dbf538"
+}

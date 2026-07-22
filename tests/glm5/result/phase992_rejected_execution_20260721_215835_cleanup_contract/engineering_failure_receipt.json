@@ -1,0 +1,35 @@
+{
+  "activation_sha256": "f5bf34d9be75bbb33bb83879f223e42832777d8291bcc22f74958007d7c51955",
+  "cleanup_receipt_created": false,
+  "created_at_local": "2026-07-21T21:58:35-05:00",
+  "deepseek7b_loaded": false,
+  "engineering_qualified": false,
+  "experiment": "delayed_two_hop_gpu_behavior",
+  "failed_model": "qwen3",
+  "failed_scope": "engineering",
+  "failure_class": "cuda_allocator_cleanup_not_zero",
+  "glm4_loaded": false,
+  "internal_trace_opened": false,
+  "manifest_artifact": {
+    "bytes": 11659,
+    "path": "manifests/engineering.jsonl",
+    "sha256": "7d6084b9349643d06878b4b1b67701b43141c82070c7867409b5013dc2c7b3df"
+  },
+  "model_order_index": 0,
+  "next_model_loaded": false,
+  "old_activation_must_not_be_reused": true,
+  "phase": 992,
+  "qwen3_two_repeat_execution_reached_raw_write": true,
+  "raw_artifact": {
+    "bytes": 4634,
+    "path": "engineering/raw/qwen3.jsonl.gz",
+    "row_count": 8,
+    "sha256": "64227c72378c71f9db81da570062d4710c938f43163c2207f7be3343ed1d9c7e"
+  },
+  "receipt_sha256": "bafc38f2b48237f32bf0d05731d68a5ff1b4e6097232b4c1dcd2a57d175eab9b",
+  "required_remediation": "add the previously qualified strict cuBLAS workspace clear sequence, reseal every Phase992 source, and restart from a fresh execution root",
+  "runner_source_sha256": "b74ecb0069eace4ecc7b0fb9ed4ab630d21a9e631e74927955d758be5d4e3d4a",
+  "schema_version": "phase992_engineering_failure_receipt.v1",
+  "status": "inconclusive_fail_closed",
+  "truth_opened": false
+}

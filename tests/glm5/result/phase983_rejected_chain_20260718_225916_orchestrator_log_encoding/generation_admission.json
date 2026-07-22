@@ -1,0 +1,132 @@
+{
+  "admission_sha256": "9b7f5c70b8577a7a1d155ac6a5382aac643ae8d4844636bac24d5326ff3c87cb",
+  "admitted": true,
+  "authorization_scope": {
+    "activation_collection": false,
+    "arms": {
+      "A": {
+        "instruction": "Solve the task and answer as directly as possible. Do not show your reasoning. End with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+        "name": "external_direct_instruction",
+        "role": "baseline"
+      },
+      "B": {
+        "instruction": "Work through the task step by step before answering. Then end with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+        "name": "external_deliberate_instruction",
+        "role": "candidate"
+      }
+    },
+    "decision_checkpoint": 2048,
+    "expected_rows_all_models": 4608,
+    "expected_rows_per_model": 1536,
+    "experiment": "fresh256_option_swap_cross_model_external_contract",
+    "external_generation_only": true,
+    "internal_intervention": false,
+    "items": 256,
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "one_model_subprocess_at_a_time": true,
+    "quantization": {
+      "attn_implementation": "sdpa",
+      "load_in_8bit": true,
+      "non_quantized_compute_dtype": "bfloat16",
+      "same_policy_all_models": true
+    },
+    "sampling": {
+      "min_p": 0.0,
+      "temperature": 0.6,
+      "top_k": 20,
+      "top_p": 0.95
+    },
+    "seed_registry_sha256": "03afb932c0ea3797e6d0731d35c10bd1e249a4838b40b1f9959cdf5e84869233",
+    "streams": [
+      0,
+      1,
+      2
+    ],
+    "strict_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ]
+  },
+  "cpu_only": true,
+  "created_at_utc": "2026-07-19T03:56:09+00:00",
+  "decision": "ADMIT_SEQUENTIAL_CROSS_MODEL_EXTERNAL_GENERATION",
+  "decision_boundary": {
+    "independent_cpu_audit_required": true,
+    "no_pooling": true,
+    "pass_does_not_authorize_holdout_or_mechanism": true,
+    "runner_cannot_compute_scientific_decision": true,
+    "secondary_cannot_override_primary": true
+  },
+  "experiment": "fresh256_option_swap_cross_model_external_contract",
+  "formal_generation_performed": false,
+  "gpu_authorized": true,
+  "gpu_used": false,
+  "holdout": false,
+  "holdout_authorized": false,
+  "holdout_loaded": false,
+  "mechanism": false,
+  "mechanism_authorized": false,
+  "model_weights_loaded": false,
+  "phase": 983,
+  "pre_generation_state": {
+    "formal_generation_performed": false,
+    "formal_rows_exist": false,
+    "gpu_used_by_admission": false,
+    "model_weights_loaded_by_admission": false
+  },
+  "protocol_file_sha256": "923cdc0a3cb9c746bb584b5b1695893ffb58b220c383a695a810638a78105500",
+  "protocol_sha256": "bf5a18a946a05a0161232f520aaff5d6ed0b3e5c299f6a5657ed412647e008cf",
+  "qualification_file_sha256": "865b0e5d457d0f0623f4e9b1b0e90d3bb9f36ed7dc57be0c305fbae17dbef3f6",
+  "qualification_sha256": "bbba5b990b6bf427a956504ad2fe46a1badc87abee185aef248cab295b9a4d00",
+  "schema_version": 1,
+  "seed_registry": {
+    "algorithm_contract": {
+      "all_model_block_count": 1152,
+      "arm_or_surface_pairing_is_not_counterfactual_causality": true,
+      "block_cells": "original/swapped x external arm A/B",
+      "blocks_per_model": 384,
+      "crn_block": "one model x one stream x one semantic seed_key",
+      "dataset_namespace_source": "installed protocol_sha256",
+      "engine_namespace": "phase983-cross-model-engine-v1",
+      "excluded_from_seed": [
+        "arm",
+        "swap_side",
+        "item_id"
+      ],
+      "included_in_seed": [
+        "protocol_sha256",
+        "engine_namespace",
+        "model_key",
+        "stream",
+        "seed_key"
+      ],
+      "model_count": 3,
+      "rows_per_crn_block": 4,
+      "seed_registry_materialized_after_protocol_hash_by_admission": true,
+      "stream_count": 3,
+      "unique_seed_key_count": 128
+    },
+    "blocks_per_model": 384,
+    "collision_free_within_each_model": true,
+    "cross_model_seed_equality_is_not_a_pairing_claim": true,
+    "dataset_namespace": "bf5a18a946a05a0161232f520aaff5d6ed0b3e5c299f6a5657ed412647e008cf",
+    "entry_count": 1152,
+    "per_model_collision_count": {
+      "deepseek7b": 0,
+      "glm4": 0,
+      "qwen3": 0
+    },
+    "per_model_unique_seed_count": {
+      "deepseek7b": 384,
+      "glm4": 384,
+      "qwen3": 384
+    },
+    "seed_registry_sha256": "03afb932c0ea3797e6d0731d35c10bd1e249a4838b40b1f9959cdf5e84869233",
+    "unique_seed_key_count": 128
+  }
+}

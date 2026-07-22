@@ -1,0 +1,97 @@
+{
+  "all_shards_finite": true,
+  "all_shards_roundtrip_exact": true,
+  "attention_collected": false,
+  "batch_size": 8,
+  "candidate_coordinates": [],
+  "candidate_mechanism_formulas": [],
+  "case_count": 8,
+  "causal_intervention": false,
+  "confirmation_accessed": false,
+  "created_at_utc": "2026-07-21T05:37:38.015017+00:00",
+  "engineering_reexecution_exact": true,
+  "feedback_index_semantics": {
+    "axis_length": 23,
+    "executed_mask": "true when Hugging Face actually executed that feedback forward; this includes absorbing pad forwards for already-finished rows while other rows in the same batch remain active",
+    "invalid_fill": "exact BF16 zero",
+    "pre_eos_mask": "true only for feedback positions strictly before the row's EOS (or before the available feedback-width boundary when EOS is absent)",
+    "slot_f": "residual produced when generated suffix token f is fed back to predict token f+1; generate prefill is not duplicated on this axis"
+  },
+  "first_ordinal": 0,
+  "heldout_accessed": false,
+  "hidden_size": 4096,
+  "hooks_registered": 0,
+  "internal_reexecution_count": 2,
+  "last_ordinal": 7,
+  "layer_count": 41,
+  "layer_index_semantics": {
+    "0": "first model-API representation returned as hidden_states[0]; its architectural interpretation is defined by the frozen model code",
+    "1..N": "subsequent model-API representations in returned order; the final entry may include a model-specific final normalization",
+    "selection": "none; all returned layers are persisted in original order"
+  },
+  "mode": "engineering",
+  "model": "glm4",
+  "model_order_index": 1,
+  "phase578_repeat1_exact_replay_case_count": 8,
+  "phase578_repeat1_raw_identity": {
+    "path": "tests/glm5/result/phase578_gpt5_development_behavior_raw/01_glm4/raw_rows.jsonl.gz",
+    "phase578_receipt_entry": {
+      "path": "01_glm4/raw_rows.jsonl.gz",
+      "sha256": "4bb3602c66ad2e37343bbfa4627f6e19b3ef43ad33426eee9548ad864df6f0e6",
+      "size_bytes": 142649
+    },
+    "sha256": "4bb3602c66ad2e37343bbfa4627f6e19b3ef43ad33426eee9548ad864df6f0e6",
+    "size_bytes": 142649
+  },
+  "phase_id": "Phase579",
+  "schema_version": "phase579_model_trace_manifest.v1",
+  "scores_collected": false,
+  "sealed_accessed": false,
+  "shard_count": 1,
+  "shard_keys": [
+    "metadata_rows",
+    "prefill_residual",
+    "prompt_mask",
+    "feedback_residual",
+    "feedback_executed_mask",
+    "feedback_pre_eos_mask"
+  ],
+  "shard_total_bytes": 166607257,
+  "shards": [
+    {
+      "batch_index": 0,
+      "batch_size": 8,
+      "bf16": true,
+      "case_count": 8,
+      "engineering_reexecution_exact": true,
+      "exact_replay_rows": 8,
+      "feedback_shape": [
+        8,
+        41,
+        23,
+        4096
+      ],
+      "filename": "trace_shard_0000.pt",
+      "finite": true,
+      "first_ordinal": 0,
+      "hidden_size": 4096,
+      "invalid_feedback_exact_zero": true,
+      "last_ordinal": 7,
+      "layer_count": 41,
+      "path": "trace_shard_0000.pt",
+      "prefill_shape": [
+        8,
+        41,
+        39,
+        4096
+      ],
+      "prompt_width": 39,
+      "sha256": "968ec7e535c2ca7dfd302533e1a659e6f696cd436f6215f4f927a3ce0cfdab82",
+      "size_bytes": 166607257,
+      "suffix_width": 24,
+      "torch_save_load_roundtrip_exact": true
+    }
+  ],
+  "split": "development",
+  "storage_dtype": "torch.bfloat16"
+}

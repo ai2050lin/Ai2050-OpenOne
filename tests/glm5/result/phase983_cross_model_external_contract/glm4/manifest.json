@@ -1,0 +1,389 @@
+{
+  "admission_file_sha256": "4587ebbf293840460618a729e3c5a949e415f81de35aa6574bd053b7b47b500c",
+  "admission_sha256": "8362660b4fd17505949d0294b29b2b668d039d5fec31f055d5d32d937b52ab24",
+  "arms": {
+    "A": {
+      "instruction": "Solve the task and answer as directly as possible. Do not show your reasoning. End with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+      "name": "external_direct_instruction",
+      "role": "baseline"
+    },
+    "B": {
+      "instruction": "Work through the task step by step before answering. Then end with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+      "name": "external_deliberate_instruction",
+      "role": "candidate"
+    }
+  },
+  "batch_size": 8,
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536,
+    2048
+  ],
+  "created_at_utc": "2026-07-19T14:11:46+00:00",
+  "creation_state": {
+    "decision_computed": false,
+    "generation_performed": false,
+    "gpu_used": true,
+    "model_weights_loaded": true
+  },
+  "dataset_audit_content_sha256": "09b1fe5d599bd21df3a3dc70973f2b45b00325182205369740559cf07ac92d20",
+  "dataset_file_sha256": "5095ebf4748d3042728c514e7eae4f457888d58781a546497568ba301b3339db",
+  "dataset_namespace": "6799236d7fbf8d9de48d670a84380d870b96a0bfb382f928cb68b714f50c5a7e",
+  "dependency_seals": {
+    "model_registry": {
+      "bytes": 1350,
+      "path": "tests/gpt5/model_registry.py",
+      "sha256": "84c30398a9effa47791635fd25662426164460e036e59bb83a38c855db370864"
+    }
+  },
+  "engine": {
+    "arm_excluded_from_seed": true,
+    "compact_active_rows": true,
+    "dense_reference_forbidden_in_formal_run": true,
+    "dynamic_cache_batch_select_indices": true,
+    "first_eos_absorbing": true,
+    "model_namespace_in_seed": true,
+    "one_longest_rollout_for_checkpoints": true,
+    "private_generator_per_row": true,
+    "same_item_stream_seed_across_arms": true,
+    "same_semantic_twin_seed_across_option_surfaces": true,
+    "swap_side_excluded_from_seed": true,
+    "two_by_two_arm_option_crn_block": true
+  },
+  "eos_token_ids": [
+    151329,
+    151336,
+    151338
+  ],
+  "expected_rows": 1536,
+  "experiment": "fresh256_option_swap_cross_model_external_contract",
+  "holdout": false,
+  "holdout_loaded": false,
+  "loaded_model_identity": {
+    "all_special_ids": [
+      151329,
+      151330,
+      151331,
+      151332,
+      151333,
+      151334,
+      151335,
+      151336,
+      151337,
+      151338,
+      151339,
+      151340,
+      151341,
+      151342
+    ],
+    "architecture": [
+      "GlmForCausalLM"
+    ],
+    "artifact_identity": {
+      "engineering_identity_sha256": "4c67065f050daacf43b5ad93745522351d626f6395c4eb4e6167cac07be90986",
+      "local_dir": "D:\\develop\\model\\ZhipuAI\\glm-4-9b-chat-hf",
+      "logical_name": "glm4",
+      "repo_id": "zai-org/glm-4-9b-chat-hf",
+      "small_files": {
+        "config.json": {
+          "sha256": "8ec64bc0dff4835a800b9eceb059e2b8263f783c898812175aa1ccdda074f596",
+          "size_bytes": 661
+        },
+        "generation_config.json": {
+          "sha256": "1871e89e9388f22b0704fb4d498311e67fda1e812adc066543b09a05a4da3667",
+          "size_bytes": 160
+        },
+        "model.safetensors.index.json": {
+          "sha256": "a487cf9538612b812f03e35621c32d97df19e26197c348c44fd74601fa0c6b9b",
+          "size_bytes": 36594
+        },
+        "tokenizer_config.json": {
+          "sha256": "5ac39fe659e4fafd9e93dc158883590a73339ced96e1a91c767cd12a9cb3f8df",
+          "size_bytes": 6116
+        }
+      },
+      "weight_file_count": 4,
+      "weight_file_registry": [
+        {
+          "name": "model-00001-of-00004.safetensors",
+          "size_bytes": 4984133600
+        },
+        {
+          "name": "model-00002-of-00004.safetensors",
+          "size_bytes": 4895075168
+        },
+        {
+          "name": "model-00003-of-00004.safetensors",
+          "size_bytes": 4895075184
+        },
+        {
+          "name": "model-00004-of-00004.safetensors",
+          "size_bytes": 4025669744
+        }
+      ],
+      "weight_note": "Shard names/sizes are engineering identity only; a future formal protocol must seal full artifact hashes independently.",
+      "weight_total_bytes": 18799953696
+    },
+    "chat_template_sha256": "27288f957f8364c990a2ce13bf5f8bf86921c4bce467ce698c76dcc69466d821",
+    "cuda_only_no_cpu_or_disk_offload": true,
+    "eos_identity": {
+      "effective_eos_token_ids": [
+        151329,
+        151336,
+        151338
+      ],
+      "multiple_effective_eos": true,
+      "sources": {
+        "inspected_config": [
+          151329,
+          151336,
+          151338
+        ],
+        "inspected_generation_config": [
+          151329,
+          151336,
+          151338
+        ],
+        "loaded_model_config": [
+          151329,
+          151336,
+          151338
+        ],
+        "loaded_model_generation_config": [
+          151329,
+          151336,
+          151338
+        ],
+        "tokenizer": [
+          151329
+        ]
+      }
+    },
+    "gpu_used": true,
+    "hf_device_map": {
+      "<direct_parameter_and_buffer_audit>": "cuda:0"
+    },
+    "input_device": "cuda:0",
+    "loaded_attn_implementation": "sdpa",
+    "loaded_model_class": "GlmForCausalLM",
+    "loaded_quantization": {
+      "attn_implementation": "sdpa",
+      "backend": "bitsandbytes",
+      "device_map": "auto",
+      "floating_parameter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "linear8bitlt_module_count": 240,
+      "llm_int8_enable_fp32_cpu_offload": false,
+      "load_in_8bit": true,
+      "local_files_only": true,
+      "model_reports_loaded_in_8bit": true,
+      "non_quantized_dtype": "torch.bfloat16",
+      "quantizer_reports_load_in_8bit": true
+    },
+    "model_class": "GlmForCausalLM",
+    "model_class_declares_sdpa": true,
+    "model_forward_has_logits_to_keep": true,
+    "model_key": "glm4",
+    "model_order_index": 1,
+    "model_type": "glm",
+    "native_generation_prefill": {
+      "assistant_prefill_text": "<|assistant|>",
+      "assistant_prefill_text_sha256": "b404d126f0754c09f7dc3d7129f2c0f96282b3a5b138183fb93e5ab9f428e9b1",
+      "assistant_prefill_token_ids": [
+        151337
+      ],
+      "assistant_prefill_token_ids_sha256": "f7591cd90300a15830d91fbba2f87433a7b37fbbb45023792e9671a53c49cb01",
+      "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+      "with_generation_prompt_sha256": "1f63fe6ab7763a5b4bd32e25bd982f365da5d9482b0f6dbda0d174b94bed29f7",
+      "without_generation_prompt_sha256": "cc37a2239c7306e9148651d96126d61320927900c1ec1432308ac4e6db9461a3"
+    },
+    "native_single_user_probe": {
+      "input_token_count": 15,
+      "rendered_sha256": "28eb4fd38d14ed799561931d37b62b57c75e6e29cbae33847c4378af423068b9"
+    },
+    "pad_token_id": 151329,
+    "planned_quantization": {
+      "attn_implementation": "sdpa",
+      "backend": "bitsandbytes",
+      "device_map": "auto",
+      "llm_int8_enable_fp32_cpu_offload": false,
+      "load_in_8bit": true,
+      "local_files_only": true,
+      "non_quantized_dtype": "torch.bfloat16"
+    },
+    "schema_version": 1,
+    "tokenizer_class": "TokenizersBackend",
+    "tokenizer_length": 151343,
+    "weights_loaded": true
+  },
+  "loaded_tokenizer_identity": {
+    "all_special_ids": [
+      151329,
+      151330,
+      151331,
+      151332,
+      151333,
+      151334,
+      151335,
+      151336,
+      151337,
+      151338,
+      151339,
+      151340,
+      151341,
+      151342
+    ],
+    "chat_template_sha256": "27288f957f8364c990a2ce13bf5f8bf86921c4bce467ce698c76dcc69466d821",
+    "effective_eos_token_ids": [
+      151329,
+      151336,
+      151338
+    ],
+    "effective_pad_token_id": 151329,
+    "native_generation_prefill": {
+      "assistant_prefill_text": "<|assistant|>",
+      "assistant_prefill_text_sha256": "b404d126f0754c09f7dc3d7129f2c0f96282b3a5b138183fb93e5ab9f428e9b1",
+      "assistant_prefill_token_ids": [
+        151337
+      ],
+      "assistant_prefill_token_ids_sha256": "f7591cd90300a15830d91fbba2f87433a7b37fbbb45023792e9671a53c49cb01",
+      "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+      "with_generation_prompt_sha256": "1f63fe6ab7763a5b4bd32e25bd982f365da5d9482b0f6dbda0d174b94bed29f7",
+      "without_generation_prompt_sha256": "cc37a2239c7306e9148651d96126d61320927900c1ec1432308ac4e6db9461a3"
+    },
+    "native_thinking_switch_used": false,
+    "probe": {
+      "arm_A_input_ids_sha256": "fef81022388a7b463f9b752f43a8c70192cd20d67ff4eb930e441083eeab0c80",
+      "arm_A_prefix_sha256": "c8486216f1bb15d894fcb06703a9ca1e314ff527fd9c804619b39269d6e0bd1f",
+      "arm_A_prompt_tokens": 115,
+      "arm_B_input_ids_sha256": "0153850d5b43df1e2071773f58859262f3a708d59d45d73e4359fc00d917a3e7",
+      "arm_B_prefix_sha256": "fd969f503f4448c79b60812bec8e05e46a76537183b0ff32f2c4d975d49974c1",
+      "arm_B_prompt_tokens": 109,
+      "item_id": "p983_x_2392a113c3b974a2f92f"
+    },
+    "tokenizer_class": "TokenizersBackend",
+    "tokenizer_eos_token_id": 151329,
+    "tokenizer_length": 151343,
+    "unexpected_special_token_ids": [
+      151330,
+      151331,
+      151332,
+      151333,
+      151334,
+      151335,
+      151337,
+      151339,
+      151340,
+      151341,
+      151342
+    ]
+  },
+  "manifest_sha256": "3c846681d02b4a049715a87a4597f8f5749f8edbb62bb2fb781203e19eeea44b",
+  "max_new_tokens": 2048,
+  "mechanism": false,
+  "mechanism_authorized": false,
+  "model_artifact_identity_sha256": "8073e3f6129d4e92d1b77d834d346787269789f443859714467eb45e67f76ce5",
+  "model_key": "glm4",
+  "model_order_index": 1,
+  "pad_token_id": 151329,
+  "phase": 983,
+  "protocol_file_sha256": "c3be1443485185ec62004ee44da020949603cc73c9a561aff0e30470bf7c013f",
+  "protocol_sha256": "6799236d7fbf8d9de48d670a84380d870b96a0bfb382f928cb68b714f50c5a7e",
+  "qualification_sha256": "3718de95c54969efd1c136624fc976d150c1cde5a3f938435df452210c38b91c",
+  "quantization": {
+    "attn_implementation": "sdpa",
+    "load_in_8bit": true,
+    "non_quantized_compute_dtype": "bfloat16",
+    "same_policy_all_models": true
+  },
+  "runtime_versions": {
+    "bitsandbytes": "0.49.2",
+    "cuda_compute_capability": [
+      12,
+      0
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_name": "NVIDIA GeForce RTX 5080",
+    "cuda_matmul_allow_tf32": false,
+    "cuda_total_memory_bytes": 17094475776,
+    "cudnn": "91900",
+    "cudnn_allow_tf32": false,
+    "cudnn_benchmark": false,
+    "deterministic_algorithms": false,
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9",
+    "sdpa_flash_enabled": true,
+    "sdpa_math_enabled": true,
+    "sdpa_memory_efficient_enabled": true,
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "transformers": "5.12.0"
+  },
+  "sampling": {
+    "min_p": 0.0,
+    "temperature": 0.6,
+    "top_k": 20,
+    "top_p": 0.95
+  },
+  "schema_version": 1,
+  "script_seals": {
+    "admission": {
+      "bytes": 18215,
+      "path": "tests/glm5/phase983_cross_model_admission.py",
+      "sha256": "21babf7c4b8583be7805e0c91ec23919cbc1f8bde5173c688876afe05252ef8e"
+    },
+    "audit": {
+      "bytes": 66964,
+      "path": "tests/glm5/phase983_cross_model_audit.py",
+      "sha256": "996b582465ff4c14681be7f20e25450dcc699f1372352bcde972e76640a6be54"
+    },
+    "core": {
+      "bytes": 21549,
+      "path": "tests/glm5/phase983_cross_model_core.py",
+      "sha256": "ce105e30ffe9062a23e595cef8a6bba7f15fd164bb69d4d4e09ae139f087bf0a"
+    },
+    "dataset": {
+      "bytes": 87785,
+      "path": "tests/glm5/phase983_option_swap_dataset.py",
+      "sha256": "1d599aeaf0770bf44d9726d33a568f4e57a5ee2b8a0e8d82032fefdeee59ec26"
+    },
+    "engine": {
+      "bytes": 54444,
+      "path": "tests/glm5/phase983_cross_model_engine.py",
+      "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+    },
+    "gate": {
+      "bytes": 52471,
+      "path": "tests/glm5/phase983_cross_model_gate.py",
+      "sha256": "7bee69fea4217aa4e5465207cc53a5278b915cfa62ab220373956a524064321c"
+    },
+    "orchestrator": {
+      "bytes": 35793,
+      "path": "tests/glm5/phase983_cross_model_orchestrator.py",
+      "sha256": "f45b8867863940236d900b1564f06db616168d5650af318d0c65de8e78af9132"
+    },
+    "protocol": {
+      "bytes": 42993,
+      "path": "tests/glm5/phase983_cross_model_protocol.py",
+      "sha256": "06467ceb2a6afcf4fbc901915fe90c019228315fd437d51123c15e25c16e1567"
+    },
+    "qualification": {
+      "bytes": 37398,
+      "path": "tests/glm5/phase983_cross_model_qualification.py",
+      "sha256": "7981d570dfec3f096b0f8fa686a85b6d691e77cd5883d7ebdcdfa15a5001199d"
+    },
+    "runner": {
+      "bytes": 62642,
+      "path": "tests/glm5/phase983_cross_model_runner.py",
+      "sha256": "a9689de46a80dbc7aa6d2f44d26f03e6440421910576844078a121cb0eeac404"
+    }
+  },
+  "streams": [
+    0,
+    1,
+    2
+  ]
+}

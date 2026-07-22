@@ -1,0 +1,381 @@
+{
+  "admission_file_sha256": "4587ebbf293840460618a729e3c5a949e415f81de35aa6574bd053b7b47b500c",
+  "admission_sha256": "8362660b4fd17505949d0294b29b2b668d039d5fec31f055d5d32d937b52ab24",
+  "arms": {
+    "A": {
+      "instruction": "Solve the task and answer as directly as possible. Do not show your reasoning. End with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+      "name": "external_direct_instruction",
+      "role": "baseline"
+    },
+    "B": {
+      "instruction": "Work through the task step by step before answering. Then end with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+      "name": "external_deliberate_instruction",
+      "role": "candidate"
+    }
+  },
+  "batch_size": 8,
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536,
+    2048
+  ],
+  "created_at_utc": "2026-07-19T04:17:02+00:00",
+  "creation_state": {
+    "decision_computed": false,
+    "generation_performed": false,
+    "gpu_used": true,
+    "model_weights_loaded": true
+  },
+  "dataset_audit_content_sha256": "09b1fe5d599bd21df3a3dc70973f2b45b00325182205369740559cf07ac92d20",
+  "dataset_file_sha256": "5095ebf4748d3042728c514e7eae4f457888d58781a546497568ba301b3339db",
+  "dataset_namespace": "6799236d7fbf8d9de48d670a84380d870b96a0bfb382f928cb68b714f50c5a7e",
+  "dependency_seals": {
+    "model_registry": {
+      "bytes": 1350,
+      "path": "tests/gpt5/model_registry.py",
+      "sha256": "84c30398a9effa47791635fd25662426164460e036e59bb83a38c855db370864"
+    }
+  },
+  "engine": {
+    "arm_excluded_from_seed": true,
+    "compact_active_rows": true,
+    "dense_reference_forbidden_in_formal_run": true,
+    "dynamic_cache_batch_select_indices": true,
+    "first_eos_absorbing": true,
+    "model_namespace_in_seed": true,
+    "one_longest_rollout_for_checkpoints": true,
+    "private_generator_per_row": true,
+    "same_item_stream_seed_across_arms": true,
+    "same_semantic_twin_seed_across_option_surfaces": true,
+    "swap_side_excluded_from_seed": true,
+    "two_by_two_arm_option_crn_block": true
+  },
+  "eos_token_ids": [
+    151643,
+    151645
+  ],
+  "expected_rows": 1536,
+  "experiment": "fresh256_option_swap_cross_model_external_contract",
+  "holdout": false,
+  "holdout_loaded": false,
+  "loaded_model_identity": {
+    "all_special_ids": [
+      151643,
+      151644,
+      151645,
+      151646,
+      151647,
+      151648,
+      151649,
+      151650,
+      151651,
+      151652,
+      151653,
+      151654,
+      151655,
+      151656
+    ],
+    "architecture": [
+      "Qwen3ForCausalLM"
+    ],
+    "artifact_identity": {
+      "engineering_identity_sha256": "0baf8222a097390887f5b395ddc37c20ce04957eeea006acebd4d67d2dec04b1",
+      "local_dir": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+      "logical_name": "qwen3",
+      "repo_id": "Qwen/Qwen3-4B",
+      "small_files": {
+        "config.json": {
+          "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+          "size_bytes": 726
+        },
+        "generation_config.json": {
+          "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2",
+          "size_bytes": 239
+        },
+        "model.safetensors.index.json": {
+          "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2",
+          "size_bytes": 32819
+        },
+        "tokenizer_config.json": {
+          "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+          "size_bytes": 9732
+        }
+      },
+      "weight_file_count": 3,
+      "weight_file_registry": [
+        {
+          "name": "model-00001-of-00003.safetensors",
+          "size_bytes": 3957900840
+        },
+        {
+          "name": "model-00002-of-00003.safetensors",
+          "size_bytes": 3987450520
+        },
+        {
+          "name": "model-00003-of-00003.safetensors",
+          "size_bytes": 99630640
+        }
+      ],
+      "weight_note": "Shard names/sizes are engineering identity only; a future formal protocol must seal full artifact hashes independently.",
+      "weight_total_bytes": 8044982000
+    },
+    "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+    "cuda_only_no_cpu_or_disk_offload": true,
+    "eos_identity": {
+      "effective_eos_token_ids": [
+        151643,
+        151645
+      ],
+      "multiple_effective_eos": true,
+      "sources": {
+        "inspected_config": [
+          151645
+        ],
+        "inspected_generation_config": [
+          151643,
+          151645
+        ],
+        "loaded_model_config": [
+          151645
+        ],
+        "loaded_model_generation_config": [
+          151643,
+          151645
+        ],
+        "tokenizer": [
+          151645
+        ]
+      }
+    },
+    "gpu_used": true,
+    "hf_device_map": {
+      "<direct_parameter_and_buffer_audit>": "cuda:0"
+    },
+    "input_device": "cuda:0",
+    "loaded_attn_implementation": "sdpa",
+    "loaded_model_class": "Qwen3ForCausalLM",
+    "loaded_quantization": {
+      "attn_implementation": "sdpa",
+      "backend": "bitsandbytes",
+      "device_map": "auto",
+      "floating_parameter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "linear8bitlt_module_count": 252,
+      "llm_int8_enable_fp32_cpu_offload": false,
+      "load_in_8bit": true,
+      "local_files_only": true,
+      "model_reports_loaded_in_8bit": true,
+      "non_quantized_dtype": "torch.bfloat16",
+      "quantizer_reports_load_in_8bit": true
+    },
+    "model_class": "Qwen3ForCausalLM",
+    "model_class_declares_sdpa": true,
+    "model_forward_has_logits_to_keep": true,
+    "model_key": "qwen3",
+    "model_order_index": 0,
+    "model_type": "qwen3",
+    "native_generation_prefill": {
+      "assistant_prefill_text": "<|im_start|>assistant\n",
+      "assistant_prefill_text_sha256": "fb3832354a86f4328bdfbf33691473fc7c08824ff6bd056f4b90c95d7fe9eaa4",
+      "assistant_prefill_token_ids": [
+        151644,
+        77091,
+        198
+      ],
+      "assistant_prefill_token_ids_sha256": "ef5941940ee034899cf442aef3e9af7a6c443ade9dd4afaa5d7fa2c4defd9d3f",
+      "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+      "with_generation_prompt_sha256": "59409ee1d18ef461f132ef4513acddabf74aac34807831292e072c431cae08d1",
+      "without_generation_prompt_sha256": "4fc48720b1620283fa92cdec3857b1f4edfd0759e1e9e345f638cd3d2df09b59"
+    },
+    "native_single_user_probe": {
+      "input_token_count": 18,
+      "rendered_sha256": "5f0577d876ea5fc7c88e142792d88930444c2d8a679d10b6270a9deccb15226c"
+    },
+    "pad_token_id": 151643,
+    "planned_quantization": {
+      "attn_implementation": "sdpa",
+      "backend": "bitsandbytes",
+      "device_map": "auto",
+      "llm_int8_enable_fp32_cpu_offload": false,
+      "load_in_8bit": true,
+      "local_files_only": true,
+      "non_quantized_dtype": "torch.bfloat16"
+    },
+    "schema_version": 1,
+    "tokenizer_class": "Qwen2Tokenizer",
+    "tokenizer_length": 151669,
+    "weights_loaded": true
+  },
+  "loaded_tokenizer_identity": {
+    "all_special_ids": [
+      151643,
+      151644,
+      151645,
+      151646,
+      151647,
+      151648,
+      151649,
+      151650,
+      151651,
+      151652,
+      151653,
+      151654,
+      151655,
+      151656
+    ],
+    "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+    "effective_eos_token_ids": [
+      151643,
+      151645
+    ],
+    "effective_pad_token_id": 151643,
+    "native_generation_prefill": {
+      "assistant_prefill_text": "<|im_start|>assistant\n",
+      "assistant_prefill_text_sha256": "fb3832354a86f4328bdfbf33691473fc7c08824ff6bd056f4b90c95d7fe9eaa4",
+      "assistant_prefill_token_ids": [
+        151644,
+        77091,
+        198
+      ],
+      "assistant_prefill_token_ids_sha256": "ef5941940ee034899cf442aef3e9af7a6c443ade9dd4afaa5d7fa2c4defd9d3f",
+      "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+      "with_generation_prompt_sha256": "59409ee1d18ef461f132ef4513acddabf74aac34807831292e072c431cae08d1",
+      "without_generation_prompt_sha256": "4fc48720b1620283fa92cdec3857b1f4edfd0759e1e9e345f638cd3d2df09b59"
+    },
+    "native_thinking_switch_used": false,
+    "probe": {
+      "arm_A_input_ids_sha256": "ed3fe5ca4153e5e90455546feceb3c41ebbb0d64156f2cf38e2e52021d9591ff",
+      "arm_A_prefix_sha256": "697d1e60981fc847341904b05ca66a0d3bd6c6098c46d3988940a8f4e1d00387",
+      "arm_A_prompt_tokens": 133,
+      "arm_B_input_ids_sha256": "89c8a5d256a5c403fad229a5ac07a3421d7057b541b2e275ac1271f67b33b362",
+      "arm_B_prefix_sha256": "4663540ebe6479b4001483383419ad7d8aab8cc3b47641f7ceb21ac287ccc51b",
+      "arm_B_prompt_tokens": 127,
+      "item_id": "p983_x_2392a113c3b974a2f92f"
+    },
+    "tokenizer_class": "Qwen2Tokenizer",
+    "tokenizer_eos_token_id": 151645,
+    "tokenizer_length": 151669,
+    "unexpected_special_token_ids": [
+      151644,
+      151646,
+      151647,
+      151648,
+      151649,
+      151650,
+      151651,
+      151652,
+      151653,
+      151654,
+      151655,
+      151656
+    ]
+  },
+  "manifest_sha256": "36a8d231c2b4fbde2f807140a8e0f0fdf5039ecf1afa6fafe89df54f05b6a47c",
+  "max_new_tokens": 2048,
+  "mechanism": false,
+  "mechanism_authorized": false,
+  "model_artifact_identity_sha256": "c99d82c36beb99cb5bcdce8a29d79aaec24b188a527fbdf504c99c0f502f438e",
+  "model_key": "qwen3",
+  "model_order_index": 0,
+  "pad_token_id": 151643,
+  "phase": 983,
+  "protocol_file_sha256": "c3be1443485185ec62004ee44da020949603cc73c9a561aff0e30470bf7c013f",
+  "protocol_sha256": "6799236d7fbf8d9de48d670a84380d870b96a0bfb382f928cb68b714f50c5a7e",
+  "qualification_sha256": "3718de95c54969efd1c136624fc976d150c1cde5a3f938435df452210c38b91c",
+  "quantization": {
+    "attn_implementation": "sdpa",
+    "load_in_8bit": true,
+    "non_quantized_compute_dtype": "bfloat16",
+    "same_policy_all_models": true
+  },
+  "runtime_versions": {
+    "bitsandbytes": "0.49.2",
+    "cuda_compute_capability": [
+      12,
+      0
+    ],
+    "cuda_device_index": 0,
+    "cuda_device_name": "NVIDIA GeForce RTX 5080",
+    "cuda_matmul_allow_tf32": false,
+    "cuda_total_memory_bytes": 17094475776,
+    "cudnn": "91900",
+    "cudnn_allow_tf32": false,
+    "cudnn_benchmark": false,
+    "deterministic_algorithms": false,
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.9",
+    "sdpa_flash_enabled": true,
+    "sdpa_math_enabled": true,
+    "sdpa_memory_efficient_enabled": true,
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "transformers": "5.12.0"
+  },
+  "sampling": {
+    "min_p": 0.0,
+    "temperature": 0.6,
+    "top_k": 20,
+    "top_p": 0.95
+  },
+  "schema_version": 1,
+  "script_seals": {
+    "admission": {
+      "bytes": 18215,
+      "path": "tests/glm5/phase983_cross_model_admission.py",
+      "sha256": "21babf7c4b8583be7805e0c91ec23919cbc1f8bde5173c688876afe05252ef8e"
+    },
+    "audit": {
+      "bytes": 66964,
+      "path": "tests/glm5/phase983_cross_model_audit.py",
+      "sha256": "996b582465ff4c14681be7f20e25450dcc699f1372352bcde972e76640a6be54"
+    },
+    "core": {
+      "bytes": 21549,
+      "path": "tests/glm5/phase983_cross_model_core.py",
+      "sha256": "ce105e30ffe9062a23e595cef8a6bba7f15fd164bb69d4d4e09ae139f087bf0a"
+    },
+    "dataset": {
+      "bytes": 87785,
+      "path": "tests/glm5/phase983_option_swap_dataset.py",
+      "sha256": "1d599aeaf0770bf44d9726d33a568f4e57a5ee2b8a0e8d82032fefdeee59ec26"
+    },
+    "engine": {
+      "bytes": 54444,
+      "path": "tests/glm5/phase983_cross_model_engine.py",
+      "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+    },
+    "gate": {
+      "bytes": 52471,
+      "path": "tests/glm5/phase983_cross_model_gate.py",
+      "sha256": "7bee69fea4217aa4e5465207cc53a5278b915cfa62ab220373956a524064321c"
+    },
+    "orchestrator": {
+      "bytes": 35793,
+      "path": "tests/glm5/phase983_cross_model_orchestrator.py",
+      "sha256": "f45b8867863940236d900b1564f06db616168d5650af318d0c65de8e78af9132"
+    },
+    "protocol": {
+      "bytes": 42993,
+      "path": "tests/glm5/phase983_cross_model_protocol.py",
+      "sha256": "06467ceb2a6afcf4fbc901915fe90c019228315fd437d51123c15e25c16e1567"
+    },
+    "qualification": {
+      "bytes": 37398,
+      "path": "tests/glm5/phase983_cross_model_qualification.py",
+      "sha256": "7981d570dfec3f096b0f8fa686a85b6d691e77cd5883d7ebdcdfa15a5001199d"
+    },
+    "runner": {
+      "bytes": 62642,
+      "path": "tests/glm5/phase983_cross_model_runner.py",
+      "sha256": "a9689de46a80dbc7aa6d2f44d26f03e6440421910576844078a121cb0eeac404"
+    }
+  },
+  "streams": [
+    0,
+    1,
+    2
+  ]
+}

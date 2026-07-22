@@ -1,0 +1,942 @@
+{
+  "analysis_name": "sealed_NO_GO_raw_row_failure_morphology_detail",
+  "analysis_scope": "CPU-only post-hoc descriptive raw-row audit",
+  "can_authorize_holdout": false,
+  "can_authorize_mechanism": false,
+  "can_set_primary_decision": false,
+  "created_at_utc": "2026-07-20T02:05:20+00:00",
+  "detail_sha256": "5d94df44a369a4ae22f108622a3d25b36551f2d45e109436ed9c7177ec11759c",
+  "experiment": "fresh256_option_swap_cross_model_external_contract",
+  "key_observation": "Qwen3 generated a literal <think> opener in all A and B rows, while DS7B's native assistant prefill opened <think> for both arms.  The intervention therefore cannot be interpreted as verified no-think versus think behavior.",
+  "measurement_warnings": [
+    "A/B are assigned natural-language instructions, not verified latent modes.",
+    "Literal <think> markers measure visible serialization, not cognition.",
+    "GLM4 has no comparable literal think tag, so adherence is unscored.",
+    "Exact/last FINAL content counts are exploratory and cannot replace strict V.",
+    "The global case-insensitive FINAL-like count intentionally makes the preregistered parser stricter than a last-label parser.",
+    "Option-swapped twins and three streams are paired robustness views, not independent samples."
+  ],
+  "models": {
+    "deepseek7b": {
+      "native_assistant_prefill_text": "<｜Assistant｜><think>\n",
+      "native_prefill_opens_literal_think": true,
+      "streams": {
+        "stream_0": {
+          "A": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 21
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 31
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 235,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 203,
+            "exact_terminal_FINAL_present": 204,
+            "generated_literal_think_close_count": 235,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 15,
+              "0257-0512": 64,
+              "0513-1024": 102,
+              "1025-1536": 33,
+              "1537-2048": 42
+            },
+            "invalid_FINAL_contract_shapes": {
+              "no_FINAL_like_marker": 31
+            },
+            "last_standalone_FINAL_correct_exploratory": 203,
+            "last_standalone_FINAL_present_exploratory": 204,
+            "marker_like_count_histogram": {
+              "0": 52,
+              "1": 204
+            },
+            "native_prefill_literal_think_open": true,
+            "option_swap_twin_summary": {
+              "both_V": 87,
+              "exactly_one_V": 29,
+              "neither_V": 12,
+              "same_terminal_state": 99,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 203,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 21,
+              "I_protocol": 31,
+              "I_sem": 1,
+              "V": 203
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 28
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 7
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 231,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 219,
+            "exact_terminal_FINAL_present": 221,
+            "generated_literal_think_close_count": 231,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 4,
+              "0257-0512": 60,
+              "0513-1024": 98,
+              "1025-1536": 40,
+              "1537-2048": 54
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 5,
+              "no_FINAL_like_marker": 2
+            },
+            "last_standalone_FINAL_correct_exploratory": 223,
+            "last_standalone_FINAL_present_exploratory": 225,
+            "marker_like_count_histogram": {
+              "0": 30,
+              "1": 226
+            },
+            "native_prefill_literal_think_open": true,
+            "option_swap_twin_summary": {
+              "both_V": 99,
+              "exactly_one_V": 21,
+              "neither_V": 8,
+              "same_terminal_state": 107,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 219,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 28,
+              "I_protocol": 7,
+              "I_sem": 2,
+              "V": 219
+            }
+          }
+        },
+        "stream_1": {
+          "A": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 24,
+              "CENSORED_WITH_MALFORMED_OR_NONTERMINAL_FINAL": 1
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 38
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 234,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 189,
+            "exact_terminal_FINAL_present": 193,
+            "generated_literal_think_close_count": 234,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 13,
+              "0257-0512": 76,
+              "0513-1024": 95,
+              "1025-1536": 35,
+              "1537-2048": 37
+            },
+            "invalid_FINAL_contract_shapes": {
+              "no_FINAL_like_marker": 38
+            },
+            "last_standalone_FINAL_correct_exploratory": 189,
+            "last_standalone_FINAL_present_exploratory": 193,
+            "marker_like_count_histogram": {
+              "0": 62,
+              "1": 194
+            },
+            "native_prefill_literal_think_open": true,
+            "option_swap_twin_summary": {
+              "both_V": 78,
+              "exactly_one_V": 33,
+              "neither_V": 17,
+              "same_terminal_state": 92,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 189,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 25,
+              "I_protocol": 38,
+              "I_sem": 4,
+              "V": 189
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 31
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 7
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 225,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 216,
+            "exact_terminal_FINAL_present": 218,
+            "generated_literal_think_close_count": 225,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 5,
+              "0257-0512": 57,
+              "0513-1024": 105,
+              "1025-1536": 41,
+              "1537-2048": 48
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 3,
+              "no_FINAL_like_marker": 4
+            },
+            "last_standalone_FINAL_correct_exploratory": 218,
+            "last_standalone_FINAL_present_exploratory": 220,
+            "marker_like_count_histogram": {
+              "0": 35,
+              "1": 221
+            },
+            "native_prefill_literal_think_open": true,
+            "option_swap_twin_summary": {
+              "both_V": 99,
+              "exactly_one_V": 18,
+              "neither_V": 11,
+              "same_terminal_state": 109,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 216,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 31,
+              "I_protocol": 7,
+              "I_sem": 2,
+              "V": 216
+            }
+          }
+        },
+        "stream_2": {
+          "A": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 26
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 32
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 230,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 194,
+            "exact_terminal_FINAL_present": 198,
+            "generated_literal_think_close_count": 230,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 13,
+              "0257-0512": 77,
+              "0513-1024": 90,
+              "1025-1536": 34,
+              "1537-2048": 42
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 2,
+              "no_FINAL_like_marker": 30
+            },
+            "last_standalone_FINAL_correct_exploratory": 194,
+            "last_standalone_FINAL_present_exploratory": 198,
+            "marker_like_count_histogram": {
+              "0": 56,
+              "1": 200
+            },
+            "native_prefill_literal_think_open": true,
+            "option_swap_twin_summary": {
+              "both_V": 82,
+              "exactly_one_V": 30,
+              "neither_V": 16,
+              "same_terminal_state": 95,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 194,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 26,
+              "I_protocol": 32,
+              "I_sem": 4,
+              "V": 194
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 26
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 11
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 230,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 219,
+            "exact_terminal_FINAL_present": 219,
+            "generated_literal_think_close_count": 230,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 2,
+              "0257-0512": 55,
+              "0513-1024": 113,
+              "1025-1536": 41,
+              "1537-2048": 45
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 6,
+              "no_FINAL_like_marker": 5
+            },
+            "last_standalone_FINAL_correct_exploratory": 225,
+            "last_standalone_FINAL_present_exploratory": 225,
+            "marker_like_count_histogram": {
+              "0": 31,
+              "1": 225
+            },
+            "native_prefill_literal_think_open": true,
+            "option_swap_twin_summary": {
+              "both_V": 103,
+              "exactly_one_V": 13,
+              "neither_V": 12,
+              "same_terminal_state": 114,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 219,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 26,
+              "I_protocol": 11,
+              "I_sem": 0,
+              "V": 219
+            }
+          }
+        }
+      }
+    },
+    "glm4": {
+      "native_assistant_prefill_text": "<|assistant|>",
+      "native_prefill_opens_literal_think": false,
+      "streams": {
+        "stream_0": {
+          "A": {
+            "C_subtypes": {},
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 18
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 0,
+            "effective_think_open_and_generated_close_count": 0,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 141,
+            "exact_terminal_FINAL_present": 238,
+            "generated_literal_think_close_count": 0,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 256,
+              "0257-0512": 0,
+              "0513-1024": 0,
+              "1025-1536": 0,
+              "1537-2048": 0
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 3,
+              "no_FINAL_like_marker": 15
+            },
+            "last_standalone_FINAL_correct_exploratory": 141,
+            "last_standalone_FINAL_present_exploratory": 238,
+            "marker_like_count_histogram": {
+              "0": 15,
+              "1": 241
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 32,
+              "exactly_one_V": 77,
+              "neither_V": 19,
+              "same_terminal_state": 44,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 141,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 0,
+              "I_protocol": 18,
+              "I_sem": 97,
+              "V": 141
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 22
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 90
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 0,
+            "effective_think_open_and_generated_close_count": 0,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 108,
+            "exact_terminal_FINAL_present": 149,
+            "generated_literal_think_close_count": 0,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 152,
+              "0257-0512": 74,
+              "0513-1024": 8,
+              "1025-1536": 0,
+              "1537-2048": 22
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 53,
+              "exact_terminal_FINAL_plus_additional_marker_like_text": 5,
+              "no_FINAL_like_marker": 32
+            },
+            "last_standalone_FINAL_correct_exploratory": 108,
+            "last_standalone_FINAL_present_exploratory": 149,
+            "marker_like_count_histogram": {
+              "0": 54,
+              "1": 196,
+              "2": 6
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 31,
+              "exactly_one_V": 42,
+              "neither_V": 55,
+              "same_terminal_state": 60,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 104,
+            "strict_V_minus_exact_terminal_correct": -4,
+            "terminal_states": {
+              "C": 22,
+              "I_protocol": 90,
+              "I_sem": 40,
+              "V": 104
+            }
+          }
+        },
+        "stream_1": {
+          "A": {
+            "C_subtypes": {},
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 14
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 0,
+            "effective_think_open_and_generated_close_count": 0,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 131,
+            "exact_terminal_FINAL_present": 242,
+            "generated_literal_think_close_count": 0,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 256,
+              "0257-0512": 0,
+              "0513-1024": 0,
+              "1025-1536": 0,
+              "1537-2048": 0
+            },
+            "invalid_FINAL_contract_shapes": {
+              "no_FINAL_like_marker": 14
+            },
+            "last_standalone_FINAL_correct_exploratory": 131,
+            "last_standalone_FINAL_present_exploratory": 242,
+            "marker_like_count_histogram": {
+              "0": 14,
+              "1": 242
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 24,
+              "exactly_one_V": 83,
+              "neither_V": 21,
+              "same_terminal_state": 42,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 131,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 0,
+              "I_protocol": 14,
+              "I_sem": 111,
+              "V": 131
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 29,
+              "CENSORED_WITH_MALFORMED_OR_NONTERMINAL_FINAL": 1
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 66
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 0,
+            "effective_think_open_and_generated_close_count": 0,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 122,
+            "exact_terminal_FINAL_present": 162,
+            "generated_literal_think_close_count": 0,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 145,
+              "0257-0512": 73,
+              "0513-1024": 7,
+              "1025-1536": 1,
+              "1537-2048": 30
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 40,
+              "exact_terminal_FINAL_plus_additional_marker_like_text": 2,
+              "no_FINAL_like_marker": 24
+            },
+            "last_standalone_FINAL_correct_exploratory": 122,
+            "last_standalone_FINAL_present_exploratory": 162,
+            "marker_like_count_histogram": {
+              "0": 53,
+              "1": 197,
+              "2": 5,
+              "68": 1
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 39,
+              "exactly_one_V": 42,
+              "neither_V": 47,
+              "same_terminal_state": 65,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 120,
+            "strict_V_minus_exact_terminal_correct": -2,
+            "terminal_states": {
+              "C": 30,
+              "I_protocol": 66,
+              "I_sem": 40,
+              "V": 120
+            }
+          }
+        },
+        "stream_2": {
+          "A": {
+            "C_subtypes": {},
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 20
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 0,
+            "effective_think_open_and_generated_close_count": 0,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 137,
+            "exact_terminal_FINAL_present": 236,
+            "generated_literal_think_close_count": 0,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 256,
+              "0257-0512": 0,
+              "0513-1024": 0,
+              "1025-1536": 0,
+              "1537-2048": 0
+            },
+            "invalid_FINAL_contract_shapes": {
+              "no_FINAL_like_marker": 20
+            },
+            "last_standalone_FINAL_correct_exploratory": 137,
+            "last_standalone_FINAL_present_exploratory": 236,
+            "marker_like_count_histogram": {
+              "0": 20,
+              "1": 236
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 32,
+              "exactly_one_V": 73,
+              "neither_V": 23,
+              "same_terminal_state": 45,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 137,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 0,
+              "I_protocol": 20,
+              "I_sem": 99,
+              "V": 137
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 30,
+              "CENSORED_WITH_MALFORMED_OR_NONTERMINAL_FINAL": 1
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 80,
+              "EOS_WITH_UNEXPECTED_SPECIAL_TOKEN": 1
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 0,
+            "effective_think_open_and_generated_close_count": 0,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 111,
+            "exact_terminal_FINAL_present": 150,
+            "generated_literal_think_close_count": 0,
+            "generated_literal_think_open_count": 0,
+            "generated_token_count_bins": {
+              "0001-0256": 157,
+              "0257-0512": 59,
+              "0513-1024": 8,
+              "1025-1536": 1,
+              "1537-2048": 31
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 44,
+              "exact_terminal_FINAL_plus_additional_marker_like_text": 5,
+              "no_FINAL_like_marker": 31,
+              "unexpected_non_EOS_special_token": 1
+            },
+            "last_standalone_FINAL_correct_exploratory": 111,
+            "last_standalone_FINAL_present_exploratory": 150,
+            "marker_like_count_histogram": {
+              "0": 61,
+              "1": 186,
+              "2": 7,
+              "28": 1,
+              "3": 1
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 32,
+              "exactly_one_V": 45,
+              "neither_V": 51,
+              "same_terminal_state": 65,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 109,
+            "strict_V_minus_exact_terminal_correct": -2,
+            "terminal_states": {
+              "C": 31,
+              "I_protocol": 81,
+              "I_sem": 35,
+              "V": 109
+            }
+          }
+        }
+      }
+    },
+    "qwen3": {
+      "native_assistant_prefill_text": "<|im_start|>assistant\n",
+      "native_prefill_opens_literal_think": false,
+      "streams": {
+        "stream_0": {
+          "A": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 14
+            },
+            "I_protocol_subtypes": {},
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 242,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 242,
+            "exact_terminal_FINAL_present": 242,
+            "generated_literal_think_close_count": 242,
+            "generated_literal_think_open_count": 256,
+            "generated_token_count_bins": {
+              "0001-0256": 41,
+              "0257-0512": 94,
+              "0513-1024": 67,
+              "1025-1536": 35,
+              "1537-2048": 19
+            },
+            "invalid_FINAL_contract_shapes": {},
+            "last_standalone_FINAL_correct_exploratory": 242,
+            "last_standalone_FINAL_present_exploratory": 242,
+            "marker_like_count_histogram": {
+              "0": 14,
+              "1": 242
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 117,
+              "exactly_one_V": 8,
+              "neither_V": 3,
+              "same_terminal_state": 120,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 242,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 14,
+              "I_protocol": 0,
+              "I_sem": 0,
+              "V": 242
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 36
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 18
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 226,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 206,
+            "exact_terminal_FINAL_present": 206,
+            "generated_literal_think_close_count": 226,
+            "generated_literal_think_open_count": 256,
+            "generated_token_count_bins": {
+              "0001-0256": 2,
+              "0257-0512": 59,
+              "0513-1024": 109,
+              "1025-1536": 31,
+              "1537-2048": 55
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 14,
+              "exact_terminal_FINAL_plus_additional_marker_like_text": 4
+            },
+            "last_standalone_FINAL_correct_exploratory": 206,
+            "last_standalone_FINAL_present_exploratory": 206,
+            "marker_like_count_histogram": {
+              "0": 36,
+              "1": 215,
+              "2": 5
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 87,
+              "exactly_one_V": 28,
+              "neither_V": 13,
+              "same_terminal_state": 98,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 202,
+            "strict_V_minus_exact_terminal_correct": -4,
+            "terminal_states": {
+              "C": 36,
+              "I_protocol": 18,
+              "I_sem": 0,
+              "V": 202
+            }
+          }
+        },
+        "stream_1": {
+          "A": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 16
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 1
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 240,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 239,
+            "exact_terminal_FINAL_present": 239,
+            "generated_literal_think_close_count": 240,
+            "generated_literal_think_open_count": 256,
+            "generated_token_count_bins": {
+              "0001-0256": 45,
+              "0257-0512": 82,
+              "0513-1024": 75,
+              "1025-1536": 25,
+              "1537-2048": 29
+            },
+            "invalid_FINAL_contract_shapes": {
+              "no_FINAL_like_marker": 1
+            },
+            "last_standalone_FINAL_correct_exploratory": 239,
+            "last_standalone_FINAL_present_exploratory": 239,
+            "marker_like_count_histogram": {
+              "0": 17,
+              "1": 239
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 114,
+              "exactly_one_V": 11,
+              "neither_V": 3,
+              "same_terminal_state": 117,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 239,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 16,
+              "I_protocol": 1,
+              "I_sem": 0,
+              "V": 239
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 35
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 11
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 232,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 214,
+            "exact_terminal_FINAL_present": 214,
+            "generated_literal_think_close_count": 232,
+            "generated_literal_think_open_count": 256,
+            "generated_token_count_bins": {
+              "0001-0256": 0,
+              "0257-0512": 60,
+              "0513-1024": 109,
+              "1025-1536": 33,
+              "1537-2048": 54
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 7,
+              "exact_terminal_FINAL_plus_additional_marker_like_text": 4
+            },
+            "last_standalone_FINAL_correct_exploratory": 214,
+            "last_standalone_FINAL_present_exploratory": 214,
+            "marker_like_count_histogram": {
+              "0": 35,
+              "1": 217,
+              "2": 4
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 95,
+              "exactly_one_V": 20,
+              "neither_V": 13,
+              "same_terminal_state": 108,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 210,
+            "strict_V_minus_exact_terminal_correct": -4,
+            "terminal_states": {
+              "C": 35,
+              "I_protocol": 11,
+              "I_sem": 0,
+              "V": 210
+            }
+          }
+        },
+        "stream_2": {
+          "A": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 13
+            },
+            "I_protocol_subtypes": {},
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 243,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 243,
+            "exact_terminal_FINAL_present": 243,
+            "generated_literal_think_close_count": 243,
+            "generated_literal_think_open_count": 256,
+            "generated_token_count_bins": {
+              "0001-0256": 42,
+              "0257-0512": 92,
+              "0513-1024": 75,
+              "1025-1536": 29,
+              "1537-2048": 18
+            },
+            "invalid_FINAL_contract_shapes": {},
+            "last_standalone_FINAL_correct_exploratory": 243,
+            "last_standalone_FINAL_present_exploratory": 243,
+            "marker_like_count_histogram": {
+              "0": 13,
+              "1": 243
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 118,
+              "exactly_one_V": 7,
+              "neither_V": 3,
+              "same_terminal_state": 121,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 243,
+            "strict_V_minus_exact_terminal_correct": 0,
+            "terminal_states": {
+              "C": 13,
+              "I_protocol": 0,
+              "I_sem": 0,
+              "V": 243
+            }
+          },
+          "B": {
+            "C_subtypes": {
+              "CENSORED_BEFORE_FINAL": 29
+            },
+            "I_protocol_subtypes": {
+              "EOS_WITH_INVALID_FINAL_CONTRACT": 13
+            },
+            "N": 256,
+            "effective_prefill_or_generated_think_open_count": 256,
+            "effective_think_open_and_generated_close_count": 230,
+            "exact_terminal_FINAL_correct_ignoring_EOS_or_hidden_special": 220,
+            "exact_terminal_FINAL_present": 220,
+            "generated_literal_think_close_count": 230,
+            "generated_literal_think_open_count": 256,
+            "generated_token_count_bins": {
+              "0001-0256": 2,
+              "0257-0512": 62,
+              "0513-1024": 100,
+              "1025-1536": 49,
+              "1537-2048": 43
+            },
+            "invalid_FINAL_contract_shapes": {
+              "FINAL_like_text_but_not_unique_exact_terminal_contract": 7,
+              "exact_terminal_FINAL_plus_additional_marker_like_text": 6
+            },
+            "last_standalone_FINAL_correct_exploratory": 220,
+            "last_standalone_FINAL_present_exploratory": 220,
+            "marker_like_count_histogram": {
+              "0": 29,
+              "1": 220,
+              "2": 7
+            },
+            "native_prefill_literal_think_open": false,
+            "option_swap_twin_summary": {
+              "both_V": 97,
+              "exactly_one_V": 20,
+              "neither_V": 11,
+              "same_terminal_state": 107,
+              "semantic_pair_count": 128,
+              "twins_are_not_independent_samples": true
+            },
+            "strict_V_count": 214,
+            "strict_V_minus_exact_terminal_correct": -6,
+            "terminal_states": {
+              "C": 29,
+              "I_protocol": 13,
+              "I_sem": 0,
+              "V": 214
+            }
+          }
+        }
+      }
+    }
+  },
+  "models_pooled": false,
+  "phase": 983,
+  "primary_decision_unchanged": true,
+  "schema_version": 1,
+  "source_audit_file_sha256": "1f914718df164f6506f2701c780e4c26ec2f1a0c8e7070f50f3bf903c1d3d62e",
+  "source_audit_sha256": "1cac51248a4cc3157a785cb99c767c0eebc536138b0e60d9a7958c4e247022a4",
+  "source_scientific_decision": "NO-GO"
+}

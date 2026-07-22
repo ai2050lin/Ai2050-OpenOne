@@ -1,0 +1,801 @@
+{
+  "created_at_utc": "2026-07-22T01:40:34.882363+00:00",
+  "cuda_used": false,
+  "experiment": "delayed_two_hop_gpu_admission_package",
+  "migration_by_model": {
+    "deepseek7b": {
+      "accepted_runtime_migration": true,
+      "current_transformers_version": "5.12.0",
+      "identity_field_checks": {
+        "candidate_continuation_ids": true,
+        "candidate_continuation_text": true,
+        "chat_template_sha256": true,
+        "comparison_counts": true,
+        "comparison_failures": true,
+        "max_prompt_tokens": true,
+        "min_prompt_tokens": true,
+        "model_max_length": true,
+        "natural_answer_target_token_positions": true,
+        "record_count": true,
+        "relation_phrase_ids": true,
+        "special_token_ids": true,
+        "teacher_forced_context_joiner": true,
+        "teacher_forced_prefix_ids": true,
+        "token_sequences_sha256": true,
+        "tokenizer_class": true,
+        "unexpected_special_token_count": true,
+        "vocab_size": true
+      },
+      "sealed_transformers_version": "5.14.1",
+      "tokenizer_artifact_files_sha256_equal": true,
+      "version_string_changed": true
+    },
+    "glm4": {
+      "accepted_runtime_migration": true,
+      "current_transformers_version": "5.12.0",
+      "identity_field_checks": {
+        "candidate_continuation_ids": true,
+        "candidate_continuation_text": true,
+        "chat_template_sha256": true,
+        "comparison_counts": true,
+        "comparison_failures": true,
+        "max_prompt_tokens": true,
+        "min_prompt_tokens": true,
+        "model_max_length": true,
+        "natural_answer_target_token_positions": true,
+        "record_count": true,
+        "relation_phrase_ids": true,
+        "special_token_ids": true,
+        "teacher_forced_context_joiner": true,
+        "teacher_forced_prefix_ids": true,
+        "token_sequences_sha256": true,
+        "tokenizer_class": true,
+        "unexpected_special_token_count": true,
+        "vocab_size": true
+      },
+      "sealed_transformers_version": "5.14.1",
+      "tokenizer_artifact_files_sha256_equal": true,
+      "version_string_changed": true
+    },
+    "qwen3": {
+      "accepted_runtime_migration": true,
+      "current_transformers_version": "5.12.0",
+      "identity_field_checks": {
+        "candidate_continuation_ids": true,
+        "candidate_continuation_text": true,
+        "chat_template_sha256": true,
+        "comparison_counts": true,
+        "comparison_failures": true,
+        "max_prompt_tokens": true,
+        "min_prompt_tokens": true,
+        "model_max_length": true,
+        "natural_answer_target_token_positions": true,
+        "record_count": true,
+        "relation_phrase_ids": true,
+        "special_token_ids": true,
+        "teacher_forced_context_joiner": true,
+        "teacher_forced_prefix_ids": true,
+        "token_sequences_sha256": true,
+        "tokenizer_class": true,
+        "unexpected_special_token_count": true,
+        "vocab_size": true
+      },
+      "sealed_transformers_version": "5.14.1",
+      "tokenizer_artifact_files_sha256_equal": true,
+      "version_string_changed": true
+    }
+  },
+  "migration_does_not_rewrite_phase990": true,
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "model_weights_loaded": false,
+  "phase": 991,
+  "phase990_exact_protocol_rebuild_in_current_runtime": false,
+  "phase990_primary_current_recomputation": {
+    "cuda_used": false,
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "HF_HUB_OFFLINE": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "TRANSFORMERS_OFFLINE": "1"
+    },
+    "mandatory_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "model_weights_loaded": false,
+    "models": {
+      "deepseek7b": {
+        "candidate_continuation_ids": {
+          "black": [
+            3691
+          ],
+          "blue": [
+            6303
+          ],
+          "green": [
+            6176
+          ],
+          "red": [
+            2518
+          ]
+        },
+        "candidate_continuation_text": {
+          "black": " black",
+          "blue": " blue",
+          "green": " green",
+          "red": " red"
+        },
+        "chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+        "comparison_counts": {
+          "near_far_token_multiset": 5120,
+          "order_token_multiset": 5120,
+          "relation_equal_length": 2560,
+          "semantic_token_multiset": 5120,
+          "teacher_forced_canonical_boundary": 40960
+        },
+        "comparison_failures": {},
+        "cuda_used": false,
+        "max_prompt_tokens": 255,
+        "min_prompt_tokens": 242,
+        "model_key": "deepseek7b",
+        "model_loader_api_called": false,
+        "model_max_length": 16384,
+        "model_weights_loaded": false,
+        "natural_answer_target_token_positions": {
+          "black": 4,
+          "blue": 4,
+          "green": 4,
+          "red": 4
+        },
+        "passed": true,
+        "raw_text_input_no_chat_template": true,
+        "record_count": 10240,
+        "relation_phrase_ids": {
+          "inner": [
+            9179
+          ],
+          "outer": [
+            15955
+          ]
+        },
+        "special_token_ids": [
+          151643,
+          151646
+        ],
+        "teacher_forced_context_joiner": "\n",
+        "teacher_forced_prefix_ids": [
+          785,
+          30403,
+          11134,
+          374
+        ],
+        "token_sequences_sha256": "f0055e244e8e4dac0f0e5508d394383f87961058381d36e0d6114db38dbf442d",
+        "tokenizer_artifact_seal": {
+          "configured_path": "models/hf/deepseek-r1-distill-qwen-7b",
+          "configured_path_is_symlink": true,
+          "files": {
+            "config.json": {
+              "bytes": 680,
+              "sha256": "8290d3c1e385e2616572eb6926f7e2745f901d1c13da95970326a8a73f6c379c"
+            },
+            "generation_config.json": {
+              "bytes": 181,
+              "sha256": "72cbec1015da9ed03ad025483005cbf6481403abf947adfd54e504d1a66a2126"
+            },
+            "tokenizer.json": {
+              "bytes": 7031660,
+              "sha256": "88145e3c3249adc2546ede277e9819d6e405e19072456e4b521cbc724bd60773"
+            },
+            "tokenizer_config.json": {
+              "bytes": 3071,
+              "sha256": "8ac8c85fb242563c2260baec0909debd69d718af6a0b3d90e6cab62b4d341cd5"
+            }
+          },
+          "files_sha256": "5be7be64eb3c5fd5521f112b3a96766ee50962af2b63eabc626e9fbe06cf0698",
+          "resolved_path": "D:\\develop\\model\\deepseek-ai\\DeepSeek-R1-Distill-Qwen-7B",
+          "weight_files_included_in_tokenizer_seal": false
+        },
+        "tokenizer_class": "Qwen2Tokenizer",
+        "transformers_version": "5.12.0",
+        "trust_remote_code": false,
+        "unexpected_special_token_count": 0,
+        "vocab_size": 151665,
+        "weight_file_open_guard_attempts": []
+      },
+      "glm4": {
+        "candidate_continuation_ids": {
+          "black": [
+            3691
+          ],
+          "blue": [
+            6303
+          ],
+          "green": [
+            6176
+          ],
+          "red": [
+            2518
+          ]
+        },
+        "candidate_continuation_text": {
+          "black": " black",
+          "blue": " blue",
+          "green": " green",
+          "red": " red"
+        },
+        "chat_template_sha256": "27288f957f8364c990a2ce13bf5f8bf86921c4bce467ce698c76dcc69466d821",
+        "comparison_counts": {
+          "near_far_token_multiset": 5120,
+          "order_token_multiset": 5120,
+          "relation_equal_length": 2560,
+          "semantic_token_multiset": 5120,
+          "teacher_forced_canonical_boundary": 40960
+        },
+        "comparison_failures": {},
+        "cuda_used": false,
+        "max_prompt_tokens": 244,
+        "min_prompt_tokens": 231,
+        "model_key": "glm4",
+        "model_loader_api_called": false,
+        "model_max_length": 128000,
+        "model_weights_loaded": false,
+        "natural_answer_target_token_positions": {
+          "black": 4,
+          "blue": 4,
+          "green": 4,
+          "red": 4
+        },
+        "passed": true,
+        "raw_text_input_no_chat_template": true,
+        "record_count": 10240,
+        "relation_phrase_ids": {
+          "inner": [
+            9176
+          ],
+          "outer": [
+            15942
+          ]
+        },
+        "special_token_ids": [
+          151329,
+          151330,
+          151331,
+          151332,
+          151333,
+          151334,
+          151335,
+          151336,
+          151337,
+          151338,
+          151339,
+          151340,
+          151341,
+          151342
+        ],
+        "teacher_forced_context_joiner": "\n",
+        "teacher_forced_prefix_ids": [
+          785,
+          30286,
+          11129,
+          374
+        ],
+        "token_sequences_sha256": "cec1ab9d1421d2deb3a5a8d299e8abc3310864df4cff07a889664748594a9cfe",
+        "tokenizer_artifact_seal": {
+          "configured_path": "models/hf/glm4-9b-chat-hf",
+          "configured_path_is_symlink": true,
+          "files": {
+            "config.json": {
+              "bytes": 661,
+              "sha256": "8ec64bc0dff4835a800b9eceb059e2b8263f783c898812175aa1ccdda074f596"
+            },
+            "generation_config.json": {
+              "bytes": 160,
+              "sha256": "1871e89e9388f22b0704fb4d498311e67fda1e812adc066543b09a05a4da3667"
+            },
+            "tokenizer.json": {
+              "bytes": 19967863,
+              "sha256": "8a7269d6daa6328de533def0082ff9d3a825bb89036cbcc665c324f941f67fbf"
+            },
+            "tokenizer_config.json": {
+              "bytes": 6116,
+              "sha256": "5ac39fe659e4fafd9e93dc158883590a73339ced96e1a91c767cd12a9cb3f8df"
+            }
+          },
+          "files_sha256": "7b4b4b7151512c8b5d845d55b5228e38da14bf0977070ea24167021b01be2225",
+          "resolved_path": "D:\\develop\\model\\ZhipuAI\\glm-4-9b-chat-hf",
+          "weight_files_included_in_tokenizer_seal": false
+        },
+        "tokenizer_class": "TokenizersBackend",
+        "transformers_version": "5.12.0",
+        "trust_remote_code": false,
+        "unexpected_special_token_count": 0,
+        "vocab_size": 151343,
+        "weight_file_open_guard_attempts": []
+      },
+      "qwen3": {
+        "candidate_continuation_ids": {
+          "black": [
+            3691
+          ],
+          "blue": [
+            6303
+          ],
+          "green": [
+            6176
+          ],
+          "red": [
+            2518
+          ]
+        },
+        "candidate_continuation_text": {
+          "black": " black",
+          "blue": " blue",
+          "green": " green",
+          "red": " red"
+        },
+        "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+        "comparison_counts": {
+          "near_far_token_multiset": 5120,
+          "order_token_multiset": 5120,
+          "relation_equal_length": 2560,
+          "semantic_token_multiset": 5120,
+          "teacher_forced_canonical_boundary": 40960
+        },
+        "comparison_failures": {},
+        "cuda_used": false,
+        "max_prompt_tokens": 255,
+        "min_prompt_tokens": 242,
+        "model_key": "qwen3",
+        "model_loader_api_called": false,
+        "model_max_length": 131072,
+        "model_weights_loaded": false,
+        "natural_answer_target_token_positions": {
+          "black": 4,
+          "blue": 4,
+          "green": 4,
+          "red": 4
+        },
+        "passed": true,
+        "raw_text_input_no_chat_template": true,
+        "record_count": 10240,
+        "relation_phrase_ids": {
+          "inner": [
+            9179
+          ],
+          "outer": [
+            15955
+          ]
+        },
+        "special_token_ids": [
+          151643,
+          151644,
+          151645,
+          151646,
+          151647,
+          151648,
+          151649,
+          151650,
+          151651,
+          151652,
+          151653,
+          151654,
+          151655,
+          151656
+        ],
+        "teacher_forced_context_joiner": "\n",
+        "teacher_forced_prefix_ids": [
+          785,
+          30403,
+          11134,
+          374
+        ],
+        "token_sequences_sha256": "f0055e244e8e4dac0f0e5508d394383f87961058381d36e0d6114db38dbf442d",
+        "tokenizer_artifact_seal": {
+          "configured_path": "models/hf/qwen3-4b",
+          "configured_path_is_symlink": true,
+          "files": {
+            "config.json": {
+              "bytes": 726,
+              "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+            },
+            "generation_config.json": {
+              "bytes": 239,
+              "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+            },
+            "merges.txt": {
+              "bytes": 1671853,
+              "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+            },
+            "tokenizer.json": {
+              "bytes": 11422654,
+              "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+            },
+            "tokenizer_config.json": {
+              "bytes": 9732,
+              "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+            },
+            "vocab.json": {
+              "bytes": 2776833,
+              "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+            }
+          },
+          "files_sha256": "1b5e2f05d681b50d9b35963d2a98b48abcb04e38087e44e712f21a9ac4523f8e",
+          "resolved_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+          "weight_files_included_in_tokenizer_seal": false
+        },
+        "tokenizer_class": "Qwen2Tokenizer",
+        "transformers_version": "5.12.0",
+        "trust_remote_code": false,
+        "unexpected_special_token_count": 0,
+        "vocab_size": 151669,
+        "weight_file_open_guard_attempts": []
+      }
+    },
+    "observed_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "passed": true,
+    "records_per_model": 10240
+  },
+  "phase991_extension_current_recomputation": {
+    "cuda_used": false,
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "HF_HUB_OFFLINE": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "TRANSFORMERS_OFFLINE": "1"
+    },
+    "mandatory_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "model_weights_loaded": false,
+    "models": {
+      "deepseek7b": {
+        "candidate_continuation_ids": {
+          "black": [
+            3691
+          ],
+          "blue": [
+            6303
+          ],
+          "green": [
+            6176
+          ],
+          "red": [
+            2518
+          ]
+        },
+        "candidate_continuation_text": {
+          "black": " black",
+          "blue": " blue",
+          "green": " green",
+          "red": " red"
+        },
+        "chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+        "comparison_counts": {
+          "near_far_token_multiset": 2048,
+          "order_token_multiset": 2048,
+          "relation_equal_length": 1024,
+          "semantic_token_multiset": 2048,
+          "teacher_forced_canonical_boundary": 16384
+        },
+        "comparison_failures": {},
+        "cuda_used": false,
+        "max_prompt_tokens": 255,
+        "min_prompt_tokens": 242,
+        "model_key": "deepseek7b",
+        "model_loader_api_called": false,
+        "model_max_length": 16384,
+        "model_weights_loaded": false,
+        "natural_answer_target_token_positions": {
+          "black": 4,
+          "blue": 4,
+          "green": 4,
+          "red": 4
+        },
+        "passed": true,
+        "raw_text_input_no_chat_template": true,
+        "record_count": 4096,
+        "relation_phrase_ids": {
+          "inner": [
+            9179
+          ],
+          "outer": [
+            15955
+          ]
+        },
+        "special_token_ids": [
+          151643,
+          151646
+        ],
+        "teacher_forced_context_joiner": "\n",
+        "teacher_forced_prefix_ids": [
+          785,
+          30403,
+          11134,
+          374
+        ],
+        "token_sequences_sha256": "307a621473d10c61449d8eb8e3d988b6829514fa8d0918be24c12cf5baf77aae",
+        "tokenizer_artifact_seal": {
+          "configured_path": "models/hf/deepseek-r1-distill-qwen-7b",
+          "configured_path_is_symlink": true,
+          "files": {
+            "config.json": {
+              "bytes": 680,
+              "sha256": "8290d3c1e385e2616572eb6926f7e2745f901d1c13da95970326a8a73f6c379c"
+            },
+            "generation_config.json": {
+              "bytes": 181,
+              "sha256": "72cbec1015da9ed03ad025483005cbf6481403abf947adfd54e504d1a66a2126"
+            },
+            "tokenizer.json": {
+              "bytes": 7031660,
+              "sha256": "88145e3c3249adc2546ede277e9819d6e405e19072456e4b521cbc724bd60773"
+            },
+            "tokenizer_config.json": {
+              "bytes": 3071,
+              "sha256": "8ac8c85fb242563c2260baec0909debd69d718af6a0b3d90e6cab62b4d341cd5"
+            }
+          },
+          "files_sha256": "5be7be64eb3c5fd5521f112b3a96766ee50962af2b63eabc626e9fbe06cf0698",
+          "resolved_path": "D:\\develop\\model\\deepseek-ai\\DeepSeek-R1-Distill-Qwen-7B",
+          "weight_files_included_in_tokenizer_seal": false
+        },
+        "tokenizer_class": "Qwen2Tokenizer",
+        "transformers_version": "5.12.0",
+        "trust_remote_code": false,
+        "unexpected_special_token_count": 0,
+        "vocab_size": 151665,
+        "weight_file_open_guard_attempts": []
+      },
+      "glm4": {
+        "candidate_continuation_ids": {
+          "black": [
+            3691
+          ],
+          "blue": [
+            6303
+          ],
+          "green": [
+            6176
+          ],
+          "red": [
+            2518
+          ]
+        },
+        "candidate_continuation_text": {
+          "black": " black",
+          "blue": " blue",
+          "green": " green",
+          "red": " red"
+        },
+        "chat_template_sha256": "27288f957f8364c990a2ce13bf5f8bf86921c4bce467ce698c76dcc69466d821",
+        "comparison_counts": {
+          "near_far_token_multiset": 2048,
+          "order_token_multiset": 2048,
+          "relation_equal_length": 1024,
+          "semantic_token_multiset": 2048,
+          "teacher_forced_canonical_boundary": 16384
+        },
+        "comparison_failures": {},
+        "cuda_used": false,
+        "max_prompt_tokens": 244,
+        "min_prompt_tokens": 231,
+        "model_key": "glm4",
+        "model_loader_api_called": false,
+        "model_max_length": 128000,
+        "model_weights_loaded": false,
+        "natural_answer_target_token_positions": {
+          "black": 4,
+          "blue": 4,
+          "green": 4,
+          "red": 4
+        },
+        "passed": true,
+        "raw_text_input_no_chat_template": true,
+        "record_count": 4096,
+        "relation_phrase_ids": {
+          "inner": [
+            9176
+          ],
+          "outer": [
+            15942
+          ]
+        },
+        "special_token_ids": [
+          151329,
+          151330,
+          151331,
+          151332,
+          151333,
+          151334,
+          151335,
+          151336,
+          151337,
+          151338,
+          151339,
+          151340,
+          151341,
+          151342
+        ],
+        "teacher_forced_context_joiner": "\n",
+        "teacher_forced_prefix_ids": [
+          785,
+          30286,
+          11129,
+          374
+        ],
+        "token_sequences_sha256": "3341f2f373363981a446f32bcb04e1228a9dd4713bd8b18a2910fc9bbb96185e",
+        "tokenizer_artifact_seal": {
+          "configured_path": "models/hf/glm4-9b-chat-hf",
+          "configured_path_is_symlink": true,
+          "files": {
+            "config.json": {
+              "bytes": 661,
+              "sha256": "8ec64bc0dff4835a800b9eceb059e2b8263f783c898812175aa1ccdda074f596"
+            },
+            "generation_config.json": {
+              "bytes": 160,
+              "sha256": "1871e89e9388f22b0704fb4d498311e67fda1e812adc066543b09a05a4da3667"
+            },
+            "tokenizer.json": {
+              "bytes": 19967863,
+              "sha256": "8a7269d6daa6328de533def0082ff9d3a825bb89036cbcc665c324f941f67fbf"
+            },
+            "tokenizer_config.json": {
+              "bytes": 6116,
+              "sha256": "5ac39fe659e4fafd9e93dc158883590a73339ced96e1a91c767cd12a9cb3f8df"
+            }
+          },
+          "files_sha256": "7b4b4b7151512c8b5d845d55b5228e38da14bf0977070ea24167021b01be2225",
+          "resolved_path": "D:\\develop\\model\\ZhipuAI\\glm-4-9b-chat-hf",
+          "weight_files_included_in_tokenizer_seal": false
+        },
+        "tokenizer_class": "TokenizersBackend",
+        "transformers_version": "5.12.0",
+        "trust_remote_code": false,
+        "unexpected_special_token_count": 0,
+        "vocab_size": 151343,
+        "weight_file_open_guard_attempts": []
+      },
+      "qwen3": {
+        "candidate_continuation_ids": {
+          "black": [
+            3691
+          ],
+          "blue": [
+            6303
+          ],
+          "green": [
+            6176
+          ],
+          "red": [
+            2518
+          ]
+        },
+        "candidate_continuation_text": {
+          "black": " black",
+          "blue": " blue",
+          "green": " green",
+          "red": " red"
+        },
+        "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+        "comparison_counts": {
+          "near_far_token_multiset": 2048,
+          "order_token_multiset": 2048,
+          "relation_equal_length": 1024,
+          "semantic_token_multiset": 2048,
+          "teacher_forced_canonical_boundary": 16384
+        },
+        "comparison_failures": {},
+        "cuda_used": false,
+        "max_prompt_tokens": 255,
+        "min_prompt_tokens": 242,
+        "model_key": "qwen3",
+        "model_loader_api_called": false,
+        "model_max_length": 131072,
+        "model_weights_loaded": false,
+        "natural_answer_target_token_positions": {
+          "black": 4,
+          "blue": 4,
+          "green": 4,
+          "red": 4
+        },
+        "passed": true,
+        "raw_text_input_no_chat_template": true,
+        "record_count": 4096,
+        "relation_phrase_ids": {
+          "inner": [
+            9179
+          ],
+          "outer": [
+            15955
+          ]
+        },
+        "special_token_ids": [
+          151643,
+          151644,
+          151645,
+          151646,
+          151647,
+          151648,
+          151649,
+          151650,
+          151651,
+          151652,
+          151653,
+          151654,
+          151655,
+          151656
+        ],
+        "teacher_forced_context_joiner": "\n",
+        "teacher_forced_prefix_ids": [
+          785,
+          30403,
+          11134,
+          374
+        ],
+        "token_sequences_sha256": "307a621473d10c61449d8eb8e3d988b6829514fa8d0918be24c12cf5baf77aae",
+        "tokenizer_artifact_seal": {
+          "configured_path": "models/hf/qwen3-4b",
+          "configured_path_is_symlink": true,
+          "files": {
+            "config.json": {
+              "bytes": 726,
+              "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+            },
+            "generation_config.json": {
+              "bytes": 239,
+              "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+            },
+            "merges.txt": {
+              "bytes": 1671853,
+              "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+            },
+            "tokenizer.json": {
+              "bytes": 11422654,
+              "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+            },
+            "tokenizer_config.json": {
+              "bytes": 9732,
+              "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+            },
+            "vocab.json": {
+              "bytes": 2776833,
+              "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+            }
+          },
+          "files_sha256": "1b5e2f05d681b50d9b35963d2a98b48abcb04e38087e44e712f21a9ac4523f8e",
+          "resolved_path": "D:\\develop\\model\\Qwen\\Qwen3-4B",
+          "weight_files_included_in_tokenizer_seal": false
+        },
+        "tokenizer_class": "Qwen2Tokenizer",
+        "transformers_version": "5.12.0",
+        "trust_remote_code": false,
+        "unexpected_special_token_count": 0,
+        "vocab_size": 151669,
+        "weight_file_open_guard_attempts": []
+      }
+    },
+    "observed_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "passed": true,
+    "records_per_model": 4096
+  },
+  "reason": "sealed transformers version 5.14.1 differs from current 5.12.0",
+  "role": "cpu_only_tokenizer_runtime_migration_and_extension_preflight",
+  "schema_version": 1,
+  "tokenizer_audit_sha256": "dcfc21e145c3d570ee7852666987832814eb173049f075e5d8999716b53bf171"
+}

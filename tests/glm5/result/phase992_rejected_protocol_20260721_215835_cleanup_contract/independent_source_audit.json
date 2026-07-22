@@ -1,0 +1,314 @@
+{
+  "audit_sha256": "51b27b6872201276f53701755a26630ec998cf2206dfbc3a6a046d269332f085",
+  "checks": {
+    "all_component_self_tests_pass": true,
+    "all_static_checks_pass": true,
+    "cuda_not_used": true,
+    "disk_preflight_pass": true,
+    "engineering_eight_frozen": true,
+    "formal_python_qualified": true,
+    "independent_source_hashes_pass": true,
+    "internal_access_still_forbidden": true,
+    "model_weights_not_loaded": true,
+    "phase991_qualified": true,
+    "raw_greedy_int8_bf16_sdpa_frozen": true,
+    "scoring_truth_not_opened": true,
+    "simulation_pass": true
+  },
+  "component_self_tests": {
+    "component_count": 4,
+    "components": {
+      "audit": {
+        "command_arguments": [
+          "--self-test",
+          "--no-write"
+        ],
+        "report": {
+          "checks": {
+            "ambiguity_separate": true,
+            "counterfactual_fail_closed": true,
+            "embedded_rejected": true,
+            "extension_conditional": true,
+            "first_marker": true,
+            "full_independent_recompute": true,
+            "integer_gate_inclusive": true,
+            "no_truth_read_by_self_test": true,
+            "scope_counts": true,
+            "scorer_not_imported": true,
+            "strict_format": true
+          },
+          "cuda_used": false,
+          "files_written": 0,
+          "passed": true,
+          "phase": 992,
+          "role": "independent_cpu_no_truth_no_write_self_test",
+          "schema_version": "phase992_delayed_binding_independent_audit.v1",
+          "truth_opened": false
+        },
+        "returncode": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "7040d103429d2df0bcf74723ee918d7053a7845323a8022da2b8a72a1283ac03"
+      },
+      "broker": {
+        "command_arguments": [
+          "--self-test"
+        ],
+        "report": {
+          "checks": {
+            "abort_is_terminal_fail_closed": true,
+            "chain_tamper_rejected": true,
+            "exclusive_event_and_chain": true,
+            "grant_then_seal_state_machine": true,
+            "no_overwrite": true,
+            "runner_source_path_not_shared": true
+          },
+          "cuda_used": false,
+          "passed": true,
+          "schema_version": "phase992_holdout_broker_self_test.v1"
+        },
+        "returncode": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "b93df4ad12116a97e5ee468b3d7f5b3e9557847f910b0b266b2d24b4bb8f013a"
+      },
+      "runner": {
+        "command_arguments": [
+          "--self-test"
+        ],
+        "report": {
+          "checks": {
+            "behavior_only_literals": true,
+            "canonical_hash_order_independent": true,
+            "deterministic_gzip_writer": true,
+            "frozen_batch_and_budget": true,
+            "frozen_model_order": true,
+            "frozen_values": true,
+            "raw_schema": true,
+            "self_hash_round_trip": true,
+            "truth_keys_rejected": true
+          },
+          "cuda_used": false,
+          "files_written": 0,
+          "passed": true,
+          "schema_version": "phase992_delayed_binding_runner_self_test.v1",
+          "truth_opened": false
+        },
+        "returncode": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "9e37ec21e1e759657e7d82e893e44f2f2052b59cde4a8a904d904f379ac6776a"
+      },
+      "scorer": {
+        "command_arguments": [
+          "--self-test",
+          "--no-write"
+        ],
+        "report": {
+          "checks": {
+            "ascii_boundary_rejects_embedded": true,
+            "distinct_ambiguity": true,
+            "extension_count": true,
+            "first_complete_marker": true,
+            "format_separate": true,
+            "full_scoring_path": true,
+            "inclusive_integer_thresholds": true,
+            "major_fail_closed": true,
+            "no_model_runtime_import": true,
+            "public_admission_path": true,
+            "repeat_not_ambiguous": true,
+            "scope_counts": true,
+            "strict_format": true,
+            "three_stage_release": true
+          },
+          "cuda_used": false,
+          "files_written": 0,
+          "passed": true,
+          "phase": 992,
+          "role": "pure_cpu_no_truth_no_write_self_test",
+          "schema_version": "phase992_delayed_binding_score.v1",
+          "truth_opened": false
+        },
+        "returncode": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_sha256": "8bf656f00b4b8bea898175243a3bca4e1b99ce0631c380c8a3f42c0a2c5b025b"
+      }
+    },
+    "cuda_visible_devices": "",
+    "formal_python": {
+      "path": "C:\\Users\\Admin\\.workbuddy\\binaries\\python\\versions\\3.11.9\\python.exe",
+      "sha256": "0f11fb7422fa347b7609ba0964ceccef3c8fa9f15230c37b9ec27668e68e8a8a"
+    },
+    "passed": true
+  },
+  "created_at_utc": "2026-07-22T02:57:01+00:00",
+  "cuda_used": false,
+  "experiment": "delayed_two_hop_gpu_behavior",
+  "independent_source_hash_audit": {
+    "all_hashes_match": true,
+    "cuda_used": false,
+    "formal_python": {
+      "path": "C:\\Users\\Admin\\.workbuddy\\binaries\\python\\versions\\3.11.9\\python.exe",
+      "sha256": "0f11fb7422fa347b7609ba0964ceccef3c8fa9f15230c37b9ec27668e68e8a8a"
+    },
+    "model_weights_loaded": false,
+    "passed": true,
+    "phase": 992,
+    "schema_version": "phase992_independent_hash_audit.v1",
+    "source_count": 6,
+    "sources": {
+      "audit": {
+        "actual": {
+          "bytes": 58727,
+          "path": "tests/glm5/phase992_delayed_binding_audit.py",
+          "sha256": "0a16a98035da2384129d5f27f7a794bf5777f11cb2a8a22d30c15134a79dda2f"
+        },
+        "expected": {
+          "bytes": 58727,
+          "path": "tests/glm5/phase992_delayed_binding_audit.py",
+          "sha256": "0a16a98035da2384129d5f27f7a794bf5777f11cb2a8a22d30c15134a79dda2f"
+        },
+        "match": true
+      },
+      "broker": {
+        "actual": {
+          "bytes": 29564,
+          "path": "tests/glm5/phase992_holdout_broker.py",
+          "sha256": "c7e1b35723f22463cbd2a111e6caaa7cce300cbaadd1fcd63e8a9087106beafb"
+        },
+        "expected": {
+          "bytes": 29564,
+          "path": "tests/glm5/phase992_holdout_broker.py",
+          "sha256": "c7e1b35723f22463cbd2a111e6caaa7cce300cbaadd1fcd63e8a9087106beafb"
+        },
+        "match": true
+      },
+      "phase983_engine": {
+        "actual": {
+          "bytes": 54444,
+          "path": "tests/glm5/phase983_cross_model_engine.py",
+          "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+        },
+        "expected": {
+          "bytes": 54444,
+          "path": "tests/glm5/phase983_cross_model_engine.py",
+          "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+        },
+        "match": true
+      },
+      "protocol": {
+        "actual": {
+          "bytes": 48626,
+          "path": "tests/glm5/phase992_delayed_binding_protocol.py",
+          "sha256": "745845924995ca1d77324e48505bfdae64bfc2809ee7d2c474c86b13ada50b98"
+        },
+        "expected": {
+          "bytes": 48626,
+          "path": "tests/glm5/phase992_delayed_binding_protocol.py",
+          "sha256": "745845924995ca1d77324e48505bfdae64bfc2809ee7d2c474c86b13ada50b98"
+        },
+        "match": true
+      },
+      "runner": {
+        "actual": {
+          "bytes": 54778,
+          "path": "tests/glm5/phase992_delayed_binding_runner.py",
+          "sha256": "b74ecb0069eace4ecc7b0fb9ed4ab630d21a9e631e74927955d758be5d4e3d4a"
+        },
+        "expected": {
+          "bytes": 54778,
+          "path": "tests/glm5/phase992_delayed_binding_runner.py",
+          "sha256": "b74ecb0069eace4ecc7b0fb9ed4ab630d21a9e631e74927955d758be5d4e3d4a"
+        },
+        "match": true
+      },
+      "scorer": {
+        "actual": {
+          "bytes": 65363,
+          "path": "tests/glm5/phase992_delayed_binding_scorer.py",
+          "sha256": "3c7bb913fe806e5871a8fb1ee248c02baa5d1651ba3b7ad8051114e7f7f73d0b"
+        },
+        "expected": {
+          "bytes": 65363,
+          "path": "tests/glm5/phase992_delayed_binding_scorer.py",
+          "sha256": "3c7bb913fe806e5871a8fb1ee248c02baa5d1651ba3b7ad8051114e7f7f73d0b"
+        },
+        "match": true
+      }
+    }
+  },
+  "model_weights_loaded": false,
+  "phase": 992,
+  "protocol_sha256": "b7962f4646cd04cd26039ca39c0920eb4afd4647b4805a44973b5bb855da2b9a",
+  "role": "cpu_only_static_simulation_and_independent_source_audit",
+  "schema_version": "phase992_protocol_audit.v1",
+  "scoring_truth_opened": false,
+  "simulation_self_test": {
+    "checks": {
+      "activation_authority_fail_closed": true,
+      "behavior_only": true,
+      "early_holdout_rejected": true,
+      "early_scoring_rejected": true,
+      "generation_contract_greedy": true,
+      "generation_contract_raw": true,
+      "parser_contract_examples": true,
+      "valid_staged_path": true,
+      "wrong_model_order_rejected": true
+    },
+    "parser_cases": {
+      "ambiguous": {
+        "ambiguous": true,
+        "matches": [
+          "green",
+          "black"
+        ],
+        "prediction": "green",
+        "unparsed": false
+      },
+      "ascii_boundary": {
+        "ambiguous": false,
+        "matches": [
+          "blue"
+        ],
+        "prediction": "blue",
+        "unparsed": false
+      },
+      "first_complete": {
+        "ambiguous": true,
+        "matches": [
+          "blue",
+          "red"
+        ],
+        "prediction": "blue",
+        "unparsed": false
+      },
+      "none": {
+        "ambiguous": false,
+        "matches": [],
+        "prediction": null,
+        "unparsed": true
+      },
+      "strict": {
+        "ambiguous": false,
+        "matches": [
+          "red"
+        ],
+        "prediction": "red",
+        "unparsed": false
+      }
+    },
+    "passed": true
+  },
+  "static_checks": {
+    "all_five_phase992_sources_ast_parse": true,
+    "nonrunner_transformers_imports_absent": true,
+    "phase983_engine": {
+      "bytes": 54444,
+      "path": "tests/glm5/phase983_cross_model_engine.py",
+      "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+    },
+    "phase983_required_adapter_api_present": true,
+    "protocol_model_and_gpu_imports_absent": true,
+    "runner_activation_schema_and_internal_trace_guard_present": true,
+    "runner_hidden_attention_score_hooks_absent": true,
+    "runner_phase983_adapter_lifecycle_present": true,
+    "runner_raw_input_literal_present": true
+  }
+}

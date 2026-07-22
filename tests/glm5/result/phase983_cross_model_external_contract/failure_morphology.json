@@ -1,0 +1,2480 @@
+{
+  "analysis_name": "sealed_NO_GO_failure_morphology",
+  "analysis_scope": "CPU-only post-hoc descriptive counts",
+  "can_authorize_holdout": false,
+  "can_authorize_mechanism": false,
+  "can_set_primary_decision": false,
+  "causal_mechanism_claimed": false,
+  "created_at_utc": "2026-07-20T01:55:44+00:00",
+  "cross_model": {
+    "all_three_models_passed": false,
+    "basic_reading": "同一自然语言配置束在三个原生模板下产生不同外部形态；不存在跨模型稳定正向结果。",
+    "common_qualifying_task_count_recomputed": 0,
+    "common_qualifying_tasks_recomputed": [],
+    "cross_model_pass": false,
+    "delta_V_signs_by_stream": {
+      "stream_0": {
+        "deepseek7b": "positive",
+        "glm4": "negative",
+        "qwen3": "negative"
+      },
+      "stream_1": {
+        "deepseek7b": "positive",
+        "glm4": "negative",
+        "qwen3": "negative"
+      },
+      "stream_2": {
+        "deepseek7b": "positive",
+        "glm4": "negative",
+        "qwen3": "negative"
+      }
+    },
+    "universal_positive_delta_V": false
+  },
+  "experiment": "fresh256_option_swap_cross_model_external_contract",
+  "interpretation_boundaries": [
+    "终态四分箱是外部测量口径，不是神经网络内部通道。",
+    "V+C+I_protocol+I_sem=N只是记账恒等式。",
+    "冻结共同随机数下的成对转移是关联计数，不是个体反事实因果。",
+    "检查点只描述预算轨迹；只有2048-token终态参与主判定。",
+    "模型使用各自原生聊天模板，因此外部指令对比不等于共同thinking开关。",
+    "本报告在看到NO-GO后生成，不能反向选择门槛或候选配置。"
+  ],
+  "models": {
+    "deepseek7b": {
+      "all_three_streams_passed": false,
+      "common_qualifying_task_count": 2,
+      "common_qualifying_tasks": [
+        "constraint_order",
+        "relation_path"
+      ],
+      "consistently_harmed_tasks_delta_V_at_most_minus_3": [
+        "string_transform"
+      ],
+      "consistently_helped_tasks_delta_V_at_least_3": [
+        "constraint_order",
+        "relation_path"
+      ],
+      "decision_delta_V_vector_stream_0_1_2": [
+        16,
+        27,
+        25
+      ],
+      "delta_V_signs": [
+        "positive",
+        "positive",
+        "positive"
+      ],
+      "descriptive_failure_phenotype": "B主要改善协议终止，语义救援很弱且成对坏泄漏仍超阈值",
+      "first_nonnegative_checkpoint_by_stream_0_1_2": [
+        "1024",
+        "1024",
+        "1024"
+      ],
+      "mixed_or_small_task_directions": [
+        "boolean_logic",
+        "modular_arithmetic",
+        "multistep_arithmetic",
+        "sequence_rule",
+        "state_machine"
+      ],
+      "model_pass": false,
+      "streams": {
+        "stream_0": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 75,
+                  "I_protocol": 28,
+                  "I_sem": 1,
+                  "V": 152
+                },
+                "B": {
+                  "C": 94,
+                  "I_protocol": 4,
+                  "I_sem": 1,
+                  "V": 157
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -5,
+                "delta_V_B_minus_A": 5
+              },
+              "1536": {
+                "A": {
+                  "C": 42,
+                  "I_protocol": 29,
+                  "I_sem": 1,
+                  "V": 184
+                },
+                "B": {
+                  "C": 54,
+                  "I_protocol": 5,
+                  "I_sem": 2,
+                  "V": 195
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -12,
+                "delta_V_B_minus_A": 11
+              },
+              "2048": {
+                "A": {
+                  "C": 21,
+                  "I_protocol": 31,
+                  "I_sem": 1,
+                  "V": 203
+                },
+                "B": {
+                  "C": 28,
+                  "I_protocol": 7,
+                  "I_sem": 2,
+                  "V": 219
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -17,
+                "delta_V_B_minus_A": 16
+              },
+              "256": {
+                "A": {
+                  "C": 241,
+                  "I_protocol": 2,
+                  "I_sem": 0,
+                  "V": 13
+                },
+                "B": {
+                  "C": 252,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 4
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 9,
+                "delta_V_B_minus_A": -9
+              },
+              "512": {
+                "A": {
+                  "C": 177,
+                  "I_protocol": 11,
+                  "I_sem": 1,
+                  "V": 67
+                },
+                "B": {
+                  "C": 192,
+                  "I_protocol": 4,
+                  "I_sem": 1,
+                  "V": 59
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 8,
+                "delta_V_B_minus_A": -8
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": -5,
+              "1536": -12,
+              "2048": -17,
+              "256": 9,
+              "512": 8
+            },
+            "delta_V_path": {
+              "1024": 5,
+              "1536": 11,
+              "2048": 16,
+              "256": -9,
+              "512": -8
+            },
+            "first_nonnegative_delta_V_checkpoint": "1024"
+          },
+          "decision_contrasts": {
+            "R_I_sem": -1,
+            "delta_C": 7,
+            "delta_C_plus_I_protocol": -17,
+            "delta_I_protocol": -24,
+            "delta_V": 16
+          },
+          "decision_counts": {
+            "A": {
+              "C": 21,
+              "I_protocol": 31,
+              "I_sem": 1,
+              "V": 203
+            },
+            "B": {
+              "C": 28,
+              "I_protocol": 7,
+              "I_sem": 2,
+              "V": 219
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": 11,
+            "hard": 5
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "every_task_delta_V_at_least_minus_2"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "R_I_sem_at_least_26",
+            "bad_paired_leakage_at_most_12",
+            "delta_V_at_least_26",
+            "paired_I_sem_to_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": 2,
+            "B": 14
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 1,
+            "V_A_to_I_sem_B": 2,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 0,
+              "I_sem_to_I_protocol": 0,
+              "V_to_C": 12,
+              "V_to_I_protocol": 6
+            },
+            "bad_paired_leakage": 18,
+            "net_I_sem_to_V_minus_V_to_I_sem": -1
+          },
+          "qualifying_tasks": [
+            "constraint_order",
+            "relation_path"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": 4,
+            "swapped": 12
+          },
+          "task_delta_V": {
+            "boolean_logic": -1,
+            "constraint_order": 14,
+            "modular_arithmetic": -1,
+            "multistep_arithmetic": 0,
+            "relation_path": 9,
+            "sequence_rule": -1,
+            "state_machine": -1,
+            "string_transform": -3
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 29,
+                "transition": "I_protocol->V"
+              },
+              {
+                "count": 12,
+                "transition": "V->C"
+              },
+              {
+                "count": 6,
+                "transition": "C->V"
+              },
+              {
+                "count": 6,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 2,
+                "transition": "V->I_sem"
+              },
+              {
+                "count": 1,
+                "transition": "I_protocol->C"
+              }
+            ],
+            "gross_into_V": 36,
+            "gross_out_of_V": 20,
+            "into_V_components": {
+              "C->V": 6,
+              "I_protocol->V": 29,
+              "I_sem->V": 1
+            },
+            "matrix": {
+              "C": {
+                "C": 15,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 6
+              },
+              "I_protocol": {
+                "C": 1,
+                "I_protocol": 1,
+                "I_sem": 0,
+                "V": 29
+              },
+              "I_sem": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 1
+              },
+              "V": {
+                "C": 12,
+                "I_protocol": 6,
+                "I_sem": 2,
+                "V": 183
+              }
+            },
+            "net_into_V": 16,
+            "out_of_V_components": {
+              "V->C": 12,
+              "V->I_protocol": 6,
+              "V->I_sem": 2
+            }
+          }
+        },
+        "stream_1": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 72,
+                  "I_protocol": 28,
+                  "I_sem": 2,
+                  "V": 154
+                },
+                "B": {
+                  "C": 89,
+                  "I_protocol": 6,
+                  "I_sem": 2,
+                  "V": 159
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -5,
+                "delta_V_B_minus_A": 5
+              },
+              "1536": {
+                "A": {
+                  "C": 37,
+                  "I_protocol": 34,
+                  "I_sem": 4,
+                  "V": 181
+                },
+                "B": {
+                  "C": 48,
+                  "I_protocol": 6,
+                  "I_sem": 2,
+                  "V": 200
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -17,
+                "delta_V_B_minus_A": 19
+              },
+              "2048": {
+                "A": {
+                  "C": 25,
+                  "I_protocol": 38,
+                  "I_sem": 4,
+                  "V": 189
+                },
+                "B": {
+                  "C": 31,
+                  "I_protocol": 7,
+                  "I_sem": 2,
+                  "V": 216
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -25,
+                "delta_V_B_minus_A": 27
+              },
+              "256": {
+                "A": {
+                  "C": 243,
+                  "I_protocol": 2,
+                  "I_sem": 0,
+                  "V": 11
+                },
+                "B": {
+                  "C": 251,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 5
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 6,
+                "delta_V_B_minus_A": -6
+              },
+              "512": {
+                "A": {
+                  "C": 167,
+                  "I_protocol": 16,
+                  "I_sem": 2,
+                  "V": 71
+                },
+                "B": {
+                  "C": 194,
+                  "I_protocol": 5,
+                  "I_sem": 1,
+                  "V": 56
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 16,
+                "delta_V_B_minus_A": -15
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": -5,
+              "1536": -17,
+              "2048": -25,
+              "256": 6,
+              "512": 16
+            },
+            "delta_V_path": {
+              "1024": 5,
+              "1536": 19,
+              "2048": 27,
+              "256": -6,
+              "512": -15
+            },
+            "first_nonnegative_delta_V_checkpoint": "1024"
+          },
+          "decision_contrasts": {
+            "R_I_sem": 2,
+            "delta_C": 6,
+            "delta_C_plus_I_protocol": -25,
+            "delta_I_protocol": -31,
+            "delta_V": 27
+          },
+          "decision_counts": {
+            "A": {
+              "C": 25,
+              "I_protocol": 38,
+              "I_sem": 4,
+              "V": 189
+            },
+            "B": {
+              "C": 31,
+              "I_protocol": 7,
+              "I_sem": 2,
+              "V": 216
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": 8,
+            "hard": 19
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "every_task_delta_V_at_least_minus_2"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "R_I_sem_at_least_26",
+            "bad_paired_leakage_at_most_12",
+            "paired_I_sem_to_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": 9,
+            "B": 18
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 3,
+            "V_A_to_I_sem_B": 1,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 1,
+              "I_sem_to_I_protocol": 0,
+              "V_to_C": 11,
+              "V_to_I_protocol": 6
+            },
+            "bad_paired_leakage": 18,
+            "net_I_sem_to_V_minus_V_to_I_sem": 2
+          },
+          "qualifying_tasks": [
+            "constraint_order",
+            "relation_path",
+            "state_machine"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": 12,
+            "swapped": 15
+          },
+          "task_delta_V": {
+            "boolean_logic": 1,
+            "constraint_order": 11,
+            "modular_arithmetic": -4,
+            "multistep_arithmetic": 0,
+            "relation_path": 16,
+            "sequence_rule": 1,
+            "state_machine": 5,
+            "string_transform": -3
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 35,
+                "transition": "I_protocol->V"
+              },
+              {
+                "count": 11,
+                "transition": "V->C"
+              },
+              {
+                "count": 7,
+                "transition": "C->V"
+              },
+              {
+                "count": 6,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 3,
+                "transition": "I_sem->V"
+              },
+              {
+                "count": 1,
+                "transition": "I_protocol->C"
+              }
+            ],
+            "gross_into_V": 45,
+            "gross_out_of_V": 18,
+            "into_V_components": {
+              "C->V": 7,
+              "I_protocol->V": 35,
+              "I_sem->V": 3
+            },
+            "matrix": {
+              "C": {
+                "C": 18,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 7
+              },
+              "I_protocol": {
+                "C": 1,
+                "I_protocol": 1,
+                "I_sem": 1,
+                "V": 35
+              },
+              "I_sem": {
+                "C": 1,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 3
+              },
+              "V": {
+                "C": 11,
+                "I_protocol": 6,
+                "I_sem": 1,
+                "V": 171
+              }
+            },
+            "net_into_V": 27,
+            "out_of_V_components": {
+              "V->C": 11,
+              "V->I_protocol": 6,
+              "V->I_sem": 1
+            }
+          }
+        },
+        "stream_2": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 76,
+                  "I_protocol": 26,
+                  "I_sem": 3,
+                  "V": 151
+                },
+                "B": {
+                  "C": 86,
+                  "I_protocol": 10,
+                  "I_sem": 0,
+                  "V": 160
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -6,
+                "delta_V_B_minus_A": 9
+              },
+              "1536": {
+                "A": {
+                  "C": 42,
+                  "I_protocol": 32,
+                  "I_sem": 4,
+                  "V": 178
+                },
+                "B": {
+                  "C": 45,
+                  "I_protocol": 10,
+                  "I_sem": 0,
+                  "V": 201
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -19,
+                "delta_V_B_minus_A": 23
+              },
+              "2048": {
+                "A": {
+                  "C": 26,
+                  "I_protocol": 32,
+                  "I_sem": 4,
+                  "V": 194
+                },
+                "B": {
+                  "C": 26,
+                  "I_protocol": 11,
+                  "I_sem": 0,
+                  "V": 219
+                },
+                "delta_C_plus_I_protocol_B_minus_A": -21,
+                "delta_V_B_minus_A": 25
+              },
+              "256": {
+                "A": {
+                  "C": 243,
+                  "I_protocol": 1,
+                  "I_sem": 0,
+                  "V": 12
+                },
+                "B": {
+                  "C": 254,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 2
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 10,
+                "delta_V_B_minus_A": -10
+              },
+              "512": {
+                "A": {
+                  "C": 166,
+                  "I_protocol": 10,
+                  "I_sem": 1,
+                  "V": 79
+                },
+                "B": {
+                  "C": 199,
+                  "I_protocol": 8,
+                  "I_sem": 0,
+                  "V": 49
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 31,
+                "delta_V_B_minus_A": -30
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": -6,
+              "1536": -19,
+              "2048": -21,
+              "256": 10,
+              "512": 31
+            },
+            "delta_V_path": {
+              "1024": 9,
+              "1536": 23,
+              "2048": 25,
+              "256": -10,
+              "512": -30
+            },
+            "first_nonnegative_delta_V_checkpoint": "1024"
+          },
+          "decision_contrasts": {
+            "R_I_sem": 4,
+            "delta_C": 0,
+            "delta_C_plus_I_protocol": -21,
+            "delta_I_protocol": -21,
+            "delta_V": 25
+          },
+          "decision_counts": {
+            "A": {
+              "C": 26,
+              "I_protocol": 32,
+              "I_sem": 4,
+              "V": 194
+            },
+            "B": {
+              "C": 26,
+              "I_protocol": 11,
+              "I_sem": 0,
+              "V": 219
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": 9,
+            "hard": 16
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "every_task_delta_V_at_least_minus_2"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "R_I_sem_at_least_26",
+            "bad_paired_leakage_at_most_12",
+            "delta_V_at_least_26",
+            "paired_I_sem_to_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": 12,
+            "B": 13
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 4,
+            "V_A_to_I_sem_B": 0,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 0,
+              "I_sem_to_I_protocol": 0,
+              "V_to_C": 7,
+              "V_to_I_protocol": 9
+            },
+            "bad_paired_leakage": 16,
+            "net_I_sem_to_V_minus_V_to_I_sem": 4
+          },
+          "qualifying_tasks": [
+            "constraint_order",
+            "relation_path",
+            "state_machine"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": 12,
+            "swapped": 13
+          },
+          "task_delta_V": {
+            "boolean_logic": -1,
+            "constraint_order": 11,
+            "modular_arithmetic": -4,
+            "multistep_arithmetic": 1,
+            "relation_path": 17,
+            "sequence_rule": -1,
+            "state_machine": 5,
+            "string_transform": -3
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 30,
+                "transition": "I_protocol->V"
+              },
+              {
+                "count": 9,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 7,
+                "transition": "C->V"
+              },
+              {
+                "count": 7,
+                "transition": "V->C"
+              },
+              {
+                "count": 4,
+                "transition": "I_sem->V"
+              }
+            ],
+            "gross_into_V": 41,
+            "gross_out_of_V": 16,
+            "into_V_components": {
+              "C->V": 7,
+              "I_protocol->V": 30,
+              "I_sem->V": 4
+            },
+            "matrix": {
+              "C": {
+                "C": 19,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 7
+              },
+              "I_protocol": {
+                "C": 0,
+                "I_protocol": 2,
+                "I_sem": 0,
+                "V": 30
+              },
+              "I_sem": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 4
+              },
+              "V": {
+                "C": 7,
+                "I_protocol": 9,
+                "I_sem": 0,
+                "V": 178
+              }
+            },
+            "net_into_V": 25,
+            "out_of_V_components": {
+              "V->C": 7,
+              "V->I_protocol": 9,
+              "V->I_sem": 0
+            }
+          }
+        }
+      },
+      "task_delta_V_vectors_stream_0_1_2": {
+        "boolean_logic": [
+          -1,
+          1,
+          -1
+        ],
+        "constraint_order": [
+          14,
+          11,
+          11
+        ],
+        "modular_arithmetic": [
+          -1,
+          -4,
+          -4
+        ],
+        "multistep_arithmetic": [
+          0,
+          0,
+          1
+        ],
+        "relation_path": [
+          9,
+          16,
+          17
+        ],
+        "sequence_rule": [
+          -1,
+          1,
+          -1
+        ],
+        "state_machine": [
+          -1,
+          5,
+          5
+        ],
+        "string_transform": [
+          -3,
+          -3,
+          -3
+        ]
+      }
+    },
+    "glm4": {
+      "all_three_streams_passed": false,
+      "common_qualifying_task_count": 2,
+      "common_qualifying_tasks": [
+        "boolean_logic",
+        "multistep_arithmetic"
+      ],
+      "consistently_harmed_tasks_delta_V_at_most_minus_3": [
+        "constraint_order",
+        "relation_path",
+        "sequence_rule",
+        "state_machine",
+        "string_transform"
+      ],
+      "consistently_helped_tasks_delta_V_at_least_3": [
+        "boolean_logic",
+        "multistep_arithmetic"
+      ],
+      "decision_delta_V_vector_stream_0_1_2": [
+        -37,
+        -11,
+        -28
+      ],
+      "delta_V_signs": [
+        "negative",
+        "negative",
+        "negative"
+      ],
+      "descriptive_failure_phenotype": "B确有语义错误救援，但被协议错误与未终止增量反向淹没",
+      "first_nonnegative_checkpoint_by_stream_0_1_2": [
+        null,
+        null,
+        null
+      ],
+      "mixed_or_small_task_directions": [
+        "modular_arithmetic"
+      ],
+      "model_pass": false,
+      "streams": {
+        "stream_0": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 18,
+                  "I_sem": 97,
+                  "V": 141
+                },
+                "B": {
+                  "C": 22,
+                  "I_protocol": 90,
+                  "I_sem": 40,
+                  "V": 104
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 94,
+                "delta_V_B_minus_A": -37
+              },
+              "1536": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 18,
+                  "I_sem": 97,
+                  "V": 141
+                },
+                "B": {
+                  "C": 22,
+                  "I_protocol": 90,
+                  "I_sem": 40,
+                  "V": 104
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 94,
+                "delta_V_B_minus_A": -37
+              },
+              "2048": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 18,
+                  "I_sem": 97,
+                  "V": 141
+                },
+                "B": {
+                  "C": 22,
+                  "I_protocol": 90,
+                  "I_sem": 40,
+                  "V": 104
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 94,
+                "delta_V_B_minus_A": -37
+              },
+              "256": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 18,
+                  "I_sem": 97,
+                  "V": 141
+                },
+                "B": {
+                  "C": 104,
+                  "I_protocol": 46,
+                  "I_sem": 20,
+                  "V": 86
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 132,
+                "delta_V_B_minus_A": -55
+              },
+              "512": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 18,
+                  "I_sem": 97,
+                  "V": 141
+                },
+                "B": {
+                  "C": 30,
+                  "I_protocol": 84,
+                  "I_sem": 39,
+                  "V": 103
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 96,
+                "delta_V_B_minus_A": -38
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": 94,
+              "1536": 94,
+              "2048": 94,
+              "256": 132,
+              "512": 96
+            },
+            "delta_V_path": {
+              "1024": -37,
+              "1536": -37,
+              "2048": -37,
+              "256": -55,
+              "512": -38
+            },
+            "first_nonnegative_delta_V_checkpoint": null
+          },
+          "decision_contrasts": {
+            "R_I_sem": 57,
+            "delta_C": 22,
+            "delta_C_plus_I_protocol": 94,
+            "delta_I_protocol": 72,
+            "delta_V": -37
+          },
+          "decision_counts": {
+            "A": {
+              "C": 0,
+              "I_protocol": 18,
+              "I_sem": 97,
+              "V": 141
+            },
+            "B": {
+              "C": 22,
+              "I_protocol": 90,
+              "I_sem": 40,
+              "V": 104
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": -11,
+            "hard": -26
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "easy_delta_V_at_least_0",
+            "every_task_delta_V_at_least_minus_2",
+            "hard_delta_V_at_least_0"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "bad_paired_leakage_at_most_12",
+            "delta_C_at_most_12",
+            "delta_C_plus_I_protocol_at_most_12",
+            "delta_I_protocol_at_most_12",
+            "delta_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": 0,
+            "B": -37
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 36,
+            "V_A_to_I_sem_B": 18,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 6,
+              "I_sem_to_I_protocol": 38,
+              "V_to_C": 13,
+              "V_to_I_protocol": 47
+            },
+            "bad_paired_leakage": 104,
+            "net_I_sem_to_V_minus_V_to_I_sem": 18
+          },
+          "qualifying_tasks": [
+            "boolean_logic",
+            "multistep_arithmetic"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": -29,
+            "swapped": -8
+          },
+          "task_delta_V": {
+            "boolean_logic": 3,
+            "constraint_order": -8,
+            "modular_arithmetic": -7,
+            "multistep_arithmetic": 14,
+            "relation_path": -11,
+            "sequence_rule": -13,
+            "state_machine": -7,
+            "string_transform": -8
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 47,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 38,
+                "transition": "I_sem->I_protocol"
+              },
+              {
+                "count": 36,
+                "transition": "I_sem->V"
+              },
+              {
+                "count": 18,
+                "transition": "V->I_sem"
+              },
+              {
+                "count": 13,
+                "transition": "V->C"
+              },
+              {
+                "count": 6,
+                "transition": "I_sem->C"
+              }
+            ],
+            "gross_into_V": 41,
+            "gross_out_of_V": 78,
+            "into_V_components": {
+              "C->V": 0,
+              "I_protocol->V": 5,
+              "I_sem->V": 36
+            },
+            "matrix": {
+              "C": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "I_protocol": {
+                "C": 3,
+                "I_protocol": 5,
+                "I_sem": 5,
+                "V": 5
+              },
+              "I_sem": {
+                "C": 6,
+                "I_protocol": 38,
+                "I_sem": 17,
+                "V": 36
+              },
+              "V": {
+                "C": 13,
+                "I_protocol": 47,
+                "I_sem": 18,
+                "V": 63
+              }
+            },
+            "net_into_V": -37,
+            "out_of_V_components": {
+              "V->C": 13,
+              "V->I_protocol": 47,
+              "V->I_sem": 18
+            }
+          }
+        },
+        "stream_1": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 14,
+                  "I_sem": 111,
+                  "V": 131
+                },
+                "B": {
+                  "C": 31,
+                  "I_protocol": 66,
+                  "I_sem": 40,
+                  "V": 119
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 83,
+                "delta_V_B_minus_A": -12
+              },
+              "1536": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 14,
+                  "I_sem": 111,
+                  "V": 131
+                },
+                "B": {
+                  "C": 30,
+                  "I_protocol": 66,
+                  "I_sem": 40,
+                  "V": 120
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 82,
+                "delta_V_B_minus_A": -11
+              },
+              "2048": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 14,
+                  "I_sem": 111,
+                  "V": 131
+                },
+                "B": {
+                  "C": 30,
+                  "I_protocol": 66,
+                  "I_sem": 40,
+                  "V": 120
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 82,
+                "delta_V_B_minus_A": -11
+              },
+              "256": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 14,
+                  "I_sem": 111,
+                  "V": 131
+                },
+                "B": {
+                  "C": 111,
+                  "I_protocol": 32,
+                  "I_sem": 23,
+                  "V": 90
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 129,
+                "delta_V_B_minus_A": -41
+              },
+              "512": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 14,
+                  "I_sem": 111,
+                  "V": 131
+                },
+                "B": {
+                  "C": 38,
+                  "I_protocol": 62,
+                  "I_sem": 37,
+                  "V": 119
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 86,
+                "delta_V_B_minus_A": -12
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": 83,
+              "1536": 82,
+              "2048": 82,
+              "256": 129,
+              "512": 86
+            },
+            "delta_V_path": {
+              "1024": -12,
+              "1536": -11,
+              "2048": -11,
+              "256": -41,
+              "512": -12
+            },
+            "first_nonnegative_delta_V_checkpoint": null
+          },
+          "decision_contrasts": {
+            "R_I_sem": 71,
+            "delta_C": 30,
+            "delta_C_plus_I_protocol": 82,
+            "delta_I_protocol": 52,
+            "delta_V": -11
+          },
+          "decision_counts": {
+            "A": {
+              "C": 0,
+              "I_protocol": 14,
+              "I_sem": 111,
+              "V": 131
+            },
+            "B": {
+              "C": 30,
+              "I_protocol": 66,
+              "I_sem": 40,
+              "V": 120
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": -5,
+            "hard": -6
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "easy_delta_V_at_least_0",
+            "every_task_delta_V_at_least_minus_2",
+            "hard_delta_V_at_least_0"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "bad_paired_leakage_at_most_12",
+            "delta_C_at_most_12",
+            "delta_C_plus_I_protocol_at_most_12",
+            "delta_I_protocol_at_most_12",
+            "delta_V_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": 14,
+            "B": -25
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 44,
+            "V_A_to_I_sem_B": 16,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 12,
+              "I_sem_to_I_protocol": 31,
+              "V_to_C": 15,
+              "V_to_I_protocol": 31
+            },
+            "bad_paired_leakage": 89,
+            "net_I_sem_to_V_minus_V_to_I_sem": 28
+          },
+          "qualifying_tasks": [
+            "boolean_logic",
+            "multistep_arithmetic"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": -15,
+            "swapped": 4
+          },
+          "task_delta_V": {
+            "boolean_logic": 12,
+            "constraint_order": -6,
+            "modular_arithmetic": -3,
+            "multistep_arithmetic": 19,
+            "relation_path": -14,
+            "sequence_rule": -8,
+            "state_machine": -3,
+            "string_transform": -8
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 44,
+                "transition": "I_sem->V"
+              },
+              {
+                "count": 31,
+                "transition": "I_sem->I_protocol"
+              },
+              {
+                "count": 31,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 16,
+                "transition": "V->I_sem"
+              },
+              {
+                "count": 15,
+                "transition": "V->C"
+              },
+              {
+                "count": 12,
+                "transition": "I_sem->C"
+              }
+            ],
+            "gross_into_V": 51,
+            "gross_out_of_V": 62,
+            "into_V_components": {
+              "C->V": 0,
+              "I_protocol->V": 7,
+              "I_sem->V": 44
+            },
+            "matrix": {
+              "C": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "I_protocol": {
+                "C": 3,
+                "I_protocol": 4,
+                "I_sem": 0,
+                "V": 7
+              },
+              "I_sem": {
+                "C": 12,
+                "I_protocol": 31,
+                "I_sem": 24,
+                "V": 44
+              },
+              "V": {
+                "C": 15,
+                "I_protocol": 31,
+                "I_sem": 16,
+                "V": 69
+              }
+            },
+            "net_into_V": -11,
+            "out_of_V_components": {
+              "V->C": 15,
+              "V->I_protocol": 31,
+              "V->I_sem": 16
+            }
+          }
+        },
+        "stream_2": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 20,
+                  "I_sem": 99,
+                  "V": 137
+                },
+                "B": {
+                  "C": 32,
+                  "I_protocol": 80,
+                  "I_sem": 35,
+                  "V": 109
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 92,
+                "delta_V_B_minus_A": -28
+              },
+              "1536": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 20,
+                  "I_sem": 99,
+                  "V": 137
+                },
+                "B": {
+                  "C": 31,
+                  "I_protocol": 81,
+                  "I_sem": 35,
+                  "V": 109
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 92,
+                "delta_V_B_minus_A": -28
+              },
+              "2048": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 20,
+                  "I_sem": 99,
+                  "V": 137
+                },
+                "B": {
+                  "C": 31,
+                  "I_protocol": 81,
+                  "I_sem": 35,
+                  "V": 109
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 92,
+                "delta_V_B_minus_A": -28
+              },
+              "256": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 20,
+                  "I_sem": 99,
+                  "V": 137
+                },
+                "B": {
+                  "C": 99,
+                  "I_protocol": 45,
+                  "I_sem": 24,
+                  "V": 88
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 124,
+                "delta_V_B_minus_A": -49
+              },
+              "512": {
+                "A": {
+                  "C": 0,
+                  "I_protocol": 20,
+                  "I_sem": 99,
+                  "V": 137
+                },
+                "B": {
+                  "C": 40,
+                  "I_protocol": 74,
+                  "I_sem": 33,
+                  "V": 109
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 94,
+                "delta_V_B_minus_A": -28
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": 92,
+              "1536": 92,
+              "2048": 92,
+              "256": 124,
+              "512": 94
+            },
+            "delta_V_path": {
+              "1024": -28,
+              "1536": -28,
+              "2048": -28,
+              "256": -49,
+              "512": -28
+            },
+            "first_nonnegative_delta_V_checkpoint": null
+          },
+          "decision_contrasts": {
+            "R_I_sem": 64,
+            "delta_C": 31,
+            "delta_C_plus_I_protocol": 92,
+            "delta_I_protocol": 61,
+            "delta_V": -28
+          },
+          "decision_counts": {
+            "A": {
+              "C": 0,
+              "I_protocol": 20,
+              "I_sem": 99,
+              "V": 137
+            },
+            "B": {
+              "C": 31,
+              "I_protocol": 81,
+              "I_sem": 35,
+              "V": 109
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": -15,
+            "hard": -13
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "easy_delta_V_at_least_0",
+            "every_task_delta_V_at_least_minus_2",
+            "hard_delta_V_at_least_0"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "bad_paired_leakage_at_most_12",
+            "delta_C_at_most_12",
+            "delta_C_plus_I_protocol_at_most_12",
+            "delta_I_protocol_at_most_12",
+            "delta_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": -2,
+            "B": -26
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 32,
+            "V_A_to_I_sem_B": 14,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 13,
+              "I_sem_to_I_protocol": 37,
+              "V_to_C": 16,
+              "V_to_I_protocol": 37
+            },
+            "bad_paired_leakage": 103,
+            "net_I_sem_to_V_minus_V_to_I_sem": 18
+          },
+          "qualifying_tasks": [
+            "boolean_logic",
+            "multistep_arithmetic"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": -14,
+            "swapped": -14
+          },
+          "task_delta_V": {
+            "boolean_logic": 9,
+            "constraint_order": -3,
+            "modular_arithmetic": -2,
+            "multistep_arithmetic": 11,
+            "relation_path": -13,
+            "sequence_rule": -11,
+            "state_machine": -11,
+            "string_transform": -8
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 37,
+                "transition": "I_sem->I_protocol"
+              },
+              {
+                "count": 37,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 32,
+                "transition": "I_sem->V"
+              },
+              {
+                "count": 16,
+                "transition": "V->C"
+              },
+              {
+                "count": 14,
+                "transition": "V->I_sem"
+              },
+              {
+                "count": 13,
+                "transition": "I_sem->C"
+              }
+            ],
+            "gross_into_V": 39,
+            "gross_out_of_V": 67,
+            "into_V_components": {
+              "C->V": 0,
+              "I_protocol->V": 7,
+              "I_sem->V": 32
+            },
+            "matrix": {
+              "C": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "I_protocol": {
+                "C": 2,
+                "I_protocol": 7,
+                "I_sem": 4,
+                "V": 7
+              },
+              "I_sem": {
+                "C": 13,
+                "I_protocol": 37,
+                "I_sem": 17,
+                "V": 32
+              },
+              "V": {
+                "C": 16,
+                "I_protocol": 37,
+                "I_sem": 14,
+                "V": 70
+              }
+            },
+            "net_into_V": -28,
+            "out_of_V_components": {
+              "V->C": 16,
+              "V->I_protocol": 37,
+              "V->I_sem": 14
+            }
+          }
+        }
+      },
+      "task_delta_V_vectors_stream_0_1_2": {
+        "boolean_logic": [
+          3,
+          12,
+          9
+        ],
+        "constraint_order": [
+          -8,
+          -6,
+          -3
+        ],
+        "modular_arithmetic": [
+          -7,
+          -3,
+          -2
+        ],
+        "multistep_arithmetic": [
+          14,
+          19,
+          11
+        ],
+        "relation_path": [
+          -11,
+          -14,
+          -13
+        ],
+        "sequence_rule": [
+          -13,
+          -8,
+          -11
+        ],
+        "state_machine": [
+          -7,
+          -3,
+          -11
+        ],
+        "string_transform": [
+          -8,
+          -8,
+          -8
+        ]
+      }
+    },
+    "qwen3": {
+      "all_three_streams_passed": false,
+      "common_qualifying_task_count": 0,
+      "common_qualifying_tasks": [],
+      "consistently_harmed_tasks_delta_V_at_most_minus_3": [
+        "boolean_logic",
+        "modular_arithmetic",
+        "multistep_arithmetic",
+        "sequence_rule",
+        "string_transform"
+      ],
+      "consistently_helped_tasks_delta_V_at_least_3": [],
+      "decision_delta_V_vector_stream_0_1_2": [
+        -40,
+        -29,
+        -29
+      ],
+      "delta_V_signs": [
+        "negative",
+        "negative",
+        "negative"
+      ],
+      "descriptive_failure_phenotype": "B延迟或破坏终止，但没有可观测语义错误救援信号",
+      "first_nonnegative_checkpoint_by_stream_0_1_2": [
+        null,
+        null,
+        null
+      ],
+      "mixed_or_small_task_directions": [
+        "constraint_order",
+        "relation_path",
+        "state_machine"
+      ],
+      "model_pass": false,
+      "streams": {
+        "stream_0": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 54,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 202
+                },
+                "B": {
+                  "C": 86,
+                  "I_protocol": 13,
+                  "I_sem": 0,
+                  "V": 157
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 45,
+                "delta_V_B_minus_A": -45
+              },
+              "1536": {
+                "A": {
+                  "C": 19,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 237
+                },
+                "B": {
+                  "C": 55,
+                  "I_protocol": 14,
+                  "I_sem": 0,
+                  "V": 187
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 50,
+                "delta_V_B_minus_A": -50
+              },
+              "2048": {
+                "A": {
+                  "C": 14,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 242
+                },
+                "B": {
+                  "C": 36,
+                  "I_protocol": 18,
+                  "I_sem": 0,
+                  "V": 202
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 40,
+                "delta_V_B_minus_A": -40
+              },
+              "256": {
+                "A": {
+                  "C": 215,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 41
+                },
+                "B": {
+                  "C": 254,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 2
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 39,
+                "delta_V_B_minus_A": -39
+              },
+              "512": {
+                "A": {
+                  "C": 121,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 135
+                },
+                "B": {
+                  "C": 195,
+                  "I_protocol": 7,
+                  "I_sem": 0,
+                  "V": 54
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 81,
+                "delta_V_B_minus_A": -81
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": 45,
+              "1536": 50,
+              "2048": 40,
+              "256": 39,
+              "512": 81
+            },
+            "delta_V_path": {
+              "1024": -45,
+              "1536": -50,
+              "2048": -40,
+              "256": -39,
+              "512": -81
+            },
+            "first_nonnegative_delta_V_checkpoint": null
+          },
+          "decision_contrasts": {
+            "R_I_sem": 0,
+            "delta_C": 22,
+            "delta_C_plus_I_protocol": 40,
+            "delta_I_protocol": 18,
+            "delta_V": -40
+          },
+          "decision_counts": {
+            "A": {
+              "C": 14,
+              "I_protocol": 0,
+              "I_sem": 0,
+              "V": 242
+            },
+            "B": {
+              "C": 36,
+              "I_protocol": 18,
+              "I_sem": 0,
+              "V": 202
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": -14,
+            "hard": -26
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "easy_delta_V_at_least_0",
+            "every_task_delta_V_at_least_minus_2",
+            "hard_delta_V_at_least_0"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "R_I_sem_at_least_26",
+            "bad_paired_leakage_at_most_12",
+            "delta_C_at_most_12",
+            "delta_C_plus_I_protocol_at_most_12",
+            "delta_I_protocol_at_most_12",
+            "delta_V_at_least_26",
+            "paired_I_sem_to_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": -19,
+            "B": -21
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 0,
+            "V_A_to_I_sem_B": 0,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 0,
+              "I_sem_to_I_protocol": 0,
+              "V_to_C": 25,
+              "V_to_I_protocol": 18
+            },
+            "bad_paired_leakage": 43,
+            "net_I_sem_to_V_minus_V_to_I_sem": 0
+          },
+          "qualifying_tasks": [],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": -21,
+            "swapped": -19
+          },
+          "task_delta_V": {
+            "boolean_logic": -4,
+            "constraint_order": 0,
+            "modular_arithmetic": -11,
+            "multistep_arithmetic": -8,
+            "relation_path": 0,
+            "sequence_rule": -10,
+            "state_machine": -1,
+            "string_transform": -6
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 25,
+                "transition": "V->C"
+              },
+              {
+                "count": 18,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 3,
+                "transition": "C->V"
+              }
+            ],
+            "gross_into_V": 3,
+            "gross_out_of_V": 43,
+            "into_V_components": {
+              "C->V": 3,
+              "I_protocol->V": 0,
+              "I_sem->V": 0
+            },
+            "matrix": {
+              "C": {
+                "C": 11,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 3
+              },
+              "I_protocol": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "I_sem": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "V": {
+                "C": 25,
+                "I_protocol": 18,
+                "I_sem": 0,
+                "V": 199
+              }
+            },
+            "net_into_V": -40,
+            "out_of_V_components": {
+              "V->C": 25,
+              "V->I_protocol": 18,
+              "V->I_sem": 0
+            }
+          }
+        },
+        "stream_1": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 54,
+                  "I_protocol": 1,
+                  "I_sem": 0,
+                  "V": 201
+                },
+                "B": {
+                  "C": 87,
+                  "I_protocol": 11,
+                  "I_sem": 0,
+                  "V": 158
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 43,
+                "delta_V_B_minus_A": -43
+              },
+              "1536": {
+                "A": {
+                  "C": 29,
+                  "I_protocol": 1,
+                  "I_sem": 0,
+                  "V": 226
+                },
+                "B": {
+                  "C": 54,
+                  "I_protocol": 11,
+                  "I_sem": 0,
+                  "V": 191
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 35,
+                "delta_V_B_minus_A": -35
+              },
+              "2048": {
+                "A": {
+                  "C": 16,
+                  "I_protocol": 1,
+                  "I_sem": 0,
+                  "V": 239
+                },
+                "B": {
+                  "C": 35,
+                  "I_protocol": 11,
+                  "I_sem": 0,
+                  "V": 210
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 29,
+                "delta_V_B_minus_A": -29
+              },
+              "256": {
+                "A": {
+                  "C": 211,
+                  "I_protocol": 1,
+                  "I_sem": 0,
+                  "V": 44
+                },
+                "B": {
+                  "C": 256,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 0
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 44,
+                "delta_V_B_minus_A": -44
+              },
+              "512": {
+                "A": {
+                  "C": 129,
+                  "I_protocol": 1,
+                  "I_sem": 0,
+                  "V": 126
+                },
+                "B": {
+                  "C": 196,
+                  "I_protocol": 8,
+                  "I_sem": 0,
+                  "V": 52
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 74,
+                "delta_V_B_minus_A": -74
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": 43,
+              "1536": 35,
+              "2048": 29,
+              "256": 44,
+              "512": 74
+            },
+            "delta_V_path": {
+              "1024": -43,
+              "1536": -35,
+              "2048": -29,
+              "256": -44,
+              "512": -74
+            },
+            "first_nonnegative_delta_V_checkpoint": null
+          },
+          "decision_contrasts": {
+            "R_I_sem": 0,
+            "delta_C": 19,
+            "delta_C_plus_I_protocol": 29,
+            "delta_I_protocol": 10,
+            "delta_V": -29
+          },
+          "decision_counts": {
+            "A": {
+              "C": 16,
+              "I_protocol": 1,
+              "I_sem": 0,
+              "V": 239
+            },
+            "B": {
+              "C": 35,
+              "I_protocol": 11,
+              "I_sem": 0,
+              "V": 210
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": -9,
+            "hard": -20
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "easy_delta_V_at_least_0",
+            "every_task_delta_V_at_least_minus_2",
+            "hard_delta_V_at_least_0"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "R_I_sem_at_least_26",
+            "bad_paired_leakage_at_most_12",
+            "delta_C_at_most_12",
+            "delta_C_plus_I_protocol_at_most_12",
+            "delta_V_at_least_26",
+            "paired_I_sem_to_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": -17,
+            "B": -12
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 0,
+            "V_A_to_I_sem_B": 0,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 0,
+              "I_sem_to_I_protocol": 0,
+              "V_to_C": 25,
+              "V_to_I_protocol": 10
+            },
+            "bad_paired_leakage": 35,
+            "net_I_sem_to_V_minus_V_to_I_sem": 0
+          },
+          "qualifying_tasks": [],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": -18,
+            "swapped": -11
+          },
+          "task_delta_V": {
+            "boolean_logic": -3,
+            "constraint_order": 0,
+            "modular_arithmetic": -10,
+            "multistep_arithmetic": -7,
+            "relation_path": -1,
+            "sequence_rule": -5,
+            "state_machine": 2,
+            "string_transform": -5
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 25,
+                "transition": "V->C"
+              },
+              {
+                "count": 10,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 6,
+                "transition": "C->V"
+              }
+            ],
+            "gross_into_V": 6,
+            "gross_out_of_V": 35,
+            "into_V_components": {
+              "C->V": 6,
+              "I_protocol->V": 0,
+              "I_sem->V": 0
+            },
+            "matrix": {
+              "C": {
+                "C": 10,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 6
+              },
+              "I_protocol": {
+                "C": 0,
+                "I_protocol": 1,
+                "I_sem": 0,
+                "V": 0
+              },
+              "I_sem": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "V": {
+                "C": 25,
+                "I_protocol": 10,
+                "I_sem": 0,
+                "V": 204
+              }
+            },
+            "net_into_V": -29,
+            "out_of_V_components": {
+              "V->C": 25,
+              "V->I_protocol": 10,
+              "V->I_sem": 0
+            }
+          }
+        },
+        "stream_2": {
+          "checkpoint_profile": {
+            "by_checkpoint": {
+              "1024": {
+                "A": {
+                  "C": 47,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 209
+                },
+                "B": {
+                  "C": 92,
+                  "I_protocol": 11,
+                  "I_sem": 0,
+                  "V": 153
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 56,
+                "delta_V_B_minus_A": -56
+              },
+              "1536": {
+                "A": {
+                  "C": 18,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 238
+                },
+                "B": {
+                  "C": 43,
+                  "I_protocol": 11,
+                  "I_sem": 0,
+                  "V": 202
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 36,
+                "delta_V_B_minus_A": -36
+              },
+              "2048": {
+                "A": {
+                  "C": 13,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 243
+                },
+                "B": {
+                  "C": 29,
+                  "I_protocol": 13,
+                  "I_sem": 0,
+                  "V": 214
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 29,
+                "delta_V_B_minus_A": -29
+              },
+              "256": {
+                "A": {
+                  "C": 214,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 42
+                },
+                "B": {
+                  "C": 254,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 2
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 40,
+                "delta_V_B_minus_A": -40
+              },
+              "512": {
+                "A": {
+                  "C": 122,
+                  "I_protocol": 0,
+                  "I_sem": 0,
+                  "V": 134
+                },
+                "B": {
+                  "C": 192,
+                  "I_protocol": 7,
+                  "I_sem": 0,
+                  "V": 57
+                },
+                "delta_C_plus_I_protocol_B_minus_A": 77,
+                "delta_V_B_minus_A": -77
+              }
+            },
+            "checkpoint_role": "descriptive_only; 2048 alone sets the decision",
+            "delta_C_plus_I_protocol_path": {
+              "1024": 56,
+              "1536": 36,
+              "2048": 29,
+              "256": 40,
+              "512": 77
+            },
+            "delta_V_path": {
+              "1024": -56,
+              "1536": -36,
+              "2048": -29,
+              "256": -40,
+              "512": -77
+            },
+            "first_nonnegative_delta_V_checkpoint": null
+          },
+          "decision_contrasts": {
+            "R_I_sem": 0,
+            "delta_C": 16,
+            "delta_C_plus_I_protocol": 29,
+            "delta_I_protocol": 13,
+            "delta_V": -29
+          },
+          "decision_counts": {
+            "A": {
+              "C": 13,
+              "I_protocol": 0,
+              "I_sem": 0,
+              "V": 243
+            },
+            "B": {
+              "C": 29,
+              "I_protocol": 13,
+              "I_sem": 0,
+              "V": 214
+            }
+          },
+          "difficulty_delta_V": {
+            "easy": -9,
+            "hard": -20
+          },
+          "failed_coverage_checks": [
+            "at_least_6_tasks_delta_V_at_least_3",
+            "easy_delta_V_at_least_0",
+            "every_task_delta_V_at_least_minus_2",
+            "hard_delta_V_at_least_0"
+          ],
+          "failed_label_swap_checks": [
+            "both_gold_strata_pass",
+            "both_swap_strata_pass"
+          ],
+          "failed_primary_checks": [
+            "R_I_sem_at_least_26",
+            "bad_paired_leakage_at_most_12",
+            "delta_C_at_most_12",
+            "delta_C_plus_I_protocol_at_most_12",
+            "delta_I_protocol_at_most_12",
+            "delta_V_at_least_26",
+            "paired_I_sem_to_V_at_least_26",
+            "paired_net_at_least_26"
+          ],
+          "gold_label_delta_V": {
+            "A": -13,
+            "B": -16
+          },
+          "paired": {
+            "I_sem_A_to_V_B": 0,
+            "V_A_to_I_sem_B": 0,
+            "bad_leakage_terms": {
+              "I_sem_to_C": 0,
+              "I_sem_to_I_protocol": 0,
+              "V_to_C": 23,
+              "V_to_I_protocol": 13
+            },
+            "bad_paired_leakage": 36,
+            "net_I_sem_to_V_minus_V_to_I_sem": 0
+          },
+          "qualifying_tasks": [
+            "state_machine"
+          ],
+          "stream_passed": false,
+          "swap_surface_delta_V": {
+            "original": -19,
+            "swapped": -10
+          },
+          "task_delta_V": {
+            "boolean_logic": -4,
+            "constraint_order": 0,
+            "modular_arithmetic": -9,
+            "multistep_arithmetic": -7,
+            "relation_path": 0,
+            "sequence_rule": -9,
+            "state_machine": 4,
+            "string_transform": -4
+          },
+          "transition_flux": {
+            "dominant_off_diagonal_transitions": [
+              {
+                "count": 23,
+                "transition": "V->C"
+              },
+              {
+                "count": 13,
+                "transition": "V->I_protocol"
+              },
+              {
+                "count": 7,
+                "transition": "C->V"
+              }
+            ],
+            "gross_into_V": 7,
+            "gross_out_of_V": 36,
+            "into_V_components": {
+              "C->V": 7,
+              "I_protocol->V": 0,
+              "I_sem->V": 0
+            },
+            "matrix": {
+              "C": {
+                "C": 6,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 7
+              },
+              "I_protocol": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "I_sem": {
+                "C": 0,
+                "I_protocol": 0,
+                "I_sem": 0,
+                "V": 0
+              },
+              "V": {
+                "C": 23,
+                "I_protocol": 13,
+                "I_sem": 0,
+                "V": 207
+              }
+            },
+            "net_into_V": -29,
+            "out_of_V_components": {
+              "V->C": 23,
+              "V->I_protocol": 13,
+              "V->I_sem": 0
+            }
+          }
+        }
+      },
+      "task_delta_V_vectors_stream_0_1_2": {
+        "boolean_logic": [
+          -4,
+          -3,
+          -4
+        ],
+        "constraint_order": [
+          0,
+          0,
+          0
+        ],
+        "modular_arithmetic": [
+          -11,
+          -10,
+          -9
+        ],
+        "multistep_arithmetic": [
+          -8,
+          -7,
+          -7
+        ],
+        "relation_path": [
+          0,
+          -1,
+          0
+        ],
+        "sequence_rule": [
+          -10,
+          -5,
+          -9
+        ],
+        "state_machine": [
+          -1,
+          2,
+          4
+        ],
+        "string_transform": [
+          -6,
+          -5,
+          -4
+        ]
+      }
+    }
+  },
+  "models_pooled": false,
+  "morphology_sha256": "64232e113320607402e539cf1b0628f399b5aeba29a084394772bff3863a05cb",
+  "next_stage_constraints": {
+    "allowed_now": "保存失败形态并设计新的、独立预注册的开发阶段",
+    "exclude_failed_model": false,
+    "relax_thresholds": false,
+    "reuse_formal_rows_for_candidate_selection": false,
+    "run_holdout_now": false,
+    "run_internal_mechanism_now": false
+  },
+  "phase": 983,
+  "primary_decision_unchanged": true,
+  "schema_version": 1,
+  "source_audit_file_sha256": "1f914718df164f6506f2701c780e4c26ec2f1a0c8e7070f50f3bf903c1d3d62e",
+  "source_audit_sha256": "1cac51248a4cc3157a785cb99c767c0eebc536138b0e60d9a7958c4e247022a4",
+  "source_protocol_sha256": "6799236d7fbf8d9de48d670a84380d870b96a0bfb382f928cb68b714f50c5a7e",
+  "source_scientific_decision": "NO-GO",
+  "statistical_significance_claimed": false
+}

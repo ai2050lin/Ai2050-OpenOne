@@ -1,0 +1,640 @@
+{
+  "arms": {
+    "A": {
+      "instruction": "Solve the task and answer as directly as possible. Do not show your reasoning. End with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+      "name": "external_direct_instruction",
+      "role": "baseline"
+    },
+    "B": {
+      "instruction": "Work through the task step by step before answering. Then end with exactly one standalone line FINAL: X, replacing X with A or B. Output nothing after that line.",
+      "name": "external_deliberate_instruction",
+      "role": "candidate"
+    }
+  },
+  "attachment_lineage": {
+    "language_math_attachment_sha256": "7193bb49384fb7314c9dba2ae7366f725a25b82557853a1580a55c57f2759588",
+    "phase983_proposal_attachment_sha256": "140613f8e9b7e91d68751e17d815bbb8930094ed90a665c86ac4591551d9b00b"
+  },
+  "batch_size": 8,
+  "checkpoints": [
+    256,
+    512,
+    1024,
+    1536,
+    2048
+  ],
+  "created_at_utc": "2026-07-19T03:00:47+00:00",
+  "dataset": {
+    "dataset_audit_content_sha256": "09b1fe5d599bd21df3a3dc70973f2b45b00325182205369740559cf07ac92d20",
+    "dataset_audit_file_sha256": "98fed24375cfd46430752bbcb401ede603b7dade83748d8c7cb9e259d0b3957d",
+    "dataset_content_sha256": "18bc8e6659ee2ce9e6616e820336fcf532ce04eb453c6e0f5b60bc454fabf012",
+    "dataset_file_sha256": "5095ebf4748d3042728c514e7eae4f457888d58781a546497568ba301b3339db",
+    "fresh_against_phase979_and_phase981": true,
+    "item_count": 256,
+    "option_swap_twins": true,
+    "phase977_holdout_loaded": false,
+    "semantic_instance_count": 128
+  },
+  "dependency_seals": {
+    "model_registry": {
+      "bytes": 1350,
+      "path": "tests/gpt5/model_registry.py",
+      "sha256": "84c30398a9effa47791635fd25662426164460e036e59bb83a38c855db370864"
+    }
+  },
+  "execution_contract": {
+    "arm_excluded_from_seed": true,
+    "cpu_only_protocol_freeze": true,
+    "decision_withheld_for_independent_cpu_audit": true,
+    "engineering_qualification_authorized": true,
+    "first_eos_absorbing": true,
+    "formal_generation_authorized": false,
+    "formal_generation_requires_separate_admission": true,
+    "gpu_used": false,
+    "model_namespace_in_seed": true,
+    "model_weights_loaded": false,
+    "one_longest_rollout_for_all_checkpoints": true,
+    "one_model_resident_at_a_time": true,
+    "private_generator_per_row": true,
+    "qualification_uses_no_formal_dataset_items": true,
+    "resume_and_batch_hashing": true,
+    "same_semantic_seed_key_model_stream_across_arms_and_swaps": true,
+    "strict_sequential_subprocess_order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ]
+  },
+  "expected_rows_all_models": 4608,
+  "expected_rows_per_model": 1536,
+  "experiment": "fresh256_option_swap_cross_model_external_contract",
+  "forbidden_interpretations": [
+    "native thinking switch equivalence",
+    "equivalent native assistant prefill across model families",
+    "internal neural channel",
+    "individual counterfactual causality from common random seeds",
+    "statistical independence of seed streams",
+    "cross-model pooled denominator",
+    "shared internal language mechanism"
+  ],
+  "gate_contract": {
+    "coverage": {
+      "easy_and_hard_delta_V_floor": 0,
+      "every_task_delta_V_floor": -2,
+      "qualifying_task_delta_V_min": 3,
+      "qualifying_tasks_required": 6,
+      "same_tasks_required_across_all_model_stream_cells": true,
+      "same_tasks_required_within_model_stream_intersection": true
+    },
+    "cpu_only": true,
+    "decision": {
+      "cross_model_pass": "all3_models AND all9_common_tasks>=6",
+      "model_pass": "all3_streams AND common_tasks>=6",
+      "pooling_allowed": false,
+      "secondary_can_set_primary": false
+    },
+    "denominators": {
+      "per_difficulty": 128,
+      "per_gold_label": 128,
+      "per_gold_swap_cell": 64,
+      "per_model_stream_arm": 256,
+      "per_swap_variant": 128,
+      "per_task": 32,
+      "per_task_difficulty": 16,
+      "per_task_difficulty_gold_swap_cell": 4,
+      "semantic_pairs": 128
+    },
+    "direction": "external_bundle_B_minus_external_bundle_A",
+    "experiment": "cross_model_external_configuration_bundle_gate",
+    "gold_and_swap_safety": {
+      "candidate_B_abs_C_gold_A_minus_gold_B_max": 12,
+      "delta_C_plus_I_protocol_max": 6,
+      "delta_V_min": 13,
+      "each_N": 128
+    },
+    "internal_thinking_mechanism_claim": false,
+    "model_display_names": {
+      "deepseek7b": "DS7B",
+      "glm4": "GLM4",
+      "qwen3": "Qwen3"
+    },
+    "models": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "operational_threshold_interpretation": {
+      "benefit": "pre-fixed approximately 10 percent of N=256",
+      "caller_overrides_allowed": false,
+      "gold_and_swap_strata": "proportionally halved for N=128",
+      "harm": "pre-fixed approximately 5 percent of N=256",
+      "natural_constant": false,
+      "statistical_significance_test": false
+    },
+    "pairing": {
+      "baseline_candidate_item_keys_and_metadata_must_match": true,
+      "one_original_and_one_swapped_surface_per_semantic_id": true,
+      "opposite_gold_labels_within_semantic_pair": true,
+      "twins_are_not_independent_samples": true
+    },
+    "partition": "V+C+I_protocol+I_sem=N",
+    "per_model_stream_primary": {
+      "R_I_sem_min": 26,
+      "delta_C_max": 12,
+      "delta_C_plus_I_protocol_max": 12,
+      "delta_I_protocol_max": 12,
+      "delta_V_min": 26,
+      "paired_I_sem_to_V_min": 26,
+      "paired_bad_leakage_formula": "I_sem->C + I_sem->I_protocol + V->C + V->I_protocol",
+      "paired_bad_leakage_max": 12,
+      "paired_net_I_sem_to_V_minus_V_to_I_sem_min": 26
+    },
+    "phase": 983,
+    "same_natural_language_instruction_contract": true,
+    "schema_version": 1,
+    "scientific_object": "cross-model external configuration bundle contrast",
+    "states": [
+      "V",
+      "C",
+      "I_protocol",
+      "I_sem"
+    ],
+    "streams": [
+      "stream_0",
+      "stream_1",
+      "stream_2"
+    ]
+  },
+  "gate_contract_sha256": "617c90c1cd539b6e0e3261c6859549b1bc243cdd31a8979083b85c452fb16c41",
+  "max_new_tokens": 2048,
+  "model_artifact_identities": {
+    "deepseek7b": {
+      "files": {
+        "config.json": {
+          "bytes": 680,
+          "sha256": "8290d3c1e385e2616572eb6926f7e2745f901d1c13da95970326a8a73f6c379c"
+        },
+        "generation_config.json": {
+          "bytes": 181,
+          "sha256": "72cbec1015da9ed03ad025483005cbf6481403abf947adfd54e504d1a66a2126"
+        },
+        "model-00001-of-000002.safetensors": {
+          "bytes": 8606596466,
+          "sha256": "8b27be8d43b81d0cd19b3113ef88caf1a61c2fc602de77e3cce97aedcec184b4"
+        },
+        "model-00002-of-000002.safetensors": {
+          "bytes": 6624675384,
+          "sha256": "1780a9502f56f592cb4d6262c8c76ca8ad36a86b0257e052c672d87f49707e80"
+        },
+        "model.safetensors.index.json": {
+          "bytes": 28090,
+          "sha256": "788266ec033788abcf34b2cb8fe156ce300ae05d94d3d54c60f2ecffd8927a1a"
+        },
+        "tokenizer.json": {
+          "bytes": 7031660,
+          "sha256": "88145e3c3249adc2546ede277e9819d6e405e19072456e4b521cbc724bd60773"
+        },
+        "tokenizer_config.json": {
+          "bytes": 3071,
+          "sha256": "8ac8c85fb242563c2260baec0909debd69d718af6a0b3d90e6cab62b4d341cd5"
+        }
+      },
+      "gpu_accessed": false,
+      "identity_sha256": "d024a1fd04ef9cc90c1cfeac4a305ed07328b4e0ef4d4b7d2b7c13c7220fc666",
+      "model_key": "deepseek7b",
+      "relative_path": "models/hf/deepseek-r1-distill-qwen-7b",
+      "weight_bytes": 15231271850,
+      "weight_file_count": 2,
+      "weights_loaded": false
+    },
+    "glm4": {
+      "files": {
+        "config.json": {
+          "bytes": 661,
+          "sha256": "8ec64bc0dff4835a800b9eceb059e2b8263f783c898812175aa1ccdda074f596"
+        },
+        "generation_config.json": {
+          "bytes": 160,
+          "sha256": "1871e89e9388f22b0704fb4d498311e67fda1e812adc066543b09a05a4da3667"
+        },
+        "model-00001-of-00004.safetensors": {
+          "bytes": 4984133600,
+          "sha256": "36b42739ee927f68ec00fbb329b78938784654b4269b6ef68e6c0f86244fe8fe"
+        },
+        "model-00002-of-00004.safetensors": {
+          "bytes": 4895075168,
+          "sha256": "029329f34bb73bd71b7e5f6391c62383d6bf888b88d4168fb7c416ea283da3f7"
+        },
+        "model-00003-of-00004.safetensors": {
+          "bytes": 4895075184,
+          "sha256": "b5e6131e4059dcd8f29b006c8d951684fdf2a89cc79132d74e1b071a42fb9cae"
+        },
+        "model-00004-of-00004.safetensors": {
+          "bytes": 4025669744,
+          "sha256": "02e9f256892a30b5e1c1176b0fff19d143f7944432529f16f2c7e8bb0d8106a0"
+        },
+        "model.safetensors.index.json": {
+          "bytes": 36594,
+          "sha256": "a487cf9538612b812f03e35621c32d97df19e26197c348c44fd74601fa0c6b9b"
+        },
+        "tokenizer.json": {
+          "bytes": 19967863,
+          "sha256": "8a7269d6daa6328de533def0082ff9d3a825bb89036cbcc665c324f941f67fbf"
+        },
+        "tokenizer_config.json": {
+          "bytes": 6116,
+          "sha256": "5ac39fe659e4fafd9e93dc158883590a73339ced96e1a91c767cd12a9cb3f8df"
+        }
+      },
+      "gpu_accessed": false,
+      "identity_sha256": "8073e3f6129d4e92d1b77d834d346787269789f443859714467eb45e67f76ce5",
+      "model_key": "glm4",
+      "relative_path": "models/hf/glm4-9b-chat-hf",
+      "weight_bytes": 18799953696,
+      "weight_file_count": 4,
+      "weights_loaded": false
+    },
+    "qwen3": {
+      "files": {
+        "config.json": {
+          "bytes": 726,
+          "sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a"
+        },
+        "generation_config.json": {
+          "bytes": 239,
+          "sha256": "2325da0f15bb848e018c5ae071b7943332e9f871d6b60e2ed22ca97d4cb993d2"
+        },
+        "merges.txt": {
+          "bytes": 1671853,
+          "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+        },
+        "model-00001-of-00003.safetensors": {
+          "bytes": 3957900840,
+          "sha256": "328a91d3122359d5547f9d79521205bc0a46e1f79a792dfe650e99fc2d651223"
+        },
+        "model-00002-of-00003.safetensors": {
+          "bytes": 3987450520,
+          "sha256": "6cd087b316306a68c562436b5492edbcf6e16c6dba3a1308279caa5a58e21ca5"
+        },
+        "model-00003-of-00003.safetensors": {
+          "bytes": 99630640,
+          "sha256": "e4bf436957184f4eeb86a80e9db394503f1f56446b2e6b7edeac5b81470f4ca1"
+        },
+        "model.safetensors.index.json": {
+          "bytes": 32819,
+          "sha256": "6dc0981b8829fead746441f68f38f24c5ca4a3a66351f652c26c6df0efc43ab2"
+        },
+        "tokenizer.json": {
+          "bytes": 11422654,
+          "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+        },
+        "tokenizer_config.json": {
+          "bytes": 9732,
+          "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101"
+        },
+        "vocab.json": {
+          "bytes": 2776833,
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+        }
+      },
+      "gpu_accessed": false,
+      "identity_sha256": "c99d82c36beb99cb5bcdce8a29d79aaec24b188a527fbdf504c99c0f502f438e",
+      "model_key": "qwen3",
+      "relative_path": "models/hf/qwen3-4b",
+      "weight_bytes": 8044982000,
+      "weight_file_count": 3,
+      "weights_loaded": false
+    }
+  },
+  "model_order": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "models": [
+    "qwen3",
+    "glm4",
+    "deepseek7b"
+  ],
+  "native_generation_prefill_policy": {
+    "frozen_separately_for_each_model": true,
+    "is_not_a_native_thinking_switch_intervention": true,
+    "is_part_of_the_model_specific_native_template_bundle": true,
+    "must_be_identical_across_arms_within_model": true,
+    "must_be_identical_across_models": false
+  },
+  "phase": 983,
+  "primary_direction": "B_minus_A",
+  "protocol_sha256": "b47986c16ea220ef6452c6b5b91afb9ab1d90ee1e3b37576ac06239d6000616d",
+  "quantization": {
+    "attn_implementation": "sdpa",
+    "load_in_8bit": true,
+    "non_quantized_compute_dtype": "bfloat16",
+    "same_policy_all_models": true
+  },
+  "sampling": {
+    "min_p": 0.0,
+    "temperature": 0.6,
+    "top_k": 20,
+    "top_p": 0.95
+  },
+  "schema_version": 1,
+  "scope": {
+    "activation_collection": false,
+    "holdout": false,
+    "holdout_loaded": false,
+    "internal_intervention": false,
+    "mechanism": false,
+    "mechanism_authorized": false,
+    "multimodal_generalization": false
+  },
+  "script_seals": {
+    "admission": {
+      "bytes": 17790,
+      "path": "tests/glm5/phase983_cross_model_admission.py",
+      "sha256": "05f091f9a296617b4886759092bded630518dd2b1aa624e7e980ace87423e118"
+    },
+    "audit": {
+      "bytes": 66747,
+      "path": "tests/glm5/phase983_cross_model_audit.py",
+      "sha256": "de27092dc3104d9448648c72fb7735f26d280e67d26a36b618fb58b3ce51375e"
+    },
+    "core": {
+      "bytes": 19472,
+      "path": "tests/glm5/phase983_cross_model_core.py",
+      "sha256": "d794e20d1c53a2e235a717aedd86b2703c29c38f304eca0f149d3cae2a1c7359"
+    },
+    "dataset": {
+      "bytes": 87785,
+      "path": "tests/glm5/phase983_option_swap_dataset.py",
+      "sha256": "1d599aeaf0770bf44d9726d33a568f4e57a5ee2b8a0e8d82032fefdeee59ec26"
+    },
+    "engine": {
+      "bytes": 54444,
+      "path": "tests/glm5/phase983_cross_model_engine.py",
+      "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+    },
+    "gate": {
+      "bytes": 52471,
+      "path": "tests/glm5/phase983_cross_model_gate.py",
+      "sha256": "7bee69fea4217aa4e5465207cc53a5278b915cfa62ab220373956a524064321c"
+    },
+    "orchestrator": {
+      "bytes": 24089,
+      "path": "tests/glm5/phase983_cross_model_orchestrator.py",
+      "sha256": "d454369885a470c37475e6c2b8e52e119b8a5fb510cecdeb83b3f5818d916d69"
+    },
+    "protocol": {
+      "bytes": 42669,
+      "path": "tests/glm5/phase983_cross_model_protocol.py",
+      "sha256": "2358ff83515b5757ba51ce7f5d03160d80e0bf87b23d90b08923cc58cdd756b0"
+    },
+    "qualification": {
+      "bytes": 34309,
+      "path": "tests/glm5/phase983_cross_model_qualification.py",
+      "sha256": "82b20baf04d6ee36887ec7c06acdc2ab5931e7581f8c2588eae0f27e688ea6ec"
+    },
+    "runner": {
+      "bytes": 60615,
+      "path": "tests/glm5/phase983_cross_model_runner.py",
+      "sha256": "2588e244c3ff64218cc29522ff42691c488d270f5da64b38759cf9c3ea98252e"
+    }
+  },
+  "seed_contract": {
+    "all_model_block_count": 1152,
+    "arm_or_surface_pairing_is_not_counterfactual_causality": true,
+    "block_cells": "original/swapped x external arm A/B",
+    "blocks_per_model": 384,
+    "crn_block": "one model x one stream x one semantic seed_key",
+    "dataset_namespace_source": "installed protocol_sha256",
+    "engine_namespace": "phase983-cross-model-engine-v1",
+    "excluded_from_seed": [
+      "arm",
+      "swap_side",
+      "item_id"
+    ],
+    "included_in_seed": [
+      "protocol_sha256",
+      "engine_namespace",
+      "model_key",
+      "stream",
+      "seed_key"
+    ],
+    "model_count": 3,
+    "rows_per_crn_block": 4,
+    "seed_registry_materialized_after_protocol_hash_by_admission": true,
+    "stream_count": 3,
+    "unique_seed_key_count": 128
+  },
+  "streams": [
+    0,
+    1,
+    2
+  ],
+  "study_object": "paired external natural-language instruction configuration bundles",
+  "terminal_measurement": {
+    "C": "no EOS at the checkpoint budget; a non-EOS unexpected special token remains C with CENSORED_WITH_UNEXPECTED_SPECIAL_TOKEN subtype",
+    "I_protocol": "EOS but exact terminal FINAL contract invalid, or EOS with any non-EOS unexpected special token",
+    "I_sem": "EOS and exact terminal FINAL contract valid but wrong label",
+    "V": "EOS and one exact terminal FINAL label matching gold",
+    "accounting_identity_only": "V+C+I_protocol+I_sem=N",
+    "invalid_final_with_eos": {
+      "protocol_subtype": "EOS_WITH_INVALID_FINAL_CONTRACT",
+      "terminal_state": "I_protocol"
+    },
+    "otherwise_protocol_subtype": null,
+    "states_are_external_outcome_bins": true,
+    "unexpected_special_definition": "per-model frozen all_special_ids minus effective_eos_token_ids; prompt tokens are excluded and only generated trajectory tokens are inspected",
+    "unexpected_special_fields": [
+      "unexpected_special_count",
+      "unexpected_special_positions",
+      "unexpected_special_token_ids"
+    ],
+    "unexpected_special_with_eos": {
+      "protocol_subtype": "EOS_WITH_UNEXPECTED_SPECIAL_TOKEN",
+      "terminal_state": "I_protocol"
+    },
+    "unexpected_special_without_eos": {
+      "censor_subtype": "CENSORED_WITH_UNEXPECTED_SPECIAL_TOKEN",
+      "terminal_state": "C"
+    }
+  },
+  "tokenizer_adapters": {
+    "deepseek7b": {
+      "all_special_ids": [
+        151643,
+        151646
+      ],
+      "chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+      "effective_eos_token_ids": [
+        151643
+      ],
+      "effective_pad_token_id": 151643,
+      "gpu_accessed": false,
+      "model_key": "deepseek7b",
+      "native_generation_prefill": {
+        "assistant_prefill_text": "<｜Assistant｜><think>\n",
+        "assistant_prefill_text_sha256": "f68d8764d05a07aad2586a2d412381f32f711bbcbfebbf78c44b6ebf74b14d05",
+        "assistant_prefill_token_ids": [
+          151645,
+          151648,
+          198
+        ],
+        "assistant_prefill_token_ids_sha256": "0d0f22259d8cebae0b639ce4e67f6e64381b7fa290552d4a6baf0697014295c7",
+        "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+        "with_generation_prompt_sha256": "0e8bd567c76818a939e1507459aedd1452b7fc22e41d6dde6e6d085e42b2a851",
+        "without_generation_prompt_sha256": "406fd2ad1f6f1803d0afb9251672e66f9b0822d2161e80374e396f79aa997bc3"
+      },
+      "native_thinking_switch_used": false,
+      "probe": {
+        "arm_A_input_ids_sha256": "37032f6133c967ec22a723256c032186429191f4736c66ed3bb77112315d2004",
+        "arm_A_prefix_sha256": "555aaef7a8ef53c5c46b432f8aa4c2660f6b7ccddb94207be1b9270bc2b53899",
+        "arm_A_prompt_tokens": 130,
+        "arm_B_input_ids_sha256": "423f3e166b8688ae6cbcf94e6c46ebb967946134c8bfbdbaa1067930ef944952",
+        "arm_B_prefix_sha256": "184f955437efcb89705f93e2eee7ebc6735495fa3f7f15838e3f1246169735e0",
+        "arm_B_prompt_tokens": 124,
+        "item_id": "p983_x_2392a113c3b974a2f92f"
+      },
+      "tokenizer_class": "Qwen2Tokenizer",
+      "tokenizer_eos_token_id": 151643,
+      "tokenizer_length": 151665,
+      "unexpected_special_token_ids": [
+        151646
+      ],
+      "weights_loaded": false
+    },
+    "glm4": {
+      "all_special_ids": [
+        151329,
+        151330,
+        151331,
+        151332,
+        151333,
+        151334,
+        151335,
+        151336,
+        151337,
+        151338,
+        151339,
+        151340,
+        151341,
+        151342
+      ],
+      "chat_template_sha256": "27288f957f8364c990a2ce13bf5f8bf86921c4bce467ce698c76dcc69466d821",
+      "effective_eos_token_ids": [
+        151329,
+        151336,
+        151338
+      ],
+      "effective_pad_token_id": 151329,
+      "gpu_accessed": false,
+      "model_key": "glm4",
+      "native_generation_prefill": {
+        "assistant_prefill_text": "<|assistant|>",
+        "assistant_prefill_text_sha256": "b404d126f0754c09f7dc3d7129f2c0f96282b3a5b138183fb93e5ab9f428e9b1",
+        "assistant_prefill_token_ids": [
+          151337
+        ],
+        "assistant_prefill_token_ids_sha256": "f7591cd90300a15830d91fbba2f87433a7b37fbbb45023792e9671a53c49cb01",
+        "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+        "with_generation_prompt_sha256": "1f63fe6ab7763a5b4bd32e25bd982f365da5d9482b0f6dbda0d174b94bed29f7",
+        "without_generation_prompt_sha256": "cc37a2239c7306e9148651d96126d61320927900c1ec1432308ac4e6db9461a3"
+      },
+      "native_thinking_switch_used": false,
+      "probe": {
+        "arm_A_input_ids_sha256": "fef81022388a7b463f9b752f43a8c70192cd20d67ff4eb930e441083eeab0c80",
+        "arm_A_prefix_sha256": "c8486216f1bb15d894fcb06703a9ca1e314ff527fd9c804619b39269d6e0bd1f",
+        "arm_A_prompt_tokens": 115,
+        "arm_B_input_ids_sha256": "0153850d5b43df1e2071773f58859262f3a708d59d45d73e4359fc00d917a3e7",
+        "arm_B_prefix_sha256": "fd969f503f4448c79b60812bec8e05e46a76537183b0ff32f2c4d975d49974c1",
+        "arm_B_prompt_tokens": 109,
+        "item_id": "p983_x_2392a113c3b974a2f92f"
+      },
+      "tokenizer_class": "TokenizersBackend",
+      "tokenizer_eos_token_id": 151329,
+      "tokenizer_length": 151343,
+      "unexpected_special_token_ids": [
+        151330,
+        151331,
+        151332,
+        151333,
+        151334,
+        151335,
+        151337,
+        151339,
+        151340,
+        151341,
+        151342
+      ],
+      "weights_loaded": false
+    },
+    "qwen3": {
+      "all_special_ids": [
+        151643,
+        151644,
+        151645,
+        151646,
+        151647,
+        151648,
+        151649,
+        151650,
+        151651,
+        151652,
+        151653,
+        151654,
+        151655,
+        151656
+      ],
+      "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+      "effective_eos_token_ids": [
+        151643,
+        151645
+      ],
+      "effective_pad_token_id": 151643,
+      "gpu_accessed": false,
+      "model_key": "qwen3",
+      "native_generation_prefill": {
+        "assistant_prefill_text": "<|im_start|>assistant\n",
+        "assistant_prefill_text_sha256": "fb3832354a86f4328bdfbf33691473fc7c08824ff6bd056f4b90c95d7fe9eaa4",
+        "assistant_prefill_token_ids": [
+          151644,
+          77091,
+          198
+        ],
+        "assistant_prefill_token_ids_sha256": "ef5941940ee034899cf442aef3e9af7a6c443ade9dd4afaa5d7fa2c4defd9d3f",
+        "probe_text": "PHASE983_NATIVE_GENERATION_PREFILL_PROBE",
+        "with_generation_prompt_sha256": "59409ee1d18ef461f132ef4513acddabf74aac34807831292e072c431cae08d1",
+        "without_generation_prompt_sha256": "4fc48720b1620283fa92cdec3857b1f4edfd0759e1e9e345f638cd3d2df09b59"
+      },
+      "native_thinking_switch_used": false,
+      "probe": {
+        "arm_A_input_ids_sha256": "ed3fe5ca4153e5e90455546feceb3c41ebbb0d64156f2cf38e2e52021d9591ff",
+        "arm_A_prefix_sha256": "697d1e60981fc847341904b05ca66a0d3bd6c6098c46d3988940a8f4e1d00387",
+        "arm_A_prompt_tokens": 133,
+        "arm_B_input_ids_sha256": "89c8a5d256a5c403fad229a5ac07a3421d7057b541b2e275ac1271f67b33b362",
+        "arm_B_prefix_sha256": "4663540ebe6479b4001483383419ad7d8aab8cc3b47641f7ceb21ac287ccc51b",
+        "arm_B_prompt_tokens": 127,
+        "item_id": "p983_x_2392a113c3b974a2f92f"
+      },
+      "tokenizer_class": "Qwen2Tokenizer",
+      "tokenizer_eos_token_id": 151645,
+      "tokenizer_length": 151669,
+      "unexpected_special_token_ids": [
+        151644,
+        151646,
+        151647,
+        151648,
+        151649,
+        151650,
+        151651,
+        151652,
+        151653,
+        151654,
+        151655,
+        151656
+      ],
+      "weights_loaded": false
+    }
+  },
+  "unique_decision_checkpoint": 2048
+}

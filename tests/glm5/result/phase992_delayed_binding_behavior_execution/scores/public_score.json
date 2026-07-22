@@ -1,0 +1,3745 @@
+{
+  "activation_sha256": "f14b48e26c5574a4fa1f0878d43399b23df5198e5efa39e8ea35b5c33d12711d",
+  "created_at_utc": "2026-07-22T06:29:21.778825+00:00",
+  "equivalence_rule": {
+    "marker_regex": "(?<![A-Za-z])(red|blue|green|black)(?![A-Za-z])",
+    "multiple_distinct_markers": "first scores semantics; ambiguity separate",
+    "normalization": "casefold; frozen ASCII word-boundary marker regex",
+    "primary_prediction": "first complete marker in generated text before EOS",
+    "strict_format_eos_budget": "separate accounts"
+  },
+  "experiment": "delayed_two_hop_gpu_behavior",
+  "models": {
+    "deepseek7b": {
+      "case_evidence_count": 8192,
+      "case_evidence_sha256": "b6bb4c3ab3e55e06aac284928b65fac3deba949d5518aa7b45d04c65640be4e2",
+      "gate_counts": {
+        "counterfactual": {
+          "correct": 1,
+          "denominator": 12288
+        },
+        "major_conditions": {
+          "binding_swap": {
+            "correct": 4,
+            "denominator": 2048
+          },
+          "original": {
+            "correct": 0,
+            "denominator": 2048
+          },
+          "relation_swap": {
+            "correct": 1,
+            "denominator": 2048
+          },
+          "value_swap": {
+            "correct": 3,
+            "denominator": 2048
+          }
+        },
+        "split_variants": {
+          "adversarial|binding_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "confirmation|binding_swap__paraphrase__order_a__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_a__near": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96
+          }
+        }
+      },
+      "model": "deepseek7b",
+      "natural_generation": {
+        "counterfactual_pair_sensitivity": {
+          "by_condition_pair": {
+            "binding_swap|relation_swap": {
+              "correct": 0,
+              "denominator": 2048,
+              "percent": 0.0
+            },
+            "original|binding_swap": {
+              "correct": 0,
+              "denominator": 2048,
+              "percent": 0.0
+            },
+            "original|relation_swap": {
+              "correct": 0,
+              "denominator": 2048,
+              "percent": 0.0
+            },
+            "original|value_swap": {
+              "correct": 1,
+              "denominator": 2048,
+              "percent": 0.048828125
+            },
+            "value_swap|binding_swap": {
+              "correct": 0,
+              "denominator": 2048,
+              "percent": 0.0
+            },
+            "value_swap|relation_swap": {
+              "correct": 0,
+              "denominator": 2048,
+              "percent": 0.0
+            }
+          },
+          "correct": 1,
+          "definition": "both predictions parsed and different over all six unordered semantic pairs per matched nuisance cell",
+          "denominator": 12288,
+          "joint_semantic_correct_pairs": 0,
+          "joint_semantic_correct_percent": 0.0,
+          "passed": false,
+          "percent": 0.008138020833333334,
+          "threshold_percent": 85
+        },
+        "major_conditions": {
+          "binding_swap": {
+            "correct": 4,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 0.1953125,
+            "threshold_percent": 90
+          },
+          "original": {
+            "correct": 0,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 90
+          },
+          "relation_swap": {
+            "correct": 1,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 0.048828125,
+            "threshold_percent": 90
+          },
+          "value_swap": {
+            "correct": 3,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 0.146484375,
+            "threshold_percent": 90
+          }
+        },
+        "overall": {
+          "correct": 8,
+          "denominator": 8192,
+          "percent": 0.09765625
+        },
+        "separate_accounts": {
+          "ambiguity": 1,
+          "budget_exhausted": 8192,
+          "denominator": 8192,
+          "eos_seen": 0,
+          "strict_reference_format": 0,
+          "unparsed": 8148
+        },
+        "split_variants": {
+          "adversarial|binding_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_a__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_a__near": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_a__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_b__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_b__near": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          }
+        }
+      },
+      "primary_behavior_pass": false,
+      "raw_receipt_sha256": "4fbdaef6c49ec8dbeb42578f815c9e4208ef41b0226cf0611451dc75fc550921",
+      "scientific_scope": {
+        "behavior_evidence_only": true,
+        "causal_mechanism_evidence": false,
+        "internal_structure_evidence": false
+      },
+      "scope": "public",
+      "scope_behavior_pass": false,
+      "teacher_forced_diagnostic": {
+        "definition": "target first-continuation logit minus maximum of three foil logits",
+        "denominator": 8192,
+        "maximum_margin": 4.6875,
+        "mean_margin": -1.0777053833007812,
+        "median_margin": -1.125,
+        "minimum_margin": -5.6875,
+        "positive": 2141,
+        "positive_percent": 26.13525390625,
+        "role": "diagnostic_only_not_a_natural_generation_gate",
+        "tie": 95
+      }
+    },
+    "glm4": {
+      "case_evidence_count": 8192,
+      "case_evidence_sha256": "9f9f2026f5537f38158fdd9113cd1c4786008856c310ae5c75c1a4b5ff6692b9",
+      "gate_counts": {
+        "counterfactual": {
+          "correct": 1431,
+          "denominator": 12288
+        },
+        "major_conditions": {
+          "binding_swap": {
+            "correct": 407,
+            "denominator": 2048
+          },
+          "original": {
+            "correct": 451,
+            "denominator": 2048
+          },
+          "relation_swap": {
+            "correct": 469,
+            "denominator": 2048
+          },
+          "value_swap": {
+            "correct": 487,
+            "denominator": 2048
+          }
+        },
+        "split_variants": {
+          "adversarial|binding_swap__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_a__near": {
+            "correct": 16,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_b__far": {
+            "correct": 16,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_b__near": {
+            "correct": 9,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_a__far": {
+            "correct": 7,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_a__near": {
+            "correct": 13,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_b__far": {
+            "correct": 7,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_b__near": {
+            "correct": 11,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_a__near": {
+            "correct": 14,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_b__far": {
+            "correct": 18,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_b__near": {
+            "correct": 13,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_a__far": {
+            "correct": 15,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_a__near": {
+            "correct": 14,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_b__far": {
+            "correct": 7,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_b__near": {
+            "correct": 11,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_a__near": {
+            "correct": 8,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_b__far": {
+            "correct": 19,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_b__near": {
+            "correct": 13,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_a__far": {
+            "correct": 12,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_a__near": {
+            "correct": 13,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_b__far": {
+            "correct": 18,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_b__near": {
+            "correct": 12,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_a__far": {
+            "correct": 19,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_a__near": {
+            "correct": 14,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_b__far": {
+            "correct": 21,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_b__near": {
+            "correct": 10,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_a__far": {
+            "correct": 12,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_a__near": {
+            "correct": 11,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_b__far": {
+            "correct": 13,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_b__near": {
+            "correct": 11,
+            "denominator": 64
+          },
+          "confirmation|binding_swap__paraphrase__order_a__far": {
+            "correct": 30,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_a__near": {
+            "correct": 24,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_b__far": {
+            "correct": 27,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_b__near": {
+            "correct": 23,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_a__far": {
+            "correct": 14,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_a__near": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_b__far": {
+            "correct": 18,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_b__near": {
+            "correct": 16,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_a__far": {
+            "correct": 32,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_a__near": {
+            "correct": 24,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_b__far": {
+            "correct": 33,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_b__near": {
+            "correct": 16,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_a__far": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_a__near": {
+            "correct": 18,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_b__far": {
+            "correct": 19,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_b__near": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_a__far": {
+            "correct": 28,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_a__near": {
+            "correct": 25,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_b__far": {
+            "correct": 32,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_b__near": {
+            "correct": 29,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_a__far": {
+            "correct": 14,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_a__near": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_b__far": {
+            "correct": 16,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_b__near": {
+            "correct": 16,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_a__far": {
+            "correct": 38,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_a__near": {
+            "correct": 24,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_b__far": {
+            "correct": 43,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_b__near": {
+            "correct": 21,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_a__far": {
+            "correct": 16,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_a__near": {
+            "correct": 15,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_b__far": {
+            "correct": 14,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_b__near": {
+            "correct": 9,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_a__far": {
+            "correct": 24,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_a__near": {
+            "correct": 18,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_b__far": {
+            "correct": 22,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_b__near": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_a__far": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_a__near": {
+            "correct": 15,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_b__far": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_b__near": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_a__far": {
+            "correct": 32,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_a__near": {
+            "correct": 15,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_b__far": {
+            "correct": 25,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_b__near": {
+            "correct": 22,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_a__far": {
+            "correct": 18,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_a__near": {
+            "correct": 13,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_b__far": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_b__near": {
+            "correct": 23,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_a__far": {
+            "correct": 31,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_a__near": {
+            "correct": 21,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_b__far": {
+            "correct": 35,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_b__near": {
+            "correct": 24,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_a__far": {
+            "correct": 19,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_a__near": {
+            "correct": 22,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_b__far": {
+            "correct": 12,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_b__near": {
+            "correct": 21,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_a__far": {
+            "correct": 32,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_a__near": {
+            "correct": 25,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_b__far": {
+            "correct": 39,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_b__near": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_a__far": {
+            "correct": 24,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_a__near": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_b__far": {
+            "correct": 16,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_b__near": {
+            "correct": 23,
+            "denominator": 96
+          }
+        }
+      },
+      "model": "glm4",
+      "natural_generation": {
+        "counterfactual_pair_sensitivity": {
+          "by_condition_pair": {
+            "binding_swap|relation_swap": {
+              "correct": 229,
+              "denominator": 2048,
+              "percent": 11.181640625
+            },
+            "original|binding_swap": {
+              "correct": 220,
+              "denominator": 2048,
+              "percent": 10.7421875
+            },
+            "original|relation_swap": {
+              "correct": 220,
+              "denominator": 2048,
+              "percent": 10.7421875
+            },
+            "original|value_swap": {
+              "correct": 258,
+              "denominator": 2048,
+              "percent": 12.59765625
+            },
+            "value_swap|binding_swap": {
+              "correct": 260,
+              "denominator": 2048,
+              "percent": 12.6953125
+            },
+            "value_swap|relation_swap": {
+              "correct": 244,
+              "denominator": 2048,
+              "percent": 11.9140625
+            }
+          },
+          "correct": 1431,
+          "definition": "both predictions parsed and different over all six unordered semantic pairs per matched nuisance cell",
+          "denominator": 12288,
+          "joint_semantic_correct_pairs": 826,
+          "joint_semantic_correct_percent": 6.722005208333333,
+          "passed": false,
+          "percent": 11.6455078125,
+          "threshold_percent": 85
+        },
+        "major_conditions": {
+          "binding_swap": {
+            "correct": 407,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 19.873046875,
+            "threshold_percent": 90
+          },
+          "original": {
+            "correct": 451,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 22.021484375,
+            "threshold_percent": 90
+          },
+          "relation_swap": {
+            "correct": 469,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 22.900390625,
+            "threshold_percent": 90
+          },
+          "value_swap": {
+            "correct": 487,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 23.779296875,
+            "threshold_percent": 90
+          }
+        },
+        "overall": {
+          "correct": 1814,
+          "denominator": 8192,
+          "percent": 22.1435546875
+        },
+        "separate_accounts": {
+          "ambiguity": 18,
+          "budget_exhausted": 8192,
+          "denominator": 8192,
+          "eos_seen": 0,
+          "strict_reference_format": 0,
+          "unparsed": 5406
+        },
+        "split_variants": {
+          "adversarial|binding_swap__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 64,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_a__near": {
+            "correct": 16,
+            "denominator": 64,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_b__far": {
+            "correct": 16,
+            "denominator": 64,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_b__near": {
+            "correct": 9,
+            "denominator": 64,
+            "passed": false,
+            "percent": 14.0625,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_a__far": {
+            "correct": 7,
+            "denominator": 64,
+            "passed": false,
+            "percent": 10.9375,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_a__near": {
+            "correct": 13,
+            "denominator": 64,
+            "passed": false,
+            "percent": 20.3125,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_b__far": {
+            "correct": 7,
+            "denominator": 64,
+            "passed": false,
+            "percent": 10.9375,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_b__near": {
+            "correct": 11,
+            "denominator": 64,
+            "passed": false,
+            "percent": 17.1875,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 64,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_a__near": {
+            "correct": 14,
+            "denominator": 64,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_b__far": {
+            "correct": 18,
+            "denominator": 64,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_b__near": {
+            "correct": 13,
+            "denominator": 64,
+            "passed": false,
+            "percent": 20.3125,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_a__far": {
+            "correct": 15,
+            "denominator": 64,
+            "passed": false,
+            "percent": 23.4375,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_a__near": {
+            "correct": 14,
+            "denominator": 64,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_b__far": {
+            "correct": 7,
+            "denominator": 64,
+            "passed": false,
+            "percent": 10.9375,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_b__near": {
+            "correct": 11,
+            "denominator": 64,
+            "passed": false,
+            "percent": 17.1875,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 64,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_a__near": {
+            "correct": 8,
+            "denominator": 64,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_b__far": {
+            "correct": 19,
+            "denominator": 64,
+            "passed": false,
+            "percent": 29.6875,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_b__near": {
+            "correct": 13,
+            "denominator": 64,
+            "passed": false,
+            "percent": 20.3125,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_a__far": {
+            "correct": 12,
+            "denominator": 64,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_a__near": {
+            "correct": 13,
+            "denominator": 64,
+            "passed": false,
+            "percent": 20.3125,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_b__far": {
+            "correct": 18,
+            "denominator": 64,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_b__near": {
+            "correct": 12,
+            "denominator": 64,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_a__far": {
+            "correct": 19,
+            "denominator": 64,
+            "passed": false,
+            "percent": 29.6875,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_a__near": {
+            "correct": 14,
+            "denominator": 64,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_b__far": {
+            "correct": 21,
+            "denominator": 64,
+            "passed": false,
+            "percent": 32.8125,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_b__near": {
+            "correct": 10,
+            "denominator": 64,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_a__far": {
+            "correct": 12,
+            "denominator": 64,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_a__near": {
+            "correct": 11,
+            "denominator": 64,
+            "passed": false,
+            "percent": 17.1875,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_b__far": {
+            "correct": 13,
+            "denominator": 64,
+            "passed": false,
+            "percent": 20.3125,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_b__near": {
+            "correct": 11,
+            "denominator": 64,
+            "passed": false,
+            "percent": 17.1875,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_a__far": {
+            "correct": 30,
+            "denominator": 96,
+            "passed": false,
+            "percent": 31.25,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_a__near": {
+            "correct": 24,
+            "denominator": 96,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_b__far": {
+            "correct": 27,
+            "denominator": 96,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_b__near": {
+            "correct": 23,
+            "denominator": 96,
+            "passed": false,
+            "percent": 23.958333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_a__far": {
+            "correct": 14,
+            "denominator": 96,
+            "passed": false,
+            "percent": 14.583333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_a__near": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_b__far": {
+            "correct": 18,
+            "denominator": 96,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_b__near": {
+            "correct": 16,
+            "denominator": 96,
+            "passed": false,
+            "percent": 16.666666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_a__far": {
+            "correct": 32,
+            "denominator": 96,
+            "passed": false,
+            "percent": 33.333333333333336,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_a__near": {
+            "correct": 24,
+            "denominator": 96,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_b__far": {
+            "correct": 33,
+            "denominator": 96,
+            "passed": false,
+            "percent": 34.375,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_b__near": {
+            "correct": 16,
+            "denominator": 96,
+            "passed": false,
+            "percent": 16.666666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_a__far": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_a__near": {
+            "correct": 18,
+            "denominator": 96,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_b__far": {
+            "correct": 19,
+            "denominator": 96,
+            "passed": false,
+            "percent": 19.791666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_b__near": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_a__far": {
+            "correct": 28,
+            "denominator": 96,
+            "passed": false,
+            "percent": 29.166666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_a__near": {
+            "correct": 25,
+            "denominator": 96,
+            "passed": false,
+            "percent": 26.041666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_b__far": {
+            "correct": 32,
+            "denominator": 96,
+            "passed": false,
+            "percent": 33.333333333333336,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_b__near": {
+            "correct": 29,
+            "denominator": 96,
+            "passed": false,
+            "percent": 30.208333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_a__far": {
+            "correct": 14,
+            "denominator": 96,
+            "passed": false,
+            "percent": 14.583333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_a__near": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_b__far": {
+            "correct": 16,
+            "denominator": 96,
+            "passed": false,
+            "percent": 16.666666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_b__near": {
+            "correct": 16,
+            "denominator": 96,
+            "passed": false,
+            "percent": 16.666666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_a__far": {
+            "correct": 38,
+            "denominator": 96,
+            "passed": false,
+            "percent": 39.583333333333336,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_a__near": {
+            "correct": 24,
+            "denominator": 96,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_b__far": {
+            "correct": 43,
+            "denominator": 96,
+            "passed": false,
+            "percent": 44.791666666666664,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_b__near": {
+            "correct": 21,
+            "denominator": 96,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_a__far": {
+            "correct": 16,
+            "denominator": 96,
+            "passed": false,
+            "percent": 16.666666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_a__near": {
+            "correct": 15,
+            "denominator": 96,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_b__far": {
+            "correct": 14,
+            "denominator": 96,
+            "passed": false,
+            "percent": 14.583333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_b__near": {
+            "correct": 9,
+            "denominator": 96,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_a__far": {
+            "correct": 24,
+            "denominator": 96,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_a__near": {
+            "correct": 18,
+            "denominator": 96,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_b__far": {
+            "correct": 22,
+            "denominator": 96,
+            "passed": false,
+            "percent": 22.916666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_b__near": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_a__far": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_a__near": {
+            "correct": 15,
+            "denominator": 96,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_b__far": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_b__near": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_a__far": {
+            "correct": 32,
+            "denominator": 96,
+            "passed": false,
+            "percent": 33.333333333333336,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_a__near": {
+            "correct": 15,
+            "denominator": 96,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_b__far": {
+            "correct": 25,
+            "denominator": 96,
+            "passed": false,
+            "percent": 26.041666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_b__near": {
+            "correct": 22,
+            "denominator": 96,
+            "passed": false,
+            "percent": 22.916666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_a__far": {
+            "correct": 18,
+            "denominator": 96,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_a__near": {
+            "correct": 13,
+            "denominator": 96,
+            "passed": false,
+            "percent": 13.541666666666666,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_b__far": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_b__near": {
+            "correct": 23,
+            "denominator": 96,
+            "passed": false,
+            "percent": 23.958333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_a__far": {
+            "correct": 31,
+            "denominator": 96,
+            "passed": false,
+            "percent": 32.291666666666664,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_a__near": {
+            "correct": 21,
+            "denominator": 96,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_b__far": {
+            "correct": 35,
+            "denominator": 96,
+            "passed": false,
+            "percent": 36.458333333333336,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_b__near": {
+            "correct": 24,
+            "denominator": 96,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_a__far": {
+            "correct": 19,
+            "denominator": 96,
+            "passed": false,
+            "percent": 19.791666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_a__near": {
+            "correct": 22,
+            "denominator": 96,
+            "passed": false,
+            "percent": 22.916666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_b__far": {
+            "correct": 12,
+            "denominator": 96,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_b__near": {
+            "correct": 21,
+            "denominator": 96,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_a__far": {
+            "correct": 32,
+            "denominator": 96,
+            "passed": false,
+            "percent": 33.333333333333336,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_a__near": {
+            "correct": 25,
+            "denominator": 96,
+            "passed": false,
+            "percent": 26.041666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_b__far": {
+            "correct": 39,
+            "denominator": 96,
+            "passed": false,
+            "percent": 40.625,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_b__near": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_a__far": {
+            "correct": 24,
+            "denominator": 96,
+            "passed": false,
+            "percent": 25.0,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_a__near": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_b__far": {
+            "correct": 16,
+            "denominator": 96,
+            "passed": false,
+            "percent": 16.666666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_b__near": {
+            "correct": 23,
+            "denominator": 96,
+            "passed": false,
+            "percent": 23.958333333333332,
+            "threshold_percent": 85
+          }
+        }
+      },
+      "primary_behavior_pass": false,
+      "raw_receipt_sha256": "400747bbb1c58e462ba5d4118e2a2091f852fda10ffbb4b32f6ce3fb78e111fd",
+      "scientific_scope": {
+        "behavior_evidence_only": true,
+        "causal_mechanism_evidence": false,
+        "internal_structure_evidence": false
+      },
+      "scope": "public",
+      "scope_behavior_pass": false,
+      "teacher_forced_diagnostic": {
+        "definition": "target first-continuation logit minus maximum of three foil logits",
+        "denominator": 8192,
+        "maximum_margin": 2.8125,
+        "mean_margin": -0.06140899658203125,
+        "median_margin": -0.0625,
+        "minimum_margin": -4.1875,
+        "positive": 3804,
+        "positive_percent": 46.435546875,
+        "role": "diagnostic_only_not_a_natural_generation_gate",
+        "tie": 261
+      }
+    },
+    "qwen3": {
+      "case_evidence_count": 8192,
+      "case_evidence_sha256": "ac63603d75a611880990255bd96c1222ebb7892be511fbb897d92d74055ac827",
+      "gate_counts": {
+        "counterfactual": {
+          "correct": 667,
+          "denominator": 12288
+        },
+        "major_conditions": {
+          "binding_swap": {
+            "correct": 206,
+            "denominator": 2048
+          },
+          "original": {
+            "correct": 250,
+            "denominator": 2048
+          },
+          "relation_swap": {
+            "correct": 220,
+            "denominator": 2048
+          },
+          "value_swap": {
+            "correct": 269,
+            "denominator": 2048
+          }
+        },
+        "split_variants": {
+          "adversarial|binding_swap__paraphrase__order_a__far": {
+            "correct": 9,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_a__near": {
+            "correct": 1,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_b__far": {
+            "correct": 8,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__paraphrase__order_b__near": {
+            "correct": 4,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_a__near": {
+            "correct": 10,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 64
+          },
+          "adversarial|binding_swap__standard__order_b__near": {
+            "correct": 6,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_a__far": {
+            "correct": 11,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_a__near": {
+            "correct": 8,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_b__far": {
+            "correct": 17,
+            "denominator": 64
+          },
+          "adversarial|original__paraphrase__order_b__near": {
+            "correct": 4,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_a__near": {
+            "correct": 8,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 64
+          },
+          "adversarial|original__standard__order_b__near": {
+            "correct": 8,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_a__far": {
+            "correct": 10,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_a__near": {
+            "correct": 3,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_b__far": {
+            "correct": 18,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__paraphrase__order_b__near": {
+            "correct": 3,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_a__near": {
+            "correct": 9,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_b__far": {
+            "correct": 3,
+            "denominator": 64
+          },
+          "adversarial|relation_swap__standard__order_b__near": {
+            "correct": 7,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_a__far": {
+            "correct": 12,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_a__near": {
+            "correct": 5,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_b__far": {
+            "correct": 17,
+            "denominator": 64
+          },
+          "adversarial|value_swap__paraphrase__order_b__near": {
+            "correct": 8,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_a__near": {
+            "correct": 9,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_b__far": {
+            "correct": 3,
+            "denominator": 64
+          },
+          "adversarial|value_swap__standard__order_b__near": {
+            "correct": 12,
+            "denominator": 64
+          },
+          "confirmation|binding_swap__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_a__near": {
+            "correct": 6,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_b__far": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__paraphrase__order_b__near": {
+            "correct": 9,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_a__near": {
+            "correct": 15,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "confirmation|binding_swap__standard__order_b__near": {
+            "correct": 9,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_a__far": {
+            "correct": 23,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_a__near": {
+            "correct": 10,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_b__far": {
+            "correct": 25,
+            "denominator": 96
+          },
+          "confirmation|original__paraphrase__order_b__near": {
+            "correct": 3,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_a__far": {
+            "correct": 5,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_a__near": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "confirmation|original__standard__order_b__near": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_a__far": {
+            "correct": 21,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_a__near": {
+            "correct": 5,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_b__far": {
+            "correct": 23,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__paraphrase__order_b__near": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_a__near": {
+            "correct": 5,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "confirmation|relation_swap__standard__order_b__near": {
+            "correct": 8,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_a__far": {
+            "correct": 22,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_a__near": {
+            "correct": 10,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_b__far": {
+            "correct": 25,
+            "denominator": 96
+          },
+          "confirmation|value_swap__paraphrase__order_b__near": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_a__near": {
+            "correct": 18,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "confirmation|value_swap__standard__order_b__near": {
+            "correct": 13,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_a__far": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_a__near": {
+            "correct": 7,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_b__far": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "discovery|binding_swap__paraphrase__order_b__near": {
+            "correct": 3,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_a__far": {
+            "correct": 3,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_a__near": {
+            "correct": 19,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "discovery|binding_swap__standard__order_b__near": {
+            "correct": 17,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_a__far": {
+            "correct": 27,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_a__near": {
+            "correct": 10,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_b__far": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "discovery|original__paraphrase__order_b__near": {
+            "correct": 9,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_a__near": {
+            "correct": 14,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_b__far": {
+            "correct": 3,
+            "denominator": 96
+          },
+          "discovery|original__standard__order_b__near": {
+            "correct": 9,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_a__far": {
+            "correct": 20,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_a__near": {
+            "correct": 11,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_b__far": {
+            "correct": 30,
+            "denominator": 96
+          },
+          "discovery|relation_swap__paraphrase__order_b__near": {
+            "correct": 10,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_a__near": {
+            "correct": 6,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_b__far": {
+            "correct": 4,
+            "denominator": 96
+          },
+          "discovery|relation_swap__standard__order_b__near": {
+            "correct": 8,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_a__far": {
+            "correct": 23,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_a__near": {
+            "correct": 9,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_b__far": {
+            "correct": 26,
+            "denominator": 96
+          },
+          "discovery|value_swap__paraphrase__order_b__near": {
+            "correct": 7,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_a__near": {
+            "correct": 12,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 96
+          },
+          "discovery|value_swap__standard__order_b__near": {
+            "correct": 21,
+            "denominator": 96
+          }
+        }
+      },
+      "model": "qwen3",
+      "natural_generation": {
+        "counterfactual_pair_sensitivity": {
+          "by_condition_pair": {
+            "binding_swap|relation_swap": {
+              "correct": 110,
+              "denominator": 2048,
+              "percent": 5.37109375
+            },
+            "original|binding_swap": {
+              "correct": 110,
+              "denominator": 2048,
+              "percent": 5.37109375
+            },
+            "original|relation_swap": {
+              "correct": 88,
+              "denominator": 2048,
+              "percent": 4.296875
+            },
+            "original|value_swap": {
+              "correct": 132,
+              "denominator": 2048,
+              "percent": 6.4453125
+            },
+            "value_swap|binding_swap": {
+              "correct": 126,
+              "denominator": 2048,
+              "percent": 6.15234375
+            },
+            "value_swap|relation_swap": {
+              "correct": 101,
+              "denominator": 2048,
+              "percent": 4.931640625
+            }
+          },
+          "correct": 667,
+          "definition": "both predictions parsed and different over all six unordered semantic pairs per matched nuisance cell",
+          "denominator": 12288,
+          "joint_semantic_correct_pairs": 292,
+          "joint_semantic_correct_percent": 2.3763020833333335,
+          "passed": false,
+          "percent": 5.428059895833333,
+          "threshold_percent": 85
+        },
+        "major_conditions": {
+          "binding_swap": {
+            "correct": 206,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 10.05859375,
+            "threshold_percent": 90
+          },
+          "original": {
+            "correct": 250,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 12.20703125,
+            "threshold_percent": 90
+          },
+          "relation_swap": {
+            "correct": 220,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 10.7421875,
+            "threshold_percent": 90
+          },
+          "value_swap": {
+            "correct": 269,
+            "denominator": 2048,
+            "passed": false,
+            "percent": 13.134765625,
+            "threshold_percent": 90
+          }
+        },
+        "overall": {
+          "correct": 945,
+          "denominator": 8192,
+          "percent": 11.53564453125
+        },
+        "separate_accounts": {
+          "ambiguity": 2,
+          "budget_exhausted": 8192,
+          "denominator": 8192,
+          "eos_seen": 0,
+          "strict_reference_format": 0,
+          "unparsed": 6548
+        },
+        "split_variants": {
+          "adversarial|binding_swap__paraphrase__order_a__far": {
+            "correct": 9,
+            "denominator": 64,
+            "passed": false,
+            "percent": 14.0625,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_a__near": {
+            "correct": 1,
+            "denominator": 64,
+            "passed": false,
+            "percent": 1.5625,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_b__far": {
+            "correct": 8,
+            "denominator": 64,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__paraphrase__order_b__near": {
+            "correct": 4,
+            "denominator": 64,
+            "passed": false,
+            "percent": 6.25,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_a__near": {
+            "correct": 10,
+            "denominator": 64,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 64,
+            "passed": false,
+            "percent": 3.125,
+            "threshold_percent": 85
+          },
+          "adversarial|binding_swap__standard__order_b__near": {
+            "correct": 6,
+            "denominator": 64,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_a__far": {
+            "correct": 11,
+            "denominator": 64,
+            "passed": false,
+            "percent": 17.1875,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_a__near": {
+            "correct": 8,
+            "denominator": 64,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_b__far": {
+            "correct": 17,
+            "denominator": 64,
+            "passed": false,
+            "percent": 26.5625,
+            "threshold_percent": 85
+          },
+          "adversarial|original__paraphrase__order_b__near": {
+            "correct": 4,
+            "denominator": 64,
+            "passed": false,
+            "percent": 6.25,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_a__near": {
+            "correct": 8,
+            "denominator": 64,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 64,
+            "passed": false,
+            "percent": 3.125,
+            "threshold_percent": 85
+          },
+          "adversarial|original__standard__order_b__near": {
+            "correct": 8,
+            "denominator": 64,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_a__far": {
+            "correct": 10,
+            "denominator": 64,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_a__near": {
+            "correct": 3,
+            "denominator": 64,
+            "passed": false,
+            "percent": 4.6875,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_b__far": {
+            "correct": 18,
+            "denominator": 64,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__paraphrase__order_b__near": {
+            "correct": 3,
+            "denominator": 64,
+            "passed": false,
+            "percent": 4.6875,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 64,
+            "passed": false,
+            "percent": 1.5625,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_a__near": {
+            "correct": 9,
+            "denominator": 64,
+            "passed": false,
+            "percent": 14.0625,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_b__far": {
+            "correct": 3,
+            "denominator": 64,
+            "passed": false,
+            "percent": 4.6875,
+            "threshold_percent": 85
+          },
+          "adversarial|relation_swap__standard__order_b__near": {
+            "correct": 7,
+            "denominator": 64,
+            "passed": false,
+            "percent": 10.9375,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_a__far": {
+            "correct": 12,
+            "denominator": 64,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_a__near": {
+            "correct": 5,
+            "denominator": 64,
+            "passed": false,
+            "percent": 7.8125,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_b__far": {
+            "correct": 17,
+            "denominator": 64,
+            "passed": false,
+            "percent": 26.5625,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__paraphrase__order_b__near": {
+            "correct": 8,
+            "denominator": 64,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 64,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_a__near": {
+            "correct": 9,
+            "denominator": 64,
+            "passed": false,
+            "percent": 14.0625,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_b__far": {
+            "correct": 3,
+            "denominator": 64,
+            "passed": false,
+            "percent": 4.6875,
+            "threshold_percent": 85
+          },
+          "adversarial|value_swap__standard__order_b__near": {
+            "correct": 12,
+            "denominator": 64,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_a__far": {
+            "correct": 18,
+            "denominator": 96,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_a__near": {
+            "correct": 6,
+            "denominator": 96,
+            "passed": false,
+            "percent": 6.25,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_b__far": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__paraphrase__order_b__near": {
+            "correct": 9,
+            "denominator": 96,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_a__near": {
+            "correct": 15,
+            "denominator": 96,
+            "passed": false,
+            "percent": 15.625,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "confirmation|binding_swap__standard__order_b__near": {
+            "correct": 9,
+            "denominator": 96,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_a__far": {
+            "correct": 23,
+            "denominator": 96,
+            "passed": false,
+            "percent": 23.958333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_a__near": {
+            "correct": 10,
+            "denominator": 96,
+            "passed": false,
+            "percent": 10.416666666666666,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_b__far": {
+            "correct": 25,
+            "denominator": 96,
+            "passed": false,
+            "percent": 26.041666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|original__paraphrase__order_b__near": {
+            "correct": 3,
+            "denominator": 96,
+            "passed": false,
+            "percent": 3.125,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_a__far": {
+            "correct": 5,
+            "denominator": 96,
+            "passed": false,
+            "percent": 5.208333333333333,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_a__near": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "confirmation|original__standard__order_b__near": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_a__far": {
+            "correct": 21,
+            "denominator": 96,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_a__near": {
+            "correct": 5,
+            "denominator": 96,
+            "passed": false,
+            "percent": 5.208333333333333,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_b__far": {
+            "correct": 23,
+            "denominator": 96,
+            "passed": false,
+            "percent": 23.958333333333332,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__paraphrase__order_b__near": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_a__near": {
+            "correct": 5,
+            "denominator": 96,
+            "passed": false,
+            "percent": 5.208333333333333,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "confirmation|relation_swap__standard__order_b__near": {
+            "correct": 8,
+            "denominator": 96,
+            "passed": false,
+            "percent": 8.333333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_a__far": {
+            "correct": 22,
+            "denominator": 96,
+            "passed": false,
+            "percent": 22.916666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_a__near": {
+            "correct": 10,
+            "denominator": 96,
+            "passed": false,
+            "percent": 10.416666666666666,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_b__far": {
+            "correct": 25,
+            "denominator": 96,
+            "passed": false,
+            "percent": 26.041666666666668,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__paraphrase__order_b__near": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_a__far": {
+            "correct": 0,
+            "denominator": 96,
+            "passed": false,
+            "percent": 0.0,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_a__near": {
+            "correct": 18,
+            "denominator": 96,
+            "passed": false,
+            "percent": 18.75,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "confirmation|value_swap__standard__order_b__near": {
+            "correct": 13,
+            "denominator": 96,
+            "passed": false,
+            "percent": 13.541666666666666,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_a__far": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_a__near": {
+            "correct": 7,
+            "denominator": 96,
+            "passed": false,
+            "percent": 7.291666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_b__far": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__paraphrase__order_b__near": {
+            "correct": 3,
+            "denominator": 96,
+            "passed": false,
+            "percent": 3.125,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_a__far": {
+            "correct": 3,
+            "denominator": 96,
+            "passed": false,
+            "percent": 3.125,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_a__near": {
+            "correct": 19,
+            "denominator": 96,
+            "passed": false,
+            "percent": 19.791666666666668,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_b__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|binding_swap__standard__order_b__near": {
+            "correct": 17,
+            "denominator": 96,
+            "passed": false,
+            "percent": 17.708333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_a__far": {
+            "correct": 27,
+            "denominator": 96,
+            "passed": false,
+            "percent": 28.125,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_a__near": {
+            "correct": 10,
+            "denominator": 96,
+            "passed": false,
+            "percent": 10.416666666666666,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_b__far": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|original__paraphrase__order_b__near": {
+            "correct": 9,
+            "denominator": 96,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_a__far": {
+            "correct": 1,
+            "denominator": 96,
+            "passed": false,
+            "percent": 1.0416666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_a__near": {
+            "correct": 14,
+            "denominator": 96,
+            "passed": false,
+            "percent": 14.583333333333334,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_b__far": {
+            "correct": 3,
+            "denominator": 96,
+            "passed": false,
+            "percent": 3.125,
+            "threshold_percent": 85
+          },
+          "discovery|original__standard__order_b__near": {
+            "correct": 9,
+            "denominator": 96,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_a__far": {
+            "correct": 20,
+            "denominator": 96,
+            "passed": false,
+            "percent": 20.833333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_a__near": {
+            "correct": 11,
+            "denominator": 96,
+            "passed": false,
+            "percent": 11.458333333333334,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_b__far": {
+            "correct": 30,
+            "denominator": 96,
+            "passed": false,
+            "percent": 31.25,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__paraphrase__order_b__near": {
+            "correct": 10,
+            "denominator": 96,
+            "passed": false,
+            "percent": 10.416666666666666,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_a__near": {
+            "correct": 6,
+            "denominator": 96,
+            "passed": false,
+            "percent": 6.25,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_b__far": {
+            "correct": 4,
+            "denominator": 96,
+            "passed": false,
+            "percent": 4.166666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|relation_swap__standard__order_b__near": {
+            "correct": 8,
+            "denominator": 96,
+            "passed": false,
+            "percent": 8.333333333333334,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_a__far": {
+            "correct": 23,
+            "denominator": 96,
+            "passed": false,
+            "percent": 23.958333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_a__near": {
+            "correct": 9,
+            "denominator": 96,
+            "passed": false,
+            "percent": 9.375,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_b__far": {
+            "correct": 26,
+            "denominator": 96,
+            "passed": false,
+            "percent": 27.083333333333332,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__paraphrase__order_b__near": {
+            "correct": 7,
+            "denominator": 96,
+            "passed": false,
+            "percent": 7.291666666666667,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_a__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_a__near": {
+            "correct": 12,
+            "denominator": 96,
+            "passed": false,
+            "percent": 12.5,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_b__far": {
+            "correct": 2,
+            "denominator": 96,
+            "passed": false,
+            "percent": 2.0833333333333335,
+            "threshold_percent": 85
+          },
+          "discovery|value_swap__standard__order_b__near": {
+            "correct": 21,
+            "denominator": 96,
+            "passed": false,
+            "percent": 21.875,
+            "threshold_percent": 85
+          }
+        }
+      },
+      "primary_behavior_pass": false,
+      "raw_receipt_sha256": "6a130523fe9ca78e2e0421fb0ea9a50a1b58eb30d9a120c3128327e1682c4feb",
+      "scientific_scope": {
+        "behavior_evidence_only": true,
+        "causal_mechanism_evidence": false,
+        "internal_structure_evidence": false
+      },
+      "scope": "public",
+      "scope_behavior_pass": false,
+      "teacher_forced_diagnostic": {
+        "definition": "target first-continuation logit minus maximum of three foil logits",
+        "denominator": 8192,
+        "maximum_margin": 13.375,
+        "mean_margin": 0.8189239501953125,
+        "median_margin": 0.625,
+        "minimum_margin": -11.125,
+        "positive": 4577,
+        "positive_percent": 55.87158203125,
+        "role": "diagnostic_only_not_a_natural_generation_gate",
+        "tie": 100
+      }
+    }
+  },
+  "passed": false,
+  "phase": 992,
+  "role": "sealed_truth_released_behavior_score",
+  "run_id": "phase992-public-42d7d749ae5f49cd850ab983f304a0ee",
+  "schema_version": "phase992_delayed_binding_score.v1",
+  "scientific_adjudication": {
+    "baseline_outperformance_is_not_mechanism_evidence": true,
+    "behavior_only": true,
+    "internal_structure_discovered": false,
+    "mechanism_formula_authorized": false,
+    "teacher_forcing_is_diagnostic_only": true
+  },
+  "scope": "public",
+  "score_sha256": "755dcab241481cfcb2ea0ba250f1759b98e8d9bb6544406061023af64d967c6e",
+  "shortcut_baselines": {
+    "chosen_option": "B_matched_baseline_and_future_interventions",
+    "discovery_fitted_lookup_baseline": {
+      "above_baseline_does_not_prove_internal_two_hop_computation": true,
+      "evaluations": {
+        "adversarial": {
+          "accuracy_percent": 28.125,
+          "correct": 72,
+          "denominator": 256,
+          "seen_feature_rows": 256,
+          "unseen_feature_rows": 0
+        },
+        "confirmation": {
+          "accuracy_percent": 31.25,
+          "correct": 120,
+          "denominator": 384,
+          "seen_feature_rows": 384,
+          "unseen_feature_rows": 0
+        },
+        "discovery": {
+          "accuracy_percent": 37.5,
+          "correct": 144,
+          "denominator": 384,
+          "seen_feature_rows": 384,
+          "unseen_feature_rows": 0
+        },
+        "expanded_confirmation": {
+          "accuracy_percent": 23.828125,
+          "correct": 122,
+          "denominator": 512,
+          "seen_feature_rows": 512,
+          "unseen_feature_rows": 0
+        },
+        "sealed_holdout": {
+          "accuracy_percent": 34.375,
+          "correct": 88,
+          "denominator": 256,
+          "seen_feature_rows": 256,
+          "unseen_feature_rows": 0
+        }
+      },
+      "feature": "query_name+resolved_selected_object+query_relation",
+      "fit_split": "discovery",
+      "holdout_was_already_locally_inspectable_and_is_not_blind": true,
+      "no_rule_was_tuned_after_holdout_accuracy": true,
+      "not_a_pure_surface_baseline": true,
+      "role": "first-hop-resolved selected-object plus relation lookup baseline",
+      "table_sha256": "34cd5fb017052b7588f209d0a5999173cd8b8bc56a67d2d2aa1b8a2b41846076",
+      "tie_break": "fixed VALUES order red,blue,green,black",
+      "training_rows": 384,
+      "unseen_fallback": "red"
+    },
+    "oracle_structure_baseline": {
+      "behavior_above_baseline_is_not_second_hop_proof": true,
+      "chance_percent": 25.0,
+      "chosen_option": "B_freeze_matched_baseline_and_required_interventions",
+      "extension_selected_owner_conjunction_baseline": {
+        "accuracy_percent": 40.625,
+        "cell_count_sha256": "eef39ee2c40b1a57913062f17cf7db59bd1035db030bc9b8bb376f662c903a60",
+        "denominator": 512,
+        "feature": "query_entity_name+selected_object_name+query_relation",
+        "majority_correct": 208,
+        "nonempty_feature_cells": 64
+      },
+      "future_mechanism_requires_relation_value_binding_and_wrong_donor_controls": true,
+      "primary_selected_owner_conjunction_baselines": {
+        "adversarial": {
+          "accuracy_percent": 37.5,
+          "cell_count_sha256": "9b843f7a9638777ca33657eacbed97d2a980e87106da8adfa244fe89b997a7ed",
+          "denominator": 256,
+          "feature": "query_entity_name+selected_object_name+query_relation",
+          "majority_correct": 96,
+          "nonempty_feature_cells": 64
+        },
+        "confirmation": {
+          "accuracy_percent": 37.5,
+          "cell_count_sha256": "52ad69a1b720a482a4a1883fa1baee73062c3b2a74f94349e8df92def688742c",
+          "denominator": 384,
+          "feature": "query_entity_name+selected_object_name+query_relation",
+          "majority_correct": 144,
+          "nonempty_feature_cells": 64
+        },
+        "discovery": {
+          "accuracy_percent": 37.5,
+          "cell_count_sha256": "b8b63c0d72c99a39484d248250db0453c4cf52b5cef88e2c99cd9898d7e20cf5",
+          "denominator": 384,
+          "feature": "query_entity_name+selected_object_name+query_relation",
+          "majority_correct": 144,
+          "nonempty_feature_cells": 64
+        },
+        "sealed_holdout": {
+          "accuracy_percent": 37.5,
+          "cell_count_sha256": "db113775a9d2dee994aa85f81c02d9286c0f0b9042e1a9e6ce8f65201c66d396",
+          "denominator": 256,
+          "feature": "query_entity_name+selected_object_name+query_relation",
+          "majority_correct": 96,
+          "nonempty_feature_cells": 64
+        }
+      },
+      "shortcut_claimed_eliminated": false
+    },
+    "reported_as_behavior_comparator_not_mechanism_evidence": true,
+    "source_phase991_gpu_admission_sha256": "db2e6fbb4b02d33cf1020f1e0abd474b3452e7f43a9bfef51605ac4d9a9b8c15"
+  },
+  "thresholds": {
+    "counterfactual_pair_sensitivity_min_percent": 85,
+    "each_major_condition_min_percent": 90,
+    "each_split_variant_min_percent": 85
+  },
+  "truth_artifact_seals": {
+    "adversarial": {
+      "bytes": 1449664,
+      "path": "scoring_truth/private/adversarial.jsonl",
+      "sha256": "83957f121d2041b79cc55a4df729a3335994d5c1fe06f46cd2284729a8e41d27"
+    },
+    "confirmation": {
+      "bytes": 2177728,
+      "path": "scoring_truth/private/confirmation.jsonl",
+      "sha256": "20de31a7d0cb471edc0495e855ba620cf98a4315e74938e83838ae332c02c216"
+    },
+    "discovery": {
+      "bytes": 2168512,
+      "path": "scoring_truth/private/discovery.jsonl",
+      "sha256": "bc1ccd45ffc27834f3d8ad4a9831700e4b613a3b66c0eebb9e7a08f73b93a253"
+    }
+  }
+}

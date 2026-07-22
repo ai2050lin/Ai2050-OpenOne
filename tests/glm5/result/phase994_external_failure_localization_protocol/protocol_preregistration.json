@@ -1,0 +1,358 @@
+{
+  "created_at_utc": "2026-07-22T07:28:45.050401+00:00",
+  "dataset_audit": {
+    "constructed_normalized_prompt_count_before_serialization_duplication": 1536,
+    "constructed_prompt_overlap_with_phase990_plus_phase991": 0,
+    "copy_control_start_item_is_answer_value": true,
+    "cross_transform_accuracy_comparisons_are_label_mix_confounded": true,
+    "depth_ladder_is_scaffolding_not_a_pure_internal_depth_intervention": true,
+    "fixed_lookup_program_scaffold": true,
+    "gold_value_counts_by_transform": {
+      "binding_swap": {
+        "black": 29,
+        "blue": 33,
+        "green": 34,
+        "red": 32
+      },
+      "original": {
+        "black": 32,
+        "blue": 32,
+        "green": 32,
+        "red": 32
+      },
+      "relation_swap": {
+        "black": 37,
+        "blue": 34,
+        "green": 22,
+        "red": 35
+      },
+      "value_swap": {
+        "black": 30,
+        "blue": 29,
+        "green": 40,
+        "red": 29
+      }
+    },
+    "independent_unit": "semantic_world_id",
+    "neutral_padding_rule": "one line with one note token everywhere; copy/one-hop use two note tokens only when query entity is Borin,Celia,Darin,Elara,or Faron",
+    "neutral_padding_rule_depends_on_query_entity_not_answer": true,
+    "nuisance_assignment_formula": "n2=q0 XOR s0; n1=q1 XOR s1; n0=q0 XOR relation; id=4*n2+2*n1+n0",
+    "nuisance_cell_repeats": 16,
+    "nuisance_schedule": [
+      [
+        "standard",
+        "order_a",
+        "near"
+      ],
+      [
+        "standard",
+        "order_a",
+        "far"
+      ],
+      [
+        "standard",
+        "order_b",
+        "near"
+      ],
+      [
+        "standard",
+        "order_b",
+        "far"
+      ],
+      [
+        "paraphrase",
+        "order_a",
+        "near"
+      ],
+      [
+        "paraphrase",
+        "order_a",
+        "far"
+      ],
+      [
+        "paraphrase",
+        "order_b",
+        "near"
+      ],
+      [
+        "paraphrase",
+        "order_b",
+        "far"
+      ]
+    ],
+    "one_hop_start_item_is_resolved_object": true,
+    "paired_cell_count": 1536,
+    "paired_rows_are_not_independent": true,
+    "rows": 3072,
+    "rows_per_paired_cell": 2,
+    "rows_per_serialization_depth_cell": {
+      "native_default_chat|copy_control": 512,
+      "native_default_chat|one_hop": 512,
+      "native_default_chat|two_hop": 512,
+      "raw_text|copy_control": 512,
+      "raw_text|one_hop": 512,
+      "raw_text|two_hop": 512
+    },
+    "same_registry_body_within_source_record_across_depth": true,
+    "same_user_text_across_serializations": true,
+    "semantic_transforms": [
+      "original",
+      "value_swap",
+      "binding_swap",
+      "relation_swap"
+    ],
+    "splits": {
+      "localization_a": 64,
+      "localization_b": 64
+    },
+    "two_hop_start_item_is_query_entity": true,
+    "worlds": 128,
+    "worlds_with_four_distinct_transform_gold_values": 128
+  },
+  "engineering_contract": {
+    "exact_repeat_required_for_each_model": true,
+    "must_pass_before_public": true,
+    "rows": 16
+  },
+  "experiment": "external_interface_depth_budget_localization",
+  "factor_design": {
+    "batch_size": 8,
+    "budget_24_is_nested_not_an_independent_generation": true,
+    "depths": [
+      "copy_control",
+      "one_hop",
+      "two_hop"
+    ],
+    "derived_prefix_views": [
+      24,
+      64
+    ],
+    "greedy": true,
+    "max_new_tokens": 64,
+    "native_thinking_state_equated_across_models": false,
+    "native_thinking_switch_used": false,
+    "not_a_chat_template_only_effect": true,
+    "public_batches_match_world_transform_membership_across_depth_and_serialization": true,
+    "response_instruction": "Reply with one short sentence beginning \"The retrieved marker is\".",
+    "serialization_language": {
+      "native_default_chat": "model-native default chat-template serialization (no model-specific control passed)",
+      "raw_text": "raw-text serialization"
+    },
+    "serializations": [
+      "raw_text",
+      "native_default_chat"
+    ],
+    "teacher_forced_forward_in_phase994": false
+  },
+  "model_contract": {
+    "attention": "sdpa",
+    "cuda_only": true,
+    "full_phase991_model_file_hash_verification_before_each_load": true,
+    "int8_bitsandbytes": true,
+    "non_quantized_dtype": "bfloat16",
+    "order": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "serial_only": true,
+    "strict_cuda_cleanup_between_models": true
+  },
+  "parser_contract": {
+    "multiple_distinct_markers_without_scaffold_are_primary_unparsed": true,
+    "multiple_distinct_scaffold_markers_reported_separately": true,
+    "nested_budget_invariant_applies_to_phase992_first_marker_not_last_scaffold_primary": true,
+    "phase992_compatible_first_marker_reported_separately": true,
+    "primary": "last complete generated-only scaffold match before effective EOS; if no complete scaffold exists, fall back only when exactly one distinct marker occurs anywhere in generated text",
+    "primary_parser_not_selected_after_results": true,
+    "primary_regex": "(?i)(?<![A-Za-z])The\\s+retrieved\\s+marker\\s+is\\s+(red|blue|green|black)\\s*\\.",
+    "strict_format_reported_separately": true
+  },
+  "phase": 994,
+  "protocol_sha256": "5528cea07d0453723a89bc1da9514b15b1d4a54e4a368f085389738494ba97a0",
+  "role": "preregistered_external_failure_localization_before_any_phase994_model_run",
+  "runtime_identity": {
+    "distributions": {
+      "accelerate": "1.14.0",
+      "bitsandbytes": "0.49.2",
+      "tokenizers": "0.22.2",
+      "torch": "2.11.0+cu128",
+      "transformers": "5.12.0"
+    },
+    "python_executable": "C:\\Users\\Admin\\.workbuddy\\binaries\\python\\versions\\3.11.9\\python.exe",
+    "python_version": "3.11.9"
+  },
+  "schema_version": "phase994_external_failure_localization_protocol.v1",
+  "scientific_scope": {
+    "all_phase994_worlds_are_failure_localization_discovery_not_holdout": true,
+    "causal_intervention_authorized": false,
+    "cross_transform_accuracy_differences_are_not_clean_causal_contrasts": true,
+    "diagnostic_external_behavior_only": true,
+    "internal_trace_authorized": false,
+    "mechanism_formula_authorized": false,
+    "posthoc_phase993_motivated_but_phase994_preregistered_before_run": true,
+    "public_failure_does_not_prove_general_model_inability": true
+  },
+  "seed_selection": {
+    "attempts": [
+      {
+        "overlap_counts": {
+          "abstract_semantic": 0,
+          "normalized_prompt": 0,
+          "observable_semantic": 3
+        },
+        "passed": false,
+        "payload_sha256": "861f1cf48373d3a33e639ca2925bec3136fb9f28af64f64a85513180529759f4",
+        "seed_hex": "0x0000000003E20080",
+        "seed_uint64": 65142912
+      },
+      {
+        "overlap_counts": {
+          "abstract_semantic": 0,
+          "normalized_prompt": 0,
+          "observable_semantic": 0
+        },
+        "passed": true,
+        "payload_sha256": "616a50b18112c19bb9b17e5de57f64c0966db5152dd89b4203e5e8aed168d8d7",
+        "seed_hex": "0x0000000003E20081",
+        "seed_uint64": 65142913
+      }
+    ],
+    "gold_accuracy_used": false,
+    "historical_counts": {
+      "combined_worlds": 448,
+      "phase990_worlds": 320,
+      "phase991_extension_worlds": 128
+    },
+    "model_outputs_read": false,
+    "outcome_independent_selection": true,
+    "same_seed_exact_regeneration": true,
+    "search_start": 65142912,
+    "selected_seed": 65142913,
+    "selection_rule": "first sequential uint64 seed with zero overlap at all three registered layers"
+  },
+  "source_seals": {
+    "audit": {
+      "bytes": 32605,
+      "path": "tests/glm5/phase994_external_failure_localization_audit.py",
+      "sha256": "3a5bcb11aa9847ed17841ab1217d4774c6ceb30de5ccd0aa54161f752b586990"
+    },
+    "model_registry": {
+      "bytes": 1350,
+      "path": "tests/gpt5/model_registry.py",
+      "sha256": "84c30398a9effa47791635fd25662426164460e036e59bb83a38c855db370864"
+    },
+    "phase983_engine": {
+      "bytes": 54444,
+      "path": "tests/glm5/phase983_cross_model_engine.py",
+      "sha256": "e345daf3c3eae289eb7a71b8a741eeaf3a11c6897d009a5f9d90a386b23eef6f"
+    },
+    "phase990_core_dependency": {
+      "bytes": 71468,
+      "path": "tests/glm5/phase990_binding_core.py",
+      "sha256": "7b05c36a91520f13659d851d7207296b54f61f3a0b7dc7d73f8f9aecf87d707d"
+    },
+    "phase990_dataset_dependency": {
+      "bytes": 106596,
+      "path": "tests/glm5/phase990_binding_dataset.py",
+      "sha256": "117ac095e9acca027a6de7dbfa96d54b4a077be3352e0a7b865879aa877fd848"
+    },
+    "phase991_generator": {
+      "bytes": 36368,
+      "path": "tests/glm5/phase991_gpu_admission_core.py",
+      "sha256": "d012b138fea02347ba443623a098def790c7aed91935f31d3e4ddc88a29fe85e"
+    },
+    "phase992_runner_helpers": {
+      "bytes": 56483,
+      "path": "tests/glm5/phase992_delayed_binding_runner.py",
+      "sha256": "b6070d53a5c20cdf9a3d22dd7841386768a91d59d50e85119c82784fc658e002"
+    },
+    "protocol": {
+      "bytes": 32478,
+      "path": "tests/glm5/phase994_external_failure_localization_protocol.py",
+      "sha256": "311b5d425b6deabcd68d7a6e930419834deb0b69b1c0bcf6d7bab34af9fe24c5"
+    },
+    "runner": {
+      "bytes": 34627,
+      "path": "tests/glm5/phase994_external_failure_localization_runner.py",
+      "sha256": "7771646a659e315c0fcf18292359e33e6f4ccba455ba19a060d2dec9b30a870f"
+    },
+    "scorer": {
+      "bytes": 35002,
+      "path": "tests/glm5/phase994_external_failure_localization_scorer.py",
+      "sha256": "5574d39358ccc80907fe96487233f6d592babcd5b5ad22760a442dab49818ac7"
+    }
+  },
+  "thresholds": {
+    "all_four_transforms_correct_min_world_count_of_128": 109,
+    "each_semantic_transform_min_correct_count_of_128": 116,
+    "each_split_min_correct_count_of_64": 58,
+    "gate_budget_tokens": 64
+  },
+  "tokenizer_precheck": {
+    "deepseek7b": {
+      "chat_template_sha256": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+      "depth_triples_with_exact_equal_token_length": 1024,
+      "effective_eos_token_ids": [
+        151643
+      ],
+      "model_weights_loaded": false,
+      "native_render_count": 1536,
+      "native_rendered_identity_sha256": "b8f0a9d438c3bd9f79ec3b39d7d718042bba45324763bc75aeb866f7981b1325",
+      "rendered_prompt_token_max": 294,
+      "rendered_prompt_token_min": 277,
+      "tokenizer_class": "Qwen2Tokenizer",
+      "tokenizer_length": 151665
+    },
+    "glm4": {
+      "chat_template_sha256": "27288f957f8364c990a2ce13bf5f8bf86921c4bce467ce698c76dcc69466d821",
+      "depth_triples_with_exact_equal_token_length": 1024,
+      "effective_eos_token_ids": [
+        151329,
+        151336,
+        151338
+      ],
+      "model_weights_loaded": false,
+      "native_render_count": 1536,
+      "native_rendered_identity_sha256": "d4ba9f9694e80a4f364c1b99d1e258942643cf3ee5b25eccd1f20f28ae49886b",
+      "rendered_prompt_token_max": 283,
+      "rendered_prompt_token_min": 266,
+      "tokenizer_class": "TokenizersBackend",
+      "tokenizer_length": 151343
+    },
+    "qwen3": {
+      "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+      "depth_triples_with_exact_equal_token_length": 1024,
+      "effective_eos_token_ids": [
+        151643,
+        151645
+      ],
+      "model_weights_loaded": false,
+      "native_render_count": 1536,
+      "native_rendered_identity_sha256": "fca4622a9077d7d3b3743416de093b67720fc6fa682c3e32c0befe49ac2bd1d2",
+      "rendered_prompt_token_max": 297,
+      "rendered_prompt_token_min": 277,
+      "tokenizer_class": "Qwen2Tokenizer",
+      "tokenizer_length": 151669
+    }
+  },
+  "truth_contract": {
+    "existing_phase992_holdout_access_authorized": false,
+    "locally_inspectable_immutable_not_blind": true,
+    "runner_truth_access": false,
+    "score_only_after_all_three_public_raw_status_and_cleanup_receipts": true
+  },
+  "upstream": {
+    "phase992_activation_sha256": "f14b48e26c5574a4fa1f0878d43399b23df5198e5efa39e8ea35b5c33d12711d",
+    "phase992_public_behavior_passed": false,
+    "phase993_audit_file_sha256": "34c3ae76e3b4f2ad8908cf8ee9d2f529573c68e1697cebd924cf04ef62b23fb6",
+    "phase993_result_file_sha256": "029f4415954622768d7d8fec56ab6168e4c550971ba10b42b4d942a8f4728a9d"
+  },
+  "zero_overlap_scope": {
+    "compared_against_entire_phase990_cpu_corpus_and_phase991_expanded_confirmation": true,
+    "lexical_generalization_tested": false,
+    "phase992_holdout_model_access_performed": false,
+    "phase992_model_access_gate_changed": false,
+    "uses_existing_immutable_not_blind_cpu_registry": true
+  }
+}
