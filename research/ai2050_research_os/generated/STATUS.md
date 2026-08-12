@@ -6,7 +6,7 @@
 
 - 活跃战役：`C001` 全局结构辨识战役（进行中）
 - 当前工作包：`WP01` 相机与行为资格
-- 最新迁移 Phase：`1235`
+- 最新迁移 Phase：`1236`
 - 自动续行：`false`
 - 当前瓶颈：尚未获得经过类型化行为授权、可采集且可预测未知干预的未来响应张量；协议不变内容状态仍未被证明。
 - 下一决策：执行冻结合同 EXP-C001-WP01-001 的无模型预审计；预审计通过前不得运行 Qwen3。
@@ -35,6 +35,7 @@
 
 | Phase | 类型 | 裁决 | 自动续行 | 证据 |
 |---:|---|---|---|---|
+| 1236 | engineering_audit | wp00_engineering_closure_no_model_authority | false | E-C001-WP00-001 |
 | 1235 | confirmation | typed_generation_boundary_short_contract_failed | false | K210 |
 | 1226 | calibration | temporal_coalition_camera_known_truth_passed | false | K203 |
 | 1223 | discrimination | answer_boundary_single_site_handoff_failed | false | K200 |
@@ -42,4 +43,3 @@
 | 1221 | audit | family_gate_overaggregation_identified | true | K198 |
 | 1220 | confirmation | unified_parent_behavior_gate_failed | false | K197 |
 | 1219 | confirmation | preformation_summary_prediction_failed | false | K196 |
-| 1218 | discovery | dense_prefix_geometry_gate_failed | false | K195 |

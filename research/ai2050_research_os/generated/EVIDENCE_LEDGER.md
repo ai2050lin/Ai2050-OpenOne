@@ -19,6 +19,7 @@
 | `K200` 答案边界单点因果交接负边界 | 1223 | E3 | L2 | negative_boundary | 五个行为授权作用域均未通过 discovery 加 holdout 的 whole-residual 单深度交接门。 | Qwen3 FP16，生成且行为正确子集，答案边界单点补丁。 |
 | `K203` 固定数值布局的时序联盟功能商相机 | 1226 | E3-KT | L3 | calibration | 构造的 Transformer-shaped 系统中，相机恢复三类功能商、最小充分联盟、时间制度，并预测未见干预轨迹和正确拒答潜在实现。 | 构造已知真值微型系统，固定 CUDA-FP16 geometry。 |
 | `K210` Qwen3 类型化生成编译边界 | 1235 | E3-TYPED | L1 | mixed_boundary | 对象—marker 的完整候选评分、无候选评分、trie、固定句式内容和自然句式内容稳定；严格短字符串合同不稳定。 | Qwen3-4B CUDA FP16，人工英语 registry，96 个 axis-world cluster，七读出。 |
+| `E-C001-WP00-001` C001-WP00 研究操作系统工程闭合 | 1236 | E0-ENG | L0 | infrastructure | 23 个 Git blob 来源、复合 Phase 主键、类型化对象与构念、严格合同 schema、冻结 manifest 和 18/18 无模型审计形成可复算工程闭环。 | 仅研究基础设施与合同完整性；模型运行 0、GPU 用时 0，不含神经机制证据。 |
 
 ## K190：自然化必要性—冗余—中介相机适用域边界
 
@@ -149,3 +150,13 @@
 - 拼图：P00, P02, P03, P07, P08, P12, P13
 - 候选：H00, H05
 - 来源记录：PHREC-GLM-1235-01
+
+## E-C001-WP00-001：C001-WP00 研究操作系统工程闭合
+
+- Claim（主张）：23 个 Git blob 来源、复合 Phase 主键、类型化对象与构念、严格合同 schema、冻结 manifest 和 18/18 无模型审计形成可复算工程闭环。
+- Scope（适用域）：仅研究基础设施与合同完整性；模型运行 0、GPU 用时 0，不含神经机制证据。
+- Authorizes（授权）：EXP-C001-WP01-001 的无模型预审计
+- Forbids（禁止）：内部机制结论, 预审计完成前运行 Qwen3, 自动进入 GLM4、DS7B 或 TB03
+- 拼图：P00, P01, P02, P03, P13
+- 候选：—
+- 来源记录：PHREC-GLM-1236-01

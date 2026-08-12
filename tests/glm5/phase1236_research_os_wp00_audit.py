@@ -75,7 +75,7 @@ def main() -> int:
     source_ids = {item["id"] for item in sources}
     source_paths_exist = all((WORKSPACE / item["path"]).is_file() for item in sources)
     no_upload_refs = all("../upload" not in json.dumps(item, ensure_ascii=False) for item in data["evidence"])
-    record("source_registry_22_git_snapshots", len(sources) == 22 and len(source_ids) == 22 and source_paths_exist, {"count": len(sources), "paths_exist": source_paths_exist})
+    record("source_registry_23_git_snapshots", len(sources) == 23 and len(source_ids) == 23 and source_paths_exist, {"count": len(sources), "paths_exist": source_paths_exist})
     record("legacy_upload_refs_removed", no_upload_refs, "evidence contains no ../upload reference")
     record("nul_sources_typed", all(item["nul_count"] == 0 or item["authority"] != "primary_evidence" for item in sources), [{"id": item["id"], "nul_count": item["nul_count"], "authority": item["authority"]} for item in sources if item["nul_count"]])
 

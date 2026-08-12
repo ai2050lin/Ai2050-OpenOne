@@ -26,6 +26,7 @@
 | `SRC-GPT-20260715` | historical_snapshot | secondary_evidence | 1435443 | 0 | `16b311932764` | `b686f8eb9de5` | research/gpt5/docs/AGI_GPT5_MEMO_20260715.md |
 | `SRC-GPT-SUMMARY` | navigation_summary | navigation_only | 35273 | 0 | `16b311932764` | `7dc48183fe1b` | research/gpt5/docs/AGI_GPT5_MEMO_SUMMARY.md |
 | `SRC-GPT-VISUAL` | visual_engineering | engineering_only | 25043 | 0 | `16b311932764` | `7af6be9d2668` | research/gpt5/docs/AGI_GPT5_MEMO_VISUAL.md |
+| `SRC-GLM-WP00-P1236` | wp00_engineering_closure | engineering_evidence | 1150671 | 0 | `cc4e6a30259f` | `40fbcc8c6c77` | research/glm5/docs/AGI_GLM5_MEMO.md |
 
 > 含 NUL 的来源只保留原始字节，不允许静默规范化后升级证据。
 
