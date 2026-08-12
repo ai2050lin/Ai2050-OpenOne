@@ -1,0 +1,33 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:01<12:44,  1.92s/it]Loading weights:  28%|¨€¨€¨‚       | 110/398 [00:02<00:03, 74.39it/s]Loading weights:  40%|¨€¨€¨€¨€      | 161/398 [00:02<00:03, 70.28it/s]Loading weights:  48%|¨€¨€¨€¨€¨‚     | 192/398 [00:03<00:02, 69.09it/s]Loading weights:  54%|¨€¨€¨€¨€¨€¨†    | 213/398 [00:03<00:02, 70.26it/s]Loading weights:  58%|¨€¨€¨€¨€¨€¨‚    | 230/398 [00:03<00:02, 74.70it/s]Loading weights:  62%|¨€¨€¨€¨€¨€¨€¨‡   | 245/398 [00:04<00:02, 69.86it/s]Loading weights:  65%|¨€¨€¨€¨€¨€¨€¨…   | 257/398 [00:04<00:02, 68.39it/s]Loading weights:  67%|¨€¨€¨€¨€¨€¨€¨ƒ   | 267/398 [00:04<00:02, 64.93it/s]Loading weights:  70%|¨€¨€¨€¨€¨€¨€¨   | 278/398 [00:04<00:01, 65.13it/s]Loading weights:  73%|¨€¨€¨€¨€¨€¨€¨€¨†  | 289/398 [00:04<00:01, 66.02it/s]Loading weights:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 300/398 [00:04<00:01, 64.78it/s]Loading weights:  78%|¨€¨€¨€¨€¨€¨€¨€¨‚  | 311/398 [00:05<00:01, 67.13it/s]Loading weights:  81%|¨€¨€¨€¨€¨€¨€¨€¨€  | 322/398 [00:05<00:01, 64.23it/s]Loading weights:  84%|¨€¨€¨€¨€¨€¨€¨€¨€¨† | 333/398 [00:05<00:00, 67.18it/s]Loading weights:  86%|¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ | 344/398 [00:05<00:00, 70.25it/s]Loading weights:  89%|¨€¨€¨€¨€¨€¨€¨€¨€¨ | 355/398 [00:05<00:00, 68.52it/s]Loading weights:  92%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨‡| 366/398 [00:05<00:00, 66.63it/s]Loading weights:  95%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨…| 377/398 [00:06<00:00, 65.22it/s]Loading weights:  97%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ| 388/398 [00:06<00:00, 68.01it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 398/398 [00:06<00:00, 63.92it/s]
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_shared_shell_pattern_atlas_scan.py", line 314, in run
+    ) = pad_rows(forward_rows, int(pad_id), device)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1065_multimode_response_atlas_scan.py", line 170, in pad_rows
+    positions[index] = torch.tensor([
+                                    ^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1065_multimode_response_atlas_scan.py", line 171, in <listcomp>
+    int(row["role_positions"][role])
+        ~~~~~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'source_primary'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_shared_shell_pattern_atlas_scan.py", line 1043, in <module>
+    main()
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_shared_shell_pattern_atlas_scan.py", line 1039, in main
+    run(args.model)
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_shared_shell_pattern_atlas_scan.py", line 1032, in run
+    release_fp16(model, tokenizer)
+TypeError: release_fp16() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_run_sequential.py", line 184, in <module>
+    main()
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_run_sequential.py", line 113, in main
+    result = run_command([
+             ^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1078_run_sequential.py", line 42, in run_command
+    raise RuntimeError(f"command failed: {result}")
+RuntimeError: command failed: {'command': ['C:\\Users\\Admin\\.workbuddy\\binaries\\python\\versions\\3.11.9\\python.exe', 'D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\phase1078_shared_shell_pattern_atlas_scan.py', 'qwen3'], 'returncode': 1, 'elapsed_seconds': 15.901954174041748}

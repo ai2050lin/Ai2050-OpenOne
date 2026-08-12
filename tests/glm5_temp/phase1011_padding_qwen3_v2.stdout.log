@@ -1,0 +1,50 @@
+[model_utils] Loading qwen3... (8bit=True)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=4.42GB
+{
+  "schema_version": "phase1011_padding_equivalence.v2",
+  "phase": 1011,
+  "model": "qwen3",
+  "unit_id": "qwen3.comparison.entity.discovery.t0.p0.w0",
+  "state_count": 8,
+  "input_lengths": [
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    75
+  ],
+  "mixed_batch_vs_singleton": {
+    "candidate_panel_prediction_agreement_rate": 1.0,
+    "maximum_candidate_logit_error": 2.5625,
+    "median_candidate_logit_error": 0.81787109375,
+    "maximum_hidden_relative_error": 0.32439959049224854,
+    "median_hidden_relative_error": 0.09329238906502724,
+    "maximum_response_magnitude_error": 45.9306640625,
+    "median_response_magnitude_error": 0.2781503200531006,
+    "maximum_response_relative_error": 1.0,
+    "median_response_relative_error": 0.03557546064257622,
+    "minimum_response_direction_cosine": -0.6404348015785217,
+    "median_response_direction_cosine": 0.8285133540630341,
+    "scope": "includes batch-shape and matrix-kernel drift"
+  },
+  "mixed_batch_vs_same_shape_homogeneous": {
+    "candidate_panel_prediction_agreement_rate": 1.0,
+    "maximum_candidate_logit_error": 1.4375,
+    "median_candidate_logit_error": 1.21875,
+    "maximum_hidden_relative_error": 0.302995890378952,
+    "median_hidden_relative_error": 0.09146752208471298,
+    "maximum_response_magnitude_error": 39.591339111328125,
+    "median_response_magnitude_error": 0.28029823303222656,
+    "maximum_response_relative_error": 1.0,
+    "median_response_relative_error": 0.03465072810649872,
+    "minimum_response_direction_cosine": -0.5647455453872681,
+    "median_response_direction_cosine": 0.8669659495353699,
+    "scope": "holds batch size and padded width fixed; isolates mixed-state batch composition"
+  },
+  "elapsed_seconds": 11.491402626037598,
+  "interpretation": "quantifies batching/padding instrumentation drift; it does not test a language mechanism"
+}
+[model_utils] GPU memory released, allocated=4.43 GB

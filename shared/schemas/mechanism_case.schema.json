@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai2050.local/schemas/mechanism_case.schema.json",
+  "title": "OpenOne MechanismCase",
+  "type": "object",
+  "required": ["schema_version", "case_id", "model", "evidence_level", "status", "sample", "events"],
+  "properties": {
+    "schema_version": {
+      "const": "mechanism_case.v1"
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "phase": {
+      "type": ["integer", "string"]
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_level": {
+      "type": "string"
+    },
+    "status": {
+      "enum": ["exploratory", "registered", "passed", "failed", "blocked"]
+    },
+    "protocol_frozen": {
+      "type": "boolean"
+    },
+    "sample": {
+      "type": "object"
+    },
+    "counterfactual": {
+      "type": ["object", "null"]
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["layer", "component"],
+        "properties": {
+          "id": { "type": "string" },
+          "layer": { "type": "integer" },
+          "token_position": { "type": "integer" },
+          "component": {
+            "enum": ["embedding", "residual", "norm", "attention", "mlp", "unembedding", "output"]
+          },
+          "event_type": { "type": "string" },
+          "evidence_level": { "type": "string" },
+          "score": { "type": "number" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "candidate_margins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["layer", "candidates"],
+        "properties": {
+          "layer": { "type": "integer" },
+          "target_label": { "type": "string" },
+          "competitor_label": { "type": "string" },
+          "margin": { "type": "number" },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "score"],
+              "properties": {
+                "label": { "type": "string" },
+                "score": { "type": "number" },
+                "probability": { "type": "number" }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "interventions": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "causal_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target"],
+        "properties": {
+          "source": { "type": "string" },
+          "target": { "type": "string" },
+          "edge_type": { "type": "string" },
+          "evidence_level": { "type": "string" },
+          "weight": { "type": "number" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "negative_controls": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "conclusion": {
+      "type": ["object", "string", "null"]
+    },
+    "evidence_boundary": {
+      "type": ["string", "null"]
+    },
+    "provenance": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}

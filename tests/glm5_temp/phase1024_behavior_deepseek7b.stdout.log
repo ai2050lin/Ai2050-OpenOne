@@ -1,0 +1,148 @@
+[phase1023-fp16] loading deepseek7b with {0: '11GiB', 'cpu': '24GiB'}
+[phase1024-behavior] candidate batch=20 sequences=160/1280
+[phase1024-behavior] candidate batch=40 sequences=320/1280
+[phase1024-behavior] candidate batch=60 sequences=480/1280
+[phase1024-behavior] candidate batch=80 sequences=640/1280
+[phase1024-behavior] candidate batch=100 sequences=800/1280
+[phase1024-behavior] candidate batch=120 sequences=960/1280
+[phase1024-behavior] candidate batch=140 sequences=1120/1280
+[phase1024-behavior] candidate batch=160 sequences=1280/1280
+[phase1024-qualification] 1/8 rare.taotie correct=False text='饕餮指的是!'
+[phase1024-qualification] 2/8 rare.xiezhi correct=True text='“獬豸!“是中国古代!文化中对神兽的别称，通常指!龙和!马的结合体。它!在中国!'
+[phase1024-qualification] 3/8 translation.apple correct=True text=' pomme'
+[phase1024-qualification] 4/8 translation.wolf correct=True text='狼!'
+[phase1024-qualification] 5/8 punctuation.question correct=False text='The!'
+[phase1024-qualification] 6/8 punctuation.exclamation correct=False text='The!'
+[phase1024-qualification] 7/8 connector.contrast correct=False text='! The! fruit! looked! ripe'
+[phase1024-qualification] 8/8 connector.result correct=False text='The!'
+{
+  "model": "deepseek7b",
+  "nonce": {
+    "overall_accuracy": 0.1953125,
+    "by_split": {
+      "confirmation": {
+        "count": 64,
+        "accuracy": 0.15625
+      },
+      "discovery": {
+        "count": 64,
+        "accuracy": 0.234375
+      }
+    },
+    "by_family": {
+      "confirmation|animal": {
+        "count": 8,
+        "accuracy": 0.25
+      },
+      "confirmation|body_part": {
+        "count": 8,
+        "accuracy": 0.5
+      },
+      "confirmation|color": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|fruit": {
+        "count": 8,
+        "accuracy": 0.5
+      },
+      "confirmation|object": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|place": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|profession": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|vehicle": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|animal": {
+        "count": 8,
+        "accuracy": 0.375
+      },
+      "discovery|body_part": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|color": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|fruit": {
+        "count": 8,
+        "accuracy": 0.875
+      },
+      "discovery|object": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|place": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|profession": {
+        "count": 8,
+        "accuracy": 0.375
+      },
+      "discovery|vehicle": {
+        "count": 8,
+        "accuracy": 0.25
+      }
+    },
+    "chance": 0.125
+  },
+  "polysemy": {
+    "overall_accuracy": 0.5703125,
+    "by_partition_split": {
+      "calibration|confirmation": {
+        "count": 32,
+        "accuracy": 0.59375
+      },
+      "calibration|discovery": {
+        "count": 32,
+        "accuracy": 0.625
+      },
+      "heldout|confirmation": {
+        "count": 32,
+        "accuracy": 0.5625
+      },
+      "heldout|discovery": {
+        "count": 32,
+        "accuracy": 0.5
+      }
+    },
+    "chance": 0.5
+  },
+  "qualification": {
+    "case_count": 8,
+    "accuracy": 0.375,
+    "hit_token_limit_rate": 0.25,
+    "repeated_single_symbol_rate": 0.0,
+    "by_family": {
+      "connector": {
+        "count": 2,
+        "accuracy": 0.0
+      },
+      "punctuation": {
+        "count": 2,
+        "accuracy": 0.0
+      },
+      "rare_definition": {
+        "count": 2,
+        "accuracy": 0.5
+      },
+      "translation": {
+        "count": 2,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "behavior_claim_qualified": false
+}
+[model_utils] GPU memory released, allocated=10.42 GB

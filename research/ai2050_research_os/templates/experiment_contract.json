@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "experiment_id": "EXP-C001-WP00-001",
+  "campaign_id": "C001",
+  "work_package_id": "WP00",
+  "phase": null,
+  "title": "待填写的实验名称",
+  "status": "draft",
+  "question": "本实验要区分的唯一科学问题。",
+  "construct_types": ["content"],
+  "puzzle_ids": ["P00"],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H05",
+      "prediction_id": "PR-H05-001",
+      "observable": "明确的观测量",
+      "direction": "increase|decrease|invariant|pattern|abstain",
+      "expected": "运行前写出的数值范围或结构模式",
+      "distinguishes_from": ["H00"]
+    }
+  ],
+  "scope": {
+    "models": ["Qwen3-4B"],
+    "tasks": ["fresh_task_name"],
+    "languages": ["en"],
+    "protocols": ["short", "sentence", "natural"],
+    "precision": ["fp16"],
+    "backend": ["cuda"],
+    "excluded_claims": ["跨模型机制", "自然语言普适规律"]
+  },
+  "data_contract": {
+    "cluster_unit": "world",
+    "calibration": {"worlds": 0, "seed": 0},
+    "discovery": {"worlds": 0, "seed": 0},
+    "selection": {"worlds": 0, "seed": 0},
+    "confirmation": {"worlds": 0, "seed": 0, "sealed": true},
+    "split_rule": "按潜在世界拆分，同一事实的改写和多语言版本不得跨房间。",
+    "leakage_audit": "待填写"
+  },
+  "factor_design": {
+    "axes": ["content", "format", "protocol"],
+    "required_pairwise_coverage": true,
+    "required_three_way_cells": ["content×format×protocol"],
+    "matched_counterfactuals": ["correct_content_wrong_format", "wrong_content_correct_format"]
+  },
+  "event_registry": [],
+  "intervention_registry": [],
+  "readout_registry": [
+    {"id": "Q-content", "type": "content", "definition": "待填写"},
+    {"id": "Q-format", "type": "format", "definition": "待填写"}
+  ],
+  "controls": [
+    "matched_null",
+    "wrong_donor",
+    "same_answer_wrong_binding",
+    "random_same_norm",
+    "zero_or_identity",
+    "full_recompute"
+  ],
+  "metrics": [
+    {
+      "id": "M-primary",
+      "unit": "world_cluster",
+      "estimator": "待填写",
+      "confidence_interval": "cluster_bootstrap",
+      "higher_is_better": true
+    }
+  ],
+  "typed_gates": [
+    {
+      "id": "G-content",
+      "construct_type": "content",
+      "required_partitions": ["discovery", "confirmation"],
+      "formula": "待填写",
+      "threshold_source": "calibration",
+      "threshold": null,
+      "authorizes": ["仅内容机制下一层测试"],
+      "failure_type": "construct_failure|behavior_failure|predictive_failure"
+    }
+  ],
+  "budget": {
+    "max_gpu_hours": null,
+    "max_runs": null,
+    "max_adaptive_rounds": 0,
+    "right_censoring_rule": "待填写"
+  },
+  "stopping_rules": [
+    "主要构念门失败后停止其对应物理授权。",
+    "达到预算上限时登记删失，不延长直到出现正结果。",
+    "确认集揭盲后不修改指标、阈值和必需分区。"
+  ],
+  "adjudication": {
+    "possible_verdicts": ["global_survivor", "local_mechanism", "bounded_rejected", "abstain", "invalid"],
+    "failure_claim": "失败时在什么范围内关闭哪个强版本。",
+    "reopen_condition": "需要怎样的数学新版本和旧失败预测才能重开。"
+  },
+  "permissions": {
+    "authorizes_on_pass": [],
+    "forbids_even_on_pass": [],
+    "authorizes_on_failure": [],
+    "forbids_on_failure": []
+  },
+  "audit": {
+    "preaudit_checks": [],
+    "independent_result_auditor": "待填写",
+    "raw_result_required": true,
+    "preserve_failed_partitions": true
+  },
+  "frozen_artifacts": {
+    "contract_sha256": null,
+    "code_sha256": null,
+    "material_sha256": null,
+    "environment_sha256": null
+  }
+}
+

@@ -1,0 +1,82 @@
+[phase1023-fp16] loading deepseek7b with {0: '11GiB', 'cpu': '24GiB'}
+[behavior] deepseek7b batch=10 cases=240/1600 elapsed=44.1s
+[behavior] deepseek7b batch=20 cases=475/1600 elapsed=91.6s
+[behavior] deepseek7b batch=30 cases=672/1600 elapsed=178.9s
+[behavior] deepseek7b batch=40 cases=912/1600 elapsed=318.2s
+[behavior] deepseek7b batch=50 cases=1152/1600 elapsed=457.2s
+[behavior] deepseek7b batch=60 cases=1392/1600 elapsed=597.6s
+[behavior] deepseek7b batch=70 cases=1600/1600 elapsed=764.4s
+{
+  "classification": {
+    "count": 480,
+    "semantic_accuracy": 0.0,
+    "protocol_accuracy": 0.0,
+    "mean_semantic_score": 0.04963961562724602,
+    "median_generated_tokens": 8.0,
+    "error_classes": {
+      "semantic_error": 480
+    }
+  },
+  "connector": {
+    "count": 48,
+    "semantic_accuracy": 0.020833333333333332,
+    "protocol_accuracy": 0.020833333333333332,
+    "mean_semantic_score": 0.07070294447745427,
+    "median_generated_tokens": 10.0,
+    "error_classes": {
+      "semantic_error": 47,
+      "semantic_success": 1
+    }
+  },
+  "punctuation": {
+    "count": 48,
+    "semantic_accuracy": 0.25,
+    "protocol_accuracy": 0.25,
+    "mean_semantic_score": 0.25,
+    "median_generated_tokens": 4.0,
+    "error_classes": {
+      "semantic_error": 36,
+      "semantic_success": 12
+    }
+  },
+  "rare_definition": {
+    "count": 64,
+    "semantic_accuracy": 0.09375,
+    "protocol_accuracy": 0.09375,
+    "mean_semantic_score": 0.09861283318239908,
+    "median_generated_tokens": 40.0,
+    "error_classes": {
+      "semantic_error": 58,
+      "semantic_success": 6
+    }
+  },
+  "translation": {
+    "count": 960,
+    "semantic_accuracy": 0.058333333333333334,
+    "protocol_accuracy": 0.03333333333333333,
+    "mean_semantic_score": 0.10914405297148869,
+    "median_generated_tokens": 24.0,
+    "error_classes": {
+      "truncated_error": 691,
+      "semantic_success": 32,
+      "semantic_error": 133,
+      "language_error": 80,
+      "format_success": 24
+    }
+  }
+}
+{
+  "count": 912,
+  "semantic_accuracy": 0.06140350877192982,
+  "protocol_accuracy": 0.03508771929824561,
+  "mean_semantic_score": 0.11488847681209335,
+  "median_generated_tokens": 24.0,
+  "error_classes": {
+    "truncated_error": 643,
+    "semantic_success": 32,
+    "semantic_error": 133,
+    "language_error": 80,
+    "format_success": 24
+  }
+}
+[model_utils] GPU memory released, allocated=10.42 GB

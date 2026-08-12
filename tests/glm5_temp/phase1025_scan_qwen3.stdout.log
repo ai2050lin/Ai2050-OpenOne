@@ -1,0 +1,53 @@
+[model_utils] Loading qwen3... (8bit=False)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+[phase1025] qwen3 cases=160/256
+{
+  "schema_version": "phase1025_model_summary.v1",
+  "phase": 1025,
+  "protocol_digest": "48866b1c054c1a5ad69655322cfe66dd4545306feb540145c8a5fe9755b1bd3a",
+  "model": "qwen3",
+  "precision": "fp16",
+  "quantization": "none",
+  "placement": {
+    "placement": "full_cuda",
+    "max_memory": null,
+    "parameter_dtypes": {
+      "float16": 4022468096
+    },
+    "quantization": "none"
+  },
+  "runtime_precision_audit": {
+    "parameter_dtypes": {
+      "float16": 4022468096
+    },
+    "suspicious_quantized_module_classes": [],
+    "has_fp16_parameters": true,
+    "has_bf16_parameters": false,
+    "has_quantized_modules": false
+  },
+  "frozen_depths": [
+    0,
+    5,
+    9,
+    10,
+    13,
+    31,
+    35
+  ],
+  "selection_source": "phase1024_only",
+  "tensor_finiteness": {
+    "shape": [
+      256,
+      3,
+      7,
+      2560
+    ],
+    "value_count": 13762560,
+    "nonfinite_count": 0,
+    "all_finite": true
+  },
+  "metric_count": 21,
+  "elapsed_seconds": 5.884860038757324,
+  "claim_limit": "binding-specific observational control only; no output ability or causal mechanism claim"
+}
+[model_utils] GPU memory released, allocated=8.11 GB

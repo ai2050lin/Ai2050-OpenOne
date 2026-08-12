@@ -1,0 +1,817 @@
+[model_utils] Loading qwen3... (8bit=True)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=4.42GB
+[scan] qwen3 comparison/entity 2/2
+[scan] qwen3 comparison/property 2/2
+[scan] qwen3 comparison/binary 2/2
+[scan] qwen3 negation/entity 2/2
+[scan] qwen3 negation/property 2/2
+[scan] qwen3 negation/binary 2/2
+[scan] qwen3 semantic_role/entity 2/2
+[scan] qwen3 semantic_role/property 2/2
+[scan] qwen3 semantic_role/binary 2/2
+{
+  "schema_version": "phase1011_native_scan_model_summary.v1",
+  "phase": 1011,
+  "protocol_revision": 2,
+  "scope": "smoke",
+  "protocol_digest": "f61dbb2f77ea32b1bba5f188bdebe0c7f5cbfead7f4eab5ac06061e6fd114a6c",
+  "model": "qwen3",
+  "model_info": {
+    "n_layers": 36,
+    "d_model": 2560,
+    "model_class": "Qwen3ForCausalLM",
+    "loaded_8bit": true
+  },
+  "panel_count": 9,
+  "unit_count": 18,
+  "scalar_measurement_count": 170694,
+  "raw_hidden_tensors_persisted": 0,
+  "panels": [
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "comparison",
+      "output_mode": "entity",
+      "unit_count": 2,
+      "event_count": 1308,
+      "operation_count": 9,
+      "scalar_measurement_count": 23544,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.9545152187347412
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "comparison",
+      "output_mode": "property",
+      "unit_count": 2,
+      "event_count": 1090,
+      "operation_count": 9,
+      "scalar_measurement_count": 19620,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        },
+        "strict_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.3544135093688965
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "comparison",
+      "output_mode": "binary",
+      "unit_count": 2,
+      "event_count": 1090,
+      "operation_count": 9,
+      "scalar_measurement_count": 19620,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "strict_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.2554724216461182
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "negation",
+      "output_mode": "entity",
+      "unit_count": 2,
+      "event_count": 1199,
+      "operation_count": 9,
+      "scalar_measurement_count": 21582,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.3210504055023193
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "negation",
+      "output_mode": "property",
+      "unit_count": 2,
+      "event_count": 1090,
+      "operation_count": 9,
+      "scalar_measurement_count": 19620,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.3124897480010986
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "negation",
+      "output_mode": "binary",
+      "unit_count": 2,
+      "event_count": 1090,
+      "operation_count": 9,
+      "scalar_measurement_count": 19620,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_rollout": {
+          "F": 0,
+          "Q": 1,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.3034310340881348
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "semantic_role",
+      "output_mode": "entity",
+      "unit_count": 2,
+      "event_count": 872,
+      "operation_count": 9,
+      "scalar_measurement_count": 15696,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        },
+        "strict_rollout": {
+          "F": 2,
+          "Q": 2,
+          "FQ": 2,
+          "E": 2,
+          "O": 2,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 2
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.1612317562103271
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "semantic_role",
+      "output_mode": "property",
+      "unit_count": 2,
+      "event_count": 872,
+      "operation_count": 9,
+      "scalar_measurement_count": 15696,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 0,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 0,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        },
+        "strict_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 0,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.1808497905731201
+    },
+    {
+      "schema_version": "phase1011_native_scan_panel_summary.v1",
+      "phase": 1011,
+      "protocol_revision": 2,
+      "model": "qwen3",
+      "family": "semantic_role",
+      "output_mode": "binary",
+      "unit_count": 2,
+      "event_count": 872,
+      "operation_count": 9,
+      "scalar_measurement_count": 15696,
+      "raw_hidden_tensors_persisted": 0,
+      "operations": [
+        "F",
+        "Q",
+        "FQ",
+        "E",
+        "O",
+        "N",
+        "S",
+        "I",
+        "X"
+      ],
+      "stages": [
+        "prompt",
+        "after_answer"
+      ],
+      "direction_axes": [
+        "semantic_panel",
+        "natural_rollout"
+      ],
+      "qualified_pair_counts": {
+        "semantic_panel": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 0,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        },
+        "strict_teacher": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 0,
+          "E": 0,
+          "O": 0,
+          "N": 0,
+          "S": 0,
+          "I": 0,
+          "X": 0
+        },
+        "natural_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 2,
+          "E": 2,
+          "O": 0,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        },
+        "strict_rollout": {
+          "F": 0,
+          "Q": 0,
+          "FQ": 1,
+          "E": 2,
+          "O": 0,
+          "N": 2,
+          "S": 2,
+          "I": 2,
+          "X": 0
+        }
+      },
+      "identity_normalized_floor": {
+        "maximum": 0.0,
+        "mean": 0.0,
+        "nonzero_count": 0
+      },
+      "direction_formula": "(||sum_i u_i||^2-n)/(n(n-1)); computed separately for behavior-qualified discovery and confirmation pairs",
+      "edge_claim_allowed": "co_response_only",
+      "after_answer_caveat": "contains the teacher-forced answer-token surface and is not by itself a semantic or causal mechanism",
+      "elapsed_seconds": 1.1741983890533447
+    }
+  ],
+  "elapsed_seconds": 21.502131938934326,
+  "claim_limit": "descriptive repeated response fields only; no scan edge establishes transport, mediation, necessity, or sufficiency"
+}
+[model_utils] GPU memory released, allocated=4.43 GB

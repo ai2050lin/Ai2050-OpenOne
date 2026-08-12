@@ -1,0 +1,772 @@
+[model_utils] Loading glm4... (8bit=True)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=10.65GB
+[glm4/discovery] 1/16
+[glm4/discovery] 2/16
+[glm4/discovery] 3/16
+[glm4/discovery] 4/16
+[glm4/discovery] 5/16
+[glm4/discovery] 6/16
+[glm4/discovery] 7/16
+[glm4/discovery] 8/16
+[glm4/discovery] 9/16
+[glm4/discovery] 10/16
+[glm4/discovery] 11/16
+[glm4/discovery] 12/16
+[glm4/discovery] 13/16
+[glm4/discovery] 14/16
+[glm4/discovery] 15/16
+[glm4/discovery] 16/16
+[glm4/confirmation] 1/16
+[glm4/confirmation] 2/16
+[glm4/confirmation] 3/16
+[glm4/confirmation] 4/16
+[glm4/confirmation] 5/16
+[glm4/confirmation] 6/16
+[glm4/confirmation] 7/16
+[glm4/confirmation] 8/16
+[glm4/confirmation] 9/16
+[glm4/confirmation] 10/16
+[glm4/confirmation] 11/16
+[glm4/confirmation] 12/16
+[glm4/confirmation] 13/16
+[glm4/confirmation] 14/16
+[glm4/confirmation] 15/16
+[glm4/confirmation] 16/16
+[model_utils] GPU memory released, allocated=10.66 GB
+{
+  "schema_version": "phase1002_temporal_rollout_summary.v1",
+  "phase": 1002,
+  "model": "glm4",
+  "status": "complete",
+  "source_applied_once_at_prompt_cache_build": true,
+  "topology_variant": "primary",
+  "receiver_gate_checks": {
+    "discovery": {
+      "source_do": true,
+      "restore": true,
+      "mediation": true
+    },
+    "confirmation": {
+      "source_do": true,
+      "restore": true,
+      "mediation": true
+    }
+  },
+  "receiver_gate_pass_before_rollout": true,
+  "frozen_event_ids": [
+    "l39.mlp.answer_boundary",
+    "l28.attn.answer_boundary",
+    "l34.attn.answer_boundary",
+    "l36.attn.answer_boundary",
+    "l40.mlp.answer_boundary",
+    "l37.attn.answer_boundary",
+    "l29.mlp.answer_boundary",
+    "l38.mlp.answer_boundary",
+    "l20.attn.query_name",
+    "l35.attn.answer_boundary",
+    "l30.mlp.answer_boundary",
+    "l36.mlp.answer_boundary"
+  ],
+  "rollout_directions_per_split": 128,
+  "generation_summary": {
+    "confirmation": {
+      "restore_all_steps": {
+        "n": 128,
+        "source_exact_rate": 0.0,
+        "target_exact_rate": 0.8984375,
+        "source_semantic_rate": 0.0,
+        "target_semantic_rate": 0.8984375,
+        "eos_rate": 1.0
+      },
+      "restore_nonsemantic_steps": {
+        "n": 128,
+        "source_exact_rate": 1.0,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 1.0,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 1.0
+      },
+      "restore_semantic_step_only": {
+        "n": 128,
+        "source_exact_rate": 0.0,
+        "target_exact_rate": 0.78125,
+        "source_semantic_rate": 0.0,
+        "target_semantic_rate": 0.78125,
+        "eos_rate": 1.0
+      },
+      "source_do": {
+        "n": 128,
+        "source_exact_rate": 1.0,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 1.0,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 1.0
+      }
+    },
+    "discovery": {
+      "restore_all_steps": {
+        "n": 128,
+        "source_exact_rate": 0.0078125,
+        "target_exact_rate": 0.84375,
+        "source_semantic_rate": 0.0078125,
+        "target_semantic_rate": 0.84375,
+        "eos_rate": 1.0
+      },
+      "restore_nonsemantic_steps": {
+        "n": 128,
+        "source_exact_rate": 0.9921875,
+        "target_exact_rate": 0.0078125,
+        "source_semantic_rate": 0.9921875,
+        "target_semantic_rate": 0.0078125,
+        "eos_rate": 1.0
+      },
+      "restore_semantic_step_only": {
+        "n": 128,
+        "source_exact_rate": 0.015625,
+        "target_exact_rate": 0.796875,
+        "source_semantic_rate": 0.015625,
+        "target_semantic_rate": 0.796875,
+        "eos_rate": 1.0
+      },
+      "source_do": {
+        "n": 128,
+        "source_exact_rate": 1.0,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 1.0,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 1.0
+      }
+    }
+  },
+  "temporal_state_summary": {
+    "l20.attn.query_name": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.7837117910385132,
+        "mean_relative_response": 0.7997905185911804,
+        "median_response_norm": 1.5826637744903564
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.7819804251194,
+        "mean_relative_response": 0.7994876850862056,
+        "median_response_norm": 1.5851605534553528
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.7830741703510284,
+        "mean_relative_response": 0.8023565667681396,
+        "median_response_norm": 1.600231111049652
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.783268928527832,
+        "mean_relative_response": 0.8029216737486422,
+        "median_response_norm": 1.600231111049652
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.7852399349212646,
+        "mean_relative_response": 0.8017398773226887,
+        "median_response_norm": 1.5879983305931091
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.7858045399188995,
+        "mean_relative_response": 0.8001187047921121,
+        "median_response_norm": 1.6037657856941223
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.7864907383918762,
+        "mean_relative_response": 0.8003556046169251,
+        "median_response_norm": 1.6029610633850098
+      }
+    },
+    "l28.attn.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.21555322408676147,
+        "mean_relative_response": 0.2137725199572742,
+        "median_response_norm": 1.3774059414863586
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.2692314386367798,
+        "mean_relative_response": 0.27206093491986394,
+        "median_response_norm": 1.9335429072380066
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.2377905771136284,
+        "mean_relative_response": 0.23927930206991732,
+        "median_response_norm": 1.870282769203186
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.1937478482723236,
+        "mean_relative_response": 0.20635939465137199,
+        "median_response_norm": 1.6013294458389282
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.4081631600856781,
+        "mean_relative_response": 0.413922950043343,
+        "median_response_norm": 2.7850921154022217
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.5741437077522278,
+        "mean_relative_response": 0.568886331981048,
+        "median_response_norm": 3.5244580507278442
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.3647649884223938,
+        "mean_relative_response": 0.35147555504227057,
+        "median_response_norm": 2.0827572345733643
+      }
+    },
+    "l29.mlp.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.1993309035897255,
+        "mean_relative_response": 0.20155836077174172,
+        "median_response_norm": 1.9081646800041199
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.3466998338699341,
+        "mean_relative_response": 0.35209360625594854,
+        "median_response_norm": 2.8155102729797363
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.2240164428949356,
+        "mean_relative_response": 0.2513076626928523,
+        "median_response_norm": 2.1901499032974243
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.26507122814655304,
+        "mean_relative_response": 0.2660229008179158,
+        "median_response_norm": 2.3864551782608032
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.6839732229709625,
+        "mean_relative_response": 0.6875070433598012,
+        "median_response_norm": 6.319143533706665
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.5467889904975891,
+        "mean_relative_response": 0.5578459270764142,
+        "median_response_norm": 4.391518592834473
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.6673150062561035,
+        "mean_relative_response": 0.6740872624795884,
+        "median_response_norm": 5.3715455532073975
+      }
+    },
+    "l30.mlp.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.20003445446491241,
+        "mean_relative_response": 0.20247551664942876,
+        "median_response_norm": 2.298146367073059
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.23858550935983658,
+        "mean_relative_response": 0.24078296480001882,
+        "median_response_norm": 2.7137484550476074
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.22839003801345825,
+        "mean_relative_response": 0.24687185703078285,
+        "median_response_norm": 1.9868279695510864
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.2201450914144516,
+        "mean_relative_response": 0.2215356209781021,
+        "median_response_norm": 2.2536884546279907
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.6017224192619324,
+        "mean_relative_response": 0.6047362460521981,
+        "median_response_norm": 6.73391580581665
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.423002228140831,
+        "mean_relative_response": 0.431603038974572,
+        "median_response_norm": 4.642261266708374
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.5572272837162018,
+        "mean_relative_response": 0.5490356077207252,
+        "median_response_norm": 5.7520668506622314
+      }
+    },
+    "l34.attn.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.19600218534469604,
+        "mean_relative_response": 0.20263876271201298,
+        "median_response_norm": 0.9685202538967133
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.5028798282146454,
+        "mean_relative_response": 0.5199313285993412,
+        "median_response_norm": 8.560293674468994
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.21153133362531662,
+        "mean_relative_response": 0.27424897538730875,
+        "median_response_norm": 3.4846982955932617
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.24635762721300125,
+        "mean_relative_response": 0.258069847302977,
+        "median_response_norm": 2.5413169860839844
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.7867565155029297,
+        "mean_relative_response": 0.7928655018331483,
+        "median_response_norm": 8.858387470245361
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.43877963721752167,
+        "mean_relative_response": 0.45804372197017074,
+        "median_response_norm": 4.317652940750122
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.4515494257211685,
+        "mean_relative_response": 0.46540998137788847,
+        "median_response_norm": 5.3527679443359375
+      }
+    },
+    "l35.attn.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.160096675157547,
+        "mean_relative_response": 0.1621976413880475,
+        "median_response_norm": 1.00048828125
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.2985961139202118,
+        "mean_relative_response": 0.30389883159659803,
+        "median_response_norm": 4.342088222503662
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.18839434534311295,
+        "mean_relative_response": 0.19707352563273162,
+        "median_response_norm": 2.730857014656067
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.19787700474262238,
+        "mean_relative_response": 0.20525516691850498,
+        "median_response_norm": 2.6148836612701416
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.4307611435651779,
+        "mean_relative_response": 0.4331867265282199,
+        "median_response_norm": 5.308946132659912
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.2962469309568405,
+        "mean_relative_response": 0.30930866283597425,
+        "median_response_norm": 4.297360181808472
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.24942956864833832,
+        "mean_relative_response": 0.2651297135162167,
+        "median_response_norm": 4.2077882289886475
+      }
+    },
+    "l36.attn.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.26540690660476685,
+        "mean_relative_response": 0.2675073586869985,
+        "median_response_norm": 1.6554623246192932
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.23835939168930054,
+        "mean_relative_response": 0.24046908045420423,
+        "median_response_norm": 4.589933633804321
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.14146289974451065,
+        "mean_relative_response": 0.14480073188315146,
+        "median_response_norm": 2.7391514778137207
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.15027232468128204,
+        "mean_relative_response": 0.15505366967408918,
+        "median_response_norm": 2.822071075439453
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.40597914159297943,
+        "mean_relative_response": 0.4074734387686476,
+        "median_response_norm": 6.18676233291626
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.5129246413707733,
+        "mean_relative_response": 0.5121144402073696,
+        "median_response_norm": 6.065571069717407
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.49648623168468475,
+        "mean_relative_response": 0.4940750848618336,
+        "median_response_norm": 5.7409749031066895
+      }
+    },
+    "l36.mlp.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.2197962999343872,
+        "mean_relative_response": 0.2220209126244299,
+        "median_response_norm": 4.06337308883667
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.2870735377073288,
+        "mean_relative_response": 0.2982971104211174,
+        "median_response_norm": 4.821489334106445
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.15846489369869232,
+        "mean_relative_response": 0.18318972998531535,
+        "median_response_norm": 3.3994308710098267
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.21324147284030914,
+        "mean_relative_response": 0.21628936001798138,
+        "median_response_norm": 3.85571825504303
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.6980588138103485,
+        "mean_relative_response": 0.693422892363742,
+        "median_response_norm": 14.02869462966919
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.37548159062862396,
+        "mean_relative_response": 0.37838549178559333,
+        "median_response_norm": 8.869802474975586
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.3838629871606827,
+        "mean_relative_response": 0.3713344836723991,
+        "median_response_norm": 8.330189228057861
+      }
+    },
+    "l37.attn.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.17018181830644608,
+        "mean_relative_response": 0.1751396291074343,
+        "median_response_norm": 3.062909722328186
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.20808632671833038,
+        "mean_relative_response": 0.21262007451150566,
+        "median_response_norm": 4.228780508041382
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.1506730318069458,
+        "mean_relative_response": 0.1538719607051462,
+        "median_response_norm": 2.664156675338745
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.16566374152898788,
+        "mean_relative_response": 0.16923867957666516,
+        "median_response_norm": 2.746126890182495
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.2631976008415222,
+        "mean_relative_response": 0.2655164842726663,
+        "median_response_norm": 4.073113203048706
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.3136904090642929,
+        "mean_relative_response": 0.3162518441095017,
+        "median_response_norm": 5.524275779724121
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.3064018785953522,
+        "mean_relative_response": 0.29810859641293064,
+        "median_response_norm": 5.482836008071899
+      }
+    },
+    "l38.mlp.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.2140149101614952,
+        "mean_relative_response": 0.2149209839408286,
+        "median_response_norm": 5.095705270767212
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.16185342520475388,
+        "mean_relative_response": 0.1695755762339104,
+        "median_response_norm": 5.479775667190552
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.0888618603348732,
+        "mean_relative_response": 0.0983919138670899,
+        "median_response_norm": 3.7366222143173218
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.13423772901296616,
+        "mean_relative_response": 0.13835881059640087,
+        "median_response_norm": 4.456777572631836
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.2712421417236328,
+        "mean_relative_response": 0.27537457551807165,
+        "median_response_norm": 12.351327896118164
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.3516845405101776,
+        "mean_relative_response": 0.3570089712156914,
+        "median_response_norm": 11.631525039672852
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.2815539836883545,
+        "mean_relative_response": 0.2698183073371183,
+        "median_response_norm": 11.493719100952148
+      }
+    },
+    "l39.mlp.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.18438223004341125,
+        "mean_relative_response": 0.18475562246749178,
+        "median_response_norm": 13.129690170288086
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.1915702372789383,
+        "mean_relative_response": 0.19274843949824572,
+        "median_response_norm": 23.2601957321167
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.15176108479499817,
+        "mean_relative_response": 0.16282802226487547,
+        "median_response_norm": 13.73966121673584
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.17025581747293472,
+        "mean_relative_response": 0.17420474521350116,
+        "median_response_norm": 16.50118637084961
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.5059471130371094,
+        "mean_relative_response": 0.5037678175140172,
+        "median_response_norm": 48.831764221191406
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.40941569209098816,
+        "mean_relative_response": 0.4109175945050083,
+        "median_response_norm": 48.076045989990234
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.3833186477422714,
+        "mean_relative_response": 0.3683652216568589,
+        "median_response_norm": 50.360605239868164
+      }
+    },
+    "l40.mlp.answer_boundary": {
+      "0": {
+        "step_role": "protocol_newline",
+        "n": 256,
+        "median_relative_response": 0.17527949064970016,
+        "mean_relative_response": 0.17825694917701185,
+        "median_response_norm": 16.624526977539062
+      },
+      "1": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.17614790797233582,
+        "mean_relative_response": 0.1809022369561717,
+        "median_response_norm": 20.997167587280273
+      },
+      "2": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.12370708584785461,
+        "mean_relative_response": 0.1410246570885647,
+        "median_response_norm": 16.55476188659668
+      },
+      "3": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.1944783627986908,
+        "mean_relative_response": 0.20015412010252476,
+        "median_response_norm": 13.80539321899414
+      },
+      "4": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.48688532412052155,
+        "mean_relative_response": 0.4927272906061262,
+        "median_response_norm": 52.59566688537598
+      },
+      "5": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.45822402834892273,
+        "mean_relative_response": 0.4548925150302239,
+        "median_response_norm": 44.18022537231445
+      },
+      "6": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.43734094500541687,
+        "mean_relative_response": 0.42265278846025467,
+        "median_response_norm": 59.39768981933594
+      }
+    }
+  },
+  "cache_full_recompute_audit": {
+    "n": 128,
+    "token_sequence_agreement": 1.0
+  },
+  "thresholds": {
+    "semantic_restore_rate": 0.5,
+    "wrong_step_restore_target_max": 0.1,
+    "cache_full_recompute_token_agreement": 0.99
+  },
+  "checks": {
+    "semantic_step_restore": true,
+    "wrong_step_control": true,
+    "cache_recompute": true
+  },
+  "elapsed_seconds": 272.49355006217957,
+  "claim_boundary": "This establishes a cache-carried causal effect if it passes. It does not by itself identify whether keys, values, or both carry that effect. A rollout from a receiver variant that failed its semantic-step gate is diagnostic only.",
+  "temporal_rollout_pass": true
+}

@@ -1,0 +1,238 @@
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+[deepseek7b/discovery] 1/16
+[deepseek7b/discovery] 2/16
+[deepseek7b/discovery] 3/16
+[deepseek7b/discovery] 4/16
+[deepseek7b/discovery] 5/16
+[deepseek7b/discovery] 6/16
+[deepseek7b/discovery] 7/16
+[deepseek7b/discovery] 8/16
+[deepseek7b/discovery] 9/16
+[deepseek7b/discovery] 10/16
+[deepseek7b/discovery] 11/16
+[deepseek7b/discovery] 12/16
+[deepseek7b/discovery] 13/16
+[deepseek7b/discovery] 14/16
+[deepseek7b/discovery] 15/16
+[deepseek7b/discovery] 16/16
+[deepseek7b/confirmation] 1/16
+[deepseek7b/confirmation] 2/16
+[deepseek7b/confirmation] 3/16
+[deepseek7b/confirmation] 4/16
+[deepseek7b/confirmation] 5/16
+[deepseek7b/confirmation] 6/16
+[deepseek7b/confirmation] 7/16
+[deepseek7b/confirmation] 8/16
+[deepseek7b/confirmation] 9/16
+[deepseek7b/confirmation] 10/16
+[deepseek7b/confirmation] 11/16
+[deepseek7b/confirmation] 12/16
+[deepseek7b/confirmation] 13/16
+[deepseek7b/confirmation] 14/16
+[deepseek7b/confirmation] 15/16
+[deepseek7b/confirmation] 16/16
+[model_utils] GPU memory released, allocated=8.72 GB
+{
+  "schema_version": "phase1002_temporal_rollout_summary.v1",
+  "phase": 1002,
+  "model": "deepseek7b",
+  "status": "complete",
+  "source_applied_once_at_prompt_cache_build": true,
+  "topology_variant": "primary",
+  "receiver_gate_checks": {
+    "discovery": {
+      "source_do": true,
+      "restore": true,
+      "mediation": true
+    },
+    "confirmation": {
+      "source_do": true,
+      "restore": true,
+      "mediation": true
+    }
+  },
+  "receiver_gate_pass_before_rollout": true,
+  "frozen_event_ids": [
+    "l20.attn.answer_boundary",
+    "l27.attn.answer_boundary"
+  ],
+  "rollout_directions_per_split": 128,
+  "generation_summary": {
+    "confirmation": {
+      "restore_all_steps": {
+        "n": 128,
+        "source_exact_rate": 0.359375,
+        "target_exact_rate": 0.625,
+        "source_semantic_rate": 0.359375,
+        "target_semantic_rate": 0.625,
+        "eos_rate": 0.9921875
+      },
+      "restore_nonsemantic_steps": {
+        "n": 128,
+        "source_exact_rate": 0.9765625,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 0.9765625,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 1.0
+      },
+      "restore_semantic_step_only": {
+        "n": 128,
+        "source_exact_rate": 0.390625,
+        "target_exact_rate": 0.59375,
+        "source_semantic_rate": 0.390625,
+        "target_semantic_rate": 0.59375,
+        "eos_rate": 1.0
+      },
+      "source_do": {
+        "n": 128,
+        "source_exact_rate": 0.9765625,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 0.9765625,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 0.9921875
+      }
+    },
+    "discovery": {
+      "restore_all_steps": {
+        "n": 128,
+        "source_exact_rate": 0.3203125,
+        "target_exact_rate": 0.6640625,
+        "source_semantic_rate": 0.3203125,
+        "target_semantic_rate": 0.6640625,
+        "eos_rate": 1.0
+      },
+      "restore_nonsemantic_steps": {
+        "n": 128,
+        "source_exact_rate": 0.9921875,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 0.9921875,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 1.0
+      },
+      "restore_semantic_step_only": {
+        "n": 128,
+        "source_exact_rate": 0.3359375,
+        "target_exact_rate": 0.6171875,
+        "source_semantic_rate": 0.3359375,
+        "target_semantic_rate": 0.6484375,
+        "eos_rate": 0.9609375
+      },
+      "source_do": {
+        "n": 128,
+        "source_exact_rate": 0.9921875,
+        "target_exact_rate": 0.0,
+        "source_semantic_rate": 0.9921875,
+        "target_semantic_rate": 0.0,
+        "eos_rate": 1.0
+      }
+    }
+  },
+  "temporal_state_summary": {
+    "l20.attn.answer_boundary": {
+      "0": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.2559279203414917,
+        "mean_relative_response": 0.2595342820859514,
+        "median_response_norm": 18.826208114624023
+      },
+      "1": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.2803098112344742,
+        "mean_relative_response": 0.2811057801009156,
+        "median_response_norm": 20.904902458190918
+      },
+      "2": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.41961629688739777,
+        "mean_relative_response": 0.4187706020893529,
+        "median_response_norm": 32.88710975646973
+      },
+      "3": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.5804550349712372,
+        "mean_relative_response": 0.569971707998775,
+        "median_response_norm": 44.32345199584961
+      },
+      "4": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.5270422101020813,
+        "mean_relative_response": 0.5343742786208168,
+        "median_response_norm": 39.5633430480957
+      },
+      "5": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.3507421314716339,
+        "mean_relative_response": 0.3570994181209244,
+        "median_response_norm": 20.67904567718506
+      }
+    },
+    "l27.attn.answer_boundary": {
+      "0": {
+        "step_role": "determiner",
+        "n": 256,
+        "median_relative_response": 0.37747959792613983,
+        "mean_relative_response": 0.41039925545919687,
+        "median_response_norm": 76.21429443359375
+      },
+      "1": {
+        "step_role": "object_noun",
+        "n": 256,
+        "median_relative_response": 0.18646830320358276,
+        "mean_relative_response": 0.18944480712525547,
+        "median_response_norm": 44.44252395629883
+      },
+      "2": {
+        "step_role": "copula",
+        "n": 256,
+        "median_relative_response": 0.18857916444540024,
+        "mean_relative_response": 0.19928092902409844,
+        "median_response_norm": 42.72164726257324
+      },
+      "3": {
+        "step_role": "semantic_value",
+        "n": 256,
+        "median_relative_response": 0.5552579760551453,
+        "mean_relative_response": 0.5808491975767538,
+        "median_response_norm": 143.6135711669922
+      },
+      "4": {
+        "step_role": "punctuation",
+        "n": 256,
+        "median_relative_response": 0.5466261208057404,
+        "mean_relative_response": 0.567256725160405,
+        "median_response_norm": 87.49323654174805
+      },
+      "5": {
+        "step_role": "eos",
+        "n": 256,
+        "median_relative_response": 0.35928501188755035,
+        "mean_relative_response": 0.37053110101260245,
+        "median_response_norm": 76.40377807617188
+      }
+    }
+  },
+  "cache_full_recompute_audit": {
+    "n": 128,
+    "token_sequence_agreement": 0.9921875
+  },
+  "thresholds": {
+    "semantic_restore_rate": 0.5,
+    "wrong_step_restore_target_max": 0.1,
+    "cache_full_recompute_token_agreement": 0.99
+  },
+  "checks": {
+    "semantic_step_restore": true,
+    "wrong_step_control": true,
+    "cache_recompute": true
+  },
+  "elapsed_seconds": 184.66962432861328,
+  "claim_boundary": "This establishes a cache-carried causal effect if it passes. It does not by itself identify whether keys, values, or both carry that effect. A rollout from a receiver variant that failed its semantic-step gate is diagnostic only.",
+  "temporal_rollout_pass": true
+}

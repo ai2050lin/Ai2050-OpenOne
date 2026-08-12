@@ -1,0 +1,18 @@
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:  11%|¨€         | 42/398 [00:00<00:00, 389.69it/s]Loading weights:  25%|¨€¨€¨…       | 99/398 [00:00<00:00, 483.21it/s]Loading weights:  37%|¨€¨€¨€¨ƒ      | 148/398 [00:00<00:00, 478.85it/s]Loading weights:  51%|¨€¨€¨€¨€¨€     | 201/398 [00:00<00:00, 485.38it/s]Loading weights:  63%|¨€¨€¨€¨€¨€¨€¨†   | 250/398 [00:00<00:00, 486.17it/s]Loading weights:  75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 299/398 [00:00<00:00, 479.80it/s]Loading weights:  87%|¨€¨€¨€¨€¨€¨€¨€¨€¨ƒ | 348/398 [00:00<00:00, 480.51it/s]Loading weights: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 398/398 [00:00<00:00, 486.53it/s]
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1024_fp16_orthogonal_scan.py", line 1252, in <module>
+    main()
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1024_fp16_orthogonal_scan.py", line 1164, in main
+    residual_raw, residual_rows, selection = scan_residual(
+                                             ^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1024_fp16_orthogonal_scan.py", line 798, in scan_residual
+    "metrics": vector_metrics(values, cases),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1024_fp16_orthogonal_scan.py", line 617, in vector_metrics
+    "discovery": poly_vector_metrics(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase1024_fp16_orthogonal_scan.py", line 489, in poly_vector_metrics
+    direction_cosines.append(float(
+                             ^^^^^^
+TypeError: only 0-dimensional arrays can be converted to Python scalars

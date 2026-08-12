@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Square, Trash2, Search, Target, Zap, CheckCircle, Brain, FileText, SkipForward } from 'lucide-react';
+import { CURRENT_RESEARCH_STATE } from '../researchKernel/currentResearchState';
 import { RESEARCH_PHASES } from './aiRnDConfig';
 
 const PHASE_ICONS = {
@@ -30,7 +31,7 @@ export const AIRnDConsoleTab = ({
 }) => {
   const logEndRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
-  const [subTab, setSubTab] = useState('live');
+  const subTab = 'live';
   const [researchInput, setResearchInput] = useState('');
 
   useEffect(() => {
@@ -171,6 +172,19 @@ export const AIRnDConsoleTab = ({
             </div>
           </div>
         </div>
+      </div>
+
+      <div style={{
+        padding: '9px 16px',
+        borderBottom: '1px solid rgba(245,158,11,0.16)',
+        background: 'rgba(245,158,11,0.055)',
+        color: '#d6c59b',
+        fontSize: 10,
+        lineHeight: 1.55,
+        flexShrink: 0,
+      }}>
+        <strong style={{ color: '#fbbf24' }}>正式证据门：{CURRENT_RESEARCH_STATE.statusLabel}</strong>
+        <span> · 当前启动的自动研发只能记为探索性运行；在两名独立人类盲审完成前，不自动升级为正式机制结论。</span>
       </div>
 
       {/* Research input */}

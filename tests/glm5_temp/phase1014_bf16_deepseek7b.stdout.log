@@ -1,0 +1,89 @@
+[precision-bf16] loading deepseek7b with {0: '11GiB', 'cpu': '24GiB'}
+[precision-bf16] deepseek7b 8/120
+[precision-bf16] deepseek7b 16/120
+[precision-bf16] deepseek7b 24/120
+[precision-bf16] deepseek7b 32/120
+[precision-bf16] deepseek7b 40/120
+[precision-bf16] deepseek7b 48/120
+[precision-bf16] deepseek7b 56/120
+[precision-bf16] deepseek7b 64/120
+[precision-bf16] deepseek7b 72/120
+[precision-bf16] deepseek7b 80/120
+[precision-bf16] deepseek7b 88/120
+[precision-bf16] deepseek7b 96/120
+[precision-bf16] deepseek7b 104/120
+[precision-bf16] deepseek7b 112/120
+[precision-bf16] deepseek7b 120/120
+{
+  "schema_version": "phase1014_bf16_precision_model.v1",
+  "phase": 1014,
+  "model": "deepseek7b",
+  "source_precision_protocol_digest": "0a513240dd46b6c8bf500ab078dabc88538fdf993e78e6861b1a50ce45e51b72",
+  "precision": "bfloat16",
+  "placement": {
+    "placement": "accelerate_auto_cpu_gpu",
+    "max_memory": {
+      "cuda:0": "11GiB",
+      "cpu": "24GiB"
+    },
+    "device_map": {
+      "model.embed_tokens": "0",
+      "model.layers.0": "0",
+      "model.layers.1": "0",
+      "model.layers.2": "0",
+      "model.layers.3": "0",
+      "model.layers.4": "0",
+      "model.layers.5": "0",
+      "model.layers.6": "0",
+      "model.layers.7": "0",
+      "model.layers.8": "0",
+      "model.layers.9": "0",
+      "model.layers.10": "0",
+      "model.layers.11": "0",
+      "model.layers.12": "0",
+      "model.layers.13": "0",
+      "model.layers.14": "0",
+      "model.layers.15": "0",
+      "model.layers.16": "0",
+      "model.layers.17": "0",
+      "model.layers.18": "0",
+      "model.layers.19": "0",
+      "model.layers.20": "cpu",
+      "model.layers.21": "cpu",
+      "model.layers.22": "cpu",
+      "model.layers.23": "cpu",
+      "model.layers.24": "cpu",
+      "model.layers.25": "cpu",
+      "model.layers.26": "cpu",
+      "model.layers.27": "cpu",
+      "model.norm": "cpu",
+      "model.rotary_emb": "cpu",
+      "lm_head": "cpu"
+    }
+  },
+  "selected_event_count": 8,
+  "confirmation_unit_count": 120,
+  "singleton_forward_count": 840,
+  "state_forward_order": [
+    "base",
+    "F",
+    "Q",
+    "E",
+    "N",
+    "L",
+    "identity"
+  ],
+  "cell_count": 120,
+  "precision_supported_event_count": 1,
+  "identity_maximum": 0.0,
+  "elapsed_seconds": 566.2914979457855,
+  "operational_thresholds_not_theory": {
+    "canonical_direction": 0.5,
+    "orientation_gain": 0.3,
+    "matched_control_prevalence": 0.7,
+    "panel_count": 4,
+    "cross_panel_direction": 0.3,
+    "eight_bit_bf16_cosine": 0.5
+  },
+  "claim_limit": "precision and held-out response replication only; no causal or transport claim"
+}

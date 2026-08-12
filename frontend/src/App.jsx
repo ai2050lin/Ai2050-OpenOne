@@ -18,7 +18,17 @@ import { useAppleNeuronWorkspace } from './blueprint/appleNeuronWorkspaceBridge'
 import { MODEL_CONFIGS } from './blueprint/appleNeuron/constants';
 import { GlobalConfigPanel } from './components/app/GlobalConfigPanel';
 import { AttentionHeatmap, MLPActivationChart, Visualization } from './components/app/LegacyVisualization';
+import {
+  MechanismModeSwitch,
+  MechanismSpaceLegend,
+  MechanismWorkspaceDock,
+} from './components/app/MechanismWorkspace';
 import { PatternFamilyAtlasControls } from './components/app/PatternFamilyAtlasControls';
+import {
+  ResearchEvidenceCockpit,
+  ResearchEvidenceDrawer,
+  ResearchEvidenceRail,
+} from './components/app/ResearchEvidenceCockpit';
 import { ResearchSpaceOverlay } from './components/app/ResearchSpaceOverlay';
 import ICSPBPanel from './components/FiberNetPanel';
 
@@ -1452,6 +1462,8 @@ export default function App() {
   const [patternFamilyEvidenceFocus, setPatternFamilyEvidenceFocus] = useState('key');
   const [patternFamilyMaxUnits, setPatternFamilyMaxUnits] = useState(48);
   const [patternFamilySelectedNodeId, setPatternFamilySelectedNodeId] = useState('');
+  const [selectedEvidenceGate, setSelectedEvidenceGate] = useState(null);
+  const [mechanismWorkspaceMode, setMechanismWorkspaceMode] = useState('observe');
   const [pluginWindowVisibility, setPluginWindowVisibility] = useState(() => (
     getPluginWindowState(getResearchPluginById('language-mechanism'))
   ));
@@ -1603,17 +1615,40 @@ export default function App() {
   const schemaVersion = visData?.schema_version || '1.0';
   const isAtlasGraph = schemaVersion === 'atlas_graph_v1';
   const atlasGraph = isAtlasGraph ? visData?.graph : null;
-  const atlasNodes = Array.isArray(atlasGraph?.nodes) ? atlasGraph.nodes : [];
-  const atlasEdges = Array.isArray(atlasGraph?.edges)
-    ? atlasGraph.edges
-    : Array.isArray(atlasGraph?.links)
-    ? atlasGraph.links
+  const mechanismCase = visData?.mechanism_case || null;
+  const displayAtlasGraph = useMemo(() => {
+    if (!atlasGraph || mechanismWorkspaceMode !== 'present') return atlasGraph;
+    const visibleEvidence = new Set(['repeated', 'replicated', 'causal', 'closed', 'passed']);
+    const sourceNodes = Array.isArray(atlasGraph.nodes) ? atlasGraph.nodes : [];
+    const sourceEdges = Array.isArray(atlasGraph.edges)
+      ? atlasGraph.edges
+      : Array.isArray(atlasGraph.links)
+        ? atlasGraph.links
+        : [];
+    const nodes = sourceNodes.filter((node) => node && (
+      visibleEvidence.has(node.evidence_level)
+      || visibleEvidence.has(node.evidence_status)
+      || node.causal === true
+      || /(?:causal|closed|confirmed|passed|L[4-6])/i.test(String(node.evidence_level || node.evidence_status || ''))
+    ));
+    const nodeIds = new Set(nodes.map((node) => node.id));
+    const edges = sourceEdges.filter((edge) => edge && (
+      nodeIds.has(edge.source || edge.from)
+      && nodeIds.has(edge.target || edge.to)
+    ));
+    return { ...atlasGraph, nodes, edges };
+  }, [atlasGraph, mechanismWorkspaceMode]);
+  const atlasNodes = Array.isArray(displayAtlasGraph?.nodes) ? displayAtlasGraph.nodes : [];
+  const atlasEdges = Array.isArray(displayAtlasGraph?.edges)
+    ? displayAtlasGraph.edges
+    : Array.isArray(displayAtlasGraph?.links)
+    ? displayAtlasGraph.links
     : [];
   const atlasLayerCount = atlasNodes.reduce((maxLayer, node) => {
     const layer = Number(node?.layer);
     return Number.isFinite(layer) ? Math.max(maxLayer, layer + 1) : maxLayer;
   }, 0);
-  const visualizations = visData?.visualizations || [];
+  const visualizations = Array.isArray(visData?.visualizations) ? visData.visualizations : [];
   const byType = {
     trajectory: visualizations.filter(v => v.type === 'trajectory'),
     point_cloud: visualizations.filter(v => v.type === 'point_cloud'),
@@ -2367,6 +2402,9 @@ export default function App() {
       setResearchLayerVisibility((prev) => ({ ...prev, atlas: true, boundary: true }));
     }
   };
+  const selectEvidenceGate = (gateId) => {
+    setSelectedEvidenceGate((current) => current === gateId ? null : gateId);
+  };
   const showSimpleAiCycle = activeResearchPluginId === 'ai-research-loop' || researchMode === 'ai_loop';
   const cockpitCardStyle = {
     marginBottom: 12,
@@ -2699,6 +2737,13 @@ export default function App() {
                           ))}
                       </select>
                     </div>
+
+                    <ResearchEvidenceCockpit onSelectGate={selectEvidenceGate} />
+
+                    <MechanismModeSwitch
+                      mode={mechanismWorkspaceMode}
+                      onModeChange={setMechanismWorkspaceMode}
+                    />
 
                     {activeResearchPluginId === 'language-mechanism' && (
                       <>
@@ -4417,6 +4462,37 @@ export default function App() {
           错误: {visError}
         </div>
       )}
+
+      {isAppleMainView && (
+        <ResearchEvidenceRail
+          selectedGateId={selectedEvidenceGate}
+          onSelectGate={selectEvidenceGate}
+        />
+      )}
+
+      {isAppleMainView && (
+        <MechanismSpaceLegend mode={mechanismWorkspaceMode} />
+      )}
+
+      {isAppleMainView && (
+        <MechanismWorkspaceDock
+          mode={mechanismWorkspaceMode}
+          currentLayer={fpCurrentLayer}
+          mechanismCase={mechanismCase}
+          trace={realResearchTrace.trace}
+          forwardData={fpData}
+          activeFileMeta={activeFileMeta}
+          hidden={Boolean(selectedEvidenceGate)}
+        />
+      )}
+
+      {isAppleMainView && selectedEvidenceGate && (
+        <ResearchEvidenceDrawer
+          gateId={selectedEvidenceGate}
+          onClose={() => setSelectedEvidenceGate(null)}
+        />
+      )}
+
         <Canvas shadows>
           {isAppleMainView && <color attach="background" args={['#090b15']} />}
           {isAppleMainView && <fog attach="fog" args={['#090b15', 18, fpCurrentLayer != null ? 200 : 80]} />}
@@ -4474,19 +4550,23 @@ export default function App() {
                 showDNNLayers={false}
                 visibleComponents={[]}
                 forwardPassLayer={fpCurrentLayer}
-                forwardPassData={fpData?.layers ? Object.fromEntries(fpData.layers.map(l => [l.layer, l])) : null}
+                forwardPassData={Array.isArray(fpData?.layers)
+                  ? Object.fromEntries(fpData.layers.filter(Boolean).map((layer) => [layer.layer, layer]))
+                  : null}
                 modelKey={fpModel}
                 layerAnimProgress={layerAnimProgress}
                 fpSpeed={fpSpeed}
                 lang={lang}
               />
-              <RealUnitTraceRenderer
-                trace={realResearchTrace.trace}
-                stableUnits={realResearchTrace.stableUnits}
-                currentEvent={realResearchTrace.currentEvent}
-                currentLayer={fpCurrentLayer}
-                onHover={setHoveredInfo}
-              />
+              {mechanismWorkspaceMode !== 'present' && (
+                <RealUnitTraceRenderer
+                  trace={realResearchTrace.trace}
+                  stableUnits={realResearchTrace.stableUnits}
+                  currentEvent={realResearchTrace.currentEvent}
+                  currentLayer={fpCurrentLayer}
+                  onHover={setHoveredInfo}
+                />
+              )}
               {appleNeuronWorkspace.analysisMode === 'reverse_engineering' && (
                 <ReverseEngineeringOverlay
                   viewMode={appleNeuronWorkspace.reverseEngineeringState?.viewMode}
@@ -4520,6 +4600,9 @@ export default function App() {
                 atlasNodes={atlasNodes}
                 atlasEdges={atlasEdges}
                 activeResearchPlugin={activeResearchPlugin}
+                selectedEvidenceGate={selectedEvidenceGate}
+                onSelectEvidenceGate={selectEvidenceGate}
+                mechanismMode={mechanismWorkspaceMode}
               />
 
               {visData && !isPatternFamilyAtlasView && (
@@ -4530,7 +4613,7 @@ export default function App() {
                   {/* 机制图谱测试结果 */}
                   {isAtlasGraph && researchLayerVisibility.atlas && (
                     <AtlasGraphRenderer
-                      graph={atlasGraph}
+                      graph={displayAtlasGraph}
                       onHoverNode={setHoveredInfo}
                     />
                   )}

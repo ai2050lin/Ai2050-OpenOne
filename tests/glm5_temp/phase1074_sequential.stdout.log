@@ -1,0 +1,124 @@
+Phase1074 protocol f3cb0148844c42f60ba5eed1aa66e47e3d176be4194495be22391eb1bfbc38ed cases=1280/model pairs=640/model
+[model_utils] Loading qwen3... (8bit=False)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+{"phase": 1074, "model": "qwen3", "candidate_accuracy": 0.98828125, "task_accuracy": {"max": 0.9953125, "min": 0.98125}, "confirmation_accuracy": 0.9890625, "natural_semantic_first_rate": 0.89375, "strong_relations": ["height", "age", "weight", "arrival", "score"], "behavior_gate_passed": true, "elapsed_seconds": 24.009129762649536}
+[model_utils] GPU memory released, allocated=8.12 GB
+[phase1023-fp16] loading glm4 with {0: '11GiB', 'cpu': '24GiB'}
+{"phase": 1074, "model": "glm4", "candidate_accuracy": 0.88671875, "task_accuracy": {"max": 0.940625, "min": 0.8328125}, "confirmation_accuracy": 0.8515625, "natural_semantic_first_rate": 0.89375, "strong_relations": ["height", "age", "weight", "score"], "behavior_gate_passed": false, "elapsed_seconds": 456.242219209671}
+[model_utils] GPU memory released, allocated=10.23 GB
+[phase1023-fp16] loading deepseek7b with {0: '11GiB', 'cpu': '24GiB'}
+{"phase": 1074, "model": "deepseek7b", "candidate_accuracy": 0.78828125, "task_accuracy": {"max": 0.840625, "min": 0.7359375}, "confirmation_accuracy": 0.759375, "natural_semantic_first_rate": 0.75625, "strong_relations": ["weight"], "behavior_gate_passed": false, "elapsed_seconds": 326.03971314430237}
+[model_utils] GPU memory released, allocated=10.42 GB
+{
+  "schema_version": "phase1074_behavior_decision.v1",
+  "phase": 1074,
+  "protocol_digest": "f3cb0148844c42f60ba5eed1aa66e47e3d176be4194495be22391eb1bfbc38ed",
+  "selected_models": [
+    "qwen3"
+  ],
+  "selected_model_count": 1,
+  "repeated_relations": {
+    "height": [
+      "qwen3",
+      "glm4"
+    ],
+    "age": [
+      "qwen3",
+      "glm4"
+    ],
+    "weight": [
+      "qwen3",
+      "glm4",
+      "deepseek7b"
+    ],
+    "arrival": [
+      "qwen3"
+    ],
+    "score": [
+      "qwen3",
+      "glm4"
+    ]
+  },
+  "should_run_internal_dynamics": false,
+  "route": "stop_at_behavior_foundation",
+  "reason": "Fewer than two models passed the frozen behavior gate; an internal operation-selection interpretation would be invalid.",
+  "model_summaries": {
+    "qwen3": {
+      "candidate_accuracy": 0.98828125,
+      "by_task": {
+        "max": 0.9953125,
+        "min": 0.98125
+      },
+      "by_path": {
+        "direct": 0.99375,
+        "transitive": 0.9828125
+      },
+      "by_split": {
+        "discovery": 0.9875,
+        "confirmation": 0.9890625
+      },
+      "natural_semantic_first_rate": 0.89375,
+      "strong_relations": [
+        "height",
+        "age",
+        "weight",
+        "arrival",
+        "score"
+      ],
+      "model_behavior_gate_passed": true
+    },
+    "glm4": {
+      "candidate_accuracy": 0.88671875,
+      "by_task": {
+        "max": 0.940625,
+        "min": 0.8328125
+      },
+      "by_path": {
+        "direct": 0.90625,
+        "transitive": 0.8671875
+      },
+      "by_split": {
+        "discovery": 0.921875,
+        "confirmation": 0.8515625
+      },
+      "natural_semantic_first_rate": 0.89375,
+      "strong_relations": [
+        "height",
+        "age",
+        "weight",
+        "score"
+      ],
+      "model_behavior_gate_passed": false
+    },
+    "deepseek7b": {
+      "candidate_accuracy": 0.78828125,
+      "by_task": {
+        "max": 0.840625,
+        "min": 0.7359375
+      },
+      "by_path": {
+        "direct": 0.76875,
+        "transitive": 0.8078125
+      },
+      "by_split": {
+        "discovery": 0.8171875,
+        "confirmation": 0.759375
+      },
+      "natural_semantic_first_rate": 0.75625,
+      "strong_relations": [
+        "weight"
+      ],
+      "model_behavior_gate_passed": false
+    }
+  }
+}
+{
+  "schema_version": "phase1074_automatic_next.v1",
+  "phase": 1074,
+  "protocol_digest": "f3cb0148844c42f60ba5eed1aa66e47e3d176be4194495be22391eb1bfbc38ed",
+  "selected_models": [],
+  "should_continue_automatically": false,
+  "next_phase": null,
+  "route": "stop_at_behavior_foundation",
+  "reason": "The behavior gate did not authorize internal dynamics."
+}

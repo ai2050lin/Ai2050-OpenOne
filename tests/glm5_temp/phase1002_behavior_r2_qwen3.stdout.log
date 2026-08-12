@@ -1,0 +1,79 @@
+[model_utils] Loading qwen3... (8bit=True)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=4.42GB
+[teacher] batch=32 key=('confirmation', 1)
+[teacher] batch=64 key=('confirmation', 3)
+[teacher] batch=96 key=('discovery', 1)
+[teacher] batch=128 key=('discovery', 3)
+[natural] batch=32 key=('confirmation', 1)
+[natural] batch=64 key=('confirmation', 3)
+[natural] batch=96 key=('discovery', 1)
+[natural] batch=128 key=('discovery', 3)
+{
+  "schema_version": "phase1002_multitoken_behavior_summary.v1",
+  "phase": 1002,
+  "model": "qwen3",
+  "status": "complete",
+  "case_count": 4096,
+  "effective_eos_ids": [
+    151643,
+    151645
+  ],
+  "split_summary": {
+    "discovery": {
+      "n": 2048,
+      "teacher_semantic_candidate_accuracy": 0.99609375,
+      "teacher_full_global_argmax_rate": 0.99609375,
+      "teacher_step_accuracy": {
+        "0": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 0.99609375,
+        "4": 1.0
+      },
+      "natural_exact_sentence_rate": 0.99609375,
+      "natural_semantic_accuracy": 0.99609375,
+      "natural_eos_rate": 1.0,
+      "template_exact_sentence_rate": {
+        "0": 0.984375,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0
+      }
+    },
+    "confirmation": {
+      "n": 2048,
+      "teacher_semantic_candidate_accuracy": 0.998046875,
+      "teacher_full_global_argmax_rate": 0.998046875,
+      "teacher_step_accuracy": {
+        "0": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 0.998046875,
+        "4": 1.0
+      },
+      "natural_exact_sentence_rate": 0.998046875,
+      "natural_semantic_accuracy": 0.998046875,
+      "natural_eos_rate": 1.0,
+      "template_exact_sentence_rate": {
+        "0": 0.9921875,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0
+      }
+    }
+  },
+  "thresholds": {
+    "candidate_accuracy": 0.95,
+    "exact_sentence_rate": 0.95
+  },
+  "gate_checks": {
+    "discovery_candidate": true,
+    "confirmation_candidate": true,
+    "discovery_exact_sentence": true,
+    "confirmation_exact_sentence": true
+  },
+  "behavior_gate_pass": true,
+  "quantized_8bit": true,
+  "elapsed_seconds": 173.76632595062256
+}
+[model_utils] GPU memory released, allocated=4.43 GB

@@ -1,0 +1,119 @@
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+[rollout] deepseek7b/color/t2 1/4
+[rollout] deepseek7b/color/t2 2/4
+[rollout] deepseek7b/color/t2 3/4
+[rollout] deepseek7b/color/t2 4/4
+[model_utils] GPU memory released, allocated=8.72 GB
+{
+  "schema_version": "phase1004_rollout_model_summary.v1",
+  "phase": 1004,
+  "model": "deepseek7b",
+  "status": "complete",
+  "precision": "8bit",
+  "cell_count": 4,
+  "rollout_gate_pass_count": 0,
+  "cells": [
+    {
+      "model": "deepseek7b",
+      "domain": "color",
+      "template": 2,
+      "n": 32,
+      "source_positions": [
+        6,
+        8,
+        12,
+        14,
+        21
+      ],
+      "donor_audit": {
+        "same_answer_control": false,
+        "candidate_pool_source": "complete_frozen_protocol_model_domain_split_template",
+        "candidate_pool_count": 256,
+        "recipient_count": 32,
+        "unique_donor_count": 32,
+        "unique_donor_fraction": 1.0,
+        "maximum_donor_reuse": 1,
+        "all_cross_world": true,
+        "all_answer_contracts_hold": true,
+        "different_answer_value_sets_disjoint": true,
+        "assignment_digest": "db4aaddb787d1a09b6d8e759510760b61fe40f6704ebe7a45c4136d2c35d2870"
+      },
+      "same_answer_donor_audit": {
+        "same_answer_control": true,
+        "candidate_pool_source": "complete_frozen_protocol_model_domain_split_template",
+        "candidate_pool_count": 256,
+        "recipient_count": 32,
+        "unique_donor_count": 32,
+        "unique_donor_fraction": 1.0,
+        "maximum_donor_reuse": 1,
+        "all_cross_world": true,
+        "all_answer_contracts_hold": true,
+        "different_answer_value_sets_disjoint": null,
+        "assignment_digest": "94f60c2855c48548259550b43b2c383fd96830a3925277deb2e8384d26a69dfa"
+      },
+      "conditions": {
+        "clean_target": {
+          "n": 32,
+          "target_semantic_rate": 0.96875,
+          "donor_semantic_rate": 0.0,
+          "target_exact_rate": 0.96875,
+          "donor_exact_rate": 0.0,
+          "target_eos_boundary_rate": 0.96875,
+          "donor_eos_boundary_rate": 0.0
+        },
+        "frozen_same_answer_control": {
+          "n": 32,
+          "target_semantic_rate": 0.96875,
+          "donor_semantic_rate": 0.0,
+          "target_exact_rate": 0.96875,
+          "donor_exact_rate": 0.0,
+          "target_eos_boundary_rate": 0.96875,
+          "donor_eos_boundary_rate": 0.0
+        },
+        "frozen_source": {
+          "n": 32,
+          "target_semantic_rate": 0.0,
+          "donor_semantic_rate": 0.9375,
+          "target_exact_rate": 0.0,
+          "donor_exact_rate": 0.9375,
+          "target_eos_boundary_rate": 0.0,
+          "donor_eos_boundary_rate": 0.9375
+        },
+        "frozen_target_noop": {
+          "n": 32,
+          "target_semantic_rate": 0.96875,
+          "donor_semantic_rate": 0.0,
+          "target_exact_rate": 0.96875,
+          "donor_exact_rate": 0.0,
+          "target_eos_boundary_rate": 0.96875,
+          "donor_eos_boundary_rate": 0.0,
+          "noop_sequence_agreement": 1.0
+        }
+      },
+      "rollout_gate_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "color",
+      "template": 3,
+      "status": "source_parent_gate_failed",
+      "rollout_gate_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "shape",
+      "template": 2,
+      "status": "source_parent_gate_failed",
+      "rollout_gate_pass": false
+    },
+    {
+      "model": "deepseek7b",
+      "domain": "shape",
+      "template": 3,
+      "status": "source_parent_gate_failed",
+      "rollout_gate_pass": false
+    }
+  ],
+  "elapsed_seconds": 36.35719394683838
+}

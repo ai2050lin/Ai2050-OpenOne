@@ -2,10 +2,8 @@
  * AtlasGraphRenderer — 机制图谱测试结果3D渲染器
  *
  * 输入 Schema: atlas_graph_v1
- * 坐标含义:
- *   x: head/channel/intervention offset
- *   y: layer
- *   z: model/concept lane
+ * 默认坐标含义为组件偏移/Layer/模型通道；MechanismCase可显式提供
+ * Layer/Token/组件坐标。渲染器只使用数据坐标，不提升证据等级。
  */
 import React, { useMemo } from 'react';
 import { Line, Text } from '@react-three/drei';
@@ -51,6 +49,23 @@ function asNumber(value, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function recordId(value) {
+  const id = value && typeof value === 'object' ? value.id : value;
+  return id == null ? '' : String(id);
+}
+
+function nodeKey(node, index = 0) {
+  return recordId(node?.id) || `atlas-node-${index}`;
+}
+
+function displayText(value, fallback = '') {
+  if (value == null || value === '') return fallback;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return displayText(value.label ?? value.name ?? value.id, fallback);
+}
+
 function nodeSize(node) {
   const explicitSize = Number(node.size);
   if (Number.isFinite(explicitSize)) return clamp(explicitSize, 0.08, 0.95);
@@ -64,6 +79,21 @@ function nodeSize(node) {
 
 function edgeWidth(edge) {
   return clamp(1 + Math.abs(asNumber(edge.weight, 0)) * 2.4, 1, 5);
+}
+
+function evidenceVisual(record = {}) {
+  const evidence = record.evidence_level || record.evidence_status || record.status || '';
+  const causal = record.causal === true || ['causal', 'closed'].includes(evidence);
+  const failed = ['failed', 'falsified'].includes(evidence) || record.type === 'failure';
+  const repeated = ['repeated', 'replicated'].includes(evidence);
+  return {
+    evidence,
+    causal,
+    failed,
+    repeated,
+    color: failed ? '#ef4444' : causal ? '#f97316' : repeated ? '#facc15' : null,
+    opacity: failed ? 0.82 : causal ? 0.92 : repeated ? 0.8 : 0.5,
+  };
 }
 
 function buildPosition(node, index, modelLaneMap) {
@@ -85,7 +115,8 @@ function buildPosition(node, index, modelLaneMap) {
   }[node.type] ?? 0;
 
   const layer = node.layer !== undefined ? asNumber(node.layer, 0) : asNumber(node.y, 0);
-  const modelLane = modelLaneMap.get(node.model || node.id?.split(':')?.[0] || 'default') ?? 0;
+  const idPrefix = recordId(node.id).split(':')[0];
+  const modelLane = modelLaneMap.get(displayText(node.model, idPrefix || 'default')) ?? 0;
   const head = node.head !== undefined ? asNumber(node.head, 0) : 0;
   const channel = node.channel !== undefined ? asNumber(node.channel, 0) : 0;
   const jitter = ((index % 7) - 3) * 0.28;
@@ -98,26 +129,35 @@ function buildPosition(node, index, modelLaneMap) {
 }
 
 function makeLabel(node) {
-  if (node.label) return node.label;
+  if (node.label != null) return displayText(node.label, 'node');
   if (node.layer !== undefined && node.head !== undefined && node.channel !== undefined) {
     return `L${node.layer}H${node.head}C${node.channel}`;
   }
   if (node.layer !== undefined && node.head !== undefined) {
     return `L${node.layer}H${node.head}`;
   }
-  return node.id || node.type || 'node';
+  return displayText(node.id ?? node.type, 'node');
 }
 
 export default function AtlasGraphRenderer({ graph, onHoverNode }) {
   const { nodes, edges, positions, modelLanes } = useMemo(() => {
-    const rawNodes = Array.isArray(graph?.nodes) ? graph.nodes : [];
-    const rawEdges = Array.isArray(graph?.edges) ? graph.edges : graph?.links || [];
-    const models = Array.from(new Set(rawNodes.map((node) => node.model || node.id?.split(':')?.[0] || 'default')));
+    const rawNodes = (Array.isArray(graph?.nodes) ? graph.nodes : [])
+      .filter((node) => node && typeof node === 'object');
+    const rawEdges = (Array.isArray(graph?.edges)
+      ? graph.edges
+      : Array.isArray(graph?.links)
+        ? graph.links
+        : [])
+      .filter((edge) => edge && typeof edge === 'object');
+    const models = Array.from(new Set(rawNodes.map((node) => {
+      const idPrefix = recordId(node.id).split(':')[0];
+      return displayText(node.model, idPrefix || 'default');
+    })));
     const laneMap = new Map(models.map((model, index) => [model, index - (models.length - 1) / 2]));
     const posMap = new Map();
 
     rawNodes.forEach((node, index) => {
-      posMap.set(node.id, buildPosition(node, index, laneMap));
+      posMap.set(nodeKey(node, index), buildPosition(node, index, laneMap));
     });
 
     return {
@@ -154,33 +194,47 @@ export default function AtlasGraphRenderer({ graph, onHoverNode }) {
       ))}
 
       {edges.map((edge, index) => {
-        const source = positions.get(edge.source);
-        const target = positions.get(edge.target);
+        const sourceId = recordId(edge.source ?? edge.from);
+        const targetId = recordId(edge.target ?? edge.to);
+        const source = positions.get(sourceId);
+        const target = positions.get(targetId);
         if (!source || !target) return null;
         const relation = edge.relation || edge.type || 'contains';
-        const color = EDGE_COLORS[relation] || '#64748b';
+        const evidence = evidenceVisual(edge);
+        const color = evidence.color || EDGE_COLORS[relation] || '#64748b';
         return (
           <Line
-            key={`${edge.source}-${edge.target}-${index}`}
+            key={`${sourceId}-${targetId}-${index}`}
             points={[source, target]}
             color={color}
-            lineWidth={edgeWidth(edge)}
+            lineWidth={evidence.causal ? Math.max(3, edgeWidth(edge)) : edgeWidth(edge)}
             transparent
-            opacity={relation === 'contains' ? 0.22 : 0.68}
+            opacity={relation === 'contains' ? 0.22 : evidence.opacity}
+            dashed={!evidence.causal}
+            dashSize={evidence.failed ? 0.22 : 0.14}
+            gapSize={evidence.failed ? 0.14 : 0.09}
           />
         );
       })}
 
       {nodes.map((node, index) => {
-        const position = positions.get(node.id) || [0, 0, 0];
-        const color = node.color || NODE_COLORS[node.type] || '#60a5fa';
+        const key = nodeKey(node, index);
+        const position = positions.get(key) || [0, 0, 0];
+        const evidence = evidenceVisual(node);
+        const color = evidence.color || node.color || NODE_COLORS[node.type] || '#60a5fa';
         const size = nodeSize(node);
         const evidenceLevel = node.evidence_level || node.evidence || '';
-        const opacity = evidenceLevel === 'candidate' ? 0.48 : evidenceLevel === 'likelihood_only' ? 0.72 : 0.9;
+        const opacity = evidenceLevel === 'candidate'
+          ? 0.48
+          : evidenceLevel === 'likelihood_only'
+            ? 0.72
+            : evidence.causal
+              ? 0.96
+              : 0.86;
         const label = makeLabel(node);
 
         return (
-          <group key={node.id || index} position={position}>
+          <group key={key} position={position}>
             <mesh
               onPointerOver={(event) => {
                 event.stopPropagation();
@@ -195,7 +249,7 @@ export default function AtlasGraphRenderer({ graph, onHoverNode }) {
               <meshStandardMaterial
                 color={color}
                 emissive={color}
-                emissiveIntensity={node.type === 'failure' ? 0.6 : 0.35}
+                emissiveIntensity={evidence.failed ? 0.65 : evidence.causal ? 0.58 : 0.3}
                 transparent
                 opacity={opacity}
                 roughness={0.4}

@@ -1,0 +1,50 @@
+[model_utils] Loading glm4... (8bit=True)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=10.65GB
+{
+  "schema_version": "phase1011_padding_equivalence.v2",
+  "phase": 1011,
+  "model": "glm4",
+  "unit_id": "glm4.comparison.entity.discovery.t0.p0.w0",
+  "state_count": 8,
+  "input_lengths": [
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    68
+  ],
+  "mixed_batch_vs_singleton": {
+    "candidate_panel_prediction_agreement_rate": 0.875,
+    "maximum_candidate_logit_error": 4.0625,
+    "median_candidate_logit_error": 1.546875,
+    "maximum_hidden_relative_error": 0.5241730213165283,
+    "median_hidden_relative_error": 0.10579250752925873,
+    "maximum_response_magnitude_error": 33.45551681518555,
+    "median_response_magnitude_error": 0.0588834285736084,
+    "maximum_response_relative_error": 1.0,
+    "median_response_relative_error": 0.03633633255958557,
+    "minimum_response_direction_cosine": -0.849492073059082,
+    "median_response_direction_cosine": 0.802375316619873,
+    "scope": "includes batch-shape and matrix-kernel drift"
+  },
+  "mixed_batch_vs_same_shape_homogeneous": {
+    "candidate_panel_prediction_agreement_rate": 0.75,
+    "maximum_candidate_logit_error": 3.65625,
+    "median_candidate_logit_error": 1.265625,
+    "maximum_hidden_relative_error": 0.6312353610992432,
+    "median_hidden_relative_error": 0.105579923838377,
+    "maximum_response_magnitude_error": 26.42417335510254,
+    "median_response_magnitude_error": 0.05780738592147827,
+    "maximum_response_relative_error": 1.1312599182128906,
+    "median_response_relative_error": 0.036722779273986816,
+    "minimum_response_direction_cosine": -0.716492235660553,
+    "median_response_direction_cosine": 0.8020431995391846,
+    "scope": "holds batch size and padded width fixed; isolates mixed-state batch composition"
+  },
+  "elapsed_seconds": 30.38914966583252,
+  "interpretation": "quantifies batching/padding instrumentation drift; it does not test a language mechanism"
+}
+[model_utils] GPU memory released, allocated=10.66 GB

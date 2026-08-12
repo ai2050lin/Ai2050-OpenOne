@@ -1,0 +1,3692 @@
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+[deepseek7b/color/discovery] 1/8
+[deepseek7b/color/discovery] 2/8
+[deepseek7b/color/discovery] 3/8
+[deepseek7b/color/discovery] 4/8
+[deepseek7b/color/discovery] 5/8
+[deepseek7b/color/discovery] 6/8
+[deepseek7b/color/discovery] 7/8
+[deepseek7b/color/discovery] 8/8
+[deepseek7b/color/confirmation] 1/8
+[deepseek7b/color/confirmation] 2/8
+[deepseek7b/color/confirmation] 3/8
+[deepseek7b/color/confirmation] 4/8
+[deepseek7b/color/confirmation] 5/8
+[deepseek7b/color/confirmation] 6/8
+[deepseek7b/color/confirmation] 7/8
+[deepseek7b/color/confirmation] 8/8
+[deepseek7b/shape/discovery] 1/8
+[deepseek7b/shape/discovery] 2/8
+[deepseek7b/shape/discovery] 3/8
+[deepseek7b/shape/discovery] 4/8
+[deepseek7b/shape/discovery] 5/8
+[deepseek7b/shape/discovery] 6/8
+[deepseek7b/shape/discovery] 7/8
+[deepseek7b/shape/discovery] 8/8
+[deepseek7b/shape/confirmation] 1/8
+[deepseek7b/shape/confirmation] 2/8
+[deepseek7b/shape/confirmation] 3/8
+[deepseek7b/shape/confirmation] 4/8
+[deepseek7b/shape/confirmation] 5/8
+[deepseek7b/shape/confirmation] 6/8
+[deepseek7b/shape/confirmation] 7/8
+[deepseek7b/shape/confirmation] 8/8
+[model_utils] GPU memory released, allocated=8.72 GB
+{
+  "schema_version": "phase1003_anchor_subset_model.v1",
+  "phase": 1003,
+  "model": "deepseek7b",
+  "status": "complete",
+  "behavior_qualified_domains": [
+    "color",
+    "shape"
+  ],
+  "domains": {
+    "color": {
+      "schema_version": "phase1003_anchor_subset_summary.v1",
+      "phase": 1003,
+      "implementation_revision": 4,
+      "model": "deepseek7b",
+      "domain": "color",
+      "status": "complete",
+      "source_depth": 1,
+      "case_batch_size": 8,
+      "condition_batch_size": 1,
+      "condition_isolation": true,
+      "instrument_revision_audit": {
+        "revision_1": "No-op was initially conflated with target correctness.",
+        "revision_2": "No-op was compared with a clean forward at a different batch size; 8bit numerical drift remained.",
+        "revision_3": "State capture and intervention used the same expanded batch size, but mixed intervention conditions still showed large candidate-logit drift.",
+        "revision_4": "Formal execution isolates one intervention condition per forward call and matches capture/intervention batch size.",
+        "scientific_results_used_to_select_subsets": false
+      },
+      "subset_count": 32,
+      "direction_count_per_split": 64,
+      "donor_audits": {
+        "discovery": {
+          "recipient_count": 64,
+          "unique_donor_count": 62,
+          "unique_donor_fraction": 0.96875,
+          "maximum_donor_reuse": 2,
+          "minimum_used_donor_reuse": 1,
+          "all_cross_world": true,
+          "all_donor_answers_differ_from_target": true,
+          "donor_assignment_digest": "d8a2de687ad41d375e260b192088a42f31b38bc94ebe326576ba5ebeef7c3511"
+        },
+        "confirmation": {
+          "recipient_count": 64,
+          "unique_donor_count": 61,
+          "unique_donor_fraction": 0.953125,
+          "maximum_donor_reuse": 2,
+          "minimum_used_donor_reuse": 1,
+          "all_cross_world": true,
+          "all_donor_answers_differ_from_target": true,
+          "donor_assignment_digest": "23e7ed6264faf6cc2f0741a8f5e5a2a206e520c5d9e31daf5feb362f6aff18d0"
+        }
+      },
+      "controls": {
+        "discovery": {
+          "empty_noop_prediction_agreement": 1.0,
+          "empty_noop_max_candidate_logit_difference": 0.0,
+          "full_anchor_donor_rate": 1.0,
+          "full_anchor_median_transfer": 1.0
+        },
+        "confirmation": {
+          "empty_noop_prediction_agreement": 1.0,
+          "empty_noop_max_candidate_logit_difference": 0.0,
+          "full_anchor_donor_rate": 0.984375,
+          "full_anchor_median_transfer": 1.0
+        }
+      },
+      "split_summary": {
+        "discovery": {
+          "s00": {
+            "subset_id": "s00",
+            "roles": [],
+            "cardinality": 0,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.0,
+            "target_rate": 1.0,
+            "clean_prediction_agreement": 1.0,
+            "maximum_candidate_logit_difference_from_target": 0.0,
+            "median_normalized_transfer": 0.0,
+            "mean_normalized_transfer": 0.0,
+            "qualified_donor_rate": 0.0,
+            "restored_roles": [],
+            "remaining_donor_subset_id": "s31",
+            "restoration_target_rate": 0.0,
+            "median_restoration_mediation": 0.0
+          },
+          "s01": {
+            "subset_id": "s01",
+            "roles": [
+              "slot0_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.109375,
+            "target_rate": 0.71875,
+            "clean_prediction_agreement": 0.71875,
+            "maximum_candidate_logit_difference_from_target": 10.125,
+            "median_normalized_transfer": 0.12335225194692612,
+            "mean_normalized_transfer": 0.16628420036067837,
+            "qualified_donor_rate": 0.109375,
+            "restored_roles": [
+              "slot0_entity"
+            ],
+            "remaining_donor_subset_id": "s30",
+            "restoration_target_rate": 0.109375,
+            "median_restoration_mediation": 0.09195592121066538
+          },
+          "s02": {
+            "subset_id": "s02",
+            "roles": [
+              "slot0_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.28125,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 19.9375,
+            "median_normalized_transfer": 0.24951305240392685,
+            "mean_normalized_transfer": 0.40656313646650233,
+            "qualified_donor_rate": 0.28125,
+            "restored_roles": [
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s29",
+            "restoration_target_rate": 0.28125,
+            "median_restoration_mediation": 0.1588712752628425
+          },
+          "s03": {
+            "subset_id": "s03",
+            "roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.265625,
+            "target_rate": 0.515625,
+            "clean_prediction_agreement": 0.515625,
+            "maximum_candidate_logit_difference_from_target": 17.375,
+            "median_normalized_transfer": 0.22365345805883408,
+            "mean_normalized_transfer": 0.3497909110301407,
+            "qualified_donor_rate": 0.265625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s28",
+            "restoration_target_rate": 0.234375,
+            "median_restoration_mediation": 0.25966225219356404
+          },
+          "s04": {
+            "subset_id": "s04",
+            "roles": [
+              "slot1_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.0625,
+            "target_rate": 0.734375,
+            "clean_prediction_agreement": 0.734375,
+            "maximum_candidate_logit_difference_from_target": 11.5625,
+            "median_normalized_transfer": 0.0994931235909462,
+            "mean_normalized_transfer": 0.15922932476678398,
+            "qualified_donor_rate": 0.0625,
+            "restored_roles": [
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s27",
+            "restoration_target_rate": 0.0625,
+            "median_restoration_mediation": 0.1387565309589811
+          },
+          "s05": {
+            "subset_id": "s05",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.1875,
+            "target_rate": 0.453125,
+            "clean_prediction_agreement": 0.453125,
+            "maximum_candidate_logit_difference_from_target": 11.875,
+            "median_normalized_transfer": 0.3094918429851532,
+            "mean_normalized_transfer": 0.32672019652090967,
+            "qualified_donor_rate": 0.1875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s26",
+            "restoration_target_rate": 0.140625,
+            "median_restoration_mediation": 0.2980212099301036
+          },
+          "s06": {
+            "subset_id": "s06",
+            "roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.390625,
+            "target_rate": 0.3125,
+            "clean_prediction_agreement": 0.3125,
+            "maximum_candidate_logit_difference_from_target": 19.1875,
+            "median_normalized_transfer": 0.4739241302013397,
+            "mean_normalized_transfer": 0.5616714465140831,
+            "qualified_donor_rate": 0.390625,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s25",
+            "restoration_target_rate": 0.40625,
+            "median_restoration_mediation": 0.4719011744887932
+          },
+          "s07": {
+            "subset_id": "s07",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.375,
+            "target_rate": 0.3125,
+            "clean_prediction_agreement": 0.3125,
+            "maximum_candidate_logit_difference_from_target": 18.1875,
+            "median_normalized_transfer": 0.49132412672042847,
+            "mean_normalized_transfer": 0.4975912968220655,
+            "qualified_donor_rate": 0.375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s24",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.47461513265640354
+          },
+          "s08": {
+            "subset_id": "s08",
+            "roles": [
+              "slot1_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.296875,
+            "target_rate": 0.515625,
+            "clean_prediction_agreement": 0.515625,
+            "maximum_candidate_logit_difference_from_target": 20.875,
+            "median_normalized_transfer": 0.3737095892429352,
+            "mean_normalized_transfer": 0.4226053738966584,
+            "qualified_donor_rate": 0.296875,
+            "restored_roles": [
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s23",
+            "restoration_target_rate": 0.296875,
+            "median_restoration_mediation": 0.20790780567904202
+          },
+          "s09": {
+            "subset_id": "s09",
+            "roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.390625,
+            "target_rate": 0.328125,
+            "clean_prediction_agreement": 0.328125,
+            "maximum_candidate_logit_difference_from_target": 20.578125,
+            "median_normalized_transfer": 0.4867584854364395,
+            "mean_normalized_transfer": 0.5711708195740357,
+            "qualified_donor_rate": 0.390625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s22",
+            "restoration_target_rate": 0.390625,
+            "median_restoration_mediation": 0.49102004658945503
+          },
+          "s10": {
+            "subset_id": "s10",
+            "roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.578125,
+            "target_rate": 0.046875,
+            "clean_prediction_agreement": 0.046875,
+            "maximum_candidate_logit_difference_from_target": 19.0625,
+            "median_normalized_transfer": 0.9167945683002472,
+            "mean_normalized_transfer": 0.8376707080169581,
+            "qualified_donor_rate": 0.578125,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s21",
+            "restoration_target_rate": 0.578125,
+            "median_restoration_mediation": 0.9145245908751445
+          },
+          "s11": {
+            "subset_id": "s11",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.5625,
+            "target_rate": 0.125,
+            "clean_prediction_agreement": 0.125,
+            "maximum_candidate_logit_difference_from_target": 18.5625,
+            "median_normalized_transfer": 0.7205759286880493,
+            "mean_normalized_transfer": 0.7498650541238021,
+            "qualified_donor_rate": 0.5625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s20",
+            "restoration_target_rate": 0.515625,
+            "median_restoration_mediation": 0.709215896381916
+          },
+          "s12": {
+            "subset_id": "s12",
+            "roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.1875,
+            "target_rate": 0.515625,
+            "clean_prediction_agreement": 0.515625,
+            "maximum_candidate_logit_difference_from_target": 21.578125,
+            "median_normalized_transfer": 0.33751268684864044,
+            "mean_normalized_transfer": 0.3635949829003948,
+            "qualified_donor_rate": 0.1875,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s19",
+            "restoration_target_rate": 0.234375,
+            "median_restoration_mediation": 0.3562036296834163
+          },
+          "s13": {
+            "subset_id": "s13",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.3125,
+            "target_rate": 0.3125,
+            "clean_prediction_agreement": 0.3125,
+            "maximum_candidate_logit_difference_from_target": 22.8046875,
+            "median_normalized_transfer": 0.5227072834968567,
+            "mean_normalized_transfer": 0.5050722477171803,
+            "qualified_donor_rate": 0.3125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s18",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.5089974385282658
+          },
+          "s14": {
+            "subset_id": "s14",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.53125,
+            "target_rate": 0.078125,
+            "clean_prediction_agreement": 0.078125,
+            "maximum_candidate_logit_difference_from_target": 19.21875,
+            "median_normalized_transfer": 0.751671552658081,
+            "mean_normalized_transfer": 0.7516918553155847,
+            "qualified_donor_rate": 0.53125,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s17",
+            "restoration_target_rate": 0.5,
+            "median_restoration_mediation": 0.7239063402359541
+          },
+          "s15": {
+            "subset_id": "s15",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.515625,
+            "target_rate": 0.140625,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 19.0625,
+            "median_normalized_transfer": 0.704477846622467,
+            "mean_normalized_transfer": 0.6717327341903001,
+            "qualified_donor_rate": 0.515625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s16",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.6644732723386368
+          },
+          "s16": {
+            "subset_id": "s16",
+            "roles": [
+              "query_name"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.140625,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 12.5625,
+            "median_normalized_transfer": 0.3355267345905304,
+            "mean_normalized_transfer": 0.3345029877964407,
+            "qualified_donor_rate": 0.140625,
+            "restored_roles": [
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s15",
+            "restoration_target_rate": 0.140625,
+            "median_restoration_mediation": 0.295522138034122
+          },
+          "s17": {
+            "subset_id": "s17",
+            "roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.203125,
+            "target_rate": 0.5,
+            "clean_prediction_agreement": 0.5,
+            "maximum_candidate_logit_difference_from_target": 15.75,
+            "median_normalized_transfer": 0.27609366178512573,
+            "mean_normalized_transfer": 0.27709867235716956,
+            "qualified_donor_rate": 0.203125,
+            "restored_roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s14",
+            "restoration_target_rate": 0.078125,
+            "median_restoration_mediation": 0.24832843213124903
+          },
+          "s18": {
+            "subset_id": "s18",
+            "roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.296875,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.34375,
+            "maximum_candidate_logit_difference_from_target": 18.40625,
+            "median_normalized_transfer": 0.49100257456302643,
+            "mean_normalized_transfer": 0.5020045141282026,
+            "qualified_donor_rate": 0.296875,
+            "restored_roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s13",
+            "restoration_target_rate": 0.3125,
+            "median_restoration_mediation": 0.47729268176005524
+          },
+          "s19": {
+            "subset_id": "s19",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.515625,
+            "target_rate": 0.234375,
+            "clean_prediction_agreement": 0.234375,
+            "maximum_candidate_logit_difference_from_target": 20.46875,
+            "median_normalized_transfer": 0.6437963843345642,
+            "mean_normalized_transfer": 0.643692490819376,
+            "qualified_donor_rate": 0.515625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s12",
+            "restoration_target_rate": 0.515625,
+            "median_restoration_mediation": 0.6624873240751348
+          },
+          "s20": {
+            "subset_id": "s20",
+            "roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.171875,
+            "target_rate": 0.515625,
+            "clean_prediction_agreement": 0.515625,
+            "maximum_candidate_logit_difference_from_target": 14.3125,
+            "median_normalized_transfer": 0.2907841056585312,
+            "mean_normalized_transfer": 0.2755234506112174,
+            "qualified_donor_rate": 0.171875,
+            "restored_roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s11",
+            "restoration_target_rate": 0.125,
+            "median_restoration_mediation": 0.27942406013247384
+          },
+          "s21": {
+            "subset_id": "s21",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.171875,
+            "target_rate": 0.578125,
+            "clean_prediction_agreement": 0.578125,
+            "maximum_candidate_logit_difference_from_target": 16.375,
+            "median_normalized_transfer": 0.08547541126608849,
+            "mean_normalized_transfer": 0.22991965420806082,
+            "qualified_donor_rate": 0.171875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s10",
+            "restoration_target_rate": 0.046875,
+            "median_restoration_mediation": 0.08320541643177501
+          },
+          "s22": {
+            "subset_id": "s22",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.40625,
+            "target_rate": 0.390625,
+            "clean_prediction_agreement": 0.390625,
+            "maximum_candidate_logit_difference_from_target": 18.0625,
+            "median_normalized_transfer": 0.5089799612760544,
+            "mean_normalized_transfer": 0.4597432058362756,
+            "qualified_donor_rate": 0.40625,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s09",
+            "restoration_target_rate": 0.328125,
+            "median_restoration_mediation": 0.5132415268919139
+          },
+          "s23": {
+            "subset_id": "s23",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.578125,
+            "target_rate": 0.296875,
+            "clean_prediction_agreement": 0.296875,
+            "maximum_candidate_logit_difference_from_target": 20.59375,
+            "median_normalized_transfer": 0.7920921742916107,
+            "mean_normalized_transfer": 0.6099397200014209,
+            "qualified_donor_rate": 0.578125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s08",
+            "restoration_target_rate": 0.515625,
+            "median_restoration_mediation": 0.6262903985438067
+          },
+          "s24": {
+            "subset_id": "s24",
+            "roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.3125,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.34375,
+            "maximum_candidate_logit_difference_from_target": 21.6875,
+            "median_normalized_transfer": 0.5253848731517792,
+            "mean_normalized_transfer": 0.5105830617831089,
+            "qualified_donor_rate": 0.3125,
+            "restored_roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s07",
+            "restoration_target_rate": 0.3125,
+            "median_restoration_mediation": 0.5086758769685599
+          },
+          "s25": {
+            "subset_id": "s25",
+            "roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.34375,
+            "target_rate": 0.40625,
+            "clean_prediction_agreement": 0.40625,
+            "maximum_candidate_logit_difference_from_target": 22.984375,
+            "median_normalized_transfer": 0.5280988216400146,
+            "mean_normalized_transfer": 0.4755836124149937,
+            "qualified_donor_rate": 0.34375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s06",
+            "restoration_target_rate": 0.3125,
+            "median_restoration_mediation": 0.5260758720422869
+          },
+          "s26": {
+            "subset_id": "s26",
+            "roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.421875,
+            "target_rate": 0.140625,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 19.28125,
+            "median_normalized_transfer": 0.7019788026809692,
+            "mean_normalized_transfer": 0.6721427084412426,
+            "qualified_donor_rate": 0.421875,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s05",
+            "restoration_target_rate": 0.453125,
+            "median_restoration_mediation": 0.6905081464677849
+          },
+          "s27": {
+            "subset_id": "s27",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.6875,
+            "target_rate": 0.0625,
+            "clean_prediction_agreement": 0.0625,
+            "maximum_candidate_logit_difference_from_target": 19.59375,
+            "median_normalized_transfer": 0.861243486404419,
+            "mean_normalized_transfer": 0.8349934765137732,
+            "qualified_donor_rate": 0.6875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s04",
+            "restoration_target_rate": 0.734375,
+            "median_restoration_mediation": 0.9005068811992185
+          },
+          "s28": {
+            "subset_id": "s28",
+            "roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.515625,
+            "target_rate": 0.234375,
+            "clean_prediction_agreement": 0.234375,
+            "maximum_candidate_logit_difference_from_target": 20.34375,
+            "median_normalized_transfer": 0.7403377890586853,
+            "mean_normalized_transfer": 0.6719828878995031,
+            "qualified_donor_rate": 0.515625,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s03",
+            "restoration_target_rate": 0.515625,
+            "median_restoration_mediation": 0.7763465367662171
+          },
+          "s29": {
+            "subset_id": "s29",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.59375,
+            "target_rate": 0.28125,
+            "clean_prediction_agreement": 0.28125,
+            "maximum_candidate_logit_difference_from_target": 20.890625,
+            "median_normalized_transfer": 0.8411287367343903,
+            "mean_normalized_transfer": 0.6383337407605723,
+            "qualified_donor_rate": 0.59375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s02",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.7504869421785931
+          },
+          "s30": {
+            "subset_id": "s30",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.6875,
+            "target_rate": 0.109375,
+            "clean_prediction_agreement": 0.109375,
+            "maximum_candidate_logit_difference_from_target": 19.75,
+            "median_normalized_transfer": 0.9080441296100616,
+            "mean_normalized_transfer": 0.8452590621309355,
+            "qualified_donor_rate": 0.6875,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s01",
+            "restoration_target_rate": 0.71875,
+            "median_restoration_mediation": 0.8766477520733305
+          },
+          "s31": {
+            "subset_id": "s31",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 5,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 1.0,
+            "target_rate": 0.0,
+            "clean_prediction_agreement": 0.0,
+            "maximum_candidate_logit_difference_from_target": 19.71875,
+            "median_normalized_transfer": 1.0,
+            "mean_normalized_transfer": 0.9999999916180968,
+            "qualified_donor_rate": 1.0,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s00",
+            "restoration_target_rate": 1.0,
+            "median_restoration_mediation": 1.0
+          }
+        },
+        "confirmation": {
+          "s00": {
+            "subset_id": "s00",
+            "roles": [],
+            "cardinality": 0,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.0,
+            "target_rate": 1.0,
+            "clean_prediction_agreement": 1.0,
+            "maximum_candidate_logit_difference_from_target": 0.0,
+            "median_normalized_transfer": 0.0,
+            "mean_normalized_transfer": 0.0,
+            "qualified_donor_rate": 0.0,
+            "restored_roles": [],
+            "remaining_donor_subset_id": "s31",
+            "restoration_target_rate": 0.0,
+            "median_restoration_mediation": 0.0
+          },
+          "s01": {
+            "subset_id": "s01",
+            "roles": [
+              "slot0_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.15625,
+            "target_rate": 0.671875,
+            "clean_prediction_agreement": 0.671875,
+            "maximum_candidate_logit_difference_from_target": 10.5,
+            "median_normalized_transfer": 0.13876570761203766,
+            "mean_normalized_transfer": 0.16753241446713218,
+            "qualified_donor_rate": 0.15625,
+            "restored_roles": [
+              "slot0_entity"
+            ],
+            "remaining_donor_subset_id": "s30",
+            "restoration_target_rate": 0.078125,
+            "median_restoration_mediation": 0.12116350169786394
+          },
+          "s02": {
+            "subset_id": "s02",
+            "roles": [
+              "slot0_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.25,
+            "target_rate": 0.5625,
+            "clean_prediction_agreement": 0.5625,
+            "maximum_candidate_logit_difference_from_target": 19.875,
+            "median_normalized_transfer": 0.2616431713104248,
+            "mean_normalized_transfer": 0.37015376993076643,
+            "qualified_donor_rate": 0.25,
+            "restored_roles": [
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s29",
+            "restoration_target_rate": 0.25,
+            "median_restoration_mediation": 0.2537415275440113
+          },
+          "s03": {
+            "subset_id": "s03",
+            "roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.203125,
+            "target_rate": 0.515625,
+            "clean_prediction_agreement": 0.515625,
+            "maximum_candidate_logit_difference_from_target": 19.28125,
+            "median_normalized_transfer": 0.39900533854961395,
+            "mean_normalized_transfer": 0.3413291335600661,
+            "qualified_donor_rate": 0.203125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s28",
+            "restoration_target_rate": 0.1875,
+            "median_restoration_mediation": 0.36982005400412016
+          },
+          "s04": {
+            "subset_id": "s04",
+            "roles": [
+              "slot1_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.046875,
+            "target_rate": 0.859375,
+            "clean_prediction_agreement": 0.859375,
+            "maximum_candidate_logit_difference_from_target": 9.5625,
+            "median_normalized_transfer": 0.14994926005601883,
+            "mean_normalized_transfer": 0.16769441826909315,
+            "qualified_donor_rate": 0.046875,
+            "restored_roles": [
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s27",
+            "restoration_target_rate": 0.0625,
+            "median_restoration_mediation": 0.12275847502376175
+          },
+          "s05": {
+            "subset_id": "s05",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.21875,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 9.75,
+            "median_normalized_transfer": 0.3143213242292404,
+            "mean_normalized_transfer": 0.33129827748052776,
+            "qualified_donor_rate": 0.21875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s26",
+            "restoration_target_rate": 0.125,
+            "median_restoration_mediation": 0.29323507108400726
+          },
+          "s06": {
+            "subset_id": "s06",
+            "roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.359375,
+            "target_rate": 0.390625,
+            "clean_prediction_agreement": 0.390625,
+            "maximum_candidate_logit_difference_from_target": 20.21875,
+            "median_normalized_transfer": 0.5048163533210754,
+            "mean_normalized_transfer": 0.5267018704871589,
+            "qualified_donor_rate": 0.359375,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s25",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.49309563351114083
+          },
+          "s07": {
+            "subset_id": "s07",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.3125,
+            "target_rate": 0.375,
+            "clean_prediction_agreement": 0.375,
+            "maximum_candidate_logit_difference_from_target": 20.734375,
+            "median_normalized_transfer": 0.5186660587787628,
+            "mean_normalized_transfer": 0.49776036727416795,
+            "qualified_donor_rate": 0.3125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s24",
+            "restoration_target_rate": 0.25,
+            "median_restoration_mediation": 0.5008137583391565
+          },
+          "s08": {
+            "subset_id": "s08",
+            "roles": [
+              "slot1_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.25,
+            "target_rate": 0.5625,
+            "clean_prediction_agreement": 0.5625,
+            "maximum_candidate_logit_difference_from_target": 21.1875,
+            "median_normalized_transfer": 0.13847165554761887,
+            "mean_normalized_transfer": 0.3947100813675206,
+            "qualified_donor_rate": 0.25,
+            "restored_roles": [
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s23",
+            "restoration_target_rate": 0.25,
+            "median_restoration_mediation": 0.09990797972081394
+          },
+          "s09": {
+            "subset_id": "s09",
+            "roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.40625,
+            "target_rate": 0.28125,
+            "clean_prediction_agreement": 0.28125,
+            "maximum_candidate_logit_difference_from_target": 19.359375,
+            "median_normalized_transfer": 0.492115318775177,
+            "mean_normalized_transfer": 0.5545651724969503,
+            "qualified_donor_rate": 0.40625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s22",
+            "restoration_target_rate": 0.421875,
+            "median_restoration_mediation": 0.45426400225161834
+          },
+          "s10": {
+            "subset_id": "s10",
+            "roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.53125,
+            "target_rate": 0.125,
+            "clean_prediction_agreement": 0.125,
+            "maximum_candidate_logit_difference_from_target": 23.84375,
+            "median_normalized_transfer": 0.878492921590805,
+            "mean_normalized_transfer": 0.7632829253852833,
+            "qualified_donor_rate": 0.53125,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s21",
+            "restoration_target_rate": 0.5,
+            "median_restoration_mediation": 0.7890434552199258
+          },
+          "s11": {
+            "subset_id": "s11",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.453125,
+            "target_rate": 0.140625,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 21.9375,
+            "median_normalized_transfer": 0.7629598081111908,
+            "mean_normalized_transfer": 0.7407573590171523,
+            "qualified_donor_rate": 0.453125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s20",
+            "restoration_target_rate": 0.46875,
+            "median_restoration_mediation": 0.7198379351740696
+          },
+          "s12": {
+            "subset_id": "s12",
+            "roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.25,
+            "target_rate": 0.546875,
+            "clean_prediction_agreement": 0.546875,
+            "maximum_candidate_logit_difference_from_target": 18.53125,
+            "median_normalized_transfer": 0.2820044457912445,
+            "mean_normalized_transfer": 0.35118295215215767,
+            "qualified_donor_rate": 0.25,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s19",
+            "restoration_target_rate": 0.25,
+            "median_restoration_mediation": 0.2860747674597265
+          },
+          "s13": {
+            "subset_id": "s13",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.390625,
+            "target_rate": 0.265625,
+            "clean_prediction_agreement": 0.265625,
+            "maximum_candidate_logit_difference_from_target": 18.65625,
+            "median_normalized_transfer": 0.46391282975673676,
+            "mean_normalized_transfer": 0.5099644353613257,
+            "qualified_donor_rate": 0.390625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s18",
+            "restoration_target_rate": 0.390625,
+            "median_restoration_mediation": 0.4877450980392157
+          },
+          "s14": {
+            "subset_id": "s14",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.515625,
+            "target_rate": 0.140625,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 20.6875,
+            "median_normalized_transfer": 0.723755270242691,
+            "mean_normalized_transfer": 0.7116821391209669,
+            "qualified_donor_rate": 0.515625,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s17",
+            "restoration_target_rate": 0.546875,
+            "median_restoration_mediation": 0.6992920838278615
+          },
+          "s15": {
+            "subset_id": "s15",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.546875,
+            "target_rate": 0.125,
+            "clean_prediction_agreement": 0.125,
+            "maximum_candidate_logit_difference_from_target": 21.375,
+            "median_normalized_transfer": 0.716157078742981,
+            "mean_normalized_transfer": 0.690484959166497,
+            "qualified_donor_rate": 0.546875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s16",
+            "restoration_target_rate": 0.546875,
+            "median_restoration_mediation": 0.6824025115664243
+          },
+          "s16": {
+            "subset_id": "s16",
+            "roles": [
+              "query_name"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.125,
+            "target_rate": 0.546875,
+            "clean_prediction_agreement": 0.546875,
+            "maximum_candidate_logit_difference_from_target": 10.625,
+            "median_normalized_transfer": 0.31759749352931976,
+            "mean_normalized_transfer": 0.3270432227291167,
+            "qualified_donor_rate": 0.125,
+            "restored_roles": [
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s15",
+            "restoration_target_rate": 0.125,
+            "median_restoration_mediation": 0.2838429049790506
+          },
+          "s17": {
+            "subset_id": "s17",
+            "roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.203125,
+            "target_rate": 0.546875,
+            "clean_prediction_agreement": 0.546875,
+            "maximum_candidate_logit_difference_from_target": 15.5625,
+            "median_normalized_transfer": 0.3007079213857651,
+            "mean_normalized_transfer": 0.31157995769171976,
+            "qualified_donor_rate": 0.203125,
+            "restored_roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s14",
+            "restoration_target_rate": 0.140625,
+            "median_restoration_mediation": 0.27624470606646473
+          },
+          "s18": {
+            "subset_id": "s18",
+            "roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.328125,
+            "target_rate": 0.390625,
+            "clean_prediction_agreement": 0.390625,
+            "maximum_candidate_logit_difference_from_target": 19.65625,
+            "median_normalized_transfer": 0.512254923582077,
+            "mean_normalized_transfer": 0.4886084844401921,
+            "qualified_donor_rate": 0.328125,
+            "restored_roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s13",
+            "restoration_target_rate": 0.265625,
+            "median_restoration_mediation": 0.5360871791201713
+          },
+          "s19": {
+            "subset_id": "s19",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.578125,
+            "target_rate": 0.25,
+            "clean_prediction_agreement": 0.25,
+            "maximum_candidate_logit_difference_from_target": 21.28125,
+            "median_normalized_transfer": 0.7139252126216888,
+            "mean_normalized_transfer": 0.6430903691143612,
+            "qualified_donor_rate": 0.578125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s12",
+            "restoration_target_rate": 0.546875,
+            "median_restoration_mediation": 0.7179955644735452
+          },
+          "s20": {
+            "subset_id": "s20",
+            "roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.21875,
+            "target_rate": 0.46875,
+            "clean_prediction_agreement": 0.46875,
+            "maximum_candidate_logit_difference_from_target": 17.5625,
+            "median_normalized_transfer": 0.2801620662212372,
+            "mean_normalized_transfer": 0.3163282093792077,
+            "qualified_donor_rate": 0.21875,
+            "restored_roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s11",
+            "restoration_target_rate": 0.140625,
+            "median_restoration_mediation": 0.23704020879210505
+          },
+          "s21": {
+            "subset_id": "s21",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.25,
+            "target_rate": 0.5,
+            "clean_prediction_agreement": 0.5,
+            "maximum_candidate_logit_difference_from_target": 16.4375,
+            "median_normalized_transfer": 0.21095655113458633,
+            "mean_normalized_transfer": 0.29454088646161836,
+            "qualified_donor_rate": 0.25,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s10",
+            "restoration_target_rate": 0.125,
+            "median_restoration_mediation": 0.12150703709906523
+          },
+          "s22": {
+            "subset_id": "s22",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.359375,
+            "target_rate": 0.421875,
+            "clean_prediction_agreement": 0.421875,
+            "maximum_candidate_logit_difference_from_target": 18.9375,
+            "median_normalized_transfer": 0.5457359850406647,
+            "mean_normalized_transfer": 0.4850762866481091,
+            "qualified_donor_rate": 0.359375,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s09",
+            "restoration_target_rate": 0.28125,
+            "median_restoration_mediation": 0.5078846742380166
+          },
+          "s23": {
+            "subset_id": "s23",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.65625,
+            "target_rate": 0.25,
+            "clean_prediction_agreement": 0.25,
+            "maximum_candidate_logit_difference_from_target": 21.4375,
+            "median_normalized_transfer": 0.9000920057296753,
+            "mean_normalized_transfer": 0.6370418085571146,
+            "qualified_donor_rate": 0.65625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s08",
+            "restoration_target_rate": 0.5625,
+            "median_restoration_mediation": 0.8615283455334791
+          },
+          "s24": {
+            "subset_id": "s24",
+            "roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.359375,
+            "target_rate": 0.25,
+            "clean_prediction_agreement": 0.25,
+            "maximum_candidate_logit_difference_from_target": 18.53125,
+            "median_normalized_transfer": 0.499186247587204,
+            "mean_normalized_transfer": 0.5110978372395039,
+            "qualified_donor_rate": 0.359375,
+            "restored_roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s07",
+            "restoration_target_rate": 0.375,
+            "median_restoration_mediation": 0.4813339303332669
+          },
+          "s25": {
+            "subset_id": "s25",
+            "roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.453125,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.34375,
+            "maximum_candidate_logit_difference_from_target": 18.625,
+            "median_normalized_transfer": 0.5069043934345245,
+            "mean_normalized_transfer": 0.48424965711456025,
+            "qualified_donor_rate": 0.453125,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s06",
+            "restoration_target_rate": 0.390625,
+            "median_restoration_mediation": 0.49518365201392994
+          },
+          "s26": {
+            "subset_id": "s26",
+            "roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.515625,
+            "target_rate": 0.125,
+            "clean_prediction_agreement": 0.125,
+            "maximum_candidate_logit_difference_from_target": 22.09375,
+            "median_normalized_transfer": 0.7067649066448212,
+            "mean_normalized_transfer": 0.6904443176463246,
+            "qualified_donor_rate": 0.515625,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s05",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.6856786913660492
+          },
+          "s27": {
+            "subset_id": "s27",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.796875,
+            "target_rate": 0.0625,
+            "clean_prediction_agreement": 0.0625,
+            "maximum_candidate_logit_difference_from_target": 20.875,
+            "median_normalized_transfer": 0.8772415518760681,
+            "mean_normalized_transfer": 0.8233299697749317,
+            "qualified_donor_rate": 0.796875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s04",
+            "restoration_target_rate": 0.859375,
+            "median_restoration_mediation": 0.8500507361673793
+          },
+          "s28": {
+            "subset_id": "s28",
+            "roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.53125,
+            "target_rate": 0.1875,
+            "clean_prediction_agreement": 0.1875,
+            "maximum_candidate_logit_difference_from_target": 21.21875,
+            "median_normalized_transfer": 0.6301799714565277,
+            "mean_normalized_transfer": 0.664000833639875,
+            "qualified_donor_rate": 0.53125,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s03",
+            "restoration_target_rate": 0.515625,
+            "median_restoration_mediation": 0.6009946594135283
+          },
+          "s29": {
+            "subset_id": "s29",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.59375,
+            "target_rate": 0.25,
+            "clean_prediction_agreement": 0.25,
+            "maximum_candidate_logit_difference_from_target": 20.46875,
+            "median_normalized_transfer": 0.7462584972381592,
+            "mean_normalized_transfer": 0.6403598904144019,
+            "qualified_donor_rate": 0.59375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s02",
+            "restoration_target_rate": 0.5625,
+            "median_restoration_mediation": 0.73835683033544
+          },
+          "s30": {
+            "subset_id": "s30",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.671875,
+            "target_rate": 0.078125,
+            "clean_prediction_agreement": 0.078125,
+            "maximum_candidate_logit_difference_from_target": 21.90625,
+            "median_normalized_transfer": 0.8788365125656128,
+            "mean_normalized_transfer": 0.8549828841350973,
+            "qualified_donor_rate": 0.671875,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s01",
+            "restoration_target_rate": 0.671875,
+            "median_restoration_mediation": 0.8612342941611235
+          },
+          "s31": {
+            "subset_id": "s31",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 5,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.984375,
+            "target_rate": 0.0,
+            "clean_prediction_agreement": 0.0,
+            "maximum_candidate_logit_difference_from_target": 22.0,
+            "median_normalized_transfer": 1.0,
+            "mean_normalized_transfer": 0.9999999916180968,
+            "qualified_donor_rate": 0.984375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s00",
+            "restoration_target_rate": 1.0,
+            "median_restoration_mediation": 1.0
+          }
+        }
+      },
+      "pairwise_interactions": {
+        "discovery": [
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot0_value",
+            "factorial_interaction": -0.22305642579704,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_entity",
+            "factorial_interaction": 0.0012066713934473228,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.017718754683301086,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.22368851579994953,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_entity",
+            "factorial_interaction": -0.004121014719203231,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_value",
+            "factorial_interaction": 0.008502197653797339,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.23906161013474048,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.21823971576304757,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.21820886195200728,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.24652529990999028,
+            "descriptive_only": true
+          }
+        ],
+        "confirmation": [
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot0_value",
+            "factorial_interaction": -0.1963570508378325,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_entity",
+            "factorial_interaction": -0.0039285552556975745,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.007677323337702546,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.1829956795045291,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_entity",
+            "factorial_interaction": -0.011146317712700693,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.001580925913003739,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.208588508219691,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.2112215474844561,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.17840943161900213,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.21065546685713343,
+            "descriptive_only": true
+          }
+        ]
+      },
+      "discovery_selection": {
+        "status": "FROZEN_FROM_DISCOVERY",
+        "minimum_cardinality": 5,
+        "selected_subset_ids": [
+          "s31"
+        ],
+        "selected_subsets": [
+          [
+            "slot0_entity",
+            "slot0_value",
+            "slot1_entity",
+            "slot1_value",
+            "query_name"
+          ]
+        ],
+        "selection_uses_confirmation": false
+      },
+      "selected_confirmation": [
+        {
+          "subset_id": "s31",
+          "roles": [
+            "slot0_entity",
+            "slot0_value",
+            "slot1_entity",
+            "slot1_value",
+            "query_name"
+          ],
+          "cardinality": 5,
+          "donor_rate": 0.984375,
+          "median_normalized_transfer": 1.0,
+          "confirmation_gate": true
+        }
+      ],
+      "parent_instrument_pass": true,
+      "frozen_subset_confirmation_pass": true,
+      "claim_boundary": "The exhaustive table identifies causal semantic-role subsets at depth 1 for this controlled task. Roles are prompt positions, not neurons, and minimality is relative to the five-role universe only."
+    },
+    "shape": {
+      "schema_version": "phase1003_anchor_subset_summary.v1",
+      "phase": 1003,
+      "implementation_revision": 4,
+      "model": "deepseek7b",
+      "domain": "shape",
+      "status": "complete",
+      "source_depth": 1,
+      "case_batch_size": 8,
+      "condition_batch_size": 1,
+      "condition_isolation": true,
+      "instrument_revision_audit": {
+        "revision_1": "No-op was initially conflated with target correctness.",
+        "revision_2": "No-op was compared with a clean forward at a different batch size; 8bit numerical drift remained.",
+        "revision_3": "State capture and intervention used the same expanded batch size, but mixed intervention conditions still showed large candidate-logit drift.",
+        "revision_4": "Formal execution isolates one intervention condition per forward call and matches capture/intervention batch size.",
+        "scientific_results_used_to_select_subsets": false
+      },
+      "subset_count": 32,
+      "direction_count_per_split": 64,
+      "donor_audits": {
+        "discovery": {
+          "recipient_count": 64,
+          "unique_donor_count": 62,
+          "unique_donor_fraction": 0.96875,
+          "maximum_donor_reuse": 2,
+          "minimum_used_donor_reuse": 1,
+          "all_cross_world": true,
+          "all_donor_answers_differ_from_target": true,
+          "donor_assignment_digest": "ad9d25fb91b301016c3587684a5647a6f4fe0c0722726c53fa5840fd15035742"
+        },
+        "confirmation": {
+          "recipient_count": 64,
+          "unique_donor_count": 62,
+          "unique_donor_fraction": 0.96875,
+          "maximum_donor_reuse": 2,
+          "minimum_used_donor_reuse": 1,
+          "all_cross_world": true,
+          "all_donor_answers_differ_from_target": true,
+          "donor_assignment_digest": "fc10c7501de8d839bea0aad4b285fc6f05debc4fe80ff742a1f7378369468e79"
+        }
+      },
+      "controls": {
+        "discovery": {
+          "empty_noop_prediction_agreement": 1.0,
+          "empty_noop_max_candidate_logit_difference": 0.0,
+          "full_anchor_donor_rate": 0.96875,
+          "full_anchor_median_transfer": 1.0
+        },
+        "confirmation": {
+          "empty_noop_prediction_agreement": 1.0,
+          "empty_noop_max_candidate_logit_difference": 0.0,
+          "full_anchor_donor_rate": 0.984375,
+          "full_anchor_median_transfer": 1.0
+        }
+      },
+      "split_summary": {
+        "discovery": {
+          "s00": {
+            "subset_id": "s00",
+            "roles": [],
+            "cardinality": 0,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.015625,
+            "target_rate": 0.96875,
+            "clean_prediction_agreement": 1.0,
+            "maximum_candidate_logit_difference_from_target": 0.0,
+            "median_normalized_transfer": 0.0,
+            "mean_normalized_transfer": 0.0,
+            "qualified_donor_rate": 0.0,
+            "restored_roles": [],
+            "remaining_donor_subset_id": "s31",
+            "restoration_target_rate": 0.015625,
+            "median_restoration_mediation": 0.0
+          },
+          "s01": {
+            "subset_id": "s01",
+            "roles": [
+              "slot0_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.109375,
+            "target_rate": 0.78125,
+            "clean_prediction_agreement": 0.78125,
+            "maximum_candidate_logit_difference_from_target": 10.5625,
+            "median_normalized_transfer": 0.1241166964173317,
+            "mean_normalized_transfer": 0.15209655864236993,
+            "qualified_donor_rate": 0.09836065573770492,
+            "restored_roles": [
+              "slot0_entity"
+            ],
+            "remaining_donor_subset_id": "s30",
+            "restoration_target_rate": 0.078125,
+            "median_restoration_mediation": 0.08566121484054615
+          },
+          "s02": {
+            "subset_id": "s02",
+            "roles": [
+              "slot0_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.25,
+            "target_rate": 0.578125,
+            "clean_prediction_agreement": 0.578125,
+            "maximum_candidate_logit_difference_from_target": 20.75,
+            "median_normalized_transfer": 0.2514135017991066,
+            "mean_normalized_transfer": 0.3630082624258648,
+            "qualified_donor_rate": 0.2459016393442623,
+            "restored_roles": [
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s29",
+            "restoration_target_rate": 0.265625,
+            "median_restoration_mediation": 0.1636786305519355
+          },
+          "s03": {
+            "subset_id": "s03",
+            "roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.21875,
+            "target_rate": 0.5625,
+            "clean_prediction_agreement": 0.5625,
+            "maximum_candidate_logit_difference_from_target": 16.5,
+            "median_normalized_transfer": 0.30314409732818604,
+            "mean_normalized_transfer": 0.34732264462218154,
+            "qualified_donor_rate": 0.21311475409836064,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s28",
+            "restoration_target_rate": 0.15625,
+            "median_restoration_mediation": 0.25758037431272174
+          },
+          "s04": {
+            "subset_id": "s04",
+            "roles": [
+              "slot1_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.0625,
+            "target_rate": 0.71875,
+            "clean_prediction_agreement": 0.75,
+            "maximum_candidate_logit_difference_from_target": 11.125,
+            "median_normalized_transfer": 0.09871672466397285,
+            "mean_normalized_transfer": 0.14962664905033307,
+            "qualified_donor_rate": 0.04918032786885246,
+            "restored_roles": [
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s27",
+            "restoration_target_rate": 0.078125,
+            "median_restoration_mediation": 0.12835533316078568
+          },
+          "s05": {
+            "subset_id": "s05",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.171875,
+            "target_rate": 0.453125,
+            "clean_prediction_agreement": 0.484375,
+            "maximum_candidate_logit_difference_from_target": 11.5625,
+            "median_normalized_transfer": 0.31003738939762115,
+            "mean_normalized_transfer": 0.32244376407470554,
+            "qualified_donor_rate": 0.16393442622950818,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s26",
+            "restoration_target_rate": 0.109375,
+            "median_restoration_mediation": 0.3096224077214034
+          },
+          "s06": {
+            "subset_id": "s06",
+            "roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.390625,
+            "target_rate": 0.328125,
+            "clean_prediction_agreement": 0.328125,
+            "maximum_candidate_logit_difference_from_target": 21.21875,
+            "median_normalized_transfer": 0.47845683991909027,
+            "mean_normalized_transfer": 0.5111555304756621,
+            "qualified_donor_rate": 0.3770491803278688,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s25",
+            "restoration_target_rate": 0.40625,
+            "median_restoration_mediation": 0.526233739109679
+          },
+          "s07": {
+            "subset_id": "s07",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.328125,
+            "target_rate": 0.3125,
+            "clean_prediction_agreement": 0.3125,
+            "maximum_candidate_logit_difference_from_target": 16.25,
+            "median_normalized_transfer": 0.49177075922489166,
+            "mean_normalized_transfer": 0.4862494122935459,
+            "qualified_donor_rate": 0.3114754098360656,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s24",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.5287586944890316
+          },
+          "s08": {
+            "subset_id": "s08",
+            "roles": [
+              "slot1_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.265625,
+            "target_rate": 0.578125,
+            "clean_prediction_agreement": 0.5625,
+            "maximum_candidate_logit_difference_from_target": 19.125,
+            "median_normalized_transfer": 0.204960435628891,
+            "mean_normalized_transfer": 0.38948183098545996,
+            "qualified_donor_rate": 0.26229508196721313,
+            "restored_roles": [
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s23",
+            "restoration_target_rate": 0.28125,
+            "median_restoration_mediation": 0.28222064915924944
+          },
+          "s09": {
+            "subset_id": "s09",
+            "roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.328125,
+            "target_rate": 0.390625,
+            "clean_prediction_agreement": 0.390625,
+            "maximum_candidate_logit_difference_from_target": 18.90625,
+            "median_normalized_transfer": 0.4643843024969101,
+            "mean_normalized_transfer": 0.5412504931809963,
+            "qualified_donor_rate": 0.32786885245901637,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s22",
+            "restoration_target_rate": 0.375,
+            "median_restoration_mediation": 0.5277889493328818
+          },
+          "s10": {
+            "subset_id": "s10",
+            "roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.53125,
+            "target_rate": 0.15625,
+            "clean_prediction_agreement": 0.171875,
+            "maximum_candidate_logit_difference_from_target": 19.1875,
+            "median_normalized_transfer": 0.8699579238891602,
+            "mean_normalized_transfer": 0.7841362848994322,
+            "qualified_donor_rate": 0.5245901639344263,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s21",
+            "restoration_target_rate": 0.515625,
+            "median_restoration_mediation": 0.8204609690046238
+          },
+          "s11": {
+            "subset_id": "s11",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.515625,
+            "target_rate": 0.15625,
+            "clean_prediction_agreement": 0.171875,
+            "maximum_candidate_logit_difference_from_target": 18.0625,
+            "median_normalized_transfer": 0.7315287292003632,
+            "mean_normalized_transfer": 0.7360231273050886,
+            "qualified_donor_rate": 0.5081967213114754,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s20",
+            "restoration_target_rate": 0.453125,
+            "median_restoration_mediation": 0.7128339140534263
+          },
+          "s12": {
+            "subset_id": "s12",
+            "roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.1875,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 19.78125,
+            "median_normalized_transfer": 0.33446450531482697,
+            "mean_normalized_transfer": 0.3387839217466535,
+            "qualified_donor_rate": 0.19672131147540983,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s19",
+            "restoration_target_rate": 0.1875,
+            "median_restoration_mediation": 0.34876885644768857
+          },
+          "s13": {
+            "subset_id": "s13",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.28125,
+            "target_rate": 0.296875,
+            "clean_prediction_agreement": 0.3125,
+            "maximum_candidate_logit_difference_from_target": 17.375,
+            "median_normalized_transfer": 0.4776119589805603,
+            "mean_normalized_transfer": 0.49688691803021356,
+            "qualified_donor_rate": 0.29508196721311475,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s18",
+            "restoration_target_rate": 0.328125,
+            "median_restoration_mediation": 0.5249958631340896
+          },
+          "s14": {
+            "subset_id": "s14",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.53125,
+            "target_rate": 0.125,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 18.84375,
+            "median_normalized_transfer": 0.7392766773700714,
+            "mean_normalized_transfer": 0.7261103716446087,
+            "qualified_donor_rate": 0.5245901639344263,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s17",
+            "restoration_target_rate": 0.5,
+            "median_restoration_mediation": 0.7492424242424243
+          },
+          "s15": {
+            "subset_id": "s15",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.40625,
+            "target_rate": 0.15625,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 17.28125,
+            "median_normalized_transfer": 0.7021874487400055,
+            "mean_normalized_transfer": 0.6793432282283902,
+            "qualified_donor_rate": 0.4262295081967213,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s16",
+            "restoration_target_rate": 0.46875,
+            "median_restoration_mediation": 0.7023410307292507
+          },
+          "s16": {
+            "subset_id": "s16",
+            "roles": [
+              "query_name"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.140625,
+            "target_rate": 0.46875,
+            "clean_prediction_agreement": 0.5,
+            "maximum_candidate_logit_difference_from_target": 11.5,
+            "median_normalized_transfer": 0.2976589798927307,
+            "mean_normalized_transfer": 0.30916321324184537,
+            "qualified_donor_rate": 0.13114754098360656,
+            "restored_roles": [
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s15",
+            "restoration_target_rate": 0.15625,
+            "median_restoration_mediation": 0.29781257470714795
+          },
+          "s17": {
+            "subset_id": "s17",
+            "roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.140625,
+            "target_rate": 0.5,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 13.25,
+            "median_normalized_transfer": 0.2507575750350952,
+            "mean_normalized_transfer": 0.26460108713945374,
+            "qualified_donor_rate": 0.13114754098360656,
+            "restored_roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s14",
+            "restoration_target_rate": 0.125,
+            "median_restoration_mediation": 0.26072333749044535
+          },
+          "s18": {
+            "subset_id": "s18",
+            "roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.328125,
+            "target_rate": 0.328125,
+            "clean_prediction_agreement": 0.328125,
+            "maximum_candidate_logit_difference_from_target": 17.75,
+            "median_normalized_transfer": 0.4750041216611862,
+            "mean_normalized_transfer": 0.4829281084093964,
+            "qualified_donor_rate": 0.3114754098360656,
+            "restored_roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s13",
+            "restoration_target_rate": 0.296875,
+            "median_restoration_mediation": 0.5223880597014925
+          },
+          "s19": {
+            "subset_id": "s19",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.5,
+            "target_rate": 0.1875,
+            "clean_prediction_agreement": 0.1875,
+            "maximum_candidate_logit_difference_from_target": 20.125,
+            "median_normalized_transfer": 0.6512311398983002,
+            "mean_normalized_transfer": 0.6224368328694254,
+            "qualified_donor_rate": 0.4918032786885246,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s12",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.6655355015666136
+          },
+          "s20": {
+            "subset_id": "s20",
+            "roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.15625,
+            "target_rate": 0.453125,
+            "clean_prediction_agreement": 0.453125,
+            "maximum_candidate_logit_difference_from_target": 14.875,
+            "median_normalized_transfer": 0.2871660888195038,
+            "mean_normalized_transfer": 0.26298434688942507,
+            "qualified_donor_rate": 0.14754098360655737,
+            "restored_roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s11",
+            "restoration_target_rate": 0.15625,
+            "median_restoration_mediation": 0.2684712862488511
+          },
+          "s21": {
+            "subset_id": "s21",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.125,
+            "target_rate": 0.515625,
+            "clean_prediction_agreement": 0.515625,
+            "maximum_candidate_logit_difference_from_target": 14.125,
+            "median_normalized_transfer": 0.1795390322804451,
+            "mean_normalized_transfer": 0.22099043882917613,
+            "qualified_donor_rate": 0.11475409836065574,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s10",
+            "restoration_target_rate": 0.15625,
+            "median_restoration_mediation": 0.1300421044713838
+          },
+          "s22": {
+            "subset_id": "s22",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.34375,
+            "target_rate": 0.375,
+            "clean_prediction_agreement": 0.375,
+            "maximum_candidate_logit_difference_from_target": 20.671875,
+            "median_normalized_transfer": 0.4722110480070114,
+            "mean_normalized_transfer": 0.43794136870565126,
+            "qualified_donor_rate": 0.32786885245901637,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s09",
+            "restoration_target_rate": 0.390625,
+            "median_restoration_mediation": 0.535615696706793
+          },
+          "s23": {
+            "subset_id": "s23",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.515625,
+            "target_rate": 0.28125,
+            "clean_prediction_agreement": 0.28125,
+            "maximum_candidate_logit_difference_from_target": 19.5625,
+            "median_normalized_transfer": 0.7177793383598328,
+            "mean_normalized_transfer": 0.5729046599153662,
+            "qualified_donor_rate": 0.5081967213114754,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s08",
+            "restoration_target_rate": 0.578125,
+            "median_restoration_mediation": 0.7950395617772368
+          },
+          "s24": {
+            "subset_id": "s24",
+            "roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.265625,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.359375,
+            "maximum_candidate_logit_difference_from_target": 17.6875,
+            "median_normalized_transfer": 0.4712413102388382,
+            "mean_normalized_transfer": 0.4855479372345144,
+            "qualified_donor_rate": 0.2786885245901639,
+            "restored_roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s07",
+            "restoration_target_rate": 0.3125,
+            "median_restoration_mediation": 0.5082292382858846
+          },
+          "s25": {
+            "subset_id": "s25",
+            "roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.3125,
+            "target_rate": 0.40625,
+            "clean_prediction_agreement": 0.40625,
+            "maximum_candidate_logit_difference_from_target": 15.8125,
+            "median_normalized_transfer": 0.4737662672996521,
+            "mean_normalized_transfer": 0.45561856969288783,
+            "qualified_donor_rate": 0.32786885245901637,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s06",
+            "restoration_target_rate": 0.328125,
+            "median_restoration_mediation": 0.5215431627196333
+          },
+          "s26": {
+            "subset_id": "s26",
+            "roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.5625,
+            "target_rate": 0.109375,
+            "clean_prediction_agreement": 0.125,
+            "maximum_candidate_logit_difference_from_target": 17.65625,
+            "median_normalized_transfer": 0.6903775930404663,
+            "mean_normalized_transfer": 0.6877095671370625,
+            "qualified_donor_rate": 0.5573770491803278,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s05",
+            "restoration_target_rate": 0.453125,
+            "median_restoration_mediation": 0.6899626133531315
+          },
+          "s27": {
+            "subset_id": "s27",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.71875,
+            "target_rate": 0.078125,
+            "clean_prediction_agreement": 0.09375,
+            "maximum_candidate_logit_difference_from_target": 20.375,
+            "median_normalized_transfer": 0.8716446757316589,
+            "mean_normalized_transfer": 0.8526618061587214,
+            "qualified_donor_rate": 0.7049180327868853,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s04",
+            "restoration_target_rate": 0.71875,
+            "median_restoration_mediation": 0.9012832794613259
+          },
+          "s28": {
+            "subset_id": "s28",
+            "roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.546875,
+            "target_rate": 0.15625,
+            "clean_prediction_agreement": 0.15625,
+            "maximum_candidate_logit_difference_from_target": 19.375,
+            "median_normalized_transfer": 0.7424196302890778,
+            "mean_normalized_transfer": 0.6525745129911229,
+            "qualified_donor_rate": 0.5573770491803278,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s03",
+            "restoration_target_rate": 0.5625,
+            "median_restoration_mediation": 0.6968559116391934
+          },
+          "s29": {
+            "subset_id": "s29",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.5625,
+            "target_rate": 0.265625,
+            "clean_prediction_agreement": 0.25,
+            "maximum_candidate_logit_difference_from_target": 19.15625,
+            "median_normalized_transfer": 0.8363213837146759,
+            "mean_normalized_transfer": 0.6221465022972552,
+            "qualified_donor_rate": 0.5737704918032787,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s02",
+            "restoration_target_rate": 0.578125,
+            "median_restoration_mediation": 0.7485865006696968
+          },
+          "s30": {
+            "subset_id": "s30",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.765625,
+            "target_rate": 0.078125,
+            "clean_prediction_agreement": 0.09375,
+            "maximum_candidate_logit_difference_from_target": 18.53125,
+            "median_normalized_transfer": 0.9143387973308563,
+            "mean_normalized_transfer": 0.8404787252657115,
+            "qualified_donor_rate": 0.7704918032786885,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s01",
+            "restoration_target_rate": 0.78125,
+            "median_restoration_mediation": 0.8758833055255668
+          },
+          "s31": {
+            "subset_id": "s31",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 5,
+            "n": 64,
+            "behavior_qualified_n": 61,
+            "donor_rate": 0.96875,
+            "target_rate": 0.015625,
+            "clean_prediction_agreement": 0.03125,
+            "maximum_candidate_logit_difference_from_target": 19.8125,
+            "median_normalized_transfer": 1.0,
+            "mean_normalized_transfer": 0.999999986961484,
+            "qualified_donor_rate": 0.9836065573770492,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s00",
+            "restoration_target_rate": 0.96875,
+            "median_restoration_mediation": 1.0
+          }
+        },
+        "confirmation": {
+          "s00": {
+            "subset_id": "s00",
+            "roles": [],
+            "cardinality": 0,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.0,
+            "target_rate": 1.0,
+            "clean_prediction_agreement": 1.0,
+            "maximum_candidate_logit_difference_from_target": 0.0,
+            "median_normalized_transfer": 0.0,
+            "mean_normalized_transfer": 0.0,
+            "qualified_donor_rate": 0.0,
+            "restored_roles": [],
+            "remaining_donor_subset_id": "s31",
+            "restoration_target_rate": 0.0,
+            "median_restoration_mediation": 0.0
+          },
+          "s01": {
+            "subset_id": "s01",
+            "roles": [
+              "slot0_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.109375,
+            "target_rate": 0.734375,
+            "clean_prediction_agreement": 0.734375,
+            "maximum_candidate_logit_difference_from_target": 10.375,
+            "median_normalized_transfer": 0.11572901532053947,
+            "mean_normalized_transfer": 0.15014794924718444,
+            "qualified_donor_rate": 0.109375,
+            "restored_roles": [
+              "slot0_entity"
+            ],
+            "remaining_donor_subset_id": "s30",
+            "restoration_target_rate": 0.078125,
+            "median_restoration_mediation": 0.06966632962588473
+          },
+          "s02": {
+            "subset_id": "s02",
+            "roles": [
+              "slot0_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.265625,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 19.59375,
+            "median_normalized_transfer": 0.2589339464902878,
+            "mean_normalized_transfer": 0.4259624821943362,
+            "qualified_donor_rate": 0.265625,
+            "restored_roles": [
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s29",
+            "restoration_target_rate": 0.25,
+            "median_restoration_mediation": 0.3881841672539347
+          },
+          "s03": {
+            "subset_id": "s03",
+            "roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.265625,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 19.671875,
+            "median_normalized_transfer": 0.2838774770498276,
+            "mean_normalized_transfer": 0.38974576015152707,
+            "qualified_donor_rate": 0.265625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value"
+            ],
+            "remaining_donor_subset_id": "s28",
+            "restoration_target_rate": 0.1875,
+            "median_restoration_mediation": 0.406458313955291
+          },
+          "s04": {
+            "subset_id": "s04",
+            "roles": [
+              "slot1_entity"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.078125,
+            "target_rate": 0.765625,
+            "clean_prediction_agreement": 0.765625,
+            "maximum_candidate_logit_difference_from_target": 8.625,
+            "median_normalized_transfer": 0.12308645993471146,
+            "mean_normalized_transfer": 0.14527495655420353,
+            "qualified_donor_rate": 0.078125,
+            "restored_roles": [
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s27",
+            "restoration_target_rate": 0.03125,
+            "median_restoration_mediation": 0.13749546586374956
+          },
+          "s05": {
+            "subset_id": "s05",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.171875,
+            "target_rate": 0.546875,
+            "clean_prediction_agreement": 0.546875,
+            "maximum_candidate_logit_difference_from_target": 9.5,
+            "median_normalized_transfer": 0.2894842177629471,
+            "mean_normalized_transfer": 0.28835489449556917,
+            "qualified_donor_rate": 0.171875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s26",
+            "restoration_target_rate": 0.109375,
+            "median_restoration_mediation": 0.2901216755638917
+          },
+          "s06": {
+            "subset_id": "s06",
+            "roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.359375,
+            "target_rate": 0.3125,
+            "clean_prediction_agreement": 0.3125,
+            "maximum_candidate_logit_difference_from_target": 20.046875,
+            "median_normalized_transfer": 0.5138826072216034,
+            "mean_normalized_transfer": 0.5544244318298297,
+            "qualified_donor_rate": 0.359375,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s25",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.4945656218691856
+          },
+          "s07": {
+            "subset_id": "s07",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.359375,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.34375,
+            "maximum_candidate_logit_difference_from_target": 18.9375,
+            "median_normalized_transfer": 0.5096859335899353,
+            "mean_normalized_transfer": 0.5113335834612371,
+            "qualified_donor_rate": 0.359375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity"
+            ],
+            "remaining_donor_subset_id": "s24",
+            "restoration_target_rate": 0.296875,
+            "median_restoration_mediation": 0.5055537032626816
+          },
+          "s08": {
+            "subset_id": "s08",
+            "roles": [
+              "slot1_value"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.28125,
+            "target_rate": 0.578125,
+            "clean_prediction_agreement": 0.578125,
+            "maximum_candidate_logit_difference_from_target": 21.75,
+            "median_normalized_transfer": 0.19698981940746307,
+            "mean_normalized_transfer": 0.3627408695756458,
+            "qualified_donor_rate": 0.28125,
+            "restored_roles": [
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s23",
+            "restoration_target_rate": 0.265625,
+            "median_restoration_mediation": 0.21255273411258901
+          },
+          "s09": {
+            "subset_id": "s09",
+            "roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.390625,
+            "target_rate": 0.359375,
+            "clean_prediction_agreement": 0.359375,
+            "maximum_candidate_logit_difference_from_target": 23.375,
+            "median_normalized_transfer": 0.4924062490463257,
+            "mean_normalized_transfer": 0.4896331006893888,
+            "qualified_donor_rate": 0.390625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s22",
+            "restoration_target_rate": 0.40625,
+            "median_restoration_mediation": 0.49291850261043435
+          },
+          "s10": {
+            "subset_id": "s10",
+            "roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.546875,
+            "target_rate": 0.109375,
+            "clean_prediction_agreement": 0.109375,
+            "maximum_candidate_logit_difference_from_target": 23.5,
+            "median_normalized_transfer": 0.9056168794631958,
+            "mean_normalized_transfer": 0.8143440727653797,
+            "qualified_donor_rate": 0.546875,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s21",
+            "restoration_target_rate": 0.546875,
+            "median_restoration_mediation": 0.937767094017094
+          },
+          "s11": {
+            "subset_id": "s11",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.59375,
+            "target_rate": 0.140625,
+            "clean_prediction_agreement": 0.140625,
+            "maximum_candidate_logit_difference_from_target": 24.5,
+            "median_normalized_transfer": 0.7698758542537689,
+            "mean_normalized_transfer": 0.7409617996308953,
+            "qualified_donor_rate": 0.59375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s20",
+            "restoration_target_rate": 0.546875,
+            "median_restoration_mediation": 0.7648974008207934
+          },
+          "s12": {
+            "subset_id": "s12",
+            "roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.234375,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 17.9375,
+            "median_normalized_transfer": 0.28379295766353607,
+            "mean_normalized_transfer": 0.3366917532548541,
+            "qualified_donor_rate": 0.234375,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s19",
+            "restoration_target_rate": 0.234375,
+            "median_restoration_mediation": 0.3070230896096756
+          },
+          "s13": {
+            "subset_id": "s13",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.390625,
+            "target_rate": 0.28125,
+            "clean_prediction_agreement": 0.28125,
+            "maximum_candidate_logit_difference_from_target": 20.078125,
+            "median_normalized_transfer": 0.48914922773838043,
+            "mean_normalized_transfer": 0.45993487216037465,
+            "qualified_donor_rate": 0.390625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s18",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.48347417668439796
+          },
+          "s14": {
+            "subset_id": "s14",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.46875,
+            "target_rate": 0.125,
+            "clean_prediction_agreement": 0.125,
+            "maximum_candidate_logit_difference_from_target": 18.78125,
+            "median_normalized_transfer": 0.7505989968776703,
+            "mean_normalized_transfer": 0.7604861927684397,
+            "qualified_donor_rate": 0.46875,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s17",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.7785870224378411
+          },
+          "s15": {
+            "subset_id": "s15",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.59375,
+            "target_rate": 0.15625,
+            "clean_prediction_agreement": 0.15625,
+            "maximum_candidate_logit_difference_from_target": 17.78125,
+            "median_normalized_transfer": 0.70956751704216,
+            "mean_normalized_transfer": 0.6960840970277786,
+            "qualified_donor_rate": 0.59375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value"
+            ],
+            "remaining_donor_subset_id": "s16",
+            "restoration_target_rate": 0.484375,
+            "median_restoration_mediation": 0.7405774088776615
+          },
+          "s16": {
+            "subset_id": "s16",
+            "roles": [
+              "query_name"
+            ],
+            "cardinality": 1,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.171875,
+            "target_rate": 0.484375,
+            "clean_prediction_agreement": 0.484375,
+            "maximum_candidate_logit_difference_from_target": 10.4375,
+            "median_normalized_transfer": 0.25942258536815643,
+            "mean_normalized_transfer": 0.29018529260065407,
+            "qualified_donor_rate": 0.171875,
+            "restored_roles": [
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s15",
+            "restoration_target_rate": 0.15625,
+            "median_restoration_mediation": 0.29043247507709957
+          },
+          "s17": {
+            "subset_id": "s17",
+            "roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.109375,
+            "target_rate": 0.53125,
+            "clean_prediction_agreement": 0.53125,
+            "maximum_candidate_logit_difference_from_target": 14.9375,
+            "median_normalized_transfer": 0.22141297161579132,
+            "mean_normalized_transfer": 0.21235775244531396,
+            "qualified_donor_rate": 0.109375,
+            "restored_roles": [
+              "slot0_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s14",
+            "restoration_target_rate": 0.125,
+            "median_restoration_mediation": 0.2494009959477514
+          },
+          "s18": {
+            "subset_id": "s18",
+            "roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.359375,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.34375,
+            "maximum_candidate_logit_difference_from_target": 19.84375,
+            "median_normalized_transfer": 0.5165258347988129,
+            "mean_normalized_transfer": 0.5108925812892267,
+            "qualified_donor_rate": 0.359375,
+            "restored_roles": [
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s13",
+            "restoration_target_rate": 0.28125,
+            "median_restoration_mediation": 0.5108507670850767
+          },
+          "s19": {
+            "subset_id": "s19",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.546875,
+            "target_rate": 0.234375,
+            "clean_prediction_agreement": 0.234375,
+            "maximum_candidate_logit_difference_from_target": 19.84375,
+            "median_normalized_transfer": 0.6929769217967987,
+            "mean_normalized_transfer": 0.6394184508972103,
+            "qualified_donor_rate": 0.546875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s12",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.716207038485285
+          },
+          "s20": {
+            "subset_id": "s20",
+            "roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.15625,
+            "target_rate": 0.546875,
+            "clean_prediction_agreement": 0.546875,
+            "maximum_candidate_logit_difference_from_target": 15.75,
+            "median_normalized_transfer": 0.2351025938987732,
+            "mean_normalized_transfer": 0.22969706561707426,
+            "qualified_donor_rate": 0.15625,
+            "restored_roles": [
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s11",
+            "restoration_target_rate": 0.140625,
+            "median_restoration_mediation": 0.23012415349887133
+          },
+          "s21": {
+            "subset_id": "s21",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.109375,
+            "target_rate": 0.546875,
+            "clean_prediction_agreement": 0.546875,
+            "maximum_candidate_logit_difference_from_target": 16.25,
+            "median_normalized_transfer": 0.062232907861471176,
+            "mean_normalized_transfer": 0.1620797432915424,
+            "qualified_donor_rate": 0.109375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s10",
+            "restoration_target_rate": 0.109375,
+            "median_restoration_mediation": 0.0943831445621727
+          },
+          "s22": {
+            "subset_id": "s22",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.375,
+            "target_rate": 0.40625,
+            "clean_prediction_agreement": 0.40625,
+            "maximum_candidate_logit_difference_from_target": 19.84375,
+            "median_normalized_transfer": 0.5070814788341522,
+            "mean_normalized_transfer": 0.471255112614017,
+            "qualified_donor_rate": 0.375,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s09",
+            "restoration_target_rate": 0.359375,
+            "median_restoration_mediation": 0.5075937609533824
+          },
+          "s23": {
+            "subset_id": "s23",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.5625,
+            "target_rate": 0.265625,
+            "clean_prediction_agreement": 0.265625,
+            "maximum_candidate_logit_difference_from_target": 19.703125,
+            "median_normalized_transfer": 0.7874473035335541,
+            "mean_normalized_transfer": 0.6039891833788715,
+            "qualified_donor_rate": 0.5625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s08",
+            "restoration_target_rate": 0.578125,
+            "median_restoration_mediation": 0.8030101870829001
+          },
+          "s24": {
+            "subset_id": "s24",
+            "roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 2,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.40625,
+            "target_rate": 0.296875,
+            "clean_prediction_agreement": 0.296875,
+            "maximum_candidate_logit_difference_from_target": 19.1875,
+            "median_normalized_transfer": 0.4944463074207306,
+            "mean_normalized_transfer": 0.4612900415522745,
+            "qualified_donor_rate": 0.40625,
+            "restored_roles": [
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s07",
+            "restoration_target_rate": 0.34375,
+            "median_restoration_mediation": 0.4903140513706022
+          },
+          "s25": {
+            "subset_id": "s25",
+            "roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.40625,
+            "target_rate": 0.34375,
+            "clean_prediction_agreement": 0.34375,
+            "maximum_candidate_logit_difference_from_target": 20.1875,
+            "median_normalized_transfer": 0.5054343640804291,
+            "mean_normalized_transfer": 0.41177641195827164,
+            "qualified_donor_rate": 0.40625,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s06",
+            "restoration_target_rate": 0.3125,
+            "median_restoration_mediation": 0.48611739121073144
+          },
+          "s26": {
+            "subset_id": "s26",
+            "roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.578125,
+            "target_rate": 0.109375,
+            "clean_prediction_agreement": 0.109375,
+            "maximum_candidate_logit_difference_from_target": 18.28125,
+            "median_normalized_transfer": 0.7098783254623413,
+            "mean_normalized_transfer": 0.6972860409878194,
+            "qualified_donor_rate": 0.578125,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s05",
+            "restoration_target_rate": 0.546875,
+            "median_restoration_mediation": 0.7105157922020217
+          },
+          "s27": {
+            "subset_id": "s27",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.796875,
+            "target_rate": 0.03125,
+            "clean_prediction_agreement": 0.03125,
+            "maximum_candidate_logit_difference_from_target": 20.65625,
+            "median_normalized_transfer": 0.8625045418739319,
+            "mean_normalized_transfer": 0.8502868907526135,
+            "qualified_donor_rate": 0.796875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s04",
+            "restoration_target_rate": 0.765625,
+            "median_restoration_mediation": 0.8769135360564717
+          },
+          "s28": {
+            "subset_id": "s28",
+            "roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 3,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.53125,
+            "target_rate": 0.1875,
+            "clean_prediction_agreement": 0.1875,
+            "maximum_candidate_logit_difference_from_target": 23.90625,
+            "median_normalized_transfer": 0.5935417115688324,
+            "mean_normalized_transfer": 0.5742262490675785,
+            "qualified_donor_rate": 0.53125,
+            "restored_roles": [
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s03",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.7161225312374042
+          },
+          "s29": {
+            "subset_id": "s29",
+            "roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.546875,
+            "target_rate": 0.25,
+            "clean_prediction_agreement": 0.25,
+            "maximum_candidate_logit_difference_from_target": 24.03125,
+            "median_normalized_transfer": 0.6118158400058746,
+            "mean_normalized_transfer": 0.5420831897972676,
+            "qualified_donor_rate": 0.546875,
+            "restored_roles": [
+              "slot0_entity",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s02",
+            "restoration_target_rate": 0.53125,
+            "median_restoration_mediation": 0.7410660660660661
+          },
+          "s30": {
+            "subset_id": "s30",
+            "roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 4,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.75,
+            "target_rate": 0.078125,
+            "clean_prediction_agreement": 0.078125,
+            "maximum_candidate_logit_difference_from_target": 25.03125,
+            "median_normalized_transfer": 0.93033367395401,
+            "mean_normalized_transfer": 0.8337691780179739,
+            "qualified_donor_rate": 0.75,
+            "restored_roles": [
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s01",
+            "restoration_target_rate": 0.734375,
+            "median_restoration_mediation": 0.8842709829004046
+          },
+          "s31": {
+            "subset_id": "s31",
+            "roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "cardinality": 5,
+            "n": 64,
+            "behavior_qualified_n": 64,
+            "donor_rate": 0.984375,
+            "target_rate": 0.0,
+            "clean_prediction_agreement": 0.0,
+            "maximum_candidate_logit_difference_from_target": 24.40625,
+            "median_normalized_transfer": 1.0,
+            "mean_normalized_transfer": 0.9999999878928065,
+            "qualified_donor_rate": 0.984375,
+            "restored_roles": [
+              "slot0_entity",
+              "slot0_value",
+              "slot1_entity",
+              "slot1_value",
+              "query_name"
+            ],
+            "remaining_donor_subset_id": "s00",
+            "restoration_target_rate": 1.0,
+            "median_restoration_mediation": 1.0
+          }
+        }
+      },
+      "pairwise_interactions": {
+        "discovery": [
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot0_value",
+            "factorial_interaction": -0.1677821764460532,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_entity",
+            "factorial_interaction": 0.020720556382002542,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.00032789644683361985,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.19665868474476156,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_entity",
+            "factorial_interaction": -0.0014793810005357955,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_value",
+            "factorial_interaction": 0.031646191488107434,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.1892433672583138,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.20032455828913953,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.19580551540275337,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.21309710699279094,
+            "descriptive_only": true
+          }
+        ],
+        "confirmation": [
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot0_value",
+            "factorial_interaction": -0.18636467128999357,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_entity",
+            "factorial_interaction": -0.0070680113058188,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.023255718133441405,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.22797548940252454,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_entity",
+            "factorial_interaction": -0.016813006918710016,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "slot1_value",
+            "factorial_interaction": 0.025640720995397714,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot0_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.2052551935057636,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "slot1_value",
+            "factorial_interaction": -0.17132407287499518,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_entity",
+            "role_b": "query_name",
+            "factorial_interaction": -0.20576318353778333,
+            "descriptive_only": true
+          },
+          {
+            "role_a": "slot1_value",
+            "role_b": "query_name",
+            "factorial_interaction": -0.19163612062402535,
+            "descriptive_only": true
+          }
+        ]
+      },
+      "discovery_selection": {
+        "status": "FROZEN_FROM_DISCOVERY",
+        "minimum_cardinality": 5,
+        "selected_subset_ids": [
+          "s31"
+        ],
+        "selected_subsets": [
+          [
+            "slot0_entity",
+            "slot0_value",
+            "slot1_entity",
+            "slot1_value",
+            "query_name"
+          ]
+        ],
+        "selection_uses_confirmation": false
+      },
+      "selected_confirmation": [
+        {
+          "subset_id": "s31",
+          "roles": [
+            "slot0_entity",
+            "slot0_value",
+            "slot1_entity",
+            "slot1_value",
+            "query_name"
+          ],
+          "cardinality": 5,
+          "donor_rate": 0.984375,
+          "median_normalized_transfer": 1.0,
+          "confirmation_gate": true
+        }
+      ],
+      "parent_instrument_pass": true,
+      "frozen_subset_confirmation_pass": true,
+      "claim_boundary": "The exhaustive table identifies causal semantic-role subsets at depth 1 for this controlled task. Roles are prompt positions, not neurons, and minimality is relative to the five-role universe only."
+    }
+  },
+  "parent_instrument_pass_count": 2,
+  "frozen_subset_confirmation_pass_count": 2,
+  "elapsed_seconds": 181.69360065460205
+}

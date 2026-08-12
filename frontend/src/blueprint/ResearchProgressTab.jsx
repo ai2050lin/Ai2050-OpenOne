@@ -3,261 +3,181 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Cpu,
-  Database,
-  Layers3,
-  Network,
-  ShieldCheck,
+  Crosshair,
+  FlaskConical,
+  Gauge,
+  Route,
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { MODEL_SYSTEM_SOURCES, summarizeModelEvidence, useModelSystemEvidence } from './useModelSystemEvidence';
+import { CURRENT_RESEARCH_STATE } from '../researchKernel/currentResearchState';
 
-const panelStyle = {
-  border: '1px solid rgba(148, 163, 184, 0.14)',
-  borderRadius: 8,
-  background: 'rgba(15, 23, 42, 0.36)',
-};
+import './ResearchProgressTab.css';
 
-const MODEL_NAMES = {
-  qwen3: 'Qwen3-4B',
-  glm4: 'GLM4-9B-Chat',
-  deepseek7b: 'DeepSeek-R1-Distill-Qwen-7B',
-};
-
-const MODEL_BOUNDARIES = {
-  qwen3: {
-    state: '路径更分布式',
-    detail: 'Phase338 的冻结早期 source residual 粗块没有通过 heldout + private 完整模型门；错误深度干预也会损伤答案，暂时不能定位为特异因果块。',
-  },
-  glm4: {
-    state: '模型特异粗块候选',
-    detail: 'GLM4 的早期 source MLP 粗块在材料绑定和部分多词元短语复制中出现位置特异必要性，但 Phase344 已关闭“一般复制机制”外推，只保留模型与任务特异边界。',
-  },
-  deepseek7b: {
-    state: '路径更分布式',
-    detail: 'Phase338 的冻结早期 source residual 粗块没有通过 heldout + private 完整模型门；结果可能包含分布式路径、冗余和协议敏感性。',
-  },
-};
-
-const RECENT_STAGES = [
+const RESEARCH_STAGES = [
   {
-    id: 'protocol',
-    phase: 'Phase 337',
-    title: '协议资格门',
-    value: '7/9 模型-接口合格',
-    summary: '答案对齐接口使三个模型在冻结材料关系任务上全部达到 12/12，建立了共同可审计分母。',
-    detail: '该结果修复了“模型尚在思考”和“模型不知道答案”的混淆，但答案对齐接口人为跳过思考段，不能视为完整自然聊天机制。',
+    id: 'static-search',
+    phase: 'Phase 901-1106',
+    title: '静态语义实体搜索',
+    objective: '在颜色、属性、关系等受控任务上寻找固定语义方向、单神经元和局部因果组件。',
+    result: '积累了候选竞争、内容条件化、复用拓扑和地址路由等局部拼图，但固定跨材料执行方向、单点通用运输器等假说未通过项目测试。',
+    shift: '从寻找静态坐标转向追踪条件化计算过程。',
   },
   {
-    id: 'coarse_block',
-    phase: 'Phase 338',
-    title: '分层粗块因果筛选',
-    value: '完整模型门 1/3',
-    summary: '三个模型都指向早期 source 区域，但只有 GLM4 的 MLP 粗块通过完整模型门。',
-    detail: '功能位置出现弱收敛，物理组件并不一致。Qwen3 和 DeepSeek7B 对错误深度同样敏感，因此跨模型粗块门为 0。',
+    id: 'behavior-gates',
+    phase: 'Phase 1107-1125',
+    title: '自然语义行为门',
+    objective: '用 WordNet 四象限、形容词双正交材料和受控训练区分行为能力、线性可读与真实使用。',
+    result: '形容词双正交行为在三模型中稳定通过；自然语境义项方向与定义方向的固定物理桥在 0/3 模型中闭合。',
+    shift: '确立“先行为、后内部；可读不等于使用”的证据顺序。',
   },
   {
-    id: 'measurement',
-    phase: 'Phase 340-342',
-    title: '测量路径不变性',
-    value: '仅 2 条执行路径稳定',
-    summary: '修复 GLM4 批处理异常后，研究进一步发现批量、缓存和执行后端并不天然语义等价。',
-    detail: '这属于测量执行层，而不是语言神经机制。后续实验必须冻结执行模式并先通过不变性门，否则同一提示的差异可能来自工具链。',
+    id: 'instrument',
+    phase: 'Phase 1126-1134',
+    title: '数值、路线与材料资格',
+    objective: '排除 FP16 溢出、运行路径和材料质量对机制结论的污染。',
+    result: '定位 GLM4、DS7B 数值问题，建立模型与材料入口契约，并形成时效关系反事实研究对象。',
+    shift: '确认数值健康和研究对象资格都是机制实验的前置门。',
   },
   {
-    id: 'replication',
-    phase: 'Phase 343-344',
-    title: '复制边界审计',
-    value: '跨模型候选 0',
-    summary: '全新基线中 38/48 模型任务单元合格，但十三任务粗块审计没有形成跨模型一般复制机制。',
-    detail: 'GLM4 候选只保留为多词元短语复制的模型特异、任务特异必要性效应；单神经元因果仍为 0/72。',
+    id: 'temporal-binding',
+    phase: 'Phase 1135-1138',
+    title: '时效绑定与状态跃迁',
+    objective: '用四状态反事实与整残差替换定位答案状态何时获得可搬运性。',
+    result: 'Qwen3-4B 的行为在 Qwen3-14B 同族复验；两个尺寸均在相对深度 0.6-0.7 出现可搬运性增强，但没有共同通过的充分深度。',
+    shift: '研究对象从“语义方向”推进到“状态转移与充分性”。',
+  },
+  {
+    id: 'matched-path',
+    phase: 'Phase 1139',
+    title: '同路径插值校准',
+    objective: '消除跨批次执行漂移，并判断后半程状态变化是平滑调制还是相变。',
+    result: 'live-state 同路径插值使 α=0 漂移精确为零；深度 0.7 是强调制 donor，但约三成样本不足以翻转答案。',
+    shift: '任何因果结论必须先通过身份等价和执行路径等价。',
+  },
+  {
+    id: 'sequence-alignment',
+    phase: 'Phase 1140',
+    title: '多 token 决策路径对齐',
+    objective: '修复“单点补丁”与“序列级候选评分”之间的位置错配。',
+    result: '覆盖 candidate prediction span 后，12/12 条共享前缀曲线被恢复；统一充分状态仍未获得双模型授权。',
+    shift: '下一干预目标转向候选首次分叉的真实决策边界。',
   },
 ];
 
-const formatNumber = (value) => new Intl.NumberFormat('zh-CN').format(Number(value || 0));
+const CONFIRMED = [
+  '项目测试中的语言信息更符合上下文条件化、分布式展开的过程，而不是一个跨材料固定不变的执行向量。',
+  '输出表现为候选竞争；表示、控制、执行与最终生成必须分别记账。',
+  'Qwen3-4B 与 Qwen3-14B 在时效绑定任务上重复出现后半程状态可搬运性增强。',
+  '同路径 α=0 校准可以消除自补丁漂移，说明干预仪器必须先验证身份等价。',
+  '共享首 token 的候选需要覆盖其预测路径，答案开头并不总是唯一决策位置。',
+];
 
-function StatusMetric({ label, value, tone = '#e2e8f0', note }) {
-  return (
-    <div style={{ padding: '12px 14px', borderTop: `2px solid ${tone}`, background: 'rgba(15,23,42,0.28)', minHeight: 78 }}>
-      <div style={{ color: '#94a3b8', fontSize: 10 }}>{label}</div>
-      <div style={{ color: tone, fontSize: 20, lineHeight: 1.15, fontWeight: 900, fontFamily: 'monospace', marginTop: 5 }}>{value}</div>
-      {note && <div style={{ color: '#64748b', fontSize: 10, marginTop: 4 }}>{note}</div>}
-    </div>
-  );
-}
+const NOT_CONFIRMED = [
+  '尚未找到跨模型、跨任务稳定成立的最小计算单元或语言编码不变量。',
+  '相对深度 0.6-0.7 的跃迁不等于存在统一语义层，也不等于完整机制已经形成。',
+  '整残差 donor 没有同时获得必要性、充分性、特异性、预测性与跨材料重复。',
+  '当前结果不能直接外推到所有大模型，更不能直接证明人脑采用相同编码机制。',
+  '真实生成闭合、精确修改控制和完整智能理论仍未完成。',
+];
 
-function ModelDetail({ snapshot, summary }) {
-  const boundary = MODEL_BOUNDARIES[snapshot.model] || {};
-  const rows = [
-    ['Architecture', snapshot.architecture],
-    ['Layer / hidden / MLP', `${snapshot.num_hidden_layers} / ${snapshot.hidden_size} / ${snapshot.intermediate_size}`],
-    ['Attention / KV Head', `${snapshot.num_attention_heads} / ${snapshot.num_key_value_heads}`],
-    ['Vocabulary', formatNumber(snapshot.vocab_size)],
-    ['模式族覆盖', `${summary.familyCount}/9`],
-    ['组件事件', formatNumber(summary.componentEvents)],
-    ['路径签名', formatNumber(summary.pathSignatures)],
-    ['物理候选', formatNumber(summary.unitCandidates)],
-    ['局部读出候选', formatNumber(summary.localReadoutCandidates)],
-    ['局部传播通过', formatNumber(summary.localPropagationPasses)],
-    ['单神经元因果', formatNumber(summary.singleUnitCausal)],
-    ['完整自然链', formatNumber(summary.completeChains)],
-  ];
-  return (
-    <div style={{ display: 'grid', gap: 14 }}>
-      <div style={{ color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>{boundary.detail}</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 8 }}>
-        {rows.map(([label, value]) => (
-          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 10px', borderBottom: '1px solid rgba(148,163,184,0.12)' }}>
-            <span style={{ color: '#94a3b8', fontSize: 11 }}>{label}</span>
-            <strong style={{ color: String(value) === '0' ? '#fda4af' : '#dbeafe', fontSize: 11, textAlign: 'right', overflowWrap: 'anywhere' }}>{value}</strong>
-          </div>
-        ))}
-      </div>
-      <div style={{ color: '#64748b', fontSize: 10, overflowWrap: 'anywhere' }}>模型修订：{snapshot.model_revision}</div>
-      <a href={MODEL_SYSTEM_SOURCES.models} target="_blank" rel="noreferrer" style={{ color: '#7dd3fc', fontSize: 11 }}>查看真实模型注册表</a>
-    </div>
-  );
-}
+const FORMULAS = [
+  {
+    label: '四状态绑定效应',
+    formula: 'I_bind = 1/2 [(m_orig,post - m_orig,pre) - (m_swap,post - m_swap,pre)]',
+    note: '消除候选静态偏好、时间方向偏好和档案格式偏好。',
+  },
+  {
+    label: '自然状态转移',
+    formula: 'X_(l+1) = F_l(X_l; q, c, Θ)',
+    note: '研究重点是状态如何在条件 q、上下文 c 和参数 Θ 下逐层变化。',
+  },
+  {
+    label: '同路径干预响应',
+    formula: 'ρ_l(α) = M(F_>l((1-α)X_l^a + αX_l^b))',
+    note: '在同一执行路径内插值状态，并测量候选 margin 或生成结果。',
+  },
+  {
+    label: '机制边闭合门',
+    formula: 'E_(u→v) = I ∧ S ∧ N ∧ C ∧ P ∧ R',
+    note: '身份等价、充分性、必要性、特异性、独立预测和跨材料重复必须同时成立。',
+  },
+];
 
 export const ResearchProgressTab = () => {
-  const { data, errors, loading } = useModelSystemEvidence();
-  const [activeModel, setActiveModel] = useState('');
-  const [activeStage, setActiveStage] = useState('');
-  const atlasMetrics = data.atlas?.metrics || {};
-  const models = data.models?.models || [];
-
-  const modelRows = models.map((snapshot) => ({
-    snapshot,
-    summary: summarizeModelEvidence(data.atlas, snapshot.model),
-  }));
-
-  const selectedModel = modelRows.find((row) => row.snapshot.model === activeModel);
-  const selectedStage = RECENT_STAGES.find((stage) => stage.id === activeStage);
+  const [activeStage, setActiveStage] = useState('sequence-alignment');
+  const selectedStage = RESEARCH_STAGES.find((stage) => stage.id === activeStage);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <section style={{ padding: '22px 24px', borderBottom: '1px solid rgba(148,163,184,0.14)', background: 'rgba(15,23,42,0.18)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 18 }}>
-          <div style={{ maxWidth: 820 }}>
-            <div style={{ color: '#67e8f9', fontSize: 10, fontWeight: 900, letterSpacing: 1.5 }}>MODEL & MECHANISM STATUS</div>
-            <h2 style={{ color: '#f8fafc', fontSize: 26, margin: '6px 0 7px' }}>三模型逆向分析状态</h2>
-            <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
-              三模型运行、九族图谱和大规模组件观测已经建立；最新科学结果仍停留在模型特异粗块与局部传播候选，尚未形成跨模型因果规则、单神经元必要性或完整自然闭合。
-            </div>
-          </div>
-          <div style={{ color: '#fbbf24', fontSize: 11, fontWeight: 800, padding: '7px 10px', border: '1px solid rgba(245,158,11,0.28)', background: 'rgba(245,158,11,0.08)' }}>
-            最新客户端证据包 Phase {data.atlas?.phase || '-'} · 最新科学审计 Phase 344
-          </div>
-        </div>
-        {loading && <div style={{ color: '#7dd3fc', fontSize: 11, marginTop: 12 }}>正在读取模型与图谱证据…</div>}
-        {errors.length > 0 && <div style={{ color: '#fda4af', fontSize: 11, marginTop: 12 }}>{errors.length} 个数据源读取失败，页面显示部分状态。</div>}
-      </section>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(145px, 1fr))', gap: 9 }}>
-        <StatusMetric label="真实模型注册" value={`${models.length}/3`} tone="#34d399" note="配置哈希可追溯" />
-        <StatusMetric label="模式族物理覆盖" value={`${atlasMetrics.mapped_family_count || 0}/${atlasMetrics.family_count || 0}`} tone="#22d3ee" note="覆盖不等于闭合" />
-        <StatusMetric label="注册机制" value={formatNumber(atlasMetrics.registered_mechanism_count)} tone="#60a5fa" note="三模型统一分母" />
-        <StatusMetric label="Prompt-model 案例" value={formatNumber(atlasMetrics.prompt_model_case_count)} tone="#a78bfa" />
-        <StatusMetric label="组件事件" value={formatNumber(atlasMetrics.component_event_count)} tone="#f59e0b" />
-        <StatusMetric label="跨模型因果规则" value="0" tone="#fda4af" note="严格门未通过" />
-        <StatusMetric label="单神经元因果" value={formatNumber(atlasMetrics.single_unit_causal_count)} tone="#fda4af" />
-        <StatusMetric label="完整自然链" value={formatNumber(atlasMetrics.full_natural_chain_pass_count)} tone="#fda4af" />
-      </div>
-
-      <section style={{ display: 'grid', gap: 12 }}>
+    <div className="research-progress">
+      <header className="research-progress__header">
         <div>
-          <div style={{ color: '#f8fafc', fontSize: 17, fontWeight: 800 }}>模型状态</div>
-          <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>点击模型查看真实架构、图谱分母、当前物理候选和严格边界。</div>
+          <span>CURRENT RESEARCH · PHASE {CURRENT_RESEARCH_STATE.phase}</span>
+          <h1>从静态表征搜索转向条件化状态转移</h1>
+          <p>{CURRENT_RESEARCH_STATE.summary}</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
-          {modelRows.map(({ snapshot, summary }) => {
-            const active = activeModel === snapshot.model;
-            const boundary = MODEL_BOUNDARIES[snapshot.model] || {};
-            return (
-              <button
-                key={snapshot.model}
-                type="button"
-                aria-expanded={active}
-                onClick={() => setActiveModel(active ? '' : snapshot.model)}
-                style={{ ...panelStyle, padding: 16, color: '#e2e8f0', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', borderColor: active ? '#22d3ee' : 'rgba(148,163,184,0.14)' }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-                  <Cpu size={18} color="#22d3ee" />
-                  {active ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                </div>
-                <div style={{ color: '#f8fafc', fontSize: 15, fontWeight: 800, marginTop: 10 }}>{MODEL_NAMES[snapshot.model] || snapshot.model}</div>
-                <div style={{ color: '#94a3b8', fontSize: 10, marginTop: 4 }}>{snapshot.num_hidden_layers}L · d{snapshot.hidden_size} · MLP {formatNumber(snapshot.intermediate_size)}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 12, fontSize: 10 }}>
-                  <span style={{ color: '#bae6fd' }}>{summary.familyCount}/9 模式族</span>
-                  <span style={{ color: '#fbbf24' }}>{boundary.state}</span>
-                </div>
-              </button>
-            );
-          })}
+        <div className="research-progress__verdict">
+          <AlertTriangle size={17} />
+          <span>当前判决</span>
+          <strong>{CURRENT_RESEARCH_STATE.statusLabel}</strong>
         </div>
-        {selectedModel && (
-          <div style={{ padding: 16, borderTop: '2px solid #22d3ee', background: 'rgba(2,6,23,0.4)' }}>
-            <ModelDetail snapshot={selectedModel.snapshot} summary={selectedModel.summary} />
-          </div>
-        )}
-      </section>
+      </header>
 
-      <section style={{ display: 'grid', gap: 12 }}>
-        <div>
-          <div style={{ color: '#f8fafc', fontSize: 17, fontWeight: 800 }}>最近科学进展</div>
-          <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>从协议资格、粗块筛选、测量校准到一般复制候选关闭，点击查看结论边界。</div>
+      <section className="research-progress__section">
+        <div className="research-progress__heading">
+          <Route size={19} />
+          <div><h2>六阶段推进逻辑</h2><p>点击阶段查看目标、结果和方法论转换。</p></div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
-          {RECENT_STAGES.map((stage) => {
-            const active = activeStage === stage.id;
+        <div className="research-progress__stages">
+          {RESEARCH_STAGES.map((stage) => {
+            const active = stage.id === activeStage;
             return (
-              <button key={stage.id} type="button" aria-expanded={active} onClick={() => setActiveStage(active ? '' : stage.id)} style={{ ...panelStyle, padding: 15, color: '#e2e8f0', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', borderColor: active ? '#f59e0b' : 'rgba(148,163,184,0.14)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-                  <span style={{ color: '#fbbf24', fontSize: 10, fontWeight: 800 }}>{stage.phase}</span>
-                  {active ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                </div>
-                <div style={{ color: '#f8fafc', fontSize: 13, fontWeight: 800, marginTop: 9 }}>{stage.title}</div>
-                <div style={{ color: '#7dd3fc', fontSize: 11, fontFamily: 'monospace', marginTop: 5 }}>{stage.value}</div>
-                <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.55, marginTop: 8 }}>{stage.summary}</div>
+              <button key={stage.id} type="button" className={active ? 'is-active' : ''} onClick={() => setActiveStage(active ? '' : stage.id)} aria-expanded={active}>
+                <span>{stage.phase}</span>
+                <strong>{stage.title}</strong>
+                {active ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
             );
           })}
         </div>
         {selectedStage && (
-          <div style={{ padding: 15, borderLeft: '3px solid #f59e0b', background: 'rgba(245,158,11,0.05)', color: '#cbd5e1', fontSize: 12, lineHeight: 1.7 }}>
-            <strong style={{ color: '#fef3c7' }}>{selectedStage.phase} · {selectedStage.title}：</strong>{selectedStage.detail}
+          <div className="research-progress__stage-detail">
+            <div><span>核心问题</span><p>{selectedStage.objective}</p></div>
+            <div><span>实验结果</span><p>{selectedStage.result}</p></div>
+            <div><span>推进意义</span><p>{selectedStage.shift}</p></div>
           </div>
         )}
       </section>
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 10 }}>
-        <div style={{ ...panelStyle, padding: 16, borderLeft: '3px solid #34d399' }}>
-          <CheckCircle2 size={18} color="#34d399" />
-          <div style={{ color: '#d1fae5', fontSize: 13, fontWeight: 800, marginTop: 8 }}>已经完成</div>
-          <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.7, marginTop: 7 }}>三模型注册与顺序 CUDA 执行、九族统一数据合同、全层组件观测、物理地址图谱、证据内核和客户端分区加载。</div>
+      <section className="research-progress__section research-progress__evidence">
+        <div>
+          <div className="research-progress__heading"><CheckCircle2 size={19} /><div><h2>当前可以说什么</h2><p>项目内部已经获得的正结果与稳定约束。</p></div></div>
+          <ul>{CONFIRMED.map((item) => <li key={item}>{item}</li>)}</ul>
         </div>
-        <div style={{ ...panelStyle, padding: 16, borderLeft: '3px solid #f59e0b' }}>
-          <Network size={18} color="#f59e0b" />
-          <div style={{ color: '#fef3c7', fontSize: 13, fontWeight: 800, marginTop: 8 }}>当前研究层级</div>
-          <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.7, marginTop: 7 }}>存在模型特异粗块与局部传播候选，但尚未恢复可迁移规则；九族是基准分类，不是已经证明的语言本体。</div>
-        </div>
-        <div style={{ ...panelStyle, padding: 16, borderLeft: '3px solid #fb7185' }}>
-          <AlertTriangle size={18} color="#fb7185" />
-          <div style={{ color: '#ffe4e6', fontSize: 13, fontWeight: 800, marginTop: 8 }}>关键硬伤</div>
-          <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.7, marginTop: 7 }}>执行路径不完全等价、跨模型候选为零、单神经元因果为零、完整自然链为零，且三个小模型不能直接代表大模型或人脑。</div>
-        </div>
-        <div style={{ ...panelStyle, padding: 16, borderLeft: '3px solid #60a5fa' }}>
-          <ShieldCheck size={18} color="#60a5fa" />
-          <div style={{ color: '#dbeafe', fontSize: 13, fontWeight: 800, marginTop: 8 }}>下一证据门</div>
-          <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.7, marginTop: 7 }}>先冻结可复现执行路径和模型哈希，再选择跨三模型基线合格的新机制，执行粗块到最小交互集合的分层因果提取。</div>
+        <div>
+          <div className="research-progress__heading"><AlertTriangle size={19} /><div><h2>当前不能说什么</h2><p>仍未通过严格证据门的关键主张。</p></div></div>
+          <ul>{NOT_CONFIRMED.map((item) => <li key={item}>{item}</li>)}</ul>
         </div>
       </section>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, color: '#7dd3fc', fontSize: 10 }}>
-        <a href={MODEL_SYSTEM_SOURCES.atlas} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}><Layers3 size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />物理图谱 manifest</a>
-        <a href={MODEL_SYSTEM_SOURCES.kernel} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}><Database size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />证据内核 manifest</a>
-      </div>
+      <section className="research-progress__section">
+        <div className="research-progress__heading"><Gauge size={19} /><div><h2>当前测试原理</h2><p>公式用于约束实验判决，不替代机制解释。</p></div></div>
+        <div className="research-progress__formulas">
+          {FORMULAS.map((item) => (
+            <article key={item.label}><span>{item.label}</span><code>{item.formula}</code><p>{item.note}</p></article>
+          ))}
+        </div>
+      </section>
+
+      <section className="research-progress__next">
+        <Crosshair size={23} />
+        <div>
+          <span>NEXT FALSIFIABLE TARGET</span>
+          <h2>候选首次分叉决策边界</h2>
+          <p>{CURRENT_RESEARCH_STATE.nextTask}</p>
+        </div>
+        <FlaskConical size={20} />
+      </section>
     </div>
   );
 };

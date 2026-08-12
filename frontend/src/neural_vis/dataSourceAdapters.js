@@ -386,6 +386,122 @@ function adaptMechanismTrace(data, fileMeta, source) {
   });
 }
 
+const MECHANISM_CASE_COMPONENT_Z = {
+  embedding: -5,
+  residual: -3,
+  norm: -1.5,
+  attention: 0,
+  mlp: 2,
+  unembedding: 4.5,
+  output: 5.5,
+};
+
+const MECHANISM_CASE_EVIDENCE_COLORS = {
+  hypothesis: '#64748b',
+  observation: '#38bdf8',
+  observed: '#38bdf8',
+  repeated: '#facc15',
+  replicated: '#facc15',
+  causal: '#f97316',
+  closed: '#22c55e',
+  falsified: '#ef4444',
+  failed: '#ef4444',
+};
+
+function adaptMechanismCase(data, fileMeta, source) {
+  const events = (Array.isArray(data.events) ? data.events : [])
+    .filter((event) => event && typeof event === 'object');
+  const interventions = (Array.isArray(data.interventions) ? data.interventions : [])
+    .filter((item) => item && typeof item === 'object');
+  const model = data.model || fileMeta?.model || 'unknown';
+  const caseId = data.case_id || fileMeta?.id || `${model}:mechanism-case`;
+  const nodes = events.map((event, index) => {
+    const id = String(event.id ?? event.event_id ?? `${caseId}:event:${index}`);
+    const layer = asNumber(event.layer, -1);
+    const tokenPosition = asNumber(event.token_position ?? event.position, 0);
+    const component = String(event.component || event.event_type || 'residual');
+    const evidence = String(event.evidence_level || event.evidence_status || event.status || 'observation');
+    return {
+      ...event,
+      id,
+      label: event.label || `L${layer} · T${tokenPosition} · ${component}`,
+      model,
+      layer,
+      token_position: tokenPosition,
+      component,
+      type: traceNodeType(component),
+      color: event.color || MECHANISM_CASE_EVIDENCE_COLORS[evidence] || '#38bdf8',
+      size: Math.min(0.38, Math.max(0.12, asNumber(event.size, 0.18))),
+      position: Array.isArray(event.position_3d) && event.position_3d.length === 3 ? event.position_3d : [
+        layer * 1.35,
+        tokenPosition * 0.72,
+        MECHANISM_CASE_COMPONENT_Z[component] ?? 1,
+      ],
+      evidence_level: evidence,
+      causal: ['causal', 'closed'].includes(evidence) || event.causal === true,
+      show_label: event.show_label === true || ['causal', 'closed'].includes(evidence),
+    };
+  });
+
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const rawEdges = [
+    ...(Array.isArray(data.causal_edges) ? data.causal_edges : []),
+    ...(Array.isArray(data.observation_edges) ? data.observation_edges : []),
+  ];
+  const edges = rawEdges
+    .filter((edge) => edge && typeof edge === 'object')
+    .map((edge, index) => ({
+      ...edge,
+      id: edge.id || edge.edge_id || `${caseId}:edge:${index}`,
+      source: String(edge.source?.id ?? edge.source ?? edge.source_id ?? edge.from?.id ?? edge.from ?? ''),
+      target: String(edge.target?.id ?? edge.target ?? edge.target_id ?? edge.to?.id ?? edge.to ?? ''),
+      causal: edge.causal === true || edge.edge_type === 'causal',
+      evidence_level: edge.evidence_level || (edge.causal ? 'causal' : 'observation'),
+    }))
+    .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+
+  const interventionNodes = interventions
+    .filter((item) => !item.event_id && Number.isFinite(Number(item.layer)))
+    .map((item, index) => ({
+      ...item,
+      id: String(item.id ?? `${caseId}:intervention:${index}`),
+      label: item.label || `${item.type || item.operation || 'intervention'} · ${item.component || item.target || ''}`,
+      type: 'intervention',
+      model,
+      layer: asNumber(item.layer, -1),
+      color: '#f97316',
+      size: 0.24,
+      position: [
+        asNumber(item.layer, 0) * 1.35,
+        asNumber(item.token_position ?? item.position, 0) * 0.72,
+        (MECHANISM_CASE_COMPONENT_Z[item.component] ?? 1) + 0.8,
+      ],
+      evidence_level: item.evidence_level || item.status || 'causal_candidate',
+      causal: true,
+      show_label: true,
+    }));
+  nodes.push(...interventionNodes);
+
+  const maxLayer = Math.max(0, ...nodes.map((node) => asNumber(node.layer, 0)));
+  return canonicalGraph(data, fileMeta, source, {
+    title: data.title || `${model} · ${caseId}`,
+    nodes,
+    edges,
+  }, {
+    title: data.title || `${model} · 机制案例`,
+    model,
+    phase: data.phase,
+    model_info: { model, phase: data.phase, n_layers: maxLayer + 1 },
+    run_id: data.run_id || caseId,
+    prompt: data.sample?.prompt || data.sample?.text || null,
+    mechanism_case: data,
+    candidate_margins: data.candidate_margins || [],
+    interventions,
+    negative_controls: data.negative_controls || [],
+    conclusion: data.conclusion || null,
+  });
+}
+
 export function normalizeVisualizationPayload(data, fileMeta = {}, source = null) {
   const schema = data?.schema_version || '1.0';
   if (schema === 'atlas_graph_v1' || Array.isArray(data?.visualizations)) {
@@ -399,6 +515,7 @@ export function normalizeVisualizationPayload(data, fileMeta = {}, source = null
   if (schema === 'neuron_atlas_partition.v1') return adaptNeuronAtlas(data, fileMeta, source);
   if (schema === 'real_component_trace.v1') return adaptRealComponentTrace(data, fileMeta, source);
   if (schema === 'mechanism_trace_v1') return adaptMechanismTrace(data, fileMeta, source);
+  if (schema === 'mechanism_case.v1') return adaptMechanismCase(data, fileMeta, source);
   if (source?.payload_adapter === 'atlas_graph' && data?.graph) {
     return adaptRegisteredAtlasGraph(data, fileMeta, source);
   }

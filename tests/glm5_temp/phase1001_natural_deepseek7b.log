@@ -1,0 +1,52 @@
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+[natural-confirmation_full_natural] 1/16
+[natural-confirmation_full_natural] 2/16
+[natural-confirmation_full_natural] 3/16
+[natural-confirmation_full_natural] 4/16
+[natural-confirmation_full_natural] 5/16
+[natural-confirmation_full_natural] 6/16
+[natural-confirmation_full_natural] 7/16
+[natural-confirmation_full_natural] 8/16
+[natural-confirmation_full_natural] 9/16
+[natural-confirmation_full_natural] 10/16
+[natural-confirmation_full_natural] 11/16
+[natural-confirmation_full_natural] 12/16
+[natural-confirmation_full_natural] 13/16
+[natural-confirmation_full_natural] 14/16
+[natural-confirmation_full_natural] 15/16
+[natural-confirmation_full_natural] 16/16
+{
+  "model": "deepseek7b",
+  "decision_boundary": "original_answer_boundary",
+  "official_joint_size": 2,
+  "size_summaries": {
+    "2": {
+      "subset_size": 256,
+      "conditions": {
+        "source_do": {
+          "n": 256,
+          "source_rate": 0.9765625,
+          "target_rate": 0.0,
+          "eos_rate": 0.81640625,
+          "exact_short_rate": 0.81640625
+        },
+        "source_plus_joint_restore": {
+          "n": 256,
+          "source_rate": 0.4140625,
+          "target_rate": 0.53515625,
+          "eos_rate": 0.7734375,
+          "exact_short_rate": 0.76171875
+        }
+      },
+      "official_frozen_size": true,
+      "posthoc_robustness_size": false
+    }
+  },
+  "gate_checks": {
+    "source_do_source_rate": true,
+    "joint_restore_target_rate": true,
+    "full_256_directions": true
+  }
+}
+[model_utils] GPU memory released, allocated=8.72 GB

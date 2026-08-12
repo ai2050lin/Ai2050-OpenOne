@@ -1,0 +1,125 @@
+[phase1023-fp16] loading deepseek7b with {0: '11GiB', 'cpu': '24GiB'}
+[phase1039] deepseek7b depth=3 channel=attention_write condition=same_family_selected
+[phase1039] deepseek7b depth=3 channel=attention_write condition=cross_family_selected
+[phase1039] deepseek7b depth=3 channel=attention_write condition=cross_family_unselected
+[phase1039] deepseek7b depth=3 channel=attention_write condition=cross_family_wrong_target
+[phase1039] deepseek7b depth=3 channel=mlp_write condition=same_family_selected
+[phase1039] deepseek7b depth=3 channel=mlp_write condition=cross_family_selected
+[phase1039] deepseek7b depth=3 channel=mlp_write condition=cross_family_unselected
+[phase1039] deepseek7b depth=3 channel=mlp_write condition=cross_family_wrong_target
+[phase1039] deepseek7b depth=14 channel=attention_write condition=same_family_selected
+[phase1039] deepseek7b depth=14 channel=attention_write condition=cross_family_selected
+[phase1039] deepseek7b depth=14 channel=attention_write condition=cross_family_unselected
+[phase1039] deepseek7b depth=14 channel=attention_write condition=cross_family_wrong_target
+[phase1039] deepseek7b depth=14 channel=mlp_write condition=same_family_selected
+[phase1039] deepseek7b depth=14 channel=mlp_write condition=cross_family_selected
+[phase1039] deepseek7b depth=14 channel=mlp_write condition=cross_family_unselected
+[phase1039] deepseek7b depth=14 channel=mlp_write condition=cross_family_wrong_target
+[phase1039] deepseek7b depth=24 channel=attention_write condition=same_family_selected
+[phase1039] deepseek7b depth=24 channel=attention_write condition=cross_family_selected
+[phase1039] deepseek7b depth=24 channel=attention_write condition=cross_family_unselected
+[phase1039] deepseek7b depth=24 channel=attention_write condition=cross_family_wrong_target
+[phase1039] deepseek7b depth=24 channel=mlp_write condition=same_family_selected
+[phase1039] deepseek7b depth=24 channel=mlp_write condition=cross_family_selected
+[phase1039] deepseek7b depth=24 channel=mlp_write condition=cross_family_unselected
+[phase1039] deepseek7b depth=24 channel=mlp_write condition=cross_family_wrong_target
+{
+  "schema_version": "phase1039_model_summary.v1",
+  "phase": 1039,
+  "model": "deepseek7b",
+  "protocol_digest": "c59f51feb6a12ed5f01f53f6cc4f12cb3705f40f55633cbfbacdc1c1795d47ff",
+  "source_protocol_digest": "84ecd186a130b08c4510844ed2d65107c55e9e42c17227364ddf33a6b98b08b1",
+  "precision": {
+    "parameter_dtypes": {
+      "float16": 7615616512
+    },
+    "suspicious_quantized_module_classes": [],
+    "has_fp16_parameters": true,
+    "has_bf16_parameters": false,
+    "has_quantized_modules": false
+  },
+  "placement": {
+    "placement": "accelerate_auto_cpu_gpu",
+    "max_memory": {
+      "cuda:0": "11GiB",
+      "cpu": "24GiB"
+    },
+    "device_map": {
+      "model.embed_tokens": "0",
+      "model.layers.0": "0",
+      "model.layers.1": "0",
+      "model.layers.2": "0",
+      "model.layers.3": "0",
+      "model.layers.4": "0",
+      "model.layers.5": "0",
+      "model.layers.6": "0",
+      "model.layers.7": "0",
+      "model.layers.8": "0",
+      "model.layers.9": "0",
+      "model.layers.10": "0",
+      "model.layers.11": "0",
+      "model.layers.12": "0",
+      "model.layers.13": "0",
+      "model.layers.14": "0",
+      "model.layers.15": "0",
+      "model.layers.16": "0",
+      "model.layers.17": "0",
+      "model.layers.18": "0",
+      "model.layers.19": "0",
+      "model.layers.20": "cpu",
+      "model.layers.21": "cpu",
+      "model.layers.22": "cpu",
+      "model.layers.23": "cpu",
+      "model.layers.24": "cpu",
+      "model.layers.25": "cpu",
+      "model.layers.26": "cpu",
+      "model.layers.27": "cpu",
+      "model.norm": "cpu",
+      "model.rotary_emb": "cpu",
+      "lm_head": "cpu"
+    },
+    "parameter_dtypes": {
+      "float16": 7615616512
+    },
+    "quantization": "none"
+  },
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "patch_depths": [
+    3,
+    14,
+    24
+  ],
+  "readout_depth": 27,
+  "sample_counts": {
+    "targets": 256,
+    "channels": 2,
+    "conditions": 4,
+    "depths": 3,
+    "patched_forward_rows": 6144,
+    "clean_cache_rows": 1024
+  },
+  "zero_delta_identity_max_abs": 0.0,
+  "array_finiteness": {
+    "clean_component_states": {
+      "all_finite": true,
+      "finite_value_rate": 1.0,
+      "nonfinite_value_count": 0
+    },
+    "patched_candidate_logits": {
+      "all_finite": true,
+      "finite_value_rate": 1.0,
+      "nonfinite_value_count": 0
+    },
+    "patched_penultimate_readout": {
+      "all_finite": true,
+      "finite_value_rate": 1.0,
+      "nonfinite_value_count": 0
+    }
+  },
+  "elapsed_seconds": 554.6482305526733
+}
+[model_utils] GPU memory released, allocated=10.42 GB

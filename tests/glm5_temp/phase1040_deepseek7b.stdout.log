@@ -1,0 +1,107 @@
+[phase1023-fp16] loading deepseek7b with {0: '11GiB', 'cpu': '24GiB'}
+[phase1040-clean] deepseek7b cases=512/2880
+[phase1040-clean] deepseek7b cases=1024/2880
+[phase1040-clean] deepseek7b cases=1536/2880
+[phase1040-clean] deepseek7b cases=2048/2880
+[phase1040-clean] deepseek7b cases=2560/2880
+[phase1040-patch] deepseek7b channel=mlp_write condition=same_family_selected
+[phase1040-patch] deepseek7b channel=mlp_write condition=cross_family_selected
+[phase1040-patch] deepseek7b channel=mlp_write condition=cross_family_unselected
+[phase1040-patch] deepseek7b channel=mlp_write condition=cross_family_wrong_target
+[phase1040-patch] deepseek7b channel=layer_output condition=same_family_selected
+[phase1040-patch] deepseek7b channel=layer_output condition=cross_family_selected
+[phase1040-patch] deepseek7b channel=layer_output condition=cross_family_unselected
+[phase1040-patch] deepseek7b channel=layer_output condition=cross_family_wrong_target
+{
+  "schema_version": "phase1040_model_summary.v1",
+  "phase": 1040,
+  "model": "deepseek7b",
+  "protocol_digest": "67cc1c81bd8dfa2482ce1b2e1122d7b94160529d09c8faeba6c624cc24e067af",
+  "precision": {
+    "parameter_dtypes": {
+      "float16": 7615616512
+    },
+    "suspicious_quantized_module_classes": [],
+    "has_fp16_parameters": true,
+    "has_bf16_parameters": false,
+    "has_quantized_modules": false
+  },
+  "placement": {
+    "placement": "accelerate_auto_cpu_gpu",
+    "max_memory": {
+      "cuda:0": "11GiB",
+      "cpu": "24GiB"
+    },
+    "device_map": {
+      "model.embed_tokens": "0",
+      "model.layers.0": "0",
+      "model.layers.1": "0",
+      "model.layers.2": "0",
+      "model.layers.3": "0",
+      "model.layers.4": "0",
+      "model.layers.5": "0",
+      "model.layers.6": "0",
+      "model.layers.7": "0",
+      "model.layers.8": "0",
+      "model.layers.9": "0",
+      "model.layers.10": "0",
+      "model.layers.11": "0",
+      "model.layers.12": "0",
+      "model.layers.13": "0",
+      "model.layers.14": "0",
+      "model.layers.15": "0",
+      "model.layers.16": "0",
+      "model.layers.17": "0",
+      "model.layers.18": "0",
+      "model.layers.19": "0",
+      "model.layers.20": "cpu",
+      "model.layers.21": "cpu",
+      "model.layers.22": "cpu",
+      "model.layers.23": "cpu",
+      "model.layers.24": "cpu",
+      "model.layers.25": "cpu",
+      "model.layers.26": "cpu",
+      "model.layers.27": "cpu",
+      "model.norm": "cpu",
+      "model.rotary_emb": "cpu",
+      "lm_head": "cpu"
+    },
+    "parameter_dtypes": {
+      "float16": 7615616512
+    },
+    "quantization": "none"
+  },
+  "model_info": {
+    "class": "Qwen2ForCausalLM",
+    "n_layers": 28,
+    "d_model": 3584
+  },
+  "physical_depth": 3,
+  "normalized_depth_slot": 1,
+  "sample_counts": {
+    "cases": 2880,
+    "targets": 720,
+    "channels": 2,
+    "conditions": 4,
+    "patched_forward_rows": 5760
+  },
+  "array_finiteness": {
+    "clean_source_channels": {
+      "all_finite": true,
+      "finite_value_rate": 1.0,
+      "nonfinite_value_count": 0
+    },
+    "clean_candidate_logits": {
+      "all_finite": true,
+      "finite_value_rate": 1.0,
+      "nonfinite_value_count": 0
+    },
+    "patched_candidate_logits": {
+      "all_finite": true,
+      "finite_value_rate": 1.0,
+      "nonfinite_value_count": 0
+    }
+  },
+  "elapsed_seconds": 705.845308303833
+}
+[model_utils] GPU memory released, allocated=10.42 GB

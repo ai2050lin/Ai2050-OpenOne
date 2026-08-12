@@ -1,0 +1,288 @@
+[precision-bf16] loading glm4 with {0: '11GiB', 'cpu': '24GiB'}
+[generate] glm4 batch=20 rows=320/3164 elapsed=69.9s
+[generate] glm4 batch=40 rows=640/3164 elapsed=185.3s
+[generate] glm4 batch=60 rows=960/3164 elapsed=309.3s
+[generate] glm4 batch=80 rows=1280/3164 elapsed=438.4s
+[generate] glm4 batch=100 rows=1600/3164 elapsed=566.4s
+[generate] glm4 batch=120 rows=1920/3164 elapsed=688.9s
+[generate] glm4 batch=140 rows=2240/3164 elapsed=810.9s
+[generate] glm4 batch=160 rows=2560/3164 elapsed=932.3s
+[generate] glm4 batch=180 rows=2868/3164 elapsed=1064.5s
+[score] glm4 batch=40
+[score] glm4 batch=80
+[score] glm4 batch=120
+[score] glm4 batch=160
+[score] glm4 batch=200
+[score] glm4 batch=240
+[score] glm4 batch=280
+[score] glm4 batch=320
+[score] glm4 batch=360
+[score] glm4 batch=400
+{
+  "schema_version": "phase1021_natural_behavior_summary.v1",
+  "phase": 1021,
+  "protocol_revision": 1,
+  "protocol_digest": "cc87625bde9edcff720ebd00a3690eaf62d66c47163646b1fb8745ad5aa60c46",
+  "model": "glm4",
+  "precision": "bf16",
+  "placement": {
+    "placement": "accelerate_auto_cpu_gpu",
+    "max_memory": {
+      "cuda:0": "11GiB",
+      "cpu": "24GiB"
+    },
+    "device_map": {
+      "model.embed_tokens": "0",
+      "model.layers.0": "0",
+      "model.layers.1": "0",
+      "model.layers.2": "0",
+      "model.layers.3": "0",
+      "model.layers.4": "0",
+      "model.layers.5": "0",
+      "model.layers.6": "0",
+      "model.layers.7": "0",
+      "model.layers.8": "0",
+      "model.layers.9": "0",
+      "model.layers.10": "0",
+      "model.layers.11": "0",
+      "model.layers.12": "0",
+      "model.layers.13": "0",
+      "model.layers.14": "0",
+      "model.layers.15": "0",
+      "model.layers.16": "0",
+      "model.layers.17": "0",
+      "model.layers.18": "0",
+      "model.layers.19": "0",
+      "model.layers.20": "0",
+      "model.layers.21": "0",
+      "model.layers.22": "cpu",
+      "model.layers.23": "cpu",
+      "model.layers.24": "cpu",
+      "model.layers.25": "cpu",
+      "model.layers.26": "cpu",
+      "model.layers.27": "cpu",
+      "model.layers.28": "cpu",
+      "model.layers.29": "cpu",
+      "model.layers.30": "cpu",
+      "model.layers.31": "cpu",
+      "model.layers.32": "cpu",
+      "model.layers.33": "cpu",
+      "model.layers.34": "cpu",
+      "model.layers.35": "cpu",
+      "model.layers.36": "cpu",
+      "model.layers.37": "cpu",
+      "model.layers.38": "cpu",
+      "model.layers.39": "cpu",
+      "model.norm": "cpu",
+      "model.rotary_emb": "cpu",
+      "lm_head": "cpu"
+    }
+  },
+  "case_count": 3164,
+  "selected_by_family": {
+    "multilingual_operation": "native_chat",
+    "rare_definition": "native_chat",
+    "punctuation_next": "raw",
+    "contrast_relation": "native_chat"
+  },
+  "family": {
+    "multilingual_operation": {
+      "count": 2460,
+      "exact_accuracy": 0.7341463414634146,
+      "semantic_accuracy": 0.7552845528455284,
+      "mean_semantic_score": 0.8520231815425822,
+      "first_token_accuracy": 0.8394308943089431,
+      "median_candidate_margin": 1.4303270498911544
+    },
+    "rare_definition": {
+      "count": 256,
+      "exact_accuracy": 0.2734375,
+      "semantic_accuracy": 0.40625,
+      "mean_semantic_score": 0.5130580357142857,
+      "first_token_accuracy": 0.46875,
+      "median_candidate_margin": 1.23093064626058
+    },
+    "punctuation_next": {
+      "count": 192,
+      "exact_accuracy": 0.40625,
+      "semantic_accuracy": 0.40625,
+      "mean_semantic_score": 0.40625,
+      "first_token_accuracy": 0.40625,
+      "median_candidate_margin": 0.375
+    },
+    "contrast_relation": {
+      "count": 256,
+      "exact_accuracy": 0.203125,
+      "semantic_accuracy": 0.203125,
+      "mean_semantic_score": 0.5117976528854165,
+      "first_token_accuracy": 0.58984375,
+      "median_candidate_margin": 0.814453125
+    }
+  },
+  "subgroup": {
+    "comma_colon": {
+      "count": 64,
+      "exact_accuracy": 0.0,
+      "semantic_accuracy": 0.0,
+      "mean_semantic_score": 0.0,
+      "first_token_accuracy": 0.0,
+      "median_candidate_margin": -0.234375
+    },
+    "connector_generation": {
+      "count": 128,
+      "exact_accuracy": 0.2109375,
+      "semantic_accuracy": 0.2109375,
+      "mean_semantic_score": 0.4377778180899553,
+      "first_token_accuracy": 0.3828125,
+      "median_candidate_margin": 1.9501953125
+    },
+    "content_switch": {
+      "count": 264,
+      "exact_accuracy": 0.8560606060606061,
+      "semantic_accuracy": 0.8636363636363636,
+      "mean_semantic_score": 0.9299647805259544,
+      "first_token_accuracy": 0.946969696969697,
+      "median_candidate_margin": 2.3862205505371095
+    },
+    "irrelevant_switch": {
+      "count": 240,
+      "exact_accuracy": 0.7916666666666666,
+      "semantic_accuracy": 0.7916666666666666,
+      "mean_semantic_score": 0.889652688436225,
+      "first_token_accuracy": 0.9375,
+      "median_candidate_margin": 1.73828125
+    },
+    "mode_switch": {
+      "count": 696,
+      "exact_accuracy": 0.9252873563218391,
+      "semantic_accuracy": 0.9281609195402298,
+      "mean_semantic_score": 0.9620946355947423,
+      "first_token_accuracy": 0.9727011494252874,
+      "median_candidate_margin": 0.84765625
+    },
+    "operation_switch": {
+      "count": 696,
+      "exact_accuracy": 0.5833333333333334,
+      "semantic_accuracy": 0.5847701149425287,
+      "mean_semantic_score": 0.7102253217099499,
+      "first_token_accuracy": 0.6824712643678161,
+      "median_candidate_margin": 0.939453125
+    },
+    "rare_short_definition": {
+      "count": 256,
+      "exact_accuracy": 0.2734375,
+      "semantic_accuracy": 0.40625,
+      "mean_semantic_score": 0.5130580357142857,
+      "first_token_accuracy": 0.46875,
+      "median_candidate_margin": 1.23093064626058
+    },
+    "relation_recognition": {
+      "count": 128,
+      "exact_accuracy": 0.1953125,
+      "semantic_accuracy": 0.1953125,
+      "mean_semantic_score": 0.5858174876808777,
+      "first_token_accuracy": 0.796875,
+      "median_candidate_margin": 0.5703125
+    },
+    "sentence_rollout": {
+      "count": 240,
+      "exact_accuracy": 0.24583333333333332,
+      "semantic_accuracy": 0.44166666666666665,
+      "mean_semantic_score": 0.7147849016308778,
+      "first_token_accuracy": 0.5458333333333333,
+      "median_candidate_margin": 0.6543441931406657
+    },
+    "statement_exclamation": {
+      "count": 64,
+      "exact_accuracy": 0.5,
+      "semantic_accuracy": 0.5,
+      "mean_semantic_score": 0.5,
+      "first_token_accuracy": 0.5,
+      "median_candidate_margin": 0.953125
+    },
+    "statement_question": {
+      "count": 64,
+      "exact_accuracy": 0.71875,
+      "semantic_accuracy": 0.71875,
+      "mean_semantic_score": 0.71875,
+      "first_token_accuracy": 0.71875,
+      "median_candidate_margin": 0.796875
+    },
+    "target_switch": {
+      "count": 324,
+      "exact_accuracy": 0.8672839506172839,
+      "semantic_accuracy": 0.8672839506172839,
+      "mean_semantic_score": 0.9304525081349699,
+      "first_token_accuracy": 0.9475308641975309,
+      "median_candidate_margin": 0.78466796875
+    }
+  },
+  "task_kind": {
+    "classify": {
+      "count": 348,
+      "exact_accuracy": 0.3074712643678161,
+      "semantic_accuracy": 0.3074712643678161,
+      "mean_semantic_score": 0.49221314152705625,
+      "first_token_accuracy": 0.4166666666666667,
+      "median_candidate_margin": -3.15625
+    },
+    "connector_generation": {
+      "count": 128,
+      "exact_accuracy": 0.2109375,
+      "semantic_accuracy": 0.2109375,
+      "mean_semantic_score": 0.4377778180899553,
+      "first_token_accuracy": 0.3828125,
+      "median_candidate_margin": 1.9501953125
+    },
+    "copy": {
+      "count": 468,
+      "exact_accuracy": 0.7393162393162394,
+      "semantic_accuracy": 0.7393162393162394,
+      "mean_semantic_score": 0.880038313491285,
+      "first_token_accuracy": 0.7692307692307693,
+      "median_candidate_margin": -3.5077366987864176
+    },
+    "punctuation": {
+      "count": 192,
+      "exact_accuracy": 0.40625,
+      "semantic_accuracy": 0.40625,
+      "mean_semantic_score": 0.40625,
+      "first_token_accuracy": 0.40625,
+      "median_candidate_margin": 0.375
+    },
+    "rare_definition": {
+      "count": 256,
+      "exact_accuracy": 0.2734375,
+      "semantic_accuracy": 0.40625,
+      "mean_semantic_score": 0.5130580357142857,
+      "first_token_accuracy": 0.46875,
+      "median_candidate_margin": 1.23093064626058
+    },
+    "relation_recognition": {
+      "count": 128,
+      "exact_accuracy": 0.1953125,
+      "semantic_accuracy": 0.1953125,
+      "mean_semantic_score": 0.5858174876808777,
+      "first_token_accuracy": 0.796875,
+      "median_candidate_margin": 0.5703125
+    },
+    "sentence_translation": {
+      "count": 120,
+      "exact_accuracy": 0.49166666666666664,
+      "semantic_accuracy": 0.8833333333333333,
+      "mean_semantic_score": 0.8908986415153086,
+      "first_token_accuracy": 0.9916666666666667,
+      "median_candidate_margin": 22.542168617248535
+    },
+    "translate": {
+      "count": 1524,
+      "exact_accuracy": 0.8490813648293963,
+      "semantic_accuracy": 0.8523622047244095,
+      "mean_semantic_score": 0.9225203974065475,
+      "first_token_accuracy": 0.9455380577427821,
+      "median_candidate_margin": 2.735367774963379
+    }
+  },
+  "elapsed_seconds": 2078.9780559539795
+}
+[model_utils] GPU memory released, allocated=10.23 GB

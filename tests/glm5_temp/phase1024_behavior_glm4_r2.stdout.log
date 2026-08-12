@@ -1,0 +1,148 @@
+[phase1023-fp16] loading glm4 with {0: '11GiB', 'cpu': '24GiB'}
+[phase1024-behavior] candidate batch=20 sequences=160/1280
+[phase1024-behavior] candidate batch=40 sequences=320/1280
+[phase1024-behavior] candidate batch=60 sequences=480/1280
+[phase1024-behavior] candidate batch=80 sequences=640/1280
+[phase1024-behavior] candidate batch=100 sequences=800/1280
+[phase1024-behavior] candidate batch=120 sequences=960/1280
+[phase1024-behavior] candidate batch=140 sequences=1120/1280
+[phase1024-behavior] candidate batch=160 sequences=1280/1280
+[phase1024-qualification] 1/8 rare.taotie correct=False text='\n贪婪的食欲象征。\n饕餮的核心含义是：食欲无度，象征贪婪。\n饕餮的核心含义是'
+[phase1024-qualification] 2/8 rare.xiezhi correct=True text='\n“獬豸”通常表示古代传说中的神兽，它具有分辨是非的能力，常被用来象征公正和正义。\n"�'
+[phase1024-qualification] 3/8 translation.apple correct=True text='\npomme\nIt seems there'
+[phase1024-qualification] 4/8 translation.wolf correct=True text="\n狼\nThe English word '"
+[phase1024-qualification] 5/8 punctuation.question correct=False text='\nThe missing punctuation'
+[phase1024-qualification] 6/8 punctuation.exclamation correct=False text='\nThe missing punctuation'
+[phase1024-qualification] 7/8 connector.contrast correct=True text='\nHowever,\nThe fruit looked'
+[phase1024-qualification] 8/8 connector.result correct=True text='\nThe alarm rang. Consequently, everyone'
+{
+  "model": "glm4",
+  "nonce": {
+    "overall_accuracy": 0.1328125,
+    "by_split": {
+      "confirmation": {
+        "count": 64,
+        "accuracy": 0.125
+      },
+      "discovery": {
+        "count": 64,
+        "accuracy": 0.140625
+      }
+    },
+    "by_family": {
+      "confirmation|animal": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|body_part": {
+        "count": 8,
+        "accuracy": 1.0
+      },
+      "confirmation|color": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|fruit": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|object": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|place": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|profession": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "confirmation|vehicle": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|animal": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|body_part": {
+        "count": 8,
+        "accuracy": 1.0
+      },
+      "discovery|color": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|fruit": {
+        "count": 8,
+        "accuracy": 0.125
+      },
+      "discovery|object": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|place": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|profession": {
+        "count": 8,
+        "accuracy": 0.0
+      },
+      "discovery|vehicle": {
+        "count": 8,
+        "accuracy": 0.0
+      }
+    },
+    "chance": 0.125
+  },
+  "polysemy": {
+    "overall_accuracy": 0.5859375,
+    "by_partition_split": {
+      "calibration|confirmation": {
+        "count": 32,
+        "accuracy": 0.5625
+      },
+      "calibration|discovery": {
+        "count": 32,
+        "accuracy": 0.625
+      },
+      "heldout|confirmation": {
+        "count": 32,
+        "accuracy": 0.53125
+      },
+      "heldout|discovery": {
+        "count": 32,
+        "accuracy": 0.625
+      }
+    },
+    "chance": 0.5
+  },
+  "qualification": {
+    "case_count": 8,
+    "accuracy": 0.625,
+    "hit_token_limit_rate": 1.0,
+    "repeated_single_symbol_rate": 0.0,
+    "by_family": {
+      "connector": {
+        "count": 2,
+        "accuracy": 1.0
+      },
+      "punctuation": {
+        "count": 2,
+        "accuracy": 0.0
+      },
+      "rare_definition": {
+        "count": 2,
+        "accuracy": 0.5
+      },
+      "translation": {
+        "count": 2,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "behavior_claim_qualified": false
+}
+[model_utils] GPU memory released, allocated=10.23 GB

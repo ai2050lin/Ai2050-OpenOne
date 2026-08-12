@@ -1,0 +1,141 @@
+[bf16] Loading glm4 with auto CPU/GPU placement max_memory={0: '11GiB', 'cpu': '18GiB'}
+[source-bf16] negation n=8 roles=4 reconstruction=0.0309105
+[source-bf16] semantic_role n=8 roles=4 reconstruction=0.0311489
+{
+  "schema_version": "phase1010_source_role_bf16_confirmation.v1",
+  "phase": 1010,
+  "model": "glm4",
+  "precision": "bfloat16",
+  "split": "confirmation",
+  "source_discovery_summary": {
+    "schema_version": "phase1010_source_role_discovery.v1",
+    "phase": 1010,
+    "model": "glm4",
+    "precision": "8bit",
+    "prerequisite_bf16_digest": "30ca0fa55b5b874f149964045d99768a14dd662f1669ae7ab324a3f78209fd87",
+    "source_selection_digest": "a1ad5d5c792e6ceff544bfbf604c2550caf5660674dd7d7c5646b95d8a87949e",
+    "layer": 30,
+    "selected_heads": [
+      18,
+      28,
+      26
+    ],
+    "output_type": "code",
+    "operation": "F",
+    "family_count": 2,
+    "unit_role_row_count": 435,
+    "cell_role_count": 30,
+    "atomic_role_count": 11,
+    "aggregate_role_count": 4,
+    "maximum_attention_reconstruction_error": 0.030977249145507812,
+    "maximum_noop_logit_error": 0.0,
+    "selected_atomic_roles": [
+      "response_map_instruction"
+    ],
+    "confirmation_roles": [
+      "response_map_instruction",
+      "task_semantics",
+      "response_surface_all",
+      "all_sources"
+    ],
+    "elapsed_seconds": 76.71590566635132,
+    "claim_limit": "maps direct source-role contributions into the frozen L30 head group; it does not locate earlier-layer computation"
+  },
+  "layer": 30,
+  "selected_heads": [
+    18,
+    28,
+    26
+  ],
+  "output_type": "code",
+  "operation": "F",
+  "families": [
+    "negation",
+    "semantic_role"
+  ],
+  "confirmation_n_per_family": 8,
+  "confirmation_roles": [
+    "response_map_instruction",
+    "task_semantics",
+    "response_surface_all",
+    "all_sources"
+  ],
+  "selected_role_support": {
+    "response_map_instruction": {
+      "negation": {
+        "sufficiency": 0.14990234375,
+        "restore": 0.1826171875,
+        "shuffled": 0.025146484375,
+        "delta_norm_ratio": 0.9993589985811533
+      },
+      "semantic_role": {
+        "sufficiency": 0.15185546875,
+        "restore": 0.1630859375,
+        "shuffled": -0.06689453125,
+        "delta_norm_ratio": 0.9992107276156179
+      }
+    }
+  },
+  "response_map_instruction_repeats": true,
+  "role_delta_norm_comparison": {
+    "negation": {
+      "response_map_instruction": 0.9993589985811533,
+      "task_semantics": 0.018143359171081806
+    },
+    "semantic_role": {
+      "response_map_instruction": 0.9992107276156179,
+      "task_semantics": 0.017886594704775403
+    }
+  },
+  "maximum_attention_reconstruction_error": 0.031148910522460938,
+  "maximum_noop_logit_error": 0.0,
+  "device_map": {
+    "model.embed_tokens": "0",
+    "model.layers.0": "0",
+    "model.layers.1": "0",
+    "model.layers.2": "0",
+    "model.layers.3": "0",
+    "model.layers.4": "0",
+    "model.layers.5": "0",
+    "model.layers.6": "0",
+    "model.layers.7": "0",
+    "model.layers.8": "0",
+    "model.layers.9": "0",
+    "model.layers.10": "0",
+    "model.layers.11": "0",
+    "model.layers.12": "0",
+    "model.layers.13": "0",
+    "model.layers.14": "0",
+    "model.layers.15": "0",
+    "model.layers.16": "0",
+    "model.layers.17": "0",
+    "model.layers.18": "0",
+    "model.layers.19": "0",
+    "model.layers.20": "0",
+    "model.layers.21": "0",
+    "model.layers.22": "cpu",
+    "model.layers.23": "cpu",
+    "model.layers.24": "cpu",
+    "model.layers.25": "cpu",
+    "model.layers.26": "cpu",
+    "model.layers.27": "cpu",
+    "model.layers.28": "cpu",
+    "model.layers.29": "cpu",
+    "model.layers.30": "cpu",
+    "model.layers.31": "cpu",
+    "model.layers.32": "cpu",
+    "model.layers.33": "cpu",
+    "model.layers.34": "cpu",
+    "model.layers.35": "cpu",
+    "model.layers.36": "cpu",
+    "model.layers.37": "cpu",
+    "model.layers.38": "cpu",
+    "model.layers.39": "cpu",
+    "model.norm": "cpu",
+    "model.rotary_emb": "cpu",
+    "lm_head": "cpu"
+  },
+  "elapsed_seconds": 175.4950988292694,
+  "strongest_supported_statement": "For code-label F interventions in two held-out families, the discovery-frozen L30 head group receives most of its changed direct attention contribution from fixed trailing response-map/instruction positions whose contextual states have changed. This is a local relay observation, not the origin of the language rule.",
+  "automatic_next_step": "trace_when_and_how_semantic_information_is_written_into_the_fixed_trailing_relay_positions"
+}

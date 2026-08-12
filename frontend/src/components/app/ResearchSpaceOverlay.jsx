@@ -1,9 +1,34 @@
-import { Text } from '@react-three/drei';
+import { Line, Text } from '@react-three/drei';
 
-export function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNodes, atlasEdges, activeResearchPlugin }) {
+import { CURRENT_RESEARCH_STATE, RESEARCH_COMPUTATION_CHAIN } from '../../researchKernel/currentResearchState';
+
+const CHAIN_COLORS = {
+  passed: '#34d399',
+  blocked: '#f59e0b',
+  pending: '#64748b',
+};
+
+export function ResearchSpaceOverlay({
+  layerVisibility,
+  activeFileMeta,
+  atlasNodes,
+  atlasEdges,
+  activeResearchPlugin,
+  selectedEvidenceGate,
+  onSelectEvidenceGate,
+  mechanismMode = 'observe',
+}) {
   const phaseLabel = activeFileMeta?.phase ? `Phase ${activeFileMeta.phase}` : 'Current phase';
   const graphLabel = `${atlasNodes.length || 0} nodes / ${atlasEdges.length || 0} edges`;
   const routeLabel = activeResearchPlugin?.shortName || activeResearchPlugin?.name || '研究路线';
+  const visibleComputationChain = mechanismMode === 'present'
+    ? RESEARCH_COMPUTATION_CHAIN.filter((stage) => stage.status === 'passed')
+    : RESEARCH_COMPUTATION_CHAIN;
+  const chainTitle = mechanismMode === 'compare'
+    ? '原始 / 反事实证据链'
+    : mechanismMode === 'present'
+      ? '已通过成果链'
+      : '当前机制观察链';
 
   return (
     <group>
@@ -65,6 +90,55 @@ export function ResearchSpaceOverlay({ layerVisibility, activeFileMeta, atlasNod
         <Text position={[0, 55, -12]} fontSize={0.55} color="#bfdbfe" anchorX="center">
           {phaseLabel} · {graphLabel}
         </Text>
+      )}
+
+      {layerVisibility.atlas && (
+        <group position={[0, -7.2, -7]}>
+          <Text position={[0, 1.65, 0]} fontSize={0.42} color="#bae6fd" anchorX="center">
+            {chainTitle} · Phase {CURRENT_RESEARCH_STATE.phase}
+          </Text>
+          {visibleComputationChain.length > 1 && (
+            <Line
+              points={visibleComputationChain.map((_, index) => [index * 4.8 - ((visibleComputationChain.length - 1) * 2.4), 0, 0])}
+              color="#334155"
+              lineWidth={1}
+              transparent
+              opacity={0.72}
+            />
+          )}
+          {visibleComputationChain.map((stage, index) => {
+            const x = index * 4.8 - ((visibleComputationChain.length - 1) * 2.4);
+            const selected = selectedEvidenceGate === stage.gateId;
+            const color = CHAIN_COLORS[stage.status] || CHAIN_COLORS.pending;
+            return (
+              <group
+                key={stage.id}
+                position={[x, 0, 0]}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSelectEvidenceGate?.(stage.gateId);
+                }}
+                onPointerOver={(event) => {
+                  event.stopPropagation();
+                  document.body.style.cursor = 'pointer';
+                }}
+                onPointerOut={() => { document.body.style.cursor = 'default'; }}
+              >
+                <mesh scale={selected ? 1.35 : 1}>
+                  <sphereGeometry args={[0.28, 18, 18]} />
+                  <meshStandardMaterial
+                    color={color}
+                    emissive={color}
+                    emissiveIntensity={selected ? 1.1 : 0.45}
+                  />
+                </mesh>
+                <Text position={[0, -0.68, 0]} fontSize={0.25} color={selected ? '#f8fafc' : '#94a3b8'} anchorX="center">
+                  {stage.label}
+                </Text>
+              </group>
+            );
+          })}
+        </group>
       )}
     </group>
   );

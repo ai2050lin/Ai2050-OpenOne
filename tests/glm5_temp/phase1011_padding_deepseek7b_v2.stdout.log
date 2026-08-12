@@ -1,0 +1,50 @@
+[model_utils] Loading deepseek7b... (8bit=True)
+[model_utils] deepseek7b loaded, device=cuda:0, class=Qwen2ForCausalLM, GPU=8.71GB
+{
+  "schema_version": "phase1011_padding_equivalence.v2",
+  "phase": 1011,
+  "model": "deepseek7b",
+  "unit_id": "deepseek7b.comparison.entity.discovery.t0.p0.w0",
+  "state_count": 8,
+  "input_lengths": [
+    65,
+    65,
+    65,
+    65,
+    65,
+    65,
+    65,
+    70
+  ],
+  "mixed_batch_vs_singleton": {
+    "candidate_panel_prediction_agreement_rate": 1.0,
+    "maximum_candidate_logit_error": 2.0,
+    "median_candidate_logit_error": 0.9375,
+    "maximum_hidden_relative_error": 3.0086472034454346,
+    "median_hidden_relative_error": 0.06455780565738678,
+    "maximum_response_magnitude_error": 1009.565185546875,
+    "median_response_magnitude_error": 0.6011409759521484,
+    "maximum_response_relative_error": 4.468770980834961,
+    "median_response_relative_error": 0.028760382905602455,
+    "minimum_response_direction_cosine": -0.9911635518074036,
+    "median_response_direction_cosine": 0.8951774835586548,
+    "scope": "includes batch-shape and matrix-kernel drift"
+  },
+  "mixed_batch_vs_same_shape_homogeneous": {
+    "candidate_panel_prediction_agreement_rate": 1.0,
+    "maximum_candidate_logit_error": 2.25,
+    "median_candidate_logit_error": 1.3515625,
+    "maximum_hidden_relative_error": 1.8654547929763794,
+    "median_hidden_relative_error": 0.06447247415781021,
+    "maximum_response_magnitude_error": 1200.17919921875,
+    "median_response_magnitude_error": 0.5849151611328125,
+    "maximum_response_relative_error": 6.28599214553833,
+    "median_response_relative_error": 0.029180176556110382,
+    "minimum_response_direction_cosine": -0.9783345460891724,
+    "median_response_direction_cosine": 0.8951653242111206,
+    "scope": "holds batch size and padded width fixed; isolates mixed-state batch composition"
+  },
+  "elapsed_seconds": 29.987935066223145,
+  "interpretation": "quantifies batching/padding instrumentation drift; it does not test a language mechanism"
+}
+[model_utils] GPU memory released, allocated=8.72 GB

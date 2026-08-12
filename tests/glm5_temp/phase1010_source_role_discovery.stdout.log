@@ -1,0 +1,39 @@
+[model_utils] Loading glm4... (8bit=True)
+[model_utils] glm4 loaded, device=cuda:0, class=GlmForCausalLM, GPU=10.65GB
+[source-discovery] negation n=19 groups=2 reconstruction=0.0303402
+[source-discovery] semantic_role n=10 groups=2 reconstruction=0.0309772
+{
+  "schema_version": "phase1010_source_role_discovery.v1",
+  "phase": 1010,
+  "model": "glm4",
+  "precision": "8bit",
+  "prerequisite_bf16_digest": "30ca0fa55b5b874f149964045d99768a14dd662f1669ae7ab324a3f78209fd87",
+  "source_selection_digest": "a1ad5d5c792e6ceff544bfbf604c2550caf5660674dd7d7c5646b95d8a87949e",
+  "layer": 30,
+  "selected_heads": [
+    18,
+    28,
+    26
+  ],
+  "output_type": "code",
+  "operation": "F",
+  "family_count": 2,
+  "unit_role_row_count": 435,
+  "cell_role_count": 30,
+  "atomic_role_count": 11,
+  "aggregate_role_count": 4,
+  "maximum_attention_reconstruction_error": 0.030977249145507812,
+  "maximum_noop_logit_error": 0.0,
+  "selected_atomic_roles": [
+    "response_map_instruction"
+  ],
+  "confirmation_roles": [
+    "response_map_instruction",
+    "task_semantics",
+    "response_surface_all",
+    "all_sources"
+  ],
+  "elapsed_seconds": 76.71590566635132,
+  "claim_limit": "maps direct source-role contributions into the frozen L30 head group; it does not locate earlier-layer computation"
+}
+[model_utils] GPU memory released, allocated=10.66 GB
