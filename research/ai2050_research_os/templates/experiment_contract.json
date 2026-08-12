@@ -1,116 +1,162 @@
 {
-  "schema_version": "1.0.0",
-  "experiment_id": "EXP-C001-WP00-001",
-  "campaign_id": "C001",
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C000-WP00-000",
+  "campaign_id": "C000",
   "work_package_id": "WP00",
   "phase": null,
-  "title": "待填写的实验名称",
+  "title": "待冻结的实验合同",
   "status": "draft",
-  "question": "本实验要区分的唯一科学问题。",
-  "construct_types": ["content"],
+  "question": "本实验只区分哪一个预注册科学问题？",
+  "object_ids": ["OBJ-C000-EXAMPLE"],
+  "construct_types": ["CON-EXAMPLE"],
   "puzzle_ids": ["P00"],
   "hypothesis_predictions": [
     {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-EXAMPLE",
+      "observable": "运行前定义的可观测量",
+      "expected": "运行前写明的数值范围或结构模式",
+      "distinguishes_from": ["H05"],
+      "death_observation": "足以关闭该预测的观察"
+    },
+    {
       "hypothesis_id": "H05",
-      "prediction_id": "PR-H05-001",
-      "observable": "明确的观测量",
-      "direction": "increase|decrease|invariant|pattern|abstain",
-      "expected": "运行前写出的数值范围或结构模式",
-      "distinguishes_from": ["H00"]
+      "prediction_id": "PR-H05-EXAMPLE",
+      "observable": "与 H00 相同的预注册可观测量",
+      "expected": "能和 H00 产生不同裁决的预注册结果",
+      "distinguishes_from": ["H00"],
+      "death_observation": "足以关闭 H05 的观察"
     }
   ],
   "scope": {
     "models": ["Qwen3-4B"],
     "tasks": ["fresh_task_name"],
     "languages": ["en"],
-    "protocols": ["short", "sentence", "natural"],
+    "protocols": ["candidate", "natural"],
     "precision": ["fp16"],
     "backend": ["cuda"],
-    "excluded_claims": ["跨模型机制", "自然语言普适规律"]
+    "allowed_observations": ["input_ids", "full_vocab_logits", "generated_tokens"],
+    "excluded_claims": ["cross-model mechanism", "human brain mechanism"]
   },
   "data_contract": {
-    "cluster_unit": "world",
-    "calibration": {"worlds": 0, "seed": 0},
-    "discovery": {"worlds": 0, "seed": 0},
-    "selection": {"worlds": 0, "seed": 0},
-    "confirmation": {"worlds": 0, "seed": 0, "sealed": true},
-    "split_rule": "按潜在世界拆分，同一事实的改写和多语言版本不得跨房间。",
-    "leakage_audit": "待填写"
+    "cluster_unit": "latent_world",
+    "calibration": {"worlds": 128, "seed": 1, "sealed": false},
+    "discovery": {"worlds": 128, "seed": 2, "sealed": false},
+    "selection": {"worlds": 128, "seed": 3, "sealed": true},
+    "confirmation": {"worlds": 128, "seed": 4, "sealed": true},
+    "split_rule": "按潜在世界与模板族整体互斥。",
+    "leakage_audit": ["answer_absent", "same_token_bag_swap", "target_change", "nontarget_noop", "query_switch", "alternative_program_upper_bound"],
+    "answer_payload_rule": "候选答案及其 token 不得进入模型输入。"
   },
   "factor_design": {
-    "axes": ["content", "format", "protocol"],
+    "axes": ["target", "context", "protocol"],
     "required_pairwise_coverage": true,
-    "required_three_way_cells": ["content×format×protocol"],
-    "matched_counterfactuals": ["correct_content_wrong_format", "wrong_content_correct_format"]
+    "required_collision_groups": ["target_change", "nontarget_noop"],
+    "forbidden_posthoc_pooling": ["drop_failed_worlds", "select_successful_templates"]
   },
-  "event_registry": [],
-  "intervention_registry": [],
-  "readout_registry": [
-    {"id": "Q-content", "type": "content", "definition": "待填写"},
-    {"id": "Q-format", "type": "format", "definition": "待填写"}
-  ],
-  "controls": [
-    "matched_null",
-    "wrong_donor",
-    "same_answer_wrong_binding",
-    "random_same_norm",
-    "zero_or_identity",
-    "full_recompute"
-  ],
+  "controls": ["constant_program", "first_record_program", "last_record_program", "same_bag_wrong_binding", "target_change", "nontarget_noop", "query_switch", "full_recompute"],
   "metrics": [
     {
-      "id": "M-primary",
-      "unit": "world_cluster",
-      "estimator": "待填写",
-      "confidence_interval": "cluster_bootstrap",
-      "higher_is_better": true
+      "id": "M-EXAMPLE",
+      "construct_id": "CON-EXAMPLE",
+      "unit": "latent_world",
+      "estimator": "exact_count_with_worst_partition",
+      "threshold_source": "pre-run calibration"
+    },
+    {
+      "id": "M-FORMAT",
+      "construct_id": "CON-EXAMPLE",
+      "unit": "latent_world",
+      "estimator": "exact_string_count",
+      "threshold_source": "pre-run calibration"
+    },
+    {
+      "id": "M-NATURAL",
+      "construct_id": "CON-EXAMPLE",
+      "unit": "latent_world",
+      "estimator": "complete_rollout_count",
+      "threshold_source": "pre-run calibration"
+    },
+    {
+      "id": "M-CACHE",
+      "construct_id": "CON-EXAMPLE",
+      "unit": "token_trajectory",
+      "estimator": "exact_cache_recompute_count",
+      "threshold_source": "known-equivalence calibration"
     }
   ],
   "typed_gates": [
     {
-      "id": "G-content",
-      "construct_type": "content",
-      "required_partitions": ["discovery", "confirmation"],
-      "formula": "待填写",
-      "threshold_source": "calibration",
-      "threshold": null,
-      "authorizes": ["仅内容机制下一层测试"],
-      "failure_type": "construct_failure|behavior_failure|predictive_failure"
+      "id": "G-EXAMPLE",
+      "construct_id": "CON-EXAMPLE",
+      "required_partitions": ["discovery", "selection", "confirmation"],
+      "rule": "预注册的通过阈值和最差分区阈值。",
+      "authorizes": ["该构念的下一层低成本测试"],
+      "failure_type": "behavior_failure"
+    },
+    {
+      "id": "G-FORMAT",
+      "construct_id": "CON-EXAMPLE",
+      "required_partitions": ["selection", "confirmation"],
+      "rule": "预注册的严格格式门。",
+      "authorizes": ["仅格式构念的下一层测试"],
+      "failure_type": "behavior_failure"
+    },
+    {
+      "id": "G-NATURAL",
+      "construct_id": "CON-EXAMPLE",
+      "required_partitions": ["selection", "confirmation"],
+      "rule": "预注册的自然生成门。",
+      "authorizes": ["仅自然生成构念的下一层测试"],
+      "failure_type": "generation_failure"
+    },
+    {
+      "id": "G-CACHE",
+      "construct_id": "CON-EXAMPLE",
+      "required_partitions": ["selection", "confirmation"],
+      "rule": "预注册的停止与缓存一致性门。",
+      "authorizes": ["仅停止与缓存构念的下一层测试"],
+      "failure_type": "generation_failure"
     }
   ],
   "budget": {
-    "max_gpu_hours": null,
-    "max_runs": null,
+    "max_gpu_hours": 1,
+    "max_runs": 1,
     "max_adaptive_rounds": 0,
-    "right_censoring_rule": "待填写"
+    "max_world_clusters": 512,
+    "right_censoring_rule": "达到预算即登记删失，不追加预算追逐正结果。"
   },
   "stopping_rules": [
-    "主要构念门失败后停止其对应物理授权。",
-    "达到预算上限时登记删失，不延长直到出现正结果。",
-    "确认集揭盲后不修改指标、阈值和必需分区。"
+    "无模型预审计失败则不运行模型。",
+    "确认集揭盲后不得修改材料、指标、阈值或解析器。",
+    "构念失败只关闭该构念，不以其他构念替代。",
+    "达到预算后登记删失，不追加预算追逐正结果。"
   ],
   "adjudication": {
-    "possible_verdicts": ["global_survivor", "local_mechanism", "bounded_rejected", "abstain", "invalid"],
-    "failure_claim": "失败时在什么范围内关闭哪个强版本。",
-    "reopen_condition": "需要怎样的数学新版本和旧失败预测才能重开。"
+    "possible_verdicts": ["typed_behavior_qualified", "bounded_rejected", "abstain", "invalid", "censored"],
+    "failure_claim": "失败只关闭合同明确限定的模型、任务、协议和构念范围。",
+    "reopen_condition": "新版本必须事前解释旧失败并冻结全新确认集。"
   },
   "permissions": {
-    "authorizes_on_pass": [],
-    "forbids_even_on_pass": [],
-    "authorizes_on_failure": [],
-    "forbids_on_failure": []
+    "authorizes_on_pass": ["仅通过构念进入下一层测试"],
+    "forbids_even_on_pass": ["内部机制结论", "跨模型结论", "人脑结论"],
+    "authorizes_on_failure": ["登记类型化负边界"],
+    "forbids_on_failure": ["删除失败样本", "事后换模板重跑"]
   },
   "audit": {
-    "preaudit_checks": [],
-    "independent_result_auditor": "待填写",
+    "preaudit_checks": ["schema", "source_freeze", "world_disjointness", "answer_absence"],
+    "independent_result_auditor": "required_before_run_ready",
     "raw_result_required": true,
-    "preserve_failed_partitions": true
+    "preserve_failed_partitions": true,
+    "audit_must_not_read_narrative_conclusion": true
   },
+  "execution_sequence": ["preaudit_no_model", "Qwen3-4B", "gpu_release_and_audit", "stop_without_auto_continue"],
   "frozen_artifacts": {
-    "contract_sha256": null,
-    "code_sha256": null,
-    "material_sha256": null,
-    "environment_sha256": null
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C000-WP00-000.manifest.json",
+    "code_paths": [],
+    "material_paths": [],
+    "environment_paths": ["schemas/experiment_contract.schema.json"],
+    "readiness": "contract_frozen"
   }
 }
-

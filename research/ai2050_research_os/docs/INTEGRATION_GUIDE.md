@@ -6,7 +6,7 @@
 
 ```text
 research/
-└── mechanism_os/
+└── ai2050_research_os/
 ```
 
 若现有工程已经有 `tests/gpt5/`、`tests/glm5/` 和结果目录，不要移动原实验。只在 `phases.json` 和 `evidence.json` 中保存相对路径与摘要。
@@ -50,8 +50,9 @@ tests/glm5/result/phase1235_*/
 在自动化流程中加入：
 
 ```bash
-python3 research/mechanism_os/scripts/researchctl.py validate
-python3 research/mechanism_os/scripts/researchctl.py build --check-clean
+.venv/Scripts/python.exe research/ai2050_research_os/scripts/researchctl.py validate
+.venv/Scripts/python.exe research/ai2050_research_os/scripts/researchctl.py build --check-clean
+.venv/Scripts/python.exe research/ai2050_research_os/scripts/researchctl.py verify-manifest manifests/EXP-C001-WP01-001.manifest.json
 ```
 
 第一条阻止无效引用和非法状态进入主分支；第二条阻止机器账本与生成看板不一致。
@@ -90,4 +91,3 @@ artifacts/
 3. 证据、裁决和自动看板更新。
 
 这样可以从版本历史上确认指标和门是否在揭盲前存在。
-

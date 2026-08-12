@@ -12,6 +12,13 @@
 | evidence.json | id | 不可变证据条目 |
 | phases.json | phase | 执行批次索引 |
 | decisions.json | id | 授权与停止裁决 |
+| sources.json | id | Git commit + blob 固定的原始来源 |
+| objects.json | id | 同一对象跨层级纵向身份 |
+| constructs.json | id | 类型化构念及其非等价项 |
+| contracts.json | id | 预注册合同、状态迁移与 manifest |
+| runs.json | id | 正式运行状态、模型和产物引用 |
+| artifacts.json | id | 大型产物路径、摘要、类型和体积 |
+| corrections.json | id | 不覆盖原主张的勘误记录 |
 
 ## 二、合法状态
 
@@ -45,7 +52,9 @@
 
 ## 三、引用规则
 
+- `record_id` 是 Phase 记录唯一主键；整数 `phase` 和 `phase_label` 允许重复；
 - `campaign_id` 必须指向现有战役；历史条目可用保留值 `LEGACY`；
+- 证据通过 `source_record_ids` 指向 Phase 记录，Phase 再指向不可变 `source_id`；
 - `evidence_refs` 必须指向 `evidence.json`；
 - `hypothesis_ids`、`puzzle_ids`、`test_battery_ids` 必须存在；
 - 拼图依赖和测试前置依赖必须无环；
@@ -68,4 +77,3 @@ progress=
 ## 五、生成文件
 
 `generated/` 全部由 `researchctl.py build` 生成。任何手工修改都会在下一次生成中被覆盖。
-

@@ -35,10 +35,11 @@
 
 在本目录运行：
 
-```bash
-python3 scripts/researchctl.py validate
-python3 scripts/researchctl.py build
-python3 scripts/researchctl.py summary
+```powershell
+..\..\.venv\Scripts\python.exe scripts\researchctl.py validate
+..\..\.venv\Scripts\python.exe scripts\researchctl.py build
+..\..\.venv\Scripts\python.exe scripts\researchctl.py summary
+..\..\.venv\Scripts\python.exe scripts\researchctl.py verify-manifest manifests\EXP-C001-WP01-001.manifest.json
 ```
 
 - `validate`（校验）：检查编号、引用、依赖、状态和值域；
@@ -48,8 +49,8 @@ python3 scripts/researchctl.py summary
 
 冻结示例：
 
-```bash
-python3 scripts/researchctl.py freeze templates/experiment_contract.json
+```powershell
+..\..\.venv\Scripts\python.exe scripts\researchctl.py freeze contracts\EXP-C001-WP01-001.json
 ```
 
 ## 三、目录结构
@@ -71,7 +72,16 @@ ai2050_research_os/
 │   ├── tests.json
 │   ├── evidence.json
 │   ├── phases.json
-│   └── decisions.json
+│   ├── decisions.json
+│   ├── sources.json          # Git commit + blob 的不可变来源
+│   ├── objects.json          # 同一研究对象的纵向身份
+│   ├── constructs.json       # 内容/格式/生成/停止等独立构念
+│   ├── contracts.json        # 冻结合同索引
+│   ├── runs.json             # 正式运行及状态迁移
+│   ├── artifacts.json        # 产物路径、摘要与体积
+│   └── corrections.json      # 保留原记录的勘误链
+├── contracts/                # 通过严格 Schema 的预注册合同
+├── manifests/                # 合同、Schema、对象和预算冻结清单
 ├── templates/                # 新实验、新 Phase、新拼图的冻结模板
 ├── schemas/                  # 状态和合同字段说明
 ├── scripts/researchctl.py    # 无第三方依赖的校验与汇总工具
@@ -99,13 +109,12 @@ ai2050_research_os/
 
 ## 六、当前起点
 
-初始账本以 Phase 1210–1235 的可见材料为基线。当前最重要的事实是：
+初始账本以 Phase 1210–1235 的可见材料为科学基线，并在 WP00 登记了 GPT/GLM docs 的 22 个不可变 Git 快照。当前最重要的事实是：
 
 - 已有若干已知真值测量相机和有限功能商校准；
 - 自然化整状态运输、形成前摘要预测、答案边界单点补丁均出现明确适用域边界；
 - Phase 1235 得到稳定的类型化行为响应，但严格短字符串合同不稳定；
 - 尚未得到协议相对独立的内部功能状态、未来响应张量、最小自然因果联盟或完整自回归闭环；
-- 下一步不是自动执行原 Phase 1236，而是启动全局结构辨识战役的合同冻结与发现集构建。
+- WP00 已完成，下一步是 `EXP-C001-WP01-001` 的无模型预审计；合同仍为 `run_ready=false`，不得提前运行 Qwen3。
 
 详见 [CURRENT_BASELINE.md](docs/CURRENT_BASELINE.md)。
-

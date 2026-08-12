@@ -31,8 +31,11 @@
 更新顺序固定为：
 
 ```text
-evidence.json
-→ phases.json
+sources.json / corrections.json
+→ phases.json（record_id 为主键，Phase 只作标签）
+→ evidence.json
+→ objects.json / constructs.json
+→ contracts.json / runs.json / artifacts.json
 → hypotheses.json
 → puzzles.json
 → decisions.json
@@ -59,6 +62,13 @@ evidence.json
 - 首词元不等于生成闭环；
 - 单模型不等于跨模型结构；
 - 终态存在不等于形成机制。
+
+### 2.1 合同与运行状态不能跳跃
+
+- 合同：`draft → calibrated → preregistered → ready → running → auditing → adjudicated`；
+- 运行：`planned → ready → running → auditing → adjudicated`；
+- `preregistered` 只表示问题、预算和停止条件已冻结，不等于 `run_ready`；
+- 只有代码、材料、环境和独立审计器全部进入 manifest 后，合同才可转为 `ready`。
 
 ### 3. 负结果必须产品化
 
@@ -135,4 +145,3 @@ evidence.json
 - 因果与生成闭合达到的最高层；
 - 可迁移工程资产；
 - 是否授权下一战役。
-

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "COR-WP00-001",
+    "date": "2026-08-11",
+    "status": "active",
+    "target_type": "evidence_source",
+    "target_ids": ["K190", "K191", "K192", "K193", "K194", "K195", "K196", "K197", "K198", "K199", "K200", "K203", "K210"],
+    "problem": "初始迁移引用不存在的 ../upload 路径，导致 validate 失败 13 项。",
+    "correction": "证据改为引用 PHREC 复合记录；PHREC 再引用 Git blob 固定的真实 Memo 来源。",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-WP00-002",
+    "date": "2026-08-11",
+    "status": "active",
+    "target_type": "phase_identity",
+    "target_ids": ["phases.json"],
+    "problem": "整数 Phase 在历史中存在重复，不能作为机器唯一主键。",
+    "correction": "新增 record_id；phase 和 phase_label 仅作为显示字段，允许相同标签出现多次。",
+    "preserves_original_claim": true
+  }
+]

@@ -1,33 +1,17 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai2050.local/schemas/experiment_contract.schema.json",
-  "title": "AI2050 Experiment Contract",
+  "title": "AI2050 Experiment Contract v1.1",
   "type": "object",
   "required": [
-    "schema_version",
-    "experiment_id",
-    "campaign_id",
-    "work_package_id",
-    "title",
-    "status",
-    "question",
-    "construct_types",
-    "puzzle_ids",
-    "hypothesis_predictions",
-    "scope",
-    "data_contract",
-    "controls",
-    "metrics",
-    "typed_gates",
-    "budget",
-    "stopping_rules",
-    "adjudication",
-    "permissions",
-    "audit",
-    "frozen_artifacts"
+    "schema_version", "experiment_id", "campaign_id", "work_package_id", "phase",
+    "title", "status", "question", "object_ids", "construct_types", "puzzle_ids",
+    "hypothesis_predictions", "scope", "data_contract", "factor_design", "controls",
+    "metrics", "typed_gates", "budget", "stopping_rules", "adjudication",
+    "permissions", "audit", "execution_sequence", "frozen_artifacts"
   ],
   "properties": {
-    "schema_version": {"type": "string"},
+    "schema_version": {"type": "string", "pattern": "^1\\.1\\.[0-9]+$"},
     "experiment_id": {"type": "string", "pattern": "^EXP-[A-Z0-9-]+$"},
     "campaign_id": {"type": "string", "pattern": "^C[0-9]{3}$"},
     "work_package_id": {"type": "string", "pattern": "^WP[0-9]{2}$"},
@@ -35,25 +19,121 @@
     "title": {"type": "string", "minLength": 1},
     "status": {"enum": ["draft", "calibrated", "preregistered", "ready", "running", "auditing", "adjudicated", "blocked", "censored", "invalid", "archived"]},
     "question": {"type": "string", "minLength": 1},
-    "construct_types": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "object_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^OBJ-"}},
+    "construct_types": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^CON-"}},
     "puzzle_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^P[0-9]{2}$"}},
-    "hypothesis_predictions": {"type": "array", "minItems": 1},
-    "scope": {"type": "object"},
-    "data_contract": {"type": "object"},
+    "hypothesis_predictions": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["hypothesis_id", "prediction_id", "observable", "expected", "distinguishes_from", "death_observation"],
+        "properties": {
+          "hypothesis_id": {"type": "string", "pattern": "^H[0-9]{2}$"},
+          "prediction_id": {"type": "string", "pattern": "^PR-"},
+          "observable": {"type": "string", "minLength": 1},
+          "expected": {"type": "string", "minLength": 1},
+          "distinguishes_from": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^H[0-9]{2}$"}},
+          "death_observation": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["models", "tasks", "languages", "protocols", "precision", "backend", "allowed_observations", "excluded_claims"],
+      "properties": {
+        "models": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "tasks": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "languages": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "protocols": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "precision": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "backend": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "allowed_observations": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "excluded_claims": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "data_contract": {
+      "type": "object",
+      "required": ["cluster_unit", "calibration", "discovery", "selection", "confirmation", "split_rule", "leakage_audit", "answer_payload_rule"],
+      "properties": {
+        "cluster_unit": {"type": "string", "minLength": 1},
+        "calibration": {"type": "object"},
+        "discovery": {"type": "object"},
+        "selection": {"type": "object"},
+        "confirmation": {"type": "object"},
+        "split_rule": {"type": "string", "minLength": 1},
+        "leakage_audit": {"type": "array", "minItems": 6, "items": {"type": "string"}},
+        "answer_payload_rule": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
     "factor_design": {"type": "object"},
-    "event_registry": {"type": "array"},
-    "intervention_registry": {"type": "array"},
-    "readout_registry": {"type": "array"},
-    "controls": {"type": "array", "minItems": 1},
-    "metrics": {"type": "array", "minItems": 1},
-    "typed_gates": {"type": "array", "minItems": 1},
-    "budget": {"type": "object"},
-    "stopping_rules": {"type": "array", "minItems": 1},
+    "controls": {"type": "array", "minItems": 8, "items": {"type": "string"}},
+    "metrics": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "construct_id", "unit", "estimator", "threshold_source"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^M-"},
+          "construct_id": {"type": "string", "pattern": "^CON-"},
+          "unit": {"type": "string"},
+          "estimator": {"type": "string"},
+          "threshold_source": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "typed_gates": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "construct_id", "required_partitions", "rule", "authorizes", "failure_type"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^G-"},
+          "construct_id": {"type": "string", "pattern": "^CON-"},
+          "required_partitions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "rule": {"type": "string", "minLength": 1},
+          "authorizes": {"type": "array", "items": {"type": "string"}},
+          "failure_type": {"enum": ["construct_failure", "behavior_failure", "instrument_failure", "identifiability_failure", "predictive_failure", "generation_failure"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "budget": {
+      "type": "object",
+      "required": ["max_gpu_hours", "max_runs", "max_adaptive_rounds", "max_world_clusters", "right_censoring_rule"],
+      "properties": {
+        "max_gpu_hours": {"type": "number", "minimum": 0},
+        "max_runs": {"type": "integer", "minimum": 1},
+        "max_adaptive_rounds": {"type": "integer", "minimum": 0},
+        "max_world_clusters": {"type": "integer", "minimum": 1},
+        "right_censoring_rule": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "stopping_rules": {"type": "array", "minItems": 4, "items": {"type": "string"}},
     "adjudication": {"type": "object"},
     "permissions": {"type": "object"},
     "audit": {"type": "object"},
-    "frozen_artifacts": {"type": "object"}
+    "execution_sequence": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "frozen_artifacts": {
+      "type": "object",
+      "required": ["freeze_mode", "manifest_path", "code_paths", "material_paths", "environment_paths", "readiness"],
+      "properties": {
+        "freeze_mode": {"enum": ["external_manifest"]},
+        "manifest_path": {"type": "string", "minLength": 1},
+        "code_paths": {"type": "array", "items": {"type": "string"}},
+        "material_paths": {"type": "array", "items": {"type": "string"}},
+        "environment_paths": {"type": "array", "items": {"type": "string"}},
+        "readiness": {"enum": ["contract_frozen", "run_ready", "adjudicated"]}
+      },
+      "additionalProperties": false
+    }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }
-
