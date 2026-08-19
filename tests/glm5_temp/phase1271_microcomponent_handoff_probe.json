@@ -1,0 +1,271 @@
+{
+  "status": "development_only",
+  "seed": 1271699993,
+  "attempts": [
+    {
+      "seed": 1271699992,
+      "natural": 0.9718424677848816,
+      "training": {
+        "steps": 6500,
+        "accuracy_overall": 0.98333740234375,
+        "accuracy_direct": 1.0,
+        "accuracy_code": 0.9665584564208984,
+        "parameter_count": 453024,
+        "elapsed_seconds": 90.0794406999994
+      },
+      "gap": 0.0,
+      "passed": false
+    },
+    {
+      "seed": 1271699993,
+      "natural": 1.0,
+      "training": {
+        "steps": 3600,
+        "accuracy_overall": 1.0,
+        "accuracy_direct": 1.0,
+        "accuracy_code": 1.0,
+        "parameter_count": 453024,
+        "elapsed_seconds": 42.84676269999909
+      },
+      "gap": 0.0,
+      "passed": true
+    }
+  ],
+  "training": {
+    "steps": 3600,
+    "accuracy_overall": 1.0,
+    "accuracy_direct": 1.0,
+    "accuracy_code": 1.0,
+    "parameter_count": 453024,
+    "elapsed_seconds": 42.84676269999909
+  },
+  "natural_accuracy": 1.0,
+  "executor_gap": 0.0,
+  "results": [
+    {
+      "layer": 0,
+      "stage": "attn_write_answer",
+      "donor": "h11",
+      "patch_expected": 0.583984375,
+      "reverse_base": 0.5888671875,
+      "patch_false_target": 0.583984375
+    },
+    {
+      "layer": 0,
+      "stage": "attn_write_answer",
+      "donor": "hwrong11",
+      "patch_expected": 0.5703125,
+      "reverse_base": 0.5888671875,
+      "patch_false_target": 0.1318359375
+    },
+    {
+      "layer": 0,
+      "stage": "mlp_write_answer",
+      "donor": "h11",
+      "patch_expected": 0.43359375,
+      "reverse_base": 0.4462890625,
+      "patch_false_target": 0.43359375
+    },
+    {
+      "layer": 0,
+      "stage": "mlp_write_answer",
+      "donor": "hwrong11",
+      "patch_expected": 0.31640625,
+      "reverse_base": 0.4462890625,
+      "patch_false_target": 0.1943359375
+    },
+    {
+      "layer": 0,
+      "stage": "after_block_answer",
+      "donor": "h11",
+      "patch_expected": 0.583984375,
+      "reverse_base": 0.5888671875,
+      "patch_false_target": 0.583984375
+    },
+    {
+      "layer": 0,
+      "stage": "after_block_answer",
+      "donor": "hwrong11",
+      "patch_expected": 0.5703125,
+      "reverse_base": 0.5888671875,
+      "patch_false_target": 0.1318359375
+    },
+    {
+      "layer": 1,
+      "stage": "attn_write_answer",
+      "donor": "h11",
+      "patch_expected": 0.1611328125,
+      "reverse_base": 0.1630859375,
+      "patch_false_target": 0.1611328125
+    },
+    {
+      "layer": 1,
+      "stage": "attn_write_answer",
+      "donor": "hwrong11",
+      "patch_expected": 0.126953125,
+      "reverse_base": 0.1630859375,
+      "patch_false_target": 0.0576171875
+    },
+    {
+      "layer": 1,
+      "stage": "mlp_write_answer",
+      "donor": "h11",
+      "patch_expected": 0.0634765625,
+      "reverse_base": 0.064453125,
+      "patch_false_target": 0.0634765625
+    },
+    {
+      "layer": 1,
+      "stage": "mlp_write_answer",
+      "donor": "hwrong11",
+      "patch_expected": 0.03125,
+      "reverse_base": 0.064453125,
+      "patch_false_target": 0.0693359375
+    },
+    {
+      "layer": 1,
+      "stage": "after_block_answer",
+      "donor": "h11",
+      "patch_expected": 0.716796875,
+      "reverse_base": 0.72265625,
+      "patch_false_target": 0.716796875
+    },
+    {
+      "layer": 1,
+      "stage": "after_block_answer",
+      "donor": "hwrong11",
+      "patch_expected": 0.6953125,
+      "reverse_base": 0.72265625,
+      "patch_false_target": 0.095703125
+    }
+  ],
+  "coalitions": [
+    {
+      "program": "all_attn_writes",
+      "donor": "h11",
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 1.0
+    },
+    {
+      "program": "all_attn_writes",
+      "donor": "hwrong11",
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 0.0
+    },
+    {
+      "program": "all_mlp_writes",
+      "donor": "h11",
+      "patch_expected": 0.9189453125,
+      "reverse_base": 0.91796875,
+      "patch_false_target": 0.9189453125
+    },
+    {
+      "program": "all_mlp_writes",
+      "donor": "hwrong11",
+      "patch_expected": 0.8642578125,
+      "reverse_base": 0.91796875,
+      "patch_false_target": 0.0361328125
+    },
+    {
+      "program": "all_attn_and_mlp_writes",
+      "donor": "h11",
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 1.0
+    },
+    {
+      "program": "all_attn_and_mlp_writes",
+      "donor": "hwrong11",
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 0.0
+    },
+    {
+      "program": "all_after_block_states",
+      "donor": "h11",
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 1.0
+    },
+    {
+      "program": "all_after_block_states",
+      "donor": "hwrong11",
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 0.0
+    }
+  ],
+  "attention_prefixes": [
+    {
+      "end_layer": 0,
+      "layers": [
+        0
+      ],
+      "patch_expected": 0.583984375,
+      "reverse_base": 0.5888671875,
+      "patch_false_target": 0.583984375
+    },
+    {
+      "end_layer": 1,
+      "layers": [
+        0,
+        1
+      ],
+      "patch_expected": 0.716796875,
+      "reverse_base": 0.72265625,
+      "patch_false_target": 0.716796875
+    },
+    {
+      "end_layer": 2,
+      "layers": [
+        0,
+        1,
+        2
+      ],
+      "patch_expected": 0.8896484375,
+      "reverse_base": 0.88671875,
+      "patch_false_target": 0.8896484375
+    },
+    {
+      "end_layer": 3,
+      "layers": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "patch_expected": 0.9638671875,
+      "reverse_base": 0.94921875,
+      "patch_false_target": 0.9638671875
+    },
+    {
+      "end_layer": 4,
+      "layers": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 1.0
+    },
+    {
+      "end_layer": 5,
+      "layers": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "patch_expected": 1.0,
+      "reverse_base": 1.0,
+      "patch_false_target": 1.0
+    }
+  ]
+}

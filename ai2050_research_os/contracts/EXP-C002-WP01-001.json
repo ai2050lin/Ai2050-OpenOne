@@ -1,0 +1,357 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C002-WP01-001",
+  "campaign_id": "C002",
+  "work_package_id": "WP01",
+  "phase": 1248,
+  "title": "Qwen3 模型自身未来干预响应张量试采",
+  "status": "adjudicated",
+  "question": "Phase1247 校准的隐藏到响应相机能否在 Qwen3-4B 中，跨记录表示、代码表映射、候选式与自然补全式接口预测未见 activation-patch 响应，并同时覆盖模型答对与答错样本？",
+  "object_ids": [
+    "OBJ-C002-QWEN-SELF-RESPONSE-ATLAS"
+  ],
+  "construct_types": [
+    "CON-MODEL-SELF-RESPONSE",
+    "CON-HIDDEN-RESPONSE-IMAGING",
+    "CON-INTERVENTION-SPECIFICITY",
+    "CON-TYPED-OBSERVABILITY"
+  ],
+  "puzzle_ids": [
+    "P01",
+    "P03",
+    "P04",
+    "P05",
+    "P07",
+    "P13"
+  ],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H07",
+      "prediction_id": "PR-H07-C002-WP01-001",
+      "observable": "公开隐藏供体差分对未见 Qwen3 完整补丁候选-logit 响应的预测",
+      "expected": "发现集小幅度响应拟合的相机在全新确认模板和 alpha=1 上显著超过常数、置乱隐藏差分和隐藏范数基线。",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "确认集方向、误差或控制优势任一冻结门失败，且不能归因于数值重放或缺乏可测响应。"
+    },
+    {
+      "hypothesis_id": "H05",
+      "prediction_id": "PR-H05-C002-WP01-001",
+      "observable": "candidate 与 natural-completion 两个接口中相机预测的方向与覆盖率",
+      "expected": "模型自身响应规律可在两个输出接口分别保持，不要求两个接口 gold 正确率相同。",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "任何一个接口的确认余弦低于 0.40 或正方向比例低于 0.70。"
+    },
+    {
+      "hypothesis_id": "H06",
+      "prediction_id": "PR-H06-C002-WP01-001",
+      "observable": "改变查询答案的目标供体与保持查询答案的非目标供体之实际响应比",
+      "expected": "被选事件的目标供体响应至少为 matched-null 的 1.25 倍，且在直接词和代码记录中均可测。",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "目标响应弱于最小效应门，或目标/非目标响应不能区分。"
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C002-WP01-001",
+      "observable": "正确与错误样本分层、接口分层及三种设计基线上的确认表现",
+      "expected": "若可迁移响应对象不存在，至少一个必要分层或总体确认会落回设计基线。",
+      "distinguishes_from": [
+        "H07"
+      ],
+      "death_observation": "总体、双接口以及样本量合格的正确/错误分层全部通过冻结门。"
+    }
+  ],
+  "scope": {
+    "models": [
+      "Qwen3-4B"
+    ],
+    "tasks": [
+      "factorial_object_tag_binding_and_codebook_translation"
+    ],
+    "languages": [
+      "en"
+    ],
+    "protocols": [
+      "candidate_instruction",
+      "natural_completion",
+      "activation_patch_target_donor",
+      "activation_patch_matched_null"
+    ],
+    "precision": [
+      "fp16"
+    ],
+    "backend": [
+      "cuda"
+    ],
+    "allowed_observations": [
+      "candidate_logits",
+      "projected_hidden_delta",
+      "actual_single_event_patch_response",
+      "semantic_correctness_side_ledger"
+    ],
+    "excluded_claims": [
+      "semantic mechanism identity",
+      "component necessity",
+      "free generation closure",
+      "cross-model conservation",
+      "human brain mechanism",
+      "new foundational mathematics"
+    ]
+  },
+  "data_contract": {
+    "cluster_unit": "latent world containing all eight factorial conditions and both receiver states",
+    "calibration": {
+      "upstream_phase": 1247,
+      "status": "known_truth_imaging_camera_confirmed",
+      "sealed": false
+    },
+    "discovery": {
+      "worlds": 12,
+      "rows": 192,
+      "alphas": [0.25, 0.5],
+      "sealed": false
+    },
+    "selection": {
+      "worlds": 8,
+      "rows": 128,
+      "alpha": 0.75,
+      "sealed": true
+    },
+    "confirmation": {
+      "worlds": 16,
+      "rows": 256,
+      "alpha": 1.0,
+      "new_template_family": true,
+      "sealed": true
+    },
+    "split_rule": "世界为不可拆分集群；同一世界的八条件和两 receiver 状态不得跨分区；确认模板族与发现/选择模板族互斥。",
+    "leakage_audit": [
+      "world_cluster_integrity",
+      "target_donor_changes_gold",
+      "null_donor_preserves_gold",
+      "direct_mapping_irrelevance",
+      "code_mapping_relevance",
+      "balanced_full_codebook_surface",
+      "single_token_candidate_boundary",
+      "confirmation_template_holdout",
+      "confirmation_excluded_from_selection",
+      "source_hash_freeze"
+    ],
+    "answer_payload_rule": "完整代码表在每个 prompt 中等量包含全部八个候选词，不提供目标特异载体；直接词记录中的代码表映射是因果无关控制，代码记录中的映射决定 gold。"
+  },
+  "factor_design": {
+    "axes": {
+      "record_representation": ["direct_word", "numeric_code"],
+      "codebook_mapping": ["identity", "permuted"],
+      "output_interface": ["candidate", "natural_completion"],
+      "receiver_state": [0, 1]
+    },
+    "event_registry": "depths 6,12,18,24; residual at source; attention and MLP output at answer boundary",
+    "projection": "fixed 96-dimensional Rademacher projection",
+    "camera_fit": "discovery alpha 0.25 and 0.5, target plus matched-null donors",
+    "event_selection": "selection alpha 0.75 only",
+    "confirmation": "alpha 1.0 with new templates",
+    "forbidden_posthoc_actions": [
+      "drop_error_samples",
+      "pool_gold_and_response_gates",
+      "confirmation_event_reselection",
+      "change_projection_or_threshold",
+      "select_successful_interface"
+    ]
+  },
+  "controls": [
+    "constant_response",
+    "shuffled_hidden_delta",
+    "hidden_norm_only",
+    "matched_non_target_donor",
+    "direct_mapping_irrelevance",
+    "balanced_full_codebook_surface",
+    "candidate_natural_interface_split",
+    "correct_error_side_ledger",
+    "full_forward_replay",
+    "sign_flip_corruption_sentinel",
+    "out_of_domain_alpha_abstention",
+    "multi_event_nonidentifiability_abstention"
+  ],
+  "metrics": [
+    {
+      "id": "M-QWEN-SELF-RESPONSE",
+      "construct_id": "CON-MODEL-SELF-RESPONSE",
+      "unit": "sample-event-donor-alpha",
+      "estimator": "actual centered eight-candidate logit response with finite and replay audits",
+      "threshold_source": "frozen Phase1248 protocol after Phase1247 calibration"
+    },
+    {
+      "id": "M-QWEN-IMAGING",
+      "construct_id": "CON-HIDDEN-RESPONSE-IMAGING",
+      "unit": "confirmation sample at selected event",
+      "estimator": "cosine, positive direction fraction, relative error and best-baseline advantage",
+      "threshold_source": "frozen Phase1248 protocol"
+    },
+    {
+      "id": "M-QWEN-SPECIFICITY",
+      "construct_id": "CON-INTERVENTION-SPECIFICITY",
+      "unit": "selected event and confirmation partition",
+      "estimator": "target to matched-null actual response norm ratio",
+      "threshold_source": "frozen Phase1248 protocol"
+    },
+    {
+      "id": "M-QWEN-OBSERVABILITY",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "unit": "registered intervention domain and semantic stratum",
+      "estimator": "interface coverage, eligible correct/error strata and explicit out-of-domain abstention",
+      "threshold_source": "frozen Phase1248 protocol"
+    }
+  ],
+  "typed_gates": [
+    {
+      "id": "G-NUMERICAL",
+      "construct_id": "CON-MODEL-SELF-RESPONSE",
+      "required_partitions": ["discovery", "selection", "confirmation"],
+      "rule": "全部候选 logit 有限；独立完整前向重放 top-1 一致率为 1.0，最大 logit 差不超过 0.02。",
+      "authorizes": ["模型自身响应裁决"],
+      "failure_type": "instrument_failure"
+    },
+    {
+      "id": "G-RESPONSE-SIGNAL",
+      "construct_id": "CON-INTERVENTION-SPECIFICITY",
+      "required_partitions": ["confirmation"],
+      "rule": "目标供体实际响应范数均值至少 0.05，目标/matched-null 效应比至少 1.25。",
+      "authorizes": ["对非平凡目标响应拟合相机"],
+      "failure_type": "instrument_failure"
+    },
+    {
+      "id": "G-CAMERA",
+      "construct_id": "CON-HIDDEN-RESPONSE-IMAGING",
+      "required_partitions": ["selection", "confirmation"],
+      "rule": "确认余弦至少 0.60、正方向比例至少 0.80、相对误差至多 0.80、超过最强常数/置乱/范数基线至少 0.25。",
+      "authorizes": ["离线响应结构竞赛"],
+      "failure_type": "predictive_failure"
+    },
+    {
+      "id": "G-INTERFACE",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "required_partitions": ["confirmation"],
+      "rule": "candidate 与 natural-completion 各自余弦至少 0.40、正方向比例至少 0.70，不允许只保留成功接口。",
+      "authorizes": ["把相机限定为双接口有效"],
+      "failure_type": "predictive_failure"
+    },
+    {
+      "id": "G-CORRECT-ERROR",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "required_partitions": ["confirmation"],
+      "rule": "样本量至少 32 的正确或错误分层须分别达到余弦 0.35、正方向比例 0.65；不足 32 的分层必须拒答而非伪造通过。",
+      "authorizes": ["在合格分层内比较错误与正确响应"],
+      "failure_type": "identifiability_failure"
+    },
+    {
+      "id": "G-IDENTIFIABILITY",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "required_partitions": ["confirmation"],
+      "rule": "登记单事件域内接受；alpha>1 与多事件单观测均拒答；符号翻转阳性哨兵造成余弦下降至少 0.5。",
+      "authorizes": ["仅在登记观测合同内解释"],
+      "failure_type": "identifiability_failure"
+    }
+  ],
+  "budget": {
+    "max_gpu_hours": 2,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_world_clusters": 36,
+    "right_censoring_rule": "达到 2 GPU-hours、FP16 数值门失败、CUDA OOM 或实现错误时停止；实现错误可在未生成正式结果前修复并重新冻结，科学门失败不得补跑。"
+  },
+  "stopping_rules": [
+    "独立无模型预审任一项失败则不加载 Qwen3。",
+    "正式结果生成后不得修改材料、事件、阈值、投影或分层资格。",
+    "任一主门失败则不运行结构竞赛或其他模型。",
+    "gold 正确率不授权也不阻止模型自身响应采集。",
+    "确认集不得参与事件选择。",
+    "本合同不自动运行 GLM4 或 DS7B。"
+  ],
+  "adjudication": {
+    "possible_verdicts": [
+      "qwen_model_self_response_atlas_qualified",
+      "bounded_external_validity_failure",
+      "invalid",
+      "censored"
+    ],
+    "failure_claim": "只在 Qwen3-4B FP16、该人工 2x2x2 绑定任务、十二个事件和当前相机中否决外部效度；不反证未来响应商空间或语言机制。",
+    "reopen_condition": "必须产生数学上不同的可观测对象或相机，并前瞻解释本期具体失败门；不得换热点或降低阈值。"
+  },
+  "permissions": {
+    "authorizes_on_pass": [
+      "仅使用既有数组离线比较固定方向、全局线性、条件化线性和拒答模型"
+    ],
+    "forbids_even_on_pass": [
+      "语义机制身份结论",
+      "组件必要性结论",
+      "自然生成闭环",
+      "跨模型结论",
+      "神经元搜索",
+      "新基础数学升级"
+    ],
+    "authorizes_on_failure": [
+      "登记模型自身响应相机的限定负边界",
+      "保留 Phase1247 已知真值相机校准"
+    ],
+    "forbids_on_failure": [
+      "结构竞赛",
+      "换事件重跑",
+      "删除错误样本",
+      "运行其他模型"
+    ]
+  },
+  "audit": {
+    "preaudit_checks": [
+      "factorial_cluster_integrity",
+      "donor_semantics",
+      "mapping_factor_semantics",
+      "balanced_answer_surface",
+      "token_positions",
+      "template_holdout",
+      "camera_partition_freeze",
+      "source_hashes"
+    ],
+    "independent_result_auditor": "tests/glm5/phase1248_c002_qwen_self_response_atlas_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_partitions": true,
+    "audit_must_not_read_narrative_conclusion": true
+  },
+  "execution_sequence": [
+    "preregister_factorial_material",
+    "independent_preaudit_no_model",
+    "load_Qwen3_FP16_CUDA_once",
+    "capture_receiver_target_null_states",
+    "run_registered_single_event_patches",
+    "release_GPU",
+    "sealed_event_selection_and_confirmation",
+    "independent_recomputation",
+    "stop_or_open_offline_structure_contract"
+  ],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C002-WP01-001.manifest.json",
+    "code_paths": [
+      "tests/glm5/phase1248_c002_qwen_self_response_atlas.py",
+      "tests/glm5/phase1248_c002_qwen_self_response_atlas_audit.py"
+    ],
+    "material_paths": [
+      "tests/glm5/result/phase1248_c002_qwen_self_response_atlas/material/frozen_worlds.jsonl",
+      "tests/glm5/result/phase1248_c002_qwen_self_response_atlas/material/qwen3_token_manifest.jsonl"
+    ],
+    "environment_paths": [
+      "tests/glm5/result/phase1248_c002_qwen_self_response_atlas/protocol/preregistration.json",
+      "tests/glm5/result/phase1248_c002_qwen_self_response_atlas/protocol/environment_snapshot.json",
+      "tests/glm5/result/phase1248_c002_qwen_self_response_atlas/audit/independent_preaudit.json",
+      "tests/glm5/result/phase1247_c002_hidden_response_imaging_camera/analysis/final.json",
+      "tests/glm5/result/phase1247_c002_hidden_response_imaging_camera/audit/independent_final_audit.json",
+      "research/ai2050_research_os/schemas/experiment_contract.schema.json"
+    ],
+    "readiness": "run_ready"
+  }
+}

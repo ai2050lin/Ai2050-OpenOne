@@ -1,0 +1,150 @@
+{
+  "phase": 1308,
+  "campaign": "C033",
+  "audit_stage": "pre_model",
+  "created_at_utc": "2026-08-15T12:58:00.570496+00:00",
+  "auditor_imports_main": false,
+  "checks": [
+    {
+      "name": "protocol_digest",
+      "passed": true,
+      "detail": "39276dd31fcbef8ee20c0f2e7ae19e76679a4d986ef181c6d431fe1c40aaa572"
+    },
+    {
+      "name": "source_hashes",
+      "passed": true,
+      "detail": {
+        "main": "ea7e85bf2f9b0fb4343887f97ae226484f069379375e90e17f1b99a8f2304cb1",
+        "auditor": "a6af661e80c99f084e818ca9e3928ca2a64bcdabeb7decb4a92946b535801d24"
+      }
+    },
+    {
+      "name": "parent_authorization",
+      "passed": true,
+      "detail": "Phase1307"
+    },
+    {
+      "name": "thresholds",
+      "passed": true,
+      "detail": {
+        "finite_fraction_min": 1.0,
+        "baseline_accuracy_min": 0.99,
+        "blocked_target_identity_accuracy_max": 0.3,
+        "cross_surface_rescue_accuracy_min": 0.7,
+        "cross_surface_rescue_recovery_fraction_median_min": 0.7,
+        "cross_surface_over_null_margin_ratio_min": 1.25,
+        "pairwise_rescue_win_fraction_min": 0.75,
+        "natural_retention_min": 0.99
+      }
+    },
+    {
+      "name": "fixed_graph",
+      "passed": true,
+      "detail": {
+        "event": "assistant_answer_boundary",
+        "block": 25,
+        "rescue": 26
+      }
+    },
+    {
+      "name": "manifest_count",
+      "passed": true,
+      "detail": 192
+    },
+    {
+      "name": "manifest_hash",
+      "passed": true,
+      "detail": {
+        "sha256": "df146a9c8e6b30bfb6e067b31eac418bd6b578d51789766c94e6fc36a7dd1cb5",
+        "case_count": 192,
+        "partition_counts": {
+          "confirmation": 96,
+          "holdout": 96
+        },
+        "surface_counts": {
+          "catalog_prose": 96,
+          "inventory_ledger": 96
+        }
+      }
+    },
+    {
+      "name": "partition_balance",
+      "passed": true,
+      "detail": {
+        "confirmation": 96,
+        "holdout": 96
+      }
+    },
+    {
+      "name": "surface_balance",
+      "passed": true,
+      "detail": {
+        "catalog_prose": 96,
+        "inventory_ledger": 96
+      }
+    },
+    {
+      "name": "unique_cases",
+      "passed": true,
+      "detail": "unique"
+    },
+    {
+      "name": "opposite_surface",
+      "passed": true,
+      "detail": "opposite"
+    },
+    {
+      "name": "target_pair",
+      "passed": true,
+      "detail": "0->1"
+    },
+    {
+      "name": "correct_delta_identity",
+      "passed": true,
+      "detail": "opposite surface, same identity transition"
+    },
+    {
+      "name": "null_delta_no_gold_change",
+      "passed": true,
+      "detail": "matched-null"
+    },
+    {
+      "name": "wrong_attribute_identity_matched",
+      "passed": false,
+      "detail": "same identity transition, wrong attribute"
+    },
+    {
+      "name": "arms",
+      "passed": true,
+      "detail": [
+        "baseline",
+        "block_only",
+        "correct_cross_surface",
+        "matched_null_cross_surface",
+        "wrong_attribute_cross_surface",
+        "self_retention"
+      ]
+    },
+    {
+      "name": "hard_stops",
+      "passed": true,
+      "detail": [
+        "No discovery partition",
+        "No same-surface rescue fallback",
+        "No new event, depth, donor, component, or threshold",
+        "No second formal model run",
+        "C033 closes after this phase regardless of verdict"
+      ]
+    },
+    {
+      "name": "formal_outputs_absent",
+      "passed": true,
+      "detail": "clear"
+    }
+  ],
+  "passed_count": 17,
+  "total_count": 18,
+  "all_checks_passed": false,
+  "authorization": "none",
+  "protocol_digest": "39276dd31fcbef8ee20c0f2e7ae19e76679a4d986ef181c6d431fe1c40aaa572"
+}

@@ -1,0 +1,163 @@
+{
+  "phase": 1309,
+  "campaign": "C034",
+  "schema_version": "phase1309.c034.typed_response_contract.v1",
+  "purpose": "distinguish generic identity displacement from attribute-typed computation using a multi-readout response family, then test upstream type separation and late convergence in Qwen3",
+  "adjudication": {
+    "accepted": [
+      "C033 executed the full behavior-descriptive-causal-rescue chain but did not close its terminal gate",
+      "C033 established strong local answer-identity manipulation and descriptive cross-surface rescue",
+      "correct and wrong-attribute identity-matched deltas were indistinguishable under the registered answer-identity readout"
+    ],
+    "corrected_overclaims": [
+      "C033 did not prove that the late residual lacks attribute information; it failed to identify such information under the registered intervention/readout family",
+      "C033 did not prove a universal generic-identity operator; shared output displacement remains an alternative",
+      "cross-surface identity rescue was descriptively successful but the registered rescue gate failed",
+      "T=0 denotes failure of one frozen type-selectivity test, not absence of type information in Qwen3",
+      "the full evidential chain was executed, not closed"
+    ]
+  },
+  "known_truth_camera": {
+    "classes": [
+      "generic",
+      "typed",
+      "mixed",
+      "null"
+    ],
+    "single_readout_collision_required": 1.0,
+    "multi_readout_accuracy_required": 1.0,
+    "calibration_sha256": "9f1aeac3d65df3b104ce96925526be832ea84a26320d39c39d81989048420118"
+  },
+  "material": {
+    "source": "C033 frozen controlled-English material; prompts unchanged",
+    "independent_material": false,
+    "pair_count": 576,
+    "state_count": 1152,
+    "partitions": [
+      "discovery",
+      "confirmation",
+      "holdout"
+    ],
+    "attributes": [
+      "color",
+      "material",
+      "location",
+      "size",
+      "shape",
+      "status"
+    ],
+    "surfaces": [
+      "catalog_prose",
+      "inventory_ledger"
+    ],
+    "panels": [
+      "active",
+      "matched_null"
+    ],
+    "material_sha256": "b6e648bb204a0200406f5184097879cc2d15ea51bae262d402c48cada3984a93",
+    "naturalness_sha256": "9f41149ae691ca1243683bc1a7108f7e6bf9a95a96e3215a4072c7b2146c5e06"
+  },
+  "model": {
+    "model_id": "qwen3-4b-fp16-cuda-no-quantization",
+    "compiler": "right_padding",
+    "formal_runs_per_model_phase": 1,
+    "other_models_authorized": false
+  },
+  "behavior": {
+    "thresholds": {
+      "finite_fraction_min": 1.0,
+      "candidate_accuracy_min": 0.98,
+      "partition_accuracy_min": 0.97,
+      "attribute_accuracy_min": 0.96,
+      "surface_accuracy_min": 0.97,
+      "active_pair_success_min": 0.95,
+      "attribute_family_success_min": 0.9,
+      "generation_coverage_min": 0.98,
+      "generation_label_accuracy_min": 0.97,
+      "generation_pair_success_min": 0.93
+    }
+  },
+  "trajectory": {
+    "roles": [
+      "query_end",
+      "answer_boundary"
+    ],
+    "query_depths": [
+      8,
+      14,
+      20,
+      26,
+      32
+    ],
+    "late_comparator": {
+      "role": "answer_boundary",
+      "depth": 26
+    },
+    "candidate_selection": "on discovery only, choose the eligible query_end depth with maximal median type gap; deterministic shallow-depth tie break",
+    "same_attribute": "cosine between identity-aligned active deltas across the two surfaces",
+    "wrong_attribute": "cosine between anchor-surface active delta and opposite-surface next-attribute delta aligned to the same identity transition",
+    "type_gap": "same-attribute cosine minus wrong-attribute cosine",
+    "thresholds": {
+      "finite_fraction_min": 1.0,
+      "behavior_replay_accuracy_min": 0.98,
+      "same_attribute_cross_surface_cosine_median_min": 0.15,
+      "type_gap_median_min": 0.05,
+      "type_gap_positive_fraction_min": 0.65,
+      "active_to_null_norm_ratio_min": 1.1,
+      "upstream_over_late_type_gap_min": 0.05
+    },
+    "confirmation_rule": "selected depth must pass all thresholds separately in confirmation and holdout and exceed each partition's late type gap"
+  },
+  "causal": {
+    "block": "at query_end selected depth, replace target active-state1 with same-target active-state0 residual",
+    "rescue": "at selected depth+1 add opposite-surface correct-attribute active identity1-minus-identity0 delta",
+    "controls": [
+      "block_only",
+      "matched_null_delta",
+      "identity-matched_wrong_attribute_delta",
+      "self_retention"
+    ],
+    "thresholds": {
+      "finite_fraction_min": 1.0,
+      "baseline_accuracy_min": 0.98,
+      "blocked_target_identity_accuracy_max": 0.6,
+      "correct_rescue_accuracy_min": 0.65,
+      "recovery_fraction_median_min": 0.5,
+      "correct_over_null_margin_ratio_min": 1.25,
+      "pairwise_correct_win_fraction_min": 0.7,
+      "natural_retention_min": 0.98
+    },
+    "claim_scope": "upstream attribute-selective local rescue within one Qwen3 model and entity world; not minimal, cross-world, or cross-model"
+  },
+  "branches": {
+    "phase1309_fail": "close_c034_before_model",
+    "phase1309_pass": "phase1310_qwen3_behavior_only",
+    "phase1310_fail": "close_c034_without_hidden",
+    "phase1310_pass": "phase1311_typed_trajectory_only",
+    "phase1311_fail": "close_c034_without_causal",
+    "phase1311_pass": "phase1312_upstream_selective_rescue_only",
+    "phase1312_any_verdict": "close_c034"
+  },
+  "hard_stops": [
+    "No model weights before Phase1309 independent audit passes",
+    "No hidden states before Phase1310 behavior gate passes",
+    "No causal intervention before Phase1311 trajectory gate passes",
+    "No post-unblinding role, depth, metric, donor, threshold, or partition change",
+    "No head, MLP, neuron, or subspace search in C034",
+    "C034 closes after Phase1312 or at the first failed gate"
+  ],
+  "dependencies": {
+    "c033_final": "3ae639c9eb4d9129f899e267138594bb944cd76a4959730d0ac6fcdf235c8c98",
+    "c033_audit": "6cff5d2abe4f0aef6ea55558afb61d4d2ea264aa9fb0aee2efb72b55950867d2",
+    "source_material": "3dd60a5051975449009f89f86f0911dbb24477bdd4691b2c6998b2b118a79a03",
+    "material": "b6e648bb204a0200406f5184097879cc2d15ea51bae262d402c48cada3984a93",
+    "calibration": "9f1aeac3d65df3b104ce96925526be832ea84a26320d39c39d81989048420118"
+  },
+  "source_hashes": {
+    "main": "97750b42095b6619217fce06acd430d3f22e3183b109749b5de3d7ef6ddf90f5",
+    "auditor": "5963e38dd92f03af58c30ad15ee4b3bcff50d2ac1f2cf88357af0b78ace1fc36"
+  },
+  "model_weights_loaded": false,
+  "created_at_utc": "2026-08-15T13:27:14.939749+00:00",
+  "protocol_digest": "b472e047d7c9ed577c76d5006f282725577a27f32116acebaa91a1c5a0f0bed6"
+}

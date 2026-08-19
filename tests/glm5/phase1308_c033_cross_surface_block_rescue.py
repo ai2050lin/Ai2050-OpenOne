@@ -1,0 +1,448 @@
+#!/usr/bin/env python3
+"""Phase1308: terminal cross-surface block/rescue experiment for C033."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import inspect
+import json
+import shutil
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import torch
+
+ROOT = Path(__file__).resolve().parents[2]
+T = ROOT / "tests/glm5"
+sys.path.insert(0, str(T))
+from phase1023_fp16_utils import load_fp16, quantization_audit, release_fp16  # noqa: E402
+
+PHASE = 1308
+CAMPAIGN = "C033"
+SCRIPT = Path(__file__).resolve()
+AUDITOR = T / "phase1308_c033_cross_surface_block_rescue_audit.py"
+PARENT = T / "result/phase1307_c033_bidirectional_answer_boundary_swap"
+HIDDEN = T / "result/phase1306_c033_frozen_answer_boundary_hidden"
+CONTRACT = T / "result/phase1304_c033_role_typed_causal_graph_contract"
+OUT = T / "result/phase1308_c033_cross_surface_block_rescue"
+PROTOCOL = OUT / "protocol/preregistration.json"
+MANIFEST = OUT / "protocol/frozen_rescue_manifest.jsonl"
+PRE = OUT / "audit/independent_preaudit.json"
+POST = OUT / "audit/independent_final_audit.json"
+ARRAYS = OUT / "raw/rescue_arrays.npz"
+META = OUT / "raw/run_metadata.json"
+SUMMARY = OUT / "analysis/rescue_summary.json"
+FINAL = OUT / "analysis/final.json"
+COMPLETE = OUT / "protocol/formal_run_complete.json"
+
+PARTITIONS = ("confirmation", "holdout")
+ATTRS = ("color", "material", "location", "size", "shape", "status")
+SURFACES = ("catalog_prose", "inventory_ledger")
+ARMS = ("baseline", "block_only", "correct_cross_surface", "matched_null_cross_surface", "wrong_attribute_cross_surface", "self_retention")
+EVENT = "assistant_answer_boundary"
+BLOCK_DEPTH = 25
+RESCUE_DEPTH = 26
+BATCH = 4
+EPS = 1e-12
+
+
+def canonical(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
+def digest(value: Any) -> str:
+    return hashlib.sha256(canonical(value).encode()).hexdigest()
+
+
+def sha(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(1024 * 1024):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def load(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def rows(path: Path) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def save(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+
+
+def write_rows(path: Path, values: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="\n") as f:
+        for value in values:
+            f.write(canonical(value) + "\n")
+
+
+def build_manifest() -> list[dict[str, Any]]:
+    source = rows(HIDDEN / "protocol/frozen_hidden_manifest.jsonl")
+    lookup = {
+        (x["partition"], x["profile_index"], x["attribute"], x["surface"], x["panel"]): x
+        for x in source
+    }
+    result = []
+    for partition in PARTITIONS:
+        for profile in range(8):
+            for attribute in ATTRS:
+                for surface in SURFACES:
+                    opposite = SURFACES[1 - SURFACES.index(surface)]
+                    target = lookup[(partition, profile, attribute, surface, "active")]
+                    donor = lookup[(partition, profile, attribute, opposite, "active")]
+                    null = lookup[(partition, profile, attribute, opposite, "matched_null")]
+                    wrong_attribute = lookup[
+                        (partition, profile, ATTRS[(ATTRS.index(attribute) + 1) % len(ATTRS)], opposite, "active")
+                    ]
+                    wrong_state0 = [
+                        state for state in wrong_attribute["states"]
+                        if state["gold_position"] == target["identity_positions"][0]
+                    ]
+                    wrong_state1 = [
+                        state for state in wrong_attribute["states"]
+                        if state["gold_position"] == target["identity_positions"][1]
+                    ]
+                    if len(wrong_state0) != 1 or len(wrong_state1) != 1:
+                        raise RuntimeError("wrong-attribute identity-matched delta is not unique")
+                    result.append(
+                        {
+                            "case_key": f"{partition}|p{profile:02d}|{attribute}|{surface}",
+                            "partition": partition,
+                            "profile_index": profile,
+                            "attribute": attribute,
+                            "target_surface": surface,
+                            "donor_surface": opposite,
+                            "identity_positions": target["identity_positions"],
+                            "target_state0": target["states"][0],
+                            "target_state1": target["states"][1],
+                            "correct_donor_state0": donor["states"][0],
+                            "correct_donor_state1": donor["states"][1],
+                            "null_donor_state0": null["states"][0],
+                            "null_donor_state1": null["states"][1],
+                            "wrong_attribute_state0": wrong_state0[0],
+                            "wrong_attribute_state1": wrong_state1[0],
+                            "donor_keys": {
+                                "target": target["group_id"],
+                                "correct": donor["group_id"],
+                                "matched_null": null["group_id"],
+                                "wrong_attribute": wrong_attribute["group_id"],
+                            },
+                        }
+                    )
+    return result
+
+
+def preregister(force: bool) -> None:
+    parent_final = load(PARENT / "analysis/final.json")
+    parent_audit = load(PARENT / "audit/independent_final_audit.json")
+    contract = load(CONTRACT / "protocol/preregistration.json")
+    if parent_final.get("authorization") != "phase1308_cross_surface_block_rescue_only" or not parent_audit.get("all_checks_passed"):
+        raise RuntimeError("Phase1307 did not authorize Phase1308")
+    frozen = contract["cross_surface_block_rescue"]
+    if frozen["target_surfaces"] != list(SURFACES):
+        raise RuntimeError("surface drift")
+    if OUT.exists() and not force:
+        raise RuntimeError(f"{OUT} already exists")
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    manifest = build_manifest()
+    write_rows(MANIFEST, manifest)
+    timeless = {
+        "phase": PHASE,
+        "campaign": CAMPAIGN,
+        "schema_version": "phase1308.c033.cross_surface_block_rescue.v1",
+        "model": "qwen3-4b-fp16-cuda-no-quantization",
+        "formal_run_budget": 1,
+        "runtime": {"compiler": "right_padding", "global_fixed_length": True, "batch": BATCH},
+        "object": "sequential answer-boundary block at depth25 and opposite-surface delta rescue at depth26",
+        "partitions": list(PARTITIONS),
+        "target_surfaces": list(SURFACES),
+        "event": EVENT,
+        "block_depth": BLOCK_DEPTH,
+        "rescue_depth": RESCUE_DEPTH,
+        "arms": list(ARMS),
+        "manifest": {
+            "sha256": sha(MANIFEST),
+            "case_count": len(manifest),
+            "partition_counts": {p: sum(x["partition"] == p for x in manifest) for p in PARTITIONS},
+            "surface_counts": {s: sum(x["target_surface"] == s for x in manifest) for s in SURFACES},
+        },
+        "block": "replace target active-state1 answer-boundary depth25 residual with same-target active-state0 residual",
+        "rescue": "after block, add opposite-surface active state1-minus-state0 residual at answer-boundary depth26",
+        "controls": {
+            "block_only": "no depth26 delta",
+            "matched_null": "opposite-surface matched-null state1-minus-state0 delta",
+            "wrong_attribute": "opposite-surface next-attribute active state1-minus-state0 delta with the same identity transition",
+            "self_retention": "replace target state1 depth25 residual with its own unmodified depth25 residual",
+        },
+        "readout": "target identity1-minus-identity0 candidate margin",
+        "recovery_fraction": "(correct-rescue margin minus block margin)/(baseline margin minus block margin)",
+        "aggregation": {
+            "cell": "baseline, blocked, and correct-rescue identity gates required separately in each partition x target-surface cell",
+            "global": "pool all cases for recovery median, correct/null ratio, and pairwise rescue wins",
+            "retention": "pool baseline and exact depth25 self replacement",
+        },
+        "thresholds": frozen["thresholds"],
+        "success_authorization": "close_c033_with_cross_surface_rescue_candidate",
+        "failure_authorization": "close_c033_at_rescue_boundary",
+        "claim_scope": frozen["claim_scope"],
+        "hard_stops": [
+            "No discovery partition",
+            "No same-surface rescue fallback",
+            "No new event, depth, donor, component, or threshold",
+            "No second formal model run",
+            "C033 closes after this phase regardless of verdict",
+        ],
+        "engineering_correction": {
+            "status": "pre-model semantic-control correction",
+            "invalid_attempt_archive": "tests/glm5_temp/phase1308_invalid_preaudit_identity_direction_20260815",
+            "reason": "the first draft used next-attribute binding-state order, which the independent preaudit showed reversed the intended identity transition in 192/192 cases",
+            "repair": "order the next-attribute pair by the target identity0-to-identity1 transition; no model weights were loaded and the formal run budget remained unconsumed",
+        },
+        "dependencies": {
+            "parent_protocol": sha(PARENT / "protocol/preregistration.json"),
+            "parent_manifest": sha(PARENT / "protocol/frozen_swap_manifest.jsonl"),
+            "parent_final": sha(PARENT / "analysis/final.json"),
+            "parent_audit": sha(PARENT / "audit/independent_final_audit.json"),
+            "hidden_manifest": sha(HIDDEN / "protocol/frozen_hidden_manifest.jsonl"),
+            "contract": sha(CONTRACT / "protocol/preregistration.json"),
+            "manifest": sha(MANIFEST),
+        },
+        "source_hashes": {"main": sha(SCRIPT), "auditor": sha(AUDITOR)},
+        "model_weights_loaded": False,
+    }
+    protocol = {
+        **timeless,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "protocol_digest": digest(timeless),
+    }
+    save(PROTOCOL, protocol)
+    print(canonical({"cases": len(manifest), "digest": protocol["protocol_digest"]}))
+
+
+def make_batch(states: list[dict[str, Any]], raw_max: int, pad: int, device: torch.device):
+    ids = torch.full((len(states), raw_max), pad, dtype=torch.long, device=device)
+    mask = torch.zeros_like(ids)
+    for i, state in enumerate(states):
+        n = len(state["ids"])
+        ids[i, :n] = torch.tensor(state["ids"], dtype=torch.long, device=device)
+        mask[i, :n] = 1
+    return ids, mask, mask.cumsum(-1) - 1
+
+
+def candidate_scores(model: Any, hidden: torch.Tensor, candidate_ids: list[int]) -> torch.Tensor:
+    ids = torch.tensor(candidate_ids, dtype=torch.long, device=hidden.device)
+    return model.lm_head.weight[ids] @ model.model.norm(hidden)
+
+
+def summarize(margins: np.ndarray, answers: np.ndarray, metadata: list[dict[str, Any]], th: dict[str, float]):
+    baseline = margins[:, 0]
+    blocked = margins[:, 1]
+    correct = margins[:, 2]
+    null = margins[:, 3]
+    wrong = margins[:, 4]
+    correct_gain = correct - blocked
+    null_gain = null - blocked
+    wrong_gain = wrong - blocked
+    denominator = baseline - blocked
+    recovery = correct_gain / np.where(np.abs(denominator) > EPS, denominator, np.nan)
+    cells = {}
+    for partition in PARTITIONS:
+        cells[partition] = {}
+        for surface in SURFACES:
+            indices = [i for i, x in enumerate(metadata) if x["partition"] == partition and x["target_surface"] == surface]
+            cells[partition][surface] = {
+                "baseline_accuracy": float(np.mean(answers[indices, 0])),
+                "blocked_target_identity_accuracy": float(np.mean(answers[indices, 1])),
+                "correct_rescue_accuracy": float(np.mean(answers[indices, 2])),
+                "self_retention_accuracy": float(np.mean(answers[indices, 5])),
+            }
+    metrics = {
+        "baseline_accuracy": float(np.mean(answers[:, 0])),
+        "blocked_target_identity_accuracy": float(np.mean(answers[:, 1])),
+        "correct_rescue_accuracy": float(np.mean(answers[:, 2])),
+        "self_retention_accuracy": float(np.mean(answers[:, 5])),
+        "correct_rescue_gain_median": float(np.median(correct_gain)),
+        "matched_null_gain_median": float(np.median(null_gain)),
+        "wrong_attribute_gain_median": float(np.median(wrong_gain)),
+        "recovery_fraction_median": float(np.nanmedian(recovery)),
+        "valid_recovery_fraction": float(np.mean(np.isfinite(recovery))),
+        "cross_surface_over_null_margin_ratio": float(np.median(correct_gain)) / max(abs(float(np.median(null_gain))), EPS),
+        "pairwise_rescue_win_fraction": float(np.mean(correct_gain > np.maximum(null_gain, wrong_gain))),
+        "natural_retention": float(np.mean(answers[:, [0, 5]])),
+    }
+    gates = {
+        "finite": bool(np.isfinite(margins).all()),
+        "recovery_defined": metrics["valid_recovery_fraction"] == 1.0,
+        "recovery": metrics["recovery_fraction_median"] >= th["cross_surface_rescue_recovery_fraction_median_min"],
+        "null_ratio": metrics["cross_surface_over_null_margin_ratio"] >= th["cross_surface_over_null_margin_ratio_min"],
+        "pairwise_win": metrics["pairwise_rescue_win_fraction"] >= th["pairwise_rescue_win_fraction_min"],
+        "natural_retention": metrics["natural_retention"] >= th["natural_retention_min"],
+    }
+    for partition in PARTITIONS:
+        for surface in SURFACES:
+            cell = cells[partition][surface]
+            prefix = f"{partition}_{surface}"
+            gates[f"{prefix}_baseline"] = cell["baseline_accuracy"] >= th["baseline_accuracy_min"]
+            gates[f"{prefix}_blocked"] = cell["blocked_target_identity_accuracy"] <= th["blocked_target_identity_accuracy_max"]
+            gates[f"{prefix}_rescue"] = cell["correct_rescue_accuracy"] >= th["cross_surface_rescue_accuracy_min"]
+            gates[f"{prefix}_self"] = cell["self_retention_accuracy"] >= th["natural_retention_min"]
+    return {"metrics": metrics, "cells": cells, "gates": gates, "all_gates_passed": all(gates.values())}
+
+
+@torch.inference_mode()
+def run() -> None:
+    protocol = load(PROTOCOL)
+    pre = load(PRE)
+    if pre.get("authorization") != "run_phase1308_once" or not pre.get("all_checks_passed"):
+        raise RuntimeError("independent preaudit did not authorize the run")
+    if any(path.exists() for path in (ARRAYS, META, SUMMARY, FINAL, COMPLETE)):
+        raise RuntimeError("formal run budget already consumed")
+    manifest = rows(MANIFEST)
+    model = None
+    started = time.time()
+    try:
+        model, tokenizer, device, placement = load_fp16("qwen3")
+        qa = quantization_audit(model)
+        if qa["has_quantized_modules"] or not qa["has_fp16_parameters"]:
+            raise RuntimeError(qa)
+        state_keys = (
+            "target_state0", "target_state1", "correct_donor_state0", "correct_donor_state1",
+            "null_donor_state0", "null_donor_state1", "wrong_attribute_state0", "wrong_attribute_state1",
+        )
+        raw_max = max(len(x[key]["ids"]) for x in manifest for key in state_keys)
+        pad = int(tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id)
+        supports = "logits_to_keep" in inspect.signature(model.forward).parameters
+        margins = np.empty((len(manifest), len(ARMS)), dtype=np.float32)
+        answers = np.empty((len(manifest), len(ARMS)), dtype=np.bool_)
+        layer25 = model.model.layers[BLOCK_DEPTH]
+        layer26 = model.model.layers[RESCUE_DEPTH]
+
+        for start in range(0, len(manifest), BATCH):
+            group = manifest[start:start + BATCH]
+            reference_states = [x[key] for x in group for key in state_keys]
+            rids, rmask, rpos = make_batch(reference_states, raw_max, pad, device)
+            rkw = {"input_ids": rids, "attention_mask": rmask, "position_ids": rpos,
+                   "use_cache": False, "output_hidden_states": True, "return_dict": True}
+            if supports:
+                rkw["logits_to_keep"] = 1
+            reference_out = model(**rkw)
+            blocks = []
+            selfs = []
+            correct_deltas = []
+            null_deltas = []
+            wrong_deltas = []
+            for local, x in enumerate(group):
+                states = reference_states[8 * local:8 * local + 8]
+                event_positions = [state["position"] for state in states]
+                h25 = [reference_out.hidden_states[BLOCK_DEPTH][8 * local + i, event_positions[i]].clone() for i in range(2)]
+                h26 = [reference_out.hidden_states[RESCUE_DEPTH][8 * local + i, event_positions[i]].clone() for i in range(2, 8)]
+                blocks.append(h25[0])
+                selfs.append(h25[1])
+                correct_deltas.append(h26[1] - h26[0])
+                null_deltas.append(h26[3] - h26[2])
+                wrong_deltas.append(h26[5] - h26[4])
+            del reference_out
+
+            target_states = []
+            block_rows = []
+            block_positions = []
+            block_vectors = []
+            rescue_rows = []
+            rescue_positions = []
+            rescue_vectors = []
+            for local, x in enumerate(group):
+                base = len(target_states)
+                target_states.extend([x["target_state1"]] * len(ARMS))
+                for arm_i in (1, 2, 3, 4):
+                    block_rows.append(base + arm_i)
+                    block_positions.append(x["target_state1"]["position"])
+                    block_vectors.append(blocks[local])
+                block_rows.append(base + 5)
+                block_positions.append(x["target_state1"]["position"])
+                block_vectors.append(selfs[local])
+                for arm_i, vector in ((2, correct_deltas[local]), (3, null_deltas[local]), (4, wrong_deltas[local])):
+                    rescue_rows.append(base + arm_i)
+                    rescue_positions.append(x["target_state1"]["position"])
+                    rescue_vectors.append(vector)
+            tids, tmask, tpos = make_batch(target_states, raw_max, pad, device)
+            br = torch.tensor(block_rows, dtype=torch.long, device=device)
+            bp = torch.tensor(block_positions, dtype=torch.long, device=device)
+            bv = torch.stack(block_vectors)
+            rr = torch.tensor(rescue_rows, dtype=torch.long, device=device)
+            rp = torch.tensor(rescue_positions, dtype=torch.long, device=device)
+            rv = torch.stack(rescue_vectors)
+
+            def block_hook(_module: Any, args: tuple[Any, ...]):
+                hidden = args[0].clone()
+                hidden[br, bp] = bv
+                return (hidden,) + args[1:]
+
+            def rescue_hook(_module: Any, args: tuple[Any, ...]):
+                hidden = args[0].clone()
+                hidden[rr, rp] = hidden[rr, rp] + rv
+                return (hidden,) + args[1:]
+
+            handle25 = layer25.register_forward_pre_hook(block_hook)
+            handle26 = layer26.register_forward_pre_hook(rescue_hook)
+            try:
+                tkw = {"input_ids": tids, "attention_mask": tmask, "position_ids": tpos,
+                       "use_cache": False, "output_hidden_states": True, "return_dict": True}
+                if supports:
+                    tkw["logits_to_keep"] = 1
+                target_out = model(**tkw)
+            finally:
+                handle26.remove()
+                handle25.remove()
+            final_hidden = target_out.hidden_states[-1]
+            for local, x in enumerate(group):
+                base = len(ARMS) * local
+                identity0, identity1 = x["identity_positions"]
+                for arm_i in range(len(ARMS)):
+                    scores = candidate_scores(model, final_hidden[base + arm_i, x["target_state1"]["position"]],
+                                              x["target_state1"]["candidate_ids"])
+                    margins[start + local, arm_i] = float((scores[identity1] - scores[identity0]).float().item())
+                    answers[start + local, arm_i] = int(torch.argmax(scores).item()) == identity1
+            del target_out
+
+        metadata = [{"case_key": x["case_key"], "partition": x["partition"], "profile_index": x["profile_index"],
+                     "attribute": x["attribute"], "target_surface": x["target_surface"],
+                     "donor_surface": x["donor_surface"]} for x in manifest]
+        analysis = summarize(margins, answers, metadata, protocol["thresholds"])
+        authorization = "close_c033_with_cross_surface_rescue_candidate" if analysis["all_gates_passed"] else "close_c033_at_rescue_boundary"
+        ARRAYS.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(ARRAYS, identity1_minus_identity0_margin=margins, target_identity_correct=answers)
+        save(META, {"phase": PHASE, "campaign": CAMPAIGN, "protocol_digest": protocol["protocol_digest"],
+                    "array_sha256": sha(ARRAYS), "manifest_sha256": sha(MANIFEST), "model_audit": qa,
+                    "placement": placement, "runtime_seconds": time.time() - started,
+                    "cuda_peak_allocated_bytes": torch.cuda.max_memory_allocated() if torch.cuda.is_available() else 0,
+                    "case_metadata": metadata})
+        save(SUMMARY, {**analysis, "phase": PHASE, "campaign": CAMPAIGN, "authorization": authorization})
+        save(FINAL, {"phase": PHASE, "campaign": CAMPAIGN,
+                     "verdict": "cross_surface_rescue_qualified" if analysis["all_gates_passed"] else "cross_surface_rescue_gate_failed",
+                     "all_gates_passed": analysis["all_gates_passed"], "authorization": authorization,
+                     "c033_closed": True, "protocol_digest": protocol["protocol_digest"]})
+        save(COMPLETE, {"completed_at_utc": datetime.now(timezone.utc).isoformat(), "formal_runs_consumed": 1,
+                        "protocol_digest": protocol["protocol_digest"]})
+        print(canonical({"gates": analysis["gates"], "authorization": authorization}))
+    finally:
+        if model is not None:
+            release_fp16(model)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=("preregister", "run"))
+    parser.add_argument("--force", action="store_true")
+    args = parser.parse_args()
+    preregister(args.force) if args.command == "preregister" else run()

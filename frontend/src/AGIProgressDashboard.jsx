@@ -120,7 +120,7 @@ export const AGIProgressDashboard = () => {
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <TrendingUp className="text-blue-400" />
-            AGI 研究进度中心
+            语言机制研究进度中心
           </h1>
           <div className="text-xs text-zinc-500 flex items-center gap-1">
             <Clock size={12} />
@@ -131,7 +131,7 @@ export const AGIProgressDashboard = () => {
           </div>
         </div>
         <p className="text-sm text-zinc-400">
-          三条主线：结构分析、路线验证、进度治理。
+          当前基线：Phase 1236 / C001-WP00。结构发现、行为资格、因果闭合与工程状态分别记账。
         </p>
       </div>
 
@@ -228,7 +228,7 @@ export const AGIProgressDashboard = () => {
         <section>
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <CheckCircle2 className="text-emerald-400" size={18} />
-            真实 LLM 验证结果
+            历史曲率演示（非当前机制证据）
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* GPT-2 验证结果 */}
@@ -236,7 +236,7 @@ export const AGIProgressDashboard = () => {
               <div className="flex items-center justify-between mb-3">
                 <span className="font-semibold text-white">GPT-2 Small</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/20 text-green-300 border border-green-500/30">
-                  已验证
+                  历史记录
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
@@ -267,7 +267,7 @@ export const AGIProgressDashboard = () => {
               <div className="flex items-center justify-between mb-3">
                 <span className="font-semibold text-white">Qwen2.5-0.5B</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  已验证
+                  历史记录
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
@@ -296,19 +296,19 @@ export const AGIProgressDashboard = () => {
 
           {/* 分析结论 */}
           <div className="mt-4 p-4 rounded-xl border border-white/10 bg-zinc-900/40">
-            <div className="text-sm font-semibold text-zinc-200 mb-2">关键发现</div>
+            <div className="text-sm font-semibold text-zinc-200 mb-2">证据边界</div>
             <ul className="text-xs text-zinc-400 space-y-1.5">
               <li className="flex items-start gap-2">
                 <span className="text-green-400 mt-0.5">•</span>
-                <span>两个模型的曲率都在 ~0.01 级别，大规模模型的激活流形非常平坦</span>
+                <span>这些数值来自早期演示口径，未进入 C001 当前不可变证据注册表。</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-400 mt-0.5">•</span>
-                <span>Qwen 曲率略低于 GPT-2，更大的模型可能有更平滑的表示空间</span>
+                <span>不能由两个模型的局部估计推出“模型越大表示空间越平滑”的尺度规律。</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-violet-400 mt-0.5">•</span>
-                <span>验证了理论预测：真实 LLM 的几何特性与理论模型一致</span>
+                <span>曲率读数不能证明流形理论、NFB 或完整语言数学结构；当前理论扩张保持冻结。</span>
               </li>
             </ul>
           </div>

@@ -24,88 +24,88 @@ const RESEARCH_STAGES = [
     shift: '从寻找静态坐标转向追踪条件化计算过程。',
   },
   {
-    id: 'behavior-gates',
-    phase: 'Phase 1107-1125',
-    title: '自然语义行为门',
-    objective: '用 WordNet 四象限、形容词双正交材料和受控训练区分行为能力、线性可读与真实使用。',
-    result: '形容词双正交行为在三模型中稳定通过；自然语境义项方向与定义方向的固定物理桥在 0/3 模型中闭合。',
-    shift: '确立“先行为、后内部；可读不等于使用”的证据顺序。',
+    id: 'behavior-and-instrument',
+    phase: 'Phase 1107-1140',
+    title: '行为门、仪器资格与序列路径',
+    objective: '先确认模型稳定执行目标行为，再校准数值、材料、同路径干预和多 token 决策相机。',
+    result: '建立了“可读不等于使用”和同路径身份等价标准；后半程状态可搬运性增强得到同族重复，但没有统一充分状态。',
+    shift: '从固定方向读取转向有明确行为对象、位置合同和执行等价的状态转移实验。',
   },
   {
-    id: 'instrument',
-    phase: 'Phase 1126-1134',
-    title: '数值、路线与材料资格',
-    objective: '排除 FP16 溢出、运行路径和材料质量对机制结论的污染。',
-    result: '定位 GLM4、DS7B 数值问题，建立模型与材料入口契约，并形成时效关系反事实研究对象。',
-    shift: '确认数值健康和研究对象资格都是机制实验的前置门。',
+    id: 'known-truth-cameras',
+    phase: 'Phase 1151-1201',
+    title: '已知真值相机与因果联盟校准',
+    objective: '在机制真值可知的网络中检验算法能否识别双路径、冗余、协同、形成事件、响应商和救援结构。',
+    result: '相机能够识别部分已知真值结构，也系统暴露学习后外部效度、组合泛化、长时身份和粗联盟救援的失败边界。',
+    shift: '确认真正可迁移的对象应是条件化未来响应与功能等价类，而非固定坐标或单点热点。',
   },
   {
-    id: 'temporal-binding',
-    phase: 'Phase 1135-1138',
-    title: '时效绑定与状态跃迁',
-    objective: '用四状态反事实与整残差替换定位答案状态何时获得可搬运性。',
-    result: 'Qwen3-4B 的行为在 Qwen3-14B 同族复验；两个尺寸均在相对深度 0.6-0.7 出现可搬运性增强，但没有共同通过的充分深度。',
-    shift: '研究对象从“语义方向”推进到“状态转移与充分性”。',
+    id: 'functional-objects',
+    phase: 'Phase 1202-1228',
+    title: '功能商、类型化行为与原子对象',
+    objective: '把对象—属性绑定、操作行为、生成时间和内部响应拆成可分别授权的功能对象。',
+    result: '获得五个行为原子和若干局部 Qwen3 因果拼图，同时证明单点答案边界、固定数值域和教师强制相机都存在明确适用边界。',
+    shift: '从“某层是什么”转向“同一功能在不同条件和读出下保持哪些可观测关系”。',
   },
   {
-    id: 'matched-path',
-    phase: 'Phase 1139',
-    title: '同路径插值校准',
-    objective: '消除跨批次执行漂移，并判断后半程状态变化是平滑调制还是相变。',
-    result: 'live-state 同路径插值使 α=0 漂移精确为零；深度 0.7 是强调制 donor，但约三成样本不足以翻转答案。',
-    shift: '任何因果结论必须先通过身份等价和执行路径等价。',
+    id: 'typed-generation',
+    phase: 'Phase 1229-1235',
+    title: '程序可识别行为门与七读出边界',
+    objective: '用去答案载荷、非双射世界、密封材料和七种读出区分内容选择、格式服从与自然生成。',
+    result: 'Phase1235 四门为 (1,0,1,1)：候选评分、固定句式和自然内容稳定，严格短字符串合同失败；总门因此为 0。',
+    shift: '同一对象的行为必须记为类型化响应向量，不能再用一个总准确率或“知道但说不出”替代机制分析。',
   },
   {
-    id: 'sequence-alignment',
-    phase: 'Phase 1140',
-    title: '多 token 决策路径对齐',
-    objective: '修复“单点补丁”与“序列级候选评分”之间的位置错配。',
-    result: '覆盖 candidate prediction span 后，12/12 条共享前缀曲线被恢复；统一充分状态仍未获得双模型授权。',
-    shift: '下一干预目标转向候选首次分叉的真实决策边界。',
+    id: 'research-os-wp00',
+    phase: 'Phase 1236 · C001-WP00',
+    title: '全局结构辨识研究操作系统',
+    objective: '停止围绕局部热点无限续写 Phase，把证据、假说、对象、构念、测试、裁决和权限编译成机器可拒绝的系统。',
+    result: 'WP00 校验通过；9 个假说、14 个拼图、13 类测试、14 条关键证据、2 个对象和 4 个构念已登记。WP01 合同已预注册但 run_ready=false。',
+    shift: 'Phase 只保留为执行批次，科学主线改为响应张量、候选机制竞赛、主动实验和封存裁决。',
   },
 ];
 
 const CONFIRMED = [
   '项目测试中的语言信息更符合上下文条件化、分布式展开的过程，而不是一个跨材料固定不变的执行向量。',
-  '输出表现为候选竞争；表示、控制、执行与最终生成必须分别记账。',
-  'Qwen3-4B 与 Qwen3-14B 在时效绑定任务上重复出现后半程状态可搬运性增强。',
-  '同路径 α=0 校准可以消除自补丁漂移，说明干预仪器必须先验证身份等价。',
-  '共享首 token 的候选需要覆盖其预测路径，答案开头并不总是唯一决策位置。',
+  '内容选择、严格格式、自然完整生成和停止缓存属于不同构念，必须分别取证和授权。',
+  'Phase1235 在 96 个 axis-world 上确认：完整候选排序稳定不蕴含所有字符串读出合同稳定。',
+  'K210 支持类型化行为响应边界，但明确不支持隐藏内容模块或生成编译模块主张。',
+  'C001-WP00 已把关键证据和权限迁移为可校验注册表，能够阻止从局部正结果越权启动内部扫描。',
 ];
 
 const NOT_CONFIRMED = [
   '尚未找到跨模型、跨任务稳定成立的最小计算单元或语言编码不变量。',
-  '相对深度 0.6-0.7 的跃迁不等于存在统一语义层，也不等于完整机制已经形成。',
-  '整残差 donor 没有同时获得必要性、充分性、特异性、预测性与跨材料重复。',
-  '当前结果不能直接外推到所有大模型，更不能直接证明人脑采用相同编码机制。',
-  '真实生成闭合、精确修改控制和完整智能理论仍未完成。',
+  '没有在当前合格自然对象上获得 hidden、attention、head、MLP、neuron、必要性、救援或中介证据。',
+  'WP00 工程闭合不等于 WP01 科学实验通过；当前 run_ready=false，模型运行数为 0。',
+  '人工英语 registry 和单模型 Qwen3 结果不能外推到开放语言、其他模型或人脑编码机制。',
+  '真实生成闭合、跨模型功能同构、精确修改控制和完整智能理论均未完成。',
 ];
 
 const FORMULAS = [
   {
-    label: '四状态绑定效应',
-    formula: 'I_bind = 1/2 [(m_orig,post - m_orig,pre) - (m_swap,post - m_swap,pre)]',
-    note: '消除候选静态偏好、时间方向偏好和档案格式偏好。',
+    label: '类型化行为向量',
+    formula: 'b(x,q) = (B_choice, B_bare-score, B_trie, B_bare, B_cued, B_sentence, B_natural)',
+    note: '同一内容查询在七种读出合同中分别记账，不把异质成功和失败压成一个分数。',
   },
   {
-    label: '自然状态转移',
-    formula: 'X_(l+1) = F_l(X_l; q, c, Θ)',
-    note: '研究重点是状态如何在条件 q、上下文 c 和参数 Θ 下逐层变化。',
+    label: 'Phase1235 类型门',
+    formula: 'G_1235 = G_program ∧ G_candidate ∧ G_short ∧ G_sentence ∧ G_natural = 0',
+    note: '实测核心四门为 (1,0,1,1)，冻结合取失败，因此不能追溯授权 hidden。',
   },
   {
-    label: '同路径干预响应',
-    formula: 'ρ_l(α) = M(F_>l((1-α)X_l^a + αX_l^b))',
-    note: '在同一执行路径内插值状态，并测量候选 margin 或生成结果。',
+    label: '未来响应候选对象',
+    formula: 'R_T(H_e) = { Q(F_≥e(do(I), H_e)) - Q(F_≥e(H_e)) }_(I,Q)',
+    note: '这是下一阶段候选测量对象，当前尚未获准采集，不能写成已经发现的内部结构。',
   },
   {
-    label: '机制边闭合门',
-    formula: 'E_(u→v) = I ∧ S ∧ N ∧ C ∧ P ∧ R',
-    note: '身份等价、充分性、必要性、特异性、独立预测和跨材料重复必须同时成立。',
+    label: 'WP01 运行权限',
+    formula: 'Authorize_run ⇔ contract_frozen ∧ material_audit ∧ leakage_controls ∧ environment_manifest ∧ independent_audit',
+    note: '任一先决项未通过，机器必须保持 run_ready=false。',
   },
 ];
 
 export const ResearchProgressTab = () => {
-  const [activeStage, setActiveStage] = useState('sequence-alignment');
+  const [activeStage, setActiveStage] = useState('research-os-wp00');
   const selectedStage = RESEARCH_STAGES.find((stage) => stage.id === activeStage);
 
   return (
@@ -113,7 +113,7 @@ export const ResearchProgressTab = () => {
       <header className="research-progress__header">
         <div>
           <span>CURRENT RESEARCH · PHASE {CURRENT_RESEARCH_STATE.phase}</span>
-          <h1>从静态表征搜索转向条件化状态转移</h1>
+          <h1>从局部 Phase 转向全局结构辨识战役</h1>
           <p>{CURRENT_RESEARCH_STATE.summary}</p>
         </div>
         <div className="research-progress__verdict">
@@ -126,7 +126,7 @@ export const ResearchProgressTab = () => {
       <section className="research-progress__section">
         <div className="research-progress__heading">
           <Route size={19} />
-          <div><h2>六阶段推进逻辑</h2><p>点击阶段查看目标、结果和方法论转换。</p></div>
+          <div><h2>七阶段推进逻辑</h2><p>点击阶段查看目标、结果和方法论转换。</p></div>
         </div>
         <div className="research-progress__stages">
           {RESEARCH_STAGES.map((stage) => {
@@ -173,7 +173,7 @@ export const ResearchProgressTab = () => {
         <Crosshair size={23} />
         <div>
           <span>NEXT FALSIFIABLE TARGET</span>
-          <h2>候选首次分叉决策边界</h2>
+          <h2>WP01 无模型冻结与反泄漏预审计</h2>
           <p>{CURRENT_RESEARCH_STATE.nextTask}</p>
         </div>
         <FlaskConical size={20} />

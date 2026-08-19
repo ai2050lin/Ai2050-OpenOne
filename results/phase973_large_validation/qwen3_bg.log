@@ -1,0 +1,35 @@
+[01:51:28] Phase 973 started
+[01:51:28] 
+============================================================
+Phase 973: Qwen3
+============================================================
+[model_utils] Loading qwen3... (8bit=False)
+[model_utils] qwen3 loaded, device=cuda:0, class=Qwen3ForCausalLM, GPU=8.10GB
+[01:51:42]   Qwen3ForCausalLM, 36L
+[01:51:42]   Task 2: Qwen3 high-b test (b in [20,25,30,35])...
+[01:51:51]     b=20: clean=1/10  eos=3/10
+[01:51:54]     b=25: clean=5/10  eos=9/10
+[01:51:57]     b=30: clean=6/10  eos=10/10
+[01:52:00]     b=35: clean=6/10  eos=10/10
+[01:52:00]   Task 2 done (19s)
+[01:52:00]   Task 3: Gap distribution analysis (50 prompts)...
+[01:52:02]     Gap stats: mean=21.45  std=2.32  min=17.97  max=27.78  median=20.94
+[01:52:02]     Quartiles: Q25=19.93  Q50=20.94  Q75=22.48
+[01:52:02]     Lowest gap (easiest):
+[01:52:02]       'Ice is': gap=17.97  top1=' a'
+[01:52:02]       'Stars are': gap=18.09  top1=' born'
+[01:52:02]       'Gold is a': gap=18.20  top1=' precious'
+[01:52:02]       'Diamonds are': gap=18.27  top1=' the'
+[01:52:02]       'Whales are': gap=18.84  top1=' the'
+[01:52:02]     Highest gap (hardest):
+[01:52:02]       'The alphabet has': gap=25.35  top1=' '
+[01:52:02]       'Water boils at': gap=25.65  top1=' '
+[01:52:02]       'Tokyo is the capital of': gap=26.06  top1=' Japan'
+[01:52:02]       'A triangle has': gap=27.37  top1=' sides'
+[01:52:02]       'A square has': gap=27.78  top1=' a'
+[01:52:02]   Task 3 done (2s)
+[01:52:02] 
+  Qwen3 total: 20s (0.3 min)
+[model_utils] GPU memory released, allocated=8.11 GB
+[01:52:02] 
+Phase 973 complete!

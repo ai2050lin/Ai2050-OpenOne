@@ -1,0 +1,117 @@
+[
+  {
+    "id": "COR-WP00-001",
+    "date": "2026-08-11",
+    "status": "active",
+    "target_type": "evidence_source",
+    "target_ids": [
+      "K190",
+      "K191",
+      "K192",
+      "K193",
+      "K194",
+      "K195",
+      "K196",
+      "K197",
+      "K198",
+      "K199",
+      "K200",
+      "K203",
+      "K210"
+    ],
+    "problem": "初始迁移引用不存在的 ../upload 路径，导致 validate 失败 13 项。",
+    "correction": "证据改为引用 PHREC 复合记录；PHREC 再引用 Git blob 固定的真实 Memo 来源。",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-WP00-002",
+    "date": "2026-08-11",
+    "status": "active",
+    "target_type": "phase_identity",
+    "target_ids": [
+      "phases.json"
+    ],
+    "problem": "整数 Phase 在历史中存在重复，不能作为机器唯一主键。",
+    "correction": "新增 record_id；phase 和 phase_label 仅作为显示字段，允许相同标签出现多次。",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-WP01-001",
+    "date": "2026-08-12",
+    "status": "active",
+    "target_type": "preauthorization_material",
+    "target_ids": [
+      "EXP-C001-WP01-001"
+    ],
+    "problem": "The first no-model material draft covered only 10 of 12 gold-slot by name-world cells.",
+    "correction": "No weights were loaded; the draft was quarantined and all 512 worlds were regenerated with complete blockwise name-world rotation before the passing 35/35 preaudit.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-WP01-002",
+    "date": "2026-08-12",
+    "status": "active",
+    "target_type": "run_authorization_wrapper",
+    "target_ids": [
+      "EXP-C001-WP01-001",
+      "RUN-EXP-C001-WP01-001-001"
+    ],
+    "problem": "The wrapper passed a contract ID where researchctl expected a manifest path and decoded UTF-8 output using the host code page.",
+    "correction": "Before loading weights, the wrapper was fixed to pass the frozen manifest path with explicit UTF-8 decoding; validation and manifest verification then passed.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-WP01-003",
+    "date": "2026-08-12",
+    "status": "active",
+    "target_type": "adjudicated_readiness_state",
+    "target_ids": [
+      "EXP-C001-WP01-001"
+    ],
+    "problem": "The schema allowed adjudicated readiness, but the validator requires contract readiness=run_ready whenever the index retains historical run_ready=true.",
+    "correction": "The contract keeps run_ready as historical authorization while status and manifest readiness carry the terminal adjudicated state.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-C002-WP01-001",
+    "date": "2026-08-12",
+    "status": "active",
+    "target_type": "independent_preaudit_implementation",
+    "target_ids": [
+      "EXP-C002-WP01-001"
+    ],
+    "problem": "The independent preaudit initially lacked the standard-library re import and stopped before any model was loaded or formal result was created.",
+    "correction": "The missing import was added, the protocol and manifest were regenerated and frozen, and the independent preaudit then passed 24/24 before the single authorized FP16 CUDA run.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-C010-001",
+    "date": "2026-08-13",
+    "status": "active",
+    "target_type": "evidence_grade",
+    "target_ids": ["K218"],
+    "problem": "K218 was labeled E3-KT even though freely trained task/endpoint truth does not expose internal mechanism truth.",
+    "correction": "K218 is regraded E3-CONTROLLED-FREE. Its 4/6 causal breadth result is preserved, but it is not known-mechanism truth.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-C010-002",
+    "date": "2026-08-13",
+    "status": "active",
+    "target_type": "metric_interpretation",
+    "target_ids": ["K219", "EXP-C009-WP01-001"],
+    "problem": "The Phase1256 wrong-donor cosine near 0.5 was treated as independent identity evidence, but shared-base one-hot category changes have cosine exactly one half.",
+    "correction": "The frozen verdict is preserved because matched null already failed; future identity tests use direct target-versus-wrong contrast, and wrong cosine remains diagnostic only.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-C012-001",
+    "date": "2026-08-13",
+    "status": "active",
+    "target_type": "metric_interpretation",
+    "target_ids": ["K225", "EXP-C012-WP01-001"],
+    "problem": "Phase1261 path rescue subtracts mediator_prediction and immediately adds the identical tensor back. Its correct-rescue error is therefore an algebraic replay, not independent mediation evidence.",
+    "correction": "The frozen C012 failure verdict and factorial/type boundary are preserved. G-PATH is narrowed to handoff, block and wrong-donor diagnostics; the correct replay contributes zero evidence. C013 requires rescue estimated on an independent donor fold and records exact replay only as a leakage sentinel.",
+    "preserves_original_claim": true
+  }
+]

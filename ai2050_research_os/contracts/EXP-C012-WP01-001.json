@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C012-WP01-001",
+  "campaign_id": "C012",
+  "work_package_id": "WP01",
+  "phase": 1261,
+  "title": "Known-truth factorial response compiler and path camera calibration",
+  "status": "adjudicated",
+  "question": "Can a finite frozen compiler family predict target effect A, preserve legitimate context B, recover interaction J, reject nuisance and wrong identity, close a two-stage path, and abstain when the response is unidentifiable?",
+  "object_ids": ["OBJ-C012-FACTORIAL-RESPONSE-COMPILER"],
+  "construct_types": ["CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P01", "P03", "P05", "P06", "P07", "P13"],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H03",
+      "prediction_id": "PR-H03-C012-WP01-001",
+      "observable": "Held-out compiler type, A1, B, J, identity, nuisance, path and manifold metrics.",
+      "expected": "All seven truth families are typed exactly, including abstention, and every applicable confirmation gate passes in both registry splits.",
+      "distinguishes_from": ["H00"],
+      "death_observation": "Any family is mistyped or any frozen confirmation gate fails."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C012-WP01-001",
+      "observable": "The same held-out factorial response and path battery.",
+      "expected": "A finite response compiler cannot jointly preserve B, predict J and abstain under hidden collisions.",
+      "distinguishes_from": ["H03"],
+      "death_observation": "Exact type recovery and all applicable gates pass across both splits."
+    }
+  ],
+  "scope": {
+    "models": ["336 known-truth conditional dynamical systems"],
+    "tasks": ["four synthetic factorial response tasks"],
+    "languages": ["none"],
+    "protocols": ["A/B/J factorial decomposition", "finite compiler competition", "typed abstention", "stage-local path block and rescue"],
+    "precision": ["CUDA float64"],
+    "backend": ["cuda"],
+    "allowed_observations": ["public factorial states", "held-out response deltas", "public task identity", "confirmation path response"],
+    "excluded_claims": ["free-network mechanism", "natural language", "Qwen3 mechanism", "unique physical implementation", "new mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One private mechanism family with one registry split, task and replicate identity.",
+    "calibration": {"systems": 336, "families": 7, "development_probe_systems": 42},
+    "discovery": {"cases_per_system": 384, "sealed": true},
+    "selection": {"cases_per_system": 192, "sealed": true},
+    "confirmation": {"cases_per_system": 384, "sealed": true},
+    "split_rule": "Calibration and family-holdout registries are independently seeded; confirmation neither selects compiler type nor changes thresholds.",
+    "leakage_audit": ["public/private truth split", "opaque system identifiers", "source hashes", "material digests", "partition isolation", "registry split", "task split", "confirmation isolation"],
+    "answer_payload_rule": "Private mechanism labels are unavailable until adjudication; abstention systems remain in the denominator."
+  },
+  "factor_design": {
+    "systems": 336,
+    "families": 7,
+    "registry_splits": 2,
+    "tasks": 4,
+    "replicates": 6,
+    "cases_per_system": 960,
+    "cells": ["H00", "H10", "H01", "H11"],
+    "effects": ["A0", "B", "J", "A1"]
+  },
+  "controls": ["mean response", "sign-flipped target", "label permutation", "nuisance-only donor", "wrong-identity donor", "oracle positive sentinel", "hidden collision", "family holdout", "path block", "wrong rescue"],
+  "metrics": [
+    {"id": "M-C012-WP01-TYPE", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "known-truth system", "estimator": "Exact compiler and abstention type recovery.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C012-WP01-FACTORIAL", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "confirmation rows", "estimator": "Relative A1, B and J response error.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C012-WP01-SPECIFICITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation rows", "estimator": "Wrong identity, nuisance sensitivity and control separation.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C012-WP01-PATH", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation rows", "estimator": "Stage-local handoff, block, rescue and wrong rescue.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C012-WP01-MANIFOLD", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "confirmation rows", "estimator": "95th-percentile distance to the registered natural target state.", "threshold_source": "Frozen before formal run."}
+  ],
+  "typed_gates": [
+    {"id": "G-C012-WP01-TYPE", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["selection", "confirmation"], "rule": "Compiler and abstention type accuracy equal one across all 336 systems.", "authorizes": ["applicable confirmation", "one free-Transformer phase"], "failure_type": "identifiability_failure"},
+    {"id": "G-C012-WP01-FACTORIAL", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["confirmation"], "rule": "Every actionable system passes frozen A1, B and J thresholds.", "authorizes": ["known-truth factorial compiler claim"], "failure_type": "construct_failure"},
+    {"id": "G-C012-WP01-SPECIFICITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Every actionable system rejects wrong identity and nuisance while all negative controls exceed their floor.", "authorizes": ["known-truth selective response claim"], "failure_type": "construct_failure"},
+    {"id": "G-C012-WP01-PATH", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Every actionable system passes stage-local handoff, block, correct rescue and wrong-identity rescue.", "authorizes": ["known-truth path claim"], "failure_type": "construct_failure"},
+    {"id": "G-C012-WP01-BREADTH", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["calibration", "family_holdout"], "rule": "Every system passes within both independent registry splits.", "authorizes": ["instrument calibration verdict"], "failure_type": "instrument_failure"}
+  ],
+  "budget": {
+    "max_gpu_hours": 0.25,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_world_clusters": 336,
+    "right_censoring_rule": "Any type or conjunctive gate failure stops C012 before free-network or pretrained-model execution."
+  },
+  "stopping_rules": ["No private family label is exposed before adjudication.", "Confirmation cannot select a compiler.", "No candidate, width, bandwidth, threshold or family changes after preregistration.", "Failure blocks free-network execution.", "Pass does not authorize Qwen3 or a language claim."],
+  "adjudication": {
+    "possible_verdicts": ["factorial_response_compiler_camera_calibrated", "factorial_response_compiler_camera_not_calibrated", "invalid"],
+    "observed_verdict": "factorial_response_compiler_camera_not_calibrated",
+    "failure_claim": "Type recovery was 331/336 because five smooth-local systems were already sufficient under earlier linear or quadratic candidates, and two actionable systems failed the manifold tail gate. The result rejects this exact generative-family type gate and blocks external validity; it does not reject conditional mechanisms generally."
+  },
+  "permissions": {
+    "authorizes_on_pass": ["one separately frozen free-trained cross-depth Transformer factorial compiler phase"],
+    "forbids_even_on_pass": ["Qwen3", "natural-language mechanism", "unique implementation", "new mathematics"],
+    "authorizes_on_failure": ["known-truth instrument boundary"],
+    "forbids_on_failure": ["candidate addition", "threshold repair", "family deletion", "free-network run"]
+  },
+  "audit": {
+    "preaudit_checks": 15,
+    "independent_result_auditor": "tests/glm5/phase1261_c012_factorial_response_compiler_calibration_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_result": true
+  },
+  "execution_sequence": ["development_probe", "freeze_source_and_material", "preregister", "independent_preaudit", "single_formal_cuda_run", "truth_unblind", "independent_final_audit"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C012-WP01-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1261_c012_factorial_response_compiler_calibration.py", "tests/glm5/phase1261_c012_factorial_response_compiler_calibration_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1261_c012_factorial_response_compiler_calibration/material/public_systems.jsonl", "tests/glm5/result/phase1261_c012_factorial_response_compiler_calibration/material/private_mechanism_truth.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1261_c012_factorial_response_compiler_calibration/protocol/preregistration.json", "tests/glm5/result/phase1261_c012_factorial_response_compiler_calibration/protocol/environment_snapshot.json", "tests/glm5/result/phase1261_c012_factorial_response_compiler_calibration/audit/independent_preaudit.json"],
+    "readiness": "run_ready"
+  }
+}

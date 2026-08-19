@@ -49,6 +49,7 @@ from scripts.agi_core_engine import AGICoreEngine
 from scripts.rlmf_manager import RLMFManager
 from server.api_v1_runs import create_runs_router
 from server.cross_bundle_service import cross_bundle_aligner
+from server.current_research_progress import build_current_research_progress
 from server.global_workspace_service import global_workspace_controller
 from server.rag_fiber_service import rag_fiber_manager
 from server.ricci_flow_service import ricci_flow_service
@@ -147,21 +148,32 @@ async def lifespan(app: FastAPI):
         model.load_state_dict(state_dict, strict=False)
         
         print(f"[OK] Forced 12-layer GPT-2 loaded successfully on {model.cfg.device}!")
-    except Exception as e:
-        print(f"[ERROR] Error during forced 12-layer load: {e}")
-        import traceback
-        traceback.print_exc()
-        if os.environ.get("AI2050_SKIP_MODEL_LOAD", "0") == "1":
-            print("[WARN] AI2050_SKIP_MODEL_LOAD=1; starting API server without local model.")
-            model = None
-        else:
+    except Exception as local_error:
+        model = None
+        allow_remote = os.environ.get("AI2050_ALLOW_REMOTE_MODEL_LOAD", "0") == "1"
+        require_model = os.environ.get("AI2050_REQUIRE_MODEL", "0") == "1"
+        print(f"[WARN] Optional local GPT-2 model is unavailable: {local_error}")
+
+        if allow_remote:
             try:
-                # Emergency Fallback
                 model = transformer_lens.HookedTransformer.from_pretrained("gpt2-small")
-                print("[OK] Successfully loaded gpt2-small as emergency fallback.")
+                print("[OK] Successfully loaded gpt2-small from the configured Hugging Face endpoint.")
             except Exception as fallback_error:
-                print(f"[ERROR] Critical failure during fallback: {fallback_error}")
-                model = None
+                print(f"[WARN] Remote GPT-2 fallback failed: {fallback_error}")
+        else:
+            print(
+                "[AI2050] Remote model loading is disabled. Set "
+                "AI2050_ALLOW_REMOTE_MODEL_LOAD=1 to enable it."
+            )
+
+        if model is None:
+            if require_model:
+                raise RuntimeError(
+                    "AI2050_REQUIRE_MODEL=1, but neither the local nor remote GPT-2 load succeeded."
+                ) from local_error
+            print(
+                "[AI2050] Continuing without GPT-2; model-dependent endpoints will return HTTP 503."
+            )
 
     if model:
         try:
@@ -1662,6 +1674,11 @@ async def get_nfb_flux(model: str = "gpt2"):
 
 @app.get("/agi/progress")
 async def get_agi_progress():
+    """Return the evidence-bounded Phase1236/C001 research baseline."""
+    return build_current_research_progress(root_dir)
+
+
+async def _get_agi_progress_legacy():
     """Parses AGI_RESEARCH_PHASE.md and returns structured progress data."""
     # 使用相对路径，基于项目根目录
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -2264,7 +2281,20 @@ async def snn_step_api(request: SNNStepRequest):
         res = []
         for _ in range(request.steps):
             res.append(snn_instance.step_simulation())
-        return {"status": "ok", "history": res, "time": snn_instance.time}
+        active_spikes: Dict[str, List[int]] = {}
+        for frame in res:
+            for layer_name, indices in frame.items():
+                active_spikes.setdefault(layer_name, []).extend(indices)
+        active_spikes = {
+            layer_name: sorted(set(indices))
+            for layer_name, indices in active_spikes.items()
+        }
+        return {
+            "status": "ok",
+            "history": res,
+            "spikes": active_spikes,
+            "time": snn_instance.time,
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -2386,4 +2416,24 @@ async def process_agi_chat_status():
 if __name__ == "__main__":
     import uvicorn
     # 修改日志级别，以避免过多干扰输出
-    uvicorn.run("server.server:app", host="0.0.0.0", port=5001, reload=True, log_level="warning")
+    from server.startup_guard import decide_server_start
+
+    reload_enabled = os.environ.get("AI2050_RELOAD", "0") == "1"
+    server_host = os.environ.get("AI2050_HOST", "0.0.0.0")
+    raw_server_port = os.environ.get("AI2050_PORT", "5001")
+    try:
+        server_port = int(raw_server_port)
+    except ValueError:
+        print(f"[AI2050] AI2050_PORT must be an integer; got {raw_server_port!r}.", file=sys.stderr)
+    else:
+        decision = decide_server_start(server_host, server_port)
+        output = sys.stdout if decision.existing_ai2050_backend else sys.stderr
+        print(f"[AI2050] {decision.reason}", file=output)
+        if decision.should_start:
+            uvicorn.run(
+                "server.server:app",
+                host=server_host,
+                port=server_port,
+                reload=reload_enabled,
+                log_level="warning",
+            )

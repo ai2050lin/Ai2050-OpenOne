@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C007-WP01-001",
+  "campaign_id": "C007",
+  "work_package_id": "WP01",
+  "phase": 1254,
+  "title": "Free Transformer typed-edge sparse sufficient coalition external validity",
+  "status": "adjudicated",
+  "question": "Does the C006 typed edge camera identify an identity-specific, bidirectionally causal sparse sufficient coalition in freely trained Transformers across depth?",
+  "object_ids": ["OBJ-C007-FREE-TYPED-EDGE-COALITION"],
+  "construct_types": ["CON-MODEL-SELF-RESPONSE", "CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P01", "P04", "P05", "P06", "P07"],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H07",
+      "prediction_id": "PR-H07-C007-WP01-001",
+      "observable": "Frozen sparse QK/OV/MLP coalition rescue, wrong-identity response, matched-null response and reverse blocking on unseen worlds.",
+      "expected": "At least four of six models, with every depth represented, pass the complete confirmation conjunction.",
+      "distinguishes_from": ["H00"],
+      "death_observation": "The full conjunction fails breadth or any depth has no passing replicate."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C007-WP01-001",
+      "observable": "The same confirmation intervention battery after discovery and selection are frozen.",
+      "expected": "Free training yields model-specific or nonselective coalitions that rescue behavior without identity, null or reverse-block specificity.",
+      "distinguishes_from": ["H07"],
+      "death_observation": "The registered complete conjunction repeats in breadth."
+    }
+  ],
+  "scope": {
+    "models": ["TinyCausalTransformer 4-layer", "TinyCausalTransformer 6-layer", "TinyCausalTransformer 8-layer"],
+    "tasks": ["source code lookup plus later cyclic mapping"],
+    "languages": ["synthetic tokens"],
+    "protocols": ["QK matrix transplant", "per-head OV payload transplant", "MLP residual-write transplant", "reverse blocking"],
+    "precision": ["fp32"],
+    "backend": ["cuda"],
+    "allowed_observations": ["independent task accuracy", "centered candidate response", "typed component intervention response"],
+    "excluded_claims": ["planted mechanism recovery", "unique minimal algorithm", "semantic circuit", "natural-language mechanism", "cross-model coordinate identity", "new mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One base, target, wrong-identity and matched-null code-world quartet.",
+    "calibration": {"development": "One excluded 3-layer, width-64 seed verifies numerical execution and protocol feasibility."},
+    "discovery": {"groups": 32, "sealed": true},
+    "selection": {"groups": 32, "sealed": true},
+    "confirmation": {"groups": 64, "sealed": true},
+    "split_rule": "Discovery ranks components; selection chooses only among frozen prefix sizes; confirmation cannot select anything.",
+    "leakage_audit": ["row digest", "partition counts", "counterfactual answer relation", "native-explicit equivalence", "selection-prefix identity", "atomic completion marker"],
+    "answer_payload_rule": "All four natural sequences must independently achieve the task answer before internal interventions are interpreted."
+  },
+  "factor_design": {
+    "depths": [4, 6, 8],
+    "replicates_per_depth": 2,
+    "component_roles": ["qk", "ov", "mlp"],
+    "prefix_sizes": [1, 2, 4, 8, 12],
+    "conditions": ["correct rescue", "wrong identity", "matched null", "reverse blocking", "leave one out"]
+  },
+  "controls": ["wrong-identity donor", "matched-null donor", "reverse blocking", "native versus explicit execution", "all natural counterfactual accuracies", "confirmation leave-one-out diagnostic", "all failed seeds retained", "disjoint confirmation worlds"],
+  "metrics": [
+    {"id": "M-C007-BEHAVIOR", "construct_id": "CON-MODEL-SELF-RESPONSE", "unit": "model and natural condition", "estimator": "Independent task accuracy and native-explicit logit gap.", "threshold_source": "Frozen Phase1254 protocol."},
+    {"id": "M-C007-RESCUE", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "model", "estimator": "Correct rescue cosine, relative error, signed projection and target-answer accuracy.", "threshold_source": "Frozen Phase1254 protocol."},
+    {"id": "M-C007-IDENTITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "model", "estimator": "Correct-minus-wrong cosine margin and wrong cosine ceiling.", "threshold_source": "Frozen Phase1254 protocol."},
+    {"id": "M-C007-NULL", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "model", "estimator": "Matched-null response norm divided by target response norm.", "threshold_source": "Frozen Phase1254 protocol."},
+    {"id": "M-C007-BLOCK", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "model", "estimator": "Target response remaining after restoring coalition values from base.", "threshold_source": "Frozen Phase1254 protocol."}
+  ],
+  "typed_gates": [
+    {"id": "G-C007-BEHAVIOR", "construct_id": "CON-MODEL-SELF-RESPONSE", "required_partitions": ["confirmation"], "rule": "All six models pass all natural conditions and explicit execution equivalence.", "authorizes": ["internal confirmation interpretation"], "failure_type": "behavior_failure"},
+    {"id": "G-C007-RESCUE", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["confirmation"], "rule": "Passing models meet correct rescue cosine, error, projection and answer-accuracy thresholds.", "authorizes": ["sparse sufficient coalition candidate"], "failure_type": "predictive_failure"},
+    {"id": "G-C007-SPECIFICITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Wrong identity and matched-null controls pass together.", "authorizes": ["identity-specific candidate"], "failure_type": "construct_failure"},
+    {"id": "G-C007-BLOCK", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["confirmation"], "rule": "Reverse blocking leaves at most 0.40 of the target response.", "authorizes": ["bidirectional causal candidate"], "failure_type": "construct_failure"},
+    {"id": "G-C007-BREADTH", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["confirmation"], "rule": "At least four of six models pass the full conjunction and every depth has at least one pass.", "authorizes": ["one separately frozen Qwen3 single-model contract"], "failure_type": "predictive_failure"}
+  ],
+  "budget": {"max_gpu_hours": 1.5, "max_runs": 1, "max_adaptive_rounds": 0, "max_world_clusters": 128, "right_censoring_rule": "No seed replacement, threshold change, role deletion, prefix extension, task change or confirmation reselection."},
+  "stopping_rules": ["Any behavior-unqualified seed stays in the denominator.", "Failure blocks pretrained-model escalation.", "Leave-one-out is a redundancy diagnostic, not a pass gate.", "A pass establishes a sparse sufficient coalition candidate, not a unique minimal algorithm."],
+  "adjudication": {
+    "possible_verdicts": ["free_transformer_typed_edge_coalition_confirmed", "free_transformer_typed_edge_coalition_not_confirmed", "invalid", "censored"],
+    "observed_verdict": "free_transformer_typed_edge_coalition_not_confirmed",
+    "failure_claim": "The registered sparse typed-edge coalition did not satisfy the full rescue, identity, null, reverse-block and breadth conjunction.",
+    "reopen_condition": "A later campaign must change and recalibrate the intervention object; confirmation models and thresholds remain frozen."
+  },
+  "permissions": {
+    "authorizes_on_pass": ["one fresh Qwen3 single-model typed-edge external-validity contract"],
+    "forbids_even_on_pass": ["GLM4 or DS7B run", "semantic circuit claim", "unique minimal algorithm", "cross-model coordinate claim", "new mathematics"],
+    "authorizes_on_failure": ["retain per-model coalitions as descriptive diagnostics"],
+    "forbids_on_failure": ["pretrained-model run", "seed replacement", "threshold relaxation", "larger coalition under this contract"]
+  },
+  "audit": {"preaudit_checks": ["hashes", "partitions", "counterfactual answers", "component counts", "prefix freeze", "one-shot cleanliness"], "independent_result_auditor": "tests/glm5/phase1254_c007_free_transformer_edge_external_validity_audit.py", "raw_result_required": true, "preserve_failed_models": true, "audit_must_not_read_narrative_conclusion": true},
+  "execution_sequence": ["excluded_development_probe", "preregister", "independent_preaudit", "train_one_model_at_a_time", "discovery_rank", "selection_prefix", "confirmation_interventions", "independent_final_audit"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C007-WP01-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1254_c007_free_transformer_edge_external_validity.py", "tests/glm5/phase1254_c007_free_transformer_edge_external_validity_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1254_c007_free_transformer_edge_external_validity/material/frozen_counterfactuals.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1254_c007_free_transformer_edge_external_validity/protocol/preregistration.json", "tests/glm5/result/phase1254_c007_free_transformer_edge_external_validity/protocol/environment_snapshot.json", "tests/glm5/result/phase1254_c007_free_transformer_edge_external_validity/audit/independent_preaudit.json"],
+    "readiness": "run_ready"
+  }
+}

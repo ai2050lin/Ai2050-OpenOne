@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C011-WP02-001",
+  "campaign_id": "C011",
+  "work_package_id": "WP02",
+  "phase": 1260,
+  "title": "Free Transformer selective-operator and path-mediation external validity",
+  "status": "adjudicated",
+  "question": "Does the calibrated global/conditioned/abstain camera identify at least two target-selective events and close held-out path mediation in freely trained same-executor Transformers across depth?",
+  "object_ids": ["OBJ-C011-FREE-TRANSFORMER-SELECTIVE-OPERATOR"],
+  "construct_types": ["CON-MODEL-SELF-RESPONSE", "CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P01", "P03", "P05", "P06", "P07", "P13"],
+  "hypothesis_predictions": [
+    {"hypothesis_id": "H03", "prediction_id": "PR-H03-C011-WP02-001", "observable": "Per-layer held-out target/null operator fit and frozen upstream-mediator intervention battery.", "expected": "At least four of six models, including one per depth, yield two passing events and close target, context, wrong, null, block and rescue gates.", "distinguishes_from": ["H00"], "death_observation": "The frozen breadth conjunction or any required confirmation family fails."},
+    {"hypothesis_id": "H00", "prediction_id": "PR-H00-C011-WP02-001", "observable": "The same layerwise and interventional response battery.", "expected": "Free state geometry causes abstention, target/null collision or failed mediation breadth.", "distinguishes_from": ["H03"], "death_observation": "The complete frozen cross-depth conjunction passes."}
+  ],
+  "scope": {
+    "models": ["TinyCausalTransformer-4L seed0/1", "TinyCausalTransformer-6L seed0/1", "TinyCausalTransformer-8L seed0/1"],
+    "tasks": ["four-value cyclic-code object-value lookup"],
+    "languages": ["synthetic token language"],
+    "protocols": ["same explicit QK/OV/MLP executor", "answer-boundary block residual", "global or shift-conditioned oblique operator", "typed abstention", "upstream-mediator patching"],
+    "precision": ["CUDA float32 training and inference", "float64 analysis where applicable"],
+    "backend": ["cuda"],
+    "allowed_observations": ["behavior", "layer residual deltas", "frozen target/null operator fit", "authorized intervention responses"],
+    "excluded_claims": ["natural language", "pretrained model mechanism", "nonlinear impossibility", "absence of mediation", "new mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One frozen object-value world evaluated in one independently trained network.",
+    "calibration": {"phase1259_dependency": true, "same_executor": true},
+    "discovery": {"worlds": 128, "sealed": true},
+    "selection": {"worlds": 128, "sealed": true},
+    "confirmation": {"worlds": 256, "sealed": true},
+    "split_rule": "Worlds are disjoint; discovery fits, selection chooses per-layer camera and event pair, confirmation never reselects.",
+    "leakage_audit": ["world digest", "model seed registry", "same-executor hash", "partition isolation", "operator-type freeze", "event-pair freeze"],
+    "answer_payload_rule": "Behavior failures and camera abstentions remain in the six-model breadth denominator."
+  },
+  "factor_design": {"models": 6, "depths": [4, 6, 8], "seeds_per_depth": 2, "worlds": 512, "panels": ["base", "target", "wrong", "null"], "events": "every answer-boundary post-block residual"},
+  "controls": ["wrong identity", "matched null", "random operator", "full-state null", "same-executor equality", "behavior-first gate", "diagnostic context probe", "manifold proximity", "held-out worlds"],
+  "metrics": [
+    {"id": "M-C011-WP02-BEHAVIOR", "construct_id": "CON-MODEL-SELF-RESPONSE", "unit": "model-partition", "estimator": "Natural task accuracy and executor gap.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP02-CAMERA", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "model-layer", "estimator": "Target relative error, null leakage and idempotence for global/conditioned/abstention selection.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP02-TARGET", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "confirmation worlds", "estimator": "Correct response cosine, relative error and behavior transfer.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP02-SPECIFICITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation worlds", "estimator": "Wrong identity, matched-null, context retention and manifold proximity.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP02-MEDIATION", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation worlds", "estimator": "Downstream block and correct/wrong mediator rescue.", "threshold_source": "Frozen before formal run."}
+  ],
+  "typed_gates": [
+    {"id": "G-C011-WP02-BEHAVIOR", "construct_id": "CON-MODEL-SELF-RESPONSE", "required_partitions": ["discovery", "selection", "confirmation"], "rule": "Each model reaches at least 0.995 task accuracy and executor gap at most 0.0002.", "authorizes": ["layerwise camera selection"], "failure_type": "behavior_failure"},
+    {"id": "G-C011-WP02-CAMERA", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["selection"], "rule": "At least two passing events per model and at least four models with one actionable model per depth.", "authorizes": ["frozen confirmation intervention"], "failure_type": "identifiability_failure"},
+    {"id": "G-C011-WP02-TARGET", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["confirmation"], "rule": "Every breadth-authorized model passes correct response geometry and behavior transfer.", "authorizes": ["free-network target-rescue claim"], "failure_type": "predictive_failure"},
+    {"id": "G-C011-WP02-SPECIFICITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Wrong, null, context and manifold gates all pass in every breadth-authorized model.", "authorizes": ["free-network selective-state claim"], "failure_type": "construct_failure"},
+    {"id": "G-C011-WP02-MEDIATION", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Frozen upstream block and correct/wrong mediator rescue gates pass in every breadth-authorized model.", "authorizes": ["one separately frozen natural-template contract"], "failure_type": "construct_failure"}
+  ],
+  "budget": {"max_gpu_hours": 1.5, "max_runs": 1, "max_adaptive_rounds": 0, "max_world_clusters": 512, "right_censoring_rule": "Nonqualified and abstaining models remain in the breadth denominator; any failed dependency stops confirmation and pretrained escalation."},
+  "stopping_rules": ["Behavior failure stops camera interpretation for that model but remains in breadth.", "At least two selected events are required before intervention.", "Confirmation never reselects camera type or event layer.", "Failure blocks Qwen3 escalation.", "No seed, depth or threshold repair is permitted."],
+  "adjudication": {"possible_verdicts": ["free_transformer_selective_operator_mediation_confirmed", "free_transformer_selective_operator_mediation_not_confirmed", "invalid"], "observed_verdict": "free_transformer_selective_operator_mediation_not_confirmed", "failure_claim": "All six models passed behavior, but zero models yielded two selected events; confirmation intervention and path mediation were not authorized."},
+  "permissions": {"authorizes_on_pass": ["one separately frozen natural-template contract"], "forbids_even_on_pass": ["automatic Qwen3 run", "language mechanism", "new mathematics"], "authorizes_on_failure": ["free-network linear selective-operator identifiability boundary"], "forbids_on_failure": ["Qwen3", "seed replacement", "threshold relaxation", "claim that path mediation is absent"]},
+  "audit": {"preaudit_checks": 13, "independent_result_auditor": "tests/glm5/phase1260_c011_free_transformer_selective_operator_mediation_audit.py", "raw_result_required": true, "preserve_failed_result": true},
+  "execution_sequence": ["freeze_worlds_and_seeds", "preregister", "independent_preaudit", "train_same_executor_models", "behavior_gate", "discovery_fit", "selection_and_event_pair_freeze", "authorized_confirmation_or_stop", "independent_final_audit"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C011-WP02-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1260_c011_free_transformer_selective_operator_mediation.py", "tests/glm5/phase1260_c011_free_transformer_selective_operator_mediation_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1260_c011_free_transformer_selective_operator_mediation/material/frozen_factorial_worlds.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1260_c011_free_transformer_selective_operator_mediation/protocol/preregistration.json", "tests/glm5/result/phase1260_c011_free_transformer_selective_operator_mediation/protocol/environment_snapshot.json", "tests/glm5/result/phase1260_c011_free_transformer_selective_operator_mediation/audit/independent_preaudit.json"],
+    "readiness": "run_ready"
+  }
+}

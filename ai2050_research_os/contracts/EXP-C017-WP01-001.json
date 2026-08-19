@@ -1,0 +1,89 @@
+{
+  "contract_id": "EXP-C017-WP01-001",
+  "campaign": "C017",
+  "phase": 1269,
+  "title": "Prospective confirmation of a depth-wise causal-support funnel",
+  "status": "draft_before_preregistration",
+  "question": "Across fresh behavior-qualified free Transformers, does the smallest independently confirmed exact-state support contract monotonically with depth and terminate at the answer position?",
+  "dependency": {
+    "campaign": "C016",
+    "phase": 1268,
+    "formal_decision": "negative",
+    "candidate_only": "causal support size decreases with depth",
+    "reuse_of_mechanism_results_for_selection": false
+  },
+  "models": {
+    "architectures": [
+      "shallow4",
+      "middle6",
+      "deep8"
+    ],
+    "frozen_seed_pool_per_architecture": 5,
+    "selected_per_architecture": 3,
+    "selection_rule": "first three seeds passing behavior-only qualification",
+    "fresh_free_training": true,
+    "pretrained_forbidden": true
+  },
+  "partitions": {
+    "behavior_qualification": 1024,
+    "mechanism_oracle_population": 3456,
+    "independent_confirmation": 1024,
+    "behavior_and_mechanism_separated": true
+  },
+  "ordered_support_families": [
+    "answer_only",
+    "query_triplet",
+    "source_query",
+    "source_map_query",
+    "semantic_chain",
+    "causal_suffix"
+  ],
+  "support_sizes": {
+    "answer_only": 1,
+    "query_triplet": 3,
+    "source_query": 4,
+    "source_map_query": 6,
+    "semantic_chain": 7,
+    "causal_suffix": 19
+  },
+  "positive_control": "full_sequence",
+  "statistics": {
+    "selection_draws": 32768,
+    "global_error_budget": 0.01,
+    "population_support_accuracy_min": 0.95,
+    "confirmation_accuracy_min": 0.95,
+    "robust_coverage_min": 0.9,
+    "certificate_false_authorizations_max": 0
+  },
+  "funnel_definition": {
+    "complete_trajectory": true,
+    "independent_confirmation_at_every_layer": true,
+    "support_size_monotone_nonincreasing": true,
+    "strict_contraction_required": true,
+    "first_layer_larger_than_answer_only": true,
+    "final_layer_answer_only": true
+  },
+  "breadth": {
+    "funnel_models_min": 6,
+    "funnel_per_depth_min": 2,
+    "selected_models_required": 9
+  },
+  "hard_stops": [
+    "Behavior screening may inspect outputs and qualification metrics only; rejected seeds receive no hidden-state measurement.",
+    "Every admitted model and every layer remains in the mechanism denominator.",
+    "Exact oracle population scores are audit truth and cannot select a support family.",
+    "The full-sequence positive control cannot authorize the funnel claim.",
+    "A final-layer answer-only replay cannot pass without early distributed support and strict depth-wise contraction.",
+    "No donor compiler is designed or fit in this phase.",
+    "No Qwen3, GLM4, DS7B, or other pretrained model is loaded in this phase.",
+    "One formal run, no adaptive rerun, no threshold revision after reveal."
+  ],
+  "scope": {
+    "synthetic_cyclic_code_only": true,
+    "exact_state_replacement_only": true,
+    "behavior_qualified_small_free_transformers": true,
+    "natural_language_claim": false,
+    "minimal_circuit_claim": false,
+    "unique_mechanism_claim": false
+  }
+}

@@ -62,37 +62,6 @@ export function ResearchEvidenceCockpit({ onSelectGate }) {
   );
 }
 
-export function ResearchEvidenceRail({ selectedGateId, onSelectGate }) {
-  return (
-    <div className="research-evidence-rail" aria-label="研究证据门">
-      <div className="research-evidence-rail__phase">
-        <span>当前研究</span>
-        <strong>P{CURRENT_RESEARCH_STATE.phase}</strong>
-      </div>
-      <div className="research-evidence-rail__track">
-        {RESEARCH_EVIDENCE_GATES.map((gate, index) => {
-          const Icon = STATUS_ICONS[gate.status] || Circle;
-          return (
-            <div className="research-evidence-rail__step" key={gate.id}>
-              <button
-                type="button"
-                className={`is-${gate.status} ${selectedGateId === gate.id ? 'is-selected' : ''}`}
-                onClick={() => onSelectGate?.(gate.id)}
-                title={`${gate.label}：${gate.value}`}
-                aria-pressed={selectedGateId === gate.id}
-              >
-                <Icon size={12} />
-                <span>{gate.shortLabel}</span>
-              </button>
-              {index < RESEARCH_EVIDENCE_GATES.length - 1 && <i aria-hidden="true" />}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function ResearchEvidenceDrawer({ gateId, onClose }) {
   const gate = getResearchEvidenceGate(gateId);
   if (!gate) return null;

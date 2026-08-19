@@ -1,0 +1,48 @@
+{
+  "contract_id": "EXP-C020-WP01-001",
+  "phase": 1272,
+  "campaign": "C020",
+  "title": "Cross-seed minimal layer-coalition transfer",
+  "status": "draft",
+  "predecessor": "EXP-C019-WP01-001",
+  "objective": "Discover a minimum-cardinality answer-position attention-write layer mask in one frozen model per depth, then test the identical mask on two unseen seeds at the same depth.",
+  "primary_claim": "A discovery-selected layer coalition transfers the h01/h11 contrast bidirectionally and by donor identity on all held-out same-depth models.",
+  "secondary_claims": [
+    "The transported coalition remains inclusion-minimal on held-out models.",
+    "The coalition is sparse, with cardinality no greater than half the network depth.",
+    "Matched MLP writes do not automatically reproduce the selected attention coalition."
+  ],
+  "design": {
+    "architectures": ["shallow4", "middle6", "deep8"],
+    "models_per_depth": 3,
+    "discovery_models_per_depth": 1,
+    "heldout_models_per_depth": 2,
+    "selection_cases": 16384,
+    "confirmation_population_cases": 3456,
+    "qualification_cases": 1024,
+    "candidate_masks": "all 2^L masks including the empty and full controls",
+    "selection": "minimum cardinality, then lexicographic layer tuple, among simultaneous-confidence-certified masks",
+    "confirmation": "same frozen mask on the exhaustive finite task population and held-out seeds"
+  },
+  "interventions": [
+    "correct h11 attention writes into h01",
+    "reverse h01 attention writes into h11",
+    "wrong-identity attention writes into h01",
+    "same-state no-op writes",
+    "matched selected-layer MLP writes",
+    "pre-source attention-write null",
+    "full attention trajectory positive control"
+  ],
+  "claim_boundaries": [
+    "A contrast-switching coalition is not a proof that its members are individually necessary under natural execution.",
+    "Teacher-forced component writes contain oracle trajectory information.",
+    "Layer indices are compared only within the same architecture depth.",
+    "No head, neuron, pretrained model, natural-language, or cross-architecture claim is authorized by registration alone."
+  ],
+  "hard_stops": [
+    "No threshold, seed, mask, donor, or component may change after preregistration.",
+    "Held-out seeds and exhaustive confirmation results cannot select the mask.",
+    "Failure closes synthetic layer-coalition localization instead of starting another mask search.",
+    "Head-level analysis requires the primary, shared-minimality, and sparsity gates together."
+  ]
+}

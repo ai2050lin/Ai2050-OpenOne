@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C014-WP02-001",
+  "campaign_id": "C014",
+  "work_package_id": "WP02",
+  "phase": 1265,
+  "title": "Free-Transformer factorial response certificate external validity",
+  "status": "preregistered",
+  "question": "Do freely trained same-executor Transformers contain layerwise source-by-later-condition response objects that the calibrated finite-population certificate can type and independently replay across depth?",
+  "object_ids": [
+    "OBJ-C014-FREE-TRANSFORMER-FACTORIAL-RESPONSE-TYPE"
+  ],
+  "construct_types": [
+    "CON-TYPED-OBSERVABILITY",
+    "CON-HIDDEN-RESPONSE-IMAGING",
+    "CON-INTERVENTION-SPECIFICITY"
+  ],
+  "puzzle_ids": [
+    "P01",
+    "P03",
+    "P05",
+    "P06",
+    "P07",
+    "P13"
+  ],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H03",
+      "prediction_id": "PR-H03-C014-WP02-001",
+      "observable": "Exact and sampled layerwise A0/B/J/A1 risks, typed certificate, answer-state causal admissibility and independent-donor replay.",
+      "expected": "All models pass behavior; certificate false authorization is zero; robust and ambiguity gates pass; at least four of six models with every depth represented expose a causally admissible certified event whose independent-donor replay passes identity controls.",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "Any conjunctive behavior/certificate gate fails, fewer than four models or one depth pass, or any selected independent-donor causal confirmation fails."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C014-WP02-001",
+      "observable": "The same frozen free-network battery.",
+      "expected": "Free networks lack a stable certifiable response type, or predictable response states do not yield independently replayable causal events across depth.",
+      "distinguishes_from": [
+        "H03"
+      ],
+      "death_observation": "The complete cross-depth conjunction passes."
+    }
+  ],
+  "scope": {
+    "models": [
+      "six freely trained same-executor TinyCausalTransformers"
+    ],
+    "architectures": [
+      "4 layers",
+      "6 layers",
+      "8 layers"
+    ],
+    "replicates_per_depth": 2,
+    "tasks": [
+      "four-value cyclic-code source-by-later-shift factorial mapping"
+    ],
+    "languages": [
+      "none"
+    ],
+    "precision": [
+      "FP32 same explicit executor",
+      "FP64 candidate fit and risk certificate"
+    ],
+    "backend": [
+      "cuda"
+    ],
+    "excluded_claims": [
+      "natural language mechanism",
+      "unique physical circuit",
+      "cross-model semantic invariant",
+      "Qwen3",
+      "GLM4",
+      "DS7B",
+      "new mathematics"
+    ]
+  },
+  "data_contract": {
+    "oracle_universe": "All 3456 combinations of source/target identity, distinct base/changed shift and codebook order under a deterministic nuisance record.",
+    "discovery": 1024,
+    "donor": 1024,
+    "causal_selection": 1024,
+    "confirmation": 1024,
+    "selection_draws": 16384,
+    "panels": [
+      "H00",
+      "H10",
+      "H01",
+      "H11",
+      "Hwrong10",
+      "Hwrong11"
+    ],
+    "split_rule": "Candidate type fits discovery; risk certificate samples the oracle universe; causal admissibility uses causal_selection; selected type is refit on donor; causal effect is tested only on confirmation.",
+    "leakage_audit": [
+      "material row hashes",
+      "executor identity",
+      "exact-risk selection prohibition",
+      "discovery/donor/causal-selection/confirmation separation",
+      "frozen model seeds",
+      "frozen depth",
+      "frozen candidate rank and RFF width"
+    ]
+  },
+  "factor_design": {
+    "A0": "H10-H00 at one answer-boundary layer event",
+    "B": "H01-H00 for the later shift/codebook change",
+    "A1": "H11-H01 under the changed shift",
+    "J": "A1-A0",
+    "candidate_order": [
+      "additive",
+      "linear",
+      "quadratic",
+      "RFF",
+      "abstain"
+    ],
+    "compression_rank": 16,
+    "rff_width": 256,
+    "population_pass_max": 0.05,
+    "population_earlier_fail_min": 0.15,
+    "rescue_authorization_upper_max": 0.025
+  },
+  "controls": [
+    "exact finite-universe risk",
+    "point estimate",
+    "typed abstention",
+    "wrong source identity",
+    "exact answer-state patch sentinel",
+    "reverse answer-state block",
+    "independent donor fit",
+    "behavior qualification",
+    "same executor gap"
+  ],
+  "typed_gates": [
+    {
+      "id": "G-C014-WP02-BEHAVIOR",
+      "rule": "All six models reach at least 0.995 training and frozen-world accuracy with executor gap at most 2e-4.",
+      "failure_type": "behavior_failure"
+    },
+    {
+      "id": "G-C014-WP02-CERTIFICATE",
+      "rule": "Zero false authorization; every behavior-qualified model has robust coverage at least 0.90 and exact-ambiguity abstention equal to one.",
+      "failure_type": "identifiability_failure"
+    },
+    {
+      "id": "G-C014-WP02-CAUSAL",
+      "rule": "Causal selection uses exact answer-state sentinel and reverse block only; every frozen event then passes independent-donor correct/wrong confirmation.",
+      "failure_type": "construct_failure"
+    },
+    {
+      "id": "G-C014-WP02-BREADTH",
+      "rule": "At least four of six models pass, every depth contributes at least one model, every qualified model exposes at least one admissible event, and at least one non-additive type is certified.",
+      "failure_type": "external_validity_failure"
+    }
+  ],
+  "budget": {
+    "max_gpu_hours": 1.5,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_models": 6,
+    "right_censoring_rule": "One formal pass or fail closes WP02; no model, seed, layer, rank, RFF width or threshold repair."
+  },
+  "stopping_rules": [
+    "Behavior failures and abstentions remain in the denominator.",
+    "Exact population risks cannot select a type or layer.",
+    "Confirmation cannot change the selected type or event.",
+    "Failure closes C014 before any pretrained model.",
+    "Pass authorizes only design of a new pretrained contract, never automatic pretrained execution."
+  ],
+  "adjudication": {
+    "possible_verdicts": [
+      "free_transformer_response_certificate_confirmed",
+      "free_transformer_response_certificate_not_confirmed",
+      "invalid"
+    ],
+    "observed_verdict": null
+  },
+  "permissions": {
+    "authorizes_on_pass": [
+      "design one separately frozen pretrained-model contract"
+    ],
+    "forbids_even_on_pass": [
+      "automatic Qwen3 execution",
+      "GLM4",
+      "DS7B",
+      "natural-language mechanism claim",
+      "unique circuit claim"
+    ],
+    "authorizes_on_failure": [
+      "free-network external-validity boundary"
+    ],
+    "forbids_on_failure": [
+      "rank increase",
+      "RFF expansion",
+      "seed replacement",
+      "threshold relaxation",
+      "pretrained escalation"
+    ]
+  },
+  "audit": {
+    "independent_result_auditor": "tests/glm5/phase1265_c014_free_transformer_population_certificate_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_result": true
+  },
+  "execution_sequence": [
+    "bounded development probe",
+    "freeze source and contract",
+    "generate exhaustive universe",
+    "preregister",
+    "independent preaudit",
+    "single formal six-model CUDA run",
+    "adjudicate",
+    "independent final audit"
+  ]
+}

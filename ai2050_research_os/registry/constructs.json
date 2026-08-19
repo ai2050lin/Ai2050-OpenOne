@@ -1,0 +1,82 @@
+[
+  {
+    "id": "CON-CONTENT-SELECTION",
+    "name": "内容选择",
+    "status": "preregistered",
+    "definition": "在不依赖严格表面字符串的情况下，选择与目标对象和关系绑定的正确内容。",
+    "observable": "候选排序、无候选全词表内容判据、固定句式内容和自然句式内容。",
+    "non_equivalences": ["严格字符串正确", "格式服从", "首 token 正确", "hidden 内容模块存在"],
+    "required_controls": ["same_bag_binding_swap", "target_value_change", "nontarget_noop", "query_switch", "answer_absent"],
+    "target_closure_level": 5
+  },
+  {
+    "id": "CON-EXACT-FORMAT",
+    "name": "严格格式编译",
+    "status": "preregistered",
+    "definition": "把已选内容编译为预注册的精确短字符串与格式。",
+    "observable": "严格字符串、前后缀、大小写、标点和附加文本合同。",
+    "non_equivalences": ["内容正确", "自然语义等价", "候选排序正确"],
+    "required_controls": ["correct_content_wrong_format", "wrong_content_correct_format", "carrier_swap", "template_holdout"],
+    "target_closure_level": 5
+  },
+  {
+    "id": "CON-NATURAL-GENERATION",
+    "name": "自然完整生成",
+    "status": "preregistered",
+    "definition": "在无外部 trie 或候选限制时完整生成语义正确且自然的答案序列。",
+    "observable": "完整词元轨迹、内容判据、多参考答案判据和序列概率。",
+    "non_equivalences": ["首 token 正确", "教师强制概率高", "候选集合内正确"],
+    "required_controls": ["full_vocab_rollout", "multi_reference", "prefix_perturbation", "wrong_content_fluent"],
+    "target_closure_level": 6
+  },
+  {
+    "id": "CON-STOP-CACHE",
+    "name": "停止与缓存闭合",
+    "status": "preregistered",
+    "definition": "正确内容生成后，增量 KV cache、后续词元竞争和停止条件共同闭合。",
+    "observable": "逐 token 反馈、增量缓存与完整重算一致性、EOS/停止及错误累积。",
+    "non_equivalences": ["第一 token 正确", "外部截断", "候选 trie 到达叶节点"],
+    "required_controls": ["cache_full_recompute", "wrong_prefix", "eos_competition", "continued_generation"],
+    "target_closure_level": 6
+  },
+  {
+    "id": "CON-MODEL-SELF-RESPONSE",
+    "name": "模型自身未来响应",
+    "status": "calibrated",
+    "definition": "不依赖 gold 正确性，记录合法内部干预导致的模型输出分布变化。",
+    "observable": "候选 logit、margin 与完整输出分布相对于未干预基线的中心化差分。",
+    "non_equivalences": ["答案正确", "隐藏可读", "自然生成成功", "语义因果解释"],
+    "required_controls": ["zero_intervention", "matched_null_donor", "shuffled_hidden_delta", "repeatability"],
+    "target_closure_level": 3
+  },
+  {
+    "id": "CON-HIDDEN-RESPONSE-IMAGING",
+    "name": "隐藏到响应成像",
+    "status": "calibrated",
+    "definition": "从预注册的公开隐藏变化预测未见样本上实际内部干预的未来输出响应。",
+    "observable": "预测与实际响应的方向、相对误差、控制优势及跨架构复现。",
+    "non_equivalences": ["隐藏方向检索", "事后相关", "行为准确率", "单一热点"],
+    "required_controls": ["constant_response", "shuffled_hidden_delta", "heldout_alpha", "sealed_confirmation", "architecture_replication"],
+    "target_closure_level": 3
+  },
+  {
+    "id": "CON-INTERVENTION-SPECIFICITY",
+    "name": "干预目标特异性",
+    "status": "calibrated",
+    "definition": "相机对改变查询目标答案的供体响应强于保持目标答案不变的 matched-null 供体响应。",
+    "observable": "目标供体与 matched-null 供体的实际响应范数比及预测优势。",
+    "non_equivalences": ["任意扰动敏感", "同载体变化", "大范数补丁", "行为正确"],
+    "required_controls": ["matched_non_target_donor", "same_norm_shuffle", "target_answer_change", "null_answer_preservation"],
+    "target_closure_level": 3
+  },
+  {
+    "id": "CON-TYPED-OBSERVABILITY",
+    "name": "类型化可观测性",
+    "status": "calibrated",
+    "definition": "明确相机在哪些事件、强度和联合干预上可识别，并对合同外对象显式拒答。",
+    "observable": "域内接受、域外强度拒答、多事件非识别拒答和损坏哨兵检出。",
+    "non_equivalences": ["全局可识别", "所有干预可解释", "拒答即机制不存在", "数值有限即合法"],
+    "required_controls": ["alpha_out_of_domain", "multi_event_hidden_change", "sign_flip_sentinel", "registered_single_event"],
+    "target_closure_level": 3
+  }
+]

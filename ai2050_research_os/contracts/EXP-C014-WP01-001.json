@@ -1,0 +1,276 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C014-WP01-001",
+  "campaign_id": "C014",
+  "work_package_id": "WP01",
+  "phase": 1264,
+  "title": "Exact finite-population predictive-type certificate calibration",
+  "status": "preregistered",
+  "question": "Can a simultaneous bounded-loss certificate achieve zero false authorization while retaining nontrivial coverage of margin-separated predictive types under exact finite-population truth?",
+  "object_ids": [
+    "OBJ-C014-RISK-CERTIFIED-PREDICTIVE-TYPE"
+  ],
+  "construct_types": [
+    "CON-TYPED-OBSERVABILITY",
+    "CON-INTERVENTION-SPECIFICITY",
+    "CON-HIDDEN-RESPONSE-IMAGING"
+  ],
+  "puzzle_ids": [
+    "P01",
+    "P03",
+    "P05",
+    "P06",
+    "P07",
+    "P13"
+  ],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H03",
+      "prediction_id": "PR-H03-C014-WP01-001",
+      "observable": "Exact finite-population risks, point estimates, simultaneous certificate intervals, typed abstention, dual-donor rescue and partial-cut controls.",
+      "expected": "The interval certificate makes zero false authorizations, covers at least 95 percent of robust actionable systems, abstains on every exact ambiguity, and all high-fidelity rescue confirmations pass.",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "Any false authorization, robust coverage below 0.95, any forced ambiguous system, or any registered rescue/control failure."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C014-WP01-001",
+      "observable": "The same frozen exact-risk and certificate battery.",
+      "expected": "Finite observations cannot jointly support zero false authorization and nontrivial robust coverage, or the rescue subdomain remains uncertified.",
+      "distinguishes_from": [
+        "H03"
+      ],
+      "death_observation": "Every certificate, breadth, rescue and control gate passes in both registry splits."
+    }
+  ],
+  "scope": {
+    "models": [
+      "432 constructed conditional dynamical systems"
+    ],
+    "tasks": [
+      "four synthetic factorial response tasks"
+    ],
+    "languages": [
+      "none"
+    ],
+    "protocols": [
+      "exact registered finite-population enumeration",
+      "bounded-loss simultaneous certificate",
+      "point and always-abstain baselines",
+      "continuous boundary gradients",
+      "dual independent donor rescue",
+      "partial-cut controls"
+    ],
+    "precision": [
+      "CUDA float64"
+    ],
+    "backend": [
+      "cuda"
+    ],
+    "allowed_observations": [
+      "opaque public system identity",
+      "discovery responses",
+      "uniform with-replacement selection draws from the sealed finite universe",
+      "certificate bounds",
+      "typed rescue authorization"
+    ],
+    "excluded_claims": [
+      "continuous population truth",
+      "epsilon relation transitivity",
+      "free-network mechanism",
+      "natural language",
+      "Qwen3 mechanism",
+      "new mathematics"
+    ]
+  },
+  "data_contract": {
+    "cluster_unit": "One source profile, registry split, task and replicate; source profile remains private and is not the estimand.",
+    "systems": 432,
+    "discovery_cases_per_system": 1024,
+    "finite_population_cases_per_system": 8192,
+    "selection_draws_per_system": 16384,
+    "donor_cases_per_world": 768,
+    "confirmation_cases_per_system": 1024,
+    "split_rule": "Two registry splits, nine source profiles, four tasks and six replicates. Candidate models fit only discovery; exact truth exhausts the registered finite universe; selection draws uniformly with replacement using an independent seed.",
+    "leakage_audit": [
+      "opaque public IDs",
+      "private profile/seed/amplitude",
+      "source hashes",
+      "material digests",
+      "discovery/oracle/selection isolation",
+      "donor-world isolation",
+      "confirmation isolation",
+      "registry split",
+      "task split"
+    ],
+    "answer_payload_rule": "Profile, amplitude and exact risks remain private until adjudication; all boundary and unsupported systems remain in the denominator."
+  },
+  "factor_design": {
+    "source_profiles": 9,
+    "registry_splits": 2,
+    "tasks": 4,
+    "replicates": 6,
+    "candidate_types": [
+      "additive",
+      "linear",
+      "quadratic",
+      "rff",
+      "abstain"
+    ],
+    "pass_boundary_targets": [
+      0.03,
+      0.045,
+      0.0498,
+      0.0502,
+      0.065,
+      0.11
+    ],
+    "earlier_failure_boundary_targets": [
+      0.09,
+      0.135,
+      0.1498,
+      0.1502,
+      0.19,
+      0.26
+    ],
+    "population_truth_rule": "Least-complex candidate with exact bounded risk at most 0.050 and all earlier exact risks at least 0.150; otherwise abstain.",
+    "certificate_rule": "Authorize only when the selected upper bound is at most 0.050 and all earlier lower bounds are at least 0.150.",
+    "rescue_rule": "Run rescue only when the selected risk upper bound is at most 0.025."
+  },
+  "controls": [
+    "point estimator",
+    "always abstain",
+    "hidden collision",
+    "unsupported high frequency",
+    "pass-threshold gradient",
+    "earlier-failure gradient",
+    "wrong identity donor",
+    "dual donor worlds",
+    "complementary partial cuts",
+    "algebraic replay sentinel",
+    "mean response",
+    "sign flip"
+  ],
+  "metrics": [
+    {
+      "id": "M-C014-WP01-CERTIFICATE",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "unit": "known-truth system",
+      "estimator": "False authorization, robust coverage and exact-ambiguity abstention against exhaustive finite-population risk.",
+      "threshold_source": "Frozen after a 72-system development probe and before formal material generation."
+    },
+    {
+      "id": "M-C014-WP01-BASELINES",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "unit": "known-truth system",
+      "estimator": "Point estimate and always-abstain comparison under the same exact truth.",
+      "threshold_source": "Frozen before formal run."
+    },
+    {
+      "id": "M-C014-WP01-RESCUE",
+      "construct_id": "CON-INTERVENTION-SPECIFICITY",
+      "unit": "high-fidelity certified system",
+      "estimator": "Dual independent-donor rescue, wrong identity rejection, exact block, partial-cut residual and algebraic sentinel.",
+      "threshold_source": "Frozen after a 72-system development probe and before formal material generation."
+    }
+  ],
+  "typed_gates": [
+    {
+      "id": "G-C014-WP01-ORACLE",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "rule": "All exact risks and classes reproduce by exhaustive finite-universe recomputation.",
+      "authorizes": [
+        "certificate adjudication"
+      ],
+      "failure_type": "instrument_failure"
+    },
+    {
+      "id": "G-C014-WP01-CERTIFICATE",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "rule": "Zero false authorization, robust coverage at least 0.95, exact-ambiguity abstention equal to one, and both registry splits pass.",
+      "authorizes": [
+        "known-truth risk-certified predictive-type claim"
+      ],
+      "failure_type": "identifiability_failure"
+    },
+    {
+      "id": "G-C014-WP01-NONTRIVIAL",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "rule": "All four robust classes have at least 20 systems and certificate robust coverage strictly exceeds the zero coverage of always-abstain.",
+      "authorizes": [
+        "nontrivial certification claim"
+      ],
+      "failure_type": "coverage_failure"
+    },
+    {
+      "id": "G-C014-WP01-RESCUE",
+      "construct_id": "CON-INTERVENTION-SPECIFICITY",
+      "rule": "Every rescue-authorized system passes dual donor, wrong identity, block, partial-cut, manifold and negative-control gates.",
+      "authorizes": [
+        "high-fidelity known-truth rescue subclaim"
+      ],
+      "failure_type": "construct_failure"
+    }
+  ],
+  "budget": {
+    "max_gpu_hours": 0.75,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_world_clusters": 432,
+    "right_censoring_rule": "Any conjunctive failure stops C014 before free-network or pretrained-model execution."
+  },
+  "stopping_rules": [
+    "No source profile, amplitude or exact risk is exposed before adjudication.",
+    "No threshold, draw count, boundary target, profile or seed changes after preregistration.",
+    "A failure closes WP01 without a larger selection-panel repair.",
+    "Algebraic replay is never counted as rescue evidence.",
+    "A pass authorizes one separately frozen free-Transformer phase and never Qwen3 directly."
+  ],
+  "adjudication": {
+    "possible_verdicts": [
+      "finite_population_certificate_calibrated",
+      "finite_population_certificate_not_calibrated",
+      "invalid"
+    ],
+    "observed_verdict": null
+  },
+  "permissions": {
+    "authorizes_on_pass": [
+      "one separately frozen cross-depth free-Transformer certificate external-validity phase"
+    ],
+    "forbids_even_on_pass": [
+      "Qwen3",
+      "natural-language mechanism",
+      "continuous-distribution coverage",
+      "global quotient claim",
+      "new mathematics"
+    ],
+    "authorizes_on_failure": [
+      "known-truth certification boundary"
+    ],
+    "forbids_on_failure": [
+      "threshold repair",
+      "draw-count increase",
+      "boundary deletion",
+      "free-network run"
+    ]
+  },
+  "audit": {
+    "independent_result_auditor": "tests/glm5/phase1264_c014_population_risk_certificate_calibration_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_result": true,
+    "full_population_recomputation_required": true
+  },
+  "execution_sequence": [
+    "development_probe",
+    "freeze_source_and_contract",
+    "generate_exact_population_truth",
+    "preregister",
+    "independent_preaudit",
+    "single_formal_cuda_run",
+    "truth_unblind",
+    "independent_final_audit"
+  ]
+}

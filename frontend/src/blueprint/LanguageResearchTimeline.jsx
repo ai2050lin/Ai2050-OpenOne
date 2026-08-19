@@ -25,7 +25,7 @@ function MilestoneDetail({ milestone, lang }) {
 }
 
 export function LanguageResearchTimeline({ lang }) {
-  const [activeMilestoneId, setActiveMilestoneId] = useState('sequence-decision-path');
+  const [activeMilestoneId, setActiveMilestoneId] = useState('research-os-wp00');
 
   return (
     <section className="language-analysis-section" id="research-history">

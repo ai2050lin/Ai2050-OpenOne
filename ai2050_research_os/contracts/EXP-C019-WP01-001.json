@@ -1,0 +1,81 @@
+{
+  "contract_id": "EXP-C019-WP01-001",
+  "campaign": "C019",
+  "phase": 1271,
+  "title": "Cross-layer answer-position micro-write trajectory",
+  "status": "draft_before_preregistration",
+  "question": "Is a teacher-forced trajectory of answer-position attention writes bidirectionally and identity-specifically sufficient, and can a proper prefix hand control back to the natural network?",
+  "dependency": {
+    "campaign": "C018",
+    "phase": 1270,
+    "formal_decision": "answer_excluded_upstream_recomputation_not_confirmed",
+    "new_object": "within-block answer-position attention and MLP writes across time"
+  },
+  "models": {
+    "architectures": [
+      "shallow4",
+      "middle6",
+      "deep8"
+    ],
+    "frozen_seed_pool_per_architecture": 5,
+    "selected_per_architecture": 3,
+    "selection_rule": "first three behavior-qualified seeds per depth",
+    "fresh_free_training": true,
+    "pretrained_forbidden": true
+  },
+  "programs": {
+    "attention_prefixes": "replace donor attention writes at answer position 22 from layer 0 through each registered end layer",
+    "attention_full_wrong_identity": "same trajectory using hwrong11 donor; must recover the wrong donor answer and avoid the h11 target",
+    "mlp_full_correct_and_wrong": "matched component trajectory, reported separately",
+    "after_block_full": "answer-state replay positive control",
+    "attention_pre_source_null": "replace attention writes at position 2, whose causal history is identical",
+    "attention_position8_descriptive": "matched non-answer destination, descriptive only"
+  },
+  "partitions": {
+    "behavior_qualification": 1024,
+    "mechanism_oracle_population": 3456,
+    "independent_confirmation": 1024
+  },
+  "statistics": {
+    "selection_draws": 32768,
+    "global_error_budget": 0.01,
+    "expected_accuracy_min": 0.95,
+    "wrong_false_target_max": 0.05,
+    "positive_control_accuracy_min": 0.999,
+    "null_switch_accuracy_max": 0.05,
+    "false_authorizations_max": 0,
+    "robust_coverage_min": 0.9
+  },
+  "primary_gate": {
+    "teacher_forced_attention_models_min": 6,
+    "teacher_forced_attention_per_depth_min": 2,
+    "selected_models_required": 9,
+    "wrong_identity_specificity_required": true
+  },
+  "secondary_gates": {
+    "proper_prefix_models_min": 6,
+    "proper_prefix_per_depth_min": 2,
+    "proper_prefix_definition": "shortest confirmed attention prefix ends before the final layer",
+    "component_advantage_min": 0.05,
+    "component_advantage_is_not_required_for_primary_gate": true
+  },
+  "hard_stops": [
+    "Development seeds and probe outputs are excluded from the formal seed pools and evidence denominator.",
+    "Behavior qualification cannot inspect micro-writes or intervention outcomes.",
+    "Oracle population scores cannot select the shortest attention prefix.",
+    "Confirmation cannot select a prefix, component family, threshold, or seed.",
+    "A full trajectory is teacher-forced external control and cannot by itself establish a self-generated natural program.",
+    "Attention sufficiency, proper-prefix self-maintenance, and attention-over-MLP advantage are separate claims.",
+    "No head search, learned donor, pretrained model, or post-reveal expansion is allowed.",
+    "One formal run and zero adaptive rounds."
+  ],
+  "scope": {
+    "synthetic_cyclic_code_only": true,
+    "same_case_natural_donor_micro_writes": true,
+    "answer_position_component_outputs": true,
+    "natural_language_claim": false,
+    "head_identity_claim": false,
+    "minimal_circuit_claim": false,
+    "independent_donor_claim": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "contract_id": "EXP-C021-WP01-003",
+  "phase": 1276,
+  "campaign": "C021",
+  "title": "Read-only checkpoint continuation and final adjudication of C021 WP01",
+  "status": "draft",
+  "predecessor": "EXP-C021-WP01-002",
+  "objective": "Freeze the exact Phase1275 partial-ledger hashes, run only the five remaining preregistered model keys, and produce the one complete 27-model C021 adjudication.",
+  "recovery_rules": [
+    "Phase1275 qualification keys must equal the first 22 keys of the original frozen order.",
+    "Phase1275 measured keys must equal the behavior-qualified subset of those 22 keys.",
+    "Only the remaining five original keys may be trained.",
+    "All prior failures remain in the denominator and no seed is replaced."
+  ],
+  "hard_stops": [
+    "Any partial-ledger hash or prefix-order mismatch denies continuation.",
+    "No camera score is read until all 27 qualification records exist.",
+    "The original Phase1274 semantic digest and material bytes must remain unchanged.",
+    "Failure closes C021 synthetic local-isomorphism search."
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C011-WP01-001",
+  "campaign_id": "C011",
+  "work_package_id": "WP01",
+  "phase": 1259,
+  "title": "Known-truth selective operator and path-mediation camera calibration",
+  "status": "adjudicated",
+  "question": "Can one frozen camera distinguish global, control-conditioned and unidentifiable target/null response geometries, then close target rescue, context preservation and path mediation on held-out combinations?",
+  "object_ids": ["OBJ-C011-SELECTIVE-OPERATOR-CAMERA"],
+  "construct_types": ["CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P01", "P03", "P05", "P06", "P07", "P13"],
+  "hypothesis_predictions": [
+    {"hypothesis_id": "H03", "prediction_id": "PR-H03-C011-WP01-001", "observable": "Held-out camera type, target/null state response, wrong identity, block, rescue and manifold metrics.", "expected": "Global, conditioned and abstention truth families are exactly recovered and every applicable confirmation gate passes.", "distinguishes_from": ["H00"], "death_observation": "Any truth family is systematically mis-typed or any applicable frozen confirmation gate fails."},
+    {"hypothesis_id": "H00", "prediction_id": "PR-H00-C011-WP01-001", "observable": "The same held-out response and mediation battery.", "expected": "The camera either confuses response types or cannot jointly preserve target, context and mediation truth.", "distinguishes_from": ["H03"], "death_observation": "All registered truth families and applicable gates pass exactly."}
+  ],
+  "scope": {
+    "models": ["384 known-truth linear dynamical systems"],
+    "tasks": ["four synthetic typed response tasks"],
+    "languages": ["none"],
+    "protocols": ["global oblique projection", "control-conditioned oblique projection", "typed abstention", "upstream-mediator block and rescue"],
+    "precision": ["CUDA float64"],
+    "backend": ["cuda"],
+    "allowed_observations": ["known response deltas", "public control type", "held-out state and behavior responses"],
+    "excluded_claims": ["natural network mechanism", "language semantics", "Qwen3 mechanism", "unique implementation", "new mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One hidden mechanism system with one registry split, task and replicate identity.",
+    "calibration": {"systems": 384, "families": 6},
+    "discovery": {"cases_per_system": 800, "sealed": true},
+    "selection": {"cases_per_system": 400, "sealed": true},
+    "confirmation": {"cases_per_system": 400, "sealed": true},
+    "split_rule": "Mechanism parameters and factorial rows are independently generated; confirmation never selects camera type.",
+    "leakage_audit": ["public/private truth split", "truth hidden until adjudication", "row digest", "registry split", "task split", "confirmation isolation"],
+    "answer_payload_rule": "All abstentions remain in the denominator and only truth-applicable systems enter intervention confirmation."
+  },
+  "factor_design": {"systems": 384, "families": 6, "registry_splits": 2, "tasks": 4, "replicates": 8, "cases_per_system": 1600, "events": ["upstream", "mediator"]},
+  "controls": ["full-state patch", "orthogonal projector", "random projector", "wrong identity", "matched null", "public-truth leak sentinel", "path block", "wrong rescue", "held-out factorial rows"],
+  "metrics": [
+    {"id": "M-C011-WP01-TYPE", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "known-truth system", "estimator": "Exact global/conditioned/abstention type recovery.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP01-TARGET", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "confirmation rows", "estimator": "Target-state relative error and target behavior accuracy.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP01-CONTEXT", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation rows", "estimator": "Null-state fraction, context preservation and wrong-identity rejection.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP01-MEDIATION", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation rows", "estimator": "Block remaining fraction and correct/wrong mediator rescue.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C011-WP01-MANIFOLD", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "confirmation rows", "estimator": "Distance from rescued mediator state to the registered natural target manifold.", "threshold_source": "Frozen before formal run."}
+  ],
+  "typed_gates": [
+    {"id": "G-C011-WP01-TYPE", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["selection", "confirmation"], "rule": "Camera and abstention type accuracy both equal one across all 384 systems.", "authorizes": ["applicable confirmation", "one free-network external-validity phase"], "failure_type": "identifiability_failure"},
+    {"id": "G-C011-WP01-TARGET", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["confirmation"], "rule": "Every actionable family passes target state and behavior thresholds.", "authorizes": ["known-truth target-rescue claim"], "failure_type": "construct_failure"},
+    {"id": "G-C011-WP01-CONTEXT", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Every actionable family preserves context and rejects null and wrong identity.", "authorizes": ["known-truth selective-operator claim"], "failure_type": "construct_failure"},
+    {"id": "G-C011-WP01-MEDIATION", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "Every actionable family passes upstream block and correct mediator rescue while wrong rescue fails.", "authorizes": ["known-truth path-mediation claim"], "failure_type": "construct_failure"},
+    {"id": "G-C011-WP01-CONTROLS", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["confirmation"], "rule": "Full-state, orthogonal and random controls meet all frozen separation floors.", "authorizes": ["instrument calibration verdict"], "failure_type": "instrument_failure"}
+  ],
+  "budget": {"max_gpu_hours": 0.1, "max_runs": 1, "max_adaptive_rounds": 0, "max_world_clusters": 384, "right_censoring_rule": "Any truth-type or conjunctive gate failure stops the camera; no family or threshold repair."},
+  "stopping_rules": ["No truth labels are exposed before analysis.", "Confirmation never selects camera type.", "Abstentions remain in the denominator.", "Failure denies free-network extrapolation.", "Pass never authorizes a pretrained language model."],
+  "adjudication": {"possible_verdicts": ["selective_operator_mediation_camera_calibrated", "selective_operator_mediation_camera_not_calibrated", "invalid"], "observed_verdict": "selective_operator_mediation_camera_calibrated", "failure_claim": null},
+  "permissions": {"authorizes_on_pass": ["one free-trained cross-depth small-Transformer phase"], "forbids_even_on_pass": ["Qwen3", "natural-language mechanism", "new mathematics"], "authorizes_on_failure": ["instrument boundary"], "forbids_on_failure": ["threshold repair", "family deletion", "free-network run"]},
+  "audit": {"preaudit_checks": 14, "independent_result_auditor": "tests/glm5/phase1259_c011_selective_operator_mediation_calibration_audit.py", "raw_result_required": true, "preserve_failed_result": true},
+  "execution_sequence": ["generate_private_truth", "freeze_public_registry", "preregister", "independent_preaudit", "formal_cuda_run", "truth_unblind", "independent_final_audit"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C011-WP01-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1259_c011_selective_operator_mediation_calibration.py", "tests/glm5/phase1259_c011_selective_operator_mediation_calibration_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1259_c011_selective_operator_mediation_calibration/material/public_systems.jsonl", "tests/glm5/result/phase1259_c011_selective_operator_mediation_calibration/material/private_mechanism_truth.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1259_c011_selective_operator_mediation_calibration/protocol/preregistration.json", "tests/glm5/result/phase1259_c011_selective_operator_mediation_calibration/protocol/environment_snapshot.json", "tests/glm5/result/phase1259_c011_selective_operator_mediation_calibration/audit/independent_preaudit.json"],
+    "readiness": "run_ready"
+  }
+}

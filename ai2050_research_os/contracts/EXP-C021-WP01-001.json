@@ -1,0 +1,50 @@
+{
+  "contract_id": "EXP-C021-WP01-001",
+  "phase": 1274,
+  "campaign": "C021",
+  "title": "Three-task free-Transformer functional-response quotient and implementation isomorphism",
+  "status": "draft",
+  "predecessor": "EXP-C021-WP00-001",
+  "objective": "Test whether a frozen functional-response camera identifies and predicts implementation equivalence across unseen seeds, depths, and an unseen algorithm family in freely trained causal Transformers.",
+  "task_families": [
+    "cyclic: answer=(source+operator) mod 4; random mapping payload is a matched distractor",
+    "xor: answer=source XOR operator; random mapping payload is a matched distractor",
+    "context_lookup: answer=sample-specific mapping[source]; operator is a matched distractor"
+  ],
+  "design": {
+    "depths": [4, 6, 8],
+    "seeds_per_task_depth": 3,
+    "total_planned_models": 27,
+    "behavior_examples_per_model": 16384,
+    "response_cases_per_task_partition": 1024,
+    "partitions": ["discovery", "confirmation"],
+    "event_registry": "all attention/MLP singleton, prefix, and suffix answer-position write programs",
+    "intervention_roles": ["source_target", "source_wrong", "operator_target", "payload_target", "distractor_null"],
+    "readouts": ["forward_desired", "reverse_desired", "forward_switch", "reverse_switch", "forward_strength", "reverse_strength"]
+  },
+  "camera_competition": [
+    "identity_coordinate",
+    "monotone_depth_warp",
+    "response_spectrum",
+    "gated_causal_graph"
+  ],
+  "selection": "Camera and threshold are selected only on cyclic/xor seed-0/seed-1 discovery pairs.",
+  "sealed_tests": [
+    "unseen context_lookup task family",
+    "seed-2 models",
+    "joint unseen-task and unseen-seed pairs",
+    "independent confirmation response tensors"
+  ],
+  "claim_boundaries": [
+    "The networks are small synthetic causal Transformers, not pretrained language models.",
+    "Teacher-forced component-write response is an intervention program, not natural execution necessity.",
+    "Spectrum classification does not supply an executable event mapping.",
+    "Only an executable camera passing response prediction can authorize a later rescue work package."
+  ],
+  "hard_stops": [
+    "No failed seed may be replaced and no behavior threshold may be relaxed.",
+    "No confirmation pair may select a camera, threshold, event, role, or readout.",
+    "Failure closes C021 synthetic local-isomorphism search; it does not trigger more task, seed, layer, or head enumeration.",
+    "Pretrained-model transfer is not authorized under WP01."
+  ]
+}

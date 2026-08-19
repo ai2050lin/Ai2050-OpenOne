@@ -12,7 +12,7 @@ import os
 import re
 import shutil
 from copy import deepcopy
-from typing import Any, List, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union, cast
 
 import einops
 import numpy as np
@@ -20,8 +20,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import transformers
-from datasets.arrow_dataset import Dataset
-from datasets.load import load_dataset
 from huggingface_hub import constants, hf_hub_download
 from jaxtyping import Float, Int
 from rich import print as rprint
@@ -29,6 +27,13 @@ from transformers import AutoTokenizer
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 
 from transformer_lens.FactoredMatrix import FactoredMatrix
+
+if TYPE_CHECKING:
+    # Hugging Face datasets imports pyarrow's native extension.  Dataset helpers
+    # are optional for the visualisation backend, so do not make every
+    # transformer_lens import pay that startup cost (or fail on a broken
+    # optional dataset installation).
+    from datasets.arrow_dataset import Dataset
 
 CACHE_DIR = constants.HUGGINGFACE_HUB_CACHE
 USE_DEFAULT_VALUE = None
@@ -914,6 +919,10 @@ def get_dataset(dataset_name: str, **kwargs) -> Dataset:
     * c4_code (c4 + code - the 20K data points from c4-10k and code-10k. This is the mix of datasets used to train my interpretability-friendly models, though note that they are *not* in the correct ratio! There's 10K texts for each, but about 22M tokens of code and 5M tokens of C4)
     * wiki (Wikipedia, generated from the 20220301.en split of https://huggingface.co/datasets/wikipedia )
     """
+    # Keep the heavy datasets/pyarrow dependency local to the only helper that
+    # actually loads a Hugging Face dataset.
+    from datasets.load import load_dataset
+
     dataset_aliases = {
         "openwebtext": "stas/openwebtext-10k",
         "owt": "stas/openwebtext-10k",

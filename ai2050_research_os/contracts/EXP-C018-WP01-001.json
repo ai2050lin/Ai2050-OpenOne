@@ -1,0 +1,89 @@
+{
+  "contract_id": "EXP-C018-WP01-001",
+  "campaign": "C018",
+  "phase": 1270,
+  "title": "Answer-excluded upstream causal recomputation",
+  "status": "draft_before_preregistration",
+  "question": "Can upstream donor states change the answer through subsequent Transformer computation when the answer-position state itself is never patched?",
+  "dependency": {
+    "campaign": "C017",
+    "phase": 1269,
+    "required_decision": "causal_support_funnel_confirmed",
+    "new_confound_removed": "direct answer-position state replay"
+  },
+  "models": {
+    "architectures": [
+      "shallow4",
+      "middle6",
+      "deep8"
+    ],
+    "frozen_seed_pool_per_architecture": 5,
+    "selected_per_architecture": 3,
+    "selection_rule": "first three behavior-qualified seeds per depth",
+    "fresh_free_training": true,
+    "pretrained_forbidden": true
+  },
+  "ordered_answer_free_supports": [
+    "source_only",
+    "source_query_no_answer",
+    "source_map_query_no_answer",
+    "semantic_chain_no_answer",
+    "causal_prefix_no_answer"
+  ],
+  "support_sizes": {
+    "source_only": 1,
+    "source_query_no_answer": 3,
+    "source_map_query_no_answer": 5,
+    "semantic_chain_no_answer": 6,
+    "causal_prefix_no_answer": 18
+  },
+  "controls": {
+    "pre_source_prefix": "positions 0-3; causal histories are identical and switching must remain absent",
+    "answer_only": "position 22 only; direct answer-state replay control",
+    "causal_suffix_with_answer": "positions 4-22; algebraic positive executor control"
+  },
+  "partitions": {
+    "behavior_qualification": 1024,
+    "mechanism_oracle_population": 3456,
+    "independent_confirmation": 1024
+  },
+  "statistics": {
+    "selection_draws": 32768,
+    "global_error_budget": 0.01,
+    "support_accuracy_min": 0.95,
+    "confirmation_accuracy_min": 0.95,
+    "null_switch_accuracy_max": 0.05,
+    "positive_control_accuracy_min": 0.999,
+    "false_authorizations_max": 0,
+    "robust_coverage_min": 0.9
+  },
+  "primary_gate": {
+    "answer_free_recompute_models_min": 6,
+    "answer_free_recompute_per_depth_min": 2,
+    "selected_models_required": 9,
+    "at_least_one_nonterminal_confirmed_event_per_passing_model": true
+  },
+  "secondary_gate": {
+    "sparse_support_max_size": 6,
+    "sparse_recompute_models_min": 6,
+    "sparse_recompute_per_depth_min": 2
+  },
+  "hard_stops": [
+    "No analysis support may include answer position 22.",
+    "Behavior qualification cannot inspect hidden states or mechanism outcomes.",
+    "Exact oracle population scores cannot select a support or layer.",
+    "Confirmation cannot select a support, layer, threshold, or seed.",
+    "The final layer must show no answer-free switch while answer-only replay and with-answer suffix controls pass.",
+    "Primary answer-free recomputation and secondary sparse recomputation are reported separately.",
+    "No learned donor, component search, or pretrained model is run in this work package.",
+    "One formal run, zero adaptive rounds, no post-reveal seed or threshold changes."
+  ],
+  "scope": {
+    "synthetic_cyclic_code_only": true,
+    "exact_same_case_donor_states": true,
+    "answer_position_excluded_from_analysis": true,
+    "natural_language_claim": false,
+    "minimal_circuit_claim": false,
+    "independent_donor_claim": false
+  }
+}

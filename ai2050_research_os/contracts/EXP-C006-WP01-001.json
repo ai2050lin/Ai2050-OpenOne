@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C006-WP01-001",
+  "campaign_id": "C006",
+  "work_package_id": "WP01",
+  "phase": 1253,
+  "title": "Planted Transformer mechanism-edge and minimal-cut camera calibration",
+  "status": "adjudicated",
+  "question": "Can opaque interventions recover planted functional edges, complete minimal causal cuts and identity-specific rescue across serial, redundant, gated, compositional and gauge-rotated Transformer-shaped mechanisms?",
+  "object_ids": ["OBJ-C006-PLANTED-MECHANISM-CUT"],
+  "construct_types": ["CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P01", "P04", "P05", "P06", "P07"],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H07",
+      "prediction_id": "PR-H07-C006-WP01-001",
+      "observable": "Opaque edge damage, typed role probes, complete minimal-cut families and correct-versus-wrong donor rescue.",
+      "expected": "The registered camera exactly recovers every planted cut and active edge role, distinguishes output-equivalent twins, preserves gauge equivalence and rejects wrong identities in both splits.",
+      "distinguishes_from": ["H00"],
+      "death_observation": "Any mechanism family, held-out task or gauge fails the frozen conjunction."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C006-WP01-001",
+      "observable": "The same opaque intervention battery under inactive-edge, output-twin, wrong-donor and gauge controls.",
+      "expected": "Endpoint behavior or generic response spectra may fail to identify the planted implementation, and the edge camera may fail under redundancy, conditional activation or gauge rotation.",
+      "distinguishes_from": ["H07"],
+      "death_observation": "All mechanism-truth gates pass in both independently seeded splits."
+    }
+  ],
+  "scope": {
+    "models": ["fixed-shape planted Transformer QK/OV/MLP supernetwork"],
+    "tasks": ["serial lookup", "serial MLP", "redundant dual path", "conditional gate", "pair composition", "gauge-rotated lookup"],
+    "languages": ["synthetic typed symbols"],
+    "protocols": ["opaque edge blocking", "typed perturbation probe", "correct and wrong donor rescue", "complete singleton and pair cut enumeration"],
+    "precision": ["fp32"],
+    "backend": ["cuda"],
+    "allowed_observations": ["task accuracy", "edge intervention response", "minimal cut", "identity rescue", "generic output spectrum"],
+    "excluded_claims": ["free-trained algorithm discovery", "natural-language mechanism", "pretrained-model mechanism", "new mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One planted mechanism, task permutation, gauge and 64-world panel.",
+    "calibration": {"development": "One nonformal task-gauge probe per mechanism before freezing; excluded from formal evidence."},
+    "discovery": {"systems": 96, "tasks": 4, "gauges_per_task": 4, "sealed_truth": true},
+    "selection": {"systems": 0, "sealed": true},
+    "confirmation": {"systems": 96, "tasks": 4, "gauges_per_task": 4, "sealed_truth": true, "sealed": true},
+    "split_rule": "Discovery and confirmation use disjoint task seeds and gauge seeds; all formal thresholds are frozen before either split runs.",
+    "leakage_audit": ["opaque edge identifiers", "mechanism truth absent from public rows", "independent task labels", "response-inferred active masks", "global wrong-donor panels", "source hash freeze", "atomic completion marker"],
+    "answer_payload_rule": "Targets are computed by an independent symbolic task parser, never copied from model predictions."
+  },
+  "factor_design": {
+    "mechanisms": ["serial_lookup", "serial_mlp", "redundant_dual", "conditional_gate", "pair_composition", "rotated_lookup"],
+    "splits": ["discovery", "confirmation"],
+    "tasks_per_split": 4,
+    "gauges_per_task": 4,
+    "worlds_per_system": 64,
+    "opaque_edges": 15
+  },
+  "controls": ["inactive edges", "three global wrong-identity donors", "output-equivalent lookup-versus-MLP twins", "gauge-rotated twin", "strict-subset survival", "all planted cut members", "disjoint confirmation tasks", "independent symbolic targets"],
+  "metrics": [
+    {"id": "M-C006-BEHAVIOR", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "system", "estimator": "Accuracy against independent symbolic targets.", "threshold_source": "Frozen Phase1253 protocol."},
+    {"id": "M-C006-CUT", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "system", "estimator": "Exact set equality and F1 for complete minimal singleton/pair cuts.", "threshold_source": "Frozen planted truth."},
+    {"id": "M-C006-ROLE", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "edge", "estimator": "Address, payload and rule perturbation selectivity after response-based witness discovery.", "threshold_source": "Frozen typed intervention semantics."},
+    {"id": "M-C006-IDENTITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "active edge", "estimator": "Correct rescue versus maximum of three shared wrong-donor rescues.", "threshold_source": "Frozen Phase1253 thresholds."},
+    {"id": "M-C006-TWIN", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "task-gauge twin", "estimator": "Output equality paired with recovered edge-cut inequality; gauge rotation paired with abstract-cut equality.", "threshold_source": "Frozen Phase1253 protocol."}
+  ],
+  "typed_gates": [
+    {"id": "G-C006-BREADTH", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["discovery", "confirmation"], "rule": "Every registered mechanism passes every gate in both splits.", "authorizes": ["one fresh free-network external-validity contract"], "failure_type": "instrument_failure"},
+    {"id": "G-C006-CUT", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["discovery", "confirmation"], "rule": "Complete planted minimal-cut families are recovered exactly with F1 at least 0.999.", "authorizes": ["minimal-cut interpretation in a free-network contract"], "failure_type": "construct_failure"},
+    {"id": "G-C006-IDENTITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["discovery", "confirmation"], "rule": "Correct recovery is at least 0.95, every wrong recovery at most 0.35, margin at least 0.60 and top-one fraction at least 0.99.", "authorizes": ["identity rescue in a free-network contract"], "failure_type": "construct_failure"},
+    {"id": "G-C006-TWINS", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["discovery", "confirmation"], "rule": "Output-equivalent implementation twins are separated by edge cuts while gauge twins retain the same abstract cuts.", "authorizes": ["output-only abstention rule"], "failure_type": "identifiability_failure"}
+  ],
+  "budget": {"max_gpu_hours": 0.5, "max_runs": 1, "max_adaptive_rounds": 0, "max_world_clusters": 192, "right_censoring_rule": "No threshold change, seed replacement, mechanism deletion, cut truncation or donor reselection."},
+  "stopping_rules": ["Any split or mechanism failure blocks external validity.", "A pass calibrates only the instrument.", "No pretrained-model run is authorized.", "Task, endpoint, planted mechanism and free-network mechanism truth remain separate."],
+  "adjudication": {
+    "possible_verdicts": ["planted_component_edge_cut_camera_confirmed", "planted_component_edge_cut_camera_not_confirmed", "invalid", "censored"],
+    "observed_verdict": "planted_component_edge_cut_camera_confirmed",
+    "failure_claim": "Failure means this registered camera does not recover the full planted mechanism library under the frozen intervention ontology.",
+    "reopen_condition": "A future campaign must change and independently calibrate the intervention ontology; failed systems and thresholds remain frozen."
+  },
+  "permissions": {
+    "authorizes_on_pass": ["one fresh free-trained Transformer component-edge external-validity contract"],
+    "forbids_even_on_pass": ["Qwen3 run", "natural-language claim", "cross-model claim", "new mathematics"],
+    "authorizes_on_failure": ["retain per-family diagnostic boundaries"],
+    "forbids_on_failure": ["free-network escalation", "threshold relaxation", "seed replacement"]
+  },
+  "audit": {"preaudit_checks": ["hashes", "split balance", "mechanism balance", "opaque bijection", "truth sealing", "one-shot cleanliness"], "independent_result_auditor": "tests/glm5/phase1253_c006_planted_mechanism_cut_library_audit.py", "raw_result_required": true, "preserve_failed_systems": true, "audit_must_not_read_narrative_conclusion": true},
+  "execution_sequence": ["development_probe", "preregister", "independent_preaudit", "one_shot_cuda_run", "frozen_adjudication", "independent_final_audit"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C006-WP01-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1253_c006_planted_mechanism_cut_library.py", "tests/glm5/phase1253_c006_planted_mechanism_cut_library_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1253_c006_planted_mechanism_cut_library/material/public_systems.jsonl", "tests/glm5/result/phase1253_c006_planted_mechanism_cut_library/material/sealed_mechanism_truth.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1253_c006_planted_mechanism_cut_library/protocol/preregistration.json", "tests/glm5/result/phase1253_c006_planted_mechanism_cut_library/protocol/environment_snapshot.json", "tests/glm5/result/phase1253_c006_planted_mechanism_cut_library/audit/independent_preaudit.json"],
+    "readiness": "run_ready"
+  }
+}

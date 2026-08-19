@@ -1,283 +1,117 @@
-# 前端客户端快速启动指南
+# 可视化客户端快速启动
 
-## 问题诊断
+## 推荐启动方式
 
-### 原始问题
-"为什么客户端无法启动"
-
-### 问题分析
-1. **端口被占用** - 之前有其他进程占用了5173端口（PID 6520）
-2. **启动无输出** - Vite在后台启动，没有显示端口信息
-
-### 解决方案
-1. 终止占用端口的进程：`taskkill /F /PID 6520`
-2. 重新启动服务：`cd frontend && npm run dev`
-3. 验证服务状态：访问 http://localhost:5173
-
-## 快速启动步骤
-
-### 方法1：标准启动（推荐）
-
-```bash
-# 1. 进入前端目录
-cd d:\develop\TransformerLens-main\frontend
-
-# 2. 启动开发服务器
-npm run dev
-```
-
-启动后，Vite会自动在 http://localhost:5173 上运行。
-
-### 方法2：使用PowerShell（Windows）
+在仓库根目录运行：
 
 ```powershell
-# 1. 检查端口是否被占用
-netstat -ano | findstr ":5173"
-
-# 2. 如果被占用，终止进程
-taskkill /F /PID <进程ID>
-
-# 3. 启动服务
-cd d:\develop\TransformerLens-main\frontend
-npm run dev
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start_visualization.ps1
 ```
 
-### 方法3：一键启动（推荐）
+启动成功后访问：
 
-创建一个启动脚本 `start-frontend.ps1`:
+- 主客户端：<http://localhost:5173>
+- 人工标注工作台：<http://localhost:5173/annotation.html>
 
-```powershell
-# 进入前端目录
-cd $PSScriptRoot\..\frontend
+也可以在 VS Code 的“运行和调试”中选择 `Frontend` 或 `Full Stack (Backend + Frontend)`。启动配置调用同一个脚本，不再依赖某个用户目录中的固定 npm 路径。
 
-# 检查端口占用
-$portProcess = netstat -ano | Select-String ":5173" | Select-String "LISTENING"
-if ($portProcess) {
-    $pid = $portProcess.ToString().Split()[-1]
-    Write-Host "端口5173已被占用 (PID: $pid)，正在终止..." -ForegroundColor Yellow
-    taskkill /F /PID $pid | Out-Null
-    Start-Sleep -Seconds 1
-}
+注意：单独运行 `server/server.py` 只会启动 5001 后端，不会自动启动 5173 前端。若
+5001 已经有后端运行，`Full Stack (Backend + Frontend)` 会复用它，并让前端继续运行，
+不会因为重复后端进程正常退出而连带停止前端。
 
-# 启动前端服务
-Write-Host "启动前端服务..." -ForegroundColor Green
-npm run dev
+## 为什么不直接依赖 `npm run dev`
+
+部分开发环境已经包含 Node.js，但没有把 `node` 和 `npm` 加入终端 PATH。此时会出现：
+
+```text
+npm is not recognized
 ```
+
+启动器会依次检查：
+
+1. 环境变量 `AI2050_NODE_HOME`；
+2. 当前 PATH；
+3. 标准 Node.js 安装目录；
+4. 本机 WorkBuddy Node.js 运行时；
+5. 本机 Codex Node.js 运行时。
+
+找到运行时后，它只修改当前启动进程的 PATH，不修改系统环境变量。
 
 ## 环境要求
 
-### 必需的软件
-- **Node.js**: v16.0.0 或更高版本
-- **npm**: 8.0.0 或更高版本
+前端使用 Vite 7，需要以下任一版本：
 
-### 当前环境
-- Node.js: v22.14.0 ✅
-- npm: 10.9.2 ✅
+- Node.js 20.19 或更高的 20.x；
+- Node.js 22.12 或更高；
+- 更新的主版本。
 
-### 安装依赖（如果需要）
+如果 Node.js 安装在自定义目录，可以显式指定：
 
-```bash
-cd frontend
-npm install
+```powershell
+$env:AI2050_NODE_HOME = 'C:\path\to\nodejs'
+.\scripts\start_visualization.ps1
 ```
 
-## 配置说明
+## 首次安装或修复依赖
 
-### Vite配置 (vite.config.js)
-```javascript
-export default defineConfig({
-  root: '.',
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  server: {
-    host: '0.0.0.0',  // 允许外部访问
-    port: 5173,        // 默认端口
-  }
-})
+```powershell
+.\scripts\start_visualization.ps1 -Install
 ```
 
-### 更改端口（如果5173被占用）
+该命令使用锁文件执行 `npm ci`，随后启动开发服务器。
 
-编辑 `frontend/vite.config.js`，修改端口号：
+## 其他模式
 
-```javascript
-server: {
-  host: '0.0.0.0',
-  port: 3000,  // 改为其他端口
-}
+```powershell
+# 生产构建
+.\scripts\start_visualization.ps1 -Mode build
+
+# 预览生产构建
+.\scripts\start_visualization.ps1 -Mode preview
+
+# 使用其他端口
+.\scripts\start_visualization.ps1 -Port 5174
+
+# 运行全量 lint
+.\scripts\start_visualization.ps1 -Mode lint
 ```
 
-## 访问应用
+## 常见问题
 
-启动成功后，在浏览器中打开：
+### 端口 5173 被占用
 
-- **本地访问**: http://localhost:5173
-- **局域网访问**: http://<你的IP地址>:5173
+客户端启用了严格端口模式，不会悄悄切换到其他端口。检查占用：
 
-### 获取本地IP地址
-```bash
-ipconfig
-```
-找到"IPv4 地址"对应的IP。
-
-## 常见问题排查
-
-### 1. 端口被占用
-
-**症状**: 运行 `npm run dev` 没有任何输出
-
-**解决**:
-```bash
-# 查找占用端口的进程
-netstat -ano | findstr ":5173"
-
-# 终止进程
-taskkill /F /PID <进程ID>
+```powershell
+Get-NetTCPConnection -LocalPort 5173 -State Listen
 ```
 
-### 2. 依赖未安装
+确认旧进程可以停止后再结束对应 PID，或者使用：
 
-**症状**: 启动时报错找不到模块
-
-**解决**:
-```bash
-cd frontend
-npm install
+```powershell
+.\scripts\start_visualization.ps1 -Port 5174
 ```
 
-### 3. Node.js版本过低
+### 找不到 Node.js
 
-**症状**: 启动时报错 "Invalid Vite version"
+安装符合版本要求的 Node.js，或者设置 `AI2050_NODE_HOME`。启动器会输出实际使用的 Node 版本和目录。
 
-**解决**:
-从 https://nodejs.org/ 下载最新LTS版本
+### 前端正常但实时数据不可用
 
-### 4. 无法访问
+前端静态界面可以单独启动；实时模型分析和后端 API 需要另一个终端运行：
 
-**症状**: 服务已启动但浏览器无法打开
-
-**解决**:
-- 检查防火墙设置
-- 确认服务正在运行（`netstat -ano | findstr ":5173"`）
-- 尝试访问 127.0.0.1:5173 而不是 localhost:5173
-
-### 5. 热重载不工作
-
-**症状**: 修改代码后页面不自动刷新
-
-**解决**:
-- 清除浏览器缓存
-- 重启开发服务器
-- 检查Vite配置
-
-## 验证安装
-
-运行以下命令验证环境：
-
-```bash
-# 检查Node.js版本
-node --version
-
-# 检查npm版本
-npm --version
-
-# 检查已安装的包
-cd frontend
-npm list
-
-# 测试服务是否可访问
-curl http://localhost:5173
+```powershell
+.\.venv\Scripts\python.exe -m server.server
 ```
 
-## 构建生产版本
+默认后端地址为 <http://localhost:5001>。
 
-```bash
-cd frontend
-npm run build
+### 全量 lint 未通过
+
+仓库仍有历史组件的 lint 技术债。生产构建成功与否应单独检查：
+
+```powershell
+.\scripts\start_visualization.ps1 -Mode build
 ```
 
-构建产物会生成在 `dist` 目录。
-
-## 预览生产版本
-
-```bash
-cd frontend
-npm run preview
-```
-
-## 开发技巧
-
-### 1. 使用多个终端
-
-- 终端1: `npm run dev`（前端）
-- 终端2: `npm run server`（后端，如果有）
-
-### 2. 查看详细日志
-
-```bash
-# 设置日志级别
-DEBUG=vite:* npm run dev
-```
-
-### 3. 清除缓存
-
-```bash
-# 清除Vite缓存
-rm -rf node_modules/.vite
-
-# 重新安装依赖
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## 项目结构
-
-```
-frontend/
-├── index.html              # HTML入口
-├── package.json            # 项目配置
-├── vite.config.js          # Vite配置
-├── src/
-│   ├── main.jsx            # React入口
-│   ├── App.jsx             # 主应用组件
-│   ├── components/         # 组件目录
-│   └── css/               # 样式文件
-└── dist/                   # 构建输出（运行npm run build后生成）
-```
-
-## 性能优化
-
-### 1. 减少初始加载时间
-- 使用代码分割
-- 懒加载路由
-- 压缩资源
-
-### 2. 开发环境优化
-- 使用Vite的快速HMR
-- 禁用不必要的插件
-- 使用更快的source map
-
-## 总结
-
-**当前状态**: ✅ 前端已成功运行在 http://localhost:5173
-
-**验证方法**:
-1. 打开浏览器访问 http://localhost:5173
-2. 应该能看到应用界面
-3. 打开浏览器控制台（F12），检查是否有错误
-
-**下一步**:
-- 探索DNN分析3D可视化功能
-- 运行分析任务
-- 测试3D视图切换功能
-
----
-
-**注意**: 如果启动后仍然无法访问，请检查：
-1. 浏览器控制台的错误信息
-2. 终端的日志输出
-3. 防火墙和网络设置
+不要把已有 lint 警告误判为 Vite 无法启动；新增或修改文件仍应避免增加 lint 错误。

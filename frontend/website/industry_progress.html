@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>行业进展 | AI2050</title>
+    <meta
+      name="description"
+      content="追踪 OpenAI、Google DeepMind 与 Anthropic 的机械可解释性研究进展，梳理三家公司共同积累的机制拼图与行业路线演化。"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="主导航">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">AI2050</span></a>
+      <nav class="nav-links" aria-label="页面栏目">
+        <a href="index.html">首页</a>
+        <a href="ai2050.html">AI2050计划</a>
+        <a class="active" href="agi_project.html">AGI研究</a>
+        <a href="about.html">关于我们</a>
+      </nav>
+      <a class="header-action dark" href="join.html" target="_blank" rel="noopener">参与讨论</a>
+    </header>
+
+    <main class="page-shell industry-page">
+      <nav class="research-subnav" aria-label="AGI研究二级菜单">
+        <a href="agi_project.html">研究概览</a>
+        <a class="active" href="industry_progress.html" aria-current="page">行业进展</a>
+      </nav>
+      <section class="sub-hero industry-hero" aria-labelledby="industry-title">
+        <div class="industry-hero-copy">
+          <p class="eyebrow">MECHANISTIC INTERPRETABILITY · 2021—2026</p>
+          <h1 id="industry-title">行业进展</h1>
+          <div class="industry-lead">
+            <span class="industry-lead-label">研究范围</span>
+            <p>追踪 OpenAI、Google DeepMind 与 Anthropic 在深度神经网络内部机制研究上的公开进展。</p>
+          </div>
+          <nav class="company-jump-nav" aria-label="跳转到公司研究进展">
+            <a href="#openai-progress"><span>01</span>OpenAI</a>
+            <a href="#deepmind-progress"><span>02</span>Google DeepMind</a>
+            <a href="#anthropic-progress"><span>03</span>Anthropic</a>
+          </nav>
+          <p class="evidence-date">公开研究时间范围：2021 年—2026 年 · 更新至 2026 年 8 月 13 日</p>
+        </div>
+        <div class="industry-radar" aria-label="三家公司研究时间线">
+          <div class="radar-ring ring-a"></div>
+          <div class="radar-ring ring-b"></div>
+          <div class="radar-core"><strong>3</strong><span>RESEARCH LABS</span></div>
+          <span class="radar-node node-openai">OpenAI</span>
+          <span class="radar-node node-deepmind">DeepMind</span>
+          <span class="radar-node node-anthropic">Anthropic</span>
+        </div>
+      </section>
+
+      <section class="industry-section company-progress" id="lab-routes" aria-labelledby="labs-title">
+        <div class="section-heading company-heading">
+          <p class="eyebrow">THREE RESEARCH ROUTES</p>
+          <h2 id="labs-title">三家公司研究进展</h2>
+          <p>按公开发布时间梳理各自的研究主题、代表成果和工具演化。</p>
+        </div>
+
+        <div class="lab-grid">
+          <article class="lab-card openai-card" id="openai-progress">
+            <div class="lab-profile">
+              <header><span class="lab-index">01</span><div><p>OpenAI</p><h3>从神经元解释到可解释电路训练</h3></div></header>
+              <p class="lab-summary">研究路线从识别单个神经元的响应，扩展到自动解释、大规模稀疏特征、因果转向，以及直接训练结构更稀疏的 Transformer。</p>
+              <div class="research-focus" aria-label="OpenAI 研究主题"><span>神经元解释</span><span>稀疏特征</span><span>因果转向</span><span>权重稀疏</span></div>
+              <a class="source-link" href="https://openai.com/research/" target="_blank" rel="noopener">访问 OpenAI Research <span>↗</span></a>
+            </div>
+            <ol class="lab-timeline">
+              <li><time>2021</time><div><strong>Multimodal Neurons</strong><span>在 CLIP 中识别跨图像、文字与符号响应的抽象神经元，并展示文字覆盖图像产生的攻击现象。</span></div></li>
+              <li><time>2023</time><div><strong>Language Models Can Explain Neurons</strong><span>用 GPT-4 自动描述并测试 GPT-2 的 307,200 个神经元，建立“解释—预测激活—评分”流水线。</span></div></li>
+              <li><time>2024</time><div><strong>Scaling and Evaluating Sparse Autoencoders</strong><span>使用 k-sparse SAE 在 GPT-4 中训练出约 1,600 万个潜在特征，并研究特征质量的扩展规律。</span></div></li>
+              <li><time>2025</time><div><strong>Persona Features</strong><span>比较微调前后的 GPT-4o，识别与涌现失调人格相关的方向，并通过增强或抑制改变模型行为。</span></div></li>
+              <li><time>2025</time><div><strong>Weight-sparse Transformers</strong><span>从训练开始限制多数连接为零，在若干算法任务中获得规模更小、必要性与充分性更清晰的电路。</span></div></li>
+            </ol>
+          </article>
+
+          <article class="lab-card deepmind-card" id="deepmind-progress">
+            <div class="lab-profile">
+              <header><span class="lab-index">02</span><div><p>Google DeepMind</p><h3>真值校准、因果定位与开放显微镜</h3></div></header>
+              <p class="lab-summary">研究重点覆盖内部算法真值已知的实验平台、行为组件定位、稀疏字典改进，以及面向 Gemma 全系列的开放解释工具链。</p>
+              <div class="research-focus" aria-label="Google DeepMind 研究主题"><span>真值实验室</span><span>因果定位</span><span>SAE</span><span>跨层工具</span></div>
+              <a class="source-link" href="https://deepmind.google/research/" target="_blank" rel="noopener">访问 Google DeepMind Research <span>↗</span></a>
+            </div>
+            <ol class="lab-timeline">
+              <li><time>2023</time><div><strong>Tracr</strong><span>把人类可读程序编译成 Transformer，为计数、排序和括号检查等任务提供内部算法真值。</span></div></li>
+              <li><time>2023</time><div><strong>Schema-learning and Rebinding</strong><span>在可解释因果图模型中研究模板电路、条件检索，以及新 token 与模板槽位的重新绑定。</span></div></li>
+              <li><time>2024</time><div><strong>AtP*</strong><span>用梯度近似加速 Activation Patching，修复两类假阴性，并给出剩余误差估计。</span></div></li>
+              <li><time>2024</time><div><strong>Gated SAE、JumpReLU 与 Gemma Scope</strong><span>改进稀疏字典的重构—稀疏度前沿，并为 Gemma 2 多个规模和层发布数百个 SAE。</span></div></li>
+              <li><time>2025</time><div><strong>Gemma Scope 2</strong><span>覆盖 Gemma 3 从 270M 到 27B，并加入 SAE、Skip Transcoder 与跨层转码器。</span></div></li>
+            </ol>
+          </article>
+
+          <article class="lab-card anthropic-card" id="anthropic-progress">
+            <div class="lab-profile">
+              <header><span class="lab-index">03</span><div><p>Anthropic</p><h3>从电路语言到跨层计算与全局工作区</h3></div></header>
+              <p class="lab-summary">公开研究覆盖残差流和注意力电路、叠加与单义特征、跨层归因图、几何计算，以及面向未来输出的可言说表示空间。</p>
+              <div class="research-focus" aria-label="Anthropic 研究主题"><span>Transformer 电路</span><span>叠加特征</span><span>跨层归因</span><span>全局工作区</span></div>
+              <a class="source-link" href="https://transformer-circuits.pub/" target="_blank" rel="noopener">访问 Transformer Circuits Thread <span>↗</span></a>
+            </div>
+            <ol class="lab-timeline">
+              <li><time>2021</time><div><strong>Transformer Circuits Framework</strong><span>把残差流描述为共享通信通道，并用 QK、OV、组合电路和虚拟权重建立分析语言。</span></div></li>
+              <li><time>2022—23</time><div><strong>Induction Heads 与 Superposition</strong><span>研究重复模式复制电路、稀疏特征叠加、特权基，以及单义特征分解。</span></div></li>
+              <li><time>2024</time><div><strong>Scaling Monosemanticity</strong><span>从 Claude 3 Sonnet 中提取数百万级特征，并研究跨语言、跨模态和安全相关特征。</span></div></li>
+              <li><time>2025</time><div><strong>跨层电路、QK 交互与流形计算</strong><span>推进跨层转码器、归因图、两跳事实路径、QK 双线性交互、机制不忠实和计数流形研究。</span></div></li>
+              <li><time>2026</time><div><strong>自然语言自编码器与 Global Workspace</strong><span>研究激活与自然语言之间的双向重构，并用 J-lens 分析面向未来输出、可被下游读写的子空间。</span></div></li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section class="industry-section puzzle-section" id="shared-puzzles" aria-labelledby="puzzles-title">
+        <div class="section-heading split-heading">
+          <div><p class="eyebrow">SHARED DISCOVERIES</p><h2 id="puzzles-title">行业共同积累的 14 块拼图</h2></div>
+          <p>把三家公司的公开成果放在一起，可以看到从表示、路由到跨层计算逐步形成的一组共同机制线索。</p>
+        </div>
+        <div class="puzzle-grid">
+          <article><span>01—03</span><h3>通信与路由</h3><p>残差流承担共享通信；注意力的 QK 决定读取位置，OV 决定搬运内容；归纳头能够复制重复模式。</p><strong>残差流 · QK/OV · 归纳头</strong></article>
+          <article><span>04—07</span><h3>混义与特征字典</h3><p>神经元普遍混义，特征能够叠加；SAE 可以恢复更单义的方向，但字典依赖数据、宽度和目标函数。</p><strong>Superposition · SAE · 字典依赖</strong></article>
+          <article><span>08—10</span><h3>跨层与多跳运输</h3><p>同一功能状态可以跨层、跨位置和跨注意力头分布；局部计算、运输路径和多跳中间状态需要联合观察。</p><strong>跨层 · 跨位置 · 中间状态</strong></article>
+          <article><span>11</span><h3>并行与补偿路径</h3><p>模型经常同时使用多条启发式路径。删除单一路径后，行为可能由冗余或补偿电路继续完成。</p><strong>并行启发式 · 冗余 · 补偿</strong></article>
+          <article><span>12—13</span><h3>流形与工作区</h3><p>离散特征和连续流形可能是同一结构的不同描述；部分状态进入面向未来输出、容易被下游读写的工作区。</p><strong>连续流形 · J-space · 广播</strong></article>
+          <article><span>14</span><h3>机制忠实性</h3><p>高质量重构和正确输出预测不保证恢复真实计算，替代模型仍可能通过不同机制得到相同答案。</p><strong>重构边界 · 因果验证 · 机制保真</strong></article>
+        </div>
+      </section>
+
+      <section class="industry-section industry-analysis" id="industry-analysis" aria-labelledby="analysis-title">
+        <div class="section-heading split-heading">
+          <div><p class="eyebrow">INDUSTRY ANALYSIS</p><h2 id="analysis-title">研究路线的共同演化</h2></div>
+          <p>行业关注点正在从“哪个神经元响应什么”，转向“信息怎样被构造、路由、运输，并在下游产生可验证作用”。</p>
+        </div>
+
+        <div class="analysis-stage-grid">
+          <article><span>STAGE 01</span><h3>从神经元到特征</h3><p>单神经元解释逐渐让位于稀疏特征、方向和流形。研究规模从少量人工案例扩展到千万级候选特征。</p></article>
+          <article><span>STAGE 02</span><h3>从特征到电路</h3><p>研究不再只问“表示在哪里”，而是联合分析 QK/OV、跨层转码器、归因图和多跳运输路径。</p></article>
+          <article><span>STAGE 03</span><h3>从重构到机制验证</h3><p>准确重构不再被视为充分证据。已知真值模型、因果干预、路径删除和机制忠实性成为核心校验手段。</p></article>
+        </div>
+
+        <div class="claim-audit" aria-label="行业公开证据边界">
+          <div class="claim-audit-head"><span>公开证据边界</span><strong>当前可确认的范围</strong></div>
+          <article><span class="claim-status no-evidence">没有公开定律</span><h3>解释复杂度必然平方增长</h3><p>公开研究确认完整覆盖成本很高，但没有建立普适的参数平方定律。</p></article>
+          <article><span class="claim-status overreach">不能直接推出</span><h3>所有特征和流形都是副产品</h3><p>特征可视化可能产生假象，但自然输入和因果干预已经确认部分结构具有功能作用。</p></article>
+          <article><span class="claim-status contradicted">持续研究中</span><h3>顶尖实验室已经放弃内部逆向</h3><p>稀疏电路、Gemma Scope 2、跨层电路与 Global Workspace 均显示研究仍在推进。</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer compact-footer">
+      <div class="footer-brand">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><span></span></span><span class="brand-word">AI2050</span></a>
+        <p>致力于推动通用人工智能的发展，为人类创造更美好的未来。</p>
+      </div>
+      <div class="footer-col"><h4>计划</h4><a href="ai2050.html">AI2050计划</a><a href="agi_project.html">AGI研究</a><a href="industry_progress.html">行业进展</a><a href="agi_project.html#research-route">研究路线</a></div>
+      <div class="footer-col"><h4>社区</h4><a href="#">论坛</a><a href="#">活动</a><a href="#">公告</a><a href="#">资源</a></div>
+      <div class="footer-col"><h4>关于我们</h4><a href="about.html">加入我们</a><a href="about.html">联系我们</a><a href="#">免责声明</a><a href="#">隐私政策</a></div>
+      <div class="footer-bottom"><span>© 2026 AI2050. All rights reserved.</span></div>
+    </footer>
+  </body>
+</html>

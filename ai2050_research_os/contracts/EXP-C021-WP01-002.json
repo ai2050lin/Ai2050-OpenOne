@@ -1,0 +1,25 @@
+{
+  "contract_id": "EXP-C021-WP01-002",
+  "phase": 1275,
+  "campaign": "C021",
+  "title": "Throughput-safe execution of the frozen three-task response-isomorphism contract",
+  "status": "draft",
+  "predecessor": "EXP-C021-WP01-001",
+  "objective": "Execute the unchanged Phase1274 scientific contract with depth-adaptive vectorization and per-model atomic checkpoints after Phase1274 produced zero scientific output.",
+  "scientific_invariants": [
+    "same 6144 frozen material rows and material digest",
+    "same 27 model seeds, architectures, task families, thresholds, roles, readouts, events, cameras, and panels",
+    "same no-replacement and no-confirmation-selection rules"
+  ],
+  "execution_changes": {
+    "base_case_batch_by_depth": {"shallow4": 256, "middle6": 128, "deep8": 64},
+    "checkpointing": "atomically rewrite qualification and measured-model ledgers after every completed model",
+    "semantics": "exact same masks, donor traces, logits, role order, and aggregation"
+  },
+  "hard_stops": [
+    "Any semantic digest mismatch against Phase1274 denies execution.",
+    "No batch OOM may be solved by reducing cases, roles, programs, models, or thresholds.",
+    "A behavior-rejected seed is recorded and never replaced.",
+    "Failure closes C021 synthetic local-isomorphism search."
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C003-WP01-001",
+  "campaign_id": "C003",
+  "work_package_id": "WP01",
+  "phase": 1250,
+  "title": "Known-truth multi-event intervention-trajectory response camera",
+  "status": "adjudicated",
+  "question": "Can a fixed multi-event intervention trajectory predict held-out direct and code-path responses when the causally prior source observation is exactly nonidentifiable?",
+  "object_ids": ["OBJ-C003-MULTIEVENT-RESPONSE-CAMERA"],
+  "construct_types": ["CON-MODEL-SELF-RESPONSE", "CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P03", "P04", "P07"],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H07",
+      "prediction_id": "PR-H07-C003-WP01-001",
+      "observable": "Held-out target-patch response predicted from a five-event trajectory bundle under an equal 80-dimensional camera budget.",
+      "expected": "At least three of four free Transformers, with both architectures represented, pass direct and code response gates while the multi-event code cosine exceeds the best source-only camera by at least 0.60.",
+      "distinguishes_from": ["H00"],
+      "death_observation": "Fewer than three networks pass the frozen conjunction, either architecture has no passing replicate, or exact source collisions are absent."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C003-WP01-001",
+      "observable": "Source-only and structured multi-event cameras under the same fitted input dimension and sealed confirmation worlds.",
+      "expected": "If the registered event bundle is not a robust response object, its confirmation breadth or specificity gate fails despite behavior qualification.",
+      "distinguishes_from": ["H07"],
+      "death_observation": "The multi-event camera passes all frozen gates in at least three networks and both architectures."
+    }
+  ],
+  "scope": {
+    "models": ["TinyCausalTransformer compact", "TinyCausalTransformer wide"],
+    "tasks": ["direct_label_readout", "code_plus_later_shift_readout"],
+    "languages": ["synthetic_tokens"],
+    "protocols": ["target_source_embedding_patch", "matched_null_patch", "multi_event_trajectory_capture"],
+    "precision": ["fp32"],
+    "backend": ["cuda"],
+    "allowed_observations": ["centered_candidate_response", "source_delta", "shift_state_delta", "codebook_value_state_delta", "answer_boundary_state_delta"],
+    "excluded_claims": ["discrete_two_hop_neural_algorithm", "natural_language_semantics", "pretrained_model_mechanism", "cross_model_invariant", "new_foundational_mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One source-code pair and codebook order, crossed with four later shifts and direct/code representation.",
+    "calibration": {"upstream_phase": 1249, "status": "source_only_observation_nonidentifiable_across_later_context", "sealed": false},
+    "discovery": {"groups": 50, "rows": 400, "alphas": [0.25, 0.5], "sealed": false},
+    "selection": {"groups": 20, "rows": 160, "alpha": 0.75, "sealed": true},
+    "confirmation": {"groups": 30, "rows": 240, "alpha": 1.0, "sealed": true},
+    "split_rule": "Groups are indivisible; all four shifts and both representations from a group remain in one partition.",
+    "leakage_audit": ["group_integrity", "confirmation_excluded_from_selection", "independent_model_seeds", "equal_camera_dimension", "source_hash_freeze", "target_changes_query_answer", "null_preserves_query_answer", "exact_source_collision", "response_separation"],
+    "answer_payload_rule": "Direct rows expose the answer label at the source; code rows expose only a code whose label is determined by a later cyclic-shift codebook."
+  },
+  "factor_design": {
+    "axes": {"representation": ["direct", "code"], "later_shift": [0, 1, 2, 3], "donor": ["target", "null"], "alpha": [0.25, 0.5, 0.75, 1.0]},
+    "camera_families": ["source_only", "typed_source_only", "multievent_additive", "typed_multievent_additive", "multievent_interaction"],
+    "input_dimension_each": 80,
+    "output_dimension": 4,
+    "ridge_grid": [0.001, 0.01, 0.1]
+  },
+  "controls": ["matched_null_source_patch", "source_only_camera", "typed_source_only_camera", "equal_input_dimension", "sealed_confirmation", "heldout_alpha", "two_architectures", "two_seeds_per_architecture", "exact_collision_audit", "independent_final_recomputation"],
+  "metrics": [
+    {"id": "M-C003-BEHAVIOR", "construct_id": "CON-MODEL-SELF-RESPONSE", "unit": "model and representation", "estimator": "Accuracy on 16384 independently generated examples.", "threshold_source": "Frozen Phase1250 protocol."},
+    {"id": "M-C003-COLLISION", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "confirmation group", "estimator": "Exact source-feature collision and separated future response across later shifts.", "threshold_source": "Deterministic causal-prefix design."},
+    {"id": "M-C003-IMAGING", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "model, representation and donor", "estimator": "Cosine, positive fraction and relative error on sealed alpha=1 response.", "threshold_source": "Frozen development-independent breadth contract."},
+    {"id": "M-C003-SPECIFICITY", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "model", "estimator": "Absolute target-minus-null effect and null effect divided by target effect.", "threshold_source": "Frozen Phase1250 protocol; absolute effects accompany ratios."}
+  ],
+  "typed_gates": [
+    {"id": "G-C003-BEHAVIOR", "construct_id": "CON-MODEL-SELF-RESPONSE", "required_partitions": ["confirmation"], "rule": "Every network reaches at least 0.995 direct and code accuracy.", "authorizes": ["camera fitting for behavior-qualified models"], "failure_type": "behavior_failure"},
+    {"id": "G-C003-NONIDENTIFIABILITY", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["confirmation"], "rule": "All code confirmation groups have exact source collisions and response-separated later contexts.", "authorizes": ["comparison with context-bearing event bundles"], "failure_type": "identifiability_failure"},
+    {"id": "G-C003-MULTIEVENT", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["selection", "confirmation"], "rule": "Selected multi-event camera has direct and code cosine at least 0.90, positive fraction at least 0.95, relative error at most 0.55, and code advantage at least 0.60.", "authorizes": ["model-level camera pass"], "failure_type": "predictive_failure"},
+    {"id": "G-C003-BREADTH", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["confirmation"], "rule": "At least three of four networks pass, at least one per architecture, target-minus-null effect is at least 5.0, and null/target effect is at most 0.05.", "authorizes": ["one fresh Qwen3 external-validity contract"], "failure_type": "instrument_failure"}
+  ],
+  "budget": {
+    "max_gpu_hours": 0.75,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_world_clusters": 100,
+    "right_censoring_rule": "Stop on CUDA failure, behavior failure, artifact corruption or 0.75 GPU-hour; completed scientific gates may not be rerun or relaxed."
+  },
+  "stopping_rules": ["Confirmation cannot select camera family or ridge.", "Failure closes this event bundle without reselection.", "A pass cannot be called a language mechanism.", "Qwen3 is authorized only after the full known-truth breadth conjunction.", "GLM4 and DS7B are not authorized by this contract."],
+  "adjudication": {
+    "possible_verdicts": ["known_truth_multievent_camera_confirmed", "known_truth_multievent_camera_not_confirmed", "invalid", "censored"],
+    "observed_verdict": "known_truth_multievent_camera_not_confirmed",
+    "failure_claim": "The five-event, 80-dimensional, linear intervention-trajectory camera did not meet the preregistered 3/4 breadth conjunction; this does not negate the repeated multi-event advantage.",
+    "reopen_condition": "A new contract must change the mathematical observation object or provide a preregistered nonlinear/path object; it may not relax the Phase1250 thresholds or reselect these events."
+  },
+  "permissions": {
+    "authorizes_on_pass": ["one fresh Qwen3 multi-event external-validity contract"],
+    "forbids_even_on_pass": ["semantic mechanism claim", "discrete hop claim", "cross-model claim", "new mathematics claim"],
+    "authorizes_on_failure": ["record exact source nonidentifiability", "retain multi-event advantage as a bounded candidate", "close automatic Qwen continuation"],
+    "forbids_on_failure": ["threshold relaxation", "event reselection", "Qwen3 Phase1251", "GLM4 or DS7B run"]
+  },
+  "audit": {
+    "preaudit_checks": ["row_count", "partition_counts", "camera_families_frozen", "equal_input_budget", "confirmation_sealed", "independent_model_seeds", "two_architectures", "source_collision_design", "hard_stop_scope"],
+    "independent_result_auditor": "tests/glm5/phase1250_c003_multievent_response_camera_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_models": true,
+    "audit_must_not_read_narrative_conclusion": true
+  },
+  "execution_sequence": ["preregister", "independent_preaudit", "train_one_network_at_a_time", "behavior_qualification", "trajectory_capture", "selection_only_model_choice", "sealed_confirmation", "independent_final_audit", "stop_without_qwen"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C003-WP01-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1250_c003_multievent_response_camera.py", "tests/glm5/phase1250_c003_multievent_response_camera_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1250_c003_multievent_response_camera/material/frozen_worlds.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1250_c003_multievent_response_camera/protocol/preregistration.json", "tests/glm5/result/phase1250_c003_multievent_response_camera/protocol/environment_snapshot.json", "tests/glm5/result/phase1250_c003_multievent_response_camera/audit/independent_preaudit.json", "tests/glm5/result/phase1249_c003_source_observation_identifiability/analysis/final.json", "research/ai2050_research_os/schemas/experiment_contract.schema.json"],
+    "readiness": "run_ready"
+  }
+}

@@ -1,0 +1,347 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C002-WP00-001",
+  "campaign_id": "C002",
+  "work_package_id": "WP00",
+  "phase": 1247,
+  "title": "自由微型 Transformer 的隐藏变化到未来响应相机校准",
+  "status": "adjudicated",
+  "question": "公开隐藏变化能否在未见样本和未见干预幅度上，预测自由训练因果 Transformer 的真实 activation-patch 输出响应？",
+  "object_ids": [
+    "OBJ-C002-HIDDEN-RESPONSE-IMAGING"
+  ],
+  "construct_types": [
+    "CON-MODEL-SELF-RESPONSE",
+    "CON-HIDDEN-RESPONSE-IMAGING",
+    "CON-INTERVENTION-SPECIFICITY",
+    "CON-TYPED-OBSERVABILITY"
+  ],
+  "puzzle_ids": [
+    "P01",
+    "P03",
+    "P05",
+    "P13"
+  ],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H07",
+      "prediction_id": "PR-H07-C002-WP00-001",
+      "observable": "固定投影的隐藏供体差分对未见完整补丁输出响应的预测",
+      "expected": "同一事件的发现集局部响应可预测确认集 alpha=1 的中心化候选 logit 响应，并显著超过常数与置乱基线。",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "四个自由网络中少于三个达到冻结的方向、误差和基线优势门，或两种架构不能各自至少通过一个网络。"
+    },
+    {
+      "hypothesis_id": "H06",
+      "prediction_id": "PR-H06-C002-WP00-001",
+      "observable": "目标供体补丁与保持查询答案不变的 matched-null 供体补丁之响应强度",
+      "expected": "被选事件的目标供体响应显著大于 matched-null 响应，说明相机不是只预测通用载体扰动。",
+      "distinguishes_from": [
+        "H00"
+      ],
+      "death_observation": "确认集目标与 matched-null 效应比低于 1.75，或优势仅来自单一架构。"
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C002-WP00-001",
+      "observable": "确认集预测与控制基线、架构复现及类型化拒答",
+      "expected": "若局部隐藏变化不携带可迁移的响应信息，则相机不会同时超过常数、置乱和 matched-null 控制。",
+      "distinguishes_from": [
+        "H07"
+      ],
+      "death_observation": "两个架构的多数自由网络在未见样本上通过全部冻结预测、特异性与识别性门。"
+    }
+  ],
+  "scope": {
+    "models": [
+      "TinyCausalTransformer-compact",
+      "TinyCausalTransformer-deep"
+    ],
+    "tasks": [
+      "two_slot_value_binding_retrieval"
+    ],
+    "languages": [
+      "synthetic"
+    ],
+    "protocols": [
+      "activation_patch_target_donor",
+      "activation_patch_matched_null",
+      "hidden_delta_response_prediction"
+    ],
+    "precision": [
+      "fp32"
+    ],
+    "backend": [
+      "cuda"
+    ],
+    "allowed_observations": [
+      "residual_output",
+      "attention_output",
+      "mlp_output",
+      "centered_candidate_logit_response",
+      "actual_patch_effect"
+    ],
+    "excluded_claims": [
+      "natural language semantic mechanism",
+      "pretrained language model mechanism",
+      "fixed semantic direction",
+      "cross-model physical conservation",
+      "human brain mechanism",
+      "new foundational mathematics"
+    ]
+  },
+  "data_contract": {
+    "cluster_unit": "unique value0-value1-query triple",
+    "calibration": {
+      "examples": 112,
+      "role": "complete behavior training domain",
+      "sealed": false
+    },
+    "discovery": {
+      "examples": 32,
+      "role": "camera fitting at alpha 0.25 and 0.5",
+      "sealed": false
+    },
+    "selection": {
+      "examples": 24,
+      "role": "event selection at alpha 0.75",
+      "sealed": true
+    },
+    "confirmation": {
+      "examples": 56,
+      "role": "one-shot evaluation at alpha 1.0",
+      "sealed": true
+    },
+    "split_rule": "发现、选择和确认按完整三元组互斥；事件选择不得读取确认集；任务训练覆盖完整输入域，但相机泛化单位是未见干预样本与幅度。",
+    "leakage_audit": [
+      "unique_triple_partition",
+      "balanced_query_slot",
+      "target_donor_changes_answer",
+      "matched_null_preserves_answer",
+      "confirmation_excluded_from_selection",
+      "fixed_projection_seed",
+      "source_hash_freeze",
+      "final_third_excluded",
+      "one_shot_formal_run"
+    ],
+    "answer_payload_rule": "这是已知真值仪器校准而非语言生成实验；输出读出固定为八个候选 logit 的中心化响应，不把 gold 正确性与模型自身响应混为一个量。"
+  },
+  "factor_design": {
+    "architectures": [
+      "compact_4_layer",
+      "deep_6_layer"
+    ],
+    "replicates_per_architecture": 2,
+    "eligible_components": [
+      "residual",
+      "attention_output",
+      "mlp_output"
+    ],
+    "token_roles": [
+      "target_value",
+      "answer_boundary"
+    ],
+    "eligible_depth_rule": "depth <= ceil(2L/3); final third excluded",
+    "fit_alphas": [
+      0.25,
+      0.5
+    ],
+    "selection_alpha": 0.75,
+    "confirmation_alpha": 1.0,
+    "forbidden_posthoc_actions": [
+      "confirmation_event_reselection",
+      "threshold_relaxation",
+      "drop_failed_architecture",
+      "change_projection_after_result"
+    ]
+  },
+  "controls": [
+    "constant_response_baseline",
+    "deterministically_shuffled_hidden_delta",
+    "matched_non_target_donor",
+    "wrong_direction_sign_flip_sentinel",
+    "architecture_replication",
+    "seed_replication",
+    "final_third_exclusion",
+    "behavior_gate_before_camera",
+    "confirmation_blind_event_selection",
+    "multi_event_nonidentifiability_abstention"
+  ],
+  "metrics": [
+    {
+      "id": "M-SELF-RESPONSE",
+      "construct_id": "CON-MODEL-SELF-RESPONSE",
+      "unit": "model-event-example",
+      "estimator": "actual centered candidate-logit patch response and finite behavior audit",
+      "threshold_source": "pre-run development calibration with formal confirmation kept sealed"
+    },
+    {
+      "id": "M-IMAGING-PREDICTION",
+      "construct_id": "CON-HIDDEN-RESPONSE-IMAGING",
+      "unit": "model-event-confirmation example",
+      "estimator": "cosine, positive-direction fraction, relative error and null-baseline advantage",
+      "threshold_source": "frozen Phase1247 preregistration"
+    },
+    {
+      "id": "M-SPECIFICITY",
+      "construct_id": "CON-INTERVENTION-SPECIFICITY",
+      "unit": "model-selected-event",
+      "estimator": "target donor to matched-null response norm ratio",
+      "threshold_source": "frozen Phase1247 preregistration"
+    },
+    {
+      "id": "M-OBSERVABILITY",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "unit": "registered intervention domain",
+      "estimator": "in-domain acceptance, out-of-domain abstention, multi-event abstention and corruption detection",
+      "threshold_source": "frozen Phase1247 preregistration"
+    }
+  ],
+  "typed_gates": [
+    {
+      "id": "G-SELF-RESPONSE",
+      "construct_id": "CON-MODEL-SELF-RESPONSE",
+      "required_partitions": [
+        "confirmation"
+      ],
+      "rule": "每个被授权网络的完整任务准确率至少 0.999，全部实际补丁响应有限；行为失败的网络不得拟合相机。",
+      "authorizes": [
+        "该自由网络的响应相机拟合"
+      ],
+      "failure_type": "behavior_failure"
+    },
+    {
+      "id": "G-IMAGING-PREDICTION",
+      "construct_id": "CON-HIDDEN-RESPONSE-IMAGING",
+      "required_partitions": [
+        "selection",
+        "confirmation"
+      ],
+      "rule": "确认集平均余弦至少 0.85、正方向比例至少 0.90、平均相对误差至多 0.55、相对最强常数或置乱基线优势至少 0.30；四个网络至少三个通过，且每种架构至少一个。",
+      "authorizes": [
+        "建立预训练模型的全新模型自身响应试采合同"
+      ],
+      "failure_type": "instrument_failure"
+    },
+    {
+      "id": "G-SPECIFICITY",
+      "construct_id": "CON-INTERVENTION-SPECIFICITY",
+      "required_partitions": [
+        "confirmation"
+      ],
+      "rule": "每个通过网络的目标供体效应与 matched-null 效应比至少 1.75，并满足双架构广度。",
+      "authorizes": [
+        "把通过限定为目标相关响应预测，而非通用扰动预测"
+      ],
+      "failure_type": "instrument_failure"
+    },
+    {
+      "id": "G-IDENTIFIABILITY",
+      "construct_id": "CON-TYPED-OBSERVABILITY",
+      "required_partitions": [
+        "confirmation"
+      ],
+      "rule": "单事件且 alpha 位于 [0,1] 时接受率至少 0.95；alpha>1 和多事件但仅观测单事件时拒答率均为 1.0；符号翻转阳性哨兵检出率为 1.0。",
+      "authorizes": [
+        "仅在登记观测合同内解释相机结果"
+      ],
+      "failure_type": "identifiability_failure"
+    }
+  ],
+  "budget": {
+    "max_gpu_hours": 0.5,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_world_clusters": 112,
+    "right_censoring_rule": "达到 0.5 GPU-hour 或任何网络在冻结训练上无法达到行为门即停止相应网络；正式确认失败不得通过重选事件、架构或阈值修复。"
+  },
+  "stopping_rules": [
+    "独立预审计任一项失败则不运行 CUDA。",
+    "任一网络行为门失败则停止该网络的相机拟合并保留失败。",
+    "少于三个网络或任一架构无人通过时关闭本仪器升级。",
+    "确认集不得用于事件选择、投影选择或超参数修改。",
+    "本合同不授权 Qwen3、GLM4 或 DS7B。",
+    "失败不反证自然语言机制，只关闭该隐藏到响应相机版本。"
+  ],
+  "adjudication": {
+    "possible_verdicts": [
+      "known_truth_imaging_camera_qualified",
+      "partial_architecture_support",
+      "bounded_rejected",
+      "invalid",
+      "censored"
+    ],
+    "failure_claim": "只在两个登记的自由微型 Transformer 架构、该绑定任务、固定投影与单事件补丁作用域内否决当前相机。",
+    "reopen_condition": "必须改变可观测对象或干预语义，并前瞻解释本期哪一门失败；不得只更换热点或放宽阈值。"
+  },
+  "permissions": {
+    "authorizes_on_pass": [
+      "以全新合同试采 Qwen3 的模型自身干预响应，不以 gold 正确性作为采集前提"
+    ],
+    "forbids_even_on_pass": [
+      "自然语言编码机制结论",
+      "固定语义坐标结论",
+      "跨模型物理守恒结论",
+      "直接启动组件因果定位",
+      "新基础数学结论"
+    ],
+    "authorizes_on_failure": [
+      "登记隐藏到响应仪器负边界",
+      "保留 Phase1246 的行为构念边界"
+    ],
+    "forbids_on_failure": [
+      "运行预训练模型 hidden atlas",
+      "更换网络种子重跑正式门",
+      "删除失败架构",
+      "事后改变相机特征"
+    ]
+  },
+  "audit": {
+    "preaudit_checks": [
+      "protocol_digest",
+      "source_hashes",
+      "partition_counts",
+      "donor_semantics",
+      "final_third_exclusion",
+      "confirmation_blindness",
+      "null_registration",
+      "typed_abstention",
+      "one_shot_budget"
+    ],
+    "independent_result_auditor": "tests/glm5/phase1247_c002_hidden_response_imaging_camera_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_partitions": true,
+    "audit_must_not_read_narrative_conclusion": true
+  },
+  "execution_sequence": [
+    "preregister_material_and_protocol",
+    "independent_preaudit_no_model",
+    "formal_compact_r0_then_release",
+    "formal_compact_r1_then_release",
+    "formal_deep_r0_then_release",
+    "formal_deep_r1_then_release",
+    "sealed_analysis",
+    "independent_recomputation",
+    "stop_or_open_new_C002_contract"
+  ],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C002-WP00-001.manifest.json",
+    "code_paths": [
+      "tests/glm5/phase1247_c002_hidden_response_imaging_camera.py",
+      "tests/glm5/phase1247_c002_hidden_response_imaging_camera_audit.py"
+    ],
+    "material_paths": [
+      "tests/glm5/result/phase1247_c002_hidden_response_imaging_camera/material/frozen_intervention_examples.jsonl"
+    ],
+    "environment_paths": [
+      "tests/glm5/result/phase1247_c002_hidden_response_imaging_camera/protocol/environment_snapshot.json",
+      "tests/glm5/result/phase1247_c002_hidden_response_imaging_camera/protocol/preregistration.json",
+      "tests/glm5/result/phase1247_c002_hidden_response_imaging_camera/audit/independent_preaudit.json",
+      "research/ai2050_research_os/schemas/experiment_contract.schema.json"
+    ],
+    "readiness": "run_ready"
+  }
+}

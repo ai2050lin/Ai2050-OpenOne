@@ -29,6 +29,11 @@ export const RESEARCH_LAYER_DEFINITIONS = {
     label: '动力学层',
     detail: 'spike / replay / control state / temporal stability',
   },
+  heatmap: {
+    id: 'heatmap',
+    label: '热力图层',
+    detail: 'layer / token / pattern / metric intensity matrix',
+  },
 };
 
 export const RESEARCH_PLUGINS = [
@@ -100,6 +105,29 @@ export const RESEARCH_PLUGINS = [
     actions: [
       { id: 'run_path_patch', label: '路径验证' },
       { id: 'load_latest_atlas', label: '加载图谱' },
+    ],
+    modes: ['configure', 'evidence'],
+  },
+  {
+    id: 'heatmap-analysis',
+    name: '热力图分析',
+    shortName: '热力图',
+    routeType: 'heatmap_matrix',
+    workspaceTab: 'main',
+    defaultMode: 'configure',
+    target: '比较层、位置、语言模式与机制指标的相对强度',
+    focus: '把层×语言模式×指标组织为二维颜色矩阵和三维高度矩阵；真实数据必须保留来源与证据等级。',
+    status: '可视分析路线',
+    defaultLayers: ['heatmap'],
+    layers3D: ['heatmap', 'boundary'],
+    panels: [
+      { id: 'overview', label: '路线总览', defaultOpen: true },
+      { id: 'heatmap', label: '热力图效果', defaultOpen: true },
+      { id: 'evidence', label: '数据与证据', defaultOpen: false },
+    ],
+    actions: [
+      { id: 'show_heatmap', label: '显示热力图' },
+      { id: 'load_heatmap_data', label: '加载真实数据' },
     ],
     modes: ['configure', 'evidence'],
   },

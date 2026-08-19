@@ -20,16 +20,16 @@ import { GlobalConfigPanel } from './components/app/GlobalConfigPanel';
 import { AttentionHeatmap, MLPActivationChart, Visualization } from './components/app/LegacyVisualization';
 import {
   MechanismModeSwitch,
-  MechanismSpaceLegend,
   MechanismWorkspaceDock,
 } from './components/app/MechanismWorkspace';
 import { PatternFamilyAtlasControls } from './components/app/PatternFamilyAtlasControls';
 import {
   ResearchEvidenceCockpit,
   ResearchEvidenceDrawer,
-  ResearchEvidenceRail,
 } from './components/app/ResearchEvidenceCockpit';
+import { ResearchHeatmapPreview3D, ResearchHeatmapRouteCard } from './components/app/ResearchHeatmapRoute';
 import { ResearchSpaceOverlay } from './components/app/ResearchSpaceOverlay';
+import { SNNResearchDashboard } from './components/app/SNNResearchDashboard';
 import ICSPBPanel from './components/FiberNetPanel';
 
 import ReverseEngineeringOverlay from './components/reverse/ReverseEngineeringOverlay';
@@ -69,6 +69,7 @@ import SceneHelpers from './neural_vis/components/SceneHelpers';
 import useVisData from './neural_vis/hooks/useVisData';
 import { usePatternFamilyNeuronAtlas } from './researchKernel/usePatternFamilyNeuronAtlas';
 import { useResearchKernel } from './researchKernel/useResearchKernel';
+import { collectSnnSpikes } from './researchKernel/snnRuntime';
 import {
   RESEARCH_PLUGINS,
   getPluginWindowState,
@@ -106,6 +107,19 @@ function activationToColor(value) {
   if (value > 0.5) return '#ffcc00';
   if (value > 0.3) return '#22c55e';
   return '#3b82f6';
+}
+
+function probabilityToColor(value) {
+  const probability = Number(value);
+  if (!Number.isFinite(probability)) return '#94a3b8';
+  const clamped = Math.min(1, Math.max(0, probability));
+  const hue = 190 - clamped * 70;
+  return `hsl(${hue}, 78%, 58%)`;
+}
+
+function formatProbability(value) {
+  const probability = Number(value);
+  return Number.isFinite(probability) ? `${(probability * 100).toFixed(1)}%` : '-';
 }
 
 const ALGO_DOCS = {
@@ -1417,7 +1431,7 @@ export default function App() {
       setSnnState(prev => ({
         ...prev,
         time: res.data.time,
-        spikes: res.data.spikes
+        spikes: collectSnnSpikes(res.data)
       }));
     } catch (err) {
       console.error(err);
@@ -2659,17 +2673,7 @@ export default function App() {
             {/* ===== SNN Content (非main模式) ===== */}
             {inputPanelTab === 'snn' && (
               <div className="animate-fade-in">
-                <div style={{ padding: '12px', background: 'rgba(78, 205, 196, 0.1)', borderRadius: '8px', border: '1px solid rgba(78, 205, 196, 0.2)', marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
-                    <Brain size={16} color="#4ecdc4" />
-                    <div>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#4ecdc4' }}>NeuroFiber SNN 仿真</h4>
-                      <p style={{ fontSize: '11px', color: '#bfd', margin: 0, lineHeight: '1.4' }}>
-                        探索基于神经纤维丛理论的脉冲神经网络动力学。
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <SNNResearchDashboard runtimeState={snnState} />
                 <StructureAnalysisControls
                   autoResult={autoAnalysisResult}
                   systemType="snn"
@@ -2744,6 +2748,10 @@ export default function App() {
                       mode={mechanismWorkspaceMode}
                       onModeChange={setMechanismWorkspaceMode}
                     />
+
+                    {activeResearchPluginId === 'heatmap-analysis' && (
+                      <ResearchHeatmapRouteCard />
+                    )}
 
                     {activeResearchPluginId === 'language-mechanism' && (
                       <>
@@ -3387,6 +3395,7 @@ export default function App() {
                           'agent-log': researchCycle.running ? '循环运行中' : '循环待启动',
                           boundary: researchLayerVisibility.boundary ? '边界层已开启' : '边界层未开启',
                           dynamics: researchLayerVisibility.dynamics ? '动力学层已开启' : '动力学层未开启',
+                          heatmap: researchLayerVisibility.heatmap ? '热力图已开启' : '热力图未开启',
                           control: inputPanelTab === 'icspb' ? 'ICSPB已进入' : '可切换进入',
                         }[panel.id] || '已打开';
 
@@ -3413,6 +3422,7 @@ export default function App() {
                               {panel.id === 'agent-log' && 'AI循环日志应记录讨论、综合、脚本、参数、输出和回写图谱。'}
                               {panel.id === 'boundary' && '失败边界优先显示弱效应、无效干预和被反证的候选机制。'}
                               {panel.id === 'dynamics' && '动力学窗口关注时序稳定、回放、脉冲活动与控制状态。'}
+                              {panel.id === 'heatmap' && '内置矩阵只验证颜色、高度和轴标签效果；加载真实 heatmap_3d 资产后才可解释模型结果。'}
                               {panel.id === 'control' && '控制窗口用于集中管理该路线的参数、模型和运行模式。'}
                             </div>
                           </div>
@@ -3660,7 +3670,7 @@ export default function App() {
                               ) : (
                                 <div>
                                   <div>词元: <strong>"{(hoveredInfo || displayInfo).label}"</strong></div>
-                                  <div>概率: <span style={{ color: getColor((hoveredInfo || displayInfo).probability) }}>{((hoveredInfo || displayInfo).probability * 100).toFixed(1)}%</span></div>
+                                  <div>概率: <span style={{ color: probabilityToColor((hoveredInfo || displayInfo).probability) }}>{formatProbability((hoveredInfo || displayInfo).probability)}</span></div>
                                   {(hoveredInfo || displayInfo).actual && <div>实际: "{(hoveredInfo || displayInfo).actual}"</div>}
                                 </div>
                               )}
@@ -4464,17 +4474,6 @@ export default function App() {
       )}
 
       {isAppleMainView && (
-        <ResearchEvidenceRail
-          selectedGateId={selectedEvidenceGate}
-          onSelectGate={selectEvidenceGate}
-        />
-      )}
-
-      {isAppleMainView && (
-        <MechanismSpaceLegend mode={mechanismWorkspaceMode} />
-      )}
-
-      {isAppleMainView && (
         <MechanismWorkspaceDock
           mode={mechanismWorkspaceMode}
           currentLayer={fpCurrentLayer}
@@ -4604,6 +4603,11 @@ export default function App() {
                 onSelectEvidenceGate={selectEvidenceGate}
                 mechanismMode={mechanismWorkspaceMode}
               />
+
+              {activeResearchPluginId === 'heatmap-analysis'
+                && researchLayerVisibility.heatmap
+                && byType.heatmap_3d.length === 0
+                && <ResearchHeatmapPreview3D />}
 
               {visData && !isPatternFamilyAtlasView && (
                 <>

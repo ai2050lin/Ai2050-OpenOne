@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.1.0",
+  "experiment_id": "EXP-C013-WP01-001",
+  "campaign_id": "C013",
+  "work_package_id": "WP01",
+  "phase": 1263,
+  "title": "Known-truth predictive functional equivalence and independent-donor rescue calibration",
+  "status": "adjudicated",
+  "question": "Can a cross-fitted finite camera recover the least-complex margin-separated predictive class, abstain on ambiguity, and rescue a blocked path with an independently estimated donor rather than an algebraic replay?",
+  "object_ids": ["OBJ-C013-PREDICTIVE-EQUIVALENCE-INDEPENDENT-RESCUE"],
+  "construct_types": ["CON-HIDDEN-RESPONSE-IMAGING", "CON-INTERVENTION-SPECIFICITY", "CON-TYPED-OBSERVABILITY"],
+  "puzzle_ids": ["P01", "P03", "P05", "P06", "P07", "P13"],
+  "hypothesis_predictions": [
+    {
+      "hypothesis_id": "H03",
+      "prediction_id": "PR-H03-C013-WP01-001",
+      "observable": "Cross-fitted predictive class, explicit abstention, held-out factorial response, independent donor rescue, wrong donor and algebraic replay sentinel.",
+      "expected": "All 320 systems recover their reference-risk functional class or abstention, and every independently sourced confirmation gate passes in both registry splits.",
+      "distinguishes_from": ["H00"],
+      "death_observation": "Any functional class is mistyped, any ambiguous system is forced through, or any independent rescue gate fails."
+    },
+    {
+      "hypothesis_id": "H00",
+      "prediction_id": "PR-H00-C013-WP01-001",
+      "observable": "The same frozen predictive-equivalence and independent-rescue battery.",
+      "expected": "Finite observations cannot recover a stable minimal predictive quotient or distinguish independently sourced rescue from wrong donors.",
+      "distinguishes_from": ["H03"],
+      "death_observation": "Exact functional typing, abstention, independent rescue, controls and split breadth all pass."
+    }
+  ],
+  "scope": {
+    "models": ["320 known-truth conditional dynamical systems"],
+    "tasks": ["four synthetic factorial response tasks"],
+    "languages": ["none"],
+    "protocols": ["large reference-risk truth", "nested finite compiler competition", "typed abstention", "independent donor rescue", "algebraic replay sentinel"],
+    "precision": ["CUDA float64"],
+    "backend": ["cuda"],
+    "allowed_observations": ["public system identity", "discovery and selection factorial responses", "sealed confirmation responses", "independent donor fold"],
+    "excluded_claims": ["hidden generator recovery", "free-network mechanism", "natural language", "Qwen3 mechanism", "new mathematics"]
+  },
+  "data_contract": {
+    "cluster_unit": "One source family, registry split, task and replicate; source labels remain private and are not the estimand.",
+    "calibration": {"systems": 320, "source_families": 8, "development_probe_systems": 72},
+    "discovery": {"cases_per_system": 512, "sealed": true},
+    "selection": {"cases_per_system": 512, "sealed": true},
+    "confirmation": {"cases_per_system": 768, "sealed": true},
+    "split_rule": "Two 768-case reference panels define private truth after a separate 1024-case reference fit; discovery, selection, donor-discovery and confirmation are independently seeded.",
+    "leakage_audit": ["public/private truth split", "opaque IDs", "source hashes", "material digests", "reference isolation", "selection isolation", "donor-fold isolation", "confirmation isolation", "registry split", "task split"],
+    "answer_payload_rule": "Source family and reference risks remain private until adjudication; all overlap and out-of-library systems remain in the denominator."
+  },
+  "factor_design": {
+    "systems": 320,
+    "source_families": 8,
+    "registry_splits": 2,
+    "tasks": 4,
+    "replicates": 5,
+    "cases_per_system": 4864,
+    "predictive_classes": ["additive", "linear", "quadratic", "rff", "abstain"],
+    "truth_rule": "least complexity with max reference risk <=0.050 and all earlier risks >=0.120"
+  },
+  "controls": ["mean response", "sign-flipped target", "label permutation", "nuisance-only perturbation", "wrong-identity donor", "hidden collision", "out-of-library high frequency", "equivalence overlap", "oracle channel block", "algebraic replay sentinel"],
+  "metrics": [
+    {"id": "M-C013-WP01-TYPE", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "known-truth system", "estimator": "Exact predictive-class and typed-abstention recovery.", "threshold_source": "Frozen after a 72-system development probe and before formal material generation."},
+    {"id": "M-C013-WP01-FACTORIAL", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "unit": "confirmation rows", "estimator": "Relative A1 and J response error on an independent confirmation partition.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C013-WP01-RESCUE", "construct_id": "CON-INTERVENTION-SPECIFICITY", "unit": "confirmation rows", "estimator": "Oracle block plus donor-discovery fitted rescue, wrong identity rejection and donor-source gap.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C013-WP01-SENTINEL", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "confirmation rows", "estimator": "Exact subtract/add replay must be detected as a tautological positive sentinel and excluded from mediation evidence.", "threshold_source": "Frozen before formal run."},
+    {"id": "M-C013-WP01-BREADTH", "construct_id": "CON-TYPED-OBSERVABILITY", "unit": "class and registry split", "estimator": "Minimum class count, cross-source alias and split conjunction.", "threshold_source": "Frozen before formal run."}
+  ],
+  "typed_gates": [
+    {"id": "G-C013-WP01-TYPE", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["reference_a", "reference_b", "selection"], "rule": "Predictive class and abstention accuracy equal one across all 320 systems.", "authorizes": ["applicable confirmation"], "failure_type": "identifiability_failure"},
+    {"id": "G-C013-WP01-CONFIRMATION", "construct_id": "CON-HIDDEN-RESPONSE-IMAGING", "required_partitions": ["confirmation"], "rule": "Every actionable system passes frozen A1, J, identity, nuisance and manifold thresholds.", "authorizes": ["known-truth predictive quotient claim"], "failure_type": "construct_failure"},
+    {"id": "G-C013-WP01-RESCUE", "construct_id": "CON-INTERVENTION-SPECIFICITY", "required_partitions": ["donor_discovery", "confirmation"], "rule": "Every actionable system blocks the target channel, is rescued by an independently fitted donor, rejects wrong donors, and has nonzero donor-source gap.", "authorizes": ["known-truth independent-rescue claim"], "failure_type": "construct_failure"},
+    {"id": "G-C013-WP01-SENTINEL", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["confirmation"], "rule": "Exact removed-channel replay returns the target up to floating error but contributes no mediation evidence.", "authorizes": ["instrument leakage detection"], "failure_type": "instrument_failure"},
+    {"id": "G-C013-WP01-BREADTH", "construct_id": "CON-TYPED-OBSERVABILITY", "required_partitions": ["calibration", "structural_holdout"], "rule": "Every class has at least 20 systems, at least one predictive class spans source families, and every system passes in both splits.", "authorizes": ["one separately frozen free-Transformer phase"], "failure_type": "instrument_failure"}
+  ],
+  "budget": {
+    "max_gpu_hours": 0.5,
+    "max_runs": 1,
+    "max_adaptive_rounds": 0,
+    "max_world_clusters": 320,
+    "right_censoring_rule": "Any conjunctive failure stops C013 before free-network or pretrained-model execution."
+  },
+  "stopping_rules": ["No source-family label is exposed before adjudication.", "Confirmation cannot select a class.", "No candidate, threshold, class margin or family changes after preregistration.", "Algebraic replay is never counted as rescue evidence.", "Failure blocks free-network execution.", "Pass never authorizes Qwen3 directly."],
+  "adjudication": {
+    "possible_verdicts": ["predictive_equivalence_independent_rescue_calibrated", "predictive_equivalence_independent_rescue_not_calibrated", "invalid"],
+    "observed_verdict": "predictive_equivalence_independent_rescue_not_calibrated",
+    "failure_claim": "Functional type recovery was 318/320 and abstention was 82/84. Two frozen equivalence-overlap systems had one reference panel just above the 0.050 linear-risk boundary but fell just below it on selection, so they were incorrectly authorized as linear. All applicable confirmation, independent-donor rescue, wrong-identity, control and algebraic-sentinel gates passed. The result blocks free-network execution without repairing thresholds or deleting boundary systems."
+  },
+  "permissions": {
+    "authorizes_on_pass": ["one separately frozen cross-depth free-Transformer predictive-equivalence phase"],
+    "forbids_even_on_pass": ["Qwen3", "natural-language mechanism", "unique physical implementation", "new mathematics"],
+    "authorizes_on_failure": ["known-truth instrument boundary"],
+    "forbids_on_failure": ["candidate addition", "threshold repair", "system deletion", "free-network run"]
+  },
+  "audit": {
+    "preaudit_checks": 18,
+    "independent_result_auditor": "tests/glm5/phase1263_c013_predictive_equivalence_independent_rescue_calibration_audit.py",
+    "raw_result_required": true,
+    "preserve_failed_result": true
+  },
+  "execution_sequence": ["development_probe", "freeze_source", "generate_reference_truth", "preregister", "independent_preaudit", "single_formal_cuda_run", "truth_unblind", "independent_final_audit"],
+  "frozen_artifacts": {
+    "freeze_mode": "external_manifest",
+    "manifest_path": "manifests/EXP-C013-WP01-001.manifest.json",
+    "code_paths": ["tests/glm5/phase1263_c013_predictive_equivalence_independent_rescue_calibration.py", "tests/glm5/phase1263_c013_predictive_equivalence_independent_rescue_calibration_audit.py"],
+    "material_paths": ["tests/glm5/result/phase1263_c013_predictive_equivalence_independent_rescue_calibration/material/public_systems.jsonl", "tests/glm5/result/phase1263_c013_predictive_equivalence_independent_rescue_calibration/material/private_functional_truth.jsonl"],
+    "environment_paths": ["tests/glm5/result/phase1263_c013_predictive_equivalence_independent_rescue_calibration/protocol/preregistration.json", "tests/glm5/result/phase1263_c013_predictive_equivalence_independent_rescue_calibration/protocol/environment_snapshot.json", "tests/glm5/result/phase1263_c013_predictive_equivalence_independent_rescue_calibration/audit/independent_preaudit.json"],
+    "readiness": "run_ready"
+  }
+}

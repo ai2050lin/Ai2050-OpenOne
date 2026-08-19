@@ -1,0 +1,95 @@
+{
+  "phase": 1308,
+  "campaign": "C033",
+  "schema_version": "phase1308.c033.cross_surface_block_rescue.v1",
+  "model": "qwen3-4b-fp16-cuda-no-quantization",
+  "formal_run_budget": 1,
+  "runtime": {
+    "compiler": "right_padding",
+    "global_fixed_length": true,
+    "batch": 4
+  },
+  "object": "sequential answer-boundary block at depth25 and opposite-surface delta rescue at depth26",
+  "partitions": [
+    "confirmation",
+    "holdout"
+  ],
+  "target_surfaces": [
+    "catalog_prose",
+    "inventory_ledger"
+  ],
+  "event": "assistant_answer_boundary",
+  "block_depth": 25,
+  "rescue_depth": 26,
+  "arms": [
+    "baseline",
+    "block_only",
+    "correct_cross_surface",
+    "matched_null_cross_surface",
+    "wrong_attribute_cross_surface",
+    "self_retention"
+  ],
+  "manifest": {
+    "sha256": "df146a9c8e6b30bfb6e067b31eac418bd6b578d51789766c94e6fc36a7dd1cb5",
+    "case_count": 192,
+    "partition_counts": {
+      "confirmation": 96,
+      "holdout": 96
+    },
+    "surface_counts": {
+      "catalog_prose": 96,
+      "inventory_ledger": 96
+    }
+  },
+  "block": "replace target active-state1 answer-boundary depth25 residual with same-target active-state0 residual",
+  "rescue": "after block, add opposite-surface active state1-minus-state0 residual at answer-boundary depth26",
+  "controls": {
+    "block_only": "no depth26 delta",
+    "matched_null": "opposite-surface matched-null state1-minus-state0 delta",
+    "wrong_attribute": "opposite-surface next-attribute active state1-minus-state0 delta with the same identity transition",
+    "self_retention": "replace target state1 depth25 residual with its own unmodified depth25 residual"
+  },
+  "readout": "target identity1-minus-identity0 candidate margin",
+  "recovery_fraction": "(correct-rescue margin minus block margin)/(baseline margin minus block margin)",
+  "aggregation": {
+    "cell": "baseline, blocked, and correct-rescue identity gates required separately in each partition x target-surface cell",
+    "global": "pool all cases for recovery median, correct/null ratio, and pairwise rescue wins",
+    "retention": "pool baseline and exact depth25 self replacement"
+  },
+  "thresholds": {
+    "finite_fraction_min": 1.0,
+    "baseline_accuracy_min": 0.99,
+    "blocked_target_identity_accuracy_max": 0.3,
+    "cross_surface_rescue_accuracy_min": 0.7,
+    "cross_surface_rescue_recovery_fraction_median_min": 0.7,
+    "cross_surface_over_null_margin_ratio_min": 1.25,
+    "pairwise_rescue_win_fraction_min": 0.75,
+    "natural_retention_min": 0.99
+  },
+  "success_authorization": "close_c033_with_cross_surface_rescue_candidate",
+  "failure_authorization": "close_c033_at_rescue_boundary",
+  "claim_scope": "independent across surface carrier, but not across entity world or model",
+  "hard_stops": [
+    "No discovery partition",
+    "No same-surface rescue fallback",
+    "No new event, depth, donor, component, or threshold",
+    "No second formal model run",
+    "C033 closes after this phase regardless of verdict"
+  ],
+  "dependencies": {
+    "parent_protocol": "e9bc581065e14ead1927ed1bcf8fbb392862b00a11506c1e7deebea2b693472a",
+    "parent_manifest": "464a873c12d02634463e9f67cadfee96957176c85213a02ee5742bb636ad28d6",
+    "parent_final": "898496c5417e7d054bff6859a7fa3d3648fcb7c17e253db045ac989a6c1fe129",
+    "parent_audit": "ea04209459e0465ef042e6b8c8c74f78f323ab9af3b06d4cf5382c5581cc3eeb",
+    "hidden_manifest": "6fa7e27f4630610e570d3101ea8b519cac966306f3d7dbfc056f4bd6f4dc6f73",
+    "contract": "255717ebc9af3499ae490c8d9501867fccf0776ef40f41aa3213357acece7e33",
+    "manifest": "df146a9c8e6b30bfb6e067b31eac418bd6b578d51789766c94e6fc36a7dd1cb5"
+  },
+  "source_hashes": {
+    "main": "ea7e85bf2f9b0fb4343887f97ae226484f069379375e90e17f1b99a8f2304cb1",
+    "auditor": "a6af661e80c99f084e818ca9e3928ca2a64bcdabeb7decb4a92946b535801d24"
+  },
+  "model_weights_loaded": false,
+  "created_at_utc": "2026-08-15T12:58:00.167735+00:00",
+  "protocol_digest": "39276dd31fcbef8ee20c0f2e7ae19e76679a4d986ef181c6d431fe1c40aaa572"
+}

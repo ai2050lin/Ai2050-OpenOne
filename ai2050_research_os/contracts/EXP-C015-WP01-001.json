@@ -1,0 +1,62 @@
+{
+  "contract_id": "EXP-C015-WP01-001",
+  "campaign": "C015",
+  "phase": 1267,
+  "title": "Free-Transformer observation-hierarchy external validity",
+  "status": "draft_before_preregistration",
+  "question": "Which registered observation level first yields certified and independently replayable factorial responses across fresh free Transformers?",
+  "models": {
+    "family": "same-executor free tiny causal Transformer",
+    "architectures": ["shallow4", "middle6", "deep8"],
+    "replicates_per_architecture": 3,
+    "pretrained_forbidden": true
+  },
+  "camera_order": [
+    "legacy_delta",
+    "enhanced_delta",
+    "full_state",
+    "prefix_trajectory"
+  ],
+  "primary_decision": {
+    "legacy_delta": "legacy_library_sufficient_under_revised_breadth",
+    "enhanced_delta": "camera_parameterization_bottleneck",
+    "full_state": "base_state_information_bottleneck",
+    "prefix_trajectory": "prefix_trajectory_information_bottleneck",
+    "none": "registered_hierarchy_insufficient"
+  },
+  "frozen_thresholds": {
+    "behavior_accuracy_min": 0.995,
+    "population_pass_max": 0.05,
+    "global_error_budget": 0.01,
+    "selection_draws": 32768,
+    "robust_coverage_min": 0.9,
+    "rescue_authorization_upper_max": 0.025,
+    "breadth_models_min": 6,
+    "breadth_per_depth_min": 2
+  },
+  "causal_confirmation": {
+    "selection_partition": "causal_selection",
+    "fit_partition": "donor",
+    "evaluation_partition": "confirmation",
+    "controls": [
+      "exact-state oracle patch",
+      "reverse-state block",
+      "wrong-identity donor",
+      "output response cosine",
+      "state relative error"
+    ]
+  },
+  "hard_stops": [
+    "One formal run only.",
+    "Exact oracle risk cannot select a camera or event.",
+    "All nine models remain in the denominator.",
+    "No confirmation-driven reselection.",
+    "No automatic pretrained-model run."
+  ],
+  "scope": {
+    "synthetic_task_only": true,
+    "natural_language_claim": false,
+    "unique_circuit_claim": false,
+    "new_mathematics_claim": false
+  }
+}

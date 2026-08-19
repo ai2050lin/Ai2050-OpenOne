@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { MODEL_SYSTEM_SOURCES, useModelSystemEvidence } from './useModelSystemEvidence';
+import { MODEL_SYSTEM_SOURCES } from './useModelSystemEvidence';
+import { CURRENT_RESEARCH_STATE } from '../researchKernel/currentResearchState';
 
 const panelStyle = {
   border: '1px solid rgba(148, 163, 184, 0.14)',
@@ -38,34 +39,34 @@ const SYSTEM_MODULES = [
     evidence: 'model_registry.json · 3/3 models',
   },
   {
-    id: 'cuda_runner', title: '三模型 CUDA 顺序执行', icon: FlaskConical, status: 'ready',
-    summary: '严格按 Qwen3 -> GLM4 -> DeepSeek7B 运行并释放显存。',
-    detail: '该执行方式已经支撑九族全量观测和后续粗块实验，避免三个模型同时驻留导致显存溢出。它证明实验管线可执行，不代表模型机制一致。',
-    evidence: 'Phase 326-344 execution contract',
+    id: 'evidence_os', title: 'C001 不可变证据系统', icon: Database, status: 'ready',
+    summary: '关键证据、假说、拼图、对象、构念与裁决进入机器可校验注册表。',
+    detail: 'WP00 已迁移本地可见的关键证据子集，并记录适用域、来源和权限。系统不会伪造完整 K1–K210 总账，也不会让局部正结果自动升级为全局机制。',
+    evidence: 'Phase 1236 · C001-WP00',
   },
   {
-    id: 'protocol_gate', title: '协议与基线资格门', icon: ShieldCheck, status: 'partial',
-    summary: '答案对齐接口建立共同分母，但不等于完整自然聊天路径。',
-    detail: 'Phase337 有 7/9 模型-接口单元合格；答案对齐接口三模型均为 12/12。Phase340 修复批处理异常后，18/27 模型任务单元通过四划分资格。',
-    evidence: 'Phase 337 / 340',
+    id: 'typed_constructs', title: '类型化构念与权限门', icon: ShieldCheck, status: 'ready',
+    summary: '内容、格式、自然生成和停止缓存分别定义、分别授权。',
+    detail: '四种构念具有各自 observable、负控和闭合等级。内容正确不等于格式服从，候选排序不等于自然生成，第一 token 正确不等于停止缓存闭合。',
+    evidence: 'K210 · 4 registered constructs',
   },
   {
-    id: 'measurement', title: '测量路径不变性', icon: GitCompareArrows, status: 'partial',
-    summary: '缓存、批量与执行后端不能默认视为语义等价。',
-    detail: 'Phase342 的十一种执行模式审计中，只有两条路径通过完整不变性门。该问题属于测量系统，必须先冻结执行路径，才能解释模型内部因果差异。',
-    evidence: 'Phase 342 · 2 stable execution paths',
+    id: 'typed_readout', title: '七读出行为边界', icon: GitCompareArrows, status: 'partial',
+    summary: 'Phase1235 的四类门为 1·0·1·1，异质总门失败。',
+    detail: '完整候选评分、外部 trie、固定句式和自然内容可以稳定，而严格短字符串合同对模板与协议载体敏感。该结果是行为边界，不是隐藏内容模块证据。',
+    evidence: 'Phase 1235 · K210',
   },
   {
-    id: 'evidence_kernel', title: '图谱与统一证据内核', icon: Database, status: 'ready',
-    summary: '九族、模型分区、Claim、来源和证据边界已经结构化发布。',
-    detail: '当前证据包覆盖 9 个模式族、27 个模型族分区、72 个注册机制和数百万组件事件。覆盖率、候选、因果与闭合使用不同计数，不再合并成单一总百分比。',
-    evidence: 'pattern_family_neuron_atlas.v1',
+    id: 'wp01_contract', title: 'WP01 冻结实验合同', icon: FlaskConical, status: 'blocked',
+    summary: 'EXP-C001-WP01-001 已预注册，但 run_ready=false。',
+    detail: '当前只授权无模型材料生成、反泄漏负控、环境清单和独立审计器冻结。在机器资格门通过前，不得运行 Qwen3、自动跨模型或采集内部状态。',
+    evidence: 'D006 · EXP-C001-WP01-001',
   },
   {
     id: 'causal_extractor', title: '分层因果规则提取', icon: BrainCircuit, status: 'blocked',
-    summary: '粗块候选存在，但跨模型最小因果集合尚未恢复。',
-    detail: 'Phase338 只有 GLM4 的早期 source MLP 粗块通过完整模型门；Phase344 将其收紧为模型与任务特异复制候选。跨模型粗块、单神经元必要性、受控充分性和完整中介链仍为零。',
-    evidence: 'Phase 338-344 · cross-model 0',
+    summary: '当前对象尚未获准采集未来响应或执行干预。',
+    detail: '只有 WP01 的行为与构念双门通过，才允许测量未来响应张量，并进一步执行必要性、充分性、错误供体、救援、中介和完整生成闭合。',
+    evidence: 'C001 permissions · future work package locked',
   },
   {
     id: 'visual_client', title: '3D 物理图谱客户端', icon: MonitorCog, status: 'candidate',
@@ -74,18 +75,18 @@ const SYSTEM_MODULES = [
     evidence: 'Phase 324-334 client atlas',
   },
   {
-    id: 'auto_research', title: '多 AI 自动研发', icon: Network, status: 'partial',
-    summary: '已有研发控制台和多阶段流程，复现性门禁仍需统一。',
-    detail: '自动研发可以组织分析、计划、代码、执行和总结，但不能自动把相关性提升为机制。下一步需要把模型哈希、数据切分、执行模式、结果校验和反例审计设为强制门。',
-    evidence: 'AI R&D console · reproducibility gate pending',
+    id: 'cross_model', title: '跨模型功能同构', icon: Network, status: 'blocked',
+    summary: '不能把跨模型运行当作 Qwen3 行为失败的救援。',
+    detail: 'Qwen3 上的对象必须先通过本模型合同和因果闭合；随后才能按 Qwen3 → GLM4 → DS7B 顺序检验功能关系是否保持。当前没有跨模型统一机制结论。',
+    evidence: 'D001 / D006 · cross-model locked',
   },
 ];
 
 const NEXT_TASKS = [
-  { id: 'reproducibility', title: '冻结可复现性门禁', priority: 'P0', detail: '统一模型与 tokenizer 哈希、chat template、缓存、批量、精度、随机种子、数据切分和结果 checksum；任何执行路径不变性失败都阻止机制升级。' },
-  { id: 'next_mechanism', title: '选择新的跨模型合格机制', priority: 'P0', detail: '从尚未深审、协议稳定、三模型四划分基线合格的机制中预注册一个对象，避免继续追逐已被 Phase331-344 否定的旧候选。' },
-  { id: 'hierarchical_search', title: '粗块到最小交互集合', priority: 'P1', detail: '先验证位置和组件粗块，再执行递归二分、逐成员移除、组合交互、随机同规模、错层和错位置控制；不再按激活或读出 Top-K 选神经元。' },
-  { id: 'closure', title: '完整生成闭合', priority: 'P1', detail: '必要性、充分性和中介通过后，继续验证全词表 blocker、完整短语、自然 rollout、副作用和 private heldout；首词元变化不能单独算闭合。' },
+  { id: 'wp01_preflight', title: 'WP01 无模型预审计', priority: 'P0', detail: '生成全新非双射世界、全新词汇与模板；冻结多参考内容判据、错内容正确格式负控、answer-absent、same-bag swap、query switch 和 alternative-program 上界。' },
+  { id: 'freeze_environment', title: '冻结代码与环境清单', priority: 'P0', detail: '登记代码、材料、tokenizer、chat template、模型修订、精度、批次、随机种子、输出预算和全部文件哈希；独立审计器不得导入主实现。' },
+  { id: 'behavior_adjudication', title: '一次性 Qwen3 行为裁决', priority: 'P1', detail: '仅在 run_ready=true 后运行 Qwen3。内容、格式、自然生成和停止缓存分别裁决；失败后不得调 prompt 或选择成功子集。' },
+  { id: 'response_closure', title: '未来响应与救援闭合', priority: 'P2', detail: '仅在行为与构念双门通过后，采集事件×干预×读出×上下文响应，比较候选机制并执行必要性、错误供体、救援、中介与副作用负控。' },
 ];
 
 function SystemModule({ module, active, onClick }) {
@@ -105,10 +106,8 @@ function SystemModule({ module, active, onClick }) {
 }
 
 export const SystemStatusTab = () => {
-  const { data } = useModelSystemEvidence();
-  const [activeModule, setActiveModule] = useState('measurement');
-  const [activeTask, setActiveTask] = useState('reproducibility');
-  const metrics = data.atlas?.metrics || {};
+  const [activeModule, setActiveModule] = useState('wp01_contract');
+  const [activeTask, setActiveTask] = useState('wp01_preflight');
 
   const systemCounts = useMemo(() => {
     const counts = { ready: 0, partial: 0, candidate: 0, blocked: 0 };
@@ -125,9 +124,9 @@ export const SystemStatusTab = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 18 }}>
           <div style={{ maxWidth: 820 }}>
             <div style={{ color: '#a7f3d0', fontSize: 10, fontWeight: 900, letterSpacing: 1.5 }}>RESEARCH SYSTEM STATUS</div>
-            <h2 style={{ color: '#f8fafc', fontSize: 23, margin: '6px 0 7px' }}>逆向工程系统状态</h2>
+            <h2 style={{ color: '#f8fafc', fontSize: 23, margin: '6px 0 7px' }}>C001 全局结构辨识系统状态</h2>
             <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
-              工程基础已经能够稳定生产大规模观测与候选图谱，当前主要瓶颈不再是“能不能运行”，而是测量是否可复现、候选是否具有低副作用因果必要性，以及自然生成能否闭合。
+              WP00 已把关键证据与权限编译为机器可校验系统；当前主要瓶颈是获得一个跨读出稳定、程序可识别且允许进入内部研究的功能对象。WP01 尚不可运行。
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(78px, 1fr))', gap: 6, minWidth: 210 }}>
@@ -158,12 +157,12 @@ export const SystemStatusTab = () => {
         <div><div style={{ color: '#f8fafc', fontSize: 17, fontWeight: 800 }}>当前证据向量</div><div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>不使用“系统完成度”平均分，直接展示各个硬门是否通过。</div></div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
           {[
-            ['模型注册', `${data.models?.models?.length || 0}/3`, '#34d399'],
-            ['模式族映射', `${metrics.mapped_family_count || 0}/${metrics.family_count || 0}`, '#22d3ee'],
-            ['跨模型集合读出', metrics.phase330_cross_model_set_readout_specific_mechanism_count || 0, '#60a5fa'],
-            ['跨模型行为必要性', metrics.phase330_cross_model_behavior_necessity_mechanism_count || 0, '#fb7185'],
-            ['单神经元因果', metrics.single_unit_causal_count || 0, '#fb7185'],
-            ['完整自然链', metrics.full_natural_chain_pass_count || 0, '#fb7185'],
+            ['候选假说', CURRENT_RESEARCH_STATE.registry.hypotheses, '#60a5fa'],
+            ['开放拼图', CURRENT_RESEARCH_STATE.registry.puzzles, '#22d3ee'],
+            ['关键证据记录', CURRENT_RESEARCH_STATE.registry.evidence, '#34d399'],
+            ['类型化构念', CURRENT_RESEARCH_STATE.registry.constructs, '#a78bfa'],
+            ['WP01 Run Ready', String(CURRENT_RESEARCH_STATE.campaign.runReady).toUpperCase(), '#fb7185'],
+            ['WP01 模型运行', CURRENT_RESEARCH_STATE.campaign.modelRuns, '#fb7185'],
           ].map(([label, value, color]) => (
             <div key={label} style={{ padding: '10px 12px', borderTop: `2px solid ${color}`, background: 'rgba(15,23,42,0.25)' }}>
               <div style={{ color: '#94a3b8', fontSize: 10 }}>{label}</div>

@@ -9,7 +9,6 @@ import {
   GitCompareArrows,
   Presentation,
   ScanSearch,
-  ShieldCheck,
   Wrench,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -311,16 +310,5 @@ export function MechanismWorkspaceDock({
         </div>
       )}
     </aside>
-  );
-}
-
-export function MechanismSpaceLegend({ mode }) {
-  return (
-    <div className="mechanism-space-legend" aria-label="3D机制空间图例">
-      <span><i className="is-layer" />Layer深度</span>
-      <span><i className="is-token" />Token位置</span>
-      <span><i className="is-component" />组件状态</span>
-      <b><ShieldCheck size={12} />{mode === 'present' ? '只显示已声明证据' : 'Layer 3D模型已保留'}</b>
-    </div>
   );
 }

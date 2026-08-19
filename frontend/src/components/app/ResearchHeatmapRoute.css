@@ -1,0 +1,37 @@
+.research-heatmap-card {
+  margin-top: 12px;
+  padding: 10px;
+  color: #dbeafe;
+  background: linear-gradient(145deg, rgba(8, 26, 42, 0.92), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+}
+
+.research-heatmap-card header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.research-heatmap-card header div { display: flex; align-items: center; gap: 6px; color: #7dd3fc; font-size: 11px; font-weight: 800; }
+.research-heatmap-card header > span { color: #fbbf24; font-size: 8px; }
+
+.research-heatmap-card__matrix {
+  display: grid;
+  grid-template-columns: repeat(var(--heatmap-columns), minmax(0, 1fr));
+  gap: 3px;
+  margin-top: 9px;
+}
+.research-heatmap-card__matrix span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.35;
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  font: 7px/1 monospace;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.research-heatmap-card__axis { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; color: #64748b; font-size: 8px; }
+.research-heatmap-card__axis b { color: #8aa0b7; font-weight: 600; }
+.research-heatmap-card__legend { display: grid; grid-template-columns: 1fr auto auto auto; gap: 6px; align-items: center; margin-top: 8px; }
+.research-heatmap-card__legend i { height: 5px; background: linear-gradient(90deg, #1446b4, #23c3df, #f0dc5a, #fa4637); border-radius: 4px; }
+.research-heatmap-card__legend span { color: #73879b; font-size: 7px; }
+.research-heatmap-card > p { display: flex; align-items: flex-start; gap: 5px; margin: 8px 0 0; color: #9a8661; font-size: 8px; line-height: 1.4; }
+.research-heatmap-card > p svg { flex: 0 0 auto; margin-top: 1px; }
+
