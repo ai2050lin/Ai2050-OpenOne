@@ -1,11 +1,11 @@
-import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
+﻿import { ContactShadows, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import axios from 'axios';
 import {
   Activity, ArrowRightLeft, BarChart, BarChart2,
   Bot,
   Brain, CheckCircle, GitBranch, Globe, Globe2,
-  Grid3x3, HelpCircle, Layers,
+  Grid3x3, HelpCircle, Layers, ChevronDown,
   Database, Maximize2, Minimize2, Network, RefreshCw,
   Scale,
   Settings, Share2, Sparkles, Target, TrendingUp, X
@@ -24,10 +24,9 @@ import {
 } from './components/app/MechanismWorkspace';
 import { PatternFamilyAtlasControls } from './components/app/PatternFamilyAtlasControls';
 import {
-  ResearchEvidenceCockpit,
   ResearchEvidenceDrawer,
 } from './components/app/ResearchEvidenceCockpit';
-import { ResearchHeatmapPreview3D, ResearchHeatmapRouteCard } from './components/app/ResearchHeatmapRoute';
+import { ResearchHeatmapPreview3D } from './components/app/ResearchHeatmapRoute';
 import { ResearchSpaceOverlay } from './components/app/ResearchSpaceOverlay';
 import { SNNResearchDashboard } from './components/app/SNNResearchDashboard';
 import ICSPBPanel from './components/FiberNetPanel';
@@ -36,8 +35,7 @@ import ReverseEngineeringOverlay from './components/reverse/ReverseEngineeringOv
 import ErrorBoundary from './ErrorBoundary';
 import FlowTubesVisualizer from './FlowTubesVisualizer';
 import GlassMatrix3D from './GlassMatrix3D';
-import { HLAIBlueprint } from './HLAIBlueprint';
-import { AIRnDOverlay } from './AIRnD/AIRnDOverlay';
+import { ResearchCenter } from './researchCenter/ResearchCenter';
 import ParameterEncoding3D from './ParameterEncoding3D';
 import ResonanceField3D from './ResonanceField3D';
 import { SimplePanel } from './SimplePanel';
@@ -68,7 +66,8 @@ import RealUnitTraceRenderer from './neural_vis/renderers/RealUnitTraceRenderer'
 import SceneHelpers from './neural_vis/components/SceneHelpers';
 import useVisData from './neural_vis/hooks/useVisData';
 import { usePatternFamilyNeuronAtlas } from './researchKernel/usePatternFamilyNeuronAtlas';
-import { useResearchKernel } from './researchKernel/useResearchKernel';
+import { useLiveModelHeatmap } from './researchKernel/useLiveModelHeatmap';
+import { buildForwardData, eventFor } from './researchKernel/useResearchKernel';
 import { collectSnnSpikes } from './researchKernel/snnRuntime';
 import {
   RESEARCH_PLUGINS,
@@ -79,13 +78,37 @@ import {
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 
+const WORKSPACE_SCROLL_DURATION_MS = 640;
+
+function canNestedElementScroll(target, boundary, deltaY) {
+  let element = target instanceof Element ? target : target?.parentElement;
+  while (element && element !== boundary) {
+    const style = window.getComputedStyle(element);
+    const scrollable = /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight + 1;
+    if (scrollable) {
+      if (deltaY > 0 && element.scrollTop + element.clientHeight < element.scrollHeight - 1) return true;
+      if (deltaY < 0 && element.scrollTop > 1) return true;
+    }
+    element = element.parentElement;
+  }
+  return false;
+}
+
 const VIS_DATASET_MODEL_KEYS = {
   qwen3: 'qwen3-4b',
   glm4: 'glm4-9b',
   deepseek7b: 'ds7b',
 };
 
-const FP_SUB_PHASES = [
+const LIVE_HEATMAP_STAGE_LABELS = {
+  queued: '等待 GPU',
+  loading_model: '正在加载模型',
+  preparing_forward: '正在准备推理',
+  forward: '正在逐层计算',
+  complete: '已完成',
+};
+
+const FP_COMPUTATION_STEPS = [
   { id: 'input', label: 'Input', color: '#94a3b8' },
   { id: 'ln1', label: 'LN₁', color: '#818cf8' },
   { id: 'qkv', label: 'Q/K/V', color: '#60a5fa' },
@@ -99,8 +122,8 @@ const FP_SUB_PHASES = [
   { id: 'ffn_down', label: 'W_down', color: '#f97316' },
   { id: 'residual2', label: '⊕ Res₂', color: '#a78bfa' },
 ];
-const FP_PHASE_DURATIONS = [0.08, 0.07, 0.12, 0.1, 0.08, 0.1, 0.07, 0.07, 0.1, 0.08, 0.08, 0.05];
-const FP_TOTAL_DUR = FP_PHASE_DURATIONS.reduce((sum, duration) => sum + duration, 0);
+const FP_COMPUTATION_STEP_DURATIONS = [0.08, 0.07, 0.12, 0.1, 0.08, 0.1, 0.07, 0.07, 0.1, 0.08, 0.08, 0.05];
+const FP_TOTAL_COMPUTATION_DURATION = FP_COMPUTATION_STEP_DURATIONS.reduce((sum, duration) => sum + duration, 0);
 
 function activationToColor(value) {
   if (value > 0.8) return '#ff4444';
@@ -1471,6 +1494,7 @@ export default function App() {
     total: 10,
   });
   const [activeResearchPluginId, setActiveResearchPluginId] = useState('language-mechanism');
+  const [heatmapDisplayConfig, setHeatmapDisplayConfig] = useState({ mode: 'top_k', topK: 12 });
   const [patternFamilyAtlasEnabled, setPatternFamilyAtlasEnabled] = useState(true);
   const [patternFamilyId, setPatternFamilyId] = useState('content_knowledge');
   const [patternFamilyEvidenceFocus, setPatternFamilyEvidenceFocus] = useState('key');
@@ -1511,11 +1535,35 @@ export default function App() {
 
   // Layer 内部子阶段步进 (0~11, 对应 LayerExplodedView3D 的12个子阶段)
   const [fpSubPhase, setFpSubPhase] = useState(0);
-  const realResearchTrace = useResearchKernel(
-    fpModel,
-    fpCurrentLayer,
-    FP_SUB_PHASES[fpSubPhase]?.id
+  const liveModelHeatmap = useLiveModelHeatmap(fpModel);
+  const liveForwardData = useMemo(
+    () => buildForwardData(liveModelHeatmap.trace),
+    [liveModelHeatmap.trace]
   );
+  const liveCurrentEvent = useMemo(
+    () => eventFor(
+      liveModelHeatmap.trace?.events || [],
+      fpCurrentLayer,
+      FP_COMPUTATION_STEPS[fpSubPhase]?.id
+    ),
+    [fpCurrentLayer, fpSubPhase, liveModelHeatmap.trace]
+  );
+  const realResearchTrace = {
+    trace: liveModelHeatmap.trace,
+    fullStateVectors: liveModelHeatmap.fullStateVectors,
+    forwardData: liveForwardData,
+    currentEvent: liveCurrentEvent,
+    stableUnits: [],
+    ready: liveModelHeatmap.ready,
+    error: liveModelHeatmap.error,
+    c390LanguageOperationField: null,
+    c398IndependentConstructionLockbox: null,
+    c414OutputSensitiveLanguageField: null,
+    c433AxisLockboxField: null,
+    c26801ResidualStateOperatorField: null,
+    c32561LanguageEncodingField: null,
+    c42641OutputConditionedCrossmodelField: null,
+  };
   const patternFamilyNeuronAtlas = usePatternFamilyNeuronAtlas(patternFamilyId, fpModel);
 
   useEffect(() => {
@@ -1524,8 +1572,8 @@ export default function App() {
 
   // 步进到下一个子阶段
   const stepNextSubPhase = useCallback(() => {
-    const nextPhase = fpSubPhase + 1;
-    if (nextPhase >= FP_SUB_PHASES.length) {
+    const nextStepIndex = fpSubPhase + 1;
+    if (nextStepIndex >= FP_COMPUTATION_STEPS.length) {
       // 当前层所有子阶段完成，推进到下一层
       const nLayers = selectedFpLayerCount;
       if (fpCurrentLayer != null && fpCurrentLayer < nLayers - 1) {
@@ -1536,25 +1584,25 @@ export default function App() {
         setFpPlaying(false);
       }
     } else {
-      setFpSubPhase(nextPhase);
+      setFpSubPhase(nextStepIndex);
     }
   }, [fpSubPhase, fpCurrentLayer, selectedFpLayerCount]);
 
   // 计算当前 forward-pass 子阶段的中心进度
-  const getSubPhaseProgress = useCallback((phaseIdx) => {
+  const getStepProgress = useCallback((stepIdx) => {
     let cum = 0;
-    for (let i = 0; i < phaseIdx; i++) cum += FP_PHASE_DURATIONS[i];
-    const start = cum / FP_TOTAL_DUR;
-    cum += FP_PHASE_DURATIONS[phaseIdx];
-    const end = cum / FP_TOTAL_DUR;
+    for (let i = 0; i < stepIdx; i++) cum += FP_COMPUTATION_STEP_DURATIONS[i];
+    const start = cum / FP_TOTAL_COMPUTATION_DURATION;
+    cum += FP_COMPUTATION_STEP_DURATIONS[stepIdx];
+    const end = cum / FP_TOTAL_COMPUTATION_DURATION;
     return (start + end) / 2; // 子阶段中心
   }, []);
 
-  const getSubPhaseBounds = useCallback((phaseIdx) => {
+  const getStepBounds = useCallback((stepIdx) => {
     let cum = 0;
-    for (let i = 0; i < phaseIdx; i++) cum += FP_PHASE_DURATIONS[i];
-    const start = cum / FP_TOTAL_DUR;
-    const end = (cum + FP_PHASE_DURATIONS[phaseIdx]) / FP_TOTAL_DUR;
+    for (let i = 0; i < stepIdx; i++) cum += FP_COMPUTATION_STEP_DURATIONS[i];
+    const start = cum / FP_TOTAL_COMPUTATION_DURATION;
+    const end = (cum + FP_COMPUTATION_STEP_DURATIONS[stepIdx]) / FP_TOTAL_COMPUTATION_DURATION;
     return [start, end];
   }, []);
 
@@ -1566,17 +1614,17 @@ export default function App() {
     }
     if (!fpPlaying) {
       // 暂停/步进模式：设置到当前子阶段中心位置
-      setLayerAnimProgress(getSubPhaseProgress(fpSubPhase));
+      setLayerAnimProgress(getStepProgress(fpSubPhase));
       return;
     }
     layerAnimStartRef.current = performance.now();
-    const [phaseStart, phaseEnd] = getSubPhaseBounds(fpSubPhase);
-    const phaseDuration = Math.max(80, fpSpeed * FP_PHASE_DURATIONS[fpSubPhase] / FP_TOTAL_DUR);
+    const [phaseStart, phaseEnd] = getStepBounds(fpSubPhase);
+    const stepDuration = Math.max(80, fpSpeed * FP_COMPUTATION_STEP_DURATIONS[fpSubPhase] / FP_TOTAL_COMPUTATION_DURATION);
     const animate = (now) => {
       if (!layerAnimStartRef.current) layerAnimStartRef.current = now;
       const elapsed = now - layerAnimStartRef.current;
-      const phaseProgress = Math.min(1, elapsed / phaseDuration);
-      const progress = phaseStart + (phaseEnd - phaseStart) * phaseProgress;
+      const stepProgress = Math.min(1, elapsed / stepDuration);
+      const progress = phaseStart + (phaseEnd - phaseStart) * stepProgress;
       setLayerAnimProgress(progress);
       layerAnimRef.current = requestAnimationFrame(animate);
     };
@@ -1584,7 +1632,7 @@ export default function App() {
     return () => {
       if (layerAnimRef.current) cancelAnimationFrame(layerAnimRef.current);
     };
-  }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getSubPhaseBounds, getSubPhaseProgress]);
+  }, [fpPlaying, fpCurrentLayer, fpSpeed, fpSubPhase, getStepBounds, getStepProgress]);
 
   // ---- 可视化数据系统 (neural-vis) ----
   const {
@@ -1616,7 +1664,7 @@ export default function App() {
       file.filename,
       file.model,
       file.family_id,
-      file.phase,
+      file.result_type,
       file.run_id,
     ].some((value) => String(value ?? '').toLocaleLowerCase().includes(query)));
   }, [dataFiles, visDataSearch]);
@@ -1663,6 +1711,12 @@ export default function App() {
     return Number.isFinite(layer) ? Math.max(maxLayer, layer + 1) : maxLayer;
   }, 0);
   const visualizations = Array.isArray(visData?.visualizations) ? visData.visualizations : [];
+  const hasLiveHeatmapRun = Boolean(liveModelHeatmap.runId);
+  const heatmapTrace = hasLiveHeatmapRun ? liveModelHeatmap.trace : realResearchTrace.trace;
+  const heatmapFullStateVectors = hasLiveHeatmapRun
+    ? liveModelHeatmap.fullStateVectors
+    : realResearchTrace.fullStateVectors;
+  const heatmapCurrentLayer = hasLiveHeatmapRun ? liveModelHeatmap.currentLayer : fpCurrentLayer;
   const byType = {
     trajectory: visualizations.filter(v => v.type === 'trajectory'),
     point_cloud: visualizations.filter(v => v.type === 'point_cloud'),
@@ -1678,6 +1732,14 @@ export default function App() {
   const nLayers = visData?.model_info?.n_layers || atlasLayerCount || 36;
 
   useEffect(() => { loadDataManifest(); }, [loadDataManifest]);
+
+  useEffect(() => {
+    if (activeResearchPluginId !== 'heatmap-analysis' || !hasLiveHeatmapRun) return;
+    if (liveModelHeatmap.currentLayer == null) return;
+    setFpPlaying(false);
+    setFpCurrentLayer(liveModelHeatmap.currentLayer);
+    setFpSubPhase(FP_COMPUTATION_STEPS.length - 1);
+  }, [activeResearchPluginId, hasLiveHeatmapRun, liveModelHeatmap.currentLayer]);
 
   // ---- Forward Pass 动画 ----
   const startForwardPass = useCallback(() => {
@@ -1736,8 +1798,8 @@ export default function App() {
   // Forward pass按真实组件逐步推进。
   useEffect(() => {
     if (!fpPlaying || fpCurrentLayer == null) return;
-    const phaseDuration = Math.max(80, fpSpeed * FP_PHASE_DURATIONS[fpSubPhase] / FP_TOTAL_DUR);
-    fpTimerRef.current = setTimeout(stepNextSubPhase, phaseDuration);
+    const stepDuration = Math.max(80, fpSpeed * FP_COMPUTATION_STEP_DURATIONS[fpSubPhase] / FP_TOTAL_COMPUTATION_DURATION);
+    fpTimerRef.current = setTimeout(stepNextSubPhase, stepDuration);
     return () => { if (fpTimerRef.current) clearTimeout(fpTimerRef.current); };
   }, [fpPlaying, fpCurrentLayer, fpSubPhase, fpSpeed, stepNextSubPhase]);
 
@@ -1819,7 +1881,106 @@ export default function App() {
   const [showOperationHistory, setShowOperationHistory] = useState(false);
   const [showBlueprint, setShowBlueprint] = useState(false);
   const [blueprintInitialTab, setBlueprintInitialTab] = useState('roadmap');
-  const [showAIRnD, setShowAIRnD] = useState(false);
+  const [activeWorkspace, setActiveWorkspace] = useState('3d');
+  const workspaceScrollRef = useRef(null);
+  const threeDSpaceRef = useRef(null);
+  const aiRndWorkspaceRef = useRef(null);
+  const workspaceScrollFrameRef = useRef(null);
+  const workspaceScrollLockedRef = useRef(false);
+
+  const scrollToWorkspace = useCallback((workspace) => {
+    if (workspace === 'airnd') {
+      setShowBlueprint(false);
+      setShowConfigPanel(false);
+      setShowHelp(false);
+    }
+
+    const scroller = workspaceScrollRef.current;
+    const target = workspace === 'airnd' ? aiRndWorkspaceRef.current : threeDSpaceRef.current;
+    if (!scroller || !target) return;
+
+    if (workspaceScrollFrameRef.current !== null) {
+      window.cancelAnimationFrame(workspaceScrollFrameRef.current);
+      workspaceScrollFrameRef.current = null;
+    }
+
+    const startTop = scroller.scrollTop;
+    const targetTop = target.offsetTop;
+    const distance = targetTop - startTop;
+    setActiveWorkspace(workspace);
+
+    if (Math.abs(distance) < 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      scroller.scrollTop = targetTop;
+      scroller.classList.remove('is-workspace-animating');
+      workspaceScrollLockedRef.current = false;
+      return;
+    }
+
+    workspaceScrollLockedRef.current = true;
+    scroller.classList.add('is-workspace-animating');
+    const startedAt = window.performance.now();
+    const animate = (now) => {
+      const progress = Math.min(1, (now - startedAt) / WORKSPACE_SCROLL_DURATION_MS);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      scroller.scrollTop = startTop + distance * eased;
+      if (progress < 1) {
+        workspaceScrollFrameRef.current = window.requestAnimationFrame(animate);
+        return;
+      }
+      scroller.scrollTop = targetTop;
+      scroller.classList.remove('is-workspace-animating');
+      workspaceScrollFrameRef.current = null;
+      workspaceScrollLockedRef.current = false;
+    };
+    workspaceScrollFrameRef.current = window.requestAnimationFrame(animate);
+  }, []);
+
+  const handleWorkspaceWheel = useCallback((event) => {
+    if (event.ctrlKey || !event.deltaY) return;
+    const scroller = workspaceScrollRef.current;
+    if (!scroller) return;
+
+    if (workspaceScrollLockedRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (canNestedElementScroll(event.target, scroller, event.deltaY)) return;
+
+    const aiTop = aiRndWorkspaceRef.current?.offsetTop ?? scroller.clientHeight;
+    const targetWorkspace = event.deltaY > 0 ? 'airnd' : '3d';
+    const alreadyAtTarget = targetWorkspace === 'airnd'
+      ? scroller.scrollTop >= aiTop - 1
+      : scroller.scrollTop <= 1;
+    if (alreadyAtTarget) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    scrollToWorkspace(targetWorkspace);
+  }, [scrollToWorkspace]);
+
+  useEffect(() => {
+    const scroller = workspaceScrollRef.current;
+    if (!scroller) return undefined;
+    scroller.addEventListener('wheel', handleWorkspaceWheel, { passive: false, capture: true });
+    return () => scroller.removeEventListener('wheel', handleWorkspaceWheel, { capture: true });
+  }, [handleWorkspaceWheel]);
+
+  const handleWorkspaceScroll = useCallback((event) => {
+    const scroller = event.currentTarget;
+    const aiTop = aiRndWorkspaceRef.current?.offsetTop ?? scroller.clientHeight;
+    const nextWorkspace = scroller.scrollTop >= aiTop - scroller.clientHeight * 0.45 ? 'airnd' : '3d';
+    setActiveWorkspace((current) => current === nextWorkspace ? current : nextWorkspace);
+  }, []);
+
+  useEffect(() => () => {
+    if (workspaceScrollFrameRef.current !== null) {
+      window.cancelAnimationFrame(workspaceScrollFrameRef.current);
+    }
+    workspaceScrollRef.current?.classList.remove('is-workspace-animating');
+    workspaceScrollLockedRef.current = false;
+  }, []);
 
   useEffect(() => {
     if (!hasInfoPanelContent) {
@@ -2536,9 +2697,15 @@ export default function App() {
 
   return (
     <div
-      className={isPatternFamilyAtlasView ? 'pattern-family-atlas-active' : ''}
-      style={{ width: '100vw', height: '100vh', background: '#050505', color: 'white' }}
+      ref={workspaceScrollRef}
+      className="app-scroll-shell"
+      onScroll={handleWorkspaceScroll}
     >
+      <section ref={threeDSpaceRef} className="app-workspace-screen app-workspace-screen--3d" aria-label="3D 研究空间">
+        <div
+          className={`app-3d-viewport${isPatternFamilyAtlasView ? ' pattern-family-atlas-active' : ''}`}
+          style={{ width: '100vw', height: '100vh', background: '#050505', color: 'white' }}
+        >
 
       {/* Global Settings Button */}
       <button
@@ -2586,12 +2753,10 @@ export default function App() {
       </button>
 
       <button
-        onClick={() => {
-          setShowAIRnD(prev => !prev);
-        }}
+        onClick={() => scrollToWorkspace('airnd')}
         style={{
           position: 'absolute', top: 20, left: 112, zIndex: 101,
-          background: showAIRnD ? '#7c3aed' : 'rgba(20, 20, 25, 0.8)',
+          background: activeWorkspace === 'airnd' ? '#7c3aed' : 'rgba(20, 20, 25, 0.8)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
           padding: '8px',
@@ -2600,8 +2765,8 @@ export default function App() {
           backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}
-        title="AI RnD"
-        aria-label="AI RnD"
+        title="进入 AI 自动研发（向下滚动）"
+        aria-label="进入 AI 自动研发"
       >
         <Bot size={20} />
       </button>
@@ -2718,7 +2883,39 @@ export default function App() {
                       研究驾驶舱
                     </div>
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 5 }}>研究路线插件</div>
+                      <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 5 }}>常用研发框架</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6, marginBottom: 8 }}>
+                        {RESEARCH_PLUGINS.filter((plugin) => [
+                          'language-mechanism',
+                          'heatmap-analysis',
+                          'ai-research-loop',
+                        ].includes(plugin.id)).map((plugin) => {
+                          const isActive = activeResearchPluginId === plugin.id;
+                          return (
+                            <button
+                              key={plugin.id}
+                              type="button"
+                              onClick={() => applyResearchPlugin(plugin.id)}
+                              title={plugin.target}
+                              style={{
+                                minHeight: 42,
+                                padding: '6px 5px',
+                                borderRadius: 8,
+                                border: isActive ? '1px solid rgba(56,189,248,0.72)' : '1px solid rgba(148,163,184,0.20)',
+                                background: isActive ? 'rgba(14,116,144,0.30)' : 'rgba(15,23,42,0.46)',
+                                color: isActive ? '#e0f2fe' : '#94a3b8',
+                                cursor: 'pointer',
+                                fontSize: 10,
+                                fontWeight: isActive ? 800 : 600,
+                                lineHeight: 1.25,
+                              }}
+                            >
+                              {plugin.shortName}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div style={{ fontSize: 10, color: '#7f95bb', marginBottom: 5 }}>全部研发框架</div>
                       <select
                         value={activeResearchPluginId}
                         onChange={(event) => applyResearchPlugin(event.target.value)}
@@ -2742,15 +2939,108 @@ export default function App() {
                       </select>
                     </div>
 
-                    <ResearchEvidenceCockpit onSelectGate={selectEvidenceGate} />
-
                     <MechanismModeSwitch
                       mode={mechanismWorkspaceMode}
                       onModeChange={setMechanismWorkspaceMode}
                     />
 
                     {activeResearchPluginId === 'heatmap-analysis' && (
-                      <ResearchHeatmapRouteCard />
+                      <section
+                        style={{
+                          borderRadius: 12,
+                          border: '1px solid rgba(168, 85, 247, 0.25)',
+                          background: 'rgba(10, 10, 16, 0.72)',
+                          padding: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <div style={{ fontSize: 11, color: '#c4d3ff', marginBottom: 8, fontWeight: 800 }}>
+                          实时模型热力图
+                        </div>
+                        <label style={{ display: 'grid', gap: 4, marginBottom: 8, color: '#8aa0b7', fontSize: 10 }}>
+                          本地模型
+                          <select
+                            value={fpModel}
+                            disabled={liveModelHeatmap.running}
+                            onChange={(event) => handleFpModelChange(event.target.value)}
+                            style={{ width: '100%', padding: '7px 8px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: 6, background: 'rgba(2,6,23,0.72)', color: '#dbeafe', fontSize: 10 }}
+                          >
+                            <option value="qwen3-4b">Qwen3-4B</option>
+                            <option value="glm4-9b">GLM4-9B-Chat</option>
+                            <option value="ds7b">DeepSeek-R1-7B</option>
+                          </select>
+                        </label>
+                        <label style={{ display: 'grid', gap: 4, marginBottom: 8, color: '#8aa0b7', fontSize: 10 }}>
+                          输入文本
+                          <textarea
+                            value={fpInputText}
+                            disabled={liveModelHeatmap.running}
+                            onChange={(event) => setFpInputText(event.target.value)}
+                            rows={3}
+                            placeholder="输入要观察的文本"
+                            style={{ width: '100%', resize: 'vertical', padding: '7px 8px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: 6, background: 'rgba(2,6,23,0.72)', color: '#dbeafe', fontSize: 10, fontFamily: 'inherit' }}
+                          />
+                        </label>
+                        <label style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 6, alignItems: 'center', marginBottom: 8, color: '#8aa0b7', fontSize: 10 }}>
+                          显示范围
+                          <select
+                            value={heatmapDisplayConfig?.mode === 'all' ? 'all' : String(heatmapDisplayConfig?.topK ?? 12)}
+                            onChange={(event) => {
+                              const value = event.target.value;
+                              setHeatmapDisplayConfig(value === 'all' ? { mode: 'all' } : { mode: 'top_k', topK: Number(value) });
+                            }}
+                            style={{ minWidth: 0, padding: '5px 6px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: 6, background: 'rgba(2,6,23,0.72)', color: '#dbeafe', fontSize: 9 }}
+                          >
+                            {[4, 8, 12, 16].map((count) => <option key={count} value={count}>{count} 个坐标</option>)}
+                            <option value="all">全部参数</option>
+                          </select>
+                        </label>
+                        <div style={{ display: 'grid', gridTemplateColumns: liveModelHeatmap.running ? '1fr 72px' : '1fr', gap: 6 }}>
+                          <button
+                            type="button"
+                            disabled={liveModelHeatmap.running || !fpInputText.trim()}
+                            onClick={() => {
+                              resetForwardPass();
+                              liveModelHeatmap.start({
+                                prompt: fpInputText,
+                                topK: heatmapDisplayConfig?.mode === 'all' ? 64 : heatmapDisplayConfig?.topK,
+                              }).catch(() => {});
+                            }}
+                            style={{ padding: '8px 10px', border: 0, borderRadius: 7, background: 'linear-gradient(135deg, #0ea5e9, #7c3aed)', color: '#fff', fontSize: 11, fontWeight: 800, cursor: liveModelHeatmap.running ? 'wait' : 'pointer', opacity: !fpInputText.trim() ? 0.5 : 1 }}
+                          >
+                            {liveModelHeatmap.running ? '模型运行中' : hasLiveHeatmapRun ? '重新加载模型' : '加载模型并运行'}
+                          </button>
+                          {liveModelHeatmap.running && (
+                            <button
+                              type="button"
+                              onClick={() => liveModelHeatmap.stop().catch(() => {})}
+                              style={{ padding: '8px 9px', border: '1px solid rgba(251,113,133,0.35)', borderRadius: 7, background: 'rgba(127,29,29,0.24)', color: '#fda4af', fontSize: 10, fontWeight: 800, cursor: 'pointer' }}
+                            >
+                              停止
+                            </button>
+                          )}
+                        </div>
+                        {liveModelHeatmap.job && (
+                          <div style={{ marginTop: 8, color: '#9fb1d5', fontSize: 10, lineHeight: 1.5 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                              <span>{LIVE_HEATMAP_STAGE_LABELS[liveModelHeatmap.liveState?.stage] || liveModelHeatmap.job.status}</span>
+                              <span>
+                                {liveModelHeatmap.liveState?.completed_layers || 0}/{liveModelHeatmap.liveState?.total_layers || selectedFpLayerCount} Layers
+                              </span>
+                            </div>
+                            <div style={{ height: 4, marginTop: 4, overflow: 'hidden', borderRadius: 3, background: 'rgba(255,255,255,0.08)' }}>
+                              <div style={{ height: '100%', width: `${Math.min(100, 100 * (liveModelHeatmap.liveState?.completed_layers || 0) / (liveModelHeatmap.liveState?.total_layers || selectedFpLayerCount))}%`, background: 'linear-gradient(90deg, #22d3ee, #a855f7)', transition: 'width 180ms ease' }} />
+                            </div>
+                          </div>
+                        )}
+                        {liveModelHeatmap.error && (
+                          <div style={{ marginTop: 7, color: '#fb7185', fontSize: 9, lineHeight: 1.4 }}>{liveModelHeatmap.error}</div>
+                        )}
+                        <div style={{ fontSize: 10, color: '#9fb1d5', lineHeight: 1.45 }}>
+                          <div>Embedding：模型开始推理后立即显示</div>
+                          <div>HiddenState：随当前计算 Layer 实时更新</div>
+                        </div>
+                      </section>
                     )}
 
                     {activeResearchPluginId === 'language-mechanism' && (
@@ -2834,7 +3124,7 @@ export default function App() {
                 </div>
 
                 {/* ---- 模式切换: 生成模式 / 演示模式 ---- */}
-                <div style={{ marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ display: activeResearchPluginId === 'heatmap-analysis' ? 'none' : undefined, marginBottom: 16, padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, color: '#dfe8ff', fontSize: 13, fontWeight: 700 }}>
                     <Network size={14} color="#4facfe" />
                     运行模式
@@ -3184,10 +3474,10 @@ export default function App() {
                         opacity: fpCurrentLayer == null ? 0.55 : 1,
                       }}
                     >
-                      {'下一步' + (fpCurrentLayer != null ? ': ' + (FP_SUB_PHASES[Math.min(fpSubPhase + 1, FP_SUB_PHASES.length - 1)]?.label || '完成') : '')}
+                      {'下一步（步骤）' + (fpCurrentLayer != null ? '：' + (FP_COMPUTATION_STEPS[Math.min(fpSubPhase + 1, FP_COMPUTATION_STEPS.length - 1)]?.label || '完成') : '')}
                     </button>
                     <div style={{ marginTop: 6, display: 'flex', gap: 2 }}>
-                      {FP_SUB_PHASES.map((phase, i) => (
+                      {FP_COMPUTATION_STEPS.map((phase, i) => (
                         <div key={phase.id} style={{
                           flex: 1,
                           height: 4,
@@ -3198,20 +3488,20 @@ export default function App() {
                       ))}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 3, fontSize: 9, color: '#7f95bb' }}>
-                      <span>{'当前: ' + (fpCurrentLayer == null ? '未开始' : FP_SUB_PHASES[fpSubPhase]?.label)}</span>
-                      <span>{fpCurrentLayer == null ? '-' : String(fpSubPhase + 1) + '/' + FP_SUB_PHASES.length}</span>
+                      <span>{'当前步骤: ' + (fpCurrentLayer == null ? '未开始' : FP_COMPUTATION_STEPS[fpSubPhase]?.label)}</span>
+                      <span>{fpCurrentLayer == null ? '-' : String(fpSubPhase + 1) + '/' + FP_COMPUTATION_STEPS.length}</span>
                     </div>
                     <div style={{ marginTop: 8, padding: '8px 9px', border: '1px solid rgba(34,211,238,0.16)', background: 'rgba(8,47,73,0.18)', borderRadius: 6 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, color: '#a5f3fc', fontSize: 10, fontWeight: 700 }}>
-                        <span>真实组件 Trace</span>
-                        <span>{realResearchTrace.ready ? 'L2 已加载' : '等待数据'}</span>
+                        <span>实时模型 Trace</span>
+                        <span>{liveModelHeatmap.running ? '运行中' : realResearchTrace.ready ? '已连接' : '等待运行'}</span>
                       </div>
                       <div style={{ marginTop: 4, color: '#7f95bb', fontSize: 9, lineHeight: 1.45, overflowWrap: 'anywhere' }}>
                         {realResearchTrace.currentEvent
                           ? `L${realResearchTrace.currentEvent.layer} · ${realResearchTrace.currentEvent.event_type} · ${realResearchTrace.currentEvent.top_units?.length || 0} 个真实地址`
-                          : (fpCurrentLayer == null
-                            ? (realResearchTrace.trace?.run_id || '正在加载研究证据')
-                            : `${FP_SUB_PHASES[fpSubPhase]?.label} 暂无直接组件观测`)}
+                          : (liveModelHeatmap.liveState
+                            ? `L${liveModelHeatmap.currentLayer ?? '-'} · ${liveModelHeatmap.liveState.stage || liveModelHeatmap.liveState.status} · 完整 HiddenState 坐标`
+                            : '在“热力图”路线中输入文本并启动本地模型')}
                       </div>
                       {realResearchTrace.error && (
                         <div style={{ marginTop: 3, color: '#fb7185', fontSize: 9 }}>{realResearchTrace.error}</div>
@@ -4604,10 +4894,22 @@ export default function App() {
                 mechanismMode={mechanismWorkspaceMode}
               />
 
-              {activeResearchPluginId === 'heatmap-analysis'
-                && researchLayerVisibility.heatmap
-                && byType.heatmap_3d.length === 0
-                && <ResearchHeatmapPreview3D />}
+                    {activeResearchPluginId === 'heatmap-analysis' && (
+                      <ResearchHeatmapPreview3D
+                        trace={heatmapTrace}
+                        currentLayer={heatmapCurrentLayer}
+                        displayConfig={heatmapDisplayConfig}
+                        fullStateVectors={heatmapFullStateVectors}
+                        liveState={hasLiveHeatmapRun ? liveModelHeatmap.liveState || { stage: 'queued', status: liveModelHeatmap.job?.status } : null}
+                        c390LanguageOperationField={realResearchTrace.c390LanguageOperationField}
+                        c398IndependentConstructionLockbox={realResearchTrace.c398IndependentConstructionLockbox}
+                        c414OutputSensitiveLanguageField={realResearchTrace.c414OutputSensitiveLanguageField}
+                        c433AxisLockboxField={realResearchTrace.c433AxisLockboxField}
+                        c26801ResidualStateOperatorField={realResearchTrace.c26801ResidualStateOperatorField}
+                        c32561LanguageEncodingField={realResearchTrace.c32561LanguageEncodingField}
+                        c42641OutputConditionedCrossmodelField={realResearchTrace.c42641OutputConditionedCrossmodelField}
+                      />
+                    )}
 
               {visData && !isPatternFamilyAtlasView && (
                 <>
@@ -4638,9 +4940,9 @@ export default function App() {
                   {byType.point_cloud.map(pc => (
                     <PointCloudRenderer key={pc.id} pointCloud={pc} onHoverToken={setHoveredInfo} />
                   ))}
-                  {byType.heatmap_3d.map(hm => (
-                    <Heatmap3DRenderer key={hm.id} heatmap={hm} />
-                  ))}
+                    {activeResearchPluginId !== 'heatmap-analysis' && byType.heatmap_3d.map(hm => (
+                      <Heatmap3DRenderer key={hm.id} heatmap={hm} />
+                    ))}
                   {byType.flow.map(fl => (
                     <FlowRenderer key={fl.id} flow={fl} animated={false} animationProgress={1} />
                   ))}
@@ -4867,7 +5169,7 @@ export default function App() {
 
       {/* Project Genesis Blueprint */}
       {showBlueprint && (
-        <HLAIBlueprint
+        <ResearchCenter
           mode="overlay"
           scope="theory"
           initialTab={blueprintInitialTab}
@@ -4879,18 +5181,21 @@ export default function App() {
         />
       )}
 
-      {showAIRnD && (
-        <HLAIBlueprint
-          mode="sidebar"
-          scope="rnd"
-          initialTab="rnd_console"
-          lang={lang}
-          onClose={() => {
-            setShowAIRnD(false);
-          }}
-        />
-      )}
+          <button type="button" className="workspace-scroll-cue" onClick={() => scrollToWorkspace('airnd')}>
+            <span>AI 自动研发</span>
+            <ChevronDown size={16} />
+          </button>
+        </div>
+      </section>
 
+      <section ref={aiRndWorkspaceRef} className="app-workspace-screen app-workspace-screen--airnd" aria-label="AI 自动研发空间">
+        <ResearchCenter
+          mode="page"
+          scope="rnd"
+          lang={lang}
+          onClose={() => scrollToWorkspace('3d')}
+        />
+      </section>
     </div>
   );
 }

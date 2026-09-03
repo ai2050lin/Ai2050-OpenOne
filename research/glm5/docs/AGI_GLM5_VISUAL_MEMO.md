@@ -1,4 +1,4 @@
-﻿# AGI Research Memo
+﻿## AGI Research Memo
 
 > 本文档记录AGI研究的进展、问题分析和下一步行动
 
@@ -15378,4 +15378,69 @@ NeuralNetworkRenderer从v5.0(585行)重构为v6.0 Clean(210行), 去除所有冗
 
 
 
+
+
+
+## Phase 100: 可视化研究数据工作台与Loop Engineering方案 [2026-08-27 02:06]
+
+**任务与审查原理。**本期依据“语言程序图—HiddenState条件响应图—输出身份图、两座桥和证据账本”的研究思路，对现有可视化客户端与AI研发循环进行只读工程审查，并形成系统修改方案。审查对象包括实时Trace Hook、3D热力图、研究驾驶舱、AI研发Overlay、Trace服务、Research Orchestrator和Research OS Schema。本期没有运行模型、没有生成新样本、没有实施干预，因此不产生新的语言机制经验结论。
+
+**当前工程观察。**`frontend/src/App.jsx`约5054行，`ResearchHeatmapRoute.jsx`约3138行；后者同时承载实时状态、全向量、C101-C433多个Campaign专用数据适配和3D渲染，仍出现Phase来源标题与历史Campaign默认回退。实时Trace后端固定调用颜色组件脚本，默认目标为`red`，请求没有`program_id/world_id/operation_id/query_id/role_map/pair_id`；实时前端主要消费最后一个Token的Embedding和当前层单向量，尚不能表达完整多Token角色场。AI研发循环已有代码安全检查、单GPU锁、工件审计和独立审查角色，但界面与状态仍以analyze/plan/generate/execute/summarize阶段为中心，模型序列缺少Qwen3-14B，临时与结果目录也未完全符合当前glm5约束。多处源码存在UTF-8乱码。这些是工程事实，不是模型机制证据。
+
+**方案的基本对象与公式。**系统收敛为`program/case/run/pair/evidence/loop`六个不可变或版本化对象。外部程序通过编译器产生文本及角色—Token映射；内部主观测量保持完整Embedding与全Token逐层HiddenState；正式响应必须来自登记配对：
+
+$$
+R_{o,q}(x)=\Pi_oH_q(o(x))-H_q(x),
+$$
+
+其中$\Pi_o$只能来自程序角色、字符跨度和物理Token映射，不能用长度补齐或视觉相似代替。每个视觉单元必须回溯到`run_id/pair_id/layer/token/coordinate/raw_value/artifact_sha256`。证据继续分为E0外部程序有效、E1行为合格、E2响应可预测、E3局部传动稳定、E4未见组合成立、E5输出充分/必要/特异救援、E6跨语言或跨模型功能对应。
+
+**客户端裁决。**一级导航只保留研究图谱、3D观测和Loop Engineering。3D空间以LLM层栈为主轴：输入侧显示语言角色映射与全部Token的Embedding热力图；当前Layer显示对应全部Token的HiddenState；输出侧显示答案身份和自回归生成时钟。默认研究单位由单Run改为A/B Pair，只保留基线、变体、差分和干预后四种视图。完整张量保存为safetensors或分片二进制，后端按layer、token区间和坐标区间提供Tile；前端使用Texture或InstancedMesh渲染可见区域，不再把数百MB全场转换为大JSON或Campaign专用JSX。
+
+**Loop Engineering裁决。**自动研发不再以Phase数量表示进展，而以“证据缺口→合同草案→等待审核→可运行→执行中→工件审计→裁决→下一缺口/停止”推进。AI必须先登记至少两个竞争解释、预测和死亡观察，再生成`loop_contract`；方法与对照审核通过后才能生成脚本。模型测试固定按Qwen3-4B、Qwen3-14B、GLM4、DeepSeek-7B顺序单GPU串行，每个模型保存并释放后才允许下一个。先Smoke、再扩大正式样本、最后独立复验；重要正结果自动生成更大样本复测任务。缺行为资格、负控、独立分区或规定工件只能裁决为`inconclusive`。AI意见不能直接提升Evidence或理论主张。
+
+**理论进展与关键洞察。**本期没有改变条件化输出场闭合理论。工程上的新收敛是：客户端的核心研究对象不应是Phase、热力图或单个Token，而应是“可执行语言操作造成的、带角色对齐和证据等级的状态响应记录”。词义研究需要积累一个上下文功能状态族：外部程序定义可执行差分，内部场记录响应，输出桥记录其是否影响答案身份。3D的价值是帮助研究者发现值得冻结的结构和反例；只有Pair、未见预测和干预审计才能把视觉观察升级为机制证据。
+
+**问题、硬伤和瓶颈。**一，外部语言程序仍可能强加研究者本体，必须冻结竞争解释；二，完整全Token全坐标场体量巨大，需要Tile、去重和生命周期合同；三，角色—Token编译在中文、多Token词、主动/被动和翻译中容易错位；四，颜色尺度和Top-K极易制造视觉伪规律；五，现有大量Campaign专用渲染器迁移成本高；六，自动生成代码虽然有AST门，但尚无严格Schema写入、数据泄漏和GPU释放的运行时证明；七，外部人类自然度与等义盲评仍缺失；八，跨模型必须先取得各自行为资格，不能强求同一表面接口。
+
+**阶段性大任务。**P0冻结`language_program/compiled_case/trace_manifest/paired_response/evidence_record/loop_contract`六类Schema、内容寻址工件目录、Tile API和E0-E6账本；P1修复乱码、拆分两个超大组件、删除Campaign专用默认分支和Phase UI；P2完成“选择program→编译case→行为资格→Pair Trace→3D A/B/差分→Evidence登记”的真实闭环；P3把AI研发接入Evidence Gap、统一GPU Scheduler和工件审计；P4才扩展输出身份、因果干预、跨语言和跨模型功能对齐。详细方案已追加到`ai2050_research_os/README.md`的V12章节。
+
+**结论。**可视化客户端应做减法：一个研究工作区、三个一级视图、六类稳定对象和一条证据循环。成功标准不是显示更多层、更多Phase或更多Dashboard，而是每次观察都成为可复用、可比较、可追溯且可证伪的数据。当前只完成架构方案与工程审计；在P0数据合同冻结前，不授权继续为单个Campaign增加专用可视化组件。
+
+
+
+
+## Phase 2182: 研究积累、3D观察与Loop Engineering完整客户端蓝图 [2026-08-27 07:30]
+
+**任务性质与边界。**本期在Phase2164/V12方案上，根据用户明确提出的三部分目标，完成可视化客户端的完整产品架构：一是持续积累语言模式族、HiddenState场和理论进展；二是在3D空间观察真实LLM静态结构、动态运行和研究进展；三是建立自动/手动、多研发代理模型、提示词可配置、结果持久化和数据库更新的Loop Engineering。本期没有运行任何被研究模型、没有新增样本或干预，不产生新的经验机制结论。
+
+**第一部分：研究积累。**语言对象必须分为语言单位、物理token、上下文实例和程序角色，避免把名词、动词、副词、介词、标点或构式误当成固定HiddenState定义。目录覆盖词汇与符号、构式与用法、可执行语言程序。对行为合格case保存完整观测：
+
+$$
+\mathcal F(x)=\{E_{t,d}(x),H_{q,t,d}(x)\}_{q,t,d},
+$$
+
+以及登记Pair的角色对齐响应：
+
+$$
+R_{o,q}(x)=\Pi_oH_q(o(x))-H_q(x).
+$$
+
+元数据进入SQLite，完整张量进入内容寻址的safetensors/二进制工件；数据库只保存shape、dtype、capture point、哈希和关系。理论中心把claim、公式、范围、正反证据、反例、开放变量和闭合门登记为版本化对象。数学闭合分为对象定义、角色编译、行为、全场重复、未见预测、局部传动、未见组合、语义到输出、充分/必要/特异救援及跨语言/跨模型边界；状态只能是未测试、失败、窄范围通过或独立复现通过。
+
+**第二部分：3D机制观察。**3D固定为静态结构、动态运行、研究观察三种模式。静态结构只根据真实model config和模块枚举绘制Embedding、Layer、Attention、MLP、Norm、Residual与LM Head；动态运行只消费真实后端事件；研究观察以language unit、construction、program、case、Pair或claim为入口。空间轴固定为“语言程序/角色→全部token Embedding场→LLM Layer主体及当前层HiddenState→输出身份/生成时钟”。默认比较A、B、B-A和干预后；每个格子必须返回run、pair、layer、token、coordinate、raw value与artifact hash。大张量由Tile API按可见范围提供，前端使用Texture或InstancedMesh，不再整体加载数百MB JSON或为每坐标创建React节点。3D只用于发现结构、演化和异常，精确值与长表在2D Inspector中读取。
+
+**第三部分：Loop Engineering。**自动与手动模式共用同一状态机；自动模式只自动跨过普通Gate，在合同冻结、理论升级、权限扩大、连续失败或预算边界暂停；手动模式每个Gate等待用户继续。研发代理与被研究模型严格分离：一个主模型负责合同整合、编程和下一任务草案，多个辅助模型分别审查方法、复算数据、寻找反例和检查理论边界；Qwen3-4B、Qwen3-14B、GLM4、DeepSeek-7B只作为被研究对象并严格单GPU串行。
+
+每轮顺序为Evidence Gap、冻结Snapshot、竞争假设和死亡观察、独立辅助审查、loop contract、方法Gate、代码生成、安全/Schema检查、Qwen3-4B smoke与放大测试、其余模型逐个资格与运行、工件/哈希/显存释放审计、独立结果复核、accepted/rejected/inconclusive草案、确定性Evidence更新和下一Gap。提示词按角色版本化并保存hash；API key只存后端安全配置。脚本、临时文件和结果分别限制到`tests/glm5/`、`tests/glm5_temp/`和`tests/glm5/result/`。
+
+**数据库与工程收敛。**稳定对象继续使用`program/case/run/pair/evidence/loop`，并增加language unit、construction、claim、puzzle、closure gate、prompt profile和artifact audit关系。Loop更新采用事务：先验证工件与哈希，再登记Run/Pair/Evidence，最后推进Loop；失败回滚元数据但保留失败工件。旧Phase/Campaign通过Adapter导入legacy provenance，不自动提高Evidence。`App.jsx`、`ResearchHeatmapRoute.jsx`和`AIRnDOverlay`必须分别收敛为Workspace Shell、通用Tile热力图与Loop Workspace；删除Cxxx专用默认分支、Phase进度条及乱码复制链。
+
+**与当前理论的关系。**本方案不修改“条件化输出场闭合理论”。它为理论提供长期积累接口：语言模式族给出可执行外部差分，完整场记录条件响应，Pair和干预检验响应是否可预测与可调用，输出视图分离语义状态和答案身份，Evidence/closure gate防止局部观察越级。Phase2181的“q0目标语言指令embedding门控”可作为窄拼图录入，但必须显示其未解释概念翻译检索机制，说明理论中心必须同时保存正结果和严格边界。
+
+**问题、硬伤与瓶颈。**语言类别和构式本体可能由研究者强加，需冻结竞争解释；跨语言分词和多subtoken角色映射易错；完整全token全坐标场存储与浏览成本高；3D颜色易制造伪规律；旧Campaign专用组件迁移量大；自动代码即使通过AST也可能出现数据泄漏、错误控制或显存未释放；多AI意见可能形成虚假共识；理论数据库若允许自动直接修改会污染证据链。对应约束是原始工件不可变、Tile加载、角色映射审计、确定性门控、独立复核和理论更新人工确认。
+
+**阶段性大任务。**P0冻结数据库迁移、语言单位/构式目录、六类核心Schema、Tensor Artifact、Pair/Evidence/Theory和Tile协议；P1实现研究积累中心；P2实现真实静态/动态/研究三模3D；P3实现自动/手动Loop、主辅模型和提示词配置、统一GPU Scheduler；P4打通结果事务写库并自动反映到研究中心与3D；P5迁移旧数据并删除专用渲染器；P6再扩展输出身份、因果干预、跨语言和跨模型功能对齐。P0前不增加专用Dashboard，P1追溯门前不增加复杂3D特效，P3工件审计前不开放无限自动循环。
+
+**结论。**完整客户端应成为一条可持续证据生产线，而不是实验播放器：语言模式族回答“研究了什么”，HiddenState场回答“真实内部状态是什么”，理论中心回答“哪些关联成立、边界和闭合缺口是什么”，3D帮助观察，Loop Engineering负责受约束地产生下一批数据。详细蓝图已写入`ai2050_research_os/README.md`的V13章节。
 

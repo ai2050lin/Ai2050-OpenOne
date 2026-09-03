@@ -1,4 +1,4 @@
-export const RESEARCH_LAYER_DEFINITIONS = {
+﻿export const RESEARCH_LAYER_DEFINITIONS = {
   atlas: {
     id: 'atlas',
     label: '机制图谱层',
@@ -32,7 +32,7 @@ export const RESEARCH_LAYER_DEFINITIONS = {
   heatmap: {
     id: 'heatmap',
     label: '热力图层',
-    detail: 'layer / token / pattern / metric intensity matrix',
+    detail: '词嵌入序列与按层 HiddenState 的真实 top-k 状态矩阵',
   },
 };
 
@@ -110,19 +110,19 @@ export const RESEARCH_PLUGINS = [
   },
   {
     id: 'heatmap-analysis',
-    name: '热力图分析',
-    shortName: '热力图',
+    name: '状态热力图（Embedding + HiddenState）',
+    shortName: '状态热力图',
     routeType: 'heatmap_matrix',
     workspaceTab: 'main',
     defaultMode: 'configure',
-    target: '比较层、位置、语言模式与机制指标的相对强度',
-    focus: '把层×语言模式×指标组织为二维颜色矩阵和三维高度矩阵；真实数据必须保留来源与证据等级。',
+    target: '展示词嵌入序列与 HiddenState 的 top-k 热力图对齐展示',
+    focus: '左侧展示词嵌入 top-k 序列，右侧按层展示 HiddenState top-k；以最少噪音、无 Phase 语义的方式观察状态场。',
     status: '可视分析路线',
     defaultLayers: ['heatmap'],
     layers3D: ['heatmap', 'boundary'],
     panels: [
       { id: 'overview', label: '路线总览', defaultOpen: true },
-      { id: 'heatmap', label: '热力图效果', defaultOpen: true },
+      { id: 'heatmap', label: 'Embedding+HiddenState 热力图', defaultOpen: true },
       { id: 'evidence', label: '数据与证据', defaultOpen: false },
     ],
     actions: [
@@ -217,3 +217,4 @@ export function getPluginWindowState(plugin) {
     return acc;
   }, {});
 }
+

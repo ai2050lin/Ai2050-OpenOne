@@ -6,7 +6,9 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendDir = path.resolve(scriptDir, '..');
 const repoRoot = path.resolve(frontendDir, '..');
 const resultsDir = path.join(repoRoot, 'results');
-const publicVisDir = path.join(frontendDir, 'public', 'vis_data');
+const publicVisDir = process.env.AI2050_RESEARCH_ASSET_ROOT
+  ? path.resolve(process.env.AI2050_RESEARCH_ASSET_ROOT)
+  : path.join(repoRoot, 'tests', 'glm5', 'result', 'client_visualization_assets');
 const publicAtlasDir = path.join(publicVisDir, 'atlas');
 
 function sanitizeFilename(value) {

@@ -82,6 +82,41 @@ function Test-SupportedNodeVersion([string]$NodeExecutable) {
     return $versionText
 }
 
+function Get-PortListener([int]$ListenerPort) {
+    try {
+        $connection = Get-NetTCPConnection -State Listen -LocalPort $ListenerPort -ErrorAction Stop |
+            Select-Object -First 1
+        if (-not $connection) { return $null }
+
+        $process = Get-CimInstance Win32_Process -Filter "ProcessId = $($connection.OwningProcess)" -ErrorAction SilentlyContinue
+        return [pscustomobject]@{
+            ProcessId = [int]$connection.OwningProcess
+            Name = if ($process) { [string]$process.Name } else { 'unknown' }
+            ExecutablePath = if ($process) { [string]$process.ExecutablePath } else { '' }
+            CommandLine = if ($process) { [string]$process.CommandLine } else { '' }
+        }
+    }
+    catch [Microsoft.PowerShell.Cmdletization.Cim.CimJobException] {
+        return $null
+    }
+    catch {
+        if ($_.Exception.Message -match 'No matching') { return $null }
+        throw
+    }
+}
+
+function Test-AI2050VisualizationListener(
+    [object]$Listener,
+    [string]$ExpectedFrontendRoot
+) {
+    if (-not $Listener -or -not $Listener.CommandLine) { return $false }
+
+    $expectedViteScript = Join-Path $ExpectedFrontendRoot 'node_modules\vite\bin\vite.js'
+    $normalizedCommand = $Listener.CommandLine.Replace('/', '\')
+    $normalizedViteScript = $expectedViteScript.Replace('/', '\')
+    return $normalizedCommand.IndexOf($normalizedViteScript, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+}
+
 if (-not (Test-Path -LiteralPath $frontendRoot)) {
     throw "Frontend directory not found: $frontendRoot"
 }
@@ -96,7 +131,7 @@ Install Node.js >=20.19 or >=22.12, or point AI2050_NODE_HOME to a Node.js direc
 }
 
 $nodeExecutable = Join-Path $nodeHome 'node.exe'
-$npmExecutable = Join-Path $nodeHome 'npm.cmd'
+$npmCli = Join-Path $nodeHome 'node_modules\npm\bin\npm-cli.js'
 $nodeVersion = Test-SupportedNodeVersion $nodeExecutable
 $env:PATH = "$nodeHome;$env:PATH"
 
@@ -104,30 +139,58 @@ Write-Host "[AI2050] Node.js v$nodeVersion" -ForegroundColor Green
 Write-Host "[AI2050] Node home: $nodeHome" -ForegroundColor DarkGray
 Write-Host "[AI2050] Frontend: $frontendRoot" -ForegroundColor DarkGray
 
+if ($Mode -in @('dev', 'preview')) {
+    $listener = Get-PortListener $Port
+    if ($listener) {
+        if (Test-AI2050VisualizationListener $listener $frontendRoot) {
+            Write-Host "[AI2050] Visualization is already running (PID $($listener.ProcessId)); reusing it." -ForegroundColor Green
+            Write-Host "  Local:   http://localhost:$Port/" -ForegroundColor Cyan
+            exit 0
+        }
+
+        $listenerCommand = if ($listener.CommandLine) { $listener.CommandLine } else { "$($listener.Name) (command line unavailable)" }
+        throw @"
+Port $Port is already used by another process (PID $($listener.ProcessId)).
+Command: $listenerCommand
+Choose another port, for example:
+  .\scripts\start_visualization.ps1 -Port 5174
+"@
+    }
+}
+
 Push-Location $frontendRoot
 try {
-    $viteCommand = Join-Path $frontendRoot 'node_modules\.bin\vite.cmd'
-    if ($Install -or -not (Test-Path -LiteralPath $viteCommand)) {
+    $viteScript = Join-Path $frontendRoot 'node_modules\vite\bin\vite.js'
+    $eslintScript = Join-Path $frontendRoot 'node_modules\eslint\bin\eslint.js'
+    if ($Install -or -not (Test-Path -LiteralPath $viteScript)) {
         Write-Host '[AI2050] Installing locked frontend dependencies...' -ForegroundColor Yellow
-        & $npmExecutable ci
+        if (-not (Test-Path -LiteralPath $npmCli)) {
+            throw "npm CLI not found beside the selected Node.js runtime: $npmCli"
+        }
+        & $nodeExecutable $npmCli ci
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
 
     switch ($Mode) {
         'dev' {
             Write-Host "[AI2050] Starting visualization at http://localhost:$Port" -ForegroundColor Cyan
-            & $npmExecutable run dev -- --port $Port --strictPort
+            & $nodeExecutable $viteScript --port $Port --strictPort
         }
         'preview' {
             if (-not (Test-Path -LiteralPath (Join-Path $frontendRoot 'dist\index.html'))) {
-                & $npmExecutable run build
+                & $nodeExecutable $viteScript build
                 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             }
             Write-Host "[AI2050] Previewing visualization at http://localhost:$Port" -ForegroundColor Cyan
-            & $npmExecutable run preview -- --port $Port --strictPort
+            & $nodeExecutable $viteScript preview --port $Port --strictPort
         }
-        'build' { & $npmExecutable run build }
-        'lint' { & $npmExecutable run lint }
+        'build' { & $nodeExecutable $viteScript build }
+        'lint' {
+            if (-not (Test-Path -LiteralPath $eslintScript)) {
+                throw "ESLint entry point not found: $eslintScript"
+            }
+            & $nodeExecutable $eslintScript .
+        }
     }
 
     exit $LASTEXITCODE

@@ -15,15 +15,28 @@ from typing import Any, Iterable
 
 
 OS_ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE = Path(__file__).resolve().parents[3]
+
+
+def discover_workspace(start: Path) -> Path:
+    """Find the repository root without depending on a fixed directory depth."""
+    for candidate in (start, *start.parents):
+        if (candidate / "ai2050_research_os").is_dir() and (candidate / "frontend").is_dir():
+            return candidate
+    raise RuntimeError(f"无法从 {start} 定位仓库根目录")
+
+
+WORKSPACE = discover_workspace(OS_ROOT)
 REGISTRY = OS_ROOT / "registry"
 GENERATED = OS_ROOT / "generated"
 SCHEMAS = OS_ROOT / "schemas"
 CONTRACTS = OS_ROOT / "contracts"
 MANIFESTS = OS_ROOT / "manifests"
+SNAPSHOTS = OS_ROOT / "snapshots"
+CLIENT_SNAPSHOT = WORKSPACE / "frontend" / "public" / "research_data" / "current" / "snapshot.json"
 
 FILES = {
     "project": "project.json",
+    "framework": "framework.json",
     "campaigns": "campaigns.json",
     "hypotheses": "hypotheses.json",
     "puzzles": "puzzles.json",
@@ -284,6 +297,15 @@ def resolve_os_path(path_text: str) -> Path:
     return path if path.is_absolute() else OS_ROOT / path
 
 
+def resolve_manifest_artifact(path_text: str) -> Path:
+    """Resolve current and pre-root-migration paths without rewriting evidence."""
+    normalized = path_text.replace("\\", "/")
+    legacy_prefix = "research/ai2050_research_os/"
+    if normalized.startswith(legacy_prefix):
+        return OS_ROOT / normalized[len(legacy_prefix):]
+    return WORKSPACE / path_text
+
+
 def verify_manifest_file(path: Path, expected_contract_id: str, errors: list[str]) -> None:
     try:
         manifest = load_json(path)
@@ -302,7 +324,7 @@ def verify_manifest_file(path: Path, expected_contract_id: str, errors: list[str
         if role in roles:
             errors.append(f"manifest {path.name} role 重复: {role}")
         roles.add(role)
-        artifact_path = WORKSPACE / entry.get("path", "")
+        artifact_path = resolve_manifest_artifact(entry.get("path", ""))
         if not artifact_path.is_file():
             errors.append(f"manifest {path.name} 文件不存在: {entry.get('path')}")
             continue
@@ -317,6 +339,15 @@ def verify_manifest_file(path: Path, expected_contract_id: str, errors: list[str
 def validate(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     project = data["project"]
+    framework = data["framework"]
+    require_fields(framework, ["schema_version", "framework_id", "title", "north_star", "current_stage_id", "stages", "important_result_types"], "framework.json", errors)
+    stage_ids = {item.get("id") for item in framework.get("stages", [])}
+    if framework.get("current_stage_id") not in stage_ids:
+        errors.append("framework.json current_stage_id 引用不存在")
+    for index, stage in enumerate(framework.get("stages", [])):
+        require_fields(stage, ["id", "title", "status", "progress", "next_gate"], f"framework.json.stages[{index}]", errors)
+        if stage.get("status") not in {"pending", "active", "blocked", "completed"}:
+            errors.append(f"framework.json.stages[{index}] status 非法")
     cmap = unique_map(data["campaigns"], "id", "campaigns.json", errors)
     hmap = unique_map(data["hypotheses"], "id", "hypotheses.json", errors)
     pmap = unique_map(data["puzzles"], "id", "puzzles.json", errors)
@@ -1030,6 +1061,153 @@ def command_verify_manifest(path_text: str) -> int:
     return 0
 
 
+def canonical_json(value: Any) -> bytes:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def build_snapshot(data: dict[str, Any]) -> dict[str, Any]:
+    project = data["project"]
+    latest_phase = max(data["phases"], key=lambda item: (item.get("phase", -1), item.get("occurrence", 0)))
+    campaign = next((item for item in data["campaigns"] if item["id"] == project["active_campaign_id"]), None)
+    if campaign is None:
+        raise ValidationError(f"active_campaign_id 不存在: {project['active_campaign_id']}")
+    active_decisions = [item for item in data["decisions"] if item.get("status") == "active"]
+    latest_decision = active_decisions[-1] if active_decisions else None
+    source_sha = hashlib.sha256(canonical_json({name: data[name] for name in sorted(FILES)})).hexdigest()
+    evidence_grades = Counter(item.get("grade", "ungraded") for item in data["evidence"])
+    evidence_polarities = Counter(item.get("polarity", "unknown") for item in data["evidence"])
+    return {
+        "schema_version": "snapshot.v1",
+        "snapshot_id": f"SNAPSHOT-{project['as_of']}-{source_sha[:12]}",
+        "as_of": project["as_of"],
+        "source_sha256": source_sha,
+        "project": {
+            "id": project["project_id"], "name": project["name"], "strategy": project["strategy"],
+            "north_star": project["north_star"], "theory_status": project["theory_status"],
+        },
+        "framework": data["framework"],
+        "current": {
+            "phase": latest_phase["phase"], "phase_record_id": latest_phase["record_id"],
+            "phase_type": latest_phase["phase_type"], "phase_status": latest_phase["status"],
+            "verdict": latest_phase["verdict"], "campaign_id": campaign["id"],
+            "campaign_name": campaign["name"], "campaign_status": campaign["status"],
+            "bottleneck": project["current_bottleneck"], "next_decision": project["next_decision"],
+            "auto_continue": project["auto_continue"],
+            "decision_id": latest_decision["id"] if latest_decision else None,
+            "decision_title": latest_decision["title"] if latest_decision else None,
+        },
+        "counts": {name: len(value) for name, value in data.items() if isinstance(value, list)},
+        "information_architecture": {
+            "entry_points": ["space3d", "theory", "rnd"],
+            "research_center_modes": ["theory", "rnd"],
+            "stage_prefix": "R",
+            "module_prefix": "M",
+            "puzzle_prefix": "P",
+            "evidence_grade_prefix": "E",
+            "technical_stage_mapping": {f"M{index}": f"R{index}" for index in range(9)},
+        },
+        "summaries": {
+            "hypotheses": [{"id": item["id"], "name": item["name"], "status": item["status"]} for item in data["hypotheses"]],
+            "puzzles": [{"id": item["id"], "name": item["name"], "status": item["status"], "closure_level": item["current_closure_level"], "blocker": item["blocker"]} for item in data["puzzles"]],
+            "evidence": {
+                "grade_counts": dict(sorted(evidence_grades.items())),
+                "polarity_counts": dict(sorted(evidence_polarities.items())),
+                "max_closure_level": max((item.get("closure_level", 0) for item in data["evidence"]), default=0),
+                "latest": [{"id": item["id"], "grade": item["grade"], "polarity": item["polarity"], "title": item["title"], "closure_level": item["closure_level"]} for item in data["evidence"][-8:]],
+            },
+            "runs": [{"id": item["id"], "contract_id": item["contract_id"], "status": item["status"], "model": item["model"], "verdict": item["verdict"]} for item in data["runs"]],
+            "decisions": [{"id": item["id"], "title": item["title"], "status": item["status"], "authorizes": item["authorizes"], "forbids": item["forbids"]} for item in data["decisions"][-8:]],
+        },
+        "provenance": {
+            "authority": "ai2050_research_os/registry",
+            "registry_files": [f"registry/{FILES[name]}" for name in sorted(FILES)],
+            "builder": "ai2050_research_os/scripts/researchctl.py",
+        },
+    }
+
+
+def validate_snapshot(snapshot: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    validate_schema(snapshot, load_json(SCHEMAS / "snapshot.schema.json"), "snapshot", errors)
+    if snapshot != build_snapshot(load_all()):
+        errors.append("snapshot 与当前 Registry 的确定性重建结果不一致")
+    return errors
+
+
+def write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def command_build_snapshot(data: dict[str, Any]) -> int:
+    snapshot = build_snapshot(data)
+    path = SNAPSHOTS / "current" / "snapshot.json"
+    write_json(path, snapshot)
+    print(f"Canonical Snapshot 已构建: {path.relative_to(WORKSPACE)} ({snapshot['snapshot_id']})")
+    return 0
+
+
+def command_validate_snapshot() -> int:
+    path = SNAPSHOTS / "current" / "snapshot.json"
+    if not path.is_file():
+        print(f"snapshot 不存在: {path}", file=sys.stderr)
+        return 1
+    errors = validate_snapshot(load_json(path))
+    if errors:
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+    print(f"Canonical Snapshot 校验通过: {path.relative_to(WORKSPACE)}")
+    return 0
+
+
+def command_export_client() -> int:
+    source = SNAPSHOTS / "current" / "snapshot.json"
+    if not source.is_file():
+        print("请先运行 build-snapshot", file=sys.stderr)
+        return 1
+    snapshot = load_json(source)
+    if validate_snapshot(snapshot):
+        print("Snapshot 已漂移，拒绝导出客户端", file=sys.stderr)
+        return 1
+    write_json(CLIENT_SNAPSHOT, snapshot)
+    print(f"客户端 Snapshot 已导出: {CLIENT_SNAPSHOT.relative_to(WORKSPACE)}")
+    return 0
+
+
+def client_drift_findings() -> list[str]:
+    frontend_src = WORKSPACE / "frontend" / "src"
+    forbidden = {
+        "CURRENT_RESEARCH_STATE": "旧的硬编码当前状态",
+        "currentResearchState": "旧的当前状态模块",
+        "RESEARCH_EVIDENCE_GATES": "旧的硬编码证据门",
+        "/research_snapshot.json": "旧的客户端快照路径",
+    }
+    findings: list[str] = []
+    for path in sorted(frontend_src.rglob("*")):
+        if path.suffix not in {".js", ".jsx", ".ts", ".tsx"} or not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for token, label in forbidden.items():
+            if token in text:
+                findings.append(f"{path.relative_to(WORKSPACE)}: {label} ({token})")
+    legacy_export = WORKSPACE / "frontend" / "public" / "research_snapshot.json"
+    if legacy_export.exists():
+        findings.append(f"{legacy_export.relative_to(WORKSPACE)}: 旧导出副本仍存在")
+    return findings
+
+
+def command_drift_audit() -> int:
+    findings = client_drift_findings()
+    if findings:
+        print(f"客户端漂移审计失败：{len(findings)} 项", file=sys.stderr)
+        for finding in findings:
+            print(f"- {finding}", file=sys.stderr)
+        return 1
+    print("客户端漂移审计通过：未发现旧当前状态模块、硬编码证据门或旧快照路径")
+    return 0
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1041,6 +1219,10 @@ def parse_args() -> argparse.Namespace:
     freeze.add_argument("path", help="要冻结的文件")
     verify_manifest = sub.add_parser("verify-manifest", help="复算冻结 manifest 中全部文件")
     verify_manifest.add_argument("path", help="相对 Research OS 根目录的 manifest 路径")
+    sub.add_parser("build-snapshot", help="从 Registry 确定性构建 Canonical Snapshot")
+    sub.add_parser("validate-snapshot", help="校验 Snapshot Schema 与 Registry 漂移")
+    sub.add_parser("export-client", help="将已校验 Snapshot 导出到客户端")
+    sub.add_parser("drift-audit", help="扫描客户端当前研究状态的平行事实源")
     return parser.parse_args()
 
 
@@ -1061,6 +1243,14 @@ def main() -> int:
         return command_freeze(args.path)
     if args.command == "verify-manifest":
         return command_verify_manifest(args.path)
+    if args.command == "build-snapshot":
+        return command_build_snapshot(data)
+    if args.command == "validate-snapshot":
+        return command_validate_snapshot()
+    if args.command == "export-client":
+        return command_export_client()
+    if args.command == "drift-audit":
+        return command_drift_audit()
     return 2
 
 

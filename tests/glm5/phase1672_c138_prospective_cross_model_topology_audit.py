@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+import json,sys
+from pathlib import Path
+import numpy as np
+ROOT=Path(__file__).resolve().parents[2];T=ROOT/"tests/glm5";O=T/"result/phase1672_c138_prospective_cross_model_topology";sys.path.insert(0,str(T));import phase1331_relational_measurement_core as core
+def contract():
+ p=core.load(O/"protocol/preregistration.json");checks={"internal":core.load(O/"audit/internal_contract_audit.json")["all_checks_passed"],"models":all(len(core.rows(O/f"compiled/{m}.jsonl"))==256 for m in p["models"]),"hashes":all(core.sha(Path(v))==p["source_hashes"][k] for k,v in p["source_paths"].items()),"no_coordinate":"same physical coordinate" in p["forbidden"]};r={"checks":checks,"passed":sum(checks.values()),"total":len(checks),"all_checks_passed":all(checks.values()),"authorization":"run_models_sequentially"};core.save(O/"audit/independent_contract_audit.json",r);print(json.dumps(r,indent=2))
+def final():
+ s=core.load(O/"analysis/cross_model_synthesis.json");checks={"contract":core.load(O/"audit/independent_contract_audit.json")["all_checks_passed"],"behaviors":all(core.load(O/f"audit/{m}_behavior_audit.json")["all_checks_passed"] for m in ("qwen3","glm4","deepseek7b")),"qualified_assets":all(core.load(O/f"audit/{m}_capture_audit.json")["all_checks_passed"] and core.load(O/f"audit/{m}_topology_audit.json")["all_checks_passed"] for m in s["qualified_models"]),"accounting":len(s["qualified_models"])+len(s["missing_models"])==3,"closure":core.load(O/"audit/internal_closure_audit.json")["all_checks_passed"],"boundary":"no coordinate identity" in s["claim_boundary"]};r={"checks":checks,"passed":sum(checks.values()),"total":len(checks),"all_checks_passed":all(checks.values()),"scientific_gate_passed":core.load(O/"audit/internal_closure_audit.json")["scientific_gate_passed"],"authorization":"start_C139_campaign_synthesis"};core.save(O/"audit/independent_closure_audit.json",r);print(json.dumps(r,indent=2))
+if __name__=="__main__":{"contract":contract,"final":final}[sys.argv[1]]()

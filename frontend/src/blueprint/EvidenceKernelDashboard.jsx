@@ -11,8 +11,10 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-const KERNEL_BASE = '/vis_data/research_kernel';
-const ATLAS_MANIFEST = '/vis_data/pattern_family_neuron_atlas/v1/manifest.json';
+import { researchAssetUrl } from '../config/researchAssets';
+
+const KERNEL_BASE = researchAssetUrl('research_kernel');
+const ATLAS_MANIFEST = researchAssetUrl('pattern_family_neuron_atlas/v1/manifest.json');
 
 const MODULES = [
   { id: 'atlas', title: '当前图谱状态', icon: Network, color: '#f59e0b' },

@@ -36,6 +36,14 @@ def write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def write_json_atomic(path: Path, payload: Any) -> None:
+    """Publish a live snapshot without exposing a half-written JSON document."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = path.with_suffix(path.suffix + ".tmp")
+    temp_path.write_text(json.dumps(payload, ensure_ascii=False) + "\n", encoding="utf-8")
+    temp_path.replace(path)
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -293,6 +301,33 @@ def run_trace(args: argparse.Namespace) -> dict[str, Any]:
     run_id = args.round_name or f"phase287_{args.model}_{args.target_label}_component_trace"
     run_dir = RESULT_ROOT / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    progress_path = Path(args.progress_file).resolve() if args.progress_file else None
+    live_state: dict[str, Any] = {
+        "schema_version": "live_state_heatmap.v1",
+        "run_id": run_id,
+        "status": "running",
+        "stage": "loading_model",
+        "model": args.model,
+        "prompt": args.prompt,
+        "target_label": args.target_label,
+        "created_at": utc_now(),
+        "updated_at": utc_now(),
+        "token_position": None,
+        "tokens": [],
+        "embedding": None,
+        "hidden_state": {},
+        "current_layer": None,
+        "completed_layers": 0,
+        "total_layers": None,
+    }
+
+    def publish_live(**updates: Any) -> None:
+        if progress_path is None:
+            return
+        live_state.update(updates, updated_at=utc_now())
+        write_json_atomic(progress_path, live_state)
+
+    publish_live()
     if args.dry_run:
         payload = {
             "phase": PHASE,
@@ -313,6 +348,11 @@ def run_trace(args: argparse.Namespace) -> dict[str, Any]:
         model = loaded.model
         tokenizer = loaded.tokenizer
         snapshot = model_snapshot(loaded)
+        publish_live(
+            stage="preparing_forward",
+            model_snapshot=snapshot,
+            total_layers=snapshot["num_hidden_layers"],
+        )
         projector = CheckpointReadout(model, tokenizer, loaded.spec.local_dir)
         layers = get_layers(model)
         captured: dict[str, torch.Tensor] = {}
@@ -339,10 +379,47 @@ def run_trace(args: argparse.Namespace) -> dict[str, Any]:
                 register_capture(handles, captured, f"L{layer_index}:mlp_product", down_proj, pre=True)
                 register_capture(handles, captured, f"L{layer_index}:down_proj", down_proj)
 
+        # Publish the full last-token embedding once, then each block HiddenState
+        # as soon as that block finishes. This is intentionally a separate,
+        # compact stream from the component-level evidence trace below.
+        if progress_path is not None and layers:
+            def live_embedding_hook(_module: Any, inputs: tuple[Any, ...]) -> None:
+                if live_state.get("embedding") is not None:
+                    return
+                vector = to_last_token(inputs[0] if inputs else None)
+                if vector is not None:
+                    publish_live(stage="forward", embedding=vector.reshape(-1).tolist())
+
+            handles.append(layers[0].register_forward_pre_hook(live_embedding_hook))
+
+            for layer_index, layer in enumerate(layers):
+                def live_layer_hook(
+                    _module: Any,
+                    _inputs: tuple[Any, ...],
+                    output: Any,
+                    index: int = layer_index,
+                ) -> None:
+                    vector = to_last_token(output)
+                    if vector is None:
+                        return
+                    # The live payload carries only the layer currently being
+                    # executed. The complete multi-layer archive is written to
+                    # the final evidence trace after the forward pass.
+                    live_state["hidden_state"] = {str(index): vector.reshape(-1).tolist()}
+                    publish_live(
+                        stage="forward",
+                        current_layer=index,
+                        completed_layers=index + 1,
+                    )
+
+                handles.append(layer.register_forward_hook(live_layer_hook))
+
         print(f"[Phase287] hooks={len(handles)} layers={len(layers)} running forward", flush=True)
         encoded = tokenizer(args.prompt, return_tensors="pt", add_special_tokens=False)
         inputs = {key: value.to(loaded.input_device) for key, value in encoded.items()}
         token_position = int(inputs["input_ids"].shape[1] - 1)
+        tokens = [tokenizer.decode([int(token_id)]) for token_id in inputs["input_ids"][0].tolist()]
+        publish_live(stage="forward", token_position=token_position, tokens=tokens)
         with torch.inference_mode():
             output = model(**inputs, use_cache=False, output_hidden_states=True, return_dict=True)
         print(f"[Phase287] forward complete captured={len(captured)}", flush=True)
@@ -487,7 +564,7 @@ def run_trace(args: argparse.Namespace) -> dict[str, Any]:
             "prompt": args.prompt,
             "target_label": args.target_label,
             "token_position": token_position,
-            "tokens": [tokenizer.decode([int(token_id)]) for token_id in inputs["input_ids"][0].tolist()],
+            "tokens": tokens,
             "events": events,
             "next_tokens": next_tokens,
             "summary": {
@@ -506,9 +583,17 @@ def run_trace(args: argparse.Namespace) -> dict[str, Any]:
         trace_path = run_dir / "trace.json"
         write_json(trace_path, trace)
         write_json(run_dir / "model_snapshot.json", snapshot)
-        PUBLIC_ROOT.mkdir(parents=True, exist_ok=True)
-        public_path = PUBLIC_ROOT / f"{run_id}.json"
-        write_json(public_path, trace)
+        publish_live(
+            status="complete",
+            stage="complete",
+            current_layer=len(layers) - 1,
+            completed_layers=len(layers),
+            next_tokens=next_tokens,
+        )
+        if not args.skip_public_copy:
+            PUBLIC_ROOT.mkdir(parents=True, exist_ok=True)
+            public_path = PUBLIC_ROOT / f"{run_id}.json"
+            write_json(public_path, trace)
         return trace
     finally:
         for handle in handles:
@@ -524,6 +609,8 @@ def main() -> None:
     parser.add_argument("--target-label", default="red", choices=COLOR_LABELS)
     parser.add_argument("--top-k", type=int, default=16)
     parser.add_argument("--round-name", default="")
+    parser.add_argument("--progress-file", default="")
+    parser.add_argument("--skip-public-copy", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     trace = run_trace(args)

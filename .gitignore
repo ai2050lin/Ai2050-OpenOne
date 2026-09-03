@@ -37,6 +37,13 @@ results/glm5_phase712_qkv_factor_atlas_audit/phase712_deepseek7b_qkv_factor_case
 /tests/glm5/result/
 /tests/glm5/result/**
 
+# Client visualization artifacts are served by the backend from the local
+# research result store. Never bundle or recommit generated tensors/atlases.
+/frontend/public/vis_data/
+
+# Local research workspace index (rebuilt/updated by the API at runtime)
+/ai2050_research_os/generated/research_workspace.sqlite3*
+
 # Node.js
 node_modules/
 frontend/node_modules/

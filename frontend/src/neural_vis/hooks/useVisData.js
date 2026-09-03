@@ -9,8 +9,9 @@ import {
   normalizeManifestEntries,
   normalizeVisualizationPayload,
 } from '../dataSourceAdapters';
+import { researchAssetUrl } from '../../config/researchAssets';
 
-const SOURCE_REGISTRY_PATH = '/vis_data/source_registry.json';
+const SOURCE_REGISTRY_PATH = researchAssetUrl('source_registry.json');
 
 const LEGACY_SOURCE = {
   id: 'glm5_causal_fiber_atlas',
@@ -18,11 +19,11 @@ const LEGACY_SOURCE = {
   route_label: 'GLM5 路线',
   label: '因果纤维历史图谱',
   description: '兼容旧版单清单加载。',
-  manifest_path: '/vis_data/manifest.json',
+  manifest_path: researchAssetUrl('manifest.json'),
   manifest_schema: 'vis_data_manifest_v1',
   manifest_adapter: 'files',
   payload_adapter: 'atlas_graph',
-  data_base_path: '/vis_data',
+  data_base_path: researchAssetUrl(),
   models: ['qwen3', 'glm4', 'deepseek7b'],
   evidence_scope: '历史路线图谱；按各阶段原始证据等级解释',
   color: '#a78bfa',
@@ -51,7 +52,7 @@ function isSupportedPayload(data, source = null) {
 }
 
 async function fetchJson(path) {
-  const response = await fetch(path, { cache: 'no-store' });
+  const response = await fetch(researchAssetUrl(path), { cache: 'no-store' });
   if (!response.ok) throw new Error(`${path} 加载失败 (${response.status})`);
   return response.json();
 }
@@ -151,7 +152,7 @@ export default function useVisData() {
         id: fileOrPath,
         filename: fileOrPath,
         label: fileOrPath,
-        path: fileOrPath.startsWith('/') ? fileOrPath : `/vis_data/${fileOrPath}`,
+        path: researchAssetUrl(fileOrPath),
       }
       : fileOrPath;
 

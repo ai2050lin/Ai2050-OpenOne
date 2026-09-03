@@ -1,0 +1,27 @@
+{
+  "schema_version": "research_framework.v1",
+  "framework_id": "RF-LANGUAGE-SYSTEM-IDENTIFICATION",
+  "title": "语言计算系统辨识研发框架",
+  "north_star": "寻找能够预测未见语言条件、内部干预和生成轨迹的最小经验规律。",
+  "current_stage_id": "R1",
+  "stages": [
+    {"id": "R0", "title": "证据与状态统一", "status": "completed", "progress": "Canonical Snapshot、客户端单一事实源和漂移审计已建立。", "next_gate": "持续保持 Registry、Decision 与 Snapshot 无漂移。"},
+    {"id": "R1", "title": "测量合同与已知真值校准", "status": "active", "progress": "已完成多轮相机、功能等价和救援校准；有限样本边界仍未闭合。", "next_gate": "在新边界系统上确认区间化或稳定性证书。"},
+    {"id": "R2", "title": "全轨迹条件响应", "status": "blocked", "progress": "已有局部真实组件 Trace，尚无冻结实验族的完整响应图谱。", "next_gate": "R1 测量资格通过后采集 Tier A/B 轨迹。"},
+    {"id": "R3", "title": "预测状态与复杂度曲面", "status": "blocked", "progress": "尚未在独立 Confirmation 上完成受限临摹器竞争。", "next_gate": "R2 数据质量审计通过。"},
+    {"id": "R4", "title": "结构化残差", "status": "blocked", "progress": "等待冻结预测模型产生稳定残差。", "next_gate": "R3 至少一个候选稳定优于基线。"},
+    {"id": "R5", "title": "协变与组合规律", "status": "blocked", "progress": "未授权。", "next_gate": "残差候选在新数据上得到确认。"},
+    {"id": "R6", "title": "因果预测与干预", "status": "blocked", "progress": "未授权。", "next_gate": "先冻结影响方向、幅度、时间和副作用预测。"},
+    {"id": "R7", "title": "自由生成与跨模型复现", "status": "blocked", "progress": "未授权。", "next_gate": "至少两个模型在受控任务上形成预测规律候选。"},
+    {"id": "R8", "title": "理论压缩", "status": "blocked", "progress": "未授权。", "next_gate": "R2–R7 出现可重复、可反证的稳定结构。"}
+  ],
+  "important_result_types": [
+    {"id": "embedding_state", "title": "词嵌入状态", "renderer": "EmbeddingHeatmap"},
+    {"id": "hidden_state", "title": "Hidden State 状态", "renderer": "HiddenStateHeatmap"},
+    {"id": "response_trajectory", "title": "条件响应轨迹", "renderer": "TrajectoryRenderer"},
+    {"id": "causal_path", "title": "因果路径", "renderer": "CausalPathOverlay"},
+    {"id": "intervention_rescue", "title": "干预与救援", "renderer": "InterventionDeltaOverlay"},
+    {"id": "complexity_surface", "title": "复杂度—跨度曲面", "renderer": "Heatmap3DRenderer"},
+    {"id": "cross_model_mapping", "title": "跨模型功能映射", "renderer": "CrossModelMappingOverlay"}
+  ]
+}

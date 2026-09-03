@@ -13,6 +13,8 @@ from uuid import uuid4
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 
+from server.research_asset_service import research_asset_root
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYTHON_EXE = Path(sys.executable)
@@ -20,7 +22,7 @@ TRACE_SCRIPT = PROJECT_ROOT / "tests" / "gpt5" / "phase287_real_component_trace.
 TRACE_ROOT = PROJECT_ROOT / "tests" / "result" / "phase287_real_component_trace"
 JOB_ROOT = PROJECT_ROOT / "tests" / "result" / "research_trace_jobs"
 REGISTRY_PATH = JOB_ROOT / "registry.json"
-FROZEN_MANIFEST = PROJECT_ROOT / "frontend" / "public" / "vis_data" / "real_component_trace" / "manifest.json"
+FROZEN_MANIFEST = research_asset_root() / "real_component_trace" / "manifest.json"
 
 MODEL_KEYS = {"qwen3", "glm4", "deepseek7b"}
 COLOR_LABELS = {"red", "blue", "green", "yellow", "orange", "purple", "brown", "black", "white", "gray", "silver"}
@@ -138,6 +140,7 @@ class ResearchTraceManager:
             "started_at": None,
             "completed_at": None,
             "trace_path": None,
+            "progress_path": str((JOB_ROOT / run_id / "live_state.json").relative_to(PROJECT_ROOT)).replace("\\", "/"),
             "error": None,
         }
         with self._lock:
@@ -153,6 +156,9 @@ class ResearchTraceManager:
 
     @staticmethod
     def command_for(job: dict[str, Any]) -> list[str]:
+        progress_path = job.get("progress_path") or str(
+            (JOB_ROOT / str(job["run_id"]) / "live_state.json").relative_to(PROJECT_ROOT)
+        ).replace("\\", "/")
         return [
             str(PYTHON_EXE),
             str(TRACE_SCRIPT),
@@ -166,6 +172,8 @@ class ResearchTraceManager:
             str(job["top_k"]),
             "--round-name",
             str(job["run_id"]),
+            "--progress-file",
+            str(PROJECT_ROOT / str(progress_path)),
             "--skip-public-copy",
         ]
 
@@ -248,7 +256,7 @@ class ResearchTraceManager:
         if job.get("source_mode") == "replay":
             path = str(job.get("path") or "")
             filename = Path(path).name
-            trace_path = PROJECT_ROOT / "frontend" / "public" / "vis_data" / "real_component_trace" / filename
+            trace_path = research_asset_root() / "real_component_trace" / filename
         else:
             if job.get("status") != "complete":
                 raise RuntimeError(f"trace is not complete: {job.get('status')}")
@@ -256,6 +264,35 @@ class ResearchTraceManager:
         if not trace_path.exists():
             raise FileNotFoundError(trace_path)
         return read_json(trace_path, {})
+
+    def live_state(self, run_id: str) -> dict[str, Any]:
+        job = self.get(run_id)
+        if job.get("source_mode") != "live":
+            raise RuntimeError("live state is only available for a live model run")
+        progress_value = str(job.get("progress_path") or "")
+        progress_path = PROJECT_ROOT / progress_value if progress_value else None
+        payload = read_json(progress_path, {}) if progress_path else {}
+        current_layer = payload.get("current_layer")
+        hidden_state = payload.get("hidden_state") or {}
+        if current_layer is not None and isinstance(hidden_state, dict):
+            current_key = str(current_layer)
+            payload = {
+                **payload,
+                "hidden_state": {current_key: hidden_state[current_key]} if current_key in hidden_state else {},
+            }
+        return {
+            "schema_version": "live_state_heatmap.v1",
+            "run_id": run_id,
+            "model": job.get("model"),
+            "prompt": job.get("prompt"),
+            "target_label": job.get("target_label"),
+            **payload,
+            # Manager state wins so cancellation/failure is visible even if the
+            # model process stopped before it could publish a final snapshot.
+            "status": job.get("status"),
+            "stage": "queued" if job.get("status") == "queued" else payload.get("stage", "loading_model"),
+            "error": job.get("error"),
+        }
 
     def cancel(self, run_id: str) -> dict[str, Any]:
         job = self.get(run_id)
@@ -299,6 +336,16 @@ async def get_trace_payload(run_id: str):
         raise HTTPException(status_code=404, detail="trace run not found") from exc
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="trace artifact not found") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.get("/runs/{run_id}/live-state")
+async def get_live_state_payload(run_id: str):
+    try:
+        return manager.live_state(run_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="trace run not found") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 

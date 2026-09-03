@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 
+import { researchAssetUrl } from '../config/researchAssets';
+
 const SOURCES = {
-  models: '/vis_data/research_kernel/model_registry.json',
-  atlas: '/vis_data/pattern_family_neuron_atlas/v1/manifest.json',
-  kernel: '/vis_data/research_kernel/manifest.json',
-  progress: '/vis_data/research_kernel/progress.json',
+  models: researchAssetUrl('research_kernel/model_registry.json'),
+  atlas: researchAssetUrl('pattern_family_neuron_atlas/v1/manifest.json'),
+  kernel: researchAssetUrl('research_kernel/manifest.json'),
+  progress: researchAssetUrl('research_kernel/progress.json'),
 };
 
 let sharedEvidenceRequest = null;

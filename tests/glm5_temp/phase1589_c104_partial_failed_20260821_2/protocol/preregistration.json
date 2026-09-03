@@ -1,0 +1,91 @@
+{
+  "phase": 1589,
+  "campaign": "C104",
+  "created_at_utc": "2026-08-21T10:02:17.156270+00:00",
+  "status": "fresh_upstream_candidate_validation_frozen",
+  "model": "Qwen3-4B local BF16 CUDA nonquantized",
+  "materials": {
+    "families": [
+      "attribute_binding",
+      "agent_patient",
+      "negation_scope",
+      "whole_part_exception"
+    ],
+    "units": 36,
+    "cases": 576,
+    "partitions": [
+      "response_discovery",
+      "confirmation",
+      "lockbox"
+    ],
+    "factorial_rank": 16,
+    "lexically_disjoint_from": [
+      "C101",
+      "C102"
+    ]
+  },
+  "predictions": [
+    {
+      "family": "attribute_binding",
+      "role": "query_anchor",
+      "role_index": 4,
+      "state": 19,
+      "source_minimum_cosine": 0.9223825407041051,
+      "coordinates": "all_2560"
+    },
+    {
+      "family": "agent_patient",
+      "role": "query_anchor",
+      "role_index": 4,
+      "state": 19,
+      "source_minimum_cosine": 0.9533847423454911,
+      "coordinates": "all_2560"
+    },
+    {
+      "family": "negation_scope",
+      "role": "focus_record",
+      "role_index": 1,
+      "state": 3,
+      "source_minimum_cosine": 0.9382487989774302,
+      "coordinates": "all_2560"
+    },
+    {
+      "family": "whole_part_exception",
+      "role": "focus_post",
+      "role_index": 2,
+      "state": 23,
+      "source_minimum_cosine": 0.8807491266943268,
+      "coordinates": "all_2560"
+    }
+  ],
+  "barcode_path": "tests/glm5/result/phase1589_c104_upstream_candidate_validation/raw/frozen_c103_upstream_barcodes.float32.npy",
+  "barcode_sha256": "966b935cc2fec6334ebd3ee1cde2c4d10b94d55d6b6ef3d505964f17fafb0887",
+  "validation": {
+    "effect": "truth",
+    "coordinates": 2560,
+    "confirmation_and_lockbox": "cosine exceeds coordinate-permutation q99 with 2000 draws; no role/state reselection",
+    "seeds": {
+      "confirmation": 1591,
+      "lockbox": 1592
+    }
+  },
+  "storage": {
+    "scope": "all valid tokens, all 37 states, all 2560 activation coordinates",
+    "dtype": "uint16 exact BF16 bits",
+    "fixed_width": 224,
+    "batch_size": 8,
+    "total_valid_tokens": 79520,
+    "expected_bytes": 15064268800
+  },
+  "behavior": "reported separately; it does not stop internal observation",
+  "numeric": {
+    "repeat_bitwise": true,
+    "causal_prefix_bitwise": true,
+    "code_previsible_bitwise": true
+  },
+  "human_naturalness": "M_HUMAN_NATURALNESS",
+  "claim_boundary": "fresh single-Qwen upstream activation-field validation only; not semantic neurons, weights, cross-model law or new mathematics",
+  "material_digest": "9387cbeea83d9e2a001b790a0bc7109c150b7fa552c7548b3ad8f638fef0aa2f",
+  "producer_sha256": "bdd4171b55dc24b76f7327f61149bd6db3de2bf700ec030b24f64e3c852de2ab",
+  "authorization": "run_phase1590_c104_qwen_capture"
+}

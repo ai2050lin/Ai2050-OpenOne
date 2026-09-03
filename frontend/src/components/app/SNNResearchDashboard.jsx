@@ -138,7 +138,7 @@ export function SNNResearchDashboard({ runtimeState }) {
         <strong>规模化路线（尚未实训）</strong>
         <div>
           {research.scalingPlan.map((item) => (
-            <span key={item.phase}><b>Phase-{item.phase}</b>{item.parameters}<small>{item.status}</small></span>
+            <span key={item.phase}><b>Route {item.routeId || item.phase}</b>{item.parameters}<small>{item.status}</small></span>
           ))}
         </div>
       </div>
@@ -169,4 +169,3 @@ export function SNNResearchDashboard({ runtimeState }) {
     </section>
   );
 }
-

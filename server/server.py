@@ -57,7 +57,10 @@ from server.runtime.run_service import RunService
 from server.vision_service import vision_service
 from server.agi_chat_service import agi_chat_engine
 from server.ai_rnd_service import router as ai_rnd_router
+from server.research_asset_service import router as research_asset_router
 from server.research_kernel.router import router as research_kernel_router
+from server.research_trace_service import router as research_trace_router
+from server.research_workspace_service import router as research_workspace_router
 
 # --- Global Model State ---
 model = None
@@ -225,7 +228,10 @@ run_service = RunService(
 )
 app.include_router(create_runs_router(run_service))
 app.include_router(ai_rnd_router)
+app.include_router(research_asset_router)
 app.include_router(research_kernel_router)
+app.include_router(research_trace_router)
+app.include_router(research_workspace_router)
 
 
 def _resolve_workspace_relative_path(path_str: str) -> Path:

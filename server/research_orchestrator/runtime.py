@@ -14,9 +14,10 @@ from typing import Any, Callable
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-RUN_ROOT = PROJECT_ROOT / "tests" / "result" / "auto_rnd"
-TEMP_ROOT = PROJECT_ROOT / "tests" / "gpt5_temp" / "auto_rnd"
-KERNEL_ROOT = PROJECT_ROOT / "tests" / "result" / "research_kernel"
+RUN_ROOT = PROJECT_ROOT / "tests" / "glm5" / "result" / "auto_rnd"
+TEMP_ROOT = PROJECT_ROOT / "tests" / "glm5_temp" / "auto_rnd"
+KERNEL_ROOT = PROJECT_ROOT / "tests" / "glm5" / "result" / "research_kernel"
+LEGACY_KERNEL_ROOT = PROJECT_ROOT / "tests" / "result" / "research_kernel"
 PYTHON_EXE = Path(r"C:\Users\Admin\.workbuddy\binaries\python\versions\3.11.9\python.exe")
 
 MODEL_ORDER = ("qwen3", "glm4", "deepseek7b")
@@ -162,12 +163,13 @@ def validate_generated_code(code: str) -> dict[str, Any]:
 
 
 def load_evidence_context() -> dict[str, Any]:
-    manifest_path = KERNEL_ROOT / "manifest.json"
+    kernel_root = KERNEL_ROOT if (KERNEL_ROOT / "manifest.json").exists() else LEGACY_KERNEL_ROOT
+    manifest_path = kernel_root / "manifest.json"
     if not manifest_path.exists():
         return {"available": False, "reason": "research kernel manifest is missing"}
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    claims_path = KERNEL_ROOT / "claims.jsonl"
-    gaps_path = KERNEL_ROOT / "gaps.jsonl"
+    claims_path = kernel_root / "claims.jsonl"
+    gaps_path = kernel_root / "gaps.jsonl"
 
     def read_jsonl(path: Path) -> list[dict[str, Any]]:
         if not path.exists():

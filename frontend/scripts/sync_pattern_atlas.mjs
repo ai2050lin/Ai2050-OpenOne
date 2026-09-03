@@ -6,7 +6,10 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendDir = path.resolve(scriptDir, '..');
 const repoRoot = path.resolve(frontendDir, '..');
 const sourceDir = path.join(repoRoot, 'tests', 'result', 'pattern_family_atlas', 'v1');
-const targetDir = path.join(frontendDir, 'public', 'vis_data', 'pattern_family_atlas', 'v1');
+const assetRoot = process.env.AI2050_RESEARCH_ASSET_ROOT
+  ? path.resolve(process.env.AI2050_RESEARCH_ASSET_ROOT)
+  : path.join(repoRoot, 'tests', 'glm5', 'result', 'client_visualization_assets');
+const targetDir = path.join(assetRoot, 'pattern_family_atlas', 'v1');
 
 const requiredFiles = [
   'manifest.json',
@@ -61,8 +64,8 @@ async function main() {
     schema_version: 'pattern_family_atlas_public_v1',
     generated_at: new Date().toISOString(),
     source: path.relative(repoRoot, sourceDir).replace(/\\/g, '/'),
-    public_base: '/vis_data/pattern_family_atlas/v1',
-    entrypoint: '/vis_data/pattern_family_atlas/v1/manifest.json',
+    public_base: '/api/research-assets/file/pattern_family_atlas/v1',
+    entrypoint: '/api/research-assets/file/pattern_family_atlas/v1/manifest.json',
     files: copied.sort(),
   };
 

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { CURRENT_RESEARCH_STATE } from '../../researchKernel/currentResearchState';
+import { useResearchSnapshot } from '../../researchKernel/useResearchSnapshot';
 
 import './MechanismWorkspace.css';
 
@@ -230,10 +230,12 @@ function InterventionView({ mechanismCase }) {
 }
 
 function ProvenanceView({ mechanismCase, activeFileMeta, trace }) {
+  const { snapshot, error } = useResearchSnapshot();
+  const current = snapshot?.current;
   const rows = [
     ['Case', mechanismCase?.case_id || trace?.run_id || activeFileMeta?.id || '-'],
     ['模型', mechanismCase?.model || trace?.model || activeFileMeta?.model || '-'],
-    ['Phase', mechanismCase?.phase || trace?.phase || activeFileMeta?.phase || CURRENT_RESEARCH_STATE.phase],
+    ['结果类型', mechanismCase?.result_type || activeFileMeta?.result_type || activeFileMeta?.type || '内部状态观察'],
     ['证据等级', mechanismCase?.evidence_level || '自然观测 / 未声明'],
     ['状态', mechanismCase?.status || 'exploratory'],
     ['协议冻结', mechanismCase?.protocol_frozen === true ? '是' : '未声明'],
@@ -246,7 +248,7 @@ function ProvenanceView({ mechanismCase, activeFileMeta, trace }) {
       ))}
       <div className="mechanism-provenance__boundary">
         <dt>证据边界</dt>
-        <dd>{mechanismCase?.evidence_boundary || CURRENT_RESEARCH_STATE.boundary}</dd>
+        <dd>{mechanismCase?.evidence_boundary || current?.bottleneck || error || 'Canonical Snapshot 读取中'}</dd>
       </div>
     </dl>
   );

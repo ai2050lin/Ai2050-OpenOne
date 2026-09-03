@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""Independent audit for Phase1687/C153."""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+TESTS = ROOT / "tests/glm5"
+OUT = TESTS / "result/phase1687_c153_type_graph_conditional_pool_confirmation"
+PUBLIC = ROOT / "frontend/public/vis_data/research_kernel/c109_role_state_field_atlas.json"
+sys.path.insert(0, str(TESTS))
+import phase1331_relational_measurement_core as core
+
+r = core.load(OUT / "analysis/confirmation.json")
+raw = np.load(OUT / "raw/qwen3_window_role_field.bf16.npy", mmap_mode="r")
+trajectories = np.load(OUT / "analysis/fresh_conditional_trajectories.float32.npy", mmap_mode="r")
+payload = core.load(PUBLIC)
+checks = {
+    "contract": core.load(OUT / "audit/internal_contract_audit.json")["all_checks_passed"],
+    "capture": core.load(OUT / "audit/internal_capture_audit.json")["all_checks_passed"],
+    "analysis": core.load(OUT / "audit/internal_analysis_audit.json")["all_checks_passed"],
+    "closure": core.load(OUT / "audit/internal_closure_audit.json")["all_checks_passed"],
+    "raw_shape": list(raw.shape) == [256, 6, 11, 2560],
+    "trajectory_shape": list(trajectories.shape) == [128, 11, 6, 2560],
+    "gate_recomputed": r["confirmation_gate_passed"] == all(r["gates"].values()),
+    "asset": payload["phase"] == 1687 and "c153_type_graph_confirmation" in payload,
+    "hash": core.sha(PUBLIC) == core.load(OUT / "audit/internal_closure_audit.json")["asset_sha256"],
+}
+audit = {"phase": 1687, "campaign": "C153", "checks": checks, "passed": sum(checks.values()), "total": len(checks), "all_checks_passed": all(checks.values()), "scientific_gate_passed": r["confirmation_gate_passed"], "authorization": "memo_and_C154_causal_if_passed_else_campaign_close"}
+core.save(OUT / "audit/independent_closure_audit.json", audit)
+print(json.dumps(audit, indent=2))

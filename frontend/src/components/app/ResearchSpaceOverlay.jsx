@@ -1,6 +1,6 @@
 import { Line, Text } from '@react-three/drei';
 
-import { CURRENT_RESEARCH_STATE, RESEARCH_COMPUTATION_CHAIN } from '../../researchKernel/currentResearchState';
+import { useResearchSnapshot } from '../../researchKernel/useResearchSnapshot';
 
 const CHAIN_COLORS = {
   passed: '#34d399',
@@ -18,17 +18,27 @@ export function ResearchSpaceOverlay({
   onSelectEvidenceGate,
   mechanismMode = 'observe',
 }) {
-  const phaseLabel = activeFileMeta?.phase ? `Phase ${activeFileMeta.phase}` : 'Current phase';
+  const { snapshot } = useResearchSnapshot();
+  const computationChain = (snapshot?.summaries?.evidence?.latest || []).slice(-7).map((item) => ({
+    id: item.id,
+    label: item.grade,
+    gateId: item.id,
+    status: item.polarity === 'positive' ? 'passed' : item.polarity === 'negative' ? 'blocked' : 'pending',
+  }));
+
+  const resultTypeLabel = activeFileMeta?.result_type || activeFileMeta?.type || activeResearchPlugin?.resultType || 'Result Type';
   const graphLabel = `${atlasNodes.length || 0} nodes / ${atlasEdges.length || 0} edges`;
-  const routeLabel = activeResearchPlugin?.shortName || activeResearchPlugin?.name || '研究路线';
+  const routeLabel = activeResearchPlugin?.shortName || activeResearchPlugin?.name || 'Research Route';
+
   const visibleComputationChain = mechanismMode === 'present'
-    ? RESEARCH_COMPUTATION_CHAIN.filter((stage) => stage.status === 'passed')
-    : RESEARCH_COMPUTATION_CHAIN;
+    ? computationChain.filter((stage) => stage.status === 'passed')
+    : computationChain;
+
   const chainTitle = mechanismMode === 'compare'
-    ? '原始 / 反事实证据链'
+    ? 'Validation / Compare'
     : mechanismMode === 'present'
-      ? '已通过成果链'
-      : '当前机制观察链';
+      ? 'Observed Trace'
+      : 'Evidence Trace';
 
   return (
     <group>
@@ -37,7 +47,7 @@ export function ResearchSpaceOverlay({
           {routeLabel}
         </Text>
         <Text position={[0, -0.62, 0]} fontSize={0.3} color="#93c5fd" anchorX="center">
-          插件化研究路线 · 共享3D主空间
+          3D scene focuses on run-level test traces
         </Text>
       </group>
 
@@ -48,10 +58,10 @@ export function ResearchSpaceOverlay({
             <meshStandardMaterial color="#facc15" emissive="#eab308" emissiveIntensity={0.45} transparent opacity={0.78} />
           </mesh>
           <Text position={[0, 1.75, 0]} fontSize={0.42} color="#fef3c7" anchorX="center">
-            特征空间层
+            Feature Layer
           </Text>
           <Text position={[0, 1.15, 0]} fontSize={0.26} color="#fde68a" anchorX="center">
-            SAE / dictionary / feature clusters
+            SAE / Dictionary / Feature Clusters
           </Text>
         </group>
       )}
@@ -63,7 +73,7 @@ export function ResearchSpaceOverlay({
             <meshStandardMaterial color="#22c55e" emissive="#16a34a" emissiveIntensity={0.42} transparent opacity={0.82} />
           </mesh>
           <Text position={[0, 0.9, 0]} fontSize={0.4} color="#bbf7d0" anchorX="center">
-            因果路径层
+            Causal Path
           </Text>
           <Text position={[0, 0.35, 0]} fontSize={0.24} color="#86efac" anchorX="center">
             patch / ablation / restore
@@ -78,7 +88,7 @@ export function ResearchSpaceOverlay({
             <meshStandardMaterial color="#fb7185" emissive="#e11d48" emissiveIntensity={0.38} transparent opacity={0.72} />
           </mesh>
           <Text position={[0, 1.65, 0]} fontSize={0.4} color="#ffe4e6" anchorX="center">
-            动力学层
+            Dynamics Layer
           </Text>
           <Text position={[0, 1.1, 0]} fontSize={0.24} color="#fda4af" anchorX="center">
             spike / replay / control state
@@ -88,14 +98,14 @@ export function ResearchSpaceOverlay({
 
       {layerVisibility.atlas && atlasNodes.length > 0 && (
         <Text position={[0, 55, -12]} fontSize={0.55} color="#bfdbfe" anchorX="center">
-          {phaseLabel} · {graphLabel}
+          {resultTypeLabel} / {graphLabel}
         </Text>
       )}
 
       {layerVisibility.atlas && (
         <group position={[0, -7.2, -7]}>
           <Text position={[0, 1.65, 0]} fontSize={0.42} color="#bae6fd" anchorX="center">
-            {chainTitle} · Phase {CURRENT_RESEARCH_STATE.phase}
+            {chainTitle}
           </Text>
           {visibleComputationChain.length > 1 && (
             <Line
@@ -122,15 +132,13 @@ export function ResearchSpaceOverlay({
                   event.stopPropagation();
                   document.body.style.cursor = 'pointer';
                 }}
-                onPointerOut={() => { document.body.style.cursor = 'default'; }}
+                onPointerOut={() => {
+                  document.body.style.cursor = 'default';
+                }}
               >
                 <mesh scale={selected ? 1.35 : 1}>
                   <sphereGeometry args={[0.28, 18, 18]} />
-                  <meshStandardMaterial
-                    color={color}
-                    emissive={color}
-                    emissiveIntensity={selected ? 1.1 : 0.45}
-                  />
+                  <meshStandardMaterial color={color} emissive={color} emissiveIntensity={selected ? 1.1 : 0.45} />
                 </mesh>
                 <Text position={[0, -0.68, 0]} fontSize={0.25} color={selected ? '#f8fafc' : '#94a3b8'} anchorX="center">
                   {stage.label}

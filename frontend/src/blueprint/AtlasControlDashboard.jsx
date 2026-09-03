@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EvidenceKernelDashboard } from './EvidenceKernelDashboard';
+import { researchAssetUrl } from '../config/researchAssets';
 
-const ATLAS_BASE = '/vis_data/pattern_family_atlas/v2';
+const ATLAS_BASE = researchAssetUrl('pattern_family_atlas/v2');
 
 const pct = (value) => `${Math.round(Number(value || 0) * 100)}%`;
 const clamp01 = (value) => Math.max(0, Math.min(1, Number(value || 0)));

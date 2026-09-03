@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-const BASE = '/vis_data/pattern_family_neuron_atlas/v1';
+import { researchAssetUrl } from '../config/researchAssets';
+
+const BASE = researchAssetUrl('pattern_family_neuron_atlas/v1');
 
 const MODEL_KEYS = {
   'qwen3-4b': 'qwen3',

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai2050.local/schemas/snapshot.schema.json",
+  "title": "AI2050 Canonical Research Snapshot v1",
+  "type": "object",
+  "required": ["schema_version", "snapshot_id", "as_of", "source_sha256", "project", "framework", "current", "counts", "information_architecture", "summaries", "provenance"],
+  "properties": {
+    "schema_version": {"enum": ["snapshot.v1"]},
+    "snapshot_id": {"type": "string", "pattern": "^SNAPSHOT-"},
+    "as_of": {"type": "string", "minLength": 10},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "project": {"type": "object"},
+    "framework": {"type": "object"},
+    "current": {"type": "object"},
+    "counts": {"type": "object"},
+    "information_architecture": {"type": "object"},
+    "summaries": {"type": "object"},
+    "provenance": {"type": "object"}
+  },
+  "additionalProperties": false
+}

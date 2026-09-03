@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { researchAssetUrl } from '../config/researchAssets';
 import { buildForwardData, eventFor, MODEL_KEY_MAP, useResearchKernel } from './useResearchKernel';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
-const FROZEN_MANIFEST = '/vis_data/real_component_trace/manifest.json';
+const FROZEN_MANIFEST = researchAssetUrl('real_component_trace/manifest.json');
 
 async function fetchJson(path, options) {
   const response = await fetch(path, { cache: 'no-store', ...options });
@@ -79,7 +80,9 @@ export function useResearchWorkspace({
   useEffect(() => {
     if (sourceMode !== 'replay' || !effectiveReplayRun) return;
     let active = true;
-    const path = effectiveReplayRun.path || `${API_BASE}/api/research-trace/runs/${effectiveReplayRun.run_id}/trace`;
+    const path = effectiveReplayRun.path
+      ? researchAssetUrl(effectiveReplayRun.path)
+      : `${API_BASE}/api/research-trace/runs/${effectiveReplayRun.run_id}/trace`;
     Promise.resolve()
       .then(() => {
         if (!active) return null;
