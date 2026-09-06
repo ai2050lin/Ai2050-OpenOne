@@ -317,7 +317,8 @@ def main() -> None:
         "maximum_individual_early_v_region": float(max(individual_early)),
         "facts_joint_early_v": conditions["early_v_facts_all"]["donor_flip"],
         "external_early_v": conditions["early_v_external"]["donor_flip"],
-        "single_region_is_complete_gear": max(individual_early) >= 0.95,
+        "facts_value_region_sufficient_in_this_intervention": max(individual_early) >= 0.95,
+        "single_region_is_complete_gear": False,
         "language_mechanism_closed": False,
     }
     checks = {

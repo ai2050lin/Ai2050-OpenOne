@@ -33,11 +33,15 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
+  scroll-behavior: auto;
+  scroll-snap-type: y mandatory;
   scrollbar-color: rgba(139, 92, 246, 0.55) rgba(2, 6, 23, 0.72);
   scrollbar-width: thin;
   background: #050505;
+}
+
+.app-scroll-shell.is-workspace-animating {
+  scroll-snap-type: none;
 }
 
 .app-scroll-shell::-webkit-scrollbar {
@@ -59,12 +63,12 @@ body {
   width: 100%;
   min-height: 100vh;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .app-workspace-screen--3d {
   height: 100vh;
   overflow: hidden;
-  scroll-snap-stop: always;
 }
 
 .app-3d-viewport {

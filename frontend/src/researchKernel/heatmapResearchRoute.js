@@ -421,13 +421,13 @@ export const C32561_LANGUAGE_ENCODING_FIELD_ROUTE = {
 
 export const C42641_OUTPUT_CONDITIONED_CROSSMODEL_FIELD_ROUTE = {
   id: 'c42641-output-conditioned-crossmodel-field-v1',
-  title: 'C39761-C160512 Full-coordinate Q/K/V, Region, and Staged Compiler Field',
+    title: 'Phase 2600-2669 Native Coordinates and Multi-Token Scalar Parameters',
   resultType: 'output_conditioned_crossmodel_field_heatmap',
   sourcePath: researchAssetUrl('research_kernel/c42641_output_conditioned_crossmodel_field.json'),
   maxDimensions: 12,
   sourceSchema: 'c42641.output_conditioned_crossmodel_field.v1',
   boundary:
-    'Each panel uses a model-local physical axis: residual/embedding coordinates, attention-head indices, K/V head coordinates, token positions, token regions, and relative functional stages are never conflated. Phase2539-2547 add all-token embedding/HiddenState, exact Q/K/V and weighted-value coordinates, Attention/MLP-to-next-K/V writes, autonomous interventions, BF16 cross-model stage tests, and an independent value-token region replication. They support a repeated content-to-address-to-downstream-to-output functional skeleton, not a shared physical basis, minimal route, universal semantic gear, or closed language mechanism.',
+    'Panels retain complete model-local physical coordinates and separately label single-token embeddings, source-span averages, raw block outputs, final-normalized states, learned training contrasts, and behavioral axes. Phase2608 tests open-vocabulary generation; Phase2615 calibrates train-only directions in chat; Phase2619 tests a frozen early-layer operator on 240 fresh, mention-order-balanced pairs, with three norm-matched rolls and FP32-stored BF16 activations. Qwen3-14B, GLM4 and DS7B use separate physical bases. These bounded temporal transformations are not a universal semantic operator or a closed language compiler. Use full-coordinate display to inspect low-magnitude values.',
 };
 
 export const HEATMAP_RESULT_TYPES = [

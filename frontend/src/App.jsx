@@ -27,6 +27,7 @@ import {
   ResearchEvidenceDrawer,
 } from './components/app/ResearchEvidenceCockpit';
 import { ResearchHeatmapPreview3D } from './components/app/ResearchHeatmapRoute';
+import NativeParameterInspector from './components/app/NativeParameterInspector';
 import { ResearchSpaceOverlay } from './components/app/ResearchSpaceOverlay';
 import { SNNResearchDashboard } from './components/app/SNNResearchDashboard';
 import ICSPBPanel from './components/FiberNetPanel';
@@ -5130,6 +5131,8 @@ export default function App() {
             </>
           )}
         </Canvas>
+
+      {activeResearchPluginId === 'heatmap-analysis' && <NativeParameterInspector />}
 
       {/* 模型信息面板 - 已迁移到数据面板 */}
 
