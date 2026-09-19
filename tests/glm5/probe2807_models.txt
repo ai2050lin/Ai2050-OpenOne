@@ -1,0 +1,21 @@
+=== phase2621_native_behavior_run.py (MODELS at char 337) ===
+every output and exact long-sentence content."""
+import json, time
+from collections import defaultdict
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from phase2620_native_coordinate_contract import *
+from phase2621_native_language_material import build,evaluate,FAMILIES
+
+MODELS={'qwen4':'qwen3-4b','qwen14':'Qwen3-14B','glm4':'glm4-9b-chat-hf','ds7':'deepseek-r1-distill-qwen-7b'}
+
+def load_model(key):
+    torch.set_num_threads(4)
+    tok=AutoTokenizer.from_pretrained(ROOT/'models/hf'/MODELS[key],local_files_only=True,trust_remote_code=True,use_fast=True)
+    if tok.pad_token_id is None:tok.pad_token=tok.eos_token
+    model=AutoModelForCausalLM.from_pretrained(ROOT/'models/hf'/MODELS[key],dtype=torch.bfloat16,device_map='auto',
+        max_memory={0:'12GiB','cpu':'20GiB'},offload_folder=str(ROOT/f'tests/glm5_temp/native_{key}_offload'),
+        offload_state_dict=True,offload_buffers=True,local_files_only=True,trust_remote_code=True,low_cpu_mem_usage=True,attn
+
+=== phase2620_native_coordinate_contract.py (MODELS at char -1) ===
+

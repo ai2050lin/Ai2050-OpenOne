@@ -1,0 +1,17 @@
+复制战役（DS7B/GLM4/Gemma4）提供可扩展事实源。
+4. `model_namespace`：primary=qwen3-4b，pending_replication=[ds7b, glm4, gemma4]；
+- **C**：Gemma4 冷启动（P3 第四模型，收尾 model_namespace）
+- **B**：Gemma4 冷启动（model_namespace 收尾，pending_replication
+- **B**：Gemma4 冷启动（model_namespace 收尾）
+- **A（主选）**：Gemma4 冷启动（model_namespace 最后一项 pending，
+（候选 A Gemma4 冷启动：本地模型目录探针确认无 gemma4，需 ~8GB
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认网络获取）
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认网络获取）
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认）
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认）
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认）
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认）
+- **C**：Gemma4/Qwen2-7B 下载决策（待用户确认）
+- 2891 候选：A glm4 mlp eigen 格多抽确认（阈值邻近，主选）/ B norm-matched 对照（2892 L1 混杂，零前向）/ C Gemma4/Qwen2-7B 下载决策（待用户）。
+- 2901 候选：A GLM4 attn eigen 格多抽确认（M2897 margin 0.1213 强阳但仅单抽；attn/margin 系谱系第二层，主选）/ B norm-matched 对照（2892 L1 混杂，零前向）/ C Gemma4/Qwen2-7B 下载决策（待用户）。
+- 2902 候选：A GLM4 attn/mlp margin 量级差的结构根源（通道几何分析，零前向或低前向，主选）/ B norm-matched 对照（2892 L1 混杂）/ C Gemma4/Qwen2-7B 下载决策（待用户）。

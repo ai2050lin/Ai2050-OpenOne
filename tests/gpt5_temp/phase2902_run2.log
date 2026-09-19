@@ -1,0 +1,27 @@
+execution.json frozen
+dir cross-check 2893-vs-2890-recompute max=8.522e-09
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:01<12:41,  1.72s/it]Loading weights:   0%|          | 2/443 [00:03<11:06,  1.51s/it]Loading weights:  71%|███████   | 313/443 [00:03<00:00, 160.48it/s]Loading weights:  93%|█████████▎| 411/443 [00:05<00:00, 77.29it/s] Loading weights: 100%|██████████| 443/443 [00:06<00:00, 64.40it/s]
+Some parameters are on the meta device because they were offloaded to the cpu.
+model loaded: window [28,40) on cuda
+words [10/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [20/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [30/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [40/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [50/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [60/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [70/78] v1 mlp=0.00e+00 attn=0.00e+00
+v1: mlp=0.000e+00 attn=0.000e+00 pass=True
+v2 anchor rel err: mlp=1.760e-04 attn=1.753e-04
+R_gamma=0.318 R_rho=1.222 R_A=1.438 R_B=0.318
+mlp: margin=0.0198 p95=0.0402 acc=0.6795
+attn: margin=0.1213 p95=0.0426 acc=0.7308
+margin_ratio attn/mlp = 6.13
+null dirs: gamma_n mlp=0.237 attn=0.104 ; rho_n mlp=0.001 attn=0.006
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2902_glm4_channel_jacobian_asymmetry.py", line 637, in <module>
+    main()
+    ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2902_glm4_channel_jacobian_asymmetry.py", line 559, in main
+    gain = float(np.linalg.norm(W @ d) ** 2)
+                                ~~^~~
+ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 4096 is different from 13696)

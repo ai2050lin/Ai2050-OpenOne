@@ -1,0 +1,32 @@
+{
+  "phase": 2903,
+  "name": "qwen_channel_jacobian_decomposition",
+  "created": "2026-09-19T03:26:54",
+  "script_sha256_8": "bfef7191",
+  "sources": {
+    "s2886": "0a26bfab",
+    "s2887": "e4835a87",
+    "s2896": "71c5fd16",
+    "r2902": "3fe45d3b"
+  },
+  "model": "qwen3-4b",
+  "prereg": {
+    "window": "W=[26,36) frozen (2896)",
+    "sources": "dirs recomputed from 2886 S_last (labels i%2 asserted, 2896 verbatim); words/labels verbatim 2887 npz (57 words); null_tids in 2896 rng order (SEED=2896)",
+    "response": "r_ch(li,i,cn) = (module_call(li, x+eps*d(li)) - ref)/eps at pos 1, module in {mlp, self_attn}, eps=1.0, 57 words x 3 conds; machinery verbatim 2896/2898",
+    "v1": "mlp recompute rel err < 1e-6 (shape-matched [1,seq,d]) and hook-vs-call noise < 1e-4, else all void",
+    "v2_anchor": "B'[mlp] = (r.same - 0.5(r.func + r.null)) . d(li) must match stored 2896 B_eigen rel err < 1e-3 else v2_anchor_fail_all_void",
+    "metrics": "per (ch, li): gamma=mean||r||, rho=mean cos(r,d), A_word=mean|cos(r, u_w)| over 57 word rows (tie=True -> unembed=embed_tokens), A_null same with 200 random rows (fresh rng SEED=2896)",
+    "cross_model": "D_q_mlp = median_li (A_word - A_null) [qwen mlp]; D_g_mlp / D_g_attn same medians from 2902 result.json per_layer",
+    "null_control": "20 random unit dirs SEED=2903, layers {26,29,32}, both channels: A_word - A_null -> q_null_p95 (mlp)",
+    "verdict": "anchor fail => v2_anchor_fail_all_void; D_q_mlp >= 2*max(D_g_mlp, D_g_attn) and D_q_mlp > 2*q_null_p95 => language_content_density_confirmed_cross_model; elif D_q_mlp > 2*q_null_p95 => density_elevated_below_2x_glm4max; else density_not_confirmed",
+    "descriptive": "qwen internal ratios; margins of B_mlp/B_attn with SEED=2896 perms (200); weights-only spectra down_proj / o_proj + W_VO composite (32q/8kv rep=4) + zero-forward SwiGLU response"
+  },
+  "seed": 2896,
+  "seed_null_dirs": 2903,
+  "eps": 1.0,
+  "window": [
+    26,
+    36
+  ]
+}

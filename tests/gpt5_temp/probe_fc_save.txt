@@ -1,0 +1,18 @@
+def save(path, value):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_suffix(path.suffix + '.tmp')
+    temp.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf-8')
+    # Windows can deny rename while a read-only HTTP request briefly holds the old file.
+    # Preserve atomic writes and bounded retry; never truncate a live result in place.
+    for attempt in range(80):
+        try:
+            os.replace(temp, path)
+            break
+        except PermissionError:
+            if attempt==79:raise
+            time.sleep(.025)
+
+def stamp():
+    return datetime.now().astimezone().isoformat()
+

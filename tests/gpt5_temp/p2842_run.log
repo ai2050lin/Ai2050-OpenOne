@@ -1,0 +1,73 @@
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2842_qk_source_backtrace.py", line 311, in <module>
+    main()
+    ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2842_qk_source_backtrace.py", line 204, in main
+    hs_iso, _, _, _, _ = forward_run([w_tid], 0)
+                         ~~~~~~~~~~~^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2842_qk_source_backtrace.py", line 128, in forward_run
+    out = model(torch.tensor([tokens], device='cuda'),
+                output_hidden_states=True, output_attentions=True)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\utils\generic.py", line 911, in wrapper
+    output = func(self, *args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\models\qwen3\modeling_qwen3.py", line 492, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+                                       ~~~~~~~~~~^
+        input_ids=input_ids,
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\utils\generic.py", line 1040, in wrapper
+    output = func(self, *args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\utils\output_capturing.py", line 262, in wrapper
+    outputs = func(self, *args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\models\qwen3\modeling_qwen3.py", line 424, in forward
+    hidden_states = decoder_layer(
+        hidden_states,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\modeling_layers.py", line 110, in __call__
+    return super().__call__(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1884, in _call_impl
+    return inner()
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1832, in inner
+    result = forward_call(*args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\transformers\models\qwen3\modeling_qwen3.py", line 318, in forward
+    hidden_states, _ = self.self_attn(
+                       ~~~~~~~~~~~~~~^
+        hidden_states=hidden_states,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1884, in _call_impl
+    return inner()
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1821, in inner
+    args_result = hook(self, args)
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2842_qk_source_backtrace.py", line 108, in pre_hook
+    args[0].detach()[0].float().cpu().numpy())
+    ~~~~^^^
+IndexError: tuple index out of range

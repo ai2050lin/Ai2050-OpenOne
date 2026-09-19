@@ -1,0 +1,43 @@
+S0 hidden_states[36] diff norm (expect ~0): 0.000e+00
+S0 sum(all layers Dattn+Dmlp) norm (expect ~0): 0.000e+00
+S1 A11 full=0.50000 clamp=0.51562
+NOTE hidden_states[36] is POST final_layernorm (see E L35); h36_diff here is norm-space, telescoping must NOT close to it.
+S1 ||v13||=0.0888  ||res36_diff(hook combo)||=6.9550
+S1 telescoping [attn 13-35 + mlp 13-35] vs res36_diff: residual=2.9058
+S1 telescoping [13-34 both] vs ln2in35_diff: residual=3.6590
+S2 L35 ||Dattn||=2.0497 ||Dmlp||=2.3871
+S2 L32 ||Dattn||=1.2347 ||Dmlp||=2.0230
+S2 L34 ||Dattn||=0.7780 ||Dmlp||=2.1913
+S2 L33 ||Dattn||=0.5414 ||Dmlp||=2.2209
+S2 L31 ||Dattn||=0.7609 ||Dmlp||=1.6807
+S2 L30 ||Dattn||=0.7365 ||Dmlp||=1.5640
+S2 L29 ||Dattn||=0.8572 ||Dmlp||=1.3669
+S2 L28 ||Dattn||=0.3370 ||Dmlp||=0.9940
+E layer 9: A-recursion err=0.1081  C-recursion err=0.1081
+E layer 11: A-recursion err=0.1088  C-recursion err=0.1088
+E layer 12: A-recursion err=0.1195  C-recursion err=0.1195
+E layer 13: A-recursion err=0.1158  C-recursion err=0.1142
+E layer 14: A-recursion err=0.1486  C-recursion err=0.1532
+E layer 15: A-recursion err=0.1163  C-recursion err=0.1164
+E layer 16: A-recursion err=0.1774  C-recursion err=0.1453
+E layer 17: A-recursion err=0.1211  C-recursion err=0.1142
+E layer 18: A-recursion err=0.1850  C-recursion err=0.1480
+E layer 19: A-recursion err=0.1848  C-recursion err=0.1531
+E layer 20: A-recursion err=0.1918  C-recursion err=0.1870
+E layer 21: A-recursion err=0.2051  C-recursion err=0.2100
+E layer 22: A-recursion err=0.2587  C-recursion err=0.1843
+E layer 23: A-recursion err=0.2333  C-recursion err=0.2230
+E layer 24: A-recursion err=0.2661  C-recursion err=0.2865
+E layer 25: A-recursion err=0.3856  C-recursion err=0.2872
+E layer 26: A-recursion err=0.4182  C-recursion err=0.4253
+E layer 27: A-recursion err=0.3706  C-recursion err=0.3512
+E layer 28: A-recursion err=0.4427  C-recursion err=0.4876
+E layer 29: A-recursion err=0.4765  C-recursion err=0.6800
+E layer 30: A-recursion err=0.9247  C-recursion err=0.6167
+E layer 31: A-recursion err=0.8713  C-recursion err=0.7802
+E layer 32: A-recursion err=0.9884  C-recursion err=1.2585
+E layer 33: A-recursion err=1.4581  C-recursion err=1.0485
+E layer 34: A-recursion err=1.6664  C-recursion err=2.2348
+E layer 35: A-recursion err=696.0441  C-recursion err=696.2813
+E max recursion error: A=696.0441 C=696.2813
+WROTE D:\AI2050\Ai2050-OpenOne\tests\gpt5_temp\_p2865_diag_report.txt

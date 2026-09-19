@@ -1,0 +1,31 @@
+execution.json frozen
+dir cross-check 2893-vs-2890-recompute max=8.522e-09
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:01<12:51,  1.75s/it]Loading weights:   0%|          | 2/443 [00:02<07:24,  1.01s/it]Loading weights:  70%|███████   | 312/443 [00:02<00:00, 233.92it/s]Loading weights:  95%|█████████▍| 420/443 [00:05<00:00, 88.35it/s] Loading weights: 100%|██████████| 443/443 [00:05<00:00, 74.95it/s]
+Some parameters are on the meta device because they were offloaded to the cpu.
+model loaded: window [28,40) on cuda
+words [10/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [20/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [30/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [40/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [50/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [60/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [70/78] v1 mlp=0.00e+00 attn=0.00e+00
+v1: mlp=0.000e+00 attn=0.000e+00 pass=True
+v2 anchor rel err: mlp=1.760e-04 attn=1.753e-04
+R_gamma=0.318 R_rho=1.222 R_A=1.438 R_B=0.318
+mlp: margin=0.0198 p95=0.0402 acc=0.6795
+attn: margin=0.1213 p95=0.0426 acc=0.7308
+margin_ratio attn/mlp = 6.13
+null dirs: gamma_n mlp=0.237 attn=0.104 ; rho_n mlp=0.001 attn=0.006
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2902_glm4_channel_jacobian_asymmetry.py", line 678, in <module>
+    main()
+    ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2902_glm4_channel_jacobian_asymmetry.py", line 571, in main
+    Wg = ly.mlp.gate_proj.weight.detach().float().cpu().numpy()
+         ^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1967, in __getattr__
+    raise AttributeError(
+        f"'{type(self).__name__}' object has no attribute '{name}'"
+    )
+AttributeError: 'GlmMLP' object has no attribute 'gate_proj'. Did you mean: 'gate_up_proj'?

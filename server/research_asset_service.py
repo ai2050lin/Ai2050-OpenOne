@@ -167,6 +167,22 @@ def get_native_source_cases():
     return options()
 
 
+@router.get("/native-qkv-cases")
+def get_native_qkv_cases():
+    from .native_qkv_parameter_query import options
+    return options()
+
+
+@router.get("/native-qkv-parameter")
+def get_native_qkv_parameter(case: int = 0, layer: int = 0, kind: str = 'q', output_row: int = 0,
+                           input_coordinate: int = 947, token: int = 0, query_position: int = 1,
+                           source_token: int = 0, head: int = 0, head_coordinate: int = 0,
+                           checkpoint: int = 0, unit: int = 0, output_coordinate: int = 0):
+    from .native_qkv_parameter_query import query
+    return query(case, layer, kind, output_row, input_coordinate, token, query_position,
+                 source_token, head, head_coordinate, checkpoint, unit, output_coordinate)
+
+
 @router.get("/native-source-parameter")
 def get_native_source_parameter(dataset: str = 'fresh', case: int = 128, layer: int = 23, unit: int = 6197,
                                coordinate: int = 0, checkpoint: int = 24, source_token: int = 0,

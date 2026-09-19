@@ -1,0 +1,93 @@
+/* Isolated local development browser; never attaches to a user browser/session. */
+const {chromium}=require('C:/Users/Admin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const root='D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_conditional_campaign_20260910';
+(async()=>{
+ const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
+ const page=await browser.newPage({viewport:{width:1500,height:1100}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await page.goto('http://localhost:5173/rdc');
+  await page.getByLabel('实验范围').selectOption('i_factorial');
+  await page.getByTestId('field-coverage').filter({hasText:'native_bfloat16'}).waitFor();
+  await page.getByText('全坐标科学图与原始数值',{exact:true}).click();
+  await page.getByTestId('scientific-figures').locator('img').nth(2).evaluate(async img=>{await img.decode();if(img.naturalWidth<9728)throw new Error('Full native unit figure resolution is too small')});
+  await page.getByTestId('scientific-figures').scrollIntoViewIfNeeded();
+  await page.screenshot({path:root+'/client_full_coordinate_gallery.png'});
+  await page.getByText('全坐标科学图与原始数值',{exact:true}).click();
+  await page.getByRole('button',{name:'同层条件重建',exact:true}).click();
+  await page.getByLabel('原生坐标起点').fill('9727');
+  await page.getByTestId('field-coverage').filter({hasText:'5 / 48,640'}).waitFor();
+  await page.screenshot({path:root+'/client_factorial_gates.png'});
+  await page.getByRole('button',{name:'提前预测全单元',exact:true}).click();
+  await page.getByTestId('conditional-value').filter({hasText:'held_out_earlier_state_prediction'}).waitFor();
+  await page.getByRole('button',{name:'提前预测写回',exact:true}).click();
+  await page.getByTestId('conditional-value').filter({hasText:'direct down'}).waitFor();
+  await page.screenshot({path:root+'/client_predictive_write.png'});
+  await page.getByRole('button',{name:'真实标量参数路径',exact:true}).click();
+  await page.getByLabel('MLP单元').fill('9727');await page.getByLabel('链输入坐标').fill('2559');await page.getByLabel('链写回坐标').fill('2559');
+  await page.getByTestId('scalar-chain').filter({hasText:'"output_coordinate": 2559'}).waitFor();
+  await page.getByLabel('实验范围').selectOption('k_long');
+  await page.getByTestId('actual-behavior').filter({hasText:'"score_version": 2'}).waitFor();
+  await page.getByRole('button',{name:'长生成状态预测',exact:true}).click();
+  await page.getByTestId('conditional-value').filter({hasText:'H12_previousH36'}).waitFor();
+  await page.getByLabel('原生坐标起点').fill('2559');
+  await page.getByTestId('field-coverage').filter({hasText:'4 / 10,240'}).waitFor();
+  await page.screenshot({path:root+'/client_long_forecast.png'});
+  for(const [run,d,j] of [['aligned_qwen4',2560,9728],['aligned_qwen14',5120,17408],...(process.argv.includes('--full')?[['aligned_glm4',4096,13696]]:[])]){
+   await page.getByLabel('实验范围').selectOption(run);
+   await page.getByTestId('field-coverage').filter({hasText:'native_bfloat16'}).waitFor();
+   await page.getByRole('button',{name:'真实标量参数路径',exact:true}).click();
+   await page.getByLabel('MLP单元').fill(String(j-1));await page.getByLabel('链输入坐标').fill(String(d-1));await page.getByLabel('链写回坐标').fill(String(d-1));
+   await page.getByTestId('scalar-chain').filter({hasText:'"output_coordinate": '+(d-1)}).waitFor();
+   if(run.endsWith('glm4'))assert.match(await page.getByTestId('scalar-chain').innerText(),/27391/);
+   await page.screenshot({path:root+'/client_'+run+'_parameter.png'});
+  }
+  if(process.argv.includes('--full')){
+   await page.getByLabel('实验范围').selectOption('m_order');
+   await page.getByTestId('actual-behavior').filter({hasText:'"score_version": 2'}).waitFor();
+   await page.getByRole('button',{name:'全来源写回向量',exact:true}).click();
+   await page.getByTestId('conditional-value').filter({hasText:'native_all_source_group_vector_accounting'}).waitFor();
+   await page.getByLabel('原生坐标起点').fill('2559');
+   await page.getByTestId('field-coverage').filter({hasText:'9 / 23,040'}).waitFor();
+   await page.screenshot({path:root+'/client_order_source_vectors.png'});
+   const rows=JSON.parse(fs.readFileSync(root+'/m_order/material_scored.json','utf8'));
+   const zh=rows.find(r=>r.result_field_onset&&r.language==='zh');assert(zh);
+   await page.getByLabel('真实样本').selectOption(zh.sample_id);
+   await page.getByTestId('conditional-value').filter({hasText:'native_all_source_group_vector_accounting'}).waitFor();
+   await page.getByRole('button',{name:'原生坐标场',exact:true}).click();
+   await page.getByLabel('坐标域').selectOption('p');await page.getByLabel('原生坐标起点').fill('31');await page.getByLabel('起始token').fill('0');
+   await page.getByTestId('field-coverage').filter({hasText:'native_bfloat16'}).waitFor();
+   await page.screenshot({path:root+'/client_order_chinese_attention.png'});
+   await page.getByRole('button',{name:'历史KV条件注意力预测',exact:true}).click();
+   await page.getByTestId('conditional-value').filter({hasText:'earlier_query_and_available_past_KV_attention_prediction'}).waitFor();
+   await page.getByLabel('原生坐标起点').fill('2559');
+   await page.getByTestId('field-coverage').filter({hasText:'4 / 10,240'}).waitFor();
+   await page.screenshot({path:root+'/client_cached_attention_prediction.png'});
+   await page.getByText('全坐标科学图与原始数值',{exact:true}).click();
+   await page.getByTestId('scientific-figures').locator('img').evaluateAll(async imgs=>{for(const img of imgs){await img.decode();if(img.naturalWidth<2560)throw new Error('Source native coordinate figure too small')}});
+   await page.screenshot({path:root+'/client_order_figure.png'});
+   await page.getByLabel('实验范围').selectOption('o_generalization');
+   await page.getByTestId('field-coverage').filter({hasText:'native_bfloat16'}).waitFor();
+   await page.getByTestId('original-input').waitFor();
+   await page.getByRole('button',{name:'冻结注意力预测推广',exact:true}).click();
+   await page.getByTestId('conditional-value').filter({hasText:'earlier_query_and_available_past_KV_attention_prediction'}).waitFor();
+   await page.getByLabel('原生坐标起点').fill('2559');
+   await page.getByTestId('field-coverage').filter({hasText:'4 / 10,240'}).waitFor();
+   await page.screenshot({path:root+'/client_attention_generalization.png'});
+   await page.getByRole('button',{name:'探索性token条件重拟合',exact:true}).click();
+   await page.getByTestId('conditional-value').filter({hasText:'exploratory_token_conditioned_NOT_independent_confirmation'}).waitFor();
+   await page.getByLabel('原生坐标起点').fill('2559');
+   await page.getByTestId('field-coverage').filter({hasText:'6 / 15,360'}).waitFor();
+   await page.screenshot({path:root+'/client_exploratory_token_conditions.png'});
+   await page.getByRole('button',{name:'真实标量参数路径',exact:true}).click();
+   await page.getByLabel('MLP单元').fill('9727');await page.getByLabel('链输入坐标').fill('2559');await page.getByLabel('链写回坐标').fill('2559');
+   await page.getByTestId('scalar-chain').filter({hasText:'"output_coordinate": 2559'}).waitFor();
+  }
+  await page.getByLabel('实验范围').selectOption('e_confirmation');
+  await page.getByRole('button',{name:'自然 / 同形全坐标',exact:true}).click();
+  await page.getByTestId('continuity-value').filter({hasText:'最大数值差'}).waitFor();
+  assert.equal(errors.length,0,errors.join('\n'));
+  fs.writeFileSync(root+'/client_browser_audit'+(process.argv.includes('--full')?'':'_partial')+'.json',JSON.stringify({timestamp:new Date().toISOString(),passed:true,errors,scope:process.argv.includes('--full')?'I/J/K/allL/MsourceChineseBoundary/NcacheForecast/Ogeneralization/Pexploratory/Eregression':'I/J/K/Q4/Q14/Eregression'},null,2));
+  console.log('CONDITIONAL_BROWSER_PASS');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});

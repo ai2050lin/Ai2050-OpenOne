@@ -1,0 +1,27 @@
+P2800 gate numpy lens vs 2795 max|d|=0.000012
+P2800 cat fruit     dp_full=3.520 carrier40=2.337 (66%) eta2_40=2.155 rand40=0.872 K*80=80 pass=False
+P2800 cat animal    dp_full=4.268 carrier40=1.858 (44%) eta2_40=2.427 rand40=0.840 K*80=160 pass=False
+P2800 cat metal     dp_full=5.718 carrier40=5.513 (96%) eta2_40=4.504 rand40=1.815 K*80=20 pass=True
+P2800 cat vehicle   dp_full=2.797 carrier40=1.661 (59%) eta2_40=2.965 rand40=0.855 K*80=80 pass=False
+P2800 cat country   dp_full=5.492 carrier40=3.608 (66%) eta2_40=1.236 rand40=0.723 K*80=160 pass=False
+P2800 cat food      dp_full=2.384 carrier40=1.055 (44%) eta2_40=0.454 rand40=0.555 K*80=160 pass=False
+P2800 cat nature    dp_full=1.279 carrier40=1.323 (103%) eta2_40=0.133 rand40=0.084 K*80=40 pass=True
+P2800 cat furniture dp_full=2.079 carrier40=1.601 (77%) eta2_40=2.449 rand40=0.626 K*80=160 pass=False
+P2800 cat tool      dp_full=2.900 carrier40=1.625 (56%) eta2_40=0.945 rand40=0.533 K*80=None pass=False
+P2800 cat clothing  dp_full=2.580 carrier40=1.468 (57%) eta2_40=2.427 rand40=1.005 K*80=160 pass=False
+P2800 P-A4=False (2/10 cats)
+P2800 cat fruit     signed-pool hits=['/apple', 'apple', 'apples', 'berry', 'fruit', 'fruitful', 'fruits', 'fruity', 'mango'] pass=True | pos15=['fruit', 'fruit', 'fruit', '果', 'fruits', '果实', '水果', '果园']
+P2800 cat animal    signed-pool hits=['animal', 'animals'] pass=True | pos15=['animal', '动物', 'animal', 'animal', 'animal', '動物', 'animals', 'animals']
+P2800 cat metal     signed-pool hits=['-metal', 'aluminum', 'brass', 'bronze', 'copper', 'costing', 'gold', 'metal', 'metall', 'metallic', 'metals', 'nickel', 'silver', 'steel'] pass=True | pos15=['metal', '金属', 'metal', 'metal', 'metal', 'metals', 'metallic', '-metal']
+P2800 cat vehicle   signed-pool hits=['(vehicle', '.vehicle', '_vehicle', 'vehicle', 'vehicles'] pass=True | pos15=['vehicle', '车辆', 'vehicle', 'vehicle', 'vehicle', 'vehicles', '_vehicle', '(vehicle']
+P2800 cat country   signed-pool hits=['(country', '-country', '.country', '_country', 'china', 'country', 'countrycode', 'nation'] pass=True | pos15=['country', 'country', 'country', 'country', '(country', '_country', '-country', '.country']
+P2800 cat food      signed-pool hits=['(food', '-food', '.food', '_food', 'food', 'foods'] pass=True | pos15=['food', 'food', '食品', '食物', 'food', '的食物', 'food', '(food']
+P2800 cat nature    signed-pool hits=['nature'] pass=True | pos15=['nature', 'nature', 'nature', 'nature', '性质', 'natur', '自然界', 'natur']
+P2800 cat furniture signed-pool hits=['-chair', 'chair', 'chaired', 'chairs', 'furniture', 'sofa', 'sofas'] pass=True | pos15=['furniture', 'furniture', '家具', 'urniture', 'furnishings', 'chair', 'chairs', 'chair']
+P2800 cat tool      signed-pool hits=['(tool', '-tool', '-tools', '.tool', '.toolbox', '.tools', '/tool', '_tool', 'tool', 'toolbox', 'toolkit', 'tools'] pass=True | pos15=['tool', 'tool', '工具', 'tool', 'tool', '-tool', '(tool', 'tools']
+P2800 cat clothing  signed-pool hits=['apparel', 'clothing', 'dress', 'dresses', 'dressing'] pass=True | pos15=['clothing', 'clothing', 'clothes', '衣服', '服装', '服饰', '衣物', '的衣服']
+P2800 P-B4=True (10/10 cats)
+P2800 channel geometry: mean|cos|=0.1157 top3=[('animal/clothing', 0.1864), ('nature/furniture', 0.1662), ('fruit/vehicle', 0.1587)] fruit/food rank=42 P-C4=False
+P2800 subspace capture (top-40): {"fruit": 0.3081, "animal": 0.3054, "metal": 0.2898, "vehicle": 0.3098, "country": 0.2815, "food": 0.3028, "nature": 0.2856, "furniture": 0.3078, "tool": 0.2781, "clothing": 0.3034}
+P2800 top-40 overlap: max=3 mean=1.0 rand_expect=0.6
+P2800 VERDICT {"carrier_subspace_sufficient": false, "n_cats_ok": 2, "signed_pool_profile_semantic": true, "n_cats_hits": 10, "channels_near_orthogonal_fruitfood_lead": false, "mean_abs_cos": 0.11565732718239444, "top3_pairs": [["animal/clothing", 0.1864], ["nature/furniture", 0.1662], ["fruit/vehicle", 0.1587]], "fruitfood_rank": 42, "subspace_capture": {"fruit": 0.3081, "animal": 0.3054, "metal": 0.2898, "vehicle": 0.3098, "country": 0.2815, "food": 0.3028, "nature": 0.2856, "furniture": 0.3078, "tool": 0.2781, "clothing": 0.3034}, "subspace_carrier_model": false}

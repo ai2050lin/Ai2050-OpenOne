@@ -60,6 +60,14 @@ from server.ai_rnd_service import router as ai_rnd_router
 from server.research_asset_service import router as research_asset_router
 from server.research_kernel.router import router as research_kernel_router
 from server.research_trace_service import router as research_trace_router
+from server.rdc_feature_service import router as rdc_feature_router
+from server.rdc_prefix_service import router as rdc_prefix_router
+from server.rdc_relation_service import router as rdc_relation_router
+from server.rdc_joint_service import router as rdc_joint_router
+from server.rdc_operator_service import router as rdc_operator_router
+from server.rdc_law_service import router as rdc_law_router
+from server.rdc_binding_service import router as rdc_binding_router
+from server.rdc_update_service import router as rdc_update_router
 from server.research_workspace_service import router as research_workspace_router
 
 # --- Global Model State ---
@@ -231,6 +239,14 @@ app.include_router(ai_rnd_router)
 app.include_router(research_asset_router)
 app.include_router(research_kernel_router)
 app.include_router(research_trace_router)
+app.include_router(rdc_feature_router)
+app.include_router(rdc_prefix_router)
+app.include_router(rdc_relation_router)
+app.include_router(rdc_joint_router)
+app.include_router(rdc_operator_router)
+app.include_router(rdc_law_router)
+app.include_router(rdc_binding_router)
+app.include_router(rdc_update_router)
 app.include_router(research_workspace_router)
 
 

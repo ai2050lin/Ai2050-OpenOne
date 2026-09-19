@@ -1,0 +1,55 @@
+format: str
+version: int
+model: str
+protocol_family: str
+axes: list n=6
+  sample_keys=['axes_names', 'axis_id', 'kind', 'labels_n', 'notes', 'status', 'vocab_source', 'words_n']
+  sample_keys=['axis_id', 'direction_source', 'kind', 'labels_n', 'status', 'vocab_source', 'words_n']
+blocks: list n=13
+  sample_keys=['axis_id', 'block_id', 'kind', 'notes', 'shape', 'src']
+  sample_keys=['axis_id', 'block_id', 'kind', 'model', 'notes', 'shape', 'src']
+headsets: list n=4
+  sample_keys=['definition', 'n', 'phase', 'set_id', 'src']
+  sample_keys=['definition', 'members_core4', 'n', 'phase', 'set_id', 'src']
+measurements: list n=27
+  sample_keys=['meas_id', 'model', 'source', 'type', 'verdict']
+  sample_keys=['meas_id', 'model', 'source', 'type', 'verdict']
+growth_curve: list n=14
+  sample_keys=['acc', 'axis_id', 'block', 'components', 'notes', 'phase', 'point_id']
+  sample_keys=['acc', 'axis_id', 'block', 'components', 'model', 'notes', 'phase', 'point_id']
+linkage: list n=11
+  sample_keys=['evidence', 'from', 'link_id', 'phase', 'status', 'to']
+  sample_keys=['evidence', 'from', 'link_id', 'phase', 'status', 'to']
+errata_ledger: list n=3
+  sample_keys=['corrects', 'note', 'phase']
+  sample_keys=['corrects', 'note', 'phase']
+quadrants: list n=4
+  sample_keys=['drop_spectrum', 'family', 'mlp_carrier', 'quadrant']
+  sample_keys=['drop_spectrum', 'family', 'mlp_carrier', 'quadrant']
+transfer: dict
+negatives: list n=5
+  sample_keys=['claim', 'evidence', 'implication', 'neg_id', 'source', 'status']
+  sample_keys=['claim', 'evidence', 'implication', 'neg_id', 'source', 'status']
+model_namespace: dict
+migration_history: list n=1
+  sample_keys=['backup', 'backup_sha256_8', 'from_version', 'note', 'phase', 'to_version']
+
+--- last block ---
+{
+ "block_id": "B3_mlp_glm4",
+ "axis_id": "class",
+ "kind": "mlp_response",
+ "model": "glm4-9b-chat-hf",
+ "shape": [
+  80,
+  12
+ ],
+ "src": {
+  "path": "phase2888/glm4_class_mlp/glm4_class_mlp.npz",
+  "sha256_8": "c4195d65",
+  "phase": 2888,
+  "key": "B3"
+ },
+ "notes": "glm arch, window [28,40); g_direct >> g_comp direct-write arm dominates"
+}
+--- last growth ---

@@ -1,0 +1,23 @@
+total_lines=3174
+phase2824_at_line=3088
+1: ## Phase 2824: 实测写出谱与具体机制电路 [2026-09-17 06:28]
+2: 
+3: ### 1. 原理与设计
+4: 
+5: 2823 确认"几何普查 best_val ≠ 实际写出 c"（L34 h0 几何榜 vs 实测 anti-red）。本 Phase 不再普查对齐度，直接**实测写出谱**：一次 forward 捕获全部 36 层 o_proj 输入 a_h（保留 apple/cherry/sky/grass 4 行），逐层逐头计算
+6: 
+7:   delta_{l,h} = W_O^{l,h} @ a_h(apple ctx)   （2560 维写出向量，每头一个）
+8:   c_{l,h}     = <delta_{l,h}, dW_red>        （该头在 apple 语境下对 red 方向的实际写出量）
+9: 
+10: 1152 头实测谱 = apple→red 的**头级电路图**（measured circuit map）。在此基础上做四种编辑对比（rank-1 OV 重定向，2823 算子；列组 = 2822 V1 复现）：
+11: - H_meas：实测 c>0 的 top-20 头 rank-1 red→black
+12: - H_geo：2819 几何普查 top-20 晚层头（同算子）
+---TAIL 8---
+1: ### 8. 产物登记（immutable + SHA256）
+2: 
+3: - 脚本  sha256 = 
+4: -  sha256 = 
+5: -  sha256 = 
+6: -  sha256 = 
+7: 
+8: **Gens 记录**：1 次运行（12.6s，零崩溃——预审两探针起效：2819 K2.ov_rows 字段核对 + 48 实体单 token 核查）。预注册判据全程未动。

@@ -225,14 +225,15 @@ def finalize():
     pair={'cases':512,'same_body_fullnative_hash':sum(a['native_body_sha256']==b['native_body_sha256'] for a,b in zip(native,direct)),
           'native_final_available':sum(r['final_answer_available'] for r in native),'direct_final_available':sum(r['final_answer_available'] for r in direct),
           'content_correct_native':sum(r['content_correct'] for r in native),'content_correct_direct':sum(r['content_correct'] for r in direct),
-          'meaning':'SameDScheckpoint and bodytokenprefix. Explicit protocolcomparison, notdifferentmodels or independent512newfacts. Bodyhash is numericalcontrol, notsemanticabstraction.'}
+          'meaning':'SameDScheckpoint and bodytokenprefix. Explicit protocolcomparison, notdifferentmodels or independent512newfacts. Bodyhash is numericalcontrol, notsemanticabstraction.',
+          'score_meaning':'content_correct is limited-punctuation/Chinese-alias normalized WHOLE STRING equality, not semantic accuracy. final_answer_available means final channel/boundary identified, not necessarily nonempty text. Independent post-hoc explicit-final-line audit is reported separately in Phase2684; original scores/outputs are unchanged.'}
     save(OUT/'analysis/DS_protocol_pair.json',pair);checks['DS512_paired_source_indices']=len(native)==len(direct)==512;assert all(checks.values())
     finish(2683,'三模型原生四输出功能全坐标复验与DS生成预算校准',OUT,{'provenance':str(Path(__file__)),'summary':{'protocols':rr,'DS_pair':pair},'checks':checks},
         '严格顺序加载三个本地BF16非量化模型。相同原始语言材料由各自chat与tokenizer编码，固定执行形状观察全H/MLP原坐标；自然cache生成独立分账，DS先用独立实体校准输出预算。',
         r'd_{b,f,l,q,j}=X_{b,f,v0,l,q,j}-X_{b,f,v1,l,q,j};\quad C_{l,q,j}=\sum_b\mathbf1[\min_fd_{b,f,l,q,j}>0\lor\max_fd_{b,f,l,q,j}<0].',
         'C001Qwen14B512；C002GLM4 512；C003DS7B原生推理512和显式闭合空thinking进入答案区512（共3物理模型4协议、2048正式条件）；每协议八族双语两实体对两内容双目标四功能，形式/顺序固定0；C004DS两协议各64独立实体校准最长256生成token后冻结预算；C005全部H与全部MLP神经元四功能同向/正负/零/反向计数；C006全部实际token六字段坐标矩、全坐标幅值范围和2完整H展示例/协议。',
         '跨模型的原坐标条件复用图可区分模型内稳定纹理与个别索引偶然；不能把不同维度中的同编号当成同一个语义单元。生成预算、推理区与最终答案边界都是能力解释的前提。',
-        '固定模板与有限实体内容，不是开放语言通则。每族四基础组，符号通过不等于语义特异性。自然cache生成与固定padding场是两种数值执行协议，首状态差异保留，不能直接称数值完全一致。DS原生cloze实际落在thinking内；答案区配对协议显式关闭空thinking，是接口干预而非未经改变的DS推理。两组全保留，不能按较高正确率抹去另一组。无最终答案和预算截断是协议限制。全token矩和幅值为全样本合计而非每族幅值图。',
+        '固定模板与有限实体内容，不是开放语言通则。每族四基础组，符号通过不等于语义特异性。自然cache生成与固定padding场是两种数值执行协议，首状态差异保留，不能直接称数值完全一致。DS原生cloze实际落在thinking内；答案区配对协议显式关闭空thinking，是接口干预而非未经改变的DS推理。两组全保留，不能按较高正确率抹去另一组。无最终答案和预算截断是协议限制。全token矩和幅值为全样本合计而非每族幅值图。重要评分更正：历史content_correct仅是有限标点/中文别名归一化后的整串匹配，不是语义正确率；final_answer_available仅指识别到答案段边界，仍可能为空。解释后给出正确明确答案的输出可能被旧整串指标判不匹配，不能由此说语义全部失败。原分数和原输出完全保留，2684另列事后冻结的末行明确答案审计及未解析/冲突/空答案/无边界类别，不能冒称盲测或替换原分数。',
         '完成2684已有客户端热力图/具体参数查询、独立数值和真实浏览器核验，再精确清理未展示原场；整个大阶段终审之后继续同目标研究。')
 
 

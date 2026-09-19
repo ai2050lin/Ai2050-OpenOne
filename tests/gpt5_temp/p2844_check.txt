@@ -1,0 +1,15 @@
+total=4046
+recent=['2840', '2841', '2842', '2843']
+tail=
+### 5. 产物登记（immutable + SHA256，Gen2 为准）
+
+- 脚本 `tests/glm5/phase2843_gate_causal_clamp.py` sha256 = `3cca0fcb38c17022…`
+- `…/phase2843/gate_causal_clamp/execution.json` sha256 = `2b58ab3b850c3d0f…`
+- `result.json` sha256 = `38e63d688281e453…`；`gate_maps.npz` sha256 = `be8c5d5f52320ad6…`
+- Gen 记录：Gen1 崩溃（GQA repeat_kv 遗漏），Gen2 成功（125.7s，~2300 前向）。预注册判据全程未动。
+
+### 6. 接续（2844 候选）
+
+1. **15 头联合钳制 + 阶梯**（单门→top3→top5→15 头联合），检验门损伤的可加性与总充分性——门的"分布式充分性"收口。
+2. **锚定转移机制**：[cond,的,w] vs [cond,w] 的 pos1 锚定对照 + '的'位状态条件化追踪（'的'的 V 是否携带 cond 信息）。
+3. **域梯度归因**：Δgate 与词频/类目典型性的相关，剥离混杂。

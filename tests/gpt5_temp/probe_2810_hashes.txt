@@ -1,0 +1,67 @@
+=== probe time: 2026-09-17 01:48:19 ===
+
+script 38fe4bb5d016e5b872a3f7cab0b0682f4a508adbfe2735eb1f395f0e12efe3f7
+       858  sha=095e712845f64c24c3e0d8517190c4a9221c92416480cc50e4293e1b10015f3b  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2810\phrase_modulation\execution.json
+  17412423  sha=ca1901ff694f105ae5c5a82f2e83d8a9410405944244a8b85b36a00ec31e1124  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2810\phrase_modulation\hidden_states.npz
+    287715  sha=a630da38acd157389bba2597987d29a32067be47c2235ffafad2fc59dbe5732e  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2810\phrase_modulation\result.json
+
+--- verdict ---
+{
+  "n_targets": 20,
+  "n_layers": 37,
+  "conditions": [
+    "same",
+    "diff",
+    "func",
+    "null"
+  ],
+  "same_cos_final": 0.469951,
+  "diff_cos_final": 0.436153,
+  "same_shift_final": 1.231348,
+  "diff_shift_final": 1.30635,
+  "func_shift_final": 1.400547,
+  "null_shift_final": 1.318861,
+  "content_shift_final": 1.268849,
+  "max_cos_range": 0.990383,
+  "modulation_exists": true,
+  "selective_modulation": false,
+  "layer_dependent": true,
+  "function_word_minimal": false,
+  "final_verdict": "weak_or_absent"
+}
+
+--- prereg ---
+{
+  "P-K1": "modulation_exists iff cos(h_same, h_iso) < 0.999 at >=1 layer",
+  "P-K2": "selective_modulation iff mean ||delta_same|| > mean ||delta_diff|| at final layer",
+  "P-K3": "layer_dependent iff cos range across layers > 0.05 for any content condition",
+  "P-K4": "function_word_minimal iff mean ||delta_func|| < mean ||delta_content|| at final layer",
+  "verdict": "phrase_modulation_substantive iff P-K1 AND P-K2; layer_resolved iff P-K3; function_word_baseline iff P-K4"
+}
+
+--- per_word summary (final layer) ---
+{"word": "apple", "cat": "fruit", "same_cos_f": 0.428905, "same_shift_f": 1.187028, "same_cls": 0.138914, "same_dom": 0.109491, "diff_cos_f": 0.466337, "diff_shift_f": 1.207615, "diff_cls": 0.074519, "diff_dom": 0.072155, "func_cos_f": 0.385702, "func_shift_f": 1.365879, "func_cls": 0.057354, "func_dom": 0.038754, "null_cos_f": 0.413854, "null_shift_f": 1.25254, "null_cls": 0.055094, "null_dom": 0.066011}
+{"word": "banana", "cat": "fruit", "same_cos_f": 0.420505, "same_shift_f": 1.169132, "same_cls": 0.135983, "same_dom": 0.112051, "diff_cos_f": 0.454549, "diff_shift_f": 1.138062, "diff_cls": 0.054353, "diff_dom": 0.059402, "func_cos_f": 0.353503, "func_shift_f": 1.31954, "func_cls": 0.036585, "func_dom": 0.033452, "null_cos_f": 0.453282, "null_shift_f": 1.165084, "null_cls": 0.054374, "null_dom": 0.044076}
+{"word": "dog", "cat": "animal", "same_cos_f": 0.448646, "same_shift_f": 1.142027, "same_cls": 0.131394, "same_dom": 0.074169, "diff_cos_f": 0.383728, "diff_shift_f": 1.268102, "diff_cls": 0.024845, "diff_dom": 0.005497, "func_cos_f": 0.395968, "func_shift_f": 1.314067, "func_cls": 0.027781, "func_dom": 0.007042, "null_cos_f": 0.406098, "null_shift_f": 1.288549, "null_cls": 0.044861, "null_dom": 0.045729}
+{"word": "cat", "cat": "animal", "same_cos_f": 0.450179, "same_shift_f": 1.195736, "same_cls": 0.143606, "same_dom": 0.081399, "diff_cos_f": 0.466582, "diff_shift_f": 1.272991, "diff_cls": 0.08598, "diff_dom": 0.054607, "func_cos_f": 0.419344, "func_shift_f": 1.356888, "func_cls": 0.052295, "func_dom": 0.029281, "null_cos_f": 0.481474, "null_shift_f": 1.340139, "null_cls": 0.072129, "null_dom": 0.053497}
+{"word": "gold", "cat": "metal", "same_cos_f": 0.456902, "same_shift_f": 1.199795, "same_cls": 0.047804, "same_dom": 0.081261, "diff_cos_f": 0.416628, "diff_shift_f": 1.300269, "diff_cls": 0.022503, "diff_dom": 0.035738, "func_cos_f": 0.372175, "func_shift_f": 1.377876, "func_cls": 0.002908, "func_dom": 0.031813, "null_cos_f": 0.454781, "null_shift_f": 1.279667, "null_cls": 0.017551, "null_dom": 0.050464}
+{"word": "silver", "cat": "metal", "same_cos_f": 0.997776, "same_shift_f": 0.119067, "same_cls": 0.012757, "same_dom": 0.049598, "diff_cos_f": 0.352516, "diff_shift_f": 1.229417, "diff_cls": 0.017021, "diff_dom": 0.031304, "func_cos_f": 0.365314, "func_shift_f": 1.21569, "func_cls": 0.003091, "func_dom": 0.037144, "null_cos_f": 0.390732, "null_shift_f": 1.208138, "null_cls": 0.001863, "null_dom": 0.043628}
+{"word": "car", "cat": "vehicle", "same_cos_f": 0.459237, "same_shift_f": 1.151191, "same_cls": 0.01245, "same_dom": 0.014145, "diff_cos_f": 0.419357, "diff_shift_f": 1.178543, "diff_cls": 0.002286, "diff_dom": 0.028348, "func_cos_f": 0.463085, "func_shift_f": 1.211403, "func_cls": 0.003994, "func_dom": 0.01509, "null_cos_f": 0.415185, "null_shift_f": 1.183876, "null_cls": 0.001841, "null_dom": 0.01813}
+{"word": "bus", "cat": "vehicle", "same_cos_f": 0.462565, "same_shift_f": 1.221705, "same_cls": 0.016863, "same_dom": 0.014753, "diff_cos_f": 0.446928, "diff_shift_f": 1.233411, "diff_cls": 0.006113, "diff_dom": 0.02528, "func_cos_f": 0.457698, "func_shift_f": 1.250152, "func_cls": 0.012845, "func_dom": 0.003659, "null_cos_f": 0.411915, "null_shift_f": 1.455009, "null_cls": 0.005636, "null_dom": 0.021107}
+{"word": "Japan", "cat": "country", "same_cos_f": 0.409484, "same_shift_f": 1.330231, "same_cls": 0.119278, "same_dom": 0.047927, "diff_cos_f": 0.432768, "diff_shift_f": 1.335655, "diff_cls": 0.035495, "diff_dom": 0.063436, "func_cos_f": 0.320013, "func_shift_f": 1.610633, "func_cls": 0.022317, "func_dom": 0.027075, "null_cos_f": 0.385998, "null_shift_f": 1.409385, "null_cls": 0.019784, "null_dom": 0.043771}
+{"word": "China", "cat": "country", "same_cos_f": 0.405327, "same_shift_f": 1.401101, "same_cls": 0.107656, "same_dom": 0.049924, "diff_cos_f": 0.374691, "diff_shift_f": 1.55282, "diff_cls": 0.020471, "diff_dom": 0.075463, "func_cos_f": 0.303077, "func_shift_f": 1.738494, "func_cls": 0.031846, "func_dom": 0.035893, "null_cos_f": 0.372806, "null_shift_f": 1.543778, "null_cls": 0.06419, "null_dom": 0.046309}
+{"word": "bread", "cat": "food", "same_cos_f": 0.379316, "same_shift_f": 1.534651, "same_cls": 0.092591, "same_dom": 0.051623, "diff_cos_f": 0.414377, "diff_shift_f": 1.443477, "diff_cls": 0.074976, "diff_dom": 0.032688, "func_cos_f": 0.37728, "func_shift_f": 1.555284, "func_cls": 0.056172, "func_dom": 0.019393, "null_cos_f": 0.425377, "null_shift_f": 1.483091, "null_cls": 0.072314, "null_dom": 0.037029}
+{"word": "rice", "cat": "food", "same_cos_f": 0.407822, "same_shift_f": 1.213848, "same_cls": 0.095374, "same_dom": 0.067807, "diff_cos_f": 0.394116, "diff_shift_f": 1.206103, "diff_cls": 0.070673, "diff_dom": 0.042309, "func_cos_f": 0.350563, "func_shift_f": 1.331945, "func_cls": 0.06302, "func_dom": 0.030186, "null_cos_f": 0.413138, "null_shift_f": 1.175836, "null_cls": 0.085482, "null_dom": 0.058946}
+{"word": "ocean", "cat": "nature", "same_cos_f": 0.469978, "same_shift_f": 1.106578, "same_cls": 0.048234, "same_dom": 0.053261, "diff_cos_f": 0.462, "diff_shift_f": 1.174947, "diff_cls": 0.00894, "diff_dom": 0.03386, "func_cos_f": 0.437106, "func_shift_f": 1.235358, "func_cls": 0.023074, "func_dom": 0.032541, "null_cos_f": 0.475747, "null_shift_f": 1.140494, "null_cls": 0.023719, "null_dom": 0.045081}
+{"word": "river", "cat": "nature", "same_cos_f": 0.452341, "same_shift_f": 1.333165, "same_cls": 0.041362, "same_dom": 0.055323, "diff_cos_f": 0.481716, "diff_shift_f": 1.283739, "diff_cls": 0.005533, "diff_dom": 0.034539, "func_cos_f": 0.437574, "func_shift_f": 1.470295, "func_cls": 0.020731, "func_dom": 0.043962, "null_cos_f": 0.480812, "null_shift_f": 1.28201, "null_cls": 0.010977, "null_dom": 0.054925}
+{"word": "chair", "cat": "furniture", "same_cos_f": 0.490159, "same_shift_f": 1.31822, "same_cls": 0.043877, "same_dom": 0.009147, "diff_cos_f": 0.475143, "diff_shift_f": 1.324315, "diff_cls": 0.040056, "diff_dom": 0.00845, "func_cos_f": 0.45775, "func_shift_f": 1.374742, "func_cls": 0.029877, "func_dom": 0.002247, "null_cos_f": 0.486142, "null_shift_f": 1.294028, "null_cls": 0.032394, "null_dom": 0.004443}
+{"word": "table", "cat": "furniture", "same_cos_f": 0.437704, "same_shift_f": 1.455707, "same_cls": 0.022176, "same_dom": 0.016323, "diff_cos_f": 0.465672, "diff_shift_f": 1.447143, "diff_cls": 0.023156, "diff_dom": 0.056706, "func_cos_f": 0.510541, "func_shift_f": 1.486496, "func_cls": 0.007627, "func_dom": 0.0179, "null_cos_f": 0.463248, "null_shift_f": 1.405828, "null_cls": 0.006992, "null_dom": 0.035225}
+{"word": "hammer", "cat": "tool", "same_cos_f": 0.435992, "same_shift_f": 1.369169, "same_cls": 0.02889, "same_dom": 0.015949, "diff_cos_f": 0.46086, "diff_shift_f": 1.326322, "diff_cls": 0.001573, "diff_dom": 0.035477, "func_cos_f": 0.406631, "func_shift_f": 1.486449, "func_cls": 0.031898, "func_dom": 0.012469, "null_cos_f": 0.385464, "null_shift_f": 1.400188, "null_cls": 0.006856, "null_dom": 0.030243}
+{"word": "knife", "cat": "tool", "same_cos_f": 0.456113, "same_shift_f": 1.38061, "same_cls": 0.025014, "same_dom": 0.011272, "diff_cos_f": 0.452504, "diff_shift_f": 1.369597, "diff_cls": 0.001845, "diff_dom": 0.029706, "func_cos_f": 0.417935, "func_shift_f": 1.4614, "func_cls": 0.009405, "func_dom": 0.007408, "null_cos_f": 0.470113, "null_shift_f": 1.318508, "null_cls": 0.01244, "null_dom": 0.018173}
+{"word": "shirt", "cat": "clothing", "same_cos_f": 0.49163, "same_shift_f": 1.202646, "same_cls": 0.060605, "same_dom": 0.009217, "diff_cos_f": 0.470344, "diff_shift_f": 1.285047, "diff_cls": 0.047128, "diff_dom": 0.009149, "func_cos_f": 0.477366, "func_shift_f": 1.336182, "func_cls": 0.046785, "func_dom": 0.002615, "null_cos_f": 0.515763, "null_shift_f": 1.286412, "null_cls": 0.043145, "null_dom": 0.008037}
+{"word": "pants", "cat": "clothing", "same_cos_f": 0.438434, "same_shift_f": 1.595347, "same_cls": 0.040673, "same_dom": 0.003046, "diff_cos_f": 0.432247, "diff_shift_f": 1.549431, "diff_cls": 0.037069, "diff_dom": 0.010054, "func_cos_f": 0.455908, "func_shift_f": 1.512159, "func_cls": 0.041555, "func_dom": 0.00796, "null_cos_f": 0.449751, "null_shift_f": 1.464669, "null_cls": 0.049552, "null_dom": 0.007844}
+
+--- execution ---
+timestamp: 2026-09-17T01:47:04.661316-05:00
+seed: 2810
+source: {"path": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\phase2810_phrase_modulation.py", "sha256": "38fe4bb5d016e5b872a3f7cab0b0682f4a508adbfe2735eb1f395f0e12efe3f7", "snapshot": "sources\\phase2810_phrase_modulation_38fe4bb5d016e5b8.py"}

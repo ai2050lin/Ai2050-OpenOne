@@ -1,0 +1,676 @@
+{
+  "schema_version": "snapshot.v1",
+  "snapshot_id": "SNAPSHOT-2026-08-13-0480c3ff45ba",
+  "as_of": "2026-08-13",
+  "source_sha256": "0480c3ff45bac6c2af42999b4ca620b69d8966835b8e36a508f2de40e3abd6f4",
+  "project": {
+    "id": "ai2050-language-mechanism",
+    "name": "AI2050 语言编码机制全局结构辨识",
+    "strategy": "global_structure_identification",
+    "north_star": "识别能够以低描述长度预测未知世界、未知干预、多步生成、组合与跨模型响应的功能状态及其转移结构。",
+    "theory_status": "条件化输出场闭合理论与 RDC 术语保持不变。C013 supports predictive functional equivalence as the correct estimand and independently sourced donor rescue as a valid known-truth subobject, while showing that point-threshold abstention is unstable for risk-boundary systems. Functional state should be typed by a risk-qualified quotient with an explicit unresolved boundary region. Existing linear algebra, conditional dynamics, intervention, quotient and elementary error-bound language remain sufficient; no new foundational mathematics is authorized."
+  },
+  "framework": {
+    "schema_version": "research_framework.v1",
+    "framework_id": "RF-LANGUAGE-SYSTEM-IDENTIFICATION",
+    "title": "语言计算系统辨识研发框架",
+    "north_star": "寻找能够预测未见语言条件、内部干预和生成轨迹的最小经验规律。",
+    "current_stage_id": "R1",
+    "stages": [
+      {
+        "id": "R0",
+        "title": "证据与状态统一",
+        "status": "completed",
+        "progress": "Canonical Snapshot、客户端单一事实源和漂移审计已建立。",
+        "next_gate": "持续保持 Registry、Decision 与 Snapshot 无漂移。"
+      },
+      {
+        "id": "R1",
+        "title": "测量合同与已知真值校准",
+        "status": "active",
+        "progress": "已完成多轮相机、功能等价和救援校准；有限样本边界仍未闭合。",
+        "next_gate": "在新边界系统上确认区间化或稳定性证书。"
+      },
+      {
+        "id": "R2",
+        "title": "全轨迹条件响应",
+        "status": "blocked",
+        "progress": "已有局部真实组件 Trace，尚无冻结实验族的完整响应图谱。",
+        "next_gate": "R1 测量资格通过后采集 Tier A/B 轨迹。"
+      },
+      {
+        "id": "R3",
+        "title": "预测状态与复杂度曲面",
+        "status": "blocked",
+        "progress": "尚未在独立 Confirmation 上完成受限临摹器竞争。",
+        "next_gate": "R2 数据质量审计通过。"
+      },
+      {
+        "id": "R4",
+        "title": "结构化残差",
+        "status": "blocked",
+        "progress": "等待冻结预测模型产生稳定残差。",
+        "next_gate": "R3 至少一个候选稳定优于基线。"
+      },
+      {
+        "id": "R5",
+        "title": "协变与组合规律",
+        "status": "blocked",
+        "progress": "未授权。",
+        "next_gate": "残差候选在新数据上得到确认。"
+      },
+      {
+        "id": "R6",
+        "title": "因果预测与干预",
+        "status": "blocked",
+        "progress": "未授权。",
+        "next_gate": "先冻结影响方向、幅度、时间和副作用预测。"
+      },
+      {
+        "id": "R7",
+        "title": "自由生成与跨模型复现",
+        "status": "blocked",
+        "progress": "未授权。",
+        "next_gate": "至少两个模型在受控任务上形成预测规律候选。"
+      },
+      {
+        "id": "R8",
+        "title": "理论压缩",
+        "status": "blocked",
+        "progress": "未授权。",
+        "next_gate": "R2–R7 出现可重复、可反证的稳定结构。"
+      }
+    ],
+    "important_result_types": [
+      {
+        "id": "embedding_state",
+        "title": "词嵌入状态",
+        "renderer": "EmbeddingHeatmap"
+      },
+      {
+        "id": "hidden_state",
+        "title": "Hidden State 状态",
+        "renderer": "HiddenStateHeatmap"
+      },
+      {
+        "id": "response_trajectory",
+        "title": "条件响应轨迹",
+        "renderer": "TrajectoryRenderer"
+      },
+      {
+        "id": "causal_path",
+        "title": "因果路径",
+        "renderer": "CausalPathOverlay"
+      },
+      {
+        "id": "intervention_rescue",
+        "title": "干预与救援",
+        "renderer": "InterventionDeltaOverlay"
+      },
+      {
+        "id": "complexity_surface",
+        "title": "复杂度—跨度曲面",
+        "renderer": "Heatmap3DRenderer"
+      },
+      {
+        "id": "cross_model_mapping",
+        "title": "跨模型功能映射",
+        "renderer": "CrossModelMappingOverlay"
+      }
+    ]
+  },
+  "current": {
+    "phase": 1263,
+    "phase_record_id": "PHREC-GLM-1263-01",
+    "phase_type": "known_truth_predictive_equivalence_independent_rescue_calibration",
+    "phase_status": "adjudicated",
+    "verdict": "predictive_equivalence_independent_rescue_not_calibrated",
+    "campaign_id": "C013",
+    "campaign_name": "Predictive functional equivalence and independent-rescue calibration",
+    "campaign_status": "blocked",
+    "bottleneck": "Phase1263/C013 changed the estimand from hidden generator identity to a reference-risk predictive functional quotient and separated independent donor rescue from algebraic replay. Exact class recovery was 318/320 and abstention 82/84: two equivalence-overlap systems straddled the frozen 0.050 risk boundary across reference panels but fell just below it on selection. All applicable response, independent rescue, wrong-identity, control and leakage-sentinel gates passed. The bottleneck is finite-sample certification of boundary abstention, not candidate capacity.",
+    "next_decision": "C013 is closed before free-network execution. Do not delete the two overlap systems, widen the pass threshold, rerun seeds, or treat the successful algebraic replay sentinel as mediation. Any future campaign must preregister a finite-sample stability certificate or interval-valued quotient and prove it on fresh margin/boundary systems before external validity.",
+    "auto_continue": false,
+    "decision_id": "D016",
+    "decision_title": "Close C013 at the finite-sample abstention boundary and preserve independent rescue separately"
+  },
+  "counts": {
+    "campaigns": 13,
+    "hypotheses": 9,
+    "puzzles": 14,
+    "tests": 19,
+    "evidence": 30,
+    "phases": 28,
+    "decisions": 16,
+    "sources": 23,
+    "objects": 17,
+    "constructs": 8,
+    "contracts": 16,
+    "runs": 16,
+    "artifacts": 91,
+    "corrections": 9
+  },
+  "information_architecture": {
+    "entry_points": [
+      "space3d",
+      "theory",
+      "rnd"
+    ],
+    "research_center_modes": [
+      "theory",
+      "rnd"
+    ],
+    "stage_prefix": "R",
+    "module_prefix": "M",
+    "puzzle_prefix": "P",
+    "evidence_grade_prefix": "E",
+    "technical_stage_mapping": {
+      "M0": "R0",
+      "M1": "R1",
+      "M2": "R2",
+      "M3": "R3",
+      "M4": "R4",
+      "M5": "R5",
+      "M6": "R6",
+      "M7": "R7",
+      "M8": "R8"
+    }
+  },
+  "summaries": {
+    "hypotheses": [
+      {
+        "id": "H00",
+        "name": "局部条件化模体零假说",
+        "status": "candidate"
+      },
+      {
+        "id": "H01",
+        "name": "固定方向编码",
+        "status": "bounded_rejected"
+      },
+      {
+        "id": "H02",
+        "name": "层间旋转子空间",
+        "status": "candidate"
+      },
+      {
+        "id": "H03",
+        "name": "稀疏因果联盟",
+        "status": "candidate"
+      },
+      {
+        "id": "H04",
+        "name": "内容—角色因子化",
+        "status": "candidate"
+      },
+      {
+        "id": "H05",
+        "name": "内容—协议分离",
+        "status": "candidate"
+      },
+      {
+        "id": "H06",
+        "name": "条件化路由图",
+        "status": "candidate"
+      },
+      {
+        "id": "H07",
+        "name": "预测动力状态",
+        "status": "candidate"
+      },
+      {
+        "id": "H08",
+        "name": "语言操作代数",
+        "status": "candidate"
+      }
+    ],
+    "puzzles": [
+      {
+        "id": "P00",
+        "name": "功能构念分型",
+        "status": "partial",
+        "closure_level": 1,
+        "blocker": "K210 表明类型边界存在，但新的功能等价合同尚未在全新材料上冻结。"
+      },
+      {
+        "id": "P01",
+        "name": "合法观察与干预语义",
+        "status": "partial",
+        "closure_level": 2,
+        "blocker": "已知真值中可识别边界清楚，自然化 Qwen3 的 matched-null 与 carrier 仍失败。"
+      },
+      {
+        "id": "P02",
+        "name": "稳定行为对象",
+        "status": "partial",
+        "closure_level": 1,
+        "blocker": "五个原子操作和对象—marker 内容稳定，但统一家族、严格短串和自然功能仍未共同闭合。"
+      },
+      {
+        "id": "P03",
+        "name": "未来因果响应张量",
+        "status": "blocked",
+        "closure_level": 0,
+        "blocker": "旧 Phase 1236 未获自动授权；新类型化合同和相机校准尚未完成。"
+      },
+      {
+        "id": "P04",
+        "name": "全局轮廓与轨迹图谱",
+        "status": "not_started",
+        "closure_level": 0,
+        "blocker": "尚未对统一测试宇宙完成全域低成本扫描。"
+      },
+      {
+        "id": "P05",
+        "name": "紧凑预测功能状态",
+        "status": "not_started",
+        "closure_level": 0,
+        "blocker": "没有统一响应张量，候选结构尚未竞赛。"
+      },
+      {
+        "id": "P06",
+        "name": "条件路由与最小因果联盟",
+        "status": "instrument_only",
+        "closure_level": 2,
+        "blocker": "K203 只在已知真值固定布局通过；Qwen 答案边界单点补丁 K200 失败。"
+      },
+      {
+        "id": "P07",
+        "name": "内容—角色—协议因子化",
+        "status": "partial",
+        "closure_level": 1,
+        "blocker": "只有类型化行为边界，没有跨协议和跨角色双向因果交换。"
+      },
+      {
+        "id": "P08",
+        "name": "自回归生成闭环",
+        "status": "not_started",
+        "closure_level": 1,
+        "blocker": "现有候选、trie 和句式行为不等于自然全词表因果生成。"
+      },
+      {
+        "id": "P09",
+        "name": "语言操作组合律",
+        "status": "partial",
+        "closure_level": 1,
+        "blocker": "五原子只有窄行为资格，家族行为与单点因果链没有闭合。"
+      },
+      {
+        "id": "P10",
+        "name": "跨模型功能同构",
+        "status": "blocked",
+        "closure_level": 0,
+        "blocker": "尚无任何一个对象在单模型达到 L5。"
+      },
+      {
+        "id": "P11",
+        "name": "训练形成机制",
+        "status": "partial",
+        "closure_level": 2,
+        "blocker": "时钟构念已校准，但自由网络外部效度和当前形成前摘要预测失败。"
+      },
+      {
+        "id": "P12",
+        "name": "自然语言外部效度",
+        "status": "blocked",
+        "closure_level": 1,
+        "blocker": "受控对象尚未完成 L5/L6，直接扩展自然语言会重新进入对象迁移循环。"
+      },
+      {
+        "id": "P13",
+        "name": "新数学升级门",
+        "status": "gate_closed",
+        "closure_level": 0,
+        "blocker": "当前缺口是经验对象未识别，而不是现有数学无法表达。"
+      }
+    ],
+    "evidence": {
+      "grade_counts": {
+        "E0-ENG": 1,
+        "E2": 1,
+        "E2-KT": 1,
+        "E2-KT-CANDIDATE": 1,
+        "E2-QWEN": 2,
+        "E3": 6,
+        "E3-CONTROLLED-FREE": 2,
+        "E3-INSTRUMENT": 1,
+        "E3-KT": 8,
+        "E3-KT-BOUNDARY": 1,
+        "E3-KT-MIXED-BOUNDARY": 1,
+        "E3-MATH": 1,
+        "E3-METHOD": 2,
+        "E3-Q": 1,
+        "E3-TYPED": 1
+      },
+      "polarity_counts": {
+        "calibration": 3,
+        "identifiability_boundary": 1,
+        "infrastructure": 1,
+        "mixed_boundary": 3,
+        "mixed_instrument_boundary": 1,
+        "negative_boundary": 12,
+        "negative_identifiability_boundary": 2,
+        "positive": 1,
+        "positive_boundary": 1,
+        "positive_external_validity": 1,
+        "positive_instrument_calibration": 3,
+        "qualification_boundary": 1
+      },
+      "max_closure_level": 3,
+      "latest": [
+        {
+          "id": "K219",
+          "grade": "E2-QWEN",
+          "polarity": "negative_boundary",
+          "title": "Qwen3 late-OV coalition rescues and blocks but fails matched-null specificity",
+          "closure_level": 3
+        },
+        {
+          "id": "K220",
+          "grade": "E3-METHOD",
+          "polarity": "identifiability_boundary",
+          "title": "Aggregate null norm does not identify target-parallel contamination",
+          "closure_level": 2
+        },
+        {
+          "id": "K221",
+          "grade": "E3-INSTRUMENT",
+          "polarity": "positive_instrument_calibration",
+          "title": "Qwen-shaped head slicing and categorical identity geometry calibrated",
+          "closure_level": 2
+        },
+        {
+          "id": "K222",
+          "grade": "E2-QWEN",
+          "polarity": "mixed_boundary",
+          "title": "Direct queried-value transport separates from orthogonal context transport",
+          "closure_level": 3
+        },
+        {
+          "id": "K223",
+          "grade": "E3-KT",
+          "polarity": "positive_instrument_calibration",
+          "title": "Selective-operator type and path-mediation camera calibrated",
+          "closure_level": 3
+        },
+        {
+          "id": "K224",
+          "grade": "E3-CONTROLLED-FREE",
+          "polarity": "negative_identifiability_boundary",
+          "title": "Linear target-preserve/null-zero camera lacks free-network cross-depth external validity",
+          "closure_level": 2
+        },
+        {
+          "id": "K225",
+          "grade": "E3-KT-BOUNDARY",
+          "polarity": "negative_identifiability_boundary",
+          "title": "Generative family identity is not the same estimand as the minimal sufficient response compiler",
+          "closure_level": 2
+        },
+        {
+          "id": "K226",
+          "grade": "E3-KT-MIXED-BOUNDARY",
+          "polarity": "mixed_instrument_boundary",
+          "title": "Predictive functional quotient is recoverable away from a finite-sample abstention boundary",
+          "closure_level": 3
+        }
+      ]
+    },
+    "runs": [
+      {
+        "id": "RUN-EXP-C001-WP01-001-001",
+        "contract_id": "EXP-C001-WP01-001",
+        "status": "adjudicated",
+        "model": "Qwen3-4B",
+        "verdict": "bounded_rejected"
+      },
+      {
+        "id": "RUN-EXP-C002-WP00-001-001",
+        "contract_id": "EXP-C002-WP00-001",
+        "status": "adjudicated",
+        "model": "TinyCausalTransformer compact/deep, four free networks",
+        "verdict": "known_truth_imaging_camera_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C002-WP01-001-001",
+        "contract_id": "EXP-C002-WP01-001",
+        "status": "adjudicated",
+        "model": "Qwen3-4B FP16",
+        "verdict": "bounded_external_validity_failure"
+      },
+      {
+        "id": "RUN-EXP-C003-WP01-001-001",
+        "contract_id": "EXP-C003-WP01-001",
+        "status": "adjudicated",
+        "model": "TinyCausalTransformer compact/wide, four free networks",
+        "verdict": "known_truth_multievent_camera_not_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C004-WP01-001-001",
+        "contract_id": "EXP-C004-WP01-001",
+        "status": "adjudicated",
+        "model": "TinyCausalTransformer 4/6/8-layer, six free networks",
+        "verdict": "distributed_observation_necessity_rejected"
+      },
+      {
+        "id": "RUN-EXP-C005-WP01-001-001",
+        "contract_id": "EXP-C005-WP01-001",
+        "status": "adjudicated",
+        "model": "TinyCausalTransformer 4/6/8-layer, six new free networks",
+        "verdict": "known_truth_answer_state_handoff_not_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C006-WP01-001-001",
+        "contract_id": "EXP-C006-WP01-001",
+        "status": "adjudicated",
+        "model": "Planted Transformer-shaped QK/OV/MLP supernetwork, 192 sealed systems",
+        "verdict": "planted_component_edge_cut_camera_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C007-WP01-001-001",
+        "contract_id": "EXP-C007-WP01-001",
+        "status": "adjudicated",
+        "model": "TinyCausalTransformer 4/6/8-layer, six free networks under mixed executors",
+        "verdict": "free_transformer_typed_edge_coalition_not_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C008-WP01-001-001",
+        "contract_id": "EXP-C008-WP01-001",
+        "status": "adjudicated",
+        "model": "SameExecutorTinyCausalTransformer 4/6/8-layer, six new free networks",
+        "verdict": "free_transformer_typed_edge_coalition_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C009-WP01-001-001",
+        "contract_id": "EXP-C009-WP01-001",
+        "status": "adjudicated",
+        "model": "Qwen3-4B FP16 full CUDA, no quantization",
+        "verdict": "qwen3_typed_edge_coalition_not_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C010-WP01-001-001",
+        "contract_id": "EXP-C010-WP01-001",
+        "status": "adjudicated",
+        "model": "No language model; Qwen3-shaped CUDA FP16 tensors",
+        "verdict": "factorial_head_instrument_calibrated"
+      },
+      {
+        "id": "RUN-EXP-C010-WP02-001-001",
+        "contract_id": "EXP-C010-WP02-001",
+        "status": "adjudicated",
+        "model": "Qwen3-4B FP16 full CUDA, no quantization",
+        "verdict": "qwen3_natural_factorial_head_coalition_not_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C011-WP01-001-001",
+        "contract_id": "EXP-C011-WP01-001",
+        "status": "adjudicated",
+        "model": "384 known-truth selective-operator dynamical systems on CUDA float64",
+        "verdict": "selective_operator_mediation_camera_calibrated"
+      },
+      {
+        "id": "RUN-EXP-C011-WP02-001-001",
+        "contract_id": "EXP-C011-WP02-001",
+        "status": "adjudicated",
+        "model": "Same-executor TinyCausalTransformer 4/6/8-layer, six free networks",
+        "verdict": "free_transformer_selective_operator_mediation_not_confirmed"
+      },
+      {
+        "id": "RUN-EXP-C012-WP01-001-001",
+        "contract_id": "EXP-C012-WP01-001",
+        "status": "adjudicated",
+        "model": "336 known-truth factorial response systems on CUDA float64",
+        "verdict": "factorial_response_compiler_camera_not_calibrated"
+      },
+      {
+        "id": "RUN-EXP-C013-WP01-001-001",
+        "contract_id": "EXP-C013-WP01-001",
+        "status": "adjudicated",
+        "model": "320 known-truth predictive-equivalence systems on CUDA float64",
+        "verdict": "predictive_equivalence_independent_rescue_not_calibrated"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "D009",
+        "title": "Replace text-position handoff groups with typed causal-edge calibration",
+        "status": "active",
+        "authorizes": [
+          "free-network typed-edge external validity"
+        ],
+        "forbids": [
+          "rename position groups as modules",
+          "infer mechanism identity from output behavior"
+        ]
+      },
+      {
+        "id": "D010",
+        "title": "Require arithmetic-executor identity before intervention interpretation",
+        "status": "active",
+        "authorizes": [
+          "same-executor terminal correction",
+          "interpret qualified free-network intervention spectra"
+        ],
+        "forbids": [
+          "interpret executor-mismatched activation patches",
+          "repeat executor variants after the terminal correction"
+        ]
+      },
+      {
+        "id": "D011",
+        "title": "Authorize exactly one scoped Qwen3 typed-coalition test",
+        "status": "active",
+        "authorizes": [
+          "EXP-C009-WP01-001"
+        ],
+        "forbids": [
+          "GLM4 or DS7B",
+          "multiple Qwen interfaces",
+          "semantic or cross-model claims"
+        ]
+      },
+      {
+        "id": "D012",
+        "title": "Close local typed-edge campaign after Qwen3 matched-null failure",
+        "status": "active",
+        "authorizes": [
+          "document the full C006-C009 calibration ladder",
+          "design a future campaign only around genuinely new intervention semantics or a natural object contract"
+        ],
+        "forbids": [
+          "drop matched null",
+          "extend prefix size",
+          "rescan roles",
+          "run another model automatically",
+          "claim language encoding closure"
+        ]
+      },
+      {
+        "id": "D013",
+        "title": "Separate target-axis identity transport from orthogonal contextual transport",
+        "status": "active",
+        "authorizes": [
+          "design a future mechanism-truth causal mediation or subspace-selective instrument"
+        ],
+        "forbids": [
+          "discard orthogonal null",
+          "select an easy template",
+          "rescan the late band",
+          "run another pretrained model automatically",
+          "call direct identity success semantic closure"
+        ]
+      },
+      {
+        "id": "D014",
+        "title": "Close linear null-zero external validity and require complete factorial intervention semantics",
+        "status": "active",
+        "authorizes": [
+          "preregister a new known-truth factorial response-preserving compiler competition"
+        ],
+        "forbids": [
+          "Qwen3 escalation",
+          "threshold relaxation",
+          "seed replacement",
+          "return to Phase1258 hotspots",
+          "claim untested path mediation is negative",
+          "automatically launch C012"
+        ]
+      },
+      {
+        "id": "D015",
+        "title": "Close C012 at known-truth type failure and separate generator identity from predictive equivalence",
+        "status": "active",
+        "authorizes": [
+          "design a new predictive-equivalence campaign with margin-separated known truth"
+        ],
+        "forbids": [
+          "change C012 candidates or thresholds",
+          "rerun failed systems",
+          "delete smooth-local cases",
+          "launch Phase1262 free-network validation",
+          "run Qwen3",
+          "call the result a language mechanism"
+        ]
+      },
+      {
+        "id": "D016",
+        "title": "Close C013 at the finite-sample abstention boundary and preserve independent rescue separately",
+        "status": "active",
+        "authorizes": [
+          "design a new interval-valued or stability-certified functional quotient under a fresh campaign"
+        ],
+        "forbids": [
+          "delete overlap systems",
+          "change risk thresholds",
+          "increase only the same selection panel after unblinding",
+          "count replay as rescue",
+          "launch C013 WP02",
+          "run Qwen3",
+          "claim language encoding closure"
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "authority": "ai2050_research_os/registry",
+    "registry_files": [
+      "registry/artifacts.json",
+      "registry/campaigns.json",
+      "registry/constructs.json",
+      "registry/contracts.json",
+      "registry/corrections.json",
+      "registry/decisions.json",
+      "registry/evidence.json",
+      "registry/framework.json",
+      "registry/hypotheses.json",
+      "registry/objects.json",
+      "registry/phases.json",
+      "registry/project.json",
+      "registry/puzzles.json",
+      "registry/runs.json",
+      "registry/sources.json",
+      "registry/tests.json"
+    ],
+    "builder": "ai2050_research_os/scripts/researchctl.py"
+  }
+}

@@ -1,5 +1,5 @@
 """Whole-campaign independent arithmetic, provenance and scope checks."""
-import sys,re
+import sys,re,subprocess
 from pathlib import Path
 import numpy as np
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tests/glm5'))
@@ -9,6 +9,18 @@ from phase2684_source_campaign_delivery import OUT,CONTRACT,FIELD,SOURCE,PATHS,F
 
 def main():
     checks={};phases={p:read(path/'analysis/final.json') for p,path in ((2677,CONTRACT),(2678,FIELD),(2679,SOURCE),(2680,PATHS),(2681,FRESH),(2682,SCALAR),(2683,CROSS))}
+    # These independent CPU audits run only after all four actual protocols
+    # complete. Preserve frozen model outputs and original whole-string scores.
+    for key in ('qwen14','glm4','ds7','ds7_answer'):
+        subprocess.run([sys.executable,str(ROOT/'tests/glm5_temp/phase2683_completed_protocol_audit.py'),key],check=True)
+    subprocess.run([sys.executable,str(ROOT/'tests/glm5/phase2683_explicit_answer_audit.py'),'all_completed'],check=True)
+    answer_audits={key:read(CROSS/key/'analysis/explicit_answer_audit.json') for key in ('qwen14','glm4','ds7','ds7_answer')}
+    checks['all4_independent_protocol_audits']=all(read(CROSS/key/'analysis/independent_protocol_audit.json')['all_checks_passed'] for key in answer_audits)
+    checks['explicit_answer_posthoc_scoring_preserves_original_records']=all(
+        a['all_checks_passed'] and a['post_hoc'] and not a['semantic_accuracy_claim']
+        and a['original_artifacts_unchanged'] and a['legacy_fields_reproduced']
+        and a['source_hashes']['records']==sha(CROSS/key/'analysis/records.json')
+        and len(a['records'])==512 for key,a in answer_audits.items())
     checks['all7completed_phases']=all(r['all_checks_passed'] and not r['language_mechanism_closed'] for r in phases.values())
     numbers=[int(p) for p in re.findall(r'^## Phase (\d+):',MEMO.read_text(encoding='utf-8-sig'),re.M)]
     checks['recent_MEMO_continuous']=numbers[-7:]==list(range(2677,2684))
@@ -87,6 +99,7 @@ def main():
             assert float(z[key][link['coordinate']])==link['actual_Wdown']
     checks={k:bool(v) for k,v in checks.items()}
     summary={'all_checks_passed':all(checks.values()),'checks':checks,'full_coordinate_chart_checks':charts,'samebody_controls':body_pairs,'scalar_conditions':scalarconditions,
+             'explicit_answer_scoring_audit':{key:a['groups'] for key,a in answer_audits.items()},
              'independent_published_predictions':formula_checks,'max_coordinate_prediction_error':maxpred,'max_error_accounting_difference':maxerr,
              'boundary':'Basic exact-arithmetic/provenance checks; not statistical significance, semantic specificity or mechanism closure. All failures and partial counts retained.'}
     save(OUT/'analysis/scientific_checks.json',summary);print({k:v for k,v in summary.items() if k!='checks'});assert all(checks.values()),checks

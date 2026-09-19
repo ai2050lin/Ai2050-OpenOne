@@ -62,7 +62,7 @@ export default function NativeAtlasHeatmap() {
       <label>当前页行 <select aria-label="全坐标当前页行" value={selectedRow} onChange={(e) => setSelectedRow(Number(e.target.value))} style={{ maxWidth: '100%' }}>{page.rows.map((r, i) => <option key={r.row_index} value={i}>{r.row_index}: {r.label || r.source}</option>)}</select></label>
       <label>物理坐标 <input aria-label="全坐标精确编号" type="number" min="0" max={page.coordinate_count - 1} step="1" value={coordinate} onChange={(e) => setCoordinate(e.target.value)} style={{ width: 80 }} /></label>
       <p style={{ overflowWrap: 'anywhere' }}>原始值 [{selected?.row_index}, {coordinate}] = {value === undefined ? '编号超出范围' : String(value)}<br />{selected?.label || selected?.source}</p>
-      <p style={{ color: '#e4c689' }}>{page.display} 图中的导数/方向计数不等于参数本身；实际权重请使用下方单参数查询。不同模型坐标不可按编号对齐。</p>
+      <p style={{ color: '#e4c689' }}>{page.display} 请按当前类型区分真实权重、激活、投影项与方向计数；它们不是同一种量。上方精确编号可查询当前图的原值；来源/单参数面板另提供对应计算信息。不同模型坐标不可按编号对齐。</p>
     </>}
   </details>;
 }

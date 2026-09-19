@@ -1,0 +1,643 @@
+=== probe time: 2026-09-17 01:37:36 ===
+
+--- D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2806 ---
+      3970  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2806\qwen4_hierarchy\execution.json
+    115996  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2806\qwen4_hierarchy\hierarchy.npz
+      8795  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2806\qwen4_hierarchy\result.json
+
+--- D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2807 ---
+      6219  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2807\qwen4_heldout\execution.json
+   1002081  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2807\qwen4_heldout\heldout.npz
+      5236  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2807\qwen4_heldout\result.json
+
+--- D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2808 ---
+      3419  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2808\crossmodel_hierarchy\execution.json
+     18997  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2808\crossmodel_hierarchy\result.json
+
+--- D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2809 ---
+       793  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2809\qwen4_nesting_tautology\execution.json
+      1149  D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2809\qwen4_nesting_tautology\result.json
+
+--- D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913\phase2810 ---
+MISSING
+
+===== phase2807/qwen4_heldout/execution.json =====
+timestamp: "2026-09-16T23:58:09.236156-05:00"
+source:   path: "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\phase2807_rdc_heldout.py"
+  sha256: "004593e2f3eb1ad7481e4c0520d919744b62bf0618768c68e18c8cc5ea946c6f"
+  snapshot: "sources\\phase2807_rdc_heldout_004593e2f3eb1ad7.py"
+prereg:   P-I1: "generalization iff held-out full-dim accuracy >= 0.80 (chance 0.10)"
+  P-I2: "efficiency generalizes iff 10-dim held-out accuracy >= 0.85 x full-dim held-out accuracy"
+  P-I3: "level grading generalizes iff mean dom-energy share of held-out cross-domain pairs >= 3 x that of held-out same-class pairs"
+  verdict: "generalization_law iff P-I1 AND P-I2"
+held:   fruit: ["plum", "fig", "coconut", "olive", "prune", "melon", "date", "almond", "lime"]
+  animal: ["deer", "bear", "monkey", "elephant", "dolphin", "whale", "snake", "frog", "duck", "goat"]
+  metal: ["lead", "zinc", "platinum", "titanium", "chrome", "magnesium", "calcium", "lithium", "sodium", "mercury"]
+  vehicle: ["scooter", "tractor", "subway", "ferry", "canoe", "kayak", "trailer", "wagon", "sedan", "raft"]
+  country: ["Norway", "Sweden", "Finland", "Poland", "Portugal", "Greece", "Mexico", "Kenya", "Chile", "Peru"]
+  food: ["tofu", "sausage", "bacon", "ham", "salad", "curry", "pie", "cake", "candy", "stew"]
+  nature: ["beach", "island", "valley", "storm", "thunder", "fog", "frost", "star", "moon", "cave"]
+  furniture: ["couch", "drawer", "mattress", "pillow", "rug", "dresser", "cot", "crib", "buffet", "mat"]
+  tool: ["router", "grinder", "mop", "vice", "screw", "bolt", "nut", "clamp", "wedge", "punch"]
+  clothing: ["vest", "jeans", "skirt", "blouse", "sweater", "robe", "uniform", "boot", "cap", "gown"]
+held_rejected:   fruit: ["apricot 3tok", "papaya 3tok", "guava 2tok", "lychee 3tok", "raisin 2tok", "kiwi 2tok", "quince 2tok", "durian 2tok", "pomelo 3tok", "pawpaw 4tok"]
+  metal: ["tungsten 3tok", "cobalt 2tok", "radium 2tok", "barium 2tok", "cesium 2tok", "osmium 2tok", "iridium 3tok", "rhodium 2tok", "gallium 3tok", "arsenic 2tok", "indium 2tok"]
+  vehicle: ["limo 2tok", "sleigh 2tok", "glider 2tok"]
+  food: ["noodle 2tok"]
+  nature: ["meadow 2tok"]
+  furniture: ["cradle 2tok", "bookcase 2tok", "ottoman 2tok", "hutch 2tok"]
+  tool: ["chisel 2tok", "lathe 2tok", "sander 2tok", "spanner 2tok", "crowbar 2tok", "anvil 2tok", "hatchet 2tok", "trowel 3tok", "auger 2tok", "mallet 2tok", "adze 2tok"]
+  clothing: ["apron 2tok", "scarf in-atlas", "kimono 2tok", "sneaker 3tok"]
+pairs: [["plum", "fig", "same_class"], ["whale", "dolphin", "same_class"], ["couch", "rug", "same_class"], ["plum", "tractor", "cross_domain"], ["whale", "bolt", "cross_domain"], ["couch", "tiger", "cross_domain"], ["plum", "Norway", "cross_realm"]]
+seed: 2807
+note: "class words of 2806 read from its execution.json"
+cats_2806:   fruit: ["apple", "banana", "orange", "grape", "lemon", "peach", "pear", "mango", "cherry", "berry"]
+  animal: ["dog", "cat", "horse", "cow", "lion", "tiger", "wolf", "rabbit", "bird", "fish"]
+  metal: ["gold", "silver", "iron", "copper", "steel", "bronze", "brass", "tin", "aluminum", "nickel"]
+  vehicle: ["car", "bus", "truck", "train", "ship", "boat", "plane", "bicycle", "taxi", "tram"]
+  country: ["Japan", "China", "France", "Germany", "Brazil", "India", "Canada", "Russia", "Italy", "Egypt"]
+  food: ["bread", "rice", "cheese", "egg", "meat", "soup", "pasta", "pizza", "honey", "butter"]
+  nature: ["ocean", "river", "mountain", "forest", "desert", "lake", "rain", "snow", "cloud", "wind"]
+  furniture: ["chair", "table", "bed", "desk", "sofa", "shelf", "cabinet", "bench", "stool", "wardrobe"]
+  tool: ["hammer", "knife", "file", "wrench", "drill", "saw", "axe", "nail", "rope", "shovel"]
+  clothing: ["shirt", "pants", "dress", "coat", "shoe", "sock", "hat", "glove", "scarf", "jacket"]
+
+===== phase2807/qwen4_heldout/result.json =====
+phase: 2807
+prereg:   P-I1: "generalization iff held-out full-dim accuracy >= 0.80 (chance 0.10)"
+  P-I2: "efficiency generalizes iff 10-dim held-out accuracy >= 0.85 x full-dim held-out accuracy"
+  P-I3: "level grading generalizes iff mean dom-energy share of held-out cross-domain pairs >= 3 x that of held-out same-class pairs"
+  verdict: "generalization_law iff P-I1 AND P-I2"
+verdict:   acc_full_heldout: 0.838
+  acc_k_heldout:     1: 0.141
+    2: 0.313
+    3: 0.333
+    4: 0.354
+    5: 0.414
+    6: 0.495
+    7: 0.485
+    8: 0.505
+    9: 0.485
+    10: 0.869
+  acc_2dom_heldout: 0.313
+  wrong_pairs: [["fig", "tool"], ["prune", "tool"], ["date", "tool"], ["lead", "tool"], ["trailer", "tool"], ["raft", "tool"], ["ham", "tool"], ["stew", "tool"], ["rug", "tool"], ["dresser", "clothing"], ["cot", "tool"], ["buffet", "food"], ["mat", "tool"], ["uniform", "tool"], ["boot", "tool"], ["cap", "tool"]]
+  generalization: true
+  efficiency_generalizes: true
+  dom_share_same_class: 0.002
+  dom_share_cross_domain: 0.0427
+  level_grading_generalizes: true
+  n_heldout_words: 99
+  gates:     E_vs_atlas: 0.0
+    lens_vs_2797: 7e-06
+    dW_vs_2806: "1.82e-09"
+    overlap: 0
+  generalization_law: true
+pair_rows: [{"pair": "plum-fig", "tag": "same_class", "norm": 1.7, "dom_energy_share": 0.003, "class_energy_share": 0.015, "residual_share": 0.985}, {"pair": "whale-dolphin", "tag": "same_class", "norm": 1.2, "dom_energy_share": 0.001, "class_energy_share": 0.005, "residual_share": 0.995}, {"pair": "couch-rug", "tag": "same_class", "norm": 1.6, "dom_energy_share": 0.002, "class_energy_share": 0.024, "residual_share": 0.976}, {"pair": "plum-tractor", "tag": "cross_domain", "norm": 1.6, "dom_energy_share": 0.022, "class_energy_share": 0.045, "residual_share": 0.955}, {"pair": "whale-bolt", "tag": "cross_domain", "norm": 1.6, "dom_energy_share": 0.015, "class_energy_share": 0.038, "residual_share": 0.962}, {"pair": "couch-tiger", "tag": "cross_domain", "norm": 1.5, "dom_energy_share": 0.091, "class_energy_share": 0.176, "residual_share": 0.824}, {"pair": "plum-Norway", "tag": "cross_realm", "norm": 1.6, "dom_energy_share": 0.017, "class_energy_share": 0.112, "residual_share": 0.888}]
+held_words:   fruit: ["plum", "fig", "coconut", "olive", "prune", "melon", "date", "almond", "lime"]
+  animal: ["deer", "bear", "monkey", "elephant", "dolphin", "whale", "snake", "frog", "duck", "goat"]
+  metal: ["lead", "zinc", "platinum", "titanium", "chrome", "magnesium", "calcium", "lithium", "sodium", "mercury"]
+  vehicle: ["scooter", "tractor", "subway", "ferry", "canoe", "kayak", "trailer", "wagon", "sedan", "raft"]
+  country: ["Norway", "Sweden", "Finland", "Poland", "Portugal", "Greece", "Mexico", "Kenya", "Chile", "Peru"]
+  food: ["tofu", "sausage", "bacon", "ham", "salad", "curry", "pie", "cake", "candy", "stew"]
+  nature: ["beach", "island", "valley", "storm", "thunder", "fog", "frost", "star", "moon", "cave"]
+  furniture: ["couch", "drawer", "mattress", "pillow", "rug", "dresser", "cot", "crib", "buffet", "mat"]
+  tool: ["router", "grinder", "mop", "vice", "screw", "bolt", "nut", "clamp", "wedge", "punch"]
+  clothing: ["vest", "jeans", "skirt", "blouse", "sweater", "robe", "uniform", "boot", "cap", "gown"]
+
+===== phase2808/crossmodel_hierarchy/result.json =====
+phase: 2808
+prereg:   P-H1: "nesting_general iff every model has both domain-direction projection retentions >= 0.90"
+  P-H2: "efficiency_general iff every model has 10-dim class-direction accuracy >= 0.85 x full-dim accuracy"
+  P-H3: "grading_general iff every model has mean dom-energy share of cross-domain pairs >= 3 x same-class pairs"
+  verdict: "hierarchy_law_general iff P-H1 AND P-H2 AND P-H3"
+verdict:   per_model:     ds7:       arch: "['Qwen2ForCausalLM']"
+      tie: false
+      rms_eps: 1e-06
+      hidden_size: 3584
+      gateE_tie_check: -1.0
+      dW_zero_sum: "2.01e-16"
+      nesting:         nat_art: 1.0
+        liv_non: 1.0
+      P-G1: true
+      rho_tree: 0.282
+      P-G2: false
+      col_var_domain_share: 0.25
+      P-G3: false
+      acc_full: 0.38
+      acc_k:         1: 0.15
+        2: 0.22
+        3: 0.23
+        4: 0.25
+        5: 0.3
+        6: 0.29
+        7: 0.36
+        8: 0.35
+        9: 0.4
+        10: 0.38
+      acc_2dom: 0.22
+      P-G4: true
+      dom_share_same_class: 0.0013
+      dom_share_cross_domain: 0.0007
+      dom_ratio: 0.5
+      P-G5: false
+      merges: [["furniture", "clothing"], ["fruit", "animal"], ["tool", "cluster10"], ["cluster11", "cluster12"], ["food", "cluster13"], ["nature", "cluster14"], ["metal", "cluster15"], ["vehicle", "cluster16"], ["country", "cluster17"]]
+    glm4:       arch: "['GlmForCausalLM']"
+      tie: false
+      rms_eps: 1.5625e-07
+      hidden_size: 4096
+      gateE_tie_check: -1.0
+      dW_zero_sum: "2.34e-17"
+      nesting:         nat_art: 1.0
+        liv_non: 1.0
+      P-G1: true
+      rho_tree: 0.432
+      P-G2: false
+      col_var_domain_share: 0.017
+      P-G3: false
+      acc_full: 0.37
+      acc_k:         1: 0.12
+        2: 0.16
+        3: 0.27
+        4: 0.24
+        5: 0.28
+        6: 0.3
+        7: 0.3
+        8: 0.31
+        9: 0.31
+        10: 0.36
+      acc_2dom: 0.22
+      P-G4: true
+      dom_share_same_class: 0.0003
+      dom_share_cross_domain: 0.0
+      dom_ratio: 0.0
+      P-G5: false
+      merges: [["animal", "vehicle"], ["furniture", "clothing"], ["nature", "cluster10"], ["fruit", "food"], ["tool", "cluster11"], ["metal", "cluster13"], ["cluster12", "cluster14"], ["cluster15", "cluster16"], ["country", "cluster17"]]
+    qwen17:       arch: "['Qwen3ForCausalLM']"
+      tie: true
+      rms_eps: 1e-06
+      hidden_size: 2048
+      gateE_tie_check: 0.0
+      dW_zero_sum: "9.71e-17"
+      nesting:         nat_art: 1.0
+        liv_non: 1.0
+      P-G1: true
+      rho_tree: 0.517
+      P-G2: true
+      col_var_domain_share: 0.376
+      P-G3: true
+      acc_full: 1.0
+      acc_k:         1: 0.38
+        2: 0.63
+        3: 0.74
+        4: 0.83
+        5: 0.86
+        6: 0.89
+        7: 0.89
+        8: 0.99
+        9: 1.0
+        10: 1.0
+      acc_2dom: 0.6
+      P-G4: true
+      dom_share_same_class: 0.0017
+      dom_share_cross_domain: 0.1293
+      dom_ratio: 77.6
+      P-G5: true
+      merges: [["fruit", "food"], ["furniture", "clothing"], ["tool", "cluster11"], ["animal", "nature"], ["cluster10", "cluster13"], ["vehicle", "cluster12"], ["cluster14", "cluster15"], ["metal", "cluster16"], ["country", "cluster17"]]
+    qwen25:       arch: "['Qwen2ForCausalLM']"
+      tie: true
+      rms_eps: 1e-06
+      hidden_size: 2048
+      gateE_tie_check: 0.0
+      dW_zero_sum: "5.20e-17"
+      nesting:         nat_art: 1.0
+        liv_non: 1.0
+      P-G1: true
+      rho_tree: 0.448
+      P-G2: false
+      col_var_domain_share: 0.189
+      P-G3: false
+      acc_full: 1.0
+      acc_k:         1: 0.34
+        2: 0.63
+        3: 0.75
+        4: 0.85
+        5: 0.87
+        6: 0.9
+        7: 0.93
+        8: 0.97
+        9: 1.0
+        10: 1.0
+      acc_2dom: 0.64
+      P-G4: true
+      dom_share_same_class: 0.0023
+      dom_share_cross_domain: 0.1207
+      dom_ratio: 51.7
+      P-G5: true
+      merges: [["fruit", "food"], ["furniture", "clothing"], ["animal", "vehicle"], ["tool", "cluster11"], ["nature", "cluster12"], ["metal", "cluster10"], ["cluster13", "cluster14"], ["cluster15", "cluster16"], ["country", "cluster17"]]
+  nesting_general: true
+  efficiency_general: true
+  grading_general: false
+  hierarchy_law_general: false
+per_model_full:   ds7:     arch: "['Qwen2ForCausalLM']"
+    tie: false
+    rms_eps: 1e-06
+    hidden_size: 3584
+    gateE_tie_check: -1.0
+    dW_zero_sum: "2.01e-16"
+    nesting:       nat_art: 1.0
+      liv_non: 1.0
+    P-G1: true
+    rho_tree: 0.282
+    P-G2: false
+    col_var_domain_share: 0.25
+    P-G3: false
+    acc_full: 0.38
+    acc_k:       1: 0.15
+      2: 0.22
+      3: 0.23
+      4: 0.25
+      5: 0.3
+      6: 0.29
+      7: 0.36
+      8: 0.35
+      9: 0.4
+      10: 0.38
+    acc_2dom: 0.22
+    P-G4: true
+    dom_share_same_class: 0.0013
+    dom_share_cross_domain: 0.0007
+    dom_ratio: 0.5
+    P-G5: false
+    pair_rows: [{"pair": "apple-banana", "tag": "same_class", "dom": 0.0, "cls": 0.003, "res": 0.997}, {"pair": "tiger-lion", "tag": "same_class", "dom": 0.003, "cls": 0.004, "res": 0.996}, {"pair": "car-bus", "tag": "same_class", "dom": 0.001, "cls": 0.004, "res": 0.996}, {"pair": "apple-bread", "tag": "cross_class_same_domain", "dom": 0.001, "cls": 0.003, "res": 0.997}, {"pair": "apple-tiger", "tag": "cross_class_same_domain", "dom": 0.0, "cls": 0.002, "res": 0.998}, {"pair": "apple-car", "tag": "cross_domain", "dom": 0.001, "cls": 0.003, "res": 0.997}, {"pair": "apple-hammer", "tag": "cross_domain", "dom": 0.0, "cls": 0.002, "res": 0.998}, {"pair": "apple-japan", "tag": "cross_realm", "dom": 0.0, "cls": 0.003, "res": 0.997}, {"pair": "car-tiger", "tag": "cross_domain", "dom": 0.001, "cls": 0.002, "res": 0.998}]
+    merges: [["furniture", "clothing"], ["fruit", "animal"], ["tool", "cluster10"], ["cluster11", "cluster12"], ["food", "cluster13"], ["nature", "cluster14"], ["metal", "cluster15"], ["vehicle", "cluster16"], ["country", "cluster17"]]
+  glm4:     arch: "['GlmForCausalLM']"
+    tie: false
+    rms_eps: 1.5625e-07
+    hidden_size: 4096
+    gateE_tie_check: -1.0
+    dW_zero_sum: "2.34e-17"
+    nesting:       nat_art: 1.0
+      liv_non: 1.0
+    P-G1: true
+    rho_tree: 0.432
+    P-G2: false
+    col_var_domain_share: 0.017
+    P-G3: false
+    acc_full: 0.37
+    acc_k:       1: 0.12
+      2: 0.16
+      3: 0.27
+      4: 0.24
+      5: 0.28
+      6: 0.3
+      7: 0.3
+      8: 0.31
+      9: 0.31
+      10: 0.36
+    acc_2dom: 0.22
+    P-G4: true
+    dom_share_same_class: 0.0003
+    dom_share_cross_domain: 0.0
+    dom_ratio: 0.0
+    P-G5: false
+    pair_rows: [{"pair": "apple-banana", "tag": "same_class", "dom": 0.001, "cls": 0.003, "res": 0.997}, {"pair": "tiger-lion", "tag": "same_class", "dom": 0.0, "cls": 0.002, "res": 0.998}, {"pair": "car-bus", "tag": "same_class", "dom": 0.0, "cls": 0.001, "res": 0.999}, {"pair": "apple-bread", "tag": "cross_class_same_domain", "dom": 0.001, "cls": 0.004, "res": 0.996}, {"pair": "apple-tiger", "tag": "cross_class_same_domain", "dom": 0.0, "cls": 0.005, "res": 0.995}, {"pair": "apple-car", "tag": "cross_domain", "dom": 0.0, "cls": 0.002, "res": 0.998}, {"pair": "apple-hammer", "tag": "cross_domain", "dom": 0.0, "cls": 0.004, "res": 0.996}, {"pair": "apple-japan", "tag": "cross_realm", "dom": 0.0, "cls": 0.004, "res": 0.996}, {"pair": "car-tiger", "tag": "cross_domain", "dom": 0.0, "cls": 0.001, "res": 0.999}]
+    merges: [["animal", "vehicle"], ["furniture", "clothing"], ["nature", "cluster10"], ["fruit", "food"], ["tool", "cluster11"], ["metal", "cluster13"], ["cluster12", "cluster14"], ["cluster15", "cluster16"], ["country", "cluster17"]]
+  qwen17:     arch: "['Qwen3ForCausalLM']"
+    tie: true
+    rms_eps: 1e-06
+    hidden_size: 2048
+    gateE_tie_check: 0.0
+    dW_zero_sum: "9.71e-17"
+    nesting:       nat_art: 1.0
+      liv_non: 1.0
+    P-G1: true
+    rho_tree: 0.517
+    P-G2: true
+    col_var_domain_share: 0.376
+    P-G3: true
+    acc_full: 1.0
+    acc_k:       1: 0.38
+      2: 0.63
+      3: 0.74
+      4: 0.83
+      5: 0.86
+      6: 0.89
+      7: 0.89
+      8: 0.99
+      9: 1.0
+      10: 1.0
+    acc_2dom: 0.6
+    P-G4: true
+    dom_share_same_class: 0.0017
+    dom_share_cross_domain: 0.1293
+    dom_ratio: 77.6
+    P-G5: true
+    pair_rows: [{"pair": "apple-banana", "tag": "same_class", "dom": 0.003, "cls": 0.013, "res": 0.987}, {"pair": "tiger-lion", "tag": "same_class", "dom": 0.0, "cls": 0.003, "res": 0.997}, {"pair": "car-bus", "tag": "same_class", "dom": 0.002, "cls": 0.01, "res": 0.99}, {"pair": "apple-bread", "tag": "cross_class_same_domain", "dom": 0.021, "cls": 0.249, "res": 0.751}, {"pair": "apple-tiger", "tag": "cross_class_same_domain", "dom": 0.006, "cls": 0.236, "res": 0.764}, {"pair": "apple-car", "tag": "cross_domain", "dom": 0.139, "cls": 0.331, "res": 0.669}, {"pair": "apple-hammer", "tag": "cross_domain", "dom": 0.156, "cls": 0.311, "res": 0.689}, {"pair": "apple-japan", "tag": "cross_realm", "dom": 0.095, "cls": 0.229, "res": 0.771}, {"pair": "car-tiger", "tag": "cross_domain", "dom": 0.093, "cls": 0.201, "res": 0.799}]
+    merges: [["fruit", "food"], ["furniture", "clothing"], ["tool", "cluster11"], ["animal", "nature"], ["cluster10", "cluster13"], ["vehicle", "cluster12"], ["cluster14", "cluster15"], ["metal", "cluster16"], ["country", "cluster17"]]
+  qwen25:     arch: "['Qwen2ForCausalLM']"
+    tie: true
+    rms_eps: 1e-06
+    hidden_size: 2048
+    gateE_tie_check: 0.0
+    dW_zero_sum: "5.20e-17"
+    nesting:       nat_art: 1.0
+      liv_non: 1.0
+    P-G1: true
+    rho_tree: 0.448
+    P-G2: false
+    col_var_domain_share: 0.189
+    P-G3: false
+    acc_full: 1.0
+    acc_k:       1: 0.34
+      2: 0.63
+      3: 0.75
+      4: 0.85
+      5: 0.87
+      6: 0.9
+      7: 0.93
+      8: 0.97
+      9: 1.0
+      10: 1.0
+    acc_2dom: 0.64
+    P-G4: true
+    dom_share_same_class: 0.0023
+    dom_share_cross_domain: 0.1207
+    dom_ratio: 51.7
+    P-G5: true
+    pair_rows: [{"pair": "apple-banana", "tag": "same_class", "dom": 0.002, "cls": 0.012, "res": 0.988}, {"pair": "tiger-lion", "tag": "same_class", "dom": 0.001, "cls": 0.004, "res": 0.996}, {"pair": "car-bus", "tag": "same_class", "dom": 0.004, "cls": 0.014, "res": 0.986}, {"pair": "apple-bread", "tag": "cross_class_same_domain", "dom": 0.022, "cls": 0.243, "res": 0.757}, {"pair": "apple-tiger", "tag": "cross_class_same_domain", "dom": 0.007, "cls": 0.237, "res": 0.763}, {"pair": "apple-car", "tag": "cross_domain", "dom": 0.131, "cls": 0.313, "res": 0.687}, {"pair": "apple-hammer", "tag": "cross_domain", "dom": 0.146, "cls": 0.311, "res": 0.689}, {"pair": "apple-japan", "tag": "cross_realm", "dom": 0.114, "cls": 0.27, "res": 0.73}, {"pair": "car-tiger", "tag": "cross_domain", "dom": 0.085, "cls": 0.181, "res": 0.819}]
+    merges: [["fruit", "food"], ["furniture", "clothing"], ["animal", "vehicle"], ["tool", "cluster11"], ["nature", "cluster12"], ["metal", "cluster10"], ["cluster13", "cluster14"], ["cluster15", "cluster16"], ["country", "cluster17"]]
+
+===== phase2809/qwen4_nesting_tautology/result.json =====
+phase: 2809
+prereg:   P-J1: "rank precondition iff numerical rank of dW_class == 9"
+  P-J2: "tautology iff null median nesting retention >= 0.999"
+  P-J3: "alignment_substantive iff real max|cos(dom row over 10 class directions)| >= 95th percentile of null max|cos|"
+  verdict: "nesting_substantive iff NOT (P-J1 AND P-J2); tautology downgrades 2806/2808 P-G1 headlines; alignment survives iff P-J3"
+verdict:   dW_singular_top5: [0.7, 0.6, 0.6, 0.6, 0.5]
+  dW_singular_last: 0.0
+  numerical_rank: 9
+  affine_rank_centroids: 9
+  real_nesting_nat_art: 1.0
+  null_nest_max_median: 1.0
+  null_nest_max_q05: 1.0
+  null_nest_max_q95: 1.0
+  null_nest_max_min: 1.0
+  real_max_abs_cos_dom_row: 0.504
+  null_max_abs_cos_q95: 0.485
+  null_max_abs_cos_median: 0.435
+  rank_precondition: true
+  tautology: true
+  alignment_substantive: true
+  nesting_substantive: false
+  final_reading: "nesting_fact_is_algebraic_identity_but_alignment_structure_nontrivial"
+
+===== phase2806/qwen4_hierarchy/execution.json =====
+timestamp: "2026-09-16T23:32:41.870384-05:00"
+source:   path: "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\phase2806_rdc_hierarchy.py"
+  sha256: "845ba46cc7a2a073c3be98672213c61c352a6dca4f59945114f7844744ff91ad"
+  snapshot: "sources\\phase2806_rdc_hierarchy_845ba46cc7a2a073.py"
+prereg:   P-G1: "nesting iff both domain directions have class-subspace projection retention >= 0.90"
+  P-G2: "tree consistency iff Spearman(cophenetic, semantic distance 1/2/3) >= 0.5"
+  P-G3: "hierarchical layout iff domain share of column variance >= 0.30 AND class-within share >= 0.30"
+  P-G4: "efficiency iff 10-dim class-direction accuracy >= 0.85 x full-dim nearest-centroid accuracy"
+  P-G5: "level grading iff mean domain-direction energy share (cross-domain pairs) >= 3 x (same-class pairs)"
+  verdict: "hierarchy_law iff P-G1 AND P-G2 AND P-G3 AND P-G4"
+cats:   fruit: ["apple", "banana", "orange", "grape", "lemon", "peach", "pear", "mango", "cherry", "berry"]
+  animal: ["dog", "cat", "horse", "cow", "lion", "tiger", "wolf", "rabbit", "bird", "fish"]
+  metal: ["gold", "silver", "iron", "copper", "steel", "bronze", "brass", "tin", "aluminum", "nickel"]
+  vehicle: ["car", "bus", "truck", "train", "ship", "boat", "plane", "bicycle", "taxi", "tram"]
+  country: ["Japan", "China", "France", "Germany", "Brazil", "India", "Canada", "Russia", "Italy", "Egypt"]
+  food: ["bread", "rice", "cheese", "egg", "meat", "soup", "pasta", "pizza", "honey", "butter"]
+  nature: ["ocean", "river", "mountain", "forest", "desert", "lake", "rain", "snow", "cloud", "wind"]
+  furniture: ["chair", "table", "bed", "desk", "sofa", "shelf", "cabinet", "bench", "stool", "wardrobe"]
+  tool: ["hammer", "knife", "file", "wrench", "drill", "saw", "axe", "nail", "rope", "shovel"]
+  clothing: ["shirt", "pants", "dress", "coat", "shoe", "sock", "hat", "glove", "scarf", "jacket"]
+domain_of:   fruit: "natural"
+  food: "natural"
+  animal: "natural"
+  nature: "natural"
+  metal: "natural"
+  vehicle: "artifact"
+  tool: "artifact"
+  furniture: "artifact"
+  clothing: "artifact"
+  country: "abstract"
+nat_dom: ["fruit", "food", "animal", "nature", "metal"]
+art_dom: ["vehicle", "tool", "furniture", "clothing"]
+living: ["fruit", "food", "animal"]
+pairs: [["apple", "banana", "same_class"], ["tiger", "lion", "same_class"], ["car", "bus", "same_class"], ["apple", "bread", "cross_class_same_domain"], ["apple", "tiger", "cross_class_same_domain"], ["apple", "car", "cross_domain"], ["apple", "hammer", "cross_domain"], ["apple", "japan", "cross_realm"], ["car", "tiger", "cross_domain"]]
+seed: 2806
+
+===== rdc_construction_common.py =====
+--- match @19 ---
+   19 BASE = RESULT / 'rdc_query_construction_20260913'
+   20 MEMO = ROOT / 'research/glm5/docs/AGI_GLM5_MEMO.md'
+   21 
+   22 
+   23 def rank(value):
+   24     return hashlib.sha256(('construction2745/' + str(value)).encode()).hexdigest()
+   25 
+   26 
+   27 def snapshot(path):
+   28     path = Path(path)
+   29     digest = sha(path)
+   30     dest = BASE / 'sources' / (path.stem + '_' + digest[:16] + path.suffix)
+   31     if not dest.exists():
+   32         dest.parent.mkdir(parents=True, exist_ok=True)
+   33         shutil.copyfile(path, dest)
+   34     assert sha(dest) == digest
+   35     return {'path': str(path), 'sha256': digest, 'snapshot': str(dest.relative_to(BASE))}
+   36 
+   37 
+   38 def guard(expected_bytes=0):
+   39     """Safety reserve is not an experiment-size quota or a completion criterion."""
+   40     free = shutil.disk_usage(ROOT).free
+   41     assert free - expected_bytes > 4 * 1024**3, ('Physical free-space safety reserve', free, expected_bytes)
+   42     assert not (BASE / 'STOP_REQUESTED').exists(), 'Explicit local stop marker is present'
+   43 
+   44 
+   45 def ledger(kind, seconds, **extra):
+   46     path = BASE / 'compute_ledger.json'
+--- match @27 ---
+   27 def snapshot(path):
+   28     path = Path(path)
+   29     digest = sha(path)
+   30     dest = BASE / 'sources' / (path.stem + '_' + digest[:16] + path.suffix)
+   31     if not dest.exists():
+   32         dest.parent.mkdir(parents=True, exist_ok=True)
+   33         shutil.copyfile(path, dest)
+   34     assert sha(dest) == digest
+   35     return {'path': str(path), 'sha256': digest, 'snapshot': str(dest.relative_to(BASE))}
+   36 
+   37 
+   38 def guard(expected_bytes=0):
+   39     """Safety reserve is not an experiment-size quota or a completion criterion."""
+   40     free = shutil.disk_usage(ROOT).free
+   41     assert free - expected_bytes > 4 * 1024**3, ('Physical free-space safety reserve', free, expected_bytes)
+   42     assert not (BASE / 'STOP_REQUESTED').exists(), 'Explicit local stop marker is present'
+   43 
+   44 
+   45 def ledger(kind, seconds, **extra):
+   46     path = BASE / 'compute_ledger.json'
+   47     lock = BASE / 'compute_ledger.lock'
+   48     lock.parent.mkdir(parents=True, exist_ok=True)
+   49     start = time.monotonic()
+   50     fd = None
+   51     while fd is None:
+   52         try:
+   53             fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+   54         except FileExistsError:
+--- match @45 ---
+   45 def ledger(kind, seconds, **extra):
+   46     path = BASE / 'compute_ledger.json'
+   47     lock = BASE / 'compute_ledger.lock'
+   48     lock.parent.mkdir(parents=True, exist_ok=True)
+   49     start = time.monotonic()
+   50     fd = None
+   51     while fd is None:
+   52         try:
+   53             fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+   54         except FileExistsError:
+   55             assert time.monotonic() - start < 15, 'Ledger writer lock did not clear'
+   56             time.sleep(.025)
+   57     try:
+   58         records = read(path) if path.exists() else []
+   59         records.append({'timestamp': stamp(), 'kind': kind, 'seconds': seconds, **extra})
+   60         save(path, records)
+   61     finally:
+   62         os.close(fd)
+   63         lock.unlink()
+   64 
+   65 
+   66 def failure(out, start, exc):
+   67     seconds = time.monotonic() - start
+   68     save(Path(out) / ('failure_' + str(time.time_ns()) + '.json'),
+   69          {'timestamp': stamp(), 'seconds': seconds, 'error': str(exc), 'traceback': traceback.format_exc()})
+   70     ledger('failed_' + Path(out).name, seconds)
+   71 
+   72 
+
+===== rdc_feature_common.py =====
+--- match @16 ---
+   16 def stamp():
+   17     return datetime.now().astimezone().isoformat()
+   18 
+   19 def sha(path):
+   20     h = hashlib.sha256()
+   21     with Path(path).open('rb') as stream:
+   22         for chunk in iter(lambda: stream.read(8*1024**2), b''):
+   23             h.update(chunk)
+   24     return h.hexdigest()
+   25 
+   26 def read(path):
+   27     return json.loads(Path(path).read_text(encoding='utf-8'))
+   28 
+   29 def save(path, value):
+   30     path = Path(path)
+   31     path.parent.mkdir(parents=True, exist_ok=True)
+   32     temp = path.with_suffix(path.suffix + '.tmp')
+   33     temp.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf-8')
+   34     # Windows can deny rename while a read-only HTTP request briefly holds the old file.
+   35     # Preserve atomic writes and bounded retry; never truncate a live result in place.
+   36     for attempt in range(80):
+   37         try:
+   38             os.replace(temp, path)
+   39             break
+   40         except PermissionError:
+   41             if attempt==79:raise
+   42             time.sleep(.025)
+   43 
+--- match @29 ---
+   29 def save(path, value):
+   30     path = Path(path)
+   31     path.parent.mkdir(parents=True, exist_ok=True)
+   32     temp = path.with_suffix(path.suffix + '.tmp')
+   33     temp.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf-8')
+   34     # Windows can deny rename while a read-only HTTP request briefly holds the old file.
+   35     # Preserve atomic writes and bounded retry; never truncate a live result in place.
+   36     for attempt in range(80):
+   37         try:
+   38             os.replace(temp, path)
+   39             break
+   40         except PermissionError:
+   41             if attempt==79:raise
+   42             time.sleep(.025)
+   43 
+   44 def immutable(path, value):
+   45     if Path(path).exists():
+   46         assert read(path) == value, f'Immutable artifact changed: {path}'
+   47     else:
+   48         save(path, value)
+   49 
+   50 def bits(tensor):
+   51     import torch
+   52     assert tensor.dtype == torch.bfloat16
+   53     return tensor.detach().contiguous().cpu().view(torch.uint16).numpy().copy()
+   54 
+   55 def unbits(a):
+   56     return (np.asarray(a).astype(np.uint32) << 16).view(np.float32)
+--- match @72 ---
+   72 def npz(path, **arrays):
+   73     path = Path(path)
+   74     path.parent.mkdir(parents=True, exist_ok=True)
+   75     temp = path.with_name(path.stem + '.tmp.npz')
+   76     np.savez_compressed(temp, **arrays)
+   77     os.replace(temp, path)
+
+===== phase2662_symmetric_mapping_contract.py =====
+--- match @17 ---
+   17 def load_native(key):
+   18     os.environ['HF_DEACTIVATE_ASYNC_LOAD']='1';original=loading.safe_open
+   19     def pread(*args,**kwargs):kwargs['backend']='pread';return original(*args,**kwargs)
+   20     loading.safe_open=pread
+   21     try:return load_model(key)
+   22     finally:loading.safe_open=original
+   23 
+   24 
+   25 def evaluate_multi(row,text):
+   26     s=text.strip();pattern=r'(?i)Answer\s*:\s*(Yes|No)\.?' if row['language']=='en' else r'答案\s*[：:]\s*(是|否)[。.]?'
+   27     match=re.fullmatch(pattern,s);label=None if match is None else match[1].casefold() in ('yes','是')
+   28     return {'strict_correct':s.casefold()==row['target'].casefold(),'content_correct':label is not None and label==row['expected_yes'],'empty':not s,
+   29         'multi_format_recognized':match is not None,'multi_content_boundary':'Full structured answer required; only declared colon/whitespace/outerperiod variants allowed, no substring credit.'}
+   30 
+   31 
+   32 def compose(fam,lang,unit,form,v,o,p,q,m,style,shots,cal=False,multi=False):
+   33     a0,b0,body,_=parts(fam,lang,unit,form,v,o);names=(CAL_EN if lang=='en' else CAL_ZH) if cal else (EN if lang=='en' else ZH);a,b=names[unit*2:unit*2+2]
+   34     body=body.replace(a0,'{{A}}').replace(b0,'{{B}}').replace('{{A}}',a).replace('{{B}}',b);statement,_=relation(fam,lang,unit,form);en=lang=='en'
+   35     truth=v==p;affirm=truth!=bool(q);yes=affirm!=bool(m);words=['Yes','No'] if en else ['是','否'];positive,negative=words[m],words[1-m]
+   36     if en:
+   37         ask=('Is this statement ' if style==0 else 'Judge whether the statement is ')+('true' if q==0 else 'false')+('?' if style==0 else '.')
+   38         rule=f'Output code: for an affirmative answer use {positive}; for a negative answer use {negative}. Output only the code.' if style==0 else f'If the requested judgment holds, write {positive}. If it does not hold, write {negative}. Write nothing else.'
+   39         demo=''
+   40         if shots:
+   41             demo=f'\nExample 1: Statement: Two is larger than one. {ask} Code: {words[int(bool(q)!=bool(m))]}.\nExample 2: Statement: One is larger than two. {ask} Code: {words[1-int(bool(q)!=bool(m))]}.'
+   42         text=body+'\nStatement: '+statement((a,b)[p])+'. '+ask+'\n'+rule+demo+'\nNow output the code for the original statement.'
+   43     else:
+   44         ask=('这句话是否' if style==0 else '判断陈述是否')+('正确' if q==0 else '错误')+('？' if style==0 else '。')
+
+=== torch / cuda ===
+torch 2.13.0+cu130 cuda=True ngpu=1
+gpu0 NVIDIA GeForce RTX 5080 total=15.9GB
+
+=== model dir ===
+D:\AI2050\Ai2050-OpenOne\models\hf\qwen3-4b exists=True
+  .mdl
+  .msc
+  .mv
+  config.json
+  configuration.json
+  generation_config.json
+  LICENSE
+  merges.txt
+  model-00001-of-00003.safetensors
+  model-00002-of-00003.safetensors
+  model-00003-of-00003.safetensors
+  model.safetensors.index.json
+  README.md
+  tokenizer.json
+  tokenizer_config.json
+  vocab.json
+
+=== cc.ROOT / cc.BASE ===
+cc.ROOT=D:\AI2050\Ai2050-OpenOne
+cc.BASE=D:\AI2050\Ai2050-OpenOne\tests\glm5\result\rdc_query_construction_20260913

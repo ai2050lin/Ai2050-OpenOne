@@ -185,6 +185,7 @@ def review_and_plan():
     assert all(r['all_checks_passed'] for r in (fresh,scalar,cross))
     observations={'coordinate_confirmation':fresh['summary']['coordinate_confirmation'],'scalar_local_arithmetic':scalar['summary'],
                   'DS_actual_paired_protocol':read(CROSS/'analysis/DS_protocol_pair.json'),
+                  'posthoc_explicit_answer_audit':{key:read(CROSS/key/'analysis/explicit_answer_audit.json')['groups'] for key in ('qwen14','glm4','ds7','ds7_answer')},
                   'Qwen14_actual_candidate_weight_links':read(CROSS/'qwen14/analysis/candidate_weight_audit.json')['direct_same_layer_links']}
     cross_candidates={}
     for model in ('qwen14','glm4','ds7','ds7_answer'):
@@ -204,7 +205,8 @@ def review_and_plan():
           'why_change_focus':['2680/2681的完整图谱把分族条件纹理与全局普适单坐标假说分开；新词汇/形式/顺序确认必须用实际计数，而不是扩大叙述。',
              '2682已把局部MLP公式误差与末端微小输出变化分账；再重复down/gate同一恒等式不会自动解释语言操作怎样激活它。',
              '现在的source分账从已经上下文化的V开始；尚未在本轮原生标量范式下解释前序残差如何通过具体Wq/Wk/Wv与headnorm/RoPE产生条件路由。',
-             'DS原生/答案区配对属于接口条件研究，不得按较高正确率挑一组假装原生跨模型机制已复现。'],
+             'DS原生/答案区配对属于接口条件研究，不得按较高正确率挑一组假装原生跨模型机制已复现。',
+             '历史content_correct是有限归一化的整串匹配，不是语义正确率；新增末行明确答案审计保留原分数、所有未解析/冲突/空答案/无边界，且明确为见过DS案例后的事后测量修正。下一轮在读正式输出之前冻结这两类指标与候选无关的解析规则，不能再把格式失败写成语义全失败。'],
           'phases':{
               '2685':'完整结果复审、原生Q/K/V单参数与角色/词汇独立对照合同；冻结基本算术规则、精度账本和外推边界。',
               '2686':'八族双语的大规模词汇×语义角色×表达形式×输出功能材料；至少4096正式条件；分词/同token前缀/真实最终答案边界预检，独立内容和实体留给确认。每族包含意义改变与表面改变对照，不仅换名字。',
@@ -231,7 +233,7 @@ def finalize():
         r'c_{h,s,k}=P_{q,h,s}\sum_d W_{o,k,hd}V_{s,kv(h),d};\quad z_{s,k}=\frac{\gamma_k c_{s,k}}{\sqrt{D^{-1}\sum_i u_i^2+\epsilon}};\quad g_j=\sum_kW_{g,jk}x_k.\qquad \Delta m_{t,:}=W_{d,:,j}\Delta a_{t,j}.',
         'C0018448固定执行形状八族双语条件；C002512全部head/source/原坐标账本；C003全部H/MLP四功能复用和五MLP输入来源全坐标路径；C0044096新实体/新词汇/形式顺序确认、其中512来源路径复验；C005128前缀15360真实单标量有限改动及完整实际生成串FP32计分，16例FP64读出对照；C006Qwen14B/GLM4各512，DS7B原生与显式进入答案区协议各512，DS各64独立实体预算校准（3模型4协议，2048正式条件）；C007无模型只读来源/参数查询与原坐标热力图、直接/HTTP/浏览器/构建验证；C008仅清理8832未展示原场。',
         '得到的是可寻址、可复查的条件图谱：一个来源位置经哪些head写到哪个坐标、观察到的归一化状态下如何进入某个gate/up输入项、真实权重改变怎样影响局部计算。全局固定语义坐标的强假说与更细条件化纹理必须分开，仍须靠新语言操作检验复用/分化。',
-        'V来源已被上下文化，外部角色是注释不是发现的模块；RMS分母内生，所以来源分账非删除效果。跨功能末尾token、问法和prefill不同，形式泛化不充分。FP32数值验证不是BF16自主生成；FP64仅读出。2682首次加载0样本时遇到内存上限，释放本轮后端并关闭异步载入后重试，未改变模型/系统分页设置，见loading_incident.json。数千Phase不闭合只说明现有证据未完成解释，不能逻辑推出必需新数学。',
+        'V来源已被上下文化，外部角色是注释不是发现的模块；RMS分母内生，所以来源分账非删除效果。跨功能末尾token、问法和prefill不同，形式泛化不充分。FP32数值验证不是BF16自主生成；FP64仅读出。2682首次加载0样本时遇到内存上限，释放本轮后端并关闭异步载入后重试，未改变模型/系统分页设置，见loading_incident.json。数千Phase不闭合只说明现有证据未完成解释，不能逻辑推出必需新数学。历史content_correct仅表示有限归一化的整串匹配，不等于语义正确率。新增phase2683_explicit_answer_audit.py逐例复算旧字段并保留原始输出/哈希，只解析末行单一明确候选；全部样本分为匹配/不匹配/未解析/冲突/空答案/无答案边界，详见四协议explicit_answer_audit.json与scientific_checks.json。此规则在看过DS原生3个案例后制定，属于事后测量审计，不是盲测确认；明确答案匹配也未验证解释过程，更不等于遵守仅输出代码的原格式。',
         '本轮2677–2684全部完成；根据实际完整结果冻结下一同目标大任务（next_campaign.json），继续研究条件坐标如何随角色/表达/组合变化，保留全部阴性和部分规律。没有宣称破解无限组合语言机制。')
 
 

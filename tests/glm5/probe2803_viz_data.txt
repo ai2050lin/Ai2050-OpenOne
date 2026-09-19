@@ -1,0 +1,19 @@
+=== NPZ KEYS ===
+  rho: shape=(25, 4, 4) dtype=float64
+  sv: shape=(25, 4) dtype=float64
+  pr: shape=(25, 4) dtype=float64
+  default: shape=(25, 4) dtype=float64
+  dose_final: shape=(4, 4) dtype=float64
+      vals=[2.709, -7.917, 3.309, 1.898, -0.077, -2.164, 1.495, 0.746, 2.205, -7.856, 2.792, 2.858, 0.665, -2.883, 2.423, -0.205]
+  dose_apple: shape=(4, 4) dtype=float64
+      vals=[2.709, -7.917, 3.309, 1.898, 2.709, -7.917, 3.309, 1.898, 2.709, -7.917, 3.309, 1.898, 2.709, -7.917, 3.309, 1.898]
+  div_curve: shape=(37,) dtype=float64
+      vals=[1.437, -7.003, -6.474, -6.367, -7.339, -6.522, -5.795, -5.664, -5.391, -6.566, -2.546, -1.95, -1.075, -0.769, 0.797, -2.2, -1.418, -2.39, -0.976, -1.022, -1.341, -0.628, -0.259, -0.331, 1.258, 1.494, 2.186, 1.597, 1.941, 0.106, 0.521, 1.329, 0.178, -0.813, 0.389, 1.052, 2.297]
+=== RESULT.JSON ===
+TOP KEYS: phase, prereg, verdict, records, dose_rows, div_curve
+phase = 2803
+DICT prereg: {"P-A7": "profiles_general_readable iff >= 70% of 52 pairs hit >=1 relevant token in signed pooled top-30", "P-B7": "contrast_encoding_general iff >= 80% words all-pairs rho<0 AND >= 75% words flatness>=0.4", "P-C7": "pr_stratification_general iff >= 60% words max(PR)/min(PR) >= 2", "P-D7": "dose_response_positive iff final company(dose3)>dose0 AND >=2/3 successive deltas >0", "verdict": "polysemy_general_law iff P-A7 AND P-B7 AND P-C7"}
+DICT verdict: {"profiles_general_readable": true, "hit_rate": 1.0, "contrast_encoding_general": true, "allneg_rate": 1.0, "flat_rate": 1.0, "pr_stratification_general": false, "prstrat_rate": 0.04, "dose_response_positive": true, "comp_final": [-7.917, -2.164, -7.856, -2.883], "apple_drift": 0.0, "l_div": 0, "polysemy_general_law": false}
+LIST records: n=25 first={"word": "apple", "senses": ["fruit", "company", "plant", "food"], "rho": [[1.0, -0.331, -0.243, -0.249], [-0.331, 1.0, -0.357, -0.326], [-0.243, -0.357, 1.0, -0.235], [-0.249, -0.326, -0.235, 1.0]], "allneg": true, "flatness": 0.761, "sv": [2.025, 1.745, 1.541, 0.0], "pr": [249.7, 66.4, 317.6, 226.1], "pr_ratio": 4.8, "default": {"fruit": 29.6, "company": -6.19, "plant": -9.26, "food": -14.15}, "top5": {"fruit": [{"dim": 13, "C": 0.202}, {"dim": 1874, "C": 0.185}, {"dim": 1113, "C": 0.183}, {"dim": 1400, "C": 0.18}, {"dim": 2229, "C": 0.18}], "company": [{"dim": 32, "C": -0.528}, {"dim": 13, ...
+dose_rows = [{"dose": "the apple", "apple_pos": {"fruit": 2.709, "company": -7.917, "plant": 3.309, "food": 1.898}, "final": {"fruit": 2.709, "company": -7.917, "plant": 3.309, "food": 1.898}}, {"dose": "the apple iphone", "apple_pos": {"fruit": 2.709, "company": -7.917, "plant": 3.309, "food": 1.898}, "final": {"fruit": -0.077, "company": -2.164, "plant": 1.495, "food": 0.746}}, {"dose": "the apple iphone mac steve", "apple_pos": {"fruit": 2.709, "company": -7.917, "plant": 3.309, "food": 1.898}, "final": {"fruit": 2.205, "company": -7.856, "plant": 2.792, "food": 2.858}}, {"dose": "the apple iphone mac steve jobs cupertino", "apple_pos": {"fruit": 2.709, "company": -7.917, "plant": 3.309, "food": 1.898}, "final": {"fruit": 0.665, "company": -2.883, "plant": 2.423, "food": -0.205}}]
+LIST div_curve: n=37 first=1.437

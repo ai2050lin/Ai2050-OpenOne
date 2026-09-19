@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+"""Append Phase 2862 section to AGI_GPT5_MEMO.md (append-only)."""
+import io
+
+MEMO = r'D:\AI2050\Ai2050-OpenOne\research\gpt5\docs\AGI_GPT5_MEMO.md'
+
+SEC = """
+---
+
+## Phase 2862 (2026-09-18) — 前缘机制解剖：OV 静态增益与因果必要性脱钩（ov_uncorrelated），三谱正交实体化
+
+### 动机与协议（预注册冻结于任何观测前）
+MASTER_PLAN II1 收口第一刀：把 2846 双谱前缘（top-64 头，2859 S2 验证稳定）接到具体
+attention 机制。**零前向 Phase**——全部读数来自不可变产物 + 权重代数：
+- 输入：2846 census_full.npz（mean_drop / mean_s0 / mean_s1，1152 头）、
+  2859 atlas_stability.npz（top10_full 合法性校验）、SEED=2855 词表 dW_unit（10 类方向，仅 W_U+tokenizer，无 forward）。
+- OV 通道端到端类方向增益（GQA 感知）：g[h,c] = cdir_c·W_O^h W_V^{kv(h)}·cdir_c；
+  总写出范数 wn[h,c] = ‖W_O^h W_V^{kv(h)}·cdir_c‖；W_V 取 kv 头切片（group=4），W_O 取 query 头切片。
+- c0 校验：top-64（mean_drop 降序）⊇ 2859 top-10 → **true**。
+- 预注册：M1 = ov_carries_causal iff Spearman(mean_drop, max_c|g|) > 0.15
+  （2846 C3 direct-drop 全集 0.1496 同量级参考）且 top64 均值 > 随机 64 头 null p95（200 次，SEED=2862）；
+  M2/M3/M4 描述性（角色分布/层分布/top1 档案）。
+
+### 结果（phase2862/frontedge_anatomy/；exec 635aec00… / result 4f588227… / frontedge.npz 2d3c2cd0…）
+| 量 | 值 | 判决 |
+|---|---|---|
+| M1a ρ(mean_drop, max_c\|g\|) | **−0.026**（参考阈 0.15） | **M1 = ov_uncorrelated** |
+| M1b top64 均值 vs null p95 | 0.0469 vs 0.0432 | 仅边际（a 条件大败主导） |
+| M2 角色分布 | 全体：形成器 10.4% / 放大器 10.4%；**top-64：形成器 28.1%（18/64）/ 放大器 0%（0/64）** | 前缘 = 纯形成器构成 |
+| M3 层分布 | 早 L0-11: 28 / 中 L12-23: 19 / 晚 L24-35: 17 | 前缘偏早层，全域散布 |
+| M4 L13H30 档案 | drop=0.101、直写=−0.002、\|g\|≤0.0075、wn≈0.21、最大类 animal | **top1 因果头 OV 静态增益 ≈ 0** |
+| 全网均值 | mean max_c\|g\| = 0.033 | OV→cdir 静态通道整体微小 |
+
+### 科学结论
+1. **因果前缘头不通过 OV 直写类方向**：L13H30 的 OV 类方向增益（≤0.0075）比其因果损伤（0.101）
+   小 13 倍以上。其消融使 d_spec 方向塌陷的机制不是"写出 cdir"，而是**改变后续层的残差流几何**
+   （信息中继/结构角色），类方向分量是下游变换后的产物。
+2. **三谱正交的头级实体化**：静态 OV 增益谱 ⊥ 直写份额谱（C3 全集 0.15）⊥ 因果必要性谱
+   （ρ −0.026）——三张图互不预测。响应图谱必须至少含这三个独立轴；任何单轴"机制图谱"都会误导。
+3. **top-64 前缘 = 纯形成器构成**（18/64 形成器、0/64 放大器）：双谱正交（2839）不是噪声，
+   而是角色分工——高直写头（放大器）从不进入因果前缘；因果前缘头刻意不直写。
+4. II1 收口状态：静态权重代数已排除"直写"解释 → L13H30 类承载机制只剩两条候选路径：
+   (a) 位置/结构中继（其消融改变后续 attention 的键值几何）；(b) 间接写出（写出方向经下游
+   mlp/attn 变换后才投影到 cdir）。收口下一刀 = 动态追踪（路径回溯/激活修补，需前向，成本升级）。
+
+### 对"双图谱"总方案的方法论输入（与 Phase 2862 同轮的用户战略讨论）
+本 Phase 给出图谱计划的第一条硬约束：**响应图谱是多轴张量（静态写出/因果必要性/对齐份额
+至少三轴互不预测），语言族图谱与响应图谱的"关联机制"不是单一映射而是轴间变换**
+——这正是 2839 双谱正交（ρ=0.106）与 2857 原型性梯度（词表选择→类方向漂移）的方法论推广。
+战略分析详见本轮回复与工作区日志（TMA 双图谱计划草案）。
+
+### 接续（2863 候选）
+- 主选 A（II1 收口第二刀）：L13H30 动态追踪——比较 full/clamp 态下 L14-20 层
+  sain/attn hook 的 d_spec 方向位移分解（区分 (a) 结构中继 vs (b) 间接写出），~1 前向/词。
+- 主选 B（词族图谱最小版）：per-token 机制坐标——2857 原型性梯度扩展为每词
+  [类方向投影, 类内残差坐标] 双坐标（零前向，unembed 代数）。
+（脚本 tests/glm5/phase2862_frontedge_anatomy.py；产物 phase2862/frontedge_anatomy/）
+"""
+
+with io.open(MEMO, 'r', encoding='utf-8') as f:
+    n_before = sum(1 for _ in f)
+
+with io.open(MEMO, 'a', encoding='utf-8') as f:
+    f.write(SEC)
+
+with io.open(MEMO, 'r', encoding='utf-8') as f:
+    n_after = sum(1 for _ in f)
+
+print('OK %d -> %d' % (n_before, n_after))

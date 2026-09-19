@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2842_qk_source_backtrace.py", line 313, in <module>
+    main()
+    ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2842_qk_source_backtrace.py", line 215, in main
+    v = vproj[li](torch.tensor(
+        ~~~~~~~~~^^^^^^^^^^^^^^
+        sain[li], device='cuda')).detach().float() \
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: expected mat1 and mat2 to have the same dtype, but got: float != struct c10::BFloat16

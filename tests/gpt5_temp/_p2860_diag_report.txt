@@ -1,0 +1,24 @@
+[2855] files: ['execution.json', 'result.json', 'window.npz']
+[2860] files: ['execution.json', 'g_direct.npz', 'result.json']
+[2855] npz keys: ['g_comp', 'g_ln', 'g_mlp', 'lin_r', 'top32_share', 'top8_share']
+[2860] npz keys: ['dln_cos', 'dln_norm', 'g_comp', 'g_direct']
+[2855] g_comp         (80, 10)
+[2855] g_ln           (80, 10)
+[2855] g_mlp          (80, 10)
+[2855] lin_r          (80, 10)
+[2855] top32_share    (80, 10)
+[2855] top8_share     (80, 10)
+[2860] dln_cos        (80, 10)
+[2860] dln_norm       (80, 10)
+[2860] g_comp         (80, 10)
+[2860] g_direct       (80, 10)
+shapes: g55 (80, 10) g60 (80, 10)
+A) 2855 |g_mlp - g_comp|: max 0.000000 mean 0.000000
+B) |g_ln55 - dlnnorm*cos| : max 0.000000 mean 0.000000  -> LN2 path identical? True
+C) g_comp55 - g_comp60 : max 1056.4915 mean 0.8355
+   per-layer mean diff : [-0.3546, -0.7874, -0.4391, -0.8959, -0.3833, -0.7352, 1.7209, 4.5505, 7.1771, -1.4985]
+   per-layer max  diff : [1.6825, 2.7667, 2.4255, 7.187, 5.3395, 10.7459, 10.2685, 19.9775, 28.2355, 1056.4915]
+D) diff on L32-34 per word: mean 4.4828 std 6.0702 min -17.7948 max 28.2355
+   words with mean diff > +0.5: 75 ; < -0.5: 1  (of 80)
+E) 2860 per-layer mean g_comp : [-0.0789, 0.0056, 0.0846, 0.1079, 0.2178, 0.1364, 0.0082, -0.0312, -0.1094, -0.2662]
+   2860 per-layer mean g_direct: [-0.0991, 0.0289, 0.1548, 0.2438, 0.4882, 0.3473, 0.0181, -0.1171, -0.4123, -0.6735]

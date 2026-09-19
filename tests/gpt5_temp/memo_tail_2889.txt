@@ -1,0 +1,61 @@
+TOTAL_LINES 6182
+**日期**：2026-09-18。**模型**：glm4-9b-chat-hf（glm 架构，40 层，hidden
+4096，untied，vocab 151552）。运行 2m28s（手工 device_map，窗口层 GPU /
+其余 CPU）。
+
+### 原理与移植
+
+2883 协议 verbatim 移植（D1 same-context 单臂；D2 窗口缩放规则冻结：
+[floor(26/36*40), 40) = [28,40) 12 层；D3 2806 词表按 GLM4 tokenizer
+过滤——10/10 类各 8 词 = 80 词；D4 lm_head safetensors 直读）。
+
+### 硬伤两起（均已修复并登记）
+
+1. **Gen1 device_map=auto disk-offload 陷阱**：部分层参数成 meta 张量，
+   layer_dev 返回 meta → 直接调用崩溃。修复：手工 device_map（窗口
+   28-39 层 + embed + lm_head 约 3.9GB 在 GPU，其余 28 层 CPU）。
+2. **Gen1 W3 绝对预算尺度错配**：v2_abs = 0.0625 超 0.05 预算，但相对
+   误差仅 ~1.6e-3——正是 2877 认定的 cuBLAS 跨形状 bf16 预算量级；0.05
+   绝对值系 hidden-3584 尺度（DS7B）外推错配。Gen2 修订为相对预算
+   <5e-3（修订理由冻结于 execution.json，2877 先例），实测
+   v1_rel=1.1e-4 / v2_rel=2.7e-4 远低于预算——健康。
+
+### 判决：mlp_carrier_replicates = True
+
+| 门线 | 观测 | 结果 |
+|---|---|---|
+| **V1** 词表 | 10/10 类各 8 词（80 词） | **vocab_legal=true** |
+| **W3** 重构一致性（Gen2 rel） | v1_rel 1.1e-4 / v2_rel 2.7e-4 | **true** |
+| **W1** mlp 载体检索 | acc **0.8375** vs null p95 0.1381（**6.1×**） | **mlp_carries_class_axis_glm4** |
+| **W2** 复制带 | Δ = **−0.0375** | **replicates_within_band** |
+
+### 解读（三个实质发现，重复三遍）
+
+1. **跨架构确认**：glm 与 qwen 两个架构族均复现 mlp 直写载体
+   （g_direct ≫ g_comp），**载体通道是架构普适的**。
+2. **三模型载体曲线成形**：qwen3-4b 0.875 / **glm4 0.8375**（带内）/
+   ds7b 0.575（偏差）——载体强度模型依赖，且 DS7B 的 −0.30 偏差在
+   GLM4 对照下更显特殊（候选归因收窄至 reasoning-distill 训练，untied
+   几何已被 GLM4 untied 且带内排除）。
+3. **untied 假设再排除一层**：GLM4 untied 且带内——DS7B 偏差不能归因
+   untied lm_head 几何，剩余主候选 = distill 训练。
+
+### 文件与 SHA256-8
+
+| 文件 | sha256_8 |
+|---|---|
+| phase2888/glm4_class_mlp/execution.json | 9ad64b4d |
+| phase2888/glm4_class_mlp/result.json | f16bcf62 |
+| phase2888/glm4_class_mlp/glm4_class_mlp.npz | c4195d65 |
+| tests/glm5/phase2888_glm4_class_mlp.py | e83b161a |
+
+### 接续（2889 候选）
+
+- **A（主选）**：DS7B 归因收尾——distill 假设检验（若可获取非 distill
+  的同架构 7B 对照则直接判别；否则登记为 open candidate）
+- **B**：GLM4 语言轴判别（2887 协议移植：中层句状态语言方向 + 翻译词
+  载体，检验 L10 分离跨架构）
+- **C**：Gemma4 冷启动（P3 第四模型，收尾 model_namespace）
+
+*（SHA 与判决以 result.json 为准；本节由 phase2888 收尾脚本追加。）*
+

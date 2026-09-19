@@ -1,0 +1,133 @@
+AXES sample:/n[
+ {
+  "axis_id": "class",
+  "kind": "taxonomic",
+  "words_n": 80,
+  "labels_n": 10,
+  "words_source": {
+   "path": "phase2806/qwen4_hierarchy/execution.json",
+   "sha256_8": "b291ea35",
+   "phase": 2806
+  },
+  "census_source": {
+   "path": "phase2846/fullhead_census/census_full.npz",
+   "sha256_8": "75a43f9b",
+   "phase": 2846
+  },
+  "status": "active"
+ },
+ {
+  "axis_id": "attr",
+  "kind": "attributional",
+  "words_n": 28,
+  "labels_n": 10,
+  "axes_names": [
+   "size",
+   "speed",
+   "temp",
+   "age",
+   "weight",
+   "strength",
+   "brightness",
+   "moisture",
+   "height",
+   "fullness"
+  ],
+  "census_source": {
+   "path": "phase2872/attr_census/attr_census.npz",
+   "sha256_8": "72eb6982",
+   "phase": 2872
+  },
+  "geometry_source": {
+   "path": "phase2870/attr_axis_pilot/result.json",
+   "sha256_8": "874c64a5",
+   "phase": 2870
+  },
+  "status": "active"
+ }
+]/nBLOCKS sample:/n[
+ {
+  "block_id": "B1_unembed",
+  "axis_id": "class",
+  "kind": "unembed_proj",
+  "shape": [
+   80,
+   10
+  ],
+  "src": {
+   "path": "phase2867/word_coords_v1/word_coords_v1.npz",
+   "sha256_8": "1408deb1",
+   "phase": 2867,
+   "key": "B1"
+  },
+  "notes": "constructive-circularity caveat: vocab built from unembed class centers (declared in phase2867)"
+ },
+ {
+  "block_id": "B2_causal",
+  "axis_id": "class",
+  "kind": "causal_spectrum",
+  "shape": [
+   80,
+   1152
+  ],
+  "src": {
+   "path": "phase2867/word_coords_v1/word_coords_v1.npz",
+   "sha256_8": "1408deb1",
+   "phase": 2867,
+   "key": "B2"
+  }
+ }
+]/nGROWTH sample:/n[
+ {
+  "point_id": "G_joint_3fam",
+  "axis_id": "class",
+  "block": "B3_joint_3fam",
+  "components": 210,
+  "acc": 0.7471,
+  "phase": 2881,
+  "notes": "three-family joint spectrum: 21 fine labels retrieved at 8.5x null; gated fusion alpha*=0.5 generalizes the 2869 law across families"
+ },
+ {
+  "point_id": "G_ds7b_class_mlp",
+  "axis_id": "class",
+  "model": "deepseek-r1-distill-qwen-7b",
+  "block": "B3_mlp_ds7b",
+  "components": 8,
+  "acc": 0.575,
+  "phase": 2883,
+  "notes": "first cross-model growth point; carrier law holds qualitatively (3.5x null) but magnitude lower than qwen3-4b 0.875 (8-layer vs 10-layer window, distilled reasoning model)"
+ }
+]/nLINKAGE sample:/n[
+ {
+  "link_id": "L8_cross_model_carrier",
+  "from": {
+   "axis": "class",
+   "model": "qwen3-4b",
+   "block": "B3_mlp"
+  },
+  "to": {
+   "axis": "class",
+   "model": "deepseek-r1-distill-qwen-7b",
+   "block": "B3_mlp_ds7b"
+  },
+  "evidence": "same 2806 vocab + scaled window: DS7B W1 acc 0.575 (3.5x null p95 0.1625), W3 rebuild exact (v1=v2=0); carrier law replicates qualitatively, magnitude model-dependent (-0.30 deviation)",
+  "phase": 2883,
+  "status": "confirmed"
+ },
+ {
+  "link_id": "L9_carrier_attribution",
+  "from": {
+   "axis": "class",
+   "model": "qwen3-4b",
+   "block": "B3_mlp"
+  },
+  "to": {
+   "axis": "class",
+   "model": "deepseek-r1-distill-qwen-7b",
+   "block": "B3_mlp_ds7b"
+  },
+  "evidence": "M2884 five-arm window discrimination: qwen {[26,36)=0.875, [26,34)=0.8875, [28,36)=0.8250, [24,34)=0.9000}, ds7b {[20,28)=0.575, [18,28)=0.6375}; no manipulation moves acc by >=0.15 => carrier strength is an intrinsic model property (candidate causes: distill training, untied lm_head geometry)",
+  "phase": 2884,
+  "status": "confirmed"
+ }
+]/n

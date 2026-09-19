@@ -1,0 +1,46 @@
+{
+ "execution.json": {
+  "sha8": "8c6bf1a3",
+  "bytes": 1966
+ },
+ "result.json": {
+  "sha8": "2fb42fa1",
+  "bytes": 10705
+ },
+ "p_axis_stability.npz": {
+  "sha8": "6dafc809",
+  "bytes": 209
+ },
+ "SCRIPT phase2909": {
+  "sha8": "a9f4d1a4",
+  "bytes": 18165
+ },
+ "execution_created": "2026-09-19T08:04:44",
+ "negatives_n": 11,
+ "negatives_last2": [
+  {
+   "neg_id": "N10_cross_model_density_prediction",
+   "phase": 2903,
+   "model": "qwen3-4b",
+   "claim": "qwen mlp landed directions carry >= 2x glm4 language-unembed alignment (G_language_content_density_mechanism cross-model prediction)",
+   "status": "refuted",
+   "evidence": "D_q_mlp 0.00165 < q_null_p95 0.00464 (within random-direction noise); also < 2*max(D_g). Post-hoc calibration: glm4 channels likewise within noise - the A metric is not a margin carrier anywhere",
+   "notes": "margin hierarchy mechanism remains open; margin is a property of the class-correlated STRUCTURE of B rows (within-class response similarity), not of any scalar Jacobian summary tested so far"
+  },
+  {
+   "neg_id": "N11_covariance_anisotropy_invisible_to_margin",
+   "kind": "detector_domain_boundary",
+   "claim": "The 2896-family margin metrics (row-space same-label vs diff-label cosine advantage, incl. the within-class-centered variant) are blind to class-covariance anisotropy by first-moment identity: for mean-zero rows with class-dependent covariance, E[cos|same] - E[cos|diff] = 0, so no amount of sample size moves the margin",
+   "evidence": "2904b synthetic diagnostic: cov-4x-sigma construction pairwise gap -0.001 (n=400k pairs), n=57 pipeline detection 6/100 (= FP baseline); skew construction (90% mass at +2w, 10% at -18w, mean exactly 0) gap +0.092, detection 74/100; iid null 3/100. margin metrics detect class-mean shifts (1st order) and within-class skew/asymmetric-subcluster structure (3rd moment), NOT covariance anisotropy (2nd moment)",
+   "sources": [
+    {
+     "path": "phase2904/b_row_space_structure/result.json",
+     "sha256_8": "3a782d18",
+     "phase": 2904
+    }
+   ],
+   "status": "confirmed",
+   "reopen_condition": "a margin variant with covariance sensitivity (e.g. second-moment statistics of pair similarities) would have to be preregistered with its own algebraic audit"
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+errata_ledger n=8
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+  None | keys=['corrects', 'note', 'phase']
+---- last errata full ----
+{
+ "corrects": "M2902_glm4_channel_jacobian_asymmetry",
+ "note": "the language_alignment_asymmetry verdict (H3: attn landed directions carry word-unembed alignment, R_A=1.438) does not survive random-direction null calibration: D_g_attn 0.00429 and D_g_mlp 0.00102 are both BELOW their null p95 (0.01094 / 0.00506, computed post-hoc from the 2902 stored 20 null-dir entries). H1 (norm gain) and H2 (retention) refutations stand (N9); H3 downgraded to not-established. The frozen preregistered mapping output language_alignment_asymmetry remains on record as the mapping result, but the mechanism reading is: no scalar Jacobian metric tested (gain, retention, unembed alignment) explains the margin hierarchy in either model. Spectrum root cause reopened.",
+ "phase": 2903
+}
+---- linkage tail 2 full ----
+{
+ "link_id": "L13_rotation_vs_carrier_refuted",
+ "phase": 2895,
+ "connects": [
+  "M2894_rotation_structure_glm4",
+  "M2895_rotation_structure_qwen",
+  "M2887_language_axis"
+ ],
+ "relation": "refutes_anticorrelation",
+ "notes": "rotation-vs-carrier anticorrelation hypothesis refuted: both models rotate equally (top2 0.20 vs 0.16, er 23.3 vs 26.7); qwen channel reads a rotated-away fixed direction (cos 0.14-0.46 at window) with 0.7719 accuracy while glm4 needs layer-matched directions (M2893) | refined by M2896: readout types identified - qwen subspace-tolerant (stale/eigen/orth all positive 0.82-0.84), glm4 direction-matched; asymmetry is a channel property | refined by M2897: glm4 attn is partially tolerant (orth margin 0.1222), spectrum not binary; stale cell null-draw fragile"
+}
+{
+ "link_id": "L14_readout_spectrum_cross_model",
+ "phase": 2897,
+ "type": "cross_model_spectrum",
+ "connects": [
+  "M2896_qwen_readout_type",
+  "M2897_glm4_readout_spectrum",
+  "M2893_language_perlayer_glm4",
+  "M2890_language_axis_glm4",
+  "M2891_language_attn_glm4",
+  "M2899_qwen_readout_robustness",
+  "M2900_glm4_mlp_eigen_robustness",
+  "M2901_glm4_attn_eigen_robustness",
+  "M2902_glm4_channel_jacobian_asymmetry",
+  "M2903_qwen_channel_jacobian_decomposition",
+  "M2904_b_row_space_structure_audit_gate",
+  "M2905_margin_structure_skew_audited",
+  "M2906_amplitude_law_neuron_attribution"
+ ],
+ "notes": "readout tolerance spectrum: qwen mlp all-three (margins 0.18-0.22) > glm4 attn eigen+orth (margins ~0.12) > glm4 mlp eigen-only; rotation dynamics universal (M2895); carrier-law per-model variation = readout tolerance gradient | refined by M2898: glm4 attn stale component retracted (8/8 margin<=0); spectrum stands on eigen+orth tolerance | confirmed by M2899: qwen mlp tier draw-stable under 8-draw margin-first protocol (24/24 dual-flag) | M2900 quantifies glm4 mlp eigen tier: acc_flag 7/8 but margin ~0.02-0.03 (1/8 over own p95) - real but weak, ~10x below qwen; spectrum stands as margin-magnitude hierarchy | M2901 confirms spectrum second tier under multi-draw: glm4 attn eigen acc 8/8 margin 7/8, orth margin 8/8, stale 0/8 - full spectrum now margin-first adjudicated | 2902 mechanism attribution: the per-model margin hierarchy is carried by LANDED-DIRECTION LANGUAGE CONTENT DENSITY, not response gain - glm4 attn landed dirs keep word-unembed alignment (R_A=1.438 vs null-row baseline) while glm4 mlp landed dirs are language-neutral; both channels fully re-orient the injected direction (rho~0). Predicts qwen mlp (~0.2 margin) landed dirs are even more language-aligned - testable cross-model. | 2903: margin hierarchy root cause reopened - scalar Jacobian metrics (norm gain N9, retention rho~0, unembed alignment E8/N10) all fail; margin must live in the class-correlated STRUCTURE of the B row space; qwen attn eigen first measured negative (margin -0.0195) | 2904 audit gate: scalar margin variants are 1st-order (class-mean) and skewness-sensitive only; covariance anisotropy invisible by first-moment identity (N11); higher-order reading requires skew-audited detector (2905) | 2905 main reading (skew-audited): margin is carried by 1st-order class-mean shift in the B row space; F/T2 significance pattern matches margin positivity 4/4; margin level = class-mean shift diluted by within-class scatter | 2906: amplitude law channel-split - M1 isotropic summary suffices for mlp margins, attn margins suppressed by beyond-isotropy within-class shape; neuron-level readout of the class-mean shift is down_proj-column concentrated in mlp, permutation-baseline in attn (4/4 match with margin positivity)",
+ "phase_updated": 2906
+}
+---- measurement meas_id tail 6 ----
+  M2901_glm4_attn_eigen_robustness
+  M2902_glm4_channel_jacobian_asymmetry
+  M2903_qwen_channel_jacobian_decomposition
+  M2904_b_row_space_structure_audit_gate
+  M2905_margin_structure_skew_audited
+  M2906_amplitude_law_neuron_attribution

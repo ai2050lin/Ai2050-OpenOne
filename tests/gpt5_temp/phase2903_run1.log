@@ -1,0 +1,24 @@
+execution.json frozen
+dirs recomputed; cos(d(li),d18)=[0.4558, 0.4158, 0.384, 0.3208, 0.3047, 0.2484, 0.2031, 0.1807, 0.1583, 0.1376]
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:00<04:51,  1.36it/s]Loading weights:  73%|███████▎  | 289/398 [00:00<00:00, 464.12it/s]Loading weights: 100%|██████████| 398/398 [00:02<00:00, 141.45it/s]
+Some parameters are on the meta device because they were offloaded to the cpu.
+model loaded: window [26,36) on cuda
+words [10/57] v1 mlp=0.00e+00 attn=0.00e+00
+words [20/57] v1 mlp=0.00e+00 attn=0.00e+00
+words [30/57] v1 mlp=0.00e+00 attn=0.00e+00
+words [40/57] v1 mlp=0.00e+00 attn=0.00e+00
+words [50/57] v1 mlp=0.00e+00 attn=0.00e+00
+v1: mlp=0.000e+00 attn=0.000e+00 hook=0.000e+00 pass=True
+v2 anchor rel err (mlp vs 2896 B_eigen)=2.484e-01
+D_q_mlp=0.00181 D_q_attn=0.00305 R_gamma=0.133 R_rho=0.442 R_A=1.141 R_B=0.120
+D_g_mlp=0.00102 D_g_attn=0.00429
+mlp: margin=0.1568 acc=0.8246 p95=0.0486
+attn: margin=0.0467 acc=0.5789 p95=0.0506
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2903_qwen_channel_jacobian_decomposition.py", line 654, in <module>
+    main()
+    ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2903_qwen_channel_jacobian_decomposition.py", line 501, in main
+    mlpin_all, attnin_all = forward2(toks)
+    ^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 2, got 3)

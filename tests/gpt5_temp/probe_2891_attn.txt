@@ -1,0 +1,9 @@
+loaded; layers[28] type=GlmDecoderLayer
+self_attn type=GlmAttention
+self_attn.forward params: ['hidden_states', 'position_embeddings', 'attention_mask', 'past_key_values', 'kwargs']
+captured shapes: ln1in torch.Size([1, 7, 4096]) attnin torch.Size([1, 7, 4096]) attnout_pos1 (4096,)
+(1) ln1 direct ok; |ln1(ln1in) - attnin| max = 0.000000 (pos1)
+(2) layer.rotary_emb absent, using model.model.rotary_emb
+(2) self_attn direct call ok; rel err vs hook pos1 = 0.000e+00
+(4) perturbation response: proj=-0.003547 |delta|=0.080453 ratio=0.0441
+PROBE=OK

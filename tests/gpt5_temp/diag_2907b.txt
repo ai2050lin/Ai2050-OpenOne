@@ -1,0 +1,75 @@
+diag_2907b attribution grid (post-hoc)
+anchors:
+  registered 2906 glm4_mlp m1=[-0.000452,0.082766] inside=True sigma(mean-std)=0.01339/0.01825
+  registered 2907 glm4_mlp M1=[-0.003453,0.069157] inside=True sigma(rms)=0.01681/0.02163
+  registered 2906 glm4_attn m1=[0.164931,0.300391] inside=False sigma(mean-std)=0.00495/0.00585
+  registered 2907 glm4_attn M1=[0.091486,0.226235] inside=True sigma(rms)=0.00590/0.00784
+  registered 2906 qwen_mlp m1=[0.112763,0.298425] inside=True sigma(mean-std)=0.08387/0.14224
+  registered 2907 qwen_mlp M1=[0.096981,0.291130] inside=True sigma(rms)=0.09084/0.15103
+  registered 2906 qwen_attn m1=[-0.011573,0.087131] inside=False sigma(mean-std)=0.02089/0.03058
+  registered 2907 qwen_attn M1=[-0.019820,0.063102] inside=True sigma(rms)=0.02404/0.03983
+sigma ratio rms/mean-std (per group, s0/s1):
+  glm4_mlp ratio0=1.2554 ratio1=1.1854
+  glm4_attn ratio0=1.1915 ratio1=1.3407
+  qwen_mlp ratio0=1.0832 ratio1=1.0618
+  qwen_attn ratio0=1.1508 ratio1=1.3028
+---- combo mean_std|2906|mode2906 ----
+  glm4_mlp full=+0.019791 M1=[-0.000452,0.082766] inside=True (s0=0.01339 s1=0.01825)
+  glm4_attn full=+0.121262 M1=[0.164931,0.300391] inside=False (s0=0.00495 s1=0.00585)
+  qwen_mlp full=+0.179906 M1=[0.112763,0.298425] inside=True (s0=0.08387 s1=0.14224)
+  qwen_attn full=-0.019459 M1=[-0.011573,0.087131] inside=False (s0=0.02089 s1=0.03058)
+  -> inside count 2/4; attn verdict: BOTH_BELOW
+---- combo mean_std|2906|mode2907 ----
+  glm4_mlp full=+0.019791 M1=[-0.000452,0.082766] inside=True (s0=0.01339 s1=0.01825)
+  glm4_attn full=+0.121262 M1=[0.160484,0.303291] inside=False (s0=0.00495 s1=0.00585)
+  qwen_mlp full=+0.179906 M1=[0.115832,0.302230] inside=True (s0=0.08387 s1=0.14224)
+  qwen_attn full=-0.019459 M1=[-0.014657,0.083944] inside=False (s0=0.02089 s1=0.03058)
+  -> inside count 2/4; attn verdict: BOTH_BELOW
+---- combo mean_std|2907|mode2906 ----
+  glm4_mlp full=+0.019791 M1=[0.003574,0.084080] inside=True (s0=0.01339 s1=0.01825)
+  glm4_attn full=+0.121262 M1=[0.160548,0.289004] inside=False (s0=0.00495 s1=0.00585)
+  qwen_mlp full=+0.179906 M1=[0.121429,0.300200] inside=True (s0=0.08387 s1=0.14224)
+  qwen_attn full=-0.019459 M1=[-0.011812,0.089424] inside=False (s0=0.02089 s1=0.03058)
+  -> inside count 2/4; attn verdict: BOTH_BELOW
+---- combo mean_std|2907|mode2907 ----
+  glm4_mlp full=+0.019791 M1=[0.003574,0.084080] inside=True (s0=0.01339 s1=0.01825)
+  glm4_attn full=+0.121262 M1=[0.156922,0.304656] inside=False (s0=0.00495 s1=0.00585)
+  qwen_mlp full=+0.179906 M1=[0.115738,0.317836] inside=True (s0=0.08387 s1=0.14224)
+  qwen_attn full=-0.019459 M1=[-0.015335,0.083273] inside=False (s0=0.02089 s1=0.03058)
+  -> inside count 2/4; attn verdict: BOTH_BELOW
+---- combo rms|2906|mode2906 ----
+  glm4_mlp full=+0.019791 M1=[-0.006825,0.067480] inside=True (s0=0.01681 s1=0.02163)
+  glm4_attn full=+0.121262 M1=[0.099553,0.220969] inside=True (s0=0.00590 s1=0.00784)
+  qwen_mlp full=+0.179906 M1=[0.093500,0.271837] inside=True (s0=0.09084 s1=0.15103)
+  qwen_attn full=-0.019459 M1=[-0.019315,0.070066] inside=False (s0=0.02404 s1=0.03983)
+  -> inside count 3/4; attn verdict: SPLIT
+---- combo rms|2906|mode2907 ----
+  glm4_mlp full=+0.019791 M1=[-0.006825,0.067480] inside=True (s0=0.01681 s1=0.02163)
+  glm4_attn full=+0.121262 M1=[0.094895,0.220200] inside=True (s0=0.00590 s1=0.00784)
+  qwen_mlp full=+0.179906 M1=[0.096687,0.275898] inside=True (s0=0.09084 s1=0.15103)
+  qwen_attn full=-0.019459 M1=[-0.020836,0.071169] inside=True (s0=0.02404 s1=0.03983)
+  -> inside count 4/4; attn verdict: BOTH_INSIDE
+---- combo rms|2907|mode2906 ----
+  glm4_mlp full=+0.019791 M1=[-0.003453,0.069157] inside=True (s0=0.01681 s1=0.02163)
+  glm4_attn full=+0.121262 M1=[0.091004,0.211854] inside=True (s0=0.00590 s1=0.00784)
+  qwen_mlp full=+0.179906 M1=[0.102206,0.275154] inside=True (s0=0.09084 s1=0.15103)
+  qwen_attn full=-0.019459 M1=[-0.017114,0.072425] inside=False (s0=0.02404 s1=0.03983)
+  -> inside count 3/4; attn verdict: SPLIT
+---- combo rms|2907|mode2907 ----
+  glm4_mlp full=+0.019791 M1=[-0.003453,0.069157] inside=True (s0=0.01681 s1=0.02163)
+  glm4_attn full=+0.121262 M1=[0.091486,0.226235] inside=True (s0=0.00590 s1=0.00784)
+  qwen_mlp full=+0.179906 M1=[0.096981,0.291130] inside=True (s0=0.09084 s1=0.15103)
+  qwen_attn full=-0.019459 M1=[-0.019820,0.063102] inside=True (s0=0.02404 s1=0.03983)
+  -> inside count 4/4; attn verdict: BOTH_INSIDE
+==== anchor 2906 recheck max|diff| = 8.791e-07 (want 0)
+==== anchor 2907 recheck max|diff| = 6.955e-07 (want 0)
+==== cross-combo attn verdicts ====
+  mean_std|2906|mode2906       glm4_attn inside=False qwen_attn inside=False
+  mean_std|2906|mode2907       glm4_attn inside=False qwen_attn inside=False
+  mean_std|2907|mode2906       glm4_attn inside=False qwen_attn inside=False
+  mean_std|2907|mode2907       glm4_attn inside=False qwen_attn inside=False
+  rms|2906|mode2906            glm4_attn inside=True  qwen_attn inside=False
+  rms|2906|mode2907            glm4_attn inside=True  qwen_attn inside=True 
+  rms|2907|mode2906            glm4_attn inside=True  qwen_attn inside=False
+  rms|2907|mode2907            glm4_attn inside=True  qwen_attn inside=True 
+runtime 0.7s

@@ -1,0 +1,18 @@
+215:     dm = {'model.embed_tokens': 0, 'model.norm': 0, 'lm_head': 0}
+220:         MD, local_files_only=True, device_map=dm)
+225:         for p in layers[li_].self_attn.parameters():
+228:     cap = {'attnin': {}}
+231:     def pre_attn(li):
+236:             cap['attnin'].setdefault(li, []).append(
+241:         handles.append(layers[li].self_attn.register_forward_pre_hook(
+245:         for li in cap['attnin']:
+246:             del cap['attnin'][li][:]
+248:     def forward2(toks):
+252:         return {li: cap['attnin'][li][0] for li in cap['attnin']}
+259:     rotary = model.model.rotary_emb
+261:     def attn_call(li, X):
+263:         position_ids = torch.arange(t.shape[1],
+266:             pos_emb = rotary(t, position_ids)
+267:             o = layers[li].self_attn(
+364:             for cn, attnin_all in conds.items():
+366:                     x_a = attnin_all[li]

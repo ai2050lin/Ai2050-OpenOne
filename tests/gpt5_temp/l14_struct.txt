@@ -1,0 +1,7 @@
+keys=['link_id', 'phase', 'type', 'connects', 'notes', 'phase_updated']
+link_id = 'L14_readout_spectrum_cross_model'
+phase = 2897
+type = 'cross_model_spectrum'
+connects = ['M2896_qwen_readout_type', 'M2897_glm4_readout_spectrum', 'M2893_language_perlayer_glm4', 'M2890_language_axis_glm4', 'M2891_language_attn_glm4', 'M2899_qwen_readout_robustness', 'M2900_glm4_mlp_eigen_robustness', 'M2901_glm4_attn_eigen_robustness', 'M2902_glm4_channel_jacobian_asymmetry', 'M2903_qwen_channel_jacobian_decomposition']
+notes = 'readout tolerance spectrum: qwen mlp all-three (margins 0.18-0.22) > glm4 attn eigen+orth (margins ~0.12) > glm4 mlp eigen-only; rotation dynamics universal (M2895); carrier-law per-model variation = readout tolerance gradient | refined by M2898: glm4 attn stale component retracted (8/8 margin<=0); spectrum stands on eigen+orth tolerance | confirmed by M2899: qwen mlp tier draw-stable under 8-draw margin-first protocol (24/24 dual-flag) | M2900 quantifies glm4 mlp eigen tier: acc_flag 7/8 but margin ~0.02-0.03 (1/8 over own p95) - real but weak, ~10x below qwen; spectrum stands as margin-magnitude hierarchy | M2901 confirms spectrum second tier under multi-draw: glm4 attn eigen acc 8/8 margin 7/8, orth margin 8/8, stale 0/8 - full spectrum now margin-first adjudicated | 2902 mechanism attribution: the per-model margin hierarchy is carried by LANDED-DIRECTION LANGUAGE CONTENT DENSITY, no...TRUNC
+phase_updated = 2902

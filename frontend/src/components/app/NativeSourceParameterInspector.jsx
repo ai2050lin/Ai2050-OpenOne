@@ -54,7 +54,7 @@ export default function NativeSourceParameterInspector() {
     {error && <p role="alert">{error}</p>}
     {data && <>
       <p>{data.case_id} · 实际结果 L{data.layer} / J{data.unit} / k{data.coordinate} / H{data.checkpoint} / head 内 d{data.head_coordinate} · 查询 token {data.query_token} ({data.query_token_string})；E/H token {data.hidden_token} ({data.hidden_token_string})；来源 {data.source_token} ({data.source_token_string})，外部角色 {data.source_role}；query head {data.head} → KV head {data.kv_head}。</p>
-      <p>自然输出：{data.natural.generated}；内容正确 {String(data.natural.content_correct)}，严格格式正确 {String(data.natural.strict_correct)}。</p>
+      <p>自然输出：{data.natural.generated}；有限归一化整串匹配 {String(data.natural.content_correct)}，严格整串匹配 {String(data.natural.strict_correct)}。这两个旧指标不等于语义正确率。</p>
       <details><summary>真实输入前缀</summary><pre style={{ whiteSpace: 'pre-wrap' }}>{data.prompt}</pre></details>
       <div style={{ overflowX: 'auto' }}><table style={{ fontVariantNumeric: 'tabular-nums' }}><tbody>{Object.entries(data.values).map(([k, v]) => <tr key={k}><td style={{ paddingRight: 18 }}>{labels[k] || k}</td><td>{String(v)}</td></tr>)}</tbody></table></div>
       <details><summary>全部来源 token 在当前残差坐标上的分账（未筛 Top-K）</summary><div style={{ maxHeight: 350, overflow: 'auto' }}><table><thead><tr><th>token</th><th>原 token</th><th>外部角色</th><th>全部 head 项</th><th>当前 head 项</th></tr></thead><tbody>{data.source_trace.map((r) => <tr key={r.token}><td>{r.token}</td><td>{r.token_string}</td><td>{r.role}</td><td>{String(r.all_heads_term)}</td><td>{String(r.selected_head_term)}</td></tr>)}</tbody></table></div></details>

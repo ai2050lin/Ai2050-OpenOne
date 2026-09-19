@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2705_rdc_long_analysis.py", line 118, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2705_rdc_long_analysis.py", line 108, in main
+    vocabulary=decode_full_vocab(rows,predictions,y,te)
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2705_rdc_long_analysis.py", line 32, in decode_full_vocab
+    weight=checkpoint('lm_head.weight').float().cuda();gamma=checkpoint('model.norm.weight').float().cuda()
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\rdc_mechanism_common.py", line 10, in checkpoint
+    with safe_open(str(folder/index[key]),framework='pt',device='cpu') as f:return f.get_tensor(key)
+                              ~~~~~^^^^^
+KeyError: 'lm_head.weight'

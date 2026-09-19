@@ -1,0 +1,8 @@
+LINES_AFTER=2170
+MARKER=False
+TAIL=
+a5430a`
+- `…/battery.npz` sha256 = `78a16913f472f84e187df8511e756c082fa6000a26ef174f2a76a5ef212b837a`
+
+**Gens 记录**：首次运行崩溃于 line 427（投影公式维度写反：`Qb @ (Qb.T @ Zc)`，Qb 为 2560×10、Zc 为 283×2560；正确式 `(Zc @ Qb) @ Qb.T`）。崩溃发生在 fc.save 之前 → 零产物（陈旧 execution.json 已删）。判据未动，纯机械修正。重跑 4.5s 干净完成，elapsed 计时以第二次运行为准。
+

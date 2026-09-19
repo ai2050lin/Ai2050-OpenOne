@@ -1,0 +1,22 @@
+run.log exists=True size=5314
+n_lines=76 (kept 23)
+dirs ready; func=279 vocab=151552
+
+Some parameters are on the meta device because they were offloaded to the cpu.
+model loaded: 40 layers
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2888_glm4_class_mlp.py", line 312, in <module>
+    ln_x = ln2_call(l, ln2in_b[l])
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2888_glm4_class_mlp.py", line 284, in ln2_call
+    o = layers[li].post_attention_layernorm(t)
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1884, in _call_impl
+    return inner()
+  File "D:\AI2050\Ai2050-OpenOne\.venv\Lib\site-packages\torch\nn\modules\module.py", line 1811, in inner
+    args_kwargs_result = hook(self, args, kwargs)  # type: ignore[misc]
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2888_glm4_class_mlp.py", line 244, in pre_hook
+    x.detach()[0].float().cpu().numpy())
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+NotImplementedError: Cannot copy out of meta tensor; no data!

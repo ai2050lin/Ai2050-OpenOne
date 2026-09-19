@@ -1,4 +1,4 @@
-﻿# AGI Research Memo
+﻿## AGI Research Memo
 
 > 本文档记录AGI研究的进展、问题分析和下一步行动
 

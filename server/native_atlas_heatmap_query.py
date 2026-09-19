@@ -7,6 +7,7 @@ from .native_path_parameter_query import RESULT
 OUT=RESULT/'phase2669_symmetric_multitoken_delivery'
 NEW=RESULT/'phase2676_native_mlp_delivery'
 LATEST=RESULT/'phase2684_source_campaign_delivery'
+QKV=RESULT/'phase2693_qkv_campaign_delivery'
 
 
 @lru_cache(maxsize=1)
@@ -19,6 +20,10 @@ def catalog():
         path=LATEST/'material/client_panel_catalog.json'
         if path.exists():
             added=json.loads(path.read_text(encoding='utf-8'));obj['panels']+=added['panels'];obj['phase']=added['phase'];obj['boundary']+=' '+added['boundary']
+        path=QKV/'material/client_panel_catalog.json'
+        if path.exists():
+            added=json.loads(path.read_text(encoding='utf-8'))
+            if not added.get('preview_only',True):obj['panels']+=added['panels'];obj['phase']=added['phase'];obj['boundary']+=' '+added['boundary']
         return obj
     except FileNotFoundError as e:raise HTTPException(status_code=404,detail='Full-coordinate panel publication not completed yet') from e
 
@@ -26,9 +31,9 @@ def catalog():
 def options(include_rows=True):
     obj=catalog();panels=[]
     for p in obj['panels']:
-        info={k:v for k,v in p.items() if k not in ('matrix_sha256','rows')}
-        info['row_count']=len(p['rows'])
-        if include_rows:
+        info={k:v for k,v in p.items() if k not in ('matrix_sha256','rows','blocks')}
+        info['row_count']=p['row_count'] if p.get('storage')=='native_block_descriptor' else len(p['rows'])
+        if include_rows and p.get('storage')!='native_block_descriptor':
             info['rows']=[{k:v for k,v in r.items() if k in ('label','source')} for r in p['rows']]
         panels.append(info)
     return {'phase':obj['phase'],'boundary':obj['boundary'],'display':obj['display'],'panels':panels}
@@ -60,7 +65,23 @@ def matrix(key):
 def rows(panel,start,count):
     info=next((p for p in catalog()['panels'] if p['key']==panel),None)
     if info is None:raise HTTPException(status_code=404,detail='Unknown published panel')
-    if start<0 or start>=len(info['rows']) or count<1 or count>8:raise HTTPException(status_code=400,detail='Rows must start within this panel; count1..8')
+    total=info['row_count'] if info.get('storage')=='native_block_descriptor' else len(info['rows'])
+    if start<0 or start>=total or count<1 or count>8:raise HTTPException(status_code=400,detail='Rows must start within this panel; count1..8')
+    if info.get('storage')=='native_block_descriptor':
+        rr=[];offset=0;end=min(start+count,total)
+        for block in info['blocks']:
+            stop=offset+block['row_count']
+            for i in range(max(start,offset),min(end,stop)):
+                prefix=tuple(block['shape'][:-1]);idx=tuple(int(v) for v in np.unravel_index(i-offset,prefix)) if prefix else ()
+                row={**block,'index':idx};value=descriptor_row(row)
+                assert len(value)==info['coordinate_count']
+                specific=block['row_labels'][i-offset] if 'row_labels' in block else ''
+                rr.append({'row_index':i,'label':block['label']+'/index'+str(idx)+('/'+specific if specific else ''),'values':value.tolist()})
+            offset=stop
+            if offset>=end:break
+        assert len(rr)==end-start
+        return {'phase':info.get('phase',2693),'key':panel,'title':info['title'],'coordinate_count':info['coordinate_count'],
+            'total_rows':total,'start':start,'rows':rr,'display':info['boundary']+' Exact full native last axis. Prefix indices in row labels; rows paged only.'}
     if info.get('storage')=='native_descriptor':
         end=min(start+count,len(info['rows']))
         rr=[{'label':info['rows'][i]['label'],'row_index':i,'values':descriptor_row(info['rows'][i]).tolist()} for i in range(start,end)]

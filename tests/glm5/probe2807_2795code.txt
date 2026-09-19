@@ -1,0 +1,109 @@
+phase279*.py files: ['phase2790_rdc_attr_injection.py', 'phase2790b_rdc_attr_cumulative.py', 'phase2791_rdc_l0_source_competition.py', 'phase2792_rdc_purify_pipeline.py', 'phase2793_rdc_prior_decomp_context.py', 'phase2794_rdc_operator_decomp.py', 'phase2794b_rdc_prefix_scrub.py', 'phase2795_rdc_semantic_atlas.py', 'phase2796_rdc_retain_spectrum.py', 'phase2797_rdc_dim_attribution.py', 'phase2798_rdc_discriminate_carry.py', 'phase2799_rdc_crosspair_channel.py', 'phase279_compositional_topology.py']
+candidate with E30 + hidden_states: phase2795_rdc_semantic_atlas.py (10803 chars)
+=== phase2795_rdc_semantic_atlas.py around first hidden_states (char 6139) ===
+    'same cat) - mean between-cat cos >= 0.05 on unit(h30)',
+    'P-T': 'category_property_reuse iff >= 8/10 categories have '
+           'their cat word in >= 8/10 member words lens top-50',
+    'P-U': 'differentiation_in_difference_vector iff >= 2/3 near '
+           'pairs satisfy mean(|cos(d,uniq1)|,|cos(d,uniq2)|) >= '
+           '|cos(d,shared)| + 0.05, d = unit(h_a - h_b)',
+    'verdict': 'atlas_established iff P-S AND P-T; '
+               'reuse_differentiation_geometric iff P-U',
+}
+
+
+def main():
+    import torch
+    from transformers import AutoTokenizer
+    OUT.mkdir(parents=True, exist_ok=True)
+
+    tok = AutoTokenizer.from_pretrained(
+        str(ROOT / 'models' / 'hf' / 'qwen3-4b'), local_files_only=True,
+        trust_remote_code=True, use_fast=True)
+
+    execution = {'timestamp': fc.stamp(), 'source': cc.snapshot(__file__),
+                 'prereg': PREREG, 'cats': CATS, 'words': WORDS,
+                 'pairs': PAIRS, 'l_read': L_READ}
+    fc.save(OUT / 'execution.json', execution)
+
+    from phase2662_symmetric_mapping_contract import load_native
+    model, tok2 = load_native('qwen4')
+    model.eval()
+    device = next(model.parameters()).device
+    W_U = model.lm_head.weight.detach().float().cpu().numpy()
+    final_norm = model.model.norm
+    E = model.model.embed_tokens.weight.detach().float().cpu().numpy()
+
+    def unit(x):
+        return x / max(np.linalg.norm(x), 1e-9)
+
+    tc = {}
+
+    def tid(t):
+        if t not in tc:
+            ids = tok(' ' + t, add_special_tokens=False)['input_ids']
+            if len(ids) != 1:
+                ids = tok(t, add_special_tokens=False)['input_ids']
+            assert len(ids) == 1, t
+            tc[t] = int(ids[0])
+        return tc[t]
+
+    for t in WORDS + CAT_WORDS + ['red', 'yellow', 'bark', 'fur',
+                                  'driver', 'passenger']:
+        tid(t)
+
+    def lens_np(h):
+        with torch.inference_mode():
+            hn = final_norm(
+                torch.tensor(h, device=device).unsqueeze(0))
+            return W_U @ hn[0].float().cpu().numpy()
+
+    # ---------- forward pass: one per word ----------
+    H30 = []
+    top50 = {}
+    top10 = {}
+    margin_cat = {}
+    margin_cat_emb = {}
+    for w in WORDS:
+        ids = tok('The', add_special_tokens=False)['input_ids'] + \
+            tok(' ' + w, add_special_tokens=False)['input_ids']
+        p = 1
+        with torch.inference_mode():
+            o = model(torch.tensor([ids], device=device),
+                      output_hidden_states=True)
+        h30 = o.hidden_states[L_READ][0, p].float().cpu().numpy().copy()
+        H30.append(h30)
+        z = lens_np(h30)
+        top = np.argsort(-z)[:50]
+        top50[w] = [tok.decode([int(t)]).strip().lower() for t in top]
+        top10[w] = [tok.decode([int(t)]).strip()
+                    for t in np.argsort(-z)[:10]]
+        cat = CAT_OF[w]
+        others = [c for c in CAT_WORDS if c != cat]
+        margin_cat[w] = (float(z[tid(cat)])
+                         - float(np.mean([z[tid(c)] for c in others])))
+        ze = lens_np(E[tid(w)])
+        margin_cat_emb[w] = (float(ze[tid(cat)])
+                             - float(np.mean([ze[tid(c)]
+                                              for c in others])))
+    H30 = np.stack(H30)
+    print('P2795 forward done: %d words' % len(WORDS), flush=True)
+
+    # ---------- Arm C: atlas cos matrix ----------
+    U = np.stack([unit(h) for h in H30])
+    C = U @ U.T
+    words_a = np.array(WORDS)
+    cats_a = np.array([CAT_OF[w] for w in WORDS])
+    iu = np.triu_indices(len(WORDS), k=1)
+    same_w = cats_a[iu[0]] == cats_a[iu[1]]
+    within = float(np.mean(C[iu][same_w]))
+    between = float(np.mean(C[iu][~same_w]))
+    gap = within - between
+    p_s = bool(gap >= 0.05)
+    print('P2795 within=%.4f between=%.4f gap=%.4f P-S=%s'
+          % (within, between, gap, p_s), flush=True)
+    per_cat_within = {}
+    for c in CATS:
+        idx = np.where(cats_a == c)[0]
+        sub = C[np.ix_(idx, idx)]
+        n = len(idx)

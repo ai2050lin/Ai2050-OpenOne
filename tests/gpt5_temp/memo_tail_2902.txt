@@ -1,0 +1,67 @@
+SIZE=707772
+3/0.6795 > p95）但 margin-flag 阴（0.0313/0.0198 < 自身 p95）。按 G_multi_draw_lesson（margin-first 多抽），8 抽判别该格性质；stale 作期望阴性内部对照、orth 作描述性第三条件。glm4 mlp 无已知 robust 阳性条件，故不设阳性锚门，程序稳定性由 v1 确定性 + 历史种子精确复现（reproduction_check）守卫。
+
+### 预注册（冻结于 execution.json，脚本 SHA256-8 2cde5111）
+- 窗口 W=[28,40)；78 词 verbatim 2890；方向零前向自 2890 npz。
+- SEEDS=[2893,2897,2901..2906]；null-draw 规则与 2893/2897 完全一致（历史种子精确复现其 null 集）。
+- v1（每抽）：mlp recompute rel err < 1e-6，否则该抽 void。
+- 判决映射：eigen acc_flag_rate >= 0.8 且 margin_flag_rate >= 0.5 => glm4_mlp_eigen_robust；margin_flag_rate = 0 => acc_only_fragile；否则 mixed。
+
+### 结果（运行 1320.4s，n_valid=8，v1 全过，reproduction_check 双通过）
+- **判决：glm4_mlp_eigen_mixed**
+- eigen：acc 0.5641-0.7436，acc_flag **7/8**（仅 s2904 False）；margin 0.0166-0.0601（7/8 为正），margin_flag 仅 **1/8**（s2901 0.0601 > 0.0349）。
+- stale 对照：acc_flag 1/8、margin_flag 3/8——无 robust 信号，与 M2898 一致。
+- orth：acc_flag 4/8、margin_flag 1/8——边缘。
+- 概念对照全程 ~0。复现锚：s2893→0.6923（=M2893）、s2897→0.6795（=M2897）精确。
+
+### 硬伤与混杂
+- margin null 分布紧（p95 0.030-0.059），margin_flag 对弱信号判别力有限——margin 量级（效应大小）比二元 flag 更本质，已入 G_dual_flag_divergence。
+- 单抽 acc 与 p95 的差在 0.006-0.13 间波动，s2904 acc 0.5641 显示弱格 acc-flag 也不稳。
+
+### 结论
+1. **glm4 mlp eigen 是真实但弱的信号**：acc 一致高于 null（7/8），margin 7/8 为正但量级 ~0.02-0.03，比 qwen mlp（~0.2）低约一个数量级——M2893/M2897 的 acc-flag 判决维持，margin-缺失确认为其真实读法。
+2. **谱系定量化为 margin 量级层级**：qwen mlp ~0.2 >> glm4 attn ~0.12 >> glm4 mlp ~0.02-0.03——载体强度连续谱而非二分，G_dual_flag_divergence 入账。
+3. **acc-flag 与 margin-flag 在弱格分歧**：acc 检索超Chance 而同语言几何勉强超其更紧的 null——未来弱格判读以 margin 量级为准。
+
+### 接续
+- 2901 候选：A GLM4 attn eigen 格多抽确认（M2897 margin 0.1213 强阳但仅单抽；attn/margin 系谱系第二层，主选）/ B norm-matched 对照（2892 L1 混杂，零前向）/ C Gemma4/Qwen2-7B 下载决策（待用户）。
+
+### 文件
+- 脚本 tests/glm5/phase2900_glm4_mlp_eigen_robustness.py（2cde5111）
+- 产物 phase2900/glm4_mlp_eigen_robustness/：execution.json bc364ec7 / result.json 31af8120 / glm4_mlp_eigen_robustness.npz 8b3e27a8
+- Ledger：M2900_glm4_mlp_eigen_robustness + G_dual_flag_divergence + L14 精化（measurements 39 / growth 25 / linkage 14）
+
+## Phase 2901: glm4 attn eigen 格多抽判别 [2026-09-19 00:54]
+
+### 原理
+L14 谱系第二层（glm4 attn）仅 M2897 单抽：eigen margin 0.1213 强阳。M2898 已对同种子集（[2891,2897,2901..2906]）跑过 attn stale+orth（冻结 v2 acc-锚门判 all-void，描述性 rates 成立）。本 Phase 以相同种子集补 eigen 主判条件，三条件全跑，margin-first 判决；无阳性锚门（理由同 2900），程序稳定性由 v1 + 4 项 reproduction_check（M2891/M2897/M2898）守卫。
+
+### 预注册（冻结于 execution.json，脚本 SHA256-8 6f37b87c）
+- 窗口 W=[28,40)；78 词 verbatim 2890；方向零前向自 2890 npz；null-draw 规则与 2891/2897 一致。
+- v1（每抽）：attn recompute rel err < 1e-6。
+- 判决映射：eigen acc_flag_rate >= 0.8 且 margin_flag_rate >= 0.5 => glm4_attn_eigen_robust；margin_flag_rate = 0 => acc_only_fragile；否则 mixed。
+- stale/orth：描述性 + 与 M2898 跨运行对照。
+
+### 结果（运行 1315.9s，n_valid=8，v1 全过，reproduction_check 4/4）
+- **判决：glm4_attn_eigen_robust**
+- eigen：acc 0.6538-0.7308，acc_flag **8/8**；margin 0.0342-0.1213，margin_flag **7/8**（仅 s2906 0.0342 < p95 0.0434）。
+- stale 对照：margin **0/8 正**（-0.0011..-0.0176）——M2898 结论在独立重跑中精确再现。
+- orth：margin **8/8 正**（0.0317-0.1222）——强化 M2898 描述性 rates。
+- 复现锚 4/4：s2891 stale 0.5897=M2891；s2897 stale 0.6795=M2897 且 margin −0.0161=M2898；s2897 eigen 0.7308=M2897。
+
+### 硬伤与混杂
+- s2906 eigen margin 0.0342 低于自身 p95 0.0434（margin_flag 7/8 非 8/8）——弱于 qwen（24/24）的残余波动，量级仍属第二层（~0.06-0.12）。
+- margin p95 在 glm4 attn 侧波动较大（0.040-0.061），小 margin 抽的 flag 判读需谨慎（G_dual_flag_divergence 教训沿用）。
+
+### 结论
+1. **谱系第二层多抽确证**：glm4 attn eigen+orth draw-stable（margin 7/8、8/8 正），stale 缺席（0/8）跨运行精确再现——M2898 的 stale+ 撤回与 orth 部分容忍双双定谳。
+2. **全谱系 margin-first 判决完成**：qwen mlp（24/24，~0.2）>> glm4 attn（eigen 7/8+orth 8/8，~0.06-0.12）>> glm4 mlp（eigen acc 7/8 但 margin 1/8，~0.02-0.03）——三层数量级分离稳固。
+3. **读出容忍谱系成为载体定律的定量形式**：per-model 变异 = 通道读出容忍梯度，现已全部经 8 抽 margin-first 检验，无未判格。
+
+### 接续
+- 2902 候选：A GLM4 attn/mlp margin 量级差的结构根源（通道几何分析，零前向或低前向，主选）/ B norm-matched 对照（2892 L1 混杂）/ C Gemma4/Qwen2-7B 下载决策（待用户）。
+
+### 文件
+- 脚本 tests/glm5/phase2901_glm4_attn_eigen_robustness.py（6f37b87c）
+- 产物 phase2901/glm4_attn_eigen_robustness/：execution.json 897df5fb / result.json 789083bf / glm4_attn_eigen_robustness.npz 3ded0dca
+- Ledger：M2901_glm4_attn_eigen_robustness + L14 精化（measurements 40 / linkage 14）

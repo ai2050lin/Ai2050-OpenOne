@@ -1,0 +1,49 @@
+execution.json frozen
+anchor glm4_mlp margin 0.01979 acc 0.67949 dLB 4.35e-05 fast 0.0e+00 ok=True
+anchor glm4_attn margin 0.12126 acc 0.73077 dLB 4.69e-05 fast 0.0e+00 ok=True
+anchor qwen_mlp margin 0.17991 acc 0.84211 dLB 4.82e-05 fast 0.0e+00 ok=True
+anchor qwen_attn margin -0.01946 acc 0.61404 dLB 4.93e-05 fast 0.0e+00 ok=True
+audit V0_full (d=10): 40/40 pass=True
+audit V1_diagin (d=10): 40/40 pass=True
+audit V2_colz (d=10): 38/40 pass=True
+audit V3_acc (d=10): 39/40 pass=True
+audit S_front (d=6): 40/40 pass=True
+audit S_back (d=6): 40/40 pass=True
+audit S_key (d=1): 40/40 pass=True
+glm4_mlp V0_full: score=0.019791 p_med=0.38010 p_range=[0.37730,0.38400]
+glm4_mlp V1_diagin: score=0.042165 p_med=0.39090 p_range=[0.38270,0.39550]
+glm4_mlp V2_colz: score=0.013047 p_med=0.06080 p_range=[0.05760,0.06450]
+glm4_mlp V3_acc: score=0.679487 p_med=0.87420 p_range=[0.86720,0.87730]
+glm4_mlp S_front: score=0.023260 p_med=0.29550 p_range=[0.29200,0.29910]
+glm4_mlp S_back: score=0.020869 p_med=0.55510 p_range=[0.54750,0.55970]
+glm4_mlp S_key: score=0.001582 p_med=0.59930 p_range=[0.59420,0.61060]
+glm4_attn V0_full: score=0.121262 p_med=0.16830 p_range=[0.16310,0.17290]
+glm4_attn V1_diagin: score=0.141143 p_med=0.18370 p_range=[0.17110,0.18960]
+glm4_attn V2_colz: score=0.085843 p_med=0.05180 p_range=[0.04930,0.05300]
+glm4_attn V3_acc: score=0.730769 p_med=0.37840 p_range=[0.37720,0.38090]
+glm4_attn S_front: score=0.005153 p_med=0.11740 p_range=[0.11310,0.11990]
+glm4_attn S_back: score=0.157724 p_med=0.24420 p_range=[0.23740,0.24950]
+glm4_attn S_key: score=0.060346 p_med=0.30170 p_range=[0.29140,0.30570]
+qwen_mlp V0_full: score=0.179906 p_med=0.47330 p_range=[0.47180,0.48380]
+qwen_mlp V1_diagin: score=0.209819 p_med=0.48420 p_range=[0.47910,0.48960]
+qwen_mlp V2_colz: score=0.168308 p_med=0.53480 p_range=[0.53060,0.53800]
+qwen_mlp V3_acc: score=0.842105 p_med=0.85490 p_range=[0.85390,0.85990]
+qwen_mlp S_front: score=0.383354 p_med=0.76020 p_range=[0.75920,0.76510]
+qwen_mlp S_back: score=0.057704 p_med=0.32670 p_range=[0.32650,0.33170]
+qwen_mlp S_key: score=1.019503 p_med=0.95320 p_range=[0.94800,0.95630]
+qwen_attn V0_full: score=-0.019459 p_med=0.02640 p_range=[0.02570,0.03070]
+qwen_attn V1_diagin: score=0.011792 p_med=0.02730 p_range=[0.02430,0.02900]
+qwen_attn V2_colz: score=-0.001659 p_med=0.09700 p_range=[0.09350,0.10220]
+qwen_attn V3_acc: score=0.614035 p_med=0.73530 p_range=[0.72960,0.73850]
+qwen_attn S_front: score=-0.003668 p_med=0.14000 p_range=[0.13260,0.14550]
+qwen_attn S_back: score=-0.020250 p_med=0.12970 p_range=[0.12660,0.13210]
+qwen_attn S_key: score=0.071495 p_med=0.60720 p_range=[0.60580,0.61340]
+order V1_diagin: qwen_mlp>glm4_mlp>glm4_attn>qwen_attn match=True
+order V2_colz: qwen_mlp>qwen_attn>glm4_mlp>glm4_attn match=False
+order V3_acc: glm4_mlp>qwen_mlp>qwen_attn>glm4_attn match=False
+order S_front: qwen_mlp>glm4_mlp>qwen_attn>glm4_attn match=False
+order S_back: glm4_mlp>qwen_mlp>glm4_attn>qwen_attn match=False
+order S_key: qwen_mlp>qwen_attn>glm4_mlp>glm4_attn match=False
+baseline order: qwen_mlp>glm4_mlp>glm4_attn>qwen_attn
+tail_ok(qwen_attn<0.05 all 7)=False interior_ok(glm4_attn in [0.05,0.95] all 7)=True
+==== VERDICT: p_axis_order_unstable ====

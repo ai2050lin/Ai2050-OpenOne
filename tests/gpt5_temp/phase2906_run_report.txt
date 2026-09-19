@@ -1,0 +1,60 @@
+execution.json frozen
+anchor glm4_mlp margin 0.01979 acc 0.67949 dLB 4.35e-05 ok=True
+anchor glm4_attn margin 0.12126 acc 0.73077 dLB 4.69e-05 ok=True
+anchor qwen_mlp margin 0.17991 acc 0.84211 dLB 4.82e-05 ok=True
+anchor qwen_attn margin -0.01946 acc 0.61404 dLB 4.93e-05 ok=True
+coverage audit: 40/40 pass=True
+glm4_mlp: full=0.0198 from_mean=0.3758 M1=[-0.0005,0.0828] inside=True SNR=0.0458 dilution=0.0527
+glm4_attn: full=0.1213 from_mean=0.3852 M1=[0.1649,0.3004] inside=False SNR=0.1536 dilution=0.3148
+qwen_mlp: full=0.1799 from_mean=1.4726 M1=[0.1128,0.2984] inside=True SNR=0.1889 dilution=0.1222
+qwen_attn: full=-0.0195 from_mean=0.2958 M1=[-0.0116,0.0871] inside=False SNR=0.0245 dilution=-0.0658
+inside count 2/4
+==== VERDICT: amplitude_law_not_established ====
+  glm4_mlp L28: top64 share 0.2016 (perm p95 0.1659, gauss med 0.0507)
+  glm4_mlp L29: top64 share 0.1915 (perm p95 0.1791, gauss med 0.0477)
+  glm4_mlp L30: top64 share 0.1985 (perm p95 0.1579, gauss med 0.0485)
+  glm4_mlp L31: top64 share 0.2189 (perm p95 0.1893, gauss med 0.0505)
+  glm4_mlp L32: top64 share 0.1790 (perm p95 0.1735, gauss med 0.0482)
+  glm4_mlp L33: top64 share 0.1673 (perm p95 0.1232, gauss med 0.0473)
+  glm4_mlp L34: top64 share 0.3100 (perm p95 0.1859, gauss med 0.0480)
+  glm4_mlp L35: top64 share 0.2228 (perm p95 0.1772, gauss med 0.0477)
+  glm4_mlp L36: top64 share 0.2358 (perm p95 0.1778, gauss med 0.0486)
+  glm4_mlp L37: top64 share 0.1605 (perm p95 0.1311, gauss med 0.0477)
+  glm4_mlp L38: top64 share 0.1508 (perm p95 0.1251, gauss med 0.0464)
+  glm4_mlp L39: top64 share 0.1309 (perm p95 0.1213, gauss med 0.0488)
+glm4_mlp: median share 0.1950 vs perm p95 0.1697 -> concentrated
+  glm4_attn L28: top64 share 0.1854 (perm p95 0.2068, gauss med 0.1833)
+  glm4_attn L29: top64 share 0.1496 (perm p95 0.1575, gauss med 0.1480)
+  glm4_attn L30: top64 share 0.1299 (perm p95 0.1301, gauss med 0.1299)
+  glm4_attn L31: top64 share 0.4999 (perm p95 0.6240, gauss med 0.5128)
+  glm4_attn L32: top64 share 0.1337 (perm p95 0.1474, gauss med 0.1424)
+  glm4_attn L33: top64 share 0.1350 (perm p95 0.1392, gauss med 0.1338)
+  glm4_attn L34: top64 share 0.3103 (perm p95 0.3538, gauss med 0.3171)
+  glm4_attn L35: top64 share 0.1336 (perm p95 0.1371, gauss med 0.1324)
+  glm4_attn L36: top64 share 0.5227 (perm p95 0.5857, gauss med 0.4703)
+  glm4_attn L37: top64 share 0.3812 (perm p95 0.3973, gauss med 0.3735)
+  glm4_attn L38: top64 share 0.1473 (perm p95 0.1657, gauss med 0.1552)
+  glm4_attn L39: top64 share 0.1401 (perm p95 0.1565, gauss med 0.1441)
+glm4_attn: median share 0.1485 vs perm p95 0.1616 -> distributed
+  qwen_mlp L26: top64 share 0.2118 (perm p95 0.2226, gauss med 0.0655)
+  qwen_mlp L27: top64 share 0.1855 (perm p95 0.2295, gauss med 0.0670)
+  qwen_mlp L28: top64 share 0.2243 (perm p95 0.2572, gauss med 0.0722)
+  qwen_mlp L29: top64 share 0.2505 (perm p95 0.2016, gauss med 0.0656)
+  qwen_mlp L30: top64 share 0.2630 (perm p95 0.2227, gauss med 0.0667)
+  qwen_mlp L31: top64 share 0.2540 (perm p95 0.1841, gauss med 0.0655)
+  qwen_mlp L32: top64 share 0.1864 (perm p95 0.1716, gauss med 0.0645)
+  qwen_mlp L33: top64 share 0.1619 (perm p95 0.1325, gauss med 0.0638)
+  qwen_mlp L34: top64 share 0.1753 (perm p95 0.1489, gauss med 0.0634)
+  qwen_mlp L35: top64 share 0.1453 (perm p95 0.1550, gauss med 0.0653)
+qwen_mlp: median share 0.1991 vs perm p95 0.1929 -> concentrated
+  qwen_attn L26: top64 share 0.1820 (perm p95 0.2621, gauss med 0.1204)
+  qwen_attn L27: top64 share 0.2420 (perm p95 0.3004, gauss med 0.1189)
+  qwen_attn L28: top64 share 0.2129 (perm p95 0.2780, gauss med 0.1194)
+  qwen_attn L29: top64 share 0.2740 (perm p95 0.2743, gauss med 0.1190)
+  qwen_attn L30: top64 share 0.2130 (perm p95 0.2831, gauss med 0.1190)
+  qwen_attn L31: top64 share 0.2483 (perm p95 0.3417, gauss med 0.1213)
+  qwen_attn L32: top64 share 0.2867 (perm p95 0.3606, gauss med 0.1222)
+  qwen_attn L33: top64 share 0.2440 (perm p95 0.3015, gauss med 0.1197)
+  qwen_attn L34: top64 share 0.2492 (perm p95 0.2920, gauss med 0.1221)
+  qwen_attn L35: top64 share 0.2068 (perm p95 0.2110, gauss med 0.1205)
+qwen_attn: median share 0.2430 vs perm p95 0.2876 -> distributed

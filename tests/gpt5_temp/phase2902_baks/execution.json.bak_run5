@@ -1,0 +1,31 @@
+{
+  "phase": 2902,
+  "name": "glm4_channel_jacobian_asymmetry",
+  "created": "2026-09-19T02:13:07",
+  "script_sha256_8": "812bcc72",
+  "sources": {
+    "s2890": "74933303",
+    "s2893": "08aae636",
+    "s2897": "9d2a28bc"
+  },
+  "model": "glm4-9b-chat-hf",
+  "n_pairs": 40,
+  "prereg": {
+    "window": "W=[28,40) frozen (same as 2890-2893/2897)",
+    "sources": "dirs from 2893 npz (cross-checked vs S_last 2890 recompute, allclose); words/labels/contexts reproduced bit-exact from 2897 machinery (SEED=2897 rng order: null_tids first, then perms)",
+    "response": "r_ch(li,i,cn) = (module_call(li, x+eps*dir_q(li)) - ref)/eps at pos 1, module in {mlp, self_attn}, eps=1.0, 78 words x 3 conds; machinery verbatim 2897",
+    "v2_anchor": "B'[ch] = (r.same - 0.5(r.func + r.null)) . d must match stored B_%s_eigen (2897 npz) rel err < 1e-3 else v2_anchor_fail_all_void",
+    "metrics": "per (ch, li): gamma=mean_i||r||,   rho=mean_i cos(r,d), A=mean_i mean_w |cos(r,u_w)| (78 word rows; 200 null rows, fresh rng SEED=2897); ratios R_gamma/R_rho/R_A = median over li of attn/mlp; R_B = median of mean|B_attn|/mean|B_mlp|",
+    "null_control": "20 random unit dirs SEED=2902, layers {28,31,34,37}, same-cond: gamma_null/rho_null/A_null descriptive",
+    "weights_descriptive": "down_proj / o_proj spectra (top1/top2, participation ratio) + zero-forward response gain and cos(response,d): mlp via SwiGLU on gain*d, attn via GQA-expanded W_VO composite on gain*d; W_VO composite spectra recorded; all descriptive",
+    "verdict": "anchor fail => v2_anchor_fail_all_void; R_B>=2.0 and max(R_gamma,R_rho)>=1.3 => jacobian_asymmetry_confirmed_dominant_{norm_gain|direction_retention}; else R_A>=1.3 => language_alignment_asymmetry; else asymmetry_unresolved",
+    "margin_ratio": "margin_of(B_attn)/margin_of(B_mlp) with SEED=2897 perms (200), compared to observed ~4-5x hierarchy gap (2897/2900/2901)"
+  },
+  "seed": 2897,
+  "seed_null_dirs": 2902,
+  "eps": 1.0,
+  "window": [
+    28,
+    40
+  ]
+}

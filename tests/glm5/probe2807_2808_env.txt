@@ -1,0 +1,62 @@
+=== models/hf dirs ===
+Qwen3-14B  (66.1 GB)
+deepseek-r1-distill-qwen-7b  (15.2 GB)
+glm4-9b-chat-hf  (18.8 GB)
+qwen2.5-3b-instruct  (6.2 GB)
+qwen3-1.7b  (4.1 GB)
+qwen3-14b-feasibility  (0.0 GB)
+qwen3-4b  (8.1 GB)
+
+=== loader defs in phase2662_symmetric_mapping_contract.py ===
+load_native found, 283 chars
+def load_native(key):
+    os.environ['HF_DEACTIVATE_ASYNC_LOAD']='1';original=loading.safe_open
+    def pread(*args,**kwargs):kwargs['backend']='pread';return original(*args,**kwargs)
+    loading.safe_open=pread
+    try:return load_model(key)
+    finally:loading.safe_open=original
+
+
+dict-ish keys: ['2048_unique_calibration', '__main__', 'alternate', 'body', 'calibration_cases', 'calibration_length_audit', 'case_id', 'case_index', 'checks', 'common_readout_words', 'content_correct', 'contract', 'derivatives', 'disjoint_calibration_entities', 'empty', 'entity_a', 'entity_b', 'equal_length', 'expected_yes', 'family', 'field_set', 'fields', 'form', 'fp_selected', 'frozen_mask_sha256', 'heldout', 'language', 'mapping', 'maximum_difference', 'mention_order', 'multi', 'multi_content_boundary', 'multi_format_recognized', 'pairs', 'plan', 'polarity', 'prior_mask_sha256', 'prior_terminal_sha256', 'priority', 'probe_index', 'provenance', 'published', 'q14', 'question_affirmative', 'range', 'runtime', 'selection', 'sequence', 'short_answer_words', 'short_answers_single_token', 'shots', 'statement_truth', 'storage', 'strict_correct', 'style', 'summary', 'symmetry', 'target', 'target_index', 'text']
+
+=== glm5 scripts mentioning other models ===
+bottleneck_breaker.py  (36024 B)
+causal_8bit_head_hook.py  (16450 B)
+causal_baseline.py  (41695 B)
+causal_circuit_batch.py  (14012 B)
+causal_circuit_fast.py  (13111 B)
+causal_circuit_patching.py  (24314 B)
+causal_direct_head.py  (15468 B)
+causal_fiber_tracing.py  (63347 B)
+causal_hook_validation.py  (51018 B)
+causal_logit_validation.py  (46141 B)
+causal_mechanism.py  (51573 B)
+causal_megasample.py  (57924 B)
+causal_patching.py  (19753 B)
+causal_patching_lite.py  (7598 B)
+causal_rigorous_head.py  (19889 B)
+causal_rigorous_so_n.py  (57253 B)
+causal_validation.py  (52190 B)
+ccc_hook_causal.py  (14820 B)
+cci_discriminative_separation.py  (19897 B)
+cci_pc_gain_map.py  (16409 B)
+ccii_nonlinear_mapping.py  (27638 B)
+ccii_z_semantic_dim.py  (17144 B)
+cciii_lda_perturb.py  (15871 B)
+cciii_multiple_regression.py  (24858 B)
+cciv_dmodel_semantic.py  (27238 B)
+cciv_subspace_alignment.py  (27472 B)
+ccix_cross_model_alignment.py  (10534 B)
+ccix_mlp_jacobian.py  (30826 B)
+ccl_causal_intervention.py  (29991 B)
+ccl_distribution_similarity.py  (19637 B)
+cclb_causal_intervention_v2.py  (28125 B)
+cclc_pca_modulation.py  (19885 B)
+ccld_region_migration.py  (23677 B)
+ccle_orthogonal_geometry.py  (42668 B)
+cclf_linear_superposition.py  (34764 B)
+cclg_grammar_control.py  (41990 B)
+cclh_grammar_refinement.py  (38684 B)
+ccli_grammar_probe.py  (48839 B)
+cclj_grammar_semantics.py  (42679 B)
+cclk_tetrahedron_verify.py  (38631 B)

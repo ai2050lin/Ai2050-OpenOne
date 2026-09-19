@@ -1,0 +1,9 @@
+def single_token_id(tok, t, cache):
+    if t not in cache:
+        ids = tok(' ' + t, add_special_tokens=False)['input_ids']
+        if len(ids) != 1:
+            ids = tok(t, add_special_tokens=False)['input_ids']
+        assert len(ids) == 1, '%s -> %s' % (t, ids)
+        cache[t] = int(ids[0])
+    return cache[t]
+

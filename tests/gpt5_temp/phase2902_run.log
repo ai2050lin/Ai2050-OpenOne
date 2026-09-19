@@ -1,0 +1,26 @@
+execution.json frozen
+dir cross-check 2893-vs-2890-recompute max=8.522e-09
+Loading weights:   0%|          | 0/443 [00:00<?, ?it/s]Loading weights:   0%|          | 1/443 [00:01<12:29,  1.70s/it]Loading weights:   0%|          | 2/443 [00:03<11:03,  1.51s/it]Loading weights:  70%|███████   | 312/443 [00:03<00:00, 161.33it/s]Loading weights:  94%|█████████▍| 416/443 [00:05<00:00, 83.89it/s] Loading weights: 100%|██████████| 443/443 [00:06<00:00, 68.27it/s]
+Some parameters are on the meta device because they were offloaded to the cpu.
+model loaded: window [28,40) on cuda
+words [10/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [20/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [30/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [40/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [50/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [60/78] v1 mlp=0.00e+00 attn=0.00e+00
+words [70/78] v1 mlp=0.00e+00 attn=0.00e+00
+v1: mlp=0.000e+00 attn=0.000e+00 pass=True
+v2 anchor rel err: mlp=1.965e+00 attn=1.342e+00
+R_gamma=0.318 R_rho=1.222 R_A=1.438 R_B=0.240
+mlp: margin=-0.0122 p95=0.0063 acc=0.8590
+attn: margin=0.0092 p95=0.0056 acc=0.7949
+margin_ratio attn/mlp = 0.76
+Traceback (most recent call last):
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2902_glm4_channel_jacobian_asymmetry.py", line 633, in <module>
+    main()
+    ~~~~^^
+  File "D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2902_glm4_channel_jacobian_asymmetry.py", line 513, in main
+    w_tid = tid_map[w_i]
+            ~~~~~~~^^^^^
+KeyError: 0

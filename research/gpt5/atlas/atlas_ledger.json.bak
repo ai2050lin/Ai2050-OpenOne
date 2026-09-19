@@ -1,0 +1,1817 @@
+{
+  "format": "tma-atlas-ledger",
+  "version": 2,
+  "model": "qwen3-4b",
+  "protocol_family": "LPF v5.3",
+  "axes": [
+    {
+      "axis_id": "class",
+      "kind": "taxonomic",
+      "words_n": 80,
+      "labels_n": 10,
+      "words_source": {
+        "path": "phase2806/qwen4_hierarchy/execution.json",
+        "sha256_8": "b291ea35",
+        "phase": 2806
+      },
+      "census_source": {
+        "path": "phase2846/fullhead_census/census_full.npz",
+        "sha256_8": "75a43f9b",
+        "phase": 2846
+      },
+      "status": "active"
+    },
+    {
+      "axis_id": "attr",
+      "kind": "attributional",
+      "words_n": 28,
+      "labels_n": 10,
+      "axes_names": [
+        "size",
+        "speed",
+        "temp",
+        "age",
+        "weight",
+        "strength",
+        "brightness",
+        "moisture",
+        "height",
+        "fullness"
+      ],
+      "census_source": {
+        "path": "phase2872/attr_census/attr_census.npz",
+        "sha256_8": "72eb6982",
+        "phase": 2872
+      },
+      "geometry_source": {
+        "path": "phase2870/attr_axis_pilot/result.json",
+        "sha256_8": "874c64a5",
+        "phase": 2870
+      },
+      "status": "active"
+    },
+    {
+      "axis_id": "e200",
+      "kind": "taxonomic",
+      "words_n": 199,
+      "status": "quarantined",
+      "notes": "2858 G2 offdiag 0.494 > 0.488 gate; census deferred"
+    },
+    {
+      "axis_id": "syntax",
+      "kind": "syntactic",
+      "words_n": 48,
+      "labels_n": 3,
+      "axes_names": [
+        "number",
+        "gerund",
+        "comparative"
+      ],
+      "vocab_source": {
+        "path": "phase2878/syntax_trans_vocab/syntax_trans_vocab.npz",
+        "sha256_8": "0bb3ec1e",
+        "phase": 2878
+      },
+      "status": "active",
+      "notes": "tense quarantined (VG2b 0.1902 < 0.2); translation family settled separately"
+    },
+    {
+      "axis_id": "translation",
+      "kind": "cross_lingual",
+      "words_n": 35,
+      "labels_n": 3,
+      "axes_names": [
+        "lang_fr",
+        "lang_de",
+        "lang_es"
+      ],
+      "vocab_source": {
+        "path": "phase2878/syntax_trans_vocab/syntax_trans_vocab.npz",
+        "sha256_8": "0bb3ec1e",
+        "phase": 2878
+      },
+      "status": "quarantined",
+      "notes": "REAL NEGATIVE (2878 Gen2): after homograph decontamination VG2b pair-pair cos = -0.0007/-0.0029/0.0011 - no unified cross-lingual axis direction exists in the tied unembed; axes not measured"
+    },
+    {
+      "axis_id": "language",
+      "kind": "linguistic",
+      "words_n": 57,
+      "labels_n": 2,
+      "direction_source": {
+        "path": "phase2886/hourglass_cka/hourglass_cka.npz",
+        "sha256_8": "0a26bfab",
+        "phase": 2886,
+        "note": "lang_dir = unit(mean S_last[en,18] - mean S_last[fr,18]); mid-stream sentence states, new provenance (not unembed difference)"
+      },
+      "vocab_source": {
+        "path": "phase2887/language_axis_mlp/execution.json",
+        "sha256_8": "ec46fd67",
+        "phase": 2887,
+        "note": "2878 translation pairs canonical (en,L), VG0+VG1 verbatim, tid-level dedup (en 22 / L 35)"
+      },
+      "status": "active"
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "B1_unembed",
+      "axis_id": "class",
+      "kind": "unembed_proj",
+      "shape": [
+        80,
+        10
+      ],
+      "src": {
+        "path": "phase2867/word_coords_v1/word_coords_v1.npz",
+        "sha256_8": "1408deb1",
+        "phase": 2867,
+        "key": "B1"
+      },
+      "notes": "constructive-circularity caveat: vocab built from unembed class centers (declared in phase2867)"
+    },
+    {
+      "block_id": "B2_causal",
+      "axis_id": "class",
+      "kind": "causal_spectrum",
+      "shape": [
+        80,
+        1152
+      ],
+      "src": {
+        "path": "phase2867/word_coords_v1/word_coords_v1.npz",
+        "sha256_8": "1408deb1",
+        "phase": 2867,
+        "key": "B2"
+      }
+    },
+    {
+      "block_id": "B3_mlp",
+      "axis_id": "class",
+      "kind": "mlp_response",
+      "shape": [
+        80,
+        10
+      ],
+      "src": {
+        "path": "phase2867/word_coords_v1/word_coords_v1.npz",
+        "sha256_8": "1408deb1",
+        "phase": 2867,
+        "key": "B3"
+      },
+      "notes": "g_direct_true from phase2861, L26-35"
+    },
+    {
+      "block_id": "B2s_class43",
+      "axis_id": "class",
+      "kind": "causal_spectrum_sparse",
+      "shape": [
+        80,
+        43
+      ],
+      "headsets": "class43",
+      "src": {
+        "path": "phase2868/growth_v2/growth_v2.npz",
+        "sha256_8": "adf5cb98",
+        "phase": 2868,
+        "key": "B2s"
+      }
+    },
+    {
+      "block_id": "B_attr_causal",
+      "axis_id": "attr",
+      "kind": "causal_spectrum",
+      "shape": [
+        28,
+        1152
+      ],
+      "src": {
+        "path": "phase2873/growth_axis2/growth_axis2.npz",
+        "sha256_8": "95a87dbd",
+        "phase": 2873,
+        "key": "X_attr"
+      }
+    },
+    {
+      "block_id": "B_attr_causal_v2",
+      "axis_id": "attr",
+      "kind": "causal_spectrum",
+      "shape": [
+        42,
+        1152
+      ],
+      "src": {
+        "path": "phase2875/attr_census_v2/attr_census_v2.npz",
+        "sha256_8": "aff07bb2",
+        "phase": 2875,
+        "key": "drops"
+      },
+      "notes": "8 axes / 42 words legal vocab (2874); no frontedge"
+    },
+    {
+      "block_id": "B3_attr_mlp",
+      "axis_id": "attr",
+      "kind": "mlp_response",
+      "shape": [
+        42,
+        10
+      ],
+      "src": {
+        "path": "phase2877/attr_mlp_spectrum/attr_mlp_spectrum.npz",
+        "sha256_8": "8fc6e0cb",
+        "phase": 2877,
+        "key": "B3_spec"
+      },
+      "notes": "g_direct_true L26-35, spec contrast; retrieval 0.5 (2.6x null)"
+    },
+    {
+      "block_id": "B3_syntax_mlp",
+      "axis_id": "syntax",
+      "kind": "mlp_response",
+      "shape": [
+        48,
+        10
+      ],
+      "src": {
+        "path": "phase2879/syntax_mlp_spectrum/syntax_mlp_spectrum.npz",
+        "sha256_8": "24eb4941",
+        "key": "B3_spec"
+      }
+    },
+    {
+      "block_id": "B_syntax_causal",
+      "axis_id": "syntax",
+      "kind": "causal_spectrum",
+      "shape": [
+        48,
+        1152
+      ],
+      "src": {
+        "path": "phase2880/syntax_census/syntax_census.npz",
+        "sha256_8": "c153aa93",
+        "key": "drops"
+      }
+    },
+    {
+      "block_id": "B3_joint_3fam",
+      "axis_id": "class",
+      "kind": "mlp_response",
+      "shape": [
+        170,
+        210
+      ],
+      "src": {
+        "path": "phase2881/joint_word_coords/joint_word_coords.npz",
+        "sha256_8": "abe74030",
+        "key": "B3_joint"
+      },
+      "notes": "170 words x 21 family directions x 10 layers (class/attr/syntax blocks 100/80/30 cols)"
+    },
+    {
+      "block_id": "B3_mlp_ds7b",
+      "axis_id": "class",
+      "kind": "mlp_response",
+      "model": "deepseek-r1-distill-qwen-7b",
+      "shape": [
+        80,
+        8
+      ],
+      "src": {
+        "path": "phase2883/ds7b_class_mlp/ds7b_class_mlp.npz",
+        "sha256_8": "76b89284",
+        "phase": 2883,
+        "key": "B3"
+      },
+      "notes": "DS7B (28L) window 20-27 (scaled from qwen3-4b 26-35); same-context g_direct, no patch (D1)"
+    },
+    {
+      "block_id": "B3_language",
+      "axis_id": "language",
+      "kind": "mlp_response",
+      "shape": [
+        57,
+        10
+      ],
+      "src": {
+        "path": "phase2887/language_axis_mlp/language_axis_mlp.npz",
+        "sha256_8": "e4835a87",
+        "phase": 2887,
+        "key": "B3_lang"
+      },
+      "notes": "g_direct spectrum injected with lang_dir, window [26,36); concept-pair control acc 0.0000 = pure language-identity carrier"
+    },
+    {
+      "block_id": "B3_mlp_glm4",
+      "axis_id": "class",
+      "kind": "mlp_response",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        80,
+        12
+      ],
+      "src": {
+        "path": "phase2888/glm4_class_mlp/glm4_class_mlp.npz",
+        "sha256_8": "c4195d65",
+        "phase": 2888,
+        "key": "B3"
+      },
+      "notes": "glm arch, window [28,40); g_direct >> g_comp direct-write arm dominates"
+    },
+    {
+      "block_id": "B3_mlp_qwen25_3b",
+      "axis_id": "class",
+      "kind": "mlp_response",
+      "model": "qwen2.5-3b-instruct",
+      "shape": [
+        80,
+        10
+      ],
+      "src": {
+        "path": "phase2889/qwen25_distill_test/qwen25_distill_test.npz",
+        "sha256_8": "07bec8a4",
+        "phase": 2889,
+        "key": "B3"
+      },
+      "notes": "qwen2 arch NON-distill control (distill-hypothesis test), window [26,36); g_direct >> g_comp direct-write arm dominates; E rows from tied embed_tokens"
+    },
+    {
+      "block_id": "B3_language_glm4",
+      "axis_id": "language",
+      "kind": "mlp_response",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        78,
+        12
+      ],
+      "src": {
+        "path": "phase2890/language_axis_glm4/language_axis_glm4.npz",
+        "sha256_8": "74933303",
+        "phase": 2890,
+        "key": "B3_lang"
+      },
+      "notes": "NEGATIVE: g spectrum injected with GLM4-own lang_dir (li=20), window [28,40); E1 acc below null p95 - registered as measured deviation, not a carrier"
+    },
+    {
+      "block_id": "B_attn_language_glm4",
+      "axis_id": "language",
+      "kind": "attn_response",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        78,
+        12
+      ],
+      "src": {
+        "path": "phase2891/language_attn_glm4/language_attn_glm4.npz",
+        "sha256_8": "37415d8e",
+        "phase": 2891,
+        "key": "B3_attn"
+      },
+      "notes": "NEGATIVE: g_attn spectrum injected with the same 2890 lang_dir (target pos 1), window [28,40); direct-call path verified rel err 0.0 vs hook; registered as measured deviation"
+    },
+    {
+      "block_id": "B_write_locate_glm4",
+      "axis_id": "language",
+      "kind": "dual_channel_response",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        78,
+        3
+      ],
+      "src": {
+        "path": "phase2892/language_write_locate_glm4/language_write_locate_glm4.npz",
+        "sha256_8": "d760c567",
+        "phase": 2892,
+        "key": "B_mlp"
+      },
+      "notes": "W2=[37,40) (li*=39 rule-frozen from Stage1 Delta argmax); mlp margin weak-positive (0.0510 > p95 0.0447) but acc below null p95; attn negative"
+    },
+    {
+      "block_id": "B_perlayer_lang_glm4",
+      "axis_id": "language",
+      "kind": "dual_channel_response_perlayer_dir",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        78,
+        12
+      ],
+      "src": {
+        "path": "phase2893/language_perlayer_glm4/language_perlayer_glm4.npz",
+        "sha256_8": "08aae636",
+        "phase": 2893,
+        "key": "B_mlp"
+      },
+      "notes": "W=[28,40); per-layer eigen-direction dir_q(li)=unit(mean_en S_last[:,li]-mean_fr S_last[:,li]) injected into its own layer; both channels A1 positive"
+    },
+    {
+      "block_id": "B_rotation_struct_glm4",
+      "axis_id": "language",
+      "kind": "direction_sequence_geometry",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        40,
+        4096
+      ],
+      "src": {
+        "path": "phase2894/rotation_structure_glm4/rotation_structure_glm4.npz",
+        "sha256_8": "fef03893",
+        "phase": 2894,
+        "key": "dirs"
+      },
+      "notes": "dir(li)=unit(mean_en-mean_fr S_last[:,li]) for li=1..40 (dir(0) undefined: dnorm(0)=0 exactly); theta/tangent/PCA rotation structure"
+    },
+    {
+      "block_id": "B_rotation_struct_qwen",
+      "axis_id": "language",
+      "kind": "direction_sequence_geometry",
+      "model": "qwen3-4b",
+      "shape": [
+        36,
+        2560
+      ],
+      "src": {
+        "path": "phase2895/rotation_structure_qwen/rotation_structure_qwen.npz",
+        "sha256_8": "5f7bb785",
+        "phase": 2895,
+        "key": "dirs"
+      },
+      "notes": "2894 protocol verbatim on 2886 S_last (80,37,2560); dir(0) excluded (dnorm(0)=0 exactly, same as glm4)"
+    },
+    {
+      "block_id": "B_readout_qwen",
+      "axis_id": "language",
+      "kind": "triple_condition_injection",
+      "model": "qwen3-4b",
+      "shape": [
+        57,
+        10
+      ],
+      "src": {
+        "path": "phase2896/qwen_readout_type/qwen_readout_type.npz",
+        "sha256_8": "71c5fd16",
+        "phase": 2896,
+        "key": "B_stale"
+      },
+      "notes": "W=[26,36); stale(d18)/eigen(d(li))/orth(d_orth(li)) triple injection, 2887 vocab/conds verbatim; all three A-positive"
+    },
+    {
+      "block_id": "B_readout_spectrum_glm4",
+      "axis_id": "language",
+      "kind": "triple_condition_injection",
+      "model": "glm4-9b-chat-hf",
+      "shape": [
+        78,
+        12
+      ],
+      "src": {
+        "path": "phase2897/glm4_readout_spectrum/glm4_readout_spectrum.npz",
+        "sha256_8": "9d2a28bc",
+        "phase": 2897,
+        "key": "B_attn_orth"
+      },
+      "notes": "W=[28,40); stale(lang_dir)/eigen(dir_q(li))/orth(unit(dir_q-(dir_q.lang_dir)lang_dir)) triple injection, dual channel mlp+self_attn, 2890 vocab/conds verbatim 78 words; eigen+orth attn-positive, eigen mlp-positive"
+    },
+    {
+      "block_id": "B_readout_robust_qwen",
+      "axis_id": "language",
+      "kind": "multi_draw_triple_condition_injection",
+      "model": "qwen3-4b",
+      "shape": [
+        57,
+        10
+      ],
+      "src": {
+        "path": "phase2899/qwen_readout_robustness/qwen_readout_robustness.npz",
+        "sha256_8": "2af9ba4d",
+        "phase": 2899,
+        "key": "B_stale_s2896"
+      },
+      "notes": "W=[26,36); stale(d18)/eigen(d(li))/orth triple injection x 8 null-draws, 2887 vocab verbatim 57 words, directions zero-forward from 2886 S_last; 24/24 cell-draws dual-flag positive"
+    }
+  ],
+  "headsets": [
+    {
+      "set_id": "top64_causal",
+      "definition": "top-64 mean drop, 80 words",
+      "n": 64,
+      "load_share_pos": 0.516,
+      "src": {
+        "path": "phase2846/fullhead_census/census_full.npz",
+        "sha256_8": "75a43f9b",
+        "phase": 2846
+      },
+      "phase": 2846
+    },
+    {
+      "set_id": "class43",
+      "definition": "per-word eta2 F-test p<0.01, 80 words (correct tail, 2871 erratum applied)",
+      "n": 43,
+      "src": {
+        "path": "phase2868/growth_v2/growth_v2.npz",
+        "sha256_8": "adf5cb98",
+        "phase": 2868,
+        "key": "sig_mask"
+      },
+      "phase": 2868
+    },
+    {
+      "set_id": "stable_top10",
+      "definition": "2859 S2 bootstrap-stable front edge",
+      "n": 10,
+      "src": {
+        "path": "phase2859/atlas_stability/result.json",
+        "sha256_8": "7645d923",
+        "phase": 2859
+      },
+      "phase": 2859
+    },
+    {
+      "set_id": "triple_core",
+      "definition": "heads in >=2 of {top64, class43, stable_top10}",
+      "n": 15,
+      "members_core4": [
+        "L5H25",
+        "L23H7",
+        "L23H29",
+        "L26H4"
+      ],
+      "src": {
+        "path": "phase2871/sig_heads_triple/result.json",
+        "sha256_8": "59830517",
+        "phase": 2871
+      },
+      "phase": 2871
+    }
+  ],
+  "measurements": [
+    {
+      "meas_id": "M2857_drift",
+      "type": "vocab_stability",
+      "verdict": "subset_incompatibility; prototype gradient real",
+      "source": {
+        "path": "phase2857/drift_audit/result.json",
+        "sha256_8": "eb702ec4",
+        "phase": 2857
+      }
+    },
+    {
+      "meas_id": "M2859_stability",
+      "type": "frontedge_stability",
+      "verdict": "S1=false(rank noise)/S2=true/S3=true/S4=true; bipolar orthogonality most robust",
+      "source": {
+        "path": "phase2859/atlas_stability/result.json",
+        "sha256_8": "7645d923",
+        "phase": 2859
+      }
+    },
+    {
+      "meas_id": "M2861_true_wp",
+      "type": "window_response",
+      "verdict": "E2=no_amplification; max|g|=0.947; window line closed",
+      "source": {
+        "path": "phase2861/g_true/result.json",
+        "sha256_8": "040dce3b",
+        "phase": 2861
+      }
+    },
+    {
+      "meas_id": "M2862_ov",
+      "type": "ov_static_vs_causal",
+      "verdict": "M1=ov_uncorrelated(rho=-0.026); top64 pure formers; L13H30 OV gain 0.0075 (1/13 of drop)",
+      "source": {
+        "path": "phase2862/frontedge_anatomy/result.json",
+        "sha256_8": "4f588227",
+        "phase": 2862
+      }
+    },
+    {
+      "meas_id": "M2863_class_slices",
+      "type": "class_mean_signal",
+      "verdict": "J1/J2/J3 all false at 8 words/class (null-corrected)",
+      "source": {
+        "path": "phase2863/class_slices/result.json",
+        "sha256_8": "919c9f83",
+        "phase": 2863
+      }
+    },
+    {
+      "meas_id": "M2864_variance",
+      "type": "class_variance_decomp",
+      "verdict": "V1=true(max eta2 0.393)/V3=false(R2 0.122)/eta2 axis perpendicular to causal axis",
+      "source": {
+        "path": "phase2864/class_variance/result.json",
+        "sha256_8": "aab3a157",
+        "phase": 2864
+      }
+    },
+    {
+      "meas_id": "M2866_word_coords_v0",
+      "type": "word_level_margin",
+      "verdict": "W1=true(margin 0.0976 vs null 0.0170)/W2=true/W4=no shared mechanism(min nn-cos 0.144)/W5=true",
+      "source": {
+        "path": "phase2866/word_coords/result.json",
+        "sha256_8": "f89485e6",
+        "phase": 2866
+      }
+    },
+    {
+      "meas_id": "M2867_word_coords_v1",
+      "type": "three_block_complement",
+      "verdict": "T1=true(rho<=0.242)/B3 retrieval 0.875 (2.7x B2)/B1=1.0 with circularity caveat",
+      "source": {
+        "path": "phase2867/word_coords_v1/result.json",
+        "sha256_8": "75001f08",
+        "phase": 2867
+      }
+    },
+    {
+      "meas_id": "M2868_naive_fusion",
+      "type": "fusion_naive",
+      "verdict": "G1=false(B23 0.7375 < B3 0.875)/G2=true/G3=true (43 heads 26.8x compression, acc up 0.425>0.325)",
+      "source": {
+        "path": "phase2868/growth_v2/result.json",
+        "sha256_8": "59300982",
+        "phase": 2868
+      }
+    },
+    {
+      "meas_id": "M2869_density_fusion",
+      "type": "fusion_density",
+      "verdict": "H1=true(alpha*=0.25, acc 0.8875)/H2=monotone in alpha/growth_v3=0.10 boundary",
+      "source": {
+        "path": "phase2869/fusion_curve/result.json",
+        "sha256_8": "6125b38d",
+        "phase": 2869
+      }
+    },
+    {
+      "meas_id": "M2870_attr_geometry",
+      "type": "axis_orthogonality",
+      "verdict": "P1=true(max cos 0.0755)/P3=true(0.995 out-of-class)/P2 literal false but same-axis pairs 0.46-0.59 = axis_structure_confirmed (criterion flaw noted)",
+      "source": {
+        "path": "phase2870/attr_axis_pilot/result.json",
+        "sha256_8": "874c64a5",
+        "phase": 2870
+      }
+    },
+    {
+      "meas_id": "M2871_triple",
+      "type": "headset_enrichment",
+      "verdict": "U1=true(A&B p=3.6e-4, A&C p~0, B&C p=3.0e-4)/U2 zero amplifiers/U3 algebraic share invalid (negatives); pos-normalized core2=23.1% load",
+      "source": {
+        "path": "phase2871/sig_heads_triple/result.json",
+        "sha256_8": "59830517",
+        "phase": 2871
+      }
+    },
+    {
+      "meas_id": "M2872_attr_census",
+      "type": "axis2_census",
+      "verdict": "X1=false(no shared frontedge)/X2=true(rho 0.055, mechanism sides separate)/X3=independent_populations",
+      "source": {
+        "path": "phase2872/attr_census/result.json",
+        "sha256_8": "282182af",
+        "phase": 2872
+      }
+    },
+    {
+      "meas_id": "M2873_growth_axis2",
+      "type": "growth_point",
+      "verdict": "C1=not_replicated(power-limited, null p95 0.3571)/C2=axis_specific(0/3 overlap)/C3=reuse_signal weak",
+      "source": {
+        "path": "phase2873/attr_fusion/result.json",
+        "sha256_8": "dbf0e277",
+        "phase": 2873
+      }
+    },
+    {
+      "meas_id": "M2875_census_v2",
+      "type": "axis2_census_v2",
+      "verdict": "X1=false(n_heads_ge6=0)/X2=true(rho=-0.0031)/X3=independent/X5=absent(0.1667<0.1905)",
+      "source": {
+        "path": "phase2875/attr_census_v2/result.json",
+        "sha256_8": "182d0094",
+        "phase": 2875
+      }
+    },
+    {
+      "meas_id": "M2876_growth_v2",
+      "type": "growth_point",
+      "verdict": "D1=not_replicated/D2=axis_specific/D3=novel_dominant/D4=absent at 42 words",
+      "source": {
+        "path": "phase2876/growth_axis2_v2/result.json",
+        "sha256_8": "3b3770bd",
+        "phase": 2876
+      }
+    },
+    {
+      "meas_id": "M2877_mlp_channel",
+      "type": "channel_dissociation",
+      "verdict": "v1=true(det 0.0)/E1=mlp_carries_attr_axis(acc 0.5 vs null p95 0.1917)/E2=attr_margin_in_mlp(0.1158 vs 0.0563)",
+      "source": {
+        "path": "phase2877/attr_mlp_spectrum/result.json",
+        "sha256_8": "5c42ab92",
+        "phase": 2877
+      }
+    },
+    {
+      "meas_id": "M2878_syntax_trans_vocab",
+      "type": "vocab_legal_dual",
+      "verdict": "Gen1 vocab_legal=false (homograph contamination: \" chat\"->English; fr pairs 4/8) -> Gen2 expansion + frozen homograph exclusion: VG1 syntax 4/4 trans 3/3; syn_legal=true (number/gerund/comparative, 48 words 22 pairs; tense 0.1902 quarantined); trans_legal=false REAL NEGATIVE (VG2b ~0)",
+      "source": {
+        "path": "phase2878/syntax_trans_vocab/result.json",
+        "sha256_8": "66b282e3",
+        "phase": 2878
+      }
+    },
+    {
+      "meas_id": "M2879_syntax_mlp",
+      "type": "channel_dissociation",
+      "verdict": "v1=true(det 0.0)/E1=mlp_carries_syntax_axis(acc 0.7083 vs null p95 0.5208, 1.82x)/E2=margin_absent(0.0744 < 0.0889; weak trend only); layer profile peaks L35 (0.2425)",
+      "source": {
+        "path": "phase2879/syntax_mlp_spectrum/result.json",
+        "sha256_8": "44a659bd",
+        "phase": 2879
+      }
+    },
+    {
+      "meas_id": "M2880_syntax_census",
+      "type": "axis3_census",
+      "verdict": "Y1=False(syntax_frontedge_absent)/Y2=True(mechanism_side_separate,rho=0.059)/Y3=independent_populations/Y5=True(axis_signal_detected)",
+      "source": {
+        "path": "phase2880/syntax_census/result.json",
+        "sha256_8": "fa707e93",
+        "phase": 2880
+      }
+    },
+    {
+      "meas_id": "M2881_joint_coords",
+      "type": "joint_spectrum",
+      "verdict": "v1=true(det 0.0)/J1=joint_spectrum_carries_all_families(acc 0.7471 vs null p95 0.0882, 8.5x)/J2=gated_fusion_generalizes(own 0.7235 -> alpha*=0.5, delta* 0.0529 > 0.0412)/J3 transfer all>0.76/J4 family centroids mutually negative (class-attr -0.65)",
+      "source": {
+        "path": "phase2881/joint_word_coords/result.json",
+        "sha256_8": "eb95f6ff",
+        "phase": 2881
+      }
+    },
+    {
+      "meas_id": "M2883_ds7b_carrier",
+      "type": "cross_model_carrier",
+      "model": "deepseek-r1-distill-qwen-7b",
+      "verdict": "V1=true(10/10 classes, 80 words)/W3=true(v1=v2=0.0)/W1=mlp_carries_class_axis_ds7b(acc 0.575 vs null p95 0.1625, 3.5x)/W2=carrier_deviation(delta -0.30 vs qwen3-4b 0.875, outside +/-0.15 band)",
+      "source": {
+        "path": "phase2883/ds7b_class_mlp/result.json",
+        "sha256_8": "0563b354",
+        "phase": 2883
+      }
+    },
+    {
+      "meas_id": "M2884_window_discriminate",
+      "type": "attribution",
+      "model": "qwen3-4b + deepseek-r1-distill-qwen-7b",
+      "verdict": "window_discriminate=model_factor: C0=true (q_base10 0.875 and d_base8 0.575 exactly reproduced); C1=false (qwen 8L slices 0.8875/0.8250, within band); C2=false (ds7b 10L 0.6375, +0.0625 < 0.15); C3=false; the -0.30 carrier deviation is a genuine model factor, window length/position excluded",
+      "source": {
+        "path": "phase2884/window_discriminate/result.json",
+        "sha256_8": "1e68a3d9",
+        "phase": 2884
+      }
+    },
+    {
+      "meas_id": "M2885_ds7b_trans_axis",
+      "type": "discrimination",
+      "model": "deepseek-r1-distill-qwen-7b",
+      "verdict": "D+_model_general_negative: DS7B UNTIED lm_head translation-axis VG2b fr -0.0033 / de -0.0019 / es 0.0034 (all <= 0.2, all dead) vs qwen3-4b TIED reference -0.0007/-0.0029/0.0011; VG1 3/3 axes pass (10/12/13 valid pairs); tied-embedding distortion hypothesis REFUTED; \"translation != static unembed axis\" is model-general (tied+untied, 4B+7B)",
+      "source": {
+        "path": "phase2885/ds7b_trans_axis/result.json",
+        "sha256_8": "9173bd5c",
+        "phase": 2885
+      }
+    },
+    {
+      "meas_id": "M2886_hourglass_cka",
+      "type": "hourglass_test",
+      "model": "qwen3-4b",
+      "verdict": "hourglass_validated=False: H1=false (CKA curve is a STEP not inverted-U: last-token cross-language CKA low 0.13-0.19 at li 2-6, jumps to plateau 0.75-0.84 from li=7, slow decline; peak li=12 0.8394 but peak-ends contrast 0.086 < 0.10 gate); H2=false decisively (language probe LOO nearest-centroid = 1.0000 at EVERY layer li 1-36, mid NOT lower than ends 0.9146) - language identity is never stripped",
+      "source": {
+        "path": "phase2886/hourglass_cka/result.json",
+        "sha256_8": "6f579752",
+        "phase": 2886
+      }
+    },
+    {
+      "meas_id": "M2887_language_axis",
+      "type": "carrier_test",
+      "model": "qwen3-4b",
+      "verdict": "language_axis_in_mlp=True: E1 acc 0.7719 vs null p95 0.6491 (mlp_carries_language_axis); E2 same-language margin 0.1943 vs null p95 0.0482 (4.0x); E3 concept-pair control acc 0.0000 (below null p95 0.0877) = spectrum carries language identity with ZERO concept content",
+      "source": {
+        "path": "phase2887/language_axis_mlp/result.json",
+        "sha256_8": "de6e04a0",
+        "phase": 2887
+      }
+    },
+    {
+      "meas_id": "M2888_glm4_class",
+      "type": "carrier_test",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "mlp_carrier_replicates=True: W1 acc 0.8375 vs null p95 0.1381 (6.1x, mlp_carries_class_axis_glm4); W2 delta -0.0375 replicates_within_band (closest to qwen3-4b 0.875 among 3 models); W3 Gen2 rel budgets v1 1.1e-4 / v2 2.7e-4 (Gen1 abs 0.05 mismatched GLM4 activation scale - registered amendment per 2877 precedent); window [28,40) 12 layers; vocab 10/10 x 8 words legal",
+      "source": {
+        "path": "phase2888/glm4_class_mlp/result.json",
+        "sha256_8": "f16bcf62",
+        "phase": 2888
+      }
+    },
+    {
+      "meas_id": "M2889_qwen25_distill",
+      "type": "attribution_test",
+      "model": "qwen2.5-3b-instruct",
+      "verdict": "mlp_carrier_replicates=True: W1 acc 0.8375 vs null p95 0.1500 (5.6x, mlp_carries_class_axis_qwen25_3b); W2 delta -0.0375 replicates_within_band; W3 Gen2 rel v1 1.6e-4 / v2 2.0e-4; W4 distill_hypothesis_strengthened - non-distill qwen2-arch control in band exonerates the qwen2 architecture at 3B and the size direction is reverse (3B < 7B yet in band); DS7B -0.30 deviation narrowed to reasoning-distill training; residual confound: no 7B non-distill qwen2 control available locally (strengthened, not settled)",
+      "source": {
+        "path": "phase2889/qwen25_distill_test/result.json",
+        "sha256_8": "b00c36a0",
+        "phase": 2889
+      }
+    },
+    {
+      "meas_id": "M2890_language_axis_glm4",
+      "type": "carrier_test",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "language_axis_in_mlp_glm4=False (NEGATIVE): v1 ok (rel err 0.0); E1 acc 0.5256 BELOW null p95 0.6295 (null mean 0.5261 - at chance); E2 same-language margin 0.0333 < null p95 0.0395; E3 concept acc 0.0128 (also ~0 - not a channel swap, the spectrum carries neither language nor concept for this direction); WC language_carrier_deviation (delta -0.2463 vs qwen3-4b 0.7719); direction quality ok (E4 cos 1.0 at own layer li=20, decays 0.42->0.08 across window); D0 GLM4 hourglass: probe >=0.96 at essentially all layers (N5 no-stripping confirmed cross-model), CKA peak EARLY li=9 (0.8954) - different shape from qwen step at li 6->7",
+      "source": {
+        "path": "phase2890/language_axis_glm4/result.json",
+        "sha256_8": "eaaf6df3",
+        "phase": 2890
+      }
+    },
+    {
+      "meas_id": "M2891_language_attn_glm4",
+      "type": "carrier_test",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "attn_language_route_glm4=False (NEGATIVE): v1 ok (rel err 0.0, kernel-vs-hook noise 0.0); A1 acc 0.5897 < null p95 0.6410 (null mean 0.5279); A2 margin -0.0011 < null p95 0.0340; A3 concept acc 0.0000 (neither channel content); AC descriptive: attn 0.5897 vs own mlp 0.5256 (M2890) vs qwen mlp 0.7719 - both glm4 channels below null p95; closes N6 open candidate: language does NOT route via attention direct-write at the deep window either",
+      "source": {
+        "path": "phase2891/language_attn_glm4/result.json",
+        "sha256_8": "8ee79eb3",
+        "phase": 2891
+      }
+    },
+    {
+      "meas_id": "M2892_language_write_locate_glm4",
+      "type": "write_location",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "Stage1 (zero forward, 2890 S_last): L1=deep_write_dominant (segment shares of |Delta sep|: early 0.048 / mid 0.345 / DEEP 0.608); L2=False (deep |Delta| 4.18 > 0.10*sep_end 0.69) - NOT passive preservation, N7 passive claim corrected; sep grows 2.49 (li20) -> 9.61 (li39), layer 39 Delta -2.74 retraction; li*=39 -> W2=[37,40). Stage2 (dual-channel injection, rule-frozen window): mlp acc 0.6026 < null p95 0.6282 (A1 absent) but margin 0.0510 > p95 0.0447 (A2 weak-positive); attn acc 0.4231 absent. no_aligned_write_in_W2: the deep-window language separation growth is NOT channel direct-write along lang_dir - lang_dir (li=20 sentence centroid diff) is not the deep-write eigen-direction; caveat: Delta sep includes norm-growth contribution (dnorm curve rises monotonically), norm-matched control = open candidate",
+      "source": {
+        "path": "phase2892/language_write_locate_glm4/result.json",
+        "sha256_8": "9f9c874b",
+        "phase": 2892
+      }
+    },
+    {
+      "meas_id": "M2893_language_perlayer_glm4",
+      "type": "perlayer_direction_injection",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "perlayer_direction_write_detected_both: per-layer eigen-directions (zero-forward from 2890 S_last) injected at their own layers in W=[28,40); mlp acc 0.6923 > null p95 0.6410 (A1 carries, margin 0.0313 < p95 0.0349 absent, concept 0.0513 ~null); attn acc 0.6667 > p95 0.6288 AND margin 0.0732 > p95 0.0384 (both positive, concept 0.0000). Confirms 2892 hypothesis: deep layers DO write language separation but the write direction must be re-extracted per layer; lang_dir (li=20) negatives in 2890/2891/2892 were direction-mismatch artifacts. cos(dir_q(li), lang_dir) decays 0.4223 (li28) -> 0.0783 (li39). v1 rel err 0.0 both channels",
+      "source": {
+        "path": "phase2893/language_perlayer_glm4/result.json",
+        "sha256_8": "bb10476a",
+        "phase": 2893
+      }
+    },
+    {
+      "meas_id": "M2894_rotation_structure_glm4",
+      "type": "rotation_structure",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "rotation_plane_consistent_manifold_fullrank (zero forward, 2890 S_last): R1 rotation shares early 0.407 / mid 0.342 / deep 0.251 (caveat: early theta inflated by small dnorm, noise-dominated directions at li 1-2); R2 top2 tangent-PCA share 0.1648 > null p95 0.1084 (1000 random draws) => statistically concentrated but weak plane (16 percent, not a tight 2D plane); R3 effective rank 26.66 vs null median 39.95 - graded concentration, fails pre-registered 0.5x low-dim threshold; R4 top-2 tangent PCs nearly orthogonal to lang_dir (cos -0.088/-0.148) and segment top-2 spans nearly mutually orthogonal (principal angles 83-89 deg) => the rotation plane ITSELF rotates along depth. Audit: |u|=2sin(theta/2) max dev 7.8e-16, PCA recon exact; amendment: run 1 crashed pre-statistics (PC convention), dir(0) excluded with reason documented in execution.json",
+      "source": {
+        "path": "phase2894/rotation_structure_glm4/result.json",
+        "sha256_8": "c5bb65ed",
+        "phase": 2894
+      }
+    },
+    {
+      "meas_id": "M2895_rotation_structure_qwen",
+      "type": "rotation_structure",
+      "model": "qwen3-4b",
+      "verdict": "rotation_plane_consistent_manifold_fullrank - SAME verdict as glm4 (M2894): R2 top2_share 0.2037 > null p95 0.1225 (concentrated, weak plane); R3 er 23.30 vs null median 35.94 (full_rank_like); R4 segment spans 84-89 deg near-orthogonal. REFUTES the 2894-anticorrelation hypothesis: rotation geometry is model-universal, NOT what separates carrier-positive (qwen 0.7719) from carrier-negative (glm4 lang_dir injection). Sharp consequence: qwen deep mlp responds to the stale li=18 direction despite window cos decay 0.456->0.068, glm4 does not - the carrier asymmetry lies in CHANNEL READOUT (fixed-direction tolerance) not direction dynamics. dnorm(0)=0 exactly in BOTH models - class-mean language separation starts from zero at embeddings universally. Audit dev 1.6e-15; runtime 6.0s zero forward",
+      "source": {
+        "path": "phase2895/rotation_structure_qwen/result.json",
+        "sha256_8": "1019e3ec",
+        "phase": 2895
+      }
+    },
+    {
+      "meas_id": "M2896_qwen_readout_type",
+      "type": "channel_readout_discrimination",
+      "model": "qwen3-4b",
+      "verdict": "subspace_readout_tolerant: all three injection conditions A-positive (stale acc 0.8246 / margin 0.2216 vs p95 0.0292; eigen 0.8421 / 0.1799; orth 0.8246 / 0.1831; concept controls 0.000-0.070 ~null). qwen deep mlp responds to the stale li=18 direction AND per-layer eigen-directions AND the rotation-orthogonal components (cos(d(li),d18) 0.456->0.068) - readout is subspace-tolerant, not direction-matched. Cross-model closure: glm4 needs layer-matched directions (M2893 positive, stale negatives M2890/2891/2892) => carrier asymmetry = readout tolerance (qwen) vs direction matching (glm4), dynamics universal (M2895). v1 recompute 0.0 / hook-vs-call 0.0 (shape-matched capture); amendment: run 1 void per frozen v1 gate (shape-mismatched hook check, bf16 cross-shape kernel err 1.6e-3 = 2877 lesson; no verdict used from run 1)",
+      "source": {
+        "path": "phase2896/qwen_readout_type/result.json",
+        "sha256_8": "2468f496",
+        "phase": 2896
+      }
+    },
+    {
+      "meas_id": "M2897_glm4_readout_spectrum",
+      "type": "channel_readout_discrimination",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "broad_tolerance_glm4 (frozen mapping: orth+ & stale+). attn: eigen acc 0.7308/p95 0.6282 margin 0.1213 STRONG; orth acc 0.6795 margin 0.1222 STRONG; stale acc 0.6795>p95 but margin -0.0161 FRAGILE (M2891 same protocol/seed-draw gave acc 0.5897<p95, margin -0.0011 -> stale cell straddles p95 across null-token draws, margin null in BOTH runs). mlp: eigen acc 0.6795 margin 0.0198; stale 0.5385 negative (replicates M2890); orth 0.6282 vs p95 0.6288 borderline-negative. Concept controls 0.000-0.077. v1 0.0/0.0 shape-matched. Spectrum: qwen mlp subspace-tolerant > glm4 attn partially-tolerant (eigen+orth) > glm4 mlp direction-matched (eigen only)",
+      "source": {
+        "path": "phase2897/glm4_readout_spectrum/result.json",
+        "sha256_8": "e6291a28",
+        "phase": 2897
+      }
+    },
+    {
+      "meas_id": "M2898_attn_stale_robustness",
+      "type": "multi_draw_robustness",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "all_void_procedure_unstable (frozen v2 anchor gate: orth acc_flag_rate 0.625 < 0.8) with decisive descriptives: 8 seeds, attn only. STALE: margin <= 0 in 8/8 draws (-0.0011..-0.0176), acc_flag 2/8, acc 0.50-0.68 -> NO stale signal; M2897 stale+ component was a null-draw artifact. ORTH: margin > 0 in 8/8 draws (+0.0317..+0.1222) -> partial tolerance confirmed. Within-run determinism validated: seeds 2891/2897 reproduce M2891/M2897 accs exactly (0.5897/0.6795). Method lesson: single-draw acc>p95 binary flags at n=78 have low test-retest reliability (per-draw null p95 0.615-0.667); margin statistic is the stable criterion",
+      "source": {
+        "path": "phase2898/attn_stale_robustness/result.json",
+        "sha256_8": "9b2aa073",
+        "phase": 2898
+      }
+    },
+    {
+      "meas_id": "M2899_qwen_readout_robustness",
+      "type": "multi_draw_robustness",
+      "model": "qwen3-4b",
+      "verdict": "subspace_readout_tolerant_robust: 8 seeds, mlp only. ALL THREE conditions robust: stale acc_flag 8/8 (acc 0.70-0.88) margin 8/8 positive (+0.20..+0.26); eigen acc_flag 8/8 (0.79-0.93) margin 8/8 (+0.18..+0.23); orth acc_flag 8/8 (0.74-0.89) margin 8/8 (+0.18..+0.25); concept control ~0 throughout. Within-run determinism: seed 2896 reproduces M2896 accs exactly (0.8246/0.8421/0.8246). qwen mlp readout tolerance is draw-stable, contrasting glm4 attn stale fragility (M2898) - spectrum hierarchy confirmed under margin-first criteria",
+      "source": {
+        "path": "phase2899/qwen_readout_robustness/result.json",
+        "sha256_8": "b4416f00",
+        "phase": 2899
+      }
+    },
+    {
+      "meas_id": "M2900_glm4_mlp_eigen_robustness",
+      "type": "multi_draw_robustness",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "glm4_mlp_eigen_mixed: 8 seeds, mlp only, 3 conditions. EIGEN (primary): acc_flag 7/8 (acc 0.5641-0.7436, only s2904 False) but margin_flag 1/8 (margins 0.0166-0.0601, 7/8 positive yet below own p95 ~0.032-0.055; only s2901 passes). Threshold-adjacent weak-positive cell: signal real but ~10x smaller than qwen mlp (M2899 margins 0.18-0.26). STALE control: acc_flag 1/8, margin_flag 3/8 - no robust stale signal, consistent with M2898. ORTH: acc_flag 4/8, margin_flag 1/8 - borderline. Reproduction check passed: seeds 2893/2897 reproduce M2893/M2897 eigen accs exactly (0.6923/0.6795). M2893/M2897 acc-flags STAND; their margin-absence is confirmed as the true reading",
+      "source": {
+        "path": "phase2900/glm4_mlp_eigen_robustness/result.json",
+        "sha256_8": "31af8120",
+        "phase": 2900
+      }
+    },
+    {
+      "meas_id": "M2901_glm4_attn_eigen_robustness",
+      "type": "multi_draw_robustness",
+      "model": "glm4-9b-chat-hf",
+      "verdict": "glm4_attn_eigen_robust: 8 seeds (same set as M2898), attn only, 3 conditions. EIGEN (primary): acc_flag 8/8 (acc 0.6538-0.7308) margin_flag 7/8 (margins 0.0342-0.1213, only s2906 below own p95). STALE control: margin 0/8 positive (-0.0011..-0.0176) - confirms M2898. ORTH: margin 8/8 positive (0.0317-0.1222) - strengthens M2898 descriptive. Reproduction checks 4/4 pass (s2891 stale=M2891 0.5897; s2897 stale=M2897 0.6795 & margin=-0.0161=M2898; s2897 eigen=M2897 0.7308). Spectrum second tier now multi-draw confirmed: glm4 attn eigen+orth draw-stable, stale absent",
+      "source": {
+        "path": "phase2901/glm4_attn_eigen_robustness/result.json",
+        "sha256_8": "789083bf",
+        "phase": 2901
+      }
+    },
+    {
+      "meas_id": "M2902_glm4_channel_jacobian_asymmetry",
+      "type": "channel_jacobian_decomposition",
+      "model": "glm4-9b-chat-hf",
+      "phase": 2902,
+      "verdict": "language_alignment_asymmetry: the 6.1x margin gap (attn 0.1213 vs mlp 0.0198, exact M2897 reproduction via v2 anchor rel err ~1.8e-4) is NOT a response-gain or retention effect - attn responses are 3.1x SMALLER (R_gamma=0.318, same as random-dir baseline 0.44) and retention is near-zero in BOTH channels (rho~0.0-0.25, random-dir rho_null~0; both Jacobians fully re-orient the injected direction). The landed attn direction carries word-unembed alignment above its null-row baseline (A word-null per-layer ~0.002-0.009, median attn/mlp ratio R_A=1.438) while the mlp landed direction is language-neutral (word~null). mlp large response is class-nonspecific and cancels in the func/null contrast; attn small response is class-correlated and survives.",
+      "metrics": {
+        "R_gamma": 0.3181,
+        "R_rho": 1.2222,
+        "R_A": 1.4381,
+        "R_B": 0.3177,
+        "margin_ratio": 6.127,
+        "gamma_null_med": {
+          "mlp": 0.2372,
+          "attn": 0.1036
+        },
+        "rho_null_med": {
+          "mlp": 0.0006,
+          "attn": 0.0062
+        }
+      },
+      "src": {
+        "path": "phase2902/glm4_channel_jacobian_asymmetry/result.json",
+        "sha256_8": "3fe45d3b",
+        "phase": 2902
+      },
+      "notes": "window [28,40); 78 words x 3 conds, contexts bit-exact 2897 (SEED=2897); v1 recompute 0.0; 20 random-dir null (SEED=2902); weights descriptive: down_proj PR ~3600 (dim-inflated), W_VO composite PR ~210-245, zero-forward SwiGLU response on gain*d nearly zero (~1e-4) vs measured mlp gamma ~0.2-0.9 - the measured mlp response is context-interaction, not direct directional throughput"
+    },
+    {
+      "meas_id": "M2903_qwen_channel_jacobian_decomposition",
+      "type": "channel_jacobian_decomposition_cross_model",
+      "model": "qwen3-4b",
+      "phase": 2903,
+      "verdict": "density_not_confirmed: G_language_content_density_mechanism cross-model prediction refuted. qwen mlp has the LARGEST margin (0.1799, acc 0.8421 - M2896 eigen reproduced via v2 anchor rel err 2.3e-8 after load_native fix) but its landed-direction word-unembed alignment is lowest-tier (D_q_mlp = median(A_word - A_null) = 0.00165, BELOW its own random-direction null p95 0.00464). qwen attn eigen first measurement: margin -0.0195 (negative, acc 0.6140) - qwen attn does NOT carry eigen signal (opposite of glm4 attn). Post-hoc null calibration with 2902 stored null dirs: D_g_attn 0.00429 < glm4 null p95 0.01094 and D_g_mlp 0.00102 < glm4 null p95 0.00506 - the 2902 H3 evidence is also within noise. A (unembed-row alignment) carries NO above-noise signal in ANY channel of EITHER model.",
+      "metrics": {
+        "D_q_mlp": 0.00165,
+        "D_q_attn": 0.00386,
+        "D_g_mlp": 0.00102,
+        "D_g_attn": 0.00429,
+        "q_null_p95_mlp": 0.00464,
+        "q_null_p95_attn": 0.01428,
+        "g_null_p95_mlp": 0.00506,
+        "g_null_p95_attn": 0.01094,
+        "R_gamma": 0.2166,
+        "R_rho": 0.52,
+        "R_A": 1.1606,
+        "R_B": 0.2008,
+        "margin_mlp": 0.17991,
+        "margin_attn": -0.01946
+      },
+      "src": {
+        "path": "phase2903/qwen_channel_jacobian_decomposition/result.json",
+        "sha256_8": "8e6d009b",
+        "phase": 2903
+      },
+      "notes": "window [26,36); 57 words x 3 conds bit-exact 2896 (SEED=2896); directions recomputed from 2886 S_last (cos curve identical to stored cos_dli_d18); run 1 void: AutoModelForCausalLM device_map mixed cpu/cuda gave different context states than 2896 load_native full-GPU (anchor 2.5e-1), fixed by load_native verbatim (2877 lesson at device level); qwen mlp gamma 1.54-3.83 (5-10x glm4 mlp) with rho~0 - large response, fully re-oriented, class-correlated structure survives contrast but not via unembed alignment"
+    },
+    {
+      "meas_id": "M2904_b_row_space_structure_audit_gate",
+      "type": "structure_audit_gate",
+      "verdict": "detector_insensitive_all_void - anchor 4/4 (margin/acc recomputed from float32 npz match 2902/2903 stored: glm4 mlp 0.01979/0.67949, glm4 attn 0.12126/0.73077, qwen mlp 0.17991/0.84211, qwen attn -0.01946/0.61404); audit_1st_order PASS (synthetic class-mean shift: margin_full 0.176 > p95 0.031, margin_within -0.034 <= p95 -0.031); audit_negative PASS (iid 3% FP); audit_2nd_order FAIL (covariance-anisotropy construction: margin_within -0.032 not > p95 -0.026) => main reading (P={glm4 attn, qwen mlp} margin_within decomposition) never executed; construction diagnosed as first-moment-blind, see N11",
+      "source": {
+        "path": "phase2904/b_row_space_structure/result.json",
+        "sha256_8": "3a782d18",
+        "phase": 2904
+      }
+    },
+    {
+      "meas_id": "M2905_margin_structure_skew_audited",
+      "type": "structure_decomposition",
+      "verdict": "margin_carried_by_class_mean_shift - audits all pass (anchor 4/4; audit_1st PASS; audit_2nd_skew 20/20 detection vs >=12/20 gate, median margin_within +0.085; audit_negative PASS; from_mean identity 4/4). Positive set P={glm4 attn, qwen mlp}: both margin_within (-0.0229 / -0.0332) <= perm p95_within (-0.0149 / -0.0195) => 1st-order class-mean shift carries the margin. Fisher F / Hotelling T2 sign pattern matches margin positivity 4/4 (qwen mlp F 5.12>p95 2.29, T2 51.1>23.1; glm4 attn F 6.68>2.70, T2 54.9>27.1; both negative groups below). delta layer profile qwen mlp concentrated L27/L30/L34 (-0.173/-0.118/-0.107); margin_from_mean >> margin_full (1.47 vs 0.18, 0.39 vs 0.12) - class-mean structure diluted by within-class scatter",
+      "source": {
+        "path": "phase2905/margin_structure_skew_audited/result.json",
+        "sha256_8": "05a42b4d",
+        "phase": 2905
+      }
+    }
+  ],
+  "growth_curve": [
+    {
+      "point_id": "G_axis1_full",
+      "axis_id": "class",
+      "block": "B2_causal",
+      "components": 1152,
+      "acc": 0.325,
+      "phase": 2867
+    },
+    {
+      "point_id": "G_axis1_sparse",
+      "axis_id": "class",
+      "block": "B2s_class43",
+      "components": 43,
+      "acc": 0.425,
+      "phase": 2868
+    },
+    {
+      "point_id": "G_axis1_mlp",
+      "axis_id": "class",
+      "block": "B3_mlp",
+      "components": 10,
+      "acc": 0.875,
+      "phase": 2867
+    },
+    {
+      "point_id": "G_axis1_naive_fusion",
+      "axis_id": "class",
+      "block": "B23",
+      "components": 1162,
+      "acc": 0.7375,
+      "phase": 2868
+    },
+    {
+      "point_id": "G_axis1_density_fusion",
+      "axis_id": "class",
+      "block": "B3+0.25*B2s",
+      "components": 53,
+      "acc": 0.8875,
+      "phase": 2869
+    },
+    {
+      "point_id": "G_axis2_attr",
+      "axis_id": "attr",
+      "block": "B_attr_causal",
+      "components": 3,
+      "acc": 0.2143,
+      "shared_with_prev": 0,
+      "new": 3,
+      "phase": 2873,
+      "notes": "power-limited at 28 words; not a zero-proof"
+    },
+    {
+      "point_id": "G_axis2_attr42_causal",
+      "axis_id": "attr",
+      "block": "B_attr_causal_v2",
+      "components": 1152,
+      "acc": 0.1667,
+      "phase": 2875,
+      "notes": "below null p95 - channel absent"
+    },
+    {
+      "point_id": "G_axis2_attr42_mlp",
+      "axis_id": "attr",
+      "block": "B3_attr_mlp",
+      "components": 10,
+      "acc": 0.5,
+      "shared_with_prev": 0,
+      "new": 10,
+      "phase": 2877,
+      "notes": "mlp channel carries attr axis; carrier-stratification law replicates"
+    },
+    {
+      "point_id": "G_axis3_syntax_mlp",
+      "axis_id": "syntax",
+      "block": "B3_syntax_mlp",
+      "components": 10,
+      "acc": 0.7083,
+      "shared_with_prev": 0,
+      "new": 10,
+      "phase": 2879,
+      "notes": "mlp channel curve: class 0.875 / attr 0.500 / syntax 0.7083; E2 margin absent (retrieval succeeds without global same-axis clustering - unbalanced 3-axis null p95 0.5208)"
+    },
+    {
+      "point_id": "G_axis3_syntax_causal",
+      "axis_id": "syntax",
+      "block": "B_syntax_causal",
+      "components": 1152,
+      "acc": 0.5625,
+      "phase": 2880,
+      "notes": "above null p95"
+    },
+    {
+      "point_id": "G_joint_3fam",
+      "axis_id": "class",
+      "block": "B3_joint_3fam",
+      "components": 210,
+      "acc": 0.7471,
+      "phase": 2881,
+      "notes": "three-family joint spectrum: 21 fine labels retrieved at 8.5x null; gated fusion alpha*=0.5 generalizes the 2869 law across families"
+    },
+    {
+      "point_id": "G_ds7b_class_mlp",
+      "axis_id": "class",
+      "model": "deepseek-r1-distill-qwen-7b",
+      "block": "B3_mlp_ds7b",
+      "components": 8,
+      "acc": 0.575,
+      "phase": 2883,
+      "notes": "first cross-model growth point; carrier law holds qualitatively (3.5x null) but magnitude lower than qwen3-4b 0.875 (8-layer vs 10-layer window, distilled reasoning model)"
+    },
+    {
+      "point_id": "G_axis4_language",
+      "axis_id": "language",
+      "block": "B3_language",
+      "components": 10,
+      "acc": 0.7719,
+      "phase": 2887,
+      "notes": "4th axis family in the mlp channel; direction extracted from mid-stream sentence states (2886 li=18), not unembed; carrier curve now class 0.875 / attr 0.500 / syntax 0.708 / language 0.772"
+    },
+    {
+      "point_id": "G_glm4_class_mlp",
+      "axis_id": "class",
+      "model": "glm4-9b-chat-hf",
+      "block": "B3_mlp_glm4",
+      "components": 12,
+      "acc": 0.8375,
+      "phase": 2888,
+      "notes": "third model, 2nd architecture family (glm vs qwen): carrier curve qwen3-4b 0.875 / glm4 0.8375 / ds7b 0.575; magnitude is model-dependent but the channel itself is architecture-general"
+    },
+    {
+      "point_id": "G_qwen25_distill_test",
+      "axis_id": "class",
+      "model": "qwen2.5-3b-instruct",
+      "block": "B3_mlp_qwen25_3b",
+      "components": 10,
+      "acc": 0.8375,
+      "phase": 2889,
+      "notes": "4th model, 3rd data point on the qwen2 arch family: carrier curve qwen3-4b 0.875 / glm4 0.8375 / qwen2.5-3b 0.8375 / ds7b 0.575; the channel is architecture-general, strength model-dependent"
+    },
+    {
+      "point_id": "G_language_glm4",
+      "axis_id": "language",
+      "model": "glm4-9b-chat-hf",
+      "block": "B3_language_glm4",
+      "components": 12,
+      "acc": 0.5256,
+      "phase": 2890,
+      "notes": "NEGATIVE point: acc at null mean (0.5261), below null p95; language-direction mlp carrier is qwen3-4b-scoped so far; language carrier curve: qwen3-4b 0.7719 / glm4 0.5256"
+    },
+    {
+      "point_id": "G_language_attn_glm4",
+      "axis_id": "language",
+      "model": "glm4-9b-chat-hf",
+      "block": "B_attn_language_glm4",
+      "components": 12,
+      "acc": 0.5897,
+      "phase": 2891,
+      "notes": "ATTENTION channel (negative, below null p95); language carrier landscape: qwen mlp 0.7719 / glm4 mlp 0.5256 / glm4 attn 0.5897 - glm4 carries the direction in NEITHER deep-window channel"
+    },
+    {
+      "growth_id": "G_perlayer_lang_glm4",
+      "phase": 2893,
+      "model": "glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "GLM4 deep-window language write detected with layer-matched eigen-directions (mlp 0.6923, attn 0.6667 both above null p95); 2887 language-carrier claim refined: not qwen-exclusive - GLM4 has the write but only per-layer directions reveal it; direction rotation along depth is intrinsic (cos to li=20 lang_dir 0.42 -> 0.08)"
+    },
+    {
+      "growth_id": "G_rotation_struct_glm4",
+      "phase": 2894,
+      "model": "glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "GLM4 language direction rotates with depth in a statistically concentrated but slowly-rotating subspace: no single persistent rotation plane (segment spans near-orthogonal), no low-dim manifold (er 26.7/40); dnorm(0)=0 exactly - class-mean language separation starts from zero at embeddings and is built entirely by layers (per-sentence probe identity at li=1 is a different, non-class-level fact)",
+      "corrects_refines": "rotation-plane hypothesis (Unified Theory): plane exists statistically but is segment-local, not global"
+    },
+    {
+      "growth_id": "G_rotation_universal",
+      "phase": 2895,
+      "model": "qwen3-4b+glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "language-direction rotation structure is model-universal: same verdict, similar shares (early/mid/deep ~0.39/0.34/0.27 both), similar graded concentration, segment-local planes, and dnorm(0)=0 exact zero start in both models; carrier asymmetry (qwen mlp carries, glm4 does not) must be a channel-readout property"
+    },
+    {
+      "growth_id": "G_readout_types",
+      "phase": 2896,
+      "model": "qwen3-4b vs glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "two channel-readout types discovered: qwen mlp is SUBSPACE-TOLERANT (responds to stale, eigen, and orthogonal directions alike, all acc >= 0.82) while glm4 is DIRECTION-MATCHED (only layer-matched eigen-directions work); direction rotation dynamics universal (M2895) - the carrier-law per-model variation is a readout property"
+    },
+    {
+      "growth_id": "G_glm4_readout_spectrum",
+      "phase": 2897,
+      "model": "glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "GLM4 readout is channel-split: attention is partially subspace-tolerant (orth component carries full retrieval signal, margin 0.1222 >> p95 0.0434) while mlp is direction-matched (eigen only; orth borderline-negative). 2896 binary qwen-vs-glm4 contrast refines to a spectrum; the stale-direction cell is null-draw fragile (acc straddles p95, margin null in both M2891 and M2897) and needs a multi-draw robustness check before any strict claim"
+    },
+    {
+      "growth_id": "G_multi_draw_lesson",
+      "phase": 2898,
+      "model": "glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "threshold-adjacent cells (acc near null p95) must be adjudicated by margin statistic and/or multi-draw repetition: single-draw acc>p95 flags flip across null-token draws (orth 5/8, stale 2/8) while margin is draw-stable (stale 0/8 positive, orth 8/8 positive). Future protocols: margin-first decision criteria; multi-draw mandatory when |acc-p95| small"
+    },
+    {
+      "growth_id": "G_margin_first_validated_qwen",
+      "phase": 2899,
+      "model": "qwen3-4b",
+      "axis": "language",
+      "finding": "margin-first multi-draw protocol (G_multi_draw_lesson) applied to a STRONG cell family: qwen mlp three-condition tolerance passes 24/24 dual-flag with margins 6-8x null p95 - robust positive counterpart to M2898 fragile-negative; subspace_readout_tolerant (M2896) upgraded to draw-stable status"
+    },
+    {
+      "growth_id": "G_dual_flag_divergence",
+      "phase": 2900,
+      "model": "glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "weak cells split acc-flag vs margin-flag: glm4 mlp eigen is acc-positive 7/8 but margin-positive-vs-own-p95 only 1/8 - acc retrieves above-chance while same-language geometry barely exceeds its tighter null. Margin magnitude, not binary flag, is the quantitative carrier strength: spectrum margins qwen mlp ~0.2 >> glm4 attn ~0.12 >> glm4 mlp ~0.02-0.03"
+    },
+    {
+      "growth_id": "G_language_content_density_mechanism",
+      "phase": 2902,
+      "model": "glm4-9b-chat-hf",
+      "axis": "language",
+      "finding": "readout margin = class-correlated fraction of channel Jacobian response, not response magnitude: glm4 attn (small response, word-unembed-aligned landed dirs, margin 0.121) vs glm4 mlp (3x larger response, language-neutral landed dirs, margin 0.020). Unifies the L14 spectrum: qwen mlp ~0.2 >> glm4 attn ~0.12 >> glm4 mlp ~0.02 orders the language-content density of landed directions across carriers. | 2903 revision: cross-model prediction refuted (D_q_mlp 0.00165 < null p95 0.00464) and post-hoc null calibration shows the glm4 A-differences were also within noise - mechanism claim withdrawn; see E8/N10",
+      "src": {
+        "path": "phase2902/glm4_channel_jacobian_asymmetry/result.json",
+        "sha256_8": "3fe45d3b",
+        "phase": 2902
+      },
+      "status_revision": "restricted_to_within_glm4_then_refuted_by_2903_null_calibration"
+    }
+  ],
+  "linkage": [
+    {
+      "link_id": "L1_l13h30_mlp_indirect",
+      "from": {
+        "headset": "top64_causal",
+        "head": "L13H30"
+      },
+      "to": {
+        "kind": "mlp_response",
+        "block": "B3_mlp"
+      },
+      "evidence": "G_mlp/G_attn=4.7 per word; e_ff=-0.23 (~30x OV static 0.0075); rotation layer word-specific",
+      "phase": 2865,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L2_gate_backbone",
+      "from": {
+        "kind": "qk_gate_pool",
+        "n_heads": 15,
+        "share": 0.09
+      },
+      "to": {
+        "kind": "backbone_passthrough",
+        "n_heads": 497,
+        "share": 0.91
+      },
+      "evidence": "gate pool explicit modulation vs passive backbone, 60% compensatory negatives",
+      "phase": 2844,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L3_density_gating",
+      "from": {
+        "block": "B3_mlp",
+        "dim": 10
+      },
+      "to": {
+        "block": "B2_causal",
+        "dim": 1152
+      },
+      "evidence": "naive concat harmful (-0.1375); density-matched 1:4 gain +0.0125; carriers stratify by info density",
+      "phase": 2869,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L4_axis_independence",
+      "from": {
+        "axis": "class"
+      },
+      "to": {
+        "axis": "attr"
+      },
+      "evidence": "geometry cos<=0.0755 (2870); mechanism rho=-0.0031 (2875); causal overlap 0 (2876); mlp channel carries both axes at different density (class 0.875 / attr 0.5, 2877) / syntax E1 0.7083 (2879) / syntax E1 0.7083 (2879)",
+      "phase": 2873,
+      "status": "confirmed",
+      "notes": "independence holds per-channel; shared mlp carrier law"
+    },
+    {
+      "link_id": "L5_channel_law_syntax",
+      "from": {
+        "axis": "syntax"
+      },
+      "to": {
+        "kind": "mlp_response",
+        "block": "B3_syntax_mlp"
+      },
+      "evidence": "E1 retrieval 0.7083 (1.82x null p95) with zero new head components; E2 margin absent - mlp carrier law holds for a third axis family (class 0.875 / attr 0.5 / syntax 0.7083), while translation axes have NO unified direction in the tied unembed (VG2b ~0, 2878)",
+      "phase": 2879,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L6_quadrant_syntax",
+      "from": {
+        "axis": "syntax",
+        "block": "B_syntax_causal"
+      },
+      "to": {
+        "block": "B3_syntax_mlp"
+      },
+      "evidence": "channel quadrant syntax: drop-spectrum Y5=True (acc 0.5625 vs null p95 0.5417), Y1 frontedge n3=0 vs null p95 1.0; mlp E1=0.7083 (2879); post-hoc: number axis alone margin +0.3216 > 0.1460",
+      "phase": 2880,
+      "status": "measured"
+    },
+    {
+      "link_id": "L7_joint_channel",
+      "from": {
+        "block": "B3_joint_3fam",
+        "dim": 210
+      },
+      "to": {
+        "kind": "mlp_response",
+        "families": [
+          "class",
+          "attr",
+          "syntax"
+        ]
+      },
+      "evidence": "all 21 fine labels retrievable from ONE joint mlp spectrum (8.5x null); cross-family fusion adds +0.053 at alpha*=0.5 (2869 law generalizes); family centroids mutually negative (separated subspaces of one channel, not three channels)",
+      "phase": 2881,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L8_cross_model_carrier",
+      "from": {
+        "axis": "class",
+        "model": "qwen3-4b",
+        "block": "B3_mlp"
+      },
+      "to": {
+        "axis": "class",
+        "model": "deepseek-r1-distill-qwen-7b",
+        "block": "B3_mlp_ds7b"
+      },
+      "evidence": "same 2806 vocab + scaled window: DS7B W1 acc 0.575 (3.5x null p95 0.1625), W3 rebuild exact (v1=v2=0); carrier law replicates qualitatively, magnitude model-dependent (-0.30 deviation)",
+      "phase": 2883,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L9_carrier_attribution",
+      "from": {
+        "axis": "class",
+        "model": "qwen3-4b",
+        "block": "B3_mlp"
+      },
+      "to": {
+        "axis": "class",
+        "model": "deepseek-r1-distill-qwen-7b",
+        "block": "B3_mlp_ds7b"
+      },
+      "evidence": "M2884 five-arm window discrimination: qwen {[26,36)=0.875, [26,34)=0.8875, [28,36)=0.8250, [24,34)=0.9000}, ds7b {[20,28)=0.575, [18,28)=0.6375}; no manipulation moves acc by >=0.15 => carrier strength is an intrinsic model property (candidate causes: distill training, untied lm_head geometry)",
+      "phase": 2884,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L10_language_concept_split",
+      "from": {
+        "axis": "language",
+        "model": "qwen3-4b",
+        "block": "B3_language"
+      },
+      "to": {
+        "axis": "class",
+        "model": "qwen3-4b",
+        "block": "B3_mlp"
+      },
+      "evidence": "same 10-dim mlp channel: language spectrum retrieves language (E1 true) but concept pairs at chance (E3 acc 0.0000) - language identity and concept content are dissociable components of the single channel; endpoint static axis absent (N1/N4) while mid-stream-derived direction works",
+      "phase": 2887,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L11_three_model_carrier",
+      "from": {
+        "axis": "class",
+        "model": "qwen3-4b",
+        "block": "B3_mlp"
+      },
+      "to": {
+        "axis": "class",
+        "model": "glm4-9b-chat-hf",
+        "block": "B3_mlp_glm4"
+      },
+      "evidence": "three models, two architecture families (qwen3-4b 0.875, glm4-9b 0.8375 within band, ds7b 0.575 deviation): mlp direct-write carrier is architecture-general; strength model-dependent",
+      "phase": 2888,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L12_distill_attribution",
+      "from": {
+        "axis": "class",
+        "model": "deepseek-r1-distill-qwen-7b",
+        "block": "B3_mlp_ds7b"
+      },
+      "to": {
+        "axis": "class",
+        "model": "qwen2.5-3b-instruct",
+        "block": "B3_mlp_qwen25_3b"
+      },
+      "evidence": "same qwen2 architecture family, non-distill instruct training, smaller size (3B): carrier in band (0.8375 vs anchor 0.875, delta -0.0375; delta vs ds7b +0.2625) -> architecture and small size exonerated; DS7B deviation attributed to reasoning-distill training (7B non-distill control unavailable -> strengthened not settled)",
+      "phase": 2889,
+      "status": "confirmed"
+    },
+    {
+      "link_id": "L13_rotation_vs_carrier_refuted",
+      "phase": 2895,
+      "connects": [
+        "M2894_rotation_structure_glm4",
+        "M2895_rotation_structure_qwen",
+        "M2887_language_axis"
+      ],
+      "relation": "refutes_anticorrelation",
+      "notes": "rotation-vs-carrier anticorrelation hypothesis refuted: both models rotate equally (top2 0.20 vs 0.16, er 23.3 vs 26.7); qwen channel reads a rotated-away fixed direction (cos 0.14-0.46 at window) with 0.7719 accuracy while glm4 needs layer-matched directions (M2893) | refined by M2896: readout types identified - qwen subspace-tolerant (stale/eigen/orth all positive 0.82-0.84), glm4 direction-matched; asymmetry is a channel property | refined by M2897: glm4 attn is partially tolerant (orth margin 0.1222), spectrum not binary; stale cell null-draw fragile"
+    },
+    {
+      "link_id": "L14_readout_spectrum_cross_model",
+      "phase": 2897,
+      "type": "cross_model_spectrum",
+      "connects": [
+        "M2896_qwen_readout_type",
+        "M2897_glm4_readout_spectrum",
+        "M2893_language_perlayer_glm4",
+        "M2890_language_axis_glm4",
+        "M2891_language_attn_glm4",
+        "M2899_qwen_readout_robustness",
+        "M2900_glm4_mlp_eigen_robustness",
+        "M2901_glm4_attn_eigen_robustness",
+        "M2902_glm4_channel_jacobian_asymmetry",
+        "M2903_qwen_channel_jacobian_decomposition",
+        "M2904_b_row_space_structure_audit_gate",
+        "M2905_margin_structure_skew_audited"
+      ],
+      "notes": "readout tolerance spectrum: qwen mlp all-three (margins 0.18-0.22) > glm4 attn eigen+orth (margins ~0.12) > glm4 mlp eigen-only; rotation dynamics universal (M2895); carrier-law per-model variation = readout tolerance gradient | refined by M2898: glm4 attn stale component retracted (8/8 margin<=0); spectrum stands on eigen+orth tolerance | confirmed by M2899: qwen mlp tier draw-stable under 8-draw margin-first protocol (24/24 dual-flag) | M2900 quantifies glm4 mlp eigen tier: acc_flag 7/8 but margin ~0.02-0.03 (1/8 over own p95) - real but weak, ~10x below qwen; spectrum stands as margin-magnitude hierarchy | M2901 confirms spectrum second tier under multi-draw: glm4 attn eigen acc 8/8 margin 7/8, orth margin 8/8, stale 0/8 - full spectrum now margin-first adjudicated | 2902 mechanism attribution: the per-model margin hierarchy is carried by LANDED-DIRECTION LANGUAGE CONTENT DENSITY, not response gain - glm4 attn landed dirs keep word-unembed alignment (R_A=1.438 vs null-row baseline) while glm4 mlp landed dirs are language-neutral; both channels fully re-orient the injected direction (rho~0). Predicts qwen mlp (~0.2 margin) landed dirs are even more language-aligned - testable cross-model. | 2903: margin hierarchy root cause reopened - scalar Jacobian metrics (norm gain N9, retention rho~0, unembed alignment E8/N10) all fail; margin must live in the class-correlated STRUCTURE of the B row space; qwen attn eigen first measured negative (margin -0.0195) | 2904 audit gate: scalar margin variants are 1st-order (class-mean) and skewness-sensitive only; covariance anisotropy invisible by first-moment identity (N11); higher-order reading requires skew-audited detector (2905) | 2905 main reading (skew-audited): margin is carried by 1st-order class-mean shift in the B row space; F/T2 significance pattern matches margin positivity 4/4; margin level = class-mean shift diluted by within-class scatter",
+      "phase_updated": 2905
+    }
+  ],
+  "errata_ledger": [
+    {
+      "phase": 2860,
+      "corrects": [
+        2853,
+        2855
+      ],
+      "note": "pseudo-residual workpoint mixing; L32-34 gain ~7 artifact"
+    },
+    {
+      "phase": 2861,
+      "corrects": [
+        2853
+      ],
+      "note": "true-workpoint re-test: no window amplification"
+    },
+    {
+      "phase": 2871,
+      "corrects": [
+        2864
+      ],
+      "note": "102-head set was wrong-tail vector; correct = p<0.01 43"
+    },
+    {
+      "corrects": "N7_attention_route_glm4",
+      "note": "passive-preservation claim corrected by M2892: deep-window language-separation growth is dominant (60.8 percent of |Delta sep|, L2=False), the write is real but NOT aligned to lang_dir (mlp/attn injection negatives at W2 [37,40)); lang_dir is not the deep-write eigen-direction; embedding-lexical origin claim also softened (probe 1.0 from li=1 stands, but the direction keeps growing deep)",
+      "phase": 2892
+    },
+    {
+      "corrects": "N6_language_carrier_glm4/N7_attention_route_glm4",
+      "note": "direction-mismatch artifacts corrected by M2893: layer-matched eigen-directions give A1 positive on BOTH channels (mlp 0.6923 / attn 0.6667 above null p95) - GLM4 deep layers do write language separation; 2890/2891 negatives reflect stale li=20 lang_dir, not absent writes; language write is channel-real but direction-rotating along depth",
+      "phase": 2893
+    },
+    {
+      "corrects": "M2891_language_attn_glm4",
+      "note": "M2891 attn_language_signal_absent reading refined by M2897: the stale-direction attn cell is null-draw fragile - acc 0.5897 (M2891, SEED=2891) vs 0.6795 (M2897, SEED=2897) straddles null p95 ~0.63 with margin <= 0 in BOTH runs; the robust M2891 conclusion (no strong stale signal) stands, but strict \"direction-matched\" is untenable for attn (orth margin 0.1222 positive in M2897); open candidate: multi-draw robustness check",
+      "phase": 2897
+    },
+    {
+      "corrects": "M2897_glm4_readout_spectrum",
+      "note": "broad_tolerance_glm4 verdict refined by M2898: the stale+ (attn acc 0.6795>p95) component was a null-draw artifact (margin -0.0161, and 8-draw repetition gives margin<=0 in 8/8); robust 2897 reading is partial_tolerance - GLM4 attn carries eigen+orth (orth margin 8/8 positive) but NOT stale; spectrum qwen-mlp > glm4-attn > glm4-mlp unchanged",
+      "phase": 2898
+    },
+    {
+      "corrects": "M2902_glm4_channel_jacobian_asymmetry",
+      "note": "the language_alignment_asymmetry verdict (H3: attn landed directions carry word-unembed alignment, R_A=1.438) does not survive random-direction null calibration: D_g_attn 0.00429 and D_g_mlp 0.00102 are both BELOW their null p95 (0.01094 / 0.00506, computed post-hoc from the 2902 stored 20 null-dir entries). H1 (norm gain) and H2 (retention) refutations stand (N9); H3 downgraded to not-established. The frozen preregistered mapping output language_alignment_asymmetry remains on record as the mapping result, but the mechanism reading is: no scalar Jacobian metric tested (gain, retention, unembed alignment) explains the margin hierarchy in either model. Spectrum root cause reopened.",
+      "phase": 2903
+    }
+  ],
+  "quadrants": [
+    {
+      "family": "class",
+      "drop_spectrum": {
+        "organized": true,
+        "frontedge_heads": 43,
+        "sources": [
+          "M2859_stability"
+        ]
+      },
+      "mlp_carrier": {
+        "acc": 0.875,
+        "sources": [
+          "M2867_word_coords_v1"
+        ]
+      },
+      "quadrant": "organized+strong_mlp"
+    },
+    {
+      "family": "attr",
+      "drop_spectrum": {
+        "organized": false,
+        "sources": [
+          "M2875_census_v2"
+        ],
+        "note": "X1=false (n_heads_ge6=0), X5=absent"
+      },
+      "mlp_carrier": {
+        "acc": 0.5,
+        "sources": [
+          "M2877_mlp_channel"
+        ]
+      },
+      "quadrant": "dissociated_mlp_only"
+    },
+    {
+      "family": "syntax",
+      "drop_spectrum": {
+        "organized": false,
+        "weak_retrieval_acc": 0.5625,
+        "null_p95": 0.5417,
+        "sources": [
+          "M2880_syntax_census"
+        ],
+        "note": "Y1 frontedge absent; Y5 marginal +0.021"
+      },
+      "mlp_carrier": {
+        "acc": 0.7083,
+        "sources": [
+          "M2879_syntax_mlp"
+        ]
+      },
+      "quadrant": "intermediate"
+    },
+    {
+      "family": "translation",
+      "drop_spectrum": {
+        "organized": false,
+        "unified_axis_direction": false,
+        "sources": [
+          "M2878_syntax_trans_vocab"
+        ]
+      },
+      "mlp_carrier": {
+        "acc": null,
+        "sources": [],
+        "note": "not_measured - no unified axis to project"
+      },
+      "quadrant": "no_axis"
+    }
+  ],
+  "transfer": {
+    "source": {
+      "meas_id": "M2881_joint_coords",
+      "phase": 2881
+    },
+    "matrix_rows=fa_dirs_cols=fb_words": {
+      "class": {
+        "class": 0.9625,
+        "attr": 0.9286,
+        "syntax": 0.9792
+      },
+      "attr": {
+        "class": 0.975,
+        "attr": 0.9524,
+        "syntax": 0.8958
+      },
+      "syntax": {
+        "class": 0.9,
+        "attr": 0.7619,
+        "syntax": 0.8542
+      }
+    },
+    "family_centroid_cos": [
+      [
+        1.0,
+        -0.6475,
+        -0.3283
+      ],
+      [
+        -0.6475,
+        1.0,
+        -0.1436
+      ],
+      [
+        -0.3283,
+        -0.1436,
+        1.0
+      ]
+    ],
+    "interpretation": "all cells > 0.76 (class rows strongest 0.93-0.98); family centroids mutually negative - separated subspaces of one mlp channel",
+    "descriptive": true
+  },
+  "negatives": [
+    {
+      "neg_id": "N1_translation_axis_absent",
+      "kind": "real_negative",
+      "claim": "no unified cross-lingual axis direction exists in the tied unembed (en->L direction is concept/wordform dominated, language-constant component ~ 0)",
+      "evidence": "VG2b pair-pair cos fr -0.0007 / de -0.0029 / es 0.0011 after homograph decontamination (2878 Gen2)",
+      "sources": [
+        "M2878_syntax_trans_vocab"
+      ],
+      "status": "settled",
+      "reopen_condition": null
+    },
+    {
+      "neg_id": "N2_tense_axis_quarantine",
+      "kind": "quarantine",
+      "claim": "tense axis VG2b 0.1902 < 0.2 gate (margin 0.0102) - quarantined, NOT a zero-proof",
+      "evidence": "2878 Gen2 per-axis VG2b; number 0.2021 / gerund 0.2352 / comparative 0.3636 survived",
+      "sources": [
+        "M2878_syntax_trans_vocab"
+      ],
+      "status": "reopenable",
+      "reopen_condition": "expand tense pool to >= 8 single-token pairs and re-test VG2b"
+    },
+    {
+      "neg_id": "N3_e200_quarantine",
+      "kind": "quarantine",
+      "claim": "E200 vocab failed 2858 G2 cross-axis orthogonality (offdiag 0.494 > 0.488); census deferred",
+      "evidence": "2858 G2 gate; 199-word vocab",
+      "sources": [
+        "M2857_drift"
+      ],
+      "status": "reopenable",
+      "reopen_condition": "rebuild vocab with per-axis pools such that max offdiag < 0.488"
+    },
+    {
+      "neg_id": "N4_ds7b_translation",
+      "claim": "no unified cross-lingual axis direction in the UNTIED unembed (lm_head rows) of DS7B",
+      "evidence": "M2885: VG2b fr -0.0033 / de -0.0019 / es 0.0034, all axes quarantined; homograph-excluded pools, 10-13 valid pairs per axis",
+      "status": "settled",
+      "implication": "with N1 (qwen tied), absence of a static translation axis at the endpoints is model-general; hourglass (mid-stream language processing) is the main surviving hypothesis",
+      "source": {
+        "phase": 2885,
+        "meas_id": "M2885_ds7b_trans_axis"
+      }
+    },
+    {
+      "neg_id": "N5_hourglass_stripping",
+      "claim": "hourglass \"language stripped mid-stream\" (language probe dips to ~chance at mid layers)",
+      "evidence": "M2886 H2: probe = 1.0000 at every layer li 1-36 (80 sentences, en/fr); H1: CKA step at li 6->7 to 0.8 plateau, not inverted-U",
+      "status": "settled",
+      "implication": "language identity coexists with cross-language semantic alignment at all depths; the correct picture is \"aligned semantics WITH persistent language identity\", mid-layer language directions are extractable (probe=1.0) -> candidate 4th axis family for the mlp carrier law",
+      "source": {
+        "phase": 2886,
+        "meas_id": "M2886_hourglass_cka"
+      }
+    },
+    {
+      "neg_id": "N6_language_carrier_glm4",
+      "claim": "the 2887 4th-family mlp direct-write language carrier (L10) generalizes across architectures",
+      "evidence": "M2890: E1 acc 0.5256 < null p95 0.6295 (null mean 0.5261, at chance); E2 margin below null; E3 concept acc 0.0128 ~ 0 (neither language nor concept content in the spectrum); E4 direction quality verified (cos 1.0 at li=20)",
+      "status": "settled",
+      "implication": "the mlp carrier law is axis-family x model specific for language: qwen3-4b carries its mid-stream language direction through the mlp channel, glm4 does not - glm4 keeps language identity in the residual stream (probe >=0.96 all layers, D0) without mlp direct-write engagement; class/attr/syntax carriers DID replicate on glm4 (M2888), so the failure is specific to the language direction provenance (sentence-state mid-stream); open candidate: attention-response spectrum for lang_dir on glm4 (language may route via attention there)",
+      "source": {
+        "phase": 2890,
+        "meas_id": "M2890_language_axis_glm4"
+      }
+    },
+    {
+      "neg_id": "N7_attention_route_glm4",
+      "claim": "glm4 language direction routes through the attention channel (direct-write) at the deep window, closing the N6 open candidate",
+      "evidence": "M2891: A1 acc 0.5897 < null p95 0.6410; A2 margin -0.0011 < null p95 0.0340; A3 concept 0.0000; v1 rel err 0.0, direct-call verified against hooks (noise 0.0)",
+      "status": "settled",
+      "implication": "on glm4 the mid-stream language direction is neither mlp- nor attention-written at the deep window [28,40): language identity (probe >=0.96 from li=1, D0 in M2890) is embedding-lexical in origin and passively preserved in the residual stream; the 2887 mlp language carrier is qwen3-4b-specific - the carrier law requires per-model channel determination; remaining candidates: early layers (< window) write the direction, or it is never actively written after embeddings",
+      "source": {
+        "phase": 2891,
+        "meas_id": "M2891_language_attn_glm4"
+      }
+    },
+    {
+      "neg_id": "N8_attn_stale_absent_glm4",
+      "phase": 2898,
+      "model": "glm4-9b-chat-hf",
+      "claim": "the stale li=20 lang_dir carries a same-language signal in GLM4 deep attention",
+      "status": "settled",
+      "evidence": "margin <= 0 in 8/8 independent null-token draws (phase2898); acc_flag only 2/8 (both borderline); concept controls ~null",
+      "notes": "closes the M2891-vs-M2897 conflict in favor of M2891; M2897 stale+ component retracted"
+    },
+    {
+      "neg_id": "N9_attn_norm_gain_advantage",
+      "phase": 2902,
+      "model": "glm4-9b-chat-hf",
+      "claim": "the glm4 attn-vs-mlp margin advantage (6.1x) reflects a larger/better-preserved channel response (norm gain or direction retention)",
+      "status": "refuted",
+      "evidence": "R_gamma=0.318 (attn responses 3.1x SMALLER, matching random-dir baseline ratio 0.44); R_rho=1.222 < 1.3 gate with rho near zero in both channels (rho_null ~0) - both Jacobians re-orient the injected direction; R_B=0.318: attn B entries are individually SMALLER yet margin is 6.1x larger",
+      "notes": "margin is a property of the class-correlated fraction of the response, not its magnitude; registered 2026-09-19"
+    },
+    {
+      "neg_id": "N10_cross_model_density_prediction",
+      "phase": 2903,
+      "model": "qwen3-4b",
+      "claim": "qwen mlp landed directions carry >= 2x glm4 language-unembed alignment (G_language_content_density_mechanism cross-model prediction)",
+      "status": "refuted",
+      "evidence": "D_q_mlp 0.00165 < q_null_p95 0.00464 (within random-direction noise); also < 2*max(D_g). Post-hoc calibration: glm4 channels likewise within noise - the A metric is not a margin carrier anywhere",
+      "notes": "margin hierarchy mechanism remains open; margin is a property of the class-correlated STRUCTURE of B rows (within-class response similarity), not of any scalar Jacobian summary tested so far"
+    },
+    {
+      "neg_id": "N11_covariance_anisotropy_invisible_to_margin",
+      "kind": "detector_domain_boundary",
+      "claim": "The 2896-family margin metrics (row-space same-label vs diff-label cosine advantage, incl. the within-class-centered variant) are blind to class-covariance anisotropy by first-moment identity: for mean-zero rows with class-dependent covariance, E[cos|same] - E[cos|diff] = 0, so no amount of sample size moves the margin",
+      "evidence": "2904b synthetic diagnostic: cov-4x-sigma construction pairwise gap -0.001 (n=400k pairs), n=57 pipeline detection 6/100 (= FP baseline); skew construction (90% mass at +2w, 10% at -18w, mean exactly 0) gap +0.092, detection 74/100; iid null 3/100. margin metrics detect class-mean shifts (1st order) and within-class skew/asymmetric-subcluster structure (3rd moment), NOT covariance anisotropy (2nd moment)",
+      "sources": [
+        {
+          "path": "phase2904/b_row_space_structure/result.json",
+          "sha256_8": "3a782d18",
+          "phase": 2904
+        }
+      ],
+      "status": "confirmed",
+      "reopen_condition": "a margin variant with covariance sensitivity (e.g. second-moment statistics of pair similarities) would have to be preregistered with its own algebraic audit"
+    }
+  ],
+  "model_namespace": {
+    "primary": "qwen3-4b",
+    "protocol_family": "LPF v5.3",
+    "pending_replication": [
+      "ds7b",
+      "glm4",
+      "gemma4"
+    ],
+    "rule": "cross-model entries must carry a model field; ids unique within one model, same id may coexist across models in ledgers/<model>/ sub-files",
+    "active": [
+      "ds7b",
+      "glm4",
+      "qwen25_3b"
+    ],
+    "pending": [],
+    "glm4_note": "glm4-9b-chat-hf: glm arch 40L, hidden 4096, untied, vocab 151552; window [28,40); M2888 carrier within band",
+    "qwen25_note": "qwen2.5-3b-instruct: qwen2 arch 36L, hidden 2048, tied, vocab 151936; window [26,36); M2889 carrier within band (0.8375), distill-hypothesis control for ds7b attribution",
+    "qwen2_7b_note": {
+      "status": "downloaded_ready",
+      "local": "models/hf/qwen2-7b",
+      "arch": "Qwen2ForCausalLM",
+      "layers": 28,
+      "size_gb": 15.2,
+      "registered": "2026-09-19 Phase 2902 附带任务（用户批准）"
+    },
+    "gemma4_note": {
+      "status": "downloaded_ready",
+      "local": "models/hf/gemma-3-4b-it",
+      "arch": "Gemma3ForConditionalGeneration",
+      "source": "unsloth/gemma-3-4b-it (google 官仓 gated) via hf-mirror",
+      "size_gb": 8.6,
+      "registered": "2026-09-19 Phase 2902 附带任务（用户批准）",
+      "note": "model_namespace pending_replication=[ds7b,glm4,gemma4] 中 gemma4 项的材料已就绪，冷启动待排程"
+    }
+  },
+  "migration_history": [
+    {
+      "phase": 2882,
+      "from_version": 1,
+      "to_version": 2,
+      "backup": "atlas_ledger_v1_backup.json",
+      "backup_sha256_8": "9d934052",
+      "note": "existing v1 entries byte-faithful; new sections per spec v2 sections 10-13"
+    }
+  ]
+}

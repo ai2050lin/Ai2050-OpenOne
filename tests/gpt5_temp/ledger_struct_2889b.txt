@@ -1,0 +1,57 @@
+--- last growth_curve ---
+{
+ "point_id": "G_glm4_class_mlp",
+ "axis_id": "class",
+ "model": "glm4-9b-chat-hf",
+ "block": "B3_mlp_glm4",
+ "components": 12,
+ "acc": 0.8375,
+ "phase": 2888,
+ "notes": "third model, 2nd architecture family (glm vs qwen): carrier curve qwen3-4b 0.875 / glm4 0.8375 / ds7b 0.575; magnitude is model-dependent but the channel itself is architecture-general"
+}
+--- last linkage ---
+{
+ "link_id": "L11_three_model_carrier",
+ "from": {
+  "axis": "class",
+  "model": "qwen3-4b",
+  "block": "B3_mlp"
+ },
+ "to": {
+  "axis": "class",
+  "model": "glm4-9b-chat-hf",
+  "block": "B3_mlp_glm4"
+ },
+ "evidence": "three models, two architecture families (qwen3-4b 0.875, glm4-9b 0.8375 within band, ds7b 0.575 deviation): mlp direct-write carrier is architecture-general; strength model-dependent",
+ "phase": 2888,
+ "status": "confirmed"
+}
+--- last negative ---
+{
+ "neg_id": "N5_hourglass_stripping",
+ "claim": "hourglass \"language stripped mid-stream\" (language probe dips to ~chance at mid layers)",
+ "evidence": "M2886 H2: probe = 1.0000 at every layer li 1-36 (80 sentences, en/fr); H1: CKA step at li 6->7 to 0.8 plateau, not inverted-U",
+ "status": "settled",
+ "implication": "language identity coexists with cross-language semantic alignment at all depths; the correct picture is \"aligned semantics WITH persistent language identity\", mid-layer language directions are extractable (probe=1.0) -> candidate 4th axis family for the mlp carrier law",
+ "source": {
+  "phase": 2886,
+  "meas_id": "M2886_hourglass_cka"
+ }
+}
+--- model_namespace ---
+{
+ "primary": "qwen3-4b",
+ "protocol_family": "LPF v5.3",
+ "pending_replication": [
+  "ds7b",
+  "glm4",
+  "gemma4"
+ ],
+ "rule": "cross-model entries must carry a model field; ids unique within one model, same id may coexist across models in ledgers/<model>/ sub-files",
+ "active": [
+  "ds7b",
+  "glm4"
+ ],
+ "pending": [],
+ "glm4_note": "glm4-9b-chat-hf: glm arch 40L, hidden 4096, untied, vocab 151552; window [28,40); M2888 carrier within band"
+}

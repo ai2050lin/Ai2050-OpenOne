@@ -1,0 +1,16 @@
+execution.json frozen
+groups loaded: {'glm4_mlp': (78, 12), 'glm4_attn': (78, 12), 'qwen_mlp': (57, 10), 'qwen_attn': (57, 10)}
+anchor glm4_mlp margin 0.01979 (stored 0.01979) acc 0.67949 (stored 0.67949) ok=True
+anchor glm4_attn margin 0.12126 (stored 0.12126) acc 0.73077 (stored 0.73077) ok=True
+anchor qwen_mlp margin 0.17991 (stored 0.17991) acc 0.84211 (stored 0.84211) ok=True
+anchor qwen_attn margin -0.01946 (stored -0.01946) acc 0.61404 (stored 0.61404) ok=True
+audit 1st: full 0.1661 (p95 0.0300) within -0.0318 (p95 -0.0318) ok=True
+audit 2nd skew: detection 20/20 (pass >= 12) ok=True median margin_within=+0.0849
+audit neg: full 0.0135 (p95 0.0290) within -0.0332 (p95 -0.0308) ok=True
+positive set P=['glm4_attn', 'qwen_mlp']
+glm4_mlp: full=0.0198 from_mean=0.3758 within=-0.0224 p95w=-0.0155 within_over=False F=1.726(Fp95=2.348) T2=23.3(Tp95=27.0) ident_ok=True
+glm4_attn: full=0.1213 from_mean=0.3852 within=-0.0229 p95w=-0.0149 within_over=False F=6.685(Fp95=2.701) T2=54.9(Tp95=27.1) ident_ok=True
+qwen_mlp: full=0.1799 from_mean=1.4726 within=-0.0332 p95w=-0.0195 within_over=False F=5.121(Fp95=2.286) T2=51.1(Tp95=23.1) ident_ok=True
+qwen_attn: full=-0.0195 from_mean=0.2958 within=-0.0227 p95w=-0.0038 within_over=False F=0.626(Fp95=2.383) T2=14.4(Tp95=23.5) ident_ok=True
+from_mean identity all ok=True
+==== VERDICT: margin_carried_by_class_mean_shift ====

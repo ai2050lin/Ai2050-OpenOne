@@ -1,0 +1,51 @@
+== entity-sense check (country/company PR = word min?) ==
+turkey   country pr=32.0 min_sense=country entity_is_min=True
+shell    company pr=89.7 min_sense=company entity_is_min=True
+polish   country pr=46.9 min_sense=country entity_is_min=True
+
+== named-natural tighter pairs breakdown ==
+TIGHTER (12):
+  turkey   country(32.0) < animal(162.2)
+  turkey   country(32.0) < food(84.6)
+  shell    company(89.7) < animal(243.9)
+  mint     money(254.0) < plant(358.5)
+  mint     color(276.5) < plant(358.5)
+  silver   color(289.2) < metal(301.0)
+  bronze   color(222.1) < metal(242.1)
+  bronze   sport(189.2) < metal(242.1)
+  olive    color(316.6) < food(341.5)
+  port     computer(188.0) < food(219.9)
+  horn     music(250.8) < anatomy(272.4)
+  diamond  geometry(130.0) < metal(168.2)
+LOOSER (14):
+  shell    computer(325.6) >= animal(243.9)
+  squash   sport(302.5) >= food(221.4)
+  squash   sport(302.5) >= plant(302.1)
+  gold     color(308.2) >= metal(261.9)
+  gold     sport(286.2) >= metal(261.9)
+  silver   sport(304.8) >= metal(301.0)
+  salmon   color(320.3) >= animal(269.1)
+  salmon   color(320.3) >= food(272.3)
+  olive    color(316.6) >= fruit(267.9)
+  port     vehicle(280.8) >= food(219.9)
+  trunk    vehicle(303.1) >= plant(267.9)
+  trunk    vehicle(303.1) >= animal(255.4)
+  horn     vehicle(301.0) >= anatomy(272.4)
+  diamond  card(247.0) >= metal(168.2)
+
+== sample profiles ==
+turkey   animal   hits=['(cat', '.rabbit', 'bird', 'cat', 'cow', 'horse']
+turkey   food     hits=['.createfrom', 'bread', 'butter', 'cheese', 'cheeses', 'meat']
+turkey   country  hits=['america', 'brazil', 'china', 'france', 'germany', 'italy']
+shell    animal   hits=['bird', 'cat', 'dog', 'horse', 'lion', 'rabbit']
+shell    company  hits=['.microsoft', 'amazon', 'google', 'ibm', 'intel', 'microsoft']
+shell    computer hits=['code', 'computer', 'data', 'internet', 'screen', 'software']
+squash   food     hits=['bread', 'butter', 'egg', 'eggs', 'meat', 'meats']
+squash   sport    hits=['baseball', 'boxing', 'cricket', 'golf', 'hockey', 'rugby']
+squash   plant    hits=['-tree', '.tree', '_leaf', '_tree', 'fern', 'leaf']
+mint     plant    hits=['(tree', '-tree', '_leaf', '_tree', 'fern', 'leaf']
+mint     money    hits=['-tax', 'cash', 'debt', 'debtor', 'dollar', 'loan']
+mint     color    hits=['(red', '-black', '_blue', 'black', 'blue', 'brown']
+
+== flatness range ==
+min=0.63 max=0.98

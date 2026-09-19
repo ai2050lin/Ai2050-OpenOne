@@ -1,0 +1,22 @@
+P2797 gate: torch lens own margin vs 2795 max|d|=0.000018
+P2797 P-D additive decomposition max err=1.99e-05 -> True
+P2797 eta2 top dims: [{"d": 13, "eta2": 0.7674, "cat": "country", "sig": true}, {"d": 32, "eta2": 0.7322, "cat": "country", "sig": true}, {"d": 270, "eta2": 0.6657, "cat": "nature", "sig": true}, {"d": 1981, "eta2": 0.5527, "cat": "country", "sig": true}, {"d": 88, "eta2": 0.5157, "cat": "country", "sig": true}, {"d": 59, "eta2": 0.4891, "cat": "nature", "sig": true}, {"d": 1151, "eta2": 0.4835, "cat": "metal", "sig": true}, {"d": 322, "eta2": 0.4657, "cat": "nature", "sig": true}, {"d": 56, "eta2": 0.4651, "cat": "country", "sig": true}, {"d": 2505, "eta2": 0.462, "cat": "metal", "sig": true}, {"d": 732, "eta2": 0.4606, "cat": "metal", "sig": true}, {"d": 119, "eta2": 0.4536, "cat": "tool", "sig": true}]
+P2797 n_sig=805 cov=10/10 P-A=True
+P2797 eta2 E-H spearman=0.0091 top30 overlap=1
+P2797 numpy lens vs torch max err=1.99e-05
+P2797 dim 13 (country): |dMargin| in=0.0134 out=0.0270 False
+P2797 dim 32 (country): |dMargin| in=0.0030 out=0.0660 False
+P2797 dim 270 (nature): |dMargin| in=0.1372 out=0.0527 True
+P2797 dim 1981 (country): |dMargin| in=0.0391 out=0.0510 False
+P2797 dim 88 (country): |dMargin| in=0.0831 out=0.0223 True
+P2797 dim 59 (nature): |dMargin| in=0.0104 out=0.0323 False
+P2797 dim 1151 (metal): |dMargin| in=0.0359 out=0.0541 False
+P2797 dim 322 (nature): |dMargin| in=0.0574 out=0.0226 True
+P2797 dim 56 (country): |dMargin| in=0.0163 out=0.0068 True
+P2797 dim 2505 (metal): |dMargin| in=0.2194 out=0.0458 True
+P2797 P-B=False (5/10)
+P2797 E-side own-margin class-mean spectrum: {"fruit": 22.809, "animal": 19.448, "metal": 34.405, "vehicle": 21.764, "country": 14.164, "food": 10.667, "nature": -2.061, "furniture": 16.129, "tool": 8.544, "clothing": 22.329}
+P2797 span_E0=36.466 top30=34.524 (ratio 0.947) rand30=35.955 (ratio 0.986) P-C=False
+P2797 PCA E evr=0.0341,0.0295
+P2797 PCA H evr=0.0897,0.0583
+P2797 VERDICT {"category_dims_exist": true, "n_sig_dims": 805, "cat_coverage": 10, "single_dim_causal_specificity": false, "n_b_ok": 5, "top_dims_carry_prior_spectrum": false, "span_E0": 36.4659060731933, "span_ratio_top30": 0.9467419107622413, "span_ratio_rand30": 0.9859777850846296, "additive_decomposition_exact": true, "err_pd": 1.9921255123733772e-05, "eta2_spearman_E_H": 0.009073172761638298, "top30_overlap_E_H": 1, "parameter_map_established": false, "distributed_encoding": false}

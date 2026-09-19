@@ -1,0 +1,34 @@
+=== qwen4 (qwen3-4b) ===
+arch=['Qwen3ForCausalLM'] tie=True rms_eps=1e-06 vocab=151936
+tensors: {'lm_head.weight': 'MISSING', 'model.embed_tokens.weight': 'model-00001-of-00003.safetensors', 'model.norm.weight': 'model-00003-of-00003.safetensors'}
+HELD selection per class: {'fruit': 8, 'animal': 10, 'metal': 9, 'vehicle': 10, 'country': 10, 'food': 10, 'nature': 10, 'furniture': 10, 'tool': 4, 'clothing': 10}
+  SHORT fruit: ['plum', 'fig', 'coconut', 'olive', 'prune', 'melon', 'date', 'almond']
+  SHORT metal: ['lead', 'zinc', 'platinum', 'titanium', 'chrome', 'magnesium', 'calcium', 'lithium', 'sodium']
+  SHORT tool: ['router', 'grinder', 'mop', 'vice']
+HELD rejected: [('fruit', 'apricot', '3-tok'), ('fruit', 'papaya', '3-tok'), ('fruit', 'guava', '2-tok'), ('fruit', 'lychee', '3-tok'), ('fruit', 'raisin', '2-tok'), ('fruit', 'kiwi', '2-tok'), ('metal', 'tungsten', '3-tok'), ('metal', 'cobalt', '2-tok'), ('metal', 'radium', '2-tok'), ('metal', 'barium', '2-tok'), ('metal', 'cesium', '2-tok'), ('vehicle', 'limo', '2-tok'), ('vehicle', 'sleigh', '2-tok'), ('vehicle', 'glider', '2-tok'), ('food', 'noodle', '2-tok'), ('nature', 'meadow', '2-tok'), ('furniture', 'cradle', '2-tok'), ('furniture', 'bookcase', '2-tok'), ('furniture', 'ottoman', '2-tok'), ('furniture', 'hutch', '2-tok'), ('tool', 'chisel', '2-tok'), ('tool', 'lathe', '2-tok'), ('tool', 'sander', '2-tok'), ('tool', 'spanner', '2-tok'), ('tool', 'crowbar', '2-tok'), ('tool', 'anvil', '2-tok'), ('tool', 'hatchet', '2-tok'), ('tool', 'trowel', '3-tok'), ('tool', 'auger', '2-tok'), ('tool', 'mallet', '2-tok'), ('clothing', 'apron', '2-tok'), ('clothing', 'scarf', 'in-atlas'), ('clothing', 'kimono', '2-tok'), ('clothing', 'sneaker', '3-tok')]
+HELD final: {"fruit": ["plum", "fig", "coconut", "olive", "prune", "melon", "date", "almond"], "animal": ["deer", "bear", "monkey", "elephant", "dolphin", "whale", "snake", "frog", "duck", "goat"], "metal": ["lead", "zinc", "platinum", "titanium", "chrome", "magnesium", "calcium", "lithium", "sodium"], "vehicle": ["scooter", "tractor", "subway", "ferry", "canoe", "kayak", "trailer", "wagon", "sedan", "raft"], "country": ["Norway", "Sweden", "Finland", "Poland", "Portugal", "Greece", "Mexico", "Kenya", "Chile", "Peru"], "food": ["tofu", "sausage", "bacon", "ham", "salad", "curry", "pie", "cake", "candy", "stew"], "nature": ["beach", "island", "valley", "storm", "thunder", "fog", "frost", "star", "moon", "cave"], "furniture": ["couch", "drawer", "mattress", "pillow", "rug", "dresser", "cot", "crib", "buffet", "mat"], "tool": ["router", "grinder", "mop", "vice"], "clothing": ["vest", "jeans", "skirt", "blouse", "sweater", "robe", "uniform", "boot", "cap", "gown"]}
+
+=== ds7 (deepseek-r1-distill-qwen-7b) ===
+arch=['Qwen2ForCausalLM'] tie=False rms_eps=1e-06 vocab=152064
+tensors: {'lm_head.weight': 'model-00002-of-000002.safetensors', 'model.embed_tokens.weight': 'model-00001-of-000002.safetensors', 'model.norm.weight': 'model-00002-of-000002.safetensors'}
+ATLAS non-single-token: []
+BACKUP ntok: {'fruit': [('melon', 1), ('date', 1), ('kiwi', 2), ('almond', 1)], 'animal': [('owl', 1), ('seal', 1), ('crab', 1), ('ant', 1)], 'metal': [('lithium', 1), ('sodium', 1), ('barium', 2), ('cesium', 2)], 'vehicle': [('sleigh', 2), ('raft', 1), ('glider', 2), ('buggy', 1)], 'country': [('Qatar', 1), ('Nepal', 1), ('Ghana', 1), ('Wales', 1)], 'food': [('stew', 1), ('oats', 1), ('yogurt', 1), ('onion', 1)], 'nature': [('cliff', 1), ('meadow', 2), ('reef', 1), ('breeze', 1)], 'furniture': [('crib', 1), ('buffet', 1), ('mat', 1), ('hutch', 2)], 'tool': [('trowel', 3), ('auger', 2), ('mallet', 2), ('vice', 1)], 'clothing': [('cap', 1), ('gown', 1), ('kimono', 2), ('sneaker', 3)]}
+
+=== glm4 (glm4-9b-chat-hf) ===
+arch=['GlmForCausalLM'] tie=False rms_eps=1.5625e-07 vocab=151552
+tensors: {'lm_head.weight': 'model-00004-of-00004.safetensors', 'model.embed_tokens.weight': 'model-00001-of-00004.safetensors', 'model.norm.weight': 'model-00004-of-00004.safetensors'}
+ATLAS non-single-token: []
+BACKUP ntok: {'fruit': [('melon', 1), ('date', 1), ('kiwi', 2), ('almond', 1)], 'animal': [('owl', 1), ('seal', 1), ('crab', 1), ('ant', 1)], 'metal': [('lithium', 1), ('sodium', 1), ('barium', 2), ('cesium', 2)], 'vehicle': [('sleigh', 2), ('raft', 1), ('glider', 2), ('buggy', 1)], 'country': [('Qatar', 1), ('Nepal', 1), ('Ghana', 1), ('Wales', 1)], 'food': [('stew', 1), ('oats', 1), ('yogurt', 1), ('onion', 1)], 'nature': [('cliff', 1), ('meadow', 2), ('reef', 1), ('breeze', 1)], 'furniture': [('crib', 1), ('buffet', 1), ('mat', 1), ('hutch', 2)], 'tool': [('trowel', 3), ('auger', 2), ('mallet', 2), ('vice', 1)], 'clothing': [('cap', 1), ('gown', 1), ('kimono', 2), ('sneaker', 3)]}
+
+=== qwen17 (qwen3-1.7b) ===
+arch=['Qwen3ForCausalLM'] tie=True rms_eps=1e-06 vocab=151936
+tensors: {'lm_head.weight': 'model-00002-of-00002.safetensors', 'model.embed_tokens.weight': 'model-00001-of-00002.safetensors', 'model.norm.weight': 'model-00001-of-00002.safetensors'}
+ATLAS non-single-token: []
+BACKUP ntok: {'fruit': [('melon', 1), ('date', 1), ('kiwi', 2), ('almond', 1)], 'animal': [('owl', 1), ('seal', 1), ('crab', 1), ('ant', 1)], 'metal': [('lithium', 1), ('sodium', 1), ('barium', 2), ('cesium', 2)], 'vehicle': [('sleigh', 2), ('raft', 1), ('glider', 2), ('buggy', 1)], 'country': [('Qatar', 1), ('Nepal', 1), ('Ghana', 1), ('Wales', 1)], 'food': [('stew', 1), ('oats', 1), ('yogurt', 1), ('onion', 1)], 'nature': [('cliff', 1), ('meadow', 2), ('reef', 1), ('breeze', 1)], 'furniture': [('crib', 1), ('buffet', 1), ('mat', 1), ('hutch', 2)], 'tool': [('trowel', 3), ('auger', 2), ('mallet', 2), ('vice', 1)], 'clothing': [('cap', 1), ('gown', 1), ('kimono', 2), ('sneaker', 3)]}
+
+=== qwen25 (qwen2.5-3b-instruct) ===
+arch=['Qwen2ForCausalLM'] tie=True rms_eps=1e-06 vocab=151936
+tensors: {'lm_head.weight': 'MISSING', 'model.embed_tokens.weight': 'model-00001-of-00002.safetensors', 'model.norm.weight': 'model-00002-of-00002.safetensors'}
+ATLAS non-single-token: []
+BACKUP ntok: {'fruit': [('melon', 1), ('date', 1), ('kiwi', 2), ('almond', 1)], 'animal': [('owl', 1), ('seal', 1), ('crab', 1), ('ant', 1)], 'metal': [('lithium', 1), ('sodium', 1), ('barium', 2), ('cesium', 2)], 'vehicle': [('sleigh', 2), ('raft', 1), ('glider', 2), ('buggy', 1)], 'country': [('Qatar', 1), ('Nepal', 1), ('Ghana', 1), ('Wales', 1)], 'food': [('stew', 1), ('oats', 1), ('yogurt', 1), ('onion', 1)], 'nature': [('cliff', 1), ('meadow', 2), ('reef', 1), ('breeze', 1)], 'furniture': [('crib', 1), ('buffet', 1), ('mat', 1), ('hutch', 2)], 'tool': [('trowel', 3), ('auger', 2), ('mallet', 2), ('vice', 1)], 'clothing': [('cap', 1), ('gown', 1), ('kimono', 2), ('sneaker', 3)]}
+

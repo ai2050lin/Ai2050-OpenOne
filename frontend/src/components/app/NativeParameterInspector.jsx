@@ -7,6 +7,7 @@ import NativeSequenceParameterInspector from './NativeSequenceParameterInspector
 import NativeAtlasHeatmap from './NativeAtlasHeatmap';
 import NativeMlpParameterInspector from './NativeMlpParameterInspector';
 import NativeSourceParameterInspector from './NativeSourceParameterInspector';
+import NativeQKVParameterInspector from './NativeQKVParameterInspector';
 
 const labels = {
   embedding_anchor_j: '词嵌入：锚点坐标 j',
@@ -67,6 +68,7 @@ export default function NativeParameterInspector() {
       </>}
       <NativeAtlasHeatmap />
       <NativeSourceParameterInspector />
+      <NativeQKVParameterInspector />
       <NativeMlpParameterInspector />
       <NativePathParameterInspector />
       <NativePrecisionParameterInspector />
