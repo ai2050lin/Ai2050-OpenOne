@@ -1,0 +1,23 @@
+execution.json frozen
+a4 mask counts n86=469 nwd=382 shared=295 ok=True
+QL layers [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] | DEEP [22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35] | MID [1, 18, 19, 20, 21, 29]
+cells: skeleton 295 | unique bg 353 | total 648
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a5 baseline separation 185.6975 (scale 92.2913) ok=True
+a3 all-heads L18 ablation mean|ds| 1.4631 (0.01*scale 0.9229) ok=True
+ablation [100/648]
+ablation [200/648]
+ablation [300/648]
+ablation [400/648]
+ablation [500/648]
+ablation [600/648]
+ablation sweep done (648 cells, CI_rel max 0.0270)
+P1: medD 0.000568 p 9.999e-05 | skel 0.005771 vs bg 0.005135 (x1.12) | VERDICT-BASIS: skeleton_functionally_load_bearing
+P2: QL 0.005994 (n=196) vs DEEP 0.004555 (n=50) diff 0.001439 p 6.999e-04
+P3: rho(ci, rho86) 0.2916 p 2.000e-04 | rho(ci, rho_mirror) 0.3543 p 2.000e-04
+P4 survivor: [([1, 6], 0.005426), ([5, 6], 0.006406), ([7, 19], 0.005546), ([8, 2], 0.006145), ([14, 9], 0.009444), ([20, 8], 0.008034), ([21, 6], 0.005927)]
+==== VERDICT: skeleton_functionally_load_bearing ====

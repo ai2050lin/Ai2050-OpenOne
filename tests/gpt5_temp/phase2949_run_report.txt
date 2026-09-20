@@ -1,0 +1,29 @@
+execution.json frozen
+sources ok (top5_g re-verified against 2948)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a3 Vt8 rebuild vs 2939 max diff 0.00e+00 ok=True
+a7 construction self-check max abs 9.95e-14 ok=True
+a9 ablation-slice self-check 0.00e+00 | o_proj in features 4096 (expect 4096) ok=True
+a12 group-ablation mask self-check 0.00e+00 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a4 proj_func vs 2935 max abs diff 7.21e-06 ok=True
+a5 proj_null0 vs 2935 max abs diff 6.26e-06 ok=True
+a6 func separation 185.6975 ok=True
+sep null0 77.262 (func 185.698)
+B2_17 median sep 182.51 (reps [182.5, 182.5, 182.5])
+B1_17 median sep 189.61 (reps [189.6, 189.6, 189.6])
+I0_17 median sep 21.46 (reps [21.5, 21.5, 21.5])
+I1_17 median sep -9.45 (reps [-9.5, -9.5, -9.5])
+I2_17 median sep 167.87 (reps [167.9, 167.9, 167.9])
+B2_16 median sep 185.63 (reps [185.6, 185.6, 185.6])
+B1_16 median sep 186.87 (reps [186.9, 186.9, 186.9])
+I0_16 median sep 84.81 (reps [84.8, 84.8, 84.8])
+I1_16 median sep 48.12 (reps [48.1, 48.1, 48.1])
+I2_16 median sep 120.71 (reps [120.7, 120.7, 120.7])
+a10 I0_17 vs 2945 diff 0.0046 ok=True | a11 I0_16 vs 2945 diff 0.0010 ok=True
+a8 same-session determinism (I1_17 config) 0.00e+00 ok=True
+T1 False | T2 False | T3 False | T4 False
+==== VERDICT: head_dose_not_carried ====

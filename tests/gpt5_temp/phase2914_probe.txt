@@ -1,0 +1,174 @@
+== phase2913 tree ==
+D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2913\perhead_wvo_decomposition\execution.json  size=2924
+D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2913\perhead_wvo_decomposition\perhead_wvo_decomposition.npz  size=75649
+D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2913\perhead_wvo_decomposition\result.json  size=5061
+files=3
+
+== 2913 npz ==
+B_heads shape=(32, 57, 10) dtype=float32
+B_agg shape=(57, 10) dtype=float32
+B_out shape=(57, 10) dtype=float32
+margins_h shape=(32,) dtype=float32
+flips_h shape=(32,) dtype=int64
+labels_lang shape=(57,) dtype=int64
+words shape=(57,) dtype=object
+margins_h (h0..h31):
+  h0: 0.008993
+  h1: 0.038233
+  h2: -0.022970
+  h3: -0.008651
+  h4: 0.040379
+  h5: 0.022677
+  h6: 0.078878
+  h7: 0.177101
+  h8: 0.134259
+  h9: 0.007116
+  h10: 0.033574
+  h11: 0.013022
+  h12: 0.026624
+  h13: 0.001757
+  h14: 0.047867
+  h15: 0.009378
+  h16: 0.011846
+  h17: 0.039162
+  h18: -0.006825
+  h19: -0.019814
+  h20: -0.026306
+  h21: 0.055371
+  h22: 0.060090
+  h23: 0.040384
+  h24: -0.005905
+  h25: -0.028788
+  h26: 0.054220
+  h27: -0.013092
+  h28: -0.026037
+  h29: -0.000439
+  h30: -0.002597
+  h31: -0.000168
+top5 by |margin|: [(7, 0.1771), (8, 0.13426), (6, 0.07888), (22, 0.06009), (21, 0.05537)]
+
+== 2913 result.json digest ==
+top keys: ["phase", "model", "prereg", "anchors", "P1", "P2", "P3", "P4", "final_verdict", "runtime_s"]
+/phase = 2913
+/model = qwen3-4b
+/prereg/mode = forward_perhead_jacobian (protocol 2903 verbatim)
+/prereg/sources = dirs recomputed from 2886 S_last; words/labels verbatim 2887; null_tids SEED=2896 rng order; perms SEED=2896 (200); cross anchors vs 2903 npz + result.json
+/prereg/response = r_c(cond,n,q,h,:) = (o_proj_input_pert - ref)/eps at pos 1, eps=1.0, per head 128-dim; B_h = same - 0.5 func - 0.5 null projected via W_O_h
+/prereg/anchors = v2: a1 input-domain block-vs-full o_proj identity < 1e-9; a3 |margin - 2903 stored| < 5e-3 and acc within 2 words; a2cross (B_agg vs 2903 B_attn) registered WIT...
+/prereg/anchors_v2_note = run4 (v1) failed the a2 gate: e1 was exact (1.22e-15) but e2 vs 2903 B_attn = 6.07e-2 >> 1e-3 and margin d = 1.93e-3. Audit: the 2903 v2-anchor threshold 1e-3 w...
+/prereg/P1 = head margin spectrum; family gate = p95 of max_h margin under 200 SEED=2896 label permutations
+/prereg/P2 = per-head 10-layer d=1 sign-margin flips, exact binomial(9,.5) tail, BH-FDR q=0.05
+/prereg/P3 = greedy top-k margin reconstruction; selection-corrected null = full procedure per label permutation; one-sided p3
+/prereg/P4 = descriptive gap/pf0 head profiles
+/prereg/verdict = anchor fail => anchor_fail_all_void; P1&P2 => head_level_attribution_confirmed; P1 only => margin_heads_present_alternation_absent; P2 only => alternation_heads...
+/anchors/e1_block_identity = 1.2155822063255829e-15
+/anchors/e2in_outdomain_descr = 0.06072265951783522
+/anchors/e2cross_vs_2903_descr = 0.06072265937879767
+/anchors/e2run_outdomain_vs_2903_descr = 3.8814077628419806e-08
+/anchors/margin_recomp = -0.021389
+/anchors/margin_stored = -0.01946
+/anchors/e3_margin = 0.001928659580358167
+/anchors/acc_recomp = 0.631579
+/anchors/acc_stored = 0.61404
+/anchors/e3_acc_words = 0.9997199999999963
+/anchors/ok = True
+/P1/margins_top5/0/head = 7
+/P1/margins_top5/0/margin = 0.1771
+/P1/margins_top5/1/head = 8
+/P1/margins_top5/1/margin = 0.13426
+/P1/margins_top5/2/head = 6
+/P1/margins_top5/2/margin = 0.07888
+/P1/margins_top5/3/head = 22
+/P1/margins_top5/3/margin = 0.06009
+/P1/margins_top5/4/head = 21
+/P1/margins_top5/4/margin = 0.05537
+/P1/max_margin_head = 7
+/P1/max_margin = 0.1771
+/P1/p95_max_null = 0.17474
+/P1/present = True
+/P2/flips/0 = 6
+/P2/flips/1 = 4
+/P2/flips/2 = 4
+/P2/flips/3 = 2
+/P2/flips/4 = 2
+/P2/flips/5 = 5
+/P2/flips/6 = 7
+/P2/flips/7 = 4
+/P2/flips/8 = 5
+/P2/flips/9 = 3
+/P2/flips/10 = 3
+/P2/flips/11 = 4
+/P2/flips/12 = 6
+/P2/flips/13 = 6
+/P2/flips/14 = 4
+/P2/flips/15 = 5
+/P2/flips/16 = 3
+/P2/flips/17 = 4
+/P2/flips/18 = 4
+/P2/flips/19 = 2
+/P2/flips/20 = 5
+/P2/flips/21 = 6
+/P2/flips/22 = 4
+/P2/flips/23 = 3
+/P2/flips/24 = 5
+/P2/flips/25 = 2
+/P2/flips/26 = 6
+/P2/flips/27 = 4
+/P2/flips/28 = 6
+/P2/flips/29 = 4
+/P2/flips/30 = 5
+/P2/flips/31 = 6
+/P2/p_flip_min = 0.089844
+/P2/nonempty = False
+/P3/k_best = 2
+/P3/heads_topk/0 = 7
+/P3/heads_topk/1 = 8
+/P3/subset_margin = 0.28036
+/P3/full_margin = -0.02139
+/P3/p_selection_corrected = 0.01493
+/P3/significant = True
+/P4/top_gap_heads/0/head = 17
+/P4/top_gap_heads/0/gap_mean = 0.2287
+/P4/top_gap_heads/0/gap_zigzag = 5
+/P4/top_gap_heads/0/pf0_range = 0.5455
+/P4/top_gap_heads/1/head = 30
+/P4/top_gap_heads/1/gap_mean = 0.1942
+/P4/top_gap_heads/1/gap_zigzag = 6
+/P4/top_gap_heads/1/pf0_range = 0.5455
+/P4/top_gap_heads/2/head = 8
+/P4/top_gap_heads/2/gap_mean = 0.1939
+/P4/top_gap_heads/2/gap_zigzag = 6
+/P4/top_gap_heads/2/pf0_range = 0.5455
+/P4/top_gap_heads/3/head = 26
+/P4/top_gap_heads/3/gap_mean = 0.1604
+/P4/top_gap_heads/3/gap_zigzag = 5
+/P4/top_gap_heads/3/pf0_range = 0.3636
+/P4/top_gap_heads/4/head = 13
+/P4/top_gap_heads/4/gap_mean = 0.159
+/P4/top_gap_heads/4/gap_zigzag = 5
+/P4/top_gap_heads/4/pf0_range = 0.3182
+/final_verdict = margin_heads_present_alternation_absent
+/runtime_s = 21.9
+
+== phase2903 tree ==
+D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2903\qwen_channel_jacobian_decomposition\execution.json  size=2269
+D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2903\qwen_channel_jacobian_decomposition\qwen_channel_jacobian_decomposition.npz  size=3670806
+D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2903\qwen_channel_jacobian_decomposition\result.json  size=18898
+files=3
+
+== 2903 result.json weights_descriptive['26'] ==
+result.json candidates: ['D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\\phase2903\\qwen_channel_jacobian_decomposition\\result.json']
+found in: D:/AI2050/Ai2050-OpenOne/tests/glm5/result/rdc_query_construction_20260913\phase2903\qwen_channel_jacobian_decomposition\result.json
+weights_descriptive layers: ["26", "27", "28", "29", "30", "31", "32", "33", "34", "35"]
+wd['26'] keys: ["attn", "mlp"]
+wd['26']['attn'] FULL:
+{
+ "top1_over_top2": 1.04796,
+ "participation_ratio": 1968.92163,
+ "spectra_W_VO_composite": {
+  "top1_over_top2": 1.01865,
+  "participation_ratio": 764.71987
+ },
+ "zf_response_gain": 2.54108,
+ "zf_cos_resp_d": 0.15674
+}

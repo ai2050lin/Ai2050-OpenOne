@@ -1,0 +1,23 @@
+execution.json frozen
+model loaded
+pass1 [20/57]
+pass1 [40/57]
+a1 dirs rebuild 2.17e-08 ok=True
+a3 Vt8 vs 2939 0.00e+00 ok=True
+a7 xdir self-check 9.95e-14 ok=True
+a9 slice self-check 0.00e+00 | o_proj in 4096 ok=True
+a12 group mask self-check 0.00e+00 ok=True
+a2 base determinism rel 0.00e+00 ok=True
+I0_17 seps [21.5, 21.5, 21.5] median 21.46
+I1_17 seps [-9.5, -9.5, -9.5] median -9.45
+I0_16 seps [84.8, 84.8, 84.8] median 84.81
+I1_16 seps [48.1, 48.1, 48.1] median 48.12
+a8 same-session rep determinism 0.00e+00 ok=True
+a13 ablated-head capture-zero 0.00e+00 ok=True
+a16 identity bf16-bound ratio max 0.979 ok=True | raw rel max 6.25e-03 (worst {"cond": "I1_16", "link": 33, "max_abs_diff": 1.875, "max_x1": 300.0, "max_a": 24.375, "max_m": 61.0, "ratio": 0.9334413705289965})
+L17 dSep_pre -30.91 dSep_fin -30.91 D_abl 9.35 | R_att -5.28 R_mlp -16.26 R_tot -21.54 | a17 1.46e-02 (rel 4.71e-04) a18 0.00e+00
+L16 dSep_pre -36.68 dSep_fin -36.68 D_abl 9.37 | R_att -10.40 R_mlp -16.76 R_tot -27.16 | a17 1.54e-01 (rel 4.19e-03) a18 0.00e+00
+a10 dSep_fin L17 vs 2950 0.002 ok=True | a11 L16 0.006 ok=True
+L17 T1 mlp_carried (R_att -5.28 R_mlp -16.26) | T2 top3_share 0.468 argmax L35 -> band_distributed
+L16 T1 mixed (R_att -10.40 R_mlp -16.76) | T2 top3_share 0.592 argmax L35 -> band_concentrated
+==== VERDICT: mixed_modules_mixed_band ====

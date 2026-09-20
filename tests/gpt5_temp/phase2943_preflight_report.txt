@@ -1,0 +1,27 @@
+R0 proj37 vs proj39 max 0.000e+00 | vs 2942 func 0.000e+00 null0 0.000e+00
+R0 conds37=['func', 'same', 'null0', 'null1', 'null2', 'null3'] conds39=['func', 'same', 'null0', 'null1', 'null2', 'null3']
+R1 OLS rebuild vs 2937 result:
+  same beta 0.6049 (ref 0.6049) gamma 3.9365 (ref 3.9365)
+  null0 beta 0.4290 (ref 0.4290) gamma -11.5606 (ref -11.5606)
+  null1 beta 0.5486 (ref 0.5486) gamma -16.1100 (ref -16.1100)
+  null2 beta 0.5482 (ref 0.5482) gamma -12.5503 (ref -12.5503)
+  null3 beta 0.4272 (ref 0.4272) gamma -15.3504 (ref -15.3504)
+R2 identity mean(dproj) ?= gamma + (beta-1)*mean(f):
+  same mean_dproj -25.449 pred -25.449 gap 3.55e-15
+  null0 mean_dproj -54.026 pred -54.026 gap 0.00e+00
+  null1 mean_dproj -49.682 pred -49.682 gap 0.00e+00
+  null2 mean_dproj -46.148 pred -46.148 gap 0.00e+00
+  null3 mean_dproj -57.953 pred -57.953 gap 0.00e+00
+R3 U8 attribution (2939 coords):
+  same P_u8 -18.421 mean_dproj -25.449 resid -7.028 | gamma 3.936 gamma_pred_from_P 10.965 ratio 0.359
+  null0 P_u8 -43.189 mean_dproj -54.026 resid -10.837 | gamma -11.561 gamma_pred_from_P -0.724 ratio 15.978
+  null1 P_u8 -39.268 mean_dproj -49.682 resid -10.414 | gamma -16.110 gamma_pred_from_P -5.696 ratio 2.828
+  null2 P_u8 -37.041 mean_dproj -46.148 resid -9.107 | gamma -12.550 gamma_pred_from_P -3.443 ratio 3.645
+  null3 P_u8 -46.319 mean_dproj -57.953 resid -11.634 | gamma -15.350 gamma_pred_from_P -3.717 ratio 4.130
+R3 null0 per-word U8-rebuild vs actual dproj pearson 0.9975 mean(rebuild) -43.189 mean(actual) -54.026
+R4 sep contributions of dproj terms (null0):
+  sep(d) -108.44 | slope -106.03 const 0.00 resid -2.40
+  mean f lang0 188.40 lang1 2.70 | beta-1 -0.5710 gamma -11.561
+R5 d_inj(s=2.0) vs d_null0: raw spearman 0.7129 | partial controlling f 0.1006
+R5 mean d_inj -23.965 mean d_null -54.026 intercept gap 30.060 (null0 gamma -11.561)
+R5 after +gamma shift: mean -35.526 spearman vs d_null 0.7129

@@ -1,0 +1,25 @@
+execution.json frozen
+sources ok (dcks from 2939 npz)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a3 Vt8 rebuild vs 2939 max diff 0.00e+00 ok=True
+a8 construction self-check max abs 9.95e-14 ok=True
+xdir norms: med 55.49 range [5.82, 160.56]
+a2 baseline determinism rel 0.00e+00 ok=True
+a4 proj_func vs 2935 max abs diff 7.21e-06 ok=True
+a5 proj_null0 vs 2935 max abs diff 6.26e-06 ok=True
+a7 c3_func rebuild vs 2940 max abs diff 0.00e+00 ok=True
+a6 func separation 185.6975 ok=True
+descriptive proj vs 2939: func 0.00e+00 null0 0.00e+00
+dp35_actual: med -29.062 | sep null0 77.262
+scale sweep done (9 forwards)
+calib ratio {'1': 0.2074, '2': 0.861, '3': 1.5606, '4': 1.8193, '8': 3.3981, '16': 4.6054, '32': 6.6227} | s* = 2 (ratio 0.8610)
+R1 0.7401 | R2 -0.0301 (shift med +0.874 vs actual med -29.062) | sep_inj 33.03 (func 185.70 / null0 77.26)
+D1 slopes {"v1": {"1": -0.0837, "2": 0.2743, "3": 0.4145, "4": 0.4714, "8": 0.3277, "16": 0.2471, "32": 0.142}, "v2": {"1": -0.0054, "2": 0.0504, "3": 0.1359, "4": 0.286, "8": 0.1912, "16": 0.143, "32": 0.1143}, "v5": {"1": 0.095, "2": -0.0563, "3": -0.1938, "4": -0.2255, "8": -0.2602, "16": -0.2196, "32": -0.2075}}
+D2 out-of-S |c_shift| med per s: {'1': 14.007, '2': 51.142, '3': 95.202, '4': 107.775, '8': 184.185, '16': 256.898, '32': 377.883}
+D3 sep(s): {'1': 176.77, '2': 33.03, '3': -36.15, '4': -50.95, '8': -50.96, '16': -54.29, '32': -95.47}
+D4 rho vs func base: {'1': 0.9432, '2': 0.5651, '3': -0.2081, '4': -0.4107, '8': -0.7514, '16': -0.7998, '32': -0.783}
+D5 norm ratios: {'1': 1.03347, '2': 0.79867, '3': 0.86227, '4': 0.96267, '8': 1.28118, '16': 1.94463, '32': 3.05784}
+==== VERDICT: u8_displacement_not_causal ====

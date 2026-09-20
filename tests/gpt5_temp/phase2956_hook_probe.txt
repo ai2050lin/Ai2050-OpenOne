@@ -1,0 +1,7 @@
+layer0 type: Qwen3DecoderLayer
+layer0 attrs (norm/mlp/attn related): ['input_layernorm', 'mlp', 'post_attention_layernorm', 'self_attn']
+self_attn type: Qwen3Attention
+fired: {'iln0_pre': 1, 'sa0_pre': 1, 'oproj0_pre': 1, 'sa0_post': 1, 'mlp0_pre': 1, 'mlp0_post': 1, 'finalnorm_pre': 1}
+decoder pre (positional) fired: {'dl_args': 1, 'dl_shape': (1, 2, 2560)}
+iln type: Qwen3RMSNorm
+iln forward sig: (hidden_states: torch.Tensor) -> torch.Tensor

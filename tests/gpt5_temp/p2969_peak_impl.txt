@@ -1,0 +1,57 @@
+   1| """Phase 2968: is the h15 biphasic peak position an
+   7| (0.438 -> peak 0.714 at s=0.625 -> -0.064) with the peak
+   9| MEDIAN-word curve. A median peak can arise from a mixture
+  10| of monotone risers and fallers with no individual peaks.
+  12| inner argmax peak - reachability OK (discipline 10).
+  38|   T1 (PRIMARY, family A per-word peaks):
+  39|       peak word = argmax at inner grid point (1..9);
+  40|       gate G1: n_peak >= 20/57 (pre-checked 40, disc. 10);
+  41|       continuous peak via 3-point parabola on inner argmax,
+  43|       |median(peak_loc over peak words) - s_c_insession|
+  53|   T3 descriptive: peak-bucket histogram; per-word peak
+  55|       A11_L34_h15 curve peak vs C15 peak (rho, descriptive);
+  67|   open (per-word peak positions never observed before).
+  92| OUT = os.path.join(BASE, 'phase2968', 'h15_peak_anatomy')
+ 111| N_PEAK_MIN = 20
+ 121|     'question': 'is the h15 biphasic peak an individual '
+ 140|     'T1': 'per-word peaks family A: gate G1 n_peak >= 20 '
+ 141|           '(pre-checked 40); continuous parabola peak, '
+ 142|           'gate G2 |median_peak - s_c| < 0.3; bootstrap '
+ 148|     'T3': 'descriptive: peak buckets; h8/h21 peaks; '
+ 149|           'A11_L34_h15 peak vs C15 peak rho; family B '
+ 207| def peak_loc(s_grid, y):
+ 208|     """Inner argmax -> 3-point parabola vertex; None for
+ 209|     endpoint peaks."""
+ 210|     am = int(np.argmax(y))
+ 228|                    'name': 'h15_peak_anatomy',
+ 247|                    'n_peak_min': N_PEAK_MIN,
+ 662|         # ---------- T1 per-word peaks (family A) ----------
+ 665|         pk = np.array([peak_loc(s_grid, C15A[:, i])
+ 668|         peak_words = [i for i in range(n_words)
+ 670|         n_peak = len(peak_words)
+ 671|         g1_ok = bool(n_peak >= N_PEAK_MIN)
+ 672|         pv = np.array([float(pk[i]) for i in peak_words])
+ 673|         med_peak = float(np.median(pv)) if n_peak else None
+ 674|         g2_ok = bool(s_c is not None and med_peak is not None
+ 675|                      and abs(med_peak - float(s_c))
+ 679|         if n_peak >= 5:
+ 683|                 idx = rngb.integers(0, n_peak, n_peak)
+ 689|         t1 = {'n_peak_words': n_peak,
+ 692|               'median_peak_loc': (None if med_peak is None
+ 693|                                   else round(med_peak, 4)),
+ 703|         log('T1 n_peak=%d flat=%d g1=%s med_peak=%s '
+ 705|             % (n_peak, int(flat.sum()), g1_ok,
+ 706|                None if med_peak is None
+ 707|                else round(med_peak, 4),
+ 754|         for i in peak_words:
+ 757|         h8_pk = [peak_loc(s_grid, C34_A[:, i, 8])
+ 759|         h21_pk = [peak_loc(s_grid, C34_A[:, i, 21])
+ 764|         # A11_L34_h15 per-word peak vs C15 per-word peak
+ 766|         for i in peak_words:
+ 767|             ap = peak_loc(s_grid, np.stack(
+ 775|         t3 = {'peak_buckets': {str(k): v for k, v
+ 777|               'h8_inner_peaks': h8_inner,
+ 778|               'h21_inner_peaks': h21_inner,
+ 790|             % (t3['peak_buckets'], h8_inner, h21_inner,
+ 857|            'T1_peaks': t1, 'T2_familyB': t2,
+ 866|             OUT, 'h15_peak.npz'), **save)

@@ -1,0 +1,68 @@
+ledger keys: ['format', 'version', 'model', 'protocol_family', 'axes', 'blocks', 'headsets', 'measurements', 'growth_curve', 'linkage', 'errata_ledger', 'quadrants', 'transfer', 'negatives', 'model_namespace', 'migration_history', 'ledger_sha256_8']
+n_measurements=99
+last measurement: {"meas_id": "meas2960_profile_rotation_geometry", "type": "forward_family_profile_geometry", "verdict": "rank1_rotation_trajectory_curved_fixed_dominant", "source": "phase2960/profile_rotation_geometry; the 2958 S_mlp(k) profile families decompose as fixed component dominant (97.5 pct L17 / 98.8 pct L16) plus a rank-1 deviation (top-1 energy 0.897 / 0.965) with a curved trajectory in k (linear-fit rel resid 0.341 / 0.194); rotation axes concentrate at the dose-layer flank (L14-18) while deep lay
+key axes: n=6
+  last item sample: {"axis_id": "language", "kind": "linguistic", "words_n": 57, "labels_n": 2, "direction_source": {"path": "phase2886/hourglass_cka/hourglass_cka.npz", "sha256_8": "0a26bfab", "phase": 2886, "note": "lang_dir = unit(mean S_last[en,18] - mean S_last[fr,18]); mid-stream sentence states, new provenance (not unembed difference)"}, "vocab_source": {"path": "phase2887/language_axis_mlp/execution.json", "s
+key blocks: n=23
+  last item sample: {"block_id": "B_readout_robust_qwen", "axis_id": "language", "kind": "multi_draw_triple_condition_injection", "model": "qwen3-4b", "shape": [57, 10], "src": {"path": "phase2899/qwen_readout_robustness/qwen_readout_robustness.npz", "sha256_8": "2af9ba4d", "phase": 2899, "key": "B_stale_s2896"}, "notes": "W=[26,36); stale(d18)/eigen(d(li))/orth triple injection x 8 null-draws, 2887 vocab verbatim 57
+key headsets: n=4
+  last item sample: {"set_id": "triple_core", "definition": "heads in >=2 of {top64, class43, stable_top10}", "n": 15, "members_core4": ["L5H25", "L23H7", "L23H29", "L26H4"], "src": {"path": "phase2871/sig_heads_triple/result.json", "sha256_8": "59830517", "phase": 2871}, "phase": 2871}
+key measurements: n=99
+  last item sample: {"meas_id": "meas2960_profile_rotation_geometry", "type": "forward_family_profile_geometry", "verdict": "rank1_rotation_trajectory_curved_fixed_dominant", "source": "phase2960/profile_rotation_geometry; the 2958 S_mlp(k) profile families decompose as fixed component dominant (97.5 pct L17 / 98.8 pct L16) plus a rank-1 deviation (top-1 energy 0.897 / 0.965) with a curved trajectory in k (linear-fit
+key growth_curve: n=26
+  last item sample: {"growth_id": "G_language_content_density_mechanism", "phase": 2902, "model": "glm4-9b-chat-hf", "axis": "language", "finding": "readout margin = class-correlated fraction of channel Jacobian response, not response magnitude: glm4 attn (small response, word-unembed-aligned landed dirs, margin 0.121) vs glm4 mlp (3x larger response, language-neutral landed dirs, margin 0.020). Unifies the L14 spect
+key linkage: n=14
+  last item sample: {"link_id": "L14_readout_spectrum_cross_model", "phase": 2897, "type": "cross_model_spectrum", "connects": ["M2896_qwen_readout_type", "M2897_glm4_readout_spectrum", "M2893_language_perlayer_glm4", "M2890_language_axis_glm4", "M2891_language_attn_glm4", "M2899_qwen_readout_robustness", "M2900_glm4_mlp_eigen_robustness", "M2901_glm4_attn_eigen_robustness", "M2902_glm4_channel_jacobian_asymmetry", "
+key errata_ledger: n=9
+  last item sample: {"corrects": "M2906_amplitude_law_neuron_attribution", "note": "the 2906 prereg TEXT froze sigma_hat_c = sqrt(tr(Sigma_c)/d) (RMS) but the implementation used B[m].std(0).mean() (mean-std, a downward-biased proxy; ratio rms/mean-std measured 1.06-1.34 across groups, Jensen inequality). The 2906 coverage audit used the same mean-std estimator, so the drift was self-consistent and passed. Recomputin
+key quadrants: n=4
+  last item sample: {"family": "translation", "drop_spectrum": {"organized": false, "unified_axis_direction": false, "sources": ["M2878_syntax_trans_vocab"]}, "mlp_carrier": {"acc": null, "sources": [], "note": "not_measured - no unified axis to project"}, "quadrant": "no_axis"}
+key negatives: n=13
+  last item sample: {"neg_id": "N13_gap_zigzag_absent_2_3_reversal_law", "kind": "descriptive_pattern_null_under_formal_test", "claim": "the class-wise sign-balance gap sequence |pos_frac0_j - pos_frac1_j| carries a real per-layer zigzag (alternation) beyond chance for qwen_attn, generalizing the 2911 margin-sign alternation to the amplitude domain", "evidence": "2912 preregistered per-layer independent permutation t
+key migration_history: n=1
+  last item sample: {"phase": 2882, "from_version": 1, "to_version": 2, "backup": "atlas_ledger_v1_backup.json", "backup_sha256_8": "9d934052", "note": "existing v1 entries byte-faithful; new sections per spec v2 sections 10-13"}
+memo lines=9495
+--- memo tail 40 lines ---
+1. **交叉项是"方向锁定 + 幅度饱和"的秩 1 响应**：xt 逐头剖面随 s 单调爬升趋缓（如 h22：2.92→9.16→14.6→19.3→23.8→26.7），斜率 1.18 ≈ RMSNorm 归一化的饱和几何（|Δq| 随 s 有界）——二阶代数在小剂量成立、大剂量失效。
+2. **操作性含义（原语卡片）**：交叉项可用**两点标定**（方向由任意小剂量 probe 给出、幅度需两点插值），单点 s² 外推禁用；逐头模式 rho 0.97 意味着头级排序跨剂量稳定——图谱的头级签名是剂量不变的。
+3. **再解耦**：xt 追踪 dz（rho 0.842）但不追踪 ATT（rho −0.10）——2955 D1 的"logit 位移不预测 ATT 承载"在交叉项层面复现；注意力路由增益仍非单一 logit 标量可解释。
+4. sep 全网格单调穿越（182.6→145.9→72.4→21.5→−4.0→−6.4），L16@s2.0 轴 X=4.06 与 2955 复现一致。
+
+**结论（重复 3 次）**：**Δq·Δk 交叉项方向锁定（cos≈0.99）但幅度非二阶（斜率 1.18 饱和）——s² 小剂量外推不成立（rel 1.37），仅逐头模式可预测（rho 0.97）；交叉项的操作化 = 方向一点 + 幅度两点标定。**
+
+**硬伤与勘误（run1→run2）**：run1 **判决记账 bug**——锚全过（12/12）且 T1/T2/T3 已算出，但 verdict 组合行被 `if verdict is None` 兜底吞掉（anchor 分支漏赋值），误标 anchor_fail_all_void。修复为直接按 anchor_prelim 分支 + correction_note，删产物重跑（同 session 确定性，run2 权威）。**教训入 MEMORY**：verdict 必须在判据分支内显式赋值，兜底分支只允许留给锚失败路径。
+
+**文件+SHA256-8**：execution 7897d996 / result 339efa49 / npz bab77bae / script 22c2bb87。产物 `tests/glm5/result/rdc_query_construction_20260913/phase2959/cross_term_algebra/`。Ledger 98 条 / L14 connects 66 / ledger 65334e57。
+
+**接续**：机制链第二十二环（交叉项代数环）闭合，方案 v2 阶段一过半。候选 2960：A（主选）剖面旋转定位（2958 遗留：L17 消融 MLP 剖面随 k 旋转的几何——旋转轴与固定分量分解，一次前向族）；B 原语卡片压缩（把 21 环机制链压缩为层带×模块×头集×读出×剂量律×lin_r 的结构化卡片表，纯文档 Phase）；C 词类机制签名矩阵预研（阶段二启动：词表扩容 n≳40 分组设计）；D v3 解码器方向重启（2940 遗留）。
+## Phase 2960: 剖面旋转几何——固定分量+秩1偏差统一分解 [2026-09-20 00:17]
+
+**判决：`rank1_rotation_trajectory_curved_fixed_dominant`** —— 2958 的"剖面旋转"签名完成几何分解：两族的下游 S_mlp(k) 剖面族都是**固定分量主导（‖均值‖/‖剖面‖ = 97.5% L17 / 98.8% L16）+ 秩 1 偏差（top-1 偏差能量 0.897 / 0.965）+ k 轨迹弯曲（逐层线性拟合相对残差 0.341 / 0.194，超 0.15 阈）**。**2958 的 L17/L16 profile 轴分裂（cos 0.9 线两侧）是偏差幅度差异，不是机制差异——两族共用同一几何模板：固定剖面 + 单旋转轴 + 非线性幅度**。
+
+**设计（2958 verbatim 协议，runtime 15.3s）**：B0 + {I0,I1}×{L17,L16} K=3 + patch 曲线 k∈{0,0.25,0.5,0.75,1.0} K=2（切片级部分还原 k·x_orig），下游 S_mlp(k) ∈ R^18/19 做均值+偏差 SVD。判据冻结：T1 top-1 偏差能量≥0.8→rank1_rotation；T2 线性拟合残差≤0.15→trajectory_linear；T3 固定份额≥0.5→fixed_dominant。
+
+**锚（run3 权威）**：a1 dirs 重建 2.17e-08（**第 31 次连续前向锚定**）、a3/a8/a13/a14/a15/a18/a19 **bit 0**、a16 bf16 界归一 0.979、a17 恒等链 rel 4.19e-03、a21 被动链 0.011、**a22 vs 2958 npz**：R/S_mlp05 4.98e-04（3dp 舍入门 1e-3）、sep 4.66e-03（2dp 舍入门 5.01e-3）。
+
+**主检验**：
+| 检验 | 冻结阈 | L17 | L16 | 判定 |
+|---|---|---|---|---|
+| T1 旋转秩 | top-1 能量≥0.8 | **0.897** | **0.965** | 双 rank1_rotation |
+| T2 轨迹形状 | rel≤0.15 | **0.341** | **0.194** | 双 trajectory_curved |
+| T3 固定分量 | ≥0.5 | **0.975** | **0.988** | 双 fixed_dominant |
+
+**关键发现**：
+1. **偏差奇异值谱高度秩 1**：L17 σ=[5.07, 1.66, 0.39, 0.13]（σ2/σ1=0.33）、L16 σ=[8.38, 1.52, 0.47, 0.10]（σ2/σ1=0.18）——旋转由**单一轴**支配，第二轴仅 1/3 与 1/5。
+2. **旋转轴空间定位在剂量层侧翼**：|Vt[0]| 权重 top 层 L17={17,14,15,2,16}、L16={18,17,15,16,0}——旋转集中在 L14-18（剂量层±侧翼），深层（L30-35）几乎不动（mean_profile 深层值主导：L35 = −2.21/−5.13）。与 2957"两端相近、中层分化"自洽。
+3. **轨迹弯曲与 2958 剂量非线性同源**：L16 rel_lin 0.194 与其尾部加速 R(k)（k=0.75 处 −1.14 vs 线性 −4.40）对应；L17 0.341 更弯但仍秩 1——弯曲的是幅度律，不是方向。
+4. 原语卡片推进：剖面族可参数化为（固定剖面 m̄，旋转轴 v_rot，幅度律 R(k) 三点标定）三元组——图谱签名维度从 18 层压缩到 2+3 参数。
+
+**结论（重复 3 次）**：**消融 MLP 剖面族 = 固定分量主导（~98%）+ 秩 1 旋转 + 弯曲幅度律；2958 的层类型 profile 分裂是偏差幅度差异而非机制差异；旋转轴集中于剂量层侧翼（L14-18），深层不动。**
+
+**硬伤与勘误（run1→run3）**：run1 a22 用 bit 阈 1e-6 不可达——2958 npz 存的是**舍入值**（sep_k round 2dp、R/S_mlp05 round 3dp），4.66e-03 恰落 2dp 舍入界（2948 教训跨相位复现）；run2 a22 拆门通过（R/S05 4.98e-04 / sep 4.66e-03）但 T2 的 lstsq 维度写反（b=Sfam.T (n_l,5) vs A (5,2)，正确调用 lstsq(A, Sfam)）崩溃；run3 权威一次通过。**新教训入 MEMORY**：跨相位复现锚必须先检上游产物的存储精度（round 位数），bit 级仅限"上游存全精度"或同文件链。
+
+**文件+SHA256-8**：execution c6b0a8e3 / result de044f1d / npz 6f81beee / script 293b031d。产物 `tests/glm5/result/rdc_query_construction_20260913/phase2960/profile_rotation_geometry/`。Ledger 99 条 / L14 connects 67 / ledger e9a45859。
+
+**接续**：机制链第二十三环（旋转几何环）闭合，方案 v2 阶段一接近收官。候选 2961：A（主选）原语卡片压缩——把 23 环机制链压缩为结构化"原语卡片"表（层带×模块×头集×读出方向×剂量律×lin_r 稳健性，纯文档 Phase，阶段一收官）；B 词类机制签名矩阵预研（阶段二启动：词表扩容 n≳40 分组设计预注册）；C 旋转轴功能身份（v_rot 与剂量层路由头 W_ov/u35 的代数关系，一次前向）；D v3 解码器方向重启（2940 遗留）。
+recent phase dirs: ['phase2955', 'phase2956', 'phase2957', 'phase2958', 'phase2959', 'phase2960']
+phase2961 exists: False
+ws log today exists: True

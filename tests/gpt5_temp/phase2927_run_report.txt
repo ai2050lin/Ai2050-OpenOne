@@ -1,0 +1,21 @@
+execution.json frozen
+sources ok (E17 n=24)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+pass1 done (171 sequences)
+dirs_word built | cos(dirs_word, dirs86): min 0.0000 median 0.1651 max 0.2827
+pass2 words [10/57]
+pass2 words [20/57]
+pass2 words [30/57]
+pass2 words [40/57]
+pass2 words [50/57]
+pass2 done
+B86 (32, 57, 36) | Bwd (32, 57, 36)
+a1 rel 3.16e-08 ok=True | a2 m78 0.280360 ok=True | a3 sign diff 4.71e-08 ok=True
+a4 maxT event set == 2917: True (E86 n=24)
+P1: E_word n=32 | n_overlap 7/24 | jaccard 0.143 | top1 (7,19) in E': True
+P1 E_word: [(5, 6, 1.4712), (5, 1, 1.3486), (18, 5, 1.2321), (3, 3, 1.2295), (1, 9, 1.1138), (21, 6, 1.0195), (7, 19, 1.0183), (8, 3, 0.9186), (1, 6, 0.9147), (14, 9, 0.9117), (0, 10, 0.818), (23, 9, 0.8106), (21, 4, 0.7329), (12, 8, 0.7313), (11, 3, 0.7313), (7, 20, 0.729), (16, 12, 0.729), (2, 1, 0.726), (16, 9, 0.707), (25, 2, 0.707), (20, 6, 0.6481), (27, 8, 0.6469), (11, 10, 0.6449), (21, 8, 0.6449), (20, 8, 0.639), (8, 5, 0.6349)]
+P2 full-grid Spearman(sign_M_word, sign_M86): 0.1762
+P4: E_word layers [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 16, 19, 20] | E17 layers [1, 2, 3, 4, 5, 6, 8, 9, 12, 13, 16, 19, 22, 23, 24, 28]
+==== VERDICT: events_probe_partially_invariant ====

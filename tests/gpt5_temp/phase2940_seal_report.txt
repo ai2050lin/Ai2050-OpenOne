@@ -1,0 +1,32 @@
+verdict: v3_decoder_not_established
+anchors: a1 3.04e-08 a2 4.81e-09 a4 0.00e+00 a5 2.21e-04 ok=True
+runtime: 1.5s
+
+P1 layer profile of v3 (w_li = s3*U[li,2]):
+  top-10: [(16, 0.625), (17, 0.619), (18, 0.618), (15, 0.562), (3, -0.504), (2, -0.487), (4, -0.467), (1, -0.429), (5, -0.409), (14, 0.389)]
+  L15-18 mass share: 0.249
+  L20-35 mass share: 0.266
+  negative-weight layers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+
+P3 c3(func) class separation forensics:
+  median lab0 52.396 | median lab1 82.260
+  lowest-5 c3 words: [('sea', 39.15, 0), ('foot', 41.82, 0), ('water', 42.39, 0), ('star', 44.3, 0), ('Baum', 46.87, 1)]
+  highest-5 c3 words: [('nuit', 120.69, 1), ('hombre', 122.28, 1), ('rey', 124.67, 1), ('casa', 127.27, 1), ('libro', 131.72, 1)]
+  low decile lab0 count: 3/14 | high decile lab0 count: 14/14
+  rho(c3, lab) within en only: 0.0000 (n=22)
+
+P2 per-null class split of displacement d:
+  null0: med lab0 +19.798 lab1 +15.388 diff +4.410
+  null1: med lab0 +19.742 lab1 +16.440 diff +3.302
+  null2: med lab0 +23.298 lab1 +16.186 diff +7.112
+  null3: med lab0 +24.303 lab1 +19.802 diff +4.502
+  top-5 |d3| words: [('madre', 76.02), ('Nacht', 68.47), ('noche', 47.4), ('Baum', 40.72), ('city', 35.99)]
+
+same-ctx control: med lab0 +23.088 lab1 +35.834 diff -12.746
+
+SHA256-8 chain:
+  script 2940: 02247d1e
+  execution: 1fda5eb9
+  result: 11dd5d1f
+  npz: 4f5d8fa8
+  src 2887: e4835a87 | 2927: 84fec594 | 2937: 518cb922 | 2939: 8bae7be6

@@ -1,0 +1,33 @@
+execution.json frozen
+a4 mask counts n86=469 nwd=382 shared=295 ok=True
+cells: full grid 1120 (L0 excluded)
+null sets sampled: {'null0': [40264, 95640, 122467, 70227], 'null1': [81933, 149496, 43420, 82718], 'null2': [6364, 88469, 68663, 38463], 'null3': [148781, 106731, 43310, 66226]}
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a5 func separation 185.6975 (scale 92.2913) ok=True
+a7 separations: {'func': 185.7, 'null0': 77.26, 'null1': 106.05, 'null2': 106.06, 'null3': 81.47} (func>all ok=True)
+a3 L18 all-heads pos1 ablation mean|ds| 1.4631 (0.01*scale 0.9229) ok=True
+ablation func [400/1120]
+ablation func [800/1120]
+ablation null0 [400/1120]
+ablation null0 [800/1120]
+ablation null1 [400/1120]
+ablation null1 [800/1120]
+ablation null2 [400/1120]
+ablation null2 [800/1120]
+ablation null3 [400/1120]
+ablation null3 [800/1120]
+ablation sweep done (5 conds x 1120 cells, func max 0.0404)
+a6 CI_rel reproduction vs 2933 (func, 1120 cells) max abs diff 0.00e+00 ok=True
+P1 func: rho -0.6762 p 9.999e-05 p_band 0.0002 stable=True
+P1 null0: LOAD 0.011619 DEEP 0.005945 rho -0.6574 p 2.000e-04 p_band 0.0006 stable=True
+P1 null1: LOAD 0.009563 DEEP 0.005141 rho -0.6608 p 9.999e-05 p_band 0.0005 stable=True
+P1 null2: LOAD 0.010313 DEEP 0.005147 rho -0.6619 p 9.999e-05 p_band 0.0002 stable=True
+P1 null3: LOAD 0.012511 DEEP 0.006371 rho -0.6420 p 2.000e-04 p_band 0.0006 stable=True
+P2 amp-ratio pairwise: [0.7964, 0.8177, 0.7995, 0.8061, 0.8028, 0.8077] median 0.8044
+P3 raw-CI pairwise: [0.9419, 0.9426, 0.94, 0.9421, 0.94, 0.9428] median 0.9420
+P4: amp medians {'null0': 1.9668, 'null1': 1.6486, 'null2': 1.722, 'null3': 2.1293} | func grand 0.005100
+==== VERDICT: null_amp_mixed ====

@@ -1,0 +1,42 @@
+verdict: linr_ci_law_general
+runtime: 510.9 s
+anchors: a1 2.168e-08 a2 0.0 a6 0.0 | sep same 116.70 func 185.70 null 77.26
+correction_note in prereg: True
+
+== grand median CI_rel (1120 cells) ==
+pos0: same 0.005253 | func 0.004028 | null 0.007164
+pos1: same 0.007136 | func 0.005100 | null 0.009903
+pos01: same 0.007085 | func 0.005183 | null 0.009950
+pos01/pos1 ratio 1.016 | pos0/pos1 0.790 (subadditivity check: pos01 vs pos0+pos1 0.005 vs 0.009)
+
+== per-layer median CI (func): top-5 layers per config ==
+pos0: L1 0.005552, L2 0.005284, L4 0.005094, L3 0.005029, L5 0.004910
+pos1: L1 0.008616, L22 0.006514, L6 0.006501, L2 0.006499, L3 0.006247
+pos01: L1 0.008887, L22 0.006718, L2 0.006698, L6 0.006502, L3 0.006228
+
+== null vs func CI ratio per band (pos1) ==
+LOAD: func 0.005613 null 0.010257 ratio 1.827
+DEEP: func 0.002971 null 0.005941 ratio 2.000
+
+== survivor 7 (func) ==
+(1, 6) pos0 0.004323 pos1 0.005426 pos01 0.005942 shared=True
+(5, 6) pos0 0.004529 pos1 0.006406 pos01 0.006312 shared=True
+(7, 19) pos0 0.004554 pos1 0.005546 pos01 0.005343 shared=True
+(8, 2) pos0 0.005618 pos1 0.006145 pos01 0.005563 shared=True
+(14, 9) pos0 0.003657 pos1 0.009444 pos01 0.010257 shared=True
+(20, 8) pos0 0.004568 pos1 0.008034 pos01 0.007482 shared=True
+(21, 6) pos0 0.004567 pos1 0.005927 pos01 0.004347 shared=True
+skeleton median 0.005771 vs rest 0.004877 (x1.183)
+
+== top-5 pos1/func cells (2934 vs 2933 CI) ==
+(15, 34) 2934 0.040383 2933 0.040383
+(0, 24) 2934 0.035243 2933 0.035243
+(12, 22) 2934 0.026983 2933 0.026983
+(14, 21) 2934 0.026683 2933 0.026683
+(12, 1) 2934 0.024132 2933 0.024132
+
+== SHA256-8 ==
+execution.json 3ebbc5a7
+result.json 4769249b
+loadband_anatomy.npz 62da7e11
+script 8aa2c4ab

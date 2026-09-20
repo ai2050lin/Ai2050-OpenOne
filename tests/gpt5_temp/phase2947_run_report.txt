@@ -1,0 +1,23 @@
+execution.json frozen
+sources ok (2945 ref loaded)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a3 Vt8 rebuild vs 2939 max diff 0.00e+00 ok=True
+a7 construction self-check max abs 9.95e-14 ok=True
+a9 ablation-slice self-check 0.00e+00 | o_proj in features 4096 (expect 4096) ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a4 proj_func vs 2935 max abs diff 7.21e-06 ok=True
+a5 proj_null0 vs 2935 max abs diff 6.26e-06 ok=True
+a6 func separation 185.6975 ok=True
+sep null0 77.262 (func 185.698)
+REF L17@1.0 sep 21.46 | REF L16@2.0 sep 84.81
+a10 REF17 vs 2945 diff 0.0046 ok=True | a11 REF16 vs 2945 diff 0.0010 ok=True
+a8 same-session determinism 0.00e+00 ok=True
+A17 sweep done (32 heads)
+A16 sweep done (32 heads)
+A10ctrl sweep done (32 heads)
+L17: P 0.2464 effN 10.29 maxD 17.52 | L16: P 0.1803 effN 11.58 maxD 50.69 | ctrl max|Cc| 1.75
+T0 True | T1 True | T2 False
+==== VERDICT: switch_head_concentrated_only ====

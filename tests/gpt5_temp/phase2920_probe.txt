@@ -1,0 +1,38 @@
+== 2887 keys: ['B3_lang', 'g_func', 'g_null', 'g_same', 'labels_concept', 'labels_lang', 'lang_dir', 'words']
+  B3_lang shape=(57, 10) dtype=float32
+  g_func shape=(57, 10) dtype=float32
+  g_null shape=(57, 10) dtype=float32
+  g_same shape=(57, 10) dtype=float32
+  labels_concept shape=(57,) dtype=int64
+  labels_lang shape=(57,) dtype=int64
+  lang_dir shape=(2560,) dtype=float32
+  words shape=(57,) dtype=object
+words n=57 lang counts=Counter({'L': 35, 'en': 22})
+ck unique=22 sizes=[4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+labels_concept n=57 unique=22 sizes=[4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+lc == ck? True
+  ck 3753 (n=4): ['en:house', 'L:maison', 'L:Haus', 'L:casa']
+  ck 2311 (n=4): ['en:book', 'L:livre', 'L:Buch', 'L:libro']
+  ck 3729 (n=4): ['en:night', 'L:nuit', 'L:Nacht', 'L:noche']
+  ck 5220 (n=4): ['en:woman', 'L:femme', 'L:Frau', 'L:mujer']
+  ck 11477 (n=3): ['en:king', 'L:roi', 'L:rey']
+  ck 883 (n=3): ['en:man', 'L:homme', 'L:hombre']
+  ck 13078 (n=3): ['en:wine', 'L:vin', 'L:Wein']
+  ck 9396 (n=3): ['en:sea', 'L:mer', 'L:mar']
+== 2917 keys: ['B_heads', 'dirs', 'labels_lang', 'max_perm', 'p_M', 'p_maxT', 'sign_M', 'words']
+n_sig(p_maxT<=0.05)=24 margins min=0.565705 max=1.346335
+sig cells: [(7, 19, 1.34634), (26, 6, 1.23584), (8, 2, 1.12525), (25, 3, 1.12278), (22, 12, 1.1138), (24, 23, 1.01633), (21, 6, 0.91948), (13, 22, 0.82254), (5, 6, 0.81462), (6, 19, 0.81057), (27, 24, 0.81057), (4, 1, 0.80581), (21, 16, 0.73379), (4, 22, 0.72903), (20, 8, 0.72604), (1, 6, 0.64759), (4, 19, 0.64495), (14, 9, 0.63896), (1, 4, 0.56835), (15, 13, 0.56817), (17, 28, 0.56817), (26, 5, 0.56659), (28, 1, 0.56659), (24, 9, 0.56571)]
+max nonsig margin=0.560423 (gap to min sig = 0.005283)
+max_perm: min=0.242131 p95=0.552727 max=0.822540
+B_heads shape=(32, 57, 36) dtype=float32 absmax=2.0932
+== 2919 keys: ['axis_id', 'axis_names', 'cls', 'cos_matrix', 'diff_norm', 'dirs_all', 'pair_names', 'probe_curves', 'sentences']
+dirs_all (4, 36, 2560) axis_names=['lang', 'speed', 'size', 'moist']
+== tokenization (spaced / bare) ==
+  speed_hi: fast:1/1, quick:1/1, rapid:1/1, swift:1/1, speedy:1/1, brisk:1/1, hasty:2/2, fleet:1/1
+  speed_lo: slow:1/1, sluggish:1/1, leisurely:2/3, plodding:3/3, unhurried:3/4, creeping:1/1, crawling:1/1, stagnant:1/1
+  size_hi: huge:1/1, enormous:1/1, giant:1/1, massive:1/1, immense:1/1, colossal:1/1, gigantic:1/1, vast:1/1
+  size_lo: tiny:1/1, small:1/1, little:1/1, miniature:1/1, minute:1/1, petite:1/1, microscopic:1/1, diminutive:2/3
+  moist_hi: wet:1/1, damp:1/1, humid:1/1, moist:1/1, soggy:2/3, soaked:1/1, drenched:2/2, dank:1/1
+  moist_lo: dry:1/1, arid:2/2, parched:2/3, dehydrated:3/3, withered:2/3, dusty:1/1, waterless:2/2, baked:1/1
+FAILS: [('speed_hi', 'hasty'), ('speed_lo', 'leisurely'), ('speed_lo', 'plodding'), ('speed_lo', 'unhurried'), ('size_lo', 'diminutive'), ('moist_hi', 'soggy'), ('moist_hi', 'drenched'), ('moist_lo', 'arid'), ('moist_lo', 'parched'), ('moist_lo', 'dehydrated'), ('moist_lo', 'withered'), ('moist_lo', 'waterless')]
+2887 words multi-token fails: none

@@ -1,0 +1,37 @@
+top keys: ['format', 'version', 'model', 'protocol_family', 'axes', 'blocks', 'headsets', 'measurements', 'growth_curve', 'linkage', 'errata_ledger', 'quadrants', 'transfer', 'negatives', 'model_namespace', 'migration_history']
+format: tma-atlas-ledger
+version: 2
+model: qwen3-4b
+protocol_family: LPF v5.3
+axes: list len=6
+  last item keys: ['axis_id', 'kind', 'words_n', 'labels_n', 'direction_source', 'vocab_source', 'status']
+  last item: {"axis_id": "language", "kind": "linguistic", "words_n": 57, "labels_n": 2, "direction_source": {"path": "phase2886/hourglass_cka/hourglass_cka.npz", "sha256_8": "0a26bfab", "phase": 2886, "note": "lang_dir = unit(mean S_last[en,18] - mean S_last[fr,18]); mid-stream sentence states, new provenance (not unembed difference)"}, "vocab_source": {"path": "phase2887/language_axis_mlp/execution.json", "sha256_8": "ec46fd67", "phase": 2887, "note": "2878 translation pairs canonical (en,L), VG0+VG1 verbatim, tid-level dedup (en 22 / L 35)"}, "status": "active"}
+blocks: list len=23
+  last item keys: ['block_id', 'axis_id', 'kind', 'model', 'shape', 'src', 'notes']
+  last item: {"block_id": "B_readout_robust_qwen", "axis_id": "language", "kind": "multi_draw_triple_condition_injection", "model": "qwen3-4b", "shape": [57, 10], "src": {"path": "phase2899/qwen_readout_robustness/qwen_readout_robustness.npz", "sha256_8": "2af9ba4d", "phase": 2899, "key": "B_stale_s2896"}, "notes": "W=[26,36); stale(d18)/eigen(d(li))/orth triple injection x 8 null-draws, 2887 vocab verbatim 57 words, directions zero-forward from 2886 S_last; 24/24 cell-draws dual-flag positive"}
+headsets: list len=4
+  last item keys: ['set_id', 'definition', 'n', 'members_core4', 'src', 'phase']
+  last item: {"set_id": "triple_core", "definition": "heads in >=2 of {top64, class43, stable_top10}", "n": 15, "members_core4": ["L5H25", "L23H7", "L23H29", "L26H4"], "src": {"path": "phase2871/sig_heads_triple/result.json", "sha256_8": "59830517", "phase": 2871}, "phase": 2871}
+measurements: list len=67
+  last item keys: ['meas_id', 'type', 'verdict', 'source']
+  last item: {"meas_id": "M2928_survivor_core_anatomy", "type": "survivor_core_anatomy", "verdict": "survivor_core_not_established (frozen mapping: P1 fail) with the REAL findings in P2/P3 - zero-forward (212 s) on the 2927 npz. ANCHORS 4/4: a1 sign_M diff 0.0; a2 sets 24/32/7 rebuilt; a3 margins (1.34634, 1.01827); a4 cos median 0.1651. P1 OVERLAP NULL REFUTES THE OVERLAP EVIDENCE: maxT on fixed G stacks with 100 independent permutation sets gives overlap null median 7.0 (mean 7.22, max 9) - the observed 7/24 is EXACTLY AT CHANCE (p=0.85); set sizes stay 24-33 and null significant sets cluster on FIXED ho
+growth_curve: list len=26
+  last item keys: ['growth_id', 'phase', 'model', 'axis', 'finding', 'src', 'status_revision']
+  last item: {"growth_id": "G_language_content_density_mechanism", "phase": 2902, "model": "glm4-9b-chat-hf", "axis": "language", "finding": "readout margin = class-correlated fraction of channel Jacobian response, not response magnitude: glm4 attn (small response, word-unembed-aligned landed dirs, margin 0.121) vs glm4 mlp (3x larger response, language-neutral landed dirs, margin 0.020). Unifies the L14 spectrum: qwen mlp ~0.2 >> glm4 attn ~0.12 >> glm4 mlp ~0.02 orders the language-content density of landed directions across carriers. | 2903 revision: cross-model prediction refuted (D_q_mlp 0.00165 < nul
+linkage: list len=14
+  last item keys: ['link_id', 'phase', 'type', 'connects', 'notes', 'phase_updated']
+  last item: {"link_id": "L14_readout_spectrum_cross_model", "phase": 2897, "type": "cross_model_spectrum", "connects": ["M2896_qwen_readout_type", "M2897_glm4_readout_spectrum", "M2893_language_perlayer_glm4", "M2890_language_axis_glm4", "M2891_language_attn_glm4", "M2899_qwen_readout_robustness", "M2900_glm4_mlp_eigen_robustness", "M2901_glm4_attn_eigen_robustness", "M2902_glm4_channel_jacobian_asymmetry", "M2903_qwen_channel_jacobian_decomposition", "M2904_b_row_space_structure_audit_gate", "M2905_margin_structure_skew_audited", "M2906_amplitude_law_neuron_attribution", "M2907_shape_correction_law", "M2
+errata_ledger: list len=9
+  last item keys: ['corrects', 'note', 'phase']
+  last item: {"corrects": "M2906_amplitude_law_neuron_attribution", "note": "the 2906 prereg TEXT froze sigma_hat_c = sqrt(tr(Sigma_c)/d) (RMS) but the implementation used B[m].std(0).mean() (mean-std, a downward-biased proxy; ratio rms/mean-std measured 1.06-1.34 across groups, Jensen inequality). The 2906 coverage audit used the same mean-std estimator, so the drift was self-consistent and passed. Recomputing M1 intervals under the preregistered RMS definition (diag_2907b 2x2x2 grid; both recheck anchors reproduce registered intervals to 9e-7): glm4 attn flips to INSIDE in 4/4 combos; qwen attn is border
+quadrants: list len=4
+  last item keys: ['family', 'drop_spectrum', 'mlp_carrier', 'quadrant']
+  last item: {"family": "translation", "drop_spectrum": {"organized": false, "unified_axis_direction": false, "sources": ["M2878_syntax_trans_vocab"]}, "mlp_carrier": {"acc": null, "sources": [], "note": "not_measured - no unified axis to project"}, "quadrant": "no_axis"}
+transfer: dict keys=['source', 'matrix_rows=fa_dirs_cols=fb_words', 'family_centroid_cos', 'interpretation', 'descriptive']
+negatives: list len=13
+  last item keys: ['neg_id', 'kind', 'claim', 'evidence', 'status', 'phase', 'sources', 'notes']
+  last item: {"neg_id": "N13_gap_zigzag_absent_2_3_reversal_law", "kind": "descriptive_pattern_null_under_formal_test", "claim": "the class-wise sign-balance gap sequence |pos_frac0_j - pos_frac1_j| carries a real per-layer zigzag (alternation) beyond chance for qwen_attn, generalizing the 2911 margin-sign alternation to the amplitude domain", "evidence": "2912 preregistered per-layer independent permutation test, 20000 perms: qwen_attn zigzag k=7/8 p=0.172, lag-1 rho1=-0.694 p=0.177 (all four groups p>=0.17; S empty => gap_zigzag_absent); the discrepancy vs the descriptive 7/8 impression is the null law: 
+model_namespace: dict keys=['primary', 'protocol_family', 'pending_replication', 'rule', 'active', 'pending', 'glm4_note', 'qwen25_note', 'qwen2_7b_note', 'gemma4_note']
+migration_history: list len=1
+  last item keys: ['phase', 'from_version', 'to_version', 'backup', 'backup_sha256_8', 'note']
+  last item: {"phase": 2882, "from_version": 1, "to_version": 2, "backup": "atlas_ledger_v1_backup.json", "backup_sha256_8": "9d934052", "note": "existing v1 entries byte-faithful; new sections per spec v2 sections 10-13"}

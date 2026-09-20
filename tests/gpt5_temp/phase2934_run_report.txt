@@ -1,0 +1,36 @@
+execution.json frozen
+a4 mask counts n86=469 nwd=382 shared=295 ok=True
+cells: full grid 1120 (L0 excluded)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a5 func separation 185.6975 (scale 92.2913) ok=True
+a7 separations same 116.6954 func 185.6975 null 77.2622 (func>null ok=True)
+a3 L18 all-heads pos01 ablation mean|ds| 1.4468 (0.01*scale 0.9229) ok=True
+ablation pos0 [200/1120]
+ablation pos0 [400/1120]
+ablation pos0 [600/1120]
+ablation pos0 [800/1120]
+ablation pos0 [1000/1120]
+ablation pos1 [200/1120]
+ablation pos1 [400/1120]
+ablation pos1 [600/1120]
+ablation pos1 [800/1120]
+ablation pos1 [1000/1120]
+ablation pos01 [200/1120]
+ablation pos01 [400/1120]
+ablation pos01 [600/1120]
+ablation pos01 [800/1120]
+ablation pos01 [1000/1120]
+ablation sweep done (3 cfgs x 1120 cells, func/pos1 max 0.0404)
+a6 CI_rel reproduction vs 2933 (pos1/func, 1120 cells) max abs diff 0.00e+00 ok=True
+P1 pos0: LOAD 0.004594 DEEP 0.001459 p_band 0.0006 | rho -0.8443 p 9.999e-05 stable=True
+P1 pos1: LOAD 0.005605 DEEP 0.002955 p_band 0.0002 | rho -0.6762 p 9.999e-05 stable=True
+P1 pos01: LOAD 0.005639 DEEP 0.002934 p_band 0.0006 | rho -0.6793 p 9.999e-05 stable=True
+P2 same: LOAD 0.008770 DEEP 0.004394 p_band 0.0006 | rho -0.6854 p 9.999e-05 stable=True
+P2 func: LOAD 0.005605 DEEP 0.002955 p_band 0.0002 | rho -0.6762 p 9.999e-05 stable=True
+P2 null: LOAD 0.011619 DEEP 0.005945 p_band 0.0006 | rho -0.6574 p 2.000e-04 stable=True
+P3: pos0~pos1 0.5809 pos1~pos01 0.9455 | conds same~func 0.8595 null~func 0.8373
+==== VERDICT: linr_ci_law_general ====

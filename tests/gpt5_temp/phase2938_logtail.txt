@@ -1,0 +1,7 @@
+total 380
+1: - scale 塌缩机制解剖（一次前向 14s 无消融，一次运行成功）：pass1 dirs 重建 + 5 条件 baseline batch57（逐层 pos-1 attn 输入捕获 + final pre-norm 残差）+ P4 零前向 embedding 查表。锚 6/6：a1 2.17e-08（**第十三次连续前向锚定**）、a3 proj_func vs 2935 **7.21e-06**、a4 proj_null0 **6.26e-06**、a6 sep 185.70 精确复现。
+2: - **冻结判决 scale_collapse_rewrite**：P1 **能量不塌**（逐层范数比 0.94-1.07，无 <0.8 crossing）；P3 **方向塌**（cos(final, dirs35) 0.045→0.002-0.024，4 组全方向主导）；P2 重写 β 0.43-0.55（median 0.4886）+ γ −11.6..−16.1、R2 0.74-0.86；P4 embed 范数无差异（p 0.64）排除 token 身份。
+3: - seal 三项：①sep 比剖面 **U 形**——塌缩最深 L8-L16（0.11-0.36）深层回升（0.41-0.61），中层注意力是重写主战场（恰为 func sep 峰值层 L6-L10）；②**重写类不对称**——lab1 结构保留 0.75-0.84 vs lab0 被重写 0.13-0.24（呼应 2928 L+ 不对称）；③重写离群词含高 func CI 词（war 198→18、city 202→33）。
+4: - 机制结论：scale 塌缩真名 = **小 cos 分量（~4.5%）的方向塌缩**——中层注意力把末位残差旋转偏离语言方向 + ~50% 词项保留 + 负偏移；与消融侧合观：随机上下文把读出系统从"语义锚定模式"切到"无锚定模式"。
+5: - 产物：execution 13b3b60e / result 5b09c835 / npz 518cb922 / script 2e5cd727；Ledger M2937 + L14（meas 76、connects 44、ledger 4bbea246）；MEMO 8766->8808 行（title_ok L8769 复核）。
+6: - 2938 候选：A（主选）语言子空间角度完整测量（dirs 堆叠子空间 principal angles，func vs null 对齐度，一次前向）；B γ 负偏移解剖（零前向初探）；C h4 L1↔L19 主角度（零前向）；D glm4 跨模型复现（一次前向）。

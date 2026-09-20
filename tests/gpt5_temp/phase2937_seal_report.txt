@@ -1,0 +1,33 @@
+cos(final, dirs_word[35]) per cond: median / p10 / p90
+  func: 0.0450 / -0.0852 / 0.2621
+  same: 0.0281 / -0.0327 / 0.1722
+  null0: 0.0243 / -0.0599 / 0.1158
+  null1: 0.0137 / -0.0694 / 0.1478
+  null2: 0.0120 / -0.0537 / 0.1631
+  null3: 0.0023 / -0.0559 / 0.1222
+
+per-layer sep ratio sep_c(li)/sep_func(li):
+  same: L1 0.630 L4 0.531 L8 0.227 L12 0.275 L16 0.165 L20 0.335 L24 0.401 L28 0.432 L32 0.502 L35 0.571
+  null0: L1 0.607 L4 0.485 L8 0.243 L12 0.238 L16 0.114 L20 0.237 L24 0.363 L28 0.366 L32 0.422 L35 0.413
+  null1: L1 0.640 L4 0.547 L8 0.362 L12 0.414 L16 0.238 L20 0.478 L24 0.567 L28 0.580 L32 0.613 L35 0.574
+  null2: L1 0.587 L4 0.513 L8 0.275 L12 0.298 L16 0.190 L20 0.363 L24 0.485 L28 0.511 L32 0.561 L35 0.541
+  null3: L1 0.564 L4 0.482 L8 0.247 L12 0.294 L16 0.111 L20 0.293 L24 0.408 L28 0.420 L32 0.457 L35 0.433
+
+sep_func(li) profile (first 12 layers): [0.86, 1.16, 1.8, 2.39, 2.71, 3.54, 5.63, 6.05, 6.21, 7.3, 4.98, 5.4]
+
+null0 rewrite outliers (|resid| top6):
+  ['en' '3100' 'light']: func 193.99 null0 131.05 resid 59.39
+  ['en' '4116' 'war']: func 197.66 null0 18.34 resid -54.90
+  ['L' '3753' 'maison']: func 16.35 null0 38.86 resid 43.41
+  ['en' '17788' 'moon']: func 189.84 null0 112.41 resid 42.53
+  ['L' '4478' 'pied']: func 36.48 null0 46.36 resid 42.27
+  ['en' '3283' 'city']: func 201.57 null0 33.44 resid -41.47
+cross-word spearman proj func vs null0: 0.8896 | same: 0.8938
+
+within-label correlation (structure retention):
+  same: lab0 0.2388 lab1 0.7532
+  null0: lab0 0.1282 lab1 0.8420
+
+verdict: scale_collapse_rewrite
+P2 median beta 0.4886 | P3 energy_dominant median False
+SHA8: execution 13b3b60e result 5b09c835 npz 518cb922 script 2e5cd727

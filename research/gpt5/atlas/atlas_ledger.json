@@ -1098,6 +1098,470 @@
     "sha256_8": "61a08678",
     "phase": 2911
    }
+  },
+  {
+   "meas_id": "M2912_sign_balance_zigzag",
+   "type": "gap_zigzag_formal_test",
+   "verdict": "gap_zigzag_absent - anchors 4/4 (per-layer d=1 scores vs 2910 score_true maxabs 4.5-5.0e-7; Delta_B vs 2905 maxabs 4.4-4.9e-5; full margin/acc vs stored within 2e-5) and calibration v2 pass (frac in band 0.8950; p_mean 0.5994 vs analytic tie-corrected expectation 0.6100, band [0.5039,0.7160]). HISTORY: run1 was judged audit_calib_fail_all_void under the v1 band (p_median 0.687 > 0.60); diag_2912a/b then proved the null construction unbiased (iid obs vs null zigzag mean 5.18 vs 5.21; null k matches binomial(8,2/3), E[k]=5.33 by the 2/3 up-down reversal law - NOT binomial(8,0.5)) and the v1 failure to be a band-caliber defect: for a one-sided discrete p = P(perm >= obs) with ties included, E[p] = 0.5 + tau/2 with tau = sum pk^2 ~ 0.22, so E[p] ~ 0.61 and the p median centers near 0.70 (diag_2912b, 1000 iid matrices: p_mean 0.618 vs theory 0.610). v2 replaces the median band by the analytic p_mean band; p definition and all other frozen elements unchanged; run1 products deleted per rerun discipline. MAIN TEST (20000 perms/group, per-layer independent class-label permutation, sizes fixed 22/35): S = groups significant on both p_zig<=0.05 and p_rho<=0.05 is EMPTY => gap_zigzag_absent. Per group: qwen_attn zigzag k=7/8 p=0.172, rho1=-0.694 p=0.177; glm4_mlp k=7 p=0.539, rho1=-0.449 p=0.567; glm4_attn k=6 p=0.794, rho1=-0.108 p=0.928; qwen_mlp k=5 p=0.708, rho1=-0.528 p=0.440. KEY READING: the descriptive zigzag 7/8 (diag_2911c) is NOT rare under the correct null - iid sequences carry E[k]=2/3*8=5.33 reversals (middle-of-three is a local extremum with prob 2/3), so k=7/8 has p~0.17; all four rho1 are negative (-0.11..-0.69), qwen_attn most negative, none significant. The 2911 alternation evidence therefore lives in the margin SIGN sequence (2911 P1: 8/9 flips vs null flip rate 0.5, p=0.0195), not in the gap AMPLITUDE zigzag (null reversal rate 2/3 makes k=7/8 unremarkable). P3 descriptive: top-5 flip-word share 0.25-0.41; fair-coin tail of the max-flip word significant only for qwen_mlp (8 flips, p=0.0195); qwen_attn max 7 flips p=0.090",
+   "source": {
+    "path": "phase2912/sign_balance_zigzag/result.json",
+    "sha256_8": "4611db7f",
+    "phase": 2912
+   }
+  },
+  {
+   "meas_id": "M2913_perhead_wvo_decomposition",
+   "type": "perhead_wvo_decomposition",
+   "verdict": "margin_heads_present_alternation_absent - protocol 2903 verbatim forward per-head jacobian (o_proj-input pre-hook capture, 32 heads x 128 dim, GQA 8kv, eps=1.0, pos 1, conds same/func/null, SEED=2896, window [26,36)). EXECUTION HISTORY: runs 1-3 void on implementation bugs (o_proj-input numpy .cpu misuse; anchor Dfull built from the language direction in the wrong domain; result assembly referencing unassigned probe variables); run4 completed probes but failed the v1 cross-phase anchor gate (e2 vs 2903 B_attn 6.07e-2 >> 1e-3) - audit showed the 1e-3 caliber was MLP-channel-only in 2903 PREREG and does not transfer; v2 (runs 5) re-froze anchors as: a1 input-domain block-vs-full identity 1e-9 (measured 1.22e-15), a3 margin 5e-3 / acc 2 words (measured 1.93e-3 / 1 word), cross-phase quantities logged WITHOUT gate. Run-internal separation: e2run (this-run bf16 module-output B vs 2903 B_attn, same domain) = 3.88e-08 - the forward is deterministic across runs and the 6.07e-2 gap is RESPONSE-EXTRACTION-DOMAIN QUANTIZATION (bf16 module-output differencing vs fp32 o_proj-input differencing), not run drift; the fp32 input-domain margin (-0.02139) is the cleaner estimate of the attn channel margin. P1 (head margin spectrum, family max-null over 200 SEED=2896 label permutations): PRESENT - head 7 margin 0.17710 > p95_max 0.17474; top-5 h7 0.1771 / h8 0.1343 / h6 0.0789 / h22 0.0601 / h21 0.0554. P2 (per-head 10-layer d=1 sign-margin flips, exact binomial(9,.5), BH-FDR q=0.05): ABSENT - best head 7/9 flips p=0.0898, FDR set empty; the AGGREGATE 8/9 alternation (2911 P1, p=0.0195) is stronger than any single head - alternation is a cross-head aggregate phenomenon. P3 (greedy top-k reconstruction with full selection-corrected label-permutation null): SIGNIFICANT - top-2 heads {7,8} margin 0.28036 vs full-channel -0.02139, p=0.01493; two heads flip the attn channel from negative to a margin exceeding qwen_mlp (0.1799). P4 descriptive: top sign-balance-gap heads 17/30/8 (gap_mean 0.23/0.19/0.19, pf0_range up to 0.55). KEY READING: the negative attn margin is a HEAD-LEVEL STRUCTURE - two heads carry mlp-scale positive language separation diluted by the remaining 30 heads' negative contributions; L14 spectrum refined: weak channel margin = strong heads + canceling heads, not uniformly weak response",
+   "source": {
+    "path": "phase2913/perhead_wvo_decomposition/result.json",
+    "sha256_8": "552a2c66",
+    "phase": 2913
+   }
+  },
+  {
+   "meas_id": "M2914_head_identity_replication",
+   "type": "head_identity_replication",
+   "verdict": "head_identity_reproduced - Run B re-ran the 2913 per-head protocol verbatim (SEED=2896, eps=1.0, pos 1, window [26,36), 57 words verbatim 2887, o_proj-input capture): B_heads cross-run rel err 3.16e-08 (fp32 capture domain, same magnitude as the 2913 e2run 3.88e-08), Spearman AND Kendall of margins_h both exactly 1.000000, top2 {7,8} identical, family gate reproduced (h7 0.17710 > p95 0.17474, same numbers as 2913), {7,8} subset margin 0.280360 vs ref 0.28036 (absdiff 0.0), flips_h identical (P2 equality, p_flip_min 0.089844), P3 selection-corrected p=0.01493 reproduced (k=2 heads [7,8]). Anchors 5/5: a1 block identity 1.22e-15; a2 margin -0.02139 vs 2903 stored -0.01946 (1 word); a3 composite W_VO spectra vs 2903 weights_descriptive all 10 layers, worst diff 4.992e-06 (2903 caliber verbatim: M fp64 zeros, fp32@fp64->fp64 matmul, fp64 svd); a4a per-head zf identity sum_h va_h vs composite 3.08e-15; a4b thin-SVD self-check 2.96e-15. EXECUTION HISTORY: run1 void - naive sv comparison broadcast (128,) vs (200,) (A@Bm 300x200 has 72 exact-zero tail singular values; fixed by comparing leading-128). P4 (descriptive, 10-layer window): carrier heads carry NO static spectral identity - t12 rank h7=30/32 h8=4/32, PR rank h7=18 h8=32, zf_gain rank h7=14 h8=30, zf_cos rank h7=16 h8=18; Spearman(spectral stat, margins_h) ~ 0 (t12 0.0, PR -0.0114, zf_gain -0.3046, zf_cos -0.1785): the per-head margin carriers are determined by RUNTIME response (data-dependent o_proj input r_c), not by static weight spectra. KEY READING: h7/h8 head identity now formally confirmed (2913 hard-constraint clause discharged) - the attn channel's positive language separation is carried by two specific, exactly reproducible heads whose identity is invisible in the static weights and lives only in the data-dependent response",
+   "source": {
+    "path": "phase2914/head_identity_replication/result.json",
+    "sha256_8": "a0142e60",
+    "phase": 2914
+   }
+  },
+  {
+   "meas_id": "M2915_carrier_robustness_domain",
+   "type": "carrier_robustness_domain",
+   "verdict": "head_identity_broadly_stable - per-head jacobian re-run across 4 windows + 1 stale-direction control (V1 [26,36) REF / V2 [20,26) / V3 [30,36) / V4 [16,26), layer-matched 2886 class-diff dirs; V5 = V1 window with the FIXED 2887 global lang_dir). Anchors 3/3: a1 per-variant block identity max 1.42e-15; a2 V1 margin -0.02139 (1 word vs 2903); a3 V1 margins vs 2913 npz Spearman 1.000000 / rel 2.73e-08 (third consecutive exact reproduction: 2914 relB 3.16e-08 same magnitude). Verdict axis n_top2({7,8} both in top2, V1-V4) = 2/4 => broadly_stable (n_top5 also 2/4). STRUCTURE: V3 (second half of V1) keeps {7,8} as top2 with ranks SWAPPED (h8 0.16431 #1, h7 0.15076 #2; top5 4/5 overlap with V1) but family gate False (6-layer null p95 0.20731 wider than max 0.16431); V2/V4 (layers <=26) switch carriers (V2 top2 {27,31}, h7 rank14 / h8 rank8; V4 top2 {7,27} with h7 rank1 at margin 1.17970, h8 rank10) - and the CHANNEL ITSELF is positive in the early segment (V2 +0.0367 acc 0.789; V4 +0.1600 acc 0.842) vs negative late segment (V1 -0.0214 acc 0.632): the {7,8} pair carries the LATE-SEGMENT CANCELLATION STRUCTURE, not a global language carrier; head-margin ordering is nearly orthogonal across segments (Spearman V1-V2 0.026, V1-V4 0.076) but consistent within the early segment (V2-V4 0.866). V5 stale fixed direction: carriers vanish (top2 {4,20}, h7 rank14, gate False, channel margin 0.0027) - head-level separation requires the layer-matched direction family (2903 readout spectrum reproduced at head level). h7 is the only cross-segment head (V1 #1, V3 #2, V4 #1).",
+   "source": {
+    "path": "phase2915/carrier_robustness_domain/result.json",
+    "sha256_8": "07314fa6",
+    "phase": 2915
+   }
+  },
+  {
+   "meas_id": "M2916_early_carrier_selection",
+   "type": "early_carrier_selection",
+   "verdict": "early_carriers_selection_confirmed - artifact-domain (zero forward, 0.6 s) selection-corrected greedy test (2913 P3 caliber verbatim) on the 2915 npz B_heads: V2 (early window [20,26)) top carrier h27 ALONE p3=0.004975 (obs 0.78360, k=1); V4 ([16,26)) top carrier h7 ALONE p3=0.004975 (obs 1.17970, k=1); both <= 0.05 => confirmed - the early-segment carriers are statistically real and need only ONE head each. V1 test EXACTLY replicates 2913 P3 (p3 0.014925, absdev 0.0, k=2 {7,8} obs 0.28036); anchors a1 Spearman 1.0 / rel 0.0 (2915 npz margins bit-identical to 2913 after fp32 storage), a2 m78 0.28036. P2 leave-one-layer-out decomposition: EVERY carrier margin is dominated by a SINGLE (head, layer) event - V4 h7 1.17970 collapses to 0.121 without L19 (delta -1.059, sign peak L19 1.3463); V2 h27 0.78360 -> L24 (delta -0.773); V2 h31 0.44323 -> L22 (-0.381); V4 h27 0.78650 -> L24 (-0.661); late-segment V1 h7 0.17710 -> L34 (-0.157, sign peak L34 0.187) and h8 0.13426 -> L34 (-0.071); V4 h8 0.21920 -> L23 (-0.143). P3: top sign-margin events V1 = h17@L28 (0.568), h10@L34 (0.493), h8@L34; V4 = h7@L19 (1.346), h24@L23 (1.016), h13@L22. KEY READING: the 'carrier head' is really a (head, layer) EVENT - h7's cross-segment dual role is two distinct events (h7@L19 early, h7@L34 late); head identity varies across windows because different windows contain different events; the 2913 P3 {7,8} significance is the sum of two events h7@L34 + h8@L34 at the SAME layer 34, suggesting a layer-34 mechanism recruiting both heads rather than a head-pair mechanism spread over layers.",
+   "source": {
+    "path": "phase2916/early_carrier_selection/result.json",
+    "sha256_8": "fc0a8b7a",
+    "phase": 2916
+   }
+  },
+  {
+   "meas_id": "M2917_event_atlas",
+   "type": "event_atlas",
+   "verdict": "event_atlas_not_replicated (with material structure found) - full-layer (head,layer) event atlas: 32 heads x 36 layers = 1152 sign-margin cells (2910 caliber), dirs = 2886 class-diff unit directions per layer, one forward capture, null = 200 mask perms SEED=2896. EXECUTION HISTORY: run1 adjudicated under per-event BH-FDR q=0.05 and returned 0/1152 - audited as a design error with STRUCTURALLY ZERO POWER (smallest attainable per-event permutation p = 1/201 = 0.004975 while the BH first threshold is q/m = 0.05/1152 = 4.34e-5; BH could only fire if >=115 events sat at the granularity floor simultaneously); verdict label kept as frozen, criterion re-frozen as v2 maxT (Westfall-Young single-step: p_maxT = (1 + #{perms: max_{h,l} sign_perm >= sign(event)})/201, BH demoted to descriptive), artifacts wiped and rerun. v2 RESULT: 24/1152 events family-wise significant. KNOWN 2/6 survive: (7,19) margin 1.34634 p_maxT=0.005 - the TOP event of the entire atlas, matching the 2916 LOO sign peak L19 1.3463 - and (27,24) 0.81057 p=0.010; NOT surviving: (31,22) 0.456 p=0.189, (8,23) 0.171 p=1.0, (7,34) 0.187 p=1.0, (8,34) 0.297 p=0.896 - the late-segment window events are WINDOW-FAMILY-RELATIVE (significant against a ~32-head window family, not against the full 1152-cell family). NOVEL 22 events concentrated at EARLY layers (16/24 significant events at layer<=16): h26@L6 1.23584, h8@L2 1.12525, h25@L3 1.12278, h22@L12 1.11380, h24@L23 1.01633, h21@L6 0.91948, h13@L22 0.82254, h5@L6 0.81462, h6@L19 0.81057, h4@L1 0.80581, h21@L16 0.73379, h4@L22 0.72903, h20@L8 0.72604, h1@L6 0.64759, h4@L19 0.64495, h14@L9 0.63896, h1@L4 0.56835, h15@L13 0.56817, h17@L28 0.56817, h26@L5 0.56659, h28@L1 0.56659, h24@L9 0.56571. READING: the atlas is NOT closed - the two 2916 single-layer driver events (7,19) and (27,24) are real at the strongest correction level, the four late-window events are family-size artifacts of window-restricted testing, and a population of early-layer (L1-L16) lang-diff events enters at full-family level that window scans (2915: [16,36) only) never tested. Anchors a1 rel 3.16e-08, a2 m78 0.28036 absdiff 0.0.",
+   "source": {
+    "path": "phase2917/event_atlas/result.json",
+    "sha256_8": "1f988c40",
+    "phase": 2917
+   }
+  },
+  {
+   "meas_id": "M2918_event_anatomy",
+   "type": "event_anatomy",
+   "verdict": "early_events_same_mechanism - zero-forward (2.3 s) anatomy of the 24 maxT-significant (head,layer) events on the 2917 npz. Anchors: a1 sign_M recompute bit-level (median diff 8.56e-10, max 4.71e-08, 0 cells > 0.02), a2 (7,19) argmax margin 1.346335 p=0.004975, registry 24 ok. FOCUS = top-5 novel (26,6),(8,2),(25,3),(22,12),(24,23): ALL 5 mechanism-linked to the late survivors at the frozen 10-slot maxT family (p_link 0.0005 / 0.0180 / 0.0035 / 0.0085 / 0.0085); |rho| to (7,19)/(27,24) = 0.42-0.72 (mean 0.542); rho within early set mean 0.612. KEY FINDING - POLARITY STRUCTURE: all 24 events share ONE en-vs-nonen word-response pattern in two polarity classes - en+ {(8,2),(22,12),(7,19)}, L+ {(26,6),(25,3),(24,23),(27,24)}; same-polarity pairs correlate +0.45..+0.72, opposite-polarity -0.42..-0.60; polarity ALTERNATES with depth (L2 en+ -> L3 L+ -> L6 L+ -> L12 en+ -> L19 en+ -> L23 L+ -> L24 L+). GATING DENSITY (P1/P3): word level DENSE - strong events PR_word 37.6-39.7/57 at 79-97th percentile of same-layer null (NOT few-word gates; top-3 words carry only 14-31% of |r| mass), weak events sparser ((24,23) PR 20.9, 6.5th pct); layer level SHARP - temporal PR 6.3-10.3 of 36, adjacent contrast 0.76-1.15; early event responses 5-10x smaller in magnitude than (7,19) yet sign-Gram detects them (alignment not magnitude). HEAD REUSE (P4): within-head cross-layer patterns mostly DECORRELATED or ANTI-correlated (7/8 below null95: h26 L5 vs L6 -0.620 adjacent-layer polarity flip, h4 L19 vs L22 -0.479, h21 L6 vs L16 -0.345, h7 L19 vs L34 -0.377); only h4 L1<->L19 +0.447 above null95 - genuine head-channel reuse across depth. CAVEAT (registered): the 24x24 linkage graph at the harsher 276-pair maxT family has ZERO edges - linkage clears the 10-slot family but not the 276-family; cross-cell baseline correlation is high (per-distance single-pair null95 0.24-0.27), so event linkage is a MODERATE effect detectable in pre-frozen small families. READING: the language axis is re-expressed along depth as a chain of (head,layer) events sharing one bimodal word pattern with alternating polarity - a polarity-alternating carrier chain, neither independent mechanisms nor a single static carrier.",
+   "source": {
+    "path": "phase2918/event_anatomy/result.json",
+    "sha256_8": "d57378eb",
+    "phase": 2918
+   }
+  },
+  {
+   "meas_id": "M2919_multiaxis_families",
+   "type": "multiaxis_direction_families",
+   "verdict": "multiaxis_families_ready - forward (17.9 s, qwen3-4b, 200 frozen sentences) built per-layer direction families for speed/size/moisture under the 2886 last-token caliber, rows [0,36) input-to-block convention, plus collinearity audit BEFORE the multi-axis atlas (roadmap 2919). DESIGN: same-subject pairs (20 per axis, 'The {s} is fast./slow.' huge/tiny, wet/dry; pole convention dirs = unit(mean HIGH - mean LOW)) - subject contribution cancels exactly in the class-diff of means. ANCHORS: a1 fresh lang sentences vs 2886 npz S_last rel 0.0 (bit-exact deterministic forward), a2 dirs_lang rows [0,36) vs the 2917-consumed derivation rel 0.0; BONUS cross-phase check: recomputed lang LOO probe curve matches the 2886 stored curve bit-wise. P1 quality: LOO nearest-centroid best acc 1.0 for ALL axes (gate trivially passed early; informative part is the DEPTH PROFILE) - lang readable ~1.0 at ALL layers (matches 2886 registered negative: hourglass_validated=False, no probe dip), while speed DECAYS deep (1.0 -> 0.65 at L31-35), size mild decay (-> 0.875), moist stays ~0.95-1.0: ATTRIBUTE SEMANTICS GET INTEGRATED AWAY DEEP, LANGUAGE IDENTITY PERSISTS - axes have DIFFERENT DEPTH PROFILES. P2 collinearity: global max |cos| 0.4472 (speed-moist @L32), attr-attr 0.4472, lang-attr 0.1274 => no residualization needed for 2920. P3 diff norms grow superlinearly with depth (lang 320.7 vs 78.7-94.0 attr at L35: language dominates the last-token class-diff). DEGENERATE ROW REGISTERED: layer-0 rows are exactly zero (last token = final period '.', embedding identical across sentences -> dirs[0] = 0 vector; explains sign_M[:,0]=0 in 2917/2918 curves); rows 1..35 substantive. CAVEAT: attribute dirs built from sentence contexts; 2920 injects into single-word contexts - cross-protocol transfer is an explicit 2920 check (lang precedent: 2886 sentence dirs worked in 2913-2918 single-word injections).",
+   "source": {
+    "path": "phase2919/multiaxis_direction_families/result.json",
+    "sha256_8": "a5381b06",
+    "phase": 2919
+   }
+  },
+  {
+   "meas_id": "M2920_multiaxis_word_atlas",
+   "type": "multiaxis_word_atlas",
+   "verdict": "nonlang_events_absent - forward (55.1 s, qwen3-4b, 110 single-token words = 57 lang verbatim 2887 + 53 tokenizer-screened attribute adjectives) extended the 2917 event-atlas protocol to 5 axis partitions and 4 jacobian families (lang/concept share the 2886 lang-dir probe; speed/size/moist inject 2919 dirs_all[1..3]). ANCHORS 4/4 bit-exact class: a0 dirs2919[lang] vs 2886 derived rel 2.86e-08; a1 B_lang vs 2917 npz rel 3.53e-09; a2 m78 0.280360 exact; a3 sign_M diff 4.71e-08 + sig-set equality 24/24 - the lang atlas reproduced EXACTLY. RESULT: lang 24 events (top (7,19) 1.34634 identical), concept 0, speed 0, size 0, moist 0 under per-axis maxT (q=0.05); cross-axis co-occurrence EMPTY (only lang nonempty). Clean dissociation at full power (n=57, same probe, same forward): en/L partition -> 24 events, concept partition -> 0 (top margin 0.487 BELOW its null median 0.496, 124/200 perms >= top) - the (head,layer) event response to the lang probe encodes LANGUAGE IDENTITY, not concept content. Attribute-axis nulls are SMALL-n POWER-LIMITED, not evidence of absence: margins quantize (size top-40 = 9 distinct values) and permuted nulls routinely reach observed tops (speed null p50 0.971 == obs top; moist 100/200); size closest ((18,7) 1.5312, p_maxT 0.0796, 15/200). POST-HOC power diagnostic registered descriptive. P3 transfer ALL FAILED (median |cos| L1-35: lang 0.166, speed 0.237, size 0.222, moist 0.084; peaks 0.28-0.37) yet 2913-2918 proved sentence dirs causally effective at word positions => FUNCTIONAL TRANSFER != GEOMETRIC IDENTITY: the injection direction is a probe, not the word-level encoding direction; 2919 sentence dirs must not be assumed to be word-level attribute encoding directions. METHODOLOGY: sign-Gram maxT requires n >~ 40 at word level (small-n granularity failure parallels the 2917 p-granularity lesson). NEXT: 2921 candidates - attr vocab expansion to n~40-60 (main), probe-relativity (lang events under a word-level probe), lang-internal reuse principal angles (roadmap 2921).",
+   "source": {
+    "path": "phase2920/multiaxis_word_atlas/result.json",
+    "sha256_8": "bf96339b",
+    "phase": 2920
+   }
+  },
+  {
+   "meas_id": "M2921_attr_vocab_expansion",
+   "type": "attr_vocab_expansion",
+   "verdict": "attribute_events_found - forward (79.8 s, qwen3-4b, 183 single-token words = 57 lang verbatim 2887 + speed 43 (21 hi / 22 lo) + size 48 (25 hi / 23 lo) + moist 35 (19 hi / 16 lo), tokenizer-screened in 2 probe rounds) retested the 2920 negative result after expanding attribute pools to lang-scale power, same frozen sign-Gram maxT statistic (2917 verbatim) and same 4 jacobian families (concept axis closed in 2920, removed). ANCHORS 4/4 bit-exact class: a0 dirs rel 2.86e-08; a1 B_lang vs 2917 npz rel 3.53e-09; a2 m78 0.280360 exact; a3 sign_M diff 4.71e-08 + sig-set equality 24/24 - the lang atlas reproduced EXACTLY (6th consecutive forward anchor). RESULT: lang 24 (top (7,19) 1.34634 identical), speed 2 ((18,16) 1.01608, (14,12) 0.76479), size 9 (top (21,7) 1.23834, (24,19) 0.98181, (12,18) 0.86648, ...), moist 2 ((8,15) 0.99258, (10,9) 0.9917) under per-axis maxT (q=0.05). GRANULARITY PRECHECK (preregistered, discipline 8): top-40 distinct margin values lang 30 / speed 26 / size 27 / moist 23, all >= 20 => all nulls powered => the 2920 zeros were a SMALL-n GRANULARITY ARTIFACT, not absence; the 2920->2921 flip (0 -> 13 events) directly validates discipline 8. Cross-phase check: the 2920-legacy size cell (18,7) margin 1.53125 (small pool) -> 0.65363 (expanded) yet p_maxT 0.024876 sig - survived pool expansion. P2 co-occurrence: overlap matrix DIAGONAL ONLY, shared pairs = 0 - attr events share ZERO channels with the 24 lang events (per-category private paths). P3 transfer recheck with expanded pools 4/4 FAILED (median |cos| L1-35: lang 0.1664 / speed 0.2025 / size 0.2193 / moist 0.0943) - functional transfer != geometric identity reconfirmed. NEXT 2922 candidates: A attr-event anatomy via the 2918 protocol (word-position decomposition / polarity / density / curves, zero-forward), B probe relativity (lang events under a word-level probe), C h4 L1<->L19 reuse principal angles (zero-forward).",
+   "source": {
+    "path": "phase2921/attr_vocab_expansion/result.json",
+    "sha256_8": "e23cd5e9",
+    "phase": 2921
+   }
+  },
+  {
+   "meas_id": "M2922_attr_event_anatomy",
+   "type": "attr_event_anatomy",
+   "verdict": "attr_events_linked_polar - zero-forward artifact-domain anatomy (1.1 s) of the 13 attribute events from 2921 (speed 2 / size 9 / moist 2) using the 2918 protocol verbatim: word-response vectors B_ax[h,:,l], within-axis Spearman linkage vs layer-distance-matched non-sig nulls (maxT over the merged 38-pair family), pole-alignment permutation test, sparsity, temporal curves; 2917 npz for the lang comparison. ANCHORS 3/3: a1 sign_M recomputed from npz B per axis - median absdiff ~6e-10, max 0, zero cells > 0.02; a2 registry sig sizes 2/9/2 + lang 24 + per-axis top1 margins match 2921 P1 within 1e-4; a3 (7,19) argmax 1.346335. POLE ALIGNMENT: 13/13 events p_pole = 0.0005 (floor) - every attribute event splits words by polarity; d_pole |0.67-1.84| median 1.086, and 8/13 are LOW-driven (d_pole < 0: lo words respond higher, incl the size top event (21,7) d=-1.84 and both moist events) vs 5 HIGH-driven - events are polarity-structured but polarity SIGN is event-specific. LINKAGE: n_linked_all 4/38, ALL in size: (21,7)-(18,7) rho 0.676 p 0.0295, (21,7)-(25,15) 0.571 p 0.0345, (11,27)-(18,7) 0.571 p 0.0345, (24,19)-(12,18) 0.572 p 0.0345; size components: {(21,7),(25,15),(18,7),(11,27)} 4-event component + {(24,19),(12,18)} pair + 3 singletons; speed and moist event pairs do NOT link (both rho far below null95) - size is the only internally coherent attr axis. LAYER SHIFT: attr median peak layer 15 vs lang 6 - attribute events concentrate deeper. SPARSITY: attr PR_word median 24.7 vs lang 30.6, top3 mass 0.207 vs 0.196, pr_pct 0.484 vs 0.582 - same broad-response regime, slightly more concentrated. SAME-HEAD CROSS-CATEGORY: 8 heads carry events from >1 category (h21 lang(21,6)/(21,16) + size(21,7); h18 speed(18,16) + size(18,7); h26 lang x2 + size(26,21); h8/h14/h22/h24/h25) - heads are shared across categories while CELLS are private (2921 P2 shared=0): category privacy is layer-level within shared heads. NEXT 2923 candidates: A polarity-sign structure (what determines HIGH vs LOW driving; hi/lo response asymmetry vs 2919 dirs convention), B probe relativity (lang events under word-level probe), C h4 L1<->L19 reuse principal angles (zero-forward), D attr linkage power expansion (linkage nulls for n=43-48 vocab at 2000 draws; confirm the 4 size edges).",
+   "source": {
+    "path": "phase2922/attr_event_anatomy/result.json",
+    "sha256_8": "629f94c7",
+    "phase": 2922
+   }
+  },
+  {
+   "meas_id": "M2923_polarity_sign_anatomy",
+   "type": "polarity_sign_anatomy",
+   "verdict": "polarity_sign_layer_structured - zero-forward polarity sign anatomy (1.0 s) of the 13 attribute events: is the LOW/HIGH driving sign (d_pole < 0 vs > 0, 2922) predictable from top-word polarity composition, layer position, or event-specific? ANCHORS 3/3: a1 sign_M recompute ~6e-10; a2 d_pole recompute matches 2922 P1 13/13 within 1e-3; a3 2922 npz edge (21,7)-(18,7) rho 0.6764 exact + sign_M_ref equality. P1 MAIN TEST NEGATIVE (preregistered criterion p_perm <= 0.05 AND T_obs >= 10 at k=5): top-|r| word polarity composition f5 agrees with the d_pole sign in only 7/13 events (p_perm 0.4818, null p50 6 max 11; f10 5/13 p 0.6012) - and several events are sign-REVERSED (e.g. (22,2) d=-1.20 with f5=+1.0 all-HIGH top5; (8,15) d=-1.60 with f5=+0.6; (14,12) d=-0.87 with f5=+0.6): the strongest-responding words' polarity composition does NOT determine the driving sign. P2 LAYER STRUCTURE (quasi-post-hoc, descriptive weight): Fisher exact {low_shallow 7, low_deep 1, high_shallow 0, high_deep 5} p 0.0047, point-biserial r 0.623 - LOW-driven events concentrate shallow (7/8), HIGH-driven ALL deep (5/5, peaks 16-23). P3: 13/13 events are CONTRAST type (m_hi and m_lo have OPPOSITE signs, zero magnitude-type) - every attribute event cell is a bipolar contrast detector between pole means, not a one-sided detector. P4: h11 carries opposite-sign events ((11,23) +0.84 / (11,27) -0.79, same peak layer 23 - within-head sign flips exist), h18 cross-category (+1.36 speed / -1.44 size). P5: the 4 significant size linkage edges are 4/4 sign-matched (binom p 0.0625, quasi-post-hoc) - linked events share the driving sign. INTERPRETATION: attribute event cells implement signed pole-contrast readouts whose direction is organized by LAYER DEPTH (shallow = LOW-driven, deep = HIGH-driven), not by which words respond strongest - consistent with a depth-progressing polarity code; the 2919 dirs convention (HIGH - LOW) is anchor-side, the cell-side readout sign is layer-dependent. NEXT 2924 candidates: A depth-graded polarity code formalization (d_pole vs peak layer regression + per-layer sign census, zero-forward), B probe relativity (lang events under word-level probe, one forward), C h4 L1<->L19 reuse principal angles (zero-forward), D contrast-detector asymmetry (|m_hi| vs |m_lo| ratio structure).",
+   "source": {
+    "path": "phase2923/polarity_sign_anatomy/result.json",
+    "sha256_8": "87f9b769",
+    "phase": 2923
+   }
+  },
+  {
+   "meas_id": "M2924_depth_polarity_gradient",
+   "type": "depth_polarity_gradient",
+   "verdict": "depth_gradient_absent - zero-forward depth-polarity gradient test (1.2 s): is 'shallow LOW-driven / deep HIGH-driven' (2923, sig events) a FULL-GRID continuous gradient? Statistic: per-axis layer profile c_ax[l] = median_h D[h,l], D = m_hi - m_lo over ALL 32 heads; rho_axis = Spearman(l, c_ax); null = 2000 size-preserving pole permutations (rng 2899). ANCHORS 3/3: a1 ~6e-10; a2 d_pole13 recompute BIT-EXACT (max diff 0.0); a3 2923 t5_perm p50 6.0 max 11. MAIN TEST NEGATIVE 0/3 axes: speed rho +0.203 p 0.175 (direction right, ns), size rho -0.061 p 0.607 (REVERSED: shallow +1.1e-05 -> deep -2.4e-05), moist rho -0.054 p 0.640 (both ends LOW-side); per-layer sig cells scattered (speed 4, size 2, moist 0), no coherent gradient; lang en/L control rho -0.079 p 0.632 (no gradient, clean control). YET event-level structure HOLDS: Spearman(d_pole, event layer) over the 13 sig events = +0.654, p_perm 0.025 (quasi-post-hoc, rng 2900) - and rho(|d_pole|, l) = -0.495 (shallow events have STRONGER contrast). INTERPRETATION: the 2923 layer structure is an EVENT-SELECTION property (which cells become maxT-sig events), NOT a grid-wide polarity code: sig event cells are special bipolar contrast detectors whose sign is depth-organized, while the background grid's contrast direction is noise-level / not depth-organized. This BOUNDS 2923: layer_structured holds at the event level, does not extend to a depth-graded readout code. Also: contrast strength is depth-flat per axis (|D| medians ~1e-4 both ends) - no amplification with depth. NEXT 2925 candidates: A event-selection anatomy (what distinguishes the 13 sig cells from same-layer non-sig cells beyond margin: zero-forward discriminant analysis on grid features), B probe relativity (lang events under word-level probe, one forward), C h4 L1<->L19 reuse principal angles (zero-forward), D within-axis per-layer event replication (are sig cells' neighbors also contrast-structured? spatial extent of event cells).",
+   "source": {
+    "path": "phase2924/depth_polarity_gradient/result.json",
+    "sha256_8": "27f034a7",
+    "phase": 2924
+   }
+  },
+  {
+   "meas_id": "M2925_event_selection_anatomy",
+   "type": "event_selection_anatomy",
+   "verdict": "events_margin_only (frozen verdict) with a registered phi implementation defect and a decisive post-hoc |phi| diagnostic - zero-forward feature discrimination (1.0 s): 13 sig cells vs same-layer non-sig heads on 7 non-trivial features + margin reference. ANCHORS 3/3: a1 ~6e-10; a2 d_pole13 bit-exact 0.0; a3 2924 rho_axis [size] -0.060746. FROZEN RESULT: only 2/7 features BH-significant - d_pole_abs median pct 1.0 (13/13 > 0.5, sign p 1.22e-4, BH q 4.27e-4) and contrast_raw median 0.906 (13/13, same p/q); mean_abs_r 0.75 ns; pr_word 0.50, top3_mass 0.32, neighbor_phi 0.50 ns - response shape (width/magnitude) and spatial extent do NOT select events; n_BH 2 < 3 => margin_only per the frozen mapping. REGISTERED DEFECT: the preregistered phi test used SIGNED phi with a one-sided percentile - LOW-driven cells have the most EXTREME NEGATIVE phi and mathematically cannot reach 'median pct >= 0.9' (detail shows the bimodal signature: 8 cells pct ~1.0, 5 cells pct ~0.03, both extremes). POST-HOC |phi| DIAGNOSTIC (descriptive, not the frozen verdict): |phi| percentile = 1.0 for 13/13 events (sign p 1.22e-4) - EVERY sig cell is the strongest pole-sign association in its entire layer; together with d_pole_abs pct 1.0 (13/13) and contrast_raw 13/13, events are selected by POLAR CONTRAST STRENGTH, full stop - the margin criterion is essentially the same quantity, and response shape plays no role. NEXT 2926 candidates: A |phi| preregistered retest (corrected feature definition, expected flip to events_polar_separation_selected; clean prereg->defect->retest discipline loop), B probe relativity (lang events under word-level probe, one forward), C h4 L1<->L19 reuse principal angles (zero-forward), D contrast ceiling (are non-sig cells' |phi| uniformly weak or is there a gap - layer-wise |phi| distributions).",
+   "source": {
+    "path": "phase2925/event_selection_anatomy/result.json",
+    "sha256_8": "7846d213",
+    "phase": 2925
+   }
+  },
+  {
+   "meas_id": "M2926_event_selection_polar_fix",
+   "type": "event_selection_polar_fix",
+   "verdict": "events_polar_separation_selected (criterion-corrected confirmatory re-test of M2925) - zero-forward |phi| retest (0.4 s), 2925 protocol verbatim with phi->|phi| and neighbor_phi->max|phi| (both signed-form defects corrected). ANCHORS 3/3: a1 ~6e-10; a2 d_pole13 bit-exact 0.0; a3 -0.060746. P1 FLIP CONFIRMED: n_BH 3/7 (phi_abs, d_pole_abs, contrast_raw all sign p 1.22e-4, BH q 2.85e-4) and median pct(phi_abs) = 1.0 with 13/13 cells at pct 1.0 (non-event-head pool) => the frozen 2925 mapping flips margin_only -> polar_separation_selected exactly as predicted by the M2925 post-hoc diagnostic. P2 |phi|-margin INDEPENDENCE TEST: NOT independent - rho13(Spearman over 13 sig cells) = 0.978, p_perm = 0.0 (5000 perms rng(2901), null max 0.863), full-grid per-axis Spearman 0.81-0.90 => |phi| and sign-Gram margin are near-monotone aliases of one underlying quantity (symbol-consistency strength), NOT a new selection dimension; the selection mechanism is ONE axis: polar contrast/symbol-consistency strength extremum. P3 layer-internal rank: 12/13 rank-1; the single rank-2 cell is (18,7) at L7, suppressed by same-layer double event (21,7) (|phi| 0.811 vs 0.606; margin 1.238 vs 0.654) - L7 is a double-selection layer (2922 linked pair rho 0.676); P1 pool (non-event heads) still 13/13 = 1.0, so the M2925 diagnostic reproduces exactly under its own pool definition. CAVEAT: correction originates from the M2925 post-hoc diagnostic (quasi-post-hoc, annotated in prereg correction_note) - verdict weight is confirmatory-of-prediction, not blind. NEXT 2927 candidates: A probe relativity (lang events under word-level dirs_word probe, one forward ~1 min), B h4 L1<->L19 reuse principal angles (zero-forward), C contrast ceiling profile (layer-wise |phi| distribution shape: gap vs continuum below sig cells), D L7 double-selection anatomy (why one layer hosts two events of the same axis - head/layer division of labor).",
+   "source": {
+    "path": "phase2926/event_selection_polar_fix/result.json",
+    "sha256_8": "999151fa",
+    "phase": 2926
+   }
+  },
+  {
+   "meas_id": "M2927_probe_relativity",
+   "type": "probe_relativity",
+   "verdict": "events_probe_partially_invariant - one forward (111 s), 2917 protocol verbatim with DUAL readout directions per perturbation: dirs86 (2886 sentence caliber, anchor) and dirs_word (word-level probe built from this run's func-condition pos-1 attn-input captures, en/L group diff per layer; sign convention irrelevant - sign-Gram margin is sign-flip invariant). ANCHORS 4/4: a1 rel 3.16e-08 vs 2913 (seventh consecutive forward anchor in the 2917 lineage); a2 m78 0.280360 exact; a3 sign_M diff 4.71e-08 vs 2917 npz; a4 maxT event set 24/24 set-equal - the 2886 caliber of THIS run is a certified 2917 replica. P1 MAIN: word probe cos(dirs_word, dirs86) median 0.165 (replicates 2920); E_word n=32, n_overlap 7/24 (jaccard 0.143), top1 (7,19) survives => partially_invariant per frozen mapping (6 <= overlap < 12). SURVIVOR CORE (7): (1,6) (5,6) (7,19) (8,2) (14,9) (20,8) (21,6); (7,19) margin 1.346->1.018 (-24%) but layer-internal rank #1 under BOTH probes - the only rank-stable event. LOST 17 (ALL 5 deep events l>=20: (4,22) (13,22) (17,28) (24,23) (27,24)); NEW 25 with 21/25 at l<=10 - the word probe shifts the atlas toward EARLY layers and erases deep events. P2 full-grid Spearman(sign_M_word, sign_M86) = 0.176 and E17-internal rank corr 0.184 - probe change re-orders the grid, not just the significance set. INTERPRETATION: the event atlas is a probe x circuitry INTERACTION product, not a pure circuit property: sentence dirs (aggregated semantics) and word dirs (lexical identity) read out different aspects; a 7-event probe-invariant hard core exists and (7,19) is its anchor. The 2925/2926 selection mechanism (polar-contrast strength extremum) holds PER PROBE - 'which cell is strongest' is probe-dependent. NEXT 2928 candidates: A survivor-core anatomy (what makes the 7 events probe-invariant - word-response correlation, polarity, density, zero-forward on this npz), B deep-vs-early event profile under a third probe family (e.g. shuffled-label dirs or per-layer PCA-1, one forward), C h4 L1<->L19 reuse principal angles (zero-forward, roadmap legacy), D dirs_word-based attribute atlas (2921 protocol with word probe, one forward).",
+   "source": {
+    "path": "phase2927/probe_relativity/result.json",
+    "sha256_8": "4302c248",
+    "phase": 2927
+   }
+  },
+  {
+   "meas_id": "M2928_survivor_core_anatomy",
+   "type": "survivor_core_anatomy",
+   "verdict": "survivor_core_not_established (frozen mapping: P1 fail) with the REAL findings in P2/P3 - zero-forward (212 s) on the 2927 npz. ANCHORS 4/4: a1 sign_M diff 0.0; a2 sets 24/32/7 rebuilt; a3 margins (1.34634, 1.01827); a4 cos median 0.1651. P1 OVERLAP NULL REFUTES THE OVERLAP EVIDENCE: maxT on fixed G stacks with 100 independent permutation sets gives overlap null median 7.0 (mean 7.22, max 9) - the observed 7/24 is EXACTLY AT CHANCE (p=0.85); set sizes stay 24-33 and null significant sets cluster on FIXED hot layers (L6 47/10-sets, L9 31, L8 25, L19 21) shared by both calibers because the Gram structure is probe-shared - SIGNIFICANT-SET OVERLAP IS UNINFORMATIVE about circuit invariance; the 2927 '7-event invariant hard core' reading is CORRECTED (wrong selection statistic, not wrong data). P2 DUAL-STRENGTH PASS: survivor min_pct median 0.9688 vs lost 0.8125 (U=100, permutation p 0.0049) - survivors are layer-internal top cells under BOTH calibers. P3 RESPONSE-STRUCTURE INVARIANCE PASS (the mechanistic answer): survivor rho(Spearman B86[h,:,l], B_word[h,:,l] over 57 words) median 0.825 vs lost 0.377 (U=104, p 0.0025) - survivor word-response PATTERNS are probe-invariant, lost events' response vectors are probe-rewritten (L+ class events worst: (25,3) -0.64, (26,5) -0.47). (27,24) FORENSICS: dual-caliber layer-internal #1 (pct 1.000/1.000) yet lost - margin_wd 0.560 with p_maxT 0.0647 misses by 0.0147 - dual strength is necessary NOT sufficient under family-wise maxT. 2918 CLASS ASYMMETRY (descriptive): en+ 2/3 survive, L+ 0/4 - the word probe (lab0-minus-lab1 direction) systematically erases L+ events. NEXT 2929 candidates: A grid-wide response-structure map (rho(B86, B_word) over all 1152 cells - rho is the correct probe-invariance statistic; threshold scan defines the true invariant set, zero-forward), B directional-bias control (rebuild dirs_word with flipped group convention or per-pole balanced pairs, one forward, tests the L+ erasure), C h4 L1<->L19 reuse principal angles (zero-forward, roadmap legacy), D min_pct/rho-based re-selection of the atlas and cross-model replication (glm4).",
+   "source": {
+    "path": "phase2928/survivor_core_anatomy/result.json",
+    "sha256_8": "47b23cc2",
+    "phase": 2928
+   }
+  },
+  {
+   "meas_id": "M2929_response_structure_atlas",
+   "type": "response_structure_atlas",
+   "verdict": "skeleton_event_aligned - zero-forward (0.9 s) on the 2927 npz, no model load. ANCHORS 3/3: a1 E17-event rho recompute vs 2928 rho_rows max diff 0.0 (exact reproduction); a2 sets 24/32/7 rebuilt; a3 sign_M86 vs 2917 npz diff 0.0. P1 GRID-WIDE PROBE-INVARIANT SKELETON: rho_grid[h,l]=Spearman(B86[h,:,l],B_word[h,:,l]) over the 57 words; layer-wise head-permutation null (rng base 2904, 2000 perms/layer, vectorized average ranks) gives n_skeleton=501/1152 (43.5%) vs 5% expectation 57.6, exact binomial (lgamma domain) p=0.0 (underflow), rho median 0.2039 p90 0.7297 max 0.9659 => skeleton_present. REGISTERED DEGENERATE-TIE ARTIFACT: L0 all 32 heads have rho=0.0 and null p95=0.0 (degenerate rank vectors), the rho_obs >= p95 boundary 0>=0 admits all 32; true skeleton 469 (40.7%) is still 8.1x expectation - verdict unaffected. Skeleton peaks L8-L11 (22/23/24/19 of 32). P2 EVENT COUPLING: event cells 49 (E17 union Ewd) rho median 0.4862 vs background 1103 median 0.1945, U=37096.0, 10000-label-permutation p=0.0001 (1/10001 bound) => coupled. Group rho medians: survivor 0.8251 / lost 0.3774 / new 0.4743 (2928 P3 values reproduced exactly under a1). P3: no hard gap (skeleton min 0.0000 <= background max 0.4862, soft overlap); 33/49 event cells inside the skeleton; per-group membership survivor 7/7 (1.000), lost 11/17 (0.647), new 15/25 (0.600). MECHANISM CLOSED: the probe-invariant response structure IS the survivor-core mechanism of 2928 - survivors are exactly the cells whose 57-word response pattern is probe-independent; maxT event selection samples this skeleton at 67% vs 42% background; 2928 overlap-null conclusion untouched (overlap chance-level stands; rho is the informative axis).",
+   "source": {
+    "path": "phase2929/response_structure_atlas/response_structure_atlas.npz",
+    "sha256_8": "57ed5651",
+    "phase": 2929
+   }
+  },
+  {
+   "meas_id": "M2930_direction_flip_control",
+   "type": "direction_flip_control",
+   "verdict": "direction_flip_margin_shifts - one forward (57 s), 2917/2927 protocol verbatim with THREE pass-2 directions (+dirs86 anchor, +dirs_word repro, -dirs_word mirror). ANCHORS 8/8: a1 rel 3.16e-08 (8th consecutive forward anchoring); a2 m78 0.280360; a3 4.71e-08; a4 24/24 set equality; a5 dirs_word rebuild diff 2.17e-08; a6 Bwd repro rel 2.10e-08; a7 Ewd==2927 + pdiff 2.76e-08; a8 dirs_neg==-dirs_word and G_neg==-Gwd bit-exact. P1 MAIN: E_mirror n=36 vs Ewd27 n=32, overlap 20/48 jaccard 0.417, sign_M diff max 1.29 - the maxT event selection is DIRECTION-CONVENTION RELATIVE; top1 (7,19) survives; 12 lost (incl survivors (8,2) p 0.045->0.204 and (20,8) 0.025->0.090 boundary) + 16 new (incl L+ class (25,3) and (27,24) ENTERING). P2 QUADRATIC-FORM BREAK QUANTIFIED: r-level ||r(-d)+r(d)||/||r(d)|| median 1.1747 (even-order term same magnitude as linear term at eps=1.0; L4-L13 quasi-linear 0.4-0.7 vs L30-L35 1.6-1.76), B-level mir_err median 1.0192; corr(lin_r_layer, mir_err_layer)=0.9827 closes the mechanism chain even-order nonlinearity -> quadratic-form break -> margin rewrite. P3 skeleton partially convention-invariant: skel_mirror 414 vs 501, intersection 327, jaccard 0.556; L0 degenerate-tie artifact replicated (all 32, rho max 0.0). P4 SURVIVOR-CORE RHO IS CONVENTION-INVARIANT: all 7 survivors keep high positive rho under the mirror probe (|delta| median 0.0154 max 0.0703; 6/7 > 0.74, (1,6) 0.699 edge) while 2/7 lose maxT significance - rho (response structure) is the stable object, maxT the fragile selector; L+ deep-negative rho (25,3) -0.64->-0.63 and (26,5) -0.47->-0.50 preserved across convention (real anti-phase structure, not artifact). 2928 L+ 0/4 wipe-out is PARTIALLY convention-relative at the maxT level (2/4 flip in). METHODOLOGICAL: all injection-response interpretations in the 2917-2930 protocol family carry an O(1) even-order nonlinear mixture at eps=1.0; B is 'quadratic form + H[d,d] correction', and direction-sign convention is a free parameter that maxT-level claims must control for.",
+   "source": {
+    "path": "phase2930/direction_flip_control/direction_flip_control.npz",
+    "sha256_8": "cb655825",
+    "phase": 2930
+   }
+  },
+  {
+   "meas_id": "M2931_skeleton_overlap_null",
+   "type": "skeleton_overlap_null",
+   "verdict": "skeleton_overlap_above_chance - zero forward (2 s) on the 2927/2929/2930 npz. ANCHORS 4/4: a1 rho_grid recompute diff 2.22e-16; a2 rho_mirror recompute diff 0.0; a3 sets 501/414/inter 327 rebuilt; a4 2929 null_p95 replay (rng 2904) diff 0.0. DEGENERATE GATE (discipline 12): exactly 32 cells all in L0 (rank-std <= 1e-10; exact-zero rho cells = 32 = degenerate cells, no other layer affected); corrected skeletons 469/382, intersection 295, obs_jacc 0.5306. P1 MAIN: independent double within-layer head permutation null (rng 2906, R=1000) gives jaccard median 0.2711 p95 0.2953 max 0.3173 - observed 0.5306 exceeds ALL 1000 null replicates (P(null>=obs)=0.0000); excess vs independence +139.5 cells (ratio 1.897). P1b sanity: same-permutation pairing reproduces obs bit-exactly on every replicate. P2 cell-level Spearman(rho29, rhomir)=0.6709; worst layer L32 -0.4223 (strong-nonlinearity reversal, lin_r 1.66), best L11 0.9806. SURVIVOR-CORE 7/7 IN BOTH CORRECTED SKELETONS. SEAL STRUCTURE: skeleton convention-invariance is LAYER-STRUCTURED - quasi-linear layers (lin_r<0.9, L4-L17) reproduce the skeleton almost cell-by-cell (L10 24/24/24, L9 23/23/22, L8 22/23/21), strong-nonlinearity layers (lin_r>1.4, L24-L35) collapse on the mirror side (L32 15/2/0, L31 15/3/1) while the original caliber keeps its cells - lin_r is the predictor of convention robustness. CONTRAST WITH 2928: maxT significant-set overlap was EXACTLY chance (null median 7 = obs 7); rho-skeleton overlap is 1.9x independence and beyond all null replicates - the overlap-no-information law is selector-specific, not universal: rho (structure) earns overlap claims, maxT (selection) does not.",
+   "source": {
+    "path": "phase2931/skeleton_overlap_null/skeleton_overlap_null.npz",
+    "sha256_8": "5307afe1",
+    "phase": 2931
+   }
+  },
+  {
+   "meas_id": "M2932_skeleton_functional_ablation",
+   "type": "skeleton_functional_ablation",
+   "verdict": "skeleton_functionally_load_bearing - one run (52 s), REAL causal ablation: o_proj-input head slice zeroed at pos 1 per cell, full batched forward over 57 func-condition prompts; readout final residual projected on dirs_word[35] (rebuilt this run). ANCHORS 5/5: a1 dirs_word rebuild diff 2.17e-08 (9th consecutive forward anchoring); a2 batched baseline determinism rel 0.0; a3 all-heads L18 hook efficacy 1.4631 > 0.01*scale; a4 masks 469/382/295; a5 baseline separation 185.70 (scale 92.29). CELLS: shared gated skeleton 295 + 353 unique matched background (2 per skeleton cell, same-layer, rng 2907) = 648 ablated cells. P1 MAIN: D_s = CI_rel(skel) - mean(2 matched bg) median 0.000568, one-sided sign-permutation p=1.0e-4 (min attainable 1/10001); skeleton CI_rel median 0.005771 vs bg 0.005135 (ratio 1.124) - the convention-invariant skeleton is FUNCTIONALLY LOAD-BEARING but the margin is modest (~12%). P2 lin_r STRATIFICATION PREDICTS FUNCTION: QL layers (lin_r<0.9) 0.005994 (n=196) vs DEEP (lin_r>1.4) 0.004555 (n=50), diff 0.001439 p=7.0e-4 - convention-invariance of response structure tracks causal impact. P3 Spearman(CI_rel, rho29)=0.2916 (p=2.0e-4), (CI_rel, rho_mirror)=0.3543 (p=2.0e-4). SEAL STRUCTURE: per-layer top-half hits band-structured - L6-L12 strong (L9 19/22, L10 18/24, L8 15/21), L28/L29/L34 REVERSED (0/3, 0/2, 0/1) - skeleton functional load concentrates in the mid quasi-linear band; survivor 7 CI median 0.00615 vs skeleton-peer 0.00576 (2/7 above peers, not uniform); top functional cell overall (12,22) CI 0.02698 is a skeleton cell; CI_logit direction-consistent (skel 0.04996 vs bg 0.04921). CHAIN: 2929 skeleton exists -> 2930 rho convention-invariant -> 2931 overlap 1.9x independence -> 2932 skeleton causally load-bearing with lin_r-predicted functional impact - the response-structure skeleton is a real functional circuit, not an epiphenomenon.",
+   "source": {
+    "path": "phase2932/skeleton_functional_ablation/skeleton_functional_ablation.npz",
+    "sha256_8": "b8a74702",
+    "phase": 2932
+   }
+  },
+  {
+   "meas_id": "M2933_full_atlas_ci",
+   "type": "full_atlas_ci",
+   "verdict": "full_atlas_unstructured - one run (82 s), REAL causal ablation FULL GRID: all 1120 gated non-degenerate cells (L0 excluded), 2932 protocol verbatim. ANCHORS 6/6: a1 dirs_word rebuild 2.17e-08 (10th consecutive forward anchoring); a2 determinism 0.0; a3 hook efficacy ok; a4 masks 469/382/295; a5 sep 185.70; a6 CROSS-PHASE CI_rel reproduction on the 2932 648-cell subset max abs diff 0.00e+00 (bit-exact). P2 BAND STRUCTURE DECISIVELY CONFIRMED: LOAD band (L6-L12) median CI 0.005605 vs DEEP band (L28-L35) 0.002955 (x1.90), exact layer permutation p2b=0.000000 (0/6435); per-layer median CI anti-correlates with lin_r at Spearman -0.6762 (p=1.0e-4) - quasi-linear layers are causally load-bearing, deep nonlinear layers functionally quiet. P3 GRID COUPLING WEAK/MARGINAL: Spearman(CI, rho86)=0.0989 p=1.4e-3 (exceeds prereg threshold 1e-3 by 4e-4 -> frozen verdict map lands on unstructured despite the band branch being met); Spearman(CI, rho_mirror)=0.2326 p=2.0e-4 - mirror-probe response structure predicts function better than the original caliber. SEAL: deep band is quiet on median but has rare strong outliers ((15,34) CI 0.0404 grid max, deep p90 0.0062 vs load p90 0.0092); within-layer CI-rho86 coupling peaks at L9 0.654 / L24 0.501 / L11 0.476; skeleton-vs-rest full coverage 0.005771 vs 0.004877 (x1.18, consistent with 2932 x1.124); survivor layer CI ranks 3..26 ((14,9) rank 3, (20,8) rank 7, (1,6) rank 26) - survivors are structure cores, not uniform function peaks. REGISTERED: verdict is frozen-map faithful; the substantive finding is the lin_r-CI law (-0.676) plus band confirmation - the grid-level rho-CI coupling is real but weak and caliber-dependent.",
+   "source": {
+    "path": "phase2933/full_atlas_ci/full_atlas_ci.npz",
+    "sha256_8": "1ff6df21",
+    "phase": 2933
+   }
+  },
+  {
+   "meas_id": "M2934_loadband_anatomy",
+   "type": "loadband_anatomy",
+   "verdict": "linr_ci_law_general - run1 (batch171 concat) anchor-fail a6 3.69e-03 > 1e-4 (bf16 cross-batch-composition noise; a2 same-batch determinism 0.00), corrected to per-condition batch57 matching the 2933 composition; run2 (511 s) ANCHORS 7/7: a1 dirs_word rebuild 2.17e-08 (11th consecutive forward anchoring); a2 determinism 0.0; a3 pos01 hook ok; a4 masks 469/382/295; a5 func sep 185.70; a6 pos1/func CI_rel vs 2933 FULL 1120 cells max abs diff 0.00e+00 (bit-exact); a7 func sep > null sep. DESIGN: REAL ablation 3x3 = configs {pos0, pos1, pos01} x readout conds {same, func, null}, all 1120 gated cells. P1 POSITION DIMENSION: lin_r-CI law stable under ALL THREE configs - pos0 LOAD 0.004594 vs DEEP 0.001459 (x3.15) rho(med_l, lin_r)=-0.8443; pos1 -0.6762; pos01 -0.6793 (all p_band<=6e-4, p_linr<=1e-4). P2 CONDITION DIMENSION: stable under ALL THREE conds at pos1 - same -0.6854, func -0.6762, null -0.6574 (p<=2e-4). The 2933 law is position- and condition-GENERAL, not a pos1/func artifact. P3 SEAL: (1) STRONG SUBADDITIVITY pos01/pos1 grand-median ratio 1.016 - ctx-slot (pos0) contribution is already covered by word-slot ablation; pos0 top layers L1-L5 (early layers dominate the ctx slot); (2) NULL-CONDITION AMPLIFICATION: null-context CI exceeds func CI in both bands (LOAD x1.83, DEEP x2.00) - random-token context makes the readout MORE ablation-sensitive everywhere; sep same 116.7 < func 185.7 < null-context CI pattern; (3) survivor 7 all shared-skeleton members, CI consistent with 2933; skeleton-vs-rest x1.183; top-5 pos1/func cells bit-identical to 2933 ((15,34) 0.040383 grid max). REGISTERED: lin_r-CI law upgraded to general; null-amplification and pos0-early-layer profile are new descriptive findings for follow-up.",
+   "source": {
+    "path": "phase2934/loadband_anatomy/loadband_anatomy.npz",
+    "sha256_8": "62da7e11",
+    "phase": 2934
+   }
+  },
+  {
+   "meas_id": "M2935_null_amp_anatomy",
+   "type": "null_amp_anatomy",
+   "verdict": "null_amp_mixed - run1 crashed at P2 serialization (tuple-indexed 1-D array, no computation loss prereg impact), fixed pos_of map, run2 (267 s) ANCHORS 7/7: a1 dirs_word rebuild 2.17e-08 (12th consecutive forward anchoring); a2 determinism 0.0; a4 masks 469/382/295; a5 func sep 185.70; a6 func CI_rel vs 2933 FULL 1120 cells max abs diff 0.00e+00 (bit-exact); a7 func sep > all null-set seps (185.7 vs 77.3/106.1/106.1/81.5). DESIGN: REAL ablation pos1 x 5 conditions (func + 4 independently resampled null-tid sets, seeds 2896/2914/2915/2916, 2927 sampling rule verbatim), 1120 cells. P1 LAW REPLICATION: lin_r-CI law stable in ALL 4 null sets (rho -0.6574/-0.6608/-0.6619/-0.6420, all p_band<=6e-4) - the law is not a property of any particular null token draw. P2 AMPLIFICATION-RATIO STABILITY: pairwise Spearman median 0.8044 (6 pairs 0.796-0.818) - stable but below the 0.9 context-generality bar. P3 RAW-CI CONSISTENCY: pairwise median 0.9420 - CI profiles across null resamples are highly consistent. FROZEN VERDICT null_amp_mixed: amplification is predominantly a context-statistics effect (H2), with a minority token-identity component (~13% per-cell cross-set std). SEAL: (1) AMPLIFICATION GRADIENT REVERSED - the most amplified layers are the load band/ early layers (L6 x3.15, L3 x2.82, L1 x2.51) while the deep/mid layers amplify least (L11 x1.59): func semantic context SUPPRESSES ablation sensitivity most where CI is largest - amplification ratio and absolute CI are anti-correlated across layers; (2) survivor core splits in two: L6-type survivors highly amplified (amp 2.56-3.18) vs L8/L9-type survivors barely amplified (amp 1.20-1.26, func CI already high); (3) skeleton cells slightly LESS amplifiable (1.77 vs rest 1.91); (4) extreme token-id outlier cells exist ((14,6) amp std 1.38 around mean 7.14). REGISTERED: null amplification mechanism = mostly context statistics + layer-dependent suppression by semantic context; token-identity effects confined to sparse outlier cells.",
+   "source": {
+    "path": "phase2935/null_amp_anatomy/null_amp_anatomy.npz",
+    "sha256_8": "3b947b5d",
+    "phase": 2935
+   }
+  },
+  {
+   "meas_id": "M2936_anchoring_law",
+   "type": "anchoring_law",
+   "verdict": "anchoring_not_established - ZERO forward, run1 (2 s) ANCHORS 5/5: a1 2935 func ci_rel vs 2933 max abs diff 0.00e+00 (bit-exact); a4 2934 pos1/func raw vs 2935 func raw 0.00e+00 (bit-exact); a2 grids identical; a3 SHA chain ok; a5 masks 469/382/295. QUESTION: additive anchor (supp = a + b*ci, a>0) vs multiplicative model for semantic-context suppression. P1 ADDITIVE ANCHOR REJECTED: per null set Spearman(supp_raw, ci_raw_func) is NEGATIVE (-0.3232/-0.4168/-0.3517/-0.3552, median -0.3535), R2_linear 0.14-0.20 (battery bar 0.8), intercept a>0 significant (p_a 1e-4) but model R2 far too low; supp_raw<=0 in 750-805/1120 cells. P2 k-vs-ci_func median rho -0.2430. P3 same-condition battery also fails (rho -0.2668, R2lin 0.0477). P4 within-layer rho(supp, ci) median -0.5524. SEAL SCALE-AUDIT (the real finding): null/func scale ratio 0.41-0.54 (baseline readout magnitude COLLAPSES under null context: 92.29 -> 37-49); RAW-caliber amp null/func med 0.86-0.90 < 1 (absolute ablation disturbance SHRINKS under null context, LOAD shrinks more: 0.835 vs DEEP 0.919) while rel-caliber amp 1.65-2.13 > 1 - the 2934/2935 null amplification is ENTIRELY denominator-driven (rel caliber), not numerator-driven; rel-caliber supp vs ci_func rho +0.30..+0.53 (sign opposite to raw caliber). Survivor core splits in RAW caliber: (5,6) 1.61 / (8,2) 1.42 / (21,6) 1.41 / (7,19) 1.29 / (1,6) 1.14 raw-increased vs (14,9) 0.50 / (20,8) 0.58 raw-halved. 2934 same/func raw amp 0.9302. REGISTERED: (1) all 2934/2935 CI-verdicts are rel-caliber statements - magnitude statements require caliber tag; (2) lin_r-CI law itself unchanged (both calibers preserve band structure direction), but amplification-gradient-inversion narrative is a rel-caliber artifact of scale collapse; (3) additive anchor and multiplicative models both rejected - supp_raw is negatively correlated with ci_func (larger-CI cells shrink LESS in absolute terms under null context). Lesson: ratio claims must register denominator caliber (extends discipline 16).",
+   "source": "tests/glm5/phase2936_anchoring_law.py sha256_8=d948a623; outputs execution a38e8fcc result 87003d1e npz 1b3eaa93; sources s2927 84fec594 / s2929 57ed5651 / s2930 cb655825 / s2931 5307afe1 / s2933 1ff6df21 / s2934 62da7e11 / s2935 3b947b5d"
+  },
+  {
+   "meas_id": "M2937_scale_collapse",
+   "type": "scale_collapse",
+   "verdict": "scale_collapse_rewrite - ONE run 14 s, NO ablation, ANCHORS 6/6: a1 dirs rebuild 2.17e-08 (13th consecutive forward anchoring); a2 determinism 0.00e+00; a3 proj_func vs 2935 s_base 7.21e-06; a4 proj_null0 vs 2935 6.26e-06; a5 masks 469/382/295; a6 func sep 185.70. DESIGN: baseline-only 5 conditions (func/same/null0-3) x batch57, per-layer pos-1 attn-input capture + final pre-norm residual + zero-forward embedding lookup. P1 ENERGY DOES NOT COLLAPSE: per-layer residual-norm ratio (null/func) 0.94-1.07 all layers, no crossing < 0.8 - the 2936 scale collapse is NOT energy. P3 DIRECTION COLLAPSES: cos(final, dirs_word[35]) median 0.045 (func) -> 0.002-0.024 (null), ratio 0.05-0.24, all 4 sets direction-dominant (|log norm| < |log cos|); absolute cos shows dirs_word[35] explains only ~4.5% of the final residual even under func. P2 REWRITE: s_null = beta*s_func + gamma fits give beta 0.43-0.55 (median 0.4886), gamma -11.6..-16.1, R2 0.74-0.86; same beta 0.60. P4 embedding norms: words 1.085+-0.073 vs null 1.071+-0.215, p 0.64 - token-identity norm explanation rejected. SEAL: (1) sep ratio profile is U-SHAPED - language-signal collapse deepest at L8-L16 (0.11-0.36), partial recovery deep (L32-L35 0.41-0.61): mid-layer attention is the rewrite arena, where func sep itself peaks (L6-L10: 3.5-7.3); (2) REWRITE IS CLASS-ASYMMETRIC: within-lab1 readout structure highly retained (spearman 0.75-0.84) while within-lab0 rewritten (0.13-0.24) - connects to 2928 L+ class asymmetry; (3) rewrite outliers include high-func-CI words (light 194->131, war 198->18, city 202->33). REGISTERED: context-statistics effect on the baseline is a mid-layer attention-driven ROTATION of the final residual away from the language direction with ~50% word-term retention (beta) + negative offset (gamma -11..-16), NOT energy scaling; magnitude of 2936 scale collapse = direction collapse in a small-cos component. Lesson: readout-magnitude claims must decompose norm vs cos before naming a mechanism.",
+   "source": "tests/glm5/phase2937_scale_collapse.py sha256_8=2e5cd727; outputs execution 13b3b60e result 5b09c835 npz 518cb922; sources s2887 e4835a87 / s2927 84fec594 / s2929 57ed5651 / s2930 cb655825 / s2931 5307afe1 / s2935 3b947b5d"
+  },
+  {
+   "meas_id": "M2938_subspace_angles",
+   "type": "subspace_angles",
+   "verdict": "subspace_rotation_retained - ONE run 14 s, NO ablation, ANCHORS 7/7: a1 dirs rebuild 2.17e-08 (14th consecutive forward anchoring); a2 determinism 0.00e+00; a3 7.21e-06 / a4 6.26e-06 vs 2935 s_base; a5 SVD orthonormality 2.11e-15; a6 func sep 185.70; a7 align_dir35 vs 2937 |proj|/fin_norm 0.00e+00 (cross-phase bit-level). DESIGN: 2937 protocol verbatim + SVD of stacked dirs_word (36 x 2560, top-8 energy 91.9 percent - language subspace is low-rank); alignment alpha_k = ||Vt[:k] x||/||x|| scale-invariant, grid k {1,4,8,16,36} + dir35 single direction. P1 DISSOCIATION: rho (null/func median alignment) dir35 0.5091 vs PC1 0.8339 vs k=8 0.9991 vs k=36 0.9957 - collapse is STRICTLY confined to the single direction dirs_word[35]; per-word alpha_8 null0 min 0.173, 0/57 words leave the subspace. P2 paired sign-flip permutation func vs null0 alpha_8 median diff -0.0036, p 0.66 - no detectable subspace-alignment difference at all. P3 LAYER PROFILE: dir ratio collapses to 0.162 at L18 while alpha8 same layer 0.942; alpha8 ratio >= 0.77 all layers, dir ratio < 0.7 at L6-L11 - mid-layer attention re-encodes WITHIN the language subspace. SEAL: alignment gradient monotone (dir35 0.51 < PC1 0.83 < k4 0.97 < k8 1.00); L20 dir ratio 1.187 > 1 (partial deep recovery/inversion). MECHANISM: 2937 direction collapse = rotation WITHIN the language subspace, i.e. re-encoding of the word-term structure into other subspace directions under null context; the readout failure is a single-direction projection artifact, not loss of language information. Lesson: single-direction cos claims must be checked against the spanned subspace before naming a collapse.",
+   "source": "tests/glm5/phase2938_subspace_angles.py sha256_8=b7f9bf71; outputs execution 56632231 result 17d6ea93 npz 5f1bd256; sources 2927 84fec594 / 2937 518cb922"
+  },
+  {
+   "meas_id": "M2939_rotation_target",
+   "type": "rotation_target",
+   "verdict": "rotation_target_identified - ONE run 14 s, NO ablation, ANCHORS 6/6: a1 dirs rebuild 2.17e-08 (15th consecutive forward anchoring); a2 determinism 0.00e+00; a3 7.21e-06 / a4 6.26e-06 vs 2935 s_base; a5 alpha_k vs 2938 align_k 3.61e-16 (near bit-level); a6 func sep 185.70. DESIGN: 2938 protocol verbatim + NEW per-word coordinates c(w,k) = x_w . v_k in the top-8 SVD basis. P1 STRUCTURE RETENTION: per-basis Spearman rho_med over 4 null sets - dir35 0.8809 (rank structure kept even where magnitude halves), v2 0.8186, v5 0.7940, v1 0.7504 vs v6 0.3864 (ONLY basis losing word structure; share smallest 0.005-0.012). P2 ENERGY FLOW: k* = v3, delta_e_med +0.1047 (share 0.181 -> 0.290), label-swap perm p 9.999e-04; inflow also v5 +0.0689, v7 +0.0223, v4 +0.0212; OUTFLOW v1 -0.1463, v2 -0.0739. SEAL MECHANISM: v1/v2 are dir35 decomposition (coords vs dir35 proj Spearman -0.96/+0.97) while v3 is weakly coupled (-0.38) - energy moves from the dir35-parallel component to near-orthogonal v3/v5: the quantitative shape of re-encoding. P3 CLASS DISPLACEMENT: delta_c cross-null cos(null0 vs null1/2/3) 0.997-1.000 - the re-encoding direction is a FIXED context-independent direction (context-statistics driven, not token identity); same context gives a DIFFERENT displacement pattern. Word displacement ||dc||/||c_func|| median 0.341, max word war (2937 rewrite outlier consistent). CONCLUSION: null-context re-encoding = linear-structured energy transfer from the language-readout axis to a fixed near-orthogonal in-subspace direction v3, with word-rank structure largely preserved (dir35 rho 0.88). Lesson: projection-magnitude collapse and coordinate-rank structure are different claims - report both.",
+   "source": "tests/glm5/phase2939_rotation_target.py sha256_8=f14811a3; outputs execution 45f76e71 result 11183c5c npz 8bae7be6; sources 2927 84fec594 / 2938 5f1bd256"
+  },
+  {
+   "meas_id": "M2940_v3_decode",
+   "type": "v3_decode",
+   "verdict": "v3_decoder_not_established - ZERO forward 1.5 s, ANCHORS 5/5 after run1 correction_note (a1 Vt8 rebuild 3.04e-08, threshold corrected 1e-10 -> 1e-6: cross-phase dirs_word bf16 noise 2.17e-08 propagates into SVD; a2 sing_vals 4.81e-09; a3 bit-level; a4 vs 2937 proj 0.00e+00; a5 2.21e-04, threshold corrected 1e-9 -> 5.1e-4: 2939 stores P3 rounded to 3 decimals). DESIGN: v3 word-level decode from 2939 npz coords - P1 SVD layer profile, P2 displacement decoding 4 ways (class axis label-swap / concept ICC / scale lock / rewrite link, 10000 perms each), P3 v3 coordinate semantics. P1 LAYER PROFILE: v3 = mid-layer L14-L18 positive (+0.39..+0.62) + early L1-L10 and deep L24-L35 all negative (-0.4..-0.5) bipolar direction, effective layers 16.1 - v3 is owned by the mid-layer rewrite battlefield (2937 sep-collapse L8-L16, 2938 L18 dir ratio 0.162). P2 ALL DECODES FAIL: class axis obs +5.22 p 0.296; concept ICC 0.389 p 0.420; scale lock rho 0.127 p 0.352; rewrite link rho 0.099 p 0.461 - the v3 displacement is NOT a function of any word attribute: a homogeneous fixed-direction push. P2 per-null class diffs all same-sign (+3.3..+7.1) but within-word variance dominates. P3 c3(func) class separation significant (p 7.0e-04) BUT language confound: rho(c3, lab) within en only 0.0000 (n=22) - the separation is language-group driven, not a semantic axis. CONCLUSION: v3 is the fixed propulsion direction of the re-encoding machine (mid-layer owned, word-attribute-blind), not a decodable semantic axis; the null re-encoding moves all words along v3 regardless of class/concept/scale. Lessons: (1) anchor thresholds must be checked for reachability against the comparison object precision (2939 P3 rounded to 3 decimals; SVD propagates 2e-08 input noise), (2) significant group separation on a confounded word set requires within-group correlation check before claiming a semantic axis.",
+   "source": "tests/glm5/phase2940_v3_decode.py sha256_8=02247d1e; outputs execution 1fda5eb9 result 11dd5d1f npz 4f5d8fa8; sources 2887 e4835a87 / 2927 84fec594 / 2937 518cb922 / 2939 8bae7be6"
+  },
+  {
+   "meas_id": "M2941_v3_causal_injection",
+   "type": "v3_causal_injection",
+   "verdict": "v3_push_damped - forward family 9.2 s, ANCHORS 7/7: a1 dirs rebuild 2.17e-08 (16th consecutive forward anchoring); a3 Vt8 vs 2939 bit-level 0.00e+00; a4 7.21e-06 / a5 6.26e-06 vs 2935 s_base; a7 c3_func vs 2940 3.27e-13; a6 func sep 185.70. DESIGN: 2927 injection site verbatim (attn-input pos-1, L16 = argmax w_li), 2938/2939 batch57 final pre-norm readout; delta in {0,+-2,+-4,+-8,+-16,+-32} x {func, null0}; PREREG-frozen 3-branch verdict on causal gain vs linear direct prediction cos(v3,u35) = -0.227. PREFLIGHT (discipline 10): U8 coordinate shifts predict the actual dir35 readout shift per-word Spearman 0.994 BUT the v3 term alone carries only 0.4% of variance (mean shift decomposition v2 -19.7 / v1 -11.3 / v5 -8.2 / v3 -4.4 vs actual -54.0; v3 class-shift contribution -0.7 of sep displacement -108.4). P1 SUFFICIENCY (func +v3): gain med +0.009 vs prediction -0.227 -> attenuated ~26x with sign flip at delta>=16; sep even at +32 only 185.7->180.6. P2 NECESSITY (null0 -v3): rec16 0.078 subadditive - cancelling the observed +19.5 c3 shift recovers 0.28 of the 108 sep gap and ZERO word-structure rho (0.8898 vs base 0.8896). D1 c3 propagation slope 0.04-0.16 (unit injection reaches final at ~6%); D5 small-delta evenness 1.0 (linear regime), large-delta 1.2-1.8 (quadratic onset). CONCLUSION: the observed v3 push is a DAMPED SYMPTOM, not a causal lever - single-point single-direction injection at its owning layer reproduces neither the null re-encoding (gain damped 26x) nor restores the readout when cancelled (7.8%); null re-encoding is a distributed multi-layer attention computation. 2940 wording \"v3 pushes the residual away from the dir35 axis\" must be read geometrically, not causally. Lesson: ownership of a displacement direction != causal leverage over the readout; observed coordinate displacement magnitude says nothing about manipulability.",
+   "source": "tests/glm5/phase2941_v3_causal_injection.py sha256_8=3198e9b7; outputs execution f68b8fa9 result 93842517 npz fea58b3a; sources 2887 e4835a87 / 2927 84fec594 / 2935 3b947b5d / 2939 8bae7be6 / 2940 4f5d8fa8"
+  },
+  {
+   "meas_id": "M2942_u8_joint_injection",
+   "type": "u8_joint_injection",
+   "verdict": "u8_displacement_not_causal - forward family 13 s (run2 authoritative), ANCHORS 8/8: a1 dirs rebuild 2.17e-08 (17th consecutive forward anchoring); a3 Vt8 vs 2939 bit-level 0.00e+00; a4 7.21e-06 / a5 6.26e-06 vs 2935 s_base; a7 c3_func vs 2940 0.00e+00; a8 injection construction 9.95e-14; a6 func sep 185.70. DESIGN: joint per-word displacement pattern xdir(w) = dcks_S @ Vt8_S with S = {v1,v2,v5} (91% of U8 mean readout contribution per 2941 preflight; dcks = 2939 npz coords null0-func), injected at L16 attn-input pos-1 (2927 site verbatim), gain sweep s in {1,2,2.5,3,3.5,4,8,16,32}. run1 correction_note: R2/D1 negative-denominator clamp bug (max(median,1e-30) clamped -29.06 to 1e-30 -> R2 -6e29) fixed; grid refined (ratio jumped 0.51@s2 -> 1.82@s4). CALIBRATION: ratio(s) 0.21/0.86/1.56/1.82/3.40/4.61/6.62 - propagation gain is superlinear then saturating; s*=2 (ratio 0.86). MAIN: R1 = 0.7401 < 0.8 -> NOT causal (run1 at undershooting s: R1 0.7129 - verdict stable across sessions); R2 = -0.03: median proj35 shift +0.87 ~= ZERO while sep collapses 185.7 -> 33.03 (OVERSHOOTS null0 77.26) - CLASS-ASYMMETRIC displacement: median-dead but group-moving. sep(s) is THRESHOLD-DROP not gradual: 176.8 (s=1) -> 33.0 (s=2) -> -36.2 (s=3) -> -51.0 (s=4); rho word-structure 0.94 -> 0.57 -> -0.21. D1 per-direction propagation: v1 +0.27..+0.47 (positive gain, ~3x the v3 slope), v5 NEGATIVE -0.19..-0.26 (anti-restoring), v2 ~+0.05..+0.29. REPRODUCIBILITY ANOMALY (probe-established): s=2 readouts differ QUALITATIVELY across sessions (sep 84.8 / 33.0 / 14.2 in three processes) while bit-level deterministic within a session (3 repeats + alternation) and s=1, s>=4 are bit-stable across sessions - the mid-gain regime sits on an unstable boundary. CONCLUSION: the joint v1/v2/v5 displacement pattern is a STRONG but UNSTABLE lever, not a faithful causal replica: injecting the null-like pattern at ~0.9 matched amplitude drives sep PAST the null level through a threshold-drop, with per-word readout shift pattern only rank-0.74 similar and median-dead. Null re-encoding is not the readout consequence of a smooth displacement field; it behaves as a regime switch whose per-word realization cannot be replayed by residual injection. Lessons: (1) negative-valued denominators must never be clamped with max(x, eps) - sign kills; (2) injected forwards in the mid-gain regime are session-unstable: repeat-within-session + cross-session spot check required before trusting a single dose-response point.",
+   "source": "tests/glm5/phase2942_u8_joint_injection.py sha256_8=9566179b; outputs execution 89134b07 result 268af050 npz 55a9107b; sources 2887 e4835a87 / 2927 84fec594 / 2935 3b947b5d / 2939 8bae7be6 / 2940 4f5d8fa8"
+  },
+  {
+   "meas_id": "meas_2943_gamma_anatomy",
+   "type": "zero_forward_anatomy",
+   "verdict": "regime_signature_confirmed",
+   "source": "phase2943/gamma_anatomy"
+  },
+  {
+   "meas_id": "meas_2944_switch_localization",
+   "type": "forward_family_layer_injection",
+   "verdict": "switch_localized",
+   "source": "phase2944/switch_localization"
+  },
+  {
+   "meas_id": "meas_2945_threshold_curves",
+   "type": "forward_family_threshold_curve",
+   "verdict": "threshold_curve_nonmonotone",
+   "source": "phase2945/threshold_curves"
+  },
+  {
+   "meas_id": "meas_2946_dose_allocation",
+   "type": "forward_family_dose_allocation",
+   "verdict": "switch_interaction_nonlinear",
+   "source": "phase2946/dose_allocation"
+  },
+  {
+   "meas_id": "meas_2947_head_anatomy",
+   "type": "forward_family_head_ablation",
+   "verdict": "switch_head_concentrated_only",
+   "source": "phase2947/head_anatomy"
+  },
+  {
+   "meas_id": "meas_2948_wov_head_gain",
+   "type": "zero_forward_linear_head_gain",
+   "verdict": "linear_head_gain_confirmed",
+   "source": "phase2948/wov_head_gain"
+  },
+  {
+   "meas_id": "meas_2949_head_dose_sufficiency",
+   "type": "causal_head_group_ablation_x_injection",
+   "verdict": "head_dose_not_carried",
+   "source": "phase2949/head_dose_sufficiency"
+  },
+  {
+   "meas_id": "meas_2950_rebalance_anatomy",
+   "type": "head_contribution_decomposition",
+   "verdict": "rebalancing_compensatory",
+   "source": "phase2950/rebalance_anatomy"
+  },
+  {
+   "meas_id": "meas2951_rebalance_gain_functional",
+   "type": "zero_forward_mechanism_integration",
+   "verdict": "rebalance_carriers_gain_functional",
+   "source": "phase2951/rebalance_carrier_functional; quasi-post-hoc per discipline 9"
+  },
+  {
+   "meas_id": "meas2952_amplification_attention_gain",
+   "type": "forward_family_anatomy",
+   "verdict": "amplification_attention_gain_sorted",
+   "source": "phase2952/amplification_anatomy; quasi-post-hoc per discipline 9"
+  },
+  {
+   "meas_id": "meas2953_a11_s_response_sigmoid",
+   "type": "forward_family_sigmoid_response",
+   "verdict": "a11_sigmoid_threshold_decoupled",
+   "source": "phase2953/a11_s_response; keep-head aggregation caveat per discipline: keep set excludes high-leverage heads"
+  },
+  {
+   "meas_id": "meas2954_early_flipper_polarity",
+   "type": "forward_family_polarity_anatomy",
+   "verdict": "early_flipper_not_positive",
+   "source": "phase2954/early_flipper_polarity; decisive negative: 2947 promote/resist labels are rebalancing-response classes, not direct-readout polarities"
+  },
+  {
+   "meas_id": "meas2955_qk_source_decomposition",
+   "type": "forward_family_qk_decomposition",
+   "verdict": "qk_mixed_large_logit",
+   "source": "phase2955/qk_source_decomposition; A11 gain = large logit shift (med|dz|~3, same order as |z_b|), cross term dq.ddk largest at both layers - not softmax steep-region gain, not pure q/k direct"
+  },
+  {
+   "meas_id": "meas2956_rebalance_module_localization",
+   "type": "forward_family_module_localization",
+   "verdict": "mixed_modules_mixed_band",
+   "source": "phase2956/rebalance_module_localization; competitive rebalancing (dSep + D_abl) split by module via true-residual chain: MLP carries the largest share (L17 75%, L16 62%), attention beyond the exact passive loss (S_att[dose] = -D_abl) is secondary and late-concentrated (L34-35); band mixed (top3 0.47/0.59, argmax L35)"
+  },
+  {
+   "meas_id": "meas2957_rebalance_mlp_constancy",
+   "type": "forward_family_profile_constancy",
+   "verdict": "profile_partial_scale_divergent_ablation_specific",
+   "source": "phase2957/rebalance_mlp_constancy; R_mlp cross-family near-equality (2956: -16.26 vs -16.76) is a total-level coincidence, not profile identity: per-layer S_mlp profiles partially shared (cos 0.868, rho 0.573), scale divergent (b 0.549, R2 0.754), and ablation-specific (cos vs injection MLP response 0.569/0.049 - the ablation rebalancing is a genuine interaction, not an injection echo; injection M_inj sums -133.6/-88.2 vs ablation S_mlp -15.2/-18.8)"
+  },
+  {
+   "meas_id": "meas2958_imprint_dose_response",
+   "type": "forward_family_dose_response",
+   "verdict": "mixed_dose_response_mixed_profile_mixed_readout",
+   "source": "phase2958/imprint_dose_response; patch curve k*x_orig on ablated slices: rebalancing is imprint-magnitude-driven and strictly monotone (rho=1.0 both families), no threshold switch; k=1 closes bit-level to I0. Families split on all three axes: L17 linear dose/rotating profile/linear readout, L16 nonlinear (tail-accelerated)/fixed profile/nonlinear readout - consistent with the 2946/2947 switch-type vs gradient-type layer dichotomy"
+  },
+  {
+   "meas_id": "meas2959_cross_term_algebra",
+   "type": "forward_family_second_order_algebra",
+   "verdict": "anomalous_slope_direction_locked_not_predictable",
+   "source": "phase2959/cross_term_algebra; the dominant dq.ddk cross term (2955) is direction-locked (cos(dq) 0.992, cos(ddk) 0.994 across doses) but NOT second-order in magnitude: log-log slope 1.176 (IQR 1.056-1.265, R2 0.970, all 32 heads) - RMSNorm saturation makes the cross term near-linear at large s; s^2 small-dose extrapolation overshoots (rel err median 1.365) while the per-head PATTERN is predictable (rho 0.9685); xt tracks dz (rho 0.842) but not ATT (rho -0.10)"
+  },
+  {
+   "meas_id": "meas2960_profile_rotation_geometry",
+   "type": "forward_family_profile_geometry",
+   "verdict": "rank1_rotation_trajectory_curved_fixed_dominant",
+   "source": "phase2960/profile_rotation_geometry; the 2958 S_mlp(k) profile families decompose as fixed component dominant (97.5 pct L17 / 98.8 pct L16) plus a rank-1 deviation (top-1 energy 0.897 / 0.965) with a curved trajectory in k (linear-fit rel resid 0.341 / 0.194); rotation axes concentrate at the dose-layer flank (L14-18) while deep layers stay fixed - the 2958 L17/L16 profile split is a deviation-magnitude difference, not a mechanism difference"
+  },
+  {
+   "meas_id": "meas2961_primitive_card_compression",
+   "type": "documentation_card_compression",
+   "verdict": "primitive_card_complete_chain_compressed",
+   "source": "phase2961/primitive_card_compression; ZERO forward pure documentation: the 2936-2960 mechanism chain (23 rings + 2 precursors) compressed into 25 structured primitive cards (layer_band x module x head_set x readout x dose_law x lin_r + mechanism + key_numbers); anchors: 25/25 MEMO registration match (both legacy formats), 25/25 verdict verbatim match; T1 completeness 25/25; T2 verbatim traceability coverage 139/139 = 1.000; chain-continuity descriptive record sep_func 13 / sep_null0 7 sources; core compression: null re-encoding is distributed emergence closed to single-point operationalization, head importance = relation property (linear order x nonlinear mixing)"
+  },
+  {
+   "meas_id": "meas2962_word_class_signature_matrix",
+   "type": "word_class_signature_matrix",
+   "verdict": "signature_mixed_pattern_registered",
+   "source": "phase2962/word_class_signature_matrix; 45 single forwards (2937 pass1 protocol), 3 classes x 15 English single-token words (concrete/abstract/function, tokenizer pre-check before freeze); S1 routing ICC17 0.1163 p 4.58e-02 (boundary band, discipline 11, not hard); S2 readout SVD coords all-blind (maxT p 0.961, per-k min 0.65) - 2940 replicated on new list/classes; S3 load-band concrete-vs-abstract zero diff (obs 0.0048 p 0.976) with function-word descriptive gap 1.23 CONFOUNDED by token id (rho -0.605); verdict mixed per frozen map"
+  },
+  {
+   "meas_id": "meas2963_frequency_controlled_band",
+   "type": "frequency_controlled_band_recheck",
+   "verdict": "band_class_effect_beyond_frequency",
+   "source": "phase2963/frequency_controlled_band; 45 FRESH words (F15 function tid 369-3425 / C15 common nouns 1251-4627 / R15 rare nouns 13551-46118) + 5 anchor words re-forwarded from 2962; anchors 6/6 incl cross-phase protocol anchor B vs 2962 npz rel 7.76e-16 (bit-level); T1 Freedman-Lane group coef -1.0371 p 2.0e-04 (frequency-controlled, HARD); T2 within-content gradient rho -0.16 ns; T3 3/5 mixed blocks invalid-registered; T4 rho(tokid,B) all-45 -0.6464 is between-group Simpson structure; function-vs-content band gap ~1.46 is a CLASS effect beyond frequency"
+  },
+  {
+   "meas_id": "meas2964_carrier_anatomy",
+   "type": "carrier_anatomy",
+   "verdict": "carrier_localized_layers_heads",
+   "source": "phase2964/carrier_anatomy; 30 FRESH words (F15 closed-class tid 566-7241 / N15 nouns 3241-26752) + 3 anchors; anchors 6/6 incl cross-phase B vs 2963 rel 3.49e-16; T1 FL replication coef -1.0515 p 1.5e-03; T2 unique maxT significant layer L34 (gap -4.0, top-3 conc 0.461); T3 unique significant head L34/h15 (-1.66); T4 rho(gap17, D2947) 0.4296, top5 intersects 2953 flipper h21 and keep-set 5/5"
+  },
+  {
+   "meas_id": "meas2965_h15_functional_identity",
+   "type": "h15_functional_identity",
+   "verdict": "h15_shared_carrier_effect_survives",
+   "source": "phase2965/h15_functional_identity; 990 single forwards (30 intact bit-level vs 2964 rel 0.0 + 32 heads x 30 ablated at L34); anchors 8/8; T1 cos(c15,u35) -0.1301 rank 2/32 (top3 h8/h15/h21); T2 rho(C15,B) -0.7953 perm p 1e-04; T3a FL abl coef -0.9614 p 2.1e-03 NOT abolished; T3b R15 +0.1172 rank 1/32 (h8 0.1111 close 2nd), mean|dB| 0.2181 vs med 0.0124"
+  },
+  {
+   "meas_id": "meas2966_l34_routing_membership",
+   "type": "l34_routing_membership",
+   "verdict": "l34_h15_independent_of_routing",
+   "source": "phase2966/l34_routing_membership; L17 xdir injection 2953 GRID17+s0, 57-batch verbatim, K=1; anchors 11/11 incl a9 A11_L17 vs 2953 npz 1.81e-07 and a11 sep shared grid 0.0 bit-level; T1 h15 C-dose spearman -0.5909 p 0.059 FAIL (biphasic: peak 0.7139 at s=0.625 vs s_c 0.6567, then falls to -0.06); T3 rho(s,B) +0.9364 p 1e-04 monotone B collapse -1.365->-0.019; family top5 h6 rho -1.0"
+  },
+  {
+   "meas_id": "meas2967_collapse_carrier_anatomy",
+   "type": "collapse_carrier_anatomy",
+   "verdict": "collapse_carrier_localized",
+   "source": "phase2967/collapse_carrier_anatomy; 2966-identical forward family, full-layer C[36,s,57,32] retained; anchors 14/14 incl a12/a13/a14 vs 2966 npz all bit 0.0; T1 12 sig layers, 8 carrier layers L{24,26,27,28,30,31,32,33} (ratio<0.3), L34 sig q 1e-3 but ratio 0.5148; T2 318/1152 sig heads, L34 12 heads superset of 2966 top5; T1 note: L17 amplifies (ratio 367.5), collapse is downstream-deep phenomenon"
+  },
+  {
+   "meas_id": "meas2968_h15_peak_anatomy",
+   "type": "h15_peak_anatomy",
+   "verdict": "biphasic_locked_no_reverse",
+   "source": "phase2968/h15_peak_anatomy; two families (+xdir anchor, -xdir enhancement); anchors 13/13 incl a12/a13 vs 2967 npz bit 0; T1 40/57 inner-peak words, median peak 0.6746 vs s_c 0.6567 (diff 0.018), boot CI [0.586,0.838]; T2 -xdir rho -0.4455 p 0.169 ns (flat, no mirror biphasic); T3 A11-peak vs C15-peak per-word rho 0.9542"
+  },
+  {
+   "meas_id": "meas2969_peak_word_attributes",
+   "phase": 2969,
+   "name": "peak_word_attributes",
+   "created": "2026-09-20T01:59:21",
+   "verdict": "peak_source_lang_within_pair_descriptive",
+   "artifacts": {
+    "execution.json": "8ef19ac5",
+    "result.json": "1966204a",
+    "peak_attr.npz": "8d87e11c",
+    "script": "3578b793"
+   }
+  },
+  {
+   "meas_id": "meas2970_delay_carrier_localization",
+   "phase": 2970,
+   "name": "delay_carrier_localization",
+   "created": "2026-09-20T02:17:25",
+   "verdict": "delay_carrier_heads_and_layers_localized",
+   "artifacts": {
+    "execution.json": "f8bd0454",
+    "result.json": "e6b85164",
+    "delay_carrier.npz": "d0835266",
+    "script": "da58f04a"
+   }
   }
  ],
  "growth_curve": [
@@ -1546,10 +2010,69 @@
     "M2908_qwen_attn_boundary_precision",
     "M2909_p_axis_stability",
     "M2910_cross_layer_coherence",
-    "M2911_alternation_structure"
+    "M2911_alternation_structure",
+    "M2912_sign_balance_zigzag",
+    "M2913_perhead_wvo_decomposition",
+    "M2914_head_identity_replication",
+    "M2915_carrier_robustness_domain",
+    "M2916_early_carrier_selection",
+    "M2917_event_atlas",
+    "M2918_event_anatomy",
+    "M2919_multiaxis_families",
+    "M2920_multiaxis_word_atlas",
+    "M2921_attr_vocab_expansion",
+    "M2922_attr_event_anatomy",
+    "M2923_polarity_sign_anatomy",
+    "M2924_depth_polarity_gradient",
+    "M2925_event_selection_anatomy",
+    "M2926_event_selection_polar_fix",
+    "M2927_probe_relativity",
+    "M2928_survivor_core_anatomy",
+    "M2929_response_structure_atlas",
+    "M2930_direction_flip_control",
+    "M2931_skeleton_overlap_null",
+    "M2932_skeleton_functional_ablation",
+    "M2933_full_atlas_ci",
+    "M2934_loadband_anatomy",
+    "M2935_null_amp_anatomy",
+    "M2936_anchoring_law",
+    "M2937_scale_collapse",
+    "M2938_subspace_angles",
+    "M2939_rotation_target",
+    "M2940_v3_decode",
+    "M2941_v3_causal_injection",
+    "M2942_u8_joint_injection",
+    "meas_2943_gamma_anatomy",
+    "meas_2944_switch_localization",
+    "meas_2945_threshold_curves",
+    "meas_2946_dose_allocation",
+    "meas_2947_head_anatomy",
+    "meas_2948_wov_head_gain",
+    "meas_2949_head_dose_sufficiency",
+    "meas_2950_rebalance_anatomy",
+    "meas2951_rebalance_gain_functional",
+    "meas2952_amplification_attention_gain",
+    "meas2953_a11_s_response_sigmoid",
+    "meas2954_early_flipper_polarity",
+    "meas2955_qk_source_decomposition",
+    "meas2956_rebalance_module_localization",
+    "meas2957_rebalance_mlp_constancy",
+    "meas2958_imprint_dose_response",
+    "meas2959_cross_term_algebra",
+    "meas2960_profile_rotation_geometry",
+    "meas2961_primitive_card_compression",
+    "meas2962_word_class_signature_matrix",
+    "meas2963_frequency_controlled_band",
+    "meas2964_carrier_anatomy",
+    "meas2965_h15_functional_identity",
+    "meas2966_l34_routing_membership",
+    "meas2967_collapse_carrier_anatomy",
+    "meas2968_h15_peak_anatomy",
+    "meas2969_peak_word_attributes",
+    "meas2970_delay_carrier_localization"
    ],
-   "notes": "readout tolerance spectrum: qwen mlp all-three (margins 0.18-0.22) > glm4 attn eigen+orth (margins ~0.12) > glm4 mlp eigen-only; rotation dynamics universal (M2895); carrier-law per-model variation = readout tolerance gradient | refined by M2898: glm4 attn stale component retracted (8/8 margin<=0); spectrum stands on eigen+orth tolerance | confirmed by M2899: qwen mlp tier draw-stable under 8-draw margin-first protocol (24/24 dual-flag) | M2900 quantifies glm4 mlp eigen tier: acc_flag 7/8 but margin ~0.02-0.03 (1/8 over own p95) - real but weak, ~10x below qwen; spectrum stands as margin-magnitude hierarchy | M2901 confirms spectrum second tier under multi-draw: glm4 attn eigen acc 8/8 margin 7/8, orth margin 8/8, stale 0/8 - full spectrum now margin-first adjudicated | 2902 mechanism attribution: the per-model margin hierarchy is carried by LANDED-DIRECTION LANGUAGE CONTENT DENSITY, not response gain - glm4 attn landed dirs keep word-unembed alignment (R_A=1.438 vs null-row baseline) while glm4 mlp landed dirs are language-neutral; both channels fully re-orient the injected direction (rho~0). Predicts qwen mlp (~0.2 margin) landed dirs are even more language-aligned - testable cross-model. | 2903: margin hierarchy root cause reopened - scalar Jacobian metrics (norm gain N9, retention rho~0, unembed alignment E8/N10) all fail; margin must live in the class-correlated STRUCTURE of the B row space; qwen attn eigen first measured negative (margin -0.0195) | 2904 audit gate: scalar margin variants are 1st-order (class-mean) and skewness-sensitive only; covariance anisotropy invisible by first-moment identity (N11); higher-order reading requires skew-audited detector (2905) | 2905 main reading (skew-audited): margin is carried by 1st-order class-mean shift in the B row space; F/T2 significance pattern matches margin positivity 4/4; margin level = class-mean shift diluted by within-class scatter | 2906: amplitude law channel-split - M1 isotropic summary suffices for mlp margins, attn margins suppressed by beyond-isotropy within-class shape; neuron-level readout of the class-mean shift is down_proj-column concentrated in mlp, permutation-baseline in attn (4/4 match with margin positivity) | 2907 shape ladder: both attn groups reconstruct under M1 isotropy with the preregistered RMS sigma (glm4 attn 0.1213 in [0.0915,0.2262]; qwen attn -0.0195 in [-0.0198,0.0631], borderline slack 0.0004) - shape correction NOT needed; 2906 attn-below was a sigma-definition artifact (E9), 'attn shape suppresses margin' retracted as amplitude fact; spectrum stands as amplitude hierarchy with qwen attn at the M1 lower edge | 2908 high-precision adjudication (20000 draws x 5 seeds + matched coverage audit 40/40): qwen_attn p_median=0.0276, 5/5 seeds inside nominal 95% - 'below M1' refuted at high precision, honest reading AT the M1 lower edge; glm4 attn firmly inside (p=0.168) under E9-corrected RMS sigma, closing the 2906 channel-split question; new spectrum axis: percentile-within-own-null qwen mlp 0.474 > glm4 mlp 0.375 > glm4 attn 0.168 > qwen attn 0.028, independent of the margin-amplitude order | 2909 p-axis promotion REFUTED (N12): null-percentile ordering invariant only within the cosine-mean margin family; V2_colz / V3_acc / layer subsets reorder it (qwen_attn 0.026 -> 0.097 / 0.735 / 0.13-0.61); qwen_attn lower tail is a full-layer aggregation effect - second axis withdrawn, margin-amplitude hierarchy remains the primary spectrum axis under the declared 2896-family definition | 2910 coherence decomposition: qwen_attn lower tail = alternating per-layer structure (L00-L05 strictly below/above own nulls) + dominant second-half cumulative descent (k=5 0.139 -> k=8 0.010 -> k=10 0.025, reproducing 2908's 0.026 under independent seeds); partial_coherence verdict (below_frac 0.50) - aggregation is structured, not a uniform coherence nor an averaging artifact | 2911 alternation formal tests: margin-level alternation real and qwen_attn-specific (8/9 flips p=0.0195; others p>=0.25) but absent from column correlations (osc positive +0.050, S empty) and delta signs (5/9) - carrier located (descriptive diag_2911c) in the class-wise sign balance: per-layer |pos_frac0 - pos_frac1| zigzags 7/8 and tracks margin_j; sign-separation quality oscillates while signal direction/amplitude stay smooth",
-   "phase_updated": 2911
+   "notes": "readout tolerance spectrum: qwen mlp all-three (margins 0.18-0.22) > glm4 attn eigen+orth (margins ~0.12) > glm4 mlp eigen-only; rotation dynamics universal (M2895); carrier-law per-model variation = readout tolerance gradient | refined by M2898: glm4 attn stale component retracted (8/8 margin<=0); spectrum stands on eigen+orth tolerance | confirmed by M2899: qwen mlp tier draw-stable under 8-draw margin-first protocol (24/24 dual-flag) | M2900 quantifies glm4 mlp eigen tier: acc_flag 7/8 but margin ~0.02-0.03 (1/8 over own p95) - real but weak, ~10x below qwen; spectrum stands as margin-magnitude hierarchy | M2901 confirms spectrum second tier under multi-draw: glm4 attn eigen acc 8/8 margin 7/8, orth margin 8/8, stale 0/8 - full spectrum now margin-first adjudicated | 2902 mechanism attribution: the per-model margin hierarchy is carried by LANDED-DIRECTION LANGUAGE CONTENT DENSITY, not response gain - glm4 attn landed dirs keep word-unembed alignment (R_A=1.438 vs null-row baseline) while glm4 mlp landed dirs are language-neutral; both channels fully re-orient the injected direction (rho~0). Predicts qwen mlp (~0.2 margin) landed dirs are even more language-aligned - testable cross-model. | 2903: margin hierarchy root cause reopened - scalar Jacobian metrics (norm gain N9, retention rho~0, unembed alignment E8/N10) all fail; margin must live in the class-correlated STRUCTURE of the B row space; qwen attn eigen first measured negative (margin -0.0195) | 2904 audit gate: scalar margin variants are 1st-order (class-mean) and skewness-sensitive only; covariance anisotropy invisible by first-moment identity (N11); higher-order reading requires skew-audited detector (2905) | 2905 main reading (skew-audited): margin is carried by 1st-order class-mean shift in the B row space; F/T2 significance pattern matches margin positivity 4/4; margin level = class-mean shift diluted by within-class scatter | 2906: amplitude law channel-split - M1 isotropic summary suffices for mlp margins, attn margins suppressed by beyond-isotropy within-class shape; neuron-level readout of the class-mean shift is down_proj-column concentrated in mlp, permutation-baseline in attn (4/4 match with margin positivity) | 2907 shape ladder: both attn groups reconstruct under M1 isotropy with the preregistered RMS sigma (glm4 attn 0.1213 in [0.0915,0.2262]; qwen attn -0.0195 in [-0.0198,0.0631], borderline slack 0.0004) - shape correction NOT needed; 2906 attn-below was a sigma-definition artifact (E9), 'attn shape suppresses margin' retracted as amplitude fact; spectrum stands as amplitude hierarchy with qwen attn at the M1 lower edge | 2908 high-precision adjudication (20000 draws x 5 seeds + matched coverage audit 40/40): qwen_attn p_median=0.0276, 5/5 seeds inside nominal 95% - 'below M1' refuted at high precision, honest reading AT the M1 lower edge; glm4 attn firmly inside (p=0.168) under E9-corrected RMS sigma, closing the 2906 channel-split question; new spectrum axis: percentile-within-own-null qwen mlp 0.474 > glm4 mlp 0.375 > glm4 attn 0.168 > qwen attn 0.028, independent of the margin-amplitude order | 2909 p-axis promotion REFUTED (N12): null-percentile ordering invariant only within the cosine-mean margin family; V2_colz / V3_acc / layer subsets reorder it (qwen_attn 0.026 -> 0.097 / 0.735 / 0.13-0.61); qwen_attn lower tail is a full-layer aggregation effect - second axis withdrawn, margin-amplitude hierarchy remains the primary spectrum axis under the declared 2896-family definition | 2910 coherence decomposition: qwen_attn lower tail = alternating per-layer structure (L00-L05 strictly below/above own nulls) + dominant second-half cumulative descent (k=5 0.139 -> k=8 0.010 -> k=10 0.025, reproducing 2908's 0.026 under independent seeds); partial_coherence verdict (below_frac 0.50) - aggregation is structured, not a uniform coherence nor an averaging artifact | 2911 alternation formal tests: margin-level alternation real and qwen_attn-specific (8/9 flips p=0.0195; others p>=0.25) but absent from column correlations (osc positive +0.050, S empty) and delta signs (5/9) - carrier located (descriptive diag_2911c) in the class-wise sign balance: per-layer |pos_frac0 - pos_frac1| zigzags 7/8 and tracks margin_j; sign-separation quality oscillates while signal direction/amplitude stay smooth | 2912 gap-zigzag formalization: the alternation is NOT carried by gap amplitude - per-layer sign-balance gap zigzag absent under the per-layer permutation null (qwen_attn k=7/8 p=0.172, rho1 -0.694 p=0.177; S empty); the correct null for zigzag counts is the 2/3 up-down reversal law (E[k]=5.33/8), under which the descriptive 7/8 (diag_2911c) is unremarkable; alternation evidence remains margin-sign-sequence-only (2911 P1); calibration-protocol lesson: a one-sided discrete permutation p with ties included has E[p]=0.5+tau/2~0.61 (tau=sum pk^2~0.22), the v1 median band spuriously failed (run1 all_void), the v2 analytic p_mean band replaces it | 2913 per-head decomposition: the attn negative margin is head-level structure - h7 (0.177) and h8 (0.134) carry mlp-scale language separation, top-2 subset margin 0.280 (selection-corrected p=0.015) vs full -0.021; the 2911 margin-sign alternation is NOT single-head (best head 7/9 vs aggregate 8/9) - cross-head aggregate phenomenon; methodological constants: attn-channel anchor thresholds do not transfer from mlp (bf16 extraction-domain quantization gap 6.07e-2 vs true cross-run drift 3.88e-8, forward deterministic) | confirmed by M2914: 2913 per-head carriers h7/h8 reproduce EXACTLY under protocol-verbatim re-run (Spearman/Kendall 1.0, top2 {7,8}, {7,8} reconstruction absdiff 0.0, relB 3.16e-08, gate h7 0.17710 > 0.17474 same numbers) - head-level margin attribution formally confirmed; P4: carriers have no static W_VO spectral identity (spectra-vs-margins rho ~ 0 across t12/PR/zf_gain/zf_cos), identity is runtime-response-determined, invisible in static weights | M2915 robustness domain: {7,8} identity is SEGMENT-BOUND, not protocol-global - stable as top2 across late windows [26,36) and [30,36) (ranks swap in V3), switched in early windows <=26 (V2 {27,31}; V4 {7,27} with h7 #1 margin 1.18); channel margin is segment-signed (early +0.16 acc 0.84 vs late -0.02 acc 0.63), so the pair carries the late-segment cancellation structure rather than a global language carrier; stale fixed lang_dir kills head-level separation (V5 gate False, margin ~0) - head carriers require layer-matched directions | M2916: early-segment carriers selection-confirmed (V2 h27 p=0.005 k=1, V4 h7 p=0.005 k=1); leave-one-layer-out shows EVERY carrier margin is a single (head,layer) event - h7@L19 (early, -1.059 of 1.18), h27@L24, h31@L22, and late h7@L34+h8@L34 (same layer) - 'carrier head' = (head,layer) event, h7's dual role is two distinct events, and the 2913 {7,8} significance is a layer-34 pair event | M2917: full-layer 1152-cell event atlas, v2 maxT after v1 BH power-zero erratum (min perm p 1/201 > BH first threshold 4.34e-5): 24/1152 family-wise significant; known 2/6 - (7,19) 1.346 p=0.005 top-of-atlas, (27,24) 0.811 p=0.010; late-window events (31,22)/(8,23)/(7,34)/(8,34) are window-family-relative only; 22 novel events concentrated at early layers L1-L16 (h26@L6 1.236, h8@L2 1.125, h25@L3 1.123, h22@L12 1.114) - window-restricted scans never tested early layers | M2918: event anatomy - all 5 top novel early events mechanism-linked to (7,19)/(27,24) at 10-slot maxT (p 0.0005-0.018); ONE en-vs-L word pattern in two polarity classes alternating with depth (en+ {8,2; 22,12; 7,19}, L+ {26,6; 25,3; 24,23; 27,24}); word-level DENSE (PR 38-40/57 for strong events, top-3 mass only 14-31%), layer-level SHARP (temporal PR 6-10/36), within-head cross-layer patterns decorrelate or flip (only h4 L1<->L19 reuses above null95) - language axis = polarity-alternating event chain, not a static carrier | M2919: speed/size/moisture direction families built under the 2886 caliber (same-subject pairs, bit-exact anchors vs 2886); collinearity low (global max |cos| 0.447) so the multi-axis atlas needs no residualization; axes have DIFFERENT DEPTH PROFILES - lang readable ~1.0 at all layers (2886 hourglass negative confirmed), speed decays deep 1.0->0.65, size ->0.875, moist ~1.0 - attribute semantics integrated away deep while language identity persists | M2920: multi-axis word atlas NEGATIVE for non-lang axes - concept partition 0 events at full power (same 57 words, same lang-dir probe as the 24-event lang atlas: events encode language identity, not concept content); speed/size/moist 0 under maxT but small-n granularity power-limited (size p 0.0796 closest); word-vs-sentence direction transfer |cos| ~0.1-0.3 everywhere => functional transfer != geometric identity; word-level event tests need n >~ 40 | M2921: attr vocab expansion to 183 words FLIPS the 2920 verdict - attribute_events_found: speed 2 / size 9 / moist 2 (head,layer) events under the same frozen statistic, granularity precheck passed (top-40 distinct 23-30 >= 20) so the 2920 zeros were a small-n granularity artifact; co-occurrence still empty across axes (0 shared cells with the 24 lang events -> per-category private paths); word-level direction transfer still 4/4 failed (median |cos| 0.09-0.22) | M2922: attr event anatomy (zero-forward, 2918 protocol) - 13/13 attribute events are polarity-aligned (p=0.0005 floor, d_pole |0.67-1.84|, 8/13 LOW-driven); size is the only internally linked attr axis (4/36 edges, one 4-event component); attr events sit deeper (median peak L15 vs lang L6) with similar broad-response sparsity; 8 heads carry cross-category events (head shared, cell private) | M2923: polarity sign anatomy - driving sign NOT predicted by top-word composition (7/13, p 0.48) but LAYER-STRUCTURED (LOW-driven shallow 7/8, HIGH-driven deep 5/5, Fisher p 0.0047); 13/13 events are bipolar contrast detectors (m_hi/m_lo opposite signs); the 4 size linkage edges are sign-matched 4/4 | M2924: depth-polarity gradient ABSENT at grid level (0/3 axes, median-head contrast profiles within null; size reversed) but event-level structure holds (rho(d_pole, layer) +0.654 p 0.025, |d_pole| shallower-stronger -0.495) -> 2923 layer structure is an EVENT-SELECTION property, not a grid-wide depth-graded polarity code | M2925: event selection anatomy - frozen verdict events_margin_only (2/7 features BH) but registered phi sign defect; post-hoc |phi|: 13/13 sig cells are the strongest pole-sign association of their layer (pct all 1.0, p 1.22e-4), with d_pole_abs pct 13/13 = 1.0 - events are selected by polar contrast strength; response shape (PR/top3/magnitude) and spatial extent play no role | M2926: |phi| corrected re-test flips the frozen verdict to events_polar_separation_selected (3/7 BH features: phi_abs pct 13/13=1.0, d_pole_abs, contrast_raw); P2 shows |phi|~margin coupling rho13 0.978 (full-grid 0.81-0.90) - selection is ONE axis, symbol-consistency strength extremum; P3 12/13 rank-1, the exception (18,7) is suppressed by same-layer double event (21,7) at L7 | M2927: probe relativity - word-level probe shifts the event atlas (overlap 7/24, jaccard 0.143; all 5 deep events lost, 21/25 new events early-layer; full-grid rank corr 0.176) with a 7-event probe-invariant hard core anchored by (7,19) (layer-rank #1 under both probes) - atlas is a probe x circuitry interaction product; anchors 4/4 with this run's 2886 caliber exactly replicating 2917 | M2928: survivor core anatomy - overlap null median 7.0 = observed: maxT significant-set overlap is UNINFORMATIVE (fixed hot layers shared via Gram structure); the correct probe-invariance statistics are dual-caliber layer strength (P2 p 0.0049) and word-response structure rho (P3 p 0.0025, survivor 0.825 vs lost 0.377); 2927 hard-core reading corrected; L+ class events systematically erased by the word probe (0/4)",
+   "phase_updated": 2940
   }
  ],
  "errata_ledger": [
@@ -1854,6 +2377,22 @@
      "phase": 2909
     }
    ]
+  },
+  {
+   "neg_id": "N13_gap_zigzag_absent_2_3_reversal_law",
+   "kind": "descriptive_pattern_null_under_formal_test",
+   "claim": "the class-wise sign-balance gap sequence |pos_frac0_j - pos_frac1_j| carries a real per-layer zigzag (alternation) beyond chance for qwen_attn, generalizing the 2911 margin-sign alternation to the amplitude domain",
+   "evidence": "2912 preregistered per-layer independent permutation test, 20000 perms: qwen_attn zigzag k=7/8 p=0.172, lag-1 rho1=-0.694 p=0.177 (all four groups p>=0.17; S empty => gap_zigzag_absent); the discrepancy vs the descriptive 7/8 impression is the null law: for iid sequences E[k] = 2/3*(n-2) = 5.33 of 8 (up-down reversal law; middle-of-three is a local extremum with prob 1/3+1/3), NOT n/2 - diag_2912b verifies the null k distribution matches binomial(8,2/3) (mean 5.21 vs 5.33 after tie loss); the margin-sign alternation (2911 P1 p=0.0195) is unaffected",
+   "status": "confirmed_negative",
+   "phase": 2912,
+   "sources": [
+    {
+     "path": "phase2912/sign_balance_zigzag/result.json",
+     "sha256_8": "4611db7f",
+     "phase": 2912
+    }
+   ],
+   "notes": "methodological constants institutionalized: (1) zigzag/local-extremum counts null at the 2/3 reversal law; (2) a one-sided discrete permutation p with ties included has E[p] = 0.5 + sum pk^2 / 2 - calibration bands on p must be tie-corrected (2912 v1->v2 lesson)"
   }
  ],
  "model_namespace": {
@@ -1900,5 +2439,6 @@
    "backup_sha256_8": "9d934052",
    "note": "existing v1 entries byte-faithful; new sections per spec v2 sections 10-13"
   }
- ]
+ ],
+ "ledger_sha256_8": "e96dbf63"
 }

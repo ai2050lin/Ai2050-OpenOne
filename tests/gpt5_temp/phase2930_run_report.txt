@@ -1,0 +1,26 @@
+execution.json frozen
+sources ok (E17 n=24, Ewd27 n=32)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+pass1 done (171 sequences)
+dirs_word rebuilt | a5 diff 2.17e-08 ok=True | cos(dirs_word, dirs86) median 0.1651
+pass2 words [10/57]
+pass2 words [20/57]
+pass2 words [30/57]
+pass2 words [40/57]
+pass2 words [50/57]
+pass2 done (3 directions)
+B86 (32, 57, 36) | Bwd (32, 57, 36) | Bmir (32, 57, 36) | a8 G_neg==-Gwd: True
+a1 rel 3.16e-08 ok=True | a2 m78 0.280360 ok=True | a3 4.71e-08 ok=True
+a4 maxT event set == 2917: True (E86 n=24)
+a6 Bwd vs 2927 rel 2.10e-08 ok=True | a7 Ewd==2927: True pdiff 2.76e-08 ok=True
+P1: E_mirror n=36 overlap 20/49 jacc 0.417 | sign diff 1.29e+00 | top1 in: True | VERDICT-BASIS: direction_flip_margin_shifts
+P1 lost_in_mirror: [(0, 6), (0, 16), (1, 5), (2, 1), (4, 10), (5, 1), (8, 2), (8, 3), (11, 10), (20, 6), (20, 8), (25, 2)]
+P1 new_in_mirror: [(5, 5), (7, 1), (7, 6), (8, 16), (12, 1), (18, 9), (20, 1), (24, 6), (25, 3), (26, 0), (26, 2), (27, 0), (27, 24), (29, 3), (31, 2), (31, 19)]
+P2: lin_r median 1.1747 max 1.7572 | mir_err median 1.0192 p90 1.7375 max 3.4972 | rho dev median 0.1230 max 1.0550
+P3: skel_mirror 414 vs skel_2929 501 | inter 327 jacc 0.5561 | L0 mirror all32 True (rho max 0.000000)
+P4 survivor: [([1, 6], 0.6527, 0.6988), ([5, 6], 0.9192, 0.9114), ([7, 19], 0.8983, 0.828), ([8, 2], 0.8093, 0.7478), ([14, 9], 0.9658, 0.9511), ([20, 8], 0.8251, 0.8097), ([21, 6], 0.737, 0.7367)]
+P4 lost: [([1, 4], 0.4559, 0.3429), ([4, 1], 0.1933, 0.405), ([4, 19], 0.7411, 0.6876), ([4, 22], 0.7156, 0.6198), ([6, 19], 0.8652, 0.7254), ([13, 22], 0.3439, 0.0118), ([15, 13], 0.3774, 0.4515), ([17, 28], -0.2511, 0.0454), ([21, 16], -0.0189, 0.4631), ([22, 12], 0.4712, 0.2131), ([24, 9], 0.8103, 0.8709), ([24, 23], 0.3605, -0.0205), ([25, 3], -0.6417, -0.6274), ([26, 5], -0.4661, -0.5019), ([26, 6], 0.7328, 0.6928), ([27, 24], 0.8479, 0.5944), ([28, 1], 0.1686, -0.118)]
+P4 L+: [([24, 23], 0.3605, -0.0205), ([25, 3], -0.6417, -0.6274), ([26, 6], 0.7328, 0.6928), ([27, 24], 0.8479, 0.5944)]
+==== VERDICT: direction_flip_margin_shifts ====

@@ -1,0 +1,21 @@
+execution.json frozen
+a4 mask counts n86=469 nwd=382 shared=295 ok=True
+cells: full grid 1120 (L0 excluded by gate discipline)
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a5 baseline separation 185.6975 (scale 92.2913) ok=True
+a3 all-heads L18 ablation mean|ds| 1.4631 (0.01*scale 0.9229) ok=True
+ablation [200/1120]
+ablation [400/1120]
+ablation [600/1120]
+ablation [800/1120]
+ablation [1000/1120]
+ablation sweep done (1120 cells, CI_rel max 0.0404)
+a6 CI_rel reproduction vs 2932 (648 cells) max abs diff 0.00e+00 ok=True
+P2: LOAD 0.005605 vs DEEP 0.002955 diff 0.002650 p2b 0.0000 | rho(med_l, lin_r) -0.6762 p 9.999e-05
+P3: rho(ci, rho86) 0.0989 p 1.400e-03 | rho(ci, rho_mirror) 0.2326 p 2.000e-04 (n=1120)
+P4: skeleton 0.005771 vs rest 0.004877 | survivor ranks [([1, 6], 26), ([5, 6], 17), ([7, 19], 15), ([8, 2], 23), ([14, 9], 3), ([20, 8], 7), ([21, 6], 20)]
+==== VERDICT: full_atlas_unstructured ====

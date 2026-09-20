@@ -1,0 +1,21 @@
+execution.json frozen
+a2 dirs_word reload 0.00e+00 ok=True
+a5 gap_heads_L34[15] npz -1.6615 vs json -1.6615 diff 3.61e-05 ok=True
+a4 single-token 30/30, list==2964 ok=True
+model loaded
+a1 o_proj shape L34 (2560, 4096) ok=True
+intact [10/30]
+intact [20/30]
+intact [30/30]
+a3 intact B vs 2964 npz rel 0.00e+00 ok=True
+a6 chunk-vs-direct L34 rel 4.14e-16 ok=True
+a8 non-degeneracy C34 std min 5.258e-03 ok=True
+T1 cos(c15,u35) -0.1301 rank |cos| 2/32 | Vt8 [0.0826, -0.081, 0.0248, -0.0743]
+T2 rho(C15,B) -0.7953 perm-p 9.999e-05 pass=True
+ablation sweep [8/32]
+ablation sweep [16/32]
+ablation sweep [24/32]
+ablation sweep [32/32]
+a7 ablation efficacy max|C_abl34,15| 0.00e+00 ok=True
+T3a FL coef -0.9614 p 2.100e-03 abolished=False | R15 +0.1172 rank 1 | mean|dB| 0.2181 vs med 0.0124
+==== VERDICT: h15_shared_carrier_effect_survives ====

@@ -1,0 +1,26 @@
+execution.json frozen
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a5 SVD orthonormality err 2.11e-15 ok=True (sing vals top5 [4.3436, 2.3993, 1.9413, 1.2412, 1.0878])
+a2 baseline determinism rel 0.00e+00 ok=True
+baseline sweep done (6 conds)
+a3 proj_func vs 2935 s_base max abs diff 7.21e-06 ok=True
+a4 proj_null0 vs 2935 s_base max abs diff 6.26e-06 ok=True
+a6 func separation 185.6975 ok=True
+a7 align_dir35 vs 2937 |proj|/fin_norm max diff 0.00e+00 ok=True
+P1 k=1: med func 0.1198 null0 0.1134 | rho null0 0.8607 same 1.0321 | rho_median(null) 0.8339
+P1 k=4: med func 0.1982 null0 0.1968 | rho null0 0.9882 same 1.0577 | rho_median(null) 0.9701
+P1 k=8: med func 0.2466 null0 0.2379 | rho null0 1.0151 same 1.0755 | rho_median(null) 0.9991
+P1 k=16: med func 0.2807 null0 0.2760 | rho null0 0.9908 same 1.0576 | rho_median(null) 0.9839
+P1 k=36: med func 0.4513 null0 0.4443 | rho null0 1.0145 same 1.0136 | rho_median(null) 0.9957
+P1 k=dir35: med func 0.0915 null0 0.0507 | rho null0 0.5349 same 0.5854 | rho_median(null) 0.5091
+P1 rho_k8 0.9991 vs rho_d35 0.5091 (delta +0.4900)
+P2 func-null0 alpha_8 median diff -0.003648 p 6.605e-01
+P3 same: alpha8 ratio L1 0.717 L6 0.641 L12 0.831 L24 0.795 L35 0.768 | dir ratio 0.621 0.322 0.509 0.390 0.664
+P3 null0: alpha8 ratio L1 0.815 L6 0.829 L12 1.011 L24 0.968 L35 0.826 | dir ratio 0.656 0.549 0.993 1.034 0.557
+P3 null1: alpha8 ratio L1 0.811 L6 0.860 L12 1.007 L24 0.964 L35 0.873 | dir ratio 0.632 0.540 0.970 1.067 0.684
+P3 null2: alpha8 ratio L1 0.827 L6 0.855 L12 1.028 L24 0.966 L35 0.861 | dir ratio 0.624 0.514 0.964 1.048 0.721
+P3 null3: alpha8 ratio L1 0.782 L6 0.833 L12 1.026 L24 0.977 L35 0.879 | dir ratio 0.611 0.484 0.958 1.085 0.728
+==== VERDICT: subspace_rotation_retained ====

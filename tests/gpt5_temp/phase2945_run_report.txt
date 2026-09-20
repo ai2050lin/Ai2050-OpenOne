@@ -1,0 +1,23 @@
+execution.json frozen
+sources ok
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a3 Vt8 rebuild vs 2939 max diff 0.00e+00 ok=True
+a7 construction self-check max abs 9.95e-14 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a4 proj_func vs 2935 max abs diff 7.21e-06 ok=True
+a5 proj_null0 vs 2935 max abs diff 6.26e-06 ok=True
+a6 func separation 185.6975 ok=True
+sep null0 77.262 (func 185.698)
+L15 sep: {'0.25': 187.8, '0.50': 176.6, '0.75': 119.9, '1.00': 67.8, '1.25': 41.0, '1.50': 29.6, '2.00': 14.8}
+L15 ratio: {'0.25': 0.026, '0.50': 0.061, '0.75': 0.168, '1.00': 0.578, '1.25': 0.872, '1.50': 0.946, '2.00': 1.215}
+L16 sep: {'0.25': 191.0, '0.50': 195.4, '0.75': 193.2, '1.00': 176.8, '1.25': 156.6, '1.50': 133.3, '2.00': 84.8}
+L16 ratio: {'0.25': 0.049, '0.50': 0.113, '0.75': 0.17, '1.00': 0.207, '1.25': 0.234, '1.50': 0.344, '2.00': 0.508}
+L17 sep: {'0.25': 182.6, '0.50': 146.0, '0.75': 72.4, '1.00': 21.5, '1.25': 1.7, '1.50': -4.0, '2.00': -6.4}
+L17 ratio: {'0.25': 0.043, '0.50': 0.179, '0.75': 0.393, '1.00': 0.439, '1.25': 0.692, '1.50': 1.025, '2.00': 1.5}
+a8 same-session determinism max spread 2.84e-14 ok=True
+T1 {'L15': {'spearman_sep_s': -1.0, 'steepest_drop': 56.8}, 'L16': {'spearman_sep_s': -0.8929, 'steepest_drop': 48.5}, 'L17': {'spearman_sep_s': -1.0, 'steepest_drop': 73.6}} pass=False
+T2 {'L15': {'s_c': 0.8454, 'ratio_c': 0.3244, 'sep_at_s_c': 100.0}, 'L16': {'s_c': 1.8434, 'ratio_c': 0.4568, 'sep_at_s_c': 100.0}, 'L17': {'s_c': 0.6561, 'ratio_c': 0.3127, 'sep_at_s_c': 100.0}} pass=False
+==== VERDICT: threshold_curve_nonmonotone ====

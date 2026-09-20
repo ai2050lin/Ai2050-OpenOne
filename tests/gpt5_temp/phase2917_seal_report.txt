@@ -1,0 +1,56 @@
+execution.json | size=3071 | sha256-8=b548239f
+result.json | size=11399 | sha256-8=1f988c40
+event_atlas.npz | size=585550 | sha256-8=02343146
+script | sha256-8=30e0ccbb | D:\AI2050\Ai2050-OpenOne\tests\glm5\phase2917_event_atlas.py
+execution.created=2026-09-19T10:27:46
+execution.phase=2917
+prereg keys: anchors, known_events, mode, probes, protocol, question, verdict, verdict_v2_note
+prereg.anchors = {'a1': 'B_heads[:,:,26:36] vs 2913 npz max rel < 1e-5', 'a2': '|margin({7,8} on [26,36) block) - 0.28036| < 5e-3'}
+prereg.known_events = [[7, 19], [27, 24], [31, 22], [8, 23], [7, 34], [8, 34]]
+prereg.mode = forward per-head jacobian full-layer scan (36 layers x 32 heads) - (head,layer) event atlas
+prereg.probes = {'P1': 'FDR-significant set, known/satellite/novel classification, n_known_sig/n_novel', 'P2': 'known-event replication table', 'P3': 'atlas summaries (per-layer max, per-head counts, top-20)', 'P4': 'descriptive'}
+prereg.protocol = SEED=2896, eps=1.0, pos 1, 57 words verbatim 2887, conds same/func/null, dirs = 2886 class-diff unit per layer [0,36), o_proj-input capture all 36 layers; event statistic = sign-margin (2910 caliber, sign outer Gram fixed, mask permutation null, 200 SEED=2896 perms); BH-FDR q=0.05 step-up over 1152 
+prereg.question = 2916 candidate A: do the 6 known events survive family-wise BH-FDR over the full 1152-cell atlas, and are there events outside the 2915/2916 windows (novel or satellite)
+prereg.verdict = anchor fail => anchor_fail_all_void; n_known_sig==6 AND n_novel==0 => event_atlas_closed; n_known_sig==6 AND n_novel>0 => event_atlas_extended; n_known_sig>=3 => event_atlas_partially_replicated; else => event_atlas_not_replicated
+prereg.verdict_v2_note = run1 (v1) adjudicated event_atlas_not_replicated under per-event BH-FDR (0/1152 significant) - AUDIT: the v1 criterion has STRUCTURALLY ZERO POWER, a design error of mine: the smallest attainable per-event permutation p is 1/201 = 0.004975 (N_PERM=200), while the BH first threshold is q/m = 0.05/115
+verdict=None
+result top-level keys: P1, P2, P3, P4, anchors, final_verdict, model, phase, prereg, runtime_s
+result.final_verdict = event_atlas_not_replicated
+result.model = qwen3-4b
+result.phase = 2917
+result.runtime_s = 32.3
+npz keys: B_heads, sign_M, p_M, p_maxT, max_perm, dirs, labels_lang, words
+sign_M shape=32x36
+n_sig_recompute=24
+sig events (h,layer) margin p_maxT tag:
+  (7,19) margin=1.34634 p_maxT=0.0050 known
+  (26,6) margin=1.23584 p_maxT=0.0050 novel
+  (8,2) margin=1.12525 p_maxT=0.0050 novel
+  (25,3) margin=1.12278 p_maxT=0.0050 novel
+  (22,12) margin=1.11380 p_maxT=0.0050 novel
+  (24,23) margin=1.01633 p_maxT=0.0050 novel
+  (21,6) margin=0.91948 p_maxT=0.0050 novel
+  (13,22) margin=0.82254 p_maxT=0.0100 novel
+  (5,6) margin=0.81462 p_maxT=0.0100 novel
+  (6,19) margin=0.81057 p_maxT=0.0100 novel
+  (27,24) margin=0.81057 p_maxT=0.0100 known
+  (4,1) margin=0.80581 p_maxT=0.0100 novel
+  (21,16) margin=0.73379 p_maxT=0.0100 novel
+  (4,22) margin=0.72903 p_maxT=0.0100 novel
+  (20,8) margin=0.72604 p_maxT=0.0100 novel
+  (1,6) margin=0.64759 p_maxT=0.0249 novel
+  (4,19) margin=0.64495 p_maxT=0.0249 novel
+  (14,9) margin=0.63896 p_maxT=0.0249 novel
+  (1,4) margin=0.56835 p_maxT=0.0249 novel
+  (15,13) margin=0.56817 p_maxT=0.0249 novel
+  (17,28) margin=0.56817 p_maxT=0.0249 novel
+  (26,5) margin=0.56659 p_maxT=0.0348 novel
+  (28,1) margin=0.56659 p_maxT=0.0348 novel
+  (24,9) margin=0.56571 p_maxT=0.0398 novel
+known 6 detail:
+  (7,19) margin=1.34634 p_maxT=0.0050
+  (27,24) margin=0.81057 p_maxT=0.0100
+  (31,22) margin=0.45609 p_maxT=0.1891
+  (8,23) margin=0.17081 p_maxT=1.0000
+  (7,34) margin=0.18701 p_maxT=1.0000
+  (8,34) margin=0.29734 p_maxT=0.8955

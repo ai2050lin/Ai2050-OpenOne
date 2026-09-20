@@ -1,0 +1,17 @@
+execution.json frozen
+sources ok; 2913 margins top5 [(7, 0.1771), (8, 0.13426), (6, 0.07888), (22, 0.06009), (21, 0.05537)]
+model loaded (load_native full GPU)
+words [10/57] (all variants)
+words [20/57] (all variants)
+words [30/57] (all variants)
+words [40/57] (all variants)
+words [50/57] (all variants)
+a1 max 1.42e-15 | a2 V1 margin -0.02139 (stored -0.01946, 1.0 words) ok=True | a3 spearman 1.000000 rel 2.73e-08 ok=True | m78_V1 0.280360 (2914 ref 0.28036)
+P1 V1: top2 [7, 8] top5 [7, 8, 6, 22, 21] | h7 0.17710 (rank 1) h8 0.13426 (rank 2) | gate True (p95 0.17474) | chan margin -0.02139 acc 0.63158
+P1 V2: top2 [27, 31] top5 [27, 31, 24, 11, 26] | h7 0.12731 (rank 14) h8 0.20459 (rank 8) | gate True (p95 0.21765) | chan margin 0.03671 acc 0.78947
+P1 V3: top2 [8, 7] top5 [8, 7, 6, 22, 26] | h7 0.15076 (rank 2) h8 0.16431 (rank 1) | gate False (p95 0.20731) | chan margin -0.02295 acc 0.63158
+P1 V4: top2 [7, 27] top5 [7, 27, 6, 4, 31] | h7 1.17970 (rank 1) h8 0.21920 (rank 10) | gate True (p95 0.20486) | chan margin 0.16005 acc 0.84211
+P1 V5: top2 [4, 20] top5 [4, 20, 16, 14, 15] | h7 0.01172 (rank 14) h8 -0.01160 (rank 26) | gate False (p95 0.15109) | chan margin 0.00265 acc 0.57895
+P2 spearman vs V1: {'V1': 1.0, 'V2': 0.0257, 'V3': 0.9091, 'V4': 0.0762, 'V5': 0.3039, 's2913': 1.0} | V2-vs-V4 0.8658
+P4: n_top2=2/4 n_top5=2/4 gates={'V1': True, 'V2': True, 'V3': False, 'V4': True, 'V5': False}
+==== VERDICT: head_identity_broadly_stable ====

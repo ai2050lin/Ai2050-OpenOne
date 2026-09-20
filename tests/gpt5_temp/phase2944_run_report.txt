@@ -1,0 +1,25 @@
+execution.json frozen
+sources ok
+model loaded (load_native full GPU)
+pass1 words [20/57]
+pass1 words [40/57]
+a1 dirs_word rebuild diff 2.17e-08 ok=True
+a3 Vt8 rebuild vs 2939 max diff 0.00e+00 ok=True
+a7 construction self-check max abs 9.95e-14 ok=True
+a2 baseline determinism rel 0.00e+00 ok=True
+a4 proj_func vs 2935 max abs diff 7.21e-06 ok=True
+a5 proj_null0 vs 2935 max abs diff 6.26e-06 ok=True
+a6 func separation 185.6975 ok=True
+sep null0 77.262 (func 185.698)
+config L14: sep {'1': 157.45, '2': 92.27, '4': 87.1}
+config L15: sep {'1': 67.77, '2': 14.78, '4': -5.05}
+config L16: sep {'1': 176.77, '2': 84.81, '4': -50.95}
+config L17: sep {'1': 21.46, '2': -6.38, '4': -25.4}
+config L18: sep {'1': 155.55, '2': 24.07, '4': -45.33}
+config multi_split: sep {'1': 193.72, '2': 172.12, '4': 46.62}
+config multi_full: sep {'1': 14.53, '2': -35.32, '4': -67.8}
+a8 same-session determinism max spread 2.84e-14 ok=True
+T1 single sep(s=2) {'L14': 92.27, 'L15': 14.78, 'L16': 84.81, 'L17': -6.38, 'L18': 24.07} | triggered ['L14', 'L15', 'L16', 'L17', 'L18']
+T2 multi_split sep(s=2) 172.12 triggered=False
+D4 L16@2 this session sep 84.81 vs 2942 ref 84.81
+==== VERDICT: switch_localized ====

@@ -1,0 +1,23 @@
+  18| rest).  Captures per forward: v_proj out pos0/pos1, o_proj in
+  31|   a9 GQA gates (v_proj out 1024, o_proj in 4096)
+ 118|             'v_proj pos0/pos1, o_proj in pos1, final-norm '
+ 120|             '(2952 verbatim), sep via final-norm @ u35 '
+ 158| def sha8(path):
+ 166| def unit(v):
+ 170| def log(msg, lines):
+ 175| def skey(li, s):
+ 179| def logistic(s, a_lo, a_hi, k, s_t):
+ 183| def fit_logistic(s_grid, y, s_guess):
+ 210| def main():
+ 257|     ifu35 = conds35.index('func')
+ 311|         layers[0].self_attn.v_proj.weight.shape[0] == 1024
+ 372|                        .register_forward_pre_hook(
+ 375|         handles.append(layers[li].self_attn.v_proj
+ 376|                        .register_forward_hook(hook_v(li)))
+ 378|                        .register_forward_pre_hook(
+ 380|     handles.append(model.model.norm.register_forward_pre_hook(
+ 417|     u35 = dirs_word[NL - 1]
+ 458|     proj_f0 = fin_f1 @ u35
+ 459|     a4_diff = float(np.abs(proj_f0 - s_base_35[ifu35]).max())
+ 503|     proj_n0 = fin_n0 @ u35
+ 556|             P = np.stack(fins) @ u35
