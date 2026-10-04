@@ -51,6 +51,9 @@ FILES = {
     "runs": "runs.json",
     "artifacts": "artifacts.json",
     "corrections": "corrections.json",
+    "artifact_residency": "artifact_residency.json",
+    "industry": "industry.json",
+    "cases": "cases.json",
 }
 
 VALID = {
@@ -80,6 +83,8 @@ VALID = {
     "run_status": {"planned", "ready", "running", "auditing", "adjudicated", "invalid", "censored", "cancelled", "archived"},
     "artifact_status": {"frozen", "verified", "missing", "invalid", "archived"},
     "correction_status": {"active", "superseded", "archived"},
+    "industry_status": {"candidate", "verified", "superseded"},
+    "case_status": {"draft", "candidate", "published", "superseded"},
 }
 
 CONTRACT_TRANSITIONS = {
@@ -306,7 +311,13 @@ def resolve_manifest_artifact(path_text: str) -> Path:
     return WORKSPACE / path_text
 
 
-def verify_manifest_file(path: Path, expected_contract_id: str, errors: list[str]) -> None:
+def verify_manifest_file(
+    path: Path,
+    expected_contract_id: str,
+    errors: list[str],
+    residency_ids: frozenset[str] = frozenset(),
+    waived: list[str] | None = None,
+) -> None:
     try:
         manifest = load_json(path)
     except ValidationError as exc:
@@ -326,6 +337,10 @@ def verify_manifest_file(path: Path, expected_contract_id: str, errors: list[str
         roles.add(role)
         artifact_path = resolve_manifest_artifact(entry.get("path", ""))
         if not artifact_path.is_file():
+            if expected_contract_id in residency_ids:
+                if waived is not None:
+                    waived.append(f"manifest {path.name} 文件已登记离场: {entry.get('path')}")
+                continue
             errors.append(f"manifest {path.name} 文件不存在: {entry.get('path')}")
             continue
         if artifact_path.stat().st_size != entry.get("size_bytes"):
@@ -336,7 +351,7 @@ def verify_manifest_file(path: Path, expected_contract_id: str, errors: list[str
         errors.append(f"manifest {path.name} 必须包含 contract 和 schema")
 
 
-def validate(data: dict[str, Any]) -> list[str]:
+def validate(data: dict[str, Any], waived: list[str] | None = None) -> list[str]:
     errors: list[str] = []
     project = data["project"]
     framework = data["framework"]
@@ -362,6 +377,18 @@ def validate(data: dict[str, Any]) -> list[str]:
     run_map = unique_map(data["runs"], "id", "runs.json", errors)
     artifact_map = unique_map(data["artifacts"], "id", "artifacts.json", errors)
     correction_map = unique_map(data["corrections"], "id", "corrections.json", errors)
+    industry_map = unique_map(data["industry"], "id", "industry.json", errors)
+    cases_map = unique_map(data["cases"], "id", "cases.json", errors)
+    for iid, item in industry_map.items():
+        require_fields(item, ["kind", "status", "title"], f"industry {iid}", errors)
+        if item.get("status") not in VALID["industry_status"]:
+            errors.append(f"industry {iid} status 非法")
+    for cid, item in cases_map.items():
+        require_fields(item, ["kind", "status", "title", "phase_ref", "evidence_level", "narrative"], f"case {cid}", errors)
+        if item.get("status") not in VALID["case_status"]:
+            errors.append(f"case {cid} status 非法")
+        if item.get("evidence_level") not in {"has_data", "observed", "generalization_checked", "mechanism_evidence"}:
+            errors.append(f"case {cid} evidence_level 非法")
 
     campaign_ids, hypothesis_ids = set(cmap), set(hmap)
     puzzle_ids, test_ids, evidence_ids = set(pmap), set(tmap), set(emap)
@@ -534,6 +561,17 @@ def validate(data: dict[str, Any]) -> list[str]:
         check_refs(record.get("hypothesis_ids", []), hypothesis_ids, f"evidence {eid}.hypothesis_ids", errors)
         check_refs(record.get("source_record_ids", []), phase_record_ids, f"evidence {eid}.source_record_ids", errors)
 
+    residency_ids = frozenset(
+        cid
+        for record in data.get("artifact_residency", [])
+        if record.get("status") == "active"
+        for cid in record.get("contract_ids", [])
+    )
+    for res_index, record in enumerate(data.get("artifact_residency", [])):
+        require_fields(record, ["id", "date", "status", "scope", "contract_ids", "disposition", "reason"], f"artifact_residency[{res_index}]", errors)
+        if record.get("status") not in VALID["correction_status"]:
+            errors.append(f"artifact_residency[{res_index}] 状态非法: {record.get('status')}")
+        check_refs(record.get("contract_ids", []), set(contract_map), f"artifact_residency[{res_index}].contract_ids", errors)
     schema_path = SCHEMAS / "experiment_contract.schema.json"
     contract_schema = load_json(schema_path) if schema_path.is_file() else None
     if contract_schema is None:
@@ -580,7 +618,7 @@ def validate(data: dict[str, Any]) -> list[str]:
             if not manifest_path.is_file():
                 errors.append(f"contract {contract_id} manifest 不存在")
             else:
-                verify_manifest_file(manifest_path, contract_id, errors)
+                verify_manifest_file(manifest_path, contract_id, errors, residency_ids, waived)
         stage = work_packages.get((index.get("campaign_id"), index.get("work_package_id")), {})
         contract_budget = contract.get("budget", {}).get("max_gpu_hours")
         if isinstance(contract_budget, (int, float)) and contract_budget > stage.get("gpu_hour_budget", -1):
@@ -967,12 +1005,15 @@ def rendered_files(data: dict[str, Any]) -> dict[str, str]:
 
 
 def command_validate(data: dict[str, Any]) -> int:
-    errors = validate(data)
+    waived: list[str] = []
+    errors = validate(data, waived)
     if errors:
         print(f"校验失败：{len(errors)} 项", file=sys.stderr)
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
+    if waived:
+        print(f"已登记离场工件（跳过存在性校验）：{len(waived)} 项")
     counts = {name: len(data[name]) for name in FILES if name != "project"}
     print("校验通过：" + ", ".join(f"{name}={count}" for name, count in counts.items()))
     return 0
@@ -1175,6 +1216,108 @@ def command_export_client() -> int:
     return 0
 
 
+def build_snapshot_v2(data: dict[str, Any]) -> dict[str, Any]:
+    snapshot = build_snapshot(data)
+    snapshot["schema_version"] = "snapshot.v2"
+    specs_doc = load_json(REGISTRY / "visualization_specs.json")
+    snapshot["views"] = {
+        "as_of": snapshot["as_of"],
+        "items": [
+            {
+                "view_id": f"VIEW-{spec['id']}",
+                "spec_id": spec["id"],
+                "title": spec["id"],
+                "data_ref": "registry/visualization_specs.json",
+                "evidence_level": "has_data",
+                "caveats": ["registry 规格投影；证据卡与 run_ref 待补"],
+            }
+            for spec in specs_doc.get("specs", [])
+        ],
+    }
+    industry_records = data["industry"]
+    snapshot["industry"] = {
+        "as_of": snapshot["as_of"],
+        "source_ref": "ai2050_research_os/registry/industry.json",
+        "methods": [
+            {
+                "method_id": item["id"],
+                "name": item.get("name", item["title"]),
+                "era": item.get("era", ""),
+                "core_idea": item.get("core_idea", ""),
+                "evidence_grade": item["evidence_grade"],
+            }
+            for item in industry_records if item.get("kind") == "method"
+        ],
+        "tools": [
+            {
+                "tool_id": item["id"],
+                "name": item.get("name", item["title"]),
+                "org": item.get("org", ""),
+                "role": item["role"],
+                "relation_to_project": item["relation_to_project"],
+            }
+            for item in industry_records if item.get("kind") == "tool"
+        ],
+        "gaps": [
+            {
+                "gap_id": item["id"],
+                "title": item["title"],
+                "nearest_industry_work": item["nearest_industry_work"],
+                "missing": item["missing"],
+                "atlas_axis": item["atlas_axis"],
+                "candidate_queue_ref": item.get("candidate_queue_ref") or "",
+                "priority": item["priority"],
+            }
+            for item in industry_records if item.get("kind") == "gap"
+        ],
+    }
+    snapshot["cases"] = {
+        "as_of": snapshot["as_of"],
+        "items": [
+            {
+                "case_id": item["id"],
+                "title": item["title"],
+                "phase_ref": item["phase_ref"],
+                "run_ref": item.get("run_ref", ""),
+                "view_refs": item.get("view_refs", []),
+                "evidence_level": item["evidence_level"],
+                "question": item.get("question", ""),
+                "narrative": item["narrative"],
+                "limitations": item.get("limitations", []),
+                "x-explanation-identity": True,
+            }
+            for item in data["cases"]
+        ],
+    }
+    return snapshot
+
+
+def command_build_snapshot_v2(data: dict[str, Any]) -> int:
+    snapshot = build_snapshot_v2(data)
+    path = SNAPSHOTS / "draft" / "snapshot_v2.json"
+    write_json(path, snapshot)
+    print(f"Snapshot v2 草案已构建: {path.relative_to(WORKSPACE)} ({snapshot['snapshot_id']})")
+    return 0
+
+
+def command_validate_snapshot_v2() -> int:
+    path = SNAPSHOTS / "draft" / "snapshot_v2.json"
+    if not path.is_file():
+        print(f"snapshot v2 草案不存在: {path}", file=sys.stderr)
+        return 1
+    snapshot = load_json(path)
+    errors: list[str] = []
+    validate_schema(snapshot, load_json(SCHEMAS / "snapshot.v2.schema.json"), "snapshot_v2", errors)
+    if snapshot != build_snapshot_v2(load_all()):
+        errors.append("snapshot v2 草案与当前 Registry/草案源的确定性重建结果不一致")
+    if errors:
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+    print(f"Snapshot v2 草案校验通过: {path.relative_to(WORKSPACE)}")
+    return 0
+
+
 def client_drift_findings() -> list[str]:
     frontend_src = WORKSPACE / "frontend" / "src"
     forbidden = {
@@ -1223,6 +1366,8 @@ def parse_args() -> argparse.Namespace:
     sub.add_parser("validate-snapshot", help="校验 Snapshot Schema 与 Registry 漂移")
     sub.add_parser("export-client", help="将已校验 Snapshot 导出到客户端")
     sub.add_parser("drift-audit", help="扫描客户端当前研究状态的平行事实源")
+    sub.add_parser("build-snapshot-v2", help="构建 Snapshot v2 草案投影（views/industry/cases）")
+    sub.add_parser("validate-snapshot-v2", help="校验 Snapshot v2 草案 Schema 与确定性")
     return parser.parse_args()
 
 
@@ -1251,6 +1396,10 @@ def main() -> int:
         return command_export_client()
     if args.command == "drift-audit":
         return command_drift_audit()
+    if args.command == "build-snapshot-v2":
+        return command_build_snapshot_v2(data)
+    if args.command == "validate-snapshot-v2":
+        return command_validate_snapshot_v2()
     return 2
 
 

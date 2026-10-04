@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai2050.local/schemas/snapshot.v2.schema.json",
+  "title": "AI2050 Canonical Research Snapshot v2 (DRAFT)",
+  "$comment": "DRAFT-PENDING-REVIEW 2026-10-03: 未接入 researchctl validate-snapshot，不构成事实源。v2 在 v1 必填字段之上新增 views / industry / cases 三个可选顶层命名空间，用于（1）把 registry/visualization_specs.json 的视图规格与证据卡绑定，（2）承载行业进展模块（领域方法图谱、工具链、空白雷达）的投影，（3）承载由封存 Phase 派生的教学案例。三者均为 Registry/草案源的只读投影，客户端不得反向覆盖。字段含义与治理约束见 README 对应日期节。",
+  "x-draft-status": "draft-pending-review",
+  "x-draft-date": "2026-10-03",
+  "type": "object",
+  "required": ["schema_version", "snapshot_id", "as_of", "source_sha256", "project", "framework", "current", "counts", "information_architecture", "summaries", "provenance"],
+  "properties": {
+    "schema_version": {"enum": ["snapshot.v1", "snapshot.v2"]},
+    "snapshot_id": {"type": "string", "pattern": "^SNAPSHOT-"},
+    "as_of": {"type": "string", "minLength": 10},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "project": {"type": "object"},
+    "framework": {"type": "object"},
+    "current": {"type": "object"},
+    "counts": {"type": "object"},
+    "information_architecture": {"type": "object"},
+    "summaries": {"type": "object"},
+    "provenance": {"type": "object"},
+
+    "views": {
+      "type": "object",
+      "required": ["as_of", "items"],
+      "properties": {
+        "as_of": {"type": "string"},
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["view_id", "spec_id", "title", "data_ref", "evidence_level"],
+            "properties": {
+              "view_id": {"type": "string", "pattern": "^VIEW-"},
+              "spec_id": {
+                "type": "string",
+                "description": "必须引用 registry/visualization_specs.json 已登记的 spec id，如 full_coordinate_field"
+              },
+              "title": {"type": "string"},
+              "data_ref": {
+                "type": "string",
+                "description": "数据来源引用（registry 记录 ID 或 Run 产物相对路径），客户端据此提供回查入口"
+              },
+              "run_ref": {"type": "string"},
+              "phase_ref": {"type": "string"},
+              "evidence_level": {
+                "enum": ["has_data", "observed", "generalization_checked", "mechanism_evidence"],
+                "description": "四级证据标尺：有数据/已有观察/通过推广检查/有机制证据"
+              },
+              "caveats": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "降维、聚合、抽样等必须在此声明；不得把布局距离当作真实几何"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "industry": {
+      "type": "object",
+      "required": ["as_of", "methods", "tools", "gaps"],
+      "properties": {
+        "as_of": {"type": "string"},
+        "source_ref": {
+          "type": "string",
+          "description": "指向行业命名空间事实源（草案期指向 drafts/industry/，正式化后指向 registry 的行业命名空间）"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["method_id", "name", "era", "evidence_grade"],
+            "properties": {
+              "method_id": {"type": "string"},
+              "name": {"type": "string"},
+              "era": {"type": "string"},
+              "core_idea": {"type": "string"},
+              "key_works": {"type": "array", "items": {"type": "string"}},
+              "established": {"type": "string", "description": "该方法确立了什么"},
+              "limits": {"type": "array", "items": {"type": "string"}},
+              "successors": {"type": "array", "items": {"type": "string"}},
+              "evidence_grade": {
+                "enum": ["has_data", "observed", "generalization_checked", "mechanism_evidence"],
+                "description": "用本项目四级标尺度量行业声明，不是行业自评"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["tool_id", "name", "role"],
+            "properties": {
+              "tool_id": {"type": "string"},
+              "name": {"type": "string"},
+              "org": {"type": "string"},
+              "role": {"type": "string"},
+              "models_note": {"type": "string"},
+              "relation_to_project": {
+                "enum": ["reusable", "contrast", "reference", "in_house"],
+                "description": "可复用/对照/借鉴/已自有"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["gap_id", "title", "nearest_industry_work", "missing", "atlas_axis", "priority"],
+            "properties": {
+              "gap_id": {"type": "string", "pattern": "^GAP-"},
+              "title": {"type": "string"},
+              "nearest_industry_work": {"type": "string"},
+              "missing": {"type": "string"},
+              "atlas_axis": {
+                "enum": ["language_atlas", "response_atlas", "mapping_mechanism", "evidence_discipline"]
+              },
+              "candidate_queue_ref": {"type": "string", "description": "可指向研究队列条目（如 Q0x）"},
+              "priority": {"enum": ["high", "medium", "low"]}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "cases": {
+      "type": "object",
+      "required": ["as_of", "items"],
+      "properties": {
+        "as_of": {"type": "string"},
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["case_id", "title", "phase_ref", "evidence_level", "narrative"],
+            "properties": {
+              "case_id": {"type": "string", "pattern": "^CASE-"},
+              "title": {"type": "string"},
+              "phase_ref": {"type": "string"},
+              "run_ref": {"type": "string"},
+              "view_refs": {"type": "array", "items": {"type": "string"}},
+              "evidence_level": {
+                "enum": ["has_data", "observed", "generalization_checked", "mechanism_evidence"]
+              },
+              "question": {"type": "string"},
+              "narrative": {"type": "string", "description": "问题→假设→实验→结果的引导式叙述"},
+              "limitations": {"type": "array", "items": {"type": "string"}},
+              "x-explanation-identity": {
+                "const": true,
+                "description": "教学案例属于解释身份，不是事实身份；必须挂证据等级并保留对 Registry 的引用"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

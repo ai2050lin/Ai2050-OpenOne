@@ -1,0 +1,74 @@
+{
+  "schema": "q06_prereg_design_v1",
+  "phase": "Q06",
+  "title": "C_steer 基座测量（v1 承重轴 + 端口替换）",
+  "queue_ref": "research/deepseek/atlas/phase_queue_v1.json#Q06",
+  "frozen_at": "2026-10-03 22:36",
+  "frozen_note": "预注册于任何 Q06 观测（含 SMOKE）之前；本文件冻结后，修订须 bump 版本并登记理由，观测开始后不得更改。",
+  "kpi": {
+    "metric": "C_steer",
+    "definition": "对 held-out 目标组合，用抽取出的机制构造干预后行为被正确改变、且无附带损伤的样本比例（metric_dict v4 逐字）",
+    "formula": "C_steer = #{ (i,c) : behaviour_after_intervention = target AND collateral(i,c) = 0 } / N_heldout",
+    "metric_dict_content_sha8": "0652c008",
+    "gate": "本 Phase 不设通过门（metric_dict.gate = 待 Q20 预注册）；低分即诚实总成绩，不得事后改判"
+  },
+  "operator": {
+    "name": "readout-substitution（端口替换 / 读出替换）",
+    "definition": "替换 (层,方向) 的读出口，而非从残差流中减去方向",
+    "forbidden": "方向去除类操作（MEMO：cancel 反向加重 0.820 —— 减法在本系统非法；I9 明令对承重轴类对象改用读出替换）",
+    "basis": "MEMO『跳出差分搬运的可执行替代 = 端口替换』+ a_gate I9 干预干净性标准"
+  },
+  "load_bearing_axis": {
+    "object": "承重轴 v1 = L29 WR 主 PC（MEMO M14）",
+    "model": "qwen3-4b",
+    "prior_dose_curve": "R 线 3146-3150：alpha 0.05/0.10/0.15/0.25/0.5 → 0.070/0.078/0.133/0.297/0.664，无无害阈值（M14/R7）"
+  },
+  "doses": {
+    "alpha": [
+      0.05,
+      0.1,
+      0.15,
+      0.25,
+      0.5
+    ],
+    "rule": "五点半调（与 M14 剂量网格一致）；如增删端点必须在 execution annex 预注册"
+  },
+  "controls": {
+    "harmlessness": [
+      "随机方向同幅值对照",
+      "identity 恢复对照"
+    ],
+    "dirty_gate": "I9：任何干预必配无害性对照并设 dirty gate；dirty 判据在 execution annex 预注册"
+  },
+  "panel": {
+    "rule": "与 E_read 同一 held-out 面板族；指纹断言机制与 Q04/Q05 相同（panel_sha8）",
+    "collateral_probes": 13,
+    "collateral_floor_proxy": "3.5/13（无干预基线；metric_dict.proxy_evidence，源自 LOOP_DIAGNOSIS_AND_EXIT_v1.md）",
+    "forbidden": "held-out 泄漏 / 选易子面板（metric_dict.kpi_registration_rule.anti_gaming）"
+  },
+  "collateral_definition_v1": "collateral(i,c) = 干预后 13 个无关探针的错误数 - 同 cell 无干预基线错误数；>0 记为该 cell 附带损伤（v1 操作化定义，冻结；修订须 bump 本文件版本并登记理由）",
+  "models_precision": {
+    "primary": "qwen3-4b bf16（精度净臂，与 E_read 采集同精度）",
+    "optional_arms": "qwen3-14b / glm4-9b 仅在追加同款 D4 精度桥预注册（门 max|Δrel| <= 0.05）后可比",
+    "execution": "GPU 串行逐模型；显存守卫沿用 R11 精度策略（4b bf16 / 大模型 NF4）"
+  },
+  "reporting": {
+    "must_report": [
+      "E_read",
+      "E_ar(k)",
+      "C_steer"
+    ],
+    "rule": "I1：本 Phase 未降低任一全局 KPI ⇒ Ledger 登记 catalog，不得登记 advance",
+    "verdicts": "报告 steered 成功率与附带损伤分布；verdict 语法沿用既有惯例"
+  },
+  "anti_gaming": "§4 可识别性门 + §3 单模型否决权捆绑使用；MDE 由 gate_precheck 计算，一律报告 margin vs MDE",
+  "smoke": "SMOKE 先行：小子面板验证成功率可计算、collateral 可计算、双对照臂可运行；SMOKE 数字必看，不过门不得开全面板",
+  "execution_annex_rule": "execution annex（面板 cell 清单、行为读数实现、dirty 判据、seed）必须在任何 Q06 观测（含 SMOKE）之前冻结；annex 的 execution.json design_sha 必须与本文件 design_sha8 一致（drift 断言自动执行）。执行前必须加载技能 rdc-main-axis-probe（63 坑）与 rdc-phase-closeout。",
+  "queue_links": {
+    "gap_ref": "GAP-1（条件化响应动力学）候选队列 = Q06",
+    "reuses_device": [
+      "Q17（高秩散布因果地位）",
+      "Q24（承重轴剂量曲线机制解释）"
+    ]
+  }
+}

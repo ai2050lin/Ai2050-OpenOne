@@ -1,0 +1,142 @@
+{
+  "_meta": {
+    "status": "draft-pending-review",
+    "date": "2026-10-03",
+    "note": "领域方法图谱首批草案（D1）。非事实源、未接入 Registry 校验。evidence_grade 是用本项目四级标尺对行业声明的度量，不是行业自评。来源为公开论文与工具文档的桌面检索，正式化前需逐条核对原文。",
+    "counts": {"methods": 12}
+  },
+  "methods": [
+    {
+      "method_id": "M-probing",
+      "name": "线性探针 probing",
+      "era": "2018-",
+      "core_idea": "在冻结表示上训练线性分类器，检验某信息是否可解码。",
+      "key_works": ["Conneau et al. 2018", "Tenney et al. 2019 (BERT rediscovers NLP pipeline)"],
+      "established": "表示中广泛存在可解码信息；任务信息随层加深逐步可用。",
+      "limits": ["可解码不等于被模型使用（control tasks 批评，Hewitt & Liang 2019）", "探针准确率对正则与容量敏感"],
+      "successors": ["M-tuned-lens", "M-patching"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-logit-lens",
+      "name": "logit lens / tuned lens",
+      "era": "2020-2023",
+      "core_idea": "把中间隐状态直接过最终 unembedding（lens）观察预测演化；tuned lens 加可训练仿射校正。",
+      "key_works": ["nostalgebraist 2020 (logit lens)", "Belrose et al. 2023 (tuned lens)"],
+      "established": "中间层已含部分输出信息；逐层预测可作演化观察工具。",
+      "limits": ["跨层读出假设 final unembedding 可逆适用，不总是成立", "只读不解释因果"],
+      "successors": ["M-patching"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-knowledge-edit",
+      "name": "知识定位与编辑（knowledge neurons / ROME / causal tracing）",
+      "era": "2021-2023",
+      "core_idea": "定位并编辑事实性知识的存储位置，用反事实 Trace 定位关键激活。",
+      "key_works": ["Dai et al. 2022 (knowledge neurons)", "Meng et al. 2022 (ROME, causal tracing)"],
+      "established": "部分事实可在中层 MLP 定位并定向编辑； causal tracing 成为标准工具。",
+      "limits": ["后续工作对定位充分性提出系统性质疑（Hase et al. 2023：编辑成功不依赖定位准确）", "成功编辑不证明唯一性或机制完整性"],
+      "successors": ["M-patching", "M-acdc"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-patching",
+      "name": "激活补丁 / 因果干预（activation patching）",
+      "era": "2022-",
+      "core_idea": "在两组输入间交换指定激活，观察输出是否切换，建立因果责任。",
+      "key_works": ["Meng et al. 2022", "Wang et al. 2023 (IOI)"],
+      "established": "把相关性升级为局部因果证据；成为电路分析的主力干预手段。",
+      "limits": ["扫描式使用会混淆发现与确认（本项目纪律第 3.2 节同款问题）", "单点干预成功不能证明完备性（冗余通路）"],
+      "successors": ["M-acdc", "M-attribution-graphs"],
+      "evidence_grade": "generalization_checked"
+    },
+    {
+      "method_id": "M-ioi",
+      "name": "IOI 电路与完备性讨论",
+      "era": "2022-2023",
+      "core_idea": "在 GPT-2 small 上端到端拆解 induction/IOI 等小型算法任务电路。",
+      "key_works": ["Wang et al. 2023 (IOI circuit)", "backup name movers 后续工作"],
+      "established": "小模型小任务上可得到可检验的完整电路假说；暴露冗余/备份通路现象。",
+      "limits": ["任务规模极小，推广到自然任务与生产模型存疑", "完备性证明依赖穷举搜索，成本高"],
+      "successors": ["M-acdc", "M-attribution-graphs"],
+      "evidence_grade": "generalization_checked"
+    },
+    {
+      "method_id": "M-acdc",
+      "name": "自动化电路发现 ACDC",
+      "era": "2023",
+      "core_idea": "按子图同质性自动搜索电路，替代手工枚举。",
+      "key_works": ["Conmy et al. 2023 (ACDC)"],
+      "established": "电路发现可半自动化；为规模化电路研究提供流程。",
+      "limits": ["对阈值与候选子图初始化敏感", "成本随图规模上升"],
+      "successors": ["M-attribution-graphs"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-sae",
+      "name": "稀疏自编码器 SAE 特征字典",
+      "era": "2023-2024",
+      "core_idea": "在激活上训练过完备稀疏字典，把多义神经元展开为（近）单义特征。",
+      "key_works": ["Bricken et al. 2023 / Templeton et al. 2024 (Anthropic, Claude 3 Sonnet 34M 特征)", "OpenAI GPT-4 16M 特征 (2024)", "Gemma Scope (2024)"],
+      "established": "生产模型上得到百万级特征字典与特征级 steering 演示（Golden Gate）；superposition 假说获得系统性工程证据。",
+      "limits": ["重建误差未解释部分如何解读不明确（attribution 图 error node 问题）", "特征是字典模型的产物，忠实性存疑", "AxBench：steering 上简单基线可胜过 SAE", "SAEBench：常用代理指标不追踪下游有用性", "特征分裂（feature splitting）使字典不可比"],
+      "successors": ["M-crosscoders", "M-attribution-graphs"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-crosscoders",
+      "name": "跨层/跨模型 crosscoder",
+      "era": "2024-2025",
+      "core_idea": "对齐跨层或跨模型激活的共享字典，提取跨层特征与模型差异特征。",
+      "key_works": ["Lindsey et al. 2024 (sparse crosscoders)"],
+      "established": "跨层联合特征空间可训练；模型间差异可部分归因到共享特征坐标系。",
+      "limits": ["训练成本高；跨架构坐标系仍不可直接对齐"],
+      "successors": ["M-attribution-graphs"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-attribution-graphs",
+      "name": "归因图 / 电路追踪（cross-layer transcoders）",
+      "era": "2025-",
+      "core_idea": "用跨层 transcoder 构建替换模型，对单条 prompt 生成特征级归因图，端到端追踪计算路径。",
+      "key_works": ["Anthropic 2025：《Circuit Tracing: Revealing Computational Graphs in Language Models》与《On the Biology of a Large Language Model》（Claude 3.5 Haiku）", "circuit-tracer 开源（支持 Gemma/Llama 等）", "Neuronpedia 交互前端"],
+      "established": "生产模型上给出特征级端到端计算图；多步规划、跨语言电路等行为获得内部证据；行业进入'可开源复现'阶段。",
+      "limits": ["每条 prompt 单独成图，规模扩展困难", "替换模型忠实性未闭合（error node 占比可观）", "图的完备性无系统检验", "发现与确认在同一材料上进行的循环未被制度化分离"],
+      "successors": ["M-direction-methods"],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-direction-methods",
+      "name": "免词典方向法（persona vectors / emotion vectors / concept injection）",
+      "era": "2025-2026",
+      "core_idea": "绕过高维字典，直接隔离单一激活方向（人格、情绪、概念注入）做监测与干预。",
+      "key_works": ["persona vectors (Anthropic 2025)", "emotion vectors 系列", "concept-injection introspection probes"],
+      "established": "特定行为属性可用低维方向监测与引导，成本远低于 SAE 训练。",
+      "limits": ["单方向假设对复杂条件化行为可能失效", "方向间干涉与组合未系统刻画"],
+      "successors": [],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-evals",
+      "name": "方法评估基准（SAEBench / AxBench）",
+      "era": "2025",
+      "core_idea": "对可解释方法本身建立下游有用性基准（steering、检索、解码等）。",
+      "key_works": ["Karvonen et al. 2025 (SAEBench)", "Wu et al. 2025 (AxBench)"],
+      "established": "发现代理指标与下游有用性脱钩；推动方法评价从'看起来可解释'转向'有用且忠实'。",
+      "limits": ["基准任务覆盖窄；对条件化响应类方法尚无对应基准"],
+      "successors": [],
+      "evidence_grade": "observed"
+    },
+    {
+      "method_id": "M-cross-domain",
+      "name": "跨域迁移（EEG / ASR / 蛋白质模型）",
+      "era": "2026",
+      "core_idea": "把 SAE / 跨层 transcoder 配方迁移到语言之外的 transformer（脑电、语音识别、蛋白质模型 ESM2）。",
+      "key_works": ["Lehn-Schiøler et al. 2026 (EEG)", "Pluth et al. 2026 (Whisper ASR)", "Tsui et al. 2026 (ESM2 protein circuit tracing)"],
+      "established": "方法配方具备跨架构/跨模态可移植性的初步证据。",
+      "limits": ["各域特征学（ontology）需重建；纠缠失败模式在各域重现"],
+      "successors": [],
+      "evidence_grade": "observed"
+    }
+  ]
+}

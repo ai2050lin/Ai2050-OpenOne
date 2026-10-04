@@ -1,0 +1,47 @@
+{
+ "query": "Q03",
+ "title": "E_read 统一基线复算",
+ "mode": "recompute-only (no new model observation)",
+ "method": {
+  "predictor": "B4 = ridge_primal(one-hot[entity] + one-hot[class] + one-hot[template] + bias)",
+  "lam": 0.001,
+  "feature_cols": 51,
+  "readout_layer": "per-model, from phase3152 result.json k1_model_report.readout",
+  "normalization": "Dk = mean train-row variance (NOT hidden dim) => E_read = normalized MSE",
+  "split": "S1 s7 test fold; frac 0.2 -> 49 test pairs x 3 templates = 147 test rows",
+  "seeds": [
+   7,
+   8,
+   9
+  ],
+  "aggregation": "mean over 147 test rows; then mean over 3 seeds",
+  "gate": {
+   "threshold": 0.05,
+   "sense": "error <= 0.05 pass",
+   "name": "5% gate"
+  },
+  "bootstrap": {
+   "kind": "percentile",
+   "unit": "row-level within each seed",
+   "n_boot": 10000,
+   "rng_seed": 20261003
+  }
+ },
+ "carriers": {
+  "qwen3-4b": {
+   "npz": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\rdc_query_construction_20260913\\phase3152\\g1p2_tri_model_k1\\qwen3-4b\\collect.npz",
+   "npz_sha8_expected": "4ef190b7"
+  },
+  "qwen3-14b": {
+   "npz": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\rdc_query_construction_20260913\\phase3152\\g1p2_tri_model_k1\\qwen3-14b\\collect.npz",
+   "npz_sha8_expected": "733182c1"
+  },
+  "glm4-9b": {
+   "npz": "D:\\AI2050\\Ai2050-OpenOne\\tests\\glm5\\result\\rdc_query_construction_20260913\\phase3151\\g1p1_combo_additive_vs_interaction\\collect.npz",
+   "npz_sha8_expected": "c711946c"
+  }
+ },
+ "frozen_before": "any (re)observation",
+ "created": "2026-10-03 07:19:57",
+ "design_sha": "9a26f72fe08e872d3d07b084feb6d28517e6d351bbb0a2ba84b6eb04c2d78b22"
+}

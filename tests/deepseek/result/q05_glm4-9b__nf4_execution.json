@@ -1,0 +1,128 @@
+{
+ "query": "Q05",
+ "title": "E_ar(k) 正式测量",
+ "mode": "full-measure",
+ "model": "glm4-9b",
+ "prec": "nf4",
+ "mdir": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\glm4-9b-chat-hf",
+ "smoke": false,
+ "arm": "glm4-9b__nf4",
+ "panel": {
+  "classes": [
+   "水果",
+   "动物",
+   "交通工具",
+   "家具",
+   "金属",
+   "颜色"
+  ],
+  "ents": [
+   "苹果",
+   "香蕉",
+   "梨",
+   "西瓜",
+   "葡萄",
+   "草莓",
+   "芒果",
+   "柠檬",
+   "狗",
+   "猫",
+   "老虎",
+   "大象",
+   "兔子",
+   "猴子",
+   "马",
+   "牛",
+   "汽车",
+   "火车",
+   "飞机",
+   "摩托车",
+   "卡车",
+   "地铁",
+   "桌子",
+   "椅子",
+   "床",
+   "沙发",
+   "地毯",
+   "窗帘",
+   "铁",
+   "铜",
+   "铝",
+   "金",
+   "银",
+   "锌",
+   "铅",
+   "红",
+   "蓝",
+   "绿",
+   "黄",
+   "黑",
+   "白"
+  ],
+  "tpl": {
+   "0": "{e}是一种{c}。",
+   "1": "{e}属于{c}这一类。",
+   "2": "{e}，一种常见的{c}。"
+  },
+  "tpl_p0": {
+   "0": "{e}是一种",
+   "1": "{e}属于",
+   "2": "{e}，一种常见的"
+  },
+  "n_entities": 41,
+  "n_classes": 6,
+  "n_pairs": 246,
+  "n_tpl": 3,
+  "rows_full": 738,
+  "rows_active": 738,
+  "pairs_active": 246,
+  "seeds_s1": [
+   7,
+   8,
+   9
+  ],
+  "frac_s1": 0.2,
+  "heldout_rows_per_seed": 147,
+  "panel_sha8": "be17ef8a",
+  "q04_panel_sha8": "be17ef8a",
+  "engine_note": "Q04 采集器逐字复制；面板指纹断言对齐 Q04"
+ },
+ "device": {
+  "k_range": "0..K (k=0 为确定性锚)",
+  "K": 16,
+  "roll": "greedy self-rollout: ctx0 = P0 token ids; 每步读 last-position 6 类 logit; k<K 时 apped argmax(logits_last) 回喂",
+  "margin": "logit(t_target) - logit(t_competitor); t_target = 该类首 token; t_competitor = k=0 处 logit 最高的非该类类首 token（每 cell 冻结）",
+  "predictor": "B4 additive: ridge_primal(one-hot[entity]+one-hot[class]+one-hot[template]+bias)",
+  "lam": 0.001,
+  "feature_cols": 51,
+  "target_units": "logit（原始 L1，不归一化）",
+  "normalization": "none (frozen formula is raw L1); secondary relative scale reported only",
+  "seeds": [
+   7,
+   8,
+   9
+  ],
+  "aggregation": "per seed: mean over held-out rows; then mean over 3 seeds",
+  "maxctx": 64
+ },
+ "precision": {
+  "policy": "4-bit NF4（bnb_4bit_quant_type=nf4, double_quant=True, compute_dtype=bf16）；14B/9B 因 16 GB 显存无法 bf16 常驻而采用——与 E_read 的 bf16 存在量化差",
+  "prec": "nf4",
+  "declare": "nf4 引入与 E_read bf16 的量化差；由 D4 精度桥约束其可用性"
+ },
+ "gates": {
+  "D0": "collector equivalence: SMOKE+bf16+qwen3-4b 时逐位复现 Q04 SMOKE 的 E_ar(k)",
+  "D1": "k=0 determinism: two passes bit-identical on 6-class logits",
+  "D2": "non-degeneracy: std(margin_true over held-out cells) > 0",
+  "D3": "liveness: all E_ar(k) finite",
+  "S1": {
+   "rule": "max_{k>=1} E_ar(k) >= MARGIN_FLOOR",
+   "thr": 0.05,
+   "sense": ">= pass",
+   "note": "装置灵敏度门（Q04 观测后判定其不具科学否证力，保留不动）"
+  }
+ },
+ "frozen_before": "any Q05 model observation",
+ "mdir_config_sha8": "8ec64bc0",
+ "design_sha": "1c2cd13f7e24e7c02950d768823248d1574f948fb0d2f5a6512595f06a760480"
+}

@@ -1,0 +1,184 @@
+{
+ "schema": "rdc_seal_request/v1",
+ "generated_by": "tests/deepseek/_review/gen_seal_request_r5.py",
+ "generated_at": "2026-10-03 01:51",
+ "scope": "A 闸门（Q01/Q02/Q08/Q09/Q12）",
+ "read_only": true,
+ "note": "本件只汇总待 seal 事项，不代为改判、不改动任何既有判定。",
+ "gate_status": {
+  "done_zero_gpu": [
+   "Q01",
+   "Q02",
+   "Q09",
+   "Q12"
+  ],
+  "awaiting_seal": [
+   "Q08",
+   "C1-C6",
+   "I1",
+   "I9"
+  ],
+  "needs_gpu": [
+   "Q03",
+   "Q04",
+   "Q05",
+   "Q06",
+   "Q07",
+   "Q10",
+   "Q11"
+  ]
+ },
+ "Q08": {
+  "title": "K1 判定层选择（唯一影响主线的待 seal 决策）",
+  "k1_text_verbatim": "3 模型 × 未见组合 的 logit 预测误差 > 5% 且不显著优于全加性基线 B4",
+  "evidence": {
+   "per_model": [
+    {
+     "model": "qwen3-4b",
+     "kstar": 3,
+     "readout_layer": 35,
+     "b4_kstar": 0.007910657984515032,
+     "b4_readout": 0.3316153089205424,
+     "above_add_gate": false
+    },
+    {
+     "model": "qwen3-14b",
+     "kstar": 3,
+     "readout_layer": 39,
+     "b4_kstar": 0.0806781401236852,
+     "b4_readout": 0.39860084652900696,
+     "above_add_gate": true
+    },
+    {
+     "model": "glm4-9b",
+     "kstar": 3,
+     "readout_layer": 39,
+     "b4_kstar": 0.04612794021765391,
+     "b4_readout": 0.389835258324941,
+     "above_add_gate": false
+    }
+   ],
+   "aggregate": {
+    "E_read_per_model": [
+     0.3316153089205424,
+     0.39860084652900696,
+     0.389835258324941
+    ],
+    "E_read_pooled": 0.37335047125816345,
+    "kstar_pooled_margin": -0.025202164827333333,
+    "kstar_pooled_mde": 0.005695519772,
+    "readout_pooled_margin": 0.940920094649
+   }
+  },
+  "options": [
+   {
+    "id": "A",
+    "name": "读法甲：改判（推荐）",
+    "effect": "判定层=行为读出层 ⇒ K1 触发 ⇒ 「条件齿轮组=算子代数」降级为 descriptive / 功能性端口类描述。"
+   },
+   {
+    "id": "B",
+    "name": "读法乙：重述并重新冻结",
+    "effect": "承认判据自指（用假设自选的层判断假设）；K1 重述为无歧义版本。注意 TESTPLAN §8.2 规定 K1–K3 须在 3150 一并冻结、之后不得改阈值 ⇒ 重述需显式解冻升版。"
+   },
+   {
+    "id": "C",
+    "name": "暂缓",
+    "effect": "A 闸门无法关闭；B/C 闸门（Q03+ KPI 装置）不得启动。"
+   }
+  ],
+  "consequence_if_A": "K1 层位判决按 Q09 双轨：k* 层 = model_specific（qwen3-4b 否决）；读出层 = fired_all_models（3/3 否决）。"
+ },
+ "corrections_C1_C6": [
+  {
+   "id": "C1",
+   "target": "MEMO 3103 正文「62 命题 A=5/B=34/...」",
+   "current": "未标口径",
+   "proposed": "加标 `count_mode=component`（条数=62、分量和=94）",
+   "basis": "§1.2",
+   "status": "**待 seal**"
+  },
+  {
+   "id": "C2",
+   "target": "MEMO 3103 正文「约 55% 命题（A+B）」",
+   "current": "量纲混淆",
+   "proposed": "同口径二选一：`component` **41.5%**(39/94) 或 `atomic_best` **62.9%**(39/62)",
+   "basis": "§1.3",
+   "status": "**待 seal**"
+  },
+  {
+   "id": "C3",
+   "target": "TESTPLAN T5 行",
+   "current": "`A=5 / B=6 / C=10 / D=21 / E=20`",
+   "proposed": "`A=5 / B=34 / C=14 / D=21 / E=20`（`count_mode=component`，条数 62）",
+   "basis": "§1.2 不可复现",
+   "status": "**待 seal**"
+  },
+  {
+   "id": "C4",
+   "target": "`atlas_ledger.json` `ledger_sha256_8`",
+   "current": "`41d65a13`",
+   "proposed": "`0dc6e57a`（`content_excluding_self`）",
+   "basis": "§2.1",
+   "status": "**待 seal**（改 schema 后由 §4.3 规程维护）"
+  },
+  {
+   "id": "C5",
+   "target": "MEMO 3103 记录的 `proposition_ledger.json` 哈希",
+   "current": "`add57ba7`",
+   "proposed": "`9a3c6ff4`",
+   "basis": "§2.2",
+   "status": "**待 seal**"
+  },
+  {
+   "id": "C6",
+   "target": "Ledger measurements schema",
+   "current": "两套并存（270 / 199 / 兼有 165）",
+   "proposed": "统一含 `meas_id`+`phase`；`evidence_level` 三值枚举",
+   "basis": "§3",
+   "status": "**待 seal**"
+  }
+ ],
+ "I1": {
+  "section": "§1 唯一全局 KPI",
+  "ask": "确认冻结：一个 Phase 未降低 E_read / E_ar(k) / C_steer 任一者，Ledger 登记为 catalog，不得登记为 advance。"
+ },
+ "I9": {
+  "section": "§7 议程：冻结 30-Phase 队列",
+  "ask": "确认冻结：phase_queue_v1.json 为唯一议程来源，禁止由「残差 → 自动派生下一 Phase」生成新队列。"
+ },
+ "protected_fingerprints": [
+  {
+   "path": "research/gpt5/docs/AGI_GPT5_MEMO.md",
+   "role": "G 线备忘录（判决原文）",
+   "sha8": "2a84776b"
+  },
+  {
+   "path": "tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json",
+   "role": "命题账本（62 条真源）",
+   "sha8": "9a3c6ff4"
+  },
+  {
+   "path": "research/gpt5/docs/RDC_TESTPLAN_v1.md",
+   "role": "TESTPLAN（K1–K3 冻结条款）",
+   "sha8": "71b85673"
+  },
+  {
+   "path": "research/gpt5/atlas/phase_queue_v1.json",
+   "role": "30-Phase 冻结队列",
+   "sha8": "675836fd"
+  },
+  {
+   "path": "research/gpt5/docs/RDC_RESEARCH_CONSTITUTION_v1.md",
+   "role": "研究宪法 v1",
+   "sha8": "01df6398"
+  }
+ ],
+ "reply_template": "seal: Q08=甲 | C=全接受 | I1=确认 | I9=确认",
+ "post_seal_order": [
+  "1) 执行 C1–C6 更正（仅改目标文档对应字段；每项写前备份 + 写后 sha8 复核）",
+  "2) Q08 改判落 MEMO（append 不改写）+ Ledger verdict",
+  "3) A 闸门关闭 → 章 program 更新 queue 状态（Q01/Q02/Q08/Q09/Q12 = sealed）",
+  "4) 进入 B 闸门：Q03（E_read 统一基线复算，需 GPU）"
+ ]
+}

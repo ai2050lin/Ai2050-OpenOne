@@ -1,0 +1,64 @@
+{
+  "_meta": {
+    "status": "draft-pending-review",
+    "date": "2026-10-03",
+    "note": "研究空白雷达首批草案（D1）。把行业成就映射到本项目三图谱 + 证据纪律四个轴，标出'行业做了什么、缺什么'。每条 gap 是提案素材，入研究队列前须经人工授权与合同冻结。atlas_axis: language_atlas=外部语言图谱 / response_atlas=内部响应图谱 / mapping_mechanism=两图谱关联机制 / evidence_discipline=证据纪律。",
+    "counts": {"gaps": 6}
+  },
+  "gaps": [
+    {
+      "gap_id": "GAP-1",
+      "title": "条件化响应动力学：从静态特征字典到条件变化下的响应转移",
+      "nearest_industry_work": "归因图（per-prompt）与 SAE steering；direction methods 只处理单属性方向",
+      "missing": "行业主流把内部对象当静态字典；缺少'对象/否定/语域/输出协议变化时，响应如何跨层跨生成步转移'的系统测量。本项目写入门控、双剂量、写入窗等线索正落在此处。",
+      "atlas_axis": "mapping_mechanism",
+      "candidate_queue_ref": "Q06 (C_steer 基座测量：steered 成功率 + 附带损伤)",
+      "priority": "high"
+    },
+    {
+      "gap_id": "GAP-2",
+      "title": "类型化语言模式族作为一阶对象（外部语言图谱）",
+      "nearest_industry_work": "行为评测套件与提示数据集（零散、无证据状态）",
+      "missing": "行业没有'词义/角色/构式/任务'带类型、带证据状态、与内部响应双向链接的注册表。本项目 registry 已有 language_families / response_relations 种子，需扩展为完整三库。",
+      "atlas_axis": "language_atlas",
+      "candidate_queue_ref": null,
+      "priority": "high"
+    },
+    {
+      "gap_id": "GAP-3",
+      "title": "证据分级与预注册纪律的制度化",
+      "nearest_industry_work": "SAEBench/AxBench 只评方法本身；论文层面极少预注册通过判据、matched-null 控制与完备性报告",
+      "missing": "把四级证据标尺（有数据→已有观察→通过推广检查→有机制证据）+ canonical snapshot + drift 审计作为可输出到行业的方法论。这既是学习平台的教学卖点，也是对本领域忠实性/完备性危机的正面回应。",
+      "atlas_axis": "evidence_discipline",
+      "candidate_queue_ref": null,
+      "priority": "high"
+    },
+    {
+      "gap_id": "GAP-4",
+      "title": "深度-方向失配与层级响应组织（内部响应图谱）",
+      "nearest_industry_work": "layer-wise probing / logit lens 只看逐层可解码性",
+      "missing": "跨层条件化响应场的系统测量（如 rho(xhalf,depth) 类深度-方向结构）、REACH 域刻画、写入端随深度的方向失配机制。",
+      "atlas_axis": "response_atlas",
+      "candidate_queue_ref": null,
+      "priority": "medium"
+    },
+    {
+      "gap_id": "GAP-5",
+      "title": "行为读出与预测复杂度桥",
+      "nearest_industry_work": "probing 准确率报告（点估计，无预测复杂度概念）",
+      "missing": "把'给定观察量下规律的最小预测复杂度'作为机制规律的拟合对象与跨模型比较口径（E_read/E_ar 装置已建成并完成正式测量，D4 桥 PASS）。",
+      "atlas_axis": "mapping_mechanism",
+      "candidate_queue_ref": null,
+      "priority": "medium"
+    },
+    {
+      "gap_id": "GAP-6",
+      "title": "写入端分布式与软门栈",
+      "nearest_industry_work": "MLP 上的 SAE/特征分析（把 MLP 输出当特征源）",
+      "missing": "写入端作为向量预算分配系统的视角：预算 MLP 占比、L6 内无阈值增益⇒软门栈、跨条件守恒检查。",
+      "atlas_axis": "response_atlas",
+      "candidate_queue_ref": null,
+      "priority": "medium"
+    }
+  ]
+}

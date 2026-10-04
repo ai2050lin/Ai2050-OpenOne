@@ -1,7 +1,0 @@
-
-[2026-04-15 21:45] Phase CLVII (P688-P691) Logit空间编码结构完成。三模型核心发现:
-P688 G项logit投影: Qwen3同家族cos=0.965跨家族=0.853(L35差异=0.113); DS7B L27极端!同家族cos=-0.955跨家族=0.033 separation=0.988; GLM4差异极小同家族=1.000跨家族=1.000; PCA维度仅5-7维解释95%方差
-P689 概念区分度: Qwen3 within=0.944 between=0.901 ratio=0.954; DS7B within=0.504 between=0.661 ratio=1.313(跨家族更相似!); GLM4 within=0.994 between=0.992 ratio=0.998
-P690 幂律结构(重大发现!): 所有模型所有层neuron贡献服从幂律R2=0.94-0.99; 幂律指数Qwen3=0.45-0.60 DS7B=0.39-1.02 GLM4=0.30-0.45; 指数<1意味着少数neuron贡献极大但大量neuron也有贡献; n_50 Qwen3 L35=425/9728(4.4%) GLM4 L39=1401/13696(10.2%); 编码是长尾幂律不是kNN稀疏也不是均匀分布
-P691 因果干预: GLM4消融top10 apple logit变化-50.4% vs 随机-1.3%(38倍差异!); Qwen3 apple top10=1.5% random=1.4%(几乎无差异apple例外); DS7B top10=17.0% random=-0.2%(85倍差异); GLM4/DS7B有强因果结构Qwen3的apple例外
-核心结论: 1.编码是长尾幂律分布(Zipf型) 2.GLM4因果干预最成功top10消融改变50%logit 3.Qwen3的apple例外编码更均匀 4.logit空间PCA仅5-7维编码极低维 5.DS7B最后层水果反向(cos=-0.955)末端层反转效应

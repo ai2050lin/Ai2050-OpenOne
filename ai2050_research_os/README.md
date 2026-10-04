@@ -168,6 +168,46 @@ Layer 区域：各层 residual2（缺失时按冻结优先级回退）的 Hidden
 
 验证结果：Research OS、Canonical Snapshot、客户端漂移审计和 7 项专项测试通过。当前环境仍缺少 Node/npm，因此生产构建和浏览器视觉检查未完成，不得记为前端发布通过。
 
+### 平台化改造第一批：构建验证、Snapshot v2 草案、资产审计与行业情报草案 [2026-10-03 17:30]
+
+目标升级为“机制可解释性学习与研究平台”（行业进展模块 / 可视化客户端双模式 / AI 自动研发平台），本轮执行 M1a/M1b/M1c 与 M2 首批。
+
+1. **M1a 生产构建验证（补上 2026-08-19 挂账）**：Node 环境已可用（managed node 22.22.2，前端 node_modules 已装齐 453 包）。`vite build` 通过：2861 模块、4.84s、双入口（main + annotation）。主包 2215.61 kB（gzip 635.64 kB）超 500 kB 告警，代码分割列入欠账。浏览器加载验证仍未执行，不得记为发布通过。
+2. **M1b Snapshot v2 草案**：新增 `schemas/snapshot.v2.schema.json`（DRAFT，未接入 `validate-snapshot`）。v1 必填字段不变，新增三个可选命名空间：`views`（视图 + 证据卡，引用 `registry/visualization_specs.json`）、`industry`（行业进展投影）、`cases`（教学案例）。约束：三者均为只读投影，客户端不得反向覆盖；`cases` 属解释身份，必须挂四级证据等级。
+3. **M1c 客户端资产审计**：新增 `docs/CLIENT_ASSET_AUDIT_2026-10-03.md/.json`。`frontend/src` 357 个组件分档：A 已接 Canonical Snapshot 仅 **10**；B 服务端 API 驱动 69；C 概念示意/演示数据 **175**（含全部 3D 视觉件：BrainVis3D、ResonanceField3D、TDAVisualization3D、LayerFirstNeuronScene、HolonomyLoopVisualizer 等）；D 待人工复核 103。证实“展示层与证据层脱钩”是客户端改造的主要欠账。
+4. **M2 行业情报草案**：新增 `drafts/industry/{methods_map,tools,gap_radar}.json`（D1，draft-pending-review，非事实源）。12 个方法节点（2026 格局：SAE → 归因图/跨层 transcoder → 免词典方向法；SAEBench/AxBench 教训）、11 项工具对照（3 项 in_house；circuit-tracer 与 Neuronpedia 登记为对照位）、6 条研究空白（GAP-1 条件化响应动力学对应队列 Q06 C_steer，priority=high）。`drafts/` 是新目录：评审中的数据命名空间草案，未接入校验、不是事实源，正式化后迁入 Registry 新命名空间。
+5. **预存问题发现（非本轮引入）**：`researchctl validate` 当前 155 项失败，全部为 glm5 线归档后的陈旧路径（`tests/glm5/result/phase1246–1263` manifest 文件与 `research/gpt5/docs/AGI_GLM5_MEMO.md`；后者实际位于 `research/glm5/docs/`）。需要生成只读路径映射迁移报告或 corrections 记录；本轮未处理，避免触碰历史记录。注意：`export-client` 以 validate 通过为前置，此问题阻断客户端导出链。
+
+严格审视：① v2 草案尚无生成器，`build-snapshot` 仍产 v1，接入前 Schema 只是纸面合同；② 审计分档是正则启发式，C 档可能有假阳性（经 props 接收真实数据的组件会被误分）；③ `drafts/industry` 内容来自桌面检索，正式化前需逐条核对原文；④ 155 项 validate 失败使“validate 通过”这一客户端导出前置条件失效。
+
+下一批任务：修复 155 项历史路径（corrections / 只读路径映射报告）→ `build-snapshot` 支持 v2 投影 → 学习模式首批 6–10 个案例从已封存 Phase 派生 → Q06 C_steer 合同冻结。
+
+### 平台化改造第二批：校验链修复、Canonical Snapshot 重建与 v2 草案投影 [2026-10-03 22:35]
+
+1. **155 项 validate 失败根因查明**：① `SRC-GPT-IMPORTED-GLM` 登记的工作区文件 `research/gpt5/docs/AGI_GLM5_MEMO.md` 已被删除（git 历史显示 66f441bdc / 20260919 前后清理；登记 blob `dab222e4` 仍在对象库）；② 16 个 glm5 线 manifest（EXP-C001..C013）引用的 `tests/glm5/result/phase1246–1263` run bundle 整体离场，全仓目录与文件检索确认未迁移，git 从未跟踪（仅 4 个 lease 文件），无法恢复；重算脚本 `tests/glm5/phase1246–1263*.py` 仍在。离场扫描共 186 个缺失文件条目，其中 154 个属于会被 verify 的合同状态（即 validate 报出的 154 项），另 32 个属于未被 verify 的合同状态。
+2. **source 文件逐字节恢复**：从登记 commit `16b3119` 取回 blob 并做 LF→CRLF 还原，size=422790、sha256=`0c17fee6…` 与 `captured_sha256` 完全一致。该文件是 frozen import（role=misplaced_import，authority=archive_only），**严禁追加或改写**。
+3. **离场登记与校验器感知**：新增 `registry/artifact_residency.json`（`RES-GLM5-RESULT-001`，由 manifests 实际扫描数据驱动生成，含审计明细）；`researchctl` 的 `FILES` 账本新增 `artifact_residency`；`verify_manifest_file` 增加 residency 豁免——命中登记的缺失文件降级为「已登记离场」警告，存在文件的 size/sha 校验保留，独立命令 `verify-manifest` 不受豁免、保持严格。
+4. **corrections.json 新增 `COR-REG-001`**：记录根因、修法与影响（preserves_original_claim=true）。
+5. **快照链全绿**：validate 通过（154 项豁免警告，0 错误）→ build-snapshot 产出 `SNAPSHOT-2026-08-13-f04d5d60ce75`（Registry 变更致 source_sha256 更新，旧 id `66650dcad5e5` 作废）→ validate-snapshot 通过 → **export-client 恢复导出（此前被阻断）** → drift-audit 通过。
+6. **Snapshot v2 草案投影上线**：新增 `build-snapshot-v2` / `validate-snapshot-v2` 命令。v2 = v1 全量字段 + `views`（3 个 registry 规格投影）+ `industry`（12 方法 / 11 工具 / 6 空白，源 `drafts/industry/`）+ `cases`（空集，派生管道待建）；输出 `snapshots/draft/snapshot_v2.json`，不覆盖 canonical v1；Schema（snapshot.v2.schema.json）与确定性双校验通过。
+7. **routes_map.json**：`drafts/industry/` 新增十条研究路线图谱（Marr 层级 × 黑箱-白箱光谱），含 R-formal-expressivity 的 RASP 目标语言提案。
+
+严格审视：① 离场豁免只放宽“存在性”，不放宽哈希；但 32 个未被 verify 的缺失条目所在的合同，其数据完整性当前无任何校验覆盖；② 恢复的 MEMO 副本与活文档 `research/glm5/docs/AGI_GLM5_MEMO.md` 并存，后续会话必须依据 sources.json 的 role/authority 字段识别，避免误追加；③ v2 的 `cases` 仍为空集，学习案例派生管道是主要缺口；④ v2 的 industry 投影仍来自 drafts，正式化入 Registry 前不构成研究事实。
+
+下一批任务：学习模式首批 6–10 案例从已封存 Phase 派生（补 cases 管道）→ Q06 C_steer 合同冻结 → drafts/industry 逐条核对原文后正式化入 Registry。
+
+### 平台化改造第三批：cases 管道补齐、行业/案例正式化入 Registry 与 Q06 合同冻结 [2026-10-03 23:05]
+
+1. **学习案例首批落库**：`registry/cases.json` 新增 CASE-001..010，全部从已封存 Phase 派生（P4–P21 主轴/写入/否证/对象错配、R8 K1 触发、R9 E_read 基线、R10 装置纪律、R11 E_ar 正式测量、量纲纪律、限界地图）。每案例含 question / 引导式 narrative / limitations / source_refs / view_refs，强制挂四级证据标尺（当前分布：observed ×4、generalization_checked ×3、has_data ×3，无一案例越级宣称 mechanism_evidence）。所有引用数字先经 AGI_DEEPSEEK_MEMO.md 逐条 grep 核对（share_max 3.0%、MLP 0.472/效应 0.739、rho −0.7833 仅 L6–L30、E_read 0.331615/0.398601/0.389835 池化 0.373350、K1 3/3 否决 +0.940920、D4 桥 0.0489 等）。
+2. **行业情报正式化**：`registry/industry.json` 新增 29 条记录（12 方法 + 11 工具 + 6 空白），自 `drafts/industry/` 合并导入，每条带 `imported_from`/`imported_at` 溯源，status=candidate（正式 verified 须逐条核对原文后升格）。`drafts/industry/` 三文件转为冻结导入出处，不再被快照读取；routes_map.json 保留 draft 身份（讨论件）。
+3. **researchctl 扩展**：FILES 账本新增 `industry`/`cases` 两键（v1 快照 source_sha256 随之更新）；validate() 增加两账本轻校验（id 唯一 + kind/status/title/evidence_level 枚举）；`build_snapshot_v2` 改读 Registry——industry.source_ref 由 `drafts/industry/` 改为 `registry/industry.json`，cases 由空集改为 10 案例投影（含 x-explanation-identity 标记），GAP-1 的 candidate_queue_ref→Q06 链接随投影保留。
+4. **快照链全绿**：validate（industry=29, cases=10 入账）→ 新 canonical `SNAPSHOT-2026-08-13-f8bf99163a34`（旧 id `f04d5d60ce75` 作废）→ validate-snapshot → export-client → build-snapshot-v2 / validate-snapshot-v2（v2 投影：views 3 / methods 12 / tools 11 / gaps 6 / cases 10）→ drift-audit 通过。
+5. **Q06 C_steer 合同冻结（只冻结未执行）**：预注册设计 `tests/deepseek/result/q06_prereg_design_v1.json`（frozen_at 2026-10-03 22:36，sha8=`ebf960cf`），冻结于任何 Q06 观测之前。内容：KPI=metric_dict v4（`0652c008`）C_steer 公式逐字，本 Phase 不设通过门（门待 Q20）；算子=端口替换/读出替换（方向去除非法：cancel 反向加重 0.820，I9）；承重轴 v1 = L29 WR 主 PC（qwen3-4b，M14 剂量曲线 0.070→0.664 无无害阈值）；剂量=五点半调 α 0.05/0.10/0.15/0.25/0.5；控制=随机方向同幅值 + identity 恢复 + dirty gate（I9）；面板=与 E_read 同一 held-out 面板族 + 13 无关探针附带损伤（v1 操作化定义冻结：干预后错误数 − 同 cell 基线）；精度=qwen3-4b bf16 主臂，14B/9B 须追加同款 D4 桥预注册；execution annex 须在含 SMOKE 的任何观测前冻结并对齐 design_sha（drift 断言）。队列 Q06 → `contract_frozen`（prereg_design_sha=ebf960cf）。
+
+严格审视：① 行业记录 status=candidate，内容仍是桌面检索，verified 升格需逐条核对原文（尤其 2026 年条目）；② 案例 narrative 是引导式压缩叙述，课堂使用前应展开为交互式页面（M2 学习模式视图层未动）；③ Q06 冻结的是协议骨架，execution annex（cell 清单/读数实现/seed）仍需在执行前冻结——若 annex 与骨架冲突须 bump 设计版本并登记理由；④ collateral_definition_v1 是本批新增的操作化定义，Q06 结果将检验它是否可用。
+
+下一批任务：Q06 执行 Phase（R12：SMOKE → 正式测量 → 独立复核 → closeout，先加载 rdc-main-axis-probe / rdc-phase-closeout 技能）→ 行业记录逐条核对升格 verified → 学习模式客户端视图（ResearchCenter 学习模式读 v2 cases）。
+
 ---
 
 ## 一、系统定位

@@ -1,9 +1,0 @@
-# Stage56 一般核 / 严格核双结构摘要
-
-- equation_text: general_kernel = kernel_v4; strict_kernel_module = strict_module_combined; strict_residual_penalty = strict_module_residual
-- main_judgment: 一般闭包核和严格闭包模块已经开始明显分离：一般核由短闭式核承担，严格闭包更像额外附着在一般核上的正向组合模块与负向残差模块。
-
-## Signs
-- general_kernel_sign: {"union_joint_adv": "positive", "union_synergy_joint": "positive", "strict_positive_synergy": "positive"}
-- strict_module_combined_sign: {"union_joint_adv": "negative", "union_synergy_joint": "negative", "strict_positive_synergy": "positive"}
-- strict_module_residual_sign: {"union_joint_adv": "negative", "union_synergy_joint": "negative", "strict_positive_synergy": "positive"}

@@ -1,5 +1,0 @@
-@echo off
-cd /d d:\Ai2050\TransformerLens-Project
-echo [%date% %time%] Starting DeepSeek7B CCLXXV (ABSOLUTE venv) >> d:\Ai2050\TransformerLens-Project\tests\glm5_temp\cclxxv_ds7b_log5.txt
-d:\Ai2050\TransformerLens-Project\.venv\Scripts\python.exe d:\Ai2050\TransformerLens-Project\tests\glm5\phase_cclxxv_up_direction.py --model deepseek7b >> d:\Ai2050\TransformerLens-Project\tests\glm5_temp\cclxxv_ds7b_log5.txt 2>&1
-echo [%date% %time%] DeepSeek7B done >> d:\Ai2050\TransformerLens-Project\tests\glm5_temp\cclxxv_ds7b_log5.txt

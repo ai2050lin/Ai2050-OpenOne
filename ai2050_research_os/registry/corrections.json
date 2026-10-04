@@ -89,7 +89,9 @@
     "date": "2026-08-13",
     "status": "active",
     "target_type": "evidence_grade",
-    "target_ids": ["K218"],
+    "target_ids": [
+      "K218"
+    ],
     "problem": "K218 was labeled E3-KT even though freely trained task/endpoint truth does not expose internal mechanism truth.",
     "correction": "K218 is regraded E3-CONTROLLED-FREE. Its 4/6 causal breadth result is preserved, but it is not known-mechanism truth.",
     "preserves_original_claim": true
@@ -99,7 +101,10 @@
     "date": "2026-08-13",
     "status": "active",
     "target_type": "metric_interpretation",
-    "target_ids": ["K219", "EXP-C009-WP01-001"],
+    "target_ids": [
+      "K219",
+      "EXP-C009-WP01-001"
+    ],
     "problem": "The Phase1256 wrong-donor cosine near 0.5 was treated as independent identity evidence, but shared-base one-hot category changes have cosine exactly one half.",
     "correction": "The frozen verdict is preserved because matched null already failed; future identity tests use direct target-versus-wrong contrast, and wrong cosine remains diagnostic only.",
     "preserves_original_claim": true
@@ -109,9 +114,25 @@
     "date": "2026-08-13",
     "status": "active",
     "target_type": "metric_interpretation",
-    "target_ids": ["K225", "EXP-C012-WP01-001"],
+    "target_ids": [
+      "K225",
+      "EXP-C012-WP01-001"
+    ],
     "problem": "Phase1261 path rescue subtracts mediator_prediction and immediately adds the identical tensor back. Its correct-rescue error is therefore an algebraic replay, not independent mediation evidence.",
     "correction": "The frozen C012 failure verdict and factorial/type boundary are preserved. G-PATH is narrowed to handoff, block and wrong-donor diagnostics; the correct replay contributes zero evidence. C013 requires rescue estimated on an independent donor fold and records exact replay only as a leakage sentinel.",
+    "preserves_original_claim": true
+  },
+  {
+    "id": "COR-REG-001",
+    "date": "2026-10-03",
+    "status": "active",
+    "target_type": "artifact_residency",
+    "target_ids": [
+      "SRC-GPT-IMPORTED-GLM",
+      "RES-GLM5-RESULT-001"
+    ],
+    "problem": "researchctl validate 累计 155 项失败（1 项 source + 154 项 manifest 文件条目）：SRC-GPT-IMPORTED-GLM 登记的工作区文件 research/gpt5/docs/AGI_GLM5_MEMO.md 已被删除（git 历史显示 66f441bdc 20260919 前后清理，blob 仍在对象库）；16 个 glm5 线 manifest（EXP-C001..C013）引用的 tests/glm5/result/phase1246-1263 run bundle 整体离场且从未入 git，无法恢复。离场扫描另发现 32 个缺失条目属于未被 verify_manifest_file 校验的合同状态，16 合同合计 186 个缺失文件条目。",
+    "correction": "① 按登记 commit 16b3119 从 git blob dab222e4 恢复 AGI_GLM5_MEMO.md 并做 LF→CRLF 还原，恢复字节 sha256=0c17fee6d99456b5db6c04dfa8b9ef5fd1e754f1dfc0e6a962617ea12dd268e0 与 captured_sha256 逐字节一致，size=422790；② 新增 registry/artifact_residency.json（RES-GLM5-RESULT-001）登记 16 合同 186 个缺失条目的离场事实与重算入口；③ researchctl verify_manifest_file 增加 residency 感知：命中登记的缺失文件降级为『已登记离场』警告，存在文件的 size/sha 校验保留，独立命令 verify-manifest 不受豁免；④ Registry 变更将改变 canonical source_sha256，需重建 Snapshot 并重新导出客户端。",
     "preserves_original_claim": true
   }
 ]

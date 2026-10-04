@@ -1,0 +1,83 @@
+{
+ "format": "metric_dict_v1",
+ "created": "2026-10-01",
+ "meta_rules": {
+  "F2_verdict_grading": {
+   "bit_anchored": "harness-determinism only (bit replay / xphase / sha identity). NEVER counts as evidence for a scientific claim (F7).",
+   "statistical": "cross-sample statistical assert (gate vs null band). Valid as downstream premise.",
+   "descriptive": "observed pattern without gate. MUST NOT be used as premise for the next phase."
+  },
+  "F7_bit_anchor_status": "bit anchors prove harness determinism only; they do not raise the evidence level of any claim",
+  "discipline_3102": [
+   "cos + relative-L2 both",
+   "gate reachability before power",
+   "average ranks + block correction cross-model",
+   "JVP accuracy != no mixing",
+   "submodularity = conditional 2nd difference"
+  ],
+  "intervention_rules": [
+   "port substitution is the only legal input intervention (3148)",
+   "direction subtraction is ILLEGAL in this system",
+   "deep-layer absolute cos is polluted (null |cos| up to 0.84): report deltas only"
+  ],
+  "binding_dichotomy": "before any cross-model layer comparison check tie_word_embeddings (N1, 6/6)"
+ },
+ "metrics": {
+  "chg_flip_rate": {
+   "space": "behavior",
+   "complementary": false,
+   "range": [
+    0.0,
+    1.0
+   ],
+   "mde_note": "n=128 rows: MDE ~0.07 at p~0.2 (binomial)",
+   "cross_model": true,
+   "grade": "statistical"
+  },
+  "cos_delta": {
+   "space": "representation",
+   "cross_terms": true,
+   "complementary": false,
+   "rule": "report as delta vs matched null; never absolute in deep layers",
+   "cross_model": "delta-only",
+   "grade": "statistical"
+  },
+  "rel_l2": {
+   "space": "representation",
+   "cross_terms": true,
+   "grade": "statistical"
+  },
+  "auc": {
+   "space": "probe",
+   "range": [
+    0.5,
+    1.0
+   ],
+   "grade": "statistical"
+  },
+  "mapper_ari_G5": {
+   "space": "topology",
+   "range": [
+    -1.0,
+    1.0
+   ],
+   "lens_dependent": true,
+   "forbidden": "betti numbers / torus claims (n<d regime)",
+   "grade": "statistical"
+  },
+  "sae_feat_share_G4": {
+   "space": "sparse-dictionary",
+   "range": [
+    0,
+    1
+   ],
+   "def": "top-8 feature activation share of a token family",
+   "grade": "statistical"
+  },
+  "jacobian_opnorm_G6": {
+   "space": "dynamics-layerwise",
+   "rule": "descriptive only; no Lyapunov exponents (40-layer discretization)",
+   "grade": "descriptive"
+  }
+ }
+}

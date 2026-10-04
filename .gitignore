@@ -127,3 +127,56 @@ node_modules
 
 # Phase423 pinned third-party reference checkout; rebuilt by the formal runner
 /tests/gpt5_temp/phase423_vendor/
+
+# ================= Public-release slimming (2026-10-03) =================
+# Goal: published git payload <= 100MB (hard cap 300MB).
+# Keep in git: scripts (*.py), active MEMO docs, registry/snapshot/schemas,
+#              frontend/src, demo corpora, static website HTML.
+# Keep local only: experiment result data, model weights, archives, probes.
+
+# Entire legacy result store stays local
+/tests/result/
+
+# Temp dirs: keep experiment scripts (*.py) only
+/tests/glm5_temp/**
+!tests/glm5_temp/**/
+!tests/glm5_temp/**/*.py
+/tests/codex_temp/**
+!tests/codex_temp/**/
+!tests/codex_temp/**/*.py
+/tests/gpt5_temp/**
+!tests/gpt5_temp/**/
+!tests/gpt5_temp/**/*.py
+/tests/deepseek_temp/**
+!tests/deepseek_temp/**/
+!tests/deepseek_temp/**/*.py
+
+# Data dirs / datasets stay local
+/data/MNIST/
+/tests/nfb_data/
+/frontend/website/*.png
+/frontend/dist/
+/research/gpt5/data/
+
+# Archival research logs stay local (active MEMO docs remain tracked)
+/research/glm5/log/
+/research/glm5/docs/AGI_GLM5_MEMO_2026*.md
+/research/gpt5/docs/AGI_GPT5_MEMO_2026*.md
+/research/gpt5/tests/glm5/probe*.txt
+
+# Oversized single result files (kept local)
+/tests/codex/encoding_mechanism_large_scale_data_stage421.json
+
+# Generated artifacts & junk
+*.log
+*.npy
+*.csv
+*.gz
+*.pkl
+*.bak_*
+
+# Row-level result data everywhere (small demo corpora excepted)
+*.jsonl
+!/data/iso_corpus.jsonl
+!/shared/data/iso_corpus.jsonl
+# ================= end public-release slimming =================

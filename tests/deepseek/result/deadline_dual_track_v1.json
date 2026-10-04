@@ -1,0 +1,238 @@
+{
+ "schema": "rdc_deadline_dual_track_v1",
+ "generated_by": "tests/deepseek/_review/gen_q09_r5.py",
+ "queue_item": "Q09",
+ "constitution_ref": "RDC_RESEARCH_CONSTITUTION_v1.md 3 (I3)",
+ "source_testplan": {
+  "path": "research/gpt5/docs/RDC_TESTPLAN_v1.md",
+  "sha8": "71b85673"
+ },
+ "original_form": {
+  "K1": "3 模型 × 未见组合 的 logit 预测误差 > 5% 且不显著优于全加性基线 B4",
+  "K2": "phi_l(c) 与 W_l 不可分离：分离后响应 cos 下降 > 50% 而行为不掉",
+  "K3": "在 3 个模式族上，单坐标筛选 top-50 覆盖率均 < 30%",
+  "structural_defect": {
+   "K1": "触发 = 对 3 模型的全称量词 AND（合取）；与跨模型从不一致叠加 ⇒ 触发概率趋 0",
+   "K2": "同一文件内两种不一致操作化（§8.2 响应 cos 下降>50% vs 3154 预注册 交互份额>50%）",
+   "K3": "触发 = 对 3 模式族的全称量词 AND（合取）"
+  }
+ },
+ "restated_form": {
+  "track_A_primary": {
+   "rule": "主判据 = 跨模型聚合统计量 + bootstrap CI；禁用合取",
+   "K1": "pooled margin mbar=mean_{model,seed}(margin)；pooled error Ebar_read=mean_model(E_read)；触发当 (mbar > -2*MDE_pooled) OR (Ebar_read > 0.05)",
+   "K2": "pooled |dcos| 与 pooled dchg；触发当 (|dcos|_bar > 0.50) AND (dchg_bar < MDE_pooled)",
+   "K3": "pooled coverage cov_bar；触发当 (cov_bar < 0.30)"
+  },
+  "track_B_veto": {
+   "rule": "任一模型在聚合口径下不达标（与聚合结论相反）⇒ 命题标 model_specific",
+   "consequence": "model_specific 不得升为机制；只能作 descriptive / 待复现"
+  },
+  "forbidden": [
+   "把全称量词形式的合取写进触发条件",
+   "用任一模型不达标当作加固主判据的证据（方向必须相反：它是降级信号）"
+  ]
+ },
+ "k1_recompute": {
+  "per_model": {
+   "qwen3-4b": {
+    "kstar": 3,
+    "readout": 35,
+    "b4_kstar": 0.007910657984515032,
+    "b4_readout": 0.3316153089205424,
+    "m1_kstar_margins": [
+     -0.003995918203,
+     -0.001871779445,
+     -0.002428600099
+    ],
+    "m1_kstar_mdes": [
+     0.00164567322,
+     0.0021655155,
+     0.001723737313
+    ],
+    "m1_readout_margins": [
+     0.74628919363,
+     0.746069848537,
+     0.867341279984
+    ],
+    "m1_readout_mdes": [
+     0.173614220916,
+     0.135409986699,
+     0.146566495379
+    ],
+    "above_add_gate": false,
+    "m1_kstar_pass_all3": false
+   },
+   "qwen3-14b": {
+    "kstar": 3,
+    "readout": 39,
+    "b4_kstar": 0.0806781401236852,
+    "b4_readout": 0.39860084652900696,
+    "m1_kstar_margins": [
+     -0.04315668717,
+     -0.044845726341,
+     -0.04450206086
+    ],
+    "m1_kstar_mdes": [
+     0.007399310631,
+     0.008100154574,
+     0.009958824526
+    ],
+    "m1_readout_margins": [
+     1.084026694298,
+     1.041910767555,
+     1.262826323509
+    ],
+    "m1_readout_mdes": [
+     0.240717308979,
+     0.189907086962,
+     0.21978643736
+    ],
+    "above_add_gate": true,
+    "m1_kstar_pass_all3": true
+   },
+   "glm4-9b": {
+    "kstar": 3,
+    "readout": 39,
+    "b4_kstar": 0.04612794021765391,
+    "b4_readout": 0.389835258324941,
+    "m1_kstar_margins": [
+     -0.028946934268,
+     -0.032304372638,
+     -0.024767404422
+    ],
+    "m1_kstar_mdes": [
+     0.006778394964,
+     0.007540307959,
+     0.005947759261
+    ],
+    "m1_readout_margins": [
+     0.770903408527,
+     1.0503937006,
+     0.898519635201
+    ],
+    "m1_readout_mdes": [
+     0.179720398619,
+     0.301508634772,
+     0.152547054128
+    ],
+    "above_add_gate": false,
+    "m1_kstar_pass_all3": true
+   }
+  },
+  "model_level": {
+   "qwen3-4b": {
+    "readout_margin_model": 0.7865667740503334,
+    "readout_mde_model": 0.15186356766466666,
+    "readout_pass": false,
+    "kstar_margin_model": -0.002765432582333333,
+    "kstar_mde_model": 0.0018449753443333333,
+    "kstar_pass": false
+   },
+   "qwen3-14b": {
+    "readout_margin_model": 1.129587928454,
+    "readout_mde_model": 0.21680361110033333,
+    "readout_pass": false,
+    "kstar_margin_model": -0.044168158123666666,
+    "kstar_mde_model": 0.008486096577,
+    "kstar_pass": true
+   },
+   "glm4-9b": {
+    "readout_margin_model": 0.9066055814426667,
+    "readout_mde_model": 0.21125869583966664,
+    "readout_pass": false,
+    "kstar_margin_model": -0.028672903776,
+    "kstar_mde_model": 0.006755487394666666,
+    "kstar_pass": true
+   }
+  },
+  "aggregate": {
+   "E_read_per_model": [
+    0.3316153089205424,
+    0.39860084652900696,
+    0.389835258324941
+   ],
+   "E_read_pooled": 0.37335047125816345,
+   "E_read_ci95_modellevel": [
+    0.3316153089205424,
+    0.39860084652900696
+   ],
+   "kstar_pooled_margin": -0.025202164827333333,
+   "kstar_pooled_mde": 0.005695519772,
+   "kstar_margin_ci95_modellevel": [
+    -0.044168158123666666,
+    -0.002765432582333333
+   ],
+   "kstar_margin_ci95_unit9": [
+    -0.03608606630255556,
+    -0.013632180971222223
+   ],
+   "readout_pooled_margin": 0.940920094649,
+   "readout_pooled_mde": 0.19330862486822223,
+   "readout_margin_ci95_modellevel": [
+    0.7865667740503334,
+    1.129587928454
+   ],
+   "readout_margin_ci95_unit9": [
+    0.8337809708383334,
+    1.0544106629161112
+   ]
+  },
+  "verdict": {
+   "kstar_layer": "model_specific",
+   "kstar_trackA_fired": false,
+   "kstar_veto_models": [
+    "qwen3-4b"
+   ],
+   "readout_layer": "fired_all_models",
+   "readout_trackA_fired": true,
+   "readout_veto_models": [
+    "qwen3-4b",
+    "qwen3-14b",
+    "glm4-9b"
+   ],
+   "layer_choice_is_Q08": true
+  },
+  "old_form_result": "above=1/3, m1_pass@k*=2/3 ⇒ NOT triggered ⇒ operator line kept"
+ },
+ "k2_status": {
+  "state": "not_measurable_yet",
+  "reason": "phase3154 目录不存在（预注册于 3153 预注册 3154，尚未运行）",
+  "note": "同一文件内两种操作化不一致，须在 3154 开跑前先冻结其一"
+ },
+ "k3_status": {
+  "state": "not_measurable_yet",
+  "reason": "Phases 中无单坐标筛选 top-50 覆盖率量；MEMO 中的覆盖率指微场普查 283 词覆盖率，非同一条目"
+ },
+ "deadline_immunity_quantified": {
+  "old_conjunction": "K1/K3 均为跨模型或跨族全称量词 ⇒ 系统性不可触发",
+  "never_measured": [
+   "K2",
+   "K3"
+  ],
+  "measured": [
+   "K1"
+  ]
+ },
+ "provenance": {
+  "summary": "tests\\glm5\\result\\rdc_query_construction_20260913\\phase3152\\g1p2_tri_model_k1\\summary\\result_summary.json",
+  "summary_sha8": "a6c68981",
+  "r3151": "tests\\glm5\\result\\rdc_query_construction_20260913\\phase3151\\g1p1_combo_additive_vs_interaction\\result.json",
+  "r3151_sha8": "dab41389",
+  "arms": {
+   "qwen3-4b": {
+    "path": "tests\\glm5\\result\\rdc_query_construction_20260913\\phase3152\\g1p2_tri_model_k1\\qwen3-4b\\result.json",
+    "sha8": "c38b97ff"
+   },
+   "qwen3-14b": {
+    "path": "tests\\glm5\\result\\rdc_query_construction_20260913\\phase3152\\g1p2_tri_model_k1\\qwen3-14b\\result.json",
+    "sha8": "23dfb646"
+   },
+   "glm4-9b": {
+    "path": "tests\\glm5\\result\\rdc_query_construction_20260913\\phase3152\\g1p2_tri_model_k1\\glm4k1\\result.json",
+    "sha8": "111a1152"
+   }
+  },
+  "glm4_readout_source": "3152 glm4k1 仅有 note；读出层 margin/MDE 取 3151 v1.gates.M1_k39"
+ }
+}

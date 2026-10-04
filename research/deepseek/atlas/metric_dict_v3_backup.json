@@ -1,0 +1,338 @@
+{
+ "format": "metric_dict_v3",
+ "version": 3,
+ "created": "2026-10-01",
+ "frozen_at": "2026-10-03 07:46",
+ "generated_by": "tests/deepseek/register_q04_metric_v3.py",
+ "supersedes": {
+  "format": "metric_dict_v2",
+  "sha8": "03887e51",
+  "content_sha256_8": "5ce974ee",
+  "created": "2026-10-01",
+  "backup": "research/deepseek/atlas/metric_dict_v2_backup.json"
+ },
+ "meta_rules": {
+  "F2_verdict_grading": {
+   "bit_anchored": "harness-determinism only (bit replay / xphase / sha identity). NEVER counts as evidence for a scientific claim (F7).",
+   "statistical": "cross-sample statistical assert (gate vs null band). Valid as downstream premise.",
+   "descriptive": "observed pattern without gate. MUST NOT be used as premise for the next phase."
+  },
+  "F7_bit_anchor_status": "bit anchors prove harness determinism only; they do not raise the evidence level of any claim",
+  "discipline_3102": [
+   "cos + relative-L2 both",
+   "gate reachability before power",
+   "average ranks + block correction cross-model",
+   "JVP accuracy != no mixing",
+   "submodularity = conditional 2nd difference"
+  ],
+  "intervention_rules": [
+   "port substitution is the only legal input intervention (3148)",
+   "direction subtraction is ILLEGAL in this system",
+   "deep-layer absolute cos is polluted (null |cos| up to 0.84): report deltas only"
+  ],
+  "binding_dichotomy": "before any cross-model layer comparison check tie_word_embeddings (N1, 6/6)"
+ },
+ "metrics": {
+  "chg_flip_rate": {
+   "space": "behavior",
+   "complementary": false,
+   "range": [
+    0.0,
+    1.0
+   ],
+   "mde_note": "n=128 rows: MDE ~0.07 at p~0.2 (binomial)",
+   "cross_model": true,
+   "grade": "statistical"
+  },
+  "cos_delta": {
+   "space": "representation",
+   "cross_terms": true,
+   "complementary": false,
+   "rule": "report as delta vs matched null; never absolute in deep layers",
+   "cross_model": "delta-only",
+   "grade": "statistical"
+  },
+  "rel_l2": {
+   "space": "representation",
+   "cross_terms": true,
+   "grade": "statistical"
+  },
+  "auc": {
+   "space": "probe",
+   "range": [
+    0.5,
+    1.0
+   ],
+   "grade": "statistical"
+  },
+  "mapper_ari_G5": {
+   "space": "topology",
+   "range": [
+    -1.0,
+    1.0
+   ],
+   "lens_dependent": true,
+   "forbidden": "betti numbers / torus claims (n<d regime)",
+   "grade": "statistical"
+  },
+  "sae_feat_share_G4": {
+   "space": "sparse-dictionary",
+   "range": [
+    0,
+    1
+   ],
+   "def": "top-8 feature activation share of a token family",
+   "grade": "statistical"
+  },
+  "jacobian_opnorm_G6": {
+   "space": "dynamics-layerwise",
+   "rule": "descriptive only; no Lyapunov exponents (40-layer discretization)",
+   "grade": "descriptive"
+  }
+ },
+ "global_kpis": {
+  "E_read": {
+   "name_cn": "读出层预测误差",
+   "space": "behavior-readout",
+   "definition": "未见组合 (实体 i, 类 c) 在行为读出层的相对 L2 预测误差",
+   "formula": "E_read(m) = mean_{s in 3 seeds} rel_L2( B4_pred_s(h_readout; i, c), y_true(i, c) )，对 held-out test fold 求均值",
+   "operationalization": {
+    "predictor_family": "B4 = 端点 / 词袋 / 位置 / 加性 四基线中最好的组合预测器（3151/3152 冻结实现）",
+    "layer": "readout layer（模型特异；见 readout_layer）",
+    "fold": "s7 test fold（147 行）",
+    "seeds": 3,
+    "aggregation": "对 3 seed 取算术平均",
+    "primary_key": "k1_model_report.b4_rel_readout_mean3seed",
+    "secondary_key_report_only": "k1_model_report.b4_rel_kstar_mean3seed（承诺层，仅附表，不作主线）"
+   },
+   "data": {
+    "panel_rows": 738,
+    "n_pairs": 246,
+    "heldout_carrier": {
+     "qwen3-4b": {
+      "path": "tests/glm5/result/rdc_query_construction_20260913/phase3152/g1p2_tri_model_k1/qwen3-4b/collect.npz",
+      "bytes": 108334806,
+      "sha8": "4ef190b7"
+     },
+     "qwen3-14b": {
+      "path": "tests/glm5/result/rdc_query_construction_20260913/phase3152/g1p2_tri_model_k1/qwen3-14b/collect.npz",
+      "bytes": 238580833,
+      "sha8": "733182c1"
+     },
+     "glm4-9b": {
+      "path": "tests/glm5/result/rdc_query_construction_20260913/phase3151/g1p1_combo_additive_vs_interaction/collect.npz",
+      "bytes": 190179622,
+      "sha8": "c711946c"
+     }
+    },
+    "carrier_cross_check_glm4_source_npz": true
+   },
+   "gate": {
+    "threshold": 0.05,
+    "sense": "error <= 0.05 为过",
+    "name": "5% 门"
+   },
+   "ci": {
+    "method": "per-seed 全列 + 3-seed 均值；seed 数=3 不折叠为区间",
+    "bootstrap": "未启用（seed=3）；扩至 >=10 seed 后再启用 percentile bootstrap"
+   },
+   "current": {
+    "qwen3-4b": 0.3316153089205424,
+    "qwen3-14b": 0.39860084652900696,
+    "glm4-9b": 0.389835258324941
+   },
+   "current_verdict": "all_above_gate (0/3 过门)",
+   "source": {
+    "phase": 3152,
+    "per_model": {
+     "qwen3-4b": {
+      "result_path": "tests/glm5/result/rdc_query_construction_20260913/phase3152/g1p2_tri_model_k1/qwen3-4b/result.json",
+      "result_file_sha8": "c38b97ff",
+      "res_sha8": "199b145d",
+      "seal_sha8": "4954e55b",
+      "model_field": "qwen3-4b",
+      "NL": 36,
+      "readout_layer": 35,
+      "kstar": 3,
+      "b4_rel_readout_mean3seed": 0.3316153089205424,
+      "b4_rel_readout_per_seed": [
+       0.3320900797843933,
+       0.3405764698982239,
+       0.32217937707901
+      ],
+      "b4_rel_kstar_mean3seed": 0.007910657984515032,
+      "panel_rows": 738,
+      "n_pairs": 246
+     },
+     "qwen3-14b": {
+      "result_path": "tests/glm5/result/rdc_query_construction_20260913/phase3152/g1p2_tri_model_k1/qwen3-14b/result.json",
+      "result_file_sha8": "23dfb646",
+      "res_sha8": "8a29eace",
+      "seal_sha8": "2631b5fd",
+      "model_field": "qwen3-14b",
+      "NL": 40,
+      "readout_layer": 39,
+      "kstar": 3,
+      "b4_rel_readout_mean3seed": 0.39860084652900696,
+      "b4_rel_readout_per_seed": [
+       0.4094776213169098,
+       0.40581539273262024,
+       0.38050952553749084
+      ],
+      "b4_rel_kstar_mean3seed": 0.0806781401236852,
+      "panel_rows": 738,
+      "n_pairs": 246
+     },
+     "glm4-9b": {
+      "result_path": "tests/glm5/result/rdc_query_construction_20260913/phase3152/g1p2_tri_model_k1/glm4k1/result.json",
+      "result_file_sha8": "111a1152",
+      "res_sha8": "52d05025",
+      "seal_sha8": "e302664b",
+      "model_field": "glm4-9b",
+      "NL": 40,
+      "readout_layer": 39,
+      "kstar": 3,
+      "b4_rel_readout_mean3seed": 0.389835258324941,
+      "b4_rel_readout_per_seed": [
+       0.4173515737056732,
+       0.3845253884792328,
+       0.367628812789917
+      ],
+      "b4_rel_kstar_mean3seed": 0.04612794021765391,
+      "panel_rows": 738,
+      "n_pairs": 246
+     }
+    },
+    "summary": {
+     "path": "tests/glm5/result/rdc_query_construction_20260913/phase3152/g1p2_tri_model_k1/summary/result_summary.json",
+     "file_sha8": "a6c68981",
+     "res_sha8": "1d17b42e",
+     "seal_sha8": "ca50e253"
+    }
+   },
+   "status": "measured"
+  },
+  "E_ar": {
+   "name_cn": "k 步自回归 logit-margin 误差",
+   "space": "behavior-autoregressive",
+   "definition": "把模型自身前 k 步生成内容回喂后，对第 k 步 logit-margin（目标 token 减竞争 token）的预测误差",
+   "formula": "E_ar(k) = mean_cells | margin_pred(k; i, c) - margin_true(k; i, c) |，margin = logit(t_target) - logit(t_competitor)",
+   "status": "device_built",
+   "device_built_in": "Q04",
+   "to_measure_in": "Q05（全面板三模型曲线）",
+   "operationalization": {
+    "margin": "logit(t_target) - logit(t_competitor)；t_target = 该 cell 真实类名首 token；t_competitor = k=0 处 logit 最高的非该类类首 token（每 cell 冻结）",
+    "margin_true(k)": "模型自身前 k 步贪心生成内容回喂后，第 k 步 last-position 的 margin（k=0 = 模板前缀本身，无回喂）；纯自回归 rollout，无 teacher forcing",
+    "margin_pred(k)": "与 E_read 同一 B4 加性族（one-hot[entity 41] + one-hot[class 6] + one-hot[template 3] + bias, ridge λ=1e-3）在 held-out 行上的预测",
+    "predictor_family": "B4 = ridge_primal（与 E_read 同实现）",
+    "target_units": "logit（原始 L1，不归一化）",
+    "aggregation": "per seed: mean over held-out rows；then mean over 3 seeds",
+    "rollout": "ctx0 = 模板前缀 token ids；每步读 6 类 logit；k<K 时 append argmax(logits_last) 回喂"
+   },
+   "data": {
+    "panel": "与 E_read 同一 held-out 面板族：41 实体 × 6 类 = 246 pairs × 3 模板 = 738 行",
+    "fold": "S1 seeds [7,8,9]，frac=0.2 -> 49 test pairs × 3 模板 = 147 held-out 行/seed",
+    "carriers": "不需要既有 collect.npz；现场 logits（Q04 自采）",
+    "fingerprint_cross_check": "test_pairs_sha8 与 Q03 E_read 指纹逐项相同（复核 V3 PASS）"
+   },
+   "k_range": {
+    "K": 16,
+    "reported": "0..K（k=0 为装置确定性锚）",
+    "smoke_K": 4
+   },
+   "gate": {
+    "device": {
+     "D1": "k=0 确定性锚：同 cell 两遍 6 类 logit 逐位相同",
+     "D2": "非退化：held-out margin_true std > 0",
+     "D3": "存活性：全部 E_ar(k) 有限"
+    },
+    "S_smoke": {
+     "rule": "max_{k>=1} E_ar(k) >= 0.05（**原始 logit**）",
+     "role": "装置灵敏度门（非科学否证门）",
+     "observed": 4.403092861175537,
+     "thr": 0.05,
+     "pass": true
+    },
+    "S_rel_q05_prereg": {
+     "rule": "min_{k=1..K} E_ar_rel(k) <= 0.05，E_ar_rel = E_ar(k) / scale(k)",
+     "scale": "held-out margin_true 的 std",
+     "frozen_before": "Q05 任何观测（2026-10-03 Q04 冻结）",
+     "rationale": "Q04 SMOKE 发现原始 logit 单位下 0.05 被 88× 平凡满足、不具否证力；按冻结纪律不追溯改 S1，另立相对形式为 Q05 科学门"
+    }
+   },
+   "ci": "Q04 smoke 为装置验证，不报 CI；Q05 随全面板三模型报 per-seed 全列（3 seed 不折叠）",
+   "current": {
+    "smoke_only": true,
+    "model": "qwen3-4b",
+    "cells": 180,
+    "K": 4,
+    "forwards": 900,
+    "E_ar": {
+     "0": 3.2823269367218018,
+     "1": 4.403092861175537,
+     "2": 3.3877416451772056,
+     "3": 3.670281092325846,
+     "4": 3.120255947113037
+    },
+    "E_ar_rel": {
+     "0": 0.4669075302614326,
+     "1": 0.5413828229974416,
+     "2": 0.5788571934655581,
+     "3": 0.6382624710906063,
+     "4": 0.6681987860578157
+    },
+    "gates": {
+     "D1": true,
+     "D2": true,
+     "D3": true,
+     "S1": true,
+     "S1_max_k_ge1": 4.403092861175537,
+     "S1_thr": 0.05
+    },
+    "verdict": "SMOKE_DEVICE_OK|S1_DRIFT_DETECTED",
+    "note": "SMOKE 子面板仅 10 实体（PAIRS[:60]），E_ar 偏大且 per-seed 方差大，数字**不可科学解读**；仅证明装置端到端可用"
+   },
+   "device_artifacts": {
+    "device_script": "tests/deepseek/q04_e_ar_device.py",
+    "execution": {
+     "path": "tests/deepseek/result/q04_smoke_execution.json",
+     "design_sha": "33ddf69d537eba0ac98b881f80bb533b521e00a16dc913df4a5941d06c24d74e"
+    },
+    "result": {
+     "path": "tests/deepseek/result/q04_smoke_result.json",
+     "res_sha8": "04ad1af3"
+    },
+    "verify": {
+     "path": "tests/deepseek/result/verify_q04.txt",
+     "tally": "14 PASS / 0 FAIL"
+    }
+   }
+  },
+  "C_steer": {
+   "name_cn": "可控率（无附带损伤）",
+   "space": "causal-control",
+   "definition": "对 held-out 目标组合，用抽取出的机制构造干预后行为被正确改变、且无附带损伤的样本比例",
+   "formula": "C_steer = #{ (i,c) : behaviour_after_intervention = target AND collateral(i,c) = 0 } / N_heldout",
+   "status": "not_measured",
+   "to_measure_in": "Q06（基座）/ Q20（正式化）",
+   "gate": "待 Q20 预注册（低分即诚实总成绩，不得事后改判）",
+   "ci": "binomial（n = held-out 行数）；MDE 由 Q11 功效约束决定",
+   "proxy_evidence": {
+    "cancel_reverse_aggravate": 0.82,
+    "collateral_floor": "3.5/13",
+    "source": "research/gpt5/docs/LOOP_DIAGNOSIS_AND_EXIT_v1.md"
+   }
+  }
+ },
+ "kpi_registration_rule": {
+  "rule": "每个 Phase 必须报告 E_read / E_ar(k) / C_steer 三者；未降低其中任何一项者，Ledger 登记为 catalog（目录条目），不得登记为 advance（进展）",
+  "source": "RDC_RESEARCH_CONSTITUTION_v1.md §1 (I1)",
+  "anti_gaming": "必须与 §4 可识别性门 + §3 单模型否决权捆绑使用；KPI 被优化到虚假低值（held-out 泄漏 / 选易子面板）= 重演同一错误"
+ },
+ "ci_methods": {
+  "seed_level": "3 seed 全部单列（per_seed），不折叠",
+  "bootstrap": "未启用；扩 seed 后启用 percentile bootstrap（n_boot=10000）",
+  "mde": "由 gate_precheck 计算（binomial 或 paired），一律报告 margin vs MDE"
+ },
+ "content_sha256_8": "72a3d2c4"
+}

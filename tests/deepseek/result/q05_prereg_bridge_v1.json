@@ -1,0 +1,36 @@
+{
+ "schema": "rdc_q05_prereg_bridge_v1",
+ "query": "Q05",
+ "frozen_by": "tests/deepseek/q05_aggregate.py",
+ "frozen_before": "任何 nf4 臂观测（qwen3-4b nf4 / qwen3-14b nf4 / glm4-9b nf4 尚未运行）",
+ "rationale": "14B/9B 因 16 GB 显存无法 bf16 常驻，Q05 对 14B/9B 改用 4-bit NF4。量化会改变 logit，故必须用一个同模型双精度对照来界定 nf4 臂与 bf16 臂（以及 E_read bf16 基线）的可比性。",
+ "D4_precision_bridge": {
+  "rule": "max_{k=0..K} | E_ar_rel(qwen3-4b,nf4,k) - E_ar_rel(qwen3-4b,bf16,k) | <= THR",
+  "THR": 0.05,
+  "sense": "<= pass",
+  "E_ar_rel_def": "E_ar(k) / scale(k)，scale = held-out margin_true 的 std（与 Q04 预注册一致）",
+  "on_pass": "nf4 臂判定为与 bf16 可比（声明量化带）；14B/9B 曲线获准与 4b 同轴并排",
+  "on_fail": "nf4 臂降级为 descriptive-only：14B/9B 曲线不得与 bf16 基线同轴定量比较，仅报形状与量级"
+ },
+ "D4_secondary": {
+  "rule": "max_{k=0..K} |dE_ar_rel(k)| / max(E_ar_rel(qwen3-4b,bf16,·), 1e-9) <= 0.25",
+  "sense": "<= pass",
+  "note": "相对形式，抗尺度；report-only，不单独改判"
+ },
+ "shape_rule": {
+  "g(k)": "E_ar(k) - E_ar(0), k=0..K",
+  "G": "g(K)",
+  "tol_flat": "0.05 * scale(K)",
+  "flat": "G <= tol_flat",
+  "half_life_k": "min{ k>=1 : g(k) >= 0.5*G }（G>0 时）",
+  "linear": "mean(second-difference of g) 的绝对值 <= 0.02*|G|",
+  "saturating": "mean(second-difference of g) < 0",
+  "diverging": "mean(second-difference of g) > 0",
+  "note": "按 E_ar(k) 的漂移形状分类；hf 半衰期定义为漂移达半程的 k"
+ },
+ "S_rel": {
+  "rule": "min_{k=1..K} E_ar_rel(k) <= 0.05",
+  "sense": "<= pass",
+  "note": "Q04 已预注册的 Q05 科学门（原始 S1=0.05 logit 因量纲被平凡满足，保留为装置灵敏度门）"
+ }
+}

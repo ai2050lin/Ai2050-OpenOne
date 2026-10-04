@@ -1,0 +1,120 @@
+{
+ "query": "Q04",
+ "title": "E_ar(k) 装置建造",
+ "mode": "device-build + SMOKE",
+ "model": "qwen3-4b",
+ "mdir": "D:\\AI2050\\Ai2050-OpenOne\\models\\hf\\qwen3-4b",
+ "smoke": true,
+ "panel": {
+  "classes": [
+   "水果",
+   "动物",
+   "交通工具",
+   "家具",
+   "金属",
+   "颜色"
+  ],
+  "ents": [
+   "苹果",
+   "香蕉",
+   "梨",
+   "西瓜",
+   "葡萄",
+   "草莓",
+   "芒果",
+   "柠檬",
+   "狗",
+   "猫",
+   "老虎",
+   "大象",
+   "兔子",
+   "猴子",
+   "马",
+   "牛",
+   "汽车",
+   "火车",
+   "飞机",
+   "摩托车",
+   "卡车",
+   "地铁",
+   "桌子",
+   "椅子",
+   "床",
+   "沙发",
+   "地毯",
+   "窗帘",
+   "铁",
+   "铜",
+   "铝",
+   "金",
+   "银",
+   "锌",
+   "铅",
+   "红",
+   "蓝",
+   "绿",
+   "黄",
+   "黑",
+   "白"
+  ],
+  "tpl": {
+   "0": "{e}是一种{c}。",
+   "1": "{e}属于{c}这一类。",
+   "2": "{e}，一种常见的{c}。"
+  },
+  "tpl_p0": {
+   "0": "{e}是一种",
+   "1": "{e}属于",
+   "2": "{e}，一种常见的"
+  },
+  "n_entities": 41,
+  "n_classes": 6,
+  "n_pairs": 246,
+  "n_tpl": 3,
+  "rows_full": 738,
+  "rows_active": 180,
+  "pairs_active": 60,
+  "seeds_s1": [
+   7,
+   8,
+   9
+  ],
+  "frac_s1": 0.2,
+  "heldout_rows_per_seed": 147,
+  "engine_note": "与 E_read 同一 held-out 面板族（S1 fold）"
+ },
+ "device": {
+  "k_range": "0..K (k=0 为确定性锚)",
+  "K": 4,
+  "roll": "greedy self-rollout: ctx0 = P0 token ids; 每步读 last-position 6 类 logit; k<K 时 apped argmax(logits_last) 回喂",
+  "margin": "logit(t_target) - logit(t_competitor); t_target = 该类首 token; t_competitor = k=0 处 logit 最高的非该类类首 token（每 cell 冻结）",
+  "predictor": "B4 additive: ridge_primal(one-hot[entity]+one-hot[class]+one-hot[template]+bias)",
+  "lam": 0.001,
+  "feature_cols": 51,
+  "target_units": "logit（原始 L1，不归一化）",
+  "normalization": "none (frozen formula is raw L1); secondary relative scale reported only",
+  "seeds": [
+   7,
+   8,
+   9
+  ],
+  "aggregation": "per seed: mean over held-out rows; then mean over 3 seeds",
+  "maxctx": 64
+ },
+ "gates": {
+  "D1": "k=0 determinism: two passes bit-identical on 6-class logits (k=0..K)",
+  "D2": "non-degeneracy: std(margin_true over held-out cells) > 0",
+  "D3": "liveness: all E_ar(k) finite",
+  "S1": {
+   "rule": "max_{k>=1} E_ar(k) >= MARGIN_FLOOR",
+   "thr": 0.05,
+   "sense": ">= pass",
+   "note": "姿态：几何漂移可检；Q05 判决形状"
+  }
+ },
+ "carriers": {},
+ "frozen_before": "any model observation",
+ "panel_sha8": "be17ef8a",
+ "mdir_config_sha8": "8ba006f7",
+ "design_sha": "33ddf69d537eba0ac98b881f80bb533b521e00a16dc913df4a5941d06c24d74e"
+}

@@ -1,0 +1,255 @@
+{
+  "schema": "rdc_meta_single_source_v4",
+  "frozen_at": "2026-10-03",
+  "generated_by": "tests/deepseek/_review/gen_q01_r4.py",
+  "supersedes": {
+    "schema_version": 3,
+    "note": "ledger schema_version=3 实为两套异构 schema 并存"
+  },
+  "single_source_of_truth": {
+    "proposition_grades": {
+      "path": "tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json",
+      "sha8": "9a3c6ff4",
+      "n_atomic": 62
+    },
+    "measurements": {
+      "path": "research/gpt5/atlas/atlas_ledger.json",
+      "sha8": "bbda63df",
+      "n": 304
+    },
+    "kpi": {
+      "path": "research/gpt5/atlas/metric_dict.json",
+      "status": "pending_Q02"
+    }
+  },
+  "grade_counting": {
+    "canonical": "component",
+    "also_report": "atomic_best",
+    "forbidden": "分量数 ÷ 条数（量纲混淆）",
+    "tables": {
+      "component": {
+        "A": 5,
+        "B": 34,
+        "C": 14,
+        "D": 21,
+        "E": 20
+      },
+      "atomic_first": {
+        "A": 3,
+        "B": 27,
+        "C": 10,
+        "D": 9,
+        "E": 13
+      },
+      "atomic_last": {
+        "A": 5,
+        "B": 18,
+        "C": 11,
+        "D": 18,
+        "E": 10
+      },
+      "atomic_best": {
+        "A": 5,
+        "B": 34,
+        "C": 11,
+        "D": 9,
+        "E": 3
+      },
+      "atomic_worst": {
+        "A": 3,
+        "B": 11,
+        "C": 10,
+        "D": 18,
+        "E": 20
+      }
+    },
+    "sums": {
+      "component": 94,
+      "atomic": 62
+    },
+    "ratios_consistent": {
+      "component_AB_over_component": 41.4894,
+      "atomic_best_AB_over_atomic": 62.9032
+    },
+    "reproduced": {
+      "memo_3103": true,
+      "testplan": false
+    }
+  },
+  "hash_policy": {
+    "scope": "content_excluding_self",
+    "algo": "sha256[:8]",
+    "serialization": "json.dumps(obj, ensure_ascii=False, indent=1), utf-8, no trailing newline, LF",
+    "atlas_ledger": {
+      "recorded": "41d65a13",
+      "raw_bytes_sha8": "bbda63df",
+      "correct_self_excluding": "0dc6e57a",
+      "format_is_canonical": true,
+      "status": "STALE__correction_C4_sealed_pending_cross_line"
+    },
+    "proposition_ledger": {
+      "recorded_in_memo3103": "add57ba7",
+      "actual": "9a3c6ff4",
+      "status": "STALE__correction_C5_sealed_recorded_externally"
+    }
+  },
+  "measurements_schema": {
+    "n_total": 304,
+    "n_has_meas_id": 270,
+    "n_has_phase": 199,
+    "n_both": 165,
+    "evidence_level_distribution": {
+      "statistical": 304
+    },
+    "evidence_level_is_constant": true
+  },
+  "discrepancies": [
+    {
+      "id": "D1",
+      "what": "命题账本分级口径",
+      "values": {
+        "memo": "A=5 / B=34 / C=14 / D=21 / E=20",
+        "testplan": "A=5 / B=6 / C=10 / D=21 / E=20"
+      },
+      "verdict": "口径混用；testplan 不可复现",
+      "fix": "强制 count_mode；canonical=component"
+    },
+    {
+      "id": "D2",
+      "what": "有效依赖比例",
+      "values": {
+        "memo_pct": "55",
+        "recomputed_ab_over_n": 62.9032
+      },
+      "verdict": "量纲混淆",
+      "fix": "同口径只报一个值"
+    },
+    {
+      "id": "D3",
+      "what": "atlas_ledger 自声明哈希",
+      "values": {
+        "recorded": "41d65a13",
+        "actual": "bbda63df"
+      },
+      "verdict": "文件内自指 + 追加必失配",
+      "fix": "content_excluding_self，重算不变量 0dc6e57a"
+    },
+    {
+      "id": "D4",
+      "what": "proposition_ledger 记录哈希",
+      "values": {
+        "memo": "add57ba7",
+        "actual": "9a3c6ff4"
+      },
+      "verdict": "同上",
+      "fix": "外部 manifest 或重算"
+    },
+    {
+      "id": "D5",
+      "what": "Ledger schema 一致性",
+      "values": {
+        "has_meas_id": 270,
+        "has_phase": 199,
+        "both": 165
+      },
+      "verdict": "两套 schema 并存 + evidence_level 为常量",
+      "fix": "统一字段 + 三值枚举"
+    }
+  ],
+  "corrections": [
+    {
+      "id": "C1",
+      "target": "MEMO 3103",
+      "status": "accepted_sealed",
+      "resolved_value": {
+        "count_mode": "component",
+        "n_atomic": 62,
+        "sum_components": 94,
+        "table": {
+          "A": 5,
+          "B": 34,
+          "C": 14,
+          "D": 21,
+          "E": 20
+        }
+      },
+      "enactment": "本线已记录；目标正文位于 G 线备忘录（AGI_GPT5_MEMO.md），跨线不改。",
+      "sealed_at": "2026-10-03 05:03"
+    },
+    {
+      "id": "C2",
+      "target": "MEMO 3103",
+      "status": "accepted_sealed",
+      "resolved_value": {
+        "canonical_pct": 41.4894,
+        "canonical_frac": "39/94",
+        "alternate_pct": 62.9032,
+        "alternate_frac": "39/62",
+        "canonical_mode": "component"
+      },
+      "enactment": "本线已记录并采用 canonical=41.5%。",
+      "sealed_at": "2026-10-03 05:03"
+    },
+    {
+      "id": "C3",
+      "target": "TESTPLAN T5",
+      "status": "accepted_sealed",
+      "resolved_value": {
+        "A": 5,
+        "B": 34,
+        "C": 14,
+        "D": 21,
+        "E": 20,
+        "count_mode": "component",
+        "n_atomic": 62
+      },
+      "enactment": "TESTPLAN 已作为归档全文并入本线备忘录（Phase 23，逐字保留）；更正以本记录 + memo erratum 形式声明，不改写归档正文。",
+      "sealed_at": "2026-10-03 05:03"
+    },
+    {
+      "id": "C4",
+      "target": "atlas_ledger.json",
+      "status": "accepted_sealed_pending_cross_line",
+      "resolved_value": {
+        "recorded": "41d65a13",
+        "file_sha8": "bbda63df",
+        "correct_self_excluding": "0dc6e57a",
+        "recomputed_here": true
+      },
+      "enactment": "目标文件为跨线共享（含 G 线 Phase 2902–3153 测量）⇒ 未施加；补丁规格见 ledger_corrections_v1.json。",
+      "sealed_at": "2026-10-03 05:03"
+    },
+    {
+      "id": "C5",
+      "target": "MEMO 3103 哈希记录",
+      "status": "accepted_sealed",
+      "resolved_value": {
+        "recorded_in_memo3103": "add57ba7",
+        "actual": "9a3c6ff4",
+        "path": "tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json",
+        "verified_here": "9a3c6ff4"
+      },
+      "enactment": "本线以外部 manifest 记录真值（哈希自指失效 ⇒ 不写入被哈希文件本体）。",
+      "sealed_at": "2026-10-03 05:03"
+    },
+    {
+      "id": "C6",
+      "target": "atlas_ledger measurements schema",
+      "status": "accepted_sealed_pending_cross_line",
+      "resolved_value": {
+        "n_total": 304,
+        "n_has_meas_id": 270,
+        "n_has_phase": 199,
+        "n_both": 165,
+        "evidence_level_values": [
+          "statistical"
+        ]
+      },
+      "enactment": "目标为跨线共享文件 ⇒ 未施加；补丁规格见 ledger_corrections_v1.json。",
+      "sealed_at": "2026-10-03 05:03"
+    }
+  ],
+  "sealed_at": "2026-10-03 05:03",
+  "seal_verbatim": "seal: Q08=甲 | C=全接受 | I1=确认 | I9=确认",
+  "closure_record": "research/deepseek/atlas/a_gate_closure_v1.json"
+}

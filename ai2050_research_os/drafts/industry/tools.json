@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "status": "draft-pending-review",
+    "date": "2026-10-03",
+    "note": "工具链对比首批草案（D1）。relation_to_project 取值：reusable=可直接复用 / contrast=构成对照或竞品视角 / reference=借鉴思想 / in_house=本项目已自有。工具信息来自官方文档桌面检索，正式化前需核对最新版本。",
+    "counts": {"tools": 11}
+  },
+  "tools": [
+    {"tool_id": "T-transformerlens", "name": "TransformerLens", "org": "Neel Nanda / Joseph Bloom", "role": "Hook 级激活读写框架，IOI 等经典电路研究的基础设施", "models_note": "HF 开源小中型模型", "relation_to_project": "reusable", "project_note": "本项目冻结的 Qwen3/GLM4 装置可直接对接其 Hook 语义"},
+    {"tool_id": "T-saelens", "name": "SAELens", "org": "Joseph Bloom / Curt Tigges", "role": "SAE 训练与分析标准库", "models_note": "与 TransformerLens 同生态", "relation_to_project": "reference", "project_note": "若做特征字典对照实验可复用；注意 SAEBench 指标教训"},
+    {"tool_id": "T-nnsight", "name": "nnsight + NDIF", "org": "nnsight 社区", "role": "远程大规模模型 tracing（几十亿参数级）", "models_note": "NDIF 托管大模型", "relation_to_project": "reference", "project_note": "本地无对应算力；大模型验证阶段可借鉴其远程采样协议"},
+    {"tool_id": "T-circuit-tracer", "name": "circuit-tracer", "org": "Anthropic", "role": "归因图生成（跨层 transcoder 替换模型）", "models_note": "Gemma/Llama 等开源权重", "relation_to_project": "contrast", "project_note": "与本项目条件算子线最接近的竞品：它做替换模型归因，我们做条件化响应系统辨识；Qwen3 上跑通其 pipeline 可作为交叉对照"},
+    {"tool_id": "T-neuronpedia", "name": "Neuronpedia", "org": "Curt Tigges / Joseph Bloom", "role": "SAE 特征/归因图浏览器前端", "models_note": "配套 SAE 字典", "relation_to_project": "contrast", "project_note": "展示'特征字典'视角；本平台差异化=展示'结论如何被证出来'的证据链视角"},
+    {"tool_id": "T-saebench", "name": "SAEBench", "org": "Karvonen et al.", "role": "SAE 下游有用性基准", "models_note": "-", "relation_to_project": "reference", "project_note": "其'代理指标不追踪下游'教训应纳入本项目指标设计"},
+    {"tool_id": "T-axbench", "name": "AxBench", "org": "Stanford / Wu et al.", "role": "steering 评估基准（含简单基线对照）", "models_note": "-", "relation_to_project": "contrast", "project_note": "对 C_steer 类实验（Q06）是现成对照设计来源"},
+    {"tool_id": "T-bertviz", "name": "BertViz", "org": "Jesse Vig", "role": "注意力头可视化（较早期）", "models_note": "HF 模型", "relation_to_project": "reference", "project_note": "交互范式可借鉴；注意 attention 权重≠信息流"},
+    {"tool_id": "T-researchctl", "name": "researchctl.py 仪器链", "org": "本项目", "role": "Registry 校验/快照/漂移审计/冻结 manifest", "models_note": "-", "relation_to_project": "in_house", "project_note": "行业工具普遍缺失的治理层，是平台差异化资产"},
+    {"tool_id": "T-deepseek-device", "name": "tests/deepseek 测量装置（E_read / E_ar / C_steer）", "org": "本项目", "role": "行为读出、算子响应、steer 基座测量装置（bf16/NF4 精度策略已验证）", "models_note": "Qwen3-4B/14B, GLM4, DS7B", "relation_to_project": "in_house", "project_note": "对应行业 circuit-tracer 的对照位：以条件化响应转移而非替换模型归因为主线"},
+    {"tool_id": "T-rdc-services", "name": "rdc_* / native_* 服务族", "org": "本项目", "role": "60+ 服务：语言族、响应关系、单坐标/单参数钻取、算子/规律查询", "models_note": "-", "relation_to_project": "in_house", "project_note": "客户端三层视图（行为/激活/参数）的数据后端已基本存在"}
+  ]
+}

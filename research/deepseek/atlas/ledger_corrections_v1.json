@@ -1,0 +1,57 @@
+{
+  "schema": "rdc_cross_line_ledger_patch_v1",
+  "created_at": "2026-10-03 05:03",
+  "status": "SEALED_BUT_NOT_APPLIED",
+  "reason": "目标文件 research/gpt5/atlas/atlas_ledger.json 为跨线共享（含 deepseek Phase 8–21 与 G 线 Phase 2902–3153），本对话规范要求避免与其他路线混合 ⇒ 不施加，交其所有者或经用户再确认后施加。",
+  "target": "research/gpt5/atlas/atlas_ledger.json",
+  "target_sha256_before": "bbda63df990b7f17a47c3585bc7394cc84e865c1cc54f0b726d54c6c5754a157",
+  "operations": [
+    {
+      "op": "set_field",
+      "path": "ledger_sha256_8",
+      "from": "41d65a13",
+      "to": "0dc6e57a",
+      "note": "C4：content_excluding_self（json.dumps(...indent=1, ensure_ascii=False, 无尾换行) 的 sha256[:8]），本对话已独立复现"
+    },
+    {
+      "op": "unify_schema",
+      "fields": [
+        "meas_id",
+        "phase"
+      ],
+      "detail": {
+        "n_total": 304,
+        "n_has_meas_id": 270,
+        "n_has_phase": 199,
+        "n_both": 165
+      },
+      "note": "C6：统一后每条含 meas_id+phase；缺者按 name/sha 从 tests/glm5/.../phaseNNNN 回填"
+    },
+    {
+      "op": "enumerate_field",
+      "path": "measurements[].evidence_level",
+      "allowed": [
+        "bit_anchored",
+        "statistical",
+        "descriptive"
+      ],
+      "current_distribution": {
+        "statistical": 304
+      },
+      "note": "C6：现 304/304 恒为 statistical（常量）⇒ 须按 metric_dict.meta_rules.F2_verdict_grading 重新判定每条"
+    },
+    {
+      "op": "append_measurement",
+      "entry": {
+        "phase": "A-gate",
+        "name": "rdc_a_gate_closure_q01_q02_q08_q09_q12",
+        "verdict": "k1_fired_at_readout__kspecific__k2_k3_not_measurable__A_gate_closed",
+        "evidence_level": "bit_anchored",
+        "note": "Q08=甲 seal 后登记；属治理记录非科学测量"
+      },
+      "note": "A 闸门关闭的治理登记（Q08=甲）"
+    }
+  ],
+  "recorded_correct_value": "0dc6e57a",
+  "closure_record": "research/deepseek/atlas/a_gate_closure_v1.json"
+}

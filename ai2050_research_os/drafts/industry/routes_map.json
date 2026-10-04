@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "status": "draft-pending-review",
+    "date": "2026-10-03",
+    "note": "研究路线图谱（D1）：破解 LLM 语言机制的十条互补路线，按 Marr 三层级（computational/algorithmic/implementational）× 黑箱-白箱光谱排布。机制结论需要行为、算法、实现三层证据收敛。marr_level: computational=什么知识/什么问题, algorithmic=什么算法, implementational=如何实现。axis: 0=纯行为黑箱, 1=纯内部白箱。atlas_axis 对应本项目三图谱+证据纪律。",
+    "counts": {"routes": 10}
+  },
+  "routes": [
+    {"route_id": "R-psycholinguistics", "name": "心理语言学测试", "marr_level": "computational", "axis": 0.1, "representative": "主谓一致探针 (Linzen 2016)、BLiMP、最小对立对、BabyLM", "contribution": "外部语言图谱的判定材料与习得顺序", "limit": "行为正确不等于机制正确", "atlas_axis": "language_atlas"},
+    {"route_id": "R-info-compression", "name": "信息论与压缩", "marr_level": "computational", "axis": 0.4, "representative": "information bottleneck (Tishby)、语言建模即压缩 (Deletang 2024)、MDL", "contribution": "解释 next-token 训练为何逼出语言结构", "limit": "聚合量，无法定位", "atlas_axis": "mapping_mechanism"},
+    {"route_id": "R-formal-expressivity", "name": "形式表达力理论", "marr_level": "computational", "axis": 0.7, "representative": "Transformer 限于 TC0 (Hahn 2020, Merrill)、RASP (Weiss 2021)、Chomsky 层级识别力 (Bhattamishra)", "contribution": "机制假设的可行性边界；RASP 可作为条件齿轮组的形式化目标语言", "limit": "能表达不等于已学到", "atlas_axis": "language_atlas"},
+    {"route_id": "R-system-identification", "name": "行为系统辨识", "marr_level": "algorithmic", "axis": 0.15, "representative": "输入-输出系统辨识、条件化响应转移测量", "contribution": "TECHNICAL_FRAMEWORK 主线：语言计算系统辨识；预测条件变化下的响应", "limit": "黑箱规律仍需内部对齐", "atlas_axis": "mapping_mechanism"},
+    {"route_id": "R-representation-geometry", "name": "表示几何与探针", "marr_level": "algorithmic", "axis": 0.55, "representative": "probing、logit lens、RSA/CKA、线性表示假设、TDA", "contribution": "内部响应图谱的静态地图", "limit": "可解码不等于被使用", "atlas_axis": "response_atlas"},
+    {"route_id": "R-causal-abstraction", "name": "因果抽象与互换干预", "marr_level": "algorithmic", "axis": 0.65, "representative": "interchange intervention、DAS、causal abstraction (Geiger)", "contribution": "网络与候选符号算法的形式对齐验证器", "limit": "必须先有候选算法假设", "atlas_axis": "mapping_mechanism"},
+    {"route_id": "R-neurosymbolic", "name": "神经符号提取", "marr_level": "algorithmic", "axis": 0.85, "representative": "RASP 编译、程序合成、grammar induction", "contribution": "输出可读可验证的机制描述", "limit": "目前只覆盖小型算法", "atlas_axis": "mapping_mechanism"},
+    {"route_id": "R-cognitive-alignment", "name": "认知与脑对齐", "marr_level": "implementational", "axis": 0.2, "representative": "Brain-Score、阅读时程/ERP 对齐 (Schrimpf 2021)、习得顺序对比", "contribution": "语言机制的人类参照系；可塑性研究的对照位", "limit": "类比不等于同构", "atlas_axis": "response_atlas"},
+    {"route_id": "R-training-dynamics", "name": "训练动力学与发育", "marr_level": "implementational", "axis": 0.5, "representative": "grokking (Power 2022)、induction bump (Olsson 2022)、涌现能力、记忆到泛化", "contribution": "机制如何形成（可塑性）；对应路线图第 4 站", "limit": "训练运行成本高", "atlas_axis": "response_atlas"},
+    {"route_id": "R-mech-interp", "name": "机制可解释性（项目主轴）", "marr_level": "implementational", "axis": 0.95, "representative": "circuits、SAE、归因图、跨层 transcoder", "contribution": "唯一直接解剖实现层的路线", "limit": "最贵；忠实性与完备性未闭合", "atlas_axis": "response_atlas"}
+  ]
+}
