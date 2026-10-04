@@ -1,0 +1,98 @@
+{
+  "$schema": "config/industry_sources.schema.inline.v1",
+  "version": 1,
+  "created_at": "2026-10-04T00:30:00-05:00",
+  "description": "Public-release config: industry-intelligence sources fetched on demand by scripts/fetch_industry.py. Cached into cache/industry/ (gitignored, never committed). Raw artifacts archived here are required evidence before any industry.json record is promoted to status=verified.",
+  "fetch_policy": {
+    "cache_dir": "ai2050_research_os/cache/industry",
+    "timeout_seconds": 30,
+    "user_agent": "AI2050-MechInterp-Platform/1.0 (+research fetcher)",
+    "retry": 2,
+    "offline_mode": "skip-and-report",
+    "manifest": "cache/industry/manifest.json"
+  },
+  "sources": [
+    {
+      "id": "SRC-TL",
+      "name": "TransformerLens",
+      "type": "tool_repo",
+      "url": "https://github.com/TransformerLensOrg/TransformerLens",
+      "api_url": "https://api.github.com/repos/TransformerLensOrg/TransformerLens",
+      "description": "Hook-based activation/weight access for decoder LLMs; the base instrument family this project's deepseek装置 maps onto.",
+      "industry_ref": "TOOL-TRANSFORMERLENS"
+    },
+    {
+      "id": "SRC-SAEL",
+      "name": "SAELens",
+      "type": "tool_repo",
+      "url": "https://github.com/jbloomAus/SAELens",
+      "api_url": "https://api.github.com/repos/jbloomAus/SAELens",
+      "description": "Training sparse autoencoders on transformer activations; SAE-era reference tooling.",
+      "industry_ref": "TOOL-SAELENS"
+    },
+    {
+      "id": "SRC-NNSIGHT",
+      "name": "nnsight / NDIF",
+      "type": "tool_repo",
+      "url": "https://github.com/ndif-team/nnsight",
+      "api_url": "https://api.github.com/repos/ndif-team/nnsight",
+      "description": "Remote large-model intervention platform; contrast point for our local-GPU serial discipline.",
+      "industry_ref": "TOOL-NNSIGHT"
+    },
+    {
+      "id": "SRC-CTRACER",
+      "name": "circuit-tracer (Anthropic)",
+      "type": "tool_repo",
+      "url": "https://github.com/safety-research/circuit-tracer",
+      "api_url": "https://api.github.com/repos/safety-research/circuit-tracer",
+      "description": "Attribution-graph / cross-layer-transcoder circuit tracing released 2025; mainline successor to SAE feature views.",
+      "industry_ref": "TOOL-CIRCUIT-TRACER"
+    },
+    {
+      "id": "SRC-NEURONPEDIA",
+      "name": "Neuronpedia",
+      "type": "web_portal",
+      "url": "https://neuronpedia.org",
+      "api_url": "https://www.neuronpedia.org/api/feature/qwen3-4b",
+      "description": "Public SAE feature dictionary browser; the platform we benchmark our evidence-chain view against (they show features, we show how conclusions are sealed).",
+      "industry_ref": "TOOL-NEURONPEDIA"
+    },
+    {
+      "id": "SRC-AXBENCH",
+      "name": "AxBench",
+      "type": "benchmark_repo",
+      "url": "https://github.com/stanfordnlp/axbench",
+      "api_url": "https://api.github.com/repos/stanfordnlp/axbench",
+      "description": "Steering/recovery benchmark whose sobering SAE results are part of our methods map (simple baselines can beat SAE steering).",
+      "industry_ref": "METHOD-AXBENCH-LESSONS"
+    },
+    {
+      "id": "SRC-SAEBENCH",
+      "name": "SAEBench",
+      "type": "benchmark_repo",
+      "url": "https://github.com/EleutherAI/saebench",
+      "api_url": "https://api.github.com/repos/EleutherAI/saebench",
+      "description": "SAE evaluation suite; documented the proxy-metric vs downstream-usefulness gap cited in our gap radar.",
+      "industry_ref": "METHOD-SAEBENCH-LESSONS"
+    },
+    {
+      "id": "SRC-TCIRCUITS",
+      "name": "Transformer Circuits (Anthropic essays)",
+      "type": "paper_hub",
+      "url": "https://transformer-circuits.pub",
+      "api_url": null,
+      "description": "Primary source hub: superposition, toy models, monosemantic features, attribution graphs, persona vectors.",
+      "industry_ref": "METHOD-ATTRIBUTION-GRAPHS"
+    },
+    {
+      "id": "SRC-ARXIV-MI",
+      "name": "arXiv cs.LG interpretability listing",
+      "type": "paper_feed",
+      "url": "https://arxiv.org/list/cs.LG/recent",
+      "api_url": "http://export.arxiv.org/api/query?search_query=all:mechanistic+interpretability&max_results=20&sortBy=submittedDate",
+      "description": "Rolling feed used by the weekly industry sweep; entries enter drafts/ only after manual curation.",
+      "industry_ref": null
+    }
+  ],
+  "promotion_rule": "industry.json record -> verified requires: (1) source fetched & archived with sha256, (2) claim re-checked against the primary text, (3) correction appended if wording differs."
+}

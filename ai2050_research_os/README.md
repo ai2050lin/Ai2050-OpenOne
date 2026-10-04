@@ -208,6 +208,20 @@ Layer 区域：各层 residual2（缺失时按冻结优先级回退）的 Hidden
 
 下一批任务：Q06 执行 Phase（R12：SMOKE → 正式测量 → 独立复核 → closeout，先加载 rdc-main-axis-probe / rdc-phase-closeout 技能）→ 行业记录逐条核对升格 verified → 学习模式客户端视图（ResearchCenter 学习模式读 v2 cases）。
 
+### 公开平台发布形态：仓库体积纪律与三部分数据策略 [2026-10-04 00:30]
+
+**背景**：本仓库将作为公开的机制可解释性学习平台发布，git 载荷目标 ≤100MB（硬上限 300MB）。2026-10-03 瘦身 commit `0a148e4d3` 将索引从 35,895 文件 / 4.5GB 降至 13,114 文件 / 182.9MB（后续历史处置见下）。
+
+**三部分客户端的数据获取策略**：
+
+1. **行业进展与成就 = 配置化下载**。`registry/industry.json` 为结构化骨架（29 条候选），外部原始资料通过 `config/industry_sources.json` 登记的 URL 由 `scripts/fetch_industry.py` 按需下载到 `cache/industry/`（gitignore，不入仓库）。行业条目升格 verified 时，原始网页/论文须先经 fetch 归档并登记 sha256。
+2. **可视化 = 算法 + demo 数据 + 客户端生成**。仓库只携带：`registry/visualization_specs.json`（视图规格 + 证据卡）、`registry/cases.json`（10 个教学案例，含小体积演示数字）、`snapshot v2` 投影。大数据演示不由仓库携带——客户端按 views/cases 的算法在本地从 demo 种子数据重绘；完整实验数据（npz/npy/jsonl）留在本地结果库，可按案例的 `source_refs` 用对应脚本重算。
+3. **AI 自动研究 = MEMO + 脚本，结果本地复现**。入仓库：`research/*/docs/AGI_*_MEMO.md` 活文档（历史归档快照与 log/ 剔除）、`tests/*/` 与 `scripts/` 全部实验脚本、`research/deepseek/atlas/`（队列与口径）、`tests/deepseek/result/*.json` 冻结合同（各 ≤512KB）。不入仓库：run bundle、collect.npz、行级 jsonl。他人复现路径：clone → 装依赖 → 下载模型（configs 登记 HF id 与精度策略）→ 按冻结合同重跑脚本 → 与 MEMO 中封存数字对照。
+
+**保留/剔除清单**（与 .gitignore `Public-release slimming` 段一致）：保留 py 脚本（11,435 个 / 143MB）、活 MEMO、registry/schemas/snapshots、frontend/src、demo 语料（iso_corpus）、静态官网 HTML（frontend/website，png 已剔）；剔除 tests/result（3.1GB）、四个 temp 目录数据件（0.86GB）、node_modules（0.13GB）、MNIST、LFS npy、`*.log/*.bak_*/probe 输出`。**已解除 `*.npy` 的 git-lfs 跟踪**（.gitattributes），消除 44.9GB LFS 缓存与配额依赖。
+
+**未决项（历史处置）**：本次瘦身只清洗索引与新 commit；旧历史 pack 仍约 3.2GB（GitHub 上已推 4.5GB），`git clone` 全历史仍不达标。两条处置路线待用户裁决：A）新建单 commit 发布仓库（最安全，旧仓库本地保留全部历史）；B）git-filter-repo 重写现有历史并 force push（保留 commit 线索，破坏性，需协调所有并发克隆）。
+
 ---
 
 ## 一、系统定位
