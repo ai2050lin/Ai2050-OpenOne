@@ -220,7 +220,7 @@ Layer 区域：各层 residual2（缺失时按冻结优先级回退）的 Hidden
 
 **保留/剔除清单**（与 .gitignore `Public-release slimming` 段一致）：保留 py 脚本（11,435 个 / 143MB）、活 MEMO、registry/schemas/snapshots、frontend/src、demo 语料（iso_corpus）、静态官网 HTML（frontend/website，png 已剔）；剔除 tests/result（3.1GB）、四个 temp 目录数据件（0.86GB）、node_modules（0.13GB）、MNIST、LFS npy、`*.log/*.bak_*/probe 输出`。**已解除 `*.npy` 的 git-lfs 跟踪**（.gitattributes），消除 44.9GB LFS 缓存与配额依赖。
 
-**未决项（历史处置）**：本次瘦身只清洗索引与新 commit；旧历史 pack 仍约 3.2GB（GitHub 上已推 4.5GB），`git clone` 全历史仍不达标。两条处置路线待用户裁决：A）新建单 commit 发布仓库（最安全，旧仓库本地保留全部历史）；B）git-filter-repo 重写现有历史并 force push（保留 commit 线索，破坏性，需协调所有并发克隆）。
+**历史处置（已裁决：新建发布仓库）**：2026-10-04 用户选定 A 路线。已从主仓 HEAD（`1b3070146`）`git archive` 导出 13,116 文件干净树，在 `D:\AI2050\Ai2050-OpenOne-publish` 建立单 commit 发布仓库（`3589dbb` "release v1"），gc --aggressive 后 **size-pack = 46.97 MiB**（树 182.5MB 压缩后），工作区干净，presence 22/22、node_modules/tests/result/MNIST 等 heavy 路径全部 absent。主仓库本地保留全部历史（含 3.2GB 旧 pack），未受影响。**发布 push 指引**：在 GitHub 新建空仓库 → `cd D:\AI2050\Ai2050-OpenOne-publish && git remote add origin <新仓库URL> && git push -u origin main`；旧仓库 `Ai2050-OpenOne` 可改名归档或删除（自行决定，不影响发布仓）。
 
 ---
 
