@@ -33,6 +33,8 @@ CONTRACTS = OS_ROOT / "contracts"
 MANIFESTS = OS_ROOT / "manifests"
 SNAPSHOTS = OS_ROOT / "snapshots"
 CLIENT_SNAPSHOT = WORKSPACE / "frontend" / "public" / "research_data" / "current" / "snapshot.json"
+CLIENT_CASES = WORKSPACE / "frontend" / "public" / "research_data" / "current" / "cases.json"
+CLIENT_INDUSTRY = WORKSPACE / "frontend" / "public" / "research_data" / "current" / "industry.json"
 
 FILES = {
     "project": "project.json",
@@ -1213,6 +1215,19 @@ def command_export_client() -> int:
         return 1
     write_json(CLIENT_SNAPSHOT, snapshot)
     print(f"客户端 Snapshot 已导出: {CLIENT_SNAPSHOT.relative_to(WORKSPACE)}")
+    # M2: registry 只读投影（cases / industry），与 canonical snapshot 同目录导出
+    cases_path = REGISTRY / "cases.json"
+    industry_path = REGISTRY / "industry.json"
+    if cases_path.is_file():
+        write_json(CLIENT_CASES, load_json(cases_path))
+        print(f"客户端 cases 投影已导出: {CLIENT_CASES.relative_to(WORKSPACE)}")
+    else:
+        print("警告: registry/cases.json 不存在，跳过 cases 投影", file=sys.stderr)
+    if industry_path.is_file():
+        write_json(CLIENT_INDUSTRY, load_json(industry_path))
+        print(f"客户端 industry 投影已导出: {CLIENT_INDUSTRY.relative_to(WORKSPACE)}")
+    else:
+        print("警告: registry/industry.json 不存在，跳过 industry 投影", file=sys.stderr)
     return 0
 
 

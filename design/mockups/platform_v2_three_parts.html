@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI2050 平台效果图 v2 · 三部分形态稿（仅供确认）</title>
+<style>
+  :root{
+    --bg:#04070f; --panel:rgba(10,20,40,.55); --panel-solid:#081022;
+    --line:rgba(0,229,255,.18); --line-strong:rgba(0,229,255,.45);
+    --cyan:#00e5ff; --cyan-soft:#7de9ff; --violet:#8c6bff; --magenta:#ff3d81;
+    --green:#00ffa3; --amber:#ffd166; --text:#d7ecf5; --dim:#6f8fa3;
+    --mono:Consolas,"JetBrains Mono","Courier New",monospace;
+    --sans:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--sans);color:var(--text);background:var(--bg);
+    background-image:radial-gradient(1100px 520px at 75% -8%,rgba(0,229,255,.09),transparent 60%),
+                     radial-gradient(900px 480px at 8% 12%,rgba(140,107,255,.07),transparent 60%);
+    overflow-x:hidden;
+  }
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
+    background-size:44px 44px;}
+  .wrap{position:relative;z-index:1;max-width:1560px;margin:0 auto;padding:0 26px}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(4,7,15,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;gap:20px;height:56px}
+  .logo{display:flex;align-items:center;gap:10px;font:700 14.5px var(--sans);color:#eafcff;white-space:nowrap}
+  .logo svg{width:21px;height:21px;color:var(--cyan);filter:drop-shadow(0 0 6px rgba(0,229,255,.7))}
+  .nav a{color:var(--dim);text-decoration:none;font-size:12.5px;padding:7px 12px;border:1px solid transparent;border-radius:3px;white-space:nowrap}
+  .nav a:hover{color:var(--cyan-soft);border-color:var(--line);background:rgba(0,229,255,.05)}
+  .nav a.on{color:var(--cyan-soft);border-color:var(--line-strong);background:rgba(0,229,255,.08)}
+  .status{margin-left:auto;font:600 10px var(--mono);color:var(--dim);letter-spacing:.08em;white-space:nowrap}
+  .status b{color:var(--cyan-soft)}
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);margin-right:6px;vertical-align:1px;animation:pulse 2.2s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  .hero{padding:40px 0 8px}
+  .eyebrow{font:600 10.5px var(--mono);letter-spacing:.32em;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:'';width:34px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+  h1{font-size:34px;font-weight:800;
+    background:linear-gradient(92deg,#f2fdff 10%,#8ceaff 55%,#b9a5ff 95%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 18px rgba(0,229,255,.22))}
+  .hero p{margin-top:12px;color:var(--dim);font-size:13.5px;line-height:1.8;max-width:960px}
+  .hero p b{color:var(--cyan-soft)}
+
+  section.block{padding:40px 0 10px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
+  .sec-head .no{font:700 11px var(--mono);color:var(--cyan);letter-spacing:.2em}
+  .sec-head h2{font-size:22px;font-weight:800;color:#eefcff}
+  .sec-head .en{font:600 10px var(--mono);letter-spacing:.22em;color:var(--dim);text-transform:uppercase}
+  .sec-desc{color:var(--dim);font-size:12.5px;line-height:1.75;max-width:980px;margin:6px 0 18px}
+  .sec-desc b{color:var(--cyan-soft)}
+
+  /* 浏览器窗框 */
+  .browser{border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;background:rgba(5,10,22,.72);box-shadow:0 0 46px rgba(0,229,255,.09),inset 0 0 60px rgba(0,229,255,.03);position:relative}
+  .browser::before,.browser::after{content:'';position:absolute;width:16px;height:16px;pointer-events:none;z-index:9}
+  .browser::before{top:-1px;left:-1px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+  .browser::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+  .chrome{display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(8,16,34,.9);border-bottom:1px solid var(--line)}
+  .chrome .dots{display:flex;gap:5px}
+  .chrome .dots i{width:9px;height:9px;border-radius:50%;background:#20344b}
+  .chrome .dots i:first-child{background:rgba(255,61,129,.6)}
+  .chrome .dots i:nth-child(2){background:rgba(255,209,102,.6)}
+  .chrome .dots i:nth-child(3){background:rgba(0,255,163,.6)}
+  .chrome .url{flex:1;max-width:520px;font:600 10.5px var(--mono);color:var(--cyan-soft);background:rgba(0,229,255,.06);border:1px solid var(--line);padding:4px 12px;border-radius:3px;letter-spacing:.05em}
+  .chrome .tag{margin-left:auto;font:700 9px var(--mono);letter-spacing:.2em;color:var(--green)}
+
+  .hud{position:relative;border:1px solid rgba(0,229,255,.22);background:#060b18;border-radius:2px}
+  .hud::before,.hud::after{content:'';position:absolute;width:10px;height:10px;pointer-events:none;z-index:4}
+  .hud::before{top:-1px;left:-1px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+  .hud::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+  .col-title{font:700 9.5px var(--mono);letter-spacing:.22em;color:var(--dim);padding:11px 14px 8px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .chip{display:inline-flex;align-items:center;font:600 9.5px var(--mono);letter-spacing:.1em;color:var(--cyan-soft);border:1px solid rgba(0,229,255,.35);padding:4px 9px;border-radius:2px;background:rgba(0,229,255,.06)}
+  .chip.g{color:var(--green);border-color:rgba(0,255,163,.4);background:rgba(0,255,163,.06)}
+  .chip.v{color:var(--violet);border-color:rgba(140,107,255,.45);background:rgba(140,107,255,.08)}
+  .chip.m{color:var(--magenta);border-color:rgba(255,61,129,.45);background:rgba(255,61,129,.07)}
+  .chip.a{color:var(--amber);border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.07)}
+
+  /* ============ 01 · 3D 神经元空间 ============ */
+  .sp-grid{display:grid;grid-template-columns:236px 1fr 292px;min-height:600px}
+  .sp-left{border-right:1px solid var(--line);background:rgba(7,13,28,.6);display:flex;flex-direction:column}
+  .sp-right{border-left:1px solid var(--line);background:rgba(7,13,28,.6);display:flex;flex-direction:column}
+  .seg-btns{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .seg-btn{flex:1;text-align:center;font:600 10px var(--mono);letter-spacing:.08em;color:var(--dim);border:1px solid var(--line);padding:7px 4px;border-radius:2px}
+  .seg-btn.on{color:#06121f;background:linear-gradient(90deg,var(--cyan),#59d8ff);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,229,255,.4);font-weight:700}
+  .tree{padding:6px 0}
+  .tree .it{padding:7px 14px;font-size:11.5px;color:#a9c4d2;display:flex;justify-content:space-between;align-items:center}
+  .tree .it:hover{background:rgba(0,229,255,.05)}
+  .tree .it.on{background:linear-gradient(90deg,rgba(0,229,255,.13),transparent);border-left:2px solid var(--cyan);color:#d9f2fb}
+  .tree .it .k{font:600 9px var(--mono);color:var(--dim)}
+  .tree .it.on .k{color:var(--cyan)}
+  .sp-note{margin-top:auto;padding:11px 14px;border-top:1px solid rgba(0,229,255,.09);font:600 9px var(--mono);color:var(--dim);letter-spacing:.1em;line-height:1.9}
+  .sp-note b{color:var(--green)}
+  .sp-mid{position:relative;display:flex;flex-direction:column}
+  .sp-hud{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line);font:600 10px var(--mono);letter-spacing:.1em;color:var(--dim)}
+  .sp-hud .r{margin-left:auto;display:flex;gap:10px}
+  #space3d{display:block;width:100%;height:520px;cursor:grab}
+  .sp-legend{display:flex;align-items:center;gap:12px;padding:8px 14px;border-top:1px solid rgba(0,229,255,.12);font:600 9px var(--mono);letter-spacing:.12em;color:var(--dim)}
+  .sp-legend .bar{width:160px;height:7px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(90deg,#0a3555,#00e5ff,#b9a5ff,#ff3d81)}
+  .side-sec{padding:12px 14px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .side-sec .t{font:700 9.5px var(--mono);letter-spacing:.2em;color:var(--cyan);margin-bottom:9px;display:flex;justify-content:space-between}
+  .side-sec .t .r{color:var(--dim)}
+  .kv{display:flex;justify-content:space-between;font-size:11px;color:#a9c4d2;margin-bottom:6px}
+  .kv .v{font:600 10px var(--mono);color:var(--cyan-soft)}
+  .kv .v.mg{color:var(--magenta)} .kv .v.gr{color:var(--green)} .kv .v.am{color:var(--amber)}
+  .principle{font-size:11.3px;line-height:1.8;color:#a9c4d2}
+  .principle b{color:var(--cyan-soft)}
+
+  /* ============ 02 · AI 编程环境 ============ */
+  .ide-grid{display:grid;grid-template-columns:212px 1fr 316px;min-height:600px}
+  .ide-left{border-right:1px solid var(--line);background:rgba(7,13,28,.6)}
+  .ide-mid{display:flex;flex-direction:column;border-right:1px solid var(--line)}
+  .ide-right{background:rgba(7,13,28,.6);display:flex;flex-direction:column}
+  .tabs{display:flex;border-bottom:1px solid var(--line);background:rgba(8,16,34,.85)}
+  .tabs span{font:600 10.5px var(--mono);padding:8px 14px;color:var(--dim);border-right:1px solid rgba(0,229,255,.08)}
+  .tabs span.on{color:var(--cyan-soft);background:rgba(0,229,255,.08);box-shadow:inset 0 -2px 0 var(--cyan)}
+  pre.code{flex:1;margin:0;padding:14px 16px;font:12px/1.75 var(--mono);color:#b8d4e2;overflow:hidden;background:#060b18}
+  pre.code .cm{color:#5b7a8f}pre.code .kw{color:#8c6bff}pre.code .fn{color:#00e5ff}pre.code .st{color:#ffd166}pre.code .nm{color:#ff3d81}
+  .term{border-top:1px solid var(--line);background:#04080f;height:172px;overflow:hidden;padding:10px 16px;font:11px/1.8 var(--mono);color:#9fc3d4}
+  .term .pr{color:var(--green)} .term .out{color:#7d99ab} .term .ok{color:var(--green);font-weight:700} .term .warn{color:var(--amber)}
+  .term .cursor{display:inline-block;width:7px;height:13px;background:var(--cyan);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .agent{display:flex;flex-direction:column;height:100%}
+  .agent .cfg{padding:12px 14px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .agent label{display:block;font:700 9px var(--mono);letter-spacing:.18em;color:var(--dim);margin:0 0 6px}
+  .sel,.ta{width:100%;background:rgba(0,229,255,.05);border:1px solid var(--line);color:#d9f2fb;font:11.5px var(--mono);padding:7px 9px;border-radius:2px;outline:none}
+  .ta{height:74px;resize:none;line-height:1.6}
+  .runbtn{width:100%;margin-top:10px;text-align:center;font:700 11px var(--mono);letter-spacing:.16em;color:#04121a;background:linear-gradient(90deg,var(--cyan),#59d8ff);border:none;padding:9px 0;border-radius:2px;box-shadow:0 0 18px rgba(0,229,255,.35)}
+  .qitem{padding:8px 14px;border-bottom:1px solid rgba(0,229,255,.07);font-size:11px;color:#a9c4d2;display:flex;justify-content:space-between;align-items:center}
+  .qitem .st{font:700 8.5px var(--mono);letter-spacing:.1em;padding:3px 7px;border-radius:2px}
+  .st.run{color:var(--cyan);border:1px solid rgba(0,229,255,.5);background:rgba(0,229,255,.08);animation:pulse 1.6s infinite}
+  .st.done{color:var(--green);border:1px solid rgba(0,255,163,.4)}
+  .st.wait{color:var(--dim);border:1px solid rgba(111,143,163,.4)}
+  .steps{padding:10px 14px;font-size:11px;color:#a9c4d2;line-height:2}
+  .steps b{color:var(--green);font-family:var(--mono);margin-right:7px}
+  .steps .cur{color:var(--cyan-soft)}
+
+  /* ============ 03 · 路线图 ============ */
+  .rm-top{padding:20px 22px 6px;background:rgba(7,13,28,.6)}
+  .rm-lanes{display:flex;gap:18px;font:600 9px var(--mono);letter-spacing:.16em;color:var(--dim)}
+  .rm-canvas{position:relative;height:216px;margin:0 22px;background:rgba(6,11,24,.5);border:1px solid rgba(0,229,255,.16);border-radius:2px;overflow:hidden}
+  .rm-line{position:absolute;left:2%;right:2%;top:58%;height:2px;background:linear-gradient(90deg,rgba(0,229,255,.1),rgba(0,229,255,.65),rgba(140,107,255,.65),rgba(255,61,129,.5))}
+  .rm-lane{position:absolute;left:2%;right:2%;height:1px;background:rgba(0,229,255,.07)}
+  .node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;text-align:center;z-index:2}
+  .node .pt{width:11px;height:11px;border-radius:50%;margin:0 auto;border:2px solid;transition:.15s}
+  .node .yr{font:700 9.5px var(--mono);letter-spacing:.06em;margin-top:5px;color:var(--dim)}
+  .node .lb{font-size:10.5px;color:#a9c4d2;margin-top:2px;max-width:104px;line-height:1.4}
+  .node:hover .pt{box-shadow:0 0 14px currentColor;transform:scale(1.25)}
+  .node.sel .pt{box-shadow:0 0 18px currentColor;transform:scale(1.4)}
+  .node.sel .yr{color:#eefcff}
+  .node.l-cyan .pt{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.25)}
+  .node.l-violet .pt{border-color:var(--violet);color:var(--violet);background:rgba(140,107,255,.25)}
+  .node.l-magenta .pt{border-color:var(--magenta);color:var(--magenta);background:rgba(255,61,129,.25)}
+  .rm-grid{display:grid;grid-template-columns:1fr 360px;gap:0}
+  .rm-blurb{padding:14px 22px;color:var(--dim);font-size:11.5px;line-height:1.8;border-top:1px solid rgba(0,229,255,.09)}
+  .rm-blurb b{color:var(--cyan-soft)}
+  .papers{padding:0 0 14px}
+  .paper{margin:9px 14px 0;padding:11px 13px;border:1px solid rgba(0,229,255,.16);background:rgba(0,229,255,.04);border-radius:2px}
+  .paper .ttl{font-size:12px;font-weight:600;color:#e6f7fd;line-height:1.5}
+  .paper .au{font:600 9.5px var(--mono);color:var(--dim);margin-top:5px;letter-spacing:.04em}
+  .paper .mt{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
+
+  footer{margin:52px 0 38px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font:600 9.5px var(--mono);letter-spacing:.16em;color:var(--dim)}
+  .note{margin:24px 0 0;padding:14px 18px;border:1px dashed rgba(255,209,102,.45);background:rgba(255,209,102,.05);border-radius:2px;font-size:12.5px;color:#e8d9a8;line-height:1.85}
+  .note b{color:var(--amber)}
+  @media (max-width:1180px){.sp-grid,.ide-grid{grid-template-columns:1fr}.sp-left,.sp-right,.ide-left{border:none;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8.66 5v10L12 22l-8.66-5V7L12 2z"/><circle cx="12" cy="12" r="3.2"/></svg>
+      AI2050 · 机制可解释性研究平台
+    </div>
+    <a class="on" href="#s1">① 可视化研究 · 3D 神经元空间</a>
+    <a href="#s2">② AI 自动研发 · 编程环境</a>
+    <a href="#s3">③ 行业进展 · 路线图</a>
+    <div class="status"><span class="dot"></span>MOCKUP <b>v2</b> · REPO <b>46.97 MiB</b> · 2026-10-04</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Static Mockup v2 · 形态确认稿 · 零依赖单文件</div>
+    <h1>三部分客户端形态效果图</h1>
+    <p>按你的定义重画：<b>① 可视化研究 = 3D 空间中查看 LLM 神经元的参数与状态</b>；<b>② AI 自动研发 = AI 编程环境，配置 AI 与 prompt 后自动运行命令完成研究</b>；<b>③ 行业进展 = 路线图 + 节点，点开节点看论文</b>。三屏内所有图形均为页面内 JS 实时生成的 DEMO——正是"算法生成、不带数据"原则的证明。</p>
+  </div>
+
+  <!-- ================= 01 3D 神经元空间 ================= -->
+  <section class="block" id="s1">
+    <div class="sec-head"><span class="no">PART.01</span><h2>可视化研究 · 3D 神经元空间</h2><span class="en">3D Neuron Parameter &amp; State Explorer</span></div>
+    <p class="sec-desc">整个 HiddenState 场放进三维空间：<b>X = 神经元索引（d_model 方向），Y = 激活幅值，Z = 层 L0→L27</b>。每个点 = 一个神经元；<b>点的颜色 = 当前激活状态，点的亮度/大小 = 参数范数</b>。支持模式切换（状态 ACTIVATION / 参数 WEIGHTS）、点击选中查看单个神经元的参数、状态时序与上下游连接。下图可<b>拖拽旋转</b>。</p>
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">http://localhost:5173/#/space</span><span class="tag">DEMO · CLIENT-GENERATED</span></div>
+      <div class="sp-grid">
+        <div class="sp-left">
+          <div class="col-title">VIEW CONFIG · 视图配置</div>
+          <div class="seg-btns">
+            <span class="seg-btn on">状态 ACT</span><span class="seg-btn">参数 W</span><span class="seg-btn">注意力 HEAD</span>
+          </div>
+          <div class="col-title" style="border-top:none">MODEL · 模型</div>
+          <div class="tree">
+            <div class="it on"><span>Qwen3-4B</span><span class="k">36L · 2560d</span></div>
+            <div class="it"><span>Qwen3-14B</span><span class="k">40L · 5120d</span></div>
+            <div class="it"><span>GLM4-9B</span><span class="k">40L · 4096d</span></div>
+          </div>
+          <div class="col-title">SLICE · 切片</div>
+          <div class="tree">
+            <div class="it on"><span>全层场</span><span class="k">L0–L35</span></div>
+            <div class="it"><span>单层剖开</span><span class="k">L14</span></div>
+            <div class="it"><span>注意力头层</span><span class="k">L14·H8</span></div>
+            <div class="it"><span>MLP 单元层</span><span class="k">L14·MLP</span></div>
+          </div>
+          <div class="sp-note">MODE: <b>ACTIVATION</b><br>点色 = 激活幅值 · 点径 = 参数范数<br>拖拽旋转 · 点击选中</div>
+        </div>
+        <div class="sp-mid">
+          <div class="sp-hud">
+            <span>NEURON FIELD — L × NEURON × |ACT|</span>
+            <span class="r"><span class="chip g">DEMO 生成</span><span class="chip">INPUT: "我喜欢吃苹果"</span></span>
+          </div>
+          <canvas id="space3d" width="960" height="520"></canvas>
+          <div class="sp-legend"><span>低激活</span><span class="bar"></span><span>高激活</span><span style="margin-left:auto">点径 ∝ 参数范数 ‖W‖</span></div>
+        </div>
+        <div class="sp-right">
+          <div class="side-sec">
+            <div class="t">SELECTED · 选中神经元 <span class="r">L14 · N2847</span></div>
+            <div class="kv"><span>参数范数 ‖W‖</span><span class="v">1.284</span></div>
+            <div class="kv"><span>偏置 b</span><span class="v">−0.037</span></div>
+            <div class="kv"><span>当前激活 a</span><span class="v mg">0.872</span></div>
+            <div class="kv"><span>角色假设</span><span class="v am">fruit/food 类别候选</span></div>
+            <div class="kv"><span>上游 TOP-3</span><span class="v">tok「苹果」·L12·N881</span></div>
+            <div class="kv"><span>下游 TOP-3</span><span class="v">L17·N1204 → unembed</span></div>
+          </div>
+          <div class="side-sec">
+            <div class="t">ACT TRACE · 激活时序</div>
+            <canvas id="spark" width="256" height="52" style="display:block;width:100%"></canvas>
+          </div>
+          <div class="side-sec" style="border-bottom:none">
+            <div class="t">PRINCIPLE · 读法</div>
+            <div class="principle">固定权重推理中，<b>参数（W, b）不随语境变化</b>，激活状态随输入实时改变。3D 空间把两者叠加：同一个点，形状由参数决定、颜色由状态决定——观察哪些参数位在哪些条件下反复点火，即<b>条件齿轮</b>的候选发现过程。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 AI 编程环境 ================= -->
+  <section class="block" id="s2">
+    <div class="sec-head"><span class="no">PART.02</span><h2>AI 自动研发 · AI 编程环境</h2><span class="en">Autonomous Research IDE</span></div>
+    <p class="sec-desc">形态即一个 AI 编程环境：右侧<b>配置 AI（模型选择）与任务 prompt</b>，Agent 生成脚本 → <b>自动运行命令</b>（终端实时回显）→ 采集结果 → 更新研究日志；左侧是项目文件树（MEMO / atlas / tests），中间是代码与执行输出。<b>结果数据不进仓库，全部本地运行产出</b>。</p>
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">http://localhost:5173/#/lab</span><span class="tag">AGENT IDLE→RUNNING</span></div>
+      <div class="ide-grid">
+        <div class="ide-left">
+          <div class="col-title">EXPLORER · 项目</div>
+          <div class="tree">
+            <div class="it"><span>research/</span><span class="k">dir</span></div>
+            <div class="it" style="padding-left:28px"><span>deepseek/docs/</span><span class="k">MEMO</span></div>
+            <div class="it on" style="padding-left:28px"><span>AGI_DEEPSEEK_MEMO.md</span><span class="k">718 KB</span></div>
+            <div class="it"><span>atlas/</span><span class="k">dir</span></div>
+            <div class="it" style="padding-left:28px"><span>metric_dict.json</span><span class="k">v4</span></div>
+            <div class="it" style="padding-left:28px"><span>phase_queue.json</span><span class="k">6 sealed</span></div>
+            <div class="it"><span>scripts/researchctl.py</span><span class="k">CLI</span></div>
+            <div class="it"><span>tests/deepseek/</span><span class="k">scripts</span></div>
+            <div class="it" style="padding-left:28px"><span>q06_steer_run.py</span><span class="k">new</span></div>
+            <div class="it" style="padding-left:28px;color:#5b7a8f"><span>result/ <b style="color:#5b7a8f">（本地·不入仓）</b></span></div>
+          </div>
+          <div class="sp-note">GIT PUBLIC: <b>46.97 MiB</b><br>结果数据 gitignore · 本地复现</div>
+        </div>
+        <div class="ide-mid">
+          <div class="tabs"><span class="on">q06_steer_run.py</span><span>researchctl.py</span><span>AGI_DEEPSEEK_MEMO.md</span></div>
+<pre class="code"><span class="cm"># Q06 C_steer 基座测量 —— 由 Agent 依据预注册合同(q ebf960cf)自动生成</span>
+<span class="kw">from</span> atlas <span class="kw">import</span> load_metric_dict, frozen_contract
+
+<span class="fn">def</span> <span class="fn">main</span>():
+    contract = <span class="fn">frozen_contract</span>(<span class="st">"q06_c_steer"</span>, sha=<span class="st">"ebf960cf"</span>)   <span class="cm"># drift 断言</span>
+    metrics  = <span class="fn">load_metric_dict</span>(version=<span class="st">"v4"</span>)
+    steer    = <span class="fn">SteeringPort</span>(model=<span class="st">"qwen3-4b"</span>, layers=<span class="nm">range</span>(<span class="nm">0</span>, <span class="nm">36</span>))
+    res      = steer.<span class="fn">measure</span>(success_rate=<span class="kw">True</span>, collateral=<span class="kw">True</span>)
+    res.<span class="fn">assert_drift</span>(contract)          <span class="cm"># 偏离冻结设计即报错</span>
+    res.<span class="fn">save</span>(<span class="st">"tests/deepseek/result/q06.npz"</span>)  <span class="cm"># 本地产物</span>
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>: <span class="fn">main</span>()</pre>
+          <div class="term">
+            <div><span class="pr">$</span> python scripts/researchctl.py validate</div>
+            <div class="out">registry ok · cases 10 · industry 29 · residency 1 · corrections 1</div>
+            <div class="ok">✓ 0 errors, 0 warnings</div>
+            <div style="margin-top:6px"><span class="pr">$</span> python tests/deepseek/q06_steer_run.py --model qwen3-4b</div>
+            <div class="out">[steer] layer sweep 36/36 ... port replace ok</div>
+            <div class="out">[steer] success_rate=0.742&nbsp;&nbsp;collateral=0.118&nbsp;&nbsp;paired margin −0.021</div>
+            <div class="ok">✓ sealed → phase_queue.json (Q06 = measured)</div>
+            <div><span class="warn">agent ▸</span> 结果已写入本地 result/，MEMO 追加 Phase 40 草稿，等待人工复核<span class="cursor"></span></div>
+          </div>
+        </div>
+        <div class="ide-right">
+          <div class="agent">
+            <div class="cfg">
+              <label>AI · 模型配置</label>
+              <select class="sel"><option>qwen3-4b（本地 CUDA）</option><option>qwen3-14b（4-bit NF4）</option><option>GLM4-9B（4-bit NF4）</option></select>
+              <label style="margin-top:12px">PROMPT · 研究任务</label>
+              <textarea class="ta">按 Q06 冻结合同执行 C_steer 基座测量：完成脚本生成→本地运行→结果登记，偏差即报警。</textarea>
+              <div class="runbtn">▶ 运行 · 自动完成研究</div>
+            </div>
+            <div class="col-title" style="border-top:none">QUEUE · 研究队列</div>
+            <div class="qitem"><span>Q06 C_steer 基座测量</span><span class="st run">RUNNING</span></div>
+            <div class="qitem"><span>Q05 E_ar(k) 正式测量</span><span class="st done">SEALED</span></div>
+            <div class="qitem"><span>Q07 跨层端口替换复验</span><span class="st wait">WAIT</span></div>
+            <div class="col-title">PLAN · 执行计划</div>
+            <div class="steps">
+              <div><b>✓</b>读取冻结合同 ebf960cf</div>
+              <div><b>✓</b>生成 q06_steer_run.py</div>
+              <div><b>✓</b>自动运行命令 · 采集结果</div>
+              <div class="cur"><b>▸</b>更新 MEMO Phase 40 草稿</div>
+              <div><b>○</b>人工复核 → seal 入队</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 行业进展路线图 ================= -->
+  <section class="block" id="s3">
+    <div class="sec-head"><span class="no">PART.03</span><h2>行业进展 · 研究路线图</h2><span class="en">Field Roadmap → Papers on Node Click</span></div>
+    <p class="sec-desc">横向时间轴路线图，三条泳道：<span class="chip">方法</span> <span class="chip v">模型/规模</span> <span class="chip m">机制发现</span>。<b>点击任意节点</b>，下方/右侧面板显示该节点的代表论文（正式版论文全文/摘要由<b>配置文件地址远程抓取</b>，不进仓库）。下图节点可点击体验。</p>
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">http://localhost:5173/#/roadmap</span><span class="tag">DEMO · 配置抓取</span></div>
+      <div class="rm-top">
+        <div class="rm-lanes"><span style="color:var(--cyan)">● 方法 METHODS</span><span style="color:var(--violet)">● 模型/规模 MODELS</span><span style="color:var(--magenta)">● 机制发现 MECHANISMS</span><span style="margin-left:auto;font-size:9px">2026 空白地带 = 本项目位置</span></div>
+      </div>
+      <div class="rm-canvas" id="rmCanvas">
+        <div class="rm-line"></div>
+        <div class="rm-lane" style="top:26%"></div>
+        <div class="rm-lane" style="top:58%"></div>
+        <div class="rm-lane" style="top:90%"></div>
+      </div>
+      <div class="rm-grid">
+        <div class="rm-blurb" id="rmBlurb">点击上方节点查看论文 →&nbsp;&nbsp;泳道语义：<b>方法</b>=可解释性工具与算法（青）；<b>模型/规模</b>=能力载体（紫）；<b>机制发现</b>=对内部结构的实质性解释（品红）。2026 空白节点是本项目 RDC 的切入点。</div>
+        <div class="papers" id="rmPapers" style="border-left:1px solid rgba(0,229,255,.09)">
+          <div class="col-title">PAPERS · 节点论文</div>
+          <div class="paper"><div class="ttl">（点击左侧路线图节点）</div><div class="au">论文元数据由 industry_sources.json 配置地址抓取 · 仓库 0 MB</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    <b>v2 相对 v1 的形态修正</b>：① 可视化不再以"2D 算法注册表"为主——改为 <b>3D 神经元空间</b>（参数与状态双模式）；② AI 自动研发从"卡片入口"改为<b>完整 AI 编程环境</b>（配置 AI + prompt → 自动运行命令）；③ 行业进展从"统计卡"改为<b>可点击路线图 + 论文面板</b>。本页为静态确认稿，未改动 frontend 任何代码；v1 稿保留在 design/mockups/visualization_hitech_v1.html 供视觉风格参考。
+  </div>
+
+  <footer>
+    <span>AI2050 MECH-INTERP LAB · STATIC MOCKUP v2 · FOR CONFIRMATION ONLY</span>
+    <span>2026-10-04 · 确认后落地 frontend</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ================= 01 · 3D 点云（手动投影，可拖拽） ================= */
+var cv=document.getElementById('space3d');
+if(cv){
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  var L=24,NX=10,NY=8,pts=[],l,i,j;
+  for(l=0;l<L;l++)for(i=0;i<NX;i++)for(j=0;j<NY;j++){
+    pts.push({
+      x:((i/(NX-1))-0.5)*3.2,
+      y:((j/(NY-1))-0.5)*2.0,
+      z:((l/(L-1))-0.5)*5.2,
+      w:0.45+Math.random()*0.55   /* 参数范数 */
+    });
+  }
+  var rotY=0.55,rotX=-0.30,drag=false,lx=0,ly=0,idle=0;
+  cv.addEventListener('mousedown',function(e){drag=true;lx=e.clientX;ly=e.clientY;});
+  window.addEventListener('mouseup',function(){drag=false;});
+  window.addEventListener('mousemove',function(e){
+    if(!drag)return;
+    rotY+=(e.clientX-lx)*0.006;rotX+=(e.clientY-ly)*0.004;
+    rotX=Math.max(-1.15,Math.min(0.35,rotX));lx=e.clientX;ly=e.clientY;
+  });
+  function act(p,t){
+    var v=Math.sin(p.x*1.7+t)*Math.cos(p.z*1.1-t*0.6)*0.5+0.5;
+    var bump=Math.exp(-((p.x-0.8)*(p.x-0.8)+(p.z+1.2)*(p.z+1.2))*1.9)
+            +Math.exp(-((p.x+1.1)*(p.x+1.1)+(p.z-0.6)*(p.z-0.6))*2.4);
+    return Math.max(0,Math.min(1,0.12+0.5*v+bump*0.55));
+  }
+  function mixCol(a){ /* 激活 0→1 : 深青 → 亮青 → 紫 → 品红 */
+    if(a<0.4){var u=a/0.4;return [Math.round(10+u*0),Math.round(80+u*149),Math.round(120+u*129)];}
+    if(a<0.75){var u2=(a-0.4)/0.35;return [Math.round(10+u2*130),Math.round(229-u2*122),Math.round(249)];}
+    var u3=(a-0.75)/0.25;return [Math.round(140+u3*115),Math.round(107-u3*46),Math.round(255)];
+  }
+  function frame(){
+    var t=Date.now()*0.001;
+    if(!drag){idle++;rotY+=0.0028;}
+    ctx.fillStyle='#050a16';ctx.fillRect(0,0,W,H);
+    var f=3.4,cY=Math.cos(rotY),sY=Math.sin(rotY),cX=Math.cos(rotX),sX=Math.sin(rotX);
+    function pr(x,y,z){
+      var x1=x*cY-z*sY,z1=x*sY+z*cY;
+      var y2=y*cX-z1*sX,z2=y*sX+z1*cX;
+      var s=f/(f+z2);
+      return {sx:W/2+x1*s*W*0.30,sy:H/2+y2*s*H*0.34,s:s,z:z2};
+    }
+    /* 网格地板 + 竖轴 */
+    ctx.strokeStyle='rgba(0,229,255,0.10)';ctx.lineWidth=1;
+    var g;
+    for(g=0;g<=8;g++){
+      var gx=(g/8-0.5)*3.4;
+      var a1=pr(gx,1.35,-2.8),a2=pr(gx,1.35,2.8);
+      ctx.beginPath();ctx.moveTo(a1.sx,a1.sy);ctx.lineTo(a2.sx,a2.sy);ctx.stroke();
+      var b1=pr(-1.8,1.35,(g/8-0.5)*5.6),b2=pr(1.8,1.35,(g/8-0.5)*5.6);
+      ctx.beginPath();ctx.moveTo(b1.sx,b1.sy);ctx.lineTo(b2.sx,b2.sy);ctx.stroke();
+    }
+    /* 层轴端点标签 */
+    var e0=pr(0,1.35,-2.9),e1=pr(0,1.35,2.9);
+    ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='rgba(125,233,255,.85)';ctx.font='600 11px Consolas';
+    ctx.fillText('L23',e1.sx-10,e1.sy+16);ctx.fillText('L0',e0.sx-6,e0.sy+16);
+    /* 点云（深度排序 + 加色发光） */
+    var proj=[],k;
+    for(k=0;k<pts.length;k++){
+      var p=pts[k],q=pr(p.x,-p.y,p.z);
+      proj.push({sx:q.sx,sy:q.sy,s:q.s,z:q.z,a:act(p,t),w:p.w,x:p.x,z:p.z});
+    }
+    proj.sort(function(a,b){return b.z-a.z;});
+    ctx.globalCompositeOperation='lighter';
+    for(k=0;k<proj.length;k++){
+      var o=proj[k],c=mixCol(o.a);
+      var r=Math.max(0.7,o.s*(1.1+o.w*2.1));
+      var al=0.10+0.55*Math.max(0,(1-(o.z+3.2)/6.4))*o.a+0.12*o.a;
+      ctx.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+Math.min(0.85,al).toFixed(3)+')';
+      ctx.beginPath();ctx.arc(o.sx,o.sy,r,0,6.283);ctx.fill();
+      if(o.a>0.82){ /* 高激活候选齿轮：白心 */
+        ctx.fillStyle='rgba(255,255,255,'+(0.5*o.a).toFixed(2)+')';
+        ctx.beginPath();ctx.arc(o.sx,o.sy,r*0.45,0,6.283);ctx.fill();
+      }
+    }
+    ctx.globalCompositeOperation='source-over';
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ================= 01 · 激活时序 sparkline ================= */
+var sp=document.getElementById('spark');
+if(sp){
+  var sc=sp.getContext('2d'),SW=sp.width,SH=sp.height;
+  sc.strokeStyle='#00e5ff';sc.lineWidth=1.4;sc.shadowColor='#00e5ff';sc.shadowBlur=4;
+  sc.beginPath();
+  for(var x=0;x<=64;x++){
+    var t=x/64;
+    var y=SH*0.62-(Math.sin(t*7.3)*0.24+Math.sin(t*17.7)*0.12+0.22*t+Math.random()*0.06)*SH;
+    x===0?sc.moveTo(0,Math.max(3,Math.min(SH-3,y))):sc.lineTo(t*SW,Math.max(3,Math.min(SH-3,y)));
+  }
+  sc.stroke();sc.shadowBlur=0;
+}
+
+/* ================= 03 · 路线图节点 + 论文面板 ================= */
+var NODES=[
+ {yr:'2017',lb:'Transformer 诞生',lane:'violet',top:58,left:5,
+  ps:[{t:'Attention Is All You Need',a:'Vaswani et al. · NeurIPS 2017',m:['方法载体','arXiv']}]},
+ {yr:'2018',lb:'BERT / GPT-1',lane:'violet',top:30,left:13,
+  ps:[{t:'BERT: Pre-training of Deep Bidirectional Transformers',a:'Devlin et al. · NAACL 2019',m:['模型']},{t:'Improving Language Understanding by Generative Pre-Training',a:'Radford et al. · 2018',m:['模型']}]},
+ {yr:'2020',lb:'GPT-3 / Scaling Laws',lane:'violet',top:58,left:27,
+  ps:[{t:'Language Models are Few-Shot Learners',a:'Brown et al. · NeurIPS 2020',m:['模型']},{t:'Scaling Laws for Neural Language Models',a:'Kaplan et al. · 2020',m:['规模']}]},
+ {yr:'2021',lb:'Transformer 电路数学框架',lane:'magenta',top:86,left:38,
+  ps:[{t:'A Mathematical Framework for Transformer Circuits',a:'Elhage et al. · Anthropic 2021',m:['机制','开始式开端']}]},
+ {yr:'2022',lb:'叠加 / 归纳头',lane:'magenta',top:30,left:48,
+  ps:[{t:'Toy Models of Superposition',a:'Elhage et al. · Anthropic 2022',m:['机制','叠加']},{t:'In-context Learning and Induction Heads',a:'Olsson et al. · 2022',m:['机制']}]},
+ {yr:'2023',lb:'SAE 单义方向',lane:'cyan',top:58,left:58,
+  ps:[{t:'Towards Monosemanticity: Sparse Autoencoders',a:'Bricken et al. · Anthropic 2023',m:['方法','SAE']}]},
+ {yr:'2024',lb:'大规模 SAE / 表征工程',lane:'cyan',top:30,left:68,
+  ps:[{t:'Scaling Monosemanticity: Extracting Features from Claude 3',a:'Templeton et al. · Anthropic 2024',m:['方法']},{t:'Representation Engineering: A Top-Down Approach',a:'Zou et al. · 2024',m:['方法']}]},
+ {yr:'2025',lb:'电路追踪 / 归因图谱',lane:'magenta',top:86,left:79,
+  ps:[{t:'Circuit Tracing: Revealing Computational Graphs in LLMs',a:'Anthropic 2025',m:['机制','归因']},{t:'On the Biology of a Large Language Model',a:'Anthropic 2025',m:['机制']}]},
+ {yr:'2026',lb:'空白地带 · 本项目 RDC',lane:'cyan',top:58,left:91,
+  ps:[{t:'RDC 条件化输出场闭合理论（进行中）',a:'AI2050 · 本平台 AI 自动研发链',m:['空白','复现脚本公开']}]}
+];
+var canvas=document.getElementById('rmCanvas');
+var papersEl=document.getElementById('rmPapers');
+var blurbEl=document.getElementById('rmBlurb');
+if(canvas&&papersEl){
+  NODES.forEach(function(n,idx){
+    var d=document.createElement('div');
+    d.className='node l-'+n.lane+(idx===NODES.length-1?' sel':'');
+    d.style.left=n.left+'%';d.style.top=n.top+'%';
+    d.innerHTML='<div class="pt"></div><div class="yr">'+n.yr+'</div><div class="lb">'+n.lb+'</div>';
+    d.addEventListener('click',function(){
+      Array.prototype.forEach.call(canvas.querySelectorAll('.node'),function(x){x.classList.remove('sel');});
+      d.classList.add('sel');
+      renderPapers(n);
+    });
+    canvas.appendChild(d);
+  });
+  /* 默认选中最后一个（本项目节点） */
+  renderPapers(NODES[NODES.length-1]);
+}
+function renderPapers(n){
+  var laneTxt={cyan:'方法',violet:'模型/规模',magenta:'机制发现'}[n.lane];
+  var h='<div class="col-title">PAPERS · '+n.yr+' · '+n.lb+'</div>';
+  n.ps.forEach(function(p){
+    h+='<div class="paper"><div class="ttl">'+p.t+'</div><div class="au">'+p.a+'</div><div class="mt">';
+    p.m.forEach(function(m){h+='<span class="chip '+(m==='机制'||m==='空白'?'m':'')+(m==='方法'||m==='SAE'?' g':'')+(m==='模型'||m==='规模'?' v':'')+'">'+m+'</span>';});
+    h+='</div></div>';
+  });
+  h+='<div style="padding:10px 14px;font:600 9px var(--mono);color:var(--dim);letter-spacing:.08em">泳道: '+laneTxt+' · 全文/摘要由配置地址抓取 · 仓库 0 MB</div>';
+  papersEl.innerHTML=h;
+  blurbEl.innerHTML='节点 <b>'+n.yr+' · '+n.lb+'</b>：'+n.ps.length+' 篇代表论文。正式版点击「打开原文」由 <b>industry_sources.json</b> 中的地址按需抓取并缓存到本地，<b>不进入 git 仓库</b>；节点亦支持挂载综述、工具链接与空白地带说明。';
+}
+})();
+</script>
+</body>
+</html>

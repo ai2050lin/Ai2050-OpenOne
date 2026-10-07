@@ -1,0 +1,80 @@
+=== A. interaction index 5.15 / 0.007 source ===
+n2b_report_qwen2.5-3b-instruct.txt | /0\.007/ | mlp  L9   |       -0.350 |       +0.007 |   -0.320
+n2c_report_qwen2.5-3b-instruct.txt | /0\.007/ | cloze    T=2048  mass/pos: p0=0.033 p1=-0.034 p2=-0.012 p3=-0.010 p4=-0.062 p5=-0.119 p6=0.058 p7=0.046 p8=-0.036 p9=-0.101 p10=0.031 p11=-0.054 p12=0.028 p13=0.062 p14=-0.101 p15=
+n2c_report_qwen2.5-3b-instruct.txt | /0\.007/ | neutral  T=2048  mass/pos: p0=-0.104 p1=0.177 p2=0.025 p3=0.037 p4=0.098 p5=-0.209 p6=-0.034 p7=-0.048 p8=-0.094 p9=0.127 p10=0.037 p11=-0.001 p12=-0.098 p13=0.102 p14=-0.044 p15=0
+n2c_report_qwen3-4b.txt | /0\.007/ | cloze    T=2560  mass/pos: p0=-10.885 p1=1.547 p2=-2.075 p3=0.454 p4=-0.037 p5=0.473 p6=0.128 p7=-0.247 p8=-0.251 p9=0.860 p10=-0.124 p11=-1.941 p12=-0.314 p13=-0.077 p14=-0.207 p1
+n2c_report_qwen3-4b.txt | /0\.007/ | neutral  T=2560  mass/pos: p0=-8.952 p1=1.433 p2=-1.225 p3=0.203 p4=-0.128 p5=0.475 p6=0.461 p7=-0.451 p8=-0.173 p9=0.474 p10=-0.299 p11=-1.541 p12=-0.056 p13=-0.023 p14=-0.037 p15
+n2h1_report_qwen3-4b.txt | /0\.007/ | 34    |    +0.000    +10.668    +10.657     +0.011     +0.037     +0.007
+n2h1_report_qwen3-4b.txt | /0\.007/ | 34    |    +0.000    -10.663    -10.580     -0.034     -0.052     +0.007
+n2h1b_report_glm4-9b-chat-hf.txt | /0\.007/ | 1     |    +0.000     +0.198     +0.260     -0.039     +0.007     +0.023
+n2h1b_report_glm4-9b-chat-hf.txt | /0\.007/ | 33       0.041   0.121 0.040 0.026 0.010 0.007
+n2h1b_report_glm4-9b-chat-hf.txt | /0\.007/ | L15  零化 U 分量 dScore=-5.741 | 零化随机分量 dScore=-0.007
+n2h1b_report_glm4-9b-chat-hf.txt | /0\.007/ | L30  零化 U 分量 dScore=-7.309 | 零化随机分量 dScore=-0.007
+n2h1b_report_qwen2.5-3b-instruct.txt | /0\.007/ | L30  零化 U 分量 dScore=-6.698 | 零化随机分量 dScore=-0.007
+n2h1c_report_glm4-9b-chat-hf.txt | /inter/ | U-internal random dir #0 dDonor=+2.015
+n2h1c_report_glm4-9b-chat-hf.txt | /inter/ | U-internal random dir #1 dDonor=+0.252
+n2h1c_report_glm4-9b-chat-hf.txt | /inter/ | U-internal random dir #2 dDonor=+0.669
+n2h1c_report_glm4-9b-chat-hf.txt | /inter/ | U-internal random dir #3 dDonor=+0.188
+n2h1c_report_qwen3-4b.txt | /0\.007/ | U from L0   : B_cat=+0.071  A_full=+10.640  B/A=0.007
+n2h1c_report_qwen3-4b.txt | /inter/ | U-internal random dir #0 dDonor=+3.058
+n2h1c_report_qwen3-4b.txt | /inter/ | U-internal random dir #1 dDonor=+1.905
+n2h1c_report_qwen3-4b.txt | /inter/ | U-internal random dir #2 dDonor=+0.853
+n2h1c_report_qwen3-4b.txt | /inter/ | U-internal random dir #3 dDonor=+1.081
+
+=== B. K_d / polarity verdict in N3 reports ===
+n3_report_glm4-9b-chat-hf.txt | /K_d/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L3 ---
+n3_report_glm4-9b-chat-hf.txt | /K_d/ | K_d 极性解耦(否定): B/A=0.333 ; 跨上下文 B_cat=+0.398 同号? YES
+n3_report_glm4-9b-chat-hf.txt | /极性/ | === N3 条件子空间装置：跨结构 / 跨极性 / 跨族复现 ===
+n3_report_glm4-9b-chat-hf.txt | /极性/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L3 ---
+n3_report_glm4-9b-chat-hf.txt | /极性/ | K_d 极性解耦(否定): B/A=0.333 ; 跨上下文 B_cat=+0.398 同号? YES
+n3_report_glm4-9b-chat-hf.txt | /极性/ | >>> 总结：装置跨结构类型=PASS ; 跨极性=FAIL ; 跨族共享=FAMILY-SPECIFIC
+n3_report_glm4-9b-chat-hf.txt | /neg/ | hidden collected: isa 41 (+neg) color 29
+n3_report_glm4-9b-chat-hf.txt | /neg/ | base recipient-class score: F1pos=7.459  F3neg=7.628  F2col=2.900
+n3_report_glm4-9b-chat-hf.txt | /neg/ | 同上下文(neg donor->neg rec): A_full=+0.082  B_cat=+0.027  D_rand=-0.007  B/A=0.333
+n3_report_glm4-9b-chat-hf.txt | /neg/ | 跨上下文(pos donor->neg rec): B_cat=+0.398
+n3_report_glm4-9b-chat-hf.txt | /不是一种/ | 苹果不是一种             -> 水果(16.8) | 食物(13.2) | 健康(12.4) | “(12.3) | 食品(12.3)
+n3_report_glm4-9b-chat-hf.txt | /不是一种/ | 卡车不是一种             -> 交通工具(13.7) | 简单的(12.6) | 汽车(12.2) | 职业(12.1) | “(11.9)
+n3_report_glm4-9b-chat-hf.txt | /不是一种/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L3 ---
+n3_report_qwen2.5-3b-instruct.txt | /K_d/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L3 ---
+n3_report_qwen2.5-3b-instruct.txt | /K_d/ | K_d 极性解耦(否定): B/A=7.380 ; 跨上下文 B_cat=+0.491 同号? YES
+n3_report_qwen2.5-3b-instruct.txt | /极性/ | === N3 条件子空间装置：跨结构 / 跨极性 / 跨族复现 ===
+n3_report_qwen2.5-3b-instruct.txt | /极性/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L3 ---
+n3_report_qwen2.5-3b-instruct.txt | /极性/ | K_d 极性解耦(否定): B/A=7.380 ; 跨上下文 B_cat=+0.491 同号? YES
+n3_report_qwen2.5-3b-instruct.txt | /极性/ | >>> 总结：装置跨结构类型=PASS ; 跨极性=PASS ; 跨族共享=FAMILY-SPECIFIC
+n3_report_qwen2.5-3b-instruct.txt | /neg/ | hidden collected: isa 41 (+neg) color 29
+n3_report_qwen2.5-3b-instruct.txt | /neg/ | base recipient-class score: F1pos=7.345  F3neg=5.405  F2col=2.893
+n3_report_qwen2.5-3b-instruct.txt | /neg/ | 同上下文(neg donor->neg rec): A_full=+0.012  B_cat=+0.089  D_rand=-0.011  B/A=7.380
+n3_report_qwen2.5-3b-instruct.txt | /neg/ | 跨上下文(pos donor->neg rec): B_cat=+0.491
+n3_report_qwen2.5-3b-instruct.txt | /不是一种/ | 苹果不是一种             -> 水果(16.0) | 蔬菜(14.4) | 植物(14.4) | 动物(14.2) | 食物(13.9)
+n3_report_qwen2.5-3b-instruct.txt | /不是一种/ | 卡车不是一种             -> 商品(14.8) | 动物(14.1) | 交通工具(14.1) | 产品(13.2) | 食物(13.1)
+n3_report_qwen2.5-3b-instruct.txt | /不是一种/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L3 ---
+n3_report_qwen3-4b.txt | /K_d/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L6 ---
+n3_report_qwen3-4b.txt | /K_d/ | K_d 极性解耦(否定): B/A=0.526 ; 跨上下文 B_cat=+1.945 同号? YES
+n3_report_qwen3-4b.txt | /极性/ | === N3 条件子空间装置：跨结构 / 跨极性 / 跨族复现 ===
+n3_report_qwen3-4b.txt | /极性/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L6 ---
+n3_report_qwen3-4b.txt | /极性/ | K_d 极性解耦(否定): B/A=0.526 ; 跨上下文 B_cat=+1.945 同号? YES
+n3_report_qwen3-4b.txt | /极性/ | >>> 总结：装置跨结构类型=PASS ; 跨极性=FAIL ; 跨族共享=FAMILY-SPECIFIC
+n3_report_qwen3-4b.txt | /neg/ | hidden collected: isa 41 (+neg) color 29
+n3_report_qwen3-4b.txt | /neg/ | base recipient-class score: F1pos=7.739  F3neg=7.139  F2col=4.695
+n3_report_qwen3-4b.txt | /neg/ | 同上下文(neg donor->neg rec): A_full=+0.693  B_cat=+0.364  D_rand=+0.004  B/A=0.526
+n3_report_qwen3-4b.txt | /neg/ | 跨上下文(pos donor->neg rec): B_cat=+1.945
+n3_report_qwen3-4b.txt | /不是一种/ | 苹果不是一种             -> 水果(20.6) | 植物(18.2) | 蔬菜(17.1) | 树(17.0) | 动物(16.4)
+n3_report_qwen3-4b.txt | /不是一种/ | 卡车不是一种             -> 交通工具(18.5) | 汽车(17.0) | 车(16.5) | 动物(16.5) | 车辆(15.9)
+n3_report_qwen3-4b.txt | /不是一种/ | --- K_d 极性解耦：否定模板 {W}不是一种 @isa lstar=L6 ---
+
+=== C. N1b L0 scores (tied +18.87 / untied ~0) ===
+n1b_report_glm4-9b-chat-hf.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | 0      +0.400      -0.299     +0.699
+n1b_report_qwen2-7b.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | 0      +0.068      +0.612     -0.543
+n1b_report_qwen2.5-3b-instruct.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | 0     +24.101      +0.142    +23.959
+n1b_report_qwen2.5-3b-instruct.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | score_inst L0=24.101 peak @L0=24.101 ratio=1.00x
+n1b_report_qwen3-4b.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | 0     +18.870      +0.704    +18.166
+n1b_report_qwen3-4b.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | score_inst L0=18.870 peak @L0=18.870 ratio=1.00x
+n1b_report_qwen3-4b.txt | /L0.*18\.|18\.87|24\.42|24\.10|\+0\.068|\+0\.40/ | gap L0=18.166 peak @L0=18.166
+
+=== D. N1 A-arm dS windows (significant windows) ===
+n1v2_report_qwen3-4b.txt | /显著窗|sig_win|dS/ | L   sep_sense  sep_ctrl   dS      z       JSD_sense JSD_ctrl sep_null
+n1v2_report_qwen3-4b.txt | /显著窗|sig_win|dS/ | dS peak @L11=0.0205 ; JSD peak @L30=0.2529 ; 每词 dS 峰层: 苹果@L16, 小米@L16, 病毒@L16, 杜鹃@L10
+
+=== E. N2h1 zeroing necessity (random-5dim definition) ===
+n2h1b_report_glm4-9b-chat-hf.txt | /随机 5 维|random.*5|zero.*rand|置零/ | --- E1: 必要性 —— 只置零读位槽的 U 分量 vs 随机分量（不动其他 2555 维）---
+n2h1b_report_qwen2.5-3b-instruct.txt | /随机 5 维|random.*5|zero.*rand|置零/ | --- E1: 必要性 —— 只置零读位槽的 U 分量 vs 随机分量（不动其他 2555 维）---

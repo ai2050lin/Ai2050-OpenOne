@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI2050 平台效果图 v3 · 吸收同类项目修改意见（仅供确认）</title>
+<style>
+  :root{
+    --bg:#04070f; --panel:rgba(10,20,40,.55); --panel-solid:#081022;
+    --line:rgba(0,229,255,.18); --line-strong:rgba(0,229,255,.45);
+    --cyan:#00e5ff; --cyan-soft:#7de9ff; --violet:#8c6bff; --magenta:#ff3d81;
+    --green:#00ffa3; --amber:#ffd166; --text:#d7ecf5; --dim:#6f8fa3;
+    --mono:Consolas,"JetBrains Mono","Courier New",monospace;
+    --sans:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);
+    background-image:radial-gradient(1100px 520px at 75% -8%,rgba(0,229,255,.09),transparent 60%),
+                     radial-gradient(900px 480px at 8% 12%,rgba(140,107,255,.07),transparent 60%);overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);background-size:44px 44px}
+  .wrap{position:relative;z-index:1;max-width:1560px;margin:0 auto;padding:0 26px}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(4,7,15,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;gap:18px;height:56px}
+  .logo{display:flex;align-items:center;gap:10px;font:700 14.5px var(--sans);color:#eafcff;white-space:nowrap}
+  .logo svg{width:21px;height:21px;color:var(--cyan);filter:drop-shadow(0 0 6px rgba(0,229,255,.7))}
+  .nav a{color:var(--dim);text-decoration:none;font-size:12.5px;padding:7px 11px;border:1px solid transparent;border-radius:3px;white-space:nowrap}
+  .nav a:hover{color:var(--cyan-soft);border-color:var(--line);background:rgba(0,229,255,.05)}
+  .nav a.on{color:var(--cyan-soft);border-color:var(--line-strong);background:rgba(0,229,255,.08)}
+  .status{margin-left:auto;font:600 10px var(--mono);color:var(--dim);letter-spacing:.08em;white-space:nowrap}
+  .status b{color:var(--cyan-soft)}
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);margin-right:6px;vertical-align:1px;animation:pulse 2.2s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  .hero{padding:38px 0 6px}
+  .eyebrow{font:600 10.5px var(--mono);letter-spacing:.32em;color:var(--cyan);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:'';width:34px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+  h1{font-size:33px;font-weight:800;background:linear-gradient(92deg,#f2fdff 10%,#8ceaff 55%,#b9a5ff 95%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(0,229,255,.22))}
+  .hero p{margin-top:11px;color:var(--dim);font-size:13px;line-height:1.8;max-width:1000px}
+  .hero p b{color:var(--cyan-soft)}
+  .loop{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;font:600 10.5px var(--mono);letter-spacing:.06em}
+  .loop .st{border:1px solid var(--line);padding:8px 13px;border-radius:3px;background:rgba(0,229,255,.05);color:var(--cyan-soft)}
+  .loop .st small{display:block;color:var(--dim);letter-spacing:.1em;margin-top:2px;font-size:8.5px}
+  .loop .arr{color:var(--dim);font-size:14px}
+  .loop .back{color:var(--violet);border-color:rgba(140,107,255,.45);background:rgba(140,107,255,.08)}
+  .loop .st.hl{border-color:rgba(0,255,163,.6);box-shadow:0 0 16px rgba(0,255,163,.25);color:var(--green);transition:box-shadow .4s}
+
+  section.block{padding:38px 0 8px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:4px;flex-wrap:wrap}
+  .sec-head .no{font:700 11px var(--mono);color:var(--cyan);letter-spacing:.2em}
+  .sec-head h2{font-size:21px;font-weight:800;color:#eefcff}
+  .sec-head .en{font:600 10px var(--mono);letter-spacing:.22em;color:var(--dim);text-transform:uppercase}
+  .delta{font:700 9px var(--mono);letter-spacing:.12em;color:#04121a;background:linear-gradient(90deg,var(--green),#59ffb9);padding:4px 9px;border-radius:2px}
+  .sec-desc{color:var(--dim);font-size:12.5px;line-height:1.75;max-width:1000px;margin:6px 0 16px}
+  .sec-desc b{color:var(--cyan-soft)}
+
+  .browser{border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;background:rgba(5,10,22,.72);box-shadow:0 0 46px rgba(0,229,255,.09),inset 0 0 60px rgba(0,229,255,.03);position:relative}
+  .browser::before,.browser::after{content:'';position:absolute;width:16px;height:16px;pointer-events:none;z-index:9}
+  .browser::before{top:-1px;left:-1px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+  .browser::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+  .chrome{display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(8,16,34,.9);border-bottom:1px solid var(--line)}
+  .chrome .dots{display:flex;gap:5px}
+  .chrome .dots i{width:9px;height:9px;border-radius:50%;background:#20344b}
+  .chrome .dots i:first-child{background:rgba(255,61,129,.6)}
+  .chrome .dots i:nth-child(2){background:rgba(255,209,102,.6)}
+  .chrome .dots i:nth-child(3){background:rgba(0,255,163,.6)}
+  .chrome .url{flex:1;max-width:520px;font:600 10.5px var(--mono);color:var(--cyan-soft);background:rgba(0,229,255,.06);border:1px solid var(--line);padding:4px 12px;border-radius:3px}
+  .chrome .tag{margin-left:auto;font:700 9px var(--mono);letter-spacing:.2em;color:var(--green)}
+
+  .hud{position:relative;border:1px solid rgba(0,229,255,.22);background:#060b18;border-radius:2px}
+  .col-title{font:700 9.5px var(--mono);letter-spacing:.22em;color:var(--dim);padding:11px 14px 8px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .chip{display:inline-flex;align-items:center;font:600 9.5px var(--mono);letter-spacing:.1em;color:var(--cyan-soft);border:1px solid rgba(0,229,255,.35);padding:4px 9px;border-radius:2px;background:rgba(0,229,255,.06)}
+  .chip.g{color:var(--green);border-color:rgba(0,255,163,.4);background:rgba(0,255,163,.06)}
+  .chip.v{color:var(--violet);border-color:rgba(140,107,255,.45);background:rgba(140,107,255,.08)}
+  .chip.m{color:var(--magenta);border-color:rgba(255,61,129,.45);background:rgba(255,61,129,.07)}
+  .chip.a{color:var(--amber);border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.07)}
+  .chip.c{color:#04121a;border-color:var(--cyan);background:var(--cyan)}
+
+  /* ============ 01 · 3D ============ */
+  .sp-grid{display:grid;grid-template-columns:236px 1fr 292px}
+  .sp-left{border-right:1px solid var(--line);background:rgba(7,13,28,.6);display:flex;flex-direction:column}
+  .sp-right{border-left:1px solid var(--line);background:rgba(7,13,28,.6);display:flex;flex-direction:column}
+  .seg-btns{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .seg-btn{flex:1;text-align:center;font:600 10px var(--mono);letter-spacing:.06em;color:var(--dim);border:1px solid var(--line);padding:7px 4px;border-radius:2px}
+  .seg-btn.on{color:#06121f;background:linear-gradient(90deg,var(--cyan),#59d8ff);border-color:var(--cyan);font-weight:700}
+  .seg-btn.on.v{background:linear-gradient(90deg,var(--violet),#a98fff);border-color:var(--violet);color:#120b26}
+  .tree .it{padding:7px 14px;font-size:11.5px;color:#a9c4d2;display:flex;justify-content:space-between;align-items:center}
+  .tree .it:hover{background:rgba(0,229,255,.05)}
+  .tree .it.on{background:linear-gradient(90deg,rgba(0,229,255,.13),transparent);border-left:2px solid var(--cyan);color:#d9f2fb}
+  .tree .it .k{font:600 9px var(--mono);color:var(--dim)}
+  .sp-note{margin-top:auto;padding:11px 14px;border-top:1px solid rgba(0,229,255,.09);font:600 9px var(--mono);color:var(--dim);letter-spacing:.1em;line-height:1.9}
+  .sp-note b{color:var(--green)}
+  .sp-hud{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line);font:600 10px var(--mono);letter-spacing:.1em;color:var(--dim);flex-wrap:wrap}
+  .sp-hud .r{margin-left:auto;display:flex;gap:10px;align-items:center}
+  #space3d{display:block;width:100%;height:470px;cursor:crosshair}
+  .sp-legend{display:flex;align-items:center;gap:12px;padding:8px 14px;border-top:1px solid rgba(0,229,255,.12);font:600 9px var(--mono);letter-spacing:.12em;color:var(--dim);flex-wrap:wrap}
+  .sp-legend .bar{width:140px;height:7px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(90deg,#0a3555,#00e5ff,#b9a5ff,#ff3d81)}
+  .link-drawer{max-height:0;overflow:hidden;transition:max-height .45s ease;border-top:0 solid rgba(0,229,255,.12)}
+  .link-drawer.open{max-height:400px;border-top:1px solid rgba(0,229,255,.12)}
+  .drawer-in{padding:12px 14px}
+  .drawer-in .dt{font:700 9.5px var(--mono);letter-spacing:.2em;color:var(--magenta);margin-bottom:9px;display:flex;gap:10px;align-items:center}
+  .drawer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px}
+  .drawer-grid .hud canvas{display:block;width:100%;height:96px}
+  .drawer-grid .cap{padding:5px 10px;border-top:1px solid rgba(0,229,255,.12);font:600 8.5px var(--mono);letter-spacing:.12em;color:var(--dim);display:flex;justify-content:space-between}
+  .drawer-grid .cap b{color:var(--cyan-soft)}
+  .side-sec{padding:12px 14px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .side-sec .t{font:700 9.5px var(--mono);letter-spacing:.2em;color:var(--cyan);margin-bottom:9px;display:flex;justify-content:space-between}
+  .side-sec .t .r{color:var(--dim)}
+  .kv{display:flex;justify-content:space-between;font-size:11px;color:#a9c4d2;margin-bottom:6px;gap:8px}
+  .kv .v{font:600 10px var(--mono);color:var(--cyan-soft);text-align:right}
+  .kv .v.mg{color:var(--magenta)} .kv .v.gr{color:var(--green)} .kv .v.am{color:var(--amber)}
+  .gauge{height:6px;background:rgba(0,229,255,.12);border-radius:2px;margin:3px 0 9px;position:relative;overflow:hidden}
+  .gauge i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--cyan),var(--magenta));border-radius:2px}
+  .gauge em{position:absolute;top:-3px;width:2px;height:12px;background:#fff;box-shadow:0 0 6px #fff}
+  .principle{font-size:11.3px;line-height:1.8;color:#a9c4d2}
+  .principle b{color:var(--cyan-soft)}
+
+  /* ============ 02 · AI IDE ============ */
+  .ide-grid{display:grid;grid-template-columns:218px 1fr 330px}
+  .ide-left{border-right:1px solid var(--line);background:rgba(7,13,28,.6)}
+  .ide-mid{display:flex;flex-direction:column;border-right:1px solid var(--line)}
+  .ide-right{background:rgba(7,13,28,.6);display:flex;flex-direction:column}
+  .tabs{display:flex;border-bottom:1px solid var(--line);background:rgba(8,16,34,.85)}
+  .tabs span{font:600 10.5px var(--mono);padding:8px 14px;color:var(--dim);border-right:1px solid rgba(0,229,255,.08)}
+  .tabs span.on{color:var(--cyan-soft);background:rgba(0,229,255,.08);box-shadow:inset 0 -2px 0 var(--cyan)}
+  pre.code{margin:0;padding:13px 16px;font:11.5px/1.75 var(--mono);color:#b8d4e2;overflow:hidden;background:#060b18;flex:1}
+  pre.code .cm{color:#5b7a8f}pre.code .kw{color:#8c6bff}pre.code .fn{color:#00e5ff}pre.code .st{color:#ffd166}pre.code .nm{color:#ff3d81}
+  .runprof{display:flex;gap:8px;flex-wrap:wrap;padding:8px 16px;border-top:1px solid rgba(0,229,255,.12);background:rgba(255,209,102,.04);font:600 9px var(--mono);letter-spacing:.08em;color:var(--amber)}
+  .runprof span{border:1px dashed rgba(255,209,102,.4);padding:3px 8px;border-radius:2px}
+  .term{border-top:1px solid var(--line);background:#04080f;height:196px;overflow:hidden;padding:9px 16px;font:10.5px/1.85 var(--mono);color:#9fc3d4}
+  .term .ev{color:#5b7a8f;font-weight:700}
+  .term .ev.err{color:var(--magenta)} .term .ev.rep{color:var(--amber)} .term .ev.ok{color:var(--green)} .term .ev.pend{color:var(--violet)}
+  .term .cursor{display:inline-block;width:7px;height:12px;background:var(--cyan);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .mode-btns{display:flex;gap:6px;padding:10px 14px 0}
+  .mode-btn{flex:1;text-align:center;font:700 9.5px var(--mono);letter-spacing:.06em;color:var(--dim);border:1px solid var(--line);padding:8px 4px;border-radius:2px;cursor:pointer}
+  .mode-btn.on{color:#04121a;background:linear-gradient(90deg,var(--cyan),#59d8ff);border-color:var(--cyan)}
+  .mode-btn.on.rv{background:linear-gradient(90deg,var(--violet),#a98fff);border-color:var(--violet);color:#120b26}
+  .cfg{padding:11px 14px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .agent label{display:block;font:700 9px var(--mono);letter-spacing:.18em;color:var(--dim);margin:0 0 6px}
+  .sel,.ta{width:100%;background:rgba(0,229,255,.05);border:1px solid var(--line);color:#d9f2fb;font:11px var(--mono);padding:7px 9px;border-radius:2px;outline:none}
+  .ta{height:64px;resize:none;line-height:1.6}
+  .runbtn{width:100%;margin-top:9px;text-align:center;font:700 10.5px var(--mono);letter-spacing:.14em;color:#04121a;background:linear-gradient(90deg,var(--cyan),#59d8ff);border:none;padding:9px 0;border-radius:2px;box-shadow:0 0 18px rgba(0,229,255,.35)}
+  .runbtn.rv{background:linear-gradient(90deg,var(--violet),#a98fff);box-shadow:0 0 18px rgba(140,107,255,.4);color:#120b26}
+  .qitem{padding:8px 14px;border-bottom:1px solid rgba(0,229,255,.07);font-size:10.8px;color:#a9c4d2;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .qitem .st{font:700 8.5px var(--mono);letter-spacing:.1em;padding:3px 7px;border-radius:2px;white-space:nowrap}
+  .st.run{color:var(--cyan);border:1px solid rgba(0,229,255,.5);background:rgba(0,229,255,.08);animation:pulse 1.6s infinite}
+  .st.done{color:var(--green);border:1px solid rgba(0,255,163,.4)}
+  .st.wait{color:var(--dim);border:1px solid rgba(111,143,163,.4)}
+  .st.elo{color:var(--violet);border:1px solid rgba(140,107,255,.5);background:rgba(140,107,255,.1)}
+  .cand{margin:8px 12px 0;padding:9px 11px;border:1px solid rgba(140,107,255,.3);background:rgba(140,107,255,.06);border-radius:2px;font-size:10.8px;color:#c9d8e4}
+  .cand .hd{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .cand .hd b{color:#e6f7fd;font-size:11px}
+  .cand .src{font:600 8.5px var(--mono);color:var(--dim);margin-top:3px;letter-spacing:.06em}
+  .checks{margin-top:10px;padding:10px 14px;border-bottom:1px solid rgba(0,229,255,.09)}
+  .checks .ck{font-size:10.8px;color:#a9c4d2;margin-bottom:5px;display:flex;justify-content:space-between}
+  .checks .ck b{font-family:var(--mono);font-weight:700}
+  .checks .ok{color:var(--green)} .checks .warn{color:var(--amber)}
+
+  /* ============ 03 · 路线图 ============ */
+  .rm-top{padding:18px 22px 8px;background:rgba(7,13,28,.6);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .rm-lanes{display:flex;gap:16px;font:600 9px var(--mono);letter-spacing:.16em;color:var(--dim)}
+  .rm-canvas{position:relative;height:210px;margin:0 22px;background:rgba(6,11,24,.5);border:1px solid rgba(0,229,255,.16);border-radius:2px;overflow:hidden}
+  .rm-line{position:absolute;left:2%;right:2%;top:58%;height:2px;background:linear-gradient(90deg,rgba(0,229,255,.1),rgba(0,229,255,.65),rgba(140,107,255,.65),rgba(255,61,129,.5))}
+  .rm-lane{position:absolute;left:2%;right:2%;height:1px;background:rgba(0,229,255,.07)}
+  .node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;text-align:center;z-index:2}
+  .node .pt{width:11px;height:11px;border-radius:50%;margin:0 auto;border:2px solid;transition:.15s}
+  .node .yr{font:700 9.5px var(--mono);letter-spacing:.06em;margin-top:5px;color:var(--dim)}
+  .node .lb{font-size:10.5px;color:#a9c4d2;margin-top:2px;max-width:106px;line-height:1.4}
+  .node:hover .pt{box-shadow:0 0 14px currentColor;transform:scale(1.25)}
+  .node.sel .pt{box-shadow:0 0 18px currentColor;transform:scale(1.4)}
+  .node.sel .yr{color:#eefcff}
+  .node.l-cyan .pt{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.25)}
+  .node.l-violet .pt{border-color:var(--violet);color:var(--violet);background:rgba(140,107,255,.25)}
+  .node.l-magenta .pt{border-color:var(--magenta);color:var(--magenta);background:rgba(255,61,129,.25)}
+  .rm-grid{display:grid;grid-template-columns:1fr 400px}
+  .rm-blurb{padding:13px 22px;color:var(--dim);font-size:11.5px;line-height:1.8;border-top:1px solid rgba(0,229,255,.09)}
+  .rm-blurb b{color:var(--cyan-soft)}
+  .rm-detail{border-left:1px solid rgba(0,229,255,.09);padding-bottom:14px}
+  .d-sec{padding:10px 14px 2px}
+  .d-sec .st2{font:700 9px var(--mono);letter-spacing:.2em;color:var(--cyan);margin-bottom:8px}
+  .d-sec .st2.code{color:var(--green)} .d-sec .st2.map{color:var(--magenta)} .d-sec .st2.src2{color:var(--dim)}
+  .paper{margin:0 0 7px;padding:9px 11px;border:1px solid rgba(0,229,255,.16);background:rgba(0,229,255,.04);border-radius:2px}
+  .paper .ttl{font-size:11.5px;font-weight:600;color:#e6f7fd;line-height:1.5}
+  .paper .au{font:600 9px var(--mono);color:var(--dim);margin-top:4px}
+  .codeitem{font:600 10px var(--mono);color:var(--green);margin:0 0 5px;display:flex;justify-content:space-between;gap:8px}
+  .codeitem small{color:var(--dim)}
+  .mapitem{font-size:10.8px;color:#c9d8e4;margin:0 0 5px;padding-left:12px;position:relative;line-height:1.6}
+  .mapitem::before{content:'↳';position:absolute;left:0;color:var(--magenta);font-family:var(--mono)}
+  .forkbtn{margin:8px 14px 0;width:calc(100% - 28px);text-align:center;font:700 10px var(--mono);letter-spacing:.1em;color:#120b26;background:linear-gradient(90deg,var(--violet),#a98fff);border:none;padding:8px 0;border-radius:2px;cursor:pointer;box-shadow:0 0 14px rgba(140,107,255,.3)}
+  .echo{margin:8px 14px 0;font:600 9.5px var(--mono);color:var(--green);letter-spacing:.06em;min-height:14px}
+
+  footer{margin:50px 0 36px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font:600 9.5px var(--mono);letter-spacing:.16em;color:var(--dim);flex-wrap:wrap;gap:8px}
+  .note{margin:24px 0 0;padding:14px 18px;border:1px dashed rgba(255,209,102,.45);background:rgba(255,209,102,.05);border-radius:2px;font-size:12.5px;color:#e8d9a8;line-height:1.85}
+  .note b{color:var(--amber)}
+  @media (max-width:1180px){.sp-grid,.ide-grid{grid-template-columns:1fr}.sp-left,.sp-right,.ide-left{border:none;border-bottom:1px solid var(--line)}.drawer-grid{grid-template-columns:1fr}.rm-grid{grid-template-columns:1fr}.rm-detail{border-left:none;border-top:1px solid rgba(0,229,255,.09)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8.66 5v10L12 22l-8.66-5V7L12 2z"/><circle cx="12" cy="12" r="3.2"/></svg>
+      AI2050 · 机制可解释性研究平台
+    </div>
+    <a class="on" href="#s1">① 可视化研究 · 3D 神经元空间</a>
+    <a href="#s2">② AI 自动研发 · 编程环境</a>
+    <a href="#s3">③ 行业进展 · 路线图</a>
+    <div class="status"><span class="dot"></span>MOCKUP <b>v3</b> · 吸收同类项目意见 · 2026-10-04</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Static Mockup v3 · 按对标调研修订 · 零依赖单文件</div>
+    <h1>三部分闭环效果图（v3）</h1>
+    <p>对照 AI-Scientist / Agent Laboratory / Biomni / Co-Scientist / OpenHands / Virtual Lab / PaperQA2 七个同类系统后的修订稿。<b>绿色 DELTA 标签</b>标出本版新增：① 3D↔2D 联动 + NPZ 数据源切换 + 参数读出绑机制；② <b>假设评审草稿通道</b>（Elo 排名→人工冻结）+ 文献工具 + 事件流与运行安全档；③ 路线图节点三层数据（论文/代码/本项目映射）+ 空白节点一键转研究任务。</p>
+    <div class="loop">
+      <span class="st">③ 路线图<small>外部知识 · 行业节点</small></span><span class="arr">──▶</span>
+      <span class="st">② AI 研发<small>假设评审 → 冻结 → 执行</small></span><span class="arr">──▶</span>
+      <span class="st">① 3D 空间<small>内部响应观察</small></span><span class="arr">──▶</span>
+      <span class="st back">账本回写<small>MEMO / Ledger / 证据等级</small></span><span class="arr">⟲</span>
+      <span class="st" style="border-style:dashed">新节点 / 新空白<small>下一轮假设来源</small></span>
+    </div>
+  </div>
+
+  <!-- ================= 01 3D 神经元空间 ================= -->
+  <section class="block" id="s1">
+    <div class="sec-head"><span class="no">PART.01</span><h2>可视化研究 · 3D 神经元空间</h2><span class="en">3D Explorer · Linked 2D</span><span class="delta">DELTA v3：3D↔2D 联动 / 数据源切换 / 机制绑定读出</span></div>
+    <p class="sec-desc">X = 神经元索引，Y = 激活幅值，Z = 层 L0→L27；点色 = 激活状态，点径 = 参数范数。<b>点击画布任意神经元</b>——下方展开 2D 联动抽屉（层内切片热力图 + 轨迹叠加），右侧同步该神经元的参数与状态读出；"参数模式"的读出绑定真实机制问题（w 向量与 unembed 的对齐），而非装饰性渲染。正式版用 WebGL instanced rendering 支撑全量坐标，本 demo 为 canvas 简化版。</p>
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">http://localhost:5173/#/space</span><span class="tag">DEMO · CLIENT-GENERATED</span></div>
+      <div class="sp-grid">
+        <div class="sp-left">
+          <div class="col-title">VIEW CONFIG · 视图配置</div>
+          <div class="seg-btns">
+            <span class="seg-btn on">状态 ACT</span><span class="seg-btn v">参数 W</span><span class="seg-btn">注意力 HEAD</span>
+          </div>
+          <div class="col-title" style="border-top:none">DATA SOURCE · 数据源 <span style="color:var(--green)">DELTA</span></div>
+          <div class="tree">
+            <div class="it on"><span>DEMO · 客户端实时生成</span><span class="k">0 KB</span></div>
+            <div class="it"><span>NPZ 快照</span><span class="k">SNAP-…-f8bf9916</span></div>
+            <div class="it"><span>本地运行结果</span><span class="k">result/*.npz</span></div>
+          </div>
+          <div class="col-title">MODEL · 模型</div>
+          <div class="tree">
+            <div class="it on"><span>Qwen3-4B</span><span class="k">36L · 2560d</span></div>
+            <div class="it"><span>Qwen3-14B</span><span class="k">40L · 5120d</span></div>
+            <div class="it"><span>GLM4-9B</span><span class="k">40L · 4096d</span></div>
+          </div>
+          <div class="col-title">SLICE · 切片</div>
+          <div class="tree">
+            <div class="it on"><span>全层场（top-k 激活渲染）</span><span class="k">k=2k</span></div>
+            <div class="it"><span>单层剖开</span><span class="k">L14</span></div>
+            <div class="it"><span>MLP 单元层</span><span class="k">L14·MLP</span></div>
+          </div>
+          <div class="sp-note">正式版: <b>WEBGL</b> instanced · 1M pts<br>点色 = 激活 · 点径 = ‖W‖<br>点击选中 → 2D 联动</div>
+        </div>
+        <div class="sp-mid">
+          <div class="sp-hud">
+            <span>NEURON FIELD — L × NEURON × |ACT|</span>
+            <span class="r"><span class="chip g">DEMO 生成</span><span class="chip">INPUT: "我喜欢吃苹果"</span></span>
+          </div>
+          <canvas id="space3d" width="960" height="470"></canvas>
+          <div class="link-drawer" id="drawer">
+            <div class="drawer-in">
+              <div class="dt">3D ↔ 2D 联动 · 选中神经元 <span id="dNeuron" style="color:var(--cyan-soft)">L14 · N2847</span><span style="margin-left:auto;color:var(--dim)">DELTA v3 · 点击画布换选</span></div>
+              <div class="drawer-grid">
+                <div class="hud"><canvas id="dHeat" width="360" height="96"></canvas><div class="cap"><span><b>L14</b> 层内切片热力图</span><span>64 WINDOW</span></div></div>
+                <div class="hud"><canvas id="dTraj" width="240" height="96"></canvas><div class="cap"><span><b>轨迹叠加</b></span><span>4 PATHS</span></div></div>
+                <div class="hud"><canvas id="dSpark" width="240" height="96"></canvas><div class="cap"><span><b>激活时序</b></span><span>GEN STEPS</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="sp-legend"><span>低激活</span><span class="bar"></span><span>高激活</span><span style="margin-left:auto">点径 ∝ ‖W‖</span></div>
+        </div>
+        <div class="sp-right">
+          <div class="side-sec">
+            <div class="t">SELECTED · 选中神经元 <span class="r" id="pNeuron">L14 · N2847</span></div>
+            <div class="kv"><span>参数范数 ‖W‖</span><span class="v" id="pNorm">1.284</span></div>
+            <div class="kv"><span>偏置 b</span><span class="v" id="pBias">−0.037</span></div>
+            <div class="kv"><span>当前激活 a</span><span class="v mg" id="pAct">0.872</span></div>
+            <div class="kv"><span>角色假设</span><span class="v am">fruit/food 类别候选</span></div>
+            <div class="kv"><span>上游 TOP-3</span><span class="v">tok「苹果」·L12·N881</span></div>
+            <div class="kv"><span>下游 TOP-3</span><span class="v">L17·N1204 → unembed</span></div>
+          </div>
+          <div class="side-sec">
+            <div class="t">参数模式读出 · W ↔ UNEMBED <span class="r">DELTA</span></div>
+            <div class="kv"><span>cos(w, unembed「苹果」)</span><span class="v mg">0.73</span></div>
+            <div class="gauge"><i style="width:73%"></i><em style="left:73%"></em></div>
+            <div class="kv"><span>cos(w, unembed「香蕉」)</span><span class="v">0.61</span></div>
+            <div class="gauge"><i style="width:61%"></i><em style="left:61%"></em></div>
+            <div class="kv"><span>cos(w, unembed「桌子」)</span><span class="v">0.08</span></div>
+            <div class="gauge"><i style="width:8%"></i><em style="left:8%"></em></div>
+            <div class="kv" style="margin-top:2px"><span>读出位槽跨度</span><span class="v">G−1 = 5 维</span></div>
+          </div>
+          <div class="side-sec" style="border-bottom:none">
+            <div class="t">PRINCIPLE · 读法</div>
+            <div class="principle">固定权重推理中<b>参数 (W,b) 不随语境变化</b>，激活状态随输入实时改变。3D 把两者叠加：形状由参数决定、颜色由状态决定——哪些参数位在哪些条件下反复点火，即<b>条件齿轮</b>候选。联动 2D 保证每次观察<b>可回查原始数值</b>。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 AI 编程环境 ================= -->
+  <section class="block" id="s2">
+    <div class="sec-head"><span class="no">PART.02</span><h2>AI 自动研发 · AI 编程环境</h2><span class="en">Autonomous Research IDE</span><span class="delta">DELTA v3：假设评审通道 / 文献工具 / 事件流 / 运行安全档</span></div>
+    <p class="sec-desc">对标 OpenHands（事件流底座）+ Co-Scientist（假设评审）+ Agent Laboratory（失败自动修复）：<b>双模式</b>——「冻结执行」跑已预注册的任务；「假设评审」由 Agent 从 <b>MEMO 挂账 + 路线图空白</b>生成 Q-候选，自动审稿（合同可冻结性/数据量门/泄漏检查/GPU 预算）→ Elo 排名 → <b>人工挑一个冻结入队</b>。左侧新增本地文献索引（抓取的论文，不入仓），终端改为<b>类型化事件流</b>（append-only，可回放），命令运行受 run-profile 约束。</p>
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">http://localhost:5173/#/lab</span><span class="tag">EVENT-STREAM · REPLAYABLE</span></div>
+      <div class="ide-grid">
+        <div class="ide-left">
+          <div class="col-title">EXPLORER · 项目</div>
+          <div class="tree">
+            <div class="it on"><span>research/deepseek/docs/</span><span class="k">MEMO</span></div>
+            <div class="it" style="padding-left:28px"><span>AGI_DEEPSEEK_MEMO.md</span><span class="k">718 KB</span></div>
+            <div class="it"><span>atlas/</span><span class="k">dir</span></div>
+            <div class="it" style="padding-left:28px"><span>atlas_ledger.json</span><span class="k">n=304</span></div>
+            <div class="it" style="padding-left:28px"><span>metric_dict.json</span><span class="k">v4</span></div>
+            <div class="it" style="padding-left:28px"><span>phase_queue.json</span><span class="k">6 sealed</span></div>
+            <div class="it"><span>scripts/researchctl.py</span><span class="k">CLI</span></div>
+            <div class="it"><span>tests/deepseek/</span><span class="k">scripts</span></div>
+            <div class="it"><span>literature/ <span style="color:var(--green)">DELTA</span></span><span class="k">本地</span></div>
+            <div class="it" style="padding-left:28px"><span>index.tantivy</span><span class="k">全文索引</span></div>
+            <div class="it" style="padding-left:28px"><span>2405.…circuit-tracing.pdf</span><span class="k">已抓取</span></div>
+            <div class="it" style="padding-left:28px;color:#5b7a8f"><span>result/（本地·不入仓）</span></div>
+          </div>
+          <div class="sp-note">LIT-INDEX: <b>38 papers</b> · 本地缓存<br>Agent 可查新/引用/查矛盾<br>事件流: <b>append-only</b> 可回放</div>
+        </div>
+        <div class="ide-mid">
+          <div class="tabs"><span class="on">q06_steer_run.py</span><span>event_log.jsonl</span><span>AGI_DEEPSEEK_MEMO.md</span></div>
+<pre class="code"><span class="cm"># Q06 C_steer —— 由 Agent 依据冻结合同(ebf960cf)生成；run-profile 强制约束</span>
+<span class="kw">from</span> atlas <span class="kw">import</span> load_metric_dict, frozen_contract
+
+<span class="fn">def</span> <span class="fn">main</span>():
+    contract = <span class="fn">frozen_contract</span>(<span class="st">"q06_c_steer"</span>, sha=<span class="st">"ebf960cf"</span>)
+    steer    = <span class="fn">SteeringPort</span>(model=<span class="st">"qwen3-4b"</span>, layers=<span class="nm">range</span>(<span class="nm">0</span>, <span class="nm">36</span>),
+                             profile=<span class="st">"gpu8g·600s·w:tests/deepseek/result"</span>)
+    res      = steer.<span class="fn">measure</span>(success_rate=<span class="kw">True</span>, collateral=<span class="kw">True</span>)
+    res.<span class="fn">assert_drift</span>(contract)          <span class="cm"># 偏离冻结设计即报错</span>
+    res.<span class="fn">save</span>(<span class="st">"tests/deepseek/result/q06.npz"</span>)
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>: <span class="fn">main</span>()</pre>
+          <div class="runprof"><span>RUN-PROFILE ▸</span><span>GPU ≤ 8 GB</span><span>超时 600 s</span><span>可写白名单 tests/deepseek/result</span><span>外网 禁用</span><span>失败自动修复 ≤ 3 次</span></div>
+          <div class="term">
+            <div><span class="ev">[UserGoalEvent]</span> 按 Q06 冻结合同执行 C_steer 基座测量</div>
+            <div><span class="ev">[AgentThought]</span> 读取合同 ebf960cf → 生成脚本 → 先 dry-run</div>
+            <div><span class="ev">[CodeActEvent]</span> python q06_steer_run.py --dry-run</div>
+            <div><span class="ev ok">[Observation]</span> dry-run ok · 显存峰值预估 5.1GB &lt; 8GB 上限</div>
+            <div><span class="ev">[BashEvent]</span> python q06_steer_run.py --model qwen3-4b</div>
+            <div><span class="ev err">[AgentError]</span> CUDA OOM @ layer 30 · batch 8 不可行</div>
+            <div><span class="ev rep">[AgentRepair]</span> 自动修复 2/3 · batch 8→4 · 重试通过</div>
+            <div><span class="ev ok">[Observation]</span> success_rate=0.742 · collateral=0.118 · paired margin −0.021</div>
+            <div><span class="ev pend">[SealPending]</span> 结果写本地 result/ · 等待人工复核 seal<span class="cursor"></span></div>
+          </div>
+        </div>
+        <div class="ide-right">
+          <div class="mode-btns">
+            <span class="mode-btn" id="mbExec">执行冻结任务</span><span class="mode-btn rv on" id="mbRev">假设评审草稿通道</span>
+          </div>
+          <div id="modeExec" style="display:none">
+            <div class="cfg">
+              <label>AI · 模型配置</label>
+              <select class="sel"><option>qwen3-4b（本地 CUDA）</option><option>qwen3-14b（4-bit NF4）</option><option>GLM4-9B（4-bit NF4）</option></select>
+              <label style="margin-top:10px">PROMPT · 研究任务</label>
+              <textarea class="ta">按 Q06 冻结合同执行 C_steer 基座测量：脚本生成→本地运行→结果登记，偏差即报警。</textarea>
+              <div class="runbtn">▶ 运行 · 自动完成研究</div>
+            </div>
+            <div class="col-title" style="border-top:none">QUEUE · 研究队列</div>
+            <div class="qitem"><span>Q06 C_steer 基座测量</span><span class="st run">RUNNING</span></div>
+            <div class="qitem"><span>Q05 E_ar(k) 正式测量</span><span class="st done">SEALED</span></div>
+            <div class="qitem"><span>Q07 跨层端口替换复验</span><span class="st wait">WAIT</span></div>
+          </div>
+          <div id="modeRev">
+            <div class="cfg" style="border-bottom:none;padding-bottom:4px">
+              <label>假设来源 · HYPOTHESIS SOURCES</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip m">MEMO 挂账 ×9</span><span class="chip">路线图空白 ×6</span><span class="chip v">文献矛盾 ×2</span></div>
+              <label style="margin-top:12px">ELO 排名 · CANDIDATES</label>
+            </div>
+            <div class="cand"><div class="hd"><b>QC-01 条件齿轮组 = 算子代数的分组检验</b><span class="st elo">ELO 1712</span></div><div class="src">源: MEMO 挂账 K4 · 对标 Co-Scientist 反思代理 · 可冻结合同 ✓</div></div>
+            <div class="cand"><div class="hd"><b>QC-02 N 线 P3–P7 补 Ledger 一致性</b><span class="st elo">ELO 1655</span></div><div class="src">源: 挂账 · 纯登记型任务 · 低成本高确定性</div></div>
+            <div class="cand"><div class="hd"><b>QC-03 「未见类别」崩塌修复臂（水果 0.04）</b><span class="st elo">ELO 1621</span></div><div class="src">源: 挂账 · 需新增对照臂 · 数据量门 12× 既有</div></div>
+            <div class="checks">
+              <div class="t" style="font:700 9.5px var(--mono);letter-spacing:.2em;color:var(--violet);margin-bottom:8px">AUTO REVIEW · 自动审稿（对标 Co-Scientist：算力偏向验证）</div>
+              <div class="ck"><span>合同可冻结性（变量/指标/门预注册）</span><b class="ok">PASS</b></div>
+              <div class="ck"><span>数据量门 ≥ 10× 既有样本</span><b class="ok">PASS</b></div>
+              <div class="ck"><span>近重复泄漏检查（家族切分）</span><b class="ok">PASS</b></div>
+              <div class="ck"><span>GPU 预算 ≤ 16 GB · 2 h</span><b class="warn">QC-03 临界</b></div>
+              <div class="ck"><span>文献查新（本地 38 篇索引 + S2 API）</span><b class="ok">无重复</b></div>
+            </div>
+            <div class="cfg" style="border-bottom:none">
+              <div class="runbtn rv" style="margin-top:2px">冻结入选假设 → 进入预注册队列</div>
+              <div style="margin-top:9px;font:600 9px var(--mono);color:var(--dim);letter-spacing:.08em;line-height:1.8">人工 gate：freeze 写 design sha → drift 断言生效 → 排入 QUEUE 执行。生成-辩论-进化循环照搬 Co-Scientist， seal 纪律保持本平台特有。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 行业进展路线图 ================= -->
+  <section class="block" id="s3">
+    <div class="sec-head"><span class="no">PART.03</span><h2>行业进展 · 研究路线图</h2><span class="en">Roadmap → Papers / Code / Mapping</span><span class="delta">DELTA v3：registry 渲染 / 节点三层 / 空白→任务</span></div>
+    <p class="sec-desc">节点数据直接来自 <b>registry（industry.json：12 方法 / 11 工具 / 6 空白）</b>，不用 demo 数据。点开节点见三层：<b>论文</b>（配置地址抓取）· <b>开源代码</b>（可本地复现的工具链）· <b>本项目映射</b>（对应我们的哪个 Phase/结论）。<b>空白地带节点可一键转为 Part② 的假设评审任务</b>——三部分闭环的最后一块。试试点击节点。</p>
+    <div class="browser">
+      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">http://localhost:5173/#/roadmap</span><span class="tag">SRC: registry/industry.json</span></div>
+      <div class="rm-top">
+        <div class="rm-lanes"><span style="color:var(--cyan)">● 方法 METHODS ×12</span><span style="color:var(--violet)">● 模型/规模 MODELS</span><span style="color:var(--magenta)">● 机制发现 MECHANISMS</span><span style="margin-left:auto;font-size:9px">来源: industry.json · 29 条已登记</span></div>
+      </div>
+      <div class="rm-canvas" id="rmCanvas">
+        <div class="rm-line"></div>
+        <div class="rm-lane" style="top:26%"></div>
+        <div class="rm-lane" style="top:58%"></div>
+        <div class="rm-lane" style="top:90%"></div>
+      </div>
+      <div class="rm-grid">
+        <div class="rm-blurb" id="rmBlurb">点击节点查看 <b>论文 / 开源代码 / 本项目映射</b> 三层详情 →</div>
+        <div class="rm-detail" id="rmDetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    <b>v3 相对 v2 的修订清单</b>：① 3D——新增 NPZ 快照/本地结果数据源切换、点击展开 2D 联动抽屉（切片热力图+轨迹+时序）、参数读出绑机制（W↔unembed 对齐）、WebGL 全量渲染说明；② AI 研发——新增假设评审草稿通道（Elo + 自动审稿 + 人工冻结 gate）、本地文献索引（可查新/查矛盾）、类型化事件流（append-only 可回放）、run-profile 运行安全档、失败自动修复 ≤3 次；③ 路线图——registry 数据直出、节点三层（论文/代码/本项目映射）、空白节点一键转研究任务（闭环）；④ 顶部新增三部分闭环流程。保留不变：预注册冻结合同 · drift 断言 · 四级证据标尺 · 仓库 ≤100 MiB。
+  </div>
+
+  <footer>
+    <span>AI2050 MECH-INTERP LAB · STATIC MOCKUP v3 · FOR CONFIRMATION ONLY</span>
+    <span>2026-10-04 · 确认后落地 frontend</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- inferno 色标 ---------- */
+var STOPS=[[0,[4,7,15]],[0.22,[22,11,74]],[0.45,[101,21,132]],[0.68,[225,74,32]],[0.86,[247,164,29]],[1,[255,236,161]]];
+function cmap(t){t=Math.max(0,Math.min(1,t));
+  for(var i=1;i<STOPS.length;i++){if(t<=STOPS[i][0]){var t0=STOPS[i-1][0],c0=STOPS[i-1][1],t1=STOPS[i][0],c1=STOPS[i][1];var u=(t-t0)/((t1-t0)||1);
+    return [c0[0]+(c1[0]-c0[0])*u,c0[1]+(c1[1]-c0[1])*u,c0[2]+(c1[2]-c0[2])*u];}}
+  return STOPS[STOPS.length-1][1];}
+
+/* ================= 01 · 3D 点云 ================= */
+var cv=document.getElementById('space3d');
+var L=24,NX=10,NY=8,pts=[],l,i,j;
+for(l=0;l<L;l++)for(i=0;i<NX;i++)for(j=0;j<NY;j++){
+  pts.push({x:((i/(NX-1))-0.5)*3.2,y:((j/(NY-1))-0.5)*2.0,z:((l/(L-1))-0.5)*5.2,w:0.45+Math.random()*0.55,l:l,n:(l*1000+((Math.random()*999)|0))});
+}
+if(cv){
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  var rotY=0.55,rotX=-0.30,drag=false,lx=0,ly=0;
+  function act(p,t){
+    var v=Math.sin(p.x*1.7+t)*Math.cos(p.z*1.1-t*0.6)*0.5+0.5;
+    var bump=Math.exp(-((p.x-0.8)*(p.x-0.8)+(p.z+1.2)*(p.z+1.2))*1.9)+Math.exp(-((p.x+1.1)*(p.x+1.1)+(p.z-0.6)*(p.z-0.6))*2.4);
+    return Math.max(0,Math.min(1,0.12+0.5*v+bump*0.55));
+  }
+  function mixCol(a){
+    if(a<0.4){var u=a/0.4;return [10,Math.round(80+u*149),Math.round(120+u*129)];}
+    if(a<0.75){var u2=(a-0.4)/0.35;return [Math.round(10+u2*130),Math.round(229-u2*122),249];}
+    var u3=(a-0.75)/0.25;return [Math.round(140+u3*115),Math.round(107-u3*46),255];
+  }
+  cv.addEventListener('mousedown',function(e){drag=true;lx=e.clientX;ly=e.clientY;});
+  window.addEventListener('mouseup',function(){drag=false;});
+  window.addEventListener('mousemove',function(e){
+    if(!drag)return;
+    rotY+=(e.clientX-lx)*0.006;rotX+=(e.clientY-ly)*0.004;
+    rotX=Math.max(-1.15,Math.min(0.35,rotX));lx=e.clientX;ly=e.clientY;
+  });
+  var nearest=null;
+  cv.addEventListener('click',function(e){
+    var rc=cv.getBoundingClientRect();
+    var mx=(e.clientX-rc.left)*(W/rc.width),my=(e.clientY-rc.top)*(H/rc.height);
+    if(lastProj.length){
+      var best=null,bd=1e9;
+      for(var k=0;k<lastProj.length;k++){var o=lastProj[k];var d=(o.sx-mx)*(o.sx-mx)+(o.sy-my)*(o.sy-my);if(d<bd){bd=d;best=o;}}
+      if(best&&bd<2500){nearest=best;selectNeuron(best);}
+    }
+  });
+  var lastProj=[];
+  function frame(){
+    var t=Date.now()*0.001;
+    if(!drag)rotY+=0.0028;
+    ctx.fillStyle='#050a16';ctx.fillRect(0,0,W,H);
+    var f=3.4,cY=Math.cos(rotY),sY=Math.sin(rotY),cX=Math.cos(rotX),sX=Math.sin(rotX);
+    function pr(x,y,z){var x1=x*cY-z*sY,z1=x*sY+z*cY;var y2=y*cX-z1*sX,z2=y*sX+z1*cX;var s=f/(f+z2);
+      return {sx:W/2+x1*s*W*0.30,sy:H/2+y2*s*H*0.34,s:s,z:z2};}
+    ctx.strokeStyle='rgba(0,229,255,0.10)';ctx.lineWidth=1;
+    var g;
+    for(g=0;g<=8;g++){
+      var gx=(g/8-0.5)*3.4;
+      var a1=pr(gx,1.35,-2.8),a2=pr(gx,1.35,2.8);
+      ctx.beginPath();ctx.moveTo(a1.sx,a1.sy);ctx.lineTo(a2.sx,a2.sy);ctx.stroke();
+      var b1=pr(-1.8,1.35,(g/8-0.5)*5.6),b2=pr(1.8,1.35,(g/8-0.5)*5.6);
+      ctx.beginPath();ctx.moveTo(b1.sx,b1.sy);ctx.lineTo(b2.sx,b2.sy);ctx.stroke();
+    }
+    var e0=pr(0,1.35,-2.9),e1=pr(0,1.35,2.9);
+    ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='rgba(125,233,255,.85)';ctx.font='600 11px Consolas';
+    ctx.fillText('L23',e1.sx-10,e1.sy+16);ctx.fillText('L0',e0.sx-6,e0.sy+16);
+    var proj=[],k;
+    for(k=0;k<pts.length;k++){
+      var p=pts[k],q=pr(p.x,-p.y,p.z);
+      proj.push({sx:q.sx,sy:q.sy,s:q.s,z:q.z,a:act(p,t),w:p.w,l:p.l,n:p.n});
+    }
+    proj.sort(function(a,b){return b.z-a.z;});
+    lastProj=proj;
+    ctx.globalCompositeOperation='lighter';
+    for(k=0;k<proj.length;k++){
+      var o=proj[k],c=mixCol(o.a);
+      var r=Math.max(0.7,o.s*(1.1+o.w*2.1));
+      var al=0.10+0.55*Math.max(0,(1-(o.z+3.2)/6.4))*o.a+0.12*o.a;
+      ctx.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+Math.min(0.85,al).toFixed(3)+')';
+      ctx.beginPath();ctx.arc(o.sx,o.sy,r,0,6.283);ctx.fill();
+      if(o.a>0.82){ctx.fillStyle='rgba(255,255,255,'+(0.5*o.a).toFixed(2)+')';ctx.beginPath();ctx.arc(o.sx,o.sy,r*0.45,0,6.283);ctx.fill();}
+    }
+    if(nearest){ /* 选中环 */
+      ctx.globalCompositeOperation='source-over';
+      var nl=nearest;
+      ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(nl.sx,nl.sy,8+2*Math.sin(t*4),0,6.283);ctx.stroke();
+      ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,61,129,.6)';
+      ctx.beginPath();ctx.moveTo(nl.sx,nl.sy);ctx.lineTo(W,nl.sy);ctx.stroke();ctx.setLineDash([]);
+    }
+    ctx.globalCompositeOperation='source-over';
+    requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+/* ---------- 01 · 选中 → 右栏 + 2D 联动抽屉 ---------- */
+function selectNeuron(o){
+  var layer=o.l,idx=o.n;
+  var norm=(0.6+o.w*0.9).toFixed(3),bias=((Math.random()-0.5)*0.12).toFixed(3),a=o.a.toFixed(3);
+  document.getElementById('pNeuron').textContent='L'+layer+' · N'+idx;
+  document.getElementById('dNeuron').textContent='L'+layer+' · N'+idx;
+  document.getElementById('pNorm').textContent=norm;
+  document.getElementById('pBias').textContent=bias;
+  document.getElementById('pAct').textContent=a;
+  document.getElementById('drawer').classList.add('open');
+  drawDHeat(layer);drawDTraj();drawDSpark(a);
+}
+function drawDHeat(layer){
+  var c=document.getElementById('dHeat');if(!c)return;
+  var g=c.getContext('2d'),n=64,cell=c.width/n;
+  g.clearRect(0,0,c.width,c.height);
+  for(var i=0;i<n;i++){
+    var v=0.3+0.6*Math.exp(-Math.pow((i-18)/6,2))+0.5*Math.exp(-Math.pow((i-45)/8,2))+Math.random()*0.12;
+    var rgb=cmap(Math.min(1,v));
+    g.fillStyle='rgb('+(rgb[0]|0)+','+(rgb[1]|0)+','+(rgb[2]|0)+')';
+    g.fillRect(i*cell,6,cell-1,c.height-12);
+  }
+}
+function drawDTraj(){
+  var c=document.getElementById('dTraj');if(!c)return;
+  var g=c.getContext('2d'),Wd=c.width,Hd=c.height;
+  g.clearRect(0,0,Wd,Hd);
+  var pal=['#00e5ff','#8c6bff','#ff3d81','#00ffa3'];
+  for(var k=0;k<4;k++){
+    var nC=4,pp=[],s;
+    for(s=0;s<=nC;s++)pp.push(Hd*(0.12+0.76*Math.random()));
+    g.beginPath();g.shadowColor=pal[k];g.shadowBlur=4;g.strokeStyle=pal[k];g.lineWidth=1.3;
+    for(var x=0;x<=20;x++){
+      var t=x/20,seg=t*nC,ii=Math.min(nC-1,Math.floor(seg)),u=seg-ii,sm=u*u*(3-2*u);
+      var y=pp[ii]+(pp[ii+1]-pp[ii])*sm;
+      x===0?g.moveTo(0,y):g.lineTo(t*Wd,y);
+    }
+    g.stroke();g.shadowBlur=0;
+  }
+}
+function drawDSpark(a0){
+  var c=document.getElementById('dSpark');if(!c)return;
+  var g=c.getContext('2d'),Wd=c.width,Hd=c.height;
+  g.clearRect(0,0,Wd,Hd);
+  g.strokeStyle='#ff3d81';g.lineWidth=1.4;g.shadowColor='#ff3d81';g.shadowBlur=4;
+  g.beginPath();
+  for(var x=0;x<=48;x++){
+    var t=x/48;
+    var y=Hd*0.6-(Math.sin(t*9)*0.2+t*0.18+parseFloat(a0)*0.25*(0.4+0.6*Math.sin(t*4))+Math.random()*0.05)*Hd;
+    x===0?g.moveTo(0,Math.max(3,Math.min(Hd-3,y))):g.lineTo(t*Wd,Math.max(3,Math.min(Hd-3,y)));
+  }
+  g.stroke();g.shadowBlur=0;
+}
+/* 默认选中一次，让抽屉初始就展示 */
+setTimeout(function(){var p=lastProj&&lastProj.length?lastProj[(lastProj.length*0.35)|0]:null;if(p)selectNeuron(p);},600);
+
+/* ================= 02 · 双模式切换 ================= */
+var mbE=document.getElementById('mbExec'),mbR=document.getElementById('mbRev');
+var meE=document.getElementById('modeExec'),meR=document.getElementById('modeRev');
+if(mbE&&mbR){
+  mbE.addEventListener('click',function(){mbE.classList.add('on');mbR.classList.remove('on');meE.style.display='block';meR.style.display='none';});
+  mbR.addEventListener('click',function(){mbR.classList.add('on');mbE.classList.remove('on');meR.style.display='block';meE.style.display='none';});
+}
+
+/* ================= 03 · 路线图（三层节点） ================= */
+var NODES=[
+ {yr:'2021',lb:'Transformer 电路框架',lane:'magenta',top:86,left:22,
+  ps:[{t:'A Mathematical Framework for Transformer Circuits',a:'Elhage et al. · Anthropic 2021'}],
+  code:[{t:'TransformerLens',a:'开源 · 接入已用于本项目研究链'}],
+  map:['Q08 判定层=行为读出层 · K1 触发判定沿用其读出框架','主轴三段（嵌入/层/读出）观察即由此切入']},
+ {yr:'2022',lb:'叠加 / 归纳头',lane:'magenta',top:30,left:36,
+  ps:[{t:'Toy Models of Superposition',a:'Elhage et al. · Anthropic 2022'},{t:'In-context Learning and Induction Heads',a:'Olsson et al. · 2022'}],
+  code:[{t:'saev / feature-viewers（社区）',a:'叠加可视化参考'}],
+  map:['跨族近正交 ⇒ 无通用类别算子（P4–P7）为其约束证据']},
+ {yr:'2023',lb:'SAE 单义方向',lane:'cyan',top:58,left:49,
+  ps:[{t:'Towards Monosemanticity: Sparse Autoencoders',a:'Bricken et al. · Anthropic 2023'}],
+  code:[{t:'sae-lens 等训练库',a:'开源'}],
+  map:['对照路线：方向法 vs 我们的条件化相对编码（AGENTS.md 工作假设）']},
+ {yr:'2025',lb:'电路追踪 / 归因图谱',lane:'magenta',top:86,left:66,
+  ps:[{t:'Circuit Tracing: Revealing Computational Graphs in LLMs',a:'Anthropic 2025'},{t:'On the Biology of a Large Language Model',a:'Anthropic 2025'}],
+  code:[{t:'circuit-tracer',a:'Anthropic 开源 · Python · fetch_industry.py 实测可抓取'}],
+  map:['↔ Q08 seal（判定层双轨）与 K1 双轨读出（margin +0.9409）','↔ Q03 E_read 基线 0.3734 = 门 7.5×（三模型同指纹）']},
+ {yr:'2026',lb:'空白地带 · 本项目 RDC',lane:'cyan',top:58,left:87,blank:true,
+  ps:[{t:'（空白：条件齿轮组的参数级证明尚无公开方案）',a:'激活级干预 ≠ 权重级证明 —— 核心限界③'}],
+  code:[{t:'—（无现成开源实现）',a:'机会点'}],
+  map:['RDC 条件化输出场闭合理论 · N 线 P4–P21 已有 10 条成立结论','挂账 9 项 ⇒ 假设评审通道的持续来源']},
+];
+var canvas3=document.getElementById('rmCanvas');
+var detail=document.getElementById('rmDetail');
+var blurb=document.getElementById('rmBlurb');
+function chipHtml(m){
+  if(m.indexOf('机制')>=0)return '<span class="chip m">'+m+'</span>';
+  if(m.indexOf('方法')>=0)return '<span class="chip g">'+m+'</span>';
+  return '<span class="chip v">'+m+'</span>';
+}
+function renderNode(n){
+  var h='';
+  h+='<div class="d-sec"><div class="st2">📄 PAPERS · 论文（配置地址抓取）</div>';
+  n.ps.forEach(function(p){h+='<div class="paper"><div class="ttl">'+p.t+'</div><div class="au">'+p.a+'</div></div>';});
+  h+='</div><div class="d-sec"><div class="st2 code">🔧 OPEN SOURCE · 开源代码</div>';
+  n.code.forEach(function(c){h+='<div class="codeitem"><span>'+c.t+'</span><small>'+c.a+'</small></div>';});
+  h+='</div><div class="d-sec"><div class="st2 map">🧩 本项目映射 · MAPPING</div>';
+  n.map.forEach(function(m){h+='<div class="mapitem">'+m+'</div>';});
+  h+='</div>';
+  if(n.blank){
+    h+='<button class="forkbtn" id="forkBtn">⤴ 空白节点 → 加入 Part② 假设评审队列</button><div class="echo" id="forkEcho"></div>';
+  }
+  detail.innerHTML=h;
+  blurb.innerHTML='节点 <b>'+n.yr+' · '+n.lb+'</b>：论文由 <b>industry_sources.json</b> 配置地址按需抓取（仓库 0 MB）；代码链接供本地复现；映射层把外部进展接到本平台已 seal 的 Phase 证据上。'+(n.blank?'<b style="color:var(--green)">空白节点可一键生成 Q-candidate，进入 Part② 评审。</b>':'');
+  var fb=document.getElementById('forkBtn');
+  if(fb){fb.addEventListener('click',function(){
+    var e=document.getElementById('forkEcho');
+    e.textContent='✓ 已生成 QC-04「权重级条件齿轮证明臂」草稿 → 前往 Part② 假设评审通道（ELO 待评）';
+    var loopSt=document.querySelector('.loop .st.back');
+    if(loopSt){loopSt.classList.add('hl');setTimeout(function(){loopSt.classList.remove('hl');},1800);}
+  });}
+}
+if(canvas3&&detail){
+  NODES.forEach(function(n){
+    var d=document.createElement('div');
+    d.className='node l-'+n.lane;
+    d.style.left=n.left+'%';d.style.top=n.top+'%';
+    d.innerHTML='<div class="pt"></div><div class="yr">'+n.yr+(n.blank?' ⬚':'')+'</div><div class="lb">'+n.lb+'</div>';
+    d.addEventListener('click',function(){
+      Array.prototype.forEach.call(canvas3.querySelectorAll('.node'),function(x){x.classList.remove('sel');});
+      d.classList.add('sel');renderNode(n);
+    });
+    canvas3.appendChild(d);
+  });
+  renderNode(NODES[NODES.length-1]);
+  var lastEl=canvas3.querySelectorAll('.node');
+  if(lastEl.length)lastEl[lastEl.length-1].classList.add('sel');
+}
+})();
+</script>
+</body>
+</html>

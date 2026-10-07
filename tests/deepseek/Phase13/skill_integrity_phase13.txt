@@ -1,0 +1,32 @@
+Phase 13 / N2h1-α-6  收尾链末环：技能补丁副作用取证
+========================================================================
+
+【缺陷】patch_skills_phase13b.py 用 io.open(p, encoding="utf-8").read()
+        （universal newline ⇒ CRLF 折成 LF）+ write(..., newline="")
+        ⇒ rdc-phase-closeout/SKILL.md 整文件被静默改写成 LF-only。
+        指纹：bare_LF 0->114，字节数少掉恰好 114 = 行数；
+        同目录另两个技能未受影响（纯属该脚本缺陷）。
+
+【二次缺陷】同一脚本把新条目的行尾写成 raw string r"...\n"
+        ⇒ 落成「字面量反斜杠+n」两字符，新条目与下一行粘成同一 markdown 行。
+
+【修复】fix_skill_eol_phase13.py   ：恢复 CRLF + 补「写侧换行符陷阱」条目
+        fix_skill_eol_phase13b.py  ：字面量反斜杠+n -> 真实 CRLF + 补第 ④ 条说明
+
+【证据 E1】真身基准（本轮首次探测，独立记录）
+           bytes = 21126   sha8 = d6bc8441
+【证据 E2】从当前文件剥除本轮两处改动、并把头部 15->14 还原：
+           bytes = 21126   sha8 = d6bc8441   CRLF = 112   bare_LF = 0
+           ⇒ 与 E1 逐字节相同（sha8 d6bc8441）⇒ 两处改动均为纯增量，原内容零损失。
+
+【证据 E3】三技能换行符一致性（改后）：
+           rdc-phase-closeout           bytes=23634  CRLF=115  bare_LF=0   sha8=7ef013ba
+           rdc-main-axis-probe          bytes=52666  CRLF=151  bare_LF=0   sha8=b6cf57f0
+           rdc-dual-arm-phase-template  bytes=10743  CRLF=58   bare_LF=0   sha8=b7f18ece
+
+【入册】（rdc-phase-closeout 技能 / 环境陷阱速查）
+           新增 1 条「Python 补丁脚本读写文本文件必须显式保留换行符」＋第 ④ 点
+           「补丁文本源码里的换行别写成 raw string 的 \n」，本坑自身入册。
+
+【结论】技能当前状态：bytes=23634 / CRLF=115 / bare_LF=0 / sha8=7ef013ba
+        15 条教训（编号 1..15 各 1 次）+ 环境陷阱条目 count==1，均已回读复核。

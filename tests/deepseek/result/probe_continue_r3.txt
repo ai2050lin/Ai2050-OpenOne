@@ -1,0 +1,76 @@
+=== [A] 文件指纹 ===
+['.workbuddy/memory/MEMORY.md', 8495, 58, 'a3a7305e', False, 10]
+['.workbuddy/memory/2026-10-02.md', 103042, 315, 'b185c377', False, 18]
+['.workbuddy/memory/2026-10-03.md', 'MISSING']
+['research/gpt5/docs/LOOP_DIAGNOSIS_AND_EXIT_v1.md', 32055, 321, '013d08a9', False, 10]
+['tests/deepseek_temp/_review/loop_stats_r3.json', 4001, 213, 'f4a0dca2', False, 0]
+['tests/deepseek_temp/_review/loop_diagnosis_r3.html', 22633, 180, 'e715b4f7', False, 0]
+['tests/deepseek/_review/gen_loop_diagnosis_r3.py', 6208, 139, '78d928fd', False, 0]
+['tests/deepseek/_review/gen_loop_html_r3.py', 22281, 230, 'cceaa1de', False, 0]
+['research/gpt5/atlas/atlas_ledger.json', 753723, 7988, 'bbda63df', False, 0]
+['research/gpt5/atlas/phase_queue_v1.json', 'MISSING']
+['research/gpt5/docs/RDC_RESEARCH_CONSTITUTION_v1.md', 'MISSING']
+
+=== [B] loop_stats_r3.json 顶层键 ===
+  scale                    dict keys=['gpt5_bytes', 'gpt5_lines', 'gpt5_sha8', 'gpt5_h2', 'gpt5_h3', 'gpt5_phases_distinct', 'ds_bytes', 'ds_lines', 'ds_sha8', 'ds_h2', 'ds_phases_distinct']
+  keywords                 dict keys=['gpt5', 'deepseek']
+  verdict_vocab            dict keys=['gpt5_uses', 'gpt5_tokens', 'gpt5_unique', 'gpt5_reuse', 'deepseek_uses', 'deepseek_unique', 'gpt5_verdict_mentions', 'sample']
+  g1                       dict keys=['rows', 'anova', 'cheatsheet', 'amplification']
+  kill                     dict keys=['K1_mentions', 'K2_mentions', 'K3_mentions', 'K1_cond', 'K1_observed', 'verdict', 'g1p3_verdict', 'readout_fail_ratio']
+  audit_consistency        dict keys=['memo_3103_dist', 'memo_3103_line', 'testplan_dist', 'memo_pct_claim']
+  ledger                   dict keys=['actual_sha8', 'declared', 'measurements', 'schema_version']
+  audit_findings           dict keys=['grade_A_share', 'self_correction', 'single_point_mentions', 'panel_rows', 'no_combo_result']
+  nline                    dict keys=['alpha_subphases', 'phases_total', 'topic', 'cross_precision_phases']
+
+=== [C] MEMORY.md 标题 ===
+  chars=5069
+     1 # RDC/LPF 项目纪律（工作区长期记忆）
+     4 ## 0 约定与落点
+    11 ## 1 装置铁律（26 条全文在 skill `rdc-main-axis-probe` 坑集）
+    15 ## 2 N 线主线（P4→P21，关键数）
+    24 ## 3 挂账与限界
+    29 ## 4 G 线（gpt5）
+    32 ## 5 本机缺陷（Windows）
+    38 ## 6 工作方式
+    41 ## 7 下一步（死线优先级）
+    47 ## 8 技能
+    50 ## 9 元层循环诊断（2026-10-02，R3 复核轮，非 Phase）
+
+=== [D] gpt5 MEMO 关键词（E_ar / 自回归 / 多步 / held-out）===
+  E_ar         0
+  自回归          22
+  多步           24
+  held-out     20
+  heldout      3
+  外推           45
+  E_read       0
+  C_steer      0
+  高秩散布         3
+  未识别          1
+  独立因子         1
+
+=== [E] _review 目录清单 ===
+  tests/deepseek/_review (9):
+      compact_memory_r3.py
+      do_append_r2.py
+      do_wlog_r2.py
+      gen_loop_diagnosis_r3.py
+      gen_loop_html_r3.py
+      patch_memory_skill_r3.py
+      probe_continue_r3.py
+      probe_memos_r3.py
+      verify_final_r2.py
+  tests/deepseek_temp/_review (13):
+      _gen_r3_stdout.txt
+      _memory_backup_pre_compact_r3.md
+      _memory_compact_r3.txt
+      _memory_dump_r3.md
+      _patch_memory_skill_r3.txt
+      loop_diagnosis_r3.html
+      loop_stats_r3.json
+      memo_append_r2.md
+      memo_review_20261001
+      probe_memos_r3.txt
+      verify_append_r2.txt
+      verify_final_r2.txt
+      verify_wlog_r2.txt

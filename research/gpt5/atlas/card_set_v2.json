@@ -1,0 +1,251 @@
+{
+  "card_set": "v2",
+  "generated_by": 2988,
+  "created": "2026-09-20T07:53:47",
+  "labels": {
+    "robust": 5,
+    "len2_specific": 3,
+    "untested": 26
+  },
+  "note": "domain-of-validity census per plan v4 P0; robust/len2 labels carry retest evidence (2987/2988), untested cards must not be cited without a protocol tag; Omega-F cross-model copying must copy this set with labels",
+  "cards": [
+    {
+      "meas_id": "M2936_anchoring_law",
+      "phase": 2936,
+      "domain_label": "robust",
+      "basis": "direction rebuild anchor 2.17e-08 across protocols (2988 rerun); structural law, protocol-independent",
+      "verdict_v1": "anchoring_not_established - ZERO forward, run1 (2 s) ANCHORS 5/5: a1 2935 func ci_rel vs 2933 max abs diff 0.00e+00 (bit-exact); a4 2934 pos1/func raw vs 2935 func raw 0.00e+00 (bit-exact); a2 grids identical; a3 SHA chain ok; a5 masks 469/382/295. QUESTION: additive anchor (supp = a + b*ci, a>0) vs multiplicative model for semantic-context suppression. P1 ADDITIVE ANCHOR REJECTED: per null set Spearman(supp_raw, ci_raw_func) is NEGATIVE (-0.3232/-0.4168/-0.3517/-0.3552, median -0.3535), R2_linear 0.14-0.20 (battery bar 0.8), intercept a>0 significant (p_a 1e-4) but model R2 far too low; supp_raw<=0 in 750-805/1120 cells. P2 k-vs-ci_func median rho -0.2430. P3 same-condition battery also fails (rho -0.2668, R2lin 0.0477). P4 within-layer rho(supp, ci) median -0.5524. SEAL SCALE-AUDIT (the real finding): null/func scale ratio 0.41-0.54 (baseline readout magnitude COLLAPSES under null context: 92.29 -> 37-49); RAW-caliber amp null/func med 0.86-0.90 < 1 (absolute ablation disturbance SHRINKS under null context, LOAD shrinks more: 0.835 vs DEEP 0.919) while rel-caliber amp 1.65-2.13 > 1 - the 2934/2935 null amplification is ENTIRELY denominator-driven (rel caliber), not numerator-driven; rel-caliber supp vs ci_func rho +0.30..+0.53 (sign opposite to raw caliber). Survivor core splits in RAW caliber: (5,6) 1.61 / (8,2) 1.42 / (21,6) 1.41 / (7,19) 1.29 / (1,6) 1.14 raw-increased vs (14,9) 0.50 / (20,8) 0.58 raw-halved. 2934 same/func raw amp 0.9302. REGISTERED: (1) all 2934/2935 CI-verdicts are rel-caliber statements - magnitude statements require caliber tag; (2) lin_r-CI law itself unchanged (both calibers preserve band structure direction), but amplification-gradient-inversion narrative is a rel-caliber artifact of scale collapse; (3) additive anchor and multiplicative models both rejected - supp_raw is negatively correlated with ci_func (larger-CI cells shrink LESS in absolute terms under null context). Lesson: ratio claims must register denominator caliber (extends discipline 16)."
+    },
+    {
+      "meas_id": "M2937_scale_collapse",
+      "phase": 2937,
+      "domain_label": "untested",
+      "basis": "2986 shows readout manifold drifts sharply with context; protocol dependence suspected, not retested",
+      "verdict_v1": "scale_collapse_rewrite - ONE run 14 s, NO ablation, ANCHORS 6/6: a1 dirs rebuild 2.17e-08 (13th consecutive forward anchoring); a2 determinism 0.00e+00; a3 proj_func vs 2935 s_base 7.21e-06; a4 proj_null0 vs 2935 6.26e-06; a5 masks 469/382/295; a6 func sep 185.70. DESIGN: baseline-only 5 conditions (func/same/null0-3) x batch57, per-layer pos-1 attn-input capture + final pre-norm residual + zero-forward embedding lookup. P1 ENERGY DOES NOT COLLAPSE: per-layer residual-norm ratio (null/func) 0.94-1.07 all layers, no crossing < 0.8 - the 2936 scale collapse is NOT energy. P3 DIRECTION COLLAPSES: cos(final, dirs_word[35]) median 0.045 (func) -> 0.002-0.024 (null), ratio 0.05-0.24, all 4 sets direction-dominant (|log norm| < |log cos|); absolute cos shows dirs_word[35] explains only ~4.5% of the final residual even under func. P2 REWRITE: s_null = beta*s_func + gamma fits give beta 0.43-0.55 (median 0.4886), gamma -11.6..-16.1, R2 0.74-0.86; same beta 0.60. P4 embedding norms: words 1.085+-0.073 vs null 1.071+-0.215, p 0.64 - token-identity norm explanation rejected. SEAL: (1) sep ratio profile is U-SHAPED - language-signal collapse deepest at L8-L16 (0.11-0.36), partial recovery deep (L32-L35 0.41-0.61): mid-layer attention is the rewrite arena, where func sep itself peaks (L6-L10: 3.5-7.3); (2) REWRITE IS CLASS-ASYMMETRIC: within-lab1 readout structure highly retained (spearman 0.75-0.84) while within-lab0 rewritten (0.13-0.24) - connects to 2928 L+ class asymmetry; (3) rewrite outliers include high-func-CI words (light 194->131, war 198->18, city 202->33). REGISTERED: context-statistics effect on the baseline is a mid-layer attention-driven ROTATION of the final residual away from the language direction with ~50% word-term retention (beta) + negative offset (gamma -11..-16), NOT energy scaling; magnitude of 2936 scale collapse = direction collapse in a small-cos component. Lesson: readout-magnitude claims must decompose norm vs cos before naming a mechanism."
+    },
+    {
+      "meas_id": "M2938_subspace_angles",
+      "phase": 2938,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "subspace_rotation_retained - ONE run 14 s, NO ablation, ANCHORS 7/7: a1 dirs rebuild 2.17e-08 (14th consecutive forward anchoring); a2 determinism 0.00e+00; a3 7.21e-06 / a4 6.26e-06 vs 2935 s_base; a5 SVD orthonormality 2.11e-15; a6 func sep 185.70; a7 align_dir35 vs 2937 |proj|/fin_norm 0.00e+00 (cross-phase bit-level). DESIGN: 2937 protocol verbatim + SVD of stacked dirs_word (36 x 2560, top-8 energy 91.9 percent - language subspace is low-rank); alignment alpha_k = ||Vt[:k] x||/||x|| scale-invariant, grid k {1,4,8,16,36} + dir35 single direction. P1 DISSOCIATION: rho (null/func median alignment) dir35 0.5091 vs PC1 0.8339 vs k=8 0.9991 vs k=36 0.9957 - collapse is STRICTLY confined to the single direction dirs_word[35]; per-word alpha_8 null0 min 0.173, 0/57 words leave the subspace. P2 paired sign-flip permutation func vs null0 alpha_8 median diff -0.0036, p 0.66 - no detectable subspace-alignment difference at all. P3 LAYER PROFILE: dir ratio collapses to 0.162 at L18 while alpha8 same layer 0.942; alpha8 ratio >= 0.77 all layers, dir ratio < 0.7 at L6-L11 - mid-layer attention re-encodes WITHIN the language subspace. SEAL: alignment gradient monotone (dir35 0.51 < PC1 0.83 < k4 0.97 < k8 1.00); L20 dir ratio 1.187 > 1 (partial deep recovery/inversion). MECHANISM: 2937 direction collapse = rotation WITHIN the language subspace, i.e. re-encoding of the word-term structure into other subspace directions under null context; the readout failure is a single-direction projection artifact, not loss of language information. Lesson: single-direction cos claims must be checked against the spanned subspace before naming a collapse."
+    },
+    {
+      "meas_id": "M2939_rotation_target",
+      "phase": 2939,
+      "domain_label": "robust",
+      "basis": "Vt8 bit-level 0.00 in 2988 rerun; structural",
+      "verdict_v1": "rotation_target_identified - ONE run 14 s, NO ablation, ANCHORS 6/6: a1 dirs rebuild 2.17e-08 (15th consecutive forward anchoring); a2 determinism 0.00e+00; a3 7.21e-06 / a4 6.26e-06 vs 2935 s_base; a5 alpha_k vs 2938 align_k 3.61e-16 (near bit-level); a6 func sep 185.70. DESIGN: 2938 protocol verbatim + NEW per-word coordinates c(w,k) = x_w . v_k in the top-8 SVD basis. P1 STRUCTURE RETENTION: per-basis Spearman rho_med over 4 null sets - dir35 0.8809 (rank structure kept even where magnitude halves), v2 0.8186, v5 0.7940, v1 0.7504 vs v6 0.3864 (ONLY basis losing word structure; share smallest 0.005-0.012). P2 ENERGY FLOW: k* = v3, delta_e_med +0.1047 (share 0.181 -> 0.290), label-swap perm p 9.999e-04; inflow also v5 +0.0689, v7 +0.0223, v4 +0.0212; OUTFLOW v1 -0.1463, v2 -0.0739. SEAL MECHANISM: v1/v2 are dir35 decomposition (coords vs dir35 proj Spearman -0.96/+0.97) while v3 is weakly coupled (-0.38) - energy moves from the dir35-parallel component to near-orthogonal v3/v5: the quantitative shape of re-encoding. P3 CLASS DISPLACEMENT: delta_c cross-null cos(null0 vs null1/2/3) 0.997-1.000 - the re-encoding direction is a FIXED context-independent direction (context-statistics driven, not token identity); same context gives a DIFFERENT displacement pattern. Word displacement ||dc||/||c_func|| median 0.341, max word war (2937 rewrite outlier consistent). CONCLUSION: null-context re-encoding = linear-structured energy transfer from the language-readout axis to a fixed near-orthogonal in-subspace direction v3, with word-rank structure largely preserved (dir35 rho 0.88). Lesson: projection-magnitude collapse and coordinate-rank structure are different claims - report both."
+    },
+    {
+      "meas_id": "M2940_v3_decode",
+      "phase": 2940,
+      "domain_label": "robust",
+      "basis": "2988 WB replication: word-blind both arms (ICC p 0.29/0.72), lang decode p=1e-4 both arms",
+      "verdict_v1": "v3_decoder_not_established - ZERO forward 1.5 s, ANCHORS 5/5 after run1 correction_note (a1 Vt8 rebuild 3.04e-08, threshold corrected 1e-10 -> 1e-6: cross-phase dirs_word bf16 noise 2.17e-08 propagates into SVD; a2 sing_vals 4.81e-09; a3 bit-level; a4 vs 2937 proj 0.00e+00; a5 2.21e-04, threshold corrected 1e-9 -> 5.1e-4: 2939 stores P3 rounded to 3 decimals). DESIGN: v3 word-level decode from 2939 npz coords - P1 SVD layer profile, P2 displacement decoding 4 ways (class axis label-swap / concept ICC / scale lock / rewrite link, 10000 perms each), P3 v3 coordinate semantics. P1 LAYER PROFILE: v3 = mid-layer L14-L18 positive (+0.39..+0.62) + early L1-L10 and deep L24-L35 all negative (-0.4..-0.5) bipolar direction, effective layers 16.1 - v3 is owned by the mid-layer rewrite battlefield (2937 sep-collapse L8-L16, 2938 L18 dir ratio 0.162). P2 ALL DECODES FAIL: class axis obs +5.22 p 0.296; concept ICC 0.389 p 0.420; scale lock rho 0.127 p 0.352; rewrite link rho 0.099 p 0.461 - the v3 displacement is NOT a function of any word attribute: a homogeneous fixed-direction push. P2 per-null class diffs all same-sign (+3.3..+7.1) but within-word variance dominates. P3 c3(func) class separation significant (p 7.0e-04) BUT language confound: rho(c3, lab) within en only 0.0000 (n=22) - the separation is language-group driven, not a semantic axis. CONCLUSION: v3 is the fixed propulsion direction of the re-encoding machine (mid-layer owned, word-attribute-blind), not a decodable semantic axis; the null re-encoding moves all words along v3 regardless of class/concept/scale. Lessons: (1) anchor thresholds must be checked for reachability against the comparison object precision (2939 P3 rounded to 3 decimals; SVD propagates 2e-08 input noise), (2) significant group separation on a confounded word set requires within-group correlation check before claiming a semantic axis."
+    },
+    {
+      "meas_id": "M2941_v3_causal_injection",
+      "phase": 2941,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "v3_push_damped - forward family 9.2 s, ANCHORS 7/7: a1 dirs rebuild 2.17e-08 (16th consecutive forward anchoring); a3 Vt8 vs 2939 bit-level 0.00e+00; a4 7.21e-06 / a5 6.26e-06 vs 2935 s_base; a7 c3_func vs 2940 3.27e-13; a6 func sep 185.70. DESIGN: 2927 injection site verbatim (attn-input pos-1, L16 = argmax w_li), 2938/2939 batch57 final pre-norm readout; delta in {0,+-2,+-4,+-8,+-16,+-32} x {func, null0}; PREREG-frozen 3-branch verdict on causal gain vs linear direct prediction cos(v3,u35) = -0.227. PREFLIGHT (discipline 10): U8 coordinate shifts predict the actual dir35 readout shift per-word Spearman 0.994 BUT the v3 term alone carries only 0.4% of variance (mean shift decomposition v2 -19.7 / v1 -11.3 / v5 -8.2 / v3 -4.4 vs actual -54.0; v3 class-shift contribution -0.7 of sep displacement -108.4). P1 SUFFICIENCY (func +v3): gain med +0.009 vs prediction -0.227 -> attenuated ~26x with sign flip at delta>=16; sep even at +32 only 185.7->180.6. P2 NECESSITY (null0 -v3): rec16 0.078 subadditive - cancelling the observed +19.5 c3 shift recovers 0.28 of the 108 sep gap and ZERO word-structure rho (0.8898 vs base 0.8896). D1 c3 propagation slope 0.04-0.16 (unit injection reaches final at ~6%); D5 small-delta evenness 1.0 (linear regime), large-delta 1.2-1.8 (quadratic onset). CONCLUSION: the observed v3 push is a DAMPED SYMPTOM, not a causal lever - single-point single-direction injection at its owning layer reproduces neither the null re-encoding (gain damped 26x) nor restores the readout when cancelled (7.8%); null re-encoding is a distributed multi-layer attention computation. 2940 wording \"v3 pushes the residual away from the dir35 axis\" must be read geometrically, not causally. Lesson: ownership of a displacement direction != causal leverage over the readout; observed coordinate displacement magnitude says nothing about manipulability."
+    },
+    {
+      "meas_id": "M2942_u8_joint_injection",
+      "phase": 2942,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "u8_displacement_not_causal - forward family 13 s (run2 authoritative), ANCHORS 8/8: a1 dirs rebuild 2.17e-08 (17th consecutive forward anchoring); a3 Vt8 vs 2939 bit-level 0.00e+00; a4 7.21e-06 / a5 6.26e-06 vs 2935 s_base; a7 c3_func vs 2940 0.00e+00; a8 injection construction 9.95e-14; a6 func sep 185.70. DESIGN: joint per-word displacement pattern xdir(w) = dcks_S @ Vt8_S with S = {v1,v2,v5} (91% of U8 mean readout contribution per 2941 preflight; dcks = 2939 npz coords null0-func), injected at L16 attn-input pos-1 (2927 site verbatim), gain sweep s in {1,2,2.5,3,3.5,4,8,16,32}. run1 correction_note: R2/D1 negative-denominator clamp bug (max(median,1e-30) clamped -29.06 to 1e-30 -> R2 -6e29) fixed; grid refined (ratio jumped 0.51@s2 -> 1.82@s4). CALIBRATION: ratio(s) 0.21/0.86/1.56/1.82/3.40/4.61/6.62 - propagation gain is superlinear then saturating; s*=2 (ratio 0.86). MAIN: R1 = 0.7401 < 0.8 -> NOT causal (run1 at undershooting s: R1 0.7129 - verdict stable across sessions); R2 = -0.03: median proj35 shift +0.87 ~= ZERO while sep collapses 185.7 -> 33.03 (OVERSHOOTS null0 77.26) - CLASS-ASYMMETRIC displacement: median-dead but group-moving. sep(s) is THRESHOLD-DROP not gradual: 176.8 (s=1) -> 33.0 (s=2) -> -36.2 (s=3) -> -51.0 (s=4); rho word-structure 0.94 -> 0.57 -> -0.21. D1 per-direction propagation: v1 +0.27..+0.47 (positive gain, ~3x the v3 slope), v5 NEGATIVE -0.19..-0.26 (anti-restoring), v2 ~+0.05..+0.29. REPRODUCIBILITY ANOMALY (probe-established): s=2 readouts differ QUALITATIVELY across sessions (sep 84.8 / 33.0 / 14.2 in three processes) while bit-level deterministic within a session (3 repeats + alternation) and s=1, s>=4 are bit-stable across sessions - the mid-gain regime sits on an unstable boundary. CONCLUSION: the joint v1/v2/v5 displacement pattern is a STRONG but UNSTABLE lever, not a faithful causal replica: injecting the null-like pattern at ~0.9 matched amplitude drives sep PAST the null level through a threshold-drop, with per-word readout shift pattern only rank-0.74 similar and median-dead. Null re-encoding is not the readout consequence of a smooth displacement field; it behaves as a regime switch whose per-word realization cannot be replayed by residual injection. Lessons: (1) negative-valued denominators must never be clamped with max(x, eps) - sign kills; (2) injected forwards in the mid-gain regime are session-unstable: repeat-within-session + cross-session spot check required before trusting a single dose-response point."
+    },
+    {
+      "meas_id": "meas_2943_gamma_anatomy",
+      "phase": 2943,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "regime_signature_confirmed"
+    },
+    {
+      "meas_id": "meas_2944_switch_localization",
+      "phase": 2944,
+      "domain_label": "untested",
+      "basis": "indirect support only: 2988 confirms L17 switch exists and locks under L16 context",
+      "verdict_v1": "switch_localized"
+    },
+    {
+      "meas_id": "meas_2945_threshold_curves",
+      "phase": 2945,
+      "domain_label": "untested",
+      "basis": "partial: s_c instrument recomputed in 2988, L2=0.6567 exact reproduction, L16N=0.6677 stable",
+      "verdict_v1": "threshold_curve_nonmonotone"
+    },
+    {
+      "meas_id": "meas_2946_dose_allocation",
+      "phase": 2946,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "switch_interaction_nonlinear"
+    },
+    {
+      "meas_id": "meas_2947_head_anatomy",
+      "phase": 2947,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "switch_head_concentrated_only"
+    },
+    {
+      "meas_id": "meas_2948_wov_head_gain",
+      "phase": 2948,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "linear_head_gain_confirmed"
+    },
+    {
+      "meas_id": "meas_2949_head_dose_sufficiency",
+      "phase": 2949,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "head_dose_not_carried"
+    },
+    {
+      "meas_id": "meas_2950_rebalance_anatomy",
+      "phase": 2950,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "rebalancing_compensatory"
+    },
+    {
+      "meas_id": "meas2951_rebalance_gain_functional",
+      "phase": 2951,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "rebalance_carriers_gain_functional"
+    },
+    {
+      "meas_id": "meas2952_amplification_attention_gain",
+      "phase": 2952,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "amplification_attention_gain_sorted"
+    },
+    {
+      "meas_id": "meas2953_a11_s_response_sigmoid",
+      "phase": 2953,
+      "domain_label": "untested",
+      "basis": "partial: A11 grid bit-level reproduced in 2988 (instrument reproduction, claim not retested)",
+      "verdict_v1": "a11_sigmoid_threshold_decoupled"
+    },
+    {
+      "meas_id": "meas2954_early_flipper_polarity",
+      "phase": 2954,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "early_flipper_not_positive"
+    },
+    {
+      "meas_id": "meas2955_qk_source_decomposition",
+      "phase": 2955,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "qk_mixed_large_logit"
+    },
+    {
+      "meas_id": "meas2956_rebalance_module_localization",
+      "phase": 2956,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "mixed_modules_mixed_band"
+    },
+    {
+      "meas_id": "meas2957_rebalance_mlp_constancy",
+      "phase": 2957,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "profile_partial_scale_divergent_ablation_specific"
+    },
+    {
+      "meas_id": "meas2958_imprint_dose_response",
+      "phase": 2958,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "mixed_dose_response_mixed_profile_mixed_readout"
+    },
+    {
+      "meas_id": "meas2959_cross_term_algebra",
+      "phase": 2959,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "anomalous_slope_direction_locked_not_predictable"
+    },
+    {
+      "meas_id": "meas2960_profile_rotation_geometry",
+      "phase": 2960,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "rank1_rotation_trajectory_curved_fixed_dominant"
+    },
+    {
+      "meas_id": "meas2962_word_class_signature_matrix",
+      "phase": 2962,
+      "domain_label": "len2_specific",
+      "basis": "2987: collapses at a single filler token, content-independent",
+      "verdict_v1": "signature_mixed_pattern_registered"
+    },
+    {
+      "meas_id": "meas2963_frequency_controlled_band",
+      "phase": 2963,
+      "domain_label": "robust",
+      "basis": "2987: lang effect p<=3e-4 in all 5 conditions",
+      "verdict_v1": "band_class_effect_beyond_frequency"
+    },
+    {
+      "meas_id": "meas2964_carrier_anatomy",
+      "phase": 2964,
+      "domain_label": "len2_specific",
+      "basis": "2987: h15 carrier len-2 only, migrates to h11 (p 8e-4) / h23 under context",
+      "verdict_v1": "carrier_localized_layers_heads"
+    },
+    {
+      "meas_id": "meas2965_h15_functional_identity",
+      "phase": 2965,
+      "domain_label": "len2_specific",
+      "basis": "2987: h15 contrast significant at L2 only (p .040)",
+      "verdict_v1": "h15_shared_carrier_effect_survives"
+    },
+    {
+      "meas_id": "meas2966_l34_routing_membership",
+      "phase": 2966,
+      "domain_label": "untested",
+      "basis": "carrier-identity cards under protocol-relativity suspicion after 2987 migration finding",
+      "verdict_v1": "l34_h15_independent_of_routing"
+    },
+    {
+      "meas_id": "meas2967_collapse_carrier_anatomy",
+      "phase": 2967,
+      "domain_label": "untested",
+      "basis": "same suspicion; 2988 a12/a13 bit-level reproduction is instrument reproduction, not claim retest",
+      "verdict_v1": "collapse_carrier_localized"
+    },
+    {
+      "meas_id": "meas2968_h15_peak_anatomy",
+      "phase": 2968,
+      "domain_label": "robust",
+      "basis": "2988 T1 lock replicates at L16N: n_peak 40->40, s_c 0.6567->0.6677, med_peak 0.675->0.749 (lock tol 0.3)",
+      "verdict_v1": "biphasic_locked_no_reverse"
+    },
+    {
+      "meas_id": "meas2969_peak_word_attributes",
+      "phase": 2969,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "peak_source_lang_within_pair_descriptive"
+    },
+    {
+      "meas_id": "meas2970_delay_carrier_localization",
+      "phase": 2970,
+      "domain_label": "untested",
+      "basis": "",
+      "verdict_v1": "delay_carrier_heads_and_layers_localized"
+    }
+  ]
+}

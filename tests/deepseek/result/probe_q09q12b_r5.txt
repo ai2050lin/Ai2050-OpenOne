@@ -1,0 +1,202 @@
+=== [D] K2/K3 现有可测量性 ===
+  top-50         32
+  top50          30
+  覆盖率            24
+  cover          22
+  可分离            16
+  不可分离           3
+  phi_l          0
+  φ_ℓ            2
+  条件门            1
+
+--- 含 '覆盖率' 且含 'top' 的行 ---
+  L2347   1. **微场普查主任务**：系统性枚举 top-50 PC 的微场归属（top-k unembed + eval/atlas 词投影聚类），量化 283 词的微场覆盖率；预注册"覆盖率 ≥70% ⇒ 知识网络坐标假说成立"。
+  L2386   - **P-M1**：coverage(283 词, τ=0.45, θ=0.50) ≥ 0.70
+  L2387   - **P-M2**：coverage_eval183 − coverage_rand250 ≥ 0.15
+  L7255   2907 遗留最脆弱一环：qwen_attn margin_full = -0.019459 落在 M1 区间 [-0.019820, 0.063102] 内但下界富余仅 0.0004，且 diag_2907b 显示其判定对 seed/流结构 MC 敏感（rms 下 inside 2/4、below 2/4）——400 抽样的区间端点 MC 误差 ~0.00
+  L7396   - 校准审计（rng [2911,0]）：200 个 iid 57x10 正态矩阵 x 1000 置换——置换 p 的 [0.05,0.95] 覆盖率须在 [0.80,0.97] 且中位 p 在 [0.40,0.60]。实测 frac=0.88、median=0.505，pass。
+  L9271   **硬伤与勘误**：run1 decoder-layer 级 with_kwargs pre-hook 使 transformers forward 崩溃（RoPE 形状错位）——改用 self_attn 级 pre-hook 捕获层输入（2950 verbatim 安全路径）；run3 pass1 忘加 batch 维（1-D 输入 -> 2-D hidd
+  L13842  Part A：D_mean P c0 0/c1 −2.0944/c2 +0.4316/c3 +1.1289；A1 c1 +0.5678/c2 +1.8445/c3 +2.4231；E_10 sd 1.423/1.349、E_31 sd 0.863/0.952；repro bit-exact 0.0；span len 分布 P [367,0×6,63,146,
+
+--- 3154 是否已运行（找 phase3154 目录/结果） ---
+  tests/glm5/result/rdc_query_construction_20260913/phase3154* -> 0
+  tests/glm5/result/**/phase315* -> 10
+     tests\glm5\result\client_visualization_assets\pattern_family_atlas\v2\phase315_missing_rows.jsonl
+     tests\glm5\result\client_visualization_assets\pattern_family_atlas\v2\phase315_template_heldout_case_rows.jsonl
+     tests\glm5\result\client_visualization_assets\pattern_family_atlas\v2\phase315_template_heldout_component_rows.jsonl
+     tests\glm5\result\client_visualization_assets\pattern_family_atlas\v2\phase315_template_heldout_position_rows.jsonl
+     tests\glm5\result\client_visualization_assets\pattern_family_atlas\v2\phase315_template_heldout_prediction_rows.jsonl
+     tests\glm5\result\client_visualization_assets\pattern_family_atlas\v2\phase315_template_heldout_summary.json
+     tests\glm5\result\rdc_query_construction_20260913\phase3150
+     tests\glm5\result\rdc_query_construction_20260913\phase3151
+     tests\glm5\result\rdc_query_construction_20260913\phase3152
+     tests\glm5\result\rdc_query_construction_20260913\phase3153
+
+=== [E] 命题账本全表与引用位点 ===
+总条数=62
+含 D 或 E 分量（并集）条数=38
+  其中 纯D/E（无A/B/C）=12
+
+--- 按 id 精确匹配的引用位点（扫描范围=3103 之后的 MEMO 行） ---
+账本 id: R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21, R22, R23, R24, R25, R26, R27, R28, R29, R30, R31, R32, R33, R34, R35, R36, R37, R38, R39, R40, R41, R42, R43, R44, R45, R46, R47, R48, R49, R50, R51, R52, R53, R54, R55, R56, R57, PA-01, PA-02, PA-03, PA-04, PA-05
+
+--- D/E 级命题中，其 id 在「新推理链」文本中被引用的（11 条） ---
+   [R01] B+D    训练世界差异揭示低层全盲、深层才接入历史  << MEMO>3103
+   [R10] E+B    实体感紧凑性定律  << LOOP_DIAGNOSIS_AND_EXIT_v1.md
+   [R11] B+E    层级嵌套、十维骨架、未见词分类  << LOOP_DIAGNOSIS_AND_EXIT_v1.md
+   [R44] E+A    次模等价于高阶Mobius全非正、大基座补全定律  << MEMO>3103, LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R48] E+C    谱-迁移连续统跨架构显著确认  << MEMO>3103, LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R51] E+B    方向编码而非集合编码、无专职组  << LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R52] D      head(norm(delta-m))证明一阶直通桥  << LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R53] E+B    SwiGLU一阶公式与6%高阶残差  << LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R54] E+B    96.5%沿残差通道、RMSNorm透明  << LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R55] E+A    L37自然载体与因果焦点重叠1/0/0证明解耦  << MEMO>3103, LOOP_DIAGNOSIS_AND_EXIT_v1.md, MEMO_AUDIT_2750_3148.md
+   [R57] D      三图谱已完备、RDC完整闭合、无限组合已破解  << MEMO>3103
+
+--- 交叉核对：所有 id（含 A/B/C 级）在各文本中的出现次数 ---
+  id    MEMO>3103  RDC_TESTPLAN_v1.md            RDC_RESEARCH_CONSTITUTION_    LOOP_DIAGNOSIS_AND_EXIT_v1    UNIFIED_REVIEW_ADJUDICATIO    PARADIGM_SHIFT_VERDICT_v1.    META_SINGLE_SOURCE_Q01.md     METRIC_DICT_Q02.md            MEMO_AUDIT_2750_3148.md       FIRST_PRINCIPLES_3090_3149  
+  R01           1  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R02           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R03           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R04           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R05           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R06           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R07           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R08           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R09           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R10           0  0                             0                             1                             0                             0                             0                             0                             0                             0                           
+  R11           0  0                             0                             2                             0                             0                             0                             0                             0                             0                           
+  R12           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R13           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R14           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R15           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R16           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R17           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R18           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R19           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R20           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R21           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R22           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R23           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R24           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R25           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R26           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R27           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R28           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R29           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R30           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R31           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R32           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R33           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R34           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R35           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R36           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R37           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R38           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R39           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R40           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R41           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R42           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R43           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R44           1  0                             0                             1                             0                             0                             0                             0                             1                             0                           
+  R45           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R46           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R47           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R48           1  0                             0                             1                             0                             0                             0                             0                             1                             0                           
+  R49           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R50           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R51           0  0                             0                             1                             0                             0                             0                             0                             1                             0                           
+  R52           0  0                             0                             1                             0                             0                             0                             0                             1                             0                           
+  R53           0  0                             0                             1                             0                             0                             0                             0                             3                             0                           
+  R54           0  0                             0                             2                             0                             0                             0                             0                             3                             0                           
+  R55           1  0                             0                             1                             0                             0                             0                             0                             2                             0                           
+  R56           0  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  R57           1  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  PA-01         1  0                             0                             0                             0                             0                             0                             0                             1                             0                           
+  PA-02         1  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  PA-03         1  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  PA-04         1  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+  PA-05         1  0                             0                             0                             0                             0                             0                             0                             0                             0                           
+
+--- consumer_check 内容 ---
+{
+ "2759": [
+  {
+   "line": 423,
+   "ctx": "脚本 phase2759_rdc_question_span_deletion.py = bf7628b9b6d4289050f150ecb08"
+  },
+  {
+   "line": 423,
+   "ctx": "89050f150ecb080c86cd1f9d7d062b177a79e4f13346c2714f8；产物 phase2759/qwen4_question_span/{execution.json bf159823…, result.json"
+  },
+  {
+   "line": 435,
+   "ctx": "= not_confirmed。**预注册假说（问句事实 span 承载区分）被否定；新结论（跨 2757/2758/2759 三相闭环）：问句事实复读 span 是共模负偏置的载体，删除它使 D 从 −22 抬至 −14 且世界间距增大——区分"
+  },
+  {
+   "line": 439,
+   "ctx": "2（签名几何跨模型功能移植，在 2755 的 1.7B checkpoint 上运行 2752 式充分性/必要性检验）。2759 的\"偏置/区分可分离\"结论直接喂给 2761：知识链弱行为的成分分解应先剥离共模偏置再定位断层。"
+  },
+  {
+   "line": 492,
+   "ctx": "ldr/ws 近 100%），阻抗剖面全层触底。\"说不出\"不是知识在某层丢失，而是**读出端竞争**：错误 token（2759 的共模偏置方向）在最终 softmax 胜出，而正确方向全程线性可写。"
+  },
+  {
+   "line": 494,
+   "ctx": "4. 与 2759 闭环：2759 说偏置锚在问句事实 span、区分与偏置可分离；2761 说正确答案全程在内部可得、输出被竞争压掉——"
+  },
+  {
+   "line": 494,
+   "ctx": "4. 与 2759 闭环：2759 说偏置锚在问句事实 span、区分与偏置可分离；2761 说正确答案全程在内部可得、输出被竞争压掉——**知识链缺陷的"
+  },
+  {
+   "line": 506,
+   "ctx": "92.9%）并成功修复（定向注入 100% 翻转、方向特异对照成立）；但断层不是层间中继故障而是全局读出竞争**——与 2759 偏置结论、2760 kc 深带平台坐标共同指向：知识链改进路径 = 读出端偏置抑制，不是链计算增强。"
+  },
+  {
+   "line": 551,
+   "ctx": "判据通过）**。用户三项需求全部闭合：2760（层分布图）、2761(+a)（断层定位与修复）、2762（功能移植）；2759（接续预注册的问句 span 删除）判定 not_confirmed 并产出偏置/区分可分离新结论。"
+  },
+  {
+   "line": 555,
+   "ctx": "下一阶段候选（按总目标排序）：(a) V3 评估与计划文档——把 2759–2762 整合进下一轮可判定计划，重点把读出竞争（2761）与偏置锚点（2759）合并为输出端干预设计；(b) per"
+  },
+  {
+   "line": 555,
+   "ctx": "：(a) V3 评估与计划文档——把 2759–2762 整合进下一轮可判定计划，重点把读出竞争（2761）与偏置锚点（2759）合并为输出端干预设计；(b) perm 训练态 + 读出端偏置抑制的组合修复（是否能把 kc 行为从 78% 提到 a"
+  },
+  {
+   "line": 565,
+   "ctx": "抑制：v_row := h_final(含问句事实 span) − h_final(删 span)（native 定义，2759 fact-token 规则，320 行全非空 G2，中位范数 72.1），推理时 hook layers[35] 输出"
+  },
+  {
+   "line": 565,
+   "ctx": "3001）。5 run（native + perm_2747/2748 + true_2747 + mass_2747，2759 部署协议 G0）× 320 diagnostic 行，greedy 首 token 判定。预注册判据：C1 perm"
+  },
+  {
+   "line": 580,
+   "ctx": "残差末位线性贡献，32.3% native-wrong 行翻正而匹配随机方向 0/65——v_row 携带行为因果内容，2759 偏置锚点在行为面成立。"
+  },
+  {
+   "line": 637,
+   "ctx": "结构统一解释 2761（oracle 全修）、2763（bsub 修 ws/ldr 不修 kc 多数行、训练态双刃）与 2759（问句 span = 共模偏置锚点，压制 near-miss 行的读出）。"
+  }
+ ],
+ "2861": [
+  {
+   "line": 4797,
+   "ctx": "2861 在**正确工作点**上重测窗口解剖三量——x_in 一律用 pre-hook 直接捕获（硬伤④修正协议首次执行）："
+  },
+  {
+   "line": 4812,
+   "ctx": "### 结果（phase2861/g_true/；exec f23ea1d9… / result 040dce3b… / g_true.npz ac39"
+  },
+  {
+   "line": 4839,
+   "ctx": "### 窗口解剖战线收束清单（2853→2861）"
+  },
+  {
+   "line": 4840,
+   "ctx": "active_amplification：**作废**（伪影）；T1 正确
+
+EXPORTED tests\deepseek_temp\_review\prop_ledger_flat_r5.json

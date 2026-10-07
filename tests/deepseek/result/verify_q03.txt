@@ -1,0 +1,67 @@
+Q03 独立复核（独立进程，重新读盘）
+==============================================================================
+1) held-out carriers（sha8 须与 metric_dict 冻结值一致）
+  [PASS] carrier qwen3-4b sha8                                      4ef190b7 == 4ef190b7
+  [PASS] carrier qwen3-14b sha8                                     733182c1 == 733182c1
+  [PASS] carrier glm4-9b sha8                                       c711946c == c711946c
+2) q03_result 的复算值 vs 3151/3152 原始 result.json
+  [PASS] qwen3-4b per-seed == source                                max|d|=0.00e+00
+  [PASS] qwen3-4b mean == source                                    0.331615
+  [PASS] qwen3-4b readout layer matches source                      layer=35
+  [PASS] qwen3-14b per-seed == source                               max|d|=0.00e+00
+  [PASS] qwen3-14b mean == source                                   0.398601
+  [PASS] qwen3-14b readout layer matches source                     layer=39
+  [PASS] glm4-9b per-seed == source                                 max|d|=0.00e+00
+  [PASS] glm4-9b mean == source                                     0.389835
+  [PASS] glm4-9b readout layer matches source                       layer=39
+3) E_read 池化 vs metric_dict.json（I1 真源）
+     [INFO] metric_dict 未含显式池化字段（仅定义+gate 在册）；按三份 result 独立重算
+     （metric_dict 无显式池化字段，独立从三份 result 重算）
+  [PASS] 池化值一致                                                      md=0.373350 vs q03=0.373350
+  [PASS] 三模型 E_read 顺序值一致                                           {'qwen3-4b': 0.331615, 'qwen3-14b': 0.398601, 'glm4-9b': 0.389835}
+4) 5% 门判定
+  [PASS] 全部模型未过门 (0/3)                                              pass=0/3
+  [PASS] 最小 E_read = 门的 6.63x                                       min=0.331615  6.63x
+  [PASS] 阈值 = 0.05                                                  0.05
+5) 预注册 design_sha 自洽性
+  [PASS] design_sha 重算一致                                            9a26f72f
+6) bootstrap 95% CI 合理性（mean ∈ CI，宽度>0）
+  [PASS] qwen3-4b seed7 CI 覆盖点估计                                    [0.3121, 0.3533] contains 0.3321
+  [PASS] qwen3-4b seed8 CI 覆盖点估计                                    [0.3183, 0.3640] contains 0.3406
+  [PASS] qwen3-4b seed9 CI 覆盖点估计                                    [0.3034, 0.3414] contains 0.3222
+  [PASS] qwen3-14b seed7 CI 覆盖点估计                                   [0.3777, 0.4441] contains 0.4095
+  [PASS] qwen3-14b seed8 CI 覆盖点估计                                   [0.3728, 0.4422] contains 0.4058
+  [PASS] qwen3-14b seed9 CI 覆盖点估计                                   [0.3502, 0.4124] contains 0.3805
+  [PASS] glm4-9b seed7 CI 覆盖点估计                                     [0.3881, 0.4491] contains 0.4174
+  [PASS] glm4-9b seed8 CI 覆盖点估计                                     [0.3574, 0.4142] contains 0.3845
+  [PASS] glm4-9b seed9 CI 覆盖点估计                                     [0.3418, 0.3941] contains 0.3676
+  [PASS] n_boot=10000                                               10000
+7) 统一 held-out 指纹（三模型共用）
+  [PASS] 3 seed 各 49 test pairs                                     {'7': 49, '8': 49, '9': 49}
+  [PASS] 3 seed 各 197 train pairs                                   {'7': 197, '8': 197, '9': 197}
+  [PASS] test fold sha8 三 seed 互异                                   ['551deb63', 'ef61b0b7', '6377737b']
+8) 受保护（跨线/冻结）文件指纹未变
+  [PASS] AGI_GPT5_MEMO.md sha8                                      2a84776b == 2a84776b
+  [PASS] atlas_ledger.json sha8                                     bbda63df == bbda63df
+  [PASS] proposition_ledger.json sha8                               9a3c6ff4 == 9a3c6ff4
+  [PASS] RDC_TESTPLAN_v1.md sha8                                    71b85673 == 71b85673
+  [PASS] metric_dict.json sha8                                      03887e51 == 03887e51
+  [PASS] phase_queue_v1.json sha8                                   37da9a8d == 37da9a8d
+  [PASS] phase3152 script sha8                                      d795f41c == d795f41c
+  [PASS] phase3151 script sha8                                      292ed9f3 == 292ed9f3
+8b) 研究日志现状（并发写者存在；仅记录，不判 FAIL）
+     bytes=692727 lines=7015 sha8=5b3bdcec
+     Phase 35 内容在位 = True
+     Phase 36（并发写者 E4/E4b）在位 = True
+     prefix(685649) sha8=5be5bf12 (Phase36 脚本登记 before=5be5bf12)
+9) Q03 产物指纹
+     q03_execution.json         1698 B  5e2d4f0f
+     q03_result.json            5587 B  57827730
+     q03_report.txt             3585 B  46662493
+  [PASS] q03_result res_sha8 self-consistent                        cda99b05
+10) 与 3152 内建锚的交叉核对
+  [PASS] glm4 anchor 0.389835 与 3152 断言一致                           0.389835
+  [PASS] qwen3-4b kstar 锚 0.007910657984515032                      0.007910658
+
+==============================================================================
+汇总: PASS=42  FAIL=0  ->  ALL_PASS

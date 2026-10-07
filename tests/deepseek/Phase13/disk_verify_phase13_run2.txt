@@ -1,0 +1,117 @@
+
+[A_files_sha]
+   result_phase13.json sha8 == anchors.result                 PASS
+   exec.seal_sha256 == sha(seal)                              PASS
+   exec.seal_sha8 == 808c4575                                 PASS
+   exec.source.phase12_result_sha256 == sha(phase12 result)   PASS
+   phase12 result sha8 == 7bf4510a                            PASS
+   R.anchors.phase12_result_sha256 matches file               PASS
+   judgement.meta.result_sha8 == sha(result)                  PASS
+   judgement.meta.seal_sha8 == sha(seal)                      PASS
+   judgement.meta.exec_sha8 == sha(exec)                      PASS
+   report exists & non-empty                                  PASS
+   script n2h1a6_paired_site.py exists                        PASS
+
+[B_rebuild]
+   nP == 24 (order len)                                       PASS
+   PM_swap.shape == (18,14,24)                                PASS
+   PM_R.shape == (14,24)                                      PASS
+   FULL_SWAP 重建 == R12.FULL_SWAP (bit)                        PASS
+   FULL_SWAP == 10.797395833333333                            PASS
+   R.anchors.FULL_SWAP_rebuilt == FULL_SWAP                   PASS
+   alphagrid 14 点                                             PASS
+
+[C_rng_replay_bit]
+   A0 J_ci max|d| == 0.000e+00                                PASS
+   A0 top3_share_x_ci max|d| == 0.0                           PASS
+   A0 rho_xhalf max|d| == 0.0                                 PASS
+   A0 perm_x 2000 values max|d| == 0.0                        PASS
+   R13.A0_replicate.max_dev == 0.0                            PASS
+   R13.A0_replicate.ok                                        PASS
+   A0b conf band max_dev == 0.0                               PASS
+   floors.F14 ok & dev 0                                      PASS
+   independent recompute agrees (dj==0)                       PASS
+
+[D_profile_recompute]
+   xhalf top3_share 点估计 == R13                                PASS
+   xhalf argmax 窗口 == R13 (=14)                               PASS
+   J top3_share 点估计 == R13                                    PASS
+   J argmax 窗口 == R13 (=1)                                    PASS
+   xhalf jumps == R13.A4.jumps                                PASS
+   xhalf argmax 直方图 == R13                                    PASS
+   xhalf w14 freq > 0.5                                       PASS
+   R13 P(>=0.60) xhalf == 0.3790                              PASS
+   R13 P(>=0.60) J == 0.9730                                  PASS
+   |W_x - W_j| >= 3 (coord_dep 分量)                            PASS
+
+[E_delta_tables]
+   ΔJ 带独立重算 max|d| < 1e-12                                    PASS
+   Δxhalf 带独立重算 max|d| < 1e-12                                PASS
+   ΔJ 标签全一致                                                   PASS
+   Δxhalf 标签全一致                                               PASS
+   N_dec_J == 10 == R13.A5                                    PASS
+   N_dec_X == 4 == R13.A5                                     PASS
+   R13 disc_verdict == PAIRED_TEST_INFORMATIVE                PASS
+
+[F_algebra]
+   cov>0 对数 == 17                                             PASS
+   cov>0 => sd_paired<sd_indep 无反例                            PASS
+   F17 方差分解 max|d| < 1e-12 (2.842e-14)                        PASS
+   F15 望远镜和(点估计) < 1e-12                                      PASS
+   F16 望远镜和(逐样本) < 1e-12                                      PASS
+   R13 tighten_median == 0.5475                               PASS
+   R13 N_dec_indep_J == 2                                     PASS
+   N_dec_J(10) > N_dec_indep(2)                               PASS
+
+[G_floors_pred_verdict]
+   F14-F23 全部 ok 或 None(报告项)                                  PASS
+   F14 ok                                                     PASS
+   F15/F16/F17 ok                                             PASS
+   F19 ok (概率守恒)                                              PASS
+   F21 ok (无 torch)                                           PASS
+   F18 报告 17/17 两坐标                                           PASS
+   P1 PASS (mode 14, freq>=0.5)                               PASS
+   P2 PASS (mode<=2, freq>=0.5)                               PASS
+   P3 PASS (rho<=0.2)                                         PASS
+   predictions 三条全 PASS                                       PASS
+   P13_verdict == CONCENTRATION_COORDINATE_DEPENDENT          PASS
+   extra.coord_dep True                                       PASS
+   zero_extra_forward True / elapsed < 60 s                   PASS
+   A6 L32->L34 dX 带排除 0                                       PASS
+   A7 L20->L34 dX 与发现集同号（负）                                   PASS
+   A8 α=0.4 剔除时 XH_RANGE 仍 > 0.10（不跌破）                        PASS
+   A8 裕度压缩后 < 1%（0.1007/0.10 - 1）                             PASS
+   A9 N_dec_J_alt == 5                                        PASS
+
+[H_docs]
+   MEMO bytes == 308863                                       PASS
+   MEMO sha8 == 4f9b4574                                      PASS
+   MEMO BOM                                                   PASS
+   MEMO bare_lf == 0                                          PASS
+   Phase 13 标题唯一                                              PASS
+   Phase 标题共 13 个                                             PASS
+   Phase 13 节在 L2860                                          PASS
+   Ledger measurements == 296                                 PASS
+   Ledger tail phase == 13                                    PASS
+   Ledger tail verdict == 期望                                  PASS
+   Ledger backup 存在                                           PASS
+   baseline.tag == post-append-phase13                        PASS
+   baseline.bytes == 308863                                   PASS
+   baseline.phase_headings 13                                 PASS
+   judgement.P13_verdict 一致                                   PASS
+   wlog 含 Phase 13 节                                          PASS
+
+[I_no_forward]
+   torch 未被本脚本导入                                              PASS
+   exec.zero_extra_forward True                               PASS
+   exec.cpu_only True                                         PASS
+   exec.no_torch True                                         PASS
+
+======================================================================
+TOTAL checks = 90 ; FAIL = 0
+A0 逐位: J_ci max|d|=0.000e+00 ; top3 max|d|=0.000e+00 ; rho max|d|=0.000e+00 ; perm_x(2000) max|d|=0.000e+00
+Δ 独立重算: ΔJ max|d|=0.000e+00 ; Δxhalf max|d|=0.000e+00
+F17=2.842e-14 F15=0.000e+00 F16=2.842e-14 ; N_dec_J=10 N_dec_X=4 ; P13=CONCENTRATION_COORDINATE_DEPENDENT
+MEMO 308863 B / 3149 行 / sha8 4f9b4574 ; Ledger n=296 ; baseline post-append-phase13
+======================================================================
+DONE -> D:\AI2050\Ai2050-OpenOne\tests\deepseek\Phase13\disk_verify_phase13.txt | FAIL = 0

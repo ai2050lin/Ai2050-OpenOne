@@ -1,0 +1,144 @@
+
+[A_files_sha]
+   exec.seal_sha256 == sha(seal)                                  PASS
+   exec.amend1.sha256 == sha(amend1)                              PASS
+   exec.amend2.sha256 == sha(amend2)                              PASS
+   R.seal_sha256 == sha(seal)                                     PASS
+   R.amend1.sha256 == sha(amend1)                                 PASS
+   R.amend2.sha256 == sha(amend2)                                 PASS
+   R.seal_sha8 == exec.seal_sha8                                  PASS
+   judgement.meta.result_sha8 == sha(result)                      PASS
+   judgement.meta.seal_sha8 == sha(seal)                          PASS
+   judgement.meta.amend1_sha8 == sha(amend1)                      PASS
+   judgement.meta.amend2_sha8 == sha(amend2)                      PASS
+   judgement.meta.exec_sha8 == sha(exec)                          PASS
+   report exists & non-empty                                      PASS
+   script n2h1a7_prefix_swap.py exists                            PASS
+   amend1 kind is schema_amend                                    PASS
+   amend2 adds A8 arm                                             PASS
+
+[B_rebuild]
+   ORDER len == 24                                                PASS
+   FULL_SWAP 重建 == R12.FULL_SWAP (bit)                            PASS
+   FULL_SWAP == R14.A0a.rebuilt (bit)                             PASS
+   FULL_SWAP == R14.dose_coord.full_swap (bit)                    PASS
+   R14.inherits.FULL_SWAP == FULL_SWAP (bit)                      PASS
+   mean over ALL 41 keys != FULL_SWAP (口径分离)                      PASS
+   R12 sha == inherits 记录                                         PASS
+   R13 sha == inherits 记录                                         PASS
+
+[C_point_estimates]
+   A1 xhalf 独立重算 max|d| == 0 (0.0e+00)                            PASS
+   A1 J 独立重算 max|d| == 0 (0.0e+00)                                PASS
+   A8 xhalf 独立重算 max|d| == 0 (0.0e+00)                            PASS
+   A8 J 独立重算 max|d| == 0 (0.0e+00)                                PASS
+   18 位点 A1 xhalf 全可达                                             PASS
+   A8 位点数 == 18                                                   PASS
+
+[D_concentration_point]
+   A1 top3_x 独立重算 == R14 (=0.5712956336843185)                    PASS
+   A1 argmax_w_x 独立重算 == R14 (=14)                                PASS
+   A1 top3_j 独立重算 == R14 (=0.7733372645660426)                    PASS
+   A1 argmax_w_j 独立重算 == R14 (=0)                                 PASS
+   A8 top3_x 独立重算 == R14 (=0.5745253378763875)                    PASS
+   A8 argmax_w_x 独立重算 == R14 (=14)                                PASS
+   A8 top3_j 独立重算 == R14 (=0.7952727865259923)                    PASS
+   A8 argmax_w_j 独立重算 == R14 (=1)                                 PASS
+   A1 窗口语义 w 覆盖 sites[w..w+3]                                     PASS
+   A8 窗口语义 w 覆盖 i[w..w+3]                                         PASS
+
+[E_bootstrap_replay]
+   A1 4 个尾部概率 max|d| == 0 (0.0e+00)                               PASS
+   A1 众数窗口一致                                                      PASS
+   A1 众数频次 max|d| <= 1e-15                                        PASS
+   A1 窗口直方图逐键一致                                                   PASS
+   A1 top3 CI (lo/hi/med x2 坐标) 一致                                PASS
+   A1 jumps 重算（PM 路径）max|d| == 0 (x 0.0e+00 / J 0.0e+00)          PASS
+   A1 置换 null 95 分位 max|d| == 0 (0.0e+00)                         PASS
+   A1 配对 Δ 标签全一致                                                  PASS
+   A1 N_dec_J 独立 == R14                                           PASS
+   A1 N_dec_X 独立 == R14                                           PASS
+   A8 4 个尾部概率 max|d| == 0 (0.0e+00)                               PASS
+   A8 众数窗口一致                                                      PASS
+   A8 众数频次 max|d| <= 1e-15                                        PASS
+   A8 窗口直方图逐键一致                                                   PASS
+   A8 top3 CI 一致                                                  PASS
+   A8 jumps 重算（PM 路径）max|d| == 0 (x 0.0e+00 / J 0.0e+00)          PASS
+   A8 置换 null 95 分位 max|d| == 0 (0.0e+00)                         PASS
+   A8 site 数组为 0..17                                              PASS
+
+[F_alpha1_perpair_identity]
+   A1 全 18 位点 alpha=1 逐对 == FULL_SWAP_pairs（元素级）                  PASS
+   A8 全 18 支撑 alpha=1 **不**等于 FULL_SWAP_pairs（口径分离）               PASS
+   A1 逐对均值 == FULL_SWAP (bit)                                     PASS
+   A8 端点 y(i,1) == Phase12 recover(site_i) 18/18 (max|d| 0.0e+00) PASS
+   R14.A8_verdict.F30a_dev == 0.0                                 PASS
+   R14.floors.F30.F30a.n_pairs == 432 (18 位点 x 24 对)              PASS
+
+[G_position]
+   median(y0/y1) 独立重算一致                                           PASS
+   位置判决独立重算一致                                                     PASS
+   可加性判决独立重算一致                                                    PASS
+   n(y0>y1) 一致                                                    PASS
+   n(y0>0) 一致                                                     PASS
+   n(S>0) 一致                                                      PASS
+   18 位点位置端点齐全                                                    PASS
+   y01 面板级常数（range < 1e-9）                                        PASS
+   F30b 面板级 dev == 0.0                                            PASS
+   F29 面板级 dev == 0.0                                             PASS
+
+[H_predictions_verdict_floors]
+   floors 键 == F24..F35 + G0p                                     PASS
+   F24 ok (FULL_SWAP bit-equal)                                   PASS
+   F25 ok (n6 dev <= tol)                                         PASS
+   F26 ok (U6 dev)                                                PASS
+   F27 ok (T=2)                                                   PASS
+   F28 ok (alpha=0 no-op)                                         PASS
+   F29 面板级 dev == 0.0                                             PASS
+   F30a 逐对恒等式 dev == 0.0                                          PASS
+   F30b 面板级常数 dev == 0.0                                          PASS
+   F31 ok (base 无退化)                                              PASS
+   F32 ok (18/18 xhalf 可达)                                        PASS
+   G0p == True                                                    PASS
+   预测 P1..P7 全部登记                                                 PASS
+   P1..P7 == 预注册事实（P1/P2/P3/P7 真，P4/P5/P6 假）                      PASS
+   R14.verdict.A8 第三口径 = A8_cumulative_layer                      PASS
+   R14.verdict.A1 == A8_verdict.V_A1（一致）                          PASS
+   端点在 A1 面板级退化 -> 非 FAIL（有声明）                                    PASS
+   A7 dense 网格 ratio 记录存在                                         PASS
+   extra.FULL_PANEL == True                                       PASS
+   smoke == False                                                 PASS
+   三层继承锚齐备                                                        PASS
+
+[I_docs]
+   MEMO 前缀锚：前 308863 B sha8 == 4f9b4574                           PASS
+   MEMO 前缀逐字节未变（追加非回改：字节数只增）                                      PASS
+   MEMO BOM                                                       PASS
+   MEMO bare_lf == 0                                              PASS
+   Phase 14 标题唯一                                                  PASS
+   Phase 标题共 14 个                                                 PASS
+   Phase 14 节位于文件尾部段                                              PASS
+   Ledger measurements == 297                                     PASS
+   Ledger tail phase == 14                                        PASS
+   Ledger tail prereg_id == N2h1a7                                PASS
+   Ledger tail result_sha8 == sha(result)                         PASS
+   Ledger tail seal_sha8 == sha(seal)                             PASS
+   Ledger backup 存在                                               PASS
+   Ledger 前 296 条未被改动                                             PASS
+   baseline.tag == post-append-phase14                            PASS
+   baseline.bytes == 实盘 MEMO bytes                                PASS
+   baseline.sha8 == 实盘 MEMO sha8                                  PASS
+   baseline.phase_headings 14 个                                   PASS
+   judgement.verdict 与 result 一致                                  PASS
+   wlog 含 Phase 14 节                                              PASS
+
+==========================================================================
+TOTAL checks = 115 ; FAIL = 0
+FULL_SWAP 独立重建 = 10.797395833333333 (bit-equal True)
+点估计重算 max|d|: A1 xhalf 0.0e+00 / J 0.0e+00 ; A8 xhalf 0.0e+00 / J 0.0e+00
+bootstrap 重放 max|d|: A1 0.0e+00 ; A8 0.0e+00 ; null A1 0.0e+00 / A8 0.0e+00
+alpha=1 逐对恒等式：A1 18/18 ; A8 非恒等 18/18 ; A8 端点==recover max|d| 0.0e+00
+null 重放 jumps 自检（PM 路径）：A1 x 0.0e+00 / J 0.0e+00 ; A8 x 0.0e+00 / J 0.0e+00
+判决：同坐标 CONCENTRATION_COORDINATE_DEPENDENT | 跨族 FAMILY_TRANSFER_BOTH | 位置 POS_LAST_POSITION_DOMINANT | 可加性 SUB_ADDITIVE
+MEMO 346025 B / 3427 行 / sha8 c9b4b3f5 ; Ledger n=297 ; baseline post-append-phase14
+==========================================================================

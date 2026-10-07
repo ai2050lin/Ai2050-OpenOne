@@ -845,3 +845,15 @@ def native_language_field(model: str='glm4', sample: str='', boundary: int=-1, v
 
 from server.rdc_question_service import router as question_router
 router.include_router(question_router)
+
+from server.rdc_trusted_rebuild_service import router as trusted_rebuild_router
+router.include_router(trusted_rebuild_router)
+
+from server.rdc_context_interaction_service import router as context_interaction_router
+router.include_router(context_interaction_router)
+
+from server.rdc_early_interaction_service import router as early_interaction_router
+router.include_router(early_interaction_router)
+
+from server.rdc_relation_stability_service import router as relation_stability_router
+router.include_router(relation_stability_router)

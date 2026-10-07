@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A 闸门关闭 · R8</title><style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1c2024;--mut:#5b6570;--line:#e3e7ec;--acc:#0b6bcb;--ok:#0f8a4f;--bad:#c0392b;--warn:#b8860b;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:26px;margin:0 0 6px}h2{font-size:18px;margin:34px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0}
+.hero{display:flex;gap:14px;flex-wrap:wrap}
+.kpi{flex:1;min-width:170px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi .n{font-size:24px;font-weight:700}.kpi .l{color:var(--mut);font-size:12px;margin-top:2px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#eef2f7;font-weight:600}tr:last-child td{border-bottom:none}
+td small{color:var(--mut);display:block;font-size:11px}
+code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.green{background:#e5f5ec;color:var(--ok)}.amber{background:#fdf3dc;color:var(--warn)}.grey{background:#eef0f3;color:var(--mut)}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+.note{background:#fdf3dc;border:1px solid #f0dfb0;border-radius:8px;padding:12px 14px;margin:12px 0;font-size:13px}
+.seal{background:#eef4fd;border:1px solid #cfe0f7;border-radius:8px;padding:12px 14px;font-family:ui-monospace,Consolas,monospace}
+.bar{height:10px;background:#e6eaef;border-radius:999px;overflow:hidden;margin:8px 0}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#0b6bcb,#37a1f5)}
+ul{margin:8px 0 0 18px;padding:0}li{margin:3px 0}
+.foot{color:var(--mut);font-size:12px;margin-top:30px;border-top:1px solid var(--line);padding-top:12px}
+</style></head><body><div class="wrap">
+<h1>A 闸门 seal 执行与关闭</h1>
+<div class="sub">deepseek 线 · R8 · 2026-10-03 05:03 · 研究日志 <code>AGI_DEEPSEEK_MEMO.md</code> Phase 35</div>
+
+<div class="seal">seal: Q08=甲 | C=全接受 | I1=确认 | I9=确认</div>
+
+<div class="hero" style="margin-top:16px">
+  <div class="kpi"><div class="n">CLOSED</div><div class="l">A 闸门状态（5/30 队列项 sealed）</div></div>
+  <div class="kpi"><div class="n">0.3734</div><div class="l">E_read 池化（5% 门的 7.5×）</div></div>
+  <div class="kpi"><div class="n">FIRED</div><div class="l">K1 判决（Q08=甲，判定层=行为读出层）</div></div>
+  <div class="kpi"><div class="n">38 / 0</div><div class="l">独立复核 PASS / FAIL = ALL_PASS</div></div>
+</div>
+
+<h2>1 · Q08=甲：K1 判定层 = 行为读出层 ⇒ K1 触发</h2>
+<div class="card">同一把 5% 门，挂在不同层位读数完全不同 —— 这正是判据自指（用假设自选的层去检验该假设）必须被消掉的地方。</div>
+<table><thead><tr><th>模型</th><th>k*</th><th>读出层</th><th>B4 误差@k*</th><th>B4 误差@读出</th>
+<th>k* 层 margin（负=候选优）</th><th>过门</th><th>读出层 margin</th><th>过门</th></tr></thead>
+<tbody><tr><td><code>qwen3-4b</code></td><td>3</td><td>35</td><td>0.0079107</td><td>0.3316153</td><td class='bad'>-0.002765<small>±0.001845</small></td><td>否</td><td class='bad'>+0.786567<small>±0.151864</small></td><td>否</td></tr>
+<tr><td><code>qwen3-14b</code></td><td>3</td><td>39</td><td>0.0806781</td><td>0.3986008</td><td class='ok'>-0.044168<small>±0.008486</small></td><td>是</td><td class='bad'>+1.129588<small>±0.216804</small></td><td>否</td></tr>
+<tr><td><code>glm4-9b</code></td><td>3</td><td>39</td><td>0.0461279</td><td>0.3898353</td><td class='ok'>-0.028673<small>±0.006755</small></td><td>是</td><td class='bad'>+0.906606<small>±0.211259</small></td><td>否</td></tr></tbody></table>
+<div class="hero" style="margin-top:12px">
+  <div class="kpi"><div class="n">+0.9409</div><div class="l">读出层池化 margin（2×MDE = 0.3866）</div></div>
+  <div class="kpi"><div class="n">-0.0252</div><div class="l">k* 层池化 margin（2×MDE = 0.0114）</div></div>
+  <div class="kpi"><div class="n">3 / 3</div><div class="l">读出层否决模型数</div></div>
+</div>
+<div class="card"><b>判决</b>：<span class="bad">K1 = fired_all_models</span>（读出层 3/3 否决 + 轨 A 触发）；
+k* 层 = <b>model_specific</b>（<code>qwen3-4b</code> 否决，不得升机制）。<br>
+<b>后果</b>：命题「条件齿轮组 = 算子代数」<b>降级为 descriptive</b>（功能性端口类描述），不得再作机制主张。</div>
+
+<h2>2 · C1–C6：全接受，逐条落盘（erratum）</h2>
+<table><thead><tr><th>id</th><th>目标</th><th>原值/原文</th><th>本线执行方式</th><th>状态</th></tr></thead>
+<tbody><tr><td><b>C1</b></td><td>MEMO 3103 正文分级数字</td><td><code>未标口径</code></td><td>本线已记录；目标正文位于 G 线备忘录（AGI_GPT5_MEMO.md），跨线不改。</td><td><span class='tag green'>已接受</span></td></tr>
+<tr><td><b>C2</b></td><td>MEMO 3103 正文「约 55% 命题（A+B）」</td><td><code>量纲混淆（分量数÷条数）</code></td><td>本线已记录并采用 canonical=41.5%。</td><td><span class='tag green'>已接受</span></td></tr>
+<tr><td><b>C3</b></td><td>TESTPLAN T5 行</td><td><code>A=5 / B=6 / C=10 / D=21 / E=20</code></td><td>TESTPLAN 已作为归档全文并入本线备忘录（Phase 23，逐字保留）；更正以本记录 + memo erratum 形式声明，不改写归档正文。</td><td><span class='tag green'>已接受</span></td></tr>
+<tr><td><b>C4</b></td><td>atlas_ledger.json ledger_sha256_8</td><td><code>41d65a13</code></td><td>目标文件为跨线共享（含 G 线 Phase 2902–3153 测量）⇒ 未施加；补丁规格见 ledger_corrections_v1.json。</td><td><span class='tag amber'>已接受·待跨线施加</span></td></tr>
+<tr><td><b>C5</b></td><td>MEMO 3103 记录的 proposition_ledger.json 哈希</td><td><code>add57ba7</code></td><td>本线以外部 manifest 记录真值（哈希自指失效 ⇒ 不写入被哈希文件本体）。</td><td><span class='tag green'>已接受</span></td></tr>
+<tr><td><b>C6</b></td><td>atlas_ledger measurements schema</td><td><code>两套并存（270 / 199 / 兼有 165）；evidence_level 常量</code></td><td>目标为跨线共享文件 ⇒ 未施加；补丁规格见 ledger_corrections_v1.json。</td><td><span class='tag amber'>已接受·待跨线施加</span></td></tr></tbody></table>
+<div class="note"><b>C4 / C6 未施加</b>：目标 <code>research/gpt5/atlas/atlas_ledger.json</code> 为<b>跨线共享</b>账本（同时含 deepseek Phase 8–21 与 G 线 Phase 2902–3153）⇒ 依「避免与其他路线混合」纪律，本轮只落补丁规格 <code>ledger_corrections_v1.json</code>（状态 <code>SEALED_BUT_NOT_APPLIED</code>）。施加需一句确认。</div>
+
+<h2>3 · 队列状态（phase_queue_v1.json，唯一议程来源）</h2>
+<div class="bar"><i style="width:16.7%"></i></div>
+<div class="sub">已 sealed 5 / 30</div>
+<table><thead><tr><th>id</th><th>标题</th><th>闸门</th><th>状态</th></tr></thead>
+<tbody><tr><td><b>Q01</b></td><td>元层单一真源对账</td><td>A 闸门</td><td><span class='tag green'>sealed</span></td></tr>
+<tr><td><b>Q02</b></td><td>KPI 口径冻结</td><td>A 闸门</td><td><span class='tag green'>sealed</span></td></tr>
+<tr><td><b>Q03</b></td><td>E_read 统一基线复算</td><td>B KPI</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q04</b></td><td>E_ar(k) 装置建造</td><td>B KPI</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q05</b></td><td>E_ar(k) 正式测量</td><td>B KPI</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q06</b></td><td>C_steer 基座测量</td><td>B KPI</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q07</b></td><td>KPI 曲线 v0 汇总</td><td>B KPI</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q08</b></td><td>K1 重述与改判</td><td>A 闸门</td><td><span class='tag green'>sealed</span></td></tr>
+<tr><td><b>Q09</b></td><td>死线双轨重述</td><td>A 闸门</td><td><span class='tag green'>sealed</span></td></tr>
+<tr><td><b>Q10</b></td><td>历史 A 级命题可识别性回溯</td><td>D 门</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q11</b></td><td>面板功效硬约束</td><td>D 门</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q12</b></td><td>D/E 级命题引用审计</td><td>A 闸门</td><td><span class='tag green'>sealed</span></td></tr>
+<tr><td><b>Q13</b></td><td>高秩散布独立因子恢复</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q14</b></td><td>因子恢复 held-out 判决</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q15</b></td><td>候选因子化替换审计</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q16</b></td><td>位置 vs 内容分解</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q17</b></td><td>高秩散布的因果地位</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q18</b></td><td>因子恢复的形式化</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q19</b></td><td>高秩散布跨模型稳定性</td><td>C 未识别</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q20</b></td><td>C_steer 基准正式化</td><td>D 门</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q21</b></td><td>IIA 判据移植</td><td>D 门</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q22</b></td><td>端口类形式化</td><td>E 机制</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q23</b></td><td>关系身份 400 维续查</td><td>E 机制</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q24</b></td><td>承重轴剂量曲线机制解释</td><td>E 机制</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q25</b></td><td>跨模型异质性作为研究对象</td><td>E 机制</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q26</b></td><td>30-Phase 中期 KPI 复盘</td><td>F 制度</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q27</b></td><td>backlog 冻结</td><td>F 制度</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q28</b></td><td>外部评审落地规则</td><td>F 制度</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q29</b></td><td>工程去摩擦</td><td>F 制度</td><td><span class='tag grey'>pending</span></td></tr>
+<tr><td><b>Q30</b></td><td>队列收束与下一代生成</td><td>F 制度</td><td><span class='tag grey'>pending</span></td></tr></tbody></table>
+
+<h2>4 · 独立复核</h2>
+<div class="card">新进程独立复核 <b>PASS 38 / FAIL 0 = ALL_PASS</b>：memo 前缀逐字节不变 + bare_lf 0 + Phase 35 在位；
+队列 5 项 sealed；6 条更正全 accepted；<code>E_read</code> 池化独立重算一致；C4 <code>content_excluding_self</code> 独立重算 = <code>0dc6e57a</code>；
+跨线受保护文件 7 枚指纹全部未变。</div>
+
+<h2>5 · 下一步</h2>
+<ul>
+<li><b>B 闸门（需 GPU；本机已探明可用：RTX 5080 / 16303 MiB / torch 2.13+cu130）</b>：Q03 <code>E_read</code> 统一基线复算 → Q04/Q05 <code>E_ar(k)</code> → Q06 <code>C_steer</code> 基座。</li>
+<li>C / D / E / F 闸门：Q13–Q19、Q10/Q11/Q20–Q25、Q26/Q27/Q30。</li>
+<li><b>待确认</b>：跨线账本补丁（C4/C6）是否由本对话施加。</li>
+</ul>
+
+<div class="foot">本页所有数字由 <code>deadline_dual_track_v1.json</code> / <code>a_gate_closure_v1.json</code> / <code>phase_queue_v1.json</code> 现场渲染，无手工转录。
+产物：<code>a_gate_closure_v1.json</code> 24c60160 · <code>verify_r8.txt</code> · memo Phase 35 150241da。</div>
+</div></body></html>

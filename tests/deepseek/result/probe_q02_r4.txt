@@ -1,0 +1,149 @@
+=== [1] KPI 名在 gpt5 MEMO 中的出现次数 ===
+  E_read     0
+  E_ar       0
+  C_steer    0
+  readout    112
+  读出层        33
+  B4         44
+
+=== [2] 读出层误差数字 0.3316 / 0.3986 / 0.3898 出现处 ===
+  0.3316 : 1 处
+    L14864  | qwen3-4b | **0.0079** | 0.3316 | 否 | −0.0040/−0.0019/−0.0024 不过门 |
+  0.3986 : 1 处
+    L14865  | qwen3-14b | **0.0807** | 0.3986 | **是** | −0.0432/−0.0448/−0.0445 pass（~5×MDE）|
+  0.3898 : 2 处
+    L14856  B4@k39 三 seed mean=0.389835 与 3151 锚 drift=**0.00e+00**；M1@k3 margins **−0.0289/−0.0323/−0.0248** 与 3151 gates 位级一致（ALS seed 公式不变）→ 重算管线=3151 管线位级复现。
+    L14863  | glm4-9b | 0.0461 | 0.3898 | 否 | −0.0289/−0.0323/−0.0248 pass（2-6×MDE）|
+  0.0461 : 2 处
+    L2470   - K 曲线（描述性）：K=10 within 0.0465 vs null q95 0.0461（贴线）；K=20 within 0.0292 vs q95 0.0245（略超）；purity 对 K 几乎不动（0.223→0.224→0.219）。
+    L14863  | glm4-9b | 0.0461 | 0.3898 | 否 | −0.0289/−0.0323/−0.0248 pass（2-6×MDE）|
+  0.0079 : 3 处
+    L3928   | L26 | 0.879 | **0.986** | 11/32 | 2.31% | +0.0079 |
+    L9102   | J75 | 0.9448 | 0.8747 | 0.0701 | 0.9527 | 0.0079 |
+    L14864  | qwen3-4b | **0.0079** | 0.3316 | 否 | −0.0040/−0.0019/−0.0024 不过门 |
+  0.0807 : 1 处
+    L14865  | qwen3-14b | **0.0807** | 0.3986 | **是** | −0.0432/−0.0448/−0.0445 pass（~5×MDE）|
+
+=== [3] MEMO Phase 3152 / 3153 节 ===
+  --- ## Phase 3152: K1三模型定夺（T4 第35 Phase）[11:17] (行 14850..14880, 31 行) ---
+    |## Phase 3152: K1三模型定夺（T4 第35 Phase）[11:17]
+    |
+    |### 执行
+    |四模式单脚本 `phase3152_g1p2_tri_model_k1.py`：qwen3-4b（NL36/D2560，k*=3/readout=35）与 qwen3-14b（NL40/D5120，k*=3/readout=39）全管线（738 行面板×S1 三 seed×S2×S3×全层曲线×M1 曲线 10 深度点×门×M1 网格 48 fits×A3 worst20×V5）+ glm4k1（零 GPU：读 31
+    |
+    |### 双锚位级复核（glm4k1）
+    |B4@k39 三 seed mean=0.389835 与 3151 锚 drift=**0.00e+00**；M1@k3 margins **−0.0289/−0.0323/−0.0248** 与 3151 gates 位级一致（ALS seed 公式不变）→ 重算管线=3151 管线位级复现。
+    |
+    |### 主判决：k1_not_triggered_b4_additive_at_kstar_operator_line_kept（×3）
+    |K1 三模型 k* 报告（判决层位=机制层 k*≈深度 7.5%，预注册冻结）：
+    |
+    || 模型 | B4@k* | B4@读出层 | above 5pct 门 | M1@k* 三seed margin |
+    ||---|---|---|---|---|
+    || glm4-9b | 0.0461 | 0.3898 | 否 | −0.0289/−0.0323/−0.0248 pass（2-6×MDE）|
+    || qwen3-4b | **0.0079** | 0.3316 | 否 | −0.0040/−0.0019/−0.0024 不过门 |
+    || qwen3-14b | **0.0807** | 0.3986 | **是** | −0.0432/−0.0448/−0.0445 pass（~5×MDE）|
+    |
+    |- **K1 弃线条件（3 模型全 above 且 M1 全败）不成立**：above=1/3、m1_pass=2/3 → **算子代数线保住**；qwen3-14b 的 k* 处组合非线性被 rank-5 交互完全修复（0.081→0.036，改善 56pct）。
+    |- M2（嵌入中介）三模型 k* 全败（margin +0.07/+0.27/+0.24）——再次否证嵌入行实现。
+    |- **层位定律（新增，三模型一致）**：B4 组合误差从 k*=3 到读出层单调恶化 4.9×-42×（4b 42×、glm4 8.5×、14b 4.9×）；argmin 全在 k=0（embedding 处 one-hot 完全可加）。4b 曲线呈"k0-6 加性近完备（<0.01）→ k7 单层跳变 0.008→0.197 → 中层平台 0.43 → 缓降 0.33"；14b/glm4 平滑上升。
+    |- **交互修复窗**：M1 仅 k≤10-11 改善（4b k3-10、14b k3-11、glm4 k3），k≥15 全线过拟合（读出层 margin +0.75/+1.08/+0.90）→ 交互结构=承诺层现象，读出层组合非线性不可由低秩交互修复。
+    |- **M1 过拟合解剖**（rank{1,2,5,10}×ridge{1e-3,1e-2,1e-1}×4 深度层×3 模型=144 fits）：读出层 optimal rank=10（网格顶格）×3 模型；强正则 rank10 读出层仅微弱改善（glm4 0.365 vs B4 0.390；14b 0.400 vs 0.410；4b 0.294 vs 0.332）→ **读出层残差=高秩散布结构**，与 k* 残差
+    |- V3 留一类全 confirmed（worst：4b=金属、14b=颜色、glm4=水果）；V4 留一实例 B4 0.719/0.687/0.611（新实体误差 ~2× S1）；V0 材料 margin 中位 0.693/0.844/1.110（qwen logit 尺度低，记录型）。
+    |- **A3 worst-20 跨模型**：qwen3-4b/14b 高重叠（床/沙发/黑/绿/黄=家具+颜色类），glm4 偏家具+错配（"狗是一种金属""窗帘是一种水果"）→ 失败模态两类：难类（颜色/家具）与错配组合；并 3153 解剖。
+    |
+    |### 锚
+    |qwen3-4b res **199b145d**（disk c38b97ff）；qwen3-14b res **8a29eace** seal **2631b5fd**（disk 23dfb646）；glm4k1 res **52d05025** seal **e302664b**（disk 111a1152）；summary res **1d17b42e**（disk a6c68981，seal ca50e253
+    |
+    |### 预注册 Phase 3153：G1-P3 失败模态解剖（TESTPLAN 4.2+UNIFIED_REVIEW A3）
+    |(1)三模型 worst-20 并/交分析：失败样本级 Jaccard + 失败模态分类表（难类 vs 错配 vs 高秩散布），glm4 错配子集（如 狗→金属）单独成列；(2)读出层高秩残差谱解剖：B4@读出层残差的 PCA 谱 + 类内/类外能量分解 + 残差与（实体轴×类轴）外积空间的子空间角——回答"读出层组合非线性的载体"；(3)k* 类子空间（5 维）与 M1 rank-5 因子网格的对齐检验（Pc 列 
+    |
+  --- ## Phase 3153: 失败模态解剖（G1-P3）[17:34] (行 14881..14901, 21 行) ---
+    |## Phase 3153: 失败模态解剖（G1-P3）[17:34]
+    |
+    |**主判决：`g1p3_fingerprint_consistent_coverage_partial`——读出层高秩残差谱指纹三模型一致（死线未触发，"交互=类子空间"叙事保住），覆盖率门部分（cov_mean 0.83 达标、4b 0.60 未达）。**
+    |
+    |### 设计与执行
+    |- 全零 GPU 复算：4b/14b 读 3152 collect.npz、glm4 读 3151 npz、SMOKE 读 3152 smoke npz（1.2s 全链）。解剖对象=S1_s7 test 行 B4@读出层残差 R（147×D），k* 层同构对照。
+    |- 四类锚全过（位级）：worst20 drift=0.0 ×3 模型；S2 vs 3152 v3 per_fold（4b/14b）；V5 drift=0.0（e_ks 0.9230/0.5186、e_ko 0.1490/0.1798）；M1@k* s7 margin −0.0040/−0.0432/−0.0289 与 3152 gates 位级一致。修 1 次（patch2）：门段 Mte/Yte/e_m1 误置于
+    |- 网格锚说明：3152 m1_grid 只含 KGRID 层（k 不含 k*=3），k* 网格值作为新记录（4b 0.00464/14b 0.03741/glm4 0.01836，ALS40it）。
+    |
+    |### 四发现（重复强调）
+    |1. **读出层残差载体三模型定量一致（ANOVA 嵌套增量 [类间,加性|类,交互(i,c),模板内]）**：4b [5.0,34.3,0.3,60.4]%、14b [6.2,35.9,0.0,59.0]%、glm4 [6.5,37.7,0.0,56.8]% —— **(i,c) 交互网格能量≈0（0.0–0.3%）**。读出层组合非线性 = 实体×类加性残余（34–38%）+ 模板内高秩散布（57–60%），不存
+    |2. **谱指纹跨模型一致（主验收过）**：ANOVA 份额 Pearson 0.999/0.995/0.998、spec_cell 谱形（σj/σ1 top10）0.968/0.991/0.977 —— 3 对全 ≥0.8 门 → 死线未触发，G1 保住。k* 对照谱尖锐（4b σ2/σ1=0.126 vs 读出层 0.615）。
+    |3. **M1 rank-5 因子列空间 ≈ Pc(k\*)（"k* 交互=类子空间"第 4 次独立确证）**：主角谱 top1 0.979/0.889/0.977（vs Pc(k*)）vs 0.142/0.335/0.378（vs Pc(KOUT)）——三模型机制层/读出层二分再确证。
+    |4. **worst20 失败模态分布模型特异**：glm4 错配主导（13/20；水果 S2=1.223 仍最差）、4b 散布主导（M3 8/20，E_g 0.27–0.42）、14b 均衡（难类 7+网格特异 7；颜色 S2=1.011）。样本级 Jaccard 0.14–0.29（对级最大 0.35）。覆盖率门 partial：cov_mean 0.83、4b 0.60<0.8（M3 定义 E_g<0.5 结构
+    |
+    |### 锚
+    |4b res **c222c7ff** seal dad158d2（disk 78ddf33f）；14b res **a0049e59** seal a600c4b5（disk fc4c900e）；glm4 res **18f2ef01** seal d36c7627（disk 61e4eaf4）；summary res **b9846738** seal 8236f974（disk b3a2066a，executi
+    |
+    |### 预注册 Phase 3154：G2-P1 多关系族与算子可分离性（K2 死线）
+    |(1)新面板采集（GPU）：3 关系族（是-a is-a / 有-a has-a / 制成-of made-of）×(实体×类)×3 模板，qwen3-4b + qwen3-14b + glm4-9b 全隐层采集（3151 collect.npz 协议复用）；(2)K2 检验：h_ℓ(i,c) 分解为 W_ℓ v_i + φ_ℓ(c) 的可分离性（实体方向响应是否关系无关、类方向是否关系无关；双向消融+子空间角）——
+    |
+
+=== [4] tests/glm5/result 中含 3152 / 3153 的目录与 json ===
+  DIR tests/glm5/result/rdc_query_construction_20260913/phase2748/client/multimodel_nonconfirmation_1789431527043595300
+      glm4_first_all_H.png                                        147261 B  9b388d61
+      glm4_full_parameter_path.png                                114141 B  851a4361
+      multimodel_mobile.png                                        47888 B  27cc0df3
+      qwen14_first_all_H.png                                      182864 B  bede4daf
+      qwen14_full_parameter_path.png                              122311 B  c22fb6f7
+      qwen4_first_all_H.png                                       176321 B  6e72b5c3
+      qwen4_full_parameter_path.png                               125637 B  eac2c607
+      result.json                                                  17510 B  b39e87ea
+  DIR tests/glm5/result/rdc_query_construction_20260913/phase3152
+  DIR tests/glm5/result/rdc_query_construction_20260913/phase3153
+
+=== [5] 文件名含 heldout / holdout / panel / readout 的 json（限 gpt5 与 glm5 产物） ===
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase738_readout_margin_continuation_audit_confirm_phase738_atlas_graph.json    24390 B  da28a3ce
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase738_readout_margin_continuation_audit_main_phase738_atlas_graph.json    23569 B  8d9f44ca
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase738_readout_margin_continuation_audit_smoke_phase738_atlas_graph.json    10847 B  fc5b0e2b
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase739_readout_threshold_closure_boundary_confirm_phase739_atlas_graph.json     7347 B  81e50f89
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase739_readout_threshold_closure_boundary_main_phase739_atlas_graph.json     7302 B  c5520808
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase739_readout_threshold_closure_boundary_smoke_phase739_atlas_graph.json     5201 B  2a542e25
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase740_natural_readout_boost_source_backtrace_confirm_phase740_atlas_graph.json    20394 B  2eb2838b
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase740_natural_readout_boost_source_backtrace_main_phase740_atlas_graph.json    18479 B  3cc1ed72
+  tests/glm5/result/client_visualization_assets/atlas/glm5_phase740_natural_readout_boost_source_backtrace_smoke_phase740_atlas_graph.json    18493 B  11a80db8
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase313_heldout_component_interaction_summary.json     3161 B  6d5efbbf
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase315_template_heldout_summary.json     4414 B  d6b10a2c
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase319_heldout_component_mediation_summary.json     3755 B  07888060
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase386_physical_holdout_protocol.json     1313 B  5d5302fd
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase407_behavioral_holdout_analysis.json     1553 B  ee26c0ba
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase408_behavioral_holdout_analysis.json     1073 B  28238d0c
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase413_candidate_panel_contract.json     1654 B  d5ba9c55
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase413_readout_qualification.json      984 B  9d3b7843
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_000_answer_only.json     7175 B  34631142
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_000_base.json     6842 B  9b0fa124
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_000_boundary_period.json     7275 B  0241c210
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_000_explain_pressure.json    12008 B  7507ae0a
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_000_list_pressure.json    11847 B  f2da5e6c
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_000_structured_json.json     7263 B  36c920f5
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_001_answer_only.json     7151 B  0260d9d7
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_001_base.json     6857 B  a2f3def1
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_001_boundary_period.json     8455 B  ebc61d08
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_001_explain_pressure.json     7311 B  2694c2e9
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_001_list_pressure.json    11504 B  691e5571
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_because_001_structured_json.json    20190 B  cec94d82
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_list_000_answer_only.json     7121 B  d89a61d2
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_list_000_base.json     6788 B  2c8d921a
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_list_000_boundary_period.json     7221 B  beb6e603
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_list_000_explain_pressure.json    11903 B  cf3e1c97
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_list_000_list_pressure.json    11742 B  6912b065
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_list_000_structured_json.json     7209 B  4b9a29c6
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_period_000_answer_only.json     7157 B  bb91246e
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_period_000_base.json     6824 B  1e046110
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_period_000_boundary_period.json     7257 B  4dad1df7
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_period_000_explain_pressure.json     7251 B  1020cfc1
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_period_000_list_pressure.json    11812 B  82c210dc
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/case_details/deepseek7b__phase265_readout_competition_target_vs_period_000_structured_json.json     7245 B  5555d8ac
+  合计 41
+
+=== [6] 已存在 metric / kpi 类文件 ===
+  research/gpt5/atlas/metric_dict.json                                                             2454 B  469c0ad1
+  tests/glm5/result/phase2444_c36721_c37040_semantic_specific_multiunit_multinull/analysis/all_layer_unit_metrics.json   492423 B  06735cae
+  tests/glm5/result/phase2457_c41041_c41360_crossmodel_relation_geometry/derived/relation_geometry_metrics.json     9641 B  c2b3ced0
+  tests/glm5/result/phase2512_c75521_c76672_existing_fullfield_event_transition_map/analysis/all_qpoint_metrics.json   548848 B  7f202663
+  tests/glm5/result/rdc_law_campaign_20260911/prediction/all_validation_grid_and_test_metrics.json  1009556 B  455c02df
+  tests/glm5/result/rdc_query_construction_20260913/compilation/glm4/metric_identity.json        496548 B  198ee5e9
+  tests/glm5/result/rdc_query_construction_20260913/compilation/qwen14/metric_identity.json      548804 B  48cecad7
+  tests/glm5/result/rdc_query_construction_20260913/compilation/qwen4/metric_identity.json       548724 B  725cf758
+  tests/glm5/result/rdc_relation_stability_20260923/fact_order_challenge/metric_rows.json        247819 B  581605aa

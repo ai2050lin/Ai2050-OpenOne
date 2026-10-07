@@ -1,0 +1,25 @@
+=== 1) 三处落盘独立复核（期望 sha8）===
+  OK       exp=66e681ab got=66e681ab  2026-10-03.md
+  OK       exp=66704c89 got=66704c89  SKILL.md
+  OK       exp=ed3319bd got=ed3319bd  MEMORY.md
+
+=== 2) R5 交付件（期望 sha8 / 大小）===
+  OK       sha8=4d1853d3 (exp=4d1853d3) bytes=7103 (exp=7103) deadline_dual_track_v1.json
+  OK       sha8=0d8633c7 (exp=0d8633c7) bytes=7176 (exp=7176) DEADLINE_DUAL_TRACK_Q09.md
+  OK       sha8=4c2ea9d2 (exp=4c2ea9d2) bytes=39171 (exp=39171) prop_citation_audit_v1.json
+  OK       sha8=32933855 (exp=32933855) bytes=13049 (exp=13049) PROP_CITATION_AUDIT_Q12.md
+  OK       sha8=ee439e4c (exp=ee439e4c) bytes=10179 (exp=10179) q09q12_gate_r5.html
+  OK       sha8=39439619 (exp=None) bytes=3934 (exp=None) disk_verify_q09q12_r5.txt
+
+=== 3) 受保护文件指纹（须与 R5 冻结一致，未被触碰）===
+  OK       exp=2a84776b got=2a84776b  AGI_GPT5_MEMO.md
+  OK       exp=9a3c6ff4 got=9a3c6ff4  proposition_ledger.json
+  OK       exp=71b85673 got=71b85673  RDC_TESTPLAN_v1.md
+  OK       exp=675836fd got=675836fd  phase_queue_v1.json
+  OK       exp=01df6398 got=01df6398  RDC_RESEARCH_CONSTITUTION_v1.md
+
+=== 4) 关键断言抽查 ===
+  q09 top keys = ['schema', 'generated_by', 'queue_item', 'constitution_ref', 'source_testplan', 'original_form', 'restated_form', 'k1_recompute', 'k2_status', 'k3_status', 'deadline_immunity_quantified', 'provenance']
+  q12 top keys = ['schema', 'queue_item', 'generated_by', 'constitution_ref', 'ledger', 'corpora', 'counts', 'F1_id_hits_primary', 'F1_id_hits_archives_counts', 'F2_namespace_occupancy', 'F3_text_fingerprint', 'verdict', 'defects']
+  Q12 json[verdict] = {"substantive_id_hits": [{"id": "R55", "grade": "E+A", "line": 13546, "meta": false, "ctx": "0 复现；B 门=L28 top-8 |ds| 份额 ≥0.50 concentrated / 0.25–0.50 moderate / <0.25 distributed。方向=零拟合 W_yes−W_no；per-head 切点只在 o_proj 输
+  disk_verify tail = [PASS] 队列 Q12 status 仍 pending（不改状态，待 seal） pending | ==== 汇总：PASS=76 FAIL=0 ==== | VERDICT: ALL_PASS

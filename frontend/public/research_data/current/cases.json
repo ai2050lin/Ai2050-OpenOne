@@ -1,0 +1,213 @@
+[
+  {
+    "kind": "case",
+    "id": "CASE-001",
+    "status": "candidate",
+    "title": "主轴三段：is-a 落点由权重绑定决定（P4–P7）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO Phase 4–7（主轴三段）",
+    "run_ref": "",
+    "view_refs": [
+      "VIEW-full_coordinate_field",
+      "VIEW-language_family_graph"
+    ],
+    "evidence_level": "observed",
+    "question": "「苹果是水果」这类 is-a 关系，在 Transformer 里存在于哪一段主轴——输入嵌入、层计算，还是输出读出？",
+    "narrative": "假设：语义关系可能由某个固定算子在某一层承载。实验（三段同时测量，全部落在真实前向观察 + 单端口替换，不用方向去除）：① 读出端——单头份额上限 share_max=3.0%，不存在承载通用类别算子的单头；② 类别子空间——G−1=5 维即充分必要（B/A 0.994–1.010，C_resid/D_rand≈0），且族间子空间近正交（0.002–0.025）⇒ 不存在通用类别算子；③ 决定性发现——权重绑定（tied embeddings）单向决定 is-a 落点：tied 模型 L0 嵌入已带类信号（+18.9~24.4）且层计算仅压制（1.00–1.05×）；untied 模型 L0≈0（+0.07/+0.40）而层计算构建（1.68–33.8×，峰在末层）——6/6 干净二分，功能等价、实现路径不同。教学点：'is-a 写在哪一段'不是一个普遍常数，而是架构选择（绑定与否）的函数。",
+    "limitations": [
+      "未见类别组合仍崩（水果类挂账）",
+      "激活级观察，非权重级证明",
+      "份额数字必须写明口径（向量预算 vs 效应份额）"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-002",
+    "status": "candidate",
+    "title": "写入端分布式：L6 是软门不是开关（P8–P11）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO Phase 8–11（写入端组件预算）",
+    "run_ref": "",
+    "view_refs": [
+      "VIEW-coordinate_microscope"
+    ],
+    "evidence_level": "observed",
+    "question": "类别轴 B_cat 在 L6 一次性锁死（写入窗 patch@L5=+0.578 → patch@L6=+10.650，相邻最大增量 +10.072）——那 L6 内部是谁在搬这根轴？",
+    "narrative": "假设：存在主导写入组件。实验（向量预算精确可加分解，33 件划分）：MLP 是最大单一写入方但向量份额仅 0.472（未过半），最大头也只有 2.4× 公平份额；容量/必要性/充分性三个视角一致平坦 ⇒ 写入端分布式。关键口径课：效应份额（T 臂 0.739 给 MLP）与向量份额（0.472）方向一致但量级不同——不写明口径会得出误导性的'MLP 占 74%'。后续：L6 内无阈值增益 ⇒ 栈=软门而非开关；深端塌陷主因是方向失配而非幅度不足。教学点：读写两端都分布式时，'找到一个承重神经元'的搜索目标是错的。",
+    "limitations": [
+      "结论限单层（L6）写入窗",
+      "跨精度复现 7/9（A0_bf16 逐位复现 P8 锚）"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-003",
+    "status": "candidate",
+    "title": "一场否证：深度单调叙事的撤回与限定（P12–P16）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO Phase 12–16（深度剖面与否证）",
+    "run_ref": "",
+    "view_refs": [
+      "VIEW-full_coordinate_field"
+    ],
+    "evidence_level": "observed",
+    "question": "「越深越容易被推动」（rho(xhalf,depth)=−0.7833）是真的深度规律，还是采样造成的假象？",
+    "narrative": "P12 发现集报告强负相关 −0.7833；P16 用预注册确认集检验 G4，得到反号 +0.80 ⇒ 判 False。追查（A4 确认集 4 位点）：符号矛盾来自位点采样——确认集里 L34 最高（0.473），而发现集 18 位点把 L6–L30 的下降段也算了进来；两个符号'都对'，只是量了剖面的不同支。最终决断：rho=−0.7833 只在 L6–L30 成立；L32→L34 的 xhalf 回升带 [−0.0785,−0.0517] 完全排除 0，且是最大单跳（占总变程 58.9%）；可达域冻结为 REACH={ℓ: ρ≥0.10}。P12/13/14 的深度表述据此撤回。教学点：确认集反号不是灾难，是定位'陈述适用域'的探针；撤回要撤得精确——保留哪段、否定哪段、为什么。",
+    "limitations": [
+      "单模型（qwen3-4b）位点剖面",
+      "REACH 阈值 0.10 是约定不是推导"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-004",
+    "status": "candidate",
+    "title": "反号即信号：P17 对象错配的改判（P17–P21）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO Phase 17–21（写入向量谱与同对象复核）",
+    "run_ref": "",
+    "view_refs": [],
+    "evidence_level": "observed",
+    "question": "spearman(w, J) 为负（三臂 −0.5459/−0.7922/−0.6026）意味着「深端写入对行为无效」吗？",
+    "narrative": "P17 看似支持'深端写入无效'。P18 用同对象重算：spearman(w_all, |b_all|)（两者都是增量写入对象）= +0.9009/+0.6935/+0.8662——符号相反且幅度都大 ⇒ P17 的 P6 是对象错配（增量写入 Δ_inc,ℓ vs 累积差 d_ℓ）的产物，'深端写入对行为无效'改判为只在累积差对象上成立。同批成立：向量质心 com_V 落在 REACH 域右半（P3 PASS）；com_V 邻域 MLP 预算份额 >0.50（P5 PASS，≥2/3 臂）。教学点：相关系数换一个对照对象就反号——先审对象，再读符号；这是发现'对象错配'类错误的标准探针。",
+    "limitations": [
+      "判别力结论限主臂+对照臂设置",
+      "改判只覆盖累积差对象，不自动推广"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-005",
+    "status": "candidate",
+    "title": "K1 触发：审判式裁决如何关掉一条路线（R8/Q09）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO R8（K1 判决）+ Q09（死线双轨）",
+    "run_ref": "",
+    "view_refs": [],
+    "evidence_level": "generalization_checked",
+    "question": "「条件齿轮组=算子代数」这个提法，能通过未见组合的 logit 预测检验吗？",
+    "narrative": "K1 判据：3 模型 × 未见组合的 logit 预测误差 >5% 且不显著优于 B4 基线 ⇒ 放弃'算子代数'提法。R8 裁决数据：k* 处池化 margin −0.025202（不劣于基线），但读出层池化 margin +0.940920（2×MDE 0.386617）⇒ 3/3 模型否决；E_read 池化 0.373350 = 5% 门的 7.5×（逐模型 0.3316/0.3986/0.3898）。⇒ K1 触发，「条件齿轮组=算子代数」降级 descriptive；k* 为 model_specific（4b/14b/9b：k*=3，读出层 35/39/39）。Q09 把死线改为聚合统计+单模型否决权双轨。教学点：判定层=行为读出层；降级不是失败，是把陈述放回证据支持的范围内。",
+    "limitations": [
+      "k* 处通过但读出层失败——失败定位在端口，不在 k 的选择",
+      "提法降级为描述性，不否定齿轮组现象本身"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-006",
+    "status": "candidate",
+    "title": "基线先行：E_read 锁定与逐位复现（Q03/R9）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO R9（Q03 E_read 基线）",
+    "run_ref": "tests/deepseek/result/q03_result.json",
+    "view_refs": [],
+    "evidence_level": "generalization_checked",
+    "question": "后续所有 KPI 实验的比较基线，如何保证不是读数或转录误差？",
+    "narrative": "Q03 把 E_read 基线从三份冻结 collect.npz 现场重算：三模型 0.331615/0.398601/0.389835，池化 0.373350（sd 0.036408，n=3；bootstrap n=3/20000 次/seed 20261003）；5% 门 0/3，最小值 0.331615 = 门的 6.63×——基线远离'好'的门槛，这是后续一切实验的诚实起点。纪律三件套：① 三模型同一 held-out 指纹（跨模型共享同一面板族）；② collect.npz 锚逐位复现（drift 0.00e+00：0.331615=0.331615）；③ 队列 sealed 登记（q03_result.json）。教学点：基线必须先于任何干预实验锁定并锚定，否则后面的'改进'无从谈起；'逐位复现'是可检查的属性，不是口头承诺。",
+    "limitations": [
+      "n=3 模型级样本；扩 seed 后启用 percentile bootstrap（metric_dict.ci_methods）"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md",
+      "tests/deepseek/result/q03_result.json"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-007",
+    "status": "candidate",
+    "title": "装置纪律：SMOKE 门与幂等 design_sha（Q04/R10）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO R10（Q04 E_ar 装置）",
+    "run_ref": "tests/deepseek/result/q04_smoke_result.json",
+    "view_refs": [
+      "VIEW-full_coordinate_field"
+    ],
+    "evidence_level": "has_data",
+    "question": "正式测量前，如何证明装置本身没有漂移？",
+    "narrative": "Q04 建 E_ar(k) 装置：预注册 design_sha=33ddf69d（幂等——重跑同哈希）；SMOKE（qwen3-4b，180 cells，K=4，900 forwards）装置门 4/4，数字必看；独立复核 14 PASS/0 FAIL；面板指纹 panel_sha8=be17ef8a 冻结。Q05 复用装置前先过 D0 采集器等价门：Q05 SMOKE 的 E_ar(k) 与 Q04 逐位相同（max_abs_dev=0.00e+00）⇒ 采集器未漂移。教学点：装置与测量分离；每步哈希锚定（design_sha / res_sha8 / panel_sha8），'与装置逐字一致'是可检查的属性而不是纪律口号。",
+    "limitations": [
+      "SMOKE 是子面板（180/738 cells、K=4/16），不代替正式测量"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md",
+      "tests/deepseek/result/q04_smoke_result.json"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-008",
+    "status": "candidate",
+    "title": "E_ar(k) 正式测量：形状判决与精度桥（Q05/R11）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO R11（Q05 E_ar 正式测量）",
+    "run_ref": "tests/deepseek/result/q05_result.json",
+    "view_refs": [],
+    "evidence_level": "generalization_checked",
+    "question": "自回归 k 步预测的误差曲线长什么样——线性、饱和还是发散？量化臂的结果可信吗？",
+    "narrative": "硬前置：14B bf16≈29.55 GB > 本机 16 GB 显存，CPU offload 也不够（可用 RAM 18.6 GB）⇒ 量化是唯一可行路径，但必须先证明可比。精度策略：4b 走 bf16（与 E_read 同精度，精度净臂）；14B/9B 走 4-bit NF4（nf4+double_quant，compute_dtype=bf16）。D4 精度桥在 nf4 观测之前预注册（q05_prereg_bridge_v1.json）：同模型双精度 max_k|ΔE_ar_rel| ≤ 0.05；实测 max|Δrel| = 0.0489（k=8）⇒ PASS，nf4 臂可比。全面板 738 cells × K=16 × 4 臂（每臂 12546 forwards）：形状判决 4b=flat、14b=saturating、9b=flat；S_rel 最小值 0.6858/0.6939/0.7392；独立复核 47 PASS/0 FAIL。另发现：E_ar_rel 在常数预测者下地板≈0.8 ⇒ 门 0.05 位于平凡基线之下约 16×，是强否证型门。教学点：可行性约束（显存）不豁免可比性义务——桥先预注册，再测。",
+    "limitations": [
+      "结论以 D4 桥为条件",
+      "自回归口径=模型自身贪心 rollout（无 teacher forcing）",
+      "margin 竞争类在每 cell 的 k=0 处冻结"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md",
+      "tests/deepseek/result/q05_result.json"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-009",
+    "status": "candidate",
+    "title": "量纲纪律：跨指标比较先过量纲审计（方法案例）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO R11 限界 + Phase 8 口径课",
+    "run_ref": "",
+    "view_refs": [],
+    "evidence_level": "has_data",
+    "question": "E_ar 和 E_read 能直接比大小吗？两个 Phase 的份额数字能直接拼吗？",
+    "narrative": "反例一：E_ar 口径=原始 logit L1（不归一），E_read=归一化 MSE——量纲不同 ⇒ 只可并排读、以 rel 作桥（D4 桥正是用 ΔE_ar_rel 过的桥）。反例二：Phase 8 效应份额（T 臂 0.739 给 MLP）vs 向量份额（0.472）——分母口径不同，误引会得出'MLP 占 74%'的误导结论；引用必须写明口径。方法规则：任何跨 Phase/跨指标比较前先答三问——量的对象相同吗？分母相同吗？单位相同吗？任一不同就找桥（如 rel），找不到桥就并排读。教学点：数字漂移最常见的来源不是算错，而是口径混用。",
+    "limitations": [
+      "本案例是方法论纪律，不是新实验结果"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md"
+    ],
+    "created_at": "2026-10-03"
+  },
+  {
+    "kind": "case",
+    "id": "CASE-010",
+    "status": "candidate",
+    "title": "限界地图：研究诚实性的三张欠条（挂账案例）",
+    "phase_ref": "AGI_DEEPSEEK_MEMO 核心限界登记 + R 线挂账",
+    "run_ref": "",
+    "view_refs": [],
+    "evidence_level": "has_data",
+    "question": "这个项目明确知道自己做不到什么？",
+    "narrative": "三条核心限界（登记在案）：① 否定臂基线不成立——部分否证实验缺合适对照；② 未见类别仍崩——水果类未见组合是长期挂账；③ 激活级干预≠权重级证明——端口替换成功不等于参数级机制。配套的诚实读数：C_steer 代理证据预示可控率很低（cancel 反向加重 0.820；附带损伤地板 3.5/13）；承重轴 v1 剂量曲线无无害阈值（α 0.05→0.5 → 0.070/0.078/0.133/0.297/0.664）；3109 任意 100 维随机子空间 AUC 0.9997 ⇒ '指纹主干'重定义为不可被随机方向替代的稀疏结构（大面积功能等价端口类）。教学点：限界和挂账不是失败记录，是下一步实验的设计输入——Q06（C_steer 基座测量）正是从限界③与代理证据直接派生的队列条目。",
+    "limitations": [
+      "挂账条目随 Phase 推进动态变化，以 MEMO 最新状态为准"
+    ],
+    "source_refs": [
+      "research/deepseek/docs/AGI_DEEPSEEK_MEMO.md",
+      "research/deepseek/atlas/metric_dict.json"
+    ],
+    "created_at": "2026-10-03"
+  }
+]

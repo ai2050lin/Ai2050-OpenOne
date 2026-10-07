@@ -1,0 +1,51 @@
+PASS  E_ar recompute [qwen3-4b__bf16]                 max_dev=0.00e+00
+PASS  scale recompute [qwen3-4b__bf16]                
+PASS  E_ar_rel=E_ar/scale [qwen3-4b__bf16]            
+PASS  drift=E_ar(k)-E_ar(0) [qwen3-4b__bf16]          
+PASS  D3 liveness (all finite) [qwen3-4b__bf16]       
+PASS  S1 gate recompute [qwen3-4b__bf16]              max=8.0640 thr=0.05
+PASS  panel_sha8 == recompute [qwen3-4b__bf16]        be17ef8a
+PASS  res_sha8 recompute [qwen3-4b__bf16]             12065c5d (生产者键型约定)
+PASS  design_sha idempotent [qwen3-4b__bf16]          9413604b
+PASS  execution.model==arm model [qwen3-4b__bf16]     
+PASS  E_ar recompute [qwen3-4b__nf4]                  max_dev=0.00e+00
+PASS  scale recompute [qwen3-4b__nf4]                 
+PASS  E_ar_rel=E_ar/scale [qwen3-4b__nf4]             
+PASS  drift=E_ar(k)-E_ar(0) [qwen3-4b__nf4]           
+PASS  D3 liveness (all finite) [qwen3-4b__nf4]        
+PASS  S1 gate recompute [qwen3-4b__nf4]               max=6.7241 thr=0.05
+PASS  panel_sha8 == recompute [qwen3-4b__nf4]         be17ef8a
+PASS  res_sha8 recompute [qwen3-4b__nf4]              9fb76898 (生产者键型约定)
+PASS  design_sha idempotent [qwen3-4b__nf4]           7432cad1
+PASS  execution.model==arm model [qwen3-4b__nf4]      
+PASS  E_ar recompute [qwen3-14b__nf4]                 max_dev=0.00e+00
+PASS  scale recompute [qwen3-14b__nf4]                
+PASS  E_ar_rel=E_ar/scale [qwen3-14b__nf4]            
+PASS  drift=E_ar(k)-E_ar(0) [qwen3-14b__nf4]          
+PASS  D3 liveness (all finite) [qwen3-14b__nf4]       
+PASS  S1 gate recompute [qwen3-14b__nf4]              max=5.9105 thr=0.05
+PASS  panel_sha8 == recompute [qwen3-14b__nf4]        be17ef8a
+PASS  res_sha8 recompute [qwen3-14b__nf4]             ff92ceee (生产者键型约定)
+PASS  design_sha idempotent [qwen3-14b__nf4]          2baa6a7e
+PASS  execution.model==arm model [qwen3-14b__nf4]     
+PASS  E_ar recompute [glm4-9b__nf4]                   max_dev=0.00e+00
+PASS  scale recompute [glm4-9b__nf4]                  
+PASS  E_ar_rel=E_ar/scale [glm4-9b__nf4]              
+PASS  drift=E_ar(k)-E_ar(0) [glm4-9b__nf4]            
+PASS  D3 liveness (all finite) [glm4-9b__nf4]         
+PASS  S1 gate recompute [glm4-9b__nf4]                max=5.5282 thr=0.05
+PASS  panel_sha8 == recompute [glm4-9b__nf4]          be17ef8a
+PASS  res_sha8 recompute [glm4-9b__nf4]               251f701a (生产者键型约定)
+PASS  design_sha idempotent [glm4-9b__nf4]            1c2cd13f
+PASS  execution.model==arm model [glm4-9b__nf4]       
+PASS  K identical across arms                         {16}
+PASS  n_cells identical (=738)                        {738}
+PASS  D0 q05-smoke == q04-smoke (bit)                 max_dev=0.00e+00
+PASS  agg res_sha8 recompute                          775d7dce (生产者键型约定)
+PASS  D4 bridge recompute                             max|Δrel|=0.0489 thr=0.05 -> PASS
+PASS  agg arm count = 4                               ['qwen3-4b__bf16', 'qwen3-4b__nf4', 'qwen3-14b__nf4', 'glm4-9b__nf4']
+PASS  forwards = 12546 per arm                        {12546}
+
+NOTE  res_sha8 复核按**生产者键型约定**（曲线字典用整数键、per_seed 用字符串键）；该约定非 JSON 往返稳定，已在 q05 脚本与本文件注明。数据级复核独立于该约定（E_ar 由 per_seed 重算，max_dev=0）。
+TOTAL  PASS=47  FAIL=0
+VERDICT = ALL_PASS

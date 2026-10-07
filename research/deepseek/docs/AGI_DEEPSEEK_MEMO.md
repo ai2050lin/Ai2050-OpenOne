@@ -7360,3 +7360,52 @@ Qwen 系是**绑定**的（一个词向量既当输入又当输出），所以"�
 - 挂账不变：N 线 P3–P7 补 Ledger；跨线账本补丁（C4/C6）施加确认；N2h1-α-1 权重级；水果类；K4。
 - **并发写者事件**：本 Phase 追加前后检测到 MEMO 被他线写入（`14c3da2e`/709594 B → `b26f5bd1`/709649 B；bare_lf 45→0，Phases 仍 33–38）。本 Phase 仅 append，未触碰前文。
 
+## Phase 40: Q06 C_steer 基座测量 —— v1 承重轴 x 端口替换 = 0/376，方向减法禁令下的首张「诚实总成绩」读数（B 闸门；gpu=mid；qwen3-4b bf16）[2026-10-07 08:10]
+
+**已执行**（停电恢复后续研：预注册 ebf960cf 于 2026-10-03 22:36 冻结，本轮 annex v2 -> SMOKE -> 正式 -> 复核 -> seal）。
+
+### 1. 目标与状态
+- 队列 Q06（I7 可控性标准）：把「抽取机制 -> 控制行为 + 无附带损伤」从描述回路升级为可测基准。
+- 状态：**sealed**。result `tests/deepseek/result/q06_result.json`（res_sha8=5f88ed7e）；独立复核 **16 PASS / 0 FAIL**（`tests/deepseek_temp/Phase40/verify_q06.txt`）。
+
+### 2. 原理与算法
+- **算子 = readout-substitution（端口替换）**：$h \leftarrow h + (t - h\cdot v)\,v = h + \mathrm{d}t\cdot v$，位点 = L29 层输出（NL=36，非末层），替换「(层,方向) 的读出口」而非减去方向——方向减法在本系统非法（M15 cancel 0.820 反向加重；metric_dict.intervention_rules）。
+- **承重轴 v1（qwen3-4b 同构移植定义）**：seed7 train fold（197 pairs x 3 tpl = 591 行）TPL_P0 前缀 last-position 的 L29 残差流 H；加性分解 X=[onehot(41)+onehot(6)+onehot(3)+bias]（ridge λ=1e-3）；交互残差 R=H−Xb；**v1 = SVD(R) 第一右奇异向量**（sv_share=0.1133，μ29=6.1809，σ29=30.8793）。与 gpt5 线 M14（GLM4）为同构移植——跨模型坐标不对应（AGENTS.md §3），先验性质（无无害阈值）引自 R7。
+- **剂量**：dt = sgn·α·σ，α∈{0.05,0.10,0.15,0.25,0.50}（预注册五点半调），sgn∈{+1,−1}；t = s + dt（v2：相对当前分量的 push/pull，对齐 M14 幅度语义）。
+- **对照**：identity 恢复臂（t=s，两 prompt 口径硬断言逐位恒等）+ 随机方向同规则（|cos(v1,vr)|=0.0115）。
+- **行为读数**：单次前向 last-position 6 类类名首 token logits（Q04 k=0 同构；panel sha8 be17ef8a 逐字同面板）；target = true_class（per-cell）；eligible = base argmax ≠ true（376/441）。
+- **collateral**：13 探针句拼接于主体后（探针读数位 = 各 P0 段末位，经注意力被主体替换波及）；collateral(i,c) = 干预后错误数 − 同 cell 无干预基线错误数（v1 操作化，冻结）。
+- **C_steer** = #{(i,c): argmax_after = true_class 且 collateral = 0} / N_eligible。
+
+### 3. annex v2 修订（SMOKE v1 抓出，正式前冻结——坑 26/28 合规路径）
+- SMOKE v1（design 329e0115）：base argmax==true 仅 8.3%% ⇒ 「c'=base 第二高类」退化为常量目标；t=μ+ασ 对 z≈0 cell 替换动量退化（argmax 0/72 移动）。
+- 修订 R1 t 规则（→s+sgn·α·σ）、R2 target（→true_class）、R3 G2 门（→可计算性 + G2b 灵敏度）；未动 collateral 定义/KPI 公式/α 网格/减法禁令。SMOKE v2 全门 PASS 后开正式。
+
+### 4. 实际结果（441 cells = 3 seeds x 147 held-out 行；19,404 前向，12.2 min）
+| 量 | 值 |
+|---|---|
+| **C_steer_main（10 配置取 max）** | **0.0000（0/376，全部配置 0/376）** |
+| rand 同规则对照 | 0.0000（spec_diff = 0.0） |
+| Wilson95（主读数） | [0, 0.0101] —— 真实 C_steer ≤ 1.0%（95% 置信） |
+| 灵敏度 | argmax moved 9/4410（0.20%）；maxd ∈ [0.0312, 0.9375] logit |
+| collateral | mean 0.008 / max 1 / frac_zero 0.9327（操作干净，非打脏造成的 0 分） |
+| identity 硬断言 | 两 prompt 口径 max|Δ| = 0.0e+00（全 441 cell） |
+| 拼接基线 err_base | 11.31/13（6 类 argmax 口径；历史 3.5/13 口径源文件失传，不可逐字比） |
+
+### 5. 分析结论（严格审视）
+1. **承重轴 v1 + 端口替换不能实现类翻转控制**：C_steer = 0（上界 1.0%%）。v1 是全局形态/幅度方向（gpt5 线 3148/3149 定案），**不携带类身份杠杆**——maxd ≤ 0.94 logit 压不过 6 类先验的头部优势（base argmax 恒水果类）。
+2. **0 分是「定向杠杆缺失」而非「操作脏」**：同算子 collateral 干净（frac_zero 93.3%%）+ rand 对照同 0（spec_diff=0）⇒ 干预通路本身无损，缺的是方向特异性。
+3. **与 M14 的非对称补全承重轴画像**：clip（去除）α=0.5 破坏 66%% 生成（多步累积），push/pull 替换（单点）只动 <1 logit——**「破坏容易、定向控制难」：v1 承载生成稳定性，不承载类内容**。这是控制语义下 M14+M15 的合并推论。
+4. 硬伤：① target 语义仅「翻转到真值类」一种（Q20 扩 target 族）；② 单点替换 vs decode 多步累积——可能系统性低估干预力（但预注册冻结了 Q04 k=0 同构口径）；③ v1 为移植定义，与 GLM4 的 v1 非同一根轴，跨模型比较不成立；④ eligible 376/441 中 65 个免测 cell 偏水果类。
+
+### 6. 机制拼图与理论更新
+- **I7 兑现**：这个 0 分就是「破解整体机制」诚实总成绩的第一格——已抽取的 1 根承重轴距「可控」的距离被定量化为 0/376（Wilson 上界 1%%）。
+- **条件齿轮组视角**：类身份控制不是单轴幅度问题 ⇒ 支持多轴/组合干预路线（Q17 承重轴族剂量、Q24 机制解释、Q20 正式化扩 target+组合算子）。
+- **KPI 账**：E_read=0.331615（Q03 锁定，未变）、E_ar=Q05 已测（775d7dce，未变）、C_steer=0.0（首测新增）⇒ **未降低任何全局 KPI ⇒ Ledger 登记 catalog（n=306），不得登记 advance**。
+
+### 7. 后续与资源
+- 下一步 = **Q07 KPI 曲线 v0 汇总**（zero GPU：Q03–Q06 + 历史判决 -> 第一张单调曲线）；Q17/Q24 复用本装置；Q20 正式化扩 target 族。
+- 产物：脚本 `tests/deepseek/Phase40/`（q06_steer_base.py / run_phase40.py / verify_q06.py / closeout_q06.py）；报告与明细 `tests/deepseek_temp/Phase40/`（smoke/ 隔离）；result `tests/deepseek/result/q06_{execution,result}.json`；v1 轴 npz + detail 落 Phase40 temp。
+- 队列 Q06 -> sealed（sealed_at 2026-10-07 08:05）；挂账不变：N 线 P3–P7 补 Ledger、跨线账本补丁施加确认、N2h1-α-1 权重级、水果类、K4。
+
+锚：result sha8=5f88ed7e，design sha8=7130906b（formal）/6d98d580（smoke），prereg=ebf960cf，panel=be17ef8a，vhat=d0c6eb7b，ledger n=306。

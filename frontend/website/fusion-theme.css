@@ -1,0 +1,741 @@
+/* ============================================================
+   AI2050 官网 —— 融合工作台（/rdc-fusion）风格主题层
+   设计语言取自 rdc_fusion.css 实测 token：
+   slate 文字体系 / #e2e8f0 边框 / sky#0284c7 主强调 / emerald#34d399 状态
+   mono 数字与标签 / 白面板+轻阴影 / 渐变 logo 标 / 紧凑控制台质感
+   本文件在 styles.css 之后加载，仅覆写视觉皮肤，不改布局结构
+   ============================================================ */
+
+:root {
+  --ink: #1e293b;
+  --muted: #475569;
+  --line: #e2e8f0;
+  --blue: #0284c7;
+  --blue-deep: #0369a1;
+  --sky: #e0f2fe;
+  --silver: #f8fafc;
+  --white: #ffffff;
+  --shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --em: #34d399;
+  --em-deep: #059669;
+  --indigo: #6366f1;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+/* ---------- 基底 ---------- */
+body {
+  font-family: "Segoe UI", system-ui, "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 88% 4%, rgba(14, 165, 233, 0.05), transparent 30rem),
+    radial-gradient(circle at 6% 42%, rgba(52, 211, 153, 0.04), transparent 26rem),
+    var(--silver);
+}
+
+h1 {
+  color: #0f172a;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+}
+
+::selection {
+  background: rgba(14, 165, 233, 0.22);
+}
+
+/* ---------- 顶栏（融合 topbar：紧凑 56px） ---------- */
+.site-header {
+  min-height: 56px;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(14px);
+}
+
+.brand {
+  gap: 0.6rem;
+}
+
+.brand::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.35);
+}
+
+.brand-word {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.nav-links {
+  gap: 1.7rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.nav-links a {
+  padding: 1.2rem 0;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--blue);
+}
+
+/* ---------- 按钮（融合 fw-tbtn / fw-tbtn.primary） ---------- */
+.header-action,
+.primary-button,
+.ghost-button {
+  min-height: 32px;
+  padding: 0 0.95rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.header-action,
+.primary-button {
+  color: #fff;
+  background: var(--blue);
+  box-shadow: none;
+}
+
+.header-action:hover,
+.primary-button:hover {
+  background: #0ea5e9;
+}
+
+.header-action::after,
+.primary-button::after {
+  margin-left: 0.45rem;
+  opacity: 0.72;
+}
+
+.ghost-button {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  background: #fff;
+}
+
+.ghost-button:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.home-shell .hero .primary-button {
+  border: 1px solid var(--blue);
+  color: #fff;
+  background: var(--blue);
+  box-shadow: none;
+}
+
+.header-action.dark,
+.dark {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  background: #fff;
+  box-shadow: none;
+}
+
+.header-action.dark:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* ---------- 首页 Hero（融合 fw-hero 渐变） ---------- */
+.hero::before {
+  background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
+}
+
+.visual-glow {
+  border-color: rgba(14, 165, 233, 0.25);
+  box-shadow:
+    inset 0 0 70px rgba(14, 165, 233, 0.1),
+    0 0 90px rgba(52, 211, 153, 0.12);
+}
+
+/* ---------- 栏目卡（融合 fw-entry：白面板 + 悬浮上移） ---------- */
+.programs {
+  gap: 14px;
+}
+
+.program-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: none;
+  transition: all 0.15s;
+}
+
+.program-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+  transform: translateY(-1px);
+}
+
+.program-index {
+  font-family: var(--mono);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.program-index::after {
+  width: 34px;
+  height: 1px;
+  background: #0ea5e9;
+}
+
+.program-image {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.9)),
+    linear-gradient(135deg, #f8fafc, #e0f2fe);
+}
+
+/* 变体背景必须在 base 之后重声明：否则本层 base 的 background 简写
+   会覆盖 styles.css 中 .horizon/.brain/.forum 的 url() 栏目图 */
+.horizon {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.84)),
+    url("assets/home_plan.png") center / cover no-repeat;
+}
+
+.brain {
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.06), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.9)),
+    url("assets/home_agi.png") center / cover no-repeat;
+}
+
+.forum {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.86)),
+    url("assets/home_forum.png") center / cover no-repeat;
+}
+
+.lighthouse {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.96)),
+    url("assets/home_support.png") center / cover no-repeat;
+}
+
+/* ---------- 页脚 ---------- */
+.site-footer {
+  background: #fff;
+  border-top: 1px solid var(--line);
+}
+
+.footer-brand p,
+.footer-col a {
+  color: #64748b;
+}
+
+.footer-col a:hover {
+  color: var(--blue);
+}
+
+.footer-bottom {
+  color: #94a3b8;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- 子页 Hero 与装饰视觉 ---------- */
+.sub-hero h1 {
+  color: #0f172a;
+}
+
+.project-link-bar {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: #334155;
+  background: #fff;
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.project-link-bar a {
+  color: var(--blue);
+}
+
+/* ---------- AI2050 计划页（手风琴计划清单） ---------- */
+.plan-section {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.plan-item-detail {
+  background: #f8fafc;
+}
+
+.plan-detail-visual {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #eff6ff;
+}
+
+.num {
+  border: 1px solid var(--line);
+  color: var(--blue);
+  background: #f0f9ff;
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.row-arrow {
+  border: 1px solid var(--line);
+  color: #94a3b8;
+}
+
+.plan-item.is-expanded .row-arrow {
+  color: var(--blue);
+}
+
+/* ---------- 图标圆片（融合调色） ---------- */
+.blue { color: #0369a1; background: #e0f2fe; }
+.green { color: var(--em-deep); background: #ecfdf5; }
+.orange { color: #d97706; background: #fffbeb; }
+.purple { color: var(--indigo); background: #eef2ff; }
+
+/* ---------- AGI 研究页（路线 / 进展面板） ---------- */
+.route-panel,
+.progress-panel,
+.join-band {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.route-steps span {
+  font-family: var(--mono);
+  color: var(--blue);
+}
+
+.route-visual span {
+  border: 1px solid var(--line);
+  color: #475569;
+  background: #fff;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.route-pyramid {
+  background:
+    linear-gradient(rgba(2, 132, 199, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 132, 199, 0.15) 1px, transparent 1px),
+    linear-gradient(180deg, #f8fafc, #e0f2fe);
+  box-shadow: 0 16px 50px rgba(2, 132, 199, 0.1);
+}
+
+.formula-strip,
+.research-callout {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #334155;
+  background: #fff;
+}
+
+.route-panel .formula-strip {
+  border: 0;
+  background: transparent;
+}
+
+.research-callout {
+  border: 0;
+  background: transparent;
+  color: #0f172a;
+}
+
+.research-callout::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--em);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
+}
+
+.progress-panel .progress-list article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.progress-arrow {
+  color: #0ea5e9;
+}
+
+.progress-percent {
+  color: #0f172a;
+  font-family: var(--mono);
+}
+
+/* ---------- About 页（使命 / 原则 / 加入） ---------- */
+.join-band h2 {
+  color: #0f172a;
+}
+
+.stats-grid {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.stats-grid b {
+  font-family: var(--mono);
+  color: var(--blue);
+}
+
+/* ---------- 行业进展页 ---------- */
+.industry-page {
+  --industry-navy: #0f172a;
+  --industry-cyan: #0ea5e9;
+  --industry-violet: #6366f1;
+}
+
+.industry-page .eyebrow,
+.eyebrow {
+  font-family: var(--mono);
+  color: var(--blue);
+  letter-spacing: 0.14em;
+}
+
+.industry-hero {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: #1e293b;
+  background: linear-gradient(120deg, #fff 55%, #eff6ff);
+  box-shadow: none;
+}
+
+.industry-hero::before {
+  background-image:
+    linear-gradient(rgba(2, 132, 199, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 132, 199, 0.05) 1px, transparent 1px);
+}
+
+.industry-hero .eyebrow {
+  color: var(--blue);
+}
+
+.industry-hero h1 {
+  color: #0f172a;
+}
+
+.industry-page .industry-lead {
+  border-left: 3px solid var(--em);
+  color: #334155 !important;
+}
+
+.industry-page .industry-lead-label {
+  color: var(--blue);
+  font-family: var(--mono);
+}
+
+.evidence-date {
+  color: #94a3b8 !important;
+  font-family: var(--mono);
+}
+
+/* 雷达视觉 */
+.radar-ring {
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+.radar-ring::before,
+.radar-ring::after {
+  background: rgba(14, 165, 233, 0.18);
+}
+
+.radar-core {
+  border: 1px solid #bae6fd;
+  background: radial-gradient(circle, #ffffff, #e0f2fe);
+  box-shadow: 0 10px 30px rgba(2, 132, 199, 0.15);
+}
+
+.radar-core strong {
+  color: #0369a1;
+  font-family: var(--mono);
+}
+
+.radar-core span {
+  color: #64748b;
+  font-family: var(--mono);
+}
+
+.radar-node {
+  border: 1px solid var(--line);
+  color: #334155;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.radar-node::before {
+  background: #0ea5e9;
+  box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.12);
+}
+
+.company-heading {
+  border-bottom: 1px solid var(--line);
+}
+
+/* 实验室卡：左栏深色档位换融合三色（sky / indigo / emerald） */
+.company-progress .lab-card {
+  border: 1px solid var(--line);
+  border-top-width: 1px;
+  border-radius: 10px;
+  background: #fff;
+  transition: all 0.15s;
+}
+
+.company-progress .lab-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+}
+
+.company-progress .openai-card .lab-profile {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(125, 211, 252, 0.38), transparent 13rem),
+    linear-gradient(150deg, #0c4a6e, #0284c7);
+}
+
+.company-progress .deepmind-card .lab-profile {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(165, 180, 252, 0.32), transparent 13rem),
+    linear-gradient(150deg, #312e81, #6366f1);
+}
+
+.company-progress .anthropic-card .lab-profile {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(110, 231, 183, 0.3), transparent 13rem),
+    linear-gradient(150deg, #065f46, #10b981);
+}
+
+.lab-index {
+  border-radius: 8px;
+  font-family: var(--mono);
+  background: var(--blue);
+}
+
+.deepmind-card .lab-index { background: var(--indigo); }
+.anthropic-card .lab-index { background: var(--em-deep); }
+
+.deepmind-card header p { color: #4f46e5; }
+.anthropic-card header p { color: var(--em-deep); }
+
+/* 时间线（mono 年份 + 融合三色节点） */
+.lab-timeline li {
+  border-left: 1px solid var(--line);
+}
+
+.company-progress .lab-timeline li {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.company-progress .lab-timeline li::before {
+  background: #0ea5e9;
+  box-shadow: 0 0 0 1px #0ea5e9;
+}
+
+.company-progress .deepmind-card .lab-timeline li::before {
+  background: var(--indigo);
+  box-shadow: 0 0 0 1px var(--indigo);
+}
+
+.company-progress .anthropic-card .lab-timeline li::before {
+  background: var(--em);
+  box-shadow: 0 0 0 1px var(--em);
+}
+
+.company-progress .lab-timeline time {
+  font-family: var(--mono);
+  color: #0369a1;
+}
+
+.company-progress .deepmind-card .lab-timeline time { color: #4f46e5; }
+.company-progress .anthropic-card .lab-timeline time { color: var(--em-deep); }
+
+.lab-takeaway {
+  border-left: 3px solid var(--em);
+  color: #334155;
+  background: #ecfdf5;
+}
+
+.research-focus span {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #475569;
+  background: #f1f5f9;
+}
+
+.company-progress .research-focus span {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* 拼图 / 阶段 / 审计（融合面板化） */
+.puzzle-section {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f1f5f9;
+}
+
+.puzzle-grid article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.puzzle-grid article > span {
+  font-family: var(--mono);
+  color: var(--blue);
+}
+
+.puzzle-grid strong {
+  color: #0369a1;
+  font-family: var(--mono);
+}
+
+.industry-analysis {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.analysis-stage-grid article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.analysis-stage-grid article > span {
+  font-family: var(--mono);
+  color: var(--blue);
+}
+
+.analysis-stage-grid h3 {
+  color: #0f172a;
+}
+
+.analysis-stage-grid p {
+  color: #64748b;
+}
+
+.claim-audit {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.claim-audit-head {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+.claim-audit-head span {
+  color: var(--blue);
+  font-family: var(--mono);
+}
+
+.claim-audit article {
+  border-bottom: 1px solid var(--line);
+}
+
+.claim-audit h3 {
+  color: #1e293b;
+}
+
+.claim-audit p {
+  color: #64748b;
+}
+
+.claim-status {
+  font-family: var(--mono);
+  border: 1px solid transparent;
+}
+
+.claim-status.no-evidence { color: #475569; background: #f1f5f9; border-color: #e2e8f0; }
+.claim-status.overreach { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+.claim-status.contradicted { color: #0369a1; background: #e0f2fe; border-color: #bae6fd; }
+
+/* ---------- 二级导航（融合分段控件 fw-mode-seg） ---------- */
+.research-subnav {
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f1f5f9;
+  box-shadow: none;
+}
+
+.research-subnav a {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.research-subnav a:hover {
+  color: #1e293b;
+  background: transparent;
+}
+
+.research-subnav a.active {
+  color: #1e293b;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.company-jump-nav a {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: #475569;
+  background: #fff;
+  font-weight: 600;
+}
+
+.company-jump-nav a span {
+  font-family: var(--mono);
+  color: var(--blue);
+}
+
+.company-jump-nav a:hover {
+  border-color: var(--blue);
+  color: #1e293b;
+}
+
+/* ---------- 参与讨论页 ---------- */
+.code-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.code-card h3 {
+  color: #0f172a;
+}
+
+.refresh-btn {
+  min-height: 32px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  background: #fff;
+  font-size: 0.82rem;
+}
+
+.refresh-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}

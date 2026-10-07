@@ -1,0 +1,127 @@
+=== [1] ledger 类文件清单 ===
+  research/gpt5/atlas/atlas_ledger.json                                                          753723 B  bbda63df
+  research/gpt5/atlas/atlas_ledger_v1_backup.json                                                 21877 B  9d934052
+  research/gpt5/atlas/cleanup_ledger_20260930.json                                                 2529 B  6e5a22a2
+  tests/glm5/result/client_visualization_assets/pattern_family_atlas/v2/phase358_expanded_ledger_summary.json     1086 B  92c41639
+  tests/glm5/result/gpt5_comprehensive_review_20260923/claim_ledger.json                         116634 B  035b7790
+  tests/glm5/result/phase2676_native_mlp_delivery/analysis/next_ledger_algebra_preflight.json      1429 B  12f0a10d
+  tests/glm5/result/rdc_binding_campaign_20260912/compute_ledger.json                              7183 B  c9a2bf13
+  tests/glm5/result/rdc_continuity_campaign_20260909/g_generation/ledger_protocol.json              625 B  5bc105e5
+  tests/glm5/result/rdc_continuity_campaign_20260909/g_generation/ledger_result.json               1600 B  6b9ac037
+  tests/glm5/result/rdc_framework_audit_20260923/claim_ledger.json                                 6252 B  24ebaa6e
+  tests/glm5/result/rdc_joint_atlas_20260911/compute_ledger.json                                   4161 B  c6183956
+  tests/glm5/result/rdc_law_campaign_20260911/compute_ledger.json                                  7758 B  36a7cd17
+  tests/glm5/result/rdc_operator_atlas_20260911/compute_ledger.json                                8956 B  42c45dbe
+  tests/glm5/result/rdc_query_campaign_20260913/compute_ledger.json                                9307 B  18346ea5
+  tests/glm5/result/rdc_query_construction_20260913/compute_ledger.json                           28674 B  61479de0
+  tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json    38389 B  9a3c6ff4
+  tests/glm5/result/rdc_six_puzzles_audit_20260923/claim_ledger.json                              11607 B  c7dd332d
+  tests/glm5/result/rdc_update_campaign_20260913/compute_ledger.json                               8668 B  ff2bca31
+  合计 18 个
+
+=== [2] atlas_ledger.json 元字段 ===
+  bytes     = 753723
+  sha8(raw) = bbda63df
+  has_crlf  = False
+  has_bom   = False
+  顶层键    = ['format', 'version', 'model', 'protocol_family', 'axes', 'blocks', 'headsets', 'measurements', 'growth_curve', 'linkage', 'errata_ledger', 'quadrants', 'transfer', 'negatives', 'model_namespace', 'migration_history', 'ledger_sha256_8', 'schema_version']
+    format                     'tma-atlas-ledger'
+    version                    2
+    model                      'qwen3-4b'
+    protocol_family            'LPF v5.3'
+    axes                       list(6)
+    blocks                     list(23)
+    headsets                   list(4)
+    measurements               list(304)
+    growth_curve               list(26)
+    linkage                    list(14)
+    errata_ledger              list(9)
+    quadrants                  list(4)
+    transfer                   dict {"source": {"meas_id": "M2881_joint_coords", "phase": 2881}, "matrix_rows=fa_dirs_cols=fb_words": {"class": {"class": 0.9625, "attr": 0.9286, "syntax": 0.9792}, "attr": {"class": 0.975, "attr": 0.9524, "syntax": 0.8958}, "syntax": {"class": 0.9, "attr": 0.7619, "syntax": 0.8542}}, "family_centroid_cos": [[1.0, -0.6475, -0.3283], [-0.6475, 1.0, -0.1436], [-0.3283, -0.1436, 1.0]], "interpretation": 
+    negatives                  list(13)
+    model_namespace            dict {"primary": "qwen3-4b", "protocol_family": "LPF v5.3", "pending_replication": ["ds7b", "glm4", "gemma4"], "rule": "cross-model entries must carry a model field; ids unique within one model, same id may coexist across models in ledgers/<model>/ sub-files", "active": ["ds7b", "glm4", "qwen25_3b"], "pending": [], "glm4_note": "glm4-9b-chat-hf: glm arch 40L, hidden 4096, untied, vocab 151552; window [
+    migration_history          list(9)
+    ledger_sha256_8            '41d65a13'
+    schema_version             3
+  measurements[0] keys = ['meas_id', 'type', 'verdict', 'source', 'evidence_level', 'model_scope', 'n_rows', 'prereg_id', 'superseded_by']
+  measurements 首条 = {"meas_id": "M2857_drift", "type": "vocab_stability", "verdict": "subset_incompatibility; prototype gradient real", "source": {"path": "phase2857/drift_audit/result.json", "sha256_8": "eb702ec4", "phase": 2857}, "evidence_level": "statistical", "model_scope": "glm4-9b", "n_rows": null, "prereg_id": "p2857", "superseded_by": null}
+  末三条:
+    {"phase": 19, "name": "n2h1a12_quant_scheme_robustness_qwen3_4b_glm4_9b_bf16", "seal_sha8": "7a9e5cd2", "exec_sha8": "98af7b43", "result_sha8": "c0b05a26", "probe_sha8": "170aa967", "evidence_level": "statistical", "model_scope": "qwen3-4b + glm4-9b-chat-hf (nf4 vs bf16); Qwen3-14B calibration-only", "n_rows": 172, "n_forwards_per_arm": {"A0_nf4": 43, "A0_bf16": 43, "A1_nf4": 43, "A1_bf16": 43}, "
+    {"phase": 20, "name": "n2h1a13_behavioural_and_profile_quant_scheme_robustness_qwen3_4b_glm4_9b_bf16", "seal_sha8": "38cfbcd6", "exec_sha8": "fae678da", "result_sha8": "66207601", "probe_sha8": "5eb86edc", "evidence_level": "statistical", "model_scope": "qwen3-4b + glm4-9b-chat-hf (nf4 vs bf16); Qwen3-14B excluded from the bf16 leg", "n_rows": 55712, "n_forwards_per_arm": {"A0_nf4": 13586, "A0_bf1
+    {"phase": 21, "name": "n2h1a14_component_vector_budget_and_weight_capacity_quant_scheme_robustness_qwen3_4b_glm4_9b", "seal_sha8": "bea6d415", "exec_sha8": "9205d12c", "result_sha8": "2f2200f1", "probe_sha8": null, "evidence_level": "statistical", "model_scope": "qwen3-4b + glm4-9b-chat-hf (nf4 vs bf16); Qwen3-14B excluded", "n_rows": 164, "n_forwards_per_arm": {"A0_nf4": 1052, "A0_bf16": 1052, "A
+  measurements n=304 phase 范围 8..3153
+  含 N 线条目数（粗筛）= 35
+
+=== [3] 自声明 ledger_sha256_8 语义复现（目标 41d65a13） ===
+  自声明 ledger_sha256_8 = '41d65a13'
+  候选数 = 25
+  命中目标 '41d65a13' 的候选 = （无 -> 自声明哈希非当前内容语义，需另立 schema）
+  部分候选抽样:
+    dumps(d,ea=True,ind=None)                      e436e47c
+    dumps(d,ea=True,ind=None)+CRLF                 e436e47c
+    dumps(d,ea=True,ind=1)                         a8ad8689
+    dumps(d,ea=True,ind=1)+CRLF                    44ba9a72
+    dumps(d,ea=True,ind=2)                         3314423c
+    dumps(d,ea=True,ind=2)+CRLF                    708aae4e
+    dumps(d,ea=False,ind=None)                     262f47a8
+    dumps(d,ea=False,ind=None)+CRLF                262f47a8
+    dumps(d,ea=False,ind=1)                        bbda63df
+    dumps(d,ea=False,ind=1)+CRLF                   1131ae96
+    dumps(d,ea=False,ind=2)                        dcd82a0c
+    dumps(d,ea=False,ind=2)+CRLF                   8240d415
+
+=== [4] proposition_ledger.json ===
+  候选: ['tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json']
+  --- tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json (38389 B, sha8 9a3c6ff4) ---
+    phase                    3103
+    name                     'omega_p101_formula_audit'
+    grade_key                'A=bit-level recompute; B=supported-in-scope; C=candidate; D=downgraded; E=withdrawn'
+    grade_distribution       dict keys=['B', 'D', 'E', 'C', 'A']
+    propositions_review      list(57)
+    propositions_new         list(5)
+    consumer_check           dict keys=['2759', '2861', '2906', '3036', '3045', '3075', '3089']
+    [propositions_review] 元素键 = ['claim', 'grade', 'id', 'phases', 'retain', 'review_verdict']
+    [propositions_review] 按 grade 计数 = {'B+D': 9, 'B': 10, 'E': 3, 'C+D': 2, 'B+C': 3, 'C': 6, 'D': 6, 'E+B': 6, 'B+E': 4, 'E+D': 1, 'D+E': 2, 'D+B': 1, 'C+E': 1, 'E+A': 2, 'E+C': 1}
+    [propositions_new] 元素键 = ['claim', 'evidence', 'grade', 'id', 'phases']
+    [propositions_new] 按 grade 计数 = {'A': 3, 'B': 1, 'C': 1}
+
+=== [5] MEMO 3103 节（命题账本） ===
+  标题 = ## Phase 3103: Ω-P101 RDC 命题级证据分级账本——[2026-09-23 06:07]
+  行范围 = 13214..13243
+    |## Phase 3103: Ω-P101 RDC 命题级证据分级账本——[2026-09-23 06:07]
+    |
+    |62 命题 A5/B34/C14/D21/E20，反例传播核查与框架底座定版（formula_audit，免前向）
+    |
+    |**性质**：T1 大任务（清理理论依赖链）落地。对审查报告 R01–R57 全部主张 + 3101–3103 新命题建立**命题级账本**（审查第 7 节"后续否证未传播到总框架"硬伤的直接修复）。产物：`tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/`（proposition_ledger.json sha8=
+    |
+    |### 1. 等级体系与分布
+    |A=bit 级/独立重算复现；B=限域内成立（方法正确）；C=候选观察待验；D=降级（表述/解释错误但局部材料可用）；E=撤回（反证/作废）。**62 条命题：A=5，B=34，C=14，D=21，E=20**（含复合等级按分量计）。分布解读：约 55% 命题（A+B）可作为有效依赖引用；21 条 D 级须用"可保留基础"栏的修订形式引用；20 条 E 级禁止进入新推理链。
+    |
+    |### 2. A 级新命题（本会话新增的最高等级证据）
+    |- **PA-01**（3101）：3093 干预语义 = 全 V 流替换——变体探针 bit 级 1e-12 + 3101 复刻 d2b=0、med_c=0.5104 一致。
+    |- **PA-02**（3103）：3075 次模违反条件二阶差分 **467/1792>0.02**（max D=0.2625）——从 sealed A_S+MASKS 独立重算，与审查逐位一致。
+    |- **PA-03**（3101）：**seventh_carrier_absent**——L37 swap 恢复 = 分布式再平衡而非自然载体归还（三门全败，全锚 bit-0）。
+    |- **PA-04**（3101，B）：L37 跨条件稳定自然写入头组 {21,12,14,…} 与族特异因果焦点头解耦。
+    |- **PA-05**（3102，C）：3100 SwiGLU 修订入口（正确一阶误差 22.5%/23.1%、二阶 5.9%/9.4%）——审查方重算，本方复现后升 B。
+    |
+    |### 3. 反例传播核查（E/D 级命题的消费者检查）
+    |对 8 个关键源 Phase 做后续引用 grep（consumer_grep.txt）：
+    |- **纠错已自传播**（无需行动）：2861 active_amplification 已宣告作废（MEMO L4840）；3036 曲率断言已标注"协议条件"（L11175）；2759 已用修订后"偏置/区分可分离"结论（L435/L439）；3045 作为"V 侧无特权"被 3046–3048 正确使用。
+    |- **低风险**：2906 的 37 处提及绝大多数是 rng seed [2906,x] 与文件名，命题级引用少。
+    |- **剩余传播风险（登记）**：① **3076 建立在 3075 之上**——若其引用"超模结构定位"判决须连带降级（R44 级联）；② 3091–3092 连续统依赖 3089 强确认——已被 R48 撤回覆盖，3102 已登记。
+    |
+    |### 4. RDC 框架底座定版（采用审查第 6 节，不加新定理）
+    |可保留的计算核对关系：残差流方程 $r_\ell=H_\ell+A_\ell(N_\ell(H_\ell)),\ H_{\ell+1}=r_\ell+M_\ell(N'_\ell(r_\ell))$、log-odds 读出式 $\log(p_a/p_b)=(w_a-w_b)^\top D_\gamma h/s$、attention 三项分解 $O=A(X)V(X)W_O$（完整变化含 A₀ΔV、ΔA V₀、ΔAΔV）、RDC 候选接口 
+    |
+    |### 5. 结论与接续
+    |理论依赖链清理完成：**每条强主张现在都有等级、来源与适用域**；E/D 级的传播风险收敛到两个已登记点。接续 **3104**（T2 主线）：真关系组合剂量设计——沿 2754 断边/分叉/同端点异路径范式 + 3093 全 V 流干预，4B 先导实验；验收=冻结提取器在未见组合上超越端点/词袋/位置/加性基线。
+    |
+    |产物 sha8：proposition_ledger.json=add57ba7（62 命题全量字段含 grade/retain/consumer_check）。
+    |
+
+=== [6] RDC_TESTPLAN_v1.md 命题账本/分级相关行 ===
+  bytes=22542 sha8=71b85673
+  T5     - **方法**：逐条对照 MEMO（Phase 2750–3148，397 节 / 392 Phase）中已 sealed 的证据与 3103 命题账本（62 条：A=5 / B=6 / C=10 / D=21 / E=20）
+  T138   | F2 | **判决分级强制化** | 每条判决必须标 `bit_anchored` \| `statistical` \| `descriptive`；**规定 descriptive 不得作为下一 Phase 的前提** | 新 Phase 的 `result.json` 中断言校验：引用 descriptive 前提 → fail |
+  T266   | **抽象精确** | 抽象度 $A = 1 - \mathrm{sens}(\text{实体替换})$；精确度 $P = \mathrm{sens}(\text{关系/角色替换})$ | A、P 同报 | A 高而 P 也低 → 是**坍缩**不是抽象 |
+  T322   **方案怎么排？** 先花半天做**制度冻结**（度量字典、判决分级、开跑前的功效检查、Ledger 升级）——这一步零 GPU，但它决定后面所有实验的可信度。然后三条主线并行推进：

@@ -1,0 +1,60 @@
+=== R8 独立复核 @ 新进程 ===
+
+== 1) memo append-only ==
+  [PASS] 前缀逐字节不变 前 676086 B
+  [PASS] 前缀 sha8 == b257f54f 
+  [PASS] BOM 
+  [PASS] bare_lf == 0 bare=0
+  [PASS] Phase 35 在位 
+  [PASS] Phase 标题数 == 35 
+  [PASS] seal 原文在位 
+  [PASS] K1 判决词在位 
+  [PASS] C 表数字在位 
+  memo = 685647 B  150241da
+
+== 2) phase_queue_v1.json ==
+  [PASS] 原 30 项 
+  [PASS] sealed == Q01/Q02/Q08/Q09/Q12 ['Q01', 'Q02', 'Q08', 'Q09', 'Q12']
+  [PASS] 其余仍 pending 
+  [PASS] 条目数不变（仅状态变） 
+  queue = 11473 B  37da9a8d（前 675836fd）
+
+== 3) meta_single_source_v4.json ==
+  [PASS] 6 条更正全 accepted 
+  [PASS] seal_verbatim 记录 
+  [PASS] C4 更正值为 0dc6e57a 
+  meta = 7050 B  08f0dcf2（前 f9d7ede6）
+
+== 4) a_gate_closure_v1.json（独立重算）==
+  [PASS] E_read 池化独立重算 == JSON 0.37335047 vs 0.37335047
+  [PASS] E_read 池化 > 5% 门 0.3734 (7.5×)
+  [PASS] 读出层 3/3 否决 
+  [PASS] 读出层 margin 未达负向门 
+  [PASS] k* 层 1 模型否决 ⇒ model_specific 
+  [PASS] closure.verdict 与 deadline JSON 一致 
+  [PASS] gate_closed 
+  [PASS] C4 content_excluding_self 重算 == 0dc6e57a 0dc6e57a
+  [PASS] 账本当前 recorded 仍为陈旧 41d65a13（未施加） 
+  closure = 9496 B  24c60160
+
+== 5) ledger_corrections_v1.json ==
+  [PASS] 状态 SEALED_BUT_NOT_APPLIED 
+  [PASS] 4 条 op 
+  [PASS] 记录正确值 0dc6e57a 
+  patch = 2087 B  beb775bd
+
+== 6) 跨线受保护文件指纹 ==
+  [PASS] 未变 AGI_GPT5_MEMO.md exp=2a84776b got=2a84776b
+  [PASS] 未变 atlas_ledger.json exp=bbda63df got=bbda63df
+  [PASS] 未变 proposition_ledger.json exp=9a3c6ff4 got=9a3c6ff4
+  [PASS] 未变 metric_dict.json exp=03887e51 got=03887e51
+  [PASS] 未变 deadline_dual_track_v1.json exp=4d1853d3 got=4d1853d3
+  [PASS] 未变 prop_citation_audit_v1.json exp=4c2ea9d2 got=4c2ea9d2
+  [PASS] 未变 seal_request_v1.json exp=d871a4b4 got=d871a4b4
+
+== 7) 备份 ==
+  [PASS] 备份 AGI_DEEPSEEK_MEMO.md b257f54f
+  [PASS] 备份 phase_queue_v1.json 675836fd
+  [PASS] 备份 meta_single_source_v4.json f9d7ede6
+
+==== 汇总：PASS=38  FAIL=0  ALL_PASS ====

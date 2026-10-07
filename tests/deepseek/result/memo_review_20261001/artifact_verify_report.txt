@@ -1,0 +1,277 @@
+=== 1. artifact existence (tests/gpt5_temp/) ===
+N1_design_seal.json                            OK  bd05ba88
+N2h1_design_seal.json                          OK  4d32b1aa
+N3_design_seal.json                            OK  66afc202
+e1_embed_probe_20260930.py                     OK  b8cea76c
+e1_embed_probe_report.txt                      OK  09195063
+e2_context_conditioned_probe_20261001.py       OK  af449ff9
+e2_report.txt                                  OK  d6de235f
+n1_v2_main_axis_scan.py                        OK  93a37421
+n1b_ontology_readout.py                        OK  090a2d58
+n1c_ontology_cloze.py                          OK  1a2c9beb
+n2_reconstruction_source.py                    OK  9e999f06
+n2b_robustness.py                              OK  0fb13ffc
+n2c_slot_commitment.py                         OK  f9c5b3a9
+n2d_attn_write.py                              OK  35b8d0e9
+n2e_template_robustness.py                     OK  43b76022
+n2f_topk_diag.py                               OK  35d47eba
+n2g_critical_layers.py                         OK  1dc9ee1b
+n2h1_permutation_ablation.py                   OK  66e4e669
+n2h1b_subspace_align.py                        OK  53f2f74c
+n2h1c_cross_material.py                        OK  aec7d7f9
+n3_subspace_generality.py                      OK  95c1e750
+n2_report_qwen3-4b.txt                         OK  0ea80c53
+n2h1_report_qwen3-4b.txt                       OK  58adab1c
+n2h1b_report_qwen2.5-3b-instruct.txt           OK  946bcf1d
+n2h1b_report_glm4-9b-chat-hf.txt               OK  f18f3ad1
+n2h1c_report_qwen3-4b.txt                      OK  4fb86141
+n2h1c_report_glm4-9b-chat-hf.txt               OK  19a77901
+n3_report_qwen3-4b.txt                         OK  51e19b7f
+n3_report_qwen2.5-3b-instruct.txt              OK  7bcbd714
+n3_report_glm4-9b-chat-hf.txt                  OK  34d3d644
+e3_report.txt                                  OK  f6b540c1
+e3b_report.txt                                 OK  d22051ce
+missing_count=0 []
+
+report file counts: n1v2=6 n1b=5 n1c=2 n2b=2 n2c=2 n2d=3 n2e=2 n2f=1 n2g=2
+n1v2: ['n1v2_report_gemma-3-4b-it.txt', 'n1v2_report_glm4-9b-chat-hf.txt', 'n1v2_report_qwen2-7b.txt', 'n1v2_report_qwen2.5-3b-instruct.txt', 'n1v2_report_qwen3-1.7b.txt', 'n1v2_report_qwen3-4b.txt']
+n1b: ['n1b_report_glm4-9b-chat-hf.txt', 'n1b_report_qwen2-7b.txt', 'n1b_report_qwen2.5-3b-instruct.txt', 'n1b_report_qwen3-1.7b.txt', 'n1b_report_qwen3-4b.txt']
+n1c: ['n1c_report_qwen2.5-3b-instruct.txt', 'n1c_report_qwen3-4b.txt']
+
+=== 2. design seals (frozen criteria) ===
+--- N1_design_seal.json (1958 bytes, sha8 bd05ba88) ---
+  phase = N1
+  title = main_axis_layer_scan
+  type = exploratory_preregistered_probe
+  frozen_at_local = 2026-10-01 03:2x
+  line = RDC / gpt5 探索线（非 T4 编号；3150 已被 T4 线 Ω-P148 占用）
+  rationale = E2 的两个方法缺陷必须修：非最小对、缺零假设带；并补上 embed->layer->unembed 三段同时测量。
+  models.[0] = qwen3-4b
+  models.[1] = glm4-9b-chat-hf
+  models.[2] = qwen2.5-3b-instruct
+  arm_A.name = sense_split
+  arm_A.words.[0] = 苹果(fruit/company)
+  arm_A.words.[1] = 小米(grain/company)
+  arm_A.words.[2] = 病毒(bio/computer)
+  arm_A.words.[3] = 杜鹃(flower/bird)
+  arm_A.frames = 8
+  arm_A.pairs_per_word = 8
+  arm_A.measure_position = position of a COMMON trailing token (period), so that L0 sep == 0 by construction
+  arm_A.metric = sep_l = 1 - cos(h_l^A, h_l^B) at common last position
+  arm_A.controls.[0] = ctrlA: monosemous word with the SAME suffixes
+  arm_A.controls.[1] = ctrlB: monosemous word with neutral parallel suffixes
+  arm_A.null_band = pairs of unrelated sentences
+  arm_A.gate = dS = sep_sense - sep_ctrlA must exceed mean+2*SEM of the null band in >=3 consecutive layers; else arm_A descriptive onl
+  arm_B.name = ontology_margin
+  arm_B.context = 这是{W}。 at W position
+  arm_B.metric = margin_l = cos(h_l(W), h_l(sup1)) - cos(h_l(W), h_l(sup2))
+  arm_B.instances = 8
+  arm_B.gate = report L0 value as reference; amplification factor > 1.5 in a >=3 layer window => layer computes ontology; else pass-thr
+  arm_C.name = input_port_substitution
+  arm_C.design = target-final ('这是{W}') and target+suffix; replace target embedding row by same-class / other-class / random rows
+  arm_C.metric = KL(p_sub || p_base) and top1-preserved
+  arm_C.gate = same-class KL < other-class KL with non-overlapping 95% CI => embedding row is a class routing key
+  honesty.[0] = single machine, bf16, greedy-free scoring
+  honesty.[1] = no held-out concept set in this probe (exploratory)
+  honesty.[2] = A/B/C are different quantities at different positions - must not be cross-verified against each other
+--- N2h1_design_seal.json (1718 bytes, sha8 4d32b1aa) ---
+  probe = N2-h1
+  title = 置换向量消融：读位槽承诺由类别分量承载，还是全状态移植的几何伪影？
+  created_local = 2026-10-01T05:41:00 CDT
+  parent = N2c 承诺曲线（L6 一次性锁死，全状态移植）N2g（L6 不跨模板存活）
+  question = N2c 的 dDonor 在 L6 跳变 +10.11，但其移植对象是【整块 hidden state】。该跳变是内容注入（类别分量）还是几何破坏（范数/位置/正交残差）？
+  model_primary = qwen3-4b
+  model_secondary.[0] = qwen2.5-3b-instruct
+  model_secondary.[1] = glm4-9b-chat-hf
+  subspace.definition = U_l = 类均值方向张成的正交基（G 个上位类，去全局均值，rank = G-1 = 5），per-layer 单独估计
+  subspace.estimation_context = %s是一种（末位 hidden state）
+  subspace.random_control = V_l = 随机 5 维正交基（seed 20261001 固定）
+  modes.A_full = h <- h_donor
+  modes.B_cat = h <- h_rec + P_U (h_donor - h_rec)
+  modes.C_resid = h <- h_rec + (I-P_U)(h_donor - h_rec)
+  modes.D_rand = h <- h_rec + P_V (h_donor - h_rec)
+  modes.E_same = donor 取【同类】实例，用 B 模式（类别不变对照）
+  modes.S_self = donor = recipient 自身（sanity，应 delta≈0）
+  layers.[0] = 1
+  layers.[1] = 3
+  layers.[2] = 5
+  layers.[3] = 6
+  layers.[4] = 7
+  layers.[5] = 9
+  layers.[6] = 12
+  layers.[7] = 15
+  layers.[8] = 17
+  layers.[9] = 20
+  layers.[10] = 24
+  layers.[11] = 27
+  panel = 全部单 token 实例（6 大类，约 41 例），每实例配 1 个跨类 donor + 1 个同类 donor
+  rank_sweep.layers = primary 模型的承诺层
+  rank_sweep.ranks.[0] = 1
+  rank_sweep.ranks.[1] = 2
+  rank_sweep.ranks.[2] = 3
+  rank_sweep.ranks.[3] = 5
+  rank_sweep.ranks.[4] = 10
+  rank_sweep.ranks.[5] = 20
+  rank_sweep.ranks.[6] = 50
+  readouts.dRecip = score_recip(patch) - score_recip(base)
+  readouts.dDonor = score_donor(patch) - score_donor(base_recip)
+  criteria.H1-A_content = B 曲线在承诺层一次性跳变（前一层 <1.0，承诺层 >5.0）且 B 末层 >= 0.7 * A 末层
+  criteria.H1-B_artifact = B 无跳变 或 B 末层 < 0.3 * A 末层；且 D_rand 与 B 相当或更强
+  criteria.H1-C_mixed = 其余情况
+  criteria.E_same_control = E 的 dDonor < 0.3 * B 的 dDonor（同类不变）；若 E ≈ B 则说明效应与类别无关
+  criteria.D_floor = D_rand 的末层 dDonor 即'任意 5 维扰动'地板；B 必须显著高于 D 才可称为类别特异
+  predeclared_failure = 若 H1-B 成立 —— 整条 N2c 承诺曲线降级为几何伪影，N2 系列关闭，不再沿'读位槽写入口'方向追问
+  no_observation_before_seal = True
+--- N3_design_seal.json (1490 bytes, sha8 66afc202) ---
+  seal_id = N3_design_seal
+  created = 2026-10-01T13:05
+  phase = N3 (探索性, 非 Phase 编号)
+  frozen_before_observation = True
+  question = N2h1 的唯一正面装置「条件化类别子空间 + 置换向量消融」能否 (a) 跨 L2 结构类型复现、(b) 跨极性不变、(c) 跨语言族迁移？若 (a) 失败，则外部方案「统一实验卡 + 每族测特征 + 拼图还原」的前提被否证。
+  families.F1_is_a.tmpl_pos = %s是一种
+  families.F1_is_a.tmpl_neg = %s不是一种
+  families.F1_is_a.n_classes = 6
+  families.F1_is_a.role = 基线复现 (N2h1)
+  families.F2_color.tmpl = %s的颜色是
+  families.F2_color.n_classes = 6
+  families.F2_color.role = 同族不同 L2 结构类型 (实体-属性)，检验装置通用性
+  device.subspace = U_l = span{类均值 - 全局均值}, rank = min(G-1, 5), per-layer, L2 归一化前
+  device.modes.[0] = S_self
+  device.modes.[1] = A_full
+  device.modes.[2] = B_cat
+  device.modes.[3] = B_cat_loo
+  device.modes.[4] = C_resid
+  device.modes.[5] = D_rand
+  device.modes.[6] = E_same
+  device.B_cat_loo = 类均值逐受体留一（严格泛化，剔除受体自身对类均值的贡献）
+  device.commitment_layer = lstar = argmax(相邻层 B_cat dDonor 增量)（禁止取饱和平台层）
+  device.patch_position = 末位 (read slot)
+  device.last_layer_excluded = True
+  criteria.K_a = F2 在其 lstar 处 B_cat/A_full >= 0.70 且相邻增量 > 3.0 且 D_rand/B_cat < 1.0 → 装置跨 L2 结构复现（通过）
+  criteria.K_b = E_same/B_cat < 0.30（同类供体无害 = 类别特异）
+  criteria.K_c = B_cat_loo/B_cat >= 0.70（留一泛化成立，非记忆）
+  criteria.K_d = F3 否定模板下 B_cat 与 A_full 同号且 B/A >= 0.70 → 类别子空间与极性解耦；否则判「极性-内容纠缠」
+  criteria.K_e = F4 用他族子空间做 B_cat：比值 < 0.30 → 族特异（无共享子空间）；>= 0.70 → 存在共享子空间
+  criteria.falsify_whole_line = K_a 失败 ⇒ 「统一实验卡跨结构类型」不成立，方案必须改为每族独立装置发现
+  noise_floor = D_rand 即读出简并零假设带（随机 5 维正交基）
+  notes = 面板无 held-out 概念集；B_cat_loo 充当最小泛化检验；跨模型 (qwen2.5-3b / glm4-9b) 为后续臂
+
+=== 3. key-number spot checks ===
+--- N2: distributed verdict / L6 6.01 / I=5.15 (n2_report_qwen3-4b.txt) ---
+  /share/ -> 12 hit(s)
+    | 每个 head 在末位单独置零；share = |Δ_h| / Σ_h|Δ_h| (层内)
+    | L0: Σ|Δ|=0.771  max|Δ_h|=0.086  share_max=0.112  DISTRIBUTED
+    | L6: Σ|Δ|=1.168  max|Δ_h|=0.151  share_max=0.129  DISTRIBUTED
+    | L9: Σ|Δ|=0.619  max|Δ_h|=0.197  share_max=0.318  CONCENTRATED
+  /0\.030/ -> 1 hit(s)
+    | 全部被测 head (n=288): Σ|Δ|=8.767  max|Δ_h|=0.266  全局 share_max=0.030
+  /6\.01/ -> 3 hit(s)
+    | 6      -6.014      +163.0     18.582       -0.817        +0.6     14.572
+    | attn 最强 8 层(最负=必要): L6(-6.01) L34(-0.64) L35(-0.61) L29(-0.50) L27(-0.36) L33(-0.26) L31(-0.25) L17(-0.17)
+    | attn 单层最大贡献 L6=-6.014 ; mlp 单层最大贡献 L0=-5.108
+  /5\.15/ -> 0 hit(s)
+--- N2h1 qwen3-4b: B_cat ~10.65 etc (n2h1_report_qwen3-4b.txt) ---
+  /10\.6\d/ -> 24 hit(s)
+    | 6     |    +0.000    +10.640    +10.650     -0.182     -0.011     -0.053
+    | 7     |    +0.000    +10.653    +10.757     -0.210     +0.000     -0.068
+    | 9     |    +0.000    +10.658    +10.679     +0.077     -0.000     -0.082
+    | 12    |    +0.000    +10.649    +10.762     +0.010     +0.011     -0.029
+  /B_cat/ -> 4 hit(s)
+    | [B_cat] done @82s
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | B_cat   dDonor 峰值 @L35 = +13.204 ; 末层 = +13.204
+  /C_resid/ -> 4 hit(s)
+    | [C_resid] done @106s
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | C_resid 末层 = -0.860 ; E_same 末层 = -0.838 ; S_self 末层 = -0.901
+  /D_rand/ -> 4 hit(s)
+    | [D_rand] done @131s
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | D_rand  dDonor 峰值 @L27 = +0.052 ; 末层 = -0.838
+  /E_same/ -> 4 hit(s)
+    | [E_same] done @155s
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | L     |    S_self     A_full      B_cat    C_resid     D_rand     E_same
+    | C_resid 末层 = -0.860 ; E_same 末层 = -0.838 ; S_self 末层 = -0.901
+--- N2h1b glm4: ~9.6-9.9 (n2h1b_report_glm4-9b-chat-hf.txt) ---
+  /9\.6\d/ -> 1 hit(s)
+    | 3     |    +0.000     +9.636     +9.672     +0.099     +0.000     -0.054
+  /9\.7\d/ -> 13 hit(s)
+    | 5     |    +0.000     +9.734     +9.848     +0.198     +0.008     -0.073
+    | 6     |    +0.000     +9.737     +9.925     +0.168     +0.004     -0.067
+    | 7     |    +0.000     +9.735     +9.792     +0.202     +0.011     -0.090
+    | 9     |    +0.000     +9.730     +9.869     +0.228     +0.005     -0.070
+  /B/A/ -> 7 hit(s)
+    | B/A 末层 = 1.010 ; 最大跳变 @L3 (+9.412，前一层 L1 +0.260)
+    | hold-out 水果     n= 8 : B_cat=+0.495  A_full=+9.104  D_rand=-0.017  B/A=0.05
+    | hold-out 动物     n= 8 : B_cat=+4.125  A_full=+10.162  D_rand=+0.002  B/A=0.41
+    | hold-out 交通工具   n= 6 : B_cat=+6.704  A_full=+10.148  D_rand=+0.022  B/A=0.66
+--- N3 qwen3-4b: color B/A 0.925 / loo 0.829 (n3_report_qwen3-4b.txt) ---
+  /0\.925/ -> 3 hit(s)
+    | B/A=0.925  B_loo/B=0.829  E/B=-0.036  D/B=-0.001
+    | F2 color B/A=0.925 (lstar=L27)
+    | K_a 装置跨 L2 结构复现: B/A=0.925 (>=0.70?) ; 跳变=+3.327 (>3.0?) ; D/B=-0.001 (<1.0?) -> PASS
+  /0\.829/ -> 2 hit(s)
+    | B/A=0.925  B_loo/B=0.829  E/B=-0.036  D/B=-0.001
+    | K_c 留一泛化: isa B_loo/B=0.957 ; col B_loo/B=0.829 (>=0.70?)
+  /L27/ -> 7 hit(s)
+    | col 承诺层 lstar=L27  (相邻增量 +3.327 ; 前一层 +1.085)
+    | A_full 相邻增量 @L27 = +3.219
+    | col @L27 : A_full=+4.770  B_cat=+4.412  B_loo=+3.655  C_resid=+0.208  D_rand=-0.005  E_same=-0.159  S_self=+0.000
+    | L27  主角 cos = 0.329 0.183 0.100 0.077 0.003
+  /color/ -> 3 hit(s)
+    | F2 color classes=6 instances=29
+    | hidden collected: isa 41 (+neg) color 29
+    | F2 color B/A=0.925 (lstar=L27)
+  /ratio/ -> 2 hit(s)
+    | col @L27 用 isa 子空间: B_wrong=+0.112  vs B_cat=+4.412  ratio=0.025
+    | K_e 跨族: col 用 isa 子空间 ratio=0.025 (<0.30=族特异 ; >=0.70=共享)
+--- N3 glm4: color values (n3_report_glm4-9b-chat-hf.txt) ---
+  /0\.894/ -> 3 hit(s)
+    | B/A=0.894  B_loo/B=0.922  E/B=-0.116  D/B=-0.008
+    | F2 color B/A=0.894 (lstar=L24)
+    | K_a 装置跨 L2 结构复现: B/A=0.894 (>=0.70?) ; 跳变=+1.644 (>3.0?) ; D/B=-0.008 (<1.0?) -> FAIL
+  /0\.922/ -> 2 hit(s)
+    | B/A=0.894  B_loo/B=0.922  E/B=-0.116  D/B=-0.008
+    | K_c 留一泛化: isa B_loo/B=0.949 ; col B_loo/B=0.922 (>=0.70?)
+  /L24/ -> 7 hit(s)
+    | col 承诺层 lstar=L24  (相邻增量 +1.644 ; 前一层 -0.039)
+    | A_full 相邻增量 @L24 = +2.053
+    | col @L24 : A_full=+1.795  B_cat=+1.606  B_loo=+1.480  C_resid=-0.082  D_rand=-0.013  E_same=-0.187  S_self=+0.000
+    | L24  主角 cos = 0.344 0.290 0.149 0.070 0.008
+--- N3 qwen2.5-3b: color values (n3_report_qwen2.5-3b-instruct.txt) ---
+  /1\.040/ -> 3 hit(s)
+    | B/A=1.040  B_loo/B=0.852  E/B=-0.089  D/B=0.003
+    | F2 color B/A=1.040 (lstar=L33)
+    | K_a 装置跨 L2 结构复现: B/A=1.040 (>=0.70?) ; 跳变=+2.146 (>3.0?) ; D/B=0.003 (<1.0?) -> FAIL
+  /0\.852/ -> 2 hit(s)
+    | B/A=1.040  B_loo/B=0.852  E/B=-0.089  D/B=0.003
+    | K_c 留一泛化: isa B_loo/B=0.952 ; col B_loo/B=0.852 (>=0.70?)
+  /L33/ -> 7 hit(s)
+    | col 承诺层 lstar=L33  (相邻增量 +2.146 ; 前一层 +1.219)
+    | A_full 相邻增量 @L33 = +1.584
+    | col @L33 : A_full=+3.233  B_cat=+3.364  B_loo=+2.866  C_resid=-0.060  D_rand=+0.011  E_same=-0.300  S_self=+0.000
+    | L33  主角 cos = 0.401 0.313 0.206 0.063 0.032
+--- E2: exact zeros/ones + R11 (e2_report.txt) ---
+  /1\.0000/ -> 40 hit(s)
+    | 0       1.0000    1.0000    0.0000    0.0000    0.2217    0.2217    0.0972
+    | 1       0.9702    1.0000    0.0260   -0.0050    0.5541    0.5229    0.4050
+    | 2       0.9613    1.0000    0.0308   -0.0064    0.4632    0.4382    0.4336
+    | 3       0.9430    1.0000    0.0389    0.0016    0.5385    0.4916    0.4529
+  /0\.1758/ -> 3 hit(s)
+    | 11      0.7195    1.0000    0.1758    0.1294    0.6188    0.4302    0.4354
+    | 4) g_fruit 最大层：L11  0.1758 ；g_comp 最大层：L36  0.1532
+    | 10      0.7692    0.1693    0.0849    0.1758
+  /0\.715/ -> 2 hit(s)
+    | 12      0.7153    1.0000    0.1468    0.1043    0.6261    0.4319    0.4450
+    | 12      0.7153    0.1468    0.1043    0.1942
+--- E1: apple-food / apple-plant / q95 (e1_embed_probe_report.txt) ---
+  /0\.0555/ -> 1 hit(s)
+    | 苹果    -食物          +0.0555    +0.0534
+  /0\.0241/ -> 1 hit(s)
+    | 苹果    -植物          +0.0241    +0.0409
+  /0\.1670/ -> 1 hit(s)
+    | [7] 随机 token 对基线（n=179700 对）: mean +0.0872  sd 0.0535  |cos| mean 0.0885  q95 0.1670

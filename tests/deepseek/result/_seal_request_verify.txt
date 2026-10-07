@@ -1,0 +1,118 @@
+== MD 全文 ==
+# A 闸门 seal 请求（R5，2026-10-03）
+
+> 本件由 `tests/deepseek/_review/gen_seal_request_r5.py` 现场渲染（数字一律取自源 result / 报告，无手工转录）。
+> **只读汇总**：不代为改判，不改动任何既有判定；所有动作在 seal 后才执行。
+
+## 0 A 闸门进度
+
+| 项 | 状态 |
+|---|---|
+| Q01 元层单一真源对账 | 已完成（零 GPU） |
+| Q02 KPI 口径冻结 | 已完成（零 GPU） |
+| Q09 死线双轨重述（I3） | 已完成（零 GPU） |
+| Q12 D/E 命题引用审计（I4） | 已完成（零 GPU） |
+| **Q08 K1 判定层选择** | **待 seal（本件第 1 节）** |
+| C1–C6 更正表 | **待 seal（本件第 2 节）** |
+| I1 / I9 制度条款 | **待 seal（本件第 3 节）** |
+
+## 1 Q08：K1 判定层选择（唯一影响主线的决策）
+
+**K1 原文（`RDC_TESTPLAN_v1.md` §8.2 逐字）**：3 模型 × **未见组合** 的 logit 预测误差 **> 5%** 且不显著优于全加性基线 B4。
+
+### 1.1 证据（3151/3152 result 现场重算）
+
+| 模型 | B4@k*（约 7.5% 深度） | B4@**读出层** | 是否过 5% 门 |
+|---|---|---|---|
+| qwen3-4b | 0.007911 | **0.3316** | 否 |
+| qwen3-14b | 0.080678 | **0.3986** | 是 |
+| glm4-9b | 0.046128 | **0.3898** | 否 |
+
+- **聚合**：`E_read` 池化 **0.3734**（逐模型 0.3316 / 0.3986 / 0.3898）；池化 margin@k* **-0.025202**（MDE 0.005696）；池化 margin@读出层 **0.9409**。
+- **关键事实**：同一条 5% 门，挂在 k* 层得 **1/3 过门**（未触发），挂在行为读出层得 **0/3 过门**（触发）；读出层误差达门的 **6.6×**（0.3316 / 0.05）。
+
+### 1.2 两种读法
+
+- **读法甲（推荐）**：K1 的语义是「能否预测未见组合」，而「行为」由模型输出定义 ⇒ 判定层应为**行为读出层** ⇒ **K1 应当触发**，「条件齿轮组=算子代数」降级为 `descriptive`（功能性端口类描述）。
+- **读法乙**：若「承诺层 k* = 候选取作用层」是**预先登记且有意**的判据，则 K1 原文在两处自相矛盾，**必须重述为无歧义版本并重新冻结**。注意 TESTPLAN §8.2 已规定 K1–K3 须在 3150 一并冻结、之后不得修改 ⇒ 重述需**显式解冻升版**。
+
+> 无论哪种读法，「**用假设自己指定的层来判断假设**」都必须被显式接受或显式否决，不能默认。
+
+### 1.3 请选择
+
+- **A. 读法甲：改判（推荐）** —— 判定层=行为读出层 ⇒ K1 触发 ⇒ 「条件齿轮组=算子代数」降级为 descriptive / 功能性端口类描述。
+- **B. 读法乙：重述并重新冻结** —— 承认判据自指（用假设自选的层判断假设）；K1 重述为无歧义版本。注意 TESTPLAN §8.2 规定 K1–K3 须在 3150 一并冻结、之后不得改阈值 ⇒ 重述需显式解冻升版。
+- **C. 暂缓** —— A 闸门无法关闭；B/C 闸门（Q03+ KPI 装置）不得启动。
+
+## 2 C1–C6 更正表（Q01 产出，逐条待 seal）
+
+| id | 目标 | 现状 | 改为 | 依据 | 状态 |
+|---|---|---|---|---|---|
+| C1 | MEMO 3103 正文「62 命题 A=5/B=34/...」 | 未标口径 | 加标 `count_mode=component`（条数=62、分量和=94） | §1.2 | **待 seal** |
+| C2 | MEMO 3103 正文「约 55% 命题（A+B）」 | 量纲混淆 | 同口径二选一：`component` **41.5%**(39/94) 或 `atomic_best` **62.9%**(39/62) | §1.3 | **待 seal** |
+| C3 | TESTPLAN T5 行 | `A=5 / B=6 / C=10 / D=21 / E=20` | `A=5 / B=34 / C=14 / D=21 / E=20`（`count_mode=component`，条数 62） | §1.2 不可复现 | **待 seal** |
+| C4 | `atlas_ledger.json` `ledger_sha256_8` | `41d65a13` | `0dc6e57a`（`content_excluding_self`） | §2.1 | **待 seal**（改 schema 后由 §4.3 规程维护） |
+| C5 | MEMO 3103 记录的 `proposition_ledger.json` 哈希 | `add57ba7` | `9a3c6ff4` | §2.2 | **待 seal** |
+| C6 | Ledger measurements schema | 两套并存（270 / 199 / 兼有 165） | 统一含 `meas_id`+`phase`；`evidence_level` 三值枚举 | §3 | **待 seal** |
+
+选项：**全接受** / **逐条取舍**（请列出接受的 id）。
+
+## 3 I1 / I9 制度条款
+
+- **I1（§1 唯一全局 KPI）**：确认冻结：一个 Phase 未降低 E_read / E_ar(k) / C_steer 任一者，Ledger 登记为 catalog，不得登记为 advance。
+- **I9（§7 议程）**：确认冻结：phase_queue_v1.json 为唯一议程来源，禁止由「残差 → 自动派生下一 Phase」生成新队列。
+
+选项：**确认** / **修改**（请给出改动）。
+
+## 4 冻结与不变量（本件生成时现场指纹）
+
+| 文件 | 角色 | sha8 |
+|---|---|---|
+| `research/gpt5/docs/AGI_GPT5_MEMO.md` | G 线备忘录（判决原文） | `2a84776b` |
+| `tests/glm5/result/rdc_query_construction_20260913/phase3103/omega_p101_formula_audit/proposition_ledger.json` | 命题账本（62 条真源） | `9a3c6ff4` |
+| `research/gpt5/docs/RDC_TESTPLAN_v1.md` | TESTPLAN（K1–K3 冻结条款） | `71b85673` |
+| `research/gpt5/atlas/phase_queue_v1.json` | 30-Phase 冻结队列 | `675836fd` |
+| `research/gpt5/docs/RDC_RESEARCH_CONSTITUTION_v1.md` | 研究宪法 v1 | `01df6398` |
+
+## 5 seal 后执行顺序
+
+- 1) 执行 C1–C6 更正（仅改目标文档对应字段；每项写前备份 + 写后 sha8 复核）
+- 2) Q08 改判落 MEMO（append 不改写）+ Ledger verdict
+- 3) A 闸门关闭 → 章 program 更新 queue 状态（Q01/Q02/Q08/Q09/Q12 = sealed）
+- 4) 进入 B 闸门：Q03（E_read 统一基线复算，需 GPU）
+
+## 6 一行回复模板
+
+```text
+seal: Q08=甲 | C=全接受 | I1=确认 | I9=确认
+```
+
+
+== HTML 断言 ==
+  OK  : A 闸门 seal 请求
+  OK  : Q08
+  OK  : 读法A
+  OK  : 读法B
+  OK  : 读法C
+  OK  : C1
+  OK  : C6
+  OK  : 0.3316
+  OK  : 0.3898
+  OK  : 0.3986
+  OK  : E_read
+  OK  : I1 · §1 唯一全局 KPI
+  OK  : I9 · §7
+  OK  : seal: Q08=甲
+  placeholder_residue = False
+  bytes=8481 chars=6960 sha8=3976537e
+
+== 受保护文件（生成器只读，须未变） ==
+  OK       exp=2a84776b got=2a84776b research/gpt5/docs/AGI_GPT5_MEMO.md
+  OK       exp=71b85673 got=71b85673 research/gpt5/docs/RDC_TESTPLAN_v1.md
+  OK       exp=675836fd got=675836fd research/gpt5/atlas/phase_queue_v1.json
+  OK       exp=01df6398 got=01df6398 research/gpt5/docs/RDC_RESEARCH_CONSTITUTION_v1.md
+
+== 本件产物指纹 ==
+  seal_request_v1.json  5556 B  d871a4b4
+  SEAL_REQUEST_A_GATE.md  5544 B  7678cbe0
+  seal_request_a_gate.html  8481 B  3976537e

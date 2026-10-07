@@ -1,0 +1,393 @@
+=== 3152 目录树 ===
+  phase3152\g1p2_tri_model_k1\glm4k1\execution.json                             1032 B 2770db79
+  phase3152\g1p2_tri_model_k1\glm4k1\result.json                                7772 B 111a1152
+  phase3152\g1p2_tri_model_k1\glm4k1\run_log.txt                                3255 B 6c115166
+  phase3152\g1p2_tri_model_k1\qwen3-14b\collect.npz                        238580833 B 733182c1
+  phase3152\g1p2_tri_model_k1\qwen3-14b\execution.json                          1988 B bffb876f
+  phase3152\g1p2_tri_model_k1\qwen3-14b\result.json                            20100 B 23dfb646
+  phase3152\g1p2_tri_model_k1\qwen3-14b\run_log.txt                             9675 B cb664058
+  phase3152\g1p2_tri_model_k1\qwen3-4b\collect.npz                         108334806 B 4ef190b7
+  phase3152\g1p2_tri_model_k1\qwen3-4b\execution.json                           1985 B 8e3a4bf5
+  phase3152\g1p2_tri_model_k1\qwen3-4b\result.json                             19363 B c38b97ff
+  phase3152\g1p2_tri_model_k1\qwen3-4b\run_log.txt                              9453 B 2b4dc795
+  phase3152\g1p2_tri_model_k1\qwen3-4b\smoke\collect_smoke.npz              31705100 B af70e131
+  phase3152\g1p2_tri_model_k1\qwen3-4b\smoke\execution.json                     1946 B 9a302556
+  phase3152\g1p2_tri_model_k1\qwen3-4b\smoke\result.json                       10426 B a5d5fb17
+  phase3152\g1p2_tri_model_k1\qwen3-4b\smoke\run_log.txt                        3277 B 40144ccd
+  phase3152\g1p2_tri_model_k1\summary\execution.json                            1083 B a24bfbff
+  phase3152\g1p2_tri_model_k1\summary\result_summary.json                       4123 B a6c68981
+  phase3152\g1p2_tri_model_k1\summary\run_log.txt                                286 B ab6b424b
+
+=== 3151 目录树 ===
+  phase3151\g1p1_combo_additive_vs_interaction\collect.npz                 190179622 B c711946c
+  phase3151\g1p1_combo_additive_vs_interaction\execution.json                   1478 B dedce16b
+  phase3151\g1p1_combo_additive_vs_interaction\result.json                      4365 B dab41389
+  phase3151\g1p1_combo_additive_vs_interaction\result_rev3151b.json             1694 B dd0cc176
+  phase3151\g1p1_combo_additive_vs_interaction\result_v2fix.json                1653 B d8cef721
+  phase3151\g1p1_combo_additive_vs_interaction\run_log.txt                      6075 B d4a78ba6
+  phase3151\g1p1_combo_additive_vs_interaction\v2fix_log.txt                     228 B 63415ea3
+  phase3151\g1p1_combo_additive_vs_interaction\smoke\collect_smoke.npz      55660557 B 07cf7a36
+  phase3151\g1p1_combo_additive_vs_interaction\smoke\execution.json             1475 B 56971b3a
+  phase3151\g1p1_combo_additive_vs_interaction\smoke\result.json                4349 B d62e4b5d
+  phase3151\g1p1_combo_additive_vs_interaction\smoke\run_log.txt               12189 B e854ba97
+
+=== 3152 result 中与 K1 相关的键（mde / readout / k_star / margin / above / m1） ===
+
+--- qwen3-4b/result.json (sha8 c38b97ff) ---
+   $.kstar                                                          = 3
+   $.readout                                                        = 35
+   $.m1_curve_layers                                                = [3, 6, 10, 14, 17, 21, 24, 28, 32, 35]
+   $.v0_material.median_true_margin                                 = 0.6927080154418945
+   $.curve.B4                                                       : {'0': 0.0014453778276219964, '1': 0.04174504429101944, '2': 0.011271809227764606, '3': 0.00762719707
+   $.m1_curve                                                       : {'3': 0.003631278406828642, '6': 0.004176720976829529, '10': 0.185658261179924, '14': 0.314838856458
+   $.curve_argmin_b4                                                = 0
+   $.gates.M1_kstar                                                 : {'pass_all3': False, 'margins': [-0.003995918203145266, -0.0018717794446274638, -0.00242860009893775
+   $.gates.M1_kstar.margins                                         = [-0.003995918203145266, -0.0018717794446274638, -0.00242860009893775]
+   $.gates.M1_kstar.mdes                                            = [0.0016456732199462817, 0.0021655154995255917, 0.00172373731333993]
+   $.gates.M2_kstar                                                 : {'pass_all3': False, 'margins': [0.06761252135038376, 0.07104463875293732, 0.06997030973434448], 'md
+   $.gates.M2_kstar.margins                                         = [0.06761252135038376, 0.07104463875293732, 0.06997030973434448]
+   $.gates.M2_kstar.mdes                                            = [0.009312722676971214, 0.009250310064989579, 0.00988900035212228]
+   $.gates.M1_readout                                               : {'pass_all3': False, 'margins': [0.7462891936302185, 0.7460698485374451, 0.8673412799835205], 'mdes'
+   $.gates.M1_readout.margins                                       = [0.7462891936302185, 0.7460698485374451, 0.8673412799835205]
+   $.gates.M1_readout.mdes                                          = [0.1736142209158062, 0.13540998669863982, 0.1465664953791287]
+   $.gates.M2_readout                                               : {'pass_all3': False, 'margins': [0.2850510776042938, 0.30417829751968384, 0.32253536581993103], 'mde
+   $.gates.M2_readout.margins                                       = [0.2850510776042938, 0.30417829751968384, 0.32253536581993103]
+   $.gates.M2_readout.mdes                                          = [0.01827885623232348, 0.02064195139727966, 0.019481411770998366]
+   $.v1_verdict_kstar                                               : combo_approx_additive_at_kstar
+   $.v3.worst_class_b4                                              : 金属
+   $.v3.per_fold.c0_k3.b4                                           = 0.10477474331855774
+   $.v3.per_fold.c0_k3.margin_m2_minus_b4                           = 0.1464671492576599
+   $.v3.per_fold.c0_k35.b4                                          = 0.724678635597229
+   $.v3.per_fold.c0_k35.margin_m2_minus_b4                          = 0.3531235456466675
+   $.v3.per_fold.c1_k3.b4                                           = 0.05024777725338936
+   $.v3.per_fold.c1_k3.margin_m2_minus_b4                           = 0.09754639491438866
+   $.v3.per_fold.c1_k35.b4                                          = 0.6863007545471191
+   $.v3.per_fold.c1_k35.margin_m2_minus_b4                          = 0.36383044719696045
+   $.v3.per_fold.c2_k3.b4                                           = 0.036346208304166794
+   $.v3.per_fold.c2_k3.margin_m2_minus_b4                           = 0.07551570609211922
+   $.v3.per_fold.c2_k35.b4                                          = 0.6520580053329468
+   $.v3.per_fold.c2_k35.margin_m2_minus_b4                          = 0.3838280439376831
+   $.v3.per_fold.c3_k3.b4                                           = 0.04429549723863602
+   $.v3.per_fold.c3_k3.margin_m2_minus_b4                           = 0.09106659144163132
+   $.v3.per_fold.c3_k35.b4                                          = 0.6966027021408081
+   $.v3.per_fold.c3_k35.margin_m2_minus_b4                          = 0.4171231985092163
+   $.v3.per_fold.c4_k3.b4                                           = 0.057151611894369125
+   $.v3.per_fold.c4_k3.margin_m2_minus_b4                           = 0.10673699155449867
+   $.v3.per_fold.c4_k35.b4                                          = 0.7515418529510498
+   $.v3.per_fold.c4_k35.margin_m2_minus_b4                          = 0.43219006061553955
+   $.v3.per_fold.c5_k3.b4                                           = 0.09566311538219452
+   $.v3.per_fold.c5_k3.margin_m2_minus_b4                           = 0.13897623121738434
+   $.v3.per_fold.c5_k35.b4                                          = 0.7018294334411621
+   $.v3.per_fold.c5_k35.margin_m2_minus_b4                          = 0.48987579345703125
+   $.v4.mean_b4_rel                                                 = 0.7190833513329669
+   $.v4.max_b4_rel                                                  = 0.9620926976203918
+   $.v4.min_b4_rel                                                  = 0.5141894221305847
+   $.v5.class_subspace_energy_kstar                                 = 0.9229608774185181
+   $.v5.sv_ratio_kstar                                              = 1.0
+   $.v5.class_subspace_energy_readout                               = 0.14902473986148834
+   $.v5.sv_ratio_readout                                            = 1.0
+   $.m1_grid                                                        : {'k14_r1_l0.001': 3.5439178943634033, 'k14_B4': 0.28496453166007996, 'k14_r1_l0.01': 0.4993834197521
+   $.m1_grid.k14_B4                                                 = 0.28496453166007996
+   $.m1_grid.k21_B4                                                 = 0.4256981611251831
+   $.m1_grid.k28_B4                                                 = 0.358445942401886
+   $.m1_grid.k35_B4                                                 = 0.3320900797843933
+   $.m1_grid_opt_rank                                               : {'14': 10, '21': 10, '28': 10, '35': 10}
+   $.m1_overfit_note                                                : rank10_optimal_at_readout_k35
+   $.k1_model_report.kstar                                          = 3
+   $.k1_model_report.readout                                        = 35
+   $.k1_model_report.b4_rel_kstar_mean3seed                         = 0.007910657984515032
+   $.k1_model_report.b4_rel_kstar_per_seed                          = [0.007627197075635195, 0.00737302890047431, 0.008731747977435589]
+   $.k1_model_report.b4_rel_readout_mean3seed                       = 0.3316153089205424
+   $.k1_model_report.b4_rel_readout_per_seed                        = [0.3320900797843933, 0.3405764698982239, 0.32217937707901]
+   $.k1_model_report.m1_kstar                                       : {'pass_all3': False, 'margins': [-0.003995918203145266, -0.0018717794446274638, -0.00242860009893775
+   $.k1_model_report.m1_kstar.margins                               = [-0.003995918203145266, -0.0018717794446274638, -0.00242860009893775]
+   $.k1_model_report.m1_kstar.mdes                                  = [0.0016456732199462817, 0.0021655154995255917, 0.00172373731333993]
+   $.k1_model_report.m2_kstar                                       : {'pass_all3': False, 'margins': [0.06761252135038376, 0.07104463875293732, 0.06997030973434448], 'md
+   $.k1_model_report.m2_kstar.margins                               = [0.06761252135038376, 0.07104463875293732, 0.06997030973434448]
+   $.k1_model_report.m2_kstar.mdes                                  = [0.009312722676971214, 0.009250310064989579, 0.00988900035212228]
+   $.k1_model_report.m1_readout                                     : {'pass_all3': False, 'margins': [0.7462891936302185, 0.7460698485374451, 0.8673412799835205], 'mdes'
+   $.k1_model_report.m1_readout.margins                             = [0.7462891936302185, 0.7460698485374451, 0.8673412799835205]
+   $.k1_model_report.m1_readout.mdes                                = [0.1736142209158062, 0.13540998669863982, 0.1465664953791287]
+   $.k1_model_report.m2_readout                                     : {'pass_all3': False, 'margins': [0.2850510776042938, 0.30417829751968384, 0.32253536581993103], 'mde
+   $.k1_model_report.m2_readout.margins                             = [0.2850510776042938, 0.30417829751968384, 0.32253536581993103]
+   $.k1_model_report.m2_readout.mdes                                = [0.01827885623232348, 0.02064195139727966, 0.019481411770998366]
+   $.k1_model_report.above_add_gate                                 = False
+
+--- qwen3-14b/result.json (sha8 23dfb646) ---
+   $.kstar                                                          = 3
+   $.readout                                                        = 39
+   $.m1_curve_layers                                                = [3, 7, 11, 15, 19, 23, 27, 31, 35, 39]
+   $.v0_material.median_true_margin                                 = 0.84375
+   $.curve.B4                                                       : {'0': 0.007269298192113638, '1': 0.023411531001329422, '2': 0.044999584555625916, '3': 0.07908059656
+   $.m1_curve                                                       : {'3': 0.03592390567064285, '7': 0.0820946916937828, '11': 0.22245630621910095, '15': 0.5110218524932
+   $.curve_argmin_b4                                                = 0
+   $.gates.M1_kstar                                                 : {'pass_all3': True, 'margins': [-0.043156687170267105, -0.04484572634100914, -0.04450206086039543], 
+   $.gates.M1_kstar.margins                                         = [-0.043156687170267105, -0.04484572634100914, -0.04450206086039543]
+   $.gates.M1_kstar.mdes                                            = [0.007399310631265372, 0.008100154574377972, 0.009958824525762956]
+   $.gates.M2_kstar                                                 : {'pass_all3': False, 'margins': [0.27367115020751953, 0.28700703382492065, 0.3556826710700989], 'mde
+   $.gates.M2_kstar.margins                                         = [0.27367115020751953, 0.28700703382492065, 0.3556826710700989]
+   $.gates.M2_kstar.mdes                                            = [0.04695937042230266, 0.04346495309474032, 0.05294370631556063]
+   $.gates.M1_readout                                               : {'pass_all3': False, 'margins': [1.0840266942977905, 1.0419107675552368, 1.2628263235092163], 'mdes'
+   $.gates.M1_readout.margins                                       = [1.0840266942977905, 1.0419107675552368, 1.2628263235092163]
+   $.gates.M1_readout.mdes                                          = [0.2407173089791519, 0.18990708696181582, 0.21978643735961703]
+   $.gates.M2_readout                                               : {'pass_all3': False, 'margins': [0.22435542941093445, 0.23400452733039856, 0.2443854957818985], 'mde
+   $.gates.M2_readout.margins                                       = [0.22435542941093445, 0.23400452733039856, 0.2443854957818985]
+   $.gates.M2_readout.mdes                                          = [0.023770017044727625, 0.026260340304453903, 0.02128510897655397]
+   $.v1_verdict_kstar                                               : interaction_pair_generalizes_at_kstar
+   $.v3.worst_class_b4                                              : 颜色
+   $.v3.per_fold.c0_k3.b4                                           = 0.6243205666542053
+   $.v3.per_fold.c0_k3.margin_m2_minus_b4                           = 0.6531134247779846
+   $.v3.per_fold.c0_k39.b4                                          = 0.7835021018981934
+   $.v3.per_fold.c0_k39.margin_m2_minus_b4                          = 0.3047541379928589
+   $.v3.per_fold.c1_k3.b4                                           = 0.5596088171005249
+   $.v3.per_fold.c1_k3.margin_m2_minus_b4                           = 0.647262454032898
+   $.v3.per_fold.c1_k39.b4                                          = 0.7012121081352234
+   $.v3.per_fold.c1_k39.margin_m2_minus_b4                          = 0.2734578251838684
+   $.v3.per_fold.c2_k3.b4                                           = 0.9189821481704712
+   $.v3.per_fold.c2_k3.margin_m2_minus_b4                           = 0.7267071008682251
+   $.v3.per_fold.c2_k39.b4                                          = 0.5958898663520813
+   $.v3.per_fold.c2_k39.margin_m2_minus_b4                          = 0.31447112560272217
+   $.v3.per_fold.c3_k3.b4                                           = 0.5551770925521851
+   $.v3.per_fold.c3_k3.margin_m2_minus_b4                           = 0.6506481170654297
+   $.v3.per_fold.c3_k39.b4                                          = 0.6561522483825684
+   $.v3.per_fold.c3_k39.margin_m2_minus_b4                          = 0.3610023260116577
+   $.v3.per_fold.c4_k3.b4                                           = 0.385494202375412
+   $.v3.per_fold.c4_k3.margin_m2_minus_b4                           = 0.5210375487804413
+   $.v3.per_fold.c4_k39.b4                                          = 0.8128430843353271
+   $.v3.per_fold.c4_k39.margin_m2_minus_b4                          = 0.3666473627090454
+   $.v3.per_fold.c5_k3.b4                                           = 0.8739386200904846
+   $.v3.per_fold.c5_k3.margin_m2_minus_b4                           = 0.7274248003959656
+   $.v3.per_fold.c5_k39.b4                                          = 1.0112472772598267
+   $.v3.per_fold.c5_k39.margin_m2_minus_b4                          = 0.40311920642852783
+   $.v4.mean_b4_rel                                                 = 0.6873986401209017
+   $.v4.max_b4_rel                                                  = 0.8734374046325684
+   $.v4.min_b4_rel                                                  = 0.5546086430549622
+   $.v5.class_subspace_energy_kstar                                 = 0.5185551047325134
+   $.v5.sv_ratio_kstar                                              = 1.0
+   $.v5.class_subspace_energy_readout                               = 0.17983831465244293
+   $.v5.sv_ratio_readout                                            = 1.0
+   $.m1_grid                                                        : {'k15_r1_l0.001': 4.04624605178833, 'k15_B4': 0.3141186237335205, 'k15_r1_l0.01': 0.6825217604637146
+   $.m1_grid.k15_B4                                                 = 0.3141186237335205
+   $.m1_grid.k23_B4                                                 = 0.44740840792655945
+   $.m1_grid.k31_B4                                                 = 0.429188072681427
+   $.m1_grid.k39_B4                                                 = 0.4094776213169098
+   $.m1_grid_opt_rank                                               : {'15': 10, '23': 10, '31': 10, '39': 10}
+   $.m1_overfit_note                                                : rank10_optimal_at_readout_k39
+   $.k1_model_report.kstar                                          = 3
+   $.k1_model_report.readout                                        = 39
+   $.k1_model_report.b4_rel_kstar_mean3seed                         = 0.0806781401236852
+   $.k1_model_report.b4_rel_kstar_per_seed                          = [0.07908059656620026, 0.08286002278327942, 0.08009380102157593]
+   $.k1_model_report.b4_rel_readout_mean3seed                       = 0.39860084652900696
+   $.k1_model_report.b4_rel_readout_per_seed                        = [0.4094776213169098, 0.40581539273262024, 0.38050952553749084]
+   $.k1_model_report.m1_kstar                                       : {'pass_all3': True, 'margins': [-0.043156687170267105, -0.04484572634100914, -0.04450206086039543], 
+   $.k1_model_report.m1_kstar.margins                               = [-0.043156687170267105, -0.04484572634100914, -0.04450206086039543]
+   $.k1_model_report.m1_kstar.mdes                                  = [0.007399310631265372, 0.008100154574377972, 0.009958824525762956]
+   $.k1_model_report.m2_kstar                                       : {'pass_all3': False, 'margins': [0.27367115020751953, 0.28700703382492065, 0.3556826710700989], 'mde
+   $.k1_model_report.m2_kstar.margins                               = [0.27367115020751953, 0.28700703382492065, 0.3556826710700989]
+   $.k1_model_report.m2_kstar.mdes                                  = [0.04695937042230266, 0.04346495309474032, 0.05294370631556063]
+   $.k1_model_report.m1_readout                                     : {'pass_all3': False, 'margins': [1.0840266942977905, 1.0419107675552368, 1.2628263235092163], 'mdes'
+   $.k1_model_report.m1_readout.margins                             = [1.0840266942977905, 1.0419107675552368, 1.2628263235092163]
+   $.k1_model_report.m1_readout.mdes                                = [0.2407173089791519, 0.18990708696181582, 0.21978643735961703]
+   $.k1_model_report.m2_readout                                     : {'pass_all3': False, 'margins': [0.22435542941093445, 0.23400452733039856, 0.2443854957818985], 'mde
+   $.k1_model_report.m2_readout.margins                             = [0.22435542941093445, 0.23400452733039856, 0.2443854957818985]
+   $.k1_model_report.m2_readout.mdes                                = [0.023770017044727625, 0.026260340304453903, 0.02128510897655397]
+   $.k1_model_report.above_add_gate                                 = True
+
+--- glm4k1/result.json (sha8 111a1152) ---
+   $.kstar                                                          = 3
+   $.readout                                                        = 39
+   $.v0_material.median_true_margin                                 = -0.875
+   $.m1_grid                                                        : {'k15_r1_l0.001': 1.1601710319519043, 'k15_r1_l0.01': 0.5738131999969482, 'k15_r1_l0.1': 0.450983434
+   $.m1_grid.k39_B4                                                 = 0.4173515737056732
+   $.m1_grid_opt_rank                                               : {'15': 10, '23': 10, '31': 10, '39': 10}
+   $.m1_overfit_note                                                : rank10_optimal_at_readout_k39
+   $.k1_model_report.kstar                                          = 3
+   $.k1_model_report.readout                                        = 39
+   $.k1_model_report.b4_rel_kstar_mean3seed                         = 0.04612794021765391
+   $.k1_model_report.b4_rel_kstar_per_seed                          = [0.046175260096788406, 0.05326969921588898, 0.03893886134028435]
+   $.k1_model_report.b4_rel_readout_mean3seed                       = 0.389835258324941
+   $.k1_model_report.b4_rel_readout_per_seed                        = [0.4173515737056732, 0.3845253884792328, 0.367628812789917]
+   $.k1_model_report.m1_kstar                                       : {'pass_all3': True, 'margins': [-0.028946934267878532, -0.032304372638463974, -0.024767404422163963]
+   $.k1_model_report.m1_kstar.margins                               = [-0.028946934267878532, -0.032304372638463974, -0.024767404422163963]
+   $.k1_model_report.m1_kstar.mdes                                  = [0.0067783949636473035, 0.0075403079586488005, 0.005947759261347404]
+   $.k1_model_report.m2_kstar                                       : {'pass_all3': False, 'margins': None, 'mdes': None, 'note': 'M2 not recomputed; 3151 gates show M2 f
+   $.k1_model_report.m2_kstar.margins                               : None
+   $.k1_model_report.m2_kstar.mdes                                  : None
+   $.k1_model_report.m1_readout                                     : {'pass_all3': False, 'note': 'M1@k39 from 3151 fails (margins +0.77/+1.05/+0.90 positive = worse)'}
+   $.k1_model_report.m2_readout                                     : {'pass_all3': False}
+   $.k1_model_report.above_add_gate                                 = False
+   $.k1_model_report.anchor_b4_k39_drift                            = 0.0
+   $.k1_model_report.m1_kstar_per_seed_mean                         = [0.017228323966264725, 0.020965328440070152, 0.014171451330184937]
+
+--- summary/result_summary.json (sha8 a6c68981) ---
+   $.k1_3model.qwen3-4b.kstar                                       = 3
+   $.k1_3model.qwen3-4b.readout                                     = 35
+   $.k1_3model.qwen3-4b.b4_rel_kstar                                = 0.007910657984515032
+   $.k1_3model.qwen3-4b.b4_rel_readout                              = 0.3316153089205424
+   $.k1_3model.qwen3-4b.m1_kstar_pass_all3                          = False
+   $.k1_3model.qwen3-4b.m1_kstar_margins                            = [-0.003995918203145266, -0.0018717794446274638, -0.00242860009893775]
+   $.k1_3model.qwen3-4b.m2_kstar_pass_all3                          = False
+   $.k1_3model.qwen3-4b.above_add_gate                              = False
+   $.k1_3model.qwen3-14b.kstar                                      = 3
+   $.k1_3model.qwen3-14b.readout                                    = 39
+   $.k1_3model.qwen3-14b.b4_rel_kstar                               = 0.0806781401236852
+   $.k1_3model.qwen3-14b.b4_rel_readout                             = 0.39860084652900696
+   $.k1_3model.qwen3-14b.m1_kstar_pass_all3                         = True
+   $.k1_3model.qwen3-14b.m1_kstar_margins                           = [-0.043156687170267105, -0.04484572634100914, -0.04450206086039543]
+   $.k1_3model.qwen3-14b.m2_kstar_pass_all3                         = False
+   $.k1_3model.qwen3-14b.above_add_gate                             = True
+   $.k1_3model.glm4-9b.kstar                                        = 3
+   $.k1_3model.glm4-9b.readout                                      = 39
+   $.k1_3model.glm4-9b.b4_rel_kstar                                 = 0.04612794021765391
+   $.k1_3model.glm4-9b.b4_rel_readout                               = 0.389835258324941
+   $.k1_3model.glm4-9b.m1_kstar_pass_all3                           = True
+   $.k1_3model.glm4-9b.m1_kstar_margins                             = [-0.028946934267878532, -0.032304372638463974, -0.024767404422163963]
+   $.k1_3model.glm4-9b.m2_kstar_pass_all3                           = False
+   $.k1_3model.glm4-9b.above_add_gate                               = False
+   $.k1_depth_note.qwen3-4b.kstar_depth_frac                        = 0.0833
+   $.k1_depth_note.qwen3-4b.readout_depth_frac                      = 0.9722
+   $.k1_depth_note.qwen3-14b.kstar_depth_frac                       = 0.075
+   $.k1_depth_note.qwen3-14b.readout_depth_frac                     = 0.975
+   $.k1_depth_note.glm4-9b.kstar_depth_frac                         = 0.075
+   $.k1_depth_note.glm4-9b.readout_depth_frac                       = 0.975
+   $.b4_curve_argmin                                                : {'qwen3_4b': 0, 'qwen3_14b': 0}
+   $.m1_grid_opt_rank                                               : {'qwen3_4b': {'14': 10, '21': 10, '28': 10, '35': 10}, 'qwen3_14b': {'15': 10, '23': 10, '31': 10, '
+
+=== 3151 result 相关键 ===
+--- phase3151\g1p1_combo_additive_vs_interaction\result.json (sha8 dab41389) ---
+   $.v0_material.median_true_margin                                 = 1.1095378398895264
+   $.v1.b4_s1_k39_rel                                               = 0.389835258324941
+   $.v1.gates.M1_k3[0].margin                                       = -0.028946934267878532
+   $.v1.gates.M1_k3[0].mde                                          = 0.0067783949636473035
+   $.v1.gates.M1_k3[1].margin                                       = -0.032304372638463974
+   $.v1.gates.M1_k3[1].mde                                          = 0.0075403079586488005
+   $.v1.gates.M1_k3[2].margin                                       = -0.024767404422163963
+   $.v1.gates.M1_k3[2].mde                                          = 0.005947759261347404
+   $.v1.gates.M2_k3[0].margin                                       = 0.2423144429922104
+   $.v1.gates.M2_k3[0].mde                                          = 0.07463549425060194
+   $.v1.gates.M2_k3[1].margin                                       = 0.2211429625749588
+   $.v1.gates.M2_k3[1].mde                                          = 0.06067924481725915
+   $.v1.gates.M2_k3[2].margin                                       = 0.21150703728199005
+   $.v1.gates.M2_k3[2].mde                                          = 0.056556742354170166
+   $.v1.gates.M1_k39[0].margin                                      = 0.7709034085273743
+   $.v1.gates.M1_k39[0].mde                                         = 0.1797203986189981
+   $.v1.gates.M1_k39[1].margin                                      = 1.0503937005996704
+   $.v1.gates.M1_k39[1].mde                                         = 0.3015086347717493
+   $.v1.gates.M1_k39[2].margin                                      = 0.8985196352005005
+   $.v1.gates.M1_k39[2].mde                                         = 0.15254705412810085
+   $.v1.gates.M2_k39[0].margin                                      = 0.21483293175697327
+   $.v1.gates.M2_k39[0].mde                                         = 0.021661233535729265
+   $.v1.gates.M2_k39[1].margin                                      = 0.20826993882656097
+   $.v1.gates.M2_k39[1].mde                                         = 0.01887656040883694
+   $.v1.gates.M2_k39[2].margin                                      = 0.2194586992263794
+   $.v1.gates.M2_k39[2].mde                                         = 0.018870257540199293
+   $.v3.per_fold.c0_k3.b4                                           = 0.3421441912651062
+   $.v3.per_fold.c0_k3.margin_m2_minus_b4                           = 0.3480273485183716
+   $.v3.per_fold.c0_k39.b4                                          = 1.222617268562317
+   $.v3.per_fold.c0_k39.margin_m2_minus_b4                          = 0.28914833068847656
+   $.v3.per_fold.c1_k3.b4                                           = 0.45332038402557373
+   $.v3.per_fold.c1_k3.margin_m2_minus_b4                           = 0.5559161901473999
+   $.v3.per_fold.c1_k39.b4                                          = 0.7090320587158203
+   $.v3.per_fold.c1_k39.margin_m2_minus_b4                          = 0.2409321665763855
+   $.v3.per_fold.c2_k3.b4                                           = 0.45980000495910645
+   $.v3.per_fold.c2_k3.margin_m2_minus_b4                           = 0.5552225112915039
+   $.v3.per_fold.c2_k39.b4                                          = 0.9090737700462341
+   $.v3.per_fold.c2_k39.margin_m2_minus_b4                          = 0.3088015913963318
+   $.v3.per_fold.c3_k3.b4                                           = 0.35344481468200684
+   $.v3.per_fold.c3_k3.margin_m2_minus_b4                           = 0.4892747402191162
+   $.v3.per_fold.c3_k39.b4                                          = 1.0821170806884766
+   $.v3.per_fold.c3_k39.margin_m2_minus_b4                          = 0.3460531234741211
+   $.v3.per_fold.c4_k3.b4                                           = 0.2631382942199707
+   $.v3.per_fold.c4_k3.margin_m2_minus_b4                           = 0.41497868299484253
+   $.v3.per_fold.c4_k39.b4                                          = 0.8001216650009155
+   $.v3.per_fold.c4_k39.margin_m2_minus_b4                          = 0.247145414352417
+   $.v3.per_fold.c5_k3.b4                                           = 0.5579732060432434
+   $.v3.per_fold.c5_k3.margin_m2_minus_b4                           = 0.6201534867286682
+   $.v3.per_fold.c5_k39.b4                                          = 0.848355770111084
+   $.v3.per_fold.c5_k39.margin_m2_minus_b4                          = 0.30044662952423096
+   $.v4.mean_b4_rel                                                 = 0.6113563376228984
+   $.v4.max_b4_rel                                                  = 0.8577883243560791
+   $.v4.min_b4_rel                                                  = 0.4362521767616272
+--- phase3151\g1p1_combo_additive_vs_interaction\result_rev3151b.json (sha8 dd0cc176) ---
+   $.evidence.median_true_margin                                    = 1.1095
+   $.evidence.v3.m2_fruit_margin_k3_k39                             = [0.348, 0.289]
+   $.evidence.v4_s3_b4_mean                                         = 0.6114
+--- phase3151\g1p1_combo_additive_vs_interaction\result_v2fix.json (sha8 d8cef721) ---
+   $.v2_k3.M1_vs_B4.per_seed.s7.margin                              = -0.028946934267878532
+   $.v2_k3.M1_vs_B4.per_seed.s7.mde                                 = 0.0067783949636473035
+   $.v2_k3.M1_vs_B4.per_seed.s8.margin                              = -0.032304372638463974
+   $.v2_k3.M1_vs_B4.per_seed.s8.mde                                 = 0.0075403079586488005
+   $.v2_k3.M1_vs_B4.per_seed.s9.margin                              = -0.024767404422163963
+   $.v2_k3.M1_vs_B4.per_seed.s9.mde                                 = 0.005947759261347404
+   $.v2_k3.M1_vs_B5.per_seed.s7.margin                              = -0.16872133051200125
+   $.v2_k3.M1_vs_B5.per_seed.s7.mde                                 = 0.04591337335505526
+   $.v2_k3.M1_vs_B5.per_seed.s8.margin                              = -0.14676130331905268
+   $.v2_k3.M1_vs_B5.per_seed.s8.mde                                 = 0.02789709771507199
+   $.v2_k3.M1_vs_B5.per_seed.s9.margin                              = -0.1665056730974884
+   $.v2_k3.M1_vs_B5.per_seed.s9.mde                                 = 0.03186306359818886
+   $.v2_k3.M2_vs_B4.per_seed.s7.margin                              = 0.2423144429922104
+   $.v2_k3.M2_vs_B4.per_seed.s7.mde                                 = 0.07463549425060194
+   $.v2_k3.M2_vs_B4.per_seed.s8.margin                              = 0.2211429625749588
+   $.v2_k3.M2_vs_B4.per_seed.s8.mde                                 = 0.06067924481725915
+   $.v2_k3.M2_vs_B4.per_seed.s9.margin                              = 0.21150703728199005
+   $.v2_k3.M2_vs_B4.per_seed.s9.mde                                 = 0.056556742354170166
+   $.v2_k3.M2_vs_B5.per_seed.s7.margin                              = 0.10254005421767484
+   $.v2_k3.M2_vs_B5.per_seed.s7.mde                                 = 0.05123896401447751
+   $.v2_k3.M2_vs_B5.per_seed.s8.margin                              = 0.1066860190348327
+   $.v2_k3.M2_vs_B5.per_seed.s8.mde                                 = 0.060112753004863254
+   $.v2_k3.M2_vs_B5.per_seed.s9.margin                              = 0.06976877518927889
+   $.v2_k3.M2_vs_B5.per_seed.s9.mde                                 = 0.05550562968845579
+--- phase3151\g1p1_combo_additive_vs_interaction\smoke\result.json (sha8 d62e4b5d) ---
+   $.v0_material.median_true_margin                                 = 0.8668620586395264
+   $.v1.b4_s1_k39_rel                                               = 0.45484036207199097
+   $.v1.gates.M1_k3[0].margin                                       = -0.017266562208533287
+   $.v1.gates.M1_k3[0].mde                                          = 0.005695195366116363
+   $.v1.gates.M1_k3[1].margin                                       = -0.01820652186870575
+   $.v1.gates.M1_k3[1].mde                                          = 0.006051199120805227
+   $.v1.gates.M1_k3[2].margin                                       = -0.021207304671406746
+   $.v1.gates.M1_k3[2].mde                                          = 0.00894985659724298
+   $.v1.gates.M2_k3[0].margin                                       = 0.25321605801582336
+   $.v1.gates.M2_k3[0].mde                                          = 0.09169097878776539
+   $.v1.gates.M2_k3[1].margin                                       = 0.16913634538650513
+   $.v1.gates.M2_k3[1].mde                                          = 0.08776606788246367
+   $.v1.gates.M2_k3[2].margin                                       = 0.20562714338302612
+   $.v1.gates.M2_k3[2].mde                                          = 0.09039214207213894
+   $.v1.gates.M1_k39[0].margin                                      = 0.2588984966278076
+   $.v1.gates.M1_k39[0].mde                                         = 0.04218998911048636
+   $.v1.gates.M1_k39[1].margin                                      = 0.23397909104824066
+   $.v1.gates.M1_k39[1].mde                                         = 0.06530527265262893
+   $.v1.gates.M1_k39[2].margin                                      = 0.24805566668510437
+   $.v1.gates.M1_k39[2].mde                                         = 0.04268205861391731
+   $.v1.gates.M2_k39[0].margin                                      = 0.12158586084842682
+   $.v1.gates.M2_k39[0].mde                                         = 0.02968636593673631
+   $.v1.gates.M2_k39[1].margin                                      = 0.17846743762493134
+   $.v1.gates.M2_k39[1].mde                                         = 0.05438550100968866
+   $.v1.gates.M2_k39[2].margin                                      = 0.10082153975963593
+   $.v1.gates.M2_k39[2].mde                                         = 0.03620389383867497
+   $.v3.per_fold.c0_k3.b4                                           = 0.3406137228012085
+   $.v3.per_fold.c0_k3.margin_m2_minus_b4                           = 0.24848949909210205
+   $.v3.per_fold.c0_k39.b4                                          = 1.252189040184021
+   $.v3.per_fold.c0_k39.margin_m2_minus_b4                          = 0.19579899311065674
+   $.v3.per_fold.c1_k3.b4                                           = 0.44217875599861145
+   $.v3.per_fold.c1_k3.margin_m2_minus_b4                           = 0.4499494731426239
+   $.v3.per_fold.c1_k39.b4                                          = 0.7172138094902039
+   $.v3.per_fold.c1_k39.margin_m2_minus_b4                          = 0.15763789415359497
+   $.v3.per_fold.c2_k3.b4                                           = 0.41736286878585815
+   $.v3.per_fold.c2_k3.margin_m2_minus_b4                           = 0.4316473603248596
+   $.v3.per_fold.c2_k39.b4                                          = 0.9435332417488098
+   $.v3.per_fold.c2_k39.margin_m2_minus_b4                          = 0.21041804552078247
+   $.v3.per_fold.c3_k3.b4                                           = 0.3297618627548218
+   $.v3.per_fold.c3_k3.margin_m2_minus_b4                           = 0.3790006637573242
+   $.v3.per_fold.c3_k39.b4                                          = 1.0714346170425415
+   $.v3.per_fold.c3_k39.margin_m2_minus_b4                          = 0.25106585025787354
+   $.v3.per_fold.c4_k3.b4                                           = 0.2514597475528717
+   $.v3.per_fold.c4_k3.margin_m2_minus_b4                           = 0.31722840666770935
+   $.v3.per_fold.c4_k39.b4                                          = 0.8243474364280701
+   $.v3.per_fold.c4_k39.margin_m2_minus_b4                          = 0.13927727937698364
+   $.v3.per_fold.c5_k3.b4                                           = 0.5476326942443848
+   $.v3.per_fold.c5_k3.margin_m2_minus_b4                           = 0.5123178958892822
+   $.v3.per_fold.c5_k39.b4                                          = 0.9465446472167969
+   $.v3.per_fold.c5_k39.margin_m2_minus_b4                          = 0.2072058916091919
+   $.v4.mean_b4_rel                                                 = 0.6833836336930593
+   $.v4.max_b4_rel                                                  = 0.8737398982048035
+   $.v4.min_b4_rel                                                  = 0.521051287651062

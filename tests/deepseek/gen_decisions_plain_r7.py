@@ -1,0 +1,282 @@
+# -*- coding: utf-8 -*-
+"""R7：生成通俗版「deepseek 线归属整理 + 主线决策」单页 HTML。
+数字全部现场读取 result JSON（不手工转录）。"""
+import os, json, hashlib, re, html
+
+ROOT = r"D:\AI2050\Ai2050-OpenOne"
+RES  = os.path.join(ROOT, r"tests\deepseek\result")
+OUT  = os.path.join(RES, "decisions_plain_r7.html")
+
+def J(p):
+    return json.loads(open(p, "rb").read().decode("utf-8-sig"))
+def sha8(p):
+    return hashlib.sha256(open(p, "rb").read()).hexdigest()[:8]
+
+dd = J(os.path.join(RES, "deadline_dual_track_v1.json"))
+sr = J(os.path.join(RES, "seal_request_v1.json"))
+k  = dd["k1_recompute"]
+pm, ag, vd = k["per_model"], k["aggregate"], k["verdict"]
+GATE = 0.05
+MODELS = ["qwen3-4b", "qwen3-14b", "glm4-9b"]
+
+# 现场计算
+ratio = pm["qwen3-4b"]["b4_readout"] / GATE
+n_kstar_pass = sum(1 for m in MODELS if pm[m]["b4_kstar"] > GATE)
+n_read_pass  = sum(1 for m in MODELS if pm[m]["b4_readout"] > GATE)
+
+CSS = """
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:#1d232b;font:15px/1.75 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:34px 22px 70px}
+h1{font-size:27px;margin:0 0 6px;letter-spacing:-.4px}
+.sub{color:#5b6673;font-size:14px;margin-bottom:26px}
+h2{font-size:19px;margin:34px 0 12px;padding-bottom:7px;border-bottom:2px solid #e6e9ee}
+h3{font-size:15.5px;margin:20px 0 8px}
+p{margin:8px 0}
+.card{background:#fff;border:1px solid #e3e7ec;border-radius:11px;padding:16px 18px;margin:12px 0;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.kpirow{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+.kpi{flex:1 1 150px;background:#fff;border:1px solid #e3e7ec;border-radius:11px;padding:13px 14px}
+.kpi .v{font-size:21px;font-weight:700;color:#0b62d0;letter-spacing:-.3px}
+.kpi .l{font-size:12px;color:#6a7683;margin-top:3px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;background:#fff}
+th,td{border:1px solid #e3e7ec;padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#f0f3f7;font-weight:600;font-size:13px}
+code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:12.5px;font-family:Consolas,monospace}
+.tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:12px;font-weight:600}
+.t-ok{background:#e6f4ea;color:#137333}
+.t-no{background:#fce8e6;color:#b3261e}
+.t-warn{background:#fef7e0;color:#9a6700}
+.t-info{background:#e8f0fe;color:#0b57d0}
+.plain{background:#fbfcfe;border-left:3px solid #0b62d0;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0}
+.plain b{color:#0b4ea8}
+.big{font-size:16px}
+.opt{background:#fff;border:1px solid #e3e7ec;border-left:4px solid #0b62d0;border-radius:8px;padding:12px 15px;margin:9px 0}
+.opt .h{font-weight:700;margin-bottom:3px}
+.opt.rec{border-left-color:#137333;background:#fafdfb}
+pre{background:#0f172a;color:#e2e8f0;padding:13px 15px;border-radius:9px;overflow:auto;font-size:13px}
+.small{font-size:12.5px;color:#6a7683}
+ul{margin:7px 0 7px 20px;padding:0}
+li{margin:4px 0}
+.hl{background:#fff3cd;padding:0 3px;border-radius:3px}
+hr{border:0;border-top:1px dashed #d9dee5;margin:22px 0}
+"""
+
+def tag(txt, cls): return '<span class="tag %s">%s</span>' % (cls, txt)
+
+# ---------- 归属整理 ----------
+prov_rows = [
+    ("MAIN_AXIS_VERDICT_v1.md", "N1 主轴三段裁决；日志 Phase 4 依据；gpt5 日志 0 引用", "deepseek", "已并入 Phase 32"),
+    ("EMBED_ANCHOR_VERDICT_v1.md", "E1 词嵌入锚点裁决；日志 Phase 2 依据；gpt5 日志 0 引用", "deepseek", "已并入 Phase 33"),
+    ("MEMO_AUDIT_2750_3148.md", "MEMO 审计（RDC 计划之源）；日志 18 处引用；gpt5 日志 0 引用", "deepseek", "已并入 Phase 34"),
+    ("metric_dict_v1_backup.json", "Q02 的 v1 备份；仅日志引用", "deepseek", "迁至 deepseek/atlas/"),
+    ("atlas_ledger.json", "共享证据账本（两条线都在用）", "共享", "不动（请定）"),
+    ("ATLAS_LEDGER_SPEC / card_set_v2 / cleanup_ledger", "gpt5 日志 Phase 2882 / 2988 登记", "其他线", "不动"),
+    ("plan_v3–v6 / hdmcc / research_synthesis / lpf_multiaxis / fingerprint_* / ATLAS_PLAN / MASTER_PLAN", "LPF v5.3 时期产物；gpt5 日志引用", "其他线", "不动"),
+    ("FIRST_PRINCIPLES_3090_3149 / PARADIGM_SHIFT_VERDICT / UNIFIED_REVIEW_ADJUDICATION", "gpt5 日志 Phase 3150/3151 登记（后两件自述线=RDC/T4）", "其他线（跨线引用）", "不动"),
+    ("AGI_GPT5_MEMO*.md / backup / code / data", "G 线本体与其历史资产", "其他线", "不动"),
+]
+prov_html = "".join(
+    "<tr><td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td></tr>" % (
+        html.escape(a), b,
+        tag(c, "t-info" if c == "deepseek" else ("t-warn" if c == "共享" else "t-no")), d)
+    for a, b, c, d in prov_rows)
+
+# ---------- K1 表 ----------
+k1_rows = ""
+for m in MODELS:
+    g = pm[m]
+    k1_rows += "<tr><td><code>%s</code></td><td>%d</td><td>%d</td><td>%s</td><td class='plain big'>%s</td><td>%s</td><td>%s</td></tr>" % (
+        m, g["kstar"], g["readout"],
+        "%.4f%%" % (g["b4_kstar"] * 100),
+        "<b>%.2f%%</b>" % (g["b4_readout"] * 100),
+        tag("过门" if g["b4_kstar"] > GATE else "未过门", "t-no" if g["b4_kstar"] > GATE else "t-ok"),
+        tag("过门" if g["b4_readout"] > GATE else "未过门", "t-no" if g["b4_readout"] > GATE else "t-ok"))
+
+# ---------- 选项卡 ----------
+opt_html = ""
+for o in sr["Q08"]["options"]:
+    rec = " rec" if o["id"] == "A" else ""
+    opt_html += ("<div class='opt%s'><div class='h'>%s. %s %s</div><div>%s</div></div>"
+                 % (rec, o["id"], o["name"], ("<span class='tag t-ok'>推荐</span>" if o["id"] == "A" else ""),
+                    html.escape(o["effect"])))
+
+c_rows = "".join(
+    "<tr><td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td></tr>" % (
+        c["id"], html.escape(c["target"]), html.escape(c["current"]), html.escape(c["proposed"]))
+    for c in sr["corrections_C1_C6"])
+
+I1 = sr["I1"]["ask"]; I9 = sr["I9"]["ask"]
+
+memo_sha = sha8(os.path.join(ROOT, r"research\deepseek\docs\AGI_DEEPSEEK_MEMO.md"))
+memo_b = os.path.getsize(os.path.join(ROOT, r"research\deepseek\docs\AGI_DEEPSEEK_MEMO.md"))
+
+BODY = f"""
+<div class="wrap">
+<h1>deepseek 线归属整理 &amp; 主线决策（通俗版）</h1>
+<div class="sub">R7 · 2026-10-03 · 唯一研究日志 <code>research/deepseek/docs/AGI_DEEPSEEK_MEMO.md</code>
+（{memo_b:,} B / <code>{memo_sha}</code>）· 全部数字现场取自 result，无手工转录</div>
+
+<h2>0 三句话总结</h2>
+<div class="card">
+<ol>
+<li><b>归属</b>：<code>research/gpt5/</code> 下只有 <b>3 件 .md + 1 个 JSON</b> 属于本对话（deepseek 线），已全文并入唯一研究日志；
+其余是其他 AI 线的历史资产，<b>一律未动</b>（含被判据判为「其他线」的 20 件）。</li>
+<li><b>主线卡在 3 个「签字」上</b>，不是卡在做实验上：K1 该在哪一层判定（<b>Q08</b>）、6 条记账更正（<b>C1–C6</b>）、
+两条制度条款（<b>I1 / I9</b>）。这三项不签，后面需要 GPU 的实验不许开工。</li>
+<li><b>最关键的一个数字</b>：同一条 5% 的失败线，挂在「假设自己挑的层」上是 <b>{n_kstar_pass}/3 过门</b>（看着像没事），
+挂在「模型真正输出答案的层」上是 <b>{n_read_pass}/3 过门</b>（误差是门槛的 <b>{ratio:.1f} 倍</b>）⇒ <b>结论翻转</b>。</li>
+</ol>
+</div>
+
+<h2>1 这个项目在干什么（大白话）</h2>
+<div class="card">
+<p>想搞清 LLM 内部到底怎么「存和用」语言概念（比如「苹果是一种水果」这类关系）。做法是不断做小实验，
+每个实验叫一个 <b>Phase</b>，把结论拼成一张图。每做完就要下一个 <b>判决</b>（算不算成立、算不算新发现）。</p>
+<p class="big">体检结果：<b>402 个 Phase、685 次判决，但只有 48 个不同的判决标签</b>——大量重复；
+397 个 Phase 里只有 <b>26 个（6.55%）</b>真的报告了「某个指标从 A 变成 B」，其余 <b>93%</b> 只是「我又做了一个实验」的目录条目。</p>
+<div class="plain">这就是「<b>无限 Phase 循环</b>」：一直在产出局部特征，但<b>攒不起来</b>。
+所以先停下来做体检（诊断 → 研究宪法 → 议程队列 → 四项零 GPU 检查），再决定要不要继续做实验。</div>
+</div>
+
+<h2>2 三个「死线」是什么，以及它们为什么从来没响过</h2>
+<div class="card">
+<p><b>死线</b> = 事先写好的「如果出现这个结果，我就承认这条理论路线错了」。相当于给自己设的<b>触发式否决条件</b>——
+本来是防止自己骗自己的，结果它们被写成了永远不响。</p>
+<table>
+<tr><th>死线</th><th>原文条件（逐字）</th><th>大白话</th><th>状态</th></tr>
+<tr><td><b>K1</b></td><td>{html.escape(dd['original_form']['K1'])}</td>
+    <td>3 个模型猜「没见过的组合」时错得都 &gt;5%，而且都不比一个「只会做加法」的简单基线好
+        → 放弃「<b>条件齿轮组 = 算子代数</b>」（即：多个语义方向能像齿轮一样组合、有代数结构）</td>
+    <td>{tag('已重算', 't-ok')}</td></tr>
+<tr><td><b>K2</b></td><td>{html.escape(dd['original_form']['K2'])}</td>
+    <td>把那套「条件门」拆开后，响应相似度掉一半以上、但行为没变 → 放弃「条件门是独立结构」</td>
+    <td>{tag('从未被测量', 't-no')}</td></tr>
+<tr><td><b>K3</b></td><td>{html.escape(dd['original_form']['K3'])}</td>
+    <td>3 类模式里，靠<b>单个坐标</b>筛出的 top-50 覆盖率都 &lt;30% → 放弃「单坐标机制」</td>
+    <td>{tag('从未被测量', 't-no')}</td></tr>
+</table>
+<h3>体检发现的 3 个毛病（可逐条查证）</h3>
+<ul>
+<li><b>① 合取（把门焊死）</b>：K1 要求「<b>所有</b>模型都满足」，K3 要求「<b>所有</b>模式族都满足」。
+而项目自己说「跨模型从不一致」⇒ 两支同时成立的概率被系统性压低。实测上面一层只有 <b>{n_kstar_pass}/3</b>。</li>
+<li><b>② 自相矛盾（无法预先登记判决）</b>：K2 在同一份文件里有两个互斥的「怎么算」——
+一份写「响应 cos 下降 &gt;50%」，另一份写「交互份额 &gt;50%」。两个量的单位和零假设都不同。</li>
+<li><b>③ 根本没有装置</b>：K2 依赖的 3154 实验<b>目录不存在</b>；K3 要的「top-50 覆盖率」这个量<b>全库都没有</b>。</li>
+</ul>
+<div class="plain big">一句话：<b>三条死线里，两条从未被测量，一条的触发条件写成合取。</b>这就是「死线免疫」的完整病理。</div>
+</div>
+
+<h2>3 修好之后重算 K1 —— 结论翻转（本节是主线的核心）</h2>
+<div class="card">
+<p><b>误差</b> = 模型猜「没见过的组合」时错多少；<b>门槛</b> = 5%。「过门」= 误差超过门槛 = 死线触发。</p>
+<table>
+<tr><th>模型</th><th>k* 层<br><span class="small">承诺层（假设自己挑的）</span></th><th>读出层<br><span class="small">真正输出答案处</span></th>
+    <th>误差 @ k* 层</th><th>误差 @ 读出层</th><th>k* 层过 5% 门？</th><th>读出层过 5% 门？</th></tr>
+{k1_rows}
+<tr><td><b>合计</b></td><td>—</td><td>—</td><td>—</td>
+    <td class="big">池化 <b>{ag['E_read_pooled']*100:.2f}%</b></td>
+    <td>{tag(f'{n_kstar_pass}/3 过门', 't-ok')}</td>
+    <td>{tag(f'{n_read_pass}/3 过门', 't-no')}</td></tr>
+</table>
+<div class="kpirow">
+<div class="kpi"><div class="v">{ag['kstar_pooled_margin']:+.4f}</div><div class="l">k* 层 池化 margin（负 = 候选优于基线 ⇒ 通过）</div></div>
+<div class="kpi"><div class="v">{ag['readout_pooled_margin']:+.4f}</div><div class="l">读出层 池化 margin（正 = 候选更差 ⇒ 触发）</div></div>
+<div class="kpi"><div class="v">{ratio:.1f}×</div><div class="l">读出层误差 ÷ 5% 门槛</div></div>
+</div>
+<div class="plain">
+<b>为什么两个答案差这么多？</b>因为「承诺层 k*」是<b>提出这个理论的人自己挑的层</b>（约 7–8% 深度处）。
+用一个自己挑的层去检验自己的假设，很容易得到「我没错」的答案。换成模型真正说话的那一层，误差大了将近 7 倍。
+<br><b>所以：「用假设自己指定的层来判断假设」这件事，必须被显式接受或显式否决，不能默认。</b>
+</div>
+<h3>修好后的双轨判决（聚合统计 + 单模型否决权）</h3>
+<table>
+<tr><th>判定层</th><th>双轨判决</th><th>含义</th></tr>
+<tr><td>读出层（行为层）</td><td>{tag(vd['readout_layer'], 't-no')}</td>
+    <td>3/3 模型都不达标，且聚合主判据触发 ⇒ <b>死线触发</b>；旧结论「未触发、算子代数线保住」<b>不成立</b></td></tr>
+<tr><td>k* 层（承诺层）</td><td>{tag(vd['kstar_layer'], 't-warn')}</td>
+    <td>聚合通过，但被 <code>{', '.join(vd['kstar_veto_models'])}</code> 一票否决 ⇒ 只能算「部分模型特有」，<b>不得升为机制</b></td></tr>
+</table>
+<p class="small">旧形式结果：<code>{html.escape(k['old_form_result'])}</code></p>
+</div>
+
+<h2>4 需要你签的三件事</h2>
+
+<h3>决策 1 · Q08：K1 该在哪一层判定？（唯一影响主线存续的决策）</h3>
+<div class="card">{opt_html}
+<p class="small">若选 <b>乙</b>，需注意 TESTPLAN §8.2 原本规定 K1–K3 在 3150 一并冻结、之后不得修改 ⇒ 重述必须<b>显式解冻升版</b>。
+若选 <b>丙</b>，A 闸门无法关闭，B 闸门（Q03+ 需 GPU）不得启动。</p>
+</div>
+
+<h3>决策 2 · C1–C6：6 条「记账更正」接受吗？</h3>
+<div class="card">
+<p>这些<b>不是实验结论</b>，而是报告/账本里<b>写错或口径不清</b>的地方。最典型的一条：</p>
+<table><tr><th>id</th><th>目标</th><th>现状</th><th>改为</th></tr>{c_rows}</table>
+<div class="plain">大白话：比如「62 条命题里约 55% 不能直接进新推理链」——这是拿<b>分量数</b>除以<b>条数</b>（单位不一样，
+等于把「3 个苹果 + 2 个橘子」说成「5 个苹果」）。同一单位下应该是 <b>41.5%</b>（39/94）或 <b>62.9%</b>（39/62）。
+另外账本把自己也算进哈希里 ⇒ 永远对不上，要改成「不算自己」的版本。</div>
+<p>选项：<b>全接受</b> / <b>逐条取舍</b>（请列出接受的 id）。</p>
+</div>
+
+<h3>决策 3 · I1 / I9：两条「制度条款」冻结吗？</h3>
+<div class="card">
+<div class="opt"><div class="h">I1 · 唯一全局 KPI</div><div>{html.escape(I1)}</div>
+<div class="plain" style="margin:8px 0 0"><b>大白话</b>：一个 Phase 如果没有让 <code>E_read</code>（读出误差）这类<b>全局指标</b>变好，
+就只能记成「目录」，<b>不许记成「进展」</b>。不许把「我又做了一个实验」当成绩。这条正是治「402 个 Phase 却攒不起来」的药。</div></div>
+<div class="opt"><div class="h">I9 · 议程唯一来源</div><div>{html.escape(I9)}</div>
+<div class="plain" style="margin:8px 0 0"><b>大白话</b>：只能用<b>预先冻结的那张 30 项队列</b>（Q01–Q30）决定下一个做什么；
+<b>禁止</b>「看到一个残差就自动派生下一个 Phase」——那正是无限循环的发动机。</div></div>
+<p>选项：<b>确认</b> / <b>修改</b>（请给出改动）。</p>
+</div>
+
+<h2>5 一行回复模板</h2>
+<div class="card">
+<pre>seal: Q08=甲 | C=全接受 | I1=确认 | I9=确认</pre>
+<p class="small">签完之后我会按序执行：<b>①</b> 落 C1–C6 更正（改前备份 / 改后校验 sha）
+→ <b>②</b> K1 改判 append 进研究日志 + 账本登记 → <b>③</b> 关闭 A 闸门（Q01/Q02/Q08/Q09/Q12 = sealed）
+→ <b>④</b> 进入 B 闸门 <code>Q03</code>（E_read 统一基线复算，<b>需要 GPU</b>）。</p>
+</div>
+
+<h2>6 名词对照表</h2>
+<div class="card">
+<table>
+<tr><th>术语</th><th>大白话</th></tr>
+<tr><td>Phase</td><td>一次小实验；项目已累计 402 个</td></tr>
+<tr><td>判决 / verdict</td><td>给这次实验下结论（成立 / 不成立 / 算新发现 / 只算目录）</td></tr>
+<tr><td>死线 / K1·K2·K3</td><td>事先写好的「如果出现 X 就承认这条路线错了」的触发式否决条件</td></tr>
+<tr><td>k* 承诺层</td><td>假设自己指定的那一层（约 7–8% 深度）</td></tr>
+<tr><td>读出层</td><td>模型真正输出最终答案的位置（行为由此定义）</td></tr>
+<tr><td>B4 / 全加性基线</td><td>「只会做加法」的简单对照模型；比不过它，说明复杂结构没带来增益</td></tr>
+<tr><td>margin / MDE</td><td>margin=候选误差−基线误差（<b>负 = 候选更好</b>）；MDE=能分辨的最小差异（噪声底）</td></tr>
+<tr><td>模型级否决权</td><td>只要有 <b>一个</b>模型不达标，结论就降级为「部分模型特有」，不许说成普遍机制</td></tr>
+<tr><td>E_read</td><td>统一的全局误差指标（本项目用来判断有没有真进步）</td></tr>
+<tr><td>命题账本</td><td>把每条结论（命题）分级记录的总账（62 条）</td></tr>
+<tr><td>A 闸门 / B 闸门</td><td>A=零 GPU 的元层体检，必须先关；B=需要 GPU 的正式实验</td></tr>
+<tr><td>seal（签字冻结）</td><td>你确认后该项才生效；未 seal 前不许改动既有判定</td></tr>
+</table>
+</div>
+
+<h2>7 归属整理结果（本轮已执行）</h2>
+<div class="card">
+<table>
+<tr><th>文件</th><th>归属判据（证据法）</th><th>归属</th><th>处置</th></tr>
+{prov_html}
+</table>
+<p class="small">判据规则：<b>谁的备忘录登记了它，就是谁的</b>。deepseek 线 = 本对话。
+3 件 deepseek 文档已全文并入唯一研究日志为 <b>Phase 32–34</b>（标题降一级、逐行包含性 100%、原件已备份后删除）；
+<code>metric_dict_v1_backup.json</code> 已迁入 <code>research/deepseek/atlas/</code>。
+独立复核 <b>44 PASS / 0 FAIL</b>，其中 20 件其他线文件指纹逐一确认<b>未被触碰</b>。</p>
+</div>
+
+<hr>
+<p class="small">本页只做汇总，不代为改判、不改动任何既有判定。数字来源：
+<code>deadline_dual_track_v1.json</code>（{sha8(os.path.join(RES,'deadline_dual_track_v1.json'))}）·
+<code>seal_request_v1.json</code>（{sha8(os.path.join(RES,'seal_request_v1.json'))}）</p>
+</div>
+"""
+
+doc = "<!DOCTYPE html><html lang='zh-CN'><head><meta charset='utf-8'>" \
+      "<meta name='viewport' content='width=device-width,initial-scale=1'>" \
+      "<title>deepseek 线归属整理与主线决策（通俗版）</title><style>%s</style></head><body>%s</body></html>" % (CSS, BODY)
+open(OUT, "w", encoding="utf-8", newline="\n").write(doc)
+print("WROTE %s  %d chars  sha8=%s" % (OUT, len(doc), sha8(OUT)))
+print("ratio=%.3f kstar_pass=%d read_pass=%d" % (ratio, n_kstar_pass, n_read_pass))

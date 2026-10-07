@@ -1,0 +1,148 @@
+
+== A. 文件与哈希 ==
+[PASS] A1 seal 存在且非空                                        21077 B sha8=6ea6bdc1
+[PASS] A1 execution 存在且非空                                   14559 B sha8=8bda64c2
+[PASS] A1 result 存在且非空                                      908097 B sha8=53a293a8
+[PASS] A2 result.execution_sha256 == 实盘 execution sha256    8bda64c2b2d9a4c5
+[PASS] A3 result.seal_sha256 == 实盘 seal sha256              6ea6bdc1061afe29
+[PASS] A4 每臂报告齐备                                            ['n2h1a8_report_A0_calib_qwen3-4b-nf4.txt', 'n2h1a8_report_A1_glm4-9b-nf4.txt', 'n2h1a8_report_A2_qwen3-14b-nf4.txt']
+
+== B. seal <-> execution 一致性 ==
+[PASS] B1 execution.seal_sha256 == seal 实盘                  
+[PASS] B2 seal.phase == execution.phase == 15               
+[PASS] B3 网格三处一致 (profile_sites)                            
+[PASS] B4 网格三处一致 (alphas)                                   
+[PASS] B5 W/xh_frac 冻结一致                                    
+[PASS] B6 继承锚 XH_12_by_site 18 位点                           
+[PASS] B7 继承锚 J_swap_12_by_site 18 位点                       
+[PASS] B8 冻结参照 d_argmax_4B == 13                            
+
+== C. result 结构完整性 ==
+[PASS] C1 result 顶层键齐备                                      缺 []
+[PASS] C2 三臂齐备                                              ['A0_calib_qwen3-4b-nf4', 'A1_glm4-9b-nf4', 'A2_qwen3-14b-nf4']
+[PASS] C3 A0_calib_qwen3-4b-nf4    E4_per_pair 位点齐备         18 位点
+[PASS] C4 A0_calib_qwen3-4b-nf4    每行 alpha 数 == 14         rows=14 pairs=24
+[PASS] C3 A1_glm4-9b-nf4           E4_per_pair 位点齐备         18 位点
+[PASS] C4 A1_glm4-9b-nf4           每行 alpha 数 == 14         rows=14 pairs=24
+[PASS] C3 A2_qwen3-14b-nf4         E4_per_pair 位点齐备         18 位点
+[PASS] C4 A2_qwen3-14b-nf4         每行 alpha 数 == 14         rows=14 pairs=24
+
+== D. 独立重算 xhalf / J（从 E4_per_pair + FULL_SWAP） ==
+[PASS] D1 A0_calib_qwen3-4b-nf4    xhalf 逐位点重算一致            max|d|=0.000e+00
+[PASS] D2 A0_calib_qwen3-4b-nf4    J 逐位点重算一致                max abs=0.000e+00 rel=0.000e+00
+[PASS] D3 A0_calib_qwen3-4b-nf4    XH_RANGE 重算一致            0.105652 vs 0.10565238719543679
+[PASS] D4 A0_calib_qwen3-4b-nf4    E5.xhalf == E4_summary.xhalf 
+[PASS] D1 A1_glm4-9b-nf4           xhalf 逐位点重算一致            max|d|=0.000e+00
+[PASS] D2 A1_glm4-9b-nf4           J 逐位点重算一致                max abs=0.000e+00 rel=0.000e+00
+[PASS] D3 A1_glm4-9b-nf4           XH_RANGE 重算一致            0.116432 vs 0.1164322366054047
+[PASS] D4 A1_glm4-9b-nf4           E5.xhalf == E4_summary.xhalf 
+[PASS] D1 A2_qwen3-14b-nf4         xhalf 逐位点重算一致            max|d|=0.000e+00
+[PASS] D2 A2_qwen3-14b-nf4         J 逐位点重算一致                max abs=0.000e+00 rel=0.000e+00
+[PASS] D3 A2_qwen3-14b-nf4         XH_RANGE 重算一致            0.122138 vs 0.12213814086045521
+[PASS] D4 A2_qwen3-14b-nf4         E5.xhalf == E4_summary.xhalf 
+
+== E. FULL_SWAP 独立重算 ==
+[PASS] E1 A0_calib_qwen3-4b-nf4    FS_VEC == FS_PAIR[FS_ORDER] n=24
+[PASS] E2 A0_calib_qwen3-4b-nf4    FULL_SWAP == mean(FS_VEC) 10.749739583333
+[PASS] E3 A0_calib_qwen3-4b-nf4    FS_VEC 长度 == discovery 对数 (24) n=24
+[PASS] E1 A1_glm4-9b-nf4           FS_VEC == FS_PAIR[FS_ORDER] n=24
+[PASS] E2 A1_glm4-9b-nf4           FULL_SWAP == mean(FS_VEC) 9.555468750000
+[PASS] E3 A1_glm4-9b-nf4           FS_VEC 长度 == discovery 对数 (24) n=24
+[PASS] E1 A2_qwen3-14b-nf4         FS_VEC == FS_PAIR[FS_ORDER] n=24
+[PASS] E2 A2_qwen3-14b-nf4         FULL_SWAP == mean(FS_VEC) 9.473437500000
+[PASS] E3 A2_qwen3-14b-nf4         FS_VEC 长度 == discovery 对数 (24) n=24
+
+== F. 集中度 + 置换零假设逐位重放 ==
+[PASS] F1 A0_calib_qwen3-4b-nf4    top3_x 重算一致              0.5454238009752779
+[PASS] F2 A0_calib_qwen3-4b-nf4    top3_j 重算一致              0.8318515978276527
+[PASS] F3 A0_calib_qwen3-4b-nf4    argmax 窗口一致              x=14 j=0
+[PASS] F4 A0_calib_qwen3-4b-nf4    jumps_x 重算一致             
+[PASS] F5 A0_calib_qwen3-4b-nf4    range_x 重算一致             
+[PASS] F6 A0_calib_qwen3-4b-nf4    null95_x 逐位重放一致          0.6982118745417619 vs 0.6982118745417619
+[PASS] F7 A0_calib_qwen3-4b-nf4    null95_j 逐位重放一致          0.7261909499443492 vs 0.7261909499443492
+[PASS] F8 A0_calib_qwen3-4b-nf4    margin_x == share_x - null95_x -0.152788
+[PASS] F9 A0_calib_qwen3-4b-nf4    d_argmax_window 重算一致     14 vs 14
+[PASS] F1 A1_glm4-9b-nf4           top3_x 重算一致              0.5740698871596008
+[PASS] F2 A1_glm4-9b-nf4           top3_j 重算一致              0.5903908376899366
+[PASS] F3 A1_glm4-9b-nf4           argmax 窗口一致              x=11 j=1
+[PASS] F4 A1_glm4-9b-nf4           jumps_x 重算一致             
+[PASS] F5 A1_glm4-9b-nf4           range_x 重算一致             
+[PASS] F6 A1_glm4-9b-nf4           null95_x 逐位重放一致          0.53835385363388 vs 0.53835385363388
+[PASS] F7 A1_glm4-9b-nf4           null95_j 逐位重放一致          0.6159424110833784 vs 0.6159424110833784
+[PASS] F8 A1_glm4-9b-nf4           margin_x == share_x - null95_x 0.035716
+[PASS] F9 A1_glm4-9b-nf4           d_argmax_window 重算一致     10 vs 10
+[PASS] F1 A2_qwen3-14b-nf4         top3_x 重算一致              0.34543062035112687
+[PASS] F2 A2_qwen3-14b-nf4         top3_j 重算一致              0.5375316124923967
+[PASS] F3 A2_qwen3-14b-nf4         argmax 窗口一致              x=10 j=5
+[PASS] F4 A2_qwen3-14b-nf4         jumps_x 重算一致             
+[PASS] F5 A2_qwen3-14b-nf4         range_x 重算一致             
+[PASS] F6 A2_qwen3-14b-nf4         null95_x 逐位重放一致          0.43669011293355187 vs 0.43669011293355187
+[PASS] F7 A2_qwen3-14b-nf4         null95_j 逐位重放一致          0.6592447421400397 vs 0.6592447421400397
+[PASS] F8 A2_qwen3-14b-nf4         margin_x == share_x - null95_x -0.091259
+[PASS] F9 A2_qwen3-14b-nf4         d_argmax_window 重算一致     5 vs 5
+
+== G. 判决复算 ==
+[PASS] G1 A0_calib_qwen3-4b-nf4    Q0_device 复算一致           PASS
+[PASS] G2 A0_calib_qwen3-4b-nf4    Q2 标签复算一致                ARGS_GAP_GE3
+[PASS] G3 A0_calib_qwen3-4b-nf4    Q3 标签复算一致                NULL_X_OK
+[PASS] G4 A0_calib_qwen3-4b-nf4    Q4 标签复算一致                AT_OR_BELOW_NULL
+[PASS] G1 A1_glm4-9b-nf4           Q0_device 复算一致           PASS
+[PASS] G2 A1_glm4-9b-nf4           Q2 标签复算一致                ARGS_GAP_GE3
+[PASS] G3 A1_glm4-9b-nf4           Q3 标签复算一致                NULL_X_OK
+[PASS] G4 A1_glm4-9b-nf4           Q4 标签复算一致                ABOVE_NULL
+[PASS] G1 A2_qwen3-14b-nf4         Q0_device 复算一致           PASS
+[PASS] G2 A2_qwen3-14b-nf4         Q2 标签复算一致                ARGS_GAP_GE3
+[PASS] G3 A2_qwen3-14b-nf4         Q3 标签复算一致                NULL_X_OK
+[PASS] G4 A2_qwen3-14b-nf4         Q4 标签复算一致                AT_OR_BELOW_NULL
+[PASS] G5 joint Q2 复算一致                                     ARGS_GAP_LAYERSTACK
+[PASS] G6 joint Q3 复算一致                                     CONC_JUDGE_ALIVE_X
+[PASS] G7 A0 max|dxhalf| 复算一致                               0.006171
+[PASS] G8 A0 pass_tol == (max|dxhalf| <= 0.05)              
+[PASS] G9 A0 argmax_same 非 None 假阳                          
+[PASS] G10 A0 Q1 标签复算一致                                     
+
+== H. 预注册预测核对复算 ==
+[PASS] H1 P1 存在于 predictions_check                          装置自检 ok_arms=['A0_calib_qwen3-4b-nf4', 'A1_glm4-9b-nf4', 'A2_qwen3-14b-nf4'] err_arms=[]
+[PASS] H1 P2 存在于 predictions_check                          A0 max|dxhalf|=0.006170736462439319 ; argmax same=True
+[PASS] H1 P3 存在于 predictions_check                          {'A0_calib_qwen3-4b-nf4': 0.6982118745417619, 'A1_glm4-9b-nf4': 0.53835385363388, 'A2_qwen
+[PASS] H1 P4 存在于 predictions_check                          {'A0_calib_qwen3-4b-nf4': 14, 'A1_glm4-9b-nf4': 10, 'A2_qwen3-14b-nf4': 5}
+[PASS] H1 P5 存在于 predictions_check                          {'A0_calib_qwen3-4b-nf4': 6, 'A1_glm4-9b-nf4': 3, 'A2_qwen3-14b-nf4': 4}
+[PASS] H1 P6 存在于 predictions_check                          {'A0_calib_qwen3-4b-nf4': -0.7874097007223942, 'A1_glm4-9b-nf4': -0.9731682146542827, 'A2_
+[PASS] H1 P7 存在于 predictions_check                          {'A0_calib_qwen3-4b-nf4': 0.10565238719543679, 'A1_glm4-9b-nf4': 0.1164322366054047, 'A2_q
+
+== I. 文档落点 ==
+[PASS] I1 MEMO Phase 15 节存在                                 headings=1 ; bytes=389885 sha8=0bd7bfd0
+[PASS] I2 追加前基线快照存在                                         bytes=346025 lines=3427 sha8=c9b4b3f5
+[PASS] I3 前缀锚：追加前字节未被改动                                     c9b4b3f5 vs c9b4b3f5
+[PASS] I4 bare_lf == 0（MEMO 纪律）                             bare_lf=0
+[PASS] I5 _infra/memo_baseline.json 与实盘自洽                   baseline bytes=389885 ; memo bytes=389885
+[PASS] I6 wlog 存在                                           43659 B
+[PASS] I6b wlog 含 Phase 15 主节                               主节标题数=1
+[PASS] I6c wlog 含收尾补记段（唯一）                                  count=1
+[PASS] I6d 补记段未被 bash 反引号替换吞字（段内含反引号）                       backticks_in_segment=106
+[PASS] I6e 补记段落点上文未被改动（含 Phase 15 主节标题）                     None
+
+== J. amend1 词表勘误 / 逐臂 sup_id 独立复核 ==
+[PASS] J1 amend1 存在                                         8813 B sha8=a5cde7e5
+[PASS] J2 amend1.amend_of_seal_sha256 == 实盘 seal            6ea6bdc1
+[PASS] J3 result.amend1_sha256 == 实盘 amend1                 a5cde7e5851b6b44
+[PASS] J4 amend1 承载首轮(作废)exec 的 sha8                        9255151c6c477a95
+[PASS] J5 首轮作废日志保留                                          evidence of the intercepted run
+[PASS] J6 result.sup_id_ref == exec.sup_id                  
+[PASS] J7 A0_calib_qwen3-4b-nf4    逐臂 sup_id 与实盘 tokenizer 一致 {"水果": 104618, "动物": 101239, "交通工具": 118113, "家具": 104259, "金属": 100843, "颜色": 102284}
+[PASS] J8 A0_calib_qwen3-4b-nf4    6/6 类别词单 token 且 decode 可逆 
+[PASS] J7 A1_glm4-9b-nf4           逐臂 sup_id 与实盘 tokenizer 一致 {"水果": 103444, "动物": 100787, "交通工具": 122416, "家具": 103813, "金属": 101406, "颜色": 101526}
+[PASS] J8 A1_glm4-9b-nf4           6/6 类别词单 token 且 decode 可逆 
+[PASS] J7 A2_qwen3-14b-nf4         逐臂 sup_id 与实盘 tokenizer 一致 {"水果": 104618, "动物": 101239, "交通工具": 118113, "家具": 104259, "金属": 100843, "颜色": 102284}
+[PASS] J8 A2_qwen3-14b-nf4         6/6 类别词单 token 且 decode 可逆 
+[PASS] J9 A0/A2 sup_id == qwen 参考值                          
+[PASS] J10 A1 sup_id != qwen 参考值（词表确实不同）                    {"水果": 103444, "动物": 100787, "交通工具": 122416, "家具": 103813, "金属": 101406, "颜色": 101526}
+[PASS] J11 A0_calib_qwen3-4b-nf4    F1b_ok                  
+[PASS] J12 A0_calib_qwen3-4b-nf4    F2_base_bad 为空（修正后）     bad=0
+[PASS] J11 A1_glm4-9b-nf4           F1b_ok                  
+[PASS] J12 A1_glm4-9b-nf4           F2_base_bad 为空（修正后）     bad=0
+[PASS] J11 A2_qwen3-14b-nf4         F1b_ok                  
+[PASS] J12 A2_qwen3-14b-nf4         F2_base_bad 为空（修正后）     bad=0
+[PASS] J13 三臂 Q0_device 全 PASS                              {'A0_calib_qwen3-4b-nf4': 'PASS', 'A1_glm4-9b-nf4': 'PASS', 'A2_qwen3-14b-nf4': 'PASS'}
+
+TOTAL checks = 126 ; FAIL = 0

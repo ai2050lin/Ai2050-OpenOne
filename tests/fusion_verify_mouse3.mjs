@@ -1,0 +1,124 @@
+/* 鼠标交互验证 v3：左键=完整旋转(θ+φ)、右键=二维平移(panX+panY 上下左右, 角度零变化) */
+import { chromium } from 'playwright-core';
+
+const CHROME = 'C:\\Users\\Admin\\AppData\\Local\\ms-playwright\\chromium-1247\\chrome-win64\\chrome.exe';
+const OUT = 'D:/AI2050/Ai2050-OpenOne/tests/';
+
+const browser = await chromium.launch({ executablePath: CHROME, headless: true });
+const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+const errs = [];
+page.on('console', m => { if (m.type() === 'error') errs.push(m.text().slice(0, 120)); });
+page.on('pageerror', e => errs.push('PAGEERR ' + String(e).slice(0, 160)));
+
+await page.goto('http://localhost:5173/rdc-fusion', { waitUntil: 'networkidle' });
+await page.waitForTimeout(800);
+
+async function readCam() {
+  const txt = await page.evaluate(() => document.querySelector('.fw-sp-readout')?.textContent || '');
+  const m = txt.match(/θ (-?\d+)° · φ (-?\d+)° · 平移 ([+-]?\d+),([+-]?\d+)px/);
+  return m ? { th: +m[1], ph: +m[2], px: +m[3], py: +m[4] } : null;
+}
+async function shot(name) { await page.screenshot({ path: OUT + name }); }
+
+const cv = page.locator('.fw-sp-canvas');
+const box = await cv.boundingBox();
+const cx = box.x + box.width * 0.45, cy = box.y + box.height * 0.5;
+
+/* 1) 左键斜拖 → θ 与 φ 都变（完整旋转） */
+await page.mouse.move(cx, cy);
+await page.mouse.down();
+await page.waitForTimeout(650);
+const s0 = await readCam();
+await page.mouse.move(cx + 100, cy + 70, { steps: 8 });
+await page.mouse.up();
+await page.waitForTimeout(650);
+const s1 = await readCam();
+console.log('LEFT_DRAG_FULL_ROTATE', JSON.stringify(s0), '→', JSON.stringify(s1),
+  'PASS', Math.abs(s1.th - s0.th) >= 5 && Math.abs(s1.ph - s0.ph) >= 2);
+
+/* 2) 右键斜拖（右 90 / 上 80）→ panX≈+90 且 panY≈-80，θ/φ 零变化 */
+await page.mouse.move(cx, cy);
+await page.mouse.down({ button: 'right' });
+await page.waitForTimeout(650);
+const s2 = await readCam();
+await page.mouse.move(cx + 90, cy - 80, { steps: 8 });
+await page.mouse.up({ button: 'right' });
+await page.waitForTimeout(650);
+const s3 = await readCam();
+const frozen = s3.th === s2.th && s3.ph === s2.ph;
+const panOk = Math.abs(s3.px - s2.px - 90) <= 10 && Math.abs(s3.py - s2.py + 80) <= 10;
+console.log('RIGHT_DRAG_PAN_XY', JSON.stringify(s2), '→', JSON.stringify(s3),
+  'ANGLE_FROZEN', frozen, 'PAN_XY_OK', panOk, 'PASS', frozen && panOk);
+
+/* 3) 右键纯水平拖（左移 120px）→ 仅 panX 变，panY 不动（快速读数，避免 2.5s 后 auto-rotate 恢复干扰） */
+await page.mouse.move(cx, cy);
+await page.mouse.down({ button: 'right' });
+await page.waitForTimeout(400);
+const s4 = await readCam();
+await page.mouse.move(cx - 120, cy, { steps: 5 });
+await page.mouse.up({ button: 'right' });
+await page.waitForTimeout(300);
+const s5 = await readCam();
+const frozenH = s5.th === s4.th && s5.ph === s4.ph;
+const panH = Math.abs(s5.px - s4.px + 120) <= 10 && Math.abs(s5.py - s4.py) <= 2;
+console.log('RIGHT_DRAG_PAN_H', JSON.stringify(s4), '→', JSON.stringify(s5),
+  'ANGLE_FROZEN', frozenH, 'PAN_H_OK', panH, 'PASS', frozenH && panH);
+await shot('fusion_mouse3_stack.png');
+
+/* 4) 左键点选层盒仍工作 */
+let picked = false;
+for (const [fx, fy] of [[0.40, 0.42], [0.46, 0.46], [0.52, 0.50], [0.58, 0.44], [0.36, 0.50]]) {
+  await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
+  await page.waitForTimeout(300);
+  const hd = await page.evaluate(() => document.querySelector('.fw-lp .fw-lp-hd')?.textContent || '');
+  if (/L\d+/.test(hd) && !/总览/.test(hd)) { picked = true; break; }
+}
+console.log('LEFT_CLICK_PICK_LAYER', picked);
+
+/* 5) 神经元级：右键斜拖双轴平移 */
+const btnNeu = page.locator('button:has-text("进入神经元空间")');
+if (picked && await btnNeu.count() > 0) {
+  await btnNeu.first().click();
+  await page.waitForTimeout(700);
+  const box2 = await page.locator('.fw-sp-canvas').boundingBox();
+  const cx2 = box2.x + box2.width * 0.45, cy2 = box2.y + box2.height * 0.5;
+  await page.mouse.move(cx2, cy2);
+  await page.mouse.down({ button: 'right' });
+  await page.waitForTimeout(650);
+  const n0 = await readCam();
+  await page.mouse.move(cx2 + 70, cy2 + 60, { steps: 8 });
+  await page.mouse.up({ button: 'right' });
+  await page.waitForTimeout(650);
+  const n1 = await readCam();
+  const frozenN = n1.th === n0.th && n1.ph === n0.ph;
+  const panN = Math.abs(n1.px - n0.px - 70) <= 10 && Math.abs(n1.py - n0.py - 60) <= 10;
+  console.log('NEU_RIGHT_PAN_XY', JSON.stringify(n0), '→', JSON.stringify(n1),
+    'ANGLE_FROZEN', frozenN, 'PAN_XY_OK', panN, 'PASS', frozenN && panN);
+  await shot('fusion_mouse3_neuron.png');
+}
+
+/* 6) 特征点云：右键斜拖双轴平移 */
+const cloudBtn = page.locator('.fw-mode-seg button', { hasText: '特征点云' });
+if (await cloudBtn.count() > 0) {
+  await cloudBtn.first().click();
+  await page.waitForTimeout(700);
+  const box3 = await page.locator('.fw-sp-canvas').boundingBox();
+  const cx3 = box3.x + box3.width * 0.5, cy3 = box3.y + box3.height * 0.5;
+  await page.mouse.move(cx3, cy3);
+  await page.mouse.down({ button: 'right' });
+  await page.waitForTimeout(650);
+  const c0 = await readCam();
+  await page.mouse.move(cx3 - 60, cy3 + 50, { steps: 8 });
+  await page.mouse.up({ button: 'right' });
+  await page.waitForTimeout(650);
+  const c1 = await readCam();
+  const frozenC = c1.th === c0.th && c1.ph === c0.ph;
+  const panC = Math.abs(c1.px - c0.px + 60) <= 10 && Math.abs(c1.py - c0.py - 50) <= 10;
+  console.log('CLOUD_RIGHT_PAN_XY', JSON.stringify(c0), '→', JSON.stringify(c1),
+    'ANGLE_FROZEN', frozenC, 'PAN_XY_OK', panC, 'PASS', frozenC && panC);
+  await shot('fusion_mouse3_cloud.png');
+}
+
+console.log('CONSOLE_ERRORS', errs.length);
+errs.slice(0, 6).forEach(e => console.log('ERR', e));
+await browser.close();

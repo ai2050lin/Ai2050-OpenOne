@@ -1,0 +1,47 @@
+Q02 独立磁盘复核（源文件重算）
+============================================================
+[PASS] v2 format  <metric_dict_v2>
+[PASS] v2 version==2
+[PASS] v1 备份存在且 sha8=469c0ad1  <469c0ad1>
+[PASS] v1 备份内容 == supersedes.sha8
+[PASS] 兼容: len(metrics)==7  <7>
+[PASS] 兼容: meta_rules 含 F2/F7
+[PASS] E_read[qwen3-4b] 与 v2 逐位相等  <0.3316153089205424 vs 0.3316153089205424>
+[PASS] E_read[qwen3-4b] per_seed 均值 == mean3seed
+[PASS] E_read[qwen3-14b] 与 v2 逐位相等  <0.39860084652900696 vs 0.39860084652900696>
+[PASS] E_read[qwen3-14b] per_seed 均值 == mean3seed
+[PASS] E_read[glm4-9b] 与 v2 逐位相等  <0.389835258324941 vs 0.389835258324941>
+[PASS] E_read[glm4-9b] per_seed 均值 == mean3seed
+[PASS] E_read 3/3 均 > 0.05  <{'qwen3-4b': 0.3316153089205424, 'qwen3-14b': 0.39860084652900696, 'glm4-9b': 0.389835258324941}>
+[PASS] current_verdict 与重算一致  <all_above_gate (0/3 过门) vs all_above_gate (0/3 过门)>
+[PASS] carrier[qwen3-4b].sha8 == 实测  <4ef190b7 vs 4ef190b7>
+[PASS] carrier[qwen3-4b].bytes == 实测
+[PASS] carrier[qwen3-14b].sha8 == 实测  <733182c1 vs 733182c1>
+[PASS] carrier[qwen3-14b].bytes == 实测
+[PASS] carrier[glm4-9b].sha8 == 实测  <c711946c vs c711946c>
+[PASS] carrier[glm4-9b].bytes == 实测
+[PASS] glm4 source_npz_sha8 == 实测 3151 npz  <c711946c vs c711946c>
+[PASS] source[qwen3-4b].result_file_sha8 与盘上一致
+[PASS] source[qwen3-14b].result_file_sha8 与盘上一致
+[PASS] source[glm4-9b].result_file_sha8 与盘上一致
+[PASS] content_sha256_8 自洽（排除自身重算）  <5ce974ee vs 5ce974ee>
+[PASS] 三 KPI 齐备  <['E_read', 'E_ar', 'C_steer']>
+[PASS] E_ar.status == not_built
+[PASS] C_steer.status == not_measured
+[PASS] E_ar 含 to_build_in
+[PASS] C_steer 含 to_measure_in
+[PASS] kpi_registration_rule 含 catalog/advance
+[PASS] 报告 md 含 0.33162
+[PASS] 报告 md 含 0.39860
+[PASS] 报告 md 含 0.38984
+[PASS] 报告 md 含 03887e51
+[PASS] 报告 md 含 469c0ad1
+[PASS] 报告 md 含 5ce974ee
+[PASS] 报告 md 含 c38b97ff
+[PASS] 报告 md 无 None
+[PASS] 报告 md 无 nan
+[PASS] Ledger 未变（bbda63df / 304）
+[PASS] 宪法未变（01df6398）
+[PASS] Q01 交付物仍在（meta_single_source_v4.json）
+============================================================
+PASS=43  FAIL=0  ->  ALL_PASS

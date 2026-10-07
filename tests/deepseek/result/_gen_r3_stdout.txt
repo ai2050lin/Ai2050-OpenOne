@@ -1,0 +1,214 @@
+STATS OK
+{
+ "scale": {
+  "gpt5_bytes": 1900611,
+  "gpt5_lines": 14901,
+  "gpt5_sha8": "2a84776b",
+  "gpt5_h2": 403,
+  "gpt5_h3": 2087,
+  "gpt5_phases_distinct": 402,
+  "ds_bytes": 497406,
+  "ds_lines": 4774,
+  "ds_sha8": "4ba5e22f",
+  "ds_h2": 25,
+  "ds_phases_distinct": 22
+ },
+ "keywords": {
+  "gpt5": {
+   "判决": 685,
+   "预注册": 580,
+   "否证": 86,
+   "降级": 51,
+   "撤回": 12,
+   "纠错": 4,
+   "post-hoc": 35,
+   "硬伤": 332,
+   "bit 锚": 36,
+   "一次通过": 54,
+   "patch": 53,
+   "死线": 8,
+   "接续": 380,
+   "自动进入": 6,
+   "与总目标": 4
+  },
+  "deepseek": {
+   "判决": 69,
+   "预注册": 94,
+   "否证": 68,
+   "降级": 36,
+   "撤回": 9,
+   "纠错": 9,
+   "post-hoc": 7,
+   "硬伤": 10,
+   "bit 锚": 1,
+   "一次通过": 2,
+   "patch": 21,
+   "死线": 71,
+   "接续": 0,
+   "自动进入": 0,
+   "与总目标": 1
+  }
+ },
+ "verdict_vocab": {
+  "gpt5_uses": 47,
+  "gpt5_tokens": 53,
+  "gpt5_unique": 48,
+  "gpt5_reuse": 1.104,
+  "deepseek_uses": 2,
+  "deepseek_unique": 2,
+  "gpt5_verdict_mentions": 685,
+  "sample": [
+   "a_3149_ok",
+   "anchoring_not_established",
+   "attr_events_linked_polar",
+   "attribute_events_found",
+   "carrier_localised",
+   "carrier_replicated_14b",
+   "carrier_replicated_7b",
+   "carrier_skeleton_class",
+   "combined_repair_confirmed",
+   "depth_gradient_absent",
+   "direction_flip_margin_shifts",
+   "early_events_same_mechanism",
+   "event_atlas_not_replicated",
+   "events_margin_only",
+   "events_polar_separation_selected",
+   "events_probe_partially_invariant",
+   "false",
+   "flip_deoracled"
+  ]
+ },
+ "g1": {
+  "rows": [
+   {
+    "model": "glm4-9b",
+    "b4_kstar": 0.0461,
+    "b4_readout": 0.3898,
+    "above5": "否",
+    "m1_kstar": "−0.0289/−0.0323/−0.0248 pass（2-6×MDE）"
+   },
+   {
+    "model": "qwen3-4b",
+    "b4_kstar": 0.0079,
+    "b4_readout": 0.3316,
+    "above5": "否",
+    "m1_kstar": "−0.0040/−0.0019/−0.0024 不过门"
+   },
+   {
+    "model": "qwen3-14b",
+    "b4_kstar": 0.0807,
+    "b4_readout": 0.3986,
+    "above5": "是",
+    "m1_kstar": "−0.0432/−0.0448/−0.0445 pass（~5×MDE）"
+   }
+  ],
+  "anova": [
+   {
+    "model": "4b",
+    "share": [
+     5.0,
+     34.3,
+     0.3,
+     60.4
+    ]
+   },
+   {
+    "model": "14b",
+    "share": [
+     6.2,
+     35.9,
+     0.0,
+     59.0
+    ]
+   },
+   {
+    "model": "glm4",
+    "share": [
+     6.5,
+     37.7,
+     0.0,
+     56.8
+    ]
+   }
+  ],
+  "cheatsheet": [],
+  "amplification": [
+   4.9,
+   42.0
+  ]
+ },
+ "kill": {
+  "K1_mentions": 36,
+  "K2_mentions": 40,
+  "K3_mentions": 27,
+  "K1_cond": "3 模型 × 未见组合误差 > 5% 且不显著优于 B4（合取 3/3）",
+  "K1_observed": "above5 = 1/3 → 未触发",
+  "verdict": "k1_not_triggered_b4_additive_at_kstar_operator_line_kept",
+  "g1p3_verdict": "g1p3_fingerprint_consistent_coverage_partial（死线未触发）",
+  "readout_fail_ratio": 6.6
+ },
+ "audit_consistency": {
+  "memo_3103_dist": [
+   [
+    "5",
+    "34",
+    "14",
+    "21",
+    "20"
+   ]
+  ],
+  "memo_3103_line": [
+   [
+    "5",
+    "34",
+    "14",
+    "21",
+    "20"
+   ]
+  ],
+  "testplan_dist": [
+   [
+    "5",
+    "6",
+    "10",
+    "21",
+    "20"
+   ]
+  ],
+  "memo_pct_claim": [
+   "55"
+  ]
+ },
+ "ledger": {
+  "actual_sha8": "bbda63df",
+  "declared": "41d65a13",
+  "measurements": 304,
+  "schema_version": 3
+ },
+ "audit_findings": {
+  "grade_A_share": [
+   [
+    "5",
+    "8"
+   ]
+  ],
+  "self_correction": [
+   "332"
+  ],
+  "single_point_mentions": [
+   [
+    "76",
+    "111",
+    "3"
+   ]
+  ],
+  "panel_rows": "T4 主线面板 128 行；翻转子 n=8/13/19/39",
+  "no_combo_result": true
+ },
+ "nline": {
+  "alpha_subphases": 36,
+  "phases_total": 21,
+  "topic": "写入窗定位（N2h1-α-1 … α-14，14 个连续 Phase 同一主题）",
+  "cross_precision_phases": 30
+ }
+}

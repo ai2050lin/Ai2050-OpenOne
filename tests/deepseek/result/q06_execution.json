@@ -1,0 +1,145 @@
+{
+ "query": "Q06",
+ "title": "C_steer 基座测量（v1 承重轴 + 端口替换）",
+ "version": 2,
+ "revise_log": [
+  "v1->v2 (SMOKE v1 后、正式前冻结)：R1 t 规则 mu+sgn*alpha*sigma -> s+sgn*alpha*sigma (SMOKE v1 argmax 0/72 移动，绝对值规则对 z≈0 cell 动量退化)；R2 target cprime=base第二高类(退化为常量, base argmax==true 仅 8.3%) -> true_class；R3 G2 门 liveness -> computability + G2b 灵敏度描述。未改动：collateral 定义 v1、KPI 公式、alpha 五点、方向减法禁令、面板。"
+ ],
+ "model": "qwen3-4b",
+ "prec": "bf16",
+ "smoke": false,
+ "prereg_path": "tests/deepseek/result/q06_prereg_design_v1.json",
+ "prereg_sha8": "ebf960cf",
+ "panel": {
+  "classes": [
+   "水果",
+   "动物",
+   "交通工具",
+   "家具",
+   "金属",
+   "颜色"
+  ],
+  "ents": [
+   "苹果",
+   "香蕉",
+   "梨",
+   "西瓜",
+   "葡萄",
+   "草莓",
+   "芒果",
+   "柠檬",
+   "狗",
+   "猫",
+   "老虎",
+   "大象",
+   "兔子",
+   "猴子",
+   "马",
+   "牛",
+   "汽车",
+   "火车",
+   "飞机",
+   "摩托车",
+   "卡车",
+   "地铁",
+   "桌子",
+   "椅子",
+   "床",
+   "沙发",
+   "地毯",
+   "窗帘",
+   "铁",
+   "铜",
+   "铝",
+   "金",
+   "银",
+   "锌",
+   "铅",
+   "红",
+   "蓝",
+   "绿",
+   "黄",
+   "黑",
+   "白"
+  ],
+  "tpl_p0": {
+   "0": "{e}是一种",
+   "1": "{e}属于",
+   "2": "{e}，一种常见的"
+  },
+  "n_entities": 41,
+  "n_classes": 6,
+  "n_pairs": 246,
+  "n_tpl": 3,
+  "seeds_s1": [
+   7,
+   8,
+   9
+  ],
+  "frac_s1": 0.2,
+  "heldout_rows_per_seed": 147,
+  "engine_note": "与 E_read 同一 held-out 面板族（S1 fold）"
+ },
+ "v1_axis": {
+  "site": "L29 层输出（残差流 post-block）；qwen3-4b NL=36",
+  "extract": "seed7 train fold（197 pairs x 3 tpl = 591 行）TPL_P0 前缀 last-position L29 残差流 H；加性分解 X=[onehot(41)+onehot(6)+onehot(3)+bias]，ridge(lambda=1e-3) 拟合；交互残差 R=H-Xb；v1 = SVD(R) 第一右奇异向量（2560 维单位向量），符号约定 sum(R@v1)>=0；与 gpt5 线 M14（GLM4 T4 面板）为同构移植定义（跨模型坐标不对应，AGENTS.md §3）",
+  "mu_sigma": "mu29/sigma29 = seed7 train fold 上 s=H@v1 的 mean/std（float64）",
+  "rand_dir": "default_rng(20261007).normal(2560) 归一化；mu_r/sigma_r 同一批 H 上 s=H@vrand 的 mean/std"
+ },
+ "operator": {
+  "name": "readout-substitution（端口替换）",
+  "formula": "h <- h + (t - h.v)*v = h + dt*v, dt = sgn*alpha*sigma；禁方向减法（M15 cancel 0.820 反向加重；metric_dict.intervention_rules）",
+  "t_rule": "t = s + sgn*alpha*sigma（v2；python float64 标量、fp32 乘 v 后 cast bf16 写回单点）",
+  "site_pos": "行为 prompt = last-position；collateral 拼接 prompt = 主体句末位（探针段经注意力被波及）",
+  "alphas": [
+   0.05,
+   0.1,
+   0.15,
+   0.25,
+   0.5
+  ],
+  "sgns": [
+   1,
+   -1
+  ],
+  "arms": [
+   "base",
+   "identity",
+   "steer(sgn x alpha, 10)",
+   "rand(sgn x alpha, 10)"
+  ]
+ },
+ "behaviour": {
+  "readout": "单次前向 last-position 6 类类名首 token logits（Q04 k=0 同构；prompt=TPL_P0 逐字）",
+  "target": "c' = true_class（cell 真值类，per-cell 特异；v2）；eligible = base argmax != true_class",
+  "success": "argmax_after == true_class 且 collateral == 0（仅 eligible 计入分母）"
+ },
+ "collateral": {
+  "n_probes": 13,
+  "probe_rule": "default_rng(20261007) 从 seed7 train fold pairs 抽 13 个（replace=False）；句式 TPL_P0[0]+{c}。；探针读数位 = 各探针 P0 段末位",
+  "concat": "主体 P0 + [探针 k P0 + {c_k} + 。] x13（一次前向，多读数位）",
+  "err": "探针错误 = 该读数位 6 类 argmax != 探针真值类",
+  "diff": "collateral(cell,arm) = 干预后 13 探针错误数 - 同 cell 无干预拼接基线错误数（>0 记附带损伤）",
+  "note": "v1 操作化定义；err_base 为 6 类 argmax 口径基线（SMOKE 实测 ~11.75/13，历史 3.5/13 口径的源文件 LOOP_DIAGNOSIS_AND_EXIT_v1.md 已失传，不可逐字复刻）"
+ },
+ "stats": {
+  "aggregation": "per seed: mean over eligible held-out rows; then mean over 3 seeds（与 E_read 同族）",
+  "main_readout": "C_steer_main = max over 10 steer configs 的池化成功率（机制族乐观上界读数）；rand 对照同口径同报；差分 = 机制特异性",
+  "ci": "per-seed Wilson 95% + MDE80 = 2.80*sqrt(p(1-p)/n)",
+  "gate": "本 Phase 不设通过门（metric_dict v4：低分即诚实总成绩，不得事后改判）"
+ },
+ "reporting": {
+  "must_report": [
+   "E_read",
+   "E_ar(k)",
+   "C_steer"
+  ],
+  "rule": "I1：未降低任一全局 KPI => Ledger 登记 catalog，不得登记 advance",
+  "refs": {
+   "E_read": "0.3316153089205424 (Q03 锁定)",
+   "E_ar": "Q05 measured (aggregate_res_sha8=775d7dce)"
+  }
+ },
+ "panel_sha8": "be17ef8a",
+ "design_sha": "7130906b11e03baee7398ae4b9e0288bf2bc17c31c9e9a8ab8248654669413aa"
+}

@@ -1,0 +1,57 @@
+Q03: E_read 统一基线复算 — 报告（recompute-only，零 GPU）
+====================================================================
+design_sha = 9a26f72f
+res_sha8   = cda99b05
+
+统一 held-out 指纹（三模型共用同一构造）:
+  seed 7 : 197 train pairs / 49 test pairs (x3 tpl = 147 test rows)  test_sha8=551deb63
+  seed 8 : 197 train pairs / 49 test pairs (x3 tpl = 147 test rows)  test_sha8=ef61b0b7
+  seed 9 : 197 train pairs / 49 test pairs (x3 tpl = 147 test rows)  test_sha8=6377737b
+
+逐模型复算 vs 锚（3161 口径：B4 加性 one-hot，λ=1e-3，Dk=训练方差）:
+  model      layer    recompute  anchor     drift      gate(<=0.05)
+  qwen3-4b   35       0.331615   0.331615   0.00e+00   FAIL
+  qwen3-14b  39       0.398601   0.398601   0.00e+00   FAIL
+  glm4-9b    39       0.389835   0.389835   0.00e+00   FAIL
+
+per-seed（读出层）复算:
+  qwen3-4b   0.332090 0.340576 0.322179
+  qwen3-14b  0.409478 0.405815 0.380510
+  glm4-9b    0.417352 0.384525 0.367629
+
+bootstrap 95% CI（row-level, n_boot=10000, rng_seed=20261003）:
+  qwen3-4b   seed 7 : 0.332090  [0.312111, 0.353311]  (n_rows=147)
+  qwen3-4b   seed 8 : 0.340576  [0.318253, 0.363985]  (n_rows=147)
+  qwen3-4b   seed 9 : 0.322179  [0.303386, 0.341414]  (n_rows=147)
+  qwen3-14b  seed 7 : 0.409478  [0.377697, 0.444093]  (n_rows=147)
+  qwen3-14b  seed 8 : 0.405815  [0.372752, 0.442216]  (n_rows=147)
+  qwen3-14b  seed 9 : 0.380510  [0.350246, 0.412375]  (n_rows=147)
+  glm4-9b    seed 7 : 0.417352  [0.388141, 0.449106]  (n_rows=147)
+  glm4-9b    seed 8 : 0.384525  [0.357365, 0.414208]  (n_rows=147)
+  glm4-9b    seed 9 : 0.367629  [0.341760, 0.394060]  (n_rows=147)
+
+汇总:
+  E_read 池化(3模型均值) = 0.373350  (sd=0.036408, n=3)
+  5% 门 (<=0.05) 过门模型数 = 0/3
+  最小 E_read = 0.331615 = 门的 6.63x
+  carrier sha8 全部匹配 = True
+  锚全部匹配 (drift<1e-4) = True
+
+注: E_read 为归一化 MSE（除以训练行方差），非原始 L2。0.05 门 = 加性模型须解释 95% 方差。
+
+--- run log ---
+[    0.0] execution.json FROZEN design_sha=9a26f72f
+[    0.2] held-out fingerprint = {"7": {"n_train_pairs": 197, "n_test_pairs": 49, "test_pairs_sha8": "551deb63"}, "8": {"n_train_pairs": 197, "n_test_pairs": 49, "test_pairs_sha8": "ef61b0b7"}, "9": {"n_train_pairs": 197, "n_test_pairs": 49, "test_pairs_sha8": "6377737b"}}
+[    0.3] qwen3-4b carrier sha8=4ef190b7 ok=True bytes=108334806 | readout=35 kstar=3
+[    0.7] qwen3-4b H.shape=((3, 246, 37, 2560),)
+[    1.1] qwen3-4b B4@readout recompute=['0.33209', '0.34058', '0.32218'] mean=0.331615 (anchor 0.331615 drift=0.00e+00)
+[    1.1] qwen3-4b B4@kstar   recompute=['0.00763', '0.00737', '0.00873'] mean=0.007911 (anchor 0.007911 drift=0.00e+00)
+[    1.2] qwen3-14b carrier sha8=733182c1 ok=True bytes=238580833 | readout=39 kstar=3
+[    2.1] qwen3-14b H.shape=((3, 246, 41, 5120),)
+[    2.4] qwen3-14b B4@readout recompute=['0.40948', '0.40582', '0.38051'] mean=0.398601 (anchor 0.398601 drift=0.00e+00)
+[    2.4] qwen3-14b B4@kstar   recompute=['0.07908', '0.08286', '0.08009'] mean=0.080678 (anchor 0.080678 drift=0.00e+00)
+[    2.5] glm4-9b carrier sha8=c711946c ok=True bytes=190179622 | readout=39 kstar=3
+[    3.2] glm4-9b H.shape=((3, 246, 41, 4096),)
+[    3.4] glm4-9b B4@readout recompute=['0.41735', '0.38453', '0.36763'] mean=0.389835 (anchor 0.389835 drift=0.00e+00)
+[    3.4] glm4-9b B4@kstar   recompute=['0.04618', '0.05327', '0.03894'] mean=0.046128 (anchor 0.046128 drift=0.00e+00)
+[    3.4] result.json res_sha8=cda99b05

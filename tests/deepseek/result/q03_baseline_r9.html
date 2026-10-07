@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q03 E_read 统一基线复算</title><style>body{font-family:-apple-system,'Segoe UI','Microsoft YaHei',sans-serif;background:#fff;color:#1a1a1a;margin:0;padding:32px;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px;border-bottom:3px solid #2563eb;padding-bottom:10px}
+h2{font-size:17px;margin:26px 0 10px;color:#1e40af}
+.sub{color:#666;font-size:13px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
+th,td{border:1px solid #d8dee9;padding:7px 10px;text-align:left}
+th{background:#f1f5f9;font-weight:600}
+td.num{font-family:Consolas,monospace;text-align:right}
+.pass{color:#15803d;font-weight:600}
+.fail{color:#b91c1c;font-weight:600}
+.kpi{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0}
+.card{flex:1;min-width:190px;border:1px solid #d8dee9;border-radius:8px;padding:12px 14px;background:#f8fafc}
+.card .lab{font-size:12px;color:#64748b}
+.card .val{font-size:22px;font-weight:700;font-family:Consolas,monospace;color:#0f172a}
+.card .note{font-size:11px;color:#94a3b8}
+.warn{border-left:4px solid #f59e0b;background:#fffbeb;padding:12px 16px;margin:14px 0;font-size:13px;border-radius:0 6px 6px 0}
+.ok{border-left:4px solid #16a34a;background:#f0fdf4;padding:12px 16px;margin:14px 0;font-size:13px;border-radius:0 6px 6px 0}
+code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:12px}
+.mono{font-family:Consolas,monospace}</style></head><body><div class="wrap">
+<h1>Q03 · E_read 统一基线复算</h1>
+<div class="sub">B 闸门（KPI）· 零 GPU · recompute-only（无新模型观测）· design_sha <code>9a26f72f</code> · res_sha8 <code>cda99b05</code> · 2026-10-03</div>
+<div class="ok"><b>一句话结论：</b>K1 判决所依赖的 E_read 基线已从三份冻结载体<b>独立重算并逐位复现</b>（全部锚 <code>drift = 0.00e+00</code>）；三模型误差 <b>33.2% / 39.9% / 39.0%</b>，池化 <b>0.373350</b>，<b>5% 门 0/3 过门</b>（最小值仍为门槛的 6.63 倍）。</div>
+<h2>1 · 这个方法在算什么</h2>
+<p>模型见过 (苹果, 水果)，能否预测<b>没见过</b>的组合 (床, 颜色) 在<b>读出层</b>的内部状态？B4 是"加性最强"的预测器：只允许"实体 + 类别 + 模板"三者的<b>相加</b>效应，用其余组合拟合，再来预测被藏起来的组合。</p>
+<p>误差 <code>E_read = &lt;预测偏差平方均值&gt; / &lt;训练数据方差&gt;</code>，即<b>归一化误差</b>。所以 0.33 意味着加性模型只解释了 67% 的方差；<b>0.05 门 = 加性模型必须解释 95% 的方差</b>才算"组合可加"。</p>
+<p>held-out 切分 = <code>S1</code>（seed 7/8/9，抽 20% 组合）：每 seed 49 个测试组合 × 3 模板 = <b>147 个测试行</b>。</p>
+<h2>2 · 三个模型的结果（读出层）</h2>
+<table><tr><th>模型</th><th>载体 sha8</th><th>H 形状</th><th>读出层</th><th>E_read（复算）</th><th>3151/3152 锚</th><th>drift</th><th>5% 门</th></tr>
+<tr><td><code>qwen3-4b</code></td><td class="mono">4ef190b7</td><td class="mono">(3, 246, 37, 2560)</td><td class="num">35</td><td class="num">0.331615</td><td class="num">0.331615</td><td class="num">0.00e+00</td><td class="fail">未过</td></tr>
+<tr><td><code>qwen3-14b</code></td><td class="mono">733182c1</td><td class="mono">(3, 246, 41, 5120)</td><td class="num">39</td><td class="num">0.398601</td><td class="num">0.398601</td><td class="num">0.00e+00</td><td class="fail">未过</td></tr>
+<tr><td><code>glm4-9b</code></td><td class="mono">c711946c</td><td class="mono">(3, 246, 41, 4096)</td><td class="num">39</td><td class="num">0.389835</td><td class="num">0.389835</td><td class="num">0.00e+00</td><td class="fail">未过</td></tr>
+</table>
+<div class="kpi">
+<div class="card"><div class="lab">E_read 池化（3 模型均值）</div><div class="val">0.373350</div><div class="note">sd = 0.036408（n=3）</div></div>
+<div class="card"><div class="lab">5% 门（≤0.05）过门</div><div class="val fail">0/3</div><div class="note">未过门</div></div>
+<div class="card"><div class="lab">最小 E_read / 门槛</div><div class="val">6.63×</div><div class="note">0.331615</div></div>
+<div class="card"><div class="lab">锚逐位复现</div><div class="val pass">0.00e+00</div><div class="note">6 组锚全匹配</div></div>
+</div>
+<h2>3 · per-seed 与 bootstrap 95% CI（row-level，n_boot=10000）</h2>
+<table><tr><th>模型</th><th>seed 7</th><th>seed 8</th><th>seed 9</th><th>3-seed 均值</th></tr>
+<tr><td><code>qwen3-4b</code></td><td class="num">0.332090<br><span class="mono" style="font-size:11px;color:#64748b">[0.3121, 0.3533]</span></td><td class="num">0.340576<br><span class="mono" style="font-size:11px;color:#64748b">[0.3183, 0.3640]</span></td><td class="num">0.322179<br><span class="mono" style="font-size:11px;color:#64748b">[0.3034, 0.3414]</span></td><td class="num"><b>0.331615</b></td></tr>
+<tr><td><code>qwen3-14b</code></td><td class="num">0.409478<br><span class="mono" style="font-size:11px;color:#64748b">[0.3777, 0.4441]</span></td><td class="num">0.405815<br><span class="mono" style="font-size:11px;color:#64748b">[0.3728, 0.4422]</span></td><td class="num">0.380510<br><span class="mono" style="font-size:11px;color:#64748b">[0.3502, 0.4124]</span></td><td class="num"><b>0.398601</b></td></tr>
+<tr><td><code>glm4-9b</code></td><td class="num">0.417352<br><span class="mono" style="font-size:11px;color:#64748b">[0.3881, 0.4491]</span></td><td class="num">0.384525<br><span class="mono" style="font-size:11px;color:#64748b">[0.3574, 0.4142]</span></td><td class="num">0.367629<br><span class="mono" style="font-size:11px;color:#64748b">[0.3418, 0.3941]</span></td><td class="num"><b>0.389835</b></td></tr>
+</table>
+<h2>4 · 统一 held-out 指纹（三模型共用同一构造）</h2>
+<p><code>PAIRS = 41 实体 × 6 类别 = 246</code>；<code>seeds = [7,8,9]</code>；<code>frac = 0.2</code> —— 3151（glm4）与 3152（qwen3）两份预注册<b>逐字相同</b>，故三个模型的测试组合完全一致，E_read 可跨模型直接比较。</p>
+<table><tr><th>seed</th><th>训练组合</th><th>测试组合</th><th>测试行</th><th>测试集 sha8</th></tr>
+<tr><td class="num">7</td><td class="num">197</td><td class="num">49</td><td class="num">147</td><td class="mono">551deb63</td></tr>
+<tr><td class="num">8</td><td class="num">197</td><td class="num">49</td><td class="num">147</td><td class="mono">ef61b0b7</td></tr>
+<tr><td class="num">9</td><td class="num">197</td><td class="num">49</td><td class="num">147</td><td class="mono">6377737b</td></tr>
+</table>
+<h2>5 · k* 层对照（为什么这不是伪影）</h2>
+<p>同一口径在<b>承诺层 k\*</b>（假设自己挑的浅层）上复算，同样逐位匹配：三模型 k\* 误差 = 0.007911 / 0.080678 / 0.046128。即"浅层看起来可加、读出层不可加"的落差是<b>真实的层位效应</b>，与 R8 的 K1 判决（读出层 <code>fired_all_models</code>）自洽。</p>
+<h2>6 · ⚠ 并发写者与文件漂移（如实记录）</h2>
+<div class="warn">
+<b>1.</b> 研究日志在 R8 收尾（<code>150241da</code> / 685,647 B）之后、本轮开始前被<b>外部写入</b>：<code>+2 B</code> → <code>5be5bf12</code>（685,649 B），随后 Phase 36 追加 → <code>5b3bdcec</code>（692,727 B）。<br>
+<b>2.</b> 证据：<code>prefix(685,649)</code> 的 sha8 = <code>5be5bf12</code>，恰好等于并发写者 Phase 36 脚本自报的 before 值 ⇒ <b>追加未篡改前文</b>。<br>
+<b>3.</b> Phase 36 <b>不是本对话的产物</b>（内容为 E4/E4b 词频 × 嵌入有效维度，用户队列外插入）；本对话只在其后追加 Phase 37，未改写它。<br>
+<b>4.</b> 观察到一处质量缺陷：Phase 36 追加引入了 <b>45 个裸 LF</b>（文件 bare_lf 0 → 45），全部落在 Phase 36 正文区间；Phase 35 及之前仍是纯 CRLF，本次 Phase 37 追加也保持纯 CRLF。未擅自修改他线内容，留待决定。
+</div>
+<h2>7 · 产物与复核</h2>
+<table><tr><th>文件</th><th>说明</th><th>sha8</th></tr>
+<tr><td><code>q03_execution.json</code></td><td>预注册（design_sha 9a26f72f）</td><td class="mono">5e2d4f0f</td></tr>
+<tr><td><code>q03_result.json</code></td><td>复算结果 + bootstrap CI（res_sha8 cda99b05）</td><td class="mono">57827730</td></tr>
+<tr><td><code>q03_report.txt</code></td><td>人类可读报告</td><td class="mono">46662493</td></tr>
+<tr><td><code>verify_q03.txt</code></td><td>独立复核 42 PASS / 0 FAIL</td><td class="mono">3516663d</td></tr>
+<tr><td><code>verify_q03_landing.txt</code></td><td>落账复核 28 PASS / 0 FAIL</td><td class="mono">1127f817</td></tr>
+</table>
+<p style="font-size:12px;color:#94a3b8">队列：<code>Q03 → sealed</code>（sealed_items 现 6 项：Q01/Q02/Q03/Q08/Q09/Q12）。下一项 B 闸门：<code>Q04 E_ar(k)</code>（gpu=mid）。</p>
+</div></body></html>

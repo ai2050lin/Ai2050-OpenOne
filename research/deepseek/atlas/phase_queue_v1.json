@@ -94,11 +94,14 @@
    "gpu": "mid",
    "source": "I7",
    "deliverable": "v1 承重轴 + 端口替换：held-out 目标改动的 steered 成功率与附带损伤",
-   "status": "contract_frozen",
+   "status": "sealed",
    "contract_frozen_at": "2026-10-03 22:36",
    "prereg_design_sha": "ebf960cf",
    "prereg_ref": "tests/deepseek/result/q06_prereg_design_v1.json",
-   "note": "预注册合同已冻结（frozen before any Q06 observation incl. SMOKE）；执行 Phase 须以 design_sha drift 断言对齐本哈希，并先加载 rdc-main-axis-probe / rdc-phase-closeout 技能。"
+   "note": "C_steer 基座测量完成（annex v2，design 7130906b）：C_steer_main=0.0000 (0/376 eligible, 10 配置全 0)；rand 同规则对照 0.0000，spec_diff=0.0；Wilson95 上界 0.0101；灵敏度 argmax moved 9/4410、maxd<=0.94 logit；collateral 干净（mean 0.008/max 1/frac0 0.933）；identity 两 prompt 逐位恒等 0.00e+00；独立复核 16 PASS/0 FAIL。I1：E_read/E_ar 引用未变 + C_steer 新增读数 => Ledger 登记 catalog。",
+   "sealed_at": "2026-10-07 08:05",
+   "seal_record": "tests/deepseek/result/q06_result.json",
+   "res_sha8": "5f88ed7e"
   },
   {
    "q": 7,
@@ -397,8 +400,8 @@
  ],
  "backlog_policy": "未采纳残差入 backlog，仅在 Q26 由全局 KPI 曲线统一决定去留。",
  "count": 30,
- "status_updated_at": "2026-10-03 22:36",
- "status_updated_by": "tests/deepseek_temp/update_queue_q06_contract.py",
+ "status_updated_at": "2026-10-07 08:05",
+ "status_updated_by": "tests/deepseek/Phase40/closeout_q06.py",
  "sealed_items": [
   "Q01",
   "Q02",
@@ -406,7 +409,8 @@
   "Q08",
   "Q09",
   "Q12",
-  "Q05"
+  "Q05",
+  "Q06"
  ],
  "device_built_items": [
   "Q04"

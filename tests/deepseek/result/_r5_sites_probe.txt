@@ -1,0 +1,75 @@
+== memory dir ==
+  2026-09-15.md               1804 B  sha8=561c8ec8
+  2026-09-18.md               1606 B  sha8=9726d2e7
+  2026-09-21.md              17278 B  sha8=7897e55b
+  2026-09-22.md              11043 B  sha8=e87e1690
+  2026-09-23.md              24714 B  sha8=41ada982
+  2026-09-24.md              16503 B  sha8=e593e319
+  2026-09-25.md               4209 B  sha8=3f5dd088
+  2026-09-26.md               2334 B  sha8=4152f0dd
+  2026-09-27.md               7975 B  sha8=a090376f
+  2026-09-28.md               4906 B  sha8=e138bb68
+  2026-09-29.md               8839 B  sha8=ba1ea6d2
+  2026-09-30.md              13888 B  sha8=4bfd405a
+  2026-10-01.md              41658 B  sha8=a73f502b
+  2026-10-02.md             103042 B  sha8=b185c377
+  2026-10-03.md               2907 B  sha8=d4540e4b
+  MEMORY.md                   8266 B  sha8=741193d6
+
+== wlog 2026-10-03.md full ==
+001|# 工作日志 2026-10-03
+002|
+003|## Phase 21 之后（R3 续研：验收函数落地，非 Phase）
+004|
+005|- **把 I1 操作化为可计算量**：`tests/deepseek/_review/classify_phases_r3.py` 扫描 gpt5 MEMO，启发式判定「共享指标变化」⇒ **397 个 Phase 节中仅 26 个（6.55%）报告了「指标名 + 小数 A→B」**（窄词表 18，区间 [18,26]）⇒ **93.45% 是目录条目**。
+006|- **两份治理交付件**：
+007|  - `research/gpt5/docs/RDC_RESEARCH_CONSTITUTION_v1.md`（10,388 B / sha8 `01df6398` / LF-only）：I1–I11 全部落为判据（KPI 三数、行为判决层、死线双轨、可识别性门、未识别变量程序、单一真源、冻结队列、外部评审规则、工程去摩擦）。
+008|  - `research/gpt5/atlas/phase_queue_v1.json`（9,669 B / sha8 `675836fd` / 30 项 Q01–Q30 / 唯一议程来源）。
+009|- **生成与复核**：`gen_constitution_r3.py`（数据驱动，0 占位残留）；`disk_verify_continue_r3.py` 独立复核 **PASS 44 / FAIL 0**（源文件级重算：Phase 节 397、宽词表 advance 精确复现 26、ledger 自声明 `41d65a13` ≠ 实际 `bbda63df`、MEMO 中 E_ar/E_read/C_steer 各 0 次）。
+010|- **一处工程修正**：生成器文本模式写盘产生 CRLF（10388 vs 10555 差 166 行）⇒ 改 `newline="\n"` 强制 LF，使 hash 跨平台可复现。
+011|- **未改动**：MEMO 原文、既有判决、Ledger 均未触碰；K1 改判仍为待 seal 的决策点（Q08）。
+012|
+013|## R4：A 闸门 Q01 + Q02（元层单一真源 + KPI 口径冻结，零 GPU）
+014|- **Q01**：五处元层不自洽全定位根因（原 3 + 新 2：MEMO 记 `proposition_ledger`=`add57ba7`≠实际 `9a3c6ff4`；`measurements` 两套 schema 且 `evidence_level` 304/304 恒为常量）。口径量纲混淆（55%/63% = 分量数÷条数）；哈希自指结构性失效（自洽值 `0dc6e57a`）。产物 `research/gpt5/docs/META_SINGLE_SOURCE_Q01.md`(`95366ca9`) + `research/gpt5/atlas/meta_single_source_v4.json`(`f9d7ede6`)；独立复核 **44/0 ALL_PASS**。
+015|- **Q02**：`metric_dict.json` v1→v2（`469c0ad1`→`03887e51`；备份 `metric_dict_v1_backup.json`），新增 `global_kpis`（E_read=`b4_rel_readout_mean3seed` 0.33162/0.39860/0.38984，**0/3 过 5% 门**；E_ar/C_steer 口径冻结未测）+ 登记规则；`metrics`7 + `meta_rules` 原样 ⇒ 兼容 P3150 历史断言。报告 `research/gpt5/docs/METRIC_DICT_Q02.md`(`ba518fea`)；复核 **43/0 ALL_PASS**。
+016|- 汇报页 `tests/deepseek_temp/_review/q01q02_gate_r4.html`(`d5fbf42b`)。
+017|- 脚本入 `tests/deepseek/_review/`（probe_q01/q01b/q02/q02b/q02c、gen_q01/gen_q02/gen_q01q02_html、disk_verify_q01/q02），报告入 `tests/deepseek_temp/_review/`。
+018|- **未改动**任何 MEMO 原文 / TESTPLAN / Ledger / 3152 产物；6 条更正 C1–C6 **待 seal**。
+019|- 技能 `rdc-phase-closeout` 新增**教训 37**（元层单一真源审计 5 条）；MEMORY.md 重写压缩并纳入本节。
+020|
+
+== wlog-ish files under project ==
+  D:/AI2050/Ai2050-OpenOne/tests/deepseek_temp/_review\verify_wlog_r2.txt  72 B sha8=3ffd171a
+
+== SKILL tail (last 30 lines) ==
+0217|```text
+0218|五类陷阱（全部实测）：
+0219|(a) 计数口径必须显式命名。同一 62 条复合 grade 账本，component（拆分量，和 94）
+0220|    与 atomic_*（每条一值，和 62）给出不同表；MEMO 与 TESTPLAN 各用一半 -> 「对不上」。
+0221|    规范：count_mode 必填；本线 canonical = component，并列报 atomic_best。
+0222|(b) 禁止「分量数 ÷ 条数」。MEMO 的「约 55%（A+B）」= 34/62、「63%」= 39/62 都是
+0223|    分母错配；同量纲唯一成立值 = 39/94 = 41.5%。
+0224|(c) 文件内自声明哈希在追加后必然失效。atlas_ledger 声明 41d65a13 vs 实际 bbda63df，
+0225|    18 种候选语义全不命中（= 追加前历史值）。修法：
+0226|      sha256(json.dumps(d 去掉该字段, ensure_ascii=False, indent=1))[:8]
+0227|    排除自身 => 回写后不变（实测不变量 0dc6e57a）。
+0228|(d) 元层审计必须「只读」。发现的不自洽一律落「更正表 + 待 seal」，不得顺手改
+0229|    MEMO/TESTPLAN/Ledger。就地升版前先确认历史断言（P3150 只查 len(metrics)==7
+0230|    与 meta_rules 含 F2/F7 => 加字段安全；先备份 v1 并在 supersedes 记录其 sha8）。
+0231|(e) KPI 冻结必须带完整来源指纹。E_read 口径 = k1_model_report.b4_rel_readout_mean3seed，
+0232|    须连同 result.json 文件 sha8 + res_sha8 + held-out 载体 npz sha8 一起冻结，
+0233|    否则「同一口径」不可复现。
+0234|```
+0235|
+0236|## 参照实现（Phase 3125，210/210 全绿；Phase 3128，19/19 全绿）
+0237|
+0238|- vals 提取：`tests/gpt5_temp/p3125_vals_extract.py`
+0239|- closeout 五写：`tests/gpt5_temp/phase3125_closeout.py`（3128 版 `phase3128_closeout.py` 含 wlog try/except 修复）
+0240|- disk verify：`tests/gpt5_temp/p3125_disk_verify.py`（11 分区）；`tests/gpt5_temp/p3128_disk_verify.py`（19 分区 A×4/B×2/C×2/D×3/E×2/F×2/G×4，含 3127 门值 f32 路径 1e-12 复刻、npz 中位数重算、capture_b rho 全量重算 3e-8、6 组 flip 标签重算、ledger sha 重算）
+0241|- N 线独立复核（Phase 11）：`tests/deepseek/Phase11/disk_verify_phase11.py`（17 分区 A0/A1/B1/B2/B3/C/D/D2/E/F/G/H/I/J/K/L/M，含**同 seed 逐位复现 bootstrap 带与置换 null**），末尾 `TOTAL FAILS: 0`。
+0242|- N 线独立复核（Phase 12）：`tests/deepseek/Phase12/disk_verify_phase12.py`（从冻结 `result_phase12.json` 确定性重算 `xhalf`/`J_swap`/`recover`、**同 seed 复现 bootstrap 带与置换 null**、G 族布尔、F11/F12/F13/F10）。
+0243|- N 线独立复核（Phase 17）：`tests/deepseek/Phase17/disk_verify_phase17.py`（**A–L 分区，178 项 0 FAIL**；从**臂记录** `w_all`/`reach` 用**区间求和**重算 `com_V` 族/`median`/`share_*`/`spearman`、**同 seed 重跑置换 null**、从 P16 锚序列重算 `span_k`/`com_layer`、Q7 双读数、**探针 vs 生产跨实现逐位对齐**、MEMO 前缀锚与 `_infra` 基线链）。
+0244|
+0245|新 Phase 按内容替换分区与重算目标，流程与幂等结构保持一致。
+0246|
+SKILL total lines=246

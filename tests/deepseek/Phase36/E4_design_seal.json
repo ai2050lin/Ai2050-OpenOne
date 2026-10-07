@@ -1,0 +1,50 @@
+{
+  "seal_id": "E4_design_seal",
+  "phase": 36,
+  "line": "RDC / deepseek 线 E 系列嵌入探针（零 GPU，用户直接指令，队列外授权插入）",
+  "created_local": "2026-10-03T05:30 CDT",
+  "frozen_before_observation": true,
+  "question_user": "常用词（好/的 等）的词嵌入是不是满秩的，生僻字（麒麟 等）是不是低秩的？",
+  "concept_note": "单条词嵌入是一个向量，无矩阵秩。操作化为两层：A 向量级有效维度（分量能量分布）；B 组级矩阵有效秩（组行矩阵的奇异谱）。",
+  "operationalization": {
+    "A_per_vector": {
+      "p_i": "v_i^2 / sum_j v_j^2",
+      "PR": "1 / sum p_i^2（participation ratio；高斯随机向量期望约 (d+2)/3）",
+      "entropy_dim": "exp(-sum p ln p)",
+      "top10_share": "p 排序前 10 之和",
+      "max_share": "p 最大值",
+      "norm": "||v||_2"
+    },
+    "B_group_matrix": {
+      "spectrum": "K x d 行矩阵 SVD 奇异值 sigma，raw 与去组均值（centered）两口径",
+      "PR_spec": "(sum sigma^2)^2 / sum sigma^4",
+      "entropy_rank": "exp(H(sigma^2 / sum sigma^2))",
+      "num_rank": "sigma > eps*sigma_1 计数，eps=1e-2 与 1e-1",
+      "pairwise_cos": "组内两两 cos（raw 与 centered）+ 最近邻 cos 均值",
+      "K_matching": "各组子采样 K=20，重复 50 次取中位数，消除组大小差异"
+    }
+  },
+  "token_groups_frozen": {
+    "HIGH": ["的","了","是","我","你","他","她","它","们","这","那","有","不","没","好","就","都","也","很","和","与","或","但","在","被","把","从","到","上","下","中","里","外","说","要","会","能","去","来","吃","大","小","多","少","个","年","月","日","时","天"],
+    "MID": ["猫","狗","山","河","湖","海","树","花","草","书","车","房","路","桥","城","村","云","雨","雪","风"],
+    "RARE": ["麒","麟","饕","餮","魍","魉","貔","貅","魑","魅","龘","靐","麤","犇","骉","羴","猋","曌","齉","龖"],
+    "HIGH2": ["我们","现在","时间","问题","工作","事情","因为","所以"],
+    "RARE2": ["麒麟","饕餮","魍魉","貔貅"],
+    "RANDOM_CJK": "从词表随机抽 200 个解码后含 CJK 的 token（排除特殊/格式 token）",
+    "RANDOM_ALL": "全词表随机 600（复现 E1 格式 token 污染警示）"
+  },
+  "models": ["qwen3-4b", "qwen2.5-3b-instruct", "glm4-9b-chat-hf"],
+  "criteria_predeclared": {
+    "C1_vector_level": "HIGH 与 RARE 的 PR 中位数相对差 >= 10% 且 Mann-Whitney p < 0.01 => 词频-有效维度关系成立，方向按实测报告；否则记'无可测关系'",
+    "C2_group_level": "centered PR_spec：HIGH < 0.7 x RARE => 常用词占更低维子空间（'常用词满秩'否证）；> 1.3 x RARE => 反向；之间 => 组级无差异",
+    "C3_random_null": "RARE 组 PR 落入高斯模拟带（mean +/- 2sd，同 d）=> 生僻词向量近似未训练随机初始化（'低秩'以随机各向同性形式出现，即高有效维而非低有效维）",
+    "C4_norm": "报告各组范数中位数（频率-范数关系旁证训练强度），不作判据"
+  },
+  "honesty": [
+    "探索性（非预注册队列内 Phase）；用户指令插入，宪法队列外",
+    "词频分组是人工判定，非语料频率实测",
+    "单 token 过滤后组员变化需报告；2-char 词组作次级检查",
+    "零前向，仅静态嵌入行；不涉及层计算中的表现",
+    "多 token 词（若麒麟为多 token）逐 token 分析并注明"
+  ]
+}

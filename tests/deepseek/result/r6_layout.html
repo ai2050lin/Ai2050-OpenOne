@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang='zh-CN'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>R6 归位汇报 · deepseek 线</title><style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1a1d21;--mut:#5b6470;--bd:#e3e6ea;--ok:#0a7d43;--ac:#1a5fb4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+h1{font-size:23px;margin:0 0 4px}h2{font-size:16px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--bd)}
+.sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{background:#f0f2f5;font-weight:600}td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+code{background:#f0f2f5;padding:1px 5px;border-radius:4px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:13px 15px}
+.kpi .v{font-size:21px;font-weight:700;color:var(--ac)}.kpi .l{color:var(--mut);font-size:12px}
+pre{background:#f0f2f5;border:1px solid var(--bd);border-radius:8px;padding:12px;overflow:auto;font-size:12.5px;line-height:1.5}
+.ok{color:var(--ok);font-weight:600}ul{margin:6px 0 0 18px;padding:0}li{margin:3px 0}
+</style></head><body><div class='wrap'>
+<h1>R6 · 研究日志唯一化 + deepseek 目录归一</h1>
+<div class='sub'>2026-10-03 · 仅本对话（deepseek 线）遵守 · 全程未改任何既有判定</div>
+<div class='grid'>
+<div class='kpi'><div class='v'>24</div><div class='l'>MEMO Phase 总数（1–31）</div></div>
+<div class='kpi'><div class='v'>aeb4e786</div><div class='l'>MEMO sha8 · 6319 行</div></div>
+<div class='kpi'><div class='v'>8 + 6</div><div class='l'>gpt5 目录迁出（.md + .json）</div></div>
+<div class='kpi'><div class='v'>68</div><div class='l'>tests/deepseek/result/ 条目</div></div>
+</div>
+<h2>1 规范 v4（仅本对话生效）</h2><div class='card'><ul>
+<li><b>研究日志唯一落点</b>：<code>research/deepseek/docs/AGI_DEEPSEEK_MEMO.md</code>（append-only、BOM+CRLF、bare_lf 0、标题一律 <code>## Phase {N}: …</code>）；<b>不再新建其他 .md</b>。</li>
+<li><code>AGI_GPT5_MEMO.md</code> 属<b>其他 AI 路线</b>：本对话不读、不改、不追加。</li>
+<li><b>三类落点</b>：测试脚本 → <code>tests/deepseek/</code>；临时脚本 → <code>tests/deepseek_temp/</code>；测试结果 → <code>tests/deepseek/result/</code>。</li>
+<li>历史 <code>Phase1..21/</code> 保持原样（其路径已被 MEMO 多处引用）。</li></ul></div>
+<h2>2 目录结构 前 → 后</h2><div class='card'><pre>
+前                                       后（本对话产物）
+research/gpt5/docs/*.md (8 件 deepseek)  → research/deepseek/docs/AGI_DEEPSEEK_MEMO.md  [Phase 23-30 全文并入]
+research/gpt5/atlas/metric_dict.json     → research/deepseek/atlas/metric_dict.json
+research/gpt5/atlas/phase_queue_v1.json  → research/deepseek/atlas/phase_queue_v1.json
+research/gpt5/atlas/{4 个审计 JSON}      → tests/deepseek/result/
+tests/deepseek/_review/*.py  (17 耐用)   → tests/deepseek/*.py
+tests/deepseek/_review/*.py  (27 临时)   → tests/deepseek_temp/*.py
+tests/deepseek_temp/_review/*  (59 项)   → tests/deepseek/result/
+</pre></div>
+<h2>3 并入的 8 件文档（全文，标题降一级）</h2><div class='card'><table>
+<tr><th>承接</th><th>源文件</th><th>内容</th><th class='n'>sha8</th><th class='n'>字节</th></tr>
+<tr><td><b>Phase 23</b></td><td><code>RDC_TESTPLAN_v1.md</code></td><td>RDC 破解路线裁决与测试方案 v1</td><td class='n'>71b85673</td><td class='n'>22542</td></tr>
+<tr><td><b>Phase 24</b></td><td><code>LOOP_DIAGNOSIS_AND_EXIT_v1.md</code></td><td>循环诊断与出路 v1</td><td class='n'>013d08a9</td><td class='n'>32055</td></tr>
+<tr><td><b>Phase 25</b></td><td><code>RDC_RESEARCH_CONSTITUTION_v1.md</code></td><td>RDC 研究宪法 v1</td><td class='n'>01df6398</td><td class='n'>10388</td></tr>
+<tr><td><b>Phase 26</b></td><td><code>META_SINGLE_SOURCE_Q01.md</code></td><td>Q01 元层单一真源对账</td><td class='n'>95366ca9</td><td class='n'>9060</td></tr>
+<tr><td><b>Phase 27</b></td><td><code>METRIC_DICT_Q02.md</code></td><td>Q02 KPI 口径冻结</td><td class='n'>ba518fea</td><td class='n'>5687</td></tr>
+<tr><td><b>Phase 28</b></td><td><code>DEADLINE_DUAL_TRACK_Q09.md</code></td><td>Q09 死线双轨重述</td><td class='n'>0d8633c7</td><td class='n'>7176</td></tr>
+<tr><td><b>Phase 29</b></td><td><code>PROP_CITATION_AUDIT_Q12.md</code></td><td>Q12 D/E 命题引用审计</td><td class='n'>32933855</td><td class='n'>13049</td></tr>
+<tr><td><b>Phase 30</b></td><td><code>SEAL_REQUEST_A_GATE.md</code></td><td>A 闸门 seal 请求</td><td class='n'>7678cbe0</td><td class='n'>5544</td></tr>
+</table><div class='sub' style='margin:10px 0 0'>复核：8/8 文档<b>逐行包含性 100%</b>（共 949 行非空正文，未命中 0）。原件已备份 <code>tests/deepseek_temp/_archive_r6/gpt5_docs/</code> 后从 gpt5 目录删除。</div></div>
+<h2>4 迁出的 6 个 JSON</h2><div class='card'><table>
+<tr><th>原路径</th><th>新位置</th><th class='n'>sha8</th></tr>
+<tr><td><code>research/gpt5/atlas/metric_dict.json</code></td><td><code>research/deepseek/atlas/metric_dict.json</code></td><td class='n'>03887e51</td></tr>
+<tr><td><code>research/gpt5/atlas/phase_queue_v1.json</code></td><td><code>research/deepseek/atlas/phase_queue_v1.json</code></td><td class='n'>675836fd</td></tr>
+<tr><td><code>research/gpt5/atlas/deadline_dual_track_v1.json</code></td><td><code>tests/deepseek/result/deadline_dual_track_v1.json</code></td><td class='n'>4d1853d3</td></tr>
+<tr><td><code>research/gpt5/atlas/prop_citation_audit_v1.json</code></td><td><code>tests/deepseek/result/prop_citation_audit_v1.json</code></td><td class='n'>4c2ea9d2</td></tr>
+<tr><td><code>research/gpt5/atlas/meta_single_source_v4.json</code></td><td><code>tests/deepseek/result/meta_single_source_v4.json</code></td><td class='n'>f9d7ede6</td></tr>
+<tr><td><code>research/gpt5/atlas/seal_request_v1.json</code></td><td><code>tests/deepseek/result/seal_request_v1.json</code></td><td class='n'>d871a4b4</td></tr>
+</table></div>
+<h2>5 分桶统计</h2><div class='card'><table>
+<tr><th>桶</th><th>含义</th><th class='n'>当前 .py / 条目</th></tr>
+<tr><td><code>tests/deepseek/</code></td><td>测试脚本（可复跑 / 复核 / 生成交付件）</td><td class='n'>17</td></tr>
+<tr><td><code>tests/deepseek_temp/</code></td><td>临时脚本（探针 / 一次性补丁）</td><td class='n'>37</td></tr>
+<tr><td><code>tests/deepseek/result/</code></td><td>测试结果（json / txt / html / md 报告）</td><td class='n'>68</td></tr>
+</table><div class='sub' style='margin:10px 0 0'>归位后 17 个耐用脚本内嵌的 <code>_review</code> 输出路径已死 ⇒ 32 处改写为 <code>tests/deepseek/result</code>（残留死路径 0；哨兵 <code>propositions_review</code> 6 处未误伤）。</div></div>
+<h2>6 不变量复核</h2><div class='card'><table>
+<tr><th>项</th><th>结果</th></tr>
+<tr><td>MEMO 前缀（Phase 1–22）逐字节不变</td><td class='ok'>True</td></tr>
+<tr><td>MEMO BOM + CRLF，bare_lf</td><td class='ok'>0</td></tr>
+<tr><td>Phase 22 标题去「（非 Phase 编号）」</td><td class='ok'>已规范化</td></tr>
+<tr><td>8 件文档全文包含性</td><td class='ok'>100%（949 行 / 0 未命中）</td></tr>
+<tr><td>6 个 JSON 迁移后哈希</td><td class='ok'>全部一致</td></tr>
+<tr><td>既有判定</td><td class='ok'>未改动（并入为全文搬运）</td></tr>
+</table></div>
+<h2>7 一句话 ×3</h2><div class='card'><ul>
+<li>研究日志唯一落点 = <code>AGI_DEEPSEEK_MEMO.md</code>；G 线目录不再承载 deepseek 产物。</li>
+<li>测试脚本 / 临时脚本 / 测试结果三桶分离，<b>仅本对话遵守</b>。</li>
+<li>全程未改任何既有判定 —— 并入是全文搬运 + 标题降级，Phase 22 仅修一处遗留标题标记。</li></ul></div>
+</div></body></html>

@@ -448,11 +448,15 @@ E_{u\rightarrow v}=I\land S\land N\land C\land P\land R
 
 ### 前端
 
+最简方式：在资源管理器中**双击仓库根目录的 `start_client.bat`**（无需 VSCode；关闭窗口即停止客户端）。
+
+或在终端执行：
+
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start_visualization.ps1
 ```
 
-默认地址：`http://localhost:5173`
+默认地址：`http://localhost:5173`（注意：不是 5001——5001 是后端 API；也不要直接双击 `frontend/index.html`，ES 模块无法经 file:// 加载）
 
 人工标注工作台：`http://localhost:5173/annotation.html`
 

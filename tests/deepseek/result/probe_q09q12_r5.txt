@@ -1,0 +1,139 @@
+=== [0] MEMO 概览 ===
+MEMO bytes=1900611 lines=14901 sha8=2a84776b
+
+=== [A] K1/K2/K3 出现位置（含 死线/触发/判据 上下文的行） ===
+命中行数 = 28
+  L472    Phase 2761 = 知识链"内部知道但说不出"断层定位与激活修复（用户需求 2）：logit-lens 逐层判"内部知道"（target rank-1），对行为错误行做目标方向注入扫描（36 残差位置 × 3 强度）得阻抗剖面，预注册 K1/K2/K3 判据；随机方向对照。随后 Phase 2762 = 签名几何跨模型功能移植（用户需求 3，2755 checkpoint 上的 2752 式充分性/必要性）。
+  L486    | K3 修复 | 主判据翻转率 100%（14/14）但对照 28.6%>15% 字面不过；**2761a 匹配强度对照：α=0.1 下 kc 定向 71.4% vs 随机 28.6%（配对差 0.43，CI [0.07,0.71]），ldr 100% vs 40%，ws 96% vs 16%——方向特异成立**；neg 反向（定向 0% vs 随机 25%，其 argmax 距边界近，属另一机制） |
+  L502    1. α 网格下界 0.1 饱和导致 K2 无分辨力（阻抗剖面被地板效应压平），"断层不在层间"的结论是在地板效应下的否定，更细的强度网格（α<0.1）可能分辨出层间差异；2. 注入用的是 target 的 unembed 行——修复证明"可绕过"而非"模型自主恢复"；3. 行为仅首 token（B1 类比），未测完整生成；4. 错误行样本小（kc 14）；5. logit lens 的 rank-1 是必要非充分判
+  L2028   **测试原理**：2807-2809 全部为静态端（E/W_U 零前向）；2810 首次运行真实前向，检验"词位随身档案在短语语境中被上游词调制"的剂量-反应假说（LPF v5.3 组合性第一块试金石）。设计：20 目标词（10 类 × 2）× 5 条件（iso 单词基线 / same 同类修饰 "banana apple" / diff 跨域修饰 "hammer apple" / func 虚词 "the appl
+  L2039   **头条发现（负结果 + 机制线索）**：①**通用上下文通道主导裸 Δ**——虚词 "the"（attention-sink 型高频 token）位移 1.400 超过一切实词条件，null 随机 token 1.319 与 content 1.269 同量级；18/20 词 func 位移同时大于两个 content 条件（例外：silver 的 diff 1.229>func 1.216、pants 的 sam
+  L2045   **结论**：**裸隐状态层面"短语档案调制"的预注册判据失败**（P-K2/P-K4 双否证）——LPF v5.3 的档案-上下文接口不能在裸 Δ 层面测量：裸 Δ 被非语义通用通道（attention-sink/位置通道）支配。这与 2806-2809 静态端"档案自足、后置上下文免疫"互补：**上下文效应必须先剥离通用通道，才能看到语义调制**。探索性信号（same 类方向份额 2-2.3× 于对照）说明语义通
+  L2360   **Gens 记录**：首跑崩于 assert K2≥5（名词池候选太少：mountain/whale/elephant/desert/snow/frost/wolf/pillow/truck/cave 等与电池词冲突或多 token，仅 3/6 属性存活）。崩前零 result 产物（execution.json 已删）。修复：候选池扩至每极 6 个、崩溃前打印拒绝明细、补 PC-类别 eta² 探索性诊断（P-R
+  L2984   3. **边界的技术含义**：颜色绑定主要不在 MLP 列（在 OV 头 + attention 通路 + 分布式表征的组合计算中，2819 K2 的 35 个 OV 颜色头是下一步编辑目标）；"只改苹果不改别人"需要实体条件化编辑（列门控输入侧注入，2821 B1 的 f(实体,域) 位点）。
+  L3026   - **Arm O（OV rank-1 编辑）**：2819 K2 的 1152 头普查取晚层（L≥30）top-5 颜色头（L33 h23 red 0.63 / L31 h15 red 0.61 / L34 h0 color 0.52 / L35 h22 red 0.51 / L31 h8 color 0.47）；捕获 apple 上下文 a_h（o_proj 输入头切片）；rank-1 重定向 W_O^h += 
+  L3174   **Gens 记录**：1 次运行（12.6s，零崩溃——预审两探针起效：2819 K2.ov_rows 字段核对 + 48 实体单 token 核查）。预注册判据全程未动。
+  L3240   **Gens 记录**：2 次运行（①einsum 下标错误——store[L].reshape(96,32,128) 把 batch×位置维混展，K3 降为二维；改为先按位置维 mean 再 reshape；②干净 20.4s）。预注册判据全程未动。
+  L4418   2. 2851 K1 fail 的完整解释：判据只认 attn 写出（深层 attn 增量 ≈0），真凶 MLP 不在判据内——预注册否证了 attn 透射假说本身；2852 补上 MLP 通道并完成定位。
+  L10321  GLM4 原生重建 2945 注入机器：98 cells verbatim（2996 glm arm 词表）；pass1 全 40 层 dirs_g 重建（a1：L17/18/19 vs 2996 npz dirs_attn_glm **bit 级 0.00**——2996 捕获协议跨卡复现）；Vt8_g=SVD[:8]、u39=dirs_g[39] 读出；in-session dcks=c8(null0)−c8(f
+  L10391  2999 机器 verbatim（98 cells、dirs_g bit 锚 2996、Vt8/u39、xdir per-cell (98,4096)、单层 attn_in pos-1 注入）。**T1 词 token swap**：种子化随机伙伴词上下文（SEED_PARTNER=3002，禁严格反类配对——那会使 ctx-labels sep ≡ −sep_D 永真）+ 加法 2×2 分解 m(word,ctx)
+  L10414  3000/2945 机器 verbatim 的 3001 完全镜像（57 词 2887、dirs_word a1 vs 2927 2.2e-8、Vt8 a3 vs 2939 0.0、u35、dcks 2939、xdir=dcks_S@Vt8_S per-cell (57,2560)、单层 attn_in pos-1 注入）。T1 同款种子化随机伙伴 + 加法 2×2 分解（carry 门 0.7）；T2 L15/L1
+  L10437  3002 机器 verbatim（57 词 2887、dirs a1 2.2e-8、Vt8 0.0、u35、xdir per-cell、pos-1 注入）。**T1 剂量律**：L15/L17 × s∈{0.5,1,2,3} × K3，过原点线性拟合最大相对残差门 0.15；sub_rnd0 剂量对照（正交随机方向随剂量是否增长）。**T2 镜像对称**：−xdir s=2 K2，对称门 |r−/r+−1|≤0.2、
+  L12367  **接续 3084 菜单**——A（主选）**3B 层位扫描**（L_INJ ∈ {28, 31, 33, 34} 小规模 E3 焦点扫描，定位 3B 因果载入层、检验 n_neg 族分布随层变化；中量前向）。B **3B 放宽预注册重跑**（新预注册放宽 K3/topk 门 + C 族专项）。C **4B 主干解剖**（免前向为主，CS top-1 成分的头/子集分解）。D **f2~U_AB 第三复现设计**。E
+  L12574  - **（degenerate 分支）**描述性筛选与全管线可行性解耦：A1 的 n_neg 是 K3=24 完整协议的描述量，但 top8 子集质量在完整管线下另有标准——层位选择判据应升级为"描述性 + 可行性"双门。
+  L13266  ### 3. K3 负结果的自纠：不适定门 + 混杂量化（本 Phase 核心方法论产出）
+  L13267  预注册 K3 门：真值探针 AUC≥0.80、零参数 yes/no margin 对内严格率≥0.65、端点基线≤0.60。实测：**margin AUC test 0.497 / testE 0.490 = chance；对内严格率 0.324；均值反向（true 0.158 < false 0.270）**；探针 AUC 0.75–0.82（差 0.00005 摸门）。逐层审查后发现两个设计缺陷，**结论从"sh
+  L13274  ① K3 门预注册时未检验"真值是否 in-context 可观察"这一前提（2754 与 3104 的真值语义不同源）；② d_rel 构造引入系统性关系频率差；③ 查询行逐字复制第 k 行使"真=句子复现"结构存在（虽因两条件都复制而不构成真值线索，但削弱与 2754 多跳范式的可比性）；④ 3104 无法区分"关系抽象绑定"与"谓词 token 局部拷贝到宾语位"——crit_obj 曲线只证明信息到了端点状态
+  L14807  用户提供长文主张"停止微观修补、转向 TDA/SAE/Neural ODE"。**总裁决：诊断大体正确、历史叙事错误、三条处方一真二偏**。逐条 15 项判定（4✅/8⚠️/6❌）：①"还原论陷阱"对——但正是我们 3109/3138/3139/3140/3148/3149 先确证；②"3000 Phase 全在找齿轮"前提错——TESTPLAN v1（2026-09-30）已完成同等裁决并预注册 3150 P0（死
+  L14825  **问题**：LLM 组合能力可加还是真组合？**材料**：状态库 672×2×4 + 实体A×关系R×模板T 笛卡尔积按组合切分（防近重复泄漏）。**验收（唯一）**：未见组合上打败四基线（B1 独立加性/B2 记忆检索/B3 单坐标最大/B4 全加性）。**判决（可能否证整条主线）**：若 3 模型未见组合误差>5% 且不优于 B4 → 弃"算子代数"（死线 K1）→ G4 SAE 提前。工具：gate_prec
+  L14842  7. **K1：模型 1/3 无触发**；但 B4@k39=0.39>5% 且候选不胜任 → K1 压力实录，3152 双模型定夺。
+  L14853  四模式单脚本 `phase3152_g1p2_tri_model_k1.py`：qwen3-4b（NL36/D2560，k*=3/readout=35）与 qwen3-14b（NL40/D5120，k*=3/readout=39）全管线（738 行面板×S1 三 seed×S2×S3×全层曲线×M1 曲线 10 深度点×门×M1 网格 48 fits×A3 worst20×V5）+ glm4k1（零 GPU：读 31
+  L14867  - **K1 弃线条件（3 模型全 above 且 M1 全败）不成立**：above=1/3、m1_pass=2/3 → **算子代数线保住**；qwen3-14b 的 k* 处组合非线性被 rank-5 交互完全修复（0.081→0.036，改善 56pct）。
+  L14899  ### 预注册 Phase 3154：G2-P1 多关系族与算子可分离性（K2 死线）
+  L14900  (1)新面板采集（GPU）：3 关系族（是-a is-a / 有-a has-a / 制成-of made-of）×(实体×类)×3 模板，qwen3-4b + qwen3-14b + glm4-9b 全隐层采集（3151 collect.npz 协议复用）；(2)K2 检验：h_ℓ(i,c) 分解为 W_ℓ v_i + φ_ℓ(c) 的可分离性（实体方向响应是否关系无关、类方向是否关系无关；双向消融+子空间角）——
+
+--- 各标记计数 ---
+  K1               36
+  K2               40
+  K3               27
+  K 死线             0
+  kill criteria    0
+  死线               8
+  触发               49
+
+=== [B] 命题账本真源 ===
+glob 命中 1 个：
+   tests\glm5\result\rdc_query_construction_20260913\phase3103\omega_p101_formula_audit\proposition_ledger.json  (38389 B, sha8 9a3c6ff4)
+
+--- schema ---
+  phase = 3103
+  name = 'omega_p101_formula_audit'
+  grade_key = 'A=bit-level recompute; B=supported-in-scope; C=candidate; D=downgraded; E=withdrawn'
+  grade_distribution -> dict keys=['B', 'D', 'E', 'C', 'A']
+  propositions_review -> list(57)
+  propositions_new -> list(5)
+  consumer_check -> dict keys=['2759', '2861', '2906', '3036', '3045', '3075', '3089']
+
+--- propositions_review 首条键集 ---
+  ['claim', 'grade', 'id', 'phases', 'retain', 'review_verdict']
+  首条样例: {"id": "R01", "phases": "2750,2756-2760", "claim": "训练世界差异揭示低层全盲、深层才接入历史", "review_verdict": "限域观察；强解释错误", "grade": "B+D", "retain": "配对训练世界响应差异、同前缀比较"}
+
+--- propositions_new 首条键集 ---
+  ['claim', 'evidence', 'grade', 'id', 'phases']
+  首条样例: {"id": "PA-01", "phases": "3101", "claim": "3093干预语义=全V流替换(所有层v_proj钳回自然bank,仅L37[0,4)携带prefix V)", "grade": "A", "evidence": "变体探针bit级1e-12;3101复刻d2b=0,med_c=0.5104一致"}
+
+--- 命题总条数 = 62 ---
+grade 键名 = grade
+  原始标签分布 {'B+D': 9, 'B': 11, 'E': 3, 'C+D': 2, 'B+C': 3, 'C': 7, 'D': 6, 'E+B': 6, 'B+E': 4, 'E+D': 1, 'D+E': 2, 'D+B': 1, 'C+E': 1, 'E+A': 2, 'E+C': 1, 'A': 3}
+  分量口径分布 {'B': 34, 'D': 21, 'E': 20, 'C': 14, 'A': 5}
+  条数=62  分量和=94
+
+--- D 级（分量口径）21 条 ---
+   [R01] B+D | 训练世界差异揭示低层全盲、深层才接入历史
+   [R04] C+D | 内部知道但说不出，oracle修复证明知识存在
+   [R05] B+D | 偏置修复、pull符号规则与否定深未知
+   [R06] B+D | 修复机制自然迁移与共享e0轴
+   [R09] D | 多义对比负相关、平坦谱为普适语义法则
+   [R12] E+D | 残差是属性流形/微场/GPS；静态嵌入无知识坐标
+   [R13] D | OV无语义或对齐列就是功能神经元
+   [R17] D+E | 深层MLP主动放大及增益窗口
+   [R21] B+D | margin检测器与幅值定律
+   [R23] B+D | 头x层事件图谱、探针不变骨架
+   [R26] B+D | 卡片链认证、词类签名、频率控制
+   [R28] D+B | 长上下文推广与签名适用域
+
+--- E 级（分量口径）20 条 ---
+   [R03] E | 问句事实泄露是错误根源
+   [R10] E+B | 实体感紧凑性定律
+   [R11] B+E | 层级嵌套、十维骨架、未见词分类
+   [R12] E+D | 残差是属性流形/微场/GPS；静态嵌入无知识坐标
+   [R15] E | 知识链不在运行时传播
+   [R17] D+E | 深层MLP主动放大及增益窗口
+   [R22] E+B | 伪逆定位0.7%神经元承载20%语言能量
+   [R35] B+E | 指纹竞争、普遍logistic曲率律
+   [R36] D+E | KV写入98.3%词身份、秩1情境轴
+   [R37] C+E | 风格全局引力场及L20因果反转
+   [R39] B+E | gamma白化、读出预对齐、64通道载荷
+   [R42] B+E | Attention头是线性读取器
+
+=== [C] 候选引用位点（3103 之后的 MEMO 节 + docs 目录） ===
+3103 节标题 L13214: ## Phase 3103: Ω-P101 RDC 命题级证据分级账本——[2026-09-23 06:07]
+3103 之后的 MEMO 行数 = 1687
+
+docs 目录 .md 共 36 个：
+   AGI_GPT5_ICSPB.md                                             14541 B  47866afe
+   AGI_GPT5_MEMO.md                                            1900611 B  2a84776b
+   AGI_GPT5_MEMO_20260301.md                                    197083 B  82b0ee94
+   AGI_GPT5_MEMO_20260306.md                                    209523 B  99ab6a3a
+   AGI_GPT5_MEMO_20260310.md                                    533851 B  0ae3288d
+   AGI_GPT5_MEMO_20260317.md                                   2339217 B  85d0e8bc
+   AGI_GPT5_MEMO_20260525.md                                   2452731 B  e348842f
+   AGI_GPT5_MEMO_20260615.md                                   1325199 B  d7a061f2
+   AGI_GPT5_MEMO_20260701.md                                    858119 B  d485cf51
+   AGI_GPT5_MEMO_20260715.md                                   1435443 B  2f21582e
+   AGI_GPT5_MEMO_20260810.md                                   2495809 B  2e7da093
+   AGI_GPT5_MEMO_20260925.md                                   1742462 B  d8f56bd1
+   AGI_GPT5_MEMO_SUMMARY.md                                      35273 B  3d7ccc16
+   AGI_GPT5_MEMO_VISUAL.md                                       25043 B  6ef2d57e
+   ATLAS_PLAN_map_cracking_v2.md                                  9327 B  48806a5d
+   EMBED_ANCHOR_VERDICT_v1.md                                    13776 B  792f9181
+   FINGERPRINT_PARADIGM_PLAN.md                                   8437 B  e905abaa
+   FIRST_PRINCIPLES_3090_3149.md                                  5244 B  fce9c394
+   LOOP_DIAGNOSIS_AND_EXIT_v1.md                                 32055 B  013d08a9
+   MAIN_AXIS_VERDICT_v1.md                                       14227 B  827fc48d
+   MASTER_PLAN_map_linkage_v1.md                                 10776 B  34230a9d
+   MEMO_AUDIT_2750_3148.md                                       23442 B  5473f968
+   META_SINGLE_SOURCE_Q01.md                                      9060 B  95366ca9
+   METRIC_DICT_Q02.md                                             5687 B  ba518fea
+   PARADIGM_SHIFT_VERDICT_v1.md                                  10018 B  f9078b0b
+   RDC_RESEARCH_CONSTITUTION_v1.md                               10388 B  01df6398
+   RDC_TESTPLAN_v1.md                                            22542 B  71b85673
+   UNIFIED_REVIEW_ADJUDICATION_v1.md                              5959 B  a4320a0a
+   fingerprint_competition_review_20260921.md                     7673 B  8778e714
+   hdmcc_knowledge_map_review_20260921.md                        66073 B  8bdd0066
+   lpf_multiaxis_gating_roadmap_v1.md                             9135 B  afa60f18
+   plan_v3_omega_dynamic_manifold.md                              9097 B  56f1cc9d
+   plan_v4_micro_macro_merge.md                                   7687 B  f91bbf87
+   plan_v5_dynamic_manifold_control.md                            9040 B  321fab42
+   plan_v6_reuse_topology.md                                     14487 B  55b8c09c
+   research_synthesis_20260921.md                                13766 B  3c62b2ea

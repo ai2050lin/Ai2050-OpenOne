@@ -1,0 +1,169 @@
+== discrepancies ==
+[
+ {
+  "id": "D1",
+  "what": "命题账本分级口径",
+  "values": {
+   "memo": "A=5 / B=34 / C=14 / D=21 / E=20",
+   "testplan": "A=5 / B=6 / C=10 / D=21 / E=20"
+  },
+  "verdict": "口径混用；testplan 不可复现",
+  "fix": "强制 count_mode；canonical=component"
+ },
+ {
+  "id": "D2",
+  "what": "有效依赖比例",
+  "values": {
+   "memo_pct": "55",
+   "recomputed_ab_over_n": 62.9032
+  },
+  "verdict": "量纲混淆",
+  "fix": "同口径只报一个值"
+ },
+ {
+  "id": "D3",
+  "what": "atlas_ledger 自声明哈希",
+  "values": {
+   "recorded": "41d65a13",
+   "actual": "bbda63df"
+  },
+  "verdict": "文件内自指 + 追加必失配",
+  "fix": "content_excluding_self，重算不变量 0dc6e57a"
+ },
+ {
+  "id": "D4",
+  "what": "proposition_ledger 记录哈希",
+  "values": {
+   "memo": "add57ba7",
+   "actual": "9a3c6ff4"
+  },
+  "verdict": "同上",
+  "fix": "外部 manifest 或重算"
+ },
+ {
+  "id": "D5",
+  "what": "Ledger schema 一致性",
+  "values": {
+   "has_meas_id": 270,
+   "has_phase": 199,
+   "both": 165
+  },
+  "verdict": "两套 schema 并存 + evidence_level 为常量",
+  "fix": "统一字段 + 三值枚举"
+ }
+]
+
+== grade_counting ==
+{
+ "canonical": "component",
+ "also_report": "atomic_best",
+ "forbidden": "分量数 ÷ 条数（量纲混淆）",
+ "tables": {
+  "component": {
+   "A": 5,
+   "B": 34,
+   "C": 14,
+   "D": 21,
+   "E": 20
+  },
+  "atomic_first": {
+   "A": 3,
+   "B": 27,
+   "C": 10,
+   "D": 9,
+   "E": 13
+  },
+  "atomic_last": {
+   "A": 5,
+   "B": 18,
+   "C": 11,
+   "D": 18,
+   "E": 10
+  },
+  "atomic_best": {
+   "A": 5,
+   "B": 34,
+   "C": 11,
+   "D": 9,
+   "E": 3
+  },
+  "atomic_worst": {
+   "A": 3,
+   "B": 11,
+   "C": 10,
+   "D": 18,
+   "E": 20
+  }
+ },
+ "sums": {
+  "component": 94,
+  "atomic": 62
+ },
+ "ratios_consistent": {
+  "component_AB_over_component": 41.4894,
+  "atomic_best_AB_over_atomic": 62.9032
+ },
+ "reproduced": {
+  "memo_3103": true,
+  "testplan": false
+ }
+}
+
+== hash_policy ==
+{
+ "scope": "content_excluding_self",
+ "algo": "sha256[:8]",
+ "serialization": "json.dumps(obj, ensure_ascii=False, indent=1), utf-8, no trailing newline, LF",
+ "atlas_ledger": {
+  "recorded": "41d65a13",
+  "raw_bytes_sha8": "bbda63df",
+  "correct_self_excluding": "0dc6e57a",
+  "format_is_canonical": true,
+  "status": "STALE"
+ },
+ "proposition_ledger": {
+  "recorded_in_memo3103": "add57ba7",
+  "actual": "9a3c6ff4",
+  "status": "STALE"
+ }
+}
+
+== 宪法 §2 K1 两种读法 ==
+ 25|| `E_read` | 未见组合在**行为读出层**的 rel-L2 预测误差 | **`glm4-9b` 0.3898 / `qwen3-4b` 0.3316 / `qwen3-14b` 0.3986** | 已测（Q03 统一复算） |
+ 26|| `E_ar(k)` | k 步自回归 logit-margin 预测误差曲线 | 不存在（MEMO 中 `E_ar` 出现 0 次） | 缺失（Q04–Q05 建造） |
+ 27|| `C_steer` | 用抽取机制控制 held-out 行为且无附带损伤的比例 | 未测；代理指标预示很低（cancel 反向加重 0.820；附带损伤地板 3.5/13） | 未测（Q06/Q20） |
+ 28|
+ 29|**登记规则（本宪法核心）**：一个 Phase 若未降低三者中任何一个，其在 Ledger 中登记为 `catalog`（目录条目），**不得**登记为 `advance`（进展）。
+ 30|
+ 31|> ⚠️ 反向风险（自我限制）：KPI 若被优化到虚假低值（held-out 泄漏 / 选易子面板），将重演同一错误。**必须与 §4 可识别性门 + §5 单模型否决权捆绑使用。**
+ 32|
+ 33|---
+ 34|
+ 35|## §2 判决层由行为定义（I2）
+ 36|
+ 37|任何「我们解释了 X」的断言，误差必须在**行为读出层与模型最终输出**上报告。承诺层 k* 可另附报告，**不得用于主线存续判定**。
+ 38|
+ 39|**K1 的现状与两种读法**（详见诊断 §3.3 / §8.4）：
+ 40|
+ 41|| 模型 | B4@k*（约 7.5% 深度） | B4@读出层 | 是否过 5% 门 |
+ 42||---|---|---|---|
+ 43|| glm4-9b | 0.0461 | **0.3898** | 否 |
+ 44|| qwen3-4b | 0.0079 | **0.3316** | 否 |
+ 45|| qwen3-14b | 0.0807 | **0.3986** | 是 |
+ 46|
+ 47|- **读法甲（推荐）**：K1 的语义是「能否预测未见组合」，行为由输出定义 -> 判定层应为读出层 -> **K1 应当触发**，「算子代数」降级为 `descriptive`。
+ 48|- **读法乙**：若「承诺层 = 候选取作用层」是**预先登记并有意**的判据，则 K1 的原文在两处自相矛盾，**必须重述为无歧义版本并重新冻结**。
+ 49|
+ 50|> **无论哪种读法，「用假设自己指定的层来判断假设」都必须被显式接受或显式否决，不能默认。** 该项落为 Q08，需用户 seal。本宪法不擅自改动 MEMO 中的既有判决。
+ 51|
+ 52|---
+ 53|
+ 54|## §3 死线双轨（I3）
+ 55|
+ 56|1. **主判据 = 跨模型聚合量**（pooled error + bootstrap CI），**不用合取**。
+ 57|2. **单个模型的反例即足以把命题标记为 `model_specific`**；`model_specific` **不得升为机制**。
+ 58|
+ 59|> 依据：项目自述「跨模型阴性反复出现」。**合取 + 系统异质 = 死线永不触发**，这是可预测的，不是运气。
+ 60|
+ 61|---
+ 62|

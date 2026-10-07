@@ -1,0 +1,64 @@
+# FIRST_PRINCIPLES_3090_3149 (F6-min)
+
+- 性质：最小合规版——每 Phase 一行第一性原理洞察；完整重写延至 3160。机械行=verdict 语义展开。
+
+- Phase 3090: （ledger 无正式条目）锚定阶段起点：bit-0 锚族建立。
+- Phase 3091: verdict 语义展开: continuum_robust_l38。
+- Phase 3092: verdict 语义展开: gate_sensitive_substantive。
+- Phase 3093: verdict 语义展开: fifth_trunk_no_migrate。
+- Phase 3094: verdict 语义展开: fifth_mixed_degradation。
+- Phase 3095: verdict 语义展开: fifth_ab_mixed。
+- Phase 3096: verdict 语义展开: fifth_lens_late_assembly。
+- Phase 3097: verdict 语义展开: fifth_cliff_single_step。
+- Phase 3098: verdict 语义展开: fifth_lastblock_mlp_rewrite。
+- Phase 3099: verdict 语义展开: fifth_mlp_neuron_diffuse。
+- Phase 3100: verdict 语义展开: sixth_upstream_residual。
+- Phase 3101: 干预语义先逆向再复刻：3093 全 V 流替换 != 单层替换。
+- Phase 3102: 统计收紧五原则：双报/可达域/平均秩/JVP≠混合/条件二阶差分。
+- Phase 3103: 命题账本制度：62 条命题分级，E 级禁入新链。
+- Phase 3104: verdict 语义展开: K1_K2_relation_binding_valid;_K3_gate_ill_posed_confounded。
+- Phase 3105: 读出端追踪 in-context 真值：m AUC 0.99、P>A1 74/74。
+- Phase 3106: 剂量追踪绑定-真值层对齐 Pearson 0.960。
+- Phase 3107: 坐标基跨材料简并旋转（J 0.053）：unembed 与探针近正交而功能耦合=多路读出。
+- Phase 3108: top-200 J 0.11/0.07=选择噪声主导；子空间角全 fail（后被 3109 欠定修正）。
+- Phase 3109: 欠定几何=真值弥散冗余：写入头组固定几何不存在，读出端=功能等价端口类。
+- Phase 3110: 真值=记录级一阶矩广播（AUC 0.99）：最小端口 d_min=5 全息冗余。
+- Phase 3111: verdict 语义展开: mixed_broadcast_plus_distribution。
+- Phase 3112: L6 emerge λ1 0.479：早层已有全局主轴。
+- Phase 3113: MLP 主写窗 L20-28、L32 负写=擦除相：写入是两相过程。
+- Phase 3114: verdict 语义展开: erase_not_active。
+- Phase 3115: 三层联合 additive：写入分解在 o_proj 输入侧可加。
+- Phase 3116: verdict 语义展开: no_behavioral_decoupling。
+- Phase 3117: verdict 语义展开: sampled_consequence_confirmed。
+- Phase 3118: AUC 振荡 0.981→0.672：探针跨层不稳定=读出非存储。
+- Phase 3119: verdict 语义展开: rewrite_nonlinear。
+- Phase 3120: 重述步上推：行为读出依赖生成步位而非静态层。
+- Phase 3121: token 级替换失效：身份不在单 token。
+- Phase 3122: verdict 语义展开: pit_marginal。
+- Phase 3123: AUC 平台 0.50→0.66=i.i.d. 扩散伪影：跨行探针的零假设必须共模校正。
+- Phase 3124: (m,锚点,算子) 族不足：L35 释压=范数×语义各半。
+- Phase 3125: 第三成分=内容尾迹：写入链带 trail（lag1-3）。
+- Phase 3126: verdict 语义展开: writechain_diffuse。
+- Phase 3127: 写入链功能否定=单层无必要：交换实验阴性。
+- Phase 3128: 多层 swap 阴性=写入链纯相关：坐标注入 dose 单调才是因果通路。
+- Phase 3129: swap 全量重写而 margin 仅 172 翻转=行为读出与内部表示解耦。
+- Phase 3130: 注入严格绑定读点位；A1/P-fit 坐标零重叠=方向特异。
+- Phase 3131: 注入窗 L20-28 稳健；谱峰 L38；分叉决策层 L17。
+- Phase 3132: L17 注入改写 0.920/rescue 0.009=L17 是分叉层因果位点。
+- Phase 3133: L17 全维移植 chg 0.134 部分充分：全息冗余下的部分因果。
+- Phase 3134: dvec 载体 l17_max：注入有效性与层位绑定（3134 chg_matrix 为 prompt-only，审计教训）。
+- Phase 3135: co50∩co36=0 而 co50@L17 chg 0.422=端口类：深度>坐标身份。
+- Phase 3136: 写入线性直通/读出阈值饱和：传导 cos 缓降而行为 chg 饱和。
+- Phase 3137: 模式差是效力系数非可达性：k0only≡po_l17_s1.0 位级同。
+- Phase 3138: 范数占比≠因果占比：B 95-99% 无信号、I 8-16% AUC 1.0；身份重写窗 L26-32。
+- Phase 3139: 端口消费 I 主导/own 3-9%=端口读方向不读行坐标（第 4 次确证）。
+- Phase 3140: own 反特异 rank 0.77-0.91=端口类第 5 次确证；WR 双通路分离。
+- Phase 3141: cinj step1 谱分离=L19 脉冲+L23-28 平台；WR PC1×dvec29 joint_blocking。
+- Phase 3142: verdict 语义展开: coverage_full。
+- Phase 3143: verdict 语义展开: coverage_full。
+- Phase 3144: blocking 不在逐层 w_dn；pc1 通道=format token 挤入；残差能量沿 w_dn 单调至 L39。
+- Phase 3145: v1 轴=承重轴：clip@38 0.8047=dirty gate 拦截；dv29 自身 −67.02 被放大归因修正。
+- Phase 3146: 尾部信号在 bottom15；L39 跳升下游真实；v1 无干净窗口。
+- Phase 3147: 尾部符号剂量交叉 d*∈(3,4)；co50ex S 形阈值；neg 晚发=format 通道偏移。
+- Phase 3148: 符号交叉点 d*∈(3.0,3.5)；主源=坐标族联合非巨头；uncancel_insufficient（减法非法）；v1_sym_mixed。
+- Phase 3149: 载体按符号分离（neg 碎片/pos 骨架）；poslate=早期固化读出渐进；kx 近似互换；v3 偏置阈值后效应。

@@ -1,0 +1,30 @@
+== meta_single_source_v4.json keys ==
+  ['schema', 'frozen_at', 'generated_by', 'supersedes', 'single_source_of_truth', 'grade_counting', 'hash_policy', 'measurements_schema', 'discrepancies', 'corrections']
+  [corrections] = [{"id": "C1", "target": "MEMO 3103", "status": "awaiting_seal"}, {"id": "C2", "target": "MEMO 3103", "status": "awaiting_seal"}, {"id": "C3", "target": "TESTPLAN T5", "status": "awaiting_seal"}, {"id": "C4", "target": "atlas_ledger.json", "status": "awaiting_seal"}, {"id": "C5", "target": "MEMO 3103 哈希记录", "status": "awaiting_seal"}, {"id": "C6", "target": "atlas_ledger measurements schema", "status": "awaiting_seal"}]
+
+== deadline_dual_track_v1.json : k1_recompute / readings ==
+  k1_recompute = {"per_model": {"qwen3-4b": {"kstar": 3, "readout": 35, "b4_kstar": 0.007910657984515032, "b4_readout": 0.3316153089205424, "m1_kstar_margins": [-0.003995918203, -0.001871779445, -0.002428600099], "m1_kstar_mdes": [0.00164567322, 0.0021655155, 0.001723737313], "m1_readout_margins": [0.74628919363, 0.746069848537, 0.867341279984], "m1_readout_mdes": [0.173614220916, 0.135409986699, 0.146566495379], "above_add_gate": false, "m1_kstar_pass_all3": false}, "qwen3-14b": {"kstar": 3, "readout": 39, "b4_kstar": 0.0806781401236852, "b4_readout": 0.39860084652900696, "m1_kstar_margins": [-0.04315668717, -0.044845726341, -0.04450206086], "m1_kstar_mdes": [0.007399310631, 0.008100154574, 0.009958824526], "m1_readout_margins": [1.084026694298, 1.041910767555, 1.262826323509], "m1_readout_mdes": [0.240717308979, 0.189907086962, 0.21978643736], "above_add_gate": true, "m1_kstar_pass_all3": true}, "glm4-9b": {"kstar": 3, "readout": 39, "b4_kstar": 0.04612794021765391, "b4_readout": 0.389835258324941, "m1_kstar_margins": [-0.028946934268, -0.032304372638, -0.024767404422], "m1_kstar_mdes": [0.006778394964, 0.007540307959, 0.005947759261], "m1_readout_margins": [0.770903408527, 1.0503937006, 0.898519635201], "m1_readout_mdes": [0.179720398619, 0.301508634772, 0.152547054128], "above_add_gate": false, "m1_kstar_pass_all3": true}}, "model_level": {"qwen3-4b": {"readout_margin_model": 0.7865667740503334, "readout_mde_model": 0.15186356766466666, "readout_pass": false, "kstar_margin_model": -0.002765432582333333, "kstar_mde_model": 0.0018449753443333333, "kstar_pass": false}, "qwen3-14b": {"readout_margin_model": 1.129587928454, "readout_mde_model": 0.21680361110033333, "readout_pass": false, "kstar_margin_model": -0.044168158123666666, "kstar_mde_model": 0.008486096577, "kstar_pass": true}, "glm4-9b": {"readout_margin_model": 0.9066055814426667, "readout_mde_model": 0.21125869583966664, "readout_pass": false, "kstar_margin_model": -0.028672903776, "kstar_mde_model": 0.006755487394666666, "kstar_pass": true}}, "aggregate": {"E_read_per_model": [0.3316153089205424, 0.39860084652900696, 0.389835258324941], "E_read_pooled": 0.37335047125816345, "E_read_ci95_modellevel": [0.3316153089205424, 0.39860084652900696], "kstar_pooled_margin": -0.025202164827333333, "kstar_pooled_mde": 0.005695519772, "kstar_margin_ci95_modellevel": [-0.044168158123666666, -0.002765432582333333], "kstar_margin_ci95_unit9": [-0.03608606630255556, -0.013632180971222223], "readout_pooled_margin": 0.94092009464
+  k2_status = {"state": "not_measurable_yet", "reason": "phase3154 目录不存在（预注册于 3153 预注册 3154，尚未运行）", "note": "同一文件内两种操作化不一致，须在 3154 开跑前先冻结其一"}
+  k3_status = {"state": "not_measurable_yet", "reason": "Phases 中无单坐标筛选 top-50 覆盖率量；MEMO 中的覆盖率指微场普查 283 词覆盖率，非同一条目"}
+  restated_form = {"track_A_primary": {"rule": "主判据 = 跨模型聚合统计量 + bootstrap CI；禁用合取", "K1": "pooled margin mbar=mean_{model,seed}(margin)；pooled error Ebar_read=mean_model(E_read)；触发当 (mbar > -2*MDE_pooled) OR (Ebar_read > 0.05)", "K2": "pooled |dcos| 与 pooled dchg；触发当 (|dcos|_bar > 0.50) AND (dchg_bar < MDE_pooled)", "K3": "pooled coverage cov_bar；触发当 (cov_bar < 0.30)"}, "track_B_veto": {"rule": "任一模型在聚合口径下不达标（与聚合结论相反）⇒ 命题标 model_specific", "consequence": "model_specific 不得升为机制；只能作 descriptive / 待复现"}, "forbidden": ["把全称量词形式的合取写进触发条件", "用任一模型不达标当作加固主判据的证据（方向必须相反：它是降级信号）"]}
+
+== constitution : I1 / I9 / seal 相关行 ==
+  19|## §1 唯一全局 KPI（I1）
+  50|> **无论哪种读法，「用假设自己指定的层来判断假设」都必须被显式接受或显式否决，不能默认。** 该项落为 Q08，需用户 seal。本宪法不擅自改动 MEMO 中的既有判决。
+ 108|## §7 议程：冻结 30-Phase 队列（I9）
+ 117|| Q02 | KPI 口径冻结 | A 闸门 | all | zero | I1 |
+ 118|| Q03 | E_read 统一基线复算 | B KPI | E_read | low | I1 |
+ 119|| Q04 | E_ar(k) 装置建造 | B KPI | E_ar | mid | I1 |
+ 120|| Q05 | E_ar(k) 正式测量 | B KPI | E_ar | mid | I1 |
+ 122|| Q07 | KPI 曲线 v0 汇总 | B KPI | all | zero | I1 |
+ 141|| Q26 | 30-Phase 中期 KPI 复盘 | F 制度 | all | zero | I9 |
+ 142|| Q27 | backlog 冻结 | F 制度 | none | zero | I9 |
+ 145|| Q30 | 队列收束与下一代生成 | F 制度 | none | zero | I9 |
+ 161|2. §2 的 K1 处置（Q08）是**需要用户 seal 的决策点**；本文件只呈现两种读法与推荐，不代为改判。
+
+== TESTPLAN §8.2 死线原文 ==
+ 282|### 8.2 三条 kill criteria（预注册，达到即放弃对应提法）
+ 286|| **K1** | 3 模型 × **未见组合** 的 logit 预测误差 **> 5%** 且不显著优于全加性基线 B4 | 放弃"条件齿轮组=算子代数"，降级为"功能性端口类描述" |
+ 287|| **K2** | $\phi_\ell(c)$ 与 $W_\ell$ 不可分离：分离后响应 cos 下降 **> 50%** 而行为不掉 | 放弃"条件门"作为独立结构 |
+ 288|| **K3** | 在 3 个模式族上，单坐标筛选 top-50 覆盖率均 **< 30%** | 放弃"单坐标机制"目标，改为"低维联合（≤10 维）+ 端口类"目标 |
+ 290|**K1–K3 必须在 3150 一并冻结**，之后不得修改阈值（防事后调门）。

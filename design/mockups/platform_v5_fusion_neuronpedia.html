@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ai2050 Atlas · v5 三界面融合（Neuronpedia 风格）</title>
+<style>
+  /* ============ Design Tokens（取自 Neuronpedia 源码实测） ============ */
+  :root{
+    --bg:#ffffff; --bg-sub:#f8fafc; --bg-panel:#f1f5f9;
+    --border:#e2e8f0; --border-strong:#cbd5e1;
+    --text:#1e293b; --text-2:#475569; --text-3:#94a3b8;
+    --blue:#0284c7; --blue-hi:#0ea5e9; --sel:#bae6fd;
+    --indigo:#6366f1; --indigo-deep:#4f46e5;
+    --emerald:#34d399; --emerald-deep:#059669;
+    --amber:#fbbf24; --amber-deep:#b45309;
+    --rose:#f43f5e; --sky:#0ea5e9;
+    --mono:ui-monospace,'Cascadia Code',Consolas,monospace;
+    --sans:'Segoe UI',system-ui,'Microsoft YaHei',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--bg-sub);color:var(--text);font-size:13px;overflow:hidden;min-width:1280px}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(203,213,225,.8);border-radius:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* ============ 顶栏 ============ */
+  .topbar{height:52px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px;position:relative;z-index:40}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;letter-spacing:-.2px;margin-right:4px}
+  .logo-mark{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#0ea5e9,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800}
+  .logo small{font-weight:500;color:var(--text-3);font-size:11px;margin-left:2px}
+  .np-select{display:flex;align-items:center;gap:6px;border:1px solid var(--border-strong);border-radius:6px;padding:5px 10px;background:#fff;font-size:12px;color:var(--text-2);cursor:pointer;white-space:nowrap}
+  .np-select:hover{border-color:var(--blue);color:var(--text)}
+  .np-select b{color:var(--text);font-weight:600}
+  .np-select .dot{width:7px;height:7px;border-radius:50%}
+  .np-select .car{color:var(--text-3);font-size:10px}
+  .crumb{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--mono);font-size:12px;color:var(--text-2);background:var(--bg-panel);border:1px solid var(--border);border-radius:6px;padding:5px 14px;min-width:0}
+  .crumb .sep{color:var(--text-3)}
+  .crumb .obj{color:var(--blue);font-weight:700}
+  .crumb .lens-chip{font-family:var(--sans);font-size:11px;padding:1px 8px;border-radius:99px;background:#fff;border:1px solid var(--border-strong);color:var(--text-2)}
+  .cmdk{display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text-3);cursor:pointer;background:#fff}
+  .cmdk:hover{border-color:var(--blue);color:var(--text-2)}
+  .cmdk kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--border);border-radius:4px;padding:1px 5px;background:var(--bg-panel);color:var(--text-2)}
+  .bell{position:relative;width:32px;height:32px;border:1px solid var(--border-strong);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);background:#fff}
+  .bell:hover{border-color:var(--blue)}
+  .bell .badge{position:absolute;top:-5px;right:-5px;background:var(--rose);color:#fff;font-size:9px;font-weight:700;border-radius:99px;padding:1px 5px;border:2px solid #fff}
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#34d399,#0ea5e9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+
+  /* ============ 主体三列 ============ */
+  .frame{display:flex;height:calc(100vh - 52px - 30px)}
+  .rail{width:52px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:4px;flex-shrink:0}
+  .rail .rbtn{width:38px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text-3);cursor:pointer;font-size:9px;border:1px solid transparent;background:transparent}
+  .rail .rbtn svg{width:17px;height:17px}
+  .rail .rbtn:hover{background:var(--bg-panel);color:var(--text-2)}
+  .rail .rbtn.on{background:#eff6ff;color:var(--blue);border-color:#bfdbfe}
+  .rail .div{width:24px;height:1px;background:var(--border);margin:6px 0}
+
+  main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg-sub)}
+
+  /* ============ 透镜条 ============ */
+  .lensbar{height:46px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:14px}
+  .obj-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .obj-title .chip{font-family:var(--mono);font-size:10px;font-weight:600;background:var(--bg-panel);border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--text-2)}
+  .ev-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+  .ev-mech{background:#d1fae5;color:#065f46}
+  .lens-tabs{display:flex;gap:2px;background:var(--bg-panel);border-radius:8px;padding:3px}
+  .ltab{padding:5px 16px;border-radius:6px;font-size:12px;color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:6px;border:1px solid transparent}
+  .ltab svg{width:14px;height:14px}
+  .ltab:hover{color:var(--text)}
+  .ltab.on{background:#fff;color:var(--text);border-color:var(--border);box-shadow:0 1px 2px rgba(15,23,42,.06);font-weight:600}
+  .lens-tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .tbtn{border:1px solid var(--border-strong);background:#fff;border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:5px}
+  .tbtn:hover{border-color:var(--blue);color:var(--text)}
+  .tbtn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .tbtn.primary:hover{background:var(--blue-hi)}
+
+  /* ============ 视口 ============ */
+  .viewport{flex:1;position:relative;overflow:hidden}
+  .lens-view{position:absolute;inset:0;display:none}
+  .lens-view.on{display:flex}
+
+  /* ---- 总览 ---- */
+  .home{display:grid;grid-template-columns:1fr 300px;gap:14px;padding:16px;overflow:auto}
+  .hero-card{background:linear-gradient(120deg,#fff 55%,#eff6ff);border:1px solid var(--border);border-radius:10px;padding:18px 20px;grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
+  .hero-card h2{font-size:16px;margin-bottom:4px}
+  .hero-card p{color:var(--text-2);font-size:12px;max-width:640px;line-height:1.6}
+  .hero-num{text-align:right;font-family:var(--mono)}
+  .hero-num .n{font-size:22px;font-weight:700;color:var(--blue)}
+  .hero-num .l{font-size:10px;color:var(--text-3)}
+  .entry{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s;position:relative}
+  .entry:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(2,132,199,.08);transform:translateY(-1px)}
+  .entry .ic{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .entry .ic svg{width:18px;height:18px}
+  .entry h3{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+  .entry p{font-size:11.5px;color:var(--text-2);line-height:1.6}
+  .entry .tag{font-size:10px;color:var(--text-3);font-family:var(--mono);margin-top:8px;display:block}
+  .side-col{display:flex;flex-direction:column;gap:14px}
+  .mini-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px}
+  .mini-card h4{font-size:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .mini-card h4 a{font-size:10px;color:var(--blue);text-decoration:none;font-weight:500}
+  .task-row{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--border);font-size:11.5px}
+  .task-row:first-of-type{border-top:none}
+  .task-st{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+  .st-run{background:var(--emerald);box-shadow:0 0 0 3px rgba(52,211,153,.25)}
+  .st-done{background:var(--border-strong)}
+  .st-que{background:#fcd34d}
+  .task-row .t{flex:1}
+  .task-row .t b{display:block;color:var(--text);font-weight:600}
+  .task-row .t span{color:var(--text-3);font-size:10.5px;font-family:var(--mono)}
+  .evt-row{padding:6px 0;border-top:1px solid var(--border);font-size:11px;color:var(--text-2);display:flex;gap:8px}
+  .evt-row:first-of-type{border-top:none}
+  .evt-row .tm{font-family:var(--mono);color:var(--text-3);flex-shrink:0;font-size:10px}
+
+  /* ---- 3D 空间透镜 ---- */
+  .spatial{flex-direction:column}
+  .sp-toolbar{height:38px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 14px;font-size:11px;color:var(--text-2)}
+  .chk{display:flex;align-items:center;gap:5px;cursor:pointer}
+  .chk input{accent-color:var(--blue)}
+  .sp-canvas-wrap{flex:1;position:relative;background:radial-gradient(ellipse at 50% 42%,#f0f9ff 0%,#e0f2fe 45%,#e2e8f0 100%);overflow:hidden}
+  #cloud{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+  #cloud:active{cursor:grabbing}
+  .sp-legend{position:absolute;left:14px;bottom:14px;background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;backdrop-filter:blur(4px)}
+  .sp-legend .li{display:flex;align-items:center;gap:7px;margin-top:5px;color:var(--text-2)}
+  .sp-legend .li:first-child{margin-top:0}
+  .swatch{width:10px;height:10px;border-radius:50%}
+  .sp-readout{position:absolute;right:14px;bottom:14px;background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--mono);font-size:10.5px;color:var(--text-2);backdrop-filter:blur(4px);line-height:1.7}
+  .sp-readout b{color:var(--text)}
+  .sp-focus{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:8px}
+  .sp-focus .tbtn{background:rgba(255,255,255,.92);backdrop-filter:blur(4px)}
+  .obj-flag{position:absolute;padding:4px 9px;background:#059669;color:#fff;border-radius:6px;font-size:11px;font-weight:600;pointer-events:none;box-shadow:0 2px 8px rgba(5,150,105,.4);white-space:nowrap}
+  .obj-flag::after{content:'';position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-top-color:#059669;border-bottom:none}
+
+  /* ---- AI 研发透镜 ---- */
+  .process{display:grid;grid-template-columns:230px 1fr 300px;background:#fff}
+  .pr-left{border-right:1px solid var(--border);overflow:auto;padding:10px}
+  .pr-mid{display:flex;flex-direction:column;min-width:0;background:#fff}
+  .pr-right{border-left:1px solid var(--border);overflow:auto;padding:12px;background:var(--bg-sub)}
+  .pr-sec{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.6px;margin:10px 0 6px;text-transform:uppercase}
+  .pr-sec:first-child{margin-top:0}
+  .q-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:11.5px;color:var(--text-2);cursor:pointer}
+  .q-row:hover{background:var(--bg-panel)}
+  .q-row.on{background:#eff6ff;color:var(--text)}
+  .q-row .id{font-family:var(--mono);font-size:10.5px;width:38px;color:var(--text-3)}
+  .q-row.on .id{color:var(--blue)}
+  .q-row .pill{margin-left:auto;font-size:9px;padding:1px 6px;border-radius:99px;font-weight:600}
+  .pill-run{background:#d1fae5;color:#065f46}
+  .pill-done{background:var(--bg-panel);color:var(--text-3)}
+  .file{font-family:var(--mono);font-size:11px;color:var(--text-2);padding:3px 8px 3px 18px;border-radius:4px;cursor:pointer;display:block}
+  .file:hover{background:var(--bg-panel);color:var(--text)}
+  .file.dir{color:var(--text);font-weight:600;padding-left:4px}
+  .ed-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg-sub)}
+  .ed-tab{padding:7px 16px;font-size:11.5px;font-family:var(--mono);color:var(--text-3);cursor:pointer;border-right:1px solid var(--border)}
+  .ed-tab.on{background:#fff;color:var(--text);font-weight:600;box-shadow:inset 0 -2px 0 var(--blue)}
+  .ed-body{flex:1;overflow:auto;padding:12px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#334155;background:#fff}
+  .ed-body .kw{color:#7c3aed}.ed-body .st{color:#0e7490}.ed-body .cm{color:#94a3b8}.ed-body .fn{color:#b45309}.ed-body .num{color:#0369a1}
+  .term{height:150px;border-top:1px solid var(--border);background:#0f172a;color:#e2e8f0;font-family:var(--mono);font-size:11px;padding:10px 14px;overflow:auto;line-height:1.7}
+  .term .g{color:#34d399}.term .y{color:#fbbf24}.term .dim{color:#64748b}
+  .res-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px}
+  .res-card h5{font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+  .res-card .meta{font-family:var(--mono);font-size:10.5px;color:var(--text-2);line-height:1.8}
+  .res-card .meta b{color:var(--text)}
+  .pass{color:#059669;font-weight:700}
+  .xact{display:flex;gap:6px;margin-top:10px}
+  .xact .tbtn{flex:1;justify-content:center;font-size:10.5px}
+
+  /* ---- 路线图透镜 ---- */
+  .progress{flex-direction:column;overflow:auto;padding:0}
+  .rg-scroll{flex:1;overflow:auto;padding:18px 20px}
+  .rg-title{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .rg-title .n{font-family:var(--mono);font-size:10px;background:var(--bg-panel);border-radius:4px;padding:1px 6px;color:var(--text-3)}
+  .lane{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+  .lane-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;font-weight:700}
+  .lane-head .ln-dot{width:8px;height:8px;border-radius:50%}
+  .lane-head small{color:var(--text-3);font-weight:400;font-size:10.5px}
+  .tl{display:flex;align-items:flex-start;position:relative;padding-top:2px}
+  .tl::before{content:'';position:absolute;top:9px;left:12px;right:12px;height:2px;background:var(--border)}
+  .tl-node{flex:1;min-width:0;position:relative;text-align:center;padding:0 4px;cursor:pointer}
+  .tl-dot{width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--border-strong);margin:2px auto 8px;position:relative;z-index:1}
+  .tl-node.done .tl-dot{border-color:var(--emerald);background:var(--emerald)}
+  .tl-node.now .tl-dot{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(2,132,199,.15)}
+  .tl-node .lb{font-family:var(--mono);font-size:10px;color:var(--text-2);font-weight:600}
+  .tl-node .tt{font-size:10px;color:var(--text-3);margin-top:2px;line-height:1.4}
+  .tl-node.now .lb{color:var(--blue)}
+  .peer-row{display:flex;gap:10px}
+  .peer-card{flex:1;background:var(--bg-sub);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer}
+  .peer-card:hover{border-color:var(--blue)}
+  .peer-card .src{font-size:10px;color:var(--text-3);display:flex;justify-content:space-between}
+  .peer-card h6{font-size:11.5px;margin:3px 0 4px;line-height:1.45}
+  .peer-card p{font-size:10px;color:var(--text-2);line-height:1.5}
+  .rg-note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:11px;color:#92400e;line-height:1.6}
+
+  /* ============ 右侧对象卡（Neuronpedia 特征卡范式） ============ */
+  .side{width:322px;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+  .side-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .side-head .t{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.5px}
+  .side-body{flex:1;overflow:auto;padding:14px}
+  .f-name{font-size:14px;font-weight:700;line-height:1.4}
+  .f-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0;font-family:var(--mono);font-size:10px;color:var(--text-2)}
+  .f-meta .kv{background:var(--bg-sub);border:1px solid var(--border);border-radius:6px;padding:6px 8px}
+  .f-meta .kv b{display:block;color:var(--text);font-size:11px;margin-top:1px}
+  .act-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px}
+  .act-head{background:var(--bg-panel);padding:5px 10px;font-size:10px;color:var(--text-2);display:flex;justify-content:space-between;font-family:var(--mono)}
+  .act-text{padding:10px;line-height:2.1;font-size:12px;color:var(--text-2)}
+  .tok{font-family:var(--mono);font-size:11px;padding:1px 3px;border-radius:3px;white-space:pre-wrap}
+  .act-more{font-size:10.5px;color:var(--blue);padding:0 10px 8px;cursor:pointer}
+  .lens-links{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px}
+  .lens-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--border);font-size:11.5px;cursor:pointer;color:var(--text-2)}
+  .lens-link:first-child{border-top:none}
+  .lens-link:hover{background:var(--bg-sub);color:var(--text)}
+  .lens-link svg{width:14px;height:14px;flex-shrink:0}
+  .lens-link b{color:var(--text);font-weight:600;min-width:56px}
+  .lens-link .arr{margin-left:auto;color:var(--text-3)}
+  .side-actions{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border)}
+  .side-actions .tbtn{flex:1;justify-content:center}
+
+  /* ============ 底部状态条 ============ */
+  .statusbar{height:30px;background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;font-size:10.5px;color:var(--text-2);padding:0 12px;gap:16px}
+  .st-chip{display:flex;align-items:center;gap:5px;font-family:var(--mono);white-space:nowrap}
+  .st-chip .ok{color:#059669;font-weight:700}
+  .ticker{flex:1;overflow:hidden;position:relative;height:100%;display:flex;align-items:center}
+  .ticker-in{display:flex;gap:34px;white-space:nowrap;animation:tick 46s linear infinite;font-family:var(--mono)}
+  .ticker-in span b{color:var(--blue);font-weight:600}
+  .ticker-in span{color:var(--text-3)}
+  @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ============ ⌘K / 说明浮层 ============ */
+  .modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:12vh;backdrop-filter:blur(2px)}
+  .modal-mask.on{display:flex}
+  .cmdk-panel{width:560px;background:#fff;border-radius:12px;box-shadow:0 20px 50px rgba(15,23,42,.25);overflow:hidden}
+  .cmdk-panel input{width:100%;border:none;outline:none;padding:15px 18px;font-size:14px;border-bottom:1px solid var(--border);font-family:var(--sans)}
+  .cmdk-group{padding:8px 8px 4px}
+  .cmdk-group .gl{font-size:10px;font-weight:700;color:var(--text-3);padding:4px 10px;letter-spacing:.5px}
+  .cmdk-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:12.5px;cursor:pointer;color:var(--text-2)}
+  .cmdk-item:hover,.cmdk-item.hot{background:#eff6ff;color:var(--text)}
+  .cmdk-item .k{font-family:var(--mono);font-size:10px;color:var(--blue);background:#eff6ff;border-radius:4px;padding:1px 6px;min-width:64px;text-align:center}
+  .cmdk-item .d{margin-left:auto;font-size:10px;color:var(--text-3)}
+  .about-fab{position:absolute;left:14px;top:14px;z-index:30}
+  .about-pop{position:absolute;left:14px;top:52px;z-index:31;width:400px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(15,23,42,.18);padding:16px;display:none;font-size:11.5px;line-height:1.7;color:var(--text-2)}
+  .about-pop.on{display:block}
+  .about-pop b.t{font-size:12.5px;color:var(--text);display:block;margin-bottom:6px}
+  .about-pop .pt{margin-top:9px;padding-top:9px;border-top:1px dashed var(--border)}
+  .about-pop .pt b{color:var(--text)}
+  .about-pop .pt em{color:var(--blue);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- ================= 顶栏：全局上下文（模型 / source / 对象路由 / ⌘K） ================= -->
+<header class="topbar">
+  <div class="logo"><div class="logo-mark">A2</div>Ai2050 Atlas <small>v5 · RDC</small></div>
+  <div class="np-select"><span class="dot" style="background:#6366f1"></span><b>qwen3-4b</b><span class="car">▾</span></div>
+  <div class="np-select"><b>6-l6-teal</b><span style="color:var(--text-3);font-size:10px">RDC 特征源</span><span class="car">▾</span></div>
+  <div class="crumb">
+    qwen3-4b <span class="sep">/</span> 6-l6-teal <span class="sep">/</span> <span class="obj">F#3734</span>
+    <span class="lens-chip" id="crumbLens">空间透镜</span>
+  </div>
+  <div class="cmdk" onclick="toggleCmdk(true)">搜索对象、任务、论文… <kbd>⌘K</kbd></div>
+  <div class="bell">🔔<span class="badge">2</span></div>
+  <div class="avatar">R</div>
+</header>
+
+<div class="frame">
+  <!-- ================= 左轨：平台级导航 ================= -->
+  <nav class="rail">
+    <div class="rbtn" data-nav="home" onclick="goLens('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>总览
+    </div>
+    <div class="div"></div>
+    <div class="rbtn on" data-nav="spatial" onclick="goLens('spatial')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/></svg>空间
+    </div>
+    <div class="rbtn" data-nav="process" onclick="goLens('process')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 4l-3 16"/></svg>研发
+    </div>
+    <div class="rbtn" data-nav="progress" onclick="goLens('progress')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h5M9 12h5M17 8l5 4-5 4V8z"/><circle cx="7" cy="12" r="2.5"/><circle cx="15" cy="12" r="2.5"/></svg>路线
+    </div>
+    <div class="div"></div>
+    <div class="rbtn" data-nav="ledger" onclick="alert('账本视图（v4 已有设计：registry / 队列 / 证据等级）')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM8 8h8M8 12h8M8 16h5"/></svg>账本
+    </div>
+    <div class="rbtn" data-nav="sources" onclick="alert('数据源：collect.npz / Neuronpedia :3000 / InterPLM :8501 / atlas_ledger.json')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>数据
+    </div>
+  </nav>
+
+  <!-- ================= 主视口 ================= -->
+  <main>
+    <!-- 透镜条：同一对象，三种透镜 -->
+    <div class="lensbar">
+      <div class="obj-title">F#3734 <span class="chip">L6 · is-a 上位：水果族</span>
+        <span class="ev-badge ev-mech">● mechanism_evidence</span>
+      </div>
+      <div class="lens-tabs">
+        <div class="ltab on" data-lens="spatial" onclick="goLens('spatial')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/></svg>空间 3D
+        </div>
+        <div class="ltab" data-lens="process" onclick="goLens('process')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>AI 研发
+        </div>
+        <div class="ltab" data-lens="progress" onclick="goLens('progress')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg>行业进展
+        </div>
+      </div>
+      <div class="lens-tools">
+        <button class="tbtn" onclick="alert('导出当前视图为 PNG / 分享链接（URL 即状态）')">分享</button>
+        <button class="tbtn primary" onclick="alert('派发 AI 实验：以 F#3734 为对象新建 Q 任务（预注册 → 冻结 → 执行）')">＋ 派 AI 实验</button>
+      </div>
+    </div>
+
+    <div class="viewport">
+
+      <!-- ============ 透镜 ①：3D 空间 ============ -->
+      <section class="lens-view spatial on" id="view-spatial">
+        <div class="sp-toolbar">
+          <label class="chk"><input type="checkbox" checked> 特征点云</label>
+          <label class="chk"><input type="checkbox" checked> top-k 邻居连线</label>
+          <label class="chk"><input type="checkbox"> 残差流骨架</label>
+          <label class="chk"><input type="checkbox"> 14B/9B 叠加</label>
+          <span style="color:var(--text-3)">色标：按模式族</span>
+          <span style="margin-left:auto;font-family:var(--mono);color:var(--text-3)">n=1,024 feats · L6 · R11 collect.npz</span>
+        </div>
+        <div class="sp-canvas-wrap">
+          <canvas id="cloud"></canvas>
+          <button class="tbtn about-fab" onclick="toggleAbout()">ⓘ v5 融合主张</button>
+          <div class="sp-focus">
+            <button class="tbtn" onclick="alert('以 F#3734 为中心重置相机')">◎ 以 F#3734 为中心</button>
+            <button class="tbtn" onclick="alert('切到 AI 研发透镜查看 E_ar(k) 方向')">E_ar(k) 方向叠加</button>
+          </div>
+          <div class="sp-legend">
+            <div class="li"><span class="swatch" style="background:#10b981"></span>水果族 · is-a</div>
+            <div class="li"><span class="swatch" style="background:#0ea5e9"></span>属性轴 · size/speed</div>
+            <div class="li"><span class="swatch" style="background:#f59e0b"></span>语法功能</div>
+            <div class="li"><span class="swatch" style="background:#cbd5e1"></span>其他</div>
+          </div>
+          <div class="sp-readout">
+            cam <b>θ 38° · φ 22°</b><br>
+            F#3734 <b>(0.42, −1.18, 0.73)</b><br>
+            ‖h‖=0.87 · E_read=0.332
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 透镜 ②：AI 研发（OpenScience 式工作台） ============ -->
+      <section class="lens-view process" id="view-process">
+        <div class="pr-left">
+          <div class="pr-sec">任务队列</div>
+          <div class="q-row on"><span class="id">Q06</span>C_steer 基座<span class="pill pill-run">RUNNING</span></div>
+          <div class="q-row"><span class="id">Q05</span>E_ar(k) 测量<span class="pill pill-done">SEALED</span></div>
+          <div class="q-row"><span class="id">Q04</span>E_ar 装置<span class="pill pill-done">SEALED</span></div>
+          <div class="q-row"><span class="id">Q03</span>E_read 基线<span class="pill pill-done">SEALED</span></div>
+          <div class="pr-sec">工作区 tests/deepseek/</div>
+          <span class="file dir">▾ q05_ar_sweep/</span>
+          <span class="file">collect_ar.py</span>
+          <span class="file">metric_dict_v4.json</span>
+          <span class="file">review_report.txt</span>
+          <span class="file dir">▸ q06_c_steer/</span>
+          <span class="file dir">▸ shared/</span>
+          <div class="pr-sec">运行配置</div>
+          <div class="q-row" style="cursor:default"><span class="id" style="width:auto">4b bf16 · 14B/9B NF4</span></div>
+          <div class="q-row" style="cursor:default"><span class="id" style="width:auto">drift 断言 · 预注册冻结</span></div>
+        </div>
+        <div class="pr-mid">
+          <div class="ed-tabs">
+            <div class="ed-tab on">collect_ar.py</div>
+            <div class="ed-tab">result.json</div>
+            <div class="ed-tab">review_report.txt</div>
+          </div>
+          <div class="ed-body">
+<pre style="margin:0"><span class="cm"># Q05 · E_ar(k) 正式测量 — 四臂 738×K16（节选）</span>
+<span class="kw">def</span> <span class="fn">sweep_ar</span>(model, K=<span class="num">16</span>, arms=(<span class="st">"is_a"</span>, <span class="st">"attr"</span>, <span class="st">"syntax"</span>, <span class="st">"rand"</span>)):
+    share = <span class="fn">exact_additive_budget</span>(model)          <span class="cm"># 铁律 (a) 精确可加向量预算</span>
+    <span class="kw">for</span> arm <span class="kw">in</span> arms:
+        E = [share.<span class="fn">write</span>(arm, k=k) <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, K+<span class="num">1</span>)]
+        rel = (E[<span class="num">0</span>] - E) / E[<span class="num">0</span>]                  <span class="cm"># S_rel 归一化</span>
+        <span class="kw">yield</span> arm, rel
+
+<span class="cm"># D4 桥（4b bf16 ↔ 4-bit NF4 口径桥）</span>
+<span class="kw">assert</span> <span class="fn">max</span>(<span class="fn">abs</span>(rel_bf16 - rel_nf4)) &lt; <span class="num">0.05</span>   <span class="cm"># PASS: 0.0489</span></pre>
+          </div>
+          <div class="term">
+            <div><span class="dim">$</span> python q05_ar_sweep/collect_ar.py --all-arms --K 16</div>
+            <div><span class="g">[Q05]</span> D4 bridge max|Δrel| = 0.0489 &lt; 0.05 <span class="g">PASS</span></div>
+            <div><span class="g">[Q05]</span> shape 4b=<span class="y">flat</span> · 14B=<span class="y">saturating</span> · 9B=<span class="y">flat</span></div>
+            <div><span class="g">[Q05]</span> S_rel min = 0.6858 / 0.6939 / 0.7392</div>
+            <div><span class="g">[review]</span> independent TOTAL PASS=47 FAIL=0 → sealed <span class="dim">1acb1e78</span></div>
+            <div><span class="dim">$</span> _</div>
+          </div>
+        </div>
+        <div class="pr-right">
+          <div class="res-card">
+            <h5>E_ar(k) 消融曲线 <span class="pill pill-done" style="background:#d1fae5">v4 口径</span></h5>
+            <svg viewBox="0 0 260 110" style="width:100%">
+              <line x1="30" y1="95" x2="250" y2="95" stroke="#e2e8f0"/>
+              <line x1="30" y1="95" x2="30" y2="8" stroke="#e2e8f0"/>
+              <text x="10" y="20" font-size="8" fill="#94a3b8">S_rel</text>
+              <text x="225" y="107" font-size="8" fill="#94a3b8">k</text>
+              <path d="M30 28 L60 29 L90 30 L120 31 L150 32 L180 33 L210 34 L240 35" fill="none" stroke="#0284c7" stroke-width="2"/>
+              <path d="M30 28 L62 36 L94 48 L126 60 L158 71 L190 81 L222 88 L240 90" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="4 3"/>
+              <path d="M30 24 L60 25 L90 26 L120 27 L150 28 L180 29 L210 30 L240 31" fill="none" stroke="#10b981" stroke-width="2"/>
+              <text x="150" y="24" font-size="8.5" fill="#0284c7">4b flat</text>
+              <text x="150" y="56" font-size="8.5" fill="#6366f1">14B saturating</text>
+              <text x="150" y="45" font-size="8.5" fill="#059669">9B flat</text>
+            </svg>
+            <div class="meta">形状 <b>4b flat / 14B saturating / 9B flat</b><br>含义：4b 中 is-a 关系沿 k <b>无递减</b> → 关系非碎片化存储</div>
+          </div>
+          <div class="res-card">
+            <h5>跨透镜动作</h5>
+            <div class="xact">
+              <button class="tbtn" onclick="goLens('spatial')">在 3D 中查看</button>
+              <button class="tbtn" onclick="goLens('progress')">登记到路线图</button>
+            </div>
+          </div>
+          <div class="res-card">
+            <h5>证据链</h5>
+            <div class="meta">Q03 E_read <b>0.331615</b>（4b 基线）<br>Q04 装置 <b>device_built</b> → Q05 <b>measured</b><br>队列 sealed <b>1acb1e78</b> · 复核 47/0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 透镜 ③：行业进展（路线图） ============ -->
+      <section class="lens-view progress" id="view-progress">
+        <div class="rg-scroll">
+          <div class="lane">
+            <div class="lane-head"><span class="ln-dot" style="background:#0284c7"></span>本项目 · RDC 主线 <small>F#3734 所在证据链 · Phase 4 → 39</small></div>
+            <div class="tl">
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">P4–P7</div><div class="tt">主轴三段<br>权重绑定定 is-a</div></div>
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">P8–P11</div><div class="tt">写入端分布式<br>栈=软门</div></div>
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">P17–21</div><div class="tt">w+com_V≈26<br>跨精度复现</div></div>
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">P35</div><div class="tt">A 闸门 seal<br>Q08=甲</div></div>
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">Q03</div><div class="tt">E_read 基线<br>0.332 · 5% 门 0/3</div></div>
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">Q04</div><div class="tt">E_ar 装置<br>4/4 PASS</div></div>
+              <div class="tl-node done"><div class="tl-dot"></div><div class="lb">Q05</div><div class="tt">E_ar 测量<br>形状 flat/sat</div></div>
+              <div class="tl-node now"><div class="tl-dot"></div><div class="lb">Q06</div><div class="tt">C_steer 基座<br>承重轴+端口替换</div></div>
+              <div class="tl-node"><div class="tl-dot"></div><div class="lb">远期</div><div class="tt">权重级证明<br>N2h1-α-1</div></div>
+            </div>
+          </div>
+
+          <div class="lane">
+            <div class="lane-head"><span class="ln-dot" style="background:#6366f1"></span>同行进展 <small>点击节点 → 与本项目证据链对比</small></div>
+            <div class="peer-row" style="margin-bottom:10px">
+              <div class="peer-card" onclick="alert('对比：Attribution Graphs 依赖人工假设遍历；本项目 Q05 用精确可加预算自动化消融 — 视角差登记入账本')">
+                <div class="src"><span>Anthropic</span><span>2025.03</span></div>
+                <h6>Circuit Tracing: Attribution Graphs</h6>
+                <p>层内→跨层电路自动化追踪；与 Q05 消融口径可桥接</p>
+              </div>
+              <div class="peer-card" onclick="alert('对比：Microscope 已归档但其「对象→多视图」范式被 Neuronpedia 继承，即 v5 透镜路由来源')">
+                <div class="src"><span>OpenAI</span><span>2020 · archived</span></div>
+                <h6>Microscope：模型级可视化集合</h6>
+                <p>对象导航 + 多视图挂载的原型范式</p>
+              </div>
+              <div class="peer-card" onclick="alert('对比：Superposition 对应本项目跨族近正交观察（P4–P7）；叠加上限与 G−1=5 维读位槽相关')">
+                <div class="src"><span>Anthropic</span><span>2022–2024</span></div>
+                <h6>Toy Models of Superposition / SAE</h6>
+                <p>特征叠加与稀疏字典分解基线</p>
+              </div>
+            </div>
+            <div class="peer-row">
+              <div class="peer-card" onclick="goLens('spatial')">
+                <div class="src"><span>开源生态</span><span>已部署 :3000</span></div>
+                <h6>Neuronpedia — 特征百科</h6>
+                <p>v5 的对象路由与激活卡视觉直接参考源（emerald 梯度 / slate 体系）</p>
+              </div>
+              <div class="peer-card" onclick="alert('InterPLM 结论：ESM-2 SAE 叠加结论与 LLM 同构 → 支持本项目跨模型比较策略')">
+                <div class="src"><span>开源生态</span><span>已部署 :8501</span></div>
+                <h6>InterPLM — 蛋白质 SAE 对齐</h6>
+                <p>SAE 结论跨域同构的旁证</p>
+              </div>
+              <div class="peer-card" onclick="alert('SAEBench 提供 SAE 评估标准；Q04/Q05 的装置门与 metric_dict v4 口径可对标')">
+                <div class="src"><span>开源生态</span><span>2024</span></div>
+                <h6>SAEBench — SAE 系统评估</h6>
+                <p>装置级评估标准的对标项</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rg-note">
+            <b>融合逻辑</b>：路线图节点 ≠ 静态新闻。每个节点携带证据（Phase / sealed 产物 / 论文 DOI），点击节点即切换 <b>对象路由</b> —— 左侧三个透镜同步刷新。同行节点与本项目节点的差异以「对比卡」呈现，登记入账本（Observed / Generalization_checked / Mechanism_evidence 四级证据体系）。
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 总览 ============ -->
+      <section class="lens-view home" id="view-home">
+        <div class="hero-card">
+          <div>
+            <h2>同一对象，三种透镜</h2>
+            <p>空间（3D 点云：特征在哪里、邻居是谁）· 过程（AI 研发工作台：对它做过什么实验）· 脉络（行业路线图：它支撑哪个大问题）。三界面共享顶栏的<b>对象路由</b>与右侧<b>对象卡</b>，切透镜不换对象。</p>
+          </div>
+          <div class="hero-num"><div class="n">304 / 39</div><div class="l">Ledger 条目 / MEMO Phase</div><div class="n" style="margin-top:6px">6/30</div><div class="l">队列 sealed</div></div>
+        </div>
+        <div class="entry" onclick="goLens('spatial')">
+          <div class="ic" style="background:#eff6ff;color:#0284c7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/></svg></div>
+          <h3>空间透镜 · 3D</h3>
+          <p>1,024 特征点云（L6），簇=模式族；高亮 F#3734 与 top-k 邻居；E_ar 方向叠加；14B/9B 跨模型对比。</p>
+          <span class="tag">接 collect.npz · three.js→WebGPU</span>
+        </div>
+        <div class="entry" onclick="goLens('process')">
+          <div class="ic" style="background:#f5f3ff;color:#6d28d9"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></div>
+          <h3>过程透镜 · AI 研发</h3>
+          <p>预注册 → 冻结 → 执行 → 独立复核闭环；队列、脚本、终端、结果卡同屏；结果内嵌可视化（OpenScience / prism_ai 范式）。</p>
+          <span class="tag">接 research OS registry · q06 RUNNING</span>
+        </div>
+        <div class="entry" onclick="goLens('progress')">
+          <div class="ic" style="background:#fffbeb;color:#b45309"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg></div>
+          <h3>脉络透镜 · 行业进展</h3>
+          <p>本项目证据链时间线 + 同行泳道（Anthropic / OpenAI / 开源生态）；节点挂论文与 sealed 产物，可对比登记。</p>
+          <span class="tag">接 industry.json · MEMO 索引</span>
+        </div>
+        <div class="side-col">
+          <div class="mini-card">
+            <h4>进行中 <a href="#">全部 →</a></h4>
+            <div class="task-row"><span class="task-st st-run"></span><div class="t"><b>Q06 · C_steer 基座测量</b><span>step 2/5 · 承重轴枚举</span></div></div>
+            <div class="task-row"><span class="task-st st-que"></span><div class="t"><b>N 线 P3–P7 补 Ledger</b><span>queued · 跨线账本确认</span></div></div>
+            <div class="task-row"><span class="task-st st-done"></span><div class="t"><b>Q05 · E_ar(k) 正式测量</b><span>sealed 1acb1e78 · 复核 47/0</span></div></div>
+          </div>
+          <div class="mini-card">
+            <h4>事件流 <a href="#">账本 →</a></h4>
+            <div class="evt-row"><span class="tm">08:02</span><span>Q05 sealed · metric_dict v3→v4</span></div>
+            <div class="evt-row"><span class="tm">07:44</span><span>Neuronpedia gpt2-small 导入完成 1.9M activations</span></div>
+            <div class="evt-row"><span class="tm">07:31</span><span>发布仓 3589dbb · 46.97 MiB</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ================= 右侧对象卡（Neuronpedia 特征卡范式） ================= -->
+  <aside class="side">
+    <div class="side-head">
+      <span class="t">对象卡 · OBJECT CARD</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text-3)">随透镜联动</span>
+    </div>
+    <div class="side-body">
+      <div class="f-name">is-a 上位关系：水果族</div>
+      <div class="f-meta">
+        <div class="kv">特征 ID<b>F#3734</b></div>
+        <div class="kv">层 / 位置<b>L6 · write 端</b></div>
+        <div class="kv">E_read<b>0.331615</b></div>
+        <div class="kv">share_max<b>3.0% 内</b></div>
+      </div>
+
+      <div class="act-box">
+        <div class="act-head"><span>ACTIVATIONS · 最大激活示例</span><span>max 4.21</span></div>
+        <div class="act-text">
+          <span class="tok">苹果</span><span class="tok">是</span><span class="tok">一种</span><span class="tok" style="background:rgba(52,211,153,.95);color:#022c22">水果</span><span class="tok">，</span><span class="tok" style="background:rgba(52,211,153,.45);color:#064e3b">富含</span><span class="tok">维生素</span><br>
+          <span class="tok">香蕉</span><span class="tok">、</span><span class="tok">菠萝</span><span class="tok">、</span><span class="tok">芒果</span><span class="tok">都</span><span class="tok">属于</span><span class="tok" style="background:rgba(52,211,153,.95);color:#022c22">水果</span><br>
+          <span class="tok">The</span><span class="tok">crinoletta</span><span class="tok">is</span><span class="tok">a</span><span class="tok" style="background:rgba(52,211,153,.55);color:#064e3b">hybrid</span><span class="tok" style="background:rgba(52,211,153,.75);color:#022c22">apple</span><span class="tok" style="background:rgba(52,211,153,.35)">variety</span><br>
+          <span class="tok" style="border:1.5px solid #fb923c">我</span><span class="tok" style="border:1.5px solid #fb923c">买了</span><span class="tok" style="border:1.5px solid #fb923c">一台</span><span class="tok" style="border:1.5px solid #fb923c;background:rgba(52,211,153,.12)">苹果</span><span class="tok" style="border:1.5px solid #fb923c">笔记本</span><span style="font-size:9.5px;color:var(--text-3)"> ← 一词多义对照（弱激活）</span>
+        </div>
+        <div class="act-more" onclick="alert('展开全部 81 条激活示例（Neuronpedia 同款交互）')">展开全部示例 ▾</div>
+      </div>
+
+      <div class="lens-links">
+        <div class="lens-link" onclick="goLens('spatial')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/></svg>
+          <b>空间</b>水果族簇 · top-5 邻居在 0.31–0.44<span class="arr">→</span>
+        </div>
+        <div class="lens-link" onclick="goLens('process')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
+          <b>过程</b>Q05 四臂消融已覆盖 · Q06 steering 计划中<span class="arr">→</span>
+        </div>
+        <div class="lens-link" onclick="goLens('progress')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2"><path d="M3 17l6-6 4 4 7-8"/><path d="M14 7h6v6"/></svg>
+          <b>脉络</b>支撑 Q05/Q06 节点 · 对标 Attribution Graphs<span class="arr">→</span>
+        </div>
+      </div>
+    </div>
+    <div class="side-actions">
+      <button class="tbtn" onclick="alert('打开 Neuronpedia :3000 对应特征（跨平台引用）')">Neuronpedia ↗</button>
+      <button class="tbtn primary" onclick="alert('派发 AI 实验：预注册 → 冻结 → 执行（写入队列）')">＋ 派 AI 实验</button>
+    </div>
+  </aside>
+</div>
+
+<!-- ================= 底部状态条：全局事件总线 ================= -->
+<div class="statusbar">
+  <span class="st-chip"><span class="ok">●</span> qwen3-4b bf16 · GPU 21.3/24G</span>
+  <span class="st-chip">Q06 RUNNING · step 2/5</span>
+  <div class="ticker"><div class="ticker-in">
+    <span><b>[Q05]</b> sealed 1acb1e78 · 独立复核 47/0</span><span><b>[metric_dict]</b> v3→v4 · E_ar.status=measured</span><span><b>[Neuronpedia]</b> :3000 gpt2-small/10-res-jb 就绪</span><span><b>[InterPLM]</b> :8501 ESM-2 SAE 2548 特征就绪</span><span><b>[ledger]</b> n=304 bbda63df · N 线 P3–P7 待补</span><span><b>[queue]</b> 6/30 sealed · next Q06 C_steer</span><span><b>[Q05]</b> sealed 1acb1e78 · 独立复核 47/0</span><span><b>[metric_dict]</b> v3→v4 · E_ar.status=measured</span><span><b>[Neuronpedia]</b> :3000 gpt2-small/10-res-jb 就绪</span><span><b>[InterPLM]</b> :8501 ESM-2 SAE 2548 特征就绪</span><span><b>[ledger]</b> n=304 bbda63df · N 线 P3–P7 待补</span><span><b>[queue]</b> 6/30 sealed · next Q06 C_steer</span>
+  </div></div>
+</div>
+
+<!-- ================= ⌘K ================= -->
+<div class="modal-mask" id="cmdkMask" onclick="if(event.target===this)toggleCmdk(false)">
+  <div class="cmdk-panel">
+    <input placeholder="搜索：特征 / 任务 / 论文 / 假设 / Phase…" id="cmdkInput" autofocus>
+    <div class="cmdk-group">
+      <div class="gl">对象 · FEATURES</div>
+      <div class="cmdk-item hot" onclick="toggleCmdk(false);goLens('spatial')"><span class="k">F#3734</span>is-a 上位关系：水果族<span class="d">L6 · mech_evidence</span></div>
+      <div class="cmdk-item" onclick="toggleCmdk(false);goLens('spatial')"><span class="k">F#0821</span>is-a 下位：个体实例方向<span class="d">L6 · observed</span></div>
+    </div>
+    <div class="cmdk-group">
+      <div class="gl">任务 · TASKS</div>
+      <div class="cmdk-item" onclick="toggleCmdk(false);goLens('process')"><span class="k">Q06</span>C_steer 基座测量 · RUNNING<span class="d">step 2/5</span></div>
+      <div class="cmdk-item" onclick="toggleCmdk(false);goLens('process')"><span class="k">Q05</span>E_ar(k) 正式测量 · SEALED<span class="d">1acb1e78</span></div>
+    </div>
+    <div class="cmdk-group">
+      <div class="gl">论文与节点 · PROGRESS</div>
+      <div class="cmdk-item" onclick="toggleCmdk(false);goLens('progress')"><span class="k">paper</span>Circuit Tracing: Attribution Graphs<span class="d">Anthropic 2025</span></div>
+      <div class="cmdk-item" onclick="toggleCmdk(false);goLens('progress')"><span class="k">P35</span>A 闸门 seal（R8）<span class="d">Q08=甲 · C 全接受</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= v5 融合主张浮层 ================= -->
+<div class="about-pop" id="aboutPop">
+  <b class="t">v5 融合主张 —— 三界面如何成为「一个界面」</b>
+  参照：Neuronpedia（对象路由 / 激活卡视觉，本图配色取自其源码实测）、OpenAI Microscope（对象→多视图）、OpenScience（AI 工作台内嵌科学渲染）、Multi-Agent Visualizer（3D+实时研究）、AlphaFold DB（左 viewer 右 metadata）。
+  <div class="pt"><b>① 对象路由即状态</b> —— 顶栏中央 <em>qwen3-4b / 6-l6-teal / F#3734</em> 是全局唯一地址；URL 即状态（Neuronpedia 范式），⌘K 直达对象。</div>
+  <div class="pt"><b>② 三透镜不换对象</b> —— 3D / AI 研发 / 路线图是同一对象的<em>空间·过程·脉络</em>三个视角；切透镜只换主视口与右卡内容区，对象上下文（激活、证据等级、关联）恒在。</div>
+  <div class="pt"><b>③ 跨透镜动作闭环</b> —— 结果卡可「在 3D 查看 / 登记路线图」；对象卡可「派 AI 实验」；底部事件流是三个透镜共用的<em>事件总线</em>，实验→结构→进展自动流转。</div>
+</div>
+
+<script>
+/* ---------- 透镜切换 ---------- */
+var LENS_NAME = {spatial:'空间透镜', process:'过程透镜', progress:'脉络透镜', home:'总览'};
+function goLens(l){
+  document.querySelectorAll('.lens-view').forEach(function(v){v.classList.remove('on')});
+  document.getElementById('view-'+l).classList.add('on');
+  document.querySelectorAll('.ltab').forEach(function(t){t.classList.toggle('on', t.dataset.lens===l)});
+  document.querySelectorAll('.rail .rbtn').forEach(function(r){r.classList.toggle('on', r.dataset.nav===l)});
+  document.getElementById('crumbLens').textContent = LENS_NAME[l] || l;
+  if(l!=='spatial') toggleAbout(false);
+}
+/* ---------- ⌘K ---------- */
+function toggleCmdk(on){document.getElementById('cmdkMask').classList.toggle('on', on); if(on)document.getElementById('cmdkInput').focus();}
+document.addEventListener('keydown',function(e){
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();toggleCmdk(!document.getElementById('cmdkMask').classList.contains('on'));}
+  if(e.key==='Escape'){toggleCmdk(false);toggleAbout(false);}
+});
+/* ---------- 说明浮层 ---------- */
+function toggleAbout(force){var p=document.getElementById('aboutPop'); if(force===undefined){p.classList.toggle('on')}else{p.classList.toggle('on',force)}}
+setTimeout(function(){toggleAbout(true)},600);
+
+/* ---------- 伪 3D 点云（canvas 2D 投影，零依赖） ---------- */
+var cv=document.getElementById('cloud'),ctx=cv.getContext('2d');
+function resize(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;}
+window.addEventListener('resize',resize);resize();
+
+/* 确定性伪随机 */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var rnd=mulberry(2050), PTS=[];
+/* 三簇：水果族(emerald) / 属性轴(sky) / 语法(amber) + 背景(slate) */
+var CLUSTERS=[
+  {c:[0.9,-0.6,0.4], col:'#10b981', n:120, s:0.85, fam:'is-a'},
+  {c:[-1.0,0.5,-0.5], col:'#0ea5e9', n:90,  s:0.95, fam:'attr'},
+  {c:[-0.2,-0.9,1.0], col:'#f59e0b', n:70,  s:0.75, fam:'syntax'},
+  {c:[0,0,0],         col:'#cbd5e1', n:180, s:1.9,  fam:'bg'}
+];
+CLUSTERS.forEach(function(cl){
+  for(var i=0;i<cl.n;i++){
+    PTS.push({x:cl.c[0]+(rnd()-0.5)*cl.s*2, y:cl.c[1]+(rnd()-0.5)*cl.s*2, z:cl.c[2]+(rnd()-0.5)*cl.s*2,
+              col:cl.col, r:cl.fam==='bg'?1.3:2.2, a:cl.fam==='bg'?0.35:0.8, fam:cl.fam});
+  }
+});
+/* 高亮对象 + 邻居 */
+var FOCUS={x:0.42,y:-1.18,z:0.73}, NB=[{x:0.6,y:-0.9,z:0.5,id:'F#1092'},{x:0.3,y:-1.5,z:0.9,id:'F#2210'},{x:0.8,y:-1.0,z:0.3,id:'F#3655'},{x:0.2,y:-0.8,z:0.6,id:'F#0821'}];
+var th=0.6, ph=0.35, zoom=190, drag=null, auto=true;
+cv.addEventListener('mousedown',function(e){drag={x:e.clientX,y:e.clientY};auto=false});
+window.addEventListener('mousemove',function(e){if(!drag)return;th+=(e.clientX-drag.x)*0.006;ph=Math.max(-1.2,Math.min(1.2,ph+(e.clientY-drag.y)*0.006));drag={x:e.clientX,y:e.clientY}});
+window.addEventListener('mouseup',function(){drag=null;setTimeout(function(){auto=true},2500)});
+cv.addEventListener('wheel',function(e){e.preventDefault();zoom=Math.max(110,Math.min(340,zoom-e.deltaY*0.4))},{passive:false});
+
+function project(p){
+  var ct=Math.cos(th),st=Math.sin(th),cp=Math.cos(ph),sp=Math.sin(ph);
+  var x1=p.x*ct+p.z*st, z1=-p.x*st+p.z*ct;
+  var y2=p.y*cp - z1*sp, z2=p.y*sp + z1*cp;
+  var d=4+z2*0.35, f=zoom/d;
+  return {sx:cv.width/2+x1*f, sy:cv.height/2*0.94+y2*f, s:f, depth:z2};
+}
+var pulse=0;
+function draw(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  if(auto)th+=0.0022; pulse+=0.05;
+  /* 邻居连线 */
+  PTS_SORTED=[];
+  var items=PTS.map(function(p){var q=project(p);q.p=p;return q});
+  var f=project(FOCUS);
+  var nbp=NB.map(function(n){var q=project(n);q.p=n;return q});
+  ctx.lineWidth=1.2*devicePixelRatio;
+  nbp.forEach(function(q){
+    var g=ctx.createLinearGradient(f.sx,f.sy,q.sx,q.sy);
+    g.addColorStop(0,'rgba(5,150,105,.9)');g.addColorStop(1,'rgba(5,150,105,.15)');
+    ctx.strokeStyle=g;ctx.beginPath();ctx.moveTo(f.sx,f.sy);ctx.lineTo(q.sx,q.sy);ctx.stroke();
+  });
+  /* 点（按深度排序） */
+  items.concat(nbp).sort(function(a,b){return a.depth-b.depth}).forEach(function(q){
+    var a=q.p.a*(1-0.35*((q.depth+2)/4));
+    ctx.globalAlpha=Math.max(0.08,a);
+    ctx.fillStyle=q.p.col;
+    ctx.beginPath();ctx.arc(q.sx,q.sy,q.p.r*q.s*0.016*devicePixelRatio,0,6.283);ctx.fill();
+  });
+  /* 高亮 F#3734 */
+  ctx.globalAlpha=1;
+  var r=(7+Math.sin(pulse)*1.6)*devicePixelRatio;
+  ctx.strokeStyle='rgba(5,150,105,.5)';ctx.lineWidth=1.6*devicePixelRatio;
+  ctx.beginPath();ctx.arc(f.sx,f.sy,r+5*devicePixelRatio,0,6.283);ctx.stroke();
+  ctx.fillStyle='#059669';
+  ctx.beginPath();ctx.arc(f.sx,f.sy,4.5*devicePixelRatio,0,6.283);ctx.fill();
+  ctx.fillStyle='#022c22';ctx.font=('bold '+10*devicePixelRatio)+'px '+getComputedStyle(document.body).getPropertyValue('--mono');
+  ctx.fillText('F#3734 · is-a 水果族',f.sx+9*devicePixelRatio,f.sy-8*devicePixelRatio);
+  ctx.globalAlpha=1;
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+"""Phase 3133 SMOKE launcher."""
+import os
+import runpy
+import sys
+
+os.environ['P3133_SMOKE'] = '1'
+sys.argv = [r'D:\AI2050\Ai2050-OpenOne'
+            r'\tests\glm5'
+            r'\phase3133_omega_p131_'
+            r'transplant_a1fork_migrate.py']
+runpy.run_path(sys.argv[0],
+               run_name='__main__')

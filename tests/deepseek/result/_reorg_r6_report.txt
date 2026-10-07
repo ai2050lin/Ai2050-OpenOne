@@ -1,0 +1,73 @@
+== A) delete 8 merged .md from research/gpt5/docs ==
+  DEL RDC_TESTPLAN_v1.md                 71b85673 (backup ok)
+  DEL LOOP_DIAGNOSIS_AND_EXIT_v1.md      013d08a9 (backup ok)
+  DEL RDC_RESEARCH_CONSTITUTION_v1.md    01df6398 (backup ok)
+  DEL META_SINGLE_SOURCE_Q01.md          95366ca9 (backup ok)
+  DEL METRIC_DICT_Q02.md                 ba518fea (backup ok)
+  DEL DEADLINE_DUAL_TRACK_Q09.md         0d8633c7 (backup ok)
+  DEL PROP_CITATION_AUDIT_Q12.md         32933855 (backup ok)
+  DEL SEAL_REQUEST_A_GATE.md             7678cbe0 (backup ok)
+
+== B) move JSON artifacts ==
+  MOV deadline_dual_track_v1.json    -> tests\deepseek\result\deadline_dual_track_v1.json    4d1853d3
+  MOV prop_citation_audit_v1.json    -> tests\deepseek\result\prop_citation_audit_v1.json    4c2ea9d2
+  MOV meta_single_source_v4.json     -> tests\deepseek\result\meta_single_source_v4.json     f9d7ede6
+  MOV seal_request_v1.json           -> tests\deepseek\result\seal_request_v1.json           d871a4b4
+  MOV metric_dict.json               -> research\deepseek\atlas\metric_dict.json             03887e51
+  MOV phase_queue_v1.json            -> research\deepseek\atlas\phase_queue_v1.json          675836fd
+
+== C/D) scripts bucket ==
+  DUR  append_memo_r6.py                          5bb92f5d
+  DUR  classify_phases_r3.py                      1da59e8a
+  TMP  compact_memory_r3.py                       26acf06b
+  DUR  disk_verify_continue_r3.py                 4912d07b
+  DUR  disk_verify_q01_r4.py                      3385e39a
+  DUR  disk_verify_q02_r4.py                      602f0bc9
+  DUR  disk_verify_q09q12_r5.py                   d5de9e28
+  TMP  do_append_r2.py                            35f58401
+  TMP  do_wlog_r2.py                              54ec2738
+  DUR  gen_constitution_r3.py                     83a7cd10
+  DUR  gen_loop_diagnosis_r3.py                   78d928fd
+  DUR  gen_loop_html_r3.py                        cceaa1de
+  DUR  gen_q01_r4.py                              b21e0fdf
+  DUR  gen_q01q02_html_r4.py                      d174f8aa
+  DUR  gen_q02_r4.py                              abd3dc42
+  DUR  gen_q09_r5.py                              b37dbb00
+  DUR  gen_q09q12_html_r5.py                      47deb10c
+  DUR  gen_seal_request_r5.py                     afcf6532
+  TMP  patch_memory_skill_r3.py                   1b314fff
+  TMP  patch_memory_skill_r3b.py                  e3cfe87c
+  TMP  patch_r4.py                                9d358265
+  TMP  patch_r5.py                                b18631d8
+  TMP  patch_r5b.py                               0498f3f9
+  TMP  patch_r5c.py                               ac735ede
+  TMP  patch_r5d.py                               ff209d99
+  TMP  patch_r5e.py                               56f78417
+  TMP  patch_r5f.py                               bd5731c0
+  TMP  patch_r5g.py                               9511ccf6
+  TMP  patch_r5h.py                               c964e8a9
+  TMP  patch_r6b.py                               22cec2bd
+  TMP  probe_continue_r3.py                       d5c1059a
+  TMP  probe_memos_r3.py                          c7a4ab0e
+  TMP  probe_q01_r4.py                            e02cfdbe
+  TMP  probe_q01b_r4.py                           a42d822c
+  TMP  probe_q02_r4.py                            5f1f807b
+  TMP  probe_q02b_r4.py                           b073e28c
+  TMP  probe_q02c_r4.py                           ffe084ef
+  TMP  probe_q09_d_r5.py                          fa10b267
+  TMP  probe_q09q12_r5.py                         2410fde0
+  TMP  probe_q09q12b_r5.py                        2e5795c9
+  TMP  probe_q09q12c_r5.py                        7bd762f0
+  TMP  probe_q09q12e_r5.py                        5c99838b
+  DUR  prop_citation_audit.py                     75359173
+  DUR  verify_final_r2.py                         50271250
+  _review leftover = []
+
+== E) results bucket ==
+  DIR  memo_review_20261001/
+  moved entries = 59 ; leftover = []
+
+== verify ==
+  gpt5/docs 中 8 件已删: True
+  gpt5/atlas 中 6 件已迁: True
+  tests/deepseek/*.py = 17 (期望 17)  tests/deepseek_temp/*.py = 32 (期望 >=27)  tests/deepseek/result/ 条目 = 64

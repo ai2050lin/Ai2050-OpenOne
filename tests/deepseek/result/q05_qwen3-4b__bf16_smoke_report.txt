@@ -1,0 +1,40 @@
+Q05: E_ar(k) 正式测量 —— arm=qwen3-4b__bf16（SMOKE；bf16）
+==========================================================================
+design_sha = 669b5322   res_sha8 = 494c347c
+面板: 180 cells (60 pairs × 3 模板), held-out = 147 行/seed (S1 seeds [7, 8, 9])  panel_sha8=be17ef8a
+K = 4   forwards = 900   预测器 = B4 加性 ridge(λ=0.001)   精度 = bf16
+
+E_ar(k) 曲线（原始 L1, logit 单位）:
+  k    E_ar(B4)     null(const)  scale      rel          drift(k)-drift(0)
+  0    3.2823       5.5381       7.0299     0.4669       0.0000      
+  1    4.4031       6.8469       8.1330     0.5414       1.1208      
+  2    3.3877       5.1154       5.8525     0.5789       0.1054      
+  3    3.6703       4.7581       5.7504     0.6383       0.3880      
+  4    3.1203       4.0671       4.6697     0.6682       -0.1621     
+
+装置门:
+  D0 采集器等价(Q04)   : PASS
+  D1 k=0 确定性锚      : PASS
+  D2 margin 非退化     : PASS  (std(k=0,seed7)=6.2131)
+  D3 存活性(全有限)    : PASS
+  S1 漂移可检(max k>=1): PASS  (max=4.4031, 门=0.05)
+
+rollout 样例（前 3 cell）:
+  cell(t=0,pi=0) entity=苹果 -> "水果，对吗"
+  cell(t=0,pi=1) entity=苹果 -> "水果，对吗"
+  cell(t=0,pi=2) entity=苹果 -> "水果，对吗"
+
+--- run log ---
+[    0.0] execution.json FROZEN design_sha=669b5322 arm=qwen3-4b__bf16 K=4 rows_active=180 smoke=True
+[    5.6] model load begin: D:\AI2050\Ai2050-OpenOne\models\hf\qwen3-4b prec=bf16
+[   16.0] model loaded: Qwen3ForCausalLM  vram_alloc=8.10 GB
+[   16.0] cells=180  (K=4, forwards=900)
+[   26.3] rollout 60/180
+[   36.6] rollout 120/180
+[   46.9] rollout 180/180
+[   47.0] D1 determinism (cell0 re-run bit-identical) = True
+[   47.2] seed 7 E_ar_B4[0..4] = ['2.5040', '2.7238', '2.2700', '2.7304', '2.1569']
+[   47.2] seed 8 E_ar_B4[0..4] = ['4.2172', '5.6868', '4.5941', '4.8890', '4.3777']
+[   47.2] seed 9 E_ar_B4[0..4] = ['3.1258', '4.7987', '3.2991', '3.3914', '2.8262']
+[   47.2] D0 collector equivalence vs Q04 SMOKE: True (max_abs_dev=0.00e+00)
+[   47.2] result.json res_sha8=494c347c verdict=Q05_ARM_OK|S1_DRIFT_DETECTED

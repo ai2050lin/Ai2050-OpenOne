@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEUROSCOPE · 统一客户端 v4（整合版效果图）</title>
+<style>
+  :root{
+    --bg:#05080f; --bg2:#0a101d; --panel:#0d1524; --panel2:#101a2e;
+    --line:#1b2a45; --line2:#243756;
+    --cyan:#22d3ee; --cyan-dim:#0e7490; --violet:#a78bfa; --magenta:#f472b6;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171;
+    --txt:#dbe7ff; --txt-dim:#7d93b8; --txt-faint:#4a5f80;
+    --mono:'Consolas','SFMono-Regular',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh;
+       background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(34,211,238,.07), transparent),
+                        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(167,139,250,.05), transparent);}
+  .app{display:grid;grid-template-rows:52px 1fr 30px;grid-template-columns:56px 1fr 300px;height:100vh;
+       grid-template-areas:"top top top" "rail main ctx" "status status status";}
+
+  /* ============ 顶栏（全局壳） ============ */
+  .topbar{grid-area:top;display:flex;align-items:center;gap:16px;padding:0 14px;background:linear-gradient(180deg,#0c1424,#080e1a);
+          border-bottom:1px solid var(--line);}
+  .logo{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:2px;color:var(--cyan);
+        text-shadow:0 0 12px rgba(34,211,238,.5)}
+  .logo small{color:var(--txt-faint);font-size:10px;letter-spacing:1px;margin-left:6px}
+  .loop{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;color:var(--txt-faint)}
+  .loop .seg{padding:2px 8px;border:1px solid var(--line);border-radius:3px;background:#0a121f}
+  .loop .seg.active{color:var(--cyan);border-color:var(--cyan-dim);box-shadow:0 0 8px rgba(34,211,238,.25)}
+  .loop .arr{color:var(--txt-faint)}
+  .top-spacer{flex:1}
+  .model-sel{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;padding:5px 12px;
+             border:1px solid var(--line2);border-radius:4px;background:#0a121f;cursor:pointer}
+  .model-sel .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+  .task-badge{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;padding:5px 12px;
+              border:1px solid rgba(251,191,36,.4);border-radius:4px;background:rgba(251,191,36,.06);
+              color:var(--amber);cursor:pointer}
+  .task-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulse 1.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(251,191,36,.5)}50%{opacity:.6;box-shadow:0 0 0 5px rgba(251,191,36,0)}}
+  .kbd{font-family:var(--mono);font-size:10px;padding:4px 9px;border:1px solid var(--line2);border-radius:4px;color:var(--txt-dim);cursor:pointer}
+  .kbd b{color:var(--cyan)}
+
+  /* ============ 左导航轨 ============ */
+  .rail{grid-area:rail;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;
+        background:var(--bg2);border-right:1px solid var(--line)}
+  .rail-btn{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+            font-size:17px;color:var(--txt-faint);cursor:pointer;border:1px solid transparent;position:relative}
+  .rail-btn:hover{color:var(--txt);background:#0d1626}
+  .rail-btn.active{color:var(--cyan);background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.25);
+                   box-shadow:0 0 10px rgba(34,211,238,.15)}
+  .rail-btn .tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#131f36;border:1px solid var(--line2);
+                 padding:4px 9px;border-radius:4px;font-size:11px;white-space:nowrap;display:none;z-index:50;color:var(--txt)}
+  .rail-btn:hover .tip{display:block}
+  .rail-sep{width:26px;height:1px;background:var(--line);margin:6px 0}
+  .rail-badge{position:absolute;top:4px;right:4px;font-size:8px;font-family:var(--mono);background:var(--amber);color:#000;
+              border-radius:6px;padding:0 3px;font-weight:700}
+
+  /* ============ 主视口 ============ */
+  .main{grid-area:main;position:relative;overflow:hidden;background:var(--bg)}
+  .viewport{position:absolute;inset:0;display:none}
+  .viewport.active{display:block}
+  .vp-head{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:rgba(10,16,29,.7)}
+  .vp-title{font-size:13px;font-weight:600;letter-spacing:1px}
+  .vp-sub{font-family:var(--mono);font-size:10px;color:var(--txt-faint)}
+  .chip{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;border:1px solid var(--line2);color:var(--txt-dim)}
+  .chip.cy{color:var(--cyan);border-color:var(--cyan-dim)}
+  .chip.vi{color:var(--violet);border-color:#6d5bd0}
+  .chip.mg{color:var(--magenta);border-color:#b0447f}
+  .chip.gr{color:var(--green);border-color:#1d7a5c}
+  .delta{font-size:8px;font-family:var(--mono);padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.15);
+         color:var(--green);border:1px solid rgba(52,211,153,.35);letter-spacing:1px}
+
+  /* --- 视图1: 3D 点云 --- */
+  #cloud-canvas{position:absolute;inset:0;cursor:grab}
+  .cloud-hud{position:absolute;top:60px;left:16px;display:flex;flex-direction:column;gap:6px}
+  .hud-item{font-family:var(--mono);font-size:10px;color:var(--txt-dim);padding:6px 10px;background:rgba(13,21,36,.85);
+            border:1px solid var(--line);border-radius:5px;cursor:pointer}
+  .hud-item.on{color:var(--cyan);border-color:var(--cyan-dim)}
+  .hud-item small{display:block;color:var(--txt-faint);font-size:9px;margin-top:2px}
+  .cloud-legend{position:absolute;bottom:14px;left:16px;font-family:var(--mono);font-size:9px;color:var(--txt-faint);
+                padding:7px 10px;background:rgba(13,21,36,.85);border:1px solid var(--line);border-radius:5px}
+  .legend-bar{width:120px;height:6px;border-radius:3px;margin:4px 0;
+              background:linear-gradient(90deg,#0c2d4a,#155e8a,#22d3ee,#a5f3fc)}
+  .link-drawer{position:absolute;bottom:0;left:0;right:0;height:26%;background:rgba(10,16,29,.95);border-top:1px solid var(--line2);
+               display:flex;padding:10px 16px;gap:14px;backdrop-filter:blur(4px)}
+  .drawer-box{flex:1;border:1px solid var(--line);border-radius:6px;background:#0b1322;padding:8px}
+  .drawer-box h5{font-size:10px;color:var(--txt-dim);margin-bottom:6px;font-weight:500}
+  .mini-heat{display:grid;grid-template-columns:repeat(48,1fr);gap:1px;height:calc(100% - 20px)}
+  .mini-heat i{border-radius:1px}
+
+  /* --- 视图2: AI 研发 --- */
+  .ide{position:absolute;inset:60px 0 0 0;display:grid;grid-template-columns:190px 1fr 250px}
+  .filetree{border-right:1px solid var(--line);padding:10px;font-family:var(--mono);font-size:10.5px;overflow:auto}
+  .ft-item{padding:3px 8px;border-radius:3px;color:var(--txt-dim);cursor:pointer;white-space:nowrap}
+  .ft-item:hover{color:var(--txt);background:#0d1626}
+  .ft-item.on{color:var(--cyan);background:rgba(34,211,238,.07)}
+  .ft-item .lk{color:var(--txt-faint);font-size:9px;float:right}
+  .ft-dir{color:var(--txt);margin:7px 0 3px;font-weight:600}
+  .editor{display:flex;flex-direction:column;border-right:1px solid var(--line)}
+  .ed-tabs{display:flex;border-bottom:1px solid var(--line)}
+  .ed-tab{padding:7px 14px;font-family:var(--mono);font-size:10px;color:var(--txt-dim);border-right:1px solid var(--line);cursor:pointer}
+  .ed-tab.on{color:var(--cyan);background:#0d1626}
+  .ed-code{flex:1;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.7;overflow:auto;color:#9fb8dd}
+  .ed-code .kw{color:var(--violet)} .ed-code .st{color:var(--green)} .ed-code .cm{color:var(--txt-faint)} .ed-code .fn{color:var(--cyan)}
+  .terminal{height:38%;border-top:1px solid var(--line);padding:10px 12px;font-family:var(--mono);font-size:10.5px;
+            overflow:auto;background:#070c15}
+  .terminal .ln{margin-bottom:2px;white-space:pre-wrap}
+  .t-ok{color:var(--green)} .t-warn{color:var(--amber)} .t-dim{color:var(--txt-faint)} .t-cy{color:var(--cyan)} .t-err{color:var(--red)}
+  .agent-cfg{border-left:1px solid var(--line);padding:12px;overflow:auto}
+  .cfg-sec{margin-bottom:14px}
+  .cfg-sec h5{font-size:10px;color:var(--txt-dim);letter-spacing:1px;margin-bottom:7px;text-transform:uppercase}
+  .cfg-box{border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-family:var(--mono);font-size:10px;
+           color:var(--txt-dim);margin-bottom:5px;background:#0b1322;display:flex;justify-content:space-between}
+  .cfg-box b{color:var(--txt);font-weight:500}
+  .cfg-box .ok{color:var(--green)} .cfg-box .warn{color:var(--amber)}
+  .qc-card{border:1px solid var(--line2);border-radius:6px;padding:9px;margin-bottom:7px;background:#0b1322;cursor:pointer}
+  .qc-card:hover{border-color:var(--cyan-dim)}
+  .qc-card.sel{border-color:var(--cyan);box-shadow:0 0 10px rgba(34,211,238,.15)}
+  .qc-top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;margin-bottom:4px}
+  .qc-elo{color:var(--violet)} .qc-src{color:var(--txt-faint);font-size:9px}
+  .qc-title{font-size:11px;color:var(--txt)}
+  .btn{display:inline-block;font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:4px;cursor:pointer;
+       border:1px solid var(--cyan-dim);color:var(--cyan);background:rgba(34,211,238,.06)}
+  .btn:hover{background:rgba(34,211,238,.14)}
+  .btn.freeze{border-color:var(--amber);color:var(--amber);background:rgba(251,191,36,.06)}
+
+  /* --- 视图3: 路线图 --- */
+  .roadmap-wrap{position:absolute;inset:60px 0 0 0;padding:30px 30px 10px;overflow:auto}
+  .rm-lanes{position:relative;min-width:900px}
+  .rm-lane-label{font-family:var(--mono);font-size:10px;color:var(--txt-faint);margin-bottom:6px;letter-spacing:1px}
+  .rm-lane{position:relative;height:64px;margin-bottom:18px;border-bottom:1px dashed var(--line)}
+  .rm-node{position:absolute;top:8px;transform:translateX(-50%);width:150px;cursor:pointer;text-align:center}
+  .rm-dot{width:12px;height:12px;border-radius:50%;margin:0 auto 6px;border:2px solid var(--cyan);background:#0a121f;
+          transition:.2s;position:relative}
+  .rm-node:hover .rm-dot,.rm-node.sel .rm-dot{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  .rm-node.vi .rm-dot{border-color:var(--violet)} .rm-node.vi:hover .rm-dot,.rm-node.vi.sel .rm-dot{background:var(--violet);box-shadow:0 0 12px var(--violet)}
+  .rm-node.mg .rm-dot{border-color:var(--magenta)} .rm-node.mg:hover .rm-dot,.rm-node.mg.sel .rm-dot{background:var(--magenta);box-shadow:0 0 12px var(--magenta)}
+  .rm-node.blank .rm-dot{border-style:dashed;border-color:var(--amber)}
+  .rm-name{font-size:10px;color:var(--txt)} .rm-year{font-family:var(--mono);font-size:9px;color:var(--txt-faint)}
+  .rm-axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--txt-faint);
+           border-top:1px solid var(--line);padding-top:5px;margin-top:4px}
+
+  /* ============ 右上下文面板 ============ */
+  .ctx{grid-area:ctx;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+  .ctx-head{padding:11px 14px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:1px;color:var(--txt-dim);
+            display:flex;justify-content:space-between;align-items:center}
+  .ctx-body{flex:1;overflow:auto;padding:12px 14px}
+  .kv{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;padding:5px 0;
+      border-bottom:1px solid rgba(27,42,69,.5)}
+  .kv b{color:var(--txt);font-weight:500} .kv span{color:var(--txt-dim)}
+  .gauge{margin:10px 0 4px}
+  .gauge-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--txt-dim);margin-bottom:3px}
+  .gauge-bar{height:6px;border-radius:3px;background:#0a121f;border:1px solid var(--line);overflow:hidden}
+  .gauge-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan))}
+  .ctx-sec{margin-top:16px}
+  .ctx-sec h5{font-size:10px;color:var(--txt-dim);letter-spacing:1px;margin-bottom:7px;text-transform:uppercase}
+  .conn{font-family:var(--mono);font-size:10px;padding:5px 8px;border:1px solid var(--line);border-radius:4px;
+        margin-bottom:4px;color:var(--txt-dim);display:flex;justify-content:space-between;background:#0b1322}
+  .conn .up{color:var(--green)} .conn .dn{color:var(--magenta)}
+  .carry-btn{margin-top:10px;width:100%;text-align:center;padding:8px;border-radius:5px;cursor:pointer;
+             border:1px dashed var(--cyan-dim);color:var(--cyan);font-family:var(--mono);font-size:10.5px;background:rgba(34,211,238,.04)}
+  .carry-btn:hover{background:rgba(34,211,238,.1)}
+  .paper{border:1px solid var(--line2);border-radius:6px;padding:9px;margin-bottom:8px;background:#0b1322}
+  .paper b{font-size:11px;color:var(--txt);display:block;margin-bottom:3px}
+  .paper span{font-family:var(--mono);font-size:9px;color:var(--txt-faint)}
+  .paper .map{font-size:10px;color:var(--cyan);margin-top:4px;font-family:var(--mono)}
+
+  /* ============ 底部状态条 ============ */
+  .status{grid-area:status;display:flex;align-items:center;gap:14px;padding:0 14px;background:#080e1a;
+          border-top:1px solid var(--line);font-family:var(--mono);font-size:9.5px;color:var(--txt-dim);overflow:hidden}
+  .st-item{display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .st-dot{width:6px;height:6px;border-radius:50%}
+  .ticker{flex:1;overflow:hidden;position:relative;height:100%}
+  .ticker-inner{position:absolute;white-space:nowrap;animation:tick 40s linear infinite;line-height:30px}
+  @keyframes tick{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+  .ticker-inner .ev{margin-right:36px}
+  .ev .t{color:var(--txt-faint)} .ev.ok{color:var(--green)} .ev.run{color:var(--amber)} .ev.cy{color:var(--cyan)}
+  .gpu-bar{width:70px;height:5px;border-radius:3px;background:#0a121f;border:1px solid var(--line);overflow:hidden}
+  .gpu-fill{width:64%;height:100%;background:linear-gradient(90deg,var(--violet),var(--magenta))}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══════ 顶栏：全局壳（DELTA 整合层） ═══════ -->
+  <div class="topbar">
+    <div class="logo">NEUROSCOPE<small>统一研究客户端</small></div>
+    <div class="loop" title="闭环流程：路线图→AI研发→3D观察→账本">
+      <span class="seg" data-goto="roadmap">③ 路线图</span><span class="arr">→</span>
+      <span class="seg" data-goto="ai">② AI 研发</span><span class="arr">→</span>
+      <span class="seg active" data-goto="cloud">① 3D 观察</span><span class="arr">→</span>
+      <span class="seg" data-goto="ai">账本 ⟲</span>
+    </div>
+    <div class="top-spacer"></div>
+    <div class="model-sel" title="DELTA：全局模型上下文——三个视图共享">
+      <span class="dot"></span> qwen3-4b <span style="color:var(--txt-faint)">▾</span>
+    </div>
+    <div class="task-badge" data-goto="ai" title="DELTA：AI 研发任务跨视图指示——点击跳转">
+      <span class="pulse"></span> Q06 C_steer · RUNNING
+    </div>
+    <div class="kbd"><b>⌘K</b> 命令面板</div>
+  </div>
+
+  <!-- ═══════ 左导航轨 ═══════ -->
+  <div class="rail">
+    <div class="rail-btn active" data-view="cloud">🧠<span class="tip">3D 神经元空间</span></div>
+    <div class="rail-btn" data-view="ai">⌨<span class="tip">AI 自动研发</span><span class="rail-badge">1</span></div>
+    <div class="rail-btn" data-view="roadmap">🗺<span class="tip">行业路线图</span></div>
+    <div class="rail-sep"></div>
+    <div class="rail-btn">📜<span class="tip">研究账本（MEMO/队列）</span></div>
+    <div class="rail-btn">🗂<span class="tip">数据源管理（NPZ / SAE）</span></div>
+    <div class="rail-btn">⚙<span class="tip">设置</span></div>
+  </div>
+
+  <!-- ═══════ 主视口 ═══════ -->
+  <div class="main">
+
+    <!-- ── 视图1：3D 神经元空间（形态不变，仅嵌入主视口） ── -->
+    <div class="viewport active" id="view-cloud">
+      <div class="vp-head">
+        <span class="vp-title">3D 神经元空间</span>
+        <span class="vp-sub">X=神经元索引 · Y=激活幅值 · Z=层 L0→L27</span>
+        <span class="chip cy">色=激活状态</span><span class="chip vi">径=参数范数</span>
+        <span class="chip">SNAPSHOT-…-f8bf9916</span>
+        <span class="delta">整合层：嵌入主视口，交互不变</span>
+        <div style="flex:1"></div>
+        <span class="chip gr">拖拽旋转 · 点击选中</span>
+      </div>
+      <canvas id="cloud-canvas"></canvas>
+      <div class="cloud-hud">
+        <div class="hud-item on">状态 ACT<small>激活模式</small></div>
+        <div class="hud-item">参数 W<small>权重范数</small></div>
+        <div class="hud-item">切片 L14<small>单层剖开</small></div>
+      </div>
+      <div class="cloud-legend">
+        激活幅值
+        <div class="legend-bar"></div>
+        0 ──────── max
+      </div>
+      <!-- DELTA：3D↔2D 联动抽屉（选中神经元自动展开） -->
+      <div class="link-drawer" id="drawer">
+        <div class="drawer-box"><h5>L14 层内切片热力图（选中 n-1834）</h5><div class="mini-heat" id="heat1"></div></div>
+        <div class="drawer-box"><h5>激活时序（生成步 t0→t8）</h5><canvas id="spark" style="width:100%;height:calc(100% - 20px)"></canvas></div>
+        <div class="drawer-box"><h5>同类响应分布（跨样本）</h5><canvas id="hist" style="width:100%;height:calc(100% - 20px)"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ── 视图2：AI 自动研发（形态不变，仅嵌入主视口） ── -->
+    <div class="viewport" id="view-ai">
+      <div class="vp-head">
+        <span class="vp-title">AI 自动研发</span>
+        <span class="vp-sub">执行冻结任务 + 假设评审草稿通道</span>
+        <span class="chip cy">事件流 append-only</span>
+        <span class="chip gr">run-profile：GPU≤8GB · 600s · 白名单</span>
+        <span class="delta">整合层：右侧配置面板并入全局上下文栏</span>
+      </div>
+      <div class="ide">
+        <div class="filetree">
+          <div class="ft-dir">▾ ai2050-research-os/</div>
+          <div class="ft-item on">phase_queue.json<span class="lk">↎</span></div>
+          <div class="ft-item">metric_dict.json<span class="lk">↎</span></div>
+          <div class="ft-dir">▾ tests/deepseek/</div>
+          <div class="ft-item">q06_steer_main.py</div>
+          <div class="ft-item">collect.npz<span class="lk">ρ 本地</span></div>
+          <div class="ft-dir">▾ result/ <span style="color:var(--txt-faint);font-weight:400">(本地不入仓)</span></div>
+          <div class="ft-item">q06_result.npz<span class="lk">ρ</span></div>
+          <div class="ft-dir">▾ research/deepseek/docs/</div>
+          <div class="ft-item">AGI_DEEPSEEK_MEMO.md<span class="lk">append</span></div>
+          <div class="ft-dir">▾ literature/</div>
+          <div class="ft-item">tantivy 索引 · 38 篇</div>
+        </div>
+        <div class="editor">
+          <div class="ed-tabs">
+            <div class="ed-tab on">q06_steer_main.py</div>
+            <div class="ed-tab">phase_queue.json</div>
+          </div>
+          <div class="ed-code"><span class="cm"># Q06 C_steer 基座测量 · design sha ebf960cf（冻结）</span>
+<span class="kw">def</span> <span class="fn">main</span>():
+    model = load(<span class="st">"qwen3-4b"</span>, dtype=<span class="st">"bf16"</span>, layers=<span class="st">"0..35"</span>)
+    <span class="cm"># 承重轴 + 端口替换：steered 成功率 + 附带损伤</span>
+    ports = probe_carry_axes(model, metric_dict=<span class="st">"v4"</span>)
+    <span class="kw">for</span> port <span class="kw">in</span> ports:
+        result = steer_and_measure(model, port, dose=<span class="st">"x*r"</span>)
+        assert <span class="fn">drift_check</span>(result, contract=<span class="st">"ebf960cf"</span>)
+    seal_to_queue(result, verdict=<span class="st">"PENDING_REVIEW"</span>)</div>
+          <div class="terminal">
+            <div class="ln t-dim">$ researchctl run q06 --profile gpu8g_600s</div>
+            <div class="ln t-cy">[12:01:04] contract ebf960cf drift=0.00e+00 <span class="t-ok">✓</span></div>
+            <div class="ln t-cy">[12:01:11] loading qwen3-4b … cuda:0 bf16 <span class="t-ok">✓</span></div>
+            <div class="ln t-cy">[12:01:38] probe carry axes: L14/L22/L29 (3 ports)</div>
+            <div class="ln t-err">[12:02:15] AgentError: CUDA OOM on L22 port</div>
+            <div class="ln t-warn">[12:02:16] AgentRepair(2/3): batch 32→16 + offload</div>
+            <div class="ln t-ok">[12:02:44] retry OK · steered 0.682 / damage 0.041</div>
+            <div class="ln t-dim">[12:02:45] ▸ appending event stream (seq 1042)…</div>
+          </div>
+        </div>
+        <div class="agent-cfg">
+          <div class="cfg-sec">
+            <h5>Agent 配置</h5>
+            <div class="cfg-box"><span>执行模型</span><b>qwen3-4b</b></div>
+            <div class="cfg-box"><span>任务 prompt</span><b>Q06 冻结合同</b></div>
+            <div class="cfg-box"><span>修复上限</span><b class="ok">2/3</b></div>
+            <div class="cfg-box"><span>外网</span><b class="ok">禁用</b></div>
+          </div>
+          <div class="cfg-sec">
+            <h5>假设评审草稿通道</h5>
+            <div class="qc-card sel">
+              <div class="qc-top"><span class="qc-elo">ELO 1712</span><span class="qc-src">MEMO 挂账×9</span></div>
+              <div class="qc-title">QC-01 K4 跨精度 w_ℓ 稳定性</div>
+            </div>
+            <div class="qc-card">
+              <div class="qc-top"><span class="qc-elo">ELO 1655</span><span class="qc-src">路线图空白×6</span></div>
+              <div class="qc-title">QC-02 深端方向失配定量</div>
+            </div>
+            <div class="qc-card">
+              <div class="qc-top"><span class="qc-elo">ELO 1621</span><span class="qc-src">文献矛盾×2</span></div>
+              <div class="qc-title">QC-03 叠加 vs 读出位槽</div>
+            </div>
+            <div class="btn freeze" style="width:100%;text-align:center;margin-top:2px">⛏ 冻结 QC-01 入队（人工 gate）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 视图3：行业路线图（形态不变，仅嵌入主视口） ── -->
+    <div class="viewport" id="view-roadmap">
+      <div class="vp-head">
+        <span class="vp-title">行业进展路线图</span>
+        <span class="vp-sub">registry industry.json 直出 · 12 方法 / 11 工具 / 6 空白</span>
+        <span class="chip cy">泳道：方法</span><span class="chip vi">模型规模</span><span class="chip mg">机制发现</span>
+        <span class="delta">整合层：空白节点一键转 QC 草稿（跳 AI 研发）</span>
+      </div>
+      <div class="roadmap-wrap">
+        <div class="rm-lanes">
+          <div class="rm-lane-label">泳道 A · 方法（青）</div>
+          <div class="rm-lane">
+            <div class="rm-node" style="left:10%" data-node="attn"><div class="rm-dot"></div><div class="rm-name">Attention Is All You Need</div><div class="rm-year">2017</div></div>
+            <div class="rm-node vi" style="left:28%" data-node="bert"><div class="rm-dot"></div><div class="rm-name">BERT / GPT 规模法则</div><div class="rm-year">2018-20</div></div>
+            <div class="rm-node mg" style="left:47%" data-node="ioi"><div class="rm-dot"></div><div class="rm-name">IOI 电路 / 归因图谱</div><div class="rm-year">2022-23</div></div>
+            <div class="rm-node mg" style="left:66%" data-node="sae"><div class="rm-dot"></div><div class="rm-name">SAE 特征分解规模化</div><div class="rm-year">2024-25</div></div>
+            <div class="rm-node blank" style="left:88%" data-node="blank"><div class="rm-dot"></div><div class="rm-name">空白地带 = RDC</div><div class="rm-year">2026 · 本项目</div></div>
+          </div>
+          <div class="rm-lane-label">泳道 B · 模型规模（紫）</div>
+          <div class="rm-lane" style="height:30px">
+            <div class="rm-node vi" style="left:24%"><div class="rm-dot"></div><div class="rm-name">GPT-3</div><div class="rm-year">2020</div></div>
+            <div class="rm-node vi" style="left:58%"><div class="rm-dot"></div><div class="rm-name">开源 7B-14B 浪潮</div><div class="rm-year">2023-24</div></div>
+          </div>
+          <div class="rm-lane-label">泳道 C · 机制发现（品红）</div>
+          <div class="rm-lane" style="height:30px">
+            <div class="rm-node mg" style="left:40%"><div class="rm-dot"></div><div class="rm-name">Induction Heads</div><div class="rm-year">2022</div></div>
+            <div class="rm-node mg" style="left:72%"><div class="rm-dot"></div><div class="rm-name">Circuit Tracing 开源</div><div class="rm-year">2025</div></div>
+          </div>
+          <div class="rm-axis"><span>2017</span><span>2019</span><span>2021</span><span>2023</span><span>2025</span><span>2026→</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 右上下文面板（DELTA：内容随主视口切换） ═══════ -->
+  <div class="ctx">
+    <div class="ctx-head"><span id="ctx-title">神经元详情</span><span class="chip" id="ctx-model">qwen3-4b</span></div>
+    <div class="ctx-body" id="ctx-body">
+      <div class="kv"><span>坐标</span><b>n-1834 · L14 · d=1207</b></div>
+      <div class="kv"><span>当前激活</span><b style="color:var(--cyan)">3.421</b></div>
+      <div class="kv"><span>参数范数 ‖W‖</span><b>0.817</b></div>
+      <div class="kv"><span>偏置 b</span><b>-0.043</b></div>
+      <div class="kv"><span>角色假设</span><b style="color:var(--violet)">上位词路由候选</b></div>
+      <div class="ctx-sec">
+        <h5>W ↔ unembed 对齐（读出位槽 G−1=5）</h5>
+        <div class="gauge"><div class="gauge-label"><span>苹果</span><span>0.73</span></div><div class="gauge-bar"><div class="gauge-fill" style="width:73%"></div></div></div>
+        <div class="gauge"><div class="gauge-label"><span>香蕉</span><span>0.61</span></div><div class="gauge-bar"><div class="gauge-fill" style="width:61%"></div></div></div>
+        <div class="gauge"><div class="gauge-label"><span>桌子</span><span>0.08</span></div><div class="gauge-bar"><div class="gauge-fill" style="width:8%"></div></div></div>
+      </div>
+      <div class="ctx-sec">
+        <h5>上下游 TOP-3</h5>
+        <div class="conn"><span>L14-MLP32 →</span><span class="dn">w=0.62</span></div>
+        <div class="conn"><span>L09-attn11 →</span><span class="dn">w=0.44</span></div>
+        <div class="conn"><span>← L22-MLP07</span><span class="up">w=0.39</span></div>
+      </div>
+      <!-- DELTA：跨视图对象携带 -->
+      <div class="carry-btn" id="carry-btn" title="DELTA：选中对象跨视图流动">→ 将该神经元加入 AI 研发上下文</div>
+    </div>
+  </div>
+
+  <!-- ═══════ 底部状态条（DELTA：统一事件流 ticker） ═══════ -->
+  <div class="status">
+    <div class="st-item"><span class="st-dot" style="background:var(--green)"></span>PG 5432</div>
+    <div class="st-item"><span class="st-dot" style="background:var(--green)"></span>API 5001</div>
+    <div class="st-item">GPU <div class="gpu-bar"><div class="gpu-fill"></div></div> 5.1/8G</div>
+    <div class="st-item">队列 <b style="color:var(--amber)">RUN 1</b> · <b style="color:var(--green)">SEALED 6</b> · WAIT 2</div>
+    <div class="ticker"><div class="ticker-inner" id="ticker">
+      <span class="ev run"><span class="t">07:51:04</span> Q06 steer L22 retry OK (AgentRepair 2/3)</span>
+      <span class="ev ok"><span class="t">07:48:22</span> Q05 E_ar(k) sealed → 1acb1e78 复核 47/0 PASS</span>
+      <span class="ev cy"><span class="t">07:40:11</span> Neuronpedia source 10-res-jb synced (24.6k features)</span>
+      <span class="ev ok"><span class="t">07:31:58</span> snapshot validate-snapshot-v2 PASS 0 errors</span>
+      <span class="ev run"><span class="t">07:29:03</span> QC-01 auto-review 5/5 checks passed · awaiting freeze</span>
+    </div></div>
+  </div>
+</div>
+
+<script>
+/* ============ 视图切换（全局壳核心） ============ */
+const views = {cloud:'view-cloud', ai:'view-ai', roadmap:'view-roadmap'};
+const ctxCfg = {
+  cloud:['神经元详情', showCtxNeuron],
+  ai:['Agent 运行上下文', showCtxAgent],
+  roadmap:['节点论文详情', showCtxRoadmap],
+};
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+document.querySelectorAll('[data-goto]').forEach(el => el.addEventListener('click', () => switchView(el.dataset.goto)));
+
+function switchView(name){
+  document.querySelectorAll('.viewport').forEach(v => v.classList.remove('active'));
+  document.getElementById(views[name]).classList.add('active');
+  document.querySelectorAll('.rail-btn[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  document.querySelectorAll('.loop .seg').forEach(s => s.classList.remove('active'));
+  const map = {cloud:2, ai:1, roadmap:0};
+  const segs = document.querySelectorAll('.loop .seg');
+  if (segs[map[name]]) segs[map[name]].classList.add('active');
+  const [title, render] = ctxCfg[name];
+  document.getElementById('ctx-title').textContent = title;
+  render();
+  if (name === 'cloud') setTimeout(resizeCanvas, 30);
+}
+
+/* ============ 右面板内容渲染（随视图切换） ============ */
+function showCtxNeuron(){
+  document.getElementById('ctx-body').innerHTML = document.getElementById('ctx-body').dataset.neuronHtml;
+  bindCarry();
+}
+function showCtxAgent(){
+  document.getElementById('ctx-body').innerHTML = `
+    <div class="kv"><span>当前任务</span><b style="color:var(--amber)">Q06 C_steer</b></div>
+    <div class="kv"><span>合同 sha</span><b>ebf960cf（冻结）</b></div>
+    <div class="kv"><span>事件流 seq</span><b>1042 · append-only</b></div>
+    <div class="kv"><span>修复计数</span><b style="color:var(--amber)">2/3</b></div>
+    <div class="ctx-sec"><h5>携带的 3D 对象</h5>
+      <div class="conn"><span style="color:var(--cyan)">← n-1834 L14 d1207</span><span class="up">来自 3D 视图</span></div>
+    </div>
+    <div class="ctx-sec"><h5>执行计划</h5>
+      <div class="kv"><span>✓ contract drift</span><b class="ok">0.00e+00</b></div>
+      <div class="kv"><span>✓ model load bf16</span><b class="ok">cuda:0</b></div>
+      <div class="kv"><span>▸ steer L22 port</span><b style="color:var(--amber)">retry 2/3</b></div>
+      <div class="kv"><span>○ seal to queue</span><b>PENDING</b></div>
+    </div>
+    <div class="ctx-sec"><h5>文献索引（38 篇 tantivy）</h5>
+      <div class="conn"><span>查新: carry axis steering</span><span class="up">3 hits</span></div>
+    </div>`;
+}
+function showCtxRoadmap(){
+  document.getElementById('ctx-body').innerHTML = `
+    <div class="paper"><b>Sparse Autoencoders Find Composable Features</b><span>2025 · Anthropic · 开源代码 ✓</span>
+      <div class="map">🧩 本项目映射 → Q08 判定层 seal · K1 双轨</div></div>
+    <div class="paper"><b>Circuit Tracing: Revealing Computational Graphs</b><span>2025 · DeepMind · 开源代码 ✓</span>
+      <div class="map">🧩 映射 → Q06 C_steer 承重轴端口</div></div>
+    <div class="paper"><b>Open Problems in Mechanistic Interpretability</b><span>2024 · 社区 · 空白清单</span>
+      <div class="map">🧩 6 个空白 → QC 草稿来源</div></div>
+    <div class="carry-btn" style="border-color:var(--amber);color:var(--amber)">→ 从空白节点生成 QC 草稿（跳 AI 研发）</div>`;
+  document.querySelector('.carry-btn').addEventListener('click', () => switchView('ai'));
+}
+
+/* ============ 3D 点云（形态同 v3：点=神经元，色=激活，径=范数） ============ */
+const cv = document.getElementById('cloud-canvas');
+const ctx2d = cv.getContext('2d');
+let W, H, rotX = -0.35, rotY = 0.6, dragging = false, lx = 0, ly = 0;
+const NL = 28, NPER = 36;  // 28 层 × 36 采样神经元（demo）
+let points = [];
+function genPoints(){
+  points = [];
+  let seed = 42;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let l = 0; l < NL; l++)
+    for (let i = 0; i < NPER; i++){
+      const base = 0.25 + 0.3 * Math.exp(-Math.pow(i / NPER * 2.6 - 1.3, 2) / 0.8);
+      const act = Math.max(0, Math.min(1, base + (rnd() - 0.5) * 0.55 + 0.18 * Math.sin(l * 0.5 + i)));
+      points.push({x: i / NPER - 0.5, y: act, z: l / NL, act, w: 0.3 + rnd() * 0.7, id: l * 100 + i, L: l, d: Math.floor(rnd() * 2560)});
+    }
+}
+function resizeCanvas(){
+  const r = cv.getBoundingClientRect();
+  W = cv.width = r.width * devicePixelRatio; H = cv.height = r.height * devicePixelRatio;
+  ctx2d.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  draw();
+}
+function project(p){
+  const cx = cv.clientWidth / 2, cy = cv.clientHeight * 0.52, sc = Math.min(cv.clientWidth, cv.clientHeight) * 0.9;
+  let x = p.x, y = (0.5 - p.y) * 1.6, z = (p.z - 0.5) * 1.8;
+  let x1 = x * Math.cos(rotY) - z * Math.sin(rotY), z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+  let y1 = y * Math.cos(rotX) - z1 * Math.sin(rotX), z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+  const persp = 1 / (1 + z2 * 0.25);
+  return {sx: cx + x1 * sc * persp, sy: cy + y1 * sc * persp, s: persp, z: z2};
+}
+function actColor(a){
+  const t = Math.max(0, Math.min(1, a));
+  if (t < 0.5){ const k = t / 0.5; return `rgb(${Math.round(12+9*k)},${Math.round(45+49*k)},${Math.round(74+64*k)})`; }
+  const k = (t - 0.5) / 0.5;
+  return `rgb(${Math.round(21+13*k)},${Math.round(94+105*k)},${Math.round(138+117*k)})`;
+}
+let selected = null;
+function draw(){
+  if (!W) return;
+  ctx2d.clearRect(0, 0, cv.clientWidth, cv.clientHeight);
+  // 网格
+  ctx2d.strokeStyle = 'rgba(27,42,69,.4)'; ctx2d.lineWidth = 1;
+  for (let g = 0; g <= 4; g++){
+    ctx2d.beginPath(); ctx2d.moveTo(g / 4 * cv.clientWidth, 0); ctx2d.lineTo(g / 4 * cv.clientWidth, cv.clientHeight); ctx2d.stroke();
+    ctx2d.beginPath(); ctx2d.moveTo(0, g / 4 * cv.clientHeight); ctx2d.lineTo(cv.clientWidth, g / 4 * cv.clientHeight); ctx2d.stroke();
+  }
+  const proj = points.map(p => ({...project(p), p})).sort((a, b) => b.z - a.z);
+  for (const q of proj){
+    const r = Math.max(1, q.p.w * 4.5 * q.s);
+    ctx2d.fillStyle = actColor(q.p.act);
+    ctx2d.beginPath(); ctx2d.arc(q.sx, q.sy, r, 0, 7); ctx2d.fill();
+    if (q.p.act > 0.8){ ctx2d.strokeStyle = 'rgba(255,255,255,.7)'; ctx2d.lineWidth = 1; ctx2d.beginPath(); ctx2d.arc(q.sx, q.sy, r + 1.5, 0, 7); ctx2d.stroke(); }
+  }
+  if (selected){
+    const q = project(selected);
+    ctx2d.strokeStyle = '#fff'; ctx2d.lineWidth = 2;
+    ctx2d.beginPath(); ctx2d.arc(q.sx, q.sy, 9, 0, 7); ctx2d.stroke();
+    ctx2d.fillStyle = '#fff'; ctx2d.font = '11px Consolas';
+    ctx2d.fillText(`n-${selected.id} · L${selected.L} · act ${selected.act.toFixed(2)}`, q.sx + 13, q.sy - 10);
+  }
+}
+cv.addEventListener('mousedown', e => { dragging = true; lx = e.clientX; ly = e.clientY; });
+window.addEventListener('mouseup', () => dragging = false);
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  rotY += (e.clientX - lx) * 0.008; rotX += (e.clientY - ly) * 0.008;
+  lx = e.clientX; ly = e.clientY; draw();
+});
+cv.addEventListener('click', e => {
+  const rect = cv.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  let best = null, bd = 400;
+  for (const p of points){
+    const q = project(p), d = (q.sx - mx) ** 2 + (q.sy - my) ** 2;
+    if (d < bd){ bd = d; best = p; }
+  }
+  if (best){ selected = best; updateNeuronCtx(best); draw(); }
+});
+function updateNeuronCtx(p){
+  document.getElementById('ctx-body').dataset.neuronHtml = `
+    <div class="kv"><span>坐标</span><b>n-${p.id} · L${p.L} · d=${p.d}</b></div>
+    <div class="kv"><span>当前激活</span><b style="color:var(--cyan)">${p.act.toFixed(3)}</b></div>
+    <div class="kv"><span>参数范数 ‖W‖</span><b>${p.w.toFixed(3)}</b></div>
+    <div class="kv"><span>角色假设</span><b style="color:var(--violet)">上位词路由候选</b></div>
+    <div class="ctx-sec"><h5>W ↔ unembed 对齐</h5>
+      <div class="gauge"><div class="gauge-label"><span>苹果</span><span>0.73</span></div><div class="gauge-bar"><div class="gauge-fill" style="width:73%"></div></div></div>
+      <div class="gauge"><div class="gauge-label"><span>桌子</span><span>0.08</span></div><div class="gauge-bar"><div class="gauge-fill" style="width:8%"></div></div></div>
+    </div>
+    <div class="ctx-sec"><h5>联动抽屉</h5><div class="kv"><span>切片热力图</span><b>已展开 ▾</b></div></div>
+    <div class="carry-btn" id="carry-btn">→ 将该神经元加入 AI 研发上下文</div>`;
+  bindCarry();
+}
+function bindCarry(){
+  const b = document.getElementById('carry-btn');
+  if (b) b.addEventListener('click', () => { switchView('ai'); });
+}
+
+/* ============ 联动抽屉小图 ============ */
+function drawHeat(){
+  const el = document.getElementById('heat1');
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 48 * 6; i++){
+    const v = rnd(); const c = document.createElement('i');
+    c.style.background = actColor(v * 1.2); el.appendChild(c);
+  }
+}
+function drawSpark(){
+  const c = document.getElementById('spark'); const r = c.parentElement.getBoundingClientRect();
+  c.width = r.width - 18; c.height = r.height - 22;
+  const g = c.getContext('2d'); g.strokeStyle = '#22d3ee'; g.lineWidth = 1.5; g.beginPath();
+  let seed = 13; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let y = 0.5;
+  for (let i = 0; i < 9; i++){
+    y = Math.max(0.1, Math.min(0.9, y + (rnd() - 0.45) * 0.5));
+    const x = i / 8 * (c.width - 10) + 5, py = c.height - y * c.height;
+    i ? g.lineTo(x, py) : g.moveTo(x, py);
+    g.fillStyle = 'rgba(34,211,238,.9)'; g.fillRect(x - 2, py - 2, 4, 4);
+  }
+  g.stroke();
+}
+function drawHist(){
+  const c = document.getElementById('hist'); const r = c.parentElement.getBoundingClientRect();
+  c.width = r.width - 18; c.height = r.height - 22;
+  const g = c.getContext('2d');
+  let seed = 29; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const bins = Array.from({length: 22}, (_, i) => Math.exp(-Math.pow(i - 6, 2) / 30) + rnd() * 0.15);
+  bins.forEach((v, i) => {
+    const h = v / 1.2 * c.height;
+    g.fillStyle = i > 14 ? '#f472b6' : '#a78bfa';
+    g.fillRect(i / 22 * c.width, c.height - h, c.width / 22 - 2, h);
+  });
+}
+
+/* ============ 路线图节点交互 ============ */
+document.querySelectorAll('.rm-node').forEach(n => n.addEventListener('click', () => {
+  document.querySelectorAll('.rm-node').forEach(m => m.classList.remove('sel'));
+  n.classList.add('sel');
+  if (n.dataset.node) showCtxRoadmap();
+}));
+
+/* ============ init ============ */
+genPoints(); drawHeat();
+window.addEventListener('resize', () => { resizeCanvas(); drawSpark(); drawHist(); });
+setTimeout(() => { resizeCanvas(); drawSpark(); drawHist(); }, 50);
+</script>
+</body>
+</html>

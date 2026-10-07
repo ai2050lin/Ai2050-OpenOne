@@ -3510,3 +3510,61 @@ Error: Port 5173 is already in use
 - 构建仍只有既有的大包体积提醒。
 
 本次只修改工作区滚动控制、对应 CSS 和本记录，没有修改 3D 模型数据、AI 研发后端、模型测试结果或 Memo。
+
+
+## 客户端三世界改造 M1：证据总览默认落地 [2026-10-04 04:01]
+
+### 背景
+
+客户端定性为四不像：一个导航叠加证据平台（仅 10/357 组件接 Canonical Snapshot）、自创理论科普秀（NFB/GUT，与注册理论 RDC 不一致）、旧叙事残骸（SNN/ICSPB/DNN 模块定位）、演示动画集（175 个 C 档组件无数据源）；默认落地页为 C 档概念件 glass_matrix。详见 .workbuddy/memory/2026-10-04.md 诊断。
+
+### 已完成
+
+1. 默认落地页从 App.jsx（glass_matrix 起始）换为新建 components/app/EvidenceOverview.jsx：Canonical Snapshot 驱动，含 EvidenceStamp（snapshot_id/as_of/sha8）、ResearchEvidenceCockpit 嵌入、10 个 /rdc* 证据图谱导航卡、快照 counts、四级证据标尺图例；
+2. 新建 components/app/EvidenceBadge.jsx：四级证据徽章（has_data/observed/generalization_checked/mechanism_evidence）+ 无证据卡警示态 + 全局快照戳 EvidenceStamp；
+3. 新建 components/app/ConceptGallery.jsx：C 档概念件隔离容器（四类名录 + 不得作为研究事实引用横幅），路由 /gallery；
+4. main.jsx 分发重构：routePage() 函数化，/ 默认 EvidenceOverview，/app 保留完整旧工作台（右下浮动按钮改为返回证据总览），/rdc* 十路径不变；
+5. 删除 4 个废弃入口：AppNew.jsx、main_new.jsx、AGIVisualizationApp.jsx、agi_visualization.jsx（grep 确认仅彼此引用与 main.jsx 注释行）。
+
+### 验证
+
+- Vite 正式构建通过：2867 模块（较改造前 +6，即新增组件）、8.66s、EXIT=0；既有大包体积提醒不变（代码分割列 M2）；
+- main.jsx 落盘复核：AppNew 引用清零，EvidenceOverview/ConceptGallery/routePage 在位。
+
+### 边界与未完成
+
+- App.jsx 内部未动（265KB 单体拆分、叙事 tab 摘除属 M2/M3）；ConceptGallery 为名录骨架，组件逐个挂接与回查原始数值属 M3；
+- 浏览器端视觉验证未做（本机无 playwright-cli），以构建 + 编译 200 为准，不记视觉验收通过。
+
+---
+
+## 客户端三世界改造 M2：叙事入口摘除 + 学习/研发世界落地 [2026-10-04 04:40]
+
+### 背景
+
+M1 完成默认落地页换血与概念画廊骨架；本批兑现三世界信息架构的另两翼：叙事入口摘除入画廊、10 个封存案例接入学习视图、研发世界（行业对照 + 空白雷达 + 复现指引）落地。
+
+### 叙事入口盘点结论（先查证据再动手）
+
+App.jsx 存在两个独立 tab 态：`activeTab`（1343 行，**setter 全文件无调用点，是死状态**）与 `structureTab`（1352 行，真实交互态，默认 `circuit`，本就是证据 tab）。结构面板导航只来自 `STRUCTURE_TABS_V2`（config/panels.js，全部为证据 tab）；`agi / glass_matrix / flow_tubes / global_topology` 等叙事分支在 StructureAnalysisPanel 中是**无导航入口的死分支**。真正可达的旧叙事入口只有一处：`INPUT_PANEL_TABS`（DNN/SNN/ICSPB 三按钮，App.jsx 2809 行渲染）。
+
+### 已完成
+
+1. **叙事入口摘除**：`INPUT_PANEL_TABS` 收敛为仅 DNN 主工作台（SNN/ICSPB 面板组件本体保留，M3 拆分处理）；App.jsx 死状态默认值 `glass_matrix` → `logit_lens`（语义清理，无行为影响）；ConceptGallery 名录补登本轮摘除项与死分支清单。三处均 Python 补丁 assert 唯一命中 + 独立 Grep 落盘复核。
+2. **registry 客户端投影扩展（M2-3）**：`researchctl export-client` 新增导出 `registry/cases.json`（10 案例）与 `registry/industry.json`（29 记录）到 `frontend/public/research_data/current/`，保持 registry 单一事实源；已运行落盘（cases 14.9KB / industry 21.1KB）。
+3. **三世界导航（WorldNav）**：新建共享组件，学习（/learn）· 证据（/）· 研发（/build）三入口 + 概念画廊弱化出口；EvidenceOverview 挂载（active=evidence）。
+4. **学习世界（LearnHub.jsx/css）**：方法图谱（12 节点，含 era/core_idea/established/limits，行业方法证据级用 EvidenceBadge 标定）+ 10 个封存案例手风琴卡（问题→假设→实验→局限→产物指针，默认展开 CASE-001）+ 四级证据标尺图例；数据 fetch 失败时降级提示 export-client 命令，不造假数据。
+5. **研发世界（BuildHub.jsx/css）**：五阶段研发闭环说明（含 researchctl 命令链代码块）+ 行业工具对照（按 in_house/reusable/reference/contrast 分组，11 项）+ 研究空白雷达（GAP-1..6 按 priority 分色，GAP-1→Q06 队列接续保留）+ 五步本地复现指引（对齐"结果数据不入 git"发布形态）。
+6. **路由接线**：main.jsx ROUTES 增加 `/learn`、`/build`。
+
+### 验证
+
+- Vite 正式构建通过：2873 模块（较 M1 +6，即 WorldNav/LearnHub/BuildHub 及其 CSS）、8.53s、EXIT=0；
+- 投影落盘验证：snapshot.json（24.6KB）+ cases.json（10 条）+ industry.json（29 条）三件齐；
+- 三处补丁独立 Grep 复核通过。
+
+### 边界与未完成
+
+- SNN/ICSPB/agi/glass_matrix/flow_tubes 等叙事组件的**代码本体未删**（死代码留在树中，M3 拆分时清理）；
+- B 档 69 组件挂 EvidenceBadge 未做（M3）；研发世界的队列/合同/复核状态仍是静态说明，数据化接线属 M3（不造假数据）；
+- 浏览器端视觉验证未做，不记视觉验收通过；主包 2.2MB 超限提醒仍在（代码分割 M3）。
