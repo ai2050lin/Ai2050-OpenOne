@@ -29,9 +29,9 @@ function HomeView({onGo}){
           <p>空间（3D 点云：特征在哪里、邻居是谁）· 过程（AI 研发工作台：对它做过什么实验）· 脉络（行业路线图：它支撑哪个大问题）。三界面共享顶栏的<b>对象路由</b>与右侧<b>对象卡</b>，切透镜不换对象。</p>
         </div>
         <div className="fw-hero-num">
-          <div className="stat"><div className="n">304</div><div className="l">Ledger 条目</div></div>
-          <div className="stat"><div className="n">39</div><div className="l">MEMO Phase</div></div>
-          <div className="stat"><div className="n">6/30</div><div className="l">队列 sealed</div></div>
+          <div className="stat"><div className="n">306</div><div className="l">Ledger 条目</div></div>
+          <div className="stat"><div className="n">40</div><div className="l">MEMO Phase</div></div>
+          <div className="stat"><div className="n">7/30</div><div className="l">队列 sealed</div></div>
         </div>
       </div>
       <div className="fw-entry-col">
@@ -49,7 +49,7 @@ function HomeView({onGo}){
         </div>
         <h3>过程透镜 · AI 研发</h3>
         <p>预注册 → 冻结 → 执行 → 独立复核闭环；队列、脚本、终端、结果卡同屏；结果内嵌可视化（OpenScience / prism_ai 范式）。</p>
-        <span className="tag">接 research OS registry · q06 RUNNING</span>
+        <span className="tag">接 :5001 /api/ai-rnd · 多模型自动研发</span>
       </button>
       <button className="fw-entry" onClick={()=>onGo('progress')}>
         <div className="ic" style={{background:'#fffbeb',color:'#b45309'}}>
@@ -63,9 +63,9 @@ function HomeView({onGo}){
       <div className="fw-side-col">
         <div className="fw-mini">
           <h4>进行中 <span style={{fontSize:10,color:'var(--fw-blue)',cursor:'pointer'}}>全部 →</span></h4>
-          <div className="fw-task"><span className="st fw-st-run"/><div className="t"><b>Q06 · C_steer 基座测量</b><span>step 2/5 · 承重轴枚举</span></div></div>
+          <div className="fw-task"><span className="st fw-st-run"/><div className="t"><b>Q07 · KPI 曲线 v0 汇总</b><span>next · Q03–Q06 → 单调曲线</span></div></div>
           <div className="fw-task"><span className="st fw-st-que"/><div className="t"><b>N 线 P3–P7 补 Ledger</b><span>queued · 跨线账本确认</span></div></div>
-          <div className="fw-task"><span className="st fw-st-done"/><div className="t"><b>Q05 · E_ar(k) 正式测量</b><span>sealed 1acb1e78 · 复核 47/0</span></div></div>
+          <div className="fw-task"><span className="st fw-st-done"/><div className="t"><b>Q06 · C_steer 基座测量</b><span>sealed 5f88ed7e · 复核 16/0</span></div></div>
         </div>
         <div className="fw-mini">
           <h4>事件流 <span style={{fontSize:10,color:'var(--fw-blue)',cursor:'pointer'}}>账本 →</span></h4>
@@ -227,7 +227,7 @@ export default function RdcFusionWorkspace(){
       {/* ===== 底部状态条：全局事件总线 ===== */}
       <footer className="fw-statusbar">
         <span className="fw-st-chip"><span className="ok">●</span> qwen3-4b bf16 · GPU 21.3/24G</span>
-        <span className="fw-st-chip">Q06 RUNNING · step 2/5</span>
+        <span className="fw-st-chip">Q06 SEALED · next Q07</span>
         <div className="fw-ticker"><div className="fw-ticker-in">
           {tickerText.map((t,i)=><span key={i}>{t}</span>)}
         </div></div>

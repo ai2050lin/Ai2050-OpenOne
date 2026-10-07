@@ -14912,6 +14912,7 @@ qwen3-4b res **199b145d**（disk c38b97ff）；qwen3-14b res **8a29eace** seal *
 
 **判决格式**：`g1p4_<model>|G_..|D_..|resid_..|flip_.._null_.._p_..|hoacc_..`；summary=`g1p4_fingerprint_consistent|fpmin_..` / `g1p4_fingerprint_inconsistent_material_method_descriptive|fpmin_..|bad_pairs_..`。
 **诚实边界**：3153 已证模板内高秩散布 57–60% 不可被本设计硬拆（resid 份额预期仍主导）；本 Phase 只回答可控四因素的各自可分离份额与逻辑轴因果可读性。
+
 ## Phase 3154: 多因素混杂分解（G1-P4）[2026-10-05 13:58]
 
 **主判决：`g1p4_fingerprint_consistent|fpmin_0.996|ho_pass_3/3|logic_sig_3/3`——四因素份额指纹三模型一致（KOUT 两两 Pearson 0.9959/0.9973/0.9996，门 0.8），逻辑轴 w_G 三模型干预显著（stat 3.756/3.706/3.221，100 方向 null 全 p<0.0001），held-out 新主题 16 句符号准确率 1.00/1.00/0.94 全过 0.75 门。**

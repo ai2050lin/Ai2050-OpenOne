@@ -16,7 +16,7 @@ export const TICKER=[
   '[metric_dict] v3→v4 · E_ar.status=measured',
   '[InterPLM] :8501 ESM-2 SAE 2548 特征就绪',
   '[ledger] n=304 bbda63df · N 线 P3–P7 待补',
-  '[queue] 6/30 sealed · next Q06 C_steer',
+  '[queue] 7/30 sealed · next Q07 KPI v0',
 ];
 
 export const ACT_LINES=[
@@ -32,7 +32,8 @@ export const CMDK_GROUPS=[
     {k:'F#0821',t:'is-a 下位：个体实例方向',d:'L6 · observed',go:'spatial'},
   ]},
   {gl:'任务 · TASKS',items:[
-    {k:'Q06',t:'C_steer 基座测量 · RUNNING',d:'step 2/5',go:'process'},
+    {k:'Q07',t:'KPI 曲线 v0 汇总 · NEXT',d:'Q03–Q06 → 单调曲线',go:'process'},
+    {k:'Q06',t:'C_steer 基座测量 · SEALED',d:'5f88ed7e · 复核 16/0',go:'process'},
     {k:'Q05',t:'E_ar(k) 正式测量 · SEALED',d:'1acb1e78',go:'process'},
   ]},
   {gl:'论文与节点 · PROGRESS',items:[
