@@ -1572,3 +1572,101 @@ async def get_orchestrator_status():
 @router.get("/orchestrator/runs")
 async def get_orchestrator_runs(limit: int = 50):
     return {"runs": list_research_runs(max(1, min(limit, 200)))}
+
+
+# ---------------------------------------------------------------- M3-P1（design/ui_decoupled_plan_v2.md §2）
+# 研发透镜内容层数据源：队列 / 工作区文件树 / 工件文本。内容只存在于数据层，
+# JSX 禁止出现具体实验字面量（Q05/F#3734/collect_ar.py 等）。
+
+_PHASE_QUEUE_PATH = Path(__file__).parent.parent / "research" / "deepseek" / "atlas" / "phase_queue_v1.json"
+_WS_ALLOWED_ROOTS = ("tests", "research")
+_WS_MAX_FILE = 512 * 1024
+
+
+def _ws_resolve(path: str) -> Path:
+    """白名单解析：解析后必须真实落在 tests/ 或 research/ 之下（防 ../ 逃逸）。"""
+    root = Path(__file__).parent.parent.resolve()
+    rel = (path or "").strip().replace("\\", "/").strip("/")
+    if not rel:
+        raise HTTPException(status_code=400, detail="path is required")
+    cand = (root / rel).resolve()
+    allowed = [root / r for r in _WS_ALLOWED_ROOTS]
+    if not any(cand == a or a in cand.parents for a in allowed):
+        raise HTTPException(status_code=403, detail="path outside allowed roots (tests/research)")
+    return cand
+
+
+@router.get("/queue")
+async def get_queue():
+    """研发队列（唯一议程来源 phase_queue_v1.json）。文件缺失返回空队列，不阻塞页面。"""
+    try:
+        data = json.loads(_PHASE_QUEUE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {"schema": "rdc_phase_queue_v1", "source": "missing", "count": 0,
+                "sealed": 0, "queue": []}
+    items = []
+    for it in data.get("queue", []):
+        if not isinstance(it, dict):
+            continue
+        items.append({
+            "id": it.get("id"), "q": it.get("q"), "title": it.get("title"),
+            "status": it.get("status"), "block": it.get("block"),
+            "kpi": it.get("kpi"), "gpu": it.get("gpu"),
+            "deliverable": it.get("deliverable"),
+            "seal_record": it.get("seal_record"), "res_sha8": it.get("res_sha8"),
+            "prereg_design_sha": it.get("prereg_design_sha"), "note": it.get("note"),
+        })
+    return {"schema": data.get("schema"), "source": "phase_queue_v1.json",
+            "count": len(items), "sealed": len(data.get("sealed_items", [])),
+            "queue": items}
+
+
+@router.get("/workspace")
+async def workspace_list(path: str = "tests/deepseek", limit: int = 80):
+    """工作区文件树：目录内一层列表（白名单根 tests/research）。"""
+    root = Path(__file__).parent.parent.resolve()
+    p = _ws_resolve(path)
+    if not p.exists():
+        raise HTTPException(status_code=404, detail="workspace path not found")
+    if not p.is_dir():
+        raise HTTPException(status_code=400, detail="workspace path is not a directory")
+    dirs, files = [], []
+    try:
+        children = sorted(p.iterdir(), key=lambda x: x.name)
+    except PermissionError:
+        children = []
+    for child in children:
+        if child.name.startswith(".") or child.name.startswith("__"):
+            continue
+        try:
+            rel = child.relative_to(root).as_posix()
+        except ValueError:
+            continue
+        if child.is_dir():
+            dirs.append({"name": child.name, "path": rel, "type": "dir"})
+        elif child.is_file():
+            try:
+                st = child.stat()
+            except OSError:
+                continue
+            files.append({"name": child.name, "path": rel, "type": "file",
+                          "size": int(st.st_size), "mtime": float(st.st_mtime)})
+    n = max(1, min(int(limit), 200))
+    rel_self = p.relative_to(root).as_posix()
+    return {"path": rel_self, "name": p.name,
+            "dirs": dirs, "files": files[:n], "files_total": len(files),
+            "truncated": len(files) > n}
+
+
+@router.get("/workspace/file")
+async def workspace_file(path: str):
+    """工作区文本文件内容（≤512KB，utf-8 replace）——工件查看器数据源。"""
+    p = _ws_resolve(path)
+    if not p.is_file():
+        raise HTTPException(status_code=404, detail="file not found")
+    size = p.stat().st_size
+    if size > _WS_MAX_FILE:
+        raise HTTPException(status_code=413, detail="file too large (>512KB)")
+    text = p.read_text(encoding="utf-8", errors="replace")
+    return {"path": (path or "").replace("\\", "/").strip("/"), "name": p.name,
+            "size": size, "content": text}

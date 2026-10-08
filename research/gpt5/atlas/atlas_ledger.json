@@ -6249,6 +6249,20 @@
    "superseded_by": null,
    "verdict": "q06_c_steer_base_zero|cs_main_0.0000_0/376|wilson_hi_0.0101|spec_diff_0.0|collat_clean_frac0_0.933|argmax_moved_9_of_4410|maxd_le_0.94logit|identity_bit_0.00e+00|verify_16_0",
    "rev_note": "C_steer first measurement (I7 base): v1 load-bearing axis (L29 WR-main-PC, panel interaction-residual PC1 isomorph-ported def; prereg ebf960cf) + readout substitution h+(t-s)v, dt=sgn*alpha*sigma alpha in {0.05..0.5} (prereg 5-pt grid); targets true_class on E_read heldout panel (376 eligible of 441; S1 seeds 7/8/9). ZERO steer success across all 10 configs; rand-direction control identical (0.0); collateral clean -> zero is NOT collateral-dirt but missing directional leverage (v1 = global form/magnitude axis, not class-identity lever; maxd<=0.94 logit vs prior-class head gap). Asymmetry vs M14: clip(removal) breaks 66% generation @a0.5 while push/pull substitution moves readout <1 logit -> load-bearing axis carries generation stability, not class content. I1 => catalog (no KPI decreased). annex v2 revise log: t-rule/target/G2-gate fixed after SMOKE v1 (design 329e0115->6d98d580 smoke, 7130906b formal)."
+  },
+  {
+   "phase": 3155,
+   "name": "g2p1_relation_family_operator_separability",
+   "seal_sha8": "5d2c2061",
+   "result_sha8": "14975aed",
+   "evidence_level": "statistical",
+   "model_scope": "qwen3-4b + qwen3-14b + glm4-9b",
+   "n_rows": 414,
+   "prereg_id": "p3155",
+   "superseded_by": null,
+   "verdict": "g2p1_k2_separable_conditional_gate_supported|k2int_0.1661|fpmin_0.973|ho_pass_9/9",
+   "rev_note": "K2 death line NOT triggered: shared-entity balanced panel ANOVA [E|C|T|ExC|ExT|CxT|ECT] at KOUT gives interaction share 15.2/18.3/16.4% (mean 16.6%, gate 50%) -> phi_l(c) ~ W_l separable at readout, conditional-gate structure kept; E main effect 35.9-45.8% >> C 10.8-14.5% >> ExC; bidirectional ablation: entity ridge readout cross-relation 0.956-0.965 vs within 0.981-0.995 (retention ~0.97), relation readout cross-entity 0.99-1.00 = within -> entity geometry relation-invariant; held-out relation generalization (2 train -> 3rd predict, additive phi-diff transfer on 12 calibration + 12 test entities, template-averaged pivot): err ratio 0.502-0.889 all <= 1.5 gate, 9/9 folds; KOUT fingerprint 0.9729/0.9955/0.9892 (gate 0.8, 3/3), KSTAR unstable 0.24-0.91 (shallow shares tiny, verdict layer = KOUT); subspace: entity-subspace cross-family top1 0.722-0.848, within-family entity scatter vs relation dir sv_max 0.557-0.665 (partial overlap = geometry source of 16% interaction); honesty: interaction nonzero (approximate gate), argmax layer model-specific k18/k39/k5, template confounded with length, within = leave-one-template-out; panel 24 shared entities (is-a/has-a/made-of all natural) + 16 extra/family + 6 ho/family x 3 templates = 414 rows; determinism bitwise x3; per-model res/seal: 4b 02feec80/8db0d314, 14b d880f675/8cdce6be, glm4 d21fd3a0/1e886c01, summary 14975aed/5d2c2061 | npz bc24f615/bc9e3297/6dd3c77f; exec cfe036fc/63f23dac/052f40ff/0c5f619b | disk sha8: 4b 71402337, 14b a2dcc492, glm4 46fa42d0, summary 46a5034d",
+   "created": "2026-10-08 02:29:06"
   }
  ],
  "growth_curve": [
@@ -8011,6 +8025,6 @@
    "note": "deepseek/N line backfill round 8 (continues Phase 8-14 backfills): appended Phase 15 (N2h1-alpha-8), the first three-arm cross-model phase of this line, executed under a unified nf4 convention because the host cannot hold bf16 qwen3-14b. ledger_sha256_8 remains NOT recomputed (recipe unknown; stale since Phase 8) => use per-file sha8 in this entry instead. pre-append file sha8 950d82a0."
   }
  ],
- "ledger_sha256_8": "d2862444",
+ "ledger_sha256_8": "dc32ce6e",
  "schema_version": 3
 }

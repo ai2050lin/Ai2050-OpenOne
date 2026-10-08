@@ -1,12 +1,15 @@
-/* 过程透镜 v2：AI 自动研发工作台
-   参考旧版 LoopEngineeringWorkspace：主研发模型 + 多个独立分析模型、
-   五证据门循环（缺口→契约→执行→复核→回写）、SSE 实时事件流、自动/手动执行。
-   后端：:5001 /api/ai-rnd/*（server/ai_rnd_service.py，真实可用）；
-   离线时表单仍可编辑，状态条显示「后端离线」，不阻塞页面。
-   demo 部分（任务队列/代码节选/结果卡）为真实研究数值，接入点见各注释。 */
+/* 过程透镜 v3：AI 自动研发工作台（M3-P1 内容层协议化，design/ui_decoupled_plan_v2.md §2）
+   ─────────────────────────────────────────────────────────────
+   流程骨架不变（与「测什么」无关）：五证据门 + AI 模型配置 + 目标 composer + SSE 实时事件。
+   内容层 = 三个数据插槽，LIVE/DEMO 双模，只认数据键（/api/ai-rnd/queue、/workspace、
+   /api/templates、/api/results 的 schema）；demo 内容全部在 demoData.js。
+   红线（v2 §0）：本文件不出现任何具体实验字面量（Q05/F#3734/collect_ar.py 等）。 */
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { DEMO_QUEUE, DEMO_WORKSPACE, DEMO_ARTIFACTS, DEMO_TERMINAL } from './demoData.js';
+import { TEMPLATES, DEMO_RESULTS } from './distributedData.js';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
+const DEFAULT_WS_PATH = 'tests/deepseek';   // 工作区默认根（顶栏特征源选择器未来接管）
 
 const GATES=[
   {id:'gap',label:'证据缺口',phases:['analyze']},
@@ -28,28 +31,26 @@ const EMPTY_MASTER={name:'主研发模型',model_type:'master',api_type:'openai'
 const EMPTY_ANALYST={name:'独立分析模型',model_type:'analyst',api_type:'openai',api_base:'https://api.openai.com/v1',api_key:'',model_id:'gpt-5-mini',analysis_prompt:'',planning_prompt:'',code_gen_prompt:'',summary_prompt:''};
 const DEFAULT_FORM={project_goal:'',max_loops:3,execution_mode:'auto',stop_on_accepted:true,stop_on_rejected:true,max_consecutive_inconclusive:3};
 
-/* 任务队列（demo 接入点 ← phase_queue.json：Q03–Q06 已 seal，Q07 next） */
-const QUEUE=[
-  {id:'Q07',name:'KPI 曲线 v0 汇总',pill:'NEXT',cls:'fw-pill-next',on:true},
-  {id:'Q06',name:'C_steer 基座',pill:'SEALED',cls:'fw-pill-done'},
-  {id:'Q05',name:'E_ar(k) 测量',pill:'SEALED',cls:'fw-pill-done'},
-  {id:'Q04',name:'E_ar 装置',pill:'SEALED',cls:'fw-pill-done'},
-  {id:'Q03',name:'E_read 基线',pill:'SEALED',cls:'fw-pill-done'},
-];
-const TERM_LINES=[
-  [['$ ','dim'],['python q05_ar_sweep/collect_ar.py --all-arms --K 16','']],
-  [['[Q05] ','g'],['D4 bridge max|Δrel| = 0.0489 ',''],['<',''],[' 0.05 ',''],['PASS','g']],
-  [['[Q05] ','g'],['shape 4b=',''],['flat','y'],[' · 14B=',''],['saturating','y'],[' · 9B=',''],['flat','y']],
-  [['[Q06] ','g'],['C_steer_main = 0.0000 · 95%CI ≤ 1.0% · collateral clean 93.3%','']],
-  [['[review] ','g'],['independent TOTAL PASS=47 FAIL=0 → sealed ',''],['1acb1e78','dim']],
-  [['$ ','dim'],['_','']],
-];
-
-function gateId(phase,status){
-  if(!phase) return status==='stopped'?'writeback':'gap';
-  const g=GATES.find(x=>x.phases.includes(phase));
-  return g?g.id:'gap';
+/* ── 数据键 → 展示的纯函数（live/demo 共用，零内容分支） ── */
+function nextIdOf(items){ const p=(items||[]).find(x=>x.status==='pending'); return p?p.id:null; }
+function lastSealed(items){ const q=items||[]; for(let i=q.length-1;i>=0;i--) if(q[i].status==='sealed') return q[i]; return null; }
+function queueRows(items,n){ // 队列侧栏排序：待办优先，sealed 殿后（数据驱动，无内容分支）
+  const rank=x=>x.status==='pending'?0:(x.status==='device_built'?1:2);
+  return [...items].sort((a,b)=>(rank(a)-rank(b))||((a.q||0)-(b.q||0))).slice(0,n);
 }
+function evidenceChain(items,sealed,count){
+  const last=lastSealed(items), nx=nextIdOf(items);
+  return [
+    `队列 sealed ${sealed}/${count}`,
+    last?`最近 seal ${last.id}${last.res_sha8?' · '+last.res_sha8:''}`:'',
+    nx?`next ${nx} · ${nx===((items||[]).find(x=>x.id===nx)||{}).title||''}`:'',
+  ].filter(Boolean);
+}
+function demoDistRows(){ // 分布式队列 demo 回退（数据源自 distributedData）
+  const cnt={}; DEMO_RESULTS.forEach(r=>{cnt[r.tm_id]=(cnt[r.tm_id]||0)+1;});
+  return TEMPLATES.map(t=>({tm_id:t.id,name:t.name,dim:t.dim,results:cnt[t.id]||0}));
+}
+function fmtSize(n){ return n>1048576?(n/1048576).toFixed(1)+' MB':(n/1024).toFixed(1)+' KB'; }
 function fmtTime(v){
   if(!v) return '—';
   const d=new Date(v);
@@ -104,6 +105,17 @@ function ModelFields({model,onChange,onRemove,master}){
   );
 }
 
+/* ── 通用 kv 渲染（选中项详情：有什么键渲染什么键） ── */
+function KVList({pairs}){
+  return (
+    <div className="fw-m3-kv">
+      {pairs.filter(p=>p[1]!==undefined&&p[1]!==null&&p[1]!=='').map(([k,v,mono])=>(
+        <div key={k} className="fw-m3-kvline"><i>{k}</i><b className={mono?'fw-mono':''}>{String(v)}</b></div>
+      ))}
+    </div>
+  );
+}
+
 export default function LensProcess({on,onGo}){
   const [config,setConfig]=useState({master_model:EMPTY_MASTER,analyst_models:[{...EMPTY_ANALYST}]});
   const [form,setForm]=useState(DEFAULT_FORM);
@@ -117,6 +129,17 @@ export default function LensProcess({on,onGo}){
   const [err,setErr]=useState('');
   const eid=useRef(0);
 
+  /* ── M3-P1 内容层状态 ── */
+  const [rnd,setRnd]=useState(null);            // /api/ai-rnd/queue 原样
+  const [dist,setDist]=useState(null);          // [{tm_id,name,dim,results}]
+  const [qTab,setQTab]=useState('rnd');
+  const [qSel,setQSel]=useState(null);          // {src:'rnd'|'dist', item}
+  const [ws,setWs]=useState(null);              // /workspace 原样
+  const [wsLive,setWsLive]=useState(false);
+  const [wsPath,setWsPath]=useState(DEFAULT_WS_PATH);
+  const [wsErr,setWsErr]=useState('');
+  const [art,setArt]=useState(null);            // {type,label,loading,err,item,rows,file}
+
   const api=useCallback(async(path,opts)=>{
     let r;
     try{ r=await fetch(`${API_BASE}/api/ai-rnd${path}`,opts); }
@@ -125,6 +148,37 @@ export default function LensProcess({on,onGo}){
     if(!r.ok) throw new Error(p.detail||('HTTP '+r.status));
     return p;
   },[]);
+
+  /* 内容层：队列 + 分布式模板 + 工作区（失败一律静默降级 DEMO） */
+  const loadWs=useCallback(async(p)=>{
+    setWsErr('');
+    try{
+      const r=await fetch(`${API_BASE}/api/ai-rnd/workspace?path=${encodeURIComponent(p)}`);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const payload=await r.json();
+      setWs(payload); setWsLive(true); setWsPath(payload.path||p);
+    }catch{ setWs(null); setWsLive(false); setWsPath(p); }
+  },[]);
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const r=await fetch(`${API_BASE}/api/ai-rnd/queue`);
+        const p=r.ok?await r.json():null;
+        setRnd(p&&Array.isArray(p.queue)&&p.queue.length?p:null);
+      }catch{ setRnd(null); }
+      try{
+        const [tp,rs]=await Promise.all([
+          fetch(`${API_BASE}/api/templates`).then(x=>x.ok?x.json():null).catch(()=>null),
+          fetch(`${API_BASE}/api/results?limit=200`).then(x=>x.ok?x.json():null).catch(()=>null),
+        ]);
+        if(tp&&Array.isArray(tp.templates)){
+          const cnt={}; ((rs&&rs.results)||[]).forEach(x=>{cnt[x.tm_id]=(cnt[x.tm_id]||0)+1;});
+          setDist(tp.templates.map(t=>({tm_id:t.tm_id||t.id,name:t.name,dim:t.dim,version:t.version,results:cnt[t.tm_id||t.id]||0})));
+        }else setDist(null);
+      }catch{ setDist(null); }
+      loadWs(DEFAULT_WS_PATH);
+    })();
+  },[]); // eslint-disable-line
 
   const load=useCallback(async(quiet)=>{
     try{
@@ -178,7 +232,7 @@ export default function LensProcess({on,onGo}){
         await api('/project-agent/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_goal:form.project_goal.trim(),max_tasks:Number(form.max_loops)||3})});
       }else if(type==='start'){
         await api('/project-agent/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,project_goal:form.project_goal.trim(),max_loops:Number(form.max_loops)||3})});
-        setTab(3);
+        setTab(1);
       }else if(type==='stop'){
         await api('/project-agent/stop',{method:'POST'});
       }
@@ -209,16 +263,77 @@ export default function LensProcess({on,onGo}){
     setSaving(false);
   };
 
+  /* ── 内容层派生（live → demo 回退，渲染共用） ── */
+  const rndLive=Boolean(rnd);
+  const distLive=Boolean(dist);
+  const rndItems=rndLive?rnd.queue:DEMO_QUEUE.queue;
+  const rndSealed=rndLive?rnd.sealed:DEMO_QUEUE.sealed;
+  const rndCount=rndLive?rnd.count:DEMO_QUEUE.count;
+  const distRows=distLive?dist:demoDistRows();
+  const rndNext=nextIdOf(rndItems);
+  const rndSorted=queueRows(rndItems,8);
+  const distSorted=[...distRows].sort((a,b)=>(b.results||0)-(a.results||0)).slice(0,8);
+  const wsView=wsLive?ws:DEMO_WORKSPACE;
+  const chain=evidenceChain(rndItems,rndSealed,rndCount);
+
+  /* 默认选中：研发线最高优先待办（无则首条）；渲染与 live/demo 共用 */
+  useEffect(()=>{
+    if(qSel) return;
+    const it=rndItems.find(x=>x.status==='pending')||rndItems[0];
+    if(it) setQSel({src:'rnd',item:it});
+  },[rndItems]); // eslint-disable-line
+
+  /* 选中动作：队列条目 / 工作区文件 / 分布式结果明细 */
+  const selectRnd=(item)=>{ setQSel({src:'rnd',item}); setArt({type:'queue',label:item.id+' · '+item.title,item}); setTab(0); };
+  const selectDist=(row)=>{
+    setQSel({src:'dist',item:row});
+    setArt({type:'dist',label:row.tm_id+' · '+(row.name||''),loading:true,row});
+    setTab(0);
+    (async()=>{
+      try{
+        const r=await fetch(`${API_BASE}/api/results?tm_id=${encodeURIComponent(row.tm_id)}&limit=20`);
+        const p=r.ok?await r.json():null;
+        setArt(a=>(a&&a.type==='dist'&&a.row.tm_id===row.tm_id)?{...a,loading:false,rows:(p&&p.results)||[]}:a);
+      }catch{ setArt(a=>(a&&a.type==='dist')?{...a,loading:false,err:'结果列表拉取失败'}:a); }
+    })();
+  };
+  const openFile=async(f)=>{
+    if(f.demo){
+      const d=DEMO_ARTIFACTS[f.demo];
+      setArt(d?{type:'file',label:f.name+'（demo）',file:{name:f.name,content:d.text}}:{type:'file',label:f.name,err:'demo 工件缺失'});
+      setTab(0); return;
+    }
+    setArt({type:'file',label:f.name,loading:true}); setTab(0);
+    try{
+      const r=await fetch(`${API_BASE}/api/ai-rnd/workspace/file?path=${encodeURIComponent(f.path)}`);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const p=await r.json();
+      setArt(a=>(a&&a.type==='file')?{...a,loading:false,file:p}:a);
+    }catch(e){ setArt(a=>(a&&a.type==='file')?{...a,loading:false,err:'文件读取失败（'+e.message+'）'}:a); }
+  };
+  const wsUp=()=>{
+    const parts=wsView.path.split('/').filter(Boolean);
+    if(parts.length>1){ const up=parts.slice(0,-1).join('/'); if(loadWs) loadWs(up); }
+  };
+
   const active=Boolean(agent&&agent.enabled);
   const running=status.status==='running';
   const masterReady=Boolean(config.master_model.api_key&&config.master_model.api_key.trim());
   const analystReady=config.analyst_models.filter(m=>m.api_key&&m.api_key.trim()).length;
   const ready=masterReady&&analystReady>0;
   const activeGate=GATES.findIndex(g=>g.id===gateId(status.current_phase,status.status));
+  const tabs=art?[{k:'art',label:art.label},{k:'events',label:'实时事件'}]:[{k:'events',label:'实时事件'}];
+  const tabIdx=Math.min(tab,tabs.length-1);
+
+  function gateId(phase,st){
+    if(!phase) return st==='stopped'?'writeback':'gap';
+    const g=GATES.find(x=>x.phases.includes(phase));
+    return g?g.id:'gap';
+  }
 
   return (
     <section className={'fw-view fw-process'+(on?' on':'')}>
-      {/* ===== 左栏：AI 模型配置 + 任务队列 ===== */}
+      {/* ===== 左栏：AI 模型配置 + 任务队列 + 工作区 ===== */}
       <div className="fw-pr-left">
         <div className="fw-pr-sec">AI 模型 {offline?<span className="fw-ai-off">后端离线</span>:<span className={'fw-ai-dot'+(ready?' ok':'')} title={ready?'已就绪（主模型+分析模型均配 Key）':'配置主模型与至少一个分析模型的 API Key'}/>}</div>
         <details className="fw-ai-card">
@@ -236,25 +351,51 @@ export default function LensProcess({on,onGo}){
         <button type="button" className="fw-ai-add" onClick={()=>setConfig({...config,analyst_models:[...config.analyst_models,{...EMPTY_ANALYST,name:'独立分析模型 '+(config.analyst_models.length+1)}]})}>＋ 添加分析模型</button>
         <button type="button" className="fw-ai-save" disabled={saving||offline} onClick={saveConfig}>{saving?'保存中…':'保存模型与提示词'}</button>
 
-        <div className="fw-pr-sec">任务队列</div>
-        {QUEUE.map(q=>(
-          <button key={q.id} type="button" className={'fw-q-row'+(q.on?' on':'')} onClick={()=>window.alert(q.id+' '+q.name+'：'+q.pill+'（详情接入 phase_queue.json 后开放）')}>
-            <span className="id">{q.id}</span>{q.name}<span className={'fw-pill '+q.cls}>{q.pill}</span>
+        <div className="fw-pr-sec">
+          任务队列
+          <span className="fw-m3-qtabs">
+            <button type="button" className={'fw-m3-qtab'+(qTab==='rnd'?' on':'')} onClick={()=>setQTab('rnd')}>研发线</button>
+            <button type="button" className={'fw-m3-qtab'+(qTab==='dist'?' on':'')} onClick={()=>setQTab('dist')}>分布式</button>
+            <span className={'fw-src-chip mini '+(qTab==='rnd'?(rndLive?'live':'demo'):(distLive?'live':'demo'))}>{qTab==='rnd'?(rndLive?'LIVE':'DEMO'):(distLive?'LIVE':'DEMO')}</span>
+          </span>
+        </div>
+        {qTab==='rnd'&&rndSorted.map(it=>{
+          const [pl,cls]=it.status==='pending'?[(it.id===rndNext?'NEXT':'QUEUED'),(it.id===rndNext?'fw-pill-next':'')]:it.status==='sealed'?['SEALED','fw-pill-done']:['BUILT','fw-pill-run'];
+          return (
+            <button key={it.id} type="button" className={'fw-q-row'+(it.id===rndNext?' on':'')}
+                    onClick={()=>selectRnd(it)} title={it.deliverable||it.note||''}>
+              <span className="id">{it.id}</span>{it.title}<span className={'fw-pill '+cls}>{pl}</span>
+            </button>
+          );
+        })}
+        {qTab==='rnd'&&<div className="fw-m3-more">共 {rndCount} 条 · sealed {rndSealed}（{rndLive?'phase_queue_v1':'demo'}）</div>}
+        {qTab==='dist'&&distSorted.map(row=>(
+          <button key={row.tm_id} type="button" className={'fw-q-row'+((row.results||0)>0?' has':'')} onClick={()=>selectDist(row)} title={row.name||''}>
+            <span className="id">{row.tm_id}</span>{row.name||row.dim}<span className={'fw-pill '+((row.results||0)>0?'fw-pill-run':'')}>{(row.results||0)>0?(row.results+' 结果'):'待测'}</span>
           </button>
         ))}
-        <div className="fw-pr-sec">工作区 tests/deepseek/</div>
-        <span className="fw-file dir">▾ q05_ar_sweep/</span>
-        <span className="fw-file">collect_ar.py</span>
-        <span className="fw-file">metric_dict_v4.json</span>
-        <span className="fw-file">review_report.txt</span>
-        <span className="fw-file dir">▸ q06_c_steer/</span>
-        <span className="fw-file dir">▸ shared/</span>
+        {qTab==='dist'&&<div className="fw-m3-more">共 {distRows.length} 模板（{distLive?'中心节点结果库':'demo'}）</div>}
+
+        <div className="fw-pr-sec">
+          工作区 {wsView.path&&<span className="fw-m3-wspath fw-mono" title={wsView.path}>/{wsView.path.split('/').pop()}</span>}
+          <span className={'fw-src-chip mini '+(wsLive?'live':'demo')}>{wsLive?'LIVE':'DEMO'}</span>
+        </div>
+        <button type="button" className="fw-file up" disabled={!wsLive} onClick={wsUp} title={wsLive?'上级目录':'demo 模式不可导航'}>◂ 上级</button>
+        {wsErr&&<div className="fw-ai-err">{wsErr}</div>}
+        {(wsView.dirs||[]).map(d=>(
+          <button key={d.path} type="button" className="fw-file dir" onClick={()=>{ if(wsLive) loadWs(d.path); }} title={d.path}>▸ {d.name}/</button>
+        ))}
+        {(wsView.files||[]).map(f=>(
+          <button key={f.path} type="button" className="fw-file" onClick={()=>openFile(f)} title={f.path+(f.size?(' · '+fmtSize(f.size)): '')}>{f.name}</button>
+        ))}
+        {wsView.truncated&&<div className="fw-m3-more">文件过多已截断（API limit）</div>}
+
         <div className="fw-pr-sec">运行配置</div>
         <div className="fw-q-row" style={{cursor:'default'}}><span className="id" style={{width:'auto'}}>4b bf16 · 14B/9B NF4</span></div>
         <div className="fw-q-row" style={{cursor:'default'}}><span className="id" style={{width:'auto'}}>drift 断言 · 预注册冻结</span></div>
       </div>
 
-      {/* ===== 中栏：目标 composer + 证据门 + 代码/事件 ===== */}
+      {/* ===== 中栏：目标 composer + 证据门 + 工件/事件 ===== */}
       <div className="fw-pr-mid">
         <div className="fw-ai-composer">
           <textarea rows={2} value={form.project_goal} disabled={active}
@@ -293,46 +434,53 @@ export default function LensProcess({on,onGo}){
         </div>
 
         <div className="fw-ed-tabs">
-          {['collect_ar.py','result.json','review_report.txt','实时事件'].map((t,i)=>(
-            <button key={t} type="button" className={'fw-ed-tab'+(tab===i?' on':'')} onClick={()=>setTab(i)}>{t}</button>
+          {tabs.map((t,i)=>(
+            <button key={t.k} type="button" className={'fw-ed-tab'+(tabIdx===i?' on':'')} onClick={()=>setTab(i)}>{t.label}</button>
           ))}
         </div>
         <div className="fw-ed-body">
-          {tab===0&&(
-            <pre style={{margin:0,font:'inherit'}}>
-<span className="cm"># Q05 · E_ar(k) 正式测量 — 四臂 738×K16（节选）</span>{'\n'}
-<span className="kw">def</span> <span className="fn">sweep_ar</span>(model, K=<span className="num">16</span>, arms=(<span className="st">&quot;is_a&quot;</span>, <span className="st">&quot;attr&quot;</span>, <span className="st">&quot;syntax&quot;</span>, <span className="st">&quot;rand&quot;</span>)):{'\n'}
-{'    '}share = <span className="fn">exact_additive_budget</span>(model){'          '}<span className="cm"># 铁律 (a) 精确可加向量预算</span>{'\n'}
-{'    '}<span className="kw">for</span> arm <span className="kw">in</span> arms:{'\n'}
-{'        '}E = [share.<span className="fn">write</span>(arm, k=k) <span className="kw">for</span> k <span className="kw">in</span> <span className="fn">range</span>(<span className="num">1</span>, K+<span className="num">1</span>)]{'\n'}
-{'        '}rel = (E[<span className="num">0</span>] - E) / E[<span className="num">0</span>]{'                  '}<span className="cm"># S_rel 归一化</span>{'\n'}
-{'        '}<span className="kw">yield</span> arm, rel{'\n'}
-{'\n'}
-<span className="cm"># D4 桥（4b bf16 ↔ 4-bit NF4 口径桥）</span>{'\n'}
-<span className="kw">assert</span> <span className="fn">max</span>(<span className="fn">abs</span>(rel_bf16 - rel_nf4)) &lt; <span className="num">0.05</span>{'   '}<span className="cm"># PASS: 0.0489</span>
-            </pre>
+          {tabIdx===0&&art&&(
+            <div className="fw-m3-art">
+              {art.loading&&<div className="fw-pc-empty">拉取工件…</div>}
+              {art.err&&<div className="fw-ai-err">{art.err}</div>}
+              {art.type==='file'&&art.file&&(
+                <pre className="fw-m3-pre">{art.file.content}</pre>
+              )}
+              {art.type==='queue'&&art.item&&(
+                <KVList pairs={[
+                  ['ID',art.item.id,true],['标题',art.item.title],['状态',art.item.status,true],
+                  ['块',art.item.block],['KPI',art.item.kpi,true],['GPU',art.item.gpu],
+                  ['交付物',art.item.deliverable],['seal 记录',art.item.seal_record,true],
+                  ['结果 SHA8',art.item.res_sha8,true],['预注册 design_sha',art.item.prereg_design_sha,true],
+                  ['注记',art.item.note],
+                ]}/>
+              )}
+              {art.type==='dist'&&(
+                <div className="fw-m3-dist">
+                  <KVList pairs={[['模板',art.row.tm_id,true],['名称',art.row.name],['维度',art.row.dim],['结果数',art.row.results]]}/>
+                  {!art.loading&&Array.isArray(art.rows)&&art.rows.length>0&&(
+                    <div className="fw-m3-drows">
+                      <div className="fw-pl-row head"><span>结果</span><span>模型 / 节点</span><span>状态</span><span className="r">摘要</span></div>
+                      {art.rows.map(r=>{
+                        const dg=r.summary_digest||{};
+                        const brief=dg.eta2_by_factor?('η² '+Object.entries(dg.eta2_by_factor).filter(([,v])=>typeof v==='number').map(([k,v])=>`${k} ${v.toFixed(3)}`).join('/')):(dg.status||'—');
+                        return (
+                          <div key={r.sha} className="fw-pl-row">
+                            <span className="fw-mono" title={r.sha}>{r.sha.slice(0,10)}…</span>
+                            <span className="dim2">{r.model_id||'—'} · {r.node_id}</span>
+                            <span><span className={'fw-pill '+(r.kind==='real'?'fw-pill-run':'fw-pill-done')}>{r.kind}</span></span>
+                            <span className="r dim2">{brief}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {!art.loading&&(!art.rows||!art.rows.length)&&<div className="fw-pc-empty">该模板暂无已上传结果（节点领取执行后自动出现）。</div>}
+                </div>
+              )}
+            </div>
           )}
-          {tab===1&&(
-            <pre style={{margin:0,font:'inherit'}}>
-{'{'}{'\n'}
-{'  '}&quot;phase&quot;: <span className="st">&quot;Q05&quot;</span>, <span className="st">&quot;status&quot;</span>: <span className="st">&quot;measured&quot;</span>,{'\n'}
-{'  '}&quot;d4_bridge_max_delta_rel&quot;: <span className="num">0.0489</span>,{'\n'}
-{'  '}&quot;shape&quot;: {'{'}<span className="st">&quot;4b&quot;</span>: <span className="st">&quot;flat&quot;</span>, <span className="st">&quot;14b&quot;</span>: <span className="st">&quot;saturating&quot;</span>, <span className="st">&quot;9b&quot;</span>: <span className="st">&quot;flat&quot;</span>{'}'},{'\n'}
-{'  '}&quot;s_rel_min&quot;: [<span className="num">0.6858</span>, <span className="num">0.6939</span>, <span className="num">0.7392</span>],{'\n'}
-{'  '}&quot;sealed_sha&quot;: <span className="st">&quot;1acb1e78&quot;</span>,{'\n'}
-{'  '}&quot;review&quot;: {'{'}<span className="st">&quot;pass&quot;</span>: <span className="num">47</span>, <span className="st">&quot;fail&quot;</span>: <span className="num">0</span>{'}'}{'\n'}
-{'}'}
-            </pre>
-          )}
-          {tab===2&&(
-            <pre style={{margin:0,font:'inherit',whiteSpace:'pre-wrap'}}>
-<span className="cm"># 独立复核结论（节选）</span>{'\n'}
-装置门 4/4 通过；份额全程使用精确可加向量预算；{'\n'}
-冻结锚逐位复现（drift 0.00e+00）；D4 桥在预注册门内。{'\n'}
-未支持结论：k→∞ 外推、跨层迁移、权重级因果证明。
-            </pre>
-          )}
-          {tab===3&&(
+          {tabIdx===tabs.length-1&&(
             <div className="fw-ai-events">
               {offline&&<div className="fw-ai-empty">后端 :5001 离线——启动 server.py 后，此处接入 /api/ai-rnd/session/events 实时事件流。</div>}
               {!offline&&!events.length&&<div className="fw-ai-empty">启动研发后，结构化事件（目标 / 计划 / 代码生成 / 执行 / 复核 / 回写）将在此实时滚动。</div>}
@@ -348,40 +496,37 @@ export default function LensProcess({on,onGo}){
           )}
         </div>
         <div className="fw-term">
-          {TERM_LINES.map((line,i)=>(
-            <div key={i}>{line.map(([txt,cls],j)=><span key={j} className={cls||''}>{txt}</span>)}</div>
+          {(events.length?events.slice(-14).reverse().map(ev=>`[${ev.type||'event'}] ${eventText(ev)}`):DEMO_TERMINAL).map((line,i)=>(
+            <div key={i} className={events.length?'fw-m3-tl':''}>{line}</div>
           ))}
         </div>
       </div>
 
-      {/* ===== 右栏：结果卡 + 跨透镜动作 + 证据链 ===== */}
+      {/* ===== 右栏：选中概览 + 证据链 + 跨透镜动作（全部数据驱动） ===== */}
       <div className="fw-pr-right">
         <div className="fw-res-card">
-          <h5>E_ar(k) 消融曲线 <span className="fw-pill fw-pill-run" style={{background:'#d1fae5'}}>v4 口径</span></h5>
-          <svg viewBox="0 0 260 110" style={{width:'100%',display:'block'}}>
-            <line x1="30" y1="95" x2="250" y2="95" stroke="#e2e8f0"/>
-            <line x1="30" y1="95" x2="30" y2="8" stroke="#e2e8f0"/>
-            <text x="10" y="20" fontSize="8" fill="#94a3b8">S_rel</text>
-            <text x="225" y="107" fontSize="8" fill="#94a3b8">k</text>
-            <path d="M30 28 L60 29 L90 30 L120 31 L150 32 L180 33 L210 34 L240 35" fill="none" stroke="#0284c7" strokeWidth="2"/>
-            <path d="M30 28 L62 36 L94 48 L126 60 L158 71 L190 81 L222 88 L240 90" fill="none" stroke="#6366f1" strokeWidth="2" strokeDasharray="4 3"/>
-            <path d="M30 24 L60 25 L90 26 L120 27 L150 28 L180 29 L210 30 L240 31" fill="none" stroke="#10b981" strokeWidth="2"/>
-            <text x="150" y="24" fontSize="8.5" fill="#0284c7">4b flat</text>
-            <text x="150" y="56" fontSize="8.5" fill="#6366f1">14B saturating</text>
-            <text x="150" y="45" fontSize="8.5" fill="#059669">9B flat</text>
-          </svg>
-          <div className="meta">形状 <b>4b flat / 14B saturating / 9B flat</b><br/>含义：4b 中 is-a 关系沿 k <b>无递减</b> → 关系非碎片化存储</div>
+          <h5>选中概览 <span className={'fw-src-chip mini '+(rndLive?'live':'demo')}>{rndLive?'LIVE':'DEMO'}</span></h5>
+          {qSel&&qSel.src==='rnd'&&(
+            <KVList pairs={[
+              ['ID',qSel.item.id,true],['标题',qSel.item.title],['状态',qSel.item.status],
+              ['KPI',qSel.item.kpi,true],['交付物',qSel.item.deliverable],
+              ['seal 记录',qSel.item.seal_record,true],['结果 SHA8',qSel.item.res_sha8,true],
+            ]}/>
+          )}
+          {qSel&&qSel.src==='dist'&&(
+            <KVList pairs={[['模板',qSel.item.tm_id,true],['名称',qSel.item.name],['维度',qSel.item.dim],['结果数',qSel.item.results]]}/>
+          )}
+        </div>
+        <div className="fw-res-card">
+          <h5>证据链</h5>
+          <div className="meta">{chain.map((l,i)=><span key={i}>{l}<br/></span>)}</div>
         </div>
         <div className="fw-res-card">
           <h5>跨透镜动作</h5>
           <div className="fw-xact">
             <button className="fw-tbtn" onClick={()=>onGo('spatial')}>在 3D 中查看</button>
-            <button className="fw-tbtn" onClick={()=>onGo('progress')}>登记到路线图</button>
+            <button className="fw-tbtn" onClick={()=>onGo('data')}>到数据透镜看结果</button>
           </div>
-        </div>
-        <div className="fw-res-card">
-          <h5>证据链</h5>
-          <div className="meta">Q03 E_read <b>0.331615</b>（4b 基线）<br/>Q04 装置 <b>device_built</b> → Q05 <b>measured</b><br/>Q06 C_steer <b>0.0000</b>（无定向杠杆）<br/>队列 sealed <b>1acb1e78</b> · 复核 47/0</div>
         </div>
       </div>
     </section>

@@ -1,0 +1,32 @@
+{
+  "schema": "object_registry_v1",
+  "note": "对象卡注册表（协议第五件数据源，design/ui_decoupled_plan_v2.md §3）。新对象=追加一条，界面零改动。数值来源见各 note；激活示例 ← collect.npz（F#3734 top 激活 token，值→透明度）。",
+  "objects": [
+    {
+      "id": "F#3734",
+      "label": "is-a 上位关系：水果族",
+      "layer": "L6 · write 端",
+      "evidence": "mechanism_evidence",
+      "collection": "6-l6-teal",
+      "metrics": [
+        { "k": "E_read", "v": 0.331615, "note": "4b 基线 · Q03 sealed（metric_dict v4）" },
+        { "k": "share_max", "v": 0.03, "note": "单头份额 3.0% 内（P4–P7）" },
+        { "k": "读位槽 G−1", "v": 5, "note": "维（P4–P7）" }
+      ],
+      "activations": [
+        { "dfa": false, "toks": [["苹果", 0], ["是", 0], ["一种", 0], ["水果", 0.95], ["，", 0], ["富含", 0.45], ["维生素", 0]] },
+        { "dfa": false, "toks": [["香蕉", 0], ["、", 0], ["菠萝", 0], ["、", 0], ["芒果", 0], ["都", 0], ["属于", 0], ["水果", 0.95]] },
+        { "dfa": false, "toks": [["The", 0], ["crinoletta", 0], ["is", 0], ["a", 0], ["hybrid", 0.55], ["apple", 0.75], ["variety", 0.35]] },
+        { "dfa": true, "toks": [["我", 0], ["买了", 0], ["一台", 0], ["苹果", 0.12], ["笔记本", 0]], "note": "一词多义对照（弱激活）" }
+      ],
+      "links": [
+        { "lens": "spatial", "text": "水果族簇 · top-5 邻居在 0.31–0.44" },
+        { "lens": "process", "text": "Q05 四臂消融已覆盖 · Q06 steering 计划中" },
+        { "lens": "progress", "text": "支撑 Q05/Q06 节点 · 对标 Attribution Graphs" }
+      ],
+      "tm_ids": ["TM-04"],
+      "queue_refs": ["Q03", "Q05", "Q06"],
+      "source_note": "collect.npz · metric_dict v4 · phase_queue_v1"
+    }
+  ]
+}

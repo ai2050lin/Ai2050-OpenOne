@@ -378,7 +378,7 @@
 .fw-ai-ev p{margin:0;color:var(--fw-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fw-ai-empty{font-size:11px;color:var(--fw-text-3);padding:8px;line-height:1.7}
 
-/* ===== 研发透镜 v3：分布式平台三 tab（当前机器/平台进度/业界新闻） ===== */
+/* ===== 研发透镜 v3：分布式平台三 tab（当前机器/平台进度/行业进展） ===== */
 .fw-pt-tabs{grid-column:1/-1;display:flex;gap:4px;background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:4px;width:max-content;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-bottom:14px}
 .fw-pt-tab{border:0;background:transparent;font-family:inherit;font-size:12px;font-weight:600;line-height:1;color:var(--fw-text-2);padding:8px 16px 7px;border-radius:7px;cursor:pointer;text-align:left}
 .fw-pt-tab:hover{background:var(--fw-bg-panel)}
@@ -443,7 +443,7 @@
 .fw-agg-dim b{width:34px;color:var(--fw-text)}
 .fw-agg-dim p{margin:0;flex:1;color:var(--fw-text-2);font-size:10.5px}
 .fw-agg-dim em{font-style:normal;font-family:var(--fw-mono);font-size:9px;color:var(--fw-text-3)}
-/* 业界新闻 */
+/* 行业进展 */
 .fw-news-wrap{grid-column:1/-1;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto}
 .fw-news-head{font-size:12.5px;font-weight:700;color:var(--fw-text);padding:2px 2px 4px}
 .fw-news-head span{font:500 9.5px var(--fw-mono);color:var(--fw-text-3);margin-left:8px}
@@ -456,3 +456,161 @@
 .fw-news-meta{margin-left:auto;text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
 .fw-news-tag{font:600 9px var(--fw-mono);background:#e0f2fe;color:#0369a1;border-radius:4px;padding:2px 7px;width:max-content}
 .fw-news-src{font-size:10px;color:var(--fw-text-3)}
+
+/* ===== M1 分布式接线：LIVE/DEMO 数据源徽标（路线透镜三 tab） ===== */
+.fw-src-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:var(--fw-mono);border-radius:4px;padding:2px 7px;width:max-content}
+.fw-src-chip.live{color:#047857;background:#d1fae5;border:1px solid #6ee7b7}
+.fw-src-chip.demo{color:var(--fw-text-3);background:var(--fw-bg);border:1px solid var(--fw-border)}
+.fw-src-chip.mini{font-size:9px;padding:1px 6px;width:auto;flex-shrink:0}
+
+/* ===== M3（ui_decoupled_plan_v2）：内容层插槽 + 对象卡渲染器 ===== */
+.fw-crumb .obj{background:none;border:none;cursor:pointer;font:inherit;padding:0}
+.fw-crumb .obj:hover{text-decoration:underline}
+.fw-ev-obs{background:#e0e7ff;color:#3730a3}
+.fw-m3-qtabs{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
+.fw-m3-qtab{font-size:10px;padding:1px 8px;border-radius:99px;border:1px solid var(--fw-border);background:var(--fw-bg);color:var(--fw-text-3);cursor:pointer}
+.fw-m3-qtab.on{background:#eef2ff;border-color:#a5b4fc;color:#4338ca}
+.fw-m3-more{font-size:9.5px;color:var(--fw-text-3);padding:4px 2px;font-family:var(--fw-mono)}
+.fw-m3-wspath{font-size:10px;color:var(--fw-text-3);margin-left:6px}
+.fw-file.up{color:var(--fw-text-3);font-size:11px}
+.fw-file.up:disabled{opacity:.45;cursor:default}
+.fw-q-row.has .id{color:#047857}
+.fw-m3-kv{display:flex;flex-direction:column;gap:6px}
+.fw-m3-kvline{display:flex;gap:10px;font-size:11.5px;line-height:1.5;align-items:baseline}
+.fw-m3-kvline i{flex-shrink:0;width:88px;color:var(--fw-text-3);font-style:normal}
+.fw-m3-kvline b{font-weight:600;color:var(--fw-text-1);word-break:break-all}
+.fw-m3-art{min-height:0}
+.fw-m3-pre{margin:0;font:12px/1.55 var(--fw-mono);white-space:pre-wrap;word-break:break-all;color:var(--fw-text-1);background:var(--fw-bg);border:1px solid var(--fw-border);border-radius:8px;padding:12px 14px;max-height:340px;overflow:auto}
+.fw-m3-dist{display:flex;flex-direction:column;gap:10px}
+.fw-m3-drows{border:1px solid var(--fw-border);border-radius:8px;overflow:hidden}
+.fw-m3-drows .fw-pl-row{display:grid;grid-template-columns:110px 1fr 70px 1fr;gap:8px;padding:6px 10px;font-size:11px;border-bottom:1px solid var(--fw-border);align-items:center}
+.fw-m3-drows .fw-pl-row:last-child{border-bottom:none}
+.fw-m3-drows .fw-pl-row.head{background:var(--fw-bg);color:var(--fw-text-3);font-size:10px}
+.fw-m3-tl{color:var(--fw-text-2)}
+.fw-side-actions{margin-top:10px}
+
+/* ===== 协议驱动 UI 组件（design/ui_decoupled_plan_v1.md §2 五件；只认协议键） ===== */
+/* 2-1 TemplateCard（数据透镜筛选器 / 任意模板渲染） */
+.fw-pc-tcard{display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;width:100%;
+  border:1px solid var(--fw-border);border-radius:8px;padding:8px 10px;background:var(--fw-bg-sub);cursor:pointer}
+.fw-pc-tcard:hover{border-color:#93c5fd}
+.fw-pc-tcard.on{border-color:var(--fw-blue);background:#f0f9ff;box-shadow:0 0 0 1px var(--fw-blue)}
+.fw-pc-tcard.has{border-left:3px solid #10b981}
+.fw-pc-tcard.all{background:var(--fw-bg-panel)}
+.fw-pc-tid{font:700 10.5px var(--fw-mono);color:var(--fw-text);display:flex;gap:5px;align-items:baseline}
+.fw-pc-tid i{font:500 8.5px var(--fw-mono);color:var(--fw-text-3);font-style:normal}
+.fw-pc-tname{font-size:11px;color:var(--fw-text-2);line-height:1.35}
+.fw-pc-tmeta{display:flex;flex-wrap:wrap;gap:3px}
+.fw-pc-tmeta em{font:500 8.5px var(--fw-mono);font-style:normal;background:var(--fw-bg-panel);
+  border-radius:3px;padding:1px 5px;color:var(--fw-text-3)}
+.fw-pc-tmeta em.fp{background:#fef3c7;color:#92400e}
+.fw-pc-tfoot{display:flex;justify-content:space-between;width:100%;align-items:center;margin-top:2px}
+
+/* 数据透镜布局 */
+.fw-data-grid{display:grid;grid-template-columns:minmax(230px,3fr) minmax(380px,7fr);gap:12px;align-items:start}
+.fw-data-tpllist{display:flex;flex-direction:column;gap:6px;padding:10px;max-height:520px;overflow:auto}
+.fw-data-main{min-width:0}
+
+/* 2-2 FactorEta2View */
+.fw-pc-eta2{display:flex;flex-direction:column;gap:5px;padding:8px 0}
+.fw-pc-layers{display:flex;gap:4px;margin-bottom:2px}
+.fw-pc-lbtn{font:600 9px var(--fw-mono);border:1px solid var(--fw-border);background:var(--fw-bg);
+  border-radius:4px;padding:2px 8px;cursor:pointer;color:var(--fw-text-3)}
+.fw-pc-lbtn.on{border-color:var(--fw-blue);color:var(--fw-blue);background:#f0f9ff}
+.fw-pc-erow{display:grid;grid-template-columns:92px 1fr 44px;gap:8px;align-items:center}
+.fw-pc-ename{font-size:10.5px;color:var(--fw-text-2);display:flex;align-items:baseline;gap:4px;min-width:0}
+.fw-pc-ename i{font:500 8px var(--fw-mono);color:var(--fw-text-3);font-style:normal}
+.fw-pc-ebar{height:9px;border-radius:5px;background:var(--fw-bg-panel);overflow:hidden;display:block}
+.fw-pc-ebar i{display:block;height:100%;border-radius:5px;min-width:2px}
+.fw-pc-ev{text-align:right;color:var(--fw-text-2);font-size:10px}
+.fw-pc-enote{font-size:9px;color:var(--fw-text-3);margin-top:2px}
+
+/* 2-3 FingerprintBadge */
+.fw-pc-fp{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0}
+.fw-pc-fp-tag{font:600 9px var(--fw-mono);background:#fef3c7;color:#92400e;border-radius:4px;padding:2px 6px}
+.fw-pc-fp-cell{font-size:10px;color:var(--fw-text-2);background:var(--fw-bg-panel);border-radius:4px;padding:2px 7px}
+.fw-pc-fp-cell b{color:var(--fw-text)}
+
+/* 2-4 CellCosGrid */
+.fw-pc-coswrap{margin:6px 0;min-width:0}
+.fw-pc-cos{display:grid;gap:2px;font-size:9px}
+.fw-pc-cosh{font-family:var(--fw-mono);color:var(--fw-text-3);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font-size:8.5px;text-align:center}
+.fw-pc-cosh.l{text-align:right;padding-right:3px}
+.fw-pc-cosc{border-radius:3px;min-height:20px;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:8.5px}
+.fw-pc-cosnote{font-size:9px;color:var(--fw-text-3);margin-top:3px}
+
+/* 协议数值 chips */
+.fw-pc-chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:5px 0}
+.fw-pc-chips-t{font:600 9px var(--fw-mono);color:var(--fw-text-3);margin-right:2px}
+.fw-pc-chip{display:inline-flex;gap:4px;align-items:baseline;background:var(--fw-bg-panel);
+  border-radius:4px;padding:2px 7px;font-size:9.5px;max-width:100%}
+.fw-pc-chip i{font-style:normal;color:var(--fw-text-3);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;max-width:150px}
+.fw-pc-chip b{color:var(--fw-text)}
+
+/* 2-5 SummaryBrowser */
+.fw-pc-sb{min-width:0}
+.fw-pc-srow{display:grid;grid-template-columns:96px 64px 1fr 96px 110px;gap:8px;align-items:center;
+  width:100%;padding:7px 12px;font-size:11px;color:var(--fw-text-2);border:none;border-bottom:1px solid var(--fw-bg-panel);
+  background:none;cursor:pointer;text-align:left}
+.fw-pc-srow:hover{background:var(--fw-bg-panel)}
+.fw-pc-srow-wrap.open{background:#f8fafc}
+.fw-pc-srow-wrap.open .fw-pc-srow{border-left:2px solid var(--fw-blue)}
+.fw-pc-sdet{padding:4px 14px 12px;border-bottom:1px solid var(--fw-bg-panel)}
+.fw-pc-empty{padding:16px 12px;font-size:11px;color:var(--fw-text-3);text-align:center}
+.fw-pc-rd{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fw-pc-rd-meta{font-size:9.5px;color:var(--fw-text-3);margin-bottom:4px}
+.fw-pc-fnames{font-size:9.5px;color:var(--fw-text-3)}
+.fw-pc-fnames b{color:var(--fw-text-2)}
+.fw-pc-raw{margin-top:6px}
+.fw-pc-raw summary{font-size:10px;color:var(--fw-text-3);cursor:pointer}
+.fw-pc-raw pre{margin:6px 0 0;padding:8px;background:var(--fw-bg-sub);border-radius:6px;
+  font-size:9.5px;line-height:1.5;overflow:auto;max-height:260px;font-family:var(--fw-mono)}
+
+/* AGG 实时分桶卡（协议键渲染；桶=模型×kind×seed） */
+.fw-agg-tpl{padding:7px 12px;border-bottom:1px solid var(--fw-bg-panel)}
+.fw-agg-tpl:last-child{border-bottom:0}
+.fw-agg-tpl-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.fw-agg-tpl-h b{font-size:10.5px;color:var(--fw-text)}
+.fw-agg-bucket{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:2px 0}
+.fw-agg-bucket>b{color:var(--fw-blue)}
+
+/* ===== 行业进展 · 领域阶段时间轴（EraTimeline：五阶段 + 最右最新节点） ===== */
+.fw-era{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.fw-era-tl{display:flex;align-items:flex-start;position:relative;background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:14px 10px 10px}
+.fw-era-tl::before{content:'';position:absolute;top:22px;left:28px;right:28px;height:2px;background:var(--fw-border)}
+.fw-era-node{flex:1;min-width:0;position:relative;text-align:center;padding:0 2px;cursor:pointer;background:none;border:none}
+.fw-era-dot{display:block;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--fw-border-strong);margin:0 auto 8px;position:relative;z-index:1;transition:all .15s}
+.fw-era-node:hover .fw-era-dot{transform:scale(1.15)}
+.fw-era-node.sel .fw-era-dot{border-color:var(--fw-blue);background:var(--fw-blue);box-shadow:0 0 0 4px rgba(2,132,199,.15)}
+.fw-era-node .fw-era-years{display:block;font-family:var(--fw-mono);font-size:10px;color:var(--fw-text-2);font-weight:700}
+.fw-era-node .fw-era-name{display:block;font-size:10px;color:var(--fw-text-3);margin-top:2px;line-height:1.4}
+.fw-era-node.sel .fw-era-name{color:var(--fw-blue);font-weight:600}
+/* 最右「最新」实时节点：蓝绿描边 + 呼吸脉冲 */
+.fw-era-node.live{flex:0 0 96px}
+.fw-era-node.live .fw-era-dot{border-color:#0d9488;background:#ccfbf1;animation:fw-era-pulse 2.2s ease-in-out infinite}
+.fw-era-node.live .fw-era-years{color:#0f766e}
+.fw-era-node.live.sel .fw-era-dot{border-color:var(--fw-blue);background:var(--fw-blue)}
+.fw-era-node.live.sel .fw-era-years,.fw-era-node.live.sel .fw-era-name{color:var(--fw-blue)}
+@keyframes fw-era-pulse{0%,100%{box-shadow:0 0 0 0 rgba(13,148,136,.35)}50%{box-shadow:0 0 0 7px rgba(13,148,136,0)}}
+/* 详情面板：阶段说明 + 论文列表 */
+.fw-era-detail{background:#fff;border:1px solid var(--fw-border);border-radius:10px;padding:13px 16px}
+.fw-era-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.fw-era-hd b{font-size:12.5px;color:var(--fw-text)}
+.fw-era-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fw-era-block{background:var(--fw-bg-sub);border:1px solid var(--fw-border);border-radius:8px;padding:9px 12px}
+.fw-era-block h6{margin:0 0 4px;font-size:10px;color:var(--fw-blue);letter-spacing:.04em}
+.fw-era-block p{margin:0;font-size:11px;color:var(--fw-text-2);line-height:1.7}
+.fw-era-papers h6{margin:0 0 6px;font-size:10px;color:var(--fw-text-3);font-weight:700}
+.fw-era-papers h6 span{font:500 9.5px var(--fw-mono);margin-left:6px}
+.fw-era-paper{display:flex;align-items:baseline;gap:10px;padding:6px 4px;border-top:1px solid var(--fw-bg-sub);font-size:11px}
+.fw-era-paper:first-of-type{border-top:0}
+.fw-era-paper:hover{background:var(--fw-bg-sub)}
+.fw-era-pdate{font:700 10px var(--fw-mono);color:var(--fw-blue);width:58px;flex-shrink:0}
+.fw-era-ptitle{min-width:0;color:var(--fw-text);line-height:1.5}
+.fw-era-ptag{margin-left:auto;font:600 9px var(--fw-mono);background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 6px;flex-shrink:0}
+.fw-era-psrc{font-size:9.5px;color:var(--fw-text-3);width:110px;text-align:right;flex-shrink:0}
+@media (max-width:860px){.fw-era-body{grid-template-columns:1fr}.fw-era-psrc{display:none}}
+
