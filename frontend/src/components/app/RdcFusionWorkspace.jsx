@@ -16,12 +16,13 @@ import LensProcess from './rdc_fusion/LensProcess.jsx';
 import LensProgress from './rdc_fusion/LensProgress.jsx';
 import LensData from './rdc_fusion/LensData.jsx';
 import { EVENTS, TICKER, CMDK_GROUPS, DEMO_OBJECT, DEMO_QUEUE } from './rdc_fusion/demoData.js';
+import { TECH_CATEGORIES, DEMO_COVERAGE, LANG_TEMPLATES, ANALYSES, MISSION } from './rdc_fusion/distributedData.js';
 import './rdc_fusion/rdc_fusion.css';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const DEFAULT_OBJ = 'F#3734';
 
-const LENS_NAME={spatial:'空间透镜',process:'过程透镜',progress:'脉络透镜',data:'数据透镜',home:'总览'};
+const LENS_NAME={spatial:'空间透镜',process:'过程透镜',progress:'脉络透镜',data:'分析技术',home:'总览'};
 
 function Tok({t,dfa}){
   const [txt,v]=t;
@@ -29,11 +30,11 @@ function Tok({t,dfa}){
   return <span className={'fw-tok'+(dfa?' dfa':'')} style={style}>{txt}</span>;
 }
 
-/* ── 对象卡渲染器（object_card.v1 schema 驱动；LIVE/DEMO 同构） ── */
-function ObjectCard({obj,live,onGo,onDispatch}){
-  const metrics=obj.metrics||[];
+/* ── 对象卡渲染器（object_card.v1 schema 驱动；LIVE/DEMO 同构） ──
+   2026-10-08 瘦身：metrics/links 静态叙事已删（防第二事实源腐化），
+   保留 ID/层位/激活示例/技术足迹/派实验动作；指标类内容以分析技术视图为准 */
+function ObjectCard({obj,live,onDispatch}){
   const acts=obj.activations||[];
-  const links=obj.links||[];
   const evClass='fw-ev-badge '+(obj.evidence==='mechanism_evidence'?'fw-ev-mech':'fw-ev-obs');
   return (
     <>
@@ -41,9 +42,11 @@ function ObjectCard({obj,live,onGo,onDispatch}){
       <div className="fw-f-meta">
         <div className="kv">特征 ID<b className="fw-mono">{obj.id}</b></div>
         {obj.layer&&<div className="kv">层 / 位置<b>{obj.layer}</b></div>}
-        {metrics.map(m=>(
-          <div className="kv" key={m.k} title={m.note||''}>{m.k}<b className="fw-mono">{String(m.v)}</b></div>
-        ))}
+        {Array.isArray(obj.tech_footprint)&&obj.tech_footprint.length>0&&(
+          <div className="kv" title="分析技术足迹（analysis registry）：已对该对象运行过的技术 · 到分析技术可再次运行">
+            技术足迹<b className="fw-mono">{obj.tech_footprint.map(t=>t.tech).join(' · ')}</b>
+          </div>
+        )}
       </div>
 
       {acts.length>0&&(
@@ -63,14 +66,6 @@ function ObjectCard({obj,live,onGo,onDispatch}){
         </div>
       )}
 
-      <div className="fw-lens-links">
-        {links.map((l,i)=>(
-          <button className="fw-lens-link" key={i} onClick={()=>onGo(l.lens)}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/></svg>
-            <b>{(LENS_NAME[l.lens]||l.lens).replace('透镜','')}</b>{l.text}<span className="arr">→</span>
-          </button>
-        ))}
-      </div>
       <div className="fw-side-actions">
         <button className="fw-tbtn primary" onClick={onDispatch}>＋ 派 AI 实验</button>
       </div>
@@ -79,23 +74,68 @@ function ObjectCard({obj,live,onGo,onDispatch}){
   );
 }
 
+/* M7-P1 技术四分类状态标签（渲染词表，非实验内容） */
+const CAT_STATUS={measured:'已测',device_built:'装置已建',planned:'装置待建'};
+
 function HomeView({onGo,home}){
   const st=home||{sealed:DEMO_QUEUE.sealed,count:DEMO_QUEUE.count,tpls:'—',results:'—',objects:1,queue:DEMO_QUEUE.queue};
   const q=st.queue||DEMO_QUEUE.queue;
   const nx=q.find(x=>x.status==='pending');
   const pend=q.filter(x=>x.status==='pending')[1];
   const last=[...q].reverse().find(x=>x.status==='sealed');
+  /* M7-P1 技术版图：覆盖度矩阵（P2 真源 = /api/coverage；当前 DEMO_COVERAGE） */
+  const cov=home&&home.coverage?home.coverage:DEMO_COVERAGE;
+  const covOf=(tpl,cat)=>{const c=cov.find(x=>x.tpl===tpl&&x.cat===cat);return c?c.status:'empty';};
+  const coveredCats=TECH_CATEGORIES.filter(c=>cov.some(x=>x.cat===c.id&&x.status==='done')).length;
+  const nTech=cat=>ANALYSES.filter(a=>a.category===cat.id).length;
+  const cellsOf=(cat,onlyDone)=>cov.filter(x=>x.cat===cat.id&&(!onlyDone||x.status==='done')).length;
   return (
     <div className="fw-view fw-home on">
       <div className="fw-hero">
-        <div>
-          <h2>同一对象，四种透镜</h2>
-          <p>空间（3D 点云：特征在哪里、邻居是谁）· 过程（AI 研发工作台：对它做过什么实验）· 脉络（行业路线图：它支撑哪个大问题）· 数据（结果浏览器：分布式测试返回了什么）。四界面共享顶栏的<b>对象路由</b>与右侧<b>对象卡</b>，切透镜不换对象。</p>
+        <div className="fw-mission">
+          <h2><b className="fw-brand">{MISSION.brand}</b>{MISSION.title}</h2>
+          <div className="fw-mission-chain">
+            {MISSION.chain.map((s,i)=>(
+              <span key={s.k} className="fw-mission-step">
+                <i>{s.k}</i>
+                <span>{s.v}</span>
+              </span>
+            ))}
+          </div>
         </div>
         <div className="fw-hero-num">
           <div className="stat"><div className="n">{st.count?`${st.sealed}/${st.count}`:'—'}</div><div className="l">队列 sealed</div></div>
           <div className="stat"><div className="n">{st.tpls}</div><div className="l">测试模板</div></div>
           <div className="stat"><div className="n">{st.results}</div><div className="l">结果条目</div></div>
+          <div className="stat"><div className="n">{coveredCats}/{TECH_CATEGORIES.length}</div><div className="l">技术覆盖</div></div>
+        </div>
+      </div>
+      <div className="fw-techmap">
+        <div className="fw-techmap-head">
+          <b>技术版图 · 四类分析技术</b>
+          <span>结果空间 = 对象 × 语言模板 × 分析技术 · 覆盖度矩阵：实心=已有结果 · 半透明=部分/装置已建 · 虚线=空格（点空格去研发透镜领缺口任务）</span>
+        </div>
+        <div className="fw-techmap-cards">
+          {TECH_CATEGORIES.map(c=>(
+            <button key={c.id} type="button" className="fw-tc-card" style={{'--cat':c.color}} title={c.note} onClick={()=>onGo('data')}>
+              <div className="hd"><i style={{background:c.color}}/><b>{c.name}</b><span className="fw-tc-st">{CAT_STATUS[c.status]||c.status}</span></div>
+              <div className="ms">{c.methods.join(' · ')}</div>
+              <div className="ft"><span>{nTech(c)} 项技术</span><span>覆盖 {cellsOf(c,true)}/{cellsOf(c)} 格</span><span className="dim2">{c.cost}</span></div>
+            </button>
+          ))}
+        </div>
+        <div className="fw-cov-grid">
+          <div className="fw-cov-row head"><span>模板 \ 技术</span>{TECH_CATEGORIES.map(c=><span key={c.id} style={{color:c.color}}>{c.short||c.name}</span>)}</div>
+          {LANG_TEMPLATES.map(t=>(
+            <div key={t.id} className="fw-cov-row">
+              <span className="tpl">{t.name}</span>
+              {TECH_CATEGORIES.map(c=>{
+                const s=covOf(t.id,c.id);
+                return <button key={c.id} type="button" className={'fw-cov-cell '+s}
+                               title={t.name+' × '+c.name+' · 状态 '+s} onClick={()=>onGo('process')}/>;
+              })}
+            </div>
+          ))}
         </div>
       </div>
       <div className="fw-entry-col">
@@ -127,9 +167,9 @@ function HomeView({onGo,home}){
         <div className="ic" style={{background:'#ecfdf5',color:'#059669'}}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
         </div>
-        <h3>数据透镜 · 结果浏览器</h3>
-        <p>协议驱动的通用渲染器：模板筛选器 + 结果行（η² 分解 / 反词嵌入指纹 / cos 矩阵），新模板注册即自动出现。</p>
-        <span className="tag">接 /api/templates · /api/results（summary_digest）</span>
+        <h3>分析技术 · 结果浏览器</h3>
+        <p>分析技术注册表驱动：选技术 → 契约匹配结果 → 展开自动运行（RSA/RDM、η² 分解、CKA）；亦可按结果浏览。新模板注册即自动出现。</p>
+        <span className="tag">接 /api/templates · /api/results（summary_digest）· 技术注册表</span>
       </button>
       </div>
       <div className="fw-side-col">
@@ -158,6 +198,7 @@ export default function RdcFusionWorkspace(){
   const [distStats,setDistStats]=useState(null); // /api/distributed/summary
   const [cmdk,setCmdk]=useState(false);
   const [about,setAbout]=useState(false);
+  // const [sideOpen,setSideOpen]=useState(false);  // 对象卡已隐藏，恢复时连同右侧 aside 一起取消注释
   const queryRef=useRef(null);
 
   const syncURL=(l,o)=>{
@@ -211,7 +252,7 @@ export default function RdcFusionWorkspace(){
       const rows=[`[queue] ${rndQueue.sealed}/${rndQueue.count} sealed · next ${nx?nx.id:'—'}`];
       if(last) rows.push(`[queue] ${last.id} sealed ${last.res_sha8||''}`);
       if(distStats) rows.push(`[templates] ${distStats.templates.length} · 结果 ${distStats.results_total}`);
-      rows.push(`[objects] 注册对象 ${objects?objects.length:1} · 对象卡协议 v1`);
+      rows.push(`[objects] 注册对象 ${objects?objects.length:1}`);
       return rows;
     }
     return TICKER;
@@ -273,8 +314,8 @@ export default function RdcFusionWorkspace(){
           {/* <button className="fw-rbtn" onClick={()=>window.alert('账本视图（registry / 队列 / 证据等级）：沿用旧版工作台入口，本页不重复实现')} title="账本">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM8 8h8M8 12h8M8 16h5"/></svg>账本
           </button> */}
-          <button className={'fw-rbtn'+(lens==='data'?' on':'')} onClick={()=>go('data')} title="数据 · 结果浏览器（协议驱动）">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>数据
+          <button className={'fw-rbtn'+(lens==='data'?' on':'')} onClick={()=>go('data')} title="分析技术 · 技术注册表 + 结果浏览器（协议驱动）">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>技术
           </button>
         </nav>
 
@@ -295,7 +336,7 @@ export default function RdcFusionWorkspace(){
 
           <div className="fw-viewport">
             {lens==='home'&&<HomeView onGo={go} home={{sealed:rndQueue?rndQueue.sealed:DEMO_QUEUE.sealed,count:rndQueue?rndQueue.count:DEMO_QUEUE.count,queue:rndQueue?rndQueue.queue:DEMO_QUEUE.queue,tpls:distStats?String(distStats.templates.length):'—',results:distStats?String(distStats.results_total):'—'}}/>}
-            {lens==='spatial'&&<LensSpatial on/>}
+            {lens==='spatial'&&<LensSpatial on onGo={go}/>}
             {lens==='process'&&<LensProcess on onGo={go}/>}
             {lens==='progress'&&<LensProgress on onGo={go}/>}
             {lens==='data'&&<LensData on/>}
@@ -306,7 +347,7 @@ export default function RdcFusionWorkspace(){
                 <div className="pt"><b>① 对象路由即状态</b>——顶栏中央 <em>qwen3-4b / 6-l6-teal / {objId}</em> 是全局唯一地址；URL 即状态（<em>?lens=&amp;obj=</em>），⌘K 直达对象。</div>
                 <div className="pt"><b>② 四透镜不换对象</b>——3D / AI 研发 / 路线图 / 数据浏览器是同一对象的<em>空间·过程·脉络·数据</em>四个视角；切透镜只换主视口，对象上下文（激活、证据等级、关联）恒在。</div>
                 <div className="pt"><b>③ 协议是唯一稳定契约</b>——界面是协议的通用渲染器：测试模板（factors/eta2/fingerprint）、对象卡（object_card.v1）、队列（phase_queue schema）皆只认协议键；新模板 / 新对象注册后零界面改动自动出现。</div>
-                <div className="pt"><b>④ 跨透镜动作闭环</b>——结果卡可「在 3D 查看 / 到数据透镜看结果」；对象卡可「派 AI 实验」；底部事件流是四个透镜共用的<em>事件总线</em>，实验→结构→进展自动流转。</div>
+                <div className="pt"><b>④ 跨透镜动作闭环</b>——结果卡可「在 3D 查看 / 到分析技术运行」；底部事件流是四个透镜共用的<em>事件总线</em>，实验→结构→进展自动流转。</div>
                 <div style={{textAlign:'right',marginTop:10}}>
                   <button className="fw-tbtn" onClick={()=>setAbout(false)}>知道了</button>
                 </div>
@@ -315,16 +356,25 @@ export default function RdcFusionWorkspace(){
           </div>
         </main>
 
-        {/* ===== 右侧对象卡（对象卡渲染器：schema 驱动） ===== */}
-        <aside className="fw-side">
+        {/* ===== 右侧对象卡已隐藏（对象上下文仍经 URL ?obj= 与 ⌘K 全局生效；需要时取消注释即可恢复） =====
+        <aside className={'fw-side'+(sideOpen?' open':'')}>
           <div className="fw-side-head">
-            <span className="t">对象卡 · OBJECT CARD</span>
-            <span className="sub">随透镜联动</span>
+            <button type="button" className="fw-side-toggle" onClick={()=>setSideOpen(v=>!v)}
+                    title={sideOpen?'收起对象卡——对象 ID 切换仍走顶栏/⌘K/URL':'展开对象卡（激活示例 / 技术足迹 / 派实验）'}>
+              <span className="fw-tr">{sideOpen?'▾':'▸'}</span>
+              <span className="t">对象卡</span>
+              <span className="fw-mono">{objId}</span>
+              <span className={'fw-ev-badge '+(obj.evidence==='mechanism_evidence'?'fw-ev-mech':'fw-ev-obs')}>● {obj.evidence}</span>
+            </button>
+            {sideOpen&&<span className="sub">随透镜联动</span>}
           </div>
-          <div className="fw-side-body">
-            <ObjectCard obj={obj} live={objIsLive} onGo={go} onDispatch={()=>go('process')}/>
-          </div>
+          {sideOpen&&(
+            <div className="fw-side-body">
+              <ObjectCard obj={obj} live={objIsLive} onDispatch={()=>go('process')}/>
+            </div>
+          )}
         </aside>
+        */}
       </div>
 
       {/* ===== 底部状态条：全局事件总线 ===== */}

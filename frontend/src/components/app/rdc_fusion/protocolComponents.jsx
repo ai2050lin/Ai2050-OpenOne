@@ -89,11 +89,15 @@ export function FingerprintBadge({ fp }) {
 /* ── 2-4 CellCosGrid ──────────────────────────────────────────
    cell 方向 cos 矩阵热图（源=/results/{sha} 提取的 means.npz cos）。
    行列=任意条件组合（协议键 keys），正=蓝 / 负=橙，强度按 |v|。 */
-export function CellCosGrid({ cos }) {
+/* mode='cos'（默认）：方向 cos 矩阵，正=蓝 / 负=橙，强度按 |v|；
+   mode='rdm'：相异矩阵（值域 0–2，RSA 技术输出），单色蓝深浅按 v/2，对角线 0 显白。 */
+export function CellCosGrid({ cos, mode }) {
   if (!cos || !Array.isArray(cos.matrix) || !cos.matrix.length) return null;
   const keys = cos.keys || cos.matrix.map((_, i) => 'c' + i);
   const n = keys.length;
+  const isRdm = mode === 'rdm';
   const cellColor = (v) => {
+    if (isRdm) return `rgba(2,132,199,${0.04 + 0.8 * Math.min(1, v / 2)})`;
     const a = Math.min(1, Math.abs(v));
     return v >= 0 ? `rgba(2,132,199,${0.08 + 0.75 * a})` : `rgba(217,119,6,${0.08 + 0.75 * a})`;
   };
@@ -106,14 +110,17 @@ export function CellCosGrid({ cos }) {
         {keys.flatMap((rk, i) => [
           <span key={'r' + rk} className="fw-pc-cosh l" title={rk}>{short(rk)}</span>,
           ...keys.map((ck, j) => (
-            <span key={rk + '|' + ck} className="fw-pc-cosc fw-mono" style={{ background: cellColor(cos.matrix[i][j]) }}
-                  title={`${short(rk)} × ${short(ck)} cos=${cos.matrix[i][j].toFixed(3)}`}>
+            <span key={rk + '|' + ck} className="fw-pc-cosc fw-mono"
+                  style={{ background: cellColor(cos.matrix[i][j]) }}
+                  title={`${short(rk)} × ${short(ck)} ${isRdm ? 'dissim' : 'cos'}=${cos.matrix[i][j].toFixed(3)}`}>
               {n <= 8 ? cos.matrix[i][j].toFixed(2) : ''}
             </span>
           )),
         ])}
       </div>
-      <div className="fw-pc-cosnote">条件方向 cos 矩阵 · 蓝=同向 橙=反向 · 悬停看数值</div>
+      <div className="fw-pc-cosnote">{isRdm
+        ? 'RDM 相异矩阵（dissim = 1 − cos，值域 0–2）· 色深=相异度 · 悬停看数值'
+        : '条件方向 cos 矩阵 · 蓝=同向 橙=反向 · 悬停看数值'}</div>
     </div>
   );
 }

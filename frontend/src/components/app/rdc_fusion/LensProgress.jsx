@@ -4,7 +4,7 @@
    并显示 DEMO 徽标，成功显示 LIVE 徽标。当前机器进度 = 本机 Agent 状态（demo 接入点不变）。
    三带节点点击出详情；同行差异以「对比卡」登记入账本（四级证据体系）。 */
 import { useEffect, useState } from 'react';
-import { LOCAL_NODE, PLATFORM_STATS, NODES, TEMPLATES, AGG_STEPS, AGG_DIMS, NEWS, MI_ERAS, RSA_ERAS, RSA_NOTE } from './distributedData.js';
+import { LOCAL_NODE, PLATFORM_STATS, NODES, TEMPLATES, AGG_STEPS, AGG_DIMS, NEWS, MI_ERAS, RSA_ERAS, RSA_NOTE, LANG_TEMPLATES, ANALYSES, RESEARCH_KITS, TUTORIAL_STEPS, TUTORIAL_PATHS, TECH_CATEGORIES, DEMO_COVERAGE, USAGE_DOC } from './distributedData.js';
 
 /* API 前缀：与研发透镜（LensProcess）同一惯例；禁止在组件里散落硬编码地址 */
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
@@ -57,11 +57,18 @@ function PeerCard({c}){
   );
 }
 
+/* M7-P1 技术类别查找（PROJECTIONS/era cat → 名称/颜色/短名，数据 ← TECH_CATEGORIES） */
+const catOf=id=>TECH_CATEGORIES.find(c=>c.id===id)||{};
+const catColor=id=>(catOf(id).color)||'#888780';
+const catShort=id=>(catOf(id).short)||id;
+
 /* 行业进展 · 领域阶段时间轴（可复用）：机制可解释性（MI_ERAS）与表征相似性分析（RSA_ERAS）各一条
    数据 ← eras（阶段数组）；live 可选——传入时最右追加「最新」实时节点（← /api/news）。
-   点击节点 → 下方详情面板：阶段目标 / 成果 / 代表论文（可点击跳原文）。 */
+   点击节点 → 下方详情面板：阶段目标 / 成果 / 代表论文（可点击跳原文）。
+   M7-P1：era 带 cat（四类技术归属）→ 顶部类别筛选 chips，非命中类别置灰（不隐藏，保时间轴完整）。 */
 function EraTimeline({eras,live}){
   const [sel,setSel]=useState(eras[0].id);
+  const [catSel,setCatSel]=useState('all');   // M7-P1 类别筛选
   const isLive = !!live && sel==='live';
   const era = eras.find(e=>e.id===sel) || eras[0];
   const liveNode = live ? {
@@ -77,14 +84,27 @@ function EraTimeline({eras,live}){
   const cur = isLive ? liveNode : era;
   return (
     <div className="fw-era">
-      <div className="fw-era-tl">
-        {eras.map(e=>(
-          <button key={e.id} type="button" className={'fw-era-node'+(sel===e.id?' sel':'')} onClick={()=>setSel(e.id)}>
-            <span className="fw-era-dot"/>
-            <span className="fw-era-years">{e.years}</span>
-            <span className="fw-era-name">{e.title}</span>
+      <div className="fw-cat-chips">
+        <button type="button" className={'fw-proj-chip'+(catSel==='all'?' on':'')} onClick={()=>setCatSel('all')}><span>全部类别</span></button>
+        {TECH_CATEGORIES.map(c=>(
+          <button key={c.id} type="button" className={'fw-proj-chip'+(catSel===c.id?' on':'')} style={{'--cat':c.color}}
+                  title={c.name} onClick={()=>setCatSel(c.id)}>
+            <i style={{background:c.color}}/><span>{c.short||c.name}</span>
           </button>
         ))}
+      </div>
+      <div className="fw-era-tl">
+        {eras.map(e=>{
+          const dim=catSel!=='all'&&e.cat!==catSel;
+          return (
+            <button key={e.id} type="button" className={'fw-era-node'+(sel===e.id?' sel':'')+(dim?' dim':'')} onClick={()=>setSel(e.id)}>
+              <span className="fw-era-dot"/>
+              <span className="fw-era-years">{e.years}</span>
+              <span className="fw-era-name">{e.title}</span>
+              <span className="fw-era-cat" style={{color:catColor(e.cat)}}>{catShort(e.cat)}</span>
+            </button>
+          );
+        })}
         {live && (
           <button type="button" className={'fw-era-node live'+(isLive?' sel':'')} onClick={()=>setSel('live')}
                   title={live.newsLive?'/api/news · '+live.newsSrc:'中心节点离线'}>
@@ -262,12 +282,229 @@ function AggLiveCard({templates}){
   );
 }
 
+/* 使用说明 · 新人教程四步卡（M6-P0，数据 ← TUTORIAL_STEPS）：接入→领任务→上传→下载研究
+   每步命令可一键复制；<center>/<gpu>/<model> 为占位符，接入前替换为本机实际值
+   （2026-10-08 调整：新手相关内容从「研发平台」tab 移入本「使用说明」tab） */
+function TutorialCard(){
+  const [copied,setCopied]=useState(-1);
+  const copy=(cmd,i)=>{ try{ navigator.clipboard.writeText(cmd); }catch(e){} setCopied(i); setTimeout(()=>setCopied(-1),1400); };
+  return (
+    <div className="fw-pl-card fw-tut">
+      <h6>新人教程 · 四步接入分布式研发 <span>从零参与到产出上传与本地复现 · 命令可复制</span></h6>
+      <div className="fw-tut-steps">
+        {TUTORIAL_STEPS.map((s,i)=>(
+          <div key={s.n} className="fw-tut-step">
+            <span className="fw-tut-n">{s.n}</span>
+            <div className="fw-tut-main">
+              <b>{s.t}</b>
+              <div className="fw-tut-cmd">
+                <code>{s.cmd}</code>
+                <button type="button" className="fw-tbtn" onClick={()=>copy(s.cmd,i)}>{copied===i?'✓ 已复制':'复制'}</button>
+              </div>
+              <p>{s.d}</p>
+            </div>
+            {i<TUTORIAL_STEPS.length-1&&<span className="fw-tut-arrow">→</span>}
+          </div>
+        ))}
+      </div>
+      <p className="fw-tut-note">占位符替换：<span className="fw-mono">&lt;center&gt;</span> 中心节点地址 · <span className="fw-mono">&lt;gpu&gt;</span> GPU 型号 · <span className="fw-mono">&lt;model&gt;</span> 目标模型。全流程纪律：预注册冻结（design_sha 不符拒收）、内容寻址（sha256）、口径版本强制展示。</p>
+    </div>
+  );
+}
+
+/* 使用说明 · 按技术类别上手路径（M7-P1，数据 ← TUTORIAL_PATHS）：
+   四类技术各一条——复用四步教程骨架，差异只在第 4 步 download 的 --kit 选择 */
+function TutorialPathsCard(){
+  return (
+    <div className="fw-pl-card fw-tut">
+      <h6>按技术类别上手 <span>四类技术 × 四条路径 · 骨架同上方四步，差异在第 4 步 --kit</span></h6>
+      {TUTORIAL_PATHS.map(p=>{
+        const c=catOf(p.cat);
+        return (
+          <div key={p.cat} className="fw-path-row" title={c.note||''}>
+            <span className="fw-path-dot" style={{background:c.color}}/>
+            <b>{c.name||p.cat}</b>
+            <code className="fw-mono">--kit {p.kit}</code>
+            <span className="dim2">{p.note}</span>
+          </div>
+        );
+      })}
+      <p className="fw-tut-note">类别状态实时看「研发平台 · 技术成熟度」卡组；缺口任务（哪个模板 × 哪类技术还是空格）在研发透镜「缺口」tab 领取。</p>
+    </div>
+  );
+}
+
+/* 使用说明 · 平台介绍 + 文档索引 + node_agent 子命令速查（数据 ← USAGE_DOC）
+   全部内容为真实仓库文件/端点；文档行悬停提示完整路径 */
+function TutorialDocCard(){
+  return (
+    <>
+      <div className="fw-pl-card fw-tut">
+        <h6>平台是什么 <span>一分钟了解这套分布式研发体系</span></h6>
+        <p className="fw-tut-note" style={{marginTop:0,fontSize:10.5,lineHeight:1.85}}>{USAGE_DOC.intro}</p>
+      </div>
+      <div className="fw-pl-card fw-tut">
+        <h6>文档索引 <span>深入阅读 · 均为仓库内真实文件与端点</span></h6>
+        <div className="fw-reg-xd" style={{gap:0}}>
+          {USAGE_DOC.docs.map(d=>(
+            <div key={d.t} className="fw-reg-item" style={{display:'block',padding:'8px 2px'}} title={d.s}>
+              <div className="fw-reg-hd"><b>{d.t}</b><span className="fw-mono dim2">{d.s}</span></div>
+              <div style={{marginTop:4,fontSize:10,color:'var(--fw-text-2)',lineHeight:1.65}}>{d.d}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="fw-pl-card fw-tut">
+        <h6>终端命令速查 <span>node_agent.py 五个子命令 · --server 为顶层参数置于子命令前</span></h6>
+        <div className="fw-reg-xd">
+          {USAGE_DOC.cli.map(([c,d])=>(
+            <div key={c}><i><span className="fw-mono" style={{color:'var(--fw-blue)'}}>node_agent.py {c}</span></i><span>{d}</span></div>
+          ))}
+        </div>
+        <p className="fw-tut-note">凭据纪律：<span className="fw-mono">node_credentials.json</span> 仅存本机，浏览器不读取——本机精确状态看终端 <span className="fw-mono">status</span>，浏览器内只展示公开队列快照。</p>
+      </div>
+    </>
+  );
+}
+
+/* 平台进度 · 技术成熟度卡组（M7-P1）：四类技术 × 平台状态机（与 Q04/Q06「装置建成→正式测量」同构）
+   数据 ← TECH_CATEGORIES（类状态/算力）+ ANALYSES（各类注册数/可用数）+ DEMO_COVERAGE（覆盖格） */
+function MaturityCards(){
+  return (
+    <div className="fw-mature-grid">
+      {TECH_CATEGORIES.map(c=>{
+        const techs=ANALYSES.filter(a=>a.category===c.id);
+        const avail=techs.filter(t=>t.status==='available').length;
+        const done=DEMO_COVERAGE.filter(x=>x.cat===c.id&&x.status==='done').length;
+        return (
+          <div key={c.id} className="fw-pl-card fw-mature-card" style={{borderTop:'2px solid '+c.color}} title={c.note}>
+            <div className="fw-mature-hd">
+              <b style={{color:c.color}}>{c.name}</b>
+              <span className={'fw-tmx-agg '+(c.status==='measured'?'done':c.status==='device_built'?'collecting':'todo')}>
+                {c.status==='measured'?'已测':(c.status==='device_built'?'装置已建':'装置待建')}
+              </span>
+            </div>
+            <p className="fw-mature-note">{c.note}</p>
+            <div className="fw-mature-ms">{c.methods.join(' · ')}</div>
+            <div className="fw-mature-kv">
+              <span>注册 {techs.length} 项</span><span>可用 {avail}</span><span>覆盖 {done}/{DEMO_COVERAGE.length} 格</span>
+            </div>
+            <div className="fw-mature-cost dim2">算力参考：{c.cost} · 契约 {c.input}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* 平台进度 · 双注册表卡（M6-P0/P1）：语言模板（LANG_TEMPLATES）× 分析技术（ANALYSES）+ 研究包
+   研究包组合：离线=RESEARCH_KITS DEMO 叙事；LIVE=GET /api/kits（服务端 S7，tm×analysis），
+   available 行可点击下载整包（bundle JSON：corpus/runner/contract + 结果清单 + README） */
+function RegistryCards(){
+  const [open,setOpen]=useState(null);   /* 展开的语言模板 id */
+  const [kits,setKits]=useState(null);   /* LIVE：服务端 S7 研究包清单 */
+  const [dlIng,setDlIng]=useState('');
+  useEffect(()=>{
+    let dead=false;
+    fetch(`${API_BASE}/api/kits`).then(r=>r.ok?r.json():null).catch(()=>null)
+      .then(d=>{ if(!dead&&d&&d.kits) setKits(d); });
+    return ()=>{dead=true;};
+  },[]);
+  const downloadKit=async(kid)=>{
+    setDlIng(kid);
+    try{
+      const r=await fetch(`${API_BASE}/api/kits/${kid}/bundle`);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const b=await r.json();
+      const blob=new Blob([JSON.stringify(b,null,1)],{type:'application/json'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=`${kid}.bundle.json`; a.click();
+      URL.revokeObjectURL(a.href);
+    }catch(e){
+      window.alert(`研究包 ${kid} 下载失败（${e.message}）——需中心节点已重启加载 S7 端点，或该 kit 尚无满足契约的结果。`);
+    }finally{ setDlIng(''); }
+  };
+  const tplOf=id=>LANG_TEMPLATES.find(t=>t.id===id);
+  return (
+    <div className="fw-reg-row">
+      <div className="fw-pl-card">
+        <h6>语言模板注册表 <span>{LANG_TEMPLATES.length} 种 · 受控语料+固定口径 · 空间透镜可切换体验</span></h6>
+        {LANG_TEMPLATES.map(t=>(
+          <div key={t.id} className="fw-reg-item" onClick={()=>setOpen(open===t.id?null:t.id)}>
+            <div className="fw-reg-hd">
+              <b className="fw-mono">{t.id}</b>
+              <span>{t.name}</span>
+              <span className={'fw-tmx-agg '+(t.status==='measured'?'done':'todo')}>{t.status==='measured'?'measured · 已测':'demo · 占位'}</span>
+            </div>
+            {open===t.id&&(
+              <div className="fw-reg-xd">
+                <div><i>示例 token 序列</i><span className="fw-mono">{t.demo.tokens.join(' ')}</span></div>
+                <div><i>焦点特征</i><span className="fw-mono">{t.demo.focus.id} · {t.demo.focus.label}</span></div>
+                <div><i>状态注记</i><span>{t.status==='measured'?'E_read=0.331615（TM-07，Q09 基线）':'未测量——不挂任何实测数字，Q20 族扩展后转 measured'}</span></div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="fw-pl-card">
+        <h6>分析技术注册表 <span>{ANALYSES.length} 种 · 按输入契约匹配可用性 · 口径各自登记</span></h6>
+        {ANALYSES.map(a=>(
+          <div key={a.id} className="fw-reg-item">
+            <div className="fw-reg-hd">
+              <b className="fw-mono">{a.id}</b>
+              <span>{a.name}</span>
+              <span className="fw-era-cat" style={{color:catColor(a.category)}} title={'技术类别：'+((catOf(a.category)||{}).name||a.category)}>{catShort(a.category)}</span>
+              <span className="fw-pc-ev mono">{a.evidence_level}</span>
+            </div>
+            <div className="fw-reg-xd">
+              <div><i>技术类别</i><span>{(catOf(a.category)||{}).name||a.category} · {a.status==='available'?'可运行':(a.status==='planned'?'装置待建':a.status)}</span></div>
+              <div><i>输入契约</i><span className="fw-mono">{a.input.join(' + ')||'—'}</span></div>
+              <div><i>口径版本</i><span className="fw-mono">{a.metric_version}</span></div>
+              <div><i>说明</i><span>{a.note}</span></div>
+            </div>
+          </div>
+        ))}
+        <h6 style={{marginTop:10}}>
+          研究包组合
+          <span>{kits ? 'LIVE · 服务端 S7 · available 行点击下载整包' : 'DEMO · 语言模板 × 分析技术（中心节点离线）'}</span>
+          {!kits && <span className="fw-src-chip demo" style={{marginLeft:'auto'}}>○ DEMO</span>}
+          {kits && <span className="fw-src-chip live" style={{marginLeft:'auto'}}>● LIVE S7</span>}
+        </h6>
+        {kits ? kits.kits.map(k=>(
+          <div key={k.kit_id} className="fw-reg-item"
+               onClick={()=>{ if(k.status==='available') downloadKit(k.kit_id); }}
+               title={k.status==='available'?'点击下载研究包（bundle JSON：corpus/runner/contract + 结果清单 + README）':'结果库暂无满足该 input 契约的结果'}>
+            <div className="fw-reg-hd">
+              <b className="fw-mono">{k.kit_id}</b>
+              <span className="dim2">{k.analysis_name} · {k.metric_version}</span>
+              {k.status==='available'
+                ? <button type="button" className="fw-tbtn" style={{marginLeft:'auto',flexShrink:0}}
+                          onClick={e=>{e.stopPropagation();downloadKit(k.kit_id);}}
+                          disabled={dlIng===k.kit_id}>{dlIng===k.kit_id?'下载中…':'↓ 下载'}</button>
+                : <span className={'fw-tmx-agg todo'} style={{marginLeft:'auto',flexShrink:0}}>pending · 等结果</span>}
+            </div>
+          </div>
+        )) : RESEARCH_KITS.map(k=>(
+          <div key={k.kit_id} className="fw-reg-item">
+            <div className="fw-reg-hd">
+              <b className="fw-mono">{tplOf(k.lang_tpl)?tplOf(k.lang_tpl).name:k.lang_tpl}</b>
+              <span className="dim2">× {k.analysis}</span>
+              <span className={'fw-tmx-agg '+(k.status==='available'?'done':'todo')}>{k.status==='available'?'available · 可下载':'pending · 等结果'}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function LensProgress({on,onGo}){
   const [view,setView]=useState('machine');
   /* 中心节点实时态（M1 接线）：summary=平台进度、newsLive=行业进展；拉不到则回退 demo */
   const [dist,setDist]=useState(null);
   const [distNews,setDistNews]=useState(null);
   const [newsSrc,setNewsSrc]=useState('');
+  const [schedQ,setSchedQ]=useState(null);      // M6-P2 /api/tasks（S8 调度队列只读快照，本机状态条数据源）
   useEffect(()=>{
     let dead=false;
     const load=()=>{
@@ -276,10 +513,12 @@ export default function LensProgress({on,onGo}){
       Promise.all([
         fetch(`${API_BASE}/api/distributed/summary`,{signal:ctl.signal}).then(r=>r.ok?r.json():null).catch(()=>null),
         fetch(`${API_BASE}/api/news`,{signal:ctl.signal}).then(r=>r.ok?r.json():null).catch(()=>null),
-      ]).then(([s,n])=>{
+        fetch(`${API_BASE}/api/tasks`,{signal:ctl.signal}).then(r=>r.ok?r.json():null).catch(()=>null),
+      ]).then(([s,n,q])=>{
         if(dead) return;
         if(s&&s.version) setDist(s);
         if(n&&n.items&&n.items.length){ setDistNews(n.items); setNewsSrc(n.source||''); }
+        setSchedQ(q&&q.stats?q:null);
       }).catch(()=>{}).finally(()=>clearTimeout(t));
     };
     load();
@@ -287,14 +526,17 @@ export default function LensProgress({on,onGo}){
     return ()=>{dead=true;clearInterval(iv);};
   },[]);
 
-  /* 平台进度数据源：LIVE（中心节点）或 DEMO（distributedData.js） */
-  const liveStats = dist ? [
-    {n:dist.nodes_online, l:'在线节点', s:'共 '+dist.nodes_total+' 注册'},
-    {n:dist.templates.filter(t=>t.status==='open').length, l:'开放模板', s:'模板注册表 S2'},
-    {n:dist.results_total, l:'已上传结果', s:'sha256 内容寻址'},
-    {n:dist.downloads_total, l:'结果下载', s:'他人引用计数'},
-    {n:dist.agg_version, l:'聚合版本', s:dist.version},
-  ] : PLATFORM_STATS;
+  /* 平台进度数据源：LIVE（中心节点）或 DEMO（distributedData.js）；研究包统计 ← 注册表（协议第七件） */
+  const liveStats = [
+    ...(dist ? [
+      {n:dist.nodes_online, l:'在线节点', s:'共 '+dist.nodes_total+' 注册'},
+      {n:dist.templates.filter(t=>t.status==='open').length, l:'开放模板', s:'模板注册表 S2'},
+      {n:dist.results_total, l:'已上传结果', s:'sha256 内容寻址'},
+      {n:dist.downloads_total, l:'结果下载', s:'他人引用计数'},
+      {n:dist.agg_version, l:'聚合版本', s:dist.version},
+    ] : PLATFORM_STATS),
+    {n:RESEARCH_KITS.filter(k=>k.status==='available').length, l:'可用研究包', s:'语言模板 × 分析技术'},
+  ];
   const liveNodes = dist ? dist.nodes.map(n=>({
     id:n.node_id, gpu:n.gpu||'—', model:n.model||n.name||'—', tm:'—', prog:0,
     cls: (Date.now()/1000-n.last_seen<120)?'run':'idle', up:fmtAgo(n.last_seen),
@@ -313,8 +555,9 @@ export default function LensProgress({on,onGo}){
         {/* ===== 顶层三 tab：行业进展 / 平台进度 / 当前机器进度 ===== */}
         <div className="fw-pt-tabs" role="tablist">
           <button type="button" role="tab" className={'fw-pt-tab'+(view==='news'?' on':'')} onClick={()=>setView('news')}>行业进展<small>机制可解释性动态</small></button>
-          <button type="button" role="tab" className={'fw-pt-tab'+(view==='platform'?' on':'')} onClick={()=>setView('platform')}>平台进度<small>{dist ? dist.nodes_online+' 节点在线 · '+dist.templates.length+' 模板' : '47 节点 · 12 模板'}</small></button>
-          <button type="button" role="tab" className={'fw-pt-tab'+(view==='machine'?' on':'')} onClick={()=>setView('machine')}>当前机器进度<small>NODE-A3F7 · 本机</small></button>
+          <button type="button" role="tab" className={'fw-pt-tab'+(view==='platform'?' on':'')} onClick={()=>setView('platform')}>研发平台<small>{dist ? dist.nodes_online+' 节点在线 · '+dist.templates.length+' 模板' : '47 节点 · 12 模板'}</small></button>
+          <button type="button" role="tab" className={'fw-pt-tab'+(view==='machine'?' on':'')} onClick={()=>setView('machine')}>本地进度<small>NODE-A3F7 · 本机</small></button>
+          <button type="button" role="tab" className={'fw-pt-tab'+(view==='tutorial'?' on':'')} onClick={()=>setView('tutorial')}>使用说明<small>新手教程 · 文档</small></button>
         </div>
 
         {/* ===== 当前机器进度：本机节点 + RDC 主线 ===== */}
@@ -330,6 +573,26 @@ export default function LensProgress({on,onGo}){
             <span className="fw-nmono">{LOCAL_NODE.cells}/{LOCAL_NODE.cells_total} cells</span>
             <span className="fw-nmono">上传 {LOCAL_NODE.uploaded}</span>
             <span className="fw-nmono dim">{LOCAL_NODE.server}</span>
+          </div>
+
+          {/* 本机 agent 状态条（M6-P2）：调度队列只读快照（GET /api/tasks）+ 终端详细状态指路。
+              浏览器无法读取本机 node_credentials.json（凭据不出终端），故中心侧只给队列快照；
+              本机 agent 精确状态（含凭据鉴权的 /api/nodes/me）用终端 `node_agent.py status` 查看 */}
+          <div className="fw-sched-bar">
+            {schedQ ? (<>
+              <span className="fw-sched-dot on">●</span>
+              <b>调度队列快照</b>
+              <span className="fw-mono">活跃 {schedQ.stats.claimed||0}</span>
+              <span className="fw-mono">完成 {schedQ.stats.done||0}</span>
+              <span className="fw-mono">失败 {schedQ.stats.failed||0}</span>
+              <span className="fw-mono">过期 {schedQ.stats.expired||0}</span>
+              <span className="fw-mono dim">单租约 {schedQ.lease_hours}h · GET /api/tasks</span>
+            </>) : (<>
+              <span className="fw-sched-dot">○</span>
+              <b>调度队列快照</b>
+              <span className="dim">中心节点不可达——无调度数据（本横幅为 demo 叙事，不代表本机实时状态）</span>
+            </>)}
+            <span className="fw-sched-tip" title="凭据不出终端：node_credentials.json 仅存本机，浏览器不读取">本机 agent 详细状态 → 终端 <code>node_agent.py status</code> · 全队列 → <code>node_agent.py queue</code></span>
           </div>
 
           <Lane color="#0284c7" label="自己的 · RDC 主线" small="F#3734 所在证据链 · Phase 4 → Q07 · 点击节点看详情">
@@ -354,6 +617,12 @@ export default function LensProgress({on,onGo}){
               <div key={s.l} className="fw-pl-stat"><div className="n">{s.n}</div><div className="l">{s.l}</div><div className="s">{s.s}</div></div>
             ))}
           </div>
+          {/* ===== 双注册表卡（C1：语言模板 × 分析技术 × 研究包）——新人教程已移至「使用说明」tab ===== */}
+          <RegistryCards/>
+
+          {/* ===== 技术成熟度卡组（M7-P1）：四类技术 × 平台状态机 ===== */}
+          <MaturityCards/>
+
           <div className="fw-pl-grid">
             {/* 节点列表（LIVE=summary.nodes 最近心跳；DEMO=distributedData.js） */}
             <div className="fw-pl-card">
@@ -418,6 +687,13 @@ export default function LensProgress({on,onGo}){
           <Lane color="#059669" label="平台发布" small="可视化客户端与服务端的版本时间线">
             <Timeline items={RELEASES} tag="release registry"/>
           </Lane>
+        </>)}
+
+        {/* ===== 使用说明：平台介绍 + 新人教程四步卡 + 文档索引 + 命令速查（新手内容集中于此） ===== */}
+        {view==='tutorial'&&(<>
+          <TutorialCard/>
+          <TutorialPathsCard/>
+          <TutorialDocCard/>
         </>)}
 
         {/* ===== 行业进展：领域阶段时间轴（点击节点看阶段/论文） + 实时动态流 + 同行对比卡 ===== */}

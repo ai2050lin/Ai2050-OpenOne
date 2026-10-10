@@ -1,6 +1,9 @@
 /* 层平铺全览模式（默认）：层阵排布参考旧版 DNNAnalysis3D（层沿信息流方向横排），
    层结构参考旧版 MultiLayer3DVisualization（半透明玻璃盒 + 盒内激活节点 + 层内连线 + 层间流动）
    —— qwen3-4b 全部 36 层平放为玻璃盒阵列（L0 → L35），残差流水平贯穿，流脉冲沿主干移动。
+   数值着色（S9b）：live 模式传 scan（各层 mlp.down_proj 真实权重 RMS）时，层盒按数值着色
+   （白→sky→emerald，min-max 归一），层号下显示 rms 值，hover/选中面板读数值；
+   demo（无 scan）回退研究标注带着色，显式标注。
    右侧常驻面板 = 旁边模型：默认显示模型总览（config + 全参数树）；
    点击层盒 → 显示该层内部结构与全部参数（10 权重 + 4 偏置：形状/计数/占比）。
    研究标注（真实结论映射）：REACH 层集（P16 示意）、写端峰值带 L6–L11（P8–P11 · MLP 0.472）、
@@ -8,6 +11,14 @@
 import { useEffect, useRef, useState } from 'react';
 
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* 数值色带：低=白玻璃 → 中=sky → 高=emerald（本项目高亮惯例）；v∈[0,1]，返回 'r,g,b' */
+function wtColor(v){
+  const seg=(a,b,t)=>a.map((x,i)=>Math.round(x+(b[i]-x)*t));
+  const c = v<=0.5 ? seg([255,255,255],[125,211,252],Math.max(0,v)/0.5)
+                   : seg([125,211,252],[16,185,129],Math.min(1,(v-0.5)/0.5));
+  return c.join(',');
+}
 
 const N=36;
 const reachDemo=l=>l>=8;                 /* 接入点：P16 REACH={ℓ:ρ≥0.10} 结果表 */
@@ -84,7 +95,7 @@ const LNODES=[...Array(N)].map((_,l)=>{
   return {nodes,edges};
 });
 
-export default function StackMode({onOpenParam,onOpenNeuron}){
+export default function StackMode({onOpenParam,onOpenNeuron,live,scan,scanState}){   /* live=实时模型信息包，scan=各层真实权重统计（S9b），null=demo 口径 */
   const cvRef=useRef(null);
   const camRef=useRef({th:0.55,ph:0.42,zoom:480,auto:true,pulse:0,panX:0,panY:0});
   const dragRef=useRef(null);
@@ -92,6 +103,18 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
   const selRef=useRef(-1);
   const [sel,setSel]=useState(-1);
   const [readout,setReadout]=useState({th:31,ph:24,panX:0,panY:0});
+  const [hoverL,setHoverL]=useState(-1);
+  const hoverRef=useRef(-1);
+
+  /* 权重数值映射（渲染期构建，36 项便宜）：layer → {raw, ma, sampled, norm}；经 ref 进 draw 闭包 */
+  let wmap=null;
+  if(scan&&scan.layers&&scan.layers.length){
+    const vs=scan.layers.map(x=>x.rms);
+    const mn=Math.min(...vs), mx=Math.max(...vs);
+    wmap=new Map(scan.layers.map(x=>[x.layer,{raw:x.rms,ma:x.mean_abs,sampled:x.sampled,norm:mx>mn?(x.rms-mn)/(mx-mn):0.5}]));
+  }
+  const wmapRef=useRef(wmap);
+  wmapRef.current=wmap;
 
   useEffect(()=>{
     const cv=cvRef.current; if(!cv) return;
@@ -172,8 +195,10 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
         polysRef.current.push({l,pts:pt});
         polysRef.current.push({l,pts:[pt[1],pt[2],pb[2],pb[1]]});
 
-        /* 玻璃面：顶 / 前 / 右（着色=研究标注带） */
+        /* 玻璃面：顶 / 前 / 右（着色=真实权重 RMS 数值带，demo 回退研究标注带） */
+        const wt = wmapRef.current ? wmapRef.current.get(l) : null;
         const tint = l===selRef.current ? '224,242,254'
+          : wt ? wtColor(wt.norm)
           : writePeak(l) ? '209,250,229'
           : reachDemo(l) ? '224,242,254' : '255,255,255';
         quad(pt,'rgba('+tint+',.42)');
@@ -211,12 +236,16 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
           ctx.beginPath(); ctx.arc(p.sx,p.sy,r,0,6.283); ctx.fill();
         });
 
-        /* 层号（盒前下方） */
+        /* 层号（盒前下方）+ 真实权重 rms 数值（盒足够宽时） */
         if(w>24){
           ctx.globalAlpha=0.92; ctx.fillStyle=l===selRef.current?'#0284c7':'#64748b';
           ctx.font=((w>40?9:7.5)*dpr)+'px ui-monospace,Consolas,monospace';
           const lm={sx:(pb[1].sx+pb[2].sx)/2, sy:(pb[1].sy+pb[2].sy)/2};
           ctx.fillText('L'+l, lm.sx, lm.sy+11*dpr);
+          if(wt&&w>56){
+            ctx.fillStyle='#0f766e'; ctx.font=(7*dpr)+'px ui-monospace,Consolas,monospace';
+            ctx.fillText(wt.raw.toFixed(4), lm.sx-10*dpr, lm.sy+22*dpr);
+          }
           ctx.globalAlpha=1;
         }
         /* L6 脉冲环 + F#3734 标注 */
@@ -274,7 +303,9 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
         dragRef.current={x:e.clientX,y:e.clientY,btn:dragRef.current.btn};
         return;
       }
-      cv.style.cursor=pick(mx,my)>=0?'pointer':'grab';
+      const hov=pick(mx,my);
+      cv.style.cursor=hov>=0?'pointer':'grab';
+      if(hov!==hoverRef.current){ hoverRef.current=hov; setHoverL(hov); }   /* 悬停层号（数值 readout 用） */
     };
     let autoT=null;
     const onDown=e=>{
@@ -338,9 +369,13 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
           <div className="li"><span className="fw-swatch" style={{background:'#0284c7',borderRadius:'50%'}}/>attention head 节点（示意 8 / 实际 32）</div>
           <div className="li"><span className="fw-swatch" style={{background:'#6d28d9',borderRadius:'50%'}}/>MLP unit 节点（示意 8 / 实际 9,728）</div>
           <div className="li"><span className="fw-swatch" style={{background:'#94a3b8',borderRadius:'50%'}}/>RMSNorm 节点 · 盒内连线=层内结构</div>
+          {wmap && <div className="li"><span className="fw-swatch" style={{background:'linear-gradient(90deg,#ffffff,#7dd3fc,#10b981)'}}/>层盒色=该层 down_proj 权重 RMS（真实数值，白→蓝→绿）</div>}
+          {!wmap && <div className="li"><span className="fw-swatch" style={{background:'#d1fae5',border:'1px solid #10b98166'}}/>层盒色=研究标注带（连接本地模型后按真实权重 RMS 着色）</div>}
         </div>
         <div className="fw-sp-readout">
           cam <b>θ {readout.th}° · φ {readout.ph}°</b> · 平移 <b>{readout.panX>0?'+':''}{readout.panX},{readout.panY>0?'+':''}{readout.panY}px</b> · 平铺 <b>n=36 layers</b>
+          {hoverL>=0&&wmap&&wmap.get(hoverL)&&<> · L{hoverL} <b>rms {wmap.get(hoverL).raw.toFixed(4)}</b></>}
+          {scanState==='loading'&&<span style={{color:'#0f766e'}}> · 权重数值计算中…</span>}
         </div>
       </div>
 
@@ -348,13 +383,36 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
       <aside className="fw-lp">
         {sel<0?(
           <>
-            <div className="fw-lp-hd">模型总览 <small>qwen3-4b · 4.02B</small></div>
-            <div className="fw-lp-cfg">
-              {CONFIG.flatMap(([k,v])=>[
-                <span className="k" key={k}>{k}</span>,
-                <span className="v" key={'v'+k}>{v}</span>,
-              ])}
-            </div>
+            <div className="fw-lp-hd">模型总览 <small>{live ? live.head : 'qwen3-4b · 4.02B'}</small></div>
+            {live ? (
+              <>
+                <div className="fw-lp-cfg">
+                  {live.cfg.flatMap(([k, v]) => [
+                    <span className="k" key={k}>{k}</span>,
+                    <span className="v" key={'v' + k}>{v}</span>,
+                  ])}
+                </div>
+                {live.dtypes.length > 0 && (
+                  <>
+                    <div className="sec">数据类型 · DTYPES</div>
+                    <div className="fw-lp-cfg">
+                      {live.dtypes.flatMap(([k, v]) => [
+                        <span className="k" key={k}>{k}</span>,
+                        <span className="v" key={'v' + k}>{v}</span>,
+                      ])}
+                    </div>
+                  </>
+                )}
+                {live.meta && <div className="fw-lp-note">模型路径：{live.meta}</div>}
+              </>
+            ) : (
+              <div className="fw-lp-cfg">
+                {CONFIG.flatMap(([k,v])=>[
+                  <span className="k" key={k}>{k}</span>,
+                  <span className="v" key={'v'+k}>{v}</span>,
+                ])}
+              </div>
+            )}
             <div className="sec">参数树 · ALL PARAMETERS<span>{fmt(MODEL_TOTAL)}</span></div>
             {MODEL_TREE.map(r=>(
               <div className="fw-lp-row" key={r.n}>
@@ -366,7 +424,9 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
                 <div className="fw-lp-bar"><i style={{width:(r.p/MODEL_TOTAL*100).toFixed(2)+'%'}}/></div>
               </div>
             ))}
-            <div className="fw-lp-note">点击左侧任意层盒 → 该层内部结构与全部参数。<br/>形状/计数按 Qwen3-4B 公开架构推导（config.json 口径）；节点激活为 demo 种子，接入点：torch hook 实测。</div>
+            <div className="fw-lp-note">点击左侧任意层盒 → 该层内部结构与全部参数。<br/>形状/计数按 Qwen3-4B 公开架构推导（config.json 口径）；节点激活为 demo 种子，接入点：torch hook 实测。
+              {wmap ? <><br/>层盒着色=各层 down_proj 真实权重 RMS（懒加载，非整体加载）：白→蓝→绿=min→max。</>
+                    : <><br/>盒色当前为研究标注带；连接本地模型后按真实权重 RMS 数值着色。</>}</div>
             <div className="sec">研究标注 · 全局</div>
             <div className="bdg-row">
               <span className="fw-bdg" style={{background:'#0596691a',color:'#059669',border:'1px solid #05966955'}}>F#3734 载体层 L6</span>
@@ -403,6 +463,15 @@ export default function StackMode({onOpenParam,onOpenNeuron}){
                 </div>
               );
             })}
+            {wmap&&wmap.get(sel)&&(()=>{const w=wmap.get(sel);return (
+              <>
+                <div className="sec">权重数值 · mlp.down_proj<span>{w.sampled?'32×64 行块抽样':'全量遍历'}</span></div>
+                <div className="fw-lp-cfg">
+                  <span className="k">RMS √mean(W²)</span><span className="v">{w.raw.toFixed(6)}</span>
+                  <span className="k">mean |W|</span><span className="v">{w.ma.toFixed(6)}</span>
+                </div>
+              </>
+            );})()}
             <div className="sec">ATTENTION · {HEADS} heads（GQA {KVH} kv · head_dim {D_HEAD}）<span>demo 激活</span></div>
             <div className="fw-heads-grid">
               {heads.map((v,i)=>(

@@ -1,17 +1,161 @@
-/* 数据透镜 v1：结果浏览器（design/ui_decoupled_plan_v1.md §3「数据 → SummaryBrowser」）
+/* 分析技术 → 分析技术视图（design/client_template_tech_plan_v1.md §3，M5-P0 主语反转）
    ─────────────────────────────────────────────────────────────
    与具体测试内容完全解耦：界面只渲染协议键，任何新模板注册后
    无需改本文件即可被筛选、浏览、展开。
+   双模式：按技术（默认，主语=技术：选技术 → 契约匹配结果 → 展开自动运行）
+          / 按结果（原结果浏览器，行内附属技术面板）。
    数据源（全部经 :5001 挂载的分布式路由）：
    - GET /api/templates            → 模板筛选器（D1-1 详情按需拉取）
    - GET /api/results              → 结果行（D1-3 summary_digest 平铺）
    - GET /api/results/{sha}        → 展开详情（summary 原文 + cos 矩阵提取）
    离线回退 distributedData.js 的 DEMO_RESULTS（协议结构演示行）。 */
 import { useEffect, useState } from 'react';
-import { TemplateCard, SummaryBrowser } from './protocolComponents.jsx';
-import { TEMPLATES, DEMO_RESULTS } from './distributedData.js';
+import { TemplateCard, SummaryBrowser, CellCosGrid } from './protocolComponents.jsx';
+import { TEMPLATES, DEMO_RESULTS, ANALYSES, DEMO_RDM } from './distributedData.js';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
+
+/* 技术运行内核：对 detail 施加 tech → 输出对象（或 null=缺输入契约）
+   rsa-rdm 客户端现算 RDM = 1 − cos；eta2-decompose 直读 summary.eta2_by_factor；
+   离线时 rsa-rdm 回退 DEMO_RDM 并显式挂 demo 徽标。 */
+function runTech(tech, detail, demo) {
+  if (tech.id === 'rsa-rdm') {
+    if (detail && detail.cos) {
+      return { id: 'rsa-rdm', demo: false,
+        rdm: { keys: detail.cos.keys, matrix: detail.cos.matrix.map(row => row.map(v => 1 - v)) } };
+    }
+    return demo ? { id: 'rsa-rdm', demo: true, rdm: DEMO_RDM } : null;
+  }
+  if (tech.id === 'eta2-decompose') {
+    if (detail && detail.summary && detail.summary.eta2_by_factor) {
+      return { id: 'eta2-decompose', demo: false, eta2: detail.summary.eta2_by_factor };
+    }
+    return null;
+  }
+  return null;
+}
+
+/* 分析技术面板（design/client_analysis_tech_plan_v1.md §2.3，P0/P1-lite）
+   注册表 ← ANALYSES（distributedData.js）；可用性按 input 契约对当前 detail 匹配；
+   受控模式：techId/setTechId 由视图级技术导航传入；autoRun=true 时详情到位即自动运行；
+   hideChips=true 时隐藏面板内 chips（视图级导航已承担选择）。 */
+function TechPanel({ detail, isLive, techId, setTechId, autoRun, hideChips }) {
+  const [localTech, setLocalTech] = useState('rsa-rdm');
+  const [ranTech, setRanTech] = useState(null);
+  const cid = techId || localTech;
+  const setCid = setTechId || setLocalTech;
+  const tech = ANALYSES.find(a => a.id === cid) || ANALYSES[0];
+
+  const contractOk = (key) => {
+    if (key === 'result.cos') return Boolean(detail && detail.cos);
+    if (key === 'result.summary.eta2_by_factor') return Boolean(detail && detail.summary && detail.summary.eta2_by_factor);
+    if (key === 'result2.cos') return false;                    // P2：双结果选择
+    return true;
+  };
+  const avail = tech.input.every(contractOk);
+  const demo = !isLive;                                         // 离线 → DEMO 回退
+  const runnable = avail || (demo && tech.id === 'rsa-rdm');    // DEMO 仅 rsa-rdm 有演示输出
+
+  const run = () => { setRanTech(runTech(tech, detail, demo)); };
+
+  /* 自动运行：autoRun 模式下详情到位即施加当前技术（按技术视图） */
+  useEffect(() => {
+    if (!autoRun) return;
+    if (isLive && !detail) { setRanTech(null); return; }        // LIVE 详情拉取中
+    setRanTech(runTech(tech, detail, demo));
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [autoRun, detail, cid]);
+  return (
+    <div className="fw-tech">
+      {!hideChips && (
+        <>
+          <div className="fw-tech-bar">
+            <b>分析技术</b>
+            <span className="fw-tech-tip">注册表驱动 · 按输入契约过滤可用性 · 口径各自登记，禁止跨量纲平均</span>
+            {demo && <span className="fw-src-chip demo" title="离线演示输出——协议结构演示数据">○ DEMO 输出</span>}
+          </div>
+          <div className="fw-tech-sel">
+            {ANALYSES.map(a => {
+              const aAvail = a.input.every(contractOk);
+              const aRunnable = aAvail || (demo && a.id === 'rsa-rdm');
+              return (
+                <button key={a.id} type="button" title={a.disabled_reason || a.note}
+                        className={'fw-tech-chip' + (cid === a.id ? ' on' : '') + (aRunnable ? '' : ' off')}
+                        onClick={() => { if (aRunnable) { setCid(a.id); setRanTech(null); } }}>
+                  {a.name}
+                  {!aRunnable && <small>·{a.disabled_reason ? '未开放' : '缺输入'}</small>}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+      <div className="fw-tech-meta">
+        <span className="fw-mono">{tech.metric_version}</span>
+        <span className="fw-mono dim2">证据级 {tech.evidence_level}</span>
+        <span className="dim2">{tech.note}</span>
+      </div>
+      {runnable && ranTech && ranTech.id === 'rsa-rdm' && ranTech.rdm && (
+        <TechRdm out={ranTech}/>
+      )}
+      {runnable && ranTech && ranTech.id === 'eta2-decompose' && ranTech.eta2 && (
+        <TechEta2 eta2={ranTech.eta2}/>
+      )}
+      {runnable && !ranTech && (
+        <div className="fw-tech-hint">
+          {autoRun
+            ? (isLive ? (detail ? '当前结果缺少该技术的输入契约（如 cos 矩阵）' : '拉取详情后自动运行…') : '离线演示仅开放 RSA/RDM（DEMO 输出）')
+            : '点击「运行」施加当前技术 → 输出经协议键渲染'}
+        </div>
+      )}
+      {!runnable && <div className="fw-tech-hint">{tech.disabled_reason || (isLive ? '当前结果缺少该技术的输入契约（如 cos 矩阵）' : '离线演示仅开放 RSA/RDM')}</div>}
+      {runnable && ranTech && !autoRun && (
+        <button type="button" className="fw-tbtn" style={{ marginTop: 6 }} onClick={() => setRanTech(null)}>清除输出</button>
+      )}
+    </div>
+  );
+}
+
+/* rsa-rdm 输出：RDM 热图（复用 CellCosGrid mode=rdm）+ 关系摘要（最分离/最相似条件对） */
+function TechRdm({ out }) {
+  const { keys, matrix } = out.rdm;
+  let best = null, worst = null;
+  for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) {
+    const v = matrix[i][j];
+    if (!best || v > best.v) best = { a: keys[i], b: keys[j], v };
+    if (!worst || v < worst.v) worst = { a: keys[i], b: keys[j], v };
+  }
+  return (
+    <div className="fw-tech-out">
+      {out.demo && <div className="fw-tech-demo-note">演示矩阵（协议结构演示）——接入真实结果后此处为该行 means.npz cos 现算值</div>}
+      <CellCosGrid cos={{ keys, matrix }} mode="rdm"/>
+      <div className="fw-tech-sum">
+        <span>{keys.length} 条件</span>
+        <span>最分离对 <b className="fw-mono">{best.a} × {best.b}</b>（dissim {best.v.toFixed(2)}）</span>
+        <span>最相似对 <b className="fw-mono">{worst.a} × {worst.b}</b>（dissim {worst.v.toFixed(2)}）</span>
+      </div>
+    </div>
+  );
+}
+
+/* eta2-decompose 输出：因子条形视图（数据=summary.eta2_by_factor，协议键直读） */
+function TechEta2({ eta2 }) {
+  const entries = Object.entries(eta2).filter(([, v]) => typeof v === 'number');
+  const max = Math.max(0.001, ...entries.map(([, v]) => Math.abs(v)));
+  return (
+    <div className="fw-tech-out">
+      <div className="fw-tech-bars">
+        {entries.map(([k, v]) => (
+          <div key={k} className="fw-tech-barrow" title={`${k} = ${v.toFixed(4)}`}>
+            <span className="fw-mono">{k}</span>
+            <span className="fw-tech-bartrack"><i style={{ width: `${(Math.abs(v) / max) * 100}%` }}/></span>
+            <b className="fw-mono">{v.toFixed(3)}</b>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function LensData({ on }) {
   const [live, setLive] = useState(null);          // {templates, results_total, downloads_total}
@@ -22,6 +166,8 @@ export default function LensData({ on }) {
   const [detail, setDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [err, setErr] = useState('');
+  const [viewMode, setViewMode] = useState('tech');   // 按技术（默认，主语反转）/ 按结果
+  const [techId, setTechId] = useState('rsa-rdm');    // 视图级技术选择（按技术模式）
 
   useEffect(() => {
     let dead = false;
@@ -81,6 +227,11 @@ export default function LensData({ on }) {
   const metaOf = tm => tplMeta[tm] || null;
   const factorsMap = Object.fromEntries(Object.entries(tplMeta).map(([k, m]) => [k, m.factors || []]));
   const resultsTotal = isLive ? viewRows.length : DEMO_RESULTS.length;
+  const techDef = ANALYSES.find(a => a.id === techId) || ANALYSES[0];
+  /* 按技术模式：先按模板筛选，再按「行级可判定的输入契约」预过滤
+     （eta2 的输入在 summary_digest 行级即可判定；cos 类契约须展开详情后判定，故不预过滤） */
+  const techRows = filtered.filter(r =>
+    techDef.id !== 'eta2-decompose' || (r.summary_digest && r.summary_digest.eta2_by_factor));
 
   return (
     <section className={'fw-view fw-data' + (on ? ' on' : '')}>
@@ -95,6 +246,36 @@ export default function LensData({ on }) {
           <div className="fw-pl-stat"><div className="n">{tpls.length}</div><div className="l">模板</div><div className="s">注册表 S2 · 任意句型可扩展</div></div>
           <div className="fw-pl-stat"><div className="n">{new Set((viewRows || []).map(r => r.tm_id)).size}</div><div className="l">有结果模板</div><div className="s">行=一次上传</div></div>
         </div>
+
+        {/* 视图模式：按技术（主语反转，M5-P0）/ 按结果（原浏览器） */}
+        <div className="fw-tech-seg">
+          <button type="button" className={viewMode === 'tech' ? 'on' : ''} onClick={() => setViewMode('tech')}>
+            按技术<small>选技术 → 契约匹配结果 → 展开自动运行</small>
+          </button>
+          <button type="button" className={viewMode === 'results' ? 'on' : ''} onClick={() => setViewMode('results')}>
+            按结果<small>结果浏览器（展开后行内选技术）</small>
+          </button>
+        </div>
+
+        {/* 按技术模式：视图级技术导航（注册表驱动，M4 TechPanel 升格） */}
+        {viewMode === 'tech' && (
+          <div className="fw-tech-nav">
+            <div className="fw-tech-sel">
+              {ANALYSES.map(a => (
+                <button key={a.id} type="button" title={a.disabled_reason || a.note}
+                        className={'fw-tech-chip' + (techId === a.id ? ' on' : '') + (a.disabled_reason ? ' off' : '')}
+                        onClick={() => { if (!a.disabled_reason) setTechId(a.id); }}>
+                  {a.name}{a.disabled_reason && <small>·未开放</small>}
+                </button>
+              ))}
+            </div>
+            <div className="fw-tech-meta">
+              <span className="fw-mono">{techDef.metric_version}</span>
+              <span className="fw-mono dim2">证据级 {techDef.evidence_level}</span>
+              <span className="dim2">{techDef.note}</span>
+            </div>
+          </div>
+        )}
 
         <div className="fw-data-grid">
           {/* 左列：模板筛选器（协议驱动 TemplateCard） */}
@@ -120,11 +301,17 @@ export default function LensData({ on }) {
             {err && <div className="fw-ai-err" style={{ marginBottom: 8 }}>{err}</div>}
             <div className="fw-pl-card">
               <h6>
-                结果浏览器
-                <span>{filter ? `筛选 ${filter}` : '全部模板'} · 点击行展开 summary 原文 / η² 分解 / cos 矩阵</span>
+                {viewMode === 'tech' ? `技术 · ${techDef.name}` : '结果浏览器'}
+                <span>{filter ? `筛选 ${filter}` : '全部模板'} · 点击行展开{viewMode === 'tech' ? '，详情到位后自动按输入契约运行当前技术' : ' summary 原文 / η² 分解 / cos 矩阵'}</span>
               </h6>
-              <SummaryBrowser rows={filtered} expandedSha={expandedSha} onExpand={expand}
+              <SummaryBrowser rows={viewMode === 'tech' ? techRows : filtered} expandedSha={expandedSha} onExpand={expand}
                               detail={detail} detailLoading={detailLoading} factorsByTm={factorsMap}/>
+              {expandedSha && (
+                <TechPanel detail={detail} isLive={isLive} detailLoading={detailLoading}
+                           techId={viewMode === 'tech' ? techId : undefined}
+                           setTechId={viewMode === 'tech' ? setTechId : undefined}
+                           autoRun={viewMode === 'tech'} hideChips={viewMode === 'tech'}/>
+              )}
             </div>
             <div className="fw-rg-note" style={{ marginTop: 10 }}>
               <b>解耦约定</b>：本界面是协议（模板 + 产出 schema）的通用渲染器——只认识

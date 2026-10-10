@@ -6,7 +6,7 @@
    红线（v2 §0）：本文件不出现任何具体实验字面量（Q05/F#3734/collect_ar.py 等）。 */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEMO_QUEUE, DEMO_WORKSPACE, DEMO_ARTIFACTS, DEMO_TERMINAL } from './demoData.js';
-import { TEMPLATES, DEMO_RESULTS } from './distributedData.js';
+import { TEMPLATES, DEMO_RESULTS, DEMO_SCHED, TECH_CATEGORIES, DEMO_COVERAGE, ANALYSES, LANG_TEMPLATES } from './distributedData.js';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5001').replace(/\/$/, '');
 const DEFAULT_WS_PATH = 'tests/deepseek';   // 工作区默认根（顶栏特征源选择器未来接管）
@@ -49,6 +49,20 @@ function evidenceChain(items,sealed,count){
 function demoDistRows(){ // 分布式队列 demo 回退（数据源自 distributedData）
   const cnt={}; DEMO_RESULTS.forEach(r=>{cnt[r.tm_id]=(cnt[r.tm_id]||0)+1;});
   return TEMPLATES.map(t=>({tm_id:t.id,name:t.name,dim:t.dim,results:cnt[t.id]||0}));
+}
+/* M7-P1 缺口任务（覆盖矩阵空格 → 任务建议）：数据 = DEMO_COVERAGE（P2 真源 /api/coverage），
+   技术/模板名反查注册表，零字面量。status!=='done' 即缺口。 */
+function gapRows(catFilter){
+  const tplName=id=>(LANG_TEMPLATES.find(t=>t.id===id)||{}).name||id;
+  const catOf=id=>TECH_CATEGORIES.find(c=>c.id===id)||{};
+  return DEMO_COVERAGE
+    .filter(c=>c.status!=='done'&&(!catFilter||catFilter==='all'||c.cat===catFilter))
+    .map(c=>{ const cat=catOf(c.cat); return {
+      tpl:c.tpl, cat:c.cat, status:c.status,
+      tplName:tplName(c.tpl), catName:cat.name||c.cat, catColor:cat.color,
+      input:cat.input||'—', cost:cat.cost||'—', note:cat.note||'',
+      nTech:ANALYSES.filter(a=>a.category===c.cat).length,
+    };});
 }
 function fmtSize(n){ return n>1048576?(n/1048576).toFixed(1)+' MB':(n/1024).toFixed(1)+' KB'; }
 function fmtTime(v){
@@ -132,7 +146,9 @@ export default function LensProcess({on,onGo}){
   /* ── M3-P1 内容层状态 ── */
   const [rnd,setRnd]=useState(null);            // /api/ai-rnd/queue 原样
   const [dist,setDist]=useState(null);          // [{tm_id,name,dim,results}]
+  const [sched,setSched]=useState(null);        // M6-P2 /api/tasks 原样（S8 调度队列只读视图）
   const [qTab,setQTab]=useState('rnd');
+  const [gapCat,setGapCat]=useState('all');   // M7-P1 缺口任务的技术类别过滤器
   const [qSel,setQSel]=useState(null);          // {src:'rnd'|'dist', item}
   const [ws,setWs]=useState(null);              // /workspace 原样
   const [wsLive,setWsLive]=useState(false);
@@ -176,6 +192,11 @@ export default function LensProcess({on,onGo}){
           setDist(tp.templates.map(t=>({tm_id:t.tm_id||t.id,name:t.name,dim:t.dim,version:t.version,results:cnt[t.tm_id||t.id]||0})));
         }else setDist(null);
       }catch{ setDist(null); }
+      try{
+        const r=await fetch(`${API_BASE}/api/tasks`);
+        const p=r.ok?await r.json():null;
+        setSched(p&&p.stats?p:null);
+      }catch{ setSched(null); }
       loadWs(DEFAULT_WS_PATH);
     })();
   },[]); // eslint-disable-line
@@ -266,6 +287,7 @@ export default function LensProcess({on,onGo}){
   /* ── 内容层派生（live → demo 回退，渲染共用） ── */
   const rndLive=Boolean(rnd);
   const distLive=Boolean(dist);
+  const schedLive=Boolean(sched);               // M6-P2 调度队列（S8 /api/tasks）
   const rndItems=rndLive?rnd.queue:DEMO_QUEUE.queue;
   const rndSealed=rndLive?rnd.sealed:DEMO_QUEUE.sealed;
   const rndCount=rndLive?rnd.count:DEMO_QUEUE.count;
@@ -273,7 +295,15 @@ export default function LensProcess({on,onGo}){
   const rndNext=nextIdOf(rndItems);
   const rndSorted=queueRows(rndItems,8);
   const distSorted=[...distRows].sort((a,b)=>(b.results||0)-(a.results||0)).slice(0,8);
+  const gapItems=gapRows(gapCat);   // M7-P1 缺口任务（覆盖矩阵空格）
   const wsView=wsLive?ws:DEMO_WORKSPACE;
+  /* M6-P2 调度队列派生：LIVE 从 /api/tasks 现算剩余租约；DEMO 用快照自带 remain_h */
+  const schedSrc=schedLive?sched:DEMO_SCHED;
+  const schedStats=schedLive?(sched.stats||{}):DEMO_SCHED.stats;
+  const schedLease=schedSrc.lease_hours;
+  const schedRows=(schedSrc.active||[]).map(a=>schedLive
+    ?{...a,remain_h:Math.max(0,(a.lease_until-sched.server_time)/3600)}
+    :a);
   const chain=evidenceChain(rndItems,rndSealed,rndCount);
 
   /* 默认选中：研发线最高优先待办（无则首条）；渲染与 live/demo 共用 */
@@ -354,9 +384,13 @@ export default function LensProcess({on,onGo}){
         <div className="fw-pr-sec">
           任务队列
           <span className="fw-m3-qtabs">
-            <button type="button" className={'fw-m3-qtab'+(qTab==='rnd'?' on':'')} onClick={()=>setQTab('rnd')}>研发线</button>
+            <button type="button" className={'fw-m3-qtab'+(qTab==='rnd'?' on':'')} onClick={()=>setQTab('rnd')}>研究线</button>
             <button type="button" className={'fw-m3-qtab'+(qTab==='dist'?' on':'')} onClick={()=>setQTab('dist')}>分布式</button>
-            <span className={'fw-src-chip mini '+(qTab==='rnd'?(rndLive?'live':'demo'):(distLive?'live':'demo'))}>{qTab==='rnd'?(rndLive?'LIVE':'DEMO'):(distLive?'LIVE':'DEMO')}</span>
+            <button type="button" className={'fw-m3-qtab'+(qTab==='sched'?' on':'')} onClick={()=>setQTab('sched')}>调度</button>
+            <button type="button" className={'fw-m3-qtab'+(qTab==='gap'?' on':'')} onClick={()=>setQTab('gap')} title="覆盖矩阵空格 → 任务建议（对象 × 语言模板 × 技术类别）">缺口</button>
+            <span className={'fw-src-chip mini '+((qTab==='gap'?false:(qTab==='rnd'?rndLive:qTab==='dist'?distLive:schedLive))?'live':'demo')}>
+              {qTab==='rnd'?(rndLive?'LIVE':'DEMO'):qTab==='gap'?(gapItems.length+' 格待做'):qTab==='dist'?(distLive?'LIVE':'DEMO'):(schedLive?'LIVE':'DEMO')}
+            </span>
           </span>
         </div>
         {qTab==='rnd'&&rndSorted.map(it=>{
@@ -375,6 +409,42 @@ export default function LensProcess({on,onGo}){
           </button>
         ))}
         {qTab==='dist'&&<div className="fw-m3-more">共 {distRows.length} 模板（{distLive?'中心节点结果库':'demo'}）</div>}
+        {qTab==='sched'&&schedRows.map(a=>{
+          const remain=a.remain_h;
+          return (
+            <div key={a.task_id} className="fw-q-row" style={{cursor:'default'}} title={'task '+a.task_id+' · 模板 '+a.tm_id+' · node '+(a.node_name||'?')}>
+              <span className="id">{a.tm_id}</span>{a.node_name||'?'} · {a.model||'?'}<span className={'fw-pill '+(remain<1?'':'fw-pill-run')}>{'租约 '+remain.toFixed(1)+'h'}</span>
+            </div>
+          );
+        })}
+        {qTab==='sched'&&<div className="fw-m3-more">
+          活跃 {schedStats.claimed||0} · 完成 {schedStats.done||0} · 失败 {schedStats.failed||0} · 过期 {schedStats.expired||0} · 单租约 {schedLease}h
+          （{schedLive?'GET /api/tasks 实时':'demo'}）
+        </div>}
+        {qTab==='sched'&&<div className="fw-m3-more" title="概念消歧：调度队列=节点租约实时状态；研究线队列=phase_queue 依赖序；分布式=模板结果库">
+          ↑ 调度队列=节点租约（谁在领什么）· 研究线=phase 依赖序 · 两层不同
+        </div>}
+        {qTab==='gap'&&(<>
+          <div className="fw-gap-filter">
+            <button type="button" className={'fw-m3-qtab'+(gapCat==='all'?' on':'')} onClick={()=>setGapCat('all')}>全部</button>
+            {TECH_CATEGORIES.map(c=>(
+              <button key={c.id} type="button" className={'fw-m3-qtab'+(gapCat===c.id?' on':'')}
+                      style={gapCat===c.id?{borderColor:c.color,color:c.color}:undefined}
+                      onClick={()=>setGapCat(c.id)}>{c.short||c.name}</button>
+            ))}
+          </div>
+          {gapItems.map(g=>(
+            <button key={g.tpl+'__'+g.cat} type="button" className="fw-q-row"
+                    onClick={()=>{ setQSel({src:'gap',item:g}); setArt({type:'gap',label:g.tplName+' × '+g.catName,item:g}); }}
+                    title={g.note}>
+              <span className="id" style={{color:g.catColor}}>{g.tpl}</span>
+              {g.tplName} × {g.catName}
+              <span className={'fw-pill '+(g.status==='pending'?'fw-pill-run':'')}>{g.status==='pending'?'装置已建':'空格'}</span>
+            </button>
+          ))}
+          {gapItems.length===0&&<div className="fw-m3-more">该类别暂无缺口——全部模板已有该类结果。</div>}
+          <div className="fw-m3-more">缺口 = 覆盖矩阵中 status≠done 的格（对象 × 模板 × 技术类别）· 点击看输入契约与预计算力 · P2 由 /api/coverage 转真</div>
+        </>)}
 
         <div className="fw-pr-sec">
           工作区 {wsView.path&&<span className="fw-m3-wspath fw-mono" title={wsView.path}>/{wsView.path.split('/').pop()}</span>}
@@ -478,6 +548,23 @@ export default function LensProcess({on,onGo}){
                   {!art.loading&&(!art.rows||!art.rows.length)&&<div className="fw-pc-empty">该模板暂无已上传结果（节点领取执行后自动出现）。</div>}
                 </div>
               )}
+              {art.type==='gap'&&art.item&&(
+                <div className="fw-m3-gap">
+                  <KVList pairs={[
+                    ['缺口',art.item.tplName+' × '+art.item.catName],
+                    ['技术类别',art.item.cat,true],
+                    ['输入契约',art.item.input,true],
+                    ['预计算力',art.item.cost],
+                    ['状态',art.item.status==='pending'?'装置已建 · 等结果':'空格 · 无任何结果'],
+                    ['该类技术数',art.item.nTech+' 项（ANALYSES 注册表）'],
+                    ['说明',art.item.note],
+                  ]}/>
+                  <button type="button" className="fw-tbtn" style={{marginTop:8}}
+                          onClick={()=>{ try{ navigator.clipboard.writeText('python node_agent.py run'); window.alert('领取命令已复制：python node_agent.py run'); }catch(e){ window.alert('领取命令：python node_agent.py run'); } }}>
+                    复制领取命令
+                  </button>
+                </div>
+              )}
             </div>
           )}
           {tabIdx===tabs.length-1&&(
@@ -516,6 +603,9 @@ export default function LensProcess({on,onGo}){
           {qSel&&qSel.src==='dist'&&(
             <KVList pairs={[['模板',qSel.item.tm_id,true],['名称',qSel.item.name],['维度',qSel.item.dim],['结果数',qSel.item.results]]}/>
           )}
+          {qSel&&qSel.src==='gap'&&(
+            <KVList pairs={[['缺口',qSel.item.tplName+' × '+qSel.item.catName],['状态',qSel.item.status==='pending'?'装置已建':'空格'],['契约',qSel.item.input,true]]}/>
+          )}
         </div>
         <div className="fw-res-card">
           <h5>证据链</h5>
@@ -525,7 +615,7 @@ export default function LensProcess({on,onGo}){
           <h5>跨透镜动作</h5>
           <div className="fw-xact">
             <button className="fw-tbtn" onClick={()=>onGo('spatial')}>在 3D 中查看</button>
-            <button className="fw-tbtn" onClick={()=>onGo('data')}>到数据透镜看结果</button>
+            <button className="fw-tbtn" onClick={()=>onGo('data')}>到分析技术运行</button>
           </div>
         </div>
       </div>

@@ -1,22 +1,20 @@
-/* 特征点云模式：canvas 2D 伪 3D 特征族点云（原空间透镜主体平移，接 collect.npz 前的 demo 数据） */
+/* 特征点云模式：canvas 2D 伪 3D 特征族点云（原空间透镜主体平移，接 collect.npz 前的 demo 数据）
+   语言模板驱动（design/client_template_tech_plan_v1.md §2，M5-P0）：
+   点云族 / 焦点特征 / 邻居 / 图例全部来自 LANG_TEMPLATES（distributedData.js）——
+   本组件不含任何模板叙事字面量，切换模板整体跟随。 */
 import { useEffect, useRef, useState } from 'react';
+import { LANG_TEMPLATES } from './distributedData.js';
 
-/* 确定性伪随机 */
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
-const CLUSTERS=[
-  {c:[0.9,-0.6,0.4],col:'#10b981',n:120,s:0.85,fam:'is-a'},
-  {c:[-1.0,0.5,-0.5],col:'#0ea5e9',n:90,s:0.95,fam:'attr'},
-  {c:[-0.2,-0.9,1.0],col:'#f59e0b',n:70,s:0.75,fam:'syntax'},
-  {c:[0,0,0],col:'#cbd5e1',n:180,s:1.9,fam:'bg'},
-];
-const FOCUS={x:0.42,y:-1.18,z:0.73};
-const NEIGHBORS=[
-  {x:0.6,y:-0.9,z:0.5,id:'F#1092'},{x:0.3,y:-1.5,z:0.9,id:'F#2210'},
-  {x:0.8,y:-1.0,z:0.3,id:'F#3655'},{x:0.2,y:-0.8,z:0.6,id:'F#0821'},
-];
+/* 邻居相对位置（族结构骨架，跨模板共用；特征 id ← 模板 demo.neighbors） */
+const NB_POS=[[0.6,-0.9,0.5],[0.3,-1.5,0.9],[0.8,-1.0,0.3],[0.2,-0.8,0.6]];
+const BG_CLUSTER={c:[0,0,0],col:'#cbd5e1',n:180,s:1.9};
 
-export default function CloudMode(){
+export default function CloudMode({tpl}){
+  const tplDef=tpl||LANG_TEMPLATES[0];
+  const demo=tplDef.demo;
+  const focus=demo.focus;
   const cvRef=useRef(null);
   const camRef=useRef({th:0.6,ph:0.35,zoom:190,auto:true,pulse:0,panX:0,panY:0});
   const dragRef=useRef(null);
@@ -24,17 +22,23 @@ export default function CloudMode(){
 
   useEffect(()=>{
     const cv=cvRef.current; if(!cv) return;
-    const ctx=cv.getContext('2d');
+    const ctx2=cv.getContext('2d');
     const cam=camRef.current;
 
-    /* 生成点云（一次） */
+    /* 生成点云（每次模板切换重建；族结构 ← 模板 demo.cloud） */
     const rnd=mulberry(2050), PTS=[];
-    CLUSTERS.forEach(cl=>{
+    demo.cloud.forEach(cl=>{
       for(let i=0;i<cl.n;i++){
         PTS.push({x:cl.c[0]+(rnd()-0.5)*cl.s*2,y:cl.c[1]+(rnd()-0.5)*cl.s*2,z:cl.c[2]+(rnd()-0.5)*cl.s*2,
-          col:cl.col,r:cl.fam==='bg'?1.3:2.2,a:cl.fam==='bg'?0.35:0.8});
+          col:cl.col,r:2.2,a:0.8});
       }
     });
+    for(let i=0;i<BG_CLUSTER.n;i++){
+      PTS.push({x:BG_CLUSTER.c[0]+(rnd()-0.5)*BG_CLUSTER.s*2,y:BG_CLUSTER.c[1]+(rnd()-0.5)*BG_CLUSTER.s*2,z:BG_CLUSTER.c[2]+(rnd()-0.5)*BG_CLUSTER.s*2,
+        col:BG_CLUSTER.col,r:1.3,a:0.35});
+    }
+    const FOCUS={x:focus.pos[0],y:focus.pos[1],z:focus.pos[2]};
+    const NEIGHBORS=NB_POS.map((p,i)=>({x:p[0],y:p[1],z:p[2],id:demo.neighbors[i]||('F#'+((i*917+109)%4000))}));
 
     function resize(){
       const dpr=window.devicePixelRatio||1;
@@ -54,35 +58,35 @@ export default function CloudMode(){
     let raf=0;
     function draw(){
       const dpr=window.devicePixelRatio||1;
-      ctx.clearRect(0,0,cv.width,cv.height);
+      ctx2.clearRect(0,0,cv.width,cv.height);
       if(cam.auto&&!dragRef.current) cam.th+=0.0022;
       cam.pulse+=0.05;
       const f=project(FOCUS);
       const nbp=NEIGHBORS.map(n=>({q:project(n),n}));
       /* 邻居连线 */
-      ctx.lineWidth=1.2*dpr;
+      ctx2.lineWidth=1.2*dpr;
       nbp.forEach(({q})=>{
-        const g=ctx.createLinearGradient(f.sx,f.sy,q.sx,q.sy);
+        const g=ctx2.createLinearGradient(f.sx,f.sy,q.sx,q.sy);
         g.addColorStop(0,'rgba(5,150,105,.9)'); g.addColorStop(1,'rgba(5,150,105,.15)');
-        ctx.strokeStyle=g; ctx.beginPath(); ctx.moveTo(f.sx,f.sy); ctx.lineTo(q.sx,q.sy); ctx.stroke();
+        ctx2.strokeStyle=g; ctx2.beginPath(); ctx2.moveTo(f.sx,f.sy); ctx2.lineTo(q.sx,q.sy); ctx2.stroke();
       });
       /* 点（按深度排序） */
       const items=PTS.map(p=>({q:project(p),p})).concat(nbp.map(({q})=>({q,p:{col:'#059669',r:2.6,a:0.95}})));
       items.sort((a,b)=>a.q.depth-b.q.depth).forEach(({q,p})=>{
-        ctx.globalAlpha=Math.max(0.08,p.a*(1-0.35*((q.depth+2)/4)));
-        ctx.fillStyle=p.col;
-        ctx.beginPath(); ctx.arc(q.sx,q.sy,p.r*0.016*cam.zoom*0.9*dpr,0,6.283); ctx.fill();
+        ctx2.globalAlpha=Math.max(0.08,p.a*(1-0.35*((q.depth+2)/4)));
+        ctx2.fillStyle=p.col;
+        ctx2.beginPath(); ctx2.arc(q.sx,q.sy,p.r*0.016*cam.zoom*0.9*dpr,0,6.283); ctx2.fill();
       });
-      /* 高亮 F#3734 */
-      ctx.globalAlpha=1;
+      /* 高亮焦点特征 */
+      ctx2.globalAlpha=1;
       const r=(7+Math.sin(cam.pulse)*1.6)*dpr;
-      ctx.strokeStyle='rgba(5,150,105,.5)'; ctx.lineWidth=1.6*dpr;
-      ctx.beginPath(); ctx.arc(f.sx,f.sy,r+5*dpr,0,6.283); ctx.stroke();
-      ctx.fillStyle='#059669';
-      ctx.beginPath(); ctx.arc(f.sx,f.sy,4.5*dpr,0,6.283); ctx.fill();
-      ctx.fillStyle='#022c22';
-      ctx.font='bold '+(10*dpr)+'px ui-monospace,Consolas,monospace';
-      ctx.fillText('F#3734 · is-a 水果族',f.sx+9*dpr,f.sy-8*dpr);
+      ctx2.strokeStyle='rgba(5,150,105,.5)'; ctx2.lineWidth=1.6*dpr;
+      ctx2.beginPath(); ctx2.arc(f.sx,f.sy,r+5*dpr,0,6.283); ctx2.stroke();
+      ctx2.fillStyle='#059669';
+      ctx2.beginPath(); ctx2.arc(f.sx,f.sy,4.5*dpr,0,6.283); ctx2.fill();
+      ctx2.fillStyle='#022c22';
+      ctx2.font='bold '+(10*dpr)+'px ui-monospace,Consolas,monospace';
+      ctx2.fillText(focus.id+' · '+focus.short,f.sx+9*dpr,f.sy-8*dpr);
       raf=requestAnimationFrame(draw);
     }
     raf=requestAnimationFrame(draw);
@@ -132,24 +136,24 @@ export default function CloudMode(){
       cv.removeEventListener('wheel',onWheel);
       window.removeEventListener('resize',onResize);
     };
-  },[]);
+  },[tplDef.id]);
 
   return (
     <div style={{position:'absolute',inset:0}}>
       <canvas ref={cvRef} className="fw-sp-canvas"/>
       <div className="fw-sp-focus">
-        <button className="fw-tbtn" onClick={()=>window.alert('以 F#3734 为中心重置相机（接入真实坐标后生效）')}>◎ 以 F#3734 为中心</button>
-        <button className="fw-tbtn" onClick={()=>window.alert('E_ar(k) 方向叠加：接入 Q05 四臂结果后，在点云上渲染 is-a / attr / syntax 方向箭头')}>E_ar(k) 方向叠加</button>
+        <button className="fw-tbtn" onClick={()=>window.alert('以 '+focus.id+' 为中心重置相机（接入真实坐标后生效）')}>◎ 以 {focus.id} 为中心</button>
+        <button className="fw-tbtn" onClick={()=>window.alert('E_ar(k) 方向叠加：接入 Q05 四臂结果后，在点云上渲染当前语言模板的关系方向箭头')}>E_ar(k) 方向叠加</button>
       </div>
       <div className="fw-sp-legend">
-        <div className="li"><span className="fw-swatch" style={{background:'#10b981'}}/>水果族 · is-a</div>
-        <div className="li"><span className="fw-swatch" style={{background:'#0ea5e9'}}/>属性轴 · size/speed</div>
-        <div className="li"><span className="fw-swatch" style={{background:'#f59e0b'}}/>语法功能</div>
+        {demo.cloud.map((cl,i)=>(
+          <div className="li" key={i}><span className="fw-swatch" style={{background:cl.col}}/>{cl.label}</div>
+        ))}
         <div className="li"><span className="fw-swatch" style={{background:'#cbd5e1'}}/>其他</div>
       </div>
       <div className="fw-sp-readout">
         cam <b>θ {readout.th}° · φ {readout.ph}°</b> · 平移 <b>{readout.panX>0?'+':''}{readout.panX},{readout.panY>0?'+':''}{readout.panY}px</b><br/>
-        F#3734 <b>(0.42, −1.18, 0.73)</b>
+        {focus.id} <b>({focus.pos.map(v=>v.toFixed(2)).join(', ').replace(/-/g,'−')})</b>
       </div>
     </div>
   );

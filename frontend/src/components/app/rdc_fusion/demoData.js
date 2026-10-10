@@ -125,23 +125,19 @@ export const DEMO_TERMINAL=[
   '[Q06] sealed 5f88ed7e · 复核 16/0 → Ledger n=306',
 ];
 
-/* ── 对象卡 demo（/api/object/{fid} 回退；schema=object_card.v1 与 object_registry.json 对齐） ── */
+/* ── 对象卡 demo（/api/object/{fid} 回退；schema=object_card.v1 与 object_registry.json 对齐） ──
+   2026-10-08 瘦身：删静态 links 与旧线手工指标（share_max/读位槽——第二事实源易腐），
+   保留 ID/层位/激活示例/技术足迹（有真实数据源或注册表联动）；queue_refs/tm_ids 为注册表引用保留 */
 export const DEMO_OBJECT={
   id:'F#3734',
   label:'is-a 上位关系：水果族',
   layer:'L6 · write 端',
   evidence:'mechanism_evidence',
   collection:'6-l6-teal',
-  metrics:[
-    {k:'E_read',v:0.331615,note:'4b 基线 · Q03 sealed（metric_dict v4）'},
-    {k:'share_max',v:0.03,note:'单头份额 3.0% 内（P4–P7）'},
-    {k:'读位槽 G−1',v:5,note:'维（P4–P7）'},
-  ],
   activations:ACT_LINES,
-  links:[
-    {lens:'spatial',text:'水果族簇 · top-5 邻居在 0.31–0.44'},
-    {lens:'process',text:'Q05 四臂消融已覆盖 · Q06 steering 计划中'},
-    {lens:'progress',text:'支撑 Q05/Q06 节点 · 对标 Attribution Graphs'},
+  tech_footprint:[                       /* 分析技术足迹（client_analysis_tech_plan_v1 §2.3 P0 demo 行） */
+    {tech:'RSA/RDM',level:'observed'},
+    {tech:'η² 分解',level:'observed'},
   ],
   queue_refs:['Q03','Q05','Q06'],
   tm_ids:['TM-04'],
